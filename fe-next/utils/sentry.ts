@@ -182,6 +182,9 @@ const EXPECTED_ERROR_PATTERNS = [
   /already in use/i,
   /already referred/i,
   /cannot refer yourself/i,
+  /not in progress/i,
+  /not in a game/i,
+  /not a word-hunt game/i,
 
   // Socket reconnection (normal lifecycle)
   /transport close/i,

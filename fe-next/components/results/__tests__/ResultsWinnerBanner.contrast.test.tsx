@@ -32,6 +32,16 @@ jest.mock('framer-motion', () => ({
     ),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  useMotionValue: (initial: number) => ({
+    get: () => initial,
+    set: () => {},
+    on: () => () => {},
+  }),
+  useTransform: (_val: unknown, fn: (v: number) => number) => ({
+    get: () => fn(0),
+    on: (_event: string, cb: (v: number) => void) => { cb(0); return () => {}; },
+  }),
+  animate: () => ({ stop: () => {} }),
 }));
 
 jest.mock('next/image', () => ({
@@ -65,6 +75,10 @@ jest.mock('lucide-react', () => ({
 jest.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: () => <div data-testid="mascot">Mascot</div>,
   MascotVariant: {},
+}));
+
+jest.mock('@/components/ui/CelebrationMascot', () => ({
+  CelebrationMascotWithEntrance: () => <div data-testid="mascot">CelebrationMascot</div>,
 }));
 
 import ResultsWinnerBanner from '../ResultsWinnerBanner';

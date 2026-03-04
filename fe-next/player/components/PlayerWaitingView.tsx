@@ -10,6 +10,7 @@ import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/d
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
+import { IdleMascot } from '@/components/ui/IdleMascot';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -66,7 +67,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onNameChange,
 }): React.ReactElement => {
   const { isAuthenticated } = useAuth();
-  const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - playersReady.length);
+  // Filter out host from player roster - players shouldn't see the host as a fellow player
+  const nonHostPlayers = playersReady.filter(player => {
+    const isHostPlayer = typeof player === 'object' ? player.isHost : false;
+    return !isHostPlayer;
+  });
+  const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - nonHostPlayers.length);
   const readySet = new Set(readyUsernames);
 
   // Guest name editing state
@@ -91,7 +97,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
         <AnimatePresence>
-          {playersReady.map((player, index) => {
+          {nonHostPlayers.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
             const avatar = typeof player === 'object' ? player.avatar : null;
             const isHostPlayer = typeof player === 'object' ? player.isHost : false;
@@ -182,6 +188,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className="space-y-3"
     >
+      {/* Welcoming mascot */}
+      <div className="flex justify-center">
+        <IdleMascot baseVariant="waving" size="sm" />
+      </div>
+
       {/* Ready Button */}
       <motion.button
         data-testid="ready-button"
@@ -274,7 +285,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 mb-2">
           {t('hostView.roomChat') || 'Room Chat'}
         </h3>
-        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-48 sm:h-64">
+        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-64 sm:h-80">
           <RoomChat
             username={username}
             isHost={false}
@@ -297,7 +308,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
               <Users className="w-4 h-4 text-neo-cyan" />
               <span className="text-xs font-black text-neo-cream">
-                {playersReady.length}/{MAX_PLAYERS}
+                {nonHostPlayers.length}/{MAX_PLAYERS}
               </span>
             </div>
             <button

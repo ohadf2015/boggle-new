@@ -291,6 +291,18 @@ export function updateUserSocketId(
 }
 
 /**
+ * Update username in socket mappings (for guest name changes)
+ */
+export function updateUsernameMapping(gameCode: string, oldUsername: string, newUsername: string, socketId: string): void {
+  // Remove old mappings
+  usernameToSocket.delete(`${gameCode}:${oldUsername}`);
+
+  // Set new mappings
+  socketToUsername.set(socketId, newUsername);
+  usernameToSocket.set(`${gameCode}:${newUsername}`, socketId);
+}
+
+/**
  * Get all users in a game
  */
 export function getGameUsers(game: GameBase | null): GameUserInfo[] {

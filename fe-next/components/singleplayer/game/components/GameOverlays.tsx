@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
+import { EarthquakeWarning, FireRoundIndicator, FireBottomEffect } from '@/components/earthquake';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
 import { Loader } from '@/components/ui/Loader';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
@@ -80,6 +80,9 @@ export function GameOverlays({
         isActive={fireRoundActive}
         remainingSeconds={fireRoundRemaining}
       />
+
+      {/* Pixelated fire effect at bottom of screen */}
+      <FireBottomEffect isActive={fireRoundActive} />
 
       {/* Word Validation Loading Overlay */}
       <AdaptiveAnimatePresence>

@@ -18,12 +18,14 @@ import { GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
 import { MobileShareSection } from './pre-game/MobileShareSection';
 import { PresetInfoDrawer } from './pre-game/PresetInfoDrawer';
+import { DJMascotWithEntrance } from '@/components/ui/DJMascot';
 import {
   DesktopLobbyLayout,
   InviteCard,
 } from './pre-game/desktop';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
-import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel, GameMode } from '@/shared/types/game';
+import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel } from '@/shared/types/game';
+import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 
 // ==================== Types ====================
 
@@ -116,7 +118,7 @@ function HostPreGameView({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
-  const [selectedGameMode, setSelectedGameMode] = useState<GameMode | 'random'>('random');
+  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>('random');
   const { setGameMode: setStoreGameMode } = useGameActions();
 
   // When host selects a specific mode, update the store
@@ -225,7 +227,16 @@ function HostPreGameView({
     };
   }, [gameCode, gameState, showInviteButton, hideInviteButton, isInviteButtonVisible]);
 
-  const isStartDisabled = !timerValue || filteredPlayersForDisplay.length === 0 || tournamentCreating;
+  // Use actual player count for start logic (not display-filtered list)
+  // In TV mode, exclude host from count since they're spectating
+  const actualPlayerCount = hostPlaying
+    ? playersReady.length
+    : playersReady.filter(p => {
+        const isHostPlayer = typeof p === 'object' ? p.isHost : false;
+        const name = typeof p === 'string' ? p : p.username;
+        return !isHostPlayer && name !== username;
+      }).length;
+  const isStartDisabled = !timerValue || actualPlayerCount === 0 || tournamentCreating;
 
   // Share handler for empty player slots
   const { tryNativeShare } = useNativeShare();
@@ -411,39 +422,12 @@ function HostPreGameView({
           <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-2">
             {t('gameModes.nextMode') || 'Next Mode'}
           </p>
-          <div className="grid grid-cols-4 gap-1.5">
-            {(['random', 'classic', 'blast', 'word-hunt'] as const).map((mode) => {
-              const isActive = selectedGameMode === mode;
-              const modeLabels: Record<string, string> = {
-                random: t('gameModes.random') || 'Random',
-                classic: t('gameModes.classic.name') || 'Classic',
-                blast: t('gameModes.blast.name') || 'Blast',
-                'word-hunt': t('gameModes.wordHunt.name') || 'Word Hunt',
-              };
-              const modeIcons: Record<string, string> = {
-                random: '🎲',
-                classic: '📝',
-                blast: '💥',
-                'word-hunt': '🎯',
-              };
-              return (
-                <button
-                  key={mode}
-                  onClick={() => setSelectedGameMode(mode)}
-                  data-testid={`game-mode-${mode}`}
-                  className={cn(
-                    'py-1.5 rounded-lg font-bold text-[9px] uppercase border-2 border-neo-black transition-colors flex flex-col items-center gap-0.5',
-                    isActive
-                      ? 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60 shadow-hard-sm'
-                      : 'bg-neo-navy/60 text-neo-cream/70 border-neo-white/20 hover:bg-neo-navy hover:text-neo-cream'
-                  )}
-                >
-                  <span className="text-sm">{modeIcons[mode]}</span>
-                  <span className="leading-none">{modeLabels[mode]}</span>
-                </button>
-              );
-            })}
-          </div>
+          <GameModeSelector
+            selectedMode={selectedGameMode}
+            onSelectMode={(mode) => setSelectedGameMode(mode)}
+            t={t}
+            showRandom
+          />
         </div>
 
         {/* TV Mode Toggle - always visible */}
@@ -555,7 +539,7 @@ function HostPreGameView({
         animate="visible"
         custom={4}
       >
-        <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-56 sm:h-72">
+        <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64 sm:h-80">
           <RoomChat
             username="Host"
             isHost={true}
@@ -592,26 +576,29 @@ function HostPreGameView({
       {/* Header - Command Center: Room code + player count + exit */}
       <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
-          {/* Room Code Display */}
-          <div className="flex flex-col">
-            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-widest leading-none mb-1">
-              {t('roomCode.label') || 'Room Code'}
-            </span>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-neo-display font-bold text-neo-cyan uppercase leading-none"
-                style={{ textShadow: '0 0 12px rgba(0, 255, 255, 0.6)' }}
-              >
-                {gameCode}
+          {/* Room Code Display + DJ Mascot */}
+          <div className="flex items-center gap-2">
+            <DJMascotWithEntrance size="sm" delay={0.3} />
+            <div className="flex flex-col">
+              <span className="text-[9px] uppercase font-bold text-slate-400 tracking-widest leading-none mb-1">
+                {t('roomCode.label') || 'Room Code'}
               </span>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(gameCode);
-                }}
-                className="text-slate-400 hover:text-neo-white transition-colors p-1"
-                aria-label={t('roomCode.copy') || 'Copy code'}
-              >
-                <Copy className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-neo-display font-bold text-neo-cyan uppercase leading-none"
+                  style={{ textShadow: '0 0 12px rgba(0, 255, 255, 0.6)' }}
+                >
+                  {gameCode}
+                </span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(gameCode);
+                  }}
+                  className="text-slate-400 hover:text-neo-white transition-colors p-1"
+                  aria-label={t('roomCode.copy') || 'Copy code'}
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
 

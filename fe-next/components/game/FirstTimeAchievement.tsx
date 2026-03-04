@@ -91,7 +91,7 @@ const FirstTimeAchievement = memo<FirstTimeAchievementProps>(({
   const config = currentAchievement ? ACHIEVEMENT_CONFIG[currentAchievement] : null;
 
   const positionClasses = {
-    top: 'top-4',
+    top: 'top-[max(1rem,env(safe-area-inset-top,1rem))]',
     center: 'top-1/2 -translate-y-1/2',
     bottom: 'bottom-4',
   };

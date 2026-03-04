@@ -76,8 +76,7 @@ async function registerTokenWithServer(
       return false;
     }
 
-    const data = await response.json();
-    console.log('Push token registered:', data);
+    await response.json();
     return true;
   } catch (error) {
     console.error('Error registering push token:', error);

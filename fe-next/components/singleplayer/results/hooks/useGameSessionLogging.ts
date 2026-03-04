@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from 'react';
 import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
+import logger from '@/utils/logger';
 import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 
 interface UseGameSessionLoggingParams {
@@ -57,7 +58,7 @@ export function useGameSessionLogging({
           });
         }
       } catch (error) {
-        console.error('Failed to log single player game session:', error);
+        logger.error('[useGameSessionLogging] Failed to log game session:', error);
       }
     }
 

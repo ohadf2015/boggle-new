@@ -292,6 +292,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           minWordLength: minWordLength,
           difficulty: difficulty,
           boardTheme: boardTheme,
+          gameMode: gameMode || 'classic',
         });
 
         neoSuccessToast(t('common.gameStarted'), {
@@ -308,7 +309,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     });
   }, [
     socket, t, setFinalScores, setGameType, difficulty, timerValue, roomLanguage,
-    wordsForBoard, hostPlaying, minWordLength, boardTheme,
+    wordsForBoard, hostPlaying, minWordLength, boardTheme, gameMode,
     setTableData, setRemainingTime, setShowStartAnimation,
     setPlayerWordCounts, setPlayerScores, setHostFoundWords, setHostAchievements
   ]);

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
+import { EarthquakeWarning, FireRoundIndicator, FireBottomEffect } from '@/components/earthquake';
 import TapToDragTooltip from '../../TapToDragTooltip';
 import KeyboardHintTooltip from '../../KeyboardHintTooltip';
 import { KeyboardShortcutsOverlay, KeyboardModeIndicator, KeyboardQuickTip } from '@/components/keyboard';
@@ -62,6 +62,9 @@ export const GameOverlays = memo<GameOverlaysProps>(function GameOverlays({
 
       {/* Fire Round Indicator */}
       <FireRoundIndicator isActive={fireRoundActive} remainingSeconds={fireRoundRemaining} />
+
+      {/* Pixelated fire effect at bottom of screen */}
+      <FireBottomEffect isActive={fireRoundActive} />
 
       {/* Tap-to-drag guidance - shows when player taps single letter without dragging */}
       <TapToDragTooltip

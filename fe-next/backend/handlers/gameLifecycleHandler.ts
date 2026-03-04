@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, LetterGrid, Language, DifficultyLevel, Avatar } from '@/shared/types';
+import type { Game, LetterGrid, Language, DifficultyLevel, Avatar, GameMode } from '@/shared/types';
 
 import {
   createGame,
@@ -25,7 +25,8 @@ import {
   isRoomEmpty,
   markPlayerReadyForNextGame,
   getPlayersReadyCount,
-  removeUserFromGame
+  removeUserFromGame,
+  updateUsernameMapping
 } from '../modules/gameStateManager.js';
 
 import {
@@ -55,6 +56,7 @@ import { stopAllBots } from '../modules/botManager.js';
 import { spamDetector } from '../modules/spamDetector.js';
 import { notifyRoomCreated, notifyGameStarted } from '../modules/notificationService.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
+import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
 
 // Types for payloads
 interface CreateGamePayload {
@@ -78,6 +80,7 @@ interface StartGamePayload {
   minWordLength?: number;
   difficulty?: DifficultyLevel;
   boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null;
+  gameMode?: GameMode | 'random';
 }
 
 interface StartGameAckPayload {
@@ -263,7 +266,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { letterGrid, timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode } = data as any;
+    const { letterGrid, timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode } = data;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -326,6 +329,11 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
       : undefined;
 
+    // Resolve game mode: if 'random' or missing, use weighted random selection
+    const resolvedMode: GameMode = (!gameMode || gameMode === 'random')
+      ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
+      : gameMode as GameMode;
+
     // Update game settings first
     updateGame(gameCode, {
       letterGrid,
@@ -338,8 +346,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       gameStartedAt: Date.now(),
       boardTheme: boardTheme || null, // Store theme for late joiners
       lessonVocabulary: lessonVocabulary,
-      gameMode: gameMode || 'classic',
-      modeHistory: [...(game.modeHistory || []), gameMode || 'classic']
+      gameMode: resolvedMode,
+      modeHistory: [...(game.modeHistory || []), resolvedMode]
     });
 
     // Transition state using state machine
@@ -364,6 +372,32 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     // Initialize game start coordination
     const users = getGameUsers(gameCode);
     const playerUsernames = users.map(u => u.username);
+
+    // Initialize blast mode state if needed
+    if (resolvedMode === 'blast') {
+      const { initBlastModeState } = await import('../modules/blastModeManager.js');
+      const blastState = initBlastModeState(letterGrid, playerUsernames);
+      const currentGame = getGame(gameCode);
+      if (currentGame) {
+        (currentGame as any).blastModeState = blastState;
+      }
+    }
+
+    // Initialize word hunt mode state if needed
+    if (resolvedMode === 'word-hunt') {
+      const { initWordHuntState, selectTargetWord } = await import('../modules/wordHuntManager.js');
+      const trie = getCachedTrie(gameLang);
+      const allValidWords = findAllWords(letterGrid, gameLang, { minLength: 5, maxLength: 8, maxWords: 10000, trie });
+      const targetWord = selectTargetWord(allValidWords, 5, 8);
+      if (targetWord) {
+        const huntState = initWordHuntState(targetWord, playerUsernames);
+        const currentGame = getGame(gameCode);
+        if (currentGame) {
+          (currentGame as any).wordHuntState = huntState;
+        }
+      }
+    }
+
     const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
 
     // Broadcast start
@@ -375,7 +409,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       messageId,
       gameSessionId: game.gameSessionId,
       boardTheme: boardTheme || null,
-      gameMode: game.gameMode || 'classic'
+      gameMode: resolvedMode,
+      ...(resolvedMode === 'blast' ? { blastTileOverlay: (getGame(gameCode) as any)?.blastModeState?.overlay || [] } : {}),
+      ...(resolvedMode === 'word-hunt' ? { wordHuntTargetLength: (getGame(gameCode) as any)?.wordHuntState?.targetWordLength || 0 } : {}),
     });
 
     // Calculate and emit total words on board (async, non-blocking)
@@ -526,7 +562,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         messageId: 'recovery-' + Date.now(),
         reconnect: true,
         skipAck: true,
-        boardTheme: (game as unknown as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null
+        boardTheme: (game as unknown as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null,
+        gameMode: game.gameMode || 'classic'
       });
     }
   });
@@ -680,9 +717,15 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     game.users[trimmedName] = { ...user, username: trimmedName };
     if (trimmedName !== username) {
       delete game.users[username];
+
+      // Update socket-username mappings so subsequent events use the new name
+      updateUsernameMapping(gameCode, username, trimmedName, socket.id);
     }
 
-    // Broadcast updated player list
+    // Confirm name change to the requesting client
+    socket.emit('guestNameUpdated', { oldName: username, newName: trimmedName });
+
+    // Broadcast updated player list to all clients in room
     broadcastToRoom(io, getGameRoom(gameCode), 'playerListUpdate', {
       users: getGameUsers(gameCode),
     });

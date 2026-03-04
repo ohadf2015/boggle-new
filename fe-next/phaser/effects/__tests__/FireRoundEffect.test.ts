@@ -4,10 +4,8 @@
  * Verifies:
  * - Returns null handle when both a11y flags set
  * - Creates ember emitter when reduceMotion false
- * - Creates vignette graphics at depth 50 when disableFireRoundLights false
- * - Adds pulsing alpha tween to vignette (or static alpha when reduceMotion)
- * - stopFireRoundAmbient destroys emitter + kills tweens + destroys vignette
- * - Handles null fields gracefully
+ * - Vignette is always null (removed — fire visuals now in React FireBottomEffect)
+ * - stopFireRoundAmbient destroys emitter + handles null vignette gracefully
  */
 
 import Phaser from 'phaser';
@@ -41,12 +39,6 @@ const ALL_ENABLED: FireRoundA11y = {
 const REDUCE_MOTION: FireRoundA11y = {
   reduceMotion: true,
   disableFireRoundLights: false,
-  isLowEnd: false,
-};
-
-const DISABLE_LIGHTS: FireRoundA11y = {
-  reduceMotion: false,
-  disableFireRoundLights: true,
   isLowEnd: false,
 };
 
@@ -94,34 +86,12 @@ describe('startFireRoundAmbient', () => {
     expect(handle.emitter).toBeNull();
   });
 
-  it('should create vignette graphics when disableFireRoundLights is false', () => {
+  it('should always return null vignette (vignette removed)', () => {
     const scene = createScene();
 
     const handle = startFireRoundAmbient(scene, ALL_ENABLED);
 
-    expect(scene.add.graphics).toHaveBeenCalled();
-    expect(handle.vignette).not.toBeNull();
-  });
-
-  it('should not create vignette when disableFireRoundLights is true', () => {
-    const scene = createScene();
-
-    const handle = startFireRoundAmbient(scene, DISABLE_LIGHTS);
-
     expect(handle.vignette).toBeNull();
-  });
-
-  it('should add pulsing alpha tween to vignette when reduceMotion is false', () => {
-    const scene = createScene();
-
-    startFireRoundAmbient(scene, ALL_ENABLED);
-
-    // Should have tween for vignette pulsing
-    expect(scene.tweens.add).toHaveBeenCalled();
-    const tweenConfig = (scene.tweens.add as jest.Mock).mock.calls.find(
-      (call: unknown[]) => (call[0] as { yoyo?: boolean })?.yoyo === true
-    );
-    expect(tweenConfig).toBeDefined();
   });
 });
 
@@ -138,7 +108,7 @@ describe('stopFireRoundAmbient', () => {
     expect(mockEmitter.destroy).toHaveBeenCalledTimes(1);
   });
 
-  it('should kill vignette tweens and destroy vignette', () => {
+  it('should kill vignette tweens and destroy vignette if somehow present', () => {
     const scene = createScene();
     const mockVignette = { destroy: jest.fn() };
     const handle: FireRoundHandle = { emitter: null, vignette: mockVignette };

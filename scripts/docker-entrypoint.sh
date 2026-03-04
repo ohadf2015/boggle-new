@@ -9,4 +9,4 @@ fi
 
 # Start the server
 echo "🚀 Starting server..."
-exec node server.js
+exec node dist/server.cjs

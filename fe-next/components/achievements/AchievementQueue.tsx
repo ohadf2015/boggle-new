@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, createContext, useContext, ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UnifiedAchievementModal } from './UnifiedAchievementModal';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -128,20 +129,23 @@ function AchievementInlineToast({
     return () => clearTimeout(timer);
   }, [onDismiss]);
 
-  return (
+  // Portal to document.body to escape ancestor overflow-x:clip
+  // which clips fixed-positioned elements in the locale layout
+  const toast = (
     <motion.div
       data-testid="achievement-inline-toast"
       initial={{ y: -60, opacity: 0, scale: 0.9 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
       exit={{ y: -40, opacity: 0, scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-navy pointer-events-auto"
+      className="fixed left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-navy pointer-events-auto"
       style={{
+        top: 'max(1rem, env(safe-area-inset-top, 1rem))',
         boxShadow: isRtl
           ? '-4px 4px 0px #FFE135'
           : '4px 4px 0px #FFE135',
-        minWidth: '280px',
-        maxWidth: '420px',
+        minWidth: 'min(280px, calc(100vw - 2rem))',
+        maxWidth: 'min(420px, calc(100vw - 2rem))',
       }}
     >
       {/* Achievement Icon */}
@@ -171,6 +175,12 @@ function AchievementInlineToast({
       </div>
     </motion.div>
   );
+
+  // Use portal to render at body level, escaping overflow constraints
+  if (typeof document !== 'undefined') {
+    return createPortal(toast, document.body);
+  }
+  return toast;
 }
 
 /**

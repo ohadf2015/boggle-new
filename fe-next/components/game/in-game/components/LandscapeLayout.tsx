@@ -20,6 +20,8 @@ import FloatingScoreAnimation from '../../FloatingScoreAnimation';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer } from '@/shared/types/view';
 import type { HintsState, EarthquakeState, TranslationFn, TappedCellPosition } from '../types';
+import { LeadChangeBanner } from '../../LeadChangeBanner';
+import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
 
 interface LandscapeLayoutProps {
   // Core props
@@ -91,6 +93,9 @@ interface LandscapeLayoutProps {
 
   // Min word length for score breakdown
   minWordLength: number;
+
+  // Lead change notification
+  leadChangeEvent?: LeadChangeEvent | null;
 }
 
 /**
@@ -141,6 +146,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   onCloseHelp,
   children,
   minWordLength,
+  leadChangeEvent,
 }) {
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
@@ -233,13 +239,15 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
             )}
           >
             {isPlaying && (
-              <WordFormingArea
-                word={isTypingMode ? typedWord : formedWord}
-                letterCount={isTypingMode ? typedWord.length : letterCount}
-                feedback={currentFeedback}
-                compact
-                className="mb-1 flex-shrink-0 z-50"
-              />
+              <div className="relative mb-1 flex-shrink-0 z-50">
+                <LeadChangeBanner event={leadChangeEvent ?? null} />
+                <WordFormingArea
+                  word={isTypingMode ? typedWord : formedWord}
+                  letterCount={isTypingMode ? typedWord.length : letterCount}
+                  feedback={currentFeedback}
+                  compact
+                />
+              </div>
             )}
             <div
               className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0 aspect-square"

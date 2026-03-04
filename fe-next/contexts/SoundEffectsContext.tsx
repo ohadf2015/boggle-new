@@ -7,6 +7,7 @@ import logger from '@/utils/logger';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
 import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY } from '@/lib/audio/audioLoader';
+import { getCountdownBeepParams } from '@/utils/countdownBeepParams';
 
 interface SoundEffectOptions {
   volume?: number;
@@ -151,7 +152,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
           error.message.includes('audio device')) {
         // Prevent this error from being reported to Sentry
         event.preventDefault();
-        logger.warn('[SFX] iOS Safari audio device error (silenced):', error.message);
+        logger.log('[SFX] iOS Safari audio device error (silenced):', error.message);
       }
     };
 
@@ -220,12 +221,12 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
           logger.log(`[SFX] Loaded: ${key}`);
         },
         onloaderror: (id, err) => {
-          logger.warn(`[SFX] Failed to load ${key}:`, err);
+          logger.log(`[SFX] Failed to load ${key}:`, err);
         },
         onplayerror: (id, err) => {
           // Silently handle iOS Safari audio device errors
           // These occur when the device can't start audio (e.g., silent mode, bluetooth issues)
-          logger.warn(`[SFX] Failed to play ${key}:`, err);
+          logger.log(`[SFX] Failed to play ${key}:`, err);
         },
       });
     });
@@ -264,7 +265,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       try {
         await preloadAudioOnDemand(howl);
       } catch (err) {
-        logger.warn(`[SFX] Failed to load ${soundKey}, skipping playback:`, err);
+        logger.log(`[SFX] Failed to load ${soundKey}, skipping playback:`, err);
         return; // Don't try to play if loading failed
       }
     }
@@ -285,7 +286,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       howl.play();
     } catch (err) {
       // Silently handle play errors (iOS can throw InvalidStateError)
-      logger.warn(`[SFX] Play error for ${soundKey}:`, err);
+      logger.log(`[SFX] Play error for ${soundKey}:`, err);
     }
   }, [audioUnlocked, sfxMuted, sfxVolume]);
 
@@ -320,17 +321,15 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playSound('wordAccepted', { volume: 0.4 });
   }, [playSound]);
 
-  // Play countdown beep with increasing pitch (3, 2, 1 seconds remaining)
-  // secondsRemaining: 3 = lowest pitch, 1 = highest pitch
+  // Play countdown beep with increasing pitch (10→1 seconds remaining)
+  // Smooth linear ramp: rate 0.7→1.4, volume 0.3→0.9
   const playCountdownBeep = useCallback((secondsRemaining: number) => {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
-    // Pitch increases as we get closer to 0: 3->1.0, 2->1.2, 1->1.4
-    const pitchMap: Record<number, number> = { 3: 1.0, 2: 1.2, 1: 1.4 };
-    const rate = pitchMap[secondsRemaining] || 1.0;
-    const volume = secondsRemaining === 1 ? 0.9 : 0.7; // Loudest on final beep
+    const params = getCountdownBeepParams(secondsRemaining);
+    if (!params) return;
 
-    playSound('countdownBeep', { rate, volume });
+    playSound('countdownBeep', { rate: params.rate, volume: params.volume });
   }, [audioUnlocked, sfxMuted, playSound]);
 
   // Play chat message notification sound
@@ -429,7 +428,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       try {
         await preloadAudioOnDemand(howl);
       } catch (err) {
-        logger.warn('[SFX] Failed to load fire crackle loop, skipping:', err);
+        logger.log('[SFX] Failed to load fire crackle loop, skipping:', err);
         return;
       }
     }
@@ -445,7 +444,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       logger.log('[SFX] Started fire crackle loop');
     } catch (err) {
       // Silently handle play errors (iOS can throw InvalidStateError)
-      logger.warn('[SFX] Fire crackle loop play error:', err);
+      logger.log('[SFX] Fire crackle loop play error:', err);
     }
   }, [audioUnlocked, sfxMuted, sfxVolume]);
 

@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from 'react';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
+import logger from '@/utils/logger';
 import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
@@ -49,17 +50,21 @@ export function useGuestStatsSync({
       : 0;
 
     // Update guest stats with all tracked data
-    updateGuestStatsAfterGame({
-      score: results.playerScore,
-      wordCount: validWords.length,
-      longestWord,
-      isWinner,
-      achievements: results.achievements?.map(a => a.key) || [],
-      comboBonus: totalComboBonus,
-      fireRoundBonus: totalFireRoundBonus,
-      archetype: playerArchetype?.id,
-      averageWordLength: avgWordLength,
-    });
+    try {
+      updateGuestStatsAfterGame({
+        score: results.playerScore,
+        wordCount: validWords.length,
+        longestWord,
+        isWinner,
+        achievements: results.achievements?.map(a => a.key) || [],
+        comboBonus: totalComboBonus,
+        fireRoundBonus: totalFireRoundBonus,
+        archetype: playerArchetype?.id,
+        averageWordLength: avgWordLength,
+      });
+    } catch (err) {
+      logger.error('[useGuestStatsSync] Failed to update guest stats:', err);
+    }
 
     hasUpdatedStatsRef.current = true;
   }, [isAuthenticated, results, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);

@@ -22,6 +22,7 @@ import NextStepPrompt from '@/components/results/NextStepPrompt';
 import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { AdPlaceholder } from '@/components/ads';
+import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 
 // ==============================================
 // TYPES
@@ -112,6 +113,10 @@ export interface ResultsMainContentProps {
   isMobile?: boolean;
   /** All player words for comparative insights */
   allPlayerWords?: Record<string, Array<{ word: string; score: number }>>;
+  /** Selected game mode for next game (host only) */
+  selectedGameMode?: GameModeOption;
+  /** Callback to change game mode (host only) */
+  onSelectGameMode?: (mode: GameModeOption) => void;
 }
 
 // ==============================================
@@ -155,6 +160,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   bannerSize = '320x50',
   isMobile = false,
   allPlayerWords,
+  selectedGameMode,
+  onSelectGameMode,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -192,15 +199,32 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           <>
             <div className="mt-2">
               {isHost ? (
-                <motion.button
-                  onClick={onStartGame}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
-                >
-                  <Play className="w-6 h-6" />
-                  {t('hostView.startGame') || 'Start Game'}
-                </motion.button>
+                <div className="space-y-2">
+                  {/* Game Mode Selector - host can override before starting */}
+                  {selectedGameMode !== undefined && onSelectGameMode && (
+                    <div className="bg-neo-navy-light/50 border-2 border-neo-white/10 rounded-neo p-2">
+                      <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-1.5">
+                        {t('gameModes.nextMode') || 'Next Mode'}
+                      </p>
+                      <GameModeSelector
+                        selectedMode={selectedGameMode}
+                        onSelectMode={onSelectGameMode}
+                        t={t}
+                        showRandom
+                        compact
+                      />
+                    </div>
+                  )}
+                  <motion.button
+                    onClick={onStartGame}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                  >
+                    <Play className="w-6 h-6" />
+                    {t('hostView.startGame') || 'Start Game'}
+                  </motion.button>
+                </div>
               ) : isCurrentPlayerReady ? (
                 <div className="bg-emerald-500 text-white border-3 border-neo-black rounded-neo p-3 shadow-hard">
                   <div className="flex items-center justify-center gap-2">

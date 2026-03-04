@@ -184,6 +184,9 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
     // otherwise word validation will fail (words won't be found on new grid)
     updateGame(gameCode, { letterGrid: newGrid, letterPositions: newPositions });
 
+    // Mark fire round active in server game state (source of truth for scoring)
+    updateGame(gameCode, { fireRoundActive: true });
+
     // Broadcast fire round start with new grid
     broadcastToRoom(io, room, 'fireRoundStart', {
       gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
@@ -198,6 +201,9 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
 
   // Phase 4: FIRE ROUND END (after 18 seconds = 3s + 15s fire round)
   const fireEndTimer = setTimeout(() => {
+    // Mark fire round inactive in server game state
+    updateGame(gameCode, { fireRoundActive: false });
+
     broadcastToRoom(io, room, 'fireRoundEnd', {
       gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
     });

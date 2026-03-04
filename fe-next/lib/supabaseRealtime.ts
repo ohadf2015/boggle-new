@@ -101,6 +101,7 @@ function getOrCreateClassroomProgressChannel(classroomId: string): RealtimeChann
         table: 'student_lesson_progress'
       },
       (payload) => {
+        if (!payload) return;
         logger.log('[Realtime] Classroom progress change:', payload.eventType, payload.new);
 
         // Get callbacks for this classroom
@@ -183,6 +184,7 @@ function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
         table: 'leaderboard'
       },
       (payload) => {
+        if (!payload) return;
         logger.log('[Realtime] Leaderboard change:', payload.eventType, payload.new ? `player: ${(payload.new as { username?: string }).username}` : '');
         // Notify all subscribers with debouncing per callback
         leaderboardCallbacks.forEach(callback => {
@@ -365,6 +367,7 @@ export function subscribeToProfile(
         filter: `id=eq.${userId}`
       },
       (payload) => {
+        if (!payload) return;
         logger.log('[Realtime] Profile updated:', payload.new);
         onUpdate(payload.new);
       }
@@ -409,6 +412,7 @@ export function subscribeToGameResults(
         filter: `player_id=eq.${userId}`
       },
       (payload) => {
+        if (!payload) return;
         logger.log('[Realtime] New game result:', payload.new);
         onNewResult(payload.new);
       }

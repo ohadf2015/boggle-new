@@ -16,6 +16,7 @@ import {
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { StartGameBroadcast, XpGainedPayload, LevelUpPayload } from '@/shared/types/socket';
+import { useGameStore } from '@/hooks/gameState/store';
 
 interface UseHostGameEventsProps {
   socket: Socket | null;
@@ -31,6 +32,7 @@ interface UseHostGameEventsProps {
   setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
   setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
   setFinalScores: React.Dispatch<React.SetStateAction<any>>;
+  setPlayersReady?: React.Dispatch<React.SetStateAction<any[]>>;
   setPlayerWordCounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setPlayerScores: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setPlayerAchievements: React.Dispatch<React.SetStateAction<Record<string, any[]>>>;
@@ -105,6 +107,7 @@ export function useHostGameEvents({
   intentionalExitRef,
   onShowResults,
   onGameStart,
+  setPlayersReady,
 }: UseHostGameEventsProps): UseHostGameEventsReturn {
   // Use refs to avoid stale closure issues
   const onShowResultsRef = useRef(onShowResults);
@@ -172,6 +175,11 @@ export function useHostGameEvents({
       }
       if (data.timerSeconds !== undefined) {
         setRemainingTime(data.timerSeconds);
+      }
+
+      // Sync resolved game mode from server (handles random → actual mode)
+      if ((data as any).gameMode) {
+        useGameStore.getState().setGameMode((data as any).gameMode);
       }
 
       // Reset state for new game
@@ -280,6 +288,11 @@ export function useHostGameEvents({
       setTournamentCreating(false);
       setXpGainedData(null);
       setLevelUpData(null);
+
+      // Refresh player list from server data so host can start next game
+      if (data.users && setPlayersReady) {
+        setPlayersReady(data.users);
+      }
     };
 
     // Register listeners
@@ -334,6 +347,7 @@ export function useHostGameEvents({
     handleRoomClosedDueToInactivity,
     earthquakeHandlers,
     onGameStart,
+    setPlayersReady,
   ]); // hostPlaying accessed via hostPlayingRef for event handlers
 
   return { gameSessionIdRef, gameSessionId };

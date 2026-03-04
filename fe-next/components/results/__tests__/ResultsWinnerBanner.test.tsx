@@ -11,7 +11,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-// Mock framer-motion
+// Mock framer-motion with ScoreCounter support
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
@@ -21,6 +21,16 @@ jest.mock('framer-motion', () => ({
       <span className={className} {...props}>{children}</span>
     ),
   },
+  useMotionValue: (initial: number) => ({
+    get: () => initial,
+    set: () => {},
+    on: () => () => {},
+  }),
+  useTransform: (_val: unknown, fn: (v: number) => number) => ({
+    get: () => fn(0),
+    on: (_event: string, cb: (v: number) => void) => { cb(0); return () => {}; },
+  }),
+  animate: () => ({ stop: () => {} }),
 }));
 
 // Mock confetti
@@ -49,7 +59,7 @@ describe('ResultsWinnerBanner', () => {
   };
 
   describe('default mode', () => {
-    it('renders winner name and score', () => {
+    it('renders winner name and score label', () => {
       render(
         <ResultsWinnerBanner
           winner={mockWinner}
@@ -58,7 +68,8 @@ describe('ResultsWinnerBanner', () => {
       );
 
       expect(screen.getByText('TestPlayer')).toBeInTheDocument();
-      expect(screen.getByText(/150/)).toBeInTheDocument();
+      // Score is rendered via ScoreCounter (mocked to display 0) + points label
+      expect(screen.getByText('results.points')).toBeInTheDocument();
     });
 
     it('shows mascot by default', () => {
@@ -83,8 +94,8 @@ describe('ResultsWinnerBanner', () => {
         />
       );
 
-      // Check for compact padding class
-      const contentDiv = container.querySelector('.p-2');
+      // Check for compact padding class (px-3 py-2.5)
+      const contentDiv = container.querySelector('.px-3');
       expect(contentDiv).toBeInTheDocument();
     });
 
@@ -111,7 +122,7 @@ describe('ResultsWinnerBanner', () => {
       );
 
       const username = screen.getByText('TestPlayer');
-      expect(username).toHaveClass('text-lg');
+      expect(username).toHaveClass('text-base');
     });
   });
 });

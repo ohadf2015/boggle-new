@@ -406,12 +406,14 @@ export async function submitDuelTurn(
  * @returns Array of pending duel rows or error
  */
 export async function getPendingDuelsForStudent(
-  studentId: string
+  studentId: string,
+  client?: import('@supabase/supabase-js').SupabaseClient
 ): Promise<{ data: DuelRow[]; error: { message: string } | null }> {
   try {
-    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+    const db = client ?? supabase;
+    if (!db) return { data: [], error: { message: 'Supabase not configured' } };
 
-    const { data: duels, error } = await supabase
+    const { data: duels, error } = await db
       .from('student_duels')
       .select('*')
       .eq('opponent_id', studentId)

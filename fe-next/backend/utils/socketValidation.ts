@@ -285,14 +285,14 @@ export const submitWordSchema = compiledSchemas?.submitWordSchema || z.object({
   username: usernameSchema.optional(),
   word: wordSchema,
   path: z.array(gridPositionSchema).optional(),
-  comboLevel: z.number().int().min(0).max(100).optional(),
-  fireRoundActive: z.boolean().optional().default(false),
+  // comboLevel and fireRoundActive deliberately omitted — derived server-side
+  // to prevent clients from spoofing score multipliers
 });
 
 export const submitWordVoteSchema = compiledSchemas?.submitWordVoteSchema || z.object({
   gameCode: gameCodeSchema.optional(),
   word: wordSchema,
-  voteType: z.enum(['like', 'dislike']).optional(),
+  voteType: z.enum(['valid', 'invalid']).optional(),
   isValid: z.boolean().optional(),
   language: languageSchema.optional(),
   submittedBy: usernameSchema.optional(),

@@ -29,32 +29,24 @@ export interface AdminAuthResult {
  * @returns Admin auth result with user or error response
  */
 export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthResult> {
-  const startTime = Date.now();
-
   // First try Bearer token authentication
   const authHeader = request.headers.get('authorization');
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const result = await verifyBearerToken(authHeader.substring(7));
     if (result.success) {
-      const authDuration = Date.now() - startTime;
-      console.log(`[AdminAuth] Bearer auth successful for ${result.user?.email} in ${authDuration}ms`);
       return result;
     }
     // If Bearer token provided but invalid, don't fall back to cookie auth
-    console.log('[AdminAuth] Bearer token provided but invalid');
     return result;
   }
 
   // Fall back to cookie-based session auth
   const cookieResult = await verifyCookieSession();
   if (cookieResult.success) {
-    const authDuration = Date.now() - startTime;
-    console.log(`[AdminAuth] Cookie auth successful for ${cookieResult.user?.email} in ${authDuration}ms`);
     return cookieResult;
   }
 
   // Neither auth method succeeded
-  console.log('[AdminAuth] No valid authentication found');
   return {
     success: false,
     error: 'Missing authorization header',
@@ -114,12 +106,10 @@ async function verifyBearerToken(token: string): Promise<AdminAuthResult> {
         username: profile.username,
       },
     };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[AdminAuth] Bearer token verification error:', errorMessage);
+  } catch {
     return {
       success: false,
-      error: errorMessage,
+      error: 'Authentication failed',
       response: NextResponse.json(
         { error: 'Authentication failed' },
         { status: 500 }
@@ -174,12 +164,10 @@ async function verifyCookieSession(): Promise<AdminAuthResult> {
         username: profile.username,
       },
     };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[AdminAuth] Cookie session verification error:', errorMessage);
+  } catch {
     return {
       success: false,
-      error: errorMessage,
+      error: 'Authentication failed',
       response: NextResponse.json(
         { error: 'Authentication failed' },
         { status: 500 }

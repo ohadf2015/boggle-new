@@ -7,6 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
+import logger from '@/utils/logger';
 import type { SinglePlayerResultsData, SinglePlayerMode } from '../../SinglePlayerView';
 
 interface UseCognitiveScoringParams {
@@ -36,6 +37,9 @@ export function useCognitiveScoring({
   const { saveCognitiveScore } = useSaveCognitiveScore();
   const [brainPointsReward, setBrainPointsReward] = useState<BrainPointsReward | null>(null);
   const hasSavedCognitiveScoreRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => () => { mountedRef.current = false; }, []);
 
   useEffect(() => {
     if (hasSavedCognitiveScoreRef.current) return;
@@ -64,13 +68,15 @@ export function useCognitiveScoring({
       hintsUsed: 0, // Single player mode doesn't have hints
       gameSessionId: results.gameSessionId,
     }).then(cognitiveResult => {
-      if (cognitiveResult) {
-        console.log('[useCognitiveScoring] Cognitive scores saved:', cognitiveResult);
+      if (cognitiveResult && mountedRef.current) {
+        logger.log('[useCognitiveScoring] Cognitive scores saved:', cognitiveResult);
         setBrainPointsReward({
           scoreDelta: cognitiveResult.scoreDelta,
           newScore: cognitiveResult.overallScore
         });
       }
+    }).catch((err: unknown) => {
+      logger.error('[useCognitiveScoring] Failed to save cognitive score:', err);
     });
 
     hasSavedCognitiveScoreRef.current = true;

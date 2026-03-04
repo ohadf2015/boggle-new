@@ -2,10 +2,11 @@
  * FireRoundEffect — ambient visual effects during fire round.
  *
  * Handle-based lifecycle:
- *   startFireRoundAmbient → FireRoundHandle (emitter + vignette)
- *   stopFireRoundAmbient  → destroys both
+ *   startFireRoundAmbient → FireRoundHandle (emitter only, vignette removed)
+ *   stopFireRoundAmbient  → destroys emitter
  *
- * Respects reduceMotion (no embers) and disableFireRoundLights (no vignette).
+ * Respects reduceMotion (no embers).
+ * The main fire visual is now a React canvas component (FireBottomEffect).
  */
 
 import Phaser from 'phaser';
@@ -22,7 +23,7 @@ export interface FireRoundHandle {
   vignette: { destroy: () => void } | null;
 }
 
-/** Start ambient fire round visuals: embers + red vignette overlay. */
+/** Start ambient fire round visuals: embers only (vignette removed). */
 export function startFireRoundAmbient(
   scene: Phaser.Scene,
   a11y: FireRoundA11y
@@ -33,35 +34,10 @@ export function startFireRoundAmbient(
     isLowEnd: a11y.isLowEnd,
   });
 
-  // Vignette overlay
-  let vignette: FireRoundHandle['vignette'] = null;
-  if (!a11y.disableFireRoundLights) {
-    const g = scene.add.graphics();
-    g.fillStyle(0xff2d20, 0.1);
-    g.fillRect(0, 0, scene.scale.width, scene.scale.height);
-    g.setDepth(50);
-
-    if (!a11y.reduceMotion) {
-      // Pulsing alpha
-      scene.tweens.add({
-        targets: g,
-        alpha: { from: 0.1, to: 0.2 },
-        duration: 1200,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-    } else {
-      g.setAlpha(0.15);
-    }
-
-    vignette = g;
-  }
-
-  return { emitter, vignette };
+  return { emitter, vignette: null };
 }
 
-/** Stop ambient fire round visuals, cleaning up emitter and vignette. */
+/** Stop ambient fire round visuals, cleaning up emitter. */
 export function stopFireRoundAmbient(
   scene: Phaser.Scene,
   handle: FireRoundHandle

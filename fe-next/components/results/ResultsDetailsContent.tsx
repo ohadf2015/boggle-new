@@ -20,6 +20,8 @@ const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt
 const MissedWordsComponent = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
+const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
+const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -90,6 +92,12 @@ export interface ResultsDetailsContentProps {
   showBanner?: boolean;
   /** Banner size for CrazyGames */
   bannerSize?: '320x50' | '300x250';
+  /** Resolved game mode */
+  gameMode?: string;
+  /** Blast mode results data */
+  blastResults?: { movesUsed: number; tilesCleared: number; tileBonus: number };
+  /** Word Hunt mode results data */
+  wordHuntResults?: { targetWord: string; foundTarget: boolean; isFirstFinder: boolean; survivalTime: number; discoveryWords: number };
 }
 
 // ==============================================
@@ -128,6 +136,9 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
   hideRankAndScore = false,
   showBanner = false,
   bannerSize = '300x250',
+  gameMode,
+  blastResults,
+  wordHuntResults,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -148,6 +159,14 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
           duplicateRuleDisabled={duplicateRuleDisabled}
           hideRankAndScore={hideRankAndScore}
         />
+      )}
+
+      {/* Mode-specific results summary */}
+      {gameMode === 'blast' && blastResults && (
+        <BlastResultsSummary {...blastResults} />
+      )}
+      {gameMode === 'word-hunt' && wordHuntResults && (
+        <WordHuntResultsSummary {...wordHuntResults} />
       )}
 
       {/* Share Prompt */}
@@ -228,7 +247,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
 
       {/* Room Chat */}
       {gameCode && sortedScores.length > 1 && username && (
-        <RoomChat username={username} isHost={isHost} gameCode={gameCode} className="max-h-[250px]" />
+        <RoomChat username={username} isHost={isHost} gameCode={gameCode} className="max-h-[350px]" />
       )}
 
       {/* CrazyGames Banner Ad */}

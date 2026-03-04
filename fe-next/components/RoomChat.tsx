@@ -260,7 +260,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         {/* Messages Area with Virtual Scrolling */}
         <div
           ref={parentRef}
-          className={`flex-1 overflow-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 ${variant === 'embedded' ? '' : 'max-h-[250px] sm:max-h-[350px] md:max-h-[400px]'}`}
+          className={`flex-1 overflow-auto pr-2 min-h-0 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 ${variant === 'embedded' ? '' : 'max-h-[300px] sm:max-h-[400px] md:max-h-[500px]'}`}
         >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-4 gap-2">

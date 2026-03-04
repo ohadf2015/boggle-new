@@ -18,6 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useWinStreak } from '@/hooks/useWinStreak';
 import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
+import logger from '@/utils/logger';
 import {
   getGuestStatsSummary,
   updateGuestStatsAfterGame,
@@ -242,6 +243,8 @@ export function useResultsSideEffects({
           }
         ).then(() => {
           refreshCoins();
+        }).catch((err: unknown) => {
+          logger.error('[useResultsSideEffects] Coin sync failed:', err);
         });
       }
     }
@@ -279,23 +282,28 @@ export function useResultsSideEffects({
       timestamp: w.timestamp,
     }));
 
-    const sessionId = `mp_${gameCode}_${Date.now()}`;
+    // gridSize is the grid dimension (e.g. 4 for 4x4), convert to total cells
+    const totalCells = gridSize * gridSize;
 
     saveCognitiveScore({
       playerWordData,
       gameDuration,
-      gridSize,
+      gridSize: totalCells,
       maxCombo,
       hintsUsed: 0,
-      gameSessionId: sessionId,
+      // No gameSessionId for multiplayer — the mp_ format is not a valid UUID
+      // and would be rejected by FK constraint. Cognitive scores are still saved
+      // but without a session link.
     }).then((cognitiveResult) => {
       if (cognitiveResult) {
-        console.log('[useResultsSideEffects] Cognitive scores saved:', cognitiveResult);
+        logger.log('[useResultsSideEffects] Cognitive scores saved:', cognitiveResult);
         setBrainPointsReward({
           scoreDelta: cognitiveResult.scoreDelta,
           newScore: cognitiveResult.overallScore,
         });
       }
+    }).catch((err: unknown) => {
+      logger.error('[useResultsSideEffects] Cognitive score save failed:', err);
     });
 
     hasSavedCognitiveScoreRef.current = true;

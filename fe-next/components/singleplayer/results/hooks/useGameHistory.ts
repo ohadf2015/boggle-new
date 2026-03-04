@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from 'react';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
+import logger from '@/utils/logger';
 import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
@@ -46,22 +47,26 @@ export function useGameHistory({
       ? validWords.reduce((sum, w) => sum + w.word.length, 0) / validWords.length
       : 0;
 
-    addGameToHistory({
-      score: results.playerScore,
-      wordCount: validWords.length,
-      accuracy,
-      rank: playerRank,
-      totalPlayers: totalParticipants,
-      mode: 'single',
-      isWinner,
-      longestWordLength,
-      duration: results.gameDuration,
-      comboBonus: totalComboBonus,
-      fireRoundBonus: totalFireRoundBonus,
-      archetype: playerArchetype?.id,
-      averageWordLength: avgWordLength,
-      achievementCount: results.achievements?.length || 0,
-    });
+    try {
+      addGameToHistory({
+        score: results.playerScore,
+        wordCount: validWords.length,
+        accuracy,
+        rank: playerRank,
+        totalPlayers: totalParticipants,
+        mode: 'single',
+        isWinner,
+        longestWordLength,
+        duration: results.gameDuration,
+        comboBonus: totalComboBonus,
+        fireRoundBonus: totalFireRoundBonus,
+        archetype: playerArchetype?.id,
+        averageWordLength: avgWordLength,
+        achievementCount: results.achievements?.length || 0,
+      });
+    } catch (err) {
+      logger.error('[useGameHistory] Failed to add game to history:', err);
+    }
 
     hasAddedToHistoryRef.current = true;
   }, [results, playerRank, totalParticipants, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);

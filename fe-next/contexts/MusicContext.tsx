@@ -149,17 +149,17 @@ export function MusicProvider({ children }: MusicProviderProps) {
             loop: true,
             volume: 0,
             onloaderror: (id, err) => {
-                logger.warn(`[Music] Failed to load ${key}:`, err);
+                logger.log(`[Music] Failed to load ${key}:`, err);
             },
             onplayerror: (id, err) => {
-                logger.warn(`[Music] Failed to play ${key}:`, err);
+                logger.log(`[Music] Failed to play ${key}:`, err);
                 if (Howler.ctx && Howler.ctx.state === 'suspended') {
                     Howler.ctx.resume()
                         .then(() => {
                             try {
                                 howlsRef.current[key]?.play();
                             } catch (playErr) {
-                                logger.warn(`[Music] Retry play failed for ${key}:`, playErr);
+                                logger.log(`[Music] Retry play failed for ${key}:`, playErr);
                             }
                         })
                         .catch((resumeErr: Error) => {
@@ -599,7 +599,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
                     await Howler.ctx.resume();
                     logger.log('[Music] AudioContext resumed successfully');
                 } catch (err) {
-                    logger.warn('[Music] Failed to resume AudioContext:', err);
+                    logger.log('[Music] Failed to resume AudioContext:', err);
                 }
             }
 
@@ -742,7 +742,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 await preloadAudioOnDemand(howl);
                 logger.log('[Music] Track preloaded successfully:', trackKey);
             } catch (err) {
-                logger.warn('[Music] Failed to preload track:', trackKey, err);
+                logger.log('[Music] Failed to preload track:', trackKey, err);
             }
         } else {
             logger.log('[Music] Track already loaded:', trackKey);

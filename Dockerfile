@@ -1,62 +1,80 @@
-# Multi-stage build for production
+# syntax=docker/dockerfile:1
+
+# ── Stage 1: Install dependencies ────────────────────────────────────
+FROM node:20-alpine AS deps
+
+WORKDIR /app
+
+# Copy only package files — source changes won't bust this layer
+COPY fe-next/package.json fe-next/package-lock.json ./
+
+# npm ci: deterministic, skips resolution. Cache mount persists across builds.
+# --no-audit --no-fund: skip advisory checks during install (saves ~5s)
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --no-audit --no-fund
+
+# ── Stage 2: Build Next.js (standalone) + bundle server ─────────────
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY fe-next/package*.json ./
-
-# Install ALL dependencies (including devDependencies needed for build)
-RUN npm install
-
-# Copy application files
+# Reuse cached node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
 COPY fe-next/ ./
 
-# Build Next.js app in production mode
+# Persist .next/cache across builds — webpack/SWC compilation cache
 ENV NODE_ENV=production
-RUN npm run build --ignore-scripts
 
-# Production stage
-FROM node:20-alpine
+# NEXT_TELEMETRY_DISABLED: skip telemetry network calls during build
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build Next.js with standalone output → .next/standalone/
+RUN --mount=type=cache,target=/app/.next/cache \
+    npm run build --ignore-scripts
+
+# Bundle the custom Express server with esbuild → dist/server.cjs
+# This replaces runtime tsx transpilation for faster cold starts
+RUN node scripts/bundle-server.mjs
+
+# ── Stage 3: Production image (slim) ─────────────────────────────────
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Set production environment
 ENV NODE_ENV=production
 
-# Install curl for healthcheck and bash for scripts
-RUN apk add --no-cache curl bash
+# Combine apk + supabase CLI into one layer to reduce layer count
+RUN apk add --no-cache curl bash && \
+    (curl -fsSL https://raw.githubusercontent.com/supabase/cli/main/install.sh | bash || \
+     wget -qO- https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz -C /usr/local/bin)
 
-# Install Supabase CLI for migrations
-RUN curl -fsSL https://raw.githubusercontent.com/supabase/cli/main/install.sh | bash || \
-    (wget -qO- https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz -C /usr/local/bin)
+# Copy standalone Next.js output (includes minimal node_modules)
+COPY --from=builder --chown=node:node --link /app/.next/standalone ./
 
-# Copy built app and dependencies
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/server.js ./
-COPY --from=builder /app/server ./server
-COPY --from=builder /app/backend ./backend
-COPY --from=builder /app/utils ./utils
-COPY --from=builder /app/contexts ./contexts
-COPY --from=builder /app/lib ./lib
-COPY --from=builder /app/hooks ./hooks
-COPY --from=builder /app/supabase ./supabase
-COPY --from=builder /app/next.config.mjs ./
+# Copy static assets and public (not included in standalone output)
+COPY --from=builder --chown=node:node --link /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
+
+# Copy bundled server + worker + dictionary files
+COPY --from=builder --chown=node:node /app/dist ./dist
+
+# Copy dictionary txt files to app root for dictionaryEnrichment.ts
+# (uses path.resolve(__dirname, '../hebrew_words_approved.txt') from dist/)
+COPY --from=builder --chown=node:node /app/backend/*.txt ./
+
+# Copy supabase migrations
+COPY --from=builder --chown=node:node /app/supabase ./supabase
 
 # Copy scripts
-COPY scripts/docker-migrate.sh ./scripts/docker-migrate.sh
-COPY scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
+COPY --chown=node:node scripts/docker-migrate.sh scripts/docker-entrypoint.sh ./scripts/
 RUN chmod +x ./scripts/*.sh
 
-# Expose port
+# Run as non-root for security (node user exists in node:alpine)
+USER node
+
 EXPOSE 3001
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3001/ || exit 1
 
-# Run entrypoint (migrations + server)
 ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]

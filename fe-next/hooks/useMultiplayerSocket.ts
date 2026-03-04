@@ -326,10 +326,14 @@ export function useMultiplayerSocket(
         return;
       }
 
-      logger.error('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
-
       const errorToCapture = new Error(errorMessage || errorCode || 'Unknown socket error');
-      if (!isExpectedError(errorToCapture)) {
+      const expected = isExpectedError(errorToCapture);
+
+      // Only send unexpected errors to Sentry; expected ones just log locally
+      if (expected) {
+        logger.log('[SOCKET.IO] Expected error:', errorMessage || errorCode);
+      } else {
+        logger.error('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
         captureSocketError(errorToCapture, {
           event: 'error',
           gameCode: gameCode || undefined,
@@ -339,7 +343,7 @@ export function useMultiplayerSocket(
       }
 
       if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
-        logger.error('[SOCKET.IO] Game state mismatch - querying server for actual state');
+        logger.log('[SOCKET.IO] Game state mismatch - querying server for actual state');
         socketInstance.emit('debugGameState');
       }
 

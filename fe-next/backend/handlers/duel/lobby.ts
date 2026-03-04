@@ -15,6 +15,7 @@ import type { Namespace } from 'socket.io';
 import { z } from 'zod';
 import type { DuelSocket } from './types';
 import { getPendingDuelsForStudent } from '@/lib/supabase/education/duels';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import logger from '@/backend/utils/logger';
 
 // ==========================================
@@ -181,7 +182,7 @@ export function registerLobbyHandlers(
       // Get pending duels for this student
       let pendingChallenges: unknown[] = [];
       try {
-        const result = await getPendingDuelsForStudent(userId);
+        const result = await getPendingDuelsForStudent(userId, getSupabaseAdmin() ?? undefined);
         if (result.error) {
           logger.warn(
             'DUEL',

@@ -17,7 +17,7 @@ const resend = process.env.RESEND_API_KEY
 /**
  * Helper to add timeout to any promise
  */
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> {
+export function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) =>
@@ -27,7 +27,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: st
 }
 
 // Get Supabase admin client for database operations
-function getSupabaseAdmin() {
+export function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -57,7 +57,7 @@ export function generateUnsubscribeToken(): string {
 /**
  * Get the current puzzle number (days since launch)
  */
-function getPuzzleNumber(): number {
+export function getPuzzleNumber(): number {
   const launchDate = new Date('2025-12-30'); // Puzzle #1 = 2025-12-30, Puzzle #2 = 2025-12-31
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -69,10 +69,31 @@ function getPuzzleNumber(): number {
 /**
  * Get today's date in YYYY-MM-DD format
  */
-function getTodayDate(): string {
+export function getTodayDate(): string {
   const today = new Date();
   return today.toISOString().split('T')[0];
 }
+
+/** Neo-brutalist color palette shared across email templates */
+export const EMAIL_COLORS = {
+  navy: '#1a1a2e',
+  navyLight: '#16213e',
+  navyCard: '#252545',
+  lime: '#BFFF00',
+  limeLight: '#D9FF66',
+  limeMuted: '#A6D900',
+  pink: '#FF1493',
+  pinkLight: '#FF6BB8',
+  cyan: '#00FFFF',
+  cyanMuted: '#4DD9D9',
+  purple: '#8B5CF6',
+  orange: '#FF6B35',
+  white: '#FFFFFF',
+  black: '#000000',
+  gray: '#666666',
+  grayLight: '#9CA3AF',
+  grayDark: '#374151',
+};
 
 interface EmailRecipient {
   id: string;
@@ -171,7 +192,7 @@ export async function getEligibleRecipients(_targetHourUTC: number): Promise<Ema
 /**
  * Get the current hour in a specific timezone
  */
-function getLocalHour(timezone: string): number {
+export function getLocalHour(timezone: string): number {
   try {
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('en-US', {
@@ -220,27 +241,7 @@ function generateDailyChallengeEmail(
 ): { subject: string; html: string; text: string } {
   const subject = getSubjectLine(puzzleNumber);
   const logoUrl = `${baseUrl}/logos/lexiclash_logo_english-min.png`;
-
-  // Neo-brutalist color palette (aligned with design system)
-  const colors = {
-    navy: '#1a1a2e',
-    navyLight: '#16213e',
-    navyCard: '#252545',
-    lime: '#BFFF00',
-    limeLight: '#D9FF66',
-    limeMuted: '#A6D900',
-    pink: '#FF1493',
-    pinkLight: '#FF6BB8',
-    cyan: '#00FFFF',
-    cyanMuted: '#4DD9D9',
-    purple: '#8B5CF6',
-    orange: '#FF6B35',
-    white: '#FFFFFF',
-    black: '#000000',
-    gray: '#666666',
-    grayLight: '#9CA3AF',
-    grayDark: '#374151',
-  };
+  const colors = EMAIL_COLORS;
 
   const html = `
 <!DOCTYPE html>

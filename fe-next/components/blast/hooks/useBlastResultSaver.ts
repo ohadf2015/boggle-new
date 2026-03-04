@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import type { BlastResultsData, BlastDifficulty } from '../types';
 import type { PersonalBests } from '@/app/api/blast/utils';
+import { updateGuestStatsAfterGame } from '@/utils/guestManager';
+import logger from '@/utils/logger';
 
 interface BlastResultSaverReturn {
   saved: boolean;
@@ -27,6 +29,9 @@ export function useBlastResultSaver(
     error: null,
   });
   const calledRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => () => { mountedRef.current = false; }, []);
 
   useEffect(() => {
     if (!results || calledRef.current) return;
@@ -51,32 +56,51 @@ export function useBlastResultSaver(
           }),
         });
 
-        // 401 = guest user, silently skip
+        // 401 = guest user, save basic stats to localStorage as fallback
         if (response.status === 401) {
-          setState(s => ({ ...s, saved: false }));
+          try {
+            updateGuestStatsAfterGame({
+              score: results!.finalScore,
+              wordCount: results!.wordsFound.length,
+              isWinner: false,
+            });
+          } catch (guestErr) {
+            logger.error('[useBlastResultSaver] Guest stats fallback failed:', guestErr);
+          }
+          if (mountedRef.current) {
+            setState(s => ({ ...s, saved: false }));
+          }
           return;
         }
 
         if (!response.ok) {
           const data = await response.json();
-          setState(s => ({ ...s, error: data.error || 'Failed to save', saved: false }));
+          logger.error('[useBlastResultSaver] Save failed:', data.error || response.status);
+          if (mountedRef.current) {
+            setState(s => ({ ...s, error: data.error || 'Failed to save', saved: false }));
+          }
           return;
         }
 
         const data = await response.json();
-        setState({
-          saved: true,
-          personalBests: data.personalBests ?? null,
-          isNewBestScore: data.isNewBestScore ?? false,
-          isNewBestCombo: data.isNewBestCombo ?? false,
-          error: null,
-        });
+        if (mountedRef.current) {
+          setState({
+            saved: true,
+            personalBests: data.personalBests ?? null,
+            isNewBestScore: data.isNewBestScore ?? false,
+            isNewBestCombo: data.isNewBestCombo ?? false,
+            error: null,
+          });
+        }
       } catch (err) {
-        setState(s => ({
-          ...s,
-          error: err instanceof Error ? err.message : 'Unknown error',
-          saved: false,
-        }));
+        logger.error('[useBlastResultSaver] Error saving results:', err);
+        if (mountedRef.current) {
+          setState(s => ({
+            ...s,
+            error: err instanceof Error ? err.message : 'Unknown error',
+            saved: false,
+          }));
+        }
       }
     }
 

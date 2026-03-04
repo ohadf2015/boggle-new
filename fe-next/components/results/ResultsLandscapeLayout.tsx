@@ -7,6 +7,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import RoomChat from '@/components/RoomChat';
 import type { PlayerResult, XpGainedData, LevelUpData } from '@/types/components';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
+import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 
 // Dynamic imports for components
 const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
@@ -71,6 +72,10 @@ export interface ResultsLandscapeLayoutProps {
 
   // Translation
   t: (key: string) => string;
+
+  // Game mode override (host only)
+  selectedGameMode?: GameModeOption;
+  onSelectGameMode?: (mode: GameModeOption) => void;
 }
 
 /**
@@ -102,6 +107,8 @@ export function ResultsLandscapeLayout({
   normalizeUsername,
   overlayModals,
   t,
+  selectedGameMode,
+  onSelectGameMode,
 }: ResultsLandscapeLayoutProps) {
   return (
     <>
@@ -129,8 +136,22 @@ export function ResultsLandscapeLayout({
           ) : (
             <div className="flex flex-col gap-2 w-full max-w-xs mt-2">
               {isHost ? (
-                /* HOST: Start Game button */
+                /* HOST: Game Mode Selector + Start Game button */
                 <>
+                  {selectedGameMode !== undefined && onSelectGameMode && (
+                    <div className="w-full bg-neo-navy-light/50 border-2 border-neo-white/10 rounded-neo p-2">
+                      <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-1.5">
+                        {t('gameModes.nextMode') || 'Next Mode'}
+                      </p>
+                      <GameModeSelector
+                        selectedMode={selectedGameMode}
+                        onSelectMode={onSelectGameMode}
+                        t={t}
+                        showRandom
+                        compact
+                      />
+                    </div>
+                  )}
                   <button
                     onClick={onStartGame}
                     className="w-full bg-neo-green text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"

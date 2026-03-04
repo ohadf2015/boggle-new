@@ -92,6 +92,7 @@ export interface GameState {
   restoredFromRedis?: boolean;
   gameSessionId: number;
   earthquakeTriggered?: boolean;
+  fireRoundActive?: boolean;
   gameEndedAt?: number | null;
   playerWordDetails?: Record<string, unknown[]>;
   playersReadyForNextGame: Record<string, boolean>;

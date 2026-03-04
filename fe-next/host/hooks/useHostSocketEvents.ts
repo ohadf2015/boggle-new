@@ -179,6 +179,7 @@ const useHostSocketEvents = ({
     intentionalExitRef,
     onShowResults,
     onGameStart,
+    setPlayersReady,
   });
 
   // Word submission events (for host playing)

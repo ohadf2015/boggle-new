@@ -27,6 +27,40 @@ const isCrazyGamesEnabled = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Standalone output: produces a self-contained .next/standalone/ directory
+  // with only the node_modules files actually needed at runtime (~200-350MB vs 1.4GB)
+  output: 'standalone',
+
+  // Force-include server-side packages that Next.js trace can miss
+  // (native addons, dynamic requires, data files, etc.)
+  outputFileTracingIncludes: {
+    '/**': [
+      './backend/*.txt',
+      './backend/data/dateThemedWords.js',
+      './node_modules/socket.io/**',
+      './node_modules/@socket.io/**',
+      './node_modules/ioredis/**',
+      './node_modules/express/**',
+      './node_modules/cors/**',
+      './node_modules/compression/**',
+      './node_modules/dotenv/**',
+      './node_modules/node-cron/**',
+      './node_modules/@sentry/**',
+      './node_modules/@supabase/**',
+      './node_modules/an-array-of-english-words/**',
+      './node_modules/an-array-of-spanish-words/**',
+      './node_modules/@arvidbt/**',
+      './node_modules/bad-words/**',
+      './node_modules/resend/**',
+      './node_modules/@anthropic-ai/**',
+      './node_modules/@google-cloud/**',
+      './node_modules/google-auth-library/**',
+      './node_modules/ws/**',
+      './node_modules/axios/**',
+      './node_modules/zod/**',
+    ],
+  },
+
   // Enable system TLS certs for Turbopack to fetch Google Fonts
   // optimizePackageImports automatically tree-shakes common packages like lucide-react
   experimental: {

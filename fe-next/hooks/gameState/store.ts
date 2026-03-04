@@ -29,7 +29,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
-import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameMode } from '@/shared/types/game';
+import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameMode, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import type { Player, TournamentData, TournamentStanding, ComboState } from './types';
 import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
@@ -95,6 +95,17 @@ interface GameState {
   // Game mode (multiplayer mode rotation)
   gameMode: GameMode;
 
+  // Blast multiplayer state
+  blastTileOverlay: BlastTileOverlay[];
+  blastMovesUsed: number;
+
+  // Word Hunt multiplayer state
+  wordHuntTargetLength: number;
+  wordHuntMyLife: number;
+  wordHuntPlayerLives: Record<string, number>;
+  wordHuntTargetAttempts: Array<{ guess: string; feedback: LetterFeedback[] }>;
+  wordHuntTargetFound: boolean;
+
   // Internal refs (not reactive, for callbacks)
   _comboTimeoutId: NodeJS.Timeout | null;
 }
@@ -152,6 +163,17 @@ interface GameActions {
   // Game mode actions
   setGameMode: (value: GameMode | ((prev: GameMode) => GameMode)) => void;
 
+  // Blast multiplayer actions
+  setBlastTileOverlay: (value: BlastTileOverlay[] | ((prev: BlastTileOverlay[]) => BlastTileOverlay[])) => void;
+  setBlastMovesUsed: (value: number | ((prev: number) => number)) => void;
+
+  // Word Hunt multiplayer actions
+  setWordHuntTargetLength: (value: number | ((prev: number) => number)) => void;
+  setWordHuntMyLife: (value: number | ((prev: number) => number)) => void;
+  setWordHuntPlayerLives: (value: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
+  setWordHuntTargetAttempts: (value: Array<{ guess: string; feedback: LetterFeedback[] }> | ((prev: Array<{ guess: string; feedback: LetterFeedback[] }>) => Array<{ guess: string; feedback: LetterFeedback[] }>)) => void;
+  setWordHuntTargetFound: (value: boolean | ((prev: boolean) => boolean)) => void;
+
   // Reset actions
   resetForNewRound: () => void;
   resetAll: () => void;
@@ -190,6 +212,13 @@ const initialState: GameState = {
   levelUpData: null,
   boardTheme: null,
   gameMode: 'classic',
+  blastTileOverlay: [],
+  blastMovesUsed: 0,
+  wordHuntTargetLength: 0,
+  wordHuntMyLife: 100,
+  wordHuntPlayerLives: {},
+  wordHuntTargetAttempts: [],
+  wordHuntTargetFound: false,
   _comboTimeoutId: null,
 };
 
@@ -416,6 +445,42 @@ export const useGameStore = create<GameStore>()(
     })),
 
     // ==========================================
+    // Blast Multiplayer Actions
+    // ==========================================
+
+    setBlastTileOverlay: (value) => set((state) => ({
+      blastTileOverlay: applySetState(value, state.blastTileOverlay)
+    })),
+
+    setBlastMovesUsed: (value) => set((state) => ({
+      blastMovesUsed: applySetState(value, state.blastMovesUsed)
+    })),
+
+    // ==========================================
+    // Word Hunt Multiplayer Actions
+    // ==========================================
+
+    setWordHuntTargetLength: (value) => set((state) => ({
+      wordHuntTargetLength: applySetState(value, state.wordHuntTargetLength)
+    })),
+
+    setWordHuntMyLife: (value) => set((state) => ({
+      wordHuntMyLife: applySetState(value, state.wordHuntMyLife)
+    })),
+
+    setWordHuntPlayerLives: (value) => set((state) => ({
+      wordHuntPlayerLives: applySetState(value, state.wordHuntPlayerLives)
+    })),
+
+    setWordHuntTargetAttempts: (value) => set((state) => ({
+      wordHuntTargetAttempts: applySetState(value, state.wordHuntTargetAttempts)
+    })),
+
+    setWordHuntTargetFound: (value) => set((state) => ({
+      wordHuntTargetFound: applySetState(value, state.wordHuntTargetFound)
+    })),
+
+    // ==========================================
     // Reset Actions
     // ==========================================
 
@@ -439,6 +504,13 @@ export const useGameStore = create<GameStore>()(
         leaderboard: [],
         xpGainedData: null,
         levelUpData: null,
+        blastTileOverlay: [],
+        blastMovesUsed: 0,
+        wordHuntTargetLength: 0,
+        wordHuntMyLife: 100,
+        wordHuntPlayerLives: {},
+        wordHuntTargetAttempts: [],
+        wordHuntTargetFound: false,
         _comboTimeoutId: null,
       });
     },
@@ -501,6 +573,17 @@ export const useBoardTheme = () => useGameStore((state) => state.boardTheme);
 // Game mode selector
 export const useGameMode = () => useGameStore((state) => state.gameMode);
 
+// Blast multiplayer selectors
+export const useBlastTileOverlay = () => useGameStore((state) => state.blastTileOverlay);
+export const useBlastMovesUsed = () => useGameStore((state) => state.blastMovesUsed);
+
+// Word Hunt multiplayer selectors
+export const useWordHuntTargetLength = () => useGameStore((state) => state.wordHuntTargetLength);
+export const useWordHuntMyLife = () => useGameStore((state) => state.wordHuntMyLife);
+export const useWordHuntPlayerLives = () => useGameStore((state) => state.wordHuntPlayerLives);
+export const useWordHuntTargetAttempts = () => useGameStore((state) => state.wordHuntTargetAttempts);
+export const useWordHuntTargetFound = () => useGameStore((state) => state.wordHuntTargetFound);
+
 // ==========================================
 // Actions Object (static, no re-renders)
 // ==========================================
@@ -547,6 +630,13 @@ const getActions = (state: GameStore) => ({
   setLevelUpData: state.setLevelUpData,
   setBoardTheme: state.setBoardTheme,
   setGameMode: state.setGameMode,
+  setBlastTileOverlay: state.setBlastTileOverlay,
+  setBlastMovesUsed: state.setBlastMovesUsed,
+  setWordHuntTargetLength: state.setWordHuntTargetLength,
+  setWordHuntMyLife: state.setWordHuntMyLife,
+  setWordHuntPlayerLives: state.setWordHuntPlayerLives,
+  setWordHuntTargetAttempts: state.setWordHuntTargetAttempts,
+  setWordHuntTargetFound: state.setWordHuntTargetFound,
   resetForNewRound: state.resetForNewRound,
   resetAll: state.resetAll,
 });

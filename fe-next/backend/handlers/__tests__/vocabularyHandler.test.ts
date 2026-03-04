@@ -14,12 +14,12 @@ jest.mock('../../modules/gameStateManager', () => ({
   getGameBySocketId: jest.fn(),
 }));
 
-jest.mock('../../../hooks/useWordIntegration', () => ({
+jest.mock('../../../hooks/wordIntegrationLogic', () => ({
   checkWordIntegration: jest.fn(),
 }));
 
 import { getGame, getGameBySocketId } from '../../modules/gameStateManager';
-import { checkWordIntegration } from '@/hooks/useWordIntegration';
+import { checkWordIntegration } from '@/hooks/wordIntegrationLogic';
 
 // Import handlers to test (these don't exist yet - will fail)
 import { handleSelectVocabularyWord, registerVocabularyHandlers } from '../vocabularyHandler';

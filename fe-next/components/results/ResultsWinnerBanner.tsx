@@ -1,12 +1,30 @@
-import React, { useEffect, useCallback, useRef, memo } from 'react';
-import { motion } from 'framer-motion';
-import { Crown, Trophy, Medal, Hand } from 'lucide-react';
+import React, { useEffect, useCallback, useRef, useState, memo } from 'react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { Crown, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { fireRankConfetti } from '@/utils/confettiUtils';
 import Avatar from '../Avatar';
 import { MascotWithEntrance, MascotVariant } from '@/components/ui/Mascot';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import type { PlayerResult } from '@/types/components';
+
+/** Animated score counter that counts up from 0 */
+const ScoreCounter: React.FC<{ target: number; className?: string }> = ({ target, className }) => {
+  const motionVal = useMotionValue(0);
+  const rounded = useTransform(motionVal, (v) => Math.round(v));
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    const controls = animate(motionVal, target, {
+      duration: 1.2,
+      ease: [0.16, 1, 0.3, 1],
+    });
+    const unsub = rounded.on('change', (v) => setDisplay(v));
+    return () => { controls.stop(); unsub(); };
+  }, [target, motionVal, rounded]);
+
+  return <span className={className}>{display}</span>;
+};
 
 // Winner data - includes username, score, and optional avatar
 interface WinnerData {
@@ -205,137 +223,161 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
     // Zero score - oops face
     if (winner && winner.score === 0) return 'oops';
 
-    // Single player variants (GIF-ONLY: victory → happy)
+    // Single player variants
     if (variant === 'highScore' || variant === 'newRecord') return 'happy';
-    if (variant === 'completion') return 'happy';
+    if (variant === 'completion') return 'thinking';
 
-    // Multiplayer ranking (GIF-ONLY: all celebration variants → happy)
-    if (rank === 1) return 'happy'; // Crown celebration
-    if (rank === 2) return 'happy'; // Silver happiness
-    if (rank === 3) return 'happy'; // Bronze excitement
-    return 'happy'; // Non-podium encouragement
+    // Multiplayer ranking — podium uses CelebrationMascot (not this function)
+    if (rank === 1) return 'happy';
+    if (rank === 2) return 'happy';
+    if (rank === 3) return 'happy';
+
+    // Non-podium: last place gets crying (only in games with > 2 players)
+    if (totalPlayers && totalPlayers > 2 && rank === totalPlayers) return 'crying';
+
+    // Non-podium with score → encouraging
+    return 'encouraging';
   };
 
   const mascotVariant = getMascotVariant();
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="mb-4 sm:mb-6 md:mb-8 relative w-full"
+      className="mb-3 sm:mb-4 relative w-full"
     >
       {/* Neo-Brutalist Main Container - Clickable for confetti */}
       <div
         className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] -rotate-1`}
         onClick={handleConfetti}
       >
-        {/* Comic-style halftone texture pattern - subtle for winner banner */}
+        {/* Comic-style halftone texture pattern */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,rgb(var(--neo-black))_1px,transparent_1px)] bg-[length:12px_12px]"
         />
 
-        {/* Content - Compact layout */}
-        <div className={`relative z-10 text-center ${compact ? 'p-2 sm:p-3' : 'p-3 sm:p-4 md:p-5'}`}>
-          {/* Compact horizontal layout: Icon + Content */}
-          <div className="flex items-center justify-center gap-3 sm:gap-4">
-            {/* Animated Icon + Placement Badge - Smaller */}
-            <motion.div
-              initial={{ scale: 0, rotate: -15 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.3, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-              whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
-              className="flex-shrink-0 relative"
-            >
-              <div className={`${styles.iconBgClass} border-3 border-neo-black rounded-neo shadow-hard inline-block ${compact ? 'p-1.5' : 'p-2'}`}>
-                <RankIcon
-                  className={`${styles.iconTextClass} ${compact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'} drop-shadow-[2px_2px_0px_rgb(var(--neo-black))]`}
-                />
-              </div>
-              {/* Prominent Placement Badge - Only for multiplayer ranking */}
-              {variant === 'ranking' && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                  className="absolute -top-2 -right-2 bg-neo-black text-neo-cream border-3 border-neo-cream rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shadow-hard-lg"
-                >
-                  <span className="text-lg sm:text-xl font-black">
+        {/* Shimmer sweep effect */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)',
+            backgroundSize: '200% 100%',
+          }}
+          animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
+          transition={{ duration: 2.5, delay: 0.8, ease: 'easeInOut' }}
+        />
+
+        {/* Content - Two-row centered layout */}
+        <div className={`relative z-10 ${compact ? 'px-3 py-2.5 sm:px-4 sm:py-3' : 'px-4 py-3 sm:px-5 sm:py-4'}`}>
+          {/* Row 1: Rank badge + Avatar + Name + Rank message */}
+          <div className="flex items-center justify-center gap-2.5 sm:gap-3">
+            {/* Rank placement badge */}
+            {variant === 'ranking' && (
+              <motion.div
+                initial={{ scale: 0, rotate: -20 }}
+                animate={{ scale: 1, rotate: -3 }}
+                transition={{ delay: 0.3, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                whileHover={{ scale: 1.1, rotate: 0, transition: { duration: 0.2 } }}
+                className="flex-shrink-0"
+              >
+                <div className={`
+                  relative ${styles.iconBgClass} border-3 border-neo-black rounded-neo shadow-hard
+                  flex items-center justify-center
+                  ${compact ? 'w-11 h-11' : 'w-14 h-14 sm:w-16 sm:h-16'}
+                `}>
+                  <RankIcon
+                    className={`${styles.iconTextClass} ${compact ? 'w-5 h-5' : 'w-6 h-6 sm:w-7 sm:h-7'}`}
+                  />
+                  {/* Rank number overlay */}
+                  <span className={`
+                    absolute -bottom-1.5 -end-1.5 bg-neo-black text-neo-cream border-2 border-neo-cream
+                    rounded-full font-black flex items-center justify-center shadow-hard-sm
+                    ${compact ? 'w-7 h-7 text-[11px]' : 'w-8 h-8 text-xs sm:w-9 sm:h-9 sm:text-sm'}
+                  `}>
                     {getOrdinalSuffix(rank)}
                   </span>
-                </motion.div>
-              )}
-            </motion.div>
+                </div>
+              </motion.div>
+            )}
 
-            {/* Center content: Avatar + Name + Message */}
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
-              className="flex items-center gap-2 sm:gap-3"
-            >
-              {/* Winner Avatar - Smaller */}
-              {winner.avatar && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                  className="border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5 flex-shrink-0"
-                >
+            {/* Avatar */}
+            {winner.avatar && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                className="flex-shrink-0"
+              >
+                <div className={`
+                  border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5
+                  ${compact ? '' : 'sm:p-1'}
+                `}>
                   <Avatar
                     profilePictureUrl={winner.avatar.profilePictureUrl ?? undefined}
                     avatarImage={winner.avatar.avatarImage}
-                    size="lg"
+                    size={compact ? 'md' : 'lg'}
                   />
-                </motion.div>
-              )}
-              <div className="text-left">
-                {/* Rank Message - Always shown for current player's banner */}
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.45, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                  className={`inline-block ${styles.messageBgClass} ${styles.messageTextClass} text-xs sm:text-sm font-black uppercase px-2 py-0.5 border-2 border-neo-black rounded-neo shadow-hard-sm mb-1`}
-                >
-                  {getRankMessage()}
-                </motion.span>
-                {/* Username - Smaller */}
-                <h1
-                  className={`font-black ${styles.textClass} uppercase leading-tight ${compact ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-3xl'}`}
-                  style={{
-                    textShadow: `2px 2px 0px ${styles.nameShadowColor}`,
-                  }}
-                >
-                  {winner.username}
-                </h1>
-                {/* Announcement Text - Smaller */}
-                <p className={`text-xs sm:text-sm font-bold ${styles.textClass} opacity-80 uppercase`}>
-                  {getAnnouncementText()}
-                </p>
-              </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Name + Message column */}
+            <motion.div
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
+              className="text-start min-w-0"
+            >
+              {/* Rank message pill */}
+              <motion.span
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.3 }}
+                className={`inline-block ${styles.messageBgClass} ${styles.messageTextClass} text-[10px] sm:text-xs font-black uppercase px-1.5 py-0.5 border-2 border-neo-black rounded-neo shadow-hard-sm mb-0.5`}
+              >
+                {getRankMessage()}
+              </motion.span>
+              {/* Username */}
+              <h1
+                className={`font-black ${styles.textClass} uppercase leading-none truncate ${compact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl md:text-2xl'}`}
+                style={{ textShadow: `2px 2px 0px ${styles.nameShadowColor}` }}
+              >
+                {winner.username}
+              </h1>
+              {/* Announcement */}
+              <p className={`text-[10px] sm:text-xs font-bold ${styles.textClass} opacity-70 uppercase mt-0.5`}>
+                {getAnnouncementText()}
+              </p>
             </motion.div>
 
-            {/* Score Badge - Compact */}
+            {/* Score Badge - Prominent with count-up */}
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0, rotate: 5 }}
+              animate={{ scale: 1, rotate: 2 }}
               transition={{ delay: 0.5, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-              className="flex items-center gap-2 flex-shrink-0"
+              whileHover={{ scale: 1.08, rotate: 0, transition: { duration: 0.15 } }}
+              className="flex-shrink-0 ms-auto"
             >
-              <Trophy
-                className={`text-xl sm:text-2xl ${styles.textClass} hidden sm:block`}
-                style={{ filter: `drop-shadow(1px 1px 0px ${styles.trophyShadowColor})` }}
-              />
-              <div className={`bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard ${compact ? 'px-2 py-1' : 'px-3 py-1.5 sm:px-4 sm:py-2'}`}>
-                <p className={`font-black text-neo-black ${compact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl md:text-2xl'}`}>
-                  {winner.score} <span className={compact ? 'text-[10px]' : 'text-xs sm:text-sm'}>{t('results.points')}</span>
-                </p>
+              <div className={`
+                bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard
+                flex flex-col items-center justify-center
+                ${compact ? 'px-2.5 py-1.5' : 'px-3 py-2 sm:px-4 sm:py-2.5'}
+              `}>
+                <ScoreCounter
+                  target={winner.score}
+                  className={`font-black text-neo-black leading-none ${compact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'}`}
+                />
+                <span className={`font-bold text-neo-black/60 uppercase ${compact ? 'text-[8px]' : 'text-[9px] sm:text-[10px]'}`}>
+                  {t('results.points')}
+                </span>
               </div>
             </motion.div>
           </div>
         </div>
 
-        {/* Mascot - Trophy for winners, regular mascot for others - Hidden in compact mode */}
+        {/* Mascot - Hidden in compact mode */}
         {!compact && (
           <div className="absolute -bottom-2 -right-2 sm:bottom-0 sm:right-0 z-20 pointer-events-none">
             {(rank <= 3 || variant === 'highScore' || variant === 'newRecord') && winner?.score !== 0 ? (

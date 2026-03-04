@@ -51,6 +51,11 @@ export {
   useLevelUpData,
   useBoardTheme,
   useGameMode,
+  useWordHuntTargetLength,
+  useWordHuntMyLife,
+  useWordHuntPlayerLives,
+  useWordHuntTargetAttempts,
+  useWordHuntTargetFound,
   useGameActions,
 } from './store';
 

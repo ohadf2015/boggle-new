@@ -97,7 +97,11 @@ async function cacheFirst(request) {
     const response = await fetch(request);
     if (response.ok) {
       const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, response.clone());
+      try {
+        cache.put(request, response.clone());
+      } catch (err) {
+        console.warn('[SW] Cache put failed:', err);
+      }
       limitCacheSize(DYNAMIC_CACHE, MAX_DYNAMIC_CACHE_SIZE);
     }
     return response;
@@ -117,7 +121,11 @@ async function networkFirst(request) {
     // Cache successful responses (but not redirects or errors)
     if (response.ok && response.status === 200) {
       const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, response.clone());
+      try {
+        cache.put(request, response.clone());
+      } catch (err) {
+        console.warn('[SW] Cache put failed:', err);
+      }
     }
     return response;
   } catch (error) {

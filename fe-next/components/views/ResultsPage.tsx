@@ -32,6 +32,8 @@ import { ResultsDetailsContent } from '@/components/results/ResultsDetailsConten
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import type { GameModeOption } from '@/components/GameModeSelector';
+import { useGameMode } from '@/hooks/gameState/store';
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180 }) => {
   const { t } = useLanguage();
@@ -47,6 +49,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
   const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(false);
+  // Game mode override for host (results page lets host change mode before next game)
+  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>('random');
+  const resolvedGameMode = useGameMode();
 
   // Socket events for word feedback, XP, engagement features, and player ready state
   const {
@@ -219,8 +224,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       minWordLength: 3,
       difficulty: 'MEDIUM',
       boardTheme: null,
+      gameMode: selectedGameMode,
     });
-  }, [socket, isHost, roomLanguage]);
+  }, [socket, isHost, roomLanguage, selectedGameMode]);
 
   // Overlay modals that should render regardless of orientation
   // These are rendered BEFORE the conditional returns to ensure they appear in both landscape and portrait modes
@@ -289,6 +295,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         normalizeUsername={normalizeUsername}
         overlayModals={overlayModals}
         t={t}
+        selectedGameMode={selectedGameMode}
+        onSelectGameMode={setSelectedGameMode}
       />
     );
   }
@@ -330,6 +338,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     duplicateRuleDisabled: duplicateRuleDisabled ?? false,
     allPlayerWords,
     t,
+    selectedGameMode,
+    onSelectGameMode: setSelectedGameMode,
   };
 
   // Render Results Tab Content using shared component
@@ -368,6 +378,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     isHost,
     currentStreakCount: winStreakData?.currentStreak || 0,
     t,
+    gameMode: resolvedGameMode,
   };
 
   // Render Details Tab Content using shared component

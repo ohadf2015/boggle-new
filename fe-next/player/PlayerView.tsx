@@ -86,6 +86,8 @@ interface PlayerViewProps {
   onGameStartConsumed?: () => void;
   /** Room language from parent - used for displaying share button before game starts */
   roomLanguage?: Language | null;
+  /** Called when guest name is confirmed changed by server */
+  onUsernameChange?: (newName: string) => void;
 }
 
 // ==========================================
@@ -104,6 +106,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   pendingGameStart,
   onGameStartConsumed,
   roomLanguage,
+  onUsernameChange,
 }) => {
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
@@ -310,6 +313,18 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
   }, [socket]);
 
+  // Listen for server confirmation of name change
+  useEffect(() => {
+    if (!socket) return;
+    const handleNameUpdated = (data: { newName: string }) => {
+      if (data?.newName) {
+        onUsernameChange?.(data.newName);
+      }
+    };
+    socket.on('guestNameUpdated', handleNameUpdated);
+    return () => { socket.off('guestNameUpdated', handleNameUpdated); };
+  }, [socket, onUsernameChange]);
+
   // Reset lobby ready state when game starts
   useEffect(() => {
     if (gameActive) {
@@ -344,7 +359,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   }, [remainingTime, gameActive, fadeToTrack, TRACKS]);
 
   useEffect(() => {
-    if (gameActive && remainingTime !== null && remainingTime <= 3 && remainingTime > 0) {
+    if (gameActive && remainingTime !== null && remainingTime <= 10 && remainingTime > 0) {
       playCountdownBeep(remainingTime);
     }
   }, [remainingTime, gameActive, playCountdownBeep]);

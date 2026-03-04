@@ -14,7 +14,7 @@ import {
   type PerformanceMode,
 } from './grid';
 import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
-import { useDisableFireRoundLights, useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
+import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
@@ -70,17 +70,6 @@ interface GridComponentProps {
  * VERSION: 2025-01-01-FIXED - effectiveRenderMode TDZ fix
  */
 
-// Rainbow colors for dance floor effect - Soft pastels for gentle party atmosphere
-// Moved outside component to be a stable reference for useEffect dependencies
-const RAINBOW_COLORS = [
-  '#FFB3D9', // Soft pink
-  '#FFB380', // Peachy orange
-  '#FFE680', // Gentle yellow
-  '#B3FFB3', // Mint green
-  '#B3E5FF', // Sky blue
-  '#D9B3FF', // Lavender
-  '#FFD1DC', // Rose
-];
 
 const GridComponent = memo<GridComponentProps>(({
   grid,
@@ -113,7 +102,7 @@ const GridComponent = memo<GridComponentProps>(({
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Accessibility settings
-  const disableFireRoundLights = useDisableFireRoundLights();
+
   const disableEarthquakeEffects = useDisableEarthquakeEffects();
   const accessibilityLargeLetters = useLargeLetters();
 
@@ -134,8 +123,7 @@ const GridComponent = memo<GridComponentProps>(({
   // Sound effects for earthquake
   const { playEarthquakeRumble, playEarthquakeShake } = useSoundEffects();
 
-  // Disable fire round lights on low-end devices or when reduced motion is preferred
-  const shouldDisableFireRoundLights = disableFireRoundLights || isLowEnd || !enableComplexAnimations || prefersReducedMotion;
+
 
   // Disable enhanced earthquake effects if user preference is set or device is low-end
   const shouldDisableEarthquakeEffects = disableEarthquakeEffects || isLowEnd || prefersReducedMotion;
@@ -286,95 +274,7 @@ const GridComponent = memo<GridComponentProps>(({
     playEarthquakeShake,
   });
 
-  // Fire Round: Random glowing cells with rainbow cycling
-  const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());
-  const [cellColorIndices, setCellColorIndices] = useState<Map<string, number>>(new Map());
 
-  // Randomize glowing cells when fire round is active (optimized for performance)
-  // PERFORMANCE: Skip on low-end devices, reduced motion, or user accessibility setting
-  useEffect(() => {
-    if (!fireRoundActive || shouldDisableFireRoundLights) {
-      setGlowingCells(new Set());
-      setCellColorIndices(new Map());
-      return;
-    }
-
-    let animationFrameId: number;
-    let lastUpdate = 0;
-    const updateInterval = 1200; // Gentle: 1200ms for relaxed party feel
-    const MAX_GLOW_CELLS = 5; // Fewer cells for subtle, non-distracting effect
-
-    // Check if a cell is adjacent to any already-selected cells
-    const isAdjacentToSelected = (row: number, col: number, selected: Set<string>): boolean => {
-      // Check all 8 surrounding cells (including diagonals)
-      const neighbors = [
-        `${row - 1}-${col}`,     // top
-        `${row + 1}-${col}`,     // bottom
-        `${row}-${col - 1}`,     // left
-        `${row}-${col + 1}`,     // right
-        `${row - 1}-${col - 1}`, // top-left
-        `${row - 1}-${col + 1}`, // top-right
-        `${row + 1}-${col - 1}`, // bottom-left
-        `${row + 1}-${col + 1}`, // bottom-right
-      ];
-
-      return neighbors.some(neighbor => selected.has(neighbor));
-    };
-
-    // Select up to 8 cells that are NOT adjacent to each other (disco-style distribution)
-    const randomizeGlow = () => {
-      const rows = grid.length;
-      const cols = grid[0]?.length || 0;
-      const selected = new Set<string>();
-      const colorMap = new Map<string, number>();
-
-      // Create array of all possible positions
-      const allPositions: Array<{ row: number; col: number }> = [];
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          allPositions.push({ row: i, col: j });
-        }
-      }
-
-      // Shuffle positions for random selection
-      const shuffled = allPositions.sort(() => Math.random() - 0.5);
-
-      // Select cells ensuring they're not adjacent
-      for (const pos of shuffled) {
-        if (selected.size >= MAX_GLOW_CELLS) break;
-
-        if (!isAdjacentToSelected(pos.row, pos.col, selected)) {
-          const cellKey = `${pos.row}-${pos.col}`;
-          selected.add(cellKey);
-          // Assign random rainbow color index to each cell
-          colorMap.set(cellKey, Math.floor(Math.random() * RAINBOW_COLORS.length));
-        }
-      }
-
-      setGlowingCells(selected);
-      setCellColorIndices(colorMap);
-    };
-
-    // Initial randomization
-    randomizeGlow();
-
-    // Use requestAnimationFrame for smoother updates
-    const animate = (timestamp: number) => {
-      if (timestamp - lastUpdate >= updateInterval) {
-        randomizeGlow();
-        lastUpdate = timestamp;
-      }
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animationFrameId = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, [fireRoundActive, shouldDisableFireRoundLights, grid]);
 
   // Auto-focus on grid when game becomes interactive
   useEffect(() => {
@@ -521,9 +421,6 @@ const GridComponent = memo<GridComponentProps>(({
               const isFading = fadingCells.some(c => c.row === i && c.col === j);
               const isFocused = focusedCell?.row === i && focusedCell?.col === j;
               const isAdjacentHint = adjacentHintCells.has(cellKey);
-              const isGlowing = glowingCells.has(cellKey);
-              const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
-              const glowColor = RAINBOW_COLORS[glowColorIndex];
               const isHighlighted = highlightedCellsSet.has(cellKey);
               const highlightedOrder = highlightedCellOrder.get(cellKey);
               const isEliminated = eliminatedLetters?.has(cell.toUpperCase()) ?? false;
@@ -648,13 +545,6 @@ const GridComponent = memo<GridComponentProps>(({
                   style={{
                     borderRadius: '6px',
                     fontSize: 'var(--cell-font-size)',
-                    // Rainbow dance floor effect during fire round (subtle glow)
-                    ...(isGlowing && fireRoundActive && !isSelected && !isHighlighted && {
-                      background: glowColor,
-                      boxShadow: `0 0 6px ${glowColor}40`,
-                      animation: 'rainbow-pulse 1.5s ease-in-out infinite',
-                      willChange: 'transform, box-shadow',
-                    }),
                     // Subtle glow for selected cells - clean minimal design
                     ...(isSelected && {
                       boxShadow: comboColors.isRainbow

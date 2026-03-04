@@ -9,6 +9,7 @@ import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useKeyboardHelpState } from '@/hooks/useKeyboardHelpState';
+import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 import type { WordFeedback } from './WordFormingArea';
 import type { FoundWord } from '@/shared/types/view';
 
@@ -101,6 +102,8 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
+    playComboMilestoneSound,
+    playComboBreakSound,
     setGameActive: setSoundGameActive,
   } = useSoundEffects();
 
@@ -218,6 +221,19 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     };
   }, [leaderboard, username]);
 
+  // Lead change detection
+  const leadChangeEvent = useLeadChangeDetection(leaderboard, username);
+
+  // Play sound on lead change
+  useEffect(() => {
+    if (!leadChangeEvent) return;
+    if (leadChangeEvent.type === 'took-lead') {
+      playComboMilestoneSound(5);
+    } else {
+      playComboBreakSound(1);
+    }
+  }, [leadChangeEvent, playComboMilestoneSound, playComboBreakSound]);
+
   // Word submission hook
   const { handleGridWordSubmit, fireRoundActiveRef } = useWordSubmission({
     isPlaying,
@@ -323,6 +339,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     isHelpOpen: keyboardHelp.isHelpOpen,
     onCloseHelp: keyboardHelp.closeHelp,
     minWordLength,
+    leadChangeEvent,
   } as const;
 
   // Landscape layout

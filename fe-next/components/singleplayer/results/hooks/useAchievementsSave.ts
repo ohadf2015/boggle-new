@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import logger from '@/utils/logger';
 import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { ProfileData } from '@/contexts/AuthContext';
 
@@ -49,9 +50,9 @@ export function useAchievementsSave({
           achievement_counts: updatedCounts,
         });
 
-        console.log('[useAchievementsSave] Saved achievements to profile:', achievements);
+        logger.log('[useAchievementsSave] Saved achievements to profile:', achievements);
       } catch (error) {
-        console.error('[useAchievementsSave] Failed to save achievements:', error);
+        logger.error('[useAchievementsSave] Failed to save achievements:', error);
       }
     }
 

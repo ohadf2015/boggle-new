@@ -26,6 +26,8 @@ import FloatingScoreAnimation from '../../FloatingScoreAnimation';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer, FoundWord } from '@/shared/types/view';
 import type { HintsState, EarthquakeState, TranslationFn, TappedCellPosition } from '../types';
+import { LeadChangeBanner } from '../../LeadChangeBanner';
+import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
 
 interface TournamentData {
   name?: string;
@@ -112,6 +114,9 @@ interface PortraitLayoutProps {
   // Refs
   gameStatsRef: RefObject<HTMLDivElement | null>;
 
+  // Lead change notification
+  leadChangeEvent?: LeadChangeEvent | null;
+
   // Achievement dock
   children?: ReactNode;
 }
@@ -170,6 +175,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   tournamentData,
   totalBoardWords,
   gameStatsRef,
+  leadChangeEvent,
   children,
 }) {
   // Track floating score animation
@@ -355,7 +361,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Word Forming Area - tight spacing to board */}
           {isPlaying && (
-            <div className="flex items-center justify-center flex-shrink-0 -mt-2 lg:-mt-3 mb-0">
+            <div className="relative flex items-center justify-center flex-shrink-0 -mt-2 lg:-mt-3 mb-0">
+              <LeadChangeBanner event={leadChangeEvent ?? null} />
               <WordFormingArea
                 word={isTypingMode ? typedWord : formedWord}
                 letterCount={isTypingMode ? typedWord.length : letterCount}

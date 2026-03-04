@@ -19,45 +19,39 @@ describe('BlastReadyScreen', () => {
 
   beforeEach(() => onStart.mockClear());
 
-  it('renders all 3 difficulty cards', () => {
+  it('renders 3 infographic step cards', () => {
     render(<BlastReadyScreen onStart={onStart} />);
-    expect(screen.getByTestId('difficulty-easy')).toBeInTheDocument();
-    expect(screen.getByTestId('difficulty-medium')).toBeInTheDocument();
-    expect(screen.getByTestId('difficulty-hard')).toBeInTheDocument();
+    expect(screen.getByTestId('step-card-step1')).toBeInTheDocument();
+    expect(screen.getByTestId('step-card-step2')).toBeInTheDocument();
+    expect(screen.getByTestId('step-card-step3')).toBeInTheDocument();
   });
 
-  it('medium is selected by default', () => {
+  it('displays translated step titles and descriptions', () => {
     render(<BlastReadyScreen onStart={onStart} />);
-    expect(screen.getByTestId('difficulty-medium')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('difficulty-easy')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByText('blast.ready.step1Title')).toBeInTheDocument();
+    expect(screen.getByText('blast.ready.step1Desc')).toBeInTheDocument();
+    expect(screen.getByText('blast.ready.step2Title')).toBeInTheDocument();
+    expect(screen.getByText('blast.ready.step3Title')).toBeInTheDocument();
   });
 
-  it('clicking a card selects it', () => {
+  it('does not render old difficulty picker or tile guide', () => {
     render(<BlastReadyScreen onStart={onStart} />);
-    fireEvent.click(screen.getByTestId('difficulty-hard'));
-    expect(screen.getByTestId('difficulty-hard')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('difficulty-medium')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.queryByTestId('difficulty-easy')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('difficulty-medium')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('tile-legend-gold')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('tile-legend-bomb')).not.toBeInTheDocument();
   });
 
-  it('play button calls onStart with selected difficulty', () => {
-    render(<BlastReadyScreen onStart={onStart} />);
-    fireEvent.click(screen.getByTestId('difficulty-hard'));
-    fireEvent.click(screen.getByTestId('play-button'));
-    expect(onStart).toHaveBeenCalledWith('hard');
-  });
-
-  it('play button calls onStart with medium by default', () => {
+  it('play button calls onStart with no arguments', () => {
     render(<BlastReadyScreen onStart={onStart} />);
     fireEvent.click(screen.getByTestId('play-button'));
-    expect(onStart).toHaveBeenCalledWith('medium');
+    expect(onStart).toHaveBeenCalledWith();
+    expect(onStart).toHaveBeenCalledTimes(1);
   });
 
-  it('renders tile guide with all 5 wave-1 tiles', () => {
+  it('renders title and subtitle', () => {
     render(<BlastReadyScreen onStart={onStart} />);
-    expect(screen.getByTestId('tile-legend-gold')).toBeInTheDocument();
-    expect(screen.getByTestId('tile-legend-bomb')).toBeInTheDocument();
-    expect(screen.getByTestId('tile-legend-rainbow')).toBeInTheDocument();
-    expect(screen.getByTestId('tile-legend-ice')).toBeInTheDocument();
-    expect(screen.getByTestId('tile-legend-wildcard')).toBeInTheDocument();
+    expect(screen.getByText('blast.ready.title')).toBeInTheDocument();
+    expect(screen.getByText('blast.ready.subtitle')).toBeInTheDocument();
   });
 });

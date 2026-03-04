@@ -123,7 +123,7 @@ class GameStartCoordinator {
     }
 
     if (sequence.messageId !== messageId) {
-      logger.warn('GAME_START', `Wrong messageId from ${username}. Expected: ${sequence.messageId}, Got: ${messageId}`);
+      logger.info('GAME_START', `Wrong messageId from ${username}. Expected: ${sequence.messageId}, Got: ${messageId}`);
       return { valid: false, reason: 'wrong_message_id' };
     }
 

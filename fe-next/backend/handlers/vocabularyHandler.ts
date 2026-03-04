@@ -7,7 +7,7 @@
 
 import type { Socket } from 'socket.io';
 import type { GameState } from '../modules/gameState/types';
-import { checkWordIntegration } from '@/hooks/useWordIntegration';
+import { checkWordIntegration } from '@/hooks/wordIntegrationLogic';
 
 import logger from '../utils/logger.js';
 

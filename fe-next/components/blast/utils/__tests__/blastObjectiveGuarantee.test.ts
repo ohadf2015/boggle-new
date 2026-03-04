@@ -371,7 +371,7 @@ describe('guaranteeObjectiveTiles', () => {
 
     it('should export MIN_STANDARD_RATIO constant equal to 0.6', () => {
       // Verify the constant is exported for external verification
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+       
       const { MIN_STANDARD_RATIO } = require('../blastObjectiveGuarantee');
       expect(MIN_STANDARD_RATIO).toBe(0.6);
     });

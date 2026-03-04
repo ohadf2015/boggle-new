@@ -287,7 +287,7 @@ export function usePlayerWordEvents({
 
   // Spam detection handlers
   const handleSpamWarning = useCallback((data: SpamWarningPayload) => {
-    logger.warn('[SPAM] Warning received:', data);
+    logger.log('[SPAM] Warning received:', data);
     neoWarningToast(t('spam.warning') || 'Slow down! Too many invalid words', {
       icon: '⚠️',
       duration: 4000
@@ -295,7 +295,7 @@ export function usePlayerWordEvents({
   }, [t]);
 
   const handleSpamPenalty = useCallback((data: SpamPenaltyPayload) => {
-    logger.warn('[SPAM] Penalty applied:', data);
+    logger.log('[SPAM] Penalty applied:', data);
     wordErrorToast(
       (t('spam.penalty') || 'Points deducted: -${points}').replace('${points}', String(data.pointsDeducted)),
       { duration: 4000 }
@@ -304,7 +304,7 @@ export function usePlayerWordEvents({
   }, [t, resetCombo]);
 
   const handleSpamCooldown = useCallback((data: SpamCooldownPayload) => {
-    logger.warn('[SPAM] Cooldown started:', data);
+    logger.log('[SPAM] Cooldown started:', data);
     const seconds = Math.ceil(data.duration / 1000);
     wordErrorToast(
       (t('spam.cooldown') || 'Blocked for ${seconds}s - slow down!').replace('${seconds}', String(seconds)),

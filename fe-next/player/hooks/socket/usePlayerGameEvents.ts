@@ -15,6 +15,7 @@ import {
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions } from '@/hooks/gameState';
+import type { BlastWordAcceptedPayload } from '@/shared/types/socket';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { StartGameBroadcast } from '@/shared/types/socket';
@@ -125,6 +126,13 @@ export function usePlayerGameEvents({
     setBoardTheme,
     setTotalBoardWords,
     setGameMode,
+    setBlastTileOverlay,
+    setBlastMovesUsed,
+    setWordHuntTargetLength,
+    setWordHuntMyLife,
+    setWordHuntPlayerLives,
+    setWordHuntTargetAttempts,
+    setWordHuntTargetFound,
   } = useGameActions();
 
   // Track if was in active game (TODO: move to GameState context)
@@ -207,6 +215,21 @@ export function usePlayerGameEvents({
       if (data.minWordLength) setMinWordLength(data.minWordLength);
       if ((data as any).boardTheme) setBoardTheme((data as any).boardTheme);
       if (data.gameMode) setGameMode(data.gameMode);
+
+      // Set blast tile overlay if present
+      if ((data as any).blastTileOverlay) {
+        setBlastTileOverlay((data as any).blastTileOverlay);
+        setBlastMovesUsed(0);
+      }
+
+      // Set word hunt target length if present
+      if ((data as any).wordHuntTargetLength) {
+        setWordHuntTargetLength((data as any).wordHuntTargetLength);
+        setWordHuntMyLife(100);
+        setWordHuntPlayerLives({});
+        setWordHuntTargetAttempts([]);
+        setWordHuntTargetFound(false);
+      }
 
       if ((data as any).lateJoin) {
         setGameActive(true);
@@ -364,10 +387,44 @@ export function usePlayerGameEvents({
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
 
+    // Handle blast word accepted (multiplayer blast mode)
+    const handleBlastWordAccepted = (data: BlastWordAcceptedPayload) => {
+      logger.log('[PLAYER] Blast word accepted:', data.word, 'bonus:', data.tileBonus, 'moves:', data.movesUsed);
+      setBlastMovesUsed(data.movesUsed);
+    };
+
     // Handle total board words count (for "words remaining" display)
     const handleTotalBoardWords = (data: { count: number }) => {
       logger.log('[PLAYER] Received totalBoardWords:', data.count);
       setTotalBoardWords(data.count);
+    };
+
+    // Word Hunt event handlers
+    const handleWordHuntLifeUpdate = (data: { playerLives: Record<string, number>; eliminatedPlayers: string[] }) => {
+      logger.log('[PLAYER] Word hunt life update:', data);
+      setWordHuntPlayerLives(data.playerLives);
+      if (data.playerLives[username] !== undefined) {
+        setWordHuntMyLife(data.playerLives[username]);
+      }
+    };
+
+    const handleWordHuntTargetResult = (data: { guess: string; feedback: any[]; correct: boolean; isFirstFinder: boolean; bonus: number; livesRemaining: number }) => {
+      logger.log('[PLAYER] Word hunt target result:', data);
+      setWordHuntTargetAttempts((prev) => [...prev, { guess: data.guess, feedback: data.feedback }]);
+      setWordHuntMyLife(data.livesRemaining);
+      if (data.correct) {
+        setWordHuntTargetFound(true);
+      }
+    };
+
+    const handleWordHuntTargetFound = (data: { username: string; targetWord: string; isFirstFinder: boolean }) => {
+      logger.log('[PLAYER] Word hunt target found by:', data.username);
+      // Another player found the target - show notification
+      neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: '🎯', duration: 3000 });
+    };
+
+    const handleWordHuntEliminated = (data: { username: string }) => {
+      logger.log('[PLAYER] Word hunt player eliminated:', data.username);
     };
 
     // Register listeners
@@ -384,6 +441,11 @@ export function usePlayerGameEvents({
     socket.on('fireRoundStart', earthquakeHandlers.handleFireRoundStart);
     socket.on('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
     socket.on('totalBoardWords', handleTotalBoardWords);
+    socket.on('blastWordAccepted', handleBlastWordAccepted);
+    socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
+    socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
+    socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
+    socket.on('wordHuntEliminated', handleWordHuntEliminated);
 
     return () => {
       socket.off('startGame', handleStartGame);
@@ -400,6 +462,11 @@ export function usePlayerGameEvents({
       socket.off('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
       earthquakeHandlers.cleanup();
       socket.off('totalBoardWords', handleTotalBoardWords);
+      socket.off('blastWordAccepted', handleBlastWordAccepted);
+      socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
+      socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
+      socket.off('wordHuntTargetFound', handleWordHuntTargetFound);
+      socket.off('wordHuntEliminated', handleWordHuntEliminated);
     };
     // Setters from context are stable (wrapped in useCallback)
     // NOTE: letterGrid and gameLanguage are accessed via refs (letterGridRef, gameLanguageRef)

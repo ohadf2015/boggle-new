@@ -12,7 +12,6 @@ import SpectatorBanner from '@/components/SpectatorBanner';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { TrainingGatewayModal } from '@/components/training';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
@@ -178,8 +177,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     setIsSpectator,
     spectators,
     setSpectators,
-    showTrainingGateway,
-    setShowTrainingGateway,
     pendingGameStart,
     setPendingGameStart,
     gameStartTime,
@@ -406,14 +403,31 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         `🎮 [JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`
       );
 
-      // Use socket.connected directly — React state (isConnected) can lag behind
-      // the actual socket state by 1-3ms, causing false "not connected" errors
-      if (!socket?.connected) {
-        console.error('❌ [JOIN] Cannot join - socket not connected', {
-          socket: !!socket,
-          isConnected,
-          socketConnected: socket?.connected,
+      // Wait for socket connection if socket exists but isn't connected yet
+      // This handles the race condition where join fires before connection completes
+      if (socket && !socket.connected) {
+        logger.log('[JOIN] Socket exists but not connected, waiting...');
+        const connected = await new Promise<boolean>((resolve) => {
+          const timeout = setTimeout(() => resolve(false), 5000);
+          const onConnect = () => { clearTimeout(timeout); resolve(true); };
+          socket.once('connect', onConnect);
+          // If it connects while we're setting up the listener
+          if (socket.connected) { clearTimeout(timeout); socket.off('connect', onConnect); resolve(true); }
         });
+        if (!connected) {
+          logger.log('[JOIN] Socket connection timed out after 5s');
+          setError(t('errors.notConnected') || 'Not connected to server');
+          toast.error(t('common.notConnected') || 'Not connected to server', {
+            duration: 3000,
+            icon: '⚠️',
+          });
+          return;
+        }
+        logger.log('[JOIN] Socket connected after waiting');
+      }
+
+      if (!socket?.connected) {
+        logger.log('[JOIN] No socket available');
         setError(t('errors.notConnected') || 'Not connected to server');
         toast.error(t('common.notConnected') || 'Not connected to server', {
           duration: 3000,
@@ -718,6 +732,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           pendingGameStart={pendingGameStart}
           onGameStartConsumed={() => setPendingGameStart(null)}
           roomLanguage={roomLanguage}
+          onUsernameChange={setUsername}
         />
       </FeatureErrorBoundary>
     );
@@ -726,13 +741,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   return (
     <SocketContext.Provider value={socketContextValue}>
       <ConnectionDot />
-
-      <TrainingGatewayModal
-        isOpen={showTrainingGateway}
-        onClose={() => setShowTrainingGateway(false)}
-        onSkip={() => setShowTrainingGateway(false)}
-        returnTo="multiplayer"
-      />
 
       <SpectatorBanner
         isSpectating={isSpectator}

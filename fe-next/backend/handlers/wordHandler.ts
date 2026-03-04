@@ -49,8 +49,6 @@ const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '1');
 // Types for payloads
 interface SubmitWordPayload {
   word: string;
-  comboLevel?: number;
-  fireRoundActive?: boolean;
 }
 
 interface SubmitWordVotePayload {
@@ -192,7 +190,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
     }
 
     try {
-      const { word, comboLevel = 0, fireRoundActive = false } = validation.data as SubmitWordPayload;
+      const { word } = validation.data as SubmitWordPayload;
 
       const gameCode = getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
@@ -347,7 +345,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
 
       if (shouldAutoValidate) {
-        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary === true, fireRoundActive === true);
+        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true);
       } else {
         // Word not in dictionary - reject immediately (no pending/AI validation)
         inc('wordNeedsValidation');
@@ -383,8 +381,6 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       });
       emitError(socket, ErrorCodes.WORD_PROCESSING_ERROR, {
         correlationId: `${catchGameCode}-${Date.now()}`,
-        // Include actual error for debugging (server-side details visible in client logs)
-        details: { error: err.message, stack: err.stack?.split('\n').slice(0, 3).join('\n') },
       });
       // Note: gracePeriodLockId is out of scope in catch block, but the lock has a short TTL (2s)
       // so it will auto-expire if we can't release it here. This is acceptable for error cases.
@@ -510,8 +506,10 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
 // Helper functions
 
-function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, comboLevel: number, isInDictionary: boolean, fireRoundActive: boolean = false): void {
-  const safeComboLevel = Math.max(0, parseInt(String(comboLevel), 10) || 0);
+function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean): void {
+  // Derive combo and fire round from server state (never trust client)
+  const safeComboLevel = game.playerCombos?.[username] || 0;
+  const fireRoundActive = game.fireRoundActive === true;
   const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
   const wordScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier);
@@ -521,8 +519,9 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Fire round bonus is the additional points from the 2x multiplier
   const fireRoundBonus = fireRoundActive ? scoreWithoutMultiplier : 0;
 
+  // Increment server-side combo on each accepted word
   if (!game.playerCombos) game.playerCombos = {};
-  game.playerCombos[username] = safeComboLevel;
+  game.playerCombos[username] = safeComboLevel + 1;
 
   // Record this player as the first finder of this word
   const userData = game.users?.[username];
@@ -554,6 +553,30 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     });
   }
 
+  // Apply blast mode tile bonus if applicable
+  let blastTileBonus = 0;
+  let blastTilesCleared: string[] = [];
+  let blastMoveResult: { movesUsed: number; bonusMove: boolean } | null = null;
+
+  if (game.gameMode === 'blast' && (game as any).blastModeState) {
+    try {
+      const { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } = require('../modules/blastModeManager');
+      const blastState = (game as any).blastModeState;
+      const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay);
+      blastTileBonus = calculateBlastTileBonus(tilesOnPath);
+      blastTilesCleared = tilesOnPath;
+      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel);
+
+      // Add tile bonus to score
+      if (blastTileBonus > 0) {
+        updatePlayerScore(gameCode, username, blastTileBonus, true);
+      }
+    } catch (err: unknown) {
+      const error = err as Error;
+      logger.error('BLAST', `Blast bonus calculation error: ${error.message}`);
+    }
+  }
+
   updatePlayerScore(gameCode, username, wordScore, true);
 
   inc('wordAccepted');
@@ -571,6 +594,32 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     autoValidated: true,
     fromLesson: fromLesson
   });
+
+  // Emit blast-specific data if in blast mode
+  if (blastMoveResult) {
+    socket.emit('blastWordAccepted', {
+      word: normalizedWord,
+      score: wordScore + blastTileBonus,
+      tileBonus: blastTileBonus,
+      tilesCleared: blastTilesCleared,
+      movesUsed: blastMoveResult.movesUsed,
+      bonusMove: blastMoveResult.bonusMove,
+      comboLevel: safeComboLevel,
+    });
+  }
+
+  // Restore life in word-hunt mode when a word is accepted
+  if (game.gameMode === 'word-hunt' && (game as any).wordHuntState) {
+    try {
+      const { restoreLife, getLifeBonus } = require('../modules/wordHuntManager');
+      const huntState = (game as any).wordHuntState;
+      const lifeBonus = getLifeBonus(normalizedWord.length);
+      restoreLife(huntState, username, lifeBonus);
+    } catch (err: unknown) {
+      const error = err as Error;
+      logger.error('WORD_HUNT', `Life restoration error: ${error.message}`);
+    }
+  }
 
   // Broadcast playerFoundWord to room for TV broadcast mode
   // Includes combo level and word for exciting notifications

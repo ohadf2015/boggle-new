@@ -18,13 +18,10 @@ jest.mock('@/components/ui/PlayfulBackground', () => ({
 jest.mock('../BlastGame', () => ({
   BlastGame: () => <div data-testid="blast-game" />,
 }));
-jest.mock('../BlastGamePhaser', () => ({
-  BlastGamePhaser: () => <div data-testid="blast-game" />,
-}));
 jest.mock('../BlastReadyScreen', () => ({
-  BlastReadyScreen: ({ onStart }: { onStart: (d: string) => void }) => (
+  BlastReadyScreen: ({ onStart }: { onStart: () => void }) => (
     <div data-testid="blast-ready-screen">
-      <button onClick={() => onStart('medium')}>play</button>
+      <button onClick={() => onStart()}>play</button>
     </div>
   ),
 }));
@@ -40,6 +37,14 @@ describe('BlastView ready phase', () => {
     render(<BlastView />);
     fireEvent.click(screen.getByText('play'));
     expect(screen.queryByTestId('blast-ready-screen')).not.toBeInTheDocument();
+    expect(screen.getByTestId('blast-game')).toBeInTheDocument();
+  });
+
+  it('always uses medium difficulty config', () => {
+    // BlastView should not accept or pass difficulty — it hardcodes medium
+    render(<BlastView />);
+    fireEvent.click(screen.getByText('play'));
+    // Game renders — confirms no difficulty selection needed
     expect(screen.getByTestId('blast-game')).toBeInTheDocument();
   });
 });

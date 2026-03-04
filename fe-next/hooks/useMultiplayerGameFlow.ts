@@ -1,14 +1,10 @@
 /**
  * Game flow orchestration for multiplayer
- * Manages results display, spectator state, and training gateway
+ * Manages results display and spectator state
  */
 
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import type { Socket } from 'socket.io-client';
-import {
-  shouldShowTrainingGateway as checkTrainingGateway,
-  markGatewaySeen,
-} from '@/utils/trainingProgressStorage';
 import { recordGameCompleted } from '@/utils/multiplayerProgressStorage';
 import type { Language } from '@/shared/types/game';
 
@@ -47,8 +43,6 @@ interface UseMultiplayerGameFlowReturn {
   setIsSpectator: (value: boolean) => void;
   spectators: Array<{ username: string; socketId: string; avatar: any }>;
   setSpectators: (value: Array<{ username: string; socketId: string; avatar: any }>) => void;
-  showTrainingGateway: boolean;
-  setShowTrainingGateway: (value: boolean) => void;
   pendingGameStart: GameStartData | null;
   setPendingGameStart: (data: GameStartData | null) => void;
   gameStartTime: number | null;
@@ -80,37 +74,11 @@ export function useMultiplayerGameFlow(
   const [spectators, setSpectators] = useState<Array<{ username: string; socketId: string; avatar: any }>>(
     []
   );
-  const [showTrainingGateway, setShowTrainingGateway] = useState<boolean>(false);
   const [pendingGameStart, setPendingGameStart] = useState<GameStartData | null>(null);
   const [gameStartTime, setGameStartTime] = useState<number | null>(null);
 
   // Store calculated game duration when results are shown
   const gameDurationRef = useRef<number | null>(null);
-
-  // Check if we should show the training gateway for new players
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (isActive || externalShowResults) return;
-
-    // Check if player is joining via invitation link
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomFromUrl = urlParams.get('room');
-
-    // Skip training gateway if joining via invitation
-    if (roomFromUrl) return;
-
-    const shouldShow = checkTrainingGateway();
-    if (shouldShow) {
-      // Mark as seen immediately to prevent race conditions
-      markGatewaySeen();
-
-      const timer = setTimeout(() => {
-        setShowTrainingGateway(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [isActive, externalShowResults]);
 
   // Calculate and store game duration when results are first shown
   useEffect(() => {
@@ -174,8 +142,6 @@ export function useMultiplayerGameFlow(
     setIsSpectator,
     spectators,
     setSpectators,
-    showTrainingGateway,
-    setShowTrainingGateway,
     pendingGameStart,
     setPendingGameStart,
     gameStartTime,

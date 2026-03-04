@@ -7,6 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useCoinContext, type CoinRewardResult } from '@/contexts/CoinContext';
+import logger from '@/utils/logger';
 import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 
 interface UseCoinRewardsParams {
@@ -31,6 +32,9 @@ export function useCoinRewards({
   const { awardGameCompletion } = useCoinContext();
   const [coinReward, setCoinReward] = useState<CoinRewardResult | null>(null);
   const hasAwardedCoinsRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => () => { mountedRef.current = false; }, []);
 
   useEffect(() => {
     if (hasAwardedCoinsRef.current) return;
@@ -40,16 +44,20 @@ export function useCoinRewards({
     const sessionId = results.gameSessionId || `sp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     async function awardCoins(): Promise<void> {
-      const reward = await awardGameCompletion({
-        sessionId,
-        mode: 'singleplayer',
-        score: results.playerScore,
-        rank: playerRank,
-        totalPlayers: totalParticipants,
-      });
+      try {
+        const reward = await awardGameCompletion({
+          sessionId,
+          mode: 'singleplayer',
+          score: results.playerScore,
+          rank: playerRank,
+          totalPlayers: totalParticipants,
+        });
 
-      if (reward) {
-        setCoinReward(reward);
+        if (reward && mountedRef.current) {
+          setCoinReward(reward);
+        }
+      } catch (err) {
+        logger.error('[useCoinRewards] Failed to award coins:', err);
       }
     }
 

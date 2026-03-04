@@ -3,21 +3,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Eye, EyeOff, type LucideIcon } from 'lucide-react';
+import { X, Mail, Eye, EyeOff, Wand2, Shield } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
 import { Button as ButtonComponent } from '../ui/button';
 
 // Type assertion for JSX Button component
 const Button = ButtonComponent as any;
-import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail } from '../../lib/supabase';
+import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail, signInWithMagicLink } from '../../lib/supabase';
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import type { Language } from '@/types';
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -51,15 +49,13 @@ interface Provider {
   id: 'google' | 'discord';
   icon: React.FC<{ className?: string }>;
   label: string;
-  color: string;
+  className: string;
 }
 
 type AuthMode = 'signin' | 'signup';
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats = false, initialMode = 'signin' }) => {
-  const { theme } = useTheme();
   const { t, language } = useLanguage();
-  const isDarkMode = theme === 'dark';
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -69,7 +65,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
   // Email/password form state
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
-  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [usePassword, setUsePassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -82,7 +78,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   useEffect(() => {
     if (isOpen) {
       setAuthMode(initialMode);
-      setShowEmailForm(false);
+      setUsePassword(false);
       setEmail('');
       setPassword('');
       setEmailError(null);
@@ -99,7 +95,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       return;
     }
 
-    // Focus trap
     if (e.key === 'Tab' && modalRef.current) {
       const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -117,12 +112,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     }
   }, [onClose]);
 
-  // Manage focus on open/close
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement;
       document.addEventListener('keydown', handleKeyDown);
-      // Focus the first focusable element after a short delay for animation
       setTimeout(() => {
         const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -144,30 +137,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     setError(null);
 
     try {
-      let result;
-      switch (provider) {
-        case 'google':
-          result = await signInWithGoogle();
-          break;
-        case 'discord':
-          result = await signInWithDiscord();
-          break;
-        default:
-          throw new Error('Unknown provider');
-      }
+      const result = provider === 'google'
+        ? await signInWithGoogle()
+        : await signInWithDiscord();
 
       if (result.error) {
         setError(result.error.message);
         setIsLoading(null);
       }
-      // OAuth will redirect, so no need to close modal
     } catch (err) {
       setError((err as Error).message || 'An error occurred');
       setIsLoading(null);
     }
   };
 
-  // Email validation handlers
   const handleEmailChange = (value: string) => {
     setEmail(value);
     if (value) {
@@ -191,14 +174,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate email
     const emailValidation = validateEmail(email);
     if (!emailValidation.isValid) {
       setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
       return;
     }
 
-    // Validate password
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       setPasswordError(passwordValidation.error ? t(passwordValidation.error) : 'Invalid password');
@@ -211,15 +192,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     setPasswordError(null);
 
     try {
-      let result;
-      if (authMode === 'signup') {
-        result = await signUpWithEmail(email, password);
-      } else {
-        result = await signInWithEmail(email, password);
-      }
+      const result = authMode === 'signup'
+        ? await signUpWithEmail(email, password)
+        : await signInWithEmail(email, password);
 
       if (result.error) {
-        // Handle specific errors
         if (result.error.message.includes('already registered') || result.error.message.includes('already exists')) {
           setError(t('auth.inlineSignup.emailInUse') || 'This email is already registered. Try signing in instead.');
           setAuthMode('signin');
@@ -230,11 +207,37 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         }
         setIsLoading(null);
       } else if (authMode === 'signup') {
-        // Signup successful - show confirmation message
         setSuccess(t('auth.inlineSignup.checkEmail') || 'Check your email to verify your account!');
         setIsLoading(null);
       }
-      // For signin, the auth context will handle the redirect
+    } catch (err) {
+      setError((err as Error).message || 'An error occurred');
+      setIsLoading(null);
+    }
+  };
+
+  const handleMagicLinkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
+      return;
+    }
+
+    setIsLoading('magiclink');
+    setError(null);
+    setEmailError(null);
+
+    try {
+      const result = await signInWithMagicLink(email);
+
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        setSuccess(t('auth.magicLink.checkEmail') || 'Check your email for a sign-in link!');
+      }
+      setIsLoading(null);
     } catch (err) {
       setError((err as Error).message || 'An error occurred');
       setIsLoading(null);
@@ -243,15 +246,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
   const isAnyLoading = isLoading !== null;
 
-  // Using brand colors from tailwind.config.js for consistency and maintainability
   const providers: Provider[] = [
-    { id: 'google', icon: GoogleIcon, label: 'Google', color: 'bg-brand-google text-white hover:bg-brand-google-hover' },
-    { id: 'discord', icon: DiscordIcon, label: 'Discord', color: 'bg-brand-discord text-white hover:bg-brand-discord-hover' }
+    {
+      id: 'google',
+      icon: GoogleIcon,
+      label: 'Google',
+      className: 'bg-white text-gray-800 border-3 border-neo-black hover:bg-gray-50 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed',
+    },
+    {
+      id: 'discord',
+      icon: DiscordIcon,
+      label: 'Discord',
+      className: 'bg-brand-discord text-white border-3 border-neo-black hover:bg-brand-discord-hover shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed',
+    },
   ];
 
   if (!isOpen) return null;
-
-  // Use portal to render modal at document body level to avoid transform/filter stacking context issues
   if (typeof document === 'undefined') return null;
 
   return createPortal(
@@ -260,7 +270,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       >
         <motion.div
@@ -268,83 +278,55 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           role="dialog"
           aria-modal="true"
           aria-labelledby="auth-modal-title"
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={cn(
-            'w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl',
-            isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white'
-          )}
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          transition={{ type: 'spring', damping: 22, stiffness: 280 }}
+          className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy p-6 shadow-hard-lg"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2
-              id="auth-modal-title"
-              className={cn(
-                'text-xl font-bold',
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              )}
-            >
-              {authMode === 'signup' ? (t('auth.signUp') || 'Sign Up') : t('auth.signIn')}
-            </h2>
-            <Button
-              variant="ghost"
-              size="icon"
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2
+                id="auth-modal-title"
+                className="text-2xl font-black text-white font-neo-display"
+              >
+                {authMode === 'signup' ? (t('auth.signUp') || 'Sign Up') : (t('auth.signIn') || 'Sign In')}
+              </h2>
+              <p className="text-sm text-gray-400 mt-0.5">
+                {t('auth.upgradePrompt') || 'Sign in to save progress and climb the leaderboard!'}
+              </p>
+            </div>
+            <button
               onClick={onClose}
-              className="rounded-full"
+              className="p-2 rounded-neo border-2 border-slate-600 hover:border-white hover:bg-white/10 transition-all text-gray-400 hover:text-white"
               aria-label={t('common.close') || 'Close'}
-              asChild={false}
             >
-              <X size={18} />
-            </Button>
+              <X size={16} />
+            </button>
           </div>
 
           {/* Guest Stats Preview */}
           {showGuestStats && guestStats && guestStats.gamesPlayed > 0 && (
-            <div className={cn(
-              'mb-6 p-4 rounded-xl',
-              isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
-            )}>
-              <p className={cn(
-                'text-sm font-medium mb-2',
-                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-              )}>
+            <div className="mb-5 p-3 rounded-neo border-2 border-neo-cyan/30 bg-neo-cyan/5">
+              <p className="text-xs font-bold text-neo-cyan mb-2">
                 {t('auth.guestStatsTitle')}
               </p>
-              <div className="flex gap-4 text-sm">
-                <div className={cn(
-                  'flex-1 text-center p-2 rounded-lg',
-                  isDarkMode ? 'bg-slate-600' : 'bg-white'
-                )}>
-                  <div className={cn(
-                    'font-bold text-lg',
-                    isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
-                  )}>
+              <div className="flex gap-3 text-sm">
+                <div className="flex-1 text-center p-2 rounded-lg bg-slate-800/50">
+                  <div className="font-black text-lg text-neo-cyan">
                     {guestStats.gamesPlayed}
                   </div>
-                  <div className={cn(
-                    'text-xs',
-                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                  )}>
+                  <div className="text-[10px] text-gray-400 uppercase tracking-wide">
                     {t('profile.totalGames')}
                   </div>
                 </div>
-                <div className={cn(
-                  'flex-1 text-center p-2 rounded-lg',
-                  isDarkMode ? 'bg-slate-600' : 'bg-white'
-                )}>
-                  <div className={cn(
-                    'font-bold text-lg',
-                    isDarkMode ? 'text-purple-400' : 'text-purple-600'
-                  )}>
+                <div className="flex-1 text-center p-2 rounded-lg bg-slate-800/50">
+                  <div className="font-black text-lg text-neo-pink">
                     {guestStats.totalScore}
                   </div>
-                  <div className={cn(
-                    'text-xs',
-                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                  )}>
+                  <div className="text-[10px] text-gray-400 uppercase tracking-wide">
                     {t('profile.totalScore')}
                   </div>
                 </div>
@@ -353,30 +335,29 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           )}
 
           {/* Success Message */}
-          {success && (
-            <div className={cn(
-              'mb-4 p-4 rounded-xl text-center',
-              isDarkMode ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-emerald-100 border border-emerald-500'
-            )}>
-              <p className={cn(
-                'text-sm font-bold',
-                isDarkMode ? 'text-emerald-300' : 'text-emerald-700'
-              )}>{success}</p>
-            </div>
-          )}
+          <AnimatePresence>
+            {success && (
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="mb-4 p-4 rounded-neo border-3 border-emerald-400 bg-emerald-500/10 text-center shadow-hard-sm"
+              >
+                <Mail className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+                <p className="text-sm font-bold text-emerald-300">{success}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {!success && (
             <>
-              {/* OAuth Buttons - Hidden on CrazyGames platform */}
+              {/* OAuth Buttons */}
               {isOnCrazyGamesPlatform ? (
                 <div className="space-y-3">
                   <Button
                     onClick={() => showAuthPrompt()}
                     disabled={isAnyLoading}
-                    className={cn(
-                      'w-full h-12 text-base font-medium rounded-xl transition-all',
-                      'bg-neo-orange text-white hover:bg-neo-orange/90'
-                    )}
+                    className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-orange text-white hover:bg-neo-orange/90 shadow-hard transition-all"
                     asChild={false}
                   >
                     {isLoading === 'crazygames' ? (
@@ -387,200 +368,243 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {providers.map((provider) => (
-                    <Button
+                <div className="space-y-2.5">
+                  {providers.map((provider, idx) => (
+                    <motion.div
                       key={provider.id}
-                      onClick={() => handleSignIn(provider.id)}
-                      disabled={isAnyLoading}
-                      className={cn(
-                        'w-full h-12 text-base font-medium rounded-xl transition-all',
-                        provider.color
-                      )}
-                      asChild={false}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
                     >
-                      {isLoading === provider.id ? (
-                        <Loader size="sm" />
-                      ) : (
-                        <provider.icon className="w-5 h-5" />
-                      )}
-                      <span className="ml-2">
-                        {t('auth.signInWith', { provider: provider.label })}
-                      </span>
-                    </Button>
+                      <Button
+                        onClick={() => handleSignIn(provider.id)}
+                        disabled={isAnyLoading}
+                        className={cn(
+                          'w-full h-12 text-base font-bold rounded-neo transition-all flex items-center justify-center gap-2',
+                          provider.className
+                        )}
+                        asChild={false}
+                      >
+                        {isLoading === provider.id ? (
+                          <Loader size="sm" />
+                        ) : (
+                          <>
+                            <provider.icon className="w-5 h-5" />
+                            <span>{t('auth.signInWith', { provider: provider.label })}</span>
+                          </>
+                        )}
+                      </Button>
+                    </motion.div>
                   ))}
                 </div>
               )}
 
-              {/* Email Form Toggle - Hidden on CrazyGames platform */}
-              {!isOnCrazyGamesPlatform && !showEmailForm ? (
-                <button
-                  onClick={() => setShowEmailForm(true)}
-                  className={cn(
-                    'w-full mt-4 text-sm flex items-center justify-center gap-2 transition-colors',
-                    isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'
-                  )}
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
-                </button>
-              ) : !isOnCrazyGamesPlatform && showEmailForm ? (
-                <motion.form
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  onSubmit={handleEmailSubmit}
-                  className="mt-4 space-y-3"
-                >
+              {/* Divider + Email Section — always visible (no toggle) */}
+              {!isOnCrazyGamesPlatform && (
+                <div className="mt-5">
                   {/* Divider */}
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <div className={cn('flex-1 h-px', isDarkMode ? 'bg-slate-600' : 'bg-gray-300')} />
-                    <span>{authMode === 'signup' ? 'Create account' : 'Sign in with email'}</span>
-                    <div className={cn('flex-1 h-px', isDarkMode ? 'bg-slate-600' : 'bg-gray-300')} />
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex-1 h-px bg-slate-600" />
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      {t('auth.magicLink.divider') || 'or continue with email'}
+                    </span>
+                    <div className="flex-1 h-px bg-slate-600" />
                   </div>
 
-                  {/* Email Input */}
-                  <div>
-                    <input
-                      type="email"
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => handleEmailChange(e.target.value)}
-                      placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
-                      className={cn(
-                        'w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 transition-colors',
-                        isDarkMode ? 'bg-slate-700 text-white placeholder-gray-400' : 'bg-gray-50 text-gray-900 placeholder-gray-400',
-                        emailError ? 'border-red-500' : (isDarkMode ? 'border-slate-600' : 'border-gray-200')
-                      )}
-                      disabled={isAnyLoading}
-                      spellCheck={false}
-                    />
-                    {emailError && (
-                      <p className="mt-1 text-xs text-red-500">{emailError}</p>
-                    )}
-                  </div>
+                  {!usePassword ? (
+                    /* Magic Link Form (default — no password needed) */
+                    <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
+                      <div>
+                        <input
+                          type="email"
+                          autoComplete="email"
+                          value={email}
+                          onChange={(e) => handleEmailChange(e.target.value)}
+                          placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                          className={cn(
+                            'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
+                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                            emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
+                          )}
+                          disabled={isAnyLoading}
+                          spellCheck={false}
+                        />
+                        {emailError && (
+                          <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                        )}
+                      </div>
 
-                  {/* Password Input */}
-                  <div>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
-                        value={password}
-                        onChange={(e) => handlePasswordChange(e.target.value)}
-                        placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
-                        className={cn(
-                          'w-full px-4 py-3 pr-12 rounded-xl border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 transition-colors',
-                          isDarkMode ? 'bg-slate-700 text-white placeholder-gray-400' : 'bg-gray-50 text-gray-900 placeholder-gray-400',
-                          passwordError ? 'border-red-500' : (isDarkMode ? 'border-slate-600' : 'border-gray-200')
-                        )}
-                        disabled={isAnyLoading}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? (t('auth.hidePassword') || 'Hide password') : (t('auth.showPassword') || 'Show password')}
-                        className={cn(
-                          'absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 transition-colors rounded',
-                          'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-                          isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'
-                        )}
+                      <Button
+                        type="submit"
+                        disabled={isAnyLoading || !email || !!emailError}
+                        className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2"
+                        asChild={false}
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
-                      </button>
-                    </div>
-                    {passwordError && (
-                      <p className="mt-1 text-xs text-red-500">{passwordError}</p>
-                    )}
-                  </div>
+                        {isLoading === 'magiclink' ? (
+                          <Loader size="sm" />
+                        ) : (
+                          <>
+                            <Wand2 className="w-4 h-4" />
+                            <span>{t('auth.magicLink.sendLink') || 'Send me a sign-in link'}</span>
+                          </>
+                        )}
+                      </Button>
 
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
-                    className={cn(
-                      'w-full h-12 text-base font-medium rounded-xl transition-all',
-                      'bg-cyan-500 text-white hover:bg-cyan-600'
-                    )}
-                    asChild={false}
-                  >
-                    {isLoading === 'email' ? (
-                      <Loader size="sm" />
-                    ) : (
-                      authMode === 'signup'
-                        ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
-                        : (t('auth.signIn') || 'Sign In')
-                    )}
-                  </Button>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                          <Wand2 className="w-3 h-3" />
+                          {t('auth.magicLink.noPassword') || 'No password needed'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setUsePassword(true)}
+                          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                        >
+                          {t('auth.magicLink.usePassword') || 'Use password instead'}
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    /* Password Form */
+                    <form onSubmit={handleEmailSubmit} className="space-y-3">
+                      <div>
+                        <input
+                          type="email"
+                          autoComplete="email"
+                          value={email}
+                          onChange={(e) => handleEmailChange(e.target.value)}
+                          placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                          className={cn(
+                            'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
+                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                            emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
+                          )}
+                          disabled={isAnyLoading}
+                          spellCheck={false}
+                        />
+                        {emailError && (
+                          <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                        )}
+                      </div>
 
-                  {/* Toggle auth mode */}
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
-                    className={cn(
-                      'w-full text-xs transition-colors',
-                      isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                    )}
-                  >
-                    {authMode === 'signup'
-                      ? (t('auth.alreadyHaveAccount') || 'Already have an account? Sign in')
-                      : (t('auth.noAccount') || "Don't have an account? Sign up")}
-                  </button>
-                </motion.form>
-              ) : null}
+                      <div>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
+                            value={password}
+                            onChange={(e) => handlePasswordChange(e.target.value)}
+                            placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
+                            className={cn(
+                              'w-full px-4 py-3 pe-12 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
+                              'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                              passwordError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
+                            )}
+                            disabled={isAnyLoading}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? (t('auth.hidePassword') || 'Hide password') : (t('auth.showPassword') || 'Show password')}
+                            className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
+                          </button>
+                        </div>
+                        {passwordError && (
+                          <p className="mt-1 text-xs text-red-400">{passwordError}</p>
+                        )}
+                      </div>
 
-              {/* Error Message */}
-              {error && (
-                <div className={cn(
-                  'mt-4 p-3 rounded-lg text-sm',
-                  isDarkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-700'
-                )}>
-                  {error}
+                      <Button
+                        type="submit"
+                        disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
+                        className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                        asChild={false}
+                      >
+                        {isLoading === 'email' ? (
+                          <Loader size="sm" />
+                        ) : (
+                          authMode === 'signup'
+                            ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
+                            : (t('auth.signIn') || 'Sign In')
+                        )}
+                      </Button>
+
+                      <div className="flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
+                          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                        >
+                          {authMode === 'signup'
+                            ? (t('auth.alreadyHaveAccount') || 'Already have an account? Sign in')
+                            : (t('auth.noAccount') || "Don't have an account? Sign up")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUsePassword(false)}
+                          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                        >
+                          {t('auth.magicLink.useMagicLink') || 'Use magic link'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               )}
+
+              {/* Error Message */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="mt-4 p-3 rounded-neo border-2 border-red-500/50 bg-red-500/10 text-sm text-red-300"
+                  >
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </>
           )}
 
           {/* Continue as Guest */}
-          <div className="mt-6 text-center">
+          <div className="mt-5 text-center">
             <button
               onClick={onClose}
-              className={cn(
-                'text-sm hover:underline',
-                isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-700'
-              )}
+              className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
             >
               {t('auth.continueAsGuest')}
             </button>
           </div>
 
-          {/* Terms */}
-          <p className={cn(
-            'mt-4 text-xs text-center',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            {t('auth.termsPrefix')}{' '}
-            <Link
-              href={`/${language}/legal/terms`}
-              className={cn(
-                'underline transition-colors',
-                isDarkMode ? 'hover:text-cyan-400' : 'hover:text-cyan-600'
-              )}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {t('auth.termsLink')}
-            </Link>
-            {' '}{t('auth.andText')}{' '}
-            <Link
-              href={`/${language}/legal/privacy`}
-              className={cn(
-                'underline transition-colors',
-                isDarkMode ? 'hover:text-cyan-400' : 'hover:text-cyan-600'
-              )}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {t('auth.privacyLink')}
-            </Link>
-          </p>
+          {/* Trust Signal + Terms */}
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
+              <Shield className="w-3 h-3 text-emerald-500" />
+              <span>{t('auth.trustBadge') || 'Secure & private'}</span>
+            </div>
+            <p className="text-[10px] text-gray-500 text-center">
+              {t('auth.termsPrefix')}{' '}
+              <Link
+                href={`/${language}/legal/terms`}
+                className="underline hover:text-gray-300 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {t('auth.termsLink')}
+              </Link>
+              {' '}{t('auth.andText')}{' '}
+              <Link
+                href={`/${language}/legal/privacy`}
+                className="underline hover:text-gray-300 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {t('auth.privacyLink')}
+              </Link>
+            </p>
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>,

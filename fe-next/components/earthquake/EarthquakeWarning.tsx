@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
-import { EffectsPreferencePrompt } from './EffectsPreferencePrompt';
 
 interface EarthquakeWarningProps {
   isVisible: boolean;
@@ -26,32 +24,6 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
   const [distances] = useState(() =>
     Array.from({ length: 8 }, () => 100 + Math.random() * 50)
   );
-
-  // Track if we should show the effects preference prompt (first earthquake only)
-  const [showPreferencePrompt, setShowPreferencePrompt] = useState(false);
-  const hasCheckedRef = useRef(false);
-
-  // Check if this is the user's first earthquake when warning appears
-  useEffect(() => {
-    if (isVisible && !hasCheckedRef.current) {
-      hasCheckedRef.current = true;
-      if (shouldShowGuidance('effectsPreferenceShown')) {
-        setShowPreferencePrompt(true);
-      }
-    }
-    // FIXED: Reset prompt when warning is hidden to prevent it from persisting during gameplay
-    // Also reset the check flag for next earthquake in different game
-    if (!isVisible) {
-      hasCheckedRef.current = false;
-      setShowPreferencePrompt(false);
-    }
-  }, [isVisible]);
-
-  // Handle dismissing the preference prompt
-  const handlePreferenceDismiss = useCallback(() => {
-    markGuidanceShown('effectsPreferenceShown');
-    setShowPreferencePrompt(false);
-  }, []);
 
   // Announce for screen readers when warning appears
   useEffect(() => {
@@ -143,10 +115,6 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
                 <p className="text-lg font-bold text-neo-black/80">
                   {t('earthquake.brace') || 'Brace yourself!'}
                 </p>
-                {/* Photosensitivity Warning */}
-                <p className="text-xs font-bold text-neo-red mt-2 bg-neo-cream/80 rounded px-2 py-1 inline-block border-2 border-neo-black">
-                  ⚠️ {t('earthquake.photosensitivity') || 'Flashing lights ahead! Disable in Settings if sensitive'}
-                </p>
               </div>
 
               {/* Decorative stripes */}
@@ -202,13 +170,6 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
         </motion.div>
       )}
     </AnimatePresence>
-
-      {/* First-time effects preference prompt - rendered separately so it persists */}
-      <AnimatePresence>
-        {showPreferencePrompt && (
-          <EffectsPreferencePrompt onDismiss={handlePreferenceDismiss} />
-        )}
-      </AnimatePresence>
     </>
   );
 };

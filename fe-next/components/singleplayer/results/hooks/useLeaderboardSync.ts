@@ -7,6 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { getGuestSessionId, getGuestName } from '@/utils/guestManager';
+import logger from '@/utils/logger';
 import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 
 interface UseLeaderboardSyncParams {
@@ -32,6 +33,9 @@ export function useLeaderboardSync({
   const [globalRank, setGlobalRank] = useState<number | null>(null);
   const hasSyncedLeaderboardRef = useRef(false);
   const hasFetchedGlobalRankRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => () => { mountedRef.current = false; }, []);
 
   // Sync guest scores to leaderboard
   useEffect(() => {
@@ -42,7 +46,7 @@ export function useLeaderboardSync({
       try {
         const guestFingerprint = getGuestSessionId();
         if (!guestFingerprint) {
-          console.warn('[useLeaderboardSync] No guest fingerprint available');
+          logger.warn('[useLeaderboardSync] No guest fingerprint available');
           return;
         }
 
@@ -72,10 +76,10 @@ export function useLeaderboardSync({
         }
 
         const result = await response.json();
-        console.log('[useLeaderboardSync] Leaderboard synced:', result);
+        logger.log('[useLeaderboardSync] Leaderboard synced:', result);
       } catch (error) {
         // Network errors (e.g., iOS "Load failed") are transient — warn, don't error
-        console.warn('[useLeaderboardSync] Failed to sync leaderboard:', error);
+        logger.warn('[useLeaderboardSync] Failed to sync leaderboard:', error);
       }
     }
 
@@ -96,17 +100,17 @@ export function useLeaderboardSync({
         const response = await fetch(`/api/single-player/stats/${encodeURIComponent(guestFingerprint)}`);
 
         if (!response.ok) {
-          console.warn('[useLeaderboardSync] Failed to fetch global rank:', response.status);
+          logger.warn('[useLeaderboardSync] Failed to fetch global rank:', response.status);
           return;
         }
 
         const data = await response.json();
-        if (data.rank) {
+        if (data.rank && mountedRef.current) {
           setGlobalRank(data.rank);
-          console.log('[useLeaderboardSync] Global rank fetched:', data.rank);
+          logger.log('[useLeaderboardSync] Global rank fetched:', data.rank);
         }
       } catch (error) {
-        console.error('[useLeaderboardSync] Failed to fetch global rank:', error);
+        logger.error('[useLeaderboardSync] Failed to fetch global rank:', error);
       }
     }
 

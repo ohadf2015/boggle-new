@@ -158,7 +158,7 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
 
   // Countdown beep
   useEffect(() => {
-    if (gameStarted && remainingTime !== null && remainingTime <= 3 && remainingTime > 0) {
+    if (gameStarted && remainingTime !== null && remainingTime <= 10 && remainingTime > 0) {
       playCountdownBeep(remainingTime);
     }
   }, [remainingTime, gameStarted, playCountdownBeep]);

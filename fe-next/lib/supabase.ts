@@ -104,6 +104,23 @@ export async function signInWithEmail(email: string, password: string) {
   });
 }
 
+export async function signInWithMagicLink(email: string) {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  const currentLocale = getCurrentLocale();
+  const redirectUrl = new URL('/auth/callback', window.location.origin);
+  if (currentLocale) {
+    redirectUrl.searchParams.set('locale', currentLocale);
+  }
+
+  return supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: redirectUrl.toString(),
+    },
+  });
+}
+
 export async function signOut() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
 

@@ -8,6 +8,7 @@
     "lsp": "typescript-language-server --stdio",
     "clean": "npx rimraf .next",
     "build": "(npm run build:schemas || true) && next build",
+    "build:server": "node scripts/bundle-server.mjs",
     "build:analyze": "cross-env ANALYZE=true npm run build",
     "build:schemas": "tsc --project backend/tsconfig.schemas.json",
     "start": "cross-env NODE_ENV=production tsx server.ts",
@@ -53,6 +54,7 @@
     "enrich:dictionary:promote": "tsx scripts/enrich-hebrew-dictionary.ts --promote-only"
   },
   "dependencies": {
+    "@9am/fire-flame-react": "^0.3.2",
     "@anthropic-ai/sdk": "^0.71.2",
     "@arvidbt/swedish-words": "^1.0.6",
     "@capacitor/android": "^8.0.1",
@@ -168,6 +170,7 @@
     "@types/supertest": "^6.0.3",
     "baseline-browser-mapping": "^2.9.19",
     "bundlewatch": "^0.4.1",
+    "esbuild": "^0.25.12",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "husky": "^9.1.7",

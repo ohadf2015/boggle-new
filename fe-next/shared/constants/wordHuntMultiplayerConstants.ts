@@ -1,0 +1,28 @@
+/**
+ * Word Hunt Multiplayer Constants
+ * Constants for word-hunt mode in multiplayer games
+ */
+
+export const HUNT_LIFE_DRAIN_RATE = 1.2;
+export const HUNT_INITIAL_LIFE = 100;
+export const HUNT_FIRST_FINDER_BONUS = 50;
+export const HUNT_WRONG_GUESS_PENALTY = 5;
+export const HUNT_TARGET_MIN_LENGTH = 5;
+export const HUNT_TARGET_MAX_LENGTH = 8;
+export const HUNT_LIFE_DRAIN_INTERVAL_MS = 1000;
+
+/** Life restored per word length */
+export const HUNT_LIFE_RESTORE: Record<number, number> = {
+  3: 3,
+  4: 5,
+  5: 8,
+  6: 12,
+  7: 16,
+  8: 20,
+};
+
+/** Get life restored for a word of given length */
+export function getHuntLifeBonus(wordLength: number): number {
+  if (wordLength >= 8) return HUNT_LIFE_RESTORE[8];
+  return HUNT_LIFE_RESTORE[wordLength] || 2;
+}

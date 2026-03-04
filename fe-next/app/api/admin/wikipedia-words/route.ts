@@ -33,7 +33,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     console.log('[Admin Wikipedia] GET auth failed:', authResult.error);
     return authResult.response!;
   }
-  console.log('[Admin Wikipedia] GET auth passed for user:', authResult.user?.email);
+  // Auth passed — do not log user email (PII)
 
   const { searchParams } = new URL(request.url);
   const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     console.log('[Admin Wikipedia] POST auth failed:', authResult.error);
     return authResult.response!;
   }
-  console.log('[Admin Wikipedia] POST auth passed for user:', authResult.user?.email);
+  // Auth passed — do not log user email (PII)
 
   try {
     const body = await request.json();
