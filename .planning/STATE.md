@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: completed
-stopped_at: Completed 50-02-PLAN.md
-last_updated: "2026-03-04T16:18:59.421Z"
+stopped_at: Completed 50-04-PLAN.md
+last_updated: "2026-03-04T16:20:42.886Z"
 last_activity: "2026-03-04 — 48-04 complete: BlastComboFlash tier-based overlay + audio sting callback"
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 22
-  completed_plans: 20
+  completed_plans: 21
   percent: 98
 ---
 
@@ -65,6 +65,7 @@ Progress: [██████████] 98%
 | Phase 49 P02 | 4 | 2 tasks | 8 files |
 | Phase 50 P01 | 5 | 2 tasks | 10 files |
 | Phase 50 P02 | 6 | 4 tasks | 8 files |
+| Phase 50 P04 | 7 | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,9 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - [Phase 50]: MAX_CASCADE_CHAIN raised 2→5 to allow richer visible cascade chains for psychological reinforcement (PSYC-01)
 - [Phase 50]: BlastChainCounter: data-chain-color attribute on wrapper div for jsdom-safe hex color testing
 - [Phase 50]: COMBO_ELIGIBLE_TYPES excludes standard/gold/silver/diamond/ice — only explosion specials create near-miss moments; hadCombo gate derived pre-clear via detectSpecialCombos; shimmerCells capped at 3 cells
+- [Phase 50]: DDA spawnModifier: clamping only when non-zero to preserve existing rollSpecialType(1) test fixtures
+- [Phase 50]: DDA state in ddaStateRef (not useState): cascade callbacks read latest modifier without stale closure or re-render
+- [Phase 50]: trackWordFail exposed from useBlastGame; BlastGame detects rejection via currentFeedback.id dedup pattern
 
 ### Pending Todos
 
@@ -118,6 +122,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T16:18:59.419Z
-Stopped at: Completed 50-02-PLAN.md
+Last session: 2026-03-04T16:20:42.879Z
+Stopped at: Completed 50-04-PLAN.md
 Resume file: None
