@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: completed
-stopped_at: Completed 51-02-PLAN.md
-last_updated: "2026-03-04T17:20:30.252Z"
+stopped_at: Completed 52-01-PLAN.md
+last_updated: "2026-03-04T18:08:01.293Z"
 last_activity: "2026-03-04 — 48-04 complete: BlastComboFlash tier-based overlay + audio sting callback"
 progress:
   total_phases: 7
   completed_phases: 6
-  total_plans: 24
-  completed_plans: 24
+  total_plans: 28
+  completed_plans: 25
   percent: 98
 ---
 
@@ -69,6 +69,7 @@ Progress: [██████████] 98%
 | Phase 50 P03 | 7 | 3 tasks | 10 files |
 | Phase 51-tile-idle-death-animations P01 | 4 | 2 tasks | 4 files |
 | Phase 51-tile-idle-death-animations P02 | 3 | 2 tasks | 2 files |
+| Phase 52 P01 | 6 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,7 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - [Phase 51-02]: playClearAnimation() delegates to playClearByType() after reduceMotion guard — single responsibility
 - [Phase 51-02]: rainbow: pure alpha dissolve with no rotation to make it visually distinct from generic tumble
 - [Phase 51-02]: gold/silver/diamond share playGoldBurstDeath — consistent precious-metal tier visual
+- [Phase 52]: BLAST_TILE_TYPES references BLAST_TILE_TYPE_LIST (canonical); generateBlastOverlay wave-gated via rollSpecialType+getWaveDistribution; wave param defaults to 1 for backward compat
 
 ### Pending Todos
 
@@ -131,6 +133,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T17:16:20.222Z
-Stopped at: Completed 51-02-PLAN.md
+Last session: 2026-03-04T18:08:01.291Z
+Stopped at: Completed 52-01-PLAN.md
 Resume file: None
