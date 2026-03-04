@@ -13,7 +13,7 @@ import {
   GOLD_MULTIPLIER,
   BOMB_RADIUS,
   BOMB_AREA_CLEAR_BONUS,
-  RAINBOW_BONUS,
+  RAINBOW_BOOST_MULTIPLIER,
   CHAIN_BOMB_STAGGER,
   LIGHTNING_COLUMN_CLEAR_BONUS,
   ICE_CLEAR_BONUS,
@@ -537,6 +537,33 @@ export function useBlastGame(
       // BUGF-06 fix: track gold tiles multiplicatively (3^n) not additively (n*(3-1))
       let goldMultiplier = 1;
 
+      // ── Rainbow Boost pre-scan ──────────────────────────────────────────────
+      // Rank offensive specials (explosion/clear effects). Gold/silver/diamond are
+      // score multipliers (not explosions) — excluded. Ice/frozen have no explosion effect.
+      const OFFENSIVE_RANK: Partial<Record<BlastTileType, number>> = {
+        prism: 5,
+        lightning: 4,
+        bomb: 3,
+        gem: 2,
+        magnet: 1,
+      };
+      let bestOffensiveSpecial: BlastTileType | null = null;
+      let bestOffensiveRank = -1;
+      const hasRainbow = path.some(cell => prev[cell.row]?.[cell.col]?.type === 'rainbow');
+      if (hasRainbow) {
+        for (const cell of path) {
+          const t = prev[cell.row]?.[cell.col];
+          if (!t || t.isCleared || t.type === 'rainbow') continue;
+          const rank = OFFENSIVE_RANK[t.type] ?? -1;
+          if (rank > bestOffensiveRank) {
+            bestOffensiveRank = rank;
+            bestOffensiveSpecial = t.type;
+          }
+        }
+      }
+      // When no offensive special is in the path, rainbow acts solo (2x word score)
+      let rainbowSoloMultiplier = 1;
+
       // Helper: mark a tile as cleared and track its type
       const markCleared = (t: BlastTileState) => {
         t.isCleared = true;
@@ -674,13 +701,153 @@ export function useBlastGame(
             break;
           }
 
-          case 'rainbow':
-            bonusScore += RAINBOW_BONUS;
+          case 'rainbow': {
             newExplosions.push({
               id: `rainbow-${now}-${cell.row}-${cell.col}`,
-              row: cell.row, col: cell.col, type: 'word', intensity: 1, timestamp: now,
+              row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now,
             });
+            if (bestOffensiveSpecial !== null) {
+              // Rainbow Boost: re-execute the best offensive special's effect (second firing).
+              // The original special still fires from its own case — this is the COPY.
+              switch (bestOffensiveSpecial) {
+                case 'bomb': {
+                  // Find first bomb in path and re-fire its BFS
+                  const bombCell = path.find(c => {
+                    const t = prev[c.row]?.[c.col];
+                    return t?.type === 'bomb';
+                  });
+                  if (bombCell) {
+                    // Queue a second bomb detonation from same position
+                    bombQueue.push({ row: bombCell.row, col: bombCell.col, depth: 0 });
+                  }
+                  break;
+                }
+                case 'lightning': {
+                  // Find first lightning in path and re-fire its column clear
+                  const lightningCell = path.find(c => {
+                    const t = prev[c.row]?.[c.col];
+                    return t?.type === 'lightning';
+                  });
+                  if (lightningCell) {
+                    for (let r = 0; r < gridSize; r++) {
+                      if (r === lightningCell.row) continue;
+                      const target = next[r][lightningCell.col];
+                      if (target.isCleared) continue;
+                      if (isMultiHitAlive(target)) {
+                        hitMultiHitTile(target);
+                      } else {
+                        markCleared(target);
+                        bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
+                        if (target.type === 'bomb' && !processedBombs.has(`${r},${lightningCell.col}`)) {
+                          processedBombs.add(`${r},${lightningCell.col}`);
+                          bombQueue.push({ row: r, col: lightningCell.col, depth: 0 });
+                        }
+                      }
+                    }
+                  }
+                  break;
+                }
+                case 'prism': {
+                  // Find first prism in path and re-fire its cross-clear
+                  const prismCell = path.find(c => {
+                    const t = prev[c.row]?.[c.col];
+                    return t?.type === 'prism';
+                  });
+                  if (prismCell) {
+                    // Second cross-clear row
+                    for (let c = 0; c < gridSize; c++) {
+                      if (c === prismCell.col) continue;
+                      const target = next[prismCell.row][c];
+                      if (target.isCleared) continue;
+                      if (isMultiHitAlive(target)) {
+                        hitMultiHitTile(target);
+                      } else {
+                        markCleared(target);
+                        if (target.type === 'bomb' && !processedBombs.has(`${prismCell.row},${c}`)) {
+                          processedBombs.add(`${prismCell.row},${c}`);
+                          bombQueue.push({ row: prismCell.row, col: c, depth: 0 });
+                        }
+                        if (target.type === 'lightning' && !processedLightning.has(`${prismCell.row},${c}`)) {
+                          processedLightning.add(`${prismCell.row},${c}`);
+                          for (let lr = 0; lr < gridSize; lr++) {
+                            if (lr === prismCell.row) continue;
+                            const lt = next[lr][c];
+                            if (lt.isCleared) continue;
+                            if (isMultiHitAlive(lt)) { hitMultiHitTile(lt); } else {
+                              markCleared(lt);
+                              bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
+                            }
+                          }
+                        }
+                      }
+                    }
+                    // Second cross-clear column
+                    for (let r = 0; r < gridSize; r++) {
+                      if (r === prismCell.row) continue;
+                      const target = next[r][prismCell.col];
+                      if (target.isCleared) continue;
+                      if (isMultiHitAlive(target)) {
+                        hitMultiHitTile(target);
+                      } else {
+                        markCleared(target);
+                        if (target.type === 'bomb' && !processedBombs.has(`${r},${prismCell.col}`)) {
+                          processedBombs.add(`${r},${prismCell.col}`);
+                          bombQueue.push({ row: r, col: prismCell.col, depth: 0 });
+                        }
+                        if (target.type === 'lightning' && !processedLightning.has(`${r},${prismCell.col}`)) {
+                          processedLightning.add(`${r},${prismCell.col}`);
+                          for (let lr = 0; lr < gridSize; lr++) {
+                            if (lr === r) continue;
+                            const lt = next[lr][prismCell.col];
+                            if (lt.isCleared) continue;
+                            if (isMultiHitAlive(lt)) { hitMultiHitTile(lt); } else {
+                              markCleared(lt);
+                              bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  break;
+                }
+                case 'gem': {
+                  // Gem collect bonus fires twice
+                  bonusScore += GEM_COLLECT_BONUS;
+                  break;
+                }
+                case 'magnet': {
+                  // Find first magnet in path and re-fire its attraction
+                  const magnetCell = path.find(c => {
+                    const t = prev[c.row]?.[c.col];
+                    return t?.type === 'magnet';
+                  });
+                  if (magnetCell) {
+                    for (let dr = -MAGNET_RADIUS; dr <= MAGNET_RADIUS; dr++) {
+                      for (let dc = -MAGNET_RADIUS; dc <= MAGNET_RADIUS; dc++) {
+                        if (dr === 0 && dc === 0) continue;
+                        const r = magnetCell.row + dr;
+                        const c = magnetCell.col + dc;
+                        if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                          const target = next[r][c];
+                          if (!target.isCleared && (target.type === 'wildcard' || target.type === 'rainbow')) {
+                            markCleared(target);
+                            bonusScore += MAGNET_ATTRACT_BONUS;
+                          }
+                        }
+                      }
+                    }
+                  }
+                  break;
+                }
+                default: break;
+              }
+            } else {
+              // Solo Rainbow Boost: no offensive special in path → 2x word score
+              rainbowSoloMultiplier = RAINBOW_BOOST_MULTIPLIER;
+            }
             break;
+          }
 
           case 'wildcard':
             newExplosions.push({
@@ -882,9 +1049,13 @@ export function useBlastGame(
       }
 
       totalWordsClearedRef.current += path.length;
+      // Rainbow solo: apply 2x multiplier to base score BEFORE gold
+      // Gold and rainbow are both multipliers; order: base * rainbowMult * goldMult
+      const effectiveBase = baseScore * rainbowSoloMultiplier;
+
       // BUGF-06 fix: apply gold multiplier to base score, then add other bonuses.
       // goldMultiplier = 1 (no gold), 3 (1 gold), 9 (2 gold), 27 (3 gold), etc.
-      const goldBonusScore = baseScore * goldMultiplier - baseScore; // extra from gold
+      const goldBonusScore = effectiveBase * goldMultiplier - effectiveBase; // extra from gold
       if (goldMultiplier > 1) {
         // Add per-gold-tile popups so UI shows each gold contribution
         for (const cell of path) {
@@ -902,7 +1073,7 @@ export function useBlastGame(
           }
         }
       }
-      const totalScore = baseScore * goldMultiplier + bonusScore;
+      const totalScore = effectiveBase * goldMultiplier + bonusScore;
 
       // Create score popup at the mid-point of the word path
       if (path.length > 0) {
