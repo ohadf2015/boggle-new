@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: executing
-stopped_at: Completed 47-03-PLAN.md
-last_updated: "2026-03-04T12:36:07.890Z"
+stopped_at: Completed 47-04-PLAN.md
+last_updated: "2026-03-04T12:51:27.122Z"
 last_activity: "2026-03-04 — 47-03 complete: Vortex (pull+explode, rework of Magnet) + Frost (2-hit reveal with inner special, rework of Frozen)"
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 98
 ---
 
@@ -54,6 +54,7 @@ Progress: [██████████] 98%
 
 *Updated after each plan completion*
 | Phase 47 P03 | 8 | 2 tasks | 7 files |
+| Phase 47-tile-reworks P04 | 10 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,7 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - [Phase 46]: Gold stacking multiplicative (3^n): 2 gold = 9x, not 5x
 - [Phase 46]: Cascade foundSet empty: cascade re-formations are new formations, always score
 - [Phase 46]: tileStatesRef pattern: async timer callbacks use ref not closure to avoid stale state
+- [Phase 47]: Mirror picks FIRST special in path (not best); wildcard's 0.17 redistributed equally to gold/bomb/rainbow/ice (0.25 each); Silver/Diamond use same goldMultiplier variable as Gold
 
 ### Pending Todos
 
@@ -89,6 +91,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T12:36:07.888Z
-Stopped at: Completed 47-03-PLAN.md
+Last session: 2026-03-04T12:51:27.120Z
+Stopped at: Completed 47-04-PLAN.md
 Resume file: None
