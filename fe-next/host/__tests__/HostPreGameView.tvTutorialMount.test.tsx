@@ -93,6 +93,27 @@ jest.mock('../../components/BotControls', () => ({
   default: () => null,
 }));
 
+jest.mock('@/hooks/gameState', () => ({
+  useGameActions: () => ({
+    setGameMode: jest.fn(),
+  }),
+}));
+
+jest.mock('../../hooks/useNativeShare', () => ({
+  useNativeShare: () => ({
+    canShare: false,
+    share: jest.fn(),
+  }),
+}));
+
+jest.mock('@/components/ui/DJMascot', () => ({
+  DJMascotWithEntrance: () => null,
+}));
+
+jest.mock('@/components/GameModeSelector', () => ({
+  GameModeSelector: () => null,
+}));
+
 jest.mock('../components/pre-game/PresetSelector', () => ({
   PresetSelector: () => null,
   GAME_PRESETS: {

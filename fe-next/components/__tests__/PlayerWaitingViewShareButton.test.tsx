@@ -122,7 +122,8 @@ describe('PlayerWaitingView - Command Center Style', () => {
 
     it('should display player count badge', () => {
       render(<PlayerWaitingView {...defaultProps} />);
-      expect(screen.getByText('2/8')).toBeInTheDocument();
+      // Component filters out host players from roster, so only 1 non-host shows
+      expect(screen.getByText('1/8')).toBeInTheDocument();
     });
 
     it('should have an exit button', () => {
@@ -160,8 +161,7 @@ describe('PlayerWaitingView - Command Center Style', () => {
   describe('Player Roster', () => {
     it('should display player names', () => {
       render(<PlayerWaitingView {...defaultProps} />);
-      // Players appear in both mobile and desktop layouts
-      expect(screen.getAllByText('TestHost').length).toBeGreaterThan(0);
+      // Component filters out host players, only non-host players appear in roster
       expect(screen.getAllByText('TestPlayer').length).toBeGreaterThan(0);
     });
 

@@ -21,58 +21,62 @@ jest.mock('@/lib/supabase/education', () => ({
   importCurriculumToLesson: jest.fn(),
 }));
 
+// Stable t function to avoid infinite re-renders (useCallback depends on t)
+const stableT = (key: string, params?: Record<string, string | number>) => {
+  const translations: Record<string, string> = {
+    'teacher.curriculum.title': 'Curriculum Word Lists',
+    'teacher.curriculum.description': 'Pre-built word lists aligned with Israeli educational standards',
+    'teacher.curriculum.browse': 'Browse Curriculum Lists',
+    'teacher.curriculum.import': 'Import to Lesson',
+    'teacher.curriculum.importing': 'Importing...',
+    'teacher.curriculum.imported': 'Successfully imported!',
+    'teacher.curriculum.importError': 'Failed to import word list',
+    'teacher.curriculum.preview': 'Preview Words',
+    'teacher.curriculum.wordCount': '{{count}} words',
+    'teacher.curriculum.noResults': 'No curriculum lists found matching your filters',
+    'teacher.curriculum.selectGrade': 'Select Grade Level',
+    'teacher.curriculum.selectSubject': 'Select Subject',
+    'teacher.curriculum.allGrades': 'All Grades',
+    'teacher.curriculum.allSubjects': 'All Subjects',
+    'teacher.curriculum.filters.title': 'Filter Lists',
+    'teacher.curriculum.filters.grade': 'Grade Level',
+    'teacher.curriculum.filters.subject': 'Subject Area',
+    'teacher.curriculum.filters.language': 'Language',
+    'teacher.curriculum.filters.clear': 'Clear Filters',
+    'teacher.curriculum.grades.grade_1': 'Grade 1',
+    'teacher.curriculum.grades.grade_3': 'Grade 3',
+    'teacher.curriculum.grades.grade_5': 'Grade 5',
+    'teacher.curriculum.grades.grade_7': 'Grade 7',
+    'teacher.curriculum.subjects.english': 'English',
+    'teacher.curriculum.subjects.hebrew': 'Hebrew',
+    'teacher.curriculum.subjects.science': 'Science',
+    'teacher.curriculum.subjects.math': 'Mathematics',
+    'teacher.curriculum.gradeGroups.elementary': 'Elementary School',
+    'teacher.curriculum.gradeGroups.middle': 'Middle School',
+    'teacher.curriculum.gradeGroups.high': 'High School',
+    'teacher.curriculum.standard': 'Curriculum Standard',
+    'teacher.curriculum.lastUpdated': 'Last Updated',
+    'common.loading': 'Loading...',
+    'common.error': 'Error',
+  };
+  let result = translations[key] || key;
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      result = result.replace(`{{${k}}}`, String(v));
+    });
+  }
+  return result;
+};
+
 // Mock useLanguage
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string, params?: Record<string, string | number>) => {
-      const translations: Record<string, string> = {
-        'teacher.curriculum.title': 'Curriculum Word Lists',
-        'teacher.curriculum.description': 'Pre-built word lists aligned with Israeli educational standards',
-        'teacher.curriculum.browse': 'Browse Curriculum Lists',
-        'teacher.curriculum.import': 'Import to Lesson',
-        'teacher.curriculum.importing': 'Importing...',
-        'teacher.curriculum.imported': 'Successfully imported!',
-        'teacher.curriculum.importError': 'Failed to import word list',
-        'teacher.curriculum.preview': 'Preview Words',
-        'teacher.curriculum.wordCount': '{{count}} words',
-        'teacher.curriculum.noResults': 'No curriculum lists found matching your filters',
-        'teacher.curriculum.selectGrade': 'Select Grade Level',
-        'teacher.curriculum.selectSubject': 'Select Subject',
-        'teacher.curriculum.allGrades': 'All Grades',
-        'teacher.curriculum.allSubjects': 'All Subjects',
-        'teacher.curriculum.filters.title': 'Filter Lists',
-        'teacher.curriculum.filters.grade': 'Grade Level',
-        'teacher.curriculum.filters.subject': 'Subject Area',
-        'teacher.curriculum.filters.language': 'Language',
-        'teacher.curriculum.filters.clear': 'Clear Filters',
-        'teacher.curriculum.grades.grade_1': 'Grade 1',
-        'teacher.curriculum.grades.grade_3': 'Grade 3',
-        'teacher.curriculum.grades.grade_5': 'Grade 5',
-        'teacher.curriculum.grades.grade_7': 'Grade 7',
-        'teacher.curriculum.subjects.english': 'English',
-        'teacher.curriculum.subjects.hebrew': 'Hebrew',
-        'teacher.curriculum.subjects.science': 'Science',
-        'teacher.curriculum.subjects.math': 'Mathematics',
-        'teacher.curriculum.gradeGroups.elementary': 'Elementary School',
-        'teacher.curriculum.gradeGroups.middle': 'Middle School',
-        'teacher.curriculum.gradeGroups.high': 'High School',
-        'teacher.curriculum.standard': 'Curriculum Standard',
-        'teacher.curriculum.lastUpdated': 'Last Updated',
-        'common.loading': 'Loading...',
-        'common.error': 'Error',
-      };
-      let result = translations[key] || key;
-      if (params) {
-        Object.entries(params).forEach(([k, v]) => {
-          result = result.replace(`{{${k}}}`, String(v));
-        });
-      }
-      return result;
-    },
+    t: stableT,
     language: 'en',
     dir: 'ltr',
   }),
 }));
+
 
 // Mock useAuth
 jest.mock('@/contexts/AuthContext', () => ({
