@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Students learn vocabulary through engaging, competitive gameplay that makes practice feel like play — not homework.
-**Current focus:** Phase 46 — Foundation (Unified Tile Types & Bug Fixes)
+**Current focus:** Phase 47 — Tile Reworks (New Behaviors & Spawn Tables)
 
 ## Current Position
 
-Phase: 46 of 52 (Foundation — Unified Tile Types & Bug Fixes)
-Plan: 4 of 4 in current phase (all complete)
-Status: In progress
-Last activity: 2026-03-04 — 46-03 complete (BUGF-03 through BUGF-07: gold multiplicative, cascade dedup, frozen crack, bomb double-BFS, stale state ref, 631 blast tests pass)
+Phase: 47 of 52 (Tile Reworks — New Behaviors & Spawn Tables)
+Plan: 0 of 5 in current phase
+Status: Ready to plan
+Last activity: 2026-03-04 — Phase 46 complete (4/4 plans, 12/12 must-haves verified, 631 blast tests pass)
 
-Progress: [██░░░░░░░░░░░░░░░░░░] 7% (v3.0 milestone, 2/27 plans complete)
+Progress: [███░░░░░░░░░░░░░░░░░] 15% (v3.0 milestone, 4/27 plans complete)
 
 ## Performance Metrics
 
@@ -28,7 +28,7 @@ Progress: [██░░░░░░░░░░░░░░░░░░] 7% (v3.
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 46 | 4 | 16min (4/4 complete) | 4min |
+| 46 | 4 | ~28min (4/4 complete) | ~7min |
 | 47 | 5 | - | - |
 | 48 | 4 | - | - |
 | 49 | 4 | - | - |
@@ -37,7 +37,6 @@ Progress: [██░░░░░░░░░░░░░░░░░░] 7% (v3.
 | 52 | 4 | - | - |
 
 *Updated after each plan completion*
-| Phase 46 P03 | 4 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -71,5 +70,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 46-03-PLAN.md (BUGF-03 through BUGF-07: gold multiplicative 3^n, cascade empty foundSet, frozen crack, bomb double-BFS dedup, tileStatesRef, 631 blast tests pass)
+Stopped at: Phase 46 complete. Verified 12/12 must-haves. Ready to plan Phase 47.
 Resume file: None

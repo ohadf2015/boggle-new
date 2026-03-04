@@ -52,10 +52,10 @@ Last phase: 35.
 **Plans**: 4 plans
 
 Plans:
-- [ ] 46-01-PLAN.md — Unify BlastTileType enum into shared/types/blast.ts and migrate all consumers (Wave 1)
-- [ ] 46-02-PLAN.md — Fix chain propagation bugs (BUGF-01, BUGF-02) — lightning↔bomb and prism↔lightning (Wave 2)
-- [ ] 46-03-PLAN.md — Fix state and scoring bugs (BUGF-03, BUGF-04, BUGF-05, BUGF-06, BUGF-07) (Wave 2)
-- [ ] 46-04-PLAN.md — Fix objective guarantee bugs (BUGF-08, BUGF-09) — clustering and minimum ratio (Wave 2)
+- [x] 46-01-PLAN.md — Unify BlastTileType enum into shared/types/blast.ts and migrate all consumers (Wave 1)
+- [x] 46-02-PLAN.md — Fix chain propagation bugs (BUGF-01, BUGF-02) — lightning↔bomb and prism↔lightning (Wave 2)
+- [x] 46-03-PLAN.md — Fix state and scoring bugs (BUGF-03, BUGF-04, BUGF-05, BUGF-06, BUGF-07) (Wave 3)
+- [x] 46-04-PLAN.md — Fix objective guarantee bugs (BUGF-08, BUGF-09) — clustering and minimum ratio (Wave 2)
 
 #### Phase 47: Tile Reworks — New Behaviors & Spawn Tables
 **Goal**: All four reworked tiles (Rainbow Boost, Treasure Gem, Vortex, Frost), the new Mirror tile, Wildcard removal, gold tier system, and updated spawn tables are live in singleplayer Blast.
@@ -174,7 +174,7 @@ Plans:
 | 43. Practice Experience & Design Polish | v2.0 | 4/4 | Complete | 2026-02-14 |
 | 44. Milestone Gap Closure & Tech Debt | v2.0 | 1/1 | Complete | 2026-02-14 |
 | 45. Practice XP Server-Side Wiring | v2.0 | 1/1 | Complete | 2026-02-14 |
-| 46. Foundation — Unified Types & Bug Fixes | v3.0 | 0/4 | Not started | - |
+| 46. Foundation — Unified Types & Bug Fixes | v3.0 | 4/4 | Complete | 2026-03-04 |
 | 47. Tile Reworks — New Behaviors & Spawn Tables | v3.0 | 0/5 | Not started | - |
 | 48. Combination System Core | v3.0 | 0/4 | Not started | - |
 | 49. Combination UX | v3.0 | 0/4 | Not started | - |
