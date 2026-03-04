@@ -1,4 +1,4 @@
-import type { BlastTileState, BlastTileType } from '../types';
+import type { BlastTileState } from '../types';
 import type { BlastExplosion } from '../types';
 import type { SpecialCombo } from './blastCombos';
 import { BOMB_RADIUS } from '../types';

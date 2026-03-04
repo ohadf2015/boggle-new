@@ -193,10 +193,10 @@ describe('detectSpecialCombos', () => {
   });
 
   it('should NOT detect gold_special when gold paired with only non-effect specials', () => {
-    // gold + wildcard — wildcard has no area effect, so no gold_special
+    // gold + standard — standard has no area effect, so no gold_special
     const grid = makeGrid([
       { row: 0, col: 0, type: 'gold' },
-      { row: 0, col: 1, type: 'wildcard' },
+      { row: 0, col: 1, type: 'standard' },
     ]);
     const path = makePath([0, 0], [0, 1], [0, 2]);
 
