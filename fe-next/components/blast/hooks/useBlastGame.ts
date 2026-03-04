@@ -244,6 +244,9 @@ export function useBlastGame(
   const cascadeChainLevelRef = useRef(0);
   const gameStateRef = useRef(gameState);
   gameStateRef.current = gameState;
+  // BUGF-07 fix: ref for latest tileStates so cascade timer doesn't use stale closure
+  const tileStatesRef = useRef(tileStates);
+  tileStatesRef.current = tileStates;
   const [isAutoDetecting, setIsAutoDetecting] = useState(false);
   const autoDetectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onAutoCascadeWordRef = useRef(options?.onAutoCascadeWord);
@@ -296,7 +299,9 @@ export function useBlastGame(
       if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
 
       autoDetectTimerRef.current = setTimeout(() => {
-        const foundSet = new Set(gameStateRef.current.wordsFound);
+        // BUGF-04 fix: use empty foundSet for cascade detection so re-formed words
+        // always score after gravity. Cascade words are new formations — not duplicates.
+        const foundSet = new Set<string>();
         const columnFilter = affectedColumns.length > 0 ? new Set(affectedColumns) : undefined;
         const allVerticalWords = detectVerticalWords(newGrid, newTileStates, checkWordInDict, foundSet, CASCADE_MIN_WORD_LENGTH, columnFilter);
         // Cap words per cascade level to limit simultaneous explosions
@@ -334,7 +339,9 @@ export function useBlastGame(
             const cascadeWords: string[] = [];
             const cascadeClearedTypes: Partial<Record<BlastTileType, number>> = {};
 
-            const nextTileStates = newTileStates.map(row => row.map(tile => ({ ...tile })));
+            // BUGF-07 fix: use tileStatesRef.current (always fresh) instead of
+            // closure-captured newTileStates (may be stale if state updated during timer wait)
+            const nextTileStates = tileStatesRef.current.map(row => row.map(tile => ({ ...tile })));
 
             for (const vw of verticalWords) {
               const baseScore = vw.word.length - 1;
@@ -346,9 +353,16 @@ export function useBlastGame(
               for (const cell of vw.path) {
                 const t = nextTileStates[cell.row][cell.col];
                 if (!t.isCleared) {
-                  t.isCleared = true;
-                  newlyClearedCount++;
-                  cascadeClearedTypes[t.type] = (cascadeClearedTypes[t.type] || 0) + 1;
+                  // BUGF-05 fix: multi-hit tiles (frozen/ice) crack instead of clear
+                  // when they have hitsRemaining > 1 — only the final hit clears them.
+                  if ((t.type === 'frozen' || t.type === 'ice') && t.hitsRemaining > 1) {
+                    t.hitsRemaining--;
+                    t.activationEffect = `${t.type}-crack`;
+                  } else {
+                    t.isCleared = true;
+                    newlyClearedCount++;
+                    cascadeClearedTypes[t.type] = (cascadeClearedTypes[t.type] || 0) + 1;
+                  }
                 }
               }
 
@@ -520,6 +534,8 @@ export function useBlastGame(
       // Clear path tiles and collect effects
       let newlyClearedCount = 0;
       const clearedTypeCounts: Partial<Record<BlastTileType, number>> = {};
+      // BUGF-06 fix: track gold tiles multiplicatively (3^n) not additively (n*(3-1))
+      let goldMultiplier = 1;
 
       // Helper: mark a tile as cleared and track its type
       const markCleared = (t: BlastTileState) => {
@@ -611,6 +627,15 @@ export function useBlastGame(
           }
         }
         bonusScore += baseScore * (comboMultiplier - 1);
+
+        // BUGF-03 fix: after each combo pre-clear, mark any bomb tiles in the
+        // combo's tile list as processed so the main path loop won't re-queue them
+        // into the bomb BFS (which would double-award BOMB_AREA_CLEAR_BONUS).
+        for (const tile of combo.tiles) {
+          if (tile.tileType === 'bomb') {
+            processedBombs.add(`${tile.row},${tile.col}`);
+          }
+        }
       }
 
       for (const cell of path) {
@@ -634,22 +659,13 @@ export function useBlastGame(
 
         switch (tile.type) {
           case 'gold':
-            bonusScore += baseScore * (GOLD_MULTIPLIER - 1);
+            // BUGF-06 fix: accumulate gold multiplier (multiplicative: 3^n).
+            // Bonus is applied after the path loop once all gold tiles are counted.
+            goldMultiplier *= GOLD_MULTIPLIER;
             newExplosions.push({
               id: `gold-${now}-${cell.row}-${cell.col}`,
               row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now,
             });
-            // Separate gold multiplier popup at the gold tile position
-            const goldPopup = {
-              id: `gold-bonus-${now}-${cell.row}-${cell.col}`,
-              score: baseScore * (GOLD_MULTIPLIER - 1),
-              row: cell.row,
-              col: cell.col,
-              isSpecial: true,
-              timestamp: now,
-              tileType: 'gold' as const,
-            };
-            setScorePopups(prev => [...prev, goldPopup]);
             break;
 
           case 'bomb': {
@@ -866,7 +882,27 @@ export function useBlastGame(
       }
 
       totalWordsClearedRef.current += path.length;
-      const totalScore = baseScore + bonusScore;
+      // BUGF-06 fix: apply gold multiplier to base score, then add other bonuses.
+      // goldMultiplier = 1 (no gold), 3 (1 gold), 9 (2 gold), 27 (3 gold), etc.
+      const goldBonusScore = baseScore * goldMultiplier - baseScore; // extra from gold
+      if (goldMultiplier > 1) {
+        // Add per-gold-tile popups so UI shows each gold contribution
+        for (const cell of path) {
+          const t = next[cell.row]?.[cell.col];
+          if (t?.type === 'gold') {
+            setScorePopups(prev => [...prev, {
+              id: `gold-bonus-${now}-${cell.row}-${cell.col}`,
+              score: goldBonusScore,
+              row: cell.row,
+              col: cell.col,
+              isSpecial: true,
+              timestamp: now,
+              tileType: 'gold' as const,
+            }]);
+          }
+        }
+      }
+      const totalScore = baseScore * goldMultiplier + bonusScore;
 
       // Create score popup at the mid-point of the word path
       if (path.length > 0) {
