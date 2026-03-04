@@ -1,9 +1,8 @@
-import { executeComboEffect, type ComboEffectContext, type ComboEffectResult } from '../blastComboEffects';
+import { executeComboEffect, type ComboEffectContext } from '../blastComboEffects';
 import type { BlastTileState, BlastTileType } from '../../types';
 import type { SpecialCombo } from '../blastCombos';
 import {
   TREASURE_GEM_COMPLETION_BONUS,
-  RAINBOW_BOOST_MULTIPLIER,
   FROST_REVEAL_BONUS,
 } from '../../types';
 
@@ -55,17 +54,15 @@ function makeCtx(
   path: Array<{ row: number; col: number }> = [],
   overrides: Partial<Pick<ComboEffectContext, 'gridSize' | 'now'>> = {},
 ): ComboEffectContext {
-  const clearedList: BlastTileState[] = [];
-  const hitList: BlastTileState[] = [];
   return {
     combo,
     next: grid,
     gridSize: overrides.gridSize ?? 6,
     path,
     now: overrides.now ?? 1000,
-    markCleared: (t) => { t.isCleared = true; clearedList.push(t); },
+    markCleared: (t) => { t.isCleared = true; },
     isMultiHitAlive: (t) => t.hitsRemaining > 1 && (t.type === 'ice' || t.type === 'prism' || t.type === 'frozen' || t.type === 'gem'),
-    hitMultiHitTile: (t) => { t.hitsRemaining--; t.activationEffect = `${t.type}-crack`; hitList.push(t); },
+    hitMultiHitTile: (t) => { t.hitsRemaining--; t.activationEffect = `${t.type}-crack`; },
   };
 }
 
@@ -76,7 +73,6 @@ describe('executeComboEffect', () => {
   // ── bomb_bomb ─────────────────────────────────────────────────────────────
 
   it('should clear 5x5 area around midpoint of two bomb tiles', () => {
-    // Place two bombs at (0,0) and (4,4) → midpoint (2,2)
     const grid = makeGrid([
       { row: 0, col: 0, type: 'bomb' },
       { row: 4, col: 4, type: 'bomb' },
@@ -86,14 +82,10 @@ describe('executeComboEffect', () => {
       { row: 4, col: 4, tileType: 'bomb' },
     ], 3);
     const ctx = makeCtx(grid, combo);
-
     const result = executeComboEffect(ctx);
-
-    // Midpoint (2,2) → 5x5 area = rows 0-4, cols 0-4
     expect(result.explosions.length).toBeGreaterThan(0);
     expect(result.explosions[0].type).toBe('mega_blast');
     expect(result.explosions[0].intensity).toBe(4);
-    // Tiles in the 5x5 area should be cleared
     expect(grid[2][2].isCleared).toBe(true);
     expect(grid[0][0].isCleared).toBe(true);
   });
@@ -107,10 +99,7 @@ describe('executeComboEffect', () => {
       { row: 1, col: 1, tileType: 'bomb' },
       { row: 1, col: 3, tileType: 'bomb' },
     ], 3);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo));
     expect(result.processedBombKeys).toContain('1,1');
     expect(result.processedBombKeys).toContain('1,3');
   });
@@ -126,15 +115,9 @@ describe('executeComboEffect', () => {
       { row: 0, col: 2, tileType: 'bomb' },
       { row: 3, col: 4, tileType: 'lightning' },
     ], 4);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo));
     expect(result.explosions.length).toBeGreaterThan(0);
-    // Cols 1-3 (BOMB_RADIUS=1 around col 2) should be cleared
-    for (let r = 0; r < 6; r++) {
-      expect(grid[r][2].isCleared).toBe(true);
-    }
+    for (let r = 0; r < 6; r++) expect(grid[r][2].isCleared).toBe(true);
   });
 
   // ── bomb_prism ────────────────────────────────────────────────────────────
@@ -148,13 +131,9 @@ describe('executeComboEffect', () => {
       { row: 2, col: 2, tileType: 'bomb' },
       { row: 2, col: 3, tileType: 'prism' },
     ], 5);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo));
     expect(result.explosions.length).toBeGreaterThan(0);
-    // Should have cleared entire row 2 and col 2 (and adjacent neighbors)
-    expect(grid[2][0].isCleared).toBe(true); // row 2 cleared
+    expect(grid[2][0].isCleared).toBe(true);
   });
 
   // ── lightning_lightning ───────────────────────────────────────────────────
@@ -169,12 +148,8 @@ describe('executeComboEffect', () => {
       { row: 0, col: 3, tileType: 'lightning' },
     ], 4);
     const path = makePath([0, 1], [0, 2], [0, 3]);
-    const ctx = makeCtx(grid, combo, path);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo, path));
     expect(result.explosions.length).toBeGreaterThan(0);
-    // Columns 1, 2, 3 should be cleared
     for (let r = 0; r < 6; r++) {
       expect(grid[r][1].isCleared).toBe(true);
       expect(grid[r][3].isCleared).toBe(true);
@@ -192,12 +167,8 @@ describe('executeComboEffect', () => {
       { row: 1, col: 1, tileType: 'lightning' },
       { row: 3, col: 3, tileType: 'prism' },
     ], 6);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo));
     expect(result.explosions.length).toBeGreaterThan(0);
-    // Row 1 and col 1 should be cleared (from lightning_prism cross logic)
     expect(grid[1][0].isCleared).toBe(true);
     expect(grid[0][1].isCleared).toBe(true);
   });
@@ -213,13 +184,9 @@ describe('executeComboEffect', () => {
       { row: 0, col: 0, tileType: 'prism' },
       { row: 5, col: 5, tileType: 'prism' },
     ], 10);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo));
     expect(result.explosions.length).toBeGreaterThan(0);
     expect(result.explosions[0].type).toBe('total_destruction');
-    // Every tile should be cleared
     for (let r = 0; r < 6; r++) {
       for (let c = 0; c < 6; c++) {
         expect(grid[r][c].isCleared).toBe(true);
@@ -231,26 +198,21 @@ describe('executeComboEffect', () => {
 
   it('should return empty result for unknown combo type (no-op)', () => {
     const grid = makeGrid();
-    // Use gold_special (handled by useBlastGame score logic, not executeComboEffect)
+    // Use gold_special: handled at score layer, not in executeComboEffect
     const combo = makeCombo('gold_special', [
       { row: 0, col: 0, tileType: 'gold' },
       { row: 0, col: 1, tileType: 'bomb' },
     ], 4);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo));
     expect(result.explosions).toEqual([]);
     expect(result.processedBombKeys).toEqual([]);
     expect(result.processedLightningKeys).toEqual([]);
     expect(result.bonusScore).toBe(0);
-    // No tiles should be cleared
     expect(grid[0][0].isCleared).toBe(false);
   });
 
-  it('should not throw for any combo type (all must be safe)', () => {
-    // All combo types from blastCombos.ts — each must not throw
-    const allTypes: SpecialCombo['type'][] = [
+  it('should not throw for any new combo type', () => {
+    const newTypes: SpecialCombo['type'][] = [
       'bomb_mirror', 'bomb_magnet', 'bomb_gem', 'bomb_frozen',
       'lightning_rainbow', 'lightning_mirror', 'lightning_magnet', 'lightning_gem', 'lightning_frozen',
       'prism_rainbow', 'prism_mirror', 'prism_magnet', 'prism_gem', 'prism_frozen',
@@ -259,22 +221,13 @@ describe('executeComboEffect', () => {
       'magnet_gem', 'magnet_frozen', 'gem_frozen',
       'gold_special', 'rainbow_special', 'triple_special',
     ];
-
-    for (const type of allTypes) {
-      const grid = makeGrid([
-        { row: 0, col: 0, type: 'prism' },
-        { row: 1, col: 1, type: 'magnet' },
-        { row: 2, col: 2, type: 'gem', hitsRemaining: 2 },
-        { row: 3, col: 3, type: 'frozen', hitsRemaining: 2 },
-        { row: 4, col: 4, type: 'mirror' },
-        { row: 5, col: 5, type: 'rainbow' },
-      ]);
+    for (const type of newTypes) {
+      const grid = makeGrid();
       const combo = makeCombo(type, [
-        { row: 0, col: 0, tileType: 'prism' },
-        { row: 1, col: 1, tileType: 'magnet' },
+        { row: 0, col: 0, tileType: 'bomb' },
+        { row: 0, col: 1, tileType: 'rainbow' },
       ]);
-      const ctx = makeCtx(grid, combo);
-      expect(() => executeComboEffect(ctx)).not.toThrow();
+      expect(() => executeComboEffect(makeCtx(grid, combo))).not.toThrow();
     }
   });
 
@@ -289,10 +242,7 @@ describe('executeComboEffect', () => {
       { row: 2, col: 2, tileType: 'bomb' },
       { row: 2, col: 4, tileType: 'bomb' },
     ], 3);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo));
     expect(result.explosions[0].type).toBe('mega_blast');
     expect(result.explosions[0].intensity).toBe(4);
   });
@@ -306,199 +256,302 @@ describe('executeComboEffect', () => {
       { row: 0, col: 0, tileType: 'bomb' },
       { row: 0, col: 2, tileType: 'lightning' },
     ], 4);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
+    const result = executeComboEffect(makeCtx(grid, combo));
     expect(result.processedBombKeys).toContain('0,0');
   });
 
-  // ── prism_magnet (Vortex Lattice) ─────────────────────────────────────────
+  // ── bomb_rainbow (Prism Bomb) ─────────────────────────────────────────────
 
-  it('prism_magnet: should fire vortex pull and cross-clear from magnet position', () => {
-    // prism at (2,2), magnet at (2,4)
+  it('bomb_rainbow: should clear cross (row+col) from bomb AND 3x3 around bomb', () => {
     const grid = makeGrid([
-      { row: 2, col: 2, type: 'prism' },
-      { row: 2, col: 4, type: 'magnet' },
+      { row: 2, col: 2, type: 'bomb' },
+      { row: 2, col: 4, type: 'rainbow' },
     ]);
-    const combo = makeCombo('prism_magnet', [
-      { row: 2, col: 2, tileType: 'prism' },
-      { row: 2, col: 4, tileType: 'magnet' },
-    ], 6);
-    const ctx = makeCtx(grid, combo);
+    const combo = makeCombo('bomb_rainbow', [
+      { row: 2, col: 2, tileType: 'bomb' },
+      { row: 2, col: 4, tileType: 'rainbow' },
+    ], 4);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    // Entire row 2 cleared (cross)
+    for (let c = 0; c < 6; c++) expect(grid[2][c].isCleared).toBe(true);
+    // Entire col 2 cleared (cross)
+    for (let r = 0; r < 6; r++) expect(grid[r][2].isCleared).toBe(true);
+    // 3x3 corners also cleared
+    expect(grid[1][1].isCleared).toBe(true);
+    expect(grid[3][3].isCleared).toBe(true);
+    expect(result.explosions.length).toBeGreaterThan(0);
+    expect(result.explosions[0].type).toBe('combo');
+    expect(result.explosions[0].intensity).toBe(4);
+    expect(result.processedBombKeys).toContain('2,2');
+  });
 
-    const result = executeComboEffect(ctx);
+  it('bomb_rainbow: multi-hit tiles in cross/3x3 area get hit not cleared', () => {
+    const grid = makeGrid([
+      { row: 2, col: 2, type: 'bomb' },
+      { row: 2, col: 4, type: 'rainbow' },
+      { row: 2, col: 0, type: 'frozen', hitsRemaining: 2 },
+    ]);
+    const combo = makeCombo('bomb_rainbow', [
+      { row: 2, col: 2, tileType: 'bomb' },
+      { row: 2, col: 4, tileType: 'rainbow' },
+    ], 4);
+    executeComboEffect(makeCtx(grid, combo));
+    expect(grid[2][0].isCleared).toBe(false);
+    expect(grid[2][0].hitsRemaining).toBe(1);
+  });
 
-    // Should produce an explosion
+  // ── bomb_mirror (Twin Explosion) ──────────────────────────────────────────
+
+  it('bomb_mirror: should clear 3x3 at both bomb and mirror positions', () => {
+    const grid = makeGrid([
+      { row: 1, col: 1, type: 'bomb' },
+      { row: 4, col: 4, type: 'mirror' },
+    ]);
+    const combo = makeCombo('bomb_mirror', [
+      { row: 1, col: 1, tileType: 'bomb' },
+      { row: 4, col: 4, tileType: 'mirror' },
+    ], 4);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[0][0].isCleared).toBe(true);
+    expect(grid[2][2].isCleared).toBe(true);
+    expect(grid[3][3].isCleared).toBe(true);
+    expect(grid[5][5].isCleared).toBe(true);
+    expect(result.explosions.length).toBe(2);
+    expect(result.processedBombKeys).toContain('1,1');
+  });
+
+  it('bomb_mirror: tiles outside 3x3 of either center NOT cleared', () => {
+    const grid = makeGrid([
+      { row: 0, col: 0, type: 'bomb' },
+      { row: 5, col: 5, type: 'mirror' },
+    ]);
+    const combo = makeCombo('bomb_mirror', [
+      { row: 0, col: 0, tileType: 'bomb' },
+      { row: 5, col: 5, tileType: 'mirror' },
+    ], 4);
+    executeComboEffect(makeCtx(grid, combo));
+    expect(grid[2][3].isCleared).toBe(false);
+  });
+
+  // ── bomb_magnet (Gravity Bomb) ────────────────────────────────────────────
+
+  it('bomb_magnet: should execute vortex pull then 5x5 blast around magnet', () => {
+    const grid = makeGrid([
+      { row: 0, col: 0, type: 'bomb' },
+      { row: 3, col: 3, type: 'magnet' },
+    ]);
+    const combo = makeCombo('bomb_magnet', [
+      { row: 0, col: 0, tileType: 'bomb' },
+      { row: 3, col: 3, tileType: 'magnet' },
+    ], 5);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[1][1].isCleared).toBe(true);
+    expect(grid[5][5].isCleared).toBe(true);
+    expect(grid[3][3].isCleared).toBe(true);
     expect(result.explosions.length).toBeGreaterThan(0);
     expect(result.explosions[0].intensity).toBe(4);
-    // Cross-clear from magnet position (row 2 and col 4) should be cleared
-    expect(grid[2][0].isCleared).toBe(true); // row 2
-    expect(grid[0][4].isCleared).toBe(true); // col 4
-    expect(grid[5][4].isCleared).toBe(true); // col 4
+    expect(result.processedBombKeys).toContain('0,0');
   });
 
-  // ── prism_gem (Crystal Lattice) ───────────────────────────────────────────
+  // ── bomb_gem (Gem Burst) ──────────────────────────────────────────────────
 
-  it('prism_gem: should complete gem and fire cross-clear from prism position with bonus score', () => {
-    // prism at (1,1), gem at (3,3) with hitsRemaining=2
+  it('bomb_gem: should instantly complete gem + fire bomb 3x3', () => {
     const grid = makeGrid([
-      { row: 1, col: 1, type: 'prism' },
-      { row: 3, col: 3, type: 'gem', hitsRemaining: 2 },
+      { row: 2, col: 2, type: 'bomb' },
+      { row: 0, col: 5, type: 'gem', hitsRemaining: 2 },
     ]);
-    const combo = makeCombo('prism_gem', [
-      { row: 1, col: 1, tileType: 'prism' },
-      { row: 3, col: 3, tileType: 'gem' },
-    ], 5);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
-    // Gem should be instantly completed (cleared)
+    const combo = makeCombo('bomb_gem', [
+      { row: 2, col: 2, tileType: 'bomb' },
+      { row: 0, col: 5, tileType: 'gem' },
+    ], 4);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[0][5].isCleared).toBe(true);
+    expect(grid[1][1].isCleared).toBe(true);
     expect(grid[3][3].isCleared).toBe(true);
-    // Bonus includes TREASURE_GEM_COMPLETION_BONUS
     expect(result.bonusScore).toBeGreaterThanOrEqual(TREASURE_GEM_COMPLETION_BONUS);
-    // Cross-clear from prism: row 1 should be cleared
-    expect(grid[1][0].isCleared).toBe(true);
-    expect(grid[1][5].isCleared).toBe(true);
-    expect(result.explosions.length).toBeGreaterThan(0);
+    expect(result.processedBombKeys).toContain('2,2');
   });
 
-  // ── prism_frozen (Frost Lattice) ──────────────────────────────────────────
+  // ── bomb_frozen (Cryo Blast) ──────────────────────────────────────────────
 
-  it('prism_frozen: should free ALL frost tiles on board and fire cross-clear from prism', () => {
-    // prism at (0,0), multiple frost tiles scattered
+  it('bomb_frozen: should decrement all frost tiles on board then fire bomb 3x3', () => {
     const grid = makeGrid([
-      { row: 0, col: 0, type: 'prism' },
-      { row: 1, col: 1, type: 'frozen', hitsRemaining: 2 },
-      { row: 3, col: 4, type: 'frozen', hitsRemaining: 1 },
+      { row: 2, col: 2, type: 'bomb' },
+      { row: 0, col: 0, type: 'frozen', hitsRemaining: 2 },
       { row: 5, col: 5, type: 'frozen', hitsRemaining: 2 },
     ]);
-    const combo = makeCombo('prism_frozen', [
-      { row: 0, col: 0, tileType: 'prism' },
-      { row: 1, col: 1, tileType: 'frozen' },
-    ], 4);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
-    // ALL frost tiles should be freed (hitsRemaining=0, cleared)
-    expect(grid[1][1].isCleared).toBe(true);
-    expect(grid[3][4].isCleared).toBe(true);
-    expect(grid[5][5].isCleared).toBe(true);
-    // Cross-clear from prism position (0,0): row 0 and col 0
-    expect(grid[0][5].isCleared).toBe(true); // row 0
-    expect(grid[5][0].isCleared).toBe(true); // col 0
-    expect(result.explosions.length).toBeGreaterThan(0);
-  });
-
-  // ── rainbow_mirror (Kaleidoscope) ─────────────────────────────────────────
-
-  it('rainbow_mirror: should give 3x baseScore bonus (mirror triples rainbow amplification)', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'rainbow' },
-      { row: 0, col: 1, type: 'mirror' },
-    ]);
-    const combo = makeCombo('rainbow_mirror', [
-      { row: 0, col: 0, tileType: 'rainbow' },
-      { row: 0, col: 1, tileType: 'mirror' },
-    ], 5);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
-    // Score-only combo: no tile clearing expected, but bonusScore should be 3 * baseScore
-    // baseScore here is computed from path/word — we check bonusScore > 0
-    expect(result.bonusScore).toBeGreaterThan(0);
-    expect(result.explosions.length).toBeGreaterThan(0);
-  });
-
-  it('rainbow_mirror: bonusScore should equal 3 times the provided baseScore', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'rainbow' },
-      { row: 0, col: 1, type: 'mirror' },
-    ]);
-    const combo = makeCombo('rainbow_mirror', [
-      { row: 0, col: 0, tileType: 'rainbow' },
-      { row: 0, col: 1, tileType: 'mirror' },
-    ], 5);
-    // Provide a known baseScore via combo scoreMultiplier used as baseScore proxy
-    // The implementation should use combo.scoreMultiplier * 3 or a passed baseScore
-    // We test the behavior: bonusScore = 3 * some positive reference value
-    const ctx = makeCtx(grid, combo);
-    const result = executeComboEffect(ctx);
-    // Implementation uses baseScore=1 (default when no word score passed), so 3*1=3
-    expect(result.bonusScore).toBe(3);
-  });
-
-  // ── rainbow_magnet (Whirlwind) ────────────────────────────────────────────
-
-  it('rainbow_magnet: should fire boosted vortex pull (radius 3) and explode', () => {
-    // rainbow at (2,2), magnet at (2,4)
-    const grid = makeGrid([
-      { row: 2, col: 2, type: 'rainbow' },
-      { row: 2, col: 4, type: 'magnet' },
-    ]);
-    // Place tiles at vortex radius 3 (should be affected)
-    const combo = makeCombo('rainbow_magnet', [
-      { row: 2, col: 2, tileType: 'rainbow' },
-      { row: 2, col: 4, tileType: 'magnet' },
-    ], 4);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
-    expect(result.explosions.length).toBeGreaterThan(0);
-    // At minimum one explosion should be generated
-    expect(result.bonusScore).toBeGreaterThanOrEqual(0);
-  });
-
-  // ── rainbow_gem (Lucky Boost) ─────────────────────────────────────────────
-
-  it('rainbow_gem: should add RAINBOW_BOOST_MULTIPLIER * TREASURE_GEM_COMPLETION_BONUS to bonusScore', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'rainbow' },
-      { row: 2, col: 2, type: 'gem', hitsRemaining: 2 },
-    ]);
-    const combo = makeCombo('rainbow_gem', [
-      { row: 0, col: 0, tileType: 'rainbow' },
-      { row: 2, col: 2, tileType: 'gem' },
-    ], 4);
-    const ctx = makeCtx(grid, combo);
-
-    const result = executeComboEffect(ctx);
-
-    const expectedBonus = RAINBOW_BOOST_MULTIPLIER * TREASURE_GEM_COMPLETION_BONUS;
-    expect(result.bonusScore).toBe(expectedBonus);
-    // Gem NOT auto-completed (rainbow boosts eventual completion)
-    expect(grid[2][2].isCleared).toBe(false);
-    expect(result.explosions.length).toBeGreaterThan(0);
-  });
-
-  // ── rainbow_frozen (Frost Bloom) ──────────────────────────────────────────
-
-  it('rainbow_frozen: should advance all frost tiles by 1 hit (mass reveal)', () => {
-    // Multiple frost tiles on board
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'rainbow' },
-      { row: 1, col: 1, type: 'frozen', hitsRemaining: 2 },
-      { row: 2, col: 3, type: 'frozen', hitsRemaining: 1 },
-      { row: 4, col: 4, type: 'frozen', hitsRemaining: 2 },
-    ]);
-    const combo = makeCombo('rainbow_frozen', [
-      { row: 0, col: 0, tileType: 'rainbow' },
-      { row: 1, col: 1, tileType: 'frozen' },
+    const combo = makeCombo('bomb_frozen', [
+      { row: 2, col: 2, tileType: 'bomb' },
+      { row: 0, col: 0, tileType: 'frozen' },
     ], 3);
-    const ctx = makeCtx(grid, combo);
+    executeComboEffect(makeCtx(grid, combo));
+    expect(grid[0][0].hitsRemaining).toBe(1);
+    expect(grid[5][5].hitsRemaining).toBe(1);
+    expect(grid[1][1].isCleared).toBe(true);
+    expect(grid[3][3].isCleared).toBe(true);
+  });
 
-    const result = executeComboEffect(ctx);
+  it('bomb_frozen: frost tiles with hitsRemaining=1 get marked cleared', () => {
+    const grid = makeGrid([
+      { row: 0, col: 0, type: 'bomb' },
+      { row: 5, col: 5, type: 'frozen', hitsRemaining: 1 },
+    ]);
+    const combo = makeCombo('bomb_frozen', [
+      { row: 0, col: 0, tileType: 'bomb' },
+      { row: 5, col: 5, tileType: 'frozen' },
+    ], 3);
+    executeComboEffect(makeCtx(grid, combo));
+    expect(grid[5][5].isCleared).toBe(true);
+  });
 
-    // Frost at (1,1): was 2 hits → should be cracked (hitsRemaining decremented to 1)
-    expect(grid[1][1].hitsRemaining).toBe(1);
-    // Frost at (2,3): was 1 hit → should be freed (cleared)
-    expect(grid[2][3].isCleared).toBe(true);
-    // Frost at (4,4): was 2 hits → should be cracked
-    expect(grid[4][4].hitsRemaining).toBe(1);
+  it('bomb_frozen: should add bomb to processedBombKeys', () => {
+    const grid = makeGrid([{ row: 1, col: 1, type: 'bomb' }]);
+    const combo = makeCombo('bomb_frozen', [
+      { row: 1, col: 1, tileType: 'bomb' },
+      { row: 2, col: 2, tileType: 'frozen' },
+    ], 3);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(result.processedBombKeys).toContain('1,1');
+  });
+
+  // ── lightning_rainbow (Rainbow Strike) ───────────────────────────────────
+
+  it('lightning_rainbow: should clear all columns where rainbow tiles exist + lightning column', () => {
+    const grid = makeGrid([
+      { row: 0, col: 1, type: 'lightning' },
+      { row: 2, col: 3, type: 'rainbow' },
+      { row: 4, col: 5, type: 'rainbow' },
+    ]);
+    const combo = makeCombo('lightning_rainbow', [
+      { row: 0, col: 1, tileType: 'lightning' },
+      { row: 2, col: 3, tileType: 'rainbow' },
+    ], 5);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    for (let r = 0; r < 6; r++) expect(grid[r][1].isCleared).toBe(true);
+    for (let r = 0; r < 6; r++) expect(grid[r][3].isCleared).toBe(true);
+    for (let r = 0; r < 6; r++) expect(grid[r][5].isCleared).toBe(true);
+    expect(result.processedLightningKeys).toContain('0,1');
     expect(result.explosions.length).toBeGreaterThan(0);
   });
+
+  // ── lightning_mirror (Double Strike) ─────────────────────────────────────
+
+  it('lightning_mirror: should clear columns at both lightning and mirror positions', () => {
+    const grid = makeGrid([
+      { row: 0, col: 1, type: 'lightning' },
+      { row: 3, col: 4, type: 'mirror' },
+    ]);
+    const combo = makeCombo('lightning_mirror', [
+      { row: 0, col: 1, tileType: 'lightning' },
+      { row: 3, col: 4, tileType: 'mirror' },
+    ], 4);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    for (let r = 0; r < 6; r++) expect(grid[r][1].isCleared).toBe(true);
+    for (let r = 0; r < 6; r++) expect(grid[r][4].isCleared).toBe(true);
+    expect(result.explosions.length).toBe(2);
+    expect(result.processedLightningKeys).toContain('0,1');
+  });
+
+  // ── lightning_magnet (Magnetic Storm) ────────────────────────────────────
+
+  it('lightning_magnet: should execute vortex pull then clear columns of magnet area', () => {
+    const grid = makeGrid([
+      { row: 0, col: 1, type: 'lightning' },
+      { row: 3, col: 3, type: 'magnet' },
+    ]);
+    const combo = makeCombo('lightning_magnet', [
+      { row: 0, col: 1, tileType: 'lightning' },
+      { row: 3, col: 3, tileType: 'magnet' },
+    ], 5);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    for (let r = 0; r < 6; r++) expect(grid[r][3].isCleared).toBe(true);
+    expect(result.processedLightningKeys).toContain('0,1');
+    expect(result.explosions.length).toBeGreaterThan(0);
+  });
+
+  // ── lightning_gem (Shatter Strike) ───────────────────────────────────────
+
+  it('lightning_gem: should instantly complete gem + clear lightning column', () => {
+    const grid = makeGrid([
+      { row: 0, col: 2, type: 'lightning' },
+      { row: 3, col: 4, type: 'gem', hitsRemaining: 2 },
+    ]);
+    const combo = makeCombo('lightning_gem', [
+      { row: 0, col: 2, tileType: 'lightning' },
+      { row: 3, col: 4, tileType: 'gem' },
+    ], 4);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[3][4].isCleared).toBe(true);
+    for (let r = 0; r < 6; r++) expect(grid[r][2].isCleared).toBe(true);
+    expect(result.bonusScore).toBeGreaterThanOrEqual(TREASURE_GEM_COMPLETION_BONUS);
+    expect(result.processedLightningKeys).toContain('0,2');
+  });
+
+  // ── lightning_frozen (Permafrost) ─────────────────────────────────────────
+
+  it('lightning_frozen: should clear lightning column + decrement all frost tiles', () => {
+    const grid = makeGrid([
+      { row: 0, col: 2, type: 'lightning' },
+      { row: 1, col: 0, type: 'frozen', hitsRemaining: 2 },
+      { row: 5, col: 5, type: 'frozen', hitsRemaining: 2 },
+    ]);
+    const combo = makeCombo('lightning_frozen', [
+      { row: 0, col: 2, tileType: 'lightning' },
+      { row: 1, col: 0, tileType: 'frozen' },
+    ], 3);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    for (let r = 0; r < 6; r++) expect(grid[r][2].isCleared).toBe(true);
+    expect(grid[1][0].hitsRemaining).toBe(1);
+    expect(grid[5][5].hitsRemaining).toBe(1);
+    expect(result.processedLightningKeys).toContain('0,2');
+    expect(result.explosions.length).toBeGreaterThan(0);
+  });
+
+  // ── prism_rainbow (Aurora) ────────────────────────────────────────────────
+
+  it('prism_rainbow: should fire cross-clear from every cell in the word path', () => {
+    const grid = makeGrid([
+      { row: 1, col: 1, type: 'prism' },
+      { row: 1, col: 3, type: 'rainbow' },
+    ]);
+    const combo = makeCombo('prism_rainbow', [
+      { row: 1, col: 1, tileType: 'prism' },
+      { row: 1, col: 3, tileType: 'rainbow' },
+    ], 7);
+    const path = makePath([1, 1], [1, 2], [1, 3]);
+    const result = executeComboEffect(makeCtx(grid, combo, path));
+    // Cross from each path cell: row 1 cleared and cols 1, 2, 3 cleared
+    for (let c = 0; c < 6; c++) expect(grid[1][c].isCleared).toBe(true);
+    for (let r = 0; r < 6; r++) expect(grid[r][1].isCleared).toBe(true);
+    for (let r = 0; r < 6; r++) expect(grid[r][2].isCleared).toBe(true);
+    for (let r = 0; r < 6; r++) expect(grid[r][3].isCleared).toBe(true);
+    expect(result.explosions.length).toBeGreaterThan(0);
+    expect(result.explosions[0].intensity).toBe(4);
+  });
+
+  // ── prism_mirror (Twin Cross) ─────────────────────────────────────────────
+
+  it('prism_mirror: should fire cross-clear from prism position twice (double-damage)', () => {
+    const grid = makeGrid([
+      { row: 2, col: 2, type: 'prism' },
+      { row: 2, col: 4, type: 'mirror' },
+      // ice tile in prism row — survives first pass, cleared on second
+      { row: 2, col: 0, type: 'ice', hitsRemaining: 2 },
+    ]);
+    const combo = makeCombo('prism_mirror', [
+      { row: 2, col: 2, tileType: 'prism' },
+      { row: 2, col: 4, tileType: 'mirror' },
+    ], 6);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    // ice at (2,0): first pass hits (2→1), second pass clears (isMultiHitAlive=false)
+    expect(grid[2][0].isCleared).toBe(true);
+    // Standard tiles in cross cleared
+    expect(grid[0][2].isCleared).toBe(true);
+    expect(grid[5][2].isCleared).toBe(true);
+    expect(result.explosions.length).toBeGreaterThan(0);
+    expect(result.explosions[0].intensity).toBe(4);
+    expect(result.processedBombKeys).toEqual([]);
+  });
+
+
 });
