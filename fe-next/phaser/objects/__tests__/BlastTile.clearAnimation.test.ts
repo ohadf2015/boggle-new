@@ -89,8 +89,9 @@ describe('BlastTile.playClearAnimation squash-stretch', () => {
 // ─── Rotation tween ──────────────────────────────────────────────────────────
 
 describe('BlastTile.playClearAnimation rotation', () => {
-  it('includes a rotation property in the clear tween', () => {
-    const tile = makeTile('A', 'gold', 0);
+  it('standard tile includes a rotation property in the clear tween', () => {
+    // Standard tile uses generic death which always has rotation
+    const tile = makeTile('A', 'standard', 0);
     const scene = (tile as unknown as { scene: Phaser.Scene }).scene;
     (scene.tweens.add as jest.Mock).mockClear();
 

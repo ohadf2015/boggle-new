@@ -311,7 +311,7 @@ export class BlastTile extends LetterTile {
     const { reduceMotion = false, isLowEnd = false } = options;
 
     if (reduceMotion) {
-      // Simple fade — no squash, rotation, or particles
+      // Simple fade — no squash, rotation, or particles (all types)
       return new Promise<void>((resolve) => {
         this.scene.tweens.add({
           targets: this,
@@ -326,11 +326,43 @@ export class BlastTile extends LetterTile {
       });
     }
 
-    // Emit particles immediately (visible during squash anticipation)
-    this.emitClearParticles(isLowEnd);
+    return this.playClearByType(isLowEnd);
+  }
 
+  /** Dispatch per-type death animation. Default is the generic squash+rotate+fade. */
+  private playClearByType(isLowEnd: boolean): Promise<void> {
+    switch (this.blastType) {
+      case 'bomb':
+        return this.playExplosiveDeath(isLowEnd);
+      case 'ice':
+        return this.playShatterDeath(isLowEnd);
+      case 'lightning':
+        return this.playZapDeath(isLowEnd);
+      case 'prism':
+        return this.playRefractDeath(isLowEnd);
+      case 'rainbow':
+        return this.playDissolveDeath(isLowEnd);
+      case 'gem':
+        return this.playSparkDeath(isLowEnd);
+      case 'frozen':
+        return this.playMeltDeath(isLowEnd);
+      case 'gold':
+      case 'silver':
+      case 'diamond':
+        return this.playGoldBurstDeath(isLowEnd);
+      case 'magnet':
+        return this.playMagneticPulseDeath(isLowEnd);
+      case 'mirror':
+        return this.playMirrorShatterDeath(isLowEnd);
+      default:
+        return this.playGenericDeath(isLowEnd);
+    }
+  }
+
+  /** Generic squash+rotate+fade — used for standard tiles and unknown types. */
+  private playGenericDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
     return new Promise<void>((resolve) => {
-      // Phase 1: Squash-stretch (anticipation)
       this.scene.tweens.add({
         targets: this,
         scaleX: { from: 1, to: 1.3 },
@@ -338,13 +370,274 @@ export class BlastTile extends LetterTile {
         duration: SQUASH_DURATION,
         ease: 'Quad.easeOut',
         onComplete: () => {
-          // Phase 2: Expand + rotate + fade (the actual clear)
           this.scene.tweens.add({
             targets: this,
             scaleX: { from: 0.7, to: 1.3 },
             scaleY: { from: 1.3, to: 0.7 },
             alpha: { from: 1, to: 0 },
             angle: { from: 0, to: TUMBLE_ANGLE },
+            duration: CLEAR_DURATION,
+            ease: 'Quad.easeIn',
+            onComplete: () => {
+              this.startClearing();
+              resolve();
+            },
+          });
+        },
+      });
+    });
+  }
+
+  /** Bomb: explosive burst — large scale expansion (>= 1.5x) + fade. */
+  private playExplosiveDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        scaleX: { from: 1, to: 1.3 },
+        scaleY: { from: 1, to: 0.7 },
+        duration: SQUASH_DURATION,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          this.scene.tweens.add({
+            targets: this,
+            scaleX: { from: 0.7, to: 1.8 },
+            scaleY: { from: 1.3, to: 1.8 },
+            alpha: { from: 1, to: 0 },
+            duration: CLEAR_DURATION,
+            ease: 'Expo.easeOut',
+            onComplete: () => {
+              this.startClearing();
+              resolve();
+            },
+          });
+        },
+      });
+    });
+  }
+
+  /** Ice: shatter spin — high-angle rotation (>= 90 deg) + fade. */
+  private playShatterDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        scaleX: { from: 1, to: 1.2 },
+        scaleY: { from: 1, to: 0.8 },
+        duration: SQUASH_DURATION,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          this.scene.tweens.add({
+            targets: this,
+            alpha: { from: 1, to: 0 },
+            angle: { from: 0, to: 120 },
+            duration: CLEAR_DURATION,
+            ease: 'Quad.easeIn',
+            onComplete: () => {
+              this.startClearing();
+              resolve();
+            },
+          });
+        },
+      });
+    });
+  }
+
+  /** Lightning: zap flash — rapid alpha pulses then fade. */
+  private playZapDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      // Flash 1
+      this.scene.tweens.add({
+        targets: this,
+        alpha: { from: 1, to: 0.1 },
+        duration: 40,
+        ease: 'Stepped',
+        onComplete: () => {
+          // Flash 2
+          this.scene.tweens.add({
+            targets: this,
+            alpha: { from: 0.1, to: 1 },
+            duration: 40,
+            ease: 'Stepped',
+            onComplete: () => {
+              // Flash 3 + fade out
+              this.scene.tweens.add({
+                targets: this,
+                alpha: { from: 1, to: 0 },
+                duration: 40,
+                ease: 'Stepped',
+                onComplete: () => {
+                  this.scene.tweens.add({
+                    targets: this,
+                    alpha: { from: 0, to: 0 },
+                    duration: CLEAR_DURATION - 120,
+                    onComplete: () => {
+                      this.startClearing();
+                      resolve();
+                    },
+                  });
+                },
+              });
+            },
+          });
+        },
+      });
+    });
+  }
+
+  /** Prism: refraction burst — symmetric scale expansion (both axes >= 1.2x) + fade. */
+  private playRefractDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        scaleX: { from: 1, to: 0.9 },
+        scaleY: { from: 1, to: 0.9 },
+        duration: SQUASH_DURATION,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          this.scene.tweens.add({
+            targets: this,
+            scaleX: { from: 0.9, to: 1.4 },
+            scaleY: { from: 0.9, to: 1.4 },
+            alpha: { from: 1, to: 0 },
+            duration: CLEAR_DURATION,
+            ease: 'Expo.easeOut',
+            onComplete: () => {
+              this.startClearing();
+              resolve();
+            },
+          });
+        },
+      });
+    });
+  }
+
+  /** Rainbow: dissolve — pure alpha fade, NO rotation. */
+  private playDissolveDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        alpha: { from: 1, to: 0 },
+        duration: CLEAR_DURATION + SQUASH_DURATION,
+        ease: 'Sine.easeIn',
+        onComplete: () => {
+          this.startClearing();
+          resolve();
+        },
+      });
+    });
+  }
+
+  /** Gem: sparkle burst — small squash + extra particles. */
+  private playSparkDeath(isLowEnd: boolean): Promise<void> {
+    // Emit standard particles
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        scaleX: { from: 1, to: 1.1 },
+        scaleY: { from: 1, to: 0.9 },
+        duration: SQUASH_DURATION,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          this.scene.tweens.add({
+            targets: this,
+            scaleX: { from: 0.9, to: 1.2 },
+            scaleY: { from: 1.1, to: 1.2 },
+            alpha: { from: 1, to: 0 },
+            duration: CLEAR_DURATION,
+            ease: 'Quad.easeIn',
+            onComplete: () => {
+              this.startClearing();
+              resolve();
+            },
+          });
+        },
+      });
+    });
+  }
+
+  /** Frozen: icy melt — gentle angle rotation (30deg) + slow alpha fade. */
+  private playMeltDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        alpha: { from: 1, to: 0 },
+        angle: { from: 0, to: 30 },
+        duration: CLEAR_DURATION + SQUASH_DURATION,
+        ease: 'Sine.easeInOut',
+        onComplete: () => {
+          this.startClearing();
+          resolve();
+        },
+      });
+    });
+  }
+
+  /** Gold/Silver/Diamond: medium scale expansion + fade. */
+  private playGoldBurstDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        scaleX: { from: 1, to: 1.2 },
+        scaleY: { from: 1, to: 0.85 },
+        duration: SQUASH_DURATION,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          this.scene.tweens.add({
+            targets: this,
+            scaleX: { from: 0.85, to: 1.3 },
+            scaleY: { from: 1.2, to: 1.3 },
+            alpha: { from: 1, to: 0 },
+            duration: CLEAR_DURATION,
+            ease: 'Quad.easeIn',
+            onComplete: () => {
+              this.startClearing();
+              resolve();
+            },
+          });
+        },
+      });
+    });
+  }
+
+  /** Magnet: full 360 spin + fade. */
+  private playMagneticPulseDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        alpha: { from: 1, to: 0 },
+        angle: { from: 0, to: 360 },
+        duration: CLEAR_DURATION + SQUASH_DURATION,
+        ease: 'Quad.easeIn',
+        onComplete: () => {
+          this.startClearing();
+          resolve();
+        },
+      });
+    });
+  }
+
+  /** Mirror: scaleX flip shatter — scaleX to -1 then fade. */
+  private playMirrorShatterDeath(isLowEnd: boolean): Promise<void> {
+    this.emitClearParticles(isLowEnd);
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        scaleX: { from: 1, to: -1 },
+        duration: SQUASH_DURATION,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          this.scene.tweens.add({
+            targets: this,
+            scaleX: { from: -1, to: -1.3 },
+            alpha: { from: 1, to: 0 },
             duration: CLEAR_DURATION,
             ease: 'Quad.easeIn',
             onComplete: () => {
