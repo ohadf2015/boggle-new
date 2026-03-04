@@ -139,6 +139,15 @@ export const GEM_USE_BONUS = 3;
 /** Bonus when gem is finally collected (cleared) */
 export const GEM_COLLECT_BONUS = 8;
 
+// ==================== Treasure Gem Constants ====================
+
+/** Number of hits required to complete a Treasure Gem (shard collection) */
+export const TREASURE_GEM_HITS_REQUIRED = 3;
+/** Bonus awarded when all shards are collected (Treasure Gem completed) */
+export const TREASURE_GEM_COMPLETION_BONUS = 25;
+/** Number of random special tiles spawned on the board when a Treasure Gem completes */
+export const TREASURE_GEM_SPAWN_COUNT = 2;
+
 // ==================== Cascade Chain Constants ====================
 
 /** Maximum number of auto-cascade chain levels before stopping */
