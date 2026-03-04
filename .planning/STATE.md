@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: completed
-stopped_at: Completed 49-01-PLAN.md
-last_updated: "2026-03-04T14:46:27.113Z"
+stopped_at: Completed 49-03-PLAN.md
+last_updated: "2026-03-04T14:46:34.558Z"
 last_activity: "2026-03-04 — 48-04 complete: BlastComboFlash tier-based overlay + audio sting callback"
 progress:
   total_phases: 7
@@ -93,6 +93,8 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - [Phase 48-03]: mirror_gem spawnCount=4 via new optional ComboEffectResult.spawnCount field
 - [Phase 48-04]: Tier 3 = prism_prism/prism_rainbow/lightning_prism (multiplier >= 6); onSynergyDetected fires for first combo per word only; useReducedMotion: instant onComplete no flash
 - [Phase 49]: localStorage key blast_discovered_combos stores JSON array of BlastComboType strings; discoveredCombosRef mirrors state Set to prevent stale closures; banner auto-dismisses at 1800ms normal / 300ms reduced-motion
+- [Phase 49]: scaledRadius uses Math.ceil so radii always expand at non-integer scale factors
+- [Phase 49]: CODEX_COMBOS excludes catch-alls — only 31 specific pairs are codex-trackable
 
 ### Pending Todos
 
@@ -106,6 +108,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T14:46:19.543Z
-Stopped at: Completed 49-01-PLAN.md
+Last session: 2026-03-04T14:46:34.556Z
+Stopped at: Completed 49-03-PLAN.md
 Resume file: None
