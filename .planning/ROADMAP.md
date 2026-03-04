@@ -67,14 +67,14 @@ Plans:
   3. Vortex pulls nearby tiles toward it and then explodes, visibly rearranging the board
   4. Frost tile cracks on first hit revealing the inner tile type, then frees and activates that tile on second hit
   5. Mirror doubles the partnered special's effect; Wildcard never appears on the board; Silver/Gold/Diamond tier multipliers apply correctly
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 47-01: Implement Rainbow Boost rework (TILE-01)
-- [ ] 47-02: Implement Treasure Gem shard collector (TILE-02)
-- [ ] 47-03: Implement Vortex pull+explode (TILE-03) and Frost two-hit reveal (TILE-04)
-- [ ] 47-04: Implement Mirror tile (TILE-05), remove Wildcard (TILE-06), implement gold tier system (TILE-07)
-- [ ] 47-05: Update spawn distribution tables for all waves (TILE-09)
+- [ ] 47-01-PLAN.md — Rainbow Boost rework: amplify best special or 2x word score (TILE-01) (Wave 1)
+- [ ] 47-02-PLAN.md — Treasure Gem shard collector: 3-hit accumulation, +25 bonus, spawn 2 specials (TILE-02) (Wave 2)
+- [ ] 47-03-PLAN.md — Vortex pull+explode and Frost 2-hit reveal with inner special activation (TILE-03, TILE-04) (Wave 3)
+- [ ] 47-04-PLAN.md — Mirror tile, Wildcard removal, Silver/Gold/Diamond tier system (TILE-05, TILE-06, TILE-07) (Wave 4)
+- [ ] 47-05-PLAN.md — Updated spawn distribution tables for all waves with new tile unlock progression (TILE-09) (Wave 5)
 
 #### Phase 48: Combination System Core — Detection, Matrix, and Effects
 **Goal**: Any word containing two or more special tiles triggers a unique synergy effect from the full 28-pair combination matrix, with visuals and audio clearly distinguishing combinations from individual tile clears.
