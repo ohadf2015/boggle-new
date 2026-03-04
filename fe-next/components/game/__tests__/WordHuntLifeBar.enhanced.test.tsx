@@ -18,13 +18,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: React.forwardRef(({ children, className, style, animate, transition, ...rest }: any, ref: any) => (
-      <div ref={ref} className={className} style={style} data-animate={JSON.stringify(animate)} {...rest}>{children}</div>
-    )),
-  },
-}));
+jest.mock('framer-motion', () => {
+  const MotionDiv = React.forwardRef(({ children, className, style, animate, transition, ...rest }: any, ref: any) => (
+    <div ref={ref} className={className} style={style} data-animate={JSON.stringify(animate)} {...rest}>{children}</div>
+  ));
+  MotionDiv.displayName = 'MotionDiv';
+  return { motion: { div: MotionDiv } };
+});
 
 // Mock lucide-react Heart
 jest.mock('lucide-react', () => ({
