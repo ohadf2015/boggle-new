@@ -208,9 +208,18 @@ export function BlastGame({
     announceWordResult: () => {},
     announceCombo: () => {},
     onWordAccepted: handleWordAccepted,
-    // DDA: silently track failed words to boost special tile spawn after 3+ consecutive failures
-    onWordRejected: blast.trackWordFail,
   });
+
+  // DDA: silently track word rejections (PSYC-04)
+  // After 3+ consecutive rejections, next gravity refill spawns more special tiles
+  const lastFeedbackIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    const fb = wordSubmission.currentFeedback;
+    if (fb && fb.type === 'rejected' && fb.id !== lastFeedbackIdRef.current) {
+      lastFeedbackIdRef.current = fb.id;
+      blast.trackWordFail();
+    }
+  }, [wordSubmission.currentFeedback, blast]);
 
   // Handle word submission: validate via useWordSubmission
   const handleWordSubmit = useCallback((word: string) => {

@@ -73,7 +73,9 @@ export interface UseBlastCascadeReturn {
   startCascade: (
     grid: LetterGrid,
     tileStates: BlastTileState[][],
-    onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => void
+    onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => void,
+    /** Optional DDA spawn modifier — passed to rollSpecialType during refill */
+    spawnModifier?: number,
   ) => void;
 }
 
@@ -112,13 +114,14 @@ export function useBlastCascade({
   const startCascade = useCallback((
     grid: LetterGrid,
     tileStates: BlastTileState[][],
-    onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => void
+    onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => void,
+    spawnModifier = 0,
   ) => {
     // Clear any in-flight timers from a previous cascade
     clearTimers();
 
     // Compute gravity result upfront (pure function)
-    const result = computeGravityResult(grid, tileStates, gridSize, language, specialTileChance, customDistribution);
+    const result = computeGravityResult(grid, tileStates, gridSize, language, specialTileChance, customDistribution, spawnModifier);
 
     // Columns that received new tiles (these are the only ones worth scanning for cascade words)
     const affectedColumns = [...new Set(result.newTiles.map(t => t.col))];

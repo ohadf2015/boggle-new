@@ -5,9 +5,9 @@ import { useGridInit } from '@/components/singleplayer/game/hooks/useGridInit';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
+import { createDDAState, updateDDA, getDDASpawnModifier } from '../utils/blastDDA';
 import { detectVerticalWords } from '../utils/blastVerticalScanner';
-import { detectSpecialCombos } from '../utils/blastCombos';
-import type { BlastComboType, SpecialCombo } from '../utils/blastCombos';
+import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from '../utils/blastCombos';
 import { executeComboEffect } from '../utils/blastComboEffects';
 import { getWordLengthScaleFactor } from '../utils/blastComboScaling';
 import type { LetterGrid } from '@/shared/types/game';
@@ -210,6 +210,12 @@ export interface UseBlastGameReturn {
   activeComboFlash: { id: string; comboType: BlastComboType } | null;
   /** Clear the active combo flash (called after animation completes) */
   clearComboFlash: () => void;
+  /**
+   * Track a word rejection for DDA (invisible assist).
+   * Call when useWordSubmission fires onWordRejected.
+   * After 3+ consecutive calls the next gravity refill will spawn more special tiles.
+   */
+  trackWordFail: () => void;
 }
 
 export interface UseBlastGameOptions {
@@ -311,6 +317,10 @@ export function useBlastGame(
   // Ref so clearTilesForWord callback can access onComboDetected without stale closure
   const onComboDetectedRef = useRef(options?.onComboDetected);
   onComboDetectedRef.current = options?.onComboDetected;
+
+  // DDA state — invisible assist for special tile spawn (PSYC-04)
+  // Ref-based so cascade callbacks always read the latest value without re-render
+  const ddaStateRef = useRef(createDDAState());
 
   // Cascade chain refs (avoid re-renders + break circular useCallback dependency)
   const cascadeChainLevelRef = useRef(0);
@@ -582,6 +592,9 @@ export function useBlastGame(
     word: string,
     baseScore: number
   ) => {
+    // Track word success for DDA (invisible assist)
+    ddaStateRef.current = updateDDA(ddaStateRef.current, 'success');
+
     // New player word = new cascade chain
     cascadeChainLevelRef.current = 0;
     // Cancel any pending auto-detection or highlight from a previous cascade
@@ -1536,8 +1549,10 @@ export function useBlastGame(
       // Trigger cascade after a brief delay for gap cells to appear
       const gridForCascade = effectiveGrid;
       if (gridForCascade) {
+        // Capture DDA modifier at submission time (ref is always current)
+        const ddaModifier = getDDASpawnModifier(ddaStateRef.current);
         setTimeout(() => {
-          cascade.startCascade(gridForCascade, next, handleCascadeComplete);
+          cascade.startCascade(gridForCascade, next, handleCascadeComplete, ddaModifier);
         }, 80);
       }
 
@@ -1580,6 +1595,15 @@ export function useBlastGame(
     setScorePopups(prev => prev.filter(p => p.id !== id));
   }, []);
 
+  /**
+   * Track a word failure for invisible DDA assist (PSYC-04).
+   * Call from BlastGame when useWordSubmission fires onWordRejected.
+   * After 3+ consecutive calls, the next gravity refill spawns more special tiles.
+   */
+  const trackWordFail = useCallback(() => {
+    ddaStateRef.current = updateDDA(ddaStateRef.current, 'fail');
+  }, []);
+
   return {
     grid: initialGrid,
     displayGrid,
@@ -1604,5 +1628,6 @@ export function useBlastGame(
     cascadeHighlightData,
     activeComboFlash,
     clearComboFlash,
+    trackWordFail,
   };
 }

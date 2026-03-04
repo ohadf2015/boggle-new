@@ -60,6 +60,8 @@ export function computeGravityResult(
   language: Language,
   specialTileChance: number,
   customDistribution?: Record<string, number>,
+  /** DDA spawn modifier — added to specialTileChance for new-tile rolls (see blastDDA.ts) */
+  spawnModifier = 0,
 ): GravityResult {
   const newGrid: LetterGrid = Array.from({ length: gridSize }, () =>
     Array.from({ length: gridSize }, () => '')
@@ -133,7 +135,7 @@ export function computeGravityResult(
     for (let i = 0; i < emptyCount; i++) {
       const row = bottomRow - i; // top-most first
       const letter = generateBlastLetter(language);
-      const type = rollSpecialType(specialTileChance, customDistribution);
+      const type = rollSpecialType(specialTileChance, customDistribution, spawnModifier);
 
       newGrid[row][col] = letter;
       newTileStates[row][col] = {
