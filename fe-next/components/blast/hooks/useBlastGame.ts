@@ -235,6 +235,11 @@ export interface UseBlastGameReturn {
    * Add bonus score to game state (used by Sugar Crush to accumulate total bonus).
    */
   addBonusScore: (bonus: number) => void;
+  /**
+   * Switch to unlimited moves (soft pressure mode).
+   * Called after Sugar Crush in multiplayer so the player keeps playing until server timer ends.
+   */
+  unlockMoves: () => void;
 }
 
 export interface UseBlastGameOptions {
@@ -1622,6 +1627,11 @@ export function useBlastGame(
     setGameState(prev => ({ ...prev, isDeadEnd: true }));
   }, []);
 
+  /** Switch to unlimited moves (soft pressure mode for multiplayer) */
+  const unlockMoves = useCallback(() => {
+    setGameState(prev => ({ ...prev, movesRemaining: Infinity, totalMoves: Infinity }));
+  }, []);
+
   /** Generate results data for the results screen */
   const getResultsData = useCallback((maxCombo: number, wavesCompleted = 0, waveResults: import('../types').WaveResult[] = []): BlastResultsData => {
     const { score, wordsFound, tilesCleared, totalTiles } = gameState;
@@ -1722,5 +1732,6 @@ export function useBlastGame(
     setTileStates,
     addExplosion: addExplosionCallback,
     addBonusScore,
+    unlockMoves,
   };
 }

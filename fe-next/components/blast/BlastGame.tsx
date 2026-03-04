@@ -49,6 +49,16 @@ interface BlastGameProps {
    * Parent can use this to include comboType in the socket submitWord emit.
    */
   onWordWithComboType?: (word: string, comboType: string | null) => void;
+  /**
+   * Pre-built tile states from server overlay (multiplayer).
+   * When provided, useBlastGame skips generateTileStates and uses these directly.
+   */
+  initialTileStates?: import('./types').BlastTileState[][] | null;
+  /**
+   * Seed for deterministic multiplayer refills.
+   * Broadcast by server with startGame; ensures cascade refills are identical.
+   */
+  blastSeed?: number | null;
 }
 
 /**
@@ -71,6 +81,8 @@ export function BlastGame({
   pendingDiscovery,
   acknowledgeDiscovery,
   onWordWithComboType,
+  initialTileStates,
+  blastSeed,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
@@ -91,10 +103,9 @@ export function BlastGame({
   }, [combo, playWordAcceptedSound]);
 
   // Memoize wave objectives so they don't cause re-initialization
-  // Multiplayer: no wave objectives (single timed round)
   const waveObjectives = useMemo(
-    () => isMultiplayer ? [] : getWaveObjectives(waveNumber),
-    [waveNumber, isMultiplayer],
+    () => getWaveObjectives(waveNumber),
+    [waveNumber],
   );
 
   // Objective tile types for highlighting (memoized Set for BlastTileOverlay)
@@ -109,14 +120,13 @@ export function BlastGame({
   }, [waveObjectives]);
 
   // Sugar Crush sequence (PSYC-03): fires when moves run out, converting tiles to specials
-  // Multiplayer: no sugar crush (no move limit)
   const sugarCrush = useBlastSugarCrush();
 
   // Ref to sugarCrush.start — allows onMovesExhausted to reference latest start without stale closure
   const sugarCrushStartRef = useRef(sugarCrush.start);
   sugarCrushStartRef.current = sugarCrush.start;
 
-  // Sugar crush callback — always defined (hook rules) but only passed in SP
+  // Sugar crush callback — fires when moves run out
   const handleMovesExhausted = useCallback(() => {
     sugarCrushStartRef.current(
       blastTileStatesRef.current,
@@ -129,18 +139,19 @@ export function BlastGame({
   }, [config.gridSize]);
 
   // Core blast game state (with cascade callback + move limit from wave config)
-  // Multiplayer: no move limit, no wave objectives, no sugar crush
   const blast = useBlastGame(config, {
     onAutoCascadeWord: handleAutoCascadeWord,
-    movesAllowed: isMultiplayer ? undefined : waveConfig?.movesAllowed,
-    waveObjectives: isMultiplayer ? undefined : waveObjectives,
+    movesAllowed: waveConfig?.movesAllowed,
+    waveObjectives,
     onSynergyDetected: useCallback((_comboType: BlastComboType) => {
       playComboSound(3);
     }, [playComboSound]),
     onComboDetected: useCallback((combos: SpecialCombo[]) => {
       onComboDetected?.(combos);
     }, [onComboDetected]),
-    onMovesExhausted: isMultiplayer ? undefined : handleMovesExhausted,
+    onMovesExhausted: handleMovesExhausted,
+    initialTileStates: isMultiplayer ? initialTileStates : undefined,
+    blastSeed: isMultiplayer ? blastSeed : undefined,
   });
 
   // Stable refs to blast methods for use inside onMovesExhausted callback
@@ -161,14 +172,19 @@ export function BlastGame({
   const blastAddBonusScoreRef = useRef(blast.addBonusScore);
   blastAddBonusScoreRef.current = blast.addBonusScore;  
 
-  // After sugar crush completes, add bonus score and end game
+  // After sugar crush completes: in singleplayer end the game; in multiplayer unlock moves
+  // (soft pressure — server timer is authoritative for game end in multiplayer)
   const blastEndGameRef = useRef<(totalBonus: number) => void>(() => {});
-   
+
   blastEndGameRef.current = useCallback((totalBonus: number) => {
-    // totalBonus already added per-step via addBonusScore; just end the game
     void totalBonus;
-    blast.endGame();
-  }, [blast]);
+    if (isMultiplayer) {
+      // Soft pressure: Sugar Crush spectacle done, switch to unlimited moves
+      blast.unlockMoves();
+    } else {
+      blast.endGame();
+    }
+  }, [blast, isMultiplayer]);
 
   // Multiplayer combo sync — show another player's combo flash when blastComboSync fires.
   // blastComboSync is set by usePlayerGameEvents when the server broadcasts the event.
@@ -207,15 +223,15 @@ export function BlastGame({
     minWordLength,
   );
 
-  // Objective tracking — always called (hook rules) but results ignored in multiplayer
+  // Objective tracking
   const spObjectives = useBlastObjectives({
     gameState: blast.gameState,
     tileTypeClears: blast.gameState.tileTypeClears,
     waveNumber,
     wordsFound: blast.gameState.wordsFound,
   });
-  const objectiveProgress = isMultiplayer ? [] : spObjectives.objectiveProgress;
-  const allObjectivesComplete = isMultiplayer ? false : spObjectives.allObjectivesComplete;
+  const objectiveProgress = spObjectives.objectiveProgress;
+  const allObjectivesComplete = spObjectives.allObjectivesComplete;
 
   // Game timing - initialized once via effect
   const gameStartTimeRef = useRef(0);
@@ -336,8 +352,12 @@ export function BlastGame({
   }, []);
 
   // Detect game completion or dead end
+  // In multiplayer, server timer is authoritative — skip local game-end triggers
   // Priority: objectives met → wave complete, board cleared without objectives → game end, dead end → game end
   useEffect(() => {
+    // Multiplayer: server controls game end via timer; local state doesn't trigger onGameEnd
+    if (isMultiplayer) return undefined;
+
     // All objectives met → wave complete (regardless of board clear state)
     if (allObjectivesComplete) {
       const { score, wordsFound, tilesCleared, totalTiles } = blast.gameState;
@@ -378,7 +398,7 @@ export function BlastGame({
     }
 
     return undefined;
-  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, allObjectivesComplete, blast, combo.maxCombo, onGameEnd, onWaveComplete, waveConfig]);
+  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, allObjectivesComplete, blast, combo.maxCombo, onGameEnd, onWaveComplete, waveConfig, isMultiplayer]);
 
   const handleQuitRequest = useCallback(() => {
     setShowQuitConfirm(true);

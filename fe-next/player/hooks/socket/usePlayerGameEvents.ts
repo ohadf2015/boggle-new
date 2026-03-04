@@ -390,6 +390,13 @@ export function usePlayerGameEvents({
       setLevelUpData(null);
       setTotalBoardWords(null);
 
+      // Reset word hunt state for next game
+      setWordHuntEliminatedPlayers([]);
+      setWordHuntTargetFound(false);
+      setWordHuntTargetAttempts([]);
+      setWordHuntPlayerLives({});
+      setWordHuntMyLife(100);
+
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
 
@@ -416,11 +423,15 @@ export function usePlayerGameEvents({
     };
 
     // Word Hunt event handlers
-    const handleWordHuntLifeUpdate = (data: { playerLives: Record<string, number>; eliminatedPlayers: string[] }) => {
+    const handleWordHuntLifeUpdate = (data: { playerLives: Record<string, number>; eliminatedPlayers?: string[] }) => {
       logger.log('[PLAYER] Word hunt life update:', data);
       setWordHuntPlayerLives(data.playerLives);
       if (data.playerLives[username] !== undefined) {
         setWordHuntMyLife(data.playerLives[username]);
+      }
+      // Reconcile eliminatedPlayers from server (handles reconnect and missed events)
+      if (data.eliminatedPlayers) {
+        setWordHuntEliminatedPlayers(data.eliminatedPlayers);
       }
     };
 
@@ -435,7 +446,9 @@ export function usePlayerGameEvents({
 
     const handleWordHuntTargetFound = (data: { username: string; targetWord: string; isFirstFinder: boolean }) => {
       logger.log('[PLAYER] Word hunt target found by:', data.username);
-      // Another player found the target - show notification
+      // Mark target as found for all players (disables input for non-finders too)
+      setWordHuntTargetFound(true);
+      // Show notification about who found it
       neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: '🎯', duration: 3000 });
     };
 

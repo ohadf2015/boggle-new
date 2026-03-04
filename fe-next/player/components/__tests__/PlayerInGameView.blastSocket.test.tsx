@@ -1,0 +1,183 @@
+/**
+ * Test: PlayerInGameView wires onWordWithComboType to socket emit in blast mode
+ *
+ * Verifies that BlastGame receives an onWordWithComboType callback that emits
+ * 'submitWord' with { word, comboType } over the socket.
+ */
+
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+
+// ---------------------------------------------------------------------------
+// Mocks
+// ---------------------------------------------------------------------------
+
+jest.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ profile: { total_games: 5 } }),
+}));
+
+jest.mock('@/hooks/gameState/store', () => ({
+  useGameMode: () => 'blast',
+  useBlastTileOverlay: () => [],
+  useBlastMovesUsed: () => 0,
+  useWordHuntTargetLength: () => 0,
+  useWordHuntMyLife: () => 3,
+  useWordHuntTargetAttempts: () => [],
+  useWordHuntTargetFound: () => false,
+  useWordHuntPlayerLives: () => ({}),
+  useWordHuntEliminatedPlayers: () => [],
+}));
+
+jest.mock('@/components/game/InGameScreen', () => ({
+  __esModule: true,
+  default: () => <div data-testid="in-game-screen" />,
+}));
+
+// Capture the props passed to BlastGame
+let capturedBlastGameProps: any = null;
+jest.mock('@/components/blast/BlastGame', () => ({
+  BlastGame: (props: any) => {
+    capturedBlastGameProps = props;
+    return <div data-testid="blast-game" />;
+  },
+}));
+
+jest.mock('@/components/game/BlastMoveCounter', () => ({
+  BlastMoveCounter: () => <div data-testid="blast-move-counter" />,
+}));
+
+jest.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
+  useBlastMultiplayerBridge: () => ({
+    config: { gridSize: 4, specialTileChance: 0.15, language: 'en', difficulty: 'medium' },
+    initialTileStates: null,
+    blastSeed: 42,
+  }),
+}));
+
+jest.mock('@/components/ui/button', () => ({
+  Button: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
+}));
+jest.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: any) => open ? <div>{children}</div> : null,
+  DialogContent: ({ children }: any) => <div>{children}</div>,
+  DialogHeader: ({ children }: any) => <div>{children}</div>,
+  DialogTitle: ({ children }: any) => <div>{children}</div>,
+  DialogFooter: ({ children }: any) => <div>{children}</div>,
+}));
+jest.mock('@/components/ui/alert-dialog', () => ({
+  AlertDialog: ({ children, open }: any) => open ? <div>{children}</div> : null,
+  AlertDialogContent: ({ children }: any) => <div>{children}</div>,
+  AlertDialogHeader: ({ children }: any) => <div>{children}</div>,
+  AlertDialogTitle: ({ children }: any) => <div>{children}</div>,
+  AlertDialogDescription: ({ children }: any) => <div>{children}</div>,
+  AlertDialogFooter: ({ children }: any) => <div>{children}</div>,
+  AlertDialogAction: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
+  AlertDialogCancel: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
+}));
+jest.mock('@/components/TournamentStandings', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+// ---------------------------------------------------------------------------
+// Import
+// ---------------------------------------------------------------------------
+
+import PlayerInGameView from '../PlayerInGameView';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function createMockSocket() {
+  return {
+    emit: jest.fn(),
+    on: jest.fn(),
+    off: jest.fn(),
+    id: 'mock-socket-id',
+  } as any;
+}
+
+const baseProps = {
+  username: 'testplayer',
+  gameCode: 'ABCD',
+  t: (key: string) => key,
+  dir: 'ltr' as const,
+  socket: null as any,
+  letterGrid: [['A', 'B', 'C', 'D'], ['E', 'F', 'G', 'H'], ['I', 'J', 'K', 'L'], ['M', 'N', 'O', 'P']],
+  shufflingGrid: null,
+  gameActive: true,
+  showStartAnimation: false,
+  remainingTime: 60,
+  gameLanguage: 'en' as const,
+  minWordLength: 3,
+  comboLevel: 0,
+  comboLevelRef: { current: 0 },
+  foundWords: [],
+  leaderboard: [],
+  tournamentData: null,
+  tournamentStandings: [],
+  showTournamentStandings: false,
+  setShowTournamentStandings: jest.fn(),
+  showExitConfirm: false,
+  setShowExitConfirm: jest.fn(),
+  onExitRoom: jest.fn(),
+  onConfirmExit: jest.fn(),
+  onWordSubmit: jest.fn(),
+};
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+describe('PlayerInGameView blast socket word submission', () => {
+  beforeEach(() => {
+    capturedBlastGameProps = null;
+  });
+
+  it('should pass onWordWithComboType callback to BlastGame', () => {
+    const mockSocket = createMockSocket();
+    render(<PlayerInGameView {...baseProps} socket={mockSocket} />);
+
+    expect(screen.getByTestId('blast-game')).toBeInTheDocument();
+    expect(capturedBlastGameProps).not.toBeNull();
+    expect(typeof capturedBlastGameProps.onWordWithComboType).toBe('function');
+  });
+
+  it('should emit submitWord via socket when onWordWithComboType is called', () => {
+    const mockSocket = createMockSocket();
+    render(<PlayerInGameView {...baseProps} socket={mockSocket} />);
+
+    // Simulate BlastGame calling onWordWithComboType
+    capturedBlastGameProps.onWordWithComboType('HELLO', 'double_ice');
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('submitWord', {
+      word: 'HELLO',
+      comboType: 'double_ice',
+    });
+  });
+
+  it('should emit submitWord with null comboType when no combo detected', () => {
+    const mockSocket = createMockSocket();
+    render(<PlayerInGameView {...baseProps} socket={mockSocket} />);
+
+    capturedBlastGameProps.onWordWithComboType('CAT', null);
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('submitWord', {
+      word: 'CAT',
+      comboType: null,
+    });
+  });
+
+  it('should not emit when socket is null', () => {
+    render(<PlayerInGameView {...baseProps} socket={null} />);
+
+    expect(capturedBlastGameProps).not.toBeNull();
+    expect(typeof capturedBlastGameProps.onWordWithComboType).toBe('function');
+
+    // Should not throw when called without socket
+    expect(() => {
+      capturedBlastGameProps.onWordWithComboType('TEST', null);
+    }).not.toThrow();
+  });
+});

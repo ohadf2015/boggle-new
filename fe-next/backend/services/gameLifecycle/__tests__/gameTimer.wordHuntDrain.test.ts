@@ -121,7 +121,7 @@ describe('gameTimer word hunt life drain', () => {
       mockIo,
       'room:HUNT01',
       'wordHuntLifeUpdate',
-      { playerLives: { alice: 98, bob: 98 } },
+      { playerLives: { alice: 98, bob: 98 }, eliminatedPlayers: [] },
     );
   });
 

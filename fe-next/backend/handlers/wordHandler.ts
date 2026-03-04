@@ -628,6 +628,11 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
       const huntState = (game as any).wordHuntState;
       const lifeBonus = getLifeBonus(normalizedWord.length);
       restoreLife(huntState, username, lifeBonus);
+      // Broadcast updated lives immediately so clients don't wait for next timer tick
+      broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
+        playerLives: huntState.playerLives,
+        eliminatedPlayers: huntState.eliminatedPlayers,
+      });
     } catch (err: unknown) {
       const error = err as Error;
       logger.error('WORD_HUNT', `Life restoration error: ${error.message}`);

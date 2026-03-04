@@ -26,6 +26,7 @@ import { BlastMultiplayerOverlay } from '../../BlastMultiplayerOverlay';
 import { WordHuntTargetArea } from '../../WordHuntTargetArea';
 import { WordHuntLifeBar } from '../../WordHuntLifeBar';
 import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
+import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
 
 interface LandscapeLayoutProps {
   // Core props
@@ -195,6 +196,9 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
 
   return (
     <>
+      {/* Dynamic Energy Background - animated vortex, aurora, particles */}
+      <DynamicEnergyBackground />
+
       {/* Floating Score Animation - renders above everything */}
       {isPlaying && (
         <FloatingScoreAnimation

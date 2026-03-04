@@ -83,18 +83,19 @@ export function startGameTimer(
       // Update game state with drained lives
       huntState.playerLives = updatedLives;
 
-      // Broadcast updated lives to all players in room
-      broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
-        playerLives: updatedLives,
-      });
-
-      // Broadcast elimination for each newly eliminated player
+      // Push newly eliminated before broadcasting so the full list is included
       for (const username of newlyEliminated) {
         huntState.eliminatedPlayers.push(username);
         broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntEliminated', {
           username,
         });
       }
+
+      // Broadcast updated lives to all players in room (include eliminatedPlayers for reconnecting clients)
+      broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
+        playerLives: updatedLives,
+        eliminatedPlayers: huntState.eliminatedPlayers,
+      });
     }
 
     if (remainingTime <= 0) {

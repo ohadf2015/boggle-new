@@ -208,6 +208,12 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     gridSize: (letterGrid || shufflingGrid)?.[0]?.length ?? 4,
   });
 
+  // Blast multiplayer: emit word + comboType to server via socket
+  const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null) => {
+    if (!socket) return;
+    socket.emit('submitWord', { word, comboType });
+  }, [socket]);
+
   // Word hunt guess handler — emits to server
   const handleWordHuntGuess = useCallback((guess: string) => {
     if (!socket) return;
@@ -253,6 +259,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             mode="multiplayer"
             onGameEnd={() => {/* Server controls game end in multiplayer */}}
             onQuit={onExitRoom}
+            onWordWithComboType={handleBlastWordWithCombo}
+            initialTileStates={blastBridge.initialTileStates}
+            blastSeed={blastBridge.blastSeed}
           />
         </>
       ) : (
