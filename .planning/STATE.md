@@ -51,6 +51,8 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - Word-length scaling: 1.0x base / 1.5x at 5-6 letters / 2.0x at 7+
 - [Phase 46]: MIN_STANDARD_RATIO=0.6: when board already exceeds special budget, no additional specials placed (correct behavior)
 - [Phase 46]: Fisher-Yates shuffle on standardPositions distributes objective tiles randomly vs sequential top-left clustering
+- [Phase 46 - 46-02]: processedLightning Set prevents double column-clear when lightning is at prism row+column intersection
+- [Phase 46 - 46-02]: LIGHTNING_COLUMN_CLEAR_BONUS awarded for tiles cleared by chain-triggered lightning (prism→lightning path)
 
 ### Pending Todos
 
@@ -65,5 +67,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 46-04-PLAN.md (BUGF-08 clustering fix + BUGF-09 min ratio enforcement)
+Stopped at: Completed 46-02-PLAN.md (BUGF-01 lightning→bomb chain, BUGF-02 prism→lightning chain, 608 blast tests pass)
 Resume file: None
