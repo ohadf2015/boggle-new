@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { GameModeSelector } from '../GameModeSelector';
-import type { GameModeOption } from '../GameModeSelector';
+import type { GameModeOption } from '../GameModeSelector'; // eslint-disable-line no-duplicate-imports
 
 const mockT = (key: string) => {
   const translations: Record<string, string> = {

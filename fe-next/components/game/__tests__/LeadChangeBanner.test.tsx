@@ -4,11 +4,13 @@ import { LeadChangeBanner } from '../LeadChangeBanner';
 import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
 
 // Mock framer-motion
+const MockMotionDiv = React.forwardRef(function MockMotionDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) {
+  return <div ref={ref} data-testid={props['data-testid'] as string} {...props}>{children}</div>;
+});
+
 jest.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
-      <div ref={ref} data-testid={props['data-testid'] as string} {...props}>{children}</div>
-    )),
+    div: MockMotionDiv,
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));

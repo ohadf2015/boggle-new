@@ -15,10 +15,9 @@ import {
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions } from '@/hooks/gameState';
-import type { BlastWordAcceptedPayload } from '@/shared/types/socket';
+import type { BlastWordAcceptedPayload, StartGameBroadcast } from '@/shared/types/socket';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
-import type { StartGameBroadcast } from '@/shared/types/socket';
 import type { GameTimerReturn } from '@/hooks/useGameTimer';
 
 interface UsePlayerGameEventsProps {
