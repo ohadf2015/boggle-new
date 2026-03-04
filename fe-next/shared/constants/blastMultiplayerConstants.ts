@@ -3,6 +3,7 @@
  * Constants for blast mode in multiplayer games
  */
 
+import { BLAST_TILE_TYPE_LIST } from '@/shared/types/blast';
 import type { BlastTileType } from '@/shared/types/blast';
 
 export const BLAST_BONUS_MOVE_COMBO_THRESHOLD = 3;
@@ -11,9 +12,12 @@ export const BLAST_SPECIAL_TILE_CHANCE = 0.15;
 // Re-export canonical type for backward compat (consumers should prefer @/shared/types/blast)
 export type { BlastTileType } from '@/shared/types/blast';
 
-// Tile types available in multiplayer blast (subset of canonical list)
-export const BLAST_TILE_TYPES = ['standard', 'gold', 'rainbow', 'bomb', 'ice', 'gem', 'lightning', 'magnet'] as const;
-export type BlastMPTileType = typeof BLAST_TILE_TYPES[number];
+// All canonical tile types — replaces old 8-type hardcoded subset.
+// Multiplayer now spawns the same tile pool as singleplayer (wave-gated by generateBlastOverlay).
+export const BLAST_TILE_TYPES: readonly BlastTileType[] = BLAST_TILE_TYPE_LIST;
+
+// Backward-compat alias — prefer BlastTileType from @/shared/types/blast
+export type BlastMPTileType = BlastTileType;
 
 // Tile bonus multipliers (full canonical set — 'normal' renamed to 'standard')
 export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {

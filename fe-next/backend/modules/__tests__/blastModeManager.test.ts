@@ -148,6 +148,26 @@ describe('blastModeManager', () => {
       const state = initBlastModeState(grid, players);
       expect(state.playerBonusMoves).toEqual({ alice: 0, bob: 0 });
     });
+
+    it('should return a BlastModeState with a seed number field', () => {
+      const state = initBlastModeState(grid, players);
+      expect(state).toHaveProperty('seed');
+      expect(typeof state.seed).toBe('number');
+    });
+
+    it('should return a seed that is a positive integer', () => {
+      const state = initBlastModeState(grid, players);
+      expect(state.seed).toBeGreaterThan(0);
+      expect(Number.isInteger(state.seed)).toBe(true);
+    });
+
+    it('should return different seeds on successive calls', () => {
+      // With Date.now() xor random, seeds should almost never collide
+      const seeds = Array.from({ length: 10 }, () => initBlastModeState(grid, players).seed);
+      const uniqueSeeds = new Set(seeds);
+      // At least some should differ (extremely unlikely all 10 match)
+      expect(uniqueSeeds.size).toBeGreaterThan(1);
+    });
   });
 
   // ==========================================
@@ -198,6 +218,107 @@ describe('blastModeManager', () => {
       const result = recordBlastMove(state, 'charlie', 0);
       expect(result.movesUsed).toBe(1);
       expect(state.playerMoves.charlie).toBe(1);
+    });
+  });
+
+  // ==========================================
+  // generateBlastOverlay — canonical tile types (Task 1)
+  // ==========================================
+  describe('generateBlastOverlay — canonical tile types', () => {
+    const largeGrid: string[][] = Array.from({ length: 10 }, () =>
+      Array.from({ length: 10 }, () => 'A')
+    );
+
+    it('BLAST_TILE_TYPES should include all 14 canonical types', () => {
+      const canonicalTypes = [
+        'standard', 'gold', 'bomb', 'rainbow', 'ice', 'lightning',
+        'magnet', 'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond', 'wildcard',
+      ];
+      for (const t of canonicalTypes) {
+        expect(BLAST_TILE_TYPES).toContain(t);
+      }
+    });
+
+    it('BLAST_TILE_TYPES should include previously missing types (mirror, silver, diamond, prism)', () => {
+      expect(BLAST_TILE_TYPES).toContain('mirror');
+      expect(BLAST_TILE_TYPES).toContain('silver');
+      expect(BLAST_TILE_TYPES).toContain('diamond');
+      expect(BLAST_TILE_TYPES).toContain('prism');
+      expect(BLAST_TILE_TYPES).toContain('frozen');
+    });
+
+    it('statistical: running 100 overlays on large grid eventually produces new tile types', () => {
+      const newTypes = new Set<string>();
+      for (let i = 0; i < 100; i++) {
+        const overlay = generateBlastOverlay(largeGrid, 1.0, 1);
+        for (const tile of overlay) {
+          newTypes.add(tile.type);
+        }
+      }
+      // After 100 overlays with wave=1, we expect at least silver to appear (enabled wave 1)
+      // wave 1 enables: bomb, ice, gold, silver, rainbow — silver is part of distribution
+      expect(newTypes.has('silver')).toBe(true);
+    });
+  });
+
+  // ==========================================
+  // generateBlastOverlay — wave-aware (Task 2)
+  // ==========================================
+  describe('generateBlastOverlay — wave-aware', () => {
+    const largeGrid: string[][] = Array.from({ length: 10 }, () =>
+      Array.from({ length: 10 }, () => 'A')
+    );
+
+    it('wave 1 overlay should NOT contain diamond tiles (diamond unlocks at wave 4+)', () => {
+      // Run 200 overlays to get statistical confidence
+      for (let i = 0; i < 200; i++) {
+        const overlay = generateBlastOverlay(largeGrid, 1.0, 1);
+        for (const tile of overlay) {
+          expect(tile.type).not.toBe('diamond');
+        }
+      }
+    });
+
+    it('wave 4 overlay CAN contain diamond tiles (diamond enabled at wave 4)', () => {
+      const diamondSeen = new Set<string>();
+      for (let i = 0; i < 200; i++) {
+        const overlay = generateBlastOverlay(largeGrid, 1.0, 4);
+        for (const tile of overlay) {
+          diamondSeen.add(tile.type);
+        }
+      }
+      expect(diamondSeen.has('diamond')).toBe(true);
+    });
+
+    it('wave 3 overlay CAN contain mirror tiles (mirror enabled at wave 3)', () => {
+      const mirrorSeen = new Set<string>();
+      for (let i = 0; i < 200; i++) {
+        const overlay = generateBlastOverlay(largeGrid, 1.0, 3);
+        for (const tile of overlay) {
+          mirrorSeen.add(tile.type);
+        }
+      }
+      expect(mirrorSeen.has('mirror')).toBe(true);
+    });
+
+    it('wave 1 overlay should NOT contain mirror tiles (mirror unlocks at wave 3)', () => {
+      for (let i = 0; i < 200; i++) {
+        const overlay = generateBlastOverlay(largeGrid, 1.0, 1);
+        for (const tile of overlay) {
+          expect(tile.type).not.toBe('mirror');
+        }
+      }
+    });
+
+    it('initBlastModeState accepts optional wave parameter (defaults to 1)', () => {
+      const grid = [['A', 'B'], ['C', 'D']];
+      const players = ['alice'];
+      // Without wave param — should not throw
+      const stateDefault = initBlastModeState(grid, players);
+      expect(stateDefault).toHaveProperty('overlay');
+      // With wave=2 — should not throw
+      const stateWave2 = initBlastModeState(grid, players, 2);
+      expect(stateWave2).toHaveProperty('overlay');
     });
   });
 
