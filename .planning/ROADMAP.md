@@ -201,7 +201,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 55-01-PLAN.md — Remove dead constants + fix lint duplicate-import errors (Wave 1)
+- [x] 55-01-PLAN.md — Remove dead constants + fix lint duplicate-import errors (Wave 1)
 - [x] 55-02-PLAN.md — Update REQUIREMENTS.md and ROADMAP.md stale entries (Wave 1)
 
 ---
