@@ -5606,7 +5606,8 @@ const ja = {
     "comboCodex": "コンボ図鑑",
     "codexProgress": "{discovered}/{total} 発見済み",
     "codexLocked": "???",
-    "comboDiscovered": "コンボ発見！"
+    "comboDiscovered": "コンボ発見！",
+    "chainCounter": "チェーン x{{count}}"
   },
   "student": {
     "activeGame": {

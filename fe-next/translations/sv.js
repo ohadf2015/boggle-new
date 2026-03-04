@@ -5557,7 +5557,8 @@ const sv = {
     "comboCodex": "KOMBOKODEX",
     "codexProgress": "{discovered}/{total} hittade",
     "codexLocked": "???",
-    "comboDiscovered": "KOMBINATION HITTAD!"
+    "comboDiscovered": "KOMBINATION HITTAD!",
+    "chainCounter": "KEDJA x{{count}}"
   },
   "student": {
     "activeGame": {

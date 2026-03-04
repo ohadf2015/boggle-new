@@ -5532,7 +5532,8 @@ const he = {
     "comboCodex": "קודקס קומבו",
     "codexProgress": "{discovered}/{total} התגלו",
     "codexLocked": "???",
-    "comboDiscovered": "!קומבו התגלה"
+    "comboDiscovered": "!קומבו התגלה",
+    "chainCounter": "רצף x{{count}}"
   },
   "student": {
     "activeGame": {

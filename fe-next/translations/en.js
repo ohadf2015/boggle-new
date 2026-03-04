@@ -5649,7 +5649,8 @@ const en = {
     "comboCodex": "COMBO CODEX",
     "codexProgress": "{discovered}/{total} discovered",
     "codexLocked": "???",
-    "comboDiscovered": "COMBO DISCOVERED!"
+    "comboDiscovered": "COMBO DISCOVERED!",
+    "chainCounter": "CHAIN x{{count}}"
   },
   "student": {
         "activeGame": {

@@ -23,6 +23,7 @@ import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { Mascot } from '@/components/ui/Mascot';
 import { BlastMoveCounter } from './BlastMoveCounter';
 import { BlastObjectiveDisplay } from './BlastObjectiveDisplay';
+import { BlastChainCounter } from './BlastChainCounter';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -87,6 +88,8 @@ interface BlastGameLayoutProps {
   setShowEndGameConfirm: (show: boolean) => void;
   /** When true, grid input is blocked (discovery banner showing) */
   isDiscoveryActive?: boolean;
+  /** Cells to pulse with near-miss shimmer animation (empty = none) */
+  shimmerCells?: Array<{ row: number; col: number }>;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -137,6 +140,7 @@ export function BlastGameLayout({
   onRequestHint,
   onClearHint,
   isDiscoveryActive = false,
+  shimmerCells = [],
   t,
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
@@ -529,6 +533,13 @@ export function BlastGameLayout({
 
       {/* Game grid with overlays */}
       <div className={cn('flex-1 flex flex-col items-center justify-start px-4 pt-2 relative z-30 min-h-0 transition-shadow duration-500', comboGlow)}>
+        {/* Cascade chain counter — shown above grid during active cascades */}
+        {cascadeChainLevel > 0 && (
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+            <BlastChainCounter chainLevel={cascadeChainLevel} />
+          </div>
+        )}
+
         {/* Board complete celebration overlay */}
         <AnimatePresence>
           {isComplete && (
@@ -609,6 +620,7 @@ export function BlastGameLayout({
           onScorePopupComplete={onScorePopupComplete}
           ariaLabel={t('blast.gridLabel') || 'Letter grid'}
           highlightedPath={hintPath ?? undefined}
+          shimmerCells={shimmerCells}
         />
       </div>
 

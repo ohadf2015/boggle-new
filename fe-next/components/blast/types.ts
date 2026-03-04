@@ -175,7 +175,7 @@ export const TREASURE_GEM_SPAWN_COUNT = 2;
 // ==================== Cascade Chain Constants ====================
 
 /** Maximum number of auto-cascade chain levels before stopping */
-export const MAX_CASCADE_CHAIN = 2;
+export const MAX_CASCADE_CHAIN = 5;
 /** Maximum vertical words cleared per cascade level (limits simultaneous explosions) */
 export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
