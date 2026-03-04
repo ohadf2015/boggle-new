@@ -49,6 +49,7 @@ const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '1');
 // Types for payloads
 interface SubmitWordPayload {
   word: string;
+  comboType?: string | null;
 }
 
 interface SubmitWordVotePayload {
@@ -344,8 +345,10 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       const hasPositiveScore = isWordValidForScoring(normalizedWord, game.language);
       const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
 
+      const comboType = (validation.data as SubmitWordPayload).comboType ?? null;
+
       if (shouldAutoValidate) {
-        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true);
+        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true, comboType);
       } else {
         // Word not in dictionary - reject immediately (no pending/AI validation)
         inc('wordNeedsValidation');
@@ -506,7 +509,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
 // Helper functions
 
-function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean): void {
+function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean, comboType?: string | null): void {
   // Derive combo and fire round from server state (never trust client)
   const safeComboLevel = game.playerCombos?.[username] || 0;
   const fireRoundActive = game.fireRoundActive === true;
@@ -605,6 +608,16 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
       movesUsed: blastMoveResult.movesUsed,
       bonusMove: blastMoveResult.bonusMove,
       comboLevel: safeComboLevel,
+      comboType: comboType ?? null,
+    });
+  }
+
+  // Broadcast combo type to all players in room so they see the flash effect.
+  // Trust client-reported comboType (server has no tile state to detect combos).
+  if (comboType) {
+    broadcastToRoom(io, getGameRoom(gameCode), 'blastComboSync', {
+      comboType,
+      username,
     });
   }
 

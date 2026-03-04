@@ -286,7 +286,9 @@ export const submitWordSchema = compiledSchemas?.submitWordSchema || z.object({
   word: wordSchema,
   path: z.array(gridPositionSchema).optional(),
   // comboLevel and fireRoundActive deliberately omitted — derived server-side
-  // to prevent clients from spoofing score multipliers
+  // to prevent clients from spoofing score multipliers.
+  // comboType is trusted from client (server has no tile state to detect combos).
+  comboType: z.string().optional().nullable(),
 });
 
 export const submitWordVoteSchema = compiledSchemas?.submitWordVoteSchema || z.object({

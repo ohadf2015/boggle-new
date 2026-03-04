@@ -49,7 +49,7 @@ export interface ClientToServerEvents {
   broadcastShufflingGrid: (data: { gridState: unknown }) => void;
 
   // Word events
-  submitWord: (data: { word: string; comboLevel?: number }) => void;
+  submitWord: (data: { word: string; comboLevel?: number; comboType?: string | null }) => void;
   submitWordVote: (data: SubmitWordVotePayload) => void;
   submitPeerValidationVote: (data: { word: string; isValid: boolean; gameCode?: string }) => void;
   validateWords: (data: { validatedScores: unknown }) => void;
@@ -223,6 +223,7 @@ export interface ServerToClientEvents {
 
   // Blast multiplayer events
   blastWordAccepted: (data: BlastWordAcceptedPayload) => void;
+  blastComboSync: (data: BlastComboSyncPayload) => void;
 
   // Spectator events
   spectatorUpgraded: (data: SpectatorUpgradedPayload) => void;
@@ -603,6 +604,12 @@ export interface BlastWordAcceptedPayload {
   movesUsed: number;
   bonusMove: boolean;
   comboLevel: number;
+  comboType?: string | null;
+}
+
+export interface BlastComboSyncPayload {
+  comboType: string;
+  username: string;
 }
 
 // ==================== Word Hunt Types ====================

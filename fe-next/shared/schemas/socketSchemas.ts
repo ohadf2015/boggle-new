@@ -221,6 +221,9 @@ export const SubmitWordSchema = z.object({
   path: z.array(GridPositionSchema).optional(),
   comboLevel: z.number().int().min(0).max(100).optional(),
   fireRoundActive: z.boolean().optional().default(false),
+  // comboType is trusted from client (server has no tile state to detect combos).
+  // Used to re-broadcast blast combo effects to all players in the room.
+  comboType: z.string().optional().nullable(),
 });
 
 /**
