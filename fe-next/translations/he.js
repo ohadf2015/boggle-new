@@ -5503,7 +5503,8 @@ const he = {
       "gold_special": "!כוח זהב",
       "rainbow_special": "!קשת כפולה",
       "triple_special": "!איום משולש"
-    }
+    },
+    "comboDiscovered": "!קומבו התגלה"
   },
   "student": {
     "activeGame": {

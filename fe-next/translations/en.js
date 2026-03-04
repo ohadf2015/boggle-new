@@ -5620,7 +5620,8 @@ const en = {
       "gold_special": "GOLDEN POWER!",
       "rainbow_special": "DOUBLE RAINBOW!",
       "triple_special": "TRIPLE THREAT!"
-    }
+    },
+    "comboDiscovered": "COMBO DISCOVERED!"
   },
   "student": {
         "activeGame": {

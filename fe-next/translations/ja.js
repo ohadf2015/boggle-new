@@ -5577,7 +5577,8 @@ const ja = {
       "gold_special": "ゴールデンパワー！",
       "rainbow_special": "ダブルレインボー！",
       "triple_special": "トリプルスレット！"
-    }
+    },
+    "comboDiscovered": "コンボ発見！"
   },
   "student": {
     "activeGame": {

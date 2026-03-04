@@ -5528,7 +5528,8 @@ const sv = {
       "gold_special": "GULDKRAFT!",
       "rainbow_special": "DUBBEL REGNBAGE!",
       "triple_special": "TRIPPELHOT!"
-    }
+    },
+    "comboDiscovered": "KOMBINATION HITTAD!"
   },
   "student": {
     "activeGame": {
