@@ -5,8 +5,8 @@
 import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '../blast';
 
 describe('BlastTileType canonical definition', () => {
-  it('should contain exactly 13 tile types', () => {
-    expect(BLAST_TILE_TYPE_LIST).toHaveLength(13);
+  it('should contain exactly 14 tile types', () => {
+    expect(BLAST_TILE_TYPE_LIST).toHaveLength(14);
   });
 
   it('should include standard (not normal)', () => {
@@ -14,8 +14,8 @@ describe('BlastTileType canonical definition', () => {
     expect(BLAST_TILE_TYPE_LIST).not.toContain('normal');
   });
 
-  it('should NOT contain wildcard (removed)', () => {
-    expect(BLAST_TILE_TYPE_LIST).not.toContain('wildcard');
+  it('should contain wildcard', () => {
+    expect(BLAST_TILE_TYPE_LIST).toContain('wildcard');
   });
 
   it('should contain mirror, silver, diamond (added)', () => {
@@ -39,6 +39,7 @@ describe('BlastTileType canonical definition', () => {
       'mirror',
       'silver',
       'diamond',
+      'wildcard',
     ];
     for (const type of expected) {
       expect(BLAST_TILE_TYPE_LIST).toContain(type);
