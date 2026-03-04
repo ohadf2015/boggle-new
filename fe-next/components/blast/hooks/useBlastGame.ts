@@ -7,7 +7,7 @@ import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
 import { detectVerticalWords } from '../utils/blastVerticalScanner';
 import { detectSpecialCombos } from '../utils/blastCombos';
-import type { BlastComboType } from '../utils/blastCombos';
+import type { BlastComboType, SpecialCombo } from '../utils/blastCombos';
 import { executeComboEffect } from '../utils/blastComboEffects';
 import { getWordLengthScaleFactor } from '../utils/blastComboScaling';
 import type { LetterGrid } from '@/shared/types/game';
@@ -223,6 +223,8 @@ export interface UseBlastGameOptions {
   currentWave?: number;
   /** Called when a special combination is detected (e.g. for audio sting) */
   onSynergyDetected?: (comboType: BlastComboType) => void;
+  /** Called when special combinations are detected — for first-time discovery tracking */
+  onComboDetected?: (combos: SpecialCombo[]) => void;
 }
 
 // ==================== Hook ====================
@@ -306,6 +308,9 @@ export function useBlastGame(
   // Ref so clearTilesForWord callback can access onSynergyDetected without stale closure
   const onSynergyDetectedRef = useRef(options?.onSynergyDetected);
   onSynergyDetectedRef.current = options?.onSynergyDetected;
+  // Ref so clearTilesForWord callback can access onComboDetected without stale closure
+  const onComboDetectedRef = useRef(options?.onComboDetected);
+  onComboDetectedRef.current = options?.onComboDetected;
 
   // Cascade chain refs (avoid re-renders + break circular useCallback dependency)
   const cascadeChainLevelRef = useRef(0);
@@ -705,6 +710,7 @@ export function useBlastGame(
         // Trigger combo flash overlay + audio sting callback
         setActiveComboFlash({ id: `combo-flash-${now}`, comboType: detectedCombos[0].type });
         onSynergyDetectedRef.current?.(detectedCombos[0].type);
+        onComboDetectedRef.current?.(detectedCombos);
       }
 
       for (const cell of path) {

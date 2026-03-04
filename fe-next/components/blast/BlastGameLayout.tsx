@@ -85,6 +85,8 @@ interface BlastGameLayoutProps {
   // End game dialog
   showEndGameConfirm: boolean;
   setShowEndGameConfirm: (show: boolean) => void;
+  /** When true, grid input is blocked (discovery banner showing) */
+  isDiscoveryActive?: boolean;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -134,6 +136,7 @@ export function BlastGameLayout({
   hasHintAvailable = false,
   onRequestHint,
   onClearHint,
+  isDiscoveryActive = false,
   t,
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
@@ -593,7 +596,7 @@ export function BlastGameLayout({
           gridSize={gridSize}
           explosions={explosions}
           language={language}
-          interactive={!isComplete}
+          interactive={!isComplete && !isDiscoveryActive}
           comboLevel={comboLevel}
           cascadePhase={cascadePhase}
           cascadeAnimationData={cascadeAnimationData}

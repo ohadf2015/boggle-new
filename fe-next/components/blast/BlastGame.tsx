@@ -10,13 +10,14 @@ import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordS
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastGame } from './hooks/useBlastGame';
 import { BlastComboFlash } from './BlastComboFlash';
+import { BlastComboDiscovery } from './BlastComboDiscovery';
 import { useBlastHint } from './hooks/useBlastHint';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { calculateBonusMoves } from './utils/blastMoveUtils';
 import { BlastGameLayout } from './BlastGameLayout';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import type { BlastGameConfig, BlastResultsData } from './types';
-import type { BlastComboType } from './utils/blastCombos';
+import type { BlastComboType, SpecialCombo } from './utils/blastCombos';
 import type { WaveConfig } from './utils/blastWaveConfig';
 import { getWaveObjectives } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
@@ -33,6 +34,12 @@ interface BlastGameProps {
   onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number) => void;
   onGameEnd: (results: BlastResultsData) => void;
   onQuit: () => void;
+  /** Called when a combo is detected — for first-time discovery tracking */
+  onComboDetected?: (combos: SpecialCombo[]) => void;
+  /** Non-null when a first-time discovery banner is pending display */
+  pendingDiscovery?: BlastComboType | null;
+  /** Clears pendingDiscovery after banner auto-dismisses */
+  acknowledgeDiscovery?: () => void;
 }
 
 /**
@@ -50,6 +57,9 @@ export function BlastGame({
   onWaveComplete,
   onGameEnd,
   onQuit,
+  onComboDetected,
+  pendingDiscovery,
+  acknowledgeDiscovery,
 }: BlastGameProps) {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
@@ -80,6 +90,9 @@ export function BlastGame({
       // Play max combo sound as audio sting for any combo synergy
       playComboSound(3);
     }, [playComboSound]),
+    onComboDetected: useCallback((combos: SpecialCombo[]) => {
+      onComboDetected?.(combos);
+    }, [onComboDetected]),
   });
 
   // Spam detection
@@ -252,13 +265,20 @@ export function BlastGame({
     return null; // Grid still loading
   }
 
+  const isDiscoveryActive = pendingDiscovery != null;
+
   return (
     <div className="relative flex-1 flex flex-col h-full" data-testid="blast-game-root">
       <BlastComboFlash
         activeFlash={blast.activeComboFlash}
         onComplete={blast.clearComboFlash}
       />
+      <BlastComboDiscovery
+        pendingDiscovery={pendingDiscovery ?? null}
+        onComplete={acknowledgeDiscovery ?? (() => {})}
+      />
       <BlastGameLayout
+      isDiscoveryActive={isDiscoveryActive}
       grid={blast.modifiedGrid}
       tileStates={blast.tileStates}
       gridSize={config.gridSize}
