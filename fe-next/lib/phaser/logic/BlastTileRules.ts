@@ -111,13 +111,14 @@ const EXPLOSION_COLORS: Record<BlastExplosion['type'], number> = {
 // ─── BLAST_TILE_CONFIGS — static lookup per special type ─────────────────────
 // Badge text extracted from BlastTileOverlay TILE_ICONS.label
 
-export const BLAST_TILE_CONFIGS: Record<Exclude<BlastTileType, 'standard'>, BlastTileVisualConfig> = {
+// Wildcard is in the BlastTileType union but is never spawned (removed in Phase 47).
+// BLAST_TILE_CONFIGS excludes both 'standard' (no overlay) and 'wildcard' (never spawned).
+export const BLAST_TILE_CONFIGS: Record<Exclude<BlastTileType, 'standard' | 'wildcard'>, BlastTileVisualConfig> = {
   gold:      { tint: TILE_TINTS.gold,      borderColor: TILE_BORDERS.gold,      badgeText: '3×' },
   bomb:      { tint: TILE_TINTS.bomb,      borderColor: TILE_BORDERS.bomb,      badgeText: '8' },
   rainbow:   { tint: TILE_TINTS.rainbow,   borderColor: TILE_BORDERS.rainbow,   badgeText: '+5' },
   ice:       { tint: TILE_TINTS.ice,       borderColor: TILE_BORDERS.ice,       badgeText: '×2' },
-  wildcard:  { tint: TILE_TINTS.wildcard,  borderColor: TILE_BORDERS.wildcard,  badgeText: '?' },
-  lightning: { tint: TILE_TINTS.lightning,  borderColor: TILE_BORDERS.lightning, badgeText: 'col' },
+  lightning: { tint: TILE_TINTS.lightning, borderColor: TILE_BORDERS.lightning, badgeText: 'col' },
   magnet:    { tint: TILE_TINTS.magnet,    borderColor: TILE_BORDERS.magnet,    badgeText: 'pull' },
   prism:     { tint: TILE_TINTS.prism,     borderColor: TILE_BORDERS.prism,     badgeText: '×2' },
   gem:       { tint: TILE_TINTS.gem,       borderColor: TILE_BORDERS.gem,       badgeText: '+3' },

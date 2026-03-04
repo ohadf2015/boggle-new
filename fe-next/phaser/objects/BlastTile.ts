@@ -388,8 +388,8 @@ export class BlastTile extends LetterTile {
       this.overlay.fillCircle(0, 0, glow.radius);
     }
 
-    // Update badge text
-    if (this.badge && this.blastType !== 'standard') {
+    // Update badge text (wildcard is never spawned and has no config entry)
+    if (this.badge && this.blastType !== 'standard' && this.blastType !== 'wildcard') {
       const config = BLAST_TILE_CONFIGS[this.blastType];
       this.badge.setText(config.badgeText);
     }

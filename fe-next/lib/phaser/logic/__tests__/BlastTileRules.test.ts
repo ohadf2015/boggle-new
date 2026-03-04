@@ -18,13 +18,21 @@ import type { BlastTileType } from '@/components/blast/types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** All 11 tile types (standard + 10 special) */
+/** All 14 tile types (standard + 13 special including mirror/silver/diamond/wildcard) */
 const ALL_TYPES: BlastTileType[] = [
   'standard', 'gold', 'bomb', 'rainbow', 'ice', 'wildcard',
   'lightning', 'magnet', 'prism', 'gem', 'frozen',
+  'mirror', 'silver', 'diamond',
 ];
 
-const SPECIAL_TYPES: BlastTileType[] = ALL_TYPES.filter(t => t !== 'standard');
+/**
+ * Special types that have BLAST_TILE_CONFIGS entries.
+ * Wildcard is in the type union but is never spawned and has no config entry.
+ */
+const SPECIAL_TYPES: BlastTileType[] = ALL_TYPES.filter(t => t !== 'standard' && t !== 'wildcard');
+
+/** The 3 tile types added in Phase 47 that needed Phaser visual configs */
+const NEW_TYPES: BlastTileType[] = ['mirror', 'silver', 'diamond'];
 
 function isValidHex(n: number): boolean {
   return Number.isInteger(n) && n >= 0x000000 && n <= 0xffffff;
@@ -187,11 +195,65 @@ describe('BLAST_TILE_CONFIGS', () => {
     expect(BLAST_TILE_CONFIGS.bomb.badgeText).toBe('8');
     expect(BLAST_TILE_CONFIGS.rainbow.badgeText).toBe('+5');
     expect(BLAST_TILE_CONFIGS.ice.badgeText).toBe('×2');
-    expect(BLAST_TILE_CONFIGS.wildcard.badgeText).toBe('?');
     expect(BLAST_TILE_CONFIGS.lightning.badgeText).toBe('col');
     expect(BLAST_TILE_CONFIGS.magnet.badgeText).toBe('pull');
     expect(BLAST_TILE_CONFIGS.prism.badgeText).toBe('×2');
     expect(BLAST_TILE_CONFIGS.gem.badgeText).toBe('+3');
     expect(BLAST_TILE_CONFIGS.frozen.badgeText).toBe('×3');
+  });
+});
+
+// ─── mirror / silver / diamond tile configs (Phase 47 additions) ──────────────
+
+describe('mirror/silver/diamond tile visual configs', () => {
+  it('getBlastTileTint returns valid hex for mirror, silver, diamond', () => {
+    for (const type of NEW_TYPES) {
+      expect(isValidHex(getBlastTileTint(type))).toBe(true);
+    }
+  });
+
+  it('getBlastTileBorderColor returns valid hex for mirror, silver, diamond', () => {
+    for (const type of NEW_TYPES) {
+      expect(isValidHex(getBlastTileBorderColor(type))).toBe(true);
+    }
+  });
+
+  it('getBlastTileGlowConfig returns non-zero intensity for mirror, silver, diamond', () => {
+    for (const type of NEW_TYPES) {
+      const glow = getBlastTileGlowConfig(type, 0);
+      expect(glow.intensity).toBeGreaterThan(0);
+    }
+  });
+
+  it('BLAST_TILE_CONFIGS has mirror, silver, diamond entries with badgeText', () => {
+    for (const type of NEW_TYPES) {
+      const config = (BLAST_TILE_CONFIGS as Record<string, BlastTileVisualConfig>)[type];
+      expect(config).toBeDefined();
+      expect(typeof config.tint).toBe('number');
+      expect(typeof config.borderColor).toBe('number');
+      expect(config.badgeText.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('BLAST_TILE_CONFIGS does NOT have a wildcard entry', () => {
+    expect((BLAST_TILE_CONFIGS as Record<string, BlastTileVisualConfig>)['wildcard']).toBeUndefined();
+  });
+
+  it('mirror tint is silver-reflective (high R, G, B components)', () => {
+    const tint = getBlastTileTint('mirror');
+    const r = (tint >> 16) & 0xff;
+    const g = (tint >> 8) & 0xff;
+    const b = tint & 0xff;
+    // Silver-gray: all channels should be reasonably high and similar
+    expect(r).toBeGreaterThanOrEqual(0xa0);
+    expect(g).toBeGreaterThanOrEqual(0xa0);
+    expect(b).toBeGreaterThanOrEqual(0xa0);
+  });
+
+  it('diamond tint has blue-white character (blue >= red)', () => {
+    const tint = getBlastTileTint('diamond');
+    const r = (tint >> 16) & 0xff;
+    const b = tint & 0xff;
+    expect(b).toBeGreaterThanOrEqual(r);
   });
 });
