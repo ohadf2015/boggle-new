@@ -175,7 +175,7 @@ Plans:
 | 44. Milestone Gap Closure & Tech Debt | v2.0 | 1/1 | Complete | 2026-02-14 |
 | 45. Practice XP Server-Side Wiring | v2.0 | 1/1 | Complete | 2026-02-14 |
 | 46. Foundation — Unified Types & Bug Fixes | v3.0 | 4/4 | Complete | 2026-03-04 |
-| 47. Tile Reworks — New Behaviors & Spawn Tables | 4/5 | In Progress|  | ~12min |
+| 47. Tile Reworks — New Behaviors & Spawn Tables | 5/5 | Complete   | 2026-03-04 | ~12min |
 | 48. Combination System Core | v3.0 | 0/4 | Not started | - |
 | 49. Combination UX | v3.0 | 0/4 | Not started | - |
 | 50. Psychological Hooks | v3.0 | 0/4 | Not started | - |
