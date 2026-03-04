@@ -7,13 +7,13 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { BlastGame } from './BlastGame';
-import { BlastGamePhaser } from './BlastGamePhaser';
 import { BlastResults } from './BlastResults';
 import { BlastWaveTransition } from './BlastWaveTransition';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
-import { resolveBlastConfig, type BlastPhase, type BlastDifficulty, type BlastResultsData, type WaveResult } from './types';
+import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
 import type { Language } from '@/shared/types/game';
 import { BlastReadyScreen } from './BlastReadyScreen';
+import { useBlastComboDiscovery } from './hooks/useBlastComboDiscovery';
 
 /**
  * BlastView - Page orchestrator for Blast Mode.
@@ -25,11 +25,7 @@ const BlastView: React.FC = () => {
   const { unlockAudio } = useMusic();
   const setIsInGame = useHideNavigation();
 
-  // Feature flag: use Phaser canvas rendering (true) or React DOM rendering (false)
-  const usePhaser = process.env.NEXT_PUBLIC_PHASER_GRID === 'true';
-
   const [phase, setPhase] = useState<BlastPhase>('ready');
-  const [difficulty, setDifficulty] = useState<BlastDifficulty>('medium');
   const [results, setResults] = useState<BlastResultsData | null>(null);
   // Monotonically increasing key to force remount on play again / wave advance
   const gameKeyRef = useRef(0);
@@ -41,7 +37,9 @@ const BlastView: React.FC = () => {
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
   const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
 
-  const baseConfig = resolveBlastConfig((language as Language) || 'en', difficulty);
+  const { discoveredCombos } = useBlastComboDiscovery();
+
+  const baseConfig = resolveBlastConfig((language as Language) || 'en', 'medium');
 
   // Apply wave-specific overrides to config
   const waveConfig = getWaveConfig(currentWave);
@@ -108,8 +106,7 @@ const BlastView: React.FC = () => {
     setPhase('playing');
   }, []);
 
-  const handleStart = useCallback((selectedDifficulty: BlastDifficulty) => {
-    setDifficulty(selectedDifficulty);
+  const handleStart = useCallback(() => {
     setPhase('playing');
   }, []);
 
@@ -136,33 +133,20 @@ const BlastView: React.FC = () => {
       <PlayfulBackground intensity="low" colorScheme="game" />
 
       {phase === 'ready' && (
-        <BlastReadyScreen onStart={handleStart} />
+        <BlastReadyScreen onStart={handleStart} discoveredCombos={discoveredCombos} />
       )}
 
       {phase === 'playing' && (
-        usePhaser ? (
-          <BlastGamePhaser
-            key={`game-${gameKeyRef.current}`}
-            config={config}
-            waveNumber={currentWave}
-            waveConfig={waveConfig}
-            cumulativeScore={totalScore}
-            onWaveComplete={handleWaveComplete}
-            onGameEnd={handleGameEnd}
-            onQuit={handleQuit}
-          />
-        ) : (
-          <BlastGame
-            key={`game-${gameKeyRef.current}`}
-            config={config}
-            waveNumber={currentWave}
-            waveConfig={waveConfig}
-            cumulativeScore={totalScore}
-            onWaveComplete={handleWaveComplete}
-            onGameEnd={handleGameEnd}
-            onQuit={handleQuit}
-          />
-        )
+        <BlastGame
+          key={`game-${gameKeyRef.current}`}
+          config={config}
+          waveNumber={currentWave}
+          waveConfig={waveConfig}
+          cumulativeScore={totalScore}
+          onWaveComplete={handleWaveComplete}
+          onGameEnd={handleGameEnd}
+          onQuit={handleQuit}
+        />
       )}
 
       {phase === 'waveTransition' && (
