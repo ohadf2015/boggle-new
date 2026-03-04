@@ -98,6 +98,8 @@ export interface InGameScreenProps {
   wordHuntAttempts?: Array<{ guess: string; feedback: LetterFeedback[] }>;
   wordHuntFound?: boolean;
   wordHuntLife?: number;
+  wordHuntPlayerLives?: Record<string, number>;
+  wordHuntEliminatedPlayers?: string[];
   onWordHuntGuess?: (guess: string) => void;
 
   // Player experience - used to determine inactivity threshold for keyboard trails

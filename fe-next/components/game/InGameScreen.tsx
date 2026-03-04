@@ -12,6 +12,9 @@ import { useKeyboardHelpState } from '@/hooks/useKeyboardHelpState';
 import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 import type { WordFeedback } from './WordFormingArea';
 import type { FoundWord } from '@/shared/types/view';
+import { detectSpecialCombos } from '@/components/blast/utils/blastCombos';
+import type { BlastTileState } from '@/components/blast/types';
+import type { SelectedCell } from '@/components/grid';
 
 // Extracted hooks
 import {
@@ -101,6 +104,8 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   wordHuntAttempts,
   wordHuntFound,
   wordHuntLife,
+  wordHuntPlayerLives,
+  wordHuntEliminatedPlayers,
   onWordHuntGuess,
 }) {
   // Sound effects
@@ -243,6 +248,30 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     }
   }, [leadChangeEvent, playComboMilestoneSound, playComboBreakSound]);
 
+  // Ref to hold detected combo type from path (blast multiplayer)
+  const comboTypeRef = useRef<string | null>(null);
+
+  // Detect combo type from selected cells path in blast multiplayer
+  const handlePathSubmit = useCallback((cells: SelectedCell[]) => {
+    if (gameMode !== 'blast' || !blastTileOverlay || blastTileOverlay.length === 0) {
+      comboTypeRef.current = null;
+      return;
+    }
+    // Build a minimal tileStates lookup from blastTileOverlay
+    // detectSpecialCombos accesses tileStates[row][col].type and .isCleared
+    const maxRow = Math.max(...blastTileOverlay.map(t => t.row), 0) + 1;
+    const maxCol = Math.max(...blastTileOverlay.map(t => t.col), 0) + 1;
+    const tileStates: BlastTileState[][] = Array.from({ length: maxRow }, () =>
+      Array.from({ length: maxCol }, () => ({ type: 'standard' as const, isCleared: false } as unknown as BlastTileState))
+    );
+    for (const tile of blastTileOverlay) {
+      tileStates[tile.row][tile.col] = { type: tile.type, isCleared: false } as unknown as BlastTileState;
+    }
+    const path = cells.map(c => ({ row: c.row, col: c.col }));
+    const combos = detectSpecialCombos(path, tileStates);
+    comboTypeRef.current = combos.length > 0 ? combos[0].type : null;
+  }, [gameMode, blastTileOverlay]);
+
   // Word submission hook
   const { handleGridWordSubmit, fireRoundActiveRef } = useWordSubmission({
     isPlaying,
@@ -260,6 +289,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     onResetCombo,
     setCurrentFeedback,
     setLastWordFoundTime,
+    comboTypeRef,
   });
 
   // Update fireRoundActiveRef when fireRoundActive changes
@@ -336,6 +366,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     onExitRoom,
     onShowTutorial,
     onWordSubmit: handleGridWordSubmit,
+    onPathSubmit: handlePathSubmit,
     onWordChange: handleWordChange,
     onSingleTapDetected: tapDragGuidance.handleSingleTapDetected,
     hints,
@@ -355,6 +386,8 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     wordHuntAttempts,
     wordHuntFound,
     wordHuntLife,
+    wordHuntPlayerLives,
+    wordHuntEliminatedPlayers,
     onWordHuntGuess,
   } as const;
 

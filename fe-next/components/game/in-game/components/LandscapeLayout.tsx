@@ -25,6 +25,7 @@ import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
 import { BlastMultiplayerOverlay } from '../../BlastMultiplayerOverlay';
 import { WordHuntTargetArea } from '../../WordHuntTargetArea';
 import { WordHuntLifeBar } from '../../WordHuntLifeBar';
+import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
 
 interface LandscapeLayoutProps {
   // Core props
@@ -71,6 +72,7 @@ interface LandscapeLayoutProps {
   onExitRoom?: () => void;
   onShowTutorial?: () => void;
   onWordSubmit: (word: string) => void;
+  onPathSubmit?: (cells: Array<{ row: number; col: number; letter: string }>) => void;
   onWordChange: (word: string, count: number) => void;
   onSingleTapDetected: (cell: TappedCellPosition) => void;
 
@@ -107,6 +109,8 @@ interface LandscapeLayoutProps {
   wordHuntAttempts?: Array<{ guess: string; feedback: LetterFeedback[] }>;
   wordHuntFound?: boolean;
   wordHuntLife?: number;
+  wordHuntPlayerLives?: Record<string, number>;
+  wordHuntEliminatedPlayers?: string[];
   onWordHuntGuess?: (guess: string) => void;
 }
 
@@ -145,6 +149,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   onExitRoom,
   onShowTutorial,
   onWordSubmit,
+  onPathSubmit,
   onWordChange,
   onSingleTapDetected,
   hints,
@@ -165,6 +170,8 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   wordHuntAttempts,
   wordHuntFound,
   wordHuntLife,
+  wordHuntPlayerLives,
+  wordHuntEliminatedPlayers,
   onWordHuntGuess,
 }) {
   // Track floating score animation
@@ -272,6 +279,13 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
             {gameMode === 'word-hunt' && wordHuntTargetLength && onWordHuntGuess && (
               <div className="flex-shrink-0 w-full max-w-xs mx-auto flex flex-col gap-1">
                 <WordHuntLifeBar life={wordHuntLife ?? 100} maxLife={100} />
+                {wordHuntPlayerLives && Object.keys(wordHuntPlayerLives).length > 0 && (
+                  <WordHuntPlayerLives
+                    playerLives={wordHuntPlayerLives}
+                    eliminatedPlayers={wordHuntEliminatedPlayers ?? []}
+                    currentPlayer={username}
+                  />
+                )}
                 <WordHuntTargetArea
                   targetLength={wordHuntTargetLength}
                   attempts={wordHuntAttempts ?? []}
@@ -311,6 +325,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                     interactive={isPlaying && !showStartAnimation}
                     animateOnMount={!hasAnimated}
                     onWordSubmit={onWordSubmit}
+                    onPathSubmit={onPathSubmit}
                     onWordChange={onWordChange}
                     comboLevel={comboLevel}
                     hideComboIndicator={true}

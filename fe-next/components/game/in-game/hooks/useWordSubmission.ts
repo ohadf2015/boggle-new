@@ -25,6 +25,8 @@ interface UseWordSubmissionOptions {
   onResetCombo?: () => void;
   setCurrentFeedback: (feedback: WordFeedback | null) => void;
   setLastWordFoundTime: (time: number) => void;
+  /** Ref holding the detected combo type for current word path (blast multiplayer). */
+  comboTypeRef?: MutableRefObject<string | null>;
 }
 
 interface UseWordSubmissionReturn {
@@ -54,6 +56,7 @@ export function useWordSubmission(
     onResetCombo,
     setCurrentFeedback,
     setLastWordFoundTime,
+    comboTypeRef,
   } = options;
 
   // Track current fireRoundActive value via ref for use in callbacks
@@ -129,6 +132,7 @@ export function useWordSubmission(
       word: formedWord.toLowerCase(),
       comboLevel: comboLevelRef.current,
       fireRoundActive: fireRoundActiveRef.current,
+      comboType: comboTypeRef?.current ?? null,
     });
 
     // Add to local found words

@@ -31,6 +31,7 @@ import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
 import { BlastMultiplayerOverlay } from '../../BlastMultiplayerOverlay';
 import { WordHuntTargetArea } from '../../WordHuntTargetArea';
 import { WordHuntLifeBar } from '../../WordHuntLifeBar';
+import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
 
 interface TournamentData {
   name?: string;
@@ -88,6 +89,7 @@ interface PortraitLayoutProps {
   onExitRoom?: () => void;
   onShowTutorial?: () => void;
   onWordSubmit: (word: string) => void;
+  onPathSubmit?: (cells: Array<{ row: number; col: number; letter: string }>) => void;
   onWordChange: (word: string, count: number) => void;
   onSingleTapDetected: (cell: TappedCellPosition) => void;
 
@@ -127,6 +129,8 @@ interface PortraitLayoutProps {
   wordHuntAttempts?: Array<{ guess: string; feedback: LetterFeedback[] }>;
   wordHuntFound?: boolean;
   wordHuntLife?: number;
+  wordHuntPlayerLives?: Record<string, number>;
+  wordHuntEliminatedPlayers?: string[];
   onWordHuntGuess?: (guess: string) => void;
 
   // Achievement dock
@@ -173,6 +177,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   onExitRoom,
   onShowTutorial,
   onWordSubmit,
+  onPathSubmit,
   onWordChange,
   onSingleTapDetected,
   hints,
@@ -194,6 +199,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   wordHuntAttempts,
   wordHuntFound,
   wordHuntLife,
+  wordHuntPlayerLives,
+  wordHuntEliminatedPlayers,
   onWordHuntGuess,
   children,
 }) {
@@ -426,6 +433,13 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {gameMode === 'word-hunt' && wordHuntTargetLength && onWordHuntGuess && (
             <div className="w-full max-w-md mx-auto px-2 flex flex-col gap-2">
               <WordHuntLifeBar life={wordHuntLife ?? 100} maxLife={100} />
+              {wordHuntPlayerLives && Object.keys(wordHuntPlayerLives).length > 0 && (
+                <WordHuntPlayerLives
+                  playerLives={wordHuntPlayerLives}
+                  eliminatedPlayers={wordHuntEliminatedPlayers ?? []}
+                  currentPlayer={username}
+                />
+              )}
               <WordHuntTargetArea
                 targetLength={wordHuntTargetLength}
                 attempts={wordHuntAttempts ?? []}
@@ -464,6 +478,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   interactive={isPlaying && !showStartAnimation}
                   animateOnMount={!hasAnimated}
                   onWordSubmit={onWordSubmit}
+                  onPathSubmit={onPathSubmit}
                   onWordChange={onWordChange}
                   comboLevel={comboLevel}
                   hideComboIndicator={true}
