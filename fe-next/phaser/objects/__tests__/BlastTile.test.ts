@@ -180,6 +180,32 @@ describe('BlastTile cracked states', () => {
   });
 });
 
+// ─── Diamond overlay ─────────────────────────────────────────────────────────
+
+describe('BlastTile diamond overlay', () => {
+  it('draws a diamond polygon shape via moveTo/lineTo for diamond type', () => {
+    const tile = makeTile('A', 'diamond', 0);
+    const overlay = getOverlayGraphics(tile);
+    // Diamond overlay should use moveTo + lineTo for polygon (not just fillRoundedRect)
+    const moveToFn = overlay.moveTo as jest.Mock | undefined;
+    const lineToFn = overlay.lineTo as jest.Mock | undefined;
+    // At minimum, moveTo and lineTo should have been called to draw the diamond shape
+    expect(moveToFn).toBeDefined();
+    expect(lineToFn).toBeDefined();
+    expect(moveToFn!.mock.calls.length).toBeGreaterThan(0);
+    expect(lineToFn!.mock.calls.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('draws facet lines inside the diamond', () => {
+    const tile = makeTile('A', 'diamond', 0);
+    const overlay = getOverlayGraphics(tile);
+    // Facets drawn as additional lineTo calls (6+ total: 4 for outline, 2+ for facets)
+    const lineToFn = overlay.lineTo as jest.Mock | undefined;
+    expect(lineToFn).toBeDefined();
+    expect(lineToFn!.mock.calls.length).toBeGreaterThanOrEqual(6);
+  });
+});
+
 // ─── playClearAnimation ───────────────────────────────────────────────────────
 
 describe('BlastTile.playClearAnimation', () => {

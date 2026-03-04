@@ -465,6 +465,19 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     }, 500);
   }, []);
 
+  // Stop fire crackle loop when muted
+  useEffect(() => {
+    if (sfxMuted && fireCrackleLoopIdRef.current !== null) {
+      const howl = soundsRef.current['fireCrackleLoop'];
+      if (howl) {
+        howl.stop(fireCrackleLoopIdRef.current);
+        howl.loop(false);
+        fireCrackleLoopIdRef.current = null;
+        logger.log('[SFX] Stopped fire crackle loop due to mute');
+      }
+    }
+  }, [sfxMuted]);
+
   // Memoize context value to prevent unnecessary re-renders of all consumers
   const value = useMemo<SoundEffectsContextType>(() => ({
     // Volume state

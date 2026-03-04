@@ -10,6 +10,14 @@ import InGameScreen from '../../components/game/InGameScreen';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  useGameMode,
+  useBlastTileOverlay,
+  useWordHuntTargetLength,
+  useWordHuntMyLife,
+  useWordHuntTargetAttempts,
+  useWordHuntTargetFound,
+} from '@/hooks/gameState/store';
 
 // ==================== Hint Types ====================
 
@@ -177,6 +185,20 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
+  // Game mode state from Zustand
+  const gameMode = useGameMode();
+  const blastTileOverlay = useBlastTileOverlay();
+  const wordHuntTargetLength = useWordHuntTargetLength();
+  const wordHuntLife = useWordHuntMyLife();
+  const wordHuntAttempts = useWordHuntTargetAttempts();
+  const wordHuntFound = useWordHuntTargetFound();
+
+  // Word hunt guess handler — emits to server
+  const handleWordHuntGuess = useCallback((guess: string) => {
+    if (!socket) return;
+    socket.emit('wordHuntGuess', { guess });
+  }, [socket]);
+
   // Memoized handler for closing tournament standings
   const handleCloseTournamentStandings = useCallback(() => {
     setShowTournamentStandings(false);
@@ -253,6 +275,15 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
         // Board theme
         boardTheme={boardTheme}
+
+        // Game mode overlays
+        gameMode={gameMode ?? undefined}
+        blastTileOverlay={blastTileOverlay}
+        wordHuntTargetLength={wordHuntTargetLength}
+        wordHuntAttempts={wordHuntAttempts}
+        wordHuntFound={wordHuntFound}
+        wordHuntLife={wordHuntLife}
+        onWordHuntGuess={handleWordHuntGuess}
 
         // Player experience (for keyboard trail inactivity threshold)
         totalGamesPlayed={profile?.total_games}

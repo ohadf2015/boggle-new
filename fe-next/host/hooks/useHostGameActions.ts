@@ -116,8 +116,8 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   } = options;
 
   const startGame = useCallback(() => {
-    // Validate players are ready
-    if (playersCount === 0) {
+    // Validate players are ready (allow start if host is playing solo)
+    if (playersCount === 0 && !hostPlaying) {
       logger.warn('[HOST] Cannot start game: no players');
       neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: '⚠️', duration: 3000 });
       return;

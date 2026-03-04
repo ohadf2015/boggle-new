@@ -7,11 +7,22 @@ describe('getWaveConfig', () => {
   it('returns WaveConfig for wave 1', () => {
     const config = getWaveConfig(1);
     expect(config.minWordLength).toBe(2);
-    expect(config.specialTileChance).toBe(0.15);
+    expect(config.specialTileChance).toBe(0.10);
     expect(config.vowelModifier).toBe(1.0);
     expect(config.maxCascadeChain).toBe(2);
     expect(config.lightningEnabled).toBe(false);
     expect(config.magnetEnabled).toBe(false);
+  });
+
+  it('has lower special tile chance in early waves (1-2) for less visual noise', () => {
+    const w1 = getWaveConfig(1);
+    const w2 = getWaveConfig(2);
+    const w3 = getWaveConfig(3);
+    // Early waves should be calmer (fewer specials)
+    expect(w1.specialTileChance).toBeLessThanOrEqual(0.12);
+    expect(w2.specialTileChance).toBeLessThanOrEqual(0.14);
+    // Wave 3+ stays at normal levels
+    expect(w3.specialTileChance).toBeGreaterThanOrEqual(0.17);
   });
 
   it('returns progressively harder config for higher waves', () => {

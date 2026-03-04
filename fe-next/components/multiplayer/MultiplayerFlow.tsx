@@ -22,7 +22,8 @@ interface MultiplayerFlowProps {
     isHostMode: boolean,
     roomLanguage?: Language | null,
     gameCode?: string,
-    roomName?: string
+    roomName?: string,
+    overrideUsername?: string,
   ) => void;
   refreshRooms: () => void;
 
@@ -119,7 +120,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         const profile = getProfileData();
         setGameCode(roomCode);
         setUsername(profile.username);
-        handleJoin(false, null, roomCode);
+        // Pass username as override to avoid stale closure in handleJoin
+        handleJoin(false, null, roomCode, undefined, profile.username);
       } else {
         // Need to collect profile - show join modal
         // Create a minimal room object for the modal
@@ -178,10 +180,11 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       setGameCode(selectedRoom.gameCode);
       setUsername(username);
 
-      // Get emoji/color for backward compatibility
-      const { emoji, color } = getAvatarEmojiAndColor(avatarId);
+      // Store avatar so handleJoin can pick it up via getStoredAvatarId()
+      // (JoinRoomModal already calls setStoredAvatarId, but ensure consistency)
 
-      handleJoin(false, null, selectedRoom.gameCode);
+      // Pass username as override to avoid stale closure in handleJoin
+      handleJoin(false, null, selectedRoom.gameCode, undefined, username);
     },
     [selectedRoom, handleJoin, setGameCode, setUsername]
   );
@@ -212,7 +215,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       setHostUsername(config.hostUsername);
       setUsername(config.hostUsername);
 
-      handleJoin(true, config.language, gameCode, config.roomName);
+      // Pass username as override to avoid stale closure in handleJoin
+      handleJoin(true, config.language, gameCode, config.roomName, config.hostUsername);
     },
     [handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]
   );
@@ -233,7 +237,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setUsername(quickPlayUsername);
 
     // Create room immediately with host playing (dual mode)
-    handleJoin(true, defaultLanguage, gameCode, roomName);
+    // Pass username as override to avoid stale closure in handleJoin
+    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername);
   }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
 
   // Show brief loading while CrazyGames SDK initializes (prevents flash of wrong UI)

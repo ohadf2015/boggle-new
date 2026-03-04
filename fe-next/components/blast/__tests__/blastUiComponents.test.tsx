@@ -347,6 +347,30 @@ describe('BlastTileOverlay', () => {
     const goldDiv = container.querySelector('.blast-tile-gold') as HTMLElement;
     expect(goldDiv.className).not.toContain('blast-tile-selected');
   });
+
+  it('applies objective highlight class to tiles matching objectiveTileTypes', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'bomb'), makeTile(0, 1, 'gold')],
+    ];
+    const { container } = render(
+      <BlastTileOverlay tileStates={tileStates} gridSize={2} objectiveTileTypes={new Set(['bomb'])} />,
+    );
+    const bombDiv = container.querySelector('.blast-tile-bomb') as HTMLElement;
+    const goldDiv = container.querySelector('.blast-tile-gold') as HTMLElement;
+    expect(bombDiv.className).toContain('blast-tile-objective');
+    expect(goldDiv.className).not.toContain('blast-tile-objective');
+  });
+
+  it('does not apply objective highlight when objectiveTileTypes is empty', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'bomb')],
+    ];
+    const { container } = render(
+      <BlastTileOverlay tileStates={tileStates} gridSize={1} objectiveTileTypes={new Set()} />,
+    );
+    const bombDiv = container.querySelector('.blast-tile-bomb') as HTMLElement;
+    expect(bombDiv.className).not.toContain('blast-tile-objective');
+  });
 });
 
 describe('BlastHelpModal', () => {
@@ -369,6 +393,42 @@ describe('BlastHelpModal', () => {
     expect(screen.getByTestId('bomb-icon')).toBeInTheDocument();
     expect(screen.getByTestId('rainbow-icon')).toBeInTheDocument();
     expect(screen.getByTestId('hand-icon')).toBeInTheDocument();
+  });
+
+  it('shows ice tile explanation when open', () => {
+    render(<BlastHelpModal open={true} onOpenChange={onOpenChange} t={t} />);
+    expect(screen.getByText('blast.helpIceLabel')).toBeInTheDocument();
+    expect(screen.getByText('blast.helpIce')).toBeInTheDocument();
+  });
+
+  it('shows lightning tile explanation when open', () => {
+    render(<BlastHelpModal open={true} onOpenChange={onOpenChange} t={t} />);
+    expect(screen.getByText('blast.helpLightningLabel')).toBeInTheDocument();
+    expect(screen.getByText('blast.helpLightning')).toBeInTheDocument();
+  });
+
+  it('shows magnet tile explanation when open', () => {
+    render(<BlastHelpModal open={true} onOpenChange={onOpenChange} t={t} />);
+    expect(screen.getByText('blast.helpMagnetLabel')).toBeInTheDocument();
+    expect(screen.getByText('blast.helpMagnet')).toBeInTheDocument();
+  });
+
+  it('shows mirror tile explanation when open', () => {
+    render(<BlastHelpModal open={true} onOpenChange={onOpenChange} t={t} />);
+    expect(screen.getByText('blast.helpMirrorLabel')).toBeInTheDocument();
+    expect(screen.getByText('blast.helpMirror')).toBeInTheDocument();
+  });
+
+  it('shows silver tile explanation when open', () => {
+    render(<BlastHelpModal open={true} onOpenChange={onOpenChange} t={t} />);
+    expect(screen.getByText('blast.helpSilverLabel')).toBeInTheDocument();
+    expect(screen.getByText('blast.helpSilver')).toBeInTheDocument();
+  });
+
+  it('shows diamond tile explanation when open', () => {
+    render(<BlastHelpModal open={true} onOpenChange={onOpenChange} t={t} />);
+    expect(screen.getByText('blast.helpDiamondLabel')).toBeInTheDocument();
+    expect(screen.getByText('blast.helpDiamond')).toBeInTheDocument();
   });
 
   it('renders got-it button when open', () => {

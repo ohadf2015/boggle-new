@@ -15,6 +15,8 @@ interface BlastTileOverlayProps {
   gridSize: number;
   /** Set of "row-col" keys for cells currently selected/dragged by the player */
   selectedPositions?: Set<string>;
+  /** Set of tile types that match current wave objectives — highlighted with a pulsing border */
+  objectiveTileTypes?: Set<string>;
 }
 
 /**
@@ -114,7 +116,7 @@ const TILE_ICONS: Record<string, { Icon: LucideIcon; color: string; label: strin
   magnet:    { Icon: Magnet,    color: 'text-white',       label: 'pull', labelBg: 'bg-purple-600/90 text-white' },
   prism:     { Icon: Sparkles,  color: 'text-white',       label: '×2',   labelBg: 'bg-pink-400/90 text-white' },
   gem:       { Icon: Diamond,   color: 'text-white',       label: '+3',   labelBg: 'bg-emerald-500/90 text-white' },
-  frozen:    { Icon: Snowflake, color: 'text-blue-400',    label: '×3',   labelBg: 'bg-blue-300/90 text-blue-900' },
+  frozen:    { Icon: Snowflake, color: 'text-blue-400',    label: '×2',   labelBg: 'bg-blue-300/90 text-blue-900' },
 };
 
 /**
@@ -126,6 +128,7 @@ export function BlastTileOverlay({
   tileStates,
   gridSize,
   selectedPositions,
+  objectiveTileTypes,
 }: BlastTileOverlayProps) {
   return (
     <div
@@ -173,7 +176,7 @@ export function BlastTileOverlay({
           // Multi-hit tile visual states
           const isCrackedIce = tile.type === 'ice' && tile.hitsRemaining === 1;
           const isCrackedPrism = tile.type === 'prism' && tile.hitsRemaining === 1;
-          const isCrackedFrozen = tile.type === 'frozen' && tile.hitsRemaining <= 2;
+          const isCrackedFrozen = tile.type === 'frozen' && tile.hitsRemaining === 1;
           const isWeakened = isCrackedIce || isCrackedPrism || isCrackedFrozen;
 
           // Gem glow intensifies as hitsRemaining decreases (3→2→1)
@@ -222,7 +225,7 @@ export function BlastTileOverlay({
                 ? { opacity: { duration: 1, repeat: Infinity, ease: 'easeInOut' }, type: 'spring', stiffness: 300, damping: 20 }
                 : { type: 'spring', stiffness: 300, damping: 20 }
               }
-              className={`relative rounded-lg ${config.animationClass}${isSelected ? ' blast-tile-selected' : ''}`}
+              className={`relative rounded-lg ${config.animationClass}${isSelected ? ' blast-tile-selected' : ''}${objectiveTileTypes?.has(tile.type) ? ' blast-tile-objective' : ''}`}
               style={{
                 gridRow: tile.row + 1,
                 gridColumn: tile.col + 1,

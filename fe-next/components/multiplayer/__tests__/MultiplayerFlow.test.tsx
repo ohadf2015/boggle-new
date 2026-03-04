@@ -256,7 +256,7 @@ describe('MultiplayerFlow', () => {
 
       expect(defaultProps.setGameCode).toHaveBeenCalledWith('ROOM01');
       expect(defaultProps.setUsername).toHaveBeenCalledWith('TestPlayer');
-      expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01');
+      expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, 'TestPlayer');
     });
 
     it('should show joining state in modal', async () => {
@@ -312,7 +312,8 @@ describe('MultiplayerFlow', () => {
         true,
         'en',
         expect.any(String),
-        'Test Room'
+        'Test Room',
+        'HostPlayer'
       );
     });
 
@@ -368,7 +369,7 @@ describe('MultiplayerFlow', () => {
 
       await waitFor(() => {
         expect(defaultProps.setGameCode).toHaveBeenCalledWith('INVITE1');
-        expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'INVITE1');
+        expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'INVITE1', undefined, 'StoredPlayer');
       });
     });
 

@@ -175,6 +175,8 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
                 position="top-center"
                 containerStyle={{
                     pointerEvents: 'none',
+                    zIndex: 9999,
+                    top: 20,
                 }}
                 toastOptions={{
                     duration: 2000,

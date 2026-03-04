@@ -706,13 +706,17 @@ export class BlastTile extends LetterTile {
 
     this.overlay.clear();
 
-    // Tinted fill overlay
-    this.overlay.fillStyle(tint, overlayAlpha);
-    this.overlay.fillRoundedRect(-half, -half, this.blastTileSize, this.blastTileSize, CORNER_RADIUS);
+    if (this.blastType === 'diamond') {
+      // Diamond: draw faceted gem polygon instead of rounded rect
+      this.drawDiamondShape(half, tint, borderColor, overlayAlpha);
+    } else {
+      // Standard overlay: tinted rounded rect
+      this.overlay.fillStyle(tint, overlayAlpha);
+      this.overlay.fillRoundedRect(-half, -half, this.blastTileSize, this.blastTileSize, CORNER_RADIUS);
 
-    // Border overlay
-    this.overlay.lineStyle(2, borderColor, 0.7);
-    this.overlay.strokeRoundedRect(-half, -half, this.blastTileSize, this.blastTileSize, CORNER_RADIUS);
+      this.overlay.lineStyle(2, borderColor, 0.7);
+      this.overlay.strokeRoundedRect(-half, -half, this.blastTileSize, this.blastTileSize, CORNER_RADIUS);
+    }
 
     // Glow ring (if tile has glow)
     if (glow.intensity > 0) {
@@ -725,6 +729,74 @@ export class BlastTile extends LetterTile {
       const config = BLAST_TILE_CONFIGS[this.blastType];
       this.badge.setText(config.badgeText);
     }
+  }
+
+  /**
+   * Draw a faceted diamond/gem polygon with highlight facets.
+   * Shape: top point, left/right midpoints, bottom point — classic gem shape.
+   * Inner facet lines create the "cut" look.
+   */
+  private drawDiamondShape(half: number, tint: number, borderColor: number, alpha: number): void {
+    if (!this.overlay) return;
+
+    // Diamond vertices (centered at 0,0)
+    const topY = -half * 0.85;
+    const bottomY = half * 0.85;
+    const midY = -half * 0.15; // horizontal widest point (slightly above center)
+    const sideX = half * 0.8;
+
+    // Fill the diamond polygon
+    this.overlay.fillStyle(tint, alpha);
+    this.overlay.beginPath();
+    this.overlay.moveTo(0, topY);          // top
+    this.overlay.lineTo(sideX, midY);      // right
+    this.overlay.lineTo(0, bottomY);       // bottom
+    this.overlay.lineTo(-sideX, midY);     // left
+    this.overlay.closePath();
+    this.overlay.fillPath();
+
+    // Facet highlight lines (lighter) — create the "cut gem" look
+    const facetColor = 0xffffff;
+    this.overlay.lineStyle(1, facetColor, 0.3);
+    this.overlay.beginPath();
+    // Top-left facet line
+    this.overlay.moveTo(0, topY);
+    this.overlay.lineTo(-sideX * 0.5, midY);
+    this.overlay.strokePath();
+
+    this.overlay.beginPath();
+    // Top-right facet line
+    this.overlay.moveTo(0, topY);
+    this.overlay.lineTo(sideX * 0.5, midY);
+    this.overlay.strokePath();
+
+    this.overlay.beginPath();
+    // Horizontal girdle line across the widest point
+    this.overlay.moveTo(-sideX, midY);
+    this.overlay.lineTo(sideX, midY);
+    this.overlay.strokePath();
+
+    this.overlay.beginPath();
+    // Bottom-left facet
+    this.overlay.moveTo(-sideX * 0.5, midY);
+    this.overlay.lineTo(0, bottomY);
+    this.overlay.strokePath();
+
+    this.overlay.beginPath();
+    // Bottom-right facet
+    this.overlay.moveTo(sideX * 0.5, midY);
+    this.overlay.lineTo(0, bottomY);
+    this.overlay.strokePath();
+
+    // Diamond border stroke
+    this.overlay.lineStyle(2, borderColor, 0.8);
+    this.overlay.beginPath();
+    this.overlay.moveTo(0, topY);
+    this.overlay.lineTo(sideX, midY);
+    this.overlay.lineTo(0, bottomY);
+    this.overlay.lineTo(-sideX, midY);
+    this.overlay.closePath();
+    this.overlay.strokePath();
   }
 
   private isCrackedState(): boolean {

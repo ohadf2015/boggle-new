@@ -186,6 +186,35 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
+      {/* Top 3 Leaderboard / Podium - prominent placement */}
+      {sortedScores.length > 1 && (
+        scoreRevealComplete ? (
+          isMobile ? (
+            <MobileCompactLeaderboard
+              participants={sortedScores.map(p => ({
+                name: p.username,
+                score: p.score,
+                isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
+              }))}
+            />
+          ) : (
+            <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+          )
+        ) : (
+          <ScoreRevealAnimation
+            players={sortedScores.map(p => ({
+              username: p.username,
+              finalScore: p.score,
+              avatar: p.avatar,
+              isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
+            }))}
+            currentUsername={username}
+            duration={2500}
+            onComplete={() => setScoreRevealComplete(true)}
+          />
+        )
+      )}
+
       {/* Primary CTA - Play Again / Ready / Next Step (above the fold) */}
       {gameCode && onReturnToRoom && (
         isBotsOnlyGame ? (
@@ -222,7 +251,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
                     className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
                   >
                     <Play className="w-6 h-6" />
-                    {t('hostView.startGame') || 'Start Game'}
+                    {t('results.playAgain') || 'Play Again'}
                   </motion.button>
                 </div>
               ) : isCurrentPlayerReady ? (
@@ -318,36 +347,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           />
         )
       )}
-
-      {/* Compact Top 3 Leaderboard with Score Reveal Animation */}
-      {sortedScores.length > 1 && (
-        scoreRevealComplete ? (
-          isMobile ? (
-            <MobileCompactLeaderboard
-              participants={sortedScores.map(p => ({
-                name: p.username,
-                score: p.score,
-                isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-              }))}
-            />
-          ) : (
-            <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
-          )
-        ) : (
-          <ScoreRevealAnimation
-            players={sortedScores.map(p => ({
-              username: p.username,
-              finalScore: p.score,
-              avatar: p.avatar,
-              isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-            }))}
-            currentUsername={username}
-            duration={2500}
-            onComplete={() => setScoreRevealComplete(true)}
-          />
-        )
-      )}
-
 
       {/* Brain Points Feedback */}
       <BrainPointsDisplay reward={brainPointsReward} variant="compact" />

@@ -90,6 +90,8 @@ interface BlastGameLayoutProps {
   isDiscoveryActive?: boolean;
   /** Cells to pulse with near-miss shimmer animation (empty = none) */
   shimmerCells?: Array<{ row: number; col: number }>;
+  /** Tile types matching current wave objectives — highlighted with pulsing ring */
+  objectiveTileTypes?: Set<string>;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -141,6 +143,7 @@ export function BlastGameLayout({
   onClearHint,
   isDiscoveryActive = false,
   shimmerCells = [],
+  objectiveTileTypes,
   t,
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
@@ -621,6 +624,7 @@ export function BlastGameLayout({
           ariaLabel={t('blast.gridLabel') || 'Letter grid'}
           highlightedPath={hintPath ?? undefined}
           shimmerCells={shimmerCells}
+          objectiveTileTypes={objectiveTileTypes}
         />
       </div>
 

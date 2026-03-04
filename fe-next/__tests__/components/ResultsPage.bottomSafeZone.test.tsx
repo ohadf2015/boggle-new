@@ -79,9 +79,11 @@ describe('ResultsPage mobile bottom safe zone', () => {
   });
 
   describe('ResultsPage mobile scroll container', () => {
-    test('should use --mobile-bottom-safe for bottom padding', () => {
-      // The scrollable content area should use pb-[--mobile-bottom-safe]
-      expect(resultsPageTSX).toContain('pb-[--mobile-bottom-safe]');
+    test('should have sufficient bottom padding to clear fixed tab bar', () => {
+      // The scrollable content area needs enough bottom padding
+      // to ensure content isn't hidden behind the fixed tab bar.
+      // pb-40 = 160px, which clears the tab bar (~76px) plus safe area.
+      expect(resultsPageTSX).toContain('pb-40');
     });
 
     test('fixed bottom tab bar wrapper should have appropriate styling', () => {

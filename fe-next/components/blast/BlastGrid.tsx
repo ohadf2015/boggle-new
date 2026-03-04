@@ -46,6 +46,8 @@ interface BlastGridProps {
   highlightedPath?: Array<{ row: number; col: number }>;
   /** Cells to render with near-miss shimmer pulse (empty = none) */
   shimmerCells?: Array<{ row: number; col: number }>;
+  /** Tile types matching current wave objectives — highlighted with pulsing outline */
+  objectiveTileTypes?: Set<string>;
 }
 
 /**
@@ -77,6 +79,7 @@ export function BlastGrid({
   ariaLabel,
   highlightedPath = [],
   shimmerCells = [],
+  objectiveTileTypes,
 }: BlastGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -140,6 +143,7 @@ export function BlastGrid({
         tileStates={tileStates}
         gridSize={gridSize}
         selectedPositions={selectedPositions}
+        objectiveTileTypes={objectiveTileTypes}
       />
 
       {/* Near-miss shimmer: pulse overlay on cells the player almost used */}

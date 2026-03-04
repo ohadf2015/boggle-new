@@ -17,11 +17,14 @@ import { GameOverlays } from './GameOverlays';
 import { GameHeader } from './GameHeader';
 import { ScoreDisplay } from './ScoreDisplay';
 import FloatingScoreAnimation from '../../FloatingScoreAnimation';
-import type { LetterGrid, Language } from '@/shared/types/game';
+import type { LetterGrid, Language, GameMode, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer } from '@/shared/types/view';
 import type { HintsState, EarthquakeState, TranslationFn, TappedCellPosition } from '../types';
 import { LeadChangeBanner } from '../../LeadChangeBanner';
 import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
+import { BlastMultiplayerOverlay } from '../../BlastMultiplayerOverlay';
+import { WordHuntTargetArea } from '../../WordHuntTargetArea';
+import { WordHuntLifeBar } from '../../WordHuntLifeBar';
 
 interface LandscapeLayoutProps {
   // Core props
@@ -96,6 +99,15 @@ interface LandscapeLayoutProps {
 
   // Lead change notification
   leadChangeEvent?: LeadChangeEvent | null;
+
+  // Game mode overlays
+  gameMode?: GameMode;
+  blastTileOverlay?: BlastTileOverlay[];
+  wordHuntTargetLength?: number;
+  wordHuntAttempts?: Array<{ guess: string; feedback: LetterFeedback[] }>;
+  wordHuntFound?: boolean;
+  wordHuntLife?: number;
+  onWordHuntGuess?: (guess: string) => void;
 }
 
 /**
@@ -147,6 +159,13 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   children,
   minWordLength,
   leadChangeEvent,
+  gameMode,
+  blastTileOverlay,
+  wordHuntTargetLength,
+  wordHuntAttempts,
+  wordHuntFound,
+  wordHuntLife,
+  onWordHuntGuess,
 }) {
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
@@ -249,6 +268,19 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                 />
               </div>
             )}
+            {/* Word Hunt UI — above grid in landscape */}
+            {gameMode === 'word-hunt' && wordHuntTargetLength && onWordHuntGuess && (
+              <div className="flex-shrink-0 w-full max-w-xs mx-auto flex flex-col gap-1">
+                <WordHuntLifeBar life={wordHuntLife ?? 100} maxLife={100} />
+                <WordHuntTargetArea
+                  targetLength={wordHuntTargetLength}
+                  attempts={wordHuntAttempts ?? []}
+                  onSubmit={onWordHuntGuess}
+                  found={wordHuntFound ?? false}
+                />
+              </div>
+            )}
+
             <div
               className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0 aspect-square"
             >
@@ -263,29 +295,45 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                     onWordSubmit={onWordSubmit}
                     onWordChange={onWordChange}
                   />
+                  {/* Blast tile type badges */}
+                  {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (
+                    <BlastMultiplayerOverlay
+                      overlay={blastTileOverlay}
+                      gridSize={{ rows: letterGrid.length, cols: letterGrid[0]?.length ?? 4 }}
+                    />
+                  )}
                 </div>
               ) : (
-                <GridComponent
-                  key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
-                  grid={letterGrid}
-                  interactive={isPlaying && !showStartAnimation}
-                  animateOnMount={!hasAnimated}
-                  onWordSubmit={onWordSubmit}
-                  onWordChange={onWordChange}
-                  comboLevel={comboLevel}
-                  hideComboIndicator={true}
-                  hideWordPreview={true}
-                  largeText
-                  fireRoundActive={fireRoundActive}
-                  earthquakeShaking={earthquakeState === 'shaking'}
-                  highlightedPath={
-                    shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed)
-                      ? highlightedCells
-                      : []
-                  }
-                  onSingleTapDetected={onSingleTapDetected}
-                  language={gameLanguage}
-                />
+                <div className="relative w-full h-full">
+                  <GridComponent
+                    key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
+                    grid={letterGrid}
+                    interactive={isPlaying && !showStartAnimation}
+                    animateOnMount={!hasAnimated}
+                    onWordSubmit={onWordSubmit}
+                    onWordChange={onWordChange}
+                    comboLevel={comboLevel}
+                    hideComboIndicator={true}
+                    hideWordPreview={true}
+                    largeText
+                    fireRoundActive={fireRoundActive}
+                    earthquakeShaking={earthquakeState === 'shaking'}
+                    highlightedPath={
+                      shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed)
+                        ? highlightedCells
+                        : []
+                    }
+                    onSingleTapDetected={onSingleTapDetected}
+                    language={gameLanguage}
+                  />
+                  {/* Blast tile type badges */}
+                  {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (
+                    <BlastMultiplayerOverlay
+                      overlay={blastTileOverlay}
+                      gridSize={{ rows: letterGrid.length, cols: letterGrid[0]?.length ?? 4 }}
+                    />
+                  )}
+                </div>
               )}
             </div>
 

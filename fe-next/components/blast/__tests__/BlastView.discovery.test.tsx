@@ -45,6 +45,15 @@ jest.mock('../utils/blastWaveConfig', () => ({
     scoreThreshold: 0,
   }),
   getWaveDistribution: () => ({}),
+  getWaveObjectives: () => [{ type: 'score_target', target: 20 }],
+}));
+
+jest.mock('../BlastWaveIntro', () => ({
+  BlastWaveIntro: ({ onReady }: { onReady: () => void }) => (
+    <div data-testid="wave-intro">
+      <button onClick={() => onReady()}>go</button>
+    </div>
+  ),
 }));
 
 jest.mock('../types', () => ({
@@ -114,6 +123,8 @@ describe('BlastView discovery prop wiring', () => {
   function renderAndStartGame() {
     render(<BlastView />);
     fireEvent.click(screen.getByText('play'));
+    // Advance through wave intro
+    fireEvent.click(screen.getByText('go'));
   }
 
   it('passes onComboDetected prop to BlastGame when phase is playing', () => {

@@ -1001,6 +1001,18 @@ body {
     50% { box-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 36px rgba(0,255,255,0.5), inset 0 0 18px rgba(255,255,255,0.35); }
   }
 
+  /* Objective tile highlight — subtle pulsing outline to guide strategy */
+  .blast-tile-objective {
+    animation: blast-tile-objective-pulse 2s ease-in-out infinite;
+    outline: 2px solid rgba(255,225,53,0.5);
+    outline-offset: -1px;
+  }
+
+  @keyframes blast-tile-objective-pulse {
+    0%, 100% { outline-color: rgba(255,225,53,0.3); }
+    50% { outline-color: rgba(255,225,53,0.7); }
+  }
+
   /* Accessibility: disable all blast tile idle animations for users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .blast-tile-gold,

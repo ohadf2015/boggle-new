@@ -93,6 +93,15 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
 
   // Tutorial callback
   onShowTutorial,
+
+  // Game mode overlays
+  gameMode,
+  blastTileOverlay,
+  wordHuntTargetLength,
+  wordHuntAttempts,
+  wordHuntFound,
+  wordHuntLife,
+  onWordHuntGuess,
 }) {
   // Sound effects
   const {
@@ -340,6 +349,13 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     onCloseHelp: keyboardHelp.closeHelp,
     minWordLength,
     leadChangeEvent,
+    gameMode,
+    blastTileOverlay,
+    wordHuntTargetLength,
+    wordHuntAttempts,
+    wordHuntFound,
+    wordHuntLife,
+    onWordHuntGuess,
   } as const;
 
   // Landscape layout

@@ -20,7 +20,6 @@ import {
   CHAIN_BOMB_STAGGER,
   LIGHTNING_COLUMN_CLEAR_BONUS,
   ICE_CLEAR_BONUS,
-  FROZEN_CLEAR_BONUS,
   MAGNET_RADIUS,
   MAGNET_ATTRACT_BONUS,
   PRISM_USE_BONUS,
@@ -479,11 +478,13 @@ export function useBlastGame(
               for (const cell of vw.path) {
                 const t = nextTileStates[cell.row][cell.col];
                 if (!t.isCleared) {
-                  // BUGF-05 fix: multi-hit tiles (frozen/ice) crack instead of clear
+                  // BUGF-05 fix: multi-hit tiles crack instead of clear
                   // when they have hitsRemaining > 1 — only the final hit clears them.
-                  if ((t.type === 'frozen' || t.type === 'ice') && t.hitsRemaining > 1) {
+                  if ((t.type === 'frozen' || t.type === 'ice' || t.type === 'prism' || t.type === 'gem') && t.hitsRemaining > 1) {
                     t.hitsRemaining--;
-                    t.activationEffect = `${t.type}-crack`;
+                    t.activationEffect = t.type === 'gem'
+                      ? (t.hitsRemaining === 2 ? 'gem-shard-1' : 'gem-shard-2')
+                      : `${t.type}-crack`;
                   } else {
                     t.isCleared = true;
                     newlyClearedCount++;

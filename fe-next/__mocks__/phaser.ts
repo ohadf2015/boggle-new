@@ -199,6 +199,7 @@ class PhaserGraphics {
   moveTo = jest.fn().mockReturnValue(this);
   lineTo = jest.fn().mockReturnValue(this);
   strokePath = jest.fn().mockReturnValue(this);
+  fillPath = jest.fn().mockReturnValue(this);
   closePath = jest.fn().mockReturnValue(this);
   // Note: clear is defined on the prototype (not as an instance field) so that
   // `super.clear()` calls work correctly from subclasses like WordPathTrail.

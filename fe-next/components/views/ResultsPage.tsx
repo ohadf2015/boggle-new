@@ -200,31 +200,39 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   }, [deferredFinalScoresForWords]);
 
   // Handle host starting a new game directly from results page
+  // Must reset game state first (like handleStartNewGame in useHostGameActions)
   const handleStartGame = useCallback(() => {
     if (!socket || !isHost) return;
     logger.log('[RESULTS] Host starting new game from results page');
 
-    // Generate a new board with default settings
-    const difficultyConfig = DIFFICULTIES.MEDIUM;
-    const newTable = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      roomLanguage,
-      []
-    );
+    // Reset game state first, then start new game in callback
+    socket.emit('resetGame', {}, (response: { success: boolean; error?: string; gameState?: string }) => {
+      if (response?.success) {
+        logger.log('[RESULTS] Game reset confirmed, starting new game');
 
-    // Default timer: 3 minutes
-    const timerSeconds = 180;
+        const difficultyConfig = DIFFICULTIES.MEDIUM;
+        const newTable = generateRandomTable(
+          difficultyConfig.rows,
+          difficultyConfig.cols,
+          roomLanguage,
+          []
+        );
 
-    socket.emit('startGame', {
-      letterGrid: newTable,
-      timerSeconds: timerSeconds,
-      language: roomLanguage,
-      hostPlaying: true,
-      minWordLength: 3,
-      difficulty: 'MEDIUM',
-      boardTheme: null,
-      gameMode: selectedGameMode,
+        const timerSeconds = 180;
+
+        socket.emit('startGame', {
+          letterGrid: newTable,
+          timerSeconds: timerSeconds,
+          language: roomLanguage,
+          hostPlaying: true,
+          minWordLength: 3,
+          difficulty: 'MEDIUM',
+          boardTheme: null,
+          gameMode: selectedGameMode,
+        });
+      } else {
+        logger.error('[RESULTS] Game reset failed:', response?.error);
+      }
     });
   }, [socket, isHost, roomLanguage, selectedGameMode]);
 
@@ -408,7 +416,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Tab Content - Scrollable area */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-24"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-40"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
           <div className="max-w-lg mx-auto">
@@ -419,6 +427,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.15 }}
+                style={{ minHeight: 0 }}
               >
                 {mobileActiveTab === 'results' && renderResultsTab()}
                 {mobileActiveTab === 'details' && renderDetailsTab()}

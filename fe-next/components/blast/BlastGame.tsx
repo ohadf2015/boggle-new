@@ -89,6 +89,17 @@ export function BlastGame({
   // Memoize wave objectives so they don't cause re-initialization
   const waveObjectives = useMemo(() => getWaveObjectives(waveNumber), [waveNumber]);
 
+  // Objective tile types for highlighting (memoized Set for BlastTileOverlay)
+  const objectiveTileTypes = useMemo(() => {
+    const types = new Set<string>();
+    for (const obj of waveObjectives) {
+      if ((obj.type === 'collect_type' || obj.type === 'clear_all_type') && obj.tileType) {
+        types.add(obj.tileType);
+      }
+    }
+    return types;
+  }, [waveObjectives]);
+
   // Sugar Crush sequence (PSYC-03): fires when moves run out, converting tiles to specials
   const sugarCrush = useBlastSugarCrush();
 
@@ -315,13 +326,14 @@ export function BlastGame({
   }, []);
 
   // Detect game completion or dead end
+  // Priority: objectives met → wave complete, board cleared without objectives → game end, dead end → game end
   useEffect(() => {
-    if (blast.gameState.isComplete && allObjectivesComplete) {
+    // All objectives met → wave complete (regardless of board clear state)
+    if (allObjectivesComplete) {
       const { score, wordsFound, tilesCleared, totalTiles } = blast.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
       const scoreThreshold = waveConfig?.scoreThreshold;
 
-      // Wave complete: board cleared + objectives met + threshold met (or no threshold)
       if (onWaveComplete && (!scoreThreshold || score >= scoreThreshold)) {
         const timer = setTimeout(() => {
           onWaveComplete(score, wordsFound, clearPct);
@@ -329,7 +341,7 @@ export function BlastGame({
         return () => clearTimeout(timer);
       }
 
-      // Board cleared but threshold not met — game ends
+      // Objectives met but score threshold not met — game ends
       const results = blast.getResultsData(combo.maxCombo);
       const timer = setTimeout(() => {
         onGameEnd(results);
@@ -337,6 +349,16 @@ export function BlastGame({
       return () => clearTimeout(timer);
     }
 
+    // Board cleared but objectives NOT met — game ends (failed wave)
+    if (blast.gameState.isComplete) {
+      const results = blast.getResultsData(combo.maxCombo);
+      const timer = setTimeout(() => {
+        onGameEnd(results);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+
+    // Dead end (no valid words or moves exhausted) — game ends
     if (blast.gameState.isDeadEnd) {
       const results = blast.getResultsData(combo.maxCombo);
       const timer = setTimeout(() => {
@@ -417,6 +439,7 @@ export function BlastGame({
       showEndGameConfirm={showEndGameConfirm}
       setShowEndGameConfirm={setShowEndGameConfirm}
       objectiveProgress={objectiveProgress}
+      objectiveTileTypes={objectiveTileTypes}
       bonusMoveAwarded={bonusMoveAwarded}
       hintPath={hintPath}
       hasHintAvailable={hasHintAvailable}

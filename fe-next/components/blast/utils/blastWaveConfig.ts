@@ -59,23 +59,25 @@ export interface WaveConfig {
 const WAVE_TABLE: WaveConfig[] = [
   // Placeholder index 0 (unused)
   {
-    minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22,
+    minWordLength: 2, specialTileChance: 0.10, iceDistribution: 0.17, goldDistribution: 0.22,
     vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 20,
   },
   // Wave 1 — basics only: bomb, ice, gold, silver, rainbow (20 moves — generous intro)
+  // Lower special tile chance (0.10) so new players aren't overwhelmed by special tiles
   {
-    minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22,
+    minWordLength: 2, specialTileChance: 0.10, iceDistribution: 0.17, goldDistribution: 0.22,
     vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 20,
   },
   // Wave 2 — treasure gem unlocks (18 moves)
+  // Slightly lower special tile chance (0.13) to ramp gradually
   {
-    minWordLength: 2, specialTileChance: 0.17, iceDistribution: 0.20, goldDistribution: 0.20,
+    minWordLength: 2, specialTileChance: 0.13, iceDistribution: 0.20, goldDistribution: 0.20,
     vowelModifier: 0.95, maxCascadeChain: 2, cascadeChainBonus: 0.6, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: false, frostEnabled: false, frozenEnabled: false,

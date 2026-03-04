@@ -9,7 +9,8 @@ import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { BlastGame } from './BlastGame';
 import { BlastResults } from './BlastResults';
 import { BlastWaveTransition } from './BlastWaveTransition';
-import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
+import { BlastWaveIntro } from './BlastWaveIntro';
+import { getWaveConfig, getWaveDistribution, getWaveObjectives } from './utils/blastWaveConfig';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
 import type { Language } from '@/shared/types/game';
 import { BlastReadyScreen } from './BlastReadyScreen';
@@ -21,7 +22,7 @@ import { useBlastComboDiscovery } from './hooks/useBlastComboDiscovery';
  */
 const BlastView: React.FC = () => {
   const router = useRouter();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { unlockAudio } = useMusic();
   const setIsInGame = useHideNavigation();
 
@@ -103,10 +104,15 @@ const BlastView: React.FC = () => {
   const handleWaveAdvance = useCallback(() => {
     setCurrentWave(prev => prev + 1);
     gameKeyRef.current += 1;
-    setPhase('playing');
+    setPhase('waveIntro');
   }, []);
 
   const handleStart = useCallback(() => {
+    setPhase('waveIntro');
+  }, []);
+
+  /** Wave intro dismissed — start playing */
+  const handleWaveIntroReady = useCallback(() => {
     setPhase('playing');
   }, []);
 
@@ -134,6 +140,16 @@ const BlastView: React.FC = () => {
 
       {phase === 'ready' && (
         <BlastReadyScreen onStart={handleStart} discoveredCombos={discoveredCombos} />
+      )}
+
+      {phase === 'waveIntro' && (
+        <BlastWaveIntro
+          waveNumber={currentWave}
+          objectives={getWaveObjectives(currentWave)}
+          movesAllowed={waveConfig.movesAllowed}
+          onReady={handleWaveIntroReady}
+          t={(key: string) => t(key) || undefined}
+        />
       )}
 
       {phase === 'playing' && (

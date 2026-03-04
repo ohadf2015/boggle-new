@@ -7,6 +7,14 @@ import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from 
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  useGameMode,
+  useBlastTileOverlay,
+  useWordHuntTargetLength,
+  useWordHuntMyLife,
+  useWordHuntTargetAttempts,
+  useWordHuntTargetFound,
+} from '@/hooks/gameState/store';
 
 // ==================== Types ====================
 
@@ -106,6 +114,20 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
+  // Game mode state from Zustand
+  const gameMode = useGameMode();
+  const blastTileOverlay = useBlastTileOverlay();
+  const wordHuntTargetLength = useWordHuntTargetLength();
+  const wordHuntLife = useWordHuntMyLife();
+  const wordHuntAttempts = useWordHuntTargetAttempts();
+  const wordHuntFound = useWordHuntTargetFound();
+
+  // Word hunt guess handler — emits to server
+  const handleWordHuntGuess = React.useCallback((guess: string) => {
+    if (!socket) return;
+    socket.emit('wordHuntGuess', { guess });
+  }, [socket]);
+
   // Build leaderboard from players data
   const leaderboard = useMemo(() => {
     return [...playersReady].map(player => {
@@ -176,6 +198,15 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
       // Theme
       boardTheme={boardTheme}
+
+      // Game mode overlays
+      gameMode={gameMode ?? undefined}
+      blastTileOverlay={blastTileOverlay}
+      wordHuntTargetLength={wordHuntTargetLength}
+      wordHuntAttempts={wordHuntAttempts}
+      wordHuntFound={wordHuntFound}
+      wordHuntLife={wordHuntLife}
+      onWordHuntGuess={hostPlaying ? handleWordHuntGuess : undefined}
 
       // Player experience (for keyboard trail inactivity threshold)
       totalGamesPlayed={profile?.total_games}

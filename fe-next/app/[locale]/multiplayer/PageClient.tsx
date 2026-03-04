@@ -397,7 +397,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       isHostMode: boolean,
       roomLang?: Language | null,
       overrideGameCode?: string,
-      overrideRoomName?: string
+      overrideRoomName?: string,
+      overrideUsername?: string,
     ) => {
       console.log(
         `🎮 [JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`
@@ -455,13 +456,16 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       }
 
       // Compute effective username
-      let effectiveUsername = user
-        ? profile?.display_name ||
-          user?.user_metadata?.full_name ||
-          user?.user_metadata?.name ||
-          user?.email?.split('@')[0] ||
-          username
-        : username;
+      // overrideUsername takes precedence — avoids stale closure when called immediately after setUsername
+      let effectiveUsername = overrideUsername?.trim()
+        ? overrideUsername.trim()
+        : user
+          ? profile?.display_name ||
+            user?.user_metadata?.full_name ||
+            user?.user_metadata?.name ||
+            user?.email?.split('@')[0] ||
+            username
+          : username;
 
       // Generate random name for guests without username
       let generatedAvatar: { emoji: string; color: string } | null = null;

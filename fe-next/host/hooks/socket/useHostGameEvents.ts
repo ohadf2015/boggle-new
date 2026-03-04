@@ -182,6 +182,20 @@ export function useHostGameEvents({
         useGameStore.getState().setGameMode((data as any).gameMode);
       }
 
+      // Set blast tile overlay if present (mirrors player handler)
+      if ((data as any).blastTileOverlay) {
+        useGameStore.getState().setBlastTileOverlay((data as any).blastTileOverlay);
+      }
+
+      // Set word hunt target length if present (mirrors player handler)
+      if ((data as any).wordHuntTargetLength) {
+        const store = useGameStore.getState();
+        store.setWordHuntTargetLength((data as any).wordHuntTargetLength);
+        store.setWordHuntMyLife(100);
+        store.setWordHuntTargetAttempts([]);
+        store.setWordHuntTargetFound(false);
+      }
+
       // Reset state for new game
       setWaitingForResults(false);
       waitingStartTimeRef.current = null;
