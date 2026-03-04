@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 46 of 52 (Foundation — Unified Tile Types & Bug Fixes)
-Plan: 1 of 4 in current phase
+Plan: 4 of 4 in current phase (all complete)
 Status: In progress
-Last activity: 2026-03-04 — 46-01 complete (unified BlastTileType, 'normal' → 'standard', 594 tests pass)
+Last activity: 2026-03-04 — 46-04 complete (BUGF-08 clustering fix + BUGF-09 min ratio enforcement, 606 blast tests pass)
 
-Progress: [█░░░░░░░░░░░░░░░░░░░] 4% (v3.0 milestone, 1/27 plans complete)
+Progress: [██░░░░░░░░░░░░░░░░░░] 7% (v3.0 milestone, 2/27 plans complete)
 
 ## Performance Metrics
 
@@ -28,7 +28,7 @@ Progress: [█░░░░░░░░░░░░░░░░░░░] 4% (v3.
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 46 | 4 | 14min (1/4 complete) | 14min |
+| 46 | 4 | 16min (4/4 complete) | 4min |
 | 47 | 5 | - | - |
 | 48 | 4 | - | - |
 | 49 | 4 | - | - |
@@ -49,6 +49,8 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - Redesign before bug fixes: new combo system rewrites much buggy code anyway
 - 28-pair matrix: every tile pair has defined synergy
 - Word-length scaling: 1.0x base / 1.5x at 5-6 letters / 2.0x at 7+
+- [Phase 46]: MIN_STANDARD_RATIO=0.6: when board already exceeds special budget, no additional specials placed (correct behavior)
+- [Phase 46]: Fisher-Yates shuffle on standardPositions distributes objective tiles randomly vs sequential top-left clustering
 
 ### Pending Todos
 
@@ -63,5 +65,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 46-01-PLAN.md (Unified BlastTileType canonical source)
+Stopped at: Completed 46-04-PLAN.md (BUGF-08 clustering fix + BUGF-09 min ratio enforcement)
 Resume file: None
