@@ -110,6 +110,12 @@ export interface BlastResultsData {
 
 /** Score multiplier for gold tiles */
 export const GOLD_MULTIPLIER = 3;
+/** Score multiplier for silver tiles (wave 2+) */
+export const SILVER_MULTIPLIER = 1.5;
+/** Score multiplier for diamond tiles (wave 4+) */
+export const DIAMOND_MULTIPLIER = 5;
+/** Mirror tile: doubles partner special's effect. Solo = 2x word score. */
+export const MIRROR_MULTIPLIER = 2;
 /** Number of adjacent cells a bomb clears */
 export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
 
@@ -210,12 +216,14 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   bomb: 0.22,
   rainbow: 0.22,
   ice: 0.17,
-  wildcard: 0.17,
   lightning: 0,
   magnet: 0,
   prism: 0,
   gem: 0,
   frozen: 0,
+  mirror: 0,
+  silver: 0,
+  diamond: 0,
 };
 
 // ==================== Objectives ====================
