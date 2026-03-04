@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: completed
-stopped_at: Completed 50-03-PLAN.md
-last_updated: "2026-03-04T16:34:25.571Z"
+stopped_at: Completed 51-01-PLAN.md
+last_updated: "2026-03-04T17:09:28.387Z"
 last_activity: "2026-03-04 — 48-04 complete: BlastComboFlash tier-based overlay + audio sting callback"
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 22
-  completed_plans: 22
+  total_plans: 24
+  completed_plans: 23
   percent: 98
 ---
 
@@ -67,6 +67,7 @@ Progress: [██████████] 98%
 | Phase 50 P02 | 6 | 4 tasks | 8 files |
 | Phase 50 P04 | 7 | 3 tasks | 8 files |
 | Phase 50 P03 | 7 | 3 tasks | 10 files |
+| Phase 51-tile-idle-death-animations P01 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,8 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - [Phase 50]: DDA state in ddaStateRef (not useState): cascade callbacks read latest modifier without stale closure or re-render
 - [Phase 50]: trackWordFail exposed from useBlastGame; BlastGame detects rejection via currentFeedback.id dedup pattern
 - [Phase 50]: onMovesExhausted callback delegates isDeadEnd timing to BlastGame for Sugar Crush interception
+- [Phase 51-01]: BLAST_TILE_CONFIGS type updated to Exclude<BlastTileType, 'standard' | 'wildcard'> — wildcard never spawned so no config needed
+- [Phase 51-01]: mirror idle uses alpha oscillation on overlay, not scaleX flip, to avoid RTL rendering issues
 
 ### Pending Todos
 
@@ -124,6 +127,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T16:30:23.511Z
-Stopped at: Completed 50-03-PLAN.md
+Last session: 2026-03-04T17:09:28.385Z
+Stopped at: Completed 51-01-PLAN.md
 Resume file: None
