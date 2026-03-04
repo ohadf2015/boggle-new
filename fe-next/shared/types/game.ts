@@ -3,6 +3,8 @@
  * Used by both frontend and backend
  */
 
+import type { BlastTileType } from './blast';
+
 // ==================== Core Types ====================
 
 export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'fr' | 'de';
@@ -213,6 +215,16 @@ export interface Game {
   firstFinderMap?: Record<string, FirstFinderEntry>;
   /** Chat message history (persists across rounds, max 100 messages) */
   chatHistory?: ChatHistoryEntry[];
+  /** Current game mode for multiplayer mode rotation */
+  gameMode?: GameMode;
+  /** History of game modes played in this room (for no-repeat rotation) */
+  modeHistory?: GameMode[];
+  /** Game session ID (incremented per round for stale-event detection) */
+  gameSessionId?: number;
+  /** Total words on board (calculated after start, cached for late joiners) */
+  totalBoardWords?: number;
+  /** Players who confirmed ready for next game */
+  playersReadyForNextGame?: Record<string, boolean>;
 }
 
 export interface ActiveRoom {
@@ -223,6 +235,21 @@ export interface ActiveRoom {
   gameState: GameState;
   isRanked: boolean;
   createdAt: number;
+}
+
+// ==================== Word Hunt Types ====================
+
+/** Letter feedback for Wordle-style target word guessing */
+export type LetterFeedback = 'correct' | 'present' | 'absent';
+
+/** Word Hunt mode state tracked per game */
+export interface WordHuntModeState {
+  targetWord: string;
+  targetWordLength: number;
+  playerLives: Record<string, number>;
+  eliminatedPlayers: string[];
+  targetFoundBy: string | null;
+  isFirstFinderClaimed: boolean;
 }
 
 // ==================== Tournament Types ====================
@@ -251,4 +278,20 @@ export interface TournamentStanding {
   avatar: Avatar;
   totalScore: number;
   roundScores: number[];
+}
+
+// ==================== Blast Multiplayer Types ====================
+
+/** Blast mode tile overlay for multiplayer */
+export interface BlastTileOverlay {
+  row: number;
+  col: number;
+  type: BlastTileType;
+}
+
+/** Blast mode state tracked per game */
+export interface BlastModeState {
+  overlay: BlastTileOverlay[];
+  playerMoves: Record<string, number>;
+  playerBonusMoves: Record<string, number>;
 }

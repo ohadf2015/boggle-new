@@ -1,0 +1,250 @@
+/**
+ * Blast Mode Manager Tests
+ * Tests for overlay generation, tile bonus calc, move tracking, bonus move logic
+ */
+
+import {
+  generateBlastOverlay,
+  calculateBlastTileBonus,
+  initBlastModeState,
+  recordBlastMove,
+  getTilesOnPath,
+} from '../blastModeManager';
+
+import {
+  BLAST_BONUS_MOVE_COMBO_THRESHOLD,
+  BLAST_SPECIAL_TILE_CHANCE,
+  BLAST_TILE_BONUSES,
+  BLAST_RAINBOW_FLAT_BONUS,
+  BLAST_TILE_TYPES,
+} from '@/shared/constants/blastMultiplayerConstants';
+
+import type { BlastTileOverlay, BlastModeState } from '@/shared/types/game';
+
+describe('blastModeManager', () => {
+  // ==========================================
+  // generateBlastOverlay
+  // ==========================================
+  describe('generateBlastOverlay', () => {
+    const grid: string[][] = [
+      ['A', 'B', 'C'],
+      ['D', 'E', 'F'],
+      ['G', 'H', 'I'],
+    ];
+
+    it('should return an array of BlastTileOverlay objects', () => {
+      const overlay = generateBlastOverlay(grid, 0.5);
+      expect(Array.isArray(overlay)).toBe(true);
+      overlay.forEach((tile) => {
+        expect(tile).toHaveProperty('row');
+        expect(tile).toHaveProperty('col');
+        expect(tile).toHaveProperty('type');
+        expect(typeof tile.row).toBe('number');
+        expect(typeof tile.col).toBe('number');
+      });
+    });
+
+    it('should only include special tiles (not standard) in overlay', () => {
+      const overlay = generateBlastOverlay(grid, 1.0); // 100% chance
+      overlay.forEach((tile) => {
+        expect(tile.type).not.toBe('standard');
+      });
+    });
+
+    it('should return empty array when specialChance is 0', () => {
+      const overlay = generateBlastOverlay(grid, 0);
+      expect(overlay).toEqual([]);
+    });
+
+    it('should return special tiles for every cell when specialChance is 1', () => {
+      const overlay = generateBlastOverlay(grid, 1.0);
+      // Every cell should have a special tile
+      expect(overlay.length).toBe(9); // 3x3 grid
+    });
+
+    it('should assign valid special tile types from BLAST_TILE_TYPES', () => {
+      const overlay = generateBlastOverlay(grid, 1.0);
+      const specialTypes = BLAST_TILE_TYPES.filter(t => t !== 'standard');
+      overlay.forEach((tile) => {
+        expect(specialTypes).toContain(tile.type);
+      });
+    });
+
+    it('should have row and col within grid bounds', () => {
+      const overlay = generateBlastOverlay(grid, 1.0);
+      overlay.forEach((tile) => {
+        expect(tile.row).toBeGreaterThanOrEqual(0);
+        expect(tile.row).toBeLessThan(grid.length);
+        expect(tile.col).toBeGreaterThanOrEqual(0);
+        expect(tile.col).toBeLessThan(grid[0].length);
+      });
+    });
+  });
+
+  // ==========================================
+  // calculateBlastTileBonus
+  // ==========================================
+  describe('calculateBlastTileBonus', () => {
+    it('should return 0 for empty path', () => {
+      expect(calculateBlastTileBonus([])).toBe(0);
+    });
+
+    it('should return standard bonus (1) for a single standard tile', () => {
+      expect(calculateBlastTileBonus(['standard'])).toBe(1);
+    });
+
+    it('should sum bonuses for multiple tiles', () => {
+      // gold=3, bomb=2 => total 5
+      expect(calculateBlastTileBonus(['gold', 'bomb'])).toBe(5);
+    });
+
+    it('should add BLAST_RAINBOW_FLAT_BONUS when rainbow is in path', () => {
+      // rainbow=1 + flat bonus=5 => 6
+      const result = calculateBlastTileBonus(['rainbow']);
+      expect(result).toBe(1 + BLAST_RAINBOW_FLAT_BONUS);
+    });
+
+    it('should add flat bonus only once even with multiple rainbows', () => {
+      // 2 rainbows: (1+1) multiplier + 5 flat = 7
+      const result = calculateBlastTileBonus(['rainbow', 'rainbow']);
+      expect(result).toBe(2 + BLAST_RAINBOW_FLAT_BONUS);
+    });
+
+    it('should handle mixed tile types correctly', () => {
+      // standard=1, gold=3, rainbow=1, ice=1.5 => sum=6.5 + flat 5 = 11.5
+      const result = calculateBlastTileBonus(['standard', 'gold', 'rainbow', 'ice']);
+      expect(result).toBe(1 + 3 + 1 + 1.5 + BLAST_RAINBOW_FLAT_BONUS);
+    });
+  });
+
+  // ==========================================
+  // initBlastModeState
+  // ==========================================
+  describe('initBlastModeState', () => {
+    const grid: string[][] = [
+      ['A', 'B'],
+      ['C', 'D'],
+    ];
+    const players = ['alice', 'bob'];
+
+    it('should return a BlastModeState object', () => {
+      const state = initBlastModeState(grid, players);
+      expect(state).toHaveProperty('overlay');
+      expect(state).toHaveProperty('playerMoves');
+      expect(state).toHaveProperty('playerBonusMoves');
+    });
+
+    it('should generate overlay for the grid', () => {
+      const state = initBlastModeState(grid, players);
+      expect(Array.isArray(state.overlay)).toBe(true);
+    });
+
+    it('should initialize playerMoves to 0 for each player', () => {
+      const state = initBlastModeState(grid, players);
+      expect(state.playerMoves).toEqual({ alice: 0, bob: 0 });
+    });
+
+    it('should initialize playerBonusMoves to 0 for each player', () => {
+      const state = initBlastModeState(grid, players);
+      expect(state.playerBonusMoves).toEqual({ alice: 0, bob: 0 });
+    });
+  });
+
+  // ==========================================
+  // recordBlastMove
+  // ==========================================
+  describe('recordBlastMove', () => {
+    let state: BlastModeState;
+
+    beforeEach(() => {
+      state = {
+        overlay: [],
+        playerMoves: { alice: 0, bob: 0 },
+        playerBonusMoves: { alice: 0, bob: 0 },
+      };
+    });
+
+    it('should increment moves for the player', () => {
+      const result = recordBlastMove(state, 'alice', 0);
+      expect(result.movesUsed).toBe(1);
+      expect(state.playerMoves.alice).toBe(1);
+    });
+
+    it('should not grant bonus move when combo is below threshold', () => {
+      const result = recordBlastMove(state, 'alice', BLAST_BONUS_MOVE_COMBO_THRESHOLD - 1);
+      expect(result.bonusMove).toBe(false);
+    });
+
+    it('should grant bonus move when combo meets threshold', () => {
+      const result = recordBlastMove(state, 'alice', BLAST_BONUS_MOVE_COMBO_THRESHOLD);
+      expect(result.bonusMove).toBe(true);
+      expect(state.playerBonusMoves.alice).toBe(1);
+    });
+
+    it('should grant bonus move when combo exceeds threshold', () => {
+      const result = recordBlastMove(state, 'alice', BLAST_BONUS_MOVE_COMBO_THRESHOLD + 5);
+      expect(result.bonusMove).toBe(true);
+    });
+
+    it('should track moves independently per player', () => {
+      recordBlastMove(state, 'alice', 0);
+      recordBlastMove(state, 'alice', 0);
+      recordBlastMove(state, 'bob', 0);
+      expect(state.playerMoves.alice).toBe(2);
+      expect(state.playerMoves.bob).toBe(1);
+    });
+
+    it('should handle unknown player gracefully by initializing to 0', () => {
+      const result = recordBlastMove(state, 'charlie', 0);
+      expect(result.movesUsed).toBe(1);
+      expect(state.playerMoves.charlie).toBe(1);
+    });
+  });
+
+  // ==========================================
+  // getTilesOnPath
+  // ==========================================
+  describe('getTilesOnPath', () => {
+    const overlay: BlastTileOverlay[] = [
+      { row: 0, col: 0, type: 'gold' },
+      { row: 0, col: 1, type: 'rainbow' },
+      { row: 1, col: 0, type: 'bomb' },
+    ];
+
+    it('should return tile types for letters on overlay positions', () => {
+      // Word "AB" - A at (0,0) has gold, B at (0,1) has rainbow
+      const positions = new Map<string, Array<{ row: number; col: number }>>();
+      positions.set('a', [{ row: 0, col: 0 }]);
+      positions.set('b', [{ row: 0, col: 1 }]);
+
+      const result = getTilesOnPath('ab', positions, overlay);
+      expect(result).toContain('gold');
+      expect(result).toContain('rainbow');
+    });
+
+    it('should return standard for letters not on special tiles', () => {
+      const positions = new Map<string, Array<{ row: number; col: number }>>();
+      positions.set('x', [{ row: 1, col: 1 }]); // No overlay at (1,1)
+
+      const result = getTilesOnPath('x', positions, overlay);
+      expect(result).toEqual(['standard']);
+    });
+
+    it('should return empty array for unknown letters', () => {
+      const positions = new Map<string, Array<{ row: number; col: number }>>();
+      // Letter 'z' not in positions map
+
+      const result = getTilesOnPath('z', positions, overlay);
+      expect(result).toEqual([]);
+    });
+
+    it('should handle word with duplicate letters', () => {
+      const positions = new Map<string, Array<{ row: number; col: number }>>();
+      positions.set('a', [{ row: 0, col: 0 }, { row: 1, col: 0 }]);
+
+      const result = getTilesOnPath('aa', positions, overlay);
+      // Both positions have overlays: (0,0)=gold, (1,0)=bomb
+      expect(result.length).toBe(2);
+    });
+  });
+});

@@ -12,8 +12,12 @@ import type {
   ActiveRoom,
   LeaderboardEntry,
   TournamentStanding,
-  WordDetail
+  WordDetail,
+  BlastTileOverlay,
+  LetterFeedback,
 } from './game';
+
+import type { BlastTileType } from './blast';
 
 import type {
   SpamWarningPayload,
@@ -216,6 +220,9 @@ export interface ServerToClientEvents {
   // Score card events
   'scorecard:data': (data: GenerateScoreCardResponse) => void;
   'scorecard:error': (data: { message: string; code?: string }) => void;
+
+  // Blast multiplayer events
+  blastWordAccepted: (data: BlastWordAcceptedPayload) => void;
 
   // Spectator events
   spectatorUpgraded: (data: SpectatorUpgradedPayload) => void;
@@ -584,6 +591,44 @@ export interface EngagementStatus {
     completed: number;
     total: number;
   };
+}
+
+// ==================== Blast Multiplayer Types ====================
+
+export interface BlastWordAcceptedPayload {
+  word: string;
+  score: number;
+  tileBonus: number;
+  tilesCleared: BlastTileType[];
+  movesUsed: number;
+  bonusMove: boolean;
+  comboLevel: number;
+}
+
+// ==================== Word Hunt Types ====================
+
+export interface WordHuntLifeUpdatePayload {
+  playerLives: Record<string, number>;
+  eliminatedPlayers: string[];
+}
+
+export interface WordHuntTargetResultPayload {
+  guess: string;
+  feedback: LetterFeedback[];
+  correct: boolean;
+  isFirstFinder: boolean;
+  bonus: number;
+  livesRemaining: number;
+}
+
+export interface WordHuntTargetFoundPayload {
+  username: string;
+  targetWord: string;
+  isFirstFinder: boolean;
+}
+
+export interface WordHuntEliminatedPayload {
+  username: string;
 }
 
 // ==================== Spectator Types ====================

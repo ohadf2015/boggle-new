@@ -1,21 +1,9 @@
 import type { Language } from '@/shared/types/game';
 
-// ==================== Tile Types ====================
+// ==================== Tile Types (canonical source: @/shared/types/blast) ====================
 
-/** Tile types for blast mode (standard + 10 special) */
-export type BlastTileType = 'standard' | 'gold' | 'bomb' | 'rainbow' | 'ice' | 'wildcard' | 'lightning' | 'magnet' | 'prism' | 'gem' | 'frozen';
-
-/** Per-cell state tracked alongside the LetterGrid */
-export interface BlastTileState {
-  row: number;
-  col: number;
-  type: BlastTileType;
-  isCleared: boolean;
-  /** Effect triggered when this tile is cleared (for animation) */
-  activationEffect: string | null;
-  /** Hits remaining before ice tile clears (2 → 1 → 0=cleared) */
-  hitsRemaining: number;
-}
+// Re-export canonical types so all blast component imports can use '../types' without change
+export type { BlastTileType, BlastTileState } from '@/shared/types/blast';
 
 // ==================== Difficulty ====================
 
