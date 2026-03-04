@@ -2,7 +2,7 @@
  * useBlastComboDiscovery - Tests for combo discovery state management hook.
  * TDD: written before implementation (RED phase).
  */
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useBlastComboDiscovery } from '../useBlastComboDiscovery';
 import type { SpecialCombo } from '../../utils/blastCombos';
 import type { BlastTileType } from '../../types';
@@ -22,6 +22,9 @@ beforeEach(() => {
   jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(
     (key: string) => { delete mockStorage[key]; },
   );
+
+  // Reset fetch mock each test
+  jest.clearAllMocks();
 });
 
 afterEach(() => {
@@ -39,7 +42,18 @@ function makeCombo(type: SpecialCombo['type']): SpecialCombo {
   };
 }
 
-// ==================== useBlastComboDiscovery ====================
+function mockFetchSuccess(responseData: Record<string, unknown>) {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve(responseData),
+  });
+}
+
+function mockFetchFailure() {
+  global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+}
+
+// ==================== useBlastComboDiscovery (existing tests) ====================
 
 describe('useBlastComboDiscovery', () => {
   it('starts with no pending discovery', () => {
@@ -130,5 +144,178 @@ describe('useBlastComboDiscovery', () => {
       result.current.onComboDetected([makeCombo('gold_special')]);
     });
     expect(result.current.discoveredCombos.has('gold_special')).toBe(true);
+  });
+});
+
+// ==================== Supabase sync (new tests - Task 2) ====================
+
+describe('useBlastComboDiscovery — Supabase sync', () => {
+  describe('Discovery POST (fire-and-forget)', () => {
+    it('calls POST /api/blast/combo-codex when authenticated and a new combo is discovered', async () => {
+      mockFetchSuccess({ discoveredCombos: ['bomb_bomb'] });
+
+      const { result } = renderHook(() =>
+        useBlastComboDiscovery({ userId: 'user-123' }),
+      );
+
+      await act(async () => {
+        result.current.onComboDetected([makeCombo('bomb_bomb')]);
+      });
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/blast/combo-codex',
+        expect.objectContaining({ method: 'POST' }),
+      );
+    });
+
+    it('does NOT call fetch when userId is undefined (unauthenticated)', async () => {
+      global.fetch = jest.fn();
+
+      const { result } = renderHook(() => useBlastComboDiscovery());
+
+      await act(async () => {
+        result.current.onComboDetected([makeCombo('bomb_bomb')]);
+      });
+
+      expect(global.fetch).not.toHaveBeenCalledWith(
+        '/api/blast/combo-codex',
+        expect.anything(),
+      );
+    });
+
+    it('does NOT call POST for already-discovered combos (no new discovery)', async () => {
+      mockStorage['blast_discovered_combos'] = JSON.stringify(['bomb_bomb']);
+      // Use mockFetchSuccess so the GET on mount resolves without crashing
+      mockFetchSuccess({ discoveredCombos: ['bomb_bomb'] });
+
+      const { result } = renderHook(() =>
+        useBlastComboDiscovery({ userId: 'user-123' }),
+      );
+
+      // Wait for the mount GET to complete
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 20));
+      });
+
+      // Reset call count after init GET
+      (global.fetch as jest.Mock).mockClear();
+
+      await act(async () => {
+        result.current.onComboDetected([makeCombo('bomb_bomb')]);
+      });
+
+      // No POST should be made for already-known combos
+      expect(global.fetch).not.toHaveBeenCalledWith(
+        '/api/blast/combo-codex',
+        expect.objectContaining({ method: 'POST' }),
+      );
+    });
+
+    it('API POST failure is non-fatal — localStorage already has the data', async () => {
+      mockFetchFailure();
+
+      const { result } = renderHook(() =>
+        useBlastComboDiscovery({ userId: 'user-123' }),
+      );
+
+      // Should not throw
+      await act(async () => {
+        result.current.onComboDetected([makeCombo('bomb_bomb')]);
+      });
+
+      // localStorage should still have the data
+      const stored = JSON.parse(mockStorage['blast_discovered_combos'] ?? '[]');
+      expect(stored).toContain('bomb_bomb');
+      // State should still be updated
+      expect(result.current.discoveredCombos.has('bomb_bomb')).toBe(true);
+    });
+  });
+
+  describe('Init GET merge (merge on load)', () => {
+    it('calls GET /api/blast/combo-codex on mount when authenticated', async () => {
+      mockFetchSuccess({ discoveredCombos: ['bomb_bomb', 'prism_prism'] });
+
+      renderHook(() => useBlastComboDiscovery({ userId: 'user-123' }));
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith('/api/blast/combo-codex');
+      });
+    });
+
+    it('does NOT call GET on mount when unauthenticated', async () => {
+      global.fetch = jest.fn();
+
+      renderHook(() => useBlastComboDiscovery());
+
+      // Wait a tick
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      });
+
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('merges server data with localStorage on load (union)', async () => {
+      // localStorage has bomb_bomb
+      mockStorage['blast_discovered_combos'] = JSON.stringify(['bomb_bomb']);
+
+      // Server has prism_prism (different combo)
+      mockFetchSuccess({ discoveredCombos: ['prism_prism'] });
+
+      const { result } = renderHook(() =>
+        useBlastComboDiscovery({ userId: 'user-123' }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.discoveredCombos.has('prism_prism')).toBe(true);
+      });
+
+      // Both should be present after merge
+      expect(result.current.discoveredCombos.has('bomb_bomb')).toBe(true);
+      expect(result.current.discoveredCombos.has('prism_prism')).toBe(true);
+    });
+
+    it('writes merged result back to localStorage', async () => {
+      mockStorage['blast_discovered_combos'] = JSON.stringify(['bomb_bomb']);
+      mockFetchSuccess({ discoveredCombos: ['prism_prism'] });
+
+      renderHook(() => useBlastComboDiscovery({ userId: 'user-123' }));
+
+      await waitFor(() => {
+        const stored = JSON.parse(mockStorage['blast_discovered_combos'] ?? '[]');
+        return stored.includes('prism_prism');
+      });
+
+      const stored = JSON.parse(mockStorage['blast_discovered_combos'] ?? '[]');
+      expect(stored).toContain('bomb_bomb');
+      expect(stored).toContain('prism_prism');
+    });
+
+    it('API GET failure falls back to localStorage only (no crash)', async () => {
+      mockStorage['blast_discovered_combos'] = JSON.stringify(['bomb_bomb']);
+      mockFetchFailure();
+
+      const { result } = renderHook(() =>
+        useBlastComboDiscovery({ userId: 'user-123' }),
+      );
+
+      // Wait a tick for the effect
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      });
+
+      // Should still have localStorage data
+      expect(result.current.discoveredCombos.has('bomb_bomb')).toBe(true);
+    });
+  });
+
+  describe('Backward compatibility', () => {
+    it('calling useBlastComboDiscovery() with no args still works (unauthenticated path)', () => {
+      const { result } = renderHook(() => useBlastComboDiscovery());
+      expect(result.current.pendingDiscovery).toBeNull();
+      expect(result.current.discoveredCombos).toBeDefined();
+      expect(typeof result.current.onComboDetected).toBe('function');
+      expect(typeof result.current.acknowledgeDiscovery).toBe('function');
+    });
   });
 });
