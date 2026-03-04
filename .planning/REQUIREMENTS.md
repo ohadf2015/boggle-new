@@ -7,15 +7,15 @@
 
 ### Tile System
 
-- [ ] **TILE-01**: Rainbow tile reworked to "Rainbow Boost" — copies and doubles the best special tile effect in the word; solo = 2x word score
-- [ ] **TILE-02**: Gem tile reworked to "Treasure Gem" — 3-hit shard collector where each hit drops a visible shard; collecting all 3 in future words gives mega bonus (+25) and spawns 2 random specials
-- [ ] **TILE-03**: Magnet tile reworked to "Vortex" — pulls all tiles within radius 2 toward it (swap positions), then explodes; creates new adjacencies and word possibilities
-- [ ] **TILE-04**: Frozen tile reworked to "Frost" — 2 hits (down from 3); first hit cracks and reveals inner special tile type; second hit frees the inner tile which immediately activates
-- [ ] **TILE-05**: New "Mirror" tile added — doubles the effect of the other special tile in the word; if no other special, mirrors word score (2x); with Bomb = two explosions, with Lightning = two column clears
+- [x] **TILE-01**: Rainbow tile reworked to "Rainbow Boost" — copies and doubles the best special tile effect in the word; solo = 2x word score
+- [x] **TILE-02**: Gem tile reworked to "Treasure Gem" — 3-hit shard collector where each hit drops a visible shard; collecting all 3 in future words gives mega bonus (+25) and spawns 2 random specials
+- [x] **TILE-03**: Magnet tile reworked to "Vortex" — pulls all tiles within radius 2 toward it (swap positions), then explodes; creates new adjacencies and word possibilities
+- [x] **TILE-04**: Frozen tile reworked to "Frost" — 2 hits (down from 3); first hit cracks and reveals inner special tile type; second hit frees the inner tile which immediately activates
+- [x] **TILE-05**: New "Mirror" tile added — doubles the effect of the other special tile in the word; if no other special, mirrors word score (2x); with Bomb = two explosions, with Lightning = two column clears
 - [ ] **TILE-06**: Wildcard tile removed from tile registry and spawn distribution
-- [ ] **TILE-07**: Gold tier system implemented — Silver (1.5x), Gold (3x), Diamond (5x wave 4+ only) replacing single gold type
+- [x] **TILE-07**: Gold tier system implemented — Silver (1.5x), Gold (3x), Diamond (5x wave 4+ only) replacing single gold type
 - [ ] **TILE-08**: Tile type enum unified between singleplayer and multiplayer into single shared `BlastTileType` in `shared/types/`
-- [ ] **TILE-09**: Spawn distribution tables updated for all waves to include new/reworked tiles with balanced probabilities
+- [x] **TILE-09**: Spawn distribution tables updated for all waves to include new/reworked tiles with balanced probabilities
 - [x] **TILE-10**: Each tile type has unique idle animation in Phaser layer (breathing, wobble, shimmer, cycling, etc.)
 - [x] **TILE-11**: Each tile type has unique death/clear animation in Phaser layer (shatter, dissolve, refract, burst, etc.)
 
@@ -38,22 +38,22 @@
 
 ### Bug Fixes
 
-- [ ] **BUGF-01**: Fix lightning tile chain propagation — lightning column-clear must trigger bombs in its path (add bomb-queue check like prism has)
-- [ ] **BUGF-02**: Fix prism cross-clear chain propagation — prism detonation must trigger lightning tiles in its row/column
-- [ ] **BUGF-03**: Fix bomb double-BFS race condition — add `processedBombs` check before combo pre-clear to prevent score inflation
-- [ ] **BUGF-04**: Fix cascade word deduplication — use separate `cascadeWordsFound` set so re-formed vertical words can cascade again
-- [ ] **BUGF-05**: Fix frozen tile cascade blocking — change type check to `type === 'frozen' && hitsRemaining > 1` so cracked frost participates in cascades
-- [ ] **BUGF-06**: Fix gold stacking — make multiplicative (3x × 3x = 9x for double gold word) to reward seeking gold paths
-- [ ] **BUGF-07**: Fix cascade stale state — capture `tileStatesRef.current` at execution time, not closure capture time
-- [ ] **BUGF-08**: Fix objective guarantee clustering — use Fisher-Yates shuffle on `standardPositions` before placing objective tiles
-- [ ] **BUGF-09**: Fix objective guarantee failure — add minimum 60% standard tile ratio; reduce other special spawn rates if objectives need more specials
+- [x] **BUGF-01**: Fix lightning tile chain propagation — lightning column-clear must trigger bombs in its path (add bomb-queue check like prism has)
+- [x] **BUGF-02**: Fix prism cross-clear chain propagation — prism detonation must trigger lightning tiles in its row/column
+- [x] **BUGF-03**: Fix bomb double-BFS race condition — add `processedBombs` check before combo pre-clear to prevent score inflation
+- [x] **BUGF-04**: Fix cascade word deduplication — use separate `cascadeWordsFound` set so re-formed vertical words can cascade again
+- [x] **BUGF-05**: Fix frozen tile cascade blocking — change type check to `type === 'frozen' && hitsRemaining > 1` so cracked frost participates in cascades
+- [x] **BUGF-06**: Fix gold stacking — make multiplicative (3x × 3x = 9x for double gold word) to reward seeking gold paths
+- [x] **BUGF-07**: Fix cascade stale state — capture `tileStatesRef.current` at execution time, not closure capture time
+- [x] **BUGF-08**: Fix objective guarantee clustering — use Fisher-Yates shuffle on `standardPositions` before placing objective tiles
+- [x] **BUGF-09**: Fix objective guarantee failure — add minimum 60% standard tile ratio; reduce other special spawn rates if objectives need more specials
 
 ### Multiplayer Sync
 
-- [x] **SYNC-01**: All new/reworked tile types available in multiplayer blast games
-- [x] **SYNC-02**: Combination effects synchronized deterministically between clients
+- [ ] **SYNC-01**: All new/reworked tile types available in multiplayer blast games
+- [ ] **SYNC-02**: Combination effects synchronized deterministically between clients
 - [x] **SYNC-03**: Cascade refill uses seeded random (not Math.random()) for multiplayer determinism
-- [x] **SYNC-04**: Combo Codex progress synced to player profile (persisted in Supabase)
+- [ ] **SYNC-04**: Combo Codex progress synced to player profile (persisted in Supabase)
 
 ## Future Requirements
 
@@ -77,15 +77,15 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TILE-01 | Phase 47 | Pending |
-| TILE-02 | Phase 47 | Pending |
-| TILE-03 | Phase 47 | Pending |
-| TILE-04 | Phase 47 | Pending |
-| TILE-05 | Phase 47 | Pending |
-| TILE-06 | Phase 47 | Pending |
-| TILE-07 | Phase 47 | Pending |
-| TILE-08 | Phase 46 | Pending |
-| TILE-09 | Phase 47 | Pending |
+| TILE-01 | Phase 47 | Complete |
+| TILE-02 | Phase 47 | Complete |
+| TILE-03 | Phase 47 | Complete |
+| TILE-04 | Phase 47 | Complete |
+| TILE-05 | Phase 47 | Complete |
+| TILE-06 | Phase 53 | Pending |
+| TILE-07 | Phase 47 | Complete |
+| TILE-08 | Phase 53 | Pending |
+| TILE-09 | Phase 47 | Complete |
 | TILE-10 | Phase 51 | Complete |
 | TILE-11 | Phase 51 | Complete |
 | COMB-01 | Phase 48 | Complete |
@@ -99,23 +99,25 @@
 | PSYC-02 | Phase 50 | Complete |
 | PSYC-03 | Phase 50 | Complete |
 | PSYC-04 | Phase 50 | Complete |
-| BUGF-01 | Phase 46 | Pending |
-| BUGF-02 | Phase 46 | Pending |
-| BUGF-03 | Phase 46 | Pending |
-| BUGF-04 | Phase 46 | Pending |
-| BUGF-05 | Phase 46 | Pending |
-| BUGF-06 | Phase 46 | Pending |
-| BUGF-07 | Phase 46 | Pending |
-| BUGF-08 | Phase 46 | Pending |
-| BUGF-09 | Phase 46 | Pending |
-| SYNC-01 | Phase 52 | Complete |
-| SYNC-02 | Phase 52 | Complete |
+| BUGF-01 | Phase 46 | Complete |
+| BUGF-02 | Phase 46 | Complete |
+| BUGF-03 | Phase 46 | Complete |
+| BUGF-04 | Phase 46 | Complete |
+| BUGF-05 | Phase 46 | Complete |
+| BUGF-06 | Phase 46 | Complete |
+| BUGF-07 | Phase 46 | Complete |
+| BUGF-08 | Phase 46 | Complete |
+| BUGF-09 | Phase 46 | Complete |
+| SYNC-01 | Phase 53 | Pending |
+| SYNC-02 | Phase 54 | Pending |
 | SYNC-03 | Phase 52 | Complete |
-| SYNC-04 | Phase 52 | Complete |
+| SYNC-04 | Phase 54 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 31 total
-- Mapped to phases: 31
+- v3.0 requirements: 35 total
+- Complete: 30
+- Pending (gap closure): 5 (TILE-06, TILE-08, SYNC-01, SYNC-02, SYNC-04)
+- Mapped to phases: 35
 - Unmapped: 0 ✓
 
 ---

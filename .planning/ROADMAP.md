@@ -71,10 +71,10 @@ Plans:
 
 Plans:
 - [x] 47-01-PLAN.md — Rainbow Boost rework: amplify best special or 2x word score (TILE-01) (Wave 1)
-- [ ] 47-02-PLAN.md — Treasure Gem shard collector: 3-hit accumulation, +25 bonus, spawn 2 specials (TILE-02) (Wave 2)
-- [ ] 47-03-PLAN.md — Vortex pull+explode and Frost 2-hit reveal with inner special activation (TILE-03, TILE-04) (Wave 3)
-- [ ] 47-04-PLAN.md — Mirror tile, Wildcard removal, Silver/Gold/Diamond tier system (TILE-05, TILE-06, TILE-07) (Wave 4)
-- [ ] 47-05-PLAN.md — Updated spawn distribution tables for all waves with new tile unlock progression (TILE-09) (Wave 5)
+- [x] 47-02-PLAN.md — Treasure Gem shard collector: 3-hit accumulation, +25 bonus, spawn 2 specials (TILE-02) (Wave 2)
+- [x] 47-03-PLAN.md — Vortex pull+explode and Frost 2-hit reveal with inner special activation (TILE-03, TILE-04) (Wave 3)
+- [x] 47-04-PLAN.md — Mirror tile, Wildcard removal, Silver/Gold/Diamond tier system (TILE-05, TILE-06, TILE-07) (Wave 4)
+- [x] 47-05-PLAN.md — Updated spawn distribution tables for all waves with new tile unlock progression (TILE-09) (Wave 5)
 
 #### Phase 48: Combination System Core — Detection, Matrix, and Effects
 **Goal**: Any word containing two or more special tiles triggers a unique synergy effect from the full 28-pair combination matrix, with visuals and audio clearly distinguishing combinations from individual tile clears.
@@ -122,10 +122,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 50-01-PLAN.md — Cascade chain counter with color-escalating visuals (PSYC-01)
-- [ ] 50-02-PLAN.md — Near-miss shimmer detection and pulse animation (PSYC-02)
-- [ ] 50-03-PLAN.md — Sugar Crush end-of-level sequence (PSYC-03)
-- [ ] 50-04-PLAN.md — Invisible assist DDA: spawn probability adjustment on fail/success streaks (PSYC-04)
+- [x] 50-01-PLAN.md — Cascade chain counter with color-escalating visuals (PSYC-01)
+- [x] 50-02-PLAN.md — Near-miss shimmer detection and pulse animation (PSYC-02)
+- [x] 50-03-PLAN.md — Sugar Crush end-of-level sequence (PSYC-03)
+- [x] 50-04-PLAN.md — Invisible assist DDA: spawn probability adjustment on fail/success streaks (PSYC-04)
 
 #### Phase 51: Visual Polish — Tile Idle and Death Animations
 **Goal**: Every tile type has a distinctive personality on the board — unique idle animations make tiles feel alive before selection, and unique death animations make clearing them feel satisfying and differentiated.
@@ -137,8 +137,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 51-01-PLAN.md — Add mirror/silver/diamond to BlastTileRules + idle tweens for all tile types (TILE-10) (Wave 1)
-- [ ] 51-02-PLAN.md — Per-type death/clear animations via playClearByType() dispatch (TILE-11) (Wave 1, depends on 51-01)
+- [x] 51-01-PLAN.md — Add mirror/silver/diamond to BlastTileRules + idle tweens for all tile types (TILE-10) (Wave 1)
+- [x] 51-02-PLAN.md — Per-type death/clear animations via playClearByType() dispatch (TILE-11) (Wave 1, depends on 51-01)
 
 #### Phase 52: Multiplayer Sync — New Mechanics in Multiplayer
 **Goal**: All new tile types, combination effects, and game mechanics work correctly and deterministically in multiplayer Blast games, and Combo Codex progress persists to each player's profile.
@@ -152,10 +152,47 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 52-01-PLAN.md — Wire all new tile types into multiplayer blast game flow (SYNC-01) (Wave 1)
-- [ ] 52-02-PLAN.md — Synchronize combination effect dispatch deterministically across clients (SYNC-02) (Wave 1)
-- [ ] 52-03-PLAN.md — Replace cascade refill Math.random() with seeded random for multiplayer determinism (SYNC-03) (Wave 1)
-- [ ] 52-04-PLAN.md — Persist Combo Codex discovery progress to Supabase player profile (SYNC-04) (Wave 1)
+- [x] 52-01-PLAN.md — Wire all new tile types into multiplayer blast game flow (SYNC-01) (Wave 1)
+- [x] 52-02-PLAN.md — Synchronize combination effect dispatch deterministically across clients (SYNC-02) (Wave 1)
+- [x] 52-03-PLAN.md — Replace cascade refill Math.random() with seeded random for multiplayer determinism (SYNC-03) (Wave 1)
+- [x] 52-04-PLAN.md — Persist Combo Codex discovery progress to Supabase player profile (SYNC-04) (Wave 1)
+
+#### Phase 53: Gap Closure — Wildcard Type Cleanup
+**Goal**: The `'wildcard'` string is fully removed from `BlastTileType` union, `BLAST_TILE_TYPE_LIST`, and all downstream consumers — eliminating contradictory test assertions and preventing wildcard tile generation in multiplayer.
+**Depends on**: Phase 52
+**Requirements**: TILE-06, TILE-08, SYNC-01
+**Gap Closure**: Closes gaps from audit
+**Success Criteria** (what must be TRUE):
+  1. `BlastTileType` union has exactly 13 types (no `'wildcard'`)
+  2. `BLAST_TILE_TYPE_LIST` has length 13 with no wildcard entry
+  3. All tests pass with no contradictory wildcard assertions
+  4. `BLAST_TILE_TYPES` in multiplayer constants excludes wildcard
+**Plans**: TBD
+
+#### Phase 54: Gap Closure — Multiplayer Combo Sync + Codex Wiring
+**Goal**: Multiplayer combo flash sync works end-to-end (client A submits combo → server broadcasts → client B sees flash), and authenticated singleplayer users persist Combo Codex progress to Supabase.
+**Depends on**: Phase 53
+**Requirements**: SYNC-02, SYNC-04
+**Gap Closure**: Closes gaps from audit
+**Success Criteria** (what must be TRUE):
+  1. `submitWord` socket payload includes `comboType` when a combo is detected
+  2. Server broadcasts `blastComboSync` to other players on combo word submission
+  3. `useBlastComboDiscovery()` receives authenticated `userId` in `BlastView.tsx`
+  4. Supabase POST fires for combo discoveries by logged-in singleplayer users
+**Plans**: TBD
+
+#### Phase 55: Tech Debt & Documentation Cleanup
+**Goal**: All tech debt items from the v3.0 audit are resolved — `blastComboEffects.ts` split under 500 lines, legacy dead constants removed, lint errors fixed, and all REQUIREMENTS.md/ROADMAP.md checkboxes reflect actual status.
+**Depends on**: Phase 54
+**Requirements**: None (tech debt)
+**Gap Closure**: Closes tech debt from audit
+**Success Criteria** (what must be TRUE):
+  1. `blastComboEffects.ts` split into files each under 500 lines
+  2. Legacy constants (`RAINBOW_BONUS`, `MAGNET_RADIUS`, etc.) removed from `types.ts`
+  3. No lint errors in `blastMultiplayerConstants.ts`
+  4. All REQUIREMENTS.md checkboxes and traceability statuses match audit findings
+  5. All ROADMAP.md plan checkboxes match actual completion
+**Plans**: TBD
 
 ---
 
@@ -182,3 +219,6 @@ Plans:
 | 50. Psychological Hooks | 4/4 | Complete    | 2026-03-04 | - |
 | 51. Visual Polish — Tile Animations | 2/2 | Complete    | 2026-03-04 | - |
 | 52. Multiplayer Sync | 4/4 | Complete    | 2026-03-04 | - |
+| 53. Gap Closure — Wildcard Type Cleanup | v3.0 | 0/0 | Pending | - |
+| 54. Gap Closure — MP Combo Sync + Codex Wiring | v3.0 | 0/0 | Pending | - |
+| 55. Gap Closure — Tech Debt & Docs Cleanup | v3.0 | 0/0 | Pending | - |
