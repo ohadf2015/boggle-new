@@ -154,10 +154,10 @@ export function getEfficiencyMachineFact(
   return {
     type: 'efficiencyMachine',
     translationKey: 'wordHunt.facts.efficiencyMachine',
-    translationParams: { score: result.efficiencyScore },
+    translationParams: { score: Math.round(result.efficiencyScore) },
     icon: 'Target',
     color: 'neo-lime',
-    value: result.efficiencyScore,
+    value: Math.round(result.efficiencyScore),
   };
 }
 
@@ -217,10 +217,10 @@ export function getCloseCallFact(
   return {
     type: 'closeCall',
     translationKey: 'wordHunt.facts.closeCall',
-    translationParams: { life: result.lifeRemaining },
+    translationParams: { life: Math.round(result.lifeRemaining) },
     icon: 'HeartPulse',
     color: 'neo-pink',
-    value: result.lifeRemaining,
+    value: Math.round(result.lifeRemaining),
   };
 }
 
@@ -235,10 +235,10 @@ export function getLifeSaverFact(
   return {
     type: 'lifeSaver',
     translationKey: 'wordHunt.facts.lifeSaver',
-    translationParams: { life: result.lifeRemaining },
+    translationParams: { life: Math.round(result.lifeRemaining) },
     icon: 'Heart',
     color: 'neo-lime',
-    value: result.lifeRemaining,
+    value: Math.round(result.lifeRemaining),
   };
 }
 

@@ -21,9 +21,9 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
     return null;
   }
 
-  const percentile = stats.totalPlayers > 0
-    ? Math.round((1 - (stats.yourStats.rank - 1) / stats.totalPlayers) * 100)
-    : 0;
+  const percentile = stats.totalPlayers > 1
+    ? Math.max(1, Math.round((stats.yourStats.rank / stats.totalPlayers) * 100))
+    : 1;
 
   return (
     <motion.div
@@ -68,14 +68,26 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
         </div>
       </motion.div>
 
-      {/* Percentile pill with glow */}
+      {/* Percentile pill with glow — extra excitement for top 5% */}
       {percentile > 0 && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
+          animate={
+            percentile <= 5
+              ? { opacity: 1, scale: [0.5, 1.2, 1], y: 0 }
+              : { opacity: 1, scale: 1, y: 0 }
+          }
           transition={{ delay: 1.1, type: 'spring', stiffness: 300, damping: 18 }}
-          className="px-3 py-1 bg-neo-lime/10 border border-neo-lime/30 rounded-full text-xs font-bold text-neo-lime"
-          style={{ boxShadow: '0 0 12px rgba(191, 255, 0, 0.2)' }}
+          className={
+            percentile <= 5
+              ? 'px-4 py-1.5 bg-neo-yellow/20 border-2 border-neo-yellow/60 rounded-full text-sm font-black text-neo-yellow'
+              : 'px-3 py-1 bg-neo-lime/10 border border-neo-lime/30 rounded-full text-xs font-bold text-neo-lime'
+          }
+          style={{
+            boxShadow: percentile <= 5
+              ? '0 0 20px rgba(255, 225, 53, 0.4), 0 0 40px rgba(255, 225, 53, 0.15)'
+              : '0 0 12px rgba(191, 255, 0, 0.2)',
+          }}
         >
           {t('wordHunt.results.topPercentile').replace('{percentile}', String(percentile))}
         </motion.div>

@@ -293,6 +293,14 @@ describe('dailyWordHuntFactsCalculator', () => {
       const result = makeResult({ solved: true, lifeRemaining: undefined });
       expect(getCloseCallFact(result, makeStats())).toBeNull();
     });
+
+    it('rounds floating-point life values', () => {
+      const result = makeResult({ solved: true, lifeRemaining: 7.400000000000001 });
+      const fact = getCloseCallFact(result, makeStats());
+      expect(fact).not.toBeNull();
+      expect(fact!.translationParams.life).toBe(7);
+      expect(fact!.value).toBe(7);
+    });
   });
 
   describe('getLifeSaverFact', () => {
@@ -312,6 +320,14 @@ describe('dailyWordHuntFactsCalculator', () => {
     it('returns null when not solved', () => {
       const result = makeResult({ solved: false, lifeRemaining: 90 });
       expect(getLifeSaverFact(result, makeStats())).toBeNull();
+    });
+
+    it('rounds floating-point life values', () => {
+      const result = makeResult({ solved: true, lifeRemaining: 82.59999999999992 });
+      const fact = getLifeSaverFact(result, makeStats());
+      expect(fact).not.toBeNull();
+      expect(fact!.translationParams.life).toBe(83);
+      expect(fact!.value).toBe(83);
     });
   });
 
