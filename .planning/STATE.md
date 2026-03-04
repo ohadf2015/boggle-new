@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: completed
-stopped_at: Completed 48-04-PLAN.md
-last_updated: "2026-03-04T14:20:08.635Z"
+stopped_at: Completed 49-01-PLAN.md
+last_updated: "2026-03-04T14:46:27.113Z"
 last_activity: "2026-03-04 — 48-04 complete: BlastComboFlash tier-based overlay + audio sting callback"
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 17
+  completed_plans: 15
   percent: 98
 ---
 
@@ -60,6 +60,8 @@ Progress: [██████████] 98%
 | Phase 48 P02 | 35 | 2 tasks | 2 files |
 | Phase 48 P03 | 15 | 2 tasks | 2 files |
 | Phase 48 P04 | 7 | 2 tasks | 5 files |
+| Phase 49 P01 | 7 | 2 tasks | 8 files |
+| Phase 49 P03 | 10 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -90,6 +92,7 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - [Phase 48-03]: mirror_magnet fires two vortex pulls at both tile positions (not doubled single)
 - [Phase 48-03]: mirror_gem spawnCount=4 via new optional ComboEffectResult.spawnCount field
 - [Phase 48-04]: Tier 3 = prism_prism/prism_rainbow/lightning_prism (multiplier >= 6); onSynergyDetected fires for first combo per word only; useReducedMotion: instant onComplete no flash
+- [Phase 49]: localStorage key blast_discovered_combos stores JSON array of BlastComboType strings; discoveredCombosRef mirrors state Set to prevent stale closures; banner auto-dismisses at 1800ms normal / 300ms reduced-motion
 
 ### Pending Todos
 
@@ -103,6 +106,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T14:11:05Z
-Stopped at: Completed 48-04-PLAN.md
+Last session: 2026-03-04T14:46:19.543Z
+Stopped at: Completed 49-01-PLAN.md
 Resume file: None
