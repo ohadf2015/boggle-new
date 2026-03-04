@@ -4,6 +4,14 @@
  *
  * Inspired by Candy Crush "complexity staircase":
  * parameters ramp difficulty gradually, with new mechanics unlocking at milestones.
+ *
+ * Tile unlock progression:
+ * Wave 1: bomb, ice, gold, silver, rainbow (basics)
+ * Wave 2: + treasure gem
+ * Wave 3: + prism, mirror
+ * Wave 4: + frost, lightning, diamond
+ * Wave 5: + (all except vortex)
+ * Wave 6+: + vortex (everything)
  */
 
 export interface WaveConfig {
@@ -25,14 +33,24 @@ export interface WaveConfig {
   scoreThreshold: number | undefined;
   /** Whether lightning tiles can appear */
   lightningEnabled: boolean;
-  /** Whether magnet tiles can appear */
+  /** Whether vortex (formerly magnet) tiles can appear */
+  vortexEnabled: boolean;
+  /** @deprecated Use vortexEnabled. Kept for backward compatibility. */
   magnetEnabled: boolean;
-  /** Whether gem tiles can appear */
+  /** Whether treasure gem tiles can appear */
   gemEnabled: boolean;
   /** Whether prism tiles can appear */
   prismEnabled: boolean;
-  /** Whether frozen tiles can appear */
+  /** Whether frost (formerly frozen) tiles can appear */
+  frostEnabled: boolean;
+  /** @deprecated Use frostEnabled. Kept for backward compatibility. */
   frozenEnabled: boolean;
+  /** Whether mirror tiles can appear (unlocks wave 3) */
+  mirrorEnabled: boolean;
+  /** Whether silver tiles can appear (available from wave 1) */
+  silverEnabled: boolean;
+  /** Whether diamond tiles can appear (unlocks wave 4) */
+  diamondEnabled: boolean;
   /** Number of moves allowed per wave */
   movesAllowed: number;
 }
@@ -40,19 +58,61 @@ export interface WaveConfig {
 /** Wave parameter lookup table (1-indexed, capped at 6) */
 const WAVE_TABLE: WaveConfig[] = [
   // Placeholder index 0 (unused)
-  { minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22, vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: false, prismEnabled: false, frozenEnabled: false, movesAllowed: 20 },
-  // Wave 1 — basics only (20 moves — generous intro)
-  { minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22, vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: false, prismEnabled: false, frozenEnabled: false, movesAllowed: 20 },
-  // Wave 2 — gems unlock (18 moves)
-  { minWordLength: 2, specialTileChance: 0.17, iceDistribution: 0.20, goldDistribution: 0.20, vowelModifier: 0.95, maxCascadeChain: 2, cascadeChainBonus: 0.6, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: true, prismEnabled: false, frozenEnabled: false, movesAllowed: 18 },
-  // Wave 3 — prisms unlock (16 moves)
-  { minWordLength: 3, specialTileChance: 0.19, iceDistribution: 0.23, goldDistribution: 0.18, vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: 30, lightningEnabled: false, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: false, movesAllowed: 16 },
-  // Wave 4 — frozen + lightning unlock (15 moves)
-  { minWordLength: 3, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16, vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 50, lightningEnabled: true, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: true, movesAllowed: 15 },
-  // Wave 5 — all minus magnet (14 moves)
-  { minWordLength: 4, specialTileChance: 0.23, iceDistribution: 0.28, goldDistribution: 0.14, vowelModifier: 0.80, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 80, lightningEnabled: true, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: true, movesAllowed: 14 },
+  {
+    minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22,
+    vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
+    lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 20,
+  },
+  // Wave 1 — basics only: bomb, ice, gold, silver, rainbow (20 moves — generous intro)
+  {
+    minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22,
+    vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
+    lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 20,
+  },
+  // Wave 2 — treasure gem unlocks (18 moves)
+  {
+    minWordLength: 2, specialTileChance: 0.17, iceDistribution: 0.20, goldDistribution: 0.20,
+    vowelModifier: 0.95, maxCascadeChain: 2, cascadeChainBonus: 0.6, scoreThreshold: undefined,
+    lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 18,
+  },
+  // Wave 3 — prism + mirror unlock (16 moves)
+  {
+    minWordLength: 3, specialTileChance: 0.19, iceDistribution: 0.23, goldDistribution: 0.18,
+    vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: 30,
+    lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: false, movesAllowed: 16,
+  },
+  // Wave 4 — frost + lightning + diamond unlock (15 moves)
+  {
+    minWordLength: 3, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16,
+    vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 50,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 15,
+  },
+  // Wave 5 — all minus vortex (14 moves)
+  {
+    minWordLength: 4, specialTileChance: 0.23, iceDistribution: 0.28, goldDistribution: 0.14,
+    vowelModifier: 0.80, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 80,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 14,
+  },
   // Wave 6+ — everything unlocked (12 moves — tight, requires strategy)
-  { minWordLength: 4, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12, vowelModifier: 0.75, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 120, lightningEnabled: true, magnetEnabled: true, gemEnabled: true, prismEnabled: true, frozenEnabled: true, movesAllowed: 12 },
+  {
+    minWordLength: 4, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12,
+    vowelModifier: 0.75, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 120,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 12,
+  },
 ];
 
 /**
@@ -106,32 +166,62 @@ export function getWaveObjectives(wave: number): BlastObjective[] {
 }
 
 /** Lightning share when enabled (taken from gold + rainbow) */
-const LIGHTNING_SHARE = 0.10;
-/** Magnet share when enabled (taken from gold + rainbow) */
-const MAGNET_SHARE = 0.08;
-/** Gem share when enabled */
-const GEM_SHARE = 0.08;
+const LIGHTNING_SHARE = 0.08;
+/** Vortex share when enabled (renamed from MAGNET_SHARE; taken from gold + rainbow) */
+const VORTEX_SHARE = 0.06;
+/** Treasure gem share when enabled */
+const TREASURE_GEM_SHARE = 0.06;
 /** Prism share when enabled */
-const PRISM_SHARE = 0.08;
-/** Frozen share when enabled */
-const FROZEN_SHARE = 0.06;
+const PRISM_SHARE = 0.06;
+/** Frost share when enabled (renamed from FROZEN_SHARE) */
+const FROST_SHARE = 0.05;
+/** Mirror share when enabled (taken from gold + rainbow) */
+const MIRROR_SHARE = 0.06;
+/** Diamond share when enabled (taken from gold + rainbow) */
+const DIAMOND_SHARE = 0.04;
 
 /**
- * Build tile distribution for a wave, gating special tiles.
- * New tile types take their share from gold/rainbow proportionally.
+ * Build tile distribution for a wave, gating special tiles by unlock progression.
+ *
+ * Candy Crush staircase unlock order:
+ * Wave 1: bomb, ice, gold, silver, rainbow (no wildcard)
+ * Wave 2: + gem (treasure)
+ * Wave 3: + prism, mirror
+ * Wave 4: + frost, lightning, diamond
+ * Wave 5: (same — all except vortex)
+ * Wave 6+: + vortex
+ *
+ * New tile shares are carved from gold + rainbow proportionally via takeShare().
  * Returns a record suitable for customDistribution in BlastGameConfig.
  */
 export function getWaveDistribution(config: WaveConfig): Record<string, number> {
-  const { goldDistribution, iceDistribution, lightningEnabled, magnetEnabled, gemEnabled, prismEnabled, frozenEnabled } = config;
+  const {
+    goldDistribution, iceDistribution,
+    lightningEnabled, vortexEnabled, magnetEnabled,
+    gemEnabled, prismEnabled, frostEnabled, frozenEnabled,
+    mirrorEnabled, diamondEnabled,
+  } = config;
 
-  // Base: bomb 0.22, rainbow remainder, ice/gold from config, wildcard 0.17
+  // Effective flags (support deprecated field aliases)
+  const useVortex = vortexEnabled || magnetEnabled;
+  const useFrost = frostEnabled || frozenEnabled;
+
+  // Base wave-1 distribution: bomb=0.25, silver=0.15, rainbow=remainder, ice/gold from config
+  // No wildcard in any wave.
+  const BOMB_BASE = 0.22;
+  const SILVER_BASE = 0.15;
+
   let gold = goldDistribution;
-  let rainbow = 1.0 - goldDistribution - iceDistribution - 0.22 - 0.17; // bomb + wildcard fixed
+  // Rainbow fills the gap after all fixed allocations
+  let rainbow = 1.0 - goldDistribution - iceDistribution - BOMB_BASE - SILVER_BASE;
   let lightning = 0;
-  let magnet = 0;
+  let vortex = 0;
   let gem = 0;
   let prism = 0;
-  let frozen = 0;
+  let frost = 0;
+  let mirror = 0;
+  let diamond = 0;
+  const silver = SILVER_BASE;
 
   // Helper: take a share proportionally from gold + rainbow
   const takeShare = (share: number) => {
@@ -147,14 +237,14 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     takeShare(LIGHTNING_SHARE);
   }
 
-  if (magnetEnabled) {
-    magnet = MAGNET_SHARE;
-    takeShare(MAGNET_SHARE);
+  if (useVortex) {
+    vortex = VORTEX_SHARE;
+    takeShare(VORTEX_SHARE);
   }
 
   if (gemEnabled) {
-    gem = GEM_SHARE;
-    takeShare(GEM_SHARE);
+    gem = TREASURE_GEM_SHARE;
+    takeShare(TREASURE_GEM_SHARE);
   }
 
   if (prismEnabled) {
@@ -162,22 +252,38 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     takeShare(PRISM_SHARE);
   }
 
-  if (frozenEnabled) {
-    frozen = FROZEN_SHARE;
-    takeShare(FROZEN_SHARE);
+  if (useFrost) {
+    frost = FROST_SHARE;
+    takeShare(FROST_SHARE);
+  }
+
+  if (mirrorEnabled) {
+    mirror = MIRROR_SHARE;
+    takeShare(MIRROR_SHARE);
+  }
+
+  if (diamondEnabled) {
+    diamond = DIAMOND_SHARE;
+    takeShare(DIAMOND_SHARE);
   }
 
   const raw: Record<string, number> = {
     gold: Math.max(0, gold),
-    bomb: 0.22,
+    bomb: BOMB_BASE,
     rainbow: Math.max(0, rainbow),
     ice: iceDistribution,
-    wildcard: 0.17,
+    silver,
     lightning,
-    magnet,
+    // vortex is the renamed magnet; keep both keys for backward compatibility
+    vortex,
+    magnet: vortex,
     gem,
     prism,
-    frozen,
+    // frost is the renamed frozen; keep both keys for backward compatibility
+    frost,
+    frozen: frost,
+    mirror,
+    diamond,
   };
 
   // Normalize to sum to 1.0 (avoids drift when many tiles are enabled)
