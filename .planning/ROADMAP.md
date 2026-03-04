@@ -108,7 +108,7 @@ Plans:
 - [x] 49-02-PLAN.md — Combo Codex modal + BlastReadyScreen button (COMB-05) (Wave 2)
 - [x] 49-03-PLAN.md — Word-length scaling: getWordLengthScaleFactor + scaledRadius in combo effects (COMB-06) (Wave 1)
 - [x] 49-04-PLAN.md — Translation completeness: 25 combo names + 4 UI keys in all 4 languages (COMB-07) (Wave 3)
-- [ ] 49-05-PLAN.md — Gap closure: wire BlastComboDiscovery into gameplay (COMB-04) (Wave 4)
+- [x] 49-05-PLAN.md — Gap closure: wire BlastComboDiscovery into gameplay (COMB-04) (Wave 4)
 
 #### Phase 50: Psychological Hooks — Addiction Layer
 **Goal**: The four psychological engagement mechanics (cascade chain counter, near-miss shimmer, Sugar Crush end sequence, invisible difficulty assist) are all active, making every game session feel dynamic and "almost" achievable.
@@ -119,13 +119,13 @@ Plans:
   2. After submitting a word that misses a nearby combo or cascade opportunity, 2-3 tiles briefly pulse to hint at the missed potential
   3. When moves run out, remaining tiles convert to specials and fire in sequence with escalating intensity before the results screen
   4. After 3+ failed words the board spawns noticeably more special tiles; after a high success streak the rate normalizes
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 50-01: Implement cascade chain counter with color-escalating visuals (PSYC-01)
-- [ ] 50-02: Implement near-miss shimmer detection and pulse animation (PSYC-02)
-- [ ] 50-03: Implement Sugar Crush end-of-level sequence (PSYC-03)
-- [ ] 50-04: Implement invisible assist DDA — spawn probability adjustment on fail/success streaks (PSYC-04)
+- [ ] 50-01-PLAN.md — Cascade chain counter with color-escalating visuals (PSYC-01)
+- [ ] 50-02-PLAN.md — Near-miss shimmer detection and pulse animation (PSYC-02)
+- [ ] 50-03-PLAN.md — Sugar Crush end-of-level sequence (PSYC-03)
+- [ ] 50-04-PLAN.md — Invisible assist DDA: spawn probability adjustment on fail/success streaks (PSYC-04)
 
 #### Phase 51: Visual Polish — Tile Idle and Death Animations
 **Goal**: Every tile type has a distinctive personality on the board — unique idle animations make tiles feel alive before selection, and unique death animations make clearing them feel satisfying and differentiated.
