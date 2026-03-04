@@ -222,6 +222,6 @@ Plans:
 | 50. Psychological Hooks | 4/4 | Complete    | 2026-03-04 | - |
 | 51. Visual Polish — Tile Animations | 2/2 | Complete    | 2026-03-04 | - |
 | 52. Multiplayer Sync | 4/4 | Complete    | 2026-03-04 | - |
-| 53. Gap Closure — Wildcard Type Cleanup | v3.0 | 0/1 | Pending | - |
+| 53. Gap Closure — Wildcard Type Cleanup | 1/1 | Complete   | 2026-03-04 | - |
 | 54. Gap Closure — MP Combo Sync + Codex Wiring | v3.0 | 0/0 | Pending | - |
 | 55. Gap Closure — Tech Debt & Docs Cleanup | v3.0 | 0/0 | Pending | - |

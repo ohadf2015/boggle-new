@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: completed
-stopped_at: Completed 52-02-PLAN.md
-last_updated: "2026-03-04T18:31:38.338Z"
+stopped_at: Completed 53-01-PLAN.md
+last_updated: "2026-03-04T19:05:42.544Z"
 last_activity: "2026-03-04 — 48-04 complete: BlastComboFlash tier-based overlay + audio sting callback"
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 28
-  completed_plans: 28
+  total_phases: 10
+  completed_phases: 8
+  total_plans: 29
+  completed_plans: 29
   percent: 98
 ---
 
@@ -73,6 +73,7 @@ Progress: [██████████] 98%
 | Phase 52 P02 | 17 | 2 tasks | 11 files |
 | Phase 52 P04 | 15 | 2 tasks | 5 files |
 | Phase 52 P03 | 14 | 2 tasks | 10 files |
+| Phase 53-wildcard-type-cleanup P01 | 3 | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -129,6 +130,7 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - [Phase 52]: rng param goes AFTER spawnModifier in rollSpecialType to avoid breaking existing callers
 - [Phase 52]: [Phase 52-03]: each cascade creates fresh RNG from same seed (not stateful); boards remain client-authoritative; seeded refill reduces divergence not lockstep
 - [Phase 52-02]: Trust-client comboType: server re-broadcasts submitWord.comboType via blastComboSync room event; blastComboSync state uses unique id per event; handler filters own username to prevent double-flash
+- [Phase 53]: Phase 53: wildcard fully removed from BlastTileType union (not just spawn distribution) — type now has 13 members, BLAST_TILE_CONFIGS Exclude simplified
 
 ### Pending Todos
 
@@ -142,6 +144,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T18:26:19.201Z
-Stopped at: Completed 52-02-PLAN.md
+Last session: 2026-03-04T19:05:42.542Z
+Stopped at: Completed 53-01-PLAN.md
 Resume file: None

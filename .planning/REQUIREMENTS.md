@@ -12,9 +12,9 @@
 - [x] **TILE-03**: Magnet tile reworked to "Vortex" — pulls all tiles within radius 2 toward it (swap positions), then explodes; creates new adjacencies and word possibilities
 - [x] **TILE-04**: Frozen tile reworked to "Frost" — 2 hits (down from 3); first hit cracks and reveals inner special tile type; second hit frees the inner tile which immediately activates
 - [x] **TILE-05**: New "Mirror" tile added — doubles the effect of the other special tile in the word; if no other special, mirrors word score (2x); with Bomb = two explosions, with Lightning = two column clears
-- [ ] **TILE-06**: Wildcard tile removed from tile registry and spawn distribution
+- [x] **TILE-06**: Wildcard tile removed from tile registry and spawn distribution
 - [x] **TILE-07**: Gold tier system implemented — Silver (1.5x), Gold (3x), Diamond (5x wave 4+ only) replacing single gold type
-- [ ] **TILE-08**: Tile type enum unified between singleplayer and multiplayer into single shared `BlastTileType` in `shared/types/`
+- [x] **TILE-08**: Tile type enum unified between singleplayer and multiplayer into single shared `BlastTileType` in `shared/types/`
 - [x] **TILE-09**: Spawn distribution tables updated for all waves to include new/reworked tiles with balanced probabilities
 - [x] **TILE-10**: Each tile type has unique idle animation in Phaser layer (breathing, wobble, shimmer, cycling, etc.)
 - [x] **TILE-11**: Each tile type has unique death/clear animation in Phaser layer (shatter, dissolve, refract, burst, etc.)
@@ -50,7 +50,7 @@
 
 ### Multiplayer Sync
 
-- [ ] **SYNC-01**: All new/reworked tile types available in multiplayer blast games
+- [x] **SYNC-01**: All new/reworked tile types available in multiplayer blast games
 - [ ] **SYNC-02**: Combination effects synchronized deterministically between clients
 - [x] **SYNC-03**: Cascade refill uses seeded random (not Math.random()) for multiplayer determinism
 - [ ] **SYNC-04**: Combo Codex progress synced to player profile (persisted in Supabase)
@@ -82,9 +82,9 @@
 | TILE-03 | Phase 47 | Complete |
 | TILE-04 | Phase 47 | Complete |
 | TILE-05 | Phase 47 | Complete |
-| TILE-06 | Phase 53 | Pending |
+| TILE-06 | Phase 53 | Complete |
 | TILE-07 | Phase 47 | Complete |
-| TILE-08 | Phase 53 | Pending |
+| TILE-08 | Phase 53 | Complete |
 | TILE-09 | Phase 47 | Complete |
 | TILE-10 | Phase 51 | Complete |
 | TILE-11 | Phase 51 | Complete |
@@ -108,7 +108,7 @@
 | BUGF-07 | Phase 46 | Complete |
 | BUGF-08 | Phase 46 | Complete |
 | BUGF-09 | Phase 46 | Complete |
-| SYNC-01 | Phase 53 | Pending |
+| SYNC-01 | Phase 53 | Complete |
 | SYNC-02 | Phase 54 | Pending |
 | SYNC-03 | Phase 52 | Complete |
 | SYNC-04 | Phase 54 | Pending |
