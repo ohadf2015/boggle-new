@@ -101,13 +101,13 @@ Plans:
   2. The Combo Codex screen is accessible from the Blast mode menu and shows discovered vs. total combinations (e.g., "12/28")
   3. A 7+ letter word containing a special tile produces a visibly stronger effect than a 3-letter word with the same tile
   4. Combination names and "COMBO DISCOVERED" banner text display correctly in Hebrew, Swedish, and Japanese
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 49-01: Build combo discovery callout — 300ms freeze, banner, first-discovery persistence (COMB-04)
-- [ ] 49-02: Build Combo Codex screen — grid of 28 combos, discovered/undiscovered states, accessible from menu (COMB-05)
-- [ ] 49-03: Implement word-length scaling for tile effects — 1.0x / 1.5x / 2.0x thresholds (COMB-06)
-- [ ] 49-04: Add combination names and descriptions to all 4 language translation files (COMB-07)
+- [ ] 49-01-PLAN.md — Combo discovery callout: useBlastComboDiscovery hook + BlastComboDiscovery banner (COMB-04) (Wave 1)
+- [ ] 49-02-PLAN.md — Combo Codex modal + BlastReadyScreen button (COMB-05) (Wave 2)
+- [ ] 49-03-PLAN.md — Word-length scaling: getWordLengthScaleFactor + scaledRadius in combo effects (COMB-06) (Wave 1)
+- [ ] 49-04-PLAN.md — Translation completeness: 25 combo names + 4 UI keys in all 4 languages (COMB-07) (Wave 3)
 
 #### Phase 50: Psychological Hooks — Addiction Layer
 **Goal**: The four psychological engagement mechanics (cascade chain counter, near-miss shimmer, Sugar Crush end sequence, invisible difficulty assist) are all active, making every game session feel dynamic and "almost" achievable.
