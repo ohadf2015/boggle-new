@@ -59,7 +59,19 @@ Students learn vocabulary through engaging, competitive gameplay that makes prac
 
 <!-- Current scope. Building toward these. -->
 
-(No active requirements — next milestone not yet planned)
+**Current Milestone: v3.0 — Blast Mode Special Tiles Redesign**
+
+**Goal:** Rework the Blast mode special tile system to maximize player engagement and "one more game" addiction through a complete combination matrix, tile reworks, psychological hooks, and bug fixes.
+
+**Target features:**
+- Complete 28-pair tile combination matrix (any 2 specials in same word = synergy effect)
+- Tile reworks: Rainbow→Rainbow Boost (amplifier), Gem→Treasure Gem (shard collector), Magnet→Vortex (pull+explode), Frozen→Frost (reveals inner tile)
+- New tile: Mirror (doubles combo partner's effect)
+- Remove: Wildcard (no mechanic)
+- Combo Codex collectible screen (track discovered combos)
+- Psychological hooks: near-miss shimmer, cascade chain counter, word-length scaling, invisible assist, Sugar Crush end-of-level
+- Fix 18 identified bugs (chain propagation, cascade dedup, MP/SP divergence)
+- Multiplayer sync for all new tile mechanics
 
 ### Out of Scope
 
@@ -80,6 +92,10 @@ Students learn vocabulary through engaging, competitive gameplay that makes prac
 ## Context
 
 - **Shipped v2.0** with 10 phases, 46 plans, 200 files, +34,809 LOC
+- **Blast mode**: 11 tile types (standard, gold, bomb, rainbow, ice, wildcard, lightning, magnet, prism, gem, frozen) with incomplete combo system (9 of 55 pairs)
+- **18 bugs identified** in blast tile system: chain propagation gaps, cascade dedup, MP/SP type divergence, score calculation inconsistencies
+- **Research done**: Candy Crush / Royal Match / Toon Blast addiction mechanics analyzed; key insight: combination discovery > individual tile effects
+- **Phaser integration**: Wave 1+2 complete; BlastScene, BlastTile, GravityController, CascadeSequencer, WordPathTrail all in Phaser layer
 - Education section: 10+ pages, 50+ components, 15+ hooks
 - Modular data layer: `lib/supabase/education/` (10 modules with barrel export)
 - Backend modules: xpManager, educationXpManager, educationAchievementManager, classroomGameManager
@@ -115,6 +131,12 @@ Students learn vocabulary through engaging, competitive gameplay that makes prac
 | Assignment type unified (practice + duel) | Simpler UI, single workflow for teachers | Good |
 | Idempotency guard on XP awards | completed_at check prevents double-awarding on retry | Good |
 | RPC with backward-compatible signature | p_lesson_id DEFAULT NULL lets duel handlers keep working | Good |
+| Rainbow Boost (amplifier) over flat bonus | Copies+doubles best special in word; solo=2x. Makes rainbow the "universal enhancer" — always exciting to include | — Pending |
+| Remove Wildcard | No mechanic implemented; 17% spawn rate diluting special pool | — Pending |
+| Mirror tile (new) | Doubles combo partner's effect — creates "what if I combine X with Y?" moments | — Pending |
+| Redesign before bug fixes | New combo system will rewrite much of the buggy code anyway; avoids fixing code that gets replaced | — Pending |
+| 28-pair combination matrix | Every tile pair has defined synergy — Candy Crush's core engagement driver | — Pending |
+| Word-length scaling for tile effects | Longer words = stronger effects (1.5x at 5-6, 2x at 7+). Unique to word games, rewards vocabulary | — Pending |
 
 ---
-*Last updated: 2026-02-14 after v2.0 milestone*
+*Last updated: 2026-03-04 after v3.0 milestone start*
