@@ -31,7 +31,7 @@
 
 ### Psychological Hooks
 
-- [ ] **PSYC-01**: Cascade chain counter — escalating "CHAIN x2, CHAIN x3..." counter during cascades with progressively intense visuals (white→yellow→gold→rainbow)
+- [x] **PSYC-01**: Cascade chain counter — escalating "CHAIN x2, CHAIN x3..." counter during cascades with progressively intense visuals (white→yellow→gold→rainbow)
 - [ ] **PSYC-02**: Near-miss shimmer — after word submission, 2-3 tiles gently pulse for 1.5s if an unused cascade/combo opportunity exists nearby
 - [ ] **PSYC-03**: Sugar Crush end-of-level — remaining moves convert to random special tiles that fire in sequence with escalating visual intensity
 - [ ] **PSYC-04**: Invisible assist (DDA) — boost special tile spawn probability by 15% after 3+ failed words; reduce by 10% when success rate >80% over last 5 words
@@ -95,7 +95,7 @@
 | COMB-05 | Phase 49 | Complete |
 | COMB-06 | Phase 49 | Complete |
 | COMB-07 | Phase 49 | Complete |
-| PSYC-01 | Phase 50 | Pending |
+| PSYC-01 | Phase 50 | Complete |
 | PSYC-02 | Phase 50 | Pending |
 | PSYC-03 | Phase 50 | Pending |
 | PSYC-04 | Phase 50 | Pending |
