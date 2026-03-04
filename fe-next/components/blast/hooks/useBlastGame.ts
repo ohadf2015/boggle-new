@@ -7,6 +7,7 @@ import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
 import { detectVerticalWords } from '../utils/blastVerticalScanner';
 import { detectSpecialCombos } from '../utils/blastCombos';
+import { executeComboEffect } from '../utils/blastComboEffects';
 import type { LetterGrid } from '@/shared/types/game';
 import {
   DEFAULT_BLAST_CONFIG,
@@ -666,64 +667,14 @@ export function useBlastGame(
       if (detectedCombos.length > 0) {
         for (const combo of detectedCombos) {
           comboMultiplier *= combo.scoreMultiplier;
-          switch (combo.type) {
-            case 'bomb_bomb': {
-              const midRow = Math.round((combo.tiles[0].row + combo.tiles[1].row) / 2);
-              const midCol = Math.round((combo.tiles[0].col + combo.tiles[1].col) / 2);
-              for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
-                const r = midRow + dr, c = midCol + dc;
-                if (r >= 0 && r < gridSize && c >= 0 && c < gridSize && !next[r][c].isCleared) {
-                  if (isMultiHitAlive(next[r][c])) hitMultiHitTile(next[r][c]); else markCleared(next[r][c]);
-                }
-              }
-              newExplosions.push({ id: `combo-bb-${now}`, row: midRow, col: midCol, type: 'mega_blast', intensity: 4, timestamp: now });
-              break;
-            }
-            case 'bomb_lightning': {
-              const bt = combo.tiles.find(t => t.tileType === 'bomb')!;
-              for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
-                const col = bt.col + dc;
-                if (col < 0 || col >= gridSize) continue;
-                for (let r = 0; r < gridSize; r++) if (!next[r][col].isCleared) {
-                  if (isMultiHitAlive(next[r][col])) hitMultiHitTile(next[r][col]); else markCleared(next[r][col]);
-                }
-              }
-              newExplosions.push({ id: `combo-bl-${now}`, row: bt.row, col: bt.col, type: 'combo', intensity: 4, timestamp: now });
-              break;
-            }
-            case 'bomb_prism': {
-              const bt = combo.tiles.find(t => t.tileType === 'bomb')!;
-              for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
-                const cR = bt.row + dr, cC = bt.col + dc;
-                if (cR < 0 || cR >= gridSize || cC < 0 || cC >= gridSize) continue;
-                for (let r = 0; r < gridSize; r++) if (!next[r][cC].isCleared) { if (isMultiHitAlive(next[r][cC])) hitMultiHitTile(next[r][cC]); else markCleared(next[r][cC]); }
-                for (let c = 0; c < gridSize; c++) if (!next[cR][c].isCleared) { if (isMultiHitAlive(next[cR][c])) hitMultiHitTile(next[cR][c]); else markCleared(next[cR][c]); }
-              }
-              newExplosions.push({ id: `combo-bp-${now}`, row: bt.row, col: bt.col, type: 'combo', intensity: 4, timestamp: now });
-              break;
-            }
-            case 'lightning_lightning': {
-              const cols = new Set(path.map(p => p.col));
-              for (const col of cols) for (let r = 0; r < gridSize; r++) if (!next[r][col].isCleared) { if (isMultiHitAlive(next[r][col])) hitMultiHitTile(next[r][col]); else markCleared(next[r][col]); }
-              newExplosions.push({ id: `combo-ll-${now}`, row: combo.tiles[0].row, col: combo.tiles[0].col, type: 'combo', intensity: 4, timestamp: now });
-              break;
-            }
-            case 'lightning_prism': {
-              for (const tile of combo.tiles) for (let d = -1; d <= 1; d++) {
-                const row = tile.row + d, col = tile.col + d;
-                if (row >= 0 && row < gridSize) for (let c = 0; c < gridSize; c++) if (!next[row][c].isCleared) { if (isMultiHitAlive(next[row][c])) hitMultiHitTile(next[row][c]); else markCleared(next[row][c]); }
-                if (col >= 0 && col < gridSize) for (let r = 0; r < gridSize; r++) if (!next[r][col].isCleared) { if (isMultiHitAlive(next[r][col])) hitMultiHitTile(next[r][col]); else markCleared(next[r][col]); }
-              }
-              newExplosions.push({ id: `combo-lp-${now}`, row: combo.tiles[0].row, col: combo.tiles[0].col, type: 'combo', intensity: 4, timestamp: now });
-              break;
-            }
-            case 'prism_prism': {
-              for (let r = 0; r < gridSize; r++) for (let c = 0; c < gridSize; c++) if (!next[r][c].isCleared) markCleared(next[r][c]);
-              newExplosions.push({ id: `combo-pp-${now}`, row: 3, col: 3, type: 'total_destruction', intensity: 4, timestamp: now });
-              break;
-            }
-            default: break;
-          }
+          const effectResult = executeComboEffect({
+            combo, next, gridSize, path, now,
+            markCleared, isMultiHitAlive, hitMultiHitTile,
+          });
+          newExplosions.push(...effectResult.explosions);
+          for (const key of effectResult.processedBombKeys) processedBombs.add(key);
+          for (const key of effectResult.processedLightningKeys) processedLightning.add(key);
+          bonusScore += effectResult.bonusScore;
 
           // BUGF-03 fix: after each combo pre-clear, mark any bomb tiles in the
           // combo's tile list as processed so the main path loop won't re-queue them
