@@ -29,7 +29,6 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   gem: 2.5,
   lightning: 2,
   magnet: 1.5,
-  wildcard: 1,
   prism: 2,
   frozen: 1.5,
   mirror: 2,

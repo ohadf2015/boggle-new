@@ -37,7 +37,6 @@ const TILE_TINTS: Record<BlastTileType, number> = {
   bomb:      0xff6440, // #FF6440 — orange-red
   rainbow:   0xff64c8, // #FF64C8 — pink-magenta
   ice:       0xb4e6ff, // #B4E6FF — light ice-blue
-  wildcard:  0xc8c8ff, // #C8C8FF — soft lavender
   lightning: 0xffe100, // #FFE100 — electric yellow
   magnet:    0x8b00ff, // #8B00FF — violet
   prism:     0xff69b4, // #FF69B4 — hot pink (rainbow conic midpoint)
@@ -56,7 +55,6 @@ const TILE_BORDERS: Record<BlastTileType, number> = {
   bomb:      0xff4628,
   rainbow:   0xa855f7,
   ice:       0x96dcff,
-  wildcard:  0xffffff,
   lightning: 0xffe100,
   magnet:    0x8b00ff,
   prism:     0xffffff,
@@ -81,7 +79,6 @@ const GLOW_BASES: Record<BlastTileType, GlowBase> = {
   bomb:      { color: 0xff4628, intensity: 0.55, radius: 10 },
   rainbow:   { color: 0xa855f7, intensity: 0.5,  radius: 10 },
   ice:       { color: 0x96dcff, intensity: 0.5,  radius: 10 },
-  wildcard:  { color: 0xffffff, intensity: 0.35, radius: 8 },
   lightning: { color: 0xffe100, intensity: 0.55, radius: 10 },
   magnet:    { color: 0x8b00ff, intensity: 0.5,  radius: 10 },
   prism:     { color: 0xffffff, intensity: 0.5,  radius: 12 },
@@ -111,9 +108,8 @@ const EXPLOSION_COLORS: Record<BlastExplosion['type'], number> = {
 // ─── BLAST_TILE_CONFIGS — static lookup per special type ─────────────────────
 // Badge text extracted from BlastTileOverlay TILE_ICONS.label
 
-// Wildcard is in the BlastTileType union but is never spawned (removed in Phase 47).
-// BLAST_TILE_CONFIGS excludes both 'standard' (no overlay) and 'wildcard' (never spawned).
-export const BLAST_TILE_CONFIGS: Record<Exclude<BlastTileType, 'standard' | 'wildcard'>, BlastTileVisualConfig> = {
+// BLAST_TILE_CONFIGS excludes 'standard' (no overlay needed).
+export const BLAST_TILE_CONFIGS: Record<Exclude<BlastTileType, 'standard'>, BlastTileVisualConfig> = {
   gold:      { tint: TILE_TINTS.gold,      borderColor: TILE_BORDERS.gold,      badgeText: '3×' },
   bomb:      { tint: TILE_TINTS.bomb,      borderColor: TILE_BORDERS.bomb,      badgeText: '8' },
   rainbow:   { tint: TILE_TINTS.rainbow,   borderColor: TILE_BORDERS.rainbow,   badgeText: '+5' },

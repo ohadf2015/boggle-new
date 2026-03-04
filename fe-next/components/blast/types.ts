@@ -153,7 +153,7 @@ export const ICE_CLEAR_BONUS = 1;
 export const FROZEN_CLEAR_BONUS = 3;
 /** Magnet search radius (2 = 5×5 area) */
 export const MAGNET_RADIUS = 2;
-/** Bonus per wildcard/rainbow attracted by magnet tile (+3 per tile) */
+/** Bonus per rainbow attracted by magnet tile (+3 per tile) */
 export const MAGNET_ATTRACT_BONUS = 3;
 /** Bonus per word a prism tile is used in (before detonation) */
 export const PRISM_USE_BONUS = 2;
@@ -225,7 +225,6 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   mirror: 0,
   silver: 0,
   diamond: 0,
-  wildcard: 0,
 };
 
 // ==================== Objectives ====================
