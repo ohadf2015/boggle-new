@@ -27,6 +27,8 @@ describe('AdUnit', () => {
     // Patch push on the array to spy
     (window as any).adsbygoogle.push = pushSpy;
     mockHostname('lexiclash.com');
+    // jsdom returns 0 for offsetWidth; stub it so tryPush succeeds
+    jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(300);
   });
 
   afterEach(() => {
