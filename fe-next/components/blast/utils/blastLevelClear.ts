@@ -45,7 +45,9 @@ const TYPE_PRIORITY: BlastTileType[] = [
   'frozen',
   'ice',
   'rainbow',
-  'wildcard',
+  'mirror',
+  'silver',
+  'diamond',
 ];
 
 // ─── Public API ─────────────────────────────────────────────────────────────
