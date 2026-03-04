@@ -78,12 +78,23 @@ export function generateBlastLetter(language: Language, vowelModifier = 1.0): st
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-/** Roll for special tile type, or return 'standard'. Accepts optional custom distribution. */
+/**
+ * Roll for special tile type, or return 'standard'.
+ * @param specialTileChance - Base probability of a special tile [0, 1]
+ * @param customDistribution - Optional override distribution
+ * @param spawnModifier - DDA modifier from getDDASpawnModifier(); clamped so effective chance stays in [0.05, 0.95]
+ */
 export function rollSpecialType(
   specialTileChance: number,
   customDistribution?: Record<string, number>,
+  spawnModifier = 0,
 ): BlastTileType {
-  if (Math.random() >= specialTileChance) return 'standard';
+  // Apply DDA modifier with clamping only when a modifier is present.
+  // Without modifier the base chance is used as-is (preserves existing behaviour).
+  const effectiveChance = spawnModifier !== 0
+    ? Math.min(0.95, Math.max(0.05, specialTileChance + spawnModifier))
+    : specialTileChance;
+  if (Math.random() >= effectiveChance) return 'standard';
 
   const dist = customDistribution ?? SPECIAL_TILE_DISTRIBUTION;
   const roll = Math.random();
