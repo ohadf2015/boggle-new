@@ -2,6 +2,21 @@ import type { Language } from '@/shared/types/game';
 import { SPECIAL_TILE_DISTRIBUTION, type BlastTileType } from '../types';
 
 /**
+ * Mulberry32 seeded PRNG — fast, high-quality 32-bit generator.
+ * Returns a function that produces values in [0, 1) identically for the same seed.
+ * Used in multiplayer blast to ensure deterministic tile refills across clients.
+ */
+export function createSeededRandom(seed: number): () => number {
+  let s = seed >>> 0;
+  return function mulberry32(): number {
+    s |= 0; s = s + 0x6D2B79F5 | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
  * Letter frequency weights per language.
  * Extracted from lib/adventure/gridGenerator.ts for reuse in blast refill.
  */
@@ -72,10 +87,12 @@ function getPool(language: Language, vowelModifier = 1.0): string[] {
 /**
  * Generate a weighted random letter for the given language.
  * @param vowelModifier - Multiplier for vowel frequency (1.0 = normal, lower = fewer vowels)
+ * @param rng - Optional random number generator; defaults to Math.random (singleplayer).
+ *              Pass a seeded RNG (via createSeededRandom) for deterministic multiplayer refills.
  */
-export function generateBlastLetter(language: Language, vowelModifier = 1.0): string {
+export function generateBlastLetter(language: Language, vowelModifier = 1.0, rng: () => number = Math.random): string {
   const pool = getPool(language, vowelModifier);
-  return pool[Math.floor(Math.random() * pool.length)];
+  return pool[Math.floor(rng() * pool.length)];
 }
 
 /**
@@ -83,21 +100,24 @@ export function generateBlastLetter(language: Language, vowelModifier = 1.0): st
  * @param specialTileChance - Base probability of a special tile [0, 1]
  * @param customDistribution - Optional override distribution
  * @param spawnModifier - DDA modifier from getDDASpawnModifier(); clamped so effective chance stays in [0.05, 0.95]
+ * @param rng - Optional random number generator; defaults to Math.random (singleplayer).
+ *              Pass a seeded RNG (via createSeededRandom) for deterministic multiplayer refills.
  */
 export function rollSpecialType(
   specialTileChance: number,
   customDistribution?: Record<string, number>,
   spawnModifier = 0,
+  rng: () => number = Math.random,
 ): BlastTileType {
   // Apply DDA modifier with clamping only when a modifier is present.
   // Without modifier the base chance is used as-is (preserves existing behaviour).
   const effectiveChance = spawnModifier !== 0
     ? Math.min(0.95, Math.max(0.05, specialTileChance + spawnModifier))
     : specialTileChance;
-  if (Math.random() >= effectiveChance) return 'standard';
+  if (rng() >= effectiveChance) return 'standard';
 
   const dist = customDistribution ?? SPECIAL_TILE_DISTRIBUTION;
-  const roll = Math.random();
+  const roll = rng();
   let cumulative = 0;
   for (const [tileType, weight] of Object.entries(dist)) {
     if (weight <= 0) continue;
