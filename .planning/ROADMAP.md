@@ -182,7 +182,10 @@ Plans:
   2. Server broadcasts `blastComboSync` to other players on combo word submission
   3. `useBlastComboDiscovery()` receives authenticated `userId` in `BlastView.tsx`
   4. Supabase POST fires for combo discoveries by logged-in singleplayer users
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 54-01-PLAN.md — Wire comboType into submitWord emit + pass userId to useBlastComboDiscovery (SYNC-02, SYNC-04) (Wave 1)
 
 #### Phase 55: Tech Debt & Documentation Cleanup
 **Goal**: All tech debt items from the v3.0 audit are resolved — `blastComboEffects.ts` split under 500 lines, legacy dead constants removed, lint errors fixed, and all REQUIREMENTS.md/ROADMAP.md checkboxes reflect actual status.
@@ -223,5 +226,5 @@ Plans:
 | 51. Visual Polish — Tile Animations | 2/2 | Complete    | 2026-03-04 | - |
 | 52. Multiplayer Sync | 4/4 | Complete    | 2026-03-04 | - |
 | 53. Gap Closure — Wildcard Type Cleanup | 1/1 | Complete    | 2026-03-04 | - |
-| 54. Gap Closure — MP Combo Sync + Codex Wiring | v3.0 | 0/0 | Pending | - |
+| 54. Gap Closure — MP Combo Sync + Codex Wiring | v3.0 | 0/1 | Pending | - |
 | 55. Gap Closure — Tech Debt & Docs Cleanup | v3.0 | 0/0 | Pending | - |
