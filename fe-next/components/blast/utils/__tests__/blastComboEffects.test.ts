@@ -553,5 +553,7 @@ describe('executeComboEffect', () => {
     expect(result.processedBombKeys).toEqual([]);
   });
 
+  // ── Task 2: Mirror, Magnet, Gem, Frozen cross-type combos ─────────────────
+
 
 });
