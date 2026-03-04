@@ -1,10 +1,11 @@
 import { executeComboEffect, type ComboEffectContext } from '../blastComboEffects';
-import type { BlastTileState, BlastTileType } from '../../types';
-import type { SpecialCombo } from '../blastCombos';
 import {
+  type BlastTileState,
+  type BlastTileType,
   TREASURE_GEM_COMPLETION_BONUS,
   FROST_REVEAL_BONUS,
 } from '../../types';
+import type { SpecialCombo } from '../blastCombos';
 
 // ==================== Helpers ====================
 
@@ -555,5 +556,125 @@ describe('executeComboEffect', () => {
 
   // ── Task 2: Mirror, Magnet, Gem, Frozen cross-type combos ─────────────────
 
+  // ── mirror_magnet (Dual Vortex) ───────────────────────────────────────────
+
+  it('mirror_magnet: fires vortex at BOTH mirror and magnet positions (2 explosions)', () => {
+    const grid = makeGrid([
+      { row: 1, col: 1, type: 'mirror' },
+      { row: 4, col: 4, type: 'magnet' },
+    ]);
+    const combo = makeCombo('mirror_magnet', [
+      { row: 1, col: 1, tileType: 'mirror' },
+      { row: 4, col: 4, tileType: 'magnet' },
+    ], 5);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    // Two separate vortex centers → two explosion events
+    expect(result.explosions.length).toBe(2);
+  });
+
+  // ── mirror_gem (Twin Gems) ────────────────────────────────────────────────
+
+  it('mirror_gem: clears gem tile and awards 2x TREASURE_GEM_COMPLETION_BONUS', () => {
+    const grid = makeGrid([
+      { row: 2, col: 2, type: 'mirror' },
+      { row: 3, col: 3, type: 'gem', hitsRemaining: 3 },
+    ]);
+    const combo = makeCombo('mirror_gem', [
+      { row: 2, col: 2, tileType: 'mirror' },
+      { row: 3, col: 3, tileType: 'gem' },
+    ], 5);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[3][3].isCleared).toBe(true);
+    expect(result.bonusScore).toBe(2 * TREASURE_GEM_COMPLETION_BONUS);
+    expect(result.spawnCount).toBe(4);
+  });
+
+  // ── mirror_frozen (Mirror Frost) ──────────────────────────────────────────
+
+  it('mirror_frozen: removes 2 hits from frost tile (hitsRemaining 2 → cleared)', () => {
+    const grid = makeGrid([
+      { row: 1, col: 1, type: 'mirror' },
+      { row: 2, col: 3, type: 'frozen', hitsRemaining: 2 },
+    ]);
+    const combo = makeCombo('mirror_frozen', [
+      { row: 1, col: 1, tileType: 'mirror' },
+      { row: 2, col: 3, tileType: 'frozen' },
+    ], 4);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[2][3].isCleared).toBe(true);
+    expect(result.bonusScore).toBe(2 * FROST_REVEAL_BONUS);
+  });
+
+  it('mirror_frozen: removes 2 hits from frost tile (hitsRemaining 1 → max(0) → cleared)', () => {
+    const grid = makeGrid([
+      { row: 0, col: 0, type: 'mirror' },
+      { row: 0, col: 5, type: 'frozen', hitsRemaining: 1 },
+    ]);
+    const combo = makeCombo('mirror_frozen', [
+      { row: 0, col: 0, tileType: 'mirror' },
+      { row: 0, col: 5, tileType: 'frozen' },
+    ], 4);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[0][5].hitsRemaining).toBe(0);
+    expect(grid[0][5].isCleared).toBe(true);
+    expect(result.bonusScore).toBe(2 * FROST_REVEAL_BONUS);
+  });
+
+  // ── magnet_gem (Gem Suction) ──────────────────────────────────────────────
+
+  it('magnet_gem: completes ALL gem tiles on board with bonus per gem', () => {
+    const grid = makeGrid([
+      { row: 0, col: 0, type: 'magnet' },
+      { row: 1, col: 1, type: 'gem', hitsRemaining: 3 },
+      { row: 3, col: 3, type: 'gem', hitsRemaining: 3 },
+      { row: 5, col: 5, type: 'gem', hitsRemaining: 3 },
+    ]);
+    const combo = makeCombo('magnet_gem', [
+      { row: 0, col: 0, tileType: 'magnet' },
+      { row: 1, col: 1, tileType: 'gem' },
+    ], 5);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[1][1].isCleared).toBe(true);
+    expect(grid[3][3].isCleared).toBe(true);
+    expect(grid[5][5].isCleared).toBe(true);
+    // 3 gems × TREASURE_GEM_COMPLETION_BONUS + vortex bonuses
+    expect(result.bonusScore).toBeGreaterThanOrEqual(3 * TREASURE_GEM_COMPLETION_BONUS);
+  });
+
+  // ── magnet_frozen (Frost Vortex) ──────────────────────────────────────────
+
+  it('magnet_frozen: vortex pull and advances all frost tiles by 1 hit', () => {
+    const grid = makeGrid([
+      { row: 3, col: 3, type: 'magnet' },
+      { row: 0, col: 0, type: 'frozen', hitsRemaining: 2 },
+      { row: 5, col: 5, type: 'frozen', hitsRemaining: 1 },
+    ]);
+    const combo = makeCombo('magnet_frozen', [
+      { row: 3, col: 3, tileType: 'magnet' },
+      { row: 0, col: 0, tileType: 'frozen' },
+    ], 4);
+    executeComboEffect(makeCtx(grid, combo));
+    // First frost (hitsRemaining 2 → 1 after hit)
+    expect(grid[0][0].hitsRemaining).toBe(1);
+    // Second frost (hitsRemaining 1 → 0 → cleared)
+    expect(grid[5][5].isCleared).toBe(true);
+  });
+
+  // ── gem_frozen (Crystal Prison) ───────────────────────────────────────────
+
+  it('gem_frozen: completes gem AND frees frost simultaneously with combined bonus', () => {
+    const grid = makeGrid([
+      { row: 2, col: 2, type: 'gem', hitsRemaining: 3 },
+      { row: 4, col: 4, type: 'frozen', hitsRemaining: 2 },
+    ]);
+    const combo = makeCombo('gem_frozen', [
+      { row: 2, col: 2, tileType: 'gem' },
+      { row: 4, col: 4, tileType: 'frozen' },
+    ], 4);
+    const result = executeComboEffect(makeCtx(grid, combo));
+    expect(grid[2][2].isCleared).toBe(true);
+    expect(grid[4][4].isCleared).toBe(true);
+    expect(result.bonusScore).toBe(TREASURE_GEM_COMPLETION_BONUS + FROST_REVEAL_BONUS);
+  });
 
 });

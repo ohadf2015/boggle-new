@@ -1,7 +1,6 @@
-import type { BlastTileState } from '../types';
-import type { BlastExplosion } from '../types';
-import type { SpecialCombo } from './blastCombos';
 import {
+  type BlastTileState,
+  type BlastExplosion,
   BOMB_RADIUS,
   VORTEX_PULL_RADIUS,
   VORTEX_EXPLODE_RADIUS,
@@ -11,6 +10,7 @@ import {
   RAINBOW_BOOST_MULTIPLIER,
   FROST_REVEAL_BONUS,
 } from '../types';
+import type { SpecialCombo } from './blastCombos';
 
 // ==================== Types ====================
 
@@ -42,6 +42,8 @@ export interface ComboEffectResult {
   processedLightningKeys: string[];
   /** Additional bonus score from this combo effect */
   bonusScore: number;
+  /** Optional: number of specials to spawn after this combo (e.g. mirror_gem doubles output) */
+  spawnCount?: number;
 }
 
 // ==================== Helpers ====================
@@ -448,6 +450,114 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
       fireCrossClear(pt2.row, pt2.col, ctx);
       fireCrossClear(pt2.row, pt2.col, ctx);
       pushExplosion(`combo-pmr-${now}`, pt2.row, pt2.col, result, now);
+      break;
+    }
+
+    // ── 48-03: Mirror, Magnet, Gem, Frozen cross-type combos ─────────────────
+
+    case 'mirror_magnet': {
+      // Dual Vortex: vortex pull+explode at BOTH magnet and mirror positions
+      const mmMagnet = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[1];
+      const mmMirror = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[0];
+      if (!mmMagnet || !mmMirror) break;
+      fireVortex(mmMagnet.row, mmMagnet.col, VORTEX_PULL_RADIUS, result, ctx);
+      pushExplosion(`combo-mma-${now}`, mmMagnet.row, mmMagnet.col, result, now);
+      fireVortex(mmMirror.row, mmMirror.col, VORTEX_PULL_RADIUS, result, ctx);
+      pushExplosion(`combo-mmb-${now}`, mmMirror.row, mmMirror.col, result, now);
+      break;
+    }
+
+    case 'mirror_gem': {
+      // Twin Gems: complete gem + 2x bonus + spawnCount 4 (mirror doubles)
+      const mgMirrorT = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[0];
+      const mgGemT = combo.tiles.find(t => t.tileType === 'gem') ?? combo.tiles[1];
+      if (!mgMirrorT) break;
+      if (mgGemT) {
+        const gemTile3 = next[mgGemT.row]?.[mgGemT.col];
+        if (gemTile3) { gemTile3.hitsRemaining = 0; ctx.markCleared(gemTile3); }
+      }
+      result.bonusScore += 2 * TREASURE_GEM_COMPLETION_BONUS;
+      result.spawnCount = 4;
+      pushExplosion(`combo-mg-${now}`, mgMirrorT.row, mgMirrorT.col, result, now);
+      break;
+    }
+
+    case 'mirror_frozen': {
+      // Mirror Frost: remove 2 hits from frost tile (mirror doubles the hit)
+      const mfMirrorT = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[0];
+      const mfFrostT = combo.tiles.find(t => t.tileType === 'frozen') ?? combo.tiles[1];
+      if (!mfMirrorT) break;
+      if (mfFrostT) {
+        const frostTile = next[mfFrostT.row]?.[mfFrostT.col];
+        if (frostTile && !frostTile.isCleared) {
+          frostTile.hitsRemaining = Math.max(0, frostTile.hitsRemaining - 2);
+          if (frostTile.hitsRemaining === 0) ctx.markCleared(frostTile);
+        }
+      }
+      result.bonusScore += 2 * FROST_REVEAL_BONUS;
+      pushExplosion(`combo-mf-${now}`, mfMirrorT.row, mfMirrorT.col, result, now);
+      break;
+    }
+
+    case 'magnet_gem': {
+      // Gem Suction: complete ALL gem tiles on board + vortex pull
+      const mgMagnetT = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[0];
+      if (!mgMagnetT) break;
+      for (let r = 0; r < gridSize; r++) {
+        for (let c = 0; c < gridSize; c++) {
+          const tile = next[r][c];
+          if (tile.type === 'gem' && !tile.isCleared) {
+            tile.hitsRemaining = 0;
+            ctx.markCleared(tile);
+            result.bonusScore += TREASURE_GEM_COMPLETION_BONUS;
+          }
+        }
+      }
+      fireVortex(mgMagnetT.row, mgMagnetT.col, VORTEX_PULL_RADIUS, result, ctx);
+      pushExplosion(`combo-mgg-${now}`, mgMagnetT.row, mgMagnetT.col, result, now);
+      break;
+    }
+
+    case 'magnet_frozen': {
+      // Frost Vortex: vortex pull toward magnet + advance all frost tiles by 1 hit
+      const mfMagnetT = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[0];
+      if (!mfMagnetT) break;
+      fireVortex(mfMagnetT.row, mfMagnetT.col, VORTEX_PULL_RADIUS, result, ctx);
+      for (let r = 0; r < gridSize; r++) {
+        for (let c = 0; c < gridSize; c++) {
+          const tile = next[r][c];
+          if (tile.type === 'frozen' && !tile.isCleared) {
+            ctx.hitMultiHitTile(tile);
+            if (tile.hitsRemaining <= 0) ctx.markCleared(tile);
+          }
+        }
+      }
+      pushExplosion(`combo-mfz-${now}`, mfMagnetT.row, mfMagnetT.col, result, now);
+      break;
+    }
+
+    case 'gem_frozen': {
+      // Crystal Prison: complete gem + free frost simultaneously with combined bonus
+      const gfGemT = combo.tiles.find(t => t.tileType === 'gem') ?? combo.tiles[0];
+      const gfFrostT = combo.tiles.find(t => t.tileType === 'frozen') ?? combo.tiles[1];
+      if (gfGemT) {
+        const gemTile4 = next[gfGemT.row]?.[gfGemT.col];
+        if (gemTile4 && !gemTile4.isCleared) {
+          gemTile4.hitsRemaining = 0;
+          ctx.markCleared(gemTile4);
+          result.bonusScore += TREASURE_GEM_COMPLETION_BONUS;
+        }
+      }
+      if (gfFrostT) {
+        const frostTile2 = next[gfFrostT.row]?.[gfFrostT.col];
+        if (frostTile2 && !frostTile2.isCleared) {
+          frostTile2.hitsRemaining = 0;
+          ctx.markCleared(frostTile2);
+          result.bonusScore += FROST_REVEAL_BONUS;
+        }
+      }
+      const gfRef = gfGemT ?? gfFrostT ?? combo.tiles[0];
+      if (gfRef) pushExplosion(`combo-gf-${now}`, gfRef.row, gfRef.col, result, now);
       break;
     }
 
