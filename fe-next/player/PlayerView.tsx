@@ -751,6 +751,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           isReady={isLobbyReady}
           readyUsernames={lobbyReadyUsernames}
           onNameChange={handleNameChange}
+          showReadyToggle={wasInActiveGame}
         />
     );
   }

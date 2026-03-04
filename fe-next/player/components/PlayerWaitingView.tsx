@@ -44,6 +44,8 @@ interface PlayerWaitingViewProps {
   readyUsernames?: string[];
   /** Called when guest changes their display name */
   onNameChange?: (newName: string) => void;
+  /** Whether to show the ready toggle (only between games, not first lobby) */
+  showReadyToggle?: boolean;
 }
 
 // Avatar color palette (matches host view)
@@ -65,6 +67,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   isReady = false,
   readyUsernames = [],
   onNameChange,
+  showReadyToggle = false,
 }): React.ReactElement => {
   const { isAuthenticated } = useAuth();
   // Filter out host from player roster - players shouldn't see the host as a fellow player
@@ -193,28 +196,30 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         <IdleMascot baseVariant="waving" size="sm" />
       </div>
 
-      {/* Ready Button */}
-      <motion.button
-        data-testid="ready-button"
-        onClick={onToggleReady}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-        className={cn(
-          'w-full p-4 rounded-neo border-3 border-neo-black shadow-hard-sm font-bold text-lg uppercase transition-colors',
-          isReady
-            ? 'bg-neo-lime text-neo-black'
-            : 'bg-white/10 text-neo-cream hover:bg-white/20'
-        )}
-      >
-        <div className="flex items-center justify-center gap-2">
-          {isReady && <Check className="w-5 h-5" />}
-          <span>
-            {isReady
-              ? (t('playerView.readyConfirmed') || 'Ready!')
-              : (t('playerView.readyUp') || 'Ready Up!')}
-          </span>
-        </div>
-      </motion.button>
+      {/* Ready Button - only between games, not for first lobby */}
+      {showReadyToggle && (
+        <motion.button
+          data-testid="ready-button"
+          onClick={onToggleReady}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          className={cn(
+            'w-full p-4 rounded-neo border-3 border-neo-black shadow-hard-sm font-bold text-lg uppercase transition-colors',
+            isReady
+              ? 'bg-neo-lime text-neo-black'
+              : 'bg-white/10 text-neo-cream hover:bg-white/20'
+          )}
+        >
+          <div className="flex items-center justify-center gap-2">
+            {isReady && <Check className="w-5 h-5" />}
+            <span>
+              {isReady
+                ? (t('playerView.readyConfirmed') || 'Ready!')
+                : (t('playerView.readyUp') || 'Ready Up!')}
+            </span>
+          </div>
+        </motion.button>
+      )}
 
       {/* Waiting hint */}
       <p className="text-sm text-center text-slate-400">

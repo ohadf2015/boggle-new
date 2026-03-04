@@ -85,6 +85,7 @@ const defaultProps = {
   onToggleReady: jest.fn(),
   isReady: false,
   readyUsernames: [] as string[],
+  showReadyToggle: true,
 };
 
 describe('PlayerWaitingView', () => {
@@ -95,6 +96,11 @@ describe('PlayerWaitingView', () => {
 
   // Both desktop and mobile render the same content, so use getAllBy for duplicated elements
   describe('Ready Button', () => {
+    it('should not render ready button for first game lobby', () => {
+      render(<PlayerWaitingView {...defaultProps} showReadyToggle={false} />);
+      expect(screen.queryByTestId('ready-button')).not.toBeInTheDocument();
+    });
+
     it('should render ready buttons (desktop + mobile)', () => {
       render(<PlayerWaitingView {...defaultProps} />);
       const buttons = screen.getAllByTestId('ready-button');
