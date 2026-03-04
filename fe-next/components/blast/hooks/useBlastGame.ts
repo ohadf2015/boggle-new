@@ -7,7 +7,6 @@ import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
 import { detectVerticalWords } from '../utils/blastVerticalScanner';
 import { detectSpecialCombos } from '../utils/blastCombos';
-import { GameBridge } from '@/lib/phaser/bridge/GameBridge';
 import type { LetterGrid } from '@/shared/types/game';
 import {
   DEFAULT_BLAST_CONFIG,
@@ -45,6 +44,7 @@ import {
 } from '../types';
 import { useBlastCascade, type BlastCascadePhase, type CascadeAnimationData } from './useBlastCascade';
 import { getInitialHitsRemaining } from '../utils/blastTileUtils';
+import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { calculateBonusMoves, calculateLeftoverMoveBonus } from '../utils/blastMoveUtils';
 
@@ -163,6 +163,8 @@ export interface UseBlastGameOptions {
   onAutoCascadeWord?: (word: string, score: number, chainLevel: number) => void;
   /** Number of moves allowed for this wave (from WaveConfig.movesAllowed) */
   movesAllowed?: number;
+  /** Wave objectives — when provided, board generation guarantees enough tiles for collect_type/clear_all_type objectives */
+  waveObjectives?: import('../types').BlastObjective[];
 }
 
 // ==================== Hook ====================
@@ -195,10 +197,13 @@ export function useBlastGame(
   // Mutable grid state — updated after each cascade completes
   const [currentGrid, setCurrentGrid] = useState<LetterGrid | null>(null);
 
-  // Tile state management
-  const [tileStates, setTileStates] = useState<BlastTileState[][]>(() =>
-    generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution)
-  );
+  // Tile state management — guarantee objective tiles are present on the board
+  const [tileStates, setTileStates] = useState<BlastTileState[][]>(() => {
+    const tiles = generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution);
+    return options?.waveObjectives
+      ? guaranteeObjectiveTiles(tiles, options.waveObjectives)
+      : tiles;
+  });
 
   // Move limit from options (default: unlimited via high number)
   const movesAllowed = options?.movesAllowed ?? Infinity;
@@ -536,6 +541,9 @@ export function useBlastGame(
       // BFS bomb queue (shared across path and prism cross-clear)
       const bombQueue: Array<{ row: number; col: number; depth: number }> = [];
       const processedBombs = new Set<string>();
+      // Tracks lightning tiles already triggered (prevents double column-clear when
+      // a lightning tile is in both the row and column of a prism cross-clear)
+      const processedLightning = new Set<string>();
 
       // ── Combo detection ──────────────────────────────────────────────────
       const detectedCombos = detectSpecialCombos(path, next);
@@ -601,7 +609,6 @@ export function useBlastGame(
             }
             default: break;
           }
-          GameBridge.emit('blast:combo:trigger', { comboType: combo.type, tiles: combo.tiles.map(t => ({ row: t.row, col: t.col })), label: combo.label, clearedCount: newlyClearedCount });
         }
         bonusScore += baseScore * (comboMultiplier - 1);
       }
@@ -622,8 +629,8 @@ export function useBlastGame(
           continue; // Don't clear yet
         }
 
-        markCleared(tile);
         tile.activationEffect = tile.type !== 'standard' ? tile.type : null;
+        markCleared(tile);
 
         switch (tile.type) {
           case 'gold':
@@ -633,15 +640,16 @@ export function useBlastGame(
               row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now,
             });
             // Separate gold multiplier popup at the gold tile position
-            setScorePopups(prev => [...prev, {
+            const goldPopup = {
               id: `gold-bonus-${now}-${cell.row}-${cell.col}`,
               score: baseScore * (GOLD_MULTIPLIER - 1),
               row: cell.row,
               col: cell.col,
               isSpecial: true,
               timestamp: now,
-              tileType: 'gold',
-            }]);
+              tileType: 'gold' as const,
+            };
+            setScorePopups(prev => [...prev, goldPopup]);
             break;
 
           case 'bomb': {
@@ -691,6 +699,25 @@ export function useBlastGame(
                   processedBombs.add(`${cell.row},${c}`);
                   bombQueue.push({ row: cell.row, col: c, depth: 0 });
                 }
+                // BUGF-02 fix: prism cross-clear hitting a lightning tile triggers its column-clear
+                if (target.type === 'lightning' && !processedLightning.has(`${cell.row},${c}`)) {
+                  processedLightning.add(`${cell.row},${c}`);
+                  for (let lr = 0; lr < gridSize; lr++) {
+                    if (lr === cell.row) continue;
+                    const ltarget = next[lr][c];
+                    if (ltarget.isCleared) continue;
+                    if (isMultiHitAlive(ltarget)) {
+                      hitMultiHitTile(ltarget);
+                    } else {
+                      markCleared(ltarget);
+                      bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
+                      if (ltarget.type === 'bomb' && !processedBombs.has(`${lr},${c}`)) {
+                        processedBombs.add(`${lr},${c}`);
+                        bombQueue.push({ row: lr, col: c, depth: 0 });
+                      }
+                    }
+                  }
+                }
               }
             }
             // Cross-clear column
@@ -705,6 +732,25 @@ export function useBlastGame(
                 if (target.type === 'bomb' && !processedBombs.has(`${r},${cell.col}`)) {
                   processedBombs.add(`${r},${cell.col}`);
                   bombQueue.push({ row: r, col: cell.col, depth: 0 });
+                }
+                // BUGF-02 fix: prism cross-clear hitting a lightning tile triggers its column-clear
+                if (target.type === 'lightning' && !processedLightning.has(`${r},${cell.col}`)) {
+                  processedLightning.add(`${r},${cell.col}`);
+                  for (let lr = 0; lr < gridSize; lr++) {
+                    if (lr === r) continue;
+                    const ltarget = next[lr][cell.col];
+                    if (ltarget.isCleared) continue;
+                    if (isMultiHitAlive(ltarget)) {
+                      hitMultiHitTile(ltarget);
+                    } else {
+                      markCleared(ltarget);
+                      bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
+                      if (ltarget.type === 'bomb' && !processedBombs.has(`${lr},${cell.col}`)) {
+                        processedBombs.add(`${lr},${cell.col}`);
+                        bombQueue.push({ row: lr, col: cell.col, depth: 0 });
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -740,6 +786,11 @@ export function useBlastGame(
               } else {
                 markCleared(target);
                 bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
+                // BUGF-01 fix: lightning column-clear hitting a bomb triggers its detonation
+                if (target.type === 'bomb' && !processedBombs.has(`${r},${cell.col}`)) {
+                  processedBombs.add(`${r},${cell.col}`);
+                  bombQueue.push({ row: r, col: cell.col, depth: 0 });
+                }
               }
             }
             break;
@@ -820,14 +871,15 @@ export function useBlastGame(
       // Create score popup at the mid-point of the word path
       if (path.length > 0) {
         const midIdx = Math.floor(path.length / 2);
-        setScorePopups(prev => [...prev, {
+        const mainPopup = {
           id: `score-${now}-${path[midIdx].row}-${path[midIdx].col}`,
           score: totalScore,
           row: path[midIdx].row,
           col: path[midIdx].col,
           isSpecial: bonusScore > 0,
           timestamp: now,
-        }]);
+        };
+        setScorePopups(prev => [...prev, mainPopup]);
       }
 
       if (word.length > bestWordRef.current.length) {
