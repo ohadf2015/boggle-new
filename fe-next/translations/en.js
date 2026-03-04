@@ -317,6 +317,10 @@ const en = {
   "game": {
     "comboHint": "Find words fast for combo!"
   },
+  "leadChange": {
+    "tookLead": "You're in the lead!",
+    "lostLead": "{{username}} took the lead!"
+  },
   "countdown": {
     "hint": "Swipe letters to form words!"
   },
@@ -3598,6 +3602,23 @@ const en = {
   "wordHunt": {
     "title": "Word Hunt",
     "alreadyGuessed": "Already tried that!",
+    "guessTarget": "Guess the target word",
+    "found": "Found it!",
+    "foundTarget": "found the target word",
+    "submit": "Submit",
+    "lifeBar": "Life bar",
+    "multiplayer": {
+      "targetWord": "Target Word",
+      "firstFinder": "First Finder!",
+      "found": "Found!",
+      "notFound": "Not Found",
+      "survivalTime": "Survival Time",
+      "discoveryWords": "Words Found",
+      "lifePoints": "Life Points",
+      "eliminated": "Eliminated",
+      "guessTarget": "Guess Target",
+      "submit": "Submit Guess",
+    },
     "shareResult": "Share",
     "quitConfirmTitle": "Leave the Hunt?",
     "quitConfirmMessage": "Your progress will be lost!",
@@ -5526,10 +5547,23 @@ const en = {
     "totalScore": "Total",
     "waveBreakdown": "Wave Breakdown",
     "wavesCompleted": "Waves",
+    "multiplayer": {
+      "moves": "Moves",
+      "bonusMove": "Bonus Move!",
+      "tileBonus": "Tile Bonus",
+      "tilesCleared": "Tiles Cleared",
+      "moveCounter": "Move Counter",
+    },
     "ready": {
       "title": "Blast Mode",
       "subtitle": "Clear tiles by forming words. Chain combos for big scores!",
       "play": "Blast Off!",
+      "step1Title": "Swipe Words",
+      "step1Desc": "Drag across adjacent letters to form words",
+      "step2Title": "Power Tiles",
+      "step2Desc": "Special tiles explode, freeze, and multiply your score",
+      "step3Title": "Beat the Wave",
+      "step3Desc": "Complete objectives before you run out of moves",
       "difficulty": "Difficulty",
       "tileGuide": "Tile Guide",
       "wave2Plus": "Wave 2+",
@@ -6937,6 +6971,11 @@ const en = {
     random: "Random",
     nextMode: "Next Mode",
     randomizing: "Randomizing..."
+  },
+  "presets": {
+    "fast": "Quick",
+    "party": "Party",
+    "challenge": "Challenge"
   }
 };
 

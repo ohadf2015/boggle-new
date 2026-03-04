@@ -317,6 +317,10 @@ const ja = {
   "game": {
     "comboHint": "素早く単語を見つけてコンボ！"
   },
+  "leadChange": {
+    "tookLead": "トップに立った！",
+    "lostLead": "{{username}}がトップに！"
+  },
   "countdown": {
     "hint": "スワイプして単語を作ろう！"
   },
@@ -3539,6 +3543,23 @@ const ja = {
   "wordHunt": {
     "title": "ワードハント",
     "alreadyGuessed": "その単語は既に推測されています！",
+    "guessTarget": "ターゲットワードを推測",
+    "found": "見つけた！",
+    "foundTarget": "ターゲットワードを見つけました",
+    "submit": "送信",
+    "lifeBar": "ライフバー",
+    "multiplayer": {
+      "targetWord": "ターゲットワード",
+      "firstFinder": "最初の発見者！",
+      "found": "発見！",
+      "notFound": "未発見",
+      "survivalTime": "生存時間",
+      "discoveryWords": "発見した単語",
+      "lifePoints": "ライフポイント",
+      "eliminated": "脱落",
+      "guessTarget": "ターゲットを推測",
+      "submit": "推測を送信",
+    },
     "shareResult": "結果をシェア",
     "quitConfirmTitle": "ハントを終了する？",
     "quitConfirmMessage": "進行状況が失われます！",
@@ -5485,10 +5506,23 @@ const ja = {
     "totalScore": "合計",
     "waveBreakdown": "ウェーブ詳細",
     "wavesCompleted": "ウェーブ",
+    "multiplayer": {
+      "moves": "手数",
+      "bonusMove": "ボーナスムーブ！",
+      "tileBonus": "タイルボーナス",
+      "tilesCleared": "クリアしたタイル",
+      "moveCounter": "手数カウンター",
+    },
     "ready": {
       "title": "ブラストモード",
       "subtitle": "単語を作ってタイルをクリア。コンボをつなげて高得点！",
       "play": "ブラスト開始！",
+      "step1Title": "単語をスワイプ",
+      "step1Desc": "隣り合う文字をなぞって単語を作ろう",
+      "step2Title": "パワータイル",
+      "step2Desc": "特殊タイルは爆発、凍結、スコア倍増の効果あり",
+      "step3Title": "ウェーブ突破",
+      "step3Desc": "手数がなくなる前にミッションを達成しよう",
       "difficulty": "難易度",
       "tileGuide": "タイルガイド",
       "wave2Plus": "ウェーブ2以降",
@@ -6854,6 +6888,11 @@ const ja = {
     random: "ランダム",
     nextMode: "次のモード",
     randomizing: "ランダム選択中..."
+  },
+  "presets": {
+    "fast": "クイック",
+    "party": "パーティー",
+    "challenge": "チャレンジ"
   }
 };
 

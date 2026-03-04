@@ -3425,6 +3425,23 @@ const es = {
   "wordHunt": {
     "title": "Caza de Palabras",
     "alreadyGuessed": "¡Ya adivinaste esa palabra!",
+    "guessTarget": "Adivina la palabra objetivo",
+    "found": "¡Encontrada!",
+    "foundTarget": "encontró la palabra objetivo",
+    "submit": "Enviar",
+    "lifeBar": "Barra de vida",
+    "multiplayer": {
+      "targetWord": "Palabra Objetivo",
+      "firstFinder": "¡Primer Descubridor!",
+      "found": "¡Encontrada!",
+      "notFound": "No Encontrada",
+      "survivalTime": "Tiempo de Supervivencia",
+      "discoveryWords": "Palabras Encontradas",
+      "lifePoints": "Puntos de Vida",
+      "eliminated": "Eliminado",
+      "guessTarget": "Adivinar Objetivo",
+      "submit": "Enviar Intento",
+    },
     "shareResult": "Compartir Resultado",
     "quitConfirmTitle": "¿Abandonar la cacería?",
     "quitConfirmMessage": "¡Perderás tu progreso!",
@@ -5394,7 +5411,25 @@ const es = {
     "needScore": "Necesitas {score}",
     "totalScore": "Total",
     "waveBreakdown": "Desglose de oleadas",
-    "wavesCompleted": "Oleadas"
+    "wavesCompleted": "Oleadas",
+    "multiplayer": {
+      "moves": "Movimientos",
+      "bonusMove": "Movimiento Extra!",
+      "tileBonus": "Bonus de Ficha",
+      "tilesCleared": "Fichas Limpiadas",
+      "moveCounter": "Contador de Movimientos",
+    },
+    "ready": {
+      "title": "Modo Blast",
+      "subtitle": "¡Limpia fichas formando palabras. Encadena combos para grandes puntuaciones!",
+      "play": "¡A jugar!",
+      "step1Title": "Desliza palabras",
+      "step1Desc": "Arrastra sobre letras adyacentes para formar palabras",
+      "step2Title": "Fichas de poder",
+      "step2Desc": "Las fichas especiales explotan, congelan y multiplican tu puntuación",
+      "step3Title": "Supera la oleada",
+      "step3Desc": "Completa objetivos antes de quedarte sin movimientos"
+    }
   },
   "student": {
     "dashboard": {
@@ -6465,6 +6500,11 @@ const es = {
     "random": "Aleatorio",
     "nextMode": "Siguiente modo",
     "randomizing": "Aleatorizando..."
+  },
+  "presets": {
+    "fast": "Rápido",
+    "party": "Fiesta",
+    "challenge": "Desafío"
   }
 };
 

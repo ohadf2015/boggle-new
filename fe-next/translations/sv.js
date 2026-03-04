@@ -317,6 +317,10 @@ const sv = {
   "game": {
     "comboHint": "Hitta ord snabbt för kombo!"
   },
+  "leadChange": {
+    "tookLead": "Du leder!",
+    "lostLead": "{{username}} tog ledningen!"
+  },
   "countdown": {
     "hint": "Svep bokstäver för att bilda ord!"
   },
@@ -3490,6 +3494,23 @@ const sv = {
   "wordHunt": {
     "title": "Ordjakt",
     "alreadyGuessed": "Du har redan gissat det ordet!",
+    "guessTarget": "Gissa målordet",
+    "found": "Hittad!",
+    "foundTarget": "hittade målordet",
+    "submit": "Skicka",
+    "lifeBar": "Livstapel",
+    "multiplayer": {
+      "targetWord": "Målord",
+      "firstFinder": "Första hittaren!",
+      "found": "Hittad!",
+      "notFound": "Ej hittad",
+      "survivalTime": "Överlevnadstid",
+      "discoveryWords": "Hittade ord",
+      "lifePoints": "Livspoäng",
+      "eliminated": "Eliminerad",
+      "guessTarget": "Gissa målordet",
+      "submit": "Skicka gissning",
+    },
     "shareResult": "Dela resultat",
     "quitConfirmTitle": "Lämna jakten?",
     "quitConfirmMessage": "Du förlorar dina framsteg!",
@@ -5436,10 +5457,23 @@ const sv = {
     "totalScore": "Totalt",
     "waveBreakdown": "Vågöversikt",
     "wavesCompleted": "Vågor",
+    "multiplayer": {
+      "moves": "Drag",
+      "bonusMove": "Bonusdrag!",
+      "tileBonus": "Brickbonus",
+      "tilesCleared": "Rensade brickor",
+      "moveCounter": "Dragräknare",
+    },
     "ready": {
       "title": "Blast-läge",
       "subtitle": "Rensa brickor genom att bilda ord. Kedjekombos ger stora poäng!",
       "play": "Sätt igång!",
+      "step1Title": "Svep ord",
+      "step1Desc": "Dra över intilliggande bokstäver för att bilda ord",
+      "step2Title": "Kraftbrickor",
+      "step2Desc": "Specialbrickor spränger, fryser och multiplicerar din poäng",
+      "step3Title": "Klara vågen",
+      "step3Desc": "Slutför mål innan dragen tar slut",
       "difficulty": "Svårighetsgrad",
       "tileGuide": "Brickguide",
       "wave2Plus": "Våg 2+",
@@ -6828,6 +6862,11 @@ const sv = {
     random: "Slumpmässigt",
     nextMode: "Nästa läge",
     randomizing: "Slumpar..."
+  },
+  "presets": {
+    "fast": "Snabb",
+    "party": "Fest",
+    "challenge": "Utmaning"
   }
 };
 

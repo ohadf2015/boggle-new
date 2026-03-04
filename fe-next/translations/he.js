@@ -317,6 +317,10 @@ const he = {
   "game": {
     "comboHint": "מצא מילים מהר לקומבו!"
   },
+  "leadChange": {
+    "tookLead": "אתם מובילים!",
+    "lostLead": "{{username}} תפס את ההובלה!"
+  },
   "countdown": {
     "hint": "גררו אותיות כדי ליצור מילים!"
   },
@@ -3494,6 +3498,23 @@ const he = {
   "wordHunt": {
     "title": "ציד מילים",
     "alreadyGuessed": "כבר ניחשת את המילה הזאת!",
+    "guessTarget": "נחש את מילת היעד",
+    "found": "מצאת!",
+    "foundTarget": "מצא את מילת היעד",
+    "submit": "שלח",
+    "lifeBar": "סרגל חיים",
+    "multiplayer": {
+      "targetWord": "מילת היעד",
+      "firstFinder": "מוצא ראשון!",
+      "found": "נמצא!",
+      "notFound": "לא נמצא",
+      "survivalTime": "זמן הישרדות",
+      "discoveryWords": "מילים שנמצאו",
+      "lifePoints": "נקודות חיים",
+      "eliminated": "הודח",
+      "guessTarget": "נחשו את היעד",
+      "submit": "שליחת ניחוש",
+    },
     "shareResult": "שתפו תוצאה",
     "quitConfirmTitle": "לעזוב את הציד?",
     "quitConfirmMessage": "ההתקדמות שלך תאבד!",
@@ -5411,10 +5432,23 @@ const he = {
     "totalScore": "סה\"כ",
     "waveBreakdown": "פירוט גלים",
     "wavesCompleted": "גלים",
+    "multiplayer": {
+      "moves": "מהלכים",
+      "bonusMove": "מהלך בונוס!",
+      "tileBonus": "בונוס אריח",
+      "tilesCleared": "אריחים שנוקו",
+      "moveCounter": "מונה מהלכים",
+    },
     "ready": {
       "title": "מצב פיצוץ",
       "subtitle": "נקה אריחים ביצירת מילים. שרשר קומבו לניקוד גדול!",
       "play": "יאללה!",
+      "step1Title": "החליקו מילים",
+      "step1Desc": "גררו על אותיות סמוכות ליצירת מילים",
+      "step2Title": "אריחי כוח",
+      "step2Desc": "אריחים מיוחדים מתפוצצים, מקפיאים ומכפילים ניקוד",
+      "step3Title": "נצחו את הגל",
+      "step3Desc": "השלימו משימות לפני שנגמרים המהלכים",
       "difficulty": "רמת קושי",
       "tileGuide": "מדריך אריחים",
       "wave2Plus": "גל 2+",
@@ -6830,6 +6864,11 @@ const he = {
     random: "אקראי",
     nextMode: "מצב הבא",
     randomizing: "מגריל..."
+  },
+  "presets": {
+    "fast": "מהיר",
+    "party": "מסיבה",
+    "challenge": "אתגר"
   }
 };
 
