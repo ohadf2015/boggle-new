@@ -170,7 +170,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 53-01-PLAN.md — Remove wildcard from BlastTileType union, Records, and test assertions (TILE-06, TILE-08, SYNC-01) (Wave 1)
+- [x] 53-01-PLAN.md — Remove wildcard from BlastTileType union, Records, and test assertions (TILE-06, TILE-08, SYNC-01) (Wave 1)
 
 #### Phase 54: Gap Closure — Multiplayer Combo Sync + Codex Wiring
 **Goal**: Multiplayer combo flash sync works end-to-end (client A submits combo → server broadcasts → client B sees flash), and authenticated singleplayer users persist Combo Codex progress to Supabase.
@@ -185,7 +185,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 54-01-PLAN.md — Wire comboType into submitWord emit + pass userId to useBlastComboDiscovery (SYNC-02, SYNC-04) (Wave 1)
+- [x] 54-01-PLAN.md — Wire comboType into submitWord emit + pass userId to useBlastComboDiscovery (SYNC-02, SYNC-04) (Wave 1)
 
 #### Phase 55: Tech Debt & Documentation Cleanup
 **Goal**: All tech debt items from the v3.0 audit are resolved — `blastComboEffects.ts` split under 500 lines, legacy dead constants removed, lint errors fixed, and all REQUIREMENTS.md/ROADMAP.md checkboxes reflect actual status.
@@ -198,7 +198,11 @@ Plans:
   3. No lint errors in `blastMultiplayerConstants.ts`
   4. All REQUIREMENTS.md checkboxes and traceability statuses match audit findings
   5. All ROADMAP.md plan checkboxes match actual completion
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 55-01-PLAN.md — Remove dead constants + fix lint duplicate-import errors (Wave 1)
+- [ ] 55-02-PLAN.md — Update REQUIREMENTS.md and ROADMAP.md stale entries (Wave 1)
 
 ---
 
@@ -227,4 +231,4 @@ Plans:
 | 52. Multiplayer Sync | 4/4 | Complete    | 2026-03-04 | - |
 | 53. Gap Closure — Wildcard Type Cleanup | 1/1 | Complete    | 2026-03-04 | - |
 | 54. Gap Closure — MP Combo Sync + Codex Wiring | 1/1 | Complete    | 2026-03-04 | - |
-| 55. Gap Closure — Tech Debt & Docs Cleanup | v3.0 | 0/0 | Pending | - |
+| 55. Tech Debt & Docs Cleanup | v3.0 | 0/2 | Pending | - |
