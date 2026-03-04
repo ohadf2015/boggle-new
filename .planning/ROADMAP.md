@@ -87,10 +87,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 48-01-PLAN.md — Expand detection to 28 pairs + extract combo effect executor from useBlastGame (COMB-01) (Wave 1)
-- [ ] 48-02-PLAN.md — Implement combo effects: Bomb/Lightning/Prism/Rainbow pairs (12 effects) (COMB-02) (Wave 2)
-- [ ] 48-03-PLAN.md — Implement combo effects: Vortex/Frost/Mirror/Gem pairs (10 effects) (COMB-02) (Wave 2)
-- [ ] 48-04-PLAN.md — BlastComboFlash visual overlay + audio sting callback (COMB-03) (Wave 3)
+- [x] 48-01-PLAN.md — Expand detection to 28 pairs + extract combo effect executor from useBlastGame (COMB-01) (Wave 1)
+- [x] 48-02-PLAN.md — Implement combo effects: Bomb/Lightning/Prism/Rainbow pairs (12 effects) (COMB-02) (Wave 2)
+- [x] 48-03-PLAN.md — Implement combo effects: Vortex/Frost/Mirror/Gem pairs (10 effects) (COMB-02) (Wave 2)
+- [x] 48-04-PLAN.md — BlastComboFlash visual overlay + audio sting callback (COMB-03) (Wave 3)
 
 #### Phase 49: Combination UX — Discovery, Codex, Scaling, Translations
 **Goal**: Players are rewarded for discovering new combinations with a dramatic first-time callout, can browse their discovery progress in the Combo Codex, receive stronger effects for longer words, and all combination text is translated.

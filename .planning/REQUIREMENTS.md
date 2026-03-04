@@ -23,7 +23,7 @@
 
 - [x] **COMB-01**: Combination detection system — when a word path contains 2+ special tiles, a synergy effect triggers based on the tile pair
 - [x] **COMB-02**: Full 28-pair combination matrix implemented with unique effects for every special tile pairing
-- [ ] **COMB-03**: Combination effects visually distinct from individual tile effects (bigger particles, screen effects, unique audio stings)
+- [x] **COMB-03**: Combination effects visually distinct from individual tile effects (bigger particles, screen effects, unique audio stings)
 - [ ] **COMB-04**: Combo Discovery callout — first time any combination fires, brief gameplay freeze (300ms) + "COMBO DISCOVERED: [name]!" banner with unique icon
 - [ ] **COMB-05**: Combo Codex collectible screen — tracks discovered combos (e.g., "12/28 combos discovered") accessible from Blast mode menu
 - [ ] **COMB-06**: Word-length scaling for tile effects — 3-4 letter word = base effect; 5-6 = 1.5x effect (larger radius/more columns); 7+ = 2x effect
@@ -90,7 +90,7 @@
 | TILE-11 | Phase 51 | Pending |
 | COMB-01 | Phase 48 | Complete |
 | COMB-02 | Phase 48 | Complete |
-| COMB-03 | Phase 48 | Pending |
+| COMB-03 | Phase 48 | Complete |
 | COMB-04 | Phase 49 | Pending |
 | COMB-05 | Phase 49 | Pending |
 | COMB-06 | Phase 49 | Pending |
