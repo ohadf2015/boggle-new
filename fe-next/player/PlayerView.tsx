@@ -747,11 +747,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}
           onConfirmExit={confirmExitRoom}
-          onToggleReady={handleToggleLobbyReady}
-          isReady={isLobbyReady}
-          readyUsernames={lobbyReadyUsernames}
           onNameChange={handleNameChange}
-          showReadyToggle={wasInActiveGame}
         />
     );
   }

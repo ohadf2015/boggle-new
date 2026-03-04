@@ -36,16 +36,8 @@ interface PlayerWaitingViewProps {
   setShowExitConfirm: (show: boolean) => void;
   onExitRoom: () => void;
   onConfirmExit: () => void;
-  /** Called when player toggles their ready state */
-  onToggleReady?: () => void;
-  /** Whether this player is currently ready */
-  isReady?: boolean;
-  /** Usernames of players who have marked themselves ready */
-  readyUsernames?: string[];
   /** Called when guest changes their display name */
   onNameChange?: (newName: string) => void;
-  /** Whether to show the ready toggle (only between games, not first lobby) */
-  showReadyToggle?: boolean;
 }
 
 // Avatar color palette (matches host view)
@@ -63,11 +55,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   setShowExitConfirm,
   onExitRoom,
   onConfirmExit,
-  onToggleReady,
-  isReady = false,
-  readyUsernames = [],
   onNameChange,
-  showReadyToggle = false,
 }): React.ReactElement => {
   const { isAuthenticated } = useAuth();
   // Filter out host from player roster - players shouldn't see the host as a fellow player
@@ -76,7 +64,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     return !isHostPlayer;
   });
   const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - nonHostPlayers.length);
-  const readySet = new Set(readyUsernames);
 
   // Guest name editing state
   const [isEditingName, setIsEditingName] = useState(false);
@@ -106,7 +93,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             const isHostPlayer = typeof player === 'object' ? player.isHost : false;
             const isBot = typeof player === 'object' ? player.isBot : false;
             const isMe = name === username;
-            const isPlayerReady = readySet.has(name);
 
             return (
               <motion.div
@@ -149,15 +135,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                       <Bot className="w-3 h-3 text-neo-black" />
                     </div>
                   )}
-                  {/* Ready indicator */}
-                  {isPlayerReady && !isHostPlayer && (
-                    <div
-                      data-testid={`ready-indicator-${name}`}
-                      className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center"
-                    >
-                      <Check className="w-3 h-3 text-neo-black" />
-                    </div>
-                  )}
                 </div>
                 <span className="text-[11px] font-bold truncate w-16 text-center text-neo-cream">
                   {name}
@@ -196,30 +173,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         <IdleMascot baseVariant="waving" size="sm" />
       </div>
 
-      {/* Ready Button - only between games, not for first lobby */}
-      {showReadyToggle && (
-        <motion.button
-          data-testid="ready-button"
-          onClick={onToggleReady}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          className={cn(
-            'w-full p-4 rounded-neo border-3 border-neo-black shadow-hard-sm font-bold text-lg uppercase transition-colors',
-            isReady
-              ? 'bg-neo-lime text-neo-black'
-              : 'bg-white/10 text-neo-cream hover:bg-white/20'
-          )}
-        >
-          <div className="flex items-center justify-center gap-2">
-            {isReady && <Check className="w-5 h-5" />}
-            <span>
-              {isReady
-                ? (t('playerView.readyConfirmed') || 'Ready!')
-                : (t('playerView.readyUp') || 'Ready Up!')}
-            </span>
-          </div>
-        </motion.button>
-      )}
+      {/* Ready button removed from lobby - players only mark ready on the results page */}
 
       {/* Waiting hint */}
       <p className="text-sm text-center text-slate-400">

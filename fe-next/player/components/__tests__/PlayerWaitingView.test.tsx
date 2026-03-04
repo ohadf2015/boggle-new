@@ -82,10 +82,6 @@ const defaultProps = {
   setShowExitConfirm: jest.fn(),
   onExitRoom: jest.fn(),
   onConfirmExit: jest.fn(),
-  onToggleReady: jest.fn(),
-  isReady: false,
-  readyUsernames: [] as string[],
-  showReadyToggle: true,
 };
 
 describe('PlayerWaitingView', () => {
@@ -94,58 +90,10 @@ describe('PlayerWaitingView', () => {
     mockIsAuthenticated = false;
   });
 
-  // Both desktop and mobile render the same content, so use getAllBy for duplicated elements
   describe('Ready Button', () => {
-    it('should not render ready button for first game lobby', () => {
-      render(<PlayerWaitingView {...defaultProps} showReadyToggle={false} />);
-      expect(screen.queryByTestId('ready-button')).not.toBeInTheDocument();
-    });
-
-    it('should render ready buttons (desktop + mobile)', () => {
+    it('should not render ready button in lobby (ready only on results page)', () => {
       render(<PlayerWaitingView {...defaultProps} />);
-      const buttons = screen.getAllByTestId('ready-button');
-      expect(buttons.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('should show not-ready state by default', () => {
-      render(<PlayerWaitingView {...defaultProps} isReady={false} />);
-      const buttons = screen.getAllByTestId('ready-button');
-      expect(buttons[0]).toHaveTextContent('playerView.readyUp');
-    });
-
-    it('should show ready state when isReady is true', () => {
-      render(<PlayerWaitingView {...defaultProps} isReady={true} />);
-      const buttons = screen.getAllByTestId('ready-button');
-      expect(buttons[0]).toHaveTextContent('playerView.readyConfirmed');
-    });
-
-    it('should call onToggleReady when clicked', () => {
-      const onToggleReady = jest.fn();
-      render(<PlayerWaitingView {...defaultProps} onToggleReady={onToggleReady} />);
-      const buttons = screen.getAllByTestId('ready-button');
-      fireEvent.click(buttons[0]);
-      expect(onToggleReady).toHaveBeenCalledTimes(1);
-    });
-
-    it('should show ready indicators on players who are ready', () => {
-      render(
-        <PlayerWaitingView
-          {...defaultProps}
-          readyUsernames={['Player2']}
-        />
-      );
-      const indicators = screen.getAllByTestId('ready-indicator-Player2');
-      expect(indicators.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('should not show ready indicator for players who are not ready', () => {
-      render(
-        <PlayerWaitingView
-          {...defaultProps}
-          readyUsernames={['Player2']}
-        />
-      );
-      expect(screen.queryByTestId('ready-indicator-TestPlayer')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('ready-button')).not.toBeInTheDocument();
     });
   });
 
