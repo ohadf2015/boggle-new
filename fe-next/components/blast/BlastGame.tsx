@@ -22,6 +22,7 @@ import type { BlastGameConfig, BlastResultsData } from './types';
 import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
+import { useBlastComboSync } from '@/hooks/gameState';
 
 interface BlastGameProps {
   config: BlastGameConfig;
@@ -41,6 +42,11 @@ interface BlastGameProps {
   pendingDiscovery?: BlastComboType | null;
   /** Clears pendingDiscovery after banner auto-dismisses */
   acknowledgeDiscovery?: () => void;
+  /**
+   * Multiplayer: called when local player submits a word with a detected combo.
+   * Parent can use this to include comboType in the socket submitWord emit.
+   */
+  onWordWithComboType?: (word: string, comboType: string | null) => void;
 }
 
 /**
@@ -61,6 +67,7 @@ export function BlastGame({
   onComboDetected,
   pendingDiscovery,
   acknowledgeDiscovery,
+  onWordWithComboType,
 }: BlastGameProps) {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
@@ -144,6 +151,18 @@ export function BlastGame({
     blast.endGame();
   }, [blast]);
 
+  // Multiplayer combo sync — show another player's combo flash when blastComboSync fires.
+  // blastComboSync is set by usePlayerGameEvents when the server broadcasts the event.
+  // Each new sync has a unique id so this effect fires once per event.
+  const blastComboSync = useBlastComboSync();
+  useEffect(() => {
+    if (blastComboSync) {
+      blast.triggerComboFlash(blastComboSync.comboType);
+    }
+  // Only fire when a new combo sync arrives (id is unique per event)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blastComboSync?.id]);
+
   // Near-miss shimmer (psychological hook: shows what the player almost got)
   const nearMiss = useBlastNearMiss();
 
@@ -216,6 +235,10 @@ export function BlastGame({
   // Track last submitted path for tile clearing
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
 
+  // Ref to onWordWithComboType — avoids stale closure in handleWordAccepted
+  const onWordWithComboTypeRef = useRef(onWordWithComboType);
+  useEffect(() => { onWordWithComboTypeRef.current = onWordWithComboType; }, [onWordWithComboType]);
+
   // Direct callback when a word is accepted
   const handleWordAccepted = useCallback((data: { word: string; score: number }) => {
     // Check for bonus moves from long words
@@ -232,6 +255,12 @@ export function BlastGame({
       // Detect whether the submitted word triggered a combo (used to skip near-miss shimmer)
       const detectedCombos = detectSpecialCombos(path, blast.tileStates);
       const hadCombo = detectedCombos.length > 0;
+
+      // Report detected comboType to parent for multiplayer socket emit
+      if (onWordWithComboTypeRef.current) {
+        const comboType = detectedCombos.length > 0 ? detectedCombos[0].type : null;
+        onWordWithComboTypeRef.current(data.word, comboType);
+      }
 
       blast.clearTilesForWord(path, data.word, data.score);
       lastPathRef.current = [];

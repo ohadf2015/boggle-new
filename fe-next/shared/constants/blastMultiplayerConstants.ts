@@ -4,7 +4,7 @@
  */
 
 import { BLAST_TILE_TYPE_LIST } from '@/shared/types/blast';
-import type { BlastTileType } from '@/shared/types/blast';
+import type { BlastTileType } from '@/shared/types/blast'; // eslint-disable-line no-duplicate-imports
 
 export const BLAST_BONUS_MOVE_COMBO_THRESHOLD = 3;
 export const BLAST_SPECIAL_TILE_CHANCE = 0.15;
