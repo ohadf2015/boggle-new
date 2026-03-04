@@ -112,8 +112,10 @@ export interface BlastResultsData {
 export const GOLD_MULTIPLIER = 3;
 /** Number of adjacent cells a bomb clears */
 export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
-/** Bonus score for rainbow tiles */
+/** Bonus score for rainbow tiles (legacy — replaced by RAINBOW_BOOST_MULTIPLIER) */
 export const RAINBOW_BONUS = 5;
+/** Multiplier applied by Rainbow Boost: copies and doubles the best special's effect, or doubles word score solo */
+export const RAINBOW_BOOST_MULTIPLIER = 2;
 /** Stagger delay (ms) between chain bomb explosions for visual ripple */
 export const CHAIN_BOMB_STAGGER = 120;
 /** Bonus per tile cleared by bomb area blast (+1 per tile) */
