@@ -1,0 +1,89 @@
+# Requirements: LexiClash v3.0 — Blast Mode Special Tiles Redesign
+
+**Defined:** 2026-03-04
+**Core Value:** Special tile combinations create emergent spectacle that drives "one more game" addiction through discovery, chain reactions, and psychological hooks.
+
+## v3.0 Requirements
+
+### Tile System
+
+- [ ] **TILE-01**: Rainbow tile reworked to "Rainbow Boost" — copies and doubles the best special tile effect in the word; solo = 2x word score
+- [ ] **TILE-02**: Gem tile reworked to "Treasure Gem" — 3-hit shard collector where each hit drops a visible shard; collecting all 3 in future words gives mega bonus (+25) and spawns 2 random specials
+- [ ] **TILE-03**: Magnet tile reworked to "Vortex" — pulls all tiles within radius 2 toward it (swap positions), then explodes; creates new adjacencies and word possibilities
+- [ ] **TILE-04**: Frozen tile reworked to "Frost" — 2 hits (down from 3); first hit cracks and reveals inner special tile type; second hit frees the inner tile which immediately activates
+- [ ] **TILE-05**: New "Mirror" tile added — doubles the effect of the other special tile in the word; if no other special, mirrors word score (2x); with Bomb = two explosions, with Lightning = two column clears
+- [ ] **TILE-06**: Wildcard tile removed from tile registry and spawn distribution
+- [ ] **TILE-07**: Gold tier system implemented — Silver (1.5x), Gold (3x), Diamond (5x wave 4+ only) replacing single gold type
+- [ ] **TILE-08**: Tile type enum unified between singleplayer and multiplayer into single shared `BlastTileType` in `shared/types/`
+- [ ] **TILE-09**: Spawn distribution tables updated for all waves to include new/reworked tiles with balanced probabilities
+- [ ] **TILE-10**: Each tile type has unique idle animation in Phaser layer (breathing, wobble, shimmer, cycling, etc.)
+- [ ] **TILE-11**: Each tile type has unique death/clear animation in Phaser layer (shatter, dissolve, refract, burst, etc.)
+
+### Combination System
+
+- [ ] **COMB-01**: Combination detection system — when a word path contains 2+ special tiles, a synergy effect triggers based on the tile pair
+- [ ] **COMB-02**: Full 28-pair combination matrix implemented with unique effects for every special tile pairing
+- [ ] **COMB-03**: Combination effects visually distinct from individual tile effects (bigger particles, screen effects, unique audio stings)
+- [ ] **COMB-04**: Combo Discovery callout — first time any combination fires, brief gameplay freeze (300ms) + "COMBO DISCOVERED: [name]!" banner with unique icon
+- [ ] **COMB-05**: Combo Codex collectible screen — tracks discovered combos (e.g., "12/28 combos discovered") accessible from Blast mode menu
+- [ ] **COMB-06**: Word-length scaling for tile effects — 3-4 letter word = base effect; 5-6 = 1.5x effect (larger radius/more columns); 7+ = 2x effect
+- [ ] **COMB-07**: Combination names and descriptions translated in all 4 languages (EN, HE, SV, JA)
+
+### Psychological Hooks
+
+- [ ] **PSYC-01**: Cascade chain counter — escalating "CHAIN x2, CHAIN x3..." counter during cascades with progressively intense visuals (white→yellow→gold→rainbow)
+- [ ] **PSYC-02**: Near-miss shimmer — after word submission, 2-3 tiles gently pulse for 1.5s if an unused cascade/combo opportunity exists nearby
+- [ ] **PSYC-03**: Sugar Crush end-of-level — remaining moves convert to random special tiles that fire in sequence with escalating visual intensity
+- [ ] **PSYC-04**: Invisible assist (DDA) — boost special tile spawn probability by 15% after 3+ failed words; reduce by 10% when success rate >80% over last 5 words
+
+### Bug Fixes
+
+- [ ] **BUGF-01**: Fix lightning tile chain propagation — lightning column-clear must trigger bombs in its path (add bomb-queue check like prism has)
+- [ ] **BUGF-02**: Fix prism cross-clear chain propagation — prism detonation must trigger lightning tiles in its row/column
+- [ ] **BUGF-03**: Fix bomb double-BFS race condition — add `processedBombs` check before combo pre-clear to prevent score inflation
+- [ ] **BUGF-04**: Fix cascade word deduplication — use separate `cascadeWordsFound` set so re-formed vertical words can cascade again
+- [ ] **BUGF-05**: Fix frozen tile cascade blocking — change type check to `type === 'frozen' && hitsRemaining > 1` so cracked frost participates in cascades
+- [ ] **BUGF-06**: Fix gold stacking — make multiplicative (3x × 3x = 9x for double gold word) to reward seeking gold paths
+- [ ] **BUGF-07**: Fix cascade stale state — capture `tileStatesRef.current` at execution time, not closure capture time
+- [ ] **BUGF-08**: Fix objective guarantee clustering — use Fisher-Yates shuffle on `standardPositions` before placing objective tiles
+- [ ] **BUGF-09**: Fix objective guarantee failure — add minimum 60% standard tile ratio; reduce other special spawn rates if objectives need more specials
+
+### Multiplayer Sync
+
+- [ ] **SYNC-01**: All new/reworked tile types available in multiplayer blast games
+- [ ] **SYNC-02**: Combination effects synchronized deterministically between clients
+- [ ] **SYNC-03**: Cascade refill uses seeded random (not Math.random()) for multiplayer determinism
+- [ ] **SYNC-04**: Combo Codex progress synced to player profile (persisted in Supabase)
+
+## Future Requirements
+
+### Advanced Polish
+- **FUTR-01**: Concurrent input during cascade animations (Royal Match pattern)
+- **FUTR-02**: Dynamic difficulty via spawn rate adjustment based on rolling session performance
+- **FUTR-03**: Haptic feedback patterns per tile type on mobile devices
+- **FUTR-04**: Audio design — unique sound effects per tile clear, combo trigger, and cascade level
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| New game modes using tiles | Focus on perfecting Blast mode first |
+| Tile skin customization | Cosmetic layer deferred; get mechanics right first |
+| Tile trading/gifting | Social features not core to engagement loop |
+| Competitive combo leaderboards | Defer until Combo Codex validates discovery metagame |
+| AI-powered board generation | Current seeded random + guarantee system is sufficient |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| (Populated during roadmap creation) | | |
+
+**Coverage:**
+- v3.0 requirements: 31 total
+- Mapped to phases: 0
+- Unmapped: 31 ⚠️
+
+---
+*Requirements defined: 2026-03-04*
+*Last updated: 2026-03-04 after initial definition*
