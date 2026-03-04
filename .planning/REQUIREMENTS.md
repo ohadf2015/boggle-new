@@ -21,7 +21,7 @@
 
 ### Combination System
 
-- [ ] **COMB-01**: Combination detection system — when a word path contains 2+ special tiles, a synergy effect triggers based on the tile pair
+- [x] **COMB-01**: Combination detection system — when a word path contains 2+ special tiles, a synergy effect triggers based on the tile pair
 - [ ] **COMB-02**: Full 28-pair combination matrix implemented with unique effects for every special tile pairing
 - [ ] **COMB-03**: Combination effects visually distinct from individual tile effects (bigger particles, screen effects, unique audio stings)
 - [ ] **COMB-04**: Combo Discovery callout — first time any combination fires, brief gameplay freeze (300ms) + "COMBO DISCOVERED: [name]!" banner with unique icon
@@ -88,7 +88,7 @@
 | TILE-09 | Phase 47 | Pending |
 | TILE-10 | Phase 51 | Pending |
 | TILE-11 | Phase 51 | Pending |
-| COMB-01 | Phase 48 | Pending |
+| COMB-01 | Phase 48 | Complete |
 | COMB-02 | Phase 48 | Pending |
 | COMB-03 | Phase 48 | Pending |
 | COMB-04 | Phase 49 | Pending |
