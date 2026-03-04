@@ -11,28 +11,37 @@ import type { BlastTileType } from '@/shared/types/blast';
 import {
   BLAST_BONUS_MOVE_COMBO_THRESHOLD,
   BLAST_SPECIAL_TILE_CHANCE,
-  BLAST_TILE_TYPES,
   BLAST_TILE_BONUSES,
   BLAST_RAINBOW_FLAT_BONUS,
 } from '@/shared/constants/blastMultiplayerConstants';
 
+import { getWaveConfig, getWaveDistribution } from '@/components/blast/utils/blastWaveConfig';
+import { rollSpecialType } from '@/components/blast/utils/blastLetterGenerator';
+
 /**
- * Generate blast tile overlay for a grid.
- * For each cell, rolls random; if < specialChance, assigns random special type.
- * Returns array of special tiles only (normal tiles not included).
+ * Generate blast tile overlay for a grid using wave-aware tile distribution.
+ * For each cell, rolls using rollSpecialType with the wave's distribution so
+ * tile availability matches singleplayer progression (e.g., diamond only wave 4+).
+ *
+ * @param grid - The letter grid
+ * @param specialChance - Base probability of a special tile [0, 1]
+ * @param wave - Current wave number (defaults to 1); gates which tile types can appear
+ * @returns Array of special tile overlays (standard tiles omitted)
  */
 export function generateBlastOverlay(
   grid: string[][],
-  specialChance: number
+  specialChance: number,
+  wave = 1
 ): BlastTileOverlay[] {
   const overlay: BlastTileOverlay[] = [];
-  const specialTypes = BLAST_TILE_TYPES.filter(t => t !== 'standard');
+  const waveConfig = getWaveConfig(wave);
+  const distribution = getWaveDistribution(waveConfig);
 
   for (let row = 0; row < grid.length; row++) {
     for (let col = 0; col < grid[row].length; col++) {
-      if (Math.random() < specialChance) {
-        const randomType = specialTypes[Math.floor(Math.random() * specialTypes.length)];
-        overlay.push({ row, col, type: randomType });
+      const tileType = rollSpecialType(specialChance, distribution);
+      if (tileType !== 'standard') {
+        overlay.push({ row, col, type: tileType as BlastTileType });
       }
     }
   }
@@ -68,12 +77,17 @@ export function calculateBlastTileBonus(tilesOnPath: BlastTileType[]): number {
 /**
  * Initialize blast mode state for a new game.
  * Generates overlay, initializes move tracking for all players.
+ *
+ * @param grid - The letter grid
+ * @param players - Player usernames
+ * @param wave - Current wave number (defaults to 1); passed to generateBlastOverlay for tile gating
  */
 export function initBlastModeState(
   grid: string[][],
-  players: string[]
+  players: string[],
+  wave = 1
 ): BlastModeState {
-  const overlay = generateBlastOverlay(grid, BLAST_SPECIAL_TILE_CHANCE);
+  const overlay = generateBlastOverlay(grid, BLAST_SPECIAL_TILE_CHANCE, wave);
 
   const playerMoves: Record<string, number> = {};
   const playerBonusMoves: Record<string, number> = {};
@@ -83,7 +97,12 @@ export function initBlastModeState(
     playerBonusMoves[player] = 0;
   }
 
-  return { overlay, playerMoves, playerBonusMoves };
+  // Generate a seed for deterministic multiplayer refills.
+  // XOR of timestamp and a random value to minimize collisions.
+  // Use >>> 0 to ensure unsigned 32-bit positive integer; || 1 avoids zero.
+  const seed = (Date.now() ^ Math.floor(Math.random() * 0xFFFFFFFF)) >>> 0 || 1;
+
+  return { overlay, playerMoves, playerBonusMoves, seed };
 }
 
 /**
