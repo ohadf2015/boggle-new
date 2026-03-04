@@ -149,13 +149,13 @@ Plans:
   2. Two clients watching the same combination effect see identical particle/screen effects with no divergence
   3. Board refills after cascades produce the same tiles on all clients (seeded random, not Math.random())
   4. Combo Codex progress earned in any session (singleplayer or multiplayer) persists to the player's Supabase profile
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 52-01: Wire all new tile types into multiplayer blast game flow (SYNC-01)
-- [ ] 52-02: Synchronize combination effect dispatch deterministically across clients (SYNC-02)
-- [ ] 52-03: Replace cascade refill Math.random() with seeded random for multiplayer determinism (SYNC-03)
-- [ ] 52-04: Persist Combo Codex discovery progress to Supabase player profile (SYNC-04)
+- [ ] 52-01-PLAN.md — Wire all new tile types into multiplayer blast game flow (SYNC-01) (Wave 1)
+- [ ] 52-02-PLAN.md — Synchronize combination effect dispatch deterministically across clients (SYNC-02) (Wave 1)
+- [ ] 52-03-PLAN.md — Replace cascade refill Math.random() with seeded random for multiplayer determinism (SYNC-03) (Wave 1)
+- [ ] 52-04-PLAN.md — Persist Combo Codex discovery progress to Supabase player profile (SYNC-04) (Wave 1)
 
 ---
 
