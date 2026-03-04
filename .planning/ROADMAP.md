@@ -49,13 +49,13 @@ Last phase: 35.
   3. Prism cross-clear correctly triggers lightning tiles it passes through
   4. Double-bomb words no longer inflate scores from BFS race condition
   5. Cascade correctly re-forms and re-scores vertical words after gravity (dedup bug gone)
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 46-01: Unify BlastTileType enum into shared/types/ and migrate all consumers
-- [ ] 46-02: Fix chain propagation bugs (BUGF-01, BUGF-02) — lightning↔bomb and prism↔lightning
-- [ ] 46-03: Fix state and scoring bugs (BUGF-03, BUGF-04, BUGF-05, BUGF-06, BUGF-07)
-- [ ] 46-04: Fix objective guarantee bugs (BUGF-08, BUGF-09) — clustering and minimum ratio
+- [ ] 46-01-PLAN.md — Unify BlastTileType enum into shared/types/blast.ts and migrate all consumers (Wave 1)
+- [ ] 46-02-PLAN.md — Fix chain propagation bugs (BUGF-01, BUGF-02) — lightning↔bomb and prism↔lightning (Wave 2)
+- [ ] 46-03-PLAN.md — Fix state and scoring bugs (BUGF-03, BUGF-04, BUGF-05, BUGF-06, BUGF-07) (Wave 2)
+- [ ] 46-04-PLAN.md — Fix objective guarantee bugs (BUGF-08, BUGF-09) — clustering and minimum ratio (Wave 2)
 
 #### Phase 47: Tile Reworks — New Behaviors & Spawn Tables
 **Goal**: All four reworked tiles (Rainbow Boost, Treasure Gem, Vortex, Frost), the new Mirror tile, Wildcard removal, gold tier system, and updated spawn tables are live in singleplayer Blast.
