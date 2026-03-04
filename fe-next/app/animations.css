@@ -3005,3 +3005,60 @@ html.reduce-motion *::after {
     animation: none !important;
   }
 }
+
+/* ====================================
+   NEAR-MISS SHIMMER PULSE
+   Pulses on tiles adjacent to a submitted word that could have formed a combo.
+   ==================================== */
+
+@keyframes nearMissPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  20% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  50% {
+    opacity: 0.85;
+    transform: scale(1.0);
+  }
+
+  80% {
+    opacity: 0.5;
+    transform: scale(1.03);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.0);
+  }
+}
+
+/* Reduced motion: use border-only glow instead of scale animation */
+@media (prefers-reduced-motion: reduce) {
+  .near-miss-pulse {
+    animation: nearMissPulseReduced 1.5s ease-out forwards !important;
+  }
+
+  @keyframes nearMissPulseReduced {
+    0% {
+      opacity: 0;
+    }
+
+    20% {
+      opacity: 1;
+    }
+
+    80% {
+      opacity: 0.6;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+}

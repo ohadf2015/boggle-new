@@ -13,13 +13,13 @@ import { BlastComboFlash } from './BlastComboFlash';
 import { BlastComboDiscovery } from './BlastComboDiscovery';
 import { useBlastHint } from './hooks/useBlastHint';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
+import { useBlastNearMiss } from './hooks/useBlastNearMiss';
 import { calculateBonusMoves } from './utils/blastMoveUtils';
 import { BlastGameLayout } from './BlastGameLayout';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import type { BlastGameConfig, BlastResultsData } from './types';
-import type { BlastComboType, SpecialCombo } from './utils/blastCombos';
-import type { WaveConfig } from './utils/blastWaveConfig';
-import { getWaveObjectives } from './utils/blastWaveConfig';
+import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
+import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
 
 interface BlastGameProps {
@@ -94,6 +94,9 @@ export function BlastGame({
       onComboDetected?.(combos);
     }, [onComboDetected]),
   });
+
+  // Near-miss shimmer (psychological hook: shows what the player almost got)
+  const nearMiss = useBlastNearMiss();
 
   // Spam detection
   const spamDetection = useSpamDetection();
@@ -175,10 +178,19 @@ export function BlastGame({
     }
 
     if (lastPathRef.current.length > 0) {
-      blast.clearTilesForWord(lastPathRef.current, data.word, data.score);
+      const path = lastPathRef.current;
+
+      // Detect whether the submitted word triggered a combo (used to skip near-miss shimmer)
+      const detectedCombos = detectSpecialCombos(path, blast.tileStates);
+      const hadCombo = detectedCombos.length > 0;
+
+      blast.clearTilesForWord(path, data.word, data.score);
       lastPathRef.current = [];
+
+      // Trigger near-miss shimmer if no combo was already triggered
+      nearMiss.check(path, blast.modifiedGrid ?? [], blast.tileStates, config.gridSize, hadCombo);
     }
-  }, [blast]);
+  }, [blast, nearMiss, config.gridSize]);
 
   // Word submission hook - reuses proven validation pipeline
   const wordSubmission = useWordSubmission({
@@ -196,6 +208,8 @@ export function BlastGame({
     announceWordResult: () => {},
     announceCombo: () => {},
     onWordAccepted: handleWordAccepted,
+    // DDA: silently track failed words to boost special tile spawn after 3+ consecutive failures
+    onWordRejected: blast.trackWordFail,
   });
 
   // Handle word submission: validate via useWordSubmission
@@ -279,6 +293,7 @@ export function BlastGame({
       />
       <BlastGameLayout
       isDiscoveryActive={isDiscoveryActive}
+      shimmerCells={nearMiss.shimmerCells}
       grid={blast.modifiedGrid}
       tileStates={blast.tileStates}
       gridSize={config.gridSize}

@@ -44,6 +44,8 @@ interface BlastGridProps {
   ariaLabel?: string;
   /** Optional highlighted path (for hints/tutorials) */
   highlightedPath?: Array<{ row: number; col: number }>;
+  /** Cells to render with near-miss shimmer pulse (empty = none) */
+  shimmerCells?: Array<{ row: number; col: number }>;
 }
 
 /**
@@ -74,6 +76,7 @@ export function BlastGrid({
   onScorePopupComplete,
   ariaLabel,
   highlightedPath = [],
+  shimmerCells = [],
 }: BlastGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -138,6 +141,24 @@ export function BlastGrid({
         gridSize={gridSize}
         selectedPositions={selectedPositions}
       />
+
+      {/* Near-miss shimmer: pulse overlay on cells the player almost used */}
+      {containerWidth > 0 && shimmerCells.length > 0 && shimmerCells.map(cell => (
+        <div
+          key={`shimmer-${cell.row}-${cell.col}`}
+          className="absolute pointer-events-none near-miss-pulse"
+          style={{
+            left: cell.col * cellSize,
+            top: cell.row * cellSize,
+            width: cellSize,
+            height: cellSize,
+            borderRadius: 4,
+            border: '2px solid rgba(255, 225, 53, 0.85)',
+            boxShadow: '0 0 8px rgba(255, 225, 53, 0.6), inset 0 0 8px rgba(255, 225, 53, 0.2)',
+            animation: 'nearMissPulse 1.5s ease-out forwards',
+          }}
+        />
+      ))}
 
       {/* Cascade word highlight glow (z-15, between tile overlay and cascade overlay) */}
       {containerWidth > 0 && cascadeHighlightData && (
