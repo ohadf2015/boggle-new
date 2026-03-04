@@ -132,8 +132,8 @@ describe('Mirror and Gold tier constants', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Wildcard removal', () => {
-  it('wildcard is in BLAST_TILE_TYPE_LIST (kept for backward compat)', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('wildcard');
+  it('wildcard is NOT in BLAST_TILE_TYPE_LIST (fully removed in Phase 53)', () => {
+    expect(BLAST_TILE_TYPE_LIST).not.toContain('wildcard');
   });
 
   it('rollSpecialType never returns wildcard when distribution has no wildcard', () => {

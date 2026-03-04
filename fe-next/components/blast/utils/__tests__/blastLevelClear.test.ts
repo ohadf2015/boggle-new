@@ -172,10 +172,10 @@ describe('buildAutoTriggerSequence', () => {
     expect(result).toHaveLength(2);
   });
 
-  it('includes rainbow and wildcard tiles', () => {
+  it('includes rainbow and mirror tiles', () => {
     const grid = makeGrid([
       makeTile(0, 0, 'rainbow', false),
-      makeTile(1, 1, 'wildcard', false),
+      makeTile(1, 1, 'mirror', false),
     ]);
     const result = buildAutoTriggerSequence(grid);
     expect(result).toHaveLength(2);

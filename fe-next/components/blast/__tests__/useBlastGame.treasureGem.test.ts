@@ -387,7 +387,7 @@ describe('Treasure Gem: wave-gated spawns respect enabled flags', () => {
   it('wave 1 completion does not spawn lightning (wave 4+ only)', async () => {
     // Wave 1 config: lightningEnabled=false, magnetEnabled=false, gemEnabled=false,
     // prismEnabled=false, frozenEnabled=false.
-    // Spawned specials should only be from: gold, bomb, rainbow, ice, wildcard.
+    // Spawned specials should only be from: gold, bomb, rainbow, ice.
     const { result } = renderHook(() => useBlastGame({
       gridSize: GRID,
       specialTileChance: 1.0,

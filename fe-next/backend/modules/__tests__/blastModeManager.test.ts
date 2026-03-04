@@ -229,14 +229,15 @@ describe('blastModeManager', () => {
       Array.from({ length: 10 }, () => 'A')
     );
 
-    it('BLAST_TILE_TYPES should include all 14 canonical types', () => {
+    it('BLAST_TILE_TYPES should include all 13 canonical types (no wildcard)', () => {
       const canonicalTypes = [
         'standard', 'gold', 'bomb', 'rainbow', 'ice', 'lightning',
-        'magnet', 'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond', 'wildcard',
+        'magnet', 'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond',
       ];
       for (const t of canonicalTypes) {
         expect(BLAST_TILE_TYPES).toContain(t);
       }
+      expect(BLAST_TILE_TYPES).not.toContain('wildcard');
     });
 
     it('BLAST_TILE_TYPES should include previously missing types (mirror, silver, diamond, prism)', () => {

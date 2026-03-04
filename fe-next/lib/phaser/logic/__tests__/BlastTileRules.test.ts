@@ -18,18 +18,15 @@ import type { BlastTileType } from '@/components/blast/types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** All 14 tile types (standard + 13 special including mirror/silver/diamond/wildcard) */
+/** All 13 tile types (standard + 12 special including mirror/silver/diamond) */
 const ALL_TYPES: BlastTileType[] = [
-  'standard', 'gold', 'bomb', 'rainbow', 'ice', 'wildcard',
+  'standard', 'gold', 'bomb', 'rainbow', 'ice',
   'lightning', 'magnet', 'prism', 'gem', 'frozen',
   'mirror', 'silver', 'diamond',
 ];
 
-/**
- * Special types that have BLAST_TILE_CONFIGS entries.
- * Wildcard is in the type union but is never spawned and has no config entry.
- */
-const SPECIAL_TYPES: BlastTileType[] = ALL_TYPES.filter(t => t !== 'standard' && t !== 'wildcard');
+/** Special types that have BLAST_TILE_CONFIGS entries (all non-standard types). */
+const SPECIAL_TYPES: BlastTileType[] = ALL_TYPES.filter(t => t !== 'standard');
 
 /** The 3 tile types added in Phase 47 that needed Phaser visual configs */
 const NEW_TYPES: BlastTileType[] = ['mirror', 'silver', 'diamond'];

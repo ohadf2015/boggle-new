@@ -536,7 +536,7 @@ describe('Rainbow Boost picks best offensive special over gold', () => {
     for (const type of tilesInPath) {
       if (type === 'rainbow') continue;
       if (SCORE_MULTIPLIER_SPECIALS.includes(type)) continue;
-      if (type === 'ice' || type === 'frozen' || type === 'standard' || type === 'wildcard') continue;
+      if (type === 'ice' || type === 'frozen' || type === 'standard') continue;
       const rank = RANK[type] ?? 0;
       if (rank > bestRank) {
         bestRank = rank;
