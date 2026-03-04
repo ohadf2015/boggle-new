@@ -8,15 +8,14 @@
  * Written BEFORE fix (RED phase).
  */
 import { render } from '@testing-library/react';
-import { FROST_HITS_REQUIRED } from '../types';
+import { FROST_HITS_REQUIRED, type BlastTileState } from '../types';
 
 // Mock framer-motion
 jest.mock('framer-motion', () => {
   const React = require('react');
   return {
     motion: {
-      div: React.forwardRef(({ children, ...props }: any, ref: any) => {
-        // Forward style and data-testid for inspection
+      div: React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
         return <div ref={ref} {...props}>{children}</div>;
       }),
     },
@@ -27,9 +26,13 @@ jest.mock('framer-motion', () => {
 // Mock lucide-react icons
 jest.mock('lucide-react', () => {
   const React = require('react');
-  const Icon = (name: string) => React.forwardRef(
-    (props: any, ref: any) => <svg ref={ref} data-testid={`icon-${name}`} {...props} />
-  );
+  const Icon = (name: string) => {
+    const IconComponent = React.forwardRef(
+      (props: any, ref: any) => <svg ref={ref} data-testid={`icon-${name}`} {...props} />
+    );
+    IconComponent.displayName = name;
+    return IconComponent;
+  };
   return {
     Star: Icon('star'),
     Bomb: Icon('bomb'),
@@ -44,7 +47,6 @@ jest.mock('lucide-react', () => {
 });
 
 import { BlastTileOverlay } from '../BlastTileOverlay';
-import type { BlastTileState } from '../types';
 
 function makeTile(overrides: Partial<BlastTileState> = {}): BlastTileState {
   return {
