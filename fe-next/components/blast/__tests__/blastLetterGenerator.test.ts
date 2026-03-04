@@ -71,7 +71,8 @@ describe('rollSpecialType', () => {
   });
 
   it('should return a valid tile type', () => {
-    const validTypes = ['standard', 'gold', 'bomb', 'rainbow', 'ice', 'wildcard'];
+    // Wildcard removed: valid default types now are standard, gold, bomb, rainbow, ice
+    const validTypes = ['standard', 'gold', 'bomb', 'rainbow', 'ice'];
     for (let i = 0; i < 100; i++) {
       const result = rollSpecialType(0.5);
       expect(validTypes).toContain(result);
@@ -79,31 +80,33 @@ describe('rollSpecialType', () => {
   });
 
   it('should always return special when chance is 1', () => {
-    const specialTypes = ['gold', 'bomb', 'rainbow', 'ice', 'wildcard'];
+    // Wildcard removed: special types are gold, bomb, rainbow, ice (sum to 1.0)
+    const specialTypes = ['gold', 'bomb', 'rainbow', 'ice'];
     const results = new Set<string>();
     for (let i = 0; i < 100; i++) {
       results.add(rollSpecialType(1));
     }
-    // All results should be special (not standard)
+    // All results should be special (not standard) — wildcard no longer in distribution
     results.forEach(r => {
       expect(specialTypes).toContain(r);
     });
   });
 
   it('should produce distribution matching SPECIAL_TILE_DISTRIBUTION', () => {
-    // With 100% special chance, verify all special types appear
-    const counts: Record<string, number> = { gold: 0, bomb: 0, rainbow: 0, ice: 0, wildcard: 0, standard: 0 };
+    // With 100% special chance, verify all active special types appear
+    const counts: Record<string, number> = { gold: 0, bomb: 0, rainbow: 0, ice: 0, standard: 0 };
     const iterations = 1000;
     for (let i = 0; i < iterations; i++) {
       const type = rollSpecialType(1);
-      counts[type]++;
+      const key = counts[type] !== undefined ? type : 'standard';
+      counts[key]++;
     }
 
     // Gold should be roughly SPECIAL_TILE_DISTRIBUTION.gold of total
     const goldRatio = counts.gold / iterations;
     expect(goldRatio).toBeGreaterThan(SPECIAL_TILE_DISTRIBUTION.gold * 0.5);
     expect(goldRatio).toBeLessThan(SPECIAL_TILE_DISTRIBUTION.gold * 1.5);
-    // No standard tiles when chance is 1
+    // No standard tiles when chance is 1 (distribution sums to 1.0)
     expect(counts.standard).toBe(0);
   });
 });

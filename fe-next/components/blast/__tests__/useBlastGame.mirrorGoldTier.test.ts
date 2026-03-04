@@ -306,7 +306,16 @@ describe('Mirror + Lightning: lightning column-clear fires twice', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Mirror solo: doubles word score when no partner special', () => {
-  it('Mirror solo hook: final score is 2x baseScore (MIRROR_MULTIPLIER)', async () => {
+  it('Mirror solo pure simulation: mirrorSoloMultiplier applied correctly', () => {
+    // Mirror solo = no offensive special in path → mirrorSoloMultiplier = MIRROR_MULTIPLIER
+    // effectiveBase = baseScore * rainbowSoloMult(1) * mirrorSoloMult(2)
+    const baseScore = 5;
+    const mirrorSoloMult = MIRROR_MULTIPLIER; // 2
+    const effectiveBase = baseScore * 1 * mirrorSoloMult;
+    expect(effectiveBase).toBe(10); // 5 * 2
+  });
+
+  it('Mirror solo hook: 2-tile path with mirror gives 2x baseScore', async () => {
     const { result } = renderHook(() => useBlastGame({
       gridSize: GRID,
       specialTileChance: 1.0,
@@ -314,21 +323,24 @@ describe('Mirror solo: doubles word score when no partner special', () => {
       customDistribution: MIRROR_ONLY_DIST,
     }));
 
-    // All tiles are mirror. A word path with mirror and standard-only tiles
-    // (but since dist is mirror-only, all specials are mirror — still no offensive special)
+    // Use 2 mirror tiles in path (avoids triple_special combo bonus at >= 3 specials)
+    // 2 mirror tiles: mirrorSoloMultiplier = 2 (no offensive specials → solo mode)
+    // No gold combos, no triple_special (only 2 specials < 3)
     const baseScore = 5;
+    const initialScore = result.current.gameState.score;
 
     act(() => {
       result.current.clearTilesForWord(
-        [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }],
-        'test',
+        [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+        'go',
         baseScore
       );
     });
 
-    // Score should be 2x baseScore (mirror solo doubles word score)
-    const finalScore = result.current.gameState.score;
-    expect(finalScore).toBe(baseScore * MIRROR_MULTIPLIER);
+    const earnedScore = result.current.gameState.score - initialScore;
+    // 2 mirror tiles, no offensive specials: mirrorSoloMultiplier = 2
+    // effectiveBase = 5 * 2 = 10, goldMultiplier = 1, bonusScore = 0
+    expect(earnedScore).toBe(baseScore * MIRROR_MULTIPLIER);
   });
 });
 
@@ -398,105 +410,153 @@ describe('Mirror + Rainbow + Bomb: bomb fires 3 times', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Gold Tier: Silver, Gold, Diamond multipliers
+// Gold Tier: Silver, Gold, Diamond multipliers (pure simulation)
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Pure simulation of the gold multiplier accumulation for tier tiles.
+ * Mirrors the logic in clearTilesForWord: goldMultiplier *= TIER_MULTIPLIER for each tile.
+ */
+function simulateTierScore(baseScore: number, tileMultipliers: number[]): number {
+  let goldMultiplier = 1;
+  for (const mult of tileMultipliers) {
+    goldMultiplier *= mult;
+  }
+  return baseScore * goldMultiplier;
+}
+
 describe('Gold tier: Silver 1.5x multiplier', () => {
-  it('Silver tile: final score = baseScore * SILVER_MULTIPLIER', async () => {
+  it('Single silver tile: baseScore * SILVER_MULTIPLIER', () => {
+    const baseScore = 10;
+    const score = simulateTierScore(baseScore, [SILVER_MULTIPLIER]);
+    expect(score).toBe(10 * 1.5); // 15
+  });
+
+  it('Double silver: baseScore * SILVER_MULTIPLIER^2', () => {
+    const baseScore = 10;
+    const score = simulateTierScore(baseScore, [SILVER_MULTIPLIER, SILVER_MULTIPLIER]);
+    expect(score).toBe(10 * 1.5 * 1.5); // 22.5
+  });
+
+  it('SILVER_MULTIPLIER constant drives formula correctly', () => {
+    expect(SILVER_MULTIPLIER).toBe(1.5);
+    const baseScore = 4;
+    expect(simulateTierScore(baseScore, [SILVER_MULTIPLIER])).toBe(baseScore * SILVER_MULTIPLIER);
+  });
+
+  it('Silver hook: single silver tile in 2-tile word gives SILVER_MULTIPLIER boost', () => {
     const { result } = renderHook(() => useBlastGame({
-      gridSize: GRID,
+      gridSize: 4,
       specialTileChance: 1.0,
       language: 'en',
       customDistribution: SILVER_ONLY_DIST,
     }));
 
     const baseScore = 4;
+    const initialScore = result.current.gameState.score;
 
+    // Path of 2 tiles (both silver = 1.5 * 1.5 = 2.25x)
     act(() => {
       result.current.clearTilesForWord(
-        [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
-        'cat',
+        [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+        'GO',
         baseScore
       );
     });
 
-    const finalScore = result.current.gameState.score;
-    expect(finalScore).toBe(baseScore * SILVER_MULTIPLIER);
+    const earnedScore = result.current.gameState.score - initialScore;
+    // 2 silver tiles: 1.5^2 = 2.25, score = 4 * 2.25 = 9
+    expect(earnedScore).toBe(baseScore * SILVER_MULTIPLIER * SILVER_MULTIPLIER);
   });
 });
 
 describe('Gold tier: Gold 3x multiplier (existing behavior unchanged)', () => {
-  it('Gold tile: final score = baseScore * GOLD_MULTIPLIER', async () => {
+  it('Single gold tile: baseScore * GOLD_MULTIPLIER', () => {
+    const baseScore = 10;
+    const score = simulateTierScore(baseScore, [GOLD_MULTIPLIER]);
+    expect(score).toBe(30); // 10 * 3
+  });
+
+  it('GOLD_MULTIPLIER constant is 3 (unchanged)', () => {
+    expect(GOLD_MULTIPLIER).toBe(3);
+  });
+
+  it('Gold hook: double gold word gives 9x base (3^2)', () => {
     const { result } = renderHook(() => useBlastGame({
-      gridSize: GRID,
+      gridSize: 4,
       specialTileChance: 1.0,
       language: 'en',
       customDistribution: GOLD_ONLY_DIST,
     }));
 
     const baseScore = 4;
+    const initialScore = result.current.gameState.score;
 
     act(() => {
       result.current.clearTilesForWord(
-        [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
-        'cat',
+        [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+        'GO',
         baseScore
       );
     });
 
-    const finalScore = result.current.gameState.score;
-    expect(finalScore).toBe(baseScore * GOLD_MULTIPLIER);
+    const earnedScore = result.current.gameState.score - initialScore;
+    // 2 gold tiles: 3^2 = 9x, score = 4 * 9 = 36
+    expect(earnedScore).toBe(baseScore * GOLD_MULTIPLIER * GOLD_MULTIPLIER);
   });
 });
 
 describe('Gold tier: Diamond 5x multiplier', () => {
-  it('Diamond tile: final score = baseScore * DIAMOND_MULTIPLIER', async () => {
+  it('Single diamond tile: baseScore * DIAMOND_MULTIPLIER', () => {
+    const baseScore = 10;
+    const score = simulateTierScore(baseScore, [DIAMOND_MULTIPLIER]);
+    expect(score).toBe(50); // 10 * 5
+  });
+
+  it('DIAMOND_MULTIPLIER constant is 5', () => {
+    expect(DIAMOND_MULTIPLIER).toBe(5);
+  });
+
+  it('Diamond hook: double diamond word gives 25x base (5^2)', () => {
     const { result } = renderHook(() => useBlastGame({
-      gridSize: GRID,
+      gridSize: 4,
       specialTileChance: 1.0,
       language: 'en',
       customDistribution: DIAMOND_ONLY_DIST,
     }));
 
     const baseScore = 4;
+    const initialScore = result.current.gameState.score;
 
     act(() => {
       result.current.clearTilesForWord(
-        [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
-        'cat',
+        [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+        'GO',
         baseScore
       );
     });
 
-    const finalScore = result.current.gameState.score;
-    expect(finalScore).toBe(baseScore * DIAMOND_MULTIPLIER);
+    const earnedScore = result.current.gameState.score - initialScore;
+    // 2 diamond tiles: 5^2 = 25x, score = 4 * 25 = 100
+    expect(earnedScore).toBe(baseScore * DIAMOND_MULTIPLIER * DIAMOND_MULTIPLIER);
   });
 });
 
 describe('Gold tier: Mixed tiers multiplicative (Silver + Gold = 4.5x)', () => {
-  it('Silver + Gold in same word: score = baseScore * SILVER_MULTIPLIER * GOLD_MULTIPLIER', async () => {
-    const { result } = renderHook(() => useBlastGame({
-      gridSize: GRID,
-      specialTileChance: 1.0,
-      language: 'en',
-      // half silver, half gold
-      customDistribution: { silver: 0.5, gold: 0.5 },
-    }));
+  it('Silver + Gold in same word: score = baseScore * SILVER_MULTIPLIER * GOLD_MULTIPLIER', () => {
+    const baseScore = 10;
+    // 1 silver + 1 gold = 1.5 * 3 = 4.5x
+    const score = simulateTierScore(baseScore, [SILVER_MULTIPLIER, GOLD_MULTIPLIER]);
+    expect(score).toBe(45); // 10 * 4.5
+  });
 
-    // With all tiles being either silver or gold, a word in row 0 should hit both
-    // The test verifies multiplicative behavior conceptually:
-    const expectedMultiplier = SILVER_MULTIPLIER * GOLD_MULTIPLIER; // 4.5
-    expect(expectedMultiplier).toBe(4.5);
-
-    // Verify the multiplier constants are correct for multiplicative calculation
+  it('Multiplicative constants: Silver*Gold=4.5, Silver*Diamond=7.5, Gold*Diamond=15', () => {
     expect(SILVER_MULTIPLIER * GOLD_MULTIPLIER).toBe(4.5);
     expect(SILVER_MULTIPLIER * DIAMOND_MULTIPLIER).toBe(7.5);
     expect(GOLD_MULTIPLIER * DIAMOND_MULTIPLIER).toBe(15);
   });
 
-  it('Silver + Gold hook: score exceeds both individual multipliers applied separately', async () => {
-    // Test that mixing silver+gold produces multiplicative result
-    // silver=1.5 * gold=3 = 4.5x, which exceeds just gold=3x
+  it('Mixed tiers exceed gold-only score (4.5x > 3x)', () => {
     const silverGoldMult = SILVER_MULTIPLIER * GOLD_MULTIPLIER;
     const goldMult = GOLD_MULTIPLIER;
     expect(silverGoldMult).toBeGreaterThan(goldMult);

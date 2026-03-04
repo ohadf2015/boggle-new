@@ -212,10 +212,10 @@ export interface CascadeHighlightData {
 
 /** Default distribution of special tiles (must sum to 1.0). Wave-gated tiles start at 0. */
 export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'>, number> = {
-  gold: 0.22,
-  bomb: 0.22,
-  rainbow: 0.22,
-  ice: 0.17,
+  gold: 0.25,
+  bomb: 0.25,
+  rainbow: 0.25,
+  ice: 0.25,
   lightning: 0,
   magnet: 0,
   prism: 0,

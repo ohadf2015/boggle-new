@@ -93,5 +93,5 @@ export function rollSpecialType(
     cumulative += weight;
     if (roll < cumulative) return tileType as BlastTileType;
   }
-  return 'wildcard'; // Fallback
+  return 'standard'; // Fallback
 }
