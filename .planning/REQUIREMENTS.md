@@ -53,7 +53,7 @@
 - [x] **SYNC-01**: All new/reworked tile types available in multiplayer blast games
 - [ ] **SYNC-02**: Combination effects synchronized deterministically between clients
 - [ ] **SYNC-03**: Cascade refill uses seeded random (not Math.random()) for multiplayer determinism
-- [ ] **SYNC-04**: Combo Codex progress synced to player profile (persisted in Supabase)
+- [x] **SYNC-04**: Combo Codex progress synced to player profile (persisted in Supabase)
 
 ## Future Requirements
 
@@ -111,7 +111,7 @@
 | SYNC-01 | Phase 52 | Complete |
 | SYNC-02 | Phase 52 | Pending |
 | SYNC-03 | Phase 52 | Pending |
-| SYNC-04 | Phase 52 | Pending |
+| SYNC-04 | Phase 52 | Complete |
 
 **Coverage:**
 - v3.0 requirements: 31 total

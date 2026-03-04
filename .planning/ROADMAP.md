@@ -181,4 +181,4 @@ Plans:
 | 49. Combination UX | 5/5 | Complete    | 2026-03-04 | - |
 | 50. Psychological Hooks | 4/4 | Complete    | 2026-03-04 | - |
 | 51. Visual Polish — Tile Animations | 2/2 | Complete    | 2026-03-04 | - |
-| 52. Multiplayer Sync | 1/4 | In Progress|  | - |
+| 52. Multiplayer Sync | 2/4 | In Progress|  | - |
