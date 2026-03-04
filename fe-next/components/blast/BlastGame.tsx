@@ -9,6 +9,7 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastGame } from './hooks/useBlastGame';
+import { useBlastSugarCrush } from './hooks/useBlastSugarCrush';
 import { BlastComboFlash } from './BlastComboFlash';
 import { BlastComboDiscovery } from './BlastComboDiscovery';
 import { useBlastHint } from './hooks/useBlastHint';
@@ -81,6 +82,13 @@ export function BlastGame({
   // Memoize wave objectives so they don't cause re-initialization
   const waveObjectives = useMemo(() => getWaveObjectives(waveNumber), [waveNumber]);
 
+  // Sugar Crush sequence (PSYC-03): fires when moves run out, converting tiles to specials
+  const sugarCrush = useBlastSugarCrush();
+
+  // Ref to sugarCrush.start — allows onMovesExhausted to reference latest start without stale closure
+  const sugarCrushStartRef = useRef(sugarCrush.start);
+  sugarCrushStartRef.current = sugarCrush.start;
+
   // Core blast game state (with cascade callback + move limit from wave config)
   const blast = useBlastGame(config, {
     onAutoCascadeWord: handleAutoCascadeWord,
@@ -93,7 +101,43 @@ export function BlastGame({
     onComboDetected: useCallback((combos: SpecialCombo[]) => {
       onComboDetected?.(combos);
     }, [onComboDetected]),
+    onMovesExhausted: useCallback(() => {
+      // Callback fires instead of auto-setting isDeadEnd.
+      // sugarCrushStartRef.current is used to avoid stale closure.
+      // The actual blast refs (tileStates, setTileStates, etc.) are captured at call time.
+      // We schedule the start via a timeout=0 to ensure tileStates is settled before crush begins.
+      sugarCrushStartRef.current(
+        blastTileStatesRef.current,
+        config.gridSize,
+        blastSetTileStatesRef.current,
+        blastAddExplosionRef.current,
+        blastAddBonusScoreRef.current,
+        blastEndGameRef.current,
+      );
+    }, [config.gridSize]),
   });
+
+  // Stable refs to blast methods for use inside onMovesExhausted callback
+  // (avoids stale closure over blast object which changes on each render)
+  const blastTileStatesRef = useRef(blast.tileStates);
+  blastTileStatesRef.current = blast.tileStates;
+
+  const blastSetTileStatesRef = useRef(blast.setTileStates);
+  blastSetTileStatesRef.current = blast.setTileStates;
+
+  const blastAddExplosionRef = useRef(blast.addExplosion);
+  blastAddExplosionRef.current = blast.addExplosion;
+
+  const blastAddBonusScoreRef = useRef(blast.addBonusScore);
+  blastAddBonusScoreRef.current = blast.addBonusScore;
+
+  // After sugar crush completes, add bonus score and end game
+  const blastEndGameRef = useRef<(totalBonus: number) => void>(() => {});
+  blastEndGameRef.current = useCallback((totalBonus: number) => {
+    // totalBonus already added per-step via addBonusScore; just end the game
+    void totalBonus;
+    blast.endGame();
+  }, [blast]);
 
   // Near-miss shimmer (psychological hook: shows what the player almost got)
   const nearMiss = useBlastNearMiss();
@@ -288,7 +332,8 @@ export function BlastGame({
     return null; // Grid still loading
   }
 
-  const isDiscoveryActive = pendingDiscovery != null;
+  // Block grid during discovery banners or Sugar Crush sequence
+  const isDiscoveryActive = pendingDiscovery != null || sugarCrush.isActive;
 
   return (
     <div className="relative flex-1 flex flex-col h-full" data-testid="blast-game-root">

@@ -5487,6 +5487,7 @@ const he = {
     "bonusMoves": "+{count} מהלכים!",
     "outOfMoves": "נגמרו המהלכים!",
     "movesBonus": "בונוס מהלכים",
+    "sugarCrush": "פיצוץ סופי!",
     "objective": {
       "scoreTarget": "השג {target} נק'",
       "collectType": "אסוף {target} {tileType}",

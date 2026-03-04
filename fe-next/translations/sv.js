@@ -5512,6 +5512,7 @@ const sv = {
     "bonusMoves": "+{count} Drag!",
     "outOfMoves": "Inga drag kvar!",
     "movesBonus": "Dragbonus",
+    "sugarCrush": "Sockerkross!",
     "objective": {
       "scoreTarget": "Nå {target} poäng",
       "collectType": "Samla {target} {tileType}",

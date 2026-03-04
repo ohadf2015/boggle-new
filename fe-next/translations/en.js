@@ -5604,6 +5604,7 @@ const en = {
     "bonusMoves": "+{count} Moves!",
     "outOfMoves": "Out of Moves!",
     "movesBonus": "Move Bonus",
+    "sugarCrush": "Sugar Crush!",
     "objective": {
       "scoreTarget": "Score {target} pts",
       "collectType": "Collect {target} {tileType}",

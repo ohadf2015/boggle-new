@@ -216,6 +216,20 @@ export interface UseBlastGameReturn {
    * After 3+ consecutive calls the next gravity refill will spawn more special tiles.
    */
   trackWordFail: () => void;
+  /**
+   * Direct tile state setter — used by Sugar Crush to convert tile types in place.
+   * Accepts an updater function that receives previous state and returns new state.
+   */
+  setTileStates: (updater: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
+  /**
+   * Add a visual explosion at a grid position (used by Sugar Crush sequence).
+   * Explosion type maps to the converted tile type for visual consistency.
+   */
+  addExplosion: (row: number, col: number, tileType: string) => void;
+  /**
+   * Add bonus score to game state (used by Sugar Crush to accumulate total bonus).
+   */
+  addBonusScore: (bonus: number) => void;
 }
 
 export interface UseBlastGameOptions {
@@ -231,6 +245,12 @@ export interface UseBlastGameOptions {
   onSynergyDetected?: (comboType: BlastComboType) => void;
   /** Called when special combinations are detected — for first-time discovery tracking */
   onComboDetected?: (combos: SpecialCombo[]) => void;
+  /**
+   * Called when moves are exhausted instead of auto-marking isDeadEnd.
+   * If provided, the caller is responsible for eventually calling endGame().
+   * Used by BlastGame to trigger the Sugar Crush sequence before ending.
+   */
+  onMovesExhausted?: () => void;
 }
 
 // ==================== Hook ====================
@@ -542,8 +562,14 @@ export function useBlastGame(
   useEffect(() => {
     const { movesRemaining, isComplete, isDeadEnd, movesUsed } = gameState;
     if (!isComplete && !isDeadEnd && movesUsed > 0 && movesRemaining <= 0 && isFinite(gameState.totalMoves)) {
-      setGameState(prev => ({ ...prev, isDeadEnd: true }));
+      if (options?.onMovesExhausted) {
+        // Delegate to caller (e.g. BlastGame Sugar Crush sequence)
+        options.onMovesExhausted();
+      } else {
+        setGameState(prev => ({ ...prev, isDeadEnd: true }));
+      }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState]);
 
   // Dead-end detection: check after cascade settles
@@ -1604,6 +1630,38 @@ export function useBlastGame(
     ddaStateRef.current = updateDDA(ddaStateRef.current, 'fail');
   }, []);
 
+  /**
+   * Add a visual explosion at a grid position.
+   * Used by Sugar Crush sequence to show conversion effects.
+   * Maps tileType string to the closest valid BlastExplosion type.
+   */
+  const addExplosionCallback = useCallback((row: number, col: number, tileType: string) => {
+    const validTypes = ['word', 'bomb', 'clear', 'cascade', 'lightning', 'magnet', 'prism', 'gem', 'combo', 'mega_blast', 'total_destruction'] as const;
+    type ExplosionType = typeof validTypes[number];
+    const explosionType: ExplosionType = validTypes.includes(tileType as ExplosionType)
+      ? (tileType as ExplosionType)
+      : 'bomb'; // Default to bomb for standard type mappings
+
+    setExplosions(prev => [
+      ...prev,
+      {
+        id: `sugar-crush-${row}-${col}-${Date.now()}`,
+        row,
+        col,
+        type: explosionType,
+        intensity: 2,
+        timestamp: Date.now(),
+      },
+    ]);
+  }, []);
+
+  /**
+   * Add bonus score to game state (used by Sugar Crush).
+   */
+  const addBonusScore = useCallback((bonus: number) => {
+    setGameState(prev => ({ ...prev, score: prev.score + bonus }));
+  }, []);
+
   return {
     grid: initialGrid,
     displayGrid,
@@ -1629,5 +1687,8 @@ export function useBlastGame(
     activeComboFlash,
     clearComboFlash,
     trackWordFail,
+    setTileStates,
+    addExplosion: addExplosionCallback,
+    addBonusScore,
   };
 }

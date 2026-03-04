@@ -5561,6 +5561,7 @@ const ja = {
     "bonusMoves": "+{count} 手!",
     "outOfMoves": "手数切れ!",
     "movesBonus": "手数ボーナス",
+    "sugarCrush": "シュガークラッシュ!",
     "objective": {
       "scoreTarget": "{target}点を獲得",
       "collectType": "{tileType}を{target}個集める",
