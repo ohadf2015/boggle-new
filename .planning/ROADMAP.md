@@ -101,13 +101,14 @@ Plans:
   2. The Combo Codex screen is accessible from the Blast mode menu and shows discovered vs. total combinations (e.g., "12/28")
   3. A 7+ letter word containing a special tile produces a visibly stronger effect than a 3-letter word with the same tile
   4. Combination names and "COMBO DISCOVERED" banner text display correctly in Hebrew, Swedish, and Japanese
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
-- [ ] 49-01-PLAN.md — Combo discovery callout: useBlastComboDiscovery hook + BlastComboDiscovery banner (COMB-04) (Wave 1)
-- [ ] 49-02-PLAN.md — Combo Codex modal + BlastReadyScreen button (COMB-05) (Wave 2)
-- [ ] 49-03-PLAN.md — Word-length scaling: getWordLengthScaleFactor + scaledRadius in combo effects (COMB-06) (Wave 1)
-- [ ] 49-04-PLAN.md — Translation completeness: 25 combo names + 4 UI keys in all 4 languages (COMB-07) (Wave 3)
+- [x] 49-01-PLAN.md — Combo discovery callout: useBlastComboDiscovery hook + BlastComboDiscovery banner (COMB-04) (Wave 1)
+- [x] 49-02-PLAN.md — Combo Codex modal + BlastReadyScreen button (COMB-05) (Wave 2)
+- [x] 49-03-PLAN.md — Word-length scaling: getWordLengthScaleFactor + scaledRadius in combo effects (COMB-06) (Wave 1)
+- [x] 49-04-PLAN.md — Translation completeness: 25 combo names + 4 UI keys in all 4 languages (COMB-07) (Wave 3)
+- [ ] 49-05-PLAN.md — Gap closure: wire BlastComboDiscovery into gameplay (COMB-04) (Wave 4)
 
 #### Phase 50: Psychological Hooks — Addiction Layer
 **Goal**: The four psychological engagement mechanics (cascade chain counter, near-miss shimmer, Sugar Crush end sequence, invisible difficulty assist) are all active, making every game session feel dynamic and "almost" achievable.
@@ -177,7 +178,7 @@ Plans:
 | 46. Foundation — Unified Types & Bug Fixes | v3.0 | 4/4 | Complete | 2026-03-04 |
 | 47. Tile Reworks — New Behaviors & Spawn Tables | 5/5 | Complete    | 2026-03-04 | ~12min |
 | 48. Combination System Core | 3/4 | Complete    | 2026-03-04 | - |
-| 49. Combination UX | 4/4 | Complete   | 2026-03-04 | - |
+| 49. Combination UX | 4/5 | In progress (gap closure) | - | - |
 | 50. Psychological Hooks | v3.0 | 0/4 | Not started | - |
 | 51. Visual Polish — Tile Animations | v3.0 | 0/2 | Not started | - |
 | 52. Multiplayer Sync | v3.0 | 0/4 | Not started | - |
