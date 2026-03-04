@@ -27,7 +27,7 @@
 - [x] **COMB-04**: Combo Discovery callout — first time any combination fires, brief gameplay freeze (300ms) + "COMBO DISCOVERED: [name]!" banner with unique icon
 - [x] **COMB-05**: Combo Codex collectible screen — tracks discovered combos (e.g., "12/28 combos discovered") accessible from Blast mode menu
 - [x] **COMB-06**: Word-length scaling for tile effects — 3-4 letter word = base effect; 5-6 = 1.5x effect (larger radius/more columns); 7+ = 2x effect
-- [ ] **COMB-07**: Combination names and descriptions translated in all 4 languages (EN, HE, SV, JA)
+- [x] **COMB-07**: Combination names and descriptions translated in all 4 languages (EN, HE, SV, JA)
 
 ### Psychological Hooks
 
@@ -94,7 +94,7 @@
 | COMB-04 | Phase 49 | Complete |
 | COMB-05 | Phase 49 | Complete |
 | COMB-06 | Phase 49 | Complete |
-| COMB-07 | Phase 49 | Pending |
+| COMB-07 | Phase 49 | Complete |
 | PSYC-01 | Phase 50 | Pending |
 | PSYC-02 | Phase 50 | Pending |
 | PSYC-03 | Phase 50 | Pending |
