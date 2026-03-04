@@ -177,3 +177,125 @@ describe('getWaveDistribution', () => {
     expect(dist6.ice).toBeGreaterThan(dist1.ice);
   });
 });
+
+// ==================== New distribution tests (47-05) ====================
+
+describe('getWaveDistribution — new tile unlock progression', () => {
+  it('wave 1: has no wildcard, no advanced tiles (mirror/vortex/frost/prism/lightning/gem/diamond)', () => {
+    const dist = getWaveDistribution(getWaveConfig(1));
+    // Wildcard must be gone
+    expect(dist.wildcard ?? 0).toBe(0);
+    // Basic specials all present
+    expect(dist.bomb).toBeGreaterThan(0);
+    expect(dist.ice).toBeGreaterThan(0);
+    expect(dist.gold).toBeGreaterThan(0);
+    expect(dist.silver).toBeGreaterThan(0);
+    expect(dist.rainbow).toBeGreaterThan(0);
+    // Advanced tiles absent in wave 1
+    expect(dist.mirror ?? 0).toBe(0);
+    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
+    expect(dist.prism ?? 0).toBe(0);
+    expect(dist.lightning ?? 0).toBe(0);
+    expect(dist.gem ?? 0).toBe(0);
+    expect(dist.diamond ?? 0).toBe(0);
+  });
+
+  it('wave 2: unlocks treasure gem (gem > 0), still no mirror/lightning/prism/frost/vortex/diamond', () => {
+    const dist = getWaveDistribution(getWaveConfig(2));
+    expect(dist.gem).toBeGreaterThan(0);
+    expect(dist.mirror ?? 0).toBe(0);
+    expect(dist.lightning ?? 0).toBe(0);
+    expect(dist.prism ?? 0).toBe(0);
+    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
+    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+    expect(dist.diamond ?? 0).toBe(0);
+  });
+
+  it('wave 3: unlocks prism + mirror (both > 0), still no lightning/frost/vortex/diamond', () => {
+    const dist = getWaveDistribution(getWaveConfig(3));
+    expect(dist.prism).toBeGreaterThan(0);
+    expect(dist.mirror).toBeGreaterThan(0);
+    expect(dist.lightning ?? 0).toBe(0);
+    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
+    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+    expect(dist.diamond ?? 0).toBe(0);
+  });
+
+  it('wave 4: unlocks frost + lightning + diamond (all > 0), still no vortex/magnet', () => {
+    const dist = getWaveDistribution(getWaveConfig(4));
+    expect(dist.frost ?? dist.frozen ?? 0).toBeGreaterThan(0);
+    expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.diamond).toBeGreaterThan(0);
+    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+  });
+
+  it('wave 5: all tiles except vortex/magnet are > 0', () => {
+    const dist = getWaveDistribution(getWaveConfig(5));
+    expect(dist.bomb).toBeGreaterThan(0);
+    expect(dist.ice).toBeGreaterThan(0);
+    expect(dist.gold).toBeGreaterThan(0);
+    expect(dist.silver).toBeGreaterThan(0);
+    expect(dist.rainbow).toBeGreaterThan(0);
+    expect(dist.gem).toBeGreaterThan(0);
+    expect(dist.prism).toBeGreaterThan(0);
+    expect(dist.mirror).toBeGreaterThan(0);
+    expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.frost ?? dist.frozen ?? 0).toBeGreaterThan(0);
+    expect(dist.diamond).toBeGreaterThan(0);
+    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+  });
+
+  it('wave 6+: everything including vortex/magnet is > 0', () => {
+    const dist = getWaveDistribution(getWaveConfig(6));
+    expect(dist.vortex ?? dist.magnet ?? 0).toBeGreaterThan(0);
+    expect(dist.mirror).toBeGreaterThan(0);
+    expect(dist.diamond).toBeGreaterThan(0);
+  });
+
+  it('all distributions for waves 1-6 sum to 1.0 (within 0.01)', () => {
+    for (let wave = 1; wave <= 6; wave++) {
+      const dist = getWaveDistribution(getWaveConfig(wave));
+      const sum = (Object.values(dist) as number[]).reduce((a, b) => a + b, 0);
+      expect(sum).toBeCloseTo(1.0, 2); // within 0.01
+    }
+  });
+
+  it('silver is present in all waves (basic tier)', () => {
+    for (let wave = 1; wave <= 6; wave++) {
+      const dist = getWaveDistribution(getWaveConfig(wave));
+      expect(dist.silver).toBeGreaterThan(0);
+    }
+  });
+
+  it('no wildcard in any wave 1-10', () => {
+    for (let wave = 1; wave <= 10; wave++) {
+      const dist = getWaveDistribution(getWaveConfig(wave));
+      expect(dist.wildcard ?? 0).toBe(0);
+    }
+  });
+
+  it('WaveConfig has mirrorEnabled, silverEnabled, diamondEnabled flags', () => {
+    const config = getWaveConfig(1);
+    expect(typeof config.mirrorEnabled).toBe('boolean');
+    expect(typeof config.silverEnabled).toBe('boolean');
+    expect(typeof config.diamondEnabled).toBe('boolean');
+  });
+
+  it('mirrorEnabled=false for wave 1-2, true for wave 3+', () => {
+    expect(getWaveConfig(1).mirrorEnabled).toBe(false);
+    expect(getWaveConfig(2).mirrorEnabled).toBe(false);
+    expect(getWaveConfig(3).mirrorEnabled).toBe(true);
+  });
+
+  it('diamondEnabled=false for wave 1-3, true for wave 4+', () => {
+    expect(getWaveConfig(3).diamondEnabled).toBe(false);
+    expect(getWaveConfig(4).diamondEnabled).toBe(true);
+  });
+
+  it('silverEnabled=true for all waves', () => {
+    for (let wave = 1; wave <= 6; wave++) {
+      expect(getWaveConfig(wave).silverEnabled).toBe(true);
+    }
+  });
+});
