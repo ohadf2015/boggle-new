@@ -180,5 +180,5 @@ Plans:
 | 48. Combination System Core | 3/4 | Complete    | 2026-03-04 | - |
 | 49. Combination UX | 5/5 | Complete    | 2026-03-04 | - |
 | 50. Psychological Hooks | 4/4 | Complete    | 2026-03-04 | - |
-| 51. Visual Polish — Tile Animations | 1/2 | In Progress|  | - |
+| 51. Visual Polish — Tile Animations | 2/2 | Complete   | 2026-03-04 | - |
 | 52. Multiplayer Sync | v3.0 | 0/4 | Not started | - |

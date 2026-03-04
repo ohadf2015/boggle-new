@@ -16,8 +16,8 @@
 - [ ] **TILE-07**: Gold tier system implemented — Silver (1.5x), Gold (3x), Diamond (5x wave 4+ only) replacing single gold type
 - [ ] **TILE-08**: Tile type enum unified between singleplayer and multiplayer into single shared `BlastTileType` in `shared/types/`
 - [ ] **TILE-09**: Spawn distribution tables updated for all waves to include new/reworked tiles with balanced probabilities
-- [ ] **TILE-10**: Each tile type has unique idle animation in Phaser layer (breathing, wobble, shimmer, cycling, etc.)
-- [ ] **TILE-11**: Each tile type has unique death/clear animation in Phaser layer (shatter, dissolve, refract, burst, etc.)
+- [x] **TILE-10**: Each tile type has unique idle animation in Phaser layer (breathing, wobble, shimmer, cycling, etc.)
+- [x] **TILE-11**: Each tile type has unique death/clear animation in Phaser layer (shatter, dissolve, refract, burst, etc.)
 
 ### Combination System
 
@@ -86,8 +86,8 @@
 | TILE-07 | Phase 47 | Pending |
 | TILE-08 | Phase 46 | Pending |
 | TILE-09 | Phase 47 | Pending |
-| TILE-10 | Phase 51 | Pending |
-| TILE-11 | Phase 51 | Pending |
+| TILE-10 | Phase 51 | Complete |
+| TILE-11 | Phase 51 | Complete |
 | COMB-01 | Phase 48 | Complete |
 | COMB-02 | Phase 48 | Complete |
 | COMB-03 | Phase 48 | Complete |
