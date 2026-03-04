@@ -167,7 +167,10 @@ Plans:
   2. `BLAST_TILE_TYPE_LIST` has length 13 with no wildcard entry
   3. All tests pass with no contradictory wildcard assertions
   4. `BLAST_TILE_TYPES` in multiplayer constants excludes wildcard
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 53-01-PLAN.md — Remove wildcard from BlastTileType union, Records, and test assertions (TILE-06, TILE-08, SYNC-01) (Wave 1)
 
 #### Phase 54: Gap Closure — Multiplayer Combo Sync + Codex Wiring
 **Goal**: Multiplayer combo flash sync works end-to-end (client A submits combo → server broadcasts → client B sees flash), and authenticated singleplayer users persist Combo Codex progress to Supabase.
@@ -219,6 +222,6 @@ Plans:
 | 50. Psychological Hooks | 4/4 | Complete    | 2026-03-04 | - |
 | 51. Visual Polish — Tile Animations | 2/2 | Complete    | 2026-03-04 | - |
 | 52. Multiplayer Sync | 4/4 | Complete    | 2026-03-04 | - |
-| 53. Gap Closure — Wildcard Type Cleanup | v3.0 | 0/0 | Pending | - |
+| 53. Gap Closure — Wildcard Type Cleanup | v3.0 | 0/1 | Pending | - |
 | 54. Gap Closure — MP Combo Sync + Codex Wiring | v3.0 | 0/0 | Pending | - |
 | 55. Gap Closure — Tech Debt & Docs Cleanup | v3.0 | 0/0 | Pending | - |
