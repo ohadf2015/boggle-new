@@ -37,7 +37,7 @@ const BlastView: React.FC = () => {
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
   const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
 
-  const { discoveredCombos } = useBlastComboDiscovery();
+  const { discoveredCombos, pendingDiscovery, onComboDetected, acknowledgeDiscovery } = useBlastComboDiscovery();
 
   const baseConfig = resolveBlastConfig((language as Language) || 'en', 'medium');
 
@@ -146,6 +146,9 @@ const BlastView: React.FC = () => {
           onWaveComplete={handleWaveComplete}
           onGameEnd={handleGameEnd}
           onQuit={handleQuit}
+          onComboDetected={onComboDetected}
+          pendingDiscovery={pendingDiscovery}
+          acknowledgeDiscovery={acknowledgeDiscovery}
         />
       )}
 
