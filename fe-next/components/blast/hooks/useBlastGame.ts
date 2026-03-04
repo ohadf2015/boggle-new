@@ -22,8 +22,8 @@ import {
   MAGNET_ATTRACT_BONUS,
   PRISM_USE_BONUS,
   PRISM_CROSS_BONUS,
-  GEM_USE_BONUS,
-  GEM_COLLECT_BONUS,
+  TREASURE_GEM_COMPLETION_BONUS,
+  TREASURE_GEM_SPAWN_COUNT,
   SPECIAL_TILE_DISTRIBUTION,
   MAX_CASCADE_CHAIN,
   MAX_CASCADE_WORDS_PER_LEVEL,
@@ -47,6 +47,7 @@ import { getInitialHitsRemaining } from '../utils/blastTileUtils';
 import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { calculateBonusMoves, calculateLeftoverMoveBonus } from '../utils/blastMoveUtils';
+import { getWaveConfig, getWaveDistribution } from '../utils/blastWaveConfig';
 
 // ==================== Helpers ====================
 
@@ -165,6 +166,8 @@ export interface UseBlastGameOptions {
   movesAllowed?: number;
   /** Wave objectives — when provided, board generation guarantees enough tiles for collect_type/clear_all_type objectives */
   waveObjectives?: import('../types').BlastObjective[];
+  /** Current wave number — used for Treasure Gem spawn distribution gating (default: 1) */
+  currentWave?: number;
 }
 
 // ==================== Hook ====================
@@ -207,6 +210,8 @@ export function useBlastGame(
 
   // Move limit from options (default: unlimited via high number)
   const movesAllowed = options?.movesAllowed ?? Infinity;
+  // Current wave number for Treasure Gem spawn gating (default: 1)
+  const currentWave = options?.currentWave ?? 1;
 
   // Game state
   const [gameState, setGameState] = useState<BlastGameState>({
@@ -536,6 +541,8 @@ export function useBlastGame(
       const clearedTypeCounts: Partial<Record<BlastTileType, number>> = {};
       // BUGF-06 fix: track gold tiles multiplicatively (3^n) not additively (n*(3-1))
       let goldMultiplier = 1;
+      // Treasure Gem: count gems completing this word to spawn specials after path loop
+      let gemsCompletedThisWord = 0;
 
       // ── Rainbow Boost pre-scan ──────────────────────────────────────────────
       // Rank offensive specials (explosion/clear effects). Gold/silver/diamond are
@@ -672,11 +679,18 @@ export function useBlastGame(
         // Multi-hit tiles: decrement on non-final hits
         if (isMultiHitAlive(tile)) {
           tile.hitsRemaining--;
-          tile.activationEffect = `${tile.type}-crack`;
 
-          // Prism and gem get use bonuses even on non-final hits
+          // Gem: shard-specific activationEffect (gem-shard-1, gem-shard-2)
+          // Ice/frozen/prism: use generic crack effect
+          if (tile.type === 'gem') {
+            // hitsRemaining after decrement: 2 = shard-1, 1 = shard-2
+            tile.activationEffect = tile.hitsRemaining === 2 ? 'gem-shard-1' : 'gem-shard-2';
+          } else {
+            tile.activationEffect = `${tile.type}-crack`;
+          }
+
+          // Prism gets use bonus on non-final hits; gem no longer does (Treasure Gem redesign)
           if (tile.type === 'prism') bonusScore += PRISM_USE_BONUS;
-          if (tile.type === 'gem') bonusScore += GEM_USE_BONUS;
 
           continue; // Don't clear yet
         }
@@ -812,8 +826,8 @@ export function useBlastGame(
                   break;
                 }
                 case 'gem': {
-                  // Gem collect bonus fires twice
-                  bonusScore += GEM_COLLECT_BONUS;
+                  // Treasure Gem completion bonus fires twice (Rainbow amplifies the gem's reward)
+                  bonusScore += TREASURE_GEM_COMPLETION_BONUS;
                   break;
                 }
                 case 'magnet': {
@@ -940,14 +954,17 @@ export function useBlastGame(
             break;
           }
 
-          case 'gem':
-            // Final hit — COLLECT
-            bonusScore += GEM_USE_BONUS + GEM_COLLECT_BONUS;
+          case 'gem': {
+            // Final hit — Treasure Gem COMPLETE: award bonus + schedule special spawns
+            tile.activationEffect = 'gem-complete';
+            bonusScore += TREASURE_GEM_COMPLETION_BONUS;
+            gemsCompletedThisWord++;
             newExplosions.push({
               id: `gem-${now}-${cell.row}-${cell.col}`,
               row: cell.row, col: cell.col, type: 'gem', intensity: 2, timestamp: now,
             });
             break;
+          }
 
           case 'frozen':
             // Final hit — bonus for clearing toughest obstacle
@@ -1001,6 +1018,56 @@ export function useBlastGame(
             }
             break;
           }
+        }
+      }
+
+      // ── Treasure Gem: spawn random specials on completion ─────────────────────
+      // For each gem that completed this word, spawn TREASURE_GEM_SPAWN_COUNT
+      // random special tiles on previously-standard non-cleared cells.
+      // Respects wave-enabled flags via getWaveDistribution(getWaveConfig(currentWave)).
+      if (gemsCompletedThisWord > 0) {
+        const waveConfig = getWaveConfig(currentWave);
+        const waveDist = getWaveDistribution(waveConfig);
+        // Remove 'standard' and 'gem' from spawn pool (fallback is handled by rollSpecialFromDistribution)
+        const spawnDist = { ...waveDist };
+        delete spawnDist['standard'];
+        delete spawnDist['gem'];
+
+        // Normalize spawn distribution
+        const spawnTotal = Object.values(spawnDist).reduce((a, b) => a + b, 0);
+        if (spawnTotal > 0) {
+          for (const key of Object.keys(spawnDist)) {
+            spawnDist[key] /= spawnTotal;
+          }
+        }
+
+        // Collect candidate standard tiles (not cleared, not in path)
+        const pathSet = new Set(path.map(p => `${p.row},${p.col}`));
+        const standardCandidates: BlastTileState[] = [];
+        for (let r = 0; r < gridSize; r++) {
+          for (let c = 0; c < gridSize; c++) {
+            const t = next[r][c];
+            if (!t.isCleared && t.type === 'standard' && !pathSet.has(`${r},${c}`)) {
+              standardCandidates.push(t);
+            }
+          }
+        }
+
+        // Shuffle candidates using a simple random (non-seeded for variety)
+        for (let i = standardCandidates.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [standardCandidates[i], standardCandidates[j]] = [standardCandidates[j], standardCandidates[i]];
+        }
+
+        // Convert up to TREASURE_GEM_SPAWN_COUNT tiles per completed gem
+        const spawnCount = gemsCompletedThisWord * TREASURE_GEM_SPAWN_COUNT;
+        const toConvert = standardCandidates.slice(0, spawnCount);
+        for (const candidate of toConvert) {
+          const roll = Math.random();
+          const newType = rollSpecialFromDistribution(roll, spawnDist);
+          candidate.type = newType;
+          candidate.hitsRemaining = getInitialHitsRemaining(newType);
+          candidate.activationEffect = null;
         }
       }
 
@@ -1128,7 +1195,7 @@ export function useBlastGame(
 
       return next;
     });
-  }, [gridSize, effectiveGrid, cascade, handleCascadeComplete]);
+  }, [gridSize, effectiveGrid, cascade, handleCascadeComplete, currentWave]);
 
   /** End the game manually */
   const endGame = useCallback(() => {
