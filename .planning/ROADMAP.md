@@ -134,11 +134,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Each of the 10+ tile types has a visually distinct idle animation visible while tiles sit on the board (breathing, wobble, shimmer, cycling, etc.)
   2. Each tile type produces a distinct death animation when cleared (shatter, dissolve, refract, burst, etc.) — no two types look identical on clear
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 51-01: Implement idle animations for all tile types in Phaser BlastTile layer (TILE-10)
-- [ ] 51-02: Implement death/clear animations for all tile types in Phaser BlastTile layer (TILE-11)
+- [ ] 51-01-PLAN.md — Add mirror/silver/diamond to BlastTileRules + idle tweens for all tile types (TILE-10) (Wave 1)
+- [ ] 51-02-PLAN.md — Per-type death/clear animations via playClearByType() dispatch (TILE-11) (Wave 1, depends on 51-01)
 
 #### Phase 52: Multiplayer Sync — New Mechanics in Multiplayer
 **Goal**: All new tile types, combination effects, and game mechanics work correctly and deterministically in multiplayer Blast games, and Combo Codex progress persists to each player's profile.
