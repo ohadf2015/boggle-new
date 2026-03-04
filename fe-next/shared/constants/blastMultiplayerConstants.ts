@@ -28,6 +28,9 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   wildcard: 1,
   prism: 2,
   frozen: 1.5,
+  mirror: 2,
+  silver: 4,
+  diamond: 5,
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 5;

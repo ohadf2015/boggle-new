@@ -265,10 +265,8 @@ describe('useBlastGame — chain propagation (BUGF-01 and BUGF-02)', () => {
       // Combined: all 6×5 = 30 tiles in cols 0-4 should be cleared
       for (let r = 0; r < 6; r++) {
         for (let c = 0; c <= 4; c++) {
-          expect(grid[r][c].isCleared).toBe(
-            true,
-            `Expected (${r},${c}) cleared by lightning+bomb chain`,
-          );
+          // (r,c) should be cleared by lightning+bomb chain
+          expect(grid[r][c].isCleared).toBe(true);
         }
       }
     });
@@ -391,10 +389,8 @@ describe('useBlastGame — chain propagation (BUGF-01 and BUGF-02)', () => {
 
       // FIX: ALL tiles in col 1 (lightning's column) should be cleared
       for (let r = 0; r < gridSize; r++) {
-        expect(grid[r][1].isCleared).toBe(
-          true,
-          `Expected (${r},1) cleared by lightning chain from prism→lightning`,
-        );
+        // (r,1) should be cleared by lightning chain from prism→lightning
+        expect(grid[r][1].isCleared).toBe(true);
       }
     });
 
@@ -455,10 +451,8 @@ describe('useBlastGame — chain propagation (BUGF-01 and BUGF-02)', () => {
 
       // ALL tiles in col 4 should be cleared (prism's column sweep + lightning's column-clear)
       for (let r = 0; r < gridSize; r++) {
-        expect(next[r][4].isCleared).toBe(
-          true,
-          `Expected (${r},4) cleared by prism column + lightning chain`,
-        );
+        // (r,4) should be cleared by prism column + lightning chain
+        expect(next[r][4].isCleared).toBe(true);
       }
 
       // Row 2 should be cleared by prism's row sweep
@@ -669,20 +663,16 @@ describe('useBlastGame — chain propagation (BUGF-01 and BUGF-02)', () => {
 
       // 3. Lightning at (3,1) was swept by prism row, triggering col 1 clear
       for (let r = 0; r < gridSize; r++) {
-        expect(next[r][1].isCleared).toBe(
-          true,
-          `Expected (${r},1) cleared by lightning triggered by prism`,
-        );
+        // (r,1) should be cleared by lightning triggered by prism
+        expect(next[r][1].isCleared).toBe(true);
       }
 
       // 4. Bomb at (0,1) was cleared by lightning and detonated — blast covers
       //    rows 0-2, cols 0-3 (radius 2 from (0,1) in the 6x6 grid)
       for (let r = 0; r <= Math.min(0 + BOMB_RADIUS, gridSize - 1); r++) {
         for (let c = Math.max(0, 1 - BOMB_RADIUS); c <= Math.min(1 + BOMB_RADIUS, gridSize - 1); c++) {
-          expect(next[r][c].isCleared).toBe(
-            true,
-            `Expected (${r},${c}) cleared by bomb blast from (0,1)`,
-          );
+          // (r,c) should be cleared by bomb blast from (0,1)
+          expect(next[r][c].isCleared).toBe(true);
         }
       }
     });

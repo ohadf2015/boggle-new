@@ -86,7 +86,7 @@ export function BlastExplosionLayer({
         const x = containerOffset.x + popup.col * cellSize + cellSize / 2;
         const y = containerOffset.y + popup.row * cellSize + cellSize / 2;
         const intensity = getScoreIntensity(popup.score);
-        const glowColor = popup.tileType ? POPUP_GLOW_COLORS[popup.tileType] : undefined;
+        const glowColor = popup.tileType ? POPUP_GLOW_COLORS[popup.tileType as keyof typeof POPUP_GLOW_COLORS] : undefined;
         const defaultGlow = `rgba(255,215,0,${intensity === 3 ? '0.6' : '0.35'})`;
 
         return (

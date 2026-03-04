@@ -7,7 +7,7 @@
 import { mockAuth } from './__mocks__/supabaseAuthMocks';
 
 jest.mock('@supabase/ssr', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+   
   const { mockAuth: auth } = require('./__mocks__/supabaseAuthMocks');
   return {
     createBrowserClient: () => ({

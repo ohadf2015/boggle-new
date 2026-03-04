@@ -6,7 +6,7 @@
 
 // ==================== Tile Type ====================
 
-/** All possible blast mode tile types (standard + 12 special) */
+/** All possible blast mode tile types (standard + 13 special) */
 export type BlastTileType =
   | 'standard'
   | 'gold'
@@ -20,7 +20,8 @@ export type BlastTileType =
   | 'frozen'
   | 'mirror'
   | 'silver'
-  | 'diamond';
+  | 'diamond'
+  | 'wildcard';
 
 /** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
@@ -37,6 +38,7 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'mirror',
   'silver',
   'diamond',
+  'wildcard',
 ] as const;
 
 // ==================== Tile State ====================

@@ -43,6 +43,9 @@ const TILE_TINTS: Record<BlastTileType, number> = {
   prism:     0xff69b4, // #FF69B4 — hot pink (rainbow conic midpoint)
   gem:       0x50c878, // #50C878 — emerald
   frozen:    0xc8dcff, // #C8DCFF — pale blue
+  mirror:    0xd4d4d8, // silver-gray
+  silver:    0xc0c0c0, // silver
+  diamond:   0xb9f2ff, // light diamond blue
 };
 
 // ─── Tile border colours (from CSS border declarations) ──────────────────────
@@ -59,6 +62,9 @@ const TILE_BORDERS: Record<BlastTileType, number> = {
   prism:     0xffffff,
   gem:       0x50c878,
   frozen:    0xb4dcff,
+  mirror:    0xd4d4d8,
+  silver:    0xc0c0c0,
+  diamond:   0xb9f2ff,
 };
 
 // ─── Per-type glow base configs ──────────────────────────────────────────────
@@ -81,6 +87,9 @@ const GLOW_BASES: Record<BlastTileType, GlowBase> = {
   prism:     { color: 0xffffff, intensity: 0.5,  radius: 12 },
   gem:       { color: 0x50c878, intensity: 0.45, radius: 10 },
   frozen:    { color: 0xb4dcff, intensity: 0.5,  radius: 10 },
+  mirror:    { color: 0xd4d4d8, intensity: 0.4,  radius: 8 },
+  silver:    { color: 0xc0c0c0, intensity: 0.45, radius: 10 },
+  diamond:   { color: 0xb9f2ff, intensity: 0.6,  radius: 12 },
 };
 
 // ─── Explosion colours (per explosion type) ──────────────────────────────────
@@ -113,6 +122,9 @@ export const BLAST_TILE_CONFIGS: Record<Exclude<BlastTileType, 'standard'>, Blas
   prism:     { tint: TILE_TINTS.prism,     borderColor: TILE_BORDERS.prism,     badgeText: '×2' },
   gem:       { tint: TILE_TINTS.gem,       borderColor: TILE_BORDERS.gem,       badgeText: '+3' },
   frozen:    { tint: TILE_TINTS.frozen,    borderColor: TILE_BORDERS.frozen,    badgeText: '×3' },
+  mirror:    { tint: TILE_TINTS.mirror,    borderColor: TILE_BORDERS.mirror,    badgeText: '↔' },
+  silver:    { tint: TILE_TINTS.silver,    borderColor: TILE_BORDERS.silver,    badgeText: '×4' },
+  diamond:   { tint: TILE_TINTS.diamond,   borderColor: TILE_BORDERS.diamond,   badgeText: '×5' },
 };
 
 // ─── Public API ──────────────────────────────────────────────────────────────

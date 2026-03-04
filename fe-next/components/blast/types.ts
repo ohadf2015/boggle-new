@@ -2,8 +2,9 @@ import type { Language } from '@/shared/types/game';
 
 // ==================== Tile Types (canonical source: @/shared/types/blast) ====================
 
-// Re-export canonical types so all blast component imports can use '../types' without change
-export type { BlastTileType, BlastTileState } from '@/shared/types/blast';
+// Import for local use + re-export so all blast component imports can use '../types' without change
+import type { BlastTileType, BlastTileState } from '@/shared/types/blast';
+export type { BlastTileType, BlastTileState };
 
 // ==================== Difficulty ====================
 
@@ -224,6 +225,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   mirror: 0,
   silver: 0,
   diamond: 0,
+  wildcard: 0,
 };
 
 // ==================== Objectives ====================

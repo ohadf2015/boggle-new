@@ -611,7 +611,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         socket.emit('join', joinPayload);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [
       socket,
       gameCode,

@@ -27,11 +27,11 @@ function getProgress(
       break;
 
     case 'collect_type':
-      current = (objective.tileType && tileTypeClears[objective.tileType]) || 0;
+      current = (objective.tileType && tileTypeClears[objective.tileType as BlastTileType]) || 0;
       break;
 
     case 'clear_all_type': {
-      const tileType = objective.tileType!;
+      const tileType = objective.tileType as BlastTileType;
       current = tileTypeClears[tileType] || 0;
       // Target is the total count of that tile type on the board
       target = (initialTileTypeCounts && initialTileTypeCounts[tileType]) || 0;
