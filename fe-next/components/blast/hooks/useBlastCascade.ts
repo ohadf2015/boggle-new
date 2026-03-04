@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState } from '../types';
 import { computeGravityResult, type ClearedTile, type FallingTile, type NewTile } from '../utils/blastGravity';
+import { createSeededRandom } from '../utils/blastLetterGenerator';
 
 // ==================== Types ====================
 
@@ -60,6 +61,15 @@ interface UseBlastCascadeOptions {
   customDistribution?: Record<string, number>;
   /** Respect prefers-reduced-motion */
   reducedMotion?: boolean;
+  /**
+   * Seed for deterministic multiplayer refills.
+   * When provided (from server via BlastModeState.seed), a seeded RNG is created
+   * via createSeededRandom(blastSeed) and passed to computeGravityResult.
+   * Singleplayer: omit or leave null — defaults to Math.random.
+   * NOTE: Each cascade creates a NEW seeded RNG from the same seed to ensure
+   *       cross-client determinism when they process the same cascade event.
+   */
+  blastSeed?: number | null;
 }
 
 export interface UseBlastCascadeReturn {
@@ -97,6 +107,7 @@ export function useBlastCascade({
   specialTileChance,
   customDistribution,
   reducedMotion = false,
+  blastSeed = null,
 }: UseBlastCascadeOptions): UseBlastCascadeReturn {
   const [cascadePhase, setCascadePhase] = useState<BlastCascadePhase>('idle');
   const [animationData, setAnimationData] = useState<CascadeAnimationData | null>(null);
@@ -120,8 +131,13 @@ export function useBlastCascade({
     // Clear any in-flight timers from a previous cascade
     clearTimers();
 
+    // Create seeded RNG for deterministic multiplayer refills when seed is available.
+    // Each cascade creates a fresh RNG from the same seed so all clients produce
+    // the same tiles for the same cascade event (reduced divergence, not lockstep).
+    const rng = blastSeed != null ? createSeededRandom(blastSeed) : undefined;
+
     // Compute gravity result upfront (pure function)
-    const result = computeGravityResult(grid, tileStates, gridSize, language, specialTileChance, customDistribution, spawnModifier);
+    const result = computeGravityResult(grid, tileStates, gridSize, language, specialTileChance, customDistribution, spawnModifier, rng);
 
     // Columns that received new tiles (these are the only ones worth scanning for cascade words)
     const affectedColumns = [...new Set(result.newTiles.map(t => t.col))];
@@ -165,7 +181,7 @@ export function useBlastCascade({
     }, timing.clear + timing.fall + timing.appear);
 
     timersRef.current = [t1, t2, t3];
-  }, [gridSize, language, specialTileChance, customDistribution, reducedMotion, clearTimers]);
+  }, [gridSize, language, specialTileChance, customDistribution, reducedMotion, blastSeed, clearTimers]);
 
   const isAnimating = cascadePhase !== 'idle';
 

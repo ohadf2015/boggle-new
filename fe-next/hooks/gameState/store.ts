@@ -98,6 +98,10 @@ interface GameState {
   // Blast multiplayer state
   blastTileOverlay: BlastTileOverlay[];
   blastMovesUsed: number;
+  /** Seeded PRNG seed from server for deterministic multiplayer refills */
+  blastSeed: number | null;
+  /** Pending combo sync from another player — triggers BlastComboFlash for spectators */
+  blastComboSync: { comboType: string; username: string; id: string } | null;
 
   // Word Hunt multiplayer state
   wordHuntTargetLength: number;
@@ -166,6 +170,8 @@ interface GameActions {
   // Blast multiplayer actions
   setBlastTileOverlay: (value: BlastTileOverlay[] | ((prev: BlastTileOverlay[]) => BlastTileOverlay[])) => void;
   setBlastMovesUsed: (value: number | ((prev: number) => number)) => void;
+  setBlastSeed: (value: number | null | ((prev: number | null) => number | null)) => void;
+  setBlastComboSync: (value: { comboType: string; username: string; id: string } | null) => void;
 
   // Word Hunt multiplayer actions
   setWordHuntTargetLength: (value: number | ((prev: number) => number)) => void;
@@ -214,6 +220,8 @@ const initialState: GameState = {
   gameMode: 'classic',
   blastTileOverlay: [],
   blastMovesUsed: 0,
+  blastSeed: null,
+  blastComboSync: null,
   wordHuntTargetLength: 0,
   wordHuntMyLife: 100,
   wordHuntPlayerLives: {},
@@ -456,6 +464,12 @@ export const useGameStore = create<GameStore>()(
       blastMovesUsed: applySetState(value, state.blastMovesUsed)
     })),
 
+    setBlastSeed: (value) => set((state) => ({
+      blastSeed: applySetState(value, state.blastSeed)
+    })),
+
+    setBlastComboSync: (value) => set({ blastComboSync: value }),
+
     // ==========================================
     // Word Hunt Multiplayer Actions
     // ==========================================
@@ -506,6 +520,8 @@ export const useGameStore = create<GameStore>()(
         levelUpData: null,
         blastTileOverlay: [],
         blastMovesUsed: 0,
+        blastSeed: null,
+        blastComboSync: null,
         wordHuntTargetLength: 0,
         wordHuntMyLife: 100,
         wordHuntPlayerLives: {},
@@ -576,6 +592,8 @@ export const useGameMode = () => useGameStore((state) => state.gameMode);
 // Blast multiplayer selectors
 export const useBlastTileOverlay = () => useGameStore((state) => state.blastTileOverlay);
 export const useBlastMovesUsed = () => useGameStore((state) => state.blastMovesUsed);
+export const useBlastSeed = () => useGameStore((state) => state.blastSeed);
+export const useBlastComboSync = () => useGameStore((state) => state.blastComboSync);
 
 // Word Hunt multiplayer selectors
 export const useWordHuntTargetLength = () => useGameStore((state) => state.wordHuntTargetLength);
@@ -632,6 +650,8 @@ const getActions = (state: GameStore) => ({
   setGameMode: state.setGameMode,
   setBlastTileOverlay: state.setBlastTileOverlay,
   setBlastMovesUsed: state.setBlastMovesUsed,
+  setBlastSeed: state.setBlastSeed,
+  setBlastComboSync: state.setBlastComboSync,
   setWordHuntTargetLength: state.setWordHuntTargetLength,
   setWordHuntMyLife: state.setWordHuntMyLife,
   setWordHuntPlayerLives: state.setWordHuntPlayerLives,

@@ -294,4 +294,12 @@ export interface BlastModeState {
   overlay: BlastTileOverlay[];
   playerMoves: Record<string, number>;
   playerBonusMoves: Record<string, number>;
+  /**
+   * Seeded PRNG seed for deterministic multiplayer refills.
+   * Generated server-side in initBlastModeState and broadcast with startGame.
+   * Clients use createSeededRandom(seed) to produce identical tile refills.
+   * NOTE: Boards remain client-authoritative; seeded refill reduces divergence
+   *       but does not guarantee lockstep (different words clear different cells).
+   */
+  seed?: number;
 }

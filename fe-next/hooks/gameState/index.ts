@@ -56,6 +56,10 @@ export {
   useWordHuntPlayerLives,
   useWordHuntTargetAttempts,
   useWordHuntTargetFound,
+  useBlastTileOverlay,
+  useBlastMovesUsed,
+  useBlastSeed,
+  useBlastComboSync,
   useGameActions,
 } from './store';
 

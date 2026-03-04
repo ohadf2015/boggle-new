@@ -15,7 +15,7 @@ import {
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions } from '@/hooks/gameState';
-import type { BlastWordAcceptedPayload, StartGameBroadcast } from '@/shared/types/socket';
+import type { BlastWordAcceptedPayload, BlastComboSyncPayload, StartGameBroadcast } from '@/shared/types/socket';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { GameTimerReturn } from '@/hooks/useGameTimer';
@@ -127,6 +127,8 @@ export function usePlayerGameEvents({
     setGameMode,
     setBlastTileOverlay,
     setBlastMovesUsed,
+    setBlastSeed,
+    setBlastComboSync,
     setWordHuntTargetLength,
     setWordHuntMyLife,
     setWordHuntPlayerLives,
@@ -219,6 +221,10 @@ export function usePlayerGameEvents({
       if ((data as any).blastTileOverlay) {
         setBlastTileOverlay((data as any).blastTileOverlay);
         setBlastMovesUsed(0);
+        // Store seed for deterministic multiplayer refills (see 52-03)
+        if ((data as any).blastSeed != null) {
+          setBlastSeed((data as any).blastSeed);
+        }
       }
 
       // Set word hunt target length if present
@@ -392,6 +398,16 @@ export function usePlayerGameEvents({
       setBlastMovesUsed(data.movesUsed);
     };
 
+    // Handle combo sync from another player — triggers BlastComboFlash overlay for spectators.
+    // Only fires for other players' combos; local player sees their own flash immediately.
+    const handleBlastComboSync = (data: BlastComboSyncPayload) => {
+      logger.log('[PLAYER] Blast combo sync from:', data.username, 'combo:', data.comboType);
+      // Only show flash for other players' combos (not our own)
+      if (data.username !== username) {
+        setBlastComboSync({ ...data, id: `combo-sync-${Date.now()}` });
+      }
+    };
+
     // Handle total board words count (for "words remaining" display)
     const handleTotalBoardWords = (data: { count: number }) => {
       logger.log('[PLAYER] Received totalBoardWords:', data.count);
@@ -441,6 +457,7 @@ export function usePlayerGameEvents({
     socket.on('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
     socket.on('totalBoardWords', handleTotalBoardWords);
     socket.on('blastWordAccepted', handleBlastWordAccepted);
+    socket.on('blastComboSync', handleBlastComboSync);
     socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
     socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
@@ -462,6 +479,7 @@ export function usePlayerGameEvents({
       earthquakeHandlers.cleanup();
       socket.off('totalBoardWords', handleTotalBoardWords);
       socket.off('blastWordAccepted', handleBlastWordAccepted);
+      socket.off('blastComboSync', handleBlastComboSync);
       socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);

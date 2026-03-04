@@ -62,6 +62,15 @@ export function computeGravityResult(
   customDistribution?: Record<string, number>,
   /** DDA spawn modifier — added to specialTileChance for new-tile rolls (see blastDDA.ts) */
   spawnModifier = 0,
+  /**
+   * Optional seeded RNG for deterministic multiplayer refills.
+   * When provided (via createSeededRandom(seed)), all new tile generation uses
+   * this RNG, making refills identical across clients sharing the same seed.
+   * Omit (or pass undefined) for singleplayer — defaults to Math.random.
+   * NOTE: Boards remain client-authoritative; seeded refill reduces divergence
+   *       but does not guarantee lockstep (different words clear different cells).
+   */
+  rng?: () => number,
 ): GravityResult {
   const newGrid: LetterGrid = Array.from({ length: gridSize }, () =>
     Array.from({ length: gridSize }, () => '')
@@ -134,8 +143,8 @@ export function computeGravityResult(
     const emptyCount = bottomRow + 1;
     for (let i = 0; i < emptyCount; i++) {
       const row = bottomRow - i; // top-most first
-      const letter = generateBlastLetter(language);
-      const type = rollSpecialType(specialTileChance, customDistribution, spawnModifier);
+      const letter = generateBlastLetter(language, 1.0, rng);
+      const type = rollSpecialType(specialTileChance, customDistribution, spawnModifier, rng);
 
       newGrid[row][col] = letter;
       newTileStates[row][col] = {

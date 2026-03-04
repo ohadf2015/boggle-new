@@ -59,6 +59,7 @@ import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { calculateBonusMoves, calculateLeftoverMoveBonus } from '../utils/blastMoveUtils';
 import { getWaveConfig, getWaveDistribution } from '../utils/blastWaveConfig';
+import { useBlastSeed } from '@/hooks/gameState';
 
 // ==================== Helpers ====================
 
@@ -211,6 +212,11 @@ export interface UseBlastGameReturn {
   /** Clear the active combo flash (called after animation completes) */
   clearComboFlash: () => void;
   /**
+   * Externally trigger a combo flash (e.g. from multiplayer blastComboSync event).
+   * Accepts any string comboType; only valid BlastComboType values will display properly.
+   */
+  triggerComboFlash: (comboType: string) => void;
+  /**
    * Track a word rejection for DDA (invisible assist).
    * Call when useWordSubmission fires onWordRejected.
    * After 3+ consecutive calls the next gravity refill will spawn more special tiles.
@@ -251,6 +257,13 @@ export interface UseBlastGameOptions {
    * Used by BlastGame to trigger the Sugar Crush sequence before ending.
    */
   onMovesExhausted?: () => void;
+  /**
+   * Seed for deterministic multiplayer refills.
+   * From BlastModeState.seed broadcast by server with startGame.
+   * Passed to useBlastCascade so each cascade uses createSeededRandom(blastSeed).
+   * Omit for singleplayer — falls back to Math.random.
+   */
+  blastSeed?: number | null;
 }
 
 // ==================== Hook ====================
@@ -267,6 +280,11 @@ export function useBlastGame(
   options?: UseBlastGameOptions,
 ): UseBlastGameReturn {
   const { gridSize, specialTileChance, language, difficulty = 'medium', customDistribution } = config;
+
+  // Read blast seed from store (set by server via startGame event in multiplayer).
+  // options.blastSeed takes precedence; falls back to store value; finally null (singleplayer).
+  const storedBlastSeed = useBlastSeed();
+  const effectiveBlastSeed = options?.blastSeed ?? storedBlastSeed ?? null;
 
   // Reuse grid generation from singleplayer, with blast gridSize override
   const {
@@ -331,6 +349,11 @@ export function useBlastGame(
   // Active combo flash state — set when a special combination fires, cleared by BlastComboFlash
   const [activeComboFlash, setActiveComboFlash] = useState<{ id: string; comboType: BlastComboType } | null>(null);
   const clearComboFlash = useCallback(() => setActiveComboFlash(null), []);
+  // External trigger — used by multiplayer blastComboSync to show another player's combo flash.
+  // Cast comboType to BlastComboType; unknown types render as a generic flash.
+  const triggerComboFlash = useCallback((comboType: string) => {
+    setActiveComboFlash({ id: `combo-sync-${Date.now()}`, comboType: comboType as BlastComboType });
+  }, []);
   // Ref so clearTilesForWord callback can access onSynergyDetected without stale closure
   const onSynergyDetectedRef = useRef(options?.onSynergyDetected);
   onSynergyDetectedRef.current = options?.onSynergyDetected;
@@ -354,12 +377,13 @@ export function useBlastGame(
   const onAutoCascadeWordRef = useRef(options?.onAutoCascadeWord);
   onAutoCascadeWordRef.current = options?.onAutoCascadeWord;
 
-  // Cascade hook
+  // Cascade hook — pass blastSeed for deterministic multiplayer refills
   const cascade = useBlastCascade({
     gridSize,
     language,
     specialTileChance,
     customDistribution,
+    blastSeed: effectiveBlastSeed,
   });
 
   // The effective grid = currentGrid (post-cascade) or initialGrid (pre-first-cascade)
@@ -1686,6 +1710,7 @@ export function useBlastGame(
     cascadeHighlightData,
     activeComboFlash,
     clearComboFlash,
+    triggerComboFlash,
     trackWordFail,
     setTileStates,
     addExplosion: addExplosionCallback,
