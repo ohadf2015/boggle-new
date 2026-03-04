@@ -77,13 +77,47 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated during roadmap creation) | | |
+| TILE-01 | Phase 47 | Pending |
+| TILE-02 | Phase 47 | Pending |
+| TILE-03 | Phase 47 | Pending |
+| TILE-04 | Phase 47 | Pending |
+| TILE-05 | Phase 47 | Pending |
+| TILE-06 | Phase 47 | Pending |
+| TILE-07 | Phase 47 | Pending |
+| TILE-08 | Phase 46 | Pending |
+| TILE-09 | Phase 47 | Pending |
+| TILE-10 | Phase 51 | Pending |
+| TILE-11 | Phase 51 | Pending |
+| COMB-01 | Phase 48 | Pending |
+| COMB-02 | Phase 48 | Pending |
+| COMB-03 | Phase 48 | Pending |
+| COMB-04 | Phase 49 | Pending |
+| COMB-05 | Phase 49 | Pending |
+| COMB-06 | Phase 49 | Pending |
+| COMB-07 | Phase 49 | Pending |
+| PSYC-01 | Phase 50 | Pending |
+| PSYC-02 | Phase 50 | Pending |
+| PSYC-03 | Phase 50 | Pending |
+| PSYC-04 | Phase 50 | Pending |
+| BUGF-01 | Phase 46 | Pending |
+| BUGF-02 | Phase 46 | Pending |
+| BUGF-03 | Phase 46 | Pending |
+| BUGF-04 | Phase 46 | Pending |
+| BUGF-05 | Phase 46 | Pending |
+| BUGF-06 | Phase 46 | Pending |
+| BUGF-07 | Phase 46 | Pending |
+| BUGF-08 | Phase 46 | Pending |
+| BUGF-09 | Phase 46 | Pending |
+| SYNC-01 | Phase 52 | Pending |
+| SYNC-02 | Phase 52 | Pending |
+| SYNC-03 | Phase 52 | Pending |
+| SYNC-04 | Phase 52 | Pending |
 
 **Coverage:**
 - v3.0 requirements: 31 total
-- Mapped to phases: 0
-- Unmapped: 31 ⚠️
+- Mapped to phases: 31
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-04*
-*Last updated: 2026-03-04 after initial definition*
+*Last updated: 2026-03-04 after roadmap creation (traceability populated)*
