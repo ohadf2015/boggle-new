@@ -7,6 +7,7 @@ import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
 import { detectVerticalWords } from '../utils/blastVerticalScanner';
 import { detectSpecialCombos } from '../utils/blastCombos';
+import type { BlastComboType } from '../utils/blastCombos';
 import { executeComboEffect } from '../utils/blastComboEffects';
 import type { LetterGrid } from '@/shared/types/game';
 import {
@@ -204,6 +205,10 @@ export interface UseBlastGameReturn {
   cascadeHighlightData: CascadeHighlightData | null;
   // Legacy alias
   modifiedGrid: LetterGrid | null;
+  /** Active combo flash to show on screen (null when no flash) */
+  activeComboFlash: { id: string; comboType: BlastComboType } | null;
+  /** Clear the active combo flash (called after animation completes) */
+  clearComboFlash: () => void;
 }
 
 export interface UseBlastGameOptions {
@@ -215,6 +220,8 @@ export interface UseBlastGameOptions {
   waveObjectives?: import('../types').BlastObjective[];
   /** Current wave number — used for Treasure Gem spawn distribution gating (default: 1) */
   currentWave?: number;
+  /** Called when a special combination is detected (e.g. for audio sting) */
+  onSynergyDetected?: (comboType: BlastComboType) => void;
 }
 
 // ==================== Hook ====================
@@ -291,6 +298,13 @@ export function useBlastGame(
   const [cascadeHighlightPhase, setCascadeHighlightPhase] = useState<CascadeHighlightPhase>('idle');
   const [cascadeHighlightData, setCascadeHighlightData] = useState<CascadeHighlightData | null>(null);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Active combo flash state — set when a special combination fires, cleared by BlastComboFlash
+  const [activeComboFlash, setActiveComboFlash] = useState<{ id: string; comboType: BlastComboType } | null>(null);
+  const clearComboFlash = useCallback(() => setActiveComboFlash(null), []);
+  // Ref so clearTilesForWord callback can access onSynergyDetected without stale closure
+  const onSynergyDetectedRef = useRef(options?.onSynergyDetected);
+  onSynergyDetectedRef.current = options?.onSynergyDetected;
 
   // Cascade chain refs (avoid re-renders + break circular useCallback dependency)
   const cascadeChainLevelRef = useRef(0);
@@ -686,6 +700,9 @@ export function useBlastGame(
           }
         }
         bonusScore += baseScore * (comboMultiplier - 1);
+        // Trigger combo flash overlay + audio sting callback
+        setActiveComboFlash({ id: `combo-flash-${now}`, comboType: detectedCombos[0].type });
+        onSynergyDetectedRef.current?.(detectedCombos[0].type);
       }
 
       for (const cell of path) {
@@ -1577,5 +1594,7 @@ export function useBlastGame(
     cascadeChainLevel: gameState.cascadeChainLevel,
     cascadeHighlightPhase,
     cascadeHighlightData,
+    activeComboFlash,
+    clearComboFlash,
   };
 }

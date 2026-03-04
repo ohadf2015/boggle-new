@@ -9,13 +9,16 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastGame } from './hooks/useBlastGame';
+import { BlastComboFlash } from './BlastComboFlash';
 import { useBlastHint } from './hooks/useBlastHint';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { calculateBonusMoves } from './utils/blastMoveUtils';
 import { BlastGameLayout } from './BlastGameLayout';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import type { BlastGameConfig, BlastResultsData } from './types';
+import type { BlastComboType } from './utils/blastCombos';
 import type { WaveConfig } from './utils/blastWaveConfig';
+import { getWaveObjectives } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
 
 interface BlastGameProps {
@@ -65,10 +68,18 @@ export function BlastGame({
     playWordAcceptedSound();
   }, [combo, playWordAcceptedSound]);
 
+  // Memoize wave objectives so they don't cause re-initialization
+  const waveObjectives = useMemo(() => getWaveObjectives(waveNumber), [waveNumber]);
+
   // Core blast game state (with cascade callback + move limit from wave config)
   const blast = useBlastGame(config, {
     onAutoCascadeWord: handleAutoCascadeWord,
     movesAllowed: waveConfig?.movesAllowed,
+    waveObjectives,
+    onSynergyDetected: useCallback((_comboType: BlastComboType) => {
+      // Play max combo sound as audio sting for any combo synergy
+      playComboSound(3);
+    }, [playComboSound]),
   });
 
   // Spam detection
@@ -242,7 +253,12 @@ export function BlastGame({
   }
 
   return (
-    <BlastGameLayout
+    <div className="relative flex-1 flex flex-col h-full" data-testid="blast-game-root">
+      <BlastComboFlash
+        activeFlash={blast.activeComboFlash}
+        onComplete={blast.clearComboFlash}
+      />
+      <BlastGameLayout
       grid={blast.modifiedGrid}
       tileStates={blast.tileStates}
       gridSize={config.gridSize}
@@ -285,5 +301,6 @@ export function BlastGame({
       onClearHint={clearHint}
       t={(key: string) => t(key) || undefined}
     />
+    </div>
   );
 }
