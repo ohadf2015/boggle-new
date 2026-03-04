@@ -9,6 +9,7 @@ import { detectVerticalWords } from '../utils/blastVerticalScanner';
 import { detectSpecialCombos } from '../utils/blastCombos';
 import type { BlastComboType } from '../utils/blastCombos';
 import { executeComboEffect } from '../utils/blastComboEffects';
+import { getWordLengthScaleFactor } from '../utils/blastComboScaling';
 import type { LetterGrid } from '@/shared/types/game';
 import {
   DEFAULT_BLAST_CONFIG,
@@ -683,6 +684,7 @@ export function useBlastGame(
           comboMultiplier *= combo.scoreMultiplier;
           const effectResult = executeComboEffect({
             combo, next, gridSize, path, now,
+            wordLengthScale: getWordLengthScaleFactor(path.length),
             markCleared, isMultiHitAlive, hitMultiHitTile,
           });
           newExplosions.push(...effectResult.explosions);

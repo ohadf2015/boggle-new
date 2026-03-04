@@ -11,6 +11,7 @@ import {
 } from '../types';
 import type { SpecialCombo } from './blastCombos';
 import { executeTacticalCombo } from './blastComboEffectsTactical';
+import { scaledRadius } from './blastComboScaling';
 
 // ==================== Types ====================
 
@@ -25,6 +26,12 @@ export interface ComboEffectContext {
   path: Array<{ row: number; col: number }>;
   /** Current timestamp for explosion IDs */
   now: number;
+  /**
+   * Word-length scaling factor (1.0 | 1.5 | 2.0).
+   * Apply to area/radius parameters ONLY — NOT to score multipliers.
+   * Use getWordLengthScaleFactor(path.length) from blastComboScaling.
+   */
+  wordLengthScale: number;
   /** Mark a tile as cleared (mutates grid) */
   markCleared: (tile: BlastTileState) => void;
   /** Returns true if tile is multi-hit and NOT on its final hit */
@@ -88,7 +95,10 @@ function fireAreaBlast(row: number, col: number, radius: number, ctx: ComboEffec
   }
 }
 
-/** Execute vortex pull+explode centered at (centerRow, centerCol) with given pull radius */
+/**
+ * Execute vortex pull+explode centered at (centerRow, centerCol) with given pull radius.
+ * The explode radius is derived from VORTEX_EXPLODE_RADIUS scaled by ctx.wordLengthScale.
+ */
 export function fireVortex(
   centerRow: number,
   centerCol: number,
@@ -96,7 +106,8 @@ export function fireVortex(
   result: ComboEffectResult,
   ctx: ComboEffectContext,
 ): void {
-  const { next, gridSize } = ctx;
+  const { next, gridSize, wordLengthScale } = ctx;
+  const explodeRadius = scaledRadius(VORTEX_EXPLODE_RADIUS, wordLengthScale);
   // Phase 1: Pull — outermost ring inward (axis-preference movement)
   for (let pr = pullRadius; pr >= 1; pr--) {
     for (let dr = -pr; dr <= pr; dr++) {
@@ -139,9 +150,9 @@ export function fireVortex(
       }
     }
   }
-  // Phase 2: Explode — clear tiles within radius 1 of vortex position
-  for (let dr = -VORTEX_EXPLODE_RADIUS; dr <= VORTEX_EXPLODE_RADIUS; dr++) {
-    for (let dc = -VORTEX_EXPLODE_RADIUS; dc <= VORTEX_EXPLODE_RADIUS; dc++) {
+  // Phase 2: Explode — clear tiles within scaled explode radius of vortex position
+  for (let dr = -explodeRadius; dr <= explodeRadius; dr++) {
+    for (let dc = -explodeRadius; dc <= explodeRadius; dc++) {
       if (dr === 0 && dc === 0) continue;
       const r = centerRow + dr;
       const c = centerCol + dc;
@@ -169,7 +180,7 @@ export function pushExplosion(id: string, row: number, col: number, result: Comb
  * so useBlastGame.ts doesn't crash when new pairs are detected.
  */
 export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
-  const { combo, next, gridSize, path, now } = ctx;
+  const { combo, next, gridSize, path, now, wordLengthScale } = ctx;
   const result = emptyResult();
 
   switch (combo.type) {
@@ -187,7 +198,8 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
 
     case 'bomb_lightning': {
       const bt = combo.tiles.find(t => t.tileType === 'bomb')!;
-      for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
+      const blRadius = scaledRadius(BOMB_RADIUS, wordLengthScale);
+      for (let dc = -blRadius; dc <= blRadius; dc++) {
         const col = bt.col + dc;
         if (col < 0 || col >= gridSize) continue;
         for (let r = 0; r < gridSize; r++) {
@@ -257,11 +269,10 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
     // ── 48-02: Bomb cross-type combos ───────────────────────────────────────
 
     case 'bomb_rainbow': {
-      // Prism Bomb: cross-clear (row+col) from bomb + standard 3x3 around bomb
+      // Prism Bomb: cross-clear (row+col) from bomb + scaled area around bomb
       const bt = combo.tiles.find(t => t.tileType === 'bomb')!;
-      // Cross-clear + 3x3 around bomb
       fireCrossClear(bt.row, bt.col, ctx);
-      fireAreaBlast(bt.row, bt.col, BOMB_RADIUS, ctx);
+      fireAreaBlast(bt.row, bt.col, scaledRadius(BOMB_RADIUS, wordLengthScale), ctx);
       pushExplosion(`combo-br-${now}`, bt.row, bt.col, result, now);
       result.processedBombKeys.push(`${bt.row},${bt.col}`);
       break;
@@ -272,8 +283,9 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
       const bt = combo.tiles.find(t => t.tileType === 'bomb') ?? combo.tiles[0];
       const mt = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[1];
       if (!bt || !mt) break;
+      const bmRadius = scaledRadius(BOMB_RADIUS, wordLengthScale);
       for (const center of [bt, mt]) {
-        fireAreaBlast(center.row, center.col, BOMB_RADIUS, ctx);
+        fireAreaBlast(center.row, center.col, bmRadius, ctx);
         pushExplosion(`combo-bm-${now}-${center.row}-${center.col}`, center.row, center.col, result, now);
       }
       result.processedBombKeys.push(`${bt.row},${bt.col}`);
@@ -281,12 +293,12 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
     }
 
     case 'bomb_magnet': {
-      // Gravity Bomb: vortex pull toward magnet then 5x5 blast around magnet
+      // Gravity Bomb: vortex pull toward magnet then scaled blast around magnet
       const mg = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[1];
       if (!mg) break;
-      fireVortex(mg.row, mg.col, VORTEX_PULL_RADIUS, result, ctx);
-      // 5x5 blast (radius 2) around magnet
-      fireAreaBlast(mg.row, mg.col, 2, ctx);
+      fireVortex(mg.row, mg.col, scaledRadius(VORTEX_PULL_RADIUS, wordLengthScale), result, ctx);
+      // 5x5 blast (radius 2) scaled by word length
+      fireAreaBlast(mg.row, mg.col, scaledRadius(2, wordLengthScale), ctx);
       pushExplosion(`combo-bmg-${now}`, mg.row, mg.col, result, now);
       const bt2 = combo.tiles.find(t => t.tileType === 'bomb')!;
       result.processedBombKeys.push(`${bt2.row},${bt2.col}`);
@@ -306,7 +318,7 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
           result.bonusScore += TREASURE_GEM_COMPLETION_BONUS;
         }
       }
-      fireAreaBlast(bt3.row, bt3.col, BOMB_RADIUS, ctx);
+      fireAreaBlast(bt3.row, bt3.col, scaledRadius(BOMB_RADIUS, wordLengthScale), ctx);
       pushExplosion(`combo-bg-${now}`, bt3.row, bt3.col, result, now);
       result.processedBombKeys.push(`${bt3.row},${bt3.col}`);
       break;
@@ -324,7 +336,7 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
       }
       const bt4 = combo.tiles.find(t => t.tileType === 'bomb') ?? combo.tiles[0];
       if (!bt4) break;
-      fireAreaBlast(bt4.row, bt4.col, BOMB_RADIUS, ctx);
+      fireAreaBlast(bt4.row, bt4.col, scaledRadius(BOMB_RADIUS, wordLengthScale), ctx);
       pushExplosion(`combo-bfz-${now}`, bt4.row, bt4.col, result, now);
       result.processedBombKeys.push(`${bt4.row},${bt4.col}`);
       break;
@@ -371,13 +383,14 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
       const lt3 = combo.tiles.find(t => t.tileType === 'lightning') ?? combo.tiles[0];
       const mg2 = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[1];
       if (!lt3 || !mg2) break;
-      fireVortex(mg2.row, mg2.col, VORTEX_PULL_RADIUS, result, ctx);
+      const lmVortexRadius = scaledRadius(VORTEX_PULL_RADIUS, wordLengthScale);
+      fireVortex(mg2.row, mg2.col, lmVortexRadius, result, ctx);
       // Clear the magnet column (and nearby columns from pull area)
       const colsToBlast = new Set<number>();
-      for (let dr = -VORTEX_PULL_RADIUS; dr <= VORTEX_PULL_RADIUS; dr++) {
+      for (let dr = -lmVortexRadius; dr <= lmVortexRadius; dr++) {
         const r = mg2.row + dr;
         if (r >= 0 && r < gridSize) {
-          for (let dc = -VORTEX_PULL_RADIUS; dc <= VORTEX_PULL_RADIUS; dc++) {
+          for (let dc = -lmVortexRadius; dc <= lmVortexRadius; dc++) {
             const c = mg2.col + dc;
             if (c >= 0 && c < gridSize && !next[r][c].isCleared) {
               colsToBlast.add(c);

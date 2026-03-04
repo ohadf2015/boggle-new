@@ -53,7 +53,7 @@ function makeCtx(
   grid: BlastTileState[][],
   combo: SpecialCombo,
   path: Array<{ row: number; col: number }> = [],
-  overrides: Partial<Pick<ComboEffectContext, 'gridSize' | 'now'>> = {},
+  overrides: Partial<Pick<ComboEffectContext, 'gridSize' | 'now' | 'wordLengthScale'>> = {},
 ): ComboEffectContext {
   return {
     combo,
@@ -61,6 +61,8 @@ function makeCtx(
     gridSize: overrides.gridSize ?? 6,
     path,
     now: overrides.now ?? 1000,
+    // Default to 1.0 (base scale) so existing tests are unaffected
+    wordLengthScale: overrides.wordLengthScale ?? 1.0,
     markCleared: (t) => { t.isCleared = true; },
     isMultiHitAlive: (t) => t.hitsRemaining > 1 && (t.type === 'ice' || t.type === 'prism' || t.type === 'frozen' || t.type === 'gem'),
     hitMultiHitTile: (t) => { t.hitsRemaining--; t.activationEffect = `${t.type}-crack`; },

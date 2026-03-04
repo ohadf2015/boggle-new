@@ -8,6 +8,7 @@ import {
   FROST_REVEAL_BONUS,
 } from '../types';
 import type { ComboEffectContext, ComboEffectResult } from './blastComboEffects';
+import { scaledRadius } from './blastComboScaling';
 
 // Re-use helpers via import (they need to be exported from main file)
 import { applyToTile, fireVortex, pushExplosion } from './blastComboEffects';
@@ -27,9 +28,10 @@ export function executeTacticalCombo(
       const mmMagnet = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[1];
       const mmMirror = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[0];
       if (!mmMagnet || !mmMirror) break;
-      fireVortex(mmMagnet.row, mmMagnet.col, VORTEX_PULL_RADIUS, result, ctx);
+      const mmVortexRadius = scaledRadius(VORTEX_PULL_RADIUS, ctx.wordLengthScale);
+      fireVortex(mmMagnet.row, mmMagnet.col, mmVortexRadius, result, ctx);
       pushExplosion(`combo-mma-${now}`, mmMagnet.row, mmMagnet.col, result, now);
-      fireVortex(mmMirror.row, mmMirror.col, VORTEX_PULL_RADIUS, result, ctx);
+      fireVortex(mmMirror.row, mmMirror.col, mmVortexRadius, result, ctx);
       pushExplosion(`combo-mmb-${now}`, mmMirror.row, mmMirror.col, result, now);
       return true;
     }
@@ -77,7 +79,7 @@ export function executeTacticalCombo(
           }
         }
       }
-      fireVortex(mgMagnetT.row, mgMagnetT.col, VORTEX_PULL_RADIUS, result, ctx);
+      fireVortex(mgMagnetT.row, mgMagnetT.col, scaledRadius(VORTEX_PULL_RADIUS, ctx.wordLengthScale), result, ctx);
       pushExplosion(`combo-mgg-${now}`, mgMagnetT.row, mgMagnetT.col, result, now);
       return true;
     }
@@ -85,7 +87,7 @@ export function executeTacticalCombo(
     case 'magnet_frozen': {
       const mfMagnetT = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[0];
       if (!mfMagnetT) break;
-      fireVortex(mfMagnetT.row, mfMagnetT.col, VORTEX_PULL_RADIUS, result, ctx);
+      fireVortex(mfMagnetT.row, mfMagnetT.col, scaledRadius(VORTEX_PULL_RADIUS, ctx.wordLengthScale), result, ctx);
       for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
           const tile = next[r][c];
