@@ -13,8 +13,10 @@ import type { Server as HttpServer } from 'http';
 // Track cleanup timers for graceful shutdown
 const cleanupTimers: Set<NodeJS.Timeout> = new Set();
 
-// Maximum concurrent connections allowed (prevents resource exhaustion)
-const MAX_CONNECTIONS = parseInt(process.env.MAX_SOCKET_CONNECTIONS || '1000', 10);
+// Maximum concurrent connections allowed (prevents resource exhaustion).
+// Lowered from 1000 to 200 — each socket can trigger multiple Supabase queries,
+// and Supabase's Varnish layer has a ~20-60 max_conn limit.
+const MAX_CONNECTIONS = parseInt(process.env.MAX_SOCKET_CONNECTIONS || '200', 10);
 
 /**
  * Create and configure Socket.IO server

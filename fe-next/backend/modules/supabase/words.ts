@@ -278,36 +278,62 @@ export async function incrementBotWordUsage(word: string, language: string): Pro
  * @param language - Game language
  * @param reason - Why the word was invalid (default: 'not_in_dictionary')
  */
+// Batch buffer for wrong word recording to avoid per-word Supabase calls
+const wrongWordBuffer: Array<{ word: string; language: string; reason: InvalidWordReason }> = [];
+let wrongWordFlushTimer: ReturnType<typeof setTimeout> | null = null;
+const WRONG_WORD_FLUSH_INTERVAL = 5000; // Flush every 5 seconds
+const WRONG_WORD_BATCH_SIZE = 20; // Or when buffer reaches this size
+
+async function flushWrongWordBuffer(): Promise<void> {
+  if (wrongWordBuffer.length === 0) return;
+
+  const batch = wrongWordBuffer.splice(0, WRONG_WORD_BATCH_SIZE);
+  const client = getSupabase();
+  if (!client) return;
+
+  // Process batch sequentially (each is a single RPC call)
+  for (const entry of batch) {
+    try {
+      await client.rpc('record_invalid_word_submission', {
+        p_word: entry.word,
+        p_language: entry.language,
+        p_reason: entry.reason
+      });
+    } catch {
+      // Non-critical, skip failures
+    }
+  }
+
+  logger.debug('SUPABASE', `Flushed ${batch.length} invalid word record(s)`);
+
+  // If more items remain, schedule another flush
+  if (wrongWordBuffer.length > 0) {
+    wrongWordFlushTimer = setTimeout(() => flushWrongWordBuffer(), WRONG_WORD_FLUSH_INTERVAL);
+  }
+}
+
 export async function recordPlayerWrongWord(
   word: string,
   language: string,
   reason: InvalidWordReason = 'not_in_dictionary'
 ): Promise<void> {
-  const client = getSupabase();
-  if (!client) return;
+  if (!getSupabase()) return;
 
   const normalizedWord = word.toLowerCase().trim();
-
-  // Skip very short words (likely typos)
   if (normalizedWord.length < 3) return;
 
-  try {
-    // Use the RPC function to upsert/increment submission count
-    const { error } = await client.rpc('record_invalid_word_submission', {
-      p_word: normalizedWord,
-      p_language: language,
-      p_reason: reason
-    });
+  wrongWordBuffer.push({ word: normalizedWord, language, reason });
 
-    if (error) {
-      // Ignore errors - this is non-critical functionality
-      logger.debug('SUPABASE', `Failed to record invalid word "${normalizedWord}": ${error.message}`);
-    } else {
-      logger.debug('SUPABASE', `Recorded invalid word "${normalizedWord}" (${reason}) for ${language}`);
-    }
-  } catch (err) {
-    // Ignore errors - this is non-critical functionality
-    logger.debug('SUPABASE', `Error recording invalid word: ${err}`);
+  // Flush immediately if batch size reached, otherwise debounce
+  if (wrongWordBuffer.length >= WRONG_WORD_BATCH_SIZE) {
+    if (wrongWordFlushTimer) clearTimeout(wrongWordFlushTimer);
+    wrongWordFlushTimer = null;
+    flushWrongWordBuffer().catch(() => {});
+  } else if (!wrongWordFlushTimer) {
+    wrongWordFlushTimer = setTimeout(() => {
+      wrongWordFlushTimer = null;
+      flushWrongWordBuffer().catch(() => {});
+    }, WRONG_WORD_FLUSH_INTERVAL);
   }
 }
 

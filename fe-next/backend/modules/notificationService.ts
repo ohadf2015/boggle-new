@@ -224,7 +224,8 @@ async function sendDiscordNotification(embed: DiscordEmbed): Promise<void> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         embeds: [embed]
-      })
+      }),
+      signal: AbortSignal.timeout(5000)
     });
 
     if (!response.ok) {
@@ -251,7 +252,8 @@ async function sendTelegramNotification(message: string): Promise<void> {
         chat_id: TELEGRAM_CHAT_ID,
         text: message,
         parse_mode: 'MarkdownV2'
-      })
+      }),
+      signal: AbortSignal.timeout(5000)
     });
 
     if (!response.ok) {

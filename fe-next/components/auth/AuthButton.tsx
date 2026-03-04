@@ -126,7 +126,8 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
   const checkUnclaimedReward = useCallback(async () => {
     if (!user?.id) return;
     try {
-      const response = await fetch('/api/engagement/calendar');
+      const { fetchWithAuth } = await import('@/utils/authFetch');
+      const response = await fetchWithAuth('/api/engagement/calendar');
       if (response.ok) {
         const data = await response.json();
         setHasUnclaimedReward(data.canClaimToday);

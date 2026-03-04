@@ -16,6 +16,23 @@ import { processGameEndEngagement, processAchievementEngagement } from '../../ha
 import logger from '../../utils/logger';
 import type { PlayerResult, UserData } from './types';
 
+// Track pending engagement timeouts per game so they can be cleared on game cleanup
+const pendingEngagementTimeouts = new Map<string, ReturnType<typeof setTimeout>[]>();
+
+/**
+ * Clear all pending engagement timeouts for a game.
+ * Should be called when a game is deleted/cleaned up to prevent
+ * orphaned Supabase queries from dead sockets.
+ */
+export function clearEngagementTimeouts(gameCode: string): void {
+  const timeouts = pendingEngagementTimeouts.get(gameCode);
+  if (timeouts) {
+    for (const t of timeouts) clearTimeout(t);
+    pendingEngagementTimeouts.delete(gameCode);
+    logger.debug('ENGAGEMENT', `Cleared ${timeouts.length} pending engagement timeout(s) for game ${gameCode}`);
+  }
+}
+
 /**
  * Record game results to Supabase and emit XP/engagement events
  */
@@ -220,19 +237,35 @@ async function processEngagementEvents(
     // Process engagement (daily challenges, near-misses, mystery rewards)
     // Mystery rewards are delayed by 15 seconds to avoid overwhelming users
     if (playerSocket && playerId) {
-      setTimeout(async () => {
-        await processGameEndEngagement(playerSocket, playerId, gameStats, gameCode);
+      const timeoutId = setTimeout(async () => {
+        // Skip if socket disconnected while we were waiting
+        if (playerSocket.disconnected) {
+          logger.debug('ENGAGEMENT', `Skipping engagement for ${playerId} - socket disconnected`);
+          return;
+        }
 
-        // Process achievement engagement for mystery rewards
-        for (const achievement of playerResult.achievements || []) {
-          await processAchievementEngagement(
-            playerSocket,
-            playerId,
-            achievement.key,
-            gameCode
-          );
+        try {
+          await processGameEndEngagement(playerSocket, playerId, gameStats, gameCode);
+
+          // Process achievement engagement for mystery rewards
+          for (const achievement of playerResult.achievements || []) {
+            if (playerSocket.disconnected) break;
+            await processAchievementEngagement(
+              playerSocket,
+              playerId,
+              achievement.key,
+              gameCode
+            );
+          }
+        } catch (err) {
+          logger.error('ENGAGEMENT', `Delayed engagement failed for ${playerId}: ${(err as Error).message}`);
         }
       }, 15000); // 15 second delay
+
+      // Track timeout for cleanup
+      const gameTimeouts = pendingEngagementTimeouts.get(gameCode) || [];
+      gameTimeouts.push(timeoutId);
+      pendingEngagementTimeouts.set(gameCode, gameTimeouts);
     }
   }
 }

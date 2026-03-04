@@ -1,6 +1,7 @@
 /**
  * Supabase Client Module
- * Core client initialization and configuration for backend operations
+ * Core client initialization and configuration for backend operations.
+ * Uses a concurrency-limited fetch to prevent Varnish 503 "max_conn reached" errors.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -11,8 +12,52 @@ const logger = require('../../utils/logger');
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+// Max concurrent HTTP requests to Supabase PostgREST API.
+// Supabase free/Pro Varnish layer typically allows 20-60 concurrent connections.
+const MAX_CONCURRENT_REQUESTS = parseInt(process.env.SUPABASE_MAX_CONCURRENT || '15', 10);
+
+// Semaphore for limiting concurrent Supabase API requests
+let activeRequests = 0;
+const requestQueue: Array<() => void> = [];
+
+function acquireSlot(): Promise<void> {
+  if (activeRequests < MAX_CONCURRENT_REQUESTS) {
+    activeRequests++;
+    return Promise.resolve();
+  }
+  return new Promise<void>((resolve) => {
+    requestQueue.push(() => {
+      activeRequests++;
+      resolve();
+    });
+  });
+}
+
+function releaseSlot(): void {
+  activeRequests--;
+  const next = requestQueue.shift();
+  if (next) next();
+}
+
+// Concurrency-limited fetch wrapper for Supabase client
+const originalFetch = globalThis.fetch;
+function concurrencyLimitedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+  const isSupabaseRequest = supabaseUrl && url.startsWith(supabaseUrl);
+
+  if (!isSupabaseRequest) {
+    return originalFetch(input, init);
+  }
+
+  return acquireSlot().then(() => {
+    return originalFetch(input, init).finally(() => {
+      releaseSlot();
+    });
+  });
+}
+
 // Log configuration status at startup
-logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, ServiceKey=${!!supabaseServiceKey}`);
+logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, ServiceKey=${!!supabaseServiceKey}, MaxConcurrent=${MAX_CONCURRENT_REQUESTS}`);
 if (!supabaseUrl || !supabaseServiceKey) {
   logger.warn('SUPABASE', 'Supabase not fully configured (missing URL or SUPABASE_SERVICE_ROLE_KEY). Stats will not be saved to database.');
 } else {
@@ -20,7 +65,8 @@ if (!supabaseUrl || !supabaseServiceKey) {
   (async () => {
     try {
       const testClient = createClient(supabaseUrl, supabaseServiceKey, {
-        auth: { autoRefreshToken: false, persistSession: false }
+        auth: { autoRefreshToken: false, persistSession: false },
+        global: { fetch: concurrencyLimitedFetch }
       });
       const { error } = await testClient.from('profiles').select('id').limit(1);
       if (error) {
@@ -41,7 +87,8 @@ let supabase: SupabaseClient | null = null;
 
 /**
  * Initialize Supabase client (lazy initialization)
- * Uses service role key to bypass RLS for server-side operations
+ * Uses service role key to bypass RLS for server-side operations.
+ * Includes concurrency-limited fetch to prevent Varnish max_conn exhaustion.
  */
 export function getSupabase(): SupabaseClient | null {
   if (!supabase && supabaseUrl && supabaseServiceKey) {
@@ -49,10 +96,18 @@ export function getSupabase(): SupabaseClient | null {
       auth: {
         autoRefreshToken: false,
         persistSession: false
+      },
+      global: {
+        fetch: concurrencyLimitedFetch
       }
     });
   }
   return supabase;
+}
+
+/** Expose metrics for monitoring */
+export function getConnectionMetrics() {
+  return { activeRequests, queueLength: requestQueue.length, maxConcurrent: MAX_CONCURRENT_REQUESTS };
 }
 
 /**
@@ -62,14 +117,8 @@ export function isSupabaseConfigured(): boolean {
   if (!supabaseUrl || !supabaseServiceKey) {
     return false;
   }
-
-  const trimmedKey = supabaseServiceKey.trim();
-  return (
-    trimmedKey !== '' &&
-    trimmedKey !== 'YOUR_SERVICE_ROLE_KEY_HERE' &&
-    trimmedKey !== 'placeholder' &&
-    !trimmedKey.includes('SERVICE_ROLE_KEY')
-  );
+  // Only check non-empty — the startup test query validates the actual key
+  return supabaseServiceKey.trim() !== '';
 }
 
 // Type definitions shared across modules
@@ -155,4 +204,5 @@ export interface LifetimeAchievement {
 module.exports = {
   getSupabase,
   isSupabaseConfigured,
+  getConnectionMetrics,
 };

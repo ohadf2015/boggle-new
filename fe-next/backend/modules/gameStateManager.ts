@@ -57,6 +57,8 @@ import type { ReadyStateGameBase } from './readyStateManager';
 import type { QueryGameBase } from './gameQueryManager';
 import type { HostGameBase, TransferHostResult } from './hostManager';
 
+import { clearEngagementTimeouts } from '../services/gameLifecycle/gameResults';
+
 const logger = require('../utils/logger');
 const { canTransition, transition, getValidEvents } = require('../utils/gameStateMachine');
 
@@ -132,6 +134,9 @@ function deleteGame(gameCode: string): void {
   if (game.reconnectionTimeout) clearTimeout(game.reconnectionTimeout);
   if (game.validationTimeout) clearTimeout(game.validationTimeout);
   clearPersistTimer(gameCode);
+  // Clear any pending delayed engagement timeouts to prevent
+  // orphaned Supabase queries from disconnected sockets
+  clearEngagementTimeouts(gameCode);
 
   userManager.cleanupUserMappings(asBase<GameBase>(game), gameCode);
   scoreManager.clearLeaderboardThrottle(gameCode);
@@ -276,6 +281,10 @@ function updateUserSocketId(gameCode: string, username: string, newSocketId: str
   const result = userManager.updateUserSocketId(asBase<GameBase>(games[gameCode]), gameCode, username, newSocketId, authContext);
   if (result) persistGameState(gameCode);
   return result;
+}
+
+function updateUsernameMapping(gameCode: string, oldUsername: string, newUsername: string, socketId: string): void {
+  userManager.updateUsernameMapping(gameCode, oldUsername, newUsername, socketId);
 }
 
 function getGameUsers(gameCode: string): Array<{ username: string; score?: number } & GameState['users'][string]> {
@@ -451,7 +460,7 @@ function setTournamentIdForGame(gameCode: string, tournamentId: string | null): 
 export {
   createGame, getGame, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
   addUserToGame, removeUserFromGame, removeUserBySocketId, getGameBySocketId, getUsernameBySocketId,
-  getSocketIdByUsername, getUserBySocketId, updateUserSocketId, getGameUsers,
+  getSocketIdByUsername, getUserBySocketId, updateUserSocketId, updateUsernameMapping, getGameUsers,
   addSpectatorToGame, removeSpectatorFromGame, getGameSpectators, upgradeSpectatorToPlayer, isSpectator,
   markPlayerReadyForNextGame, getPlayersReadyCount, isPlayerReadyForNextGame, clearPlayersReadyForNextGame,
   getAllGames, getDetailedGames, getActiveRooms, getEmptyRooms, isRoomEmpty, cleanupEmptyRooms,
@@ -471,7 +480,7 @@ export {
 const cjsExports = {
   createGame, getGame, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
   addUserToGame, removeUserFromGame, removeUserBySocketId, getGameBySocketId, getUsernameBySocketId,
-  getSocketIdByUsername, getUserBySocketId, updateUserSocketId, getGameUsers,
+  getSocketIdByUsername, getUserBySocketId, updateUserSocketId, updateUsernameMapping, getGameUsers,
   addSpectatorToGame, removeSpectatorFromGame, getGameSpectators, upgradeSpectatorToPlayer, isSpectator,
   markPlayerReadyForNextGame, getPlayersReadyCount, isPlayerReadyForNextGame, clearPlayersReadyForNextGame,
   getAllGames, getDetailedGames, getActiveRooms, getEmptyRooms, isRoomEmpty, cleanupEmptyRooms,
