@@ -263,6 +263,11 @@ export interface UseBlastGameOptions {
    * Omit for singleplayer — falls back to Math.random.
    */
   blastSeed?: number | null;
+  /**
+   * Pre-built tile states from server overlay (multiplayer).
+   * When provided, skips generateTileStates and uses these directly.
+   */
+  initialTileStates?: BlastTileState[][] | null;
 }
 
 // ==================== Hook ====================
@@ -305,8 +310,9 @@ export function useBlastGame(
   // Current wave number for Treasure Gem spawn gating + Frost inner type gating (default: 1)
   const currentWave = options?.currentWave ?? 1;
 
-  // Tile state management — guarantee objective tiles are present on the board
+  // Tile state management — use server overlay in multiplayer, else generate locally
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() => {
+    if (options?.initialTileStates) return options.initialTileStates;
     const tiles = generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution, currentWave);
     return options?.waveObjectives
       ? guaranteeObjectiveTiles(tiles, options.waveObjectives)

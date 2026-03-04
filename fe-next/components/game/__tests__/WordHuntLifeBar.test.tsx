@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { WordHuntLifeBar } from '../WordHuntLifeBar';
 
 // Mock LanguageContext
@@ -13,6 +14,20 @@ jest.mock('@/contexts/LanguageContext', () => ({
     t: (key: string) => key,
     dir: 'ltr',
   }),
+}));
+
+// Mock framer-motion
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: React.forwardRef(({ children, className, style, ...rest }: any, ref: any) => (
+      <div ref={ref} className={className} style={style} {...rest}>{children}</div>
+    )),
+  },
+}));
+
+// Mock lucide-react
+jest.mock('lucide-react', () => ({
+  Heart: (props: any) => <svg data-testid="heart-icon" {...props} />,
 }));
 
 describe('WordHuntLifeBar', () => {
@@ -28,22 +43,22 @@ describe('WordHuntLifeBar', () => {
     expect(fill).toHaveStyle({ width: '50%' });
   });
 
-  it('should show green color when life is high (>60%)', () => {
+  it('should show green gradient when life is high (>60%)', () => {
     render(<WordHuntLifeBar life={80} maxLife={100} />);
     const fill = screen.getByTestId('word-hunt-life-bar-fill');
-    expect(fill.className).toContain('bg-green');
+    expect(fill.className).toContain('green');
   });
 
-  it('should show yellow color when life is medium (30-60%)', () => {
+  it('should show yellow/orange gradient when life is medium (30-60%)', () => {
     render(<WordHuntLifeBar life={45} maxLife={100} />);
     const fill = screen.getByTestId('word-hunt-life-bar-fill');
-    expect(fill.className).toContain('bg-yellow');
+    expect(fill.className).toMatch(/yellow|orange/);
   });
 
-  it('should show red color when life is low (<30%)', () => {
+  it('should show red gradient when life is low (<30%)', () => {
     render(<WordHuntLifeBar life={20} maxLife={100} />);
     const fill = screen.getByTestId('word-hunt-life-bar-fill');
-    expect(fill.className).toContain('bg-red');
+    expect(fill.className).toContain('red');
   });
 
   it('should handle zero life', () => {

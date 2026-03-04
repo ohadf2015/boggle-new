@@ -28,6 +28,7 @@ import { registerScorecardHandlers } from './scorecardHandler.js';
 import { registerVocabularyHandlers } from './vocabularyHandler.js';
 import { registerClassroomGameHandlers } from './classroomGameHandler.js';
 import { registerAvatarHandlers } from './avatarHandler.js';
+import { registerWordHuntHandlers } from './wordHuntHandler.js';
 import { vocabularyEnrichmentHandler } from './vocabularyEnrichmentHandler.js';
 import {
   startGameTimer,
@@ -63,6 +64,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   });
   registerClassroomGameHandlers(io, socket);
   registerAvatarHandlers(io, socket);
+  registerWordHuntHandlers(io, socket);
 
   // Register vocabulary enrichment handler for flashcard training
   socket.on('enrichVocabulary', (payload) => {

@@ -3,7 +3,6 @@
  * Renders correct tile badges on grid cells
  */
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BlastMultiplayerOverlay } from '../BlastMultiplayerOverlay';
 import type { BlastTileOverlay } from '@/shared/types/game';
@@ -94,5 +93,47 @@ describe('BlastMultiplayerOverlay', () => {
         <BlastMultiplayerOverlay overlay={allTypes} gridSize={gridSize} />
       );
     }).not.toThrow();
+  });
+
+  it('should render badges for ALL 12 special tile types', () => {
+    const gridSize5 = { rows: 5, cols: 5 };
+    const allSpecialTypes: BlastTileOverlay[] = [
+      { row: 0, col: 0, type: 'gold' },
+      { row: 0, col: 1, type: 'bomb' },
+      { row: 0, col: 2, type: 'rainbow' },
+      { row: 0, col: 3, type: 'ice' },
+      { row: 1, col: 0, type: 'lightning' },
+      { row: 1, col: 1, type: 'magnet' },
+      { row: 1, col: 2, type: 'gem' },
+      { row: 1, col: 3, type: 'prism' },
+      { row: 2, col: 0, type: 'frozen' },
+      { row: 2, col: 1, type: 'mirror' },
+      { row: 2, col: 2, type: 'silver' },
+      { row: 2, col: 3, type: 'diamond' },
+    ];
+
+    render(
+      <BlastMultiplayerOverlay overlay={allSpecialTypes} gridSize={gridSize5} />
+    );
+
+    // Every special tile type must render a badge — none should return null
+    for (const tile of allSpecialTypes) {
+      const el = screen.getByTestId(`blast-tile-${tile.row}-${tile.col}`);
+      expect(el).toBeInTheDocument();
+      expect(el.textContent).toBeTruthy();
+    }
+  });
+
+  it('should not render a badge for standard tile type', () => {
+    const overlay: BlastTileOverlay[] = [
+      { row: 0, col: 0, type: 'standard' as any },
+    ];
+
+    const { container } = render(
+      <BlastMultiplayerOverlay overlay={overlay} gridSize={gridSize} />
+    );
+
+    const badges = container.querySelectorAll('[data-testid^="blast-tile-"]');
+    expect(badges.length).toBe(0);
   });
 });

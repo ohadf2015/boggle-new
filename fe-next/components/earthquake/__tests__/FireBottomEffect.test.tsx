@@ -39,10 +39,25 @@ describe('FireBottomEffect', () => {
   });
 
   it('should unmount cleanly when switching from active to inactive', () => {
-    const { rerender, container } = render(<FireBottomEffect isActive={true} />);
+    const { rerender } = render(<FireBottomEffect isActive={true} />);
     expect(screen.getByTestId('fire-flame')).toBeInTheDocument();
 
     rerender(<FireBottomEffect isActive={false} />);
-    expect(container.firstChild).toBeNull();
+    expect(screen.queryByTestId('fire-flame')).not.toBeInTheDocument();
+  });
+
+  it('should render via portal into document.body to escape stacking contexts', () => {
+    const { container } = render(
+      <div style={{ overflow: 'hidden', transform: 'translateZ(0)' }}>
+        <FireBottomEffect isActive={true} />
+      </div>
+    );
+    // The fire effect should NOT be inside the container div (it portals out)
+    const fireInContainer = container.querySelector('[data-testid="fire-bottom-effect"]');
+    expect(fireInContainer).toBeNull();
+
+    // But it should exist in document.body
+    const fireInBody = document.body.querySelector('[data-testid="fire-bottom-effect"]');
+    expect(fireInBody).toBeInTheDocument();
   });
 });

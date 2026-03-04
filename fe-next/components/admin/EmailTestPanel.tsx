@@ -38,7 +38,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
     setMessage('');
 
     try {
-      const response = await fetch('/api/admin/send-test-email', {
+      const response = await fetch('/api/admin/send-test-reengagement', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,6 +47,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
         body: JSON.stringify({
           email,
           recipientName: recipientName || 'Test User',
+          language,
         }),
       });
 
@@ -79,7 +80,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
             <Mail className="w-5 h-5 text-neo-black" />
           </div>
           <span className="font-neo-display text-lg">
-            {t('admin.email.title') || 'Email Testing'}
+            {t('admin.email.title') || 'Email Testing'} — Re-engagement
           </span>
         </CardTitle>
       </CardHeader>
@@ -135,7 +136,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                {t('admin.email.sendTest') || 'Send Test Email'}
+                Send Re-engagement Email
               </>
             )}
           </Button>
@@ -177,9 +178,9 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
             </Label>
             <div className="border-2 border-neo-black rounded-neo overflow-hidden">
               <iframe
-                src={`${baseUrl}/api/admin/email-preview`}
+                src={`${baseUrl}/api/admin/reengagement-email-preview?language=${language}`}
                 className="w-full h-[500px] bg-white"
-                title="Email Preview"
+                title="Re-engagement Email Preview"
                 sandbox="allow-same-origin"
               />
             </div>
@@ -192,7 +193,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
         {/* Info Box */}
         <div className="mt-4 p-3 bg-neo-navy rounded-neo border-2 border-slate-700">
           <p className="text-xs text-slate-400">
-            {t('admin.email.info') || 'Test emails are sent with [TEST] prefix in the subject line. They use the same template as production daily challenge emails.'}
+            Sends a test re-engagement email with [TEST] prefix. Uses today&apos;s daily word first letter for the current language ({language}).
           </p>
         </div>
       </CardContent>

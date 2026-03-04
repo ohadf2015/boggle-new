@@ -7,16 +7,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import TournamentStandings from '../../components/TournamentStandings';
 import InGameScreen from '../../components/game/InGameScreen';
+import { BlastGame } from '@/components/blast/BlastGame';
+import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
+import { BlastMoveCounter } from '@/components/game/BlastMoveCounter';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
   useBlastTileOverlay,
+  useBlastMovesUsed,
   useWordHuntTargetLength,
   useWordHuntMyLife,
   useWordHuntTargetAttempts,
   useWordHuntTargetFound,
+  useWordHuntPlayerLives,
+  useWordHuntEliminatedPlayers,
 } from '@/hooks/gameState/store';
 
 // ==================== Hint Types ====================
@@ -188,15 +194,24 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Game mode state from Zustand
   const gameMode = useGameMode();
   const blastTileOverlay = useBlastTileOverlay();
+  const blastMovesUsed = useBlastMovesUsed();
   const wordHuntTargetLength = useWordHuntTargetLength();
   const wordHuntLife = useWordHuntMyLife();
   const wordHuntAttempts = useWordHuntTargetAttempts();
   const wordHuntFound = useWordHuntTargetFound();
+  const wordHuntPlayerLives = useWordHuntPlayerLives();
+  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
+
+  // Blast multiplayer bridge — converts Zustand state to BlastGame props
+  const blastBridge = useBlastMultiplayerBridge({
+    letterGrid: letterGrid || shufflingGrid,
+    gridSize: (letterGrid || shufflingGrid)?.[0]?.length ?? 4,
+  });
 
   // Word hunt guess handler — emits to server
   const handleWordHuntGuess = useCallback((guess: string) => {
     if (!socket) return;
-    socket.emit('wordHuntGuess', { guess });
+    socket.emit('submitTargetWord', { guess });
   }, [socket]);
 
   // Memoized handler for closing tournament standings
@@ -227,70 +242,86 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-cream dark:bg-neo-navy p-0 md:p-4 transition-colors duration-300">
 
-      {/* Main Game Content */}
-      <InGameScreen
-        // Core identity
-        username={username}
-        gameCode={gameCode}
-        isHost={false}
-        isPlaying={true}
-        gameplayFocusMode={true}
-        t={t}
-        dir={dir}
-        socket={socket}
+      {/* Main Game Content — Blast mode uses BlastGame, all others use InGameScreen */}
+      {gameMode === 'blast' ? (
+        <>
+          <div className="flex items-center justify-between px-3 py-1">
+            <BlastMoveCounter movesUsed={blastMovesUsed} />
+          </div>
+          <BlastGame
+            config={blastBridge.config}
+            mode="multiplayer"
+            onGameEnd={() => {/* Server controls game end in multiplayer */}}
+            onQuit={onExitRoom}
+          />
+        </>
+      ) : (
+        <InGameScreen
+          // Core identity
+          username={username}
+          gameCode={gameCode}
+          isHost={false}
+          isPlaying={true}
+          gameplayFocusMode={true}
+          t={t}
+          dir={dir}
+          socket={socket}
 
-        // Game state
-        letterGrid={effectiveGrid}
-        remainingTime={remainingTime}
-        timerValue={3} // Default 3 minutes, will be overridden by server
-        gameActive={gameActive}
-        showStartAnimation={showStartAnimation}
-        gameLanguage={gameLanguage}
-        minWordLength={minWordLength}
-        comboLevel={comboLevel}
-        comboLevelRef={comboLevelRef}
-        comboTimeRemaining={comboTimeRemaining}
-        comboDanger={comboDanger}
+          // Game state
+          letterGrid={effectiveGrid}
+          remainingTime={remainingTime}
+          timerValue={3}
+          gameActive={gameActive}
+          showStartAnimation={showStartAnimation}
+          gameLanguage={gameLanguage}
+          minWordLength={minWordLength}
+          comboLevel={comboLevel}
+          comboLevelRef={comboLevelRef}
+          comboTimeRemaining={comboTimeRemaining}
+          comboDanger={comboDanger}
 
-        // Player data
-        foundWords={foundWords}
-        leaderboard={leaderboard}
-        totalBoardWords={totalBoardWords}
+          // Player data
+          foundWords={foundWords}
+          leaderboard={leaderboard}
+          totalBoardWords={totalBoardWords}
 
-        // Callbacks
-        onExitRoom={onExitRoom}
-        onWordSubmit={onWordSubmit}
-        onResetCombo={onResetCombo}
+          // Callbacks
+          onExitRoom={onExitRoom}
+          onWordSubmit={onWordSubmit}
+          onResetCombo={onResetCombo}
 
-        // Tournament
-        tournamentData={tournamentData}
+          // Tournament
+          tournamentData={tournamentData}
 
-        // Hints
-        hints={hints}
+          // Hints
+          hints={hints}
 
-        // Earthquake/Fire Round
-        earthquakeState={earthquakeState}
-        fireRoundActive={fireRoundActive}
-        fireRoundRemaining={fireRoundRemaining}
+          // Earthquake/Fire Round
+          earthquakeState={earthquakeState}
+          fireRoundActive={fireRoundActive}
+          fireRoundRemaining={fireRoundRemaining}
 
-        // Board theme
-        boardTheme={boardTheme}
+          // Board theme
+          boardTheme={boardTheme}
 
-        // Game mode overlays
-        gameMode={gameMode ?? undefined}
-        blastTileOverlay={blastTileOverlay}
-        wordHuntTargetLength={wordHuntTargetLength}
-        wordHuntAttempts={wordHuntAttempts}
-        wordHuntFound={wordHuntFound}
-        wordHuntLife={wordHuntLife}
-        onWordHuntGuess={handleWordHuntGuess}
+          // Game mode overlays
+          gameMode={gameMode ?? undefined}
+          blastTileOverlay={blastTileOverlay}
+          wordHuntTargetLength={wordHuntTargetLength}
+          wordHuntAttempts={wordHuntAttempts}
+          wordHuntFound={wordHuntFound}
+          wordHuntLife={wordHuntLife}
+          wordHuntPlayerLives={wordHuntPlayerLives}
+          wordHuntEliminatedPlayers={wordHuntEliminatedPlayers}
+          onWordHuntGuess={handleWordHuntGuess}
 
-        // Player experience (for keyboard trail inactivity threshold)
-        totalGamesPlayed={profile?.total_games}
+          // Player experience (for keyboard trail inactivity threshold)
+          totalGamesPlayed={profile?.total_games}
 
-        // Tutorial callback
-        onShowTutorial={onShowTutorial}
-      />
+          // Tutorial callback
+          onShowTutorial={onShowTutorial}
+        />
+      )}
 
       {/* Tournament Standings Modal */}
       <Dialog open={showTournamentStandings} onOpenChange={setShowTournamentStandings}>

@@ -32,7 +32,7 @@ jest.mock('@/components/ui/alert-dialog', () => ({
   AlertDialogContent: ({ children }: any) => <div>{children}</div>,
   AlertDialogHeader: ({ children }: any) => <div>{children}</div>,
   AlertDialogTitle: ({ children }: any) => <h2>{children}</h2>,
-  AlertDialogDescription: ({ children, asChild }: any) => <div>{children}</div>,
+  AlertDialogDescription: ({ children }: any) => <div>{children}</div>,
   AlertDialogFooter: ({ children }: any) => <div>{children}</div>,
   AlertDialogAction: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
 }));

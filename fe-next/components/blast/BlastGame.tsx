@@ -26,6 +26,8 @@ import { useBlastComboSync } from '@/hooks/gameState';
 
 interface BlastGameProps {
   config: BlastGameConfig;
+  /** Game mode: 'singleplayer' uses objectives, sugar crush, waves; 'multiplayer' skips them */
+  mode?: 'singleplayer' | 'multiplayer';
   /** Current wave number (1-based) */
   waveNumber?: number;
   /** Wave-specific config from blastWaveConfig */
@@ -58,6 +60,7 @@ interface BlastGameProps {
  */
 export function BlastGame({
   config,
+  mode = 'singleplayer',
   waveNumber = 1,
   waveConfig,
   cumulativeScore = 0,
@@ -69,6 +72,7 @@ export function BlastGame({
   acknowledgeDiscovery,
   onWordWithComboType,
 }: BlastGameProps) {
+  const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
   const { isLowEnd } = useDevicePerformance();
@@ -87,7 +91,11 @@ export function BlastGame({
   }, [combo, playWordAcceptedSound]);
 
   // Memoize wave objectives so they don't cause re-initialization
-  const waveObjectives = useMemo(() => getWaveObjectives(waveNumber), [waveNumber]);
+  // Multiplayer: no wave objectives (single timed round)
+  const waveObjectives = useMemo(
+    () => isMultiplayer ? [] : getWaveObjectives(waveNumber),
+    [waveNumber, isMultiplayer],
+  );
 
   // Objective tile types for highlighting (memoized Set for BlastTileOverlay)
   const objectiveTileTypes = useMemo(() => {
@@ -101,61 +109,61 @@ export function BlastGame({
   }, [waveObjectives]);
 
   // Sugar Crush sequence (PSYC-03): fires when moves run out, converting tiles to specials
+  // Multiplayer: no sugar crush (no move limit)
   const sugarCrush = useBlastSugarCrush();
 
   // Ref to sugarCrush.start — allows onMovesExhausted to reference latest start without stale closure
   const sugarCrushStartRef = useRef(sugarCrush.start);
   sugarCrushStartRef.current = sugarCrush.start;
 
+  // Sugar crush callback — always defined (hook rules) but only passed in SP
+  const handleMovesExhausted = useCallback(() => {
+    sugarCrushStartRef.current(
+      blastTileStatesRef.current,
+      config.gridSize,
+      blastSetTileStatesRef.current,
+      blastAddExplosionRef.current,
+      blastAddBonusScoreRef.current,
+      blastEndGameRef.current,
+    );
+  }, [config.gridSize]);
+
   // Core blast game state (with cascade callback + move limit from wave config)
+  // Multiplayer: no move limit, no wave objectives, no sugar crush
   const blast = useBlastGame(config, {
     onAutoCascadeWord: handleAutoCascadeWord,
-    movesAllowed: waveConfig?.movesAllowed,
-    waveObjectives,
+    movesAllowed: isMultiplayer ? undefined : waveConfig?.movesAllowed,
+    waveObjectives: isMultiplayer ? undefined : waveObjectives,
     onSynergyDetected: useCallback((_comboType: BlastComboType) => {
-      // Play max combo sound as audio sting for any combo synergy
       playComboSound(3);
     }, [playComboSound]),
     onComboDetected: useCallback((combos: SpecialCombo[]) => {
       onComboDetected?.(combos);
     }, [onComboDetected]),
-    onMovesExhausted: useCallback(() => {
-      // Callback fires instead of auto-setting isDeadEnd.
-      // sugarCrushStartRef.current is used to avoid stale closure.
-      // The actual blast refs (tileStates, setTileStates, etc.) are captured at call time.
-      // We schedule the start via a timeout=0 to ensure tileStates is settled before crush begins.
-      sugarCrushStartRef.current(
-        blastTileStatesRef.current,
-        config.gridSize,
-        blastSetTileStatesRef.current,
-        blastAddExplosionRef.current,
-        blastAddBonusScoreRef.current,
-        blastEndGameRef.current,
-      );
-    }, [config.gridSize]),
+    onMovesExhausted: isMultiplayer ? undefined : handleMovesExhausted,
   });
 
   // Stable refs to blast methods for use inside onMovesExhausted callback
   // (avoids stale closure over blast object which changes on each render)
    
   const blastTileStatesRef = useRef(blast.tileStates);
-  blastTileStatesRef.current = blast.tileStates; // eslint-disable-line react-hooks/immutability
+  blastTileStatesRef.current = blast.tileStates;  
 
    
   const blastSetTileStatesRef = useRef(blast.setTileStates);
-  blastSetTileStatesRef.current = blast.setTileStates; // eslint-disable-line react-hooks/immutability
+  blastSetTileStatesRef.current = blast.setTileStates;  
 
    
   const blastAddExplosionRef = useRef(blast.addExplosion);
-  blastAddExplosionRef.current = blast.addExplosion; // eslint-disable-line react-hooks/immutability
+  blastAddExplosionRef.current = blast.addExplosion;  
 
    
   const blastAddBonusScoreRef = useRef(blast.addBonusScore);
-  blastAddBonusScoreRef.current = blast.addBonusScore; // eslint-disable-line react-hooks/immutability
+  blastAddBonusScoreRef.current = blast.addBonusScore;  
 
   // After sugar crush completes, add bonus score and end game
   const blastEndGameRef = useRef<(totalBonus: number) => void>(() => {});
-  // eslint-disable-next-line react-hooks/immutability
+   
   blastEndGameRef.current = useCallback((totalBonus: number) => {
     // totalBonus already added per-step via addBonusScore; just end the game
     void totalBonus;
@@ -199,13 +207,15 @@ export function BlastGame({
     minWordLength,
   );
 
-  // Objective tracking
-  const { objectiveProgress, allObjectivesComplete } = useBlastObjectives({
+  // Objective tracking — always called (hook rules) but results ignored in multiplayer
+  const spObjectives = useBlastObjectives({
     gameState: blast.gameState,
     tileTypeClears: blast.gameState.tileTypeClears,
     waveNumber,
     wordsFound: blast.gameState.wordsFound,
   });
+  const objectiveProgress = isMultiplayer ? [] : spObjectives.objectiveProgress;
+  const allObjectivesComplete = isMultiplayer ? false : spObjectives.allObjectivesComplete;
 
   // Game timing - initialized once via effect
   const gameStartTimeRef = useRef(0);

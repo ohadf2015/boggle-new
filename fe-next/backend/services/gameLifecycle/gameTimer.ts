@@ -10,6 +10,7 @@ import { getGame, updateGame } from '../../modules/gameStateManager';
 import { resetGameAIValidationCount } from '../../modules/communityWordManager';
 import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { clearGameTimer, setGameTimer } from '../../utils/timerManager';
+import { drainLife } from '../../modules/wordHuntManager';
 import { startBotsForGame } from './botGame';
 import { endGame } from './gameEnd';
 
@@ -72,6 +73,29 @@ export function startGameTimer(
       });
     }
     lastBroadcastSecond = remainingTime;
+
+    // Word Hunt: drain life from all non-eliminated players each tick
+    const currentGame = getGame(gameCode);
+    if (currentGame?.gameMode === 'word-hunt' && (currentGame as any).wordHuntState) {
+      const huntState = (currentGame as any).wordHuntState;
+      const { updatedLives, newlyEliminated } = drainLife(huntState);
+
+      // Update game state with drained lives
+      huntState.playerLives = updatedLives;
+
+      // Broadcast updated lives to all players in room
+      broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
+        playerLives: updatedLives,
+      });
+
+      // Broadcast elimination for each newly eliminated player
+      for (const username of newlyEliminated) {
+        huntState.eliminatedPlayers.push(username);
+        broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntEliminated', {
+          username,
+        });
+      }
+    }
 
     if (remainingTime <= 0) {
       clearGameTimer(gameCode);

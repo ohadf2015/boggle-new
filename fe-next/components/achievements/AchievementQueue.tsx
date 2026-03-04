@@ -129,8 +129,9 @@ function AchievementInlineToast({
     return () => clearTimeout(timer);
   }, [onDismiss]);
 
-  // Portal to document.body to escape ancestor overflow-x:clip
-  // which clips fixed-positioned elements in the locale layout
+  // Uses inset-x-0 + flex centering instead of left-1/2 -translate-x-1/2
+  // to avoid the element extending beyond viewport bounds, which gets
+  // clipped by overflow-x:clip on body (screen-fit class)
   const toast = (
     <motion.div
       data-testid="achievement-inline-toast"
@@ -138,40 +139,46 @@ function AchievementInlineToast({
       animate={{ y: 0, opacity: 1, scale: 1 }}
       exit={{ y: -40, opacity: 0, scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className="fixed left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-navy pointer-events-auto"
+      className="fixed inset-x-0 z-[9999] flex justify-center pointer-events-none px-4"
       style={{
         top: 'max(1rem, env(safe-area-inset-top, 1rem))',
-        boxShadow: isRtl
-          ? '-4px 4px 0px #FFE135'
-          : '4px 4px 0px #FFE135',
-        minWidth: 'min(280px, calc(100vw - 2rem))',
-        maxWidth: 'min(420px, calc(100vw - 2rem))',
       }}
     >
-      {/* Achievement Icon */}
       <div
-        data-testid="achievement-inline-icon"
-        className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-neo-black bg-neo-yellow shrink-0"
+        className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-navy pointer-events-auto"
+        style={{
+          boxShadow: isRtl
+            ? '-4px 4px 0px #FFE135'
+            : '4px 4px 0px #FFE135',
+          minWidth: 'min(280px, calc(100vw - 2rem))',
+          maxWidth: 'min(420px, calc(100vw - 2rem))',
+        }}
       >
-        <span className="text-2xl">{icon}</span>
-      </div>
-
-      {/* Text Content */}
-      <div className="flex flex-col flex-1 min-w-0">
-        <span className="text-xs font-bold uppercase tracking-wide text-neo-white/70">
-          {t('achievements.unlocked') || 'Achievement Unlocked!'}
-        </span>
-        <span
-          data-testid="achievement-inline-name"
-          className="font-black text-lg truncate text-neo-lime"
+        {/* Achievement Icon */}
+        <div
+          data-testid="achievement-inline-icon"
+          className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-neo-black bg-neo-yellow shrink-0"
         >
-          {name}
-        </span>
-        {description && (
-          <span className="text-xs text-neo-white/60 truncate">
-            {description}
+          <span className="text-2xl">{icon}</span>
+        </div>
+
+        {/* Text Content */}
+        <div className="flex flex-col flex-1 min-w-0">
+          <span className="text-xs font-bold uppercase tracking-wide text-neo-white/70">
+            {t('achievements.unlocked') || 'Achievement Unlocked!'}
           </span>
-        )}
+          <span
+            data-testid="achievement-inline-name"
+            className="font-black text-lg truncate text-neo-lime"
+          >
+            {name}
+          </span>
+          {description && (
+            <span className="text-xs text-neo-white/60 truncate">
+              {description}
+            </span>
+          )}
+        </div>
       </div>
     </motion.div>
   );

@@ -219,7 +219,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Uses natural page scroll (no internal overflow container) so mobile scrolling works reliably.
   // Fixed bottom bar on mobile provides the sticky CTA.
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh bg-neo-navy text-white">
       <div className="px-2 md:px-4 xl:px-6 pb-40 md:pb-6">
         <div className="mx-auto space-y-4 md:space-y-6 pt-2 md:pt-4">
 

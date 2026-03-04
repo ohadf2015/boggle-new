@@ -14,6 +14,8 @@ import {
   useWordHuntMyLife,
   useWordHuntTargetAttempts,
   useWordHuntTargetFound,
+  useWordHuntPlayerLives,
+  useWordHuntEliminatedPlayers,
 } from '@/hooks/gameState/store';
 
 // ==================== Types ====================
@@ -121,11 +123,13 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   const wordHuntLife = useWordHuntMyLife();
   const wordHuntAttempts = useWordHuntTargetAttempts();
   const wordHuntFound = useWordHuntTargetFound();
+  const wordHuntPlayerLives = useWordHuntPlayerLives();
+  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
 
   // Word hunt guess handler — emits to server
   const handleWordHuntGuess = React.useCallback((guess: string) => {
     if (!socket) return;
-    socket.emit('wordHuntGuess', { guess });
+    socket.emit('submitTargetWord', { guess });
   }, [socket]);
 
   // Build leaderboard from players data
@@ -206,6 +210,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       wordHuntAttempts={wordHuntAttempts}
       wordHuntFound={wordHuntFound}
       wordHuntLife={wordHuntLife}
+      wordHuntPlayerLives={wordHuntPlayerLives}
+      wordHuntEliminatedPlayers={wordHuntEliminatedPlayers}
       onWordHuntGuess={hostPlaying ? handleWordHuntGuess : undefined}
 
       // Player experience (for keyboard trail inactivity threshold)

@@ -251,6 +251,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             gameCode={gameCode}
             className="h-full"
             onNewMessage={() => {}}
+            variant="embedded"
           />
         </div>
       </section>
@@ -305,6 +306,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                     gameCode={gameCode}
                     className="h-full"
                     onNewMessage={() => {}}
+                    variant="embedded"
                   />
                 </div>
               </>

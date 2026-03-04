@@ -3,7 +3,6 @@
  * Renders special tile badges on grid cells for blast multiplayer mode.
  */
 
-import React from 'react';
 import type { BlastTileOverlay } from '@/shared/types/game';
 import type { BlastTileType } from '@/shared/types/blast';
 
@@ -12,15 +11,20 @@ interface BlastMultiplayerOverlayProps {
   gridSize: { rows: number; cols: number };
 }
 
-/** Emoji/icon mapping for tile types */
+/** Emoji/icon mapping for all 12 special tile types */
 const TILE_ICONS: Partial<Record<BlastTileType, string>> = {
-  gold: '\u2B50',       // star
+  gold: '\u2B50',           // star
   rainbow: '\uD83C\uDF08', // rainbow
   bomb: '\uD83D\uDCA3',    // bomb
   ice: '\u2744\uFE0F',     // snowflake
   gem: '\uD83D\uDC8E',     // gem
   lightning: '\u26A1',      // lightning
   magnet: '\uD83E\uDDF2',  // magnet
+  prism: '\uD83D\uDD2E',   // crystal ball
+  frozen: '\uD83E\uDDCA',  // ice cube
+  mirror: '\uD83E\uDE9E',  // mirror
+  silver: '\uD83E\uDD48',  // silver medal
+  diamond: '\uD83D\uDC8E', // gem (diamond variant)
 };
 
 export function BlastMultiplayerOverlay({ overlay, gridSize }: BlastMultiplayerOverlayProps) {

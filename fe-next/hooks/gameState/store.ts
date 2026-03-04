@@ -109,6 +109,7 @@ interface GameState {
   wordHuntPlayerLives: Record<string, number>;
   wordHuntTargetAttempts: Array<{ guess: string; feedback: LetterFeedback[] }>;
   wordHuntTargetFound: boolean;
+  wordHuntEliminatedPlayers: string[];
 
   // Internal refs (not reactive, for callbacks)
   _comboTimeoutId: NodeJS.Timeout | null;
@@ -179,6 +180,7 @@ interface GameActions {
   setWordHuntPlayerLives: (value: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
   setWordHuntTargetAttempts: (value: Array<{ guess: string; feedback: LetterFeedback[] }> | ((prev: Array<{ guess: string; feedback: LetterFeedback[] }>) => Array<{ guess: string; feedback: LetterFeedback[] }>)) => void;
   setWordHuntTargetFound: (value: boolean | ((prev: boolean) => boolean)) => void;
+  setWordHuntEliminatedPlayers: (value: string[] | ((prev: string[]) => string[])) => void;
 
   // Reset actions
   resetForNewRound: () => void;
@@ -227,6 +229,7 @@ const initialState: GameState = {
   wordHuntPlayerLives: {},
   wordHuntTargetAttempts: [],
   wordHuntTargetFound: false,
+  wordHuntEliminatedPlayers: [],
   _comboTimeoutId: null,
 };
 
@@ -494,6 +497,10 @@ export const useGameStore = create<GameStore>()(
       wordHuntTargetFound: applySetState(value, state.wordHuntTargetFound)
     })),
 
+    setWordHuntEliminatedPlayers: (value) => set((state) => ({
+      wordHuntEliminatedPlayers: applySetState(value, state.wordHuntEliminatedPlayers)
+    })),
+
     // ==========================================
     // Reset Actions
     // ==========================================
@@ -527,6 +534,7 @@ export const useGameStore = create<GameStore>()(
         wordHuntPlayerLives: {},
         wordHuntTargetAttempts: [],
         wordHuntTargetFound: false,
+        wordHuntEliminatedPlayers: [],
         _comboTimeoutId: null,
       });
     },
@@ -601,6 +609,7 @@ export const useWordHuntMyLife = () => useGameStore((state) => state.wordHuntMyL
 export const useWordHuntPlayerLives = () => useGameStore((state) => state.wordHuntPlayerLives);
 export const useWordHuntTargetAttempts = () => useGameStore((state) => state.wordHuntTargetAttempts);
 export const useWordHuntTargetFound = () => useGameStore((state) => state.wordHuntTargetFound);
+export const useWordHuntEliminatedPlayers = () => useGameStore((state) => state.wordHuntEliminatedPlayers);
 
 // ==========================================
 // Actions Object (static, no re-renders)
@@ -657,6 +666,7 @@ const getActions = (state: GameStore) => ({
   setWordHuntPlayerLives: state.setWordHuntPlayerLives,
   setWordHuntTargetAttempts: state.setWordHuntTargetAttempts,
   setWordHuntTargetFound: state.setWordHuntTargetFound,
+  setWordHuntEliminatedPlayers: state.setWordHuntEliminatedPlayers,
   resetForNewRound: state.resetForNewRound,
   resetAll: state.resetAll,
 });

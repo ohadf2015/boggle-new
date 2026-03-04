@@ -134,6 +134,7 @@ export function usePlayerGameEvents({
     setWordHuntPlayerLives,
     setWordHuntTargetAttempts,
     setWordHuntTargetFound,
+    setWordHuntEliminatedPlayers,
   } = useGameActions();
 
   // Track if was in active game (TODO: move to GameState context)
@@ -440,6 +441,7 @@ export function usePlayerGameEvents({
 
     const handleWordHuntEliminated = (data: { username: string }) => {
       logger.log('[PLAYER] Word hunt player eliminated:', data.username);
+      setWordHuntEliminatedPlayers((prev) => [...prev, data.username]);
     };
 
     // Register listeners
