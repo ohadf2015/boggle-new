@@ -151,6 +151,7 @@ export function useWordSubmission(
     playWordAcceptedSound,
     announceWordResult,
     comboLevelRef,
+    comboTypeRef,
     setCurrentFeedback,
   ]);
 

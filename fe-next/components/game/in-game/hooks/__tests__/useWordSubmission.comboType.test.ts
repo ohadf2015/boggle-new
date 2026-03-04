@@ -28,9 +28,8 @@ jest.mock('@/utils/haptics', () => ({
 // ---------------------------------------------------------------------------
 // Imports (after mocks)
 // ---------------------------------------------------------------------------
-import { useRef } from 'react';
+import { useRef, type MutableRefObject } from 'react';
 import { useWordSubmission } from '../useWordSubmission';
-import type { MutableRefObject } from 'react';
 
 // ---------------------------------------------------------------------------
 // Helpers
