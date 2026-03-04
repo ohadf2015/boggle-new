@@ -187,7 +187,7 @@ describe('handlePostComboCodex', () => {
     );
 
     expect(result.status).toBe(200);
-    const { discoveredCombos } = result.data;
+    const discoveredCombos = result.data.discoveredCombos as string[];
     expect(discoveredCombos.filter((c: string) => c === 'bomb_bomb')).toHaveLength(1);
     expect(discoveredCombos).toContain('prism_prism');
   });
