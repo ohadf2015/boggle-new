@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { translations } from '@/translations';
 import HomePageClient from './PageClient';
 
 /**
@@ -36,6 +37,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HomePage({ params }: PageProps) {
   const { locale } = await params;
+  const t = translations[locale as keyof typeof translations] || translations.en;
+  const seo = t.landing?.seo;
+  const legal = t.legal;
 
   return (
     <>
@@ -45,28 +49,23 @@ export default async function HomePage({ params }: PageProps) {
           Hidden visually since the client-side LandingSEOSection covers the same content
           with richer interactivity. This is a fallback for non-JS bots (e.g. AdSense). */}
       <section className="sr-only" aria-hidden="true">
-        <h2>What is LexiClash?</h2>
-        <p>
-          LexiClash is a free, fast-paced multiplayer word game you can play right in your browser.
-          Compete with friends in real-time word battles on a shared letter grid — find words, build
-          combos, and climb the leaderboard. No download required. Available in English, Hebrew,
-          Swedish, Japanese, and Spanish.
-        </p>
-        <h2>Game Modes</h2>
+        <h2>{seo?.whatIsTitle}</h2>
+        <p>{seo?.whatIsContent}</p>
+        <h2>{seo?.featuresTitle}</h2>
         <ul>
-          <li>Multiplayer Rooms — Create a private room and share the code with up to 20 friends.</li>
-          <li>Single Player vs. Bots — Practice your word-finding skills against AI opponents.</li>
-          <li>Daily Challenge — A fresh puzzle every day, identical for all players worldwide.</li>
-          <li>Adventure Mode — Journey through 10 themed worlds with 100 levels.</li>
+          <li>{seo?.feature1Title} — {seo?.feature1Desc}</li>
+          <li>{seo?.feature2Title} — {seo?.feature2Desc}</li>
+          <li>{seo?.feature3Title} — {seo?.feature3Desc}</li>
+          <li>{seo?.feature4Title} — {seo?.feature4Desc}</li>
         </ul>
-        <h2>Legal &amp; Policies</h2>
+        <h2>{legal?.title}</h2>
         <nav>
           <ul>
-            <li><a href={`/${locale}/legal/privacy`}>Privacy Policy</a></li>
-            <li><a href={`/${locale}/legal/terms`}>Terms of Service</a></li>
-            <li><a href={`/${locale}/legal/disclaimer`}>Disclaimer</a></li>
-            <li><a href={`/${locale}/about`}>About LexiClash</a></li>
-            <li><a href={`/${locale}/contact`}>Contact Us</a></li>
+            <li><a href={`/${locale}/legal/privacy`}>{legal?.privacyPolicy}</a></li>
+            <li><a href={`/${locale}/legal/terms`}>{legal?.termsOfService}</a></li>
+            <li><a href={`/${locale}/legal/disclaimer`}>{legal?.disclaimer?.title || 'Disclaimer'}</a></li>
+            <li><a href={`/${locale}/about`}>{t.footer?.about || 'About'}</a></li>
+            <li><a href={`/${locale}/contact`}>{t.footer?.contact || 'Contact'}</a></li>
           </ul>
         </nav>
       </section>

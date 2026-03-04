@@ -105,6 +105,12 @@ const nextConfig = {
   // SEO: Redirect non-www to www and ensure consistent URLs
   async redirects() {
     return [
+      // Redirect bare root to default locale (prevents 404 and duplicate content flags)
+      {
+        source: '/',
+        destination: '/en',
+        permanent: true,
+      },
       // Redirect non-www to www (handled by hosting platform like Vercel/Railway)
       // This is a fallback for any requests that slip through
       {

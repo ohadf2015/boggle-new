@@ -16,7 +16,7 @@ export default function GlobalNotFound() {
               The page you&apos;re looking for doesn&apos;t exist or has been moved.
             </p>
             <Link
-              href="/"
+              href="/en"
               className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-medium transition-all"
             >
               Back to Game

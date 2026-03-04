@@ -4,7 +4,7 @@
  * one-more-game prompts, and variable ratio mystery rewards
  */
 
-const { getSupabase } = require('./supabaseServer');
+import { getSupabase } from './supabaseServer';
 
 // ==================== TYPES ====================
 
@@ -162,7 +162,7 @@ export const STREAK_BONUSES: Record<number, StreakBonus> = {
  * Record player login and update streak
  */
 export async function recordLogin(playerId: string): Promise<LoginResult> {
-  const supabase = getSupabase();
+  const supabase = getSupabase()!;
   const today = new Date().toISOString().split('T')[0];
 
   // Get or create engagement record
@@ -338,7 +338,7 @@ export const CALENDAR_REWARDS: CalendarReward[] = [
  * Get calendar status for player
  */
 export async function getCalendarStatus(playerId: string): Promise<CalendarStatus> {
-  const supabase = getSupabase();
+  const supabase = getSupabase()!;
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
@@ -394,7 +394,7 @@ export async function claimCalendarReward(playerId: string): Promise<{
   appliedReward?: unknown;
   nextReward?: CalendarReward | null;
 }> {
-  const supabase = getSupabase();
+  const supabase = getSupabase()!;
   const status = await getCalendarStatus(playerId);
 
   if (!status.canClaimToday) {
@@ -428,7 +428,7 @@ export async function claimCalendarReward(playerId: string): Promise<{
  * Apply a reward to player
  */
 export async function applyReward(playerId: string, reward: CalendarReward): Promise<unknown> {
-  const supabase = getSupabase();
+  const supabase = getSupabase()!;
 
   switch (reward.type) {
     case 'xp':
@@ -476,7 +476,7 @@ export const COMEBACK_TIERS: ComebackTier[] = [
  * Check and apply come-back bonuses
  */
 export async function checkComebackBonus(playerId: string): Promise<ComebackBonusInfo> {
-  const supabase = getSupabase();
+  const supabase = getSupabase()!;
 
   const { data: engagement } = await supabase
     .from('player_engagement')
@@ -530,7 +530,7 @@ export async function claimComebackBonus(playerId: string): Promise<{
   bonus?: ComebackBonusInfo['tier'];
   expiresAt?: string;
 }> {
-  const supabase = getSupabase();
+  const supabase = getSupabase()!;
   const bonusInfo = await checkComebackBonus(playerId);
 
   if (!bonusInfo.eligible || !bonusInfo.tier) {
@@ -879,7 +879,7 @@ export async function logMysteryReward(
   gameCode: string,
   reward: MysteryRewardResult
 ): Promise<void> {
-  const supabase = getSupabase();
+  const supabase = getSupabase()!;
 
   await supabase.from('mystery_rewards_log').insert({
     player_id: playerId,
@@ -900,7 +900,7 @@ function getDaysInMonth(month: number, year: number): number {
  * Get full engagement status for a player
  */
 export async function getEngagementStatus(playerId: string): Promise<EngagementStatus> {
-  const supabase = getSupabase();
+  const supabase = getSupabase()!;
 
   const { data: engagement } = await supabase
     .from('player_engagement')
@@ -926,38 +926,3 @@ export async function getEngagementStatus(playerId: string): Promise<EngagementS
 }
 
 // CommonJS exports for backward compatibility
-module.exports = {
-  // Streak system
-  recordLogin,
-  getStreakBonuses,
-  getStreakXpMultiplier,
-  STREAK_BONUSES,
-
-  // Calendar rewards
-  getCalendarStatus,
-  claimCalendarReward,
-  CALENDAR_REWARDS,
-
-  // Come-back campaigns
-  checkComebackBonus,
-  claimComebackBonus,
-  COMEBACK_TIERS,
-
-  // Near-miss notifications
-  calculateNearMisses,
-  NEAR_MISS_THRESHOLDS,
-
-  // One more game prompts
-  getOneMoreGamePrompt,
-  ONE_MORE_GAME_PROMPTS,
-
-  // Mystery rewards
-  rollMysteryReward,
-  rollMysteryBox,
-  logMysteryReward,
-  MYSTERY_REWARD_POOLS,
-
-  // General
-  getEngagementStatus,
-  applyReward,
-};

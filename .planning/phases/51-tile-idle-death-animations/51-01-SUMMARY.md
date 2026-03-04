@@ -98,6 +98,11 @@ None - no external service configuration required.
 - Ready for Phase 51 Plan 02 (tile death animations or next plan in phase)
 - No blockers
 
+## Self-Check: PASSED
+- SUMMARY.md: FOUND at .planning/phases/51-tile-idle-death-animations/51-01-SUMMARY.md
+- Task 1 commit a1668b9c: FOUND
+- Task 2 commit 1672f9cd: FOUND
+
 ---
 *Phase: 51-tile-idle-death-animations*
 *Completed: 2026-03-04*

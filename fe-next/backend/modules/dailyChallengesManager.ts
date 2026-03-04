@@ -3,9 +3,7 @@
  * Generates and tracks daily challenges for player engagement
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-
-const { getSupabase } = require('./supabaseServer');
+import { getSupabase } from './supabaseServer';
 
 // Challenge type definitions
 export const CHALLENGE_TYPES = {
@@ -168,7 +166,7 @@ export interface ChallengeStats {
  * @returns Array of generated challenges
  */
 export async function generateDailyChallenges(playerId: string): Promise<DailyChallenge[]> {
-  const supabase: SupabaseClient = getSupabase();
+  const supabase = getSupabase()!;
   const today = new Date().toISOString().split('T')[0];
 
   // Check if challenges already exist for today
@@ -232,7 +230,7 @@ export async function generateDailyChallenges(playerId: string): Promise<DailyCh
  * @returns Updated challenges and any completions
  */
 export async function updateChallengeProgress(playerId: string, gameStats: GameStats): Promise<ChallengeUpdateResult> {
-  const supabase: SupabaseClient = getSupabase();
+  const supabase = getSupabase()!;
   const today = new Date().toISOString().split('T')[0];
 
   // Get today's challenges
@@ -342,7 +340,7 @@ export async function updateChallengeProgress(playerId: string, gameStats: GameS
  * @returns Reward details
  */
 export async function claimChallengeReward(playerId: string, challengeId: string): Promise<ChallengeRewardResult> {
-  const supabase: SupabaseClient = getSupabase();
+  const supabase = getSupabase()!;
 
   // Get the challenge
   const { data: challenge, error: fetchError } = await supabase
@@ -410,7 +408,7 @@ export async function claimChallengeReward(playerId: string, challengeId: string
  * @returns Today's challenges
  */
 export async function getTodaysChallenges(playerId: string): Promise<DailyChallenge[]> {
-  const supabase: SupabaseClient = getSupabase();
+  const supabase = getSupabase()!;
   const today = new Date().toISOString().split('T')[0];
 
   // First, ensure challenges exist
@@ -457,7 +455,7 @@ function shuffleArray<T>(array: T[]): T[] {
  * @returns Completion stats
  */
 export async function getChallengeStats(playerId: string): Promise<ChallengeStats> {
-  const supabase: SupabaseClient = getSupabase();
+  const supabase = getSupabase()!;
 
   const { data: completed } = await supabase
     .from('daily_challenges')
@@ -476,13 +474,3 @@ export async function getChallengeStats(playerId: string): Promise<ChallengeStat
 }
 
 // CommonJS exports for backward compatibility
-module.exports = {
-  CHALLENGE_TYPES,
-  CHALLENGE_TIERS,
-  generateDailyChallenges,
-  updateChallengeProgress,
-  claimChallengeReward,
-  getTodaysChallenges,
-  getStreakMultiplier,
-  getChallengeStats,
-};

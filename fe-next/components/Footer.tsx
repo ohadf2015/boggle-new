@@ -95,6 +95,32 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
+              href={`/${language}/legal/privacy`}
+              className="
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-lime
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('legal.privacyPolicy') || 'Privacy Policy'}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
+              href={`/${language}/legal/terms`}
+              className="
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-lime
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('legal.termsOfService') || 'Terms of Service'}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
               href={`/${language}/contact`}
               className="
                 min-h-[48px] px-3 flex items-center

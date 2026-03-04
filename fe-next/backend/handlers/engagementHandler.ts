@@ -24,7 +24,7 @@ import {
   claimChallengeReward,
   getTodaysChallenges,
   getChallengeStats,
-} from '../modules/dailyChallengesManager.js';
+} from '../modules/dailyChallengesManager';
 
 import {
   recordLogin,
@@ -38,11 +38,11 @@ import {
   rollMysteryReward,
   logMysteryReward,
   getEngagementStatus,
-} from '../modules/engagementManager.js';
+} from '../modules/engagementManager';
 
-import { safeEmit } from '../utils/socketHelpers.js';
-import { checkRateLimit } from '../utils/rateLimiter.js';
-import logger from '../utils/logger.js';
+import { safeEmit } from '../utils/socketHelpers';
+import { checkRateLimit } from '../utils/rateLimiter';
+import logger from '../utils/logger';
 
 // Types for payloads
 interface PlayerIdPayload {
