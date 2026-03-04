@@ -4,7 +4,7 @@ milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: executing
 stopped_at: Completed 47-05-PLAN.md
-last_updated: "2026-03-04T12:59:29.972Z"
+last_updated: "2026-03-04T13:02:30.687Z"
 last_activity: "2026-03-04 — 47-03 complete: Vortex (pull+explode, rework of Magnet) + Frost (2-hit reveal with inner special, rework of Frozen)"
 progress:
   total_phases: 7
