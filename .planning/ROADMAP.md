@@ -84,13 +84,13 @@ Plans:
   1. Submitting a word with 2+ special tiles always triggers a combination effect (no silent misses)
   2. All 28 tile pairs produce distinct, named effects — no two pairs produce identical outcomes
   3. Combination clears visually exceed individual tile clears (larger particles, screen flash, distinct audio sting)
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 48-01: Build combination detection system — scan word path, identify special pairs, dispatch synergy (COMB-01)
-- [ ] 48-02: Implement combination matrix Part 1 — pairs involving Bomb, Lightning, Prism, Rainbow Boost (COMB-02)
-- [ ] 48-03: Implement combination matrix Part 2 — pairs involving Vortex, Frost, Mirror, Treasure Gem, Gold tiers (COMB-02)
-- [ ] 48-04: Implement combination visual/audio layer — particles, screen effects, audio stings (COMB-03)
+- [ ] 48-01-PLAN.md — Expand detection to 28 pairs + extract combo effect executor from useBlastGame (COMB-01) (Wave 1)
+- [ ] 48-02-PLAN.md — Implement combo effects: Bomb/Lightning/Prism/Rainbow pairs (12 effects) (COMB-02) (Wave 2)
+- [ ] 48-03-PLAN.md — Implement combo effects: Vortex/Frost/Mirror/Gem pairs (10 effects) (COMB-02) (Wave 2)
+- [ ] 48-04-PLAN.md — BlastComboFlash visual overlay + audio sting callback (COMB-03) (Wave 3)
 
 #### Phase 49: Combination UX — Discovery, Codex, Scaling, Translations
 **Goal**: Players are rewarded for discovering new combinations with a dramatic first-time callout, can browse their discovery progress in the Combo Codex, receive stronger effects for longer words, and all combination text is translated.
