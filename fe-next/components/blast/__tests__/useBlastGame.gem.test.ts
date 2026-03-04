@@ -3,7 +3,10 @@
  * Gem tiles require 3 hits to collect. Each use gives +3 bonus,
  * final collection gives +3 + +8 = +11. Total potential: 17 bonus points.
  */
-import { type BlastTileState, type BlastTileType, GEM_USE_BONUS, GEM_COLLECT_BONUS } from '../types';
+import { type BlastTileState, type BlastTileType } from '../types';
+
+const GEM_USE_BONUS = 3;
+const GEM_COLLECT_BONUS = 8;
 
 function makeTileState(
   row: number, col: number, type: BlastTileType = 'standard', hitsRemaining = 0,

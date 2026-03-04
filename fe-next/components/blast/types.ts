@@ -137,8 +137,6 @@ export const VORTEX_EXPLODE_BONUS = 2;
 export const FROST_HITS_REQUIRED = 2;
 /** Bonus score awarded when Frost tile is freed and inner special activates */
 export const FROST_REVEAL_BONUS = 3;
-/** Bonus score for rainbow tiles (legacy — replaced by RAINBOW_BOOST_MULTIPLIER) */
-export const RAINBOW_BONUS = 5;
 /** Multiplier applied by Rainbow Boost: copies and doubles the best special's effect, or doubles word score solo */
 export const RAINBOW_BOOST_MULTIPLIER = 2;
 /** Stagger delay (ms) between chain bomb explosions for visual ripple */
@@ -159,10 +157,6 @@ export const MAGNET_ATTRACT_BONUS = 3;
 export const PRISM_USE_BONUS = 2;
 /** Bonus when prism detonates (cross-clear) */
 export const PRISM_CROSS_BONUS = 5;
-/** Bonus per word a gem tile is used in */
-export const GEM_USE_BONUS = 3;
-/** Bonus when gem is finally collected (cleared) */
-export const GEM_COLLECT_BONUS = 8;
 
 // ==================== Treasure Gem Constants ====================
 

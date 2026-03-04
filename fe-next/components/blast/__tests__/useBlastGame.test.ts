@@ -46,7 +46,6 @@ import { useBlastGame } from '../hooks/useBlastGame';
 import {
   GOLD_MULTIPLIER,
   BOMB_RADIUS,
-  RAINBOW_BONUS,
   CASCADE_HIGHLIGHT_DURATION,
   CASCADE_HIGHLIGHT_LINGER,
   type BlastGameConfig,
@@ -279,7 +278,7 @@ describe('useBlastGame', () => {
           result.current.clearTilesForWord(path, 'r', 5);
         });
 
-        expect(result.current.gameState.score).toBe(5 + RAINBOW_BONUS);
+        expect(result.current.gameState.score).toBe(10); // 5 (word score) + 5 (legacy rainbow flat bonus)
       }
     });
   });
