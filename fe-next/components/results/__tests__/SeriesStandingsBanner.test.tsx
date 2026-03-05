@@ -11,14 +11,20 @@ import SeriesStandingsBanner from '../SeriesStandingsBanner';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 
 // Mock framer-motion
+const MockDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
+  <div ref={ref} {...props}>{children}</div>
+));
+MockDiv.displayName = 'MockMotionDiv';
+
+const MockSpan = React.forwardRef(({ children, ...props }: any, ref: any) => (
+  <span ref={ref} {...props}>{children}</span>
+));
+MockSpan.displayName = 'MockMotionSpan';
+
 jest.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <div ref={ref} {...props}>{children}</div>
-    )),
-    span: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <span ref={ref} {...props}>{children}</span>
-    )),
+    div: MockDiv,
+    span: MockSpan,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));

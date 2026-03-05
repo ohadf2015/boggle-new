@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 3685,
+    "totalKeysInCode": 3688,
     "keyCountByLanguage": {
-      "en": 5438,
-      "he": 5454,
-      "sv": 5448,
-      "ja": 5463,
+      "en": 5441,
+      "he": 5457,
+      "sv": 5451,
+      "ja": 5466,
       "es": 4907
     },
     "missingFromEnglish": 0,
@@ -381,6 +381,9 @@
       "results.sessionStats.comeback",
       "results.sessionStats.rivalry",
       "results.sessionStats.bigRound",
+      "results.series.title",
+      "results.series.gameCount",
+      "results.series.round",
       "tutorial.multiDirection",
       "achievements.duelWinner.name",
       "achievements.duelWinner.description",
