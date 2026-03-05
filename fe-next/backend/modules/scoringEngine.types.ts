@@ -10,7 +10,7 @@
  *   totalScore = baseScore + comboBonus
  *
  * Combo Multipliers (legacy, kept for compatibility):
- *   0-2: x1.0, 3-4: x1.25, 5-6: x1.5, 7-8: x1.75, 9-10: x2.0, 11+: x2.25
+ *   0-2: x1.0, 3-4: x1.25, 5-6: x1.5, 7-8: x1.75, 9-10: x2.0, 11-14: x2.25, 15-19: x2.5, 20-24: x2.75, 25+: x3.0
  */
 
 import type { Avatar } from '@/shared/types/game';
@@ -82,7 +82,7 @@ export interface AIValidationResult {
  * Higher combo levels give better multipliers
  *
  * @param comboLevel - Current combo level (0+)
- * @returns Multiplier (1.0 - 2.25)
+ * @returns Multiplier (1.0 - 3.0)
  */
 export function getComboMultiplier(comboLevel: number): number {
   if (comboLevel <= 2) return 1.0;
@@ -90,7 +90,10 @@ export function getComboMultiplier(comboLevel: number): number {
   if (comboLevel <= 6) return 1.5;
   if (comboLevel <= 8) return 1.75;
   if (comboLevel <= 10) return 2.0;
-  return 2.25; // Max multiplier at combo 11+
+  if (comboLevel <= 14) return 2.25;
+  if (comboLevel <= 19) return 2.5;
+  if (comboLevel <= 24) return 2.75;
+  return 3.0;
 }
 
 /**

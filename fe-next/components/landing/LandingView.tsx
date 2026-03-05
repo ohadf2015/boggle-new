@@ -26,6 +26,12 @@ import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
+import { useEvents } from '@/hooks/useEvents';
+
+// Lazy load EventBanner - only shown when active events exist
+const EventBanner = dynamic(() => import('@/components/events/EventBanner'), {
+  ssr: false,
+});
 
 // Lazy load AuthModal - only opened when user clicks locked feature
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), {
@@ -105,6 +111,11 @@ const LandingView: React.FC = () => {
 
   // Daily challenge pre-fetch for streak and completion status
   const dailyChallengeStatus = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
+
+  // Seasonal events
+  const { activeEvents, myEvents, joinEvent: joinEventAction } = useEvents();
+  const [dismissedEventIds, setDismissedEventIds] = useState<Set<string>>(new Set());
+  const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
 
   // Mouse-based parallax for hero section
   const mouseParallax = useMouseParallax(15);
@@ -239,6 +250,18 @@ const LandingView: React.FC = () => {
 
       {/* Header - compact in landscape via CSS */}
       <Header />
+
+      {/* Seasonal Event Banner - only shown if active events exist */}
+      {visibleEvent && (
+        <div className="w-full max-w-7xl mx-auto px-2 sm:px-3 lg:px-6 xl:px-8 pt-2">
+          <EventBanner
+            event={visibleEvent}
+            onJoin={(id) => joinEventAction(id)}
+            onDismiss={() => setDismissedEventIds((prev) => new Set([...prev, visibleEvent.id]))}
+            hasJoined={myEvents.some((e) => e.id === visibleEvent.id)}
+          />
+        </div>
+      )}
 
       {/* Main content */}
       <section className={cn(

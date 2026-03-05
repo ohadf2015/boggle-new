@@ -81,4 +81,22 @@ describe('ComboMilestoneAnnouncement', () => {
     rerender(<ComboMilestoneAnnouncement comboLevel={3} />);
     expect(screen.queryByText('NICE!')).not.toBeInTheDocument();
   });
+
+  it('shows "LEGENDARY!" when combo reaches 15', () => {
+    const { rerender } = render(<ComboMilestoneAnnouncement comboLevel={0} />);
+    rerender(<ComboMilestoneAnnouncement comboLevel={15} />);
+    expect(screen.getByText('LEGENDARY!')).toBeInTheDocument();
+  });
+
+  it('shows "MYTHIC STREAK!" when combo reaches 20', () => {
+    const { rerender } = render(<ComboMilestoneAnnouncement comboLevel={0} />);
+    rerender(<ComboMilestoneAnnouncement comboLevel={20} />);
+    expect(screen.getByText('MYTHIC STREAK!')).toBeInTheDocument();
+  });
+
+  it('shows "TRANSCENDENT!" when combo reaches 25', () => {
+    const { rerender } = render(<ComboMilestoneAnnouncement comboLevel={0} />);
+    rerender(<ComboMilestoneAnnouncement comboLevel={25} />);
+    expect(screen.getByText('TRANSCENDENT!')).toBeInTheDocument();
+  });
 });

@@ -10,6 +10,8 @@ import {
   calculateWordScore,
   calculateWordScoreByLength,
   WORD_SCORES,
+  getComboTierName,
+  type ComboTierName,
 } from '../scoring';
 
 describe('Scoring Utilities', () => {
@@ -40,15 +42,82 @@ describe('Scoring Utilities', () => {
       expect(getComboMultiplier(10)).toBe(2.0);
     });
 
-    it('should return 2.25 for combo levels 11+', () => {
+    it('should return 2.25 for combo levels 11-14', () => {
       expect(getComboMultiplier(11)).toBe(2.25);
-      expect(getComboMultiplier(15)).toBe(2.25);
-      expect(getComboMultiplier(100)).toBe(2.25);
+      expect(getComboMultiplier(14)).toBe(2.25);
+    });
+
+    it('should return 2.5 for combo levels 15-19 (Legendary)', () => {
+      expect(getComboMultiplier(15)).toBe(2.5);
+      expect(getComboMultiplier(19)).toBe(2.5);
+    });
+
+    it('should return 2.75 for combo levels 20-24 (Mythic)', () => {
+      expect(getComboMultiplier(20)).toBe(2.75);
+      expect(getComboMultiplier(24)).toBe(2.75);
+    });
+
+    it('should return 3.0 for combo levels 25+ (Transcendent)', () => {
+      expect(getComboMultiplier(25)).toBe(3.0);
+      expect(getComboMultiplier(50)).toBe(3.0);
+      expect(getComboMultiplier(100)).toBe(3.0);
     });
 
     it('should handle negative combo levels gracefully', () => {
       expect(getComboMultiplier(-1)).toBe(1.0);
       expect(getComboMultiplier(-10)).toBe(1.0);
+    });
+  });
+
+  describe('getComboTierName', () => {
+    it('should return "none" for combo levels 0-2', () => {
+      expect(getComboTierName(0)).toBe('none');
+      expect(getComboTierName(1)).toBe('none');
+      expect(getComboTierName(2)).toBe('none');
+    });
+
+    it('should return "basic" for combo levels 3-4', () => {
+      expect(getComboTierName(3)).toBe('basic');
+      expect(getComboTierName(4)).toBe('basic');
+    });
+
+    it('should return "good" for combo levels 5-6', () => {
+      expect(getComboTierName(5)).toBe('good');
+      expect(getComboTierName(6)).toBe('good');
+    });
+
+    it('should return "great" for combo levels 7-8', () => {
+      expect(getComboTierName(7)).toBe('great');
+      expect(getComboTierName(8)).toBe('great');
+    });
+
+    it('should return "amazing" for combo levels 9-10', () => {
+      expect(getComboTierName(9)).toBe('amazing');
+      expect(getComboTierName(10)).toBe('amazing');
+    });
+
+    it('should return "legendary" for combo levels 11-14', () => {
+      expect(getComboTierName(11)).toBe('legendary');
+      expect(getComboTierName(14)).toBe('legendary');
+    });
+
+    it('should return "mythic" for combo levels 15-19', () => {
+      expect(getComboTierName(15)).toBe('mythic');
+      expect(getComboTierName(19)).toBe('mythic');
+    });
+
+    it('should return "transcendent" for combo levels 20-24', () => {
+      expect(getComboTierName(20)).toBe('transcendent');
+      expect(getComboTierName(24)).toBe('transcendent');
+    });
+
+    it('should return "transcendent" for combo levels 25+', () => {
+      expect(getComboTierName(25)).toBe('transcendent');
+      expect(getComboTierName(100)).toBe('transcendent');
+    });
+
+    it('should handle negative combo levels', () => {
+      expect(getComboTierName(-1)).toBe('none');
     });
   });
 
@@ -340,6 +409,27 @@ describe('Scoring Utilities', () => {
       expect(WORD_SCORES[8]).toBe(calculateWordScore('ABCDEFGH'));
     });
   });
+
+  describe('rarity multiplier', () => {
+      it('should apply rarity multiplier when provided', () => {
+        // CAT base = 2, rarity 1.5 => 3
+        expect(calculateWordScore('CAT', 0, 1, 1.5)).toBe(3);
+      });
+
+      it('should apply rarity after combo and fire', () => {
+        // HOUSE: base 4 + combo 5 = 9, fire 2x = 18, rarity 1.25 = 22.5 => 22
+        expect(calculateWordScore('HOUSE', 5, 2, 1.25)).toBe(22);
+      });
+
+      it('should default to 1.0 rarity when not provided', () => {
+        expect(calculateWordScore('CAT', 0, 1)).toBe(2);
+      });
+
+      it('should handle epic rarity (2x)', () => {
+        // TEST: base 3, rarity 2x => 6
+        expect(calculateWordScore('TEST', 0, 1, 2)).toBe(6);
+      });
+    });
 
   describe('backward compatibility', () => {
     it('should produce same results as old scoringEngine implementation', () => {

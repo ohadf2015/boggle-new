@@ -3,11 +3,12 @@
 import React, { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Bot, Users, Brain, ArrowLeft, ArrowRight, Sparkles, Trophy } from 'lucide-react';
+import { Bot, Users, Brain, ArrowLeft, ArrowRight, Sparkles, Trophy, Swords } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { clearSessionPreservingUsername } from '@/utils/session';
+import { getCloseLossMessage } from '@/shared/utils/closeLossDetector';
 
 export type NextStepMode = 'practice' | 'solo-bots' | 'daily' | 'multiplayer-bots';
 
@@ -22,6 +23,12 @@ interface NextStepPromptProps {
   variant?: 'desktop' | 'mobile' | 'landscape';
   /** Additional CSS classes */
   className?: string;
+  /** Whether this was a close multiplayer loss */
+  isCloseLoss?: boolean;
+  /** Absolute score difference for close loss */
+  scoreDifference?: number;
+  /** Callback for rematch action */
+  onRematch?: () => void;
 }
 
 interface ModeConfig {
@@ -48,6 +55,9 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   onAction,
   variant = 'desktop',
   className,
+  isCloseLoss: isCloseLossProp = false,
+  scoreDifference,
+  onRematch,
 }) => {
   const { t, language, dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -112,6 +122,73 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const title = t(config.titleKey) || config.titleKey;
   const description = t(config.descKey) || config.descKey;
   const backText = t('nextStep.backToLobby') || 'Back to Lobby';
+
+  // Close loss rematch prompt - overrides normal flow
+  if (isCloseLossProp && scoreDifference != null) {
+    const closeLossMsg = getCloseLossMessage(scoreDifference, t);
+    const rematchText = t('closeLoss.rematch') || 'Rematch!';
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
+        className={cn(
+          'bg-gradient-to-br from-neo-red to-neo-orange',
+          'border-4 border-neo-black rounded-neo-lg shadow-hard-xl',
+          'p-6 relative overflow-hidden',
+          className
+        )}
+      >
+        <div className="relative z-10 text-center space-y-4">
+          <Swords className="w-10 h-10 text-neo-black mx-auto" />
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black uppercase text-neo-black tracking-tight">
+              {t('closeLoss.soClose') || 'So close!'}
+            </h3>
+            <p className="text-neo-black/80 font-bold mt-1">
+              {closeLossMsg}
+            </p>
+          </div>
+
+          {onRematch && (
+            <button
+              onClick={onRematch}
+              className={cn(
+                'inline-flex items-center justify-center gap-2',
+                'px-8 py-4',
+                'bg-neo-black text-neo-white',
+                'font-black text-lg uppercase',
+                'border-4 border-neo-black rounded-neo',
+                'shadow-hard-lg hover:shadow-hard-xl',
+                'hover:-translate-x-1 hover:-translate-y-1',
+                'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
+                'transition-all duration-150'
+              )}
+            >
+              {rematchText}
+            </button>
+          )}
+
+          <button
+            onClick={onBackToLobby}
+            className={cn(
+              'inline-flex items-center justify-center gap-2',
+              'px-6 py-2.5',
+              'bg-neo-white/80 text-neo-black',
+              'font-bold text-sm uppercase',
+              'border-3 border-neo-black rounded-neo',
+              'shadow-hard hover:shadow-hard-lg',
+              'transition-all duration-150'
+            )}
+          >
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            {backText}
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
   // Landscape variant - compact horizontal layout
   if (variant === 'landscape') {

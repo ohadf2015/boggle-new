@@ -39,11 +39,12 @@ describe('useComboMilestone', () => {
     jest.useRealTimers();
   });
 
-  it('exports COMBO_MILESTONES with 10/15/20 thresholds', () => {
-    expect(COMBO_MILESTONES).toHaveLength(3);
+  it('exports COMBO_MILESTONES with 10/15/20/25 thresholds', () => {
+    expect(COMBO_MILESTONES).toHaveLength(4);
     expect(COMBO_MILESTONES[0].threshold).toBe(10);
     expect(COMBO_MILESTONES[1].threshold).toBe(15);
     expect(COMBO_MILESTONES[2].threshold).toBe(20);
+    expect(COMBO_MILESTONES[3].threshold).toBe(25);
   });
 
   it('returns null milestone initially', () => {
@@ -73,7 +74,7 @@ describe('useComboMilestone', () => {
 
     expect(result.current.currentMilestone).toEqual(expect.objectContaining({
       threshold: 15,
-      labelKey: 'adventure.combo.unstoppable',
+      labelKey: 'adventure.combo.mythic',
     }));
   });
 
@@ -86,7 +87,7 @@ describe('useComboMilestone', () => {
 
     expect(result.current.currentMilestone).toEqual(expect.objectContaining({
       threshold: 20,
-      labelKey: 'adventure.combo.legendary',
+      labelKey: 'adventure.combo.transcendent',
     }));
   });
 

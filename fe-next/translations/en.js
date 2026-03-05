@@ -363,6 +363,12 @@ const en = {
     "explanationTitle": "Combo Power!",
     "explanationText": "Chain words fast for multipliers! Higher streak = bigger bonus. Keep it going!"
   },
+  "wordRarity": {
+    "common": "Common",
+    "uncommon": "Uncommon",
+    "rare": "Rare",
+    "epic": "Epic"
+  },
   "earthquake": {
     "warning": "EARTHQUAKE!",
     "brace": "Brace yourself!",
@@ -1249,7 +1255,9 @@ const en = {
       "demoHint": "Connect touching letters",
       "demoSuccess": "Nice!",
       "demoComplete": "You got it! Let's clash!",
-      "startHere": "Start Here"
+      "startHere": "Start Here",
+      "watchMe": "Watch this!",
+      "yourTurn": "Your turn! Spell:"
     },
     "name": {
       "placeholder": "Your name",
@@ -1260,7 +1268,9 @@ const en = {
     },
     "profile": {
       "title": "Suit Up!",
-      "subtitle": "Pick your look and name"
+      "subtitle": "Pick your look and name",
+      "deferredTitle": "Save your progress?",
+      "deferredSubtitle": "Set up your profile to keep your stats!"
     },
     "quickTips": {
       "title": "Pro Tips",
@@ -1486,6 +1496,19 @@ const en = {
     "goMultiplayerDesc": "Real humans, real competition, real bragging rights",
     "brainTraining": "Brain Gym",
     "brainTrainingDesc": "Level up your mental game"
+  },
+  "almostFound": {
+    "title": "You Almost Found...",
+    "matchPercent": "{percent}% match",
+    "wouldHaveScored": "+{score} pts"
+  },
+  "closeLoss": {
+    "soClose": "So close!",
+    "justPoints": "Just {points} points away!",
+    "rematch": "Rematch!",
+    "rematchQuestion": "Rematch?",
+    "almostHadIt": "You almost had it!",
+    "nailBiter": "What a nail-biter!"
   },
   "player": {
     "new": "NEW"
@@ -2131,6 +2154,20 @@ const en = {
     "more": "more",
     "soClose": "You're so close! One more game could do it."
   },
+  "almostFound": {
+    "title": "You Almost Found...",
+    "matchPercent": "{percent}% match",
+    "wouldHaveScored": "+{score} pts"
+  },
+  "closeLoss": {
+    "soClose": "So close!",
+    "justPoints": "Just {points} points away!",
+    "rematch": "Rematch!",
+    "rematchQuestion": "Rematch?",
+    "almostHadIt": "You almost had it!",
+    "nailBiter": "What a nail-biter!",
+    "challengeBot": "Challenge a Bot"
+  },
   "mysteryReward": {
     "title": "Mystery Reward",
     "youFound": "You Found a Mystery Reward!",
@@ -2747,7 +2784,27 @@ const en = {
     "addCountry": "Add country",
     "changeCountry": "Change",
     "countrySaved": "Country set!",
-    "countryError": "Couldn't update - try again!"
+    "countryError": "Couldn't update - try again!",
+    "records": {
+      "title": "Personal Records",
+      "longestWord": "Longest Word",
+      "highestCombo": "Highest Combo",
+      "fastestWord": "Fastest Word",
+      "uniqueWords": "Unique Words",
+      "bestRanked": "Best Ranked",
+      "bestCasual": "Best Casual",
+      "share": "Share"
+    }
+  },
+  "streaks": {
+    "wager": {
+      "title": "Wager Your Coins!",
+      "description": "Bet coins on your streak - win 3x or lose it all!",
+      "payout": "Potential Payout",
+      "risk": "You'll lose your wager if you break the streak!",
+      "confirm": "Place Wager",
+      "skip": "Skip"
+    }
   },
   "calendar": {
     "title": "Daily Loot",
@@ -4797,7 +4854,9 @@ const en = {
       "amazing": "Amazing!",
       "incredible": "INCREDIBLE!",
       "unstoppable": "UNSTOPPABLE!",
-      "legendary": "LEGENDARY!"
+      "legendary": "LEGENDARY!",
+      "mythic": "MYTHIC!",
+      "transcendent": "TRANSCENDENT!"
     },
     "worlds": {
       "alphabetMeadows": "Alphabet Meadows",
@@ -7055,6 +7114,77 @@ const en = {
     "fast": "Quick",
     "party": "Party",
     "challenge": "Challenge"
+  },
+  "shareResult": {
+    "singleplayer": "LexiClash Solo",
+    "multiplayer": "LexiClash Battle",
+    "blast": "LexiClash Blast",
+    "daily": "LexiClash Daily",
+    "adventure": "LexiClash Adventure",
+    "wordHunt": "LexiClash Word Hunt",
+    "score": "Score",
+    "words": "Words",
+    "longest": "Longest",
+    "combo": "Combo",
+    "won": "Won!",
+    "lost": "Lost",
+    "level": "Level",
+    "puzzle": "Puzzle",
+    "vs": "vs"
+  },
+  "events": {
+    "joinNow": "Join Now!",
+    "timeRemaining": "Time Remaining",
+    "dismiss": "Dismiss",
+    "endsIn": "Ends in",
+    "joined": "Joined",
+    "leaderboard": "Leaderboard",
+    "position": "Position",
+    "score": "Score",
+    "rewards": "Rewards",
+    "you": "You",
+    "noParticipants": "No participants yet"
+  },
+  "league": {
+    "title": "Weekly League",
+    "bronze": "Bronze",
+    "silver": "Silver",
+    "gold": "Gold",
+    "diamond": "Diamond",
+    "ruby": "Ruby",
+    "position": "Position",
+    "xp": "XP",
+    "promotionZone": "Promotion Zone",
+    "safeZone": "Safe Zone",
+    "relegationZone": "Relegation Zone",
+    "promoted": "Promoted!",
+    "relegated": "Relegated",
+    "stayed": "Stayed",
+    "weeklyRewards": "Weekly Rewards",
+    "coinsEarned": "Coins Earned",
+    "newWeekIn": "New week starts in",
+    "joinLeague": "Join League",
+    "yourPosition": "Your Position",
+    "top": "Top",
+    "standings": "Standings",
+    "noLeague": "Join a league to compete!",
+    "finalResults": "Final Results",
+    "viewStandings": "View Standings"
+  },
+  "socialGift": {
+    "title": "Send a Gift",
+    "sendTo": "Send to",
+    "type": {
+      "hints": "Hint",
+      "streak_freeze": "Streak Shield",
+      "coins": "Coins"
+    },
+    "coins": "coins",
+    "amount": "Amount",
+    "remaining": "Daily gifts remaining",
+    "send": "Send Gift",
+    "sent": "Gift Sent!",
+    "limitReached": "Daily limit reached"
   }
 };
 

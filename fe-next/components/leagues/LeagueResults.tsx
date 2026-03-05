@@ -1,0 +1,65 @@
+'use client';
+
+import React from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import type { LeagueTier, LeagueZone } from '@/hooks/useLeague';
+
+const ZONE_MESSAGES: Record<LeagueZone, string> = {
+  promotion: 'league.promoted',
+  safe: 'league.stayed',
+  relegation: 'league.relegated',
+};
+
+const ZONE_COLORS: Record<LeagueZone, string> = {
+  promotion: 'text-green-400',
+  safe: 'text-neo-white',
+  relegation: 'text-red-400',
+};
+
+interface LeagueResultsProps {
+  tier: LeagueTier;
+  position: number;
+  zone: LeagueZone;
+  coinsEarned: number;
+  onClose: () => void;
+}
+
+export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: LeagueResultsProps) {
+  const { t } = useLanguage();
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <AdaptiveMotion
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="border-3 border-black rounded-neo shadow-hard-lg bg-neo-navy p-6 max-w-sm w-full mx-4"
+      >
+        <h2 className="font-neo-display text-2xl font-bold text-neo-white text-center mb-4">
+          {t('league.finalResults')}
+        </h2>
+
+        <div className="text-center mb-4">
+          <p className={`font-neo-display text-3xl font-bold ${ZONE_COLORS[zone]}`}>
+            {t(ZONE_MESSAGES[zone])}
+          </p>
+          <p className="text-neo-white/60 mt-1">
+            #{position} in {t(`league.${tier}`)}
+          </p>
+        </div>
+
+        <div className="border-3 border-black rounded-neo bg-neo-navy/50 p-4 text-center mb-4">
+          <p className="text-sm text-neo-white/60">{t('league.coinsEarned')}</p>
+          <p className="font-neo-display text-2xl font-bold text-neo-yellow">{coinsEarned}</p>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full border-3 border-black rounded-neo bg-neo-yellow text-black font-bold py-3 shadow-hard-sm active:shadow-hard-pressed active:translate-y-[2px] transition-all"
+        >
+          OK
+        </button>
+      </AdaptiveMotion.div>
+    </div>
+  );
+}

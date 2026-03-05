@@ -44,6 +44,8 @@ export interface WordFeedback {
   foundByAvatar?: { emoji?: string; color?: string; avatarImage?: string } | null;
   /** Whether this word is from lesson vocabulary (classroom games) */
   fromLesson?: boolean;
+  /** Word rarity classification for bonus display */
+  rarity?: 'common' | 'uncommon' | 'rare' | 'epic';
 }
 
 interface WordFormingAreaProps {
@@ -303,6 +305,28 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   +{visibleFeedback.score}
+                </motion.span>
+              )}
+            </AnimatePresence>
+
+            {/* Rarity badge - for accepted feedback with non-common rarity */}
+            <AnimatePresence mode="popLayout">
+              {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.rarity && visibleFeedback.rarity !== 'common' && (
+                <motion.span
+                  key="rarity"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  transition={{ delay: 0.15, type: 'spring', stiffness: 500 }}
+                  className={cn(
+                    'font-black rounded-neo border-2 border-neo-black uppercase',
+                    compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5',
+                    visibleFeedback.rarity === 'uncommon' && 'bg-green-400 text-neo-black',
+                    visibleFeedback.rarity === 'rare' && 'bg-blue-400 text-white',
+                    visibleFeedback.rarity === 'epic' && 'bg-purple-500 text-white',
+                  )}
+                >
+                  {visibleFeedback.rarity}
                 </motion.span>
               )}
             </AnimatePresence>

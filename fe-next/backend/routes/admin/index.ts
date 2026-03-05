@@ -23,6 +23,7 @@
  * - /api/admin/invalid-words - Invalid word submissions
  * - /api/admin/daily-word/* - Daily challenge management
  * - /api/admin/send-test-email - Email testing
+ * - /api/admin/send-test-reengagement - Re-engagement email testing
  */
 
 import express, { Router } from 'express';

@@ -363,6 +363,12 @@ const sv = {
     "explanationTitle": "Kombokraft!",
     "explanationText": "Kedja ord snabbt för att bygga kombos. Högre kombo = större multiplikatorer. Tappa den inte!"
   },
+  "wordRarity": {
+    "common": "Vanlig",
+    "uncommon": "Ovanlig",
+    "rare": "Sällsynt",
+    "epic": "Episk"
+  },
   "earthquake": {
     "warning": "JORDBÄVNING!",
     "brace": "Håll i dig!",
@@ -1129,7 +1135,9 @@ const sv = {
       "demoHint": "Koppla ihop angränsande bokstäver",
       "demoSuccess": "Perfekt!",
       "demoComplete": "Du förstår! Nu vet du hur man spelar.",
-      "startHere": "Börja här"
+      "startHere": "Börja här",
+      "watchMe": "Titta!",
+      "yourTurn": "Din tur! Stava:"
     },
     "name": {
       "placeholder": "Ange ditt namn",
@@ -1140,7 +1148,9 @@ const sv = {
     },
     "profile": {
       "title": "Skapa Din Profil",
-      "subtitle": "Avatar + namn = redo för strid"
+      "subtitle": "Avatar + namn = redo för strid",
+      "deferredTitle": "Spara dina framsteg?",
+      "deferredSubtitle": "Skapa en profil for att behålla din statistik!"
     },
     "quickTips": {
       "title": "Proffstips",
@@ -1366,6 +1376,19 @@ const sv = {
     "goMultiplayerDesc": "Utmana riktiga spelare i livekamper med ord",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Förbättra dina kognitiva förmågor med fokuserade övningar"
+  },
+  "almostFound": {
+    "title": "Du hittade nästan...",
+    "matchPercent": "{percent}% matchning",
+    "wouldHaveScored": "+{score} poäng"
+  },
+  "closeLoss": {
+    "soClose": "Så nära!",
+    "justPoints": "Bara {points} poäng ifrån!",
+    "rematch": "Returmatch!",
+    "rematchQuestion": "Returmatch?",
+    "almostHadIt": "Du hade det nästan!",
+    "nailBiter": "Vilken rysare!"
   },
   "player": {
     "new": "NY"
@@ -2011,6 +2034,20 @@ const sv = {
     "more": "mer",
     "soClose": "Du var så nära! Ett spel till kan göra det."
   },
+  "almostFound": {
+    "title": "Du hittade nastan...",
+    "matchPercent": "{percent}% matchning",
+    "wouldHaveScored": "+{score} poang"
+  },
+  "closeLoss": {
+    "soClose": "Sa nara!",
+    "justPoints": "Bara {points} poang bort!",
+    "rematch": "Returmatch!",
+    "rematchQuestion": "Returmatch?",
+    "almostHadIt": "Du hade nastan det!",
+    "nailBiter": "Vilken nagelbitare!",
+    "challengeBot": "Utmana en bot"
+  },
   "mysteryReward": {
     "title": "Mysteriebelöning",
     "youFound": "Du hittade en mysteriebelöning!",
@@ -2223,7 +2260,27 @@ const sv = {
     "addCountry": "Lägg till land",
     "changeCountry": "Ändra land",
     "countrySaved": "Land uppdaterat!",
-    "countryError": "Kunde inte uppdatera land"
+    "countryError": "Kunde inte uppdatera land",
+    "records": {
+      "title": "Personliga rekord",
+      "longestWord": "Langsta ordet",
+      "highestCombo": "Hogsta kombo",
+      "fastestWord": "Snabbaste ordet",
+      "uniqueWords": "Unika ord",
+      "bestRanked": "Basta rankade",
+      "bestCasual": "Basta casual",
+      "share": "Dela"
+    }
+  },
+  "streaks": {
+    "wager": {
+      "title": "Satsa dina mynt!",
+      "description": "Satsa mynt pa din svit - vinn 3x eller forlora allt!",
+      "payout": "Potentiell utbetalning",
+      "risk": "Du forlorar din insats om du bryter sviten!",
+      "confirm": "Lagg insats",
+      "skip": "Hoppa over"
+    }
   },
   "consent": {
     "title": "Samtycke krävs",
@@ -4732,7 +4789,9 @@ const sv = {
       "amazing": "Fantastiskt!",
       "incredible": "OTROLIGT!",
       "unstoppable": "OSTOPPBAR!",
-      "legendary": "LEGENDARISKT!"
+      "legendary": "LEGENDARISKT!",
+      "mythic": "MYTISKT!",
+      "transcendent": "TRANSCENDENT!"
     },
     "worlds": {
       "alphabetMeadows": "Alfabetsängarna",
@@ -6946,6 +7005,77 @@ const sv = {
     "fast": "Snabb",
     "party": "Fest",
     "challenge": "Utmaning"
+  },
+  "shareResult": {
+    "singleplayer": "LexiClash Solo",
+    "multiplayer": "LexiClash Strid",
+    "blast": "LexiClash Blast",
+    "daily": "LexiClash Daglig",
+    "adventure": "LexiClash Aventyr",
+    "wordHunt": "LexiClash Ordjakt",
+    "score": "Poang",
+    "words": "Ord",
+    "longest": "Langsta",
+    "combo": "Kombo",
+    "won": "Vann!",
+    "lost": "Forlorade",
+    "level": "Niva",
+    "puzzle": "Pussel",
+    "vs": "mot"
+  },
+  "events": {
+    "joinNow": "Gå med nu!",
+    "timeRemaining": "Tid kvar",
+    "dismiss": "Stäng",
+    "endsIn": "Slutar om",
+    "joined": "Ansluten",
+    "leaderboard": "Topplista",
+    "position": "Position",
+    "score": "Poäng",
+    "rewards": "Belöningar",
+    "you": "Du",
+    "noParticipants": "Inga deltagare ännu"
+  },
+  "league": {
+    "title": "Veckoliga",
+    "bronze": "Brons",
+    "silver": "Silver",
+    "gold": "Guld",
+    "diamond": "Diamant",
+    "ruby": "Rubin",
+    "position": "Position",
+    "xp": "XP",
+    "promotionZone": "Uppflyttningszon",
+    "safeZone": "Säker zon",
+    "relegationZone": "Nedflyttningszon",
+    "promoted": "Uppflyttad!",
+    "relegated": "Nedflyttad",
+    "stayed": "Stannade",
+    "weeklyRewards": "Veckobelöningar",
+    "coinsEarned": "Mynt intjänade",
+    "newWeekIn": "Ny vecka börjar om",
+    "joinLeague": "Gå med i liga",
+    "yourPosition": "Din position",
+    "top": "Topp",
+    "standings": "Ställning",
+    "noLeague": "Gå med i en liga för att tävla!",
+    "finalResults": "Slutresultat",
+    "viewStandings": "Visa ställning"
+  },
+  "socialGift": {
+    "title": "Skicka en gåva",
+    "sendTo": "Skicka till",
+    "type": {
+      "hints": "Ledtråd",
+      "streak_freeze": "Svitskydd",
+      "coins": "Mynt"
+    },
+    "coins": "mynt",
+    "amount": "Belopp",
+    "remaining": "Dagliga gåvor kvar",
+    "send": "Skicka gåva",
+    "sent": "Gåva skickad!",
+    "limitReached": "Daglig gräns nådd"
   }
 };
 

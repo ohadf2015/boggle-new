@@ -41,6 +41,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'adventure.combo.great': 'Great!',
         'adventure.combo.amazing': 'Amazing!',
         'adventure.combo.legendary': 'LEGENDARY!',
+        'adventure.combo.mythic': 'MYTHIC!',
+        'adventure.combo.transcendent': 'TRANSCENDENT!',
       };
       return translations[key] || key;
     },
@@ -95,9 +97,19 @@ describe('ComboTierBadge', () => {
       expect(screen.getByText('LEGENDARY!')).toBeInTheDocument();
     });
 
-    it('should render "LEGENDARY!" at comboCount = 20', () => {
+    it('should render "MYTHIC!" at comboCount = 15', () => {
+      render(<ComboTierBadge comboCount={15} />);
+      expect(screen.getByText('MYTHIC!')).toBeInTheDocument();
+    });
+
+    it('should render "TRANSCENDENT!" at comboCount = 20', () => {
       render(<ComboTierBadge comboCount={20} />);
-      expect(screen.getByText('LEGENDARY!')).toBeInTheDocument();
+      expect(screen.getByText('TRANSCENDENT!')).toBeInTheDocument();
+    });
+
+    it('should render "TRANSCENDENT!" at comboCount = 100', () => {
+      render(<ComboTierBadge comboCount={100} />);
+      expect(screen.getByText('TRANSCENDENT!')).toBeInTheDocument();
     });
   });
 
@@ -233,13 +245,31 @@ describe('getComboTier helper', () => {
     expect(tier9?.translationKey).toBe('adventure.combo.amazing');
   });
 
-  it('should return legendary tier for comboCount 10+', () => {
+  it('should return legendary tier for comboCount 10-14', () => {
     const tier = getComboTier(10);
     expect(tier).toBeDefined();
     expect(tier?.translationKey).toBe('adventure.combo.legendary');
 
+    const tier14 = getComboTier(14);
+    expect(tier14?.translationKey).toBe('adventure.combo.legendary');
+  });
+
+  it('should return mythic tier for comboCount 15-19', () => {
+    const tier = getComboTier(15);
+    expect(tier).toBeDefined();
+    expect(tier?.translationKey).toBe('adventure.combo.mythic');
+
+    const tier19 = getComboTier(19);
+    expect(tier19?.translationKey).toBe('adventure.combo.mythic');
+  });
+
+  it('should return transcendent tier for comboCount 20+', () => {
+    const tier = getComboTier(20);
+    expect(tier).toBeDefined();
+    expect(tier?.translationKey).toBe('adventure.combo.transcendent');
+
     const tier100 = getComboTier(100);
-    expect(tier100?.translationKey).toBe('adventure.combo.legendary');
+    expect(tier100?.translationKey).toBe('adventure.combo.transcendent');
   });
 });
 
@@ -249,8 +279,8 @@ describe('COMBO_TIERS constant', () => {
     expect(Array.isArray(COMBO_TIERS)).toBe(true);
   });
 
-  it('should have 4 tier levels', () => {
-    expect(COMBO_TIERS).toHaveLength(4);
+  it('should have 6 tier levels', () => {
+    expect(COMBO_TIERS).toHaveLength(6);
   });
 
   it('should have tiers in ascending threshold order', () => {

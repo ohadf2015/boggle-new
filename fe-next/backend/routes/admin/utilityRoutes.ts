@@ -166,4 +166,69 @@ router.post('/send-test-email', async (req: AdminRequest, res: Response): Promis
   }
 });
 
+/**
+ * POST /api/admin/send-test-reengagement
+ * Send a test re-engagement email to a specified address
+ */
+router.post('/send-test-reengagement', async (req: AdminRequest, res: Response): Promise<void> => {
+  const startTime = Date.now();
+  logger.info('ADMIN_API', '====== Send test reengagement email request START ======');
+
+  try {
+    const { sendTestReengagementEmail, getFirstLetterForLanguage } = await import('../../../lib/reengagementEmail');
+    const { isEmailServiceConfigured } = await import('../../../lib/email');
+
+    if (!isEmailServiceConfigured()) {
+      logger.warn('ADMIN_API', 'Email service not configured');
+      res.status(503).json({
+        error: 'Email service not configured',
+        details: {
+          hasApiKey: !!process.env.RESEND_API_KEY,
+          hasFromEmail: !!process.env.RESEND_FROM_EMAIL,
+        }
+      });
+      return;
+    }
+
+    const { email, recipientName, language: reqLanguage } = req.body || {};
+
+    const targetEmail = email || req.adminUser?.email;
+    if (!targetEmail) {
+      res.status(400).json({ error: 'No email address provided' });
+      return;
+    }
+
+    const language = reqLanguage || 'en';
+    const name = recipientName || req.adminUser?.username || 'Test User';
+
+    const letterData = await getFirstLetterForLanguage(language);
+    const firstLetter = letterData?.letter || 'T';
+
+    logger.info('ADMIN_API', `Sending test reengagement email to ${targetEmail} (lang=${language}, letter=${firstLetter})`);
+
+    const result = await sendTestReengagementEmail(targetEmail, name, language, firstLetter);
+
+    if (!result.success) {
+      logger.warn('ADMIN_API', `Send failed: ${result.error}`);
+      res.status(500).json({ error: result.error || 'Failed to send test email' });
+      return;
+    }
+
+    logger.info('ADMIN_API', `====== SUCCESS - Total time: ${Date.now() - startTime}ms ======`);
+    auditLog(req.adminUser, 'SEND_TEST_REENGAGEMENT_EMAIL', { targetEmail, language, firstLetter });
+
+    res.json({
+      success: true,
+      message: `Test re-engagement email sent to ${targetEmail}`,
+      sentTo: targetEmail,
+      language,
+      firstLetter,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Send test reengagement email error: ${err.message}`);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
 export default router;

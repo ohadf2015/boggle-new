@@ -363,6 +363,12 @@ const he = {
     "explanationTitle": "כוח הקומבו!",
     "explanationText": "שרשרו מילים מהר לבניית קומבו. קומבו גבוה = מכפילים גדולים. אל תפילו!"
   },
+  "wordRarity": {
+    "common": "נפוצה",
+    "uncommon": "לא שכיחה",
+    "rare": "נדירה",
+    "epic": "אפית"
+  },
   "earthquake": {
     "warning": "רעידת אדמה!",
     "brace": "תתכוננו!",
@@ -1139,7 +1145,9 @@ const he = {
       "demoHint": "חברו אותיות סמוכות",
       "demoSuccess": "מצוין!",
       "demoComplete": "הבנת! עכשיו את/ה יודע/ת לשחק.",
-      "startHere": "התחילו כאן"
+      "startHere": "התחילו כאן",
+      "watchMe": "תראו!",
+      "yourTurn": "תורכם! כתבו:"
     },
     "name": {
       "placeholder": "הכניסו שם",
@@ -1150,7 +1158,9 @@ const he = {
     },
     "profile": {
       "title": "צרו את הפרופיל שלכם",
-      "subtitle": "אווטאר + שם = מוכנים לקרב"
+      "subtitle": "אווטאר + שם = מוכנים לקרב",
+      "deferredTitle": "לשמור את ההתקדמות?",
+      "deferredSubtitle": "הגדירו פרופיל כדי לשמור את הסטטיסטיקות!"
     },
     "quickTips": {
       "title": "טיפים מקצוענים",
@@ -1378,6 +1388,19 @@ const he = {
     "goMultiplayerDesc": "אתגרו שחקנים אמיתיים בקרבות מילים חיים",
     "brainTraining": "אימון מוחי",
     "brainTrainingDesc": "שפרו את הכישורים הקוגניטיביים שלכם עם תרגילים ממוקדים"
+  },
+  "almostFound": {
+    "title": "כמעט מצאת...",
+    "matchPercent": "{percent}% התאמה",
+    "wouldHaveScored": "+{score} נק'"
+  },
+  "closeLoss": {
+    "soClose": "כמעט!",
+    "justPoints": "רק {points} נקודות הפרש!",
+    "rematch": "משחק חוזר!",
+    "rematchQuestion": "משחק חוזר?",
+    "almostHadIt": "כמעט הצלחת!",
+    "nailBiter": "איזה מתח!"
   },
   "player": {
     "new": "חדש"
@@ -2023,6 +2046,20 @@ const he = {
     "more": "עוד",
     "soClose": "היית כל כך קרוב! משחק אחד עוד יכול לעשות את זה."
   },
+  "almostFound": {
+    "title": "כמעט מצאת...",
+    "matchPercent": "{percent}% התאמה",
+    "wouldHaveScored": "+{score} נק'"
+  },
+  "closeLoss": {
+    "soClose": "כמעט!",
+    "justPoints": "רק {points} נקודות הפרידו!",
+    "rematch": "עוד סיבוב!",
+    "rematchQuestion": "רוצה עוד סיבוב?",
+    "almostHadIt": "כמעט הצלחת!",
+    "nailBiter": "איזה משחק צמוד!",
+    "challengeBot": "אתגר בוט"
+  },
   "mysteryReward": {
     "title": "פרס מסתורי",
     "youFound": "מצאת פרס מסתורי!",
@@ -2639,7 +2676,27 @@ const he = {
     "addCountry": "הוסף מדינה",
     "changeCountry": "שנה מדינה",
     "countrySaved": "המדינה עודכנה!",
-    "countryError": "שגיאה בעדכון המדינה"
+    "countryError": "שגיאה בעדכון המדינה",
+    "records": {
+      "title": "שיאים אישיים",
+      "longestWord": "המילה הארוכה ביותר",
+      "highestCombo": "קומבו הכי גבוה",
+      "fastestWord": "המילה המהירה ביותר",
+      "uniqueWords": "מילים ייחודיות",
+      "bestRanked": "ניקוד מדורג הכי טוב",
+      "bestCasual": "ניקוד רגיל הכי טוב",
+      "share": "שתף"
+    }
+  },
+  "streaks": {
+    "wager": {
+      "title": "הימר על המטבעות שלך!",
+      "description": "הימר מטבעות על הרצף שלך - תרוויח פי 3 או תפסיד הכל!",
+      "payout": "תשלום פוטנציאלי",
+      "risk": "תפסיד את ההימור אם תשבור את הרצף!",
+      "confirm": "הצב הימור",
+      "skip": "דלג"
+    }
   },
   "calendar": {
     "title": "פרסים יומיים",
@@ -4707,7 +4764,9 @@ const he = {
       "amazing": "!מדהים",
       "incredible": "!מדהים",
       "unstoppable": "!בלתי ניתן לעצירה",
-      "legendary": "!אגדי"
+      "legendary": "!אגדי",
+      "mythic": "!מיתי",
+      "transcendent": "!על-טבעי"
     },
     "worlds": {
       "alphabetMeadows": "אחו האותיות",
@@ -6948,6 +7007,77 @@ const he = {
     "fast": "מהיר",
     "party": "מסיבה",
     "challenge": "אתגר"
+  },
+  "shareResult": {
+    "singleplayer": "LexiClash סולו",
+    "multiplayer": "LexiClash קרב",
+    "blast": "LexiClash בלאסט",
+    "daily": "LexiClash יומי",
+    "adventure": "LexiClash הרפתקה",
+    "wordHunt": "LexiClash ציד מילים",
+    "score": "ניקוד",
+    "words": "מילים",
+    "longest": "הארוכה ביותר",
+    "combo": "קומבו",
+    "won": "ניצחון!",
+    "lost": "הפסד",
+    "level": "שלב",
+    "puzzle": "פאזל",
+    "vs": "מול"
+  },
+  "events": {
+    "joinNow": "!הצטרף עכשיו",
+    "timeRemaining": "זמן שנותר",
+    "dismiss": "סגור",
+    "endsIn": "נגמר בעוד",
+    "joined": "הצטרפת",
+    "leaderboard": "טבלת מובילים",
+    "position": "מיקום",
+    "score": "ניקוד",
+    "rewards": "פרסים",
+    "you": "את/ה",
+    "noParticipants": "אין משתתפים עדיין"
+  },
+  "league": {
+    "title": "ליגה שבועית",
+    "bronze": "ארד",
+    "silver": "כסף",
+    "gold": "זהב",
+    "diamond": "יהלום",
+    "ruby": "רובי",
+    "position": "מיקום",
+    "xp": "XP",
+    "promotionZone": "אזור עלייה",
+    "safeZone": "אזור בטוח",
+    "relegationZone": "אזור ירידה",
+    "promoted": "!עלית",
+    "relegated": "ירדת",
+    "stayed": "נשארת",
+    "weeklyRewards": "פרסים שבועיים",
+    "coinsEarned": "מטבעות שהורווחו",
+    "newWeekIn": "שבוע חדש מתחיל בעוד",
+    "joinLeague": "הצטרף לליגה",
+    "yourPosition": "המיקום שלך",
+    "top": "טופ",
+    "standings": "טבלה",
+    "noLeague": "!הצטרף לליגה כדי להתחרות",
+    "finalResults": "תוצאות סופיות",
+    "viewStandings": "צפה בטבלה"
+  },
+  "socialGift": {
+    "title": "שליחת מתנה",
+    "sendTo": "שלח ל",
+    "type": {
+      "hints": "רמז",
+      "streak_freeze": "מגן רצף",
+      "coins": "מטבעות"
+    },
+    "coins": "מטבעות",
+    "amount": "כמות",
+    "remaining": "מתנות יומיות שנותרו",
+    "send": "שלח מתנה",
+    "sent": "המתנה נשלחה!",
+    "limitReached": "הגעת למגבלה היומית"
   }
 };
 

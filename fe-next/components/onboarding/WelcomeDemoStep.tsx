@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Pointer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
@@ -14,23 +14,29 @@ interface WelcomeDemoStepProps {
 }
 
 /**
- * WelcomeDemoStep - Welcome message with interactive word selection demo
- * Users learn by doing - swiping to form the demo word
+ * WelcomeDemoStep - Fast onboarding: fun in 15 seconds
+ * Phase 1 (0-2s): Auto-trace shows how to form a word
+ * Phase 2 (2-7s): Player traces ONE word
+ * Phase 3 (on success): Celebration + "Let's Play!" button
  */
 const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
   onDemoComplete,
   demoCompleted,
 }) => {
   const { t, language } = useLanguage();
+  const [autoTracing, setAutoTracing] = useState(true);
 
-  // Get the demo configuration for the current language, fallback to English
   const demoConfig = useMemo(() => {
     return demoConfigs[language] || demoConfigs.en;
   }, [language]);
 
+  const handleAutoTraceComplete = useCallback(() => {
+    setAutoTracing(false);
+  }, []);
+
   return (
     <div className="flex flex-col items-center space-y-3 sm:space-y-5">
-      {/* Welcome header with waving mascot */}
+      {/* Compact welcome header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -43,31 +49,33 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.welcome.title')}
         </h2>
-        <p className="text-xs sm:text-sm text-neo-white/80">
-          {t('onboarding.welcome.subtitle')}
-        </p>
       </motion.div>
 
-      {/* Instruction */}
+      {/* Phase indicator */}
       {!demoCompleted && (
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md max-w-sm text-center"
         >
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <Pointer className="text-xl text-neo-black animate-bounce" />
+          {autoTracing ? (
             <span className="font-bold text-neo-black text-xs sm:text-sm">
-              {t('onboarding.welcome.demoInstruction')}
+              {t('onboarding.welcome.watchMe', 'Watch this!')}
             </span>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-neo-black">
-            {t('onboarding.welcome.demoWord')}
-          </div>
-          <div className="text-[10px] sm:text-xs text-neo-black/60 mt-1">
-            {t('onboarding.welcome.demoHint')}
-          </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Pointer className="text-xl text-neo-black animate-bounce" />
+                <span className="font-bold text-neo-black text-xs sm:text-sm">
+                  {t('onboarding.welcome.yourTurn', 'Your turn! Spell:')}
+                </span>
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-neo-black">
+                {t('onboarding.welcome.demoWord')}
+              </div>
+            </>
+          )}
         </motion.div>
       )}
 
@@ -75,7 +83,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
+        transition={{ delay: 0.3, type: 'spring', stiffness: 280, damping: 26 }}
         className="w-full"
       >
         <MiniGrid
@@ -84,9 +92,47 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           demoWord={demoConfig.word}
           demoPath={demoConfig.path}
           onDemoComplete={onDemoComplete}
-          showHints={true}
+          showHints={!autoTracing}
+          autoTrace={autoTracing}
+          onAutoTraceComplete={handleAutoTraceComplete}
         />
       </motion.div>
+
+      {/* Celebration + Let's Play button */}
+      <AnimatePresence>
+        {demoCompleted && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          >
+            <motion.button
+              data-testid="lets-play-button"
+              onClick={onDemoComplete}
+              className="bg-neo-lime border-3 border-neo-black rounded-neo px-8 py-3 font-black text-lg uppercase shadow-hard text-neo-black hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {t('onboarding.letsPlay')}
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Skip button - always visible */}
+      {!demoCompleted && (
+        <motion.button
+          data-testid="skip-button"
+          onClick={onDemoComplete}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.7 }}
+          transition={{ delay: 1 }}
+          className="text-neo-white/60 text-xs underline hover:text-neo-white/80 transition-colors"
+        >
+          {t('onboarding.skip')}
+        </motion.button>
+      )}
     </div>
   );
 };

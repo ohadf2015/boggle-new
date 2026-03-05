@@ -16,23 +16,32 @@
  */
 
 /**
- * Get combo multiplier based on combo level
+ * Combo tier names for UI display and logic branching.
+ */
+export type ComboTierName = 'none' | 'basic' | 'good' | 'great' | 'amazing' | 'legendary' | 'mythic' | 'transcendent';
+
+/**
+ * Get combo tier name based on combo level.
  *
- * Higher combo levels give better multipliers:
- * - Combo 0-2: x1.0 (no bonus for small combos)
- * - Combo 3-4: x1.25
- * - Combo 5-6: x1.5
- * - Combo 7-8: x1.75
- * - Combo 9-10: x2.0
- * - Combo 11+: x2.25 (max)
+ * @param comboLevel - Current combo level
+ * @returns Tier name string
+ */
+export function getComboTierName(comboLevel: number): ComboTierName {
+  if (comboLevel <= 2) return 'none';
+  if (comboLevel <= 4) return 'basic';
+  if (comboLevel <= 6) return 'good';
+  if (comboLevel <= 8) return 'great';
+  if (comboLevel <= 10) return 'amazing';
+  if (comboLevel <= 14) return 'legendary';
+  if (comboLevel <= 19) return 'mythic';
+  return 'transcendent';
+}
+
+/**
+ * Get combo multiplier based on combo level (no cap).
  *
- * @param comboLevel - Current combo level (0-∞, typically 0-15)
- * @returns Multiplier value (1.0 - 2.25)
- *
- * @example
- * getComboMultiplier(0) // => 1.0
- * getComboMultiplier(5) // => 1.5
- * getComboMultiplier(12) // => 2.25
+ * @param comboLevel - Current combo level (0-∞)
+ * @returns Multiplier value (1.0 - 3.0)
  */
 export function getComboMultiplier(comboLevel: number): number {
   if (comboLevel <= 2) return 1.0;
@@ -40,7 +49,10 @@ export function getComboMultiplier(comboLevel: number): number {
   if (comboLevel <= 6) return 1.5;
   if (comboLevel <= 8) return 1.75;
   if (comboLevel <= 10) return 2.0;
-  return 2.25; // Max multiplier at combo 11+
+  if (comboLevel <= 14) return 2.25;
+  if (comboLevel <= 19) return 2.5;
+  if (comboLevel <= 24) return 2.75;
+  return 3.0;
 }
 
 /**
@@ -117,15 +129,16 @@ export function getComboBonus(comboLevel: number, wordLength: number = 4): numbe
 export function calculateWordScore(
   word: string,
   comboLevel: number = 0,
-  fireRoundMultiplier: number = 1
+  fireRoundMultiplier: number = 1,
+  rarityMultiplier: number = 1
 ): number {
   const length = word.length;
-  if (length < 2) return 0; // Empty strings and single letters not allowed
+  if (length < 2) return 0;
 
-  const baseScore = length - 1; // Each letter beyond the first gets 1 point
+  const baseScore = length - 1;
   const bonus = getComboBonus(comboLevel, length);
 
-  return (baseScore + bonus) * fireRoundMultiplier;
+  return Math.floor((baseScore + bonus) * fireRoundMultiplier * rarityMultiplier);
 }
 
 /**

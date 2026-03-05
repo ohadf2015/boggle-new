@@ -358,6 +358,12 @@ const es = {
     "explanationTitle": "¡Poder Combo!",
     "explanationText": "Encadena palabras rápido para crear combos. Mayor combo = mayores multiplicadores. ¡No lo dejes caer!"
   },
+  "wordRarity": {
+    "common": "Comun",
+    "uncommon": "Poco comun",
+    "rare": "Raro",
+    "epic": "Epico"
+  },
   "earthquake": {
     "warning": "¡TERREMOTO!",
     "brace": "¡Prepárate!",
@@ -1325,6 +1331,19 @@ const es = {
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Mejora tus habilidades cognitivas con ejercicios enfocados"
   },
+  "almostFound": {
+    "title": "Casi encontraste...",
+    "matchPercent": "{percent}% coincidencia",
+    "wouldHaveScored": "+{score} pts"
+  },
+  "closeLoss": {
+    "soClose": "Tan cerca!",
+    "justPoints": "Solo {points} puntos de diferencia!",
+    "rematch": "Revancha!",
+    "rematchQuestion": "Revancha?",
+    "almostHadIt": "Casi lo tenias!",
+    "nailBiter": "Que emocionante!"
+  },
   "player": {
     "new": "NUEVO"
   },
@@ -1821,6 +1840,20 @@ const es = {
     "tip": "Consejo",
     "more": "más",
     "soClose": "¡Estuviste tan cerca! Una partida más podría lograrlo."
+  },
+  "almostFound": {
+    "title": "Casi encontraste...",
+    "matchPercent": "{percent}% coincidencia",
+    "wouldHaveScored": "+{score} pts"
+  },
+  "closeLoss": {
+    "soClose": "¡Tan cerca!",
+    "justPoints": "¡Solo {points} puntos de diferencia!",
+    "rematch": "¡Revancha!",
+    "rematchQuestion": "¿Revancha?",
+    "almostHadIt": "¡Casi lo logras!",
+    "nailBiter": "¡Que partido tan reñido!",
+    "challengeBot": "Desafiar a un bot"
   },
   "mysteryReward": {
     "title": "Recompensa Misteriosa",
@@ -2358,7 +2391,27 @@ const es = {
     "addCountry": "Añadir país",
     "changeCountry": "Cambiar país",
     "countrySaved": "¡País actualizado!",
-    "countryError": "Error al actualizar el país"
+    "countryError": "Error al actualizar el país",
+    "records": {
+      "title": "Records personales",
+      "longestWord": "Palabra mas larga",
+      "highestCombo": "Combo mas alto",
+      "fastestWord": "Palabra mas rapida",
+      "uniqueWords": "Palabras unicas",
+      "bestRanked": "Mejor clasificado",
+      "bestCasual": "Mejor casual",
+      "share": "Compartir"
+    }
+  },
+  "streaks": {
+    "wager": {
+      "title": "Apuesta tus monedas!",
+      "description": "Apuesta monedas en tu racha - gana 3x o pierdelo todo!",
+      "payout": "Pago potencial",
+      "risk": "Perderas tu apuesta si rompes la racha!",
+      "confirm": "Apostar",
+      "skip": "Saltar"
+    }
   },
   "calendar": {
     "title": "Recompensas Diarias",
@@ -4611,7 +4664,9 @@ const es = {
       "amazing": "¡Increíble!",
       "legendary": "¡LEGENDARIO!",
       "incredible": "¡INCREÍBLE!",
-      "unstoppable": "¡IMPARABLE!"
+      "unstoppable": "¡IMPARABLE!",
+      "mythic": "¡MITICO!",
+      "transcendent": "¡TRASCENDENTE!"
     },
     "worlds": {
       "alphabetMeadows": "Praderas del Alfabeto",

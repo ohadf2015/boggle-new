@@ -50,6 +50,18 @@ export const COMBO_TIERS: ComboTier[] = [
     color: 'bg-neo-pink',
     animation: 'animate-neo-press',
   },
+  {
+    threshold: 15,
+    translationKey: 'adventure.combo.mythic',
+    color: 'bg-gradient-to-r from-purple-500 to-pink-500',
+    animation: 'animate-neo-shake',
+  },
+  {
+    threshold: 20,
+    translationKey: 'adventure.combo.transcendent',
+    color: 'bg-gradient-to-r from-yellow-300 via-white to-yellow-300',
+    animation: 'animate-pulse',
+  },
 ];
 
 /**

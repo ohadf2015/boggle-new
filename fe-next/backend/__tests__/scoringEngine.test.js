@@ -142,9 +142,24 @@ describe('Scoring Engine', () => {
       expect(getComboMultiplier(10)).toBe(2.0);
     });
 
-    test('combo 11+ returns max 2.25', () => {
+    test('combo 11-14 returns 2.25', () => {
       expect(getComboMultiplier(11)).toBe(2.25);
-      expect(getComboMultiplier(100)).toBe(2.25);
+      expect(getComboMultiplier(14)).toBe(2.25);
+    });
+
+    test('combo 15-19 returns 2.5 (Legendary)', () => {
+      expect(getComboMultiplier(15)).toBe(2.5);
+      expect(getComboMultiplier(19)).toBe(2.5);
+    });
+
+    test('combo 20-24 returns 2.75 (Mythic)', () => {
+      expect(getComboMultiplier(20)).toBe(2.75);
+      expect(getComboMultiplier(24)).toBe(2.75);
+    });
+
+    test('combo 25+ returns 3.0 (Transcendent)', () => {
+      expect(getComboMultiplier(25)).toBe(3.0);
+      expect(getComboMultiplier(100)).toBe(3.0);
     });
 
   });

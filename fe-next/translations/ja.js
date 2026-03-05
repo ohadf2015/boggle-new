@@ -363,6 +363,12 @@ const ja = {
     "explanationTitle": "コンボパワー！",
     "explanationText": "素早く単語をつなげてコンボを作ろう。高コンボ = 高倍率。途切れさせるな！"
   },
+  "wordRarity": {
+    "common": "普通",
+    "uncommon": "珍しい",
+    "rare": "レア",
+    "epic": "エピック"
+  },
   "earthquake": {
     "warning": "地震だ！",
     "brace": "構えろ！",
@@ -1129,7 +1135,9 @@ const ja = {
       "demoHint": "隣接する文字をつなげよう",
       "demoSuccess": "完璧！",
       "demoComplete": "できた！遊び方がわかったね。",
-      "startHere": "ここから"
+      "startHere": "ここから",
+      "watchMe": "見て！",
+      "yourTurn": "あなたの番！スペル："
     },
     "name": {
       "placeholder": "名前を入力",
@@ -1140,7 +1148,9 @@ const ja = {
     },
     "profile": {
       "title": "プロフィールを作成",
-      "subtitle": "アバター + 名前 = バトル準備完了"
+      "subtitle": "アバター + 名前 = バトル準備完了",
+      "deferredTitle": "進捗を保存しますか？",
+      "deferredSubtitle": "プロフィールを設定して統計を保存しよう！"
     },
     "quickTips": {
       "title": "プロのヒント",
@@ -1368,6 +1378,19 @@ const ja = {
     "goMultiplayerDesc": "リアルプレイヤーとライブワードバトルに挑戦",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "集中トレーニングで認知能力を向上"
+  },
+  "almostFound": {
+    "title": "もう少しで見つかった...",
+    "matchPercent": "{percent}%一致",
+    "wouldHaveScored": "+{score}点"
+  },
+  "closeLoss": {
+    "soClose": "惜しい!",
+    "justPoints": "あと{points}ポイントだった!",
+    "rematch": "リマッチ!",
+    "rematchQuestion": "リマッチする?",
+    "almostHadIt": "もう少しだった!",
+    "nailBiter": "手に汗握る展開!"
   },
   "player": {
     "new": "NEW"
@@ -2013,6 +2036,20 @@ const ja = {
     "more": "あと",
     "soClose": "あと少しでした！もう1ゲームで達成できるかも。"
   },
+  "almostFound": {
+    "title": "もう少しで見つけられた...",
+    "matchPercent": "{percent}%一致",
+    "wouldHaveScored": "+{score}ポイント"
+  },
+  "closeLoss": {
+    "soClose": "惜しい！",
+    "justPoints": "あと{points}ポイントだった！",
+    "rematch": "リマッチ！",
+    "rematchQuestion": "もう一回？",
+    "almostHadIt": "もう少しだった！",
+    "nailBiter": "接戦でした！",
+    "challengeBot": "ボットに挑戦"
+  },
   "mysteryReward": {
     "title": "ミステリー報酬",
     "youFound": "ミステリー報酬を見つけました！",
@@ -2302,7 +2339,27 @@ const ja = {
     "addCountry": "国を追加",
     "changeCountry": "国を変更",
     "countrySaved": "国が更新されました！",
-    "countryError": "国の更新に失敗しました"
+    "countryError": "国の更新に失敗しました",
+    "records": {
+      "title": "個人記録",
+      "longestWord": "最長の単語",
+      "highestCombo": "最高コンボ",
+      "fastestWord": "最速の単語",
+      "uniqueWords": "ユニークな単語",
+      "bestRanked": "ランク最高得点",
+      "bestCasual": "カジュアル最高得点",
+      "share": "共有"
+    }
+  },
+  "streaks": {
+    "wager": {
+      "title": "コインを賭けよう！",
+      "description": "連勝にコインを賭けて3倍獲得か全て失うか！",
+      "payout": "予想配当",
+      "risk": "連勝が途切れると賭け金を失います！",
+      "confirm": "賭ける",
+      "skip": "スキップ"
+    }
   },
   "calendar": {
     "title": "デイリー報酬",
@@ -4781,7 +4838,9 @@ const ja = {
       "amazing": "すごい!",
       "incredible": "すごい!",
       "unstoppable": "止められない!",
-      "legendary": "伝説級!"
+      "legendary": "伝説級!",
+      "mythic": "神話級!",
+      "transcendent": "超越!"
     },
     "worlds": {
       "alphabetMeadows": "アルファベットの草原",
@@ -6972,6 +7031,77 @@ const ja = {
     "fast": "クイック",
     "party": "パーティー",
     "challenge": "チャレンジ"
+  },
+  "shareResult": {
+    "singleplayer": "LexiClash ソロ",
+    "multiplayer": "LexiClash バトル",
+    "blast": "LexiClash ブラスト",
+    "daily": "LexiClash デイリー",
+    "adventure": "LexiClash アドベンチャー",
+    "wordHunt": "LexiClash ワードハント",
+    "score": "スコア",
+    "words": "単語数",
+    "longest": "最長",
+    "combo": "コンボ",
+    "won": "勝利!",
+    "lost": "敗北",
+    "level": "レベル",
+    "puzzle": "パズル",
+    "vs": "対"
+  },
+  "events": {
+    "joinNow": "今すぐ参加!",
+    "timeRemaining": "残り時間",
+    "dismiss": "閉じる",
+    "endsIn": "終了まで",
+    "joined": "参加済み",
+    "leaderboard": "リーダーボード",
+    "position": "順位",
+    "score": "スコア",
+    "rewards": "報酬",
+    "you": "あなた",
+    "noParticipants": "まだ参加者がいません"
+  },
+  "league": {
+    "title": "ウィークリーリーグ",
+    "bronze": "ブロンズ",
+    "silver": "シルバー",
+    "gold": "ゴールド",
+    "diamond": "ダイヤモンド",
+    "ruby": "ルビー",
+    "position": "順位",
+    "xp": "XP",
+    "promotionZone": "昇格ゾーン",
+    "safeZone": "セーフゾーン",
+    "relegationZone": "降格ゾーン",
+    "promoted": "昇格!",
+    "relegated": "降格",
+    "stayed": "残留",
+    "weeklyRewards": "週間報酬",
+    "coinsEarned": "獲得コイン",
+    "newWeekIn": "新しい週まで",
+    "joinLeague": "リーグに参加",
+    "yourPosition": "あなたの順位",
+    "top": "トップ",
+    "standings": "順位表",
+    "noLeague": "リーグに参加して競争しよう!",
+    "finalResults": "最終結果",
+    "viewStandings": "順位表を見る"
+  },
+  "socialGift": {
+    "title": "ギフトを送る",
+    "sendTo": "送り先",
+    "type": {
+      "hints": "ヒント",
+      "streak_freeze": "ストリークシールド",
+      "coins": "コイン"
+    },
+    "coins": "コイン",
+    "amount": "金額",
+    "remaining": "残りの日間ギフト",
+    "send": "ギフトを送る",
+    "sent": "ギフト送信完了！",
+    "limitReached": "日間上限に達しました"
   }
 };
 

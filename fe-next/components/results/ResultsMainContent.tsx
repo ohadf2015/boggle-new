@@ -23,6 +23,8 @@ import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { AdPlaceholder } from '@/components/ads';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
+import ShareButton from '@/components/results/ShareButton';
+import type { ShareParams } from '@/shared/utils/shareResultGenerator';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
 
@@ -291,14 +293,23 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
             </div>
 
             {/* Share Button */}
-            {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && onShowDetails && (
-              <button
-                onClick={onShowDetails}
-                className="w-full bg-neo-pink text-white font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
-              >
-                <Trophy className="w-4 h-4" />
-                {t('results.share') || 'Share'}
-              </button>
+            {currentPlayerData && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
+              <ShareButton
+                params={{
+                  gameMode: 'multiplayer',
+                  score: currentPlayerData.score || 0,
+                  wordsFound: currentPlayerValidWords.length,
+                  longestWord: currentPlayerValidWords.length > 0
+                    ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word
+                    : undefined,
+                  won: currentPlayerRank === 1,
+                  opponentScore: sortedScores.length > 1
+                    ? sortedScores.find(p => normalizeUsername(p.username) !== normalizeUsername(username))?.score
+                    : undefined,
+                } satisfies ShareParams}
+                t={t}
+                className="w-full"
+              />
             )}
           </>
         )

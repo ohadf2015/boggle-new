@@ -47,8 +47,9 @@ export interface UseComboMilestoneReturn {
  */
 export const COMBO_MILESTONES: ComboMilestoneConfig[] = [
   { threshold: 10, labelKey: 'adventure.combo.incredible', duration: 2000, particleBudget: 0.6 },
-  { threshold: 15, labelKey: 'adventure.combo.unstoppable', duration: 2500, particleBudget: 0.8 },
-  { threshold: 20, labelKey: 'adventure.combo.legendary', duration: 3000, particleBudget: 1.0 },
+  { threshold: 15, labelKey: 'adventure.combo.mythic', duration: 2500, particleBudget: 0.8 },
+  { threshold: 20, labelKey: 'adventure.combo.transcendent', duration: 3000, particleBudget: 1.0 },
+  { threshold: 25, labelKey: 'adventure.combo.transcendent', duration: 3500, particleBudget: 1.0 },
 ];
 
 // ==============================================

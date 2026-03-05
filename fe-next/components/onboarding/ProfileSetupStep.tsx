@@ -13,6 +13,7 @@ interface ProfileSetupStepProps {
   displayName: string;
   onAvatarSelect: (avatarId: string) => void;
   onNameChange: (name: string) => void;
+  deferred?: boolean;
 }
 
 /**
@@ -24,6 +25,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
   displayName,
   onAvatarSelect,
   onNameChange,
+  deferred = false,
 }) => {
   const { t } = useLanguage();
   const [nameTouched, setNameTouched] = useState(false);
@@ -74,6 +76,25 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
   };
 
   const selectedAvatar = AVATARS.find((a) => a.id === selectedAvatarId) || AVATARS[0];
+
+  // Deferred mode: gentle prompt after first game
+  if (deferred) {
+    return (
+      <motion.div
+        data-testid="deferred-profile-prompt"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard-sm text-center max-w-sm mx-auto"
+      >
+        <h3 className="font-black text-neo-black text-sm uppercase mb-1">
+          {t('onboarding.profile.deferredTitle', 'Save your progress?')}
+        </h3>
+        <p className="text-xs text-neo-black/70">
+          {t('onboarding.profile.deferredSubtitle', 'Set up your profile to keep your stats!')}
+        </p>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center space-y-4 sm:space-y-5 w-full max-w-md mx-auto">

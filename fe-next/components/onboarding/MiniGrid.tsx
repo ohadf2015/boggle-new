@@ -29,6 +29,8 @@ interface MiniGridProps {
   demoPath: GridPosition[];
   onDemoComplete: () => void;
   showHints?: boolean;
+  autoTrace?: boolean;
+  onAutoTraceComplete?: () => void;
   className?: string;
 }
 
@@ -87,6 +89,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   demoPath,
   onDemoComplete,
   showHints = true,
+  autoTrace = false,
+  onAutoTraceComplete,
   className,
 }) => {
   const { t } = useLanguage();
@@ -453,6 +457,32 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     };
   }, []);
 
+  // Auto-trace animation: automatically highlights cells along the demo path
+  const [autoTraceIndex, setAutoTraceIndex] = useState(-1);
+  useEffect(() => {
+    if (!autoTrace) {
+      setAutoTraceIndex(-1);
+      return;
+    }
+
+    // Animate through each cell in the path with delays
+    const delayPerCell = Math.floor(2000 / demoPath.length);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    demoPath.forEach((_, i) => {
+      timers.push(setTimeout(() => {
+        setAutoTraceIndex(i);
+      }, (i + 1) * delayPerCell));
+    });
+
+    // Call onAutoTraceComplete after all cells highlighted
+    timers.push(setTimeout(() => {
+      onAutoTraceComplete?.();
+    }, (demoPath.length + 1) * delayPerCell));
+
+    return () => timers.forEach(clearTimeout);
+  }, [autoTrace, demoPath, onAutoTraceComplete]);
+
   // Calculate which cells should show hint (next correct cell)
   const nextHintCell = useMemo(() => {
     if (!showHints || selectedCells.length >= demoPath.length) return null;
@@ -717,6 +747,26 @@ const MiniGrid: React.FC<MiniGridProps> = ({
           {selectedCells.length}/{demoWord.length} letters selected
         </div>
       </motion.div>
+
+      {/* Auto-trace overlay - animated finger trace */}
+      {autoTrace && autoTraceIndex >= 0 && (
+        <div data-testid="auto-trace-overlay" className="absolute inset-0 pointer-events-none z-10">
+          {demoPath.slice(0, autoTraceIndex + 1).map((pos, i) => (
+            <motion.div
+              key={`trace-${i}`}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 0.6 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="absolute w-6 h-6 bg-neo-pink rounded-full border-2 border-neo-black"
+              style={{
+                top: `${(pos.row / letters.length) * 100 + 50 / letters.length}%`,
+                left: `${(pos.col / (letters[0]?.length || 3)) * 100 + 50 / (letters[0]?.length || 3)}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Word trail - shown only after 8 seconds AND user has touched */}
       {showTrail && pathPoints.length >= 2 && (
