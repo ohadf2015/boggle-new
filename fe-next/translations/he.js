@@ -187,6 +187,7 @@ const he = {
     "points": "נק׳",
     "pts": "נק׳",
     "quit": "יציאה",
+    "leave": "עזיבה",
     "word": "מילה",
     "words": "מילים",
     "wordsFound": "מילים",
@@ -315,7 +316,8 @@ const he = {
     "retryNow": "נסה עכשיו"
   },
   "game": {
-    "comboHint": "מצא מילים מהר לקומבו!"
+    "comboHint": "מצא מילים מהר לקומבו!",
+    "calculatingResults": "מחשב תוצאות..."
   },
   "leadChange": {
     "tookLead": "אתם מובילים!",

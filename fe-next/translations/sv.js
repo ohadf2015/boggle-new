@@ -184,6 +184,7 @@ const sv = {
     "points": "pts",
     "pts": "P",
     "quit": "Avsluta",
+    "leave": "Lämna",
     "word": "ord",
     "words": "ord",
     "wordsFound": "Ord",
@@ -315,7 +316,8 @@ const sv = {
     "retryNow": "Försök nu"
   },
   "game": {
-    "comboHint": "Hitta ord snabbt för kombo!"
+    "comboHint": "Hitta ord snabbt för kombo!",
+    "calculatingResults": "Beräknar resultat..."
   },
   "leadChange": {
     "tookLead": "Du leder!",

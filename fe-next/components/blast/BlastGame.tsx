@@ -59,6 +59,14 @@ interface BlastGameProps {
    * Broadcast by server with startGame; ensures cascade refills are identical.
    */
   blastSeed?: number | null;
+  /** Multiplayer: seconds remaining from server timer */
+  remainingTime?: number | null;
+  /** Multiplayer: total game duration in seconds */
+  totalTime?: number;
+  /** Multiplayer: current leaderboard */
+  leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: any }>;
+  /** Multiplayer: current player's username */
+  username?: string;
 }
 
 /**
@@ -83,6 +91,10 @@ export function BlastGame({
   onWordWithComboType,
   initialTileStates,
   blastSeed,
+  remainingTime,
+  totalTime,
+  leaderboard,
+  username,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
@@ -210,18 +222,22 @@ export function BlastGame({
   // Min word length from wave config (defaults to 2)
   const minWordLength = waveConfig?.minWordLength ?? 2;
 
-  // Hint system
+  // Hint system — gated in multiplayer (no hints in MP)
   const foundWordsSet = useMemo(
     () => new Set(blast.gameState.wordsFound),
     [blast.gameState.wordsFound],
   );
-  const { hintPath, hasHintAvailable, requestHint, clearHint } = useBlastHint(
+  const spHint = useBlastHint(
     blast.modifiedGrid ?? [],
     config.language,
     checkWord,
     foundWordsSet,
     minWordLength,
   );
+  const hintPath = isMultiplayer ? null : spHint.hintPath;
+  const hasHintAvailable = isMultiplayer ? false : spHint.hasHintAvailable;
+  const requestHint = isMultiplayer ? undefined : spHint.requestHint;
+  const clearHint = isMultiplayer ? undefined : spHint.clearHint;
 
   // Objective tracking
   const spObjectives = useBlastObjectives({
@@ -432,6 +448,11 @@ export function BlastGame({
         onComplete={acknowledgeDiscovery ?? (() => {})}
       />
       <BlastGameLayout
+      isMultiplayer={isMultiplayer}
+      remainingTime={remainingTime}
+      totalTime={totalTime}
+      leaderboard={leaderboard}
+      username={username}
       isDiscoveryActive={isDiscoveryActive}
       shimmerCells={nearMiss.shimmerCells}
       grid={blast.modifiedGrid}

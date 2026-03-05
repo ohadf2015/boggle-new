@@ -2,12 +2,12 @@
  * AdventureGame Word Feedback Tests
  *
  * Tests that word submission uses the passed word/indices parameters
- * (not internal React selection state) so Phaser and fallback grid
- * submissions both work correctly.
+ * (not internal React selection state) so explicit word/indices
+ * submissions work correctly.
  *
  * BUG: handleWordSubmit ignored _word and _indices params, using
- * currentWord from useAdventureSelection instead. When Phaser submits
- * via bridge, React selection is empty → submission silently aborted.
+ * currentWord from useAdventureSelection instead. When submitting
+ * with explicit params, React selection is empty → submission silently aborted.
  */
 
 import React from 'react';
@@ -142,7 +142,7 @@ jest.mock('@/hooks/useAdventureWordValidation', () => ({
   }),
 }));
 
-// React selection hook returns EMPTY state (simulating Phaser-managed selection)
+// React selection hook returns EMPTY state (simulating external submission)
 const mockSelectTile = jest.fn();
 const mockClearSelection = jest.fn();
 const mockGetPath = jest.fn().mockReturnValue([]);
@@ -425,15 +425,15 @@ describe('AdventureGame Word Feedback', () => {
     }
   }
 
-  it('should call validateWord when word is submitted with explicit word/indices (Phaser path)', async () => {
-    // GIVEN — React selection hook returns empty (simulating Phaser-managed selection)
+  it('should call validateWord when word is submitted with explicit word/indices', async () => {
+    // GIVEN — React selection hook returns empty (simulating external submission)
     render(<AdventureGame {...defaultProps} />);
     advancePastEntrySequence();
 
     // Verify we captured the onWordSubmit callback from GameGridArea mock
     expect(capturedOnWordSubmit).toBeTruthy();
 
-    // WHEN — Phaser submits a word with explicit word and indices
+    // WHEN — submitting a word with explicit word and indices
     // "CAT" = tiles at (0,0)=C, (0,1)=A, (0,2)=T → indices [0, 1, 2]
     await act(async () => {
       capturedOnWordSubmit!('CAT', [0, 1, 2]);
@@ -450,13 +450,13 @@ describe('AdventureGame Word Feedback', () => {
     );
   });
 
-  it('should show accepted feedback when Phaser-submitted word is valid', async () => {
+  it('should show accepted feedback when explicitly-submitted word is valid', async () => {
     // GIVEN
     mockValidateWord.mockResolvedValueOnce({ isValid: true, score: 30 });
     render(<AdventureGame {...defaultProps} />);
     advancePastEntrySequence();
 
-    // WHEN — Phaser submits "CAT"
+    // WHEN — submitting "CAT" with explicit indices
     await act(async () => {
       capturedOnWordSubmit!('CAT', [0, 1, 2]);
     });
@@ -468,13 +468,13 @@ describe('AdventureGame Word Feedback', () => {
     expect(screen.getByTestId('feedback-type').textContent).toBe('accepted');
   });
 
-  it('should show rejected feedback when Phaser-submitted word is invalid', async () => {
+  it('should show rejected feedback when explicitly-submitted word is invalid', async () => {
     // GIVEN
     mockValidateWord.mockResolvedValueOnce({ isValid: false, errorKey: 'adventure.errors.notInDictionary' });
     render(<AdventureGame {...defaultProps} />);
     advancePastEntrySequence();
 
-    // WHEN — Phaser submits an invalid word
+    // WHEN — submitting an invalid word with explicit indices
     await act(async () => {
       capturedOnWordSubmit!('XYZ', [0, 1, 2]);
     });

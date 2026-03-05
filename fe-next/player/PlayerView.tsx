@@ -26,6 +26,8 @@ import PlayerInGameView from './components/PlayerInGameView';
 import NewPlayerOnboarding from '../components/game/NewPlayerOnboarding';
 import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { Loader2 } from 'lucide-react';
 
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
@@ -754,8 +756,35 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Waiting for results — brief transition until scores arrive (no validation modal)
   if (waitingForResults) {
+    const playerEntry = leaderboard.find(p => p.username === username);
+    const playerScore = playerEntry?.score ?? 0;
+    const validWords = foundWords.filter(w => w.validated !== false);
+
     return (
-      <div className="flex-1 w-full bg-neo-navy flex items-center justify-center" />
+      <div className="flex-1 w-full bg-neo-navy flex items-center justify-center">
+        <AdaptiveMotion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          className="flex flex-col items-center gap-4 text-center px-6"
+        >
+          <div className="border-3 border-neo-black rounded-neo shadow-hard px-6 py-4 bg-gradient-to-br from-neo-yellow to-neo-orange">
+            <div className="font-black text-neo-black text-3xl tabular-nums">
+              {playerScore.toLocaleString()}
+            </div>
+            <div className="font-bold uppercase tracking-wider text-neo-black/60 text-xs">
+              {t('common.score') || 'Score'}
+            </div>
+          </div>
+          <div className="text-white/60 font-bold text-sm">
+            {validWords.length} {t('common.words') || 'words'}
+          </div>
+          <div className="flex items-center gap-2 text-white/40 text-sm">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>{t('game.calculatingResults') || 'Calculating Results...'}</span>
+          </div>
+        </AdaptiveMotion.div>
+      </div>
     );
   }
 

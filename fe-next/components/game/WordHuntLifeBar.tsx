@@ -6,6 +6,7 @@
 
 'use client';
 
+import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,11 +32,29 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
   const { t } = useLanguage();
   const percentage = Math.min(100, Math.max(0, (life / maxLife) * 100));
   const isLow = percentage <= 20;
+  const isDanger = percentage <= 30;
+
+  // Track life decrease for pulse animation
+  const prevLifeRef = useRef(life);
+  const [isPulsing, setIsPulsing] = useState(false);
+
+  useEffect(() => {
+    if (life < prevLifeRef.current) {
+      setIsPulsing(true);
+      const timer = setTimeout(() => setIsPulsing(false), 600);
+      prevLifeRef.current = life;
+      return () => clearTimeout(timer);
+    }
+    prevLifeRef.current = life;
+    return undefined;
+  }, [life]);
+
+  const dangerGlow = isDanger ? 'shadow-[0_0_12px_rgba(255,0,0,0.4)]' : '';
 
   return (
     <div
       data-testid="word-hunt-life-bar"
-      className="flex items-center gap-2 w-full"
+      className={`flex items-center gap-2 w-full${dangerGlow ? ` ${dangerGlow}` : ''}${isPulsing ? ' animate-pulse-once' : ''}`}
       role="progressbar"
       aria-valuenow={Math.round(percentage)}
       aria-valuemin={0}

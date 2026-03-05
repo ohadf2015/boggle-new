@@ -186,6 +186,7 @@ const ja = {
     "score": "スコア",
     "points": "pt",
     "quit": "終了",
+    "leave": "退出",
     "word": "単語",
     "words": "単語",
     "wordsFound": "単語",
@@ -315,7 +316,8 @@ const ja = {
     "retryNow": "今すぐ再試行"
   },
   "game": {
-    "comboHint": "素早く単語を見つけてコンボ！"
+    "comboHint": "素早く単語を見つけてコンボ！",
+    "calculatingResults": "結果を計算中..."
   },
   "leadChange": {
     "tookLead": "トップに立った！",

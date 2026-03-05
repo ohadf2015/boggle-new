@@ -189,6 +189,7 @@ const en = {
     "points": "pts",
     "pts": "pts",
     "quit": "Quit",
+    "leave": "Leave",
     "word": "word",
     "words": "words",
     "wordsFound": "Words",
@@ -315,7 +316,8 @@ const en = {
     "retryNow": "Reconnect!"
   },
   "game": {
-    "comboHint": "Find words fast for combo!"
+    "comboHint": "Find words fast for combo!",
+    "calculatingResults": "Calculating Results..."
   },
   "leadChange": {
     "tookLead": "You're in the lead!",

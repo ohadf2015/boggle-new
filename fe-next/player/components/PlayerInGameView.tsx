@@ -9,14 +9,12 @@ import TournamentStandings from '../../components/TournamentStandings';
 import InGameScreen from '../../components/game/InGameScreen';
 import { BlastGame } from '@/components/blast/BlastGame';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
-import { BlastMoveCounter } from '@/components/game/BlastMoveCounter';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
   useBlastTileOverlay,
-  useBlastMovesUsed,
   useWordHuntTargetLength,
   useWordHuntMyLife,
   useWordHuntTargetAttempts,
@@ -194,7 +192,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Game mode state from Zustand
   const gameMode = useGameMode();
   const blastTileOverlay = useBlastTileOverlay();
-  const blastMovesUsed = useBlastMovesUsed();
+
   const wordHuntTargetLength = useWordHuntTargetLength();
   const wordHuntLife = useWordHuntMyLife();
   const wordHuntAttempts = useWordHuntTargetAttempts();
@@ -250,20 +248,18 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
       {/* Main Game Content — Blast mode uses BlastGame, all others use InGameScreen */}
       {gameMode === 'blast' ? (
-        <>
-          <div className="flex items-center justify-between px-3 py-1">
-            <BlastMoveCounter movesUsed={blastMovesUsed} />
-          </div>
           <BlastGame
             config={blastBridge.config}
             mode="multiplayer"
+            remainingTime={remainingTime}
+            leaderboard={leaderboard}
+            username={username}
             onGameEnd={() => {/* Server controls game end in multiplayer */}}
             onQuit={onExitRoom}
             onWordWithComboType={handleBlastWordWithCombo}
             initialTileStates={blastBridge.initialTileStates}
             blastSeed={blastBridge.blastSeed}
           />
-        </>
       ) : (
         <InGameScreen
           // Core identity

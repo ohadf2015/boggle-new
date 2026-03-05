@@ -18,12 +18,16 @@ import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
 import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, CascadeHighlightData, CascadeHighlightPhase, BlastObjectiveProgress } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
+import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
+import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { Mascot } from '@/components/ui/Mascot';
 import { BlastMoveCounter } from './BlastMoveCounter';
 import { BlastObjectiveDisplay } from './BlastObjectiveDisplay';
 import { BlastChainCounter } from './BlastChainCounter';
+import CircularTimer from '@/components/CircularTimer';
+import { CompactLeaderboard, type CompactPlayer } from '@/components/game/CompactLeaderboard';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -92,6 +96,17 @@ interface BlastGameLayoutProps {
   shimmerCells?: Array<{ row: number; col: number }>;
   /** Tile types matching current wave objectives — highlighted with pulsing ring */
   objectiveTileTypes?: Set<string>;
+  // Multiplayer
+  /** When true, show MP UI (timer, leaderboard) and hide SP controls */
+  isMultiplayer?: boolean;
+  /** Multiplayer: seconds remaining from server timer */
+  remainingTime?: number | null;
+  /** Multiplayer: total game duration in seconds */
+  totalTime?: number;
+  /** Multiplayer: current leaderboard */
+  leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: any }>;
+  /** Multiplayer: current player's username */
+  username?: string;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -144,32 +159,21 @@ export function BlastGameLayout({
   isDiscoveryActive = false,
   shimmerCells = [],
   objectiveTileTypes,
+  isMultiplayer = false,
+  remainingTime,
+  totalTime,
+  leaderboard,
+  username,
   t,
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
   const earnedStars = calculateEarnedStars(tilesCleared, totalTiles);
   const [showHelp, setShowHelp] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
-  const [screenFlash, setScreenFlash] = useState(false);
   const [shakeClass, setShakeClass] = useState('');
-  const [comboMilestone, setComboMilestone] = useState<string | null>(null);
   const [cascadeAnnouncement, setCascadeAnnouncement] = useState<string | null>(null);
-  const prevWordsRef = useRef(wordsFound.length);
   const prevExplosionsRef = useRef(0);
-  const prevComboRef = useRef(comboLevel);
   const prevCascadeRef = useRef(0);
-
-  // Screen flash when a word is cleared (cascade starts)
-  useEffect(() => {
-    if (wordsFound.length > prevWordsRef.current) {
-      setScreenFlash(true);
-      const timer = setTimeout(() => setScreenFlash(false), 200);
-      prevWordsRef.current = wordsFound.length;
-      return () => clearTimeout(timer);
-    }
-    prevWordsRef.current = wordsFound.length;
-    return undefined;
-  }, [wordsFound.length]);
 
   // Screen shake on bomb, prism, and lightning explosions
   useEffect(() => {
@@ -195,19 +199,6 @@ export function BlastGameLayout({
     prevExplosionsRef.current = shakeCount;
     return undefined;
   }, [explosions]);
-
-  // Combo milestone announcements
-  useEffect(() => {
-    const milestones: Record<number, string> = { 3: 'NICE!', 5: 'FIRE!', 7: 'MYTHIC!', 10: 'GODLIKE!' };
-    if (comboLevel > prevComboRef.current && milestones[comboLevel]) {
-      setComboMilestone(milestones[comboLevel]);
-      const timer = setTimeout(() => setComboMilestone(null), 1200);
-      prevComboRef.current = comboLevel;
-      return () => clearTimeout(timer);
-    }
-    prevComboRef.current = comboLevel;
-    return undefined;
-  }, [comboLevel]);
 
   // Cascade chain announcement + haptic
   useEffect(() => {
@@ -254,17 +245,7 @@ export function BlastGameLayout({
       )}
 
       {/* Screen flash on word clear */}
-      <AnimatePresence>
-        {screenFlash && (
-          <motion.div
-            initial={{ opacity: 0.1 }}
-            animate={{ opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute inset-0 z-40 pointer-events-none bg-white"
-          />
-        )}
-      </AnimatePresence>
+      <ScreenFlashOverlay trigger={wordsFound.length} />
 
       {/* Header */}
       <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pt-4 pb-2">
@@ -275,11 +256,20 @@ export function BlastGameLayout({
           className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold text-xs tracking-widest"
         >
           <ArrowLeft className="me-1.5 h-4 w-4 rtl:rotate-180" />
-          <span className="hidden sm:inline">{t('common.quit') || 'QUIT'}</span>
+          <span className="hidden sm:inline">
+            {isMultiplayer
+              ? (t('common.leave') || 'Leave')
+              : (t('common.quit') || 'QUIT')}
+          </span>
         </Button>
 
-        {/* Wave badge */}
-        {waveNumber > 1 && (
+        {/* MP: CircularTimer between quit and help */}
+        {isMultiplayer && remainingTime != null && (
+          <CircularTimer remainingTime={remainingTime} totalTime={totalTime} size="xs" />
+        )}
+
+        {/* Wave badge — SP only */}
+        {!isMultiplayer && waveNumber > 1 && (
           <motion.div
             key={waveNumber}
             initial={{ scale: 0.5, opacity: 0 }}
@@ -302,15 +292,18 @@ export function BlastGameLayout({
           <HelpCircle className="h-5 w-5" />
         </Button>
 
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => setShowEndGameConfirm(true)}
-          className="border-2 border-neo-black shadow-hard-sm font-bold text-xs"
-        >
-          <Bomb className="h-4 w-4 sm:me-1.5" />
-          <span className="hidden sm:inline">{t('blast.giveUp') || 'End Game'}</span>
-        </Button>
+        {/* End Game button — SP only */}
+        {!isMultiplayer && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setShowEndGameConfirm(true)}
+            className="border-2 border-neo-black shadow-hard-sm font-bold text-xs"
+          >
+            <Bomb className="h-4 w-4 sm:me-1.5" />
+            <span className="hidden sm:inline">{t('blast.giveUp') || 'End Game'}</span>
+          </Button>
+        )}
       </header>
 
       {/* Combo Display */}
@@ -324,27 +317,7 @@ export function BlastGameLayout({
       </div>
 
       {/* Combo milestone announcement */}
-      <AnimatePresence>
-        {comboMilestone && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 1.5, y: -10 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="absolute top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
-          >
-            <div className={cn(
-              'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-lg uppercase tracking-wider',
-              comboLevel >= 10 ? 'bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-              comboLevel >= 7 ? 'bg-gradient-to-r from-pink-500 via-cyan-500 to-yellow-500 text-white' :
-              comboLevel >= 5 ? 'bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black' :
-              'bg-neo-cyan text-neo-black'
-            )}>
-              {comboMilestone}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ComboMilestoneAnnouncement comboLevel={comboLevel} />
 
       {/* Cascade word showcase banner (replaces simple text announcement) */}
       <AnimatePresence>
@@ -429,6 +402,24 @@ export function BlastGameLayout({
         </div>
       </div>
 
+      {/* MP Leaderboard */}
+      {isMultiplayer && leaderboard && leaderboard.length > 0 && username && (
+        <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-2">
+          <CompactLeaderboard
+            players={leaderboard.map((p, i): CompactPlayer => ({
+              username: p.username,
+              score: p.score,
+              rank: i + 1,
+              isCurrentUser: p.username === username,
+              avatarEmoji: p.avatar?.emoji,
+              avatarColor: p.avatar?.color,
+            }))}
+            currentUsername={username}
+            t={(key: string) => t(key) || key}
+          />
+        </div>
+      )}
+
       {/* Score threshold progress (visible on wave 3+) */}
       {scoreThreshold && score < scoreThreshold && (
         <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
@@ -502,7 +493,7 @@ export function BlastGameLayout({
                 {t('blast.stuck') || 'Stuck?'}
               </span>
               <div className="flex gap-2 flex-wrap justify-end">
-                {hasHintAvailable && !hintPath && (
+                {!isMultiplayer && hasHintAvailable && !hintPath && (
                   <Button
                     size="sm"
                     onClick={onRequestHint}
@@ -520,14 +511,16 @@ export function BlastGameLayout({
                   <Shuffle className="h-3.5 w-3.5 me-1" />
                   {t('blast.shuffle') || 'Shuffle'}
                 </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setShowEndGameConfirm(true)}
-                  className="border-2 border-neo-black shadow-hard-sm font-bold text-xs"
-                >
-                  {t('blast.giveUp') || 'End Game'}
-                </Button>
+                {!isMultiplayer && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setShowEndGameConfirm(true)}
+                    className="border-2 border-neo-black shadow-hard-sm font-bold text-xs"
+                  >
+                    {t('blast.giveUp') || 'End Game'}
+                  </Button>
+                )}
               </div>
             </div>
           </motion.div>

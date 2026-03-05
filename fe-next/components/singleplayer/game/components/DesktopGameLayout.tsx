@@ -5,10 +5,7 @@ import { ArrowLeft, Pause, Play, Coins } from 'lucide-react';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import GridComponent from '@/components/GridComponent';
-import { PhaserGame } from '@/components/phaser/PhaserGame';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-
-const USE_PHASER_GRID = process.env.NEXT_PUBLIC_PHASER_GRID === 'true';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
@@ -313,33 +310,21 @@ export function DesktopGameLayout({
             </AdaptiveAnimatePresence>
 
             <div className="desktop-grid-container game-board-container" style={{ width: 'min(100cqw, 100cqh)', height: 'min(100cqw, 100cqh)' }}>
-              {USE_PHASER_GRID ? (
-                <div className="relative w-full h-full">
-                  <PhaserGame
-                    grid={grid}
-                    comboLevel={comboLevel}
-                    fireRoundActive={fireRoundActive}
-                    onWordSubmit={onWordSubmit}
-                    onWordChange={(word, count) => onWordChange(word, count)}
-                  />
-                </div>
-              ) : (
-                <GridComponent
-                  grid={grid}
-                  interactive={!isPaused}
-                  onWordSubmit={onWordSubmit}
-                  onPathSubmit={onPathSubmit}
-                  onWordChange={onWordChange}
-                  hideWordPreview
-                  hideComboIndicator={true}
-                  comboLevel={comboLevel}
-                  largeText
-                  fireRoundActive={fireRoundActive}
-                  earthquakeShaking={earthquakeState === 'shaking'}
-                  highlightedPath={gridHighlightedPath}
-                  language={language}
-                />
-              )}
+              <GridComponent
+                grid={grid}
+                interactive={!isPaused}
+                onWordSubmit={onWordSubmit}
+                onPathSubmit={onPathSubmit}
+                onWordChange={onWordChange}
+                hideWordPreview
+                hideComboIndicator={true}
+                comboLevel={comboLevel}
+                largeText
+                fireRoundActive={fireRoundActive}
+                earthquakeShaking={earthquakeState === 'shaking'}
+                highlightedPath={gridHighlightedPath}
+                language={language}
+              />
             </div>
           </div>
         </div>

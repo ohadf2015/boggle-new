@@ -68,7 +68,6 @@ const externalPackages = [
   'react-dom/*',
   'framer-motion',
   'framer-motion/*',
-  'phaser',
   'remotion',
   'remotion/*',
   '@remotion/*',

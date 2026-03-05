@@ -255,4 +255,102 @@ describe('BlastGame mode=multiplayer', () => {
     // In SP mode, objectives ARE used
     expect(mockUseBlastObjectives).toHaveBeenCalled();
   });
+
+  // -------------------------------------------------------------------------
+  // Phase 1: MP parity — timer, leaderboard, header fix, hint gating
+  // -------------------------------------------------------------------------
+
+  it('should pass isMultiplayer=true to layout in multiplayer mode', () => {
+    render(
+      <BlastGame
+        config={baseConfig}
+        mode="multiplayer"
+        onGameEnd={jest.fn()}
+        onQuit={jest.fn()}
+      />
+    );
+
+    expect(capturedLayoutProps.value.isMultiplayer).toBe(true);
+  });
+
+  it('should pass isMultiplayer=false to layout in singleplayer mode', () => {
+    render(
+      <BlastGame
+        config={baseConfig}
+        mode="singleplayer"
+        onGameEnd={jest.fn()}
+        onQuit={jest.fn()}
+      />
+    );
+
+    expect(capturedLayoutProps.value.isMultiplayer).toBe(false);
+  });
+
+  it('should pass remainingTime and totalTime to layout when provided', () => {
+    render(
+      <BlastGame
+        config={baseConfig}
+        mode="multiplayer"
+        remainingTime={45}
+        totalTime={120}
+        onGameEnd={jest.fn()}
+        onQuit={jest.fn()}
+      />
+    );
+
+    expect(capturedLayoutProps.value.remainingTime).toBe(45);
+    expect(capturedLayoutProps.value.totalTime).toBe(120);
+  });
+
+  it('should pass leaderboard and username to layout when provided', () => {
+    const leaderboard = [
+      { username: 'alice', score: 100, wordCount: 5 },
+      { username: 'bob', score: 80, wordCount: 3 },
+    ];
+
+    render(
+      <BlastGame
+        config={baseConfig}
+        mode="multiplayer"
+        leaderboard={leaderboard}
+        username="alice"
+        onGameEnd={jest.fn()}
+        onQuit={jest.fn()}
+      />
+    );
+
+    expect(capturedLayoutProps.value.leaderboard).toEqual(leaderboard);
+    expect(capturedLayoutProps.value.username).toBe('alice');
+  });
+
+  it('should not pass hint props to layout in multiplayer mode', () => {
+    render(
+      <BlastGame
+        config={baseConfig}
+        mode="multiplayer"
+        onGameEnd={jest.fn()}
+        onQuit={jest.fn()}
+      />
+    );
+
+    expect(capturedLayoutProps.value.hintPath).toBeNull();
+    expect(capturedLayoutProps.value.hasHintAvailable).toBe(false);
+    expect(capturedLayoutProps.value.onRequestHint).toBeUndefined();
+    expect(capturedLayoutProps.value.onClearHint).toBeUndefined();
+  });
+
+  it('should pass hint props in singleplayer mode', () => {
+    render(
+      <BlastGame
+        config={baseConfig}
+        mode="singleplayer"
+        onGameEnd={jest.fn()}
+        onQuit={jest.fn()}
+      />
+    );
+
+    // In SP mode, hint props are passed (from the mocked useBlastHint)
+    expect(capturedLayoutProps.value.onRequestHint).toBeDefined();
+    expect(capturedLayoutProps.value.onClearHint).toBeDefined();
+  });
 });

@@ -86,9 +86,6 @@ const nextConfig = {
     'react-hot-toast',
     'remotion',
     '@remotion/player',
-    // Phaser: exclude from SSR bundle (browser-only, needs window/canvas)
-    // PhaserCanvas.tsx imports it only via dynamic({ ssr: false })
-    'phaser',
   ],
 
   // Compiler optimizations
@@ -331,12 +328,6 @@ const nextConfig = {
   webpack: (config, { isServer }) => {
     // Alias the TypeScript index to the compiled JavaScript version
     config.resolve.alias['@arvidbt/swedish-words'] = path.resolve(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js');
-
-    // Phaser must never be bundled server-side: it accesses window/canvas at module load time.
-    // PhaserCanvas.tsx uses dynamic({ ssr: false }) so the client bundle is unaffected.
-    if (isServer) {
-      config.externals = [...(config.externals || []), 'phaser'];
-    }
 
     return config;
   },

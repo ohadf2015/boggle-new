@@ -36,9 +36,6 @@ import type { BossPhaseNew } from '@/hooks/useAdventureBossNew';
 interface BossOverlayProps {
   /** Boss configuration (null if not a boss level) */
   boss: BossConfig | null;
-  /** When true, active battle UI is rendered in Phaser canvas (default: true).
-   *  Intro/victory/defeat cinematics always render as React/Remotion. */
-  usePhaserBossUI?: boolean;
   /** Current HP */
   currentHP: number;
   /** Maximum HP */
@@ -90,7 +87,6 @@ export interface BossOverlayRef {
 const BossOverlay = memo<BossOverlayProps>(
   ({
     boss,
-    usePhaserBossUI = true,
     currentHP,
     maxHP,
     phase,
@@ -169,7 +165,7 @@ const BossOverlay = memo<BossOverlayProps>(
         )}
 
         {/* Active Battle UI */}
-        {showingActivePhase && !showingVictory && !showingDefeat && !usePhaserBossUI && (
+        {showingActivePhase && !showingVictory && !showingDefeat && (
           <BossActiveBattleUI
             boss={boss}
             currentHP={currentHP}

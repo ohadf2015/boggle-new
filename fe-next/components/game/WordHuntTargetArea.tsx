@@ -46,7 +46,7 @@ export function WordHuntTargetArea({
   };
 
   return (
-    <div className="flex flex-col items-center gap-3" data-testid="word-hunt-target-area">
+    <div className={`flex flex-col items-center gap-3${found ? ' found-celebration' : ''}`} data-testid="word-hunt-target-area">
       {/* Target word blanks */}
       <div className="flex gap-1">
         {Array.from({ length: targetLength }).map((_, i) => (

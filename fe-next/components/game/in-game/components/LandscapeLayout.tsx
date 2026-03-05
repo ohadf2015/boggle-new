@@ -1,13 +1,11 @@
 'use client';
 
-import React, { memo, useState, useEffect, useCallback, type ReactNode } from 'react';
+import React, { memo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
+import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
 import CircularTimer from '@/components/CircularTimer';
 import GridComponent from '@/components/GridComponent';
-import { PhaserGame } from '@/components/phaser/PhaserGame';
-
-const USE_PHASER_GRID = process.env.NEXT_PUBLIC_PHASER_GRID === 'true';
 import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
 import ComboDisplay from '../../ComboDisplay';
 import HintButton from '@/components/HintButton';
@@ -27,6 +25,8 @@ import { WordHuntTargetArea } from '../../WordHuntTargetArea';
 import { WordHuntLifeBar } from '../../WordHuntLifeBar';
 import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
 import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
+import { ComboMilestoneAnnouncement } from '../../ComboMilestoneAnnouncement';
+import { ScreenFlashOverlay } from '../../ScreenFlashOverlay';
 
 interface LandscapeLayoutProps {
   // Core props
@@ -178,12 +178,15 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [isFireRoundScore, setIsFireRoundScore] = useState(false);
+  // Counter for screen flash trigger (increments on accepted words)
+  const [acceptedCount, setAcceptedCount] = useState(0);
 
   // Trigger floating score animation when word is accepted
   useEffect(() => {
     if (currentFeedback?.type === 'accepted' && currentFeedback.score) {
       setFloatingScore(currentFeedback.score);
       setIsFireRoundScore(currentFeedback.fireRoundActive ?? false);
+      setAcceptedCount(prev => prev + 1);
     }
   }, [currentFeedback]);
 
@@ -194,10 +197,40 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
     setIsFireRoundScore(false);
   }, []);
 
+  // Combo glow class based on combo level
+  const comboGlow = comboLevel >= 7
+    ? 'shadow-[0_0_20px_rgba(255,0,255,0.4)]'
+    : comboLevel >= 5
+    ? 'shadow-[0_0_15px_rgba(255,225,53,0.4)]'
+    : comboLevel >= 3
+    ? 'shadow-[0_0_10px_rgba(0,255,255,0.3)]'
+    : '';
+
+  // Haptic feedback on word accept
+  const prevFeedbackRef = useRef(currentFeedback);
+  useEffect(() => {
+    if (
+      currentFeedback?.type === 'accepted' &&
+      currentFeedback !== prevFeedbackRef.current
+    ) {
+      const wordLen = currentFeedback.word?.length ?? 0;
+      vibrateWordSubmit(wordLen, comboLevel, fireRoundActive);
+    }
+    prevFeedbackRef.current = currentFeedback;
+  }, [currentFeedback, comboLevel, fireRoundActive]);
+
   return (
     <>
       {/* Dynamic Energy Background - animated vortex, aurora, particles */}
       <DynamicEnergyBackground />
+
+      {/* Combo milestone announcement + screen flash */}
+      {isPlaying && (
+        <>
+          <ComboMilestoneAnnouncement comboLevel={comboLevel} />
+          <ScreenFlashOverlay trigger={acceptedCount} />
+        </>
+      )}
 
       {/* Floating Score Animation - renders above everything */}
       {isPlaying && (
@@ -300,60 +333,44 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
             )}
 
             <div
-              className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0 aspect-square"
-            >
-              {USE_PHASER_GRID ? (
-                <div className="relative w-full h-full">
-                  <PhaserGame
-                    grid={letterGrid}
-                    comboLevel={comboLevel}
-                    fireRoundActive={fireRoundActive}
-                    earthquakeState={earthquakeState}
-                    wordFeedback={currentFeedback}
-                    onWordSubmit={onWordSubmit}
-                    onWordChange={onWordChange}
-                  />
-                  {/* Blast tile type badges */}
-                  {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (
-                    <BlastMultiplayerOverlay
-                      overlay={blastTileOverlay}
-                      gridSize={{ rows: letterGrid.length, cols: letterGrid[0]?.length ?? 4 }}
-                    />
-                  )}
-                </div>
-              ) : (
-                <div className="relative w-full h-full">
-                  <GridComponent
-                    key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
-                    grid={letterGrid}
-                    interactive={isPlaying && !showStartAnimation}
-                    animateOnMount={!hasAnimated}
-                    onWordSubmit={onWordSubmit}
-                    onPathSubmit={onPathSubmit}
-                    onWordChange={onWordChange}
-                    comboLevel={comboLevel}
-                    hideComboIndicator={true}
-                    hideWordPreview={true}
-                    largeText
-                    fireRoundActive={fireRoundActive}
-                    earthquakeShaking={earthquakeState === 'shaking'}
-                    highlightedPath={
-                      shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed)
-                        ? highlightedCells
-                        : []
-                    }
-                    onSingleTapDetected={onSingleTapDetected}
-                    language={gameLanguage}
-                  />
-                  {/* Blast tile type badges */}
-                  {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (
-                    <BlastMultiplayerOverlay
-                      overlay={blastTileOverlay}
-                      gridSize={{ rows: letterGrid.length, cols: letterGrid[0]?.length ?? 4 }}
-                    />
-                  )}
-                </div>
+              data-testid="grid-wrapper-landscape"
+              className={cn(
+                'flex-1 flex items-center justify-center game-board-frame-landscape min-w-0 aspect-square',
+                'transition-shadow duration-500',
+                comboGlow
               )}
+            >
+              <div className="relative w-full h-full">
+                <GridComponent
+                  key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
+                  grid={letterGrid}
+                  interactive={isPlaying && !showStartAnimation}
+                  animateOnMount={!hasAnimated}
+                  onWordSubmit={onWordSubmit}
+                  onPathSubmit={onPathSubmit}
+                  onWordChange={onWordChange}
+                  comboLevel={comboLevel}
+                  hideComboIndicator={true}
+                  hideWordPreview={true}
+                  largeText
+                  fireRoundActive={fireRoundActive}
+                  earthquakeShaking={earthquakeState === 'shaking'}
+                  highlightedPath={
+                    shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed)
+                      ? highlightedCells
+                      : []
+                  }
+                  onSingleTapDetected={onSingleTapDetected}
+                  language={gameLanguage}
+                />
+                {/* Blast tile type badges */}
+                {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (
+                  <BlastMultiplayerOverlay
+                    overlay={blastTileOverlay}
+                    gridSize={{ rows: letterGrid.length, cols: letterGrid[0]?.length ?? 4 }}
+                  />
+                )}
+              </div>
             </div>
 
             {isPlaying && leaderboard.length > 1 && (

@@ -186,6 +186,7 @@ const es = {
     "points": "pts",
     "pts": "PTS",
     "quit": "Salir",
+    "leave": "Abandonar",
     "word": "palabra",
     "words": "palabras",
     "wordsFound": "Palabras",
@@ -314,7 +315,8 @@ const es = {
     "retryNow": "Reintentar ahora"
   },
   "game": {
-    "comboHint": "¡Rápido! Encadena palabras"
+    "comboHint": "¡Rápido! Encadena palabras",
+    "calculatingResults": "Calculando resultados..."
   },
   "countdown": {
     "hint": "¡Desliza letras para formar palabras!"
