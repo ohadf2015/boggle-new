@@ -662,7 +662,7 @@ export async function sendTestEmail(
   console.warn('[Email] Config OK, preparing email', { fromEmail, toEmail });
 
   const puzzleNumber = getPuzzleNumber();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
   const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=test-token-preview`;
   const playUrl = `${baseUrl}/en/daily`;
 

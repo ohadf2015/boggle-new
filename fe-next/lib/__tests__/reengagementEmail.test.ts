@@ -250,7 +250,47 @@ describe('generateReengagementEmailHtml', () => {
     expect(text).toContain('H');
   });
 
-  test('should generate Hebrew template with RTL direction', () => {
+  test('should include mascot image in email', () => {
+    const { html } = generateReengagementEmailHtml({
+      recipientName: 'Test',
+      firstLetter: 'A',
+      language: 'en',
+      unsubscribeUrl: '#',
+      playUrl: '#',
+      baseUrl: 'https://example.com',
+    });
+
+    expect(html).toContain('/mascot/waving-nobg.gif');
+    expect(html).toContain('alt="Lexi"');
+  });
+
+  test('should use English logo for non-Hebrew languages', () => {
+    const { html } = generateReengagementEmailHtml({
+      recipientName: 'Test',
+      firstLetter: 'A',
+      language: 'en',
+      unsubscribeUrl: '#',
+      playUrl: '#',
+      baseUrl: 'https://example.com',
+    });
+
+    expect(html).toContain('/logos/lexiclash_logo_english-min.png');
+  });
+
+  test('should use Hebrew logo for Hebrew language', () => {
+    const { html } = generateReengagementEmailHtml({
+      recipientName: 'יוסי',
+      firstLetter: 'ש',
+      language: 'he',
+      unsubscribeUrl: '#',
+      playUrl: '#',
+      baseUrl: 'https://example.com',
+    });
+
+    expect(html).toContain('/logos/lexiclash_logo_hebrew-min.png');
+  });
+
+  test('should generate Hebrew template with RTL direction and flipped shadows', () => {
     const { html } = generateReengagementEmailHtml({
       recipientName: 'יוסי',
       firstLetter: 'ש',
@@ -264,6 +304,8 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('יוסי');
     expect(html).toContain('ש');
     expect(html).toContain('התגעגענו');
+    // RTL shadow direction (negative x offset)
+    expect(html).toContain('-8px 8px 0px');
   });
 
   test('should generate Swedish template', () => {
