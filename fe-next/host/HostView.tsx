@@ -553,6 +553,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
           boardTheme={state.boardTheme}
+          totalTime={settings.timerValue * 60}
         />
       )}
 

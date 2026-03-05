@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
+import { BlastGame } from '@/components/blast/BlastGame';
+import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
 import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
@@ -69,6 +71,9 @@ interface HostInGameViewProps {
 
   // Theme
   boardTheme?: BoardTheme | null;
+
+  // Blast multiplayer: total game duration for CircularTimer progress ring
+  totalTime?: number;
 }
 
 // ==================== Component ====================
@@ -113,6 +118,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
   // Theme
   boardTheme,
+
+  // Blast multiplayer
+  totalTime,
 }): React.ReactElement => {
   // Get player's game history for trail display logic
   const { profile } = useAuth();
@@ -127,8 +135,20 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
 
+  // Blast multiplayer bridge — converts Zustand state to BlastGame props
+  const blastBridge = useBlastMultiplayerBridge({
+    letterGrid: tableData,
+    gridSize: tableData?.[0]?.length ?? 4,
+  });
+
+  // Blast multiplayer: emit word + comboType to server via socket
+  const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null) => {
+    if (!socket) return;
+    socket.emit('submitWord', { word, comboType });
+  }, [socket]);
+
   // Word hunt guess handler — emits to server
-  const handleWordHuntGuess = React.useCallback((guess: string) => {
+  const handleWordHuntGuess = useCallback((guess: string) => {
     if (!socket) return;
     socket.emit('submitTargetWord', { guess });
   }, [socket]);
@@ -167,6 +187,25 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     }));
   }, [hostFoundWords]);
 
+  // Blast with host playing: use dedicated BlastGame (same as PlayerInGameView)
+  if (gameMode === 'blast' && hostPlaying) {
+    return (
+      <BlastGame
+        config={blastBridge.config}
+        mode="multiplayer"
+        remainingTime={remainingTime}
+        totalTime={totalTime}
+        leaderboard={leaderboard}
+        username={username}
+        onGameEnd={() => {/* Server controls game end in multiplayer */}}
+        onQuit={() => {/* Host uses stop game, not quit */}}
+        onWordWithComboType={handleBlastWordWithCombo}
+        initialTileStates={blastBridge.initialTileStates}
+        blastSeed={blastBridge.blastSeed}
+      />
+    );
+  }
+
   // Word-hunt with host playing: use dedicated WordHuntGame
   if (gameMode === 'word-hunt' && hostPlaying) {
     return (
@@ -181,6 +220,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
         onWordHuntGuess={handleWordHuntGuess}
         gameActive={true}
         minWordLength={minWordLength}
+        socket={socket}
+        foundWords={foundWords}
       />
     );
   }

@@ -284,6 +284,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             onWordHuntGuess={handleWordHuntGuess}
             gameActive={gameActive}
             minWordLength={minWordLength}
+            socket={socket}
+            foundWords={foundWords}
           />
       ) : (
         <InGameScreen

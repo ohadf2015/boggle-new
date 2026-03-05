@@ -56,7 +56,14 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ skipAnimations: false }),
 }));
 
+// Mock client word validator
+jest.mock('@/utils/clientWordValidator', () => ({
+  validateWordLocally: jest.fn().mockReturnValue({ isValid: true, shouldSubmitToServer: true }),
+  couldBeOnBoard: jest.fn().mockReturnValue(true),
+}));
+
 import { WordHuntGame } from '../WordHuntGame';
+import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
 
 describe('WordHuntGame', () => {
   const defaultGrid = [
@@ -65,6 +72,10 @@ describe('WordHuntGame', () => {
     ['I', 'J', 'K', 'L'],
     ['M', 'N', 'O', 'P'],
   ];
+
+  const mockSocket = {
+    emit: jest.fn(),
+  } as unknown as import('socket.io-client').Socket;
 
   const defaultProps = {
     grid: defaultGrid,
@@ -80,6 +91,8 @@ describe('WordHuntGame', () => {
     onWordHuntGuess: jest.fn(),
     gameActive: true,
     minWordLength: 3,
+    socket: mockSocket,
+    foundWords: [] as Array<{ word: string; isValid?: boolean | null; score?: number; duplicate?: boolean }>,
   };
 
   beforeEach(() => {
@@ -90,6 +103,8 @@ describe('WordHuntGame', () => {
     mockBridgeReturn.isGameOver = false;
     mockBridgeReturn.lifePoints = 75;
     mockBridgeReturn.eliminatedPlayers = [];
+    (validateWordLocally as jest.Mock).mockReturnValue({ isValid: true, shouldSubmitToServer: true });
+    (couldBeOnBoard as jest.Mock).mockReturnValue(true);
   });
 
   it('should render WordHuntGameLayout', () => {
@@ -173,6 +188,109 @@ describe('WordHuntGame', () => {
 
       expect(defaultProps.onWordSubmit).toHaveBeenCalledWith('HELLO');
       expect(defaultProps.onWordHuntGuess).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('socket emission', () => {
+    it('should emit submitWord to socket on valid word', () => {
+      render(<WordHuntGame {...defaultProps} />);
+      const layoutOnWordSubmit = capturedLayoutProps.value!.onWordSubmit as (word: string) => void;
+
+      act(() => {
+        layoutOnWordSubmit('CAT');
+      });
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('submitWord', expect.objectContaining({
+        word: 'cat',
+        comboLevel: 0,
+      }));
+    });
+
+    it('should NOT emit submitWord when socket is null', () => {
+      render(<WordHuntGame {...defaultProps} socket={null} />);
+      const layoutOnWordSubmit = capturedLayoutProps.value!.onWordSubmit as (word: string) => void;
+
+      act(() => {
+        layoutOnWordSubmit('CAT');
+      });
+
+      expect(defaultProps.onWordSubmit).toHaveBeenCalledWith('CAT');
+      // No socket emit since socket is null
+    });
+
+    it('should NOT emit submitWord when game is not active', () => {
+      render(<WordHuntGame {...defaultProps} gameActive={false} />);
+      const layoutOnWordSubmit = capturedLayoutProps.value!.onWordSubmit as (word: string) => void;
+
+      act(() => {
+        layoutOnWordSubmit('CAT');
+      });
+
+      expect(mockSocket.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('client-side validation', () => {
+    it('should reject duplicate words with duplicate feedback', () => {
+      (validateWordLocally as jest.Mock).mockReturnValue({
+        isValid: false,
+        errorKey: 'playerView.wordAlreadyFound',
+        shouldSubmitToServer: false,
+      });
+
+      render(<WordHuntGame {...defaultProps} />);
+      const layoutOnWordSubmit = capturedLayoutProps.value!.onWordSubmit as (word: string) => void;
+
+      act(() => {
+        layoutOnWordSubmit('CAT');
+      });
+
+      expect(defaultProps.onWordSubmit).not.toHaveBeenCalled();
+      expect(mockSocket.emit).not.toHaveBeenCalled();
+      expect(capturedLayoutProps.value!.wordFeedback).toMatchObject({
+        type: 'duplicate',
+        word: 'CAT',
+      });
+    });
+
+    it('should reject too-short words with rejected feedback', () => {
+      (validateWordLocally as jest.Mock).mockReturnValue({
+        isValid: false,
+        errorKey: 'playerView.wordTooShortMin',
+        shouldSubmitToServer: false,
+      });
+
+      render(<WordHuntGame {...defaultProps} />);
+      const layoutOnWordSubmit = capturedLayoutProps.value!.onWordSubmit as (word: string) => void;
+
+      act(() => {
+        layoutOnWordSubmit('AB');
+      });
+
+      expect(defaultProps.onWordSubmit).not.toHaveBeenCalled();
+      expect(mockSocket.emit).not.toHaveBeenCalled();
+      expect(capturedLayoutProps.value!.wordFeedback).toMatchObject({
+        type: 'rejected',
+        word: 'AB',
+      });
+    });
+
+    it('should reject words not on board', () => {
+      (couldBeOnBoard as jest.Mock).mockReturnValue(false);
+
+      render(<WordHuntGame {...defaultProps} />);
+      const layoutOnWordSubmit = capturedLayoutProps.value!.onWordSubmit as (word: string) => void;
+
+      act(() => {
+        layoutOnWordSubmit('XYZ');
+      });
+
+      expect(defaultProps.onWordSubmit).not.toHaveBeenCalled();
+      expect(mockSocket.emit).not.toHaveBeenCalled();
+      expect(capturedLayoutProps.value!.wordFeedback).toMatchObject({
+        type: 'rejected',
+        word: 'XYZ',
+      });
     });
   });
 

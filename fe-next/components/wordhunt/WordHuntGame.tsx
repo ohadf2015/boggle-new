@@ -3,8 +3,10 @@
 import React, { memo, useState, useCallback, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
+import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
 import { useWordHuntMultiplayerBridge } from './hooks/useWordHuntMultiplayerBridge';
 import { WordHuntGameLayout } from './WordHuntGameLayout';
+import type { Socket } from 'socket.io-client';
 import type { LetterGrid, Language } from '@/types';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 
@@ -25,6 +27,8 @@ export interface WordHuntGameProps {
   onWordHuntGuess: (guess: string) => void;
   gameActive: boolean;
   minWordLength: number;
+  socket: Socket | null;
+  foundWords: Array<{ word: string; isValid?: boolean | null; score?: number; duplicate?: boolean }>;
 }
 
 export const WordHuntGame = memo<WordHuntGameProps>(({
@@ -38,6 +42,8 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   onWordHuntGuess,
   gameActive,
   minWordLength,
+  socket,
+  foundWords,
 }) => {
   const { t, dir } = useLanguage();
 
@@ -66,9 +72,52 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     setLetterCount(count);
   }, []);
 
-  // Handle word submission — dual submission logic
+  // Handle word submission — validate locally, emit to server, dual submission
   function handleWordSubmit(word: string) {
-    // Always submit the word for scoring
+    const lang = gameLanguage || 'en';
+
+    // Client-side validation
+    const validation = validateWordLocally(word, lang, minWordLength, foundWords);
+    if (!validation.isValid) {
+      feedbackIdRef.current += 1;
+      setWordFeedback({
+        id: String(feedbackIdRef.current),
+        type: validation.errorKey === 'playerView.wordAlreadyFound' ? 'duplicate' : 'rejected',
+        word,
+        message: validation.errorKey ? t(validation.errorKey) : undefined,
+        timestamp: Date.now(),
+      });
+      setFormedWord('');
+      setLetterCount(0);
+      return;
+    }
+
+    // Board check
+    if (!couldBeOnBoard(word, grid, lang)) {
+      feedbackIdRef.current += 1;
+      setWordFeedback({
+        id: String(feedbackIdRef.current),
+        type: 'rejected',
+        word,
+        message: t('playerView.wordNotOnBoard'),
+        timestamp: Date.now(),
+      });
+      setFormedWord('');
+      setLetterCount(0);
+      return;
+    }
+
+    // Emit to server for scoring + validation
+    if (socket && gameActive) {
+      socket.emit('submitWord', {
+        word: word.toLowerCase(),
+        comboLevel: 0,
+        fireRoundActive: false,
+        comboType: null,
+      });
+    }
+
+    // Add to local found words
     onWordSubmit(word);
 
     // If word length matches target and target not found, also submit as target guess
@@ -76,7 +125,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       onWordHuntGuess(word);
     }
 
-    // Show feedback
+    // Show accepted feedback (optimistic)
     feedbackIdRef.current += 1;
     setWordFeedback({
       id: String(feedbackIdRef.current),
@@ -94,7 +143,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   const handleWordSubmitCb = useCallback((word: string) => {
     handleWordSubmit(word);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onWordSubmit, onWordHuntGuess, bridge.targetLength, bridge.targetFound]);
+  }, [onWordSubmit, onWordHuntGuess, bridge.targetLength, bridge.targetFound, socket, gameActive, foundWords, gameLanguage, minWordLength, grid]);
 
   return (
     <WordHuntGameLayout
