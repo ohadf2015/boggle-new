@@ -20,7 +20,7 @@ jest.mock('@/lib/email', () => ({
     cyanMuted: '#4DD9D9', purple: '#8B5CF6', orange: '#FF6B35',
     white: '#FFFFFF', black: '#000000', gray: '#666666',
     grayLight: '#9CA3AF', grayDark: '#374151',
-  },
+  } as Record<string, string>,
 }));
 
 // Mock resend
@@ -275,6 +275,26 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('/logos/lexiclash_logo_english-min.png');
+  });
+
+  test('should include speech bubble and mini mystery tiles', () => {
+    const { html } = generateReengagementEmailHtml({
+      recipientName: 'Test',
+      firstLetter: 'A',
+      language: 'en',
+      unsubscribeUrl: '#',
+      playUrl: '#',
+      baseUrl: 'https://example.com',
+    });
+
+    // Speech bubble with greeting
+    expect(html).toContain('speech-bubble');
+    // Mini mystery tiles flanking the main tile
+    expect(html).toContain('mini-tile');
+    // CTA glow animation
+    expect(html).toContain('cta-glow');
+    // Mascot glow backdrop
+    expect(html).toContain('mascot-glow');
   });
 
   test('should use Hebrew logo for Hebrew language', () => {

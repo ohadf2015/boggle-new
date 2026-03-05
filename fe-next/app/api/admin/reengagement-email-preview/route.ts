@@ -7,7 +7,7 @@ import { generateReengagementEmailHtml } from '@/lib/reengagementEmail';
  */
 export async function GET(request: NextRequest) {
   const language = request.nextUrl.searchParams.get('language') || 'en';
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
 
   const { html } = generateReengagementEmailHtml({

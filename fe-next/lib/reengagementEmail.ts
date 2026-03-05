@@ -392,12 +392,20 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
       transform: translate(2px, 2px);
       box-shadow: 3px 3px 0px ${colors.black} !important;
     }
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(191,255,0,0.3), 0 0 40px rgba(191,255,0,0.1); }
+      50% { box-shadow: 0 0 30px rgba(191,255,0,0.5), 0 0 60px rgba(191,255,0,0.2); }
+    }
+    .cta-glow { animation: glow-pulse 2s ease-in-out infinite; }
     @media only screen and (max-width: 600px) {
       .container { padding: 16px !important; }
-      .main-card { padding: 20px 16px !important; }
+      .main-card { padding: 24px 16px 28px !important; }
       .letter-tile { width: 72px !important; height: 72px !important; font-size: 40px !important; line-height: 64px !important; }
-      .mascot-img { width: 100px !important; height: 100px !important; }
-      .greeting-text { font-size: 24px !important; }
+      .mascot-img { width: 90px !important; height: 90px !important; }
+      .mascot-glow { width: 110px !important; height: 110px !important; }
+      .greeting-text { font-size: 22px !important; }
+      .speech-bubble { padding: 12px 16px !important; }
+      .mini-tile { width: 36px !important; height: 36px !important; font-size: 18px !important; line-height: 28px !important; }
     }
   </style>
 </head>
@@ -434,60 +442,99 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
 
                 <!-- Card Content -->
                 <tr>
-                  <td class="main-card" style="padding: 32px 28px 36px;">
+                  <td class="main-card" style="padding: 36px 28px 40px;">
 
-                    <!-- Mascot + Greeting Row -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                    <!-- Mascot with glow backdrop -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 8px;">
                       <tr>
                         <td align="center">
-                          <img src="${mascotUrl}" alt="Lexi" width="120" height="120" class="mascot-img" style="display: block; width: 120px; height: 120px;" />
+                          <div class="mascot-glow" style="width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,255,0.15) 0%, rgba(139,92,246,0.08) 50%, transparent 70%); display: inline-block; text-align: center; line-height: 0; padding-top: 5px;">
+                            <img src="${mascotUrl}" alt="Lexi" width="120" height="120" class="mascot-img" style="display: inline-block; width: 120px; height: 120px;" />
+                          </div>
                         </td>
                       </tr>
                     </table>
 
-                    <!-- Greeting -->
-                    <h1 class="greeting-text" style="color: ${colors.white}; font-size: 28px; margin: 0 0 6px 0; font-weight: 700; text-align: center; line-height: 1.3;">
-                      ${strings.greeting(recipientName)}
-                    </h1>
+                    <!-- Speech bubble greeting -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                      <tr>
+                        <td align="center">
+                          <!-- Bubble arrow -->
+                          <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid rgba(255,255,255,0.08); margin-bottom: 0;">&nbsp;</div>
+                          <!-- Bubble body -->
+                          <div class="speech-bubble" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px 24px; display: inline-block; max-width: 420px;">
+                            <h1 class="greeting-text" style="color: ${colors.white}; font-size: 26px; margin: 0 0 4px 0; font-weight: 700; text-align: center; line-height: 1.3;">
+                              ${strings.greeting(recipientName)}
+                            </h1>
+                            <p style="color: ${colors.grayLight}; font-size: 15px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500;">
+                              ${strings.teaser}
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
 
-                    <!-- Teaser Text -->
-                    <p style="color: ${colors.grayLight}; font-size: 17px; line-height: 1.5; margin: 0 0 28px 0; text-align: center; font-weight: 500;">
-                      ${strings.teaser}
-                    </p>
+                    <!-- Decorative sparkle divider -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                      <tr>
+                        <td align="center">
+                          <span style="color: ${colors.grayDark}; font-size: 11px; letter-spacing: 6px;">&#10022; &#10022; &#10022;</span>
+                        </td>
+                      </tr>
+                    </table>
 
-                    <!-- Letter Tile Hero -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 12px;">
+                    <!-- Letter Tile Hero with depth tiles -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 10px;">
                       <tr>
                         <td align="center">
                           <table role="presentation" cellpadding="0" cellspacing="0">
                             <tr>
-                              <!-- Question mark left -->
-                              <td style="font-size: 36px; color: ${colors.pink}; padding: 0 12px; vertical-align: middle; font-weight: 700;">?</td>
-                              <!-- The Letter Tile -->
+                              <!-- Mini mystery tile left -->
+                              <td style="vertical-align: middle; padding: 0 6px;">
+                                <div class="mini-tile" style="width: 44px; height: 44px; background: linear-gradient(180deg, ${colors.pink} 0%, ${colors.pinkLight} 100%); border: 3px solid ${colors.black}; border-radius: 10px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 38px; font-size: 22px; font-weight: 700; color: ${colors.white}; font-family: 'Fredoka', Arial, sans-serif; opacity: 0.85;">
+                                  ?
+                                </div>
+                              </td>
+                              <!-- The main Letter Tile -->
                               <td>
-                                <div class="letter-tile" style="width: 96px; height: 96px; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); border: 4px solid ${colors.black}; border-radius: 16px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; display: inline-block; text-align: center; line-height: 88px; font-size: 52px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
+                                <div class="letter-tile" style="width: 96px; height: 96px; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); border: 4px solid ${colors.black}; border-radius: 16px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}, 0 0 24px rgba(191,255,0,0.2); display: inline-block; text-align: center; line-height: 88px; font-size: 52px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
                                   ${firstLetter}
                                 </div>
                               </td>
-                              <!-- Question mark right -->
-                              <td style="font-size: 36px; color: ${colors.cyan}; padding: 0 12px; vertical-align: middle; font-weight: 700;">?</td>
+                              <!-- Mini mystery tile right -->
+                              <td style="vertical-align: middle; padding: 0 6px;">
+                                <div class="mini-tile" style="width: 44px; height: 44px; background: linear-gradient(180deg, ${colors.cyan} 0%, ${colors.cyanMuted} 100%); border: 3px solid ${colors.black}; border-radius: 10px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 38px; font-size: 22px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; opacity: 0.85;">
+                                  ?
+                                </div>
+                              </td>
                             </tr>
                           </table>
                         </td>
                       </tr>
                     </table>
 
-                    <!-- Mystery Underscores -->
-                    <p style="text-align: center; margin: 0 0 8px 0;">
-                      <span style="color: ${colors.lime}; font-size: 32px; font-weight: 700; letter-spacing: 10px;">${firstLetter} _ _ _ _</span>
-                    </p>
+                    <!-- Mystery word blanks -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 6px;">
+                      <tr>
+                        <td align="center">
+                          <table role="presentation" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px;">&nbsp;</span></td>
+                              <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px; opacity: 0.7;">&nbsp;</span></td>
+                              <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px; opacity: 0.5;">&nbsp;</span></td>
+                              <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px; opacity: 0.3;">&nbsp;</span></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
 
                     <!-- Question -->
                     <p style="color: ${colors.cyan}; font-size: 17px; text-align: center; margin: 0 0 28px 0; font-weight: 600;">
                       ${strings.question}
                     </p>
 
-                    <!-- CTA Button -->
+                    <!-- CTA Button with glow -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td align="center">
@@ -498,7 +545,7 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="${playUrl}" target="_blank" class="cta-button button-cta" style="display: inline-block; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 18px; font-weight: 700; text-decoration: none; padding: 16px 48px; border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; letter-spacing: 1px;">
+                          <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: inline-block; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 18px; font-weight: 700; text-decoration: none; padding: 16px 52px; border: 3px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; letter-spacing: 1px;">
                             ${strings.cta}
                           </a>
                           <!--<![endif]-->
@@ -507,13 +554,13 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     </table>
 
                     <!-- Streak Encouragement -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 24px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 28px;">
                       <tr>
                         <td>
-                          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(${isRTL ? '270deg' : '90deg'}, rgba(255, 107, 53, 0.15) 0%, rgba(255, 107, 53, 0.03) 100%); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 10px; padding: 0;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(${isRTL ? '270deg' : '90deg'}, rgba(255, 107, 53, 0.15) 0%, rgba(255, 107, 53, 0.03) 100%); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 12px; padding: 0;">
                             <tr>
                               <!-- Accent bar -->
-                              <td width="5" style="background-color: ${colors.orange}; border-radius: ${isRTL ? '0 10px 10px 0' : '10px 0 0 10px'}; font-size: 0;">&nbsp;</td>
+                              <td width="5" style="background-color: ${colors.orange}; border-radius: ${isRTL ? '0 12px 12px 0' : '12px 0 0 12px'}; font-size: 0;">&nbsp;</td>
                               <td style="padding: 14px 16px;">
                                 <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                                   <tr>
