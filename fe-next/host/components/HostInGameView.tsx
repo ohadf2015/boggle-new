@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
+import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -165,6 +166,26 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       timestamp: index,
     }));
   }, [hostFoundWords]);
+
+  // Word-hunt with host playing: use dedicated WordHuntGame
+  if (gameMode === 'word-hunt' && hostPlaying) {
+    return (
+      <WordHuntGame
+        grid={tableData}
+        gameLanguage={roomLanguage}
+        remainingTime={remainingTime ?? 0}
+        totalTime={timerValue * 60}
+        leaderboard={leaderboard}
+        username={username}
+        score={leaderboard.find(p => p.username === username)?.score ?? 0}
+        onQuit={() => {/* Host uses stop game, not quit */}}
+        onWordSubmit={onWordSubmit}
+        onWordHuntGuess={handleWordHuntGuess}
+        gameActive={true}
+        minWordLength={minWordLength}
+      />
+    );
+  }
 
   return (
     <InGameScreen

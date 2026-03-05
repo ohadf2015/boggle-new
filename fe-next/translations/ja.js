@@ -3576,6 +3576,11 @@ const ja = {
       "guessTarget": "ターゲットを推測",
       "submit": "推測を送信",
     },
+    "mp": {
+      "players": "プレイヤー",
+      "eliminated": "脱落",
+      "youEliminated": "脱落しました！",
+    },
     "shareResult": "結果をシェア",
     "quitConfirmTitle": "ハントを終了する？",
     "quitConfirmMessage": "進行状況が失われます！",

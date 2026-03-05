@@ -263,8 +263,7 @@ export function ResultsTabContent({
       {gameCode && sortedScores.length > 1 && (
         <PlayersReadyIndicator
           players={sortedScores
-            .filter(p => !isHost || p.username !== username)
-            .map(p => ({ username: p.username, avatar: p.avatar, isBot: p.isBot }))}
+            .map(p => ({ username: p.username, avatar: p.avatar, isBot: p.isBot, isHost: p.isHost }))}
           readyUsernames={readyUsernames}
           currentUsername={username}
           isHost={isHost}

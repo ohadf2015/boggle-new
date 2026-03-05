@@ -130,4 +130,57 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
       expect.objectContaining({ gameMode: 'classic' })
     );
   });
+
+  it('should force 6x6 grid when gameMode is blast (startGame)', () => {
+    // GIVEN: gameMode is blast (already mocked as blast at top)
+    const { useGameMode } = require('@/hooks/gameState');
+    (useGameMode as jest.Mock).mockReturnValue('blast');
+    const { generateRandomTable } = require('@/utils/utils');
+
+    const { result } = renderHook(() => useHostGameActions(baseOptions));
+
+    // WHEN: startGame is called directly (regular game flow)
+    act(() => {
+      result.current.startGame();
+    });
+
+    // THEN: generateRandomTable should be called with 6x6 (not 5x5 from MEDIUM difficulty)
+    expect(generateRandomTable).toHaveBeenCalledWith(6, 6, 'en', []);
+  });
+
+  it('should force 6x6 grid when gameMode is blast (handleStartNewGame)', () => {
+    // GIVEN
+    const { useGameMode } = require('@/hooks/gameState');
+    (useGameMode as jest.Mock).mockReturnValue('blast');
+    const { generateRandomTable } = require('@/utils/utils');
+    generateRandomTable.mockClear();
+
+    const { result } = renderHook(() => useHostGameActions(baseOptions));
+
+    // WHEN
+    act(() => {
+      result.current.handleStartNewGame();
+    });
+
+    // THEN: generateRandomTable called with 6x6
+    expect(generateRandomTable).toHaveBeenCalledWith(6, 6, 'en', []);
+  });
+
+  it('should use difficulty-based grid size for non-blast modes', () => {
+    // GIVEN
+    const { useGameMode } = require('@/hooks/gameState');
+    (useGameMode as jest.Mock).mockReturnValue('classic');
+    const { generateRandomTable } = require('@/utils/utils');
+    generateRandomTable.mockClear();
+
+    const { result } = renderHook(() => useHostGameActions(baseOptions));
+
+    // WHEN
+    act(() => {
+      result.current.startGame();
+    });
+
+    // THEN: MEDIUM difficulty = 5x5
+    expect(generateRandomTable).toHaveBeenCalledWith(5, 5, 'en', []);
+  });
 });

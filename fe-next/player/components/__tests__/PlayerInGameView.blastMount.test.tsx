@@ -37,6 +37,11 @@ jest.mock('@/hooks/gameState/store', () => ({
   useWordHuntEliminatedPlayers: () => [],
 }));
 
+// Mock cn utility
+jest.mock('@/lib/utils', () => ({
+  cn: (...args: any[]) => args.filter(Boolean).join(' '),
+}));
+
 // Mock InGameScreen — renders a testid so we can check if it's mounted
 jest.mock('@/components/game/InGameScreen', () => ({
   __esModule: true,
@@ -45,7 +50,13 @@ jest.mock('@/components/game/InGameScreen', () => ({
 
 // Mock BlastGame — renders a testid so we can check if it's mounted
 jest.mock('@/components/blast/BlastGame', () => ({
-  BlastGame: (props: any) => <div data-testid="blast-game" data-mode={props.mode} />,
+  BlastGame: (props: any) => (
+    <div
+      data-testid="blast-game"
+      data-mode={props.mode}
+      data-total-time={props.totalTime ?? ''}
+    />
+  ),
 }));
 
 // Mock BlastMoveCounter
@@ -167,5 +178,33 @@ describe('PlayerInGameView blast mode mounting', () => {
 
     // BlastMoveCounter is now rendered inside BlastGameLayout, not PlayerInGameView
     expect(screen.queryByTestId('blast-move-counter')).not.toBeInTheDocument();
+  });
+
+  it('should use dark navy background without padding for blast mode', () => {
+    mockGameMode.value = 'blast';
+
+    const { container } = render(<PlayerInGameView {...baseProps} />);
+
+    // The outer wrapper should have blast-specific classes
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.className).toContain('bg-neo-navy');
+    expect(wrapper.className).not.toContain('bg-neo-cream');
+  });
+
+  it('should use cream background with padding for classic mode', () => {
+    mockGameMode.value = 'classic';
+
+    const { container } = render(<PlayerInGameView {...baseProps} />);
+
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.className).toContain('bg-neo-cream');
+  });
+
+  it('should pass totalTime to BlastGame', () => {
+    mockGameMode.value = 'blast';
+
+    render(<PlayerInGameView {...baseProps} totalTime={180} />);
+
+    expect(screen.getByTestId('blast-game')).toHaveAttribute('data-total-time', '180');
   });
 });

@@ -844,6 +844,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         fireRoundRemaining={fireRoundRemaining}
         boardTheme={boardTheme}
         onShowTutorial={() => setShowOnboarding(true)}
+        totalTime={totalGameTimeRef.current}
       />
     </>
   );

@@ -147,7 +147,6 @@ const TvResultsView = memo<TvResultsViewProps>(({
   // Animation orchestration
   const {
     currentPhase,
-    isComplete,
     isAnimating,
     skipToEnd,
     getPhaseVisibility,
@@ -393,9 +392,9 @@ const TvResultsView = memo<TvResultsViewProps>(({
           </div>
         )}
 
-        {/* Controls Bar */}
+        {/* Controls Bar - visible as soon as header phase starts so host can skip/play again */}
         <TvResultsControls
-          visible={getPhaseVisibility('controls') || isComplete}
+          visible={getPhaseVisibility('header')}
           isAnimating={isAnimating}
           isTournament={isTournament}
           isLastRound={isLastRound}

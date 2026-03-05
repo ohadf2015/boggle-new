@@ -159,15 +159,12 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       return;
     }
 
-    // Regular game
+    // Regular game — blast mode always uses 6x6 grid
     const difficultyConfig = DIFFICULTIES[difficulty];
+    const rows = gameMode === 'blast' ? 6 : difficultyConfig.rows;
+    const cols = gameMode === 'blast' ? 6 : difficultyConfig.cols;
     const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
-    const newTable = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      roomLanguage,
-      embedWords
-    );
+    const newTable = generateRandomTable(rows, cols, roomLanguage, embedWords);
 
     setTableData(newTable);
     const seconds = timerValue * 60;
@@ -267,13 +264,10 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
         // Immediately start a new game - skip the waiting room
         // This includes all current players and any waiting room players
         const difficultyConfig = DIFFICULTIES[difficulty];
+        const rows = gameMode === 'blast' ? 6 : difficultyConfig.rows;
+        const cols = gameMode === 'blast' ? 6 : difficultyConfig.cols;
         const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
-        const newTable = generateRandomTable(
-          difficultyConfig.rows,
-          difficultyConfig.cols,
-          roomLanguage,
-          embedWords
-        );
+        const newTable = generateRandomTable(rows, cols, roomLanguage, embedWords);
 
         setTableData(newTable);
         const seconds = timerValue * 60;
@@ -336,32 +330,26 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   const regenerateBoard = useCallback(() => {
     if (!socket) return;
 
-    // Request new words from server
+    // Request new words from server — blast mode always uses 6x6
     const difficultyConfig = DIFFICULTIES[difficulty];
+    const rows = gameMode === 'blast' ? 6 : difficultyConfig.rows;
+    const cols = gameMode === 'blast' ? 6 : difficultyConfig.cols;
     socket.emit('getWordsForBoard', {
       language: roomLanguage,
-      boardSize: {
-        rows: difficultyConfig.rows,
-        cols: difficultyConfig.cols,
-      },
+      boardSize: { rows, cols },
     });
 
     // The new words will be received via socket event and stored in wordsForBoard
     // Generate a new board immediately with current words (will be updated when new words arrive)
     const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
-    const newTable = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      roomLanguage,
-      embedWords
-    );
+    const newTable = generateRandomTable(rows, cols, roomLanguage, embedWords);
 
     setTableData(newTable);
 
     neoInfoToast(t('hostView.boardRegenerated') || 'Board regenerated!', {
       duration: 2000,
     });
-  }, [socket, difficulty, roomLanguage, wordsForBoard, t, setTableData]);
+  }, [socket, difficulty, roomLanguage, wordsForBoard, t, setTableData, gameMode]);
 
   return {
     startGame,

@@ -3637,6 +3637,11 @@ const en = {
       "guessTarget": "Guess Target",
       "submit": "Submit Guess",
     },
+    "mp": {
+      "players": "Players",
+      "eliminated": "Eliminated",
+      "youEliminated": "You've been eliminated!",
+    },
     "shareResult": "Share",
     "quitConfirmTitle": "Leave the Hunt?",
     "quitConfirmMessage": "Your progress will be lost!",

@@ -35,8 +35,8 @@ const PODIUM_CONFIG = {
     size: 'large',
     avatarSize: 120,
     scoreSize: 'text-5xl',
-    nameSize: 'text-3xl',
-    height: 'h-72',
+    nameSize: 'text-2xl',
+    height: 'min-h-[320px]',
     order: 2, // Center position
   },
   2: {
@@ -48,8 +48,8 @@ const PODIUM_CONFIG = {
     size: 'medium',
     avatarSize: 100,
     scoreSize: 'text-4xl',
-    nameSize: 'text-2xl',
-    height: 'h-60',
+    nameSize: 'text-xl',
+    height: 'min-h-[270px]',
     order: 1, // Left position
   },
   3: {
@@ -61,8 +61,8 @@ const PODIUM_CONFIG = {
     size: 'small',
     avatarSize: 80,
     scoreSize: 'text-3xl',
-    nameSize: 'text-2xl',
-    height: 'h-52',
+    nameSize: 'text-lg',
+    height: 'min-h-[230px]',
     order: 3, // Right position
   },
 };
@@ -180,7 +180,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
         delay: isWinner ? 0.2 : 0,
       }}
       className={cn(
-        'flex flex-col items-center justify-end p-6 rounded-neo border-4 border-neo-black',
+        'flex flex-col items-center justify-end pt-8 pb-4 px-4 rounded-neo border-4 border-neo-black',
         `bg-gradient-to-b ${config.bgGradient}`,
         config.shadowColor,
         config.height,
@@ -208,7 +208,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.5 }}
         className={cn(
-          'font-black uppercase tracking-wide mb-3',
+          'font-black uppercase tracking-wide mb-2',
           config.textColor,
           isWinner ? 'text-lg' : 'text-sm'
         )}
@@ -222,7 +222,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.4 }}
         className={cn(
-          'relative mb-3',
+          'relative mb-2',
           isWinner && 'animate-pulse-subtle'
         )}
       >

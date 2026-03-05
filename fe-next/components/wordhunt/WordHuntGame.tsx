@@ -1,0 +1,149 @@
+'use client';
+
+import React, { memo, useState, useCallback, useRef } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
+import { useWordHuntMultiplayerBridge } from './hooks/useWordHuntMultiplayerBridge';
+import { WordHuntGameLayout } from './WordHuntGameLayout';
+import type { LetterGrid, Language } from '@/types';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
+
+export interface LeaderboardEntry {
+  username: string;
+  score: number;
+  wordCount?: number;
+}
+
+export interface WordHuntGameProps {
+  grid: LetterGrid;
+  gameLanguage: Language | null;
+  remainingTime: number | null;
+  totalTime: number;
+  leaderboard: LeaderboardEntry[];
+  username: string;
+  score: number;
+  onQuit: () => void;
+  onWordSubmit: (word: string) => void;
+  onWordHuntGuess: (guess: string) => void;
+  gameActive: boolean;
+  minWordLength: number;
+}
+
+export const WordHuntGame = memo<WordHuntGameProps>(({
+  grid,
+  gameLanguage,
+  remainingTime,
+  totalTime,
+  leaderboard,
+  username,
+  score,
+  onQuit,
+  onWordSubmit,
+  onWordHuntGuess,
+  gameActive,
+  minWordLength,
+}) => {
+  const { t, dir } = useLanguage();
+
+  // Bridge: convert Zustand MP state → SP-compatible props
+  const bridge = useWordHuntMultiplayerBridge();
+
+  // Local swipe/word state
+  const [formedWord, setFormedWord] = useState('');
+  const [letterCount, setLetterCount] = useState(0);
+  const [wordFeedback, setWordFeedback] = useState<WordFeedback | null>(null);
+  const feedbackIdRef = useRef(0);
+
+  // Keyboard input support
+  const keyboard = useKeyboardWordInput({
+    grid,
+    language: gameLanguage || 'en',
+    gameLanguage,
+    enabled: gameActive && !bridge.isGameOver,
+    onWordSubmit: handleWordSubmit,
+    minWordLength,
+  });
+
+  // Handle word change from grid swiping
+  const handleWordChange = useCallback((word: string, count: number) => {
+    setFormedWord(word);
+    setLetterCount(count);
+  }, []);
+
+  // Handle word submission — dual submission logic
+  function handleWordSubmit(word: string) {
+    // Always submit the word for scoring
+    onWordSubmit(word);
+
+    // If word length matches target and target not found, also submit as target guess
+    if (word.length === bridge.targetLength && !bridge.targetFound) {
+      onWordHuntGuess(word);
+    }
+
+    // Show feedback
+    feedbackIdRef.current += 1;
+    setWordFeedback({
+      id: String(feedbackIdRef.current),
+      type: 'accepted',
+      word,
+      timestamp: Date.now(),
+    });
+
+    // Clear formed word
+    setFormedWord('');
+    setLetterCount(0);
+  }
+
+  // Wrap handleWordSubmit in useCallback for layout
+  const handleWordSubmitCb = useCallback((word: string) => {
+    handleWordSubmit(word);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onWordSubmit, onWordHuntGuess, bridge.targetLength, bridge.targetFound]);
+
+  return (
+    <WordHuntGameLayout
+      // Header
+      remainingTime={remainingTime ?? 0}
+      totalTime={totalTime}
+      score={score}
+      onQuit={onQuit}
+
+      // Clue boxes (from bridge)
+      currentHint={bridge.currentHint}
+      attempts={bridge.attempts}
+      accumulatedClues={bridge.accumulatedClues}
+      knownLetters={bridge.knownLetters}
+      latestAttemptFeedback={bridge.latestAttemptFeedback}
+      showFeedbackOverlay={bridge.showFeedbackOverlay}
+
+      // Life bar (from bridge)
+      lifePoints={bridge.lifePoints}
+      isGameOver={bridge.isGameOver}
+      isLifeGaining={false}
+      lifeGainAmount={null}
+
+      // Grid
+      grid={grid}
+      onWordSubmit={handleWordSubmitCb}
+      onWordChange={handleWordChange}
+      highlightedPath={keyboard.highlightedCells}
+
+      // Word forming
+      formedWord={keyboard.isTypingMode ? keyboard.typedWord : formedWord}
+      letterCount={keyboard.isTypingMode ? keyboard.typedWord.length : letterCount}
+      wordFeedback={wordFeedback}
+
+      // Leaderboard (from bridge + props)
+      playerLives={bridge.playerLives}
+      eliminatedPlayers={bridge.eliminatedPlayers}
+      leaderboard={leaderboard}
+      currentUsername={username}
+
+      // Common
+      t={t}
+      gameDir={dir}
+    />
+  );
+});
+
+WordHuntGame.displayName = 'WordHuntGame';

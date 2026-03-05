@@ -300,8 +300,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
       {gameCode && sortedScores.length > 1 && (
         <PlayersReadyIndicator
           players={sortedScores
-            .filter(p => !isHost || p.username !== username)
-            .map(p => ({ username: p.username, avatar: p.avatar, isBot: (p as any).isBot }))}
+            .map(p => ({ username: p.username, avatar: p.avatar, isBot: (p as any).isBot, isHost: (p as any).isHost }))}
           readyUsernames={readyUsernames}
           currentUsername={username}
           isHost={isHost}

@@ -12,6 +12,7 @@ interface PlayerInfo {
   username: string;
   avatar?: AvatarType & { profilePictureUrl?: string };
   isBot?: boolean;
+  isHost?: boolean;
 }
 
 interface PlayersReadyIndicatorProps {
@@ -34,25 +35,28 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
   const { t } = useLanguage();
   const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
 
+  // Exclude host from player list — host clicks "Start Game", not "Ready"
+  const nonHostPlayers = useMemo(() => players.filter(p => !p.isHost), [players]);
+
   // Bots are always ready - count them as ready automatically
-  const botCount = useMemo(() => players.filter(p => p.isBot).length, [players]);
+  const botCount = useMemo(() => nonHostPlayers.filter(p => p.isBot).length, [nonHostPlayers]);
   const humanReadyCount = readyUsernames.length;
   const effectiveReadyCount = humanReadyCount + botCount;
-  const totalPlayers = players.length;
+  const totalPlayers = nonHostPlayers.length;
   const allReady = effectiveReadyCount >= totalPlayers && totalPlayers > 0;
   const progressPercent = totalPlayers > 0 ? (effectiveReadyCount / totalPlayers) * 100 : 0;
 
   // Sort players: ready first (including bots), then by username
   const sortedPlayers = useMemo(() => {
-    return [...players].sort((a, b) => {
+    return [...nonHostPlayers].sort((a, b) => {
       const aReady = a.isBot || readySet.has(a.username);
       const bReady = b.isBot || readySet.has(b.username);
       if (aReady !== bReady) return bReady ? 1 : -1;
       return a.username.localeCompare(b.username);
     });
-  }, [players, readySet]);
+  }, [nonHostPlayers, readySet]);
 
-  if (players.length === 0) return null;
+  if (nonHostPlayers.length === 0) return null;
 
   return (
     <motion.div

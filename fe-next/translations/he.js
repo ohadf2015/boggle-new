@@ -3531,6 +3531,11 @@ const he = {
       "guessTarget": "נחשו את היעד",
       "submit": "שליחת ניחוש",
     },
+    "mp": {
+      "players": "שחקנים",
+      "eliminated": "הודח",
+      "youEliminated": "הודחת מהמשחק!",
+    },
     "shareResult": "שתפו תוצאה",
     "quitConfirmTitle": "לעזוב את הציד?",
     "quitConfirmMessage": "ההתקדמות שלך תאבד!",

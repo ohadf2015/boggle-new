@@ -9,8 +9,10 @@ import TournamentStandings from '../../components/TournamentStandings';
 import InGameScreen from '../../components/game/InGameScreen';
 import { BlastGame } from '@/components/blast/BlastGame';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
+import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
@@ -122,6 +124,9 @@ interface PlayerInGameViewProps {
 
   // Tutorial callback
   onShowTutorial?: () => void;
+
+  // Blast multiplayer: total game duration for CircularTimer progress ring
+  totalTime?: number;
 }
 
 // ==================== Component ====================
@@ -185,6 +190,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Tutorial callback
   onShowTutorial,
+
+  // Blast multiplayer
+  totalTime,
 }): React.ReactElement => {
   // Get player's game history for trail display logic
   const { profile } = useAuth();
@@ -244,14 +252,18 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-cream dark:bg-neo-navy p-0 md:p-4 transition-colors duration-300">
+    <div className={cn(
+      'flex-1 flex flex-col min-h-0 overflow-hidden transition-colors duration-300',
+      gameMode === 'blast' ? 'bg-neo-navy p-0' : 'bg-neo-cream dark:bg-neo-navy p-0 md:p-4'
+    )}>
 
-      {/* Main Game Content — Blast mode uses BlastGame, all others use InGameScreen */}
+      {/* Main Game Content — Blast/WordHunt use dedicated components, others use InGameScreen */}
       {gameMode === 'blast' ? (
           <BlastGame
             config={blastBridge.config}
             mode="multiplayer"
             remainingTime={remainingTime}
+            totalTime={totalTime}
             leaderboard={leaderboard}
             username={username}
             onGameEnd={() => {/* Server controls game end in multiplayer */}}
@@ -259,6 +271,21 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             onWordWithComboType={handleBlastWordWithCombo}
             initialTileStates={blastBridge.initialTileStates}
             blastSeed={blastBridge.blastSeed}
+          />
+      ) : gameMode === 'word-hunt' ? (
+          <WordHuntGame
+            grid={effectiveGrid}
+            gameLanguage={gameLanguage}
+            remainingTime={remainingTime ?? 0}
+            totalTime={totalTime ?? 180}
+            leaderboard={leaderboard}
+            username={username}
+            score={leaderboard.find(p => p.username === username)?.score ?? 0}
+            onQuit={onExitRoom}
+            onWordSubmit={onWordSubmit}
+            onWordHuntGuess={handleWordHuntGuess}
+            gameActive={gameActive}
+            minWordLength={minWordLength}
           />
       ) : (
         <InGameScreen

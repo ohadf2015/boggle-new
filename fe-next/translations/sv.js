@@ -3527,6 +3527,11 @@ const sv = {
       "guessTarget": "Gissa målordet",
       "submit": "Skicka gissning",
     },
+    "mp": {
+      "players": "Spelare",
+      "eliminated": "Eliminerad",
+      "youEliminated": "Du har blivit eliminerad!",
+    },
     "shareResult": "Dela resultat",
     "quitConfirmTitle": "Lämna jakten?",
     "quitConfirmMessage": "Du förlorar dina framsteg!",

@@ -332,4 +332,30 @@ describe('BlastGameLayout multiplayer mode', () => {
     );
     expect(screen.getByText('blast.shuffle')).toBeInTheDocument();
   });
+
+  it('hides board-complete overlay in multiplayer mode', () => {
+    const completeState = { ...defaultGameState, isComplete: true };
+    render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={true}
+        gameState={completeState}
+      />,
+    );
+    // The "Board Cleared!" text should NOT appear in MP
+    expect(screen.queryByText('blast.complete')).not.toBeInTheDocument();
+  });
+
+  it('shows board-complete overlay in singleplayer mode when complete', () => {
+    const completeState = { ...defaultGameState, isComplete: true };
+    render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={false}
+        gameState={completeState}
+      />,
+    );
+    // The "Board Cleared!" text SHOULD appear in SP
+    expect(screen.getByText('blast.complete')).toBeInTheDocument();
+  });
 });

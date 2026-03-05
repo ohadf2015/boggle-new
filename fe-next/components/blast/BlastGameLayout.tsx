@@ -536,9 +536,9 @@ export function BlastGameLayout({
           </div>
         )}
 
-        {/* Board complete celebration overlay */}
+        {/* Board complete celebration overlay — SP only (server controls MP end) */}
         <AnimatePresence>
-          {isComplete && (
+          {!isMultiplayer && isComplete && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
