@@ -60,9 +60,9 @@ describe('validateBlastResult', () => {
     expect(result.valid).toBe(false);
   });
 
-  it('should reject tilesCleared > totalTiles', () => {
+  it('should accept tilesCleared > totalTiles (cumulative in gravity mode)', () => {
     const result = validateBlastResult({ ...validPayload, tilesCleared: 50, totalTiles: 36 });
-    expect(result.valid).toBe(false);
+    expect(result.valid).toBe(true);
   });
 
   it('should accept all valid difficulties', () => {

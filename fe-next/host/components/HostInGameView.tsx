@@ -173,8 +173,6 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       <WordHuntGame
         grid={tableData}
         gameLanguage={roomLanguage}
-        remainingTime={remainingTime ?? 0}
-        totalTime={timerValue * 60}
         leaderboard={leaderboard}
         username={username}
         score={leaderboard.find(p => p.username === username)?.score ?? 0}

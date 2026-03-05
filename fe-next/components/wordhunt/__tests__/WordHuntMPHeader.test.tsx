@@ -1,24 +1,15 @@
 /**
  * Tests for WordHuntMPHeader
- * Timer + score + quit button for MP WordHunt
+ * Score badge + quit button for MP WordHunt (no timer — life meter is core mechanic)
  */
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-// Mock CircularTimer
-jest.mock('@/components/CircularTimer', () => {
-  return function MockCircularTimer(props: { remainingTime: number; totalTime?: number; size?: string }) {
-    return <div data-testid="circular-timer" data-remaining={props.remainingTime} data-size={props.size} />;
-  };
-});
-
 import { WordHuntMPHeader } from '../WordHuntMPHeader';
 
 describe('WordHuntMPHeader', () => {
   const defaultProps = {
-    remainingTime: 120,
-    totalTime: 180,
     score: 450,
     onQuit: jest.fn(),
     t: (key: string) => key,
@@ -28,11 +19,9 @@ describe('WordHuntMPHeader', () => {
     jest.clearAllMocks();
   });
 
-  it('should render CircularTimer with correct props', () => {
+  it('should NOT render a CircularTimer', () => {
     render(<WordHuntMPHeader {...defaultProps} />);
-    const timer = screen.getByTestId('circular-timer');
-    expect(timer).toBeInTheDocument();
-    expect(timer).toHaveAttribute('data-remaining', '120');
+    expect(screen.queryByTestId('circular-timer')).not.toBeInTheDocument();
   });
 
   it('should display the score', () => {
@@ -52,15 +41,11 @@ describe('WordHuntMPHeader', () => {
     expect(defaultProps.onQuit).toHaveBeenCalledTimes(1);
   });
 
-  it('should use small timer size', () => {
-    render(<WordHuntMPHeader {...defaultProps} />);
-    const timer = screen.getByTestId('circular-timer');
-    expect(timer).toHaveAttribute('data-size', 'sm');
-  });
-
-  it('should handle null remainingTime gracefully', () => {
-    render(<WordHuntMPHeader {...defaultProps} remainingTime={null as unknown as number} />);
-    const timer = screen.getByTestId('circular-timer');
-    expect(timer).toBeInTheDocument();
+  it('should use neo-brutalist styling on score badge', () => {
+    const { container } = render(<WordHuntMPHeader {...defaultProps} />);
+    const scoreEl = screen.getByText('450');
+    const badge = scoreEl.closest('div');
+    expect(badge?.className).toContain('border-3');
+    expect(badge?.className).toContain('shadow-hard-sm');
   });
 });

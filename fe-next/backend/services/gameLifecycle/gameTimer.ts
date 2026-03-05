@@ -10,7 +10,7 @@ import { getGame, updateGame } from '../../modules/gameStateManager';
 import { resetGameAIValidationCount } from '../../modules/communityWordManager';
 import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { clearGameTimer, setGameTimer } from '../../utils/timerManager';
-import { drainLife } from '../../modules/wordHuntManager';
+import { drainLife, areAllPlayersEliminated } from '../../modules/wordHuntManager';
 import { startBotsForGame } from './botGame';
 import { endGame } from './gameEnd';
 
@@ -96,6 +96,13 @@ export function startGameTimer(
         playerLives: updatedLives,
         eliminatedPlayers: huntState.eliminatedPlayers,
       });
+
+      // End game early if all players are eliminated
+      if (areAllPlayersEliminated(huntState)) {
+        clearGameTimer(gameCode);
+        endGame(io, gameCode);
+        return;
+      }
     }
 
     if (remainingTime <= 0) {

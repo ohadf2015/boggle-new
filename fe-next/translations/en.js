@@ -3720,6 +3720,8 @@ const en = {
       "rank": "Rank"
     },
     "results": {
+      "survivors": "Survivors",
+      "eliminated": "Eliminated",
       "gameOver": "Game Over",
       "tapToCelebrate": "Tap to celebrate!",
       "targetWord": "Target Word",

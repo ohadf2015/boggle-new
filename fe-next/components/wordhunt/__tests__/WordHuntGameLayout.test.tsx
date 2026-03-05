@@ -1,6 +1,6 @@
 /**
  * Tests for WordHuntGameLayout
- * Portrait layout composing SP survival + MP components
+ * Portrait layout composing SP survival + MP components (no timer display)
  */
 
 import React from 'react';
@@ -49,9 +49,7 @@ describe('WordHuntGameLayout', () => {
   ];
 
   const defaultProps = {
-    // Header
-    remainingTime: 120,
-    totalTime: 180,
+    // Header (no timer props)
     score: 450,
     onQuit: jest.fn(),
 
@@ -101,7 +99,7 @@ describe('WordHuntGameLayout', () => {
     expect(screen.getByTestId('mp-leaderboard')).toBeInTheDocument();
   });
 
-  it('should pass score to header', () => {
+  it('should pass score to header without timer props', () => {
     render(<WordHuntGameLayout {...defaultProps} score={999} />);
     expect(screen.getByTestId('mp-header')).toHaveAttribute('data-score', '999');
   });

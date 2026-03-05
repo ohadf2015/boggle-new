@@ -376,7 +376,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     // Initialize blast mode state if needed
     if (resolvedMode === 'blast') {
       const { initBlastModeState } = await import('../modules/blastModeManager.js');
-      const blastState = initBlastModeState(letterGrid, playerUsernames);
+      // Multiplayer blast starts at wave 3 for richer tile variety
+      // (unlocks prism, mirror, etc. that normally require SP progression)
+      const mpBlastWave = playerUsernames.length >= 2 ? 3 : 1;
+      const blastState = initBlastModeState(letterGrid, playerUsernames, mpBlastWave);
       const currentGame = getGame(gameCode);
       if (currentGame) {
         (currentGame as any).blastModeState = blastState;
@@ -465,6 +468,11 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         messageId,
         gameSessionId: game.gameSessionId,
         boardTheme: boardTheme || null,
+        gameMode: resolvedMode,
+        ...(resolvedMode === 'blast' ? {
+          blastTileOverlay: (getGame(gameCode) as any)?.blastModeState?.overlay || [],
+          blastSeed: (getGame(gameCode) as any)?.blastModeState?.seed ?? null,
+        } : {}),
         retry: true
       });
     });
@@ -557,6 +565,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     if (isInProgress(game.gameState)) {
       logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);
+      const recoveryGameMode = game.gameMode || 'classic';
       safeEmit(socket, 'startGame', {
         letterGrid: game.letterGrid,
         timerSeconds: game.remainingTime || game.timerSeconds,
@@ -566,7 +575,11 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         reconnect: true,
         skipAck: true,
         boardTheme: (game as unknown as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null,
-        gameMode: game.gameMode || 'classic'
+        gameMode: recoveryGameMode,
+        ...(recoveryGameMode === 'blast' && (game as any).blastModeState ? {
+          blastTileOverlay: (game as any).blastModeState.overlay || [],
+          blastSeed: (game as any).blastModeState.seed ?? null,
+        } : {}),
       });
     }
   });

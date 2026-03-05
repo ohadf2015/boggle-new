@@ -115,13 +115,15 @@ export function BlastGame({
   }, [combo, playWordAcceptedSound]);
 
   // Memoize wave objectives so they don't cause re-initialization
+  // MP doesn't use wave objectives — skip computation entirely
   const waveObjectives = useMemo(
-    () => getWaveObjectives(waveNumber),
-    [waveNumber],
+    () => isMultiplayer ? [] : getWaveObjectives(waveNumber),
+    [waveNumber, isMultiplayer],
   );
 
   // Objective tile types for highlighting (memoized Set for BlastTileOverlay)
   const objectiveTileTypes = useMemo(() => {
+    if (isMultiplayer) return new Set<string>();
     const types = new Set<string>();
     for (const obj of waveObjectives) {
       if ((obj.type === 'collect_type' || obj.type === 'clear_all_type') && obj.tileType) {
@@ -129,7 +131,7 @@ export function BlastGame({
       }
     }
     return types;
-  }, [waveObjectives]);
+  }, [waveObjectives, isMultiplayer]);
 
   // Sugar Crush sequence (PSYC-03): fires when moves run out, converting tiles to specials
   const sugarCrush = useBlastSugarCrush();

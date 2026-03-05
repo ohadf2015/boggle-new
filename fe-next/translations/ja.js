@@ -2151,8 +2151,10 @@ const ja = {
       "checkEmail": "メールでサインインリンクを確認してください！",
       "usePassword": "パスワードを使用",
       "useMagicLink": "マジックリンクを使用",
-      "divider": "またはメールで続行"
+      "divider": "またはメールで続行",
+      "noPassword": "パスワード不要"
     },
+    "trustBadge": "安全＆プライベート",
     "callback": {
       "completingSignIn": "サインイン中...",
       "takingTooLong": "予想より時間がかかっています。もう一度試しますか？",
@@ -3659,6 +3661,8 @@ const ja = {
       "rank": "ランク"
     },
     "results": {
+      "survivors": "生存者",
+      "eliminated": "脱落者",
       "gameOver": "ゲームオーバー",
       "tapToCelebrate": "タップしてお祝い！",
       "targetWord": "目標単語",

@@ -81,4 +81,71 @@ describe('useBlastMultiplayerBridge', () => {
 
     expect(result.current.initialTileStates).toBeNull();
   });
+
+  it('should assign innerType to frozen tiles using seeded random', () => {
+    // GIVEN: overlay with a frozen tile
+    const overlay: BlastTileOverlay[] = [
+      { row: 1, col: 2, type: 'frozen' },
+    ];
+
+    (mockBlastTileOverlay as any).length = 0;
+    mockBlastTileOverlay.push(...overlay);
+
+    // WHEN
+    const { result } = renderHook(() =>
+      useBlastMultiplayerBridge({ letterGrid: mockLetterGrid, gridSize: 4 })
+    );
+
+    const frozenTile = result.current.initialTileStates![1][2];
+
+    // THEN: frozen tile should have an innerType from the valid candidates
+    expect(frozenTile.type).toBe('frozen');
+    expect(frozenTile.innerType).toBeDefined();
+    expect(['bomb', 'lightning', 'prism', 'gem', 'rainbow']).toContain(frozenTile.innerType);
+  });
+
+  it('should produce deterministic innerType for same seed', () => {
+    // GIVEN: overlay with frozen tiles and seed = 42
+    const overlay: BlastTileOverlay[] = [
+      { row: 0, col: 0, type: 'frozen' },
+      { row: 1, col: 1, type: 'frozen' },
+    ];
+
+    (mockBlastTileOverlay as any).length = 0;
+    mockBlastTileOverlay.push(...overlay);
+
+    // WHEN: render twice with same seed
+    const { result: result1 } = renderHook(() =>
+      useBlastMultiplayerBridge({ letterGrid: mockLetterGrid, gridSize: 4 })
+    );
+    const { result: result2 } = renderHook(() =>
+      useBlastMultiplayerBridge({ letterGrid: mockLetterGrid, gridSize: 4 })
+    );
+
+    // THEN: same innerType values (deterministic)
+    expect(result1.current.initialTileStates![0][0].innerType)
+      .toBe(result2.current.initialTileStates![0][0].innerType);
+    expect(result1.current.initialTileStates![1][1].innerType)
+      .toBe(result2.current.initialTileStates![1][1].innerType);
+  });
+
+  it('should NOT assign innerType to non-frozen special tiles', () => {
+    // GIVEN: overlay with non-frozen specials
+    const overlay: BlastTileOverlay[] = [
+      { row: 0, col: 0, type: 'bomb' },
+      { row: 1, col: 1, type: 'gold' },
+    ];
+
+    (mockBlastTileOverlay as any).length = 0;
+    mockBlastTileOverlay.push(...overlay);
+
+    // WHEN
+    const { result } = renderHook(() =>
+      useBlastMultiplayerBridge({ letterGrid: mockLetterGrid, gridSize: 4 })
+    );
+
+    // THEN: no innerType on non-frozen tiles
+    expect(result.current.initialTileStates![0][0].innerType).toBeUndefined();
+    expect(result.current.initialTileStates![1][1].innerType).toBeUndefined();
+  });
 });

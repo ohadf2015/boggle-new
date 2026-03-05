@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 3682,
+    "totalKeysInCode": 3685,
     "keyCountByLanguage": {
-      "en": 5433,
-      "he": 5447,
-      "sv": 5441,
-      "ja": 5456,
+      "en": 5438,
+      "he": 5454,
+      "sv": 5448,
+      "ja": 5463,
       "es": 4907
     },
     "missingFromEnglish": 0,
@@ -164,8 +164,6 @@
   "missingByLanguage": {
     "he": [
       "share.qrCode",
-      "auth.magicLink.noPassword",
-      "auth.trustBadge",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -181,8 +179,6 @@
     ],
     "sv": [
       "share.qrCode",
-      "auth.magicLink.noPassword",
-      "auth.trustBadge",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -236,8 +232,6 @@
       "challengeAction"
     ],
     "ja": [
-      "auth.magicLink.noPassword",
-      "auth.trustBadge",
       "challenge.yourRecord",
       "challenge.noRecord",
       "challenge.newRecord",
@@ -403,6 +397,9 @@
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
+      "wordHunt.mp.players",
+      "wordHunt.mp.eliminated",
+      "wordHunt.mp.youEliminated",
       "wordHunt.facts.title",
       "wordHunt.facts.firstTry",
       "wordHunt.facts.speedSolver",
@@ -418,6 +415,8 @@
       "wordHunt.facts.palindrome",
       "wordHunt.facts.rareLetter",
       "wordHunt.facts.longWord",
+      "wordHunt.results.survivors",
+      "wordHunt.results.eliminated",
       "accessibility.skipToMain",
       "adventure.bosses.mechanicProgress",
       "adventure.bosses.phases.phase1",

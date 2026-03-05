@@ -15,8 +15,6 @@ import type { HighlightedCell } from '@/components/GridComponent';
 
 export interface WordHuntGameLayoutProps {
   // Header
-  remainingTime: number;
-  totalTime: number;
   score: number;
   onQuit: () => void;
 
@@ -58,8 +56,6 @@ export interface WordHuntGameLayoutProps {
 
 export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   // Header
-  remainingTime,
-  totalTime,
   score,
   onQuit,
 
@@ -100,10 +96,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
 }) => {
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-      {/* Timer + Score + Quit */}
+      {/* Score + Quit */}
       <WordHuntMPHeader
-        remainingTime={remainingTime}
-        totalTime={totalTime}
         score={score}
         onQuit={onQuit}
         t={t}

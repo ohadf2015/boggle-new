@@ -11,6 +11,17 @@ jest.mock('../../../backend/modules/gameModeSelector', () => ({
   ALL_GAME_MODES: ['classic', 'blast', 'word-hunt'],
 }));
 
+// Mock blastModeManager to spy on initBlastModeState wave parameter
+const mockInitBlastModeState = jest.fn().mockReturnValue({
+  overlay: [],
+  playerMoves: {},
+  playerBonusMoves: {},
+  seed: 12345,
+});
+jest.mock('../../../backend/modules/blastModeManager', () => ({
+  initBlastModeState: (...args: any[]) => mockInitBlastModeState(...args),
+}));
+
 jest.mock('../../../backend/modules/gameStateManager', () => ({
   createGame: jest.fn().mockReturnValue({ hostSocketId: 'socket-1', modeHistory: [] }),
   getGame: jest.fn(),
@@ -134,9 +145,12 @@ jest.mock('../../../backend/modules/classroomGameManager', () => ({
 import {
   getGame,
   getGameBySocketId,
+  getGameUsers,
+  getSocketIdByUsername,
   updateGame,
 } from '../../../backend/modules/gameStateManager';
-import { broadcastToRoom, safeEmit } from '../../../backend/utils/socketHelpers';
+import { broadcastToRoom, safeEmit, getSocketById } from '../../../backend/utils/socketHelpers';
+import gameStartCoordinator from '../../../backend/utils/gameStartCoordinator';
 
 describe('gameLifecycleHandler - gameMode', () => {
   let io: any;
@@ -336,6 +350,201 @@ describe('gameLifecycleHandler - gameMode', () => {
           gameMode: 'classic',
         })
       );
+    });
+
+    it('should include blastTileOverlay and blastSeed in recovery when gameMode is blast', () => {
+      // GIVEN: blast game in progress with blastModeState
+      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
+      (getGame as jest.Mock).mockReturnValue({
+        gameState: 'in-progress',
+        letterGrid: [['A', 'B'], ['C', 'D']],
+        remainingTime: 100,
+        timerSeconds: 180,
+        language: 'en',
+        minWordLength: 2,
+        gameMode: 'blast',
+        blastModeState: {
+          overlay: [['normal', 'bomb'], ['ice', 'normal']],
+          seed: 42,
+        },
+      });
+
+      const handler = getHandler('requestGameState');
+
+      // WHEN
+      handler();
+
+      // THEN: safeEmit includes blast-specific fields
+      expect(safeEmit).toHaveBeenCalledWith(
+        socket,
+        'startGame',
+        expect.objectContaining({
+          gameMode: 'blast',
+          blastTileOverlay: [['normal', 'bomb'], ['ice', 'normal']],
+          blastSeed: 42,
+        })
+      );
+    });
+
+    it('should NOT include blast fields in recovery when gameMode is classic', () => {
+      // GIVEN: classic game in progress
+      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
+      (getGame as jest.Mock).mockReturnValue({
+        gameState: 'in-progress',
+        letterGrid: [['A']],
+        remainingTime: 100,
+        timerSeconds: 180,
+        language: 'en',
+        minWordLength: 2,
+        gameMode: 'classic',
+      });
+
+      const handler = getHandler('requestGameState');
+
+      // WHEN
+      handler();
+
+      // THEN: no blast fields in payload
+      const payload = (safeEmit as jest.Mock).mock.calls[0][2];
+      expect(payload).not.toHaveProperty('blastTileOverlay');
+      expect(payload).not.toHaveProperty('blastSeed');
+    });
+  });
+
+  describe('startGame - MP blast uses elevated wave for richer tile variety', () => {
+    const mpBlastGame = {
+      hostSocketId: 'socket-1',
+      gameState: 'waiting',
+      language: 'en',
+      modeHistory: [],
+      gameSessionId: 1,
+      users: { alice: {}, bob: {} },
+    };
+
+    beforeEach(() => {
+      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
+      (getGame as jest.Mock).mockReturnValue({ ...mpBlastGame });
+      (getGameUsers as jest.Mock).mockReturnValue([
+        { username: 'alice' },
+        { username: 'bob' },
+      ]);
+    });
+
+    it('should pass wave=3 to initBlastModeState for multiplayer blast games', async () => {
+      // GIVEN: a multiplayer game (2+ players) starting blast mode
+      const handler = getHandler('startGame');
+
+      // WHEN
+      await handler({
+        letterGrid: [['A', 'B'], ['C', 'D']],
+        timerSeconds: 180,
+        gameMode: 'blast',
+      });
+
+      // THEN: initBlastModeState was called with wave=3 (not default 1)
+      expect(mockInitBlastModeState).toHaveBeenCalledWith(
+        [['A', 'B'], ['C', 'D']],
+        ['alice', 'bob'],
+        3
+      );
+    });
+  });
+
+  describe('startGame retry - blast data in retry payload', () => {
+    it('should include gameMode, blastTileOverlay and blastSeed in retry emit', async () => {
+      // GIVEN: a blast game where retry callback is invoked
+      // Configure initBlastModeState to return specific overlay/seed
+      const blastOverlay = [['normal', 'bomb'], ['ice', 'normal']];
+      mockInitBlastModeState.mockReturnValueOnce({
+        overlay: blastOverlay,
+        playerMoves: {},
+        playerBonusMoves: {},
+        seed: 42,
+      });
+
+      // Use a single mutable game object so the handler's mutation persists
+      const gameObj: any = {
+        hostSocketId: 'socket-1',
+        gameState: 'waiting',
+        language: 'en',
+        modeHistory: [],
+        gameSessionId: 1,
+      };
+
+      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
+      (getGame as jest.Mock).mockReturnValue(gameObj);
+      (getSocketIdByUsername as jest.Mock).mockReturnValue('socket-2');
+      const targetSocket = { id: 'socket-2', emit: jest.fn() };
+      (getSocketById as jest.Mock).mockReturnValue(targetSocket);
+      (safeEmit as jest.Mock).mockReturnValue(true);
+
+      const handler = getHandler('startGame');
+
+      // WHEN: start game with blast mode
+      await handler({
+        letterGrid: [['A', 'B'], ['C', 'D']],
+        timerSeconds: 180,
+        gameMode: 'blast',
+      });
+
+      // THEN: scheduleRetries was called; extract the retry callback
+      expect(gameStartCoordinator.scheduleRetries).toHaveBeenCalled();
+      const retryCallback = (gameStartCoordinator.scheduleRetries as jest.Mock).mock.calls[0][2];
+
+      // Clear mocks to isolate the retry call
+      (safeEmit as jest.Mock).mockClear();
+
+      // WHEN: retry callback fires for a player
+      retryCallback('player1');
+
+      // THEN: safeEmit includes blast fields from initBlastModeState
+      expect(safeEmit).toHaveBeenCalledWith(
+        targetSocket,
+        'startGame',
+        expect.objectContaining({
+          gameMode: 'blast',
+          blastTileOverlay: blastOverlay,
+          blastSeed: 42,
+          retry: true,
+        })
+      );
+    });
+
+    it('should NOT include blast fields in retry when gameMode is classic', async () => {
+      // GIVEN: a classic game
+      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
+      (getGame as jest.Mock).mockReturnValue({
+        hostSocketId: 'socket-1',
+        gameState: 'waiting',
+        language: 'en',
+        modeHistory: [],
+        gameSessionId: 1,
+        gameMode: 'classic',
+      });
+      (getSocketIdByUsername as jest.Mock).mockReturnValue('socket-2');
+      const targetSocket = { id: 'socket-2', emit: jest.fn() };
+      (getSocketById as jest.Mock).mockReturnValue(targetSocket);
+      (safeEmit as jest.Mock).mockReturnValue(true);
+
+      const handler = getHandler('startGame');
+
+      // WHEN
+      await handler({
+        letterGrid: [['A']],
+        timerSeconds: 180,
+        gameMode: 'classic',
+      });
+
+      const retryCallback = (gameStartCoordinator.scheduleRetries as jest.Mock).mock.calls[0][2];
+      (safeEmit as jest.Mock).mockClear();
+
+      // WHEN: retry fires
+      retryCallback('player1');
+
+      // THEN: no blast fields
+      const payload = (safeEmit as jest.Mock).mock.calls[0][2];
+      expect(payload).not.toHaveProperty('blastTileOverlay');
+      expect(payload).not.toHaveProperty('blastSeed');
     });
   });
 });

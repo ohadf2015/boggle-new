@@ -202,7 +202,7 @@ describe('BlastGame multiplayer soft pressure', () => {
     capturedLayoutProps = null;
   });
 
-  it('should pass waveObjectives to useBlastGame in multiplayer mode', () => {
+  it('should pass empty waveObjectives to useBlastGame in multiplayer mode', () => {
     render(
       <BlastGame
         config={baseConfig}
@@ -213,9 +213,9 @@ describe('BlastGame multiplayer soft pressure', () => {
     );
 
     expect(capturedUseBlastGameOptions).not.toBeNull();
-    // Should NOT be undefined — objectives should be enabled
+    // MP suppresses wave objectives — they are meaningless without the wave system
     expect(capturedUseBlastGameOptions.waveObjectives).toBeDefined();
-    expect(capturedUseBlastGameOptions.waveObjectives).toHaveLength(2);
+    expect(capturedUseBlastGameOptions.waveObjectives).toHaveLength(0);
   });
 
   it('should pass movesAllowed to useBlastGame in multiplayer mode when waveConfig provided', () => {

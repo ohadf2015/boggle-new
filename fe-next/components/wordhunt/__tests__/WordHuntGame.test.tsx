@@ -1,6 +1,7 @@
 /**
  * Tests for WordHuntGame orchestrator
  * Main component that integrates bridge hook + layout for MP WordHunt
+ * Timer display removed — life meter is the core mechanic
  */
 
 import React from 'react';
@@ -68,8 +69,6 @@ describe('WordHuntGame', () => {
   const defaultProps = {
     grid: defaultGrid,
     gameLanguage: 'en' as const,
-    remainingTime: 120,
-    totalTime: 180,
     leaderboard: [
       { username: 'alice', score: 300, wordCount: 10 },
       { username: 'bob', score: 200, wordCount: 8 },
@@ -106,10 +105,12 @@ describe('WordHuntGame', () => {
     expect(capturedLayoutProps.value!.showFeedbackOverlay).toBe(false);
   });
 
-  it('should pass score and timer to layout', () => {
-    render(<WordHuntGame {...defaultProps} score={999} remainingTime={60} />);
+  it('should pass score to layout without timer props', () => {
+    render(<WordHuntGame {...defaultProps} score={999} />);
     expect(capturedLayoutProps.value!.score).toBe(999);
-    expect(capturedLayoutProps.value!.remainingTime).toBe(60);
+    // Timer props should not be passed to layout
+    expect(capturedLayoutProps.value!.remainingTime).toBeUndefined();
+    expect(capturedLayoutProps.value!.totalTime).toBeUndefined();
   });
 
   it('should pass leaderboard and username to layout', () => {

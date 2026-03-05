@@ -97,7 +97,7 @@ export interface ResultsDetailsContentProps {
   /** Blast mode results data */
   blastResults?: { movesUsed: number; tilesCleared: number; tileBonus: number };
   /** Word Hunt mode results data */
-  wordHuntResults?: { targetWord: string; foundTarget: boolean; isFirstFinder: boolean; survivalTime: number; discoveryWords: number };
+  wordHuntResults?: { targetWord: string; foundTarget: boolean; isFirstFinder: boolean; survivalTime: number; discoveryWords: number; playerResults?: Array<{ username: string; score: number; survived: boolean; lifeRemaining: number }>; currentUsername?: string };
 }
 
 // ==============================================

@@ -33,7 +33,7 @@ import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { GameModeOption } from '@/components/GameModeSelector';
-import { useGameMode } from '@/hooks/gameState/store';
+import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers } from '@/hooks/gameState/store';
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180 }) => {
   const { t } = useLanguage();
@@ -52,6 +52,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Game mode override for host (results page lets host change mode before next game)
   const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>('random');
   const resolvedGameMode = useGameMode();
+  const wordHuntPlayerLives = useWordHuntPlayerLives();
+  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
 
   // Socket events for word feedback, XP, engagement features, and player ready state
   const {
@@ -387,6 +389,22 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentStreakCount: winStreakData?.currentStreak || 0,
     t,
     gameMode: resolvedGameMode,
+    ...(resolvedGameMode === 'word-hunt' && Object.keys(wordHuntPlayerLives).length > 0 ? {
+      wordHuntResults: {
+        targetWord: '',
+        foundTarget: false,
+        isFirstFinder: false,
+        survivalTime: 0,
+        discoveryWords: 0,
+        playerResults: sortedScores.map((p) => ({
+          username: p.username,
+          score: p.score || 0,
+          survived: !wordHuntEliminatedPlayers.includes(p.username),
+          lifeRemaining: wordHuntPlayerLives[p.username] ?? 0,
+        })),
+        currentUsername: username,
+      },
+    } : {}),
   };
 
   // Render Details Tab Content using shared component

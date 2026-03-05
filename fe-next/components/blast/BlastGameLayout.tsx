@@ -172,6 +172,7 @@ export function BlastGameLayout({
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [shakeClass, setShakeClass] = useState('');
   const [cascadeAnnouncement, setCascadeAnnouncement] = useState<string | null>(null);
+  const [showMpCelebration, setShowMpCelebration] = useState(false);
   const prevExplosionsRef = useRef(0);
   const prevCascadeRef = useRef(0);
 
@@ -223,6 +224,19 @@ export function BlastGameLayout({
     }, 2000);
     return () => clearTimeout(timer);
   }, [hintPath, onClearHint]);
+
+  // MP board-clear celebration: show briefly then auto-dismiss
+  useEffect(() => {
+    if (isMultiplayer && isComplete) {
+      setShowMpCelebration(true);
+      const timer = setTimeout(() => setShowMpCelebration(false), 2500);
+      return () => clearTimeout(timer);
+    }
+    if (!isComplete) {
+      setShowMpCelebration(false);
+    }
+    return undefined;
+  }, [isMultiplayer, isComplete]);
 
   // Combo-based grid glow color
   const comboGlow = comboLevel >= 7
@@ -536,7 +550,7 @@ export function BlastGameLayout({
           </div>
         )}
 
-        {/* Board complete celebration overlay — SP only (server controls MP end) */}
+        {/* Board complete celebration — SP: blocking overlay, MP: lightweight auto-dismiss toast */}
         <AnimatePresence>
           {!isMultiplayer && isComplete && (
             <motion.div
@@ -593,6 +607,31 @@ export function BlastGameLayout({
                   {score.toLocaleString()} {t('common.points') || 'pts'}
                 </motion.div>
               </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* MP board-clear toast — non-blocking, auto-dismisses */}
+        <AnimatePresence>
+          {isMultiplayer && showMpCelebration && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.8 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            >
+              <div className={cn(
+                'px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
+                'bg-gradient-to-r from-neo-lime via-yellow-300 to-neo-orange',
+                'flex items-center gap-2'
+              )}>
+                <Star className="h-5 w-5 text-neo-black fill-neo-orange" />
+                <span className="font-black text-lg uppercase text-neo-black">
+                  {t('blast.complete') || 'Board Cleared!'}
+                </span>
+                <Star className="h-5 w-5 text-neo-black fill-neo-orange" />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

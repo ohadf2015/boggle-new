@@ -39,7 +39,6 @@ export function validateBlastResult(body: Record<string, unknown>): ValidationRe
 
   if (score < 0) return { valid: false, error: 'Invalid score: must be non-negative' };
   if (tilesCleared < 0 || totalTiles < 0) return { valid: false, error: 'Invalid tile counts: must be non-negative' };
-  if (tilesCleared > totalTiles) return { valid: false, error: 'Invalid tilesCleared: cannot exceed totalTiles' };
 
   if (stars < 1 || stars > 3) return { valid: false, error: 'Invalid stars: must be between 1 and 3' };
 

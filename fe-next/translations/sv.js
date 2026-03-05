@@ -2149,8 +2149,10 @@ const sv = {
       "checkEmail": "Kolla din e-post efter en inloggningslänk!",
       "usePassword": "Använd lösenord istället",
       "useMagicLink": "Använd magisk länk",
-      "divider": "eller fortsätt med e-post"
+      "divider": "eller fortsätt med e-post",
+      "noPassword": "Inget lösenord behövs"
     },
+    "trustBadge": "Säker & privat",
     "callback": {
       "completingSignIn": "Slutför inloggning...",
       "takingTooLong": "Det tar längre tid än väntat. Försök igen?",
@@ -3610,6 +3612,8 @@ const sv = {
       "rank": "Rank"
     },
     "results": {
+      "survivors": "Överlevande",
+      "eliminated": "Eliminerade",
       "gameOver": "Spelet är slut",
       "tapToCelebrate": "Tryck för att fira!",
       "targetWord": "Målordet",

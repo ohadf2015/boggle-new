@@ -276,8 +276,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           <WordHuntGame
             grid={effectiveGrid}
             gameLanguage={gameLanguage}
-            remainingTime={remainingTime ?? 0}
-            totalTime={totalTime ?? 180}
             leaderboard={leaderboard}
             username={username}
             score={leaderboard.find(p => p.username === username)?.score ?? 0}

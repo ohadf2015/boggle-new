@@ -33,17 +33,23 @@ jest.mock('../gameEnd', () => ({
 
 jest.mock('../../../modules/wordHuntManager', () => ({
   drainLife: jest.fn(),
+  areAllPlayersEliminated: jest.fn(),
 }));
 
 import { getGame, updateGame } from '../../../modules/gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../../../utils/socketHelpers';
-import { drainLife } from '../../../modules/wordHuntManager';
+import { clearGameTimer } from '../../../utils/timerManager';
+import { drainLife, areAllPlayersEliminated } from '../../../modules/wordHuntManager';
+import { endGame } from '../gameEnd';
 import { startGameTimer } from '../gameTimer';
 
 const mockGetGame = getGame as jest.Mock;
 const mockUpdateGame = updateGame as jest.Mock;
 const mockBroadcastToRoom = broadcastToRoom as jest.Mock;
 const mockDrainLife = drainLife as jest.Mock;
+const mockAreAllPlayersEliminated = areAllPlayersEliminated as jest.Mock;
+const mockClearGameTimer = clearGameTimer as jest.Mock;
+const mockEndGame = endGame as jest.Mock;
 
 describe('gameTimer word hunt life drain', () => {
   let mockIo: any;
@@ -173,5 +179,71 @@ describe('gameTimer word hunt life drain', () => {
     jest.advanceTimersByTime(1000);
 
     expect(mockDrainLife).not.toHaveBeenCalled();
+  });
+
+  it('should end game early when all word-hunt players are eliminated', () => {
+    const huntState = {
+      targetWord: 'hello',
+      targetWordLength: 5,
+      playerLives: { alice: 2, bob: 2 },
+      eliminatedPlayers: [],
+      targetFoundBy: null,
+      isFirstFinderClaimed: false,
+    };
+
+    mockGetGame.mockReturnValue({
+      gameState: 'in-progress',
+      gameMode: 'word-hunt',
+      wordHuntState: huntState,
+      letterGrid: [['A']],
+      language: 'en',
+      gameSessionId: 'sess-1',
+    });
+
+    mockDrainLife.mockReturnValue({
+      updatedLives: { alice: 0, bob: 0 },
+      newlyEliminated: ['alice', 'bob'],
+    });
+
+    mockAreAllPlayersEliminated.mockReturnValue(true);
+
+    startGameTimer(mockIo, 'HUNT01', 60);
+    jest.advanceTimersByTime(1000);
+
+    expect(mockClearGameTimer).toHaveBeenCalledWith('HUNT01');
+    expect(mockEndGame).toHaveBeenCalledWith(mockIo, 'HUNT01');
+  });
+
+  it('should NOT end game early when some word-hunt players are still alive', () => {
+    const huntState = {
+      targetWord: 'hello',
+      targetWordLength: 5,
+      playerLives: { alice: 100, bob: 2 },
+      eliminatedPlayers: [],
+      targetFoundBy: null,
+      isFirstFinderClaimed: false,
+    };
+
+    mockGetGame.mockReturnValue({
+      gameState: 'in-progress',
+      gameMode: 'word-hunt',
+      wordHuntState: huntState,
+      letterGrid: [['A']],
+      language: 'en',
+      gameSessionId: 'sess-1',
+    });
+
+    mockDrainLife.mockReturnValue({
+      updatedLives: { alice: 98, bob: 0 },
+      newlyEliminated: ['bob'],
+    });
+
+    mockAreAllPlayersEliminated.mockReturnValue(false);
+
+    startGameTimer(mockIo, 'HUNT01', 60);
+    jest.advanceTimersByTime(1000);
+
+    // endGame should NOT have been called (only clearGameTimer from init is ok)
+    expect(mockEndGame).not.toHaveBeenCalled();
   });
 });

@@ -56,6 +56,7 @@ export {
   useWordHuntPlayerLives,
   useWordHuntTargetAttempts,
   useWordHuntTargetFound,
+  useWordHuntEliminatedPlayers,
   useBlastTileOverlay,
   useBlastMovesUsed,
   useBlastSeed,

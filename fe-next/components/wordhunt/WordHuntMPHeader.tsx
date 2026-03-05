@@ -2,31 +2,22 @@
 
 import React, { memo } from 'react';
 import { X } from 'lucide-react';
-import CircularTimer from '@/components/CircularTimer';
 
 export interface WordHuntMPHeaderProps {
-  remainingTime: number;
-  totalTime: number;
   score: number;
   onQuit: () => void;
   t: (key: string) => string;
 }
 
 export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
-  remainingTime,
-  totalTime,
   score,
   onQuit,
   t,
 }) => {
   return (
     <div className="flex items-center justify-between px-3 py-2 gap-2">
-      {/* Timer */}
-      <CircularTimer
-        remainingTime={remainingTime ?? 0}
-        totalTime={totalTime}
-        size="sm"
-      />
+      {/* Spacer for layout balance */}
+      <div className="w-10" />
 
       {/* Score Badge */}
       <div className="flex-1 flex justify-center">

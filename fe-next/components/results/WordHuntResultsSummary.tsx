@@ -1,7 +1,14 @@
 'use client';
 
-import { Heart, Clock, BookOpen } from 'lucide-react';
+import { Heart, Clock, BookOpen, Skull, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+export interface WordHuntPlayerResult {
+  username: string;
+  score: number;
+  survived: boolean;
+  lifeRemaining: number;
+}
 
 interface WordHuntResultsSummaryProps {
   targetWord: string;
@@ -9,6 +16,8 @@ interface WordHuntResultsSummaryProps {
   isFirstFinder: boolean;
   survivalTime: number;
   discoveryWords: number;
+  playerResults?: WordHuntPlayerResult[];
+  currentUsername?: string;
 }
 
 export default function WordHuntResultsSummary({
@@ -17,8 +26,17 @@ export default function WordHuntResultsSummary({
   isFirstFinder,
   survivalTime,
   discoveryWords,
+  playerResults,
+  currentUsername,
 }: WordHuntResultsSummaryProps) {
   const { t } = useLanguage();
+
+  const survivors = playerResults
+    ?.filter((p) => p.survived)
+    .sort((a, b) => b.score - a.score);
+  const eliminated = playerResults
+    ?.filter((p) => !p.survived)
+    .sort((a, b) => b.score - a.score);
 
   return (
     <div className="space-y-3">
@@ -64,6 +82,103 @@ export default function WordHuntResultsSummary({
             <span className="text-xs text-neo-cream/70">{t('wordHunt.multiplayer.discoveryWords')}</span>
           </div>
         </div>
+      </div>
+
+      {/* Survivors section */}
+      {survivors && survivors.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-green-400" />
+            <span className="text-sm font-bold text-green-400 font-neo-display">
+              {t('wordHunt.results.survivors')}
+            </span>
+          </div>
+          <div className="space-y-1">
+            {survivors.map((player) => (
+              <PlayerRow
+                key={player.username}
+                player={player}
+                isCurrentUser={player.username === currentUsername}
+                variant="survivor"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Eliminated section */}
+      {eliminated && eliminated.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Skull className="w-4 h-4 text-red-400" />
+            <span className="text-sm font-bold text-red-400 font-neo-display">
+              {t('wordHunt.results.eliminated')}
+            </span>
+          </div>
+          <div className="space-y-1">
+            {eliminated.map((player) => (
+              <PlayerRow
+                key={player.username}
+                player={player}
+                isCurrentUser={player.username === currentUsername}
+                variant="eliminated"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PlayerRow({
+  player,
+  isCurrentUser,
+  variant,
+}: {
+  player: WordHuntPlayerResult;
+  isCurrentUser: boolean;
+  variant: 'survivor' | 'eliminated';
+}) {
+  const isSurvivor = variant === 'survivor';
+
+  return (
+    <div
+      data-testid={`player-row-${player.username}`}
+      className={`flex items-center justify-between p-2 rounded-neo border-3 border-neo-black shadow-hard-sm ${
+        isCurrentUser
+          ? 'bg-neo-yellow/20 border-neo-yellow'
+          : isSurvivor
+          ? 'bg-green-900/30'
+          : 'bg-red-900/20 opacity-70'
+      }`}
+    >
+      <div className="flex items-center gap-2 min-w-0">
+        {!isSurvivor && <Skull className="w-4 h-4 text-red-400 flex-shrink-0" />}
+        <span
+          className={`text-sm font-bold truncate ${
+            isCurrentUser ? 'text-neo-yellow' : 'text-neo-white'
+          }`}
+        >
+          {player.username}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 flex-shrink-0">
+        {isSurvivor && (
+          <div
+            role="progressbar"
+            aria-valuenow={player.lifeRemaining}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            className="w-16 h-2 bg-neo-black/50 rounded-full overflow-hidden"
+          >
+            <div
+              className="h-full bg-green-400 rounded-full"
+              style={{ width: `${player.lifeRemaining}%` }}
+            />
+          </div>
+        )}
+        <span className="text-sm font-bold text-neo-white">{player.score}</span>
       </div>
     </div>
   );

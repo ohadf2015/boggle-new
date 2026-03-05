@@ -339,6 +339,23 @@ describe('BlastGame mode=multiplayer', () => {
     expect(capturedLayoutProps.value.onClearHint).toBeUndefined();
   });
 
+  it('should pass empty objectiveTileTypes even at higher wave numbers in MP', () => {
+    // Wave 2+ has collect_type objectives in SP which populate objectiveTileTypes.
+    // In MP, these should be suppressed.
+    render(
+      <BlastGame
+        config={baseConfig}
+        mode="multiplayer"
+        waveNumber={3}
+        onGameEnd={jest.fn()}
+        onQuit={jest.fn()}
+      />
+    );
+
+    expect(capturedLayoutProps.value.objectiveTileTypes.size).toBe(0);
+    expect(capturedLayoutProps.value.objectiveProgress).toEqual([]);
+  });
+
   it('should pass hint props in singleplayer mode', () => {
     render(
       <BlastGame

@@ -7,9 +7,13 @@
 import { useMemo } from 'react';
 import { useBlastTileOverlay, useBlastSeed, useGameLanguage } from '@/hooks/gameState/store';
 import type { BlastTileOverlay, LetterGrid } from '@/shared/types/game';
-import type { BlastTileState } from '@/shared/types/blast';
+import type { BlastTileState, BlastTileType } from '@/shared/types/blast';
 import type { BlastGameConfig } from '../types';
 import { getInitialHitsRemaining } from '../utils/blastTileUtils';
+import { createSeededRandom } from '../utils/blastLetterGenerator';
+
+/** Valid inner types for frozen tiles in multiplayer — matches SP candidates */
+const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
 
 interface UseBlastMultiplayerBridgeOptions {
   letterGrid: LetterGrid | null;
@@ -29,6 +33,7 @@ interface UseBlastMultiplayerBridgeReturn {
 function overlayToTileStates(
   overlay: BlastTileOverlay[],
   gridSize: number,
+  seed: number | null,
 ): BlastTileState[][] {
   // Build lookup for O(1) access
   const lookup = new Map<string, BlastTileOverlay>();
@@ -36,12 +41,22 @@ function overlayToTileStates(
     lookup.set(`${tile.row}-${tile.col}`, tile);
   }
 
+  // Seeded RNG for deterministic frozen innerType across all players
+  const random = createSeededRandom(seed ?? 0);
+
   const states: BlastTileState[][] = [];
   for (let row = 0; row < gridSize; row++) {
     states[row] = [];
     for (let col = 0; col < gridSize; col++) {
       const entry = lookup.get(`${row}-${col}`);
       const type = entry?.type ?? 'standard';
+
+      // Frozen tiles get a hidden special innerType (revealed on second hit)
+      const innerType: BlastTileType | undefined =
+        type === 'frozen'
+          ? FROST_INNER_CANDIDATES[Math.floor(random() * FROST_INNER_CANDIDATES.length)]
+          : undefined;
+
       states[row][col] = {
         row,
         col,
@@ -49,6 +64,7 @@ function overlayToTileStates(
         isCleared: false,
         activationEffect: null,
         hitsRemaining: getInitialHitsRemaining(type),
+        ...(innerType !== undefined ? { innerType } : {}),
       };
     }
   }
@@ -72,8 +88,8 @@ export function useBlastMultiplayerBridge({
 
   const initialTileStates = useMemo(() => {
     if (!letterGrid) return null;
-    return overlayToTileStates(blastTileOverlay, gridSize);
-  }, [blastTileOverlay, gridSize, letterGrid]);
+    return overlayToTileStates(blastTileOverlay, gridSize, blastSeed);
+  }, [blastTileOverlay, gridSize, letterGrid, blastSeed]);
 
   return { config, initialTileStates, blastSeed };
 }

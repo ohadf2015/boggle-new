@@ -154,6 +154,14 @@ export function restoreLife(
 }
 
 /**
+ * Check if all players in the game have been eliminated.
+ */
+export function areAllPlayersEliminated(state: WordHuntModeState): boolean {
+  const allPlayers = Object.keys(state.playerLives);
+  return allPlayers.length > 0 && allPlayers.every(p => state.eliminatedPlayers.includes(p));
+}
+
+/**
  * Subtract HUNT_WRONG_GUESS_PENALTY from player's life.
  * If life drops to 0 or below, add to eliminated.
  */

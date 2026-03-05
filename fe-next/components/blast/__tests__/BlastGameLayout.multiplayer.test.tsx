@@ -3,7 +3,7 @@
  * Verifies MP UI (timer, leaderboard, hidden SP controls).
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 
 // ---------------------------------------------------------------------------
 // Mocks (same pattern as BlastGameLayout.hint.test.tsx)
@@ -333,7 +333,7 @@ describe('BlastGameLayout multiplayer mode', () => {
     expect(screen.getByText('blast.shuffle')).toBeInTheDocument();
   });
 
-  it('hides board-complete overlay in multiplayer mode', () => {
+  it('shows lightweight board-clear celebration in multiplayer mode', () => {
     const completeState = { ...defaultGameState, isComplete: true };
     render(
       <BlastGameLayout
@@ -342,8 +342,44 @@ describe('BlastGameLayout multiplayer mode', () => {
         gameState={completeState}
       />,
     );
-    // The "Board Cleared!" text should NOT appear in MP
+    // MP should show "Board Cleared!" text (lightweight toast, not blocking overlay)
+    expect(screen.getByText('blast.complete')).toBeInTheDocument();
+  });
+
+  it('MP board-clear celebration does NOT have blocking backdrop', () => {
+    const completeState = { ...defaultGameState, isComplete: true };
+    const { container } = render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={true}
+        gameState={completeState}
+      />,
+    );
+    // The blocking overlay has backdrop-blur-sm class; MP celebration should not
+    const backdropElements = container.querySelectorAll('.backdrop-blur-sm');
+    expect(backdropElements.length).toBe(0);
+  });
+
+  it('MP board-clear celebration auto-dismisses after timeout', () => {
+    jest.useFakeTimers();
+    const completeState = { ...defaultGameState, isComplete: true };
+    render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={true}
+        gameState={completeState}
+      />,
+    );
+    // Initially visible
+    expect(screen.getByText('blast.complete')).toBeInTheDocument();
+
+    // After 3 seconds, should auto-dismiss (timer is 2500ms)
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
     expect(screen.queryByText('blast.complete')).not.toBeInTheDocument();
+
+    jest.useRealTimers();
   });
 
   it('shows board-complete overlay in singleplayer mode when complete', () => {
@@ -357,5 +393,19 @@ describe('BlastGameLayout multiplayer mode', () => {
     );
     // The "Board Cleared!" text SHOULD appear in SP
     expect(screen.getByText('blast.complete')).toBeInTheDocument();
+  });
+
+  it('SP board-complete overlay HAS blocking backdrop', () => {
+    const completeState = { ...defaultGameState, isComplete: true };
+    const { container } = render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={false}
+        gameState={completeState}
+      />,
+    );
+    // SP overlay has the blocking backdrop-blur-sm class
+    const backdropElements = container.querySelectorAll('.backdrop-blur-sm');
+    expect(backdropElements.length).toBeGreaterThan(0);
   });
 });

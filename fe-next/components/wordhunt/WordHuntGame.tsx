@@ -17,8 +17,6 @@ export interface LeaderboardEntry {
 export interface WordHuntGameProps {
   grid: LetterGrid;
   gameLanguage: Language | null;
-  remainingTime: number | null;
-  totalTime: number;
   leaderboard: LeaderboardEntry[];
   username: string;
   score: number;
@@ -32,8 +30,6 @@ export interface WordHuntGameProps {
 export const WordHuntGame = memo<WordHuntGameProps>(({
   grid,
   gameLanguage,
-  remainingTime,
-  totalTime,
   leaderboard,
   username,
   score,
@@ -102,9 +98,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
 
   return (
     <WordHuntGameLayout
-      // Header
-      remainingTime={remainingTime ?? 0}
-      totalTime={totalTime}
+      // Header (no timer)
       score={score}
       onQuit={onQuit}
 

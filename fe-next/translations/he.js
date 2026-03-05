@@ -2161,8 +2161,10 @@ const he = {
       "checkEmail": "בדקו את האימייל - שלחנו קישור להתחברות!",
       "usePassword": "השתמשו בסיסמה במקום",
       "useMagicLink": "קישור קסם",
-      "divider": "או המשיכו עם אימייל"
+      "divider": "או המשיכו עם אימייל",
+      "noPassword": "לא צריך סיסמה"
     },
+    "trustBadge": "מאובטח ופרטי",
     "callback": {
       "completingSignIn": "משלים התחברות...",
       "takingTooLong": "זה לוקח יותר זמן מהצפוי. לנסות שוב?",
@@ -3614,6 +3616,8 @@ const he = {
       "rank": "דירוג"
     },
     "results": {
+      "survivors": "שורדים",
+      "eliminated": "הודחו",
       "gameOver": "גמר המשחק",
       "tapToCelebrate": "לחץ לחגוג!",
       "targetWord": "מילת היעד",

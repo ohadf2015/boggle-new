@@ -433,6 +433,7 @@ module.exports = {
   getSocketIdByUsername,
   getUserBySocketId,
   updateUserSocketId,
+  updateUsernameMapping,
   getGameUsers,
 
   // Host management
