@@ -43,7 +43,6 @@ const LOCALIZED_STRINGS: Record<string, {
   teaser: string;
   question: string;
   cta: string;
-  streakMessage: string;
   footerReason: string;
   socialProof: string;
 }> = {
@@ -52,7 +51,6 @@ const LOCALIZED_STRINGS: Record<string, {
     teaser: "Today's word starts with...",
     question: 'Can you figure it out?',
     cta: 'REVEAL THE WORD',
-    streakMessage: 'Start a new streak today!',
     footerReason: 'You subscribed to daily challenges.',
     socialProof: 'Join thousands of word hunters playing daily',
   },
@@ -61,7 +59,6 @@ const LOCALIZED_STRINGS: Record<string, {
     teaser: '...המילה של היום מתחילה ב',
     question: '?תצליח/י לגלות',
     cta: 'גלו את המילה',
-    streakMessage: '!התחילו רצף חדש היום',
     footerReason: '.נרשמת לאתגר היומי',
     socialProof: '🌍 הצטרפו לאלפי שחקנים שמשחקים כל יום',
   },
@@ -70,7 +67,6 @@ const LOCALIZED_STRINGS: Record<string, {
     teaser: 'Dagens ord börjar med...',
     question: 'Kan du lista ut det?',
     cta: 'AVSLÖJA ORDET',
-    streakMessage: 'Starta en ny svit idag!',
     footerReason: 'Du prenumererar på dagliga utmaningar.',
     socialProof: 'Tusentals ordspelare spelar varje dag',
   },
@@ -79,7 +75,6 @@ const LOCALIZED_STRINGS: Record<string, {
     teaser: '今日の単語の最初の文字は...',
     question: 'わかりますか？',
     cta: '単語を確認する',
-    streakMessage: '今日から新しい連続記録を始めましょう！',
     footerReason: 'デイリーチャレンジに登録しています。',
     socialProof: '毎日何千人ものワードハンターがプレイ中',
   },
@@ -88,7 +83,6 @@ const LOCALIZED_STRINGS: Record<string, {
     teaser: 'La palabra de hoy empieza con...',
     question: '¿Puedes adivinarla?',
     cta: 'DESCUBRE LA PALABRA',
-    streakMessage: '¡Empieza una nueva racha hoy!',
     footerReason: 'Te suscribiste al desafío diario.',
     socialProof: 'Miles de cazadores de palabras juegan a diario',
   },
@@ -144,12 +138,6 @@ interface EmailTemplateParams {
   unsubscribeUrl: string;
   playUrl: string;
   baseUrl: string;
-}
-
-/** Pick the right logo based on language */
-function getLogoUrl(baseUrl: string, language: string): string {
-  if (language === 'he') return `${baseUrl}/logos/lexiclash_logo_hebrew-min.webp`;
-  return `${baseUrl}/logos/lexiclash_logo_english-min.webp`;
 }
 
 /** Get the mascot image URL — waving mascot for re-engagement */
@@ -357,7 +345,6 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
   const strings = LOCALIZED_STRINGS[language] || LOCALIZED_STRINGS['en'];
   const isRTL = language === 'he';
   const dir = isRTL ? 'rtl' : 'ltr';
-  const logoUrl = getLogoUrl(baseUrl, language);
   const mascotUrl = getMascotUrl(baseUrl);
   const subject = getReengagementSubject(language, firstLetter, recipientName);
   const currentYear = new Date().getFullYear();
@@ -424,8 +411,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
           <!-- Logo -->
           <tr>
             <td align="center" style="padding-bottom: 24px;">
-              <a href="${baseUrl}" target="_blank" style="text-decoration: none;">
-                <img src="${logoUrl}" alt="LexiClash" width="160" style="display: block; max-width: 160px; height: auto;" />
+              <a href="${baseUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                <span style="font-family: 'Fredoka', Arial, sans-serif; font-size: 28px; font-weight: 700; color: ${colors.white}; letter-spacing: 1px;">Lexi<span style="color: ${colors.lime};">Clash</span></span>
               </a>
             </td>
           </tr>
@@ -545,9 +532,11 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: inline-block; background: linear-gradient(180deg, ${colors.lime} 0%, #a3e635 50%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 56px; border: 4px solid ${colors.black}; border-radius: 16px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}, 0 0 28px rgba(191,255,0,0.25); letter-spacing: 1.5px; font-family: 'Fredoka', Arial, sans-serif; transition: transform 0.15s ease, box-shadow 0.15s ease;">
-                            &#9654;&nbsp;&nbsp;${strings.cta}
-                          </a>
+                          <div style="display: inline-block; background: linear-gradient(135deg, ${colors.pink}, ${colors.purple}, ${colors.cyan}, ${colors.lime}); padding: 4px; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}, 0 0 32px rgba(191,255,0,0.3), 0 0 64px rgba(139,92,246,0.15);">
+                            <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: block; background: linear-gradient(180deg, ${colors.lime} 0%, #a3e635 50%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 22px; font-weight: 700; text-decoration: none; padding: 20px 60px; border: 3px solid ${colors.black}; border-radius: 16px; letter-spacing: 2px; font-family: 'Fredoka', Arial, sans-serif; transition: transform 0.15s ease, box-shadow 0.15s ease; text-transform: uppercase;">
+                              &#9654;&nbsp;&nbsp;${strings.cta}
+                            </a>
+                          </div>
                           <!--<![endif]-->
                         </td>
                       </tr>

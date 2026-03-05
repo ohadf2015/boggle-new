@@ -264,7 +264,7 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('alt="Lexi"');
   });
 
-  test('should use English logo for non-Hebrew languages', () => {
+  test('should use text-based logo with LexiClash branding', () => {
     const { html } = generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
@@ -274,7 +274,8 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/logos/lexiclash_logo_english-min.webp');
+    expect(html).toContain('Lexi');
+    expect(html).toContain('Clash');
   });
 
   test('should include speech bubble and mini mystery tiles', () => {
@@ -297,7 +298,7 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('mascot-glow');
   });
 
-  test('should use Hebrew logo for Hebrew language', () => {
+  test('should use text-based logo for Hebrew language too', () => {
     const { html } = generateReengagementEmailHtml({
       recipientName: 'יוסי',
       firstLetter: 'ש',
@@ -307,7 +308,8 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/logos/lexiclash_logo_hebrew-min.webp');
+    expect(html).toContain('Lexi');
+    expect(html).toContain('Clash');
   });
 
   test('should generate Hebrew template with RTL direction and flipped shadows', () => {
