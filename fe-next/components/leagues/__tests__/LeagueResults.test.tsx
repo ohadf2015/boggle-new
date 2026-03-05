@@ -20,9 +20,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 jest.mock('@/components/motion/AdaptiveMotion', () => ({
-  AdaptiveMotion: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-    <div data-testid="adaptive-motion" {...props}>{children}</div>
-  ),
+  AdaptiveMotion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <div data-testid="adaptive-motion" {...props}>{children}</div>
+    ),
+  },
 }));
 
 import { LeagueResults } from '../LeagueResults';

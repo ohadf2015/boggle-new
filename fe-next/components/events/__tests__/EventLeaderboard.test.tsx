@@ -28,9 +28,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 jest.mock('@/components/motion/AdaptiveMotion', () => ({
-  AdaptiveMotion: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
-    <div data-testid="adaptive-motion" {...props}>{children}</div>
-  ),
+  AdaptiveMotion: {
+    div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
+      <div data-testid="adaptive-motion" {...props}>{children}</div>
+    ),
+  },
   AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
