@@ -148,8 +148,8 @@ interface EmailTemplateParams {
 
 /** Pick the right logo based on language */
 function getLogoUrl(baseUrl: string, language: string): string {
-  if (language === 'he') return `${baseUrl}/logos/lexiclash_logo_hebrew-min.png`;
-  return `${baseUrl}/logos/lexiclash_logo_english-min.png`;
+  if (language === 'he') return `${baseUrl}/logos/lexiclash_logo_hebrew-min.webp`;
+  return `${baseUrl}/logos/lexiclash_logo_english-min.webp`;
 }
 
 /** Get the mascot image URL — waving mascot for re-engagement */
@@ -514,10 +514,10 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     </table>
 
                     <!-- Mystery word blanks -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 6px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 6px;" dir="${dir}">
                       <tr>
                         <td align="center">
-                          <table role="presentation" cellpadding="0" cellspacing="0">
+                          <table role="presentation" cellpadding="0" cellspacing="0" dir="${dir}">
                             <tr>
                               <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px;">&nbsp;</span></td>
                               <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px; opacity: 0.7;">&nbsp;</span></td>
@@ -539,44 +539,16 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       <tr>
                         <td align="center">
                           <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:56px;v-text-anchor:middle;width:280px;" arcsize="14%" stroke="t" strokecolor="${colors.black}" strokeweight="3px" fillcolor="${colors.lime}">
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:62px;v-text-anchor:middle;width:320px;" arcsize="14%" stroke="t" strokecolor="${colors.black}" strokeweight="4px" fillcolor="${colors.lime}">
                             <w:anchorlock/>
-                            <center style="color:${colors.black};font-family:Arial,sans-serif;font-size:18px;font-weight:bold;">${strings.cta}</center>
+                            <center style="color:${colors.black};font-family:Arial,sans-serif;font-size:20px;font-weight:bold;">&#9654; ${strings.cta}</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: inline-block; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 18px; font-weight: 700; text-decoration: none; padding: 16px 52px; border: 3px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; letter-spacing: 1px;">
-                            ${strings.cta}
+                          <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: inline-block; background: linear-gradient(180deg, ${colors.lime} 0%, #a3e635 50%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 56px; border: 4px solid ${colors.black}; border-radius: 16px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}, 0 0 28px rgba(191,255,0,0.25); letter-spacing: 1.5px; font-family: 'Fredoka', Arial, sans-serif; transition: transform 0.15s ease, box-shadow 0.15s ease;">
+                            &#9654;&nbsp;&nbsp;${strings.cta}
                           </a>
                           <!--<![endif]-->
-                        </td>
-                      </tr>
-                    </table>
-
-                    <!-- Streak Encouragement -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 28px;">
-                      <tr>
-                        <td>
-                          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(${isRTL ? '270deg' : '90deg'}, rgba(255, 107, 53, 0.15) 0%, rgba(255, 107, 53, 0.03) 100%); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 12px; padding: 0;">
-                            <tr>
-                              <!-- Accent bar -->
-                              <td width="5" style="background-color: ${colors.orange}; border-radius: ${isRTL ? '0 12px 12px 0' : '12px 0 0 12px'}; font-size: 0;">&nbsp;</td>
-                              <td style="padding: 14px 16px;">
-                                <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
-                                  <tr>
-                                    <td width="36" valign="middle" style="text-align: center;">
-                                      <span style="font-size: 24px; line-height: 1;">&#128293;</span>
-                                    </td>
-                                    <td valign="middle" style="text-align: ${isRTL ? 'right' : 'left'}; padding-${isRTL ? 'right' : 'left'}: 8px;">
-                                      <span style="color: ${colors.orange}; font-size: 15px; font-weight: 600; line-height: 1.4;">
-                                        ${strings.streakMessage}
-                                      </span>
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
-                          </table>
                         </td>
                       </tr>
                     </table>
@@ -654,9 +626,7 @@ ${strings.teaser}
 ${strings.question}
 ════════════════════════════════
 
-▶▶▶ ${strings.cta}: ${playUrl}
-
-🔥 ${strings.streakMessage}
+▶ ${strings.cta}: ${playUrl}
 
 ---
 
@@ -787,7 +757,7 @@ export async function sendTestReengagementEmail(
     recipientName,
     firstLetter,
     language,
-    unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=test-token-preview`,
+    unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=${'0'.repeat(64)}`,
     playUrl: `${baseUrl}/${locale}/daily`,
     baseUrl,
   });

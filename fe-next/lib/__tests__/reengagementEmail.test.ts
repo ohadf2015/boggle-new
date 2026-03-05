@@ -274,7 +274,7 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/logos/lexiclash_logo_english-min.png');
+    expect(html).toContain('/logos/lexiclash_logo_english-min.webp');
   });
 
   test('should include speech bubble and mini mystery tiles', () => {
@@ -307,7 +307,7 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/logos/lexiclash_logo_hebrew-min.png');
+    expect(html).toContain('/logos/lexiclash_logo_hebrew-min.webp');
   });
 
   test('should generate Hebrew template with RTL direction and flipped shadows', () => {

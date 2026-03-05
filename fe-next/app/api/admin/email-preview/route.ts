@@ -16,7 +16,7 @@ export async function GET() {
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   const puzzleNumber = Math.max(1, diffDays + 1);
 
-  const logoUrl = `${baseUrl}/logos/lexiclash_logo_english-min.png`;
+  const logoUrl = `${baseUrl}/logos/lexiclash_logo_english-min.webp`;
 
   // Neo-brutalist color palette (aligned with design system)
   const colors = {

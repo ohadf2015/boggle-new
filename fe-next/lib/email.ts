@@ -240,7 +240,7 @@ function generateDailyChallengeEmail(
   _language: string = 'en'
 ): { subject: string; html: string; text: string } {
   const subject = getSubjectLine(puzzleNumber);
-  const logoUrl = `${baseUrl}/logos/lexiclash_logo_english-min.png`;
+  const logoUrl = `${baseUrl}/logos/lexiclash_logo_english-min.webp`;
   const colors = EMAIL_COLORS;
 
   const html = `
