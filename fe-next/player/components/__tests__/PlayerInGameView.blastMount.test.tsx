@@ -5,7 +5,6 @@
  * instead of InGameScreen when the game mode is 'blast'.
  */
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // ---------------------------------------------------------------------------
@@ -160,21 +159,13 @@ describe('PlayerInGameView blast mode mounting', () => {
     expect(screen.queryByTestId('blast-game')).not.toBeInTheDocument();
   });
 
-  it('should render BlastMoveCounter in blast mode', () => {
+  it('should not render BlastMoveCounter directly (moved to BlastGameLayout)', () => {
     mockGameMode.value = 'blast';
     mockBlastMovesUsed.value = 7;
 
     render(<PlayerInGameView {...baseProps} />);
 
-    expect(screen.getByTestId('blast-move-counter')).toBeInTheDocument();
-    expect(screen.getByTestId('blast-move-counter')).toHaveTextContent('7');
-  });
-
-  it('should NOT render BlastMoveCounter in non-blast mode', () => {
-    mockGameMode.value = 'classic';
-
-    render(<PlayerInGameView {...baseProps} />);
-
+    // BlastMoveCounter is now rendered inside BlastGameLayout, not PlayerInGameView
     expect(screen.queryByTestId('blast-move-counter')).not.toBeInTheDocument();
   });
 });
