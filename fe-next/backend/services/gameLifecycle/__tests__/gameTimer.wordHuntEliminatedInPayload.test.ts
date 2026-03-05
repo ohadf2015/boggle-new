@@ -34,6 +34,7 @@ jest.mock('../gameEnd', () => ({
 
 jest.mock('../../../modules/wordHuntManager', () => ({
   drainLife: jest.fn(),
+  areAllPlayersEliminated: jest.fn().mockReturnValue(false),
 }));
 
 import { getGame } from '../../../modules/gameStateManager';

@@ -4,30 +4,28 @@
  * Displays accumulated scores, positions, and session stats
  * across multiple multiplayer games in a row.
  */
-import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SeriesStandingsBanner from '../SeriesStandingsBanner';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 
-// Mock framer-motion
-const MockDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
-  <div ref={ref} {...props}>{children}</div>
-));
-MockDiv.displayName = 'MockMotionDiv';
-
-const MockSpan = React.forwardRef(({ children, ...props }: any, ref: any) => (
-  <span ref={ref} {...props}>{children}</span>
-));
-MockSpan.displayName = 'MockMotionSpan';
-
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: MockDiv,
-    span: MockSpan,
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
+// Mock framer-motion — components must be defined inside the factory to avoid
+// Jest hoisting the jest.mock() call above the const declarations (TDZ error).
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const MockDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <div ref={ref} {...props}>{children}</div>
+  ));
+  MockDiv.displayName = 'MockMotionDiv';
+  const MockSpan = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <span ref={ref} {...props}>{children}</span>
+  ));
+  MockSpan.displayName = 'MockMotionSpan';
+  return {
+    motion: { div: MockDiv, span: MockSpan },
+    AnimatePresence: ({ children }: any) => React.createElement(React.Fragment, null, children),
+  };
+});
 
 const mockT = (key: string, params?: Record<string, string | number>) => {
   const translations: Record<string, string> = {
