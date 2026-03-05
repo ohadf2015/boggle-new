@@ -76,7 +76,7 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
             const Icon = positionIcons[index] ?? null;
 
             return (
-              <AdaptiveMotion
+              <AdaptiveMotion.div
                 key={p.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}

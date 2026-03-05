@@ -30,7 +30,7 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <AdaptiveMotion
+      <AdaptiveMotion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="border-3 border-black rounded-neo shadow-hard-lg bg-neo-navy p-6 max-w-sm w-full mx-4"

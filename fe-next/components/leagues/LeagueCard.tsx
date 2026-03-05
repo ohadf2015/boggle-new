@@ -42,7 +42,7 @@ export function LeagueCard({ tier, myPosition, myXp, topStandings }: LeagueCardP
   const tierKey = `league.${tier}` as const;
 
   return (
-    <AdaptiveMotion
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`border-3 border-black rounded-neo shadow-hard-sm ${TIER_BG[tier]} p-4`}

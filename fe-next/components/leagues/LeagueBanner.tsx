@@ -33,7 +33,7 @@ export function LeagueBanner({ standings, myUserId, tier }: LeagueBannerProps) {
           {standings.map((s) => {
             const isMe = s.userId === myUserId;
             return (
-              <AdaptiveMotion
+              <AdaptiveMotion.div
                 key={s.userId}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
