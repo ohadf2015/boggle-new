@@ -1466,6 +1466,11 @@ const en = {
       "comeback": "Climbed {positions} positions!",
       "rivalry": "Only {diff} pts apart!",
       "bigRound": "{score} pts in round {round}!"
+    },
+    "series": {
+      "title": "Session Standings",
+      "gameCount": "Game {count}",
+      "round": "R{num}"
     }
   },
   "nextStep": {

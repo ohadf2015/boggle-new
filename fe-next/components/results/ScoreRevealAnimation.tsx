@@ -6,6 +6,7 @@ import { Crown, Medal, Star, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { fireRankConfetti } from '@/utils/confettiUtils';
 import Avatar from '../Avatar';
 
 /**
@@ -174,9 +175,10 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
       } else {
         // Animation complete
         setIsRevealing(false);
-        // Play achievement sound for dramatic finish
+        // Play achievement sound + confetti burst for dramatic finish
         if (enableComplexAnimations) {
           playAchievementSound();
+          fireRankConfetti(1, 'light');
         }
         onComplete?.();
       }
@@ -210,10 +212,12 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           opacity: { duration: 0.3 },
         }}
         className={cn(
-          'flex items-center gap-3 p-2 rounded-neo border-2 border-neo-black',
+          'flex items-center gap-3 p-2 rounded-neo border-2 border-neo-black transition-colors duration-300',
           isTop3 ? rankStyle.bg : 'bg-white dark:bg-slate-800',
           isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-1',
-          'shadow-hard-sm'
+          'shadow-hard-sm',
+          // Flash highlight when position just swapped
+          lastPositionSwap && sortedByDisplayed[position]?.username === player.username && 'bg-neo-lime/20'
         )}
       >
         {/* Rank badge */}
@@ -291,6 +295,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         >
           <motion.div
             className="h-full bg-neo-lime"
+            style={{ boxShadow: '0 0 12px var(--neo-lime, #BFFF00), 0 0 4px var(--neo-lime, #BFFF00)' }}
             initial={{ width: '0%' }}
             animate={{ width: '100%' }}
             transition={{ duration: clampedDuration / 1000, ease: 'easeOut' }}

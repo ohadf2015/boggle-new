@@ -16,8 +16,10 @@ const ScoreCounter: React.FC<{ target: number; className?: string }> = ({ target
 
   useEffect(() => {
     const controls = animate(motionVal, target, {
-      duration: 1.2,
-      ease: [0.16, 1, 0.3, 1],
+      type: 'spring',
+      stiffness: 80,
+      damping: 15,
+      mass: 0.5,
     });
     const unsub = rounded.on('change', (v) => setDisplay(v));
     return () => { controls.stop(); unsub(); };
@@ -376,6 +378,22 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
             </motion.div>
           </div>
         </div>
+
+        {/* Winner pulse ring - visible for 1st place */}
+        {rank === 1 && variant === 'ranking' && (
+          <>
+            <div
+              className="absolute inset-0 rounded-neo-lg pointer-events-none"
+              style={{ animation: 'banner-pulse-ring 2s ease-in-out 1s infinite' }}
+            />
+            <style>{`
+              @keyframes banner-pulse-ring {
+                0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,225,53,0), 0 0 20px rgba(255,225,53,0.15); }
+                50% { box-shadow: inset 0 0 20px rgba(255,225,53,0.15), 0 0 40px rgba(255,225,53,0.3); }
+              }
+            `}</style>
+          </>
+        )}
 
         {/* Mascot - Hidden in compact mode */}
         {!compact && (

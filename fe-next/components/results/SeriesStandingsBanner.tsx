@@ -1,0 +1,167 @@
+'use client';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Trophy, ArrowUp, ArrowDown } from 'lucide-react';
+import { cn } from '../../lib/utils';
+import SessionStatsCard from './SessionStatsCard';
+import type { SeriesStanding } from '@/hooks/useSeriesTracker';
+
+interface SeriesStandingsBannerProps {
+  standings: SeriesStanding[];
+  roundNumber: number;
+  currentUsername?: string;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  /** Compact mode for mobile */
+  compact?: boolean;
+}
+
+const RANK_COLORS = ['text-neo-yellow', 'text-slate-300', 'text-amber-600'];
+const RANK_BG = ['bg-neo-yellow/20', 'bg-slate-300/10', 'bg-amber-600/10'];
+
+const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
+  standings,
+  roundNumber,
+  currentUsername,
+  t,
+  compact = false,
+}) => {
+  // Only show after 2+ rounds
+  if (roundNumber < 2 || standings.length === 0) return null;
+
+  const sessionStandings = standings.map(s => ({
+    username: s.username,
+    totalScore: s.totalScore,
+    roundScores: s.roundScores,
+  }));
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      className="bg-neo-navy-light/60 border-3 border-neo-white/20 rounded-neo p-3 shadow-hard"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <Trophy className="w-4 h-4 text-neo-yellow" />
+          <span className="text-xs font-black uppercase tracking-widest text-neo-cream/70">
+            {t('results.series.title')}
+          </span>
+        </div>
+        <span className="text-xs font-bold text-neo-cream/50">
+          {t('results.series.gameCount', { count: roundNumber })}
+        </span>
+      </div>
+
+      {/* Standings List */}
+      <div className="space-y-1">
+        {standings.map((player, index) => {
+          const isCurrentUser = player.username === currentUsername;
+          const isTopThree = index < 3;
+
+          return (
+            <div
+              key={player.username}
+              data-testid={`series-player-${player.username}`}
+              className={cn(
+                'flex items-center gap-2 px-2 py-1.5 rounded-neo border-2 transition-colors',
+                isCurrentUser
+                  ? 'border-neo-cyan bg-neo-cyan/10'
+                  : 'border-transparent',
+                isTopThree && !isCurrentUser && RANK_BG[index]
+              )}
+            >
+              {/* Rank */}
+              <span
+                className={cn(
+                  'w-5 text-center font-black text-sm',
+                  isTopThree ? RANK_COLORS[index] : 'text-neo-cream/50'
+                )}
+              >
+                {player.currentRank}
+              </span>
+
+              {/* Avatar */}
+              {player.avatar?.emoji && (
+                <span className="text-base" role="img" aria-hidden>
+                  {player.avatar.emoji}
+                </span>
+              )}
+
+              {/* Name + Round Scores */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1">
+                  <span
+                    className={cn(
+                      'text-sm font-bold truncate',
+                      isCurrentUser ? 'text-neo-cyan' : 'text-neo-cream'
+                    )}
+                  >
+                    {player.username}
+                  </span>
+                  {/* Rank Change Arrow */}
+                  {player.rankChange > 0 && (
+                    <span
+                      data-testid={`rank-up-${player.username}`}
+                      className="text-neo-lime flex items-center"
+                    >
+                      <ArrowUp className="w-3 h-3" />
+                      <span className="text-[10px] font-bold">{player.rankChange}</span>
+                    </span>
+                  )}
+                  {player.rankChange < 0 && (
+                    <span
+                      data-testid={`rank-down-${player.username}`}
+                      className="text-neo-pink flex items-center"
+                    >
+                      <ArrowDown className="w-3 h-3" />
+                      <span className="text-[10px] font-bold">{Math.abs(player.rankChange)}</span>
+                    </span>
+                  )}
+                </div>
+                {/* Round score pills */}
+                {!compact && (
+                  <div className="flex gap-0.5 mt-0.5">
+                    {player.roundScores.map((score, i) => (
+                      <span
+                        key={i}
+                        className={cn(
+                          'text-[10px] px-1 py-0 rounded bg-neo-white/10 text-neo-cream/60',
+                          i === player.roundScores.length - 1 && 'bg-neo-white/20 text-neo-cream/90 font-bold'
+                        )}
+                        title={`${t('results.series.round', { num: i + 1 }) || `R${i + 1}`}: ${score}`}
+                      >
+                        {score}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Total Score */}
+              <span
+                className={cn(
+                  'text-sm font-black',
+                  isCurrentUser ? 'text-neo-cyan' : 'text-neo-cream'
+                )}
+              >
+                {player.totalScore}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Session Stats (interesting facts) */}
+      <SessionStatsCard
+        standings={sessionStandings}
+        currentRound={roundNumber}
+        t={t}
+      />
+    </motion.div>
+  );
+};
+
+export default SeriesStandingsBanner;

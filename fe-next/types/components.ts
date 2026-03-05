@@ -104,6 +104,10 @@ export interface ResultsPageProps {
   gridSize?: number;
   /** Game duration in seconds for cognitive scoring */
   gameDuration?: number;
+  /** Series standings for accumulated scores across multiple games */
+  seriesStandings?: Array<{ username: string; avatar?: { emoji?: string; color?: string }; totalScore: number; roundScores: number[]; currentRank: number; rankChange: number }>;
+  /** Current series round number */
+  seriesRoundNumber?: number;
 }
 
 export interface VoteInfo {

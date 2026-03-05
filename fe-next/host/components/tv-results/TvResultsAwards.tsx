@@ -502,24 +502,25 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
             {awards.map((award, index) => (
               <motion.div
                 key={award.id}
-                initial={{ scale: 0.8, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
+                initial={{ rotateY: -90, opacity: 0 }}
+                animate={{ rotateY: 0, opacity: 1 }}
                 transition={{
-                  delay: index * 0.2,
+                  delay: index * 0.25,
                   type: 'spring',
-                  stiffness: 300,
-                  damping: 20,
+                  stiffness: 250,
+                  damping: 18,
                 }}
+                style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
                 className={cn(
                   'relative p-4 rounded-neo border-4 border-neo-black shadow-hard',
                   award.color
                 )}
               >
-                {/* Icon Badge */}
+                {/* Icon Badge — full spin */}
                 <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
+                  initial={{ scale: 0, rotate: -360 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: index * 0.2 + 0.3, type: 'spring', stiffness: 400, damping: 22 }}
+                  transition={{ delay: index * 0.25 + 0.35, type: 'spring', stiffness: 500, damping: 12 }}
                   className="absolute -top-4 -right-4 w-12 h-12 bg-neo-cream rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard"
                 >
                   <award.icon className="w-6 h-6 text-neo-black" />
@@ -535,14 +536,20 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                   {award.description}
                 </p>
 
-                {/* Recipient */}
+                {/* Recipient — avatar pops in with bounce */}
                 <div className="flex items-center gap-3">
-                  <Avatar
-                    profilePictureUrl={award.recipient.avatar?.profilePictureUrl ?? undefined}
-                    avatarImage={award.recipient.avatar?.avatarImage}
-                    size="md"
-                    className="border-3 border-neo-black shadow-hard-sm"
-                  />
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: index * 0.25 + 0.5, type: 'spring', stiffness: 400, damping: 8 }}
+                  >
+                    <Avatar
+                      profilePictureUrl={award.recipient.avatar?.profilePictureUrl ?? undefined}
+                      avatarImage={award.recipient.avatar?.avatarImage}
+                      size="md"
+                      className="border-3 border-neo-black shadow-hard-sm"
+                    />
+                  </motion.div>
                   <div className="flex-1 min-w-0">
                     <p className="font-black text-neo-black truncate">
                       {award.recipient.username}

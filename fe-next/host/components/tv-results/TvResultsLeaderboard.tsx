@@ -107,14 +107,25 @@ const TvResultsLeaderboard = memo<TvResultsLeaderboardProps>(({
                   )}
                 </div>
 
-                {/* Score */}
-                <div className="text-right">
-                  <p className="font-black text-xl text-neo-black">
-                    {player.score}
-                  </p>
-                  <p className="text-xs font-bold uppercase text-neo-black/50">
-                    {t('tvResults.pts')}
-                  </p>
+                {/* Score with bar */}
+                <div className="text-right flex items-center gap-2">
+                  <motion.div
+                    className="h-3 rounded-full bg-neo-lime/60 border border-neo-black/20"
+                    style={{ transformOrigin: 'right' }}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: index * 0.08 + 0.3, duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
+                  >
+                    <div style={{ width: `${Math.max(20, (player.score / (players[0]?.score || 1)) * 80)}px` }} className="h-full" />
+                  </motion.div>
+                  <div>
+                    <p className="font-black text-xl text-neo-black">
+                      {player.score}
+                    </p>
+                    <p className="text-xs font-bold uppercase text-neo-black/50">
+                      {t('tvResults.pts')}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             ))}

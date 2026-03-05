@@ -35,7 +35,7 @@ import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers } from '@/hooks/gameState/store';
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180 }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber }) => {
   const { t } = useLanguage();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
@@ -350,6 +350,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     t,
     selectedGameMode,
     onSelectGameMode: setSelectedGameMode,
+    seriesStandings,
+    seriesRoundNumber,
   };
 
   // Render Results Tab Content using shared component

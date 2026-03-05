@@ -1346,6 +1346,11 @@ const sv = {
       "comeback": "Klättrade {positions} platser!",
       "rivalry": "Bara {diff} poäng emellan!",
       "bigRound": "{score} poäng i omgång {round}!"
+    },
+    "series": {
+      "title": "Sammanlagd ställning",
+      "gameCount": "Spel {count}",
+      "round": "R{num}"
     }
   },
   "nextStep": {

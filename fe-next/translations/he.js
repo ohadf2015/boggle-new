@@ -1358,6 +1358,11 @@ const he = {
       "comeback": "טיפס/ה {positions} מקומות!",
       "rivalry": "רק {diff} נקודות הפרש!",
       "bigRound": "{score} נקודות בסיבוב {round}!"
+    },
+    "series": {
+      "title": "דירוג מצטבר",
+      "gameCount": "משחק {count}",
+      "round": "ס{num}"
     }
   },
   "nextStep": {

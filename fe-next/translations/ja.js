@@ -1348,6 +1348,11 @@ const ja = {
       "comeback": "{positions}ポジション上昇！",
       "rivalry": "わずか{diff}ポイント差！",
       "bigRound": "ラウンド{round}で{score}ポイント！"
+    },
+    "series": {
+      "title": "セッション順位",
+      "gameCount": "ゲーム{count}",
+      "round": "R{num}"
     }
   },
   "nextStep": {

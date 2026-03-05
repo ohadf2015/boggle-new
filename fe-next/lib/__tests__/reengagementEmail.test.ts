@@ -343,9 +343,10 @@ describe('generateReengagementEmailHtml', () => {
 // getReengagementSubject tests
 // ==========================================
 describe('getReengagementSubject', () => {
-  test('should return English subject with first letter', () => {
+  test('should return English subject with first letter or name', () => {
     const subject = getReengagementSubject('en', 'H', 'John');
-    expect(subject).toContain('H');
+    // Subject lines rotate daily; some use the letter, some use the name
+    expect(subject).toMatch(/H|John/);
     expect(typeof subject).toBe('string');
     expect(subject.length).toBeGreaterThan(0);
   });

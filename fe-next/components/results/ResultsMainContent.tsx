@@ -23,6 +23,8 @@ import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { AdPlaceholder } from '@/components/ads';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
+import type { SeriesStanding } from '@/hooks/useSeriesTracker';
+const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -117,6 +119,10 @@ export interface ResultsMainContentProps {
   selectedGameMode?: GameModeOption;
   /** Callback to change game mode (host only) */
   onSelectGameMode?: (mode: GameModeOption) => void;
+  /** Series standings for accumulated scores across multiple games */
+  seriesStandings?: SeriesStanding[];
+  /** Current series round number */
+  seriesRoundNumber?: number;
 }
 
 // ==============================================
@@ -162,6 +168,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   allPlayerWords,
   selectedGameMode,
   onSelectGameMode,
+  seriesStandings,
+  seriesRoundNumber,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -304,6 +312,16 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           readyUsernames={readyUsernames}
           currentUsername={username}
           isHost={isHost}
+        />
+      )}
+
+      {/* Series Standings - Accumulated scores across multiple games */}
+      {seriesStandings && seriesRoundNumber && seriesRoundNumber >= 2 && (
+        <SeriesStandingsBanner
+          standings={seriesStandings}
+          roundNumber={seriesRoundNumber}
+          currentUsername={username}
+          t={t}
         />
       )}
 

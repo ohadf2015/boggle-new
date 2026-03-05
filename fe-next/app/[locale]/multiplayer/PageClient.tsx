@@ -28,6 +28,7 @@ import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
 import { useMultiplayerAuth } from '@/hooks/useMultiplayerAuth';
 import { useMultiplayerSession } from '@/hooks/useMultiplayerSession';
 import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
+import { useSeriesTracker } from '@/hooks/useSeriesTracker';
 import type { Language, ActiveRoom, Avatar } from '@/shared/types/game';
 
 // Hex color validation pattern (must match backend schema)
@@ -193,6 +194,9 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     isAuthenticated,
     refreshProfile,
   });
+
+  // Track accumulated scores across multiple games in the same room
+  const seriesTracker = useSeriesTracker();
 
   const {
     socket,
@@ -379,6 +383,22 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     },
     t,
   });
+
+  // Record round scores for series tracking when results come in
+  React.useEffect(() => {
+    if (showResults && resultsData?.scores) {
+      seriesTracker.recordRound(resultsData.scores);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showResults, resultsData?.scores]);
+
+  // Reset series tracker when leaving the room
+  React.useEffect(() => {
+    if (!isActive) {
+      seriesTracker.reset();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive]);
 
   // Music transitions based on game state
   React.useEffect(() => {
@@ -680,6 +700,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
                 : 4
             }
             gameDuration={gameDuration}
+            seriesStandings={seriesTracker.standings}
+            seriesRoundNumber={seriesTracker.roundNumber}
           />
         </FeatureErrorBoundary>
       );

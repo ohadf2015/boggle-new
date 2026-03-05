@@ -1,7 +1,7 @@
 'use client';
 
-import { memo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { memo, useEffect, useState } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Crown, Medal, Award } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { fireRankConfetti } from '../../../utils/confettiUtils';
@@ -163,120 +163,199 @@ interface PodiumCardProps {
   isWinner?: boolean;
 }
 
+// Rank-specific spring configs: escalating energy builds tension
+const RANK_SPRINGS = {
+  3: { stiffness: 200, damping: 22 },   // Gentle entrance
+  2: { stiffness: 280, damping: 18 },   // More energy
+  1: { stiffness: 400, damping: 12 },   // Bouncy winner reveal
+};
+
+// Rank-specific entrance delays (3rd → 2nd → 1st builds suspense)
+const RANK_DELAYS = { 3: 0, 2: 0.15, 1: 0.35 };
+
+/** Animated score that counts up from 0 */
+const PodiumScoreCounter: React.FC<{ target: number; delay: number; className?: string }> = ({ target, delay, className }) => {
+  const motionVal = useMotionValue(0);
+  const rounded = useTransform(motionVal, (v) => Math.round(v));
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const controls = animate(motionVal, target, {
+        duration: 1.4,
+        ease: [0.16, 1, 0.3, 1],
+      });
+      const unsub = rounded.on('change', (v) => setDisplay(v));
+      return () => { controls.stop(); unsub(); };
+    }, delay * 1000);
+    return () => clearTimeout(timeout);
+  }, [target, delay, motionVal, rounded]);
+
+  return <span className={className}>{display}</span>;
+};
+
 const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
   const config = PODIUM_CONFIG[rank as keyof typeof PODIUM_CONFIG];
   const Icon = config.icon;
   const labelKey = RANK_LABELS[rank as keyof typeof RANK_LABELS];
+  const spring = RANK_SPRINGS[rank as keyof typeof RANK_SPRINGS] || RANK_SPRINGS[3];
+  const baseDelay = RANK_DELAYS[rank as keyof typeof RANK_DELAYS] || 0;
 
   return (
     <motion.div
-      initial={{ y: 100, opacity: 0, scale: 0.8 }}
-      animate={{ y: 0, opacity: 1, scale: 1 }}
-      exit={{ y: -50, opacity: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 20,
-        delay: isWinner ? 0.2 : 0,
-      }}
       className={cn(
-        'flex flex-col items-center justify-end pt-8 pb-4 px-4 rounded-neo border-4 border-neo-black',
-        `bg-gradient-to-b ${config.bgGradient}`,
-        config.shadowColor,
-        config.height,
+        'relative flex flex-col items-center',
         isWinner ? 'w-56 z-10' : 'w-48'
       )}
     >
-      {/* Rank Badge */}
+      {/* Podium base rises up first */}
       <motion.div
-        initial={{ scale: 0, rotate: -180 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
+        initial={{ clipPath: 'inset(100% 0 0 0)' }}
+        animate={{ clipPath: 'inset(0% 0 0 0)' }}
+        transition={{ duration: 0.6, delay: baseDelay, ease: [0.33, 1, 0.68, 1] }}
         className={cn(
-          'absolute -top-5 left-1/2 -translate-x-1/2',
-          'w-14 h-14 rounded-full border-4 border-neo-black',
-          'bg-neo-cream flex items-center justify-center',
-          'shadow-hard'
+          'w-full rounded-neo border-4 border-neo-black',
+          `bg-gradient-to-b ${config.bgGradient}`,
+          config.shadowColor,
+          config.height,
         )}
       >
-        <Icon className={cn('w-7 h-7', config.textColor)} />
+        {/* Player card content appears after podium rise */}
+        <motion.div
+          initial={{ y: 40, opacity: 0, scale: 0.85 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: -50, opacity: 0 }}
+          transition={{
+            type: 'spring',
+            ...spring,
+            delay: baseDelay + 0.4,
+          }}
+          className="flex flex-col items-center justify-end pt-8 pb-4 px-4 h-full"
+        >
+          {/* Rank Badge — spins in with escalating bounce */}
+          <motion.div
+            initial={{ scale: 0, rotate: -360 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{
+              delay: baseDelay + 0.6,
+              type: 'spring',
+              stiffness: isWinner ? 500 : 400,
+              damping: isWinner ? 10 : 15,
+            }}
+            className={cn(
+              'absolute -top-5 left-1/2 -translate-x-1/2',
+              'w-14 h-14 rounded-full border-4 border-neo-black',
+              'bg-neo-cream flex items-center justify-center',
+              'shadow-hard'
+            )}
+          >
+            <Icon className={cn('w-7 h-7', config.textColor)} />
+          </motion.div>
+
+          {/* Rank Label */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 26, delay: baseDelay + 0.7 }}
+            className={cn(
+              'font-black uppercase tracking-wide mb-2',
+              config.textColor,
+              isWinner ? 'text-lg' : 'text-sm'
+            )}
+          >
+            {t(`tvResults.${labelKey}`)}
+          </motion.div>
+
+          {/* Avatar — bouncy pop */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{
+              type: 'spring',
+              stiffness: isWinner ? 500 : 400,
+              damping: isWinner ? 8 : 18,
+              delay: baseDelay + 0.55,
+            }}
+            className="relative mb-2"
+          >
+            <Avatar
+              profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+              avatarImage={player.avatar?.avatarImage}
+              size={isWinner ? 'xl' : 'lg'}
+              className="border-4 border-neo-black shadow-hard"
+            />
+          </motion.div>
+
+          {/* Username */}
+          <motion.p
+            initial={{ opacity: 0, x: -15 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 26, delay: baseDelay + 0.75 }}
+            className={cn(
+              'font-black uppercase truncate max-w-full text-center mb-2',
+              'bg-black/30 px-3 py-1 rounded-neo',
+              config.textColor,
+              config.nameSize
+            )}
+            style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
+            title={player.username}
+          >
+            {player.username}
+          </motion.p>
+
+          {/* Score — counts up from 0 with elastic overshoot */}
+          <motion.div
+            initial={{ scale: 0, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{
+              type: 'spring',
+              stiffness: 350,
+              damping: isWinner ? 10 : 20,
+              delay: baseDelay + 0.85,
+            }}
+            className={cn(
+              'font-black',
+              config.textColor,
+              config.scoreSize
+            )}
+          >
+            <PodiumScoreCounter target={player.score} delay={baseDelay + 0.9} />
+            <span className="text-sm font-bold ml-1 opacity-70">{t('tvResults.pts')}</span>
+          </motion.div>
+
+          {/* Word Count */}
+          {player.wordCount !== undefined && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: baseDelay + 1.1 }}
+              className={cn('text-sm font-bold opacity-70', config.textColor)}
+            >
+              {player.wordCount} {t('tvResults.words')}
+            </motion.p>
+          )}
+        </motion.div>
       </motion.div>
 
-      {/* Rank Label */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.5 }}
-        className={cn(
-          'font-black uppercase tracking-wide mb-2',
-          config.textColor,
-          isWinner ? 'text-lg' : 'text-sm'
-        )}
-      >
-        {t(`tvResults.${labelKey}`)}
-      </motion.div>
-
-      {/* Avatar */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.4 }}
-        className={cn(
-          'relative mb-2',
-          isWinner && 'animate-pulse-subtle'
-        )}
-      >
-        <Avatar
-          profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
-          avatarImage={player.avatar?.avatarImage}
-          size={isWinner ? 'xl' : 'lg'}
-          className="border-4 border-neo-black shadow-hard"
-        />
-      </motion.div>
-
-      {/* Username */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
-        className={cn(
-          'font-black uppercase truncate max-w-full text-center mb-2',
-          'bg-black/30 px-3 py-1 rounded-neo',
-          config.textColor,
-          config.nameSize
-        )}
-        style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
-        title={player.username}
-      >
-        {player.username}
-      </motion.p>
-
-      {/* Score */}
-      <motion.div
-        initial={{ scale: 0, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.7 }}
-        className={cn(
-          'font-black',
-          config.textColor,
-          config.scoreSize
-        )}
-      >
-        {player.score}
-        <span className="text-sm font-bold ml-1 opacity-70">{t('tvResults.pts')}</span>
-      </motion.div>
-
-      {/* Word Count */}
-      {player.wordCount !== undefined && (
-        <motion.p
+      {/* Winner glow pulse ring */}
+      {isWinner && (
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.8 }}
-          className={cn('text-sm font-bold opacity-70', config.textColor)}
-        >
-          {player.wordCount} {t('tvResults.words')}
-        </motion.p>
+          transition={{ delay: baseDelay + 1.2 }}
+          className="absolute inset-0 -m-2 rounded-neo pointer-events-none"
+          style={{
+            animation: 'winner-glow-pulse 2s ease-in-out infinite',
+            boxShadow: '0 0 40px rgba(255,225,53,0.4)',
+          }}
+        />
       )}
+      <style>{`
+        @keyframes winner-glow-pulse {
+          0%, 100% { box-shadow: 0 0 30px rgba(255,225,53,0.3); }
+          50% { box-shadow: 0 0 60px rgba(255,225,53,0.6), 0 0 100px rgba(255,107,53,0.2); }
+        }
+      `}</style>
     </motion.div>
   );
 });
