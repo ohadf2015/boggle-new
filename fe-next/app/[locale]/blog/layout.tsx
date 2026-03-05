@@ -87,11 +87,39 @@ export default async function BlogLayout({ children, params }: BlogLayoutProps):
     ],
   };
 
+  const blogArticles = [
+    { slug: '10-surprising-benefits-word-games', name: '10 Surprising Benefits of Playing Word Games Daily' },
+    { slug: 'science-behind-word-games', name: 'The Science Behind Word Games and Brain Health' },
+    { slug: 'daily-challenge-strategies', name: 'Daily Challenge Strategies' },
+    { slug: 'multilingual-word-learning', name: 'Multilingual Word Learning' },
+    { slug: 'top-player-secrets', name: 'Top Player Secrets' },
+    { slug: 'improve-word-game-skills', name: 'How to Improve Your Word Game Skills' },
+  ];
+
+  // Safe: all content is from static article metadata, not user input
+  const itemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'LexiClash Blog',
+    description: 'Tips, strategies, and insights for word game enthusiasts',
+    numberOfItems: blogArticles.length,
+    itemListElement: blogArticles.map((article, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: article.name,
+      url: `https://www.lexiclash.live${localePath}/blog/${article.slug}`,
+    })),
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
       {children}
     </>

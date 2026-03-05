@@ -448,7 +448,7 @@ export default function sitemap() {
     });
   });
 
-  // Hebrew SEO landing page (high priority for Hebrew keyword searches)
+  // SEO landing pages (keyword-targeted, high priority per market)
   routes.push({
     url: `${baseUrl}/he/hebrew-multiplayer-word-game`,
     lastModified: now,
@@ -461,6 +461,62 @@ export default function sitemap() {
       },
     },
     images: [`${baseUrl}/og-image-he.jpg`],
+  });
+
+  routes.push({
+    url: `${baseUrl}/sv/swedish-multiplayer-word-game`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.95,
+    alternates: {
+      languages: {
+        'x-default': `${baseUrl}/sv/swedish-multiplayer-word-game`,
+        sv: `${baseUrl}/sv/swedish-multiplayer-word-game`,
+      },
+    },
+    images: [`${baseUrl}/og-image-sv.jpg`],
+  });
+
+  routes.push({
+    url: `${baseUrl}/ja/japanese-word-game`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.95,
+    alternates: {
+      languages: {
+        'x-default': `${baseUrl}/ja/japanese-word-game`,
+        ja: `${baseUrl}/ja/japanese-word-game`,
+      },
+    },
+    images: [`${baseUrl}/og-image-ja.jpg`],
+  });
+
+  routes.push({
+    url: `${baseUrl}/en/multiplayer-word-game-online`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.95,
+    alternates: {
+      languages: {
+        'x-default': `${baseUrl}/en/multiplayer-word-game-online`,
+        en: `${baseUrl}/en/multiplayer-word-game-online`,
+      },
+    },
+    images: [`${baseUrl}/og-image-en.jpg`],
+  });
+
+  routes.push({
+    url: `${baseUrl}/es/juego-de-palabras-multijugador`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.95,
+    alternates: {
+      languages: {
+        'x-default': `${baseUrl}/es/juego-de-palabras-multijugador`,
+        es: `${baseUrl}/es/juego-de-palabras-multijugador`,
+      },
+    },
+    images: [`${baseUrl}/og-image-es.jpg`],
   });
 
   return routes;
