@@ -1176,7 +1176,13 @@ const ja = {
       "description": "LexiClashの遊び方を学ぶ"
     },
     "swipeHint": "← スワイプで移動 →",
-    "timingHint": "ゲーム開始を待ちながら遊び方を覚えよう！"
+    "timingHint": "ゲーム開始を待ちながら遊び方を覚えよう！",
+    "comingUp": {
+      "title": "トレーニング後のお楽しみ",
+      "daily": "デイリーチャレンジ",
+      "multiplayer": "マルチプレイヤー",
+      "adventure": "アドベンチャー"
+    }
   },
   "preGameTutorial": {
     "welcome": {
@@ -1238,6 +1244,15 @@ const ja = {
       "desc": "両方のデイリーチャレンジをクリア！"
     }
   },
+  "reactions": {
+    "fire": "ファイヤー",
+    "clap": "拍手",
+    "wow": "わお",
+    "dead": "死亡",
+    "crown": "王冠",
+    "zap": "稲妻",
+    "label": "クイックリアクション"
+  },
   "chat": {
     "title": "ルームチャット",
     "placeholder": "何か書いてね...",
@@ -1284,6 +1299,7 @@ const ja = {
     "shared": "共有",
     "noPoints": "ポイントなし",
     "otherPlayers": "他のプレイヤー",
+    "foundWords": "の発見した単語",
     "aiVerified": "AIで検証済み",
     "aiRejected": "AIにより却下",
     "levelUp": "レベルアップ!",
@@ -4067,6 +4083,7 @@ const ja = {
     "message": "入力 + Enter",
     "fullMessage": "キーボードで単語を入力し、Enterで送信"
   },
+  "keyboardLanguageMismatch": "ボードの言語に合わせて{language}キーボードに切り替えてください",
   "enterKeyHint": {
     "pressEnter": "Enterで送信"
   },

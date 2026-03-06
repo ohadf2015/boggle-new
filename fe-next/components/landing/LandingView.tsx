@@ -745,7 +745,7 @@ const LandingView: React.FC = () => {
           aria-label={t('landing.tutorial') || 'Tutorial'}
         >
           <GraduationCap className="w-5 h-5" />
-          <span className="hidden sm:inline">{t('landing.tutorial') || 'Tutorial'}</span>
+          <span className="text-xs sm:text-sm">{t('landing.tutorial') || 'Tutorial'}</span>
         </motion.button>
       </div>
     </div>

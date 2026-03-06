@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Pointer, Star, Zap, Play, Sparkles } from 'lucide-react';
+import { Pointer, Star, Zap, Play, Sparkles, Calendar, Users, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QuickTipsStepProps {
@@ -130,16 +130,36 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         </div>
       </motion.div>
 
-      {/* Encouragement */}
+      {/* Coming up next - mode teasers */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, type: 'spring', stiffness: 280, damping: 26 }}
-        className="bg-neo-lime/30 border-2 border-neo-black/20 rounded-neo px-4 py-2"
+        className="w-full"
       >
-        <p className="text-center font-bold text-xs text-neo-black dark:text-neo-white">
-          {t('onboarding.training.hint') || 'More game modes will unlock as you play!'}
+        <p className="text-center font-bold text-[10px] uppercase tracking-wider text-neo-white/50 mb-2">
+          {t('onboarding.comingUp.title') || 'Coming up after training'}
         </p>
+        <div className="flex gap-2">
+          {[
+            { icon: Calendar, label: t('onboarding.comingUp.daily') || 'Daily Challenge', color: 'bg-neo-orange' },
+            { icon: Users, label: t('onboarding.comingUp.multiplayer') || 'Multiplayer', color: 'bg-neo-cyan' },
+            { icon: Swords, label: t('onboarding.comingUp.adventure') || 'Adventure', color: 'bg-neo-pink' },
+          ].map((mode, i) => (
+            <motion.div
+              key={mode.label}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.7 + i * 0.1 }}
+              className="flex-1 flex flex-col items-center gap-1 p-2 rounded-neo border border-neo-white/10 bg-neo-white/5"
+            >
+              <mode.icon className="w-4 h-4 text-neo-white/70" />
+              <span className="text-[9px] sm:text-[10px] font-bold text-neo-white/60 text-center leading-tight">
+                {mode.label}
+              </span>
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
     </div>
   );

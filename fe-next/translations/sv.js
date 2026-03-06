@@ -1175,7 +1175,13 @@ const sv = {
       "title": "Välkommen",
       "description": "Lär dig spela LexiClash"
     },
-    "swipeHint": "← Svep för att navigera →"
+    "swipeHint": "← Svep för att navigera →",
+    "comingUp": {
+      "title": "Kommer efter träningen",
+      "daily": "Daglig utmaning",
+      "multiplayer": "Multiplayer",
+      "adventure": "Äventyr"
+    }
   },
   "preGameTutorial": {
     "welcome": {
@@ -1236,6 +1242,15 @@ const sv = {
       "desc": "Klarade båda dagens utmaningar!"
     }
   },
+  "reactions": {
+    "fire": "Eld",
+    "clap": "Klapp",
+    "wow": "Wow",
+    "dead": "Dod",
+    "crown": "Krona",
+    "zap": "Blixt",
+    "label": "Snabbreaktioner"
+  },
   "chat": {
     "title": "Rumschatt",
     "placeholder": "Skriv något...",
@@ -1250,6 +1265,7 @@ const sv = {
     "yourProgress": "Din Utveckling",
     "topPlayers": "Toppspelare",
     "otherPlayers": "Andra spelare",
+    "foundWords": "hittade",
     "yourPerformance": "Ditt spel",
     "viewDetails": "Se uppdelningen",
     "viewAllWords": "Alla ord",
@@ -4017,6 +4033,7 @@ const sv = {
     "message": "Skriv + Enter",
     "fullMessage": "Skriv ord på tangentbordet och tryck Enter för att skicka"
   },
+  "keyboardLanguageMismatch": "Byt till {language}-tangentbord för att matcha brädspråket",
   "enterKeyHint": {
     "pressEnter": "Tryck Enter för att skicka"
   },

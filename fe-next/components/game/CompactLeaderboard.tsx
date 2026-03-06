@@ -32,6 +32,10 @@ interface ScoreChange {
   timestamp: number;
 }
 
+// Rapid scoring window — if 3+ scores within this window, show streak flame
+const STREAK_WINDOW_MS = 10000;
+const STREAK_THRESHOLD = 3;
+
 // Debounce interval for visual updates (ms) - prevents state cascade
 const VISUAL_UPDATE_DEBOUNCE = 100;
 
@@ -56,6 +60,8 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
   const prevRanksRef = useRef<Map<string, number>>(new Map());
   const [scoreChanges, setScoreChanges] = useState<ScoreChange[]>([]);
   const [rankChanges, setRankChanges] = useState<Map<string, 'up' | 'down'>>(new Map());
+  // Track score event history per opponent for streak detection
+  const scoreHistoryRef = useRef<Map<string, number[]>>(new Map());
 
   const { sortedPlayers, nextTarget, currentUser, totalPlayers, isLeading, maxScore } = useMemo(() => {
     const sorted = [...players].sort((a, b) => b.score - a.score);
@@ -107,11 +113,21 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
 
         // Detect score change
         if (prevScore !== undefined && player.score > prevScore) {
+          const now = Date.now();
           newScoreChanges.push({
             username: player.username,
             delta: player.score - prevScore,
-            timestamp: Date.now(),
+            timestamp: now,
           });
+
+          // Track score event for streak detection (opponents only)
+          if (player.username !== currentUsername) {
+            const history = scoreHistoryRef.current.get(player.username) || [];
+            history.push(now);
+            // Keep only events within the streak window
+            const cutoff = now - STREAK_WINDOW_MS;
+            scoreHistoryRef.current.set(player.username, history.filter(t => t > cutoff));
+          }
         }
 
         // Detect rank change
@@ -172,6 +188,13 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
     if (maxScore === 0) return 0;
     return Math.min(100, (score / maxScore) * 100);
   };
+
+  // Check if an opponent is on a scoring streak
+  const isOnStreak = useCallback((username: string): boolean => {
+    if (username === currentUsername) return false;
+    const history = scoreHistoryRef.current.get(username);
+    return !!history && history.length >= STREAK_THRESHOLD;
+  }, [currentUsername]);
 
   if (totalPlayers === 0 || !currentUser) return null;
 
@@ -325,8 +348,20 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   </AnimatePresence>
                 </motion.div>
 
-                {/* Player name (right side) */}
-                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                {/* Player name (right side) + streak flame */}
+                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                  <AnimatePresence>
+                    {isOnStreak(player.username) && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: [1, 1.2, 1], opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ scale: { duration: 0.6, repeat: Infinity } }}
+                      >
+                        <Flame className="w-3 h-3 text-neo-orange" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                   <span className={cn(
                     'text-[10px] font-bold truncate max-w-[60px]',
                     isMe ? 'text-neo-black' : 'text-neo-black/60'

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import SinglePlayerGame from './SinglePlayerGame';
+import { TutorialProvider, TutorialOverlay } from '@/components/tutorial';
 import SinglePlayerResults from './SinglePlayerResults';
 import PreGameTutorial from './PreGameTutorial';
 import { getHighScore, getAllTimeBest } from './highScoreManager';
@@ -512,12 +513,15 @@ const SinglePlayerView: React.FC = () => {
 
       <div className="w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden">
         {phase === 'playing' && (
-          <SinglePlayerGame
-            settings={gameState}
-            targetHighScore={currentHighScore?.score || null}
-            onGameEnd={handleGameEnd}
-            onQuit={handleBackToLobby}
-          />
+          <TutorialProvider autoStart>
+            <TutorialOverlay />
+            <SinglePlayerGame
+              settings={gameState}
+              targetHighScore={currentHighScore?.score || null}
+              onGameEnd={handleGameEnd}
+              onQuit={handleBackToLobby}
+            />
+          </TutorialProvider>
         )}
 
         {phase === 'results' && resultsData && resultsData.playerWordData && (

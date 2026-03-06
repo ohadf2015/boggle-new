@@ -6,6 +6,9 @@ import InGameScreen from '../../components/game/InGameScreen';
 import { BlastGame } from '@/components/blast/BlastGame';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
 import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
+import { QuickReactions, FloatingReaction } from '@/components/game/QuickReactions';
+import { AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { useQuickReactions } from '@/hooks/useQuickReactions';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -135,6 +138,12 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
 
+  // Quick emoji reactions for multiplayer
+  const { floatingReactions, sendReaction, dismissReaction } = useQuickReactions({
+    socket: socket ?? null,
+    username,
+  });
+
   // Blast multiplayer bridge — converts Zustand state to BlastGame props
   const blastBridge = useBlastMultiplayerBridge({
     letterGrid: tableData,
@@ -227,6 +236,23 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   }
 
   return (
+    <div className="relative flex-1 flex flex-col min-h-0">
+      {/* Quick Reactions overlay for host */}
+      {leaderboard.length > 1 && hostPlaying && (
+        <>
+          <div className="absolute inset-0 pointer-events-none z-40">
+            <AdaptiveAnimatePresence>
+              {floatingReactions.map((r) => (
+                <FloatingReaction key={r.id} id={r.id} emoji={r.emoji} username={r.username} x={r.x} y={r.y} onComplete={dismissReaction} />
+              ))}
+            </AdaptiveAnimatePresence>
+          </div>
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 md:bottom-auto md:top-1/2 md:left-auto md:right-2 md:-translate-y-1/2 md:translate-x-0">
+            <QuickReactions onReaction={sendReaction} layout="bar" className="md:hidden" />
+            <QuickReactions onReaction={sendReaction} layout="vertical" className="hidden md:flex" />
+          </div>
+        </>
+      )}
     <InGameScreen
       // Core identity
       username={username}
@@ -277,6 +303,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       // Player experience (for keyboard trail inactivity threshold)
       totalGamesPlayed={profile?.total_games}
     />
+    </div>
   );
 };
 

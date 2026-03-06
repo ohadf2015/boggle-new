@@ -25,10 +25,19 @@ export interface OnboardingData {
 }
 
 /**
- * Check if user has completed onboarding
+ * Check if user has completed or skipped onboarding
  */
 export const hasCompletedOnboarding = (): boolean => {
-  return getFromLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED) === 'true';
+  const value = getFromLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED);
+  return value === 'true' || value === 'skipped';
+};
+
+/**
+ * Check if user only skipped onboarding (dismissed without completing)
+ * Useful for showing re-engagement prompts
+ */
+export const wasOnboardingSkipped = (): boolean => {
+  return getFromLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED) === 'skipped';
 };
 
 /**
@@ -65,8 +74,9 @@ export const clearOnboardingData = (): void => {
 
 /**
  * Mark onboarding as skipped (user dismissed without completing)
+ * Stores 'skipped' instead of 'true' so we can re-engage later
  */
 export const markOnboardingSkipped = (): void => {
-  saveToLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
+  saveToLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED, 'skipped');
   // Don't save data since user skipped
 };

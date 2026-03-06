@@ -1295,7 +1295,13 @@ const en = {
       "title": "Welcome",
       "description": "Learn the basics"
     },
-    "swipeHint": "← Swipe →"
+    "swipeHint": "← Swipe →",
+    "comingUp": {
+      "title": "Coming up after training",
+      "daily": "Daily Challenge",
+      "multiplayer": "Multiplayer",
+      "adventure": "Adventure"
+    }
   },
   "preGameTutorial": {
     "welcome": {
@@ -1356,6 +1362,15 @@ const en = {
       "desc": "Completed both daily challenges!"
     }
   },
+  "reactions": {
+    "fire": "Fire",
+    "clap": "Clap",
+    "wow": "Wow",
+    "dead": "Dead",
+    "crown": "Crown",
+    "zap": "Zap",
+    "label": "Quick reactions"
+  },
   "chat": {
     "title": "Room Chat",
     "placeholder": "Say something...",
@@ -1370,6 +1385,7 @@ const en = {
     "yourProgress": "How You Did",
     "topPlayers": "Podium",
     "otherPlayers": "Also Played",
+    "foundWords": "found",
     "yourPerformance": "Your Game",
     "viewDetails": "Deep Dive",
     "viewAllWords": "Words",
@@ -3982,6 +3998,7 @@ const en = {
     "message": "Type + Enter",
     "fullMessage": "Type words on your keyboard and press Enter to submit"
   },
+  "keyboardLanguageMismatch": "Please switch to {language} keyboard to match the board language",
   "enterKeyHint": {
     "pressEnter": "Press Enter to submit"
   },

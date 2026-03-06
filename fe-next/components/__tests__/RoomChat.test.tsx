@@ -193,7 +193,7 @@ describe('RoomChat', () => {
       }));
     });
 
-    it('sends as Host when isHost is true', () => {
+    it('sends with actual username when isHost is true', () => {
       render(<RoomChat {...defaultProps} isHost={true} />);
 
       const input = screen.getByPlaceholderText('Type a message...');
@@ -202,7 +202,7 @@ describe('RoomChat', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
 
       expect(mockSocket.emit).toHaveBeenCalledWith('chatMessage', expect.objectContaining({
-        username: 'Host',
+        username: 'TestUser',
         isHost: true
       }));
     });

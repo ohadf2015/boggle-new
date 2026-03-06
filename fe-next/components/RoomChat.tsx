@@ -211,7 +211,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     socket.emit('chatMessage', {
       message: inputMessage.trim(),
       gameCode,
-      username: isHost ? 'Host' : username,
+      username,
       isHost
     });
 

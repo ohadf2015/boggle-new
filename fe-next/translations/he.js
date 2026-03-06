@@ -1185,7 +1185,13 @@ const he = {
       "title": "ברוכים הבאים",
       "description": "לימדו לשחק לקסיקלאש"
     },
-    "swipeHint": "החלק לניווט → ←"
+    "swipeHint": "החלק לניווט → ←",
+    "comingUp": {
+      "title": "מה מחכה אחרי האימון",
+      "daily": "אתגר יומי",
+      "multiplayer": "מרובה משתתפים",
+      "adventure": "הרפתקה"
+    }
   },
 
   "preGameTutorial": {
@@ -1248,6 +1254,15 @@ const he = {
       "desc": "השלמתם את שני האתגרים היומיים!"
     }
   },
+  "reactions": {
+    "fire": "אש",
+    "clap": "מחיאות כפיים",
+    "wow": "וואו",
+    "dead": "מת",
+    "crown": "כתר",
+    "zap": "ברק",
+    "label": "תגובות מהירות"
+  },
   "chat": {
     "title": "צ'אט החדר",
     "placeholder": "כתבו משהו...",
@@ -1262,6 +1277,7 @@ const he = {
     "yourProgress": "ההתקדמות שלך",
     "topPlayers": "שחקנים מובילים",
     "otherPlayers": "שחקנים אחרים",
+    "foundWords": "מצא",
     "yourPerformance": "המשחק שלך",
     "viewDetails": "ראו פירוט",
     "viewAllWords": "כל המילים",
@@ -4011,6 +4027,7 @@ const he = {
     "message": "הקלד + Enter",
     "fullMessage": "הקלד מילים במקלדת ולחץ Enter לשליחה"
   },
+  "keyboardLanguageMismatch": "נא להחליף למקלדת {language} בהתאם לשפת הלוח",
   "enterKeyHint": {
     "pressEnter": "לחץ Enter לשליחה"
   },

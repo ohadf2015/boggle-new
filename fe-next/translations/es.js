@@ -1203,6 +1203,15 @@ const es = {
     "requestToPlay": "¡Quiero jugar!",
     "join": "Entrar"
   },
+  "reactions": {
+    "fire": "Fuego",
+    "clap": "Aplauso",
+    "wow": "Wow",
+    "dead": "Muerto",
+    "crown": "Corona",
+    "zap": "Rayo",
+    "label": "Reacciones rapidas"
+  },
   "chat": {
     "title": "Chat de Sala",
     "placeholder": "Escribe algo...",
@@ -1217,6 +1226,7 @@ const es = {
     "yourProgress": "Tu Progreso",
     "topPlayers": "Top Jugadores",
     "otherPlayers": "Otros Jugadores",
+    "foundWords": "encontró",
     "yourPerformance": "Tu Juego",
     "viewDetails": "Ver desglose",
     "viewAllWords": "Todas las Palabras",
@@ -2626,7 +2636,13 @@ const es = {
       "title": "Bienvenida",
       "description": "Aprende a jugar LexiClash"
     },
-    "swipeHint": "← Desliza para navegar →"
+    "swipeHint": "← Desliza para navegar →",
+    "comingUp": {
+      "title": "Después del entrenamiento",
+      "daily": "Desafío diario",
+      "multiplayer": "Multijugador",
+      "adventure": "Aventura"
+    }
   },
   "preGameTutorial": {
     "welcome": {
@@ -3733,6 +3749,7 @@ const es = {
     "message": "Escribe + Enter",
     "fullMessage": "Escribe palabras en tu teclado y presiona Enter para enviar"
   },
+  "keyboardLanguageMismatch": "Cambia al teclado en {language} para que coincida con el idioma del tablero",
   "enterKeyHint": {
     "pressEnter": "Presiona Enter para enviar"
   },

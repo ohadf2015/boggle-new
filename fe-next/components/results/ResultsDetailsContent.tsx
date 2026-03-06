@@ -188,13 +188,16 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         />
       )}
 
-      {/* Other Players */}
+      {/* Other Players — auto-expand in 1v1 for natural word comparison */}
       {otherPlayers.length > 0 && (
         <CollapsibleSection
-          title={t('results.otherPlayers') || 'Other Players'}
+          title={otherPlayers.length === 1
+            ? `${otherPlayers[0].username} ${t('results.foundWords') || 'found'}`
+            : (t('results.otherPlayers') || 'Other Players')
+          }
           icon={<Users className="w-4 h-4" />}
-          badge={otherPlayers.length}
-          defaultExpanded={false}
+          badge={otherPlayers.length === 1 ? undefined : otherPlayers.length}
+          defaultExpanded={otherPlayers.length === 1}
           variant="tertiary"
           className="shadow-hard"
         >
@@ -231,13 +234,13 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
       </CollapsibleSection>
 
-      {/* Missed Words */}
+      {/* Missed Words — auto-expand when few missed words (likely interesting ones) */}
       {missedWords.length > 0 && (
         <CollapsibleSection
           title={t('results.missedWords') || 'Words You Missed'}
           icon={<Star className="w-4 h-4" />}
           badge={missedWords.length}
-          defaultExpanded={false}
+          defaultExpanded={missedWords.length <= 5}
           variant="tertiary"
           className="shadow-hard"
         >
