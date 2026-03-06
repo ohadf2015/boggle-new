@@ -19,6 +19,7 @@ export interface WordHuntGameLayoutProps {
   onQuit: () => void;
 
   // Clue boxes
+  targetLength: number;
   currentHint: HintLevel;
   attempts: TargetAttempt[];
   accumulatedClues: Map<number, AccumulatedClue>;
@@ -60,6 +61,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   onQuit,
 
   // Clue boxes
+  targetLength,
   currentHint,
   attempts,
   accumulatedClues,
@@ -107,7 +109,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
       <div className="px-3 py-1">
         <SurvivalClueBoxes
           currentHint={currentHint}
-          targetWord=""
+          targetWord={'?'.repeat(targetLength)}
           attempts={attempts}
           accumulatedClues={accumulatedClues}
           revealedLetters={new Set<number>()}

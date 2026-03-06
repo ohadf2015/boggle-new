@@ -467,7 +467,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       </div>
 
       {/* DESKTOP/TABLET VIEW - Two-column side-by-side layout (hidden on mobile) */}
-      <div className="hidden md:flex md:flex-col md:overflow-auto p-4 xl:p-6">
+      <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 md:overflow-y-auto md:overscroll-contain scrollable-area p-4 xl:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
         {/* Top Bar with Exit Button */}
         <div className="w-full max-w-6xl mx-auto flex items-center justify-end mb-4">
           <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />

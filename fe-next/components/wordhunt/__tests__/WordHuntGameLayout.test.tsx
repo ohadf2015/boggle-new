@@ -54,6 +54,7 @@ describe('WordHuntGameLayout', () => {
     onQuit: jest.fn(),
 
     // Clue boxes
+    targetLength: 5,
     currentHint: { hint: '_ _ _ _ _', level: 0, unlockCost: 0 },
     attempts: [],
     accumulatedClues: new Map(),

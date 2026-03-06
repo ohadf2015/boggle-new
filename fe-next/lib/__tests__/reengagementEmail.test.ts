@@ -261,10 +261,10 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('/mascot/waving-nobg.gif');
-    expect(html).toContain('alt="Lexi"');
+    expect(html).toContain('alt="Lexi the mascot waving hello"');
   });
 
-  test('should use text-based logo with LexiClash branding', () => {
+  test('should use logo image with LexiClash branding', () => {
     const { html } = generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
@@ -274,11 +274,11 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('Lexi');
-    expect(html).toContain('Clash');
+    expect(html).toContain('/logos/lexiclash_logo_english-min.webp');
+    expect(html).toContain('alt="LexiClash"');
   });
 
-  test('should include speech bubble and mini mystery tiles', () => {
+  test('should include speech bubble, mini tiles, hero image, and CTA', () => {
     const { html } = generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
@@ -296,9 +296,13 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('cta-glow');
     // Mascot glow backdrop
     expect(html).toContain('mascot-glow');
+    // Hero image
+    expect(html).toContain('/email/reengagement-hero.jpg');
+    // Accessible mascot alt text
+    expect(html).toContain('alt="Lexi the mascot waving hello"');
   });
 
-  test('should use text-based logo for Hebrew language too', () => {
+  test('should use Hebrew logo for Hebrew language', () => {
     const { html } = generateReengagementEmailHtml({
       recipientName: 'יוסי',
       firstLetter: 'ש',
@@ -308,8 +312,7 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('Lexi');
-    expect(html).toContain('Clash');
+    expect(html).toContain('/logos/lexiclash_logo_hebrew-min.webp');
   });
 
   test('should generate Hebrew template with RTL direction and flipped shadows', () => {

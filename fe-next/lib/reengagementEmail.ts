@@ -88,32 +88,42 @@ const LOCALIZED_STRINGS: Record<string, {
   },
 };
 
-/** Subject line variations per language (rotate by day) */
+/** Subject line variations per language (rotate by day) — casual, friend-like tone */
 const SUBJECT_LINES: Record<string, ((letter: string, name: string) => string)[]> = {
   en: [
-    (l) => `The word starts with ${l}... 🤔`,
-    (_l, name) => `We saved you a puzzle, ${name}`,
-    (l) => `${l}____. Can you crack it?`,
+    (l) => `psst... it starts with "${l}" 👀`,
+    (_l, name) => `${name}!! come back, we left you something`,
+    (l) => `ok but "${l}____" is a tough one today`,
+    (_l, name) => `hey ${name}, you won't believe today's word`,
+    (l) => `quick — today's hint: ${l}___`,
   ],
   he: [
-    (l) => `...${l} המילה מתחילה ב 🤔`,
-    (_l, name) => `${name} ,שמרנו לך חידה`,
-    (l) => `?${l}____. תצליח/י לפצח`,
+    (l) => `פסטט... זה מתחיל ב"${l}" 👀`,
+    (_l, name) => `${name}!! תחזור/י, השארנו לך משהו`,
+    (l) => `"${l}____" — קשה היום, אה?`,
+    (_l, name) => `הי ${name}, לא תאמין/י מה המילה היום`,
+    (l) => `רמז מהיר: ${l}___`,
   ],
   sv: [
-    (l) => `Ordet börjar med ${l}... 🤔`,
-    (_l, name) => `Vi sparade ett pussel åt dig, ${name}`,
-    (l) => `${l}____. Kan du knäcka det?`,
+    (l) => `psst... det börjar med "${l}" 👀`,
+    (_l, name) => `${name}!! kom tillbaka, vi sparade något`,
+    (l) => `"${l}____" — en tuff idag`,
+    (_l, name) => `hey ${name}, du kommer inte tro dagens ord`,
+    (l) => `snabb ledtråd: ${l}___`,
   ],
   ja: [
-    (l) => `今日の単語は${l}で始まります... 🤔`,
-    (_l, name) => `${name}さん、パズルが待っています`,
-    (l) => `${l}____。解けますか？`,
+    (l) => `ねえ…「${l}」から始まるよ 👀`,
+    (_l, name) => `${name}さん！戻ってきて、何か残してあるよ`,
+    (l) => `「${l}____」今日は難しいかも`,
+    (_l, name) => `ねえ${name}さん、今日の単語すごいよ`,
+    (l) => `ヒント: ${l}___`,
   ],
   es: [
-    (l) => `La palabra empieza con ${l}... 🤔`,
-    (_l, name) => `Guardamos un puzzle para ti, ${name}`,
-    (l) => `${l}____. ¿Puedes descifrarlo?`,
+    (l) => `psst... empieza con "${l}" 👀`,
+    (_l, name) => `${name}!! vuelve, te dejamos algo`,
+    (l) => `"${l}____" — hoy está difícil`,
+    (_l, name) => `oye ${name}, no vas a creer la palabra de hoy`,
+    (l) => `pista rápida: ${l}___`,
   ],
 };
 
@@ -143,6 +153,17 @@ interface EmailTemplateParams {
 /** Get the mascot image URL — waving mascot for re-engagement */
 function getMascotUrl(baseUrl: string): string {
   return `${baseUrl}/mascot/waving-nobg.gif`;
+}
+
+/** Get the logo image URL — language-aware logo */
+function getLogoUrl(baseUrl: string, language: string): string {
+  if (language === 'he') return `${baseUrl}/logos/lexiclash_logo_hebrew-min.webp`;
+  return `${baseUrl}/logos/lexiclash_logo_english-min.webp`;
+}
+
+/** Get the hero image URL for re-engagement email */
+function getHeroImageUrl(baseUrl: string): string {
+  return `${baseUrl}/email/reengagement-hero.jpg`;
 }
 
 // ==========================================
@@ -346,6 +367,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
   const isRTL = language === 'he';
   const dir = isRTL ? 'rtl' : 'ltr';
   const mascotUrl = getMascotUrl(baseUrl);
+  const logoUrl = getLogoUrl(baseUrl, language);
+  const heroImageUrl = getHeroImageUrl(baseUrl);
   const subject = getReengagementSubject(language, firstLetter, recipientName);
   const currentYear = new Date().getFullYear();
   // RTL-aware shadow direction
@@ -384,6 +407,7 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
       50% { box-shadow: 0 0 30px rgba(191,255,0,0.5), 0 0 60px rgba(191,255,0,0.2); }
     }
     .cta-glow { animation: glow-pulse 2s ease-in-out infinite; }
+    .hero-img { border-radius: 16px; }
     @media only screen and (max-width: 600px) {
       .container { padding: 16px !important; }
       .main-card { padding: 24px 16px 28px !important; }
@@ -411,16 +435,23 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
           <!-- Logo -->
           <tr>
             <td align="center" style="padding-bottom: 24px;">
-              <a href="${baseUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
-                <span style="font-family: 'Fredoka', Arial, sans-serif; font-size: 28px; font-weight: 700; color: ${colors.white}; letter-spacing: 1px;">Lexi<span style="color: ${colors.lime};">Clash</span></span>
+              <a href="${baseUrl}" target="_blank" style="text-decoration: none;">
+                <img src="${logoUrl}" alt="LexiClash" width="160" style="display: block; max-width: 160px; height: auto;" />
               </a>
+            </td>
+          </tr>
+
+          <!-- Hero Image -->
+          <tr>
+            <td align="center" style="padding-bottom: 20px;">
+              <img src="${heroImageUrl}" alt="LexiClash - Word Game" width="500" style="display: block; max-width: 100%; height: auto; border-radius: 16px; border: 3px solid ${colors.black}; box-shadow: ${shadowDir}6px 6px 0px ${colors.black};" />
             </td>
           </tr>
 
           <!-- Main Card -->
           <tr>
             <td>
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(180deg, ${colors.navyCard} 0%, ${colors.navyLight} 100%); border: 4px solid ${colors.black}; border-radius: 20px; box-shadow: ${shadowDir}8px 8px 0px ${colors.black}; overflow: hidden;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #252545; border: 4px solid ${colors.black}; border-radius: 20px; box-shadow: ${shadowDir}8px 8px 0px ${colors.black}; overflow: hidden;">
 
                 <!-- Decorative Header Bar -->
                 <tr>
@@ -429,14 +460,14 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
 
                 <!-- Card Content -->
                 <tr>
-                  <td class="main-card" style="padding: 36px 28px 40px;">
+                  <td class="main-card" style="padding: 32px 28px 36px;">
 
                     <!-- Mascot with glow backdrop -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 8px;">
                       <tr>
                         <td align="center">
-                          <div class="mascot-glow" style="width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,255,0.15) 0%, rgba(139,92,246,0.08) 50%, transparent 70%); display: inline-block; text-align: center; line-height: 0; padding-top: 5px;">
-                            <img src="${mascotUrl}" alt="Lexi" width="120" height="120" class="mascot-img" style="display: inline-block; width: 120px; height: 120px;" />
+                          <div class="mascot-glow" style="width: 130px; height: 130px; border-radius: 50%; display: inline-block; text-align: center; line-height: 0; padding-top: 5px;">
+                            <img src="${mascotUrl}" alt="Lexi the mascot waving hello" width="120" height="120" class="mascot-img" style="display: inline-block; width: 120px; height: 120px;" />
                           </div>
                         </td>
                       </tr>
@@ -447,13 +478,13 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       <tr>
                         <td align="center">
                           <!-- Bubble arrow -->
-                          <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid rgba(255,255,255,0.08); margin-bottom: 0;">&nbsp;</div>
+                          <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid #333355; margin-bottom: 0;">&nbsp;</div>
                           <!-- Bubble body -->
-                          <div class="speech-bubble" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px 24px; display: inline-block; max-width: 420px;">
+                          <div class="speech-bubble" style="background-color: #333355; border: 2px solid #444470; border-radius: 16px; padding: 16px 24px; display: inline-block; max-width: 420px;">
                             <h1 class="greeting-text" style="color: ${colors.white}; font-size: 26px; margin: 0 0 4px 0; font-weight: 700; text-align: center; line-height: 1.3;">
                               ${strings.greeting(recipientName)}
                             </h1>
-                            <p style="color: ${colors.grayLight}; font-size: 15px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500;">
+                            <p style="color: #D1D5DB; font-size: 15px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500;">
                               ${strings.teaser}
                             </p>
                           </div>
@@ -521,7 +552,7 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       ${strings.question}
                     </p>
 
-                    <!-- CTA Button with glow -->
+                    <!-- CTA Button -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td align="center">
@@ -532,11 +563,9 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <div style="display: inline-block; background: linear-gradient(135deg, ${colors.pink}, ${colors.purple}, ${colors.cyan}, ${colors.lime}); padding: 4px; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}, 0 0 32px rgba(191,255,0,0.3), 0 0 64px rgba(139,92,246,0.15);">
-                            <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: block; background: linear-gradient(180deg, ${colors.lime} 0%, #a3e635 50%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 22px; font-weight: 700; text-decoration: none; padding: 20px 60px; border: 3px solid ${colors.black}; border-radius: 16px; letter-spacing: 2px; font-family: 'Fredoka', Arial, sans-serif; transition: transform 0.15s ease, box-shadow 0.15s ease; text-transform: uppercase;">
-                              &#9654;&nbsp;&nbsp;${strings.cta}
-                            </a>
-                          </div>
+                          <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: inline-block; background-color: ${colors.lime}; color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 52px; border: 4px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; letter-spacing: 2px; font-family: 'Fredoka', Arial, sans-serif; text-transform: uppercase;">
+                            &#9654;&nbsp;&nbsp;${strings.cta}
+                          </a>
                           <!--<![endif]-->
                         </td>
                       </tr>

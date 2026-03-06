@@ -231,4 +231,158 @@ router.post('/send-test-reengagement', async (req: AdminRequest, res: Response):
   }
 });
 
+/**
+ * POST /api/admin/send-reengagement-to-player
+ * Manually send a re-engagement email to a specific player (real email, not test)
+ */
+router.post('/send-reengagement-to-player', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const {
+      sendReengagementEmail,
+      resolveUserLanguage,
+      getFirstLetterForLanguage,
+    } = await import('../../../lib/reengagementEmail');
+    const { isEmailServiceConfigured, generateUnsubscribeToken } = await import('../../../lib/email');
+
+    if (!isEmailServiceConfigured()) {
+      res.status(503).json({ error: 'Email service not configured' });
+      return;
+    }
+
+    const { playerIdentifier } = req.body || {};
+    if (!playerIdentifier) {
+      res.status(400).json({ error: 'playerIdentifier (email or username) is required' });
+      return;
+    }
+
+    const supabase = getSupabase();
+
+    // Look up player by email or username
+    const isEmail = playerIdentifier.includes('@');
+    let userId: string | null = null;
+    let playerEmail: string | null = null;
+    let profile: { id: string; display_name: string | null; username: string; timezone: string | null; country_code: string | null; email_unsubscribe_token: string | null } | null = null;
+
+    if (isEmail) {
+      // Find user by email in auth
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      if (authError) {
+        res.status(500).json({ error: 'Failed to look up users' });
+        return;
+      }
+      const authUser = authUsers.users.find((u: { email?: string }) => u.email === playerIdentifier);
+      if (!authUser) {
+        res.status(404).json({ error: `No user found with email: ${playerIdentifier}` });
+        return;
+      }
+      userId = authUser.id;
+      playerEmail = authUser.email || null;
+    } else {
+      // Find user by username
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, display_name, username, timezone, country_code, email_unsubscribe_token')
+        .eq('username', playerIdentifier)
+        .single();
+
+      if (profileError || !profileData) {
+        res.status(404).json({ error: `No user found with username: ${playerIdentifier}` });
+        return;
+      }
+      userId = profileData.id;
+      profile = profileData;
+
+      // Get email from auth
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      if (authError) {
+        res.status(500).json({ error: 'Failed to look up users' });
+        return;
+      }
+      const authUser = authUsers.users.find((u: { id: string }) => u.id === userId);
+      playerEmail = authUser?.email || null;
+    }
+
+    if (!userId || !playerEmail) {
+      res.status(404).json({ error: 'Could not resolve player email' });
+      return;
+    }
+
+    // Get profile if not already fetched
+    if (!profile) {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, display_name, username, timezone, country_code, email_unsubscribe_token')
+        .eq('id', userId)
+        .single();
+      profile = profileData;
+    }
+
+    if (!profile) {
+      res.status(404).json({ error: 'Player profile not found' });
+      return;
+    }
+
+    // Ensure unsubscribe token exists
+    if (!profile.email_unsubscribe_token) {
+      const token = generateUnsubscribeToken();
+      await supabase
+        .from('profiles')
+        .update({ email_unsubscribe_token: token })
+        .eq('id', userId);
+      profile.email_unsubscribe_token = token;
+    }
+
+    const language = await resolveUserLanguage(userId, profile.country_code);
+    const letterData = await getFirstLetterForLanguage(language);
+
+    if (!letterData) {
+      res.status(404).json({ error: `No daily word found for language: ${language}` });
+      return;
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
+
+    const result = await sendReengagementEmail(
+      {
+        id: userId,
+        email: playerEmail,
+        display_name: profile.display_name,
+        username: profile.username,
+        timezone: profile.timezone,
+        country_code: profile.country_code,
+        email_unsubscribe_token: profile.email_unsubscribe_token,
+      },
+      language,
+      letterData.letter,
+      baseUrl
+    );
+
+    if (!result.success) {
+      res.status(500).json({ error: result.error || 'Failed to send email' });
+      return;
+    }
+
+    auditLog(req.adminUser, 'SEND_REENGAGEMENT_TO_PLAYER', {
+      playerIdentifier,
+      playerEmail,
+      language,
+      letter: letterData.letter,
+    });
+
+    logger.info('ADMIN_API', `Sent re-engagement email to player ${playerIdentifier} (${playerEmail})`);
+
+    res.json({
+      success: true,
+      message: `Re-engagement email sent to ${playerEmail}`,
+      sentTo: playerEmail,
+      language,
+      firstLetter: letterData.letter,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Send reengagement to player error: ${err.message}`);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
 export default router;

@@ -121,18 +121,22 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     onWordSubmit(word);
 
     // If word length matches target and target not found, also submit as target guess
-    if (word.length === bridge.targetLength && !bridge.targetFound) {
+    const isTargetGuess = word.length === bridge.targetLength && !bridge.targetFound;
+    if (isTargetGuess) {
       onWordHuntGuess(word);
     }
 
-    // Show accepted feedback (optimistic)
-    feedbackIdRef.current += 1;
-    setWordFeedback({
-      id: String(feedbackIdRef.current),
-      type: 'accepted',
-      word,
-      timestamp: Date.now(),
-    });
+    // Show accepted feedback in word forming area only for non-target words.
+    // Target guess feedback is shown in the clue boxes via the bridge.
+    if (!isTargetGuess) {
+      feedbackIdRef.current += 1;
+      setWordFeedback({
+        id: String(feedbackIdRef.current),
+        type: 'accepted',
+        word,
+        timestamp: Date.now(),
+      });
+    }
 
     // Clear formed word
     setFormedWord('');
@@ -152,6 +156,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       onQuit={onQuit}
 
       // Clue boxes (from bridge)
+      targetLength={bridge.targetLength}
       currentHint={bridge.currentHint}
       attempts={bridge.attempts}
       accumulatedClues={bridge.accumulatedClues}
