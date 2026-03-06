@@ -314,6 +314,42 @@ export function useHostGameEvents({
       }
     };
 
+    // Word Hunt event handlers (mirrors usePlayerGameEvents)
+    const handleWordHuntLifeUpdate = (data: { playerLives: Record<string, number>; eliminatedPlayers?: string[] }) => {
+      logger.log('[HOST] Word hunt life update:', data);
+      const store = useGameStore.getState();
+      store.setWordHuntPlayerLives(data.playerLives);
+      if (data.playerLives[username] !== undefined) {
+        store.setWordHuntMyLife(data.playerLives[username]);
+      }
+      if (data.eliminatedPlayers) {
+        store.setWordHuntEliminatedPlayers(data.eliminatedPlayers);
+      }
+    };
+
+    const handleWordHuntTargetResult = (data: { guess: string; feedback: any[]; correct: boolean; isFirstFinder: boolean; bonus: number; livesRemaining: number }) => {
+      logger.log('[HOST] Word hunt target result:', data);
+      const store = useGameStore.getState();
+      store.setWordHuntTargetAttempts((prev: Array<{ guess: string; feedback: any[] }>) => [...prev, { guess: data.guess, feedback: data.feedback }]);
+      store.setWordHuntMyLife(data.livesRemaining);
+      if (data.correct) {
+        store.setWordHuntTargetFound(true);
+      }
+    };
+
+    const handleWordHuntTargetFound = (data: { username: string; targetWord: string; isFirstFinder: boolean }) => {
+      logger.log('[HOST] Word hunt target found by:', data.username);
+      const store = useGameStore.getState();
+      store.setWordHuntTargetFound(true);
+      neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: '🎯', duration: 3000 });
+    };
+
+    const handleWordHuntEliminated = (data: { username: string }) => {
+      logger.log('[HOST] Word hunt player eliminated:', data.username);
+      const store = useGameStore.getState();
+      store.setWordHuntEliminatedPlayers((prev: string[]) => [...prev, data.username]);
+    };
+
     // Register listeners
     socket.on('startGame', handleStartGame);
     socket.on('timeUpdate', handleTimeUpdate);
@@ -326,6 +362,11 @@ export function useHostGameEvents({
     socket.on('earthquakeShake', earthquakeHandlers.handleEarthquakeShake);
     socket.on('fireRoundStart', earthquakeHandlers.handleFireRoundStart);
     socket.on('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
+    // Word Hunt handlers
+    socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
+    socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
+    socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
+    socket.on('wordHuntEliminated', handleWordHuntEliminated);
 
     return () => {
       socket.off('startGame', handleStartGame);
@@ -340,6 +381,11 @@ export function useHostGameEvents({
       socket.off('fireRoundStart', earthquakeHandlers.handleFireRoundStart);
       socket.off('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
       earthquakeHandlers.cleanup();
+      // Word Hunt handlers cleanup
+      socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
+      socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
+      socket.off('wordHuntTargetFound', handleWordHuntTargetFound);
+      socket.off('wordHuntEliminated', handleWordHuntEliminated);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

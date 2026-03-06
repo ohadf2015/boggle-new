@@ -290,14 +290,12 @@ describe('generateReengagementEmailHtml', () => {
 
     // Speech bubble with greeting
     expect(html).toContain('speech-bubble');
-    // Mini mystery tiles flanking the main tile
-    expect(html).toContain('mini-tile');
+    // Word hunt tile row with mystery tiles
+    expect(html).toContain('word-tile');
     // CTA glow animation
     expect(html).toContain('cta-glow');
     // Mascot glow backdrop
     expect(html).toContain('mascot-glow');
-    // Hero image
-    expect(html).toContain('/email/reengagement-hero.jpg');
     // Accessible mascot alt text
     expect(html).toContain('alt="Lexi the mascot waving hello"');
   });

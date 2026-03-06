@@ -161,10 +161,8 @@ function getLogoUrl(baseUrl: string, language: string): string {
   return `${baseUrl}/logos/lexiclash_logo_english-min.webp`;
 }
 
-/** Get the hero image URL for re-engagement email */
-function getHeroImageUrl(baseUrl: string): string {
-  return `${baseUrl}/email/reengagement-hero.jpg`;
-}
+/** Word length for the tile row display */
+const WORD_TILE_COUNT = 5;
 
 // ==========================================
 // Language Resolution
@@ -368,7 +366,6 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
   const dir = isRTL ? 'rtl' : 'ltr';
   const mascotUrl = getMascotUrl(baseUrl);
   const logoUrl = getLogoUrl(baseUrl, language);
-  const heroImageUrl = getHeroImageUrl(baseUrl);
   const subject = getReengagementSubject(language, firstLetter, recipientName);
   const currentYear = new Date().getFullYear();
   // RTL-aware shadow direction
@@ -403,20 +400,18 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
       box-shadow: 3px 3px 0px ${colors.black} !important;
     }
     @keyframes glow-pulse {
-      0%, 100% { box-shadow: 0 0 20px rgba(191,255,0,0.3), 0 0 40px rgba(191,255,0,0.1); }
-      50% { box-shadow: 0 0 30px rgba(191,255,0,0.5), 0 0 60px rgba(191,255,0,0.2); }
+      0%, 100% { box-shadow: 0 0 20px rgba(255,20,147,0.3), 0 0 40px rgba(255,107,53,0.1); }
+      50% { box-shadow: 0 0 30px rgba(255,20,147,0.5), 0 0 60px rgba(255,107,53,0.2); }
     }
     .cta-glow { animation: glow-pulse 2s ease-in-out infinite; }
-    .hero-img { border-radius: 16px; }
     @media only screen and (max-width: 600px) {
       .container { padding: 16px !important; }
       .main-card { padding: 24px 16px 28px !important; }
-      .letter-tile { width: 72px !important; height: 72px !important; font-size: 40px !important; line-height: 64px !important; }
+      .word-tile { width: 48px !important; height: 48px !important; font-size: 24px !important; line-height: 42px !important; }
       .mascot-img { width: 90px !important; height: 90px !important; }
       .mascot-glow { width: 110px !important; height: 110px !important; }
       .greeting-text { font-size: 22px !important; }
       .speech-bubble { padding: 12px 16px !important; }
-      .mini-tile { width: 36px !important; height: 36px !important; font-size: 18px !important; line-height: 28px !important; }
     }
   </style>
 </head>
@@ -438,13 +433,6 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
               <a href="${baseUrl}" target="_blank" style="text-decoration: none;">
                 <img src="${logoUrl}" alt="LexiClash" width="160" style="display: block; max-width: 160px; height: auto;" />
               </a>
-            </td>
-          </tr>
-
-          <!-- Hero Image -->
-          <tr>
-            <td align="center" style="padding-bottom: 20px;">
-              <img src="${heroImageUrl}" alt="LexiClash - Word Game" width="500" style="display: block; max-width: 100%; height: auto; border-radius: 16px; border: 3px solid ${colors.black}; box-shadow: ${shadowDir}6px 6px 0px ${colors.black};" />
             </td>
           </tr>
 
@@ -501,46 +489,36 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       </tr>
                     </table>
 
-                    <!-- Letter Tile Hero with depth tiles -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 10px;">
-                      <tr>
-                        <td align="center">
-                          <table role="presentation" cellpadding="0" cellspacing="0">
-                            <tr>
-                              <!-- Mini mystery tile left -->
-                              <td style="vertical-align: middle; padding: 0 6px;">
-                                <div class="mini-tile" style="width: 44px; height: 44px; background: linear-gradient(180deg, ${colors.pink} 0%, ${colors.pinkLight} 100%); border: 3px solid ${colors.black}; border-radius: 10px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 38px; font-size: 22px; font-weight: 700; color: ${colors.white}; font-family: 'Fredoka', Arial, sans-serif; opacity: 0.85;">
-                                  ?
-                                </div>
-                              </td>
-                              <!-- The main Letter Tile -->
-                              <td>
-                                <div class="letter-tile" style="width: 96px; height: 96px; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); border: 4px solid ${colors.black}; border-radius: 16px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}, 0 0 24px rgba(191,255,0,0.2); display: inline-block; text-align: center; line-height: 88px; font-size: 52px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
-                                  ${firstLetter}
-                                </div>
-                              </td>
-                              <!-- Mini mystery tile right -->
-                              <td style="vertical-align: middle; padding: 0 6px;">
-                                <div class="mini-tile" style="width: 44px; height: 44px; background: linear-gradient(180deg, ${colors.cyan} 0%, ${colors.cyanMuted} 100%); border: 3px solid ${colors.black}; border-radius: 10px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 38px; font-size: 22px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; opacity: 0.85;">
-                                  ?
-                                </div>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-
-                    <!-- Mystery word blanks -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 6px;" dir="${dir}">
+                    <!-- Word Hunt Tile Row -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
                       <tr>
                         <td align="center">
                           <table role="presentation" cellpadding="0" cellspacing="0" dir="${dir}">
                             <tr>
-                              <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px;">&nbsp;</span></td>
-                              <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px; opacity: 0.7;">&nbsp;</span></td>
-                              <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px; opacity: 0.5;">&nbsp;</span></td>
-                              <td style="padding: 0 3px;"><span style="display: inline-block; width: 28px; height: 4px; background: ${colors.lime}; border-radius: 2px; opacity: 0.3;">&nbsp;</span></td>
+                              ${Array.from({ length: WORD_TILE_COUNT }, (_, i) => {
+                                const isFirst = isRTL ? i === WORD_TILE_COUNT - 1 : i === 0;
+                                if (isFirst) {
+                                  // Revealed first letter — lime tile
+                                  return `<td style="padding: 0 4px;">
+                                    <div class="word-tile" style="width: 64px; height: 64px; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}4px 4px 0px ${colors.black}; text-align: center; line-height: 58px; font-size: 36px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
+                                      ${firstLetter}
+                                    </div>
+                                  </td>`;
+                                }
+                                // Mystery tiles — dark with ? mark, alternating accent colors
+                                const accentColors = [
+                                  { bg: '#333355', border: '#444470' },
+                                  { bg: '#2d2d50', border: '#3d3d65' },
+                                  { bg: '#333355', border: '#444470' },
+                                  { bg: '#2d2d50', border: '#3d3d65' },
+                                ];
+                                const accent = accentColors[(isRTL ? WORD_TILE_COUNT - 1 - i : i) - 1] || accentColors[0];
+                                return `<td style="padding: 0 4px;">
+                                  <div class="word-tile" style="width: 64px; height: 64px; background: ${accent.bg}; border: 3px solid ${accent.border}; border-radius: 12px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 58px; font-size: 28px; font-weight: 700; color: ${colors.grayLight}; font-family: 'Fredoka', Arial, sans-serif;">
+                                    ?
+                                  </div>
+                                </td>`;
+                              }).join('')}
                             </tr>
                           </table>
                         </td>
@@ -557,13 +535,13 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       <tr>
                         <td align="center">
                           <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:62px;v-text-anchor:middle;width:320px;" arcsize="14%" stroke="t" strokecolor="${colors.black}" strokeweight="4px" fillcolor="${colors.lime}">
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:62px;v-text-anchor:middle;width:320px;" arcsize="14%" stroke="t" strokecolor="${colors.black}" strokeweight="4px" fillcolor="${colors.pink}">
                             <w:anchorlock/>
-                            <center style="color:${colors.black};font-family:Arial,sans-serif;font-size:20px;font-weight:bold;">&#9654; ${strings.cta}</center>
+                            <center style="color:${colors.white};font-family:Arial,sans-serif;font-size:20px;font-weight:bold;">&#9654; ${strings.cta}</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: inline-block; background-color: ${colors.lime}; color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 52px; border: 4px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; letter-spacing: 2px; font-family: 'Fredoka', Arial, sans-serif; text-transform: uppercase;">
+                          <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: inline-block; background: linear-gradient(135deg, ${colors.pink} 0%, ${colors.orange} 100%); color: ${colors.white}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 52px; border: 4px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; letter-spacing: 2px; font-family: 'Fredoka', Arial, sans-serif; text-transform: uppercase;">
                             &#9654;&nbsp;&nbsp;${strings.cta}
                           </a>
                           <!--<![endif]-->
