@@ -22,7 +22,7 @@ import { GameLeaderboard } from './GameLeaderboard';
 import { GameWordList } from './GameWordList';
 import { ScoreDisplay } from './ScoreDisplay';
 import FloatingScoreAnimation from '../../FloatingScoreAnimation';
-import type { LetterGrid, Language, GameMode, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
+import type { LetterGrid, Language, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer, FoundWord } from '@/shared/types/view';
 import type { HintsState, EarthquakeState, TranslationFn, TappedCellPosition } from '../types';
 import { LeadChangeBanner } from '../../LeadChangeBanner';
@@ -125,7 +125,7 @@ interface PortraitLayoutProps {
   leadChangeEvent?: LeadChangeEvent | null;
 
   // Game mode overlays
-  gameMode?: GameMode;
+  gameMode?: GameModeSelection;
   blastTileOverlay?: BlastTileOverlay[];
   wordHuntTargetLength?: number;
   wordHuntAttempts?: Array<{ guess: string; feedback: LetterFeedback[] }>;

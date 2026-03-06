@@ -127,7 +127,7 @@ function HostPreGameView({
     if (selectedGameMode !== 'random') {
       setStoreGameMode(selectedGameMode);
     } else {
-      setStoreGameMode('classic'); // Default; server overrides via rotation
+      setStoreGameMode('random'); // Server resolves via weighted rotation
     }
   }, [selectedGameMode, setStoreGameMode]);
 

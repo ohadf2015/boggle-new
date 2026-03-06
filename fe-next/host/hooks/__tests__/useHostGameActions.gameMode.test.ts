@@ -109,7 +109,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
     );
   });
 
-  it('should default gameMode to classic when undefined', () => {
+  it('should default gameMode to random when undefined', () => {
     // GIVEN: useGameMode returns undefined (mocked)
     const { useGameMode } = require('@/hooks/gameState');
     (useGameMode as jest.Mock).mockReturnValue(undefined);
@@ -127,7 +127,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
     );
     expect(startGameCall).toBeDefined();
     expect(startGameCall![1]).toEqual(
-      expect.objectContaining({ gameMode: 'classic' })
+      expect.objectContaining({ gameMode: 'random' })
     );
   });
 

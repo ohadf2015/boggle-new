@@ -92,8 +92,17 @@ jest.mock('../../../backend/utils/metrics', () => ({
   ensureGame: jest.fn(),
 }));
 
+const mockGenerateRandomTable = jest.fn().mockReturnValue([
+  ['A', 'B', 'C', 'D', 'E', 'F'],
+  ['G', 'H', 'I', 'J', 'K', 'L'],
+  ['M', 'N', 'O', 'P', 'Q', 'R'],
+  ['S', 'T', 'U', 'V', 'W', 'X'],
+  ['Y', 'Z', 'A', 'B', 'C', 'D'],
+  ['E', 'F', 'G', 'H', 'I', 'J'],
+]);
 jest.mock('../../../backend/utils/gameUtils', () => ({
   generateRandomAvatar: jest.fn(),
+  generateRandomTable: (...args: any[]) => mockGenerateRandomTable(...args),
 }));
 
 jest.mock('../../../backend/dictionary', () => ({
@@ -269,6 +278,48 @@ describe('gameLifecycleHandler - gameMode', () => {
       }));
     });
 
+    it('should regenerate 6x6 grid when random resolves to blast and grid is not 6x6', async () => {
+      // GIVEN: host sends small grid with random mode, server resolves to blast
+      mockSelectNextGameMode.mockReturnValue('blast');
+
+      const handler = getHandler('startGame');
+
+      // WHEN
+      await handler({
+        letterGrid: [['A', 'B'], ['C', 'D']],
+        timerSeconds: 180,
+        gameMode: 'random',
+      });
+
+      // THEN: generateRandomTable was called with 6x6
+      expect(mockGenerateRandomTable).toHaveBeenCalledWith(6, 6, 'en');
+
+      // AND: updateGame received the regenerated 6x6 grid
+      expect(updateGame).toHaveBeenCalledWith('TEST', expect.objectContaining({
+        letterGrid: expect.arrayContaining([
+          expect.arrayContaining(['A', 'B', 'C', 'D', 'E', 'F']),
+        ]),
+      }));
+    });
+
+    it('should NOT regenerate grid when random resolves to classic', async () => {
+      // GIVEN: host sends small grid, random resolves to classic
+      mockSelectNextGameMode.mockReturnValue('classic');
+      mockGenerateRandomTable.mockClear();
+
+      const handler = getHandler('startGame');
+
+      // WHEN
+      await handler({
+        letterGrid: [['A', 'B'], ['C', 'D']],
+        timerSeconds: 180,
+        gameMode: 'random',
+      });
+
+      // THEN: generateRandomTable was NOT called
+      expect(mockGenerateRandomTable).not.toHaveBeenCalled();
+    });
+
     it('should append to modeHistory from previous games', async () => {
       // GIVEN: game already played classic mode
       (getGame as jest.Mock).mockReturnValue({
@@ -441,9 +492,9 @@ describe('gameLifecycleHandler - gameMode', () => {
         gameMode: 'blast',
       });
 
-      // THEN: initBlastModeState was called with wave=3 (not default 1)
+      // THEN: initBlastModeState was called with the regenerated 6x6 grid and wave=3
       expect(mockInitBlastModeState).toHaveBeenCalledWith(
-        [['A', 'B'], ['C', 'D']],
+        mockGenerateRandomTable(),
         ['alice', 'bob'],
         3
       );

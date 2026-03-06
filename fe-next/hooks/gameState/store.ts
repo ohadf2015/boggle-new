@@ -29,7 +29,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
-import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameMode, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
+import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameMode, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import type { Player, TournamentData, TournamentStanding, ComboState } from './types';
 import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
@@ -92,8 +92,8 @@ interface GameState {
   // Board theme
   boardTheme: BoardTheme | null;
 
-  // Game mode (multiplayer mode rotation)
-  gameMode: GameMode;
+  // Game mode (multiplayer mode rotation; 'random' = server picks)
+  gameMode: GameModeSelection;
 
   // Blast multiplayer state
   blastTileOverlay: BlastTileOverlay[];
@@ -166,7 +166,7 @@ interface GameActions {
   setBoardTheme: (value: BoardTheme | null | ((prev: BoardTheme | null) => BoardTheme | null)) => void;
 
   // Game mode actions
-  setGameMode: (value: GameMode | ((prev: GameMode) => GameMode)) => void;
+  setGameMode: (value: GameModeSelection | ((prev: GameModeSelection) => GameModeSelection)) => void;
 
   // Blast multiplayer actions
   setBlastTileOverlay: (value: BlastTileOverlay[] | ((prev: BlastTileOverlay[]) => BlastTileOverlay[])) => void;

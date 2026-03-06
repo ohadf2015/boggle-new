@@ -4,7 +4,7 @@
 
 import type { ReactNode, MutableRefObject } from 'react';
 import type { Socket } from 'socket.io-client';
-import type { LetterGrid, Language, GameMode, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
+import type { LetterGrid, Language, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
 import type {
   FoundWord,
   ExtendedLeaderboardPlayer as LeaderboardPlayer,
@@ -88,7 +88,7 @@ export interface InGameScreenProps {
   boardTheme?: BoardTheme | null;
 
   // Game mode (classic/blast/word-hunt) — controls mode-specific overlays
-  gameMode?: GameMode;
+  gameMode?: GameModeSelection;
 
   // Blast mode overlay data
   blastTileOverlay?: BlastTileOverlay[];

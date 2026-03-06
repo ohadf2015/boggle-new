@@ -177,6 +177,11 @@ export function useHostGameEvents({
         setRemainingTime(data.timerSeconds);
       }
 
+      // Sync language from server broadcast (mirrors player handler)
+      if (data.language) {
+        useGameStore.getState().setGameLanguage(data.language);
+      }
+
       // Sync resolved game mode from server (handles random → actual mode)
       if ((data as any).gameMode) {
         useGameStore.getState().setGameMode((data as any).gameMode);
@@ -188,7 +193,7 @@ export function useHostGameEvents({
       }
 
       // Set word hunt target length if present (mirrors player handler)
-      if ((data as any).wordHuntTargetLength) {
+      if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
         const store = useGameStore.getState();
         store.setWordHuntTargetLength((data as any).wordHuntTargetLength);
         store.setWordHuntMyLife(100);

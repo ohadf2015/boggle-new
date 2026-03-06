@@ -184,7 +184,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       minWordLength: minWordLength,
       difficulty: difficulty,
       boardTheme: boardTheme,
-      gameMode: gameMode || 'classic',
+      gameMode: gameMode || 'random',
     });
 
     neoSuccessToast(t('common.gameStarted'), {
@@ -286,7 +286,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           minWordLength: minWordLength,
           difficulty: difficulty,
           boardTheme: boardTheme,
-          gameMode: gameMode || 'classic',
+          gameMode: gameMode || 'random',
         });
 
         neoSuccessToast(t('common.gameStarted'), {

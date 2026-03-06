@@ -12,6 +12,7 @@ export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'fr' | 'de';
 export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
 
 export type GameMode = 'classic' | 'blast' | 'word-hunt';
+export type GameModeSelection = GameMode | 'random';
 
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
 

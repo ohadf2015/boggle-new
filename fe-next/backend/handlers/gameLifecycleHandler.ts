@@ -46,7 +46,7 @@ import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { clearGameTimer } from '../utils/timerManager.js';
 import { saveGameState } from '../redisClient.js';
 import { inc, ensureGame } from '../utils/metrics.js';
-import { generateRandomAvatar } from '../utils/gameUtils.js';
+import { generateRandomAvatar, generateRandomTable } from '../utils/gameUtils.js';
 import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
 import { startGameTimer, endGame } from './shared.js';
@@ -266,7 +266,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { letterGrid, timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode } = data;
+    let { letterGrid } = data;
+    const { timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode } = data;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -334,6 +335,11 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
       : gameMode as GameMode;
 
+    // If random resolved to blast and grid isn't 6x6, regenerate
+    if (resolvedMode === 'blast' && (letterGrid.length !== 6 || letterGrid[0]?.length !== 6)) {
+      letterGrid = generateRandomTable(6, 6, gameLang);
+    }
+
     // Update game settings first
     updateGame(gameCode, {
       letterGrid,
@@ -388,10 +394,11 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     // Initialize word hunt mode state if needed
     if (resolvedMode === 'word-hunt') {
-      const { initWordHuntState, selectTargetWord } = await import('../modules/wordHuntManager.js');
+      const { initWordHuntState, selectTargetWordWithFallback } = await import('../modules/wordHuntManager.js');
       const trie = getCachedTrie(gameLang);
-      const allValidWords = findAllWords(letterGrid, gameLang, { minLength: 5, maxLength: 8, maxWords: 10000, trie });
-      const targetWord = selectTargetWord(allValidWords, 5, 8);
+      // Search broadly (minLength:3) so fallback can find shorter words
+      const allValidWords = findAllWords(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
+      const targetWord = selectTargetWordWithFallback(allValidWords, 5, 8);
       if (targetWord) {
         const huntState = initWordHuntState(targetWord, playerUsernames);
         const currentGame = getGame(gameCode);
@@ -417,7 +424,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         blastTileOverlay: (getGame(gameCode) as any)?.blastModeState?.overlay || [],
         blastSeed: (getGame(gameCode) as any)?.blastModeState?.seed ?? null,
       } : {}),
-      ...(resolvedMode === 'word-hunt' ? { wordHuntTargetLength: (getGame(gameCode) as any)?.wordHuntState?.targetWordLength || 0 } : {}),
+      ...(resolvedMode === 'word-hunt' ? { wordHuntTargetLength: (getGame(gameCode) as any)?.wordHuntState?.targetWordLength ?? 0 } : {}),
     });
 
     // Calculate and emit total words on board (async, non-blocking)
