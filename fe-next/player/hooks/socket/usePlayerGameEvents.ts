@@ -229,7 +229,7 @@ export function usePlayerGameEvents({
       }
 
       // Set word hunt target length if present
-      if ((data as any).wordHuntTargetLength) {
+      if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
         setWordHuntTargetLength((data as any).wordHuntTargetLength);
         setWordHuntMyLife(100);
         setWordHuntPlayerLives({});

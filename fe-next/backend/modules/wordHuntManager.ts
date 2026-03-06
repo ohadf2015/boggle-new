@@ -30,6 +30,27 @@ export function selectTargetWord(
 }
 
 /**
+ * Pick a target word with progressive fallback to shorter lengths.
+ * Tries preferred range first, then falls back to minLen-1, minLen-2, etc.
+ * Minimum fallback length is 3.
+ */
+export function selectTargetWordWithFallback(
+  validWords: string[],
+  preferredMinLen: number,
+  maxLen: number,
+): string | null {
+  const result = selectTargetWord(validWords, preferredMinLen, maxLen);
+  if (result) return result;
+
+  for (let min = preferredMinLen - 1; min >= 3; min--) {
+    const fallback = selectTargetWord(validWords, min, min);
+    if (fallback) return fallback;
+  }
+
+  return null;
+}
+
+/**
  * Initialize word hunt state for a new game.
  */
 export function initWordHuntState(
@@ -67,7 +88,7 @@ export function drainLife(state: WordHuntModeState): {
 
     updatedLives[player] -= HUNT_LIFE_DRAIN_RATE;
     if (updatedLives[player] <= 0) {
-      updatedLives[player] = Math.min(updatedLives[player], 0);
+      updatedLives[player] = 0;
       newlyEliminated.push(player);
     }
   }

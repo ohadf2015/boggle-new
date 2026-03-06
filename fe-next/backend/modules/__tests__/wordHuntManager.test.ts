@@ -7,6 +7,7 @@
 
 import {
   selectTargetWord,
+  selectTargetWordWithFallback,
   initWordHuntState,
   drainLife,
   validateTargetGuess,
@@ -58,6 +59,44 @@ describe('wordHuntManager', () => {
         expect(result!.length).toBeGreaterThanOrEqual(5);
         expect(result!.length).toBeLessThanOrEqual(8);
       }
+    });
+  });
+
+  // ==========================================
+  // selectTargetWordWithFallback
+  // ==========================================
+  describe('selectTargetWordWithFallback', () => {
+    it('should return a word in preferred range when available', () => {
+      const words = ['cat', 'hello', 'worlds', 'elephant'];
+      const result = selectTargetWordWithFallback(words, 5, 8);
+      expect(result).not.toBeNull();
+      expect(result!.length).toBeGreaterThanOrEqual(5);
+      expect(result!.length).toBeLessThanOrEqual(8);
+    });
+
+    it('should fall back to 4-letter words when no 5-8 letter words exist', () => {
+      const words = ['cats', 'dogs', 'fish', 'hi'];
+      const result = selectTargetWordWithFallback(words, 5, 8);
+      expect(result).not.toBeNull();
+      expect(result!.length).toBe(4);
+    });
+
+    it('should fall back to 3-letter words when no 4+ letter words exist', () => {
+      const words = ['cat', 'dog', 'hi'];
+      const result = selectTargetWordWithFallback(words, 5, 8);
+      expect(result).not.toBeNull();
+      expect(result!.length).toBe(3);
+    });
+
+    it('should return null only when no words of length >= 3 exist', () => {
+      const words = ['hi', 'a', 'be'];
+      const result = selectTargetWordWithFallback(words, 5, 8);
+      expect(result).toBeNull();
+    });
+
+    it('should return null for empty word list', () => {
+      const result = selectTargetWordWithFallback([], 5, 8);
+      expect(result).toBeNull();
     });
   });
 
@@ -122,6 +161,22 @@ describe('wordHuntManager', () => {
       const result = drainLife(state);
       expect(result.newlyEliminated).toContain('bob');
       expect(result.updatedLives['bob']).toBeLessThanOrEqual(0);
+    });
+
+    it('should clamp eliminated player life at 0 (not negative)', () => {
+      const state: WordHuntModeState = {
+        targetWord: 'hello',
+        targetWordLength: 5,
+        playerLives: { alice: 50, bob: 0.5 },
+        eliminatedPlayers: [],
+        targetFoundBy: null,
+        isFirstFinderClaimed: false,
+      };
+
+      const result = drainLife(state);
+      expect(result.newlyEliminated).toContain('bob');
+      // Life should be clamped at 0, not negative
+      expect(result.updatedLives['bob']).toBe(0);
     });
 
     it('should not drain life from already eliminated players', () => {
