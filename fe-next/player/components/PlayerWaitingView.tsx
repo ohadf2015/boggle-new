@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X } from 'lucide-react';
 import Avatar from '../../components/Avatar';
@@ -44,6 +44,20 @@ interface PlayerWaitingViewProps {
 const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
 const MAX_PLAYERS = 8;
 
+// Rotating word facts shown while waiting
+const WORD_FACTS = [
+  { key: 'qi', fact: '"QI" is a valid 2-letter word worth 11 points in Scrabble' },
+  { key: 'oxyphenbutazone', fact: '"OXYPHENBUTAZONE" is the highest-scoring word in Scrabble history' },
+  { key: 'set', fact: '"SET" has the most definitions of any English word — over 430' },
+  { key: 'rhythm', fact: '"RHYTHM" is the longest common English word without a vowel' },
+  { key: 'dreamt', fact: '"DREAMT" is the only English word ending in "MT"' },
+  { key: 'strengths', fact: '"STRENGTHS" has only one vowel in 9 letters' },
+  { key: 'typewriter', fact: '"TYPEWRITER" can be typed using only the top row of a keyboard' },
+  { key: 'uncopyrightable', fact: '"UNCOPYRIGHTABLE" is the longest word with no repeating letters' },
+  { key: 'aa', fact: '"AA" is a valid word — it\'s a type of volcanic lava' },
+  { key: 'za', fact: '"ZA" is slang for pizza and a valid Scrabble word' },
+];
+
 // ==================== Component ====================
 
 const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
@@ -58,6 +72,16 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onNameChange,
 }): React.ReactElement => {
   const { isAuthenticated } = useAuth();
+
+  // Rotating word facts
+  const [factIndex, setFactIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFactIndex(i => (i + 1) % WORD_FACTS.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Filter out host from player roster - players shouldn't see the host as a fellow player
   const nonHostPlayers = playersReady.filter(player => {
     const isHostPlayer = typeof player === 'object' ? player.isHost : false;
@@ -81,8 +105,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const renderPlayerRoster = (): React.ReactElement => (
     <section className="space-y-2">
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-          {t('hostView.commandersJoined') || 'Commanders Joined'}
+        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
+          {t('hostView.playersInRoom') || 'Players in Room'}
         </h3>
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
@@ -150,7 +174,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center">
               <Plus className="w-5 h-5 text-neo-cyan/50" />
             </div>
-            <span className="text-[10px] font-bold text-slate-600 uppercase">
+            <span className="text-xs font-bold text-slate-600 uppercase">
               {t('common.join') || 'Join'}
             </span>
           </div>
@@ -179,6 +203,20 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       <p className="text-sm text-center text-slate-400">
         {t('playerView.hostWillStart') || 'The host will start the game when everyone is ready'}
       </p>
+
+      {/* Word fact rotation - fills dead time */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={factIndex}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.3 }}
+          className="text-xs text-center text-neo-cyan/70 bg-neo-cyan/5 rounded-xl px-4 py-3 border border-neo-cyan/20"
+        >
+          {WORD_FACTS[factIndex].fact}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Guest name editing */}
       {!isAuthenticated && (
@@ -263,8 +301,17 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       {/* Header - Command Center style (matches host) */}
       <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
+          {/* Left side: Room code display */}
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-lg font-neo-display font-bold text-neo-cyan uppercase leading-none tracking-wider"
+              style={{ textShadow: '0 0 10px rgba(0, 255, 255, 0.5)' }}
+            >
+              {gameCode}
+            </span>
+          </div>
+
           {/* Right side: Player count + Exit */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
               <Users className="w-4 h-4 text-neo-cyan" />
               <span className="text-xs font-black text-neo-cream">

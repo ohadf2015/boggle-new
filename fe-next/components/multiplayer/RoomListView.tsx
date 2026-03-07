@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion as m } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Zap, ChevronRight, Ghost, RefreshCw, Settings2 } from 'lucide-react';
+import { ArrowLeft, Zap, ChevronRight, Ghost, RefreshCw, HelpCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -103,7 +103,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-3 border-neo-black bg-neo-navy-light shadow-hard-sm hover:bg-white/10 active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
             aria-label={t('landing.tutorial')}
           >
-            <Settings2 className="w-5 h-5 text-neo-white" />
+            <HelpCircle className="w-5 h-5 text-neo-white" />
           </button>
         </m.header>
 
@@ -136,13 +136,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   </span>
                 </div>
                 <span className="text-neo-black/60 font-bold text-[10px] uppercase tracking-widest">
-                  {t('multiplayerFlow.roomList.instantMatch') || 'Instant Matchmaking'}
+                  {t('multiplayerFlow.roomList.hostAndPlay') || 'Host & Play — Share the code with friends'}
                 </span>
               </m.button>
 
               <button
                 onClick={onCreateRoom}
-                className="mt-4 text-slate-400 hover:text-neo-pink font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime rounded px-2 py-1"
+                className="mt-4 text-slate-300 hover:text-neo-pink font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime rounded-full px-4 py-2 border border-white/20 hover:border-neo-pink/50 bg-white/5 hover:bg-white/10"
               >
                 {t('multiplayerFlow.roomList.orCreateCustom') || 'or create a custom room'}
                 <ChevronRight className="w-3 h-3" />
@@ -215,15 +215,24 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 ))}
               </div>
             ) : (
-              /* Empty State: No active rooms */
+              /* Empty State: Energetic nudge toward Quick Play */
               <div className="bg-neo-navy-light/30 border-2 border-white/5 rounded-2xl p-6 flex flex-col items-center text-center">
-                <Ghost className="w-10 h-10 text-white/10 mb-3" />
-                <h3 className="text-slate-500 font-bold text-xs uppercase tracking-widest">
-                  {t('multiplayerFlow.roomList.noRooms')}
+                <Ghost className="w-10 h-10 text-white/20 mb-3" />
+                <h3 className="text-slate-400 font-bold text-sm uppercase tracking-widest">
+                  {t('multiplayerFlow.roomList.noRoomsYet') || 'No battles in progress'}
                 </h3>
-                <p className="text-slate-600 text-[9px] mt-1 font-bold uppercase">
-                  {t('multiplayerFlow.roomList.beFirst')}
+                <p className="text-slate-500 text-xs mt-2 font-bold">
+                  {t('multiplayerFlow.roomList.beTheLegend') || 'Be the legend who starts the first battle!'}
                 </p>
+                {onQuickPlay && (
+                  <button
+                    onClick={onQuickPlay}
+                    className="mt-4 px-6 py-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard-sm font-black text-sm uppercase text-neo-black hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all flex items-center gap-2"
+                  >
+                    <Zap className="w-4 h-4" />
+                    {t('multiplayerFlow.roomList.startBattle') || 'Start a Battle'}
+                  </button>
+                )}
               </div>
             )}
           </m.section>

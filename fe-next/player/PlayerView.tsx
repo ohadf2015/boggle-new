@@ -26,7 +26,7 @@ import PlayerInGameView from './components/PlayerInGameView';
 import NewPlayerOnboarding from '../components/game/NewPlayerOnboarding';
 import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
 
 // Custom hooks
@@ -41,6 +41,7 @@ import {
   useShufflingGrid,
   useLeaderboard,
   useGameActions,
+  useGameMode,
 } from '@/hooks/gameState';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -141,7 +142,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [gameActive, setGameActive] = useState<boolean>(false);
   const [achievements, setAchievements] = useState<string[]>([]);
   const [showStartAnimation, setShowStartAnimation] = useState<boolean>(false);
+  const [showModeReveal, setShowModeReveal] = useState<boolean>(false);
   const [minWordLength, setMinWordLength] = useState<number>(2);
+  const gameMode = useGameMode();
 
   // Multiplayer timer - uses timestamp-based countdown that syncs with server
   // Initial time will be set when game starts via socket event
@@ -460,11 +463,21 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Activate game when countdown animation completes
   useEffect(() => {
-    if (!showStartAnimation && letterGrid && remainingTime && remainingTime > 0 && !gameActive && !waitingForResults) {
+    if (!showModeReveal && !showStartAnimation && letterGrid && remainingTime && remainingTime > 0 && !gameActive && !waitingForResults) {
       logger.log('[PLAYER] Countdown animation complete, activating game');
       setGameActive(true);
     }
-  }, [showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults]);
+  }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults]);
+
+  // Auto-dismiss mode reveal after 2 seconds, then trigger countdown
+  useEffect(() => {
+    if (!showModeReveal) return;
+    const timer = setTimeout(() => {
+      setShowModeReveal(false);
+      setShowStartAnimation(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [showModeReveal]);
 
   // Clear shuffling grid when game starts
   useEffect(() => {
@@ -580,7 +593,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         gameTimer.setTime(pendingGameStart.timerSeconds);
       }
       if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
-      setShowStartAnimation(true);
+      // Show mode reveal first, which will trigger countdown animation after 2s
+      setShowModeReveal(true);
 
       // Trigger music immediately for synchronization (same as onGameStart callback)
       fadeToTrack(TRACKS.IN_GAME, 800, 800);
@@ -721,11 +735,42 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Hide bottom navigation during gameplay
   useEffect(() => {
-    setIsInGame(showStartAnimation || !!showGameView);
+    setIsInGame(showModeReveal || showStartAnimation || !!showGameView);
     return () => setIsInGame(false);
-  }, [showStartAnimation, showGameView, setIsInGame]);
+  }, [showModeReveal, showStartAnimation, showGameView, setIsInGame]);
+
+  // Map game mode to display label
+  const modeRevealLabel = gameMode === 'blast' ? 'BLAST!' : gameMode === 'word-hunt' ? 'WORD HUNT!' : 'CLASSIC!';
 
   if (!showGameView && !waitingForResults) {
+    // Show dramatic mode reveal overlay before countdown
+    if (showModeReveal) {
+      return (
+        <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
+          <AdaptiveAnimatePresence>
+            <AdaptiveMotion.div
+              key="mode-reveal"
+              initial={{ scale: 0.3, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.5, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+              className="flex flex-col items-center gap-4"
+            >
+              <div className="text-7xl font-neo-display font-black text-neo-lime uppercase tracking-wider drop-shadow-[0_0_40px_rgba(163,230,53,0.5)]">
+                {modeRevealLabel}
+              </div>
+              <AdaptiveMotion.div
+                initial={{ width: 0 }}
+                animate={{ width: '80%' }}
+                transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
+                className="h-1 bg-neo-lime rounded-full"
+              />
+            </AdaptiveMotion.div>
+          </AdaptiveAnimatePresence>
+        </div>
+      );
+    }
+
     // When countdown animation is active, only show the countdown overlay
     // Don't render PlayerWaitingView underneath to avoid double loaders
     if (showStartAnimation) {

@@ -56,8 +56,8 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
       data-testid="mobile-share-section"
       className={cn('space-y-2', className)}
     >
-      <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1">
-        {t('hostView.inviteWarriors') || 'Invite Warriors'}
+      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 px-1">
+        {t('hostView.inviteFriends') || 'Invite Friends'}
       </h3>
 
       {/* Compact Horizontal Pill Strip */}

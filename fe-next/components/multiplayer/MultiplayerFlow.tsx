@@ -5,11 +5,13 @@ import RoomListView from './RoomListView';
 import JoinRoomModal from './JoinRoomModal';
 import CreateRoomModal from './CreateRoomModal';
 import type { Language, ActiveRoom } from '@/shared/types/game';
+import toast from 'react-hot-toast';
 import {
   getStoredUsername,
   getStoredAvatarId,
   hasCompleteStoredProfile,
 } from '@/utils/profileStorage';
+import { getJoinUrl } from '@/utils/share';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
@@ -239,6 +241,15 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     // Create room immediately with host playing (dual mode)
     // Pass username as override to avoid stale closure in handleJoin
     handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername);
+
+    // Auto-copy invite link to clipboard for easy sharing
+    try {
+      const joinUrl = getJoinUrl(gameCode, 'quick-play');
+      navigator.clipboard.writeText(joinUrl);
+      toast.success('Invite link copied — send it to friends!', { duration: 3000, icon: '\uD83D\uDD17' });
+    } catch {
+      // Clipboard API not available — no-op
+    }
   }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
 
   // Show brief loading while CrazyGames SDK initializes (prevents flash of wrong UI)

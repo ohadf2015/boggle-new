@@ -116,6 +116,7 @@ function HostPreGameView({
   const [selectedPreset, setSelectedPreset] = useState<PresetKey>('party');
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showBattleSettings, setShowBattleSettings] = useState(false);
   const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
   const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>('random');
@@ -238,6 +239,51 @@ function HostPreGameView({
       }).length;
   const isStartDisabled = !timerValue || actualPlayerCount === 0 || tournamentCreating;
 
+  // ==================== Auto-fill bots countdown ====================
+  const [botCountdown, setBotCountdown] = useState<number | null>(null);
+  const aloneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Start 30s wait when alone, reset when players join
+  useEffect(() => {
+    if (actualPlayerCount === 0) {
+      aloneTimerRef.current = setTimeout(() => {
+        setBotCountdown(10);
+      }, 30_000);
+    } else {
+      // Player joined — dismiss countdown
+      if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      setBotCountdown(null);
+    }
+    return () => {
+      if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
+    };
+  }, [actualPlayerCount]);
+
+  // Tick countdown and auto-start with bots at 0
+  useEffect(() => {
+    if (botCountdown === null) return;
+    if (botCountdown <= 0) {
+      socket?.emit('addBots', { gameCode, count: 2 });
+      onStartGame();
+      setBotCountdown(null);
+      return;
+    }
+    countdownIntervalRef.current = setInterval(() => {
+      setBotCountdown(prev => (prev !== null ? prev - 1 : null));
+    }, 1000);
+    return () => {
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    };
+  }, [botCountdown, socket, gameCode, onStartGame]);
+
+  const cancelBotCountdown = useCallback(() => {
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
+    setBotCountdown(null);
+  }, []);
+
   // Share handler for empty player slots
   const { tryNativeShare } = useNativeShare();
   const handleEmptySlotClick = useCallback(async () => {
@@ -274,8 +320,8 @@ function HostPreGameView({
   const renderPlayerRoster = (hostLabel?: string): React.ReactElement => (
     <section className="space-y-2">
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-          {t('hostView.commandersJoined') || 'Commanders Joined'}
+        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
+          {t('hostView.playersInRoom') || 'Players in Room'}
         </h3>
         {hostLabel && (
           <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -351,7 +397,7 @@ function HostPreGameView({
             <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center group-hover:border-neo-cyan/60 group-hover:bg-white/10 transition-colors">
               <Plus className="w-5 h-5 text-neo-cyan/50 group-hover:text-neo-cyan transition-colors" />
             </div>
-            <span className="text-[10px] font-bold text-slate-600 uppercase group-hover:text-slate-400 transition-colors">
+            <span className="text-xs font-bold text-slate-600 uppercase group-hover:text-slate-400 transition-colors">
               {t('share.invite') || 'Invite'}
             </span>
           </button>
@@ -361,35 +407,53 @@ function HostPreGameView({
   );
 
   // Render battle mode card (shared between mobile and desktop)
+  // Progressive disclosure: collapsed by default, shows only preset badge + expand button
   const renderBattleModeCard = (): React.ReactElement => (
     <section>
       <div className="bg-neo-navy-light text-neo-cream p-4 rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden">
         {/* Subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-neo-purple/10 via-transparent to-neo-cyan/5 pointer-events-none" />
 
-        <div className="relative flex items-center justify-between mb-4">
+        <button
+          onClick={() => setShowBattleSettings(!showBattleSettings)}
+          className="relative w-full flex items-center justify-between"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-neo-pink/20 border-2 border-neo-pink/40 flex items-center justify-center text-neo-pink">
               {presetIcons[selectedPreset]}
             </div>
-            <div>
+            <div className="text-start">
               <h2 className="font-neo-display font-bold text-xl leading-none uppercase text-neo-white">
                 {t('hostView.battleMode') || 'Battle Mode'}
               </h2>
-              <p className="text-[9px] font-bold uppercase text-neo-cream/50 tracking-widest mt-1">
+              <p className="text-xs font-bold uppercase text-neo-cream/50 tracking-widest mt-1">
                 {t('hostView.preset') || 'Preset'}: {t(GAME_PRESETS[selectedPreset].nameKey)}
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <span className="bg-neo-cyan/20 text-neo-cyan px-2 py-0.5 border-2 border-neo-cyan/40 rounded text-[9px] font-black">
-              {timerValue}:00 {t('common.minutes') || 'MIN'}
-            </span>
-            <span className="bg-neo-pink/20 text-neo-pink px-2 py-0.5 border-2 border-neo-pink/40 rounded text-[9px] font-black">
-              {GAME_PRESETS[selectedPreset].difficulty}
-            </span>
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col items-end gap-1">
+              <span className="bg-neo-cyan/20 text-neo-cyan px-2 py-0.5 border-2 border-neo-cyan/40 rounded text-xs font-black">
+                {timerValue}:00 {t('common.minutes') || 'MIN'}
+              </span>
+              <span className="bg-neo-pink/20 text-neo-pink px-2 py-0.5 border-2 border-neo-pink/40 rounded text-xs font-black">
+                {GAME_PRESETS[selectedPreset].difficulty}
+              </span>
+            </div>
+            <ChevronDown className={cn('w-5 h-5 text-neo-cream/50 transition-transform', showBattleSettings && 'rotate-180')} />
           </div>
-        </div>
+        </button>
+
+        {/* Expandable settings - collapsed by default */}
+        <AnimatePresence>
+        {showBattleSettings && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          className="overflow-hidden"
+        >
+        <div className="mt-4">
 
         {/* Preset Buttons - Inline 3-column with icons */}
         <div className="relative grid grid-cols-3 gap-2">
@@ -404,7 +468,7 @@ function HostPreGameView({
                 whileTap={{ scale: 0.92 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 className={cn(
-                  'py-2.5 rounded-lg font-bold text-[10px] uppercase border-2 border-neo-black transition-colors flex flex-col items-center gap-1',
+                  'py-2.5 rounded-lg font-bold text-xs uppercase border-2 border-neo-black transition-colors flex flex-col items-center gap-1',
                   isActive
                     ? `${presetActiveColors[key]} shadow-hard-sm`
                     : 'bg-neo-navy/60 text-neo-cream/70 border-neo-white/20 hover:bg-neo-navy hover:text-neo-cream hover:border-neo-white/40'
@@ -419,7 +483,7 @@ function HostPreGameView({
 
         {/* Game Mode Selector */}
         <div className="relative mt-3 pt-3 border-t border-neo-white/10">
-          <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-2">
+          <p className="text-xs font-black uppercase text-neo-cream/50 tracking-widest mb-2">
             {t('gameModes.nextMode') || 'Next Mode'}
           </p>
           <GameModeSelector
@@ -449,13 +513,18 @@ function HostPreGameView({
         {/* Advanced Settings Toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="relative w-full mt-3 py-1 flex items-center justify-center gap-1 text-[9px] font-black uppercase border-t border-neo-white/10 pt-3 text-neo-cream/40 hover:text-neo-cream transition-colors"
+          className="relative w-full mt-3 py-1 flex items-center justify-center gap-1 text-xs font-black uppercase border-t border-neo-white/10 pt-3 text-neo-cream/40 hover:text-neo-cream transition-colors"
           aria-expanded={showAdvanced}
           aria-controls="advanced-settings-panel"
         >
           {t('common.advancedSettings') || 'Advanced Settings'}
           <ChevronDown className={cn('w-3 h-3 transition-transform', showAdvanced && 'rotate-180')} aria-hidden="true" />
         </button>
+
+        </div>
+        </motion.div>
+        )}
+        </AnimatePresence>
       </div>
 
       {/* Advanced settings dropdown (outside cream card for contrast) */}
@@ -498,6 +567,29 @@ function HostPreGameView({
   // Render Command Center Mobile Content (single-scroll vertical flow)
   const renderLobbyContent = (): React.ReactElement => (
     <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0">
+
+      {/* Auto-fill bots countdown banner */}
+      <AnimatePresence>
+        {botCountdown !== null && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+            className="bg-neo-orange/20 border border-neo-orange/50 rounded-xl px-4 py-3 flex items-center justify-between"
+          >
+            <span className="text-neo-orange font-bold text-sm">
+              {t('hostView.noOneYet') || 'No one yet?'} {t('hostView.startingWithBots') || 'Starting with bots in'} {botCountdown}...
+            </span>
+            <button
+              onClick={cancelBotCountdown}
+              className="text-xs font-bold uppercase text-neo-orange border border-neo-orange/50 rounded-lg px-3 py-1 hover:bg-neo-orange/10 transition-colors"
+            >
+              {t('common.cancel') || 'Cancel'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 1. Start Button - HERO at top */}
       <motion.div
@@ -580,7 +672,7 @@ function HostPreGameView({
           <div className="flex items-center gap-2">
             <DJMascotWithEntrance size="sm" delay={0.3} />
             <div className="flex flex-col">
-              <span className="text-[9px] uppercase font-bold text-slate-400 tracking-widest leading-none mb-1">
+              <span className="text-xs uppercase font-bold text-slate-400 tracking-widest leading-none mb-1">
                 {t('roomCode.label') || 'Room Code'}
               </span>
               <div className="flex items-center gap-2">
@@ -628,6 +720,29 @@ function HostPreGameView({
           <DesktopLobbyLayout
             leftContent={
               <>
+                {/* Auto-fill bots countdown banner (desktop) */}
+                <AnimatePresence>
+                  {botCountdown !== null && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                      className="bg-neo-orange/20 border border-neo-orange/50 rounded-xl px-4 py-3 flex items-center justify-between"
+                    >
+                      <span className="text-neo-orange font-bold text-sm">
+                        {t('hostView.noOneYet') || 'No one yet?'} {t('hostView.startingWithBots') || 'Starting with bots in'} {botCountdown}...
+                      </span>
+                      <button
+                        onClick={cancelBotCountdown}
+                        className="text-xs font-bold uppercase text-neo-orange border border-neo-orange/50 rounded-lg px-3 py-1 hover:bg-neo-orange/10 transition-colors"
+                      >
+                        {t('common.cancel') || 'Cancel'}
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 {/* Start Button - HERO at top */}
                 <StartButton
                   onStartGame={onStartGame}

@@ -131,7 +131,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent noDescription className="max-w-sm sm:max-w-md">
+      <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {t('multiplayerFlow.createModal.title') || 'Create Room'}
@@ -212,7 +212,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
         </DialogBody>
 
-        <DialogFooter>
+        <DialogFooter className="sticky bottom-0 bg-inherit z-10">
           <Button
             variant="success"
             size="lg"

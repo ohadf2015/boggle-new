@@ -65,12 +65,17 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
-        <p className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+        <p className="text-center text-xs font-bold text-slate-500 uppercase tracking-widest">
           {playerCount > 0
-            ? `${playerCount} ${t('hostView.ofMaxWarriors', { max: String(maxPlayers) }) || `of ${maxPlayers} warriors ready`}`
-            : (t('hostView.waitingForPlayers') || 'Waiting for players...')
+            ? `${playerCount} ${t('hostView.ofMaxWarriors', { max: String(maxPlayers) }) || `of ${maxPlayers} players ready`}`
+            : (t('hostView.waitingForPlayers') || 'Waiting for players to join...')
           }
         </p>
+        {playerCount === 0 && (
+          <p className="text-center text-xs text-slate-600 mt-1">
+            {t('hostView.shareCodeHint') || 'Share the room code above so friends can join!'}
+          </p>
+        )}
       </div>
     </div>
   );
