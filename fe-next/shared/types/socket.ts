@@ -321,6 +321,8 @@ export interface WordAcceptedPayload {
 export interface AchievementPayload {
   key: string;
   icon: string;
+  /** Achievement count for tier calculation (GOLD/PLATINUM cinematics) */
+  count?: number;
 }
 
 export interface GameOverPayload {

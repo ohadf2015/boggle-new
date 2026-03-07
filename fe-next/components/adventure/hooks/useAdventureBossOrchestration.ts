@@ -191,14 +191,24 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     setBattleResult('none');
   }, [bossReset]);
 
-  // Unused effect callbacks (kept for interface compat)
+  // Effect callbacks wired to actual game state
   const bossEffectCallbacks = useMemo(() => ({
-    onPlayerDamage: (_amount: number) => {},
-    onTimerPenalty: (_seconds: number) => {},
-    onScreenShake: (_intensity?: number) => {},
-    onDamageFlash: () => {},
-    onScramble: () => {},
-  }), []);
+    onPlayerDamage: (amount: number) => {
+      playerHealth.takeDamage(amount);
+    },
+    onTimerPenalty: (seconds: number) => {
+      addTime(-seconds);
+    },
+    onScreenShake: (intensity?: number) => {
+      shake(intensity ?? 2);
+    },
+    onDamageFlash: () => {
+      shake(1);
+    },
+    onScramble: () => {
+      shake(3);
+    },
+  }), [playerHealth, addTime, shake]);
 
   return {
     // Boss state

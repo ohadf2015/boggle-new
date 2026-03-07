@@ -121,7 +121,7 @@ describe('CinematicPlayer - stall fallback', () => {
     composition: MockComposition,
     durationSeconds: 8,
     onComplete: jest.fn(),
-    cinematicType: 'victory' as const,
+    fallbackType: 'victory' as const,
   };
 
   beforeEach(() => {
@@ -149,10 +149,10 @@ describe('CinematicPlayer - stall fallback', () => {
     expect(screen.queryByTestId('mock-remotion-player')).not.toBeInTheDocument();
   });
 
-  it('should pass cinematicType to CinematicFallback', () => {
+  it('should pass fallbackType to CinematicFallback', () => {
     mockUseCinematic.mockReturnValue(createCinematicReturn({ isStalled: true }));
 
-    render(<CinematicPlayer {...defaultProps} cinematicType="defeat" />);
+    render(<CinematicPlayer {...defaultProps} fallbackType="defeat" />);
 
     expect(screen.getByTestId('cinematic-fallback')).toHaveAttribute('data-type', 'defeat');
   });
@@ -163,7 +163,7 @@ describe('CinematicPlayer - mobile error text', () => {
     composition: MockComposition,
     durationSeconds: 8,
     onComplete: jest.fn(),
-    cinematicType: 'victory' as const,
+    fallbackType: 'victory' as const,
   };
 
   beforeEach(() => {

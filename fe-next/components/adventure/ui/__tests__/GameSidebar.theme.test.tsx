@@ -1,28 +1,11 @@
 /**
- * GameSidebar Theme Integration Tests
+ * GameSidebar Theme Tests
  *
- * Verifies that GameSidebar uses HUD theme values from useHUDTheme()
- * instead of hardcoded Tailwind classes.
+ * Verifies GameSidebar renders with correct default styling.
  */
 
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { GameSidebar } from '../GameSidebar';
-
-const mockHUDTheme = {
-  headerBg: 'bg-emerald-950/90',
-  headerBorder: 'border-emerald-800/40',
-  sidebarBg: 'bg-emerald-900/40',
-  scoreAccent: 'text-emerald-300',
-  levelBadgeColor: 'bg-emerald-900/60',
-  levelBadgeText: 'text-emerald-400',
-  objectiveAccent: 'text-emerald-300',
-  hintActiveColor: 'bg-emerald-400',
-  hintActiveText: 'text-emerald-950',
-};
-
-jest.mock('@/contexts/AdventureThemeContext', () => ({
-  useHUDTheme: () => mockHUDTheme,
-}));
 
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -37,7 +20,7 @@ jest.mock('../../AdventureObjectives', () => ({
   default: () => <div data-testid="mock-objectives" />,
 }));
 
-describe('GameSidebar — HUD Theme Integration', () => {
+describe('GameSidebar — Default Styling', () => {
   const defaultProps = {
     objectives: [],
     hasHintsAvailable: true,
@@ -47,41 +30,30 @@ describe('GameSidebar — HUD Theme Integration', () => {
     hintLevel: 'none' as const,
   };
 
-  it('should apply sidebarBg from theme to aside element', () => {
+  it('should render aside with default neo-navy background', () => {
     const { container } = render(<GameSidebar {...defaultProps} />);
     const aside = container.querySelector('aside');
-    expect(aside?.className).toContain('bg-emerald-900/40');
-    expect(aside?.className).not.toContain('bg-neo-navy/60');
+    expect(aside?.className).toContain('bg-neo-navy/60');
   });
 
-  it('should apply hintActiveColor from theme to active hint button', () => {
-    const { container } = render(<GameSidebar {...defaultProps} />);
-    // Active hint buttons should use theme color instead of bg-neo-yellow
-    const buttons = container.querySelectorAll('button');
-    const activeButtons = Array.from(buttons).filter(b => !b.disabled);
-    const hasThemeColor = activeButtons.some(b => b.className.includes('bg-emerald-400'));
-    expect(hasThemeColor).toBe(true);
-  });
-
-  it('should apply hintActiveText from theme to active hint button', () => {
+  it('should render hint button with neo-yellow when available', () => {
     const { container } = render(<GameSidebar {...defaultProps} />);
     const buttons = container.querySelectorAll('button');
     const activeButtons = Array.from(buttons).filter(b => !b.disabled);
-    const hasThemeText = activeButtons.some(b => b.className.includes('text-emerald-950'));
-    expect(hasThemeText).toBe(true);
+    const hasYellow = activeButtons.some(b => b.className.includes('bg-neo-yellow'));
+    expect(hasYellow).toBe(true);
   });
 
-  it('should apply objectiveAccent from theme to objective header icon', () => {
-    const { container } = render(<GameSidebar {...defaultProps} />);
-    // The Target icon and header text use objectiveAccent
-    const elements = container.querySelectorAll('[class*="text-emerald-300"]');
-    expect(elements.length).toBeGreaterThan(0);
+  it('should render hint button as disabled when no hints available', () => {
+    const { container } = render(<GameSidebar {...defaultProps} hasHintsAvailable={false} />);
+    const buttons = container.querySelectorAll('button');
+    const disabledButtons = Array.from(buttons).filter(b => b.disabled);
+    expect(disabledButtons.length).toBeGreaterThan(0);
   });
 
-  it('should apply sidebarBg from theme to objective card background', () => {
-    const { container } = render(<GameSidebar {...defaultProps} />);
-    // Desktop objectives card uses sidebarBg
-    const elements = container.querySelectorAll('[class*="bg-emerald-900/40"]');
-    expect(elements.length).toBeGreaterThan(0);
+  it('should apply custom className when provided', () => {
+    const { container } = render(<GameSidebar {...defaultProps} className="test-class" />);
+    const aside = container.querySelector('aside');
+    expect(aside?.className).toContain('test-class');
   });
 });

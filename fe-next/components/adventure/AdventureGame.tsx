@@ -345,11 +345,9 @@ const AdventureGame = memo<AdventureGameProps>(
           overlays={
             <>
               <BossOverlay boss={bossOrch.bossConfig}
-                currentHP={bossOrch.bossCurrentHP}
                 maxHP={bossOrch.bossMaxHP}
-                phase={bossOrch.bossPhase}
-                isActive={bossOrch.isBossActive}
                 currentTaunt={bossOrch.bossTaunt}
+                showTaunt={!!bossOrch.bossTaunt}
                 showIntro={bossOrch.showBossIntro}
                 onStartBattle={bossOrch.handleBossIntroStart}
                 showVictory={showLevelComplete && bossOrch.bossHealthState.phase === 'victory'}
@@ -357,7 +355,9 @@ const AdventureGame = memo<AdventureGameProps>(
                 stars={gameState.stars} score={gameState.score}
                 wordsFound={gameState.wordsFound} gameState={gameState}
                 onContinue={handleContinue} onRetry={handleRetry}
-                worldNumber={levelConfig.world} />
+                worldNumber={levelConfig.world}
+                healthState={bossOrch.bossHealthState}
+                effectCallbacks={bossOrch.bossEffectCallbacks} />
 
               {isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete && !bossOrch.playerHealthState.isDead && (
                 <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">
@@ -375,14 +375,16 @@ const AdventureGame = memo<AdventureGameProps>(
                 <CinematicPlayer
                   composition={VictoryCinematic as unknown as React.ComponentType<Record<string, unknown>>}
                   compositionProps={{ starsEarned: gameState.stars, wordsFound: gameState.wordsFound.length, finalScore: gameState.score, timeRemaining }}
-                  durationSeconds={VICTORY_DURATION_FRAMES / 30} onComplete={handleCinematicComplete} cinematicType="victory" />
+                  durationSeconds={VICTORY_DURATION_FRAMES / 30} onComplete={handleCinematicComplete}
+                  fallbackType="victory" />
               )}
 
               {cinematics.showDefeatCinematic && (
                 <CinematicPlayer
                   composition={DefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
                   compositionProps={{ wordsFound: gameState.wordsFound.length, bestWord: gameState.wordsFound.reduce((best, word) => word.length > best.length ? word : best, ''), finalScore: gameState.score }}
-                  durationSeconds={DEFEAT_DURATION_FRAMES / 30} onComplete={handleCinematicComplete} cinematicType="defeat" />
+                  durationSeconds={DEFEAT_DURATION_FRAMES / 30} onComplete={handleCinematicComplete}
+                  fallbackType="defeat" />
               )}
 
               {!isBossLevel && (

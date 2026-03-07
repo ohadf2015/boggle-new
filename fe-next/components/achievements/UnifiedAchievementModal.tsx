@@ -92,7 +92,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           icon: achievement.icon,
           name: t(`achievements.${achievement.key}.name`) || achievement.key,
           description: t(`achievements.${achievement.key}.description`) || '',
-          tier: 'BRONZE', // Socket achievements default to bronze
+          tier: (achievement.count ? calculateTier(achievement.count) : null) ?? 'BRONZE',
           isNew: true,
           isUpgrade: false,
         };

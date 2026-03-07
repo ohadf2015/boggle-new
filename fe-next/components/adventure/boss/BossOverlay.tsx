@@ -385,7 +385,7 @@ const BossOverlay = memo<BossOverlayProps>(
             composition={BossEntranceCinematic as unknown as React.ComponentType<Record<string, unknown>>}
             compositionProps={{
               bossName: t(boss.displayName),
-              bossTitle: `Guardian of World ${worldNumber}`,
+              bossTitle: t('adventure.bosses.cinematics.guardianOfWorld', { worldNumber }),
               bossImagePath: boss.imagePath,
               primaryColor: '#FFE135',
               worldNumber,
@@ -393,6 +393,7 @@ const BossOverlay = memo<BossOverlayProps>(
             durationSeconds={ENTRANCE_DURATION_SECONDS}
             onComplete={handleEntranceComplete}
             testId="boss-entrance-cinematic"
+            fallbackType="bossEntrance"
           />
         )}
 
@@ -559,6 +560,7 @@ const BossOverlay = memo<BossOverlayProps>(
             durationSeconds={DEFEAT_DURATION_SECONDS}
             onComplete={handleVictoryComplete}
             testId="boss-victory-cinematic"
+            fallbackType="bossDefeat"
           />
         )}
 

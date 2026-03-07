@@ -69,6 +69,10 @@ jest.mock('@/contexts/LanguageContext', () => ({
     t: (key: string) => key,
     language: 'en',
   }),
+  useLanguageSafe: () => ({
+    t: (key: string) => key,
+    language: 'en',
+  }),
 }));
 
 jest.mock('@/contexts/MusicContext', () => ({
@@ -473,11 +477,104 @@ jest.mock('../BossVictory', () => ({
 
 jest.mock('../boss', () => ({
   BossOverlay: () => null,
+  PlayerHealthBar: () => null,
+}));
+
+jest.mock('../boss/cinematics/CinematicPlayer', () => ({
+  CinematicPlayer: () => null,
+}));
+
+jest.mock('../cinematics', () => ({
+  VictoryCinematic: () => null,
+  VICTORY_DURATION_FRAMES: 150,
+  DefeatCinematic: () => null,
+  DEFEAT_DURATION_FRAMES: 120,
+}));
+
+jest.mock('../effects/AdventureEffectsLayer', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock('../hooks/useAdventureBossOrchestration', () => ({
+  useAdventureBossOrchestration: () => ({
+    bossConfig: null,
+    bossMaxHP: 100,
+    bossTaunt: null,
+    showBossIntro: false,
+    handleBossIntroStart: jest.fn(),
+    bossHealthState: { currentHP: 100, maxHP: 100, phase: 'idle', totalDamageDealt: 0, isActive: false },
+    playerHealthState: { currentHP: 100, maxHP: 100, isDead: false },
+    isBossActive: false,
+    bossEffectCallbacks: {},
+  }),
+}));
+
+jest.mock('../hooks/useAdventureGameInit', () => ({
+  useAdventureGameInit: () => ({
+    tier: 'normal',
+    hintData: { level: 'none' },
+    powerUpCooldownMultiplier: 1,
+    recordCompletion: jest.fn(),
+    adjustedLevelConfig: {
+      world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+      objectives: [{ type: 'scoreTarget', target: 100, isPrimary: true }],
+      specialTiles: [], difficulty: 'EASY', chapterNumber: 1, levelInChapter: 1, isBossLevel: false,
+    },
+    intensityAdjustments: {},
+    flowState: 'normal',
+    startAIDirector: jest.fn(),
+    endAIDirector: jest.fn(),
+    recordAIWord: jest.fn(),
+    handleAITransition: jest.fn(),
+    isAIBossBattle: false,
+    totalXp: 0, currentLevel: 1, xpProgress: 0, awardXp: jest.fn(),
+    gold: 0, upgrades: {}, addGold: jest.fn(), purchase: jest.fn(),
+    getUpgradeEffect: jest.fn(() => 0), upgradeBonuses: {},
+    skillEffects: {},
+    handleEarnAchievement: jest.fn(),
+    recordAttempt: jest.fn(),
+    checkMilestone: jest.fn(),
+    comboMilestone: null,
+    dismissMilestone: jest.fn(),
+  }),
+}));
+
+jest.mock('../hooks/useAdventureWordSubmit', () => ({
+  useAdventureWordSubmit: () => ({
+    handleSubmitWord: jest.fn(),
+    validationFeedback: { error: null, isValid: false, wasSubmitted: false },
+    lastAccepted: null,
+    wordFeedback: null,
+    prevComboCountRef: { current: 0 },
+  }),
+}));
+
+jest.mock('../hooks/useAdventureLevelCompletion', () => ({
+  useAdventureLevelCompletion: () => ({
+    showLevelComplete: false,
+    handleContinue: jest.fn(),
+    handleRetry: jest.fn(),
+  }),
+}));
+
+jest.mock('@/components/NeoToast', () => ({
+  neoInfoToast: jest.fn(),
 }));
 
 jest.mock('../themed/GameplayBackground', () => ({
   __esModule: true,
   default: () => <div data-testid="gameplay-background">Background</div>,
+}));
+
+jest.mock('../ui', () => ({
+  GameHeader: () => <div data-testid="game-header" />,
+  GameSidebar: () => <div data-testid="game-sidebar" />,
+  GameGridArea: ({ children }: any) => <div data-testid="game-grid-area">{children}</div>,
+  PauseOverlay: () => null,
+  GameLayout: ({ header, gridArea, sidebar, overlays }: any) => (
+    <div data-testid="game-layout">{header}{gridArea}{sidebar}{overlays}</div>
+  ),
 }));
 
 jest.mock('@/hooks/useLexiReactions', () => ({

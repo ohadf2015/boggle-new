@@ -24,12 +24,17 @@ jest.mock('@remotion/player', () => {
     },
   };
    
-  const Player = React.forwardRef(({ inputProps }: { inputProps?: Record<string, unknown> }, ref: any) => {
+  // Track calls manually for mockClear/mock.calls support
+  const playerCalls: any[][] = [];
+  const Player = React.forwardRef((props: any, ref: any) => {
+    playerCalls.push([props]);
     React.useImperativeHandle(ref, () => instance);
     return React.createElement('div', { 'data-testid': 'mock-remotion-player' },
-      inputProps?.testContent || 'Mock Player');
-  });
+      props.inputProps?.testContent || 'Mock Player');
+  }) as any;
   Player.displayName = 'MockPlayer';
+  Player.mock = { calls: playerCalls };
+  Player.mockClear = () => { playerCalls.length = 0; };
   return { Player };
 });
 

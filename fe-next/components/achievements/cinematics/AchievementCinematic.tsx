@@ -121,7 +121,7 @@ export const AchievementCinematic: React.FC<AchievementCinematicProps> = ({
   tierGlow,
   stat,
   tierLabel,
-  unlockedText = 'ACHIEVEMENT UNLOCKED!',
+  unlockedText,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();

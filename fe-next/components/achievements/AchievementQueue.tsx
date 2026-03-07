@@ -4,13 +4,12 @@ import React, { useState, useCallback, useRef, useEffect, createContext, useCont
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UnifiedAchievementModal } from './UnifiedAchievementModal';
+import { CinematicPlayer } from '../adventure/boss/cinematics/CinematicPlayer';
+import { AchievementCinematic, ACHIEVEMENT_DURATION_FRAMES } from './cinematics/AchievementCinematic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getAchievementIcon } from '@/constants/achievementIcons';
+import { calculateTier, TIER_COLORS } from '@/utils/achievementTiers';
 import type { AchievementPayload } from '@/shared/types/socket';
-// NOTE: AchievementCinematic is available at ../cinematics/AchievementCinematic
-// for GOLD/PLATINUM tiers. To integrate, extend AchievementPayload with `count`
-// field, then use calculateTier() from @/utils/achievementTiers to determine
-// whether to show CinematicPlayer vs UnifiedAchievementModal in processNext().
 
 interface AchievementQueueProps {
   children: ReactNode | ((props: { queueAchievement: (achievement: AchievementPayload) => void }) => ReactNode);
@@ -21,8 +20,10 @@ interface AchievementQueueContextValue {
 }
 
 const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactElement => {
+  const { t } = useLanguage();
   const [queue, setQueue] = useState<AchievementPayload[]>([]);
   const [currentAchievement, setCurrentAchievement] = useState<AchievementPayload | null>(null);
+  const [showCinematic, setShowCinematic] = useState(false);
   const isDisplayingRef = useRef<boolean>(false);
   const queueRef = useRef<AchievementPayload[]>([]);
 
@@ -36,17 +37,24 @@ const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactEleme
     if (queueRef.current.length === 0) {
       isDisplayingRef.current = false;
       setCurrentAchievement(null);
+      setShowCinematic(false);
       return;
     }
 
     isDisplayingRef.current = true;
     const [next, ...rest] = queueRef.current;
     setQueue(rest);
-    setCurrentAchievement(next ?? null);
+    const achievement = next ?? null;
+    setCurrentAchievement(achievement);
+
+    // Show cinematic for GOLD/PLATINUM tiers
+    const tier = achievement?.count ? calculateTier(achievement.count) : null;
+    setShowCinematic(tier === 'GOLD' || tier === 'PLATINUM');
   }, []);
 
   // Handle popup complete
   const handlePopupComplete = useCallback(() => {
+    setShowCinematic(false);
     // Small delay between achievements
     setTimeout(() => {
       processNext();
@@ -73,11 +81,34 @@ const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactEleme
     }
   }, [processNext]);
 
+  // Build cinematic props for GOLD/PLATINUM
+  const cinematicTier = currentAchievement?.count ? calculateTier(currentAchievement.count) : null;
+  const isCinematicTier = cinematicTier === 'GOLD' || cinematicTier === 'PLATINUM';
+  const tierColors = isCinematicTier ? TIER_COLORS[cinematicTier] : null;
+
   // Expose queueAchievement through children render prop or context
   return (
     <>
       {typeof children === 'function' ? children({ queueAchievement }) : children}
-      {currentAchievement && (
+      {currentAchievement && showCinematic && isCinematicTier && tierColors && (
+        <CinematicPlayer
+          composition={AchievementCinematic as unknown as React.ComponentType<Record<string, unknown>>}
+          compositionProps={{
+            achievementName: t(`achievements.${currentAchievement.key}.name`) || currentAchievement.key,
+            description: t(`achievements.${currentAchievement.key}.description`) || '',
+            icon: getAchievementIcon(currentAchievement.key),
+            tier: cinematicTier,
+            tierColor: tierColors.bg,
+            tierGlow: tierColors.glow,
+            tierLabel: t(`achievements.cinematic.${cinematicTier.toLowerCase()}`),
+            unlockedText: t('achievements.cinematic.unlocked'),
+          }}
+          durationSeconds={ACHIEVEMENT_DURATION_FRAMES / 30}
+          onComplete={handlePopupComplete}
+          testId="achievement-cinematic"
+        />
+      )}
+      {currentAchievement && !showCinematic && (
         <UnifiedAchievementModal
           type="socket"
           achievement={currentAchievement}

@@ -22,6 +22,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
     language: 'en',
     setLanguage: jest.fn(),
   }),
+  useLanguageSafe: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    setLanguage: jest.fn(),
+  }),
 }));
 
 jest.mock('@/contexts/NavigationContext', () => ({

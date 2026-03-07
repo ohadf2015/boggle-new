@@ -5185,6 +5185,7 @@ const en = {
         "defeated": "{bossName} defeated!",
         "bossApproaches": "A challenger approaches...",
         "prepareForBattle": "Prepare for battle!",
+        "guardianOfWorld": "Guardian of World {worldNumber}",
         "errorTitle": "Video Error",
         "errorDescription": "Something went wrong while playing the cinematic. You can retry or skip to continue.",
         "errorTapToSkip": "Tap Skip to continue",

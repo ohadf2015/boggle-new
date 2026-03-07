@@ -5100,6 +5100,7 @@ const sv = {
         "defeated": "{bossName} besegrad!",
         "bossApproaches": "En utmanare narmar sig...",
         "prepareForBattle": "Forebered dig for strid!",
+        "guardianOfWorld": "Väktare av Värld {worldNumber}",
         "errorTitle": "Videofel",
         "errorDescription": "Något gick fel vid uppspelning. Försök igen eller hoppa över.",
         "errorTapToSkip": "Tryck på Hoppa för att fortsätta",

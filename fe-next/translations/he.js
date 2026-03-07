@@ -5075,6 +5075,7 @@ const he = {
         "defeated": "{bossName} הובס!",
         "bossApproaches": "מתמודד מתקרב...",
         "prepareForBattle": "התכונן לקרב!",
+        "guardianOfWorld": "שומר עולם {worldNumber}",
         "errorTitle": "שגיאת וידאו",
         "errorDescription": "משהו השתבש בהפעלת הסצנה. נסה שוב או דלג להמשך.",
         "errorTapToSkip": "לחץ על דלג כדי להמשיך",

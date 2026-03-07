@@ -5144,6 +5144,7 @@ const ja = {
         "defeated": "{bossName}を倒した！",
         "bossApproaches": "挑戦者が現れた...",
         "prepareForBattle": "戦いの準備をせよ！",
+        "guardianOfWorld": "ワールド{worldNumber}の守護者",
         "errorTitle": "動画エラー",
         "errorDescription": "ムービーの再生中に問題が発生しました。再試行するかスキップしてください。",
         "errorTapToSkip": "スキップをタップして続行",
