@@ -319,21 +319,21 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
               <div className="flex flex-col gap-0.5">
                 <span className="text-neo-white font-bold text-sm">
                   {status === 'reconnecting'
-                    ? t('connection.reconnecting') || 'Reconnecting...'
-                    : t('connection.disconnected') || 'Connection Lost'
+                    ? t('connection.reconnecting')
+                    : t('connection.disconnected')
                   }
                 </span>
 
                 {/* Progress indicator */}
                 {status === 'reconnecting' && reconnectAttempt > 0 && (
                   <span className="text-neo-white/80 text-xs">
-                    {t('connection.attempt') || 'Attempt'} {reconnectAttempt}/{maxReconnectAttempts}
+                    {t('connection.attempt')} {reconnectAttempt}/{maxReconnectAttempts}
                   </span>
                 )}
 
                 {status === 'disconnected' && connectionError && (
                   <span className="text-neo-white/80 text-xs">
-                    {t('connection.checkConnection') || 'Check your internet connection'}
+                    {t('connection.checkConnection')}
                   </span>
                 )}
               </div>
@@ -366,7 +366,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
                 'transition-all duration-100',
                 'flex items-center gap-2'
               )}
-              aria-label={t('connection.retry') || 'Retry connection'}
+              aria-label={t('connection.retry')}
             >
               <motion.span
                 animate={status === 'reconnecting' ? { rotate: 360 } : {}}
@@ -375,7 +375,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
               >
                 ↻
               </motion.span>
-              <span>{t('connection.retryNow') || 'Retry Now'}</span>
+              <span>{t('connection.retryNow')}</span>
             </button>
           </div>
         </div>

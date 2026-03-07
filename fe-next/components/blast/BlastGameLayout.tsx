@@ -212,7 +212,7 @@ export function BlastGameLayout({
   // Cascade chain announcement + haptic
   useEffect(() => {
     if (cascadeChainLevel > prevCascadeRef.current && cascadeChainLevel >= 1) {
-      setCascadeAnnouncement(`CASCADE x${cascadeChainLevel}`);
+      setCascadeAnnouncement((t('blast.cascadeChain') || '').replace('{level}', String(cascadeChainLevel)));
       vibrateBlastCascade();
       const timer = setTimeout(() => setCascadeAnnouncement(null), 1500);
       prevCascadeRef.current = cascadeChainLevel;
@@ -280,8 +280,8 @@ export function BlastGameLayout({
           <ArrowLeft className="me-1.5 h-4 w-4 rtl:rotate-180" />
           <span className="hidden sm:inline">
             {isMultiplayer
-              ? (t('common.leave') || 'Leave')
-              : (t('common.quit') || 'QUIT')}
+              ? (t('common.leave'))
+              : (t('common.quit'))}
           </span>
         </Button>
 
@@ -299,7 +299,7 @@ export function BlastGameLayout({
             className="px-2 py-0.5 rounded-neo border-2 border-fuchsia-400/60 bg-fuchsia-500/20"
           >
             <span className="font-black text-xs text-fuchsia-300 uppercase tracking-wider">
-              Wave {waveNumber}
+              {(t('blast.waveBadge') || '').replace('{wave}', String(waveNumber))}
             </span>
           </motion.div>
         )}
@@ -309,7 +309,7 @@ export function BlastGameLayout({
           size="sm"
           onClick={() => setShowHelp(true)}
           className="text-white/60 hover:text-white"
-          aria-label={t('blast.helpTitle') || 'Help'}
+          aria-label={t('blast.helpTitle')}
         >
           <HelpCircle className="h-5 w-5" />
         </Button>
@@ -323,7 +323,7 @@ export function BlastGameLayout({
             className="border-2 border-neo-black shadow-hard-sm font-bold text-xs"
           >
             <Bomb className="h-4 w-4 sm:me-1.5" />
-            <span className="hidden sm:inline">{t('blast.giveUp') || 'End Game'}</span>
+            <span className="hidden sm:inline">{t('blast.giveUp')}</span>
           </Button>
         )}
       </header>
@@ -394,7 +394,7 @@ export function BlastGameLayout({
               {score.toLocaleString()}
             </div>
             <div className="font-bold uppercase tracking-wider text-neo-black/60 text-[10px] sm:text-xs">
-              {t('common.score') || 'Score'}
+              {t('common.score')}
             </div>
           </div>
         </motion.div>
@@ -414,7 +414,7 @@ export function BlastGameLayout({
         >
           <div className="font-black text-white text-xl sm:text-2xl">{wordsFound.length}</div>
           <div className="font-bold uppercase tracking-wider text-white/50 text-[10px] sm:text-xs">
-            {t('common.words') || 'Words'}
+            {t('common.words')}
           </div>
         </button>
 
@@ -435,7 +435,7 @@ export function BlastGameLayout({
       {scoreThreshold && score < scoreThreshold && (
         <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
           <div className="text-[10px] font-bold text-white/40 uppercase tracking-wider text-center">
-            {t('blast.needScore') || 'Need'} {scoreThreshold - score} {t('blast.morePoints') || 'more pts'}
+            {t('blast.needScore')} {scoreThreshold - score} {t('blast.morePoints')}
           </div>
         </div>
       )}
@@ -444,7 +444,7 @@ export function BlastGameLayout({
       {cumulativeScore > 0 && (
         <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
           <div className="text-[10px] font-bold text-fuchsia-300/50 uppercase tracking-wider text-center tabular-nums">
-            {t('blast.totalScore') || 'Total'}: {(cumulativeScore + score).toLocaleString()}
+            {t('blast.totalScore')}: {(cumulativeScore + score).toLocaleString()}
           </div>
         </div>
       )}
@@ -501,7 +501,7 @@ export function BlastGameLayout({
               'flex items-center justify-between gap-2'
             )}>
               <span className="font-bold text-white text-xs sm:text-sm shrink-0">
-                {t('blast.stuck') || 'Stuck?'}
+                {t('blast.stuck')}
               </span>
               <div className="flex gap-2 flex-wrap justify-end">
                 {!isMultiplayer && hasHintAvailable && !hintPath && (
@@ -511,7 +511,7 @@ export function BlastGameLayout({
                     className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none bg-lime-400 text-black font-bold text-xs"
                   >
                     <Lightbulb className="h-3.5 w-3.5 me-1" />
-                    {t('blast.hint') || 'Hint'}
+                    {t('blast.hint')}
                   </Button>
                 )}
                 <Button
@@ -520,7 +520,7 @@ export function BlastGameLayout({
                   className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none bg-neo-lime text-neo-black font-bold text-xs"
                 >
                   <Shuffle className="h-3.5 w-3.5 me-1" />
-                  {t('blast.shuffle') || 'Shuffle'}
+                  {t('blast.shuffle')}
                 </Button>
                 {!isMultiplayer && (
                   <Button
@@ -529,7 +529,7 @@ export function BlastGameLayout({
                     onClick={() => setShowEndGameConfirm(true)}
                     className="border-2 border-neo-black shadow-hard-sm font-bold text-xs"
                   >
-                    {t('blast.giveUp') || 'End Game'}
+                    {t('blast.giveUp')}
                   </Button>
                 )}
               </div>
@@ -592,7 +592,7 @@ export function BlastGameLayout({
                   transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.5 }}
                   className="text-2xl font-black uppercase text-neo-black"
                 >
-                  {t('blast.complete') || 'Board Cleared!'}
+                  {t('blast.complete')}
                 </motion.div>
 
                 <motion.div
@@ -601,7 +601,7 @@ export function BlastGameLayout({
                   transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.65 }}
                   className="text-lg font-bold text-neo-black/70 tabular-nums"
                 >
-                  {score.toLocaleString()} {t('common.points') || 'pts'}
+                  {score.toLocaleString()} {t('common.points')}
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -625,7 +625,7 @@ export function BlastGameLayout({
               )}>
                 <Star className="h-5 w-5 text-neo-black fill-neo-orange" />
                 <span className="font-black text-lg uppercase text-neo-black">
-                  {t('blast.complete') || 'Board Cleared!'}
+                  {t('blast.complete')}
                 </span>
                 <Star className="h-5 w-5 text-neo-black fill-neo-orange" />
               </div>
@@ -650,7 +650,7 @@ export function BlastGameLayout({
           onWordChange={onWordChange}
           onExplosionComplete={onExplosionComplete}
           onScorePopupComplete={onScorePopupComplete}
-          ariaLabel={t('blast.gridLabel') || 'Letter grid'}
+          ariaLabel={t('blast.gridLabel')}
           highlightedPath={hintPath ?? undefined}
           shimmerCells={shimmerCells}
           objectiveTileTypes={objectiveTileTypes}
@@ -661,10 +661,10 @@ export function BlastGameLayout({
       <ConfirmationDialog
         open={showQuitConfirm}
         onOpenChange={setShowQuitConfirm}
-        title={t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
-        description={t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
-        confirmText={t('singlePlayer.imSure') || "I'm Sure"}
-        cancelText={t('common.cancel') || 'Cancel'}
+        title={t('singlePlayer.quitConfirmTitle') || ''}
+        description={t('singlePlayer.quitConfirmMessage') || ''}
+        confirmText={t('singlePlayer.imSure')}
+        cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
         variant="danger"
       />
@@ -673,10 +673,10 @@ export function BlastGameLayout({
       <ConfirmationDialog
         open={showEndGameConfirm}
         onOpenChange={setShowEndGameConfirm}
-        title={t('blast.endGameConfirmTitle') || 'End Game?'}
-        description={t('blast.endGameConfirmMessage') || 'Your current score will be saved. Are you sure you want to end this game?'}
-        confirmText={t('blast.giveUp') || 'End Game'}
-        cancelText={t('common.cancel') || 'Cancel'}
+        title={t('blast.endGameConfirmTitle') || ''}
+        description={t('blast.endGameConfirmMessage') || ''}
+        confirmText={t('blast.giveUp')}
+        cancelText={t('common.cancel')}
         onConfirm={onEndGame}
         variant="warning"
       />

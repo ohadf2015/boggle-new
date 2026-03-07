@@ -501,6 +501,7 @@ const he = {
     "hideShareOptions": "הסתר אפשרויות שיתוף",
     "joinInstructions": "כנסו ל-lexiclash.com והזינו את הקוד",
     "showQrCode": "הצג קוד QR",
+    "qrCode": "הצג קוד QR",
     "hideQrCode": "הסתר קוד QR",
     "scanQrCode": "סרקו להצטרפות מיידית",
     "orShareVia": "או שתפו דרך",
@@ -701,7 +702,12 @@ const he = {
       "friendActivity": "פעילות חברים",
       "noFriendsOnline": "אין חברים מחוברים",
       "invitePrompt": "התחל מסיבה על ידי שליחת קישור",
-      "inviteFriends": "הזמן חברים"
+      "inviteFriends": "הזמן חברים",
+      "noRoomsYet": "אין קרבות בתהליך",
+      "beTheLegend": "!תהיה האגדה שמתחילה את הקרב הראשון",
+      "hostAndPlay": "ארח ושחק — שתף את הקוד עם חברים",
+      "startBattle": "התחל קרב",
+      "inProgress": "פעיל"
     },
     "joinModal": {
       "title": "הצטרף לקרב",
@@ -783,6 +789,10 @@ const he = {
     "startGame": "GO!",
     "startBattle": "!התחל קרב",
     "commandersJoined": "לוחמים שהצטרפו",
+    "playersInRoom": "שחקנים בחדר",
+    "noOneYet": "?עוד אף אחד",
+    "startingWithBots": "מתחיל עם בוטים בעוד",
+    "shareCodeHint": "!שתפו את קוד החדר למעלה כדי שחברים יצטרפו",
     "battleMode": "מצב קרב",
     "preset": "הגדרה",
     "ofMaxWarriors": "מתוך {{max}} לוחמים מוכנים",
@@ -3572,6 +3582,9 @@ const he = {
       "title": "אופס!",
       "description": "משהו השתבש בטעינת האתגר.",
       "helpText": "בדקו את החיבור ונסו שוב.",
+      "loading": "טוען את הבאזז של היום...",
+      "failed": "לא ניתן לטעון. לנסות שוב?",
+      "noInternet": "אין חיבור. בדוק את האינטרנט.",
       "noOptions": "אין אפשרויות זמינות לאתגר זה"
     },
     "searches": "חיפושים",
@@ -3922,6 +3935,7 @@ const he = {
     "title": "בדרך שלך",
     "subtitle": "תעשו נוח לעצמכם. נשמר אוטומטית.",
     "footer": "נשמר במכשיר שלך. יש עוד אפשרויות נגישות בהגדרות המכשיר.",
+    "skipToMain": "דלג לתוכן הראשי",
     "fireRoundLights": {
       "title": "סיבוב אש רגוע",
       "description": "בלי הקשתות הזוהרות - שומר על הרוגע בסיבובי האש"
@@ -5505,6 +5519,35 @@ const he = {
         "name": "מכפיל מתקדם",
         "description": "כל מכפילי הניקוד מוגברים ב-10%"
       }
+    },
+    "quests": {
+      "flash": {
+        "title": "אתגר מהיר!",
+        "longWord": "מצא מילה עם {param}+ אותיות",
+        "comboStreak": "בנה רצף של {param} מילים",
+        "specificLetter": "השתמש באות {param}",
+        "fastWord": "מצא מילה ב-{param} שניות",
+        "complete": "הושלם!"
+      },
+      "chapter": {
+        "panelTitle": "משימות פרק",
+        "wordCount": {
+          "title": "אוסף מילים",
+          "desc": "מצא {target} מילים בפרק"
+        },
+        "bossNoHint": {
+          "title": "ללא רחמים",
+          "desc": "הביס את הבוס בלי רמזים"
+        },
+        "longWords": {
+          "title": "אומן מילים",
+          "desc": "מצא {target} מילים עם 6+ אותיות"
+        },
+        "perfectLevels": {
+          "title": "פרפקציוניסט",
+          "desc": "השלם {target} שלבים עם 3 כוכבים"
+        }
+      }
     }
   },
   "blast": {
@@ -5517,6 +5560,8 @@ const he = {
     "goldTile": "x3 ניקוד!",
     "bombTile": "מנקה אזור!",
     "rainbowTile": "בונוס!",
+    "cascadeChain": "CASCADE x{level}",
+    "waveBadge": "גל {wave}",
     "stars1": "טוב",
     "stars2": "מעולה",
     "stars3": "מושלם!",
@@ -6547,6 +6592,7 @@ const he = {
       "practiceToSee": "תלמידים צריכים לתרגל כדי לראות שליטה",
       "viewLessons": "שיעורים",
       "viewVocabulary": "אוצר מילים",
+      "viewAssignments": "מטלות",
       "backToClassroom": "חזרה לכיתה",
       "live": "שידור חי",
       "offline": "לא מקוון",
@@ -6877,6 +6923,7 @@ const he = {
   "availableOpponents": "יריבים זמינים",
   "backToLobby": "חזרה ללובי",
   "cancel": "ביטול",
+  "challengeAction": "אתגר",
   "challengeFrom": "אתגר מ",
   "challengePlayer": "אתגר",
   "challengeReceived": "התקבל אתגר! ⚔️",
@@ -6954,7 +7001,13 @@ const he = {
     "xpEarned": "נקודות ניסיון",
     "you": "אתה",
     "youLose": "הפסדת! 😢",
-    "youWin": "ניצחת! 🏆"
+    "youWin": "ניצחת! 🏆",
+    "opponentDisconnected": "{opponentName} התנתק",
+    "autoForfeitMessage": "תנצח אוטומטית",
+    "forfeitTitle": "לוותר על הדו-קרב?",
+    "forfeitDescription": "תפסיד והיריב ינצח. אי אפשר לבטל.",
+    "forfeitConfirm": "לוותר",
+    "forfeitCancel": "ביטול"
   },
 
   // מערכת אתגרים (יומי + שבועי)

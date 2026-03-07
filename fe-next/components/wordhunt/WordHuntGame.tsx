@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useCallback, useRef } from 'react';
+import { memo, useState, useCallback, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
@@ -143,11 +143,13 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     setLetterCount(0);
   }
 
-  // Wrap handleWordSubmit in useCallback for layout
+  // Use ref to avoid recreating callback on every state change
+  const handleWordSubmitRef = useRef(handleWordSubmit);
+  handleWordSubmitRef.current = handleWordSubmit;
+
   const handleWordSubmitCb = useCallback((word: string) => {
-    handleWordSubmit(word);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onWordSubmit, onWordHuntGuess, bridge.targetLength, bridge.targetFound, socket, gameActive, foundWords, gameLanguage, minWordLength, grid]);
+    handleWordSubmitRef.current(word);
+  }, []);
 
   return (
     <WordHuntGameLayout

@@ -435,3 +435,55 @@ export interface SkillTreeState {
   /** Total skill points earned */
   totalPointsEarned: number;
 }
+
+// ==============================================
+// QUEST TYPES
+// ==============================================
+
+/** Type of flash challenge (mid-level ephemeral) */
+export type FlashChallengeType =
+  | 'longWord'
+  | 'comboStreak'
+  | 'specificLetter'
+  | 'fastWord';
+
+export interface FlashChallenge {
+  id: string;
+  type: FlashChallengeType;
+  descriptionKey: string;
+  param: string | number;
+  durationSeconds: number;
+  rewardCoins: number;
+  rewardScore: number;
+}
+
+export type ChapterQuestType =
+  | 'wordCountChapter'
+  | 'defeatBossNoHint'
+  | 'fullComboLevels'
+  | 'perfectLevels'
+  | 'longWordCount';
+
+export interface QuestReward {
+  coins: number;
+  xp: number;
+  badge?: string;
+}
+
+export interface ChapterQuest {
+  id: string;
+  chapterNumber: number;
+  worldId: number;
+  type: ChapterQuestType;
+  titleKey: string;
+  descriptionKey: string;
+  target: number;
+  reward: QuestReward;
+}
+
+export interface ChapterQuestProgress {
+  questId: string;
+  current: number;
+  isComplete: boolean;
+  rewardClaimed: boolean;
+}

@@ -229,12 +229,12 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             <Link
               href="/"
               className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all"
-              aria-label={t('common.back') || 'Back'}
+              aria-label={t('common.back')}
             >
               <ArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
             </Link>
             <h1 className="text-xl font-black uppercase text-neo-white flex-1">
-              {t('landing.multiplayer') || 'Multiplayer'}
+              {t('landing.multiplayer')}
             </h1>
           </div>
 
@@ -277,7 +277,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                   />
                   <div>
                     <Label className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                      {t('joinView.language') || 'Language'}
+                      {t('joinView.language')}
                     </Label>
                     <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} hideLabel />
                   </div>
@@ -310,7 +310,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
               className="w-full h-12 font-black uppercase text-base bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
             >
               {mode === 'host' ? <Crown className="mr-2 w-5 h-5" /> : <User className="mr-2 w-5 h-5" />}
-              {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create Room') : (t('joinView.joinRoom') || 'Join Room')}
+              {isJoining ? (t('common.loading')) : mode === 'host' ? (t('joinView.createRoom')) : (t('joinView.joinRoom'))}
             </Button>
           </form>
         </div>
@@ -318,7 +318,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         {/* Right column: Room List */}
         <div className="w-[55%] rtl:order-1 flex flex-col gap-3 overflow-hidden">
           <h2 className="text-base font-black uppercase text-neo-white text-center">
-            {t('joinView.activeRooms') || 'Active Rooms'}
+            {t('joinView.activeRooms')}
           </h2>
           <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area bg-neo-navy text-white rounded-neo border-3 border-neo-black p-3 shadow-hard">
             <RoomList
@@ -355,17 +355,17 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <Link
             href="/"
             className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black"
-            aria-label={t('common.back') || 'Back'}
+            aria-label={t('common.back')}
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </Link>
           <div className="flex-1">
             <h1 className="text-xl sm:text-2xl font-black uppercase text-neo-white flex items-center gap-2">
               <span className="inline-block w-3 h-6 bg-neo-pink rounded-sm" />
-              {t('landing.multiplayer') || 'Multiplayer'}
+              {t('landing.multiplayer')}
             </h1>
             <p className="text-neo-white/60 text-xs sm:text-sm font-medium mt-0.5">
-              {t('multiplayer.subtitle') || 'Compete with friends in real-time'}
+              {t('multiplayer.subtitle')}
             </p>
           </div>
           <DJMascotWithEntrance size="md" className="hidden sm:block" delay={0.3} />
@@ -459,8 +459,8 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                 >
                   {mode === 'host' ? <Crown className="mr-2" /> : <User className="mr-2" />}
                   {mode === 'host'
-                    ? (isJoining ? t('joinView.creating') || 'Creating...' : t('joinView.createRoom') || 'Create Room')
-                    : (isJoining || isAutoJoining ? t('joinView.joining') || 'Joining...' : t('joinView.joinGame') || 'Join Game')}
+                    ? (isJoining ? t('joinView.creating') : t('joinView.createRoom'))
+                    : (isJoining || isAutoJoining ? t('joinView.joining') : t('joinView.joinGame'))}
                 </Button>
               </form>
             </div>

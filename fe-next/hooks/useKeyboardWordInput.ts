@@ -181,9 +181,6 @@ function getPartialHighlight(
   const usedPositions = new Set<string>();
 
   // Try to build a partial path matching as many letters as possible
-  const rows = grid.length;
-  const cols = grid[0]?.length || 0;
-
   for (let i = 0; i < normalizedWord.length; i++) {
     const letter = normalizedWord[i];
     const positions = findLetterPositions(grid, letter, language);
@@ -245,10 +242,8 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   const isDesktop = useIsDesktop();
   const { t } = useLanguageSafe();
 
-  // Keep ref in sync with state
-  useEffect(() => {
-    typedWordRef.current = typedWord;
-  }, [typedWord]);
+  // Keep ref in sync with state (inline, no effect needed)
+  typedWordRef.current = typedWord;
 
   // Notify parent of typed word changes
   useEffect(() => {

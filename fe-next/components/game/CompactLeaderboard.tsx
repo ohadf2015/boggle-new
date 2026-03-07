@@ -240,12 +240,12 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
             <Zap className="w-3.5 h-3.5 text-neo-lime" />
           </motion.div>
           <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
-            {t('leaderboard.liveRace') || 'Live Race'}
+            {t('leaderboard.liveRace')}
           </span>
         </div>
         <div className="flex items-center gap-1">
           <span className="text-[10px] font-bold text-neo-cream/70">
-            {totalPlayers} {t('leaderboard.racing') || 'racing'}
+            {totalPlayers} {t('leaderboard.racing')}
           </span>
         </div>
       </div>
@@ -258,7 +258,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
           transition={{ delay: 5, duration: 0.5 }}
           className="px-2 py-1 bg-neo-cyan/20 text-[9px] text-neo-black font-medium text-center overflow-hidden"
         >
-          {t('leaderboard.hint') || '💡 Score more points to pass other players!'}
+          {t('leaderboard.hint')}
         </motion.div>
       )}
 
@@ -266,7 +266,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
       <div className="px-2 py-1.5 bg-gradient-to-b from-neo-navy/5 to-transparent">
         {/* Track lanes */}
         <div className="relative space-y-1">
-          {raceParticipants.map((player, index) => {
+          {raceParticipants.map((player) => {
             const isMe = player.username === currentUsername;
             const isLeader = player.rank === 1;
             const position = getRacePosition(player.score);
@@ -398,7 +398,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                     'text-[10px] font-bold truncate max-w-[60px]',
                     isMe ? 'text-neo-black' : 'text-neo-black/60'
                   )}>
-                    {isMe ? (t('leaderboard.you') || 'YOU') : player.username}
+                    {isMe ? (t('leaderboard.you')) : player.username}
                   </span>
                 </div>
               </div>
@@ -429,11 +429,11 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
               <>
                 <Flame className="w-4 h-4 text-neo-orange" />
                 <span className="text-xs font-black text-neo-black">
-                  {t('leaderboard.leading') || 'Leading!'}
+                  {t('leaderboard.leading')}
                 </span>
                 {pointsAhead > 0 && (
                   <span className="text-[10px] font-bold text-neo-black/70">
-                    +{pointsAhead} {t('leaderboard.ahead') || 'ahead'}
+                    +{pointsAhead} {t('leaderboard.ahead')}
                   </span>
                 )}
               </>
@@ -448,8 +448,8 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   isCloseToOvertaking ? 'text-neo-pink' : 'text-neo-black/80'
                 )}>
                   {isCloseToOvertaking
-                    ? (t('leaderboard.almostThere') || 'Almost there!')
-                    : `${pointsToTarget} ${t('leaderboard.toCatch') || 'pts to pass'}`
+                    ? (t('leaderboard.almostThere'))
+                    : `${pointsToTarget} ${t('leaderboard.toCatch')}`
                   }
                 </span>
               </>
@@ -465,7 +465,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
             className="flex items-center gap-1"
           >
             <span className="text-[10px] font-bold text-neo-black/60 uppercase">
-              {t('common.score') || 'Score'}
+              {t('common.score')}
             </span>
             <span className="text-lg font-black text-neo-black tabular-nums">
               {currentUser.score}

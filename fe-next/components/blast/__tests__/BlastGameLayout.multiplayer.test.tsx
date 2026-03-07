@@ -291,7 +291,7 @@ describe('BlastGameLayout multiplayer mode', () => {
     render(
       <BlastGameLayout {...baseProps} isMultiplayer={false} waveNumber={3} />,
     );
-    expect(screen.getByText('Wave 3')).toBeInTheDocument();
+    expect(screen.getByText('blast.waveBadge')).toBeInTheDocument();
   });
 
   it('shows "Leave" instead of "QUIT" in multiplayer header', () => {

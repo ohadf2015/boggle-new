@@ -15,10 +15,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
-import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
-import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
+import { setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { sanitizeRoomName } from '@/utils/consts';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -106,7 +105,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
-  const { playTrack, fadeToTrack, TRACKS } = useMusic();
+  const { playTrack, TRACKS } = useMusic();
 
   // Custom hooks for modular functionality
   const {
@@ -115,7 +114,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     guestAvatar,
     setGuestAvatar,
     authLoadingStartTime,
-    setAuthLoadingStartTime,
     usernameManuallySetRef,
     hasSetRandomNameRef,
   } = useMultiplayerAuth(language as Language);
@@ -146,7 +144,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   }, []);
 
   const {
-    shouldAutoJoin,
     setShouldAutoJoin,
     prefilledRoomCode,
     setPrefilledRoomCode,
@@ -182,7 +179,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     setSpectators,
     pendingGameStart,
     setPendingGameStart,
-    gameStartTime,
     setGameStartTime,
     gameDuration,
     handleShowResults,
@@ -221,7 +217,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     roomsLoading,
     attemptingReconnect,
     setAttemptingReconnect,
-    setRoomsLoading,
     refreshRooms,
   } = useMultiplayerSocket({
     language: language as Language,

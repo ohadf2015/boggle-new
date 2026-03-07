@@ -122,10 +122,10 @@ export function PWAInstallPrompt() {
             </div>
             <div className="flex-1">
               <h3 className="font-black text-neo-white text-lg mb-1">
-                {t('pwa.installTitle') || 'Install LexiClash'}
+                {t('pwa.installTitle')}
               </h3>
               <p className="text-neo-white text-sm opacity-90">
-                {t('pwa.installDescription') || 'Install our app for faster access, offline play, and a better experience!'}
+                {t('pwa.installDescription')}
               </p>
             </div>
           </div>
@@ -135,13 +135,13 @@ export function PWAInstallPrompt() {
               onClick={handleInstallClick}
               className="flex-1 px-4 py-2.5 bg-neo-lime text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
             >
-              {t('pwa.installButton') || 'Install Now'}
+              {t('pwa.installButton')}
             </button>
             <button
               onClick={handleDismiss}
               className="px-4 py-2.5 bg-neo-white text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
             >
-              {t('common.later') || 'Later'}
+              {t('common.later')}
             </button>
           </div>
         </div>

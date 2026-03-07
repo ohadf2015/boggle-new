@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { memo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';

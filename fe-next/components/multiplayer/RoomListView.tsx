@@ -54,7 +54,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
     onRefresh: async () => {
       onRefreshRooms();
       await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success(t('multiplayerFlow.roomList.refreshed') || 'Rooms refreshed', {
+      toast.success(t('multiplayerFlow.roomList.refreshed'), {
         duration: 2000,
       });
     },
@@ -95,7 +95,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           <h1 className="font-neo-display text-lg font-black uppercase text-neo-white tracking-tight"
             style={{ textShadow: '3px 3px 0px rgba(0,0,0,0.8)' }}
           >
-            {t('multiplayerFlow.roomList.socialHub') || 'Social Hub'}
+            {t('multiplayerFlow.roomList.socialHub')}
           </h1>
 
           <button
@@ -132,11 +132,11 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                     <Zap className="w-8 h-8 text-neo-black" />
                   )}
                   <span className="text-neo-black font-black text-2xl uppercase tracking-tight">
-                    {t('multiplayerFlow.roomList.quickPlay') || 'Quick Play'}
+                    {t('multiplayerFlow.roomList.quickPlay')}
                   </span>
                 </div>
                 <span className="text-neo-black/60 font-bold text-[10px] uppercase tracking-widest">
-                  {t('multiplayerFlow.roomList.hostAndPlay') || 'Host & Play — Share the code with friends'}
+                  {t('multiplayerFlow.roomList.hostAndPlay')}
                 </span>
               </m.button>
 
@@ -144,7 +144,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 onClick={onCreateRoom}
                 className="mt-4 text-slate-300 hover:text-neo-pink font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime rounded-full px-4 py-2 border border-white/20 hover:border-neo-pink/50 bg-white/5 hover:bg-white/10"
               >
-                {t('multiplayerFlow.roomList.orCreateCustom') || 'or create a custom room'}
+                {t('multiplayerFlow.roomList.orCreateCustom')}
                 <ChevronRight className="w-3 h-3" />
               </button>
             </m.section>
@@ -160,7 +160,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           >
             <div className="flex items-center justify-between">
               <h2 className="font-neo-display font-black uppercase text-xs tracking-widest text-white/50">
-                {t('multiplayerFlow.roomList.activeBattles') || 'Active Battles'}
+                {t('multiplayerFlow.roomList.activeBattles')}
                 {totalPlayers > 0 && (
                   <span className="text-neo-cyan ms-2">
                     ({totalPlayers} {t('multiplayerFlow.roomList.online')})
@@ -202,10 +202,16 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                       {LANGUAGE_FLAGS[room.language] || '🎮'}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-neo-white truncate">
-                        {room.roomName || room.gameCode}
-                      </p>
-                      {/* TODO: Show "X/Y" format when maxPlayers is added to ActiveRoom type */}
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-sm text-neo-white truncate">
+                          {room.roomName || room.gameCode}
+                        </p>
+                        {room.gameState === 'in-progress' && (
+                          <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neo-orange bg-neo-orange/15 border border-neo-orange/40 rounded-sm">
+                            {t('multiplayerFlow.roomList.inProgress')}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-400">
                         {room.playerCount || 0} {t('joinView.players')}
                       </p>
@@ -221,10 +227,10 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               <div className="bg-neo-navy-light/30 border-2 border-white/5 rounded-2xl p-6 flex flex-col items-center text-center">
                 <Ghost className="w-10 h-10 text-white/20 mb-3" />
                 <h3 className="text-slate-400 font-bold text-sm uppercase tracking-widest">
-                  {t('multiplayerFlow.roomList.noRoomsYet') || 'No battles in progress'}
+                  {t('multiplayerFlow.roomList.noRoomsYet')}
                 </h3>
                 <p className="text-slate-500 text-xs mt-2 font-bold">
-                  {t('multiplayerFlow.roomList.beTheLegend') || 'Be the legend who starts the first battle!'}
+                  {t('multiplayerFlow.roomList.beTheLegend')}
                 </p>
                 {onQuickPlay && (
                   <button
@@ -232,7 +238,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                     className="mt-4 px-6 py-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard-sm font-black text-sm uppercase text-neo-black hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all flex items-center gap-2"
                   >
                     <Zap className="w-4 h-4" />
-                    {t('multiplayerFlow.roomList.startBattle') || 'Start a Battle'}
+                    {t('multiplayerFlow.roomList.startBattle')}
                   </button>
                 )}
               </div>

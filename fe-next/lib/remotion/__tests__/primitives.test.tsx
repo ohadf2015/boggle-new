@@ -27,6 +27,8 @@ jest.mock('remotion', () => ({
   },
   spring: () => 1,
   staticFile: (path: string) => `/static/${path}`,
+  // Required by TitleReveal for responsive font sizing
+  useVideoConfig: () => ({ width: 1280, height: 720, fps: 30, durationInFrames: 240 }),
 }));
 
 // Mock fonts

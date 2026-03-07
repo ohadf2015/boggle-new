@@ -129,19 +129,19 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
             className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-neo-black/50 bg-neo-cream dark:bg-neo-navy shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-            <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
+            <span className="hidden sm:inline">{t('common.back')}</span>
           </button>
 
           <div className="text-center">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-black uppercase text-neo-black dark:text-neo-white">
-              {t('multiplayerFlow.joinForm.title') || 'Join Room'}
+              {t('multiplayerFlow.joinForm.title')}
             </h1>
             {/* Progress indicator */}
             <div className="flex items-center justify-center gap-2 mt-2">
               <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-neo-white/30" />
               <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-neo-white/30" />
               <span className="text-xs text-neo-black/60 dark:text-slate-400 ms-2">
-                {t('multiplayerFlow.joinForm.progress') || 'Step 2 of 2'}
+                {t('multiplayerFlow.joinForm.progress')}
               </span>
             </div>
           </div>
@@ -161,7 +161,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                   {/* Profile Badge */}
                   <div className="space-y-2">
                     <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
-                      {t('multiplayerFlow.joinForm.profileLabel') || 'Your Profile'}
+                      {t('multiplayerFlow.joinForm.profileLabel')}
                     </Label>
                     <div className="flex items-center gap-3 p-3 rounded-neo bg-neo-cyan/10 dark:bg-neo-cyan/5 text-neo-black dark:text-white border-2 border-neo-cyan/30">
                       <Avatar
@@ -178,7 +178,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                   {/* Room Code Input */}
                   <div className="space-y-2">
                     <Label htmlFor="join-game-code" className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
-                      {t('multiplayerFlow.joinForm.codeLabel') || 'Enter Room Code'}
+                      {t('multiplayerFlow.joinForm.codeLabel')}
                     </Label>
                     <div className="relative">
                       <Input
@@ -189,7 +189,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                           if (gameCodeError) setGameCodeError(false);
                         }}
                         required
-                        placeholder={t('multiplayerFlow.joinForm.codePlaceholder') || 'ABC123'}
+                        placeholder={t('multiplayerFlow.joinForm.codePlaceholder')}
                         maxLength={10}
                         pattern="[A-Za-z0-9]*"
                         inputMode="text"
@@ -213,17 +213,17 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                               variant="outline"
                               onClick={handlePaste}
                               className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-cream text-neo-black hover:bg-neo-lime"
-                              aria-label={t('joinView.pasteCode') || 'Paste room code'}
+                              aria-label={t('joinView.pasteCode')}
                             >
                               <ClipboardPaste className="w-4 h-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>{t('joinView.pasteCode') || 'Paste code'}</TooltipContent>
+                          <TooltipContent>{t('joinView.pasteCode')}</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
                     <p id="game-code-hint" className="text-xs text-neo-black/60 dark:text-slate-400">
-                      {t('multiplayerFlow.joinForm.codeHint') || 'Ask your friend for their room code'}
+                      {t('multiplayerFlow.joinForm.codeHint')}
                     </p>
                     {showGameCodeError && (
                       <p id="game-code-error" className="text-xs text-red-400" role="alert">
@@ -236,14 +236,14 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
-                        {t('multiplayerFlow.joinForm.roomsLabel') || 'Or pick an active room'}
+                        {t('multiplayerFlow.joinForm.roomsLabel')}
                       </Label>
                       <button
                         type="button"
                         onClick={onRefreshRooms}
                         disabled={roomsLoading}
                         className="p-1.5 rounded-full hover:bg-neo-cyan/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:bg-neo-cyan/30 transition-colors disabled:opacity-50"
-                        aria-label={t('multiplayerFlow.joinForm.refreshButton') || 'Refresh'}
+                        aria-label={t('multiplayerFlow.joinForm.refreshButton')}
                       >
                         {roomsLoading ? <Loader size="sm" /> : <RefreshCw className="w-3 h-3 text-neo-cyan" />}
                       </button>
@@ -274,14 +274,14 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                                 </p>
                               </div>
                               <span className="px-3 py-1.5 rounded-neo text-xs font-bold bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm group-hover:shadow-hard group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] transition-all">
-                                {t('common.join') || 'Join'}
+                                {t('common.join')}
                               </span>
                             </button>
                           ))}
                         </div>
                       ) : (
                         <div className="p-4 text-center text-sm text-neo-black/60 dark:text-slate-400">
-                          {t('multiplayerFlow.joinForm.noRooms') || 'No active rooms. Ask a friend for their room code!'}
+                          {t('multiplayerFlow.joinForm.noRooms')}
                         </div>
                       )}
                     </div>
@@ -294,10 +294,10 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                     size="lg"
                     className="w-full h-14 text-lg font-black uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black"
                   >
-                    <LogIn className="mr-2 w-5 h-5" />
+                    <LogIn className="me-2 w-5 h-5" />
                     {isSubmitting
-                      ? (t('multiplayerFlow.joinForm.joining') || 'Joining...')
-                      : (t('multiplayerFlow.joinForm.joinButton') || 'Join Room')
+                      ? (t('multiplayerFlow.joinForm.joining'))
+                      : (t('multiplayerFlow.joinForm.joinButton'))
                     }
                   </Button>
                 </form>

@@ -501,6 +501,7 @@ const sv = {
     "hideShareOptions": "Dölj delningsalternativ",
     "joinInstructions": "Gå till lexiclash.com och ange kod",
     "showQrCode": "Visa QR-kod",
+    "qrCode": "Visa QR-kod",
     "hideQrCode": "Dölj QR-kod",
     "scanQrCode": "Skanna för att gå med direkt",
     "orShareVia": "Eller dela via",
@@ -701,7 +702,12 @@ const sv = {
       "friendActivity": "Vänners aktivitet",
       "noFriendsOnline": "Inga vänner online ännu",
       "invitePrompt": "Starta en fest genom att skicka en inbjudan",
-      "inviteFriends": "Bjud in vänner"
+      "inviteFriends": "Bjud in vänner",
+      "noRoomsYet": "Inga strider pågår",
+      "beTheLegend": "Bli legenden som startar den första striden!",
+      "hostAndPlay": "Var värd & spela — Dela koden med vänner",
+      "startBattle": "Starta en strid",
+      "inProgress": "Live"
     },
     "joinModal": {
       "title": "Gå med i striden",
@@ -767,6 +773,10 @@ const sv = {
     "startGame": "Starta",
     "startBattle": "Starta strid!",
     "commandersJoined": "Befälhavare anslutna",
+    "playersInRoom": "Spelare i rummet",
+    "noOneYet": "Ingen ännu?",
+    "startingWithBots": "Startar med bottar om",
+    "shareCodeHint": "Dela rumskoden ovan så att vänner kan gå med!",
     "battleMode": "Stridsläge",
     "preset": "Förinställning",
     "ofMaxWarriors": "av {{max}} krigare redo",
@@ -3470,7 +3480,7 @@ const sv = {
       "title": "Ajdå!",
       "loading": "Laddar dagens buzz...",
       "failed": "Kunde inte ladda. Försök igen?",
-      "noInternet": "Ingen anslutning. Kolla din internetanslutning.",
+      "noInternet": "Ingen anslutning. Kolla internet.",
       "noOptions": "Inga alternativ tillgängliga"
     },
     "fillTheBlank": "Fyll i luckan",
@@ -3490,7 +3500,10 @@ const sv = {
       "title": "Hoppsan!",
       "description": "Något gick fel när utmaningen laddades.",
       "helpText": "Kontrollera din anslutning och försök igen.",
-      "noOptions": "Inga alternativ tillgängliga för denna utmaning"
+      "noOptions": "Inga alternativ tillgängliga för denna utmaning",
+      "loading": "Laddar dagens buzz...",
+      "failed": "Kunde inte ladda. Försök igen?",
+      "noInternet": "Ingen anslutning. Kolla internet."
     },
     "searches": "sökningar",
     "challengeTrend": "I dagens pussel",
@@ -3928,6 +3941,7 @@ const sv = {
     "title": "På ditt sätt",
     "subtitle": "Gör det bekvämt. Sparas automatiskt.",
     "footer": "Sparas på din enhet. Kolla systeminställningarna för fler alternativ.",
+    "skipToMain": "Hoppa till huvudinnehåll",
     "fireRoundLights": {
       "title": "Lugna eldrundor",
       "description": "Skippa regnbågsglödet - håll det lugnt under eldrundor"
@@ -5530,6 +5544,35 @@ const sv = {
         "name": "Avancerad multiplikator",
         "description": "Alla poängmultiplikatorer ökas med 10%"
       }
+    },
+    "quests": {
+      "flash": {
+        "title": "Blixtutmaning!",
+        "longWord": "Hitta ett ord med {param}+ bokstäver",
+        "comboStreak": "Bygg en streak med {param} ord",
+        "specificLetter": "Använd bokstaven {param}",
+        "fastWord": "Hitta ett ord på {param}s",
+        "complete": "Klart!"
+      },
+      "chapter": {
+        "panelTitle": "Kapiteluppdrag",
+        "wordCount": {
+          "title": "Ordssamlare",
+          "desc": "Hitta {target} ord i det här kapitlet"
+        },
+        "bossNoHint": {
+          "title": "Ingen Nåd",
+          "desc": "Besegra bossen utan ledtrådar"
+        },
+        "longWords": {
+          "title": "Ordsmid",
+          "desc": "Hitta {target} ord med 6+ bokstäver"
+        },
+        "perfectLevels": {
+          "title": "Perfektionist",
+          "desc": "Slutför {target} nivåer med 3 stjärnor"
+        }
+      }
     }
   },
   "blast": {
@@ -5542,6 +5585,8 @@ const sv = {
     "goldTile": "3x poäng!",
     "bombTile": "Rensar område!",
     "rainbowTile": "Bonuspoäng!",
+    "cascadeChain": "CASCADE x{level}",
+    "waveBadge": "Våg {wave}",
     "stars1": "Bra",
     "stars2": "Toppen",
     "stars3": "Perfekt!",
@@ -6331,6 +6376,53 @@ const sv = {
       "startPractice": "Börja öva",
       "noLessons": "Inga lektioner tilldelade ännu",
       "askTeacher": "Be din lärare om en klassrumskod",
+      "lessonsAssigned": "Tilldelade lektioner",
+      "join": {
+        "title": "Gå med i en klass",
+        "subtitle": "Ange din lärares kod",
+        "codeLabel": "Klasskod",
+        "codeHint": "6 tecken från din lärare",
+        "button": "Gå med",
+        "joining": "Går med...",
+        "pasteButton": "Klistra in",
+        "success": "Du är med!",
+        "invalidCode": "Den koden fungerar inte",
+        "alreadyMember": "Du är redan med i den här klassen!",
+        "codePasted": "Inklistrat!",
+        "emptyClipboard": "Inget att klistra in",
+        "clipboardError": "Kunde inte hämta urklipp"
+      },
+      "keepGoing": "Fortsätt öva för att nå nästa nivå!",
+      "newTitleUnlocked": "Ny titel upplåst!",
+      "continue": "Fortsätt",
+      "mastery": {
+        "perfectFlashcard": "Perfekt! Du behärskar alla {count} ord!",
+        "learnedWords": "Du lärde dig {count} ord!",
+        "discoveredVocab": "Du upptäckte {count} nya ord!",
+        "greatPractice": "Bra övning! Fortsätt hitta ord!",
+        "lessonMastered": "Lektion behärskad! Du kan dessa ord!",
+        "keepPracticing": "Bra jobbat! Fortsätt öva för att behärska lektionen."
+      },
+      "streakMilestone": {
+        "week": "1 VECKAS SVIT!",
+        "weekDesc": "En hel vecka av lärande!",
+        "twoWeeks": "2 VECKORS SVIT!",
+        "twoWeeksDesc": "Två veckors engagemang!",
+        "month": "MÅNADSMASTER!",
+        "monthDesc": "30 dagar av excellens!"
+      }
+    },
+    "xp": {
+      "level": "Nivå",
+      "maxLevel": "Max nivå",
+      "nextLevel": "Nästa nivå",
+      "xpGained": "Intjänad XP",
+      "totalXp": "Total XP",
+      "progress": "Framsteg",
+      "levelUp": "Nivå upp!",
+      "newLevel": "Du nådde nivå",
+      "streak": "Dagsvit",
+      "streakBonus": "Svitbonus",
       "keepGoing": "Fortsätt öva för att nå nästa nivå!",
       "newTitleUnlocked": "Ny titel upplåst!",
       "continue": "Fortsätt",
@@ -6545,6 +6637,7 @@ const sv = {
       "practiceToSee": "Elever behöver öva för att se behärskning",
       "viewLessons": "Lektioner",
       "viewVocabulary": "Ordförråd",
+      "viewAssignments": "Uppgifter",
       "backToClassroom": "Tillbaka till klassrum",
       "live": "Live",
       "offline": "Offline",
@@ -6897,12 +6990,19 @@ const sv = {
     "xpEarned": "Intjänad XP",
     "you": "Du",
     "youLose": "Du förlorade!",
-    "youWin": "Du vann!"
+    "youWin": "Du vann!",
+    "opponentDisconnected": "{opponentName} kopplades från",
+    "autoForfeitMessage": "Du vinner automatiskt",
+    "forfeitTitle": "Ge upp duellen?",
+    "forfeitDescription": "Du förlorar och motståndaren vinner. Kan inte ångras.",
+    "forfeitConfirm": "Ge upp",
+    "forfeitCancel": "Avbryt"
   },
   "accept": "Acceptera",
   "availableOpponents": "Tillgängliga motståndare",
   "backToLobby": "Tillbaka till lobbyn",
   "cancel": "Avbryt",
+  "challengeAction": "Utmana",
   "challengeFrom": "Utmaning från",
   "challengePlayer": "Utmana",
   "challengeReceived": "Utmaning mottagen!",
@@ -6939,15 +7039,15 @@ const sv = {
   "notOnBoard": "Inte på brädet",
   "notInDictionary": "Inte i ordlistan",
   "alreadyFound": "Redan hittat",
-  "opponentDisconnected": "Motståndaren frånkopplad",
-  "autoForfeitMessage": "Du vinner automatiskt om de inte återansluter",
+  "opponentDisconnected": "Motståndaren kopplades från",
+  "autoForfeitMessage": "Du vinner automatiskt om de inte ansluter igen",
   "reconnecting": "Återansluter...",
   "opponentReconnected": "Motståndaren återanslöt!",
   "waitingReconnect": "Väntar på återanslutning",
   "secondsLeft": "sekunder kvar",
   "forfeit": "Ge upp",
   "forfeitTitle": "Ge upp duellen?",
-  "forfeitDescription": "Du förlorar denna duell och din motståndare vinner. Detta kan inte ångras.",
+  "forfeitDescription": "Du förlorar duellen och motståndaren vinner. Kan inte ångras.",
   "forfeitConfirm": "Ja, ge upp",
   "forfeitCancel": "Avbryt",
   "wonByForfeit": "Vann genom uppgivning",

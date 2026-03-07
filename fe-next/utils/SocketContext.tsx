@@ -294,16 +294,19 @@ export function useSocketOptional(): SocketContextValue | null {
  */
 export function useSocketEvent<T = unknown>(event: string, handler: (data: T) => void): void {
   const { socket } = useSocket();
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.on(event, handler);
+    const stableHandler = (data: T) => handlerRef.current(data);
+    socket.on(event, stableHandler);
 
     return () => {
-      socket.off(event, handler);
+      socket.off(event, stableHandler);
     };
-  }, [socket, event, handler]);
+  }, [socket, event]);
 }
 
 /**

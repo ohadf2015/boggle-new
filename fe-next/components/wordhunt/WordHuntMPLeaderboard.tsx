@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useRef, useState, useEffect } from 'react';
+import { memo, useRef, useState, useEffect } from 'react';
 import { Skull, X } from 'lucide-react';
 
 export interface LeaderboardPlayer {

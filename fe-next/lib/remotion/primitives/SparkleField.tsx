@@ -7,7 +7,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { interpolate } from 'remotion';
+import { interpolate, useVideoConfig } from 'remotion';
 import { createSeededRandom } from '../utils/seededRandom';
 
 export interface SparkleFieldProps {
@@ -39,15 +39,22 @@ export const SparkleField: React.FC<SparkleFieldProps> = ({
   maxOpacity = 0.8,
   fadeInFrames = 30,
 }) => {
+  const { width } = useVideoConfig();
+
+  // Scale sparkle count proportionally with composition width.
+  // Fewer sparkles on smaller screens reduces visual density and GPU overdraw.
+  const scale = Math.min(1, width / 1280);
+  const scaledCount = Math.round(count * scale);
+
   const sparkles = useMemo(() => {
     const rand = createSeededRandom(seed);
-    return Array.from({ length: count }, (_, i) => ({
+    return Array.from({ length: scaledCount }, (_, i) => ({
       id: i,
       x: rand() * 100,
       y: rand() * 100,
       delay: Math.floor(rand() * 20),
     }));
-  }, [count, seed]);
+  }, [scaledCount, seed]);
 
   const glow = glowColor ?? color;
 

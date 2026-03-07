@@ -40,7 +40,7 @@
 
 'use client';
 
-import React, { createContext, useContext, ReactNode, useMemo, useRef } from 'react';
+import { createContext, useContext, ReactNode, useMemo, useRef } from 'react';
 import { useGameStore } from '@/hooks/gameState/store';
 import type { UseGameStateReturn } from '@/hooks/gameState/types';
 
@@ -145,7 +145,31 @@ export function GameStateProvider({ children }: GameStateProviderProps) {
       lastWordTime: lastWordTimeRef,
       comboTimeout: comboTimeoutRef,
     },
-  }), [storeState]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [
+    // Only track state values — Zustand action references are stable
+    storeState.gameActive,
+    storeState.letterGrid,
+    storeState.remainingTime,
+    storeState.gameLanguage,
+    storeState.minWordLength,
+    storeState.totalBoardWords,
+    storeState.players,
+    storeState.leaderboard,
+    storeState.foundWords,
+    storeState.achievements,
+    storeState.waitingForResults,
+    storeState.showStartAnimation,
+    storeState.shufflingGrid,
+    storeState.highlightedCells,
+    storeState.combo,
+    storeState.tournamentData,
+    storeState.tournamentStandings,
+    storeState.showTournamentStandings,
+    storeState.xpGainedData,
+    storeState.levelUpData,
+    storeState.boardTheme,
+  ]);
 
   return (
     <GameStateContext.Provider value={value}>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
 // Mock useReducedMotion
@@ -7,21 +6,19 @@ jest.mock('@/hooks/useReducedMotion', () => ({
   useReducedMotion: () => mockReducedMotion,
 }));
 
-// Mock the fire-flame-react package
-jest.mock('@9am/fire-flame-react', () => ({
-  FireFlame: React.forwardRef(function MockFireFlame(
-    props: { option?: Record<string, unknown> },
-    ref: React.Ref<unknown>
-  ) {
-    return (
-      <div
-        data-testid="fire-flame"
-        ref={ref as React.Ref<HTMLDivElement>}
-        data-option={JSON.stringify(props.option)}
-      />
-    );
-  }),
+// Mock canvas 2D context
+const mockPutImageData = jest.fn();
+const mockCreateImageData = jest.fn((w: number, h: number) => ({
+  data: new Uint8ClampedArray(w * h * 4),
 }));
+
+beforeAll(() => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (HTMLCanvasElement.prototype as any).getContext = jest.fn(() => ({
+    createImageData: mockCreateImageData,
+    putImageData: mockPutImageData,
+  }));
+});
 
 import { FireBottomEffect } from '../FireBottomEffect';
 
@@ -35,10 +32,11 @@ describe('FireBottomEffect', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('should render fire flames when isActive is true', () => {
+  it('should render a canvas when isActive is true', () => {
     render(<FireBottomEffect isActive={true} />);
-    const flames = screen.getAllByTestId('fire-flame');
-    expect(flames.length).toBeGreaterThanOrEqual(1);
+    const wrapper = screen.getByTestId('fire-bottom-effect');
+    const canvas = wrapper.querySelector('canvas');
+    expect(canvas).toBeInTheDocument();
   });
 
   it('should render with fixed positioning at bottom', () => {
@@ -57,10 +55,10 @@ describe('FireBottomEffect', () => {
 
   it('should unmount cleanly when switching from active to inactive', () => {
     const { rerender } = render(<FireBottomEffect isActive={true} />);
-    expect(screen.getAllByTestId('fire-flame').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByTestId('fire-bottom-effect')).toBeInTheDocument();
 
     rerender(<FireBottomEffect isActive={false} />);
-    expect(screen.queryByTestId('fire-flame')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('fire-bottom-effect')).not.toBeInTheDocument();
   });
 
   it('should render via portal into document.body to escape stacking contexts', () => {
@@ -69,11 +67,9 @@ describe('FireBottomEffect', () => {
         <FireBottomEffect isActive={true} />
       </div>
     );
-    // The fire effect should NOT be inside the container div (it portals out)
     const fireInContainer = container.querySelector('[data-testid="fire-bottom-effect"]');
     expect(fireInContainer).toBeNull();
 
-    // But it should exist in document.body
     const fireInBody = document.body.querySelector('[data-testid="fire-bottom-effect"]');
     expect(fireInBody).toBeInTheDocument();
   });
@@ -85,43 +81,31 @@ describe('FireBottomEffect', () => {
     expect(screen.queryByTestId('fire-bottom-effect')).not.toBeInTheDocument();
   });
 
-  it('should use warm fire colors (not default blue)', () => {
+  it('should use pixelated image rendering on canvas', () => {
     render(<FireBottomEffect isActive={true} />);
-    const flames = screen.getAllByTestId('fire-flame');
-    const option = JSON.parse(flames[0].getAttribute('data-option') || '{}');
-    // Should use warm colors, not the library defaults (blue/blueviolet)
-    expect(option.innerColor).not.toBe('blue');
-    expect(option.outerColor).not.toBe('blueviolet');
+    const canvas = screen.getByTestId('fire-bottom-effect').querySelector('canvas');
+    expect(canvas).toBeInTheDocument();
+    expect(canvas!.style.imageRendering).toBe('pixelated');
   });
 
-  it('should position flame origin near the bottom of the canvas', () => {
+  it('should scale canvas to fill container', () => {
     render(<FireBottomEffect isActive={true} />);
-    const flames = screen.getAllByTestId('fire-flame');
-    const option = JSON.parse(flames[0].getAttribute('data-option') || '{}');
-    // y should be near the bottom of the canvas height
-    expect(option.y).toBeGreaterThan(option.h * 0.5);
+    const canvas = screen.getByTestId('fire-bottom-effect').querySelector('canvas');
+    expect(canvas!.style.width).toBe('100%');
+    expect(canvas!.style.height).toBe('100%');
   });
 
-  it('should render multiple flame sources across the width', () => {
+  it('should update canvas dimensions on window resize', () => {
     render(<FireBottomEffect isActive={true} />);
-    const flames = screen.getAllByTestId('fire-flame');
-    expect(flames.length).toBeGreaterThanOrEqual(2);
-  });
+    const canvasBefore = screen.getByTestId('fire-bottom-effect').querySelector('canvas');
+    const widthBefore = canvasBefore!.width;
 
-  it('should update width on window resize', () => {
-    render(<FireBottomEffect isActive={true} />);
-    const flamesBefore = screen.getAllByTestId('fire-flame');
-    const optionBefore = JSON.parse(flamesBefore[0].getAttribute('data-option') || '{}');
-
-    // Simulate resize
     act(() => {
       Object.defineProperty(window, 'innerWidth', { value: 800, writable: true });
       window.dispatchEvent(new Event('resize'));
     });
 
-    const flamesAfter = screen.getAllByTestId('fire-flame');
-    const optionAfter = JSON.parse(flamesAfter[0].getAttribute('data-option') || '{}');
-    // Width per flame should reflect the new window width
-    expect(optionAfter.w).toBe(Math.ceil(800 / flamesAfter.length));
+    const canvasAfter = screen.getByTestId('fire-bottom-effect').querySelector('canvas');
+    expect(canvasAfter!.width).not.toBe(widthBefore);
   });
 });

@@ -702,7 +702,12 @@ const ja = {
       "friendActivity": "フレンドアクティビティ",
       "noFriendsOnline": "オンラインの友達がいません",
       "invitePrompt": "招待リンクを送ってパーティーを始めよう",
-      "inviteFriends": "友達を招待"
+      "inviteFriends": "友達を招待",
+      "noRoomsYet": "進行中のバトルはありません",
+      "beTheLegend": "最初のバトルを始める伝説になろう！",
+      "hostAndPlay": "ホスト＆プレイ — コードを友達とシェア",
+      "startBattle": "バトルを始める",
+      "inProgress": "進行中"
     },
     "joinModal": {
       "title": "バトルに参戦",
@@ -768,6 +773,10 @@ const ja = {
     "startGame": "開始",
     "startBattle": "バトル開始！",
     "commandersJoined": "参加中の司令官",
+    "playersInRoom": "ルーム内のプレイヤー",
+    "noOneYet": "まだ誰もいない？",
+    "startingWithBots": "ボットで開始まで",
+    "shareCodeHint": "上のルームコードを共有して友達を招待しよう！",
     "battleMode": "バトルモード",
     "preset": "プリセット",
     "ofMaxWarriors": "{{max}}人中準備完了",
@@ -3205,25 +3214,25 @@ const ja = {
     "yourRecord": "あなたの記録",
     "noRecord": "まだ記録なし",
     "newRecord": "新記録！",
-    "tied": "タイ！",
-    "recordToBeat": "記録",
-    "toGo": "pts 記録更新まで",
-    "settingFirst": "最初の記録を設定中！",
-    "allTimeRecord": "歴代最高記録！",
-    "firstRecord": "初記録達成！",
-    "shortOf": "記録まであと{diff}点",
-    "settingRecord": "初めての記録を設定中！",
-    "aheadOfRecord": "記録より+{diff}リード！",
-    "behindRecord": "記録を破るまであと{diff}",
+    "tied": "同点！",
+    "recordToBeat": "目標記録",
+    "toGo": "あと",
+    "settingFirst": "初記録を樹立中！",
+    "allTimeRecord": "歴代最高記録",
+    "firstRecord": "初記録！",
+    "shortOf": "記録まであと",
+    "settingRecord": "新記録樹立中！",
+    "aheadOfRecord": "記録を上回り",
+    "behindRecord": "記録を下回り",
     "tiedWithRecord": "記録と同点！",
-    "challengeFriend": "友だちに挑戦",
-    "shareHint": "同じボードを友達とシェア",
-    "winnerPrompt": "圧勝！友達に挑戦しよう 😈"
+    "challengeFriend": "友達にチャレンジ",
+    "shareHint": "チャレンジをシェア",
+    "winnerPrompt": "この記録を超えられる？"
   },
   "accept": "承諾",
   "availableOpponents": "対戦可能な相手",
   "cancel": "キャンセル",
-  "challenge": "挑戦",
+  "challengeAction": "挑戦する",
   "challengedYou": "が挑戦してきた！",
   "challengeFrom": "からの挑戦",
   "challengePlayer": "プレイヤーに挑戦",
@@ -5579,6 +5588,35 @@ const ja = {
         "name": "アドバンスド倍率",
         "description": "全スコア倍率が10%増加"
       }
+    },
+    "quests": {
+      "flash": {
+        "title": "フラッシュチャレンジ!",
+        "longWord": "{param}文字以上の単語を見つけよう",
+        "comboStreak": "{param}連続ストリークを作ろう",
+        "specificLetter": "{param}の文字を使おう",
+        "fastWord": "{param}秒以内に単語を見つけよう",
+        "complete": "完了!"
+      },
+      "chapter": {
+        "panelTitle": "チャプタークエスト",
+        "wordCount": {
+          "title": "ワードコレクター",
+          "desc": "このチャプターで{target}個の単語を見つけよう"
+        },
+        "bossNoHint": {
+          "title": "ノーマーシー",
+          "desc": "ヒントなしでボスを倒そう"
+        },
+        "longWords": {
+          "title": "ワードスミス",
+          "desc": "6文字以上の単語を{target}個見つけよう"
+        },
+        "perfectLevels": {
+          "title": "パーフェクショニスト",
+          "desc": "3つ星で{target}レベルクリアしよう"
+        }
+      }
     }
   },
   "blast": {
@@ -5591,6 +5629,8 @@ const ja = {
     "goldTile": "3倍スコア！",
     "bombTile": "周囲クリア！",
     "rainbowTile": "ボーナス！",
+    "cascadeChain": "CASCADE x{level}",
+    "waveBadge": "ウェーブ {wave}",
     "stars1": "グッド",
     "stars2": "グレート",
     "stars3": "パーフェクト！",
@@ -6622,6 +6662,7 @@ const ja = {
       "practiceToSee": "習熟度を見るには生徒が練習する必要があります",
       "viewLessons": "レッスン",
       "viewVocabulary": "語彙",
+      "viewAssignments": "課題",
       "backToClassroom": "クラスルームに戻る",
       "live": "ライブ",
       "offline": "オフライン",
@@ -6975,7 +7016,13 @@ const ja = {
     "xpEarned": "獲得XP",
     "you": "あなた",
     "youLose": "敗北...",
-    "youWin": "勝利！"
+    "youWin": "勝利！",
+    "opponentDisconnected": "相手が切断しました",
+    "autoForfeitMessage": "相手が再接続しなければ自動的に勝利します",
+    "forfeitTitle": "デュエルを棄権しますか？",
+    "forfeitDescription": "このデュエルに負け、相手が勝ちます。取り消しできません。",
+    "forfeitConfirm": "はい、棄権する",
+    "forfeitCancel": "キャンセル"
   },
   "system": {
     "updatingToNewVersion": "新しいバージョンに更新中..."

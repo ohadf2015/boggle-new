@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { SurvivalClueBoxes } from '@/components/daily/survival/SurvivalClueBoxes';
 import { SurvivalLifeBar } from '@/components/daily/survival/SurvivalLifeBar';
 import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSection';

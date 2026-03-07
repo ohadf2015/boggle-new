@@ -104,7 +104,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85dvh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('multiplayerFlow.joinModal.title') || 'Join Room'}</DialogTitle>
+          <DialogTitle>{t('multiplayerFlow.joinModal.title')}</DialogTitle>
         </DialogHeader>
 
         <DialogBody className="space-y-6">
@@ -117,7 +117,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               </p>
               <p className="text-sm text-neo-cyan flex items-center gap-1.5 font-medium">
                 <Users className="w-4 h-4" />
-                {room.playerCount || 0} {t('joinView.players') || 'players'}
+                {room.playerCount || 0} {t('joinView.players')}
               </p>
             </div>
           </div>
@@ -132,7 +132,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
           {/* Username Input */}
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase text-neo-cyan">
-              {t('multiplayerFlow.joinModal.yourName') || 'Your Name'}
+              {t('multiplayerFlow.joinModal.yourName')}
             </Label>
             {isAuthenticated ? (
               <Input
@@ -149,7 +149,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 maxLength={20}
                 autoFocus
                 className="font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50"
-                placeholder={t('multiplayerFlow.joinModal.namePlaceholder') || 'Your name'}
+                placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
               />
             ) : (
               <button
@@ -166,7 +166,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 )}
               >
                 <span className="font-bold text-neo-white truncate">
-                  {username || t('multiplayerFlow.joinModal.namePlaceholder') || 'Your name'}
+                  {username || t('multiplayerFlow.joinModal.namePlaceholder')}
                 </span>
                 <Pencil className="w-4 h-4 text-neo-cyan flex-shrink-0" />
               </button>
@@ -183,8 +183,8 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
             className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase"
           >
             {isJoining
-              ? t('multiplayerFlow.joinModal.joining') || 'Joining...'
-              : t('multiplayerFlow.joinModal.joinButton') || 'Join Game'}
+              ? t('multiplayerFlow.joinModal.joining')
+              : t('multiplayerFlow.joinModal.joinButton')}
           </Button>
         </DialogFooter>
       </DialogContent>
