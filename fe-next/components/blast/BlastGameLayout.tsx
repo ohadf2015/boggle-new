@@ -222,7 +222,7 @@ export function BlastGameLayout({
       prevCascadeRef.current = 0;
     }
     return undefined;
-  }, [cascadeChainLevel]);
+  }, [cascadeChainLevel, t]);
 
   // Auto-clear hint after 2000ms
   useEffect(() => {

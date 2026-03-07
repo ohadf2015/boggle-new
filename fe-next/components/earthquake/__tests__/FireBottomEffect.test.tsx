@@ -13,7 +13,7 @@ const mockCreateImageData = jest.fn((w: number, h: number) => ({
 }));
 
 beforeAll(() => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   (HTMLCanvasElement.prototype as any).getContext = jest.fn(() => ({
     createImageData: mockCreateImageData,
     putImageData: mockPutImageData,
