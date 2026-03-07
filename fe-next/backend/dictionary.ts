@@ -5,36 +5,16 @@ import { promisify } from 'util';
 import type { Language } from '@/shared/types';
 import logger from './utils/logger';
 import { getThemedWords, getCurrentTheme } from './data/dateThemedWords';
+import {
+  normalizeHebrewWord,
+  isValidHebrewLetter,
+} from '@/shared/utils/wordNormalization';
 
 const appendFileAsync = promisify(fs.appendFile);
 
-// Hebrew letter normalization - final letters
-const hebrewFinalLetters: Record<string, string> = {
-  'ך': 'כ',
-  'ם': 'מ',
-  'ן': 'נ',
-  'ף': 'פ',
-  'ץ': 'צ'
-};
-
-// Valid Hebrew letters (aleph to tav, including final forms)
-const validHebrewLetters = new Set<string>([
-  'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י',
-  'כ', 'ך', 'ל', 'מ', 'ם', 'נ', 'ן', 'ס', 'ע', 'פ',
-  'ף', 'צ', 'ץ', 'ק', 'ר', 'ש', 'ת'
-]);
-
-function normalizeHebrewLetter(letter: string): string {
-  return hebrewFinalLetters[letter] || letter;
-}
-
-function normalizeHebrewWord(word: string): string {
-  return word.split('').map(normalizeHebrewLetter).join('');
-}
-
 // Check if a word contains only valid Hebrew letters (no punctuation like gershayim ״ or geresh ׳)
 function isValidHebrewWordForBoard(word: string): boolean {
-  return word.split('').every(char => validHebrewLetters.has(char));
+  return word.split('').every(char => isValidHebrewLetter(char));
 }
 
 // Spanish accent normalization - accented vowels to base vowels for dictionary lookup

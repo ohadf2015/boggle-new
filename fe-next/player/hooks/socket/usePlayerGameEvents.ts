@@ -14,7 +14,7 @@ import {
   sendStartGameAck,
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
-import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions } from '@/hooks/gameState';
+import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
 import type { BlastWordAcceptedPayload, BlastComboSyncPayload, StartGameBroadcast } from '@/shared/types/socket';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
@@ -122,19 +122,15 @@ export function usePlayerGameEvents({
     setShowTournamentStandings,
     setXpGainedData,
     setLevelUpData,
-    setBoardTheme,
     setTotalBoardWords,
-    setGameMode,
-    setBlastTileOverlay,
     setBlastMovesUsed,
-    setBlastSeed,
     setBlastComboSync,
-    setWordHuntTargetLength,
     setWordHuntMyLife,
     setWordHuntPlayerLives,
     setWordHuntTargetAttempts,
     setWordHuntTargetFound,
     setWordHuntEliminatedPlayers,
+    addWordHuntDiscoveryClues,
   } = useGameActions();
 
   // Track if was in active game (TODO: move to GameState context)
@@ -193,59 +189,64 @@ export function usePlayerGameEvents({
     if (!socket) return;
 
     const handleStartGame = (data: StartGameBroadcast) => {
+      // Validate session - ignore stale events
+      if (gameSessionIdRef.current !== null && (data as any).gameSessionId !== undefined &&
+          (data as any).gameSessionId < gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring stale startGame from old session');
+        return;
+      }
+
       setWasInActiveGame.current(true);
       wasInActiveGameRef.current = true;
-      setFoundWords([]);
-      setAchievements([]);
       comboShieldsUsedRef.current = 0;
 
       if ((data as any).gameSessionId !== undefined) {
         gameSessionIdRef.current = (data as any).gameSessionId;
       }
-      if (data.letterGrid) setLetterGrid(data.letterGrid);
+
+      // Batch all Zustand store updates into a single setState call
+      // This prevents cascading re-renders (was 15+ individual updates)
+      const storeUpdates: Record<string, any> = {
+        foundWords: [],
+        achievements: [],
+      };
+      if (data.letterGrid) storeUpdates.letterGrid = data.letterGrid;
+      if (data.timerSeconds) storeUpdates.remainingTime = data.timerSeconds;
+      if (data.language) storeUpdates.gameLanguage = data.language;
+      if (data.minWordLength) storeUpdates.minWordLength = data.minWordLength;
+      if ((data as any).boardTheme) storeUpdates.boardTheme = (data as any).boardTheme;
+      if (data.gameMode) storeUpdates.gameMode = data.gameMode;
+      if ((data as any).blastTileOverlay) {
+        storeUpdates.blastTileOverlay = (data as any).blastTileOverlay;
+        storeUpdates.blastMovesUsed = 0;
+        if ((data as any).blastSeed != null) storeUpdates.blastSeed = (data as any).blastSeed;
+      }
+      if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
+        storeUpdates.wordHuntTargetLength = (data as any).wordHuntTargetLength;
+        storeUpdates.wordHuntMyLife = 100;
+        storeUpdates.wordHuntPlayerLives = {};
+        storeUpdates.wordHuntTargetAttempts = [];
+        storeUpdates.wordHuntTargetFound = false;
+      }
+      if ((data as any).lateJoin) {
+        storeUpdates.gameActive = true;
+        gameActiveRef.current = true;
+      } else {
+        storeUpdates.showStartAnimation = true;
+      }
+
+      useGameStore.setState(storeUpdates);
+
+      // Non-store operations (refs, timer, toast)
       if (data.timerSeconds) {
-        setRemainingTime(data.timerSeconds);
         if (totalGameTimeRef) totalGameTimeRef.current = data.timerSeconds;
-        // Sync timer with game start time
-        // Use ref to get latest timer methods (avoids socket listener re-registration)
         if (gameTimerRef.current) {
           gameTimerRef.current.reset();
           gameTimerRef.current.setTime(data.timerSeconds);
         }
       }
-      if (data.language) setGameLanguage(data.language);
-      if (data.minWordLength) setMinWordLength(data.minWordLength);
-      if ((data as any).boardTheme) setBoardTheme((data as any).boardTheme);
-      if (data.gameMode) setGameMode(data.gameMode);
-
-      // Set blast tile overlay if present
-      if ((data as any).blastTileOverlay) {
-        setBlastTileOverlay((data as any).blastTileOverlay);
-        setBlastMovesUsed(0);
-        // Store seed for deterministic multiplayer refills (see 52-03)
-        if ((data as any).blastSeed != null) {
-          setBlastSeed((data as any).blastSeed);
-        }
-      }
-
-      // Set word hunt target length if present
-      if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
-        setWordHuntTargetLength((data as any).wordHuntTargetLength);
-        setWordHuntMyLife(100);
-        setWordHuntPlayerLives({});
-        setWordHuntTargetAttempts([]);
-        setWordHuntTargetFound(false);
-      }
-
-      if ((data as any).lateJoin) {
-        setGameActive(true);
-        gameActiveRef.current = true;
-      } else {
-        setShowStartAnimation(true);
-      }
 
       sendStartGameAck(socket, data, 'PLAYER');
-
       onGameStart?.();
 
       const toastMessage = (data as any).lateJoin
@@ -312,6 +313,10 @@ export function usePlayerGameEvents({
     };
 
     const handleValidatedScores = (data: any) => {
+      if (!useGameStore.getState().waitingForResults) {
+        logger.log('[PLAYER] Ignoring duplicate validatedScores - not waiting for results');
+        return;
+      }
       logger.log('[PLAYER] Received validatedScores event:', data);
 
       // Transition directly to results — no validation modal delay
@@ -344,12 +349,18 @@ export function usePlayerGameEvents({
       if (currentOnShowResults) {
         currentOnShowResults({
           scores: data.scores,
-          letterGrid: letterGrid,
+          letterGrid: letterGridRef.current,
         });
       }
     };
 
     const handleResetGame = (data: any) => {
+      // Guard against stale reset from old session
+      if (data.gameSessionId !== undefined && gameSessionIdRef.current !== null &&
+          data.gameSessionId < gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring stale resetGame from old session');
+        return;
+      }
       setGameActive(false);
       gameActiveRef.current = false;
       setWasInActiveGame.current(false);
@@ -457,6 +468,11 @@ export function usePlayerGameEvents({
       setWordHuntEliminatedPlayers((prev) => [...prev, data.username]);
     };
 
+    const handleWordHuntDiscoveryClues = (data: { word: string; greenPositions: Array<{ position: number; letter: string }>; knownLetters: string[] }) => {
+      logger.log('[PLAYER] Word hunt discovery clues:', data);
+      addWordHuntDiscoveryClues(data.greenPositions, data.knownLetters);
+    };
+
     // Register listeners
     socket.on('startGame', handleStartGame);
     socket.on('endGame', handleEndGame);
@@ -477,8 +493,14 @@ export function usePlayerGameEvents({
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
     socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
     socket.on('wordHuntEliminated', handleWordHuntEliminated);
+    socket.on('wordHuntDiscoveryClues', handleWordHuntDiscoveryClues);
 
     return () => {
+      // Clear fire round interval explicitly
+      if (fireRoundIntervalRef.current) {
+        clearInterval(fireRoundIntervalRef.current);
+        fireRoundIntervalRef.current = null;
+      }
       socket.off('startGame', handleStartGame);
       socket.off('endGame', handleEndGame);
       socket.off('timeUpdate', handleTimeUpdate);
@@ -499,6 +521,7 @@ export function usePlayerGameEvents({
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);
       socket.off('wordHuntEliminated', handleWordHuntEliminated);
+      socket.off('wordHuntDiscoveryClues', handleWordHuntDiscoveryClues);
     };
     // Setters from context are stable (wrapped in useCallback)
     // NOTE: letterGrid and gameLanguage are accessed via refs (letterGridRef, gameLanguageRef)

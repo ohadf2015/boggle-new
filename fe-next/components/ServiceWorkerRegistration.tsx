@@ -33,7 +33,7 @@ async function registerServiceWorker() {
       scope: '/',
     });
 
-    console.log('[PWA] Service worker registered:', registration.scope);
+    if (process.env.NODE_ENV === 'development') console.log('[PWA] Service worker registered:', registration.scope);
 
     // Handle updates
     registration.addEventListener('updatefound', () => {
@@ -42,7 +42,7 @@ async function registerServiceWorker() {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // New service worker available - could notify user to refresh
-            console.log('[PWA] New version available');
+            if (process.env.NODE_ENV === 'development') console.log('[PWA] New version available');
           }
         });
       }

@@ -79,7 +79,9 @@ export const metadata: Metadata = {
     },
     other: {
         'google-adsense-account': 'ca-pub-1896836706464880',
+        'rating': 'General',
     },
+    category: 'games',
 };
 
 interface RootLayoutProps {

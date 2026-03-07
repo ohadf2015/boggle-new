@@ -63,6 +63,7 @@ describe('useLeadChangeDetection', () => {
     expect(result.current).toEqual({
       type: 'took-lead',
       newLeader: 'player1',
+      previousLeader: 'player2',
     });
   });
 
@@ -86,10 +87,11 @@ describe('useLeadChangeDetection', () => {
     expect(result.current).toEqual({
       type: 'lost-lead',
       newLeader: 'player2',
+      previousLeader: 'player1',
     });
   });
 
-  it('should return null when lead changes but current player is not involved', () => {
+  it('should return other-took-lead when lead changes but current player is not involved', () => {
     const initial: LeaderboardPlayer[] = [
       { username: 'player2', score: 10 },
       { username: 'player3', score: 8 },
@@ -108,7 +110,11 @@ describe('useLeadChangeDetection', () => {
     ];
     rerender({ leaderboard: updated, username: 'player1' });
 
-    expect(result.current).toBeNull();
+    expect(result.current).toEqual({
+      type: 'other-took-lead',
+      newLeader: 'player3',
+      previousLeader: 'player2',
+    });
   });
 
   it('should return null when leader stays the same', () => {
@@ -170,7 +176,7 @@ describe('useLeadChangeDetection', () => {
       ],
       username: 'player1',
     });
-    expect(result.current).toEqual({ type: 'took-lead', newLeader: 'player1' });
+    expect(result.current).toEqual({ type: 'took-lead', newLeader: 'player1', previousLeader: 'player2' });
 
     // Auto-clear the event so we can detect cooldown suppression
     act(() => { jest.advanceTimersByTime(2500); });
@@ -196,7 +202,7 @@ describe('useLeadChangeDetection', () => {
       ],
       username: 'player1',
     });
-    expect(result.current).toEqual({ type: 'took-lead', newLeader: 'player1' });
+    expect(result.current).toEqual({ type: 'took-lead', newLeader: 'player1', previousLeader: 'player2' });
   });
 
   it('should auto-clear event after 2.5 seconds', () => {

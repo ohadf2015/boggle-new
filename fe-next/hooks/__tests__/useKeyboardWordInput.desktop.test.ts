@@ -11,6 +11,28 @@ import type { LetterGrid } from '@/types';
 // Mock dependencies
 jest.mock('react-hot-toast');
 jest.mock('../useMediaQuery');
+const mockTranslations: Record<string, string> = {
+  keyboardLanguageMismatch: 'Please switch to {language} keyboard to match the board language',
+  hebrew: 'Hebrew',
+  english: 'English',
+  swedish: 'Swedish',
+  japanese: 'Japanese',
+  spanish: 'Spanish',
+};
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguageSafe: () => ({
+    t: (key: string, params?: Record<string, string>) => {
+      let result = mockTranslations[key] || key;
+      if (params) {
+        Object.entries(params).forEach(([k, v]) => {
+          result = result.replace(`{${k}}`, v);
+        });
+      }
+      return result;
+    },
+    language: 'en',
+  }),
+}));
 
 const mockToast = toast as jest.Mocked<typeof toast>;
 const mockUseIsDesktop = useIsDesktop as jest.MockedFunction<typeof useIsDesktop>;

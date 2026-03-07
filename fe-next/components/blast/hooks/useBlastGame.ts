@@ -324,6 +324,14 @@ export function useBlastGame(
       : tiles;
   });
 
+  // Sync tile states when server overlay arrives after mount (multiplayer race condition)
+  const initialTileStatesFromOptions = options?.initialTileStates;
+  useEffect(() => {
+    if (initialTileStatesFromOptions && initialTileStatesFromOptions.length > 0) {
+      setTileStates(initialTileStatesFromOptions);
+    }
+  }, [initialTileStatesFromOptions]);
+
   // Game state
   const [gameState, setGameState] = useState<BlastGameState>({
     score: 0,
@@ -672,6 +680,9 @@ export function useBlastGame(
     setCascadeHighlightPhase('idle');
     setCascadeHighlightData(null);
 
+    // Collect score popups outside the updater to avoid React side-effect violations
+    const pendingPopups: BlastScorePopup[] = [];
+
     setTileStates(prev => {
       const next = prev.map(row => row.map(tile => ({ ...tile })));
       let bonusScore = 0;
@@ -732,8 +743,16 @@ export function useBlastGame(
       // When no offensive special is in the path, mirror acts solo (2x word score)
       let mirrorSoloMultiplier = 1;
 
-      // Helper: mark a tile as cleared and track its type
+      // Helper: mark a tile as cleared and track its type.
+      // Also handles gem-completion (bonus + spawn trigger) so all clear paths
+      // — direct word submission AND area damage — award the gem reward.
       const markCleared = (t: BlastTileState) => {
+        // Gem on final hit: award completion bonus + trigger special spawns
+        if (t.type === 'gem' && !t.isCleared) {
+          t.activationEffect = 'gem-complete';
+          bonusScore += TREASURE_GEM_COMPLETION_BONUS;
+          gemsCompletedThisWord++;
+        }
         t.isCleared = true;
         newlyClearedCount++;
         clearedTypeCounts[t.type] = (clearedTypeCounts[t.type] || 0) + 1;
@@ -743,11 +762,22 @@ export function useBlastGame(
       const isMultiHitAlive = (t: BlastTileState) =>
         t.hitsRemaining > 1 && (t.type === 'ice' || t.type === 'prism' || t.type === 'frozen' || t.type === 'gem');
 
+
       // Helper: hit a multi-hit tile from area damage (bomb blast, lightning, prism cross)
       const hitMultiHitTile = (t: BlastTileState) => {
         t.hitsRemaining--;
-        t.activationEffect = `${t.type}-crack`;
+        // Gem: use shard-specific effects instead of generic crack
+        if (t.type === 'gem') {
+          t.activationEffect = t.hitsRemaining === 2 ? 'gem-shard-1' : 'gem-shard-2';
+        } else if (t.type === 'frozen') {
+          t.activationEffect = 'frost-crack';
+        } else {
+          t.activationEffect = `${t.type}-crack`;
+        }
       };
+
+      // Track vortex letter swaps so we can update the letter grid after processing
+      const vortexLetterSwaps: Array<{ fromR: number; fromC: number; toR: number; toC: number }> = [];
 
       // BFS bomb queue (shared across path and prism cross-clear)
       const bombQueue: Array<{ row: number; col: number; depth: number }> = [];
@@ -1211,10 +1241,7 @@ export function useBlastGame(
           }
 
           case 'gem': {
-            // Final hit — Treasure Gem COMPLETE: award bonus + schedule special spawns
-            tile.activationEffect = 'gem-complete';
-            bonusScore += TREASURE_GEM_COMPLETION_BONUS;
-            gemsCompletedThisWord++;
+            // Final hit — Treasure Gem COMPLETE: bonus + spawns handled by markCleared
             newExplosions.push({
               id: `gem-${now}-${cell.row}-${cell.col}`,
               row: cell.row, col: cell.col, type: 'gem', intensity: 2, timestamp: now,
@@ -1410,6 +1437,8 @@ export function useBlastGame(
                     targetTile.innerType = tmpInner;
                     targetTile.isCleared = false;
                     sourceTile.isCleared = true;
+                    // Track letter swap so grid can be updated after processing
+                    vortexLetterSwaps.push({ fromR: r, fromC: c, toR: targetR, toC: targetC });
                     bonusScore += VORTEX_PULL_BONUS;
                   }
                 }
@@ -1551,7 +1580,7 @@ export function useBlastGame(
         for (const cell of path) {
           const t = next[cell.row]?.[cell.col];
           if (t?.type === 'gold') {
-            setScorePopups(prev => [...prev, {
+            pendingPopups.push({
               id: `gold-bonus-${now}-${cell.row}-${cell.col}`,
               score: goldBonusScore,
               row: cell.row,
@@ -1559,7 +1588,7 @@ export function useBlastGame(
               isSpecial: true,
               timestamp: now,
               tileType: 'gold' as const,
-            }]);
+            });
           }
         }
       }
@@ -1576,7 +1605,7 @@ export function useBlastGame(
           isSpecial: bonusScore > 0,
           timestamp: now,
         };
-        setScorePopups(prev => [...prev, mainPopup]);
+        pendingPopups.push(mainPopup);
       }
 
       if (word.length > bestWordRef.current.length) {
@@ -1609,7 +1638,18 @@ export function useBlastGame(
       }
 
       // Trigger cascade after a brief delay for gap cells to appear
-      const gridForCascade = effectiveGrid;
+      // Apply vortex letter swaps to the grid so letters follow their tile state
+      let gridForCascade = effectiveGrid;
+      if (gridForCascade && vortexLetterSwaps.length > 0) {
+        const swappedGrid = gridForCascade.map(row => [...row]);
+        for (const swap of vortexLetterSwaps) {
+          const tmp = swappedGrid[swap.fromR][swap.fromC];
+          swappedGrid[swap.fromR][swap.fromC] = swappedGrid[swap.toR][swap.toC];
+          swappedGrid[swap.toR][swap.toC] = tmp;
+        }
+        gridForCascade = swappedGrid;
+        setCurrentGrid(swappedGrid);
+      }
       if (gridForCascade) {
         // Capture DDA modifier at submission time (ref is always current)
         const ddaModifier = getDDASpawnModifier(ddaStateRef.current);
@@ -1620,6 +1660,11 @@ export function useBlastGame(
 
       return next;
     });
+
+    // Batch score popups outside the state updater (React side-effect rule)
+    if (pendingPopups.length > 0) {
+      setScorePopups(prev => [...prev, ...pendingPopups]);
+    }
   }, [gridSize, effectiveGrid, cascade, handleCascadeComplete, currentWave]);
 
   /** End the game manually */

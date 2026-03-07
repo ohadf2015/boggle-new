@@ -42,6 +42,8 @@ import { isSocketMigrating, processLongWordEngagement } from './';
 import { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } from '../utils/socketValidation.js';
 import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } from '../modules/spamDetector.js';
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../modules/blastModeManager.js';
+import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 
 // Rate limit weights
 const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '1');
@@ -563,7 +565,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   if (game.gameMode === 'blast' && (game as any).blastModeState) {
     try {
-      const { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } = require('../modules/blastModeManager');
+      // blastModeManager imported at top level
       const blastState = (game as any).blastModeState;
       const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay);
       blastTileBonus = calculateBlastTileBonus(tilesOnPath);
@@ -624,7 +626,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Restore life in word-hunt mode when a word is accepted
   if (game.gameMode === 'word-hunt' && (game as any).wordHuntState) {
     try {
-      const { restoreLife, getLifeBonus } = require('../modules/wordHuntManager');
+      // wordHuntManager imported at top level
       const huntState = (game as any).wordHuntState;
       const lifeBonus = getLifeBonus(normalizedWord.length);
       restoreLife(huntState, username, lifeBonus);
@@ -633,6 +635,16 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         playerLives: huntState.playerLives,
         eliminatedPlayers: huntState.eliminatedPlayers,
       });
+
+      // Compute and emit discovery clues (mirrors SP hint reveal on word discovery)
+      const clues = computeDiscoveryClues(huntState.targetWord, normalizedWord);
+      if (clues.greenPositions.length > 0 || clues.knownLetters.length > 0) {
+        socket.emit('wordHuntDiscoveryClues', {
+          word: normalizedWord,
+          greenPositions: clues.greenPositions,
+          knownLetters: clues.knownLetters,
+        });
+      }
     } catch (err: unknown) {
       const error = err as Error;
       logger.error('WORD_HUNT', `Life restoration error: ${error.message}`);

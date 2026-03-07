@@ -1,8 +1,9 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 
 export interface LeadChangeEvent {
-  type: 'took-lead' | 'lost-lead';
+  type: 'took-lead' | 'lost-lead' | 'other-took-lead';
   newLeader: string;
+  previousLeader?: string;
 }
 
 interface PlayerWithScore {
@@ -52,21 +53,21 @@ export function useLeadChangeDetection(
     // No change in leader
     if (currentLeader === prevLeader) return;
 
-    // Lead changed, but is current player involved?
-    const playerInvolved =
-      currentLeader === currentUsername || prevLeader === currentUsername;
-    if (!playerInvolved) return;
-
     // Check cooldown
     const now = Date.now();
     if (now - lastEventTimeRef.current < COOLDOWN_MS) return;
 
     lastEventTimeRef.current = now;
 
+    // Determine event type based on current player involvement
     const type: LeadChangeEvent['type'] =
-      currentLeader === currentUsername ? 'took-lead' : 'lost-lead';
+      currentLeader === currentUsername
+        ? 'took-lead'
+        : prevLeader === currentUsername
+          ? 'lost-lead'
+          : 'other-took-lead';
 
-    setEvent({ type, newLeader: currentLeader });
+    setEvent({ type, newLeader: currentLeader, previousLeader: prevLeader });
   }, [leaderboard, currentUsername]);
 
   // Auto-clear after 2.5s

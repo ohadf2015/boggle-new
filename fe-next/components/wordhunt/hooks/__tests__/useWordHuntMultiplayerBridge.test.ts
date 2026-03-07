@@ -15,6 +15,8 @@ const mockWordHuntState = {
   targetFound: false,
   playerLives: {} as Record<string, number>,
   eliminatedPlayers: [] as string[],
+  discoveryClues: [] as Array<{ position: number; letter: string }>,
+  knownLetters: [] as string[],
 };
 
 jest.mock('@/hooks/gameState/store', () => ({
@@ -24,6 +26,8 @@ jest.mock('@/hooks/gameState/store', () => ({
   useWordHuntTargetFound: () => mockWordHuntState.targetFound,
   useWordHuntPlayerLives: () => mockWordHuntState.playerLives,
   useWordHuntEliminatedPlayers: () => mockWordHuntState.eliminatedPlayers,
+  useWordHuntDiscoveryClues: () => mockWordHuntState.discoveryClues,
+  useWordHuntKnownLetters: () => mockWordHuntState.knownLetters,
 }));
 
 import { useWordHuntMultiplayerBridge } from '../useWordHuntMultiplayerBridge';
@@ -36,6 +40,8 @@ describe('useWordHuntMultiplayerBridge', () => {
     mockWordHuntState.targetFound = false;
     mockWordHuntState.playerLives = {};
     mockWordHuntState.eliminatedPlayers = [];
+    mockWordHuntState.discoveryClues = [];
+    mockWordHuntState.knownLetters = [];
     jest.useFakeTimers();
   });
 
@@ -116,16 +122,19 @@ describe('useWordHuntMultiplayerBridge', () => {
       expect(result.current.accumulatedClues.get(4)).toEqual({ letter: 'O', type: 'green' });
     });
 
-    it('should accumulate yellow clues from present feedback', () => {
+    it('should NOT accumulate yellow clues in accumulatedClues (mirrors SP behavior)', () => {
       mockWordHuntState.targetAttempts = [
         { guess: 'WORLD', feedback: ['absent', 'present', 'absent', 'absent', 'absent'] },
       ];
       const { result } = renderHook(() => useWordHuntMultiplayerBridge());
 
-      expect(result.current.accumulatedClues.get(1)).toEqual({ letter: 'O', type: 'yellow' });
+      // Yellow letters should NOT be in accumulatedClues - only in knownLetters
+      // The HintBoxes component handles yellow display via its own persistedLetters logic
+      expect(result.current.accumulatedClues.has(1)).toBe(false);
+      expect(result.current.accumulatedClues.size).toBe(0);
     });
 
-    it('should prefer green over yellow for same position across attempts', () => {
+    it('should accumulate green from later attempt even if earlier had yellow at same position', () => {
       mockWordHuntState.targetAttempts = [
         { guess: 'WORLD', feedback: ['absent', 'present', 'absent', 'absent', 'absent'] },
         { guess: 'HOWDY', feedback: ['absent', 'correct', 'absent', 'absent', 'absent'] },
@@ -220,6 +229,54 @@ describe('useWordHuntMultiplayerBridge', () => {
       expect(result.current.latestAttemptFeedback).toHaveLength(5);
       expect(result.current.latestAttemptFeedback![0].letter).toBe('W');
       expect(result.current.latestAttemptFeedback![0].feedback).toBe('gray');
+    });
+  });
+
+  describe('wrongGuessShake', () => {
+    it('should not shake initially', () => {
+      const { result } = renderHook(() => useWordHuntMultiplayerBridge());
+      expect(result.current.wrongGuessShake).toBe(false);
+    });
+
+    it('should shake when a wrong attempt arrives', () => {
+      const { result, rerender } = renderHook(() => useWordHuntMultiplayerBridge());
+
+      // Add a wrong attempt (no 'correct' in all positions = wrong guess)
+      mockWordHuntState.targetAttempts = [
+        { guess: 'HELLO', feedback: ['absent', 'present', 'absent', 'absent', 'absent'] },
+      ];
+      rerender();
+
+      expect(result.current.wrongGuessShake).toBe(true);
+    });
+
+    it('should not shake when a correct attempt arrives', () => {
+      const { result, rerender } = renderHook(() => useWordHuntMultiplayerBridge());
+
+      // Simulate target found alongside the attempt
+      mockWordHuntState.targetFound = true;
+      mockWordHuntState.targetAttempts = [
+        { guess: 'HELLO', feedback: ['correct', 'correct', 'correct', 'correct', 'correct'] },
+      ];
+      rerender();
+
+      expect(result.current.wrongGuessShake).toBe(false);
+    });
+
+    it('should clear shake after 400ms', () => {
+      const { result, rerender } = renderHook(() => useWordHuntMultiplayerBridge());
+
+      mockWordHuntState.targetAttempts = [
+        { guess: 'HELLO', feedback: ['absent', 'absent', 'absent', 'absent', 'absent'] },
+      ];
+      rerender();
+      expect(result.current.wrongGuessShake).toBe(true);
+
+      act(() => {
+        jest.advanceTimersByTime(400);
+      });
+
+      expect(result.current.wrongGuessShake).toBe(false);
     });
   });
 

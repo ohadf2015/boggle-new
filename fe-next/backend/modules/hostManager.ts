@@ -85,10 +85,10 @@ export function transferHost(
   game.hostSocketId = newHostUser.socketId;
   newHostUser.isHost = true;
 
-  // Clear any reconnection timeout since we transferred host instead
-  if (game.reconnectionTimeout) {
-    clearTimeout(game.reconnectionTimeout);
-    game.reconnectionTimeout = null;
+  // Clear any host reconnection timeout since we transferred host instead
+  if ((game as any).hostReconnectionTimeout) {
+    clearTimeout((game as any).hostReconnectionTimeout);
+    (game as any).hostReconnectionTimeout = null;
   }
 
   const gameCode = game.gameCode || 'unknown';

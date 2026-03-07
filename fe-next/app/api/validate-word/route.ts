@@ -11,21 +11,13 @@ import spanishWords from 'an-array-of-spanish-words';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
+import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import * as fs from 'fs';
 import * as path from 'path';
 
 // Pre-build dictionaries at module load (cached by Next.js)
 const englishDictionary = new Set(englishWords.map((w: string) => w.toLowerCase()));
 const spanishDictionary = new Set(spanishWords.map((w: string) => w.toLowerCase()));
-
-// Hebrew final letter normalization
-const hebrewFinalLetters: Record<string, string> = {
-  'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ'
-};
-
-function normalizeHebrewWord(word: string): string {
-  return word.split('').map(c => hebrewFinalLetters[c] || c).join('');
-}
 
 // Lazy-loaded dictionaries for Hebrew, Swedish, Japanese
 let hebrewDictionary: Set<string> | null = null;
@@ -172,19 +164,6 @@ async function checkCommunityWord(word: string, language: string): Promise<boole
   }
 }
 
-// Spanish accent normalization - accented vowels to base vowels for dictionary lookup
-const spanishAccentMap: Record<string, string> = {
-  'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u'
-};
-
-function normalizeSpanishWord(word: string): string {
-  return word
-    .toLowerCase()
-    .split('')
-    .map(c => spanishAccentMap[c] || c)
-    .join('');
-}
-
 function normalizeWord(word: string, language: string): string {
   switch (language) {
     case 'es':
@@ -192,7 +171,7 @@ function normalizeWord(word: string, language: string): string {
     case 'he':
       return normalizeHebrewWord(word);
     case 'ja':
-      return word; // Japanese doesn't need case normalization
+      return word;
     case 'sv':
     case 'en':
     default:

@@ -131,7 +131,7 @@ function deleteGame(gameCode: string): void {
   const game = games[gameCode];
   if (!game) return;
 
-  if (game.reconnectionTimeout) clearTimeout(game.reconnectionTimeout);
+  if ((game as any).hostReconnectionTimeout) clearTimeout((game as any).hostReconnectionTimeout);
   if (game.validationTimeout) clearTimeout(game.validationTimeout);
   clearPersistTimer(gameCode);
   // Clear any pending delayed engagement timeouts to prevent

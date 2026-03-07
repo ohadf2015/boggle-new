@@ -1,12 +1,11 @@
 /**
- * useBlastGame gem tile tests.
- * Gem tiles require 3 hits to collect. Each use gives +3 bonus,
- * final collection gives +3 + +8 = +11. Total potential: 17 bonus points.
+ * useBlastGame gem tile tests (Treasure Gem redesign).
+ * Gem tiles require 3 hits (TREASURE_GEM_HITS_REQUIRED) to complete.
+ * No per-hit bonus on intermediate hits — only TREASURE_GEM_COMPLETION_BONUS (25)
+ * on final hit, plus spawning TREASURE_GEM_SPAWN_COUNT (2) random specials.
+ * Shard effects: gem-shard-1 (hit 1), gem-shard-2 (hit 2), gem-complete (hit 3).
  */
-import { type BlastTileState, type BlastTileType } from '../types';
-
-const GEM_USE_BONUS = 3;
-const GEM_COLLECT_BONUS = 8;
+import { type BlastTileState, type BlastTileType, TREASURE_GEM_COMPLETION_BONUS, TREASURE_GEM_HITS_REQUIRED } from '../types';
 
 function makeTileState(
   row: number, col: number, type: BlastTileType = 'standard', hitsRemaining = 0,
@@ -21,15 +20,16 @@ function make6x6Grid(): BlastTileState[][] {
 }
 
 /**
- * Simulate clearTilesForWord for gem tile.
+ * Simulate clearTilesForWord for gem tile (matches current production logic).
  */
 function simulateClearForGem(
   tileStates: BlastTileState[][],
   path: Array<{ row: number; col: number }>,
-): { bonusScore: number; clearedCount: number } {
+): { bonusScore: number; clearedCount: number; activationEffect: string | null } {
   const next = tileStates.map(row => row.map(tile => ({ ...tile })));
   let bonusScore = 0;
   let clearedCount = 0;
+  let lastEffect: string | null = null;
 
   for (const cell of path) {
     const tile = next[cell.row]?.[cell.col];
@@ -37,15 +37,18 @@ function simulateClearForGem(
 
     if (tile.type === 'gem') {
       if (tile.hitsRemaining > 1) {
+        // Non-final hit: decrement, show shard, no bonus
         tile.hitsRemaining--;
-        tile.activationEffect = `gem-crack`;
-        bonusScore += GEM_USE_BONUS;
+        tile.activationEffect = tile.hitsRemaining === 2 ? 'gem-shard-1' : 'gem-shard-2';
+        lastEffect = tile.activationEffect;
         continue;
       }
-      // Final hit — COLLECT
+      // Final hit: complete gem (markCleared handles bonus)
+      tile.activationEffect = 'gem-complete';
+      bonusScore += TREASURE_GEM_COMPLETION_BONUS;
       tile.isCleared = true;
       clearedCount++;
-      bonusScore += GEM_USE_BONUS + GEM_COLLECT_BONUS;
+      lastEffect = tile.activationEffect;
       continue;
     }
 
@@ -53,60 +56,61 @@ function simulateClearForGem(
     clearedCount++;
   }
 
-  return { bonusScore, clearedCount };
+  return { bonusScore, clearedCount, activationEffect: lastEffect };
 }
 
-describe('Gem tile mechanics', () => {
-  it('starts with hitsRemaining: 3', () => {
-    const tile = makeTileState(1, 1, 'gem', 3);
+describe('Treasure Gem tile mechanics', () => {
+  it('starts with hitsRemaining matching TREASURE_GEM_HITS_REQUIRED', () => {
+    const tile = makeTileState(1, 1, 'gem', TREASURE_GEM_HITS_REQUIRED);
     expect(tile.hitsRemaining).toBe(3);
   });
 
-  it('first use: decrements to 2, NOT cleared, +3 bonus', () => {
+  it('first hit: decrements to 2, NOT cleared, no bonus, gem-shard-1 effect', () => {
     const grid = make6x6Grid();
     grid[1][1] = makeTileState(1, 1, 'gem', 3);
     const result = simulateClearForGem(grid, [{ row: 1, col: 1 }]);
-    expect(result.bonusScore).toBe(GEM_USE_BONUS);
+    expect(result.bonusScore).toBe(0);
     expect(result.clearedCount).toBe(0);
+    expect(result.activationEffect).toBe('gem-shard-1');
   });
 
-  it('second use: decrements to 1, NOT cleared, +3 bonus', () => {
+  it('second hit: decrements to 1, NOT cleared, no bonus, gem-shard-2 effect', () => {
     const grid = make6x6Grid();
     grid[1][1] = makeTileState(1, 1, 'gem', 2);
     const result = simulateClearForGem(grid, [{ row: 1, col: 1 }]);
-    expect(result.bonusScore).toBe(GEM_USE_BONUS);
+    expect(result.bonusScore).toBe(0);
     expect(result.clearedCount).toBe(0);
+    expect(result.activationEffect).toBe('gem-shard-2');
   });
 
-  it('third/final use: cleared, +11 bonus (3+8)', () => {
+  it('third/final hit: cleared, TREASURE_GEM_COMPLETION_BONUS awarded, gem-complete effect', () => {
     const grid = make6x6Grid();
     grid[1][1] = makeTileState(1, 1, 'gem', 1);
     const result = simulateClearForGem(grid, [{ row: 1, col: 1 }]);
-    expect(result.bonusScore).toBe(GEM_USE_BONUS + GEM_COLLECT_BONUS);
+    expect(result.bonusScore).toBe(TREASURE_GEM_COMPLETION_BONUS);
     expect(result.clearedCount).toBe(1);
+    expect(result.activationEffect).toBe('gem-complete');
   });
 
-  it('total potential from one gem: 17 bonus points', () => {
-    // 3 uses × 3pts + 8 collection = 17
-    const totalBonus = GEM_USE_BONUS * 3 + GEM_COLLECT_BONUS;
-    expect(totalBonus).toBe(17);
+  it('total potential from one gem: only TREASURE_GEM_COMPLETION_BONUS (no per-hit bonus)', () => {
+    expect(TREASURE_GEM_COMPLETION_BONUS).toBe(25);
   });
 
   it('gem survives gravity between uses (simulated)', () => {
     const grid = make6x6Grid();
     grid[1][1] = makeTileState(1, 1, 'gem', 3);
 
-    // First use
+    // First hit
     simulateClearForGem(grid, [{ row: 1, col: 1 }]);
-    grid[1][1].hitsRemaining = 2; // Apply hit
+    grid[1][1].hitsRemaining = 2;
 
-    // Second use
+    // Second hit
     simulateClearForGem(grid, [{ row: 1, col: 1 }]);
-    grid[1][1].hitsRemaining = 1; // Apply hit
+    grid[1][1].hitsRemaining = 1;
 
-    // Third use
+    // Third hit (final)
     const result = simulateClearForGem(grid, [{ row: 1, col: 1 }]);
     expect(result.clearedCount).toBe(1);
-    expect(result.bonusScore).toBe(GEM_USE_BONUS + GEM_COLLECT_BONUS);
+    expect(result.bonusScore).toBe(TREASURE_GEM_COMPLETION_BONUS);
   });
 });

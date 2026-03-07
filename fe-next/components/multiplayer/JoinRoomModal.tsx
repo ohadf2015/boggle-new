@@ -102,7 +102,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85vh] overflow-y-auto">
+      <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('multiplayerFlow.joinModal.title') || 'Join Room'}</DialogTitle>
         </DialogHeader>

@@ -10,25 +10,14 @@ import {
   getVerifiedWordsForPromotion,
   markWordPromoted,
 } from '../services/milogWordVerifier';
-
-// Hebrew final letter normalization (same as dictionary.ts)
-const hebrewFinalLetters: Record<string, string> = {
-  'ך': 'כ',
-  'ם': 'מ',
-  'ן': 'נ',
-  'ף': 'פ',
-  'ץ': 'צ',
-};
+import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 
 /**
  * Normalize Hebrew word for dictionary storage
  * Converts final letters to standard forms
  */
 export function normalizeHebrewWordForDictionary(word: string): string {
-  return word
-    .split('')
-    .map(letter => hebrewFinalLetters[letter] || letter)
-    .join('');
+  return normalizeHebrewWord(word);
 }
 
 /**

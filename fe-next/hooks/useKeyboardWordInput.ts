@@ -15,7 +15,8 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { couldBeOnBoard, normalizeWord } from '@/utils/clientWordValidator';
-import { detectInputLanguage, getLanguageName } from '@/utils/languageDetection';
+import { detectInputLanguage } from '@/utils/languageDetection';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import type { LetterGrid } from '@/types';
 import type { HighlightedCell } from '@/components/GridComponent';
@@ -242,6 +243,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   const typedWordRef = useRef('');
   const languageMismatchNotifiedRef = useRef(false);
   const isDesktop = useIsDesktop();
+  const { t } = useLanguageSafe();
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -346,9 +348,10 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
 
           // If input language detected and doesn't match board language
           if (inputLanguage && inputLanguage !== gameLanguage) {
-            const boardLanguageName = getLanguageName(gameLanguage);
+            const langKeyMap: Record<string, string> = { he: 'hebrew', en: 'english', sv: 'swedish', ja: 'japanese', es: 'spanish' };
+            const langName = t(langKeyMap[gameLanguage] || gameLanguage) || gameLanguage;
             toast.error(
-              `Please switch to ${boardLanguageName} keyboard to match the board language`,
+              t('keyboardLanguageMismatch', { language: langName }),
               {
                 duration: 5000,
                 position: 'top-center',

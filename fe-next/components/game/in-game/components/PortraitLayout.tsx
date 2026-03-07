@@ -13,6 +13,7 @@ import RoomChat from '@/components/RoomChat';
 import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
 import ComboDisplay from '../../ComboDisplay';
 import CompactLeaderboard from '../../CompactLeaderboard';
+import { useBlastComboSync } from '@/hooks/gameState/store';
 import { shouldShowKeyboardTrails } from '../../keyboardTrailsUtils';
 import { KeyboardInlineHint } from '@/components/keyboard';
 import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
@@ -206,6 +207,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   onWordHuntGuess,
   children,
 }) {
+  // Combo event for leaderboard badges (from Zustand blastComboSync)
+  const blastComboSync = useBlastComboSync();
+
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [isFireRoundScore, setIsFireRoundScore] = useState(false);
@@ -563,6 +567,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 }))}
                 currentUsername={username}
                 t={t}
+                comboEvent={blastComboSync}
               />
               <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} compact />
             </div>

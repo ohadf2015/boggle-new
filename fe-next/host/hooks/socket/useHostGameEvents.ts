@@ -161,6 +161,13 @@ export function useHostGameEvents({
     if (!socket) return;
 
     const handleStartGame = (data: StartGameBroadcast) => {
+      // Validate session ID - ignore stale startGame from previous sessions
+      if (gameSessionIdRef.current !== null && (data as any).gameSessionId !== undefined &&
+          (data as any).gameSessionId < gameSessionIdRef.current) {
+        logger.log('[HOST] Ignoring stale startGame from old session:', (data as any).gameSessionId);
+        return;
+      }
+
       logger.log('[HOST] Received startGame event from server');
 
       // Track game session ID
@@ -190,6 +197,11 @@ export function useHostGameEvents({
       // Set blast tile overlay if present (mirrors player handler)
       if ((data as any).blastTileOverlay) {
         useGameStore.getState().setBlastTileOverlay((data as any).blastTileOverlay);
+        useGameStore.getState().setBlastMovesUsed(0);
+        // Store seed for deterministic multiplayer refills
+        if ((data as any).blastSeed != null) {
+          useGameStore.getState().setBlastSeed((data as any).blastSeed);
+        }
       }
 
       // Set word hunt target length if present (mirrors player handler)
@@ -252,6 +264,12 @@ export function useHostGameEvents({
     };
 
     const handleValidationComplete = (data: any) => {
+      // Guard against duplicate validationComplete events
+      if (!useGameStore.getState().waitingForResults) {
+        logger.log('[HOST] Ignoring duplicate validationComplete - not waiting for results');
+        return;
+      }
+
       logger.log('[HOST] Received validationComplete event:', data);
 
       // Transition directly to results — no validation modal delay
@@ -281,6 +299,12 @@ export function useHostGameEvents({
     };
 
     const handleResetGame = (data: any) => {
+      // Validate session - only process reset for current or newer session
+      if (data.gameSessionId !== undefined && gameSessionIdRef.current !== null &&
+          data.gameSessionId < gameSessionIdRef.current) {
+        logger.log('[HOST] Ignoring stale resetGame from old session');
+        return;
+      }
       logger.log('[HOST] Game reset received');
 
       if (data.gameSessionId !== undefined) {
@@ -307,6 +331,14 @@ export function useHostGameEvents({
       setTournamentCreating(false);
       setXpGainedData(null);
       setLevelUpData(null);
+
+      // Reset word hunt state for next game
+      const whStore = useGameStore.getState();
+      whStore.setWordHuntEliminatedPlayers([]);
+      whStore.setWordHuntTargetFound(false);
+      whStore.setWordHuntTargetAttempts([]);
+      whStore.setWordHuntPlayerLives({});
+      whStore.setWordHuntMyLife(100);
 
       // Refresh player list from server data so host can start next game
       if (data.users && setPlayersReady) {
@@ -350,6 +382,11 @@ export function useHostGameEvents({
       store.setWordHuntEliminatedPlayers((prev: string[]) => [...prev, data.username]);
     };
 
+    const handleWordHuntDiscoveryClues = (data: { word: string; greenPositions: Array<{ position: number; letter: string }>; knownLetters: string[] }) => {
+      logger.log('[HOST] Word hunt discovery clues:', data);
+      useGameStore.getState().addWordHuntDiscoveryClues(data.greenPositions, data.knownLetters);
+    };
+
     // Register listeners
     socket.on('startGame', handleStartGame);
     socket.on('timeUpdate', handleTimeUpdate);
@@ -367,8 +404,14 @@ export function useHostGameEvents({
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
     socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
     socket.on('wordHuntEliminated', handleWordHuntEliminated);
+    socket.on('wordHuntDiscoveryClues', handleWordHuntDiscoveryClues);
 
     return () => {
+      // Clear fire round interval explicitly
+      if (fireRoundIntervalRef.current) {
+        clearInterval(fireRoundIntervalRef.current);
+        fireRoundIntervalRef.current = null;
+      }
       socket.off('startGame', handleStartGame);
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('endGame', handleEndGame);
@@ -386,6 +429,7 @@ export function useHostGameEvents({
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);
       socket.off('wordHuntEliminated', handleWordHuntEliminated);
+      socket.off('wordHuntDiscoveryClues', handleWordHuntDiscoveryClues);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

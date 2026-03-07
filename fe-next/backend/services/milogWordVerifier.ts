@@ -98,9 +98,20 @@ function extractWordType(text: string): { type: MilogWordType; raw: string } | n
  * Parse milog.co.il HTML to determine if word has definitions.
  * Checks word type to reject abbreviations and proper names.
  */
+// Minimum word length for gameplay (single letters have definitions on Milog but aren't game words)
+const MIN_WORD_LENGTH = 2;
+
 export function parseVerificationResult(html: string, word: string): MilogVerificationResult {
   if (!html) {
     return { verified: false, status: 'not_found', definitionCount: 0 };
+  }
+
+  // Reject words that are too short for gameplay
+  if (word.length < MIN_WORD_LENGTH) {
+    return {
+      verified: false, status: 'rejected_type', definitionCount: 0,
+      rejectedReason: `Word is too short for gameplay (minimum ${MIN_WORD_LENGTH} letters)`,
+    };
   }
 
   const linkPattern = /milog\.co\.il\/[^/]+\/e_\d+/gi;
@@ -129,22 +140,23 @@ export function parseVerificationResult(html: string, word: string): MilogVerifi
     if (typeInfo) foundTypes.push(typeInfo);
   }
 
-  // Decision: accept if ANY accepted type found, reject only if ALL are rejected
-  const acceptedEntry = foundTypes.find(t => ACCEPTED_TYPE_VALUES.has(t.type));
+  // Strict decision: reject if ANY rejected type found (abbreviation/proper_name)
+  // This prevents abbreviations that also have non-abbreviation definitions from leaking through
   const rejectedEntry = foundTypes.find(t => REJECTED_TYPE_VALUES.has(t.type));
-
-  if (acceptedEntry) {
-    return {
-      verified: true, status: 'verified', definitionCount, url,
-      wordType: acceptedEntry.type, wordTypeRaw: acceptedEntry.raw,
-    };
-  }
+  const acceptedEntry = foundTypes.find(t => ACCEPTED_TYPE_VALUES.has(t.type));
 
   if (rejectedEntry) {
     return {
       verified: false, status: 'rejected_type', definitionCount, url,
       wordType: rejectedEntry.type, wordTypeRaw: rejectedEntry.raw,
       rejectedReason: `Word type '${rejectedEntry.type}' is not accepted for gameplay`,
+    };
+  }
+
+  if (acceptedEntry) {
+    return {
+      verified: true, status: 'verified', definitionCount, url,
+      wordType: acceptedEntry.type, wordTypeRaw: acceptedEntry.raw,
     };
   }
 

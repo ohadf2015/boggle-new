@@ -183,6 +183,49 @@ export function areAllPlayersEliminated(state: WordHuntModeState): boolean {
 }
 
 /**
+ * Compute discovery clues from a found board word vs the target word.
+ * Returns positional green matches and known letters (present but wrong position).
+ * Mirrors SP's useSurvivalClues.updateCluesFromDiscovery logic.
+ */
+export function computeDiscoveryClues(
+  targetWord: string,
+  discoveredWord: string,
+): { greenPositions: { position: number; letter: string }[]; knownLetters: string[] } {
+  const target = targetWord.toLowerCase();
+  const word = discoveredWord.toLowerCase();
+  const checkLen = Math.min(word.length, target.length);
+
+  const greenPositions: { position: number; letter: string }[] = [];
+  for (let i = 0; i < checkLen; i++) {
+    if (word[i] === target[i]) {
+      greenPositions.push({ position: i, letter: word[i] });
+    }
+  }
+
+  // Build target letter counts, subtract greens, find present-but-wrong-position
+  const targetCounts: Record<string, number> = {};
+  for (const ch of target) {
+    targetCounts[ch] = (targetCounts[ch] || 0) + 1;
+  }
+  for (const g of greenPositions) {
+    targetCounts[g.letter]--;
+  }
+
+  const knownSet = new Set<string>();
+  for (let i = 0; i < word.length; i++) {
+    const ch = word[i];
+    // Skip positions that are already green
+    if (i < checkLen && word[i] === target[i]) continue;
+    if (targetCounts[ch] && targetCounts[ch] > 0) {
+      knownSet.add(ch);
+      targetCounts[ch]--;
+    }
+  }
+
+  return { greenPositions, knownLetters: [...knownSet] };
+}
+
+/**
  * Subtract HUNT_WRONG_GUESS_PENALTY from player's life.
  * If life drops to 0 or below, add to eliminated.
  */

@@ -168,6 +168,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       }
       setConnectionError(error.message);
       setIsConnected(false);
+      setIsReconnecting(false);
     };
 
     const handleReconnect = (attemptNumber: number) => {

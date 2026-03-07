@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useEffect, useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Zap, TrendingUp, Flame } from 'lucide-react';
+import { Crown, Zap, TrendingUp, Flame, Gem, Snowflake, Bomb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 
@@ -18,11 +18,17 @@ export interface CompactPlayer {
   previousRank?: number;
 }
 
+export interface ComboEvent {
+  username: string;
+  comboType: string;
+}
+
 interface CompactLeaderboardProps {
   players: CompactPlayer[];
   currentUsername: string;
   className?: string;
   t: (key: string) => string;
+  comboEvent?: ComboEvent | null;
 }
 
 // Track previous scores for detecting changes
@@ -49,11 +55,22 @@ const VISUAL_UPDATE_DEBOUNCE = 100;
  * - Pulse animations when opponents score
  * - Rank change indicators (up/down arrows)
  */
+/** Map combo type to icon */
+function getComboIcon(comboType: string) {
+  switch (comboType) {
+    case 'gem': return <Gem className="w-3 h-3 text-neo-pink" />;
+    case 'frozen': return <Snowflake className="w-3 h-3 text-neo-cyan" />;
+    case 'bomb': return <Bomb className="w-3 h-3 text-neo-orange" />;
+    default: return <Zap className="w-3 h-3 text-neo-lime" />;
+  }
+}
+
 export const CompactLeaderboard = memo<CompactLeaderboardProps>(function CompactLeaderboard({
   players,
   currentUsername,
   className,
   t,
+  comboEvent,
 }) {
   // Track previous scores and ranks for animations
   const prevScoresRef = useRef<Map<string, number>>(new Map());
@@ -348,8 +365,23 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   </AnimatePresence>
                 </motion.div>
 
-                {/* Player name (right side) + streak flame */}
+                {/* Player name (right side) + streak flame + combo badge */}
                 <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                  {/* Combo event badge */}
+                  <AnimatePresence>
+                    {comboEvent && comboEvent.username === player.username && comboEvent.username !== currentUsername && (
+                      <motion.div
+                        key={`combo-${player.username}`}
+                        data-testid={`combo-badge-${player.username}`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: [1, 1.3, 1], opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        {getComboIcon(comboEvent.comboType)}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                   <AnimatePresence>
                     {isOnStreak(player.username) && (
                       <motion.div

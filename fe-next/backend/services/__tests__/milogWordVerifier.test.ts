@@ -190,25 +190,60 @@ describe('MilogWordVerifier', () => {
       expect(result.rejectedReason).toContain('proper_name');
     });
 
-    it('should accept when mixed types include an accepted type', () => {
-      // Word with multiple definitions: one is noun, one is proper name
+    it('should reject when mixed types include an abbreviation (strict mode)', () => {
+      // Word with both proper name and noun - but if ANY rejected type, reject
       const html = `
         <html><body>
           <div class="sr_e">
-            <a href="https://milog.co.il/שרון/e_7001">שָׁרוֹן - שם פרטי</a>
+            <a href="https://milog.co.il/צהל/e_7001">צה"ל - ראשי תיבות</a>
           </div>
           <div class="sr_e">
-            <a href="https://milog.co.il/שרון/e_7002">שָׁרוֹן - שם עצם, זכר</a>
+            <a href="https://milog.co.il/צהל/e_7002">צָהַל - פועל</a>
           </div>
         </body></html>
       `;
 
-      const result = parseVerificationResult(html, 'שרון');
+      const result = parseVerificationResult(html, 'צהל');
+
+      // Strict: reject if ANY definition is abbreviation
+      expect(result.verified).toBe(false);
+      expect(result.status).toBe('rejected_type');
+      expect(result.wordType).toBe('abbreviation');
+    });
+
+    it('should accept when mixed types include accepted but no abbreviation/proper_name', () => {
+      // Word with noun and adjective - both accepted types
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/חם/e_7001">חַם - שם תואר</a>
+          </div>
+          <div class="sr_e">
+            <a href="https://milog.co.il/חם/e_7002">חָם - שם עצם</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'חם');
 
       expect(result.verified).toBe(true);
       expect(result.status).toBe('verified');
-      // Should pick the accepted type
-      expect(result.wordType).toBe('noun');
+    });
+
+    it('should reject single-letter words', () => {
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/א/e_100">א - שם עצם</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'א');
+
+      expect(result.verified).toBe(false);
+      expect(result.status).toBe('rejected_type');
+      expect(result.rejectedReason).toContain('too short');
     });
 
     it('should fall back to verified when type is unparseable but links exist', () => {

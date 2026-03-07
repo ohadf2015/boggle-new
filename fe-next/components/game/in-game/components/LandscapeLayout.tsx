@@ -10,6 +10,7 @@ import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
 import ComboDisplay from '../../ComboDisplay';
 import HintButton from '@/components/HintButton';
 import CompactLeaderboard from '../../CompactLeaderboard';
+import { useBlastComboSync } from '@/hooks/gameState/store';
 import { shouldShowKeyboardTrails } from '../../keyboardTrailsUtils';
 import { GameOverlays } from './GameOverlays';
 import { GameHeader } from './GameHeader';
@@ -175,6 +176,9 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   wordHuntEliminatedPlayers,
   onWordHuntGuess,
 }) {
+  // Combo event for leaderboard badges (from Zustand blastComboSync)
+  const blastComboSync = useBlastComboSync();
+
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [isFireRoundScore, setIsFireRoundScore] = useState(false);
@@ -389,6 +393,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                   currentUsername={username}
                   t={t}
                   className="text-xs"
+                  comboEvent={blastComboSync}
                 />
               </div>
             )}

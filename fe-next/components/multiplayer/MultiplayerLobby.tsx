@@ -223,7 +223,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
 
         <div dir={dir} className="flex h-dvh w-full overflow-hidden bg-neo-navy text-white p-3 gap-4 landscape-full-height">
         {/* Left column: Form */}
-        <div className="w-[45%] flex flex-col gap-3 overflow-y-auto overscroll-contain scrollable-area">
+        <div className="w-[45%] rtl:order-2 flex flex-col gap-3 overflow-y-auto overscroll-contain scrollable-area">
           {/* Header with back + title */}
           <div className="flex items-center gap-3">
             <Link
@@ -316,7 +316,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         </div>
 
         {/* Right column: Room List */}
-        <div className="w-[55%] flex flex-col gap-3 overflow-hidden">
+        <div className="w-[55%] rtl:order-1 flex flex-col gap-3 overflow-hidden">
           <h2 className="text-base font-black uppercase text-neo-white text-center">
             {t('joinView.activeRooms') || 'Active Rooms'}
           </h2>
@@ -381,7 +381,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <motion.div
             initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="w-full lg:w-[45%] lg:max-w-md flex flex-col"
+            className="w-full lg:w-[45%] lg:max-w-md flex flex-col rtl:order-2"
           >
             <div className="rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard-lg p-4 flex flex-col h-full relative overflow-hidden">
               {/* Decorative top accent bar */}
@@ -470,7 +470,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <motion.div
             initial={{ x: 30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="w-full lg:max-w-2xl"
+            className="w-full lg:max-w-2xl rtl:order-1"
           >
             <RoomList
               activeRooms={activeRooms}

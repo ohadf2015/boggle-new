@@ -110,6 +110,62 @@ describe('useBlastGame', () => {
     });
   });
 
+  describe('multiplayer initialTileStates sync', () => {
+    it('should use initialTileStates when provided at mount', () => {
+      const goldTile = {
+        row: 0, col: 0, type: 'gold' as const, isCleared: false,
+        activationEffect: null, hitsRemaining: 0,
+      };
+      const standardTile = (r: number, c: number) => ({
+        row: r, col: c, type: 'standard' as const, isCleared: false,
+        activationEffect: null, hitsRemaining: 0,
+      });
+
+      const initialStates = Array.from({ length: 4 }, (_, r) =>
+        Array.from({ length: 4 }, (_, c) =>
+          r === 0 && c === 0 ? goldTile : standardTile(r, c),
+        ),
+      );
+
+      const { result } = renderHook(() =>
+        useBlastGame(defaultConfig, { initialTileStates: initialStates }),
+      );
+
+      expect(result.current.tileStates[0][0].type).toBe('gold');
+    });
+
+    it('should sync tileStates when initialTileStates arrives after mount (late overlay)', () => {
+      const standardTile = (r: number, c: number) => ({
+        row: r, col: c, type: 'standard' as const, isCleared: false,
+        activationEffect: null, hitsRemaining: 0,
+      });
+
+      const lateOverlay = Array.from({ length: 4 }, (_, r) =>
+        Array.from({ length: 4 }, (_, c) => ({
+          ...standardTile(r, c),
+          type: (r === 1 && c === 1 ? 'bomb' : 'standard') as any,
+          hitsRemaining: r === 1 && c === 1 ? 1 : 0,
+        })),
+      );
+
+      // Start with null (overlay hasn't arrived yet)
+      let tileStates: any = null;
+      const { result, rerender } = renderHook(
+        () => useBlastGame(defaultConfig, { initialTileStates: tileStates }),
+      );
+
+      // Initially all standard (generated locally)
+      expect(result.current.tileStates[1][1].type).toBe('standard');
+
+      // Simulate overlay arriving from socket
+      tileStates = lateOverlay;
+      rerender();
+
+      // Should now have the server's special tile
+      expect(result.current.tileStates[1][1].type).toBe('bomb');
+    });
+  });
+
   describe('special tile placement', () => {
     it('should place no special tiles when specialTileChance is 0', () => {
       const { result } = renderHook(() => useBlastGame({

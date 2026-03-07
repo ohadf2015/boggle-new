@@ -16,6 +16,7 @@ import {
   restoreLife,
   penalizeWrongGuess,
   areAllPlayersEliminated,
+  computeDiscoveryClues,
 } from '../wordHuntManager';
 
 import type { WordHuntModeState } from '@/shared/types/game';
@@ -431,6 +432,67 @@ describe('wordHuntManager', () => {
       };
 
       expect(areAllPlayersEliminated(state)).toBe(true);
+    });
+  });
+
+  // ==========================================
+  // computeDiscoveryClues
+  // ==========================================
+  describe('computeDiscoveryClues', () => {
+    it('should return green positions for matching letters at same position', () => {
+      const result = computeDiscoveryClues('piano', 'plant');
+      // p=p at 0, a=a at 2, n=n at 3
+      expect(result.greenPositions).toEqual([
+        { position: 0, letter: 'p' },
+        { position: 2, letter: 'a' },
+        { position: 3, letter: 'n' },
+      ]);
+    });
+
+    it('should return multiple green positions', () => {
+      const result = computeDiscoveryClues('hello', 'helps');
+      expect(result.greenPositions).toEqual([
+        { position: 0, letter: 'h' },
+        { position: 1, letter: 'e' },
+        { position: 2, letter: 'l' },
+      ]);
+    });
+
+    it('should return known letters for present-but-wrong-position', () => {
+      // target: 'piano', word: 'inept'
+      // pos 0: i vs p — not green, but 'i' in piano → known
+      // pos 1: n vs i — not green, but 'n' in piano → known
+      const result = computeDiscoveryClues('piano', 'inept');
+      expect(result.knownLetters).toContain('i');
+      expect(result.knownLetters).toContain('n');
+    });
+
+    it('should not include green-matched letters in knownLetters', () => {
+      // 'h' is at position 0 in both — green, not known
+      const result = computeDiscoveryClues('hello', 'happy');
+      expect(result.greenPositions).toEqual([{ position: 0, letter: 'h' }]);
+      expect(result.knownLetters).not.toContain('h');
+    });
+
+    it('should handle shorter discovered word than target', () => {
+      const result = computeDiscoveryClues('piano', 'pin');
+      // pos 0: p=p → green, pos 1: i=i → green, pos 2: n vs a → no
+      expect(result.greenPositions).toEqual([
+        { position: 0, letter: 'p' },
+        { position: 1, letter: 'i' },
+      ]);
+    });
+
+    it('should handle no matches', () => {
+      const result = computeDiscoveryClues('piano', 'drums');
+      expect(result.greenPositions).toEqual([]);
+      expect(result.knownLetters).toEqual([]);
+    });
+
+    it('should be case insensitive', () => {
+      const result = computeDiscoveryClues('PIANO', 'PLANT');
+      // pos 0: p=p → green. Also 'a' at pos 2 in 'plant' vs 'a' at pos 2 in 'piano' → green
+      expect(result.greenPositions).toContainEqual({ position: 0, letter: 'p' });
     });
   });
 });

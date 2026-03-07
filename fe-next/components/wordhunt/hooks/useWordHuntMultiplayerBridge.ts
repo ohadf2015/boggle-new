@@ -16,6 +16,8 @@ import {
   useWordHuntTargetFound,
   useWordHuntPlayerLives,
   useWordHuntEliminatedPlayers,
+  useWordHuntDiscoveryClues,
+  useWordHuntKnownLetters,
 } from '@/hooks/gameState/store';
 import type { LetterFeedback as MPLetterFeedback } from '@/shared/types/game';
 import type { LetterFeedback as SPLetterFeedback } from '@/utils/wordHuntFeedback';
@@ -23,6 +25,7 @@ import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival
 import type { HintLevel } from '@/utils/aiHintGenerator';
 
 const FEEDBACK_OVERLAY_DURATION = 3000;
+const WRONG_GUESS_SHAKE_DURATION = 400;
 
 /** Map MP feedback string to SP feedback string */
 function convertFeedback(mp: MPLetterFeedback): SPLetterFeedback['feedback'] {
@@ -63,6 +66,7 @@ export interface WordHuntMultiplayerBridgeResult {
   currentHint: HintLevel;
   showFeedbackOverlay: boolean;
   latestAttemptFeedback: SPLetterFeedback[] | null;
+  wrongGuessShake: boolean;
   isGameOver: boolean;
 }
 
@@ -73,6 +77,8 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
   const targetFound = useWordHuntTargetFound();
   const playerLives = useWordHuntPlayerLives();
   const eliminatedPlayers = useWordHuntEliminatedPlayers();
+  const discoveryClues = useWordHuntDiscoveryClues();
+  const discoveryKnownLetters = useWordHuntKnownLetters();
 
   // Convert MP attempts to SP format
   const attempts = useMemo(
@@ -80,22 +86,29 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     [targetAttempts]
   );
 
-  // Compute accumulated clues: green wins over yellow at each position
+  // Compute accumulated clues: merge target guess feedback + discovery clues from found words
   const accumulatedClues = useMemo(() => {
     const clues = new Map<number, AccumulatedClue>();
+
+    // Discovery clues from board words (server-computed, mirrors SP logic)
+    for (const dc of discoveryClues) {
+      clues.set(dc.position, { letter: dc.letter, type: 'green' });
+    }
+
+    // Target guess feedback: only GREEN (exact position matches) go into accumulatedClues.
+    // Yellow letters go to knownLetters only (mirrors SP useSurvivalClues behavior).
+    // The HintBoxes component handles yellow display via its own persistedLetters logic.
     for (const attempt of attempts) {
       for (const fb of attempt.feedback) {
         if (fb.feedback === 'green') {
           clues.set(fb.position, { letter: fb.letter, type: 'green' });
-        } else if (fb.feedback === 'yellow' && !clues.has(fb.position)) {
-          clues.set(fb.position, { letter: fb.letter, type: 'yellow' });
         }
       }
     }
     return clues;
-  }, [attempts]);
+  }, [attempts, discoveryClues]);
 
-  // Collect yellow letters (present but wrong position)
+  // Collect known letters from target guesses + discovery
   const knownLetters = useMemo(() => {
     const known = new Set<string>();
     for (const attempt of attempts) {
@@ -105,15 +118,22 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
         }
       }
     }
+    // Add server-computed known letters from word discoveries
+    for (const letter of discoveryKnownLetters) {
+      known.add(letter);
+    }
     return known;
-  }, [attempts]);
+  }, [attempts, discoveryKnownLetters]);
 
-  // Synthetic hint: just underscores
+  // Synthetic hint: show discovered letters, underscores for unknown positions
   const currentHint = useMemo<HintLevel>(() => ({
-    hint: Array.from({ length: targetLength }, () => '_').join(' '),
+    hint: Array.from({ length: targetLength }, (_, i) => {
+      const clue = accumulatedClues.get(i);
+      return clue?.type === 'green' ? clue.letter.toUpperCase() : '_';
+    }).join(' '),
     level: 0,
     unlockCost: 0,
-  }), [targetLength]);
+  }), [targetLength, accumulatedClues]);
 
   // Feedback overlay timer
   const [showFeedbackOverlay, setShowFeedbackOverlay] = useState(false);
@@ -136,6 +156,21 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     return attempts[attempts.length - 1].feedback;
   }, [attempts]);
 
+  // Wrong guess shake (400ms pulse when a non-correct attempt arrives)
+  const [wrongGuessShake, setWrongGuessShake] = useState(false);
+  const prevShakeLengthRef = useRef(targetAttempts.length);
+
+  useEffect(() => {
+    if (targetAttempts.length > prevShakeLengthRef.current && !targetFound) {
+      setWrongGuessShake(true);
+      const timer = setTimeout(() => setWrongGuessShake(false), WRONG_GUESS_SHAKE_DURATION);
+      prevShakeLengthRef.current = targetAttempts.length;
+      return () => clearTimeout(timer);
+    }
+    prevShakeLengthRef.current = targetAttempts.length;
+    return undefined;
+  }, [targetAttempts.length, targetFound]);
+
   const isGameOver = myLife <= 0 || targetFound;
 
   return {
@@ -150,6 +185,7 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     currentHint,
     showFeedbackOverlay,
     latestAttemptFeedback,
+    wrongGuessShake,
     isGameOver,
   };
 }

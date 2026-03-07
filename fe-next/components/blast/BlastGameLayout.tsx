@@ -27,7 +27,8 @@ import { BlastMoveCounter } from './BlastMoveCounter';
 import { BlastObjectiveDisplay } from './BlastObjectiveDisplay';
 import { BlastChainCounter } from './BlastChainCounter';
 import CircularTimer from '@/components/CircularTimer';
-import { CompactLeaderboard, type CompactPlayer } from '@/components/game/CompactLeaderboard';
+import { LeadChangeBanner } from '@/components/game/LeadChangeBanner';
+import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -168,6 +169,13 @@ export function BlastGameLayout({
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
   const earnedStars = calculateEarnedStars(tilesCleared, totalTiles);
+
+  // Lead change detection for multiplayer pop-up banners
+  const leadChangeEvent = useLeadChangeDetection(
+    isMultiplayer && leaderboard ? leaderboard : [],
+    username ?? '',
+  );
+
   const [showHelp, setShowHelp] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [shakeClass, setShakeClass] = useState('');
@@ -416,21 +424,10 @@ export function BlastGameLayout({
         </div>
       </div>
 
-      {/* MP Leaderboard */}
-      {isMultiplayer && leaderboard && leaderboard.length > 0 && username && (
-        <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-2">
-          <CompactLeaderboard
-            players={leaderboard.map((p, i): CompactPlayer => ({
-              username: p.username,
-              score: p.score,
-              rank: i + 1,
-              isCurrentUser: p.username === username,
-              avatarEmoji: p.avatar?.emoji,
-              avatarColor: p.avatar?.color,
-            }))}
-            currentUsername={username}
-            t={(key: string) => t(key) || key}
-          />
+      {/* MP Lead Change Banner — pop-up style like classic game */}
+      {isMultiplayer && (
+        <div className="relative z-50">
+          <LeadChangeBanner event={leadChangeEvent} />
         </div>
       )}
 

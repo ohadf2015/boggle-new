@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import englishWords from 'an-array-of-english-words';
 import spanishWords from 'an-array-of-spanish-words';
+import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -23,15 +24,6 @@ const dictionaries: Record<string, string[] | null> = {
   sv: null,
   ja: null,
 };
-
-// Hebrew final letter normalization
-const hebrewFinalLetters: Record<string, string> = {
-  'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ'
-};
-
-function normalizeHebrewWord(word: string): string {
-  return word.split('').map(c => hebrewFinalLetters[c] || c).join('');
-}
 
 function loadDictionary(language: string): string[] {
   if (dictionaries[language]) {

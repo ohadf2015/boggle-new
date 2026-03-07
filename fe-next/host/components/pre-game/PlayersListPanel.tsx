@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot } from 'lucide-react';
 import { Card } from '../../../components/ui/card';
@@ -74,11 +74,11 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
                       avatarImage={avatar?.avatarImage}
                       size="lg"
                     />
-                    <span className="font-medium text-neo-cream/90">
+                    <span className="font-medium text-neo-cream/90 truncate max-w-[160px]" title={playerUsername}>
                       <SlotMachineText text={playerUsername} />
                     </span>
-                    {isHostPlayer && <Crown className="text-neo-yellow/80 text-sm" />}
-                    {isBot && <Bot className="text-neo-cyan/70 text-sm" />}
+                    {isHostPlayer && <Crown className="text-neo-yellow/80 text-sm" aria-label="Room host" />}
+                    {isBot && <Bot className="text-neo-cyan/70 text-sm" aria-label="AI player" />}
                     {isMe && (
                       <span className="text-xs text-neo-cream/70 font-medium">
                         ({t('playerView.me')})
@@ -96,6 +96,7 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
                         status={presenceStatus}
                         isWindowFocused={isWindowFocused}
                         size="lg"
+                        aria-label={`Player ${presenceStatus === 'active' ? 'online' : presenceStatus}`}
                       />
                     )}
                   </div>

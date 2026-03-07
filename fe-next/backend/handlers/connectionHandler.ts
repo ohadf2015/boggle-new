@@ -89,9 +89,11 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   logger.info('SOCKET', `Host (${username}) disconnected from game ${gameCode}`);
 
   // Clear any existing host reconnection timeout
-  if (game.reconnectionTimeout) {
-    clearTimeout(game.reconnectionTimeout);
-    game.reconnectionTimeout = null;
+  // NOTE: Stored as hostReconnectionTimeout to avoid conflicts if multiple
+  // disconnect events fire simultaneously (per-user isolation)
+  if ((game as any).hostReconnectionTimeout) {
+    clearTimeout((game as any).hostReconnectionTimeout);
+    (game as any).hostReconnectionTimeout = null;
   }
 
   // Mark host as disconnected BEFORE checking if room is empty
@@ -151,7 +153,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   });
 
   // Start grace period for host reconnection
-  game.reconnectionTimeout = setTimeout(() => {
+  (game as any).hostReconnectionTimeout = setTimeout(() => {
     const currentGame = getGame(gameCode);
     if (!currentGame) return;
 

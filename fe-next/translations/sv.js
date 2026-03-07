@@ -683,6 +683,8 @@ const sv = {
     ]
   },
   "multiplayerFlow": {
+    "roomClosed": "Room closed",
+    "rateLimited": "Slow down!",
     "roomList": {
       "activeRooms": "Hoppa in!",
       "online": "i strid",
@@ -3898,7 +3900,13 @@ const sv = {
     "mode": "Läge",
     "timer": "Timer",
     "subtitle": "Tävla med vänner i realtid",
-    "playersJoined": "spelare anslöt"
+    "playersJoined": "spelare anslöt",
+    "playerJoined": "gick med i spelet!",
+    "playerLeft": "lämnade spelet",
+    "playerEliminated": "har eliminerats!",
+    "youEliminated": "Du har eliminerats!",
+    "playerLastLife": "har ett liv kvar!",
+    "yourLastLife": "SISTA LIVET!"
   },
   "stats": {
     "games": "Matcher",

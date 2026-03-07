@@ -186,6 +186,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       eliminatedPlayers={bridge.eliminatedPlayers}
       leaderboard={leaderboard}
       currentUsername={username}
+      wrongGuessShake={bridge.wrongGuessShake}
 
       // Common
       t={t}

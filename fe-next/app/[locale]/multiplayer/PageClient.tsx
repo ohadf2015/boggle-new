@@ -29,6 +29,8 @@ import { useMultiplayerAuth } from '@/hooks/useMultiplayerAuth';
 import { useMultiplayerSession } from '@/hooks/useMultiplayerSession';
 import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
 import { useSeriesTracker } from '@/hooks/useSeriesTracker';
+import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotifications';
+import { useMultiplayerEventNotifications } from '@/hooks/useMultiplayerEventNotifications';
 import type { Language, ActiveRoom, Avatar } from '@/shared/types/game';
 
 // Hex color validation pattern (must match backend schema)
@@ -80,7 +82,7 @@ function ViewLoadingSkeleton(): React.JSX.Element {
     <div className="min-h-[60vh] flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
       <div className="relative z-10">
-        <PageLoader size="md" text="Loading game..." />
+        <PageLoader size="md" />
       </div>
     </div>
   );
@@ -197,6 +199,21 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   // Track accumulated scores across multiple games in the same room
   const seriesTracker = useSeriesTracker();
+
+  // Show toast notifications when players join/leave the lobby
+  usePlayerJoinLeaveNotifications({
+    players: playersInRoom,
+    currentUsername: username,
+    t,
+    enabled: isActive,
+  });
+
+  // Dramatic notifications for eliminations and last-life warnings
+  useMultiplayerEventNotifications({
+    currentUsername: username,
+    t,
+    enabled: isActive,
+  });
 
   const {
     socket,
@@ -365,16 +382,19 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setIsActive(false);
       setIsHost(false);
       setGameCode('');
+      toast.error(t('multiplayerFlow.roomClosed') || 'Room closed', { duration: 4000, icon: '🚪' });
     },
     onSessionMigrated: () => {
       clearSessionPreservingUsername(username);
       setIsActive(false);
       setIsHost(false);
       setGameCode('');
+      toast(t('multiplayerFlow.roomClosed') || 'Session moved', { duration: 3000, icon: 'ℹ️' });
     },
     onWarning: () => {},
     onRateLimited: () => {
       setIsJoining(false);
+      toast.error(t('multiplayerFlow.rateLimited') || 'Slow down!', { duration: 3000, icon: '⏳' });
     },
     onHostTransferred: (data) => {
       if (data.newHost === username) {
@@ -420,9 +440,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       overrideRoomName?: string,
       overrideUsername?: string,
     ) => {
-      console.log(
-        `🎮 [JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`
-      );
+      if (process.env.NODE_ENV === 'development') {
+        console.log(
+          `[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`
+        );
+      }
 
       // Wait for socket connection if socket exists but isn't connected yet
       // This handles the race condition where join fires before connection completes
@@ -521,7 +543,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
       const safetyTimeout = setTimeout(() => {
         setIsJoining(false);
-        console.warn('⏱️ [JOIN] Safety timeout triggered');
+        if (process.env.NODE_ENV === 'development') console.warn('[JOIN] Safety timeout triggered');
         logger.warn('[JOIN] Safety timeout triggered');
         toast.error(
           t('errors.connectionTimeout') || 'Connection timeout. Please try again.',
@@ -598,18 +620,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           avatar: hostAvatar,
           profilePictureUrl: profile?.profile_picture_url,
         };
-
-        console.log('[JOIN] Emitting createGame event:', {
-          gameCode: codeToUse,
-          roomName: finalRoomName,
-          hostUsername: finalHostUsername,
-          language: roomLang || language,
-          hasAuth: !!authUserId,
-          hasGuestToken: !!guestTokenHash,
-          hasAvatar: !!hostAvatar,
-          socketConnected: socket.connected,
-          socketId: socket.id,
-        });
 
         socket.emit('createGame', createGamePayload);
       } else {

@@ -156,6 +156,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
             className="flex flex-col gap-3"
+            aria-busy={roomsLoading}
           >
             <div className="flex items-center justify-between">
               <h2 className="font-neo-display font-black uppercase text-xs tracking-widest text-white/50">
@@ -204,6 +205,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                       <p className="font-bold text-sm text-neo-white truncate">
                         {room.roomName || room.gameCode}
                       </p>
+                      {/* TODO: Show "X/Y" format when maxPlayers is added to ActiveRoom type */}
                       <p className="text-xs text-slate-400">
                         {room.playerCount || 0} {t('joinView.players')}
                       </p>

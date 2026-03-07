@@ -684,6 +684,8 @@ const ja = {
     ]
   },
   "multiplayerFlow": {
+    "roomClosed": "Room closed",
+    "rateLimited": "Slow down!",
     "roomList": {
       "activeRooms": "飛び込め！",
       "online": "バトル中",
@@ -3902,7 +3904,13 @@ const ja = {
     "mode": "モード",
     "timer": "タイマー",
     "subtitle": "友達とリアルタイムで競争",
-    "playersJoined": "人参加中"
+    "playersJoined": "人参加中",
+    "playerJoined": "がゲームに参加しました！",
+    "playerLeft": "がゲームを退出しました",
+    "playerEliminated": "が脱落しました！",
+    "youEliminated": "脱落しました！",
+    "playerLastLife": "が最後のライフです！",
+    "yourLastLife": "最後のライフ！"
   },
   "stats": {
     "games": "ゲーム",

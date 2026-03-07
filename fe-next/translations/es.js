@@ -757,6 +757,8 @@ const es = {
     ]
   },
   "multiplayerFlow": {
+    "roomClosed": "Room closed",
+    "rateLimited": "Slow down!",
     "roomList": {
       "activeRooms": "¡Métete!",
       "online": "en batalla",
@@ -3806,7 +3808,13 @@ const es = {
     "mode": "Modo",
     "timer": "Tiempo",
     "subtitle": "Compite con amigos en tiempo real",
-    "playersJoined": "jugadores unidos"
+    "playersJoined": "jugadores unidos",
+    "playerJoined": "se unio al juego!",
+    "playerLeft": "salio del juego",
+    "playerEliminated": "ha sido eliminado!",
+    "youEliminated": "Has sido eliminado!",
+    "playerLastLife": "esta en su ultima vida!",
+    "yourLastLife": "ULTIMA VIDA!"
   },
   "stats": {
     "games": "partidas",

@@ -28,8 +28,7 @@
 
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { shallow } from 'zustand/shallow';
-import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameMode, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
+import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import type { Player, TournamentData, TournamentStanding, ComboState } from './types';
 import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
@@ -110,9 +109,10 @@ interface GameState {
   wordHuntTargetAttempts: Array<{ guess: string; feedback: LetterFeedback[] }>;
   wordHuntTargetFound: boolean;
   wordHuntEliminatedPlayers: string[];
+  wordHuntDiscoveryClues: Array<{ position: number; letter: string }>;
+  wordHuntKnownLetters: string[];
 
-  // Internal refs (not reactive, for callbacks)
-  _comboTimeoutId: NodeJS.Timeout | null;
+  // _comboTimeoutId removed from state — stored as module-level variable to avoid re-renders
 }
 
 // ==========================================
@@ -181,6 +181,25 @@ interface GameActions {
   setWordHuntTargetAttempts: (value: Array<{ guess: string; feedback: LetterFeedback[] }> | ((prev: Array<{ guess: string; feedback: LetterFeedback[] }>) => Array<{ guess: string; feedback: LetterFeedback[] }>)) => void;
   setWordHuntTargetFound: (value: boolean | ((prev: boolean) => boolean)) => void;
   setWordHuntEliminatedPlayers: (value: string[] | ((prev: string[]) => string[])) => void;
+  addWordHuntDiscoveryClues: (greens: Array<{ position: number; letter: string }>, known: string[]) => void;
+
+  // Batch actions (performance: single set() call instead of many)
+  batchStartGame: (data: {
+    letterGrid?: LetterGrid | null;
+    remainingTime?: number | null;
+    gameLanguage?: Language | null;
+    minWordLength?: number;
+    boardTheme?: BoardTheme | null;
+    gameMode?: GameModeSelection;
+    blastTileOverlay?: BlastTileOverlay[];
+    blastMovesUsed?: number;
+    blastSeed?: number | null;
+    wordHuntTargetLength?: number;
+    wordHuntMyLife?: number;
+    showStartAnimation?: boolean;
+    gameActive?: boolean;
+  }) => void;
+  batchResetGame: () => void;
 
   // Reset actions
   resetForNewRound: () => void;
@@ -196,6 +215,9 @@ export type GameStore = GameState & GameActions;
 // ==========================================
 // Initial State
 // ==========================================
+
+// Module-level variable for combo timeout — NOT in Zustand state to avoid re-renders
+let _comboTimeoutId: NodeJS.Timeout | null = null;
 
 const initialState: GameState = {
   gameActive: false,
@@ -230,7 +252,8 @@ const initialState: GameState = {
   wordHuntTargetAttempts: [],
   wordHuntTargetFound: false,
   wordHuntEliminatedPlayers: [],
-  _comboTimeoutId: null,
+  wordHuntDiscoveryClues: [],
+  wordHuntKnownLetters: [],
 };
 
 // ==========================================
@@ -363,13 +386,14 @@ export const useGameStore = create<GameStore>()(
       const state = get();
 
       // Clear existing timeout
-      if (state._comboTimeoutId) {
-        clearTimeout(state._comboTimeoutId);
+      if (_comboTimeoutId) {
+        clearTimeout(_comboTimeoutId);
       }
 
       // Set new timeout for combo reset
-      const timeoutId = setTimeout(() => {
-        set({ combo: { ...get().combo, level: 0 }, _comboTimeoutId: null });
+      _comboTimeoutId = setTimeout(() => {
+        _comboTimeoutId = null;
+        set({ combo: { ...get().combo, level: 0 } });
       }, COMBO_TIMEOUT_MS);
 
       set({
@@ -378,18 +402,17 @@ export const useGameStore = create<GameStore>()(
           level: state.combo.level + 1,
           lastWordTime: Date.now(),
         },
-        _comboTimeoutId: timeoutId,
       });
     },
 
     resetCombo: () => {
       const state = get();
-      if (state._comboTimeoutId) {
-        clearTimeout(state._comboTimeoutId);
+      if (_comboTimeoutId) {
+        clearTimeout(_comboTimeoutId);
+        _comboTimeoutId = null;
       }
       set({
         combo: { ...state.combo, level: 0 },
-        _comboTimeoutId: null,
       });
     },
 
@@ -501,14 +524,95 @@ export const useGameStore = create<GameStore>()(
       wordHuntEliminatedPlayers: applySetState(value, state.wordHuntEliminatedPlayers)
     })),
 
+    addWordHuntDiscoveryClues: (greens, known) => set((state) => {
+      // Merge new green positions (deduplicate by position)
+      const existingPositions = new Set(state.wordHuntDiscoveryClues.map(c => c.position));
+      const newGreens = greens.filter(g => !existingPositions.has(g.position));
+      const mergedClues = [...state.wordHuntDiscoveryClues, ...newGreens];
+
+      // Merge known letters (deduplicate)
+      const existingKnown = new Set(state.wordHuntKnownLetters);
+      const newKnown = known.filter(l => !existingKnown.has(l));
+      const mergedKnown = [...state.wordHuntKnownLetters, ...newKnown];
+
+      return {
+        wordHuntDiscoveryClues: mergedClues,
+        wordHuntKnownLetters: mergedKnown,
+      };
+    }),
+
+    // ==========================================
+    // Batch Actions (performance: single set() call)
+    // ==========================================
+
+    batchStartGame: (data) => {
+      set((state) => ({
+        ...state,
+        foundWords: [],
+        achievements: [],
+        ...(data.letterGrid !== undefined && { letterGrid: data.letterGrid }),
+        ...(data.remainingTime !== undefined && { remainingTime: data.remainingTime }),
+        ...(data.gameLanguage !== undefined && { gameLanguage: data.gameLanguage }),
+        ...(data.minWordLength !== undefined && { minWordLength: data.minWordLength }),
+        ...(data.boardTheme !== undefined && { boardTheme: data.boardTheme }),
+        ...(data.gameMode !== undefined && { gameMode: data.gameMode }),
+        ...(data.blastTileOverlay !== undefined && { blastTileOverlay: data.blastTileOverlay }),
+        ...(data.blastMovesUsed !== undefined && { blastMovesUsed: data.blastMovesUsed }),
+        ...(data.blastSeed !== undefined && { blastSeed: data.blastSeed }),
+        ...(data.wordHuntTargetLength !== undefined && { wordHuntTargetLength: data.wordHuntTargetLength }),
+        ...(data.wordHuntMyLife !== undefined && { wordHuntMyLife: data.wordHuntMyLife }),
+        ...(data.showStartAnimation !== undefined && { showStartAnimation: data.showStartAnimation }),
+        ...(data.gameActive !== undefined && { gameActive: data.gameActive }),
+        // Reset word hunt state if target length is set
+        ...(data.wordHuntTargetLength !== undefined && {
+          wordHuntPlayerLives: {},
+          wordHuntTargetAttempts: [],
+          wordHuntTargetFound: false,
+          wordHuntDiscoveryClues: [],
+          wordHuntKnownLetters: [],
+        }),
+      }));
+    },
+
+    batchResetGame: () => {
+      if (_comboTimeoutId) {
+        clearTimeout(_comboTimeoutId);
+        _comboTimeoutId = null;
+      }
+      set({
+        gameActive: false,
+        letterGrid: null,
+        remainingTime: null,
+        showStartAnimation: false,
+        shufflingGrid: null,
+        waitingForResults: false,
+        foundWords: [],
+        achievements: [],
+        totalBoardWords: null,
+        tournamentData: null,
+        tournamentStandings: [],
+        showTournamentStandings: false,
+        xpGainedData: null,
+        levelUpData: null,
+        wordHuntEliminatedPlayers: [],
+        wordHuntTargetFound: false,
+        wordHuntTargetAttempts: [],
+        wordHuntPlayerLives: {},
+        wordHuntMyLife: 100,
+        wordHuntDiscoveryClues: [],
+        wordHuntKnownLetters: [],
+        combo: DEFAULT_COMBO_STATE,
+      });
+    },
+
     // ==========================================
     // Reset Actions
     // ==========================================
 
     resetForNewRound: () => {
-      const state = get();
-      if (state._comboTimeoutId) {
-        clearTimeout(state._comboTimeoutId);
+      if (_comboTimeoutId) {
+        clearTimeout(_comboTimeoutId);
+        _comboTimeoutId = null;
       }
       set({
         gameActive: false,
@@ -535,16 +639,17 @@ export const useGameStore = create<GameStore>()(
         wordHuntTargetAttempts: [],
         wordHuntTargetFound: false,
         wordHuntEliminatedPlayers: [],
-        _comboTimeoutId: null,
+        wordHuntDiscoveryClues: [],
+        wordHuntKnownLetters: [],
       });
     },
 
     resetAll: () => {
-      const state = get();
-      if (state._comboTimeoutId) {
-        clearTimeout(state._comboTimeoutId);
+      if (_comboTimeoutId) {
+        clearTimeout(_comboTimeoutId);
+        _comboTimeoutId = null;
       }
-      set({ ...initialState, _comboTimeoutId: null });
+      set(initialState);
     },
   }))
 );
@@ -610,6 +715,8 @@ export const useWordHuntPlayerLives = () => useGameStore((state) => state.wordHu
 export const useWordHuntTargetAttempts = () => useGameStore((state) => state.wordHuntTargetAttempts);
 export const useWordHuntTargetFound = () => useGameStore((state) => state.wordHuntTargetFound);
 export const useWordHuntEliminatedPlayers = () => useGameStore((state) => state.wordHuntEliminatedPlayers);
+export const useWordHuntDiscoveryClues = () => useGameStore((state) => state.wordHuntDiscoveryClues);
+export const useWordHuntKnownLetters = () => useGameStore((state) => state.wordHuntKnownLetters);
 
 // ==========================================
 // Actions Object (static, no re-renders)
@@ -667,6 +774,9 @@ const getActions = (state: GameStore) => ({
   setWordHuntTargetAttempts: state.setWordHuntTargetAttempts,
   setWordHuntTargetFound: state.setWordHuntTargetFound,
   setWordHuntEliminatedPlayers: state.setWordHuntEliminatedPlayers,
+  addWordHuntDiscoveryClues: state.addWordHuntDiscoveryClues,
+  batchStartGame: state.batchStartGame,
+  batchResetGame: state.batchResetGame,
   resetForNewRound: state.resetForNewRound,
   resetAll: state.resetAll,
 });

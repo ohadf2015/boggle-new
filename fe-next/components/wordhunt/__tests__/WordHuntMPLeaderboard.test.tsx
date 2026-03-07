@@ -59,6 +59,34 @@ describe('WordHuntMPLeaderboard', () => {
     expect(lifeBars.length).toBeGreaterThanOrEqual(3);
   });
 
+  it('should show wrong-guess indicator for players who just lost life', () => {
+    const { rerender } = render(<WordHuntMPLeaderboard {...defaultProps} />);
+
+    // Bob loses life (50 -> 30)
+    rerender(
+      <WordHuntMPLeaderboard
+        {...defaultProps}
+        playerLives={{ alice: 80, bob: 30, charlie: 0 }}
+        wrongGuessPlayers={['bob']}
+      />
+    );
+
+    const bobRow = screen.getByText('bob').closest('[data-player]');
+    expect(bobRow?.querySelector('[data-wrong-guess]')).toBeInTheDocument();
+  });
+
+  it('should not show wrong-guess indicator for players not in wrongGuessPlayers', () => {
+    render(
+      <WordHuntMPLeaderboard
+        {...defaultProps}
+        wrongGuessPlayers={['bob']}
+      />
+    );
+
+    const aliceRow = screen.getByText('alice').closest('[data-player]');
+    expect(aliceRow?.querySelector('[data-wrong-guess]')).not.toBeInTheDocument();
+  });
+
   it('should render with empty leaderboard', () => {
     render(
       <WordHuntMPLeaderboard

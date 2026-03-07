@@ -1,6 +1,7 @@
 /**
  * useBlastGame frozen tile tests.
- * Frozen tiles require 3 hits to clear. They give no bonus (obstacle).
+ * Frozen (Frost) tiles require 2 hits to clear (FROST_HITS_REQUIRED).
+ * They give no bonus (obstacle) but reveal a hidden inner special on final hit.
  * They also break cascade detection in the vertical scanner.
  */
 import type { BlastTileState, BlastTileType } from '../types';
@@ -45,26 +46,21 @@ function simulateClearForFrozen(
 }
 
 describe('Frozen tile mechanics', () => {
-  it('starts with hitsRemaining: 3', () => {
-    const tile = makeTileState(2, 2, 'frozen', 3);
-    expect(tile.hitsRemaining).toBe(3);
+  it('starts with hitsRemaining: 2 (FROST_HITS_REQUIRED)', () => {
+    const tile = makeTileState(2, 2, 'frozen', 2);
+    expect(tile.hitsRemaining).toBe(2);
   });
 
-  it('requires 3 hits to clear', () => {
+  it('requires 2 hits to clear', () => {
     const grid = make6x6Grid();
-    grid[2][2] = makeTileState(2, 2, 'frozen', 3);
+    grid[2][2] = makeTileState(2, 2, 'frozen', 2);
 
     // Hit 1
     let result = simulateClearForFrozen(grid, [{ row: 2, col: 2 }]);
     expect(result.clearedCount).toBe(0);
-    grid[2][2].hitsRemaining = 2;
-
-    // Hit 2
-    result = simulateClearForFrozen(grid, [{ row: 2, col: 2 }]);
-    expect(result.clearedCount).toBe(0);
     grid[2][2].hitsRemaining = 1;
 
-    // Hit 3 (final)
+    // Hit 2 (final)
     result = simulateClearForFrozen(grid, [{ row: 2, col: 2 }]);
     expect(result.clearedCount).toBe(1);
   });
@@ -91,7 +87,7 @@ describe('Frozen tile cascade blocking', () => {
     const tileStates = letters.map((row, ri) =>
       row.map((_, ci) => ({
         row: ri, col: ci, type: (ri === 3 && ci === 0 ? 'frozen' : 'standard') as BlastTileType,
-        isCleared: false, activationEffect: null, hitsRemaining: ri === 3 && ci === 0 ? 3 : 0,
+        isCleared: false, activationEffect: null, hitsRemaining: ri === 3 && ci === 0 ? 2 : 0,
       }))
     );
 

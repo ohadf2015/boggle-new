@@ -49,6 +49,7 @@ export interface WordHuntGameLayoutProps {
   eliminatedPlayers: string[];
   leaderboard: LeaderboardPlayer[];
   currentUsername: string;
+  wrongGuessShake?: boolean;
 
   // Common
   t: (key: string) => string;
@@ -91,6 +92,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   eliminatedPlayers,
   leaderboard,
   currentUsername,
+  wrongGuessShake,
 
   // Common
   t,
@@ -106,7 +108,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
       />
 
       {/* Clue Boxes (target word blanks with accumulated feedback) */}
-      <div className="px-3 py-1">
+      <div className={`px-3 py-1${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
         <SurvivalClueBoxes
           currentHint={currentHint}
           targetWord={'?'.repeat(targetLength)}

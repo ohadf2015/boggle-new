@@ -18,11 +18,14 @@ import {
   broadcastToRoom,
   getGameRoom,
 } from '../utils/socketHelpers.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 
 interface SubmitTargetWordPayload {
   guess: string;
 }
+
+const MAX_GUESS_LENGTH = 50;
 
 /**
  * Handle a target word guess submission.
@@ -71,6 +74,11 @@ export function handleSubmitTargetWord(
   const guess = (data.guess || '').toLowerCase().trim();
   if (!guess) {
     socket.emit('error', { message: 'Guess is required' });
+    return;
+  }
+
+  if (guess.length > MAX_GUESS_LENGTH) {
+    socket.emit('error', { message: 'Guess is too long' });
     return;
   }
 
@@ -126,6 +134,16 @@ export function handleSubmitTargetWord(
  */
 export function registerWordHuntHandlers(io: Server, socket: Socket): void {
   socket.on('submitTargetWord', (data: SubmitTargetWordPayload) => {
-    handleSubmitTargetWord(io, socket, data);
+    if (!checkRateLimit(socket.id, 1)) {
+      socket.emit('rateLimited', { message: 'Too many guesses, slow down' });
+      return;
+    }
+
+    try {
+      handleSubmitTargetWord(io, socket, data);
+    } catch (error) {
+      logger.error('WORD_HUNT', `Error handling submitTargetWord: ${(error as Error).message}`);
+      socket.emit('error', { message: 'An error occurred processing your guess' });
+    }
   });
 }

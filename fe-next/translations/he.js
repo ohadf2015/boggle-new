@@ -683,6 +683,8 @@ const he = {
     ]
   },
   "multiplayerFlow": {
+    "roomClosed": "Room closed",
+    "rateLimited": "Slow down!",
     "roomList": {
       "activeRooms": "קפוץ פנימה!",
       "online": "בקרב",
@@ -763,7 +765,13 @@ const he = {
     "mode": "מצב משחק",
     "timer": "טיימר",
     "subtitle": "התחרו עם חברים בזמן אמת",
-    "playersJoined": "שחקנים הצטרפו"
+    "playersJoined": "שחקנים הצטרפו",
+    "playerJoined": "הצטרף למשחק!",
+    "playerLeft": "עזב את המשחק",
+    "playerEliminated": "הודח מהמשחק!",
+    "youEliminated": "הודחת מהמשחק!",
+    "playerLastLife": "בחיים האחרונים!",
+    "yourLastLife": "חיים אחרונים!"
   },
   "stats": {
     "games": "משחקים",

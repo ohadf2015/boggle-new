@@ -1,7 +1,7 @@
 'use client';
 
-import React, { memo } from 'react';
-import { Skull } from 'lucide-react';
+import React, { memo, useRef, useState, useEffect } from 'react';
+import { Skull, X } from 'lucide-react';
 
 export interface LeaderboardPlayer {
   username: string;
@@ -14,6 +14,7 @@ export interface WordHuntMPLeaderboardProps {
   eliminatedPlayers: string[];
   leaderboard: LeaderboardPlayer[];
   currentUsername: string;
+  wrongGuessPlayers?: string[];
   t: (key: string) => string;
 }
 
@@ -22,9 +23,37 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
   eliminatedPlayers,
   leaderboard,
   currentUsername,
+  wrongGuessPlayers = [],
   t,
 }) => {
   const eliminatedSet = new Set(eliminatedPlayers);
+
+  // Detect life drops to show brief "X" indicator (auto-derived from prop)
+  const prevLivesRef = useRef<Record<string, number>>({});
+  const [lifeDropPlayers, setLifeDropPlayers] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const prev = prevLivesRef.current;
+    const newDrops: string[] = [];
+
+    for (const [name, life] of Object.entries(playerLives)) {
+      if (prev[name] !== undefined && life < prev[name]) {
+        newDrops.push(name);
+      }
+    }
+
+    prevLivesRef.current = { ...playerLives };
+
+    if (newDrops.length > 0) {
+      setLifeDropPlayers(new Set(newDrops));
+      const timer = setTimeout(() => setLifeDropPlayers(new Set()), 800);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [playerLives]);
+
+  // Merge explicit wrongGuessPlayers prop with auto-detected life drops
+  const wrongGuessSet = new Set([...wrongGuessPlayers, ...lifeDropPlayers]);
 
   return (
     <div className="px-3 py-2">
@@ -82,6 +111,11 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
               <span className="text-sm font-mono font-bold text-neo-white tabular-nums min-w-[32px] text-right">
                 {player.score}
               </span>
+
+              {/* Wrong guess indicator */}
+              {wrongGuessSet.has(player.username) && !isEliminated && (
+                <X size={14} className="text-neo-red flex-shrink-0 animate-neo-shake" data-wrong-guess />
+              )}
 
               {/* Eliminated icon */}
               {isEliminated && (

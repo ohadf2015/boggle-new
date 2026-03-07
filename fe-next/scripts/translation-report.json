@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3738,
+    "totalKeysInCode": 3755,
     "keyCountByLanguage": {
-      "en": 5536,
-      "he": 5552,
-      "sv": 5546,
-      "ja": 5561,
-      "es": 4937
+      "en": 5565,
+      "he": 5573,
+      "sv": 5567,
+      "ja": 5582,
+      "es": 4958
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -164,6 +164,14 @@
   "missingByLanguage": {
     "he": [
       "share.qrCode",
+      "multiplayerFlow.roomList.noRoomsYet",
+      "multiplayerFlow.roomList.beTheLegend",
+      "multiplayerFlow.roomList.hostAndPlay",
+      "multiplayerFlow.roomList.startBattle",
+      "hostView.playersInRoom",
+      "hostView.noOneYet",
+      "hostView.startingWithBots",
+      "hostView.shareCodeHint",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -179,6 +187,14 @@
     ],
     "sv": [
       "share.qrCode",
+      "multiplayerFlow.roomList.noRoomsYet",
+      "multiplayerFlow.roomList.beTheLegend",
+      "multiplayerFlow.roomList.hostAndPlay",
+      "multiplayerFlow.roomList.startBattle",
+      "hostView.playersInRoom",
+      "hostView.noOneYet",
+      "hostView.startingWithBots",
+      "hostView.shareCodeHint",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -232,6 +248,14 @@
       "challengeAction"
     ],
     "ja": [
+      "multiplayerFlow.roomList.noRoomsYet",
+      "multiplayerFlow.roomList.beTheLegend",
+      "multiplayerFlow.roomList.hostAndPlay",
+      "multiplayerFlow.roomList.startBattle",
+      "hostView.playersInRoom",
+      "hostView.noOneYet",
+      "hostView.startingWithBots",
+      "hostView.shareCodeHint",
       "challenge.yourRecord",
       "challenge.noRecord",
       "challenge.newRecord",
@@ -262,6 +286,14 @@
       "common.email",
       "leadChange.tookLead",
       "leadChange.lostLead",
+      "multiplayerFlow.roomList.noRoomsYet",
+      "multiplayerFlow.roomList.beTheLegend",
+      "multiplayerFlow.roomList.hostAndPlay",
+      "multiplayerFlow.roomList.startBattle",
+      "hostView.playersInRoom",
+      "hostView.noOneYet",
+      "hostView.startingWithBots",
+      "hostView.shareCodeHint",
       "tvResults.spotlight.heading",
       "tvResults.spotlight.mascotIntro1",
       "tvResults.spotlight.mascotIntro2",

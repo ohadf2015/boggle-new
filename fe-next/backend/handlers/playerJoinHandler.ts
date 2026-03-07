@@ -415,6 +415,12 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
         // Use existing username to prevent duplicates
         oldSocket.data = oldSocket.data || {};
         oldSocket.data.migrating = true;
+        // Auto-clear migration flag after 10 seconds (safety net for crashed tabs)
+        oldSocket.data.migrationTimeout = setTimeout(() => {
+          if (oldSocket.data) {
+            oldSocket.data.migrating = false;
+          }
+        }, 10000);
         safeEmit(oldSocket, 'sessionTakenOver', {
           message: 'Your session was moved to another tab',
           gameCode
@@ -523,9 +529,9 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
 
   if (game.hostUsername === username) {
     updateHostSocketId(gameCode, socket.id);
-    if (game.reconnectionTimeout) {
-      clearTimeout(game.reconnectionTimeout);
-      game.reconnectionTimeout = null;
+    if ((game as any).hostReconnectionTimeout) {
+      clearTimeout((game as any).hostReconnectionTimeout);
+      (game as any).hostReconnectionTimeout = null;
     }
   }
 

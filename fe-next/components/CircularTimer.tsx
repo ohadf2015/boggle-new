@@ -43,6 +43,8 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   const isLowTime = remainingTime <= 20;
   // Even more urgent at 10 seconds
   const isVeryLowTime = remainingTime <= 10 && remainingTime > 0;
+  // Critical: timer dominates UI at 5 seconds
+  const isCriticalTime = remainingTime <= 5 && remainingTime > 0;
 
   // Preload results page chunks when timer is low (idempotent — safe to call repeatedly)
   if (isVeryLowTime) {
@@ -63,6 +65,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
         className={`
           relative
           ${config.frameClasses}
+          ${isCriticalTime ? 'animate-pulse drop-shadow-[0_0_15px_rgba(255,50,50,0.6)]' : ''}
         `}
       >
         <div className="relative">
@@ -121,11 +124,18 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
           {/* Timer text in the center - color change only for low time, pulse at very low time */}
           <div className="absolute inset-0 flex items-center justify-center">
             <motion.div
-              className={`${config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-cream'}`}
-              animate={isVeryLowTime && !reduceMotion ? {
+              className={`${isCriticalTime ? 'text-4xl sm:text-5xl' : config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-cream'}`}
+              animate={isCriticalTime && !reduceMotion ? {
+                scale: [1, 1.25, 1],
+                opacity: [1, 0.8, 1],
+              } : isVeryLowTime && !reduceMotion ? {
                 scale: [1, 1.1, 1],
               } : {}}
-              transition={isVeryLowTime ? {
+              transition={isCriticalTime ? {
+                duration: 0.35,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              } : isVeryLowTime ? {
                 duration: 0.5,
                 repeat: Infinity,
                 ease: 'easeInOut',

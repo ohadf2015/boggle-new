@@ -77,7 +77,7 @@ export function GameStateProvider({ children }: GameStateProviderProps) {
   // Keep refs in sync with store state
   comboLevelRef.current = storeState.combo.level;
   lastWordTimeRef.current = storeState.combo.lastWordTime;
-  comboTimeoutRef.current = storeState._comboTimeoutId;
+  // _comboTimeoutId moved to module-level variable in store.ts
 
   // Memoize context value to reduce unnecessary re-renders
   // Note: This still re-renders all consumers when any state changes.

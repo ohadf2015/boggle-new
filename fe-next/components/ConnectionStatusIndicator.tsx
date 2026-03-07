@@ -341,7 +341,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
 
             {/* Progress bar (for reconnecting) */}
             {status === 'reconnecting' && reconnectAttempt > 0 && (
-              <div className="hidden sm:flex flex-1 max-w-[200px] items-center gap-2">
+              <div className="flex flex-1 max-w-[200px] items-center gap-2">
                 <div className="flex-1 h-2 bg-neo-black/30 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-neo-lime"

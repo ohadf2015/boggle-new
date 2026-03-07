@@ -102,12 +102,23 @@ jest.mock('@/components/game/CompactLeaderboard', () => ({
   CompactPlayer: {},
 }));
 
+jest.mock('@/components/game/LeadChangeBanner', () => ({
+  LeadChangeBanner: ({ event }: any) => (
+    event ? <div data-testid="lead-change-banner" data-type={event.type}>{event.newLeader}</div> : null
+  ),
+}));
+
+jest.mock('@/hooks/useLeadChangeDetection', () => ({
+  useLeadChangeDetection: jest.fn(() => null),
+}));
+
 // ---------------------------------------------------------------------------
 // Imports (after mocks)
 // ---------------------------------------------------------------------------
 
 import { BlastGameLayout } from '../BlastGameLayout';
 import type { BlastGameState, BlastTileState } from '../types';
+import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -226,7 +237,7 @@ describe('BlastGameLayout multiplayer mode', () => {
     expect(screen.queryByTestId('circular-timer')).not.toBeInTheDocument();
   });
 
-  it('renders CompactLeaderboard when isMultiplayer with leaderboard data', () => {
+  it('does not render CompactLeaderboard in multiplayer (uses lead-change banners instead)', () => {
     const leaderboard = [
       { username: 'alice', score: 100 },
       { username: 'bob', score: 80 },
@@ -240,7 +251,7 @@ describe('BlastGameLayout multiplayer mode', () => {
         username="alice"
       />,
     );
-    expect(screen.getByTestId('compact-leaderboard')).toBeInTheDocument();
+    expect(screen.queryByTestId('compact-leaderboard')).not.toBeInTheDocument();
   });
 
   it('does not render CompactLeaderboard in singleplayer mode', () => {
@@ -407,5 +418,75 @@ describe('BlastGameLayout multiplayer mode', () => {
     // SP overlay has the blocking backdrop-blur-sm class
     const backdropElements = container.querySelectorAll('.backdrop-blur-sm');
     expect(backdropElements.length).toBeGreaterThan(0);
+  });
+
+  it('does NOT render CompactLeaderboard in multiplayer mode', () => {
+    const leaderboard = [
+      { username: 'alice', score: 100 },
+      { username: 'bob', score: 80 },
+    ];
+
+    render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={true}
+        leaderboard={leaderboard}
+        username="alice"
+      />,
+    );
+    expect(screen.queryByTestId('compact-leaderboard')).not.toBeInTheDocument();
+  });
+
+  it('renders LeadChangeBanner when useLeadChangeDetection fires in multiplayer', () => {
+    (useLeadChangeDetection as jest.Mock).mockReturnValue({
+      type: 'took-lead',
+      newLeader: 'alice',
+    });
+
+    render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={true}
+        leaderboard={[
+          { username: 'alice', score: 100 },
+          { username: 'bob', score: 80 },
+        ]}
+        username="alice"
+      />,
+    );
+    expect(screen.getByTestId('lead-change-banner')).toBeInTheDocument();
+    expect(screen.getByTestId('lead-change-banner')).toHaveAttribute('data-type', 'took-lead');
+  });
+
+  it('does not render LeadChangeBanner when no lead change event', () => {
+    (useLeadChangeDetection as jest.Mock).mockReturnValue(null);
+
+    render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={true}
+        leaderboard={[
+          { username: 'alice', score: 100 },
+          { username: 'bob', score: 80 },
+        ]}
+        username="alice"
+      />,
+    );
+    expect(screen.queryByTestId('lead-change-banner')).not.toBeInTheDocument();
+  });
+
+  it('does not render LeadChangeBanner in singleplayer mode', () => {
+    (useLeadChangeDetection as jest.Mock).mockReturnValue({
+      type: 'took-lead',
+      newLeader: 'alice',
+    });
+
+    render(
+      <BlastGameLayout
+        {...baseProps}
+        isMultiplayer={false}
+      />,
+    );
+    expect(screen.queryByTestId('lead-change-banner')).not.toBeInTheDocument();
   });
 });
