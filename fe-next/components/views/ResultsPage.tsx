@@ -35,7 +35,7 @@ import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers } from '@/hooks/gameState/store';
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, wordHuntSummary }) => {
   const { t } = useLanguage();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
@@ -391,18 +391,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentStreakCount: winStreakData?.currentStreak || 0,
     t,
     gameMode: resolvedGameMode,
-    ...(resolvedGameMode === 'word-hunt' && Object.keys(wordHuntPlayerLives).length > 0 ? {
+    ...(resolvedGameMode === 'word-hunt' && (wordHuntSummary || Object.keys(wordHuntPlayerLives).length > 0) ? {
       wordHuntResults: {
-        targetWord: '',
-        foundTarget: false,
-        isFirstFinder: false,
+        targetWord: wordHuntSummary?.targetWord || '',
+        foundTarget: !!wordHuntSummary?.targetFoundBy,
+        isFirstFinder: wordHuntSummary?.targetFoundBy === username,
         survivalTime: 0,
         discoveryWords: 0,
         playerResults: sortedScores.map((p) => ({
           username: p.username,
           score: p.score || 0,
-          survived: !wordHuntEliminatedPlayers.includes(p.username),
-          lifeRemaining: wordHuntPlayerLives[p.username] ?? 0,
+          survived: !(wordHuntSummary?.eliminatedPlayers || wordHuntEliminatedPlayers).includes(p.username),
+          lifeRemaining: (wordHuntSummary?.playerLives || wordHuntPlayerLives)[p.username] ?? 0,
         })),
         currentUsername: username,
       },
@@ -436,7 +436,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Tab Content - Scrollable area */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-40"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-40 bg-neo-navy"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
           <div className="max-w-lg mx-auto">

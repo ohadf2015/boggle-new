@@ -238,6 +238,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [fireRoundActive, setFireRoundActive] = useState(false);
   const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
 
+  // Pre-game loading: server sends 'gameStarting' immediately when host clicks Start,
+  // before heavy processing (dict loading, board gen). Cleared when actual startGame arrives.
+  const [isGameLoading, setIsGameLoading] = useState(false);
+
   // First-time achievement tracking (only for new players)
   const { pendingAchievement, triggerAchievement, clearAchievement } = useFirstTimeAchievement();
   const isNewPlayerRef = useRef(isNewPlayer()); // Check once on mount
@@ -297,6 +301,23 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       socket.off('playersReadyUpdate', handleLobbyReadyUpdate);
     };
   }, [socket, gameActive]);
+
+  // Listen for gameStarting — lightweight pre-notification before heavy server processing
+  useEffect(() => {
+    if (!socket) return;
+    const handleGameStarting = () => {
+      setIsGameLoading(true);
+    };
+    socket.on('gameStarting', handleGameStarting);
+    return () => { socket.off('gameStarting', handleGameStarting); };
+  }, [socket]);
+
+  // Clear loading state when actual game data arrives
+  useEffect(() => {
+    if (showModeReveal || showStartAnimation || gameActive) {
+      setIsGameLoading(false);
+    }
+  }, [showModeReveal, showStartAnimation, gameActive]);
 
   // Toggle lobby ready and emit to server
   const handleToggleLobbyReady = useCallback(() => {
@@ -743,6 +764,20 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const modeRevealLabel = gameMode === 'blast' ? 'BLAST!' : gameMode === 'word-hunt' ? 'WORD HUNT!' : 'CLASSIC!';
 
   if (!showGameView && !waitingForResults) {
+    // Show loading indicator when server is preparing the game
+    if (isGameLoading) {
+      return (
+        <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-10 w-10 text-neo-lime animate-spin" />
+            <div className="text-lg font-bold text-white/70">
+              {t('common.preparingGame') || 'Preparing game...'}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // Show dramatic mode reveal overlay before countdown
     if (showModeReveal) {
       return (

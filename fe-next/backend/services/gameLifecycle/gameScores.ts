@@ -172,6 +172,15 @@ export async function calculateAndBroadcastFinalScores(
     (playerResult as Record<string, unknown>).titles = titles[playerResult.username] || [];
   }
 
+  // Build word hunt summary if applicable
+  const huntState = game.gameMode === 'word-hunt' ? (game as any).wordHuntState : null;
+  const wordHuntSummary = huntState ? {
+    targetWord: huntState.targetWord,
+    playerLives: huntState.playerLives as Record<string, number>,
+    eliminatedPlayers: huntState.eliminatedPlayers as string[],
+    targetFoundBy: huntState.targetFoundBy as string | null,
+  } : undefined;
+
   // Broadcast results to all clients
   // Host expects 'validationComplete', players expect 'validatedScores'
   // Include duplicateRuleDisabled flag so frontend can display a notice
@@ -180,12 +189,14 @@ export async function calculateAndBroadcastFinalScores(
     letterGrid: game.letterGrid,
     duplicateRuleDisabled,
     playerCount,
+    wordHuntSummary,
   });
   broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', {
     scores: resultsWithIconAchievements,
     letterGrid: game.letterGrid,
     duplicateRuleDisabled,
     playerCount,
+    wordHuntSummary,
   });
 
   // Record to database

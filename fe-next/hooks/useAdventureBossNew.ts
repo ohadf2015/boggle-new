@@ -19,7 +19,7 @@ import type { BossConfig, BossTauntEvent } from '@/types/boss';
 
 export type BossPhaseNew = 'normal' | 'angry' | 'desperate';
 
-export type BossAttackType = 'lockTiles' | 'scramble' | 'timePenalty';
+export type BossAttackType = 'lockTiles' | 'scramble' | 'timePenalty' | 'damage';
 
 export interface BossAttack {
   type: BossAttackType;
@@ -27,6 +27,8 @@ export interface BossAttack {
   lockedTiles?: number[];
   /** For timePenalty: seconds to remove */
   seconds?: number;
+  /** For damage: HP damage to deal to player */
+  damage?: number;
 }
 
 export interface UseAdventureBossNewProps {
@@ -88,7 +90,14 @@ const TAUNT_DURATION = 3500;
 const LOCK_DURATION = 5000;
 
 /** All possible attack types */
-const ATTACK_TYPES: BossAttackType[] = ['lockTiles', 'scramble', 'timePenalty'];
+const ATTACK_TYPES: BossAttackType[] = ['lockTiles', 'scramble', 'timePenalty', 'damage'];
+
+/** Base damage per phase */
+const PHASE_DAMAGE: Record<BossPhaseNew, number> = {
+  normal: 8,
+  angry: 12,
+  desperate: 18,
+};
 
 // ==============================================
 // HELPERS
@@ -221,6 +230,8 @@ export function useAdventureBossNew({
       }, LOCK_DURATION);
     } else if (attackType === 'timePenalty') {
       attack.seconds = randomInt(3, 5);
+    } else if (attackType === 'damage') {
+      attack.damage = PHASE_DAMAGE[phaseRef.current] + randomInt(0, 5);
     }
 
     onAttackRef.current?.(attack);

@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import ResultsPlayerCard from '../../components/results/ResultsPlayerCard';
+import WordHuntResultsSummary from '../../components/results/WordHuntResultsSummary';
 import TournamentStandings from '../../components/TournamentStandings';
 import { getJoinUrl } from '../../utils/share';
 import { applyHebrewFinalLetters } from '../../utils/utils';
@@ -245,6 +246,7 @@ interface FinalScoresModalProps {
   onNextRound: () => void;
   socket: Socket | null;
   playersReady?: PlayersReadyData | null;
+  wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null };
 }
 
 export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
@@ -258,6 +260,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
   onNextRound,
   socket,
   playersReady,
+  wordHuntSummary,
 }): React.ReactElement => {
   const handleClose = useCallback(() => {
     onOpenChange(false);
@@ -339,6 +342,26 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
                 </div>
               )}
             </>
+          )}
+
+          {/* Word Hunt Results Summary */}
+          {wordHuntSummary && (
+            <div className="max-w-3xl mx-auto">
+              <WordHuntResultsSummary
+                targetWord={wordHuntSummary.targetWord}
+                foundTarget={!!wordHuntSummary.targetFoundBy}
+                isFirstFinder={wordHuntSummary.targetFoundBy === username}
+                survivalTime={0}
+                discoveryWords={0}
+                playerResults={filteredScores.map((p) => ({
+                  username: p.username,
+                  score: p.score || 0,
+                  survived: !wordHuntSummary.eliminatedPlayers.includes(p.username),
+                  lifeRemaining: wordHuntSummary.playerLives[p.username] ?? 0,
+                }))}
+                currentUsername={username}
+              />
+            </div>
           )}
 
           {/* Regular Game Mode: Show only game results */}

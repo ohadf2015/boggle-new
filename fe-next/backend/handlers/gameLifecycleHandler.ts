@@ -314,6 +314,17 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     const validTimer = Math.max(30, Math.min(600, parseInt(String(timerSeconds), 10) || 180));
 
+    // Resolve game mode early so we can broadcast gameStarting immediately
+    const resolvedMode: GameMode = (!gameMode || gameMode === 'random')
+      ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
+      : gameMode as GameMode;
+
+    // Immediately notify players that game is starting (before heavy processing)
+    // This gives instant visual feedback while dict loading and board generation happen
+    broadcastToRoom(io, getGameRoom(gameCode), 'gameStarting', {
+      gameMode: resolvedMode,
+    });
+
     // Ensure the language dictionary is loaded before starting the game
     const gameLang = language || game.language || 'en';
     try {
@@ -321,7 +332,6 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       logger.debug('DICT', `Language ${gameLang} loaded for game ${gameCode}`);
     } catch (error) {
       logger.error('DICT', `Failed to load language ${gameLang} for game ${gameCode}: ${error}`);
-      // Continue anyway - word validation will use community validation as fallback
     }
 
     // Check if this is a classroom game and fetch vocabulary
@@ -331,13 +341,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
       : undefined;
 
-    // Resolve game mode: if 'random' or missing, use weighted random selection
-    const resolvedMode: GameMode = (!gameMode || gameMode === 'random')
-      ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
-      : gameMode as GameMode;
-
-    // If random resolved to blast and grid isn't 6x6, regenerate
-    if (resolvedMode === 'blast' && (letterGrid.length !== 6 || letterGrid[0]?.length !== 6)) {
+    // Blast mode: ALWAYS regenerate grid server-side with correct language
+    // This prevents language mismatch when host's wordsForBoard lags behind roomLanguage
+    if (resolvedMode === 'blast') {
       letterGrid = generateRandomTable(6, 6, gameLang);
     }
 

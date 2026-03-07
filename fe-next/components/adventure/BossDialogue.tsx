@@ -196,7 +196,7 @@ export const BossDialogue = memo(function BossDialogue({
         onClick={skipTypewriter}
         className={cn(
           'flex items-start gap-3 p-3 cursor-pointer',
-          'bg-neo-navy/90 backdrop-blur-sm',
+          'bg-neo-navy backdrop-blur-sm',
           'border-3 border-neo-black rounded-neo shadow-hard',
           'max-w-sm w-full',
           className

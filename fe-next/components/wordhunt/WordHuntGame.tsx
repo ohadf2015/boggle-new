@@ -126,17 +126,16 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       onWordHuntGuess(word);
     }
 
-    // Show accepted feedback in word forming area only for non-target words.
-    // Target guess feedback is shown in the clue boxes via the bridge.
-    if (!isTargetGuess) {
-      feedbackIdRef.current += 1;
-      setWordFeedback({
-        id: String(feedbackIdRef.current),
-        type: 'accepted',
-        word,
-        timestamp: Date.now(),
-      });
-    }
+    // Show accepted feedback in word forming area for all submitted words.
+    // For target guesses, detailed green/yellow/gray feedback also appears
+    // in the clue boxes via the bridge's FeedbackOverlay.
+    feedbackIdRef.current += 1;
+    setWordFeedback({
+      id: String(feedbackIdRef.current),
+      type: 'accepted',
+      word,
+      timestamp: Date.now(),
+    });
 
     // Clear formed word
     setFormedWord('');

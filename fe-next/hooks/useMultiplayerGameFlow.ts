@@ -8,6 +8,13 @@ import type { Socket } from 'socket.io-client';
 import { recordGameCompleted } from '@/utils/multiplayerProgressStorage';
 import type { Language } from '@/shared/types/game';
 
+export interface WordHuntSummary {
+  targetWord: string;
+  playerLives: Record<string, number>;
+  eliminatedPlayers: string[];
+  targetFoundBy: string | null;
+}
+
 interface ResultsData {
   scores: Array<{
     username: string;
@@ -17,6 +24,7 @@ interface ResultsData {
   letterGrid: string[][];
   duplicateRuleDisabled?: boolean;
   playerCount?: number;
+  wordHuntSummary?: WordHuntSummary;
 }
 
 interface GameStartData {

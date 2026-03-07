@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 3759,
+    "totalKeysInCode": 3761,
     "keyCountByLanguage": {
-      "en": 5583,
-      "he": 5612,
-      "sv": 5645,
-      "ja": 5632,
-      "es": 5643
+      "en": 5584,
+      "he": 5613,
+      "sv": 5646,
+      "ja": 5633,
+      "es": 5644
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
       "fallbackUsages": 0,
-      "variableKeys": 12
+      "variableKeys": 11
     }
   },
   "runtimeRisks": {
@@ -85,14 +85,6 @@
         "file": "components/adventure/LexiReaction.tsx",
         "line": 159,
         "context": "const defaultMessage = t(defaultKey);",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(currentTaunt)",
-        "variable": "currentTaunt",
-        "file": "components/adventure/boss/BossOverlay.tsx",
-        "line": 458,
-        "context": "dialogue={t(currentTaunt)}",
         "type": "variable_key"
       },
       {

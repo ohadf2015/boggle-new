@@ -247,6 +247,9 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
   // Priority: green > yellow (from most recent to oldest attempt)
   // IMPORTANT: Yellow letters are capped by how many times they appear in the target word
   // and are REMOVED when all occurrences of that letter are found as green
+  // When targetWord is unknown (all '?', e.g. multiplayer), we can't cap yellows by frequency
+  const isTargetUnknown = targetWord.split('').every(c => c === '?');
+
   const persistedLetters = React.useMemo(() => {
     const result = new Map<number, { letter: string; type: 'green' | 'yellow' }>();
 
@@ -303,6 +306,12 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
             continue;
           }
 
+          // When target word is unknown (MP mode), allow all yellows without capping
+          if (isTargetUnknown) {
+            result.set(fb.position, { letter, type: 'yellow' });
+            continue;
+          }
+
           // Calculate current yellow counts EXCLUDING the position we might update
           const currentYellowCounts = new Map<string, number>();
           result.forEach((entry, pos) => {
@@ -329,22 +338,25 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
 
     // Third pass: remove yellow letters where all occurrences are now found as green
     // (This handles edge cases where greens were found after yellows were added)
-    const positionsToRemove: number[] = [];
-    result.forEach((entry, position) => {
-      if (entry.type === 'yellow') {
-        const letter = entry.letter;
-        const targetCount = targetLetterCounts.get(letter) || 0;
-        const greenCount = greenLetterCounts.get(letter) || 0;
-        if (greenCount >= targetCount) {
-          positionsToRemove.push(position);
+    // Skip when target is unknown (MP) — we can't determine if all occurrences are found
+    if (!isTargetUnknown) {
+      const positionsToRemove: number[] = [];
+      result.forEach((entry, position) => {
+        if (entry.type === 'yellow') {
+          const letter = entry.letter;
+          const targetCount = targetLetterCounts.get(letter) || 0;
+          const greenCount = greenLetterCounts.get(letter) || 0;
+          if (greenCount >= targetCount) {
+            positionsToRemove.push(position);
+          }
         }
-      }
-    });
+      });
 
-    positionsToRemove.forEach(pos => result.delete(pos));
+      positionsToRemove.forEach(pos => result.delete(pos));
+    }
 
     return result;
-  }, [attempts, targetLetterCounts, accumulatedClues]);
+  }, [attempts, targetLetterCounts, accumulatedClues, isTargetUnknown]);
   const sizeClass = wordLength <= 4
     ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
     : wordLength <= 6

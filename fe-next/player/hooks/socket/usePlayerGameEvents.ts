@@ -332,6 +332,7 @@ export function usePlayerGameEvents({
           letterGrid: data.letterGrid,
           duplicateRuleDisabled: data.duplicateRuleDisabled,
           playerCount: data.playerCount,
+          wordHuntSummary: data.wordHuntSummary,
         });
       }
     };

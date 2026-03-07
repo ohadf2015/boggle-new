@@ -30,7 +30,7 @@ export const DEFAULT_FPS = 30;
 export const DEFAULT_DURATION_FRAMES = 240;
 
 /** Time (ms) to wait for first frameupdate before declaring stall */
-export const STALL_DETECTION_MS = 1000;
+export const STALL_DETECTION_MS = 3000;
 
 // ==============================================
 // TYPES

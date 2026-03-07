@@ -46,17 +46,22 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   // Victory/defeat tracking
   const [battleResult, setBattleResult] = useState<'none' | 'victory' | 'defeat'>('none');
 
+  // Player health (for boss levels with player damage) — must be before handleAttack
+  const playerHealth = usePlayerHealth(isBossLevel ? 100 : 0);
+
   // Attack handler — applies boss attacks to the game
   const handleAttack = useCallback((attack: BossAttack) => {
     if (attack.type === 'timePenalty' && attack.seconds) {
       addTime(-attack.seconds);
     } else if (attack.type === 'scramble') {
-      // Scramble is handled by the grid component via lockedTiles state
       shake(3);
     } else if (attack.type === 'lockTiles') {
       shake(2);
+    } else if (attack.type === 'damage' && attack.damage) {
+      playerHealth.takeDamage(attack.damage);
+      shake(2);
     }
-  }, [addTime, shake]);
+  }, [addTime, shake, playerHealth]);
 
   // Victory handler
   const handleVictory = useCallback(() => {
@@ -104,9 +109,6 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     onDefeat: handleDefeat,
     onAttack: handleAttack,
   });
-
-  // Player health (for boss levels with player damage)
-  const playerHealth = usePlayerHealth(isBossLevel ? 100 : 0);
 
   // Low time taunt
   const lowTimeTriggedRef = useRef(false);

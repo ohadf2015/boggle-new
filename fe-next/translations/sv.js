@@ -172,6 +172,7 @@ const sv = {
     "connectedToServer": "Redo för strid!",
     "connectingToServer": "Värmer upp...",
     "gameStarted": "KÖR!",
+    "preparingGame": "Förbereder spelet...",
     "joinedGame": "Du är med!",
     "newGameReady": "Runda startar!",
     "lightMode": "Ljust läge",
@@ -1658,6 +1659,34 @@ const sv = {
         "sameChallenge": "Samma pussel för alla i världen – jämför din poäng!",
         "start": "Kör!"
       }
+    },
+    "welcome": {
+      "title": "Välkommen till LexiClash!",
+      "description": "Svep bokstäver på rutnätet för att bilda ord. Låt oss lära oss grunderna!"
+    },
+    "grid": {
+      "title": "Bokstavsrutnätet",
+      "description": "Det här är din spelplan. Koppla ihop intilliggande bokstäver i alla riktningar för att stava ord."
+    },
+    "swipe": {
+      "title": "Svep för att stava",
+      "description": "Dra fingret över bokstäver för att bilda ord. Du kan gå i alla 8 riktningar!"
+    },
+    "combo": {
+      "title": "Kombosystem",
+      "description": "Hitta ord snabbt för att bygga kombos och tjäna bonuspoäng!"
+    },
+    "timer": {
+      "title": "Timern",
+      "description": "Tävla mot klockan! Hitta så många ord du kan innan tiden tar slut."
+    },
+    "leaderboard": {
+      "title": "Topplista",
+      "description": "Följ din poäng mot andra spelare. Längre ord ger mer poäng!"
+    },
+    "ready": {
+      "title": "Du är redo!",
+      "description": "Börja svep och ha kul. Lycka till!"
     },
     "swipeHint": "← Svep för att navigera →",
     "stepLabel": "Steg {current} av {total}",
@@ -6557,6 +6586,7 @@ const sv = {
       "createClassroom": "Skapa klassrum",
       "createLesson": "Skapa lektion",
       "scanToJoin": "Skanna för att gå med",
+      "classroomSession": "Klassrumslektion",
       "connecting": "Ansluter till spelet..."
     },
     "lessonWords": {

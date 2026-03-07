@@ -174,6 +174,7 @@ const es = {
     "connectedToServer": "¡Listo para la batalla!",
     "connectingToServer": "Calentando...",
     "gameStarted": "¡YA!",
+    "preparingGame": "Preparando el juego...",
     "joinedGame": "¡Estás dentro!",
     "newGameReady": "¡Empieza la ronda!",
     "lightMode": "Modo Claro",
@@ -2856,6 +2857,34 @@ const es = {
         "sameChallenge": "¡Mismo puzzle para todos en el mundo – compara tu puntaje!",
         "start": "¡Empezar!"
       }
+    },
+    "welcome": {
+      "title": "¡Bienvenido a LexiClash!",
+      "description": "Desliza letras en la grilla para formar palabras. ¡Aprendamos lo básico!"
+    },
+    "grid": {
+      "title": "La Grilla de Letras",
+      "description": "Este es tu campo de juego. Conecta letras adyacentes en cualquier dirección para deletrear palabras."
+    },
+    "swipe": {
+      "title": "Desliza para Deletrear",
+      "description": "Arrastra el dedo sobre las letras para formar palabras. ¡Puedes ir en las 8 direcciones!"
+    },
+    "combo": {
+      "title": "Sistema de Combos",
+      "description": "¡Encuentra palabras rápidamente para construir combos y ganar puntos extra!"
+    },
+    "timer": {
+      "title": "El Temporizador",
+      "description": "¡Compite contra el reloj! Encuentra tantas palabras como puedas antes de que se acabe el tiempo."
+    },
+    "leaderboard": {
+      "title": "Tabla de Posiciones",
+      "description": "Sigue tu puntuación contra otros jugadores. ¡Palabras más largas dan más puntos!"
+    },
+    "ready": {
+      "title": "¡Estás Listo!",
+      "description": "Empieza a deslizar y diviértete. ¡Buena suerte!"
     },
     "swipeHint": "← Desliza para navegar →",
     "callout": {
@@ -6598,7 +6627,8 @@ const es = {
       "deselectAll": "Deseleccionar todo",
       "createClassroom": "Crear aula",
       "createLesson": "Crear lección",
-      "scanToJoin": "Escanea para unirte"
+      "scanToJoin": "Escanea para unirte",
+      "classroomSession": "Sesión de clase"
     },
     "onboarding": {
       "step": "Paso",

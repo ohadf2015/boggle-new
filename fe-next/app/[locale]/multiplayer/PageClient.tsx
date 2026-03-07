@@ -4,8 +4,11 @@ import React, { useState, useCallback, useMemo } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import type { Socket } from 'socket.io-client';
+import { useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
+import { EducationHeader } from '@/components/education/EducationHeader';
+import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
 import SpectatorBanner from '@/components/SpectatorBanner';
@@ -88,6 +91,9 @@ function ViewLoadingSkeleton(): React.JSX.Element {
 }
 
 export default function MultiplayerPageClient(): React.JSX.Element {
+  const searchParams = useSearchParams();
+  const isClassroomMode = searchParams?.get('classroom') === 'true';
+
   const [gameCode, setGameCode] = useState<string>('');
   const [roomName, setRoomName] = useState<string>('');
   const [hostUsername, setHostUsername] = useState<string>('');
@@ -707,6 +713,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             gameDuration={gameDuration}
             seriesStandings={seriesTracker.standings}
             seriesRoundNumber={seriesTracker.roundNumber}
+            wordHuntSummary={(resultsData as any)?.wordHuntSummary}
           />
         </FeatureErrorBoundary>
       );
@@ -780,7 +787,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         spectatorCount={spectators.length}
       />
 
-      <AutoHideHeader />
+      {isClassroomMode ? (
+        <>
+          <EducationHeader showBackButton title={t('education.classroomGame.title')} />
+          <ClassroomModeBanner lessonData={lessonDataState} />
+        </>
+      ) : (
+        <AutoHideHeader />
+      )}
       <ErrorBoundary>
         <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-hidden">
           {renderView()}

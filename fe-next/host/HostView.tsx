@@ -465,6 +465,7 @@ const HostView: React.FC<HostViewProps> = memo(({
         onNextRound={actions.handleNextRound}
         socket={socket}
         playersReady={playersReadyData}
+        wordHuntSummary={tournament.finalScores?.wordHuntSummary}
       />
 
       <QRCodeDialog

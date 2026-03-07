@@ -139,7 +139,7 @@ const Segment = memo<SegmentProps>(({ id, fill, color, label, isLowHP }) => {
       <motion.div
         data-fill-bar
         className={`
-          absolute inset-y-0 left-0 h-full
+          absolute inset-y-0 start-0 h-full
           ${color}
           transition-all duration-300 ease-out
           motion-reduce:transition-none
@@ -187,7 +187,7 @@ const Divider = memo<DividerProps>(({ threshold }) => {
       data-divider
       data-threshold={threshold}
       className="absolute top-0 bottom-0 w-[3px] bg-neo-black z-10"
-      style={{ left: `${threshold}%` }}
+      style={{ insetInlineStart: `${threshold}%` }}
       aria-hidden="true"
     />
   );

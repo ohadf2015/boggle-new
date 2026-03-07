@@ -24,7 +24,7 @@ describe('useCinematic - stall detection', () => {
   });
 
   it('should export STALL_DETECTION_MS constant', () => {
-    expect(STALL_DETECTION_MS).toBe(1000);
+    expect(STALL_DETECTION_MS).toBe(3000);
   });
 
   it('should return isStalled as false initially', () => {

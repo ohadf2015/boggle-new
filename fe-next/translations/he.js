@@ -175,6 +175,7 @@ const he = {
     "connectedToServer": "מוכן לקרב!",
     "connectingToServer": "מתחמם...",
     "gameStarted": "GO!",
+    "preparingGame": "מכין את המשחק...",
     "joinedGame": "בפנים!",
     "newGameReady": "סיבוב מתחיל!",
     "lightMode": "מצב בהיר",
@@ -1677,6 +1678,34 @@ const he = {
         "sameChallenge": "אותו פאזל לכולם בעולם – השוו ניקוד! 🌍",
         "start": "יאללה!"
       }
+    },
+    "welcome": {
+      "title": "!ברוכים הבאים ל-LexiClash",
+      "description": "החליקו על אותיות בלוח כדי ליצור מילים. בואו נלמד את הבסיס!"
+    },
+    "grid": {
+      "title": "לוח האותיות",
+      "description": "זה מגרש המשחק שלכם. חברו אותיות סמוכות בכל כיוון כדי לאיית מילים."
+    },
+    "swipe": {
+      "title": "החליקו כדי לאיית",
+      "description": "גררו את האצבע על פני אותיות כדי ליצור מילים. אפשר לנוע בכל 8 הכיוונים!"
+    },
+    "combo": {
+      "title": "מערכת קומבו",
+      "description": "מצאו מילים במהירות כדי לבנות קומבו ולהרוויח נקודות בונוס!"
+    },
+    "timer": {
+      "title": "הטיימר",
+      "description": "התחרו נגד השעון! מצאו כמה שיותר מילים לפני שהזמן נגמר."
+    },
+    "leaderboard": {
+      "title": "טבלת מובילים",
+      "description": "עקבו אחרי הניקוד שלכם מול שחקנים אחרים. מילים ארוכות שוות יותר נקודות!"
+    },
+    "ready": {
+      "title": "!מוכנים",
+      "description": "התחילו להחליק ותהנו. בהצלחה!"
     },
     "swipeHint": "החלק לניווט → ←",
     "callout": {
@@ -6512,6 +6541,7 @@ const he = {
       "createClassroom": "צור כיתה",
       "createLesson": "צור שיעור",
       "scanToJoin": "סרוק להצטרף למשחק",
+      "classroomSession": "שיעור בכיתה",
       "connecting": "מתחבר למשחק..."
     },
     "lessonWords": {

@@ -344,7 +344,7 @@ describe('BlastGameLayout multiplayer mode', () => {
     expect(screen.getByText('blast.shuffle')).toBeInTheDocument();
   });
 
-  it('shows lightweight board-clear celebration in multiplayer mode', () => {
+  it('does NOT show board-clear celebration in multiplayer mode (score-only focus)', () => {
     const completeState = { ...defaultGameState, isComplete: true };
     render(
       <BlastGameLayout
@@ -353,11 +353,11 @@ describe('BlastGameLayout multiplayer mode', () => {
         gameState={completeState}
       />,
     );
-    // MP should show "Board Cleared!" text (lightweight toast, not blocking overlay)
-    expect(screen.getByText('blast.complete')).toBeInTheDocument();
+    // MP blast focuses on score — no board-clear celebration
+    expect(screen.queryByText('blast.complete')).not.toBeInTheDocument();
   });
 
-  it('MP board-clear celebration does NOT have blocking backdrop', () => {
+  it('MP does NOT show blocking backdrop on board complete', () => {
     const completeState = { ...defaultGameState, isComplete: true };
     const { container } = render(
       <BlastGameLayout
@@ -366,31 +366,8 @@ describe('BlastGameLayout multiplayer mode', () => {
         gameState={completeState}
       />,
     );
-    // The blocking overlay has backdrop-blur-sm class; MP celebration should not
     const backdropElements = container.querySelectorAll('.backdrop-blur-sm');
     expect(backdropElements.length).toBe(0);
-  });
-
-  it('MP board-clear celebration auto-dismisses after timeout', () => {
-    jest.useFakeTimers();
-    const completeState = { ...defaultGameState, isComplete: true };
-    render(
-      <BlastGameLayout
-        {...baseProps}
-        isMultiplayer={true}
-        gameState={completeState}
-      />,
-    );
-    // Initially visible
-    expect(screen.getByText('blast.complete')).toBeInTheDocument();
-
-    // After 3 seconds, should auto-dismiss (timer is 2500ms)
-    act(() => {
-      jest.advanceTimersByTime(3000);
-    });
-    expect(screen.queryByText('blast.complete')).not.toBeInTheDocument();
-
-    jest.useRealTimers();
   });
 
   it('shows board-complete overlay in singleplayer mode when complete', () => {

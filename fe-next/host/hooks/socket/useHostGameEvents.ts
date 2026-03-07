@@ -284,7 +284,8 @@ export function useHostGameEvents({
       // Always set final scores (needed for TV broadcast mode)
       setFinalScores({
         players: data.scores,
-        gameCode: ''
+        gameCode: '',
+        wordHuntSummary: data.wordHuntSummary,
       });
 
       // Only call onShowResults if host is playing (not in broadcast mode)
@@ -294,6 +295,7 @@ export function useHostGameEvents({
           letterGrid: currentTableData,
           duplicateRuleDisabled: data.duplicateRuleDisabled,
           playerCount: data.playerCount,
+          wordHuntSummary: data.wordHuntSummary,
         });
       }
     };

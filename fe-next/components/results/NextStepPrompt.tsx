@@ -274,15 +274,13 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           </div>
         </button>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white border border-neo-black/20 dark:border-white/20"
+        <button
           onClick={onBackToLobby}
+          className="w-full py-3 text-sm font-bold uppercase text-neo-cream bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-all duration-150"
         >
-          <ArrowLeft className="me-1 w-3.5 h-3.5 rtl:rotate-180" />
+          <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
           {backText}
-        </Button>
+        </button>
       </div>
     );
   }

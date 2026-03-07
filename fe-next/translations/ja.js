@@ -175,6 +175,7 @@ const ja = {
     "connectedToServer": "バトル準備OK！",
     "connectingToServer": "ウォーミングアップ...",
     "gameStarted": "GO！",
+    "preparingGame": "ゲームを準備中...",
     "joinedGame": "参加完了！",
     "newGameReady": "ラウンド開始！",
     "lightMode": "ライトモード",
@@ -1661,10 +1662,38 @@ const ja = {
         "start": "スタート！"
       }
     },
+    "welcome": {
+      "title": "LexiClashへようこそ！",
+      "description": "グリッド上の文字をスワイプして単語を作ろう。基本を学びましょう！"
+    },
+    "grid": {
+      "title": "レターグリッド",
+      "description": "ここがあなたのプレイフィールドです。隣接する文字をつないで単語を作りましょう。"
+    },
+    "swipe": {
+      "title": "スワイプでスペル",
+      "description": "指を文字の上でドラッグして単語を作ろう。8方向すべてに進めます！"
+    },
+    "combo": {
+      "title": "コンボシステム",
+      "description": "素早く単語を見つけてコンボを作り、ボーナスポイントを獲得！"
+    },
+    "timer": {
+      "title": "タイマー",
+      "description": "時間と競争！制限時間内にできるだけ多くの単語を見つけよう。"
+    },
+    "leaderboard": {
+      "title": "リーダーボード",
+      "description": "他のプレイヤーとスコアを比較。長い単語ほど高得点！"
+    },
+    "ready": {
+      "title": "準備完了！",
+      "description": "スワイプを始めて楽しもう。頑張って！"
+    },
     "swipeHint": "← スワイプで移動 →",
     "callout": {
       "title": "文字をスワイプ！",
-      "tryWord": "試してみて:"
+      "tryWord": "試してみて："
     }
   },
   "training": {
@@ -6582,6 +6611,7 @@ const ja = {
       "createClassroom": "教室を作成",
       "createLesson": "レッスンを作成",
       "scanToJoin": "スキャンして参加",
+      "classroomSession": "教室セッション",
       "connecting": "ゲームに接続中..."
     },
     "lessonWords": {

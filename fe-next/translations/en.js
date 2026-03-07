@@ -177,6 +177,7 @@ const en = {
     "connectedToServer": "Ready to battle!",
     "connectingToServer": "Warming up...",
     "gameStarted": "GO!",
+    "preparingGame": "Preparing game...",
     "joinedGame": "You're in!",
     "newGameReady": "Round starting!",
     "lightMode": "Light Mode",
@@ -1777,6 +1778,34 @@ const en = {
         "sameChallenge": "Same puzzle for everyone worldwide – compare your score!",
         "start": "Start Hunt"
       }
+    },
+    "welcome": {
+      "title": "Welcome to LexiClash!",
+      "description": "Swipe letters on the grid to form words. Let's learn the basics!"
+    },
+    "grid": {
+      "title": "The Letter Grid",
+      "description": "This is your playing field. Connect adjacent letters in any direction to spell words."
+    },
+    "swipe": {
+      "title": "Swipe to Spell",
+      "description": "Drag your finger across letters to form words. You can go in all 8 directions!"
+    },
+    "combo": {
+      "title": "Combo System",
+      "description": "Find words quickly to build combos and earn bonus points!"
+    },
+    "timer": {
+      "title": "The Timer",
+      "description": "Race against the clock! Find as many words as you can before time runs out."
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "description": "Track your score against other players. Longer words earn more points!"
+    },
+    "ready": {
+      "title": "You're Ready!",
+      "description": "Start swiping and have fun. Good luck!"
     },
     "swipeHint": "← Swipe to navigate →",
     "stepLabel": "Step {current} of {total}",
@@ -6605,7 +6634,8 @@ const en = {
       "deselectAll": "Deselect All",
       "createClassroom": "Create Classroom",
       "createLesson": "Create Lesson",
-      "scanToJoin": "Scan to join game"
+      "scanToJoin": "Scan to join game",
+      "classroomSession": "Classroom Session"
     },
     "lessonWords": {
       "title": "Lesson Vocabulary",

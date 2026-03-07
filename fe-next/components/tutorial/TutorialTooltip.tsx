@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Sparkles,
@@ -18,16 +18,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { TutorialStep } from './tutorialSteps';
 import { cn } from '@/lib/utils';
 
-interface TargetRect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
-
 interface TutorialTooltipProps {
   step: TutorialStep;
-  targetRect: TargetRect | null;
   currentIndex: number;
   totalSteps: number;
   onNext: () => void;
@@ -47,12 +39,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 /**
- * TutorialTooltip - Displays tutorial step information
- * Positioned relative to the target element with neo-brutalist styling
+ * TutorialTooltip - Compact toast-style tutorial banner
+ * Fixed at the bottom of the screen, doesn't cover the game grid
  */
 const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
   step,
-  targetRect,
   currentIndex,
   totalSteps,
   onNext,
@@ -62,85 +53,37 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
   const { t, dir } = useLanguage();
   const isRtl = dir === 'rtl';
 
-  // Get the icon component
   const IconComponent = step.icon ? iconMap[step.icon] : null;
-
-  // Calculate tooltip position
-  const tooltipStyle = useMemo(() => {
-    if (!targetRect || step.position === 'center') {
-      // Center on screen
-      return {
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-      };
-    }
-
-    const padding = 16;
-    const tooltipWidth = 320; // Approximate width
-    const tooltipHeight = 200; // Approximate height
-
-    switch (step.position) {
-      case 'top':
-        return {
-          top: targetRect.top - tooltipHeight - padding,
-          left: targetRect.left + targetRect.width / 2 - tooltipWidth / 2,
-        };
-      case 'bottom':
-        return {
-          top: targetRect.top + targetRect.height + padding,
-          left: Math.max(
-            padding,
-            Math.min(
-              window.innerWidth - tooltipWidth - padding,
-              targetRect.left + targetRect.width / 2 - tooltipWidth / 2
-            )
-          ),
-        };
-      case 'left':
-        return {
-          top: targetRect.top + targetRect.height / 2 - tooltipHeight / 2,
-          left: targetRect.left - tooltipWidth - padding,
-        };
-      case 'right':
-        return {
-          top: targetRect.top + targetRect.height / 2 - tooltipHeight / 2,
-          left: targetRect.left + targetRect.width + padding,
-        };
-      default:
-        return {
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        };
-    }
-  }, [targetRect, step.position]);
-
   const isFirstStep = currentIndex === 0;
   const isLastStep = currentIndex === totalSteps - 1;
 
   return (
     <motion.div
       data-tutorial-tooltip
-      initial={{ opacity: 0, scale: 0.9, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9, y: 20 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
-      className="fixed z-100 w-[320px] max-w-[90vw] pointer-events-auto"
-      style={{ ...tooltipStyle, willChange: 'transform, opacity' }}
+      initial={{ y: 60, opacity: 0, scale: 0.95 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      exit={{ y: 40, opacity: 0, scale: 0.95 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[10000] w-[calc(100%-2rem)] max-w-[400px] pointer-events-auto"
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Main tooltip card */}
-      <div className="bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg">
-        {/* Header with icon and skip button */}
-        <div className="bg-neo-lime border-b-3 border-neo-black px-4 py-3 flex items-center justify-between text-neo-black overflow-visible">
+      <div
+        className="bg-neo-navy border-3 border-neo-black rounded-neo overflow-hidden"
+        style={{
+          boxShadow: isRtl
+            ? '-4px 4px 0px #000'
+            : '4px 4px 0px #000',
+        }}
+      >
+        {/* Header row: icon + step counter + skip */}
+        <div className="bg-neo-lime border-b-3 border-neo-black px-3 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {IconComponent && (
-              <div className="w-8 h-8 bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm">
-                <IconComponent className="w-4 h-4 text-neo-black" />
+              <div className="w-7 h-7 bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm">
+                <IconComponent className="w-3.5 h-3.5 text-neo-black" />
               </div>
             )}
-            <span className="font-black text-sm text-neo-black uppercase tracking-wide">
+            <span className="font-black text-xs text-neo-black uppercase tracking-wide">
               {t('tutorial.stepLabel', { current: currentIndex + 1, total: totalSteps })}
             </span>
           </div>
@@ -149,25 +92,25 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
               e.stopPropagation();
               onSkip();
             }}
-            className="w-8 h-8 bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm hover:bg-neo-pink transition-colors overflow-visible"
+            className="w-7 h-7 bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm hover:bg-neo-pink transition-colors"
             aria-label={t('tutorial.skip')}
           >
-            <X className="w-5 h-5 text-neo-black" />
+            <X className="w-4 h-4 text-neo-black" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="px-4 py-4 space-y-3 overflow-hidden">
-          <h3 className="font-black text-lg text-neo-black">
+        {/* Content: title + description */}
+        <div className="px-3 py-2.5">
+          <h3 className="font-black text-sm text-neo-white leading-tight">
             {t(step.titleKey)}
           </h3>
-          <p className="text-sm text-neo-black/80 leading-relaxed">
+          <p className="text-xs text-neo-white/70 leading-snug mt-0.5">
             {t(step.descriptionKey)}
           </p>
         </div>
 
-        {/* Navigation buttons */}
-        <div className="px-4 py-3 bg-neo-white/50 border-t-2 border-neo-black/20 flex items-center justify-between overflow-hidden">
+        {/* Navigation row */}
+        <div className="px-3 py-2 border-t-2 border-neo-white/10 flex items-center justify-between">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -175,20 +118,37 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
             }}
             disabled={isFirstStep}
             className={cn(
-              'flex items-center gap-1 px-3 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all',
+              'flex items-center gap-1 px-2.5 py-1.5 rounded-neo border-2 border-neo-black font-bold text-xs transition-all',
               isFirstStep
-                ? 'bg-neo-black/10 text-neo-black/40 cursor-not-allowed'
-                : 'bg-neo-white shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed'
+                ? 'bg-neo-white/10 text-neo-white/30 cursor-not-allowed'
+                : 'bg-neo-white shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed text-neo-black'
             )}
             aria-label={t('tutorial.prev')}
           >
             {isRtl ? (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             ) : (
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
             )}
             <span className="hidden sm:inline">{t('tutorial.prev')}</span>
           </button>
+
+          {/* Progress dots */}
+          <div className="flex gap-1.5">
+            {Array.from({ length: totalSteps }).map((_, index) => (
+              <div
+                key={index}
+                className={cn(
+                  'w-1.5 h-1.5 rounded-full transition-all',
+                  index === currentIndex
+                    ? 'bg-neo-lime scale-125'
+                    : index < currentIndex
+                    ? 'bg-neo-white/50'
+                    : 'bg-neo-white/20'
+                )}
+              />
+            ))}
+          </div>
 
           <button
             onClick={(e) => {
@@ -196,30 +156,20 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
               onNext();
             }}
             className={cn(
-              'flex items-center gap-1 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed',
-              isLastStep ? 'bg-neo-lime' : 'bg-neo-cyan'
+              'flex items-center gap-1 px-3 py-1.5 rounded-neo border-2 border-neo-black font-bold text-xs transition-all shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed',
+              isLastStep ? 'bg-neo-lime text-neo-black' : 'bg-neo-cyan text-neo-black'
             )}
           >
             <span>{isLastStep ? t('tutorial.finish') : t('tutorial.next')}</span>
             {!isLastStep &&
               (isRtl ? (
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-3.5 h-3.5" />
               ) : (
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5" />
               ))}
           </button>
         </div>
       </div>
-
-      {/* Tap hint */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="text-center text-xs text-neo-white/70 mt-2"
-      >
-        {t('tutorial.tapToContinue')}
-      </motion.p>
     </motion.div>
   );
 };

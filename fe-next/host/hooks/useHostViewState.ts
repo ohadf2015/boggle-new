@@ -35,6 +35,7 @@ export interface FinalScoresData {
     avatar?: Avatar;
   }>;
   gameCode: string;
+  wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null };
 }
 
 export interface XpGainedData {
