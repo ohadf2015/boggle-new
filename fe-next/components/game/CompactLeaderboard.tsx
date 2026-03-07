@@ -166,7 +166,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
       if (scoreCleanupRef.current) clearTimeout(scoreCleanupRef.current);
       if (rankCleanupRef.current) clearTimeout(rankCleanupRef.current);
     };
-  }, [sortedPlayers]);
+  }, [sortedPlayers, currentUsername]);
 
   // Calculate points needed to catch next target
   const pointsToTarget = useMemo(() => {
