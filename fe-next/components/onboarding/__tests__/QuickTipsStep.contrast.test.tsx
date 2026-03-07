@@ -22,7 +22,7 @@ describe('QuickTipsStep - Color Contrast', () => {
     );
   };
 
-  it('should use light text on encouragement section for proper contrast on dark backgrounds', () => {
+  it('should use high-contrast text colors on tip cards and CTA', () => {
     const { container } = renderWithLanguage(
       <QuickTipsStep
         selectedMode={null}
@@ -31,22 +31,18 @@ describe('QuickTipsStep - Color Contrast', () => {
       />
     );
 
-    // Find the encouragement section (last motion.div with bg-neo-lime/30)
-    const encouragementSection = container.querySelector('.bg-neo-lime\\/30');
-    expect(encouragementSection).toBeInTheDocument();
+    // Tip cards use bg-neo-cream with text-neo-black — good contrast
+    const tipCards = container.querySelectorAll('.bg-neo-cream');
+    expect(tipCards.length).toBeGreaterThan(0);
 
-    // Check that text uses light color for proper contrast
-    // In dark mode, text should be light (neo-white or similar)
-    // Not dark text (neo-black) which would be invisible on dark backgrounds
-    const textElement = encouragementSection?.querySelector('p');
-    expect(textElement).toBeInTheDocument();
+    // Each tip card should have dark text for contrast on light background
+    tipCards.forEach(card => {
+      const textElements = card.querySelectorAll('[class*="text-neo-black"]');
+      expect(textElements.length).toBeGreaterThan(0);
+    });
 
-    // Verify the text has proper contrast classes for dark mode
-    // Should have dark mode variant for light text on dark backgrounds
-    const hasDarkModeText =
-      textElement?.className.includes('dark:text-neo-white') ||
-      textElement?.className.includes('dark:text-white');
-
-    expect(hasDarkModeText).toBe(true);
+    // CTA section uses neo-lime gradient with neo-black text — good contrast
+    const ctaSection = container.querySelector('[class*="from-neo-lime"]');
+    expect(ctaSection).toBeInTheDocument();
   });
 });

@@ -49,7 +49,7 @@ const mockT = (key: string) => {
     'share.code': 'Code',
     'common.error': 'Failed to copy',
     'common.copied': 'Copied!',
-    'hostView.inviteWarriors': 'Invite Warriors',
+    'hostView.inviteFriends': 'Invite Friends',
   };
   return translations[key] || key;
 };
@@ -84,7 +84,7 @@ describe('MobileShareSection', () => {
 
     it('renders section title', () => {
       render(<MobileShareSection gameCode="TEST123" t={mockT} />);
-      expect(screen.getByText('Invite Warriors')).toBeInTheDocument();
+      expect(screen.getByText('Invite Friends')).toBeInTheDocument();
     });
 
     it('renders all three share buttons', () => {
