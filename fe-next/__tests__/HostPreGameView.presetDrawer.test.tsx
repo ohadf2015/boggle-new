@@ -143,6 +143,14 @@ const mockTranslations: Record<string, string> = {
   'roomCode.copied': 'Copied!',
   'common.error': 'Error',
   'playerView.me': 'You',
+  'hostView.battleMode': 'Battle Mode',
+  'hostView.preset': 'Preset',
+  'hostView.playersInRoom': 'Players in Room',
+  'hostView.noOneYet': 'No one yet',
+  'hostView.startingWithBots': 'Starting with bots in {seconds}s...',
+  'hostView.shareCodeHint': 'Share the room code above so friends can join!',
+  'hostView.inviteFriends': 'Invite Friends',
+  'common.minutes': 'MIN',
 };
 
 const mockT = (key: string) => mockTranslations[key] || key;
@@ -177,6 +185,15 @@ const defaultProps = {
   onExitRoom: jest.fn(),
   onCancelTournament: jest.fn(),
   tournamentCreating: false,
+};
+
+// Helper: Battle Mode card is collapsed by default (progressive disclosure).
+// Tests that interact with preset buttons must expand it first.
+const expandBattleModeCard = () => {
+  // Both desktop and mobile layouts render the Battle Mode card.
+  // Click only the first one to toggle showBattleSettings to true.
+  const battleModeButtons = screen.getAllByRole('button', { name: /battle mode/i });
+  fireEvent.click(battleModeButtons[0]);
 };
 
 describe('HostPreGameView Preset Selection', () => {
@@ -227,6 +244,9 @@ describe('HostPreGameView Preset Selection', () => {
 
     jest.clearAllMocks();
 
+    // Expand Battle Mode card to reveal preset buttons
+    expandBattleModeCard();
+
     // Click a Quick preset button (both desktop and mobile buttons directly apply)
     const quickButtons = screen.getAllByRole('button', { name: /quick/i });
     fireEvent.click(quickButtons[0]);
@@ -259,6 +279,9 @@ describe('HostPreGameView Preset Selection', () => {
     });
 
     jest.clearAllMocks();
+
+    // Expand Battle Mode card to reveal preset buttons
+    expandBattleModeCard();
 
     // Click a Challenge preset button
     const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
@@ -293,8 +316,12 @@ describe('HostPreGameView Preset Selection', () => {
 
     jest.clearAllMocks();
 
-    // Click a Party preset button
-    const partyButtons = screen.getAllByRole('button', { name: /party/i });
+    // Expand Battle Mode card to reveal preset buttons
+    expandBattleModeCard();
+
+    // Click a Party preset button (skip toggle buttons that also contain "Party" in their name)
+    const partyButtons = screen.getAllByRole('button', { name: /party/i })
+      .filter(btn => !btn.textContent?.includes('Battle Mode'));
     fireEvent.click(partyButtons[0]);
 
     // Party preset: 2 min timer, MEDIUM difficulty, 2 min word length
@@ -308,6 +335,9 @@ describe('HostPreGameView Preset Selection', () => {
   it('does not open preset drawer (drawer is not wired to open)', async () => {
     render(<HostPreGameView {...defaultProps} />);
 
+    // Expand Battle Mode card to reveal preset buttons
+    expandBattleModeCard();
+
     // Click any preset button
     const quickButtons = screen.getAllByRole('button', { name: /quick/i });
     fireEvent.click(quickButtons[0]);
@@ -318,6 +348,9 @@ describe('HostPreGameView Preset Selection', () => {
 
   it('renders preset buttons in both desktop and mobile layouts', () => {
     render(<HostPreGameView {...defaultProps} />);
+
+    // Expand Battle Mode card to reveal preset buttons
+    expandBattleModeCard();
 
     // Both desktop and mobile layouts should have preset buttons
     // Desktop is in hidden lg:block div, mobile is in lg:hidden div
@@ -348,6 +381,9 @@ describe('HostPreGameView Preset Selection', () => {
     });
 
     const initialCallCount = setTimerValue.mock.calls.length;
+
+    // Expand Battle Mode card to reveal preset buttons
+    expandBattleModeCard();
 
     // Click a Quick preset button
     const quickButtons = screen.getAllByRole('button', { name: /quick/i });
