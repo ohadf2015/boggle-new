@@ -62,7 +62,7 @@ interface UseHostGameEventsProps {
   intentionalExitRef: MutableRefObject<boolean>;
 
   // Callbacks
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any }) => void;
   onGameStart?: () => void;
 }
 

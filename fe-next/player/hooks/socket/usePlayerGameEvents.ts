@@ -24,7 +24,7 @@ interface UsePlayerGameEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
   username: string;
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any }) => void;
 
   // Local state (not in GameState context)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;

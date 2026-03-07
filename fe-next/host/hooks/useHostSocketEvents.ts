@@ -35,7 +35,7 @@ interface UseHostSocketEventsProps {
   username: string;
   queueAchievement: (achievement: AchievementPayload) => void;
   playComboSound: (level: number) => void;
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any }) => void;
 
   // State setters
   setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
