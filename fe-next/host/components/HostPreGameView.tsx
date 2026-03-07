@@ -119,7 +119,7 @@ function HostPreGameView({
   const [showBattleSettings, setShowBattleSettings] = useState(false);
   const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
-  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>('random');
+  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>('classic');
   const { setGameMode: setStoreGameMode } = useGameActions();
 
   // When host selects a specific mode, update the store

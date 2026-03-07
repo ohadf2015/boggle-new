@@ -222,7 +222,26 @@ function CinematicPlayerInner({
   }
 
   // ==============================================
-  // STALL FALLBACK (mobile black screen)
+  // MOBILE: SKIP REMOTION ENTIRELY
+  // ==============================================
+  // Remotion Player fires JS frameupdate events on mobile but often renders
+  // a black screen (canvas/WebGL rendering fails silently). Bypass it
+  // entirely and use the lightweight CSS/Framer Motion fallback instead.
+
+  if (isMobile && fallbackType) {
+    logDebug('Mobile detected, using CSS fallback instead of Remotion');
+    return (
+      <CinematicFallback
+        cinematicType={fallbackType}
+        compositionProps={compositionProps}
+        durationSeconds={durationSeconds}
+        onComplete={onComplete}
+      />
+    );
+  }
+
+  // ==============================================
+  // STALL FALLBACK (desktop edge cases)
   // ==============================================
 
   if (isStalled && fallbackType) {

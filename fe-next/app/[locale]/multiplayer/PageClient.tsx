@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import type { Socket } from 'socket.io-client';
@@ -33,6 +33,7 @@ import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
 import { useSeriesTracker } from '@/hooks/useSeriesTracker';
 import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotifications';
 import { useMultiplayerEventNotifications } from '@/hooks/useMultiplayerEventNotifications';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { Language, ActiveRoom, Avatar } from '@/shared/types/game';
 
 // Hex color validation pattern (must match backend schema)
@@ -106,6 +107,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     []
   );
   const [isJoining, setIsJoining] = useState<boolean>(false);
+
+  // Hide global footer when in multiplayer (prevents chat overlap)
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   useConnectionToasts();
 

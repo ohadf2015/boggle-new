@@ -158,6 +158,47 @@ describe('CinematicPlayer - stall fallback', () => {
   });
 });
 
+describe('CinematicPlayer - mobile bypass', () => {
+  const defaultProps = {
+    composition: MockComposition,
+    durationSeconds: 8,
+    onComplete: jest.fn(),
+    fallbackType: 'victory' as const,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.clearAllTimers();
+    mockUseCinematic.mockReturnValue(createCinematicReturn());
+  });
+
+  it('should render CSS fallback instead of Remotion on mobile', () => {
+    mockUseDevicePerformance.mockReturnValue(createDevicePerf({ isMobile: true }));
+
+    render(<CinematicPlayer {...defaultProps} />);
+
+    expect(screen.getByTestId('cinematic-fallback')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-remotion-player')).not.toBeInTheDocument();
+  });
+
+  it('should render Remotion Player on desktop', () => {
+    mockUseDevicePerformance.mockReturnValue(createDevicePerf({ isMobile: false }));
+
+    render(<CinematicPlayer {...defaultProps} />);
+
+    expect(screen.getByTestId('mock-remotion-player')).toBeInTheDocument();
+    expect(screen.queryByTestId('cinematic-fallback')).not.toBeInTheDocument();
+  });
+
+  it('should render Remotion on mobile if no fallbackType provided', () => {
+    mockUseDevicePerformance.mockReturnValue(createDevicePerf({ isMobile: true }));
+
+    render(<CinematicPlayer {...defaultProps} fallbackType={undefined} />);
+
+    expect(screen.getByTestId('mock-remotion-player')).toBeInTheDocument();
+  });
+});
+
 describe('CinematicPlayer - mobile error text', () => {
   const defaultProps = {
     composition: MockComposition,
