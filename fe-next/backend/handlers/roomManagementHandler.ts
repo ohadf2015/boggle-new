@@ -15,6 +15,7 @@ import {
 
 import {
   broadcastToRoom,
+  broadcastActiveRooms,
   getGameRoom
 } from '../utils/socketHelpers.js';
 
@@ -53,7 +54,7 @@ function registerRoomManagementHandlers(io: Server, socket: Socket): void {
 
     broadcastToRoom(io, getGameRoom(gameCode), 'roomClosed', {});
     deleteGame(gameCode);
-    io.emit('activeRooms', { rooms: getActiveRooms() });
+    broadcastActiveRooms(io, getActiveRooms());
 
     logger.info('SOCKET', `Room ${gameCode} closed by host`);
   });

@@ -48,6 +48,24 @@ export function broadcastToRoomExceptSender(socket: Socket, room: string, event:
 }
 
 // ==========================================
+// Lobby Room (for activeRooms broadcasts)
+// ==========================================
+
+/** Room that lobby/room-list clients join to receive activeRooms updates */
+export const LOBBY_ROOM = 'lobby:rooms';
+
+/**
+ * Broadcast activeRooms to lobby subscribers only (not all connected sockets)
+ */
+export function broadcastActiveRooms(io: Server, rooms: unknown[]): void {
+  try {
+    io.to(LOBBY_ROOM).emit('activeRooms', { rooms });
+  } catch (error) {
+    console.error('[SOCKET] Error broadcasting activeRooms to lobby:', (error as Error).message);
+  }
+}
+
+// ==========================================
 // Room Query Functions
 // ==========================================
 

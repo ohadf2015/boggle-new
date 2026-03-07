@@ -17,7 +17,7 @@ import {
   isRoomEmpty
 } from '../modules/gameStateManager.js';
 
-import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { broadcastToRoom, broadcastActiveRooms, getGameRoom } from '../utils/socketHelpers.js';
 import { emitError, ErrorMessages } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import * as botManager from '../modules/botManager.js';
@@ -152,7 +152,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
       }
     });
 
-    io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+    broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
   });
 
   // Handle removing a bot from the room (host only)
@@ -211,7 +211,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
         clearGameTimer(gameCode);
         botManager.stopAllBots(gameCode);
         deleteGame(gameCode);
-        io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+        broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
         socket.emit('botRemoved', {
           success: true,
           username: botUsernameToFind
@@ -229,7 +229,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
         username: botUsernameToFind
       });
 
-      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+      broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
       return;
     }
 
@@ -260,7 +260,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
       clearGameTimer(gameCode);
       botManager.stopAllBots(gameCode);
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+      broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
       socket.emit('botRemoved', {
         success: true,
         botId: botToRemove.id,
@@ -281,7 +281,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
       username: removedUsername
     });
 
-    io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+    broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
   });
 
   // Handle get bots list
@@ -378,7 +378,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     });
 
     socket.emit('autoFillComplete', { botsAdded });
-    io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+    broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
   });
 
   // Handle auto-start timer request

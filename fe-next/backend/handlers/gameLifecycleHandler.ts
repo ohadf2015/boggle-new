@@ -31,6 +31,7 @@ import {
 
 import {
   broadcastToRoom,
+  broadcastActiveRooms,
   getGameRoom,
   joinRoom,
   leaveRoom,
@@ -202,7 +203,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       ensureGame(gameCode);
 
       // Broadcast updated room list
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
 
       // Broadcast user list update
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
@@ -807,7 +808,7 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
       });
       clearGameTimer(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
     }
   } else {
     removeUserFromGame(existingConnection.gameCode, existingConnection.username);
@@ -818,7 +819,7 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
       clearGameTimer(existingConnection.gameCode);
       stopAllBots(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
     } else {
       const oldGame = getGame(existingConnection.gameCode);
       if (oldGame) {

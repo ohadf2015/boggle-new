@@ -22,6 +22,7 @@ import {
 
 import {
   broadcastToRoom,
+  broadcastActiveRooms,
   getGameRoom,
   safeEmit,
   getSocketById,
@@ -109,7 +110,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
     clearGameTimer(gameCode);
     cleanupGameBots(gameCode);
     deleteGame(gameCode);
-    io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+    broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
     return;
   }
 
@@ -136,7 +137,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
       });
 
       // Update active rooms
-      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+      broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
       return;
     } else {
       logger.warn('SOCKET', `Failed to transfer host in game ${gameCode}: ${transferResult.error}`);
@@ -173,7 +174,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
           broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
             users: getGameUsers(gameCode) as GameUser[]
           });
-          io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+          broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
           return;
         }
       }
@@ -191,7 +192,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
       // Clean up game
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+      broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
     }
   }, HOST_RECONNECTION_GRACE_PERIOD);
 
@@ -216,7 +217,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
       clearGameTimer(gameCode);
       cleanupGameBots(gameCode);
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+      broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
       return;
     }
 
@@ -237,7 +238,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
       clearGameTimer(gameCode);
       cleanupGameBots(gameCode);
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+      broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
       return;
     }
 
@@ -266,7 +267,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
           clearGameTimer(gameCode);
           cleanupGameBots(gameCode);
           deleteGame(gameCode);
-          io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+          broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
           return;
         }
 
@@ -280,7 +281,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
           users: getGameUsers(gameCode) as GameUser[]
         });
 
-        io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
+        broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
       }
     }, PLAYER_RECONNECTION_GRACE_PERIOD);
 

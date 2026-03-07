@@ -339,6 +339,9 @@ function createTestEnvironment() {
       io.sockets.set(socket.id, socket);
       sockets.push(socket);
 
+      // Join lobby room (mirrors socketHandlers.ts connection flow)
+      socket.join('lobby:rooms');
+
       // Register all handlers
       try {
         const { registerAllHandlers } = require('../../handlers');

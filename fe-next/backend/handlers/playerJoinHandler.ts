@@ -34,6 +34,7 @@ import {
 import {
   broadcastToRoom,
   broadcastToRoomExceptSender,
+  broadcastActiveRooms,
   getGameRoom,
   joinRoom,
   leaveRoom,
@@ -226,7 +227,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
       users: getGameUsers(gameCode)
     });
-    io.emit('activeRooms', { rooms: getActiveRooms() });
+    broadcastActiveRooms(io, getActiveRooms());
 
     logger.info('SOCKET', `${username} joined game ${gameCode}`);
 
@@ -290,7 +291,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       clearGameTimer(gameCode);
       cleanupGameBots(gameCode);
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
       return;
     }
 
@@ -320,7 +321,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         });
 
         deleteGame(gameCode);
-        io.emit('activeRooms', { rooms: getActiveRooms() });
+        broadcastActiveRooms(io, getActiveRooms());
         return;
       }
     }
@@ -328,7 +329,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
       users: getGameUsers(gameCode)
     });
-    io.emit('activeRooms', { rooms: getActiveRooms() });
+    broadcastActiveRooms(io, getActiveRooms());
   });
 
   // Handle spectator upgrade to player
@@ -472,7 +473,7 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
       });
       clearGameTimer(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
     }
   } else {
     removeUserFromGame(existingConnection.gameCode, existingConnection.username);
@@ -483,7 +484,7 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
       clearGameTimer(existingConnection.gameCode);
       cleanupGameBots(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
     } else {
       const oldGame = getGame(existingConnection.gameCode);
       if (oldGame) {
