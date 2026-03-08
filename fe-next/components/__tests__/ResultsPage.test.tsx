@@ -114,11 +114,6 @@ jest.mock('@/components/voting/WordFeedbackModal', () => ({
   },
 }));
 
-jest.mock('@/components/results/AutoRejoinTimer', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
 jest.mock('@/utils/session', () => ({
   clearSessionPreservingUsername: jest.fn(),
 }));

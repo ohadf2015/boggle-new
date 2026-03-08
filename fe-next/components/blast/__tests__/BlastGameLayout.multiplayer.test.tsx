@@ -344,17 +344,20 @@ describe('BlastGameLayout multiplayer mode', () => {
     expect(screen.getByText('blast.shuffle')).toBeInTheDocument();
   });
 
-  it('does NOT show board-clear celebration in multiplayer mode (score-only focus)', () => {
+  it('shows lightweight non-blocking toast in multiplayer mode (not full overlay)', () => {
     const completeState = { ...defaultGameState, isComplete: true };
-    render(
+    const { container } = render(
       <BlastGameLayout
         {...baseProps}
         isMultiplayer={true}
         gameState={completeState}
       />,
     );
-    // MP blast focuses on score — no board-clear celebration
-    expect(screen.queryByText('blast.complete')).not.toBeInTheDocument();
+    // MP blast shows a lightweight auto-dismiss toast (not the full SP blocking overlay)
+    expect(screen.queryByText('blast.complete')).toBeInTheDocument();
+    // But no blocking backdrop
+    const backdropElements = container.querySelectorAll('.backdrop-blur-sm');
+    expect(backdropElements.length).toBe(0);
   });
 
   it('MP does NOT show blocking backdrop on board complete', () => {

@@ -139,8 +139,8 @@ jest.mock('../ModeCard', () => {
   };
 });
 
-jest.mock('../ModeCardV2', () => {
-  return function MockModeCardV2({ title }: { title: string }) {
+jest.mock('../ModeCard', () => {
+  return function MockModeCard({ title }: { title: string }) {
     return <div data-testid={`mode-card-${title}`}>{title}</div>;
   };
 });
