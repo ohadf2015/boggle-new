@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 
 interface CollapsibleSectionProps {
-  title: string;
+  title?: string;
   icon?: React.ReactNode;
   children: React.ReactNode;
   defaultExpanded?: boolean;
@@ -69,7 +69,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     onToggle?.(newState);
   };
 
-  const contentId = `collapsible-content-${title.replace(/\s+/g, '-').toLowerCase()}`;
+  const contentId = `collapsible-content-${(title ?? '').replace(/\s+/g, '-').toLowerCase()}`;
 
   return (
     <div className={cn('rounded-neo border-2 border-neo-black overflow-hidden', className)}>

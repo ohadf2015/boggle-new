@@ -21,9 +21,9 @@ interface ConfirmationDialogProps {
   /** Callback when the open state changes */
   onOpenChange: (open: boolean) => void;
   /** Dialog title */
-  title: string;
+  title: string | undefined;
   /** Dialog description/message */
-  description: string;
+  description: string | undefined;
   /** Text for the confirm button */
   confirmText?: string;
   /** Text for the cancel button */

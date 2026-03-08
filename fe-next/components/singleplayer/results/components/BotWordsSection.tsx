@@ -15,7 +15,7 @@ import type { BotWordDetail } from '../useResultsData';
 interface BotWordsSectionProps {
   botWordDetails: BotWordDetail[];
   language: string;
-  title: string;
+  title?: string;
   t: (key: string) => string | undefined;
   defaultExpanded?: boolean;
 }

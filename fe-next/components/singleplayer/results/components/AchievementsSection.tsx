@@ -14,7 +14,7 @@ import type { GameAchievement } from '@/components/results/types';
 
 interface AchievementsSectionProps {
   achievements: GameAchievement[];
-  title: string;
+  title?: string;
   disclaimer?: string;
   defaultExpanded?: boolean;
 }

@@ -18,7 +18,7 @@ interface YourWordsSectionProps {
   sortedPointGroups: number[];
   invalidWords: WordObject[];
   wordCount: number;
-  title: string;
+  title?: string;
   t: (key: string) => string | undefined;
   defaultExpanded?: boolean;
 }

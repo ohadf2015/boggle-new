@@ -30,7 +30,7 @@ const ScoreCounter: React.FC<{ target: number; className?: string }> = ({ target
 
 // Winner data - includes username, score, and optional avatar
 interface WinnerData {
-  username: string;
+  username: string | undefined;
   score: number;
   avatar?: {
     emoji?: string;

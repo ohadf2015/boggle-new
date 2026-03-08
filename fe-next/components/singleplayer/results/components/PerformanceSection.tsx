@@ -15,7 +15,7 @@ import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
 interface PerformanceSectionProps {
   insights: PlayerInsightsType;
-  title: string;
+  title?: string;
   /** Optional player archetype to display */
   archetype?: PlayerArchetype | null;
 }

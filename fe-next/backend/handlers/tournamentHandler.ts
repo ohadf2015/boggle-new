@@ -29,7 +29,7 @@ import {
   deleteTournament
 } from '../modules/tournamentManager.js';
 import logger from '../utils/logger.js';
-import { startGameTimer } from './';
+import { startGameTimer } from './shared';
 
 // Types for payloads
 interface CreateTournamentPayload {
