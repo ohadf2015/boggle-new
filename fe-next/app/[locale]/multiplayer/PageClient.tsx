@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import type { Socket } from 'socket.io-client';
 import { useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
@@ -57,6 +56,29 @@ function sanitizeAvatarColor(
   }
 
   return DEFAULT_AVATAR_COLOR;
+}
+
+/**
+ * Builds an avatar object from profile data or guest fallbacks.
+ */
+function buildAvatar(
+  profile: { avatar_emoji?: string; avatar_color?: string; avatar_image?: string } | null,
+  fallbackAvatar: { emoji: string; color: string },
+  avatarImageId: string | null
+): { emoji?: string; color: string; avatarImage?: string } {
+  const effectiveAvatarImage = avatarImageId || profile?.avatar_image;
+  if (profile) {
+    return {
+      emoji: profile.avatar_emoji,
+      color: sanitizeAvatarColor(profile.avatar_color, effectiveAvatarImage),
+      avatarImage: effectiveAvatarImage,
+    };
+  }
+  return {
+    ...fallbackAvatar,
+    color: sanitizeAvatarColor(fallbackAvatar.color, avatarImageId),
+    avatarImage: avatarImageId || undefined,
+  };
 }
 
 // Dynamic imports for code splitting
@@ -197,10 +219,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     gameDuration,
     handleShowResults,
     handleReturnToRoom,
-    handleUpgradeToPlayer: baseHandleUpgradeToPlayer,
+    handleUpgradeToPlayer,
   } = useMultiplayerGameFlow({
-    isActive,
-    showResults: false,
     socket: null, // Will be set by socket hook
     gameCode,
     isAuthenticated,
@@ -435,7 +455,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       return;
     } else if (!isActive) {
       playTrack(TRACKS.LOBBY);
-    } else if (isActive) {
+    } else {
       playTrack(TRACKS.BEFORE_GAME);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -533,19 +553,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       }
 
       const avatarImageId = getStoredAvatarId();
-      const effectiveAvatarImage = avatarImageId || profile?.avatar_image;
       const fallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername);
-      const effectiveAvatar = profile
-        ? {
-            emoji: profile.avatar_emoji,
-            color: sanitizeAvatarColor(profile.avatar_color, effectiveAvatarImage),
-            avatarImage: effectiveAvatarImage,
-          }
-        : {
-            ...fallbackAvatar,
-            color: sanitizeAvatarColor(fallbackAvatar.color, avatarImageId),
-            avatarImage: avatarImageId || undefined,
-          };
+      const effectiveAvatar = buildAvatar(profile, fallbackAvatar, avatarImageId);
 
       setError('');
       setIsJoining(true);
@@ -603,20 +612,9 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           overrideRoomName || roomName || `${finalHostUsername} Room`
         );
 
-        const hostAvatarImage = avatarImageId || profile?.avatar_image;
         const hostFallbackAvatar =
           generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername);
-        const hostAvatar = profile
-          ? {
-              emoji: profile.avatar_emoji,
-              color: sanitizeAvatarColor(profile.avatar_color, hostAvatarImage),
-              avatarImage: hostAvatarImage,
-            }
-          : {
-              ...hostFallbackAvatar,
-              color: sanitizeAvatarColor(hostFallbackAvatar.color, avatarImageId),
-              avatarImage: avatarImageId || undefined,
-            };
+        const hostAvatar = buildAvatar(profile, hostFallbackAvatar, avatarImageId);
 
         const createGamePayload = {
           gameCode: codeToUse,
@@ -674,9 +672,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     ]
   );
 
-  const handleUpgradeToPlayer = useCallback(() => {
-    baseHandleUpgradeToPlayer(username);
-  }, [baseHandleUpgradeToPlayer, username]);
 
   const handleManualReconnect = useCallback(() => {
     if (socket && !socket.connected) {
@@ -711,13 +706,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             playerCount={resultsData?.playerCount}
             isHost={isHost}
             roomLanguage={roomLanguage ?? undefined}
-            gridSize={
-              resultsData?.letterGrid &&
-              Array.isArray(resultsData.letterGrid) &&
-              resultsData.letterGrid.length > 0
-                ? resultsData.letterGrid.length
-                : 4
-            }
+            gridSize={Array.isArray(resultsData?.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4}
             gameDuration={gameDuration}
             seriesStandings={seriesTracker.standings}
             seriesRoundNumber={seriesTracker.roundNumber}

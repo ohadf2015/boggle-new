@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 3762,
+    "totalKeysInCode": 3364,
     "keyCountByLanguage": {
-      "en": 5600,
-      "he": 5629,
-      "sv": 5662,
-      "ja": 5649,
+      "en": 5619,
+      "he": 5648,
+      "sv": 5681,
+      "ja": 5668,
       "es": 5660
     },
     "missingFromEnglish": 0,
@@ -13,7 +13,7 @@
     "runtimeRisks": {
       "templateLiterals": 6,
       "fallbackUsages": 0,
-      "variableKeys": 11
+      "variableKeys": 9
     }
   },
   "runtimeRisks": {
@@ -36,7 +36,7 @@
         "pattern": "achievements.${achievement.key}.description",
         "file": "components/achievements/AchievementPopup.tsx",
         "line": 91,
-        "context": "description: t(`achievements.${achievement.key}.description`) || ''",
+        "context": "description: t(`achievements.${achievement.key}.description`)",
         "type": "template_literal"
       },
       {
@@ -116,7 +116,7 @@
         "variable": "mechanicDescKey",
         "file": "components/adventure/themed/ModifierBadge.tsx",
         "line": 86,
-        "context": "{t(mechanicDescKey) || ''}",
+        "context": "{t(mechanicDescKey)}",
         "type": "variable_key"
       },
       {
@@ -134,22 +134,6 @@
         "line": 42,
         "context": "{t(titleKey)}",
         "type": "variable_key"
-      },
-      {
-        "pattern": "t(fallbackKey)",
-        "variable": "fallbackKey",
-        "file": "utils/errorMessageMap.ts",
-        "line": 148,
-        "context": "return t(fallbackKey);",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(fallbackKey)",
-        "variable": "fallbackKey",
-        "file": "utils/errorMessageMap.ts",
-        "line": 171,
-        "context": "return t(fallbackKey);",
-        "type": "variable_key"
       }
     ]
   },
@@ -165,7 +149,27 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [
+      "multiplayerFlow.roomList.createRoom",
+      "multiplayerFlow.roomList.noRoomsAvailable",
+      "multiplayerFlow.roomList.joinRoomAction",
+      "multiplayerFlow.roomList.availableRooms",
+      "multiplayerFlow.roomList.roomsListLabel",
+      "multiplayerFlow.createModal.languageLabel",
+      "multiplayerFlow.createModal.gameModeLabel",
+      "multiplayerFlow.createModal.wordDifficultyLabel",
+      "multiplayerFlow.joinForm.gameCodeLabel",
+      "multiplayerFlow.joinForm.gameCodePlaceholder",
+      "multiplayerFlow.joinForm.gameCodeHelp",
+      "multiplayerFlow.joinForm.pasteButton",
+      "multiplayerFlow.errors.roomFull",
+      "multiplayerFlow.errors.roomClosed",
+      "multiplayerFlow.errors.invalidCode",
+      "multiplayerFlow.errors.connectionLost",
+      "multiplayerFlow.errors.hostLeft",
+      "multiplayerFlow.errors.invalidUsername",
+      "multiplayerFlow.errors.serverError"
+    ]
   },
   "keysNotInEnglish": {
     "he": [

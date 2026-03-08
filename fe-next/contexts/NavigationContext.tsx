@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, type ReactNode } from 'react';
 
 /**
  * Navigation Context
@@ -29,20 +29,12 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const [isInGame, setIsInGame] = useState(false);
   const [activeTab, setActiveTab] = useState<'home' | 'brain' | 'profile'>('home');
 
-  const handleSetIsInGame = useCallback((value: boolean) => {
-    setIsInGame(value);
-  }, []);
-
-  const handleSetActiveTab = useCallback((tab: 'home' | 'brain' | 'profile') => {
-    setActiveTab(tab);
-  }, []);
-
   const value = useMemo(() => ({
     isInGame,
-    setIsInGame: handleSetIsInGame,
+    setIsInGame,
     activeTab,
-    setActiveTab: handleSetActiveTab,
-  }), [isInGame, handleSetIsInGame, activeTab, handleSetActiveTab]);
+    setActiveTab,
+  }), [isInGame, activeTab]);
 
   return (
     <NavigationContext.Provider value={value}>

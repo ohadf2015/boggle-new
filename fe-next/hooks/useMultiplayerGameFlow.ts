@@ -34,8 +34,6 @@ interface GameStartData {
 }
 
 interface UseMultiplayerGameFlowOptions {
-  isActive: boolean;
-  showResults: boolean;
   socket: Socket | null;
   gameCode: string;
   isAuthenticated: boolean;
@@ -58,7 +56,7 @@ interface UseMultiplayerGameFlowReturn {
   gameDuration: number;
   handleShowResults: (data: unknown) => void;
   handleReturnToRoom: () => void;
-  handleUpgradeToPlayer: (username: string) => void;
+  handleUpgradeToPlayer: () => void;
 }
 
 /**
@@ -68,8 +66,6 @@ export function useMultiplayerGameFlow(
   options: UseMultiplayerGameFlowOptions
 ): UseMultiplayerGameFlowReturn {
   const {
-    isActive,
-    showResults: externalShowResults,
     socket,
     gameCode,
     isAuthenticated,
@@ -130,16 +126,13 @@ export function useMultiplayerGameFlow(
     gameDurationRef.current = null;
   }, [socket, gameCode]);
 
-  const handleUpgradeToPlayer = useCallback(
-    (username: string) => {
-      if (!socket || !gameCode) {
-        return;
-      }
+  const handleUpgradeToPlayer = useCallback(() => {
+    if (!socket || !gameCode) {
+      return;
+    }
 
-      socket.emit('upgradeToPlayer', { gameCode });
-    },
-    [socket, gameCode]
-  );
+    socket.emit('upgradeToPlayer', { gameCode });
+  }, [socket, gameCode]);
 
   return {
     showResults,
