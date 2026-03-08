@@ -218,6 +218,8 @@ function resetGameForNewRound(gameCode: string): boolean {
   game.letterGrid = null;
   game.lastActivity = Date.now();
   game.gameEndedAt = null;
+  (game as any).wordHuntState = null;
+  (game as any).blastModeState = null;
   game.gameSessionId = (game.gameSessionId || 0) + 1;
 
   persistGameState(gameCode);
@@ -415,8 +417,12 @@ const getGameSpectators = (gameCode: string) =>
   spectatorManager.getGameSpectators(asBase<SpectatorGameBase>(games[gameCode]));
 
 function upgradeSpectatorToPlayer(gameCode: string, username: string): boolean {
+  const game = games[gameCode];
+  if (game && game.gameState !== 'waiting') {
+    return false;
+  }
   const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
-  const result = spectatorManager.upgradeSpectatorToPlayer(asBase<SpectatorGameBase>(games[gameCode]), username, MAX_PLAYERS_PER_ROOM);
+  const result = spectatorManager.upgradeSpectatorToPlayer(asBase<SpectatorGameBase>(game), username, MAX_PLAYERS_PER_ROOM);
   if (result) persistGameState(gameCode);
   return result;
 }
