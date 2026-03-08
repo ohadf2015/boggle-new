@@ -7,6 +7,7 @@
  */
 
 import path from 'path';
+import fs from 'fs';
 import os from 'os';
 import { createWorker, WorkerLike, isBun } from './workerRuntime';
 
@@ -79,6 +80,13 @@ export class WordValidatorPool {
   private async _initWorkers(): Promise<void> {
     // Worker file must be JavaScript as worker_threads don't support TypeScript directly
     const workerPath = path.join(__dirname, 'wordValidatorWorker.mjs');
+
+    // Skip worker creation if the worker file doesn't exist (uses sync fallback)
+    if (!fs.existsSync(workerPath)) {
+      console.log('[WORKER POOL] Worker file not found, using synchronous validation');
+      return;
+    }
+
     const runtime = isBun ? 'Bun' : 'Node.js';
     console.log(`[WORKER POOL] Initializing with ${runtime} runtime...`);
 

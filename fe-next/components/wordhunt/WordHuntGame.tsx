@@ -120,9 +120,9 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     // Add to local found words
     onWordSubmit(word);
 
-    // If word length matches target and target not found, also submit as target guess
-    const isTargetGuess = word.length === bridge.targetLength && !bridge.targetFound;
-    if (isTargetGuess) {
+    // Submit all words as target guesses (server handles different-length words
+    // as discovery feedback without life penalty, mirroring SP behavior)
+    if (!bridge.targetFound) {
       onWordHuntGuess(word);
     }
 
@@ -170,6 +170,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       isGameOver={bridge.isGameOver}
       isLifeGaining={false}
       lifeGainAmount={null}
+      isClueGaining={bridge.isClueGaining}
 
       // Grid
       grid={grid}

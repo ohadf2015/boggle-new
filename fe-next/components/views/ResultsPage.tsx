@@ -34,6 +34,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed } from '@/hooks/gameState/store';
+const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, wordHuntSummary }) => {
   const { t } = useLanguage();
@@ -355,14 +356,38 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     seriesRoundNumber,
   };
 
+  // Word Hunt results data (shared between tabs)
+  const wordHuntResultsData = resolvedGameMode === 'word-hunt' ? {
+    targetWord: wordHuntSummary?.targetWord || '',
+    foundTarget: !!wordHuntSummary?.targetFoundBy,
+    isFirstFinder: wordHuntSummary?.targetFoundBy === username,
+    survivalTime: 0,
+    discoveryWords: 0,
+    playerResults: (sortedScores || []).map((p) => ({
+      username: p.username,
+      score: p.score || 0,
+      survived: !(wordHuntSummary?.eliminatedPlayers || wordHuntEliminatedPlayers).includes(p.username),
+      lifeRemaining: (wordHuntSummary?.playerLives || wordHuntPlayerLives)[p.username] ?? 0,
+    })),
+    currentUsername: username,
+  } : undefined;
+
   // Render Results Tab Content using shared component
   const renderResultsTab = () => (
-    <ResultsMainContent
-      {...mainContentProps}
-      onShowDetails={() => setMobileActiveTab('details')}
-      showBanner={true}
-      bannerSize="320x50"
-    />
+    <>
+      {/* Word Hunt summary at top of results tab for immediate visibility */}
+      {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
+        <div className="mb-3">
+          <WordHuntResultsSummary {...wordHuntResultsData} />
+        </div>
+      )}
+      <ResultsMainContent
+        {...mainContentProps}
+        onShowDetails={() => setMobileActiveTab('details')}
+        showBanner={true}
+        bannerSize="320x50"
+      />
+    </>
   );
 
   // Shared props for details content component
@@ -399,21 +424,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         tileBonus: 0,
       },
     } : {}),
-    ...(resolvedGameMode === 'word-hunt' ? {
-      wordHuntResults: {
-        targetWord: wordHuntSummary?.targetWord || '',
-        foundTarget: !!wordHuntSummary?.targetFoundBy,
-        isFirstFinder: wordHuntSummary?.targetFoundBy === username,
-        survivalTime: 0,
-        discoveryWords: 0,
-        playerResults: sortedScores.map((p) => ({
-          username: p.username,
-          score: p.score || 0,
-          survived: !(wordHuntSummary?.eliminatedPlayers || wordHuntEliminatedPlayers).includes(p.username),
-          lifeRemaining: (wordHuntSummary?.playerLives || wordHuntPlayerLives)[p.username] ?? 0,
-        })),
-        currentUsername: username,
-      },
+    ...(resolvedGameMode === 'word-hunt' && wordHuntResultsData ? {
+      wordHuntResults: wordHuntResultsData,
     } : {}),
   };
 

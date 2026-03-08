@@ -161,7 +161,7 @@ describe('WordHuntGame', () => {
       expect(defaultProps.onWordHuntGuess).toHaveBeenCalledWith('HELLO');
     });
 
-    it('should NOT call onWordHuntGuess when word length does not match target', () => {
+    it('should call onWordHuntGuess even when word length does not match target (discovery feedback)', () => {
       mockBridgeReturn.targetLength = 5;
 
       render(<WordHuntGame {...defaultProps} />);
@@ -172,7 +172,7 @@ describe('WordHuntGame', () => {
       });
 
       expect(defaultProps.onWordSubmit).toHaveBeenCalledWith('CAT');
-      expect(defaultProps.onWordHuntGuess).not.toHaveBeenCalled();
+      expect(defaultProps.onWordHuntGuess).toHaveBeenCalledWith('CAT');
     });
 
     it('should NOT call onWordHuntGuess when target is already found', () => {

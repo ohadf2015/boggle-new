@@ -106,7 +106,7 @@ interface GameState {
   wordHuntTargetLength: number;
   wordHuntMyLife: number;
   wordHuntPlayerLives: Record<string, number>;
-  wordHuntTargetAttempts: Array<{ guess: string; feedback: LetterFeedback[] }>;
+  wordHuntTargetAttempts: Array<{ guess: string; feedback: LetterFeedback[]; isDiscovery?: boolean }>;
   wordHuntTargetFound: boolean;
   wordHuntEliminatedPlayers: string[];
   wordHuntDiscoveryClues: Array<{ position: number; letter: string }>;

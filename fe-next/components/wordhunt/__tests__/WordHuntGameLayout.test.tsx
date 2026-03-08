@@ -84,6 +84,9 @@ describe('WordHuntGameLayout', () => {
     leaderboard: [],
     currentUsername: 'testuser',
 
+    // Clue animation
+    isClueGaining: false,
+
     // Common
     t: (key: string) => key,
     gameDir: 'ltr' as const,

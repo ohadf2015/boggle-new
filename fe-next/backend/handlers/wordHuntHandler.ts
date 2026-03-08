@@ -18,6 +18,7 @@ import {
   broadcastToRoom,
   getGameRoom,
 } from '../utils/socketHelpers.js';
+import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 
@@ -26,10 +27,16 @@ interface SubmitTargetWordPayload {
 }
 
 const MAX_GUESS_LENGTH = 50;
+/** Delay before ending game after target found, allows celebration UI */
+const TARGET_FOUND_END_DELAY_MS = 3000;
 
 /**
  * Handle a target word guess submission.
  * Exported for direct use in tests and socket registration.
+ *
+ * Different-length guesses are treated as "discovery" feedback:
+ * they return letter feedback for display but don't penalize life,
+ * mirroring the SP survival mode behavior.
  */
 export function handleSubmitTargetWord(
   io: Server,
@@ -84,7 +91,10 @@ export function handleSubmitTargetWord(
 
   // Generate Wordle-style feedback
   const feedback = validateTargetGuess(huntState.targetWord, guess);
-  const isCorrect = feedback.every((f) => f === 'correct');
+
+  // Different-length guesses are discovery feedback only (no penalty, can't be correct)
+  const isDiscovery = guess.length !== huntState.targetWord.length;
+  const isCorrect = !isDiscovery && feedback.every((f) => f === 'correct');
 
   if (isCorrect) {
     // Target found
@@ -97,6 +107,7 @@ export function handleSubmitTargetWord(
       isFirstFinder: result.isFirstFinder,
       bonus: result.bonus,
       livesRemaining: huntState.playerLives[username] || 0,
+      isDiscovery: false,
     });
 
     broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntTargetFound', {
@@ -106,8 +117,28 @@ export function handleSubmitTargetWord(
     });
 
     logger.info('WORD_HUNT', `${username} found target word "${huntState.targetWord}" in ${gameCode} (first: ${result.isFirstFinder})`);
+
+    // End game after a short delay to allow celebration UI
+    setTimeout(() => {
+      const currentGame = getGame(gameCode);
+      if (currentGame && currentGame.gameState === 'in-progress') {
+        logger.info('WORD_HUNT', `Ending game ${gameCode} after target word found`);
+        endGame(io, gameCode);
+      }
+    }, TARGET_FOUND_END_DELAY_MS);
+  } else if (isDiscovery) {
+    // Discovery feedback: show letter matches without life penalty
+    socket.emit('wordHuntTargetResult', {
+      guess,
+      feedback,
+      correct: false,
+      isFirstFinder: false,
+      bonus: 0,
+      livesRemaining: huntState.playerLives[username] || 0,
+      isDiscovery: true,
+    });
   } else {
-    // Wrong guess - penalize
+    // Wrong same-length guess - penalize
     const penalty = penalizeWrongGuess(huntState, username);
 
     socket.emit('wordHuntTargetResult', {
@@ -117,6 +148,7 @@ export function handleSubmitTargetWord(
       isFirstFinder: false,
       bonus: 0,
       livesRemaining: penalty.livesRemaining,
+      isDiscovery: false,
     });
 
     if (penalty.eliminated) {

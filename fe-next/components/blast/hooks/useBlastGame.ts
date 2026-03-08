@@ -747,8 +747,10 @@ export function useBlastGame(
       // Also handles gem-completion (bonus + spawn trigger) so all clear paths
       // — direct word submission AND area damage — award the gem reward.
       const markCleared = (t: BlastTileState) => {
+        // Prevent double-counting tiles already cleared by another effect
+        if (t.isCleared) return;
         // Gem on final hit: award completion bonus + trigger special spawns
-        if (t.type === 'gem' && !t.isCleared) {
+        if (t.type === 'gem') {
           t.activationEffect = 'gem-complete';
           bonusScore += TREASURE_GEM_COMPLETION_BONUS;
           gemsCompletedThisWord++;

@@ -33,6 +33,9 @@ export interface WordHuntGameLayoutProps {
   isLifeGaining: boolean;
   lifeGainAmount: number | null;
 
+  // Clue animation
+  isClueGaining: boolean;
+
   // Grid
   grid: LetterGrid;
   onWordSubmit: (word: string) => void;
@@ -76,6 +79,9 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   isLifeGaining,
   lifeGainAmount,
 
+  // Clue animation
+  isClueGaining,
+
   // Grid
   grid,
   onWordSubmit,
@@ -118,7 +124,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           knownLetters={knownLetters}
           latestAttemptFeedback={latestAttemptFeedback}
           showFeedbackOverlay={showFeedbackOverlay}
-          isClueGaining={false}
+          isClueGaining={isClueGaining}
           skipAnimations={false}
           gameDir={gameDir}
           t={t}

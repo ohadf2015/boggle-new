@@ -39,7 +39,7 @@ function convertFeedback(mp: MPLetterFeedback): SPLetterFeedback['feedback'] {
 
 /** Convert an MP attempt to SP TargetAttempt format */
 function convertAttempt(
-  attempt: { guess: string; feedback: MPLetterFeedback[] }
+  attempt: { guess: string; feedback: MPLetterFeedback[]; isDiscovery?: boolean }
 ): TargetAttempt {
   const feedback: SPLetterFeedback[] = attempt.feedback.map((fb, i) => ({
     letter: attempt.guess[i] || '?',
@@ -51,6 +51,7 @@ function convertAttempt(
     word: attempt.guess,
     feedback,
     timestamp: Date.now(),
+    isDiscovery: attempt.isDiscovery,
   };
 }
 
@@ -68,6 +69,7 @@ export interface WordHuntMultiplayerBridgeResult {
   latestAttemptFeedback: SPLetterFeedback[] | null;
   wrongGuessShake: boolean;
   isGameOver: boolean;
+  isClueGaining: boolean;
 }
 
 export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult {
@@ -171,6 +173,21 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     return undefined;
   }, [targetAttempts.length, targetFound]);
 
+  // Clue gain animation - triggers when discovery clues arrive
+  const [isClueGaining, setIsClueGaining] = useState(false);
+  const prevDiscoveryCluesLengthRef = useRef(discoveryClues.length);
+
+  useEffect(() => {
+    if (discoveryClues.length > prevDiscoveryCluesLengthRef.current) {
+      setIsClueGaining(true);
+      const timer = setTimeout(() => setIsClueGaining(false), 800);
+      prevDiscoveryCluesLengthRef.current = discoveryClues.length;
+      return () => clearTimeout(timer);
+    }
+    prevDiscoveryCluesLengthRef.current = discoveryClues.length;
+    return undefined;
+  }, [discoveryClues.length]);
+
   const isGameOver = myLife <= 0 || targetFound;
 
   return {
@@ -187,5 +204,6 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     latestAttemptFeedback,
     wrongGuessShake,
     isGameOver,
+    isClueGaining,
   };
 }

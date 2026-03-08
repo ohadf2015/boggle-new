@@ -447,9 +447,9 @@ export function usePlayerGameEvents({
       }
     };
 
-    const handleWordHuntTargetResult = (data: { guess: string; feedback: any[]; correct: boolean; isFirstFinder: boolean; bonus: number; livesRemaining: number }) => {
+    const handleWordHuntTargetResult = (data: { guess: string; feedback: any[]; correct: boolean; isFirstFinder: boolean; bonus: number; livesRemaining: number; isDiscovery?: boolean }) => {
       logger.log('[PLAYER] Word hunt target result:', data);
-      setWordHuntTargetAttempts((prev) => [...prev, { guess: data.guess, feedback: data.feedback }]);
+      setWordHuntTargetAttempts((prev) => [...prev, { guess: data.guess, feedback: data.feedback, isDiscovery: data.isDiscovery || false }]);
       setWordHuntMyLife(data.livesRemaining);
       if (data.correct) {
         setWordHuntTargetFound(true);

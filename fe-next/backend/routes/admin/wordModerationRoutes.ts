@@ -862,14 +862,13 @@ router.post('/invalid-words/dismiss', async (req: AdminRequest, res: Response): 
   const normalizedWord = (word as string).toLowerCase().trim();
 
   try {
-    // Mark as dismissed by setting approved_at with a special marker
+    // Mark as dismissed by setting approved_at (reason column has a check constraint,
+    // so we don't modify it — non-null approved_at is sufficient to indicate review)
     const { error } = await supabase
       .from('invalid_word_submissions')
       .update({
         approved_at: new Date().toISOString(),
         approved_by: req.adminUser!.id,
-        // We'll use the reason field to track this is a dismissal
-        reason: `dismissed:${reason || 'admin_review'}`,
       })
       .eq('word', normalizedWord)
       .eq('language', language);

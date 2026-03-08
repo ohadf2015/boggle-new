@@ -112,12 +112,14 @@ console.log('✓ dist/server.cjs built');
 const distDir = join(root, 'dist');
 mkdirSync(distDir, { recursive: true });
 
-// Copy wordValidatorWorker.mjs directly into dist/
-// (wordValidatorPool.ts uses path.join(__dirname, 'wordValidatorWorker.mjs')
-// and __dirname resolves to dist/ in the CJS bundle)
+// Copy wordValidatorWorker.mjs if it exists (optional worker thread acceleration)
 const workerSrc = join(root, 'backend', 'modules', 'wordValidatorWorker.mjs');
-copyFileSync(workerSrc, join(distDir, 'wordValidatorWorker.mjs'));
-console.log('✓ Copied wordValidatorWorker.mjs to dist/');
+try {
+  copyFileSync(workerSrc, join(distDir, 'wordValidatorWorker.mjs'));
+  console.log('✓ Copied wordValidatorWorker.mjs to dist/');
+} catch {
+  console.log('ℹ wordValidatorWorker.mjs not found, pool will use sync fallback');
+}
 
 // Copy all backend/*.txt dictionary files directly into dist/
 // (esbuild CJS __dirname resolves to dist/ at runtime, and dictionary.ts
