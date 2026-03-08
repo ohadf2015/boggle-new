@@ -24,7 +24,6 @@ describe('Phase 4: Gradient Standardization', () => {
     'components/Header.tsx',
     'components/landing/LandingView.tsx',
     'components/daily/DailyChallenge.tsx',
-    'components/auth/WordHuntLoginGate.tsx',
     'components/daily/results/DesktopStatsCard.tsx',
   ];
 

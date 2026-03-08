@@ -30,6 +30,10 @@ jest.mock('../../../backend/utils/rateLimiter', () => ({
   checkRateLimit: jest.fn().mockReturnValue(true),
 }));
 
+jest.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
+  endGame: jest.fn(),
+}));
+
 jest.mock('../../../backend/utils/logger', () => {
   const loggerMock = {
     info: jest.fn(),
