@@ -149,7 +149,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
         className="fixed inset-0 z-[100] flex items-center justify-center"
         role="dialog"
         aria-modal="true"
-        aria-label={t('tvTutorial.ariaLabel') || 'TV Mode Tutorial'}
+        aria-label={t('tvTutorial.ariaLabel')}
       >
         {/* Dark overlay */}
         <div className="absolute inset-0 bg-neo-black/90" />
@@ -166,7 +166,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
           <button
             onClick={handleSkip}
             className="absolute top-3 right-3 p-2 text-neo-black/60 hover:text-neo-black hover:bg-neo-black/10 rounded-neo transition-colors"
-            aria-label={t('common.skip') || 'Skip'}
+            aria-label={t('common.skip')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -234,14 +234,14 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
                   className="flex-1 py-3 border-2 border-neo-black bg-neo-cream hover:bg-neo-black/10 text-neo-black font-bold"
                 >
                   <ChevronLeft className="w-5 h-5 me-1 rtl:rotate-180" />
-                  {t('common.previous') || 'Back'}
+                  {t('common.previous')}
                 </Button>
               )}
               <Button
                 onClick={handleNext}
                 className={`${isFirstStep ? 'w-full' : 'flex-1'} py-3 bg-neo-purple hover:bg-neo-purple/90 text-neo-cream font-bold border-2 border-neo-black shadow-hard-sm`}
               >
-                {isLastStep ? (t('tvTutorial.letsGo') || "Let's Go!") : (t('common.next') || 'Next')}
+                {isLastStep ? (t('tvTutorial.letsGo')) : (t('common.next'))}
                 {!isLastStep && <ChevronRight className="w-5 h-5 ms-1 rtl:rotate-180" />}
               </Button>
             </div>
@@ -286,8 +286,8 @@ export const TvHelpButton: React.FC<{
     whileTap={{ scale: 0.95 }}
     onClick={onClick}
     className="p-2 bg-neo-black/60 hover:bg-neo-black/80 text-neo-cream rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
-    title={t('tvTutorial.help') || 'Show Tutorial'}
-    aria-label={t('tvTutorial.help') || 'Show Tutorial'}
+    title={t('tvTutorial.help')}
+    aria-label={t('tvTutorial.help')}
   >
     <HelpCircle className="w-5 h-5" />
   </motion.button>

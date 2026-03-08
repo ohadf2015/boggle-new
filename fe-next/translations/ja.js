@@ -685,8 +685,8 @@ const ja = {
     ]
   },
   "multiplayerFlow": {
-    "roomClosed": "Room closed",
-    "rateLimited": "Slow down!",
+    "roomClosed": "ルームが閉鎖されました",
+    "rateLimited": "落ち着いて！",
     "roomList": {
       "activeRooms": "飛び込め！",
       "online": "バトル中",
@@ -708,7 +708,12 @@ const ja = {
       "beTheLegend": "最初のバトルを始める伝説になろう！",
       "hostAndPlay": "ホスト＆プレイ — コードを友達とシェア",
       "startBattle": "バトルを始める",
-      "inProgress": "進行中"
+      "inProgress": "進行中",
+      "createRoom": "+ ルーム作成",
+      "noRoomsAvailable": "アクティブなルームがありません。ホストしよう！",
+      "joinRoomAction": "{{roomName}}に参加",
+      "availableRooms": "利用可能なルーム",
+      "roomsListLabel": "利用可能なゲームルームの一覧"
     },
     "joinModal": {
       "title": "バトルに参戦",
@@ -724,7 +729,10 @@ const ja = {
       "roomNameLabel": "ルーム名",
       "optional": "任意",
       "createButton": "バトル開始！",
-      "creating": "アリーナ準備中..."
+      "creating": "アリーナ準備中...",
+      "languageLabel": "ゲーム言語",
+      "gameModeLabel": "ゲームモード",
+      "wordDifficultyLabel": "単語の難易度"
     },
     "profileSetup": {
       "title": "準備OK？",
@@ -765,7 +773,20 @@ const ja = {
       "refreshButton": "更新",
       "noRooms": "ルームなし。コードある？",
       "joinButton": "飛び込む！",
-      "joining": "転送中..."
+      "joining": "転送中...",
+      "gameCodeLabel": "ゲームコード",
+      "gameCodePlaceholder": "6文字のコードを入力",
+      "gameCodeHelp": "ホストが共有した6文字のコードを入力してください",
+      "pasteButton": "コードを貼り付け"
+    },
+    "errors": {
+      "roomFull": "このルームは満員です。別のルームを試すか、自分で作成してください。",
+      "roomClosed": "このルームは終了しました。ロビーに戻って別のゲームを探してください。",
+      "invalidCode": "無効なコードまたはルームが閉鎖されています。コードを確認して再試行してください。",
+      "connectionLost": "接続が切断されました。再接続中...",
+      "hostLeft": "ホストがゲームを離れました。ロビーに戻ります...",
+      "invalidUsername": "ユーザー名は2〜20文字にしてください。",
+      "serverError": "サーバーエラー。もう一度お試しください。"
     }
   },
   "hostView": {

@@ -242,7 +242,7 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 0.6, repeat: Infinity }}
-              className="ml-auto"
+              className="ms-auto"
             >
               <Loader size="sm" />
             </motion.div>
@@ -306,7 +306,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions = {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
-              className="text-xl ml-auto"
+              className="text-xl ms-auto"
             >
               ✗
             </motion.span>

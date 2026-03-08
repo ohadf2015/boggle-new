@@ -95,13 +95,13 @@ export default function ContactPageClient(): React.JSX.Element {
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-            {t('common.back') || 'Back'}
+            {t('common.back')}
           </Button>
           <h1 className={cn(
             'text-2xl font-black uppercase',
             isDarkMode ? 'text-white' : 'text-neo-black'
           )}>
-            {t('contact.title') || 'Contact Us'}
+            {t('contact.title')}
           </h1>
         </motion.div>
 
@@ -118,7 +118,7 @@ export default function ContactPageClient(): React.JSX.Element {
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
             <MessageSquare className="w-4 h-4" />
-            {t('contact.connectWithUs') || 'Connect With Us'}
+            {t('contact.connectWithUs')}
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {/* Instagram */}
@@ -166,7 +166,7 @@ export default function ContactPageClient(): React.JSX.Element {
               </div>
               <div>
                 <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  {t('contact.emailLabel') || 'Email'}
+                  {t('contact.emailLabel')}
                 </p>
                 <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                   lexiclash.game@gmail.com
@@ -187,7 +187,7 @@ export default function ContactPageClient(): React.JSX.Element {
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
             <Send className="w-4 h-4" />
-            {t('contact.sendMessage') || 'Send a Message'}
+            {t('contact.sendMessage')}
           </h2>
 
           {status === 'success' ? (
@@ -201,16 +201,16 @@ export default function ContactPageClient(): React.JSX.Element {
             >
               <CheckCircle className="w-12 h-12 mx-auto mb-3 text-neo-lime" />
               <h3 className={cn('text-lg font-bold mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('contact.successTitle') || 'Message Sent!'}
+                {t('contact.successTitle')}
               </h3>
               <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                {t('contact.successMessage') || "Thanks for reaching out! We'll get back to you soon."}
+                {t('contact.successMessage')}
               </p>
               <Button
                 onClick={() => setStatus('idle')}
                 className="mt-4 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg"
               >
-                {t('contact.sendAnother') || 'Send Another Message'}
+                {t('contact.sendAnother')}
               </Button>
             </motion.div>
           ) : (
@@ -222,7 +222,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
                 >
                   <User className="w-4 h-4" />
-                  {t('contact.nameLabel') || 'Name'}
+                  {t('contact.nameLabel')}
                   <span className="text-neo-red">*</span>
                 </label>
                 <Input
@@ -231,7 +231,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder={t('contact.namePlaceholder') || 'Your name'}
+                  placeholder={t('contact.namePlaceholder')}
                   required
                   disabled={status === 'submitting'}
                 />
@@ -244,7 +244,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
                 >
                   <Mail className="w-4 h-4" />
-                  {t('contact.emailLabel') || 'Email'}
+                  {t('contact.emailLabel')}
                   <span className="text-neo-red">*</span>
                 </label>
                 <Input
@@ -253,7 +253,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder={t('contact.emailPlaceholder') || 'your@email.com'}
+                  placeholder={t('contact.emailPlaceholder')}
                   required
                   disabled={status === 'submitting'}
                 />
@@ -266,7 +266,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
                 >
                   <MessageSquare className="w-4 h-4" />
-                  {t('contact.messageLabel') || 'Message'}
+                  {t('contact.messageLabel')}
                   <span className="text-neo-red">*</span>
                 </label>
                 <textarea
@@ -274,7 +274,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder={t('contact.messagePlaceholder') || 'Tell us what you think...'}
+                  placeholder={t('contact.messagePlaceholder')}
                   required
                   disabled={status === 'submitting'}
                   rows={5}
@@ -300,7 +300,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   className="flex items-center gap-2 p-3 rounded-neo border-2 border-neo-red bg-neo-red/10 text-neo-red"
                 >
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  <p className="text-sm font-medium">{errorMessage || t('contact.errorMessage') || 'Failed to send message. Please try again.'}</p>
+                  <p className="text-sm font-medium">{errorMessage || t('contact.errorMessage')}</p>
                 </motion.div>
               )}
 
@@ -319,12 +319,12 @@ export default function ContactPageClient(): React.JSX.Element {
                 {status === 'submitting' ? (
                   <>
                     <Loader size="sm" />
-                    <span className="ms-2">{t('contact.sending') || 'Sending...'}</span>
+                    <span className="ms-2">{t('contact.sending')}</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-5 h-5 me-2" />
-                    {t('contact.submit') || 'Send Message'}
+                    {t('contact.submit')}
                   </>
                 )}
               </Button>
@@ -344,7 +344,7 @@ export default function ContactPageClient(): React.JSX.Element {
           )}
         >
           <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
-            {t('contact.responseTime') || 'Estimated response time: 1-2 business days'}
+            {t('contact.responseTime')}
           </p>
         </motion.div>
       </div>

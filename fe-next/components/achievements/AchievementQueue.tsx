@@ -95,7 +95,7 @@ const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactEleme
           composition={AchievementCinematic as unknown as React.ComponentType<Record<string, unknown>>}
           compositionProps={{
             achievementName: t(`achievements.${currentAchievement.key}.name`) || currentAchievement.key,
-            description: t(`achievements.${currentAchievement.key}.description`) || '',
+            description: t(`achievements.${currentAchievement.key}.description`),
             icon: getAchievementIcon(currentAchievement.key),
             tier: cinematicTier,
             tierColor: tierColors.bg,
@@ -152,7 +152,7 @@ function AchievementInlineToast({
 
   const icon = getAchievementIcon(achievement.key);
   const name = t(`achievements.${achievement.key}.name`) || achievement.key;
-  const description = t(`achievements.${achievement.key}.description`) || '';
+  const description = t(`achievements.${achievement.key}.description`);
 
   // Auto-dismiss after timeout
   useEffect(() => {
@@ -196,7 +196,7 @@ function AchievementInlineToast({
         {/* Text Content */}
         <div className="flex flex-col flex-1 min-w-0">
           <span className="text-xs font-bold uppercase tracking-wide text-neo-white/70">
-            {t('achievements.unlocked') || 'Achievement Unlocked!'}
+            {t('achievements.unlocked')}
           </span>
           <span
             data-testid="achievement-inline-name"

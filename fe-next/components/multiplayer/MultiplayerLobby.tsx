@@ -309,7 +309,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
               disabled={isJoining}
               className="w-full h-12 font-black uppercase text-base bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
             >
-              {mode === 'host' ? <Crown className="mr-2 w-5 h-5" /> : <User className="mr-2 w-5 h-5" />}
+              {mode === 'host' ? <Crown className="me-2 w-5 h-5" /> : <User className="me-2 w-5 h-5" />}
               {isJoining ? (t('common.loading')) : mode === 'host' ? (t('joinView.createRoom')) : (t('joinView.joinRoom'))}
             </Button>
           </form>
@@ -457,7 +457,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                   size="lg"
                   disabled={isJoining || (mode === 'join' && (isAutoJoining || !gameCode))}
                 >
-                  {mode === 'host' ? <Crown className="mr-2" /> : <User className="mr-2" />}
+                  {mode === 'host' ? <Crown className="me-2" /> : <User className="me-2" />}
                   {mode === 'host'
                     ? (isJoining ? t('joinView.creating') : t('joinView.createRoom'))
                     : (isJoining || isAutoJoining ? t('joinView.joining') : t('joinView.joinGame'))}

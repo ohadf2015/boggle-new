@@ -130,7 +130,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             onClick={handleShare}
             className="bg-neo-white hover:bg-neo-cyan border-neo-thick border-neo-black shadow-hard-sm"
           >
-            <Share2 className="w-4 h-4 mr-2" />
+            <Share2 className="w-4 h-4 me-2" />
             {t('daily.shareButton')}
           </Button>
         </div>

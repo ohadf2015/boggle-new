@@ -37,7 +37,7 @@ export function BulkActions({
         {selectedCount > 0 ? `${selectedCount} selected` : 'Select all'}
       </span>
       {selectedCount > 0 && (
-        <div className="flex gap-2 ml-auto">
+        <div className="flex gap-2 ms-auto">
           <Button
             size="sm"
             variant="ghost"
@@ -49,7 +49,7 @@ export function BulkActions({
               <Loader size="sm" />
             ) : (
               <>
-                <Check className="w-4 h-4 mr-2" /> Approve Selected
+                <Check className="w-4 h-4 me-2" /> Approve Selected
               </>
             )}
           </Button>
@@ -64,7 +64,7 @@ export function BulkActions({
               <Loader size="sm" />
             ) : (
               <>
-                <X className="w-4 h-4 mr-2" /> Reject Selected
+                <X className="w-4 h-4 me-2" /> Reject Selected
               </>
             )}
           </Button>

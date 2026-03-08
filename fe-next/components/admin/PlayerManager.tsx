@@ -233,7 +233,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                         onClick={() => handleOpenGiftDialog(player.id)}
                         className="text-amber-600 border-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                       >
-                        <Gift className="w-4 h-4 mr-1" />
+                        <Gift className="w-4 h-4 me-1" />
                         Gift
                       </Button>
                       <Button
@@ -247,7 +247,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                         }
                         title={player.blast_access ? 'Revoke blast access' : 'Grant blast access'}
                       >
-                        <Bomb className="w-4 h-4 mr-1" />
+                        <Bomb className="w-4 h-4 me-1" />
                         {player.blast_access ? 'Blast ✓' : 'Blast'}
                       </Button>
                     </div>

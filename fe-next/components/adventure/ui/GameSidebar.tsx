@@ -273,11 +273,11 @@ export const GameSidebar = memo(function GameSidebar({
                   {(() => {
                     switch (hintLevel) {
                       case 'fullReveal':
-                        return t('adventure.game.hintFullReveal') || 'Try looking for shorter words first!';
+                        return t('adventure.game.hintFullReveal');
                       case 'lengthAndStart':
-                        return t('adventure.game.hintLengthAndStart') || 'Look for words starting with specific letters!';
+                        return t('adventure.game.hintLengthAndStart');
                       default:
-                        return t('adventure.game.hintGeneral') || 'Keep trying! Look for common patterns.';
+                        return t('adventure.game.hintGeneral');
                     }
                   })()}
                 </p>

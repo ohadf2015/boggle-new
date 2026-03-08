@@ -33,7 +33,7 @@ export function BotWordCard({ bot, language, t }: BotWordCardProps): React.React
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-white/60 font-medium">
-            {bot.totalWords} {t('singlePlayer.botWords') || 'words'}
+            {bot.totalWords} {t('singlePlayer.botWords')}
           </span>
           <span className="text-sm font-black text-neo-lime">{bot.score} pts</span>
         </div>
@@ -62,7 +62,7 @@ export function BotWordCard({ bot, language, t }: BotWordCardProps): React.React
         </div>
       ) : (
         <p className="text-xs text-white/40 italic">
-          {t('singlePlayer.noWordsToShow') || 'Word details not available'}
+          {t('singlePlayer.noWordsToShow')}
         </p>
       )}
     </div>

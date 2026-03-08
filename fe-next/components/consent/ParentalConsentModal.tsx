@@ -328,11 +328,11 @@ export function ParentalConsentModal({
                   </label>
                 </div>
                 {errors.terms ? (
-                  <p id="terms-error" className="text-sm text-neo-red font-medium ml-8" role="alert">
+                  <p id="terms-error" className="text-sm text-neo-red font-medium ms-8" role="alert">
                     {errors.terms}
                   </p>
                 ) : (
-                  <p id="terms-hint" className="text-xs text-neo-gray-500 ml-8">
+                  <p id="terms-hint" className="text-xs text-neo-gray-500 ms-8">
                     {t('consent.agreeTermsHint')}
                   </p>
                 )}

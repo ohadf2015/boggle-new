@@ -530,7 +530,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             onClick={handleNativeShare}
             className="w-full max-w-btn py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
           >
-            <Share2 className="mr-2 w-5 h-5" />
+            <Share2 className="me-2 w-5 h-5" />
             {t('daily.shareScore')}
           </Button>
 
@@ -557,7 +557,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <Button
               onClick={handleGenerateImage}
               disabled={isGeneratingImage}
-              aria-label={t('daily.shareImage') || 'Share as Image'}
+              aria-label={t('daily.shareImage')}
               size="sm"
               className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all disabled:opacity-50"
             >
@@ -598,7 +598,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             className="flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-400 transition-colors mx-auto"
           >
             {showSharePreview ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            {showSharePreview ? t('common.hidePreview') || 'Hide preview' : t('common.showPreview') || 'Show preview'}
+            {showSharePreview ? t('common.hidePreview') : t('common.showPreview')}
           </button>
 
           <AnimatePresence>
@@ -642,7 +642,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             className="pt-4 border-t border-slate-700/50"
           >
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">
-              {t('wordHunt.results.tryAnotherLanguage') || 'Try another language'}
+              {t('wordHunt.results.tryAnotherLanguage')}
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {availableLanguages.map((option) => (
@@ -761,7 +761,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   onClick={handleWhatsApp}
                   className="w-full py-3 bg-brand-whatsapp text-white border-3 border-neo-black rounded-neo"
                 >
-                  <WhatsAppIcon className="mr-2 w-5 h-5" />
+                  <WhatsAppIcon className="me-2 w-5 h-5" />
                   WhatsApp
                 </Button>
 
@@ -769,7 +769,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   onClick={handleTwitter}
                   className="w-full py-3 bg-black text-white border-3 border-gray-700 rounded-neo"
                 >
-                  <XTwitterIcon className="mr-2 w-5 h-5" />
+                  <XTwitterIcon className="me-2 w-5 h-5" />
                   X / Twitter
                 </Button>
 
@@ -779,12 +779,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                 >
                   {copied ? (
                     <>
-                      <Check className="mr-2 w-5 h-5 text-neo-lime" />
+                      <Check className="me-2 w-5 h-5 text-neo-lime" />
                       {t('common.copied')}
                     </>
                   ) : (
                     <>
-                      <Copy className="mr-2 w-5 h-5" />
+                      <Copy className="me-2 w-5 h-5" />
                       {t('daily.copyToClipboard')}
                     </>
                   )}
@@ -826,11 +826,11 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-neo-cyan/10 rounded-full border border-neo-cyan/30 mb-2">
                   <ImageIcon className="w-4 h-4 text-neo-cyan" />
                   <span className="text-xs font-bold text-neo-cyan uppercase tracking-wide">
-                    {t('daily.shareImage') || 'Share Image'}
+                    {t('daily.shareImage')}
                   </span>
                 </div>
                 <p className="text-slate-400 text-sm">
-                  {t('daily.shareImageHint') || 'Share your achievement with friends!'}
+                  {t('daily.shareImageHint')}
                 </p>
               </div>
 
@@ -853,7 +853,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   onClick={handleShareImage}
                   className="w-full py-3.5 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-lg shadow-hard font-bold text-sm hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
                 >
-                  <Share2 className="mr-2 w-4 h-4" />
+                  <Share2 className="me-2 w-4 h-4" />
                   {t('daily.shareScore')}
                 </Button>
 
@@ -862,8 +862,8 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   onClick={handleDownloadImage}
                   className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-lg font-medium text-sm transition-all"
                 >
-                  <ImageDown className="mr-2 w-4 h-4" />
-                  {t('daily.download') || 'Save Image'}
+                  <ImageDown className="me-2 w-4 h-4" />
+                  {t('daily.download')}
                 </Button>
               </div>
 

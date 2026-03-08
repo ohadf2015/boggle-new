@@ -159,7 +159,7 @@ export function SpellingChallengePractice({
 
           <div className="text-center">
             <h2 className="text-xl font-neo-display text-neo-white mb-1">
-              {t('education.practice.spellTheWord') || 'Spelling Challenge'}
+              {t('education.practice.spellTheWord')}
             </h2>
             <div className="flex flex-col items-center gap-1">
               <p className="text-neo-white/70 font-neo-body" data-testid="progress-text">
@@ -193,7 +193,7 @@ export function SpellingChallengePractice({
               'font-neo-display text-neo-white text-lg'
             )}
           >
-            {currentStreak}x {t('education.practice.streak') || 'Streak'}!
+            {currentStreak}x {t('education.practice.streak')}!
           </AdaptiveMotion.div>
         )}
 
@@ -214,7 +214,7 @@ export function SpellingChallengePractice({
             )}
           >
             <p className="font-neo-body text-neo-white text-2xl text-center">
-              {currentWord?.definition || t('education.practice.noWords') || 'No words available'}
+              {currentWord?.definition || t('education.practice.noWords')}
             </p>
             <WordContextRow
               partOfSpeech={(sortedWords[wordIndex] as any)?.partOfSpeech}
@@ -288,13 +288,13 @@ export function SpellingChallengePractice({
                   )}
                 >
                   {feedback.correct
-                    ? (t('education.practice.correct') || 'Correct!')
-                    : (t('education.practice.incorrect') || 'Incorrect')}
+                    ? (t('education.practice.correct'))
+                    : (t('education.practice.incorrect'))}
                 </AdaptiveMotion.span>
               </div>
               {!feedback.correct && (
                 <p className="text-neo-white/70 font-neo-body">
-                  {t('education.practice.correctAnswer') || 'Correct answer:'}{' '}
+                  {t('education.practice.correctAnswer')}{' '}
                   <span className="text-neo-white font-bold">{feedback.correctWord}</span>
                 </p>
               )}
@@ -325,7 +325,7 @@ export function SpellingChallengePractice({
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'transition-all'
             )}
-            placeholder={t('education.practice.typeWord') || 'Type the word...'}
+            placeholder={t('education.practice.typeWord')}
           />
           <button
             type="submit"
@@ -340,7 +340,7 @@ export function SpellingChallengePractice({
               'transition-all active:translate-y-1'
             )}
           >
-            {t('education.practice.submit') || 'Submit'}
+            {t('education.practice.submit')}
           </button>
         </form>
       </div>

@@ -204,8 +204,8 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                 <MascotWithEntrance variant="celebration" size="xs" delay={0.2} />
                 <p className="text-center text-xs font-bold text-emerald-300">
                   {isHost
-                    ? (t('results.allReadyHostCanStart') || 'All players ready! You can start the next round.')
-                    : (t('results.allPlayersReadyWaitingHost') || 'All players ready — waiting for host to start')}
+                    ? (t('results.allReadyHostCanStart'))
+                    : (t('results.allPlayersReadyWaitingHost'))}
                 </p>
               </div>
             </motion.div>

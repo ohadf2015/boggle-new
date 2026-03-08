@@ -77,7 +77,7 @@ export default function CookieConsent() {
   return (
     <div
       role="dialog"
-      aria-label={t('cookieConsent.title') || 'Cookie consent'}
+      aria-label={t('cookieConsent.title')}
       aria-modal="true"
       className={cn(
         'fixed bottom-0 inset-x-0 z-[100] p-3 sm:p-4',
@@ -90,12 +90,12 @@ export default function CookieConsent() {
         {/* Main message */}
         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
           <p className="text-sm text-neo-cream/90 font-medium flex-1 text-center sm:text-start">
-            {t('cookieConsent.message') || 'We use cookies for analytics and to serve relevant ads. You can customize your preferences below.'}{' '}
+            {t('cookieConsent.message')}{' '}
             <a
               href={`/${language}/legal/cookies`}
               className="text-neo-cyan hover:underline font-bold"
             >
-              {t('cookieConsent.learnMore') || 'Learn more'}
+              {t('cookieConsent.learnMore')}
             </a>
           </p>
           <div className="flex items-center gap-2 shrink-0">
@@ -108,7 +108,7 @@ export default function CookieConsent() {
                 'transition-colors duration-100'
               )}
             >
-              {t('cookieConsent.decline') || 'Decline All'}
+              {t('cookieConsent.decline')}
             </button>
             <button
               onClick={() => setShowDetails(!showDetails)}
@@ -119,7 +119,7 @@ export default function CookieConsent() {
                 'transition-colors duration-100'
               )}
             >
-              {t('cookieConsent.customize') || 'Customize'}
+              {t('cookieConsent.customize')}
             </button>
             <button
               onClick={handleAcceptAll}
@@ -131,7 +131,7 @@ export default function CookieConsent() {
                 'transition-all duration-100'
               )}
             >
-              {t('cookieConsent.accept') || 'Accept All'}
+              {t('cookieConsent.accept')}
             </button>
           </div>
         </div>
@@ -142,23 +142,23 @@ export default function CookieConsent() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
               {/* Essential — always on */}
               <ConsentToggle
-                label={t('cookieConsent.categories.essential') || 'Essential'}
-                description={t('cookieConsent.categories.essentialDesc') || 'Required for site functionality (login, preferences)'}
-                requiredLabel={t('cookieConsent.required') || 'Required'}
+                label={t('cookieConsent.categories.essential')}
+                description={t('cookieConsent.categories.essentialDesc')}
+                requiredLabel={t('cookieConsent.required')}
                 checked={true}
                 disabled
               />
               {/* Analytics */}
               <ConsentToggle
-                label={t('cookieConsent.categories.analytics') || 'Analytics'}
-                description={t('cookieConsent.categories.analyticsDesc') || 'Help us understand how you use the site'}
+                label={t('cookieConsent.categories.analytics')}
+                description={t('cookieConsent.categories.analyticsDesc')}
                 checked={analytics}
                 onChange={setAnalytics}
               />
               {/* Advertising */}
               <ConsentToggle
-                label={t('cookieConsent.categories.advertising') || 'Advertising'}
-                description={t('cookieConsent.categories.advertisingDesc') || 'Show relevant ads via Google AdSense'}
+                label={t('cookieConsent.categories.advertising')}
+                description={t('cookieConsent.categories.advertisingDesc')}
                 checked={advertising}
                 onChange={setAdvertising}
               />
@@ -174,7 +174,7 @@ export default function CookieConsent() {
                   'transition-all duration-100'
                 )}
               >
-                {t('cookieConsent.savePreferences') || 'Save Preferences'}
+                {t('cookieConsent.savePreferences')}
               </button>
             </div>
           </div>
@@ -265,7 +265,7 @@ export function ManageCookiesButton() {
       onClick={handleClick}
       className="text-sm text-neo-cream/50 hover:text-neo-cream/80 underline transition-colors"
     >
-      {t('cookieConsent.manageCookies') || 'Manage Cookies'}
+      {t('cookieConsent.manageCookies')}
     </button>
   );
 }

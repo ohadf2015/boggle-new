@@ -167,7 +167,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
       {!compact && (
         <div className="flex items-center justify-center gap-2 mb-2">
           <span className="text-xs font-black uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            {headerText || t('results.topPlayers') || 'Top Players'}
+            {headerText || t('results.topPlayers')}
           </span>
         </div>
       )}

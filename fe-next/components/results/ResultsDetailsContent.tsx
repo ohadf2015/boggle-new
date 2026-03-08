@@ -192,8 +192,8 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
       {otherPlayers.length > 0 && (
         <CollapsibleSection
           title={otherPlayers.length === 1
-            ? `${otherPlayers[0].username} ${t('results.foundWords') || 'found'}`
-            : (t('results.otherPlayers') || 'Other Players')
+            ? `${otherPlayers[0].username} ${t('results.foundWords')}`
+            : (t('results.otherPlayers'))
           }
           icon={<Users className="w-4 h-4" />}
           badge={otherPlayers.length === 1 ? undefined : otherPlayers.length}
@@ -225,7 +225,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
 
       {/* Performance Chart */}
       <CollapsibleSection
-        title={t('results.yourProgress') || 'Your Progress'}
+        title={t('results.yourProgress')}
         icon={<Trophy className="w-4 h-4" />}
         defaultExpanded={false}
         variant="tertiary"
@@ -237,7 +237,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
       {/* Missed Words — auto-expand when few missed words (likely interesting ones) */}
       {missedWords.length > 0 && (
         <CollapsibleSection
-          title={t('results.missedWords') || 'Words You Missed'}
+          title={t('results.missedWords')}
           icon={<Star className="w-4 h-4" />}
           badge={missedWords.length}
           defaultExpanded={missedWords.length <= 5}

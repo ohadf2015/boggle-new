@@ -708,7 +708,12 @@ const en = {
       "noFriendsOnline": "No friends online yet",
       "invitePrompt": "Start a party by sending an invite link",
       "inviteFriends": "Invite Friends",
-      "inProgress": "Live"
+      "inProgress": "Live",
+      "createRoom": "+ Create Room",
+      "noRoomsAvailable": "No active rooms. Host one!",
+      "joinRoomAction": "Join {{roomName}}",
+      "availableRooms": "Available Rooms",
+      "roomsListLabel": "List of available game rooms"
     },
     "joinModal": {
       "title": "Join the Fight",
@@ -724,7 +729,10 @@ const en = {
       "roomNameLabel": "Room Name",
       "optional": "optional",
       "createButton": "Start Battle",
-      "creating": "Setting up arena..."
+      "creating": "Setting up arena...",
+      "languageLabel": "Game Language",
+      "gameModeLabel": "Game Mode",
+      "wordDifficultyLabel": "Word Difficulty"
     },
     "profileSetup": {
       "title": "Get Ready!",
@@ -765,7 +773,20 @@ const en = {
       "refreshButton": "Refresh",
       "noRooms": "No open rooms. Got a code?",
       "joinButton": "Jump In!",
-      "joining": "Warping in..."
+      "joining": "Warping in...",
+      "gameCodeLabel": "Game Code",
+      "gameCodePlaceholder": "Enter 6-character code",
+      "gameCodeHelp": "Enter the 6-character code shared by the host",
+      "pasteButton": "Paste Code"
+    },
+    "errors": {
+      "roomFull": "This room is full. Try another one or create your own.",
+      "roomClosed": "This room has ended. Return to lobby and find another game.",
+      "invalidCode": "Invalid code or room closed. Check the code and try again.",
+      "connectionLost": "Connection lost. Reconnecting...",
+      "hostLeft": "Host left the game. Returning to lobby...",
+      "invalidUsername": "Username must be 2-20 characters.",
+      "serverError": "Server error. Please try again."
     }
   },
   "hostView": {

@@ -127,7 +127,7 @@ export default function PatternSwitcher({
         id: `duplicate-${now}`,
         type: 'duplicate',
         word: upperWord,
-        message: t('playerView.wordAlreadyFound') || 'Already found!',
+        message: t('playerView.wordAlreadyFound'),
         timestamp: now,
       });
       playErrorSound?.();
@@ -141,7 +141,7 @@ export default function PatternSwitcher({
         id: `reject-${now}`,
         type: 'rejected',
         word: upperWord,
-        message: t('playerView.wordNotInList') || 'Word not available',
+        message: t('playerView.wordNotInList'),
         timestamp: now,
       });
       playErrorSound?.();
@@ -384,7 +384,7 @@ export default function PatternSwitcher({
                 isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
               )}
             >
-              {t('brain.drills.finishGame') || 'Finish Game'}
+              {t('brain.drills.finishGame')}
             </motion.button>
           </div>
         )}

@@ -141,7 +141,7 @@ export function AttackTelegraph({
               {/* Countdown */}
               <motion.span
                 className="
-                  ml-2 w-10 h-10
+                  ms-2 w-10 h-10
                   flex items-center justify-center
                   bg-black text-white
                   font-neo-display font-bold text-xl
@@ -150,7 +150,7 @@ export function AttackTelegraph({
                 animate={prefersReducedMotion ? {} : { scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 1 }}
                 data-testid="telegraph-countdown"
-                aria-label={`${secondsRemaining} ${t('common.seconds') || 'seconds'}`}
+                aria-label={`${secondsRemaining} ${t('common.seconds')}`}
               >
                 {secondsRemaining}
               </motion.span>
@@ -172,7 +172,7 @@ export function AttackTelegraph({
             aria-valuenow={Math.round(progress * 100)}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label={t('adventure.bosses.telegraph.progress') || 'Attack progress'}
+            aria-label={t('adventure.bosses.telegraph.progress')}
           >
             <motion.div
               className={`h-full ${bossFightTheme.telegraphProgressColor}`}

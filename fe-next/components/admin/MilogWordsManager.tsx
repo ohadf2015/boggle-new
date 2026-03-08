@@ -389,10 +389,10 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="ml-auto border-red-600 text-red-400 hover:bg-red-600/20 hover:text-red-300"
+                          className="ms-auto border-red-600 text-red-400 hover:bg-red-600/20 hover:text-red-300"
                           onClick={() => setRevokeWord(word)}
                         >
-                          <Trash2 className="w-3 h-3 mr-1" />
+                          <Trash2 className="w-3 h-3 me-1" />
                           Revoke
                         </Button>
                       )}
@@ -415,7 +415,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
             disabled={offset === 0}
             className="border-slate-600"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" />
+            <ChevronLeft className="w-4 h-4 me-1" />
             Previous
           </Button>
           <span className="text-sm text-slate-400">
@@ -429,7 +429,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
             className="border-slate-600"
           >
             Next
-            <ChevronRight className="w-4 h-4 ml-1" />
+            <ChevronRight className="w-4 h-4 ms-1" />
           </Button>
         </div>
       )}

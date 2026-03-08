@@ -165,7 +165,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
       >
         {/* Hidden title for accessibility */}
         <DialogTitle className="sr-only">
-          {t('mysteryReward.title') || 'Mystery Reward'}
+          {t('mysteryReward.title')}
         </DialogTitle>
 
         <div className="p-6 flex flex-col items-center">
@@ -194,14 +194,14 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   🎁
                 </motion.div>
                 <p className={cn('text-lg font-black uppercase', styles.text)}>
-                  {t('mysteryReward.youFound') || 'You Found a Mystery Reward!'}
+                  {t('mysteryReward.youFound')}
                 </p>
                 <motion.div
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1, repeat: Infinity }}
                   className="text-sm text-white/60"
                 >
-                  {t('mysteryReward.opening') || 'Opening...'}
+                  {t('mysteryReward.opening')}
                 </motion.div>
               </motion.div>
             )}
@@ -243,7 +243,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   }}
                   className={cn('text-xl font-black uppercase', styles.text)}
                 >
-                  {t('mysteryReward.revealing') || 'Revealing...'}
+                  {t('mysteryReward.revealing')}
                 </motion.div>
               </motion.div>
             )}
@@ -317,16 +317,16 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   className="text-center space-y-1"
                 >
                   <p className="text-xs text-white/50">
-                    {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletion') || 'Game Completion Bonus')}
-                    {reward.triggerType === 'win' && (t('mysteryReward.winBonus') || 'Victory Bonus')}
-                    {reward.triggerType === 'long_word' && (t('mysteryReward.longWord') || 'Long Word Bonus')}
-                    {reward.triggerType === 'achievement' && (t('mysteryReward.achievement') || 'Achievement Bonus')}
+                    {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletion'))}
+                    {reward.triggerType === 'win' && (t('mysteryReward.winBonus'))}
+                    {reward.triggerType === 'long_word' && (t('mysteryReward.longWord'))}
+                    {reward.triggerType === 'achievement' && (t('mysteryReward.achievement'))}
                   </p>
                   <p className="text-xs text-white/70 italic">
-                    {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletionExplain') || 'Keep playing for more chances!')}
-                    {reward.triggerType === 'win' && (t('mysteryReward.winBonusExplain') || 'Winners get extra surprises!')}
-                    {reward.triggerType === 'long_word' && (t('mysteryReward.longWordExplain') || 'Your vocabulary skills paid off!')}
-                    {reward.triggerType === 'achievement' && (t('mysteryReward.achievementExplain') || 'Achievements come with perks!')}
+                    {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletionExplain'))}
+                    {reward.triggerType === 'win' && (t('mysteryReward.winBonusExplain'))}
+                    {reward.triggerType === 'long_word' && (t('mysteryReward.longWordExplain'))}
+                    {reward.triggerType === 'achievement' && (t('mysteryReward.achievementExplain'))}
                   </p>
                 </motion.div>
 
@@ -343,7 +343,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                     styles.text
                   )}
                 >
-                  {t('mysteryReward.awesome') || 'Awesome!'}
+                  {t('mysteryReward.awesome')}
                 </motion.button>
               </motion.div>
             )}

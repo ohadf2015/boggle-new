@@ -52,7 +52,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('footer.about') || 'About'}
+              {t('footer.about')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
@@ -65,7 +65,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('footer.blog') || 'Blog'}
+              {t('footer.blog')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
@@ -78,7 +78,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('footer.faq') || 'FAQ'}
+              {t('footer.faq')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
@@ -91,7 +91,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('legal.title') || 'Legal'}
+              {t('legal.title')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
@@ -104,7 +104,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('legal.privacyPolicy') || 'Privacy Policy'}
+              {t('legal.privacyPolicy')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
@@ -117,7 +117,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('legal.termsOfService') || 'Terms of Service'}
+              {t('legal.termsOfService')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
@@ -130,7 +130,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('footer.contact') || 'Contact'}
+              {t('footer.contact')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <span className="min-h-[48px] px-3 flex items-center">
@@ -142,7 +142,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               target="_blank"
               rel="noopener noreferrer"
               title={t('support.kofiTooltip')}
-              aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab') || 'opens in new tab'})`}
+              aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab')})`}
               className="
                 min-h-[44px] px-2 inline-flex items-center gap-1.5
                 text-sm font-bold uppercase tracking-wide
@@ -154,7 +154,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             >
               <KofiIcon className="text-base group-hover:animate-bounce" aria-hidden="true" />
               <span>{t('support.kofiFooter')}</span>
-              <span className="sr-only">({t('common.opensInNewTab') || 'opens in new tab'})</span>
+              <span className="sr-only">({t('common.opensInNewTab')})</span>
             </a>
           </nav>
 

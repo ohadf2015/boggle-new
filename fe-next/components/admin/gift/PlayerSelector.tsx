@@ -131,7 +131,7 @@ export function PlayerSelector({
               </span>
               <button
                 onClick={() => handleRemovePlayer(player.id)}
-                className="ml-1 hover:text-red-500 transition-colors"
+                className="ms-1 hover:text-red-500 transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

@@ -384,7 +384,7 @@ export function PlayerGiftDialog({
             onClick={handleBack}
             disabled={currentStepIndex === 0 || sending}
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <ArrowLeft className="w-4 h-4 me-1" />
             Back
           </Button>
 
@@ -398,7 +398,7 @@ export function PlayerGiftDialog({
                 <Loader size="sm" />
               ) : (
                 <>
-                  <Send className="w-4 h-4 mr-1" />
+                  <Send className="w-4 h-4 me-1" />
                   Send Gift
                 </>
               )}
@@ -410,7 +410,7 @@ export function PlayerGiftDialog({
               className="bg-neo-lime text-black hover:bg-neo-lime/90"
             >
               Next
-              <ArrowRight className="w-4 h-4 ml-1" />
+              <ArrowRight className="w-4 h-4 ms-1" />
             </Button>
           )}
         </div>

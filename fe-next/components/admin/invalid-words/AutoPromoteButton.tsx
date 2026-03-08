@@ -134,12 +134,12 @@ export function AutoPromoteButton({
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                   Promoting...
                 </>
               ) : (
                 <>
-                  <Zap className="w-4 h-4 mr-2" />
+                  <Zap className="w-4 h-4 me-2" />
                   Auto-Promote
                 </>
               )}
@@ -152,7 +152,7 @@ export function AutoPromoteButton({
         <span className="text-sm">
           <span className="text-green-500">{result.promoted} promoted</span>
           {result.failed > 0 && (
-            <span className="text-red-500 ml-2">{result.failed} failed</span>
+            <span className="text-red-500 ms-2">{result.failed} failed</span>
           )}
         </span>
       )}

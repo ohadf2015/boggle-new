@@ -54,10 +54,10 @@ export function BlastWaveIntro({
     return () => clearTimeout(timer);
   }, [advance]);
 
-  const waveTitle = (t('blast.waveIntro.title') || 'Wave {wave}')
+  const waveTitle = (t('blast.waveIntro.title') || '')
     .replace('{wave}', String(waveNumber));
 
-  const movesLabel = (t('blast.waveIntro.moves') || '{moves} Moves')
+  const movesLabel = (t('blast.waveIntro.moves') || '')
     .replace('{moves}', String(movesAllowed));
 
   return (
@@ -88,7 +88,7 @@ export function BlastWaveIntro({
         className="flex flex-col gap-2 max-w-xs w-full"
       >
         <div className="text-xs font-bold text-white/50 uppercase tracking-widest text-center mb-1">
-          {t('blast.waveIntro.objectives') || 'Objectives'}
+          {t('blast.waveIntro.objectives')}
         </div>
         {objectives.map((obj, idx) => (
           <div
@@ -138,7 +138,7 @@ export function BlastWaveIntro({
             'transition-transform duration-75'
           )}
         >
-          {t('blast.waveIntro.go') || 'GO!'}
+          {t('blast.waveIntro.go')}
         </button>
       </AdaptiveMotion.div>
     </div>

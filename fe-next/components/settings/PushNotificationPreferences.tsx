@@ -112,7 +112,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
         isDarkMode ? 'text-white' : 'text-gray-900'
       )}>
         <Bell className="text-neo-orange" />
-        {t('pushNotifications.settings.title') || 'Push Notifications'}
+        {t('pushNotifications.settings.title')}
       </h2>
 
       {/* Permission Denied Warning */}
@@ -127,13 +127,13 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
               'font-medium',
               isDarkMode ? 'text-red-400' : 'text-red-700'
             )}>
-              {t('pushNotifications.settings.permissionDenied') || 'Notifications Blocked'}
+              {t('pushNotifications.settings.permissionDenied')}
             </p>
             <p className={cn(
               'text-sm mt-1',
               isDarkMode ? 'text-red-400/80' : 'text-red-600'
             )}>
-              {t('pushNotifications.settings.permissionDeniedDesc') || 'Enable notifications in device settings to receive reminders'}
+              {t('pushNotifications.settings.permissionDeniedDesc')}
             </p>
             <button
               onClick={() => {
@@ -148,7 +148,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
                 isDarkMode ? 'text-red-400' : 'text-red-600'
               )}
             >
-              {t('pushNotifications.settings.openSettings') || 'Open Settings'}
+              {t('pushNotifications.settings.openSettings')}
             </button>
           </div>
         </div>
@@ -170,13 +170,13 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
               'font-medium',
               isDarkMode ? 'text-white' : 'text-gray-900'
             )}>
-              {t('pushNotifications.settings.enabled') || 'Daily Reminder'}
+              {t('pushNotifications.settings.enabled')}
             </p>
             <p className={cn(
               'text-sm',
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
-              {t('pushNotifications.settings.enabledDesc') || 'Morning nudge to play your daily challenges'}
+              {t('pushNotifications.settings.enabledDesc')}
             </p>
           </div>
         </div>
@@ -195,8 +195,8 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
           role="switch"
           aria-checked={preferences.enabled}
           aria-label={preferences.enabled
-            ? (t('emailPreferences.disableNotifications') || 'Disable notifications')
-            : (t('emailPreferences.enableNotifications') || 'Enable notifications')}
+            ? (t('emailPreferences.disableNotifications'))
+            : (t('emailPreferences.enableNotifications'))}
         >
           <span
             className={cn(
@@ -228,13 +228,13 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
                 'font-medium',
                 isDarkMode ? 'text-white' : 'text-gray-900'
               )}>
-                {t('pushNotifications.settings.time') || 'Reminder Time'}
+                {t('pushNotifications.settings.time')}
               </p>
               <p className={cn(
                 'text-sm',
                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
               )}>
-                {t('pushNotifications.settings.timeDesc') || 'When to wake you up with a fresh puzzle'}
+                {t('pushNotifications.settings.timeDesc')}
               </p>
             </div>
           </div>

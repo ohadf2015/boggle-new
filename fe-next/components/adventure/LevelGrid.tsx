@@ -630,7 +630,7 @@ export default function LevelGrid({
                 transition={{ delay: 0.1 }}
                 className="text-3xl sm:text-4xl font-black text-neo-white uppercase tracking-tight"
               >
-                {t('adventure.worldLabel') || 'World'} {world.id}
+                {t('adventure.worldLabel')} {world.id}
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, x: -20 }}

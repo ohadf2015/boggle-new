@@ -231,7 +231,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
-          <Users className="w-6 h-6 inline mr-2" />
+          <Users className="w-6 h-6 inline me-2" />
           {t('quickMatch')}
         </button>
       </div>

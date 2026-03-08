@@ -90,7 +90,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
       </div>
       {!canAffordAction && (
         <div className="px-4 pb-2 text-[10px] text-white/60 text-center">
-          {t('wordHunt.results.earnMoreHint') || 'Win challenges to earn more coins!'}
+          {t('wordHunt.results.earnMoreHint')}
         </div>
       )}
     </motion.div>

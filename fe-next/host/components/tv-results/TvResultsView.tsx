@@ -251,8 +251,8 @@ const TvResultsView = memo<TvResultsViewProps>(({
                 )}
               >
                 {showTournamentStandings
-                  ? `${t('tvResults.tournamentStandings') || 'Tournament Standings'}`
-                  : t('tvResults.title') || 'THE RESULTS ARE IN!'}
+                  ? `${t('tvResults.tournamentStandings')}`
+                  : t('tvResults.title')}
               </motion.h1>
 
               {isTournament && !showTournamentStandings && (

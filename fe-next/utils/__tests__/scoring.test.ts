@@ -4,7 +4,7 @@
  * Tests for scoring calculations used in the game
  */
 
-import { calculateWordScore as calculateWordScoreSimple } from '@/shared/constants/gameConstants';
+import { calculateWordScoreByLength as calculateWordScoreSimple } from '@/shared/utils/scoring';
 import { calculateEfficiencyScore, getScoreBreakdown, type ScoreBreakdown } from '../aiHintGenerator';
 
 describe('Scoring Utilities', () => {

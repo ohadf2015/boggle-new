@@ -118,7 +118,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                 <Sparkles className="w-6 h-6 flex-shrink-0" />
                 <div>
                   <p className="font-black text-sm uppercase">
-                    {t('newYear.comingSoon') || 'Something special coming soon...'}
+                    {t('newYear.comingSoon')}
                   </p>
                   <p className="text-xs font-medium opacity-90">
                     {formatTimeRemaining(newYearState.secondsUntilMidnight)}
@@ -134,7 +134,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
       <Dialog open={showCountdown} onOpenChange={(open) => { if (!open) setShowCountdown(false); }}>
         <DialogContent noDescription className="max-w-md">
           <DialogTitle className="sr-only">
-            {t('newYear.countdownTitle') || 'New Year Countdown'}
+            {t('newYear.countdownTitle')}
           </DialogTitle>
           <DialogBody className="text-center py-8">
             <motion.div
@@ -146,10 +146,10 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
 
               <div>
                 <h2 className="text-2xl font-black uppercase mb-2 text-neo-black">
-                  {t('newYear.countdownTitle') || 'New Year Countdown'}
+                  {t('newYear.countdownTitle')}
                 </h2>
                 <p className="text-sm font-medium text-neo-black/70">
-                  {t('newYear.countdownSubtitle') || 'Get ready to celebrate!'}
+                  {t('newYear.countdownSubtitle')}
                 </p>
               </div>
 
@@ -172,7 +172,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
               </motion.div>
 
               <p className="text-lg font-bold text-neo-black uppercase">
-                {t('newYear.almostThere') || 'Almost there!'}
+                {t('newYear.almostThere')}
               </p>
             </motion.div>
           </DialogBody>
@@ -183,7 +183,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
       <Dialog open={showCelebration} onOpenChange={setShowCelebration}>
         <DialogContent noDescription className="max-w-2xl overflow-hidden">
           <DialogTitle className="sr-only">
-            {t('newYear.happyNewYear') || 'Happy New Year!'}
+            {t('newYear.happyNewYear')}
           </DialogTitle>
           <DialogBody className="text-center py-12 relative">
             <motion.div
@@ -215,7 +215,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                     ease: 'easeInOut',
                   }}
                 >
-                  {t('newYear.happyNewYear') || 'Happy New Year!'}
+                  {t('newYear.happyNewYear')}
                 </motion.h1>
 
                 {/* Year badge */}
@@ -235,7 +235,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                {t('newYear.celebrationMessage') || 'Wishing you an amazing year ahead filled with words, wins, and wonder!'}
+                {t('newYear.celebrationMessage')}
               </motion.p>
 
               {/* Confetti emoji decorations */}

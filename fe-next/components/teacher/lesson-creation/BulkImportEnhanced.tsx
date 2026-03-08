@@ -233,7 +233,7 @@ export default function BulkImportEnhanced({
                   <span className="text-neo-cyan tabular-nums">
                     {t('teacher.lesson.bulkImportDetected').replace('{{count}}', String(validationResults.length))}
                   </span>
-                  <div className="flex items-center gap-4 ml-auto">
+                  <div className="flex items-center gap-4 ms-auto">
                     {stats.ready > 0 && (
                       <div className="flex items-center gap-1 text-neo-cyan">
                         <CheckCircle className="w-4 h-4" />
@@ -302,7 +302,7 @@ export default function BulkImportEnhanced({
                 disabled={validationResults.length === 0}
                 className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
               >
-                <Upload className="w-4 h-4 mr-2" />
+                <Upload className="w-4 h-4 me-2" />
                 {t('teacher.lesson.bulkImportButton')}
                 {stats.ready > 0 && ` ${stats.ready} words`}
               </Button>

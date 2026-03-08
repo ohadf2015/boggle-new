@@ -118,7 +118,7 @@ export default function LightningRound({
 
     // Check if word can be formed on the board
     if (!isWordOnBoard(upperWord, grid, language)) {
-      setFeedback({ message: t('brain.drills.errors.notOnBoard') || 'Word not on board', type: 'error' });
+      setFeedback({ message: t('brain.drills.errors.notOnBoard'), type: 'error' });
       playErrorSound?.();
       setTimeout(() => setFeedback(null), 2000);
       return;
@@ -126,7 +126,7 @@ export default function LightningRound({
 
     // Check if already found
     if (wordsFound.includes(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.alreadyFound') || 'Already found', type: 'error' });
+      setFeedback({ message: t('brain.drills.errors.alreadyFound'), type: 'error' });
       playErrorSound?.();
       setTimeout(() => setFeedback(null), 2000);
       return;
@@ -134,7 +134,7 @@ export default function LightningRound({
 
     // Check if word is in available words list
     if (!availableWordSet.has(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.invalidWord') || 'Invalid word', type: 'error' });
+      setFeedback({ message: t('brain.drills.errors.invalidWord'), type: 'error' });
       playErrorSound?.();
       setTimeout(() => setFeedback(null), 2000);
       return;
@@ -401,7 +401,7 @@ export default function LightningRound({
                 isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
               )}
             >
-              {t('brain.drills.finishGame') || 'Finish Game'}
+              {t('brain.drills.finishGame')}
             </motion.button>
           </div>
         )}

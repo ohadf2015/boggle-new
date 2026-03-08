@@ -54,7 +54,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   const handleRefresh = async () => {
     refetch();
     await new Promise((resolve) => setTimeout(resolve, 500));
-    toast.success(t('common.refreshed') || 'Refreshed', {
+    toast.success(t('common.refreshed'), {
       duration: 2000,
     });
   };
@@ -131,8 +131,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               />
               <span className={cn('text-xs', 'text-gray-600')}>
                 {subscriptionStatus === 'SUBSCRIBED'
-                  ? t('leaderboard.live') || 'Live'
-                  : t('common.connecting') || 'Connecting...'}
+                  ? t('leaderboard.live')
+                  : t('common.connecting')}
               </span>
             </div>
             <EnhancedButton
@@ -231,11 +231,11 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           }
           emptyComponent={
             <EnhancedEmptyState
-              title={t('leaderboard.noRankYet') || 'No rankings yet'}
-              description={t('leaderboard.beFirstToPlay') || 'Be the first to play and claim the top spot!'}
+              title={t('leaderboard.noRankYet')}
+              description={t('leaderboard.beFirstToPlay')}
               icon="sparkles"
               action={{
-                label: t('common.playNow') || 'Play Now',
+                label: t('common.playNow'),
                 onClick: () => router.push(`/${language}/singleplayer`),
                 variant: 'primary',
               }}
@@ -243,8 +243,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           }
           errorComponent={
             <ErrorState
-              title={t('common.error') || 'Something went wrong'}
-              description={error?.toString() || t('common.tryAgainLater') || 'Please try again later'}
+              title={t('common.error')}
+              description={error?.toString() || t('common.tryAgainLater')}
               onRetry={refetch}
             />
           }

@@ -174,7 +174,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: t('customPuzzle.title') || 'Custom Puzzle',
+          title: t('customPuzzle.title'),
           text: shareText,
           url: shareUrl,
         });
@@ -196,13 +196,13 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             <h2 className="text-xl font-bold text-red-500 mb-4">{error}</h2>
             <Link href={`/${language}/daily`}>
               <Button variant="outline">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('common.back') || 'Back'}
+                <ArrowLeft className="w-4 h-4 me-2" />
+                {t('common.back')}
               </Button>
             </Link>
           </div>
         ) : (
-          <PageLoader text={t('customPuzzle.loading') || 'Loading puzzle...'} />
+          <PageLoader text={t('customPuzzle.loading')} />
         )}
       </div>
     );
@@ -219,7 +219,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <Crown className="w-6 h-6 text-neo-lime" />
-            <h1 className="text-2xl font-bold">{t('customPuzzle.title') || 'Custom Puzzle'}</h1>
+            <h1 className="text-2xl font-bold">{t('customPuzzle.title')}</h1>
           </div>
 
           <p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -229,7 +229,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
           <div className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-4 mb-6">
             <p className="text-sm font-medium">
-              {t('customPuzzle.creatorScore') || 'Creator\'s Score'}:{' '}
+              {t('customPuzzle.creatorScore')}:{' '}
               <span className="font-bold text-neo-navy dark:text-neo-cream">
                 {puzzle.creatorEfficiencyScore} pts
               </span>
@@ -251,13 +251,13 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             onClick={() => setPhase('playing')}
             className="w-full bg-neo-green hover:bg-neo-green/90 text-white font-bold py-3"
           >
-            {t('customPuzzle.play') || 'Play Challenge'}
+            {t('customPuzzle.play')}
           </Button>
 
           <Link href={`/${language}/daily`} className="block mt-4">
             <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('common.back') || 'Back'}
+              <ArrowLeft className="w-4 h-4 me-2" />
+              {t('common.back')}
             </Button>
           </Link>
         </motion.div>
@@ -304,8 +304,8 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold mb-2">
                 {gameResult.solved
-                  ? (t('customPuzzle.solved') || 'You solved it!')
-                  : (t('customPuzzle.failed') || 'Better luck next time!')}
+                  ? (t('customPuzzle.solved'))
+                  : (t('customPuzzle.failed'))}
               </h2>
 
               {beatCreator && (
@@ -315,7 +315,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                   className="inline-flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 rounded-neo font-bold"
                 >
                   <Trophy className="w-5 h-5" />
-                  {t('customPuzzle.beatCreator') || 'You beat the creator!'}
+                  {t('customPuzzle.beatCreator')}
                 </motion.div>
               )}
             </div>
@@ -323,11 +323,11 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             {/* Score Comparison */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-neo-pink/20 border-2 border-neo-pink rounded-neo p-3 text-center">
-                <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.yourScore') || 'Your Score'}</p>
+                <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.yourScore')}</p>
                 <p className="text-2xl font-bold">{Math.round(gameResult.efficiencyScore)}</p>
               </div>
               <div className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-3 text-center">
-                <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.creatorScore') || 'Creator'}</p>
+                <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.creatorScore')}</p>
                 <p className="text-2xl font-bold">{Math.round(puzzle.creatorEfficiencyScore)}</p>
               </div>
             </div>
@@ -337,7 +337,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
               <div className="mb-6">
                 <h3 className="text-sm font-bold mb-2 flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-neo-lime" />
-                  {t('customPuzzle.leaderboard') || 'Leaderboard'}
+                  {t('customPuzzle.leaderboard')}
                 </h3>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {leaderboard.slice(0, 5).map((entry) => (
@@ -369,13 +369,13 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                 onClick={handleShare}
                 className="w-full bg-neo-pink hover:bg-neo-pink/90 text-white"
               >
-                <Share2 className="w-4 h-4 mr-2" />
-                {t('customPuzzle.share') || 'Share Challenge'}
+                <Share2 className="w-4 h-4 me-2" />
+                {t('customPuzzle.share')}
               </Button>
 
               <Link href={`/${language}/daily`} className="block">
                 <Button variant="outline" className="w-full">
-                  {t('customPuzzle.playDaily') || 'Play Daily Challenge'}
+                  {t('customPuzzle.playDaily')}
                 </Button>
               </Link>
             </div>

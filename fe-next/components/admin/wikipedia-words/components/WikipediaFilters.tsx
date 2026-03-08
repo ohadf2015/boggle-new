@@ -49,7 +49,7 @@ export function WikipediaFilters({
                 : 'bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 hover:border-neo-pink text-gray-800 dark:text-gray-200'
             )}
           >
-            <span className="mr-1">{lang.flag}</span>
+            <span className="me-1">{lang.flag}</span>
             <span className="hidden sm:inline">{lang.name}</span>
             <span className="sm:hidden">{lang.code.toUpperCase()}</span>
           </button>

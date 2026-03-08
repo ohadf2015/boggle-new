@@ -204,7 +204,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
                       <div className="flex items-center gap-1.5 pt-1 border-t border-neo-black/20">
                         <Info className="w-3 h-3" />
                         <p className="text-[10px] opacity-80">
-                          {t('brain.drills.unlockHint') || 'Play more games to unlock this drill!'}
+                          {t('brain.drills.unlockHint')}
                         </p>
                       </div>
                     </div>

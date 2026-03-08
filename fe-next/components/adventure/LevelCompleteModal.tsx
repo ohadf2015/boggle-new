@@ -171,7 +171,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 )}
               >
                 {isFailed ? t('adventure.game.tryAgain') : isPerfect 
-                  ? t('adventure.perfect') || 'PERFECT!' 
+                  ? t('adventure.perfect') 
                   : t('adventure.levelComplete')}
               </h2>
             </motion.div>
@@ -345,7 +345,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                       <X className="w-4 h-4 flex-shrink-0" />
                     )}
                     <span>{t(OBJECTIVE_TRANSLATION_KEYS[objective.type])}</span>
-                    <span className="ml-auto font-mono">
+                    <span className="ms-auto font-mono">
                       {objective.current}/{objective.target}
                     </span>
                   </li>

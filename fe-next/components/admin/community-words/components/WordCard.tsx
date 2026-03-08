@@ -75,11 +75,11 @@ export function WordCard({
             </div>
             <div className="flex flex-col text-xs text-slate-400 text-right flex-shrink-0">
               <span>
-                <ThumbsUp className="w-3 h-3 inline mr-1 text-green-500" />
+                <ThumbsUp className="w-3 h-3 inline me-1 text-green-500" />
                 {word.likes_count}
               </span>
               <span>
-                <ThumbsDown className="w-3 h-3 inline mr-1 text-red-500" />
+                <ThumbsDown className="w-3 h-3 inline me-1 text-red-500" />
                 {word.dislikes_count}
               </span>
             </div>
@@ -111,7 +111,7 @@ export function WordCard({
               <Loader size="sm" />
             ) : (
               <>
-                <X className="w-4 h-4 mr-2" /> Reject
+                <X className="w-4 h-4 me-2" /> Reject
               </>
             )}
           </Button>
@@ -127,7 +127,7 @@ export function WordCard({
               <Loader size="sm" />
             ) : (
               <>
-                <Check className="w-4 h-4 mr-2" /> Approve
+                <Check className="w-4 h-4 me-2" /> Approve
               </>
             )}
           </Button>

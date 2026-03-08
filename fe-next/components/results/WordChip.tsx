@@ -183,7 +183,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
              {isAiVerified && (
                 <p className="font-black text-xs uppercase flex items-center gap-1.5 text-neo-lime">
                   <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-cream">AI</span>
-                  {t('results.aiRejected') || 'Rejected by AI'}
+                  {t('results.aiRejected')}
                 </p>
               )}
           </div>
@@ -249,9 +249,9 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                 className="bg-neo-red text-neo-cream border-2 border-neo-black shadow-hard rounded-neo p-2"
               >
                 <p className="text-xs font-bold text-neo-black">
-                  {t('results.fireRoundBonus') || 'Fire Round Bonus!'}
+                  {t('results.fireRoundBonus')}
                   <span className="block text-neo-red mt-1 font-black">
-                    2x {t('results.points') || 'points'} (+{wordObj.fireRoundBonus})
+                    2x {t('results.points')} (+{wordObj.fireRoundBonus})
                   </span>
                 </p>
               </TooltipContent>
@@ -271,7 +271,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                 side="top"
                 className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
               >
-                <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
+                <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified')}</p>
                 {aiReason && (
                   <p className="text-xs text-neo-lime mt-1">{aiReason}</p>
                 )}

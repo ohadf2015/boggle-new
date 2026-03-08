@@ -114,7 +114,7 @@ const MusicControls: React.FC = memo(() => {
       onFocus={handleFocus}
       onBlur={handleBlur}
       role="group"
-      aria-label={t('music.controls') || 'Music controls'}
+      aria-label={t('music.controls')}
     >
       {/* Neo-Brutalist Volume Button */}
       <Button
@@ -123,9 +123,9 @@ const MusicControls: React.FC = memo(() => {
         size="icon"
         onClick={handleClick}
         className={`relative w-11 h-11 min-w-[44px] min-h-[44px] sm:w-11 sm:h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14 border-2 sm:border-3 lg:border-3 2xl:border-3 rounded-neo lg:rounded-neo shadow-hard-sm sm:shadow-hard lg:shadow-hard 2xl:shadow-hard-lg flex-shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream text-neo-black'}`}
-        aria-label={hasMounted ? (isMuted ? (t('music.unmute') || 'Unmute') : (t('music.mute') || 'Mute')) : (t('music.mute') || 'Mute')}
+        aria-label={hasMounted ? (isMuted ? (t('music.unmute')) : (t('music.mute'))) : (t('music.mute'))}
         aria-pressed={hasMounted ? !isMuted : true}
-        title={hasMounted ? (isMuted ? (t('music.soundOff') || 'Sound Off - Click to unmute') : (t('music.soundOn') || 'Sound On')) : (t('music.sound') || 'Sound')}
+        title={hasMounted ? (isMuted ? (t('music.soundOff')) : (t('music.soundOn'))) : (t('music.sound'))}
       >
         {volumeIcon}
 
@@ -191,7 +191,7 @@ const MusicControls: React.FC = memo(() => {
                       onChange={handleMusicVolumeChange}
                       dir="ltr"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      aria-label={t('music.musicVolumeSlider') || 'Music volume slider'}
+                      aria-label={t('music.musicVolumeSlider')}
                       aria-valuemin={0}
                       aria-valuemax={100}
                       aria-valuenow={Math.round(volume * 100)}
@@ -222,7 +222,7 @@ const MusicControls: React.FC = memo(() => {
                       onChange={handleSfxVolumeChange}
                       dir="ltr"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      aria-label={t('music.sfxVolumeSlider') || 'Sound effects volume slider'}
+                      aria-label={t('music.sfxVolumeSlider')}
                       aria-valuemin={0}
                       aria-valuemax={100}
                       aria-valuenow={Math.round(sfxVolume * 100)}
@@ -236,7 +236,7 @@ const MusicControls: React.FC = memo(() => {
                     <div className="flex items-center">
                       <Smartphone size={14} strokeWidth={2.5} className="text-neo-black" aria-hidden="true" />
                       <span className="text-xs font-black uppercase tracking-wide text-neo-black/70">
-                        {t('music.haptics') || 'Haptics'}
+                        {t('music.haptics')}
                       </span>
                     </div>
                     <button
@@ -245,7 +245,7 @@ const MusicControls: React.FC = memo(() => {
                       style={{ width: '44px', height: '22px' }}
                       role="switch"
                       aria-checked={hapticsEnabled}
-                      aria-label={t('music.toggleHaptics') || 'Toggle haptic feedback'}
+                      aria-label={t('music.toggleHaptics')}
                     >
                       {/* Track - thin pill shape, neo-brutalist */}
                       <div

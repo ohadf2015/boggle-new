@@ -111,7 +111,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const isModalOpen = showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic || bossOrch.showBossIntro || bossOrch.showBossFireworks;
     const { resetOnGameAction } = useLexiStuckDetection({
-      onStuck: () => { neoInfoToast(t('adventure.lexi.stuckHint') || 'Need a hint? Try looking for shorter words first!', { icon: '💡', duration: 5000 }); },
+      onStuck: () => { neoInfoToast(t('adventure.lexi.stuckHint'), { icon: '💡', duration: 5000 }); },
       isPlaying: isPlaying && entryPhase === 'playing', isPaused, isModalOpen, isBossLevel,
     });
 

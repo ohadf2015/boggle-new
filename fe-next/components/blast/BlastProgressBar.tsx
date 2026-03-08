@@ -54,7 +54,7 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
       {/* Label */}
       <div className="flex items-center justify-between mb-1 px-1">
         <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
-          {t('blast.progress') || 'Cleared'}
+          {t('blast.progress')}
         </span>
         <span className="text-xs font-black text-white tabular-nums">
           {cleared}/{total}

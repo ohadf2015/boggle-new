@@ -133,7 +133,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
               {discoveredWords.length}
             </span>
             <span className="text-[10px] text-neo-cream/40">
-              {t('wordHunt.mobile.words') || 'words'}
+              {t('wordHunt.mobile.words')}
             </span>
           </div>
         </div>
@@ -171,7 +171,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
                   )}
                 >
                   <Package className="w-3 h-3" />
-                  {t('wordHunt.desktop.lootCollected') || 'Loot'}
+                  {t('wordHunt.desktop.lootCollected')}
                 </button>
                 <button
                   data-testid="mobile-info-tab-ranks"
@@ -184,7 +184,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
                   )}
                 >
                   <Trophy className="w-3 h-3" />
-                  {t('wordHunt.desktop.liveRanks') || 'Ranks'}
+                  {t('wordHunt.desktop.liveRanks')}
                 </button>
               </div>
 
@@ -226,7 +226,7 @@ const LootTabContent: React.FC<{
     {sortedWords.length === 0 ? (
       <div className="flex flex-col items-center py-4 text-neo-cream/40 text-xs">
         <Package className="w-6 h-6 mb-1 opacity-50" />
-        <span>{t('wordHunt.desktop.noWordsYet') || 'Find words to collect loot!'}</span>
+        <span>{t('wordHunt.desktop.noWordsYet')}</span>
       </div>
     ) : (
       <>
@@ -235,7 +235,7 @@ const LootTabContent: React.FC<{
         ))}
         {/* Mini stats footer */}
         <div className="flex items-center justify-between pt-2 mt-1 border-t border-neo-black/20 text-[10px] text-neo-cream/50">
-          <span>{discoveredWordsCount} {t('wordHunt.mobile.words') || 'words'}</span>
+          <span>{discoveredWordsCount} {t('wordHunt.mobile.words')}</span>
           <span className="text-neo-cyan">{triesRemaining} tries left</span>
         </div>
       </>

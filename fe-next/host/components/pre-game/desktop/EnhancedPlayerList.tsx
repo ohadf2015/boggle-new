@@ -150,7 +150,7 @@ export function EnhancedPlayerList({
                     </span>
                     {isMe && (
                       <span className="text-[10px] xl:text-xs px-1.5 xl:px-2 py-0.5 xl:py-1 rounded bg-neo-lime/20 text-neo-lime font-bold">
-                        {t('playerView.me') || 'YOU'}
+                        {t('playerView.me')}
                       </span>
                     )}
                   </div>
@@ -158,13 +158,13 @@ export function EnhancedPlayerList({
                     {isHostPlayer && (
                       <div className="flex items-center gap-1 text-xs xl:text-sm text-neo-yellow">
                         <Crown className="w-3 h-3 xl:w-4 xl:h-4" />
-                        <span className="font-bold uppercase">{t('hostView.host') || 'Host'}</span>
+                        <span className="font-bold uppercase">{t('hostView.host')}</span>
                       </div>
                     )}
                     {isBot && (
                       <div className="flex items-center gap-1 text-xs xl:text-sm text-neo-cyan">
                         <Bot className="w-3 h-3 xl:w-4 xl:h-4" />
-                        <span className="font-bold uppercase">{t('common.bot') || 'Bot'}</span>
+                        <span className="font-bold uppercase">{t('common.bot')}</span>
                       </div>
                     )}
                   </div>
@@ -188,7 +188,7 @@ export function EnhancedPlayerList({
           >
             <Users className="w-12 h-12 xl:w-16 xl:h-16 text-neo-cream/20 mb-3 xl:mb-4" />
             <p className="text-sm xl:text-base text-neo-cream/50">
-              {t('hostView.waitingForPlayers') || 'Waiting for players...'}
+              {t('hostView.waitingForPlayers')}
             </p>
           </motion.div>
         )}

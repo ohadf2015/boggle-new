@@ -38,7 +38,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-neo-lime" />
           <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
-            {t('wordHunt.results.details') || 'Details & Rewards'}
+            {t('wordHunt.results.details')}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -73,7 +73,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
                 <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
                   <div className="flex items-center gap-2">
                     <Coins className="w-5 h-5 text-amber-600" />
-                    <span className="font-bold text-sm text-gray-700 dark:text-gray-200">{t('wordHunt.results.coinsEarned') || 'Coins Earned'}</span>
+                    <span className="font-bold text-sm text-gray-700 dark:text-gray-200">{t('wordHunt.results.coinsEarned')}</span>
                   </div>
                   <div className="text-right">
                     <span className="font-black text-lg text-amber-600 dark:text-amber-400">+{coinReward.awarded}</span>

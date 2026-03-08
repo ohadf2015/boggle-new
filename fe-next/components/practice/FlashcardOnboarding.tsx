@@ -103,7 +103,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                 id="onboarding-title"
                 className="text-2xl font-neo-display text-neo-white mb-2"
               >
-                {t('education.practice.swipeHint') || 'Swipe to answer'}
+                {t('education.practice.swipeHint')}
               </h2>
 
               {/* Explanation */}
@@ -131,7 +131,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                   <div className="flex items-center gap-1 text-neo-pink">
                     <ThumbsDown className="w-4 h-4" />
                     <span className="text-sm font-neo-body">
-                      {t('education.practice.dontKnow') || "Don't Know"}
+                      {t('education.practice.dontKnow')}
                     </span>
                   </div>
                 </AdaptiveMotion.div>
@@ -164,7 +164,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                   <div className="flex items-center gap-1 text-neo-cyan">
                     <ThumbsUp className="w-4 h-4" />
                     <span className="text-sm font-neo-body">
-                      {t('education.practice.gotIt') || 'Got It'}
+                      {t('education.practice.gotIt')}
                     </span>
                   </div>
                 </AdaptiveMotion.div>
@@ -182,7 +182,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                   'w-full sm:w-auto px-8'
                 )}
               >
-                {t('common.gotIt') || 'Got it!'}
+                {t('common.gotIt')}
               </Button>
             </div>
           </AdaptiveMotion.div>

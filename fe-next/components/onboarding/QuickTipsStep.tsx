@@ -57,10 +57,10 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         className="text-center space-y-1"
       >
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
-          {t('onboarding.quickTips.title') || 'Quick Tips'}
+          {t('onboarding.quickTips.title')}
         </h2>
         <p className="text-xs sm:text-sm text-neo-white/70">
-          {t('onboarding.quickTips.subtitle') || 'A few things to know before you start'}
+          {t('onboarding.quickTips.subtitle')}
         </p>
       </motion.div>
 
@@ -113,11 +113,11 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
             <h3 className="font-black text-lg sm:text-xl text-neo-black uppercase">
-              {t('onboarding.training.title') || 'Training Mode'}
+              {t('onboarding.training.title')}
             </h3>
           </div>
           <p className="text-xs sm:text-sm text-neo-black/80 mb-3">
-            {t('onboarding.training.description') || 'Practice at your own pace with no pressure. Perfect for beginners!'}
+            {t('onboarding.training.description')}
           </p>
           <motion.div
             className="inline-flex items-center gap-2 bg-neo-black text-neo-lime px-4 py-2 rounded-neo font-black text-sm sm:text-base"
@@ -125,7 +125,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
             transition={{ duration: 2, repeat: Infinity }}
           >
             <Play className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
-            {t('onboarding.training.ready') || "You're ready to play!"}
+            {t('onboarding.training.ready')}
           </motion.div>
         </div>
       </motion.div>
@@ -138,13 +138,13 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         className="w-full"
       >
         <p className="text-center font-bold text-[10px] uppercase tracking-wider text-neo-white/50 mb-2">
-          {t('onboarding.comingUp.title') || 'Coming up after training'}
+          {t('onboarding.comingUp.title')}
         </p>
         <div className="flex gap-2">
           {[
-            { icon: Calendar, label: t('onboarding.comingUp.daily') || 'Daily Challenge', color: 'bg-neo-orange' },
-            { icon: Users, label: t('onboarding.comingUp.multiplayer') || 'Multiplayer', color: 'bg-neo-cyan' },
-            { icon: Swords, label: t('onboarding.comingUp.adventure') || 'Adventure', color: 'bg-neo-pink' },
+            { icon: Calendar, label: t('onboarding.comingUp.daily'), color: 'bg-neo-orange' },
+            { icon: Users, label: t('onboarding.comingUp.multiplayer'), color: 'bg-neo-cyan' },
+            { icon: Swords, label: t('onboarding.comingUp.adventure'), color: 'bg-neo-pink' },
           ].map((mode, i) => (
             <motion.div
               key={mode.label}

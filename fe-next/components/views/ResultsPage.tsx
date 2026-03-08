@@ -314,8 +314,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Mobile tab configuration - Consolidated to 2 tabs for reduced cognitive load
   const mobileTabs = [
-    { id: 'results' as MobileTab, icon: <Trophy className="w-5 h-5" />, label: t('results.results') || 'Results' },
-    { id: 'details' as MobileTab, icon: <BarChart2 className="w-5 h-5" />, label: t('results.details') || 'Details' },
+    { id: 'results' as MobileTab, icon: <Trophy className="w-5 h-5" />, label: t('results.results') },
+    { id: 'details' as MobileTab, icon: <BarChart2 className="w-5 h-5" />, label: t('results.details') },
   ];
 
   // Shared props for main content component
@@ -399,7 +399,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         tileBonus: 0,
       },
     } : {}),
-    ...(resolvedGameMode === 'word-hunt' && (wordHuntSummary || Object.keys(wordHuntPlayerLives).length > 0) ? {
+    ...(resolvedGameMode === 'word-hunt' ? {
       wordHuntResults: {
         targetWord: wordHuntSummary?.targetWord || '',
         foundTarget: !!wordHuntSummary?.targetFoundBy,

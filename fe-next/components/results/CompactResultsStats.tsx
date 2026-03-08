@@ -86,7 +86,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             <span className="text-xl sm:text-2xl font-black text-white">{wordCount}</span>
           </div>
           <div className="text-[10px] sm:text-xs text-white/60 font-bold uppercase">
-            {t('results.words') || 'Words'}
+            {t('results.words')}
           </div>
         </div>
 
@@ -101,7 +101,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             </span>
           </div>
           <div className="text-[10px] sm:text-xs text-white/60 font-bold uppercase">
-            {t('results.accuracy') || 'Accuracy'}
+            {t('results.accuracy')}
           </div>
         </div>
 
@@ -113,7 +113,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
               <span className="text-xl sm:text-2xl font-black text-neo-lime">+{coinReward.awarded}</span>
             </div>
             <div className="text-[10px] sm:text-xs text-neo-lime/70 font-bold uppercase">
-              {t('reveal.coins') || 'Coins'}
+              {t('reveal.coins')}
             </div>
           </div>
         )}
@@ -127,7 +127,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
               <span className="text-xl sm:text-2xl font-black text-amber-400/70">+{coinReward.awarded}</span>
             </div>
             <div className="text-[10px] sm:text-xs text-slate-400 font-bold">
-              {t('coins.signInShort') || 'Sign in'}
+              {t('coins.signInShort')}
             </div>
           </div>
         )}
@@ -156,7 +156,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
               'text-[10px] sm:text-xs font-bold uppercase',
               brainPointsReward.scoreDelta > 0 ? 'text-neo-purple/70' : 'text-neo-red/70'
             )}>
-              {t('brain.points') || 'Brain'}
+              {t('brain.points')}
             </div>
           </div>
         )}
@@ -207,9 +207,9 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
                     visualTrend.direction === 'down' && 'text-neo-red',
                     visualTrend.direction === 'stable' && 'text-white/60'
                   )}>
-                    {visualTrend.direction === 'up' && (t('chart.improving') || 'Improving')}
-                    {visualTrend.direction === 'down' && (t('chart.declining') || 'Declining')}
-                    {visualTrend.direction === 'stable' && (t('chart.stable') || 'Stable')}
+                    {visualTrend.direction === 'up' && (t('chart.improving'))}
+                    {visualTrend.direction === 'down' && (t('chart.declining'))}
+                    {visualTrend.direction === 'stable' && (t('chart.stable'))}
                   </span>
                 </div>
               )}

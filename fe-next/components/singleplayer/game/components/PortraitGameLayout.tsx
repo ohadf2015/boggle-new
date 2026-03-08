@@ -201,7 +201,7 @@ export function PortraitGameLayout({
           className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold text-xs tracking-widest"
         >
           <ArrowLeft className="me-1.5 h-4 w-4 rtl:rotate-180" />
-          {t('common.quit') || 'QUIT'}
+          {t('common.quit')}
         </Button>
 
         {!isPracticeMode ? (
@@ -219,7 +219,7 @@ export function PortraitGameLayout({
             onClick={onFinishPractice}
             className="min-h-[44px] min-w-[80px] text-sm sm:text-base font-bold"
           >
-            {t('singlePlayer.finish') || 'Finish'}
+            {t('singlePlayer.finish')}
           </Button>
         )}
       </header>
@@ -272,7 +272,7 @@ export function PortraitGameLayout({
               <span className="font-black text-neo-black text-sm">
                 {score > 0 ? COIN_EARNING_OTHER.SINGLEPLAYER_BASE + Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR) : 0}
               </span>
-              <span className="font-bold text-neo-black/60 text-[8px] uppercase">{t('common.coins') || 'coins'}</span>
+              <span className="font-bold text-neo-black/60 text-[8px] uppercase">{t('common.coins')}</span>
             </div>
           </AdaptiveMotion.div>
         </div>
@@ -312,7 +312,7 @@ export function PortraitGameLayout({
                   {score.toLocaleString()}
                 </AdaptiveMotion.div>
                 <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px]">
-                  {t('common.score') || 'Score'}
+                  {t('common.score')}
                 </div>
               </div>
             </AdaptiveMotion.div>
@@ -332,7 +332,7 @@ export function PortraitGameLayout({
             >
               <div className="text-end relative z-10">
                 <div className="font-bold uppercase tracking-widest text-neo-black/60 text-[8px] mb-0.5">
-                  {t('common.score') || 'SCORE'}
+                  {t('common.score')}
                 </div>
                 <AdaptiveMotion.div
                   key={score}
@@ -411,7 +411,7 @@ export function PortraitGameLayout({
             >
               <div className="relative bg-gradient-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-4 rounded-lg border-3 border-neo-black shadow-hard-sm">
                 <span className="font-bold text-xs uppercase tracking-wide">
-                  {t('singlePlayer.dragInstruction') || 'Drag across letters to form words!'}
+                  {t('singlePlayer.dragInstruction')}
                 </span>
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-neo-pink border-b-3 border-r-3 border-neo-black rotate-45" />
               </div>
@@ -456,12 +456,12 @@ export function PortraitGameLayout({
           <DialogContent noDescription className="max-w-sm sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-xl font-black uppercase text-center">
-                {t('training.completion.title') || 'Well done!'}
+                {t('training.completion.title')}
               </DialogTitle>
             </DialogHeader>
             <div className="p-4 space-y-4">
               <p className="text-center text-neo-black dark:text-neo-white font-medium">
-                {t('training.completion.message') || "You've mastered the game! You can continue practicing or finish and start a real match."}
+                {t('training.completion.message')}
               </p>
             </div>
             <DialogFooter className="flex-col sm:flex-row gap-2">
@@ -470,7 +470,7 @@ export function PortraitGameLayout({
                 onClick={() => setShowCompletionPopup(false)}
                 className="flex-1 min-h-[48px] font-bold"
               >
-                {t('training.completion.continuePractice') || 'Continue Practice'}
+                {t('training.completion.continuePractice')}
               </Button>
               <Button
                 variant="success"
@@ -480,7 +480,7 @@ export function PortraitGameLayout({
                 }}
                 className="flex-1 min-h-[48px] font-bold"
               >
-                {t('training.completion.finish') || 'Finish'}
+                {t('training.completion.finish')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -491,10 +491,10 @@ export function PortraitGameLayout({
       <ConfirmationDialog
         open={showQuitConfirm}
         onOpenChange={setShowQuitConfirm}
-        title={t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
-        description={t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
-        confirmText={t('singlePlayer.imSure') || "I'm Sure"}
-        cancelText={t('common.cancel') || 'Cancel'}
+        title={t('singlePlayer.quitConfirmTitle')}
+        description={t('singlePlayer.quitConfirmMessage')}
+        confirmText={t('singlePlayer.imSure')}
+        cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
         variant="danger"
       />
@@ -531,21 +531,21 @@ function ChallengeProgressTracker({ score, targetHighScore, t }: ChallengeProgre
                 <>
                   <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-neo-black" />
                   <span className="font-black text-xs md:text-sm text-neo-black uppercase">
-                    {t('challenge.newRecord') || 'New Record!'}
+                    {t('challenge.newRecord')}
                   </span>
                 </>
               ) : score === targetHighScore ? (
                 <>
                   <Target className="w-4 h-4 md:w-5 md:h-5 text-neo-black" />
                   <span className="font-black text-xs md:text-sm text-neo-black uppercase">
-                    {t('challenge.tied') || 'Tied!'}
+                    {t('challenge.tied')}
                   </span>
                 </>
               ) : (
                 <>
                   <Crown className="w-3.5 h-3.5 md:w-4 md:h-4 text-neo-lime" />
                   <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white/70">
-                    {t('challenge.recordToBeat') || 'Record'}: <span className="font-black text-neo-black dark:text-neo-white">{targetHighScore}</span>
+                    {t('challenge.recordToBeat')}: <span className="font-black text-neo-black dark:text-neo-white">{targetHighScore}</span>
                   </span>
                 </>
               )}
@@ -583,7 +583,7 @@ function ChallengeProgressTracker({ score, targetHighScore, t }: ChallengeProgre
         <div className="flex items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-1 md:py-2 bg-neo-cyan/20 text-neo-black dark:bg-neo-cyan/10 dark:text-white rounded-neo border-2 border-dashed border-neo-cyan">
           <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 text-neo-cyan" />
           <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white/70">
-            {t('challenge.settingFirst') || 'Setting your first record!'}
+            {t('challenge.settingFirst')}
           </span>
         </div>
       )}

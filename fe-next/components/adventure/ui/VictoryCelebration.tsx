@@ -119,7 +119,7 @@ export const VictoryCelebration = memo(function VictoryCelebration({
                 'text-5xl sm:text-6xl font-black uppercase tracking-tight',
                 isPerfect ? 'text-neo-pink' : 'text-neo-yellow'
               )}>
-                {isPerfect ? t('adventure.perfect') || 'PERFECT!' : t('adventure.victory') || 'VICTORY!'}
+                {isPerfect ? t('adventure.perfect') : t('adventure.victory')}
               </h2>
               {isPerfect && (
                 <motion.div
@@ -129,7 +129,7 @@ export const VictoryCelebration = memo(function VictoryCelebration({
                   className="flex items-center justify-center gap-2 mt-2"
                 >
                   <Trophy className="w-6 h-6 text-neo-yellow" />
-                  <span className="text-neo-yellow font-bold">{t('adventure.allStars') || 'All Stars Collected!'}</span>
+                  <span className="text-neo-yellow font-bold">{t('adventure.allStars')}</span>
                 </motion.div>
               )}
             </motion.div>
@@ -176,7 +176,7 @@ export const VictoryCelebration = memo(function VictoryCelebration({
             >
               {/* Score */}
               <div className="bg-neo-black/80 border-3 border-neo-white/20 rounded-neo p-4">
-                <div className="text-neo-white/60 text-sm font-bold mb-1">{t('adventure.score') || 'Score'}</div>
+                <div className="text-neo-white/60 text-sm font-bold mb-1">{t('adventure.score')}</div>
                 <RollingNumber
                   value={score}
                   variant="white"
@@ -223,7 +223,7 @@ export const VictoryCelebration = memo(function VictoryCelebration({
                 'pointer-events-auto'
               )}
             >
-              {t('adventure.continue') || 'Continue'}
+              {t('adventure.continue')}
             </motion.button>
           </motion.div>
         )}

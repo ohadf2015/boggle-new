@@ -72,7 +72,7 @@ export const MobileBottomNav = memo<MobileBottomNavProps>(function MobileBottomN
             )}
           </div>
           <span className="text-[9px] font-bold uppercase mt-0.5">
-            {t('hostView.chat') || 'Chat'}
+            {t('hostView.chat')}
           </span>
         </button>
       </div>

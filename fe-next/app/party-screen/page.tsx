@@ -40,11 +40,11 @@ function PartyScreenContent() {
           <div className="flex items-center justify-center gap-3">
             <Monitor className="w-12 h-12 text-neo-lime" />
             <h1 className="text-4xl font-black uppercase tracking-tight">
-              {t('partyScreen.title') || 'Party Screen'}
+              {t('partyScreen.title')}
             </h1>
           </div>
           <p className="text-lg text-neo-cream/80">
-            {t('partyScreen.subtitle') || 'Display the game on your TV for everyone to see!'}
+            {t('partyScreen.subtitle')}
           </p>
         </div>
 
@@ -53,15 +53,15 @@ function PartyScreenContent() {
           <div className="flex items-start gap-3 bg-neo-cream/10 p-4 rounded-neo border-2 border-neo-cream/20">
             <QrCode className="w-6 h-6 text-neo-cyan flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-bold text-neo-lime">{t('partyScreen.qrJoin') || 'QR Code Join'}</h3>
-              <p className="text-sm text-neo-cream/70">{t('partyScreen.qrJoinDesc') || 'Friends scan the QR code to join instantly on their phones'}</p>
+              <h3 className="font-bold text-neo-lime">{t('partyScreen.qrJoin')}</h3>
+              <p className="text-sm text-neo-cream/70">{t('partyScreen.qrJoinDesc')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3 bg-neo-cream/10 p-4 rounded-neo border-2 border-neo-cream/20">
             <Users className="w-6 h-6 text-neo-pink flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-bold text-neo-lime">{t('partyScreen.liveLeaderboard') || 'Live Leaderboard'}</h3>
-              <p className="text-sm text-neo-cream/70">{t('partyScreen.liveLeaderboardDesc') || 'Watch scores update in real-time as players find words'}</p>
+              <h3 className="font-bold text-neo-lime">{t('partyScreen.liveLeaderboard')}</h3>
+              <p className="text-sm text-neo-cream/70">{t('partyScreen.liveLeaderboardDesc')}</p>
             </div>
           </div>
         </div>
@@ -70,7 +70,7 @@ function PartyScreenContent() {
         <form onSubmit={handleJoinRoom} className="space-y-4">
           <div>
             <label htmlFor="roomCode" className="block text-sm font-bold text-neo-cream/80 mb-2">
-              {t('partyScreen.enterRoomCode') || 'Enter Room Code'}
+              {t('partyScreen.enterRoomCode')}
             </label>
             <input
               type="text"
@@ -87,14 +87,14 @@ function PartyScreenContent() {
             type="submit"
             className="w-full bg-neo-lime text-neo-black font-black text-xl py-4 px-6 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard transition-shadow flex items-center justify-center gap-2"
           >
-            {t('partyScreen.startDisplay') || 'Start Party Display'}
+            {t('partyScreen.startDisplay')}
             <ArrowRight className="w-6 h-6" />
           </button>
         </form>
 
         {/* Tip */}
         <p className="text-xs text-neo-cream/50">
-          {t('partyScreen.tip') || 'Tip: Cast this page to your TV using Chrome or AirPlay for the best experience!'}
+          {t('partyScreen.tip')}
         </p>
       </div>
     </div>

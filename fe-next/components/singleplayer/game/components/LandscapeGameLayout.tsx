@@ -232,7 +232,7 @@ export function LandscapeGameLayout({
                   ? "text-xs sm:text-sm mt-0.5"
                   : "landscape-stat-label"
               )}>
-                {t('common.score') || 'SCORE'}
+                {t('common.score')}
               </div>
             </div>
           </div>
@@ -282,7 +282,7 @@ export function LandscapeGameLayout({
                 {validWordCount}
               </div>
               <div className="landscape-stat-label text-neo-black">
-                {t('common.words') || 'WORDS'}
+                {t('common.words')}
               </div>
             </div>
 
@@ -310,7 +310,7 @@ export function LandscapeGameLayout({
               variant="ghost"
               size="sm"
               onClick={onPauseToggle}
-              aria-label={isPaused ? (t('common.resume') || 'Resume') : (t('common.pause') || 'Pause')}
+              aria-label={isPaused ? (t('common.resume')) : (t('common.pause'))}
               aria-pressed={isPaused}
               className="w-12 h-12 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
             >
@@ -321,10 +321,10 @@ export function LandscapeGameLayout({
               variant="ghost"
               size="sm"
               onClick={onFinishPractice}
-              aria-label={t('singlePlayer.finish') || 'Finish'}
+              aria-label={t('singlePlayer.finish')}
               className="px-3 sm:px-4 h-10 sm:h-12 min-h-[44px] bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-xs sm:text-sm font-bold text-neo-black shadow-hard-sm"
             >
-              {t('singlePlayer.finish') || 'Finish'}
+              {t('singlePlayer.finish')}
             </Button>
           )}
 
@@ -332,7 +332,7 @@ export function LandscapeGameLayout({
             variant="ghost"
             size="sm"
             onClick={onQuitRequest}
-            aria-label={t('common.quit') || 'Quit game'}
+            aria-label={t('common.quit')}
             className="w-12 h-12 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
           >
             <ArrowLeft className="text-lg text-neo-cream rtl:rotate-180" />
@@ -386,10 +386,10 @@ export function LandscapeGameLayout({
       <ConfirmationDialog
         open={showQuitConfirm}
         onOpenChange={setShowQuitConfirm}
-        title={t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
-        description={t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
-        confirmText={t('common.quit') || 'Quit'}
-        cancelText={t('common.cancel') || 'Cancel'}
+        title={t('singlePlayer.quitConfirmTitle')}
+        description={t('singlePlayer.quitConfirmMessage')}
+        confirmText={t('common.quit')}
+        cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
         variant="danger"
       />
@@ -403,7 +403,7 @@ export function LandscapeGameLayout({
 
       {/* Screen reader status announcements */}
       <div className="sr-only" role="status" aria-live="polite">
-        {isPaused && (t('singlePlayer.gamePaused') || 'Game paused')}
+        {isPaused && (t('singlePlayer.gamePaused'))}
       </div>
     </div>
   );

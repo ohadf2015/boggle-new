@@ -54,7 +54,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           {score}
         </AdaptiveMotion.div>
         <div className="landscape-stat-label text-neo-black flex items-center gap-0.5">
-          {t('common.score') || 'SCORE'}
+          {t('common.score')}
           <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
         </div>
       </div>
@@ -97,7 +97,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
             {score}
           </AdaptiveMotion.div>
           <div className="text-sm font-bold uppercase tracking-wider text-neo-black flex items-center justify-center gap-0.5">
-            {t('common.score') || 'Score'}
+            {t('common.score')}
             <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
           </div>
         </div>
@@ -151,7 +151,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           {score}
         </AdaptiveMotion.div>
         <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px] md:text-xs">
-          {t('common.score') || 'Score'}
+          {t('common.score')}
         </div>
       </div>
       {/* Rank badge with spring entrance */}

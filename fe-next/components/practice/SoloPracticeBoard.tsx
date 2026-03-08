@@ -147,7 +147,7 @@ export default function SoloPracticeBoard({
             <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
 
             <h2 className="text-2xl font-neo-display text-neo-white mb-2">
-              {t('education.practice.complete') || 'Practice Complete!'}
+              {t('education.practice.complete')}
             </h2>
 
             <div className="my-6 space-y-4">
@@ -161,7 +161,7 @@ export default function SoloPracticeBoard({
                 <div className="p-3 bg-neo-black/30 rounded-neo">
                   <p className="text-2xl font-neo-display text-neo-white">{validWordCount}</p>
                   <p className="text-xs text-slate-400">
-                    {t('education.practice.wordsFound') || 'Words Found'}
+                    {t('education.practice.wordsFound')}
                   </p>
                 </div>
                 <div className="p-3 bg-neo-cyan/10 rounded-neo">
@@ -182,7 +182,7 @@ export default function SoloPracticeBoard({
                   </p>
                 )}
                 <p className="text-neo-white/80 font-neo-body">
-                  +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained') || 'XP'}
+                  +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
                 </p>
               </div>
             )}
@@ -215,15 +215,15 @@ export default function SoloPracticeBoard({
                   'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
                 )}
               >
-                <RotateCcw className={cn('w-4 h-4', isRTL ? 'ml-2' : 'mr-2')} />
-                {t('common.retry') || 'Play Again'}
+                <RotateCcw className="w-4 h-4 me-2" />
+                {t('common.retry')}
               </Button>
               <Button
                 variant="outline"
                 onClick={onBack}
                 className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
               >
-                {t('common.back') || 'Back'}
+                {t('common.back')}
               </Button>
             </div>
           </CardContent>
@@ -247,7 +247,7 @@ export default function SoloPracticeBoard({
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-neo-display text-neo-white">
-              {t('education.practice.soloBoard') || 'Solo Practice'}
+              {t('education.practice.soloBoard')}
             </h1>
             <p className="text-sm text-slate-400">{lessonName}</p>
           </div>
@@ -338,7 +338,7 @@ export default function SoloPracticeBoard({
             'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
           )}
         >
-          {t('education.practice.finish') || 'Finish Practice'}
+          {t('education.practice.finish')}
         </Button>
       </div>
     </div>

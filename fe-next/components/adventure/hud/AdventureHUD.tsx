@@ -165,7 +165,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
                   'font-neo-display font-black text-xl'
                 )}
               >
-                <span className="text-xs opacity-70">{t('common.score') || 'Score'}: </span>
+                <span className="text-xs opacity-70">{t('common.score')}: </span>
                 <RollingNumber value={score} variant="gold" className="text-xl font-black" />
               </div>
 

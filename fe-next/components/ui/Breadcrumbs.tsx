@@ -35,7 +35,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
             className="hover:text-neo-cyan transition-colors inline-flex items-center gap-1"
           >
             <Home className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>{t('nav.home') || 'Home'}</span>
+            <span>{t('nav.home')}</span>
           </Link>
         </li>
 

@@ -63,7 +63,7 @@ export function MobileDetailsTab({
           sortedPointGroups={sortedPointGroups}
           invalidWords={invalidWords}
           wordCount={results.playerWordData.length}
-          title={t('results.yourWords') || 'Your Words'}
+          title={t('results.yourWords')}
           t={t}
           defaultExpanded={true}
         />
@@ -73,7 +73,7 @@ export function MobileDetailsTab({
       {playerInsights && (
         <PerformanceSection
           insights={playerInsights}
-          title={t('results.performanceDetails') || 'Performance Details'}
+          title={t('results.performanceDetails')}
           archetype={playerArchetype}
         />
       )}
@@ -88,7 +88,7 @@ export function MobileDetailsTab({
         <BotWordsSection
           botWordDetails={botWordDetails}
           language={gameLanguage}
-          title={t('singlePlayer.botWordsFound') || 'Bot Words Found'}
+          title={t('singlePlayer.botWordsFound')}
           t={t}
           defaultExpanded={false}
         />
@@ -98,15 +98,15 @@ export function MobileDetailsTab({
       {results.achievements && results.achievements.length > 0 && (
         <AchievementsSection
           achievements={results.achievements}
-          title={t('hostView.achievements') || 'Achievements'}
-          disclaimer={t('singlePlayer.achievementsNotSaved') || 'Achievements in single player mode are not saved to your profile.'}
+          title={t('hostView.achievements')}
+          disclaimer={t('singlePlayer.achievementsNotSaved')}
           defaultExpanded={false}
         />
       )}
 
       {/* History Chart */}
       <CollapsibleSection
-        title={t('results.performanceHistory') || 'Performance History'}
+        title={t('results.performanceHistory')}
         icon={<TrendingUp className="w-4 h-4" />}
         defaultExpanded={false}
         variant="tertiary"
@@ -118,7 +118,7 @@ export function MobileDetailsTab({
       {/* NEW: Bonuses section */}
       {(totalComboBonus > 0 || totalFireRoundBonus > 0) && (
         <CollapsibleSection
-          title={t('results.bonuses') || 'Bonuses'}
+          title={t('results.bonuses')}
           defaultExpanded={false}
           variant="tertiary"
           className="shadow-hard"
@@ -126,13 +126,13 @@ export function MobileDetailsTab({
           <div className="space-y-2 p-3">
             {totalComboBonus > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-white/60">{t('results.comboBonus') || 'Combo Bonus'}</span>
+                <span className="text-white/60">{t('results.comboBonus')}</span>
                 <span className="font-bold text-neo-cyan">+{totalComboBonus}</span>
               </div>
             )}
             {totalFireRoundBonus > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-white/60">{t('results.fireRoundBonus') || 'Fire Round'}</span>
+                <span className="text-white/60">{t('results.fireRoundBonus')}</span>
                 <span className="font-bold text-neo-orange">+{totalFireRoundBonus}</span>
               </div>
             )}

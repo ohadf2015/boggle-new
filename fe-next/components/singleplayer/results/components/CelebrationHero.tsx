@@ -162,7 +162,7 @@ export const CelebrationHero = memo(function CelebrationHero({
 
           {/* "FINAL SCORE" label in cyan */}
           <p className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-neo-cyan mb-2">
-            {t('results.finalScore') || 'Final Score'}
+            {t('results.finalScore')}
           </p>
 
           {/* Massive score number */}
@@ -200,7 +200,7 @@ export const CelebrationHero = memo(function CelebrationHero({
               <div className="text-start">
                 <span className="text-sm sm:text-base font-black text-white block leading-tight">{wordCount}</span>
                 <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white/50">
-                  {t('results.words') || 'Words'}
+                  {t('results.words')}
                 </span>
               </div>
             </div>
@@ -215,7 +215,7 @@ export const CelebrationHero = memo(function CelebrationHero({
                   {totalWords != null ? `${wordCount}/${totalWords}` : `${accuracy}%`}
                 </span>
                 <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white/50 hidden sm:block">
-                  {t('results.accuracy') || 'Accuracy'}
+                  {t('results.accuracy')}
                 </span>
               </div>
             </div>
@@ -231,7 +231,7 @@ export const CelebrationHero = memo(function CelebrationHero({
                     +{coinReward.awarded}
                   </span>
                   <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white/50 hidden sm:block">
-                    {t('results.coinsEarned') || 'Coins'}
+                    {t('results.coinsEarned')}
                   </span>
                 </div>
               </div>

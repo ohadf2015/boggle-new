@@ -321,7 +321,7 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
 
           {/* Hint */}
           <p className="text-[10px] text-neo-black/70 mt-1.5 pt-1.5 border-t border-neo-black/10 relative z-10">
-            {t('archetypes.hint') || 'Based on your play style'}
+            {t('archetypes.hint')}
           </p>
         </motion.div>
       )}

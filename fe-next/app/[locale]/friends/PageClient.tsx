@@ -28,7 +28,7 @@ export default function FriendsPageClient(): React.JSX.Element {
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
     onRefresh: async () => {
       await refreshFriends();
-      toast.success(t('common.refreshed') || 'Refreshed', {
+      toast.success(t('common.refreshed'), {
         duration: 2000,
       });
     },
@@ -79,7 +79,7 @@ export default function FriendsPageClient(): React.JSX.Element {
             'text-xl font-black uppercase tracking-wide',
             isDark ? 'text-white' : 'text-gray-900'
           )}>
-            {t('friends.title') || 'Friends'}
+            {t('friends.title')}
           </h1>
         </div>
       </header>

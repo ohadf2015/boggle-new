@@ -141,7 +141,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                           usernameInputRef.current?.focus();
                         }}
                         className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 text-neo-black/50 hover:text-neo-black"
-                        aria-label={t('common.clear') || 'Clear'}
+                        aria-label={t('common.clear')}
                       >
                         <X className="h-5 w-5" />
                       </Button>
@@ -188,7 +188,7 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = ({
   <div className="space-y-4 sm:space-y-6">
     <div className="space-y-3">
       <Label htmlFor="auth-display-name" className="text-base font-black uppercase text-neo-cream">
-        {t('joinView.joiningAs') || 'Joining as'}
+        {t('joinView.joiningAs')}
       </Label>
       <Input
         id="auth-display-name"
@@ -199,7 +199,7 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = ({
         maxLength={20}
       />
       <p className="text-neo-cream/90 text-xs font-bold uppercase text-center">
-        {t('joinView.tapToChangeDisplayName') || 'Tap to change display name'}
+        {t('joinView.tapToChangeDisplayName')}
       </p>
     </div>
 
@@ -229,7 +229,7 @@ const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t
           <motion.span
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="mr-3 inline-block"
+            className="me-3 inline-block"
           >
             <RefreshCw size={24} aria-hidden="true" />
           </motion.span>
@@ -237,7 +237,7 @@ const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t
         </>
       ) : (
         <>
-          <Gamepad2 className="mr-3" size={24} aria-hidden="true" />
+          <Gamepad2 className="me-3" size={24} aria-hidden="true" />
           {t('joinView.joinGame')}
         </>
       )}

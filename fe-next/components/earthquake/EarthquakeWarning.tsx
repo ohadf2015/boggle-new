@@ -33,7 +33,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
       announcement.setAttribute('role', 'alert');
       announcement.setAttribute('aria-live', 'assertive');
       announcement.className = 'sr-only';
-      announcement.textContent = t('earthquake.warning') || 'Earthquake incoming!';
+      announcement.textContent = t('earthquake.warning');
       document.body.appendChild(announcement);
 
       // Clean up
@@ -110,10 +110,10 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
               {/* Warning Text */}
               <div className="text-center">
                 <h2 className="text-3xl font-black uppercase text-neo-black mb-2 tracking-wide">
-                  {t('earthquake.warning') || 'Earthquake!'}
+                  {t('earthquake.warning')}
                 </h2>
                 <p className="text-lg font-bold text-neo-black/80">
-                  {t('earthquake.brace') || 'Brace yourself!'}
+                  {t('earthquake.brace')}
                 </p>
               </div>
 

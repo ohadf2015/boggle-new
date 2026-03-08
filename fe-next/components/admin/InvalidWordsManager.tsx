@@ -336,7 +336,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                     <p className="text-sm text-slate-400">Auto-Promoted / Candidates</p>
                     <p className="text-2xl font-bold text-white">
                       {autoPromoteStats.autoPromoted}
-                      <span className="text-base text-slate-400 ml-1">/ {autoPromoteStats.candidates}</span>
+                      <span className="text-base text-slate-400 ms-1">/ {autoPromoteStats.candidates}</span>
                     </p>
                   </div>
                 </div>
@@ -514,7 +514,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                           onClick={() => handleApprove(word.word, word.language, false)}
                           disabled={isProcessing}
                         >
-                          <Check className="w-4 h-4 mr-1" />
+                          <Check className="w-4 h-4 me-1" />
                           Approve
                         </Button>
                         <Button
@@ -555,7 +555,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
             disabled={offset === 0}
             className="border-slate-600"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" />
+            <ChevronLeft className="w-4 h-4 me-1" />
             Previous
           </Button>
           <span className="text-sm text-slate-400">
@@ -569,7 +569,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
             className="border-slate-600"
           >
             Next
-            <ChevronRight className="w-4 h-4 ml-1" />
+            <ChevronRight className="w-4 h-4 ms-1" />
           </Button>
         </div>
       )}

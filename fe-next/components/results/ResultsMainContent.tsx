@@ -243,7 +243,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
                   {selectedGameMode !== undefined && onSelectGameMode && (
                     <div className="bg-neo-navy-light/50 border-2 border-neo-white/10 rounded-neo p-2">
                       <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-1.5">
-                        {t('gameModes.nextMode') || 'Next Mode'}
+                        {t('gameModes.nextMode')}
                       </p>
                       <GameModeSelector
                         selectedMode={selectedGameMode}
@@ -261,7 +261,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
                     className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
                   >
                     <Play className="w-6 h-6" />
-                    {t('results.playAgain') || 'Play Again'}
+                    {t('results.playAgain')}
                   </motion.button>
                 </div>
               ) : isCurrentPlayerReady ? (
@@ -271,7 +271,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
                     <span className="font-black uppercase">{t('results.youAreReady')}</span>
                   </div>
                   <p className="text-center text-sm text-white/80 mt-1">
-                    {t('results.waitingForHostToStart') || 'Waiting for host...'}
+                    {t('results.waitingForHostToStart')}
                   </p>
                 </div>
               ) : (
@@ -286,7 +286,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
                     {t('results.imReady')}
                   </motion.button>
                   <p className="text-center text-xs text-neo-cream/60">
-                    {t('results.readyExplanation') || 'Tap to let the host know you want to play again'}
+                    {t('results.readyExplanation')}
                   </p>
                 </div>
               )}
@@ -383,7 +383,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
       {duplicateRuleDisabled && (
         <div className="bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo p-2 text-center">
           <span className="text-xs text-neo-cyan font-bold">
-            👥 {t('results.largeRoomMode') || 'Large Room Mode'} - {t('results.duplicateRuleDisabled') || 'duplicate words count'}
+            👥 {t('results.largeRoomMode')} - {t('results.duplicateRuleDisabled')}
           </span>
         </div>
       )}

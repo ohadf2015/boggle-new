@@ -68,7 +68,7 @@ export function SpectatorBanner({
             {/* Text */}
             <div className="flex-1 min-w-0">
               <div className="font-black text-sm sm:text-base uppercase tracking-wide flex items-center gap-2">
-                {t('spectator.status') || '👀 SPECTATING'}
+                {t('spectator.status')}
                 {spectatorCount !== undefined && spectatorCount > 1 && (
                   <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
                     <Users className="w-3 h-3" />
@@ -77,7 +77,7 @@ export function SpectatorBanner({
                 )}
               </div>
               <p className="text-xs sm:text-sm mt-0.5 text-white/90 line-clamp-1">
-                {customMessage || t('spectator.explanation') || 'Room is full. You can watch but can\'t play yet.'}
+                {customMessage || t('spectator.explanation')}
               </p>
             </div>
           </div>
@@ -101,13 +101,13 @@ export function SpectatorBanner({
                 'transition-all duration-100',
                 'min-h-[44px] min-w-[44px]'
               )}
-              aria-label={t('spectator.requestToPlay') || 'Request to play'}
+              aria-label={t('spectator.requestToPlay')}
             >
               <span className="hidden sm:inline">
-                {t('spectator.requestToPlay') || 'Request to Play'}
+                {t('spectator.requestToPlay')}
               </span>
               <span className="sm:hidden">
-                {t('spectator.join') || 'Join'}
+                {t('spectator.join')}
               </span>
             </button>
           )}

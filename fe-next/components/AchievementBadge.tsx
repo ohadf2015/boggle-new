@@ -47,7 +47,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
       return {
         icon: achievement.icon,
         name: t(`achievements.${achievement.key}.name`) || achievement.key,
-        description: t(`achievements.${achievement.key}.description`) || ''
+        description: t(`achievements.${achievement.key}.description`)
       };
     }
     // Legacy format: already has name and description
@@ -87,10 +87,10 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
   const getTierName = (tierKey: TierName | null): string => {
     if (!tierKey) return '';
     const tierNames: Record<TierName, string> = {
-      BRONZE: t('achievementTiers.bronze') || 'Bronze',
-      SILVER: t('achievementTiers.silver') || 'Silver',
-      GOLD: t('achievementTiers.gold') || 'Gold',
-      PLATINUM: t('achievementTiers.platinum') || 'Platinum',
+      BRONZE: t('achievementTiers.bronze'),
+      SILVER: t('achievementTiers.silver'),
+      GOLD: t('achievementTiers.gold'),
+      PLATINUM: t('achievementTiers.platinum'),
     };
     return tierNames[tierKey] || tierKey;
   };
@@ -125,14 +125,14 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 filter: locked ? 'grayscale(100%)' : undefined,
               }}
             >
-              <span className="mr-1">{localizedAchievement.icon}</span>
+              <span className="me-1">{localizedAchievement.icon}</span>
               {localizedAchievement.name}
             </Badge>
             {/* Lock icon for locked achievements */}
             {locked && (
               <span
                 className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-600 bg-gray-700 shadow-sm"
-                title={t('profile.locked') || 'Locked'}
+                title={t('profile.locked')}
               >
                 🔒
               </span>
@@ -161,7 +161,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
               <div className="flex items-center gap-1 mb-1">
                 <span className="text-sm">🔒</span>
                 <span className="text-[11px] sm:text-xs uppercase font-bold text-neo-cyan tracking-wide">
-                  {t('profile.locked') || 'Locked'}
+                  {t('profile.locked')}
                 </span>
               </div>
             )}
@@ -176,7 +176,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                     {tierIcon} {getTierName(tier)}
                   </span>
                   <span className="text-neo-white/70">
-                    ({t('achievementTiers.earned') || 'Earned'} {count}x)
+                    ({t('achievementTiers.earned')} {count}x)
                   </span>
                 </div>
 
@@ -198,7 +198,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
 
                 {tierProgress.isMaxTier && (
                   <p className="text-[11px] sm:text-xs text-neo-lime mt-1 font-bold">
-                    {t('achievementTiers.maxTier') || 'Max Tier Reached!'}
+                    {t('achievementTiers.maxTier')}
                   </p>
                 )}
               </div>
@@ -207,7 +207,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
             {/* Hint for locked achievements */}
             {locked && (
               <p className="text-[11px] sm:text-xs text-neo-white/60 mt-2 italic">
-                {t('profile.earnThisAchievement') || 'Play games to unlock this achievement!'}
+                {t('profile.earnThisAchievement')}
               </p>
             )}
           </div>

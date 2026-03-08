@@ -293,7 +293,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     onClick={handleLogoClick}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    aria-label={t('common.goToHome') || 'Go to home page'}
+                    aria-label={t('common.goToHome')}
                 >
                     {/* Lime-light lightning bolt - left */}
                     <svg
@@ -390,7 +390,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 "transition-all duration-100"
                             )}
                             aria-label={t('gift.youHaveGifts') || `You have ${unclaimedCount} unclaimed gift${unclaimedCount !== 1 ? 's' : ''}`}
-                            title={t('gift.gifts') || 'Gifts'}
+                            title={t('gift.gifts')}
                         >
                             <Gift size={20} />
                             <GiftNotificationBadge count={unclaimedCount} />
@@ -431,8 +431,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                             "transition-all duration-100"
                         )}
-                        aria-label={showMobileMenu ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
-                        title={showMobileMenu ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
+                        aria-label={showMobileMenu ? (t('common.closeMenu')) : (t('common.openMenu'))}
+                        title={showMobileMenu ? (t('common.closeMenu')) : (t('common.openMenu'))}
                         aria-expanded={showMobileMenu}
                     >
                         {showMobileMenu ? (
@@ -479,7 +479,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 {/* Pane Header with close button */}
                                 <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20 dark:border-slate-600">
                                     <span className="text-lg font-bold text-neo-black dark:text-white">
-                                        {t('common.menu') || 'Menu'}
+                                        {t('common.menu')}
                                     </span>
                                     <button
                                         onClick={() => setShowMobileMenu(false)}
@@ -492,7 +492,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                                             "transition-all duration-100"
                                         )}
-                                        aria-label={t('common.closeMenu') || 'Close menu'}
+                                        aria-label={t('common.closeMenu')}
                                     >
                                         <X className="text-xl" size={20} />
                                     </button>
@@ -505,7 +505,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                         <>
                                             <div className="flex flex-col gap-2">
                                                 <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                                    {t('profile.coins') || 'Coins'}
+                                                    {t('profile.coins')}
                                                 </span>
                                                 <Link
                                                     href={`/${language}/profile`}
@@ -522,7 +522,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                         showAnimation={false}
                                                     />
                                                     <span className="ms-auto text-neo-black/60 dark:text-slate-400">
-                                                        {t('profile.viewProfile') || 'View Profile'}
+                                                        {t('profile.viewProfile')}
                                                     </span>
                                                 </Link>
                                             </div>
@@ -537,7 +537,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                         <>
                                             <div className="flex flex-col gap-2">
                                                 <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                                    {t('gift.rewards') || 'Rewards'}
+                                                    {t('gift.rewards')}
                                                 </span>
                                                 <button
                                                     onClick={() => {
@@ -566,7 +566,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     {/* Account Section */}
                                     <div className="flex flex-col gap-2">
                                         <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                            {t('common.account') || 'Account'}
+                                            {t('common.account')}
                                         </span>
                                         <AuthButton
                                             inline
@@ -582,13 +582,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     {/* Settings Section - Language quick-switch + full settings link */}
                                     <div className="flex flex-col gap-2">
                                         <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                            {t('settings.title') || 'Settings'}
+                                            {t('settings.title')}
                                         </span>
 
                                         {/* Quick Language Switcher - for fast language changes */}
                                         <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-white dark:bg-slate-700">
                                             <span className="text-sm font-bold text-neo-black dark:text-white">
-                                                {t('settings.language') || 'Language'}
+                                                {t('settings.language')}
                                             </span>
                                             <div className="ms-auto">
                                                 <QuickLanguageSwitcher showLabel />
@@ -608,7 +608,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan/50 border-3 border-neo-black text-neo-black dark:text-white">
                                                 <Accessibility className="w-4 h-4" aria-hidden="true" />
                                             </span>
-                                            <span>{t('settings.accessibility') || 'Accessibility'}</span>
+                                            <span>{t('settings.accessibility')}</span>
                                         </Link>
 
                                         {/* Full Settings Link - for theme, sound, accessibility */}
@@ -624,7 +624,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan/50 border-3 border-neo-black text-neo-black dark:text-white">
                                                 <Settings className="w-4 h-4" aria-hidden="true" />
                                             </span>
-                                            <span>{t('settings.moreSettings') || 'More Settings'}</span>
+                                            <span>{t('settings.moreSettings')}</span>
                                         </Link>
                                     </div>
 
@@ -635,7 +635,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     {isAuthenticated && (
                                         <div className="flex flex-col gap-2">
                                             <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                                {t('landing.brainTraining') || 'Brain Training'}
+                                                {t('landing.brainTraining')}
                                             </span>
                                             <Link
                                                 href={`/${language}/brain`}
@@ -649,7 +649,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-navy border-3 border-neo-black text-neo-purple-light">
                                                     <Brain className="w-4 h-4" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('brain.nav.dashboard') || 'Cognitive Dashboard'}</span>
+                                                <span>{t('brain.nav.dashboard')}</span>
                                             </Link>
                                         </div>
                                     )}
@@ -662,7 +662,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
                                             <div className="flex flex-col gap-2">
                                                 <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                                    {t('common.admin') || 'Admin'}
+                                                    {t('common.admin')}
                                                 </span>
 
                                                 <Link
@@ -677,7 +677,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-navy border-3 border-neo-black text-neo-pink">
                                                         <BarChart3 className="w-4 h-4" aria-hidden="true" />
                                                     </span>
-                                                    <span>{t('common.adminDashboard') || 'Admin Dashboard'}</span>
+                                                    <span>{t('common.adminDashboard')}</span>
                                                 </Link>
                                             </div>
                                         </>
@@ -689,7 +689,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     {/* Info Links Section - replaces footer on mobile */}
                                     <div className="flex flex-col gap-1.5">
                                         <span className="text-[10px] font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                            {t('common.info') || 'Info'}
+                                            {t('common.info')}
                                         </span>
                                         <div className="flex flex-col gap-1.5">
                                             <Link
@@ -704,7 +704,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-cyan border-2 border-neo-black text-neo-black">
                                                     <Info className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('footer.about') || 'About'}</span>
+                                                <span>{t('footer.about')}</span>
                                             </Link>
                                             <Link
                                                 href={`/${language}/faq`}
@@ -718,7 +718,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-yellow border-2 border-neo-black text-neo-black">
                                                     <HelpCircle className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('footer.faq') || 'FAQ'}</span>
+                                                <span>{t('footer.faq')}</span>
                                             </Link>
                                             <Link
                                                 href={`/${language}/blog`}
@@ -732,7 +732,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-orange border-2 border-neo-black text-neo-black">
                                                     <Newspaper className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('footer.blog') || 'Blog'}</span>
+                                                <span>{t('footer.blog')}</span>
                                             </Link>
                                             <Link
                                                 href={`/${language}/leaderboard`}
@@ -746,7 +746,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-lime border-2 border-neo-black text-neo-black">
                                                     <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
+                                                <span>{t('footer.leaderboard')}</span>
                                             </Link>
                                             <Link
                                                 href={`/${language}/contact`}
@@ -760,7 +760,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-cream border-2 border-neo-black text-neo-black">
                                                     <Mail className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('footer.contact') || 'Contact'}</span>
+                                                <span>{t('footer.contact')}</span>
                                             </Link>
                                             <Link
                                                 href={`/${language}/legal`}
@@ -774,14 +774,14 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-pink-light border-2 border-neo-black">
                                                     <ScrollText className="w-3.5 h-3.5 text-neo-black" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('legal.title') || 'Legal'}</span>
+                                                <span>{t('legal.title')}</span>
                                             </Link>
                                             <a
                                                 href="https://ko-fi.com/lexiclash"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 onClick={() => setShowMobileMenu(false)}
-                                                aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab') || 'opens in new tab'})`}
+                                                aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab')})`}
                                                 className={cn(
                                                     "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-neo-pink/20 dark:bg-slate-700 hover:bg-neo-pink/40 dark:hover:bg-slate-600 text-neo-black dark:text-white",
@@ -792,7 +792,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     <Coffee className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('support.kofiFooter')}</span>
-                                                <span className="sr-only">({t('common.opensInNewTab') || 'opens in new tab'})</span>
+                                                <span className="sr-only">({t('common.opensInNewTab')})</span>
                                             </a>
                                             <a
                                                 href="https://www.instagram.com/lexi.clash"
@@ -810,7 +810,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     <InstagramIcon className="w-3.5 h-3.5" size="0.875em" />
                                                 </span>
                                                 <span>Instagram</span>
-                                                <span className="sr-only">({t('common.opensInNewTab') || 'opens in new tab'})</span>
+                                                <span className="sr-only">({t('common.opensInNewTab')})</span>
                                             </a>
                                             <div
                                                 onClick={() => setShowMobileMenu(false)}

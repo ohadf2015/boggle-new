@@ -137,7 +137,7 @@ export default function LessonAssignmentDialog({
                 disabled={isAssigning || !selectedClassroomId || classrooms.length === 0}
                 className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed disabled:opacity-50"
               >
-                {isAssigning ? t('teacher.lessons.assign.assigning') || 'Assigning...' : t('teacher.lessons.assign.button')}
+                {isAssigning ? t('teacher.lessons.assign.assigning') : t('teacher.lessons.assign.button')}
               </Button>
               <Button
                 variant="outline"

@@ -100,15 +100,15 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
               {/* Text */}
               <div className="flex flex-col">
                 <span className="text-sm font-black uppercase tracking-wide text-neo-cream leading-none">
-                  {t('earthquake.fireRound') || 'Fire Round'}
+                  {t('earthquake.fireRound')}
                 </span>
                 <span className="text-xs font-bold text-neo-lime leading-none mt-0.5">
-                  {t('earthquake.multiplier') || '2× Multiplier'}
+                  {t('earthquake.multiplier')}
                 </span>
               </div>
 
               {/* Countdown */}
-              <div className="ml-2 bg-neo-black/20 text-white rounded-neo px-2 py-1 border-2 border-neo-black/40">
+              <div className="ms-2 bg-neo-black/20 text-white rounded-neo px-2 py-1 border-2 border-neo-black/40">
                 <motion.span
                   key={remainingSeconds}
                   className="text-xl font-black text-neo-cream tabular-nums"

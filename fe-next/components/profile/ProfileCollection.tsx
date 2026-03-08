@@ -42,14 +42,14 @@ export function ProfileCollection({
           isDarkMode ? 'text-white' : 'text-gray-900'
         )}>
           <Gift className="text-neo-pink" />
-          {t('collectibles.title') || 'My Collection'}
+          {t('collectibles.title')}
         </h2>
         {collectibles.length > 0 && (
           <span className={cn(
             'text-xs px-2 py-1 rounded-full',
             isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-gray-100 text-gray-600'
           )}>
-            {collectibles.length} {t('collectibles.items') || 'items'}
+            {collectibles.length} {t('collectibles.items')}
           </span>
         )}
       </div>
@@ -62,8 +62,8 @@ export function ProfileCollection({
         </div>
       ) : collectibles.length === 0 ? (
         <EnhancedEmptyState
-          title={t('collectibles.emptyCollection') || 'No collectibles yet'}
-          description={t('collectibles.earnByPlaying') || 'Earn coins by playing games'}
+          title={t('collectibles.emptyCollection')}
+          description={t('collectibles.earnByPlaying')}
           icon="sparkles"
           compact
         />
@@ -76,7 +76,7 @@ export function ProfileCollection({
         isDarkMode ? 'border-slate-700' : 'border-gray-200'
       )}>
         <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
-          {t('collectibles.shopComingSoon') || 'Shop coming soon! Collect special avatars, badges, and titles.'}
+          {t('collectibles.shopComingSoon')}
         </p>
       </div>
     </motion.div>

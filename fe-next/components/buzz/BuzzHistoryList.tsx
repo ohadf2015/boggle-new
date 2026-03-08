@@ -195,7 +195,7 @@ export default function BuzzHistoryList({
                     </div>
 
                     {/* Arrow */}
-                    <ChevronRight className="w-5 h-5 text-slate-500 flex-shrink-0" />
+                    <ChevronRight className="w-5 h-5 text-slate-500 flex-shrink-0 rtl:rotate-180" />
                   </motion.button>
                 ))}
               </AnimatePresence>

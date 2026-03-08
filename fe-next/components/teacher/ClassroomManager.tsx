@@ -123,7 +123,7 @@ export default function ClassroomManager() {
             'transition-all'
           )}
         >
-          <Plus className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
+          <Plus className="w-5 h-5 me-2" />
           {t('teacher.classroom.create')}
         </Button>
       </div>
@@ -145,7 +145,7 @@ export default function ClassroomManager() {
             }}
             className="bg-neo-cyan text-black font-black border-3 border-black shadow-hard hover:-translate-y-0.5 transition-all"
           >
-            <Plus className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
+            <Plus className="w-5 h-5 me-2" />
             {t('teacher.classroom.create')}
           </Button>
         </div>
@@ -249,7 +249,7 @@ export default function ClassroomManager() {
                       }}
                       className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all"
                     >
-                      <Edit2 className="w-4 h-4 mr-2" />
+                      <Edit2 className="w-4 h-4 me-2" />
                       {t('teacher.classroom.edit')}
                     </Button>
                     <Button

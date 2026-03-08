@@ -74,7 +74,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
     )}>
       {/* ── Card 1: Your Performance ── */}
       <InfoCard>
-        <CardTitle>{t('results.yourPerformance') || 'Your Performance'}</CardTitle>
+        <CardTitle>{t('results.yourPerformance')}</CardTitle>
 
         {hasSparkline && (
           <div className="flex items-center gap-3 mb-3">
@@ -99,7 +99,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
                 )}>
                   {trend.direction === 'up' && `+${Math.min(Math.abs(trend.percentChange), 999)}%`}
                   {trend.direction === 'down' && `${Math.max(trend.percentChange, -999)}%`}
-                  {trend.direction === 'stable' && (t('chart.stable') || 'Stable')}
+                  {trend.direction === 'stable' && (t('chart.stable'))}
                 </span>
               </div>
             )}
@@ -119,21 +119,21 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
               <Zap className="w-3.5 h-3.5 text-amber-400" />
               <div>
                 <span className="text-sm font-black text-white">{trend.bestScore}</span>
-                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.best') || 'Best'}</span>
+                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.best')}</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
               <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
               <div>
                 <span className="text-sm font-black text-white">{trend.averageScore}</span>
-                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.avg') || 'Avg'}</span>
+                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.avg')}</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px]">🎮</span>
               <div>
                 <span className="text-sm font-black text-white">{trend.totalGames}</span>
-                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.games') || 'Games'}</span>
+                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.games')}</span>
               </div>
             </div>
           </div>
@@ -144,7 +144,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
             <div className="w-10 h-10 rounded-neo border-2 border-white/10 bg-white/5 flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-white/30" />
             </div>
-            <p className="text-white/40 text-xs">{t('chart.noHistory') || 'Play more games to see trends'}</p>
+            <p className="text-white/40 text-xs">{t('chart.noHistory')}</p>
             {/* Archetype shown here when no sparkline */}
             {archetype && (
               <div className="ms-auto">
@@ -158,7 +158,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
       {/* ── Card 2: Leaderboard (solo-bots only) ── */}
       {showLeaderboard && (
         <InfoCard>
-          <CardTitle>{t('results.standings') || 'Standings'}</CardTitle>
+          <CardTitle>{t('results.standings')}</CardTitle>
           <div className="space-y-0">
             {top5.map((p, i) => (
               <div
@@ -192,7 +192,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
 
       {/* ── Card 3: Rewards ── */}
       <InfoCard>
-        <CardTitle>{t('results.rewards') || 'Rewards'}</CardTitle>
+        <CardTitle>{t('results.rewards')}</CardTitle>
         <div className="space-y-3">
           {/* Coins */}
           {coins > 0 && (
@@ -211,7 +211,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
                   +{coins}
                 </span>
                 <span className="text-[10px] text-white/40 block font-bold uppercase">
-                  {t('results.dailyPlayBonus') || 'Daily Play Bonus'}
+                  {t('results.dailyPlayBonus')}
                 </span>
               </div>
             </div>
@@ -226,7 +226,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
               <div>
                 <span className="font-black text-lg text-neo-orange">{streak}</span>
                 <span className="text-[10px] text-white/40 block font-bold uppercase">
-                  {t('results.keepItUp') || 'Keep it up!'}
+                  {t('results.keepItUp')}
                 </span>
               </div>
             </div>
@@ -241,7 +241,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
               <div>
                 <span className="font-black text-lg text-purple-400">{achievementCount}</span>
                 <span className="text-[10px] text-white/40 block font-bold uppercase">
-                  {t('results.achievementsUnlocked') || 'Trophies'}
+                  {t('results.achievementsUnlocked')}
                 </span>
               </div>
             </div>
@@ -251,14 +251,14 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
           {!isAuthenticated && coins > 0 && (
             <div className="bg-white/5 rounded-neo border border-white/10 p-3 mt-2">
               <p className="text-xs font-bold text-white/60">
-                {t('results.guestSavePrompt') || 'Sign in to save rewards'}
+                {t('results.guestSavePrompt')}
               </p>
             </div>
           )}
 
           {/* No rewards fallback */}
           {coins === 0 && streak === 0 && achievementCount === 0 && (
-            <p className="text-white/40 text-xs">{t('results.noRewards') || 'Play more to earn rewards!'}</p>
+            <p className="text-white/40 text-xs">{t('results.noRewards')}</p>
           )}
         </div>
       </InfoCard>

@@ -237,7 +237,7 @@ export default function PromptTemplateEditor({ onClose }: Props): React.ReactEle
     return (
       <div className="flex items-center justify-center p-8">
         <RefreshCw className="w-6 h-6 animate-spin text-neo-cyan" />
-        <span className="ml-2 text-slate-400">Loading templates...</span>
+        <span className="ms-2 text-slate-400">Loading templates...</span>
       </div>
     );
   }
@@ -338,7 +338,7 @@ function MessageBanner({
         >
           <AlertCircle className="w-4 h-4 text-red-400" />
           <span className="text-sm text-red-400">{error}</span>
-          <button onClick={onDismissError} className="ml-auto">
+          <button onClick={onDismissError} className="ms-auto">
             <X className="w-4 h-4 text-red-400" />
           </button>
         </motion.div>

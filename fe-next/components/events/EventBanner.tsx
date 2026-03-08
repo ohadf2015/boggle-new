@@ -83,7 +83,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
           {/* Dismiss button */}
           <button
             onClick={onDismiss}
-            aria-label={t('events.dismiss') || 'Dismiss'}
+            aria-label={t('events.dismiss')}
             className="absolute top-2 right-2 p-1 text-white/60 hover:text-white transition-colors"
           >
             <X size={18} />
@@ -111,7 +111,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
               <div className="flex items-center gap-2 mt-2" data-testid="event-countdown">
                 <Clock size={14} className="text-white/60" />
                 <span className="text-sm font-mono text-white/80">
-                  {t('events.endsIn') || 'Ends in'} {formatCountdown(timeRemaining)}
+                  {t('events.endsIn')} {formatCountdown(timeRemaining)}
                 </span>
               </div>
 
@@ -135,7 +135,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
               {hasJoined ? (
                 <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-neo border-2 border-black bg-green-500 text-black font-bold text-sm shadow-hard-sm">
                   <Zap size={14} />
-                  {t('events.joined') || 'Joined'}
+                  {t('events.joined')}
                 </span>
               ) : (
                 <button
@@ -147,7 +147,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
                   )}
                   style={{ backgroundColor: accentColor }}
                 >
-                  {t('events.joinNow') || 'Join Now!'}
+                  {t('events.joinNow')}
                 </button>
               )}
             </div>

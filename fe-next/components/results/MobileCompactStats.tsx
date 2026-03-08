@@ -57,7 +57,7 @@ const MobileCompactStats: React.FC<MobileCompactStatsProps> = memo(({
           </div>
           <span className="text-lg font-black text-white">{wordCount}</span>
           <span className="text-[10px] text-white/60 font-bold uppercase">
-            {t('results.words') || 'Words'}
+            {t('results.words')}
           </span>
         </div>
 
@@ -70,7 +70,7 @@ const MobileCompactStats: React.FC<MobileCompactStatsProps> = memo(({
             {totalWords != null ? `${wordCount}/${totalWords}` : `${accuracy}%`}
           </span>
           <span className="text-[10px] text-white/60 font-bold uppercase">
-            {t('results.accuracy') || 'Acc'}
+            {t('results.accuracy')}
           </span>
         </div>
 

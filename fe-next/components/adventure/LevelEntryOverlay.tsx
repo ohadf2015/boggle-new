@@ -198,7 +198,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.3 }}
               >
-                {t('adventure.level') || 'Level'}
+                {t('adventure.level')}
               </motion.span>
 
               <motion.span

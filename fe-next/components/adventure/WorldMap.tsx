@@ -302,8 +302,8 @@ const WorldNode = ({
             disabled={!isUnlocked}
             data-testid={`world-${world.id}`}
             aria-label={isUnlocked
-              ? `${t('adventure.playWorld') || 'Play'} ${worldName} - ${currentStars}/${totalWorldStars} ${t('adventure.stars') || 'stars'}, ${completedLevels}/${LEVELS_PER_WORLD} ${t('adventure.levelsCompleted') || 'levels completed'}`
-              : `${worldName} - ${t('adventure.locked') || 'Locked'}, ${t('adventure.requires') || 'requires'} ${unlockRequirement} ${t('adventure.stars') || 'stars'}`
+              ? `${t('adventure.playWorld')} ${worldName} - ${currentStars}/${totalWorldStars} ${t('adventure.stars')}, ${completedLevels}/${LEVELS_PER_WORLD} ${t('adventure.levelsCompleted')}`
+              : `${worldName} - ${t('adventure.locked')}, ${t('adventure.requires')} ${unlockRequirement} ${t('adventure.stars')}`
             }
             whileHover={isUnlocked ? WORLD_HOVER_VARIANT : undefined}
             whileTap={isUnlocked ? WORLD_TAP_VARIANT : undefined}
@@ -378,7 +378,7 @@ const WorldNode = ({
           {/* "NEXT" badge for the next world to play */}
           {isNextWorld && !isComplete && (
             <div className="absolute -top-2 -left-2 z-10 px-2 py-0.5 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm">
-              {t('adventure.next') || 'NEXT'}
+              {t('adventure.next')}
             </div>
           )}
 

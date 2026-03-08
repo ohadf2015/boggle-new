@@ -271,7 +271,7 @@ export default function AdventureView(): React.JSX.Element {
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 text-neo-yellow animate-spin" />
           <p className="text-neo-white font-bold">
-            {t('common.loading') || 'Loading...'}
+            {t('common.loading')}
           </p>
         </div>
       </div>
@@ -287,7 +287,7 @@ export default function AdventureView(): React.JSX.Element {
             <span className="text-3xl">!</span>
           </div>
           <p className="text-neo-white font-bold">
-            {t('adventure.loadError') || 'Failed to load progress'}
+            {t('adventure.loadError')}
           </p>
           <Link
             href="/"
@@ -297,7 +297,7 @@ export default function AdventureView(): React.JSX.Element {
               'hover:bg-neo-purple-light transition-colors'
             )}
           >
-            {t('common.back') || 'Back'}
+            {t('common.back')}
           </Link>
         </div>
       </div>
@@ -326,7 +326,7 @@ export default function AdventureView(): React.JSX.Element {
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
               <span className="hidden sm:inline">
-                {t('common.back') || 'Back'}
+                {t('common.back')}
               </span>
             </button>
           ) : (
@@ -340,7 +340,7 @@ export default function AdventureView(): React.JSX.Element {
               )}
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
-              <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
+              <span className="hidden sm:inline">{t('common.back')}</span>
             </Link>
           )}
 
@@ -348,7 +348,7 @@ export default function AdventureView(): React.JSX.Element {
           <div className="hidden sm:flex items-center gap-2">
             <Map className="w-6 h-6 text-neo-lime" />
             <h1 className="text-xl font-black text-neo-white uppercase tracking-tight">
-              {t('adventure.title') || 'Adventure'}
+              {t('adventure.title')}
             </h1>
             <Sparkles className="w-6 h-6 text-neo-yellow" />
           </div>

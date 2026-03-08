@@ -41,7 +41,7 @@ export function ProfileXpSection({
           isDarkMode ? 'text-white' : 'text-gray-900'
         )}>
           <span className={compact ? 'text-xl' : 'text-2xl'}>⚡</span>
-          {t('xp.title') || 'Player Level'}
+          {t('xp.title')}
         </h2>
         <LevelBadge
           level={getLevelFromXp(profile?.total_xp || 0)}
@@ -64,7 +64,7 @@ export function ProfileXpSection({
             'text-sm font-medium',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            {t('xp.totalXpEarned') || 'Total XP Earned'}: <span className={cn(
+            {t('xp.totalXpEarned')}: <span className={cn(
               'font-bold',
               isDarkMode ? 'text-neo-cyan' : 'text-neo-pink'
             )}>{(profile?.total_xp || 0).toLocaleString()}</span>

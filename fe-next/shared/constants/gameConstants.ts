@@ -141,42 +141,6 @@ export function generateRandomAvatar(): { emoji: string; color: string; avatarIm
   };
 }
 
-// ==================== Scoring Constants ====================
-
-/**
- * Word score calculation based on word length
- * @deprecated Import from '@/shared/utils/scoring' instead for canonical scoring
- *
- * NOTE: This table had INCORRECT values and has been corrected.
- * Correct formula: score = wordLength - 1
- */
-export const WORD_SCORES: Record<number, number> = {
-  2: 1,   // 2 letters - 1 = 1
-  3: 2,   // 3 letters - 1 = 2 (CORRECTED from 1)
-  4: 3,   // 4 letters - 1 = 3 (CORRECTED from 2)
-  5: 4,   // 5 letters - 1 = 4 (CORRECTED from 3)
-  6: 5,   // 6 letters - 1 = 5 (CORRECTED from 4)
-  7: 6,   // 7 letters - 1 = 6 (CORRECTED from 5)
-  8: 7,   // 8 letters - 1 = 7 (CORRECTED from 6)
-};
-
-/**
- * Calculate points for a word based on its length
- * @deprecated Import from '@/shared/utils/scoring' instead
- *
- * For new code, use:
- * ```typescript
- * import { calculateWordScore, calculateWordScoreByLength } from '@/shared/utils/scoring';
- * ```
- *
- * The shared version includes combo bonuses and fire round multipliers.
- */
-export function calculateWordScore(wordLength: number): number {
-  if (wordLength < 2) return 0;
-  // Use correct formula: wordLength - 1
-  return wordLength - 1;
-}
-
 // ==================== UI Constants ====================
 
 /**

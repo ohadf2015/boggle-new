@@ -46,7 +46,7 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
         <div className="flex items-center gap-2">
           <Package className="w-4 h-4 text-neo-lime" />
           <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">
-            {t('wordHunt.desktop.lootCollected') || 'Loot Collected'}
+            {t('wordHunt.desktop.lootCollected')}
           </span>
         </div>
         <div className="bg-neo-lime/20 border border-neo-lime/30 px-2.5 py-0.5 rounded-neo">
@@ -72,7 +72,7 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
         {discoveredWords.length === 0 && (
           <div className="flex flex-col items-center justify-center py-8 text-neo-cream/40">
             <Package className="w-8 h-8 mb-2 opacity-50" />
-            <span className="text-sm">{t('wordHunt.desktop.noWordsYet') || 'Find words to collect loot!'}</span>
+            <span className="text-sm">{t('wordHunt.desktop.noWordsYet')}</span>
           </div>
         )}
       </div>
@@ -83,7 +83,7 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1 text-neo-cream/60">
             <Lightbulb className="w-3 h-3 text-neo-yellow" />
-            <span>{t('wordHunt.desktop.hintsUnlocked') || 'Hints Unlocked'}</span>
+            <span>{t('wordHunt.desktop.hintsUnlocked')}</span>
           </div>
           <span className="font-bold text-neo-yellow tabular-nums">{hintStage}</span>
         </div>
@@ -92,7 +92,7 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1 text-neo-cream/60">
             <Target className="w-3 h-3 text-neo-cyan" />
-            <span>{t('wordHunt.desktop.triesRemaining') || 'Tries Remaining'}</span>
+            <span>{t('wordHunt.desktop.triesRemaining')}</span>
           </div>
           <span className={cn(
             'font-bold tabular-nums',

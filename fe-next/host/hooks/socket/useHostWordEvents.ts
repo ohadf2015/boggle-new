@@ -6,7 +6,8 @@ import { useEffect, useCallback, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 // Note: Word feedback toasts removed - WordFormingArea now handles visual feedback
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
-import type { WordAcceptedPayload, BoardTheme } from '@/shared/types/socket';
+import type { WordAcceptedPayload, BlastWordAcceptedPayload, BoardTheme } from '@/shared/types/socket';
+import { useGameStore } from '@/hooks/gameState/store';
 
 interface UseHostWordEventsProps {
   socket: Socket | null;
@@ -157,6 +158,13 @@ export function useHostWordEvents({
       }
     };
 
+    // Handle blast word accepted (update moves counter for host)
+    const handleBlastWordAccepted = (data: BlastWordAcceptedPayload) => {
+      if (hostPlaying) {
+        useGameStore.getState().setBlastMovesUsed(data.movesUsed);
+      }
+    };
+
     const handleWordsForBoard = (data: any) => {
       if (data?.words) {
         setWordsForBoard(data.words);
@@ -174,9 +182,11 @@ export function useHostWordEvents({
     socket.on('wordRejected', handleWordRejected);
     socket.on('wordTooShort', handleWordTooShort);
     socket.on('wordsForBoard', handleWordsForBoard);
+    socket.on('blastWordAccepted', handleBlastWordAccepted);
 
     return () => {
       socket.off('wordAccepted', handleWordAccepted);
+      socket.off('blastWordAccepted', handleBlastWordAccepted);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordRejected', handleWordRejected);

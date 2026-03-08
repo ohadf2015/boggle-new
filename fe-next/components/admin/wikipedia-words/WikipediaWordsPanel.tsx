@@ -95,7 +95,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
             <span className="text-green-500 font-medium">
               Sync completed: {syncSuccess.wordCount ?? 0} words synced
               {syncSuccess.languageBreakdown && Object.keys(syncSuccess.languageBreakdown).length > 1 && (
-                <span className="text-green-400 text-sm ml-2">
+                <span className="text-green-400 text-sm ms-2">
                   ({Object.entries(syncSuccess.languageBreakdown)
                     .map(([lang, count]) => `${lang}: ${count}`)
                     .join(', ')})

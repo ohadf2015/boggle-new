@@ -172,19 +172,19 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
 
     // Handle zero score - special case
     if (winner && winner.score === 0) {
-      return t('results.noPoints') || 'No Points';
+      return t('results.noPoints');
     }
 
     // Handle single player variants
-    if (variant === 'highScore') return t('singlePlayer.newHighScore') || 'New High Score!';
-    if (variant === 'newRecord') return t('challenge.allTimeRecord') || 'All-Time Record!';
-    if (variant === 'completion') return t('singlePlayer.gameOver') || 'Game Over';
+    if (variant === 'highScore') return t('singlePlayer.newHighScore');
+    if (variant === 'newRecord') return t('challenge.allTimeRecord');
+    if (variant === 'completion') return t('singlePlayer.gameOver');
 
     // Multiplayer ranking
     if (rank === 1) return t('results.youWon');
-    if (rank === 2) return t('results.secondPlace') || '2nd Place!';
-    if (rank === 3) return t('results.thirdPlace') || '3rd Place!';
-    return t('results.betterLuckNextTime') || 'Better luck next time!';
+    if (rank === 2) return t('results.secondPlace');
+    if (rank === 3) return t('results.thirdPlace');
+    return t('results.betterLuckNextTime');
   };
 
   // Get ordinal suffix for rank display (1st, 2nd, 3rd, 4th, etc.)
@@ -199,14 +199,14 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
     if (customAnnouncement) return customAnnouncement;
 
     // Handle single player variants
-    if (variant === 'highScore') return t('singlePlayer.beatYourRecord') || 'You beat your record!';
-    if (variant === 'newRecord') return t('challenge.firstRecord') || 'First Record Set!';
-    if (variant === 'completion') return t('singlePlayer.practiceComplete') || 'Practice Complete';
+    if (variant === 'highScore') return t('singlePlayer.beatYourRecord');
+    if (variant === 'newRecord') return t('challenge.firstRecord');
+    if (variant === 'completion') return t('singlePlayer.practiceComplete');
 
     // Multiplayer ranking - More placement-focused
     if (rank === 1) return t('results.winnerAnnouncement');
-    if (rank === 2) return t('results.silverMedalist') || 'Silver Medalist';
-    if (rank === 3) return t('results.bronzeMedalist') || 'Bronze Medalist';
+    if (rank === 2) return t('results.silverMedalist');
+    if (rank === 3) return t('results.bronzeMedalist');
     // For 4th+ place, show placement explicitly (e.g., "5 of 8")
     if (totalPlayers) {
       return t('results.yourPlace', { place: rank, total: totalPlayers }) || `You finished ${getOrdinalSuffix(rank)}`;

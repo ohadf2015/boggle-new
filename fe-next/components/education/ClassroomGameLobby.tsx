@@ -346,7 +346,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
           {/* Classroom Selection */}
           <div>
             <label className="block text-neo-white font-bold mb-3">
-              <School className="w-5 h-5 inline mr-2 text-neo-cyan" />
+              <School className="w-5 h-5 inline me-2 text-neo-cyan" />
               {t('education.classroomGame.selectClassroom')}
             </label>
             <div className="space-y-2">
@@ -370,7 +370,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
                     className="w-5 h-5 text-neo-cyan focus:ring-neo-cyan"
                     aria-label={`Class ${classroom.name}`}
                   />
-                  <span className="ml-3 text-neo-white font-bold flex-1">
+                  <span className="ms-3 text-neo-white font-bold flex-1">
                     {classroom.name}
                   </span>
                   <span className="text-neo-white/70 text-sm">
@@ -384,7 +384,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
           {/* Lesson Selection */}
           <div>
             <label className="block text-neo-white font-bold mb-3">
-              <BookOpen className="w-5 h-5 inline mr-2 text-neo-pink" />
+              <BookOpen className="w-5 h-5 inline me-2 text-neo-pink" />
               {t('education.classroomGame.selectLessons')}
             </label>
             <MultiLessonSelector

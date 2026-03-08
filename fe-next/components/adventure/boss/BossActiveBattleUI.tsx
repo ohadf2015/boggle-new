@@ -135,7 +135,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
                 <span className="text-xs font-neo-body font-bold text-neo-white truncate">
                   {t(boss.displayName)}
                 </span>
-                <span className="text-xs font-neo-body text-neo-white/70 ml-2">
+                <span className="text-xs font-neo-body text-neo-white/70 ms-2">
                   {currentHP}/{maxHP}
                 </span>
               </div>

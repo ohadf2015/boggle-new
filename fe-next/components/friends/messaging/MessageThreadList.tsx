@@ -125,13 +125,13 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
           {/* Message content */}
           <div className={cn('flex-1 min-w-0', isRTL && 'text-right')}>
             <div className="flex items-center justify-between mb-1">
-              <p className={cn('font-black text-white truncate', isRTL && 'ml-2')}>
+              <p className={cn('font-black text-white truncate', 'ms-2')}>
                 {thread.friendDisplayName || thread.friendUsername}
               </p>
               <span className={cn(
                 'text-xs font-medium flex-shrink-0',
                 isDark ? 'text-gray-400' : 'text-gray-500',
-                isRTL && 'mr-2'
+                'me-2'
               )}>
                 {formatRelativeTime(now, thread.lastMessageAt, language)}
               </span>

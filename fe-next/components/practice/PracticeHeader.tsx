@@ -59,13 +59,13 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
 
   const getModeLabel = (type: PracticeType): string => {
     const labels: Record<PracticeType, string> = {
-      flashcard: t('education.practice.flashcards') || 'Flashcards',
-      solo_board: t('education.practice.soloBoard') || 'Solo Board',
-      word_list: t('education.practice.wordList') || 'Word List',
-      warmup: t('education.practice.warmup') || 'Warmup',
-      matching: t('education.practice.matching') || 'Word Matching',
-      spelling: t('education.practice.spelling') || 'Spelling Challenge',
-      blitz: t('education.practice.blitz') || 'Timed Blitz',
+      flashcard: t('education.practice.flashcards'),
+      solo_board: t('education.practice.soloBoard'),
+      word_list: t('education.practice.wordList'),
+      warmup: t('education.practice.warmup'),
+      matching: t('education.practice.matching'),
+      spelling: t('education.practice.spelling'),
+      blitz: t('education.practice.blitz'),
     };
     return labels[type];
   };
@@ -110,7 +110,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
             variant="ghost"
             size="sm"
             onClick={onBack}
-            aria-label={t('common.back') || 'Back'}
+            aria-label={t('common.back')}
             className="text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10 p-2"
           >
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />

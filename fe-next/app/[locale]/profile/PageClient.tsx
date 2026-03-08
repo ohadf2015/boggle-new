@@ -81,7 +81,7 @@ export default function ProfilePageClient(): React.JSX.Element {
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
     onRefresh: async () => {
       await refreshProfile();
-      toast.success(t('common.refreshed') || 'Refreshed', {
+      toast.success(t('common.refreshed'), {
         duration: 2000,
       });
     },
@@ -142,10 +142,10 @@ export default function ProfilePageClient(): React.JSX.Element {
         avatar_image: avatarImage,
       });
       await refreshProfile();
-      toast.success(t('profile.saved') || 'Avatar updated!');
+      toast.success(t('profile.saved'));
     } catch (err) {
       console.error('Save avatar error:', err);
-      toast.error(t('profile.saveError') || 'Failed to save');
+      toast.error(t('profile.saveError'));
     }
   };
 

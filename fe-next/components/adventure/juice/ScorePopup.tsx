@@ -88,7 +88,7 @@ export function ScorePopup({
         <div className="bg-neo-yellow text-neo-black font-neo-display font-black text-2xl px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard whitespace-nowrap">
           +{score}
           {comboMultiplier && (
-            <span className="ml-2 text-lg opacity-80">×{comboMultiplier}</span>
+            <span className="ms-2 text-lg opacity-80">×{comboMultiplier}</span>
           )}
         </div>
       </motion.div>
@@ -129,7 +129,7 @@ export function ScorePopup({
       <div className="bg-neo-yellow text-neo-black font-neo-display font-black text-2xl px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard whitespace-nowrap">
         +{score}
         {comboMultiplier && (
-          <span className="ml-2 text-lg opacity-80">×{comboMultiplier}</span>
+          <span className="ms-2 text-lg opacity-80">×{comboMultiplier}</span>
         )}
       </div>
     </motion.div>

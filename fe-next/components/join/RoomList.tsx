@@ -323,7 +323,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
           onClick={onSwitchToHostMode}
           className="bg-neo-pink text-neo-white"
         >
-          <span className="mr-2"><Crown /></span>
+          <span className="me-2"><Crown /></span>
           {t('joinView.createRoom')}
         </Button>
       </motion.div>

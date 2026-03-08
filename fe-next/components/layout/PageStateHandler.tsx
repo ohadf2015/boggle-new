@@ -80,7 +80,7 @@ export function PageStateHandler({
       <div className="flex flex-col items-center justify-center py-20">
         <PageLoader
           size="md"
-          text={loadingText || t('common.loading') || 'Loading...'}
+          text={loadingText || t('common.loading')}
         />
       </div>
     );
@@ -106,7 +106,7 @@ export function PageStateHandler({
             isDarkMode ? 'text-white' : 'text-gray-900'
           )}
         >
-          {t('common.error') || 'Something went wrong'}
+          {t('common.error')}
         </p>
         <p
           className={cn(
@@ -127,7 +127,7 @@ export function PageStateHandler({
             )}
           >
             <RefreshCw className="w-4 h-4" />
-            {t('common.retry') || 'Try Again'}
+            {t('common.retry')}
           </Button>
         )}
       </div>
@@ -143,7 +143,7 @@ export function PageStateHandler({
     return (
       <EmptyState
         type="no-results"
-        title={emptyText || t('common.noData') || 'No data available'}
+        title={emptyText || t('common.noData')}
         showMascot
         mascotVariant="happy"
       />

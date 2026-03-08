@@ -64,10 +64,10 @@ const HintButton = memo<HintButtonProps>(({
   // Build accessible label
   const getAriaLabel = () => {
     if (isLoading) {
-      return t('hints.loading') || 'Loading hint...';
+      return t('hints.loading');
     }
     if (hintsRemaining <= 0) {
-      return t('hints.noHintsLeft') || 'No hints remaining';
+      return t('hints.noHintsLeft');
     }
     return t('hints.requestHint', { remaining: hintsRemaining }) || `Request hint, ${hintsRemaining} remaining`;
   };
@@ -96,8 +96,8 @@ const HintButton = memo<HintButtonProps>(({
         <div className="flex flex-col items-start min-w-0">
           <span className="text-[10px] opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-[70px]" aria-hidden="true">
             {isLoading
-              ? (t('hints.loading') || '...')
-              : (t('hints.hint') || 'Hint')
+              ? (t('hints.loading'))
+              : (t('hints.hint'))
             }
           </span>
           <div className="flex items-center gap-0.5" aria-hidden="true">
@@ -138,11 +138,11 @@ const HintButton = memo<HintButtonProps>(({
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb className="w-5 h-5 text-neo-lime" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} aria-hidden="true" />
                 <span className="font-black text-neo-black uppercase text-sm">
-                  {t('hints.hint') || 'Hint'}
+                  {t('hints.hint')}
                 </span>
                 {wordLength && (
-                  <span className="ml-auto text-xs bg-neo-pink text-white px-2 py-0.5 rounded-neo font-bold">
-                    {wordLength} {t('hints.letters') || 'letters'}
+                  <span className="ms-auto text-xs bg-neo-pink text-white px-2 py-0.5 rounded-neo font-bold">
+                    {wordLength} {t('hints.letters')}
                   </span>
                 )}
               </div>
@@ -156,7 +156,7 @@ const HintButton = memo<HintButtonProps>(({
               {firstLetter && (
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-xs text-neo-black/70">
-                    {t('hints.startsWith') || 'Starts with:'}
+                    {t('hints.startsWith')}
                   </span>
                   <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-neo font-black text-lg">
                     {firstLetter}
@@ -166,7 +166,7 @@ const HintButton = memo<HintButtonProps>(({
 
               {/* Tap to dismiss */}
               <div className="mt-2 text-xs text-neo-black/70 text-center">
-                {t('hints.tapOrEscToDismiss') || 'Tap or press Escape to dismiss'}
+                {t('hints.tapOrEscToDismiss')}
               </div>
             </div>
           </motion.div>

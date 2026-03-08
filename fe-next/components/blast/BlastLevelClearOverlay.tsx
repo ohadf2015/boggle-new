@@ -119,7 +119,7 @@ export function BlastLevelClearOverlay({
             {totalScore}
           </span>
           <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider mt-0.5">
-            {t('common.score') || 'Score'}
+            {t('common.score')}
           </span>
         </AdaptiveMotion.div>
 
@@ -139,7 +139,7 @@ export function BlastLevelClearOverlay({
               +{moveBonus}
             </span>
             <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider mt-0.5">
-              {t('blast.moveBonus') || 'Move Bonus'}
+              {t('blast.moveBonus')}
             </span>
           </AdaptiveMotion.div>
         )}
@@ -166,7 +166,7 @@ export function BlastLevelClearOverlay({
               'transition-transform duration-75'
             )}
           >
-            {t('blast.nextWave') || 'Next Wave'}
+            {t('blast.nextWave')}
           </button>
         </AdaptiveMotion.div>
       )}

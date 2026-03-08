@@ -201,7 +201,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             {autoVerifiedWords.length > 0 && (
               <div className="flex-shrink-0 py-2 px-3 bg-teal-900/30 rounded-lg border border-teal-500/40 text-center">
                 <span className="text-sm text-teal-300">
-                  ✓ {autoVerifiedWords.length} {t('hostView.wordsAutoValidated') || 'auto-validated'}
+                  ✓ {autoVerifiedWords.length} {t('hostView.wordsAutoValidated')}
                 </span>
               </div>
             )}
@@ -398,17 +398,17 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
             <div className="flex items-center justify-center gap-3 mb-2">
               <span className="text-3xl">{playersReady.readyCount === playersReady.totalPlayers ? '🎉' : '⏳'}</span>
               <span className="font-black text-neo-black text-xl uppercase">
-                {playersReady.readyCount}/{playersReady.totalPlayers} {t('hostView.playersReady') || 'Players Ready'}
+                {playersReady.readyCount}/{playersReady.totalPlayers} {t('hostView.playersReady')}
               </span>
             </div>
             {playersReady.readyCount < playersReady.totalPlayers && (
               <p className="text-neo-black/70 text-sm font-bold">
-                {t('hostView.waitingForPlayersToReady') || 'Waiting for players to confirm they\'re ready...'}
+                {t('hostView.waitingForPlayersToReady')}
               </p>
             )}
             {playersReady.readyCount === playersReady.totalPlayers && (
               <p className="text-neo-black font-bold">
-                {t('hostView.allPlayersReady') || 'All players are ready! Start the next round.'}
+                {t('hostView.allPlayersReady')}
               </p>
             )}
           </div>
@@ -421,7 +421,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
               onClick={onNextRound}
               className="w-full h-14 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
             >
-              🏁 {t('hostView.startNextRound') || 'Start Next Round'}
+              🏁 {t('hostView.startNextRound')}
             </Button>
           )}
           {(!tournamentData || tournamentData.isComplete) && (
@@ -429,7 +429,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
               onClick={onStartNewGame}
               className="w-full h-14 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
             >
-              🎮 {t('hostView.startNewGame') || 'Start New Game'}
+              🎮 {t('hostView.startNewGame')}
             </Button>
           )}
           <Button onClick={handleClose} variant="outline" className="w-full border-2 border-neo-black">
@@ -500,10 +500,10 @@ export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = ({
     <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-red-500/30">
       <AlertDialogHeader>
         <AlertDialogTitle className="text-slate-900 dark:text-white">
-          {t('hostView.confirmCancelTournament') || 'Cancel Tournament?'}
+          {t('hostView.confirmCancelTournament')}
         </AlertDialogTitle>
         <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
-          {t('hostView.cancelTournamentWarning') || 'Are you sure you want to cancel the tournament? All progress will be lost and this cannot be undone.'}
+          {t('hostView.cancelTournamentWarning')}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>

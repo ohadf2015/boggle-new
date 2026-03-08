@@ -73,13 +73,13 @@ export function MobileResultsTab({
         className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white/80 hover:text-white border border-white/30 hover:border-white/50 rounded-neo transition-colors"
       >
         <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-        {t('nextStep.backToLobby') || 'Back to Lobby'}
+        {t('nextStep.backToLobby')}
       </button>
 
       {/* ABOVE FOLD - Score celebration + Play Again */}
       <div className="relative">
         <ResultsWinnerBanner
-          winner={{ username: t('common.you') || 'You', score: results.playerScore }}
+          winner={{ username: t('common.you'), score: results.playerScore }}
           isCurrentUserWinner={true}
           rank={mode === 'solo-bots' ? playerRank : 1}
           variant={bannerConfig.variant}
@@ -126,7 +126,7 @@ export function MobileResultsTab({
       {/* Global rank - text only */}
       {globalRank && (
         <div className="text-center text-sm text-white/60">
-          <span className="font-bold">#{globalRank}</span> {t('leaderboard.globalRank') || 'Global Rank'}
+          <span className="font-bold">#{globalRank}</span> {t('leaderboard.globalRank')}
         </div>
       )}
 

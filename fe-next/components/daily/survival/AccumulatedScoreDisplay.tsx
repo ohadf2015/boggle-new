@@ -108,7 +108,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
             'text-[8px] @[80px]:text-[9px] @[100px]:text-[10px] font-bold uppercase tracking-wide font-neo-body',
             scoreColors.textColor
           )}>
-            {t('wordHunt.survival.accumulatedScore') || 'Score'}
+            {t('wordHunt.survival.accumulatedScore')}
           </span>
         </div>
 
@@ -158,7 +158,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
 
         {/* Tooltip Hint (on larger screens) */}
         <div className="hidden @[120px]:block text-[8px] text-neo-black/60 font-bold">
-          {t('wordHunt.survival.scoreBreakdownTooltip') || 'Tap for details'}
+          {t('wordHunt.survival.scoreBreakdownTooltip')}
         </div>
       </motion.div>
     </div>

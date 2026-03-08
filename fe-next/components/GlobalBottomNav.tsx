@@ -120,7 +120,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 // Add safe area padding for iOS home indicator
                 paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : undefined,
             }}
-            aria-label={t('nav.bottomNavigation') || 'Bottom navigation'}
+            aria-label={t('nav.bottomNavigation')}
         >
             <div className="flex items-center justify-around h-16">
                 {/* Home Tab */}
@@ -136,7 +136,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             ? "text-neo-yellow"
                             : "text-neo-white/60 hover:text-neo-white/80"
                     )}
-                    aria-label={t('nav.home') || 'Home'}
+                    aria-label={t('nav.home')}
                     aria-current={activeTab === 'home' ? 'page' : undefined}
                 >
                     <Home
@@ -150,7 +150,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "text-[10px] font-bold uppercase tracking-wide",
                         activeTab === 'home' && "text-neo-yellow"
                     )}>
-                        {t('nav.home') || 'Home'}
+                        {t('nav.home')}
                     </span>
                     {/* Active indicator */}
                     {activeTab === 'home' && (
@@ -174,7 +174,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             ? "text-neo-orange"
                             : "text-neo-white/60 hover:text-neo-white/80"
                     )}
-                    aria-label={t('nav.play') || 'Play'}
+                    aria-label={t('nav.play')}
                     aria-current={activeTab === 'play' ? 'page' : undefined}
                 >
                     <Swords
@@ -188,7 +188,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "text-[10px] font-bold uppercase tracking-wide",
                         activeTab === 'play' && "text-neo-orange"
                     )}>
-                        {t('nav.play') || 'Play'}
+                        {t('nav.play')}
                     </span>
                     {activeTab === 'play' && (
                         <div
@@ -211,7 +211,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             ? "text-neo-purple"
                             : "text-neo-white/60 hover:text-neo-white/80"
                     )}
-                    aria-label={t('nav.brain') || 'Brain Training'}
+                    aria-label={t('nav.brain')}
                     aria-current={activeTab === 'brain' ? 'page' : undefined}
                 >
                     <Brain
@@ -225,7 +225,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "text-[10px] font-bold uppercase tracking-wide",
                         activeTab === 'brain' && "text-neo-purple"
                     )}>
-                        {t('nav.brain') || 'Brain'}
+                        {t('nav.brain')}
                     </span>
                     {/* Active indicator */}
                     {activeTab === 'brain' && (
@@ -249,7 +249,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             ? "text-neo-cyan"
                             : "text-neo-white/60 hover:text-neo-white/80"
                     )}
-                    aria-label={t('nav.profile') || 'Profile'}
+                    aria-label={t('nav.profile')}
                     aria-current={activeTab === 'profile' ? 'page' : undefined}
                 >
                     <User
@@ -263,7 +263,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "text-[10px] font-bold uppercase tracking-wide",
                         activeTab === 'profile' && "text-neo-cyan"
                     )}>
-                        {t('nav.profile') || 'Profile'}
+                        {t('nav.profile')}
                     </span>
                     {/* Active indicator */}
                     {activeTab === 'profile' && (

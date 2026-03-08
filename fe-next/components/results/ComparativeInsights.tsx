@@ -75,7 +75,7 @@ const ComparativeInsights: React.FC<ComparativeInsightsProps> = ({
   return (
     <div className="bg-neo-navy/60 border-3 border-neo-black rounded-neo shadow-hard-sm p-3 space-y-2">
       <h3 className="text-sm font-black text-neo-yellow uppercase tracking-wide">
-        {t('results.comparativeInsights.title') || 'How You Compared'}
+        {t('results.comparativeInsights.title')}
       </h3>
       <div className="space-y-1.5">
         {uniqueWordCount > 0 && (

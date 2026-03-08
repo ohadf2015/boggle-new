@@ -320,7 +320,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
             )}
           >
             <PodiumScoreCounter target={player.score} delay={baseDelay + 0.9} />
-            <span className="text-sm font-bold ml-1 opacity-70">{t('tvResults.pts')}</span>
+            <span className="text-sm font-bold ms-1 opacity-70">{t('tvResults.pts')}</span>
           </motion.div>
 
           {/* Word Count */}

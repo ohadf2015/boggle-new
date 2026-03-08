@@ -334,7 +334,7 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
 
             {/* Combo text - shows actual count */}
             <motion.span
-              className="relative z-10 ml-1.5"
+              className="relative z-10 ms-1.5"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1, duration: 0.2 }}

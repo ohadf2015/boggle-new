@@ -58,10 +58,10 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
   }, []);
 
   const starLabel = results.stars === 3
-    ? (t('blast.stars3') || 'Perfect!')
+    ? (t('blast.stars3'))
     : results.stars === 2
-      ? (t('blast.stars2') || 'Great')
-      : (t('blast.stars1') || 'Good');
+      ? (t('blast.stars2'))
+      : (t('blast.stars1'));
 
   const handleRetrigger = () => {
     confetti({ particleCount: 80, spread: 60, origin: { y: 0.5 } });
@@ -76,7 +76,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         className="text-center mb-4"
       >
         <h1 className="text-3xl sm:text-4xl font-black uppercase text-white mb-1">
-          {t('blast.title') || 'Blast Mode'}
+          {t('blast.title')}
         </h1>
         <p className="text-lg font-bold text-neo-orange">{starLabel}</p>
       </motion.div>
@@ -94,7 +94,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
             data-testid="confetti-retrigger"
             onClick={handleRetrigger}
             className="text-2xl hover:scale-125 transition-transform duration-150 active:scale-90"
-            aria-label={t('blast.celebrateAgain') || 'Celebrate again'}
+            aria-label={t('blast.celebrateAgain')}
           >
             🎉
           </button>
@@ -105,7 +105,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
       <div className="w-full max-w-sm space-y-2 mb-8">
         <StatCard
           icon={<Trophy className="w-5 h-5" />}
-          label={t('common.score') || 'Score'}
+          label={t('common.score')}
           value={<span data-testid="blast-score-display">{displayScore.toLocaleString()}</span>}
           accentColor="#FFD700"
           delay={0.5}
@@ -114,7 +114,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         />
         <StatCard
           icon={<Grid3X3 className="w-5 h-5" />}
-          label={t('blast.progress') || 'Cleared'}
+          label={t('blast.progress')}
           value={`${results.clearPercentage}% (${results.tilesCleared}/${results.totalTiles})`}
           accentColor="#00FFFF"
           delay={0.6}
@@ -122,7 +122,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         />
         <StatCard
           icon={<Zap className="w-5 h-5" />}
-          label={t('common.words') || 'Words'}
+          label={t('common.words')}
           value={results.wordsFound.length}
           accentColor="#BFFF00"
           delay={0.7}
@@ -131,7 +131,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         {results.bestWord && (
           <StatCard
             icon={<Star className="w-5 h-5" />}
-            label={t('results.bestWord') || 'Best Word'}
+            label={t('results.bestWord')}
             value={results.bestWord.toUpperCase()}
             accentColor="#FF6B35"
             delay={0.8}
@@ -141,7 +141,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         {results.maxCombo > 0 && (
           <StatCard
             icon={<Zap className="w-5 h-5" />}
-            label={t('results.maxCombo') || 'Max Combo'}
+            label={t('results.maxCombo')}
             value={`${results.maxCombo}x`}
             accentColor="#FF1493"
             delay={0.9}
@@ -152,7 +152,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         {(results.wavesCompleted ?? 0) > 0 && (
           <StatCard
             icon={<Zap className="w-5 h-5" />}
-            label={t('blast.wavesCompleted') || 'Waves'}
+            label={t('blast.wavesCompleted')}
             value={results.wavesCompleted}
             accentColor="#A855F7"
             delay={1.0}
@@ -164,7 +164,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
       {/* Wave-by-wave breakdown */}
       <WaveBreakdown
         waveResults={results.waveResults ?? []}
-        label={t('blast.waveBreakdown') || 'Wave Breakdown'}
+        label={t('blast.waveBreakdown')}
       />
 
       {/* Action buttons */}
@@ -181,7 +181,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
           className="w-full min-h-[52px] font-black text-lg uppercase border-3 border-neo-black shadow-hard"
         >
           <RotateCcw className="me-2 h-5 w-5" />
-          {t('common.playAgain') || 'Play Again'}
+          {t('common.playAgain')}
         </Button>
         <Button
           variant="outline"
@@ -190,7 +190,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
           className="w-full min-h-[48px] font-bold uppercase"
         >
           <Home className="me-2 h-5 w-5" />
-          {t('common.home') || 'Home'}
+          {t('common.home')}
         </Button>
       </motion.div>
     </div>

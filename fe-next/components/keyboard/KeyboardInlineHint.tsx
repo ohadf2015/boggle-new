@@ -123,7 +123,7 @@ export function KeyboardInlineHint({
             'group',
             className
           )}
-          aria-label={t('keyboardInlineHint.fullMessage') || 'Type words on your keyboard and press Enter to submit'}
+          aria-label={t('keyboardInlineHint.fullMessage')}
         >
           {/* Keyboard icon with subtle animation */}
           <motion.div
@@ -136,7 +136,7 @@ export function KeyboardInlineHint({
 
           {/* Text */}
           <span>
-            {t('keyboardInlineHint.message') || 'Type + Enter'}
+            {t('keyboardInlineHint.message')}
           </span>
 
           {/* Keyboard visualization */}

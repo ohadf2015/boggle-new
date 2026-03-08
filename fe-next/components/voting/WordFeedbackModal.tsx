@@ -71,10 +71,10 @@ const getWittySentences = (t: (key: string, params?: Record<string, string>) => 
   const displayWord = applyHebrewFinalLetters(word);
   return [
     t('wordFeedback.witty1', { player, word: displayWord }) || `${player} claims "${displayWord}" is totally a word...`,
-    t('wordFeedback.witty2', { player, word: displayWord }) || 'Real word or creative genius? You decide!',
+    t('wordFeedback.witty2', { player, word: displayWord }),
     t('wordFeedback.witty3', { player, word: displayWord }) || `${player} found "${displayWord}" in their brain dictionary`,
     t('wordFeedback.witty4', { player, word: displayWord }) || `Webster called, they want to know about "${displayWord}"`,
-    t('wordFeedback.witty5', { player, word: displayWord }) || 'Sounds legit... or does it?',
+    t('wordFeedback.witty5', { player, word: displayWord }),
     t('wordFeedback.witty6', { player, word: displayWord }) || `Is "${displayWord}" a stroke of genius or madness?`,
     t('wordFeedback.witty7', { player, word: displayWord }) || `${player} swears this is a real word!`,
     t('wordFeedback.witty8', { player, word: displayWord }) || `The dictionary committee awaits your verdict on "${displayWord}"`,
@@ -251,7 +251,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
           >
             <DialogTitle className="text-xl font-black uppercase tracking-tight text-white flex items-center gap-2">
               <Book className="w-5 h-5 text-neo-yellow" />
-              {t('wordFeedback.dictionaryTitle') || 'Build Our Dictionary'}
+              {t('wordFeedback.dictionaryTitle')}
             </DialogTitle>
             {/* Word counter for multi-word queue */}
             {totalWords > 1 && (
@@ -284,7 +284,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   />
                 )}
                 <span className="text-sm text-white font-semibold">
-                  {t('wordFeedback.submittedBy') || 'Submitted by'}: <span className="font-bold text-neo-pink">{currentWord.submittedBy}</span>
+                  {t('wordFeedback.submittedBy')}: <span className="font-bold text-neo-pink">{currentWord.submittedBy}</span>
                 </span>
               </motion.div>
             )}
@@ -323,8 +323,8 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   <p className="text-xs font-semibold text-neo-gray flex items-center justify-center gap-1">
                     <CheckCircle className={`w-3 h-3 ${isValidForScoring ? 'text-neo-cyan' : 'text-neo-lime'}`} />
                     {votesNeeded > 0
-                      ? `${votesNeeded} ${t('wordFeedback.votesNeededShort') || 'more votes'}`
-                      : (t('wordFeedback.almostApproved') || 'Almost there!')}
+                      ? `${votesNeeded} ${t('wordFeedback.votesNeededShort')}`
+                      : (t('wordFeedback.almostApproved'))}
                   </p>
                 </div>
               )}
@@ -356,7 +356,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   "
                 >
                   <ThumbsDown className="w-5 h-5" />
-                  <span>{t('wordFeedback.notAWord') || 'Not a word'}</span>
+                  <span>{t('wordFeedback.notAWord')}</span>
                 </button>
 
                 {/* I Don't Know */}
@@ -377,7 +377,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   "
                 >
                   <HelpCircle className="w-5 h-5" />
-                  <span>{t('wordFeedback.dontKnow') || "Don't know"}</span>
+                  <span>{t('wordFeedback.dontKnow')}</span>
                 </button>
 
                 {/* Thumbs Up */}
@@ -398,7 +398,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   "
                 >
                   <ThumbsUp className="w-5 h-5" />
-                  <span>{t('wordFeedback.realWord') || 'Real word!'}</span>
+                  <span>{t('wordFeedback.realWord')}</span>
                 </button>
               </motion.div>
             ) : (
@@ -410,8 +410,8 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 <span className="text-2xl font-black text-neo-pink flex items-center justify-center gap-2">
                   <CheckCircle className="w-6 h-6 text-neo-lime" />
                   {hasMoreWords
-                    ? (t('wordFeedback.nextWord') || 'Next word...')
-                    : (t('wordFeedback.thankYou') || 'Thanks for helping!')
+                    ? (t('wordFeedback.nextWord'))
+                    : (t('wordFeedback.thankYou'))
                   }
                 </span>
               </motion.div>
@@ -437,7 +437,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               {/* Footer */}
               <div className="flex justify-between items-center text-xs text-neo-gray">
                 <span>
-                  {t('wordFeedback.skipHint') || 'Press ESC to skip'}
+                  {t('wordFeedback.skipHint')}
                 </span>
                 <span className="font-mono font-bold">
                   {remainingTime}s

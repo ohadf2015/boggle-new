@@ -57,7 +57,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
       <div className="text-center py-12 bg-slate-800/30 rounded-neo border-neo border-black">
         <p className="text-red-400 mb-4">{error}</p>
         <Button onClick={refresh} variant="outline">
-          {t('admin.todayGames.retry') || 'Retry'}
+          {t('admin.todayGames.retry')}
         </Button>
       </div>
     );
@@ -70,7 +70,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
         <div className="flex items-center gap-3">
           <Calendar className="w-6 h-6 text-neo-lime" />
           <h2 className="text-xl font-neo-display text-neo-white">
-            {t('admin.todayGames.title') || "Today's Games"}
+            {t('admin.todayGames.title')}
           </h2>
         </div>
         <Button
@@ -85,7 +85,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
           ) : (
             <RefreshCw className="w-4 h-4" />
           )}
-          {t('admin.todayGames.refresh') || 'Refresh'}
+          {t('admin.todayGames.refresh')}
         </Button>
       </div>
 
@@ -123,7 +123,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
 
       {/* Last Updated */}
       <div className="text-center text-sm text-slate-500">
-        {t('admin.todayGames.lastUpdated') || 'Last updated'}:{' '}
+        {t('admin.todayGames.lastUpdated')}:{' '}
         {new Date(lastRefresh).toLocaleTimeString()}
       </div>
     </div>

@@ -59,9 +59,9 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   const showNameError = nameTouched && displayName.length > 0 && !isNameValid;
 
   const getErrorMessage = () => {
-    if (!isValidFormat) return t('validation.invalidCharacters') || 'Invalid characters';
-    if (displayName.trim().length < minLength) return t('validation.usernameTooShort') || 'Too short';
-    if (displayName.length > maxLength) return t('validation.usernameTooLong') || 'Too long';
+    if (!isValidFormat) return t('validation.invalidCharacters');
+    if (displayName.trim().length < minLength) return t('validation.usernameTooShort');
+    if (displayName.length > maxLength) return t('validation.usernameTooLong');
     return '';
   };
 
@@ -106,19 +106,19 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
       >
         <DialogHeader className="bg-neo-cyan text-neo-black p-3 sm:p-4">
           <DialogTitle className="text-lg sm:text-xl font-black uppercase text-center">
-            {t('profileCustomization.title') || 'Make it yours!'}
+            {t('profileCustomization.title')}
           </DialogTitle>
         </DialogHeader>
 
         <DialogBody className="space-y-4 px-4 sm:px-5 py-3">
           <p className="text-center text-sm text-neo-black/70 dark:text-gray-300">
-            {t('profileCustomization.subtitle') || 'Choose your avatar and name'}
+            {t('profileCustomization.subtitle')}
           </p>
 
           {/* Avatar grid */}
           <div className="w-full">
             <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-2">
-              {t('profileCustomization.avatarLabel') || 'Pick your character'}
+              {t('profileCustomization.avatarLabel')}
             </label>
             <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-2">
               {/* Profile Picture Option (if available) */}
@@ -253,7 +253,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                       setDisplayName(e.target.value);
                     }}
                     onBlur={() => setNameTouched(true)}
-                    placeholder={t('profileCustomization.namePlaceholder') || 'Enter your name'}
+                    placeholder={t('profileCustomization.namePlaceholder')}
                     maxLength={maxLength}
                     className={cn(
                       'w-full px-3 py-2.5 bg-white dark:bg-slate-600 border-3 border-neo-black dark:border-slate-500 rounded-neo',
@@ -318,7 +318,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
             disabled={isSaving}
             className="flex-1 border-2 border-neo-black dark:border-slate-500 font-bold"
           >
-            {t('profileCustomization.skipButton') || 'Skip'}
+            {t('profileCustomization.skipButton')}
           </Button>
           <Button
             onClick={handleSave}
@@ -330,7 +330,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
             ) : (
               <>
                 <Check className="w-5 h-5 me-2" />
-                {t('profileCustomization.saveButton') || 'Save'}
+                {t('profileCustomization.saveButton')}
               </>
             )}
           </Button>

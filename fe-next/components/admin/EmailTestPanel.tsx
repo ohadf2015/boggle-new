@@ -66,7 +66,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
   const handleSendTestEmail = async () => {
     if (!email) {
       setStatus('error');
-      setMessage(t('admin.email.errorNoEmail') || 'Please enter an email address');
+      setMessage(t('admin.email.errorNoEmail'));
       return;
     }
 
@@ -161,7 +161,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
             <Mail className="w-5 h-5 text-neo-black" />
           </div>
           <span className="font-neo-display text-lg">
-            {t('admin.email.title') || 'Email Testing'}
+            {t('admin.email.title')}
           </span>
         </CardTitle>
       </CardHeader>
@@ -193,7 +193,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
         {/* Email Input */}
         <div className="space-y-2">
           <Label htmlFor="test-email" className="text-neo-white font-medium">
-            {t('admin.email.recipientEmail') || 'Recipient Email'}
+            {t('admin.email.recipientEmail')}
           </Label>
           <Input
             id="test-email"
@@ -208,8 +208,8 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
         {/* Name Input */}
         <div className="space-y-2">
           <Label htmlFor="recipient-name" className="text-neo-white font-medium">
-            {t('admin.email.recipientName') || 'Recipient Name'}
-            <span className="text-slate-500 ml-1">({t('common.optional') || 'optional'})</span>
+            {t('admin.email.recipientName')}
+            <span className="text-slate-500 ms-1">({t('common.optional')})</span>
           </Label>
           <Input
             id="recipient-name"
@@ -234,12 +234,12 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
           >
             {status === 'sending' ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {t('admin.email.sending') || 'Sending...'}
+                <Loader2 className="w-4 h-4 me-2 animate-spin" />
+                {t('admin.email.sending')}
               </>
             ) : (
               <>
-                <Send className="w-4 h-4 mr-2" />
+                <Send className="w-4 h-4 me-2" />
                 Send {config.label} Email
               </>
             )}
@@ -255,10 +255,10 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
               `hover:${config.bgClass} hover:text-neo-black`
             )}
           >
-            <Eye className="w-4 h-4 mr-2" />
+            <Eye className="w-4 h-4 me-2" />
             {showPreview
-              ? (t('admin.email.hidePreview') || 'Hide Preview')
-              : (t('admin.email.showPreview') || 'Preview')
+              ? (t('admin.email.hidePreview'))
+              : (t('admin.email.showPreview'))
             }
           </Button>
         </div>
@@ -280,7 +280,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
         {showPreview && (
           <div className="mt-4 space-y-2">
             <Label className="text-neo-white font-medium">
-              {t('admin.email.preview') || 'Email Preview'} — {config.label}
+              {t('admin.email.preview')} — {config.label}
             </Label>
             <div className="border-2 border-neo-black rounded-neo overflow-hidden">
               <iframe
@@ -291,7 +291,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
               />
             </div>
             <p className="text-xs text-slate-500">
-              {t('admin.email.previewNote') || 'Preview shows how the email will appear in recipients\' inboxes.'}
+              {t('admin.email.previewNote')}
             </p>
           </div>
         )}

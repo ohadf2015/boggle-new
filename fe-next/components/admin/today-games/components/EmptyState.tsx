@@ -17,10 +17,10 @@ export function EmptyState({ t }: EmptyStateProps) {
     >
       <Calendar className="w-16 h-16 text-slate-500 mb-4" />
       <h3 className="text-xl font-neo-display text-slate-400 mb-2">
-        {t('admin.todayGames.noGames') || 'No games today yet'}
+        {t('admin.todayGames.noGames')}
       </h3>
       <p className="text-slate-500">
-        {t('admin.todayGames.noGamesHint') || 'Games will appear here as players start playing'}
+        {t('admin.todayGames.noGamesHint')}
       </p>
     </motion.div>
   );

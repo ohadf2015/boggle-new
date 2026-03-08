@@ -71,9 +71,9 @@ export function BlastWaveTransition({
   }, [advance]);
 
   const stats = [
-    { label: t('common.score') || 'Score', value: previousWaveScore, suffix: '' },
-    { label: t('common.words') || 'Words', value: previousWaveWords, suffix: '' },
-    { label: t('blast.progress') || 'Cleared', value: previousClearPercentage, suffix: '%' },
+    { label: t('common.score'), value: previousWaveScore, suffix: '' },
+    { label: t('common.words'), value: previousWaveWords, suffix: '' },
+    { label: t('blast.progress'), value: previousClearPercentage, suffix: '%' },
   ];
 
   return (
@@ -137,7 +137,7 @@ export function BlastWaveTransition({
         className="flex flex-col items-center gap-3"
       >
         <div className="font-bold text-white/70 text-sm uppercase tracking-widest">
-          {t('blast.title') || 'Blast'} — {t('blast.wavesCompleted') || 'Wave'} {waveNumber}
+          {t('blast.title')} — {t('blast.wavesCompleted')} {waveNumber}
         </div>
 
         <button

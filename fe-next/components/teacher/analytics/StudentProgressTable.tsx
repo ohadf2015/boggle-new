@@ -119,7 +119,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
               >
                 {t('education.analytics.student')}
                 {sortColumn === 'name' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  <span className="ms-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th
@@ -128,7 +128,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
               >
                 {t('education.analytics.level')}
                 {sortColumn === 'level' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  <span className="ms-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th
@@ -137,7 +137,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
               >
                 XP
                 {sortColumn === 'xp' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  <span className="ms-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th
@@ -146,7 +146,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
               >
                 {t('education.analytics.mastery')}
                 {sortColumn === 'mastery' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  <span className="ms-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th
@@ -155,7 +155,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
               >
                 {t('education.analytics.accuracy')}
                 {sortColumn === 'accuracy' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  <span className="ms-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th
@@ -164,7 +164,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
               >
                 {t('education.analytics.streak')}
                 {sortColumn === 'streak' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  <span className="ms-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th className="px-4 py-3 text-left text-xs font-neo-body uppercase text-neo-white hidden lg:table-cell">
@@ -202,7 +202,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
                     <span className="text-neo-white font-neo-body">
                       {student.displayName}
                       {student.isStruggling && (
-                        <span className="ml-2 text-xs text-neo-orange">
+                        <span className="ms-2 text-xs text-neo-orange">
                           ({t('education.analytics.struggling')})
                         </span>
                       )}
@@ -233,7 +233,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
                 </td>
                 <td className="px-4 py-3 text-neo-white font-neo-body hidden md:table-cell">
                   {student.currentStreak >= 3 && (
-                    <span className="mr-1">🔥</span>
+                    <span className="me-1">🔥</span>
                   )}
                   {student.currentStreak}
                 </td>

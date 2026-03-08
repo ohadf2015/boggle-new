@@ -151,7 +151,7 @@ export function SectionCard({
                 )}
 
                 {section.lastUpdated && (
-                  <span className="text-xs text-slate-600 ml-auto">
+                  <span className="text-xs text-slate-600 ms-auto">
                     Updated: {new Date(section.lastUpdated).toLocaleDateString()}
                   </span>
                 )}

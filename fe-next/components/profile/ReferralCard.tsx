@@ -176,13 +176,13 @@ export function ReferralCard() {
             'font-bold text-base',
             isDarkMode ? 'text-white' : 'text-gray-900'
           )}>
-            {t('profile.referralReward') || 'Invite Friends'}
+            {t('profile.referralReward')}
           </h3>
           <p className={cn(
             'text-xs',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            {t('profile.referralDescription') || 'Earn XP when friends join!'}
+            {t('profile.referralDescription')}
           </p>
         </div>
         {/* Stats Summary */}
@@ -195,7 +195,7 @@ export function ReferralCard() {
               {referralData.referralCount}
             </div>
             <div className={cn('text-[10px]', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
-              {t('profile.referralsCount') || 'Friends'}
+              {t('profile.referralsCount')}
             </div>
           </div>
           <div className="text-center">
@@ -220,7 +220,7 @@ export function ReferralCard() {
               'text-[10px] font-medium uppercase tracking-wide mb-1',
               isDarkMode ? 'text-gray-500' : 'text-gray-500'
             )}>
-              {t('profile.yourReferralCode') || 'Your Code'}
+              {t('profile.yourReferralCode')}
             </div>
             <code className="text-xl font-black text-neo-pink tracking-wider">
               {referralData.referralCode}
@@ -239,7 +239,7 @@ export function ReferralCard() {
             )}
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            <span className="ms-1.5 text-xs">{copied ? t('common.copied') || 'Copied!' : t('common.copy') || 'Copy'}</span>
+            <span className="ms-1.5 text-xs">{copied ? t('common.copied') : t('common.copy')}</span>
           </Button>
         </div>
       </div>
@@ -273,7 +273,7 @@ export function ReferralCard() {
           )}
         >
           <Share2 className="w-4 h-4 me-1.5" />
-          <span className="hidden sm:inline">{t('common.share') || 'Share'}</span>
+          <span className="hidden sm:inline">{t('common.share')}</span>
         </Button>
       </div>
 
@@ -287,7 +287,7 @@ export function ReferralCard() {
             : 'text-gray-500 hover:bg-gray-100'
         )}
       >
-        <span>💎 {t('profile.referralRewards') || 'View Rewards'}</span>
+        <span>💎 {t('profile.referralRewards')}</span>
         {showRewards ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
 
@@ -331,7 +331,7 @@ export function ReferralCard() {
             'text-xs font-medium mb-2',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            👥 {t('profile.yourReferrals') || 'Your Referrals'} ({referralData.referrals.length})
+            👥 {t('profile.yourReferrals')} ({referralData.referrals.length})
           </div>
           <div className="flex flex-wrap gap-1.5">
             {referralData.referrals.slice(0, 6).map((referral) => (
@@ -380,7 +380,7 @@ export function ReferralCard() {
         )}>
           <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
             <Users className="w-4 h-4 inline-block me-1 opacity-50" />
-            {t('profile.noReferralsYet') || 'No referrals yet. Share your code!'}
+            {t('profile.noReferralsYet')}
           </p>
         </div>
       )}

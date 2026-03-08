@@ -28,7 +28,7 @@ export function GamesFilters({
       <div className="flex items-center gap-2">
         <Filter className="w-4 h-4 text-slate-400" />
         <span className="text-sm text-slate-400">
-          {t('admin.todayGames.filters') || 'Filters'}:
+          {t('admin.todayGames.filters')}:
         </span>
       </div>
 
@@ -37,7 +37,7 @@ export function GamesFilters({
         onChange={(e) => onLanguageChange(e.target.value)}
         className="bg-slate-700 text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
       >
-        <option value="all">{t('admin.todayGames.allLanguages') || 'All Languages'}</option>
+        <option value="all">{t('admin.todayGames.allLanguages')}</option>
         <option value="en">🇺🇸 English</option>
         <option value="he">🇮🇱 Hebrew</option>
         <option value="sv">🇸🇪 Swedish</option>
@@ -50,11 +50,11 @@ export function GamesFilters({
         onChange={(e) => onGameTypeChange(e.target.value as GameTypeFilter)}
         className="bg-slate-700 text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
       >
-        <option value="all">{t('admin.todayGames.allTypes') || 'All Types'}</option>
-        <option value="multiplayer">{t('admin.todayGames.multiplayer') || 'Multiplayer'}</option>
-        <option value="word_hunt">{t('admin.todayGames.wordHunt') || 'Word Hunt'}</option>
-        <option value="daily_challenge">{t('admin.todayGames.daily') || 'Daily Challenge'}</option>
-        <option value="drill">{t('admin.todayGames.drills') || 'Drills'}</option>
+        <option value="all">{t('admin.todayGames.allTypes')}</option>
+        <option value="multiplayer">{t('admin.todayGames.multiplayer')}</option>
+        <option value="word_hunt">{t('admin.todayGames.wordHunt')}</option>
+        <option value="daily_challenge">{t('admin.todayGames.daily')}</option>
+        <option value="drill">{t('admin.todayGames.drills')}</option>
       </select>
 
       <select
@@ -62,9 +62,9 @@ export function GamesFilters({
         onChange={(e) => onRankedChange(e.target.value)}
         className="bg-slate-700 text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
       >
-        <option value="all">{t('admin.todayGames.allModes') || 'All Modes'}</option>
-        <option value="true">{t('admin.todayGames.rankedOnly') || 'Ranked Only'}</option>
-        <option value="false">{t('admin.todayGames.casualOnly') || 'Casual Only'}</option>
+        <option value="all">{t('admin.todayGames.allModes')}</option>
+        <option value="true">{t('admin.todayGames.rankedOnly')}</option>
+        <option value="false">{t('admin.todayGames.casualOnly')}</option>
       </select>
     </div>
   );

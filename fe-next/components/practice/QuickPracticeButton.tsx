@@ -80,13 +80,13 @@ export function QuickPracticeButton({
 
   const getModeLabel = (type: PracticeType): string => {
     const labels: Record<PracticeType, string> = {
-      flashcard: t('education.practice.flashcards') || 'Flashcards',
-      solo_board: t('education.practice.soloBoard') || 'Solo Board',
-      word_list: t('education.practice.wordList') || 'Word List',
-      warmup: t('education.practice.warmup') || 'Warmup',
-      matching: t('education.practice.matching') || 'Word Matching',
-      spelling: t('education.practice.spelling') || 'Spelling Challenge',
-      blitz: t('education.practice.blitz') || 'Timed Blitz',
+      flashcard: t('education.practice.flashcards'),
+      solo_board: t('education.practice.soloBoard'),
+      word_list: t('education.practice.wordList'),
+      warmup: t('education.practice.warmup'),
+      matching: t('education.practice.matching'),
+      spelling: t('education.practice.spelling'),
+      blitz: t('education.practice.blitz'),
     };
     return labels[type];
   };
@@ -158,15 +158,15 @@ export function QuickPracticeButton({
           isRTL ? 'rounded-l-none rounded-r-neo' : 'rounded-r-none rounded-l-neo'
         )}
       >
-        <Sparkles className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
-        {t('education.practice.quickPractice') || 'Practice'}
+        <Sparkles className="w-5 h-5 me-2" />
+        {t('education.practice.quickPractice')}
       </Button>
 
       {/* Dropdown trigger */}
       <Button
         onClick={toggleDropdown}
         size={size}
-        aria-label={t('education.practice.moreOptions') || 'More options'}
+        aria-label={t('education.practice.moreOptions')}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         className={cn(

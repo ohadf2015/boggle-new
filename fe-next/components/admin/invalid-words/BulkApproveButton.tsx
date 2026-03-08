@@ -144,12 +144,12 @@ export function BulkApproveButton({
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                   Approving...
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-4 h-4 mr-2" />
+                  <CheckCircle className="w-4 h-4 me-2" />
                   Approve {selectedCount} Word{selectedCount !== 1 ? 's' : ''}
                 </>
               )}
@@ -162,10 +162,10 @@ export function BulkApproveButton({
         <span className="text-sm">
           <span className="text-green-500">{result.approved} approved</span>
           {result.skipped > 0 && (
-            <span className="text-yellow-500 ml-2">{result.skipped} skipped</span>
+            <span className="text-yellow-500 ms-2">{result.skipped} skipped</span>
           )}
           {result.failed > 0 && (
-            <span className="text-red-500 ml-2">{result.failed} failed</span>
+            <span className="text-red-500 ms-2">{result.failed} failed</span>
           )}
         </span>
       )}

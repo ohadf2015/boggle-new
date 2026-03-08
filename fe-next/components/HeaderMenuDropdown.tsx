@@ -67,11 +67,11 @@ const HeaderMenuDropdown = memo(() => {
                     "transition-all duration-100",
                     "font-bold text-sm"
                 )}
-                aria-label={isOpen ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
+                aria-label={isOpen ? (t('common.closeMenu')) : (t('common.openMenu'))}
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
-                <span className="hidden md:inline">{t('common.menu') || 'Menu'}</span>
+                <span className="hidden md:inline">{t('common.menu')}</span>
                 <ChevronDown
                     className={cn(
                         "w-4 h-4 transition-transform duration-200",
@@ -111,7 +111,7 @@ const HeaderMenuDropdown = memo(() => {
                                 <div className="flex items-center gap-2 px-2 mb-1">
                                     <Sparkles size={14} className="text-neo-purple" />
                                     <span className="text-[10px] font-black uppercase tracking-wider text-neo-black/60 dark:text-slate-400">
-                                        {t('common.account') || 'My Account'}
+                                        {t('common.account')}
                                     </span>
                                 </div>
 
@@ -140,7 +140,7 @@ const HeaderMenuDropdown = memo(() => {
                                         <User size={16} className="text-neo-black dark:text-white" />
                                     </div>
                                     <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                                        {t('brain.nav.profile') || 'Profile'}
+                                        {t('brain.nav.profile')}
                                     </span>
                                 </Link>
 
@@ -173,7 +173,7 @@ const HeaderMenuDropdown = memo(() => {
                                         <Brain size={16} className="text-neo-white" />
                                     </div>
                                     <span className="relative group-hover:translate-x-0.5 transition-transform duration-150">
-                                        {t('landing.brainTraining') || 'Brain Training'}
+                                        {t('landing.brainTraining')}
                                     </span>
                                 </Link>
 
@@ -190,7 +190,7 @@ const HeaderMenuDropdown = memo(() => {
                                 <div className="flex items-center gap-2 px-2 mb-1">
                                     <BarChart3 size={14} className="text-neo-pink" />
                                     <span className="text-[10px] font-black uppercase tracking-wider text-neo-black/60 dark:text-slate-400">
-                                        {t('common.admin') || 'Admin'}
+                                        {t('common.admin')}
                                     </span>
                                 </div>
 
@@ -223,7 +223,7 @@ const HeaderMenuDropdown = memo(() => {
                                         <BarChart3 size={16} className="text-neo-white" />
                                     </div>
                                     <span className="relative group-hover:translate-x-0.5 transition-transform duration-150">
-                                        {t('common.adminDashboard') || 'Admin Dashboard'}
+                                        {t('common.adminDashboard')}
                                     </span>
                                 </Link>
 
@@ -238,7 +238,7 @@ const HeaderMenuDropdown = memo(() => {
                         <div className="flex items-center gap-2 px-2 mb-1">
                             <Settings size={14} className="text-neo-orange" />
                             <span className="text-[10px] font-black uppercase tracking-wider text-neo-black/60 dark:text-slate-400">
-                                {t('settings.title') || 'Settings'}
+                                {t('settings.title')}
                             </span>
                         </div>
 
@@ -267,7 +267,7 @@ const HeaderMenuDropdown = memo(() => {
                                 <Accessibility size={16} className="text-neo-black dark:text-white" />
                             </div>
                             <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                                {t('settings.accessibility') || 'Accessibility'}
+                                {t('settings.accessibility')}
                             </span>
                         </Link>
 
@@ -296,7 +296,7 @@ const HeaderMenuDropdown = memo(() => {
                                 <Settings size={16} className="text-neo-black dark:text-white" />
                             </div>
                             <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                                {t('settings.moreSettings') || 'More Settings'}
+                                {t('settings.moreSettings')}
                             </span>
                         </Link>
 

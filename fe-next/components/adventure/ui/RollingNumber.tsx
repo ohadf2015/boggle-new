@@ -123,9 +123,9 @@ export const RollingNumber = memo(function RollingNumber({
       animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
     >
-      {prefix && <span className="opacity-70 mr-1">{prefix}</span>}
+      {prefix && <span className="opacity-70 me-1">{prefix}</span>}
       <span>{formattedValue}</span>
-      {suffix && <span className="opacity-70 ml-1">{suffix}</span>}
+      {suffix && <span className="opacity-70 ms-1">{suffix}</span>}
     </motion.span>
   );
 });

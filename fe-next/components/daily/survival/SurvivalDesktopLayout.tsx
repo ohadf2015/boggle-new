@@ -185,7 +185,7 @@ export function SurvivalDesktopLayout({
           {/* Desktop Keyboard Tip */}
           <div className="flex items-center gap-1.5 text-slate-500 text-xs font-medium mt-1">
             <Keyboard className="w-3.5 h-3.5" />
-            <span>{t('wordHunt.survival.keyboardTip') || 'Swipe on grid or type with keyboard'}</span>
+            <span>{t('wordHunt.survival.keyboardTip')}</span>
           </div>
         </div>
 

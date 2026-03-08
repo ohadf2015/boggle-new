@@ -38,10 +38,10 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
   const levelArrow = dir === 'rtl' ? '←' : '→';
 
   const breakdownItems = [
-    { key: 'gameCompletion', label: t('xp.baseXp') || 'Base XP', value: xpBreakdown.gameCompletion, icon: '🎮' },
-    { key: 'scoreXp', label: t('xp.scoreBonus') || 'Score Bonus', value: xpBreakdown.scoreXp, icon: '📊' },
-    { key: 'winBonus', label: t('xp.winBonus') || 'Win Bonus', value: xpBreakdown.winBonus, icon: '🏆', highlight: isWinner },
-    { key: 'achievementXp', label: t('xp.achievementBonus') || 'Achievement Bonus', value: xpBreakdown.achievementXp, icon: '🏅' },
+    { key: 'gameCompletion', label: t('xp.baseXp'), value: xpBreakdown.gameCompletion, icon: '🎮' },
+    { key: 'scoreXp', label: t('xp.scoreBonus'), value: xpBreakdown.scoreXp, icon: '📊' },
+    { key: 'winBonus', label: t('xp.winBonus'), value: xpBreakdown.winBonus, icon: '🏆', highlight: isWinner },
+    { key: 'achievementXp', label: t('xp.achievementBonus'), value: xpBreakdown.achievementXp, icon: '🏅' },
   ].filter(item => item.value > 0);
 
   return (
@@ -73,7 +73,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
             ⭐
           </motion.span>
           <h4 className="font-black text-neo-black dark:text-neo-cream uppercase text-sm">
-            {t('xp.xpGained') || 'XP Gained'}
+            {t('xp.xpGained')}
           </h4>
         </div>
         <motion.div
@@ -111,10 +111,10 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       {/* Level info */}
       <div className="flex items-center justify-between pt-2 border-t-2 border-neo-black/20 dark:border-neo-cream/30 relative z-10">
         <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream uppercase">
-          {t('xp.level') || 'Level'} {newLevel}
+          {t('xp.level')} {newLevel}
         </span>
         <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream">
-          {t('xp.totalXpEarned') || 'Total XP'}: {newTotalXp.toLocaleString()}
+          {t('xp.totalXpEarned')}: {newTotalXp.toLocaleString()}
         </span>
       </div>
 
@@ -134,7 +134,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
             🎉
           </motion.div>
           <p className="font-black text-neo-black uppercase text-sm">
-            {t('xp.levelUp') || 'Level Up!'}
+            {t('xp.levelUp')}
           </p>
           <p className="font-bold text-neo-black text-lg">
             {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}
@@ -146,7 +146,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
               transition={{ delay: 1.1, type: 'spring', stiffness: 280, damping: 26 }}
               className="text-xs font-bold text-neo-pink mt-1"
             >
-              {t('xp.titleUnlocked') || 'Title Unlocked'}: {levelUpData.newTitles[0]}
+              {t('xp.titleUnlocked')}: {levelUpData.newTitles[0]}
             </motion.p>
           )}
         </motion.div>

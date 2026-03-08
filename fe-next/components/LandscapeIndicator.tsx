@@ -147,20 +147,20 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
               {/* Message */}
               <div className="flex-1 min-w-0">
                 <p className="text-neo-black font-black text-sm leading-tight">
-                  {t('common.rotateLandscape') || 'Rotate for better gameplay!'}
+                  {t('common.rotateLandscape')}
                 </p>
                 <button
                   onClick={handleDontShowAgain}
                   className="text-neo-black/70 text-xs font-bold underline hover:text-neo-black transition-colors mt-0.5"
                 >
-                  {t('common.dontShowAgain') || "Don't show again"}
+                  {t('common.dontShowAgain')}
                 </button>
               </div>
 
               {/* Close button */}
               <button
                 onClick={handleDismiss}
-                aria-label={t('common.dismiss') || 'Dismiss'}
+                aria-label={t('common.dismiss')}
                 className="flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] bg-neo-cream border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100"
               >
                 <X className="text-sm text-neo-black" size={14} />

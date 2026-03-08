@@ -339,7 +339,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                             {summaryStats.validCount}
                           </div>
                           <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
-                            {t('results.validWords') || 'Valid'}
+                            {t('results.validWords')}
                           </div>
                         </div>
                         <div>
@@ -347,7 +347,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                             {summaryStats.longestWord}
                           </div>
                           <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
-                            {t('results.longest') || 'Longest'}
+                            {t('results.longest')}
                           </div>
                         </div>
                         <div>
@@ -355,7 +355,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                             {summaryStats.accuracy}%
                           </div>
                           <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
-                            {t('results.accuracy') || 'Accuracy'}
+                            {t('results.accuracy')}
                           </div>
                         </div>
                       </div>
@@ -404,7 +404,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             >
               <span className="flex items-center gap-2">
                 <Award className="w-4 h-4 text-neo-pink" />
-                {t('hostView.achievements') || 'Achievements'} ({gameAchievements.length})
+                {t('hostView.achievements')} ({gameAchievements.length})
               </span>
               {showAchievements ? (
                 <ChevronUp className="w-5 h-5" />

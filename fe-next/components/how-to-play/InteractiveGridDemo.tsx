@@ -285,8 +285,8 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             onClick={() => setAutoPlay(false)}
             className="bg-neo-cream hover:bg-neo-cream/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
           >
-            <span className={`${dir === 'rtl' ? 'ml-1' : 'mr-1'}`}>⏸</span>
-            {t('howToPlay.demo.pause') || 'Pause'}
+            <span className={`me-1`}>⏸</span>
+            {t('howToPlay.demo.pause')}
           </Button>
         ) : (
           <Button
@@ -295,8 +295,8 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             onClick={() => setAutoPlay(true)}
             className="bg-neo-lime hover:bg-neo-lime/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
           >
-            <Play className={`w-3 h-3 sm:w-4 sm:h-4 ${dir === 'rtl' ? 'ml-1' : 'mr-1'}`} />
-            {t('howToPlay.demo.play') || 'Play'}
+            <Play className={`w-3 h-3 sm:w-4 sm:h-4 me-1`} />
+            {t('howToPlay.demo.play')}
           </Button>
         )}
         <Button
@@ -305,8 +305,8 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
           onClick={handleReplay}
           className="bg-neo-cyan hover:bg-neo-cyan/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
         >
-          <RotateCw className={`w-3 h-3 sm:w-4 sm:h-4 ${dir === 'rtl' ? 'ml-1' : 'mr-1'}`} />
-          {t('howToPlay.demo.replay') || 'Replay'}
+          <RotateCw className={`w-3 h-3 sm:w-4 sm:h-4 me-1`} />
+          {t('howToPlay.demo.replay')}
         </Button>
       </div>
     </div>

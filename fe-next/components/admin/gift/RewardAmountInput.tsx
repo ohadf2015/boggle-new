@@ -72,7 +72,7 @@ export function RewardAmountInput({
             >
               {preset.label}
               {preset.label !== 'Custom' && (
-                <span className="ml-1 text-xs opacity-70">
+                <span className="ms-1 text-xs opacity-70">
                   ({preset.xp} XP, {preset.coins} coins)
                 </span>
               )}

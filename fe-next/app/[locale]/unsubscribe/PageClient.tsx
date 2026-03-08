@@ -55,7 +55,7 @@ export default function UnsubscribePageClient() {
       >
         <div className="bg-slate-800/50 border-4 border-neo-black rounded-neo shadow-hard-lg p-8 text-center">
           {status === 'loading' ? (
-            <PageLoader size="md" text={t('unsubscribe.processing') || 'Processing...'} />
+            <PageLoader size="md" text={t('unsubscribe.processing')} />
           ) : status === 'success' ? (
             <>
               <div className="inline-flex items-center justify-center w-20 h-20 bg-neo-lime border-4 border-neo-black rounded-full mb-6 text-neo-black">
@@ -63,7 +63,7 @@ export default function UnsubscribePageClient() {
               </div>
 
               <h1 className="text-2xl font-black text-neo-cream mb-4">
-                {t('unsubscribe.successTitle') || "You've been unsubscribed"}
+                {t('unsubscribe.successTitle')}
               </h1>
 
               <p className="text-neo-cream/80 mb-6">
@@ -82,7 +82,7 @@ export default function UnsubscribePageClient() {
                   )}
                 >
                   <ArrowLeft className="me-2 rtl:rotate-180" />
-                  {t('unsubscribe.backToGame') || 'Back to Game'}
+                  {t('unsubscribe.backToGame')}
                 </Button>
 
                 <Button
@@ -96,7 +96,7 @@ export default function UnsubscribePageClient() {
                   )}
                 >
                   <Mail className="me-2" />
-                  {t('unsubscribe.resubscribe') || 'Resubscribe'}
+                  {t('unsubscribe.resubscribe')}
                 </Button>
               </div>
             </>
@@ -107,7 +107,7 @@ export default function UnsubscribePageClient() {
               </div>
 
               <h1 className="text-2xl font-black text-neo-cream mb-4">
-                {t('unsubscribe.errorTitle') || 'Something went wrong'}
+                {t('unsubscribe.errorTitle')}
               </h1>
 
               <p className="text-neo-cream/80 mb-6">
@@ -125,7 +125,7 @@ export default function UnsubscribePageClient() {
                 )}
               >
                 <ArrowLeft className="me-2 rtl:rotate-180" />
-                {t('unsubscribe.backToGame') || 'Back to Game'}
+                {t('unsubscribe.backToGame')}
               </Button>
             </>
           )}

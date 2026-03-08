@@ -44,7 +44,7 @@ export function ProfileBackButtons({
           )}
         >
           <Play className="me-2" />
-          {t('profile.backToRoom') || 'Back to Room'} {activeGameSession.gameCode}
+          {t('profile.backToRoom')} {activeGameSession.gameCode}
         </Button>
       )}
 
@@ -66,8 +66,8 @@ export function ProfileBackButtons({
       >
         <ArrowLeft className="me-2 rtl:rotate-180" />
         {activeGameSession
-          ? (t('profile.backToLobby') || 'Back to Lobby')
-          : (t('profile.backToGame') || 'Back to Game')}
+          ? (t('profile.backToLobby'))
+          : (t('profile.backToGame'))}
       </Button>
     </motion.div>
   );

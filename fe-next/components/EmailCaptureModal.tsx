@@ -105,7 +105,7 @@ export function EmailCaptureModal() {
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError(t('validation.invalidEmail') || 'Please enter a valid email address');
+      setError(t('validation.invalidEmail'));
       setIsSubmitting(false);
       return;
     }
@@ -142,7 +142,7 @@ export function EmailCaptureModal() {
         setShowModal(false);
       }, 3000);
     } catch (err) {
-      setError(t('error.subscriptionFailed') || 'Subscription failed. Please try again.');
+      setError(t('error.subscriptionFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -168,8 +168,8 @@ export function EmailCaptureModal() {
         >
           <DialogTitle className="sr-only">
             {submitted
-              ? t('email.successTitle') || "You're all set!"
-              : t('email.title') || 'Get Daily Challenges!'}
+              ? t('email.successTitle')
+              : t('email.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -181,7 +181,7 @@ export function EmailCaptureModal() {
                 <Mail size={48} className="text-neo-black" />
               </div>
               <h3 className="font-black text-neo-cream text-2xl mb-2">
-                {t('email.successTitle') || "You're all set!"}
+                {t('email.successTitle')}
               </h3>
               <p className="text-neo-cream opacity-90">
                 {t('email.successMessage') ||
@@ -201,12 +201,12 @@ export function EmailCaptureModal() {
                   </div>
                 </div>
                 <h3 className="font-black text-neo-cream text-2xl md:text-3xl mb-2">
-                  {t('email.title') || 'Get Daily Challenges!'}
+                  {t('email.title')}
                 </h3>
                 {/* Compact benefits inline */}
                 <div className="flex justify-center gap-4 text-neo-cream/80 text-sm">
-                  <span>🔥 {t('email.benefitShort1') || 'Streak reminders'}</span>
-                  <span>🎯 {t('email.benefitShort2') || 'Daily puzzles'}</span>
+                  <span>🔥 {t('email.benefitShort1')}</span>
+                  <span>🎯 {t('email.benefitShort2')}</span>
                 </div>
               </div>
 
@@ -217,7 +217,7 @@ export function EmailCaptureModal() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t('email.placeholder') || 'your@email.com'}
+                    placeholder={t('email.placeholder')}
                     className="w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-gray placeholder:opacity-75 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 transition-all"
                     required
                     disabled={isSubmitting}
@@ -234,15 +234,15 @@ export function EmailCaptureModal() {
                     className="flex-1 px-6 py-3 bg-neo-lime text-neo-black font-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting
-                      ? t('email.submitting') || 'Subscribing...'
-                      : t('email.submit') || 'Subscribe'}
+                      ? t('email.submitting')
+                      : t('email.submit')}
                   </button>
                   <button
                     type="button"
                     onClick={handleDismiss}
                     className="px-4 py-3 bg-neo-gray text-neo-white font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase"
                   >
-                    {t('common.skip') || 'Skip'}
+                    {t('common.skip')}
                   </button>
                 </div>
 

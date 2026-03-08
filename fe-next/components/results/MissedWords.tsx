@@ -99,11 +99,11 @@ const MissedWords = memo<MissedWordsProps>(({
           <div className={cn("flex items-center gap-2", dir === 'rtl' && 'flex-row-reverse')}>
             <EyeOff className="w-4 h-4 text-neo-lime" />
             <span className="font-bold text-xs uppercase text-white">
-              {t('results.missedOnBoard') || 'Words You Missed on the Board'}
+              {t('results.missedOnBoard')}
             </span>
           </div>
           <span className="text-xs font-black bg-neo-lime px-2 py-0.5 rounded-full text-neo-black">
-            +{showAll ? allTotalPoints : totalPoints} {t('results.points') || 'pts'}
+            +{showAll ? allTotalPoints : totalPoints} {t('results.points')}
           </span>
         </div>
 
@@ -174,7 +174,7 @@ const MissedWords = memo<MissedWordsProps>(({
             >
               <span>
                 {showAll
-                  ? (t('common.showLess') || 'Show Less')
+                  ? (t('common.showLess'))
                   : (t('common.showMore') || `Show ${allHighValueWords.length - maxDisplay} More`)
                 }
               </span>

@@ -134,7 +134,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
       <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {t('multiplayerFlow.createModal.title') || 'Create Room'}
+            {t('multiplayerFlow.createModal.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -149,7 +149,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           {/* Username Input */}
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
-              {t('multiplayerFlow.createModal.yourName') || 'Your Name'}
+              {t('multiplayerFlow.createModal.yourName')}
             </Label>
             {isAuthenticated ? (
               <Input
@@ -166,7 +166,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 maxLength={20}
                 autoFocus
                 className="font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50"
-                placeholder={t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
+                placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
               />
             ) : (
               <button
@@ -184,7 +184,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 )}
               >
                 <span className="font-bold text-neo-white truncate">
-                  {username || t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
+                  {username || t('multiplayerFlow.createModal.namePlaceholder')}
                 </span>
                 <Pencil className="w-4 h-4 text-neo-cyan flex-shrink-0" />
               </button>
@@ -194,9 +194,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           {/* Room Name Input */}
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
-              {t('multiplayerFlow.createModal.roomNameLabel') || 'Room Name'}{' '}
+              {t('multiplayerFlow.createModal.roomNameLabel')}{' '}
               <span className="font-normal text-slate-400 dark:text-slate-500">
-                ({t('multiplayerFlow.createModal.optional') || 'optional'})
+                ({t('multiplayerFlow.createModal.optional')})
               </span>
             </Label>
             <Input
@@ -221,8 +221,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             className="w-full font-bold uppercase"
           >
             {isCreating
-              ? t('multiplayerFlow.createModal.creating') || 'Creating...'
-              : t('multiplayerFlow.createModal.createButton') || 'Create Room'}
+              ? t('multiplayerFlow.createModal.creating')
+              : t('multiplayerFlow.createModal.createButton')}
           </Button>
         </DialogFooter>
       </DialogContent>

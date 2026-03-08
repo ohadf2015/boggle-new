@@ -102,7 +102,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
           <span className="font-black text-neo-black">+{reward.awarded}</span>
         </div>
         <div className="text-[8px] font-bold uppercase text-neo-black/70">
-          {t('reveal.coins') || 'Coins'}
+          {t('reveal.coins')}
         </div>
       </div>
     );
@@ -119,7 +119,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
           <Coins className="w-5 h-5 text-neo-black" />
           <span className="font-black text-xl text-neo-black">+{reward.awarded}</span>
           <span className="text-sm font-bold text-neo-black/70">
-            {t('reveal.coins') || 'Coins'}
+            {t('reveal.coins')}
           </span>
         </div>
       </div>
@@ -142,7 +142,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
         <Coins className="w-5 h-5 text-neo-black" />
         <span className="font-black text-xl text-neo-black">+{reward.awarded}</span>
         <span className="text-sm font-bold text-neo-black/70">
-          {t('reveal.coins') || 'Coins'}
+          {t('reveal.coins')}
         </span>
       </div>
 
@@ -150,19 +150,19 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
       {showBreakdown && (
         <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium flex-wrap">
           {reward.breakdown.base > 0 && (
-            <span>{t('reveal.base') || 'Base'}: +{reward.breakdown.base}</span>
+            <span>{t('reveal.base')}: +{reward.breakdown.base}</span>
           )}
           {(reward.breakdown.scoreBonus ?? 0) > 0 && (
-            <span>{t('coins.score') || 'Score'}: +{reward.breakdown.scoreBonus}</span>
+            <span>{t('coins.score')}: +{reward.breakdown.scoreBonus}</span>
           )}
           {(reward.breakdown.placement ?? 0) > 0 && (
-            <span>{t('coins.placement') || 'Placement'}: +{reward.breakdown.placement}</span>
+            <span>{t('coins.placement')}: +{reward.breakdown.placement}</span>
           )}
           {(reward.breakdown.efficiency ?? 0) > 0 && (
-            <span>{t('coins.efficiency') || 'Efficiency'}: +{reward.breakdown.efficiency}</span>
+            <span>{t('coins.efficiency')}: +{reward.breakdown.efficiency}</span>
           )}
           {(reward.breakdown.streak ?? 0) > 0 && (
-            <span>{t('coins.streak') || 'Streak'}: +{reward.breakdown.streak}</span>
+            <span>{t('coins.streak')}: +{reward.breakdown.streak}</span>
           )}
         </div>
       )}
@@ -170,7 +170,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
       {/* Usage hint */}
       {showHint && (
         <p className="text-xs text-neo-black/60 mt-1 text-center">
-          {t('reveal.usedForReveals') || 'Use coins to reveal words in single player games!'}
+          {t('reveal.usedForReveals')}
         </p>
       )}
     </motion.div>
@@ -193,7 +193,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
   className,
   t,
 }) => {
-  const teasingMessage = t('coins.guestTeasing') || 'Sign in to earn {amount} coins!';
+  const teasingMessage = t('coins.guestTeasing');
   const formattedMessage = teasingMessage.replace('{amount}', String(reward.awarded));
 
   // Inline variant - small muted badge
@@ -208,7 +208,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
           <span className="font-bold text-slate-300 text-xs">+{reward.awarded}</span>
         </div>
         <div className="text-[7px] font-medium text-slate-400">
-          {t('coins.signInShort') || 'Sign in'}
+          {t('coins.signInShort')}
         </div>
       </div>
     );
@@ -250,7 +250,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
         <Coins className="w-5 h-5 text-amber-400/60" />
         <span className="font-black text-xl text-amber-400/80">+{reward.awarded}</span>
         <span className="text-sm font-bold text-slate-400">
-          {t('reveal.coins') || 'Coins'}
+          {t('reveal.coins')}
         </span>
       </div>
 

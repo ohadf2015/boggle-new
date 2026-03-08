@@ -68,13 +68,13 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
     if (masteryMessage) return masteryMessage;
 
     if (percentage === 100) {
-      return t('education.practice.encouragement100') || "Perfect! You've mastered these words.";
+      return t('education.practice.encouragement100');
     } else if (percentage >= 80) {
-      return t('education.practice.encouragement80') || 'Great job! Almost there.';
+      return t('education.practice.encouragement80');
     } else if (percentage >= 50) {
-      return t('education.practice.encouragement50') || 'Good effort! Keep practicing.';
+      return t('education.practice.encouragement50');
     } else {
-      return t('education.practice.encouragement0') || 'Keep trying! Practice makes progress.';
+      return t('education.practice.encouragement0');
     }
   }, [percentage, masteryMessage, t]);
 
@@ -164,7 +164,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
           </p>
           <p className="text-neo-white/70 font-neo-body mt-1">
             {correct} / {total}{' '}
-            {t('education.practice.correctCount') || 'correct'}
+            {t('education.practice.correctCount')}
           </p>
         </AdaptiveMotion.div>
 
@@ -204,7 +204,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
           >
             {timeSpent !== undefined && timeSpent > 0 && (
               <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
-                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.time') || 'Time'}</p>
+                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.time')}</p>
                 <p className="text-lg text-neo-cyan font-neo-display">
                   {Math.floor(timeSpent / 60)}:{(timeSpent % 60).toString().padStart(2, '0')}
                 </p>
@@ -212,13 +212,13 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
             )}
             {maxStreak !== undefined && maxStreak > 1 && (
               <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
-                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.maxStreak') || 'Max Streak'}</p>
+                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.maxStreak')}</p>
                 <p className="text-lg text-neo-yellow font-neo-display">{maxStreak}x</p>
               </div>
             )}
             {hintsUsed !== undefined && hintsUsed > 0 && (
               <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
-                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.hintsUsed') || 'Hints Used'}</p>
+                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.hintsUsed')}</p>
                 <p className="text-lg text-neo-purple font-neo-display">{hintsUsed}</p>
               </div>
             )}
@@ -244,7 +244,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
             )}
           >
             <RotateCcw className="w-5 h-5" />
-            {t('education.practice.tryAgain') || 'Try Again'}
+            {t('education.practice.tryAgain')}
           </Button>
           <Button
             onClick={onBack}
@@ -258,7 +258,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
             )}
           >
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
-            {t('education.practice.back') || 'Back'}
+            {t('education.practice.back')}
           </Button>
         </AdaptiveMotion.div>
       </CardContent>

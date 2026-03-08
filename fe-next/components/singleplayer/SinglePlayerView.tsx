@@ -538,7 +538,7 @@ const SinglePlayerView: React.FC = () => {
             {returnTo === 'daily' && (
               <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
                 <div className="bg-neo-orange text-neo-black px-4 py-2 rounded-full shadow-hard-sm border-2 border-neo-black text-sm font-medium animate-pulse">
-                  {t('daily.trainingSuggestion.redirecting') || 'Heading to Daily Challenge...'}
+                  {t('daily.trainingSuggestion.redirecting')}
                 </div>
               </div>
             )}

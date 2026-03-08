@@ -21,13 +21,13 @@ export function GameRow({ game, t }: GameRowProps) {
   const getTypeLabel = () => {
     switch (game.mode) {
       case 'ranked':
-        return t('admin.todayGames.ranked') || 'Ranked';
+        return t('admin.todayGames.ranked');
       case 'casual':
-        return t('admin.todayGames.casual') || 'Casual';
+        return t('admin.todayGames.casual');
       case 'word_hunt':
-        return t('admin.todayGames.wordHunt') || 'Word Hunt';
+        return t('admin.todayGames.wordHunt');
       case 'daily_challenge':
-        return t('admin.todayGames.daily') || 'Daily';
+        return t('admin.todayGames.daily');
       case 'drill':
         return `${game.drill_type || 'Drill'} L${game.drill_level || 1}`;
       default:
@@ -38,7 +38,7 @@ export function GameRow({ game, t }: GameRowProps) {
   const playerName =
     game.profiles?.display_name ||
     game.profiles?.username ||
-    (game.is_guest ? t('admin.todayGames.guest') || 'Guest' : 'Unknown');
+    (game.is_guest ? t('admin.todayGames.guest') : 'Unknown');
 
   return (
     <motion.tr
@@ -69,7 +69,7 @@ export function GameRow({ game, t }: GameRowProps) {
           <span className="text-sm text-neo-white truncate max-w-[120px]">{playerName}</span>
           {game.is_guest && (
             <span className="text-xs bg-slate-600 text-slate-300 px-1.5 py-0.5 rounded">
-              {t('admin.todayGames.guest') || 'Guest'}
+              {t('admin.todayGames.guest')}
             </span>
           )}
         </div>

@@ -97,7 +97,7 @@ export function GameOverlays({
               <Loader
                 size="md"
                 className='text-neo-black'
-                text={t('singlePlayer.verifyingWords') || 'Verifying words...'}
+                text={t('singlePlayer.verifyingWords')}
               />
             </div>
           </AdaptiveMotion.div>

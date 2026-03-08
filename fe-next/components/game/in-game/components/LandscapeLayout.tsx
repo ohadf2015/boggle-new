@@ -285,14 +285,14 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
               {isPlaying && playerRank && playerRank > 0 && leaderboard.length > 1 && (
                 <AdaptiveMotion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex flex-col items-center">
                   <div className="landscape-stat-secondary text-white">#{playerRank}</div>
-                  <div className="landscape-stat-label text-white">{t('common.rank') || 'RANK'}</div>
+                  <div className="landscape-stat-label text-white">{t('common.rank')}</div>
                 </AdaptiveMotion.div>
               )}
 
               {isPlaying && (
                 <div className="flex flex-col items-center">
                   <div className="landscape-stat-secondary text-white">{leaderboard.find(p => p.username === username)?.wordCount || 0}</div>
-                  <div className="landscape-stat-label text-white">{t('common.words') || 'WORDS'}</div>
+                  <div className="landscape-stat-label text-white">{t('common.words')}</div>
                 </div>
               )}
             </div>
@@ -448,7 +448,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                       className="text-[10px] text-neo-cream/50 text-center leading-tight"
                     >
                       <span className="text-neo-cyan">⚡</span>{' '}
-                      {t('game.comboHint') || 'Find words fast for combo!'}
+                      {t('game.comboHint')}
                     </AdaptiveMotion.div>
                   )}
                 </div>

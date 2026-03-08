@@ -67,7 +67,7 @@ export function NotificationDropdown({
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b-3 border-black bg-neo-navy">
         <h3 className="font-neo-display text-neo-white text-lg">
-          {t('notifications.title') || 'Notifications'}
+          {t('notifications.title')}
         </h3>
         {unreadCount > 0 && (
           <button
@@ -77,7 +77,7 @@ export function NotificationDropdown({
               transition-colors font-medium
             "
           >
-            {t('notifications.markAllRead') || 'Mark all read'}
+            {t('notifications.markAllRead')}
           </button>
         )}
       </div>
@@ -88,7 +88,7 @@ export function NotificationDropdown({
           <div className="py-8 px-4 text-center text-neo-white/50">
             <span className="text-3xl block mb-2">🔔</span>
             <p className="text-sm">
-              {t('notifications.empty') || 'No notifications yet'}
+              {t('notifications.empty')}
             </p>
           </div>
         ) : (
@@ -113,7 +113,7 @@ export function NotificationDropdown({
               hover:text-neo-cyan transition-colors
             "
           >
-            {t('notifications.viewAll') || 'View all notifications'}
+            {t('notifications.viewAll')}
           </button>
         </div>
       )}

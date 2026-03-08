@@ -169,7 +169,7 @@ export function CountrySelector({
           <>
             <Globe className="w-4 h-4 opacity-50" />
             <span className="flex-1 text-left opacity-70">
-              {t('profile.selectCountry') || 'Select country'}
+              {t('profile.selectCountry')}
             </span>
           </>
         )}
@@ -207,7 +207,7 @@ export function CountrySelector({
                 role="searchbox"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('profile.searchCountry') || 'Search…'}
+                placeholder={t('profile.searchCountry')}
                 className={cn(
                   'w-full pl-8 pr-8 py-2 text-sm rounded-md border',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
@@ -220,7 +220,7 @@ export function CountrySelector({
                 <button
                   type="button"
                   onClick={() => setSearch('')}
-                  aria-label={t('common.clearSearch') || 'Clear search'}
+                  aria-label={t('common.clearSearch')}
                   className={cn(
                     'absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2',
                     'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 rounded',
@@ -246,7 +246,7 @@ export function CountrySelector({
               )}
             >
               <X className="w-4 h-4" />
-              {t('profile.clearCountry') || 'Clear selection'}
+              {t('profile.clearCountry')}
             </button>
           )}
 
@@ -257,7 +257,7 @@ export function CountrySelector({
                 'px-3 py-4 text-sm text-center',
                 isDarkMode ? 'text-gray-500' : 'text-gray-400'
               )}>
-                {t('profile.noCountryFound') || 'No country found'}
+                {t('profile.noCountryFound')}
               </div>
             ) : (
               filteredCountries.map((country) => (
@@ -283,7 +283,7 @@ export function CountrySelector({
                       'text-xs px-1.5 py-0.5 rounded',
                       isDarkMode ? 'bg-cyan-800 text-cyan-300' : 'bg-cyan-100 text-cyan-700'
                     )}>
-                      {t('common.selected') || 'Selected'}
+                      {t('common.selected')}
                     </span>
                   )}
                 </button>

@@ -82,14 +82,14 @@ export function BlastHelpModal({ open, onOpenChange, t }: BlastHelpModalProps) {
       <AlertDialogContent className="max-w-sm border-3 border-neo-black shadow-hard-lg bg-neo-navy text-white">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl font-black uppercase text-center text-neo-yellow">
-            {t('blast.helpTitle') || 'How to Play'}
+            {t('blast.helpTitle')}
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-2.5 text-white/80 text-sm">
               {/* Drag instruction */}
               <div className="flex items-center gap-3 px-3 py-2 bg-neo-cyan/10 rounded-neo border-2 border-neo-cyan/30">
                 <Hand className="w-5 h-5 text-neo-cyan shrink-0" />
-                <p className="text-xs text-white/70">{t('blast.helpDrag') || 'Drag across letters to form words. Words must be at least 2 letters long.'}</p>
+                <p className="text-xs text-white/70">{t('blast.helpDrag')}</p>
               </div>
 
               {/* Score Boosters */}
@@ -199,14 +199,14 @@ export function BlastHelpModal({ open, onOpenChange, t }: BlastHelpModalProps) {
 
               {/* Goal */}
               <p className="text-white/50 text-[10px] border-t border-white/10 pt-2.5 text-center font-bold uppercase tracking-wider">
-                {t('blast.helpGoal') || 'Clear as many tiles as possible for the highest score!'}
+                {t('blast.helpGoal')}
               </p>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogAction className="w-full bg-neo-yellow text-neo-black font-black border-3 border-neo-black shadow-hard hover:shadow-hard-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-            {t('common.gotIt') || 'Got it!'}
+            {t('common.gotIt')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

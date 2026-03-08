@@ -102,7 +102,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
       >
         <Icon className="w-4 h-4" />
         <span className="font-black">{currentStreak}</span>
-        <span className="opacity-80">{t('growth.dayStreak') || 'day streak'}</span>
+        <span className="opacity-80">{t('growth.dayStreak')}</span>
         {tier && <span>{tier.emoji}</span>}
       </motion.div>
     );
@@ -166,7 +166,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
                 'text-sm font-medium',
                 isDarkMode ? 'text-gray-300' : 'text-neo-black/70'
               )}>
-                {t('growth.dayStreak') || 'day streak'}
+                {t('growth.dayStreak')}
               </span>
             </div>
 
@@ -178,8 +178,8 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
                 <span>{tier.emoji}</span>
                 <span className="uppercase tracking-wide">{tier.name}</span>
                 {isNewBest && (
-                  <span className="ml-1 px-1.5 py-0.5 bg-neo-lime text-neo-black border border-neo-black rounded-neo text-[10px] uppercase font-black">
-                    {t('growth.newBest') || 'New Best!'}
+                  <span className="ms-1 px-1.5 py-0.5 bg-neo-lime text-neo-black border border-neo-black rounded-neo text-[10px] uppercase font-black">
+                    {t('growth.newBest')}
                   </span>
                 )}
               </div>
@@ -194,7 +194,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
               'text-xs font-medium',
               isDarkMode ? 'text-gray-400' : 'text-neo-black/60'
             )}>
-              {t('growth.nextTier') || 'Next tier'}
+              {t('growth.nextTier')}
             </div>
             <div className="flex items-center justify-end gap-1.5">
               <span className="text-lg">{nextTier.emoji}</span>
@@ -202,7 +202,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
                 'text-sm font-bold',
                 isDarkMode ? 'text-gray-200' : 'text-neo-black'
               )}>
-                {nextTier.min - currentStreak} {t('growth.daysAway') || 'days away'}
+                {nextTier.min - currentStreak} {t('growth.daysAway')}
               </span>
             </div>
           </div>
@@ -255,8 +255,8 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
               </motion.div>
               <div className="text-neo-white font-black text-lg uppercase tracking-wide">
                 {isNewBest
-                  ? t('growth.newPersonalBest') || 'New Personal Best!'
-                  : `${tier?.name} ${t('growth.streakUnlocked') || 'Streak Unlocked!'}`}
+                  ? t('growth.newPersonalBest')
+                  : `${tier?.name} ${t('growth.streakUnlocked')}`}
               </div>
             </div>
           </motion.div>

@@ -255,13 +255,13 @@ export function AdminGiftModal({
   const getHeaderLine = () => {
     switch (gift.template_type) {
       case 'top_player':
-        return t('gift.topPlayerLine') || "You're one of our top players!";
+        return t('gift.topPlayerLine');
       case 'feedback_request':
-        return t('gift.feedbackLine') || 'Your voice matters to us!';
+        return t('gift.feedbackLine');
       case 'thank_you':
-        return t('gift.thankYouLine') || 'A special thank you from us!';
+        return t('gift.thankYouLine');
       default:
-        return t('gift.customLine') || 'A message just for you!';
+        return t('gift.customLine');
     }
   };
 
@@ -323,7 +323,7 @@ export function AdminGiftModal({
                   'flex items-center justify-center',
                   'border-2 border-white/20 hover:border-white/30' // Added border for better visual definition
                 )}
-                aria-label={t('common.close') || 'Close'}
+                aria-label={t('common.close')}
               >
                 <X className="w-6 h-6 text-white/90" /> {/* Increased from w-5 h-5, improved contrast */}
               </button>
@@ -398,7 +398,7 @@ export function AdminGiftModal({
                             +{gift.coin_amount.toLocaleString()}
                           </div>
                           <div className="text-xs text-amber-300/70 uppercase tracking-wide">
-                            {t('gift.coins') || 'Coins'}
+                            {t('gift.coins')}
                           </div>
                         </div>
                       </div>
@@ -415,14 +415,14 @@ export function AdminGiftModal({
                     >
                       {gift.xp_amount > 0 && (
                         <div className="text-purple-300/80">
-                          <span className="text-white/50">{t('gift.newTotal') || 'New total'}:</span>{' '}
+                          <span className="text-white/50">{t('gift.newTotal')}:</span>{' '}
                           <span className="font-bold">{(startXp + gift.xp_amount).toLocaleString()} XP</span>
                         </div>
                       )}
                       {gift.coin_amount > 0 && (
                         <div className="text-amber-300/80">
-                          <span className="text-white/50">{t('gift.newTotal') || 'New total'}:</span>{' '}
-                          <span className="font-bold">{(startCoins + gift.coin_amount).toLocaleString()} {t('gift.coins') || 'Coins'}</span>
+                          <span className="text-white/50">{t('gift.newTotal')}:</span>{' '}
+                          <span className="font-bold">{(startCoins + gift.coin_amount).toLocaleString()} {t('gift.coins')}</span>
                         </div>
                       )}
                     </motion.div>
@@ -430,14 +430,14 @@ export function AdminGiftModal({
                     <div className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs text-white/40">
                       {gift.xp_amount > 0 && (
                         <div>
-                          <span>{t('gift.currentBalance') || 'Current'}:</span>{' '}
+                          <span>{t('gift.currentBalance')}:</span>{' '}
                           <span className="font-mono">{startXp.toLocaleString()} XP</span>
                         </div>
                       )}
                       {gift.coin_amount > 0 && (
                         <div>
-                          <span>{t('gift.currentBalance') || 'Current'}:</span>{' '}
-                          <span className="font-mono">{startCoins.toLocaleString()} {t('gift.coins') || 'Coins'}</span>
+                          <span>{t('gift.currentBalance')}:</span>{' '}
+                          <span className="font-mono">{startCoins.toLocaleString()} {t('gift.coins')}</span>
                         </div>
                       )}
                     </div>
@@ -481,7 +481,7 @@ export function AdminGiftModal({
                           'text-xs uppercase tracking-wide font-semibold',
                           rarityColors[gift.badge.rarity]?.text || 'text-gray-300'
                         )}>
-                          {t(`collectibles.rarity.${gift.badge.rarity}`) || gift.badge.rarity} {t('gift.badge') || 'Badge'}
+                          {t(`collectibles.rarity.${gift.badge.rarity}`) || gift.badge.rarity} {t('gift.badge')}
                         </span>
                       </div>
                       <p className="text-white font-bold text-lg">
@@ -511,13 +511,13 @@ export function AdminGiftModal({
                   <Loader size="sm" />
                 ) : phase === 'done' ? (
                   <>
-                    <Gift className="w-5 h-5 mr-2" />
-                    {t('gift.claimed') || 'Claimed!'}
+                    <Gift className="w-5 h-5 me-2" />
+                    {t('gift.claimed')}
                   </>
                 ) : (
                   <>
-                    <Gift className="w-5 h-5 mr-2" />
-                    {t('gift.claim') || 'Claim Reward'}
+                    <Gift className="w-5 h-5 me-2" />
+                    {t('gift.claim')}
                   </>
                 )}
               </Button>
@@ -525,7 +525,7 @@ export function AdminGiftModal({
               {/* From line */}
               {gift.sender && (
                 <p className="mt-4 text-xs text-white/50">
-                  {t('gift.from') || 'From'}: {gift.sender.display_name || gift.sender.username}
+                  {t('gift.from')}: {gift.sender.display_name || gift.sender.username}
                 </p>
               )}
             </div>

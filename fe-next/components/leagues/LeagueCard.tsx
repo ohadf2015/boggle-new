@@ -70,7 +70,7 @@ export function LeagueCard({ tier, myPosition, myXp, topStandings }: LeagueCardP
           {topStandings.map((s) => (
             <div key={s.userId} className="flex items-center justify-between text-sm">
               <span className="text-neo-white/80">
-                <span className="text-neo-white/40 mr-2">#{s.position}</span>
+                <span className="text-neo-white/40 me-2">#{s.position}</span>
                 {s.displayName}
               </span>
               <span className="text-neo-yellow font-mono">{s.weeklyXp}</span>

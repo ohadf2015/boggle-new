@@ -106,7 +106,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     <section className="space-y-2">
       <div className="flex items-center justify-between px-1">
         <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
-          {t('hostView.playersInRoom') || 'Players in Room'}
+          {t('hostView.playersInRoom')}
         </h3>
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
@@ -175,7 +175,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               <Plus className="w-5 h-5 text-neo-cyan/50" />
             </div>
             <span className="text-xs font-bold text-slate-600 uppercase">
-              {t('common.join') || 'Join'}
+              {t('common.join')}
             </span>
           </div>
         ))}
@@ -201,7 +201,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* Waiting hint */}
       <p className="text-sm text-center text-slate-400">
-        {t('playerView.hostWillStart') || 'The host will start the game when everyone is ready'}
+        {t('playerView.hostWillStart')}
       </p>
 
       {/* Word fact rotation - fills dead time */}
@@ -257,7 +257,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
             >
               <Pencil className="w-3.5 h-3.5" />
-              <span>{t('playerView.editName') || 'Change name'}</span>
+              <span>{t('playerView.editName')}</span>
             </button>
           )}
         </div>
@@ -280,7 +280,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       {/* 4. Chat */}
       <section className="pb-4">
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 mb-2">
-          {t('hostView.roomChat') || 'Room Chat'}
+          {t('hostView.roomChat')}
         </h3>
         <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-64 sm:h-80">
           <RoomChat
@@ -321,7 +321,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             <button
               onClick={onExitRoom}
               className="w-9 h-9 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
-              aria-label={t('common.exit') || 'Exit'}
+              aria-label={t('common.exit')}
             >
               <LogOut className="w-4 h-4 text-neo-black" />
             </button>

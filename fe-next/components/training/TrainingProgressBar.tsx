@@ -196,10 +196,10 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
 
   // Get status message
   const statusMessage = useMemo(() => {
-    if (isComplete) return t('training.progress.complete') || "You're Ready!";
-    if (progressPercent >= 80) return t('training.progress.almostThere') || 'Almost there!';
-    if (progressPercent >= 40) return t('training.progress.keepGoing') || 'Keep going!';
-    return t('training.progress.getStarted') || 'Let\'s get started!';
+    if (isComplete) return t('training.progress.complete');
+    if (progressPercent >= 80) return t('training.progress.almostThere');
+    if (progressPercent >= 40) return t('training.progress.keepGoing');
+    return t('training.progress.getStarted');
   }, [progressPercent, isComplete, t]);
 
   // Clear justUnlocked after animation
@@ -232,7 +232,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
         {isComplete ? (
           <>
             <Trophy className="w-5 h-5" />
-            <span className="text-base font-bold">{t('training.progress.ready') || 'Ready!'}</span>
+            <span className="text-base font-bold">{t('training.progress.ready')}</span>
           </>
         ) : (
           <>
@@ -256,7 +256,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
                 'text-xs font-medium whitespace-nowrap',
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
               )}>
-                {t('training.progress.tapForDetails') || 'Tap for details'}
+                {t('training.progress.tapForDetails')}
               </span>
               <ChevronDown className={cn(
                 'w-4 h-4 flex-shrink-0',
@@ -307,7 +307,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
             'font-bold text-sm uppercase tracking-wide',
             isDarkMode ? 'text-gray-300' : 'text-neo-black'
           )}>
-            {t('training.progress.title') || 'Training Progress'}
+            {t('training.progress.title')}
           </h3>
           {compact && onToggleExpand && (
             <button
@@ -320,7 +320,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
                 isDarkMode ? 'border-slate-500 text-gray-400 hover:bg-slate-700' : 'border-gray-300 text-gray-500 hover:bg-gray-100'
               )}
             >
-              {t('common.collapse') || 'Collapse'}
+              {t('common.collapse')}
             </button>
           )}
         </div>
@@ -389,7 +389,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
                 <Trophy className="w-5 h-5" />
               </motion.div>
               <span className="font-bold text-sm">
-                {t('training.progress.readyForMultiplayer') || "You're ready for multiplayer!"}
+                {t('training.progress.readyForMultiplayer')}
               </span>
             </div>
           </motion.div>

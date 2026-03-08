@@ -143,7 +143,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
             <span className="text-sm font-black text-neo-black dark:text-gray-100 uppercase">
-              {t('xp.level') || 'Level'} {progress.currentLevel}
+              {t('xp.level')} {progress.currentLevel}
             </span>
             {/* Prestige Badge */}
             {showPrestige && prestigeDisplay && (
@@ -185,8 +185,8 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             >
               {canPrestige && <Sparkles className="w-3 h-3" />}
               {canPrestige
-                ? (t('xp.canPrestige') || 'Prestige Available!')
-                : (t('xp.maxLevel') || 'Max Level')}
+                ? (t('xp.canPrestige'))
+                : (t('xp.maxLevel'))}
             </button>
           )}
         </div>

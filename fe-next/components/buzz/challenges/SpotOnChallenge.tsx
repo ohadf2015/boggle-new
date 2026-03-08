@@ -63,7 +63,7 @@ function SpotOnTextFallback({
           onKeyDown={(e) => {
             if (e.key === 'Enter' && input.trim()) onAnswer(input.trim());
           }}
-          placeholder={t('buzz.typeYourAnswer') || 'Type your answer...'}
+          placeholder={t('buzz.typeYourAnswer')}
           className="w-full py-4 px-5 text-lg font-bold bg-slate-800 border-2 border-slate-600 focus:border-neo-cyan rounded-xl text-white placeholder:text-slate-500 outline-none transition-colors"
           autoFocus
         />

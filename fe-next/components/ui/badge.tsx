@@ -47,7 +47,7 @@ const badgeVariants = cva(
        */
       size: {
         default: "rounded-neo-pill border-2 border-neo-black px-3 py-1 text-xs",
-        status: "border-2 border-neo-black px-3 py-1 text-[10px] shadow-[2px_2px_0px_black]",
+        status: "border-2 border-neo-black px-3 py-1 text-[10px] shadow-hard-sm",
       },
     },
     defaultVariants: {

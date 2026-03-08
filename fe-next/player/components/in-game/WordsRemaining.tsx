@@ -55,7 +55,7 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
           {remaining}
         </motion.div>
         <div className="text-[10px] font-bold uppercase text-neo-cream/90">
-          {minLength ? getLengthLabel() : (t('playerView.remaining') || 'Left')}
+          {minLength ? getLengthLabel() : (t('playerView.remaining'))}
         </div>
       </div>
     );
@@ -64,11 +64,11 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
   // Full version for desktop sidebar
   const headerTitle = minLength
     ? (t('playerView.longWordsOnBoard', { min: minLength }) || `${minLength}+ Letter Words`)
-    : (t('playerView.wordsOnBoard') || 'Words on Board');
+    : (t('playerView.wordsOnBoard'));
 
   const remainingLabel = minLength
     ? (t('playerView.longWordsRemaining', { min: minLength }) || `${minLength}+ letter words left`)
-    : (t('playerView.wordsRemaining') || 'words remaining');
+    : (t('playerView.wordsRemaining'));
 
   return (
     <div
@@ -111,8 +111,8 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
 
         {/* Stats */}
         <div className="flex justify-between mt-2 text-xs font-bold text-neo-cream/90">
-          <span>{foundWordsCount} {t('playerView.found') || 'found'}</span>
-          <span>{totalWords} {t('playerView.total') || 'total'}</span>
+          <span>{foundWordsCount} {t('playerView.found')}</span>
+          <span>{totalWords} {t('playerView.total')}</span>
         </div>
       </div>
     </div>

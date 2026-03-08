@@ -49,7 +49,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
               onClick={onShowTutorial}
               whileTap={{ scale: 0.95 }}
               className="w-8 h-8 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center"
-              aria-label={t('help.viewTutorial') || 'View Tutorial'}
+              aria-label={t('help.viewTutorial')}
             >
               <HelpCircle className="w-3.5 h-3.5 text-neo-cream" />
             </AdaptiveMotion.button>
@@ -94,7 +94,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
             onClick={onShowTutorial}
             whileTap={{ scale: 0.95 }}
             className="w-9 h-9 md:w-10 md:h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
-            aria-label={t('help.viewTutorial') || 'View Tutorial'}
+            aria-label={t('help.viewTutorial')}
           >
             <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-neo-cream" />
           </AdaptiveMotion.button>
@@ -131,7 +131,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
           onClick={onShowTutorial}
           whileTap={{ scale: 0.95 }}
           className="w-11 h-11 min-w-[44px] min-h-[44px] bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
-          aria-label={t('help.viewTutorial') || 'View Tutorial'}
+          aria-label={t('help.viewTutorial')}
         >
           <HelpCircle className="w-5 h-5 text-neo-cream" />
         </AdaptiveMotion.button>

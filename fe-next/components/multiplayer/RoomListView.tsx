@@ -87,6 +87,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         >
           <Link
             href="/"
+            aria-label={t('common.back')}
             className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-3 border-neo-black bg-neo-navy-light shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
           >
             <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
@@ -186,14 +187,35 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 <PageLoader size="sm" />
               </div>
             ) : hasRooms ? (
-              <div className="flex flex-col gap-2">
+              <div
+                className="flex flex-col gap-2"
+                role="listbox"
+                aria-label={t('multiplayerFlow.roomList.roomsListLabel')}
+              >
                 {activeRooms.map((room, index) => (
                   <m.button
                     key={room.gameCode}
+                    role="option"
+                    aria-selected={false}
+                    aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: room.roomName || room.gameCode })}
                     initial={{ x: -10, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.1 + index * 0.03 }}
                     onClick={() => onRoomClick(room)}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onRoomClick(room);
+                      } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const next = (e.currentTarget.nextElementSibling as HTMLElement);
+                        next?.focus();
+                      } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prev = (e.currentTarget.previousElementSibling as HTMLElement);
+                        prev?.focus();
+                      }
+                    }}
                     whileHover={{ scale: 1.02, x: -2 }}
                     whileTap={{ scale: 0.98 }}
                     className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-left group"

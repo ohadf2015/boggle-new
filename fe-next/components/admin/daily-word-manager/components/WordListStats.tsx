@@ -104,9 +104,9 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
           className="flex-1 sm:w-full bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm"
         >
           {copied ? (
-            <Check className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <Check className="me-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           ) : (
-            <Copy className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <Copy className="me-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           )}
           {copied ? 'Copied!' : 'Copy TS'}
         </Button>
@@ -116,7 +116,7 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
           size="sm"
           className="flex-1 sm:w-full text-xs sm:text-sm"
         >
-          <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          <Download className="me-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           JSON
         </Button>
         <Button
@@ -125,7 +125,7 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
           size="sm"
           className="flex-1 sm:w-full text-xs sm:text-sm text-orange-600 border-orange-300 hover:bg-orange-50 dark:text-orange-400 dark:border-orange-700 dark:hover:bg-orange-900/20"
         >
-          <RotateCcw className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          <RotateCcw className="me-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           Reset
         </Button>
       </div>

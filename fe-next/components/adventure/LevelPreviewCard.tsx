@@ -158,7 +158,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
             <span className="text-2xl font-black text-neo-white">
               {levelConfig.timerSeconds}
             </span>
-            <span className="text-sm text-neo-white/60 ml-2">
+            <span className="text-sm text-neo-white/60 ms-2">
               {t('adventure.preview.seconds')}
             </span>
           </div>

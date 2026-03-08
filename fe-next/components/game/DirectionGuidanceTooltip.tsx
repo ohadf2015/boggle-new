@@ -172,7 +172,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                   flex items-center justify-center
                   hover:scale-110 transition-transform
                 "
-                aria-label={t('common.close') || 'Close'}
+                aria-label={t('common.close')}
               >
                 <X className="w-3 h-3" />
               </button>
@@ -183,7 +183,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                   <Route className="w-4 h-4 text-white" />
                 </div>
                 <h4 className="font-black text-neo-black text-sm uppercase tracking-wide">
-                  {t('guidance.directionPattern.title') || 'Change Directions!'}
+                  {t('guidance.directionPattern.title')}
                 </h4>
               </div>
 
@@ -313,7 +313,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <span className="text-[11px] font-semibold text-neo-black/70 uppercase tracking-wide">
-                  {t('common.tapToDismiss') || 'Tap anywhere to dismiss'}
+                  {t('common.tapToDismiss')}
                 </span>
                 <motion.span
                   className="text-neo-pink"

@@ -81,7 +81,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'WORDSMITH',
         icon: '🎓',
-        name: t('achievements.WORDSMITH.name') || 'Wordsmith',
+        name: t('achievements.WORDSMITH.name'),
         current: validWordCount,
         target: 50,
         percentage: (validWordCount / 50) * 100,
@@ -92,7 +92,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'LEXICON',
         icon: '🏆',
-        name: t('achievements.LEXICON.name') || 'Lexicon',
+        name: t('achievements.LEXICON.name'),
         current: validWordCount,
         target: 65,
         percentage: (validWordCount / 65) * 100,
@@ -103,7 +103,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'VOCABULARY_TITAN',
         icon: '🗿',
-        name: t('achievements.VOCABULARY_TITAN.name') || 'Vocabulary Titan',
+        name: t('achievements.VOCABULARY_TITAN.name'),
         current: validWordCount,
         target: 60,
         percentage: (validWordCount / 60) * 100,
@@ -116,7 +116,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'COMBO_KING',
         icon: '🔥',
-        name: t('achievements.COMBO_KING.name') || 'Combo King',
+        name: t('achievements.COMBO_KING.name'),
         current: currentCombo,
         target: 25,
         percentage: (currentCombo / 25) * 100,
@@ -127,7 +127,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'COMBO_GOD',
         icon: '👑',
-        name: t('achievements.COMBO_GOD.name') || 'Combo God',
+        name: t('achievements.COMBO_GOD.name'),
         current: currentCombo,
         target: 25,
         percentage: (currentCombo / 25) * 100,
@@ -143,7 +143,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'SPEED_DEMON',
         icon: '⚡',
-        name: t('achievements.SPEED_DEMON.name') || 'Speed Demon',
+        name: t('achievements.SPEED_DEMON.name'),
         current: validWordCount,
         target: speedDemonThreshold,
         percentage: (validWordCount / speedDemonThreshold) * 100,
@@ -156,7 +156,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'WORD_MASTER',
         icon: '📚',
-        name: t('achievements.WORD_MASTER.name') || 'Word Master',
+        name: t('achievements.WORD_MASTER.name'),
         current: Math.max(...wordLengths, 0),
         target: 7,
         percentage: (Math.max(...wordLengths, 0) / 7) * 100,
@@ -169,7 +169,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'TREASURE_HUNTER',
         icon: '💎',
-        name: t('achievements.TREASURE_HUNTER.name') || 'Treasure Hunter',
+        name: t('achievements.TREASURE_HUNTER.name'),
         current: Math.max(...wordLengths, 0),
         target: 8,
         percentage: (Math.max(...wordLengths, 0) / 8) * 100,

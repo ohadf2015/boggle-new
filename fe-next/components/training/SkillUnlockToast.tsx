@@ -147,7 +147,7 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
             {/* Text */}
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide text-neo-lime font-bold">
-                {t('training.unlock.title') || 'Skill Unlocked!'}
+                {t('training.unlock.title')}
               </span>
               <span className={cn(
                 "font-bold text-sm",

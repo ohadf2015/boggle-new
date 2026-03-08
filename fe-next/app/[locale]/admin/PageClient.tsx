@@ -44,14 +44,14 @@ export default function AdminPageClient() {
         <div className="text-center">
           <Shield className="w-16 h-16 text-neo-lime mx-auto mb-4" />
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">
-            {t('admin.accessRequired') || 'Admin Access Required'}
+            {t('admin.accessRequired')}
           </h1>
           <p className="text-slate-400 mb-6">
-            {t('admin.accessDenied') || 'You need administrator privileges to access this page.'}
+            {t('admin.accessDenied')}
           </p>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('common.backToHome') || 'Back to Home'}
+            <ArrowLeft className="w-4 h-4 me-2" />
+            {t('common.backToHome')}
           </Button>
         </div>
       </div>
@@ -63,10 +63,10 @@ export default function AdminPageClient() {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
-          <PageLoader size="lg" text={t('common.loading') || 'Loading...'} />
+          <PageLoader size="lg" text={t('common.loading')} />
           {tokenLoading && !authLoading && (
             <p className="text-slate-400 mt-4 text-sm">
-              {t('admin.loadingSession') || 'Establishing secure session...'}
+              {t('admin.loadingSession')}
             </p>
           )}
         </div>
@@ -81,14 +81,14 @@ export default function AdminPageClient() {
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">
-            {t('admin.sessionError') || 'Session Error'}
+            {t('admin.sessionError')}
           </h1>
           <p className="text-slate-400 mb-6 max-w-md">
             {tokenError}
           </p>
           <Button onClick={() => window.location.reload()} variant="outline">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            {t('common.retry') || 'Retry'}
+            <RefreshCw className="w-4 h-4 me-2" />
+            {t('common.retry')}
           </Button>
         </div>
       </div>
@@ -109,22 +109,22 @@ export default function AdminPageClient() {
               size="sm"
               className="text-slate-400 hover:text-neo-white"
             >
-              <ArrowLeft className={cn('w-4 h-4', isRTL ? 'ml-2 rotate-180' : 'mr-2')} />
-              {t('common.back') || 'Back'}
+              <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
+              {t('common.back')}
             </Button>
             <div>
               <h1 className="text-2xl font-neo-display text-neo-white">
-                {t('admin.dashboard') || 'Admin Dashboard'}
+                {t('admin.dashboard')}
               </h1>
               <p className="text-sm text-slate-400">
-                {authToken ? (t('admin.live.subtitle') || 'Real-time game monitoring') : 'Loading...'}
+                {authToken ? (t('admin.live.subtitle')) : 'Loading...'}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-400">
-              <span className="hidden xs:inline">{t('admin.welcome') || 'Welcome,'} </span>
+              <span className="hidden xs:inline">{t('admin.welcome')} </span>
               {profile?.display_name || profile?.username}
             </span>
           </div>
@@ -159,7 +159,7 @@ export default function AdminPageClient() {
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.invalidWords') || 'Invalid Words'}</span>
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.invalidWords')}</span>
             </CardContent>
           </Card>
 
@@ -169,7 +169,7 @@ export default function AdminPageClient() {
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <BookCheck className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.milogWords') || 'Milog Words'}</span>
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.milogWords')}</span>
             </CardContent>
           </Card>
 
@@ -261,9 +261,9 @@ export default function AdminPageClient() {
           </>
         ) : (
           <div className="bg-slate-800/50 rounded-neo border-neo border-black p-12 text-center">
-            <Loader size="md" text={t('admin.loadingDashboard') || 'Loading dashboard...'} />
+            <Loader size="md" text={t('admin.loadingDashboard')} />
             <p className="text-slate-400 mt-4 text-sm">
-              {t('admin.preparingTools') || 'Preparing admin tools...'}
+              {t('admin.preparingTools')}
             </p>
           </div>
         )}

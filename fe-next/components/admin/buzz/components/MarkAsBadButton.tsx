@@ -166,7 +166,7 @@ export function MarkAsBadButton({
                     <p className="text-xs text-slate-500 mt-1">
                       {feedback.length}/10 characters minimum
                       {feedback.length >= 10 && (
-                        <Check className="inline w-3 h-3 ml-1 text-green-400" />
+                        <Check className="inline w-3 h-3 ms-1 text-green-400" />
                       )}
                     </p>
                   </div>

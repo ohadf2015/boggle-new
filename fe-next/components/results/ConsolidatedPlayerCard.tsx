@@ -152,7 +152,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           <div className="flex items-center gap-2 mb-2 sm:mb-3">
             <Sparkles className="w-5 h-5 text-neo-cyan" />
             <h2 className="text-sm font-black uppercase tracking-wide text-white">
-              {t('results.yourPerformance') || 'Your Performance'}
+              {t('results.yourPerformance')}
             </h2>
           </div>
 
@@ -210,7 +210,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               >
                 <div className="text-2xl sm:text-3xl font-black text-white">{player.score}</div>
                 <div className="text-[9px] sm:text-[10px] font-bold uppercase text-slate-300">
-                  {t('results.points') || 'Points'}
+                  {t('results.points')}
                 </div>
               </motion.div>
             )}
@@ -241,7 +241,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 </div>
               </div>
               <div className="text-lg sm:text-xl font-black text-white">{validWords.length}</div>
-              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">{t('results.words') || 'Words'}</div>
+              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">{t('results.words')}</div>
             </div>
 
             {/* Accuracy */}
@@ -252,7 +252,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 </div>
               </div>
               <div className="text-lg sm:text-xl font-black text-white">{summaryStats?.accuracy || 0}%</div>
-              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">{t('results.accuracy') || 'Accuracy'}</div>
+              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">{t('results.accuracy')}</div>
             </div>
 
             {/* Best Word - Hidden on mobile (available in details), shown on sm+ */}
@@ -266,7 +266,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 {bestWord ? applyHebrewFinalLetters(bestWord.word) : '-'}
               </div>
               <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">
-                {bestWord?.score ? `${bestWord.score} ${t('results.points') || 'pts'}` : (t('results.bestWord') || 'Best')}
+                {bestWord?.score ? `${bestWord.score} ${t('results.points')}` : (t('results.bestWord'))}
               </div>
             </div>
           </div>
@@ -289,10 +289,10 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               className="mb-2 sm:mb-3 p-2 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30"
             >
               <div className="text-[10px] sm:text-xs text-neo-cyan font-bold flex items-center gap-1.5 mb-1">
-                💡 {t('results.scoringTip') || 'Scoring Tip'}
+                💡 {t('results.scoringTip')}
               </div>
               <p className="text-[9px] sm:text-[10px] text-neo-cream/70 leading-relaxed">
-                {t('results.scoringTipText') || 'Find words quickly in a row for combo bonuses (⚡). Longer words score way more points!'}
+                {t('results.scoringTipText')}
               </p>
             </motion.div>
           )}
@@ -305,8 +305,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           >
             <span className="flex items-center gap-1.5 sm:gap-2">
               <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t('results.viewDetails') || 'View Performance Details'}</span>
-              <span className="sm:hidden">{t('results.details') || 'Details'}</span>
+              <span className="hidden sm:inline">{t('results.viewDetails')}</span>
+              <span className="sm:hidden">{t('results.details')}</span>
             </span>
             <motion.div animate={{ rotate: showDetails ? 180 : 0 }} transition={{ duration: 0.2 }}>
               <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -336,8 +336,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           >
             <span className="flex items-center gap-1.5 sm:gap-2">
               <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t('results.viewAllWords') || 'View All Words'}</span>
-              <span className="sm:hidden">{t('results.words') || 'Words'}</span>
+              <span className="hidden sm:inline">{t('results.viewAllWords')}</span>
+              <span className="sm:hidden">{t('results.words')}</span>
               <span className="text-slate-300">({player.allWords?.length || 0})</span>
             </span>
             <motion.div animate={{ rotate: showWords ? 180 : 0 }} transition={{ duration: 0.2 }}>
@@ -387,8 +387,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               >
                 <span className="flex items-center gap-1.5 sm:gap-2">
                   <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">{t('results.viewXpBreakdown') || 'View XP Breakdown'}</span>
-                  <span className="sm:hidden">{t('results.xp') || 'XP'}</span>
+                  <span className="hidden sm:inline">{t('results.viewXpBreakdown')}</span>
+                  <span className="sm:hidden">{t('results.xp')}</span>
                 </span>
                 <motion.div animate={{ rotate: showXp ? 180 : 0 }} transition={{ duration: 0.2 }}>
                   <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -424,8 +424,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               >
                 <span className="flex items-center gap-1.5 sm:gap-2">
                   <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">{t('hostView.achievements') || 'Achievements'}</span>
-                  <span className="sm:hidden">{t('results.badges') || 'Badges'}</span>
+                  <span className="hidden sm:inline">{t('hostView.achievements')}</span>
+                  <span className="sm:hidden">{t('results.badges')}</span>
                   <span className="text-slate-300">({gameAchievements.length})</span>
                 </span>
                 <motion.div animate={{ rotate: showAchievements ? 180 : 0 }} transition={{ duration: 0.2 }}>

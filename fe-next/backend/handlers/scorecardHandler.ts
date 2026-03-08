@@ -22,7 +22,7 @@ import { safeEmit } from '../utils/socketHelpers.js';
 import { emitError, ErrorMessages } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { inc } from '../utils/metrics.js';
-import { isSocketMigrating } from './';
+import { isSocketMigrating } from './shared';
 import { validatePayload, generateScoreCardSchema } from '../utils/socketValidation.js';
 import { ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
 import logger from '../utils/logger.js';

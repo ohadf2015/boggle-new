@@ -105,7 +105,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
       if (result.error) {
         setError(result.error.message);
       } else {
-        setSuccess(t('auth.magicLink.checkEmail') || 'Check your email for a sign-in link!');
+        setSuccess(t('auth.magicLink.checkEmail'));
       }
       setIsLoading(null);
     } catch (err) {
@@ -197,7 +197,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                   className="w-full mb-4 text-sm text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2"
                 >
                   <Mail className="w-4 h-4" />
-                  <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
+                  <span>{t('auth.inlineSignup.orContinueWith')}</span>
                 </button>
               ) : (
                 <motion.form
@@ -208,7 +208,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                 >
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <div className="flex-1 h-px bg-gray-600" />
-                    <span>{t('auth.magicLink.divider') || 'or continue with email'}</span>
+                    <span>{t('auth.magicLink.divider')}</span>
                     <div className="flex-1 h-px bg-gray-600" />
                   </div>
 
@@ -218,7 +218,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                       autoComplete="email"
                       value={email}
                       onChange={(e) => handleEmailChange(e.target.value)}
-                      placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                      placeholder={t('auth.inlineSignup.emailPlaceholder')}
                       className={cn(
                         "w-full px-4 py-3 rounded-xl border-2 bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
                         emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
@@ -241,7 +241,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                     ) : (
                       <>
                         <Wand2 className="w-4 h-4" />
-                        <span>{t('auth.magicLink.sendLink') || 'Send me a sign-in link'}</span>
+                        <span>{t('auth.magicLink.sendLink')}</span>
                       </>
                     )}
                   </Button>

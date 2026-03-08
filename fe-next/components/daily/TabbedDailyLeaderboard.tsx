@@ -357,11 +357,11 @@ const LeaderboardTabs = memo<{
       className="bg-slate-100 dark:bg-slate-800 p-1 rounded-neo border-2 border-neo-black"
     >
       <ToggleGroupItem value="today" size="sm" className="text-xs px-3">
-        <Calendar className="w-3.5 h-3.5 mr-1.5" />
+        <Calendar className="w-3.5 h-3.5 me-1.5" />
         {t('wordHunt.leaderboard.today')}
       </ToggleGroupItem>
       <ToggleGroupItem value="alltime" size="sm" className="text-xs px-3">
-        <Crown className="w-3.5 h-3.5 mr-1.5" />
+        <Crown className="w-3.5 h-3.5 me-1.5" />
         {t('wordHunt.leaderboard.allTime')}
       </ToggleGroupItem>
     </ToggleGroup>
@@ -693,7 +693,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                     <>
                       <span className="mx-1.5">•</span>
                       <span className="text-slate-500 dark:text-slate-400">
-                        {todayGuestCount} {todayGuestCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'}
+                        {todayGuestCount} {todayGuestCount === 1 ? t('daily.guestSingular') : t('daily.guestsPlural')}
                       </span>
                     </>
                   )}

@@ -78,7 +78,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
       >
         <Users className="w-12 h-12 text-neo-black/30 mb-3" />
         <p className="text-neo-black/60 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.noPlayersYet')}</p>
-        <p className="text-neo-black/40 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers') || 'Waiting for players to join...'}</p>
+        <p className="text-neo-black/40 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers')}</p>
       </div>
     );
   }

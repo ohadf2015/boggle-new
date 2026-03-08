@@ -158,7 +158,7 @@ describe('GlobalBottomNav Clickability on Landing Page', () => {
     it('should have aria-label on nav element', () => {
       // Then: Nav should have aria-label
       expect(globalBottomNavSource).toContain('aria-label');
-      expect(globalBottomNavSource).toContain('Bottom navigation');
+      expect(globalBottomNavSource).toContain("t('nav.bottomNavigation')");
     });
 
     it('should indicate current page with aria-current', () => {

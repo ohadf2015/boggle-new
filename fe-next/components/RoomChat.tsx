@@ -242,7 +242,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
       <div className={`py-3 px-4 flex-shrink-0 ${variant === 'standalone' ? 'border-b-3 border-neo-black' : 'border-b-2 border-neo-white/10'}`}>
         <h3 className={`text-base font-black uppercase flex items-center gap-2 ${variant === 'standalone' ? 'text-neo-black' : 'text-neo-cream'}`}>
           <MessageSquare className="text-neo-pink" />
-          {t('chat.title') || 'Room Chat'}
+          {t('chat.title')}
           {unreadCount > 0 && (
             <AdaptiveMotion.div
               initial={{ scale: 0 }}
@@ -289,10 +289,10 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 className="text-center"
               >
                 <div className="bg-neo-black text-neo-white px-3 py-1 font-black uppercase text-xs tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
-                  {t('chat.noMessages') || 'No messages yet'}
+                  {t('chat.noMessages')}
                 </div>
                 <p className={`font-bold text-[10px] mt-2 uppercase tracking-wide ${variant === 'embedded' ? 'text-neo-cream/40' : 'text-neo-black/75'}`}>
-                  {t('chat.startChatting') || 'Start chatting!'}
+                  {t('chat.startChatting')}
                 </p>
               </AdaptiveMotion.div>
             </div>
@@ -369,7 +369,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
-            placeholder={t('chat.placeholder') || 'Type a message...'}
+            placeholder={t('chat.placeholder')}
             maxLength={200}
             className="flex-1 min-w-0 text-sm"
             dir="auto"
@@ -380,7 +380,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             size="icon"
             variant="cyan"
             className="flex-shrink-0"
-            aria-label={t('chat.send') || 'Send message'}
+            aria-label={t('chat.send')}
           >
             <Send aria-hidden="true" />
           </Button>
@@ -392,7 +392,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         role="log"
         aria-live="polite"
         aria-atomic="false"
-        aria-label={t('chat.newMessages') || 'New chat messages'}
+        aria-label={t('chat.newMessages')}
         className="sr-only"
       >
         {latestAnnouncement}

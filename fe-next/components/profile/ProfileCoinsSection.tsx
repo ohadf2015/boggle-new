@@ -40,7 +40,7 @@ export function ProfileCoinsSection({
           isDarkMode ? 'text-white' : 'text-gray-900'
         )}>
           <span className={compact ? 'text-xl' : 'text-2xl'}>💰</span>
-          {t('coins.title') || 'Coins & Rewards'}
+          {t('coins.title')}
         </h2>
         <CoinBalance coins={profile?.total_coins || 0} size={compact ? 'sm' : 'md'} />
       </div>
@@ -50,7 +50,7 @@ export function ProfileCoinsSection({
           'text-sm mb-4',
           isDarkMode ? 'text-gray-400' : 'text-gray-600'
         )}>
-          {t('coins.description') || 'Earn coins by playing games, winning matches, and unlocking achievements. Use them to collect special items!'}
+          {t('coins.description')}
         </p>
       )}
 
@@ -63,14 +63,14 @@ export function ProfileCoinsSection({
         <div className="text-center">
           <span className="text-lg">🎮</span>
           <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-            {t('coins.perGame') || 'Per Game'}
+            {t('coins.perGame')}
           </p>
           <p className="font-bold text-neo-lime text-sm">+10-15</p>
         </div>
         <div className="text-center">
           <span className="text-lg">🏆</span>
           <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-            {t('coins.winBonus') || 'Win Bonus'}
+            {t('coins.winBonus')}
           </p>
           <p className="font-bold text-neo-lime text-sm">+25</p>
         </div>
@@ -79,14 +79,14 @@ export function ProfileCoinsSection({
             <div className="text-center">
               <span className="text-lg">📊</span>
               <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                {t('coins.scoreBonus') || 'Score Bonus'}
+                {t('coins.scoreBonus')}
               </p>
               <p className="font-bold text-neo-lime text-sm">+score/10</p>
             </div>
             <div className="text-center">
               <span className="text-lg">🎯</span>
               <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                {t('coins.dailyChallenge') || 'Daily'}
+                {t('coins.dailyChallenge')}
               </p>
               <p className="font-bold text-neo-lime text-sm">+25-95</p>
             </div>
@@ -100,7 +100,7 @@ export function ProfileCoinsSection({
         isDarkMode ? 'border-slate-700' : 'border-gray-200'
       )}>
         <p className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
-          {t('coins.lifetimeEarned') || 'Lifetime coins earned'}:
+          {t('coins.lifetimeEarned')}:
         </p>
         <span className="font-bold text-neo-lime">
           {(profile?.lifetime_coins_earned || 0).toLocaleString()} 💰

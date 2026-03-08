@@ -500,7 +500,7 @@ export default function MemoryHunt({
                       'text-center text-lg font-medium mb-4',
                       isDarkMode ? 'text-neo-white/80' : 'text-neo-black/80'
                     )}>
-                      {t('brain.drills.memory-hunt.studyTheseWords') || 'Study these words:'}
+                      {t('brain.drills.memory-hunt.studyTheseWords')}
                     </p>
 
                     {/* Words to memorize - LARGE display with mark invalid button */}
@@ -529,7 +529,7 @@ export default function MemoryHunt({
                               'bg-neo-red/20 hover:bg-neo-red/40 text-neo-black',
                               'transition-colors'
                             )}
-                            title={t('brain.drills.memory-hunt.markInvalid') || 'Mark Invalid'}
+                            title={t('brain.drills.memory-hunt.markInvalid')}
                           >
                             <X className="w-4 h-4" />
                             <RefreshCw className="w-3 h-3" />
@@ -549,7 +549,7 @@ export default function MemoryHunt({
                         'bg-neo-green text-neo-black'
                       )}
                     >
-                      {t('brain.drills.memory-hunt.readyToStart') || "I'm Ready!"}
+                      {t('brain.drills.memory-hunt.readyToStart')}
                     </motion.button>
                   </motion.div>
                 </motion.div>
@@ -690,7 +690,7 @@ export default function MemoryHunt({
                   )}
                 >
                   <Lightbulb className="w-4 h-4" />
-                  {t('brain.drills.useHint') || 'Hint'} ({hintsRemaining})
+                  {t('brain.drills.useHint')} ({hintsRemaining})
                 </motion.button>
               )}
 
@@ -705,7 +705,7 @@ export default function MemoryHunt({
                   isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
                 )}
               >
-                {t('brain.drills.finishGame') || 'Finish Game'}
+                {t('brain.drills.finishGame')}
               </motion.button>
             </div>
           </div>

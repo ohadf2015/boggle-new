@@ -102,13 +102,13 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
           duration: 3000,
         });
       } else {
-        toast.error(t('calendar.claimError') || 'Failed to claim reward');
+        toast.error(t('calendar.claimError'));
       }
     } catch (error) {
       // Serialize error properly - Error objects don't stringify well
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('[Calendar] Error claiming reward:', errorMessage);
-      toast.error(t('calendar.claimError') || 'Failed to claim reward');
+      toast.error(t('calendar.claimError'));
     } finally {
       setIsClaiming(false);
     }
@@ -146,10 +146,10 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
         <DialogHeader>
           <DialogTitle className="flex items-center justify-center gap-2">
             <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
-            {t('calendar.title') || 'Daily Rewards'}
+            {t('calendar.title')}
           </DialogTitle>
           <DialogDescription className="sr-only">
-            {t('calendar.description') || 'Claim daily rewards by playing regularly'}
+            {t('calendar.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -161,7 +161,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
               {monthName} {calendarStatus?.year}
             </h3>
             <p className="text-xs sm:text-sm text-neo-black/70">
-              {t('calendar.claimedCount') || 'Claimed'}: {calendarStatus?.daysClaimed.length || 0}/{daysInMonth}
+              {t('calendar.claimedCount')}: {calendarStatus?.daysClaimed.length || 0}/{daysInMonth}
             </p>
           </div>
 
@@ -177,16 +177,16 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
             <div className="text-center py-8">
               <Gift className="w-12 h-12 mx-auto mb-3 text-neo-pink/50" />
               <h3 className="text-lg font-bold text-neo-black mb-2">
-                {t('calendar.loginRequired') || 'Login Required'}
+                {t('calendar.loginRequired')}
               </h3>
               <p className="text-sm text-neo-black/70 mb-4">
-                {t('calendar.loginToClaimRewards') || 'Sign in to claim your daily rewards and track your progress!'}
+                {t('calendar.loginToClaimRewards')}
               </p>
               <Button
                 onClick={onClose}
                 className="bg-neo-cyan text-neo-black font-bold uppercase text-sm py-2 px-4 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
               >
-                {t('common.close') || 'Close'}
+                {t('common.close')}
               </Button>
             </div>
           )}
@@ -196,7 +196,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
             <div className="text-center py-8">
               <Gift className="w-12 h-12 mx-auto mb-3 text-neo-pink/50" />
               <h3 className="text-lg font-bold text-neo-black mb-2">
-                {t('calendar.loadError') || 'Oops!'}
+                {t('calendar.loadError')}
               </h3>
               <p className="text-sm text-neo-black/70 mb-4">
                 {fetchError}
@@ -205,7 +205,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                 onClick={() => fetchCalendarStatus()}
                 className="bg-neo-cyan text-neo-black font-bold uppercase text-sm py-2 px-4 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
               >
-                {t('common.retry') || 'Try Again'}
+                {t('common.retry')}
               </Button>
             </div>
           )}
@@ -243,8 +243,8 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                       <Loader size="sm" />
                     ) : (
                       <>
-                        <Gift className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                        {t('calendar.claimToday') || "Claim Today's Reward"}
+                        <Gift className="w-4 h-4 sm:w-5 sm:h-5 me-2" />
+                        {t('calendar.claimToday')}
                       </>
                     )}
                   </Button>
@@ -256,10 +256,10 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                 <div className="mt-3 sm:mt-4 text-center py-2 sm:py-3 bg-neo-lime/10 rounded-neo border-2 border-neo-lime/30">
                   <p className="text-neo-lime font-bold uppercase text-xs sm:text-sm flex items-center justify-center gap-2">
                     <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                    {t('calendar.alreadyClaimed') || "Today's reward claimed!"}
+                    {t('calendar.alreadyClaimed')}
                   </p>
                   <p className="text-neo-black/60 text-[10px] sm:text-xs mt-1">
-                    {t('calendar.comeBackTomorrow') || 'Come back tomorrow for more rewards'}
+                    {t('calendar.comeBackTomorrow')}
                   </p>
                 </div>
               )}
@@ -267,7 +267,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
               {/* Legend - collapsible on mobile */}
               <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-neo-black/20">
                 <h4 className="text-[10px] sm:text-xs font-bold uppercase text-neo-black/70 mb-2">
-                  {t('calendar.rewardTypes') || 'Reward Types'}
+                  {t('calendar.rewardTypes')}
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">

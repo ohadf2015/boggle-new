@@ -54,7 +54,7 @@ export const MoreOptionsAccordion: React.FC<MoreOptionsAccordionProps> = ({
         className="w-full flex items-center justify-between px-4 py-3 bg-slate-800/50 hover:bg-slate-800/70 transition-colors"
       >
         <span className="text-sm font-bold text-slate-300">
-          {t('common.advancedSettings') || 'More Options'}
+          {t('common.advancedSettings')}
         </span>
         <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
           <ChevronDown className="w-4 h-4 text-slate-400" />
@@ -83,10 +83,10 @@ export const MoreOptionsAccordion: React.FC<MoreOptionsAccordionProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-bold text-white group-hover:text-neo-lime transition-colors">
-                      {t('customPuzzle.createYourOwn') || 'Create Your Own Puzzle'}
+                      {t('customPuzzle.createYourOwn')}
                     </div>
                     <div className="text-xs text-slate-400">
-                      {t('customPuzzle.createDescription') || 'Challenge friends with your word'}
+                      {t('customPuzzle.createDescription')}
                     </div>
                   </div>
                 </button>
@@ -96,7 +96,7 @@ export const MoreOptionsAccordion: React.FC<MoreOptionsAccordionProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                   <Globe className="w-3.5 h-3.5" />
-                  <span>{t('wordHunt.results.tryAnotherLanguage') || 'Try Another Language'}</span>
+                  <span>{t('wordHunt.results.tryAnotherLanguage')}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {otherLanguages.map(lang => (
@@ -116,7 +116,7 @@ export const MoreOptionsAccordion: React.FC<MoreOptionsAccordionProps> = ({
               <div className="pt-2 border-t border-slate-700/50">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <Gamepad2 className="w-3.5 h-3.5" />
-                  <span>{t('daily.keepPlaying') || 'Come back tomorrow for a new puzzle!'}</span>
+                  <span>{t('daily.keepPlaying')}</span>
                 </div>
               </div>
             </div>

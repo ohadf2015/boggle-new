@@ -201,7 +201,7 @@ export default function BrainTrainingPageClient() {
               'text-xl font-bold mb-2',
               isDarkMode ? 'text-neo-white' : 'text-neo-black'
             )}>
-              {t('brain.errors.loadFailed') || 'Failed to load brain score'}
+              {t('brain.errors.loadFailed')}
             </h2>
             <p className={cn(
               'text-sm mb-6',
@@ -218,7 +218,7 @@ export default function BrainTrainingPageClient() {
                 'bg-neo-cyan text-neo-black'
               )}
             >
-              {t('brain.errors.retry') || 'Retry'}
+              {t('brain.errors.retry')}
             </button>
           </motion.div>
         </div>
@@ -254,13 +254,13 @@ export default function BrainTrainingPageClient() {
               'text-xl font-bold mb-2',
               isDarkMode ? 'text-neo-white' : 'text-neo-black'
             )}>
-              {t('brain.guestView.title') || 'Track Your Cognitive Growth'}
+              {t('brain.guestView.title')}
             </h2>
             <p className={cn(
               'text-sm mb-6',
               isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
             )}>
-              {t('brain.guestView.description') || 'Sign in to track your brain training progress and unlock personalized cognitive insights'}
+              {t('brain.guestView.description')}
             </p>
             <button
               onClick={() => setShowAuthModal(true)}
@@ -271,7 +271,7 @@ export default function BrainTrainingPageClient() {
                 'bg-neo-cyan text-neo-black'
               )}
             >
-              {t('common.signIn') || 'Sign In'}
+              {t('common.signIn')}
             </button>
           </motion.div>
 
@@ -314,13 +314,13 @@ export default function BrainTrainingPageClient() {
               'text-xl font-bold mb-2',
               isDarkMode ? 'text-neo-white' : 'text-neo-black'
             )}>
-              {t('brain.empty.title') || 'Start Your Brain Training Journey'}
+              {t('brain.empty.title')}
             </h2>
             <p className={cn(
               'text-sm mb-6',
               isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
             )}>
-              {t('brain.empty.description') || 'Play your first game to unlock your Brain Score and start tracking your cognitive growth!'}
+              {t('brain.empty.description')}
             </p>
             <button
               onClick={() => router.push(`/${language}`)}
@@ -331,7 +331,7 @@ export default function BrainTrainingPageClient() {
                 'bg-neo-cyan text-neo-black'
               )}
             >
-              {t('brain.empty.playNow') || 'Play Now'}
+              {t('brain.empty.playNow')}
             </button>
           </motion.div>
 
@@ -472,13 +472,13 @@ export default function BrainTrainingPageClient() {
               'text-xl font-bold mb-2',
               isDarkMode ? 'text-neo-white' : 'text-neo-black'
             )}>
-              {t('brain.empty.title') || 'Start Your Journey'}
+              {t('brain.empty.title')}
             </h2>
             <p className={cn(
               'text-sm',
               isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
             )}>
-              {t('brain.empty.description') || 'Play more games to see your cognitive growth!'}
+              {t('brain.empty.description')}
             </p>
           </motion.div>
         )}

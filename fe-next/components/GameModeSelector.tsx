@@ -29,10 +29,10 @@ const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
 
 function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']): string {
   const labels: Record<GameModeOption, string> = {
-    random: t('gameModes.random') || 'Random',
-    classic: t('gameModes.classic.name') || 'Classic',
-    blast: t('gameModes.blast.name') || 'Blast',
-    'word-hunt': t('gameModes.wordHunt.name') || 'Word Hunt',
+    random: t('gameModes.random'),
+    classic: t('gameModes.classic.name'),
+    blast: t('gameModes.blast.name'),
+    'word-hunt': t('gameModes.wordHunt.name'),
   };
   return labels[mode];
 }

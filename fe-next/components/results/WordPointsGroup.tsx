@@ -52,9 +52,9 @@ const PointsBadge = memo<{
         color: getTextColor(points)
       }}
     >
-      {points} {t('results.points') || 'pts'}
+      {points} {t('results.points')}
     </span>
-    <span>{wordCount} {t('hostView.words') || 'words'}</span>
+    <span>{wordCount} {t('hostView.words')}</span>
   </div>
 ));
 
@@ -198,7 +198,7 @@ export const WordPointsGroup = memo<WordPointsGroupProps>(({
       {/* Header */}
       <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-2 flex items-center gap-2 uppercase">
         <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">✓</span>
-        {t('results.validWords') || 'Valid Words'} ({totalWordCount})
+        {t('results.validWords')} ({totalWordCount})
       </div>
 
       {/* Point groups */}
@@ -249,11 +249,11 @@ export const SharedWordsSection = memo<SharedWordsSectionProps>(({
     )}>
       <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-1.5 flex items-center gap-1.5 uppercase">
         <span className="bg-neo-red text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">👥</span>
-        {t('results.shared') || 'Shared Words'} ({duplicateWords.length})
+        {t('results.shared')} ({duplicateWords.length})
       </div>
       {/* Explanation for new players */}
       <p className="text-[10px] text-neo-black/60 dark:text-slate-400 mb-2 leading-tight">
-        {t('results.sharedWordsExplanation') || 'These words were found by other players too, so they score 0 points. Try to find unique words!'}
+        {t('results.sharedWordsExplanation')}
       </p>
       <div className="flex flex-wrap gap-1">
         {duplicateWords.map((wordObj, i) => (
@@ -298,7 +298,7 @@ export const InvalidWordsSection = memo<InvalidWordsSectionProps>(({
     )}>
       <div className="text-sm font-black text-neo-black/70 dark:text-white mb-1.5 flex items-center gap-1.5 uppercase">
         <span className="bg-neo-gray text-neo-cream px-2 py-0.5 rounded-neo border-2 border-neo-black">✗</span>
-        {t('results.invalid') || 'Invalid Words'} ({invalidWords.length})
+        {t('results.invalid')} ({invalidWords.length})
       </div>
       <div className="flex flex-wrap gap-1">
         {invalidWords.map((wordObj, i) => (

@@ -24,8 +24,8 @@ function getEncouragingMessage(isCurrentPlayer: boolean, t: (key: string) => str
     // For other players, show a neutral message
     return {
       emoji: '🎯',
-      headline: t('noWords.otherPlayer.headline') || 'Tough Round',
-      message: t('noWords.otherPlayer.message') || 'The letters weren\'t kind this time.',
+      headline: t('noWords.otherPlayer.headline'),
+      message: t('noWords.otherPlayer.message'),
       tip: '',
     };
   }
@@ -34,33 +34,33 @@ function getEncouragingMessage(isCurrentPlayer: boolean, t: (key: string) => str
   const messages = [
     {
       emoji: '🌟',
-      headline: t('noWords.encourage.rookie.headline') || 'First Time Jitters?',
-      message: t('noWords.encourage.rookie.message') || 'Even the best word hunters start somewhere. The board was tricky!',
-      tip: t('noWords.encourage.rookie.tip') || 'Tip: Start with 3-letter words and build from there.',
+      headline: t('noWords.encourage.rookie.headline'),
+      message: t('noWords.encourage.rookie.message'),
+      tip: t('noWords.encourage.rookie.tip'),
     },
     {
       emoji: '🎲',
-      headline: t('noWords.encourage.unlucky.headline') || 'Tough Letters!',
-      message: t('noWords.encourage.unlucky.message') || 'Sometimes the dice just don\'t roll your way. It happens to everyone!',
-      tip: t('noWords.encourage.unlucky.tip') || 'Tip: Look for common patterns like -ING, -ED, -ER.',
+      headline: t('noWords.encourage.unlucky.headline'),
+      message: t('noWords.encourage.unlucky.message'),
+      tip: t('noWords.encourage.unlucky.tip'),
     },
     {
       emoji: '🧠',
-      headline: t('noWords.encourage.thinking.headline') || 'Strategic Silence',
-      message: t('noWords.encourage.thinking.message') || 'Quality over quantity mindset... maybe too much quality this time!',
-      tip: t('noWords.encourage.thinking.tip') || 'Tip: Submit words as you find them - no penalty for trying!',
+      headline: t('noWords.encourage.thinking.headline'),
+      message: t('noWords.encourage.thinking.message'),
+      tip: t('noWords.encourage.thinking.tip'),
     },
     {
       emoji: '🚀',
-      headline: t('noWords.encourage.warmup.headline') || 'Warm-up Round',
-      message: t('noWords.encourage.warmup.message') || 'Consider this a practice run. Your brain is just getting started!',
-      tip: t('noWords.encourage.warmup.tip') || 'Tip: Scan the board quickly, then focus on high-value corners.',
+      headline: t('noWords.encourage.warmup.headline'),
+      message: t('noWords.encourage.warmup.message'),
+      tip: t('noWords.encourage.warmup.tip'),
     },
     {
       emoji: '💪',
-      headline: t('noWords.encourage.comeback.headline') || 'Comeback Loading...',
-      message: t('noWords.encourage.comeback.message') || 'The greatest players have off rounds. Next game is YOUR game!',
-      tip: t('noWords.encourage.comeback.tip') || 'Tip: Try saying letters out loud to trigger word associations.',
+      headline: t('noWords.encourage.comeback.headline'),
+      message: t('noWords.encourage.comeback.message'),
+      tip: t('noWords.encourage.comeback.tip'),
     },
   ];
 
@@ -103,7 +103,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
           <Target className="w-4 h-4" />
           <span className="text-sm font-bold">
-            {t('noWords.noWordsThisRound') || 'No words this round'}
+            {t('noWords.noWordsThisRound')}
           </span>
         </div>
       </motion.div>
@@ -168,7 +168,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
               <div className="flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-neo-black/75" />
                 <span className="text-xs font-bold text-neo-black/75 uppercase">
-                  {t('noWords.keepGoing') || 'Keep going!'}
+                  {t('noWords.keepGoing')}
                 </span>
               </div>
             </div>
@@ -212,7 +212,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
           >
             <RefreshCw className="w-4 h-4" />
             <span className="text-xs font-black uppercase tracking-wide">
-              {t('noWords.nextRoundIsYours') || 'Next round is yours!'}
+              {t('noWords.nextRoundIsYours')}
             </span>
           </motion.div>
         </div>
@@ -226,7 +226,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         className="mt-2 p-2 rounded-neo border-2 border-neo-black bg-neo-lime shadow-hard-sm"
       >
         <p className="text-[10px] font-black text-neo-black text-center uppercase tracking-wide">
-          💡 {t('noWords.funFact') || 'Fun fact: The average player misses 70% of possible words!'}
+          💡 {t('noWords.funFact')}
         </p>
       </motion.div>
     </motion.div>

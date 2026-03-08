@@ -466,7 +466,7 @@ export default function TeacherDashboard() {
           className="mt-12 p-6 rounded-neo-xl border-4 border-black bg-neo-yellow shadow-hard text-black relative overflow-hidden"
         >
           {/* Decorative circle */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 rotate-12 -mr-16 -mt-16 rounded-full pointer-events-none" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 rotate-12 -me-16 -mt-16 rounded-full pointer-events-none" />
           <div className="flex items-start gap-5 relative z-10">
             <motion.div
               className="p-3 bg-black rounded-neo shadow-hard-sm flex-shrink-0"

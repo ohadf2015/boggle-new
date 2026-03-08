@@ -165,7 +165,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       if (result.error) {
         // Handle specific errors
         if (result.error.message.includes('already registered') || result.error.message.includes('already exists')) {
-          setError(t('auth.inlineSignup.emailInUse') || 'This email is already registered. Try signing in instead.');
+          setError(t('auth.inlineSignup.emailInUse'));
           setAuthMode('signin');
         } else {
           setError(result.error.message);
@@ -173,7 +173,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
         setIsLoading(null);
       } else if (authMode === 'signup') {
         // Signup successful - show confirmation message
-        setSuccess(t('auth.inlineSignup.checkEmail') || 'Check your email to verify your account!');
+        setSuccess(t('auth.inlineSignup.checkEmail'));
         setIsLoading(null);
       }
       // For signin, the auth context will handle the redirect
@@ -203,7 +203,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       if (result.error) {
         setError(result.error.message);
       } else {
-        setSuccess(t('auth.magicLink.checkEmail') || 'Check your email for a sign-in link!');
+        setSuccess(t('auth.magicLink.checkEmail'));
       }
       setIsLoading(null);
     } catch (err) {
@@ -278,7 +278,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               enableHover
               enableClick
               clickAnimation="wiggle"
-              tooltip={t('auth.inlineSignup.mascotTooltip') || 'Click me!'}
+              tooltip={t('auth.inlineSignup.mascotTooltip')}
             />
           </motion.div>
 
@@ -294,7 +294,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             <div className="absolute left-0 rtl:left-auto rtl:right-0 top-4 -translate-x-[5px] rtl:translate-x-[5px] w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[6px] rtl:border-r-0 rtl:border-l-[6px] border-r-neo-lime rtl:border-l-neo-lime" />
 
             <p className="text-neo-black font-black text-sm leading-tight">
-              {t(`auth.inlineSignup.${randomMessage}`) || t('auth.inlineSignup.funnyMessages.dontLeaveHanging') || "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!"}
+              {t(`auth.inlineSignup.${randomMessage}`) || t('auth.inlineSignup.funnyMessages.dontLeaveHanging')}
             </p>
           </motion.div>
         </div>
@@ -307,10 +307,10 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
           className="text-center mb-4"
         >
           <h3 className="text-xl font-black text-white">
-            {t('auth.inlineSignup.title') || 'Join the Word Warriors!'}
+            {t('auth.inlineSignup.title')}
           </h3>
           <p className="text-sm text-gray-400 mt-1">
-            {t('auth.inlineSignup.subtitle') || 'Your score is too good to lose!'}
+            {t('auth.inlineSignup.subtitle')}
           </p>
         </motion.div>
 
@@ -415,7 +415,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 className="w-full text-sm text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2 py-2"
               >
                 <Mail className="w-4 h-4" />
-                <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
+                <span>{t('auth.inlineSignup.orContinueWith')}</span>
               </motion.button>
             ) : (
               <motion.div
@@ -426,7 +426,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 {/* Divider */}
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <div className="flex-1 h-px bg-gray-600" />
-                  <span>{t('auth.magicLink.divider') || 'or continue with email'}</span>
+                  <span>{t('auth.magicLink.divider')}</span>
                   <div className="flex-1 h-px bg-gray-600" />
                 </div>
 
@@ -439,7 +439,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         autoComplete="email"
                         value={email}
                         onChange={(e) => handleEmailChange(e.target.value)}
-                        placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                        placeholder={t('auth.inlineSignup.emailPlaceholder')}
                         className={cn(
                           "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
                           emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
@@ -462,7 +462,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                       ) : (
                         <>
                           <Wand2 className="w-4 h-4" />
-                          <span className="ml-2">{t('auth.magicLink.sendLink') || 'Send me a sign-in link'}</span>
+                          <span className="ms-2">{t('auth.magicLink.sendLink')}</span>
                         </>
                       )}
                     </Button>
@@ -472,7 +472,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                       onClick={() => setUsePassword(true)}
                       className="w-full text-xs text-gray-500 hover:text-gray-300"
                     >
-                      {t('auth.magicLink.usePassword') || 'Use password instead'}
+                      {t('auth.magicLink.usePassword')}
                     </button>
                   </form>
                 ) : (
@@ -483,7 +483,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         type="email"
                         value={email}
                         onChange={(e) => handleEmailChange(e.target.value)}
-                        placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                        placeholder={t('auth.inlineSignup.emailPlaceholder')}
                         className={cn(
                           "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
                           emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
@@ -501,7 +501,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                           type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => handlePasswordChange(e.target.value)}
-                          placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
+                          placeholder={t('auth.inlineSignup.passwordPlaceholder')}
                           className={cn(
                             "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan pe-12",
                             passwordError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
@@ -531,7 +531,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         <Loader size="sm" />
                       ) : (
                         authMode === 'signup'
-                          ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
+                          ? (t('auth.inlineSignup.signUpButton'))
                           : t('auth.signIn')
                       )}
                     </Button>
@@ -551,7 +551,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         onClick={() => setUsePassword(false)}
                         className="text-xs text-gray-500 hover:text-gray-300"
                       >
-                        {t('auth.magicLink.useMagicLink') || 'Use magic link'}
+                        {t('auth.magicLink.useMagicLink')}
                       </button>
                     </div>
                   </form>
@@ -569,10 +569,10 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 className="w-full mt-4 text-sm text-gray-500 hover:text-gray-300 transition-colors group"
               >
                 <span className="group-hover:hidden">
-                  {t('auth.inlineSignup.skipForNow') || 'Skip for now'}
+                  {t('auth.inlineSignup.skipForNow')}
                 </span>
                 <span className="hidden group-hover:inline text-neo-lime">
-                  {t('auth.inlineSignup.skipHover') || "(Lexi will be sad, but okay...)"}
+                  {t('auth.inlineSignup.skipHover')}
                 </span>
               </motion.button>
             )}

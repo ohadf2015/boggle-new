@@ -412,7 +412,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <CoinUnlockCard
                 icon={<Eye className="w-5 h-5 text-white" />}
                 title={t('wordHunt.results.revealTargetWord')}
-                subtitle={t('wordHunt.results.seeTheAnswer') || 'See what you were looking for'}
+                subtitle={t('wordHunt.results.seeTheAnswer')}
                 cost={coinActions.revealCost}
                 currentCoins={coinActions.currentCoins}
                 gradientFrom="from-neo-pink"
@@ -429,7 +429,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs text-slate-500">
                 <div className="flex-1 h-px bg-slate-700" />
-                <span>{t('wordHunt.ad.needMoreCoins') || 'Need more coins?'}</span>
+                <span>{t('wordHunt.ad.needMoreCoins')}</span>
                 <div className="flex-1 h-px bg-slate-700" />
               </div>
               <WatchAdButton onCoinsEarned={() => {}} t={t} />
@@ -534,8 +534,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom md:hidden">
         <MobileTabBar
           tabs={[
-            { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') || 'Results' },
-            { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') || 'Stats' },
+            { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') },
+            { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') },
           ]}
           activeTab={activeTab}
           onTabChange={(id) => setActiveTab(id as ResultTab)}

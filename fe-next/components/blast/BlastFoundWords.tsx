@@ -13,7 +13,7 @@ export function BlastFoundWords({ words, t }: BlastFoundWordsProps) {
   return (
     <div className="py-2 mb-2">
       <div className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-1.5">
-        {t('blast.foundWords') || 'Found Words'}
+        {t('blast.foundWords')}
       </div>
       <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
         {words.map((word, i) => (

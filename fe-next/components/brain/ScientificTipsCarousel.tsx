@@ -243,7 +243,7 @@ export default function ScientificTipsCarousel() {
                   rel="noopener noreferrer"
                   aria-label={t('brain.learnMore')}
                   className={cn(
-                    'flex-shrink-0 ml-3 p-2 rounded-lg border-2 border-neo-black transition-all',
+                    'flex-shrink-0 ms-3 p-2 rounded-lg border-2 border-neo-black transition-all',
                     'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-[1px]',
                     isDarkMode
                       ? 'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'

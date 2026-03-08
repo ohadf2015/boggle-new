@@ -406,7 +406,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                           className="text-[10px] text-neo-cream/40 text-right leading-tight max-w-[70px]"
                         >
                           <span className="text-neo-cyan/60">⚡</span>{' '}
-                          {t('game.comboHint') || 'Find words fast!'}
+                          {t('game.comboHint')}
                         </AdaptiveMotion.div>
                       )}
                     </div>

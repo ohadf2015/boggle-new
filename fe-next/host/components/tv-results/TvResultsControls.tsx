@@ -63,7 +63,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                     variant="outline"
                     className="bg-transparent border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
                   >
-                    <SkipForward className="w-5 h-5 mr-2" />
+                    <SkipForward className="w-5 h-5 me-2" />
                     {t('tvResults.skip')}
                   </Button>
                 </motion.div>
@@ -87,7 +87,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                     {playersReadyCount}/{totalPlayers}
                   </span>
                   <span className="font-bold text-neo-black/70 text-sm">
-                    {t('tvResults.playersReady') || 'Ready'}
+                    {t('tvResults.playersReady')}
                   </span>
                   {allReady && (
                     <motion.span
@@ -119,8 +119,8 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                       'transition-all'
                     )}
                   >
-                    <Play className="w-6 h-6 mr-2" />
-                    {t('tvResults.nextRound') || 'Next Round'}
+                    <Play className="w-6 h-6 me-2" />
+                    {t('tvResults.nextRound')}
                   </Button>
                 ) : (
                   <Button
@@ -134,8 +134,8 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                       'transition-all'
                     )}
                   >
-                    <Play className="w-6 h-6 mr-2" />
-                    {t('tvResults.startNewGame') || 'Start New Game'}
+                    <Play className="w-6 h-6 me-2" />
+                    {t('tvResults.startNewGame')}
                   </Button>
                 )}
               </motion.div>
@@ -152,7 +152,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                   variant="outline"
                   className="bg-transparent border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
                 >
-                  <QrCode className="w-5 h-5 mr-2" />
+                  <QrCode className="w-5 h-5 me-2" />
                   {t('tvResults.qrCode')}
                 </Button>
               </motion.div>

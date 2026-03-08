@@ -36,9 +36,9 @@ export function BlastMoveCounter({
     : 'from-emerald-400 to-emerald-600';
 
   const bonusText = bonusMoveAwarded === 1
-    ? t('blast.bonusMove') || '+1 Move!'
+    ? t('blast.bonusMove')
     : bonusMoveAwarded && bonusMoveAwarded > 1
-    ? (t('blast.bonusMoves') || '+{count} Moves!').replace('{count}', String(bonusMoveAwarded))
+    ? (t('blast.bonusMoves') || '').replace('{count}', String(bonusMoveAwarded))
     : null;
 
   return (
@@ -55,14 +55,14 @@ export function BlastMoveCounter({
         initial={{ scale: 1.15 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-        aria-label={`${movesRemaining} ${t('blast.movesLeft') || 'Moves'} ${t('blast.movesLeft') || 'remaining'}`}
+        aria-label={`${movesRemaining} ${t('blast.movesLeft')} ${t('blast.movesLeft')}`}
       >
         <div className="text-center">
           <div className="font-black text-neo-black text-xl sm:text-2xl leading-tight tabular-nums">
             {movesRemaining}
           </div>
           <div className="font-bold uppercase tracking-wider text-neo-black/60 text-[10px] sm:text-xs">
-            {t('blast.movesLeft') || 'Moves'}
+            {t('blast.movesLeft')}
           </div>
         </div>
       </motion.div>

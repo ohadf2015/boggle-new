@@ -104,7 +104,7 @@ export function TutorialCallout({
                   compact ? 'text-sm' : 'text-base sm:text-lg'
                 )}
               >
-                {t('tutorial.callout.title') || 'Swipe the letters!'}
+                {t('tutorial.callout.title')}
               </span>
               {tutorialWord && (
                 <span
@@ -113,7 +113,7 @@ export function TutorialCallout({
                     compact ? 'text-xs' : 'text-sm'
                   )}
                 >
-                  {t('tutorial.callout.tryWord') || 'Try:'}{' '}
+                  {t('tutorial.callout.tryWord')}{' '}
                   <span className="uppercase tracking-widest">{tutorialWord}</span>
                 </span>
               )}

@@ -91,7 +91,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Navigation guard
   useNavigationGuard({
     enabled: !state.isGameOver,
-    message: t('wordHunt.quitConfirmMessage') || 'Your progress will be lost!',
+    message: t('wordHunt.quitConfirmMessage'),
     onNavigationAttempt: () => {
       actions.setShowQuitConfirm(true);
       return false;
@@ -203,13 +203,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <ConfirmationDialog
           open={state.showQuitConfirm}
           onOpenChange={(open) => actions.setShowQuitConfirm(open)}
-          title={t('daily.quitConfirmTitle') || 'Quit Challenge?'}
+          title={t('daily.quitConfirmTitle')}
           description={
             t('daily.quitConfirm') ||
             "If you quit, this will count as your attempt for today. You won't be able to try again until tomorrow."
           }
-          confirmText={t('daily.imSure') || "I'm Sure"}
-          cancelText={t('common.cancel') || 'Cancel'}
+          confirmText={t('daily.imSure')}
+          cancelText={t('common.cancel')}
           onConfirm={handleQuitConfirm}
           variant="danger"
         />
@@ -308,7 +308,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       )}
       {state.showExample && (
         <div className="text-[11px] bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5 text-green-900 dark:text-green-100">
-          <span className="font-bold">{t('wordHunt.survival.exampleSentence') || 'Example:'}</span>{' '}
+          <span className="font-bold">{t('wordHunt.survival.exampleSentence')}</span>{' '}
           {state.exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
         </div>
       )}
@@ -386,13 +386,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <ConfirmationDialog
         open={state.showQuitConfirm}
         onOpenChange={(open) => actions.setShowQuitConfirm(open)}
-        title={t('daily.quitConfirmTitle') || 'Quit Challenge?'}
+        title={t('daily.quitConfirmTitle')}
         description={
           t('daily.quitConfirm') ||
           "If you quit, this will count as your attempt for today. You won't be able to try again until tomorrow."
         }
-        confirmText={t('daily.imSure') || "I'm Sure"}
-        cancelText={t('common.cancel') || 'Cancel'}
+        confirmText={t('daily.imSure')}
+        cancelText={t('common.cancel')}
         onConfirm={handleQuitConfirm}
         variant="danger"
       />

@@ -63,7 +63,7 @@ export function PromptPreviewDialog({
           <DialogTitle className="flex items-center gap-2">
             <Code className="w-5 h-5 text-neo-cyan" />
             Full Prompt Preview
-            <span className="text-xs px-2 py-0.5 bg-slate-700 text-slate-300 rounded ml-2">
+            <span className="text-xs px-2 py-0.5 bg-slate-700 text-slate-300 rounded ms-2">
               {language.toUpperCase()}
             </span>
           </DialogTitle>

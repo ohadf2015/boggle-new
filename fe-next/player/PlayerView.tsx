@@ -771,7 +771,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 text-neo-lime animate-spin" />
             <div className="text-lg font-bold text-white/70">
-              {t('common.preparingGame') || 'Preparing game...'}
+              {t('common.preparingGame')}
             </div>
           </div>
         </div>
@@ -853,15 +853,15 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
               {playerScore.toLocaleString()}
             </div>
             <div className="font-bold uppercase tracking-wider text-neo-black/60 text-xs">
-              {t('common.score') || 'Score'}
+              {t('common.score')}
             </div>
           </div>
           <div className="text-white/60 font-bold text-sm">
-            {validWords.length} {t('common.words') || 'words'}
+            {validWords.length} {t('common.words')}
           </div>
           <div className="flex items-center gap-2 text-white/40 text-sm">
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span>{t('game.calculatingResults') || 'Calculating Results...'}</span>
+            <span>{t('game.calculatingResults')}</span>
           </div>
         </AdaptiveMotion.div>
       </div>

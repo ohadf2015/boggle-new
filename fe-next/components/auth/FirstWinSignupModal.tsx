@@ -81,7 +81,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
         <DialogHeader variant="gradient" customBg="bg-transparent" className="border-b-0 p-0">
           <DialogTitle className="sr-only">
             {isMultiGamesVariant
-              ? t('auth.multiGames.title') || "You're Getting Good!"
+              ? t('auth.multiGames.title')
               : t('auth.firstWin.title')}
           </DialogTitle>
         </DialogHeader>
@@ -139,7 +139,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
           >
             <h2 className="text-2xl font-bold mb-2 text-neo-lime">
               {isMultiGamesVariant
-                ? t('auth.multiGames.title') || "You're Getting Good!"
+                ? t('auth.multiGames.title')
                 : t('auth.firstWin.title')}
             </h2>
             <p className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>

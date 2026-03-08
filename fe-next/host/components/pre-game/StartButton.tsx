@@ -50,7 +50,7 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
         ) : (
           <>
             <Swords className="w-7 h-7" />
-            <span>{t('hostView.startBattle') || 'Start Battle!'}</span>
+            <span>{t('hostView.startBattle')}</span>
           </>
         )}
       </motion.button>
@@ -68,12 +68,12 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
         <p className="text-center text-xs font-bold text-slate-500 uppercase tracking-widest">
           {playerCount > 0
             ? `${playerCount} ${t('hostView.ofMaxWarriors', { max: String(maxPlayers) }) || `of ${maxPlayers} players ready`}`
-            : (t('hostView.waitingForPlayers') || 'Waiting for players to join...')
+            : (t('hostView.waitingForPlayers'))
           }
         </p>
         {playerCount === 0 && (
           <p className="text-center text-xs text-slate-600 mt-1">
-            {t('hostView.shareCodeHint') || 'Share the room code above so friends can join!'}
+            {t('hostView.shareCodeHint')}
           </p>
         )}
       </div>

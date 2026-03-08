@@ -108,7 +108,7 @@ export default function ReportsPageClient() {
                   <span className="text-neo-white font-medium">
                     {classroom.name}
                   </span>
-                  <ChevronRight className="w-5 h-5 text-neo-gray" />
+                  <ChevronRight className="w-5 h-5 text-neo-gray rtl:rotate-180" />
                 </button>
               ))}
             </div>

@@ -49,10 +49,10 @@ export function InviteCard({
     try {
       await navigator.clipboard.writeText(joinUrl);
       setLinkCopied(true);
-      toast.success(t('roomCode.linkCopied') || 'Link copied!', { duration: 1500, icon: '🔗' });
+      toast.success(t('roomCode.linkCopied'), { duration: 1500, icon: '🔗' });
       setTimeout(() => setLinkCopied(false), 2000);
     } catch {
-      toast.error(t('common.error') || 'Failed to copy');
+      toast.error(t('common.error'));
     }
   }, [joinUrl, t]);
 
@@ -65,7 +65,7 @@ export function InviteCard({
 
     try {
       await navigator.share({
-        title: t('share.title') || 'Join my LexiClash game!',
+        title: t('share.title'),
         text: t('share.text', { code: gameCode }) || `Join my game with code: ${gameCode}`,
         url: joinUrl,
       });
@@ -114,7 +114,7 @@ export function InviteCard({
               {/* Room Code below QR */}
               <div className="text-center">
                 <p className="text-xs font-bold uppercase text-neo-cream/60 mb-0.5">
-                  {t('roomCode.title') || 'Room Code'}
+                  {t('roomCode.title')}
                 </p>
                 <p className="text-3xl font-black tracking-wider text-neo-lime">{gameCode}</p>
               </div>
@@ -127,11 +127,11 @@ export function InviteCard({
                 <div className="flex items-center gap-2 mb-2">
                   <Share2 className="w-6 h-6 text-neo-cyan" />
                   <h2 className="text-xl font-black uppercase text-neo-cream">
-                    {t('hostView.inviteFriends') || 'Invite Friends'}
+                    {t('hostView.inviteFriends')}
                   </h2>
                 </div>
                 <p className="text-sm text-neo-cream/70 leading-relaxed">
-                  {t('hostView.scanOrShare') || 'Scan the QR code with your phone or share the link with friends to join the game.'}
+                  {t('hostView.scanOrShare')}
                 </p>
               </div>
 
@@ -151,12 +151,12 @@ export function InviteCard({
                   {linkCopied ? (
                     <>
                       <Check className="w-5 h-5" />
-                      <span>{t('common.copied') || 'Copied!'}</span>
+                      <span>{t('common.copied')}</span>
                     </>
                   ) : (
                     <>
                       <Copy className="w-5 h-5" />
-                      <span>{t('roomCode.copyLink') || 'Copy Invite Link'}</span>
+                      <span>{t('roomCode.copyLink')}</span>
                     </>
                   )}
                 </motion.button>
@@ -169,7 +169,7 @@ export function InviteCard({
                     className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-bold text-base shadow-hard-sm hover:shadow-none transition-all"
                   >
                     <Share2 className="w-5 h-5" />
-                    <span>{t('share.button') || 'Share'}</span>
+                    <span>{t('share.button')}</span>
                   </motion.button>
                 )}
               </div>
@@ -219,7 +219,7 @@ export function InviteCard({
               {/* Room Code */}
               <div className="mb-3">
                 <p className="text-xs font-bold uppercase text-neo-cream/60 mb-0.5">
-                  {t('roomCode.title') || 'Room Code'}
+                  {t('roomCode.title')}
                 </p>
                 <p className="text-2xl font-black tracking-wider text-neo-lime">{gameCode}</p>
               </div>
@@ -240,12 +240,12 @@ export function InviteCard({
                   {linkCopied ? (
                     <>
                       <Check className="w-4 h-4" />
-                      <span>{t('common.copied') || 'Copied!'}</span>
+                      <span>{t('common.copied')}</span>
                     </>
                   ) : (
                     <>
                       <LinkIcon className="w-4 h-4" />
-                      <span>{t('roomCode.copyLink') || 'Copy Link'}</span>
+                      <span>{t('roomCode.copyLink')}</span>
                     </>
                   )}
                 </motion.button>
@@ -287,10 +287,10 @@ export function InviteCard({
         <div className="text-center mb-4">
           <Share2 className="w-8 h-8 mx-auto text-neo-cyan mb-2" />
           <h2 className="text-xl font-black uppercase text-neo-cream">
-            {t('hostView.inviteFriends') || 'Invite Friends'}
+            {t('hostView.inviteFriends')}
           </h2>
           <p className="text-sm text-neo-cream/60">
-            {t('hostView.scanOrShare') || 'Scan QR code or share link'}
+            {t('hostView.scanOrShare')}
           </p>
         </div>
 
@@ -315,7 +315,7 @@ export function InviteCard({
         {/* Room Code */}
         <div className="text-center mb-4">
           <p className="text-xs font-bold uppercase text-neo-cream/60 mb-1">
-            {t('roomCode.title') || 'Room Code'}
+            {t('roomCode.title')}
           </p>
           <p className="text-3xl font-black tracking-wider text-neo-lime">{gameCode}</p>
         </div>
@@ -336,12 +336,12 @@ export function InviteCard({
             {linkCopied ? (
               <>
                 <Check className="w-5 h-5" />
-                <span>{t('common.copied') || 'Copied!'}</span>
+                <span>{t('common.copied')}</span>
               </>
             ) : (
               <>
                 <LinkIcon className="w-5 h-5" />
-                <span>{t('roomCode.copyLink') || 'Copy Link'}</span>
+                <span>{t('roomCode.copyLink')}</span>
               </>
             )}
           </motion.button>

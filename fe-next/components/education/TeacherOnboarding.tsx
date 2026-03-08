@@ -244,7 +244,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
                 'shadow-hard-sm'
               )}
             >
-              <ChevronLeft className={cn('w-5 h-5', isRTL ? 'ml-1 rotate-180' : 'mr-1')} />
+              <ChevronLeft className="w-5 h-5 me-1 rtl:rotate-180" />
               {t('common.previous')}
             </Button>
 
@@ -261,13 +261,13 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
             >
               {isLastStep ? (
                 <>
-                  <Check className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
+                  <Check className="w-5 h-5 me-2" />
                   {t('education.onboarding.getStarted')}
                 </>
               ) : (
                 <>
                   {t('common.next')}
-                  <ChevronRight className={cn('w-5 h-5', isRTL ? 'mr-1 rotate-180' : 'ml-1')} />
+                  <ChevronRight className="w-5 h-5 ms-1 rtl:rotate-180" />
                 </>
               )}
             </Button>

@@ -86,7 +86,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Daily challenge is one-per-day so always guard (unlike single player which waits for score > 0)
   useNavigationGuard({
     enabled: !isGameOver,
-    message: t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today.',
+    message: t('daily.quitConfirm'),
     onNavigationAttempt: () => {
       setShowQuitConfirm(true);
       return false; // Block navigation, let modal handle it
@@ -359,8 +359,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           onClick={handleQuitClick}
           className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold"
         >
-          <X className="w-4 h-4 mr-1" />
-          {t('common.quit') || 'Quit'}
+          <X className="w-4 h-4 me-1" />
+          {t('common.quit')}
         </Button>
         {/* Puzzle number badge */}
         <span className="px-2 py-0.5 bg-neo-lime/20 text-neo-black dark:text-neo-lime text-xs font-bold rounded-full">
@@ -371,7 +371,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       {/* Stats row - Combo | Timer | Score - matches multiplayer InGameScreen */}
       <div className={cn(
         "flex items-center justify-center gap-3 md:gap-4 mb-2",
-        isLandscape && "flex-col h-full mr-4 mb-0"
+        isLandscape && "flex-col h-full me-4 mb-0"
       )} role="status" aria-label="Game status">
         {/* Combo (left - placeholder for layout balance) */}
         <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
@@ -419,7 +419,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
               {score}
             </motion.div>
             <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
-              {t('common.score') || 'Score'}
+              {t('common.score')}
             </div>
           </div>
         </motion.div>
@@ -532,10 +532,10 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       <ConfirmationDialog
         open={showQuitConfirm}
         onOpenChange={setShowQuitConfirm}
-        title={t('daily.quitConfirmTitle') || 'Quit Challenge?'}
-        description={t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today. You won\'t be able to try again until tomorrow.'}
-        confirmText={t('daily.imSure') || "I'm Sure"}
-        cancelText={t('common.cancel') || 'Cancel'}
+        title={t('daily.quitConfirmTitle')}
+        description={t('daily.quitConfirm')}
+        confirmText={t('daily.imSure')}
+        cancelText={t('common.cancel')}
         onConfirm={handleConfirmQuit}
         variant="danger"
       />

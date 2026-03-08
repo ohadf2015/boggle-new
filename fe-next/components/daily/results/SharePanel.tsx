@@ -73,7 +73,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             {ogImageUrl && (
               <div className="mb-6">
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">
-                  {t('wordHunt.results.previewImage') || 'Preview Image'}
+                  {t('wordHunt.results.previewImage')}
                 </p>
                 <div className="relative w-full rounded-neo border-3 border-neo-black overflow-hidden bg-gray-100 dark:bg-gray-800">
                   {!imageLoaded && (
@@ -100,7 +100,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 onClick={onWhatsApp}
                 className="py-3 bg-brand-whatsapp text-white border-3 border-neo-black rounded-neo hover:brightness-110"
               >
-                <WhatsAppIcon className="mr-2 w-5 h-5" />
+                <WhatsAppIcon className="me-2 w-5 h-5" />
                 WhatsApp
               </Button>
 
@@ -108,7 +108,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 onClick={onTwitter}
                 className="py-3 bg-black text-white border-3 border-gray-700 rounded-neo hover:bg-gray-900"
               >
-                <XTwitterIcon className="mr-2 w-5 h-5" />
+                <XTwitterIcon className="me-2 w-5 h-5" />
                 X / Twitter
               </Button>
 
@@ -116,7 +116,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 onClick={onFacebook}
                 className="py-3 bg-brand-facebook text-white border-3 border-neo-black rounded-neo hover:brightness-110"
               >
-                <FacebookIcon className="mr-2 w-5 h-5" />
+                <FacebookIcon className="me-2 w-5 h-5" />
                 Facebook
               </Button>
 
@@ -124,7 +124,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 onClick={onTelegram}
                 className="py-3 bg-[#0088cc] text-white border-3 border-neo-black rounded-neo hover:brightness-110"
               >
-                <Send className="mr-2 w-5 h-5" />
+                <Send className="me-2 w-5 h-5" />
                 Telegram
               </Button>
             </div>
@@ -137,12 +137,12 @@ export const SharePanel: React.FC<SharePanelProps> = ({
               {showMoreOptions ? (
                 <>
                   <ChevronUp className="w-4 h-4" />
-                  {t('wordHunt.results.lessOptions') || 'Less options'}
+                  {t('wordHunt.results.lessOptions')}
                 </>
               ) : (
                 <>
                   <ChevronDown className="w-4 h-4" />
-                  {t('wordHunt.results.moreOptions') || 'More options'}
+                  {t('wordHunt.results.moreOptions')}
                 </>
               )}
             </button>
@@ -161,7 +161,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                       onClick={onLinkedIn}
                       className="py-3 bg-brand-linkedin text-white border-3 border-neo-black rounded-neo hover:brightness-110"
                     >
-                      <LinkedInIcon className="mr-2 w-5 h-5" />
+                      <LinkedInIcon className="me-2 w-5 h-5" />
                       LinkedIn
                     </Button>
 
@@ -169,16 +169,16 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                       onClick={onEmail}
                       className="py-3 bg-gray-600 text-white border-3 border-neo-black rounded-neo hover:bg-gray-700"
                     >
-                      <Mail className="mr-2 w-5 h-5" />
-                      {t('share.email') || 'Email'}
+                      <Mail className="me-2 w-5 h-5" />
+                      {t('share.email')}
                     </Button>
 
                     <Button
                       onClick={onSMS}
                       className="py-3 bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo hover:brightness-110"
                     >
-                      <MessageSquare className="mr-2 w-5 h-5" />
-                      {t('share.sms') || 'SMS'}
+                      <MessageSquare className="me-2 w-5 h-5" />
+                      {t('share.sms')}
                     </Button>
 
                     <Button
@@ -187,13 +187,13 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                     >
                       {copied ? (
                         <>
-                          <Check className="mr-2 w-5 h-5 text-neo-lime" />
+                          <Check className="me-2 w-5 h-5 text-neo-lime" />
                           {t('common.copied')}
                         </>
                       ) : (
                         <>
-                          <Copy className="mr-2 w-5 h-5" />
-                          {t('daily.copyLink') || 'Copy Link'}
+                          <Copy className="me-2 w-5 h-5" />
+                          {t('daily.copyLink')}
                         </>
                       )}
                     </Button>
@@ -212,13 +212,13 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 >
                   {isGeneratingImage ? (
                     <>
-                      <Loader size="sm" className="mr-2" />
-                      {t('wordHunt.results.generating') || 'Generating...'}
+                      <Loader size="sm" className="me-2" />
+                      {t('wordHunt.results.generating')}
                     </>
                   ) : (
                     <>
-                      <ImageDown className="mr-2 w-5 h-5" />
-                      {t('daily.downloadImage') || 'Download Image'}
+                      <ImageDown className="me-2 w-5 h-5" />
+                      {t('daily.downloadImage')}
                     </>
                   )}
                 </Button>

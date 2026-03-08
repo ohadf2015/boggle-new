@@ -23,9 +23,9 @@ function getBoardSizeText(
   t: (path: string, params?: Record<string, string | number>) => string
 ): string {
   if (difficulty === 'HARD') {
-    return t('hostView.presetDrawerBoardHard') || '9x9 (Hard)';
+    return t('hostView.presetDrawerBoardHard');
   }
-  return t('hostView.presetDrawerBoardMedium') || '7x7 (Medium)';
+  return t('hostView.presetDrawerBoardMedium');
 }
 
 function capitalizeFirstLetter(str: string): string {
@@ -80,7 +80,7 @@ export const PresetInfoDrawer = memo<PresetInfoDrawerProps>(function PresetInfoD
         {/* Settings Breakdown */}
         <div className="bg-neo-black/5 rounded-neo p-3 space-y-2 border-2 border-neo-black/10">
           <h4 className="text-xs font-black uppercase text-neo-black/60 mb-2">
-            {t('common.settings') || 'Settings'}
+            {t('common.settings')}
           </h4>
 
           {/* Timer */}
@@ -88,7 +88,7 @@ export const PresetInfoDrawer = memo<PresetInfoDrawerProps>(function PresetInfoD
             <div className="flex items-center gap-2">
               <Timer className="w-4 h-4 text-neo-black/60" />
               <span className="text-sm font-bold text-neo-black">
-                {t('hostView.presetDrawerTimer') || 'Timer'}
+                {t('hostView.presetDrawerTimer')}
               </span>
             </div>
             <span className="text-sm font-black text-neo-black">{preset.timer} min</span>
@@ -99,7 +99,7 @@ export const PresetInfoDrawer = memo<PresetInfoDrawerProps>(function PresetInfoD
             <div className="flex items-center gap-2">
               <Grid3X3 className="w-4 h-4 text-neo-black/60" />
               <span className="text-sm font-bold text-neo-black">
-                {t('hostView.presetDrawerBoard') || 'Board Size'}
+                {t('hostView.presetDrawerBoard')}
               </span>
             </div>
             <span className="text-sm font-black text-neo-black">
@@ -112,11 +112,11 @@ export const PresetInfoDrawer = memo<PresetInfoDrawerProps>(function PresetInfoD
             <div className="flex items-center gap-2">
               <Type className="w-4 h-4 text-neo-black/60" />
               <span className="text-sm font-bold text-neo-black">
-                {t('hostView.presetDrawerMinWord') || 'Min Word Length'}
+                {t('hostView.presetDrawerMinWord')}
               </span>
             </div>
             <span className="text-sm font-black text-neo-black">
-              {preset.minWordLength} {t('hostView.presetDrawerLetters') || 'letters'}
+              {preset.minWordLength} {t('hostView.presetDrawerLetters')}
             </span>
           </div>
         </div>
@@ -126,7 +126,7 @@ export const PresetInfoDrawer = memo<PresetInfoDrawerProps>(function PresetInfoD
           onClick={handleSelectPreset}
           className="w-full h-12 text-base bg-neo-lime text-neo-black font-black uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5 transition-all"
         >
-          {t('hostView.presetDrawerUseMode') || 'Use This Mode'}
+          {t('hostView.presetDrawerUseMode')}
         </Button>
       </div>
     </MobileDrawer>

@@ -112,7 +112,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-white" />
           <h3 className="text-sm font-black text-white uppercase">
-            {t('nearMiss.almostThere') || 'Almost There!'}
+            {t('nearMiss.almostThere')}
           </h3>
         </div>
       </div>
@@ -178,7 +178,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
                   {/* Hint */}
                   {nearMiss.hint && !compact && (
                     <p className="mt-1.5 text-[10px] text-slate-300 italic">
-                      {t('nearMiss.tip') || 'Tip'}: {nearMiss.hint}
+                      {t('nearMiss.tip')}: {nearMiss.hint}
                     </p>
                   )}
                 </div>
@@ -195,7 +195,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
                     {nearMiss.remaining}
                   </span>
                   <p className="text-[8px] text-white/60 uppercase font-bold">
-                    {t('nearMiss.more') || 'more'}
+                    {t('nearMiss.more')}
                   </p>
                 </div>
               </div>
@@ -219,7 +219,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
               'hover:shadow-hard-md hover:-translate-y-0.5 transition-all'
             )}
           >
-            {t('nearMiss.oneMoreGame') || 'One More Game!'}
+            {t('nearMiss.oneMoreGame')}
           </motion.button>
         )}
       </div>
@@ -228,7 +228,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
       {!compact && displayMisses.length > 0 && (
         <div className="px-3 py-2 bg-white/5 border-t border-white/10">
           <p className="text-[10px] text-slate-300 text-center">
-            {t('nearMiss.soClose') || "You're so close! One more game could do it."}
+            {t('nearMiss.soClose')}
           </p>
         </div>
       )}

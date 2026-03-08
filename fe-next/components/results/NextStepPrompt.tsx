@@ -121,12 +121,12 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const config = getNextStepConfig();
   const title = t(config.titleKey) || config.titleKey;
   const description = t(config.descKey) || config.descKey;
-  const backText = t('nextStep.backToLobby') || 'Back to Lobby';
+  const backText = t('nextStep.backToLobby');
 
   // Close loss rematch prompt - overrides normal flow
   if (isCloseLossProp && scoreDifference != null) {
     const closeLossMsg = getCloseLossMessage(scoreDifference, t);
-    const rematchText = t('closeLoss.rematch') || 'Rematch!';
+    const rematchText = t('closeLoss.rematch');
 
     return (
       <motion.div
@@ -144,7 +144,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           <Swords className="w-10 h-10 text-neo-black mx-auto" />
           <div>
             <h3 className="text-xl sm:text-2xl font-black uppercase text-neo-black tracking-tight">
-              {t('closeLoss.soClose') || 'So close!'}
+              {t('closeLoss.soClose')}
             </h3>
             <p className="text-neo-black/80 font-bold mt-1">
               {closeLossMsg}
@@ -366,7 +366,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             animate={{ x: ['-200%', '200%'] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
           />
-          <span className="relative z-10">{t('nextStep.letsGo') || "Let's Go!"}</span>
+          <span className="relative z-10">{t('nextStep.letsGo')}</span>
           <motion.span
             className="relative z-10"
             animate={{ x: [0, 5, 0] }}

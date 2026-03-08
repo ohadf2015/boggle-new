@@ -64,7 +64,7 @@ export function KeyboardQuickTip({
             {/* Text - single line, compact */}
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold leading-tight">
-                {t('keyboardQuickTip.message') || 'Type words on your keyboard!'}
+                {t('keyboardQuickTip.message')}
               </p>
             </div>
 

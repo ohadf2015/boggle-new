@@ -52,29 +52,29 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
   const rings: MiniRingConfig[] = [
     {
       icon: <Zap className="w-3.5 h-3.5 text-neo-cyan" />,
-      label: t('wordHunt.score.speed') || 'Speed',
+      label: t('wordHunt.score.speed'),
       value: breakdown.speed,
       max: 400,
       color: 'neo-cyan',
-      detail: `${breakdown.raw.lifeRemaining} ${t('wordHunt.score.lifeLeft') || 'life'}`,
+      detail: `${breakdown.raw.lifeRemaining} ${t('wordHunt.score.lifeLeft')}`,
     },
     {
       icon: <Target className="w-3.5 h-3.5 text-neo-lime" />,
-      label: t('wordHunt.score.accuracy') || 'Accuracy',
+      label: t('wordHunt.score.accuracy'),
       value: breakdown.accuracy,
       max: 400,
       color: 'neo-lime',
       detail: breakdown.raw.guessesUsed === 1
-        ? (t('wordHunt.score.firstTry') || 'First try!')
-        : `${breakdown.raw.guessesUsed} ${t('wordHunt.score.guesses') || 'guesses'}`,
+        ? (t('wordHunt.score.firstTry'))
+        : `${breakdown.raw.guessesUsed} ${t('wordHunt.score.guesses')}`,
     },
     {
       icon: <BookOpen className="w-3.5 h-3.5 text-neo-pink" />,
-      label: t('wordHunt.score.exploration') || 'Exploration',
+      label: t('wordHunt.score.exploration'),
       value: breakdown.exploration,
       max: 200,
       color: 'neo-pink',
-      detail: `${breakdown.raw.wordsFound} ${t('wordHunt.score.wordsFound') || 'words'}`,
+      detail: `${breakdown.raw.wordsFound} ${t('wordHunt.score.wordsFound')}`,
     },
   ];
 
@@ -139,8 +139,8 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
               <Coins className={`w-4 h-4 ${isTeasing ? 'text-amber-500/50' : 'text-amber-400'}`} />
               <span className={`text-xs font-medium ${isTeasing ? 'text-slate-400' : 'text-slate-300'}`}>
                 {isTeasing
-                  ? (t('coins.guestTeasing') || 'Sign in to earn {amount} coins!').replace('{amount}', String(coinReward.awarded))
-                  : (t('wordHunt.results.coinsEarned') || 'Coins Earned')}
+                  ? (t('coins.guestTeasing') || '').replace('{amount}', String(coinReward.awarded))
+                  : (t('wordHunt.results.coinsEarned'))}
               </span>
             </div>
             <span className={`font-black ${isTeasing ? 'text-amber-500/50' : 'text-amber-400'}`}>

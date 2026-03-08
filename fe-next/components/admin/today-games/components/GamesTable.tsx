@@ -39,7 +39,7 @@ export function GamesTable({
           <thead className="bg-slate-700/50">
             <tr>
               <SortableHeader
-                label={t('admin.todayGames.time') || 'Time'}
+                label={t('admin.todayGames.time')}
                 field="created_at"
                 currentField={sortField}
                 sortOrder={sortOrder}
@@ -47,16 +47,16 @@ export function GamesTable({
                 isRTL={isRTL}
               />
               <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                {t('admin.todayGames.player') || 'Player'}
+                {t('admin.todayGames.player')}
               </th>
               <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                {t('admin.todayGames.type') || 'Type'}
+                {t('admin.todayGames.type')}
               </th>
               <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                {t('admin.todayGames.language') || 'Lang'}
+                {t('admin.todayGames.language')}
               </th>
               <SortableHeader
-                label={t('admin.todayGames.score') || 'Score'}
+                label={t('admin.todayGames.score')}
                 field="score"
                 currentField={sortField}
                 sortOrder={sortOrder}
@@ -64,7 +64,7 @@ export function GamesTable({
                 isRTL={isRTL}
               />
               <SortableHeader
-                label={t('admin.todayGames.words') || 'Words'}
+                label={t('admin.todayGames.words')}
                 field="word_count"
                 currentField={sortField}
                 sortOrder={sortOrder}
@@ -72,7 +72,7 @@ export function GamesTable({
                 isRTL={isRTL}
               />
               <SortableHeader
-                label={t('admin.todayGames.duration') || 'Duration'}
+                label={t('admin.todayGames.duration')}
                 field="time_played"
                 currentField={sortField}
                 sortOrder={sortOrder}
@@ -80,7 +80,7 @@ export function GamesTable({
                 isRTL={isRTL}
               />
               <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                {t('admin.todayGames.code') || 'Code'}
+                {t('admin.todayGames.code')}
               </th>
             </tr>
           </thead>
@@ -98,9 +98,9 @@ export function GamesTable({
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <span className="text-sm text-slate-400">
-            {t('admin.todayGames.showing') || 'Showing'}{' '}
+            {t('admin.todayGames.showing')}{' '}
             {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, pagination.totalCount)}{' '}
-            {t('admin.todayGames.of') || 'of'} {pagination.totalCount}
+            {t('admin.todayGames.of')} {pagination.totalCount}
           </span>
           <div className="flex gap-2">
             <Button
@@ -109,7 +109,7 @@ export function GamesTable({
               variant="outline"
               size="sm"
             >
-              {t('common.previous') || 'Previous'}
+              {t('common.previous')}
             </Button>
             <Button
               onClick={() => onPageChange((p) => p + 1)}
@@ -117,7 +117,7 @@ export function GamesTable({
               variant="outline"
               size="sm"
             >
-              {t('common.next') || 'Next'}
+              {t('common.next')}
             </Button>
           </div>
         </div>

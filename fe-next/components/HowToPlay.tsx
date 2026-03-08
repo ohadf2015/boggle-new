@@ -86,8 +86,8 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
     {
       id: 'basics',
       icon: Gamepad2,
-      title: t('howToPlay.steps.basics.title') || 'The Basics',
-      subtitle: t('howToPlay.masterTheArena') || 'Master the LexiClash arena',
+      title: t('howToPlay.steps.basics.title'),
+      subtitle: t('howToPlay.masterTheArena'),
       headerBg: 'bg-neo-cyan',
       progressColor: '#00FFFF',
       dotColor: 'bg-neo-cyan',
@@ -95,8 +95,8 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
     {
       id: 'grid',
       icon: Pointer,
-      title: t('howToPlay.steps.grid.title') || 'Finding Words',
-      subtitle: t('howToPlay.connectingDots') || 'Connecting the dots',
+      title: t('howToPlay.steps.grid.title'),
+      subtitle: t('howToPlay.connectingDots'),
       headerBg: 'bg-neo-lime',
       progressColor: '#BFFF00',
       dotColor: 'bg-neo-lime',
@@ -104,8 +104,8 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
     {
       id: 'scoring',
       icon: Star,
-      title: t('howToPlay.steps.scoring.title') || 'Scoring',
-      subtitle: t('howToPlay.levelUpGame') || 'Level up your point game',
+      title: t('howToPlay.steps.scoring.title'),
+      subtitle: t('howToPlay.levelUpGame'),
       headerBg: 'bg-neo-yellow',
       progressColor: '#FFE135',
       dotColor: 'bg-neo-yellow',
@@ -197,7 +197,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         >
           <Pointer className="w-5 h-5 text-neo-black animate-bounce" />
           <span className="font-black text-neo-black text-lg uppercase">
-            {t('onboarding.welcome.demoInstruction') || 'Swipe to form:'}{' '}
+            {t('onboarding.welcome.demoInstruction')}{' '}
             <span className="underline decoration-4 underline-offset-4">{demoConfig.word}</span>
           </span>
         </motion.div>
@@ -228,7 +228,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         >
           <div className="text-lg font-black text-neo-black flex items-center justify-center gap-2">
             <Check className="w-5 h-5" />
-            {t('onboarding.welcome.demoSuccess') || "You've got it!"}
+            {t('onboarding.welcome.demoSuccess')}
           </div>
         </motion.div>
       )}
@@ -252,7 +252,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       {/* Scoring formula card */}
       <div className="bg-neo-yellow border-4 border-neo-black rounded-neo-lg p-4 shadow-hard rotate-[1.5deg]">
         <h4 className="font-black text-neo-black text-lg uppercase italic mb-3 text-center">
-          {t('howToPlay.scoreMultipliers') || 'Score Multipliers'}
+          {t('howToPlay.scoreMultipliers')}
         </h4>
         <div className="space-y-2">
           {[
@@ -282,7 +282,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         </div>
         <div>
           <h5 className="text-white font-black uppercase text-sm">
-            {t('howToPlay.comboBonus') || 'Combo Bonus!'}
+            {t('howToPlay.comboBonus')}
           </h5>
           <p className="text-slate-300 text-xs font-medium leading-tight">
             {t('howToPlay.steps.combo.description')}
@@ -299,7 +299,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       >
         <h4 className="text-neo-pink font-black uppercase text-sm mb-3 flex items-center gap-2">
           <Lightbulb className="w-4 h-4" />
-          {t('howToPlay.proTipsTitle') || 'Pro Tips for Champions'}
+          {t('howToPlay.proTipsTitle')}
         </h4>
         <ul className="space-y-2.5">
           {[1, 2, 4].map((num) => (
@@ -338,7 +338,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       >
         <div className="flex justify-between items-center mb-2.5">
           <span className="font-neo-display font-black text-white text-sm tracking-widest uppercase">
-            {t('howToPlay.missionBriefing') || 'Mission Briefing'}
+            {t('howToPlay.missionBriefing')}
           </span>
           <span className="font-black text-white text-base">
             {currentStep + 1} / {steps.length}
@@ -378,7 +378,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         <button
           onClick={onClose}
           className="absolute top-5 end-5 w-10 h-10 bg-neo-pink border-4 border-neo-black rounded-neo-lg shadow-hard-sm flex items-center justify-center hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
-          aria-label={t('common.close') || 'Close'}
+          aria-label={t('common.close')}
         >
           <X className="w-5 h-5 text-neo-black" strokeWidth={3} />
         </button>
@@ -424,7 +424,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             active:enabled:translate-x-0.5 active:enabled:translate-y-0.5 active:enabled:shadow-hard-pressed"
         >
           <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-          <span>{t('howToPlay.back') || 'Back'}</span>
+          <span>{t('howToPlay.back')}</span>
         </button>
 
         {/* Step dots */}
@@ -458,7 +458,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard
               active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
           >
-            <span>{t('howToPlay.done') || 'Done'}</span>
+            <span>{t('howToPlay.done')}</span>
             <Check className="w-5 h-5" strokeWidth={3} />
           </button>
         ) : (
@@ -469,7 +469,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard
               active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
           >
-            <span>{t('howToPlay.nextStep') || 'Next'}</span>
+            <span>{t('howToPlay.nextStep')}</span>
             <ArrowRight className="w-4 h-4 rtl:rotate-180" />
           </button>
         )}

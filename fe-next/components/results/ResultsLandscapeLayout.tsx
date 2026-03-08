@@ -141,7 +141,7 @@ export function ResultsLandscapeLayout({
                   {selectedGameMode !== undefined && onSelectGameMode && (
                     <div className="w-full bg-neo-navy-light/50 border-2 border-neo-white/10 rounded-neo p-2">
                       <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-1.5">
-                        {t('gameModes.nextMode') || 'Next Mode'}
+                        {t('gameModes.nextMode')}
                       </p>
                       <GameModeSelector
                         selectedMode={selectedGameMode}
@@ -157,7 +157,7 @@ export function ResultsLandscapeLayout({
                     className="w-full bg-neo-green text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
                   >
                     <Play className="w-5 h-5" />
-                    {t('hostView.startGame') || 'Start Game'}
+                    {t('hostView.startGame')}
                   </button>
                   <button
                     onClick={onExitRoom}
@@ -198,7 +198,7 @@ export function ResultsLandscapeLayout({
                       {t('results.imReady')}
                     </button>
                     <p className="text-center text-[10px] text-neo-cream/50">
-                      {t('results.readyExplanation') || 'Tap to let the host know you want to play again'}
+                      {t('results.readyExplanation')}
                     </p>
                   </div>
                   <button
@@ -221,7 +221,7 @@ export function ResultsLandscapeLayout({
             className="w-full max-w-xs bg-neo-blue text-white font-bold text-sm py-3 px-4 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
           >
             <DoorOpen className="w-4 h-4" />
-            {t('results.playAgain') || 'Play Again'}
+            {t('results.playAgain')}
           </button>
         )}
       </div>

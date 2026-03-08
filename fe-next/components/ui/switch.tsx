@@ -13,10 +13,10 @@ const Switch = React.forwardRef<
     <SwitchPrimitives.Root
       className={cn(
         "peer inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border-2 border-neo-black transition-all duration-200",
-        "shadow-[2px_2px_0_0_#000] rtl:shadow-[-2px_2px_0_0_#000]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "shadow-hard-sm",
+        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        "data-[state=checked]:bg-neo-purple data-[state=checked]:shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.2)]",
+        "data-[state=checked]:bg-neo-purple data-[state=checked]:shadow-hard-pressed",
         "data-[state=unchecked]:bg-neo-cream",
         className
       )}

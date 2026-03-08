@@ -84,7 +84,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
               onClick={onClose}
               autoFocus
               className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-1.5 rounded-neo hover:bg-neo-black/10 transition-colors"
-              aria-label={t('common.close') || 'Close'}
+              aria-label={t('common.close')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -97,7 +97,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                 id="share-modal-title"
                 className="font-black text-base sm:text-lg uppercase text-neo-black dark:text-neo-white"
               >
-                {t('landing.shareModalTitle') || 'Invite Friends & Earn XP'}
+                {t('landing.shareModalTitle')}
               </h2>
             </div>
 
@@ -115,13 +115,13 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
               >
                 <div>
                   <div className="text-[10px] font-bold uppercase tracking-wide text-neo-black/50 dark:text-white/50 mb-0.5">
-                    {t('profile.yourReferralCode') || 'Your Code'}
+                    {t('profile.yourReferralCode')}
                   </div>
                   <code className="text-xl font-black text-neo-pink tracking-wider">{referralCode}</code>
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] font-bold uppercase tracking-wide text-neo-black/50 dark:text-white/50 mb-0.5">
-                    {t('common.reward') || 'Reward'}
+                    {t('common.reward')}
                   </div>
                   <div className="text-lg font-black text-neo-lime">+{referralRewardXp} XP</div>
                 </div>
@@ -130,7 +130,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
 
             {isAuthenticated && !isLoading && (
               <p className="text-sm font-bold text-neo-pink mb-4">
-                ✨ {t('landing.shareXpReward') || 'You earn +100 XP when they join!'}
+                ✨ {t('landing.shareXpReward')}
               </p>
             )}
 
@@ -139,7 +139,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                 data-testid="share-modal-guest-nudge"
                 className="text-sm text-neo-black/70 dark:text-white/70 mb-4 bg-neo-lime/20 rounded-neo p-3 border-2 border-neo-lime/50"
               >
-                🎯 {t('landing.shareGuestNudge') || 'Sign in to get your personal link & earn XP'}
+                🎯 {t('landing.shareGuestNudge')}
               </p>
             )}
 
@@ -154,7 +154,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                   'transition-shadow hover:shadow-hard-lg active:shadow-none',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
                 )}
-                aria-label={t('common.shareViaWhatsApp') || 'Share via WhatsApp'}
+                aria-label={t('common.shareViaWhatsApp')}
               >
                 <WhatsAppIcon className="w-4 h-4 shrink-0" />
                 <span className="text-sm hidden sm:inline">WhatsApp</span>
@@ -170,7 +170,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                   'transition-shadow hover:shadow-hard-lg active:shadow-none',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
                 )}
-                aria-label={t('common.shareViaTelegram') || 'Share via Telegram'}
+                aria-label={t('common.shareViaTelegram')}
               >
                 <TelegramIcon className="w-4 h-4 shrink-0" />
                 <span className="text-sm hidden sm:inline">Telegram</span>
@@ -186,10 +186,10 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                   'transition-shadow hover:shadow-hard-lg active:shadow-none',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
                 )}
-                aria-label={t('common.share') || 'Share'}
+                aria-label={t('common.share')}
               >
                 <Share2 className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span className="text-sm hidden sm:inline">{t('common.share') || 'Share'}</span>
+                <span className="text-sm hidden sm:inline">{t('common.share')}</span>
               </button>
             </div>
 
@@ -211,7 +211,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
               ) : (
                 <Copy className="w-4 h-4 shrink-0" aria-hidden="true" />
               )}
-              <span aria-live="polite">{copied ? (t('common.copied') || 'Copied!') : (t('common.copy') || 'Copy Link')}</span>
+              <span aria-live="polite">{copied ? (t('common.copied')) : (t('common.copy'))}</span>
             </button>
           </m.div>
         </>

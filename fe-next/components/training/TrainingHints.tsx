@@ -148,10 +148,10 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
 
   const getHintText = (type: TrainingHintType): string => {
     const texts: Record<TrainingHintType, string> = {
-      diagonal: t('training.hints.tryDiagonal') || 'Try dragging diagonally! ↗️',
-      directionChange: t('training.hints.changeDirection') || 'Pro tip: Change direction mid-word!',
-      corners: t('training.hints.checkCorners') || 'Check the corners for hidden words!',
-      longWords: t('training.hints.longerWords') || 'Longer words = more points! Try 5+ letters',
+      diagonal: t('training.hints.tryDiagonal'),
+      directionChange: t('training.hints.changeDirection'),
+      corners: t('training.hints.checkCorners'),
+      longWords: t('training.hints.longerWords'),
     };
     return texts[type];
   };
@@ -275,7 +275,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                   'font-bold text-sm',
                   isDarkMode ? 'text-green-300' : 'text-green-700'
                 )}>
-                  {t('training.hints.skillsUnlocked') || 'Skills unlocked! You\'re ready!'}
+                  {t('training.hints.skillsUnlocked')}
                 </span>
               </div>
               {/* Progress bar showing auto-dismiss timer */}

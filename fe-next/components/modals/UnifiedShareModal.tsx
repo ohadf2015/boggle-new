@@ -221,7 +221,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
         )}>
           {isPostGame && <Trophy className="w-5 h-5 text-neo-black" />}
           <DialogTitle className={cn('text-lg font-black uppercase', headerTextColor)}>
-            {isPostGame ? t('share.shareVictory') || 'Share Your Victory!' : t('share.modalTitle')}
+            {isPostGame ? t('share.shareVictory') : t('share.modalTitle')}
           </DialogTitle>
         </div>
 
@@ -382,7 +382,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             className="hidden sm:flex flex-col items-center"
           >
             <p className="text-xs font-bold text-white/70 uppercase tracking-wide mb-2">
-              {t('share.scanToJoin') || 'Scan to join'}
+              {t('share.scanToJoin')}
             </p>
             <div
               className="bg-white text-neo-black p-5 rounded-neo border-3 border-neo-black shadow-hard-md"
@@ -495,7 +495,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
               )}
             >
-              <span>{showMorePlatforms ? (t('share.lessOptions') || 'Less options') : (t('share.morePlatforms') || 'More platforms')}</span>
+              <span>{showMorePlatforms ? (t('share.lessOptions')) : (t('share.morePlatforms'))}</span>
               <svg
                 className={cn('w-3.5 h-3.5 transition-transform', showMorePlatforms && 'rotate-180')}
                 fill="none"
@@ -522,7 +522,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.05 }}
                   onClick={handleTwitter}
-                  aria-label={t('share.twitter') || 'Twitter/X'}
+                  aria-label={t('share.twitter')}
                   className={cn(
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
@@ -536,7 +536,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
-                  <span>{t('share.twitter') || 'X'}</span>
+                  <span>{t('share.twitter')}</span>
                 </motion.button>
 
                 {/* Discord */}
@@ -545,7 +545,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                   onClick={handleDiscord}
-                  aria-label={t('share.discord') || 'Discord'}
+                  aria-label={t('share.discord')}
                   className={cn(
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
@@ -557,7 +557,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   )}
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>{t('share.discord') || 'Discord'}</span>
+                  <span>{t('share.discord')}</span>
                 </motion.button>
 
                 {/* Email */}
@@ -566,7 +566,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.15 }}
                   onClick={handleEmail}
-                  aria-label={t('share.email') || 'Email'}
+                  aria-label={t('share.email')}
                   className={cn(
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
@@ -578,7 +578,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   )}
                 >
                   <Mail className="w-4 h-4" />
-                  <span>{t('share.email') || 'Email'}</span>
+                  <span>{t('share.email')}</span>
                 </motion.button>
 
                 {/* SMS - Mobile Only */}
@@ -588,7 +588,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     onClick={handleSms}
-                    aria-label={t('share.sms') || 'SMS'}
+                    aria-label={t('share.sms')}
                     className={cn(
                       'flex items-center justify-center gap-2 p-3 rounded-neo',
                       'border-2 border-neo-black shadow-hard-sm',
@@ -600,7 +600,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     )}
                   >
                     <MessageCircle className="w-4 h-4" />
-                    <span>{t('share.sms') || 'SMS'}</span>
+                    <span>{t('share.sms')}</span>
                   </motion.button>
                 )}
               </motion.div>
@@ -648,7 +648,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.45 }}
                 onClick={handleNativeShare}
-                aria-label={t('share.more') || 'More Options'}
+                aria-label={t('share.more')}
                 className={cn(
                   'w-full sm:hidden flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-white/30 shadow-hard-sm',
@@ -658,7 +658,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
                 )}
               >
-                <span>{t('share.more') || 'More Options...'}</span>
+                <span>{t('share.more')}</span>
               </motion.button>
             )}
           </motion.div>

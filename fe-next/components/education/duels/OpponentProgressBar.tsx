@@ -51,7 +51,7 @@ export function OpponentProgressBar({
         <span className="text-neo-black font-neo-body font-bold text-sm truncate">
           {myName}
         </span>
-        <span className="text-neo-black font-neo-body font-bold text-sm ml-2">
+        <span className="text-neo-black font-neo-body font-bold text-sm ms-2">
           {myScore}
         </span>
       </motion.div>
@@ -64,7 +64,7 @@ export function OpponentProgressBar({
         animate={{ width: `${opponentPercentage}%` }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
-        <span className="text-neo-white font-neo-body font-bold text-sm ml-2">
+        <span className="text-neo-white font-neo-body font-bold text-sm ms-2">
           {opponentScore}
         </span>
         <span className="text-neo-white font-neo-body font-bold text-sm truncate">

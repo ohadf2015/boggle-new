@@ -205,7 +205,7 @@ export function LevelUpCelebration({
             <span className="text-4xl font-black text-neo-black">{level}</span>
           </div>
           <h2 className="text-2xl font-black text-neo-lime">
-            {t('levelUp.title') || 'Level Up!'}
+            {t('levelUp.title')}
           </h2>
           {rewards?.coins && (
             <p className="text-neo-white mt-2">+{rewards.coins} coins</p>
@@ -325,7 +325,7 @@ export function LevelUpCelebration({
 
             {/* Title */}
             <h2 className="level-title text-3xl md:text-4xl font-black text-neo-lime mb-2 drop-shadow-[0_4px_0_black]">
-              {t('levelUp.title') || 'Level Up!'}
+              {t('levelUp.title')}
             </h2>
 
             <p className="level-title text-neo-white/80 text-lg mb-4">
@@ -353,7 +353,7 @@ export function LevelUpCelebration({
                   >
                     <span className="text-xl">💰</span>
                     <span className="font-black text-neo-black">
-                      +{rewards.coins} {t('common.coins') || 'Coins'}
+                      +{rewards.coins} {t('common.coins')}
                     </span>
                   </motion.div>
                 )}
@@ -379,7 +379,7 @@ export function LevelUpCelebration({
               animate={{ opacity: 1 }}
               transition={{ delay: 2 }}
             >
-              {t('common.tapToContinue') || 'Tap to continue'}
+              {t('common.tapToContinue')}
             </motion.p>
 
             {/* Celebration Mascot - appears after reveal */}

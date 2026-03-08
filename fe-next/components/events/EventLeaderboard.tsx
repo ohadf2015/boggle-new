@@ -58,14 +58,14 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
       <div className="px-4 py-3 border-b-3 border-black bg-neo-navy flex items-center gap-2">
         <Trophy size={18} className="text-neo-yellow" />
         <h3 className="font-neo-display font-bold text-white">
-          {t('events.leaderboard') || 'Leaderboard'}
+          {t('events.leaderboard')}
         </h3>
       </div>
 
       {/* Empty state */}
       {participants.length === 0 ? (
         <div className="p-6 text-center text-white/50 text-sm">
-          {t('events.noParticipants') || 'No participants yet'}
+          {t('events.noParticipants')}
         </div>
       ) : (
         <div className={cn('divide-y divide-white/10', compact && 'max-h-60 overflow-y-auto')}>
@@ -114,8 +114,8 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
                     )}>
                       {p.username}
                       {isCurrentUser && (
-                        <span className="ml-1 text-xs text-neo-yellow/70">
-                          ({t('events.you') || 'You'})
+                        <span className="ms-1 text-xs text-neo-yellow/70">
+                          ({t('events.you')})
                         </span>
                       )}
                     </span>

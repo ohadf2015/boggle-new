@@ -154,7 +154,7 @@ export const GameGridArea = memo(function GameGridArea({
                 exit={{ opacity: 0 }}
                 className="text-neo-cyan font-bold text-sm animate-pulse"
               >
-                {t('common.validating') || 'Validating...'}
+                {t('common.validating')}
               </motion.div>
             )}
 
@@ -174,8 +174,8 @@ export const GameGridArea = memo(function GameGridArea({
               >
                 <span>
                   {minWordLength === 2
-                    ? t('adventure.hints.minLetters2') || '2+ letters'
-                    : t('adventure.hints.minLetters3') || '3+ letters'
+                    ? t('adventure.hints.minLetters2')
+                    : t('adventure.hints.minLetters3')
                   }
                 </span>
                 <span className="font-black text-neo-lime">

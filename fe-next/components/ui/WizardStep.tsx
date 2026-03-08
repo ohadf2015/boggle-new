@@ -137,7 +137,7 @@ export function WizardStep({
               )}
             >
               <ArrowLeft
-                className={cn('w-4 h-4', isRTL ? 'ml-2 rotate-180' : 'mr-2')}
+                className="w-4 h-4 me-2 rtl:rotate-180"
               />
               {backLabel || defaultBackLabel}
             </Button>
@@ -162,13 +162,13 @@ export function WizardStep({
                 isLoading && 'opacity-50'
               )}
             >
-              {isLoading && <span className="animate-spin mr-2">⏳</span>}
+              {isLoading && <span className="animate-spin me-2">⏳</span>}
               {nextLabel || defaultNextLabel}
               {!isLoading && !isLastStep && (
                 <ArrowRight
                   className={cn(
                     'w-4 h-4',
-                    isRTL ? 'mr-2 rotate-180' : 'ml-2'
+                    'ms-2 rtl:rotate-180'
                   )}
                 />
               )}

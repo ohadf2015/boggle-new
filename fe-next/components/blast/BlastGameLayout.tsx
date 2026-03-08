@@ -180,6 +180,7 @@ export function BlastGameLayout({
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [shakeClass, setShakeClass] = useState('');
   const [cascadeAnnouncement, setCascadeAnnouncement] = useState<string | null>(null);
+  const [showMpCelebration, setShowMpCelebration] = useState(false);
   const prevExplosionsRef = useRef(0);
   const prevCascadeRef = useRef(0);
 
@@ -211,7 +212,7 @@ export function BlastGameLayout({
   // Cascade chain announcement + haptic
   useEffect(() => {
     if (cascadeChainLevel > prevCascadeRef.current && cascadeChainLevel >= 1) {
-      setCascadeAnnouncement((t('blast.cascadeChain') || '').replace('{level}', String(cascadeChainLevel)));
+      setCascadeAnnouncement(t('blast.cascadeChain')?.replace('{level}', String(cascadeChainLevel)) || `CASCADE x${cascadeChainLevel}`);
       vibrateBlastCascade();
       const timer = setTimeout(() => setCascadeAnnouncement(null), 1500);
       prevCascadeRef.current = cascadeChainLevel;
@@ -221,7 +222,7 @@ export function BlastGameLayout({
       prevCascadeRef.current = 0;
     }
     return undefined;
-  }, [cascadeChainLevel, t]);
+  }, [cascadeChainLevel]);
 
   // Auto-clear hint after 2000ms
   useEffect(() => {
@@ -231,6 +232,19 @@ export function BlastGameLayout({
     }, 2000);
     return () => clearTimeout(timer);
   }, [hintPath, onClearHint]);
+
+  // MP board-clear celebration: show briefly then auto-dismiss
+  useEffect(() => {
+    if (isMultiplayer && isComplete) {
+      setShowMpCelebration(true);
+      const timer = setTimeout(() => setShowMpCelebration(false), 2500);
+      return () => clearTimeout(timer);
+    }
+    if (!isComplete) {
+      setShowMpCelebration(false);
+    }
+    return undefined;
+  }, [isMultiplayer, isComplete]);
 
   // Combo-based grid glow color
   const comboGlow = comboLevel >= 7
@@ -285,7 +299,7 @@ export function BlastGameLayout({
             className="px-2 py-0.5 rounded-neo border-2 border-fuchsia-400/60 bg-fuchsia-500/20"
           >
             <span className="font-black text-xs text-fuchsia-300 uppercase tracking-wider">
-              {(t('blast.waveBadge') || '').replace('{wave}', String(waveNumber))}
+              {t('blast.waveBadge')?.replace('{wave}', String(waveNumber)) || `Wave ${waveNumber}`}
             </span>
           </motion.div>
         )}
@@ -363,11 +377,8 @@ export function BlastGameLayout({
         )}
       </AnimatePresence>
 
-      {/* Stats row: MP = Score + Words only; SP = Score + Moves + Words + Progress */}
-      <div className={cn(
-        'px-4 flex items-center shrink-0 relative z-30 mb-2 max-w-md mx-auto w-full',
-        isMultiplayer ? 'justify-center gap-6' : 'justify-between',
-      )}>
+      {/* Stats row: Score (left), Words (center), Progress (right) */}
+      <div className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-2 max-w-md mx-auto w-full">
         {/* Score */}
         <motion.div
           key={score}
@@ -388,15 +399,13 @@ export function BlastGameLayout({
           </div>
         </motion.div>
 
-        {/* Move counter (SP only — visible when move limit is finite) */}
-        {!isMultiplayer && (
-          <BlastMoveCounter
-            movesRemaining={movesRemaining}
-            totalMoves={totalMoves}
-            t={t}
-            bonusMoveAwarded={bonusMoveAwarded}
-          />
-        )}
+        {/* Move counter (visible when move limit is finite) */}
+        <BlastMoveCounter
+          movesRemaining={movesRemaining}
+          totalMoves={totalMoves}
+          t={t}
+          bonusMoveAwarded={bonusMoveAwarded}
+        />
 
         {/* Words found count - clickable to expand list */}
         <button
@@ -409,12 +418,10 @@ export function BlastGameLayout({
           </div>
         </button>
 
-        {/* Progress (SP only — MP has no board-clear objective) */}
-        {!isMultiplayer && (
-          <div className="w-28 sm:w-32">
-            <BlastProgressBar cleared={tilesCleared} total={totalTiles} t={t} />
-          </div>
-        )}
+        {/* Progress */}
+        <div className="w-28 sm:w-32">
+          <BlastProgressBar cleared={tilesCleared} total={totalTiles} t={t} />
+        </div>
       </div>
 
       {/* MP Lead Change Banner — pop-up style like classic game */}
@@ -424,8 +431,8 @@ export function BlastGameLayout({
         </div>
       )}
 
-      {/* Score threshold progress (SP wave 3+ only) */}
-      {!isMultiplayer && scoreThreshold && score < scoreThreshold && (
+      {/* Score threshold progress (visible on wave 3+) */}
+      {scoreThreshold && score < scoreThreshold && (
         <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
           <div className="text-[10px] font-bold text-white/40 uppercase tracking-wider text-center">
             {t('blast.needScore')} {scoreThreshold - score} {t('blast.morePoints')}
@@ -433,8 +440,8 @@ export function BlastGameLayout({
         </div>
       )}
 
-      {/* Cumulative score indicator (SP wave 2+ only) */}
-      {!isMultiplayer && cumulativeScore > 0 && (
+      {/* Cumulative score indicator (wave 2+) */}
+      {cumulativeScore > 0 && (
         <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
           <div className="text-[10px] font-bold text-fuchsia-300/50 uppercase tracking-wider text-center tabular-nums">
             {t('blast.totalScore')}: {(cumulativeScore + score).toLocaleString()}
@@ -601,7 +608,30 @@ export function BlastGameLayout({
           )}
         </AnimatePresence>
 
-        {/* MP board-clear toast removed — MP blast focuses on score, not board clear */}
+        {/* MP board-clear toast — non-blocking, auto-dismisses */}
+        <AnimatePresence>
+          {isMultiplayer && showMpCelebration && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.8 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            >
+              <div className={cn(
+                'px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
+                'bg-gradient-to-r from-neo-lime via-yellow-300 to-neo-orange',
+                'flex items-center gap-2'
+              )}>
+                <Star className="h-5 w-5 text-neo-black fill-neo-orange" />
+                <span className="font-black text-lg uppercase text-neo-black">
+                  {t('blast.complete')}
+                </span>
+                <Star className="h-5 w-5 text-neo-black fill-neo-orange" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <BlastGrid
           grid={grid}
@@ -631,8 +661,8 @@ export function BlastGameLayout({
       <ConfirmationDialog
         open={showQuitConfirm}
         onOpenChange={setShowQuitConfirm}
-        title={t('singlePlayer.quitConfirmTitle') || ''}
-        description={t('singlePlayer.quitConfirmMessage') || ''}
+        title={t('singlePlayer.quitConfirmTitle') ?? ''}
+        description={t('singlePlayer.quitConfirmMessage') ?? ''}
         confirmText={t('singlePlayer.imSure')}
         cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
@@ -643,8 +673,8 @@ export function BlastGameLayout({
       <ConfirmationDialog
         open={showEndGameConfirm}
         onOpenChange={setShowEndGameConfirm}
-        title={t('blast.endGameConfirmTitle') || ''}
-        description={t('blast.endGameConfirmMessage') || ''}
+        title={t('blast.endGameConfirmTitle') ?? ''}
+        description={t('blast.endGameConfirmMessage') ?? ''}
         confirmText={t('blast.giveUp')}
         cancelText={t('common.cancel')}
         onConfirm={onEndGame}

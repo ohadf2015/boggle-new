@@ -131,7 +131,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                 {isRTL ? (
                   <X className="w-5 h-5" />
                 ) : (
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
                 )}
               </button>
 

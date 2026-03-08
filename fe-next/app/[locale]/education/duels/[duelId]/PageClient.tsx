@@ -78,7 +78,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
       <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-screen">
         <PageLoader
           size="lg"
-          text={t('common.loading') || 'Loading...'}
+          text={t('common.loading')}
         />
       </div>
     );

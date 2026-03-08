@@ -164,11 +164,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // --- LANDSCAPE MODE (unchanged) ---
   if (isLandscape) {
     const bannerLabels = {
-      tryAgain: t('singlePlayer.tryAgain') || 'Try Again!',
-      keepPracticing: t('singlePlayer.keepPracticing') || 'Keep Practicing!',
-      newHighScore: t('singlePlayer.newHighScore') || 'New High Score!',
-      victory: t('singlePlayer.victory') || 'Victory!',
-      gameOver: t('singlePlayer.gameOver') || 'Game Over',
+      tryAgain: t('singlePlayer.tryAgain'),
+      keepPracticing: t('singlePlayer.keepPracticing'),
+      newHighScore: t('singlePlayer.newHighScore'),
+      victory: t('singlePlayer.victory'),
+      gameOver: t('singlePlayer.gameOver'),
     };
 
     return (
@@ -181,7 +181,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           />
           <ScoreDisplay
             score={results.playerScore} wordCount={validWordCount}
-            scoreLabel={t('common.score') || 'Score'} wordsLabel={t('common.words') || 'Words'}
+            scoreLabel={t('common.score')} wordsLabel={t('common.words')}
           />
           {mode === 'solo-bots' && playerArchetype && (
             <PlayerArchetypeBadge archetype={playerArchetype} size="sm" />
@@ -199,10 +199,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         <div className="w-1/2 flex flex-col gap-2 overflow-y-auto scrollable-area">
           <LandscapeWordsSection
             wordsByPoints={wordsByPoints} sortedPointGroups={sortedPointGroups}
-            title={t('results.yourWords') || 'Your Words'}
+            title={t('results.yourWords')}
           />
           {mode === 'solo-bots' && allParticipants.length > 1 && (
-            <RankingsSection participants={allParticipants} maxDisplay={4} title={t('results.rankings') || 'Rankings'} />
+            <RankingsSection participants={allParticipants} maxDisplay={4} title={t('results.rankings')} />
           )}
           {mode === 'solo-bots' && missedWords.length > 0 && (
             <MissedWords missedWords={missedWords} maxDisplay={3} className="text-sm" />
@@ -258,7 +258,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
           {/* 3. Global Rank Badge */}
           {globalRank && (
-            <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank') || 'Global Rank'} />
+            <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
           )}
 
           {/* 4. Info Cards (3-col desktop, stacked mobile) */}
@@ -292,7 +292,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 onClick={onBackToLobby}
               >
                 <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />
-                {t('nextStep.backToLobby') || 'Back to Lobby'}
+                {t('nextStep.backToLobby')}
               </Button>
             </div>
           </div>
@@ -314,7 +314,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             <div className="flex items-center gap-2">
               <div className="w-1 h-6 bg-neo-lime rounded-full" />
               <h3 className="text-[10px] sm:text-xs font-black text-white/30 uppercase tracking-wider">
-                {t('results.detailedAnalysis') || 'Detailed Analysis'}
+                {t('results.detailedAnalysis')}
               </h3>
             </div>
 
@@ -324,7 +324,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 sortedPointGroups={sortedPointGroups}
                 invalidWords={invalidWords}
                 wordCount={results.playerWordData.length}
-                title={t('results.yourWords') || 'Your Words'}
+                title={t('results.yourWords')}
                 t={t}
                 defaultExpanded={false}
               />
@@ -333,7 +333,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {playerInsights && (
               <PerformanceSection
                 insights={playerInsights}
-                title={t('results.performanceDetails') || 'Performance Details'}
+                title={t('results.performanceDetails')}
                 archetype={playerArchetype}
               />
             )}
@@ -346,14 +346,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               <BotWordsSection
                 botWordDetails={botWordDetails}
                 language={gameLanguage}
-                title={t('singlePlayer.botWordsFound') || 'Bot Words Found'}
+                title={t('singlePlayer.botWordsFound')}
                 t={t}
                 defaultExpanded={false}
               />
             )}
 
             <CollapsibleSection
-              title={t('results.performanceHistory') || 'Performance History'}
+              title={t('results.performanceHistory')}
               icon={<TrendingUp className="w-4 h-4" />}
               defaultExpanded={false}
               variant="tertiary"
@@ -365,8 +365,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {results.achievements && results.achievements.length > 4 && (
               <AchievementsSection
                 achievements={results.achievements}
-                title={t('hostView.achievements') || 'Achievements'}
-                disclaimer={t('singlePlayer.achievementsNotSaved') || 'Achievements in single player mode are not saved to your profile.'}
+                title={t('hostView.achievements')}
+                disclaimer={t('singlePlayer.achievementsNotSaved')}
                 defaultExpanded={false}
               />
             )}

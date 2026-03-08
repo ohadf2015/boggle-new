@@ -42,7 +42,7 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
       >
         <nav aria-label="Legal" className="flex items-center justify-center gap-2 text-[10px] text-neo-cream/50">
           <Link href={`/${language}/contact`} className="hover:text-neo-cream/80 transition-colors">
-            {t('footer.contact') || 'Contact'}
+            {t('footer.contact')}
           </Link>
           <span>·</span>
           <Link href={`/${language}/legal/privacy`} className="hover:text-neo-cream/80 transition-colors">
@@ -54,7 +54,7 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
           </Link>
           <span>·</span>
           <Link href={`/${language}/about`} className="hover:text-neo-cream/80 transition-colors">
-            {t('footer.about') || 'About'}
+            {t('footer.about')}
           </Link>
         </nav>
       </footer>

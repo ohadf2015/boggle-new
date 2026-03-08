@@ -220,7 +220,7 @@ export function DesktopGameLayout({
               className="flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
             >
               <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-              {t('common.quit') || 'Quit'}
+              {t('common.quit')}
             </button>
 
             {/* Coins display - center, yellow tilted badge */}
@@ -237,7 +237,7 @@ export function DesktopGameLayout({
                 <span className="font-black text-base text-neo-black">
                   {score > 0 ? COIN_EARNING_OTHER.SINGLEPLAYER_BASE + Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR) : 0}
                 </span>
-                <span className="text-[8px] font-bold text-neo-black/60 uppercase">{t('common.coins') || 'coins'}</span>
+                <span className="text-[8px] font-bold text-neo-black/60 uppercase">{t('common.coins')}</span>
               </div>
             </AdaptiveMotion.div>
 
@@ -247,7 +247,7 @@ export function DesktopGameLayout({
                 onClick={onFinishPractice}
                 className="flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
               >
-                {t('singlePlayer.finish') || 'Finish'}
+                {t('singlePlayer.finish')}
               </button>
             ) : (
               <button
@@ -301,7 +301,7 @@ export function DesktopGameLayout({
                 >
                   <div className="relative bg-gradient-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-6 rounded-lg border-3 border-neo-black shadow-hard-sm">
                     <span className="font-bold text-sm uppercase tracking-wide">
-                      {t('singlePlayer.dragInstruction') || 'Drag across letters to form words!'}
+                      {t('singlePlayer.dragInstruction')}
                     </span>
                     <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-neo-pink border-b-3 border-r-3 border-neo-black rotate-45" />
                   </div>
@@ -354,17 +354,17 @@ export function DesktopGameLayout({
       <ConfirmationDialog
         open={showQuitConfirm}
         onOpenChange={setShowQuitConfirm}
-        title={t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
-        description={t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
-        confirmText={t('common.quit') || 'Quit'}
-        cancelText={t('common.cancel') || 'Cancel'}
+        title={t('singlePlayer.quitConfirmTitle')}
+        description={t('singlePlayer.quitConfirmMessage')}
+        confirmText={t('common.quit')}
+        cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
         variant="danger"
       />
 
       {/* Screen reader status */}
       <div className="sr-only" role="status" aria-live="polite">
-        {isPaused && (t('singlePlayer.gamePaused') || 'Game paused')}
+        {isPaused && (t('singlePlayer.gamePaused'))}
       </div>
     </div>
   );

@@ -88,7 +88,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
       return {
         icon: achievement.icon,
         name: t(`achievements.${achievement.key}.name`) || achievement.key,
-        description: t(`achievements.${achievement.key}.description`) || ''
+        description: t(`achievements.${achievement.key}.description`)
       };
     }
 

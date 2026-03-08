@@ -289,8 +289,8 @@ function HostPreGameView({
   const handleEmptySlotClick = useCallback(async () => {
     const joinUrl = getJoinUrl(gameCode, 'lobby-slot');
     const shared = await tryNativeShare({
-      title: t('share.inviteTitle') || 'Join my LexiClash game!',
-      text: `${t('share.inviteMessage') || 'Join my LexiClash game!'}\n${t('share.code') || 'Code'}: ${gameCode}`,
+      title: t('share.inviteTitle'),
+      text: `${t('share.inviteMessage')}\n${t('share.code')}: ${gameCode}`,
       url: joinUrl,
     });
     if (!shared) {
@@ -321,7 +321,7 @@ function HostPreGameView({
     <section className="space-y-2">
       <div className="flex items-center justify-between px-1">
         <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
-          {t('hostView.playersInRoom') || 'Players in Room'}
+          {t('hostView.playersInRoom')}
         </h3>
         {hostLabel && (
           <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -392,13 +392,13 @@ function HostPreGameView({
             key={`empty-${i}`}
             onClick={handleEmptySlotClick}
             className="flex-shrink-0 flex flex-col items-center gap-2 pt-2 cursor-pointer group"
-            aria-label={t('hostView.invitePlayer') || 'Invite player'}
+            aria-label={t('hostView.invitePlayer')}
           >
             <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center group-hover:border-neo-cyan/60 group-hover:bg-white/10 transition-colors">
               <Plus className="w-5 h-5 text-neo-cyan/50 group-hover:text-neo-cyan transition-colors" />
             </div>
             <span className="text-xs font-bold text-slate-600 uppercase group-hover:text-slate-400 transition-colors">
-              {t('share.invite') || 'Invite'}
+              {t('share.invite')}
             </span>
           </button>
         ))}
@@ -424,17 +424,17 @@ function HostPreGameView({
             </div>
             <div className="text-start">
               <h2 className="font-neo-display font-bold text-xl leading-none uppercase text-neo-white">
-                {t('hostView.battleMode') || 'Battle Mode'}
+                {t('hostView.battleMode')}
               </h2>
               <p className="text-xs font-bold uppercase text-neo-cream/50 tracking-widest mt-1">
-                {t('hostView.preset') || 'Preset'}: {t(GAME_PRESETS[selectedPreset].nameKey)}
+                {t('hostView.preset')}: {t(GAME_PRESETS[selectedPreset].nameKey)}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex flex-col items-end gap-1">
               <span className="bg-neo-cyan/20 text-neo-cyan px-2 py-0.5 border-2 border-neo-cyan/40 rounded text-xs font-black">
-                {timerValue}:00 {t('common.minutes') || 'MIN'}
+                {timerValue}:00 {t('common.minutes')}
               </span>
               <span className="bg-neo-pink/20 text-neo-pink px-2 py-0.5 border-2 border-neo-pink/40 rounded text-xs font-black">
                 {GAME_PRESETS[selectedPreset].difficulty}
@@ -484,7 +484,7 @@ function HostPreGameView({
         {/* Game Mode Selector */}
         <div className="relative mt-3 pt-3 border-t border-neo-white/10">
           <p className="text-xs font-black uppercase text-neo-cream/50 tracking-widest mb-2">
-            {t('gameModes.nextMode') || 'Next Mode'}
+            {t('gameModes.nextMode')}
           </p>
           <GameModeSelector
             selectedMode={selectedGameMode}
@@ -506,7 +506,7 @@ function HostPreGameView({
             htmlFor="broadcastMode"
             className="text-xs font-bold uppercase text-neo-cream/80 cursor-pointer flex-1"
           >
-            {t('hostView.broadcastModeTitle') || 'TV Mode'}
+            {t('hostView.broadcastModeTitle')}
           </label>
         </div>
 
@@ -517,7 +517,7 @@ function HostPreGameView({
           aria-expanded={showAdvanced}
           aria-controls="advanced-settings-panel"
         >
-          {t('common.advancedSettings') || 'Advanced Settings'}
+          {t('common.advancedSettings')}
           <ChevronDown className={cn('w-3 h-3 transition-transform', showAdvanced && 'rotate-180')} aria-hidden="true" />
         </button>
 
@@ -579,13 +579,13 @@ function HostPreGameView({
             className="bg-neo-orange/20 border border-neo-orange/50 rounded-xl px-4 py-3 flex items-center justify-between"
           >
             <span className="text-neo-orange font-bold text-sm">
-              {t('hostView.noOneYet') || 'No one yet?'} {t('hostView.startingWithBots') || 'Starting with bots in'} {botCountdown}...
+              {t('hostView.noOneYet')} {t('hostView.startingWithBots')} {botCountdown}...
             </span>
             <button
               onClick={cancelBotCountdown}
               className="text-xs font-bold uppercase text-neo-orange border border-neo-orange/50 rounded-lg px-3 py-1 hover:bg-neo-orange/10 transition-colors"
             >
-              {t('common.cancel') || 'Cancel'}
+              {t('common.cancel')}
             </button>
           </motion.div>
         )}
@@ -610,7 +610,7 @@ function HostPreGameView({
 
       {/* 2. Player Roster - Horizontal scroll */}
       <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={1}>
-        {renderPlayerRoster(`${t('hostView.hostIs') || 'Host is'} ${username}`)}
+        {renderPlayerRoster(`${t('hostView.hostIs')} ${username}`)}
       </motion.div>
 
       {/* 3. Battle Mode Settings Card */}
@@ -653,13 +653,13 @@ function HostPreGameView({
           <div className="flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-neo-purple" />
             <span className="text-sm font-bold text-neo-purple">
-              {t('hostView.lessonMode') || 'Lesson Mode'}:
+              {t('hostView.lessonMode')}:
             </span>
             <span className="text-sm text-neo-cream">
               {lessonData.lessonName}
             </span>
             <span className="text-xs text-neo-cream/60">
-              ({lessonData.vocabularyWords.length} {t('hostView.words') || 'words'})
+              ({lessonData.vocabularyWords.length} {t('hostView.words')})
             </span>
           </div>
         </div>
@@ -673,7 +673,7 @@ function HostPreGameView({
             <DJMascotWithEntrance size="sm" delay={0.3} />
             <div className="flex flex-col">
               <span className="text-xs uppercase font-bold text-slate-400 tracking-widest leading-none mb-1">
-                {t('roomCode.label') || 'Room Code'}
+                {t('roomCode.label')}
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-neo-display font-bold text-neo-cyan uppercase leading-none"
@@ -686,7 +686,7 @@ function HostPreGameView({
                     navigator.clipboard.writeText(gameCode);
                   }}
                   className="text-slate-400 hover:text-neo-white transition-colors p-1"
-                  aria-label={t('roomCode.copy') || 'Copy code'}
+                  aria-label={t('roomCode.copy')}
                 >
                   <Copy className="w-4 h-4" />
                 </button>
@@ -705,7 +705,7 @@ function HostPreGameView({
             <button
               onClick={onExitRoom}
               className="w-9 h-9 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
-              aria-label={t('common.exit') || 'Exit'}
+              aria-label={t('common.exit')}
             >
               <LogOut className="w-4 h-4 text-neo-black" />
             </button>
@@ -731,13 +731,13 @@ function HostPreGameView({
                       className="bg-neo-orange/20 border border-neo-orange/50 rounded-xl px-4 py-3 flex items-center justify-between"
                     >
                       <span className="text-neo-orange font-bold text-sm">
-                        {t('hostView.noOneYet') || 'No one yet?'} {t('hostView.startingWithBots') || 'Starting with bots in'} {botCountdown}...
+                        {t('hostView.noOneYet')} {t('hostView.startingWithBots')} {botCountdown}...
                       </span>
                       <button
                         onClick={cancelBotCountdown}
                         className="text-xs font-bold uppercase text-neo-orange border border-neo-orange/50 rounded-lg px-3 py-1 hover:bg-neo-orange/10 transition-colors"
                       >
-                        {t('common.cancel') || 'Cancel'}
+                        {t('common.cancel')}
                       </button>
                     </motion.div>
                   )}
@@ -753,7 +753,7 @@ function HostPreGameView({
                 />
 
                 {/* Player Roster */}
-                {renderPlayerRoster(`${t('hostView.hostIs') || 'Host is'} ${username}`)}
+                {renderPlayerRoster(`${t('hostView.hostIs')} ${username}`)}
 
                 {/* Battle Mode Card */}
                 {renderBattleModeCard()}

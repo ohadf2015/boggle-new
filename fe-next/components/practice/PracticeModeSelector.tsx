@@ -170,7 +170,7 @@ export default function PracticeModeSelector({
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-neo-display text-neo-white">
-              {t('education.practice.title') || 'Practice Mode'}
+              {t('education.practice.title')}
             </h1>
             <p className="text-sm text-neo-white/60">{lessonName}</p>
           </div>
@@ -184,7 +184,7 @@ export default function PracticeModeSelector({
                 <div className="text-center">
                   <p className="text-2xl font-neo-display text-neo-white">{wordCount}</p>
                   <p className="text-xs text-neo-white/60">
-                    {t('education.practice.wordCount') || 'words'}
+                    {t('education.practice.wordCount')}
                   </p>
                 </div>
                 <div className="h-8 w-px bg-neo-black/30" />
@@ -225,7 +225,7 @@ export default function PracticeModeSelector({
                     </p>
                     {getSessionCount(option.type) > 0 && (
                       <p className="text-xs text-neo-white/40 mt-2">
-                        {getSessionCount(option.type)} {t('education.practice.sessionsCompleted') || 'sessions completed'}
+                        {getSessionCount(option.type)} {t('education.practice.sessionsCompleted')}
                       </p>
                     )}
                   </div>

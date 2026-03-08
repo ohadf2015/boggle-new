@@ -180,8 +180,8 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         {disconnected && !isBot && (
           <div
             className="absolute -top-1 -right-1 bg-neo-red text-neo-cream p-1 rounded-full border border-neo-black"
-            aria-label={t('common.playerDisconnected') || 'Disconnected'}
-            title={t('common.playerDisconnected') || 'Disconnected'}
+            aria-label={t('common.playerDisconnected')}
+            title={t('common.playerDisconnected')}
           >
             <WifiOff className="w-3 h-3" />
           </div>
@@ -189,8 +189,8 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         {!disconnected && presenceStatus === 'afk' && !isBot && (
           <div
             className="absolute -top-1 -right-1 bg-neo-orange text-neo-black p-1 rounded-full border border-neo-black"
-            aria-label={t('common.playerAFK') || 'Away'}
-            title={t('common.playerAFK') || 'Away'}
+            aria-label={t('common.playerAFK')}
+            title={t('common.playerAFK')}
           >
             <Clock className="w-3 h-3" />
           </div>

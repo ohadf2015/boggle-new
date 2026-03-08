@@ -96,10 +96,10 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
   const { t, language } = useLanguage();
 
   const steps = [
-    t('landing.seo.step1') || 'Create or join a game room',
-    t('landing.seo.step2') || 'Swipe adjacent letters to form words',
-    t('landing.seo.step3') || 'Build combos for bonus points',
-    t('landing.seo.step4') || 'Score the most points to win!',
+    t('landing.seo.step1'),
+    t('landing.seo.step2'),
+    t('landing.seo.step3'),
+    t('landing.seo.step4'),
   ];
 
   return (
@@ -114,10 +114,10 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.whatIsTitle') || 'What is LexiClash?'}
+          {t('landing.seo.whatIsTitle')}
         </h2>
         <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
-          {t('landing.seo.whatIsContent') || 'LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard.'}
+          {t('landing.seo.whatIsContent')}
         </p>
       </motion.div>
 
@@ -130,7 +130,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
-          {t('landing.seo.featuresTitle') || 'Why Players Love LexiClash'}
+          {t('landing.seo.featuresTitle')}
         </h2>
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
@@ -170,7 +170,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
-          {t('landing.seo.howToPlayTitle') || 'How to Play'}
+          {t('landing.seo.howToPlayTitle')}
         </h2>
         <motion.ol
           className="space-y-2 sm:space-y-3 max-w-2xl"
@@ -205,10 +205,10 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.whoCanPlayTitle') || 'Who Can Play?'}
+          {t('landing.seo.whoCanPlayTitle')}
         </h2>
         <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
-          {t('landing.seo.whoCanPlayContent') || 'LexiClash is designed for everyone — from casual players to competitive word game enthusiasts.'}
+          {t('landing.seo.whoCanPlayContent')}
         </p>
       </motion.div>
 
@@ -221,7 +221,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
-          {t('landing.seo.gameModesTitle') || 'Game Modes Explained'}
+          {t('landing.seo.gameModesTitle')}
         </h2>
         <div className="space-y-3 max-w-3xl">
           {[
@@ -246,10 +246,10 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.educationTitle') || 'Built for Learning'}
+          {t('landing.seo.educationTitle')}
         </h2>
         <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
-          {t('landing.seo.educationContent') || 'Word games are one of the most effective ways to build vocabulary and improve spelling.'}
+          {t('landing.seo.educationContent')}
         </p>
       </motion.div>
 
@@ -262,7 +262,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
-          {t('landing.seo.faqTitle') || 'Frequently Asked Questions'}
+          {t('landing.seo.faqTitle')}
         </h2>
         <dl className="space-y-4 max-w-3xl">
           {[1, 2, 3, 4, 5].map((n) => (
@@ -287,10 +287,10 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-lg sm:text-xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.communityTitle') || 'Join Thousands of Word Game Enthusiasts'}
+          {t('landing.seo.communityTitle')}
         </h2>
         <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
-          {t('landing.seo.communityContent') || 'LexiClash players span over 40 countries and five languages.'}
+          {t('landing.seo.communityContent')}
         </p>
       </motion.div>
 
@@ -302,7 +302,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <h2 className="text-lg sm:text-xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.blogTitle') || 'From Our Blog'}
+          {t('landing.seo.blogTitle')}
         </h2>
         <div className="flex flex-wrap gap-2">
           {BLOG_LINKS.map(({ slug, key, fallback }) => (

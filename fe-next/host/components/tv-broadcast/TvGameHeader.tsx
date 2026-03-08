@@ -50,7 +50,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             role="status"
             aria-live="polite"
-            aria-label={t('tvBroadcast.liveGameInProgress') || 'Live game in progress'}
+            aria-label={t('tvBroadcast.liveGameInProgress')}
           >
             {/* Pulsing recording dot */}
             <motion.div

@@ -104,7 +104,6 @@ function initializeSocketHandlers(io: Server): void {
 // Named exports for TypeScript compatibility
 export { initializeSocketHandlers };
 export { MAX_PLAYERS_PER_ROOM };
-export const handlers = require('./handlers');
 
 // CommonJS exports for backward compatibility
 module.exports = {

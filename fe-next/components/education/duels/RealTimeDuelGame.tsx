@@ -245,7 +245,7 @@ export function RealTimeDuelGame({
         data-testid="realtime-duel-game"
       >
         <Loader size="lg" />
-        <p className="ml-4 text-neo-white">{t('duels.waitingForOpponent')}</p>
+        <p className="ms-4 text-neo-white">{t('duels.waitingForOpponent')}</p>
       </div>
     );
   }

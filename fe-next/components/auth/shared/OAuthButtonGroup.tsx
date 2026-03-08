@@ -89,7 +89,7 @@ export function OAuthButtonGroup({
           ) : (
             <provider.icon className="w-5 h-5" />
           )}
-          <span className="ml-2">
+          <span className="ms-2">
             {t('auth.signInWith', { provider: provider.label })}
           </span>
         </Button>

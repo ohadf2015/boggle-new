@@ -151,7 +151,7 @@ export default function RulesPageClient(): React.JSX.Element {
                         <CardHeader className="bg-neo-lime/20 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Play className="text-neo-black dark:text-white w-5 h-5 sm:w-6 sm:h-6" />
-                                {t('rules.gameModes') || 'Game Modes'}
+                                {t('rules.gameModes')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-2 sm:p-6">
@@ -183,7 +183,7 @@ export default function RulesPageClient(): React.JSX.Element {
                                             className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2 min-h-[44px]"
                                         >
                                             <Link href={`/${language}/multiplayer`}>
-                                                <Users className={`w-3 h-3 sm:w-4 sm:h-4 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
+                                                <Users className={`w-3 h-3 sm:w-4 sm:h-4 me-1 sm:me-2`} />
                                                 {t('landing.multiPlayer')}
                                             </Link>
                                         </Button>
@@ -217,7 +217,7 @@ export default function RulesPageClient(): React.JSX.Element {
                                             className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2 min-h-[44px]"
                                         >
                                             <Link href={`/${language}/singleplayer`}>
-                                                <Bot className={`w-3 h-3 sm:w-4 sm:h-4 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
+                                                <Bot className={`w-3 h-3 sm:w-4 sm:h-4 me-1 sm:me-2`} />
                                                 {t('landing.singlePlayer')}
                                             </Link>
                                         </Button>
@@ -335,7 +335,7 @@ export default function RulesPageClient(): React.JSX.Element {
                             className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-sm sm:text-lg px-4 sm:px-6 py-2.5 sm:py-5 w-full sm:w-auto"
                         >
                             <Link href={`/${language}`}>
-                                <Play className={`w-4 h-4 sm:w-5 sm:h-5 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
+                                <Play className={`w-4 h-4 sm:w-5 sm:h-5 me-1 sm:me-2`} />
                                 {t('rules.startPlaying')}
                             </Link>
                         </Button>
@@ -346,7 +346,7 @@ export default function RulesPageClient(): React.JSX.Element {
                             className="border-2 sm:border-3 border-neo-black font-bold text-sm sm:text-lg px-4 sm:px-6 py-2.5 sm:py-5 w-full sm:w-auto"
                         >
                             <Link href={`/${language}/leaderboard`}>
-                                <Trophy className={`w-4 h-4 sm:w-5 sm:h-5 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
+                                <Trophy className={`w-4 h-4 sm:w-5 sm:h-5 me-1 sm:me-2`} />
                                 {t('leaderboard.viewLeaderboard')}
                             </Link>
                         </Button>

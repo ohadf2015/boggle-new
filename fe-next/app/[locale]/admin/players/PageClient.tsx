@@ -50,7 +50,7 @@ export default function PlayersPageClient() {
             Admin Access Required
           </h1>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4 me-2" />
             Back to Home
           </Button>
         </div>

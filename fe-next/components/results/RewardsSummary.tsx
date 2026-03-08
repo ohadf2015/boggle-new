@@ -130,7 +130,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                 <Sparkles className="w-5 h-5 text-neo-lime" />
               </motion.div>
               <h3 className="font-black text-white uppercase tracking-wider text-sm">
-                {t('results.rewardsEarned') || 'Rewards Earned'}
+                {t('results.rewardsEarned')}
               </h3>
               <motion.div
                 animate={{ rotate: [0, -10, 10, 0] }}
@@ -175,8 +175,8 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                     </div>
                     <div className="text-xs text-white/60 font-medium">
                       {isAuthenticated
-                        ? (t('reveal.coins') || 'Coins')
-                        : (t('coins.signInToEarn') || 'Sign in to earn')}
+                        ? (t('reveal.coins'))
+                        : (t('coins.signInToEarn'))}
                     </div>
                   </div>
                 </div>
@@ -239,8 +239,8 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                     </div>
                     <div className="text-xs text-white/60 font-medium">
                       {achievementsUnlocked === 1
-                        ? (t('results.achievementUnlocked') || 'Achievement Unlocked')
-                        : (t('results.achievementsUnlocked') || 'Achievements Unlocked')}
+                        ? (t('results.achievementUnlocked'))
+                        : (t('results.achievementsUnlocked'))}
                     </div>
                   </div>
                 </div>

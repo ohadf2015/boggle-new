@@ -208,7 +208,7 @@ export default function BulkWordImporter({
                 disabled={parsedWords.length === 0}
                 className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
               >
-                <Upload className="w-4 h-4 mr-2" />
+                <Upload className="w-4 h-4 me-2" />
                 {t('teacher.lesson.bulkImportButton')}
               </Button>
               <Button

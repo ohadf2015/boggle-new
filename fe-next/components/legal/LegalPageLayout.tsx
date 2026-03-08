@@ -41,7 +41,7 @@ export default function LegalPageLayout({
         {/* Breadcrumbs */}
         <Breadcrumbs
           items={breadcrumbs || [
-            { label: t('legal.title') || 'Legal', href: `/${language}/legal` },
+            { label: t('legal.title'), href: `/${language}/legal` },
             { label: title },
           ]}
         />
@@ -167,7 +167,7 @@ export default function LegalPageLayout({
                     isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
                   )}
                 >
-                  {t('legal.disclaimer.title') || 'Disclaimer'}
+                  {t('legal.disclaimer.title')}
                 </a>
               </li>
               <li>

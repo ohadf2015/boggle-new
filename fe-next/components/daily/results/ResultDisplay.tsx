@@ -273,7 +273,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 transition={{ delay: 1.2 }}
                 className="md:hidden text-[10px] text-slate-500"
               >
-                {t('wordHunt.results.tapToCelebrate') || 'Tap to celebrate!'}
+                {t('wordHunt.results.tapToCelebrate')}
               </motion.div>
 
               {/* Countdown — slides up with glow */}
@@ -346,7 +346,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     transition={{ delay: 0.8 }}
                     className="text-neo-pink font-black text-sm uppercase tracking-wider"
                   >
-                    {t('wordHunt.results.gameOver') || 'Game Over'}
+                    {t('wordHunt.results.gameOver')}
                   </motion.span>
                 </div>
               </motion.div>
@@ -362,7 +362,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   {attemptsUsed}<span className="text-slate-600">/10</span>
                 </div>
                 <div className="text-xs text-slate-500 uppercase font-medium mt-1">
-                  {t('wordHunt.results.attemptsUsed') || 'attempts used'}
+                  {t('wordHunt.results.attemptsUsed')}
                 </div>
               </motion.div>
 

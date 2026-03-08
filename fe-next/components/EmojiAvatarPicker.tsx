@@ -120,7 +120,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
     if (useProfileAvatar && profileAvatar?.displayName) {
       return profileAvatar.displayName;
     }
-    return selectedAvatar?.name || t('profile.yourAvatar') || 'Your Avatar';
+    return selectedAvatar?.name || t('profile.yourAvatar');
   };
 
   if (!mounted) return null;
@@ -136,7 +136,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
         onClick={onClose}
         role="dialog"
         aria-modal="true"
-        aria-label={t('profile.chooseAvatar') || 'Choose your avatar'}
+        aria-label={t('profile.chooseAvatar')}
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -159,7 +159,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
               'text-lg font-bold text-center',
               isDarkMode ? 'text-white' : 'text-gray-900'
             )}>
-              {t('profile.chooseAvatar') || 'Choose Your Avatar'}
+              {t('profile.chooseAvatar')}
             </h2>
           </div>
 
@@ -214,7 +214,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
               {hasProfilePicture && (
                 <button
                   onClick={handleSelectProfilePicture}
-                  aria-label={t('profile.useProfileAvatar') || 'Use your profile picture'}
+                  aria-label={t('profile.useProfileAvatar')}
                   aria-pressed={useProfileAvatar}
                   className={cn(
                     'relative aspect-square rounded-xl overflow-hidden transition-all duration-150',
@@ -237,7 +237,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
                   />
                   {/* "Profile" label */}
                   <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
-                    {t('profile.you') || 'YOU'}
+                    {t('profile.you')}
                   </div>
                   {/* Selected checkmark */}
                   {useProfileAvatar && (
@@ -255,7 +255,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
                   <button
                     key={avatar.id}
                     onClick={() => handleSelectAvatar(avatar)}
-                    aria-label={`${t('profile.selectAvatar') || 'Select'} ${avatar.name}`}
+                    aria-label={`${t('profile.selectAvatar')} ${avatar.name}`}
                     aria-pressed={isSelected}
                     className={cn(
                       'relative aspect-square rounded-xl overflow-hidden transition-all duration-150',
@@ -301,7 +301,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
               )}
             >
               <X size={16} />
-              {t('common.cancel') || 'Cancel'}
+              {t('common.cancel')}
             </button>
             <button
               type="button"
@@ -309,7 +309,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
               className="flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 bg-neo-cyan text-neo-black hover:bg-neo-cyan/90"
             >
               <Check size={16} />
-              {t('common.save') || 'Save'}
+              {t('common.save')}
             </button>
           </div>
         </motion.div>

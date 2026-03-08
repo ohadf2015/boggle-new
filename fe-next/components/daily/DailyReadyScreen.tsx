@@ -210,7 +210,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
                       <span className="text-lg">{option.flag}</span>
                       <span className="text-sm text-neo-black">{option.name}</span>
                       {hasPlayed && (
-                        <Check className="w-4 h-4 ml-auto text-neo-lime" strokeWidth={3} />
+                        <Check className="w-4 h-4 ms-auto text-neo-lime" strokeWidth={3} />
                       )}
                     </button>
                   );
@@ -368,7 +368,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           >
             <span>?</span> {t('daily.howToPlay')}
             {!tutorialCompleted && (
-              <span className="relative flex h-2 w-2 ml-1">
+              <span className="relative flex h-2 w-2 ms-1">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-neo-pink opacity-75 animate-ping" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-pink" />
               </span>

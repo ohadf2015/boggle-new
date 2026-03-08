@@ -32,7 +32,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
           'group text-start'
         )}
-        aria-label={t('landing.shareTitle') || 'Invite Friends, Earn XP'}
+        aria-label={t('landing.shareTitle')}
       >
         <div className="p-2 bg-white/20 rounded-neo border border-white/30 shrink-0">
           <Gift className="w-5 h-5 text-white" aria-hidden="true" />
@@ -40,12 +40,12 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
 
         <div className="flex-1 min-w-0">
           <div className="font-black text-white text-sm sm:text-base uppercase leading-tight">
-            {t('landing.shareTitle') || 'Invite Friends, Earn XP'}
+            {t('landing.shareTitle')}
           </div>
           <div data-testid="banner-subtitle" className="text-xs text-white/80 font-medium mt-0.5">
             {isAuthenticated
-              ? (t('landing.shareSubtitle') || '100 XP per friend who joins')
-              : (t('landing.shareSubtitleGuest') || 'Play with friends!')}
+              ? (t('landing.shareSubtitle'))
+              : (t('landing.shareSubtitleGuest'))}
           </div>
         </div>
 
@@ -60,7 +60,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
         >
           <Share2 className="w-4 h-4 text-white" />
           <span className="text-white text-sm font-bold hidden sm:inline">
-            {t('landing.shareButton') || 'Share'}
+            {t('landing.shareButton')}
           </span>
         </div>
       </button>

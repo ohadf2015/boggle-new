@@ -66,7 +66,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
     try {
       const challengeData = {
         creator: {
-          username: profile?.username || t('common.guest') || 'Guest',
+          username: profile?.username || t('common.guest'),
           avatarEmoji: profile?.avatar_emoji || '😊',
           avatarColor: profile?.avatar_color || '#4F46E5',
           playerId: isAuthenticated ? user?.id : undefined,
@@ -95,16 +95,16 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
         const url = getChallengeUrl(challenge.challengeCode, 'results-share');
         await navigator.clipboard.writeText(url);
         setChallengeUrl(url);
-        neoSuccessToast(t('daily.linkCopied') || 'Challenge link copied!');
+        neoSuccessToast(t('daily.linkCopied'));
 
         // Reset after 5 seconds to allow creating another challenge
         setTimeout(() => setChallengeUrl(null), 5000);
       } else {
-        neoErrorToast(t('daily.createChallengeFailed') || 'Failed to create challenge');
+        neoErrorToast(t('daily.createChallengeFailed'));
       }
     } catch (error) {
       console.error('Error creating challenge:', error);
-      neoErrorToast(t('daily.createChallengeFailed') || 'Failed to create challenge');
+      neoErrorToast(t('daily.createChallengeFailed'));
     } finally {
       setIsCreating(false);
     }
@@ -152,7 +152,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
               <Sparkles className="w-4 h-4 text-neo-yellow" />
             </motion.div>
             <span className="text-sm font-bold text-neo-yellow">
-              {t('challenge.winnerPrompt') || 'You crushed it! Challenge your friends 😈'}
+              {t('challenge.winnerPrompt')}
             </span>
           </motion.div>
         )}
@@ -180,17 +180,17 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
         {isCreating ? (
           <>
             <Loader2 className={cn('animate-spin', isCompact ? 'w-4 h-4' : 'w-5 h-5')} />
-            <span>{t('common.creating') || 'Creating...'}</span>
+            <span>{t('common.creating')}</span>
           </>
         ) : challengeUrl ? (
           <>
             <Check className={cn(isCompact ? 'w-4 h-4' : 'w-5 h-5')} />
-            <span>{t('daily.linkCopied') || 'Link Copied!'}</span>
+            <span>{t('daily.linkCopied')}</span>
           </>
         ) : (
           <>
             <Target className={cn(isCompact ? 'w-4 h-4' : 'w-5 h-5')} />
-            <span>{t('challenge.challengeFriend') || 'Challenge a Friend'}</span>
+            <span>{t('challenge.challengeFriend')}</span>
           </>
         )}
       </Button>
@@ -198,7 +198,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
       {/* Subtitle hint */}
       {!isCompact && !challengeUrl && !isCreating && (
         <p className="text-center text-xs text-white/60 font-medium">
-          {t('challenge.shareHint') || 'Share the same board with friends'}
+          {t('challenge.shareHint')}
         </p>
       )}
     </motion.div>

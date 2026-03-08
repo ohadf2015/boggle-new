@@ -159,7 +159,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
       {isAuthenticated && !displayName && isProfileLoading && (
         <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
           <p className="text-xs text-amber-600 dark:text-amber-400">
-            {t('joinView.loadingProfile') || 'Loading your profile...'}
+            {t('joinView.loadingProfile')}
           </p>
         </div>
       )}
@@ -173,7 +173,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
               type="button"
               onClick={() => setIsAuthAvatarPickerOpen(true)}
               className="relative group flex-shrink-0"
-              aria-label={t('joinView.changeAvatar') || 'Change avatar'}
+              aria-label={t('joinView.changeAvatar')}
             >
               {/* Show selected game avatar if set (not PROFILE_AVATAR_ID), otherwise profile picture or emoji fallback */}
               {selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID ? (
@@ -207,13 +207,13 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
             </button>
             <div className="flex-1">
               <p className="text-xs text-neo-cream/70 font-bold uppercase tracking-wide">
-                {t('joinView.hostingAs') || 'Hosting as'}
+                {t('joinView.hostingAs')}
               </p>
               <p className="text-sm text-neo-magenta font-black">
                 {displayName}
               </p>
               <p className="text-xs text-neo-cream/50 mt-0.5">
-                {t('profile.connectedAccount') || 'Connected with your account'}
+                {t('profile.connectedAccount')}
               </p>
             </div>
           </div>
@@ -278,7 +278,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
                     hostUsernameInputRef.current?.focus();
                   }}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                  aria-label={t('common.clear') || 'Clear'}
+                  aria-label={t('common.clear')}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -328,7 +328,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
                   type="button"
                   onClick={generateRoomCode}
                   size="icon"
-                  aria-label={t('joinView.generateNewCode') || 'Generate new room code'}
+                  aria-label={t('joinView.generateNewCode')}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400"
                 >
                   <Dices className="text-sm" />

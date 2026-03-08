@@ -94,7 +94,7 @@ const ComboExplanationTooltip: React.FC<ComboExplanationTooltipProps> = ({
                 flex items-center justify-center
                 hover:scale-110 transition-transform
               "
-              aria-label={t('common.close') || 'Close'}
+              aria-label={t('common.close')}
             >
               <X className="text-xs" />
             </button>
@@ -106,17 +106,17 @@ const ComboExplanationTooltip: React.FC<ComboExplanationTooltipProps> = ({
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="font-black text-neo-black text-sm uppercase tracking-wide mb-1">
-                  {t('combo.explanationTitle') || '🔥 Combo Power!'}
+                  {t('combo.explanationTitle')}
                 </h4>
                 <p className="text-neo-black/80 text-xs leading-relaxed">
-                  {t('combo.explanationText') || 'Find words quickly to build combos! Higher combos = bigger score multipliers. Keep the streak going!'}
+                  {t('combo.explanationText')}
                 </p>
               </div>
             </div>
 
             {/* Tap to dismiss hint */}
             <p className="text-center text-[10px] text-neo-black/70 mt-2 uppercase tracking-wider">
-              {t('common.tapToDismiss') || 'Tap to dismiss'}
+              {t('common.tapToDismiss')}
             </p>
           </div>
         </motion.div>

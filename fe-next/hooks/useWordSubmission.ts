@@ -17,32 +17,8 @@
 
 import { useState, useRef, useCallback, useMemo } from 'react';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
+import { getComboBonus } from '@/shared/utils/scoring';
 import type { Language, LetterGrid } from '@/shared/types/game';
-
-// ==================== Scoring Utilities ====================
-
-/**
- * Get combo bonus based on combo level and word length - matches backend scoring engine
- */
-function getComboBonus(comboLevel: number, wordLength: number): number {
-  if (comboLevel <= 0) return 0;
-
-  // Word length factor - longer words get better combo bonuses
-  let wordLengthFactor: number;
-  if (wordLength <= 3) {
-    wordLengthFactor = 0.2;  // Very short words - minimal combo bonus
-  } else if (wordLength === 4) {
-    wordLengthFactor = 0.5;  // Short words - modest combo bonus
-  } else if (wordLength === 5) {
-    wordLengthFactor = 1.0;  // Medium words - full base bonus
-  } else if (wordLength === 6) {
-    wordLengthFactor = 1.5;  // Good words - 1.5x bonus
-  } else {
-    wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus
-  }
-
-  return Math.floor(comboLevel * wordLengthFactor);
-}
 
 // ==================== Types ====================
 

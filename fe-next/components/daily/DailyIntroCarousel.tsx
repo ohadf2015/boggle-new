@@ -143,13 +143,13 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
 // Step 1: Combined Swipe Demo + Color Feedback
 const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string }> = ({ isRTL, t }) => {
   // Grid letters from translation
-  const letters = (t('daily.carousel.step1Grid') || 'C,A,O,G,T,E,D,S,R').split(',');
-  const highlightedIndices = (t('daily.carousel.step1Highlighted') || '0,1,4,7').split(',').map(Number);
+  const letters = (t('daily.carousel.step1Grid') || '').split(',');
+  const highlightedIndices = (t('daily.carousel.step1Highlighted') || '').split(',').map(Number);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-between min-h-0">
       <div className="text-sm sm:text-base font-bold text-neo-pink dark:text-neo-pink-light">
-        {t('daily.carousel.step1Title') || 'Swipe & Get Color Clues'}
+        {t('daily.carousel.step1Title')}
       </div>
 
       {/* Mini Grid with Animated Swipe */}
@@ -204,15 +204,15 @@ const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string
       <div className="flex justify-center gap-2 text-[10px] sm:text-xs">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded bg-emerald-500 border-2 border-neo-black" />
-          <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Green') || 'Right'}</span>
+          <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Green')}</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded bg-amber-400 border-2 border-neo-black" />
-          <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Yellow') || 'Wrong spot'}</span>
+          <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Yellow')}</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded bg-gray-400 border-2 border-neo-black" />
-          <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Gray') || 'Not in'}</span>
+          <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Gray')}</span>
         </div>
       </div>
     </div>
@@ -229,7 +229,7 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
   return (
     <div className="flex-1 flex flex-col items-center justify-between min-h-0">
       <div className="text-sm sm:text-base font-bold text-neo-pink dark:text-neo-pink-light">
-        {t('daily.carousel.step3Title') || 'Find Hidden Word with Clues'}
+        {t('daily.carousel.step3Title')}
       </div>
 
       {/* Target word boxes */}
@@ -283,10 +283,10 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
       {/* Description */}
       <div className="text-center space-y-1">
         <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 font-medium">
-          {t('daily.carousel.step3Desc') || '10 tries to find the word'}
+          {t('daily.carousel.step3Desc')}
         </div>
         <div className="text-[10px] sm:text-xs text-neo-pink dark:text-neo-pink-light font-bold">
-          {t('daily.carousel.step4Desc') || 'Words reveal clues!'}
+          {t('daily.carousel.step4Desc')}
         </div>
       </div>
     </div>

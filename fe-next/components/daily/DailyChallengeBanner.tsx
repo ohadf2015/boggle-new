@@ -337,7 +337,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 "font-black uppercase text-neo-black leading-tight drop-shadow-sm",
                 compact ? "text-base" : "text-lg sm:text-xl"
               )}>
-                {t('daily.badge') || 'Daily Challenge'}
+                {t('daily.badge')}
               </h2>
               <span className={cn(
                 "font-black text-neo-white bg-neo-navy/90 px-2 py-0.5 rounded-neo border-2 border-neo-black shadow-hard-xs",
@@ -355,7 +355,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                   transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 2 }}
                 >
                   <Flame className="w-3.5 h-3.5" />
-                  <span className="text-xs font-black">{streak} {t('daily.dayStreak') || 'day streak'}</span>
+                  <span className="text-xs font-black">{streak} {t('daily.dayStreak')}</span>
                 </motion.span>
               )}
               {/* Countdown */}
@@ -366,7 +366,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 <Clock className="w-3.5 h-3.5" />
                 <span className="tabular-nums">
                   {hasPlayed
-                    ? <><span>{t('daily.nextPuzzleIn') || 'Next'}: </span><span className="font-bold">{countdown}</span></>
+                    ? <><span>{t('daily.nextPuzzleIn')}: </span><span className="font-bold">{countdown}</span></>
                     : <span className="font-bold">{countdown}</span>
                   }
                 </span>

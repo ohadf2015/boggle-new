@@ -135,7 +135,7 @@ export default function WarmupRound({
             <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
 
             <h2 className="text-2xl font-neo-display text-neo-white mb-2">
-              {t('education.practice.complete') || 'Warmup Complete!'}
+              {t('education.practice.complete')}
             </h2>
 
             <div className="my-6 space-y-4">
@@ -149,7 +149,7 @@ export default function WarmupRound({
                 <div className="p-3 bg-neo-black/30 rounded-neo">
                   <p className="text-2xl font-neo-display text-neo-white">{foundWords.length}</p>
                   <p className="text-xs text-slate-400">
-                    {t('education.practice.wordsFound') || 'Words Found'}
+                    {t('education.practice.wordsFound')}
                   </p>
                 </div>
                 <div className="p-3 bg-neo-pink/10 rounded-neo">
@@ -191,15 +191,15 @@ export default function WarmupRound({
                   'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
                 )}
               >
-                <RotateCcw className={cn('w-4 h-4', isRTL ? 'ml-2' : 'mr-2')} />
-                {t('common.retry') || 'Play Again'}
+                <RotateCcw className="w-4 h-4 me-2" />
+                {t('common.retry')}
               </Button>
               <Button
                 variant="outline"
                 onClick={onBack}
                 className="border-slate-400 text-slate-400 hover:bg-slate-400/20"
               >
-                {t('common.back') || 'Back'}
+                {t('common.back')}
               </Button>
             </div>
           </CardContent>
@@ -224,7 +224,7 @@ export default function WarmupRound({
           <div className="flex-1">
             <h1 className="text-xl font-neo-display text-neo-white flex items-center gap-2">
               <Lightbulb className="w-5 h-5 text-neo-pink" />
-              {t('education.practice.warmup') || 'Warmup Round'}
+              {t('education.practice.warmup')}
             </h1>
             <p className="text-sm text-slate-400">{lessonName}</p>
           </div>
@@ -245,7 +245,7 @@ export default function WarmupRound({
               <div className="flex items-center gap-2">
                 <Lightbulb className="w-4 h-4 text-neo-pink" />
                 <span className="text-sm font-neo-body text-neo-pink">
-                  {t('education.practice.hints') || 'Word Hints'}
+                  {t('education.practice.hints')}
                 </span>
               </div>
               <Button
@@ -282,7 +282,7 @@ export default function WarmupRound({
 
             {showHints && remainingVocabWords.length === 0 && (
               <p className="text-sm text-neo-cyan">
-                <CheckCircle className="w-4 h-4 inline mr-1" />
+                <CheckCircle className="w-4 h-4 inline me-1" />
                 All vocabulary words found!
               </p>
             )}
@@ -360,7 +360,7 @@ export default function WarmupRound({
             'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
           )}
         >
-          {t('education.practice.finish') || 'Finish Warmup'}
+          {t('education.practice.finish')}
         </Button>
       </div>
     </div>

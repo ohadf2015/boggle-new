@@ -30,7 +30,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
 
   const currentAvatarConfig = AVATARS.find((a) => a.id === selectedAvatarId) || AVATARS[0];
   const currentAvatarName = isUsingProfilePicture
-    ? (t('profile.you') || 'YOU')
+    ? (t('profile.you'))
     : currentAvatarConfig.name;
   const currentAvatarImage = isUsingProfilePicture
     ? profilePictureUrl!
@@ -69,7 +69,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
           </div>
           <div className="text-left">
             <p className="text-xs font-bold uppercase text-neo-cyan">
-              {t('profile.chooseAvatar') || 'Choose Avatar'}
+              {t('profile.chooseAvatar')}
             </p>
             <p className="text-sm font-bold text-neo-white">
               {currentAvatarName}
@@ -126,7 +126,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
                       </div>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 bg-neo-black/90 text-white text-[8px] font-bold text-center py-0.5">
-                      {t('profile.you') || 'YOU'}
+                      {t('profile.you')}
                     </div>
                   </button>
                 )}

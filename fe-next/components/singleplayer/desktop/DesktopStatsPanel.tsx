@@ -122,7 +122,7 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
         <div className="font-bold text-neo-cyan tabular-nums">
           {wordsFound}
           {totalBoardWords && (
-            <span className="text-neo-cream/50 text-xs ml-1">/ {totalBoardWords}</span>
+            <span className="text-neo-cream/50 text-xs ms-1">/ {totalBoardWords}</span>
           )}
         </div>
       </div>

@@ -685,8 +685,8 @@ const he = {
     ]
   },
   "multiplayerFlow": {
-    "roomClosed": "Room closed",
-    "rateLimited": "Slow down!",
+    "roomClosed": "החדר נסגר",
+    "rateLimited": "לאט לאט!",
     "roomList": {
       "activeRooms": "קפוץ פנימה!",
       "online": "בקרב",
@@ -708,7 +708,12 @@ const he = {
       "beTheLegend": "!תהיה האגדה שמתחילה את הקרב הראשון",
       "hostAndPlay": "ארח ושחק — שתף את הקוד עם חברים",
       "startBattle": "התחל קרב",
-      "inProgress": "פעיל"
+      "inProgress": "פעיל",
+      "createRoom": "+ צור חדר",
+      "noRoomsAvailable": "אין חדרים פעילים. תארח אחד!",
+      "joinRoomAction": "הצטרף ל-{{roomName}}",
+      "availableRooms": "חדרים זמינים",
+      "roomsListLabel": "רשימת חדרי משחק זמינים"
     },
     "joinModal": {
       "title": "הצטרף לקרב",
@@ -724,7 +729,10 @@ const he = {
       "roomNameLabel": "שם החדר",
       "optional": "אופציונלי",
       "createButton": "התחל קרב",
-      "creating": "מכין זירה..."
+      "creating": "מכין זירה...",
+      "languageLabel": "שפת המשחק",
+      "gameModeLabel": "מצב משחק",
+      "wordDifficultyLabel": "רמת קושי מילים"
     },
     "profileSetup": {
       "title": "מוכן?",
@@ -765,7 +773,20 @@ const he = {
       "refreshButton": "רענן",
       "noRooms": "אין חדרים פתוחים. יש קוד?",
       "joinButton": "קפוץ פנימה!",
-      "joining": "נכנס..."
+      "joining": "נכנס...",
+      "gameCodeLabel": "קוד משחק",
+      "gameCodePlaceholder": "הכנס קוד בן 6 תווים",
+      "gameCodeHelp": "הכנס את הקוד בן 6 התווים שהמארח שיתף",
+      "pasteButton": "הדבק קוד"
+    },
+    "errors": {
+      "roomFull": "החדר מלא. נסה חדר אחר או צור משלך.",
+      "roomClosed": "החדר נסגר. חזור ללובי ומצא משחק אחר.",
+      "invalidCode": "קוד לא תקין או חדר סגור. בדוק את הקוד ונסה שוב.",
+      "connectionLost": "החיבור נותק. מתחבר מחדש...",
+      "hostLeft": "המארח עזב את המשחק. חוזר ללובי...",
+      "invalidUsername": "שם משתמש חייב להיות 2-20 תווים.",
+      "serverError": "שגיאת שרת. נסה שוב."
     }
   },
   "multiplayer": {

@@ -13,6 +13,7 @@ import { DIFFICULTIES } from '../utils/consts';
 import { usePresence } from '../hooks/usePresence';
 import { useEarthquakeFireRound } from '../hooks/useEarthquakeFireRound';
 import type { Language, PlayerResult } from '@/types';
+import { useGameMode } from '@/hooks/gameState/store';
 
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
@@ -97,6 +98,7 @@ const HostView: React.FC<HostViewProps> = memo(({
 
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
+  const currentGameMode = useGameMode();
 
   // Consolidated state management
   const state = useHostViewState({
@@ -363,7 +365,7 @@ const HostView: React.FC<HostViewProps> = memo(({
 
   // Earthquake/Fire Round feature for multiplayer (only for triggering, state managed via socket events)
   useEarthquakeFireRound({
-    enabled: runtime.gameStarted && !runtime.waitingForResults,
+    enabled: runtime.gameStarted && !runtime.waitingForResults && (!currentGameMode || currentGameMode === 'classic'),
     gameDurationSeconds: state.settings.timerValue * 60,
     currentTimeSeconds: runtime.remainingTime || 0,
     language: state.roomLanguage,

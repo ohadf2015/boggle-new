@@ -54,7 +54,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
       <button
         type="button"
         onClick={() => setIsPickerOpen(true)}
-        aria-label={t('joinView.selectAvatar') || 'Select avatar'}
+        aria-label={t('joinView.selectAvatar')}
         className={`
           relative group
           ${sizeClasses[size]}

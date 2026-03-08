@@ -191,7 +191,7 @@ export function NewPlayerOnboarding({ t, onDismiss, className }: NewPlayerOnboar
           <button
             onClick={handleSkip}
             className="absolute top-3 end-3 p-1.5 rounded-full bg-slate-700/50 hover:bg-slate-700 transition-colors"
-            aria-label={t('common.close') || 'Close'}
+            aria-label={t('common.close')}
           >
             <X className="w-4 h-4 text-neo-cream/70" />
           </button>
@@ -200,13 +200,13 @@ export function NewPlayerOnboarding({ t, onDismiss, className }: NewPlayerOnboar
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 text-neo-yellow" />
             <span className="text-sm font-bold uppercase tracking-wide text-neo-yellow">
-              {t('onboarding.header') || 'How to Play'}
+              {t('onboarding.header')}
             </span>
           </div>
 
           {/* Timing hint */}
           <p className="text-xs text-neo-cream/50 mb-3 text-center">
-            {t('onboarding.timingHint') || 'Learn while waiting for the game to start!'}
+            {t('onboarding.timingHint')}
           </p>
 
           {/* Step content */}
@@ -273,7 +273,7 @@ export function NewPlayerOnboarding({ t, onDismiss, className }: NewPlayerOnboar
               onClick={handleSkip}
               className="flex-1 text-neo-cream/70 hover:text-neo-cream"
             >
-              {t('onboarding.skip') || 'Skip'}
+              {t('onboarding.skip')}
             </Button>
             <Button
               variant="default"
@@ -282,8 +282,8 @@ export function NewPlayerOnboarding({ t, onDismiss, className }: NewPlayerOnboar
               className="flex-1 bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold"
             >
               {isLastStep
-                ? t('onboarding.letsPlay') || "Let's Play!"
-                : t('common.next') || 'Next'}
+                ? t('onboarding.letsPlay')
+                : t('common.next')}
             </Button>
           </div>
         </motion.div>

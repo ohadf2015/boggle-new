@@ -15,7 +15,7 @@ export default function AboutPageClient(): React.ReactElement {
   return (
     <LegalPageLayout
       title={t('legal.about.title')}
-      breadcrumbs={[{ label: t('legal.about.title') || 'About' }]}
+      breadcrumbs={[{ label: t('legal.about.title') }]}
     >
       {/* Last Updated */}
       <p className="text-sm mb-6 text-gray-500">
@@ -260,26 +260,26 @@ export default function AboutPageClient(): React.ReactElement {
             </div>
             <div>
               <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.founderLabel') || 'Founder'}
+                {t('legal.about.businessInfo.founderLabel')}
               </dt>
               <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.founder') || 'Ohad Fisher'}
+                {t('legal.about.businessInfo.founder')}
               </dd>
             </div>
             <div>
               <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.locationLabel') || 'Location'}
+                {t('legal.about.businessInfo.locationLabel')}
               </dt>
               <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.location') || 'Israel'}
+                {t('legal.about.businessInfo.location')}
               </dd>
             </div>
             <div>
               <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.foundedLabel') || 'Founded'}
+                {t('legal.about.businessInfo.foundedLabel')}
               </dt>
               <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.founded') || '2024'}
+                {t('legal.about.businessInfo.founded')}
               </dd>
             </div>
             <div>

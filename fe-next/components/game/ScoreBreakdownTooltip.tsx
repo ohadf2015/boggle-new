@@ -50,7 +50,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
       <button
         onClick={toggleTooltip}
         className="w-5 h-5 flex items-center justify-center text-neo-black/50 hover:text-neo-black/80 transition-colors"
-        aria-label={t('scoring.howItWorks') || 'How scoring works'}
+        aria-label={t('scoring.howItWorks')}
         aria-expanded={isOpen}
       >
         <HelpCircle className="w-4 h-4" />
@@ -82,14 +82,14 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
                 <button
                   onClick={closeTooltip}
                   className="absolute -top-2 -right-2 w-5 h-5 bg-neo-pink text-white rounded-full border-2 border-neo-black shadow-hard-sm flex items-center justify-center hover:scale-110 transition-transform"
-                  aria-label={t('common.close') || 'Close'}
+                  aria-label={t('common.close')}
                 >
                   <X className="w-2.5 h-2.5" />
                 </button>
 
                 {/* Header */}
                 <h4 className="font-black text-neo-black text-xs uppercase tracking-wide mb-2 text-center">
-                  {t('scoring.pointsPerWord') || 'Points per Word'}
+                  {t('scoring.pointsPerWord')}
                 </h4>
 
                 {/* Scoring table */}
@@ -100,10 +100,10 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
                       className="flex items-center justify-between gap-2 px-2 py-1 rounded-neo bg-white/50"
                     >
                       <span className="text-xs font-bold text-neo-black/80">
-                        {rule.letters} {t('scoring.letters') || 'letters'}
+                        {rule.letters} {t('scoring.letters')}
                       </span>
                       <span className="text-sm font-black text-neo-black">
-                        {rule.points} {t('scoring.pts') || 'pts'}
+                        {rule.points} {t('scoring.pts')}
                       </span>
                     </div>
                   ))}
@@ -111,7 +111,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
 
                 {/* Tip */}
                 <p className="text-[10px] text-neo-black/60 text-center mt-2 leading-tight">
-                  {t('scoring.longerWordsTip') || 'Longer words = way more points!'}
+                  {t('scoring.longerWordsTip')}
                 </p>
 
                 {/* Arrow pointer */}

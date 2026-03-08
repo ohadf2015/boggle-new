@@ -63,7 +63,7 @@ export default function WordListPreview({
           <div className="flex-1">
             <h1 className="text-xl font-neo-display text-neo-white flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-neo-yellow" />
-              {t('education.practice.wordList') || 'Word List'}
+              {t('education.practice.wordList')}
             </h1>
             <p className="text-sm text-slate-400">{lessonName}</p>
           </div>
@@ -99,7 +99,7 @@ export default function WordListPreview({
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t('education.practice.searchWords') || 'Search words...'}
+            placeholder={t('education.practice.searchWords')}
             className={cn(
               'border-neo border-neo-black shadow-hard-sm bg-neo-navy/50',
               isRTL ? 'pr-10' : 'pl-10'
@@ -114,8 +114,8 @@ export default function WordListPreview({
               <CardContent className="py-8 text-center">
                 <p className="text-slate-400">
                   {searchQuery
-                    ? t('education.practice.noResults') || 'No words found'
-                    : t('education.practice.noWords') || 'No words in this lesson'}
+                    ? t('education.practice.noResults')
+                    : t('education.practice.noWords')}
                 </p>
               </CardContent>
             </Card>
@@ -156,13 +156,13 @@ export default function WordListPreview({
                         <p className="text-sm text-slate-300">{word.definition}</p>
                       ) : (
                         <p className="text-sm text-slate-500 italic">
-                          {t('education.practice.noDefinition') || 'No definition provided'}
+                          {t('education.practice.noDefinition')}
                         </p>
                       )}
                       <p className="text-xs text-slate-500 mt-2">
                         {word.canIntegrate
-                          ? t('teacher.lesson.canIntegrate') || 'Can be embedded in games'
-                          : t('teacher.lesson.cannotIntegrate') || 'Tracked for progress only'}
+                          ? t('teacher.lesson.canIntegrate')
+                          : t('teacher.lesson.cannotIntegrate')}
                       </p>
                     </div>
                   )}
@@ -184,7 +184,7 @@ export default function WordListPreview({
               'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
             )}
           >
-            {t('common.understood') || 'Done'}
+            {t('common.understood')}
           </Button>
         </div>
       </div>

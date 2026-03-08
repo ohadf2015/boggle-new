@@ -42,7 +42,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
         return {
           icon: achievement.icon,
           name: t(`achievements.${achievement.key}.name`) || achievement.key,
-          description: t(`achievements.${achievement.key}.description`) || ''
+          description: t(`achievements.${achievement.key}.description`)
         };
       }
       // Legacy format: already has name and description
@@ -219,7 +219,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
               <div className="bg-neo-pink text-white border-b-4 border-neo-black px-4 py-3 flex items-center gap-2 rounded-t-lg">
                 <span className="text-xl">🏆</span>
                 <h3 className="font-black uppercase text-neo-white tracking-wide">
-                  {t('achievementDock.title') || 'YOUR ACHIEVEMENTS'}
+                  {t('achievementDock.title')}
                 </h3>
               </div>
 

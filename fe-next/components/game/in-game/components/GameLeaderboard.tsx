@@ -76,14 +76,14 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
           </span>
           {player.isMe && (
             <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
-              {t('playerView.me') || 'YOU'}
+              {t('playerView.me')}
             </span>
           )}
         </div>
         <div className="text-xs font-bold text-neo-black/70 flex items-center gap-1">
           <Type className="w-3 h-3 text-neo-cyan" />
           <span className="tabular-nums">{player.wordCount || 0}</span>
-          <span>{t('hostView.words') || 'words'}</span>
+          <span>{t('hostView.words')}</span>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         )}
         <div className="text-right bg-neo-black/5 rounded-neo px-2 py-1 min-w-[50px]">
           <div className="text-[10px] font-bold text-neo-black/60 uppercase tracking-wide">
-            {t('common.score') || 'Score'}
+            {t('common.score')}
           </div>
           <div className="text-lg font-black text-neo-black leading-none tabular-nums">{player.score}</div>
         </div>
@@ -160,7 +160,7 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
 
           {leaderboard.length === 0 && (
             <p className="text-center text-neo-black/90 py-6 text-sm font-bold">
-              {t('hostView.waitingForPlayers') || 'Waiting for players...'}
+              {t('hostView.waitingForPlayers')}
             </p>
           )}
         </div>

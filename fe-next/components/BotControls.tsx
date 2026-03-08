@@ -106,7 +106,7 @@ const BotControls: React.FC<BotControlsProps> = ({
 
     const handleBotRemoved = (data: { success?: boolean; username?: string }): void => {
       if (!data.success) {
-        setError(t('bots.removeError') || 'Failed to remove bot');
+        setError(t('bots.removeError'));
       } else if (data.username) {
         setAnnouncement(`${data.username} removed`);
         setTimeout(() => setAnnouncement(''), 2000);
@@ -177,7 +177,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       >
         <div className="flex items-center gap-2">
           <Bot className="text-neo-cyan" aria-hidden="true" />
-          <span>{t('bots.title') || 'AI Bots'}</span>
+          <span>{t('bots.title')}</span>
           {bots.length > 0 && (
             <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
               {bots.length}
@@ -225,10 +225,10 @@ const BotControls: React.FC<BotControlsProps> = ({
                 htmlFor="auto-fill-switch"
                 className="text-sm font-bold text-neo-cream block cursor-pointer"
               >
-                {t('bots.autoFill') || 'Auto-fill with AI Rivals'}
+                {t('bots.autoFill')}
               </label>
               <p className="text-xs text-neo-cream/60 truncate">
-                {t('bots.autoFillDesc') || 'Fills empty slots with AI opponents'}
+                {t('bots.autoFillDesc')}
               </p>
             </div>
           </div>
@@ -245,7 +245,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       {/* Manual Add Section */}
       <div className="space-y-2">
         <p className="text-xs text-neo-cream/60">
-          {t('bots.orAddManually') || 'Or add manually:'}
+          {t('bots.orAddManually')}
         </p>
 
         <div className="flex flex-wrap gap-2">
@@ -281,7 +281,7 @@ const BotControls: React.FC<BotControlsProps> = ({
 
         {!canAddMore && (
           <p className="text-xs text-neo-cream/50">
-            {t('bots.roomFull') || 'Room is full'}
+            {t('bots.roomFull')}
           </p>
         )}
       </div>
@@ -290,7 +290,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       {bots.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs text-neo-cream/60">
-            {t('bots.currentBots') || 'Current bots:'}
+            {t('bots.currentBots')}
           </p>
           <div className="flex flex-wrap gap-2">
             <AnimatePresence mode="popLayout">
@@ -356,7 +356,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       {bots.length === 0 && !autoFillEnabled && (
         <div className="text-center py-2">
           <p className="text-sm text-neo-cream/50">
-            {t('bots.emptyState') || 'No bots yet - add some to practice!'}
+            {t('bots.emptyState')}
           </p>
         </div>
       )}

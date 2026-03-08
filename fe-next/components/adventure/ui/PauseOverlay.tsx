@@ -130,7 +130,7 @@ export const PauseOverlay = memo(function PauseOverlay({
             )}
           >
             <RotateCcw className="w-5 h-5" />
-            {t('adventure.restart') || 'Restart'}
+            {t('adventure.restart')}
           </motion.button>
 
           {/* Exit */}
@@ -155,7 +155,7 @@ export const PauseOverlay = memo(function PauseOverlay({
 
         {/* Keyboard Hint */}
         <p className="text-center text-neo-white/40 text-xs mt-6">
-          {t('common.press') || 'Press'} <kbd className="px-2 py-1 bg-neo-black rounded font-mono">ESC</kbd> {t('common.toResume') || 'to resume'}
+          {t('common.press')} <kbd className="px-2 py-1 bg-neo-black rounded font-mono">ESC</kbd> {t('common.toResume')}
         </p>
       </motion.div>
     </motion.div>

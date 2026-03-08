@@ -52,12 +52,12 @@ export function ProfileHeader({
 
   const handleSaveDisplayName = async (): Promise<void> => {
     if (!editDisplayName.trim() || editDisplayName.trim().length < 2) {
-      toast.error(t('validation.usernameTooShort') || 'Name must be at least 2 characters');
+      toast.error(t('validation.usernameTooShort'));
       return;
     }
 
     if (editDisplayName.trim().length > 20) {
-      toast.error(t('validation.usernameTooLong') || 'Name must be 20 characters or less');
+      toast.error(t('validation.usernameTooLong'));
       return;
     }
 
@@ -67,10 +67,10 @@ export function ProfileHeader({
       await updateProfile({ display_name: editDisplayName.trim() });
       await refreshProfile();
       setIsEditingName(false);
-      toast.success(t('profile.saved') || 'Profile saved!');
+      toast.success(t('profile.saved'));
     } catch (err) {
       console.error('Save error:', err);
-      toast.error(t('profile.saveError') || 'Failed to save');
+      toast.error(t('profile.saveError'));
     } finally {
       setIsSaving(false);
     }
@@ -83,10 +83,10 @@ export function ProfileHeader({
       await updateProfile({ country_code: countryCode });
       await refreshProfile();
       setIsEditingCountry(false);
-      toast.success(t('profile.countrySaved') || 'Country updated!');
+      toast.success(t('profile.countrySaved'));
     } catch (err) {
       console.error('Save country error:', err);
-      toast.error(t('profile.countryError') || 'Failed to update country');
+      toast.error(t('profile.countryError'));
     } finally {
       setIsSavingCountry(false);
     }
@@ -129,8 +129,8 @@ export function ProfileHeader({
                 'border-2',
                 isDarkMode ? 'border-slate-600' : 'border-gray-200'
               )}
-              title={t('profile.uploadPhoto') || 'Upload Photo'}
-              aria-label={t('profile.uploadPhoto') || 'Upload Photo'}
+              title={t('profile.uploadPhoto')}
+              aria-label={t('profile.uploadPhoto')}
             >
               {isUploading ? (
                 <Loader size="sm" />
@@ -143,7 +143,7 @@ export function ProfileHeader({
                 onChange={onProfilePictureUpload}
                 className="hidden"
                 disabled={isUploading}
-                aria-label={t('profile.uploadPhoto') || 'Upload Photo'}
+                aria-label={t('profile.uploadPhoto')}
               />
             </label>
 
@@ -157,8 +157,8 @@ export function ProfileHeader({
                   'border-2 border-red-600',
                   isDarkMode ? 'bg-red-600 text-white hover:bg-red-500' : 'bg-red-500 text-white hover:bg-red-400'
                 )}
-                title={t('profile.removePhoto') || 'Remove Photo'}
-                aria-label={t('profile.removePhoto') || 'Remove Photo'}
+                title={t('profile.removePhoto')}
+                aria-label={t('profile.removePhoto')}
               >
                 <X size={20} />
               </button>
@@ -174,8 +174,8 @@ export function ProfileHeader({
                   'border-2',
                   isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500 border-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 border-gray-300'
                 )}
-                title={t('profile.chooseEmoji') || 'Change Emoji'}
-                aria-label={t('profile.chooseEmoji') || 'Change Emoji'}
+                title={t('profile.chooseEmoji')}
+                aria-label={t('profile.chooseEmoji')}
               >
                 <Edit size={20} />
               </button>
@@ -227,7 +227,7 @@ export function ProfileHeader({
                   'p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0',
                   isDarkMode ? 'text-gray-400' : 'text-gray-600'
                 )}
-                title={t('profile.editName') || 'Edit Name'}
+                title={t('profile.editName')}
               >
                 <Edit size={compact ? 12 : 14} />
               </button>
@@ -257,7 +257,7 @@ export function ProfileHeader({
                     isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-500 hover:text-gray-600'
                   )}
                 >
-                  {t('common.cancel') || 'Cancel'}
+                  {t('common.cancel')}
                 </button>
               </div>
             ) : (
@@ -267,7 +267,7 @@ export function ProfileHeader({
                   'flex items-center gap-1.5 text-sm transition-colors',
                   isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-500 hover:text-gray-600'
                 )}
-                title={t('profile.changeCountry') || 'Change country'}
+                title={t('profile.changeCountry')}
               >
                 {profile?.country_code ? (
                   <>
@@ -277,7 +277,7 @@ export function ProfileHeader({
                 ) : (
                   <>
                     <Globe className="w-3.5 h-3.5" />
-                    <span>{t('profile.addCountry') || 'Add country'}</span>
+                    <span>{t('profile.addCountry')}</span>
                   </>
                 )}
                 <Edit className="w-3 h-3 opacity-60" />

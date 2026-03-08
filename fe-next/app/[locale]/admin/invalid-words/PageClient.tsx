@@ -50,7 +50,7 @@ export default function InvalidWordsPageClient() {
             Admin Access Required
           </h1>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4 me-2" />
             Back to Home
           </Button>
         </div>
@@ -97,10 +97,10 @@ export default function InvalidWordsPageClient() {
             </div>
             <div>
               <h1 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>
-                {t('admin.invalidWords.title') || 'Invalid Words Review'}
+                {t('admin.invalidWords.title')}
               </h1>
               <p className="text-sm text-slate-500">
-                {t('admin.invalidWords.subtitle') || 'Words submitted 3+ times but not validated'}
+                {t('admin.invalidWords.subtitle')}
               </p>
             </div>
           </div>

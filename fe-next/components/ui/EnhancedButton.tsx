@@ -220,7 +220,7 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
           {/* Loading spinner */}
           {isLoading && (
             <svg
-              className="animate-spin -ml-1 mr-2 h-5 w-5"
+              className="animate-spin -ms-1 me-2 h-5 w-5"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -245,7 +245,7 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
           {/* Success icon */}
           {isSuccess && (
             <svg
-              className="w-5 h-5 mr-1"
+              className="w-5 h-5 me-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -263,7 +263,7 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
           {/* Error icon */}
           {isError && (
             <svg
-              className="w-5 h-5 mr-1"
+              className="w-5 h-5 me-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

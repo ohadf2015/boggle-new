@@ -214,16 +214,16 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-600')
             )}>
               {hasPassed
-                ? (t('training.analysis.titleComplete') || 'Training Complete!')
-                : (t('training.analysis.titleProgress') || 'Keep Practicing!')}
+                ? (t('training.analysis.titleComplete'))
+                : (t('training.analysis.titleProgress'))}
             </h2>
             <p className={cn(
               'text-sm',
               isDarkMode ? 'text-gray-300' : 'text-gray-600'
             )}>
               {hasPassed
-                ? (t('training.analysis.subtitleComplete') || 'You\'ve mastered the basics!')
-                : (t('training.analysis.subtitleProgress') || 'A few more skills to unlock')}
+                ? (t('training.analysis.subtitleComplete'))
+                : (t('training.analysis.subtitleProgress'))}
             </p>
           </motion.div>
 
@@ -236,7 +236,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           >
             <div className="flex justify-between mb-1">
               <span className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                {t('training.analysis.progress') || 'Skills Progress'}
+                {t('training.analysis.progress')}
               </span>
               <span className={cn('text-sm font-bold', isDarkMode ? 'text-gray-200' : 'text-gray-800')}>
                 {masteredCount}/{totalSkills}
@@ -336,7 +336,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
               'text-sm font-medium mb-3',
               isDarkMode ? 'text-gray-300' : 'text-gray-600'
             )}>
-              {t('training.analysis.stats') || 'Your Stats'}
+              {t('training.analysis.stats')}
             </p>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
@@ -350,7 +350,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   'text-xs',
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 )}>
-                  {t('training.analysis.wordsFound') || 'Words'}
+                  {t('training.analysis.wordsFound')}
                 </p>
               </div>
               <div>
@@ -364,7 +364,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   'text-xs',
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 )}>
-                  {t('training.analysis.longestWord') || 'Longest'}
+                  {t('training.analysis.longestWord')}
                 </p>
               </div>
               <div>
@@ -378,7 +378,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   'text-xs',
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 )}>
-                  {t('training.analysis.dirChanges') || 'Dir. Changes'}
+                  {t('training.analysis.dirChanges')}
                 </p>
               </div>
             </div>
@@ -402,7 +402,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 isDarkMode ? 'text-purple-300' : 'text-purple-700'
               )}>
                 <Sparkles className="inline w-4 h-4 me-1" />
-                {t('training.analysis.tips') || 'Tips for next time:'}
+                {t('training.analysis.tips')}
               </p>
               <ul className="space-y-1">
                 {summary.needsWork.slice(0, 2).map((skill) => (
@@ -440,7 +440,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                     )}
                   >
                     <Gamepad2 size={18} />
-                    {t('training.analysis.multiplayer') || 'Multiplayer'}
+                    {t('training.analysis.multiplayer')}
                   </Button>
                   <Button
                     onClick={() => handleGoToMode('daily')}
@@ -451,7 +451,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                     )}
                   >
                     <Calendar size={18} />
-                    {t('training.analysis.daily') || 'Daily'}
+                    {t('training.analysis.daily')}
                   </Button>
                 </div>
 
@@ -467,7 +467,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   )}
                 >
                   <RotateCcw className="me-2" size={16} />
-                  {t('training.analysis.practiceMore') || 'Practice More'}
+                  {t('training.analysis.practiceMore')}
                 </Button>
               </>
             ) : (
@@ -482,7 +482,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   )}
                 >
                   <RotateCcw size={20} />
-                  {t('training.analysis.tryAgain') || 'Try Again'}
+                  {t('training.analysis.tryAgain')}
                   <ArrowRight size={18} className="rtl:rotate-180" />
                 </Button>
 

@@ -158,9 +158,9 @@ export default function SettingsPageClient(): React.JSX.Element {
 
   // Get reduce motion display text
   const getReduceMotionLabel = () => {
-    if (settings.reduceMotion === 'system') return t('settings.system') || 'System';
-    if (settings.reduceMotion === true) return t('settings.on') || 'On';
-    return t('settings.off') || 'Off';
+    if (settings.reduceMotion === 'system') return t('settings.system');
+    if (settings.reduceMotion === true) return t('settings.on');
+    return t('settings.off');
   };
 
   return (
@@ -194,13 +194,13 @@ export default function SettingsPageClient(): React.JSX.Element {
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-            {t('common.back') || 'Back'}
+            {t('common.back')}
           </Button>
           <h1 className={cn(
             'text-2xl font-black uppercase',
             isDarkMode ? 'text-white' : 'text-neo-black'
           )}>
-            {t('settings.title') || 'Settings'}
+            {t('settings.title')}
           </h1>
         </motion.div>
 
@@ -218,28 +218,28 @@ export default function SettingsPageClient(): React.JSX.Element {
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               <Eye className="w-4 h-4" />
-              {t('settings.appearance') || 'Appearance'}
+              {t('settings.appearance')}
             </h2>
             <div className="space-y-3">
               <SettingRow
                 icon={isDarkMode ? <Moon className="w-5 h-5 text-neo-pink" /> : <Sun className="w-5 h-5 text-neo-lime" />}
-                label={t('settings.theme') || 'Theme'}
-                description={isDarkMode ? t('settings.dark') || 'Dark' : t('settings.light') || 'Light'}
+                label={t('settings.theme')}
+                description={isDarkMode ? t('settings.dark') : t('settings.light')}
                 isDarkMode={isDarkMode}
               >
                 <ToggleButton
                   isOn={isDarkMode}
                   onToggle={toggleTheme}
                   isDarkMode={isDarkMode}
-                  label={t('settings.theme') || 'Theme'}
-                  onLabel={t('settings.dark') || 'Dark'}
-                  offLabel={t('settings.light') || 'Light'}
+                  label={t('settings.theme')}
+                  onLabel={t('settings.dark')}
+                  offLabel={t('settings.light')}
                 />
               </SettingRow>
 
               <SettingRow
                 icon={<Languages className="w-5 h-5 text-neo-cyan" />}
-                label={t('settings.language') || 'Language'}
+                label={t('settings.language')}
                 isDarkMode={isDarkMode}
               >
                 <select
@@ -271,12 +271,12 @@ export default function SettingsPageClient(): React.JSX.Element {
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               <Volume2 className="w-4 h-4" />
-              {t('settings.audio') || 'Audio'}
+              {t('settings.audio')}
             </h2>
             <div className="space-y-3">
               <SettingRow
                 icon={<Music className="w-5 h-5 text-neo-pink" />}
-                label={t('settings.music') || 'Music'}
+                label={t('settings.music')}
                 isDarkMode={isDarkMode}
               >
                 <VolumeSlider
@@ -285,15 +285,15 @@ export default function SettingsPageClient(): React.JSX.Element {
                   isMuted={musicMuted}
                   onToggleMute={toggleMusicMute}
                   isDarkMode={isDarkMode}
-                  label={t('settings.music') || 'Music'}
-                  muteLabel={t('settings.mute') || 'Mute'}
-                  unmuteLabel={t('settings.unmute') || 'Unmute'}
+                  label={t('settings.music')}
+                  muteLabel={t('settings.mute')}
+                  unmuteLabel={t('settings.unmute')}
                 />
               </SettingRow>
 
               <SettingRow
                 icon={<Bell className="w-5 h-5 text-neo-lime" />}
-                label={t('settings.soundEffects') || 'Sound Effects'}
+                label={t('settings.soundEffects')}
                 isDarkMode={isDarkMode}
               >
                 <VolumeSlider
@@ -302,9 +302,9 @@ export default function SettingsPageClient(): React.JSX.Element {
                   isMuted={sfxMuted}
                   onToggleMute={toggleSfxMute}
                   isDarkMode={isDarkMode}
-                  label={t('settings.soundEffects') || 'Sound Effects'}
-                  muteLabel={t('settings.mute') || 'Mute'}
-                  unmuteLabel={t('settings.unmute') || 'Unmute'}
+                  label={t('settings.soundEffects')}
+                  muteLabel={t('settings.mute')}
+                  unmuteLabel={t('settings.unmute')}
                 />
               </SettingRow>
             </div>
@@ -322,18 +322,18 @@ export default function SettingsPageClient(): React.JSX.Element {
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               <Sparkles className="w-4 h-4" />
-              {t('settings.accessibility') || 'Accessibility'}
+              {t('settings.accessibility')}
             </h2>
             <div className="space-y-3">
               <SettingRow
                 icon={<Monitor className="w-5 h-5 text-neo-cyan" />}
-                label={t('settings.reduceMotion') || 'Reduce Motion'}
-                description={t('settings.reduceMotionDescription') || 'Limit animations'}
+                label={t('settings.reduceMotion')}
+                description={t('settings.reduceMotionDescription')}
                 isDarkMode={isDarkMode}
               >
                 <button
                   onClick={cycleReduceMotion}
-                  aria-label={`${t('settings.reduceMotion') || 'Reduce Motion'}: ${getReduceMotionLabel()}`}
+                  aria-label={`${t('settings.reduceMotion')}: ${getReduceMotionLabel()}`}
                   className={cn(
                     'px-4 py-2 rounded-neo border-3 border-neo-black font-bold min-w-[80px] text-center',
                     settings.reduceMotion === true
@@ -349,33 +349,33 @@ export default function SettingsPageClient(): React.JSX.Element {
 
               <SettingRow
                 icon={<Zap className="w-5 h-5 text-neo-lime" />}
-                label={t('settings.fireRoundLights') || 'Fire Round Lights'}
-                description={t('settings.fireRoundLightsDescription') || 'Rainbow glow effects'}
+                label={t('settings.fireRoundLights')}
+                description={t('settings.fireRoundLightsDescription')}
                 isDarkMode={isDarkMode}
               >
                 <ToggleButton
                   isOn={!settings.disableFireRoundLights}
                   onToggle={toggleFireRoundLights}
                   isDarkMode={isDarkMode}
-                  label={t('settings.fireRoundLights') || 'Fire Round Lights'}
-                  onLabel={t('settings.enabled') || 'Enabled'}
-                  offLabel={t('settings.disabled') || 'Disabled'}
+                  label={t('settings.fireRoundLights')}
+                  onLabel={t('settings.enabled')}
+                  offLabel={t('settings.disabled')}
                 />
               </SettingRow>
 
               <SettingRow
                 icon={<Sparkles className="w-5 h-5 text-neo-pink" />}
-                label={t('settings.earthquakeEffects') || 'Earthquake Effects'}
-                description={t('settings.earthquakeEffectsDescription') || 'Screen shake & particles'}
+                label={t('settings.earthquakeEffects')}
+                description={t('settings.earthquakeEffectsDescription')}
                 isDarkMode={isDarkMode}
               >
                 <ToggleButton
                   isOn={!settings.disableEarthquakeEffects}
                   onToggle={toggleEarthquakeEffects}
                   isDarkMode={isDarkMode}
-                  label={t('settings.earthquakeEffects') || 'Earthquake Effects'}
-                  onLabel={t('settings.enabled') || 'Enabled'}
-                  offLabel={t('settings.disabled') || 'Disabled'}
+                  label={t('settings.earthquakeEffects')}
+                  onLabel={t('settings.enabled')}
+                  offLabel={t('settings.disabled')}
                 />
               </SettingRow>
             </div>
@@ -392,7 +392,7 @@ export default function SettingsPageClient(): React.JSX.Element {
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               <MessageSquare className="w-4 h-4" />
-              {t('settings.support') || 'Support & Feedback'}
+              {t('settings.support')}
             </h2>
             <Link
               href={`/${language}/contact`}
@@ -409,14 +409,14 @@ export default function SettingsPageClient(): React.JSX.Element {
                 </div>
                 <div>
                   <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                    {t('contact.title') || 'Contact Us'}
+                    {t('contact.title')}
                   </p>
                   <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                    {t('settings.contactDescription') || 'Questions, feedback, or just say hi!'}
+                    {t('settings.contactDescription')}
                   </p>
                 </div>
               </div>
-              <ChevronRight className={cn('w-5 h-5', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
+              <ChevronRight className={cn('w-5 h-5 rtl:rotate-180', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
             </Link>
           </motion.section>
         </div>
@@ -433,7 +433,7 @@ export default function SettingsPageClient(): React.JSX.Element {
           )}
         >
           <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
-            {t('settings.savedAutomatically') || 'Settings are saved automatically'}
+            {t('settings.savedAutomatically')}
           </p>
         </motion.div>
       </div>

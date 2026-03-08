@@ -78,7 +78,7 @@ export default function LessonTemplateEditor({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      toast.error(t('education.template.nameRequired') || 'Template name is required');
+      toast.error(t('education.template.nameRequired'));
       return;
     }
 
@@ -105,7 +105,7 @@ export default function LessonTemplateEditor({
     const result = await onSave(data as CreateTemplateData);
 
     if (result.success) {
-      toast.success(t('education.template.saved') || 'Template saved!');
+      toast.success(t('education.template.saved'));
       onClose();
     } else {
       toast.error(result.error || 'Failed to save template');
@@ -128,11 +128,11 @@ export default function LessonTemplateEditor({
         >
           <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-6">
             {existingTemplate
-              ? t('education.template.edit') || 'Edit Template'
-              : t('education.template.create') || 'Create Template'}
+              ? t('education.template.edit')
+              : t('education.template.create')}
           </Dialog.Title>
           <Dialog.Description className="sr-only">
-            {t('education.template.description') || 'Configure game settings for this lesson'}
+            {t('education.template.description')}
           </Dialog.Description>
 
           <div className="space-y-6">
@@ -140,12 +140,12 @@ export default function LessonTemplateEditor({
             <div className="space-y-2">
               <Label className="text-sm font-neo-body text-neo-white flex items-center gap-2">
                 <Type className="w-4 h-4 text-neo-cyan" />
-                {t('education.template.name') || 'Template Name'}
+                {t('education.template.name')}
               </Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder={t('education.template.namePlaceholder') || 'e.g., Quick Review'}
+                placeholder={t('education.template.namePlaceholder')}
                 className="border-neo border-neo-black shadow-hard-sm bg-neo-navy/50"
               />
             </div>
@@ -154,7 +154,7 @@ export default function LessonTemplateEditor({
             <div className="space-y-3">
               <Label className="text-sm font-neo-body text-neo-white flex items-center gap-2">
                 <Clock className="w-4 h-4 text-neo-yellow" />
-                {t('education.template.timer') || 'Game Duration'}
+                {t('education.template.timer')}
               </Label>
               <div className="flex gap-2 flex-wrap">
                 {TIMER_OPTIONS.map((option) => (
@@ -180,7 +180,7 @@ export default function LessonTemplateEditor({
             <div className="space-y-3">
               <Label className="text-sm font-neo-body text-neo-white flex items-center gap-2">
                 <Grid3X3 className="w-4 h-4 text-neo-orange" />
-                {t('education.template.difficulty') || 'Board Size'}
+                {t('education.template.difficulty')}
               </Label>
               <div className="flex gap-2">
                 {DIFFICULTY_OPTIONS.map((option) => (
@@ -202,7 +202,7 @@ export default function LessonTemplateEditor({
               </div>
               {selectedDifficulty && (
                 <p className="text-xs text-neo-white/60">
-                  {t('education.template.boardPreview') || 'Board will be'} {selectedDifficulty.rows}x{selectedDifficulty.cols}
+                  {t('education.template.boardPreview')} {selectedDifficulty.rows}x{selectedDifficulty.cols}
                 </p>
               )}
             </div>
@@ -211,7 +211,7 @@ export default function LessonTemplateEditor({
             <div className="space-y-3">
               <Label className="text-sm font-neo-body text-neo-white flex items-center gap-2">
                 <Zap className="w-4 h-4 text-neo-pink" />
-                {t('education.template.minWordLength') || 'Minimum Word Length'}
+                {t('education.template.minWordLength')}
               </Label>
               <div className="flex gap-2">
                 {[2, 3, 4, 5].map((len) => (
@@ -239,10 +239,10 @@ export default function LessonTemplateEditor({
                 <Users className="w-4 h-4 text-neo-cyan" />
                 <div>
                   <Label className="text-sm font-neo-body text-neo-white">
-                    {t('education.template.allowLateJoin') || 'Allow Late Join'}
+                    {t('education.template.allowLateJoin')}
                   </Label>
                   <p className="text-xs text-neo-white/60">
-                    {t('education.template.allowLateJoinDesc') || 'Players can join after game starts'}
+                    {t('education.template.allowLateJoinDesc')}
                   </p>
                 </div>
               </div>
@@ -256,10 +256,10 @@ export default function LessonTemplateEditor({
             <div className="flex items-center justify-between p-4 bg-neo-black/30 rounded-neo border border-neo-black">
               <div>
                 <Label className="text-sm font-neo-body text-neo-white">
-                  {t('education.template.setDefault') || 'Set as Default'}
+                  {t('education.template.setDefault')}
                 </Label>
                 <p className="text-xs text-neo-white/60">
-                  {t('education.template.setDefaultDesc') || 'Use these settings by default for this lesson'}
+                  {t('education.template.setDefaultDesc')}
                 </p>
               </div>
               <Switch
@@ -279,17 +279,17 @@ export default function LessonTemplateEditor({
                   'transition-all'
                 )}
               >
-                <Save className={cn('w-4 h-4', isRTL ? 'ml-2' : 'mr-2')} />
+                <Save className="w-4 h-4 me-2" />
                 {isSaving
-                  ? t('education.template.saving') || 'Saving...'
-                  : t('education.template.save') || 'Save Template'}
+                  ? t('education.template.saving')
+                  : t('education.template.save')}
               </Button>
               <Button
                 variant="outline"
                 onClick={onClose}
                 className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
               >
-                {t('common.cancel') || 'Cancel'}
+                {t('common.cancel')}
               </Button>
             </div>
           </div>

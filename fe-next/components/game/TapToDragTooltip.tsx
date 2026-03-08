@@ -182,7 +182,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
                   flex items-center justify-center
                   hover:scale-110 transition-transform
                 "
-                aria-label={t('common.close') || 'Close'}
+                aria-label={t('common.close')}
               >
                 <X className="w-2.5 h-2.5" />
               </button>
@@ -197,7 +197,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
                   <Hand className="w-3 h-3 text-neo-black" />
                 </motion.div>
                 <h4 className="font-black text-neo-black text-xs uppercase tracking-wide">
-                  {t('guidance.dragTutorial.title') || 'Drag!'}
+                  {t('guidance.dragTutorial.title')}
                 </h4>
               </div>
 

@@ -38,7 +38,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
       case 'reveal_letter':
         return {
           icon: <Sparkles className="w-5 h-5" />,
-          title: t('wordHunt.survival.clueRevealLetter') || 'Letter Revealed!',
+          title: t('wordHunt.survival.clueRevealLetter'),
           cost: 3,
           emoji: '💡',
           color: 'from-neo-cyan to-blue-400',
@@ -46,7 +46,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
       case 'reveal_category':
         return {
           icon: <Tag className="w-5 h-5" />,
-          title: t('wordHunt.survival.clueRevealCategory') || 'Category Unlocked!',
+          title: t('wordHunt.survival.clueRevealCategory'),
           cost: 9,
           emoji: '🏷️',
           color: 'from-neo-pink to-purple-400',
@@ -54,7 +54,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
       case 'example_sentence':
         return {
           icon: <FileText className="w-5 h-5" />,
-          title: t('wordHunt.survival.clueExampleSentence') || 'Example Sentence Unlocked!',
+          title: t('wordHunt.survival.clueExampleSentence'),
           cost: 15,
           emoji: '📝',
           color: 'from-neo-orange to-yellow-400',
@@ -121,7 +121,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
             <div className="flex-1">
               {/* Title */}
               <div className="font-black text-sm text-neo-black font-neo-display mb-0.5">
-                {t('wordHunt.survival.autoClueUnlocked') || 'Clue Unlocked!'}
+                {t('wordHunt.survival.autoClueUnlocked')}
               </div>
 
               {/* Subtitle */}

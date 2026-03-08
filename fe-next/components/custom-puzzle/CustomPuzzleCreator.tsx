@@ -550,7 +550,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   onClick={handleShare}
                   className="w-full py-4 text-lg font-black uppercase bg-gradient-to-r from-neo-pink to-neo-orange text-neo-cream border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
                 >
-                  <Share2 className="w-5 h-5 mr-2" />
+                  <Share2 className="w-5 h-5 me-2" />
                   {t('customPuzzle.share')}
                 </Button>
 
@@ -560,7 +560,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   className="w-full py-3 text-lg font-bold bg-neo-white text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
                 >
                   {t('common.done')}
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <ArrowRight className="w-5 h-5 ms-2" />
                 </Button>
               </motion.div>
             </div>

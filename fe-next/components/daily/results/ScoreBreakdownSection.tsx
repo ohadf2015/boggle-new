@@ -43,9 +43,9 @@ function getImprovementTip(
   }
 
   const gaps = [
-    { category: 'speed', gap: 400 - breakdown.speed, tip: t('wordHunt.score.improve.speed') || 'Finish faster to improve' },
-    { category: 'accuracy', gap: 400 - breakdown.accuracy, tip: t('wordHunt.score.improve.accuracy') || 'Use fewer guesses' },
-    { category: 'exploration', gap: 200 - breakdown.exploration, tip: t('wordHunt.score.improve.exploration') || 'Find more words' },
+    { category: 'speed', gap: 400 - breakdown.speed, tip: t('wordHunt.score.improve.speed') },
+    { category: 'accuracy', gap: 400 - breakdown.accuracy, tip: t('wordHunt.score.improve.accuracy') },
+    { category: 'exploration', gap: 200 - breakdown.exploration, tip: t('wordHunt.score.improve.exploration') },
   ];
 
   // Find the category with the largest gap (most room for improvement)
@@ -76,34 +76,34 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
     {
       id: 'speed',
       icon: <Zap className="w-4 h-4" />,
-      label: t('wordHunt.score.speed') || 'Speed',
+      label: t('wordHunt.score.speed'),
       score: breakdown.speed,
       maxScore: 400,
       color: 'text-neo-cyan',
       bgColor: 'bg-neo-cyan',
-      description: `${breakdown.raw.lifeRemaining} ${t('wordHunt.score.lifeLeft') || 'life left'}`,
+      description: `${breakdown.raw.lifeRemaining} ${t('wordHunt.score.lifeLeft')}`,
     },
     {
       id: 'accuracy',
       icon: <Target className="w-4 h-4" />,
-      label: t('wordHunt.score.accuracy') || 'Accuracy',
+      label: t('wordHunt.score.accuracy'),
       score: breakdown.accuracy,
       maxScore: 400,
       color: 'text-neo-lime',
       bgColor: 'bg-neo-lime',
       description: breakdown.raw.guessesUsed === 1
-        ? t('wordHunt.score.firstTry') || 'First try!'
-        : `${breakdown.raw.guessesUsed} ${t('wordHunt.score.guesses') || 'guesses'}`,
+        ? t('wordHunt.score.firstTry')
+        : `${breakdown.raw.guessesUsed} ${t('wordHunt.score.guesses')}`,
     },
     {
       id: 'exploration',
       icon: <BookOpen className="w-4 h-4" />,
-      label: t('wordHunt.score.exploration') || 'Exploration',
+      label: t('wordHunt.score.exploration'),
       score: breakdown.exploration,
       maxScore: 200,
       color: 'text-neo-pink',
       bgColor: 'bg-neo-pink',
-      description: `${breakdown.raw.wordsFound} ${t('wordHunt.score.wordsFound') || 'words found'}`,
+      description: `${breakdown.raw.wordsFound} ${t('wordHunt.score.wordsFound')}`,
     },
   ];
 
@@ -115,7 +115,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
       <div className="p-4 bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border-b-3 border-neo-black">
         <div className="text-center">
           <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-            {t('wordHunt.score.title') || 'Your Score'}
+            {t('wordHunt.score.title')}
           </div>
           <motion.div
             initial={{ scale: 0.3, opacity: 0, y: 10 }}
@@ -151,7 +151,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
               transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className="mt-2 text-neo-lime font-bold text-sm"
             >
-              {t('wordHunt.score.perfect') || 'Perfect Score!'}
+              {t('wordHunt.score.perfect')}
             </motion.div>
           )}
         </div>

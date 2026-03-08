@@ -537,7 +537,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       onClick={handleNativeShare}
                       className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
                     >
-                      <Share2 className="w-6 h-6 mr-2" strokeWidth={2.5} />
+                      <Share2 className="w-6 h-6 me-2" strokeWidth={2.5} />
                       {t('daily.shareChallenge')}
                     </Button>
 
@@ -545,7 +545,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       onClick={() => setStep('stats')}
                       className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
                     >
-                      <BarChart3 className="w-6 h-6 mr-2" strokeWidth={2.5} />
+                      <BarChart3 className="w-6 h-6 me-2" strokeWidth={2.5} />
                       {t('daily.viewStats')}
                     </Button>
 

@@ -268,7 +268,7 @@ export default function LessonBuilder() {
             'transition-all'
           )}
         >
-          <Plus className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
+          <Plus className="w-5 h-5 me-2" />
           {t('teacher.lesson.create')}
         </Button>
       </div>
@@ -285,7 +285,7 @@ export default function LessonBuilder() {
               onClick={() => setIsCreateDialogOpen(true)}
               className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
             >
-              <Plus className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
+              <Plus className="w-5 h-5 me-2" />
               {t('teacher.lesson.create')}
             </Button>
           </CardContent>
@@ -375,7 +375,7 @@ export default function LessonBuilder() {
                         'transition-all text-xs'
                       )}
                     >
-                      <Play className={cn('w-4 h-4', isRTL ? 'ml-1' : 'mr-1')} />
+                      <Play className="w-4 h-4 me-1" />
                       {t('education.template.startGame')}
                     </Button>
                     <Button

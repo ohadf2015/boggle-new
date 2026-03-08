@@ -127,7 +127,7 @@ export function VersionChecker() {
     >
       <div className="bg-neo-purple border-3 border-neo-black rounded-neo px-6 py-3 shadow-hard animate-neo-pop">
         <p className="text-neo-white font-bold text-sm">
-          {t('system.updatingToNewVersion') || 'Updating to new version...'}
+          {t('system.updatingToNewVersion')}
         </p>
       </div>
     </div>

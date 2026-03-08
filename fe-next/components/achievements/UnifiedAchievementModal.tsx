@@ -91,7 +91,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
         return {
           icon: achievement.icon,
           name: t(`achievements.${achievement.key}.name`) || achievement.key,
-          description: t(`achievements.${achievement.key}.description`) || '',
+          description: t(`achievements.${achievement.key}.description`),
           tier: (achievement.count ? calculateTier(achievement.count) : null) ?? 'BRONZE',
           isNew: true,
           isUpgrade: false,
@@ -111,7 +111,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
         return {
           icon: unlock.icon,
           name: t(`education.achievements.${unlock.achievementKey}.name`) || unlock.achievementKey,
-          description: t(`education.achievements.${unlock.achievementKey}.description`) || '',
+          description: t(`education.achievements.${unlock.achievementKey}.description`),
           tier: tierMap[unlock.tier] || 'BRONZE',
           isNew: unlock.isNew,
           isUpgrade: unlock.isUpgrade,
@@ -175,8 +175,8 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
 
   // Get title text
   const titleText = normalized.isNew
-    ? t('achievements.unlocked') || 'Achievement Unlocked!'
-    : t('achievements.upgraded') || 'Achievement Upgraded!';
+    ? t('achievements.unlocked')
+    : t('achievements.upgraded');
 
   return (
     <AnimatePresence>
@@ -296,7 +296,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
               'transition-all duration-200'
             )}
           >
-            {t('common.continue') || 'Continue'}
+            {t('common.continue')}
           </motion.button>
         </motion.div>
       </motion.div>

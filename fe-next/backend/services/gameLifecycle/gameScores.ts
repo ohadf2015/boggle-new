@@ -181,23 +181,26 @@ export async function calculateAndBroadcastFinalScores(
     targetFoundBy: huntState.targetFoundBy as string | null,
   } : undefined;
 
+  // Build blast mode summary if applicable
+  const blastState = game.gameMode === 'blast' ? (game as any).blastModeState : null;
+  const blastSummary = blastState ? {
+    playerMoves: blastState.playerMoves as Record<string, number>,
+  } : undefined;
+
   // Broadcast results to all clients
   // Host expects 'validationComplete', players expect 'validatedScores'
   // Include duplicateRuleDisabled flag so frontend can display a notice
-  broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
+  const resultsPayload = {
     scores: resultsWithIconAchievements,
     letterGrid: game.letterGrid,
     duplicateRuleDisabled,
     playerCount,
+    gameMode: game.gameMode,
     wordHuntSummary,
-  });
-  broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', {
-    scores: resultsWithIconAchievements,
-    letterGrid: game.letterGrid,
-    duplicateRuleDisabled,
-    playerCount,
-    wordHuntSummary,
-  });
+    blastSummary,
+  };
+  broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', resultsPayload);
+  broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', resultsPayload);
 
   // Record to database
   if (isSupabaseConfigured()) {

@@ -393,7 +393,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             )}
           >
             <Flame className={streakDays >= 7 ? 'text-orange-500' : 'text-yellow-500'} />
-            {streakDays} {t('growth.dayStreak') || 'day streak'}!
+            {streakDays} {t('growth.dayStreak')}!
           </motion.div>
         )}
 

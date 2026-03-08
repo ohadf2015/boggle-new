@@ -30,10 +30,10 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                 : 'bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 hover:border-purple-400 text-gray-800 dark:text-gray-200'
             )}
           >
-            <span className="mr-1">{lang.flag}</span>
+            <span className="me-1">{lang.flag}</span>
             <span className="hidden xs:inline">{lang.name}</span>
             <span className="xs:hidden">{lang.code.toUpperCase()}</span>
-            <span className="ml-1 opacity-70">({wordCounts[lang.code] || 0})</span>
+            <span className="ms-1 opacity-70">({wordCounts[lang.code] || 0})</span>
           </button>
         ))}
       </div>

@@ -74,7 +74,7 @@ const BossMechanicWidget = memo<BossMechanicWidgetProps>(({
         {showMultiplier && (
           <span
             data-testid="bonus-multiplier"
-            className="font-neo-display text-xs font-bold text-neo-yellow ml-2 flex-shrink-0"
+            className="font-neo-display text-xs font-bold text-neo-yellow ms-2 flex-shrink-0"
           >
             {Math.floor(bonusMultiplier)}x
           </span>
@@ -87,7 +87,7 @@ const BossMechanicWidget = memo<BossMechanicWidgetProps>(({
         aria-valuenow={progressPct}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={t('adventure.bosses.mechanicProgress') || 'Mechanic progress'}
+        aria-label={t('adventure.bosses.mechanicProgress')}
         className="relative w-full h-3 bg-neo-navy-light border-2 border-neo-black rounded-full overflow-hidden"
       >
         <motion.div

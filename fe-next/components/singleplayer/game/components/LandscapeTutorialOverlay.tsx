@@ -39,30 +39,30 @@ export function LandscapeTutorialOverlay({
           onClick={(e) => e.stopPropagation()}
         >
           <h2 className="text-xl font-black text-neo-black mb-4">
-            {t('landscape.tutorialTitle') || 'Landscape Controls'}
+            {t('landscape.tutorialTitle')}
           </h2>
           <div className="space-y-3 text-neo-black/80 font-medium">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-neo-cream text-neo-black border-2 border-neo-black rounded-neo flex items-center justify-center">
                 <Pause className="text-neo-black" />
               </div>
-              <span>{t('landscape.tutorialPause') || 'Bottom-left: Pause/Resume game'}</span>
+              <span>{t('landscape.tutorialPause')}</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-neo-red border-2 border-neo-black rounded-neo flex items-center justify-center">
                 <ArrowLeft className="text-neo-cream rtl:rotate-180" />
               </div>
-              <span>{t('landscape.tutorialQuit') || 'Bottom-right: Quit game'}</span>
+              <span>{t('landscape.tutorialQuit')}</span>
             </div>
           </div>
           <div className="mt-4 pt-4 border-t-2 border-neo-black/20 text-sm text-neo-black/75">
-            <p>{t('landscape.tutorialKeyboard') || 'Keyboard: Space = Pause, Esc = Quit'}</p>
+            <p>{t('landscape.tutorialKeyboard')}</p>
           </div>
           <Button
             onClick={onDismiss}
             className="w-full mt-4 bg-neo-cyan border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-110 h-12"
           >
-            {t('common.gotIt') || 'Got it!'}
+            {t('common.gotIt')}
           </Button>
         </AdaptiveMotion.div>
       </AdaptiveMotion.div>

@@ -79,7 +79,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead }: Notifi
             border border-black
             hover:scale-125 transition-transform
           "
-          title={t('notifications.markAsRead') || 'Mark as read'}
+          title={t('notifications.markAsRead')}
         />
       )}
     </div>

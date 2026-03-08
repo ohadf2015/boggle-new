@@ -225,7 +225,7 @@ export function TimedBlitzPractice({
                   >
                     <Flame className="w-5 h-5 text-neo-yellow" />
                     <span className="font-neo-display text-neo-white text-xl">
-                      {combo}x {t('education.practice.combo') || 'Combo'}!
+                      {combo}x {t('education.practice.combo')}!
                     </span>
                   </AdaptiveMotion.div>
                 )}
@@ -262,7 +262,7 @@ export function TimedBlitzPractice({
               )}
             >
               <p className="font-neo-body text-neo-white text-2xl text-center">
-                {currentWord?.definition || t('education.practice.noWords') || 'No words available'}
+                {currentWord?.definition || t('education.practice.noWords')}
               </p>
             </AdaptiveMotion.div>
 
@@ -289,7 +289,7 @@ export function TimedBlitzPractice({
                   'disabled:opacity-50 disabled:cursor-not-allowed',
                   'transition-all'
                 )}
-                placeholder={t('education.practice.typeAnswer') || 'Type your answer...'}
+                placeholder={t('education.practice.typeAnswer')}
               />
 
               <button
@@ -305,7 +305,7 @@ export function TimedBlitzPractice({
                   'transition-all active:translate-y-1'
                 )}
               >
-                {t('education.practice.submit') || 'Submit'}
+                {t('education.practice.submit')}
               </button>
             </form>
           </AdaptiveMotion.div>
@@ -329,7 +329,7 @@ export function TimedBlitzPractice({
                 'drop-shadow-[4px_4px_0px_rgba(0,0,0,0.5)]'
               )}
             >
-              {t('education.practice.timesUp') || "TIME'S UP!"}
+              {t('education.practice.timesUp')}
             </div>
             <Sparkles className="w-12 h-12 text-neo-yellow mx-auto mt-4" />
           </AdaptiveMotion.div>

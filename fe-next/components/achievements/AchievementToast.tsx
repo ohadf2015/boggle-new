@@ -74,8 +74,8 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
   }, [isVisible, playAchievementSound]);
 
   const titleText = isNew
-    ? t('achievements.unlocked') || 'Achievement Unlocked!'
-    : t('achievements.upgraded') || 'Achievement Upgraded!';
+    ? t('achievements.unlocked')
+    : t('achievements.upgraded');
 
   const achievementName = t(achievement.nameKey) || achievement.id;
 

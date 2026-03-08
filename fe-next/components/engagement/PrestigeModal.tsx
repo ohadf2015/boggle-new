@@ -223,7 +223,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       <Loader size="sm" className="mx-auto" />
                     ) : (
                       <>
-                        <Check className="w-4 h-4 inline mr-1" />
+                        <Check className="w-4 h-4 inline me-1" />
                         {language === 'he' ? 'אשר פרסטיג\'' : 'Confirm Prestige'}
                       </>
                     )}
@@ -339,7 +339,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                           'transition-all'
                         )}
                       >
-                        <Sparkles className="w-5 h-5 inline mr-2" />
+                        <Sparkles className="w-5 h-5 inline me-2" />
                         {language === 'he' ? `קפוץ לפרסטיג' ${toRoman(nextPrestigeLevel)}` : `Prestige to ${toRoman(nextPrestigeLevel)}`}
                       </motion.button>
                     ) : (

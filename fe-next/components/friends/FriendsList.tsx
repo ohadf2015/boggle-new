@@ -395,11 +395,11 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 ))
               ) : (
                 <EnhancedEmptyState
-                  title={t('friends.noFriendsYet') || 'No friends yet'}
-                  description={t('friends.addFriendsToChallenge') || 'Add friends to challenge them to a game!'}
+                  title={t('friends.noFriendsYet')}
+                  description={t('friends.addFriendsToChallenge')}
                   icon="sparkles"
                   action={{
-                    label: t('friends.add') || 'Add Friend',
+                    label: t('friends.add'),
                     onClick: () => setShowAddFriend(true),
                     variant: 'primary',
                   }}
@@ -471,8 +471,8 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
             {pendingRequests.length === 0 && outgoingRequests.length === 0 && (
               <EnhancedEmptyState
-                title={t('friends.noPendingRequests') || 'No pending requests'}
-                description={t('friends.requestsWillAppearHere') || 'Friend requests will appear here'}
+                title={t('friends.noPendingRequests')}
+                description={t('friends.requestsWillAppearHere')}
                 icon="inbox"
                 compact
               />
@@ -584,7 +584,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                         <Loader size="sm" />
                       ) : (
                         <>
-                          <UserPlus className="w-3 h-3 mr-1" />
+                          <UserPlus className="w-3 h-3 me-1" />
                           {t('friends.add')}
                         </>
                       )}

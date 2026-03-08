@@ -257,10 +257,10 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
         open={showQuitConfirm}
         onOpenChange={onQuitCancel}
         onConfirm={onQuitConfirm}
-        title={t('wordHunt.quitConfirmTitle') || 'Quit Game?'}
-        description={t('wordHunt.quitConfirmMessage') || 'You will lose your current progress.'}
-        confirmText={t('common.quit') || 'Quit'}
-        cancelText={t('common.cancel') || 'Cancel'}
+        title={t('wordHunt.quitConfirmTitle')}
+        description={t('wordHunt.quitConfirmMessage')}
+        confirmText={t('common.quit')}
+        cancelText={t('common.cancel')}
         variant="danger"
       />
     </div>
@@ -323,7 +323,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
           {MAX_ATTEMPTS - attemptsCount}
         </div>
         <div className="landscape-stat-label text-neo-black">
-          {t('wordHunt.survival.triesLeft') || 'TRIES'}
+          {t('wordHunt.survival.triesLeft')}
         </div>
       </div>
     </div>
@@ -373,7 +373,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
           }}
         >
           <div className="landscape-stat-label text-neo-black mb-1">
-            {t('wordHunt.survival.accumulatedScore') || 'SCORE'}
+            {t('wordHunt.survival.accumulatedScore')}
           </div>
           <div className="landscape-stat-primary text-neo-black font-black">
             {Math.max(0, Math.round(liveScore))}
@@ -605,7 +605,7 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
       {!showFeedbackOverlay && knownLetters.size > 0 && (
         <div className="flex items-center justify-center gap-1 text-[9px] mb-1">
           <span className="text-yellow-400 font-medium">
-            {t('wordHunt.survival.knownLetters') || 'Wrong spot:'}
+            {t('wordHunt.survival.knownLetters')}
           </span>
           <div className="flex gap-0.5">
             {Array.from(knownLetters).map((letter) => (

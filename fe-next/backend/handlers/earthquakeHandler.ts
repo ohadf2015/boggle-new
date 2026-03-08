@@ -110,6 +110,12 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
       return;
     }
 
+    // Earthquake only applies to classic mode
+    if (game.gameMode && game.gameMode !== 'classic') {
+      logger.warn('EARTHQUAKE', `Cannot trigger earthquake in ${game.gameMode} mode for game ${gameCode}`);
+      return;
+    }
+
     // Atomically check and set earthquake flag to prevent race conditions
     // Two hosts might emit triggerEarthquake at the same time
     if (game.earthquakeTriggered) {

@@ -243,7 +243,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             )}
           >
             <Users size={14} className="text-neo-black" aria-hidden="true" />
-            <span className="text-neo-black">{t('friends.title') || 'Friends'}</span>
+            <span className="text-neo-black">{t('friends.title')}</span>
           </button>
 
           {/* Sign Out */}
@@ -260,7 +260,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             ) : (
               <LogOut size={14} aria-hidden="true" />
             )}
-            <span>{t('auth.signOut') || 'Sign Out'}</span>
+            <span>{t('auth.signOut')}</span>
           </button>
         </div>
       );
@@ -276,7 +276,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           onClick={() => setShowUserMenu(!showUserMenu)}
           aria-haspopup="menu"
           aria-expanded={showUserMenu}
-          aria-label={t('auth.userMenu') || 'User menu'}
+          aria-label={t('auth.userMenu')}
           className={cn(
             'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3 min-h-[44px]',
             isDarkMode
@@ -314,7 +314,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 transition={{ duration: 0.2 }}
                 onMouseDown={(e) => e.preventDefault()}
                 role="menu"
-                aria-label={t('auth.userMenu') || 'User menu'}
+                aria-label={t('auth.userMenu')}
                 className={cn(
                   'min-w-[180px] rounded-lg shadow-xl z-80',
                   isDarkMode
@@ -343,7 +343,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
               >
                 <User size={14} />
-                <span>{t('profile.title') || 'Profile'}</span>
+                <span>{t('profile.title')}</span>
               </Button>
 
               {/* Leaderboard Link */}
@@ -362,7 +362,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
               >
                 <Trophy size={14} aria-hidden="true" />
-                <span>{t('leaderboard.title') || 'Leaderboard'}</span>
+                <span>{t('leaderboard.title')}</span>
               </Button>
 
               {/* Friends Link */}
@@ -381,7 +381,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
               >
                 <Users size={14} aria-hidden="true" />
-                <span>{t('friends.title') || 'Friends'}</span>
+                <span>{t('friends.title')}</span>
               </Button>
 
               {/* Divider */}
@@ -406,7 +406,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
               >
                 <Settings size={14} aria-hidden="true" />
-                <span>{t('settings.title') || 'Settings'}</span>
+                <span>{t('settings.title')}</span>
               </Button>
 
               {/* Daily Rewards Calendar */}
@@ -429,9 +429,9 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                     <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-2.5 h-2.5 bg-neo-lime rounded-full border border-neo-black" />
                   )}
                 </div>
-                <span>{t('calendar.title') || 'Daily Rewards'}</span>
+                <span>{t('calendar.title')}</span>
                 {hasUnclaimedReward && (
-                  <Gift size={12} className="ms-auto text-neo-lime" aria-label={t('calendar.rewardAvailable') || 'Reward available'} />
+                  <Gift size={12} className="ms-auto text-neo-lime" aria-label={t('calendar.rewardAvailable')} />
                 )}
               </Button>
 
@@ -452,7 +452,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   )}
                 >
                   <Shield size={14} aria-hidden="true" />
-                  <span>{t('common.adminDashboard') || 'Admin'}</span>
+                  <span>{t('common.adminDashboard')}</span>
                 </Button>
               )}
 
@@ -551,7 +551,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 ) : (
                   <LogOut size={14} aria-hidden="true" />
                 )}
-                <span>{t('auth.signOut') || 'Sign Out'}</span>
+                <span>{t('auth.signOut')}</span>
               </Button>
               </motion.div>
             )}
@@ -613,7 +613,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   ) : (
                     <User size={14} className="text-neo-black" />
                   )}
-                  <span className="text-neo-black">{t('auth.loginCrazyGames') || 'Login with CrazyGames'}</span>
+                  <span className="text-neo-black">{t('auth.loginCrazyGames')}</span>
                 </button>
               ) : null}
             </>
@@ -628,7 +628,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
               >
                 <User size={14} className="text-neo-black" aria-hidden="true" />
-                <span className="text-neo-black">{t('auth.signIn') || 'Sign In'}</span>
+                <span className="text-neo-black">{t('auth.signIn')}</span>
               </button>
 
               <button
@@ -639,7 +639,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
               >
                 <User size={14} aria-hidden="true" />
-                <span>{t('auth.signUp') || 'Sign Up'}</span>
+                <span>{t('auth.signUp')}</span>
               </button>
             </>
           )}
@@ -705,7 +705,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           ) : (
             <User size={14} />
           )}
-          <span className="hidden sm:inline">{t('auth.loginCrazyGames') || 'Login'}</span>
+          <span className="hidden sm:inline">{t('auth.loginCrazyGames')}</span>
         </Button>
       );
     }
@@ -729,7 +729,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           )}
         >
           <User size={14} />
-          <span className="hidden sm:inline">{t('auth.signIn') || 'Sign In'}</span>
+          <span className="hidden sm:inline">{t('auth.signIn')}</span>
         </Button>
 
         {/* Sign Up Button */}
@@ -743,7 +743,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               : 'bg-neo-pink text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.4)] border-2 border-neo-black'
           )}
         >
-          <span className="hidden sm:inline">{t('auth.signUp') || 'Sign Up'}</span>
+          <span className="hidden sm:inline">{t('auth.signUp')}</span>
           <span className="sm:hidden">+</span>
         </Button>
       </div>

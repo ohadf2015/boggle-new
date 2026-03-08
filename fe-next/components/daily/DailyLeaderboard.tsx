@@ -387,10 +387,10 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
             </h3>
             {(totalAttempts > 0 || guestPlayerCount > 0) && (
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                {totalAttempts} {totalAttempts === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge') || 'took the challenge'}
+                {totalAttempts} {totalAttempts === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge')}
                 {guestPlayerCount > 0 && (
                   <span className="text-slate-500 dark:text-slate-400">
-                    {' '}({guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'})
+                    {' '}({guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') : t('daily.guestsPlural')})
                   </span>
                 )}
               </p>
@@ -401,7 +401,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           <div className="text-4xl mb-3">🏆</div>
           <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
             {totalAttempts > 0
-              ? (t('daily.signUpToAppear') || 'Sign up to appear on the leaderboard!')
+              ? (t('daily.signUpToAppear'))
               : t('daily.beFirstToPlay')}
           </p>
         </div>
@@ -434,12 +434,12 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}
               {guestPlayerCount > 0 && (
                 <span className="text-slate-500 dark:text-slate-500">
-                  {' '}• {guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'}
+                  {' '}• {guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') : t('daily.guestsPlural')}
                 </span>
               )}
               {totalAttempts > totalCount + guestPlayerCount && (
                 <span className="text-slate-500 dark:text-slate-500">
-                  {' '}• {totalAttempts} {t('daily.totalAttempts') || 'total attempts'}
+                  {' '}• {totalAttempts} {t('daily.totalAttempts')}
                 </span>
               )}
             </p>

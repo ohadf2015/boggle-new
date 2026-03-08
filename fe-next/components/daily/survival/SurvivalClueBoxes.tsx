@@ -71,7 +71,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
                   ? "text-yellow-600 dark:text-yellow-400"
                   : "text-gray-700 dark:text-gray-300"
             )}>
-              {triesRemaining}/{MAX_ATTEMPTS} {t('wordHunt.survival.triesLeft') || 'tries left'}
+              {triesRemaining}/{MAX_ATTEMPTS} {t('wordHunt.survival.triesLeft')}
             </span>
           </div>
         );
@@ -450,15 +450,15 @@ const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
   >
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded border border-green-700"></span>
-      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.correct') || 'Correct'}</span>
+      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.correct')}</span>
     </span>
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-500 rounded border border-yellow-600"></span>
-      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.wrongPlace') || 'Wrong place'}</span>
+      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.wrongPlace')}</span>
     </span>
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-gray-400 rounded border border-gray-500"></span>
-      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.notInWord') || 'Not in word'}</span>
+      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.notInWord')}</span>
     </span>
   </motion.div>
 );
@@ -484,7 +484,7 @@ const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters,
         className="flex items-center gap-1 text-[10px] sm:text-xs"
       >
         <span className="text-yellow-600 dark:text-yellow-400 font-medium">
-          {t('wordHunt.survival.knownLetters') || 'Wrong spot:'}
+          {t('wordHunt.survival.knownLetters')}
         </span>
         <div className="flex gap-0.5">
           {Array.from(knownLetters).map((letter) => (

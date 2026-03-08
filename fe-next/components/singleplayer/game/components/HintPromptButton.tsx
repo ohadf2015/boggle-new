@@ -56,7 +56,7 @@ export function HintPromptButton({
         }}
       >
         <Zap className="w-5 h-5" />
-        <span>{t('singlePlayer.getHint') || 'GET HINT'}</span>
+        <span>{t('singlePlayer.getHint')}</span>
       </AdaptiveMotion.button>
     </AdaptiveMotion.div>
   );

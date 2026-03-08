@@ -156,7 +156,7 @@ function SinglePlayerGame({
   if (!commonProps) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <PageLoader size="lg" text={core.t('common.loading') || 'Loading...'} />
+        <PageLoader size="lg" text={core.t('common.loading')} />
       </div>
     );
   }

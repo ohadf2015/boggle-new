@@ -172,7 +172,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
       <div className="text-center py-12">
         <p className="text-red-400 mb-4">{error}</p>
         <Button onClick={handleManualRefresh} variant="outline">
-          {t('admin.live.retry') || 'Retry'}
+          {t('admin.live.retry')}
         </Button>
       </div>
     );
@@ -192,7 +192,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </span>
-              <span className="font-neo-display text-green-400">{t('admin.live.live') || 'Live'}</span>
+              <span className="font-neo-display text-green-400">{t('admin.live.live')}</span>
             </div>
             
             {/* Mobile Refresh Button (shown only on mobile) */}
@@ -208,7 +208,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
               ) : (
                 <RefreshCw className="w-3 h-3" />
               )}
-              {t('admin.live.refresh') || 'Refresh'}
+              {t('admin.live.refresh')}
             </Button>
           </div>
 
@@ -216,20 +216,20 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
           <div className="grid grid-cols-2 sm:flex sm:items-center gap-x-4 gap-y-2 text-slate-300">
             <div className="flex items-center gap-1.5">
               <Gamepad2 className="w-4 h-4 text-purple-400" />
-              <span className="text-sm">{stats.activeGames} <span className="text-slate-500">{t('admin.live.games') || 'games'}</span></span>
+              <span className="text-sm">{stats.activeGames} <span className="text-slate-500">{t('admin.live.games')}</span></span>
             </div>
             <div className="flex items-center gap-1.5">
               <Users className="w-4 h-4 text-blue-400" />
-              <span className="text-sm">{stats.playersInGames} <span className="text-slate-500">{t('admin.live.players') || 'players'}</span></span>
+              <span className="text-sm">{stats.playersInGames} <span className="text-slate-500">{t('admin.live.players')}</span></span>
             </div>
             <div className="flex items-center gap-1.5">
               <Wifi className="w-4 h-4 text-green-400" />
-              <span className="text-sm">{stats.socketConnections} <span className="text-slate-500">{t('admin.live.sockets') || 'sockets'}</span></span>
+              <span className="text-sm">{stats.socketConnections} <span className="text-slate-500">{t('admin.live.sockets')}</span></span>
             </div>
             {stats.singlePlayerCount > 0 && (
               <div className="flex items-center gap-1.5">
                 <User className="w-4 h-4 text-amber-400" />
-                <span className="text-sm">{stats.singlePlayerCount} <span className="text-slate-500">{t('admin.live.singlePlayer') || 'solo'}</span></span>
+                <span className="text-sm">{stats.singlePlayerCount} <span className="text-slate-500">{t('admin.live.singlePlayer')}</span></span>
               </div>
             )}
           </div>
@@ -248,7 +248,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
           ) : (
             <RefreshCw className="w-4 h-4" />
           )}
-          {t('admin.live.refresh') || 'Refresh'}
+          {t('admin.live.refresh')}
         </Button>
       </div>
 
@@ -261,10 +261,10 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
         >
           <Gamepad2 className="w-16 h-16 text-slate-500 mb-4" />
           <h3 className="text-xl font-neo-display text-slate-400 mb-2">
-            {t('admin.live.noGames') || 'No active games'}
+            {t('admin.live.noGames')}
           </h3>
           <p className="text-slate-500">
-            {t('admin.live.noGamesHint') || 'Games will appear here when players start playing'}
+            {t('admin.live.noGamesHint')}
           </p>
         </motion.div>
       ) : (
@@ -272,7 +272,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
           {/* Active Games Section */}
           <div>
             <h2 className="text-lg font-neo-display text-neo-white mb-4">
-              {t('admin.live.activeGames') || 'Active Games'}
+              {t('admin.live.activeGames')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <AnimatePresence mode="popLayout">
@@ -286,26 +286,26 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
           {/* All Connected Players Table */}
           <div>
             <h2 className="text-lg font-neo-display text-neo-white mb-4">
-              {t('admin.live.connectedPlayers') || 'Connected Players'}
+              {t('admin.live.connectedPlayers')}
             </h2>
             <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
               <table className="w-full min-w-[600px]">
                 <thead className="bg-slate-700/50">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.player') || 'Player'}
+                      {t('admin.live.player')}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.game') || 'Game'}
+                      {t('admin.live.game')}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.status') || 'Status'}
+                      {t('admin.live.status')}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.score') || 'Score'}
+                      {t('admin.live.score')}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.type') || 'Type'}
+                      {t('admin.live.type')}
                     </th>
                   </tr>
                 </thead>
@@ -330,7 +330,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
 
       {/* Last Updated */}
       <div className="text-center text-sm text-slate-500">
-        {t('admin.live.lastUpdated') || 'Last updated'}: {new Date(lastRefresh).toLocaleTimeString()}
+        {t('admin.live.lastUpdated')}: {new Date(lastRefresh).toLocaleTimeString()}
       </div>
     </div>
   );
@@ -359,7 +359,7 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
         <div className="flex items-center gap-2">
           {game.isRanked && (
             <span className="px-2 py-0.5 text-xs bg-neo-lime text-black rounded font-bold">
-              {t('admin.live.ranked') || 'Ranked'}
+              {t('admin.live.ranked')}
             </span>
           )}
           <span className={cn('px-2 py-0.5 text-xs rounded font-bold text-white capitalize', stateColor)}>
@@ -392,9 +392,9 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
         <div className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
           {game.gameState === 'in-progress' ? (
-            <span>{formatTimeLeft(game.timerSeconds)} {t('admin.live.left') || 'left'}</span>
+            <span>{formatTimeLeft(game.timerSeconds)} {t('admin.live.left')}</span>
           ) : (
-            <span>{t('admin.live.started') || 'Started'} {formatTimeAgo(game.createdAt)}</span>
+            <span>{t('admin.live.started')} {formatTimeAgo(game.createdAt)}</span>
           )}
         </div>
         <span className="text-slate-500">{game.roomName}</span>
@@ -447,7 +447,7 @@ function PlayerRow({
           'px-2 py-0.5 text-xs rounded',
           player.isAuthenticated ? 'bg-green-500/20 text-green-400' : 'bg-slate-600 text-slate-300'
         )}>
-          {player.isAuthenticated ? (t('admin.live.auth') || 'Auth') : (t('admin.live.guest') || 'Guest')}
+          {player.isAuthenticated ? (t('admin.live.auth')) : (t('admin.live.guest'))}
         </span>
       </td>
     </tr>

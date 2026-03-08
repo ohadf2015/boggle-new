@@ -198,16 +198,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
       if (result.error) {
         if (result.error.message.includes('already registered') || result.error.message.includes('already exists')) {
-          setError(t('auth.inlineSignup.emailInUse') || 'This email is already registered. Try signing in instead.');
+          setError(t('auth.inlineSignup.emailInUse'));
           setAuthMode('signin');
         } else if (result.error.message.includes('Invalid login')) {
-          setError(t('auth.invalidCredentials') || 'Invalid email or password');
+          setError(t('auth.invalidCredentials'));
         } else {
           setError(result.error.message);
         }
         setIsLoading(null);
       } else if (authMode === 'signup') {
-        setSuccess(t('auth.inlineSignup.checkEmail') || 'Check your email to verify your account!');
+        setSuccess(t('auth.inlineSignup.checkEmail'));
         setIsLoading(null);
       }
     } catch (err) {
@@ -235,7 +235,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       if (result.error) {
         setError(result.error.message);
       } else {
-        setSuccess(t('auth.magicLink.checkEmail') || 'Check your email for a sign-in link!');
+        setSuccess(t('auth.magicLink.checkEmail'));
       }
       setIsLoading(null);
     } catch (err) {
@@ -292,16 +292,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                 id="auth-modal-title"
                 className="text-2xl font-black text-white font-neo-display"
               >
-                {authMode === 'signup' ? (t('auth.signUp') || 'Sign Up') : (t('auth.signIn') || 'Sign In')}
+                {authMode === 'signup' ? (t('auth.signUp')) : (t('auth.signIn'))}
               </h2>
               <p className="text-sm text-gray-400 mt-0.5">
-                {t('auth.upgradePrompt') || 'Sign in to save progress and climb the leaderboard!'}
+                {t('auth.upgradePrompt')}
               </p>
             </div>
             <button
               onClick={onClose}
               className="p-2 rounded-neo border-2 border-slate-600 hover:border-white hover:bg-white/10 transition-all text-gray-400 hover:text-white"
-              aria-label={t('common.close') || 'Close'}
+              aria-label={t('common.close')}
             >
               <X size={16} />
             </button>
@@ -406,7 +406,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex-1 h-px bg-slate-600" />
                     <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      {t('auth.magicLink.divider') || 'or continue with email'}
+                      {t('auth.magicLink.divider')}
                     </span>
                     <div className="flex-1 h-px bg-slate-600" />
                   </div>
@@ -420,7 +420,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           autoComplete="email"
                           value={email}
                           onChange={(e) => handleEmailChange(e.target.value)}
-                          placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                          placeholder={t('auth.inlineSignup.emailPlaceholder')}
                           className={cn(
                             'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
                             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
@@ -445,7 +445,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         ) : (
                           <>
                             <Wand2 className="w-4 h-4" />
-                            <span>{t('auth.magicLink.sendLink') || 'Send me a sign-in link'}</span>
+                            <span>{t('auth.magicLink.sendLink')}</span>
                           </>
                         )}
                       </Button>
@@ -453,14 +453,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] text-gray-500 flex items-center gap-1">
                           <Wand2 className="w-3 h-3" />
-                          {t('auth.magicLink.noPassword') || 'No password needed'}
+                          {t('auth.magicLink.noPassword')}
                         </span>
                         <button
                           type="button"
                           onClick={() => setUsePassword(true)}
                           className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
                         >
-                          {t('auth.magicLink.usePassword') || 'Use password instead'}
+                          {t('auth.magicLink.usePassword')}
                         </button>
                       </div>
                     </form>
@@ -473,7 +473,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           autoComplete="email"
                           value={email}
                           onChange={(e) => handleEmailChange(e.target.value)}
-                          placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                          placeholder={t('auth.inlineSignup.emailPlaceholder')}
                           className={cn(
                             'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
                             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
@@ -494,7 +494,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                             autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
                             value={password}
                             onChange={(e) => handlePasswordChange(e.target.value)}
-                            placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
+                            placeholder={t('auth.inlineSignup.passwordPlaceholder')}
                             className={cn(
                               'w-full px-4 py-3 pe-12 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
                               'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
@@ -505,7 +505,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            aria-label={showPassword ? (t('auth.hidePassword') || 'Hide password') : (t('auth.showPassword') || 'Show password')}
+                            aria-label={showPassword ? (t('auth.hidePassword')) : (t('auth.showPassword'))}
                             className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
                           >
                             {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
@@ -526,8 +526,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           <Loader size="sm" />
                         ) : (
                           authMode === 'signup'
-                            ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
-                            : (t('auth.signIn') || 'Sign In')
+                            ? (t('auth.inlineSignup.signUpButton'))
+                            : (t('auth.signIn'))
                         )}
                       </Button>
 
@@ -538,15 +538,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
                         >
                           {authMode === 'signup'
-                            ? (t('auth.alreadyHaveAccount') || 'Already have an account? Sign in')
-                            : (t('auth.noAccount') || "Don't have an account? Sign up")}
+                            ? (t('auth.alreadyHaveAccount'))
+                            : (t('auth.noAccount'))}
                         </button>
                         <button
                           type="button"
                           onClick={() => setUsePassword(false)}
                           className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
                         >
-                          {t('auth.magicLink.useMagicLink') || 'Use magic link'}
+                          {t('auth.magicLink.useMagicLink')}
                         </button>
                       </div>
                     </form>
@@ -584,7 +584,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           <div className="mt-4 flex flex-col items-center gap-2">
             <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
               <Shield className="w-3 h-3 text-emerald-500" />
-              <span>{t('auth.trustBadge') || 'Secure & private'}</span>
+              <span>{t('auth.trustBadge')}</span>
             </div>
             <p className="text-[10px] text-gray-500 text-center">
               {t('auth.termsPrefix')}{' '}

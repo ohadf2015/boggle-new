@@ -685,8 +685,8 @@ const sv = {
     ]
   },
   "multiplayerFlow": {
-    "roomClosed": "Room closed",
-    "rateLimited": "Slow down!",
+    "roomClosed": "Rummet stängt",
+    "rateLimited": "Lugna ner dig!",
     "roomList": {
       "activeRooms": "Hoppa in!",
       "online": "i strid",
@@ -708,7 +708,12 @@ const sv = {
       "beTheLegend": "Bli legenden som startar den första striden!",
       "hostAndPlay": "Var värd & spela — Dela koden med vänner",
       "startBattle": "Starta en strid",
-      "inProgress": "Live"
+      "inProgress": "Live",
+      "createRoom": "+ Skapa rum",
+      "noRoomsAvailable": "Inga aktiva rum. Starta ett!",
+      "joinRoomAction": "Gå med i {{roomName}}",
+      "availableRooms": "Tillgängliga rum",
+      "roomsListLabel": "Lista över tillgängliga spelrum"
     },
     "joinModal": {
       "title": "Gå med i striden",
@@ -724,7 +729,10 @@ const sv = {
       "roomNameLabel": "Rumsnamn",
       "optional": "valfritt",
       "createButton": "Starta striden!",
-      "creating": "Förbereder arenan..."
+      "creating": "Förbereder arenan...",
+      "languageLabel": "Spelspråk",
+      "gameModeLabel": "Spelläge",
+      "wordDifficultyLabel": "Ordsvårighet"
     },
     "profileSetup": {
       "title": "Redo?",
@@ -765,7 +773,20 @@ const sv = {
       "refreshButton": "Uppdatera",
       "noRooms": "Inga öppna rum. Har du kod?",
       "joinButton": "Hoppa in!",
-      "joining": "Hoppar in..."
+      "joining": "Hoppar in...",
+      "gameCodeLabel": "Spelkod",
+      "gameCodePlaceholder": "Ange 6-teckens kod",
+      "gameCodeHelp": "Ange den 6-teckens kod som värden delade",
+      "pasteButton": "Klistra in kod"
+    },
+    "errors": {
+      "roomFull": "Rummet är fullt. Prova ett annat eller skapa ditt eget.",
+      "roomClosed": "Rummet har avslutats. Gå tillbaka till lobbyn och hitta ett nytt spel.",
+      "invalidCode": "Ogiltig kod eller stängt rum. Kontrollera koden och försök igen.",
+      "connectionLost": "Anslutningen bröts. Återansluter...",
+      "hostLeft": "Värden lämnade spelet. Återgår till lobbyn...",
+      "invalidUsername": "Användarnamn måste vara 2-20 tecken.",
+      "serverError": "Serverfel. Försök igen."
     }
   },
   "hostView": {

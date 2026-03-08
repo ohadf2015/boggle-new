@@ -43,8 +43,8 @@ export function CollectionGrid({ collectibles, className }: CollectionGridProps)
         isDarkMode ? 'text-gray-500' : 'text-gray-400'
       )}>
         <span className="text-4xl mb-2 block">🎁</span>
-        <p>{t('collectibles.emptyCollection') || 'No collectibles yet!'}</p>
-        <p className="text-sm mt-1">{t('collectibles.earnByPlaying') || 'Earn coins by playing games'}</p>
+        <p>{t('collectibles.emptyCollection')}</p>
+        <p className="text-sm mt-1">{t('collectibles.earnByPlaying')}</p>
       </div>
     );
   }
@@ -112,12 +112,12 @@ function CollectibleBadge({ item, index, isDarkMode }: CollectibleBadgeProps) {
   const rarity = collectible.rarity || 'common';
   const itemName = t(collectible.name_key) || collectible.id;
   const rarityLabel = t(`collectibles.rarity.${rarity}`) || rarity;
-  const equippedLabel = item.is_equipped ? ` (${t('collectibles.equipped') || 'Equipped'})` : '';
+  const equippedLabel = item.is_equipped ? ` (${t('collectibles.equipped')})` : '';
 
   const tooltipContent = (
     <div className="text-center">
       <p className="font-bold">{t(collectible.name_key) || collectible.id}</p>
-      <p className="text-xs opacity-80">{t(collectible.description_key) || ''}</p>
+      <p className="text-xs opacity-80">{t(collectible.description_key)}</p>
       <p className={cn(
         'text-xs mt-1 font-medium',
         rarity === 'common' && 'text-gray-500',

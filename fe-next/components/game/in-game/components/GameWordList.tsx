@@ -29,14 +29,14 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
       <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-1.5 md:p-2">
         <div className="flex items-center justify-between mb-1 px-0.5">
           <span className="text-[10px] md:text-xs font-black uppercase text-neo-black">
-            {t('hostView.words') || 'Your Words'}
+            {t('hostView.words')}
           </span>
           <span className="text-xs font-bold text-neo-black/90 tabular-nums">{foundWords.length}</span>
         </div>
         <div className="max-h-[50px] overflow-hidden">
           {foundWords.length === 0 ? (
             <p className="text-center text-neo-black/70 py-1 text-[10px]">
-              {t('playerView.swipeHintShort') || 'Swipe letters to find words!'}
+              {t('playerView.swipeHintShort')}
             </p>
           ) : (
             <div className="flex flex-wrap gap-1">
@@ -112,7 +112,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
           {foundWords.length === 0 && (
             <div className="text-center py-6">
               <p className="text-neo-black/90 text-sm font-bold mb-2">
-                {t('playerView.noWordsYet') || 'No words found yet'}
+                {t('playerView.noWordsYet')}
               </p>
               <p className="text-neo-black/60 text-xs px-2">
                 {t('playerView.swipeHintWithMin', { min: minWordLength }) ||

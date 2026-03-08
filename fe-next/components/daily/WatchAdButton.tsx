@@ -70,7 +70,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
     if (showSuccess) {
       return {
         icon: <CheckCircle className="w-5 h-5 text-neo-lime" />,
-        text: `+${earnedAmount} ${t('wordHunt.ad.coinsEarned') || 'coins earned!'}`,
+        text: `+${earnedAmount} ${t('wordHunt.ad.coinsEarned')}`,
         subtext: null,
       };
     }
@@ -79,26 +79,26 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
       case 'loading':
         return {
           icon: <Loader size="sm" />,
-          text: t('wordHunt.ad.loading') || 'Loading ad...',
+          text: t('wordHunt.ad.loading'),
           subtext: null,
         };
       case 'showing':
         return {
           icon: <Play className="w-5 h-5 animate-pulse" />,
-          text: t('wordHunt.ad.watching') || 'Watching ad...',
-          subtext: t('wordHunt.ad.almostDone') || 'Almost done!',
+          text: t('wordHunt.ad.watching'),
+          subtext: t('wordHunt.ad.almostDone'),
         };
       case 'error':
         return {
           icon: <AlertCircle className="w-5 h-5 text-red-400" />,
-          text: t('wordHunt.ad.error') || 'Ad failed',
-          subtext: error || t('wordHunt.ad.tryAgain') || 'Try again later',
+          text: t('wordHunt.ad.error'),
+          subtext: error || t('wordHunt.ad.tryAgain'),
         };
       default:
         return {
           icon: <Play className="w-5 h-5" />,
-          text: t('wordHunt.ad.watchAd') || 'Watch Ad',
-          subtext: `+${rewardAmount} ${t('common.coins') || 'coins'}`,
+          text: t('wordHunt.ad.watchAd'),
+          subtext: `+${rewardAmount} ${t('common.coins')}`,
         };
     }
   };

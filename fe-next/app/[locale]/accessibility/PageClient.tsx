@@ -91,7 +91,7 @@ export default function AccessibilitySettingsPageClient() {
     {
       id: 'fireRoundLights',
       icon: Sparkles,
-      title: t('accessibility.fireRoundLights.title') || 'Disable Fire Round Lights',
+      title: t('accessibility.fireRoundLights.title'),
       description:
         t('accessibility.fireRoundLights.description') ||
         'Turn off the rainbow glowing cells during fire rounds to reduce visual distractions.',
@@ -101,7 +101,7 @@ export default function AccessibilitySettingsPageClient() {
     {
       id: 'earthquakeEffects',
       icon: Waves,
-      title: t('accessibility.earthquakeEffects.title') || 'Disable Earthquake Effects',
+      title: t('accessibility.earthquakeEffects.title'),
       description:
         t('accessibility.earthquakeEffects.description') ||
         'Turn off intense earthquake animations including extreme shaking, 3D tumbling, motion blur, screen shake, and particle debris.',
@@ -111,7 +111,7 @@ export default function AccessibilitySettingsPageClient() {
     {
       id: 'reduceMotion',
       icon: Zap,
-      title: t('accessibility.reduceMotion.title') || 'Reduce Animations',
+      title: t('accessibility.reduceMotion.title'),
       description:
         t('accessibility.reduceMotion.description') ||
         'Minimize animations and transitions for a calmer experience. Useful for vestibular disorders or motion sensitivity.',
@@ -121,7 +121,7 @@ export default function AccessibilitySettingsPageClient() {
     {
       id: 'disableSounds',
       icon: disableSounds ? VolumeX : Volume2,
-      title: t('accessibility.disableSounds.title') || 'Disable Sound Effects',
+      title: t('accessibility.disableSounds.title'),
       description:
         t('accessibility.disableSounds.description') ||
         'Turn off all sound effects. Music controls are still available in the header.',
@@ -131,7 +131,7 @@ export default function AccessibilitySettingsPageClient() {
     {
       id: 'highContrast',
       icon: Contrast,
-      title: t('accessibility.highContrast.title') || 'High Contrast Mode',
+      title: t('accessibility.highContrast.title'),
       description:
         t('accessibility.highContrast.description') ||
         'Increase border widths and color contrast for better visibility.',
@@ -141,7 +141,7 @@ export default function AccessibilitySettingsPageClient() {
     {
       id: 'largerText',
       icon: Type,
-      title: t('accessibility.largerText.title') || 'Larger Text',
+      title: t('accessibility.largerText.title'),
       description:
         t('accessibility.largerText.description') ||
         'Increase base font size by 125% for better readability.',
@@ -163,7 +163,7 @@ export default function AccessibilitySettingsPageClient() {
         >
           <h1 className="text-4xl md:text-5xl font-black text-neo-cream mb-3 uppercase">
             {language === 'he' && '♿'}
-            <span className="mx-2">{t('accessibility.title') || 'Accessibility'}</span>
+            <span className="mx-2">{t('accessibility.title')}</span>
             {language !== 'he' && '♿'}
           </h1>
           <p className="text-neo-cream text-lg opacity-90 max-w-2xl mx-auto">

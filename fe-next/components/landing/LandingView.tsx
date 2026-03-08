@@ -126,7 +126,7 @@ const LandingView: React.FC = () => {
       liveRoomStats.refresh();
       await new Promise((resolve) => setTimeout(resolve, 500));
       const { default: toast } = await import('react-hot-toast');
-      toast.success(t('common.refreshed') || 'Refreshed', {
+      toast.success(t('common.refreshed'), {
         duration: 2000,
       });
     },
@@ -298,7 +298,7 @@ const LandingView: React.FC = () => {
                   : "text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl mb-1 sm:mb-1.5 lg:mb-2"
               )}
             >
-              <span className="sr-only">LexiClash — </span>{t('landing.welcomeTitle') || 'Ready to Play?'}
+              <span className="sr-only">LexiClash — </span>{t('landing.welcomeTitle')}
             </h1>
             <p
               className={cn(
@@ -309,7 +309,7 @@ const LandingView: React.FC = () => {
               )}
               style={{ animationDelay: '0.1s' }}
             >
-              {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
+              {t('landing.welcomeSubtitle')}
             </p>
           </motion.div>
         )}
@@ -333,10 +333,10 @@ const LandingView: React.FC = () => {
             {isLandscape && (
               <div className="text-center mb-2 animate-fade-in-fast">
                 <p className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white" role="heading" aria-level={1}>
-                  <span className="sr-only">LexiClash — </span>{t('landing.welcomeTitle') || 'Ready to Play?'}
+                  <span className="sr-only">LexiClash — </span>{t('landing.welcomeTitle')}
                 </p>
                 <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/90">
-                  {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
+                  {t('landing.welcomeSubtitle')}
                 </p>
               </div>
             )}
@@ -386,10 +386,10 @@ const LandingView: React.FC = () => {
                   'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(255,20,147,0.4))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
-                aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
+                aria-label={`${t('landing.multiplayer')} - ${t('landing.multiplayerDesc')}`}
               >
                 <Users className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer')}</span>
                 {/* Player count badge - only show when there are active players */}
                 {liveRoomStats.activePlayers > 0 && (
                   <div className="flex items-center gap-1 bg-neo-lime text-neo-black px-2 py-0.5 rounded-neo border border-neo-black shadow-hard-xs text-xs font-bold">
@@ -397,13 +397,13 @@ const LandingView: React.FC = () => {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black opacity-75" />
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-neo-black" />
                     </span>
-                    {liveRoomStats.activePlayers} {t('landing.playingNow') || 'playing'}
+                    {liveRoomStats.activePlayers} {t('landing.playingNow')}
                   </div>
                 )}
                 {!isMobilePortrait && liveRoomStats.activePlayers === 0 && (
                   <div className="flex gap-2 text-xs" aria-hidden="true">
-                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 mr-1" />Rooms</span>
-                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 mr-1" />Host</span>
+                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 me-1" />Rooms</span>
+                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 me-1" />Host</span>
                   </div>
                 )}
               </Link>
@@ -430,14 +430,14 @@ const LandingView: React.FC = () => {
                   'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(0,255,255,0.4))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
-                aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
+                aria-label={`${t('landing.singlePlayer')} - ${t('landing.singlePlayerDesc')}`}
               >
                 <User className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer')}</span>
                 {!isMobilePortrait && (
                   <div className="flex gap-2 text-xs" aria-hidden="true">
-                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 mr-1" />Bots</span>
-                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 mr-1" />Challenges</span>
+                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 me-1" />Bots</span>
+                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 me-1" />Challenges</span>
                   </div>
                 )}
               </Link>
@@ -460,7 +460,7 @@ const LandingView: React.FC = () => {
                   'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.5))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
-                aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
+                aria-label={`${t('landing.adventureMode')} - ${t('landing.adventureModeDesc')}`}
               >
                 {/* Icon container */}
                 <div className="flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 bg-neo-black/15 rounded-neo border-2 border-neo-black/20 flex items-center justify-center">
@@ -469,10 +469,10 @@ const LandingView: React.FC = () => {
                 {/* Text */}
                 <div className="flex-1 min-w-0">
                   <span className="block text-sm sm:text-base font-black uppercase text-neo-black leading-tight">
-                    {t('landing.adventureMode') || 'Adventure'}
+                    {t('landing.adventureMode')}
                   </span>
                   <span className="block text-xs sm:text-sm text-neo-black/65 font-semibold mt-0.5 truncate">
-                    {t('landing.adventureModeDesc') || '100 levels · 10 worlds'}
+                    {t('landing.adventureModeDesc')}
                   </span>
                 </div>
                 {/* Sparkle accent */}
@@ -500,13 +500,13 @@ const LandingView: React.FC = () => {
                     'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(255,107,53,0.4))]',
                     'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                   )}
-                  aria-label={`${t('landing.blastMode') || 'Blast Mode'} - ${t('landing.blastModeDesc') || 'Clear the board!'}`}
+                  aria-label={`${t('landing.blastMode')} - ${t('landing.blastModeDesc')}`}
                 >
                   <span className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[8px] sm:text-[10px] border border-neo-black rounded-neo shadow-hard-xs transform rotate-3">
                     ADMIN
                   </span>
                   <Bomb className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-                  <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.blastMode') || 'Blast Mode'}</span>
+                  <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.blastMode')}</span>
                 </Link>
               </motion.div>
             )}
@@ -557,8 +557,8 @@ const LandingView: React.FC = () => {
                 className="w-full h-full"
               >
                 <ModeCard
-                  title={t('landing.multiplayer') || 'Multiplayer'}
-                  description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
+                  title={t('landing.multiplayer')}
+                  description={t('landing.multiplayerDesc')}
                   href={`/${language}/multiplayer`}
                   icon={<Users className="w-6 h-6" />}
                   variant="pink"
@@ -566,12 +566,12 @@ const LandingView: React.FC = () => {
                   liveBadge={{
                     openRooms: liveRoomStats.openRooms,
                     totalPlayers: liveRoomStats.totalPlayers,
-                    roomsLabel: t('landing.openRooms') || 'open rooms',
-                    playersLabel: t('landing.playersLive') || 'playing now',
+                    roomsLabel: t('landing.openRooms'),
+                    playersLabel: t('landing.playersLive'),
                   }}
                   playerCount={{
                     count: liveRoomStats.activePlayers,
-                    label: t('landing.playingNow') || 'playing',
+                    label: t('landing.playingNow'),
                   }}
                 />
               </motion.div>
@@ -582,15 +582,15 @@ const LandingView: React.FC = () => {
                 className="w-full h-full"
               >
                 <ModeCard
-                  title={t('landing.singlePlayer') || 'Single Player'}
-                  description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
+                  title={t('landing.singlePlayer')}
+                  description={t('landing.singlePlayerDesc')}
                   href={`/${language}/singleplayer`}
                   icon={<User className="w-6 h-6" />}
                   variant="cyan"
                   className="w-full"
                   personalBest={playerAllTimeBest ? {
                     score: playerAllTimeBest.score,
-                    label: t('landing.personalBest') || 'personal best',
+                    label: t('landing.personalBest'),
                   } : undefined}
                 />
               </motion.div>
@@ -603,8 +603,8 @@ const LandingView: React.FC = () => {
                 className="col-span-1 sm:col-span-2 w-full"
               >
                 <ModeCard
-                  title={t('landing.adventureMode') || 'Adventure'}
-                  description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
+                  title={t('landing.adventureMode')}
+                  description={t('landing.adventureModeDesc')}
                   href={`/${language}/adventure`}
                   icon={<Map className="w-6 h-6" />}
                   variant="lime"
@@ -616,8 +616,8 @@ const LandingView: React.FC = () => {
               {(isAdmin || profile?.blast_access) && (
                 <div className="col-span-1 sm:col-span-2 w-full max-w-md mx-auto">
                   <ModeCard
-                    title={t('landing.blastMode') || 'Blast Mode'}
-                    description={t('landing.blastModeDesc') || 'Clear the board!'}
+                    title={t('landing.blastMode')}
+                    description={t('landing.blastModeDesc')}
                     href={`/${language}/blast`}
                     icon={<Bomb className="w-6 h-6" />}
                     variant="orange"
@@ -648,7 +648,7 @@ const LandingView: React.FC = () => {
                   )}
                 >
                   <Trophy className="w-4 h-4 text-neo-yellow group-hover:scale-110 transition-transform" />
-                  <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
+                  <span>{t('footer.leaderboard')}</span>
                 </Link>
               </motion.div>
 
@@ -709,7 +709,7 @@ const LandingView: React.FC = () => {
               >
                 <Sparkles className="w-4 h-4 text-neo-lime animate-pulse" />
                 <span className="text-sm font-bold text-white whitespace-nowrap">
-                  {t('tutorialPrompt.title') || 'First time here?'}
+                  {t('tutorialPrompt.title')}
                 </span>
               </motion.div>
               {/* Arrow pointing down to button */}
@@ -742,10 +742,10 @@ const LandingView: React.FC = () => {
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          aria-label={t('landing.tutorial') || 'Tutorial'}
+          aria-label={t('landing.tutorial')}
         >
           <GraduationCap className="w-5 h-5" />
-          <span className="text-xs sm:text-sm">{t('landing.tutorial') || 'Tutorial'}</span>
+          <span className="text-xs sm:text-sm">{t('landing.tutorial')}</span>
         </motion.button>
       </div>
     </div>

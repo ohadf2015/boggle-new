@@ -94,7 +94,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
         <div className="flex items-center gap-2">
           <Trophy className="w-4 h-4 text-neo-yellow" />
           <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">
-            {t('wordHunt.desktop.liveRanks') || 'Live Ranks'}
+            {t('wordHunt.desktop.liveRanks')}
           </span>
         </div>
         <div className="flex items-center gap-1 bg-neo-yellow/20 border border-neo-yellow/30 px-2.5 py-0.5 rounded-neo">
@@ -163,8 +163,8 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
             <Trophy className="w-8 h-8 mb-2 opacity-50" />
             <span className="text-sm">
               {hasLoaded
-                ? (t('wordHunt.desktop.beFirst') || 'Be the first to rank!')
-                : (t('common.loading') || 'Loading...')}
+                ? (t('wordHunt.desktop.beFirst'))
+                : (t('common.loading'))}
             </span>
           </div>
         )}

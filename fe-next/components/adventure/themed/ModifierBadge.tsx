@@ -83,7 +83,7 @@ const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) 
               'text-[10px] opacity-80',
               modifierDisplay.textColor
             )}>
-              {t(mechanicDescKey) || ''}
+              {t(mechanicDescKey)}
             </span>
           </div>
         )}

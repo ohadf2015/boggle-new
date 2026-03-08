@@ -194,12 +194,12 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                     }
                   }}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] bg-neo-cream text-neo-black"
-                  aria-label={t('joinView.pasteCode') || 'Paste room code'}
+                  aria-label={t('joinView.pasteCode')}
                 >
                   <ClipboardPaste className="text-sm" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t('joinView.pasteCode') || 'Paste code'}</TooltipContent>
+              <TooltipContent>{t('joinView.pasteCode')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
@@ -219,7 +219,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
               type="button"
               onClick={() => setIsAuthAvatarPickerOpen(true)}
               className="relative group flex-shrink-0"
-              aria-label={t('joinView.changeAvatar') || 'Change avatar'}
+              aria-label={t('joinView.changeAvatar')}
             >
               {/* Show selected game avatar if set (not PROFILE_AVATAR_ID), otherwise profile picture or emoji fallback */}
               {selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID ? (
@@ -251,13 +251,13 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             </button>
             <div className="flex-1">
               <p className="text-xs text-neo-cream/70 font-bold uppercase tracking-wide">
-                {t('joinView.joiningAs') || 'Joining as'}
+                {t('joinView.joiningAs')}
               </p>
               <p className="text-sm text-neo-cyan font-black">
                 {displayName}
               </p>
               <p className="text-xs text-neo-cream/50 mt-0.5">
-                {t('profile.connectedAccount') || 'Connected with your account'}
+                {t('profile.connectedAccount')}
               </p>
             </div>
           </div>
@@ -322,7 +322,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                     usernameInputRef.current?.focus();
                   }}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                  aria-label={t('common.clear') || 'Clear'}
+                  aria-label={t('common.clear')}
                 >
                   <X className="h-4 w-4" />
                 </Button>

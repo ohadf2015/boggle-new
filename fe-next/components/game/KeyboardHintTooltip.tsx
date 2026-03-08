@@ -114,10 +114,10 @@ export function KeyboardHintTooltip({
             {/* Text */}
             <div className="flex-1 min-w-0 pr-2">
               <div className="font-black text-xs uppercase mb-0.5">
-                {t('keyboardHint.title') || 'Type!'}
+                {t('keyboardHint.title')}
               </div>
               <p className="text-[11px] leading-snug mb-2">
-                {t('keyboardHint.message') || 'Type words & press Enter'}
+                {t('keyboardHint.message')}
               </p>
 
               {/* Keyboard shortcuts with animation */}
@@ -154,7 +154,7 @@ export function KeyboardHintTooltip({
               'transition-all'
             )}
           >
-            {t('keyboardHint.gotIt') || 'Got it!'}
+            {t('keyboardHint.gotIt')}
           </button>
         </motion.div>
       )}

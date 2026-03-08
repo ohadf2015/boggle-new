@@ -63,7 +63,7 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                     <span className={cn("font-black", textColor)}>{sign}{reward.scoreDelta}</span>
                 </div>
                 <div className={cn("text-[8px] font-bold uppercase", subTextColor)}>
-                    {t('brain.points') || 'Brain Pts'}
+                    {t('brain.points')}
                 </div>
             </div>
         );
@@ -81,7 +81,7 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                     <Brain className={cn("w-5 h-5", iconColor)} />
                     <span className={cn("font-black text-xl", textColor)}>{sign}{reward.scoreDelta}</span>
                     <span className={cn("text-sm font-bold", subTextColor)}>
-                        {t('brain.points') || 'Brain Points'}
+                        {t('brain.points')}
                     </span>
                 </div>
             </div>
@@ -104,7 +104,7 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                 <Brain className={cn("w-5 h-5", iconColor)} />
                 <span className={cn("font-black text-xl", textColor)}>{sign}{reward.scoreDelta}</span>
                 <span className={cn("text-sm font-bold", subTextColor)}>
-                    {t('brain.points') || 'Brain Points'}
+                    {t('brain.points')}
                 </span>
             </div>
         </motion.div>

@@ -17,25 +17,14 @@ import { registerFriendChallengeHandlers } from './friendChallengeHandler.js';
 import { registerHostHandlers } from './hostHandler.js';
 import { registerConnectionHandlers } from './connectionHandler.js';
 import { registerHintHandlers } from './hintHandler.js';
-import {
-  registerEngagementHandlers,
-  processGameEndEngagement,
-  processLongWordEngagement,
-  processAchievementEngagement,
-} from './engagementHandler.js';
-import { registerEarthquakeHandlers, clearGameEarthquakeState } from './earthquakeHandler.js';
+import { registerEngagementHandlers } from './engagementHandler.js';
+import { registerEarthquakeHandlers } from './earthquakeHandler.js';
 import { registerScorecardHandlers } from './scorecardHandler.js';
 import { registerVocabularyHandlers } from './vocabularyHandler.js';
 import { registerClassroomGameHandlers } from './classroomGameHandler.js';
 import { registerAvatarHandlers } from './avatarHandler.js';
 import { registerWordHuntHandlers } from './wordHuntHandler.js';
 import { vocabularyEnrichmentHandler } from './vocabularyEnrichmentHandler.js';
-import {
-  startGameTimer,
-  endGame,
-  calculateAndBroadcastFinalScores,
-  isSocketMigrating
-} from './shared.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -74,32 +63,6 @@ function registerAllHandlers(io: Server, socket: Socket): void {
 
 export {
   registerAllHandlers,
-  registerGameHandlers,
-  registerWordHandlers,
-  registerChatHandlers,
-  registerBotHandlers,
-  registerTournamentHandlers,
-  registerPresenceHandlers,
-  registerFriendsHandlers,
-  registerFriendMessagingHandlers,
-  registerFriendChallengeHandlers,
-  registerHostHandlers,
-  registerConnectionHandlers,
-  registerHintHandlers,
-  registerEngagementHandlers,
-  registerEarthquakeHandlers,
-  registerScorecardHandlers,
-  registerVocabularyHandlers,
-  registerClassroomGameHandlers,
-  registerAvatarHandlers,
-  processGameEndEngagement,
-  processLongWordEngagement,
-  processAchievementEngagement,
-  startGameTimer,
-  endGame,
-  calculateAndBroadcastFinalScores,
-  isSocketMigrating,
   startConnectionHealthCheck,
-  clearGameEarthquakeState,
   MAX_PLAYERS_PER_ROOM
 };

@@ -679,7 +679,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                       <div className="bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo px-3 py-1.5 sm:px-4 sm:py-2 shadow-hard flex items-center gap-1.5">
                         <Hand className="w-4 h-4 sm:w-5 sm:h-5 animate-bounce" strokeWidth={2.5} />
                         <span className="font-black text-xs sm:text-sm uppercase tracking-wide">
-                          {t('onboarding.welcome.startHere') || 'Start Here'}
+                          {t('onboarding.welcome.startHere')}
                         </span>
                       </div>
                       {/* Arrow pointing down to the cell */}

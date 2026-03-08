@@ -115,7 +115,7 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
 
         {/* Swipe hint indicator - only shown on mobile */}
         <div className="block sm:hidden text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
-          {t('tutorial.swipeHint') || '← Swipe to navigate →'}
+          {t('tutorial.swipeHint')}
         </div>
       </motion.div>
     </div>
@@ -129,12 +129,12 @@ const Step1Welcome: React.FC<{ onNext: () => void }> = ({ onNext }) => {
   return (
     <div className="text-center">
       <div className="text-6xl mb-4">🎯</div>
-      <h2 className="text-3xl font-black mb-4">{t('tutorial.wordHunt.welcome.title') || 'Daily Word Hunt'}</h2>
+      <h2 className="text-3xl font-black mb-4">{t('tutorial.wordHunt.welcome.title')}</h2>
       <p className="text-lg mb-6">
-        {t('tutorial.wordHunt.welcome.description') || 'Find the hidden word! You have 10 attempts.'}
+        {t('tutorial.wordHunt.welcome.description')}
       </p>
       <Button onClick={onNext} className="w-full max-w-btn bg-neo-pink text-white">
-        {t('tutorial.wordHunt.welcome.next') || 'Next'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
+        {t('tutorial.wordHunt.welcome.next')} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
       </Button>
     </div>
   );
@@ -149,18 +149,18 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
 
   return (
     <div>
-      <h2 className="text-2xl font-black mb-4">{t('tutorial.wordHunt.lifeSystem.title') || 'Life & Word Discovery'}</h2>
+      <h2 className="text-2xl font-black mb-4">{t('tutorial.wordHunt.lifeSystem.title')}</h2>
       <p className="mb-4 text-gray-700 dark:text-gray-300">
-        {t('tutorial.wordHunt.lifeSystem.description') || 'Find words on the board to gain life & clue tokens!'}
+        {t('tutorial.wordHunt.lifeSystem.description')}
       </p>
 
       <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4">
         {/* Life bar example */}
         <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('tutorial.wordHunt.lifeSystem.lifeBarLabel') || 'Life Bar'}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('tutorial.wordHunt.lifeSystem.lifeBarLabel')}</div>
           <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 border-neo-black">
             <div className="h-full bg-green-500 flex items-center justify-center text-xs font-bold text-white" style={{ width: '85%' }}>
-              <Heart className="w-3 h-3 mr-1 fill-current" />
+              <Heart className="w-3 h-3 me-1 fill-current" />
               85/100
             </div>
           </div>
@@ -168,7 +168,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
 
         {/* Tokens example */}
         <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('tutorial.wordHunt.lifeSystem.clueTokensLabel') || 'Clue Tokens'}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('tutorial.wordHunt.lifeSystem.clueTokensLabel')}</div>
           <div className="flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo inline-flex">
             <Coins className="w-4 h-4 text-yellow-600" />
             <span className="font-bold text-sm">12</span>
@@ -176,9 +176,9 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
         </div>
 
         <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded p-3 mb-3">
-          <div className="text-sm font-bold mb-1">✓ {t('tutorial.wordHunt.lifeSystem.wordFound') || 'Word found!'}</div>
+          <div className="text-sm font-bold mb-1">✓ {t('tutorial.wordHunt.lifeSystem.wordFound')}</div>
           <div className="text-xs text-gray-600 dark:text-gray-400">
-            {t('tutorial.wordHunt.lifeSystem.swipeToGain') || 'Swipe words to gain'} +15 ❤️ +2 🪙
+            {t('tutorial.wordHunt.lifeSystem.swipeToGain')} +15 ❤️ +2 🪙
           </div>
         </div>
 
@@ -186,10 +186,10 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
 
       <div className="flex gap-2">
         <Button onClick={onPrev} variant="outline" className="flex-1">
-          ← {t('common.back') || 'Back'}
+          ← {t('common.back')}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-pink text-white">
-          {t('tutorial.wordHunt.lifeSystem.tryIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
+          {t('tutorial.wordHunt.lifeSystem.tryIt')} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
     </div>
@@ -207,13 +207,13 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
     <div>
       <div className="text-center mb-4">
         <div className="text-5xl mb-2">🎯</div>
-        <h2 className="text-2xl font-black mb-2">{t('tutorial.wordHunt.letterFeedback.title') || 'Letter Feedback'}</h2>
+        <h2 className="text-2xl font-black mb-2">{t('tutorial.wordHunt.letterFeedback.title')}</h2>
       </div>
 
       {/* Example visual - self-explanatory */}
       <div className="bg-slate-100 dark:bg-slate-800 rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-4">
         <div className="text-sm text-center text-slate-700 dark:text-slate-300 font-bold mb-3">
-          {t('tutorial.wordHunt.letterFeedback.example') || 'Example: Target is "BEACH"'}
+          {t('tutorial.wordHunt.letterFeedback.example')}
         </div>
         <div className="flex justify-center gap-1.5 mb-3">
           <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">S</div>
@@ -224,18 +224,18 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
         </div>
         {/* Compact legend */}
         <div className="flex justify-center gap-4 text-xs font-bold">
-          <span className="text-green-600 dark:text-green-400">🟩 {t('tutorial.wordHunt.letterFeedback.legendGreen') || 'Right spot'}</span>
-          <span className="text-yellow-600 dark:text-yellow-400">🟨 {t('tutorial.wordHunt.letterFeedback.legendYellow') || 'Wrong spot'}</span>
-          <span className="text-gray-500">⬜ {t('tutorial.wordHunt.letterFeedback.legendGray') || 'Not in word'}</span>
+          <span className="text-green-600 dark:text-green-400">🟩 {t('tutorial.wordHunt.letterFeedback.legendGreen')}</span>
+          <span className="text-yellow-600 dark:text-yellow-400">🟨 {t('tutorial.wordHunt.letterFeedback.legendYellow')}</span>
+          <span className="text-gray-500">⬜ {t('tutorial.wordHunt.letterFeedback.legendGray')}</span>
         </div>
       </div>
 
       <div className="flex gap-2">
         <Button onClick={onPrev} variant="outline" className="flex-1">
-          ← {t('common.back') || 'Back'}
+          ← {t('common.back')}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-pink text-white">
-          {t('tutorial.wordHunt.letterFeedback.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
+          {t('tutorial.wordHunt.letterFeedback.gotIt')} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
     </div>
@@ -254,19 +254,19 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
       <div className="text-center mb-4">
         <div className="text-5xl mb-2">🎯</div>
         <h2 className="text-2xl font-black mb-2">
-          {t('tutorial.wordHunt.triesRule.title') || 'What Counts as a Try?'}
+          {t('tutorial.wordHunt.triesRule.title')}
         </h2>
       </div>
 
       <p className="text-sm mb-4 text-center text-gray-600 dark:text-gray-300">
-        {t('tutorial.wordHunt.triesRule.description') || 'Only words matching the target length use your 10 tries!'}
+        {t('tutorial.wordHunt.triesRule.description')}
       </p>
 
       <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4 space-y-3">
         {/* Example: 5-letter target word */}
         <div className="text-center mb-3">
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-            {t('tutorial.wordHunt.triesRule.exampleTarget') || 'Example: Target word has 5 letters'}
+            {t('tutorial.wordHunt.triesRule.exampleTarget')}
           </div>
           <div className="flex justify-center gap-1">
             {['?', '?', '?', '?', '?'].map((char, idx) => (
@@ -285,7 +285,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
           <div>
             <div className="font-bold text-neo-pink">BEACH</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.triesRule.usesAttempt') || '5 letters = uses a try'}
+              {t('tutorial.wordHunt.triesRule.usesAttempt')}
             </div>
           </div>
         </div>
@@ -298,7 +298,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
           <div>
             <div className="font-bold text-green-600">CAT</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.triesRule.noAttempt') || '3 letters = NO try used, just gains life!'}
+              {t('tutorial.wordHunt.triesRule.noAttempt')}
             </div>
           </div>
         </div>
@@ -309,9 +309,9 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
             <span className="text-white font-bold text-sm">💡</span>
           </div>
           <div>
-            <div className="font-bold text-yellow-600">{t('tutorial.wordHunt.triesRule.bonusTitle') || 'BONUS!'}</div>
+            <div className="font-bold text-yellow-600">{t('tutorial.wordHunt.triesRule.bonusTitle')}</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.triesRule.revealsClue') || '3+ letter words also reveal letter clues!'}
+              {t('tutorial.wordHunt.triesRule.revealsClue')}
             </div>
           </div>
         </div>
@@ -320,16 +320,16 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
       {/* Key insight box */}
       <div className="bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-300 dark:border-amber-700 p-3 mb-4">
         <div className="text-sm font-bold text-center">
-          {t('tutorial.wordHunt.triesRule.keyInsight') || '💡 Shorter words gain life AND reveal letter clues!'}
+          {t('tutorial.wordHunt.triesRule.keyInsight')}
         </div>
       </div>
 
       <div className="flex gap-2">
         <Button onClick={onPrev} variant="outline" className="flex-1">
-          ← {t('common.back') || 'Back'}
+          ← {t('common.back')}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-pink text-white">
-          {t('tutorial.wordHunt.triesRule.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
+          {t('tutorial.wordHunt.triesRule.gotIt')} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
     </div>
@@ -347,21 +347,21 @@ const Step5Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
     <div>
       <div className="text-center mb-4">
         <div className="text-6xl mb-2">🎉</div>
-        <h2 className="text-3xl font-black mb-4">{t('tutorial.wordHunt.complete.title') || 'You\'re ready!'}</h2>
+        <h2 className="text-3xl font-black mb-4">{t('tutorial.wordHunt.complete.title')}</h2>
       </div>
 
       <div className="bg-slate-100 dark:bg-slate-800 rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-6 text-center">
         <div className="text-sm text-gray-600 dark:text-gray-300">
-          {t('tutorial.wordHunt.complete.sameChallenge') || 'Same puzzle for everyone worldwide - compare your score!'}
+          {t('tutorial.wordHunt.complete.sameChallenge')}
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
         <Button onClick={onNext} className="w-full max-w-btn bg-neo-pink text-white text-lg py-6">
-          {t('tutorial.wordHunt.complete.start') || 'Start Daily Challenge'} 🚀
+          {t('tutorial.wordHunt.complete.start')} 🚀
         </Button>
         <Button onClick={onPrev} variant="outline" size="sm">
-          ← {t('common.back') || 'Back'}
+          ← {t('common.back')}
         </Button>
       </div>
     </div>

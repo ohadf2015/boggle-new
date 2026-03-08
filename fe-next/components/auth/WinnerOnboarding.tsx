@@ -118,23 +118,23 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
     switch (trigger) {
       case 'topPercentile':
         return {
-          title: t('auth.winnerOnboarding.topPercentile.title') || 'You\'re a Top Player!',
-          subtitle: t('auth.winnerOnboarding.topPercentile.subtitle') || 'Show off your achievement on the leaderboard',
+          title: t('auth.winnerOnboarding.topPercentile.title'),
+          subtitle: t('auth.winnerOnboarding.topPercentile.subtitle'),
         };
       case 'quickSolve':
         return {
-          title: t('auth.winnerOnboarding.quickSolve.title') || 'Lightning Fast!',
-          subtitle: t('auth.winnerOnboarding.quickSolve.subtitle') || 'Let everyone see your impressive skills',
+          title: t('auth.winnerOnboarding.quickSolve.title'),
+          subtitle: t('auth.winnerOnboarding.quickSolve.subtitle'),
         };
       case 'streakAtRisk':
         return {
-          title: t('auth.winnerOnboarding.streakAtRisk.title') || 'Streak Protected!',
-          subtitle: t('auth.winnerOnboarding.streakAtRisk.subtitle') || 'Claim your spot on the leaderboard',
+          title: t('auth.winnerOnboarding.streakAtRisk.title'),
+          subtitle: t('auth.winnerOnboarding.streakAtRisk.subtitle'),
         };
       default:
         return {
-          title: t('auth.winnerOnboarding.default.title') || 'Welcome Champion!',
-          subtitle: t('auth.winnerOnboarding.default.subtitle') || 'Personalize your profile to shine on the leaderboard',
+          title: t('auth.winnerOnboarding.default.title'),
+          subtitle: t('auth.winnerOnboarding.default.subtitle'),
         };
     }
   };
@@ -219,7 +219,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 'block text-sm font-bold mb-3 uppercase tracking-wide',
                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
               )}>
-                {t('auth.winnerOnboarding.chooseAvatar') || 'Choose Your Avatar'}
+                {t('auth.winnerOnboarding.chooseAvatar')}
               </label>
 
               {/* Preview */}
@@ -348,7 +348,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 'block text-sm font-bold mb-2 uppercase tracking-wide',
                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
               )}>
-                {t('auth.winnerOnboarding.displayName') || 'Your Display Name'}
+                {t('auth.winnerOnboarding.displayName')}
               </label>
               <input
                 type="text"
@@ -357,7 +357,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 onKeyDown={handleKeyPress}
                 maxLength={20}
                 autoFocus
-                placeholder={t('auth.winnerOnboarding.namePlaceholder') || 'Enter your name...'}
+                placeholder={t('auth.winnerOnboarding.namePlaceholder')}
                 className={cn(
                   'w-full px-4 py-3 text-lg font-bold border-3 border-neo-black rounded-xl transition-all',
                   isDarkMode
@@ -371,7 +371,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                   'text-xs',
                   isDarkMode ? 'text-gray-400' : 'text-gray-600'
                 )}>
-                  {displayName.length}/20 {t('daily.characters') || 'characters'}
+                  {displayName.length}/20 {t('daily.characters')}
                 </p>
                 {error && (
                   <p className="text-xs text-red-500 font-semibold">{error}</p>
@@ -394,12 +394,12 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-3">
                   <Loader size="sm" />
-                  <span>{t('auth.winnerOnboarding.saving') || 'Saving...'}</span>
+                  <span>{t('auth.winnerOnboarding.saving')}</span>
                 </div>
               ) : (
                 <>
-                  <Trophy className="w-6 h-6 mr-2" />
-                  {t('auth.winnerOnboarding.showMeLeaderboard') || 'Show Me On The Leaderboard!'}
+                  <Trophy className="w-6 h-6 me-2" />
+                  {t('auth.winnerOnboarding.showMeLeaderboard')}
                 </>
               )}
             </Button>

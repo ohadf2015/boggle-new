@@ -259,9 +259,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl" dir={dir}>
         {/* Visually hidden title for accessibility */}
-        <DialogTitle className="sr-only">{t('onboarding.navigation.title') || 'Player Onboarding'}</DialogTitle>
+        <DialogTitle className="sr-only">{t('onboarding.navigation.title')}</DialogTitle>
         <DialogDescription className="sr-only">
-          {t('onboarding.navigation.description') || 'Learn how to play the game with this tutorial'}
+          {t('onboarding.navigation.description')}
         </DialogDescription>
 
         {/* Progress indicator */}
@@ -289,7 +289,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
           {/* Swipe hint indicator - only shown on mobile */}
           <div className="block sm:hidden text-center text-xs text-neo-white/70 mt-2">
-            {t('onboarding.swipeHint') || '← Swipe to navigate →'}
+            {t('onboarding.swipeHint')}
           </div>
         </DialogBody>
 

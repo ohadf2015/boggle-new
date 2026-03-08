@@ -67,7 +67,7 @@ export default function WordListEditor({
             onClick={onBulkImportOpen}
             className="text-neo-cyan border-neo-cyan hover:bg-neo-cyan/20 text-xs"
           >
-            <Upload className="w-3 h-3 mr-1" />
+            <Upload className="w-3 h-3 me-1" />
             {t('teacher.lesson.bulkImport')}
           </Button>
         )}
@@ -119,7 +119,7 @@ export default function WordListEditor({
                         <span className="text-xs">{t('teacher.lesson.cannotIntegrate')}</span>
                       </div>
                     )}
-                    <span className="text-neo-white font-neo-body ml-2">{word.word}</span>
+                    <span className="text-neo-white font-neo-body ms-2">{word.word}</span>
                   </div>
                   <Button
                     size="sm"

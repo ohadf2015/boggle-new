@@ -189,7 +189,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                 size="lg"
                 className="w-full h-14 text-lg font-black uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <LogIn className="mr-2 w-5 h-5" />
+                <LogIn className="me-2 w-5 h-5" />
                 {isSubmitting
                   ? t('education.student.join.joining')
                   : t('education.student.join.button')

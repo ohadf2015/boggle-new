@@ -72,7 +72,7 @@ export function SettingsPanel({
         {/* Responsive padding */}
         <div className="p-4 pt-5 xl:p-5 xl:pt-6">
           <p className="text-xs xl:text-sm font-bold uppercase text-neo-cream/60 mb-3 xl:mb-4">
-            {t('hostView.selectPreset') || 'Game Mode'}
+            {t('hostView.selectPreset')}
           </p>
 
           <div className="flex flex-col gap-2 xl:gap-3">
@@ -140,10 +140,10 @@ export function SettingsPanel({
         <Monitor className={cn('w-5 h-5 xl:w-6 xl:h-6', tvMode ? 'text-neo-purple' : 'text-neo-cream/70')} />
         <div className="flex-1 text-left">
           <p className={cn('font-bold text-sm xl:text-base', tvMode ? 'text-neo-purple' : 'text-neo-cream')}>
-            {t('hostView.broadcastModeTitle') || 'TV Mode'}
+            {t('hostView.broadcastModeTitle')}
           </p>
           <p className="text-xs xl:text-sm text-neo-cream/50">
-            {t('hostView.broadcastModeDesc') || 'Host watches, not plays'}
+            {t('hostView.broadcastModeDesc')}
           </p>
         </div>
         {/* Larger toggle switch on desktop */}

@@ -209,11 +209,11 @@ function getGameModeInfo(
 ): { label: string; icon: string } {
   switch (mode) {
     case 'single':
-      return { label: t('home.singlePlayer') || 'Single Player', icon: '🎮' };
+      return { label: t('home.singlePlayer'), icon: '🎮' };
     case 'multiplayer':
-      return { label: t('home.multiplayer') || 'Multiplayer', icon: '👥' };
+      return { label: t('home.multiplayer'), icon: '👥' };
     case 'daily':
-      return { label: t('daily.title') || 'Daily Challenge', icon: '📅' };
+      return { label: t('daily.title'), icon: '📅' };
     default:
       return { label: mode, icon: '🎲' };
   }
@@ -237,7 +237,7 @@ const CustomTooltip = ({
 
   return (
     <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard text-neo-black min-w-[140px]">
-      <div className="font-black text-xl mb-1.5">{data.score} <span className="text-base">{t('scorePage.pts') || 'pts'}</span></div>
+      <div className="font-black text-xl mb-1.5">{data.score} <span className="text-base">{t('scorePage.pts')}</span></div>
       <div className="text-xs font-bold space-y-1">
         <div className="flex items-center gap-1.5">
           <span>{modeInfo.icon}</span>
@@ -245,16 +245,16 @@ const CustomTooltip = ({
         </div>
         <div className="flex items-center gap-1.5">
           <span>📝</span>
-          <span>{data.wordCount} {t('results.words') || 'words'}</span>
+          <span>{data.wordCount} {t('results.words')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span>🎯</span>
-          <span>{data.accuracy}% {t('results.accuracy') || 'accuracy'}</span>
+          <span>{data.accuracy}% {t('results.accuracy')}</span>
         </div>
         {data.isWinner && (
           <div className="flex items-center gap-1.5 text-neo-lime font-black">
             <span>🏆</span>
-            <span>{t('results.winner') || 'Winner!'}</span>
+            <span>{t('results.winner')}</span>
           </div>
         )}
         <div className="text-neo-black/50 mt-1.5 pt-1.5 border-t border-neo-black/10 text-[10px]">{timeAgo}</div>
@@ -274,10 +274,10 @@ function getTimeAgo(
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return t('chart.timeAgo.justNow') || 'Just now';
+  if (minutes < 1) return t('chart.timeAgo.justNow');
   if (minutes < 60) return t('chart.timeAgo.minutesAgo', { count: minutes }) || `${minutes}m ago`;
   if (hours < 24) return t('chart.timeAgo.hoursAgo', { count: hours }) || `${hours}h ago`;
-  if (days === 1) return t('chart.timeAgo.yesterday') || 'Yesterday';
+  if (days === 1) return t('chart.timeAgo.yesterday');
   return t('chart.timeAgo.daysAgo', { count: days }) || `${days}d ago`;
 }
 
@@ -372,7 +372,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             <div className="flex items-center gap-2">
               <Target className="w-5 h-5 text-neo-cyan" />
               <h3 className="text-sm font-black uppercase tracking-wide text-white">
-                {t('chart.yourProgress') || 'Your Progress'}
+                {t('chart.yourProgress')}
               </h3>
             </div>
             {/* Progress badge */}
@@ -413,11 +413,11 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               >
                 <h4 className="font-black text-white uppercase text-sm mb-1">
                   {gamesNeeded === 1
-                    ? (t('chart.oneMoreGame') || '1 More Game!')
-                    : (t('chart.needMoreGames') || 'Play More Games!')}
+                    ? (t('chart.oneMoreGame'))
+                    : (t('chart.needMoreGames'))}
                 </h4>
                 <p className="text-white/60 text-xs px-4">
-                  {t('chart.needMoreGamesDesc') || 'Your improvement chart will appear after 2+ games'}
+                  {t('chart.needMoreGamesDesc')}
                 </p>
               </motion.div>
             </div>
@@ -433,7 +433,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               </div>
               <div className="text-lg font-black text-slate-400">--</div>
               <div className="text-[9px] font-bold uppercase text-slate-300">
-                {t('chart.bestScore') || 'Best'}
+                {t('chart.bestScore')}
               </div>
             </div>
             <div className="bg-white/5 rounded-neo border border-white/10 p-2 text-center">
@@ -444,7 +444,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               </div>
               <div className="text-lg font-black text-slate-400">--</div>
               <div className="text-[9px] font-bold uppercase text-slate-300">
-                {t('chart.average') || 'Avg'}
+                {t('chart.average')}
               </div>
             </div>
             <div className="bg-white/5 rounded-neo border border-white/10 p-2 text-center">
@@ -455,7 +455,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               </div>
               <div className="text-lg font-black text-slate-400">{gamesPlayed}</div>
               <div className="text-[9px] font-bold uppercase text-slate-300">
-                {t('chart.games') || 'Games'}
+                {t('chart.games')}
               </div>
             </div>
           </div>
@@ -489,7 +489,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-neo-cyan" />
             <h3 className="text-sm font-black uppercase tracking-wide text-white">
-              {t('chart.yourProgress') || 'Your Progress'}
+              {t('chart.yourProgress')}
             </h3>
           </div>
           {trend && (
@@ -622,7 +622,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               </div>
               <div className="text-lg font-black text-white">{trend.bestScore}</div>
               <div className="text-[9px] font-bold uppercase text-white/60">
-                {t('chart.bestScore') || 'Best'}
+                {t('chart.bestScore')}
               </div>
             </div>
             <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
@@ -633,7 +633,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               </div>
               <div className="text-lg font-black text-white">{trend.averageScore}</div>
               <div className="text-[9px] font-bold uppercase text-white/60">
-                {t('chart.average') || 'Avg'}
+                {t('chart.average')}
               </div>
             </div>
             <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
@@ -644,7 +644,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               </div>
               <div className="text-lg font-black text-white">{trend.totalGames}</div>
               <div className="text-[9px] font-bold uppercase text-white/60">
-                {t('chart.games') || 'Games'}
+                {t('chart.games')}
               </div>
             </div>
           </div>

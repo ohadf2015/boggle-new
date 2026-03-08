@@ -50,7 +50,7 @@ export function ProfileAchievements({
     const achievementData: Achievement = {
       icon: getAchievementIcon(key),
       name: t(`achievements.${key}.name`) || key,
-      description: t(`achievements.${key}.description`) || '',
+      description: t(`achievements.${key}.description`),
     };
     return (
       <AchievementBadge
@@ -83,13 +83,13 @@ export function ProfileAchievements({
           isDarkMode ? 'text-amber-400' : 'text-amber-700'
         )}>
           <span className="text-lg">🏆</span>
-          {t('profile.hallOfFame') || 'Hall of Fame'}
+          {t('profile.hallOfFame')}
         </h2>
         <p className={cn(
           'text-xs mb-3',
           isDarkMode ? 'text-gray-400' : 'text-gray-600'
         )}>
-          {t('profile.hallOfFameDescription') || 'Elite achievements that require exceptional skill or dedication'}
+          {t('profile.hallOfFameDescription')}
         </p>
         <div className="flex flex-wrap gap-2">
           {hallOfFameAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}

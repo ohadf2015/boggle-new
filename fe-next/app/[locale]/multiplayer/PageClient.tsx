@@ -292,7 +292,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         language: data.language,
       });
 
-      toast(t('spectator.youAreSpectating') || 'Watching as spectator', {
+      toast(t('spectator.youAreSpectating'), {
         duration: 4000,
         icon: '👀',
       });
@@ -306,7 +306,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         setIsActive(true);
         setPlayersInRoom(data.users || []);
 
-        toast.success(t('spectator.upgraded') || 'You can now play!', {
+        toast.success(t('spectator.upgraded'), {
           duration: 3000,
           icon: '🎮',
         });
@@ -391,19 +391,19 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setIsActive(false);
       setIsHost(false);
       setGameCode('');
-      toast.error(t('multiplayerFlow.roomClosed') || 'Room closed', { duration: 4000, icon: '🚪' });
+      toast.error(t('multiplayerFlow.roomClosed'), { duration: 4000, icon: '🚪' });
     },
     onSessionMigrated: () => {
       clearSessionPreservingUsername(username);
       setIsActive(false);
       setIsHost(false);
       setGameCode('');
-      toast(t('multiplayerFlow.roomClosed') || 'Session moved', { duration: 3000, icon: 'ℹ️' });
+      toast(t('multiplayerFlow.roomClosed'), { duration: 3000, icon: 'ℹ️' });
     },
     onWarning: () => {},
     onRateLimited: () => {
       setIsJoining(false);
-      toast.error(t('multiplayerFlow.rateLimited') || 'Slow down!', { duration: 3000, icon: '⏳' });
+      toast.error(t('multiplayerFlow.rateLimited'), { duration: 3000, icon: '⏳' });
     },
     onHostTransferred: (data) => {
       if (data.newHost === username) {
@@ -468,8 +468,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         });
         if (!connected) {
           logger.log('[JOIN] Socket connection timed out after 5s');
-          setError(t('errors.notConnected') || 'Not connected to server');
-          toast.error(t('common.notConnected') || 'Not connected to server', {
+          setError(t('errors.notConnected'));
+          toast.error(t('common.notConnected'), {
             duration: 3000,
             icon: '⚠️',
           });
@@ -480,8 +480,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
       if (!socket?.connected) {
         logger.log('[JOIN] No socket available');
-        setError(t('errors.notConnected') || 'Not connected to server');
-        toast.error(t('common.notConnected') || 'Not connected to server', {
+        setError(t('errors.notConnected'));
+        toast.error(t('common.notConnected'), {
           duration: 3000,
           icon: '⚠️',
         });
@@ -495,7 +495,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
       if (loading && !authLoadingTooLong) {
         logger.log('[AUTH] Auth still loading, waiting...');
-        toast.error(t('common.loadingProfile') || 'Loading profile, please wait...', {
+        toast.error(t('common.loadingProfile'), {
           duration: 2000,
           icon: '⏳',
         });
@@ -555,7 +555,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         if (process.env.NODE_ENV === 'development') console.warn('[JOIN] Safety timeout triggered');
         logger.warn('[JOIN] Safety timeout triggered');
         toast.error(
-          t('errors.connectionTimeout') || 'Connection timeout. Please try again.',
+          t('errors.connectionTimeout'),
           {
             duration: 4000,
             icon: '⚠️',

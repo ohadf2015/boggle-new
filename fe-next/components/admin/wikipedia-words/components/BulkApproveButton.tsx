@@ -68,10 +68,10 @@ export function BulkApproveButton({
         <span className="text-sm">
           <span className="text-green-500">{result.approved} approved</span>
           {result.skipped > 0 && (
-            <span className="text-yellow-500 ml-2">{result.skipped} skipped</span>
+            <span className="text-yellow-500 ms-2">{result.skipped} skipped</span>
           )}
           {result.failed > 0 && (
-            <span className="text-red-500 ml-2">{result.failed} failed</span>
+            <span className="text-red-500 ms-2">{result.failed} failed</span>
           )}
         </span>
       )}

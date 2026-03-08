@@ -94,7 +94,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader size="lg" />
-        <p className="ml-4 text-neo-white">{t('duels.loading')}</p>
+        <p className="ms-4 text-neo-white">{t('duels.loading')}</p>
       </div>
     );
   }

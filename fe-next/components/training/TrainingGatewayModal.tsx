@@ -176,13 +176,13 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
                 ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400'
                 : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600'
             )}>
-              {t('training.gateway.title') || 'New to LexiClash?'}
+              {t('training.gateway.title')}
             </h2>
             <p className={cn(
               'text-sm',
               isDarkMode ? 'text-gray-300' : 'text-gray-600'
             )}>
-              {t('training.gateway.subtitle') || 'A quick training will help you master the controls!'}
+              {t('training.gateway.subtitle')}
             </p>
           </motion.div>
 
@@ -239,7 +239,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
               'text-xs',
               isDarkMode ? 'text-purple-300/80' : 'text-purple-600/80'
             )}>
-              {t('training.gateway.demoHint') || 'Swipe in any direction - even diagonally!'}
+              {t('training.gateway.demoHint')}
             </p>
           </motion.div>
 
@@ -257,7 +257,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
               'text-sm font-medium mb-3',
               isDarkMode ? 'text-gray-300' : 'text-gray-600'
             )}>
-              {t('training.gateway.benefitsTitle') || 'Training helps you:'}
+              {t('training.gateway.benefitsTitle')}
             </p>
             <ul className="space-y-2">
               {benefits.map((benefit, index) => (
@@ -317,7 +317,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
               )}
             >
               <Dumbbell size={20} />
-              {t('training.gateway.startTraining') || 'Start Training'}
+              {t('training.gateway.startTraining')}
               <ArrowRight size={18} className="rtl:rotate-180" />
             </Button>
 
@@ -332,7 +332,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
                   : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
               )}
             >
-              {t('training.gateway.skipAnyway') || "Skip, I know how to play"}
+              {t('training.gateway.skipAnyway')}
             </Button>
 
             {/* Don't show again checkbox */}
@@ -353,7 +353,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
                     : 'bg-white border-gray-300 checked:bg-purple-500 checked:border-purple-500'
                 )}
               />
-              <span>{t('training.gateway.dontShowAgain') || "Don't show this again"}</span>
+              <span>{t('training.gateway.dontShowAgain')}</span>
             </label>
           </motion.div>
         </motion.div>

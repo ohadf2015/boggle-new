@@ -54,7 +54,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                <Calendar className="w-4 h-4 inline mr-1" />
+                <Calendar className="w-4 h-4 inline me-1" />
                 Start Date
               </label>
               <input
@@ -66,7 +66,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
             </div>
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                <Calendar className="w-4 h-4 inline mr-1" />
+                <Calendar className="w-4 h-4 inline me-1" />
                 End Date
               </label>
               <input
@@ -84,14 +84,14 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
               >
                 {bulkState.isLoading ? (
                   <>
-                    <span className="mr-2">
+                    <span className="me-2">
                       <Loader size="sm" />
                     </span>
                     Generating...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 mr-2" />
+                    <Sparkles className="w-4 h-4 me-2" />
                     Generate with AI
                   </>
                 )}
@@ -102,7 +102,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
           {/* Error Display */}
           {bulkState.error && (
             <div className="p-3 bg-red-100 dark:bg-red-900/30 border border-red-500 rounded-lg text-red-600 dark:text-red-400 text-sm">
-              <AlertTriangle className="w-4 h-4 inline mr-2" />
+              <AlertTriangle className="w-4 h-4 inline me-2" />
               {bulkState.error}
             </div>
           )}
@@ -110,7 +110,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
           {/* AI Not Configured Warning */}
           {!bulkState.aiConfigured && bulkState.stats && (
             <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-500 rounded-lg text-yellow-700 dark:text-yellow-400 text-sm">
-              <AlertTriangle className="w-4 h-4 inline mr-2" />
+              <AlertTriangle className="w-4 h-4 inline me-2" />
               <strong>AI not configured:</strong> GEMINI_API_KEY environment variable is not set.
               Words must be entered manually.
             </div>
@@ -203,14 +203,14 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                 >
                   {isSaving ? (
                     <>
-                      <span className="mr-2">
+                      <span className="me-2">
                         <Loader size="sm" />
                       </span>
                       Saving...
                     </>
                   ) : (
                     <>
-                      <Save className="w-4 h-4 mr-2" />
+                      <Save className="w-4 h-4 me-2" />
                       Save All Words
                     </>
                   )}
@@ -221,7 +221,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                   variant="outline"
                   className="border-purple-400 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
                 >
-                  <RefreshCw className="w-4 h-4 mr-2" />
+                  <RefreshCw className="w-4 h-4 me-2" />
                   Regenerate
                 </Button>
               </div>
