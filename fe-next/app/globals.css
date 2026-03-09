@@ -792,7 +792,8 @@ body {
     /* Max height leaves room for timer, stats, and word forming area above grid */
     /* CRITICAL: Use single CSS variable for BOTH width AND height to guarantee square grid */
     /* This ensures cells maintain 1:1 aspect ratio regardless of flex container constraints */
-    --board-size: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
+    --game-chrome-height: 220px;
+    --board-size: min(80vmin, calc(100vw - 32px), calc(100dvh - var(--game-chrome-height)));
     width: var(--board-size);
     height: var(--board-size);
     max-height: var(--board-size);
@@ -848,7 +849,7 @@ body {
       padding: 8px;
       /* Single variable for BOTH width AND height — guarantees square grid on mobile */
       /* Pick the smaller of: available width, or available height minus UI chrome */
-      --board-size: min(calc(100dvw - 32px), calc(100dvh - 190px - env(safe-area-inset-bottom, 0px)));
+      --board-size: min(calc(100dvw - 32px), calc(100dvh - var(--game-chrome-height, 190px) - env(safe-area-inset-bottom, 0px)));
       width: var(--board-size);
       height: var(--board-size);
       max-width: var(--board-size);
@@ -856,17 +857,6 @@ body {
       min-height: 180px;
       min-width: 180px;
     }
-  }
-
-  /* When the grid is inside a sized container (e.g. SurvivalGridSection),
-     size relative to actual available space instead of hardcoded viewport math.
-     This ensures the grid adapts when elements like the life bar are hidden. */
-  .grid-section-container .game-board-frame {
-    --board-size: min(100cqw - 16px, 100cqh - 16px);
-    width: var(--board-size);
-    height: var(--board-size);
-    max-width: var(--board-size);
-    max-height: var(--board-size);
   }
 
   /* Note: Removed position: relative override that was breaking absolute-positioned grid children */

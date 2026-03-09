@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import React, { memo } from 'react';
 import { SurvivalClueBoxes } from '@/components/daily/survival/SurvivalClueBoxes';
 import { SurvivalLifeBar } from '@/components/daily/survival/SurvivalLifeBar';
 import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSection';
@@ -105,7 +105,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   gameDir,
 }) => {
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ ['--game-chrome-height' as string]: '300px' } as React.CSSProperties}>
       {/* Score + Quit */}
       <WordHuntMPHeader
         score={score}
@@ -144,7 +144,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
       </div>
 
       {/* Grid — fills remaining space */}
-      <div className="flex-1 min-h-0 px-2 flex flex-col">
+      <div className="flex-1 min-h-0 px-2">
         <SurvivalGridSection
           grid={grid}
           isGameOver={isGameOver}
