@@ -1207,6 +1207,7 @@ const sv = {
       "back": "Tillbaka",
       "next": "Nästa",
       "letsPlay": "Kör!",
+      "startPractice": "Börja Träna",
       "title": "Välkommen",
       "description": "Lär dig spela LexiClash"
     },

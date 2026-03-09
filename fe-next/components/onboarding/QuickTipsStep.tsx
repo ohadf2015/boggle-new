@@ -2,23 +2,20 @@
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Pointer, Star, Zap, Play, Sparkles, Calendar, Users, Swords } from 'lucide-react';
+import { Pointer, Star, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QuickTipsStepProps {
   selectedMode: 'single' | 'multi' | 'daily' | null;
   onModeSelect: (mode: 'single' | 'multi' | 'daily') => void;
-  onComplete?: () => void;
 }
 
 /**
- * QuickTipsStep - Simplified final step with quick tips and single Training CTA
- * No overwhelming mode selection - just start training!
+ * QuickTipsStep - Final step with quick tips and mode teasers
  */
 const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
   selectedMode,
   onModeSelect,
-  onComplete,
 }) => {
   const { t } = useLanguage();
 
@@ -99,66 +96,25 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         </div>
       </motion.div>
 
-      {/* Single prominent Training Mode CTA */}
+      {/* Practice Mode destination card */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full"
       >
-        <div
-          className="bg-gradient-to-br from-neo-lime to-lime-300 border-3 border-neo-black rounded-neo p-4 sm:p-5 shadow-hard text-center cursor-pointer hover:shadow-hard-lg active:shadow-none active:translate-y-1 transition-all"
-          onClick={onComplete}
-        >
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
-            <h3 className="font-black text-lg sm:text-xl text-neo-black uppercase">
-              {t('onboarding.training.title')}
-            </h3>
+        <div className="flex items-center gap-3 p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime">
+          <div className="w-10 h-10 bg-neo-black rounded-full flex items-center justify-center shrink-0">
+            <Zap className="w-5 h-5 text-neo-lime" />
           </div>
-          <p className="text-xs sm:text-sm text-neo-black/80 mb-3">
-            {t('onboarding.training.description')}
-          </p>
-          <motion.div
-            className="inline-flex items-center gap-2 bg-neo-black text-neo-lime px-4 py-2 rounded-neo font-black text-sm sm:text-base"
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <Play className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
-            {t('onboarding.training.ready')}
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Coming up next - mode teasers */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, type: 'spring', stiffness: 280, damping: 26 }}
-        className="w-full"
-      >
-        <p className="text-center font-bold text-[10px] uppercase tracking-wider text-neo-white/50 mb-2">
-          {t('onboarding.comingUp.title')}
-        </p>
-        <div className="flex gap-2">
-          {[
-            { icon: Calendar, label: t('onboarding.comingUp.daily'), color: 'bg-neo-orange' },
-            { icon: Users, label: t('onboarding.comingUp.multiplayer'), color: 'bg-neo-cyan' },
-            { icon: Swords, label: t('onboarding.comingUp.adventure'), color: 'bg-neo-pink' },
-          ].map((mode, i) => (
-            <motion.div
-              key={mode.label}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.7 + i * 0.1 }}
-              className="flex-1 flex flex-col items-center gap-1 p-2 rounded-neo border border-neo-white/10 bg-neo-white/5"
-            >
-              <mode.icon className="w-4 h-4 text-neo-white/70" />
-              <span className="text-[9px] sm:text-[10px] font-bold text-neo-white/60 text-center leading-tight">
-                {mode.label}
-              </span>
-            </motion.div>
-          ))}
+          <div>
+            <div className="font-black text-sm sm:text-base text-neo-black uppercase">
+              {t('onboarding.training.title')}
+            </div>
+            <div className="text-xs text-neo-black/70 leading-snug">
+              {t('onboarding.training.description')}
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>

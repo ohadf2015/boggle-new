@@ -1206,6 +1206,7 @@ const ja = {
       "back": "戻る",
       "next": "次へ",
       "letsPlay": "行くぞ！",
+      "startPractice": "練習を始める",
       "title": "ようこそ",
       "description": "LexiClashの遊び方を学ぶ"
     },

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Rocket } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -237,7 +237,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
             onModeSelect={(mode) =>
               setFormData((prev) => ({ ...prev, selectedMode: mode }))
             }
-            onComplete={handleComplete}
           />
         );
       default:
@@ -295,7 +294,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
         {/* Navigation buttons */}
         <DialogFooter className="flex-col sm:flex-row gap-2 px-3 sm:px-6 pb-3 sm:pb-6">
-          {/* Back button (except first step) */}
+          {/* Back button (hidden on first step) */}
           {currentStep > 0 && (
             <Button
               variant="outline"
@@ -310,15 +309,23 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
           {/* Next/Complete button */}
           <Button
             variant={isLastStep ? 'default' : 'accent'}
+            size={isLastStep ? 'lg' : 'default'}
             onClick={handleNext}
             disabled={!canAdvance()}
-            className={`flex-1 text-sm sm:text-base ${
+            className={`flex-1 ${
               !canAdvance() ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            {isLastStep ? t('onboarding.navigation.letsPlay') : t('onboarding.navigation.next')}
-            {!isLastStep && (
-              <ArrowRight className="ms-2 rtl:rotate-180" />
+            {isLastStep ? (
+              <>
+                <Rocket className="me-2" />
+                {t('onboarding.navigation.startPractice')}
+              </>
+            ) : (
+              <>
+                {t('onboarding.navigation.next')}
+                <ArrowRight className="ms-2 rtl:rotate-180" />
+              </>
             )}
           </Button>
         </DialogFooter>

@@ -1223,6 +1223,7 @@ const he = {
       "back": "חזרה",
       "next": "הבא",
       "letsPlay": "יאללה!",
+      "startPractice": "התחילו לתרגל",
       "title": "ברוכים הבאים",
       "description": "לימדו לשחק לקסיקלאש"
     },

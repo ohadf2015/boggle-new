@@ -2777,6 +2777,7 @@ const es = {
       "back": "Atrás",
       "next": "Siguiente",
       "letsPlay": "¡A Jugar!",
+      "startPractice": "Empezar a Practicar",
       "title": "Bienvenida",
       "description": "Aprende a jugar LexiClash"
     },

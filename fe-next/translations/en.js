@@ -1326,6 +1326,7 @@ const en = {
       "back": "Back",
       "next": "Next",
       "letsPlay": "Let's Go!",
+      "startPractice": "Start Practice",
       "title": "Welcome",
       "description": "Learn the basics"
     },
