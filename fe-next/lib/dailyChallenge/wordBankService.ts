@@ -11,8 +11,7 @@
 
 import type { Language } from '@/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { WORD_LENGTH_RANGE, STATIC_WORD_LISTS } from './wordBankData';
-import type { WordBankEntry } from './wordBankData';
+import { WORD_LENGTH_RANGE, STATIC_WORD_LISTS, type WordBankEntry } from './wordBankData';
 
 // Re-export types and data from wordBankData
 export type { ValidationStatus, WordStatus, WordBankEntry } from './wordBankData';

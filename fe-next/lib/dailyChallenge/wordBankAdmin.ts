@@ -9,8 +9,7 @@
 
 import type { Language } from '@/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { ValidationStatus } from './wordBankData';
-import { WORD_LENGTH_RANGE, STATIC_WORD_LISTS } from './wordBankData';
+import { WORD_LENGTH_RANGE, STATIC_WORD_LISTS, type ValidationStatus } from './wordBankData';
 import { addToCommunityWords } from './wordBankBulk';
 
 // Re-export bulk operations for consumers importing from wordBankAdmin

@@ -6,8 +6,7 @@
  * so components only re-render when that slice changes.
  */
 
-import { useGameStore } from './store';
-import type { GameStore } from './store';
+import { useGameStore, type GameStore } from './store';
 
 // Core game selectors
 export const useGameActive = (): boolean => useGameStore((state) => state.gameActive);

@@ -8,14 +8,14 @@
 
 import { createClient } from '@/utils/supabase/client';
 import logger from '@/utils/logger';
-import type {
-  FriendStatus,
-  FriendshipRow,
-  ProfileRow,
-  Friend,
-  FriendRequest,
+import {
+  isUserOnline,
+  type FriendStatus,
+  type FriendshipRow,
+  type ProfileRow,
+  type Friend,
+  type FriendRequest,
 } from './friendsTypes';
-import { isUserOnline } from './friendsTypes';
 
 // Re-export all types for backward compatibility
 export type {

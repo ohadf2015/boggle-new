@@ -1,6 +1,5 @@
 import { inferTargetLetterCounts, computeYellowState } from '../wordHuntYellowLogic';
-import type { TargetAttempt } from '@/components/daily/survival/types';
-import type { AccumulatedClue } from '@/components/daily/survival/types';
+import type { TargetAttempt, AccumulatedClue } from '@/components/daily/survival/types';
 
 const mkAttempt = (word: string, feedbacks: Array<'green' | 'yellow' | 'gray'>): TargetAttempt => ({
   word,

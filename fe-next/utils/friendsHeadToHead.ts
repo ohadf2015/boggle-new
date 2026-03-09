@@ -5,14 +5,14 @@
 
 import { createClient } from '@/utils/supabase/client';
 import logger from '@/utils/logger';
-import type {
-  FriendStatus,
-  Friend,
-  ProfileRow,
-  HeadToHeadRecord,
-  FriendChallenge,
+import {
+  isUserOnline,
+  type FriendStatus,
+  type Friend,
+  type ProfileRow,
+  type HeadToHeadRecord,
+  type FriendChallenge,
 } from './friendsTypes';
-import { isUserOnline } from './friendsTypes';
 
 /**
  * Search for users to add as friends

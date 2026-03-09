@@ -9,8 +9,7 @@
 
 import type { Language } from '@/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { ValidationStatus } from './wordBankData';
-import { WORD_LENGTH_RANGE } from './wordBankData';
+import { WORD_LENGTH_RANGE, type ValidationStatus } from './wordBankData';
 import { updateValidationStatus } from './wordBankAdmin';
 
 /**
