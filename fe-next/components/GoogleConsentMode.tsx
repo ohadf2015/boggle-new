@@ -4,8 +4,8 @@ import Script from 'next/script';
  * Initializes Google Consent Mode v2 defaults via an inline script.
  *
  * MUST render BEFORE GoogleAnalytics and GoogleAdSense in the component tree.
- * Uses strategy="beforeInteractive" so consent defaults are set synchronously
- * before any Google tags load — required by Google's Consent Mode spec.
+ * Uses strategy="afterInteractive" in root layout — loads early enough
+ * to set consent defaults before any Google tags fire.
  *
  * The inline script is a static string constant (no user input / no XSS risk).
  *
@@ -43,7 +43,7 @@ export function GoogleConsentMode() {
   return (
     <Script
       id="google-consent-mode"
-      strategy="beforeInteractive"
+      strategy="afterInteractive"
       dangerouslySetInnerHTML={{ __html: CONSENT_INIT_SCRIPT }}
     />
   );

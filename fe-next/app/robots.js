@@ -122,6 +122,47 @@ export default function robots() {
         userAgent: 'TelegramBot',
         allow: commonAllowPaths,
       },
+      // AI Crawlers — explicitly allow for LLM discovery (GEO/AEO)
+      {
+        userAgent: 'GPTBot',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      {
+        userAgent: 'ChatGPT-User',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      {
+        userAgent: 'ClaudeBot',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      {
+        userAgent: 'Claude-Web',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      {
+        userAgent: 'PerplexityBot',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      {
+        userAgent: 'Google-Extended',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      {
+        userAgent: 'Amazonbot',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      {
+        userAgent: 'cohere-ai',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
     // Additional directives

@@ -80,9 +80,12 @@ const FEATURES = [
 ] as const;
 
 const BLOG_LINKS = [
-  { slug: 'science-behind-word-games', key: 'blog.scienceTitle', fallback: 'The Science Behind Word Games' },
-  { slug: 'daily-challenge-strategies', key: 'blog.strategiesTitle', fallback: 'Daily Challenge Strategies' },
-  { slug: 'improve-word-game-skills', key: 'blog.improveTitle', fallback: 'Improve Your Word Game Skills' },
+  { slug: 'science-behind-word-games', key: 'blog.scienceTitle', fallback: 'The Science Behind Word Games', category: 'Science', color: 'bg-neo-lime' },
+  { slug: 'why-word-games-are-addictive', key: 'blog.addictiveTitle', fallback: 'Why Word Games Are So Addictive', category: 'Psychology', color: 'bg-neo-pink' },
+  { slug: 'daily-challenge-strategies', key: 'blog.strategiesTitle', fallback: 'Daily Challenge Strategies', category: 'Strategy', color: 'bg-neo-yellow' },
+  { slug: 'word-games-for-brain-training', key: 'blog.brainTrainingTitle', fallback: 'Word Games for Brain Training', category: 'Brain Health', color: 'bg-neo-cyan' },
+  { slug: 'best-boggle-alternatives-2026', key: 'blog.alternativesTitle', fallback: 'Best Boggle Alternatives 2026', category: 'Reviews', color: 'bg-neo-orange' },
+  { slug: 'improve-word-game-skills', key: 'blog.improveTitle', fallback: 'Improve Your Word Game Skills', category: 'Strategy', color: 'bg-neo-purple' },
 ] as const;
 
 /* ── Main component ─────────────────────────────────────── */
@@ -300,25 +303,52 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.blogTitle')}
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {BLOG_LINKS.map(({ slug, key, fallback }) => (
-            <Link
-              key={slug}
-              href={`/${language}/blog/${slug}`}
-              className={cn(
-                'px-3 py-2 text-xs sm:text-sm font-bold',
-                'bg-neo-navy/10 dark:bg-neo-white/10 text-neo-black dark:text-neo-white',
-                'border-2 border-neo-black/20 dark:border-neo-white/20 rounded-neo',
-                'hover:bg-neo-cyan/20 hover:border-neo-cyan/40 transition-all duration-150'
-              )}
-            >
-              {t(key) || fallback}
-            </Link>
-          ))}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg sm:text-xl font-black uppercase text-neo-black dark:text-neo-white">
+            {t('landing.seo.blogTitle')}
+          </h2>
+          <Link
+            href={`/${language}/blog`}
+            className={cn(
+              'text-xs sm:text-sm font-bold',
+              'text-neo-cyan hover:text-neo-yellow transition-colors',
+              'underline underline-offset-2'
+            )}
+          >
+            {t('landing.seo.viewAllPosts') || 'View all posts →'}
+          </Link>
         </div>
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-30px' }}
+        >
+          {BLOG_LINKS.map(({ slug, key, fallback, category, color }) => (
+            <motion.div key={slug} variants={staggerItem}>
+              <Link
+                href={`/${language}/blog/${slug}`}
+                className={cn(
+                  'group block p-3 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20',
+                  'bg-neo-navy/5 dark:bg-neo-white/5',
+                  'hover:border-neo-cyan/60 hover:bg-neo-cyan/10 hover:-translate-y-0.5',
+                  'transition-all duration-200'
+                )}
+              >
+                <span className={cn(
+                  'inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-neo border border-neo-black text-neo-black mb-2',
+                  color
+                )}>
+                  {category}
+                </span>
+                <p className="text-sm font-bold text-neo-black dark:text-neo-white group-hover:text-neo-cyan transition-colors line-clamp-2">
+                  {t(key) || fallback}
+                </p>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
       </motion.div>
     </section>
   );

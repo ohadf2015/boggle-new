@@ -94,6 +94,9 @@ export default async function BlogLayout({ children, params }: BlogLayoutProps):
     { slug: 'multilingual-word-learning', name: 'Multilingual Word Learning' },
     { slug: 'top-player-secrets', name: 'Top Player Secrets' },
     { slug: 'improve-word-game-skills', name: 'How to Improve Your Word Game Skills' },
+    { slug: 'why-word-games-are-addictive', name: 'Why Word Games Are Addictive - The Psychology Explained' },
+    { slug: 'best-boggle-alternatives-2026', name: 'Best Boggle Alternatives in 2026' },
+    { slug: 'word-games-for-brain-training', name: 'Word Games for Brain Training - The Research' },
   ];
 
   // Safe: all content is from static article metadata, not user input

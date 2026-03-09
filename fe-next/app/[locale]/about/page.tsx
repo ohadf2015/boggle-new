@@ -43,32 +43,54 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function AboutPage({ params }: PageProps) {
   const { locale } = await params;
 
-  // BreadcrumbList schema — hardcoded (no user input), safe for JSON injection
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: `https://www.lexiclash.live/${locale}`,
+  // All schema content below is hardcoded constants — no user input, safe for JSON serialization
+  const schemas = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `https://www.lexiclash.live/${locale}` },
+        { '@type': 'ListItem', position: 2, name: 'About', item: `https://www.lexiclash.live/${locale}/about` },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      '@id': 'https://www.lexiclash.live/#organization',
+      name: 'LexiClash',
+      alternateName: ['LexiClash Ltd', 'לקסיקלאש'],
+      url: 'https://www.lexiclash.live',
+      logo: { '@type': 'ImageObject', url: 'https://www.lexiclash.live/icon-192.png', width: 192, height: 192 },
+      image: 'https://www.lexiclash.live/og-image-en.webp',
+      description: descriptionMap[locale] || descriptionMap.en,
+      foundingDate: '2024',
+      foundingLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressCountry: 'IL' } },
+      areaServed: 'Worldwide',
+      knowsLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+      slogan: 'Real-Time Multiplayer Word Battles',
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        url: `https://www.lexiclash.live/${locale}/contact`,
+        availableLanguage: ['English', 'Hebrew', 'Swedish', 'Japanese', 'Spanish'],
       },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'About',
-        item: `https://www.lexiclash.live/${locale}/about`,
-      },
-    ],
-  };
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      '@id': `https://www.lexiclash.live/${locale}/about#webpage`,
+      url: `https://www.lexiclash.live/${locale}/about`,
+      name: titleMap[locale] || titleMap.en,
+      description: descriptionMap[locale] || descriptionMap.en,
+      isPartOf: { '@id': 'https://www.lexiclash.live/#website' },
+      about: { '@id': 'https://www.lexiclash.live/#organization' },
+    },
+  ];
 
+  // Safe: schemas built from static constants above, no user-supplied data
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       <AboutPageClient />
     </>
   );

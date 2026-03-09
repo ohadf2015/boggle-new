@@ -7,7 +7,7 @@
  * ONLY include providers that are needed on EVERY page
  */
 
-import React, { useEffect, useMemo, ReactNode } from 'react';
+import { useEffect, useMemo, ReactNode } from 'react';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';

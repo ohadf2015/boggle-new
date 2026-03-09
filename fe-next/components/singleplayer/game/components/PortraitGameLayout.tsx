@@ -240,7 +240,7 @@ export function PortraitGameLayout({
 
       {/* Training Progress Bar - shown in practice mode (portrait) */}
       {isPracticeMode && training && (
-        <div className="px-2 md:px-4 py-1 flex-shrink-0">
+        <div className="px-2 md:px-4 py-1 flex-shrink-0 max-h-[120px] overflow-y-auto">
           <TrainingProgressBar
             completedSkills={training.completedSkills}
             score={score}
@@ -364,9 +364,9 @@ export function PortraitGameLayout({
         <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
       </div>
 
-      {/* Words Progress - subtle indicator */}
+      {/* Words Progress - subtle indicator (hidden on very short screens) */}
       {totalBoardWords != null && totalBoardWords > 0 && (
-        <div className="flex items-center justify-center gap-2 px-8 mb-1 shrink-0 relative z-30">
+        <div className="flex items-center justify-center gap-2 px-8 mb-1 shrink-0 relative z-30 hide-on-short-screen">
           <div className="h-[3px] flex-1 bg-white/10 rounded-full overflow-hidden max-w-[160px]">
             <AdaptiveMotion.div
               className="h-full bg-neo-cyan/50 rounded-full"
@@ -381,25 +381,38 @@ export function PortraitGameLayout({
         </div>
       )}
 
-      {/* Challenge Mode Progress Tracker */}
+      {/* Challenge Mode Progress Tracker (hidden on very short screens) */}
       {isChallengeMode && (
+        <div className="hide-on-short-screen">
         <ChallengeProgressTracker
           score={score}
           targetHighScore={targetHighScore}
           t={t}
         />
+        </div>
       )}
-
-      {/* Tutorial Callout - Shows above grid for new players */}
-      <TutorialCallout
-        isVisible={!!tutorialPath && !isPaused && !isGameOver}
-        tutorialWord={tutorialWord}
-        position="above-grid"
-        compact
-      />
 
       {/* Game grid - Takes remaining space */}
       <div className="flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0">
+        {/* Tutorial Callout - Absolute overlay above grid, doesn't consume flow height */}
+        <AdaptiveAnimatePresence>
+          {!!tutorialPath && !isPaused && !isGameOver && (
+            <AdaptiveMotion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute -top-1 start-4 end-4 z-50"
+            >
+              <TutorialCallout
+                isVisible
+                tutorialWord={tutorialWord}
+                position="floating"
+                compact
+              />
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+
         {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
         <AdaptiveAnimatePresence>
           {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
@@ -419,7 +432,7 @@ export function PortraitGameLayout({
           )}
         </AdaptiveAnimatePresence>
 
-        <div className="game-board-container relative w-full max-w-[min(90vw,360px)] aspect-square">
+        <div className="game-board-container relative w-full max-w-[min(90vw,360px)] max-h-full aspect-square">
           <GridComponent
             grid={grid}
             interactive={!isPaused}

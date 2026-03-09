@@ -1,16 +1,8 @@
-/**
- * useGridInteraction Hook
- * Handles touch/mouse interaction logic for the grid component
- */
-
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { getDeadzoneThreshold } from '@/utils/consts';
 import type { LetterGrid, GridPosition, Language } from '@/types';
 import type { CellPosition, SelectedCell } from './types';
 import { getPerformanceConfig } from './performanceUtils';
-import { findWordPath } from '@/utils/wordPathFinder';
-
-// Extracted utilities
 import {
   type GridMeasurements,
   isAdjacentCell,
@@ -26,11 +18,10 @@ import {
   vibrateCellDrag,
   vibrateBacktrack,
   vibrateUndo,
-  vibrateNavigation,
-  vibrateClickSelect,
-  vibrateKeyboardSelect,
 } from './hapticFeedback';
 import { createVelocityTracker } from './velocityTracker';
+import { useGridKeyboardHandler } from './useGridKeyboardHandler';
+import { useGridClickHandler } from './useGridClickHandler';
 
 interface UseGridInteractionProps {
   grid: LetterGrid;
@@ -84,16 +75,13 @@ export function useGridInteraction({
   language = 'en',
   disableLetterKeyInput = false,
 }: UseGridInteractionProps): UseGridInteractionReturn {
-  // State
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
   const [focusedCell, setFocusedCell] = useState<GridPosition | null>(null);
-  const [isKeyboardMode, setIsKeyboardMode] = useState(false);
+  const [, setIsKeyboardMode] = useState(false);
   const [adjacentCells, setAdjacentCells] = useState<GridPosition[]>([]);
   const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
   const [isClickSelectMode, setIsClickSelectMode] = useState(false);
-
-  // Refs for interaction tracking
   const isTouchingRef = useRef(false);
   const isDraggingRef = useRef(false);
   const hasMovedRef = useRef(false);
@@ -101,53 +89,32 @@ export function useGridInteraction({
   const startPosRef = useRef({ x: 0, y: 0 });
   const startCellRef = useRef<SelectedCell | null>(null);
   const isTouchDeviceRef = useRef(false);
-  const lastClickTimeRef = useRef(0);
-  const lastClickCellRef = useRef<GridPosition | null>(null);
   const lastDirectionRef = useRef<{ dx: number; dy: number } | null>(null);
-
-  // Timers
   const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Performance optimization refs
   const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
   const pendingTouchRef = useRef<{ x: number; y: number } | null>(null);
   const rafIdRef = useRef<number | null>(null);
-
-  // Use extracted velocity tracker
   const velocityTrackerRef = useRef(createVelocityTracker());
-
-  // Get performance config once (cached)
   const performanceConfig = useMemo(() => getPerformanceConfig(), []);
-
-  // Use external control if provided, otherwise internal state
   const selectedCells = externalSelectedCells || internalSelectedCells;
   const setSelectedCells = externalSelectedCells ? noOp : setInternalSelectedCells;
 
-  // Get cached or fresh grid measurements
   const getGridMeasurements = useCallback((): GridMeasurements | null => {
     if (!gridRef.current) return null;
-
     const now = performance.now();
     if (gridMeasurementsRef.current && now - gridMeasurementsRef.current.timestamp < 100) {
       return gridMeasurementsRef.current;
     }
-
     const measurements = measureGrid(gridRef.current, grid);
-    if (measurements) {
-      gridMeasurementsRef.current = measurements;
-    }
+    if (measurements) gridMeasurementsRef.current = measurements;
     return measurements;
   }, [grid, gridRef]);
-
-  // Get cell at position with measurements
   const getCellAtPos = useCallback((touchX: number, touchY: number): CellPosition | null => {
     const measurements = getGridMeasurements();
     if (!measurements) return null;
     return getCellAtPosition(touchX, touchY, grid, measurements);
   }, [grid, getGridMeasurements]);
-
-  // Update adjacent cells when selection changes
   useEffect(() => {
     const lastCell = selectedCells[selectedCells.length - 1];
     if (lastCell && isTouchingRef.current) {
@@ -156,29 +123,21 @@ export function useGridInteraction({
       setAdjacentCells([]);
     }
   }, [selectedCells, grid]);
-
-  // Sequential fade-out animation for combo trail
   const startSequentialFadeOut = useCallback((isCombo = false) => {
     if (selectedCells.length === 0) return;
-
     if (fadeTimeoutRef.current) {
       clearTimeout(fadeTimeoutRef.current);
       fadeTimeoutRef.current = null;
     }
-
     const cellsToFade = [...selectedCells];
     setFadingCells(cellsToFade);
-
     const cellFadeDelay = isCombo ? 120 : 80;
     const initialHold = isCombo ? 500 : 0;
-
-    // Fade each cell sequentially
     cellsToFade.forEach((cell, index) => {
       setTimeout(() => {
         setFadingCells(prev => prev.filter(c => !(c.row === cell.row && c.col === cell.col)));
       }, initialHold + index * cellFadeDelay);
     });
-
     const totalDelay = initialHold + cellsToFade.length * cellFadeDelay + (isCombo ? 800 : 200);
     fadeTimeoutRef.current = setTimeout(() => {
       if (!isTouchingRef.current) {
@@ -188,36 +147,25 @@ export function useGridInteraction({
       fadeTimeoutRef.current = null;
     }, totalDelay);
   }, [selectedCells, setSelectedCells]);
-
-  // Submit word helper
   const submitWord = useCallback(() => {
     if (selectedCells.length === 0) return;
-
     const formedWord = selectedCells.map(c => c.letter).join('');
-
     if (onPathSubmit) onPathSubmit([...selectedCells]);
     if (onWordSubmit) onWordSubmit(formedWord);
-
     vibrateWordSubmit(selectedCells.length, comboLevel, fireRoundActive);
-
     if (comboLevel > 0) {
       startSequentialFadeOut(true);
     } else {
       setTimeout(() => setSelectedCells([]), 500);
     }
-
     setIsClickSelectMode(false);
   }, [selectedCells, onWordSubmit, onPathSubmit, comboLevel, fireRoundActive, startSequentialFadeOut, setSelectedCells]);
-
-  // Undo last selected cell
   const undoLastCell = useCallback(() => {
     if (selectedCells.length > 0) {
       setSelectedCells(selectedCells.slice(0, -1));
       vibrateUndo(fireRoundActive);
     }
   }, [selectedCells, setSelectedCells, fireRoundActive]);
-
-  // Auto-validation for combo words
   useEffect(() => {
     if (!interactive || comboLevel === 0 || selectedCells.length === 0) {
       if (autoSubmitTimeoutRef.current) {
@@ -226,10 +174,8 @@ export function useGridInteraction({
       }
       return;
     }
-
     if (selectedCells.length >= 3) {
       if (autoSubmitTimeoutRef.current) clearTimeout(autoSubmitTimeoutRef.current);
-
       autoSubmitTimeoutRef.current = setTimeout(() => {
         if (selectedCells.length >= 3 && isTouchingRef.current) {
           const formedWord = selectedCells.map(c => c.letter).join('');
@@ -240,78 +186,50 @@ export function useGridInteraction({
         }
       }, 500);
     }
-
     return () => {
       if (autoSubmitTimeoutRef.current) clearTimeout(autoSubmitTimeoutRef.current);
     };
   }, [selectedCells, comboLevel, interactive, onWordSubmit, onPathSubmit, startSequentialFadeOut]);
-
-  // Touch start handler
   const handleTouchStart = useCallback((
-    rowIndex: number,
-    colIndex: number,
-    letter: string,
+    rowIndex: number, colIndex: number, letter: string,
     event: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>
   ) => {
     if (!interactive) return;
-
     isTouchingRef.current = true;
     hasMovedRef.current = false;
     isScrollGestureRef.current = false;
-
     if (fadeTimeoutRef.current) {
       clearTimeout(fadeTimeoutRef.current);
       fadeTimeoutRef.current = null;
     }
     setFadingCells([]);
-
     const touch = 'touches' in event ? event.touches?.[0] : event;
     if (!touch) return;
-
     startPosRef.current = { x: touch.clientX, y: touch.clientY };
     velocityTrackerRef.current.start(touch.clientX, touch.clientY);
     lastDirectionRef.current = null;
-
     startCellRef.current = { row: rowIndex, col: colIndex, letter };
     setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
-
     vibrateCellTap(fireRoundActive);
   }, [interactive, setSelectedCells, fireRoundActive]);
 
-  // Core touch move processing
   const processTouchMove = useCallback((touchX: number, touchY: number) => {
     velocityTrackerRef.current.recordPosition(touchX, touchY);
     const velocity = velocityTrackerRef.current.getVelocity();
-
-    // Deadzone check
     const deltaX = touchX - startPosRef.current.x;
     const deltaY = touchY - startPosRef.current.y;
     const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
     if (!hasMovedRef.current && totalMovement < getDeadzoneThreshold()) return;
     hasMovedRef.current = true;
-
     const currentCell = getCellAtPos(touchX, touchY);
     if (!currentCell) return;
-
     const lastCell = selectedCells[selectedCells.length - 1];
     if (!lastCell) return;
-
-    // Same cell - no change
     if (currentCell.row === lastCell.row && currentCell.col === lastCell.col) return;
-
-    // Check selection threshold
     const isDiagonal = isDiagonalMove(lastCell, currentCell);
     if (!isWithinSelectionThreshold(currentCell, isDiagonal, velocity)) return;
-
-    // Track direction
     lastDirectionRef.current = { dx: currentCell.col - lastCell.col, dy: currentCell.row - lastCell.row };
-
-    // Backtracking check
-    const existingIndex = selectedCells.findIndex(
-      c => c.row === currentCell.row && c.col === currentCell.col
-    );
-
+    const existingIndex = selectedCells.findIndex(c => c.row === currentCell.row && c.col === currentCell.col);
     if (existingIndex !== -1) {
       const newSelection = selectedCells.slice(0, existingIndex + 1);
       if (newSelection.length !== selectedCells.length) {
@@ -320,30 +238,23 @@ export function useGridInteraction({
       }
       return;
     }
-
-    // New cell - check adjacency
     if (isAdjacentCell(lastCell, currentCell)) {
       setSelectedCells([...selectedCells, { row: currentCell.row, col: currentCell.col, letter: currentCell.letter }]);
       vibrateCellDrag(fireRoundActive);
     }
   }, [selectedCells, setSelectedCells, fireRoundActive, getCellAtPos]);
 
-  // Main touch move handler with RAF throttling
   const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
     if (!interactive || !isTouchingRef.current) return;
     if (isScrollGestureRef.current) return;
-
     const touch = 'touches' in e ? e.touches[0] : e;
     if (!touch) return;
     const touchX = touch.clientX;
     const touchY = touch.clientY;
-
-    // Detect scroll vs selection intent
     if (!hasMovedRef.current) {
       const deltaX = Math.abs(touchX - startPosRef.current.x);
       const deltaY = Math.abs(touchY - startPosRef.current.y);
       const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
       if (totalMovement >= getDeadzoneThreshold()) {
         if (deltaY > deltaX * 1.5 && selectedCells.length === 0) {
           isScrollGestureRef.current = true;
@@ -354,17 +265,13 @@ export function useGridInteraction({
     } else {
       if ('cancelable' in e && e.cancelable) e.preventDefault();
     }
-
-    // RAF throttling for low-end devices
     if (performanceConfig.isLowEnd) {
       pendingTouchRef.current = { x: touchX, y: touchY };
       if (rafIdRef.current === null) {
         rafIdRef.current = requestAnimationFrame(() => {
           rafIdRef.current = null;
           const pending = pendingTouchRef.current;
-          if (pending && isTouchingRef.current) {
-            processTouchMove(pending.x, pending.y);
-          }
+          if (pending && isTouchingRef.current) processTouchMove(pending.x, pending.y);
           pendingTouchRef.current = null;
         });
       }
@@ -373,102 +280,51 @@ export function useGridInteraction({
     }
   }, [interactive, performanceConfig.isLowEnd, processTouchMove, selectedCells.length]);
 
-  // Touch end handler
   const handleTouchEnd = useCallback(() => {
     if (!interactive || !isTouchingRef.current) return;
     isTouchingRef.current = false;
-
     if (autoSubmitTimeoutRef.current) {
       clearTimeout(autoSubmitTimeoutRef.current);
       autoSubmitTimeoutRef.current = null;
     }
-
     setAdjacentCells([]);
     velocityTrackerRef.current.reset();
     lastDirectionRef.current = null;
     startCellRef.current = null;
-
     if (selectedCells.length > 0 && (hasMovedRef.current || selectedCells.length >= 2)) {
       const formedWord = selectedCells.map(c => c.letter).join('');
       if (onPathSubmit) onPathSubmit([...selectedCells]);
       if (onWordSubmit) onWordSubmit(formedWord);
-
       vibrateWordSubmit(selectedCells.length, comboLevel, fireRoundActive);
-
       if (comboLevel > 0) {
         startSequentialFadeOut(true);
       } else {
         setTimeout(() => setSelectedCells([]), 500);
       }
     } else {
-      // Single tap detection
       if (selectedCells.length === 1 && !hasMovedRef.current && isTouchDeviceRef.current && onSingleTapDetected) {
         const cell = selectedCells[0];
         onSingleTapDetected({ row: cell.row, col: cell.col, letter: cell.letter });
       }
       setSelectedCells([]);
     }
-
     hasMovedRef.current = false;
   }, [interactive, selectedCells, onWordSubmit, onPathSubmit, fireRoundActive, comboLevel, startSequentialFadeOut, setSelectedCells, onSingleTapDetected]);
 
-  // Click-to-select handler for desktop
-  // Desktop UX improvement: Longer double-click window (500ms) makes it easier
-  // to select multiple cells without accidentally submitting
-  const handleCellClick = useCallback((rowIndex: number, colIndex: number, letter: string) => {
-    const now = Date.now();
-    const timeSinceLastClick = now - lastClickTimeRef.current;
-    const sameCell = lastClickCellRef.current?.row === rowIndex && lastClickCellRef.current?.col === colIndex;
+  // Click-to-select handler for desktop (extracted)
+  const handleCellClick = useGridClickHandler({
+    selectedCells,
+    setSelectedCells,
+    submitWord,
+    fireRoundActive,
+    setIsClickSelectMode,
+  });
 
-    // Double-click on same cell = submit (500ms window for easier multi-cell selection)
-    if (sameCell && timeSinceLastClick < 500 && selectedCells.length >= 2) {
-      submitWord();
-      lastClickTimeRef.current = 0;
-      lastClickCellRef.current = null;
-      return;
-    }
-
-    lastClickTimeRef.current = now;
-    lastClickCellRef.current = { row: rowIndex, col: colIndex };
-
-    if (selectedCells.length === 0) {
-      setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
-      setIsClickSelectMode(true);
-      vibrateClickSelect();
-      return;
-    }
-
-    const existingIndex = selectedCells.findIndex(c => c.row === rowIndex && c.col === colIndex);
-
-    if (existingIndex !== -1) {
-      // Clicking last selected cell with 2+ letters = submit
-      if (existingIndex === selectedCells.length - 1 && selectedCells.length >= 2) {
-        submitWord();
-        return;
-      }
-      // Clicking earlier cell = backtrack to that position
-      setSelectedCells(selectedCells.slice(0, existingIndex + 1));
-      vibrateBacktrack(fireRoundActive);
-      return;
-    }
-
-    const lastCell = selectedCells[selectedCells.length - 1];
-    if (lastCell && isAdjacentCell(lastCell, { row: rowIndex, col: colIndex })) {
-      setSelectedCells([...selectedCells, { row: rowIndex, col: colIndex, letter }]);
-      vibrateClickSelect();
-    }
-  }, [selectedCells, setSelectedCells, submitWord, fireRoundActive]);
-
-  // Mouse down handler
   const handleMouseDown = useCallback((
-    rowIndex: number,
-    colIndex: number,
-    letter: string,
-    event: React.MouseEvent<HTMLDivElement>
+    rowIndex: number, colIndex: number, letter: string, event: React.MouseEvent<HTMLDivElement>
   ) => {
     if (!isTouchDeviceRef.current) {
       handleCellClick(rowIndex, colIndex, letter);
-
       if (selectedCells.length === 0 || isClickSelectMode) {
         isTouchingRef.current = true;
         startPosRef.current = { x: event.clientX, y: event.clientY };
@@ -479,25 +335,19 @@ export function useGridInteraction({
     handleTouchStart(rowIndex, colIndex, letter, event);
   }, [handleCellClick, handleTouchStart, selectedCells.length, isClickSelectMode]);
 
-  // Mouse move handler
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!interactive) return;
-
     const hoveredCellPos = getCellAtPos(e.clientX, e.clientY);
     setHoveredCell(hoveredCellPos ? { row: hoveredCellPos.row, col: hoveredCellPos.col } : null);
-
-    // Enable drag mode after deadzone for desktop
     if (isTouchingRef.current && !isDraggingRef.current && !isTouchDeviceRef.current) {
       const deltaX = e.clientX - startPosRef.current.x;
       const deltaY = e.clientY - startPosRef.current.y;
       const movement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
       if (movement > getDeadzoneThreshold()) {
         isDraggingRef.current = true;
         hasMovedRef.current = true;
       }
     }
-
     if (isTouchingRef.current && isDraggingRef.current) {
       const mockEvent = {
         touches: [{ clientX: e.clientX, clientY: e.clientY }],
@@ -513,7 +363,6 @@ export function useGridInteraction({
   const handleRightClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!interactive) return;
     e.preventDefault();
-
     if (selectedCells.length > 0) {
       undoLastCell();
     } else if (isClickSelectMode) {
@@ -523,158 +372,41 @@ export function useGridInteraction({
 
   const handleDoubleClick = useCallback((rowIndex: number, colIndex: number) => {
     if (!interactive) return;
-
     const lastCell = selectedCells[selectedCells.length - 1];
     if (lastCell && lastCell.row === rowIndex && lastCell.col === colIndex && selectedCells.length >= 2) {
       submitWord();
     }
   }, [interactive, selectedCells, submitWord]);
 
-  // Keyboard navigation handler
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!interactive) return;
+  // Keyboard handler (extracted)
+  const handleKeyDown = useGridKeyboardHandler({
+    grid,
+    interactive,
+    focusedCell,
+    selectedCells,
+    comboLevel,
+    fireRoundActive,
+    language,
+    disableLetterKeyInput,
+    isTouchingRef,
+    isDraggingRef,
+    onWordSubmit,
+    onPathSubmit,
+    setFocusedCell,
+    setIsKeyboardMode,
+    setSelectedCells,
+    startSequentialFadeOut,
+  });
 
-    const rows = grid.length;
-    const cols = grid[0]?.length || 4;
-
-    // Initialize focused cell
-    // NOTE: Space is NOT included here - Space is reserved for game pause/resume
-    // Users can use Enter or arrow keys to enter keyboard navigation mode
-    if (focusedCell === null && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key)) {
-      setFocusedCell({ row: 0, col: 0 });
-      setIsKeyboardMode(true);
-      e.preventDefault();
-      return;
-    }
-
-    if (!focusedCell) return;
-
-    let newRow = focusedCell.row;
-    let newCol = focusedCell.col;
-
-    switch (e.key) {
-      case 'ArrowUp':
-        newRow = Math.max(0, focusedCell.row - 1);
-        e.preventDefault();
-        break;
-      case 'ArrowDown':
-        newRow = Math.min(rows - 1, focusedCell.row + 1);
-        e.preventDefault();
-        break;
-      case 'ArrowLeft':
-        newCol = Math.max(0, focusedCell.col - 1);
-        e.preventDefault();
-        break;
-      case 'ArrowRight':
-        newCol = Math.min(cols - 1, focusedCell.col + 1);
-        e.preventDefault();
-        break;
-      // NOTE: Space is NOT handled here - Space is reserved for game pause/resume
-      // Enter handles both cell selection and word submission
-      case 'Enter': {
-        e.preventDefault();
-        const letter = grid[focusedCell.row]?.[focusedCell.col];
-        if (!letter) return;
-
-        // Submit word if cells are selected
-        if (selectedCells.length > 0) {
-          const formedWord = selectedCells.map(c => c.letter).join('');
-          if (onPathSubmit) onPathSubmit([...selectedCells]);
-          if (onWordSubmit) onWordSubmit(formedWord);
-          vibrateKeyboardSelect(fireRoundActive);
-          if (comboLevel > 0) {
-            startSequentialFadeOut(true);
-          } else {
-            setTimeout(() => setSelectedCells([]), 500);
-          }
-          return;
-        }
-
-        // Otherwise toggle cell selection
-        const existingIndex = selectedCells.findIndex(c => c.row === focusedCell.row && c.col === focusedCell.col);
-
-        if (existingIndex !== -1) {
-          setSelectedCells(selectedCells.slice(0, existingIndex));
-          vibrateUndo(fireRoundActive);
-        } else {
-          const lastCell = selectedCells[selectedCells.length - 1];
-          const canSelect = lastCell ? isAdjacentCell(lastCell, focusedCell) : true;
-
-          if (canSelect) {
-            setSelectedCells([...selectedCells, { row: focusedCell.row, col: focusedCell.col, letter }]);
-            vibrateKeyboardSelect(fireRoundActive);
-          }
-        }
-        return;
-      }
-      case 'Escape':
-        setSelectedCells([]);
-        setFocusedCell(null);
-        setIsKeyboardMode(false);
-        e.preventDefault();
-        return;
-      case 'Backspace':
-      case 'Delete':
-        if (selectedCells.length > 0) {
-          setSelectedCells(selectedCells.slice(0, -1));
-          vibrateUndo(fireRoundActive);
-        }
-        e.preventDefault();
-        return;
-      default:
-        // Handle letter typing
-        if (e.key.length === 1 && /[a-zA-Z]/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
-          if (disableLetterKeyInput) return;
-          if (isTouchingRef.current || isDraggingRef.current) return;
-
-          e.preventDefault();
-
-          const currentWord = selectedCells.map(c => c.letter).join('');
-          const nextWord = currentWord + e.key;
-          const path = findWordPath(nextWord, grid, language);
-
-          if (path) {
-            const newSelection = path.map(p => ({ row: p.row, col: p.col, letter: p.letter }));
-            setSelectedCells(newSelection);
-            setFocusedCell({ row: path[path.length - 1].row, col: path[path.length - 1].col });
-            setIsKeyboardMode(true);
-            vibrateKeyboardSelect(fireRoundActive);
-          } else if (selectedCells.length === 0) {
-            const startNewPath = findWordPath(e.key, grid, language);
-            if (startNewPath) {
-              const newSelection = startNewPath.map(p => ({ row: p.row, col: p.col, letter: p.letter }));
-              setSelectedCells(newSelection);
-              setFocusedCell({ row: startNewPath[0].row, col: startNewPath[0].col });
-              setIsKeyboardMode(true);
-              vibrateKeyboardSelect(fireRoundActive);
-            }
-          }
-          return;
-        }
-    }
-
-    // Update focused cell
-    if (newRow !== focusedCell.row || newCol !== focusedCell.col) {
-      setFocusedCell({ row: newRow, col: newCol });
-      setIsKeyboardMode(true);
-      vibrateNavigation();
-    }
-  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, onPathSubmit, startSequentialFadeOut, setSelectedCells, fireRoundActive, language, disableLetterKeyInput]);
-
-  // Global mouse up
   useEffect(() => {
     const handleMouseUp = () => {
-      if (isDraggingRef.current) {
-        isDraggingRef.current = false;
-        handleTouchEnd();
-      }
+      if (isDraggingRef.current) { isDraggingRef.current = false; handleTouchEnd(); }
       isTouchingRef.current = false;
     };
     window.addEventListener('mouseup', handleMouseUp);
     return () => window.removeEventListener('mouseup', handleMouseUp);
   }, [handleTouchEnd]);
 
-  // Detect touch device
   useEffect(() => {
     const handleFirstTouch = () => {
       isTouchDeviceRef.current = true;
@@ -684,7 +416,6 @@ export function useGridInteraction({
     return () => window.removeEventListener('touchstart', handleFirstTouch);
   }, []);
 
-  // Exit click-select mode
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (gridRef.current && !gridRef.current.contains(e.target as Node)) {
@@ -696,14 +427,12 @@ export function useGridInteraction({
         }
       }
     };
-
     const handleEscapeKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isClickSelectMode) {
         setIsClickSelectMode(false);
         setSelectedCells([]);
       }
     };
-
     window.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('keydown', handleEscapeKey);
     return () => {
@@ -712,45 +441,33 @@ export function useGridInteraction({
     };
   }, [gridRef, isClickSelectMode, selectedCells.length, submitWord, setSelectedCells]);
 
-  // Reset keyboard mode on pointer
   useEffect(() => {
     const handlePointerDown = () => setIsKeyboardMode(false);
     window.addEventListener('pointerdown', handlePointerDown);
     return () => window.removeEventListener('pointerdown', handlePointerDown);
   }, []);
 
-  // Attach touchmove with passive: false
   useEffect(() => {
     const element = gridRef.current;
     if (!element) return;
-
     element.addEventListener('touchmove', handleTouchMove, { passive: false });
     return () => element.removeEventListener('touchmove', handleTouchMove);
   }, [gridRef, handleTouchMove]);
 
-  // Cleanup RAF on unmount
   useEffect(() => {
     return () => {
-      if (rafIdRef.current !== null) {
-        cancelAnimationFrame(rafIdRef.current);
-        rafIdRef.current = null;
-      }
+      if (rafIdRef.current !== null) { cancelAnimationFrame(rafIdRef.current); rafIdRef.current = null; }
     };
   }, []);
 
-  // Invalidate grid measurement cache on resize
   useEffect(() => {
     const element = gridRef.current;
     if (!element) return;
-
     const invalidateCache = () => { gridMeasurementsRef.current = null; };
-
     const resizeObserver = new ResizeObserver(invalidateCache);
     resizeObserver.observe(element);
-
     window.addEventListener('orientationchange', invalidateCache);
     window.addEventListener('resize', invalidateCache);
-
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener('orientationchange', invalidateCache);

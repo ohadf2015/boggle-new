@@ -1890,8 +1890,10 @@ html {
 .game-view-container {
   height: 100vh;
   height: 100svh;
+  height: 100dvh;
   max-height: 100vh;
   max-height: 100svh;
+  max-height: 100dvh;
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -1912,6 +1914,13 @@ body.crazygames-embed .game-view-container,
   overflow-y: auto;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Hide secondary game UI elements on very short screens (e.g. iPhone SE, small Android) */
+@media (max-height: 580px) and (orientation: portrait) {
+  .hide-on-short-screen {
+    display: none !important;
+  }
 }
 
 /* For pages that need to fill screen but allow scroll */

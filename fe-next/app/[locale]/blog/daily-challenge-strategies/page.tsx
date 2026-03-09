@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { BlogPostingJsonLd } from '@/components/seo/BlogJsonLd';
+import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
 import StrategiesPageClient from './PageClient';
 import { contentByLocale } from './content';
 
@@ -31,24 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return {
-    title,
-    description,
-    openGraph: { type: 'article', title, description, url: `https://www.lexiclash.live/${locale}/blog/${SLUG}`, siteName: 'LexiClash' },
-    twitter: { card: 'summary_large_image', title, description },
-    alternates: {
-      canonical: `https://www.lexiclash.live/${locale}/blog/${SLUG}`,
-      languages: {
-        'x-default': `https://www.lexiclash.live/en/blog/${SLUG}`,
-        he: `https://www.lexiclash.live/he/blog/${SLUG}`,
-        en: `https://www.lexiclash.live/en/blog/${SLUG}`,
-        sv: `https://www.lexiclash.live/sv/blog/${SLUG}`,
-        ja: `https://www.lexiclash.live/ja/blog/${SLUG}`,
-        es: `https://www.lexiclash.live/es/blog/${SLUG}`,
-      },
-    },
-    robots: { index: true, follow: true },
-  };
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
 }
 
 export default async function StrategiesPage({ params }: PageProps) {

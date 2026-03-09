@@ -1,0 +1,98 @@
+import {
+  SPECIAL_TILE_DISTRIBUTION,
+  type BlastTileState,
+  type BlastTileType,
+} from '../types';
+import { getInitialHitsRemaining } from './blastTileUtils';
+import { getWaveConfig, getWaveDistribution } from './blastWaveConfig';
+
+/** Seeded random for consistent tile placement per grid */
+export function seededRandom(seed: number): () => number {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+/** Roll a special tile type from a distribution map using a given random value */
+export function rollSpecialFromDistribution(
+  roll: number,
+  dist: Record<string, number>,
+): BlastTileType {
+  let cumulative = 0;
+  for (const [tileType, weight] of Object.entries(dist)) {
+    if (weight <= 0) continue;
+    cumulative += weight;
+    if (roll < cumulative) return tileType as BlastTileType;
+  }
+  return 'standard';
+}
+
+/**
+ * Valid inner types for Frost tiles -- only explosion/effect specials, not obstacles or multipliers.
+ * Wave-gating is applied at call site using rollSpecialFromDistribution with wave distribution.
+ */
+const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
+
+/** Generate initial tile states with special tile placement */
+export function generateTileStates(
+  gridSize: number,
+  specialTileChance: number,
+  seed: number = Date.now(),
+  customDistribution?: Record<string, number>,
+  currentWave: number = 1,
+): BlastTileState[][] {
+  const random = seededRandom(seed);
+  const tiles: BlastTileState[][] = [];
+  const dist = customDistribution ?? SPECIAL_TILE_DISTRIBUTION;
+
+  // Build wave-gated distribution for frost inner type selection
+  const waveConfigForFrost = getWaveConfig(currentWave);
+  const waveDistForFrost = getWaveDistribution(waveConfigForFrost);
+  const frostInnerDist: Record<string, number> = {};
+  for (const t of FROST_INNER_CANDIDATES) {
+    if ((waveDistForFrost[t] ?? 0) > 0) {
+      frostInnerDist[t] = waveDistForFrost[t] ?? 0;
+    }
+  }
+  // Normalize to sum to 1.0
+  const frostInnerTotal = Object.values(frostInnerDist).reduce((a, b) => a + b, 0);
+  if (frostInnerTotal > 0) {
+    for (const k of Object.keys(frostInnerDist)) {
+      frostInnerDist[k] /= frostInnerTotal;
+    }
+  }
+  const hasFrostInnerCandidates = Object.values(frostInnerDist).some(v => v > 0);
+  const effectiveFrostInnerDist = hasFrostInnerCandidates
+    ? frostInnerDist
+    : { bomb: 0.5, rainbow: 0.5 };
+
+  for (let row = 0; row < gridSize; row++) {
+    tiles[row] = [];
+    for (let col = 0; col < gridSize; col++) {
+      let type: BlastTileType = 'standard';
+
+      if (random() < specialTileChance) {
+        type = rollSpecialFromDistribution(random(), dist);
+      }
+
+      const innerType: BlastTileType | undefined =
+        type === 'frozen'
+          ? rollSpecialFromDistribution(random(), effectiveFrostInnerDist)
+          : undefined;
+
+      tiles[row][col] = {
+        row,
+        col,
+        type,
+        isCleared: false,
+        activationEffect: null,
+        hitsRemaining: getInitialHitsRemaining(type),
+        ...(innerType !== undefined ? { innerType } : {}),
+      };
+    }
+  }
+
+  return tiles;
+}

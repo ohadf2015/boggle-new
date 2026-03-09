@@ -2394,23 +2394,82 @@ const es = {
       "title": "Acerca de LexiClash",
       "whoWeAre": {
         "title": "Quiénes Somos",
-        "content": "LexiClash es un juego de estrategia de palabras multijugador en tiempo real desarrollado por LexiClash Ltd. Creamos juegos de palabras atractivos, educativos y competitivos para jugadores de todo el mundo en múltiples idiomas."
+        "content": "LexiClash es un juego de estrategia de palabras multijugador en tiempo real desarrollado por LexiClash Ltd, con sede en Israel. Creamos juegos de palabras atractivos, educativos y competitivos para jugadores de todas las edades — desde jóvenes aprendices hasta entusiastas veteranos de las palabras — en múltiples idiomas y culturas.",
+        "content2": "Lo que comenzó como un pequeño proyecto de pasión ha crecido hasta convertirse en una plataforma que sirve a miles de jugadores en todo el mundo. Nuestro equipo combina una profunda experiencia en diseño de juegos, tecnología educativa y desarrollo de software multilingüe para ofrecer una experiencia de juego de palabras sin igual. Estamos comprometidos a hacer que cada sesión de juego sea divertida, justa y enriquecedora."
+      },
+      "story": {
+        "title": "Nuestra Historia",
+        "content": "LexiClash nació en 2024 en Israel a partir de una idea simple pero poderosa: ¿y si los juegos de palabras pudieran ser tan emocionantes y competitivos como los esports, y al mismo tiempo ayudar a las personas a aprender nuevos idiomas? Nuestro fundador, Ohad Fisher, creció jugando juegos de palabras con familia y amigos en múltiples idiomas. Notó que aunque había muchos juegos de palabras disponibles, ninguno combinaba verdaderamente el juego competitivo en tiempo real con un aprendizaje de idiomas significativo a través de diferentes sistemas de escritura y direcciones de texto.",
+        "content2": "Partiendo de un pequeño prototipo, el equipo construyó LexiClash desde cero con soporte multilingüe en su núcleo — incluyendo soporte completo de derecha a izquierda (RTL) para hebreo. En el primer año, LexiClash creció para admitir cinco idiomas (hebreo, inglés, sueco, japonés y español), introdujo múltiples modos de juego originales y construyó una comunidad creciente de jugadores de más de 30 países que compiten diariamente en batallas de palabras."
       },
       "mission": {
         "title": "Nuestra Misión",
-        "content": "Nuestra misión es hacer que el aprendizaje de idiomas sea divertido y competitivo. Creemos que los juegos son la mejor manera de mejorar el vocabulario, la ortografía y el pensamiento rápido mientras te conectas con amigos y jugadores de todo el mundo."
+        "content": "Nuestra misión es hacer que el aprendizaje de idiomas sea divertido, social y competitivo. Creemos que la mejor manera de ampliar tu vocabulario y agudizar tus habilidades lingüísticas es a través del juego. Los métodos de estudio tradicionales como las tarjetas de memoria y la memorización repetitiva pueden resultar tediosos — pero cuando compites contra otros jugadores para formar la palabra más larga o buscas objetivos ocultos en una cuadrícula de letras, el aprendizaje ocurre de forma natural y placentera.",
+        "content2": "Estamos construyendo LexiClash para todos: niños desde los 6 años que recién empiezan a leer, adolescentes que buscan un desafío divertido, adultos que quieren mantener su mente activa y personas mayores que disfrutan de los rompecabezas de palabras. Nuestro objetivo es crear un juego que una a las personas a través de idiomas, culturas y generaciones — demostrando que las palabras son verdaderamente universales."
+      },
+      "whatMakesUsDifferent": {
+        "title": "Qué Nos Hace Diferentes",
+        "intro": "LexiClash no es solo otro juego de palabras. Hemos diseñado cada aspecto de la experiencia para que sea original, inclusivo y profundamente atractivo. Esto es lo que nos distingue de otros juegos de palabras en el mercado:",
+        "gameModes": {
+          "title": "Modos de Juego Originales",
+          "content": "Desde el Modo Blast — donde las fichas explotan y se producen reacciones en cadena — hasta Word Hunt, donde los jugadores compiten para encontrar palabras objetivo específicas, y Desafíos Diarios que dan a cada jugador el mismo rompecabezas para resolver cada día. Nuestro Modo Aventura presenta 100 niveles en 10 mundos temáticos con batallas de jefes, fichas especiales y power-ups."
+        },
+        "multilingual": {
+          "title": "Verdadero Soporte Multilingüe",
+          "content": "Admitimos 5 idiomas incluyendo hebreo con soporte completo de diseño de derecha a izquierda. Cada modo de juego, cada elemento de la interfaz y cada retroalimentación funciona perfectamente en todos los idiomas admitidos. Los jugadores pueden cambiar de idioma instantáneamente e incluso practicar vocabulario en diferentes idiomas."
+        },
+        "education": {
+          "title": "Integración Educativa",
+          "content": "Nuestro Modo Educación permite a los profesores crear lecciones de palabras personalizadas, asignar desafíos a los estudiantes y seguir el progreso a lo largo del tiempo. Aulas de todo el mundo utilizan LexiClash como herramienta de aprendizaje complementaria que los estudiantes realmente disfrutan usar."
+        },
+        "design": {
+          "title": "Diseño Neo-Brutalista Audaz",
+          "content": "Nuestro estilo visual distintivo presenta bordes gruesos, sombras duras y colores vibrantes inspirados en juegos de fiesta. El diseño no es solo estético — garantiza alto contraste y legibilidad para todos los jugadores, incluyendo aquellos con discapacidades visuales."
+        }
       },
       "whatWeDo": {
         "title": "Lo Que Hacemos",
-        "content": "Desarrollamos juegos de palabras multijugador que combinan velocidad, estrategia y habilidades de vocabulario. LexiClash admite hebreo, inglés, sueco, japonés y español, haciéndolo accesible para jugadores de todo el mundo."
+        "content": "Desarrollamos juegos de palabras multijugador en tiempo real que combinan velocidad, estrategia y habilidades de vocabulario en una experiencia que es tanto entretenida como educativa. LexiClash admite hebreo, inglés, sueco, japonés y español, con más idiomas planificados para el futuro.",
+        "content2": "Más allá del juego principal, construimos herramientas para educadores, organizamos desafíos diarios y eventos de temporada, mantenemos tablas de clasificación competitivas y desarrollamos continuamente nuevos modos de juego y características basadas en los comentarios de la comunidad. Cada actualización está impulsada por las necesidades de nuestros jugadores y nuestro compromiso de crear la mejor plataforma de juegos de palabras del mundo."
+      },
+      "technology": {
+        "title": "Construido para la Velocidad",
+        "content": "LexiClash está construido con tecnología web de vanguardia incluyendo Next.js y conexiones WebSocket en tiempo real. Nuestro motor ofrece tiempos de respuesta inferiores a 100ms para un juego multijugador fluido — cuando envías una palabra, ves tu puntuación al instante. El juego se ejecuta completamente en el navegador sin necesidad de descargar aplicaciones, haciéndolo accesible en cualquier dispositivo con conexión a internet.",
+        "content2": "Utilizamos renderizado del lado del servidor para cargas de página rápidas, sincronización de datos en tiempo real para partidas multijugador en vivo y almacenamiento inteligente en caché para garantizar un juego fluido incluso en conexiones más lentas. Nuestra infraestructura escala automáticamente para manejar miles de jugadores simultáneos, y monitoreamos continuamente el rendimiento."
+      },
+      "forEducators": {
+        "title": "Para Educadores",
+        "content": "LexiClash fue diseñado con la educación en mente desde el primer día. Nuestro Modo Educación proporciona a los profesores un poderoso conjunto de herramientas para integrar juegos de palabras en su plan de estudios. Los profesores pueden crear listas de palabras personalizadas alineadas con sus planes de lección, asignar desafíos cronometrados a estudiantes individuales o clases enteras, y monitorear el progreso a través de paneles de análisis detallados.",
+        "content2": "La investigación muestra consistentemente que los juegos de palabras competitivos mejoran significativamente la retención de vocabulario en comparación con los métodos de estudio tradicionales. Al convertir la práctica de vocabulario en un juego, los estudiantes permanecen comprometidos más tiempo y retienen más. LexiClash se utiliza en clases de artes del lenguaje, programas de ESL y cursos de idiomas extranjeros en todo el mundo. Nuestro soporte multilingüe lo hace especialmente valioso para la educación bilingüe y los programas de inmersión lingüística."
+      },
+      "community": {
+        "title": "Nuestra Comunidad",
+        "content": "La comunidad de LexiClash es diversa, acogedora y crece cada día. Desde noches de juegos familiares casuales hasta torneos competitivos intensos, nuestros jugadores abarcan todas las edades, niveles de habilidad y orígenes. Organizamos desafíos diarios donde todos juegan el mismo rompecabezas, restablecimientos semanales de la tabla de clasificación que mantienen la competencia fresca, y eventos temáticos especiales durante festividades y celebraciones culturales.",
+        "content2": "Creemos que los mejores juegos son moldeados por sus jugadores. Por eso escuchamos activamente los comentarios de la comunidad a través de nuestros canales de redes sociales y herramientas de retroalimentación en el juego. Muchas de nuestras características más populares — incluyendo el Modo Blast y el sistema de rachas — fueron inspiradas por sugerencias de jugadores. Únete a miles de entusiastas de juegos de palabras de más de 30 países que han hecho de LexiClash su juego de palabras favorito."
+      },
+      "values": {
+        "title": "Lo Que Defendemos",
+        "content": "En LexiClash, nuestros valores guían cada decisión que tomamos — desde el diseño de juegos hasta el manejo de datos. Creemos que los juegos tienen el poder de educar, conectar e inspirar, y nos tomamos esa responsabilidad en serio.",
+        "accessibility": {
+          "title": "Accesibilidad e Inclusión",
+          "content": "LexiClash es gratuito sin muros de pago. Admitimos lectores de pantalla, navegación por teclado, movimiento reducido y diseño de alto contraste para garantizar que todos puedan jugar."
+        },
+        "privacy": {
+          "title": "Privacidad Primero",
+          "content": "Protegemos la privacidad de los jugadores — especialmente de los más jóvenes — con prácticas compatibles con COPPA, publicidad segura para niños y políticas de datos transparentes. Nunca vendemos datos personales."
+        },
+        "fairPlay": {
+          "title": "Juego Limpio",
+          "content": "Sin mecánicas de pago para ganar, sin ventajas injustas. Cada jugador compite en igualdad de condiciones. Nuestros sistemas de validación de palabras y puntuación son consistentes y transparentes."
+        }
       },
       "team": {
         "title": "Nuestro Equipo",
-        "content": "LexiClash fue fundado por un equipo de entusiastas de juegos de palabras e ingenieros de software apasionados. Estamos dedicados a crear la mejor experiencia de juego de palabras multijugador."
+        "content": "LexiClash fue fundado por Ohad Fisher y un equipo de entusiastas apasionados de juegos de palabras, ingenieros de software y especialistas en educación con sede en Israel. Somos un equipo pequeño pero dedicado que se preocupa profundamente por crear la mejor experiencia de juego de palabras multijugador posible. Cada miembro del equipo aporta amor por el lenguaje, pasión por la tecnología y compromiso con la creación de juegos divertidos, justos y accesibles para todos."
       },
       "contact": {
         "title": "Contáctanos",
-        "content": "¿Tienes preguntas o comentarios? ¡Nos encantaría saber de ti!"
+        "content": "¿Tienes preguntas, comentarios o consultas de colaboración? ¡Nos encantaría saber de ti! Ya seas un jugador con una sugerencia, un profesor interesado en usar LexiClash en tu aula, o un periodista buscando información, no dudes en comunicarte."
       },
       "businessInfo": {
         "title": "Información Comercial",
@@ -2426,26 +2485,6 @@ const es = {
         "email": "lexiclash.game@gmail.com",
         "instagramLabel": "Instagram",
         "instagram": "@lexi.clash"
-      },
-      "story": {
-        "title": "Nuestra historia",
-        "content": "LexiClash comenzo en 2024 como un proyecto de pasion nacido de una idea simple: y si los juegos de palabras fueran tan emocionantes como los esports competitivos? Fundado en Israel, nos propusimos crear un juego de palabras que combine la profundidad estrategica de Scrabble con la velocidad de la competicion en tiempo real. Hoy, miles de jugadores de mas de 30 paises compiten diariamente en batallas de palabras en 5 idiomas."
-      },
-      "technology": {
-        "title": "Construido para la velocidad",
-        "content": "LexiClash esta construido con tecnologia web de vanguardia. Nuestro motor en tiempo real ofrece tiempos de respuesta inferiores a 100ms para un juego multijugador fluido. El juego se ejecuta completamente en el navegador — sin necesidad de descargar aplicaciones."
-      },
-      "education": {
-        "title": "Educacion y aprendizaje",
-        "content": "Mas alla del entretenimiento, LexiClash es una poderosa herramienta de construccion de vocabulario. Los profesores usan nuestro Modo Educacion para crear lecciones de palabras personalizadas y seguir el progreso de los estudiantes."
-      },
-      "community": {
-        "title": "Nuestra comunidad",
-        "content": "La comunidad de LexiClash es diversa y esta creciendo. Desde noches de juegos familiares casuales hasta torneos competitivos, nuestros jugadores abarcan todas las edades y niveles de habilidad."
-      },
-      "values": {
-        "title": "Lo que defendemos",
-        "content": "Creemos que los juegos deben ser accesibles para todos. LexiClash es gratuito sin muros de pago. Priorizamos la accesibilidad con soporte completo de lector de pantalla, navegacion por teclado y diseno de alto contraste."
       }
     },
     "disclaimer": {
@@ -3073,7 +3112,10 @@ const es = {
     "tryDaily": "Prueba el Desafío Diario",
     "scienceTitle": "Qué pasa en tu cerebro cuando buscas palabras",
     "strategiesTitle": "Estrategias para el desafío diario",
-    "improveTitle": "Cómo mejorar en los juegos de palabras"
+    "improveTitle": "Cómo mejorar en los juegos de palabras",
+    "addictiveTitle": "Por qué no puedes dejar de jugar juegos de palabras",
+    "brainTrainingTitle": "Juegos de palabras para entrenar el cerebro",
+    "alternativesTitle": "Mejores alternativas a Boggle 2026"
   },
   "landing": {
     "playingNow": "jugando",
@@ -3126,6 +3168,7 @@ const es = {
       "step3": "Construye combos para puntos extra",
       "step4": "Consigue mas puntos para ganar!",
       "blogTitle": "De nuestro blog",
+      "viewAllPosts": "Ver todos los posts →",
       "whoCanPlayTitle": "¿Quién puede jugar?",
       "whoCanPlayContent": "LexiClash está diseñado para todos — desde jugadores casuales que buscan un descanso divertido hasta entusiastas competitivos de juegos de palabras que persiguen la gloria en la clasificación. El juego funciona en cualquier dispositivo con navegador web: teléfonos, tabletas, portátiles y ordenadores de escritorio. Sin descargas, sin registros para empezar a jugar. Jugadores a partir de 6 años pueden disfrutar del juego, con funciones de seguridad infantil integradas. Ya seas un estudiante mejorando vocabulario, un profesor organizando batallas de palabras en clase, o un grupo de amigos buscando un juego para fiestas, LexiClash se adapta a tu ritmo.",
       "gameModesTitle": "Modos de juego explicados",
@@ -7277,6 +7320,58 @@ const es = {
     "send": "Enviar Regalo",
     "sent": "¡Regalo Enviado!",
     "limitReached": "Límite diario alcanzado"
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "subtitle": "Preguntas y respuestas frecuentes",
+    "stillHaveQuestions": "¿Todavía tienes preguntas?",
+    "hereToHelp": "¡Estamos aquí para ayudar! Contáctanos en cualquier momento.",
+    "contactUs": "Contáctanos",
+    "learnMore": "¿Quieres saber más?",
+    "blogCta": "Visita nuestro blog para consejos, estrategias y la ciencia detrás de los juegos de palabras.",
+    "categories": {
+      "gettingStarted": "Primeros pasos",
+      "gameplay": "Jugabilidad",
+      "technical": "Técnico",
+      "account": "Cuenta",
+      "privacy": "Privacidad y seguridad"
+    },
+    "q": {
+      "whatIs": "¿Qué es LexiClash?",
+      "createAccount": "¿Cómo creo una cuenta?",
+      "isFree": "¿LexiClash es gratis?",
+      "scoring": "¿Cómo se obtienen puntos?",
+      "gameModes": "¿Qué modos de juego hay disponibles?",
+      "dailyChallenge": "¿Cómo funciona el Desafío Diario?",
+      "multipleLanguages": "¿Puedo jugar en varios idiomas?",
+      "devices": "¿Qué dispositivos son compatibles?",
+      "internet": "¿Necesito conexión a internet para jugar?",
+      "reportBug": "¿Cómo reporto un error o problema técnico?",
+      "changeProfile": "¿Cómo cambio mi nombre de usuario o perfil?",
+      "multipleDevices": "¿Puedo jugar en varios dispositivos?",
+      "deleteAccount": "¿Cómo elimino mi cuenta?",
+      "dataSafe": "¿Están seguros mis datos?",
+      "ads": "¿LexiClash muestra anuncios?",
+      "optOut": "¿Puedo optar por no participar en la recopilación de datos?"
+    },
+    "a": {
+      "whatIs": "LexiClash es un juego de palabras multijugador donde compites contra amigos o rivales de IA para encontrar palabras en un tablero compartido. Juega en solitario, acepta desafíos diarios o compite en partidas multijugador en tiempo real en hebreo, inglés, sueco y japonés.",
+      "createAccount": "Puedes jugar como invitado o crear una cuenta con Google. Tener una cuenta te permite guardar tu progreso, seguir estadísticas, competir en clasificaciones y jugar en varios dispositivos.",
+      "isFree": "¡Sí! LexiClash es completamente gratis. Todos los modos de juego, incluyendo un jugador, multijugador y desafíos diarios, están disponibles sin costo.",
+      "scoring": "Los puntos se otorgan según la longitud de la palabra y el valor de las letras. Las palabras más largas dan más puntos. Las letras raras como Q, Z y X tienen valores más altos. Se otorgan puntos extra por encontrar todas las palabras del tablero.",
+      "gameModes": "LexiClash ofrece tres modos principales: (1) Un jugador - practica contra la IA con varios niveles de dificultad, (2) Multijugador - partidas en tiempo real contra otros jugadores, (3) Desafío Diario - compite en el mismo rompecabezas que jugadores de todo el mundo.",
+      "dailyChallenge": "Cada día a medianoche UTC se genera un nuevo rompecabezas que todos los jugadores del mundo pueden intentar. Tienes una oportunidad por día para encontrar la mayor cantidad de palabras posible. Tu puntuación se registra en la clasificación diaria.",
+      "multipleLanguages": "¡Sí! LexiClash admite hebreo, inglés, sueco y japonés. Puedes cambiar de idioma en Configuración. Cada idioma tiene su propio diccionario y clasificaciones.",
+      "devices": "LexiClash funciona en todos los dispositivos modernos, incluyendo computadoras de escritorio, tabletas y smartphones. Soportamos las últimas versiones de Chrome, Firefox, Safari y Edge.",
+      "internet": "Sí, se requiere conexión a internet para el modo multijugador y los desafíos diarios. Sin embargo, puedes jugar en modo un jugador sin conexión si previamente cargaste el juego.",
+      "reportBug": "Si encuentras un error, contáctanos en lexiclash.game@gmail.com o en Instagram @lexi.clash. Incluye detalles sobre lo que sucedió y qué dispositivo/navegador estabas usando.",
+      "changeProfile": "Ve a Configuración (ícono de engranaje en el encabezado) y navega a la sección de Perfil. Allí puedes actualizar tu nombre de usuario, avatar y otros detalles del perfil.",
+      "multipleDevices": "¡Sí! Si creas una cuenta con Google, tu progreso, estadísticas y configuración se sincronizan automáticamente en todos tus dispositivos.",
+      "deleteAccount": "Para eliminar tu cuenta, ve a Configuración > Cuenta > Eliminar cuenta. Esta acción es permanente y borrará todos tus datos, incluyendo estadísticas, logros e historial de juegos.",
+      "dataSafe": "Sí. Nos tomamos la privacidad en serio y solo recopilamos los datos necesarios para operar el juego. Usamos cifrado estándar de la industria y nunca vendemos tu información personal. Consulta nuestra Política de Privacidad para más detalles.",
+      "ads": "Nos asociamos con Google AdSense para mostrar anuncios relevantes. Los anuncios nos ayudan a mantener el juego gratuito para todos. Puedes obtener más información sobre la personalización de anuncios y las opciones de exclusión en nuestra Política de Privacidad.",
+      "optOut": "Si bien cierta recopilación de datos es necesaria para el funcionamiento del juego (como tu nombre de usuario y puntuaciones), puedes optar por no participar en análisis y anuncios personalizados en Configuración > Privacidad."
+    }
   }
 };
 

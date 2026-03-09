@@ -493,7 +493,7 @@ const SinglePlayerView: React.FC = () => {
 
   return (
     <div
-      className="flex flex-col min-h-full bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative"
+      className={`flex flex-col bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative ${phase === 'playing' ? 'h-full overflow-hidden' : 'min-h-full'}`}
       {...pullToRefreshHandlers}
     >
       {/* Pull-to-refresh indicator - only show during results */}
@@ -511,7 +511,7 @@ const SinglePlayerView: React.FC = () => {
         <PreGameTutorial onComplete={handleTutorialComplete} />
       )}
 
-      <div className="w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden">
+      <div className={`w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden ${phase === 'playing' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>
         {phase === 'playing' && (
           <TutorialProvider autoStart>
             <TutorialOverlay />

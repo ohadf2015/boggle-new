@@ -2883,23 +2883,82 @@ const sv = {
       "title": "Om LexiClash",
       "whoWeAre": {
         "title": "Vilka vi är",
-        "content": "LexiClash är ett multiplayer-ordstrategispel i realtid utvecklat av LexiClash Ltd. Vi skapar engagerande, pedagogiska och tävlingsinriktade ordspel för spelare världen över på flera språk."
+        "content": "LexiClash är ett multiplayer-ordstrategispel i realtid utvecklat av LexiClash Ltd, baserat i Israel. Vi skapar engagerande, pedagogiska och tävlingsinriktade ordspel för spelare i alla åldrar — från unga elever till erfarna ordentusiaster — på flera språk och kulturer.",
+        "content2": "Det som började som ett litet passionsprojekt har vuxit till en plattform som betjänar tusentals spelare världen över. Vårt team kombinerar djup expertis inom speldesign, utbildningsteknik och flerspråkig mjukvaruutveckling för att leverera en ordspelsupplevelse utan motsvarighet. Vi är engagerade i att göra varje spelsession rolig, rättvis och berikande."
+      },
+      "story": {
+        "title": "Vår historia",
+        "content": "LexiClash föddes 2024 i Israel ur en enkel men kraftfull idé: tänk om ordspel kunde vara lika spännande och tävlingsinriktade som e-sport, samtidigt som de hjälper människor att lära sig nya språk? Vår grundare, Ohad Fisher, växte upp med att spela ordspel med familj och vänner på flera språk. Han märkte att även om det fanns många ordspel tillgängliga, kombinerade inget verkligen realtids tävlingsspel med meningsfullt språklärande över olika skriftsystem och skrivriktningar.",
+        "content2": "Med utgångspunkt i en liten prototyp byggde teamet LexiClash från grunden med flerspråkigt stöd i kärnan — inklusive fullt höger-till-vänster (RTL) stöd för hebreiska. Under det första året växte LexiClash till att stödja fem språk (hebreiska, engelska, svenska, japanska och spanska), introducerade flera originella spellägen och byggde en växande gemenskap av spelare från över 30 länder som tävlar dagligen i ordstrider."
       },
       "mission": {
         "title": "Vårt uppdrag",
-        "content": "Vårt uppdrag är att göra språkinlärning roligt och tävlingsinriktat. Vi tror att spel är det bästa sättet att förbättra ordförråd, stavning och snabbt tänkande samtidigt som man kopplar ihop med vänner och spelare globalt."
+        "content": "Vårt uppdrag är att göra språkinlärning roligt, socialt och tävlingsinriktat. Vi tror att det bästa sättet att utöka ditt ordförråd och skärpa dina språkkunskaper är genom lek. Traditionella studiemetoder som flashkort och utantillärning kan kännas tråkiga — men när du tävlar mot andra spelare om att bilda det längsta ordet eller jagar dolda mål på ett bokstavsrutnät, sker inlärningen naturligt och glädjefyllt.",
+        "content2": "Vi bygger LexiClash för alla: barn så unga som 6 som precis börjar läsa, tonåringar som söker en rolig utmaning, vuxna som vill hålla sinnet skarpt och seniorer som njuter av ordpussel. Vårt mål är att skapa ett spel som förenar människor över språk, kulturer och generationer — och bevisar att ord verkligen är universella."
+      },
+      "whatMakesUsDifferent": {
+        "title": "Vad som gör oss annorlunda",
+        "intro": "LexiClash är inte bara ytterligare ett ordspel. Vi har designat varje aspekt av upplevelsen för att vara originell, inkluderande och djupt engagerande. Här är vad som skiljer oss från andra ordspel på marknaden:",
+        "gameModes": {
+          "title": "Originella spellägen",
+          "content": "Från Blast Mode — där brickor exploderar och kaskadar i kedjereaktioner — till Word Hunt, där spelare tävlar om att hitta specifika målord, och dagliga utmaningar som ger varje spelare samma pussel att lösa varje dag. Vårt äventyrsläge har 100 nivåer i 10 temavärldar med bossstrider, specialbrickor och power-ups."
+        },
+        "multilingual": {
+          "title": "Äkta flerspråkigt stöd",
+          "content": "Vi stödjer 5 språk inklusive hebreiska med fullt höger-till-vänster layoutstöd. Varje spelläge, varje UI-element och varje återkoppling fungerar felfritt på alla språk som stöds. Spelare kan byta språk omedelbart och till och med öva ordförråd på olika språk."
+        },
+        "education": {
+          "title": "Utbildningsintegration",
+          "content": "Vårt utbildningsläge låter lärare skapa anpassade ordlektioner, tilldela utmaningar till elever och följa framsteg över tid. Klassrum runt om i världen använder LexiClash som ett kompletterande inlärningsverktyg som elever faktiskt gillar att använda."
+        },
+        "design": {
+          "title": "Djärv neo-brutalistisk design",
+          "content": "Vår distinktiva visuella stil har grova ramar, hårda skuggor och livfulla färger inspirerade av partyspel. Designen är inte bara estetisk — den säkerställer hög kontrast och läsbarhet för alla spelare, inklusive de med synnedsättningar."
+        }
       },
       "whatWeDo": {
         "title": "Vad vi gör",
-        "content": "Vi utvecklar multiplayer-ordspel som kombinerar hastighet, strategi och ordkunskaper. LexiClash stödjer hebreiska, engelska, svenska, japanska och spanska, vilket gör det tillgängligt för spelare världen över."
+        "content": "Vi utvecklar multiplayer-ordspel i realtid som kombinerar hastighet, strategi och ordkunskaper till en upplevelse som är både underhållande och pedagogisk. LexiClash stödjer hebreiska, engelska, svenska, japanska och spanska, med fler språk planerade för framtiden.",
+        "content2": "Utöver kärnspelet bygger vi verktyg för utbildare, anordnar dagliga utmaningar och säsongsevenemang, underhåller tävlingslistor och utvecklar kontinuerligt nya spellägen och funktioner baserat på gemenskapens feedback. Varje uppdatering drivs av våra spelares behov och vårt engagemang för att skapa den bästa ordspelsplattformen i världen."
+      },
+      "technology": {
+        "title": "Byggt för hastighet",
+        "content": "LexiClash är byggt med banbrytande webbteknik inklusive Next.js och realtids WebSocket-anslutningar. Vår motor levererar svarstider under 100ms för sömlöst multiplayerspel — när du skickar in ett ord ser du ditt resultat omedelbart. Spelet körs helt i webbläsaren utan appnedladdningar, vilket gör det tillgängligt på alla enheter med internetanslutning.",
+        "content2": "Vi använder server-side rendering för snabba sidladdningar, realtidsdatasynkronisering för live multiplayer-matcher och intelligent caching för att säkerställa smidigt spelande även på långsammare anslutningar. Vår infrastruktur skalar automatiskt för att hantera tusentals samtidiga spelare, och vi övervakar kontinuerligt prestandan."
+      },
+      "forEducators": {
+        "title": "För utbildare",
+        "content": "LexiClash designades med utbildning i åtanke från dag ett. Vårt utbildningsläge ger lärare ett kraftfullt verktygsset för att integrera ordspel i sin läroplan. Lärare kan skapa anpassade ordlistor som är anpassade till deras lektionsplaner, tilldela tidsbegränsade utmaningar till enskilda elever eller hela klasser, och övervaka framsteg genom detaljerade analyspaneler.",
+        "content2": "Forskning visar konsekvent att tävlingsinriktade ordspel förbättrar ordförrådsretention avsevärt jämfört med traditionella studiemetoder. Genom att förvandla ordförrådsövning till ett spel förblir elever engagerade längre och minns mer. LexiClash används i språkkurser, ESL-program och främmandespråkskurser runt om i världen. Vårt flerspråkiga stöd gör det särskilt värdefullt för tvåspråkig utbildning och språkimmersionsprogram."
+      },
+      "community": {
+        "title": "Vår gemenskap",
+        "content": "LexiClash-gemenskapen är mångfaldig, välkomnande och växer varje dag. Från avslappnade familjespelavällar till intensiva tävlingsturneringar spänner våra spelare alla åldrar, färdighetsnivåer och bakgrunder. Vi anordnar dagliga utmaningar där alla spelar samma pussel, veckovisa topplisteåterställningar som håller tävlingen fräsch, och särskilda temaevenemang under helgdagar och kulturella firanden.",
+        "content2": "Vi tror att de bästa spelen formas av sina spelare. Därför lyssnar vi aktivt på gemenskapens feedback genom våra sociala mediekanaler och feedbackverktyg i spelet. Många av våra mest populära funktioner — inklusive Blast Mode och streak-systemet — inspirerades av spelarförslag. Gå med tusentals ordspelsentusiaster från över 30 länder som har gjort LexiClash till sitt favoritordspel."
+      },
+      "values": {
+        "title": "Vad vi står för",
+        "content": "På LexiClash vägleder våra värderingar varje beslut vi fattar — från speldesign till datahantering. Vi tror att spel har kraften att utbilda, förena och inspirera, och vi tar det ansvaret på allvar.",
+        "accessibility": {
+          "title": "Tillgänglighet och inkludering",
+          "content": "LexiClash är gratis att spela utan betalväggar. Vi stödjer skärmläsare, tangentbordsnavigering, reducerad rörelse och högkontrastdesign för att säkerställa att alla kan spela."
+        },
+        "privacy": {
+          "title": "Integritet först",
+          "content": "Vi skyddar spelarnas integritet — särskilt yngre spelare — med COPPA-kompatibla metoder, barnsäker annonsering och transparenta datapolicyer. Vi säljer aldrig personuppgifter."
+        },
+        "fairPlay": {
+          "title": "Fair play",
+          "content": "Inga pay-to-win-mekaniker, inga orättvisa fördelar. Varje spelare tävlar på lika villkor. Våra ordvaliderings- och poängsystem är konsekventa och transparenta."
+        }
       },
       "team": {
         "title": "Vårt team",
-        "content": "LexiClash grundades av ett team av passionerade ordspelsentusiaster och mjukvaruingenjörer. Vi är dedikerade till att skapa den bästa multiplayer-ordspelsupplevelsen."
+        "content": "LexiClash grundades av Ohad Fisher och ett team av passionerade ordspelsentusiaster, mjukvaruingenjörer och utbildningsspecialister baserade i Israel. Vi är ett litet men dedikerat team som brinner för att skapa den bästa multiplayer-ordspelsupplevelsen. Varje teammedlem bidrar med en kärlek till språk, en passion för teknik och ett engagemang för att skapa spel som är roliga, rättvisa och tillgängliga för alla."
       },
       "contact": {
         "title": "Kontakta oss",
-        "content": "Har du frågor eller feedback? Vi skulle gärna höra från dig!"
+        "content": "Har du frågor, feedback eller samarbetsförfrågningar? Vi skulle gärna höra från dig! Oavsett om du är en spelare med ett förslag, en lärare som är intresserad av att använda LexiClash i ditt klassrum, eller en journalist som letar efter information, tveka inte att höra av dig."
       },
       "businessInfo": {
         "title": "Företagsinformation",
@@ -2915,26 +2974,6 @@ const sv = {
         "email": "lexiclash.game@gmail.com",
         "instagramLabel": "Instagram",
         "instagram": "@lexi.clash"
-      },
-      "story": {
-        "title": "Var historia",
-        "content": "LexiClash startade 2024 som ett passionsprojekt fran en enkel ide: tankt om ordspel var lika spannande som konkurrensinriktad e-sport? Grundat i Israel satte vi ut att bygga ett ordspel som kombinerar Scrabbles strategiska djup med hastigheten av tavlingar i realtid. Idag tavlar tusentals spelare fran over 30 lander dagligen i ordstrider pa 5 sprak."
-      },
-      "technology": {
-        "title": "Byggt for hastighet",
-        "content": "LexiClash ar byggt med den senaste webbtekniken. Var realtidsmotor levererar svarstider under 100ms for somlost multiplayerspel. Spelet kors helt i webblasaren — inga appnedladdningar behövs."
-      },
-      "education": {
-        "title": "Utbildning och larande",
-        "content": "Bortom underhallning ar LexiClash ett kraftfullt verktyg for ordforraduppbyggnad. Larare anvander vart utbildningslage for att skapa anpassade ordlektioner och folja elevers framsteg. Forskning visar att kompetitiva ordspel forbattrar ordforradsinlarningen med upp till 40%."
-      },
-      "community": {
-        "title": "Var gemenskap",
-        "content": "LexiClash-gemenskapen ar mangfaldig och vaxande. Fran avslappnade familjespelavkvallar till tavlingsinriktade turneringar spanner vara spelare alla aldrar och fardighetsnivaer."
-      },
-      "values": {
-        "title": "Vad vi star for",
-        "content": "Vi tror att spel ska vara tillgangliga for alla. LexiClash ar gratis att spela utan betalvaggar. Vi prioriterar tillganglighet med fullt skarmlasar-stod, tangentbordsnavigering och hogkontrast-design."
       }
     },
     "disclaimer": {
@@ -3033,7 +3072,10 @@ const sv = {
     "tryDaily": "Prova daglig utmaning",
     "scienceTitle": "Vad som händer i hjärnan när du söker efter ord",
     "strategiesTitle": "Strategier för dagliga utmaningen",
-    "improveTitle": "Hur du faktiskt blir bättre på ordspel"
+    "improveTitle": "Hur du faktiskt blir bättre på ordspel",
+    "addictiveTitle": "Varför du inte kan sluta spela ordspel",
+    "brainTrainingTitle": "Ordspel som hjärnträning",
+    "alternativesTitle": "Bästa Boggle-alternativen 2026"
   },
   "landing": {
     "playingNow": "Spelar Nu",
@@ -3087,6 +3129,7 @@ const sv = {
       "step3": "Bygg kombos for bonuspoang",
       "step4": "Fa flest poang for att vinna!",
       "blogTitle": "Fran var blogg",
+      "viewAllPosts": "Visa alla inlägg →",
       "whoCanPlayTitle": "Vem kan spela?",
       "whoCanPlayContent": "LexiClash är gjort för alla — från vardagsspelare som söker en rolig paus till tävlingsinriktade ordspelsentusiaster som jagar topplaceringar. Spelet fungerar på alla enheter med webbläsare: mobiler, surfplattor, laptops och stationära datorer. Inga nedladdningar, ingen registrering krävs för att börja spela. Spelare från 6 år kan njuta av spelet, med inbyggda barnsäkerhetsfunktioner. Oavsett om du är en elev som förbättrar ordförrådet, en lärare som kör ordstrider i klassrummet, eller en grupp vänner som söker ett partyspel, anpassar sig LexiClash efter din takt.",
       "gameModesTitle": "Spellägen förklarade",
@@ -7257,6 +7300,58 @@ const sv = {
     "send": "Skicka gåva",
     "sent": "Gåva skickad!",
     "limitReached": "Daglig gräns nådd"
+  },
+  "faq": {
+    "title": "Vanliga frågor",
+    "subtitle": "Vanliga frågor och svar",
+    "stillHaveQuestions": "Har du fortfarande frågor?",
+    "hereToHelp": "Vi finns här för att hjälpa! Kontakta oss när som helst.",
+    "contactUs": "Kontakta oss",
+    "learnMore": "Vill du lära dig mer?",
+    "blogCta": "Kolla in vår blogg för tips, strategier och vetenskapen bakom ordspel.",
+    "categories": {
+      "gettingStarted": "Kom igång",
+      "gameplay": "Spelmekanik",
+      "technical": "Tekniskt",
+      "account": "Konto",
+      "privacy": "Integritet och säkerhet"
+    },
+    "q": {
+      "whatIs": "Vad är LexiClash?",
+      "createAccount": "Hur skapar jag ett konto?",
+      "isFree": "Är LexiClash gratis?",
+      "scoring": "Hur får jag poäng?",
+      "gameModes": "Vilka spellägen finns?",
+      "dailyChallenge": "Hur fungerar den dagliga utmaningen?",
+      "multipleLanguages": "Kan jag spela på flera språk?",
+      "devices": "Vilka enheter stöds?",
+      "internet": "Behöver jag internetanslutning för att spela?",
+      "reportBug": "Hur rapporterar jag en bugg eller tekniskt problem?",
+      "changeProfile": "Hur ändrar jag mitt användarnamn eller min profil?",
+      "multipleDevices": "Kan jag spela på flera enheter?",
+      "deleteAccount": "Hur raderar jag mitt konto?",
+      "dataSafe": "Är min data säker?",
+      "ads": "Visar LexiClash annonser?",
+      "optOut": "Kan jag välja bort datainsamling?"
+    },
+    "a": {
+      "whatIs": "LexiClash är ett ordspel för flera spelare där du tävlar mot vänner eller AI-motståndare om att hitta ord på en delad spelplan. Spela ensam, utmana dagliga pussel eller tävla i realtidsmatcher på hebreiska, engelska, svenska och japanska.",
+      "createAccount": "Du kan spela som gäst eller skapa ett konto med Google-inloggning. Med ett konto kan du spara framsteg, följa statistik, tävla på topplistor och spela på olika enheter.",
+      "isFree": "Ja! LexiClash är helt gratis. Alla spellägen inklusive enspelarläge, flerspelarläge och dagliga utmaningar är tillgängliga utan kostnad.",
+      "scoring": "Poäng delas ut baserat på ordlängd och bokstavsvärden. Längre ord ger fler poäng. Ovanliga bokstäver som Q, Z och X har högre värden. Bonuspoäng delas ut för att hitta alla ord på spelplanen.",
+      "gameModes": "LexiClash erbjuder tre huvudlägen: (1) Enspelarläge - öva mot AI med olika svårighetsgrader, (2) Flerspelarläge - realtidsmatcher mot andra spelare, (3) Daglig utmaning - tävla på samma pussel som spelare världen över.",
+      "dailyChallenge": "Varje dag vid midnatt UTC genereras ett nytt pussel som alla spelare världen över kan försöka lösa. Du får en chans per dag att hitta så många ord som möjligt. Din poäng registreras på den dagliga topplistan.",
+      "multipleLanguages": "Ja! LexiClash stöder hebreiska, engelska, svenska och japanska. Du kan byta språk i Inställningar. Varje språk har sin egen ordbok och topplistor.",
+      "devices": "LexiClash fungerar på alla moderna enheter inklusive datorer, surfplattor och smartphones. Vi stöder de senaste versionerna av Chrome, Firefox, Safari och Edge.",
+      "internet": "Ja, internetanslutning krävs för flerspelarläge och dagliga utmaningar. Du kan dock spela enspelarläge offline om du tidigare har laddat spelet.",
+      "reportBug": "Om du stöter på en bugg, kontakta oss på lexiclash.game@gmail.com eller via Instagram @lexi.clash. Beskriv vad som hände och vilken enhet/webbläsare du använde.",
+      "changeProfile": "Gå till Inställningar (kugghjulsikonen i sidhuvudet) och navigera till profilsektionen. Där kan du uppdatera användarnamn, avatar och andra profiluppgifter.",
+      "multipleDevices": "Ja! Om du skapar ett konto med Google-inloggning synkroniseras dina framsteg, statistik och inställningar automatiskt mellan alla dina enheter.",
+      "deleteAccount": "För att radera ditt konto, gå till Inställningar > Konto > Radera konto. Denna åtgärd är permanent och raderar all din data inklusive statistik, prestationer och spelhistorik.",
+      "dataSafe": "Ja. Vi tar integritet på allvar och samlar bara in nödvändig data för att driva spelet. Vi använder branschstandard kryptering och säljer aldrig din personliga information. Se vår integritetspolicy för fullständiga detaljer.",
+      "ads": "Vi samarbetar med Google AdSense för att visa relevanta annonser. Annonser hjälper oss att hålla spelet gratis för alla. Du kan läsa mer om annonspersonalisering och avanmälningsalternativ i vår integritetspolicy.",
+      "optOut": "Viss datainsamling är nödvändig för att spelet ska fungera (som ditt användarnamn och poäng), men du kan välja bort analys och personaliserade annonser i Inställningar > Integritet."
+    }
   }
 };
 

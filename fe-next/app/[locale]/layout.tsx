@@ -321,6 +321,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 '@type': 'WebPageElement',
                 cssSelector: 'main',
             },
+            speakable: {
+                '@type': 'SpeakableSpecification',
+                cssSelector: ['[data-speakable="true"]', 'h1', 'h2', 'main p:first-of-type'],
+            },
         },
         // FAQ schema - common questions users ask AI assistants and search engines
         {

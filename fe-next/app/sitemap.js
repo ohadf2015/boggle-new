@@ -243,6 +243,9 @@ export default function sitemap() {
       'multilingual-word-learning',
       'top-player-secrets',
       'improve-word-game-skills',
+      'why-word-games-are-addictive',
+      'best-boggle-alternatives-2026',
+      'word-games-for-brain-training',
     ];
 
     blogArticles.forEach((slug) => {

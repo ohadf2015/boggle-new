@@ -6,8 +6,8 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
 import { createDDAState, updateDDA, getDDASpawnModifier } from '../utils/blastDDA';
-import { detectVerticalWords } from '../utils/blastVerticalScanner';
-import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from '../utils/blastCombos';
+
+import { detectSpecialCombos, type BlastComboType } from '../utils/blastCombos';
 import { executeComboEffect } from '../utils/blastComboEffects';
 import { getWordLengthScaleFactor } from '../utils/blastComboScaling';
 import type { LetterGrid } from '@/shared/types/game';
@@ -19,14 +19,6 @@ import {
   PRISM_USE_BONUS,
   PRISM_CROSS_BONUS,
   TREASURE_GEM_COMPLETION_BONUS,
-  SPECIAL_TILE_DISTRIBUTION,
-  MAX_CASCADE_CHAIN,
-  MAX_CASCADE_WORDS_PER_LEVEL,
-  CASCADE_MIN_WORD_LENGTH,
-  CASCADE_DETECTION_DELAY,
-  CASCADE_CHAIN_BONUS_MULTIPLIER,
-  CASCADE_HIGHLIGHT_DURATION,
-  CASCADE_HIGHLIGHT_LINGER,
   MIRROR_MULTIPLIER,
   SILVER_MULTIPLIER,
   DIAMOND_MULTIPLIER,
@@ -37,11 +29,10 @@ import {
   type BlastResultsData,
   type BlastExplosion,
   type BlastScorePopup,
-  type CascadeHighlightPhase,
-  type CascadeHighlightData,
 } from '../types';
-import { useBlastCascade, type BlastCascadePhase, type CascadeAnimationData } from './useBlastCascade';
-import { getInitialHitsRemaining } from '../utils/blastTileUtils';
+import { useBlastCascade } from './useBlastCascade';
+import { useBlastCascadeHandler } from './useBlastCascadeHandler';
+import { generateTileStates, rollSpecialFromDistribution } from '../utils/blastTileGeneration';
 import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import {
   type TileEffectContext,
@@ -57,225 +48,11 @@ import {
 } from './blastTileEffects';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { calculateBonusMoves, calculateLeftoverMoveBonus } from '../utils/blastMoveUtils';
-import { getWaveConfig, getWaveDistribution } from '../utils/blastWaveConfig';
+
 import { useBlastSeed } from '@/hooks/gameState';
+import type { UseBlastGameReturn, UseBlastGameOptions } from './useBlastGame.types';
 
-// ==================== Helpers ====================
-
-/** Seeded random for consistent tile placement per grid */
-function seededRandom(seed: number): () => number {
-  let s = seed;
-  return () => {
-    s = (s * 16807 + 0) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
-
-/** Roll a special tile type from a distribution map using a given random value */
-function rollSpecialFromDistribution(
-  roll: number,
-  dist: Record<string, number>,
-): BlastTileType {
-  let cumulative = 0;
-  for (const [tileType, weight] of Object.entries(dist)) {
-    if (weight <= 0) continue;
-    cumulative += weight;
-    if (roll < cumulative) return tileType as BlastTileType;
-  }
-  return 'standard'; // Fallback (catches rounding errors)
-}
-
-/**
- * Valid inner types for Frost tiles — only explosion/effect specials, not obstacles or multipliers.
- * Wave-gating is applied at call site using rollSpecialFromDistribution with wave distribution.
- */
-const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
-
-/** Generate initial tile states with special tile placement */
-function generateTileStates(
-  gridSize: number,
-  specialTileChance: number,
-  seed: number = Date.now(),
-  customDistribution?: Record<string, number>,
-  currentWave: number = 1,
-): BlastTileState[][] {
-  const random = seededRandom(seed);
-  const tiles: BlastTileState[][] = [];
-  const dist = customDistribution ?? SPECIAL_TILE_DISTRIBUTION;
-
-  // Build wave-gated distribution for frost inner type selection
-  const waveConfigForFrost = getWaveConfig(currentWave);
-  const waveDistForFrost = getWaveDistribution(waveConfigForFrost);
-  // Filter to only frost-eligible inner types (explosion/effect specials)
-  const frostInnerDist: Record<string, number> = {};
-  for (const t of FROST_INNER_CANDIDATES) {
-    if ((waveDistForFrost[t] ?? 0) > 0) {
-      frostInnerDist[t] = waveDistForFrost[t] ?? 0;
-    }
-  }
-  // Normalize to sum to 1.0 so rollSpecialFromDistribution doesn't fall through to standard
-  const frostInnerTotal = Object.values(frostInnerDist).reduce((a, b) => a + b, 0);
-  if (frostInnerTotal > 0) {
-    for (const k of Object.keys(frostInnerDist)) {
-      frostInnerDist[k] /= frostInnerTotal;
-    }
-  }
-  // Fallback: if wave gating excludes all candidates, use bomb+rainbow as safe defaults
-  const hasFrostInnerCandidates = Object.values(frostInnerDist).some(v => v > 0);
-  const effectiveFrostInnerDist = hasFrostInnerCandidates
-    ? frostInnerDist
-    : { bomb: 0.5, rainbow: 0.5 };
-
-  for (let row = 0; row < gridSize; row++) {
-    tiles[row] = [];
-    for (let col = 0; col < gridSize; col++) {
-      let type: BlastTileType = 'standard';
-
-      if (random() < specialTileChance) {
-        type = rollSpecialFromDistribution(random(), dist);
-      }
-
-      // Frost (frozen) tiles get an innerType assigned at generation:
-      // the hidden special that activates on the second (freeing) hit.
-      const innerType: BlastTileType | undefined =
-        type === 'frozen'
-          ? rollSpecialFromDistribution(random(), effectiveFrostInnerDist)
-          : undefined;
-
-      tiles[row][col] = {
-        row,
-        col,
-        type,
-        isCleared: false,
-        activationEffect: null,
-        hitsRemaining: getInitialHitsRemaining(type),
-        ...(innerType !== undefined ? { innerType } : {}),
-      };
-    }
-  }
-
-  return tiles;
-}
-
-// ==================== Return Type ====================
-
-export interface UseBlastGameReturn {
-  /** The underlying letter grid (from useGridInit) */
-  grid: LetterGrid | null;
-  /** Display grid: the current playable grid (updated after cascades) */
-  displayGrid: LetterGrid | null;
-  /** Per-cell tile state (type, cleared status) */
-  tileStates: BlastTileState[][];
-  /** Aggregate game state */
-  gameState: BlastGameState;
-  /** Active explosions for animation layer */
-  explosions: BlastExplosion[];
-  /** Active score popups for floating score display */
-  scorePopups: BlastScorePopup[];
-  /** All words available on the board */
-  availableWords: { easy: string[]; medium: string[]; hard: string[] } | null;
-  /** Clear tiles along a word path and apply special effects */
-  clearTilesForWord: (
-    path: Array<{ row: number; col: number }>,
-    word: string,
-    baseScore: number
-  ) => void;
-  /** True when auto-detection finds no valid words remaining */
-  noWordsRemaining: boolean;
-  /** End the game manually (give up) */
-  endGame: () => void;
-  /** Shuffle remaining (uncleared) tiles to create new word possibilities */
-  shuffleRemainingTiles: () => void;
-  /** Generate results data for the results screen */
-  getResultsData: (maxCombo: number) => BlastResultsData;
-  /** Remove an explosion from the active list */
-  dismissExplosion: (id: string) => void;
-  /** Remove a score popup from the active list */
-  dismissScorePopup: (id: string) => void;
-  /** Cascade animation state */
-  cascadePhase: BlastCascadePhase;
-  /** Whether cascade is in progress (blocks grid input) */
-  isCascading: boolean;
-  /** Cascade animation data for overlay rendering */
-  cascadeAnimationData: CascadeAnimationData | null;
-  /** Current cascade chain level (0 = no active chain) */
-  cascadeChainLevel: number;
-  /** Cascade highlight phase (idle or highlighting) */
-  cascadeHighlightPhase: CascadeHighlightPhase;
-  /** Cascade highlight data (words being showcased before clearing) */
-  cascadeHighlightData: CascadeHighlightData | null;
-  // Legacy alias
-  modifiedGrid: LetterGrid | null;
-  /** Active combo flash to show on screen (null when no flash) */
-  activeComboFlash: { id: string; comboType: BlastComboType } | null;
-  /** Clear the active combo flash (called after animation completes) */
-  clearComboFlash: () => void;
-  /**
-   * Externally trigger a combo flash (e.g. from multiplayer blastComboSync event).
-   * Accepts any string comboType; only valid BlastComboType values will display properly.
-   */
-  triggerComboFlash: (comboType: string) => void;
-  /**
-   * Track a word rejection for DDA (invisible assist).
-   * Call when useWordSubmission fires onWordRejected.
-   * After 3+ consecutive calls the next gravity refill will spawn more special tiles.
-   */
-  trackWordFail: () => void;
-  /**
-   * Direct tile state setter — used by Sugar Crush to convert tile types in place.
-   * Accepts an updater function that receives previous state and returns new state.
-   */
-  setTileStates: (updater: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
-  /**
-   * Add a visual explosion at a grid position (used by Sugar Crush sequence).
-   * Explosion type maps to the converted tile type for visual consistency.
-   */
-  addExplosion: (row: number, col: number, tileType: string) => void;
-  /**
-   * Add bonus score to game state (used by Sugar Crush to accumulate total bonus).
-   */
-  addBonusScore: (bonus: number) => void;
-  /**
-   * Switch to unlimited moves (soft pressure mode).
-   * Called after Sugar Crush in multiplayer so the player keeps playing until server timer ends.
-   */
-  unlockMoves: () => void;
-}
-
-export interface UseBlastGameOptions {
-  /** Called when an auto-cascade detects and clears a vertical word */
-  onAutoCascadeWord?: (word: string, score: number, chainLevel: number) => void;
-  /** Number of moves allowed for this wave (from WaveConfig.movesAllowed) */
-  movesAllowed?: number;
-  /** Wave objectives — when provided, board generation guarantees enough tiles for collect_type/clear_all_type objectives */
-  waveObjectives?: import('../types').BlastObjective[];
-  /** Current wave number — used for Treasure Gem spawn distribution gating (default: 1) */
-  currentWave?: number;
-  /** Called when a special combination is detected (e.g. for audio sting) */
-  onSynergyDetected?: (comboType: BlastComboType) => void;
-  /** Called when special combinations are detected — for first-time discovery tracking */
-  onComboDetected?: (combos: SpecialCombo[]) => void;
-  /**
-   * Called when moves are exhausted instead of auto-marking isDeadEnd.
-   * If provided, the caller is responsible for eventually calling endGame().
-   * Used by BlastGame to trigger the Sugar Crush sequence before ending.
-   */
-  onMovesExhausted?: () => void;
-  /**
-   * Seed for deterministic multiplayer refills.
-   * From BlastModeState.seed broadcast by server with startGame.
-   * Passed to useBlastCascade so each cascade uses createSeededRandom(blastSeed).
-   * Omit for singleplayer — falls back to Math.random.
-   */
-  blastSeed?: number | null;
-  /**
-   * Pre-built tile states from server overlay (multiplayer).
-   * When provided, skips generateTileStates and uses these directly.
-   */
-  initialTileStates?: BlastTileState[][] | null;
-}
-
-// ==================== Hook ====================
+export type { UseBlastGameReturn, UseBlastGameOptions };
 
 /** Map blast difficulty to useGridInit word difficulty */
 const WORD_DIFFICULTY_MAP = {
@@ -359,11 +136,6 @@ export function useBlastGame(
   const bestWordRef = useRef<string>('');
   const totalWordsClearedRef = useRef(0);
 
-  // Cascade highlight state — visible glow before tiles clear
-  const [cascadeHighlightPhase, setCascadeHighlightPhase] = useState<CascadeHighlightPhase>('idle');
-  const [cascadeHighlightData, setCascadeHighlightData] = useState<CascadeHighlightData | null>(null);
-  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   // Active combo flash state — set when a special combination fires, cleared by BlastComboFlash
   const [activeComboFlash, setActiveComboFlash] = useState<{ id: string; comboType: BlastComboType } | null>(null);
   const clearComboFlash = useCallback(() => setActiveComboFlash(null), []);
@@ -383,15 +155,11 @@ export function useBlastGame(
   // Ref-based so cascade callbacks always read the latest value without re-render
   const ddaStateRef = useRef(createDDAState());
 
-  // Cascade chain refs (avoid re-renders + break circular useCallback dependency)
-  const cascadeChainLevelRef = useRef(0);
   const gameStateRef = useRef(gameState);
   gameStateRef.current = gameState;
   // BUGF-07 fix: ref for latest tileStates so cascade timer doesn't use stale closure
   const tileStatesRef = useRef(tileStates);
   tileStatesRef.current = tileStates;
-  const [isAutoDetecting, setIsAutoDetecting] = useState(false);
-  const autoDetectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onAutoCascadeWordRef = useRef(options?.onAutoCascadeWord);
   onAutoCascadeWordRef.current = options?.onAutoCascadeWord;
 
@@ -420,172 +188,35 @@ export function useBlastGame(
   // Dictionary cache (moved up — used by both cascade detection and dead-end detection)
   const { checkWord: checkWordInDict, isLoaded: isDictLoaded } = useDictionaryCache(language);
 
-  /**
-   * Handle cascade completion: update grid, then scan for vertical cascade words.
-   * Uses ref indirection to break circular dependency (cascade → handleComplete → cascade).
-   */
-  const handleCascadeCompleteRef = useRef<(g: LetterGrid, ts: BlastTileState[][], cols: number[]) => void>(() => {});
-
-  const handleCascadeComplete = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => {
-    setCurrentGrid(newGrid);
-    setTileStates(newTileStates);
-
-    // Auto-detect vertical cascade words
-    if (
-      cascadeChainLevelRef.current < MAX_CASCADE_CHAIN &&
-      isDictLoaded &&
-      !gameStateRef.current.isComplete &&
-      !gameStateRef.current.isDeadEnd
-    ) {
-      setIsAutoDetecting(true);
-
-      // Clear previous timer if any
-      if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
-
-      autoDetectTimerRef.current = setTimeout(() => {
-        // BUGF-04 fix: use empty foundSet for cascade detection so re-formed words
-        // always score after gravity. Cascade words are new formations — not duplicates.
-        const foundSet = new Set<string>();
-        const columnFilter = affectedColumns.length > 0 ? new Set(affectedColumns) : undefined;
-        const allVerticalWords = detectVerticalWords(newGrid, newTileStates, checkWordInDict, foundSet, CASCADE_MIN_WORD_LENGTH, columnFilter);
-        // Cap words per cascade level to limit simultaneous explosions
-        const verticalWords = allVerticalWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
-
-        if (verticalWords.length > 0) {
-          const chainLevel = cascadeChainLevelRef.current + 1;
-          cascadeChainLevelRef.current = chainLevel;
-
-          // Pre-calculate scores for highlight banners
-          const highlightWords = verticalWords.map(vw => {
-            const baseScore = vw.word.length - 1;
-            const chainBonus = Math.floor(baseScore * chainLevel * CASCADE_CHAIN_BONUS_MULTIPLIER);
-            return {
-              word: vw.word,
-              path: vw.path,
-              score: baseScore + chainBonus,
-              chainLevel,
-            };
-          });
-
-          // Show cascade highlight overlay (glow + banner)
-          setCascadeHighlightData({ words: highlightWords });
-          setCascadeHighlightPhase('highlighting');
-          setIsAutoDetecting(false);
-
-          // After showcase duration, clear tiles and trigger next cascade
-          if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
-          highlightTimerRef.current = setTimeout(() => {
-            // Now actually clear the tiles
-            const newExplosions: BlastExplosion[] = [];
-            const now = Date.now();
-            let totalCascadeScore = 0;
-            let newlyClearedCount = 0;
-            const cascadeWords: string[] = [];
-            const cascadeClearedTypes: Partial<Record<BlastTileType, number>> = {};
-
-            // BUGF-07 fix: use tileStatesRef.current (always fresh) instead of
-            // closure-captured newTileStates (may be stale if state updated during timer wait)
-            const nextTileStates = tileStatesRef.current.map(row => row.map(tile => ({ ...tile })));
-
-            for (const vw of verticalWords) {
-              const baseScore = vw.word.length - 1;
-              const chainBonus = Math.floor(baseScore * chainLevel * CASCADE_CHAIN_BONUS_MULTIPLIER);
-              const wordScore = baseScore + chainBonus;
-              totalCascadeScore += wordScore;
-              cascadeWords.push(vw.word);
-
-              for (const cell of vw.path) {
-                const t = nextTileStates[cell.row][cell.col];
-                if (!t.isCleared) {
-                  // BUGF-05 fix: multi-hit tiles crack instead of clear
-                  // when they have hitsRemaining > 1 — only the final hit clears them.
-                  if ((t.type === 'frozen' || t.type === 'ice' || t.type === 'prism' || t.type === 'gem') && t.hitsRemaining > 1) {
-                    t.hitsRemaining--;
-                    t.activationEffect = t.type === 'gem'
-                      ? (t.hitsRemaining === 2 ? 'gem-shard-1' : 'gem-shard-2')
-                      : `${t.type}-crack`;
-                  } else {
-                    t.isCleared = true;
-                    newlyClearedCount++;
-                    cascadeClearedTypes[t.type] = (cascadeClearedTypes[t.type] || 0) + 1;
-                  }
-                }
-              }
-
-              const midIdx = Math.floor(vw.path.length / 2);
-              newExplosions.push({
-                id: `cascade-${now}-${vw.column}-${vw.startRow}`,
-                row: vw.path[midIdx].row,
-                col: vw.path[midIdx].col,
-                type: 'cascade',
-                intensity: 1,
-                timestamp: now,
-              });
-
-              setScorePopups(prev => [...prev, {
-                id: `cascade-score-${now}-${vw.column}-${vw.startRow}`,
-                score: wordScore,
-                row: vw.path[midIdx].row,
-                col: vw.path[midIdx].col,
-                isSpecial: true,
-                timestamp: now,
-              }]);
-
-              onAutoCascadeWordRef.current?.(vw.word, wordScore, chainLevel);
-            }
-
-            setGameState(prev => {
-              const mergedTypeClears = { ...prev.tileTypeClears };
-              for (const [tType, count] of Object.entries(cascadeClearedTypes)) {
-                mergedTypeClears[tType as BlastTileType] = (mergedTypeClears[tType as BlastTileType] || 0) + (count as number);
-              }
-              return {
-                ...prev,
-                score: prev.score + totalCascadeScore,
-                wordsFound: [...prev.wordsFound, ...cascadeWords],
-                tilesCleared: prev.tilesCleared + newlyClearedCount,
-                cascadeChainLevel: chainLevel,
-                tileTypeClears: mergedTypeClears,
-              };
-            });
-
-            setExplosions(prev => [...prev, ...newExplosions]);
-            setTileStates(nextTileStates);
-
-            // Clear highlight state
-            setCascadeHighlightPhase('idle');
-            setCascadeHighlightData(null);
-
-            // Trigger next cascade (gravity + refill)
-            setTimeout(() => {
-              cascade.startCascade(newGrid, nextTileStates, handleCascadeCompleteRef.current);
-            }, 80);
-          }, CASCADE_HIGHLIGHT_DURATION + CASCADE_HIGHLIGHT_LINGER);
-        } else {
-          // No cascade words found — reset chain
-          cascadeChainLevelRef.current = 0;
-          setGameState(prev => ({ ...prev, cascadeChainLevel: 0 }));
-          setIsAutoDetecting(false);
-        }
-      }, CASCADE_DETECTION_DELAY);
-    } else {
-      // Max chain reached or dictionary not loaded — reset
-      cascadeChainLevelRef.current = 0;
-      setGameState(prev => ({ ...prev, cascadeChainLevel: 0 }));
-    }
-  }, [isDictLoaded, checkWordInDict, cascade]);
-
-  // Keep ref in sync with latest callback
-  handleCascadeCompleteRef.current = handleCascadeComplete;
+  // Cascade handler (extracted for maintainability)
+  const {
+    handleCascadeComplete,
+    cascadeChainLevelRef,
+    isAutoDetecting,
+    autoDetectTimerRef,
+    highlightTimerRef,
+    cascadeHighlightPhase,
+    cascadeHighlightData,
+    setCascadeHighlightPhase,
+    setCascadeHighlightData,
+    setIsAutoDetecting,
+  } = useBlastCascadeHandler({
+    isDictLoaded,
+    checkWordInDict,
+    cascade,
+    gameStateRef,
+    tileStatesRef,
+    onAutoCascadeWordRef,
+    setTileStates,
+    setCurrentGrid,
+    setGameState,
+    setExplosions,
+    setScorePopups,
+  });
 
   // Dead-end detection state
   const [noWordsRemaining, setNoWordsRemaining] = useState(false);
 
-  // Cleanup timers on unmount
-  useEffect(() => () => {
-    if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
-    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
-  }, []);
 
   // Auto-complete when cumulative tilesCleared reaches the board size
   // Award leftover move bonus (Sugar Crush equivalent)
