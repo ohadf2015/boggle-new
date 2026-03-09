@@ -29,8 +29,8 @@ describe('SinglePlayerResults Scroll Layout', () => {
     });
 
     it('should have bottom padding on mobile for the sticky bar', () => {
-      // pb-40 ensures content scrolls past the fixed bottom bar
-      expect(source).toMatch(/pb-40/);
+      // pb-20 ensures content scrolls past the fixed bottom bar without excess whitespace
+      expect(source).toMatch(/pb-20/);
     });
 
     it('should use min-h-dvh for full-page feel', () => {

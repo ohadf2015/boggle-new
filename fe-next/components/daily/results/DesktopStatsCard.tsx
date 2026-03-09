@@ -40,7 +40,7 @@ export const DesktopStatsCard: React.FC<DesktopStatsCardProps> = ({ stats, t }) 
         </div>
       </div>
     ) : (
-      <div className="text-white/50 text-sm">{t('common.loading')}</div>
+      <div className="text-white/70 text-sm">{t('common.loading')}</div>
     )}
   </div>
 );

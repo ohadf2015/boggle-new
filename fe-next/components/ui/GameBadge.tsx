@@ -82,7 +82,7 @@ const VARIANT_STYLES: Record<GameBadgeVariant, string> = {
   'late-joiner': 'bg-neo-pink/20 text-neo-black border-neo-black',
   'rank': 'bg-amber-400 text-neo-black border-neo-black',
   'score-success': 'bg-emerald-500 text-white border-neo-black',
-  'score-fail': 'bg-gray-700 dark:bg-gray-600 text-white border-neo-black',
+  'score-fail': 'bg-neo-gray text-white border-neo-black',
   'streak': 'bg-orange-500 text-white border-neo-black',
   'default': 'bg-neo-navy text-neo-white border-neo-white/20',
 };

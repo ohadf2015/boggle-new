@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useVocabularyMastery } from '@/hooks/useVocabularyMastery';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { MasteryLevel } from '@/lib/supabase/analytics';

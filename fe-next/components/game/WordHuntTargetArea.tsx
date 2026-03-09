@@ -53,7 +53,7 @@ export function WordHuntTargetArea({
           <div
             key={i}
             data-testid={`target-blank-${i}`}
-            className="w-8 h-8 border-neo border-black rounded bg-gray-700 flex items-center justify-center text-neo-white font-neo-display text-lg"
+            className="w-7 h-7 sm:w-8 sm:h-8 border-neo border-black rounded bg-gray-700 flex items-center justify-center text-neo-white font-neo-display text-base sm:text-lg"
           >
             ?
           </div>
@@ -67,7 +67,7 @@ export function WordHuntTargetArea({
             <div
               key={letterIndex}
               data-testid={`attempt-${attemptIndex}-letter-${letterIndex}`}
-              className={`w-8 h-8 rounded border-neo border-black flex items-center justify-center font-neo-display text-lg uppercase ${
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded border-neo border-black flex items-center justify-center font-neo-display text-base sm:text-lg uppercase ${
                 FEEDBACK_COLORS[attempt.feedback[letterIndex]] || 'bg-gray-600'
               }`}
             >

@@ -309,7 +309,12 @@ export function DailyChallengeLanding({
               onClick={onSelectWordHunt}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && onSelectWordHunt()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectWordHunt();
+                }
+              }}
               className={cn(
                 'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black',
                 'shadow-hard overflow-hidden cursor-pointer p-4',

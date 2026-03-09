@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Book, CheckCircle, HelpCircle } from 'lucide-react';
 import Avatar from '../Avatar';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -103,7 +103,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   const [hasVoted, setHasVoted] = useState(false);
   const [encouragementSentence, setEncouragementSentence] = useState('');
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [votedWords, setVotedWords] = useState<Set<string>>(new Set());
+  const [_votedWords, setVotedWords] = useState<Set<string>>(new Set());
   const prevWordRef = useRef<string | null>(null);
 
   // Get current word from queue or fall back to single word prop
@@ -198,15 +198,6 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
     if (hasVoted) return;
     moveToNextWord();
   }, [hasVoted, moveToNextWord]);
-
-  // Handle timeout - move to next word instead of closing
-  const handleTimeout = useCallback(() => {
-    if (hasMoreWords) {
-      moveToNextWord();
-    } else {
-      onTimeout();
-    }
-  }, [hasMoreWords, moveToNextWord, onTimeout]);
 
   // Timer bar width percentage
   const timerProgress = (remainingTime / timeoutSeconds) * 100;

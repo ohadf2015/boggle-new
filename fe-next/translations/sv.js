@@ -317,6 +317,7 @@ const sv = {
     "retryNow": "Försök nu"
   },
   "game": {
+    "combo": "Kombo",
     "comboHint": "Hitta ord snabbt för kombo!",
     "calculatingResults": "Beräknar resultat..."
   },

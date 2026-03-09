@@ -54,15 +54,50 @@ export function broadcastToRoomExceptSender(socket: Socket, room: string, event:
 /** Room that lobby/room-list clients join to receive activeRooms updates */
 export const LOBBY_ROOM = 'lobby:rooms';
 
+// Throttle state for broadcastActiveRooms (leading-edge + trailing debounce, 500ms)
+const BROADCAST_THROTTLE_MS = 500;
+let _broadcastActiveRoomsTimer: ReturnType<typeof setTimeout> | null = null;
+let _pendingBroadcastArgs: { io: Server; rooms: unknown[] } | null = null;
+
+function _executeBroadcast(): void {
+  if (_pendingBroadcastArgs) {
+    const { io, rooms } = _pendingBroadcastArgs;
+    try {
+      io.to(LOBBY_ROOM).emit('activeRooms', { rooms });
+    } catch (error) {
+      console.error('[SOCKET] Error broadcasting activeRooms to lobby:', (error as Error).message);
+    }
+    _pendingBroadcastArgs = null;
+  }
+  _broadcastActiveRoomsTimer = null;
+}
+
 /**
- * Broadcast activeRooms to lobby subscribers only (not all connected sockets)
+ * Broadcast activeRooms to lobby subscribers only (not all connected sockets).
+ * Throttled: first call fires immediately, subsequent calls within 500ms
+ * are debounced so only the last one executes after the window.
  */
 export function broadcastActiveRooms(io: Server, rooms: unknown[]): void {
-  try {
-    io.to(LOBBY_ROOM).emit('activeRooms', { rooms });
-  } catch (error) {
-    console.error('[SOCKET] Error broadcasting activeRooms to lobby:', (error as Error).message);
+  _pendingBroadcastArgs = { io, rooms };
+
+  // Leading edge: if no timer running, execute immediately and start cooldown
+  if (!_broadcastActiveRoomsTimer) {
+    _executeBroadcast();
+    _broadcastActiveRoomsTimer = setTimeout(() => {
+      // Trailing edge: flush any pending call that arrived during cooldown
+      _executeBroadcast();
+    }, BROADCAST_THROTTLE_MS);
   }
+  // Otherwise, _pendingBroadcastArgs is updated and will fire when timer expires
+}
+
+/** Reset throttle state between tests */
+export function _resetBroadcastThrottle(): void {
+  if (_broadcastActiveRoomsTimer) {
+    clearTimeout(_broadcastActiveRoomsTimer);
+    _broadcastActiveRoomsTimer = null;
+  }
+  _pendingBroadcastArgs = null;
 }
 
 // ==========================================

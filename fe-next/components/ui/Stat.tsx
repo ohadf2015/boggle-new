@@ -87,34 +87,34 @@ export interface StatProps {
 
 const VARIANT_STYLES: Record<StatVariant, { bg: string; border: string; text: string }> = {
   default: {
-    bg: 'bg-slate-100/50 dark:bg-slate-800/50',
-    border: 'border-slate-200 dark:border-slate-700',
-    text: 'text-slate-900 dark:text-slate-100',
+    bg: 'bg-neo-navy/50',
+    border: 'border-neo-cream/20',
+    text: 'text-neo-cream',
   },
   accent: {
-    bg: 'bg-neo-cyan/10 dark:bg-neo-cyan/20',
-    border: 'border-neo-cyan/40 dark:border-neo-cyan/30',
-    text: 'text-neo-cyan dark:text-neo-cyan-light',
+    bg: 'bg-neo-cyan/20',
+    border: 'border-neo-cyan/30',
+    text: 'text-neo-cyan',
   },
   success: {
-    bg: 'bg-neo-lime/10 dark:bg-neo-lime/20',
-    border: 'border-neo-lime/40 dark:border-neo-lime/30',
-    text: 'text-neo-lime-dark dark:text-neo-lime',
+    bg: 'bg-neo-lime/20',
+    border: 'border-neo-lime/30',
+    text: 'text-neo-lime',
   },
   warning: {
-    bg: 'bg-neo-yellow/10 dark:bg-neo-yellow/20',
-    border: 'border-neo-yellow/40 dark:border-neo-yellow/30',
-    text: 'text-neo-yellow-dark dark:text-neo-yellow',
+    bg: 'bg-neo-yellow/20',
+    border: 'border-neo-yellow/30',
+    text: 'text-neo-yellow',
   },
   info: {
-    bg: 'bg-neo-pink/10 dark:bg-neo-pink/20',
-    border: 'border-neo-pink/40 dark:border-neo-pink/30',
-    text: 'text-neo-pink-dark dark:text-neo-pink',
+    bg: 'bg-neo-pink/20',
+    border: 'border-neo-pink/30',
+    text: 'text-neo-pink',
   },
   highlight: {
-    bg: 'bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30',
-    border: 'border-cyan-200 dark:border-cyan-500/30',
-    text: 'text-cyan-600 dark:text-cyan-400',
+    bg: 'bg-gradient-to-br from-cyan-900/30 to-blue-900/30',
+    border: 'border-neo-cyan/30',
+    text: 'text-neo-cyan',
   },
 };
 
@@ -259,7 +259,7 @@ export function Stat({
 
     // Icon above value (StatDisplay/StatCard style)
     return (
-      <div className="text-slate-400 dark:text-slate-500 mb-1" aria-hidden="true">
+      <div className="text-muted-foreground mb-1" aria-hidden="true">
         {isIconComponent && !isReactElement ? (
           (() => {
             const IconComponent = icon as React.ComponentType<{ className?: string }>;
@@ -290,7 +290,7 @@ export function Stat({
           'font-black',
           variant === 'highlight' || variant === 'accent' || variant === 'success'
             ? variantStyle.text
-            : 'text-slate-900 dark:text-slate-100',
+            : 'text-neo-cream',
           sizeConfig.value
         )}
       >
@@ -301,7 +301,7 @@ export function Stat({
       <div
         className={cn(
           'font-bold uppercase tracking-wide',
-          'text-slate-500 dark:text-slate-400',
+          'text-muted-foreground',
           sizeConfig.label
         )}
       >
@@ -312,7 +312,7 @@ export function Stat({
       {subValue && (
         <div
           className={cn(
-            'text-slate-400 dark:text-slate-500',
+            'text-muted-foreground',
             sizeConfig.subValue
           )}
         >

@@ -24,7 +24,7 @@ interface UsePlayerGameEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
   username: string;
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any }) => void;
 
   // Local state (not in GameState context)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
@@ -224,9 +224,10 @@ export function usePlayerGameEvents({
       if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
         storeUpdates.wordHuntTargetLength = (data as any).wordHuntTargetLength;
         storeUpdates.wordHuntMyLife = 100;
-        storeUpdates.wordHuntPlayerLives = {};
+        storeUpdates.wordHuntPlayerLives = (data as any).wordHuntPlayerLives || {};
         storeUpdates.wordHuntTargetAttempts = [];
         storeUpdates.wordHuntTargetFound = false;
+        storeUpdates.wordHuntEliminatedPlayers = (data as any).wordHuntEliminatedPlayers || [];
       }
       if ((data as any).lateJoin) {
         storeUpdates.gameActive = true;
@@ -333,6 +334,7 @@ export function usePlayerGameEvents({
           duplicateRuleDisabled: data.duplicateRuleDisabled,
           playerCount: data.playerCount,
           wordHuntSummary: data.wordHuntSummary,
+          blastSummary: data.blastSummary,
         });
       }
     };
@@ -409,6 +411,15 @@ export function usePlayerGameEvents({
       setWordHuntPlayerLives({});
       setWordHuntMyLife(100);
 
+      // Reset blast mode state for next game
+      const blastResetStore = useGameStore.getState();
+      blastResetStore.setBlastTileOverlay([]);
+      blastResetStore.setBlastMovesUsed(0);
+      blastResetStore.setBlastTotalTileBonus(0);
+      blastResetStore.setBlastTotalTilesCleared(0);
+      blastResetStore.setBlastSeed(null);
+      blastResetStore.setBlastComboSync(null);
+
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
 
@@ -416,6 +427,10 @@ export function usePlayerGameEvents({
     const handleBlastWordAccepted = (data: BlastWordAcceptedPayload) => {
       logger.log('[PLAYER] Blast word accepted:', data.word, 'bonus:', data.tileBonus, 'moves:', data.movesUsed);
       setBlastMovesUsed(data.movesUsed);
+      // Accumulate tile bonus and tiles cleared for results display
+      const store = useGameStore.getState();
+      store.setBlastTotalTileBonus(prev => prev + (data.tileBonus || 0));
+      store.setBlastTotalTilesCleared(prev => prev + (data.tilesCleared?.length || 0));
     };
 
     // Handle combo sync from another player — triggers BlastComboFlash overlay for spectators.

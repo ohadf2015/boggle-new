@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { memo, useEffect, useId } from 'react';
+import { memo, useEffect, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';

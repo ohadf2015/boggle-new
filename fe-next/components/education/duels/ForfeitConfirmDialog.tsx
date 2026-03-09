@@ -37,7 +37,7 @@ export function ForfeitConfirmDialog({
           className={cn(
             'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50',
             'bg-neo-navy border-neo-thick rounded-neo shadow-hard',
-            'p-6 max-w-md w-full'
+            'p-4 sm:p-6 w-[calc(100%-2rem)] max-w-md'
           )}
         >
           <AlertDialog.Title className="text-2xl font-neo-display font-bold text-neo-white mb-4">

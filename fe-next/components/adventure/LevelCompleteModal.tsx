@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { memo, useMemo, useEffect } from 'react';
+import { memo, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Check, X, Trophy, RotateCcw, LogOut, Coins, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -98,7 +98,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     onContinue,
     onRetry,
     onExit,
-    totalStars = 0,
+    totalStars: _totalStars = 0,
     bestAttempt,
   }) => {
     const { t } = useLanguage();

@@ -117,7 +117,7 @@ export function WaveBreakdown({ waveResults, label }: { waveResults: WaveResult[
       transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 1.1 }}
       className="w-full max-w-sm mb-8"
     >
-      <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2 text-center">
+      <div className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-2 text-center">
         {label}
       </div>
       <div className="space-y-1.5 rounded-neo border-3 border-neo-black/50 bg-white/5 p-2 shadow-hard-sm">
@@ -138,9 +138,9 @@ export function WaveBreakdown({ waveResults, label }: { waveResults: WaveResult[
               <div className="absolute inset-y-0 left-0 opacity-10 rounded-neo" style={{ width: `${wr.clearPercentage}%`, background: color }} />
               <span className="font-black text-xs text-fuchsia-300 relative z-10 shrink-0">W{wr.waveNumber}</span>
               <span className="font-black text-sm text-white tabular-nums relative z-10">{wr.score}</span>
-              <span className="text-[10px] text-white/40 relative z-10">pts</span>
+              <span className="text-[10px] text-white/60 relative z-10">pts</span>
               <div className="flex-1" />
-              <span className="text-[10px] font-bold text-white/50 tabular-nums relative z-10">
+              <span className="text-[10px] font-bold text-white/70 tabular-nums relative z-10">
                 {wr.wordsFound}w · {wr.clearPercentage}%
               </span>
             </motion.div>

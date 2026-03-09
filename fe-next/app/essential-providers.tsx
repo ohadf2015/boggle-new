@@ -164,6 +164,22 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
                                                 {memoizedChildren}
                                             </NavigationProvider>
                                         </HapticsProvider>
+                                        <Toaster
+                                            position="top-center"
+                                            containerStyle={{
+                                                pointerEvents: 'none',
+                                                zIndex: 9999,
+                                                top: 20,
+                                            }}
+                                            toastOptions={{
+                                                duration: 2000,
+                                                style: {
+                                                    background: '#363636',
+                                                    color: '#fff',
+                                                    pointerEvents: 'auto',
+                                                },
+                                            }}
+                                        />
                                     </SoundEffectsProvider>
                                 </MusicProvider>
                             </MotionConfigProvider>
@@ -171,22 +187,6 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
                     </AuthProvider>
                 </LanguageProvider>
             </ThemeProvider>
-            <Toaster
-                position="top-center"
-                containerStyle={{
-                    pointerEvents: 'none',
-                    zIndex: 9999,
-                    top: 20,
-                }}
-                toastOptions={{
-                    duration: 2000,
-                    style: {
-                        background: '#363636',
-                        color: '#fff',
-                        pointerEvents: 'auto',
-                    },
-                }}
-            />
         </ErrorBoundary>
     );
 }

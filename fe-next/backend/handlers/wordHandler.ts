@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { WordDetail, Language, Avatar } from '@/shared/types';
+import type { WordDetail } from '@/shared/types';
 import type { GameState } from '../modules/gameState/types.js';
 import type { LeaderboardPlayer } from '../modules/scoreManager.js';
 
@@ -20,7 +20,6 @@ import {
   markUserActivity,
   recordPeerValidationVote,
   removePeerRejectedWordScore,
-  trackAiApprovedWord,
   getFirstFinder,
   recordFirstFinder,
 } from '../modules/gameStateManager.js';
@@ -29,11 +28,11 @@ import { broadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/
 import { isWordOnBoardAsync } from '../modules/wordValidatorPool.js';
 import { isProfane } from '../utils/profanityFilter.js';
 import { calculateWordScore } from '../modules/scoringEngine.js';
-import { checkAndAwardAchievements, ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
+import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isDictionaryWord } from '../dictionary.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
 import { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager.js';
-import { emitError, ErrorMessages, ErrorCodes } from '../utils/errorHandler.js';
+import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import { addWordToBlacklist } from '../modules/botManager.js';
@@ -69,21 +68,6 @@ interface SubmitPeerValidationVotePayload {
   gameCode?: string;
 }
 
-interface SpamResult {
-  tier: string;
-  message?: string;
-  penaltyApplied?: number;
-  invalidCount: number;
-  totalPenaltyPoints?: number;
-  cooldownDuration?: number;
-}
-
-interface VoteResult {
-  success: boolean;
-  error?: string;
-  isNowValid?: boolean;
-}
-
 interface PeerValidationResult {
   success: boolean;
   error?: string;
@@ -101,11 +85,6 @@ interface Achievement {
   icon: string;
 }
 
-interface GameUserData {
-  socketId?: string;
-  authUserId?: string | null;
-  avatar?: Avatar;
-}
 
 /**
  * Handle spam detection after an invalid word submission
@@ -388,6 +367,11 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       emitError(socket, ErrorCodes.WORD_PROCESSING_ERROR, {
         correlationId: `${catchGameCode}-${Date.now()}`,
       });
+      // Also emit wordRejected so the player gets visual feedback (word tile clears)
+      const submittedWord = (data as SubmitWordPayload)?.word?.toLowerCase?.()?.trim?.()?.substring(0, 50);
+      if (submittedWord) {
+        socket.emit('wordRejected', { word: submittedWord, reason: 'error' });
+      }
       // Note: gracePeriodLockId is out of scope in catch block, but the lock has a short TTL (2s)
       // so it will auto-expire if we can't release it here. This is acceptable for error cases.
     }
@@ -409,15 +393,14 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
     const { word, voteType, gameCode: providedGameCode } = validation.data as SubmitWordVotePayload;
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
-    const rawUsername = getUsernameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
 
     if (!gameCode) return;
 
     const game = getGame(gameCode);
     if (!game) return;
-    if (!rawUsername) return;
+    if (!username) return;
 
-    const username: string = rawUsername;
     const userData = game.users?.[username];
     const userId = userData?.authUserId || null;
     const guestId = userData?.guestTokenHash || null;
@@ -470,11 +453,10 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
     const { word, isValid, gameCode: providedGameCode } = validation.data as SubmitPeerValidationVotePayload;
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
-    const rawUsername = getUsernameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
 
     if (!gameCode) return;
-    if (!rawUsername) return; // Username is required for peer validation
-    const username: string = rawUsername;
+    if (!username) return;
 
     const game = getGame(gameCode);
     if (!game) return;
@@ -499,7 +481,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
   });
 
   // Handle validate words (legacy, for host validation)
-  socket.on('validateWords', async (data: unknown) => {
+  socket.on('validateWords', async (_data: unknown) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
@@ -548,7 +530,6 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   // Save to database if dictionary word
   if (isInDictionary && isSupabaseConfigured()) {
-    const userData = game.users?.[username];
     savePlayerWord({
       word: normalizedWord,
       language: game.language || 'en',
@@ -564,10 +545,10 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   let blastTilesCleared: string[] = [];
   let blastMoveResult: { movesUsed: number; bonusMove: boolean } | null = null;
 
-  if (game.gameMode === 'blast' && (game as any).blastModeState) {
+  if (game.gameMode === 'blast' && game.blastModeState) {
     try {
       // blastModeManager imported at top level
-      const blastState = (game as any).blastModeState;
+      const blastState = game.blastModeState;
       const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay);
       blastTileBonus = calculateBlastTileBonus(tilesOnPath);
       blastTilesCleared = tilesOnPath;
@@ -625,10 +606,10 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   }
 
   // Restore life in word-hunt mode when a word is accepted
-  if (game.gameMode === 'word-hunt' && (game as any).wordHuntState) {
+  if (game.gameMode === 'word-hunt' && game.wordHuntState) {
     try {
       // wordHuntManager imported at top level
-      const huntState = (game as any).wordHuntState;
+      const huntState = game.wordHuntState;
       const lifeBonus = getLifeBonus(normalizedWord.length);
       restoreLife(huntState, username, lifeBonus);
       // Broadcast updated lives immediately so clients don't wait for next timer tick
@@ -637,10 +618,12 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         eliminatedPlayers: huntState.eliminatedPlayers,
       });
 
-      // Compute and emit discovery clues (mirrors SP hint reveal on word discovery)
+      // Compute and broadcast discovery clues to ALL players (cooperative mechanic)
       const clues = computeDiscoveryClues(huntState.targetWord, normalizedWord);
       if (clues.greenPositions.length > 0 || clues.knownLetters.length > 0) {
-        socket.emit('wordHuntDiscoveryClues', {
+        // Track discovery word count for results summary
+        huntState.discoveryWordCount = (huntState.discoveryWordCount || 0) + 1;
+        broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntDiscoveryClues', {
           word: normalizedWord,
           greenPositions: clues.greenPositions,
           knownLetters: clues.knownLetters,
@@ -673,7 +656,6 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   // Process long word engagement (8+ letters triggers mystery reward chance)
   if (normalizedWord.length >= 8) {
-    const userData = game.users?.[username];
     if (userData?.authUserId) {
       processLongWordEngagement(socket, userData.authUserId, normalizedWord, gameCode)
         .catch((err: Error) => logger.debug('ENGAGEMENT', `Long word engagement error: ${err.message}`));
@@ -681,7 +663,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   }
 }
 
-function handleWordBecameValid(io: Server, socket: Socket, game: GameState, gameCode: string, word: string, submitter?: string): void {
+function handleWordBecameValid(io: Server, _socket: Socket, game: GameState, gameCode: string, word: string, submitter?: string): void {
   if (submitter && game.playerWordDetails?.[submitter]) {
     const wordDetails = game.playerWordDetails[submitter] as WordDetail[];
     const wordDetail = wordDetails.find((wd: WordDetail) => wd.word === word);

@@ -3,7 +3,7 @@
  * Centralized type definitions for game state management
  */
 
-import type { LetterGrid, Language, GridPosition, GameMode } from '@/shared/types/game';
+import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState } from '@/shared/types/game';
 
 // Redis client interface
 export interface RedisClient {
@@ -55,6 +55,10 @@ export interface PlayerAchievement {
   [key: string]: unknown;
 }
 
+// Re-export shared types for backward compatibility
+export type BlastModeState = SharedBlastModeState;
+export type WordHuntState = SharedWordHuntModeState;
+
 // Game state interface
 export interface GameState {
   gameCode: string;
@@ -104,6 +108,8 @@ export interface GameState {
   startTime?: number;
   gameMode?: GameMode;
   modeHistory?: GameMode[];
+  blastModeState?: BlastModeState | null;
+  wordHuntState?: WordHuntState | null;
 }
 
 // Game creation data interface

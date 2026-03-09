@@ -13,7 +13,11 @@ interface PageParams {
   }>;
 }
 
-const LoadingFallback = () => <PageLoader text="Loading Daily Buzz..." nested />;
+const LoadingFallback = () => (
+  <div className="flex-1 flex items-center justify-center bg-neo-navy">
+    <PageLoader size="lg" text="Loading Daily Buzz..." />
+  </div>
+);
 
 const BuzzChallengeWrapper = dynamicImport(() => import('@/components/buzz/BuzzChallengeWrapper'), {
   loading: LoadingFallback,

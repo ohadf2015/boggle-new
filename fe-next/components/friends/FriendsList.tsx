@@ -520,7 +520,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('friends.searchByUsername')}
                 className={cn(
-                  'w-full pl-10 pr-4 py-2 rounded-neo border-2 font-medium',
+                  'w-full ps-10 pe-4 py-2 rounded-neo border-2 font-medium',
                   isDark
                     ? 'bg-slate-700 border-white/10 text-white placeholder:text-gray-400'
                     : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500'

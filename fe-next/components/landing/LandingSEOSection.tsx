@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import { motion, type Variants } from 'framer-motion';
 import { Swords, CalendarDays, Map, Globe, ChevronDown } from 'lucide-react';

@@ -185,7 +185,7 @@ interface LeaderboardEntryRowProps extends LeaderboardEntryWithDelta {
 }
 
 const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
-  ({ userId, displayName, avatarUrl, totalXp, currentLevel, rank, isCurrentUser, isInactive, currentStreak, previousRank, rankDelta, isNew, totalStudents, index }) => {
+  ({ userId, displayName, avatarUrl, totalXp, currentLevel, rank, isCurrentUser, isInactive, currentStreak, previousRank: _previousRank, rankDelta, isNew, totalStudents, index }) => {
     const { t } = useLanguage();
 
     return (

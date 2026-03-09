@@ -94,7 +94,7 @@ export function BlastLevelClearOverlay({
                   delay: 0.3 + i * 0.3,
                 }}
               >
-                <span className={i <= stars ? 'text-yellow-400' : 'text-white/20'}>
+                <span className={i <= stars ? 'text-yellow-400' : 'text-white/60'}>
                   &#9733;
                 </span>
               </AdaptiveMotion.div>
@@ -118,7 +118,7 @@ export function BlastLevelClearOverlay({
           <span className="font-black text-3xl text-white font-neo-display tabular-nums">
             {totalScore}
           </span>
-          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider mt-0.5">
+          <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
             {t('common.score')}
           </span>
         </AdaptiveMotion.div>
@@ -138,7 +138,7 @@ export function BlastLevelClearOverlay({
             <span className="font-black text-3xl text-cyan-400 font-neo-display tabular-nums">
               +{moveBonus}
             </span>
-            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider mt-0.5">
+            <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
               {t('blast.moveBonus')}
             </span>
           </AdaptiveMotion.div>

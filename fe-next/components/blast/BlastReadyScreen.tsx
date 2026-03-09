@@ -59,7 +59,7 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
         <h1 className="text-5xl font-black uppercase text-white font-neo-display">
           {t('blast.ready.title')}
         </h1>
-        <p className="text-sm font-bold text-white/50 mt-1">
+        <p className="text-sm font-bold text-white/70 mt-1">
           {t('blast.ready.subtitle')}
         </p>
       </motion.div>
@@ -82,7 +82,7 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
               <div className="font-black text-sm text-white uppercase tracking-wide">
                 {t(step.titleKey)}
               </div>
-              <div className="text-xs text-white/50 leading-snug mt-0.5">
+              <div className="text-xs text-white/70 leading-snug mt-0.5">
                 {t(step.descKey)}
               </div>
             </div>

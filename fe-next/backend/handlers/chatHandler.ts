@@ -105,6 +105,7 @@ function registerChatHandlers(io: Server, socket: Socket): void {
 
   // Handle chat history request (for late joiners and page refresh)
   socket.on('requestChatHistory', (data: ChatHistoryRequest) => {
+    if (!checkRateLimit(socket.id)) return;
     if (isSocketMigrating(socket)) return;
 
     const gameCode = data?.gameCode || getGameBySocketId(socket.id);

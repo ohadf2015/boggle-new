@@ -11,7 +11,7 @@
 
 'use client';
 
-import React, { memo, useEffect, useId } from 'react';
+import { memo, useEffect, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -91,7 +91,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
     return null;
   }
 
-  const { tier, icon, isNew, isUpgrade } = unlock;
+  const { tier, icon, isNew } = unlock;
 
   // Get tier name for display
   const tierName = t(`education.achievements.tiers.${tier}`);

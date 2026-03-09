@@ -55,13 +55,13 @@ export function BotWordCard({ bot, language, t }: BotWordCardProps): React.React
             );
           })}
           {bot.words.length > 20 && (
-            <span className="text-[10px] text-white/50 font-medium self-center">
+            <span className="text-[10px] text-white/70 font-medium self-center">
               +{bot.words.length - 20} more
             </span>
           )}
         </div>
       ) : (
-        <p className="text-xs text-white/40 italic">
+        <p className="text-xs text-white/60 italic">
           {t('singlePlayer.noWordsToShow')}
         </p>
       )}

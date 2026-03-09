@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { ChevronDown, ChevronUp, Edit2, RotateCcw, Check, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { SectionStatus } from '../types';
@@ -43,7 +42,12 @@ export function SectionCard({
         onClick={onToggle}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && onToggle()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">{metadata.icon}</span>

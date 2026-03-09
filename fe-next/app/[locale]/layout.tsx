@@ -47,40 +47,14 @@ interface LocaleLayoutProps {
     params: Promise<{ locale: string }>;
 }
 
-// Helper function to get locale-specific URL path
-// Always returns explicit locale path for SEO consistency
+const SUPPORTED_LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es']);
+
 function getLocalePath(locale: string): string {
-    switch (locale) {
-        case 'en':
-            return '/en';
-        case 'sv':
-            return '/sv';
-        case 'ja':
-            return '/ja';
-        case 'he':
-            return '/he';
-        case 'es':
-            return '/es';
-        default:
-            return '/en'; // Default to English for SEO
-    }
+    return SUPPORTED_LOCALES.has(locale) ? `/${locale}` : '/en';
 }
 
-// Helper function to get language code for structured data
 function getLanguageCode(locale: string): string {
-    switch (locale) {
-        case 'en':
-            return 'en';
-        case 'sv':
-            return 'sv';
-        case 'ja':
-            return 'ja';
-        case 'es':
-            return 'es';
-        case 'he':
-        default:
-            return 'he';
-    }
+    return SUPPORTED_LOCALES.has(locale) ? locale : 'he';
 }
 
 export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
@@ -762,9 +736,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
                     <div className="flex-1 flex flex-col min-h-0 relative [overflow-x:clip]">
-                        <main 
-                            id="main-content" 
-                            className="relative z-10 overflow-auto main-content-safe min-h-0 flex-1" 
+                        <main
+                            id="main-content"
+                            className="relative z-10 overflow-auto main-content-safe min-h-0 flex-1 flex flex-col"
                             tabIndex={-1}
                         >
                             {children}

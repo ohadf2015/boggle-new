@@ -242,13 +242,13 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 {/* Current Status */}
                 <div className="flex items-center justify-between p-4 rounded-neo bg-white/5 border-2 border-white/10">
                   <div>
-                    <p className="text-xs text-white/50 uppercase tracking-wide">
+                    <p className="text-xs text-white/70 uppercase tracking-wide">
                       {language === 'he' ? 'רמה נוכחית' : 'Current Level'}
                     </p>
                     <p className="text-2xl font-black text-white">{currentLevel}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-white/50 uppercase tracking-wide">
+                    <p className="text-xs text-white/70 uppercase tracking-wide">
                       {language === 'he' ? 'פרסטיג\'' : 'Prestige'}
                     </p>
                     <p className="text-2xl font-black">
@@ -257,12 +257,12 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                           {PRESTIGE_ICONS[currentPrestige]} {toRoman(currentPrestige)}
                         </span>
                       ) : (
-                        <span className="text-white/50">-</span>
+                        <span className="text-white/70">-</span>
                       )}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-white/50 uppercase tracking-wide">
+                    <p className="text-xs text-white/70 uppercase tracking-wide">
                       {language === 'he' ? 'מכפיל XP' : 'XP Multiplier'}
                     </p>
                     <p className="text-2xl font-black text-neo-lime">
@@ -288,7 +288,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   <>
                     {/* Next Prestige Rewards Preview */}
                     <div className="space-y-2">
-                      <p className="text-xs text-white/50 uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-xs text-white/70 uppercase tracking-wide flex items-center gap-1">
                         <Star className="w-3 h-3" />
                         {language === 'he' ? `פרסים לפרסטיג' ${toRoman(nextPrestigeLevel)}` : `Prestige ${toRoman(nextPrestigeLevel)} Rewards`}
                       </p>
@@ -311,13 +311,13 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                               <p className={cn('font-bold text-sm', canPrestige ? colors.text.replace('text-', 'text-') : 'text-white')}>
                                 {reward.displayName}
                               </p>
-                              <p className="text-xs text-white/50 truncate">{reward.description}</p>
+                              <p className="text-xs text-white/70 truncate">{reward.description}</p>
                             </div>
                             {reward.type === 'multiplier' && (
-                              <Zap className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-white/30')} />
+                              <Zap className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-white/60')} />
                             )}
                             {reward.type === 'title' && (
-                              <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-white/30')} />
+                              <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-white/60')} />
                             )}
                           </motion.div>
                         ))}
@@ -344,12 +344,12 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       </motion.button>
                     ) : (
                       <div className="p-4 rounded-neo bg-white/5 border-2 border-white/10 text-center">
-                        <p className="text-white/50 text-sm">
+                        <p className="text-white/70 text-sm">
                           {language === 'he'
                             ? `הגע לרמה 100 כדי לבצע פרסטיג'`
                             : `Reach Level 100 to Prestige`}
                         </p>
-                        <p className="text-white/30 text-xs mt-1">
+                        <p className="text-white/60 text-xs mt-1">
                           {language === 'he'
                             ? `${100 - currentLevel} רמות נותרו`
                             : `${100 - currentLevel} levels remaining`}

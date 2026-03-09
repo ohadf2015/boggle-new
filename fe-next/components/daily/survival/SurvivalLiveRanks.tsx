@@ -159,7 +159,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
 
         {/* Empty State */}
         {entries.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8 text-neo-cream/40">
+          <div className="flex flex-col items-center justify-center py-8 text-neo-cream/70">
             <Trophy className="w-8 h-8 mb-2 opacity-50" />
             <span className="text-sm">
               {hasLoaded

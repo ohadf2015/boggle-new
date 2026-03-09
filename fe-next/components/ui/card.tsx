@@ -13,10 +13,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        // Neo-Brutalist card styling
-        "rounded-neo-lg border-4 border-neo-black bg-neo-cream text-neo-black",
-        // Dark mode - use dark background with 3:1+ contrast border
-        "dark:bg-slate-800 dark:text-neo-white dark:border-slate-400",
+        // Neo-Brutalist card styling (dark-only)
+        "rounded-neo-lg border-4 border-neo-cream/40 bg-neo-navy text-neo-white",
         "shadow-hard-lg h-full",
         // Container query setup for responsive children
         "cq-container",
@@ -58,8 +56,8 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-neo-cream dark:bg-neo-gray text-neo-black dark:text-neo-white shadow-hard-lg border-4",
-        dark: "bg-neo-gray dark:bg-neo-black text-neo-white shadow-hard-lg border-4",
+        default: "bg-neo-gray text-neo-white shadow-hard-lg border-4",
+        dark: "bg-neo-black text-neo-white shadow-hard-lg border-4",
         gradient: "border-3 shadow-hard", // For ModeCard-style gradients - background set via gradient prop
         outline: "bg-transparent border-3 shadow-hard-sm",
       },
@@ -143,7 +141,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm lg:text-base xl:text-lg text-neo-black/90 dark:text-neo-white/90", className)}
+    className={cn("text-sm lg:text-base xl:text-lg text-neo-white/90", className)}
     {...props}
   />
 ));

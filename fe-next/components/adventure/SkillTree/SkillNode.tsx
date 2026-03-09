@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -94,8 +94,6 @@ export const SkillNode = memo<SkillNodeProps>(
     const { t } = useLanguage();
     const status = getSkillStatus(skill, state);
     const tierColors = getTierColors(skill.tier);
-    const pathAccent = getPathAccent(skill.path);
-
     const handleClick = useCallback(() => {
       if (status === 'available' && onSkillClick) {
         onSkillClick(skill);

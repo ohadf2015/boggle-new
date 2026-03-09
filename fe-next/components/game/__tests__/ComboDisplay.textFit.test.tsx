@@ -79,7 +79,7 @@ describe('ComboDisplay Text Fitting', () => {
 
     // All text elements should be present and visible
     expect(screen.getByText(/x5/)).toBeInTheDocument();
-    expect(screen.getByText(/Combo/)).toBeInTheDocument();
+    expect(screen.getByText(/game\.combo/)).toBeInTheDocument();
   });
 
   it('compact mode reduces spacing between elements', () => {
@@ -102,7 +102,7 @@ describe('ComboDisplay Text Fitting', () => {
 
     // Double-digit combo should still be readable
     expect(screen.getByText(/x10/)).toBeInTheDocument();
-    expect(screen.getByText(/Combo/)).toBeInTheDocument();
+    expect(screen.getByText(/game\.combo/)).toBeInTheDocument();
 
     // Container should allow glow overflow with overflow-visible
     const outerContainer = container.firstChild as HTMLElement;

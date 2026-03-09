@@ -317,6 +317,7 @@ const he = {
     "retryNow": "נסה עכשיו"
   },
   "game": {
+    "combo": "קומבו",
     "comboHint": "מצא מילים מהר לקומבו!",
     "calculatingResults": "מחשב תוצאות..."
   },

@@ -415,19 +415,19 @@ export function AdminGiftModal({
                     >
                       {gift.xp_amount > 0 && (
                         <div className="text-purple-300/80">
-                          <span className="text-white/50">{t('gift.newTotal')}:</span>{' '}
+                          <span className="text-white/70">{t('gift.newTotal')}:</span>{' '}
                           <span className="font-bold">{(startXp + gift.xp_amount).toLocaleString()} XP</span>
                         </div>
                       )}
                       {gift.coin_amount > 0 && (
                         <div className="text-amber-300/80">
-                          <span className="text-white/50">{t('gift.newTotal')}:</span>{' '}
+                          <span className="text-white/70">{t('gift.newTotal')}:</span>{' '}
                           <span className="font-bold">{(startCoins + gift.coin_amount).toLocaleString()} {t('gift.coins')}</span>
                         </div>
                       )}
                     </motion.div>
                   ) : (
-                    <div className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs text-white/40">
+                    <div className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs text-white/60">
                       {gift.xp_amount > 0 && (
                         <div>
                           <span>{t('gift.currentBalance')}:</span>{' '}
@@ -524,7 +524,7 @@ export function AdminGiftModal({
 
               {/* From line */}
               {gift.sender && (
-                <p className="mt-4 text-xs text-white/50">
+                <p className="mt-4 text-xs text-white/70">
                   {t('gift.from')}: {gift.sender.display_name || gift.sender.username}
                 </p>
               )}

@@ -62,7 +62,7 @@ interface UseHostGameEventsProps {
   intentionalExitRef: MutableRefObject<boolean>;
 
   // Callbacks
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any }) => void;
   onGameStart?: () => void;
 }
 
@@ -209,8 +209,10 @@ export function useHostGameEvents({
         const store = useGameStore.getState();
         store.setWordHuntTargetLength((data as any).wordHuntTargetLength);
         store.setWordHuntMyLife(100);
+        store.setWordHuntPlayerLives((data as any).wordHuntPlayerLives || {});
         store.setWordHuntTargetAttempts([]);
         store.setWordHuntTargetFound(false);
+        store.setWordHuntEliminatedPlayers((data as any).wordHuntEliminatedPlayers || []);
       }
 
       // Reset state for new game
@@ -296,6 +298,7 @@ export function useHostGameEvents({
           duplicateRuleDisabled: data.duplicateRuleDisabled,
           playerCount: data.playerCount,
           wordHuntSummary: data.wordHuntSummary,
+          blastSummary: data.blastSummary,
         });
       }
     };
@@ -341,6 +344,14 @@ export function useHostGameEvents({
       whStore.setWordHuntTargetAttempts([]);
       whStore.setWordHuntPlayerLives({});
       whStore.setWordHuntMyLife(100);
+
+      // Reset blast mode state for next game
+      whStore.setBlastTileOverlay([]);
+      whStore.setBlastMovesUsed(0);
+      whStore.setBlastTotalTileBonus(0);
+      whStore.setBlastTotalTilesCleared(0);
+      whStore.setBlastSeed(null);
+      whStore.setBlastComboSync(null);
 
       // Refresh player list from server data so host can start next game
       if (data.users && setPlayersReady) {

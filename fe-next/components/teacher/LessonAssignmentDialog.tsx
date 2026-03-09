@@ -24,8 +24,7 @@ export default function LessonAssignmentDialog({
   lessonId,
   lessonName,
 }: LessonAssignmentDialogProps) {
-  const { t, language } = useLanguage();
-  const isRTL = language === 'he';
+  const { t } = useLanguage();
   const { classrooms, isLoading: isLoadingClassrooms } = useClassrooms();
   const { assignLesson, isAssigning } = useAssignLesson();
 

@@ -131,8 +131,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   const containerClasses = cn(
     'flex items-center justify-center relative',
     compact
-      ? 'h-10 min-h-[40px] min-w-[80px] xs:min-w-[100px]'
-      : 'h-14 min-h-[56px] min-w-[100px] xs:min-w-[140px]',
+      ? 'h-10 min-h-[40px] min-w-[100px] xs:min-w-[120px]'
+      : 'h-14 min-h-[56px] min-w-[120px] xs:min-w-[160px]',
     className
   );
 

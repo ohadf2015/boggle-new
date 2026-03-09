@@ -21,7 +21,11 @@ interface PageParams {
   }>;
 }
 
-const LoadingFallback = () => <PageLoader text="Loading Word Hunt..." nested />;
+const LoadingFallback = () => (
+  <div className="flex-1 flex items-center justify-center bg-neo-navy">
+    <PageLoader size="lg" text="Loading Word Hunt..." />
+  </div>
+);
 
 const DailyChallenge = dynamicImport(() => import('@/components/daily/DailyChallenge'), {
   loading: LoadingFallback,

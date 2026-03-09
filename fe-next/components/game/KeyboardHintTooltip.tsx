@@ -81,7 +81,7 @@ export function KeyboardHintTooltip({
           exit={{ opacity: 0, x: -20, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 350, damping: 28 }}
           className={cn(
-            'fixed top-20 left-4 z-40',
+            'fixed top-28 left-4 z-40',
             'max-w-[220px]',
             'bg-neo-pink/95 backdrop-blur-md text-white',
             'border-3 border-neo-black',

@@ -195,6 +195,9 @@ const EXPECTED_ERROR_PATTERNS = [
   /socket not connected/i,
   /Cannot join/i,
   /cannot emit/i,
+
+  // Transient server errors (player should retry)
+  /An error occurred while processing your word/i,
 ];
 
 /**

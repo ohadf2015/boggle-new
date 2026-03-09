@@ -541,7 +541,7 @@ describe('useAdventureBossNew', () => {
 
       expect(onAttack).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: expect.stringMatching(/^(lockTiles|scramble|timePenalty)$/),
+          type: expect.stringMatching(/^(lockTiles|scramble|timePenalty|damage)$/),
         })
       );
     });

@@ -292,7 +292,7 @@ export default function ProfilePageClient(): React.JSX.Element {
           )}
 
           <motion.div
-            className="h-full px-5 pt-2 page-content-safe"
+            className="h-full px-5 pt-2 pb-24 sm:pb-0 page-content-safe"
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}

@@ -39,12 +39,12 @@ describe('FireBottomEffect', () => {
     expect(canvas).toBeInTheDocument();
   });
 
-  it('should render with fixed positioning at bottom', () => {
+  it('should render with fixed positioning covering full viewport', () => {
     render(<FireBottomEffect isActive={true} />);
     const wrapper = screen.getByTestId('fire-bottom-effect');
     expect(wrapper).toBeInTheDocument();
     expect(wrapper.className).toContain('fixed');
-    expect(wrapper.className).toContain('bottom-0');
+    expect(wrapper.className).toContain('inset-0');
   });
 
   it('should have pointer-events-none so it does not block interaction', () => {

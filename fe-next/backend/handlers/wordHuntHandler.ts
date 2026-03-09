@@ -67,7 +67,7 @@ export function handleSubmitTargetWord(
     return;
   }
 
-  const huntState = (game as any).wordHuntState;
+  const huntState = game.wordHuntState;
   if (!huntState) {
     socket.emit('error', { message: 'Word hunt state not initialized' });
     return;

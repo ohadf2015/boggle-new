@@ -317,6 +317,7 @@ const en = {
     "retryNow": "Reconnect!"
   },
   "game": {
+    "combo": "Combo",
     "comboHint": "Find words fast for combo!",
     "calculatingResults": "Calculating Results..."
   },

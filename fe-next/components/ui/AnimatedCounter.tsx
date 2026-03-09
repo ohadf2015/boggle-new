@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { motion, useSpring, useTransform, useMotionValue } from 'framer-motion';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { motion, useSpring, useMotionValue } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
@@ -80,7 +80,6 @@ export function AnimatedCounter({
   // Calculate if value increased or decreased
   const change = value - prevValueRef.current;
   const isIncrease = change > 0;
-  const isDecrease = change < 0;
 
   // Motion value for spring animation
   const motionValue = useMotionValue(prevValueRef.current);
@@ -186,7 +185,7 @@ export function AnimatedCounter({
     default: 'text-neo-white',
     gold: 'text-neo-lime',
     success: 'text-neo-lime',
-    danger: 'text-red-400',
+    danger: 'text-neo-red',
   };
 
   // Glow styles

@@ -317,6 +317,7 @@ const ja = {
     "retryNow": "今すぐ再試行"
   },
   "game": {
+    "combo": "コンボ",
     "comboHint": "素早く単語を見つけてコンボ！",
     "calculatingResults": "結果を計算中..."
   },

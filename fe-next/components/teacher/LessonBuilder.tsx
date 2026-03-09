@@ -25,7 +25,6 @@ import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkele
 export default function LessonBuilder() {
   const { t, language } = useLanguage();
   const router = useRouter();
-  const isRTL = language === 'he';
   const { lessons, isLoading, createLesson, updateLesson } = useLessons();
   const { classrooms } = useClassrooms();
 

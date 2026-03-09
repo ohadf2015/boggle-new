@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useRef, useState, useEffect } from 'react';
+import { memo, useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Crown, Medal, Award, WifiOff, Clock, ArrowUp, ArrowDown } from 'lucide-react';
 import Avatar from '../../../components/Avatar';

@@ -118,7 +118,7 @@ export function PortraitGameLayout({
   comboCoinReward,
   onCoinAnimationComplete,
   formedWord,
-  letterCount,
+  letterCount: _letterCount,
   currentFeedback,
   keyboardInput,
   tutorialPath,
@@ -193,7 +193,7 @@ export function PortraitGameLayout({
       />
 
       {/* Header with controls */}
-      <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pt-4 pb-2">
+      <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pt-2 pb-1">
         <Button
           variant="destructive"
           size="sm"
@@ -256,7 +256,7 @@ export function PortraitGameLayout({
       )}
 
       {/* Stats section - Gemini Pro: Coins (left), Timer (center), Score (right) */}
-      <div ref={gameStatsRef} className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-3 max-w-md mx-auto w-full" role="status" aria-label="Game status">
+      <div ref={gameStatsRef} className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-1 max-w-md mx-auto w-full" role="status" aria-label="Game status">
         {/* Left: Coins badge */}
         <div className="flex-1 flex justify-start">
           <AdaptiveMotion.div
@@ -360,7 +360,7 @@ export function PortraitGameLayout({
       </div>
 
       {/* Word Forming Area */}
-      <div className="h-12 flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-2 max-w-[360px] mx-auto w-full overflow-visible">
+      <div className="h-10 flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-1 max-w-[360px] mx-auto w-full overflow-visible">
         <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
       </div>
 
@@ -375,7 +375,7 @@ export function PortraitGameLayout({
               transition={{ type: 'spring', stiffness: 100, damping: 20 }}
             />
           </div>
-          <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider tabular-nums">
+          <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider tabular-nums">
             {validWordCount}/{totalBoardWords}
           </span>
         </div>
@@ -399,7 +399,7 @@ export function PortraitGameLayout({
       />
 
       {/* Game grid - Takes remaining space */}
-      <div className="flex-1 flex flex-col items-center justify-start px-4 pt-2 relative z-30 min-h-[200px]">
+      <div className="flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0">
         {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
         <AdaptiveAnimatePresence>
           {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
@@ -407,7 +407,7 @@ export function PortraitGameLayout({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-2 left-4 right-4 z-40"
+              className="absolute top-2 start-4 end-4 z-40"
             >
               <div className="relative bg-gradient-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-4 rounded-lg border-3 border-neo-black shadow-hard-sm">
                 <span className="font-bold text-xs uppercase tracking-wide">
@@ -419,7 +419,7 @@ export function PortraitGameLayout({
           )}
         </AdaptiveAnimatePresence>
 
-        <div className="game-board-container relative w-full max-w-[360px] aspect-square">
+        <div className="game-board-container relative w-full max-w-[min(90vw,360px)] aspect-square">
           <GridComponent
             grid={grid}
             interactive={!isPaused}

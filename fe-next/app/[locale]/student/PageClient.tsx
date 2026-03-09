@@ -164,7 +164,7 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
       <div className="bg-neo-yellow px-6 pt-5 pb-4">
         {/* Mascot - floating in top-right corner */}
         <motion.div
-          className="absolute top-2 right-2 z-10"
+          className="absolute top-2 end-2 z-10"
           initial={{ scale: 0, rotate: 30 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.5 }}

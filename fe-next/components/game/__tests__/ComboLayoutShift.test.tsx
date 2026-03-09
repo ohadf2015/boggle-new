@@ -130,7 +130,7 @@ describe('Combo Layout Shift Prevention', () => {
 
     // But the combo text is not present (ComboDisplay returns null for level 0)
     expect(screen.queryByText(/x0/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Combo/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/game\.combo/)).not.toBeInTheDocument();
   });
 
   it('ComboDisplay shows content for level > 0', () => {
@@ -138,6 +138,6 @@ describe('Combo Layout Shift Prevention', () => {
 
     // Combo content should be visible
     expect(screen.getByText(/x3/)).toBeInTheDocument();
-    expect(screen.getByText(/Combo/)).toBeInTheDocument();
+    expect(screen.getByText(/game\.combo/)).toBeInTheDocument();
   });
 });

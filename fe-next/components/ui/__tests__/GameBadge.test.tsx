@@ -126,7 +126,7 @@ describe('GameBadge', () => {
         <GameBadge variant="score-fail">Failed</GameBadge>
       );
       const badge = container.querySelector('span');
-      expect(badge).toHaveClass('bg-gray-700');
+      expect(badge).toHaveClass('bg-neo-gray');
     });
 
     it('should render streak variant', () => {
@@ -451,7 +451,7 @@ describe('GameBadge', () => {
       );
 
       expect(screen.getByText('X/10')).toBeInTheDocument();
-      expect(container.querySelector('.bg-gray-700')).toBeInTheDocument();
+      expect(container.querySelector('.bg-neo-gray')).toBeInTheDocument();
     });
   });
 

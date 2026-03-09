@@ -3,7 +3,7 @@
 // Note: Dynamic rendering is set in page.tsx (server component)
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Trophy, Medal, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Trophy, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
 import { ErrorState, EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
@@ -264,7 +264,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             {/* Table Header */}
             <div
               className={cn(
-                'grid grid-cols-10 gap-3 px-3 py-2 text-sm font-semibold',
+                'hidden sm:grid grid-cols-10 gap-3 px-3 py-2 text-sm font-semibold',
                 isDarkMode ? 'bg-slate-700/50 text-gray-300' : 'bg-gray-50 text-gray-600'
               )}
             >
@@ -284,7 +284,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   <div
                     key={entry.player_id}
                     className={cn(
-                      'grid grid-cols-10 gap-3 px-3 py-2 items-center transition-colors',
+                      'flex flex-col sm:grid sm:grid-cols-10 gap-1 sm:gap-3 px-3 py-2 items-start sm:items-center transition-colors',
                       isCurrentUser
                         ? isDarkMode
                           ? 'bg-cyan-900/20'
@@ -294,8 +294,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                           : 'hover:bg-gray-50'
                     )}
                   >
-                    <div className="col-span-1 text-center">{getRankIcon(rank)}</div>
-                    <div className="col-span-5 flex items-center gap-2">
+                    <div className="hidden sm:block sm:col-span-1 text-center">{getRankIcon(rank)}</div>
+                    <div className="flex items-center gap-2 w-full sm:w-auto sm:col-span-5">
+                      <div className="sm:hidden flex-shrink-0 w-6 text-center">{getRankIcon(rank)}</div>
                       <Avatar
                         profilePictureUrl={entry.profile_picture_url ?? undefined}
                         avatarImage={entry.avatar_image ?? undefined}
@@ -303,7 +304,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       />
                       <span
                         className={cn(
-                          'font-medium truncate text-sm',
+                          'font-medium truncate text-sm flex-1',
                           isCurrentUser
                             ? isDarkMode
                               ? 'text-cyan-400'
@@ -315,16 +316,22 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       >
                         {entry.display_name || entry.username}
                       </span>
+                      <div className={cn(
+                        'sm:hidden font-semibold text-sm',
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      )}>
+                        {entry.total_score?.toLocaleString() || 0}
+                      </div>
                     </div>
                     <div
                       className={cn(
-                        'col-span-2 text-right font-semibold text-sm',
+                        'hidden sm:block sm:col-span-2 text-right font-semibold text-sm',
                         isDarkMode ? 'text-white' : 'text-gray-900'
                       )}
                     >
                       {entry.total_score?.toLocaleString() || 0}
                     </div>
-                    <div className={cn('col-span-2 text-right text-sm', 'text-gray-600')}>
+                    <div className={cn('hidden sm:block sm:col-span-2 text-right text-sm', 'text-gray-600')}>
                       {entry.games_played || 0}
                     </div>
                   </div>

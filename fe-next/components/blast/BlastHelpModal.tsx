@@ -34,7 +34,7 @@ function CategoryHeader({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-2 pt-1">
       <div className="h-px flex-1 bg-white/15" />
-      <span className="text-[9px] font-black uppercase tracking-widest text-white/40">{label}</span>
+      <span className="text-[9px] font-black uppercase tracking-widest text-white/60">{label}</span>
       <div className="h-px flex-1 bg-white/15" />
     </div>
   );
@@ -198,7 +198,7 @@ export function BlastHelpModal({ open, onOpenChange, t }: BlastHelpModalProps) {
               />
 
               {/* Goal */}
-              <p className="text-white/50 text-[10px] border-t border-white/10 pt-2.5 text-center font-bold uppercase tracking-wider">
+              <p className="text-white/70 text-[10px] border-t border-white/10 pt-2.5 text-center font-bold uppercase tracking-wider">
                 {t('blast.helpGoal')}
               </p>
             </div>

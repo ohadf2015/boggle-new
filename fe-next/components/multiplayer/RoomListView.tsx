@@ -109,7 +109,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         </m.header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 flex flex-col px-4 lg:px-6 gap-6 overflow-y-auto pb-10">
+        <div className="flex-1 flex flex-col px-4 lg:px-6 gap-6 overflow-y-auto pb-10 safe-area-bottom">
 
           {/* Quick Play CTA */}
           {onQuickPlay && (
@@ -160,7 +160,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             aria-busy={roomsLoading}
           >
             <div className="flex items-center justify-between">
-              <h2 className="font-neo-display font-black uppercase text-xs tracking-widest text-white/50">
+              <h2 className="font-neo-display font-black uppercase text-xs tracking-widest text-white/70">
                 {t('multiplayerFlow.roomList.activeBattles')}
                 {totalPlayers > 0 && (
                   <span className="text-neo-cyan ms-2">
@@ -198,7 +198,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                     role="option"
                     aria-selected={false}
                     aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: room.roomName || room.gameCode })}
-                    initial={{ x: -10, opacity: 0 }}
+                    initial={{ x: dir === 'rtl' ? 10 : -10, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.1 + index * 0.03 }}
                     onClick={() => onRoomClick(room)}
@@ -216,9 +216,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                         prev?.focus();
                       }
                     }}
-                    whileHover={{ scale: 1.02, x: -2 }}
+                    whileHover={{ scale: 1.02, x: dir === 'rtl' ? 2 : -2 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-left group"
+                    className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-start group"
                   >
                     <span className="text-xl">
                       {LANGUAGE_FLAGS[room.language] || '🎮'}
@@ -247,7 +247,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             ) : (
               /* Empty State: Energetic nudge toward Quick Play */
               <div className="bg-neo-navy-light/30 border-2 border-white/5 rounded-2xl p-6 flex flex-col items-center text-center">
-                <Ghost className="w-10 h-10 text-white/20 mb-3" />
+                <Ghost className="w-10 h-10 text-white/60 mb-3" />
                 <h3 className="text-slate-400 font-bold text-sm uppercase tracking-widest">
                   {t('multiplayerFlow.roomList.noRoomsYet')}
                 </h3>
@@ -272,12 +272,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
           <DialogContent
             noDescription
-            className="max-w-md sm:max-w-lg max-h-[85vh] overflow-hidden p-0 bg-neo-navy border-neo-black/50"
+            className="max-w-md sm:max-w-lg max-h-[85dvh] overflow-hidden p-0 bg-neo-navy border-neo-black/50"
           >
             <DialogHeader className="sr-only">
               <DialogTitle>{t('landing.tutorial')}</DialogTitle>
             </DialogHeader>
-            <div className="overflow-y-auto max-h-[80vh]">
+            <div className="overflow-y-auto max-h-[80dvh]">
               <HowToPlay onClose={() => setShowHowToPlay(false)} />
             </div>
           </DialogContent>

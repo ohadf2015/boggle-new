@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -85,7 +85,7 @@ const ChapterIndicator = memo<ChapterIndicatorProps>(({
   className,
 }) => {
   const { t } = useLanguage();
-  const { currentLevel, isBoss, getLevelPosition, theme } = useAdventureTheme();
+  const { isBoss, getLevelPosition } = useAdventureTheme();
   const chapter = useCurrentChapter();
 
   const levelPosition = getLevelPosition();

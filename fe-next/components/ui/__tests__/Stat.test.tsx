@@ -63,35 +63,35 @@ describe('Stat', () => {
       const { container } = render(
         <Stat value={10} label="Test" variant="default" />
       );
-      expect(container.querySelector('.bg-slate-100\\/50')).toBeInTheDocument();
+      expect(container.querySelector('.bg-neo-navy\\/50')).toBeInTheDocument();
     });
 
     it('should render accent variant', () => {
       const { container } = render(
         <Stat value={10} label="Test" variant="accent" />
       );
-      expect(container.querySelector('.bg-neo-cyan\\/10')).toBeInTheDocument();
+      expect(container.querySelector('.bg-neo-cyan\\/20')).toBeInTheDocument();
     });
 
     it('should render success variant', () => {
       const { container } = render(
         <Stat value={10} label="Test" variant="success" />
       );
-      expect(container.querySelector('.bg-neo-lime\\/10')).toBeInTheDocument();
+      expect(container.querySelector('.bg-neo-lime\\/20')).toBeInTheDocument();
     });
 
     it('should render warning variant', () => {
       const { container } = render(
         <Stat value={10} label="Test" variant="warning" />
       );
-      expect(container.querySelector('.bg-neo-yellow\\/10')).toBeInTheDocument();
+      expect(container.querySelector('.bg-neo-yellow\\/20')).toBeInTheDocument();
     });
 
     it('should render info variant', () => {
       const { container } = render(
         <Stat value={10} label="Test" variant="info" />
       );
-      expect(container.querySelector('.bg-neo-pink\\/10')).toBeInTheDocument();
+      expect(container.querySelector('.bg-neo-pink\\/20')).toBeInTheDocument();
     });
 
     it('should render highlight variant with gradient', () => {
@@ -427,13 +427,13 @@ describe('Stat', () => {
         />
       );
 
-      // Should have dark mode classes on wrapper
+      // Should have dark-themed classes on wrapper (dark-only design)
       const stat = container.querySelector('[role="status"]');
-      expect(stat?.className).toContain('dark:bg-slate-800');
+      expect(stat?.className).toContain('bg-neo-navy/50');
 
-      // Dark text color is on the value div, not the wrapper
+      // Value text uses neo-cream color
       const valueDiv = stat?.querySelector('.font-black');
-      expect(valueDiv?.className).toContain('dark:text-slate-100');
+      expect(valueDiv?.className).toContain('text-neo-cream');
     });
   });
 

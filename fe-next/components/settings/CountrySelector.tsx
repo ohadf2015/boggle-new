@@ -209,7 +209,7 @@ export function CountrySelector({
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('profile.searchCountry')}
                 className={cn(
-                  'w-full pl-8 pr-8 py-2 text-sm rounded-md border',
+                  'w-full ps-8 pe-8 py-2 text-sm rounded-md border',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                   isDarkMode
                     ? 'bg-slate-700 border-slate-600 text-white placeholder:text-gray-500 focus:border-cyan-500'

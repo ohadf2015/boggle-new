@@ -316,7 +316,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   transition={{ delay: 0.5 }}
                   className="text-center space-y-1"
                 >
-                  <p className="text-xs text-white/50">
+                  <p className="text-xs text-white/70">
                     {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletion'))}
                     {reward.triggerType === 'win' && (t('mysteryReward.winBonus'))}
                     {reward.triggerType === 'long_word' && (t('mysteryReward.longWord'))}

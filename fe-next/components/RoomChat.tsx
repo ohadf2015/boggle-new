@@ -291,7 +291,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 <div className="bg-neo-black text-neo-white px-3 py-1 font-black uppercase text-xs tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
                   {t('chat.noMessages')}
                 </div>
-                <p className={`font-bold text-[10px] mt-2 uppercase tracking-wide ${variant === 'embedded' ? 'text-neo-cream/40' : 'text-neo-black/75'}`}>
+                <p className={`font-bold text-[10px] mt-2 uppercase tracking-wide ${variant === 'embedded' ? 'text-neo-cream/70' : 'text-neo-black/75'}`}>
                   {t('chat.startChatting')}
                 </p>
               </AdaptiveMotion.div>

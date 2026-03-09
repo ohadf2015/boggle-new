@@ -26,7 +26,7 @@ export interface DuelDisconnectOverlayProps {
 export function DuelDisconnectOverlay({
   opponentName,
   gracePeriodSeconds = 30,
-  onDismiss,
+  onDismiss: _onDismiss,
 }: DuelDisconnectOverlayProps) {
   const { t } = useLanguage();
   const [secondsRemaining, setSecondsRemaining] = useState(gracePeriodSeconds);

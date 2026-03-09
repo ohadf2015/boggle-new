@@ -30,7 +30,7 @@ function StarRating({ stars }: { stars: 1 | 2 | 3 }) {
   return (
     <div className="flex gap-1 justify-center text-3xl" aria-label={`${stars} stars`}>
       {[1, 2, 3].map(i => (
-        <span key={i} className={i <= stars ? 'text-yellow-400' : 'text-white/20'}>
+        <span key={i} className={i <= stars ? 'text-yellow-400' : 'text-white/60'}>
           ★
         </span>
       ))}
@@ -122,7 +122,7 @@ export function BlastWaveTransition({
             <span className="font-black text-2xl text-white font-neo-display tabular-nums">
               {stat.value}{stat.suffix}
             </span>
-            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider mt-0.5">
+            <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
               {stat.label}
             </span>
           </AdaptiveMotion.div>

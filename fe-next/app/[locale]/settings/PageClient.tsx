@@ -40,7 +40,7 @@ function SettingRow({ icon, label, description, children, isDarkMode }: SettingR
     )}>
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <div className={cn(
-          'w-10 h-10 rounded-lg flex items-center justify-center border-2 border-neo-black',
+          'w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center border-2 border-neo-black',
           isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
         )}>
           {icon}
@@ -136,10 +136,10 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode, labe
         aria-valuemax={100}
         aria-valuenow={Math.round((isMuted ? 0 : value) * 100)}
         className={cn(
-          'w-24 h-2 rounded-full appearance-none cursor-pointer',
+          'w-full sm:w-24 h-2 rounded-full appearance-none cursor-pointer',
           isMuted ? 'opacity-50' : '',
           isDarkMode ? 'bg-slate-600' : 'bg-gray-300',
-          '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-neo-lime [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-neo-black [&::-webkit-slider-thumb]:cursor-pointer'
+          '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-neo-lime [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-neo-black [&::-webkit-slider-thumb]:cursor-pointer'
         )}
       />
     </div>

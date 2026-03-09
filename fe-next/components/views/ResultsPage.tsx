@@ -24,21 +24,19 @@ const ResultsLandscapeLayout = dynamic(() => import('@/components/results/Result
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 
 // Shared result components
-import { ResultsActionButtons } from '@/components/results/ResultsActionButtons';
 import { ResultsModals } from '@/components/results/ResultsModals';
-import NextStepPrompt from '@/components/results/NextStepPrompt';
 import { ResultsMainContent } from '@/components/results/ResultsMainContent';
 import { ResultsDetailsContent } from '@/components/results/ResultsDetailsContent';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { GameModeOption } from '@/components/GameModeSelector';
-import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed } from '@/hooks/gameState/store';
+import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared } from '@/hooks/gameState/store';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, wordHuntSummary }) => {
-  const { t } = useLanguage();
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, wordHuntSummary }) => {
+  const { t, dir } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
   const setIsInGame = useHideNavigation();
 
@@ -56,6 +54,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
   const blastMovesUsed = useBlastMovesUsed();
+  const blastTotalTileBonus = useBlastTotalTileBonus();
+  const blastTotalTilesCleared = useBlastTotalTilesCleared();
 
   // Socket events for word feedback, XP, engagement features, and player ready state
   const {
@@ -420,8 +420,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     ...(resolvedGameMode === 'blast' ? {
       blastResults: {
         movesUsed: blastMovesUsed,
-        tilesCleared: currentPlayerData?.allWords?.length ?? 0,
-        tileBonus: 0,
+        tilesCleared: blastTotalTilesCleared,
+        tileBonus: blastTotalTileBonus,
       },
     } : {}),
     ...(resolvedGameMode === 'word-hunt' && wordHuntResultsData ? {
@@ -451,21 +451,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       <div className="md:hidden flex flex-col flex-1 min-h-0">
         {/* Exit Button Header */}
         <div className="flex-shrink-0 w-full flex items-center justify-end px-2 py-2">
-          <ExitRoomButton onClick={handleExitRoom} label="" className="w-10 h-10 min-w-[40px] min-h-[40px] p-0" />
+          <ExitRoomButton onClick={handleExitRoom} label="" className="w-11 h-11 min-w-[44px] min-h-[44px] p-0" />
         </div>
 
         {/* Tab Content - Scrollable area */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-40 bg-neo-navy"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-24 sm:pb-40 bg-neo-navy"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={mobileActiveTab}
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                exit={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
                 transition={{ duration: 0.15 }}
                 style={{ minHeight: 0 }}
               >

@@ -7,6 +7,7 @@ import { getComboColors } from '../grid/comboColors';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import FloatingCoinAnimation from './FloatingCoinAnimation';
 import { InteractiveMascot } from '../ui/InteractiveMascot';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ComboDisplayProps {
   comboLevel: number;
@@ -135,6 +136,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   onCoinAnimationComplete,
   highContrast = false,
 }) => {
+  const { t } = useLanguage();
   const comboColors = getComboColors(comboLevel);
   const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const isHighCombo = comboLevel >= 5;
@@ -225,7 +227,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             <div
               className={cn(
                 'absolute pointer-events-none top-1/2 -translate-y-1/2',
-                compact ? '-left-8' : '-left-10'
+                compact ? '-start-8' : '-start-10'
               )}
             >
               <svg
@@ -381,7 +383,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                     : `1px 1px 3px rgba(0,0,0,0.5), 0 0 10px ${rarityColors.shadow}`,
                 }}
               >
-                Combo
+                {t('game.combo')}
               </span>
             </div>
 
@@ -484,7 +486,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
           {showMascot && (
             <motion.div
               data-testid="combo-mascot"
-              className="absolute -left-10 top-1/2 -translate-y-1/2 pointer-events-none"
+              className="absolute -start-10 top-1/2 -translate-y-1/2 pointer-events-none"
               initial={{ scale: 0, opacity: 0, x: 20 }}
               animate={{ scale: 1, opacity: 1, x: 0 }}
               exit={{ scale: 0, opacity: 0, x: 20 }}

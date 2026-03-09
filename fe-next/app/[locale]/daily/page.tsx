@@ -22,9 +22,12 @@ interface PageParams {
   }>;
 }
 
-// Loading fallback component using unified PageLoader
-// nested=true ensures it fills parent flex container instead of using fixed 100dvh height
-const LoadingFallback = () => <PageLoader text="Loading Daily Challenge..." nested />;
+// Loading fallback - flex-1 fills parent flex-col, centers loader vertically
+const LoadingFallback = () => (
+  <div className="flex-1 flex items-center justify-center bg-neo-navy">
+    <PageLoader size="lg" text="Loading Daily Challenge..." />
+  </div>
+);
 
 // Dynamic import for code splitting (client component)
 const DailyChallengeRouter = dynamicImport(() => import('@/components/daily/DailyChallengeRouter'), {

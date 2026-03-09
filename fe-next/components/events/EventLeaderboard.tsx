@@ -64,7 +64,7 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
 
       {/* Empty state */}
       {participants.length === 0 ? (
-        <div className="p-6 text-center text-white/50 text-sm">
+        <div className="p-6 text-center text-white/70 text-sm">
           {t('events.noParticipants')}
         </div>
       ) : (

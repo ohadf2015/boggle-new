@@ -92,19 +92,19 @@ export interface CollapsibleProps {
 
 const VARIANT_STYLES: Record<CollapsibleVariant, { header: string; content: string; badge: string }> = {
   primary: {
-    header: 'bg-slate-800 text-white border-neo-cyan',
-    content: 'bg-slate-800/50',
+    header: 'bg-neo-navy text-white border-neo-cyan',
+    content: 'bg-neo-navy/50',
     badge: 'bg-neo-cyan text-neo-black',
   },
   secondary: {
     header: 'bg-neo-cream text-neo-black border-neo-black',
-    content: 'bg-white dark:bg-slate-800',
+    content: 'bg-neo-navy',
     badge: 'bg-neo-purple text-neo-cream',
   },
   tertiary: {
-    header: 'bg-slate-100 dark:bg-slate-700 text-neo-black dark:text-neo-cream border-neo-black/30',
-    content: 'bg-slate-50 dark:bg-slate-800',
-    badge: 'bg-slate-500 text-white',
+    header: 'bg-neo-gray text-neo-cream border-neo-black/30',
+    content: 'bg-neo-navy',
+    badge: 'bg-muted-foreground text-white',
   },
   default: {
     header: 'border-white/20 bg-white/5 hover:bg-white/10 text-white',
@@ -117,9 +117,9 @@ const VARIANT_STYLES: Record<CollapsibleVariant, { header: string; content: stri
     badge: 'bg-neo-cyan/30 text-white',
   },
   subtle: {
-    header: 'border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200',
+    header: 'border-neo-gray bg-neo-navy hover:bg-neo-gray text-neo-cream/70',
     content: '',
-    badge: 'bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200',
+    badge: 'bg-neo-gray text-neo-cream/70',
   },
 };
 

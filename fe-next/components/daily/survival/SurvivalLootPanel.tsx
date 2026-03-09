@@ -70,7 +70,7 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
 
         {/* Empty State */}
         {discoveredWords.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8 text-neo-cream/40">
+          <div className="flex flex-col items-center justify-center py-8 text-neo-cream/70">
             <Package className="w-8 h-8 mb-2 opacity-50" />
             <span className="text-sm">{t('wordHunt.desktop.noWordsYet')}</span>
           </div>

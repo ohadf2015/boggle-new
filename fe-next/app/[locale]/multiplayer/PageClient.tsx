@@ -104,7 +104,7 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
 
 function ViewLoadingSkeleton(): React.JSX.Element {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative">
+    <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
       <div className="relative z-10">
         <PageLoader size="md" />

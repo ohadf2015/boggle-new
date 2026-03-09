@@ -182,7 +182,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                 </div>
                 {/* Breakdown tooltip hint */}
                 {isAuthenticated && coinReward.breakdown && (
-                  <div className="text-xs text-white/40 space-y-0.5 text-right">
+                  <div className="text-xs text-white/60 space-y-0.5 text-right">
                     {coinReward.breakdown.base > 0 && (
                       <div>Base: +{coinReward.breakdown.base}</div>
                     )}
@@ -223,7 +223,12 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                 onClick={onAchievementsClick}
                 role={onAchievementsClick ? 'button' : undefined}
                 tabIndex={onAchievementsClick ? 0 : undefined}
-                onKeyDown={onAchievementsClick ? (e) => e.key === 'Enter' && onAchievementsClick() : undefined}
+                onKeyDown={onAchievementsClick ? (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onAchievementsClick();
+                  }
+                } : undefined}
                 className={cn(
                   "flex items-center justify-between p-3 rounded-neo border-2 bg-neo-pink/20 border-neo-pink/50",
                   onAchievementsClick && "cursor-pointer hover:bg-neo-pink/30 active:scale-[0.98] transition-all"

@@ -1,12 +1,11 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { CollectibleItem, PlayerCollectible } from '@/contexts/auth/authTypes';
+import type { PlayerCollectible } from '@/contexts/auth/authTypes';
 import { MobileTooltip } from '@/components/ui/MobileTooltip';
 
 interface CollectionGridProps {
@@ -87,7 +86,6 @@ export function CollectionGrid({ collectibles, className }: CollectionGridProps)
                   key={item.id}
                   item={item}
                   index={index}
-                  isDarkMode={isDarkMode}
                 />
               ))}
             </div>
@@ -101,10 +99,9 @@ export function CollectionGrid({ collectibles, className }: CollectionGridProps)
 interface CollectibleBadgeProps {
   item: PlayerCollectible;
   index: number;
-  isDarkMode: boolean;
 }
 
-function CollectibleBadge({ item, index, isDarkMode }: CollectibleBadgeProps) {
+function CollectibleBadge({ item, index }: CollectibleBadgeProps) {
   const { t } = useLanguage();
   const collectible = item.collectible;
   if (!collectible) return null;
@@ -143,7 +140,7 @@ function CollectibleBadge({ item, index, isDarkMode }: CollectibleBadgeProps) {
         whileHover={{ scale: 1.1, y: -2 }}
         className={cn(
           'w-12 h-12 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-shadow overflow-hidden',
-          'shadow-sm hover:shadow-hard focus:outline-none focus:ring-2 focus:ring-neo-cyan',
+          'shadow-sm hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
           rarityColors[rarity],
           rarityBgColors[rarity],
           item.is_equipped && 'ring-2 ring-neo-lime ring-offset-2'

@@ -55,7 +55,7 @@ export function LetterTileWord({
   if (letters.length === 0) {
     return (
       <div className="h-12 flex items-center justify-center">
-        <span className="text-white/40 font-bold text-sm uppercase tracking-wide">
+        <span className="text-white/60 font-bold text-sm uppercase tracking-wide">
           {/* Empty - waiting for word */}
         </span>
       </div>

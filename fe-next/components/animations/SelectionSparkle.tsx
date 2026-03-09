@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, memo, useRef } from 'react';
+import React, { useEffect, useState, useCallback, memo, useRef, useReducer } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
@@ -84,8 +84,20 @@ export const SelectionSparkle = memo(function SelectionSparkle({
 }: SelectionSparkleProps) {
   const { isLowEnd, prefersReducedMotion, maxParticles, enableComplexAnimations } =
     useDevicePerformance();
-  const [particles, setParticles] = useState<SparkleParticle[]>([]);
-  const [isActive, setIsActive] = useState(false);
+  // Batch particles + isActive — they always change together on trigger start/end
+  type SparkleState = { particles: SparkleParticle[]; isActive: boolean };
+  type SparkleAction = { type: 'start'; particles: SparkleParticle[] } | { type: 'end' };
+  const [sparkleState, dispatchSparkle] = useReducer(
+    (state: SparkleState, action: SparkleAction): SparkleState => {
+      switch (action.type) {
+        case 'start': return { particles: action.particles, isActive: true };
+        case 'end': return { particles: [], isActive: false };
+        default: return state;
+      }
+    },
+    { particles: [], isActive: false }
+  );
+  const { particles, isActive } = sparkleState;
 
   // Use ref for position to avoid dependency array issues
   // Position changes should NOT trigger the effect - only triggerKey should
@@ -117,12 +129,11 @@ export const SelectionSparkle = memo(function SelectionSparkle({
   useEffect(() => {
     const currentPosition = positionRef.current;
     if (currentPosition && enableComplexAnimations) {
-      setParticles(generateParticles(currentPosition));
-      setIsActive(true);
+      // dispatch batches particles + isActive in one update
+      dispatchSparkle({ type: 'start', particles: generateParticles(currentPosition) });
 
       const timer = setTimeout(() => {
-        setIsActive(false);
-        setParticles([]);
+        dispatchSparkle({ type: 'end' });
       }, duration + 100);
 
       return () => clearTimeout(timer);

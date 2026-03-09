@@ -38,7 +38,7 @@ const badgeVariants = cva(
         "display-accent": "bg-neo-pink/80 text-neo-black border-neo-black/50 shadow-none cursor-default",
         "display-cyan": "bg-neo-cyan/80 text-neo-black border-neo-black/50 shadow-none cursor-default",
         "display-purple": "bg-neo-purple/80 text-neo-cream border-neo-black/50 shadow-none cursor-default",
-        "display-muted": "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-400/50 shadow-none cursor-default",
+        "display-muted": "bg-neo-gray text-neo-cream/70 border-neo-cream/40 shadow-none cursor-default",
       },
       /**
        * Size variants:

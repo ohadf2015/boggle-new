@@ -55,11 +55,6 @@ export function WordBankTable({
     setActioningWord(null);
   };
 
-  const formatDate = (dateStr: string | null): string => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString();
-  };
-
   const getSourceBadgeColor = (source: string): string => {
     switch (source) {
       case 'wikipedia':
@@ -139,16 +134,16 @@ export function WordBankTable({
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                 {t('admin.wordBank.word')}
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+              <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                 {t('admin.wordBank.source')}
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+              <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                 {t('admin.wordBank.status')}
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+              <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                 {t('admin.wordBank.validationStatus')}
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-300 uppercase tracking-wider">
+              <th className="hidden sm:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-300 uppercase tracking-wider">
                 {t('admin.wordBank.timesUsed')}
               </th>
               <th className="px-4 py-3 text-center text-xs font-semibold text-gray-300 uppercase tracking-wider">
@@ -183,7 +178,7 @@ export function WordBankTable({
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="hidden sm:table-cell px-4 py-3">
                   <span
                     className={`px-2 py-1 text-xs font-medium rounded border ${getSourceBadgeColor(
                       word.source
@@ -192,7 +187,7 @@ export function WordBankTable({
                     {word.source}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-2 sm:px-4 py-3">
                   <span
                     className={`px-2 py-1 text-xs font-medium rounded border ${getStatusBadgeColor(
                       word.status
@@ -201,7 +196,7 @@ export function WordBankTable({
                     {word.status}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="hidden md:table-cell px-4 py-3">
                   <span
                     className={`px-2 py-1 text-xs font-medium rounded border ${getValidationStatusBadgeColor(
                       word.validation_status
@@ -210,7 +205,7 @@ export function WordBankTable({
                     {word.validation_status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-center text-gray-300">{word.times_used}</td>
+                <td className="hidden sm:table-cell px-4 py-3 text-center text-gray-300">{word.times_used}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-center gap-1">
                     {/* Approve/Reject for pending words */}

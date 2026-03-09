@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useCallback, useReducer } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
@@ -74,8 +74,20 @@ export function CoinBurstSource({
   className,
 }: CoinBurstSourceProps) {
   const { isLowEnd, prefersReducedMotion, enableGlowEffects, maxParticles } = useDevicePerformance();
-  const [isActive, setIsActive] = useState(false);
-  const [particles, setParticles] = useState<SparkleParticle[]>([]);
+  // Batch isActive + particles — they always change together on burst start/end
+  type BurstState = { isActive: boolean; particles: SparkleParticle[] };
+  type BurstAction = { type: 'start'; particles: SparkleParticle[] } | { type: 'end' };
+  const [burstState, dispatchBurst] = useReducer(
+    (state: BurstState, action: BurstAction): BurstState => {
+      switch (action.type) {
+        case 'start': return { isActive: true, particles: action.particles };
+        case 'end': return { isActive: false, particles: [] };
+        default: return state;
+      }
+    },
+    { isActive: false, particles: [] }
+  );
+  const { isActive, particles } = burstState;
 
   // Particle counts based on intensity and device capability
   const getParticleCount = useCallback(() => {
@@ -83,12 +95,9 @@ export function CoinBurstSource({
     return Math.min(base, isLowEnd ? 4 : maxParticles);
   }, [intensity, isLowEnd, maxParticles]);
 
-  // Generate particles when triggered
+  // Generate particles when triggered — dispatch batches isActive + particles in one update
   useEffect(() => {
     if (trigger && !isActive) {
-      setIsActive(true);
-      onBurstStart?.();
-
       const count = getParticleCount();
       const newParticles: SparkleParticle[] = Array.from({ length: count }, (_, i) => ({
         id: Date.now() + i,
@@ -99,12 +108,12 @@ export function CoinBurstSource({
         color: GOLD_COLORS[Math.floor(Math.random() * GOLD_COLORS.length)],
       }));
 
-      setParticles(newParticles);
+      dispatchBurst({ type: 'start', particles: newParticles });
+      onBurstStart?.();
 
       // Auto-cleanup after animation
       const timer = setTimeout(() => {
-        setIsActive(false);
-        setParticles([]);
+        dispatchBurst({ type: 'end' });
         onBurstComplete?.();
       }, 800);
 

@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Download, Eye, EyeOff, Filter, X } from 'lucide-react';
+import { Download, Eye, EyeOff, Filter, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import logger from '@/utils/logger';
 import {

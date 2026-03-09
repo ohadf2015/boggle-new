@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import { motion, AnimatePresence, useSpring } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
@@ -64,9 +64,24 @@ export function ComboIntensityBadge({
 }: ComboIntensityBadgeProps) {
   const { isLowEnd, prefersReducedMotion, enableGlowEffects, enableComplexAnimations } =
     useDevicePerformance();
-  const [prevCombo, setPrevCombo] = useState(combo);
-  const [isIncreasing, setIsIncreasing] = useState(false);
-  const [showComboUp, setShowComboUp] = useState(false);
+  // Batch prevCombo + isIncreasing + showComboUp — always update together on combo change
+  type ComboAnimState = { prevCombo: number; isIncreasing: boolean; showComboUp: boolean };
+  type ComboAnimAction =
+    | { type: 'increase'; combo: number }
+    | { type: 'clearAnim'; combo: number }
+    | { type: 'sync'; combo: number };
+  const [comboAnim, dispatchComboAnim] = useReducer(
+    (state: ComboAnimState, action: ComboAnimAction): ComboAnimState => {
+      switch (action.type) {
+        case 'increase': return { prevCombo: action.combo, isIncreasing: true, showComboUp: true };
+        case 'clearAnim': return { ...state, isIncreasing: false, showComboUp: false };
+        case 'sync': return { ...state, prevCombo: action.combo };
+        default: return state;
+      }
+    },
+    { prevCombo: combo, isIncreasing: false, showComboUp: false }
+  );
+  const { prevCombo, isIncreasing, showComboUp } = comboAnim;
 
   // Determine intensity level
   const intensity = useMemo(() => {
@@ -98,8 +113,8 @@ export function ComboIntensityBadge({
       onComboChange?.(combo, direction);
 
       if (direction === 'up') {
-        setIsIncreasing(true);
-        setShowComboUp(true);
+        // dispatch batches prevCombo + isIncreasing + showComboUp in one update
+        dispatchComboAnim({ type: 'increase', combo });
         springScale.set(1.2);
         glowIntensity.set(1);
 
@@ -109,12 +124,11 @@ export function ComboIntensityBadge({
         }, 150);
 
         setTimeout(() => {
-          setIsIncreasing(false);
-          setShowComboUp(false);
+          dispatchComboAnim({ type: 'clearAnim', combo });
         }, 600);
+      } else {
+        dispatchComboAnim({ type: 'sync', combo });
       }
-
-      setPrevCombo(combo);
     }
   }, [combo, prevCombo, onComboChange, springScale, glowIntensity]);
 
@@ -158,7 +172,7 @@ export function ComboIntensityBadge({
       >
         {combo}x
         {multiplier && (
-          <span className={cn('ml-1 opacity-70', sizeConfig[size].multiplier)}>
+          <span className={cn('ms-1 opacity-70', sizeConfig[size].multiplier)}>
             ({multiplier}x)
           </span>
         )}

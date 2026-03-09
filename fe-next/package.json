@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npx rimraf .next && tsx server.ts",
+    "dev": "tsx server.ts",
     "dev:windows": "if exist .next rd /s /q .next && npx tsx server.ts",
     "lsp": "typescript-language-server --stdio",
     "clean": "npx rimraf .next",
@@ -121,7 +121,7 @@
     "logrocket": "^10.1.1",
     "lucide-react": "^0.554.0",
     "million": "^3.1.11",
-    "next": "16.0.10",
+    "next": "^16.1.6",
     "node-cron": "^4.2.1",
     "postcss": "^8.5.6",
     "qrcode.react": "^4.2.0",

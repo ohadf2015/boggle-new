@@ -12,6 +12,7 @@ import {
   addUserToGame,
   removeUserFromGame,
   getGameBySocketId,
+  getUsernameBySocketId,
   getSocketIdByUsername,
   getGameUsers,
   getActiveRooms,
@@ -244,7 +245,9 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
   });
 
   // Handle leave room
-  socket.on('leaveRoom', ({ gameCode, username }: LeaveRoomPayload) => {
+  // Derive username from server-side mapping to prevent impersonation
+  socket.on('leaveRoom', ({ gameCode }: LeaveRoomPayload) => {
+    const username = getUsernameBySocketId(socket.id);
     if (!gameCode || !username) return;
 
     const game = getGame(gameCode);
@@ -334,6 +337,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
   // Handle spectator upgrade to player
   socket.on('upgradeToPlayer', ({ gameCode }: UpgradeToPlayerPayload) => {
+    if (!checkRateLimit(socket.id)) return;
     if (!gameCode) return;
 
     const game = getGame(gameCode);
@@ -359,6 +363,14 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       return;
     }
 
+    // Only allow upgrade during waiting or in-progress states
+    // Prevent upgrades during 'finished' or 'validating' which could corrupt results
+    const isLateJoin = isInProgress(game.gameState);
+    if (game.gameState !== 'waiting' && !isLateJoin) {
+      emitError(socket, 'Cannot join while game is ending. Wait for the next round.');
+      return;
+    }
+
     // Upgrade spectator to player
     const success = upgradeSpectatorToPlayer(gameCode, username);
 
@@ -369,8 +381,6 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     logger.info('SOCKET', `Spectator ${username} upgraded to player in game ${gameCode}`);
 
-    // Notify the upgraded player
-    const isLateJoin = isInProgress(game.gameState);
     socket.emit('spectatorUpgraded', {
       success: true,
       username,
@@ -551,7 +561,7 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
 
   // Send game state on reconnection if game is in progress (use state machine helper)
   if (isInProgress(game.gameState)) {
-    socket.emit('startGame', {
+    const reconnectPayload: Record<string, any> = {
       letterGrid: game.letterGrid,
       timerSeconds: game.remainingTime || game.timerSeconds,
       language: game.language,
@@ -559,8 +569,24 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
       messageId: 'reconnect-' + Date.now(),
       reconnect: true,
       skipAck: true,
-      boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null
-    });
+      boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null,
+      gameMode: game.gameMode || 'classic',
+    };
+
+    // Include blast mode state for reconnecting players
+    if (game.gameMode === 'blast' && game.blastModeState) {
+      reconnectPayload.blastTileOverlay = game.blastModeState.overlay || [];
+      reconnectPayload.blastSeed = game.blastModeState.seed ?? null;
+    }
+
+    // Include word hunt state for reconnecting players
+    if (game.gameMode === 'word-hunt' && game.wordHuntState) {
+      reconnectPayload.wordHuntTargetLength = game.wordHuntState.targetWordLength ?? 0;
+      reconnectPayload.wordHuntEliminatedPlayers = game.wordHuntState.eliminatedPlayers || [];
+      reconnectPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};
+    }
+
+    socket.emit('startGame', reconnectPayload);
   }
 
   broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
@@ -574,7 +600,7 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
 function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: string): void {
   logger.info('SOCKET', `${username} joining game ${gameCode} in progress`);
 
-  socket.emit('startGame', {
+  const lateJoinPayload: Record<string, any> = {
     letterGrid: game.letterGrid,
     timerSeconds: game.remainingTime || game.timerSeconds,
     language: game.language,
@@ -582,8 +608,24 @@ function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: 
     messageId: 'late-join-' + Date.now(),
     lateJoin: true,
     skipAck: true,
-    boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null
-  });
+    boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null,
+    gameMode: game.gameMode || 'classic',
+  };
+
+  // Include blast mode state for late joiners
+  if (game.gameMode === 'blast' && game.blastModeState) {
+    lateJoinPayload.blastTileOverlay = game.blastModeState.overlay || [];
+    lateJoinPayload.blastSeed = game.blastModeState.seed ?? null;
+  }
+
+  // Include word hunt state for late joiners
+  if (game.gameMode === 'word-hunt' && game.wordHuntState) {
+    lateJoinPayload.wordHuntTargetLength = game.wordHuntState.targetWordLength ?? 0;
+    lateJoinPayload.wordHuntEliminatedPlayers = game.wordHuntState.eliminatedPlayers || [];
+    lateJoinPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};
+  }
+
+  socket.emit('startGame', lateJoinPayload);
 
   const leaderboard = getLeaderboard(gameCode);
   socket.emit('updateLeaderboard', { leaderboard });

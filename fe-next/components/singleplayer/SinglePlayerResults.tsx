@@ -72,8 +72,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onQuickRematch: _onQuickRematch,
   onBackToLobby,
 }) => {
-  void _onPlayAgain;
-  void _onQuickRematch;
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
@@ -172,7 +170,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     };
 
     return (
-      <div className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
+      <div className="flex h-dvh w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
         <div className="w-1/2 flex flex-col items-center gap-2 overflow-y-auto scrollable-area">
           <LandscapeBanner
             playerScore={results.playerScore} validWordCount={validWordCount}
@@ -220,7 +218,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Fixed bottom bar on mobile provides the sticky CTA.
   return (
     <div className="min-h-dvh bg-neo-navy text-white">
-      <div className="px-2 md:px-4 xl:px-6 pb-40 md:pb-6">
+      <div className="px-2 md:px-4 xl:px-6 pb-20 md:pb-6">
         <div className="mx-auto space-y-4 md:space-y-6 pt-2 md:pt-4">
 
           {/* 1. Celebration Hero */}
@@ -307,13 +305,21 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 isWinner={isWinner}
               />
             )}
+            <Button
+              variant="ghost"
+              className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40"
+              onClick={onBackToLobby}
+            >
+              <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />
+              {t('nextStep.backToLobby')}
+            </Button>
           </div>
 
           {/* 9. Detailed Analysis - collapsed sections */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <div className="w-1 h-6 bg-neo-lime rounded-full" />
-              <h3 className="text-[10px] sm:text-xs font-black text-white/30 uppercase tracking-wider">
+              <h3 className="text-[10px] sm:text-xs font-black text-white/60 uppercase tracking-wider">
                 {t('results.detailedAnalysis')}
               </h3>
             </div>

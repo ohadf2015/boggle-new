@@ -153,7 +153,7 @@ export function LandscapeGameLayout({
       : highlightedPath;
 
   return (
-    <div className="relative flex items-center justify-center w-full h-full flex-1 overflow-hidden bg-slate-900 text-white">
+    <div className="relative flex items-center justify-center w-full h-full flex-1 overflow-hidden bg-neo-navy text-white">
       <GameOverlays
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
@@ -302,7 +302,7 @@ export function LandscapeGameLayout({
         <div
           className="row-start-2 col-span-3 z-30 flex justify-between items-center px-2 pb-2"
           style={{
-            paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)'
           }}
         >
           {!isPracticeMode ? (

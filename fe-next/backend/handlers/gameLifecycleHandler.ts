@@ -332,6 +332,13 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       logger.debug('DICT', `Language ${gameLang} loaded for game ${gameCode}`);
     } catch (error) {
       logger.error('DICT', `Failed to load language ${gameLang} for game ${gameCode}: ${error}`);
+      // Retry once — if dictionary still fails, words will be rejected
+      try {
+        await ensureLanguageLoaded(gameLang);
+        logger.info('DICT', `Language ${gameLang} loaded on retry for game ${gameCode}`);
+      } catch (retryError) {
+        logger.error('DICT', `Dictionary load failed on retry for ${gameLang} in game ${gameCode}: ${retryError}`);
+      }
     }
 
     // Check if this is a classroom game and fetch vocabulary
@@ -412,6 +419,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         if (currentGame) {
           (currentGame as any).wordHuntState = huntState;
         }
+      } else {
+        logger.error('WORD_HUNT', `No target word found for game ${gameCode} - falling back to classic mode`);
+        // Fall back to classic mode if no target word can be selected
+        updateGame(gameCode, { gameMode: 'classic' });
       }
     }
 
@@ -554,6 +565,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
   // Debug: Get current game state (for debugging sync issues)
   socket.on('debugGameState', () => {
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     const game = gameCode ? getGame(gameCode) : null;
     socket.emit('debugGameStateResponse', {
@@ -571,6 +583,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
   // This is a safety net: if a player reconnects or their socket briefly drops
   // during the startGame broadcast, they can request current game state
   socket.on('requestGameState', () => {
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) return;
 
@@ -590,9 +603,14 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         skipAck: true,
         boardTheme: (game as unknown as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null,
         gameMode: recoveryGameMode,
-        ...(recoveryGameMode === 'blast' && (game as any).blastModeState ? {
-          blastTileOverlay: (game as any).blastModeState.overlay || [],
-          blastSeed: (game as any).blastModeState.seed ?? null,
+        ...(recoveryGameMode === 'blast' && game.blastModeState ? {
+          blastTileOverlay: game.blastModeState.overlay || [],
+          blastSeed: game.blastModeState.seed ?? null,
+        } : {}),
+        ...(recoveryGameMode === 'word-hunt' && game.wordHuntState ? {
+          wordHuntTargetLength: game.wordHuntState.targetWordLength ?? 0,
+          wordHuntEliminatedPlayers: game.wordHuntState.eliminatedPlayers || [],
+          wordHuntPlayerLives: game.wordHuntState.playerLives || {},
         } : {}),
       });
     }
@@ -661,6 +679,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
   // Handle player confirming they want to play again
   socket.on('confirmReadyForNextGame', () => {
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
@@ -699,6 +718,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
   // Handle player toggling lobby ready state (before game starts)
   socket.on('lobbyReady', (data: { ready: boolean }) => {
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
@@ -729,6 +749,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
   // Handle guest name update in lobby
   socket.on('updateGuestName', (data: { newName: string }) => {
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
@@ -738,10 +759,16 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (!game || game.gameState !== 'waiting') return;
 
     const trimmedName = data.newName.trim().slice(0, 20);
-    if (!trimmedName) return;
+    if (!trimmedName || !/^[\p{L}\p{N}\p{Emoji} _-]{1,30}$/u.test(trimmedName)) return;
 
     const user = game.users[username];
     if (!user || user.isHost) return;
+
+    // Prevent taking another player's name
+    if (trimmedName !== username && game.users[trimmedName]) {
+      socket.emit('error', { error: 'NAME_TAKEN', message: 'That name is already in use' });
+      return;
+    }
 
     // Re-register under new username
     game.users[trimmedName] = { ...user, username: trimmedName };

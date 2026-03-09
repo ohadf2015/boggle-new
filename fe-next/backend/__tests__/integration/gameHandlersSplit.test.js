@@ -6,6 +6,7 @@
  */
 
 const { createTestEnvironment, customMatchers } = require('../helpers/socketTestHelper');
+const { _resetBroadcastThrottle } = require('../../utils/socketHelpers');
 
 // Add custom matchers
 expect.extend(customMatchers);
@@ -24,6 +25,7 @@ describe('Game Lifecycle Handler', () => {
   });
 
   beforeEach(() => {
+    _resetBroadcastThrottle();
     env = createTestEnvironment();
     jest.useFakeTimers({ advanceTimers: true });
   });
@@ -242,11 +244,14 @@ describe('Player Join Handler', () => {
   let env;
 
   beforeEach(() => {
+    _resetBroadcastThrottle();
     env = createTestEnvironment();
+    jest.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
     env.cleanup();
+    jest.useRealTimers();
   });
 
   describe('join', () => {
@@ -378,6 +383,9 @@ describe('Player Join Handler', () => {
         username: 'LeavingPlayer',
       });
 
+      // Flush throttled broadcast
+      jest.advanceTimersByTime(500);
+
       expect(playerSocket.getEmittedEvents()).toContainEvent('activeRooms');
     });
   });
@@ -387,11 +395,14 @@ describe('Room Management Handler', () => {
   let env;
 
   beforeEach(() => {
+    _resetBroadcastThrottle();
     env = createTestEnvironment();
+    jest.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
     env.cleanup();
+    jest.useRealTimers();
   });
 
   describe('closeRoom', () => {
@@ -437,6 +448,9 @@ describe('Room Management Handler', () => {
       hostSocket.clearTracking();
 
       await hostSocket.receiveEvent('closeRoom', {});
+
+      // Flush throttled broadcast
+      jest.advanceTimersByTime(500);
 
       expect(hostSocket.getEmittedEvents()).toContainEvent('activeRooms');
     });
@@ -524,6 +538,7 @@ describe('Handler Integration', () => {
   });
 
   beforeEach(() => {
+    _resetBroadcastThrottle();
     env = createTestEnvironment();
     jest.useFakeTimers({ advanceTimers: true });
   });

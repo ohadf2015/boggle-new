@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { translations } from '@/translations';
@@ -10,8 +10,12 @@ interface PageParams {
   params: Promise<{ locale: string; puzzleCode: string }>;
 }
 
-// Loading fallback component using unified PageLoader
-const LoadingFallback = () => <PageLoader text="Loading Custom Puzzle..." />;
+// Loading fallback component - flex-1 fills parent, PageLoader centers within
+const LoadingFallback = () => (
+  <div className="flex-1 flex items-center justify-center bg-neo-navy">
+    <PageLoader size="lg" text="Loading Custom Puzzle..." />
+  </div>
+);
 
 // Dynamic import for code splitting (client component)
 const CustomPuzzleGame = dynamicImport(() => import('@/components/custom-puzzle/CustomPuzzleGame'), {
@@ -28,10 +32,8 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const { locale } = await params;
   const supportedLocales = Object.keys(translations);
   const validLocale = (supportedLocales.includes(locale) ? locale : 'en') as Locale;
-  const t = translations[validLocale] as Record<string, unknown>;
 
-   
-  const customPuzzle = (t as any).customPuzzle || {};
+  const customPuzzle = (translations[validLocale] as any).customPuzzle || {};
   const title = customPuzzle.title || 'Custom Puzzle';
   const description = customPuzzle.description || 'Can you solve this custom word puzzle?';
 

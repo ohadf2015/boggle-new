@@ -122,7 +122,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
 
         {/* Empty State */}
         {displayWords.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8 text-neo-cream/40">
+          <div className="flex flex-col items-center justify-center py-8 text-neo-cream/70">
             <List className="w-8 h-8 mb-2 opacity-50" />
             <span className="text-sm">{t('singlePlayer.noWordsYet')}</span>
           </div>
@@ -275,7 +275,7 @@ const WordLengthDistribution: React.FC<WordLengthDistributionProps> = ({ words }
               )}
               style={{ height: `${height}%`, minHeight: count > 0 ? '4px' : '0' }}
             />
-            <span className="text-[8px] text-neo-cream/40">{len}</span>
+            <span className="text-[8px] text-neo-cream/70">{len}</span>
           </div>
         );
       })}

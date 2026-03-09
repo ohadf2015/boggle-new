@@ -30,7 +30,7 @@ describe('Card Component', () => {
       const { container } = render(<Card>Test Card</Card>);
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('bg-neo-cream');
+      expect(card).toHaveClass('bg-neo-navy');
       expect(card).toHaveClass('border-4');
       expect(card).toHaveClass('shadow-hard-lg');
       expect(card).toHaveClass('cq-container');
@@ -64,7 +64,7 @@ describe('Card Component', () => {
       const { container } = render(<CardVariant>Test Card</CardVariant>);
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('bg-neo-cream');
+      expect(card).toHaveClass('bg-neo-gray');
       expect(card).toHaveClass('shadow-hard-lg');
       expect(card).toHaveClass('border-4');
     });
@@ -73,7 +73,7 @@ describe('Card Component', () => {
       const { container } = render(<CardVariant variant="dark">Test Card</CardVariant>);
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('bg-neo-gray');
+      expect(card).toHaveClass('bg-neo-black');
       expect(card).toHaveClass('text-neo-white');
       expect(card).toHaveClass('border-4');
     });
@@ -252,7 +252,7 @@ describe('Card Component', () => {
       );
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('bg-neo-gray');
+      expect(card).toHaveClass('bg-neo-black');
       expect(card).toHaveClass('custom-class');
     });
   });

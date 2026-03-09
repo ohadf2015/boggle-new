@@ -140,21 +140,24 @@ describe('Race Condition Fixes', () => {
 
       // Simulate Word Hunt state
       const game = getGame('WH_TEST');
-      (game as any).wordHuntState = {
+      game!.wordHuntState = {
         targetWord: 'EXAMPLE',
         targetFoundBy: 'p1',
-        targetLength: 7,
+        targetWordLength: 7,
+        eliminatedPlayers: [],
+        playerLives: {},
       };
-      (game as any).blastModeState = {
+      game!.blastModeState = {
         overlay: [],
         seed: 42,
+        playerMoves: {},
       };
 
       resetGameForNewRound('WH_TEST');
 
       const resetGame = getGame('WH_TEST');
-      expect((resetGame as any).wordHuntState).toBeNull();
-      expect((resetGame as any).blastModeState).toBeNull();
+      expect(resetGame!.wordHuntState).toBeNull();
+      expect(resetGame!.blastModeState).toBeNull();
     });
 
     test('should clear playerWordDetails on reset', () => {

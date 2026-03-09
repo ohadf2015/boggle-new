@@ -2,9 +2,9 @@ import { cn } from '@/lib/utils';
 
 /** Rank badge color classes for top 3 places (1-indexed). */
 const RANK_BADGE_COLORS = [
-  'bg-amber-400 text-neo-black border-amber-600',   // 1st - gold
-  'bg-slate-300 text-neo-black border-slate-500',    // 2nd - silver
-  'bg-orange-300 text-neo-black border-orange-500',  // 3rd - bronze
+  'bg-tier-gold text-neo-black border-tier-gold-border',   // 1st - gold
+  'bg-neo-cream/30 text-neo-black border-neo-gray',       // 2nd - silver
+  'bg-tier-bronze text-neo-black border-tier-bronze-border', // 3rd - bronze
 ] as const;
 
 export { RANK_BADGE_COLORS };

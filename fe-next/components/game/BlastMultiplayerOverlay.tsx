@@ -45,7 +45,7 @@ export function BlastMultiplayerOverlay({ overlay, gridSize }: BlastMultiplayerO
             key={`${tile.row}-${tile.col}`}
             data-testid={`blast-tile-${tile.row}-${tile.col}`}
             className="absolute flex items-start justify-end"
-            style={{ left, top, width, height }}
+            style={{ insetInlineStart: left, top, width, height }}
           >
             <span className="text-xs leading-none opacity-90">
               {icon}

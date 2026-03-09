@@ -247,6 +247,7 @@ export function BlastGameLayout({
   }, [isMultiplayer, isComplete]);
 
   // Combo-based grid glow color
+  // Glow shadows are symmetric (0 x-offset) so they work in both LTR and RTL
   const comboGlow = comboLevel >= 7
     ? 'shadow-[0_0_20px_rgba(255,0,255,0.4)]'
     : comboLevel >= 5
@@ -270,7 +271,7 @@ export function BlastGameLayout({
       <ScreenFlashOverlay trigger={wordsFound.length} />
 
       {/* Header */}
-      <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pt-4 pb-2">
+      <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pb-1" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)' }}>
         <Button
           variant="destructive"
           size="sm"
@@ -329,7 +330,7 @@ export function BlastGameLayout({
       </header>
 
       {/* Combo Display */}
-      <div className="h-8 flex items-center justify-center shrink-0 relative z-30">
+      <div className="h-6 flex items-center justify-center shrink-0 relative z-30">
         <ComboDisplay
           comboLevel={comboLevel}
           compact
@@ -348,7 +349,7 @@ export function BlastGameLayout({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute top-32 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            className="absolute top-16 short:top-8 sm:top-32 start-1/2 -translate-x-1/2 z-50 pointer-events-none"
           >
             <BlastCascadeWordBanner highlightData={cascadeHighlightData} />
           </motion.div>
@@ -363,7 +364,7 @@ export function BlastGameLayout({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 1.5, y: -10 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="absolute top-32 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            className="absolute top-32 start-1/2 -translate-x-1/2 z-50 pointer-events-none"
           >
             <div className={cn(
               'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-xl uppercase tracking-wider',
@@ -378,7 +379,7 @@ export function BlastGameLayout({
       </AnimatePresence>
 
       {/* Stats row: Score (left), Words (center), Progress (right) */}
-      <div className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-2 max-w-md mx-auto w-full">
+      <div className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-1 max-w-md mx-auto w-full">
         {/* Score */}
         <motion.div
           key={score}
@@ -413,7 +414,7 @@ export function BlastGameLayout({
           className="text-center cursor-pointer hover:scale-105 transition-transform"
         >
           <div className="font-black text-white text-xl sm:text-2xl">{wordsFound.length}</div>
-          <div className="font-bold uppercase tracking-wider text-white/50 text-[10px] sm:text-xs">
+          <div className="font-bold uppercase tracking-wider text-white/70 text-[10px] sm:text-xs">
             {t('common.words')}
           </div>
         </button>
@@ -434,7 +435,7 @@ export function BlastGameLayout({
       {/* Score threshold progress (visible on wave 3+) */}
       {scoreThreshold && score < scoreThreshold && (
         <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
-          <div className="text-[10px] font-bold text-white/40 uppercase tracking-wider text-center">
+          <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider text-center">
             {t('blast.needScore')} {scoreThreshold - score} {t('blast.morePoints')}
           </div>
         </div>
@@ -460,12 +461,12 @@ export function BlastGameLayout({
       <div className={cn(
         'flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-2',
         'max-w-[360px] mx-auto w-full overflow-visible',
-        'min-h-[48px] rounded-neo',
+        'min-h-[40px] rounded-neo',
         formedWord ? 'bg-white/5 border border-white/10' : ''
       )}>
         <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
         {formedWord && (
-          <span className="absolute end-3 text-[10px] font-bold text-white/40 tabular-nums">
+          <span className="absolute end-3 text-[10px] font-bold text-white/60 tabular-nums">
             {formedWord.length}
           </span>
         )}
@@ -539,10 +540,10 @@ export function BlastGameLayout({
       </AnimatePresence>
 
       {/* Game grid with overlays */}
-      <div className={cn('flex-1 flex flex-col items-center justify-start px-4 pt-2 relative z-30 min-h-0 transition-shadow duration-500', comboGlow)}>
+      <div className={cn('flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0 transition-shadow duration-500', comboGlow)}>
         {/* Cascade chain counter — shown above grid during active cascades */}
         {cascadeChainLevel > 0 && (
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+          <div className="absolute top-2 start-1/2 -translate-x-1/2 z-50 pointer-events-none">
             <BlastChainCounter chainLevel={cascadeChainLevel} />
           </div>
         )}
@@ -616,7 +617,7 @@ export function BlastGameLayout({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.8 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+              className="absolute top-4 start-1/2 -translate-x-1/2 z-50 pointer-events-none"
             >
               <div className={cn(
                 'px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',

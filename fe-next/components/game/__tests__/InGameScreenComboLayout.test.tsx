@@ -178,7 +178,7 @@ describe('InGameScreen Combo Layout', () => {
       const comboRow = screen.getByTestId('combo-row-mobile');
       expect(comboRow).toBeInTheDocument();
       // But content is empty (ComboDisplay returns null for level 0)
-      expect(comboRow).not.toHaveTextContent(/Combo/);
+      expect(comboRow).not.toHaveTextContent(/game\.combo/);
     });
   });
 
@@ -227,7 +227,7 @@ describe('InGameScreen Combo Layout', () => {
       render(<FixedStatsRowTestComponent comboLevel={0} />);
 
       // ComboDisplay returns null when level < 1
-      expect(screen.queryByText(/Combo/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/game\.combo/)).not.toBeInTheDocument();
     });
 
     it('shows combo when level is 1 or higher', () => {
@@ -235,7 +235,7 @@ describe('InGameScreen Combo Layout', () => {
 
       // Mobile combo row should contain combo text
       const comboRow = screen.getByTestId('combo-row-mobile');
-      expect(comboRow).toHaveTextContent(/Combo/);
+      expect(comboRow).toHaveTextContent(/game\.combo/);
     });
 
     it('shows x2 combo text for level 2', () => {

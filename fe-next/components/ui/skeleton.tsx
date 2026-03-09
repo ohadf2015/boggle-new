@@ -81,10 +81,9 @@ export const NeoSkeleton = memo(function NeoSkeleton({
         className="absolute inset-0"
         style={{
           background: `linear-gradient(90deg, transparent 0%, rgba(255, 225, 53, 0.08) 50%, transparent 100%)`,
-          backgroundSize: '200% 100%',
         }}
         animate={{
-          backgroundPosition: ['200% 0', '-200% 0'],
+          x: ['-100%', '100%'],
         }}
         transition={{
           duration: 1.5,

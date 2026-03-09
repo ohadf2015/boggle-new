@@ -87,7 +87,7 @@ export function BlastWaveIntro({
         transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 24 }}
         className="flex flex-col gap-2 max-w-xs w-full"
       >
-        <div className="text-xs font-bold text-white/50 uppercase tracking-widest text-center mb-1">
+        <div className="text-xs font-bold text-white/70 uppercase tracking-widest text-center mb-1">
           {t('blast.waveIntro.objectives')}
         </div>
         {objectives.map((obj, idx) => (

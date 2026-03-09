@@ -54,7 +54,7 @@ export function GameRow({ game, t }: GameRowProps) {
           <span className="text-sm text-slate-300">{formatTime(game.created_at)}</span>
         </div>
       </td>
-      <td className="px-4 py-3">
+      <td className="px-2 sm:px-4 py-3">
         <div className="flex items-center gap-2">
           {game.is_guest ? (
             <User className="w-4 h-4 text-slate-400" />
@@ -74,13 +74,13 @@ export function GameRow({ game, t }: GameRowProps) {
           )}
         </div>
       </td>
-      <td className="px-4 py-3">
+      <td className="hidden sm:table-cell px-4 py-3">
         <div className="flex items-center gap-2">
           {typeIcon}
           <span className="text-sm text-slate-300">{getTypeLabel()}</span>
         </div>
       </td>
-      <td className="px-4 py-3">
+      <td className="hidden sm:table-cell px-4 py-3">
         <span className="text-lg">{flag}</span>
       </td>
       <td className="px-4 py-3">
@@ -92,7 +92,7 @@ export function GameRow({ game, t }: GameRowProps) {
       <td className="px-4 py-3">
         <span className="text-sm text-slate-300">{formatDuration(game.time_played)}</span>
       </td>
-      <td className="px-4 py-3">
+      <td className="hidden md:table-cell px-4 py-3">
         <span className="font-mono text-xs text-slate-400">{game.game_code}</span>
       </td>
     </motion.tr>

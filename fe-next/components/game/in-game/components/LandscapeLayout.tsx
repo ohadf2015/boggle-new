@@ -378,7 +378,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
             </div>
 
             {isPlaying && leaderboard.length > 1 && (
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[280px]">
+              <div className="absolute top-2 start-1/2 -translate-x-1/2 z-30 w-auto max-w-[280px]">
                 <CompactLeaderboard
                   players={leaderboard.map((p, index) => ({
                     username: p.username,
@@ -419,7 +419,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
           <div
             className="row-start-2 col-span-3 z-30 flex justify-between items-end px-2 pb-2"
             style={{
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)',
             }}
           >
             <div className="flex flex-col items-start gap-1">
@@ -445,7 +445,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                     <AdaptiveMotion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 0.6 }}
-                      className="text-[10px] text-neo-cream/50 text-center leading-tight"
+                      className="text-[10px] text-neo-cream/50 text-start leading-tight"
                     >
                       <span className="text-neo-cyan">⚡</span>{' '}
                       {t('game.comboHint')}

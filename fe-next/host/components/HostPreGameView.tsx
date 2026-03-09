@@ -513,7 +513,7 @@ function HostPreGameView({
         {/* Advanced Settings Toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="relative w-full mt-3 py-1 flex items-center justify-center gap-1 text-xs font-black uppercase border-t border-neo-white/10 pt-3 text-neo-cream/40 hover:text-neo-cream transition-colors"
+          className="relative w-full mt-3 py-1 flex items-center justify-center gap-1 text-xs font-black uppercase border-t border-neo-white/10 pt-3 text-neo-cream/70 hover:text-neo-cream transition-colors"
           aria-expanded={showAdvanced}
           aria-controls="advanced-settings-panel"
         >

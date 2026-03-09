@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { getComboColors } from './comboColors';
@@ -14,9 +14,6 @@ interface ComboIndicatorProps {
 
 // Total animation duration - badge shows then auto-dismisses
 const TOTAL_DURATION = 2800; // ms - visible long enough to appreciate
-const ENTRANCE_DURATION = 0.3; // seconds - quick pop in
-const VISIBLE_DURATION = 1400; // ms - hold time at full visibility
-const EXIT_DURATION = 0.2; // seconds - fast exit
 
 // Sparkle particle component
 const Sparkle: React.FC<{
@@ -131,8 +128,20 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
 
   const comboColors = getComboColors(comboLevel);
   const controls = useAnimation();
-  const [visibleCombo, setVisibleCombo] = useState<number | null>(null);
-  const [animationKey, setAnimationKey] = useState(0);
+  // Batch visibleCombo + animationKey — they always update together when combo fires
+  type ComboDisplayState = { visibleCombo: number | null; animationKey: number };
+  type ComboDisplayAction = { type: 'show'; combo: number } | { type: 'dismiss' };
+  const [comboDisplay, dispatchComboDisplay] = useReducer(
+    (state: ComboDisplayState, action: ComboDisplayAction): ComboDisplayState => {
+      switch (action.type) {
+        case 'show': return { visibleCombo: action.combo, animationKey: state.animationKey + 1 };
+        case 'dismiss': return { ...state, visibleCombo: null };
+        default: return state;
+      }
+    },
+    { visibleCombo: null, animationKey: 0 }
+  );
+  const { visibleCombo, animationKey } = comboDisplay;
   const [sparkleData, setSparkleData] = useState<{ angle: number; distance: number }[]>([]);
 
   // Generate random sparkle data when animationKey changes
@@ -152,12 +161,12 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   // Show combo indicator and auto-dismiss
   useEffect(() => {
     if (comboLevel > 0 && comboColors.text) {
-      setVisibleCombo(comboLevel);
-      setAnimationKey((k) => k + 1);
+      // dispatch batches visibleCombo + animationKey in one update
+      dispatchComboDisplay({ type: 'show', combo: comboLevel });
 
       // Auto-dismiss after animation completes
       const timer = setTimeout(() => {
-        setVisibleCombo(null);
+        dispatchComboDisplay({ type: 'dismiss' });
       }, TOTAL_DURATION);
 
       return () => clearTimeout(timer);

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import type { UnifiedGame, SortField, SortOrder, GamesResponse } from '../types';
@@ -35,7 +34,7 @@ export function GamesTable({
   return (
     <>
       <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
-        <table className="w-full min-w-[800px]">
+        <table className="w-full min-w-[600px] sm:min-w-[800px]">
           <thead className="bg-slate-700/50">
             <tr>
               <SortableHeader
@@ -46,13 +45,13 @@ export function GamesTable({
                 onSort={onSort}
                 isRTL={isRTL}
               />
-              <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+              <th className="px-2 sm:px-4 py-3 text-left text-sm font-neo-display text-slate-300">
                 {t('admin.todayGames.player')}
               </th>
-              <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+              <th className="hidden sm:table-cell px-4 py-3 text-left text-sm font-neo-display text-slate-300">
                 {t('admin.todayGames.type')}
               </th>
-              <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+              <th className="hidden sm:table-cell px-4 py-3 text-left text-sm font-neo-display text-slate-300">
                 {t('admin.todayGames.language')}
               </th>
               <SortableHeader
@@ -79,7 +78,7 @@ export function GamesTable({
                 onSort={onSort}
                 isRTL={isRTL}
               />
-              <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+              <th className="hidden md:table-cell px-4 py-3 text-left text-sm font-neo-display text-slate-300">
                 {t('admin.todayGames.code')}
               </th>
             </tr>

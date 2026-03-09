@@ -347,6 +347,12 @@ export function useMultiplayerSocket(
         socketInstance.emit('debugGameState');
       }
 
+      // Treat word processing errors as transient — don't bubble as a fatal error
+      if (data?.code === 'WORD_PROCESSING_ERROR') {
+        logger.log('[SOCKET.IO] Word processing error (transient) — player can retry');
+        return;
+      }
+
       onError(data);
     });
 

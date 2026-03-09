@@ -129,7 +129,12 @@ export function QuestCard({
         onTouchEnd={tiltHandlers.onTouchEnd}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+          }
+        }}
         className={cn(
           'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black',
           'shadow-hard overflow-hidden cursor-pointer',

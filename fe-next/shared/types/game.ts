@@ -226,6 +226,25 @@ export interface Game {
   totalBoardWords?: number;
   /** Players who confirmed ready for next game */
   playersReadyForNextGame?: Record<string, boolean>;
+  /** Blast mode state (present during blast games) */
+  blastModeState?: {
+    overlay: BlastTileOverlay[];
+    seed: number | null;
+    playerMoves: Record<string, number>;
+    playerBonusMoves: Record<string, number>;
+    [key: string]: unknown;
+  } | null;
+  /** Word hunt state (present during word-hunt games) */
+  wordHuntState?: {
+    targetWord: string;
+    targetWordLength: number;
+    targetFoundBy: string | null;
+    eliminatedPlayers: string[];
+    playerLives: Record<string, number>;
+    isFirstFinderClaimed: boolean;
+    discoveryWordCount?: number;
+    [key: string]: unknown;
+  } | null;
 }
 
 export interface ActiveRoom {
@@ -251,6 +270,7 @@ export interface WordHuntModeState {
   eliminatedPlayers: string[];
   targetFoundBy: string | null;
   isFirstFinderClaimed: boolean;
+  discoveryWordCount?: number;
 }
 
 // ==================== Tournament Types ====================

@@ -1,10 +1,10 @@
 'use client';
 
 import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion';
-import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { memo, useState, useCallback, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { MASCOT_IMAGES, MascotVariant, getMascotImagePath, isGifVariant } from './Mascot';
+import { MascotVariant, getMascotImagePath, isGifVariant } from './Mascot';
 import {
   getBaseVariant,
   type ExtendedMascotVariant,
@@ -457,7 +457,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
       <motion.div
         data-testid="interactive-mascot"
         data-variant={variant}
-        className={`relative ${sizeClassName || SIZE_CLASSES[size]} ${isInteractive ? 'cursor-pointer' : ''}`}
+        className={`relative ${sizeClassName || SIZE_CLASSES[size]} ${isInteractive ? 'cursor-pointer' : ''} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}

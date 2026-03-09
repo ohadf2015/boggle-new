@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';

@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,7 +20,7 @@ import type { BossIntroProps } from '@/types/boss';
 // COMPONENT
 // ==============================================
 
-const BossIntro = memo<BossIntroProps>(({ boss, worldNumber, onStart, onSkip }) => {
+const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onStart, onSkip }) => {
   const { t } = useLanguage();
   const bossFightTheme = useBossFightTheme();
 

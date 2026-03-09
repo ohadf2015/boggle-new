@@ -173,16 +173,19 @@ export async function calculateAndBroadcastFinalScores(
   }
 
   // Build word hunt summary if applicable
-  const huntState = game.gameMode === 'word-hunt' ? (game as any).wordHuntState : null;
+  const huntState = game.gameMode === 'word-hunt' ? game.wordHuntState : null;
   const wordHuntSummary = huntState ? {
     targetWord: huntState.targetWord,
     playerLives: huntState.playerLives as Record<string, number>,
     eliminatedPlayers: huntState.eliminatedPlayers as string[],
     targetFoundBy: huntState.targetFoundBy as string | null,
+    foundTarget: !!huntState.targetFoundBy,
+    survivalTime: game.gameDuration || 0,
+    discoveryWords: huntState.discoveryWordCount || 0,
   } : undefined;
 
   // Build blast mode summary if applicable
-  const blastState = game.gameMode === 'blast' ? (game as any).blastModeState : null;
+  const blastState = game.gameMode === 'blast' ? game.blastModeState : null;
   const blastSummary = blastState ? {
     playerMoves: blastState.playerMoves as Record<string, number>,
   } : undefined;

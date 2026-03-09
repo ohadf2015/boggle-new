@@ -124,7 +124,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                       required
                       autoFocus
                       className={cn(
-                        "h-14 text-lg pr-12 bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
+                        "h-14 text-lg pe-12 bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
                         usernameError && "border-neo-pink bg-neo-pink/20 text-neo-pink"
                       )}
                       placeholder={t('joinView.playerNamePlaceholder')}

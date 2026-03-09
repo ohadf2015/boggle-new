@@ -229,7 +229,7 @@ function ShortcutSection({ icon, title, children }: ShortcutSectionProps) {
           {title}
         </h3>
       </div>
-      <div className="space-y-2 pl-7">{children}</div>
+      <div className="space-y-2 ps-7">{children}</div>
     </div>
   );
 }

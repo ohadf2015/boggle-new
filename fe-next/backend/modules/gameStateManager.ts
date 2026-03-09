@@ -218,8 +218,8 @@ function resetGameForNewRound(gameCode: string): boolean {
   game.letterGrid = null;
   game.lastActivity = Date.now();
   game.gameEndedAt = null;
-  (game as any).wordHuntState = null;
-  (game as any).blastModeState = null;
+  game.wordHuntState = null;
+  game.blastModeState = null;
   game.gameSessionId = (game.gameSessionId || 0) + 1;
 
   persistGameState(gameCode);

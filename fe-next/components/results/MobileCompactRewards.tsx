@@ -72,7 +72,7 @@ const MobileCompactRewards: React.FC<MobileCompactRewardsProps> = memo(({
             +{coins}
           </span>
           {!isAuthenticated && (
-            <span className="text-[10px] text-white/40">
+            <span className="text-[10px] text-white/60">
               {t('coins.signInShort')}
             </span>
           )}

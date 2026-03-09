@@ -86,9 +86,9 @@ export function RealTimeDuelGame({
   const [currentWord, setCurrentWord] = useState('');
   const [words, setWords] = useState<WordStatus[]>([]);
   const [myScore, setMyScore] = useState(0);
-  const [myWordCount, setMyWordCount] = useState(0);
+  const [_myWordCount, setMyWordCount] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
-  const [opponentWordCount, setOpponentWordCount] = useState(0);
+  const [_opponentWordCount, setOpponentWordCount] = useState(0);
   const [isDisconnected, setIsDisconnected] = useState(false);
   const [gracePeriodSeconds, setGracePeriodSeconds] = useState(30);
   const [showForfeitDialog, setShowForfeitDialog] = useState(false);

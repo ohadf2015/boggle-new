@@ -117,7 +117,12 @@ export function SectionEditor({
         onClick={() => setIsExpanded(!isExpanded)}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && setIsExpanded(!isExpanded)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded(!isExpanded);
+          }
+        }}
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">🧩</span>

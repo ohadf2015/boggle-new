@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Lightbulb, TrendingUp, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -77,8 +77,6 @@ export default function BuzzGameScreen({
   const [startTime] = useState(() => Date.now());
   const [challengeStartTime, setChallengeStartTime] = useState(() => Date.now());
 
-  // Draft answers for bidirectional navigation
-  const [draftAnswers, setDraftAnswers] = useState<Map<number, string>>(new Map());
   // Track which challenges used hints
   const [hintsUsed, setHintsUsed] = useState<Set<number>>(new Set());
   // Track answered challenges
@@ -151,7 +149,6 @@ export default function BuzzGameScreen({
   });
 
   const currentChallenge = challengeData.challenges[currentIndex];
-  const isLastChallenge = currentIndex === challengeData.challenges.length - 1;
 
   // Restore hint state when navigating to a challenge
   useEffect(() => {
@@ -215,13 +212,6 @@ export default function BuzzGameScreen({
         timeTakenSeconds: timeTaken,
       };
       setAnswers((prev) => [...prev, answerRecord]);
-
-      // Clear draft answer for this challenge
-      setDraftAnswers((prev) => {
-        const next = new Map(prev);
-        next.delete(currentIndex);
-        return next;
-      });
 
       // Check if this completes a perfect game (all correct)
       const allAnswered = answers.length + 1 === challengeData.challenges.length;

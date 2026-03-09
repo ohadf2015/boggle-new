@@ -221,6 +221,12 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
         role={hasInvalidReason ? "button" : undefined}
         aria-label={hasInvalidReason ? `${displayWord}: ${displayReason}` : undefined}
         tabIndex={hasInvalidReason ? 0 : undefined}
+        onKeyDown={hasInvalidReason ? (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        } : undefined}
       >
         {label}
         {/* Show info icon for invalid words with reason - indicates it's tappable */}

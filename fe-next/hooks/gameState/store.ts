@@ -97,6 +97,8 @@ interface GameState {
   // Blast multiplayer state
   blastTileOverlay: BlastTileOverlay[];
   blastMovesUsed: number;
+  blastTotalTileBonus: number;
+  blastTotalTilesCleared: number;
   /** Seeded PRNG seed from server for deterministic multiplayer refills */
   blastSeed: number | null;
   /** Pending combo sync from another player — triggers BlastComboFlash for spectators */
@@ -171,6 +173,8 @@ interface GameActions {
   // Blast multiplayer actions
   setBlastTileOverlay: (value: BlastTileOverlay[] | ((prev: BlastTileOverlay[]) => BlastTileOverlay[])) => void;
   setBlastMovesUsed: (value: number | ((prev: number) => number)) => void;
+  setBlastTotalTileBonus: (value: number | ((prev: number) => number)) => void;
+  setBlastTotalTilesCleared: (value: number | ((prev: number) => number)) => void;
   setBlastSeed: (value: number | null | ((prev: number | null) => number | null)) => void;
   setBlastComboSync: (value: { comboType: string; username: string; id: string } | null) => void;
 
@@ -244,6 +248,8 @@ const initialState: GameState = {
   gameMode: 'classic',
   blastTileOverlay: [],
   blastMovesUsed: 0,
+  blastTotalTileBonus: 0,
+  blastTotalTilesCleared: 0,
   blastSeed: null,
   blastComboSync: null,
   wordHuntTargetLength: 0,
@@ -490,6 +496,14 @@ export const useGameStore = create<GameStore>()(
       blastMovesUsed: applySetState(value, state.blastMovesUsed)
     })),
 
+    setBlastTotalTileBonus: (value) => set((state) => ({
+      blastTotalTileBonus: applySetState(value, state.blastTotalTileBonus)
+    })),
+
+    setBlastTotalTilesCleared: (value) => set((state) => ({
+      blastTotalTilesCleared: applySetState(value, state.blastTotalTilesCleared)
+    })),
+
     setBlastSeed: (value) => set((state) => ({
       blastSeed: applySetState(value, state.blastSeed)
     })),
@@ -546,8 +560,7 @@ export const useGameStore = create<GameStore>()(
     // ==========================================
 
     batchStartGame: (data) => {
-      set((state) => ({
-        ...state,
+      set(() => ({
         foundWords: [],
         achievements: [],
         ...(data.letterGrid !== undefined && { letterGrid: data.letterGrid }),
@@ -601,6 +614,12 @@ export const useGameStore = create<GameStore>()(
         wordHuntMyLife: 100,
         wordHuntDiscoveryClues: [],
         wordHuntKnownLetters: [],
+        blastTileOverlay: [],
+        blastMovesUsed: 0,
+        blastTotalTileBonus: 0,
+        blastTotalTilesCleared: 0,
+        blastSeed: null,
+        blastComboSync: null,
         combo: DEFAULT_COMBO_STATE,
       });
     },
@@ -631,6 +650,8 @@ export const useGameStore = create<GameStore>()(
         levelUpData: null,
         blastTileOverlay: [],
         blastMovesUsed: 0,
+        blastTotalTileBonus: 0,
+        blastTotalTilesCleared: 0,
         blastSeed: null,
         blastComboSync: null,
         wordHuntTargetLength: 0,
@@ -705,6 +726,8 @@ export const useGameMode = () => useGameStore((state) => state.gameMode);
 // Blast multiplayer selectors
 export const useBlastTileOverlay = () => useGameStore((state) => state.blastTileOverlay);
 export const useBlastMovesUsed = () => useGameStore((state) => state.blastMovesUsed);
+export const useBlastTotalTileBonus = () => useGameStore((state) => state.blastTotalTileBonus);
+export const useBlastTotalTilesCleared = () => useGameStore((state) => state.blastTotalTilesCleared);
 export const useBlastSeed = () => useGameStore((state) => state.blastSeed);
 export const useBlastComboSync = () => useGameStore((state) => state.blastComboSync);
 
@@ -766,6 +789,8 @@ const getActions = (state: GameStore) => ({
   setGameMode: state.setGameMode,
   setBlastTileOverlay: state.setBlastTileOverlay,
   setBlastMovesUsed: state.setBlastMovesUsed,
+  setBlastTotalTileBonus: state.setBlastTotalTileBonus,
+  setBlastTotalTilesCleared: state.setBlastTotalTilesCleared,
   setBlastSeed: state.setBlastSeed,
   setBlastComboSync: state.setBlastComboSync,
   setWordHuntTargetLength: state.setWordHuntTargetLength,

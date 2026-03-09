@@ -315,14 +315,14 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
     </div>
   );
 
-  const renderStepContent = (): React.ReactNode => {
+  const stepContent = (() => {
     switch (activeStep.id) {
       case 'basics': return renderBasicsContent();
       case 'grid': return renderGridContent();
       case 'scoring': return renderScoringContent();
       default: return null;
     }
-  };
+  })();
 
   return (
     <motion.div
@@ -402,7 +402,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               exit={{ opacity: 0, x: isRTL ? 20 : -20 }}
               transition={{ duration: 0.15 }}
             >
-              {renderStepContent()}
+              {stepContent}
             </motion.div>
           </AnimatePresence>
         </motion.div>

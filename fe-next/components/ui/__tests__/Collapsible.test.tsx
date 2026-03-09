@@ -257,7 +257,7 @@ describe('Collapsible', () => {
       );
 
       const button = container.querySelector('button');
-      expect(button?.className).toContain('bg-slate-800');
+      expect(button?.className).toContain('bg-neo-navy');
     });
   });
 

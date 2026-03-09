@@ -158,10 +158,13 @@ export function useHostWordEvents({
       }
     };
 
-    // Handle blast word accepted (update moves counter for host)
+    // Handle blast word accepted (update moves counter and accumulated stats for host)
     const handleBlastWordAccepted = (data: BlastWordAcceptedPayload) => {
       if (hostPlaying) {
-        useGameStore.getState().setBlastMovesUsed(data.movesUsed);
+        const store = useGameStore.getState();
+        store.setBlastMovesUsed(data.movesUsed);
+        store.setBlastTotalTileBonus(prev => prev + (data.tileBonus || 0));
+        store.setBlastTotalTilesCleared(prev => prev + (data.tilesCleared?.length || 0));
       }
     };
 

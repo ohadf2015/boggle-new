@@ -291,7 +291,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         gameLanguage={gameLanguage}
       />
 
-      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out pb-16 lg:pb-4">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -336,7 +336,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center relative min-h-[110px] md:min-h-[120px] lg:min-h-[110px]"
+                className="flex w-full items-center justify-center relative min-h-[70px] short:min-h-[60px] md:min-h-[100px] lg:min-h-[110px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -371,7 +371,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 {/* Right Side: Score (mobile) - positioned absolutely to not affect timer centering */}
                 {isPlaying && (
                   <div
-                    className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 lg:hidden"
+                    className="absolute end-1 md:end-2 top-1/2 -translate-y-1/2 lg:hidden"
                     data-testid="score-mobile"
                   >
                     <ScoreDisplay
@@ -388,7 +388,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 {/* Desktop: Combo + Score */}
                 {isPlaying && (
                   <div
-                    className="hidden lg:flex lg:flex-col lg:items-end lg:gap-2 lg:absolute lg:right-4 rtl:lg:right-auto rtl:lg:left-4 lg:top-1/2 lg:-translate-y-1/2 z-30"
+                    className="hidden lg:flex lg:flex-col lg:items-end lg:gap-2 lg:absolute lg:end-4 lg:top-1/2 lg:-translate-y-1/2 z-30"
                     data-testid="combo-desktop"
                   >
                     <div className="h-[32px] flex items-center justify-end">
@@ -403,7 +403,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                         <AdaptiveMotion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 0.5 }}
-                          className="text-[10px] text-neo-cream/40 text-right leading-tight max-w-[70px]"
+                          className="text-[10px] text-neo-cream/70 text-right leading-tight max-w-[70px]"
                         >
                           <span className="text-neo-cyan/60">⚡</span>{' '}
                           {t('game.comboHint')}
@@ -555,7 +555,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Mobile: Split-view with compact leaderboard + words */}
           {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-1 flex-shrink-0 overflow-hidden max-h-[120px]">
+            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 flex-shrink-0 overflow-y-auto max-h-[120px] short:max-h-[80px]">
               <CompactLeaderboard
                 players={leaderboard.map((p) => ({
                   username: p.username,

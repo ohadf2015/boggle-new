@@ -10,6 +10,7 @@
  */
 
 const { createTestEnvironment, customMatchers } = require('../helpers/socketTestHelper');
+const { _resetBroadcastThrottle } = require('../../utils/socketHelpers');
 
 // Add custom matchers
 expect.extend(customMatchers);
@@ -28,6 +29,7 @@ describe('Game Flow Integration', () => {
   });
 
   beforeEach(() => {
+    _resetBroadcastThrottle();
     env = createTestEnvironment();
     // Clear rate limiter state between tests
     jest.useFakeTimers({ advanceTimers: true });

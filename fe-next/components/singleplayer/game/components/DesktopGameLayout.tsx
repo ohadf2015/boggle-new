@@ -297,7 +297,7 @@ export function DesktopGameLayout({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-2 left-4 right-4 z-40"
+                  className="absolute top-2 start-4 end-4 z-40"
                 >
                   <div className="relative bg-gradient-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-6 rounded-lg border-3 border-neo-black shadow-hard-sm">
                     <span className="font-bold text-sm uppercase tracking-wide">

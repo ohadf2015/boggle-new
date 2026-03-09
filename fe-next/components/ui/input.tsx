@@ -13,20 +13,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         type={type}
         className={cn(
           // Base styling
-          "flex h-11 w-full px-4 py-2 text-sm font-medium",
+          "flex h-11 w-full px-4 py-2 text-base font-medium",
           // Neo-Brutalist: thick border, hard shadow
-          "rounded-neo border-3 border-neo-black dark:border-slate-500",
-          "bg-neo-cream dark:bg-slate-700 text-slate-900 dark:text-white",
+          "rounded-neo border-3 border-neo-gray",
+          "bg-neo-gray text-white",
           // Inset shadow for depth
           "shadow-hard-pressed",
           // Placeholder styling
-          "placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:font-normal",
+          "placeholder:text-muted-foreground placeholder:font-normal",
           // Focus state with cyan ring
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
           // Focus: slight "press" effect
           "focus:shadow-hard-pressed",
           // Disabled state
-          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-neo-cream/50 dark:disabled:bg-slate-600/50",
+          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-neo-gray/50",
           // File input styling
           "file:border-0 file:bg-neo-lime file:text-neo-black file:font-bold file:uppercase file:text-xs file:me-3 file:px-3 file:py-1 file:rounded-neo",
           // Transition

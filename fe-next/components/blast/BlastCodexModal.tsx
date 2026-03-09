@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -81,7 +80,7 @@ export function BlastCodexModal({ discoveredCombos, isOpen, onClose }: BlastCode
                     'px-3 py-2 rounded-neo border-3 text-center transition-colors',
                     isDiscovered
                       ? 'bg-neo-yellow/20 border-neo-yellow/60 text-neo-yellow'
-                      : 'bg-gray-800/50 border-gray-600/40 text-white/30',
+                      : 'bg-gray-800/50 border-gray-600/40 text-white/60',
                   ].join(' ')}
                 >
                   <p className="font-neo-display font-black text-xs uppercase leading-tight">

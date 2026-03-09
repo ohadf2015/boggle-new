@@ -16,7 +16,6 @@ import {
   Clock,
   Gem,
   FileText,
-  Trophy,
   Swords,
   Heart,
   Zap,

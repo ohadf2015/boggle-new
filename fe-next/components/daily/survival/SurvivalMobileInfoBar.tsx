@@ -117,7 +117,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
               {myRank ? `#${myRank}` : `${totalPlayers}`}
             </span>
             {totalPlayers > 0 && (
-              <span className="text-[10px] text-neo-cream/40">
+              <span className="text-[10px] text-neo-cream/70">
                 <Users className="w-2.5 h-2.5 inline" /> {totalPlayers}
               </span>
             )}
@@ -132,7 +132,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
             <span data-testid="mobile-info-words-count" className="text-xs font-bold text-neo-lime">
               {discoveredWords.length}
             </span>
-            <span className="text-[10px] text-neo-cream/40">
+            <span className="text-[10px] text-neo-cream/70">
               {t('wordHunt.mobile.words')}
             </span>
           </div>
@@ -224,7 +224,7 @@ const LootTabContent: React.FC<{
 }> = ({ sortedWords, hintStage, triesRemaining, discoveredWordsCount, t }) => (
   <div className="space-y-1">
     {sortedWords.length === 0 ? (
-      <div className="flex flex-col items-center py-4 text-neo-cream/40 text-xs">
+      <div className="flex flex-col items-center py-4 text-neo-cream/70 text-xs">
         <Package className="w-6 h-6 mb-1 opacity-50" />
         <span>{t('wordHunt.desktop.noWordsYet')}</span>
       </div>
@@ -287,7 +287,7 @@ const RanksTabContent: React.FC<{
 }> = ({ entries, totalPlayers, isCurrentPlayer }) => (
   <div className="space-y-1">
     {entries.length === 0 ? (
-      <div className="flex flex-col items-center py-4 text-neo-cream/40 text-xs">
+      <div className="flex flex-col items-center py-4 text-neo-cream/70 text-xs">
         <Trophy className="w-6 h-6 mb-1 opacity-50" />
         <span>Loading ranks...</span>
       </div>

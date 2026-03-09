@@ -317,6 +317,7 @@ const es = {
     "retryNow": "Reintentar ahora"
   },
   "game": {
+    "combo": "Combo",
     "comboHint": "¡Rápido! Encadena palabras",
     "calculatingResults": "Calculando resultados..."
   },
