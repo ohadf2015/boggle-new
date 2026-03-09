@@ -858,6 +858,17 @@ body {
     }
   }
 
+  /* When the grid is inside a sized container (e.g. SurvivalGridSection),
+     size relative to actual available space instead of hardcoded viewport math.
+     This ensures the grid adapts when elements like the life bar are hidden. */
+  .grid-section-container .game-board-frame {
+    --board-size: min(100cqw - 16px, 100cqh - 16px);
+    width: var(--board-size);
+    height: var(--board-size);
+    max-width: var(--board-size);
+    max-height: var(--board-size);
+  }
+
   /* Note: Removed position: relative override that was breaking absolute-positioned grid children */
   .game-board-frame>* {
     z-index: 10;
