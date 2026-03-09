@@ -83,6 +83,16 @@ function initializeSocketHandlers(io: Server): void {
 
         // Register all event handlers for this socket
         registerAllHandlers(io, socket);
+
+        // Allow authenticated clients to join their personal user room for
+        // O(1) targeted broadcasts from socialHelpers.broadcastToUser.
+        socket.on('friends:setAuth', (data: { userId: string }) => {
+          const userId = data?.userId;
+          if (!userId || typeof userId !== 'string') return;
+          (socket as any).authUserId = userId;
+          socket.join(`user:${userId}`);
+          logger.debug('SOCKET', `Socket ${socket.id} joined user room user:${userId}`);
+        });
       })
       .catch((err: Error) => {
         // On Redis error, allow connection (fail open)
@@ -90,6 +100,14 @@ function initializeSocketHandlers(io: Server): void {
         logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
         socket.join('lobby:rooms');
         registerAllHandlers(io, socket);
+
+        socket.on('friends:setAuth', (data: { userId: string }) => {
+          const userId = data?.userId;
+          if (!userId || typeof userId !== 'string') return;
+          (socket as any).authUserId = userId;
+          socket.join(`user:${userId}`);
+          logger.debug('SOCKET', `Socket ${socket.id} joined user room user:${userId}`);
+        });
       });
 
     // Clean up rate limiting on disconnect

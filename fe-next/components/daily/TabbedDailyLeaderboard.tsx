@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar } from 'lucide-react';
+import { Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar, Users } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
+import { useFriends } from '@/hooks/useFriends';
 import type { Language } from '@/types';
 
 // ==========================================
@@ -52,7 +53,7 @@ export interface AllTimeParticipant {
   rank_position: number;
 }
 
-type LeaderboardTab = 'today' | 'alltime';
+type LeaderboardTab = 'today' | 'alltime' | 'friends';
 
 interface TabbedDailyLeaderboardProps {
   puzzleDate: string;
@@ -364,6 +365,10 @@ const LeaderboardTabs = memo<{
         <Crown className="w-3.5 h-3.5 me-1.5" />
         {t('wordHunt.leaderboard.allTime')}
       </ToggleGroupItem>
+      <ToggleGroupItem value="friends" size="sm" className="text-xs px-3">
+        <Users className="w-3.5 h-3.5 me-1.5" />
+        {t('leaderboard.friends')}
+      </ToggleGroupItem>
     </ToggleGroup>
   </div>
 ));
@@ -387,6 +392,10 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   defaultTab = 'today',
 }) => {
   const [activeTab, setActiveTab] = useState<LeaderboardTab>(defaultTab);
+
+  // Friends data for filtering
+  const { friends } = useFriends();
+  const friendUserIds = useMemo(() => new Set(friends.map(f => f.odUserId)), [friends]);
 
   // Today's leaderboard state
   const [todayParticipants, setTodayParticipants] = useState<DailyParticipant[]>([]);
@@ -550,13 +559,20 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
   // Get current data based on active tab
   // Filter all-time participants to only show those who have solved at least one challenge
-  // to avoid "shaming" users who attempted but never solved
   const filteredAllTimeParticipants = allTimeParticipants.filter(p => p.games_won > 0);
-  const participants = activeTab === 'today' ? todayParticipants : filteredAllTimeParticipants;
-  const totalCount = activeTab === 'today' ? todayTotalCount : allTimeTotalCount;
+  const friendsParticipants = useMemo(
+    () => todayParticipants.filter(p => p.player_id && friendUserIds.has(p.player_id)),
+    [todayParticipants, friendUserIds]
+  );
+  const participants = activeTab === 'today'
+    ? todayParticipants
+    : activeTab === 'friends'
+      ? friendsParticipants
+      : filteredAllTimeParticipants;
+  const totalCount = activeTab === 'today' ? todayTotalCount : activeTab === 'friends' ? friendsParticipants.length : allTimeTotalCount;
   const totalSolvedCount = activeTab === 'today' ? todayTotalSolved : 0;
-  const loading = activeTab === 'today' ? todayLoading : allTimeLoading;
-  const error = activeTab === 'today' ? todayError : allTimeError;
+  const loading = activeTab === 'friends' ? todayLoading : activeTab === 'today' ? todayLoading : allTimeLoading;
+  const error = activeTab === 'friends' ? todayError : activeTab === 'today' ? todayError : allTimeError;
 
   // Determine which participants to show
   const visibleParticipants = expanded
@@ -601,7 +617,11 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         <div className="text-center py-6">
           <div className="text-4xl mb-3">🏆</div>
           <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
-            {activeTab === 'today' ? t('daily.beFirstToPlay') : t('wordHunt.leaderboard.noPlayersYet')}
+            {activeTab === 'friends'
+              ? t('leaderboard.noFriendsPlayed')
+              : activeTab === 'today'
+                ? t('daily.beFirstToPlay')
+                : t('wordHunt.leaderboard.noPlayersYet')}
           </p>
         </div>
       );

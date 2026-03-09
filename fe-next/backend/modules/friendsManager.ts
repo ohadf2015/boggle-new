@@ -54,8 +54,7 @@ export async function areFriends(userAId: string, userBId: string): Promise<bool
       .from('friends')
       .select('id')
       .eq('status', 'accepted')
-      .or(`user_id.eq.${userAId},friend_id.eq.${userAId}`)
-      .or(`user_id.eq.${userBId},friend_id.eq.${userBId}`)
+      .or(`and(user_id.eq.${userAId},friend_id.eq.${userBId}),and(user_id.eq.${userBId},friend_id.eq.${userAId})`)
       .single();
 
     if (error && error.code !== 'PGRST116') {
@@ -90,8 +89,7 @@ export async function sendFriendRequest(
     const { data: existing } = await supabase
       .from('friends')
       .select('id, status')
-      .or(`user_id.eq.${fromUserId},friend_id.eq.${fromUserId}`)
-      .or(`user_id.eq.${toUserId},friend_id.eq.${toUserId}`)
+      .or(`and(user_id.eq.${fromUserId},friend_id.eq.${toUserId}),and(user_id.eq.${toUserId},friend_id.eq.${fromUserId})`)
       .single();
 
     if (existing) {
@@ -198,9 +196,10 @@ export async function acceptFriendRequest(
 }
 
 /**
- * Decline a friend request
+ * Decline a friend request.
+ * Requires `userId` to verify the decliner is the intended recipient (friend_id).
  */
-export async function declineFriendRequest(requestId: string): Promise<{ success: boolean }> {
+export async function declineFriendRequest(requestId: string, userId: string): Promise<{ success: boolean }> {
   try {
     const supabase = getSupabase();
     if (!supabase) {
@@ -212,6 +211,7 @@ export async function declineFriendRequest(requestId: string): Promise<{ success
       .from('friends')
       .delete()
       .eq('id', requestId)
+      .eq('friend_id', userId)
       .eq('status', 'pending');
 
     if (error) {
@@ -241,8 +241,7 @@ export async function unfriend(userId: string, friendUserId: string): Promise<{ 
       .from('friends')
       .delete()
       .eq('status', 'accepted')
-      .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
-      .or(`user_id.eq.${friendUserId},friend_id.eq.${friendUserId}`);
+      .or(`and(user_id.eq.${userId},friend_id.eq.${friendUserId}),and(user_id.eq.${friendUserId},friend_id.eq.${userId})`);
 
     if (error) {
       logger.error('FRIENDS_MANAGER', `Error unfriending user: ${error.message}`);

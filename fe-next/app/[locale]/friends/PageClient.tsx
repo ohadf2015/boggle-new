@@ -36,13 +36,6 @@ export default function FriendsPageClient(): React.JSX.Element {
     enabled: isAuthenticated,
   });
 
-  // Handle challenge click - create a challenge and send to friend
-  const handleChallengeClick = (friend: { odUserId: string; username: string }) => {
-    // For now, redirect to home to start a game
-    // In future, this could open a challenge creation flow
-    router.push(`/${language}`);
-  };
-
   return (
     <div
       className={cn(
@@ -100,19 +93,17 @@ export default function FriendsPageClient(): React.JSX.Element {
                 'text-lg font-bold mb-2',
                 isDark ? 'text-white' : 'text-gray-900'
               )}>
-                {language === 'he' ? 'התחבר כדי להוסיף חברים' : 'Sign in to add friends'}
+                {t('friends.signInTitle')}
               </p>
               <p className={cn(
                 'text-sm',
                 isDark ? 'text-gray-400' : 'text-gray-500'
               )}>
-                {language === 'he'
-                  ? 'צור חשבון כדי לאתגר חברים ולראות מי מנצח!'
-                  : 'Create an account to challenge friends and see who wins!'}
+                {t('friends.signInDescription')}
               </p>
             </div>
           ) : (
-            <FriendsList onChallengeClick={handleChallengeClick} />
+            <FriendsList />
           )}
         </motion.div>
       </div>

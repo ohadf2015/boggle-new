@@ -2619,6 +2619,8 @@ const sv = {
     "topPercent": "Topp ${percent}%",
     "noRankYet": "Spela för att bli rankad!",
     "viewLeaderboard": "Visa topplista",
+    "friends": "Vänner",
+    "noFriendsPlayed": "Ingen av dina vänner har spelat idag än!",
     "you": "DU",
     "liveRace": "Live Race",
     "racing": "tävlar",
@@ -3989,7 +3991,26 @@ const sv = {
       "send": "Skicka Utmaning",
       "pending": "Väntande Utmaning",
       "customMessage": "Lägg till ett meddelande (valfritt)",
-      "inviteMessage": "Utmaning från {name}! Kan du slå deras poäng?"
+      "inviteMessage": "Utmaning från {name}! Kan du slå deras poäng?",
+      "defaultMessage": "utmanar dig!",
+      "modes": {
+        "classic": "Klassisk",
+        "blitz": "Blixt",
+        "survival": "Överlevnad"
+      }
+    },
+    "copyInviteLink": "Kopiera inbjudningslänk",
+    "linkCopied": "Länk kopierad!",
+    "seeAll": "Visa alla",
+    "cancelRequest": "Avbryt",
+    "signInTitle": "Logga in för att lägga till vänner",
+    "signInDescription": "Skapa ett konto för att utmana vänner och se vem som vinner!",
+    "headToHead": {
+      "title": "Huvud mot Huvud",
+      "wins": "Dina Vinster",
+      "losses": "Deras Vinster",
+      "draws": "Oavgjort",
+      "totalGames": "matcher tillsammans"
     },
     "messageLimit": "{current}/{max} tecken",
     "errors": {

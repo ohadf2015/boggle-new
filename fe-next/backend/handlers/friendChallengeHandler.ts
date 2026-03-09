@@ -8,12 +8,9 @@ import { checkRateLimit } from '../utils/rateLimiter';
 import { emitError } from '../utils/errorHandler';
 import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
+import { notifyGameInvite } from '../modules/pushNotificationTriggers';
 import { getSupabase } from '../modules/supabaseServer';
-import {
-  getCachedUserProfile,
-  cacheUserProfile,
-  type CachedUserProfile,
-} from '../redis';
+import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
 
 // Rate limit weights
 const RATE_WEIGHTS = {
@@ -23,84 +20,6 @@ const RATE_WEIGHTS = {
   GET_CHALLENGES: 1,
   CANCEL_CHALLENGE: 1,
 };
-
-/**
- * Get authenticated user ID from socket
- */
-function getAuthUserId(socket: Socket): string | null {
-  return (socket as any).authUserId || null;
-}
-
-/**
- * Broadcast event to specific user by auth ID
- */
-function broadcastToUser(io: Server, authUserId: string, event: string, data: any) {
-  io.sockets.sockets.forEach((sock) => {
-    if ((sock as any).authUserId === authUserId) {
-      sock.emit(event, data);
-    }
-  });
-}
-
-/**
- * Get user profile by ID (with Redis caching)
- */
-async function getUserProfile(userId: string) {
-  try {
-    // Check Redis cache first
-    const cached = await getCachedUserProfile(userId);
-    if (cached) {
-      return {
-        username: cached.username,
-        displayName: cached.displayName,
-        avatar: {
-          emoji: cached.avatarEmoji,
-          color: cached.avatarColor,
-          image: cached.avatarImage,
-        },
-      };
-    }
-
-    // Cache miss - fetch from database
-    const supabase = getSupabase();
-    if (!supabase) {
-      logger.error('CHALLENGE_HANDLER', 'Supabase client not available');
-      return null;
-    }
-
-    const { data } = await supabase
-      .from('profiles')
-      .select('username, display_name, avatar_emoji, avatar_color, avatar_image')
-      .eq('id', userId)
-      .single();
-
-    if (!data) return null;
-
-    // Cache the profile for future requests
-    const profileToCache: CachedUserProfile = {
-      userId,
-      username: data.username,
-      displayName: data.display_name,
-      avatarEmoji: data.avatar_emoji || '👤',
-      avatarColor: data.avatar_color || '#808080',
-      avatarImage: data.avatar_image,
-    };
-    await cacheUserProfile(profileToCache);
-
-    return {
-      username: data.username,
-      displayName: data.display_name,
-      avatar: {
-        emoji: data.avatar_emoji || '👤',
-        color: data.avatar_color || '#808080',
-        image: data.avatar_image,
-      },
-    };
-  } catch (error) {
-    logger.error('CHALLENGE_HANDLER', `Error getting user profile: ${(error as Error).message}`);
-    return null;
-  }
-}
 
 /**
  * Generate a unique game room code
@@ -131,12 +50,11 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
     };
     message?: string;
   }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.SEND_CHALLENGE)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.SEND_CHALLENGE)) {
       socket.emit('rateLimited');
       return;
     }
-
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated to send challenges');
       return;
@@ -215,8 +133,9 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
         expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
       };
 
-      // Notify recipient
+      // Notify recipient via Socket.IO (online) + push (offline)
       broadcastToUser(io, data.friendUserId, 'friends:challengeReceived', challengeData);
+      notifyGameInvite(data.friendUserId, fromProfile.username, roomCode, authUserId).catch(() => {});
 
       // Confirm to sender
       socket.emit('friends:challengeSent', challengeData);
@@ -233,12 +152,11 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
 
   // ==================== Accept Challenge ====================
   socket.on('friends:acceptChallenge', async (data: { challengeId: string }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.ACCEPT_CHALLENGE)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.ACCEPT_CHALLENGE)) {
       socket.emit('rateLimited');
       return;
     }
-
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -332,12 +250,11 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
 
   // ==================== Decline Challenge ====================
   socket.on('friends:declineChallenge', async (data: { challengeId: string }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.DECLINE_CHALLENGE)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.DECLINE_CHALLENGE)) {
       socket.emit('rateLimited');
       return;
     }
-
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -426,12 +343,11 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
 
   // ==================== Get Pending Challenges ====================
   socket.on('friends:getPendingChallenges', async () => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.GET_CHALLENGES)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.GET_CHALLENGES)) {
       socket.emit('rateLimited');
       return;
     }
-
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -479,12 +395,11 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
 
   // ==================== Cancel Challenge ====================
   socket.on('friends:cancelChallenge', async (data: { challengeId: string }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.CANCEL_CHALLENGE)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.CANCEL_CHALLENGE)) {
       socket.emit('rateLimited');
       return;
     }
-
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;

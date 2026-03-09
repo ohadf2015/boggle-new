@@ -310,6 +310,32 @@ export async function getPendingRequests(): Promise<FriendRequest[]> {
 }
 
 /**
+ * Cancel an outgoing friend request (sent by current user)
+ */
+export async function cancelFriendRequest(requestId: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  const { error } = await supabase
+    .from('friends')
+    .delete()
+    .eq('id', requestId)
+    .eq('user_id', user.id)
+    .eq('status', 'pending');
+
+  if (error) {
+    logger.error('Error cancelling friend request:', error);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+/**
  * Get outgoing friend requests (sent by current user, still pending)
  */
 export async function getOutgoingRequests(): Promise<FriendRequest[]> {

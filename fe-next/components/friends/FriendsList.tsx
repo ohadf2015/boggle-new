@@ -7,7 +7,10 @@ import {
   Target,
   Bell,
   MessageCircle,
+  X,
+  ChevronRight,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useFriends } from '@/hooks/useFriends';
@@ -56,9 +59,12 @@ const FriendsList: React.FC<FriendsListProps> = ({
     sendRequest,
     acceptRequest,
     declineRequest,
+    cancelRequest,
     unfriend,
     search,
   } = useFriends();
+
+  const router = useRouter();
 
   const {
     threads,
@@ -88,6 +94,12 @@ const FriendsList: React.FC<FriendsListProps> = ({
     await declineRequest(requestId);
     setActionLoading(null);
   }, [declineRequest]);
+
+  const handleCancelRequest = useCallback(async (requestId: string) => {
+    setActionLoading(requestId);
+    await cancelRequest(requestId);
+    setActionLoading(null);
+  }, [cancelRequest]);
 
   const handleThreadClick = useCallback((thread: MessageThreadType) => {
     setSelectedThread(thread);
@@ -152,6 +164,14 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
   // Compact view
   if (compact) {
+    const sortedFriends = [...friends].sort((a, b) => {
+      if (a.isOnline && !b.isOnline) return -1;
+      if (!a.isOnline && b.isOnline) return 1;
+      const aTime = a.lastSeenAt ? new Date(a.lastSeenAt).getTime() : 0;
+      const bTime = b.lastSeenAt ? new Date(b.lastSeenAt).getTime() : 0;
+      return bTime - aTime;
+    });
+
     return (
       <div className={cn('space-y-2', className)}>
         <div className="flex items-center justify-between">
@@ -172,13 +192,27 @@ const FriendsList: React.FC<FriendsListProps> = ({
             </span>
           )}
         </div>
-        {friends.slice(0, 5).map(friend => (
+        {sortedFriends.slice(0, 5).map(friend => (
           <FriendRow key={friend.id} friend={friend} isDark={isDark} compact onChallengeClick={onChallengeClick} />
         ))}
         {friends.length === 0 && (
           <p className={cn('text-xs text-center py-2', isDark ? 'text-gray-400' : 'text-gray-500')}>
             {t('friends.noFriendsYet')}
           </p>
+        )}
+        {friends.length > 5 && (
+          <button
+            onClick={() => router.push(`/${language}/friends`)}
+            className={cn(
+              'w-full flex items-center justify-center gap-1 py-1.5 rounded-neo border-2 text-xs font-bold',
+              isDark
+                ? 'border-white/10 text-gray-300 hover:bg-white/5'
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+            )}
+          >
+            {t('friends.seeAll')} ({friends.length})
+            <ChevronRight className="w-3 h-3" />
+          </button>
         )}
       </div>
     );
@@ -259,7 +293,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 </div>
                 <div className="space-y-2">
                   {pendingChallenges.map(challenge => (
-                    <ChallengeRow key={challenge.id} challenge={challenge} isDark={isDark} language={language} />
+                    <ChallengeRow key={challenge.id} challenge={challenge} isDark={isDark} />
                   ))}
                 </div>
               </div>
@@ -322,10 +356,22 @@ const FriendsList: React.FC<FriendsListProps> = ({
                   {outgoingRequests.map(req => (
                     <div key={req.id} className="flex items-center gap-2 text-sm">
                       <Avatar avatarImage={req.fromAvatarImage} size="sm" />
-                      <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{req.fromUsername}</span>
+                      <span className={cn('flex-1', isDark ? 'text-gray-300' : 'text-gray-600')}>{req.fromUsername}</span>
                       <span className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-400')}>
                         ({t('friends.pending')})
                       </span>
+                      <button
+                        onClick={() => handleCancelRequest(req.id)}
+                        disabled={actionLoading === req.id}
+                        title={t('friends.cancelRequest')}
+                        aria-label={t('friends.cancelRequest')}
+                        className={cn(
+                          'p-1 rounded border-2 border-neo-black shadow-hard-sm font-bold transition-opacity',
+                          'bg-neo-pink text-white hover:opacity-80 disabled:opacity-40'
+                        )}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     </div>
                   ))}
                 </div>

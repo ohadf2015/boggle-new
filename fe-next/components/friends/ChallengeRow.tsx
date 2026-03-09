@@ -4,12 +4,12 @@ import React from 'react';
 import { Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { FriendChallenge } from '@/utils/friends';
 
 interface ChallengeRowProps {
   challenge: FriendChallenge;
   isDark: boolean;
-  language: string;
 }
 
 /**
@@ -24,8 +24,9 @@ interface ChallengeRowProps {
 export const ChallengeRow: React.FC<ChallengeRowProps> = ({
   challenge,
   isDark,
-  language,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <a
       href={`/challenge/${challenge.challengeCode}`}
@@ -43,7 +44,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
           {challenge.challengerUsername}
         </p>
         <p className={cn('text-xs truncate', isDark ? 'text-yellow-300' : 'text-yellow-600')}>
-          {challenge.message || (language === 'he' ? 'מזמין אותך לאתגר!' : 'challenges you!')}
+          {challenge.message || t('friends.challenges.defaultMessage')}
         </p>
       </div>
       <Target className="w-5 h-5 text-neo-lime" />

@@ -43,12 +43,6 @@ const TIMER_OPTIONS = [
   { value: 180, label: '3:00' },
 ];
 
-const MODE_OPTIONS = [
-  { value: 'classic', label: 'Classic' },
-  { value: 'blitz', label: 'Blitz' },
-  { value: 'survival', label: 'Survival' },
-];
-
 /**
  * ChallengeInviteDialog - Modal for sending game challenges to friends
  *
@@ -69,6 +63,12 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
   const { t, language } = useLanguage();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+
+  const modeOptions = [
+    { value: 'classic', label: t('friends.challenges.modes.classic') },
+    { value: 'blitz', label: t('friends.challenges.modes.blitz') },
+    { value: 'survival', label: t('friends.challenges.modes.survival') },
+  ];
 
   const [settings, setSettings] = useState<GameSettings>({
     language: language || 'en',
@@ -240,7 +240,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
                       isLoading && 'opacity-50 cursor-not-allowed'
                     )}
                   >
-                    {MODE_OPTIONS.map((opt) => (
+                    {modeOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>

@@ -3105,6 +3105,8 @@ const en = {
     "topPercent": "Top ${percent}%",
     "noRankYet": "Play games to get ranked!",
     "viewLeaderboard": "View Leaderboard",
+    "friends": "Friends",
+    "noFriendsPlayed": "None of your friends have played today yet!",
     "you": "You",
     "liveRace": "Live Race",
     "racing": "racing",
@@ -4158,7 +4160,26 @@ const en = {
       "send": "Send Challenge",
       "pending": "Challenge Pending",
       "customMessage": "Add a message (optional)",
-      "inviteMessage": "Challenge from {name}! Can you beat their score?"
+      "inviteMessage": "Challenge from {name}! Can you beat their score?",
+      "defaultMessage": "challenges you!",
+      "modes": {
+        "classic": "Classic",
+        "blitz": "Blitz",
+        "survival": "Survival"
+      }
+    },
+    "copyInviteLink": "Copy invite link",
+    "linkCopied": "Link copied!",
+    "seeAll": "See all",
+    "cancelRequest": "Cancel",
+    "signInTitle": "Sign in to add friends",
+    "signInDescription": "Create an account to challenge friends and see who wins!",
+    "headToHead": {
+      "title": "Head to Head",
+      "wins": "Your Wins",
+      "losses": "Their Wins",
+      "draws": "Draws",
+      "totalGames": "games together"
     },
     "messageLimit": "{current}/{max} characters",
     "errors": {

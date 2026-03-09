@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Target, Circle, UserMinus } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Avatar from '@/components/Avatar';
-import type { Friend } from '@/utils/friends';
+import { getHeadToHead, type Friend, type HeadToHeadRecord } from '@/utils/friends';
 
 interface FriendDetailDialogProps {
   friend: Friend | null;
@@ -27,6 +27,15 @@ export function FriendDetailDialog({
   t,
 }: FriendDetailDialogProps): React.JSX.Element {
   const [actionLoading, setActionLoading] = useState(false);
+  const [h2h, setH2H] = useState<HeadToHeadRecord | null>(null);
+
+  useEffect(() => {
+    if (friend?.odUserId) {
+      getHeadToHead(friend.odUserId).then(setH2H);
+    } else {
+      setH2H(null);
+    }
+  }, [friend?.odUserId]);
 
   const handleUnfriend = useCallback(async () => {
     if (!friend) return;
@@ -94,6 +103,41 @@ export function FriendDetailDialog({
                   </p>
                 </div>
               </div>
+
+              {/* Head to Head */}
+              {h2h && h2h.totalGames > 0 && (
+                <div className={cn(
+                  'p-3 rounded-neo border-2',
+                  isDark ? 'bg-slate-700/50 border-white/10' : 'bg-gray-50 border-gray-200'
+                )}>
+                  <p className={cn('text-xs font-bold mb-2 uppercase tracking-wide', isDark ? 'text-gray-300' : 'text-gray-600')}>
+                    {t('friends.headToHead.title')}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 text-center mb-1">
+                    <div>
+                      <p className="text-lg font-black text-green-500">{h2h.myWins}</p>
+                      <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
+                        {t('friends.headToHead.wins')}
+                      </p>
+                    </div>
+                    <div>
+                      <p className={cn('text-lg font-black', isDark ? 'text-gray-400' : 'text-gray-400')}>{h2h.draws}</p>
+                      <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
+                        {t('friends.headToHead.draws')}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-black text-red-500">{h2h.theirWins}</p>
+                      <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
+                        {t('friends.headToHead.losses')}
+                      </p>
+                    </div>
+                  </div>
+                  <p className={cn('text-xs text-center mt-1', isDark ? 'text-gray-500' : 'text-gray-400')}>
+                    {h2h.totalGames} {t('friends.headToHead.totalGames')}
+                  </p>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex gap-2">

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Search, UserPlus } from 'lucide-react';
+import { Search, UserPlus, Link } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Avatar from '@/components/Avatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { Friend } from '@/utils/friends';
 
 interface AddFriendDialogProps {
@@ -26,10 +28,33 @@ export function AddFriendDialog({
   search,
   sendRequest,
 }: AddFriendDialogProps): React.JSX.Element {
+  const { profile } = useAuth();
+  const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Friend[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const handleCopyInviteLink = useCallback(async () => {
+    if (!profile?.username) return;
+    const link = `${window.location.origin}/${language}/friends?ref=${profile.username}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // Fallback for browsers without clipboard API
+      const el = document.createElement('textarea');
+      el.value = link;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    }
+  }, [profile?.username, language]);
 
   // Debounced search
   useEffect(() => {
@@ -70,6 +95,24 @@ export function AddFriendDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Copy invite link */}
+          {profile?.username && (
+            <button
+              onClick={handleCopyInviteLink}
+              className={cn(
+                'w-full flex items-center justify-center gap-2 py-2 rounded-neo border-2 border-neo-black shadow-hard-sm font-bold text-sm transition-colors',
+                linkCopied
+                  ? 'bg-neo-lime text-neo-black'
+                  : isDark
+                    ? 'bg-slate-700 text-white hover:bg-slate-600'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+              )}
+            >
+              <Link className="w-4 h-4" />
+              {linkCopied ? t('friends.linkCopied') : t('friends.copyInviteLink')}
+            </button>
+          )}
+
           {/* Search input */}
           <div className="relative">
             <Search className={cn(

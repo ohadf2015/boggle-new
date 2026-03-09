@@ -10,11 +10,7 @@ import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
 import { cleanProfanity } from '../utils/profanityFilter';
-import {
-  getCachedUserProfile,
-  cacheUserProfile,
-  type CachedUserProfile,
-} from '../redis';
+import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
 
 // Rate limit weights
 const RATE_WEIGHTS = {
@@ -39,84 +35,6 @@ function sanitizeHtml(str: string): string {
 }
 
 /**
- * Get authenticated user ID from socket
- */
-function getAuthUserId(socket: Socket): string | null {
-  return (socket as any).authUserId || null;
-}
-
-/**
- * Broadcast event to specific user by auth ID
- */
-function broadcastToUser(io: Server, authUserId: string, event: string, data: any) {
-  io.sockets.sockets.forEach((sock) => {
-    if ((sock as any).authUserId === authUserId) {
-      sock.emit(event, data);
-    }
-  });
-}
-
-/**
- * Get user profile by ID (with Redis caching)
- */
-async function getUserProfile(userId: string) {
-  try {
-    // Check Redis cache first
-    const cached = await getCachedUserProfile(userId);
-    if (cached) {
-      return {
-        username: cached.username,
-        displayName: cached.displayName,
-        avatar: {
-          emoji: cached.avatarEmoji,
-          color: cached.avatarColor,
-          image: cached.avatarImage,
-        },
-      };
-    }
-
-    // Cache miss - fetch from database
-    const supabase = getSupabase();
-    if (!supabase) {
-      logger.error('MESSAGING_HANDLER', 'Supabase client not available');
-      return null;
-    }
-
-    const { data } = await supabase
-      .from('profiles')
-      .select('username, display_name, avatar_emoji, avatar_color, avatar_image')
-      .eq('id', userId)
-      .single();
-
-    if (!data) return null;
-
-    // Cache the profile for future requests
-    const profileToCache: CachedUserProfile = {
-      userId,
-      username: data.username,
-      displayName: data.display_name,
-      avatarEmoji: data.avatar_emoji || '👤',
-      avatarColor: data.avatar_color || '#808080',
-      avatarImage: data.avatar_image,
-    };
-    await cacheUserProfile(profileToCache);
-
-    return {
-      username: data.username,
-      displayName: data.display_name,
-      avatar: {
-        emoji: data.avatar_emoji || '👤',
-        color: data.avatar_color || '#808080',
-        image: data.avatar_image,
-      },
-    };
-  } catch (error) {
-    logger.error('MESSAGING_HANDLER', `Error getting user profile: ${(error as Error).message}`);
-    return null;
-  }
-}
-
-/**
  * Register friend messaging socket event handlers
  */
 export function registerFriendMessagingHandlers(io: Server, socket: Socket): void {
@@ -127,12 +45,12 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     message: string;
     tempId?: string;
   }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.SEND_MESSAGE)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.SEND_MESSAGE)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated to send messages');
       return;
@@ -173,10 +91,10 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
         timestamp: result.message!.timestamp,
       });
 
-      // Try real-time delivery to recipient
-      const isDelivered = broadcastToUser(io, data.recipientUserId, 'friends:messageReceived', result.message);
+      // Real-time delivery to recipient via user room
+      broadcastToUser(io, data.recipientUserId, 'friends:messageReceived', result.message);
 
-      logger.info('MESSAGING', `Message sent from ${authUserId} to ${data.recipientUserId} (delivered: ${isDelivered})`);
+      logger.info('MESSAGING', `Message sent from ${authUserId} to ${data.recipientUserId}`);
     } catch (error) {
       logger.error('MESSAGING_HANDLER', `Error sending message: ${(error as Error).message}`);
       socket.emit('friends:error', {
@@ -192,12 +110,12 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     before?: number;
     limit?: number;
   }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.GET_MESSAGES)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.GET_MESSAGES)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -240,12 +158,12 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     friendUserId: string;
     lastReadMessageId: string;
   }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.MARK_READ)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.MARK_READ)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -296,12 +214,12 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     recipientUserId: string;
     isTyping: boolean;
   }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.TYPING)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.TYPING)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) return;
 
     if (!data?.recipientUserId) return;
@@ -329,12 +247,12 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
 
   // ==================== Delete Message ====================
   socket.on('friends:deleteMessage', async (data: { messageId: string }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.DELETE_MESSAGE)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.DELETE_MESSAGE)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -394,12 +312,12 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
 
   // ==================== Get Message Threads ====================
   socket.on('friends:getThreads', async () => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.GET_THREADS)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.GET_THREADS)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -449,7 +367,7 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
           // Get unread count
           const unreadCount = await friendsManager.getUnreadCount(authUserId, friendId);
 
-          // Get friend profile
+          // Get friend profile (includes isOnline from last_seen_at)
           const profile = await getUserProfile(friendId);
 
           if (!profile || !lastMsg) return null;
@@ -465,7 +383,7 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
             lastMessage: lastMsg.message,
             lastMessageAt: new Date(lastMsg.created_at).getTime(),
             unreadCount,
-            isOnline: false, // Will be enriched by presence handler
+            isOnline: profile.isOnline ?? false,
           };
         })
       );

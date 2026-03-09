@@ -11,6 +11,7 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
+  cancelFriendRequest,
   removeFriend,
   blockUser,
   searchUsers,
@@ -35,6 +36,7 @@ interface UseFriendsActions {
   sendRequest: (userId: string) => Promise<{ success: boolean; error?: string }>;
   acceptRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
   declineRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
+  cancelRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
   unfriend: (friendUserId: string) => Promise<{ success: boolean; error?: string }>;
   block: (userId: string) => Promise<{ success: boolean; error?: string }>;
   search: (query: string) => Promise<Friend[]>;
@@ -155,6 +157,15 @@ export function useFriends(): UseFriendsReturn {
     return result;
   }, [refresh]);
 
+  // Cancel outgoing request
+  const cancelRequest = useCallback(async (requestId: string) => {
+    const result = await cancelFriendRequest(requestId);
+    if (result.success) {
+      await refresh();
+    }
+    return result;
+  }, [refresh]);
+
   // Unfriend
   const unfriend = useCallback(async (friendUserId: string) => {
     const result = await removeFriend(friendUserId);
@@ -233,6 +244,7 @@ export function useFriends(): UseFriendsReturn {
     sendRequest,
     acceptRequest,
     declineRequest,
+    cancelRequest,
     unfriend,
     block,
     search,

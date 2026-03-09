@@ -9,11 +9,8 @@ import { emitError } from '../utils/errorHandler';
 import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
-import {
-  getCachedUserProfile,
-  cacheUserProfile,
-  type CachedUserProfile,
-} from '../redis';
+import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
+import { notifyFriendRequest, notifyFriendAccepted } from '../modules/pushNotificationTriggers';
 
 // Rate limit weights
 const RATE_WEIGHTS = {
@@ -28,105 +25,18 @@ const RATE_WEIGHTS = {
 };
 
 /**
- * Get authenticated user ID from socket
- */
-function getAuthUserId(socket: Socket): string | null {
-  return (socket as any).authUserId || null;
-}
-
-/**
- * Broadcast event to specific user by auth ID
- */
-function broadcastToUser(io: Server, authUserId: string, event: string, data: any) {
-  // Find all sockets for this user
-  io.sockets.sockets.forEach((sock) => {
-    if ((sock as any).authUserId === authUserId) {
-      sock.emit(event, data);
-    }
-  });
-}
-
-/**
- * Get user profile by ID (with Redis caching)
- */
-async function getUserProfile(userId: string) {
-  try {
-    // Check Redis cache first
-    const cached = await getCachedUserProfile(userId);
-    if (cached) {
-      // Compute isOnline from cached lastSeenAt
-      const isOnline = cached.lastSeenAt
-        ? new Date(cached.lastSeenAt) > new Date(Date.now() - 5 * 60 * 1000)
-        : false;
-
-      return {
-        username: cached.username,
-        displayName: cached.displayName,
-        avatar: {
-          emoji: cached.avatarEmoji,
-          color: cached.avatarColor,
-          image: cached.avatarImage,
-        },
-        isOnline,
-      };
-    }
-
-    // Cache miss - fetch from database
-    const supabase = getSupabase();
-    if (!supabase) {
-      logger.error('FRIENDS_HANDLER', 'Supabase client not available');
-      return null;
-    }
-
-    const { data } = await supabase
-      .from('profiles')
-      .select('username, display_name, avatar_emoji, avatar_color, avatar_image, last_seen_at')
-      .eq('id', userId)
-      .single();
-
-    if (!data) return null;
-
-    // Cache the profile for future requests
-    const profileToCache: CachedUserProfile = {
-      userId,
-      username: data.username,
-      displayName: data.display_name,
-      avatarEmoji: data.avatar_emoji || '👤',
-      avatarColor: data.avatar_color || '#808080',
-      avatarImage: data.avatar_image,
-      lastSeenAt: data.last_seen_at,
-    };
-    await cacheUserProfile(profileToCache);
-
-    return {
-      username: data.username,
-      displayName: data.display_name,
-      avatar: {
-        emoji: data.avatar_emoji || '👤',
-        color: data.avatar_color || '#808080',
-        image: data.avatar_image,
-      },
-      isOnline: data.last_seen_at && new Date(data.last_seen_at) > new Date(Date.now() - 5 * 60 * 1000),
-    };
-  } catch (error) {
-    logger.error('FRIENDS_HANDLER', `Error getting user profile: ${(error as Error).message}`);
-    return null;
-  }
-}
-
-/**
  * Register friend management socket event handlers
  */
 export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
   // ==================== Send Friend Request ====================
   socket.on('friends:sendRequest', async (data: { targetUserId: string; targetUsername?: string }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.SEND_REQUEST)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.SEND_REQUEST)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated to send friend requests');
       return;
@@ -187,8 +97,9 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
         expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
       };
 
-      // Notify recipient
+      // Notify recipient via Socket.IO (online) + push (offline)
       broadcastToUser(io, data.targetUserId, 'friends:requestReceived', requestData);
+      notifyFriendRequest(data.targetUserId, fromProfile.username, authUserId).catch(() => {});
 
       // Confirm to sender
       socket.emit('friends:requestSent', requestData);
@@ -205,12 +116,12 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
   // ==================== Accept Friend Request ====================
   socket.on('friends:acceptRequest', async (data: { requestId: string }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.ACCEPT_REQUEST)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.ACCEPT_REQUEST)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -287,8 +198,9 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
         expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
       };
 
-      // Notify sender
+      // Notify sender via Socket.IO (online) + push (offline)
       broadcastToUser(io, senderId, 'friends:requestAccepted', acceptedData);
+      notifyFriendAccepted(senderId, recipientProfile.username, recipientId).catch(() => {});
 
       // Confirm to recipient
       socket.emit('friends:requestAccepted', acceptedData);
@@ -321,12 +233,12 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
   // ==================== Decline Friend Request ====================
   socket.on('friends:declineRequest', async (data: { requestId: string }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.DECLINE_REQUEST)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.DECLINE_REQUEST)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -341,7 +253,8 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
     }
 
     try {
-      const result = await friendsManager.declineFriendRequest(data.requestId);
+      // Pass authUserId so the manager verifies the decliner is the recipient
+      const result = await friendsManager.declineFriendRequest(data.requestId, authUserId);
 
       if (!result.success) {
         socket.emit('friends:error', {
@@ -368,12 +281,12 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
   // ==================== Unfriend ====================
   socket.on('friends:unfriend', async (data: { friendUserId: string }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.UNFRIEND)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.UNFRIEND)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -421,12 +334,12 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
   // ==================== Search Users ====================
   socket.on('friends:searchUsers', async (data: { query: string; limit?: number }) => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.SEARCH_USERS)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.SEARCH_USERS)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;
@@ -459,39 +372,51 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
         .neq('id', authUserId) // Exclude self
         .limit(limit);
 
-      if (!profiles) {
+      if (!profiles || profiles.length === 0) {
         socket.emit('friends:searchResults', { users: [], timestamp: Date.now() });
         return;
       }
 
-      // Check friendship status for each user
-      const users = await Promise.all(
-        profiles.map(async (profile) => {
-          const isFriend = await friendsManager.areFriends(authUserId, profile.id);
+      // Batch fetch ALL friendship rows involving authUserId in a single query
+      const profileIds = profiles.map((p) => p.id);
+      const { data: friendshipRows } = await supabase
+        .from('friends')
+        .select('id, user_id, friend_id, status')
+        .or(
+          profileIds
+            .map(
+              (pid) =>
+                `and(user_id.eq.${authUserId},friend_id.eq.${pid}),and(user_id.eq.${pid},friend_id.eq.${authUserId})`
+            )
+            .join(',')
+        );
 
-          // Check if pending request exists
-          const { data: pendingRequest } = await supabase
-            .from('friends')
-            .select('id')
-            .eq('status', 'pending')
-            .or(`user_id.eq.${authUserId},friend_id.eq.${authUserId}`)
-            .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`)
-            .single();
+      // Build lookup map: otherUserId -> { isFriend, isPending }
+      type FriendshipStatus = { isFriend: boolean; isPending: boolean };
+      const statusMap = new Map<string, FriendshipStatus>();
 
-          return {
-            userId: profile.id,
-            username: profile.username,
-            displayName: profile.display_name,
-            avatar: {
-              emoji: profile.avatar_emoji || '👤',
-              color: profile.avatar_color || '#808080',
-              image: profile.avatar_image,
-            },
-            isFriend,
-            isPending: !!pendingRequest,
-          };
-        })
-      );
+      for (const row of friendshipRows || []) {
+        const otherId = row.user_id === authUserId ? row.friend_id : row.user_id;
+        const isFriend = row.status === 'accepted';
+        const isPending = row.status === 'pending';
+        statusMap.set(otherId, { isFriend, isPending });
+      }
+
+      const users = profiles.map((profile) => {
+        const status = statusMap.get(profile.id);
+        return {
+          userId: profile.id,
+          username: profile.username,
+          displayName: profile.display_name,
+          avatar: {
+            emoji: profile.avatar_emoji || '👤',
+            color: profile.avatar_color || '#808080',
+            image: profile.avatar_image,
+          },
+          isFriend: status?.isFriend ?? false,
+          isPending: status?.isPending ?? false,
+        };
+      });
 
       socket.emit('friends:searchResults', {
         users,
@@ -508,12 +433,12 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
   // ==================== Get Pending Requests ====================
   socket.on('friends:getPendingRequests', async () => {
-    if (!checkRateLimit(socket.id, RATE_WEIGHTS.GET_PENDING)) {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.GET_PENDING)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const authUserId = getAuthUserId(socket);
     if (!authUserId) {
       emitError(socket, 'Must be authenticated');
       return;

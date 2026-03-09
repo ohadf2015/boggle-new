@@ -2619,6 +2619,8 @@ const ja = {
     "topPercent": "トップ${percent}%",
     "noRankYet": "ゲームをプレイしてランク入り!",
     "viewLeaderboard": "リーダーボードを見る",
+    "friends": "フレンド",
+    "noFriendsPlayed": "今日はまだフレンドが誰も遊んでいません！",
     "you": "あなた",
     "liveRace": "ライブレース",
     "racing": "競争中",
@@ -4050,7 +4052,26 @@ const ja = {
       "send": "チャレンジを送信",
       "pending": "チャレンジ保留中",
       "customMessage": "メッセージを追加（任意）",
-      "inviteMessage": "{name}からの挑戦！スコアを超えられる？"
+      "inviteMessage": "{name}からの挑戦！スコアを超えられる？",
+      "defaultMessage": "チャレンジに招待しています！",
+      "modes": {
+        "classic": "クラシック",
+        "blitz": "ブリッツ",
+        "survival": "サバイバル"
+      }
+    },
+    "copyInviteLink": "招待リンクをコピー",
+    "linkCopied": "リンクをコピーしました！",
+    "seeAll": "すべて表示",
+    "cancelRequest": "キャンセル",
+    "signInTitle": "フレンドを追加するにはサインインしてください",
+    "signInDescription": "アカウントを作成してフレンドに挑戦し、誰が勝つか見てみましょう！",
+    "headToHead": {
+      "title": "対戦記録",
+      "wins": "あなたの勝利",
+      "losses": "相手の勝利",
+      "draws": "引き分け",
+      "totalGames": "対戦回数"
     },
     "messageLimit": "{current}/{max}文字",
     "errors": {

@@ -3004,6 +3004,8 @@ const he = {
     "topPercent": "${percent}% העליונים",
     "noRankYet": "שחק משחקים כדי להיכנס לדירוג!",
     "viewLeaderboard": "צפייה בטבלת מובילים",
+    "friends": "חברים",
+    "noFriendsPlayed": "עדיין אף חבר לא שיחק היום!",
     "you": "אתה",
     "liveRace": "מירוץ חי",
     "racing": "מתחרים",
@@ -3999,7 +4001,26 @@ const he = {
       "send": "שלח אתגר",
       "pending": "אתגר ממתין",
       "customMessage": "הוסף הודעה (אופציונלי)",
-      "inviteMessage": "אתגר מ-{name}! תצליחו לנצח?"
+      "inviteMessage": "אתגר מ-{name}! תצליחו לנצח?",
+      "defaultMessage": "מזמין אותך לאתגר!",
+      "modes": {
+        "classic": "קלאסי",
+        "blitz": "בליץ",
+        "survival": "הישרדות"
+      }
+    },
+    "copyInviteLink": "העתק קישור הזמנה",
+    "linkCopied": "הקישור הועתק!",
+    "seeAll": "ראה הכל",
+    "cancelRequest": "ביטול",
+    "signInTitle": "התחבר כדי להוסיף חברים",
+    "signInDescription": "צור חשבון כדי לאתגר חברים ולראות מי מנצח!",
+    "headToHead": {
+      "title": "מול מול",
+      "wins": "הניצחונות שלך",
+      "losses": "הניצחונות שלהם",
+      "draws": "תיקו",
+      "totalGames": "משחקים ביחד"
     },
     "messageLimit": "{current}/{max} תווים",
     "errors": {
