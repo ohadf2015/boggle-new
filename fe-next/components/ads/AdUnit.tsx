@@ -4,8 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
-/** Google AdSense publisher ID — matches GoogleAdSense.tsx head script */
-const AD_CLIENT = 'ca-pub-1896836706464880';
+import { ADSENSE_PUBLISHER_ID } from '@/lib/adsense';
 
 declare global {
   interface Window {
@@ -93,7 +92,7 @@ export const AdUnit: React.FC<AdUnitProps> = ({ adSlot, width, height, className
           ? { display: 'inline-block', width: `${width}px`, height: `${height}px` }
           : { display: 'block' }
         }
-        data-ad-client={AD_CLIENT}
+        data-ad-client={ADSENSE_PUBLISHER_ID}
         data-ad-slot={adSlot}
         {...(!isFixed && {
           'data-ad-format': 'auto',

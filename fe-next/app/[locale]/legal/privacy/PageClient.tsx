@@ -175,6 +175,18 @@ export default function PrivacyPolicyPageClient(): React.ReactElement {
               AdSense Partner Policy
             </a>
           </li>
+          <li>{t('legal.privacy.advertisingPartners.yourChoices.browserCookies')}</li>
+          <li>
+            {t('legal.privacy.advertisingPartners.yourChoices.aboutAds')}{' '}
+            <a
+              href="https://www.aboutads.info/choices"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neo-cyan hover:underline font-medium"
+            >
+              aboutads.info
+            </a>
+          </li>
         </ul>
 
         <div className={cn(

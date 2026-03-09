@@ -1,24 +1,52 @@
-'use client';
-
-import { useEffect } from 'react';
-import { initGoogleConsentMode } from '@/utils/cookieConsent';
+import Script from 'next/script';
 
 /**
- * Initializes Google Consent Mode v2 defaults.
+ * Initializes Google Consent Mode v2 defaults via an inline script.
  *
  * MUST render BEFORE GoogleAnalytics and GoogleAdSense in the component tree.
- * Sets consent defaults to "denied" until user interacts with cookie banner,
- * then CookieConsent updates consent state via gtag('consent', 'update', ...).
+ * Uses strategy="beforeInteractive" so consent defaults are set synchronously
+ * before any Google tags load — required by Google's Consent Mode spec.
+ *
+ * The inline script is a static string constant (no user input / no XSS risk).
  *
  * Required for AdSense approval in EU/EEA regions.
  * @see https://developers.google.com/tag-platform/security/guides/consent
  */
-export function GoogleConsentMode() {
-  useEffect(() => {
-    initGoogleConsentMode();
-  }, []);
 
-  return null;
+// Static consent initialization script — reads stored consent from localStorage
+// and sets Google Consent Mode v2 defaults before any Google tags load.
+// Content is a hardcoded constant — safe for dangerouslySetInnerHTML.
+const CONSENT_INIT_SCRIPT = `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+window.gtag = gtag;
+var stored = null;
+try {
+  var raw = localStorage.getItem('cookie-consent-v2');
+  if (raw) stored = JSON.parse(raw);
+} catch(e) {}
+var ad = stored && stored.advertising ? 'granted' : 'denied';
+var an = stored && stored.analytics ? 'granted' : 'denied';
+gtag('consent', 'default', {
+  ad_storage: ad,
+  ad_user_data: ad,
+  ad_personalization: ad,
+  analytics_storage: an,
+  functionality_storage: 'granted',
+  personalization_storage: 'granted',
+  security_storage: 'granted',
+  wait_for_update: 500
+});
+`;
+
+export function GoogleConsentMode() {
+  return (
+    <Script
+      id="google-consent-mode"
+      strategy="beforeInteractive"
+      dangerouslySetInnerHTML={{ __html: CONSENT_INIT_SCRIPT }}
+    />
+  );
 }
 
 export default GoogleConsentMode;

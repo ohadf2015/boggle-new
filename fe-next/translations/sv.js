@@ -2754,35 +2754,37 @@ const sv = {
         "cookies": "Annonskookies: Under TFCD-läget sätter Google inte personaliserade annonskookies. Begränsade cookies kan användas för annonsfrekvenstak och aggregerad annonsrapportering.",
         "personalization": "Ingen annonspersonalisering: Annonser personaliseras inte baserat på surfhistorik, intressen eller demografiska profiler. Alla användare ser samma kontextuella, icke-riktade annonser.",
         "thirdPartyAccess": "Begränsad dataåtkomst: Under barnriktat behandling får annonspartners endast aggregerad, icke-identifierbar data för annonsprestandarapportering.",
-        "optOut": "Eftersom annonser redan är icke-personaliserade krävs ingen avanmälan. Du kan läsa mer om Googles annonspolicyer på https://www.google.com/settings/ads.",
+        "optOut": "Du kan välja bort personaliserad annonsering genom att besöka Googles annonsinställningar på https://www.google.com/settings/ads. Du kan också välja bort tredjepartsannons-cookies genom att besöka https://www.aboutads.info/choices.",
         "learnMore": "För mer information om hur Google hanterar barnriktat innehåll, besök https://policies.google.com/technologies/partner-sites"
       },
       "advertisingPartners": {
         "title": "Annonspartners",
-        "intro": "Vi samarbetar med Google AdSense för att visa icke-personaliserade annonser på vår webbplats. Annonsintäkter hjälper till att hålla LexiClash gratis för alla spelare. Alla annonser fungerar under barnriktat innehåll-läge (TFCD).",
+        "intro": "Vi samarbetar med Google AdSense för att visa annonser på vår webbplats. Tredjepartsleverantörer, inklusive Google, använder cookies för att visa annonser. Googles användning av annonscookies gör det möjligt för Google och dess partners att visa annonser baserat på användares besök på LexiClash och andra webbplatser på internet. Annonsintäkter hjälper till att hålla LexiClash gratis för alla spelare. Alla annonser fungerar under barnriktat innehåll-läge (TFCD).",
         "howItWorks": {
           "title": "Hur annonsering fungerar",
-          "cookies": "Alla annonser är icke-personaliserade — inget surfbeteende spåras för annonsriktning",
+          "cookies": "Tredjepartsleverantörer, inklusive Google, använder cookies för att visa annonser baserat på dina tidigare besök på denna och andra webbplatser",
           "control": "Barnriktat behandling (TFCD) är aktiverat som standard, vilket säkerställer ingen annonspersonalisering",
           "noSale": "Vi säljer aldrig din personliga data till annonsörer",
           "revenue": "Annonsintäkter hjälper oss att hålla LexiClash gratis att spela",
-          "thirdParty": "Googles annonsvisning uppfyller COPPA-kraven för barnriktade webbplatser"
+          "thirdParty": "Google kan samla in enhetsspecifik information (såsom enhetstyp, operativsystem och webbläsare) och IP-baserad platsdata för annonsvisning, frekvensbegränsning och aggregerad rapportering"
         },
         "yourChoices": {
           "title": "Dina val",
-          "intro": "Eftersom alla annonser är icke-personaliserade krävs ingen åtgärd. För mer information:",
-          "optOut": "Läs om icke-personaliserade annonser",
+          "intro": "Du har flera alternativ för att kontrollera annonsering på LexiClash:",
+          "optOut": "Du kan välja bort personaliserad annonsering genom att besöka Googles annonsinställningar",
           "googlePrivacy": "Granska Googles integritetspraxis",
-          "partnerPolicy": "Läs om AdSense partnerregler"
+          "partnerPolicy": "Läs om AdSense partnerregler",
+          "browserCookies": "Du kan hantera eller ta bort cookies via dina webbläsarinställningar. Observera att inaktivering av cookies kan påverka webbplatsens funktionalitet.",
+          "aboutAds": "Du kan också välja bort tredjepartsleverantörers annonscookies genom att besöka"
         },
         "important": {
           "title": "Viktigt:",
-          "content": "Alla annonser på LexiClash är icke-personaliserade och uppfyller krav för barnriktat innehåll. Inga intressebaserade eller remarketingannonser visas. Du kan läsa mer om Googles annonspolicyer via"
+          "content": "Alla annonser på LexiClash är icke-personaliserade och uppfyller krav för barnriktat innehåll. Inga intressebaserade eller remarketingannonser visas. För mer information om hur Google använder data på partnersajter, besök https://policies.google.com/technologies/partner-sites. Du kan läsa mer om Googles annonspolicyer via"
         }
       },
       "cookies": {
         "title": "5. Cookies och lokal lagring",
-        "content": "Vi använder essentiella cookies och lokal lagring för: autentiseringstoken (Supabase), användarnamn och preferenser (localStorage), temainställningar (mörkt/ljust läge) och språkpreferenser. Vi använder också LogRocket-cookies för analysändamål. Annonsering fungerar under barnriktat innehåll-läge (TFCD), som begränsar cookies till annonsfrekvenstak och aggregerad rapportering — inga personaliserade annons- eller spårningscookies används."
+        "content": "Vi använder essentiella cookies och lokal lagring för: autentiseringstoken (Supabase), användarnamn och preferenser (localStorage), temainställningar (mörkt/ljust läge) och språkpreferenser. Vi använder också LogRocket-cookies för analysändamål. Tredjepartsleverantörer, inklusive Google, använder cookies för annonsvisning, frekvensbegränsning och aggregerad rapportering. Annonsering fungerar under barnriktat innehåll-läge (TFCD) — ingen personaliserad annonsering eller spårningscookies för korswebbplatsdata används. Du kan hantera cookies via dina webbläsarinställningar: de flesta webbläsare låter dig visa, ta bort och blockera cookies från webbplatser. Observera att inaktivering av essentiella cookies kan förhindra att webbplatsen fungerar korrekt."
       },
       "dataRetention": {
         "title": "6. Datalagring",
@@ -2858,7 +2860,7 @@ const sv = {
         "intro": "Du har flera alternativ för att kontrollera cookies:",
         "browser": "Webbläsarinställningar — de flesta webbläsare låter dig blockera eller ta bort cookies via inställningsmenyn",
         "banner": "Vår samtycksbanner — när du besöker oss första gången låter vår cookiesamtycksbanner dig acceptera eller avvisa icke-nödvändiga cookies",
-        "optOut": "Avaktivera Googles annonspersonalisering",
+        "optOut": "Du kan välja bort personaliserad annonsering genom att besöka Googles annonsinställningar",
         "googlePrivacy": "Läs mer om Googles datapraxis"
       },
       "consent": {

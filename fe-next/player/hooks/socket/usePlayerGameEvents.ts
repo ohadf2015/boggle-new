@@ -163,6 +163,11 @@ export function usePlayerGameEvents({
   // Track game session ID
   const gameSessionIdRef = useRef<number>(0);
 
+  // Track whether results have already been processed for this game session
+  // Prevents true duplicates without blocking the initial event (fixes race condition
+  // where validatedScores can arrive before endGame sets waitingForResults=true)
+  const hasProcessedResultsRef = useRef<number | null>(null);
+
   // Fire round interval ref - persists across handler recreations
   // This is critical for ensuring the countdown continues even if useEffect re-runs
   const fireRoundIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -314,13 +319,20 @@ export function usePlayerGameEvents({
     };
 
     const handleValidatedScores = (data: any) => {
-      if (!useGameStore.getState().waitingForResults) {
-        logger.log('[PLAYER] Ignoring duplicate validatedScores - not waiting for results');
+      // Deduplicate by game session — prevents processing results twice for the same game
+      // but does NOT block the initial event (unlike the old waitingForResults guard which
+      // caused a race condition when validatedScores arrived before endGame)
+      if (hasProcessedResultsRef.current === gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring duplicate validatedScores - already processed for session', gameSessionIdRef.current);
         return;
       }
+      hasProcessedResultsRef.current = gameSessionIdRef.current;
       logger.log('[PLAYER] Received validatedScores event:', data);
 
       // Transition directly to results — no validation modal delay
+      // Also ensures game is marked inactive as fallback (in case endGame hasn't arrived yet)
+      setGameActive(false);
+      gameActiveRef.current = false;
       setWaitingForResults(false);
       setShowWordFeedback(false);
       setWordToVote(null);
@@ -377,6 +389,7 @@ export function usePlayerGameEvents({
       setShufflingGrid(null);
       setShowStartAnimation(false);
       waitingStartTimeRef.current = null;
+      hasProcessedResultsRef.current = null;
 
       // Reset timer for next game
       // Use ref to get latest timer methods (avoids socket listener re-registration)

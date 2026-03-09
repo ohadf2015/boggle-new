@@ -120,6 +120,9 @@ export function useHostGameEvents({
   // Track when we entered waiting state to prevent flickering
   const waitingStartTimeRef = useRef<number | null>(null);
 
+  // Track which game session's results have been processed to prevent duplicates
+  const hasProcessedResultsRef = useRef<number | null>(null);
+
   // Track game session ID to ignore stale events
   const gameSessionIdRef = useRef<number>(0);
   // State version for triggering re-renders when session changes
@@ -216,6 +219,7 @@ export function useHostGameEvents({
       }
 
       // Reset state for new game
+      hasProcessedResultsRef.current = null;
       setWaitingForResults(false);
       waitingStartTimeRef.current = null;
       setShowStartAnimation(true);
@@ -266,11 +270,12 @@ export function useHostGameEvents({
     };
 
     const handleValidationComplete = (data: any) => {
-      // Guard against duplicate validationComplete events
-      if (!useGameStore.getState().waitingForResults) {
-        logger.log('[HOST] Ignoring duplicate validationComplete - not waiting for results');
+      // Guard against duplicate validationComplete events using session ID
+      if (hasProcessedResultsRef.current === gameSessionIdRef.current) {
+        logger.log('[HOST] Ignoring duplicate validationComplete - already processed for session:', gameSessionIdRef.current);
         return;
       }
+      hasProcessedResultsRef.current = gameSessionIdRef.current;
 
       logger.log('[HOST] Received validationComplete event:', data);
 
@@ -278,6 +283,8 @@ export function useHostGameEvents({
       const currentOnShowResults = onShowResultsRef.current;
       const currentTableData = tableDataRef.current;
 
+      // Ensure game state is fully transitioned (fallback if timeUpdate race missed these)
+      setGameStarted(false);
       setWaitingForResults(false);
       waitingStartTimeRef.current = null;
 

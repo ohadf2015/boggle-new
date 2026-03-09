@@ -2265,35 +2265,37 @@ const es = {
         "cookies": "Cookies publicitarias: En el modo TFCD, Google no establece cookies de publicidad personalizada. Se pueden utilizar cookies limitadas solo para limitar la frecuencia de anuncios e informes agregados.",
         "personalization": "Sin personalización de anuncios: Los anuncios no se personalizan según el historial de navegación, intereses o perfiles demográficos. Todos los usuarios ven los mismos anuncios contextuales no dirigidos.",
         "thirdPartyAccess": "Acceso limitado a datos: Bajo el tratamiento dirigido a niños, los socios publicitarios solo reciben datos agregados y no identificables para informes de rendimiento publicitario.",
-        "optOut": "Dado que los anuncios ya son no personalizados, no se requiere exclusión. Puedes obtener más información sobre las políticas publicitarias de Google en https://www.google.com/settings/ads.",
+        "optOut": "Puedes optar por no recibir publicidad personalizada visitando la Configuración de anuncios de Google en https://www.google.com/settings/ads. También puedes optar por no recibir cookies publicitarias de proveedores externos visitando https://www.aboutads.info/choices.",
         "learnMore": "Para obtener más información sobre cómo Google maneja el contenido dirigido a niños, visita https://policies.google.com/technologies/partner-sites"
       },
       "advertisingPartners": {
         "title": "Socios Publicitarios",
-        "intro": "Nos asociamos con Google AdSense para mostrar anuncios no personalizados en nuestro sitio web. Los ingresos publicitarios ayudan a mantener LexiClash gratuito para todos los jugadores. Todos los anuncios operan bajo el modo de tratamiento dirigido a niños (TFCD).",
+        "intro": "Nos asociamos con Google AdSense para mostrar anuncios en nuestro sitio web. Los proveedores externos, incluido Google, utilizan cookies para publicar anuncios. El uso de cookies publicitarias por parte de Google permite a Google y a sus socios publicar anuncios basados en las visitas de los usuarios a LexiClash y otros sitios en Internet. Los ingresos publicitarios ayudan a mantener LexiClash gratuito para todos los jugadores. Todos los anuncios operan bajo el modo de tratamiento dirigido a niños (TFCD).",
         "howItWorks": {
           "title": "Cómo funciona la publicidad",
-          "cookies": "Todos los anuncios son no personalizados — no se rastrea el comportamiento de navegación para la orientación de anuncios",
+          "cookies": "Los proveedores externos, incluido Google, utilizan cookies para publicar anuncios basados en tus visitas anteriores a este y otros sitios web",
           "control": "El tratamiento dirigido a niños (TFCD) está habilitado por defecto, asegurando que no haya personalización de anuncios",
           "noSale": "Nunca vendemos tus datos personales a anunciantes",
           "revenue": "Los ingresos publicitarios nos ayudan a mantener LexiClash gratuito",
-          "thirdParty": "La publicidad de Google cumple con los requisitos de COPPA para sitios dirigidos a niños"
+          "thirdParty": "Google puede recopilar información específica del dispositivo (como tipo de dispositivo, sistema operativo y navegador) y datos de ubicación basados en IP para la publicación de anuncios, limitación de frecuencia e informes agregados"
         },
         "yourChoices": {
           "title": "Tus opciones",
-          "intro": "Dado que todos los anuncios son no personalizados, no se requiere ninguna acción. Para más información:",
-          "optOut": "Conocer sobre anuncios no personalizados",
+          "intro": "Tienes varias opciones para controlar la publicidad en LexiClash:",
+          "optOut": "Puedes optar por no recibir publicidad personalizada visitando la Configuración de anuncios de Google",
           "googlePrivacy": "Revisar las prácticas de privacidad de Google",
-          "partnerPolicy": "Conocer las políticas de socios de AdSense"
+          "partnerPolicy": "Conocer las políticas de socios de AdSense",
+          "browserCookies": "Puedes gestionar o eliminar cookies a través de la configuración de tu navegador. Ten en cuenta que desactivar las cookies puede afectar la funcionalidad del sitio.",
+          "aboutAds": "También puedes optar por no recibir cookies publicitarias de proveedores externos visitando"
         },
         "important": {
           "title": "Importante:",
-          "content": "Todos los anuncios en LexiClash son no personalizados y cumplen con los requisitos de contenido dirigido a niños. No se muestran anuncios basados en intereses ni de remarketing. Puedes obtener más información sobre las políticas publicitarias de Google a través de"
+          "content": "Todos los anuncios en LexiClash son no personalizados y cumplen con los requisitos de contenido dirigido a niños. No se muestran anuncios basados en intereses ni de remarketing. Para más información sobre cómo Google utiliza datos en sitios de socios, visita https://policies.google.com/technologies/partner-sites. Puedes obtener más información sobre las políticas publicitarias de Google a través de"
         }
       },
       "cookies": {
         "title": "Cookies y Almacenamiento Local",
-        "content": "Usamos cookies esenciales y almacenamiento local para: tokens de autenticación (Supabase), nombre de usuario y preferencias (localStorage), configuración de tema (modo oscuro/claro) y preferencias de idioma. También usamos cookies de LogRocket para análisis. La publicidad opera bajo el modo de tratamiento dirigido a niños (TFCD), que limita las cookies a la limitación de frecuencia de anuncios e informes agregados — no se utilizan cookies de publicidad personalizada ni de seguimiento entre sitios."
+        "content": "Usamos cookies esenciales y almacenamiento local para: tokens de autenticación (Supabase), nombre de usuario y preferencias (localStorage), configuración de tema (modo oscuro/claro) y preferencias de idioma. También usamos cookies de LogRocket para análisis. Los proveedores externos, incluido Google, utilizan cookies para la publicación de anuncios, limitación de frecuencia e informes agregados. La publicidad opera bajo el modo de tratamiento dirigido a niños (TFCD) — no se utilizan cookies de publicidad personalizada ni de seguimiento entre sitios. Puedes gestionar las cookies a través de la configuración de tu navegador: la mayoría de los navegadores te permiten ver, eliminar y bloquear cookies de sitios web. Ten en cuenta que desactivar las cookies esenciales puede impedir que el sitio funcione correctamente."
       },
       "security": {
         "title": "Seguridad de Datos",
@@ -2369,7 +2371,7 @@ const es = {
         "intro": "Tienes varias opciones para controlar las cookies:",
         "browser": "Configuración del navegador — la mayoría de los navegadores te permiten bloquear o eliminar cookies a través de su menú de configuración",
         "banner": "Nuestro banner de consentimiento — cuando visitas por primera vez, nuestro banner de consentimiento de cookies te permite aceptar o rechazar cookies no esenciales",
-        "optOut": "Desactivar la personalización de anuncios de Google",
+        "optOut": "Puedes optar por no recibir publicidad personalizada visitando la Configuración de anuncios de Google",
         "googlePrivacy": "Más información sobre las prácticas de datos de Google"
       },
       "consent": {
