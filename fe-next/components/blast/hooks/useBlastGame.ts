@@ -554,6 +554,7 @@ export function useBlastGame(
     });
 
     if (pendingPopups.length > 0) setScorePopups(prev => [...prev, ...pendingPopups]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs and state setters are stable
   }, [gridSize, effectiveGrid, cascade, handleCascadeComplete, currentWave]);
 
   /** End the game manually */
