@@ -248,6 +248,24 @@ export function BlastTileOverlay({
                   <span>{iconEntry.label}</span>
                 </span>
               )}
+
+              {/* Hits remaining badge for multi-hit tiles (ice, frozen, prism, gem) */}
+              {tile.hitsRemaining > 0 && (
+                <span
+                  className={cn(
+                    'absolute top-0 left-0 flex items-center justify-center rounded-br-md rounded-tl-lg',
+                    'w-4 h-4 text-[9px] font-black leading-none animate-neo-pop',
+                    tile.hitsRemaining === 1
+                      ? 'bg-red-500/90 text-white'
+                      : tile.hitsRemaining === 2
+                      ? 'bg-amber-400/90 text-black'
+                      : 'bg-white/80 text-black',
+                  )}
+                  data-testid={`hits-${tile.type}`}
+                >
+                  {tile.hitsRemaining}
+                </span>
+              )}
             </motion.div>
           );
         })}

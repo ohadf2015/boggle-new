@@ -29,17 +29,16 @@ import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import {
-  calculateFinalAchievements,
   checkLiveAchievements,
   createAchievementState,
-  type WordData as AchievementWordData,
   type SinglePlayerAchievement,
 } from '@/utils/singlePlayerAchievements';
 import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
 import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
-import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from '../../SinglePlayerView';
-import type { LetterGrid, Language } from '@/shared/types/game';
+import { buildGameResults, buildFallbackResults } from './buildGameResults';
+import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../SinglePlayerView';
+import type { LetterGrid } from '@/shared/types/game';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { FoundWord, TrainingState, DirectionGuidanceState, KeyboardInputState } from '../types';
 
@@ -63,28 +62,16 @@ const MIN_TRACKED_WORD_LENGTH = 5;
  * Consolidates all state management, effects, and handlers
  */
 export function useSinglePlayerCore({
-  settings,
-  targetHighScore,
-  onGameEnd,
-  onQuit,
+  settings, targetHighScore, onGameEnd, onQuit,
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
   const {
-    playWordAcceptedSound,
-    playComboSound,
-    playEarthquakeRumble,
-    playEarthquakeShake,
-    playFireRoundStart,
-    startFireCrackleLoop,
-    stopFireCrackleLoop,
-    setGameActive,
+    playWordAcceptedSound, playComboSound, playEarthquakeRumble,
+    playEarthquakeShake, playFireRoundStart, startFireCrackleLoop,
+    stopFireCrackleLoop, setGameActive,
   } = useSoundEffects();
   const { announceWordResult, announceCombo, announceTimer } = useAnnouncer();
-
-  // Device performance detection
   const { isLowEnd } = useDevicePerformance();
-
-  // Layout detection
   const isLandscape = useMobileLandscape();
   const { isDesktop, isTv } = useDesktopLayout();
   const isGiftModalOpen = useGiftModalPause();
@@ -110,21 +97,13 @@ export function useSinglePlayerCore({
   const [isEarthquakePaused, setIsEarthquakePaused] = useState(false);
   const [progressBarExpanded, setProgressBarExpanded] = useState(false);
   const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
-
-  // Achievement state
   const [liveAchievements, setLiveAchievements] = useState<SinglePlayerAchievement[]>([]);
   const achievementStateRef = useRef(createAchievementState());
 
   // Reveal word state
   const [revealState, setRevealState] = useState<{
-    revealsUsed: number;
-    isLoading: boolean;
-    highlightedPath: Array<{ row: number; col: number }>;
-  }>({
-    revealsUsed: 0,
-    isLoading: false,
-    highlightedPath: [],
-  });
+    revealsUsed: number; isLoading: boolean; highlightedPath: Array<{ row: number; col: number }>;
+  }>({ revealsUsed: 0, isLoading: false, highlightedPath: [] });
 
   // Refs
   const availableWordsRef = useRef(availableWords);
@@ -144,7 +123,7 @@ export function useSinglePlayerCore({
   const isTypingModeRef = useRef(false);
   const gameStatsRef = useRef<HTMLDivElement>(null);
 
-  // Auto-clear feedback after 1.5s for terminal states (accepted/rejected/duplicate)
+  // Auto-clear feedback after 1.5s for terminal states
   useEffect(() => {
     if (feedbackClearTimerRef.current) {
       clearTimeout(feedbackClearTimerRef.current);
@@ -156,30 +135,16 @@ export function useSinglePlayerCore({
         feedbackClearTimerRef.current = null;
       }, 1500);
     }
-    return () => {
-      if (feedbackClearTimerRef.current) {
-        clearTimeout(feedbackClearTimerRef.current);
-      }
-    };
+    return () => { if (feedbackClearTimerRef.current) clearTimeout(feedbackClearTimerRef.current); };
   }, [currentFeedback]);
 
-  // Bot simulation
+  // Sub-hooks
   const { botScores, botWords, resetBots, initializeBotUsedWords } = useBotSimulation({
-    mode: settings.mode,
-    bots: settings.bots,
-    isPaused,
-    isGameOver,
-    availableWords,
+    mode: settings.mode, bots: settings.bots, isPaused, isGameOver, availableWords,
   });
-
-  // Spam detection
   const { checkSubmission, resetSpamDetection } = useSpamDetection();
-
-  // Combo system
   const combo = useComboSystem({
-    onComboSound: (level) => {
-      if (level >= 2) playComboSound(level);
-    },
+    onComboSound: (level) => { if (level >= 2) playComboSound(level); },
     onComboMilestone: (level) => {
       const coinsAwarded = awardComboCoins(level, 'singleplayer');
       if (coinsAwarded > 0) setComboCoinReward(coinsAwarded);
@@ -187,158 +152,78 @@ export function useSinglePlayerCore({
     trackMaxCombo: true,
     timerIntervalMs: isLowEnd ? 500 : 250,
   });
-
-  // Direction guidance
   const directionGuidance = useDirectionPatternGuidance();
-
-  // First-play tutorial
   const firstPlayTutorial = useFirstPlayTutorial({
-    grid,
-    availableWords,
-    language: settings.language,
+    grid, availableWords, language: settings.language,
     isGameActive: !!grid && !isPaused && !isGameOver,
   });
 
-  // Training analysis (practice mode)
   const trainingGridSize = useMemo(() => ({ rows: 5, cols: 5 }), []);
   const handleTrainingAnalysisComplete = useCallback(() => { }, []);
-
-  // CRITICAL: Destructure to get stable function references for dependency arrays.
-  // Using the entire hook object in dependencies causes infinite re-render loops
-  // because the object reference changes on each render even if functions are stable.
   const {
-    trackPath: trainingAnalysisTrackPath,
-    trackValidWord: trainingAnalysisTrackValidWord,
-    currentHint: trainingAnalysisCurrentHint,
-    dismissHint: trainingAnalysisDismissHint,
-    finishTraining: trainingAnalysisFinishTraining,
-    hasPassed: trainingAnalysisHasPassed,
+    trackPath: trainingAnalysisTrackPath, trackValidWord: trainingAnalysisTrackValidWord,
+    currentHint: trainingAnalysisCurrentHint, dismissHint: trainingAnalysisDismissHint,
+    finishTraining: trainingAnalysisFinishTraining, hasPassed: trainingAnalysisHasPassed,
   } = useTrainingAnalysis({
-    enabled: settings.mode === 'practice',
-    gridSize: trainingGridSize,
+    enabled: settings.mode === 'practice', gridSize: trainingGridSize,
     onTrainingComplete: handleTrainingAnalysisComplete,
   });
 
-  // Training progress
-  const handleTrainingSkillUnlock = useCallback((skillId: string) => {
-    console.log(`Skill unlocked: ${skillId}`);
-  }, []);
-
-  const handleTrainingComplete = useCallback(() => {
-    setShowCompletionPopup(true);
-  }, []);
-
-  // CRITICAL: Destructure to get stable function references (updateProgress, trackPath, trackValidWord)
-  // instead of using the whole hook object. Inline objects create new references each render,
-  // which causes useEffect dependencies to trigger infinitely.
+  const handleTrainingSkillUnlock = useCallback((skillId: string) => { console.log(`Skill unlocked: ${skillId}`); }, []);
+  const handleTrainingComplete = useCallback(() => { setShowCompletionPopup(true); }, []);
   const {
-    completedSkills: trainingCompletedSkills,
-    completedSkillsRef: trainingCompletedSkillsRef,
-    justUnlocked: trainingJustUnlocked,
-    isComplete: trainingIsComplete,
-    clearJustUnlocked: trainingClearJustUnlocked,
-    updateProgress: trainingUpdateProgress,
-    trackPath: trainingTrackPath,
-    trackValidWord: trainingTrackValidWord,
+    completedSkills: trainingCompletedSkills, completedSkillsRef: trainingCompletedSkillsRef,
+    justUnlocked: trainingJustUnlocked, isComplete: trainingIsComplete,
+    clearJustUnlocked: trainingClearJustUnlocked, updateProgress: trainingUpdateProgress,
+    trackPath: trainingTrackPath, trackValidWord: trainingTrackValidWord,
   } = useTrainingProgress({
     enabled: settings.mode === 'practice',
-    onSkillUnlock: handleTrainingSkillUnlock,
-    onComplete: handleTrainingComplete,
+    onSkillUnlock: handleTrainingSkillUnlock, onComplete: handleTrainingComplete,
   });
 
-  // Timer
   const timer = useGameTimer({
     initialTime: settings.timerSeconds,
     isPaused: isPaused || settings.mode === 'practice',
     isExternallyPaused: isEarthquakePaused || isGiftModalOpen,
     autoStart: settings.mode !== 'practice',
-    onTimeUp: () => {
-      if (!gameOverCalledRef.current) setIsGameOver(true);
-    },
+    onTimeUp: () => { if (!gameOverCalledRef.current) setIsGameOver(true); },
   });
 
-  // Navigation guard
   useNavigationGuard({
     enabled: !!grid && !isGameOver && score > 0,
     message: t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?',
-    onNavigationAttempt: () => {
-      setShowQuitConfirm(true);
-      return false;
-    },
+    onNavigationAttempt: () => { setShowQuitConfirm(true); return false; },
   });
 
-  // Auto-scroll
   const gameActive = !!grid && !isPaused && !isGameOver && timer.remainingTime > 0;
   useAutoScrollOnGameStart(gameStatsRef, { gameActive, isLandscape });
+  useCrazyGamesLifecycle({ isGameActive: gameActive, isGameOver, score, maxCombo: combo.maxCombo });
 
-  // CrazyGames lifecycle
-  useCrazyGamesLifecycle({
-    isGameActive: gameActive,
-    isGameOver,
-    score,
-    maxCombo: combo.maxCombo,
-  });
-
-  // Earthquake/Fire Round
-  const {
-    earthquakeState,
-    fireRoundActive,
-    fireRoundRemaining,
-    getScoreMultiplier,
-  } = useEarthquakeFireRound({
-    enabled: settings.mode !== 'practice',
-    gameDurationSeconds: settings.timerSeconds,
-    currentTimeSeconds: timer.remainingTime,
-    language: settings.language,
-    difficulty: settings.difficulty,
-    mode: 'singleplayer',
-    onGridRegenerate: (newGrid) => {
-      setGrid(newGrid);
-      foundWordsSetRef.current.clear();
-    },
-    onEarthquakeStart: () => {
-      playEarthquakeRumble();
-      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate([150, 100, 150, 100, 200]);
-      }
-    },
-    onEarthquakeShake: () => {
-      playEarthquakeShake();
-      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate([300, 150, 300, 150, 400, 150, 300]);
-      }
-    },
-    onFireRoundStart: () => {
-      playFireRoundStart();
-      startFireCrackleLoop();
-      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(200);
-      }
-    },
+  const { earthquakeState, fireRoundActive, fireRoundRemaining, getScoreMultiplier } = useEarthquakeFireRound({
+    enabled: settings.mode !== 'practice', gameDurationSeconds: settings.timerSeconds,
+    currentTimeSeconds: timer.remainingTime, language: settings.language,
+    difficulty: settings.difficulty, mode: 'singleplayer',
+    onGridRegenerate: (newGrid) => { setGrid(newGrid); foundWordsSetRef.current.clear(); },
+    onEarthquakeStart: () => { playEarthquakeRumble(); if (typeof window !== 'undefined' && 'vibrate' in navigator) navigator.vibrate([150, 100, 150, 100, 200]); },
+    onEarthquakeShake: () => { playEarthquakeShake(); if (typeof window !== 'undefined' && 'vibrate' in navigator) navigator.vibrate([300, 150, 300, 150, 400, 150, 300]); },
+    onFireRoundStart: () => { playFireRoundStart(); startFireCrackleLoop(); if (typeof window !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(200); },
     onFireRoundEnd: stopFireCrackleLoop,
     onTimerPause: () => setIsEarthquakePaused(true),
     onTimerResume: () => setIsEarthquakePaused(false),
   });
 
-  // Game music
   useGameMusic({
-    phase: 'playing',
-    remainingTime: timer.remainingTime,
-    totalTime: settings.timerSeconds,
+    phase: 'playing', remainingTime: timer.remainingTime, totalTime: settings.timerSeconds,
     isPaused: isPaused || isGameOver || settings.mode === 'practice',
-    enabled: settings.mode !== 'practice',
-    earthquakeState,
+    enabled: settings.mode !== 'practice', earthquakeState,
   });
 
-  // Calculate word score
   const calculateWordScore = useCallback((wordLength: number, currentComboLevel: number): number => {
     const baseScore = Math.max(wordLength - 1, 1);
-    const comboBonus = calculateComboBonus(currentComboLevel, wordLength);
-    const multiplier = getScoreMultiplier();
-    return (baseScore + comboBonus) * multiplier;
+    return (baseScore + calculateComboBonus(currentComboLevel, wordLength)) * getScoreMultiplier();
   }, [getScoreMultiplier]);
 
-  // Word submission handler - defined before keyboardInput
+  // Word submission handler
   const handleWordSubmit = useCallback((word: string) => {
     const normalizedWord = word.toLowerCase().trim();
     const minWordLength = settings.minWordLength ?? 2;
@@ -355,24 +240,17 @@ export function useSinglePlayerCore({
       }
       return;
     }
-
     if (spamResult.isWarning) {
       wordErrorToast(t('playerView.submittingTooFast') || 'Submitting too fast!', { duration: 1500 });
     }
 
-    const localValidation = validateWordLocally(
-      normalizedWord, settings.language, minWordLength,
-      foundWords.map(fw => ({ word: fw.word, isValid: fw.isValid }))
-    );
-
+    const localValidation = validateWordLocally(normalizedWord, settings.language, minWordLength, foundWords.map(fw => ({ word: fw.word, isValid: fw.isValid })));
     if (!localValidation.isValid) {
       const errorKey = localValidation.errorKey ?? 'Invalid word';
       let msg = t(errorKey) || errorKey;
       if (localValidation.errorParams?.min) msg = msg.replace('${min}', String(localValidation.errorParams.min));
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: msg, timestamp: now });
-      hapticError();
-      announceWordResult(normalizedWord, false, undefined, msg);
-      combo.resetCombo();
+      hapticError(); announceWordResult(normalizedWord, false, undefined, msg); combo.resetCombo();
       return;
     }
 
@@ -380,18 +258,14 @@ export function useSinglePlayerCore({
     if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, settings.language)) {
       const notOnBoardMsg = t('playerView.wordNotOnBoard') || 'Word not on board';
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: notOnBoardMsg, timestamp: now });
-      hapticError();
-      announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
-      combo.resetCombo();
+      hapticError(); announceWordResult(normalizedWord, false, undefined, notOnBoardMsg); combo.resetCombo();
       return;
     }
 
     if (foundWordsSetRef.current.has(normalizedWord)) {
       const alreadyFoundMsg = t('playerView.wordAlreadyFound') || 'Already found!';
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: alreadyFoundMsg, timestamp: now });
-      hapticError();
-      announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
-      combo.resetCombo();
+      hapticError(); announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg); combo.resetCombo();
       return;
     }
 
@@ -406,30 +280,24 @@ export function useSinglePlayerCore({
     setFoundWords(foundWordsRef.current);
 
     fetch('/api/dictionary/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ word: normalizedWord, language: settings.language }),
     })
       .then(res => res.ok ? res.json() : { isValid: false, source: 'error' })
       .then(result => {
         if (result.isValid) {
-          const wordLenScore = Math.max(normalizedWord.length - 1, 1);
           const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
-          const scoreWithoutMultiplier = wordLenScore + comboBonus;
+          const scoreWithoutMultiplier = Math.max(normalizedWord.length - 1, 1) + comboBonus;
           const multiplier = getScoreMultiplier();
           const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
 
           foundWordsRef.current = foundWordsRef.current.map(fw =>
-            fw.word === normalizedWord && fw.timestamp === now
-              ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
-              : fw
+            fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus } : fw
           );
           setFoundWords(foundWordsRef.current);
           setScore(prev => prev + fullScore);
-          playWordAcceptedSound();
-          hapticForWordScore(normalizedWord.length);
-          lastWordFoundTimeRef.current = Date.now();
-          setShowHintPrompt(false);
+          playWordAcceptedSound(); hapticForWordScore(normalizedWord.length);
+          lastWordFoundTimeRef.current = Date.now(); setShowHintPrompt(false);
           combo.incrementCombo(true);
           trainingAnalysisTrackValidWord(normalizedWord.length);
           trainingTrackValidWord(normalizedWord.length);
@@ -441,52 +309,29 @@ export function useSinglePlayerCore({
           announceWordResult(normalizedWord, true, fullScore);
           announceCombo(currentCombo + 1);
 
-          // Check for live achievements
           const validatedWords = foundWordsRef.current
             .filter(fw => fw.isValid === true)
-            .map(fw => ({
-              word: fw.word,
-              score: fw.score,
-              timestamp: fw.timestamp,
-              timeSinceStart: fw.timeSinceStart,
-              isValid: true,
-              comboBonus: fw.comboBonus,
-            }));
-
+            .map(fw => ({ word: fw.word, score: fw.score, timestamp: fw.timestamp, timeSinceStart: fw.timeSinceStart, isValid: true, comboBonus: fw.comboBonus }));
           const newAchievements = checkLiveAchievements(
-            achievementStateRef.current,
-            validatedWords,
-            normalizedWord,
-            true,
-            timeSinceStart,
-            currentCombo + 1,
-            settings.timerSeconds
+            achievementStateRef.current, validatedWords, normalizedWord, true, timeSinceStart, currentCombo + 1, settings.timerSeconds
           );
-
-          if (newAchievements.length > 0) {
-            setLiveAchievements(prev => [...prev, ...newAchievements]);
-          }
+          if (newAchievements.length > 0) setLiveAchievements(prev => [...prev, ...newAchievements]);
         } else {
           combo.resetCombo();
           foundWordsRef.current = foundWordsRef.current.map(fw =>
-            fw.word === normalizedWord && fw.timestamp === now
-              ? { ...fw, isValid: false, score: 0 }
-              : fw
+            fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
           );
           setFoundWords(foundWordsRef.current);
           const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
           setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
-          hapticError();
-          announceWordResult(normalizedWord, false, undefined, invalidMsg);
+          hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
           recordNotInDictionary(normalizedWord, settings.language, 'single_player');
         }
       })
       .catch(() => {
         combo.resetCombo();
         foundWordsRef.current = foundWordsRef.current.map(fw =>
-          fw.word === normalizedWord && fw.timestamp === now
-            ? { ...fw, isValid: false, score: 0 }
-            : fw
+          fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
         );
         setFoundWords(foundWordsRef.current);
         const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
@@ -497,60 +342,30 @@ export function useSinglePlayerCore({
 
   // Keyboard input
   const keyboardInput = useKeyboardWordInput({
-    grid: grid || ([] as LetterGrid),
-    language: settings.language,
-    gameLanguage: settings.language,
-    enabled: !!grid && !isPaused && !isGameOver,
-    onWordSubmit: handleWordSubmit,
+    grid: grid || ([] as LetterGrid), language: settings.language, gameLanguage: settings.language,
+    enabled: !!grid && !isPaused && !isGameOver, onWordSubmit: handleWordSubmit,
     minWordLength: settings.minWordLength ?? 2,
   });
 
   // Keep refs in sync
   useEffect(() => {
-    scoreRef.current = score;
-    foundWordsRef.current = foundWords;
-    botScoresRef.current = botScores;
-    botWordsRef.current = botWords;
-    gridRef.current = grid;
-    availableWordsRef.current = availableWords;
-    onGameEndRef.current = onGameEnd;
-    showHintPromptRef.current = showHintPrompt;
+    scoreRef.current = score; foundWordsRef.current = foundWords;
+    botScoresRef.current = botScores; botWordsRef.current = botWords;
+    gridRef.current = grid; availableWordsRef.current = availableWords;
+    onGameEndRef.current = onGameEnd; showHintPromptRef.current = showHintPrompt;
     isTypingModeRef.current = keyboardInput.isTypingMode;
   }, [score, foundWords, botScores, botWords, grid, availableWords, onGameEnd, showHintPrompt, keyboardInput.isTypingMode]);
 
-  // Initialize game start time
-  useEffect(() => {
-    gameStartTimeRef.current = Date.now();
-  }, []);
+  useEffect(() => { gameStartTimeRef.current = Date.now(); }, []);
+  useEffect(() => { setGameActive(true); return () => setGameActive(false); }, [setGameActive]);
 
-  // Sound effects activation
-  useEffect(() => {
-    setGameActive(true);
-    return () => setGameActive(false);
-  }, [setGameActive]);
-
-  // Heartbeat for admin visibility
+  // Heartbeat
   useEffect(() => {
     const sessionId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
-    const sendHeartbeat = async () => {
-      try {
-        await fetch('/api/single-player/heartbeat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId, language: settings.language, mode: settings.mode }),
-        });
-      } catch { /* ignore */ }
-    };
+    const sendHeartbeat = async () => { try { await fetch('/api/single-player/heartbeat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId, language: settings.language, mode: settings.mode }) }); } catch { /* ignore */ } };
     sendHeartbeat();
     const interval = setInterval(sendHeartbeat, 30000);
-    return () => {
-      clearInterval(interval);
-      fetch('/api/single-player/heartbeat', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
-      }).catch(() => { });
-    };
+    return () => { clearInterval(interval); fetch('/api/single-player/heartbeat', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) }).catch(() => { }); };
   }, [settings.language, settings.mode]);
 
   // Landscape tutorial
@@ -564,71 +379,43 @@ export function useSinglePlayerCore({
   // Hint prompt timer
   useEffect(() => {
     if (isPaused || isGameOver || !grid) return;
-    const HINT_PROMPT_DELAY = 15000;
     if (lastWordFoundTimeRef.current === 0) lastWordFoundTimeRef.current = Date.now();
     const checkInactivity = setInterval(() => {
-      const timeSinceLastWord = Date.now() - lastWordFoundTimeRef.current;
-      if (timeSinceLastWord >= HINT_PROMPT_DELAY && !showHintPromptRef.current) {
-        setShowHintPrompt(true);
-      }
+      if (Date.now() - lastWordFoundTimeRef.current >= 15000 && !showHintPromptRef.current) setShowHintPrompt(true);
     }, 5000);
     return () => clearInterval(checkInactivity);
   }, [isPaused, isGameOver, grid]);
 
   // Timer announcements
-  useEffect(() => {
-    if (gameActive) announceTimer(timer.remainingTime);
-  }, [timer.remainingTime, gameActive, announceTimer]);
+  useEffect(() => { if (gameActive) announceTimer(timer.remainingTime); }, [timer.remainingTime, gameActive, announceTimer]);
 
   // Training progress updates
   const validWordsCount = useMemo(() => foundWords.filter(fw => fw.isValid === true).length, [foundWords]);
-
   useEffect(() => {
     if (settings.mode !== 'practice' || score < 15) return;
     const skillsRef = trainingCompletedSkillsRef.current;
-    trainingUpdateProgress({
-      score,
-      wordsFound: validWordsCount,
-      hasDiagonal: skillsRef?.has('diagonal') ?? false,
-      hasDirectionChange: skillsRef?.has('directionChange') ?? false,
-    });
+    trainingUpdateProgress({ score, wordsFound: validWordsCount, hasDiagonal: skillsRef?.has('diagonal') ?? false, hasDirectionChange: skillsRef?.has('directionChange') ?? false });
   }, [score, settings.mode, validWordsCount, trainingUpdateProgress, trainingCompletedSkillsRef]);
 
   // Generate grid
   useEffect(() => {
     const difficultyConfig = DIFFICULTIES[settings.difficulty];
-    const rows = difficultyConfig.rows;
-    const cols = difficultyConfig.cols;
+    const rows = difficultyConfig.rows; const cols = difficultyConfig.cols;
     const totalCells = rows * cols;
     const baseWordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
     const wordCount = settings.mode === 'practice' ? Math.min(50, baseWordCount * 2) : baseWordCount;
     const maxWordLen = Math.min(12, Math.max(rows, cols));
-
     const initGrid = async () => {
       let wordsToEmbed: string[] = [];
       if (settings.language !== 'ja') {
         try {
-          const response = await fetch('/api/themed-words', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ language: settings.language, count: wordCount, minLength: 3, maxLength: maxWordLen }),
-          });
-          if (response.ok) {
-            const data = await response.json();
-            wordsToEmbed = data.words || [];
-          }
-        } catch (error) {
-          console.warn('Failed to fetch themed words:', error);
-        }
+          const response = await fetch('/api/themed-words', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language: settings.language, count: wordCount, minLength: 3, maxLength: maxWordLen }) });
+          if (response.ok) { const data = await response.json(); wordsToEmbed = data.words || []; }
+        } catch (error) { console.warn('Failed to fetch themed words:', error); }
       }
-      const newGrid = generateRandomTable(rows, cols, settings.language, wordsToEmbed);
-      setGrid(newGrid);
+      setGrid(generateRandomTable(rows, cols, settings.language, wordsToEmbed));
     };
-
-    initGrid();
-    initializeBotUsedWords(settings.bots);
-    resetBots();
-    resetSpamDetection();
+    initGrid(); initializeBotUsedWords(settings.bots); resetBots(); resetSpamDetection();
   }, [settings.difficulty, settings.language, settings.bots, settings.mode, initializeBotUsedWords, resetBots, resetSpamDetection]);
 
   // Fetch grid words
@@ -636,238 +423,79 @@ export function useSinglePlayerCore({
     if (!grid) return;
     gridVersionRef.current += 1;
     const currentVersion = gridVersionRef.current;
-
-    const timeoutId = setTimeout(() => {
-      if (!availableWordsRef.current) {
-        setAvailableWords({ easy: [], medium: [], hard: [] });
-      }
-    }, 5000);
-
+    const timeoutId = setTimeout(() => { if (!availableWordsRef.current) setAvailableWords({ easy: [], medium: [], hard: [] }); }, 5000);
     const fetchGridWords = async () => {
       try {
-        const response = await fetch('/api/solve-grid', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ grid, language: settings.language }),
-        });
+        const response = await fetch('/api/solve-grid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ grid, language: settings.language }) });
         if (currentVersion !== gridVersionRef.current) return;
-        if (!response.ok) {
-          setAvailableWords({ easy: [], medium: [], hard: [] });
-          return;
-        }
+        if (!response.ok) { setAvailableWords({ easy: [], medium: [], hard: [] }); return; }
         const result = await response.json();
-        if (result.success && result.words) {
-          setAvailableWords(result.words);
-        } else {
-          setAvailableWords({ easy: [], medium: [], hard: [] });
-        }
-      } catch {
-        setAvailableWords({ easy: [], medium: [], hard: [] });
-      }
+        if (result.success && result.words) setAvailableWords(result.words);
+        else setAvailableWords({ easy: [], medium: [], hard: [] });
+      } catch { setAvailableWords({ easy: [], medium: [], hard: [] }); }
     };
-
     fetchGridWords();
     return () => clearTimeout(timeoutId);
   }, [grid, settings.language]);
 
   // Handle game over
   useEffect(() => {
-    // Use grid state instead of ref to avoid sync timing issues
     if (!isGameOver || gameOverCalledRef.current || !grid) return;
     gameOverCalledRef.current = true;
-
-    const finalizeAndEndGame = () => {
-      try {
-        // No AI validation - treat pending words (isValid: null) as invalid
-        const finalWords = foundWordsRef.current.map(w => ({
-          ...w,
-          isValid: w.isValid === true, // null or false becomes false
-        }));
-
-        const validWords = finalWords.filter(w => w.isValid === true);
-        const finalScore = validWords.reduce((sum, w) => sum + w.score, 0);
-        const actualGameDuration = settings.mode === 'practice'
-          ? Math.max(1, Math.floor((Date.now() - gameStartTimeRef.current) / 1000))
-          : settings.timerSeconds;
-
-        const validWordData: AchievementWordData[] = validWords.map(w => ({
-          word: w.word, score: w.score, timestamp: w.timestamp, timeSinceStart: w.timeSinceStart,
-          isValid: true, comboBonus: w.comboBonus,
-        }));
-
-        const allWordData: AchievementWordData[] = finalWords.map(w => ({
-          word: w.word, score: w.score, timestamp: w.timestamp, timeSinceStart: w.timeSinceStart,
-          isValid: w.isValid === true, comboBonus: w.comboBonus,
-        }));
-
-        const finalAchievements = calculateFinalAchievements(validWordData, allWordData, actualGameDuration, combo.maxCombo);
-
-        // Generate unique session ID for vote tracking
-        const gameSessionId = crypto.randomUUID();
-
-        // Collect words for validation modal (community dictionary building)
-        const allBotWords = settings.bots.flatMap(bot => {
-          const words = botWordsRef.current[bot.id] || [];
-          return words.filter(word => !word.match(/^word\d+$/));
-        });
-
-        const playerPendingWords = foundWordsRef.current
-          .filter(w => w.isValid === null)
-          .map(w => w.word);
-
-        const combinedWordsForValidation = [...new Set([...allBotWords, ...playerPendingWords])];
-        const shuffledWords = combinedWordsForValidation.sort(() => Math.random() - 0.5);
-        const botWordsForValidation = shuffledWords.slice(0, 5);
-
-        const results: SinglePlayerResultsData = {
-          playerScore: finalScore,
-          playerWords: validWords.map(w => w.word),
-          playerWordData: finalWords.map(w => ({
-            word: w.word, score: w.isValid ? w.score : 0, timestamp: w.timestamp,
-            timeSinceStart: w.timeSinceStart, isValid: w.isValid === true,
-            comboBonus: w.isValid ? (w.comboBonus || 0) : 0,
-            fireRoundBonus: w.isValid ? (w.fireRoundBonus || 0) : 0,
-          })),
-          gameDuration: actualGameDuration,
-          botScores: settings.bots.map(bot => ({
-            name: bot.name, score: botScoresRef.current[bot.id] || 0, words: botWordsRef.current[bot.id] || [],
-          })),
-          grid: grid!,
-          allPossibleWords: [],
-          isNewHighScore: false,
-          achievements: finalAchievements,
-          botWordsForValidation,
-          gameSessionId,
-          language: settings.language,
-        };
-
-        if (settings.mode === 'practice') trainingAnalysisFinishTraining();
-        onGameEndRef.current(results);
-      } catch (error) {
-        // Ensure game always transitions to results even if validation fails
-        console.error('Game end processing failed:', error);
-        setIsValidatingWords(false);
-
-        // Build fallback results from current state
-        const currentWords = foundWordsRef.current;
-        const validWords = currentWords.filter(w => w.isValid === true);
-        const fallbackScore = validWords.reduce((sum, w) => sum + w.score, 0);
-        const fallbackDuration = settings.mode === 'practice'
-          ? Math.max(1, Math.floor((Date.now() - gameStartTimeRef.current) / 1000))
-          : settings.timerSeconds;
-
-        // Generate fallback session ID and validation words
-        const fallbackSessionId = crypto.randomUUID();
-        const fallbackBotWords = settings.bots.flatMap(bot => {
-          const words = botWordsRef.current[bot.id] || [];
-          return words.filter(word => !word.match(/^word\d+$/));
-        }).slice(0, 5);
-
-        const fallbackResults: SinglePlayerResultsData = {
-          playerScore: fallbackScore,
-          playerWords: validWords.map(w => w.word),
-          playerWordData: currentWords.map(w => ({
-            word: w.word,
-            score: w.isValid ? w.score : 0,
-            timestamp: w.timestamp,
-            timeSinceStart: w.timeSinceStart,
-            isValid: w.isValid === true,
-            comboBonus: w.isValid ? (w.comboBonus || 0) : 0,
-            fireRoundBonus: w.isValid ? (w.fireRoundBonus || 0) : 0,
-          })),
-          gameDuration: fallbackDuration,
-          botScores: settings.bots.map(bot => ({
-            name: bot.name,
-            score: botScoresRef.current[bot.id] || 0,
-            words: botWordsRef.current[bot.id] || [],
-          })),
-          grid: grid!,
-          allPossibleWords: [],
-          isNewHighScore: false,
-          achievements: [],
-          botWordsForValidation: fallbackBotWords,
-          gameSessionId: fallbackSessionId,
-          language: settings.language,
-        };
-
-        if (settings.mode === 'practice') trainingAnalysisFinishTraining();
-        onGameEndRef.current(fallbackResults);
-      }
+    const resultParams = {
+      foundWords: foundWordsRef.current, grid: grid!, bots: settings.bots,
+      botScores: botScoresRef.current, botWords: botWordsRef.current,
+      gameStartTime: gameStartTimeRef.current, timerSeconds: settings.timerSeconds,
+      maxCombo: combo.maxCombo, mode: settings.mode, language: settings.language,
     };
-
-    finalizeAndEndGame();
+    try {
+      const results = buildGameResults(resultParams);
+      if (settings.mode === 'practice') trainingAnalysisFinishTraining();
+      onGameEndRef.current(results);
+    } catch (error) {
+      console.error('Game end processing failed:', error);
+      setIsValidatingWords(false);
+      const fallback = buildFallbackResults(resultParams);
+      if (settings.mode === 'practice') trainingAnalysisFinishTraining();
+      onGameEndRef.current(fallback);
+    }
   }, [isGameOver, grid, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const hasKeyboardLayout = isLandscape || isDesktop || isTv;
     if (!hasKeyboardLayout || isGameOver) return;
-
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.key === 'Escape' && isTypingModeRef.current) return;
-
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        score > 0 ? setShowQuitConfirm(true) : onQuit();
-      } else if (e.key === ' ' && settings.mode !== 'practice') {
-        e.preventDefault();
-        setIsPaused(prev => !prev);
-      }
+      if (e.key === 'Escape') { e.preventDefault(); score > 0 ? setShowQuitConfirm(true) : onQuit(); }
+      else if (e.key === ' ' && settings.mode !== 'practice') { e.preventDefault(); setIsPaused(prev => !prev); }
     };
-
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isLandscape, isDesktop, isTv, isGameOver, score, settings.mode, onQuit]);
 
-  // Path submission handler
+  // Handlers
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
-    directionGuidance.trackWordPath(cells);
-    firstPlayTutorial.trackUserPath(cells);
-    trainingAnalysisTrackPath(cells);
-    trainingTrackPath(cells);
+    directionGuidance.trackWordPath(cells); firstPlayTutorial.trackUserPath(cells);
+    trainingAnalysisTrackPath(cells); trainingTrackPath(cells);
   }, [directionGuidance, firstPlayTutorial, trainingAnalysisTrackPath, trainingTrackPath]);
 
-  // Word change handler
-  const handleWordChange = useCallback((word: string, count: number) => {
-    setFormedWord(word);
-    setLetterCount(count);
-  }, []);
-
-  // Handlers
+  const handleWordChange = useCallback((word: string, count: number) => { setFormedWord(word); setLetterCount(count); }, []);
   const handleFinishPractice = useCallback(() => setIsGameOver(true), []);
-
-  const dismissLandscapeTutorial = useCallback(() => {
-    setShowLandscapeTutorial(false);
-    localStorage.setItem('landscape-tutorial-seen', 'true');
-  }, []);
-
+  const dismissLandscapeTutorial = useCallback(() => { setShowLandscapeTutorial(false); localStorage.setItem('landscape-tutorial-seen', 'true'); }, []);
   const handleQuitRequest = useCallback(() => {
-    if (settings.mode === 'practice') {
-      setIsGameOver(true);
-      return;
-    }
+    if (settings.mode === 'practice') { setIsGameOver(true); return; }
     score > 0 ? setShowQuitConfirm(true) : onQuit();
   }, [score, onQuit, settings.mode]);
-
-  const handlePauseToggle = useCallback(() => {
-    setIsPaused(prev => !prev);
-  }, []);
-
-  // UI toggle handlers (stable references for memoized props)
-  const handleCoinAnimationComplete = useCallback(() => {
-    setComboCoinReward(null);
-  }, []);
-
-  const handleToggleProgressBar = useCallback(() => {
-    setProgressBarExpanded(prev => !prev);
-  }, []);
+  const handlePauseToggle = useCallback(() => { setIsPaused(prev => !prev); }, []);
+  const handleCoinAnimationComplete = useCallback(() => { setComboCoinReward(null); }, []);
+  const handleToggleProgressBar = useCallback(() => { setProgressBarExpanded(prev => !prev); }, []);
 
   // Reveal handler
   const revealableWordCount = useMemo(() => {
     if (!availableWords || !grid) return 0;
-    const foundWordsList = foundWords.filter(fw => fw.isValid === true).map(fw => fw.word);
-    return getRevealableWordCount(availableWords, foundWordsList, settings.language);
+    return getRevealableWordCount(availableWords, foundWords.filter(fw => fw.isValid === true).map(fw => fw.word), settings.language);
   }, [availableWords, foundWords, grid, settings.language]);
 
   const handleReveal = useCallback(async () => {
@@ -875,40 +503,24 @@ export function useSinglePlayerCore({
     setRevealState(prev => ({ ...prev, isLoading: true }));
     const foundWordsList = foundWords.filter(fw => fw.isValid === true).map(fw => fw.word);
     const result = selectRandomRevealWord(availableWords, foundWordsList, grid, settings.language);
-    if (!result) {
-      setRevealState(prev => ({ ...prev, isLoading: false }));
-      return null;
-    }
-    setRevealState(prev => ({
-      ...prev,
-      revealsUsed: prev.revealsUsed + 1,
-      isLoading: false,
-      highlightedPath: result.path.map(p => ({ row: p.row, col: p.col })),
-    }));
+    if (!result) { setRevealState(prev => ({ ...prev, isLoading: false })); return null; }
+    setRevealState(prev => ({ ...prev, revealsUsed: prev.revealsUsed + 1, isLoading: false, highlightedPath: result.path.map(p => ({ row: p.row, col: p.col })) }));
     if (highlightTimeoutRef.current) clearTimeout(highlightTimeoutRef.current);
-    highlightTimeoutRef.current = setTimeout(() => {
-      setRevealState(prev => ({ ...prev, highlightedPath: [] }));
-    }, 4000);
+    highlightTimeoutRef.current = setTimeout(() => { setRevealState(prev => ({ ...prev, highlightedPath: [] })); }, 4000);
     return result;
   }, [revealState.isLoading, availableWords, grid, foundWords, settings.language]);
 
   // Computed values
   const totalBoardWords = useMemo(() => {
     if (!availableWords) return null;
-    const allWords = new Set([
-      ...availableWords.easy, ...availableWords.medium, ...availableWords.hard,
-    ].filter(word => word.length >= MIN_TRACKED_WORD_LENGTH));
+    const allWords = new Set([...availableWords.easy, ...availableWords.medium, ...availableWords.hard].filter(word => word.length >= MIN_TRACKED_WORD_LENGTH));
     return allWords.size;
   }, [availableWords]);
 
-  // Build training state object for layouts
   const trainingState: TrainingState | null = settings.mode === 'practice' ? {
-    completedSkills: trainingCompletedSkills,
-    justUnlocked: trainingJustUnlocked,
-    isComplete: trainingIsComplete,
-    currentHint: trainingAnalysisCurrentHint,
-    hasPassed: trainingAnalysisHasPassed,
-    clearJustUnlocked: trainingClearJustUnlocked,
+    completedSkills: trainingCompletedSkills, justUnlocked: trainingJustUnlocked,
+    isComplete: trainingIsComplete, currentHint: trainingAnalysisCurrentHint,
+    hasPassed: trainingAnalysisHasPassed, clearJustUnlocked: trainingClearJustUnlocked,
     dismissHint: trainingAnalysisDismissHint,
   } : null;
 
@@ -918,79 +530,28 @@ export function useSinglePlayerCore({
   };
 
   const keyboardInputState: KeyboardInputState = {
-    isTypingMode: keyboardInput.isTypingMode,
-    typedWord: keyboardInput.typedWord,
+    isTypingMode: keyboardInput.isTypingMode, typedWord: keyboardInput.typedWord,
     highlightedCells: keyboardInput.highlightedCells,
   };
 
   return {
-    // Layout detection
-    isLandscape,
-    isDesktop,
-    isTv,
-    // Core state
-    grid,
-    foundWords,
-    score,
-    isPaused,
-    isGameOver,
-    isValidatingWords,
-    // Timer
-    timer,
-    // Combo
-    combo,
-    comboCoinReward,
-    handleCoinAnimationComplete,
-    // Word forming
-    formedWord,
-    letterCount,
-    currentFeedback,
-    // Keyboard input
+    isLandscape, isDesktop, isTv,
+    grid, foundWords, score, isPaused, isGameOver, isValidatingWords,
+    timer, combo, comboCoinReward, handleCoinAnimationComplete,
+    formedWord, letterCount, currentFeedback,
     keyboardInput: keyboardInputState,
-    // Tutorial
-    tutorialPath: firstPlayTutorial.tutorialPath,
-    tutorialWord: firstPlayTutorial.tutorialWord,
-    // Reveal
-    revealState,
-    revealableWordCount,
-    handleReveal,
-    // Fire/Earthquake
-    fireRoundActive,
-    fireRoundRemaining,
-    earthquakeState,
-    // Hints
-    showHintPrompt,
-    setShowHintPrompt,
-    // Direction guidance
+    tutorialPath: firstPlayTutorial.tutorialPath, tutorialWord: firstPlayTutorial.tutorialWord,
+    revealState, revealableWordCount, handleReveal,
+    fireRoundActive, fireRoundRemaining, earthquakeState,
+    showHintPrompt, setShowHintPrompt,
     directionGuidance: directionGuidanceState,
-    // Training
-    training: trainingState,
-    progressBarExpanded,
-    handleToggleProgressBar,
-    // Dialogs
-    showQuitConfirm,
-    setShowQuitConfirm,
-    showLandscapeTutorial,
-    dismissLandscapeTutorial,
-    showCompletionPopup,
-    setShowCompletionPopup,
-    // Computed
-    totalBoardWords,
-    targetHighScore,
-    // Achievements
-    liveAchievements,
-    // Refs
-    lastWordFoundTimeRef,
-    gameStatsRef,
-    // Handlers
-    handleWordSubmit,
-    handlePathSubmit,
-    handleWordChange,
-    handlePauseToggle,
-    handleFinishPractice,
-    handleQuitRequest,
-    onQuit,
-    // Translation
-    t,
+    training: trainingState, progressBarExpanded, handleToggleProgressBar,
+    showQuitConfirm, setShowQuitConfirm,
+    showLandscapeTutorial, dismissLandscapeTutorial,
+    showCompletionPopup, setShowCompletionPopup,
+    totalBoardWords, targetHighScore, liveAchievements,
+    lastWordFoundTimeRef, gameStatsRef,
+    handleWordSubmit, handlePathSubmit, handleWordChange,
+    handlePauseToggle, handleFinishPractice, handleQuitRequest, onQuit, t,
   };
 }

@@ -57,6 +57,8 @@ export interface UseBlastGameOptions {
   onSynergyDetected?: (comboType: BlastComboType) => void;
   onComboDetected?: (combos: SpecialCombo[]) => void;
   onMovesExhausted?: () => void;
+  /** When true, disables board-clear auto-complete and dead-end detection (server timer is authoritative) */
+  isMultiplayer?: boolean;
   blastSeed?: number | null;
   initialTileStates?: BlastTileState[][] | null;
 }

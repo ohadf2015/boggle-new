@@ -49,8 +49,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
   const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(false);
   // Game mode override for host (results page lets host change mode before next game)
-  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>('random');
   const resolvedGameMode = useGameMode();
+  // Persist the game mode that was just played (so "Play Again" keeps the same mode)
+  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(resolvedGameMode || 'random');
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
   const blastMovesUsed = useBlastMovesUsed();
@@ -361,8 +362,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     targetWord: wordHuntSummary?.targetWord || '',
     foundTarget: !!wordHuntSummary?.targetFoundBy,
     isFirstFinder: wordHuntSummary?.targetFoundBy === username,
-    survivalTime: 0,
-    discoveryWords: 0,
+    survivalTime: wordHuntSummary?.survivalTime ?? 0,
+    discoveryWords: wordHuntSummary?.discoveryWords ?? 0,
     playerResults: (sortedScores || []).map((p) => ({
       username: p.username,
       score: p.score || 0,

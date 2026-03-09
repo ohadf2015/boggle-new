@@ -498,6 +498,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
           blastTileOverlay: (getGame(gameCode) as any)?.blastModeState?.overlay || [],
           blastSeed: (getGame(gameCode) as any)?.blastModeState?.seed ?? null,
         } : {}),
+        ...(resolvedMode === 'word-hunt' ? { wordHuntTargetLength: (getGame(gameCode) as any)?.wordHuntState?.targetWordLength ?? 0 } : {}),
         retry: true
       });
     });

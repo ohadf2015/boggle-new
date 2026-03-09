@@ -43,13 +43,43 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
       icon: '✅',
     });
     return true;
-  } catch (error) {
-    logger.error('Failed to copy URL:', error);
-    const errorMessage = t ? t('share.copyError') : 'Error copying link';
-    toast.error(errorMessage, {
-      duration: 2000,
-    });
-    return false;
+  } catch (clipboardError) {
+    // Fallback to execCommand for mobile browsers that lose focus
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      if (success) {
+        const successMessage = t ? t('share.linkCopied') : 'Link copied! 📋';
+        toast.success(successMessage, {
+          duration: 2000,
+          icon: '✅',
+        });
+        return true;
+      }
+      throw new Error('execCommand copy returned false');
+    } catch (fallbackError) {
+      // Both methods failed — log appropriately
+      const isNotAllowed = clipboardError instanceof DOMException && clipboardError.name === 'NotAllowedError';
+      if (isNotAllowed) {
+        logger.warn('Clipboard copy failed (NotAllowedError + fallback failed):', fallbackError);
+      } else {
+        logger.error('Failed to copy URL:', clipboardError);
+      }
+      const errorMessage = t ? t('share.copyError') : 'Error copying link';
+      toast.error(errorMessage, {
+        duration: 2000,
+      });
+      return false;
+    }
   }
 };
 

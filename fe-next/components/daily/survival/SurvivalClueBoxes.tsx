@@ -7,6 +7,7 @@ import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { AccumulatedClue, TargetAttempt } from './types';
 import { MAX_ATTEMPTS, GRAY_LETTER_FADE_DELAY } from './constants';
+import { inferTargetLetterCounts, exactLetterCounts, computeYellowState } from '@/utils/wordHuntYellowLogic';
 
 export interface SurvivalClueBoxesProps {
   currentHint: HintLevel | null;
@@ -234,129 +235,16 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
   const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
   const wordLength = hintChars.length;
 
-  // Count how many times each letter appears in the target word
-  const targetLetterCounts = React.useMemo(() => {
-    const counts = new Map<string, number>();
-    targetWord.toUpperCase().split('').forEach(letter => {
-      counts.set(letter, (counts.get(letter) || 0) + 1);
-    });
-    return counts;
-  }, [targetWord]);
+  // Determine letter counts: exact when target is known, inferred from feedback when unknown (MP)
+  const letterCounts = React.useMemo(() => {
+    const isUnknown = targetWord.split('').every(c => c === '?');
+    return isUnknown ? inferTargetLetterCounts(attempts) : exactLetterCounts(targetWord);
+  }, [targetWord, attempts]);
 
-  // Compute persisted letters from attempts (most recent yellow/green at each position)
-  // Priority: green > yellow (from most recent to oldest attempt)
-  // IMPORTANT: Yellow letters are capped by how many times they appear in the target word
-  // and are REMOVED when all occurrences of that letter are found as green
-  // When targetWord is unknown (all '?', e.g. multiplayer), we can't cap yellows by frequency
-  const isTargetUnknown = targetWord.split('').every(c => c === '?');
-
-  const persistedLetters = React.useMemo(() => {
-    const result = new Map<number, { letter: string; type: 'green' | 'yellow' }>();
-
-    // First pass: collect all green letters from attempts (these always win)
-    for (const attempt of attempts) {
-      for (const fb of attempt.feedback) {
-        if (fb.feedback === 'green') {
-          result.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'green' });
-        }
-      }
-    }
-
-    // Count green occurrences from BOTH attempts AND accumulatedClues
-    // accumulatedClues can contain greens from word discovery, shop reveals, etc.
-    // Use a Set to track which positions we've counted to avoid double-counting
-    const greenLetterCounts = new Map<string, number>();
-    const countedPositions = new Set<number>();
-
-    // Count greens from persisted attempts first
-    result.forEach((entry, position) => {
-      if (entry.type === 'green') {
-        const letter = entry.letter;
-        greenLetterCounts.set(letter, (greenLetterCounts.get(letter) || 0) + 1);
-        countedPositions.add(position);
-      }
-    });
-
-    // Also count greens from accumulatedClues, but skip positions we already counted
-    accumulatedClues.forEach((clue, position) => {
-      if (clue.type === 'green' && !countedPositions.has(position)) {
-        const letter = clue.letter.toUpperCase();
-        greenLetterCounts.set(letter, (greenLetterCounts.get(letter) || 0) + 1);
-        countedPositions.add(position);
-      }
-    });
-
-    // Second pass: collect yellow letters, but LIMIT by target word frequency
-    // Process attempts in order so most recent yellows win at each position
-    // We need to recalculate yellow counts after each update to handle replacements
-    for (const attempt of attempts) {
-      for (const fb of attempt.feedback) {
-        if (fb.feedback === 'yellow') {
-          const letter = fb.letter.toUpperCase();
-          const existing = result.get(fb.position);
-
-          // Skip if position already has a green (from attempts)
-          if (existing?.type === 'green') {
-            continue;
-          }
-
-          // Skip if position has a green in accumulatedClues
-          const accumulatedClue = accumulatedClues.get(fb.position);
-          if (accumulatedClue?.type === 'green') {
-            continue;
-          }
-
-          // When target word is unknown (MP mode), allow all yellows without capping
-          if (isTargetUnknown) {
-            result.set(fb.position, { letter, type: 'yellow' });
-            continue;
-          }
-
-          // Calculate current yellow counts EXCLUDING the position we might update
-          const currentYellowCounts = new Map<string, number>();
-          result.forEach((entry, pos) => {
-            if (entry.type === 'yellow' && pos !== fb.position) {
-              currentYellowCounts.set(entry.letter, (currentYellowCounts.get(entry.letter) || 0) + 1);
-            }
-          });
-
-          // Check if we can set this yellow
-          const targetCount = targetLetterCounts.get(letter) || 0;
-          const greenCount = greenLetterCounts.get(letter) || 0;
-          const currentYellowCount = currentYellowCounts.get(letter) || 0;
-
-          // Maximum yellows allowed = target occurrences - green occurrences
-          const maxYellows = Math.max(0, targetCount - greenCount);
-
-          if (currentYellowCount < maxYellows) {
-            // Allow setting/replacing yellow at this position
-            result.set(fb.position, { letter, type: 'yellow' });
-          }
-        }
-      }
-    }
-
-    // Third pass: remove yellow letters where all occurrences are now found as green
-    // (This handles edge cases where greens were found after yellows were added)
-    // Skip when target is unknown (MP) — we can't determine if all occurrences are found
-    if (!isTargetUnknown) {
-      const positionsToRemove: number[] = [];
-      result.forEach((entry, position) => {
-        if (entry.type === 'yellow') {
-          const letter = entry.letter;
-          const targetCount = targetLetterCounts.get(letter) || 0;
-          const greenCount = greenLetterCounts.get(letter) || 0;
-          if (greenCount >= targetCount) {
-            positionsToRemove.push(position);
-          }
-        }
-      });
-
-      positionsToRemove.forEach(pos => result.delete(pos));
-    }
-
-    return result;
-  }, [attempts, targetLetterCounts, accumulatedClues, isTargetUnknown]);
+  const { persistedLetters } = React.useMemo(
+    () => computeYellowState(attempts, letterCounts, accumulatedClues),
+    [attempts, letterCounts, accumulatedClues]
+  );
   const sizeClass = wordLength <= 4
     ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
     : wordLength <= 6

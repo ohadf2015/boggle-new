@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut, Trophy, ChevronDown, Users, Settings, Calendar, Gift, Shield } from 'lucide-react';
+import { User, LogOut, ChevronDown, Users } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -18,6 +17,7 @@ import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { CalendarRewardsModal } from '../engagement/CalendarRewardsModal';
+import { AuthButtonDropdownMenu } from './AuthButtonDropdownMenu';
 import type { Language as LanguageType } from '@/shared/types';
 
 interface LanguageItem {
@@ -31,17 +31,13 @@ const languages: LanguageItem[] = [
   { code: 'he', name: 'עברית', flag: '🇮🇱' },
   { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
   { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' }
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
 ];
 
 interface AuthButtonProps {
-  /** When true, renders items inline without dropdown (for mobile menu) */
   inline?: boolean;
-  /** Callback when an action closes the menu */
   onClose?: () => void;
-  /** External handler for opening sign in modal */
   onSignInClick?: () => void;
-  /** External handler for opening sign up modal */
   onSignUpClick?: () => void;
 }
 
@@ -49,10 +45,9 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
   const { t, language, setLanguage, dir } = useLanguage();
   const { isAuthenticated, profile, isSupabaseEnabled, loading, isAdmin, user } = useAuth();
   const router = useRouter();
-  const isDarkMode = true; // App is dark-only
+  const isDarkMode = true;
   const isRTL = dir === 'rtl';
 
-  // CrazyGames authentication
   const {
     isCrazyGames,
     user: crazyGamesUser,
@@ -62,19 +57,15 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
     isAccountAvailable: isCrazyGamesAccountAvailable,
   } = useCrazyGamesAuth();
 
-  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
-  const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
-  const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
-  const [isLanguageExpanded, setIsLanguageExpanded] = useState<boolean>(false);
-  const [showCalendarModal, setShowCalendarModal] = useState<boolean>(false);
-  const [hasUnclaimedReward, setHasUnclaimedReward] = useState<boolean>(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [hasUnclaimedReward, setHasUnclaimedReward] = useState(false);
 
-  // Refs for click-outside detection and position tracking
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  // State for dropdown position (for portal rendering)
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; right: number } | null>(null);
 
   // Close dropdown when clicking outside
@@ -82,17 +73,12 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowUserMenu(false);
-        setIsLanguageExpanded(false);
       }
     };
-
     if (showUserMenu) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showUserMenu]);
 
   // Calculate dropdown position for portal rendering
@@ -101,21 +87,17 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
       if (buttonRef.current && showUserMenu) {
         const rect = buttonRef.current.getBoundingClientRect();
         setDropdownPosition({
-          top: rect.bottom + 8, // 8px = mt-2
-          // RTL: align dropdown's left edge with button's left edge
-          // LTR: align dropdown's right edge with button's right edge
+          top: rect.bottom + 8,
           left: isRTL ? rect.left : undefined!,
           right: isRTL ? undefined! : window.innerWidth - rect.right,
         });
       }
     };
-
     if (showUserMenu) {
       updatePosition();
       window.addEventListener('resize', updatePosition);
       window.addEventListener('scroll', updatePosition, true);
     }
-
     return () => {
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition, true);
@@ -133,7 +115,6 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
         setHasUnclaimedReward(data.canClaimToday);
       }
     } catch (error) {
-      // Serialize error properly - Error objects don't stringify well
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('[AuthButton] Error checking reward:', errorMessage);
     }
@@ -143,9 +124,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
     if (!user?.id) return;
     checkUnclaimedReward();
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        checkUnclaimedReward();
-      }
+      if (document.visibilityState === 'visible') checkUnclaimedReward();
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -158,35 +137,22 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
   };
 
   const openSignIn = () => {
-    if (onSignInClick) {
-      onSignInClick();
-    } else {
-      setAuthModalMode('signin');
-      setShowAuthModal(true);
-    }
+    if (onSignInClick) { onSignInClick(); }
+    else { setAuthModalMode('signin'); setShowAuthModal(true); }
   };
 
   const openSignUp = () => {
-    if (onSignUpClick) {
-      onSignUpClick();
-    } else {
-      setAuthModalMode('signup');
-      setShowAuthModal(true);
-    }
+    if (onSignUpClick) { onSignUpClick(); }
+    else { setAuthModalMode('signup'); setShowAuthModal(true); }
   };
 
-  const currentLang = languages.find(l => l.code === language) ?? languages[0] ?? { code: 'en', flag: '🇺🇸', name: 'English' };
+  const currentLang = languages.find(l => l.code === language) ?? languages[0] ?? { code: 'en' as LanguageType, flag: '🇺🇸', name: 'English' };
 
-  // Don't render if Supabase is not configured
   if (!isSupabaseEnabled) return null;
 
-  // Show loading skeleton
   if (loading) {
     return (
-      <div className={cn(
-        'w-24 h-9 rounded-full animate-pulse',
-        isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-      )} />
+      <div className={cn('w-24 h-9 rounded-full animate-pulse', isDarkMode ? 'bg-slate-700' : 'bg-gray-200')} />
     );
   }
 
@@ -197,69 +163,38 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
     setIsSigningOut(false);
   };
 
-  // Authenticated user - show user menu
+  // Authenticated user
   if (isAuthenticated && profile) {
-    // Inline variant for mobile menu - renders items directly without dropdown
+    // Inline variant for mobile menu
     if (inline) {
       return (
         <div className="flex flex-col gap-2 w-full">
-          {/* Profile Header with Avatar and Level - links to profile page */}
           <button
-            onClick={() => {
-              router.push(`/${language}/profile`);
-              onClose?.();
-            }}
+            onClick={() => { router.push(`/${language}/profile`); onClose?.(); }}
             className={cn(
               "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
               "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
             )}
           >
-            <Avatar
-              profilePictureUrl={profile.profile_picture_url ?? undefined}
-              avatarImage={profile.avatar_image}
-              size="sm"
-            />
-            <span className="text-neo-black truncate flex-1">
-              {profile.display_name || profile.username}
-            </span>
+            <Avatar profilePictureUrl={profile.profile_picture_url ?? undefined} avatarImage={profile.avatar_image} size="sm" />
+            <span className="text-neo-black truncate flex-1">{profile.display_name || profile.username}</span>
             {profile.total_xp !== undefined && (
-              <LevelBadge
-                level={getLevelFromXp(profile.total_xp || 0)}
-                size="sm"
-                animate={false}
-              />
+              <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />
             )}
           </button>
-
-          {/* Friends Link */}
           <button
-            onClick={() => {
-              router.push(`/${language}/friends`);
-              onClose?.();
-            }}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-              "bg-white hover:bg-neo-cyan/50"
-            )}
+            onClick={() => { router.push(`/${language}/friends`); onClose?.(); }}
+            className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-white hover:bg-neo-cyan/50")}
           >
             <Users size={14} className="text-neo-black" aria-hidden="true" />
             <span className="text-neo-black">{t('friends.title')}</span>
           </button>
-
-          {/* Sign Out */}
           <button
             onClick={handleSignOut}
             disabled={isSigningOut}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-              "bg-red-100 hover:bg-red-200 text-red-600"
-            )}
+            className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-red-100 hover:bg-red-200 text-red-600")}
           >
-            {isSigningOut ? (
-              <Loader size="sm" />
-            ) : (
-              <LogOut size={14} aria-hidden="true" />
-            )}
+            {isSigningOut ? <Loader size="sm" /> : <LogOut size={14} aria-hidden="true" />}
             <span>{t('auth.signOut')}</span>
           </button>
         </div>
@@ -284,289 +219,41 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
           )}
         >
-          <Avatar
-            profilePictureUrl={profile.profile_picture_url ?? undefined}
-            avatarImage={profile.avatar_image}
-            size="sm"
-          />
-          <span className="hidden sm:inline max-w-[80px] truncate font-medium">
-            {profile.display_name || profile.username}
-          </span>
+          <Avatar profilePictureUrl={profile.profile_picture_url ?? undefined} avatarImage={profile.avatar_image} size="sm" />
+          <span className="hidden sm:inline max-w-[80px] truncate font-medium">{profile.display_name || profile.username}</span>
           {profile.total_xp !== undefined && (
-            <LevelBadge
-              level={getLevelFromXp(profile.total_xp || 0)}
-              size="sm"
-              animate={false}
-            />
+            <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />
           )}
           <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
         </Button>
 
-        {/* User Dropdown - Portal for proper z-index layering */}
         {showUserMenu && dropdownPosition && typeof document !== 'undefined' && createPortal(
-          <AnimatePresence>
-            {showUserMenu && (
-              <motion.div
-                ref={dropdownRef}
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                onMouseDown={(e) => e.preventDefault()}
-                role="menu"
-                aria-label={t('auth.userMenu')}
-                className={cn(
-                  'min-w-[180px] rounded-lg shadow-xl z-80',
-                  isDarkMode
-                    ? 'bg-slate-800 border border-slate-700'
-                    : 'bg-white border border-gray-200'
-                )}
-                style={{
-                  position: 'fixed',
-                  top: dropdownPosition.top,
-                  ...(isRTL ? { left: dropdownPosition.left } : { right: dropdownPosition.right })
-                }}
-              >
-              {/* Profile Link */}
-              <Button
-                role="menuitem"
-                variant="ghost"
-                onClick={() => {
-                  router.push(`/${language}/profile`);
-                  setShowUserMenu(false);
-                }}
-                className={cn(
-                  'w-full justify-start gap-3 rounded-t-lg',
-                  isDarkMode
-                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                )}
-              >
-                <User size={14} />
-                <span>{t('profile.title')}</span>
-              </Button>
-
-              {/* Leaderboard Link */}
-              <Button
-                role="menuitem"
-                variant="ghost"
-                onClick={() => {
-                  router.push(`/${language}/leaderboard`);
-                  setShowUserMenu(false);
-                }}
-                className={cn(
-                  'w-full justify-start gap-3',
-                  isDarkMode
-                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                )}
-              >
-                <Trophy size={14} aria-hidden="true" />
-                <span>{t('leaderboard.title')}</span>
-              </Button>
-
-              {/* Friends Link */}
-              <Button
-                role="menuitem"
-                variant="ghost"
-                onClick={() => {
-                  router.push(`/${language}/friends`);
-                  setShowUserMenu(false);
-                }}
-                className={cn(
-                  'w-full justify-start gap-3',
-                  isDarkMode
-                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                )}
-              >
-                <Users size={14} aria-hidden="true" />
-                <span>{t('friends.title')}</span>
-              </Button>
-
-              {/* Divider */}
-              <div className={cn(
-                'my-1 h-px',
-                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-              )} />
-
-              {/* Settings Link */}
-              <Button
-                role="menuitem"
-                variant="ghost"
-                onClick={() => {
-                  router.push(`/${language}/settings`);
-                  setShowUserMenu(false);
-                }}
-                className={cn(
-                  'w-full justify-start gap-3',
-                  isDarkMode
-                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                )}
-              >
-                <Settings size={14} aria-hidden="true" />
-                <span>{t('settings.title')}</span>
-              </Button>
-
-              {/* Daily Rewards Calendar */}
-              <Button
-                role="menuitem"
-                variant="ghost"
-                onClick={() => {
-                  setShowCalendarModal(true);
-                }}
-                className={cn(
-                  'w-full justify-start gap-3 relative',
-                  isDarkMode
-                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                )}
-              >
-                <div className="relative">
-                  <Calendar size={14} aria-hidden="true" />
-                  {hasUnclaimedReward && (
-                    <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-2.5 h-2.5 bg-neo-lime rounded-full border border-neo-black" />
-                  )}
-                </div>
-                <span>{t('calendar.title')}</span>
-                {hasUnclaimedReward && (
-                  <Gift size={12} className="ms-auto text-neo-lime" aria-label={t('calendar.rewardAvailable')} />
-                )}
-              </Button>
-
-              {/* Admin Dashboard Link - only shown for admin users */}
-              {isAdmin && (
-                <Button
-                  role="menuitem"
-                  variant="ghost"
-                  onClick={() => {
-                    router.push(`/${language}/admin`);
-                    setShowUserMenu(false);
-                  }}
-                  className={cn(
-                    'w-full justify-start gap-3',
-                    isDarkMode
-                      ? 'text-neo-pink hover:bg-slate-700 hover:text-neo-pink'
-                      : 'text-neo-pink hover:bg-gray-50 hover:text-neo-pink'
-                  )}
-                >
-                  <Shield size={14} aria-hidden="true" />
-                  <span>{t('common.adminDashboard')}</span>
-                </Button>
-              )}
-
-              {/* Divider */}
-              <div className={cn(
-                'my-1 h-px',
-                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-              )} />
-
-              {/* Language Section - Collapsible */}
-              <div>
-                <Button
-                  role="menuitem"
-                  aria-expanded={isLanguageExpanded}
-                  aria-haspopup="true"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsLanguageExpanded(!isLanguageExpanded);
-                  }}
-                  className={cn(
-                    'w-full justify-between gap-3',
-                    isDarkMode
-                      ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg" aria-hidden="true">{currentLang.flag}</span>
-                    <span>{currentLang.name}</span>
-                  </div>
-                  <ChevronDown
-                    size={10}
-                    className={cn('transition-transform duration-200', isLanguageExpanded && 'rotate-180')}
-                    aria-hidden="true"
-                  />
-                </Button>
-
-                <AnimatePresence>
-                  {isLanguageExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      {languages
-                        .filter(lang => lang.code !== language)
-                        .map((lang) => (
-                          <Button
-                            key={lang.code}
-                            role="menuitem"
-                            variant="ghost"
-                            onClick={() => {
-                              setLanguage(lang.code);
-                              setIsLanguageExpanded(false);
-                            }}
-                            className={cn(
-                              'w-full justify-start gap-3 ps-8',
-                              isDarkMode
-                                ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                            )}
-                          >
-                            <span className="text-lg" aria-hidden="true">{lang.flag}</span>
-                            <span>{lang.name}</span>
-                          </Button>
-                        ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Divider */}
-              <div className={cn(
-                'my-1 h-px',
-                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-              )} aria-hidden="true" />
-
-              {/* Sign Out */}
-              <Button
-                role="menuitem"
-                variant="ghost"
-                onClick={handleSignOut}
-                disabled={isSigningOut}
-                className={cn(
-                  'w-full justify-start gap-3 rounded-b-lg text-red-500 hover:text-red-600',
-                  isDarkMode
-                    ? 'hover:bg-slate-700'
-                    : 'hover:bg-gray-50'
-                )}
-              >
-                {isSigningOut ? (
-                  <Loader size="sm" />
-                ) : (
-                  <LogOut size={14} aria-hidden="true" />
-                )}
-                <span>{t('auth.signOut')}</span>
-              </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>,
+          <AuthButtonDropdownMenu
+            dropdownRef={dropdownRef}
+            dropdownPosition={dropdownPosition}
+            isRTL={isRTL}
+            isDarkMode={isDarkMode}
+            language={language}
+            currentLang={currentLang}
+            isAdmin={isAdmin}
+            isSigningOut={isSigningOut}
+            hasUnclaimedReward={hasUnclaimedReward}
+            t={t}
+            router={router}
+            setLanguage={setLanguage}
+            setShowUserMenu={setShowUserMenu}
+            setShowCalendarModal={setShowCalendarModal}
+            onSignOut={handleSignOut}
+          />,
           document.body
         )}
 
-        {/* Calendar Rewards Modal */}
         <CalendarRewardsModal isOpen={showCalendarModal} onClose={handleCalendarClose} />
       </div>
     );
   }
 
-  // Guest user - show Sign In and Sign Up buttons
-  // Hide external login options when on CrazyGames platform (runtime detection)
+  // Guest user
   const hideLogin = isCrazyGames;
 
   // Inline variant for mobile menu
@@ -574,31 +261,18 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
     return (
       <>
         <div className="flex flex-col gap-2 w-full">
-          {/* CrazyGames: Show logged in user or login button */}
           {hideLogin ? (
             <>
-              {/* CrazyGames user logged in */}
               {isCrazyGamesLoggedIn && crazyGamesUser ? (
-                <div className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black w-full",
-                  "bg-neo-cyan shadow-hard-sm"
-                )}>
+                <div className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black w-full", "bg-neo-cyan shadow-hard-sm")}>
                   {crazyGamesUser.profilePictureUrl ? (
-                    <Image
-                      src={crazyGamesUser.profilePictureUrl}
-                      alt={crazyGamesUser.username}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6 rounded-full object-cover"
-                      unoptimized
-                    />
+                    <Image src={crazyGamesUser.profilePictureUrl} alt={crazyGamesUser.username} width={24} height={24} className="w-6 h-6 rounded-full object-cover" unoptimized />
                   ) : (
                     <User size={14} className="text-neo-black" />
                   )}
                   <span className="text-neo-black truncate flex-1">{crazyGamesUser.username}</span>
                 </div>
               ) : isCrazyGamesAccountAvailable ? (
-                /* CrazyGames login button */
                 <button
                   onClick={loginWithCrazyGames}
                   disabled={isCrazyGamesLoggingIn}
@@ -608,85 +282,52 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                     isCrazyGamesLoggingIn && "opacity-70 cursor-wait"
                   )}
                 >
-                  {isCrazyGamesLoggingIn ? (
-                    <Loader size="sm" />
-                  ) : (
-                    <User size={14} className="text-neo-black" />
-                  )}
+                  {isCrazyGamesLoggingIn ? <Loader size="sm" /> : <User size={14} className="text-neo-black" />}
                   <span className="text-neo-black">{t('auth.loginCrazyGames')}</span>
                 </button>
               ) : null}
             </>
           ) : (
-            /* Normal Sign In/Up Buttons */
             <>
               <button
                 onClick={openSignIn}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-                  "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
-                )}
+                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard")}
               >
                 <User size={14} className="text-neo-black" aria-hidden="true" />
                 <span className="text-neo-black">{t('auth.signIn')}</span>
               </button>
-
               <button
                 onClick={openSignUp}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-                  "bg-neo-pink text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
-                )}
+                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-pink text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard")}
               >
                 <User size={14} aria-hidden="true" />
                 <span>{t('auth.signUp')}</span>
               </button>
             </>
           )}
-
         </div>
-
-        {/* Auth Modal - Hidden on CrazyGames */}
         {!hideLogin && (
-          <AuthModal
-            isOpen={showAuthModal}
-            onClose={() => setShowAuthModal(false)}
-            showGuestStats={true}
-            initialMode={authModalMode}
-          />
+          <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} showGuestStats={true} initialMode={authModalMode} />
         )}
       </>
     );
   }
 
-  // Default dropdown variant - Sign In and Sign Up buttons
-  // On CrazyGames platform, show CrazyGames login instead
+  // Default dropdown variant - guest
   if (hideLogin) {
-    // CrazyGames user is logged in - show their info (no dropdown since dark-mode only)
     if (isCrazyGamesLoggedIn && crazyGamesUser) {
       return (
         <div className="flex items-center gap-1 sm:gap-2 rounded-full px-2 sm:px-3 min-h-[44px] bg-slate-800 text-cyan-300 border border-slate-700">
-          {/* CrazyGames Profile Picture */}
           {crazyGamesUser.profilePictureUrl ? (
-            <Image
-              src={crazyGamesUser.profilePictureUrl}
-              alt={crazyGamesUser.username}
-              width={24}
-              height={24}
-              className="w-6 h-6 rounded-full object-cover"
-              unoptimized
-            />
+            <Image src={crazyGamesUser.profilePictureUrl} alt={crazyGamesUser.username} width={24} height={24} className="w-6 h-6 rounded-full object-cover" unoptimized />
           ) : (
             <User size={16} />
           )}
-          <span className="hidden sm:inline max-w-[80px] truncate font-medium">
-            {crazyGamesUser.username}
-          </span>
+          <span className="hidden sm:inline max-w-[80px] truncate font-medium">{crazyGamesUser.username}</span>
         </div>
       );
     }
 
-    // CrazyGames platform, not logged in - show CrazyGames login button
     if (isCrazyGamesAccountAvailable) {
       return (
         <Button
@@ -695,65 +336,45 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           disabled={isCrazyGamesLoggingIn}
           className={cn(
             'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
-            isDarkMode
-              ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
-              : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
+            'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
           )}
         >
-          {isCrazyGamesLoggingIn ? (
-            <Loader size="sm" />
-          ) : (
-            <User size={14} />
-          )}
+          {isCrazyGamesLoggingIn ? <Loader size="sm" /> : <User size={14} />}
           <span className="hidden sm:inline">{t('auth.loginCrazyGames')}</span>
         </Button>
       );
     }
 
-    // CrazyGames platform, accounts not available - nothing to show
     return null;
   }
 
   return (
     <>
       <div className="flex items-center gap-2">
-        {/* Sign In Button */}
         <Button
           size="sm"
           onClick={openSignIn}
           className={cn(
             'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
-            isDarkMode
-              ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
-              : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
+            'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
           )}
         >
           <User size={14} />
           <span className="hidden sm:inline">{t('auth.signIn')}</span>
         </Button>
-
-        {/* Sign Up Button */}
         <Button
           size="sm"
           onClick={openSignUp}
           className={cn(
             'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
-            isDarkMode
-              ? 'bg-neo-pink text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] border-2 border-neo-black'
-              : 'bg-neo-pink text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.4)] border-2 border-neo-black'
+            'bg-neo-pink text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] border-2 border-neo-black'
           )}
         >
           <span className="hidden sm:inline">{t('auth.signUp')}</span>
           <span className="sm:hidden">+</span>
         </Button>
       </div>
-
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        showGuestStats={true}
-        initialMode={authModalMode}
-      />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} showGuestStats={true} initialMode={authModalMode} />
     </>
   );
 };

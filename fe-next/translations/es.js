@@ -742,7 +742,12 @@ const es = {
       "beTheLegend": "¡Sé la leyenda que inicia la primera batalla!",
       "hostAndPlay": "Crea y juega — Comparte el código con amigos",
       "startBattle": "Iniciar una batalla",
-      "inProgress": "En vivo"
+      "inProgress": "En vivo",
+      "createRoom": "+ Crear sala",
+      "noRoomsAvailable": "No hay salas activas. ¡Crea una!",
+      "joinRoomAction": "Unirse a {{roomName}}",
+      "availableRooms": "Salas disponibles",
+      "roomsListLabel": "Lista de salas disponibles"
     },
     "joinModal": {
       "title": "Únete al combate",
@@ -758,7 +763,10 @@ const es = {
       "roomNameLabel": "Nombre de sala",
       "optional": "opcional",
       "createButton": "¡A darle!",
-      "creating": "Preparando arena..."
+      "creating": "Preparando arena...",
+      "languageLabel": "Idioma del juego",
+      "gameModeLabel": "Modo de juego",
+      "wordDifficultyLabel": "Dificultad de palabras"
     },
     "profileSetup": {
       "title": "¿Listo?",
@@ -799,7 +807,20 @@ const es = {
       "refreshButton": "Actualizar",
       "noRooms": "No hay salas. ¿Tienes código?",
       "joinButton": "¡Entrar!",
-      "joining": "Entrando..."
+      "joining": "Entrando...",
+      "gameCodeLabel": "Código de partida",
+      "gameCodePlaceholder": "Ingresa el código de 6 caracteres",
+      "gameCodeHelp": "Ingresa el código de 6 caracteres que te compartió el anfitrión",
+      "pasteButton": "Pegar código"
+    },
+    "errors": {
+      "roomFull": "Esta sala está llena. Prueba otra o crea la tuya.",
+      "roomClosed": "Esta sala terminó. Vuelve al lobby y busca otra partida.",
+      "invalidCode": "Código inválido o sala cerrada. Revisa el código e intenta de nuevo.",
+      "connectionLost": "Se perdió la conexión. Reconectando...",
+      "hostLeft": "El anfitrión abandonó la partida. Volviendo al lobby...",
+      "invalidUsername": "El nombre debe tener entre 2 y 20 caracteres.",
+      "serverError": "Error del servidor. Inténtalo de nuevo."
     }
   },
   "hostView": {

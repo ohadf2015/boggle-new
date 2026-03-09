@@ -180,7 +180,7 @@ export async function calculateAndBroadcastFinalScores(
     eliminatedPlayers: huntState.eliminatedPlayers as string[],
     targetFoundBy: huntState.targetFoundBy as string | null,
     foundTarget: !!huntState.targetFoundBy,
-    survivalTime: game.gameDuration || 0,
+    survivalTime: game.gameStartedAt ? Math.round((Date.now() - game.gameStartedAt) / 1000) : 0,
     discoveryWords: huntState.discoveryWordCount || 0,
   } : undefined;
 

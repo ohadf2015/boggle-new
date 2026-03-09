@@ -216,6 +216,7 @@ export function useHostGameEvents({
         store.setWordHuntTargetAttempts([]);
         store.setWordHuntTargetFound(false);
         store.setWordHuntEliminatedPlayers((data as any).wordHuntEliminatedPlayers || []);
+        useGameStore.setState({ wordHuntDiscoveryClues: [], wordHuntKnownLetters: [] });
       }
 
       // Reset state for new game
@@ -351,6 +352,7 @@ export function useHostGameEvents({
       whStore.setWordHuntTargetAttempts([]);
       whStore.setWordHuntPlayerLives({});
       whStore.setWordHuntMyLife(100);
+      useGameStore.setState({ wordHuntDiscoveryClues: [], wordHuntKnownLetters: [] });
 
       // Reset blast mode state for next game
       whStore.setBlastTileOverlay([]);

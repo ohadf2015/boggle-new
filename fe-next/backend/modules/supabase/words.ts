@@ -34,35 +34,56 @@ export async function saveHostApprovedWord(params: WordApprovalInput): Promise<{
   if (!client) return { data: null, error: { message: 'Supabase not configured' }, isNewWord: false };
 
   try {
-    // Check if word already exists
-    const { data: existing, error: fetchError } = await client
-      .from('community_words')
-      .select('id, approval_count, promoted_to_dictionary')
-      .eq('word', word)
-      .eq('language', language)
-      .single();
+    const now = new Date().toISOString();
 
-    if (fetchError && fetchError.code !== 'PGRST116') {
-      logger.error('SUPABASE', `Error checking existing word "${word}"`, fetchError.message);
-      return { data: null, error: fetchError, isNewWord: false };
-    }
+    // Try insert first. If the word already exists, the unique constraint
+    // returns error code 23505 instead of the old SELECT-then-INSERT race.
+    const { data: inserted, error: insertError } = await client
+      .from('community_words')
+      .insert({
+        word,
+        language,
+        approval_count: 1,
+        promoted_to_dictionary: promoted,
+        promoted_at: promoted ? now : null,
+        first_approved_by: hostUserId,
+        first_approved_in_game: gameCode,
+        last_approved_by: hostUserId,
+        last_approved_in_game: gameCode
+      })
+      .select()
+      .single();
 
     let wordRecord: unknown;
     let isNewWord = false;
 
-    if (existing) {
-      // Word exists - update approval count
+    if (!insertError && inserted) {
+      wordRecord = inserted;
+      isNewWord = true;
+    } else if (insertError && insertError.code === '23505') {
+      // Word already exists - fetch and update
+      const { data: existing, error: fetchError } = await client
+        .from('community_words')
+        .select('id, approval_count, promoted_to_dictionary')
+        .eq('word', word)
+        .eq('language', language)
+        .single();
+
+      if (fetchError || !existing) {
+        logger.error('SUPABASE', `Error fetching existing word "${word}"`, fetchError?.message);
+        return { data: null, error: fetchError || { message: 'Word not found after conflict' }, isNewWord: false };
+      }
+
       const updates: Record<string, unknown> = {
         approval_count: existing.approval_count + 1,
         last_approved_by: hostUserId,
         last_approved_in_game: gameCode,
-        last_approved_at: new Date().toISOString()
+        last_approved_at: now
       };
 
-      // Mark as promoted if threshold reached
       if (promoted && !existing.promoted_to_dictionary) {
         updates.promoted_to_dictionary = true;
-        updates.promoted_at = new Date().toISOString();
+        updates.promoted_at = now;
       }
 
       const { data: updated, error: updateError } = await client
@@ -79,30 +100,9 @@ export async function saveHostApprovedWord(params: WordApprovalInput): Promise<{
 
       wordRecord = updated;
     } else {
-      // New word - insert
-      isNewWord = true;
-      const { data: inserted, error: insertError } = await client
-        .from('community_words')
-        .insert({
-          word,
-          language,
-          approval_count: 1,
-          promoted_to_dictionary: promoted,
-          promoted_at: promoted ? new Date().toISOString() : null,
-          first_approved_by: hostUserId,
-          first_approved_in_game: gameCode,
-          last_approved_by: hostUserId,
-          last_approved_in_game: gameCode
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        logger.error('SUPABASE', `Error inserting word "${word}"`, insertError.message);
-        return { data: null, error: insertError, isNewWord: false };
-      }
-
-      wordRecord = inserted;
+      // Real insert error (not a conflict)
+      logger.error('SUPABASE', `Error inserting word "${word}"`, insertError?.message);
+      return { data: null, error: insertError, isNewWord: false };
     }
 
     // Record the individual approval event
@@ -144,7 +144,38 @@ export async function savePlayerWord(params: PlayerWordInput): Promise<{ data: u
   const normalizedWord = word.toLowerCase().trim();
 
   try {
-    // Check if word already exists
+    const now = new Date().toISOString();
+
+    // Try insert first. If the word already exists, the unique constraint
+    // on (word, language) returns an error (code 23505) instead of the old
+    // SELECT-then-INSERT race that caused duplicate key violations.
+    const { data: inserted, error: insertError } = await client
+      .from('player_words')
+      .insert({
+        word: normalizedWord,
+        language,
+        times_submitted: 1,
+        first_submitted_by: playerId,
+        first_submitted_in_game: gameCode,
+        last_submitted_by: playerId,
+        last_submitted_in_game: gameCode,
+        last_submitted_at: now
+      })
+      .select()
+      .single();
+
+    if (!insertError && inserted) {
+      logger.debug('SUPABASE', `Saved new player word "${normalizedWord}" (${language}) - times submitted: 1`);
+      return { data: inserted, error: null, isNewWord: true };
+    }
+
+    // If error is NOT a unique constraint violation, it's a real error
+    if (insertError && insertError.code !== '23505') {
+      logger.error('SUPABASE', `Error inserting player word "${normalizedWord}"`, insertError.message);
+      return { data: null, error: insertError, isNewWord: false };
+    }
+
+    // Word already exists - fetch current row and increment times_submitted
     const { data: existing, error: fetchError } = await client
       .from('player_words')
       .select('id, times_submitted')
@@ -152,62 +183,31 @@ export async function savePlayerWord(params: PlayerWordInput): Promise<{ data: u
       .eq('language', language)
       .single();
 
-    if (fetchError && fetchError.code !== 'PGRST116') {
-      logger.error('SUPABASE', `Error checking existing player word "${normalizedWord}"`, fetchError.message);
-      return { data: null, error: fetchError, isNewWord: false };
+    if (fetchError || !existing) {
+      logger.error('SUPABASE', `Error fetching existing player word "${normalizedWord}"`, fetchError?.message);
+      return { data: null, error: fetchError || { message: 'Word not found after conflict' }, isNewWord: false };
     }
 
-    let wordRecord: unknown;
-    let isNewWord = false;
+    const { data: updated, error: updateError } = await client
+      .from('player_words')
+      .update({
+        times_submitted: existing.times_submitted + 1,
+        last_submitted_by: playerId,
+        last_submitted_in_game: gameCode,
+        last_submitted_at: now
+      })
+      .eq('id', existing.id)
+      .select()
+      .single();
 
-    if (existing) {
-      // Word exists - update submission count
-      const { data: updated, error: updateError } = await client
-        .from('player_words')
-        .update({
-          times_submitted: existing.times_submitted + 1,
-          last_submitted_by: playerId,
-          last_submitted_in_game: gameCode,
-          last_submitted_at: new Date().toISOString()
-        })
-        .eq('id', existing.id)
-        .select()
-        .single();
-
-      if (updateError) {
-        logger.error('SUPABASE', `Error updating player word "${normalizedWord}"`, updateError.message);
-        return { data: null, error: updateError, isNewWord: false };
-      }
-
-      wordRecord = updated;
-    } else {
-      // New word - insert
-      isNewWord = true;
-      const { data: inserted, error: insertError } = await client
-        .from('player_words')
-        .insert({
-          word: normalizedWord,
-          language,
-          times_submitted: 1,
-          first_submitted_by: playerId,
-          first_submitted_in_game: gameCode,
-          last_submitted_by: playerId,
-          last_submitted_in_game: gameCode
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        logger.error('SUPABASE', `Error inserting player word "${normalizedWord}"`, insertError.message);
-        return { data: null, error: insertError, isNewWord: false };
-      }
-
-      wordRecord = inserted;
+    if (updateError) {
+      logger.error('SUPABASE', `Error updating player word "${normalizedWord}"`, updateError.message);
+      return { data: null, error: updateError, isNewWord: false };
     }
 
-    const wordData = wordRecord as { times_submitted?: number } | null;
-    logger.debug('SUPABASE', `${isNewWord ? 'Saved new' : 'Updated'} player word "${normalizedWord}" (${language}) - times submitted: ${wordData?.times_submitted || 1}`);
-    return { data: wordRecord, error: null, isNewWord };
+    const wordData = updated as { times_submitted?: number } | null;
+    logger.debug('SUPABASE', `Updated player word "${normalizedWord}" (${language}) - times submitted: ${wordData?.times_submitted || 1}`);
+    return { data: updated, error: null, isNewWord: false };
 
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : 'Unexpected error';

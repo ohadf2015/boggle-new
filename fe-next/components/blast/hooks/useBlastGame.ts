@@ -220,7 +220,9 @@ export function useBlastGame(
 
   // Auto-complete when cumulative tilesCleared reaches the board size
   // Award leftover move bonus (Sugar Crush equivalent)
+  // Skipped in multiplayer — server timer is authoritative; tiles keep cascading/refilling
   useEffect(() => {
+    if (options?.isMultiplayer) return;
     const { tilesCleared, totalTiles, isComplete, isDeadEnd, movesRemaining } = gameState;
     if (!isComplete && !isDeadEnd && tilesCleared >= totalTiles && totalTiles > 0) {
       const bonus = calculateLeftoverMoveBonus(movesRemaining);
@@ -231,10 +233,12 @@ export function useBlastGame(
         score: prev.score + bonus,
       }));
     }
-  }, [gameState]);
+  }, [gameState, options?.isMultiplayer]);
 
   // Game over when moves exhausted (only if move limit is finite)
+  // Skipped in multiplayer — moves are unlimited, timer controls game end
   useEffect(() => {
+    if (options?.isMultiplayer) return;
     const { movesRemaining, isComplete, isDeadEnd, movesUsed } = gameState;
     if (!isComplete && !isDeadEnd && movesUsed > 0 && movesRemaining <= 0 && isFinite(gameState.totalMoves)) {
       if (options?.onMovesExhausted) {
@@ -245,7 +249,7 @@ export function useBlastGame(
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState]);
+  }, [gameState, options?.isMultiplayer]);
 
   // Dead-end detection: check after cascade settles
   useEffect(() => {

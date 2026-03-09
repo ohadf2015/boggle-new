@@ -124,6 +124,9 @@ Sentry.init({
     // Notifications subscription timeouts - handled with automatic retry
     // See lib/supabaseRealtimeNotifications.ts:89 for retry logic
     /notifications channel subscription timed out/i,
+    // JSON-LD @context TypeError from browser extensions (SEO analyzers, schema validators)
+    // Not first-party code - no application code calls .toLowerCase() on @context
+    /\["@context"\]\.toLowerCase/i,
   ],
 
   denyUrls: [

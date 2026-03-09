@@ -157,6 +157,7 @@ export function BlastGame({
     onAutoCascadeWord: handleAutoCascadeWord,
     movesAllowed: waveConfig?.movesAllowed,
     waveObjectives,
+    isMultiplayer,
     onSynergyDetected: useCallback((_comboType: BlastComboType) => {
       playComboSound(3);
     }, [playComboSound]),
@@ -259,9 +260,10 @@ export function BlastGame({
     }
   }, []);
 
-  // Confetti burst on board complete — fires once per wave clear
+  // Confetti burst on board complete — fires once per wave clear (SP only)
   const confettiFiredRef = useRef(false);
   useEffect(() => {
+    if (isMultiplayer) return;
     if (blast.gameState.isComplete && !confettiFiredRef.current) {
       confettiFiredRef.current = true;
       confetti({
@@ -272,7 +274,7 @@ export function BlastGame({
       });
     }
     // Reset guard when wave resets (waveNumber prop changes)
-  }, [blast.gameState.isComplete]);
+  }, [blast.gameState.isComplete, isMultiplayer]);
 
   // Word forming state (from GridComponent drag)
   const [formedWord, setFormedWord] = useState('');

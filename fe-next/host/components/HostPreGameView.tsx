@@ -12,7 +12,7 @@ import { useNativeShare } from '../../hooks/useNativeShare';
 import { cn } from '../../lib/utils';
 import { getJoinUrl, copyJoinUrl } from '../../utils/share';
 import { useSocket } from '../../utils/SocketContext';
-import { useGameActions } from '@/hooks/gameState';
+import { useGameActions, useGameMode } from '@/hooks/gameState';
 
 import { GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
@@ -119,7 +119,8 @@ function HostPreGameView({
   const [showBattleSettings, setShowBattleSettings] = useState(false);
   const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
-  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>('classic');
+  const storeGameMode = useGameMode();
+  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(storeGameMode || 'classic');
   const { setGameMode: setStoreGameMode } = useGameActions();
 
   // When host selects a specific mode, update the store

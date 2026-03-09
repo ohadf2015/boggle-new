@@ -23,6 +23,7 @@ import type { LetterFeedback as MPLetterFeedback } from '@/shared/types/game';
 import type { LetterFeedback as SPLetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival/types';
 import type { HintLevel } from '@/utils/aiHintGenerator';
+import { inferTargetLetterCounts, computeYellowState } from '@/utils/wordHuntYellowLogic';
 
 const FEEDBACK_OVERLAY_DURATION = 3000;
 const WRONG_GUESS_SHAKE_DURATION = 400;
@@ -110,22 +111,16 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     return clues;
   }, [attempts, discoveryClues]);
 
-  // Collect known letters from target guesses + discovery
+  // Collect known letters using shared yellow logic (handles green-removes-yellow + capping)
   const knownLetters = useMemo(() => {
-    const known = new Set<string>();
-    for (const attempt of attempts) {
-      for (const fb of attempt.feedback) {
-        if (fb.feedback === 'yellow') {
-          known.add(fb.letter);
-        }
-      }
-    }
+    const letterCounts = inferTargetLetterCounts(attempts);
+    const { knownLetters: computed } = computeYellowState(attempts, letterCounts, accumulatedClues);
     // Add server-computed known letters from word discoveries
     for (const letter of discoveryKnownLetters) {
-      known.add(letter);
+      computed.add(letter);
     }
-    return known;
-  }, [attempts, discoveryKnownLetters]);
+    return computed;
+  }, [attempts, discoveryKnownLetters, accumulatedClues]);
 
   // Synthetic hint: show discovered letters, underscores for unknown positions
   const currentHint = useMemo<HintLevel>(() => ({

@@ -109,7 +109,7 @@ export interface ResultsPageProps {
   /** Current series round number */
   seriesRoundNumber?: number;
   /** Word Hunt summary from server (target word, lives, eliminated) */
-  wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null };
+  wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null; survivalTime?: number; discoveryWords?: number };
 }
 
 export interface VoteInfo {

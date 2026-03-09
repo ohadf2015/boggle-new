@@ -29,6 +29,7 @@ import { BlastChainCounter } from './BlastChainCounter';
 import CircularTimer from '@/components/CircularTimer';
 import { LeadChangeBanner } from '@/components/game/LeadChangeBanner';
 import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
+import { BlastOpponentFeed } from './BlastOpponentFeed';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -429,6 +430,13 @@ export function BlastGameLayout({
       {isMultiplayer && (
         <div className="relative z-50">
           <LeadChangeBanner event={leadChangeEvent} />
+        </div>
+      )}
+
+      {/* MP Opponent Activity Feed — subtle ticker showing opponent words/combos */}
+      {isMultiplayer && (
+        <div className="relative h-0">
+          <BlastOpponentFeed />
         </div>
       )}
 

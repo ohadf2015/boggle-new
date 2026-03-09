@@ -233,6 +233,8 @@ export function usePlayerGameEvents({
         storeUpdates.wordHuntTargetAttempts = [];
         storeUpdates.wordHuntTargetFound = false;
         storeUpdates.wordHuntEliminatedPlayers = (data as any).wordHuntEliminatedPlayers || [];
+        storeUpdates.wordHuntDiscoveryClues = [];
+        storeUpdates.wordHuntKnownLetters = [];
       }
       if ((data as any).lateJoin) {
         storeUpdates.gameActive = true;
@@ -423,6 +425,7 @@ export function usePlayerGameEvents({
       setWordHuntTargetAttempts([]);
       setWordHuntPlayerLives({});
       setWordHuntMyLife(100);
+      useGameStore.setState({ wordHuntDiscoveryClues: [], wordHuntKnownLetters: [] });
 
       // Reset blast mode state for next game
       const blastResetStore = useGameStore.getState();
@@ -432,6 +435,7 @@ export function usePlayerGameEvents({
       blastResetStore.setBlastTotalTilesCleared(0);
       blastResetStore.setBlastSeed(null);
       blastResetStore.setBlastComboSync(null);
+      useGameStore.setState({ blastOpponentActivity: [] });
 
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
@@ -453,6 +457,37 @@ export function usePlayerGameEvents({
       // Only show flash for other players' combos (not our own)
       if (data.username !== username) {
         setBlastComboSync({ ...data, id: `combo-sync-${Date.now()}` });
+        // Also push to opponent activity feed
+        useGameStore.getState().pushBlastOpponentActivity({
+          id: `combo-${Date.now()}`,
+          username: data.username,
+          type: 'combo',
+          message: data.comboType,
+        });
+      }
+    };
+
+    // Handle playerFoundWord broadcast — shows opponent word activity in blast MP feed
+    const handlePlayerFoundWord = (data: { username: string; word: string; score: number; comboLevel: number; wordCount: number }) => {
+      if (data.username === username) return; // Skip own words
+      const store = useGameStore.getState();
+      store.pushBlastOpponentActivity({
+        id: `word-${Date.now()}-${data.username}`,
+        username: data.username,
+        type: 'word',
+        word: data.word,
+        score: data.score,
+        comboLevel: data.comboLevel,
+      });
+      // Milestone alerts at score thresholds
+      if (data.score > 0 && data.score % 500 < 50 && data.score >= 500) {
+        store.pushBlastOpponentActivity({
+          id: `milestone-${Date.now()}-${data.username}`,
+          username: data.username,
+          type: 'milestone',
+          score: data.score,
+          message: `${data.score}+ pts!`,
+        });
       }
     };
 
@@ -518,6 +553,7 @@ export function usePlayerGameEvents({
     socket.on('totalBoardWords', handleTotalBoardWords);
     socket.on('blastWordAccepted', handleBlastWordAccepted);
     socket.on('blastComboSync', handleBlastComboSync);
+    socket.on('playerFoundWord', handlePlayerFoundWord);
     socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
     socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
@@ -546,6 +582,7 @@ export function usePlayerGameEvents({
       socket.off('totalBoardWords', handleTotalBoardWords);
       socket.off('blastWordAccepted', handleBlastWordAccepted);
       socket.off('blastComboSync', handleBlastComboSync);
+      socket.off('playerFoundWord', handlePlayerFoundWord);
       socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);

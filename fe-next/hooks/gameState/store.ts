@@ -103,6 +103,8 @@ interface GameState {
   blastSeed: number | null;
   /** Pending combo sync from another player — triggers BlastComboFlash for spectators */
   blastComboSync: { comboType: string; username: string; id: string } | null;
+  /** Opponent activity events for multiplayer blast feed (max 5, auto-rotate) */
+  blastOpponentActivity: Array<{ id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }>;
 
   // Word Hunt multiplayer state
   wordHuntTargetLength: number;
@@ -177,6 +179,7 @@ interface GameActions {
   setBlastTotalTilesCleared: (value: number | ((prev: number) => number)) => void;
   setBlastSeed: (value: number | null | ((prev: number | null) => number | null)) => void;
   setBlastComboSync: (value: { comboType: string; username: string; id: string } | null) => void;
+  pushBlastOpponentActivity: (event: { id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }) => void;
 
   // Word Hunt multiplayer actions
   setWordHuntTargetLength: (value: number | ((prev: number) => number)) => void;
@@ -252,6 +255,7 @@ const initialState: GameState = {
   blastTotalTilesCleared: 0,
   blastSeed: null,
   blastComboSync: null,
+  blastOpponentActivity: [],
   wordHuntTargetLength: 0,
   wordHuntMyLife: 100,
   wordHuntPlayerLives: {},
@@ -510,6 +514,10 @@ export const useGameStore = create<GameStore>()(
 
     setBlastComboSync: (value) => set({ blastComboSync: value }),
 
+    pushBlastOpponentActivity: (event) => set((state) => ({
+      blastOpponentActivity: [...state.blastOpponentActivity.slice(-4), event],
+    })),
+
     // ==========================================
     // Word Hunt Multiplayer Actions
     // ==========================================
@@ -620,6 +628,7 @@ export const useGameStore = create<GameStore>()(
         blastTotalTilesCleared: 0,
         blastSeed: null,
         blastComboSync: null,
+        blastOpponentActivity: [],
         combo: DEFAULT_COMBO_STATE,
       });
     },
@@ -654,6 +663,7 @@ export const useGameStore = create<GameStore>()(
         blastTotalTilesCleared: 0,
         blastSeed: null,
         blastComboSync: null,
+        blastOpponentActivity: [],
         wordHuntTargetLength: 0,
         wordHuntMyLife: 100,
         wordHuntPlayerLives: {},
@@ -730,6 +740,7 @@ export const useBlastTotalTileBonus = () => useGameStore((state) => state.blastT
 export const useBlastTotalTilesCleared = () => useGameStore((state) => state.blastTotalTilesCleared);
 export const useBlastSeed = () => useGameStore((state) => state.blastSeed);
 export const useBlastComboSync = () => useGameStore((state) => state.blastComboSync);
+export const useBlastOpponentActivity = () => useGameStore((state) => state.blastOpponentActivity);
 
 // Word Hunt multiplayer selectors
 export const useWordHuntTargetLength = () => useGameStore((state) => state.wordHuntTargetLength);
@@ -793,6 +804,7 @@ const getActions = (state: GameStore) => ({
   setBlastTotalTilesCleared: state.setBlastTotalTilesCleared,
   setBlastSeed: state.setBlastSeed,
   setBlastComboSync: state.setBlastComboSync,
+  pushBlastOpponentActivity: state.pushBlastOpponentActivity,
   setWordHuntTargetLength: state.setWordHuntTargetLength,
   setWordHuntMyLife: state.setWordHuntMyLife,
   setWordHuntPlayerLives: state.setWordHuntPlayerLives,
