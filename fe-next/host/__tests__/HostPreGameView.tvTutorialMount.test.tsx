@@ -94,6 +94,7 @@ jest.mock('../../components/BotControls', () => ({
 }));
 
 jest.mock('@/hooks/gameState', () => ({
+  useGameMode: () => 'classic',
   useGameActions: () => ({
     setGameMode: jest.fn(),
   }),

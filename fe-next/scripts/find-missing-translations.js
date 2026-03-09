@@ -82,37 +82,51 @@ function findProblematicFlatKeys(obj, prefix = '', problematic = []) {
   return problematic;
 }
 
+function parseESMTranslationFile(filePath) {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  // Find the object literal after "const xx = "
+  const constIdx = content.indexOf('const ');
+  const objStart = content.indexOf('{', constIdx);
+  let depth = 0;
+  let objEnd = objStart;
+  for (let i = objStart; i < content.length; i++) {
+    if (content[i] === '{') depth++;
+    else if (content[i] === '}') { depth--; if (depth === 0) { objEnd = i; break; } }
+  }
+  const objStr = content.substring(objStart, objEnd + 1);
+  // Evaluate the object literal in isolation (safe - only static translation data)
+  const vm = require('vm');
+  return vm.runInNewContext(`(${objStr})`);
+}
+
 function getTranslationKeysFromFile() {
   console.log('Reading translations file...');
 
-  const content = fs.readFileSync(TRANSLATIONS_FILE, 'utf-8');
+  const translationsDir = path.dirname(TRANSLATIONS_FILE);
+  const indexContent = fs.readFileSync(TRANSLATIONS_FILE, 'utf-8');
 
-  // Use a safe approach: eval the file in a controlled way
-  // Extract the translations object using regex and parsing
-  const translationsMatch = content.match(/const\s+translations\s*=\s*(\{[\s\S]*?\});?\s*(?:\/\/|module\.exports)/);
-
-  if (!translationsMatch) {
-    // Try alternative approach - require the module
-    try {
-      const translationsModule = require(TRANSLATIONS_FILE);
-      const translations = translationsModule.translations;
-
-      const result = {};
-      const problematicByLanguage = {};
-      for (const lang of Object.keys(translations)) {
-        result[lang] = extractTranslationKeys(translations[lang]);
-        problematicByLanguage[lang] = findProblematicFlatKeys(translations[lang]);
+  // Extract language imports: import { en } from './en.js'
+  const importRegex = /import\s*\{\s*(\w+)\s*\}\s*from\s*['"]\.\/(\w+)\.js['"]/g;
+  const translations = {};
+  let m;
+  while ((m = importRegex.exec(indexContent)) !== null) {
+    const langName = m[1];
+    const fileName = m[2];
+    const langFile = path.join(translationsDir, `${fileName}.js`);
+    if (fs.existsSync(langFile)) {
+      try {
+        translations[langName] = parseESMTranslationFile(langFile);
+      } catch (e) {
+        console.error(`Failed to parse ${langFile}: ${e.message}`);
+        process.exit(1);
       }
-      return { translations, keysByLanguage: result, problematicByLanguage };
-    } catch (e) {
-      console.error('Failed to parse translations file:', e.message);
-      process.exit(1);
     }
   }
 
-  // Fallback to require
-  const translationsModule = require(TRANSLATIONS_FILE);
-  const translations = translationsModule.translations;
+  if (Object.keys(translations).length === 0) {
+    console.error('Failed to parse translations: no language files found');
+    process.exit(1);
+  }
 
   const result = {};
   const problematicByLanguage = {};

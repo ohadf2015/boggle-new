@@ -121,6 +121,35 @@ export async function signInWithMagicLink(email: string) {
   });
 }
 
+/**
+ * Send OTP code to email (mobile-friendly alternative to magic link)
+ * No emailRedirectTo — user enters the 6-digit code in-app
+ */
+export async function sendOtpCode(email: string) {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  return supabase.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: true,
+    },
+  });
+}
+
+/**
+ * Verify OTP code entered by user
+ * On success, Supabase sets the session automatically
+ */
+export async function verifyOtpCode(email: string, token: string) {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  return supabase.auth.verifyOtp({
+    email,
+    token,
+    type: 'email',
+  });
+}
+
 export async function signOut() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
 

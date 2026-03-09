@@ -329,7 +329,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={handleWhatsApp}
               aria-label="Share on WhatsApp"
               size="sm"
-              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
+              className="flex-1 py-3 bg-brand-whatsapp hover:bg-brand-whatsapp-hover text-white border-2 border-slate-600 rounded-lg transition-all"
             >
               <WhatsAppIcon className="w-4 h-4" />
             </Button>

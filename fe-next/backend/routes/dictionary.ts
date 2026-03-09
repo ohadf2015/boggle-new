@@ -7,7 +7,7 @@
 import express, { Request, Response, Router, NextFunction } from 'express';
 import logger from '../utils/logger';
  
-import { createEndpointLimiter } from '../utils/rateLimiter';
+import { createEndpointLimiter } from '../utils/apiRateLimiter';
 
 // Import the same dictionary used by multiplayer
  

@@ -20,6 +20,7 @@ jest.mock('@/utils/SocketContext', () => ({
 }));
 
 jest.mock('@/hooks/gameState', () => ({
+  useGameMode: () => 'classic',
   useGameActions: () => ({ setGameMode: jest.fn() }),
 }));
 

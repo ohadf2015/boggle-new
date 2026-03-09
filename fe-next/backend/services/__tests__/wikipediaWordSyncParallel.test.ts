@@ -9,13 +9,13 @@ import { join } from 'path';
 
 describe('Wikipedia Word Sync Parallel Processing', () => {
   test('syncLocalJSONToDatabase should process languages in parallel to avoid timeout', () => {
-    // GIVEN: The wikipediaWordPopulator.ts file
-    const populatorPath = join(__dirname, '../wikipediaWordPopulator.ts');
-    const populatorContent = readFileSync(populatorPath, 'utf-8');
+    // GIVEN: The wikipediaWordAdmin.ts file (where the actual implementation lives)
+    const adminPath = join(__dirname, '../wikipediaWordAdmin.ts');
+    const adminContent = readFileSync(adminPath, 'utf-8');
 
     // Find the syncLocalJSONToDatabase function
-    const functionMatch = populatorContent.match(
-      /export async function syncLocalJSONToDatabase[\s\S]*?(?=export |$)/
+    const functionMatch = adminContent.match(
+      /export async function syncLocalJSONToDatabase[\s\S]*?(?=\nexport |$)/
     );
     expect(functionMatch).not.toBeNull();
     const functionBody = functionMatch![0];

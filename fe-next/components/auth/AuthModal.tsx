@@ -11,7 +11,8 @@ import { Button as ButtonComponent } from '../ui/button';
 // Type assertion for JSX Button component
 const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail, signInWithMagicLink } from '../../lib/supabase';
+import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { isNative } from '../../utils/platform';
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
@@ -71,6 +72,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [otpStep, setOtpStep] = useState<'enter-email' | 'enter-code'>('enter-email');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpCooldown, setOtpCooldown] = useState(0);
 
   const guestStats: GuestStats | null = showGuestStats ? getGuestStatsSummary() : null;
 
@@ -85,6 +89,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       setPasswordError(null);
       setError(null);
       setSuccess(null);
+      setOtpStep('enter-email');
+      setOtpCode('');
+      setOtpCooldown(0);
     }
   }, [isOpen, initialMode]);
 
@@ -244,7 +251,63 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     }
   };
 
+  const handleOtpSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
+      return;
+    }
+
+    setIsLoading('otp');
+    setError(null);
+    setEmailError(null);
+
+    try {
+      const result = await sendOtpCode(email);
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        setOtpStep('enter-code');
+        // Start 60s cooldown (Supabase rate limit)
+        setOtpCooldown(60);
+        const interval = setInterval(() => {
+          setOtpCooldown((prev) => {
+            if (prev <= 1) { clearInterval(interval); return 0; }
+            return prev - 1;
+          });
+        }, 1000);
+      }
+      setIsLoading(null);
+    } catch (err) {
+      setError((err as Error).message || 'An error occurred');
+      setIsLoading(null);
+    }
+  };
+
+  const handleOtpVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpCode.length !== 6) return;
+
+    setIsLoading('otp-verify');
+    setError(null);
+
+    try {
+      const result = await verifyOtpCode(email, otpCode);
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        onClose();
+      }
+      setIsLoading(null);
+    } catch (err) {
+      setError((err as Error).message || 'An error occurred');
+      setIsLoading(null);
+    }
+  };
+
   const isAnyLoading = isLoading !== null;
+  const showOtpFlow = isNative();
 
   const providers: Provider[] = [
     {
@@ -412,7 +475,109 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   </div>
 
                   {!usePassword ? (
-                    /* Magic Link Form (default — no password needed) */
+                    showOtpFlow ? (
+                      /* OTP Code Form (native — no browser redirect) */
+                      otpStep === 'enter-email' ? (
+                        <form onSubmit={handleOtpSend} className="space-y-3">
+                          <div>
+                            <input
+                              type="email"
+                              autoComplete="email"
+                              value={email}
+                              onChange={(e) => handleEmailChange(e.target.value)}
+                              placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                              className={cn(
+                                'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
+                                'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                                emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
+                              )}
+                              disabled={isAnyLoading}
+                              spellCheck={false}
+                            />
+                            {emailError && (
+                              <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                            )}
+                          </div>
+                          <Button
+                            type="submit"
+                            disabled={isAnyLoading || !email || !!emailError}
+                            className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2"
+                            asChild={false}
+                          >
+                            {isLoading === 'otp' ? (
+                              <Loader size="sm" />
+                            ) : (
+                              <>
+                                <Mail className="w-4 h-4" />
+                                <span>{t('auth.otp.sendCode')}</span>
+                              </>
+                            )}
+                          </Button>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                              <Mail className="w-3 h-3" />
+                              {t('auth.otp.noPassword')}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setUsePassword(true)}
+                              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                            >
+                              {t('auth.magicLink.usePassword')}
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <form onSubmit={handleOtpVerify} className="space-y-3">
+                          <p className="text-sm text-gray-300 mb-2">
+                            {t('auth.otp.codeSentTo')} <span className="font-bold text-white">{email}</span>
+                          </p>
+                          <div>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              autoComplete="one-time-code"
+                              maxLength={6}
+                              value={otpCode}
+                              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                              placeholder="000000"
+                              className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors border-slate-600 focus:border-neo-cyan"
+                              disabled={isAnyLoading}
+                            />
+                          </div>
+                          <Button
+                            type="submit"
+                            disabled={isAnyLoading || otpCode.length !== 6}
+                            className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                            asChild={false}
+                          >
+                            {isLoading === 'otp-verify' ? (
+                              <Loader size="sm" />
+                            ) : (
+                              t('auth.otp.verify')
+                            )}
+                          </Button>
+                          <div className="flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={() => { setOtpStep('enter-email'); setOtpCode(''); setError(null); }}
+                              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                            >
+                              {t('auth.otp.changeEmail')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleOtpSend as unknown as React.MouseEventHandler}
+                              disabled={otpCooldown > 0}
+                              className="text-xs text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-40"
+                            >
+                              {otpCooldown > 0 ? `${t('auth.otp.resend')} (${otpCooldown}s)` : t('auth.otp.resend')}
+                            </button>
+                          </div>
+                        </form>
+                      )
+                    ) : (
+                    /* Magic Link Form (web — no password needed) */
                     <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
                       <div>
                         <input
@@ -464,6 +629,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         </button>
                       </div>
                     </form>
+                    )
                   ) : (
                     /* Password Form */
                     <form onSubmit={handleEmailSubmit} className="space-y-3">

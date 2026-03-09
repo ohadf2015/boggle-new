@@ -13,6 +13,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { linkSessionToUser } from '@/utils/sessionTracking';
+import { registerPushToken, unregisterPushToken } from '@/utils/pushNotifications/tokenRegistration';
 import { broadcastSessionRefreshed } from '@/utils/crossTabAuthSync';
 import { captureBackgroundError } from '@/utils/sentry';
 import logger from '@/utils/logger';
@@ -311,6 +312,8 @@ async function handleAuthStateChange(
               setLoading(false);
             }
           }
+          // Register push token for native mobile apps (fire-and-forget)
+          registerPushToken().catch(() => {});
           // Check for pending classroom join after successful sign-in
           if (typeof window !== 'undefined') {
             const pendingJoinCode = sessionStorage.getItem('joinClassroomReturnCode');
@@ -326,6 +329,7 @@ async function handleAuthStateChange(
       break;
 
     case 'SIGNED_OUT':
+      unregisterPushToken().catch(() => {});
       setUser(null);
       setProfile(null);
       setRankedProgress(null);

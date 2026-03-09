@@ -2393,6 +2393,14 @@ const en = {
       "divider": "or continue with email",
       "noPassword": "No password needed"
     },
+    "otp": {
+      "sendCode": "Send me a code",
+      "noPassword": "No password needed",
+      "codeSentTo": "Code sent to",
+      "verify": "Verify code",
+      "changeEmail": "Change email",
+      "resend": "Resend code"
+    },
     "trustBadge": "Secure & private",
     "callback": {
       "completingSignIn": "Finishing up...",

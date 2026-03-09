@@ -12,6 +12,7 @@ import {
 import type { SinglePlayerResultsData, BotOpponent } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import type { FoundWord } from '../types';
+import type { Language } from '@/types';
 
 interface BuildResultsParams {
   foundWords: FoundWord[];
@@ -23,7 +24,7 @@ interface BuildResultsParams {
   timerSeconds: number;
   maxCombo: number;
   mode: string;
-  language: string;
+  language: Language;
 }
 
 /**

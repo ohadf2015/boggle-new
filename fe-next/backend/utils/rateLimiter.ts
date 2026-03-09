@@ -18,19 +18,9 @@ import {
   RATE_LIMIT_KEYS,
 } from '../redis/rateLimit';
 
-// Re-export API rate limiter
-export {
-  apiRateLimiter,
-  createEndpointLimiter,
-  strictRateLimiter,
-  authRateLimiter,
-  getApiRateLimitStats,
-  isApiIpBlocked,
-  blockApiIp,
-  shutdownApiRateLimiter,
-  _apiStore,
-  ENDPOINT_CONFIGS,
-} from './apiRateLimiter';
+// NOTE: Do NOT re-export from apiRateLimiter here — it creates a circular dependency
+// (apiRateLimiter imports RateLimiterCore from this file).
+// Import directly from './apiRateLimiter' instead.
 
 export interface RateLimiterCoreOptions {
   maxRequests: number;

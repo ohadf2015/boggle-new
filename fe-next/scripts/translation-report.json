@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 3381,
+    "totalKeysInCode": 3404,
     "keyCountByLanguage": {
-      "en": 5694,
-      "he": 5723,
-      "sv": 5756,
-      "ja": 5743,
+      "en": 5717,
+      "he": 5740,
+      "sv": 5773,
+      "ja": 5760,
       "es": 5754
     },
     "missingFromEnglish": 0,
@@ -146,10 +146,55 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
-    "es": []
+    "he": [
+      "auth.otp.sendCode",
+      "auth.otp.noPassword",
+      "auth.otp.codeSentTo",
+      "auth.otp.verify",
+      "auth.otp.changeEmail",
+      "auth.otp.resend"
+    ],
+    "sv": [
+      "auth.otp.sendCode",
+      "auth.otp.noPassword",
+      "auth.otp.codeSentTo",
+      "auth.otp.verify",
+      "auth.otp.changeEmail",
+      "auth.otp.resend"
+    ],
+    "ja": [
+      "auth.otp.sendCode",
+      "auth.otp.noPassword",
+      "auth.otp.codeSentTo",
+      "auth.otp.verify",
+      "auth.otp.changeEmail",
+      "auth.otp.resend"
+    ],
+    "es": [
+      "auth.otp.sendCode",
+      "auth.otp.noPassword",
+      "auth.otp.codeSentTo",
+      "auth.otp.verify",
+      "auth.otp.changeEmail",
+      "auth.otp.resend",
+      "leaderboard.friends",
+      "leaderboard.noFriendsPlayed",
+      "friends.challenges.defaultMessage",
+      "friends.challenges.modes.classic",
+      "friends.challenges.modes.blitz",
+      "friends.challenges.modes.survival",
+      "friends.copyInviteLink",
+      "friends.linkCopied",
+      "friends.seeAll",
+      "friends.cancelRequest",
+      "friends.signInTitle",
+      "friends.signInDescription",
+      "friends.headToHead.title",
+      "friends.headToHead.wins",
+      "friends.headToHead.losses",
+      "friends.headToHead.draws",
+      "friends.headToHead.totalGames"
+    ]
   },
   "keysNotInEnglish": {
     "he": [

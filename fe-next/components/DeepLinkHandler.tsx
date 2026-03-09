@@ -7,6 +7,7 @@ import { Browser } from '@capacitor/browser';
 import logger from '@/utils/logger';
 import { defaultLocale, locales } from '@/lib/i18n';
 import { isNative } from '@/utils/platform';
+import { setupPushListeners } from '@/utils/pushNotifications/tokenRegistration';
 
 /**
  * DeepLinkHandler Component
@@ -96,6 +97,7 @@ export default function DeepLinkHandler() {
 
     // Register the deep link listener
     let cleanup: (() => void) | null = null;
+    let pushCleanup: (() => void) | null = null;
 
     App.addListener('appUrlOpen', handleAppUrlOpen)
       .then((listener) => {
@@ -105,9 +107,31 @@ export default function DeepLinkHandler() {
         logger.error('Failed to register deep link listener:', error);
       });
 
+    // Set up push notification tap → deep link routing
+    if (isNative()) {
+      setupPushListeners(
+        undefined, // onReceived — no-op for foreground notifications
+        (data) => {
+          // When user taps a push notification, route to the deep link
+          const deepLink = data.deepLink;
+          if (deepLink) {
+            const validLocale = (typeof window !== 'undefined' && locales.find((l) => window.location.pathname.startsWith(`/${l}`))) || defaultLocale;
+            const route = deepLink.startsWith('/') ? `/${validLocale}${deepLink}` : `/${validLocale}/${deepLink}`;
+            logger.log('Push notification tap routing to:', route);
+            router.replace(route);
+          }
+        }
+      ).then((fn) => {
+        pushCleanup = fn;
+      }).catch((error) => {
+        logger.error('Failed to set up push listeners:', error);
+      });
+    }
+
     // Cleanup on unmount
     return () => {
       cleanup?.();
+      pushCleanup?.();
     };
   }, [router]);
 
