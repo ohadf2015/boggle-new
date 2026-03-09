@@ -12,7 +12,6 @@ jest.mock('framer-motion', () => ({
 
 describe('QuickTipsStep - Color Contrast', () => {
   const mockOnModeSelect = jest.fn();
-  const mockOnComplete = jest.fn();
 
   const renderWithLanguage = (component: React.ReactElement) => {
     return render(
@@ -27,7 +26,6 @@ describe('QuickTipsStep - Color Contrast', () => {
       <QuickTipsStep
         selectedMode={null}
         onModeSelect={mockOnModeSelect}
-        onComplete={mockOnComplete}
       />
     );
 
@@ -41,8 +39,8 @@ describe('QuickTipsStep - Color Contrast', () => {
       expect(textElements.length).toBeGreaterThan(0);
     });
 
-    // CTA section uses neo-lime gradient with neo-black text — good contrast
-    const ctaSection = container.querySelector('[class*="from-neo-lime"]');
-    expect(ctaSection).toBeInTheDocument();
+    // Tip icon circles use bg-neo-lime with neo-black text — good contrast
+    const limeCircles = container.querySelectorAll('.bg-neo-lime');
+    expect(limeCircles.length).toBeGreaterThan(0);
   });
 });
