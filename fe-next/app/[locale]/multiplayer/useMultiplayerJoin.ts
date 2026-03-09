@@ -1,0 +1,244 @@
+/**
+ * useMultiplayerJoin Hook
+ *
+ * Encapsulates the handleJoin logic for the multiplayer page.
+ * Extracted from PageClient.tsx for maintainability.
+ */
+
+import { useCallback } from 'react';
+import type { Socket } from 'socket.io-client';
+import toast from 'react-hot-toast';
+import logger from '@/utils/logger';
+import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
+import { setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
+import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
+import { sanitizeRoomName } from '@/utils/consts';
+import { getGuestSessionId, hashToken } from '@/utils/guestManager';
+import type { Language, Avatar } from '@/shared/types/game';
+
+// Hex color validation pattern (must match backend schema)
+const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
+const DEFAULT_AVATAR_COLOR = '#FF6B6B';
+
+function sanitizeAvatarColor(
+  color: string | undefined | null,
+  avatarImage?: string | null
+): string {
+  if (color && HEX_COLOR_PATTERN.test(color)) return color;
+  if (avatarImage) return getAvatarEmojiAndColor(avatarImage).color;
+  return DEFAULT_AVATAR_COLOR;
+}
+
+function buildAvatar(
+  profile: { avatar_emoji?: string; avatar_color?: string; avatar_image?: string } | null,
+  fallbackAvatar: { emoji: string; color: string },
+  avatarImageId: string | null
+): { emoji?: string; color: string; avatarImage?: string } {
+  const effectiveAvatarImage = avatarImageId || profile?.avatar_image;
+  if (profile) {
+    return {
+      emoji: profile.avatar_emoji,
+      color: sanitizeAvatarColor(profile.avatar_color, effectiveAvatarImage),
+      avatarImage: effectiveAvatarImage,
+    };
+  }
+  return {
+    ...fallbackAvatar,
+    color: sanitizeAvatarColor(fallbackAvatar.color, avatarImageId),
+    avatarImage: avatarImageId || undefined,
+  };
+}
+
+interface UseMultiplayerJoinOptions {
+  socket: Socket | null;
+  gameCode: string;
+  username: string;
+  roomName: string;
+  hostUsername: string;
+  language: Language;
+  t: (path: string, params?: Record<string, string | number>) => string;
+  isSupabaseEnabled: boolean;
+  user: { id?: string; email?: string; user_metadata?: { full_name?: string; name?: string } } | null;
+  profile: { display_name?: string; avatar_emoji?: string; avatar_color?: string; avatar_image?: string; profile_picture_url?: string | null } | null;
+  loading: boolean;
+  authLoadingStartTime: number | null;
+  guestAvatar: { emoji: string; color: string } | null;
+  setGuestAvatar: (avatar: { emoji: string; color: string }) => void;
+  setUsername: (username: string) => void;
+  setError: (error: string) => void;
+  setIsJoining: (isJoining: boolean) => void;
+}
+
+type HandleJoinFn = (
+  isHostMode: boolean,
+  roomLang?: Language | null,
+  overrideGameCode?: string,
+  overrideRoomName?: string,
+  overrideUsername?: string,
+) => Promise<void>;
+
+export function useMultiplayerJoin({
+  socket,
+  gameCode,
+  username,
+  roomName,
+  hostUsername,
+  language,
+  t,
+  isSupabaseEnabled,
+  user,
+  profile,
+  loading,
+  authLoadingStartTime,
+  guestAvatar,
+  setGuestAvatar,
+  setUsername,
+  setError,
+  setIsJoining,
+}: UseMultiplayerJoinOptions): HandleJoinFn {
+  return useCallback(
+    async (
+      isHostMode: boolean,
+      roomLang?: Language | null,
+      overrideGameCode?: string,
+      overrideRoomName?: string,
+      overrideUsername?: string,
+    ) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
+      }
+
+      // Wait for socket connection
+      if (socket && !socket.connected) {
+        logger.log('[JOIN] Socket exists but not connected, waiting...');
+        const connected = await new Promise<boolean>((resolve) => {
+          const timeout = setTimeout(() => resolve(false), 5000);
+          const onConnect = (): void => { clearTimeout(timeout); resolve(true); };
+          socket.once('connect', onConnect);
+          if (socket.connected) { clearTimeout(timeout); socket.off('connect', onConnect); resolve(true); }
+        });
+        if (!connected) {
+          setError(t('errors.notConnected'));
+          toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️' });
+          return;
+        }
+      }
+
+      if (!socket?.connected) {
+        setError(t('errors.notConnected'));
+        toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️' });
+        return;
+      }
+
+      // Wait for auth
+      const AUTH_LOADING_TIMEOUT = 5000;
+      const authLoadingTooLong = authLoadingStartTime && Date.now() - authLoadingStartTime > AUTH_LOADING_TIMEOUT;
+
+      if (loading && !authLoadingTooLong) {
+        toast.error(t('common.loadingProfile'), { duration: 2000, icon: '⏳' });
+        return;
+      }
+
+      if (authLoadingTooLong) {
+        logger.warn('[AUTH] Auth loading timed out, proceeding without profile');
+      }
+
+      // Compute effective username
+      let effectiveUsername = overrideUsername?.trim()
+        ? overrideUsername.trim()
+        : user
+          ? profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || username
+          : username;
+
+      let generatedAvatar: { emoji: string; color: string } | null = null;
+      if (!effectiveUsername?.trim() && !user) {
+        const { name, avatar } = getRandomDefaultNameWithAvatar(language);
+        effectiveUsername = name;
+        generatedAvatar = avatar;
+        setGuestAvatar(avatar);
+      }
+
+      if (effectiveUsername !== username) {
+        setUsername(effectiveUsername);
+      }
+
+      const avatarImageId = getStoredAvatarId();
+      const fallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername);
+      const effectiveAvatar = buildAvatar(profile, fallbackAvatar, avatarImageId);
+
+      setError('');
+      setIsJoining(true);
+
+      const safetyTimeout = setTimeout(() => {
+        setIsJoining(false);
+        logger.warn('[JOIN] Safety timeout triggered');
+        toast.error(t('errors.connectionTimeout'), { duration: 4000, icon: '⚠️' });
+      }, 10000);
+
+      const clearSafetyTimeout = (): void => clearTimeout(safetyTimeout);
+      socket.once('joined', clearSafetyTimeout);
+      socket.once('error', clearSafetyTimeout);
+      socket.once('joinedAsSpectator', clearSafetyTimeout);
+      socket.once('rateLimited', clearSafetyTimeout);
+
+      const codeToUse = overrideGameCode || gameCode;
+
+      // Build auth context
+      let authUserId = null;
+      let guestTokenHash = null;
+      let guestSessionId: string | null = null;
+
+      if (isSupabaseEnabled) {
+        if (user?.id) {
+          authUserId = user.id;
+        } else {
+          guestSessionId = getGuestSessionId();
+          if (guestSessionId) {
+            guestTokenHash = await hashToken(guestSessionId);
+          }
+        }
+      }
+
+      if (isHostMode) {
+        const finalHostUsername = user ? effectiveUsername : hostUsername || effectiveUsername;
+        const finalRoomName = sanitizeRoomName(overrideRoomName || roomName || `${finalHostUsername} Room`);
+        const hostFallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername);
+        const hostAvatar = buildAvatar(profile, hostFallbackAvatar, avatarImageId);
+
+        socket.emit('createGame', {
+          gameCode: codeToUse,
+          roomName: finalRoomName,
+          hostUsername: finalHostUsername,
+          language: roomLang || language,
+          authUserId,
+          guestTokenHash,
+          guestSessionId,
+          avatar: hostAvatar,
+          profilePictureUrl: profile?.profile_picture_url,
+        });
+      } else {
+        logger.log('[JOIN] Emitting join event:', {
+          gameCode: codeToUse,
+          username: effectiveUsername,
+          hasAuth: !!authUserId,
+          socketConnected: socket.connected,
+        });
+
+        socket.emit('join', {
+          gameCode: codeToUse,
+          username: effectiveUsername,
+          authUserId,
+          guestTokenHash,
+          guestSessionId,
+          avatar: effectiveAvatar,
+          profilePictureUrl: profile?.profile_picture_url,
+        });
+      }
+    },
+    [
+      socket, gameCode, username, roomName, language, t,
+      isSupabaseEnabled, user, profile, loading, authLoadingStartTime,
+      guestAvatar, hostUsername, setGuestAvatar, setUsername, setError, setIsJoining,
+    ]
+  );
+}

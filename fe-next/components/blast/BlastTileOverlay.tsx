@@ -219,13 +219,10 @@ export function BlastTileOverlay({
             <motion.div
               key={`bg-${posKey}`}
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: isWeakened ? [1, 0.85, 1] : 1, scale: 1 }}
+              animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.3 }}
-              transition={isWeakened
-                ? { opacity: { duration: 1, repeat: Infinity, ease: 'easeInOut' }, type: 'spring', stiffness: 300, damping: 20 }
-                : { type: 'spring', stiffness: 300, damping: 20 }
-              }
-              className={`relative rounded-lg ${config.animationClass}${isSelected ? ' blast-tile-selected' : ''}${objectiveTileTypes?.has(tile.type) ? ' blast-tile-objective' : ''}`}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className={`relative rounded-lg ${config.animationClass}${isWeakened ? ' blast-tile-weakened' : ''}${isSelected ? ' blast-tile-selected' : ''}${objectiveTileTypes?.has(tile.type) ? ' blast-tile-objective' : ''}`}
               style={{
                 gridRow: tile.row + 1,
                 gridColumn: tile.col + 1,

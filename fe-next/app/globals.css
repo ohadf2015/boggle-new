@@ -1025,6 +1025,39 @@ body {
     .blast-tile-frozen {
       animation: none;
     }
+    .blast-tile-weakened {
+      animation: none;
+    }
+  }
+
+  /* Weakened (cracked) tile pulse — moved from Framer Motion JS to CSS for GPU compositing */
+  .blast-tile-weakened {
+    animation: blast-weakened-pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes blast-weakened-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+
+  /* Pause idle tile animations during cascade to reduce GPU thrash.
+     Cascade overlay (anime.js) + idle CSS animations fighting = repaint storm.
+     This single toggle eliminates 10+ concurrent animations during cascades. */
+  .blast-game[data-cascade="active"] .blast-tile-gold,
+  .blast-game[data-cascade="active"] .blast-tile-bomb,
+  .blast-game[data-cascade="active"] .blast-tile-lightning,
+  .blast-game[data-cascade="active"] .blast-tile-prism,
+  .blast-game[data-cascade="active"] .blast-tile-gem,
+  .blast-game[data-cascade="active"] .blast-tile-rainbow,
+  .blast-game[data-cascade="active"] .blast-tile-ice,
+  .blast-game[data-cascade="active"] .blast-tile-wildcard,
+  .blast-game[data-cascade="active"] .blast-tile-magnet,
+  .blast-game[data-cascade="active"] .blast-tile-frozen,
+  .blast-game[data-cascade="active"] .blast-tile-mirror,
+  .blast-game[data-cascade="active"] .blast-tile-silver,
+  .blast-game[data-cascade="active"] .blast-tile-diamond,
+  .blast-game[data-cascade="active"] .blast-tile-weakened {
+    animation-play-state: paused;
   }
 
   /* Blast grid frame styling */

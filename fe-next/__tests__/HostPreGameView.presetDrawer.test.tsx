@@ -359,10 +359,10 @@ describe('HostPreGameView Preset Selection', () => {
     const partyButtons = screen.getAllByRole('button', { name: /party/i });
     const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
 
-    // Each preset button appears in both desktop and mobile layouts
-    expect(quickButtons.length).toBeGreaterThanOrEqual(2);
-    expect(partyButtons.length).toBeGreaterThanOrEqual(2);
-    expect(challengeButtons.length).toBeGreaterThanOrEqual(2);
+    // Each preset button renders (consolidated into single responsive layout)
+    expect(quickButtons.length).toBeGreaterThanOrEqual(1);
+    expect(partyButtons.length).toBeGreaterThanOrEqual(1);
+    expect(challengeButtons.length).toBeGreaterThanOrEqual(1);
   });
 
   it('applies preset settings immediately on click (no intermediate step)', async () => {

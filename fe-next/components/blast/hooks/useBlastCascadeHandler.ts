@@ -190,7 +190,7 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
             setCascadeHighlightData(null);
 
             setTimeout(() => {
-              cascade.startCascade(newGrid, nextTileStates, handleCascadeCompleteRef.current);
+              cascade.startCascade(newGrid, nextTileStates, handleCascadeCompleteRef.current, 0, chainLevel);
             }, 80);
           }, CASCADE_HIGHLIGHT_DURATION + CASCADE_HIGHLIGHT_LINGER);
         } else {

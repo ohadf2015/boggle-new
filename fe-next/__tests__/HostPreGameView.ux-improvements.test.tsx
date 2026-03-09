@@ -31,9 +31,13 @@ describe('HostPreGameView UX improvements', () => {
 
   it('TV Mode toggle appears outside the advanced settings accordion', () => {
     // TV Mode should be visible without expanding "Advanced Settings"
-    // Check that broadcastMode checkbox appears BEFORE the showAdvanced conditional block
-    const broadcastIdx = source.indexOf('broadcastMode');
-    const advancedIdx = source.indexOf('showAdvanced &&');
+    // broadcastMode was extracted to BattleModeCard — check that file
+    const battleModeSource = fs.readFileSync(
+      path.join(__dirname, '../host/components/pre-game/BattleModeCard.tsx'),
+      'utf-8'
+    );
+    const broadcastIdx = battleModeSource.indexOf('broadcastMode');
+    const advancedIdx = battleModeSource.indexOf('showAdvanced &&');
     expect(broadcastIdx).toBeGreaterThan(-1);
     expect(advancedIdx).toBeGreaterThan(-1);
     expect(broadcastIdx).toBeLessThan(advancedIdx);

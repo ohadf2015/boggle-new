@@ -31,10 +31,10 @@ export function BlastChainCounter({ chainLevel }: BlastChainCounterProps) {
           data-testid="blast-chain-counter"
           data-chain-level={chainLevel}
           data-chain-color={color}
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.4 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+          initial={{ opacity: 0, scale: 0.5, y: 8 }}
+          animate={{ opacity: 1, scale: [1.3, 1], y: 0 }}
+          exit={{ opacity: 0, scale: 1.6, y: -5 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
           className="pointer-events-none select-none"
         >
           {isRainbow ? (

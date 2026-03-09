@@ -65,9 +65,9 @@ interface UseWordSubmissionReturn {
   /** Handle word submission */
   handleWordSubmit: (word: string) => void;
   /** Ref to found words for game end processing */
-  foundWordsRef: React.MutableRefObject<FoundWord[]>;
+  foundWordsRef: React.RefObject<FoundWord[]>;
   /** Ref to found words set for duplicate checking */
-  foundWordsSetRef: React.MutableRefObject<Set<string>>;
+  foundWordsSetRef: React.RefObject<Set<string>>;
   /** Reset state for new game */
   resetWordSubmission: () => void;
   /** Prefetch validation for a word being formed (call as user types) */

@@ -12,6 +12,9 @@ import type {
   DateRange,
   StudentReportData,
   ClassReportData,
+  MasteryLevel,
+  HeatmapCell,
+  VocabularyHeatmapData,
 } from './analyticsTypes';
 
 /**
@@ -341,5 +344,119 @@ export async function getClassReportData(
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getClassReportData:', error);
     return { data: null, error: { message: error } };
+  }
+}
+
+/**
+ * Get vocabulary mastery heatmap data (student x word grid)
+ */
+export async function getVocabularyHeatmapData(
+  classroomId: string,
+  lessonId?: string
+): Promise<{ data: VocabularyHeatmapData; error: { message: string } | null }> {
+  const emptyData = { students: [], words: [], cells: [] };
+
+  if (!supabase) {
+    return { data: emptyData, error: { message: 'Supabase not configured' } };
+  }
+
+  try {
+    const { data: memberships, error: memberError } = await supabase
+      .from('classroom_memberships')
+      .select('student_id')
+      .eq('classroom_id', classroomId);
+
+    if (memberError) {
+      logger.error('Error fetching classroom memberships:', memberError);
+      return { data: emptyData, error: { message: memberError.message } };
+    }
+
+    if (!memberships || memberships.length === 0) {
+      return { data: emptyData, error: null };
+    }
+
+    const studentIds = memberships.map(m => m.student_id);
+
+    const { data: profiles, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, display_name')
+      .in('id', studentIds);
+
+    if (profileError) {
+      logger.error('Error fetching profiles:', profileError);
+      return { data: emptyData, error: { message: profileError.message } };
+    }
+
+    const students = (profiles || []).map(p => ({ id: p.id, name: p.display_name || 'Unknown' }));
+
+    let query = supabase
+      .from('student_lesson_progress')
+      .select('student_id, lesson_id, words_attempted')
+      .in('student_id', studentIds);
+
+    if (lessonId) {
+      query = query.eq('lesson_id', lessonId);
+    }
+
+    const { data: progressData, error: progressError } = await query;
+
+    if (progressError) {
+      logger.error('Error fetching progress:', progressError);
+      return { data: emptyData, error: { message: progressError.message } };
+    }
+
+    const wordsSet = new Set<string>();
+    if (progressData) {
+      progressData.forEach((progress) => {
+        if (progress.words_attempted) {
+          Object.keys(progress.words_attempted).forEach(word => wordsSet.add(word));
+        }
+      });
+    }
+
+    const words = Array.from(wordsSet);
+    const cells: HeatmapCell[] = [];
+
+    students.forEach(student => {
+      words.forEach(word => {
+        let totalAttempts = 0;
+        let totalCorrect = 0;
+
+        if (progressData) {
+          progressData.forEach((progress) => {
+            const wordsData = progress.words_attempted as WordsAttemptedRecord | null;
+            if (progress.student_id === student.id && wordsData?.[word]) {
+              totalAttempts += wordsData[word].attempts || 0;
+              totalCorrect += wordsData[word].correct || 0;
+            }
+          });
+        }
+
+        let masteryLevel: MasteryLevel = 'not-started';
+        let accuracy = 0;
+
+        if (totalAttempts > 0) {
+          accuracy = Math.round((totalCorrect / totalAttempts) * 100);
+          if (accuracy >= 80 && totalAttempts >= 3) {
+            masteryLevel = 'mastered';
+          } else if (accuracy >= 50) {
+            masteryLevel = 'practicing';
+          } else {
+            masteryLevel = 'struggling';
+          }
+        }
+
+        cells.push({
+          studentId: student.id, studentName: student.name,
+          word, masteryLevel, accuracy, attempts: totalAttempts,
+        });
+      });
+    });
+
+    return { data: { students, words, cells }, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in getVocabularyHeatmapData:', error);
+    return { data: emptyData, error: { message: error } };
   }
 }

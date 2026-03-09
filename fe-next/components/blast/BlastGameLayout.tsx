@@ -19,7 +19,6 @@ import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, C
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
 import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
-import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { Mascot } from '@/components/ui/Mascot';
@@ -186,10 +185,11 @@ export function BlastGameLayout({
   const prevCascadeRef = useRef(0);
 
   // Screen shake on bomb, prism, and lightning explosions
+  // Shake queue depth = 1: if already shaking, drop new triggers to avoid compound chaos
   useEffect(() => {
     const shakeTypes = new Set(['bomb', 'prism', 'lightning']);
     const shakeCount = explosions.filter(e => shakeTypes.has(e.type)).length;
-    if (shakeCount > prevExplosionsRef.current) {
+    if (shakeCount > prevExplosionsRef.current && !shakeClass) {
       const hasPrism = explosions.some(e => e.type === 'prism');
       const hasBomb = explosions.some(e => e.type === 'bomb');
       const hasLightning = explosions.some(e => e.type === 'lightning');
@@ -202,13 +202,13 @@ export function BlastGameLayout({
       if (hasPrism) vibrateBlastPrism();
       else if (hasBomb) vibrateBlastBomb();
       else if (hasLightning) vibrateBlastLightning();
-      const timer = setTimeout(() => setShakeClass(''), 350);
+      const timer = setTimeout(() => setShakeClass(''), 250);
       prevExplosionsRef.current = shakeCount;
       return () => clearTimeout(timer);
     }
     prevExplosionsRef.current = shakeCount;
     return undefined;
-  }, [explosions]);
+  }, [explosions, shakeClass]);
 
   // Cascade chain announcement + haptic
   useEffect(() => {
@@ -258,7 +258,7 @@ export function BlastGameLayout({
     : '';
 
   return (
-    <div className={cn('relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy', shakeClass)}>
+    <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
       <DynamicEnergyBackground />
 
       {/* Powerup mascot — overlays when hint path is active */}
@@ -268,8 +268,10 @@ export function BlastGameLayout({
         </div>
       )}
 
-      {/* Screen flash on word clear */}
-      <ScreenFlashOverlay trigger={wordsFound.length} />
+      {/* Screen flash removed — Blast mode has enough visual feedback via
+          BlastComboFlash, explosions, and cascade overlays. The ScreenFlashOverlay
+          was double-firing with ComboFlash on combo words and also flashing on
+          every cascade auto-clear, adding noise without information. */}
 
       {/* Header */}
       <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pb-1" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)' }}>
@@ -383,9 +385,10 @@ export function BlastGameLayout({
       <div className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-1 max-w-md mx-auto w-full">
         {/* Score */}
         <motion.div
-          key={score}
-          initial={{ scale: 1.2, rotate: -1 }}
+          key={Math.floor(score / 50)}
+          initial={{ scale: 1.1, rotate: -1 }}
           animate={{ scale: 1, rotate: -1.5 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           className="border-3 border-neo-black rounded-neo shadow-hard px-3 py-1.5 min-w-[80px]"
           style={{
             background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
@@ -548,7 +551,7 @@ export function BlastGameLayout({
       </AnimatePresence>
 
       {/* Game grid with overlays */}
-      <div className={cn('flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0 transition-shadow duration-500', comboGlow)}>
+      <div className={cn('flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0 transition-shadow duration-500', comboGlow, shakeClass)}>
         {/* Cascade chain counter — shown above grid during active cascades */}
         {cascadeChainLevel > 0 && (
           <div className="absolute top-2 start-1/2 -translate-x-1/2 z-50 pointer-events-none">

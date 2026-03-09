@@ -6,7 +6,7 @@
       "he": 5723,
       "sv": 5756,
       "ja": 5743,
-      "es": 5735
+      "es": 5754
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -149,27 +149,7 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": [
-      "multiplayerFlow.roomList.createRoom",
-      "multiplayerFlow.roomList.noRoomsAvailable",
-      "multiplayerFlow.roomList.joinRoomAction",
-      "multiplayerFlow.roomList.availableRooms",
-      "multiplayerFlow.roomList.roomsListLabel",
-      "multiplayerFlow.createModal.languageLabel",
-      "multiplayerFlow.createModal.gameModeLabel",
-      "multiplayerFlow.createModal.wordDifficultyLabel",
-      "multiplayerFlow.joinForm.gameCodeLabel",
-      "multiplayerFlow.joinForm.gameCodePlaceholder",
-      "multiplayerFlow.joinForm.gameCodeHelp",
-      "multiplayerFlow.joinForm.pasteButton",
-      "multiplayerFlow.errors.roomFull",
-      "multiplayerFlow.errors.roomClosed",
-      "multiplayerFlow.errors.invalidCode",
-      "multiplayerFlow.errors.connectionLost",
-      "multiplayerFlow.errors.hostLeft",
-      "multiplayerFlow.errors.invalidUsername",
-      "multiplayerFlow.errors.serverError"
-    ]
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [

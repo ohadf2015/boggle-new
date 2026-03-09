@@ -175,17 +175,19 @@ export const MAX_CASCADE_CHAIN = 5;
 export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
 export const CASCADE_MIN_WORD_LENGTH = 4;
-/** Delay (ms) before scanning for cascade words after grid settles */
-export const CASCADE_DETECTION_DELAY = 700;
+/** Delay (ms) before scanning for cascade words after grid settles.
+ * Reduced from 700ms → 400ms to eliminate the "frozen board" dead gap. */
+export const CASCADE_DETECTION_DELAY = 400;
 /** Bonus multiplier per chain level: base * chainLevel * this */
 export const CASCADE_CHAIN_BONUS_MULTIPLIER = 0.5;
 
 // ==================== Cascade Highlight Constants ====================
 
-/** Duration (ms) cascade words stay highlighted on grid before clearing */
-export const CASCADE_HIGHLIGHT_DURATION = 800;
+/** Duration (ms) cascade words stay highlighted on grid before clearing.
+ * Reduced from 800ms → 600ms for snappier cascade pacing. */
+export const CASCADE_HIGHLIGHT_DURATION = 600;
 /** Brief pause (ms) after banner before tiles clear */
-export const CASCADE_HIGHLIGHT_LINGER = 200;
+export const CASCADE_HIGHLIGHT_LINGER = 150;
 
 // ==================== Cascade Highlight Types ====================
 

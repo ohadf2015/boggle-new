@@ -20,32 +20,44 @@ export interface CascadeAnimationData {
 // Shared between this hook (timing) and BlastCascadeOverlay (animation params).
 
 export const BLAST_ANIM = {
-  clear: { duration: 280, stagger: 12, easing: 'easeInQuart' },
-  fall: { baseDuration: 160, perRowDuration: 60, easing: 'easeInCubic' },
-  appear: { duration: 200, stagger: 14, easing: 'easeOutBack' },
-  buffer: 30, // safety margin (ms)
+  clear: { duration: 240, stagger: 8, easing: 'cubicBezier(0.55, 0, 1, 0.45)' },
+  fall: { baseDuration: 200, perRowDuration: 45, easing: 'cubicBezier(0.34, 1.56, 0.64, 1)' },
+  appear: { duration: 180, stagger: 10, easing: 'cubicBezier(0.22, 1, 0.36, 1)' },
+  buffer: 20, // safety margin (ms)
 } as const;
 
-/** Calculate actual phase duration from tile counts */
+/**
+ * Momentum multiplier — each cascade chain link gets progressively faster.
+ * Chain 0 (player word) = 1.0x, Chain 1 = 0.85x, Chain 2 = 0.7x, Chain 3+ = 0.6x minimum.
+ * This creates the "pinball rolling downhill" feeling where cascades accelerate.
+ */
+function chainSpeedMultiplier(chainLevel: number): number {
+  return Math.max(0.6, 1 - chainLevel * 0.15);
+}
+
+/** Calculate actual phase duration from tile counts, with chain-aware acceleration */
 function calcPhaseDurations(
   clearedCount: number,
   fallingTiles: FallingTile[],
   newCount: number,
+  chainLevel = 0,
 ): { clear: number; fall: number; appear: number } {
+  const speed = chainSpeedMultiplier(chainLevel);
+
   // Clearing: duration + stagger from center (half the count)
   const clear = clearedCount > 0
-    ? BLAST_ANIM.clear.duration + BLAST_ANIM.clear.stagger * Math.ceil(clearedCount / 2) + BLAST_ANIM.buffer
+    ? (BLAST_ANIM.clear.duration + BLAST_ANIM.clear.stagger * Math.ceil(clearedCount / 2)) * speed + BLAST_ANIM.buffer
     : 0;
 
   // Falling: per-element duration proportional to fall distance (like gravity)
   const maxFallDist = fallingTiles.reduce((max, t) => Math.max(max, t.fallDistance), 0);
   const fall = maxFallDist > 0
-    ? BLAST_ANIM.fall.baseDuration + BLAST_ANIM.fall.perRowDuration * maxFallDist + BLAST_ANIM.buffer
+    ? (BLAST_ANIM.fall.baseDuration + BLAST_ANIM.fall.perRowDuration * maxFallDist) * speed + BLAST_ANIM.buffer
     : 0;
 
   // Appearing: duration + stagger per tile
   const appear = newCount > 0
-    ? BLAST_ANIM.appear.duration + BLAST_ANIM.appear.stagger * Math.max(newCount - 1, 0) + BLAST_ANIM.buffer
+    ? (BLAST_ANIM.appear.duration + BLAST_ANIM.appear.stagger * Math.max(newCount - 1, 0)) * speed + BLAST_ANIM.buffer
     : 0;
 
   return { clear, fall, appear };
@@ -86,6 +98,8 @@ export interface UseBlastCascadeReturn {
     onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => void,
     /** Optional DDA spawn modifier — passed to rollSpecialType during refill */
     spawnModifier?: number,
+    /** Current cascade chain level — higher = faster animations (momentum) */
+    chainLevel?: number,
   ) => void;
 }
 
@@ -127,6 +141,7 @@ export function useBlastCascade({
     tileStates: BlastTileState[][],
     onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => void,
     spawnModifier = 0,
+    chainLevel = 0,
   ) => {
     // Clear any in-flight timers from a previous cascade
     clearTimers();
@@ -148,11 +163,12 @@ export function useBlastCascade({
       return;
     }
 
-    // Calculate durations from actual tile data
+    // Calculate durations from actual tile data (chain-aware: higher chain = faster)
     const timing = calcPhaseDurations(
       result.clearedTiles.length,
       result.fallingTiles,
       result.newTiles.length,
+      chainLevel,
     );
 
     setAnimationData({

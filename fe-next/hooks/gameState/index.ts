@@ -25,9 +25,12 @@
 // Legacy hook (backward compatibility)
 export { useGameState } from './useGameState';
 
-// Zustand store and selectors (RECOMMENDED)
+// Zustand store (RECOMMENDED)
+export { useGameStore } from './store';
+export type { GameStore } from './store';
+
+// Selector hooks and actions (split for maintainability)
 export {
-  useGameStore,
   useGameActive,
   useLetterGrid,
   useRemainingTime,
@@ -62,9 +65,7 @@ export {
   useBlastSeed,
   useBlastComboSync,
   useGameActions,
-} from './store';
-
-export type { GameStore } from './store';
+} from './selectors';
 
 // Re-export types for consumers
 export type {

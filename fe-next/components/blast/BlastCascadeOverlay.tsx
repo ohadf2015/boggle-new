@@ -64,12 +64,11 @@ export function BlastCascadeOverlay({
         if (clearTargets.length > 0) {
           anime({
             targets: clearTargets,
-            scale: [1, 1.2, 0],
-            opacity: [1, 1, 0],
-            rotate: anime.stagger([-8, 8]),
-            filter: ['brightness(1)', 'brightness(1.5)', 'brightness(0.3)'],
+            scale: [1, 1.15, 0],
+            opacity: [1, 0.9, 0],
+            rotate: anime.stagger([-6, 6]),
             duration: BLAST_ANIM.clear.duration,
-            easing: BLAST_ANIM.clear.easing,
+            easing: 'cubicBezier(0.55, 0, 1, 0.45)',
             delay: anime.stagger(BLAST_ANIM.clear.stagger, { from: 'center' }),
           });
         }
@@ -87,13 +86,13 @@ export function BlastCascadeOverlay({
               },
               0,
             ],
-            scaleY: [0.88, 1.12, 0.97, 1.0],
-            scaleX: [1.08, 0.92, 1.02, 1.0],
+            scaleY: [0.92, 1.08, 0.98, 1.0],
+            scaleX: [1.05, 0.94, 1.01, 1.0],
             duration: function (el: Element) {
               const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
               return BLAST_ANIM.fall.baseDuration + dist * BLAST_ANIM.fall.perRowDuration;
             },
-            easing: BLAST_ANIM.fall.easing,
+            easing: 'cubicBezier(0.34, 1.56, 0.64, 1)',
           });
         }
       }
@@ -110,11 +109,10 @@ export function BlastCascadeOverlay({
               },
               0,
             ],
-            scale: [0.5, 1],
+            scale: [0.6, 1],
             opacity: [0, 1],
-            boxShadow: ['0 0 12px rgba(255,255,255,0.6)', '0 0 0px rgba(255,255,255,0)'],
             duration: BLAST_ANIM.appear.duration,
-            easing: BLAST_ANIM.appear.easing,
+            easing: 'cubicBezier(0.22, 1, 0.36, 1)',
             delay: anime.stagger(BLAST_ANIM.appear.stagger, { from: 'first' }),
           });
         }
@@ -141,8 +139,8 @@ export function BlastCascadeOverlay({
               width: cellSize - inset * 2,
               height: cellSize - inset * 2,
               fontSize: cellSize * 0.45,
+              willChange: 'transform, opacity',
               ...(colorConfig ? { background: colorConfig.background, border: colorConfig.border } : { border: '2px solid rgba(0,0,0,0.3)' }),
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             }}
           >
             {tile.letter}
@@ -163,7 +161,7 @@ export function BlastCascadeOverlay({
             height: cellSize - inset * 2,
             fontSize: cellSize * 0.45,
             border: '2px solid rgba(0,0,0,0.3)',
-            boxShadow: `0 ${Math.min(tile.fallDistance * 3, 12)}px ${Math.min(tile.fallDistance * 4, 16)}px rgba(0,0,0,0.2)`,
+            willChange: 'transform',
           }}
         >
           {tile.letter}
@@ -183,7 +181,7 @@ export function BlastCascadeOverlay({
             height: cellSize - inset * 2,
             fontSize: cellSize * 0.45,
             border: '2px solid rgba(0,0,0,0.3)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            willChange: 'transform, opacity',
           }}
         >
           {tile.letter}

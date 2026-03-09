@@ -2,7 +2,7 @@
 
 import { ExplosionEffect } from '@/components/adventure/juice/ExplosionEffect';
 import { ScorePopup } from '@/components/adventure/juice/ScorePopup';
-import type { BlastExplosion, BlastScorePopup, BlastTileType } from './types';
+import type { BlastExplosion, BlastScorePopup } from './types';
 
 /** Varied colors per explosion type — avoids monotone orange */
 const EXPLOSION_COLORS: Record<BlastExplosion['type'], string> = {
@@ -19,25 +19,18 @@ const EXPLOSION_COLORS: Record<BlastExplosion['type'], string> = {
   total_destruction: '#FFE135', // bright yellow — total destruction
 };
 
-/** Drop-shadow color per tile type for score popups */
-const POPUP_GLOW_COLORS: Partial<Record<BlastTileType, string>> = {
-  gold: 'rgba(255,215,0,0.7)',
-  bomb: 'rgba(255,50,50,0.6)',
-  rainbow: 'rgba(168,85,247,0.6)',
-  lightning: 'rgba(255,255,0,0.6)',
-  prism: 'rgba(255,105,180,0.6)',
-  gem: 'rgba(80,200,120,0.6)',
-  magnet: 'rgba(139,0,255,0.6)',
-  ice: 'rgba(150,220,255,0.5)',
-  frozen: 'rgba(180,220,255,0.5)',
-};
-
-/** Score popup intensity tier — scales visual impact with score value */
+/** Score popup intensity tier — wider range for better feedback hierarchy.
+ * Small words (3-letter, low score) should feel trivial; long words should feel exceptional. */
 function getScoreIntensity(score: number): number {
-  if (score >= 16) return 3;  // large: text-2xl + particle burst
-  if (score >= 6) return 2;   // medium: text-xl + glow ring
-  return 1;                   // small: text-lg plain
+  if (score >= 25) return 3;  // exceptional: large scale + particle burst (8+ letter words)
+  if (score >= 10) return 2;  // strong: medium scale (5-7 letter words)
+  return 1;                   // subtle: small, no extra effects (3-4 letter words)
 }
+
+/** Cap simultaneous explosions to prevent visual overload during bomb chains.
+ * Excess explosions are dropped — the player won't notice missing particles
+ * in a sea of 15 simultaneous detonations, but they WILL notice the jank. */
+const MAX_VISIBLE_EXPLOSIONS = 6;
 
 interface BlastExplosionLayerProps {
   explosions: BlastExplosion[];
@@ -65,8 +58,8 @@ export function BlastExplosionLayer({
 }: BlastExplosionLayerProps) {
   return (
     <div className="absolute inset-0 pointer-events-none z-30">
-      {/* Particle explosions */}
-      {explosions.map(exp => {
+      {/* Particle explosions — capped to prevent GPU overload during bomb chains */}
+      {explosions.slice(0, MAX_VISIBLE_EXPLOSIONS).map(exp => {
         const x = containerOffset.x + exp.col * cellSize + cellSize / 2;
         const y = containerOffset.y + exp.row * cellSize + cellSize / 2;
 
@@ -86,17 +79,12 @@ export function BlastExplosionLayer({
         const x = containerOffset.x + popup.col * cellSize + cellSize / 2;
         const y = containerOffset.y + popup.row * cellSize + cellSize / 2;
         const intensity = getScoreIntensity(popup.score);
-        const glowColor = popup.tileType ? POPUP_GLOW_COLORS[popup.tileType as keyof typeof POPUP_GLOW_COLORS] : undefined;
-        const defaultGlow = `rgba(255,215,0,${intensity === 3 ? '0.6' : '0.35'})`;
 
         return (
           <div
             key={popup.id}
             style={{
-              transform: intensity === 3 ? 'scale(1.35)' : intensity === 2 ? 'scale(1.15)' : 'scale(1)',
-              filter: intensity >= 2 || glowColor
-                ? `drop-shadow(0 0 ${intensity === 3 ? '12' : '8'}px ${glowColor || defaultGlow})`
-                : 'none',
+              transform: intensity === 3 ? 'scale(1.5)' : intensity === 2 ? 'scale(1.2)' : 'scale(0.9)',
             }}
           >
             <ScorePopup

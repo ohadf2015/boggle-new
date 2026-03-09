@@ -1,47 +1,21 @@
 /**
  * Zustand Game State Store
  *
- * This store replaces the Context + useReducer pattern with Zustand for better performance.
- *
- * KEY BENEFIT: Components subscribe to specific slices of state, so they only re-render
- * when the data they actually use changes. This eliminates the "God Context" problem
- * where any state change caused all consumers to re-render.
- *
- * MIGRATION: The store maintains the same API as the previous useGameState hook,
- * so existing components can migrate incrementally.
- *
- * USAGE:
- * ```tsx
- * // Option 1: Use specific selector (RECOMMENDED - best performance)
- * const gameActive = useGameStore(state => state.gameActive);
- *
- * // Option 2: Use pre-made selector hooks (cleaner API)
- * const gameActive = useGameActive();
- *
- * // Option 3: Use multiple values with shallow comparison
- * const { gameActive, remainingTime } = useGameStore(
- *   state => ({ gameActive: state.gameActive, remainingTime: state.remainingTime }),
- *   shallow
- * );
- * ```
+ * Replaces Context + useReducer with Zustand for selective re-renders.
+ * Selectors and actions are in selectors.ts, types in storeTypes.ts.
  */
 
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
-import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
-import type { Player, TournamentData, TournamentStanding, ComboState } from './types';
+import type { ComboState } from './types';
+import type { GameState, GameActions } from './storeTypes';
 import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
 
 // ==========================================
-// Constants
+// Constants & Types
 // ==========================================
 
-const COMBO_TIMEOUT_MS = 8000; // 8 seconds to maintain combo
-
-// ==========================================
-// Default Values
-// ==========================================
+const COMBO_TIMEOUT_MS = 8000;
 
 const DEFAULT_COMBO_STATE: ComboState = {
   level: 0,
@@ -49,179 +23,7 @@ const DEFAULT_COMBO_STATE: ComboState = {
   shieldsUsed: 0,
 };
 
-// ==========================================
-// Store State Interface
-// ==========================================
-
-interface GameState {
-  // Core game state
-  gameActive: boolean;
-  letterGrid: LetterGrid | null;
-  remainingTime: number | null;
-  gameLanguage: Language | null;
-  minWordLength: number;
-  totalBoardWords: number | null;
-
-  // Player state
-  players: Player[];
-  leaderboard: LeaderboardEntry[];
-
-  // Word state
-  foundWords: WordDetail[];
-  achievements: AchievementPayload[];
-
-  // UI state
-  waitingForResults: boolean;
-  showStartAnimation: boolean;
-  shufflingGrid: LetterGrid | null;
-  highlightedCells: Array<{ row: number; col: number }>;
-
-  // Combo state
-  combo: ComboState;
-
-  // Tournament state
-  tournamentData: TournamentData | null;
-  tournamentStandings: TournamentStanding[];
-  showTournamentStandings: boolean;
-
-  // XP/Level state
-  xpGainedData: XpGainedPayload | null;
-  levelUpData: LevelUpPayload | null;
-
-  // Board theme
-  boardTheme: BoardTheme | null;
-
-  // Game mode (multiplayer mode rotation; 'random' = server picks)
-  gameMode: GameModeSelection;
-
-  // Blast multiplayer state
-  blastTileOverlay: BlastTileOverlay[];
-  blastMovesUsed: number;
-  blastTotalTileBonus: number;
-  blastTotalTilesCleared: number;
-  /** Seeded PRNG seed from server for deterministic multiplayer refills */
-  blastSeed: number | null;
-  /** Pending combo sync from another player — triggers BlastComboFlash for spectators */
-  blastComboSync: { comboType: string; username: string; id: string } | null;
-  /** Opponent activity events for multiplayer blast feed (max 5, auto-rotate) */
-  blastOpponentActivity: Array<{ id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }>;
-
-  // Word Hunt multiplayer state
-  wordHuntTargetLength: number;
-  wordHuntMyLife: number;
-  wordHuntPlayerLives: Record<string, number>;
-  wordHuntTargetAttempts: Array<{ guess: string; feedback: LetterFeedback[]; isDiscovery?: boolean }>;
-  wordHuntTargetFound: boolean;
-  wordHuntEliminatedPlayers: string[];
-  wordHuntDiscoveryClues: Array<{ position: number; letter: string }>;
-  wordHuntKnownLetters: string[];
-
-  // _comboTimeoutId removed from state — stored as module-level variable to avoid re-renders
-}
-
-// ==========================================
-// Store Actions Interface
-// ==========================================
-
-interface GameActions {
-  // Core game actions
-  setGameActive: (value: boolean | ((prev: boolean) => boolean)) => void;
-  setLetterGrid: (value: LetterGrid | null | ((prev: LetterGrid | null) => LetterGrid | null)) => void;
-  setRemainingTime: (value: number | null | ((prev: number | null) => number | null)) => void;
-  setGameLanguage: (value: Language | null | ((prev: Language | null) => Language | null)) => void;
-  setMinWordLength: (value: number | ((prev: number) => number)) => void;
-  setTotalBoardWords: (value: number | null | ((prev: number | null) => number | null)) => void;
-
-  // Player actions
-  setPlayers: (value: Player[] | ((prev: Player[]) => Player[])) => void;
-  updatePlayer: (username: string, updates: Partial<Player>) => void;
-  addPlayer: (player: Player) => void;
-  removePlayer: (username: string) => void;
-  setLeaderboard: (value: LeaderboardEntry[] | ((prev: LeaderboardEntry[]) => LeaderboardEntry[])) => void;
-
-  // Word actions
-  addFoundWord: (word: WordDetail) => void;
-  setFoundWords: (value: WordDetail[] | ((prev: WordDetail[]) => WordDetail[])) => void;
-  addAchievement: (achievement: AchievementPayload) => void;
-  setAchievements: (value: AchievementPayload[] | ((prev: AchievementPayload[]) => AchievementPayload[])) => void;
-
-  // UI actions
-  setWaitingForResults: (value: boolean | ((prev: boolean) => boolean)) => void;
-  setShowStartAnimation: (value: boolean | ((prev: boolean) => boolean)) => void;
-  setShufflingGrid: (value: LetterGrid | null | ((prev: LetterGrid | null) => LetterGrid | null)) => void;
-  setHighlightedCells: (value: Array<{ row: number; col: number }> | ((prev: Array<{ row: number; col: number }>) => Array<{ row: number; col: number }>)) => void;
-
-  // Combo actions
-  incrementCombo: () => void;
-  resetCombo: () => void;
-  useComboShield: () => boolean;
-  updateLastWordTime: () => void;
-
-  // Tournament actions
-  setTournamentData: (value: TournamentData | null | ((prev: TournamentData | null) => TournamentData | null)) => void;
-  setTournamentStandings: (value: TournamentStanding[] | ((prev: TournamentStanding[]) => TournamentStanding[])) => void;
-  setShowTournamentStandings: (value: boolean | ((prev: boolean) => boolean)) => void;
-
-  // XP/Level actions
-  setXpGainedData: (value: XpGainedPayload | null | ((prev: XpGainedPayload | null) => XpGainedPayload | null)) => void;
-  setLevelUpData: (value: LevelUpPayload | null | ((prev: LevelUpPayload | null) => LevelUpPayload | null)) => void;
-
-  // Board theme actions
-  setBoardTheme: (value: BoardTheme | null | ((prev: BoardTheme | null) => BoardTheme | null)) => void;
-
-  // Game mode actions
-  setGameMode: (value: GameModeSelection | ((prev: GameModeSelection) => GameModeSelection)) => void;
-
-  // Blast multiplayer actions
-  setBlastTileOverlay: (value: BlastTileOverlay[] | ((prev: BlastTileOverlay[]) => BlastTileOverlay[])) => void;
-  setBlastMovesUsed: (value: number | ((prev: number) => number)) => void;
-  setBlastTotalTileBonus: (value: number | ((prev: number) => number)) => void;
-  setBlastTotalTilesCleared: (value: number | ((prev: number) => number)) => void;
-  setBlastSeed: (value: number | null | ((prev: number | null) => number | null)) => void;
-  setBlastComboSync: (value: { comboType: string; username: string; id: string } | null) => void;
-  pushBlastOpponentActivity: (event: { id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }) => void;
-
-  // Word Hunt multiplayer actions
-  setWordHuntTargetLength: (value: number | ((prev: number) => number)) => void;
-  setWordHuntMyLife: (value: number | ((prev: number) => number)) => void;
-  setWordHuntPlayerLives: (value: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
-  setWordHuntTargetAttempts: (value: Array<{ guess: string; feedback: LetterFeedback[] }> | ((prev: Array<{ guess: string; feedback: LetterFeedback[] }>) => Array<{ guess: string; feedback: LetterFeedback[] }>)) => void;
-  setWordHuntTargetFound: (value: boolean | ((prev: boolean) => boolean)) => void;
-  setWordHuntEliminatedPlayers: (value: string[] | ((prev: string[]) => string[])) => void;
-  addWordHuntDiscoveryClues: (greens: Array<{ position: number; letter: string }>, known: string[]) => void;
-
-  // Batch actions (performance: single set() call instead of many)
-  batchStartGame: (data: {
-    letterGrid?: LetterGrid | null;
-    remainingTime?: number | null;
-    gameLanguage?: Language | null;
-    minWordLength?: number;
-    boardTheme?: BoardTheme | null;
-    gameMode?: GameModeSelection;
-    blastTileOverlay?: BlastTileOverlay[];
-    blastMovesUsed?: number;
-    blastSeed?: number | null;
-    wordHuntTargetLength?: number;
-    wordHuntMyLife?: number;
-    showStartAnimation?: boolean;
-    gameActive?: boolean;
-  }) => void;
-  batchResetGame: () => void;
-
-  // Reset actions
-  resetForNewRound: () => void;
-  resetAll: () => void;
-}
-
-// ==========================================
-// Combined Store Type
-// ==========================================
-
 export type GameStore = GameState & GameActions;
-
-// ==========================================
-// Initial State
-// ==========================================
 
 // Module-level variable for combo timeout — NOT in Zustand state to avoid re-renders
 let _comboTimeoutId: NodeJS.Timeout | null = null;
@@ -685,151 +487,46 @@ export const useGameStore = create<GameStore>()(
   }))
 );
 
-// ==========================================
-// Selector Hooks (for cleaner API and maximum performance)
-// ==========================================
-
-// These hooks subscribe to only the specific slice they need,
-// so components only re-render when that slice changes.
-
-// Core game selectors
-export const useGameActive = () => useGameStore((state) => state.gameActive);
-export const useLetterGrid = () => useGameStore((state) => state.letterGrid);
-export const useRemainingTime = () => useGameStore((state) => state.remainingTime);
-export const useGameLanguage = () => useGameStore((state) => state.gameLanguage);
-export const useMinWordLength = () => useGameStore((state) => state.minWordLength);
-export const useTotalBoardWords = () => useGameStore((state) => state.totalBoardWords);
-
-// Player selectors
-export const usePlayers = () => useGameStore((state) => state.players);
-export const useLeaderboard = () => useGameStore((state) => state.leaderboard);
-
-// Word selectors
-export const useFoundWords = () => useGameStore((state) => state.foundWords);
-export const useAchievements = () => useGameStore((state) => state.achievements);
-
-// UI selectors
-export const useWaitingForResults = () => useGameStore((state) => state.waitingForResults);
-export const useShowStartAnimation = () => useGameStore((state) => state.showStartAnimation);
-export const useShufflingGrid = () => useGameStore((state) => state.shufflingGrid);
-export const useHighlightedCells = () => useGameStore((state) => state.highlightedCells);
-
-// Combo selectors
-export const useCombo = () => useGameStore((state) => state.combo);
-export const useComboLevel = () => useGameStore((state) => state.combo.level);
-
-// Tournament selectors
-export const useTournamentData = () => useGameStore((state) => state.tournamentData);
-export const useTournamentStandings = () => useGameStore((state) => state.tournamentStandings);
-export const useShowTournamentStandings = () => useGameStore((state) => state.showTournamentStandings);
-
-// XP/Level selectors
-export const useXpGainedData = () => useGameStore((state) => state.xpGainedData);
-export const useLevelUpData = () => useGameStore((state) => state.levelUpData);
-
-// Board theme selector
-export const useBoardTheme = () => useGameStore((state) => state.boardTheme);
-
-// Game mode selector
-export const useGameMode = () => useGameStore((state) => state.gameMode);
-
-// Blast multiplayer selectors
-export const useBlastTileOverlay = () => useGameStore((state) => state.blastTileOverlay);
-export const useBlastMovesUsed = () => useGameStore((state) => state.blastMovesUsed);
-export const useBlastTotalTileBonus = () => useGameStore((state) => state.blastTotalTileBonus);
-export const useBlastTotalTilesCleared = () => useGameStore((state) => state.blastTotalTilesCleared);
-export const useBlastSeed = () => useGameStore((state) => state.blastSeed);
-export const useBlastComboSync = () => useGameStore((state) => state.blastComboSync);
-export const useBlastOpponentActivity = () => useGameStore((state) => state.blastOpponentActivity);
-
-// Word Hunt multiplayer selectors
-export const useWordHuntTargetLength = () => useGameStore((state) => state.wordHuntTargetLength);
-export const useWordHuntMyLife = () => useGameStore((state) => state.wordHuntMyLife);
-export const useWordHuntPlayerLives = () => useGameStore((state) => state.wordHuntPlayerLives);
-export const useWordHuntTargetAttempts = () => useGameStore((state) => state.wordHuntTargetAttempts);
-export const useWordHuntTargetFound = () => useGameStore((state) => state.wordHuntTargetFound);
-export const useWordHuntEliminatedPlayers = () => useGameStore((state) => state.wordHuntEliminatedPlayers);
-export const useWordHuntDiscoveryClues = () => useGameStore((state) => state.wordHuntDiscoveryClues);
-export const useWordHuntKnownLetters = () => useGameStore((state) => state.wordHuntKnownLetters);
-
-// ==========================================
-// Actions Object (static, no re-renders)
-// ==========================================
-
-// CRITICAL FIX for React Error #185 (Maximum update depth exceeded):
-// Instead of using a selector that creates a new object on every call,
-// we extract actions once as a static object. Zustand actions are stable
-// (they don't change), so we can safely cache them.
-//
-// Old approach (causes infinite loop):
-// export const useGameActions = () => useGameStore((state) => ({ ...actions }), shallow);
-// ^ This creates new object every call, causing useEffect deps to re-trigger
-//
-// New approach (stable reference):
-// Get actions from store once, return the same object reference always
-const getActions = (state: GameStore) => ({
-  setGameActive: state.setGameActive,
-  setLetterGrid: state.setLetterGrid,
-  setRemainingTime: state.setRemainingTime,
-  setGameLanguage: state.setGameLanguage,
-  setMinWordLength: state.setMinWordLength,
-  setTotalBoardWords: state.setTotalBoardWords,
-  setPlayers: state.setPlayers,
-  updatePlayer: state.updatePlayer,
-  addPlayer: state.addPlayer,
-  removePlayer: state.removePlayer,
-  setLeaderboard: state.setLeaderboard,
-  addFoundWord: state.addFoundWord,
-  setFoundWords: state.setFoundWords,
-  addAchievement: state.addAchievement,
-  setAchievements: state.setAchievements,
-  setWaitingForResults: state.setWaitingForResults,
-  setShowStartAnimation: state.setShowStartAnimation,
-  setShufflingGrid: state.setShufflingGrid,
-  setHighlightedCells: state.setHighlightedCells,
-  incrementCombo: state.incrementCombo,
-  resetCombo: state.resetCombo,
-  useComboShield: state.useComboShield,
-  updateLastWordTime: state.updateLastWordTime,
-  setTournamentData: state.setTournamentData,
-  setTournamentStandings: state.setTournamentStandings,
-  setShowTournamentStandings: state.setShowTournamentStandings,
-  setXpGainedData: state.setXpGainedData,
-  setLevelUpData: state.setLevelUpData,
-  setBoardTheme: state.setBoardTheme,
-  setGameMode: state.setGameMode,
-  setBlastTileOverlay: state.setBlastTileOverlay,
-  setBlastMovesUsed: state.setBlastMovesUsed,
-  setBlastTotalTileBonus: state.setBlastTotalTileBonus,
-  setBlastTotalTilesCleared: state.setBlastTotalTilesCleared,
-  setBlastSeed: state.setBlastSeed,
-  setBlastComboSync: state.setBlastComboSync,
-  pushBlastOpponentActivity: state.pushBlastOpponentActivity,
-  setWordHuntTargetLength: state.setWordHuntTargetLength,
-  setWordHuntMyLife: state.setWordHuntMyLife,
-  setWordHuntPlayerLives: state.setWordHuntPlayerLives,
-  setWordHuntTargetAttempts: state.setWordHuntTargetAttempts,
-  setWordHuntTargetFound: state.setWordHuntTargetFound,
-  setWordHuntEliminatedPlayers: state.setWordHuntEliminatedPlayers,
-  addWordHuntDiscoveryClues: state.addWordHuntDiscoveryClues,
-  batchStartGame: state.batchStartGame,
-  batchResetGame: state.batchResetGame,
-  resetForNewRound: state.resetForNewRound,
-  resetAll: state.resetAll,
-});
-
-// Cache the actions object - it never changes since Zustand actions are stable
-let cachedActions: ReturnType<typeof getActions> | null = null;
-
-/**
- * Get game actions (stable reference, never causes re-renders)
- *
- * This hook returns a stable object containing all store actions.
- * Unlike state selectors, actions don't change, so we cache the result.
- */
-export const useGameActions = () => {
-  if (!cachedActions) {
-    cachedActions = getActions(useGameStore.getState());
-  }
-  return cachedActions;
-};
+// Re-export selectors and actions for backward compatibility
+// (many files import directly from './store' instead of the index)
+export {
+  useGameActive,
+  useLetterGrid,
+  useRemainingTime,
+  useGameLanguage,
+  useMinWordLength,
+  useTotalBoardWords,
+  usePlayers,
+  useLeaderboard,
+  useFoundWords,
+  useAchievements,
+  useWaitingForResults,
+  useShowStartAnimation,
+  useShufflingGrid,
+  useHighlightedCells,
+  useCombo,
+  useComboLevel,
+  useTournamentData,
+  useTournamentStandings,
+  useShowTournamentStandings,
+  useXpGainedData,
+  useLevelUpData,
+  useBoardTheme,
+  useGameMode,
+  useBlastTileOverlay,
+  useBlastMovesUsed,
+  useBlastTotalTileBonus,
+  useBlastTotalTilesCleared,
+  useBlastSeed,
+  useBlastComboSync,
+  useBlastOpponentActivity,
+  useWordHuntTargetLength,
+  useWordHuntMyLife,
+  useWordHuntPlayerLives,
+  useWordHuntTargetAttempts,
+  useWordHuntTargetFound,
+  useWordHuntEliminatedPlayers,
+  useWordHuntDiscoveryClues,
+  useWordHuntKnownLetters,
+  useGameActions,
+} from './selectors';

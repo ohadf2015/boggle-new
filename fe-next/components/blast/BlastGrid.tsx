@@ -120,6 +120,8 @@ export function BlastGrid({
     <div
       ref={containerRef}
       className="blast-game blast-grid-frame relative w-full aspect-square max-w-[360px]"
+      style={{ contain: 'layout paint' }}
+      data-cascade={cascadePhase !== 'idle' ? 'active' : 'idle'}
       aria-label={ariaLabel}
     >
       {/* Base grid - proven word input */}
