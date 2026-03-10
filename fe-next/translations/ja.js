@@ -3069,7 +3069,12 @@ const ja = {
     "about": "概要",
     "blog": "ブログ",
     "faq": "よくある質問",
-    "cookiePolicy": "Cookieポリシー"
+    "cookiePolicy": "Cookieポリシー",
+    "wordOfTheDay": "今日の言葉",
+    "wordSolver": "ワードソルバー",
+    "howToPlay": "遊び方",
+    "guides": "ガイド",
+    "glossary": "用語集"
   },
   "support": {
     "kofiFooter": "コーヒーをおごる",
@@ -7225,6 +7230,13 @@ const ja = {
     badge: "マルチプレイヤーに新登場",
     title: "ワードハントモードを試そう！",
     subtitle: "対戦相手より先に隠されたターゲットワードを見つけよう。ライフ、脱落、そして大混乱！",
+  },
+  wordHuntPromo: {
+    title: "友達にワードハントで挑戦しよう！",
+    subtitle: "対戦相手より先に隠されたターゲットワードを見つけよう。ライフ、脱落、そして大混乱！",
+    cta: "今すぐプレイ",
+    dismiss: "あとで",
+    imageAlt: "2人のプレイヤーによる壮大なワードバトル",
   },
   gameModes: {
     classic: {

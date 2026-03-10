@@ -71,7 +71,7 @@ export function createLazyHowl(
  * sound.play();
  */
 export function preloadAudioOnDemand(howl: Howl): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     // Already loaded - no-op
     if (howl.state() === 'loaded') {
       resolve();
@@ -81,7 +81,7 @@ export function preloadAudioOnDemand(howl: Howl): Promise<void> {
     // Currently loading - wait for it
     if (howl.state() === 'loading') {
       howl.once('load', () => resolve());
-      howl.once('loaderror', (_id, err) => reject(new Error(String(err))));
+      howl.once('loaderror', () => resolve()); // Gracefully degrade
       return;
     }
 
@@ -92,8 +92,8 @@ export function preloadAudioOnDemand(howl: Howl): Promise<void> {
     });
 
     howl.once('loaderror', (_id, err) => {
-      logger.warn('[AudioLoader] Failed to preload audio:', err);
-      reject(new Error(String(err)));
+      logger.debug('[AudioLoader] Failed to preload audio:', err);
+      resolve(); // Gracefully degrade — audio is non-critical
     });
 
     howl.load();

@@ -67,7 +67,7 @@ export function FriendDetailDialog({
               </div>
             </DialogHeader>
 
-            <div className="space-y-4 mt-4">
+            <div className="space-y-4 p-4 overflow-y-auto">
               {/* Online status */}
               <div className="flex items-center gap-2">
                 <Circle

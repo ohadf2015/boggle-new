@@ -3120,7 +3120,12 @@ const es = {
     "about": "Acerca de",
     "blog": "Blog",
     "faq": "Preguntas frecuentes",
-    "cookiePolicy": "Política de Cookies"
+    "cookiePolicy": "Política de Cookies",
+    "wordOfTheDay": "Palabra del Día",
+    "wordSolver": "Buscador de Palabras",
+    "howToPlay": "Cómo jugar",
+    "guides": "Guías",
+    "glossary": "Glosario"
   },
   "support": {
     "kofiFooter": "Invítanos un Café",

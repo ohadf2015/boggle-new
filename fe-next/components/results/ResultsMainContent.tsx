@@ -21,7 +21,7 @@ import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
-const WordHuntAnnouncementBanner = dynamic(() => import('@/components/results/WordHuntAnnouncementBanner'), { ssr: false });
+const WordHuntPromoPopup = dynamic(() => import('@/components/results/WordHuntPromoPopup'), { ssr: false });
 import { AdPlaceholder } from '@/components/ads';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 import ShareButton from '@/components/results/ShareButton';
@@ -359,9 +359,9 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Word Hunt Announcement - show when not already playing word-hunt */}
+      {/* Word Hunt Promo Popup - show when not already playing word-hunt */}
       {gameCode && gameMode && gameMode !== 'word-hunt' && (
-        <WordHuntAnnouncementBanner />
+        <WordHuntPromoPopup />
       )}
 
       {/* Compact Stats Row */}

@@ -56,6 +56,19 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
+              href={`/${language}/how-to-play`}
+              className="
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.howToPlay', 'How to Play')}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
               href={`/${language}/blog`}
               className="
                 min-h-[48px] px-3 flex items-center
@@ -66,6 +79,45 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               "
             >
               {t('footer.blog')}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
+              href={`/${language}/word-of-the-day`}
+              className="
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.wordOfTheDay')}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
+              href={`/${language}/guides`}
+              className="
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.guides', 'Guides')}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
+              href={`/${language}/glossary`}
+              className="
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.glossary', 'Glossary')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
@@ -118,6 +170,19 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               "
             >
               {t('legal.termsOfService')}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
+              href={`/${language}/tools/word-solver`}
+              className="
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.wordSolver')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link

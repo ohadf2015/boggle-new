@@ -270,6 +270,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             // Social media and platform presence for SEO authority
             sameAs: [
                 'https://www.lexiclash.live',
+                'https://www.instagram.com/lexi.clash',
             ],
             contactPoint: {
                 '@type': 'ContactPoint',
@@ -570,6 +571,25 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 },
             ],
         },
+        // SiteNavigationElement schema for main navigation
+        {
+            '@context': 'https://schema.org',
+            '@type': 'SiteNavigationElement',
+            '@id': 'https://www.lexiclash.live/#site-navigation',
+            name: 'Main Navigation',
+            hasPart: [
+                { '@type': 'SiteNavigationElement', name: 'Home', url: `https://www.lexiclash.live${localePath}` },
+                { '@type': 'SiteNavigationElement', name: 'Play Classic', url: `https://www.lexiclash.live${localePath}/singleplayer` },
+                { '@type': 'SiteNavigationElement', name: 'Daily Challenge', url: `https://www.lexiclash.live${localePath}/daily` },
+                { '@type': 'SiteNavigationElement', name: 'Multiplayer', url: `https://www.lexiclash.live${localePath}/multiplayer` },
+                { '@type': 'SiteNavigationElement', name: 'How to Play', url: `https://www.lexiclash.live${localePath}/how-to-play` },
+                { '@type': 'SiteNavigationElement', name: 'Blog', url: `https://www.lexiclash.live${localePath}/blog` },
+                { '@type': 'SiteNavigationElement', name: 'FAQ', url: `https://www.lexiclash.live${localePath}/faq` },
+                { '@type': 'SiteNavigationElement', name: 'Leaderboard', url: `https://www.lexiclash.live${localePath}/leaderboard` },
+                { '@type': 'SiteNavigationElement', name: 'About', url: `https://www.lexiclash.live${localePath}/about` },
+                { '@type': 'SiteNavigationElement', name: 'Contact', url: `https://www.lexiclash.live${localePath}/contact` },
+            ],
+        },
         // BreadcrumbList schema for better SERP navigation
         {
             '@context': 'https://schema.org',
@@ -727,6 +747,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     privacy/terms/about links even without JS execution (AdSense requirement) */}
                 <nav aria-label="Site Navigation" className="sr-only">
                     <ul>
+                        <li><a href={`/${validLocale}/how-to-play`}>How to Play</a></li>
                         <li><a href={`/${validLocale}/blog`}>Blog</a></li>
                         <li><a href={`/${validLocale}/faq`}>FAQ</a></li>
                         <li><a href={`/${validLocale}/about`}>About LexiClash</a></li>

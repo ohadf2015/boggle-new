@@ -3188,7 +3188,12 @@ const en = {
     "about": "About",
     "blog": "Blog",
     "faq": "FAQ",
-    "cookiePolicy": "Cookie Policy"
+    "cookiePolicy": "Cookie Policy",
+    "wordOfTheDay": "Word of the Day",
+    "wordSolver": "Word Solver",
+    "howToPlay": "How to Play",
+    "guides": "Guides",
+    "glossary": "Glossary"
   },
   "support": {
     "kofiFooter": "Buy Us a Coffee",
@@ -7301,6 +7306,13 @@ const en = {
     badge: "New in Multiplayer",
     title: "Try Word Hunt Mode!",
     subtitle: "Race to find the hidden target word before your opponents. Lives, elimination, and pure chaos!",
+  },
+  wordHuntPromo: {
+    title: "Challenge Your Friends to Word Hunt!",
+    subtitle: "Find the hidden target word before your opponents. Lives, elimination, and absolute chaos!",
+    cta: "Play Now",
+    dismiss: "Maybe later",
+    imageAlt: "Two players in an epic word battle duel",
   },
   gameModes: {
     classic: {

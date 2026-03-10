@@ -94,7 +94,7 @@ export function AddFriendDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto p-4">
           {/* Copy invite link */}
           {profile?.username && (
             <button

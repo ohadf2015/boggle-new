@@ -143,12 +143,13 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
             className={cn(
               'fixed left-1/2 top-1/2 z-50 w-full max-w-md',
               '-translate-x-1/2 -translate-y-1/2',
-              'p-4',
+              'p-4 max-h-[100dvh]',
               className
             )}
           >
             <div className={cn(
               'rounded-neo border-2 border-neo-black shadow-hard-lg p-6',
+              'max-h-[calc(100dvh-2rem)] overflow-y-auto',
               isDark ? 'bg-slate-800' : 'bg-white'
             )}>
               {/* Header */}

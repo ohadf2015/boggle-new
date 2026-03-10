@@ -343,7 +343,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
 
           // If input language detected and doesn't match board language
           if (inputLanguage && inputLanguage !== gameLanguage) {
-            const langKeyMap: Record<string, string> = { he: 'hebrew', en: 'english', sv: 'swedish', ja: 'japanese', es: 'spanish' };
+            const langKeyMap: Record<string, string> = { he: 'joinView.hebrew', en: 'joinView.english', sv: 'joinView.swedish', ja: 'joinView.japanese', es: 'joinView.spanish' };
             const langName = t(langKeyMap[gameLanguage] || gameLanguage) || gameLanguage;
             toast.error(
               t('keyboardLanguageMismatch', { language: langName }),

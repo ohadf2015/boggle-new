@@ -1,0 +1,111 @@
+import type { Metadata } from 'next';
+import ClassicStrategyPageClient from './PageClient';
+import { contentByLocale } from './content';
+
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+const SITE_URL = 'https://www.lexiclash.live';
+const SLUG = 'classic-strategy';
+const DATE_PUBLISHED = '2026-03-10';
+
+const metaTitles: Record<string, string> = {
+  en: 'Classic Mode Strategy Guide - Find More Words, Score Higher | LexiClash',
+  he: 'מדריך אסטרטגיה למצב קלאסי - מצאו יותר מילים | לקסיקלאש',
+  sv: 'Strategiguide for Klassiskt Lage - Hitta Fler Ord | LexiClash',
+  ja: 'クラシックモード攻略ガイド - もっと単語を見つけよう | LexiClash',
+  es: 'Guia de Estrategia Modo Clasico - Encuentra Mas Palabras | LexiClash',
+};
+
+const metaDescriptions: Record<string, string> = {
+  en: 'Master LexiClash Classic mode with proven scanning patterns, time management tips, and scoring strategies. Learn the corner-edge-center technique used by top 10% players.',
+  he: 'שלטו במצב קלאסי של לקסיקלאש עם טכניקות סריקה מוכחות, ניהול זמן ואסטרטגיות ניקוד. למדו את טכניקת פינה-שוליים-מרכז.',
+  sv: 'Bemestra LexiClash Klassiskt lage med bevisade skanningsmonster, tidshanteringstips och poangstrategier.',
+  ja: 'LexiClashクラシックモードを実証済みのスキャンパターン、時間管理のヒント、スコアリング戦略でマスターしましょう。',
+  es: 'Domina el modo Clasico de LexiClash con patrones de escaneo probados, consejos de gestion del tiempo y estrategias de puntuacion.',
+};
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const title = metaTitles[locale] || metaTitles.en;
+  const description = metaDescriptions[locale] || metaDescriptions.en;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: 'article',
+      title,
+      description,
+      url: `${SITE_URL}/${locale}/guides/${SLUG}`,
+      siteName: 'LexiClash',
+      publishedTime: DATE_PUBLISHED,
+    },
+    twitter: { card: 'summary_large_image', title, description },
+    alternates: {
+      canonical: `${SITE_URL}/${locale}/guides/${SLUG}`,
+      languages: {
+        'x-default': `${SITE_URL}/en/guides/${SLUG}`,
+        he: `${SITE_URL}/he/guides/${SLUG}`,
+        en: `${SITE_URL}/en/guides/${SLUG}`,
+        sv: `${SITE_URL}/sv/guides/${SLUG}`,
+        ja: `${SITE_URL}/ja/guides/${SLUG}`,
+        es: `${SITE_URL}/es/guides/${SLUG}`,
+      },
+    },
+    robots: { index: true, follow: true },
+  };
+}
+
+export default async function ClassicStrategyPage({ params }: PageProps) {
+  const { locale } = await params;
+  const content = contentByLocale[locale] || contentByLocale.en;
+
+  // Safe: all content is from static constants defined in content.ts, not user input
+  const howToSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: content.title,
+    description: content.subtitle,
+    url: `${SITE_URL}/${locale}/guides/${SLUG}`,
+    datePublished: DATE_PUBLISHED,
+    inLanguage: locale,
+    step: content.sections.map((s, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: s.title || `Step ${i + 1}`,
+      text: s.content.substring(0, 200),
+    })),
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: `${SITE_URL}/${locale}/guides` },
+      { '@type': 'ListItem', position: 3, name: content.title, item: `${SITE_URL}/${locale}/guides/${SLUG}` },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: content.faq.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  };
+
+  return (
+    <>
+      {/* Safe: all content is from static blog data constants, not user input */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <ClassicStrategyPageClient />
+    </>
+  );
+}

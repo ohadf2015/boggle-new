@@ -3069,7 +3069,12 @@ const sv = {
     "about": "Om oss",
     "blog": "Blogg",
     "faq": "Vanliga frågor",
-    "cookiePolicy": "Cookiepolicy"
+    "cookiePolicy": "Cookiepolicy",
+    "wordOfTheDay": "Dagens Ord",
+    "wordSolver": "Ordlösare",
+    "howToPlay": "Hur man spelar",
+    "guides": "Guider",
+    "glossary": "Ordlista"
   },
   "support": {
     "kofiFooter": "Köp oss en kaffe",
@@ -7252,6 +7257,13 @@ const sv = {
     badge: "Nytt i Multiplayer",
     title: "Testa Word Hunt-läget!",
     subtitle: "Hitta det dolda målordet före dina motståndare. Liv, eliminering och rent kaos!",
+  },
+  wordHuntPromo: {
+    title: "Utmana dina vänner i Word Hunt!",
+    subtitle: "Hitta det dolda målordet före dina motståndare. Liv, eliminering och rent kaos!",
+    cta: "Spela nu",
+    dismiss: "Kanske senare",
+    imageAlt: "Två spelare i en episk ordstrid",
   },
   gameModes: {
     classic: {

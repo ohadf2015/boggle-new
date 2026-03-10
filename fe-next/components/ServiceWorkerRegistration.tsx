@@ -29,6 +29,12 @@ export function ServiceWorkerRegistration() {
 
 async function registerServiceWorker() {
   try {
+    // Check if sw.js exists before attempting registration to avoid 404 errors
+    const swResponse = await fetch('/sw.js', { method: 'HEAD' });
+    if (!swResponse.ok) {
+      return; // sw.js not available, skip registration silently
+    }
+
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',
     });

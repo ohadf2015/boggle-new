@@ -291,6 +291,9 @@ export function useSurvivalGameLogic({
 
   // Dictionary validation
   const validateWordInDictionary = useCallback(async (word: string): Promise<boolean> => {
+    // Target word is always valid — it's curated from word lists
+    if (word.toLowerCase() === targetWord.toLowerCase()) return true;
+
     try {
       const response = await fetch('/api/dictionary/check', {
         method: 'POST',
@@ -299,11 +302,11 @@ export function useSurvivalGameLogic({
       });
       const data = await response.json();
       return data.isValid === true;
-    } catch (error) {
-      console.error('Dictionary validation error:', error);
+    } catch {
+      // Network error fetching dictionary — treat word as valid to avoid blocking gameplay
       return true;
     }
-  }, [language]);
+  }, [language, targetWord]);
 
   // Handle word change from grid
   const handleWordChange = useCallback((word: string, count: number) => {

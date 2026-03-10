@@ -272,6 +272,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
           <DialogContent
             noDescription
+            hideCloseButton
             className="max-w-md sm:max-w-lg max-h-[85dvh] overflow-hidden p-0 bg-neo-navy border-neo-black/50"
           >
             <DialogHeader className="sr-only">

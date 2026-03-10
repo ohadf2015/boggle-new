@@ -213,6 +213,27 @@ export default function sitemap() {
     });
   });
 
+  // How to Play pages for all locales (AEO/GEO target page)
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/how-to-play`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/how-to-play`,
+          he: `${baseUrl}/he/how-to-play`,
+          en: `${baseUrl}/en/how-to-play`,
+          sv: `${baseUrl}/sv/how-to-play`,
+          ja: `${baseUrl}/ja/how-to-play`,
+          es: `${baseUrl}/es/how-to-play`,
+        },
+      },
+    });
+  });
+
   // Blog pages for all locales
   locales.forEach((locale) => {
     const localePath = `/${locale}`;
@@ -409,6 +430,68 @@ export default function sitemap() {
     });
   });
 
+  // Guides pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+
+    // Guides index
+    routes.push({
+      url: `${baseUrl}${localePath}/guides`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/guides`,
+          he: `${baseUrl}/he/guides`,
+          en: `${baseUrl}/en/guides`,
+          sv: `${baseUrl}/sv/guides`,
+          ja: `${baseUrl}/ja/guides`,
+          es: `${baseUrl}/es/guides`,
+        },
+      },
+    });
+
+    // Strategy guides
+    const guidesSlugs = ['classic-strategy', 'blast-strategy', 'word-hunt-strategy'];
+    guidesSlugs.forEach((slug) => {
+      routes.push({
+        url: `${baseUrl}${localePath}/guides/${slug}`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.85,
+        alternates: {
+          languages: {
+            'x-default': `${baseUrl}/en/guides/${slug}`,
+            he: `${baseUrl}/he/guides/${slug}`,
+            en: `${baseUrl}/en/guides/${slug}`,
+            sv: `${baseUrl}/sv/guides/${slug}`,
+            ja: `${baseUrl}/ja/guides/${slug}`,
+            es: `${baseUrl}/es/guides/${slug}`,
+          },
+        },
+      });
+    });
+
+    // Glossary
+    routes.push({
+      url: `${baseUrl}${localePath}/glossary`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/glossary`,
+          he: `${baseUrl}/he/glossary`,
+          en: `${baseUrl}/en/glossary`,
+          sv: `${baseUrl}/sv/glossary`,
+          ja: `${baseUrl}/ja/glossary`,
+          es: `${baseUrl}/es/glossary`,
+        },
+      },
+    });
+  });
+
   // Cookie Policy pages for all locales
   locales.forEach((locale) => {
     const localePath = `/${locale}`;
@@ -430,6 +513,27 @@ export default function sitemap() {
     });
   });
 
+  // Word of the Day pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/word-of-the-day`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/word-of-the-day`,
+          he: `${baseUrl}/he/word-of-the-day`,
+          en: `${baseUrl}/en/word-of-the-day`,
+          sv: `${baseUrl}/sv/word-of-the-day`,
+          ja: `${baseUrl}/ja/word-of-the-day`,
+          es: `${baseUrl}/es/word-of-the-day`,
+        },
+      },
+    });
+  });
+
   // Adventure mode pages for all locales
   locales.forEach((locale) => {
     const localePath = `/${locale}`;
@@ -446,6 +550,44 @@ export default function sitemap() {
           sv: `${baseUrl}/sv/adventure`,
           ja: `${baseUrl}/ja/adventure`,
           es: `${baseUrl}/es/adventure`,
+        },
+      },
+    });
+  });
+
+  // Tools pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/tools`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/tools`,
+          he: `${baseUrl}/he/tools`,
+          en: `${baseUrl}/en/tools`,
+          sv: `${baseUrl}/sv/tools`,
+          ja: `${baseUrl}/ja/tools`,
+          es: `${baseUrl}/es/tools`,
+        },
+      },
+    });
+
+    routes.push({
+      url: `${baseUrl}${localePath}/tools/word-solver`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/tools/word-solver`,
+          he: `${baseUrl}/he/tools/word-solver`,
+          en: `${baseUrl}/en/tools/word-solver`,
+          sv: `${baseUrl}/sv/tools/word-solver`,
+          ja: `${baseUrl}/ja/tools/word-solver`,
+          es: `${baseUrl}/es/tools/word-solver`,
         },
       },
     });
