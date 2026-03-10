@@ -150,6 +150,7 @@ jest.mock('../results', () => ({
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
   SharePanel: () => <div data-testid="share-panel" />,
   EmojiShareCard: () => <div data-testid="emoji-share-card" />,
+  DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
 }));
 
 // ── Inline sub-components ─────────────────────────────────────────────────────
@@ -200,6 +201,22 @@ jest.mock('@/components/ui/button', () => ({
 jest.mock('@/lib/utils', () => ({
   cn: (...args: string[]) => args.filter(Boolean).join(' '),
 }));
+
+jest.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: jest.fn(),
+}));
+
+jest.mock('@/utils/mascotConfig', () => ({
+  FLEXING_SCORE_THRESHOLD: 0.6,
+  ENCOURAGING_SCORE_THRESHOLD: 0.4,
+}));
+
+jest.mock('@/components/results/WordHuntAnnouncementBanner', () => {
+  const React = require('react');
+  return React.forwardRef(function MockWordHuntAnnouncementBanner(props: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) {
+    return React.createElement('div', { ...props, ref, 'data-testid': 'word-hunt-announcement-banner' });
+  });
+});
 
 // ── Import component AFTER all mocks ──────────────────────────────────────────
 import DailyWordHuntResults from '../DailyWordHuntResults';
