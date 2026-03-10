@@ -33,19 +33,24 @@ jest.mock('@/utils/session', () => ({
   clearSessionPreservingUsername: jest.fn(),
 }));
 
-jest.mock('framer-motion', () => ({
-  motion: {
-    button: React.forwardRef(({ children, onMouseEnter, onMouseLeave, ...props }: any, ref: any) => (
-      <button ref={ref} onClick={props.onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} className={props.className}>{children}</button>
-    )),
-    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <div ref={ref} className={props.className}>{children}</div>
-    )),
-    span: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <span ref={ref} className={props.className}>{children}</span>
-    )),
-  },
-}));
+jest.mock('framer-motion', () => {
+  const ReactMock = require('react');
+  const MotionButton = ReactMock.forwardRef(({ children, onMouseEnter, onMouseLeave, ...props }: any, ref: any) => (
+    <button ref={ref} onClick={props.onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} className={props.className}>{children}</button>
+  ));
+  MotionButton.displayName = 'MotionButton';
+  const MotionDiv = ReactMock.forwardRef(({ children, ...props }: any, ref: any) => (
+    <div ref={ref} className={props.className}>{children}</div>
+  ));
+  MotionDiv.displayName = 'MotionDiv';
+  const MotionSpan = ReactMock.forwardRef(({ children, ...props }: any, ref: any) => (
+    <span ref={ref} className={props.className}>{children}</span>
+  ));
+  MotionSpan.displayName = 'MotionSpan';
+  return {
+    motion: { button: MotionButton, div: MotionDiv, span: MotionSpan },
+  };
+});
 
 import WordHuntAnnouncementBanner from '../WordHuntAnnouncementBanner';
 import { clearSessionPreservingUsername } from '@/utils/session';
