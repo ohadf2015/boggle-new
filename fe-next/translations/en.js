@@ -326,7 +326,13 @@ const en = {
     "lostLead": "{{username}} took the lead!"
   },
   "countdown": {
-    "hint": "Swipe letters to form words!"
+    "hint": "Swipe letters to form words!",
+    "go": "GO!",
+    "modeReveal": {
+      "blast": "BLAST!",
+      "wordHunt": "WORD HUNT!",
+      "classic": "CLASSIC!"
+    }
   },
   "help": {
     "title": "Quick Help",
@@ -5846,6 +5852,11 @@ const en = {
       "tileBonus": "Tile Bonus",
       "tilesCleared": "Tiles Cleared",
       "moveCounter": "Move Counter",
+      "maxCombo": "Max Combo",
+      "gems": "Gems",
+      "bestWord": "Best Word",
+      "wordsFoundCount": "Words",
+      "playerStats": "Player Stats",
     },
     "ready": {
       "title": "Blast Mode",

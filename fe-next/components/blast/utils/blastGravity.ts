@@ -44,6 +44,25 @@ export interface GravityResult {
 }
 
 /**
+ * Generate a letter that differs from its vertical neighbor to prevent
+ * repetitive clusters after cascade refills. Retries up to `maxRetries`
+ * times using the provided RNG; falls back to the last attempt if all
+ * retries produce duplicates. Deterministic when using a seeded RNG.
+ */
+export function generateNonDuplicateLetter(
+  language: Language,
+  rng: () => number,
+  neighborLetter: string,
+  maxRetries = 3,
+): string {
+  let letter = generateBlastLetter(language, 1.0, rng);
+  for (let attempt = 0; attempt < maxRetries && letter === neighborLetter; attempt++) {
+    letter = generateBlastLetter(language, 1.0, rng);
+  }
+  return letter;
+}
+
+/**
  * Compute the full gravity result: shift tiles down, fill empty spaces.
  * Pure function — no side effects, fully testable.
  *
@@ -143,7 +162,13 @@ export function computeGravityResult(
     const emptyCount = bottomRow + 1;
     for (let i = 0; i < emptyCount; i++) {
       const row = bottomRow - i; // top-most first
-      const letter = generateBlastLetter(language, 1.0, rng);
+      const letter = generateNonDuplicateLetter(
+        language,
+        rng ?? Math.random,
+        // Check the tile below (previously placed refill or surviving tile)
+        newGrid[row + 1]?.[col] ?? '',
+        3,
+      );
       const type = rollSpecialType(specialTileChance, customDistribution, spawnModifier, rng);
 
       newGrid[row][col] = letter;

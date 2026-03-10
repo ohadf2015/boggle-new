@@ -188,6 +188,7 @@ export async function calculateAndBroadcastFinalScores(
   const blastState = game.gameMode === 'blast' ? game.blastModeState : null;
   const blastSummary = blastState ? {
     playerMoves: blastState.playerMoves as Record<string, number>,
+    playerStats: blastState.playerStats ?? {},
   } : undefined;
 
   // Broadcast results to all clients

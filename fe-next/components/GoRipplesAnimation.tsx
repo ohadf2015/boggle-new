@@ -134,7 +134,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
             }`}
             style={{ textShadow: '2px 2px 0px rgba(255,255,255,0.3)' }}
           >
-            {count > 0 ? count : 'GO!'}
+            {count > 0 ? count : (t?.('countdown.go') || 'GO!')}
           </span>
         </motion.div>
       </AnimatePresence>
@@ -147,7 +147,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ delay: 0.3, duration: 0.3 }}
-            className="absolute bottom-[25%] text-center text-neo-cream/90 text-sm sm:text-base font-bold px-4"
+            className="absolute bottom-[25%] text-center text-neo-white text-base sm:text-lg font-black px-6 py-2 bg-neo-black/40 rounded-neo backdrop-blur-sm"
           >
             {t?.('countdown.hint') || 'Swipe letters to form words!'}
           </motion.p>

@@ -31,7 +31,7 @@ import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { GameModeOption } from '@/components/GameModeSelector';
-import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared } from '@/hooks/gameState/store';
+import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats } from '@/hooks/gameState/store';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, wordHuntSummary }) => {
@@ -57,6 +57,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const blastMovesUsed = useBlastMovesUsed();
   const blastTotalTileBonus = useBlastTotalTileBonus();
   const blastTotalTilesCleared = useBlastTotalTilesCleared();
+  const blastPlayerStats = useBlastPlayerStats();
 
   // Socket events for word feedback, XP, engagement features, and player ready state
   const {
@@ -423,6 +424,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         movesUsed: blastMovesUsed,
         tilesCleared: blastTotalTilesCleared,
         tileBonus: blastTotalTileBonus,
+        playerStats: blastPlayerStats,
       },
     } : {}),
     ...(resolvedGameMode === 'word-hunt' && wordHuntResultsData ? {

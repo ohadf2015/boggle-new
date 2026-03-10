@@ -3,7 +3,7 @@
  * These types define the shape of the store's state and actions.
  */
 
-import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
+import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameModeSelection, BlastTileOverlay, LetterFeedback, BlastPlayerStats } from '@/shared/types/game';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import type { Player, TournamentData, TournamentStanding, ComboState } from './types';
 
@@ -60,6 +60,8 @@ export interface GameState {
   blastSeed: number | null;
   blastComboSync: { comboType: string; username: string; id: string } | null;
   blastOpponentActivity: Array<{ id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }>;
+  /** Rich per-player blast stats from results */
+  blastPlayerStats: Record<string, BlastPlayerStats>;
 
   // Word Hunt multiplayer state
   wordHuntTargetLength: number;
@@ -133,6 +135,7 @@ export interface GameActions {
   setBlastSeed: (value: number | null | ((prev: number | null) => number | null)) => void;
   setBlastComboSync: (value: { comboType: string; username: string; id: string } | null) => void;
   pushBlastOpponentActivity: (event: { id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }) => void;
+  setBlastPlayerStats: (value: Record<string, BlastPlayerStats> | ((prev: Record<string, BlastPlayerStats>) => Record<string, BlastPlayerStats>)) => void;
 
   // Word Hunt multiplayer actions
   setWordHuntTargetLength: (value: number | ((prev: number) => number)) => void;

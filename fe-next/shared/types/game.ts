@@ -310,11 +310,22 @@ export interface BlastTileOverlay {
   type: BlastTileType;
 }
 
+/** Per-player blast stats tracked during a game */
+export interface BlastPlayerStats {
+  maxCombo: number;
+  gemsCollected: number;
+  wordsFound: string[];
+  bestWord: string;
+  tilesCleared: number;
+}
+
 /** Blast mode state tracked per game */
 export interface BlastModeState {
   overlay: BlastTileOverlay[];
   playerMoves: Record<string, number>;
   playerBonusMoves: Record<string, number>;
+  /** Rich per-player stats for results page */
+  playerStats: Record<string, BlastPlayerStats>;
   /**
    * Seeded PRNG seed for deterministic multiplayer refills.
    * Generated server-side in initBlastModeState and broadcast with startGame.

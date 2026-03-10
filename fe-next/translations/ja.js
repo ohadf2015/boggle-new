@@ -326,7 +326,13 @@ const ja = {
     "lostLead": "{{username}}がトップに！"
   },
   "countdown": {
-    "hint": "スワイプして単語を作ろう！"
+    "hint": "スワイプして単語を作ろう！",
+    "go": "スタート！",
+    "modeReveal": {
+      "blast": "ブラスト！",
+      "wordHunt": "ワードハント！",
+      "classic": "クラシック！"
+    }
   },
   "help": {
     "title": "クイックヘルプ",
@@ -5805,6 +5811,11 @@ const ja = {
       "tileBonus": "タイルボーナス",
       "tilesCleared": "クリアしたタイル",
       "moveCounter": "手数カウンター",
+      "maxCombo": "最大コンボ",
+      "gems": "宝石",
+      "bestWord": "ベストワード",
+      "wordsFoundCount": "単語数",
+      "playerStats": "プレイヤー統計",
     },
     "ready": {
       "title": "ブラストモード",

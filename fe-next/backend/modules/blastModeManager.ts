@@ -4,7 +4,7 @@
  * for multiplayer blast games.
  */
 
-import type { BlastTileOverlay, BlastModeState } from '@/shared/types/game';
+import type { BlastTileOverlay, BlastModeState, BlastPlayerStats } from '@/shared/types/game';
 
 import type { BlastTileType } from '@/shared/types/blast';
 
@@ -91,10 +91,12 @@ export function initBlastModeState(
 
   const playerMoves: Record<string, number> = {};
   const playerBonusMoves: Record<string, number> = {};
+  const playerStats: Record<string, BlastPlayerStats> = {};
 
   for (const player of players) {
     playerMoves[player] = 0;
     playerBonusMoves[player] = 0;
+    playerStats[player] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 };
   }
 
   // Generate a seed for deterministic multiplayer refills.
@@ -102,7 +104,7 @@ export function initBlastModeState(
   // Use >>> 0 to ensure unsigned 32-bit positive integer; || 1 avoids zero.
   const seed = (Date.now() ^ Math.floor(Math.random() * 0xFFFFFFFF)) >>> 0 || 1;
 
-  return { overlay, playerMoves, playerBonusMoves, seed };
+  return { overlay, playerMoves, playerBonusMoves, playerStats, seed };
 }
 
 /**
@@ -112,7 +114,10 @@ export function initBlastModeState(
 export function recordBlastMove(
   state: BlastModeState,
   username: string,
-  comboLevel: number
+  comboLevel: number,
+  word?: string,
+  tilesCleared?: number,
+  gemCount?: number,
 ): { movesUsed: number; bonusMove: boolean } {
   // Initialize if unknown player
   if (state.playerMoves[username] === undefined) {
@@ -127,6 +132,21 @@ export function recordBlastMove(
   const bonusMove = comboLevel >= BLAST_BONUS_MOVE_COMBO_THRESHOLD;
   if (bonusMove) {
     state.playerBonusMoves[username] += 1;
+  }
+
+  // Update rich per-player stats
+  if (state.playerStats) {
+    if (!state.playerStats[username]) {
+      state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 };
+    }
+    const stats = state.playerStats[username];
+    if (comboLevel > stats.maxCombo) stats.maxCombo = comboLevel;
+    if (word) {
+      stats.wordsFound.push(word);
+      if (word.length > stats.bestWord.length) stats.bestWord = word;
+    }
+    if (tilesCleared) stats.tilesCleared += tilesCleared;
+    if (gemCount) stats.gemsCollected += gemCount;
   }
 
   return {

@@ -95,7 +95,7 @@ export interface ResultsDetailsContentProps {
   /** Resolved game mode */
   gameMode?: string;
   /** Blast mode results data */
-  blastResults?: { movesUsed: number; tilesCleared: number; tileBonus: number };
+  blastResults?: { movesUsed: number; tilesCleared: number; tileBonus: number; playerStats?: Record<string, import('@/shared/types/game').BlastPlayerStats> };
   /** Word Hunt mode results data */
   wordHuntResults?: { targetWord: string; foundTarget: boolean; isFirstFinder: boolean; survivalTime: number; discoveryWords: number; playerResults?: Array<{ username: string; score: number; survived: boolean; lifeRemaining: number }>; currentUsername?: string };
 }

@@ -57,6 +57,7 @@ export const useBlastTotalTilesCleared = (): number => useGameStore((state) => s
 export const useBlastSeed = () => useGameStore((state) => state.blastSeed);
 export const useBlastComboSync = () => useGameStore((state) => state.blastComboSync);
 export const useBlastOpponentActivity = () => useGameStore((state) => state.blastOpponentActivity);
+export const useBlastPlayerStats = () => useGameStore((state) => state.blastPlayerStats);
 
 // Word Hunt multiplayer selectors
 export const useWordHuntTargetLength = (): number => useGameStore((state) => state.wordHuntTargetLength);
@@ -114,6 +115,7 @@ const getActions = (state: GameStore) => ({
   setBlastSeed: state.setBlastSeed,
   setBlastComboSync: state.setBlastComboSync,
   pushBlastOpponentActivity: state.pushBlastOpponentActivity,
+  setBlastPlayerStats: state.setBlastPlayerStats,
   setWordHuntTargetLength: state.setWordHuntTargetLength,
   setWordHuntMyLife: state.setWordHuntMyLife,
   setWordHuntPlayerLives: state.setWordHuntPlayerLives,

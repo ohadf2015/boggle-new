@@ -144,7 +144,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
       </div>
 
       {/* Grid — fills remaining space */}
-      <div className="flex-1 min-h-0 px-2">
+      <div className="flex-1 min-h-0 px-2 relative">
         <SurvivalGridSection
           grid={grid}
           isGameOver={isGameOver}
@@ -154,10 +154,23 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           highlightedPath={highlightedPath}
           t={t}
         />
+
+        {/* Floating invalid word notification over grid */}
+        {wordFeedback && (wordFeedback.type === 'rejected' || wordFeedback.type === 'duplicate') && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <div className={`px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-bold text-sm animate-neo-shake ${
+              wordFeedback.type === 'rejected' ? 'bg-neo-red text-neo-cream' : 'bg-neo-pink text-neo-black'
+            }`}>
+              {wordFeedback.type === 'rejected' && '✗ '}
+              {wordFeedback.type === 'duplicate' && '⟳ '}
+              {wordFeedback.message || (wordFeedback.type === 'duplicate' ? t('playerView.wordAlreadyFound') : t('playerView.invalidWord'))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Word Forming Area */}
-      <div className="px-3">
+      <div className="px-3 flex-shrink-0">
         <WordFormingArea
           word={formedWord}
           letterCount={letterCount}
@@ -167,13 +180,15 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
       </div>
 
       {/* MP Leaderboard */}
-      <WordHuntMPLeaderboard
-        playerLives={playerLives}
-        eliminatedPlayers={eliminatedPlayers}
-        leaderboard={leaderboard}
-        currentUsername={currentUsername}
-        t={t}
-      />
+      <div className="flex-shrink-0 max-h-[30vh] overflow-y-auto">
+        <WordHuntMPLeaderboard
+          playerLives={playerLives}
+          eliminatedPlayers={eliminatedPlayers}
+          leaderboard={leaderboard}
+          currentUsername={currentUsername}
+          t={t}
+        />
+      </div>
     </div>
   );
 });

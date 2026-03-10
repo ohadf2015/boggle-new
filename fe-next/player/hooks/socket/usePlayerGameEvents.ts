@@ -331,6 +331,11 @@ export function usePlayerGameEvents({
       hasProcessedResultsRef.current = gameSessionIdRef.current;
       logger.log('[PLAYER] Received validatedScores event:', data);
 
+      // Store rich blast player stats if available
+      if (data.blastSummary?.playerStats) {
+        useGameStore.getState().setBlastPlayerStats(data.blastSummary.playerStats);
+      }
+
       // Transition directly to results — no validation modal delay
       // Also ensures game is marked inactive as fallback (in case endGame hasn't arrived yet)
       setGameActive(false);

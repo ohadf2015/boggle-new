@@ -112,6 +112,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   playerWordCounts,
 
   // Actions
+  onStopGame,
   socket,
 
   // Earthquake/Fire Round
@@ -207,7 +208,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
         leaderboard={leaderboard}
         username={username}
         onGameEnd={() => {/* Server controls game end in multiplayer */}}
-        onQuit={() => {/* Host uses stop game, not quit */}}
+        onQuit={onStopGame}
         onWordWithComboType={handleBlastWordWithCombo}
         initialTileStates={blastBridge.initialTileStates}
         blastSeed={blastBridge.blastSeed}
@@ -224,7 +225,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
         leaderboard={leaderboard}
         username={username}
         score={leaderboard.find(p => p.username === username)?.score ?? 0}
-        onQuit={() => {/* Host uses stop game, not quit */}}
+        onQuit={onStopGame}
         onWordSubmit={onWordSubmit}
         onWordHuntGuess={handleWordHuntGuess}
         gameActive={true}

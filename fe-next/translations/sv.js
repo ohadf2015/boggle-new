@@ -326,7 +326,13 @@ const sv = {
     "lostLead": "{{username}} tog ledningen!"
   },
   "countdown": {
-    "hint": "Svep bokstäver för att bilda ord!"
+    "hint": "Svep bokstäver för att bilda ord!",
+    "go": "KÖR!",
+    "modeReveal": {
+      "blast": "BLAST!",
+      "wordHunt": "ORDJAKT!",
+      "classic": "KLASSISKT!"
+    }
   },
   "help": {
     "title": "Snabbhjälp",
@@ -5761,6 +5767,11 @@ const sv = {
       "tileBonus": "Brickbonus",
       "tilesCleared": "Rensade brickor",
       "moveCounter": "Dragräknare",
+      "maxCombo": "Max kombo",
+      "gems": "Ädelstenar",
+      "bestWord": "Bästa ord",
+      "wordsFoundCount": "Ord",
+      "playerStats": "Spelarstatistik",
     },
     "ready": {
       "title": "Blast-läge",

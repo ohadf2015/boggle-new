@@ -326,7 +326,13 @@ const he = {
     "lostLead": "{{username}} תפס את ההובלה!"
   },
   "countdown": {
-    "hint": "גררו אותיות כדי ליצור מילים!"
+    "hint": "גררו אותיות כדי ליצור מילים!",
+    "go": "!קדימה",
+    "modeReveal": {
+      "blast": "!פיצוץ",
+      "wordHunt": "!ציד מילים",
+      "classic": "!קלאסי"
+    }
   },
   "help": {
     "title": "עזרה מהירה",
@@ -5736,6 +5742,11 @@ const he = {
       "tileBonus": "בונוס אריח",
       "tilesCleared": "אריחים שנוקו",
       "moveCounter": "מונה מהלכים",
+      "maxCombo": "קומבו מקסימלי",
+      "gems": "אבני חן",
+      "bestWord": "המילה הטובה",
+      "wordsFoundCount": "מילים",
+      "playerStats": "סטטיסטיקות שחקנים",
     },
     "ready": {
       "title": "מצב פיצוץ",

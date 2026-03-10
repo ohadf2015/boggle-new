@@ -322,7 +322,13 @@ const es = {
     "calculatingResults": "Calculando resultados..."
   },
   "countdown": {
-    "hint": "¡Desliza letras para formar palabras!"
+    "hint": "¡Desliza letras para formar palabras!",
+    "go": "¡YA!",
+    "modeReveal": {
+      "blast": "¡BLAST!",
+      "wordHunt": "¡CAZA DE PALABRAS!",
+      "classic": "¡CLÁSICO!"
+    }
   },
   "help": {
     "title": "Ayuda Rápida",
@@ -5795,7 +5801,12 @@ const es = {
       "bonusMove": "Movimiento Extra!",
       "tileBonus": "Bonus de Ficha",
       "tilesCleared": "Fichas Limpiadas",
-      "moveCounter": "Contador de Movimientos"
+      "moveCounter": "Contador de Movimientos",
+      "maxCombo": "Combo Máximo",
+      "gems": "Gemas",
+      "bestWord": "Mejor Palabra",
+      "wordsFoundCount": "Palabras",
+      "playerStats": "Estadísticas de Jugadores"
     },
     "ready": {
       "title": "Modo Blast",

@@ -552,7 +552,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
       const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay);
       blastTileBonus = calculateBlastTileBonus(tilesOnPath);
       blastTilesCleared = tilesOnPath;
-      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel);
+      const gemCount = tilesOnPath.filter(t => t === 'gem').length;
+      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount);
 
       // Add tile bonus to score
       if (blastTileBonus > 0) {

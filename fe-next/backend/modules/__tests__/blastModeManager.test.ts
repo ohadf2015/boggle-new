@@ -181,6 +181,10 @@ describe('blastModeManager', () => {
         overlay: [],
         playerMoves: { alice: 0, bob: 0 },
         playerBonusMoves: { alice: 0, bob: 0 },
+        playerStats: {
+          alice: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 },
+          bob: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 },
+        },
       };
     });
 
@@ -218,6 +222,33 @@ describe('blastModeManager', () => {
       const result = recordBlastMove(state, 'charlie', 0);
       expect(result.movesUsed).toBe(1);
       expect(state.playerMoves.charlie).toBe(1);
+    });
+
+    it('should track word in playerStats when provided', () => {
+      recordBlastMove(state, 'alice', 3, 'HELLO', 5, 0);
+      expect(state.playerStats.alice.wordsFound).toEqual(['HELLO']);
+      expect(state.playerStats.alice.tilesCleared).toBe(5);
+      expect(state.playerStats.alice.maxCombo).toBe(3);
+    });
+
+    it('should update bestWord to longest word', () => {
+      recordBlastMove(state, 'alice', 0, 'HI', 2, 0);
+      recordBlastMove(state, 'alice', 0, 'WORLD', 5, 0);
+      recordBlastMove(state, 'alice', 0, 'CAT', 3, 0);
+      expect(state.playerStats.alice.bestWord).toBe('WORLD');
+    });
+
+    it('should accumulate gems collected', () => {
+      recordBlastMove(state, 'alice', 0, 'GEM', 3, 2);
+      recordBlastMove(state, 'alice', 0, 'GEMS', 4, 1);
+      expect(state.playerStats.alice.gemsCollected).toBe(3);
+    });
+
+    it('should update maxCombo only when higher', () => {
+      recordBlastMove(state, 'alice', 5, 'A', 1, 0);
+      recordBlastMove(state, 'alice', 3, 'B', 1, 0);
+      recordBlastMove(state, 'alice', 7, 'C', 1, 0);
+      expect(state.playerStats.alice.maxCombo).toBe(7);
     });
   });
 

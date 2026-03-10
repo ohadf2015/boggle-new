@@ -427,7 +427,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy">
       {/* GO Animation */}
       {runtime.showStartAnimation && (
-        <GoRipplesAnimation onComplete={() => state.setShowStartAnimation(false)} />
+        <GoRipplesAnimation onComplete={() => state.setShowStartAnimation(false)} t={t} />
       )}
 
       {/* Dialogs */}

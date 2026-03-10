@@ -280,6 +280,11 @@ export function useHostGameEvents({
 
       logger.log('[HOST] Received validationComplete event:', data);
 
+      // Store rich blast player stats if available
+      if (data.blastSummary?.playerStats) {
+        useGameStore.getState().setBlastPlayerStats(data.blastSummary.playerStats);
+      }
+
       // Transition directly to results — no validation modal delay
       const currentOnShowResults = onShowResultsRef.current;
       const currentTableData = tableDataRef.current;

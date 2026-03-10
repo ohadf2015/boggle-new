@@ -381,28 +381,33 @@ export function BlastGameLayout({
         )}
       </AnimatePresence>
 
-      {/* Stats row: Score (left), Words (center), Progress (right) */}
-      <div className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-1 max-w-md mx-auto w-full">
-        {/* Score */}
-        <motion.div
-          key={Math.floor(score / 50)}
-          initial={{ scale: 1.1, rotate: -1 }}
-          animate={{ scale: 1, rotate: -1.5 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          className="border-3 border-neo-black rounded-neo shadow-hard px-3 py-1.5 min-w-[80px]"
-          style={{
-            background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-          }}
-        >
-          <div className="text-center">
-            <div className="font-black text-neo-black text-xl sm:text-2xl leading-tight tabular-nums">
-              {score.toLocaleString()}
+      {/* Stats row */}
+      <div className={cn(
+        'px-4 flex items-center shrink-0 relative z-30 mb-1 max-w-md mx-auto w-full',
+        isMultiplayer ? 'justify-center gap-8' : 'justify-between'
+      )}>
+        {/* Score — SP only */}
+        {!isMultiplayer && (
+          <motion.div
+            key={Math.floor(score / 50)}
+            initial={{ scale: 1.1, rotate: -1 }}
+            animate={{ scale: 1, rotate: -1.5 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            className="border-3 border-neo-black rounded-neo shadow-hard px-3 py-1.5 min-w-[80px]"
+            style={{
+              background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+            }}
+          >
+            <div className="text-center">
+              <div className="font-black text-neo-black text-xl sm:text-2xl leading-tight tabular-nums">
+                {score.toLocaleString()}
+              </div>
+              <div className="font-bold uppercase tracking-wider text-neo-black/60 text-[10px] sm:text-xs">
+                {t('common.score')}
+              </div>
             </div>
-            <div className="font-bold uppercase tracking-wider text-neo-black/60 text-[10px] sm:text-xs">
-              {t('common.score')}
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* Move counter (visible when move limit is finite) */}
         <BlastMoveCounter
@@ -423,10 +428,12 @@ export function BlastGameLayout({
           </div>
         </button>
 
-        {/* Progress */}
-        <div className="w-28 sm:w-32">
-          <BlastProgressBar cleared={tilesCleared} total={totalTiles} t={t} />
-        </div>
+        {/* Progress — SP only */}
+        {!isMultiplayer && (
+          <div className="w-28 sm:w-32">
+            <BlastProgressBar cleared={tilesCleared} total={totalTiles} t={t} />
+          </div>
+        )}
       </div>
 
       {/* MP Lead Change Banner — pop-up style like classic game */}

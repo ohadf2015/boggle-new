@@ -58,6 +58,7 @@ const initialState: GameState = {
   blastSeed: null,
   blastComboSync: null,
   blastOpponentActivity: [],
+  blastPlayerStats: {},
   wordHuntTargetLength: 0,
   wordHuntMyLife: 100,
   wordHuntPlayerLives: {},
@@ -320,6 +321,10 @@ export const useGameStore = create<GameStore>()(
       blastOpponentActivity: [...state.blastOpponentActivity.slice(-4), event],
     })),
 
+    setBlastPlayerStats: (value) => set((state) => ({
+      blastPlayerStats: applySetState(value, state.blastPlayerStats)
+    })),
+
     // ==========================================
     // Word Hunt Multiplayer Actions
     // ==========================================
@@ -431,6 +436,7 @@ export const useGameStore = create<GameStore>()(
         blastSeed: null,
         blastComboSync: null,
         blastOpponentActivity: [],
+        blastPlayerStats: {},
         combo: DEFAULT_COMBO_STATE,
       });
     },
@@ -466,6 +472,7 @@ export const useGameStore = create<GameStore>()(
         blastSeed: null,
         blastComboSync: null,
         blastOpponentActivity: [],
+        blastPlayerStats: {},
         wordHuntTargetLength: 0,
         wordHuntMyLife: 100,
         wordHuntPlayerLives: {},
@@ -520,6 +527,7 @@ export {
   useBlastSeed,
   useBlastComboSync,
   useBlastOpponentActivity,
+  useBlastPlayerStats,
   useWordHuntTargetLength,
   useWordHuntMyLife,
   useWordHuntPlayerLives,

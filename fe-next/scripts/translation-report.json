@@ -3,9 +3,9 @@
     "totalKeysInCode": 3404,
     "keyCountByLanguage": {
       "en": 5717,
-      "he": 5740,
-      "sv": 5773,
-      "ja": 5760,
+      "he": 5746,
+      "sv": 5779,
+      "ja": 5766,
       "es": 5754
     },
     "missingFromEnglish": 0,
@@ -146,30 +146,9 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "auth.otp.sendCode",
-      "auth.otp.noPassword",
-      "auth.otp.codeSentTo",
-      "auth.otp.verify",
-      "auth.otp.changeEmail",
-      "auth.otp.resend"
-    ],
-    "sv": [
-      "auth.otp.sendCode",
-      "auth.otp.noPassword",
-      "auth.otp.codeSentTo",
-      "auth.otp.verify",
-      "auth.otp.changeEmail",
-      "auth.otp.resend"
-    ],
-    "ja": [
-      "auth.otp.sendCode",
-      "auth.otp.noPassword",
-      "auth.otp.codeSentTo",
-      "auth.otp.verify",
-      "auth.otp.changeEmail",
-      "auth.otp.resend"
-    ],
+    "he": [],
+    "sv": [],
+    "ja": [],
     "es": [
       "auth.otp.sendCode",
       "auth.otp.noPassword",

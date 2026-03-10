@@ -430,7 +430,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   }, [showModeReveal, showStartAnimation, showGameView, setIsInGame]);
 
   // Map game mode to display label
-  const modeRevealLabel = gameMode === 'blast' ? 'BLAST!' : gameMode === 'word-hunt' ? 'WORD HUNT!' : 'CLASSIC!';
+  const modeRevealLabel = gameMode === 'blast' ? t('countdown.modeReveal.blast') : gameMode === 'word-hunt' ? t('countdown.modeReveal.wordHunt') : t('countdown.modeReveal.classic');
 
   if (!showGameView && !waitingForResults) {
     // Show loading indicator when server is preparing the game
@@ -480,7 +480,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     if (showStartAnimation) {
       return (
         <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
-          <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
+          <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} t={t} />
         </div>
       );
     }
@@ -540,7 +540,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   return (
     <>
       {showStartAnimation && (
-        <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
+        <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} t={t} />
       )}
       {showOnboarding && (
         <NewPlayerOnboarding
