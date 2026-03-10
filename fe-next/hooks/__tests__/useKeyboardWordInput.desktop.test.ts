@@ -18,6 +18,11 @@ const mockTranslations: Record<string, string> = {
   swedish: 'Swedish',
   japanese: 'Japanese',
   spanish: 'Spanish',
+  'joinView.hebrew': 'Hebrew',
+  'joinView.english': 'English',
+  'joinView.swedish': 'Swedish',
+  'joinView.japanese': 'Japanese',
+  'joinView.spanish': 'Spanish',
 };
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({

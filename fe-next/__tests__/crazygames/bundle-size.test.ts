@@ -146,8 +146,8 @@ describe('CrazyGames Bundle Size Verification', () => {
       // Call preloadAudioOnDemand
       const loadPromise = preloadAudioOnDemand(mockHowl as any);
 
-      // VERIFY: Promise rejects with error
-      await expect(loadPromise).rejects.toThrow('Network error');
+      // VERIFY: Promise resolves (graceful degradation - audio is non-critical)
+      await expect(loadPromise).resolves.toBeUndefined();
 
       // VERIFY: Error listener was registered
       expect(mockHowl.once).toHaveBeenCalledWith('loaderror', expect.any(Function));
