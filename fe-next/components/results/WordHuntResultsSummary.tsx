@@ -1,7 +1,8 @@
 'use client';
 
-import { Heart, Clock, BookOpen, Skull, Shield } from 'lucide-react';
+import { Heart, Clock, Skull, Shield, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 export interface WordHuntPlayerResult {
   username: string;
@@ -29,7 +30,10 @@ export default function WordHuntResultsSummary({
   playerResults,
   currentUsername,
 }: WordHuntResultsSummaryProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Apply Hebrew final letters for display (e.g., כ→ך at end of word)
+  const displayTargetWord = language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord;
 
   const survivors = playerResults
     ?.filter((p) => p.survived)
@@ -40,30 +44,30 @@ export default function WordHuntResultsSummary({
 
   return (
     <div className="space-y-3">
-      {/* Target word reveal */}
-      <div className="flex items-center justify-between p-3 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm">
+      {/* Target word reveal — prominent hero display */}
+      <div className="flex flex-col items-center gap-2 p-4 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-neo-yellow" />
-          <span className="text-sm text-neo-cream/70">{t('wordHunt.multiplayer.targetWord')}</span>
+          <Target className="w-5 h-5 text-neo-yellow" />
+          <span className="text-sm font-bold text-neo-cream/70 uppercase tracking-wide">{t('wordHunt.multiplayer.targetWord')}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-neo-white tracking-wider">{targetWord}</span>
-          {foundTarget ? (
-            isFirstFinder ? (
-              <span className="px-2 py-0.5 text-xs font-bold bg-neo-yellow text-neo-black rounded-neo">
-                {t('wordHunt.multiplayer.firstFinder')}
-              </span>
-            ) : (
-              <span className="px-2 py-0.5 text-xs font-bold bg-green-500 text-neo-black rounded-neo">
-                {t('wordHunt.multiplayer.found')}
-              </span>
-            )
-          ) : (
-            <span className="px-2 py-0.5 text-xs font-bold bg-red-500 text-neo-white rounded-neo">
-              {t('wordHunt.multiplayer.notFound')}
+        <span className="text-3xl font-black text-neo-white tracking-widest font-neo-display uppercase">
+          {displayTargetWord}
+        </span>
+        {foundTarget ? (
+          isFirstFinder ? (
+            <span className="px-3 py-1 text-xs font-bold bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black shadow-hard-sm">
+              {t('wordHunt.multiplayer.firstFinder')}
             </span>
-          )}
-        </div>
+          ) : (
+            <span className="px-3 py-1 text-xs font-bold bg-green-500 text-neo-black rounded-neo border-2 border-neo-black shadow-hard-sm">
+              {t('wordHunt.multiplayer.found')}
+            </span>
+          )
+        ) : (
+          <span className="px-3 py-1 text-xs font-bold bg-red-500 text-neo-white rounded-neo border-2 border-neo-black shadow-hard-sm">
+            {t('wordHunt.multiplayer.notFound')}
+          </span>
+        )}
       </div>
 
       {/* Stats row */}

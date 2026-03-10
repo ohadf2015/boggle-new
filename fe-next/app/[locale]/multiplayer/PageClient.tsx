@@ -68,6 +68,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const searchParams = useSearchParams();
   const isClassroomMode = searchParams?.get('classroom') === 'true';
   const preselectedMode = searchParams?.get('mode') as GameMode | null;
+  const autoCreate = searchParams?.get('autoCreate') === 'true';
   const validModes: GameMode[] = ['classic', 'blast', 'word-hunt'];
   const { setGameMode: setStoreGameMode } = useGameActions();
 
@@ -300,7 +301,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           <MultiplayerFlow
             handleJoin={handleJoin} refreshRooms={refreshRooms}
             activeRooms={activeRooms} roomsLoading={roomsLoading}
-            isJoining={isJoining} isAuthenticated={isAuthenticated}
+            isJoining={isJoining} isAuthenticated={isAuthenticated} autoCreate={autoCreate}
             displayName={profile?.display_name ?? ''} profileAvatarId={profile?.avatar_image}
             profilePictureUrl={profile?.profile_picture_url}
             prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}

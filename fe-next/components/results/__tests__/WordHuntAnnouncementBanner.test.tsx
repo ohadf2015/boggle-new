@@ -74,7 +74,7 @@ describe('WordHuntAnnouncementBanner', () => {
     fireEvent.click(screen.getByText('Try Word Hunt Mode!'));
 
     expect(clearSessionPreservingUsername).toHaveBeenCalled();
-    expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?mode=word-hunt');
+    expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?mode=word-hunt&autoCreate=true');
   });
 
   it('applies custom className', () => {

@@ -30,7 +30,7 @@ const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
 
   const handleClick = () => {
     clearSessionPreservingUsername();
-    router.push(`/${language}/multiplayer?mode=word-hunt`);
+    router.push(`/${language}/multiplayer?mode=word-hunt&autoCreate=true`);
   };
 
   const glowColor = 'rgba(139, 92, 246, 0.5)';

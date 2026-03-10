@@ -38,6 +38,9 @@ interface MultiplayerFlowProps {
   prefilledRoom?: string;
   defaultLanguage: Language;
 
+  // Auto-create room on mount (e.g., from Word Hunt banner)
+  autoCreate?: boolean;
+
   // Profile avatar info for authenticated users
   profileAvatarId?: string;
   profilePictureUrl?: string | null;
@@ -62,6 +65,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   isAuthenticated,
   displayName,
   prefilledRoom,
+  autoCreate,
   defaultLanguage,
   profileAvatarId,
   profilePictureUrl,
@@ -71,7 +75,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   setHostUsername,
 }) => {
   // Flow state - simplified to room-list with modal overlays
-  const [flowState, setFlowState] = useState<FlowState>('room-list');
+  const [flowState, setFlowState] = useState<FlowState>(autoCreate ? 'create-modal' : 'room-list');
   const [selectedRoom, setSelectedRoom] = useState<ActiveRoom | null>(null);
 
   // CrazyGames invite integration

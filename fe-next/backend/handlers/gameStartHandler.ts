@@ -40,6 +40,7 @@ import { stopAllBots } from '../modules/botManager.js';
 import { notifyGameStarted } from '../modules/notificationService.js';
 import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
 import { initializePlayerData } from './gameLifecycleHandler.js';
+import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
 
 interface StartGamePayload {
   letterGrid: LetterGrid;
@@ -276,7 +277,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const { initWordHuntState, selectTargetWordWithFallback } = await import('../modules/wordHuntManager.js');
       const trie = getCachedTrie(gameLang);
       const allValidWords = findAllWords(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
-      const targetWord = selectTargetWordWithFallback(allValidWords, 5, 8);
+      const targetWord = selectTargetWordWithFallback(allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH);
       if (targetWord) {
         const huntState = initWordHuntState(targetWord, playerUsernames);
         const currentGame = getGame(gameCode);
