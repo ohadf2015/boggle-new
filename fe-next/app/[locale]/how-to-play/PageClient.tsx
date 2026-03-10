@@ -6,8 +6,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { AdPlaceholder } from '@/components/ads';
 import { GameModeJsonLd } from '@/components/seo/GameModeJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
-import { getHowToPlayContent } from './content';
-import type { GameModeContent, FAQItem, ScoringRow } from './content';
+import { getHowToPlayContent, type GameModeContent, type FAQItem, type ScoringRow } from './content';
 
 const SITE_URL = 'https://www.lexiclash.live';
 

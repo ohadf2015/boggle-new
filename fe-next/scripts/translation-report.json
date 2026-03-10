@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3416,
+    "totalKeysInCode": 3426,
     "keyCountByLanguage": {
-      "en": 5729,
-      "he": 5758,
-      "sv": 5791,
-      "ja": 5778,
-      "es": 5763
+      "en": 5739,
+      "he": 5768,
+      "sv": 5801,
+      "ja": 5788,
+      "es": 5768
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -175,7 +175,12 @@
       "friends.headToHead.totalGames",
       "wordHuntAnnouncement.badge",
       "wordHuntAnnouncement.title",
-      "wordHuntAnnouncement.subtitle"
+      "wordHuntAnnouncement.subtitle",
+      "wordHuntPromo.title",
+      "wordHuntPromo.subtitle",
+      "wordHuntPromo.cta",
+      "wordHuntPromo.dismiss",
+      "wordHuntPromo.imageAlt"
     ]
   },
   "keysNotInEnglish": {

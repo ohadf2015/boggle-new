@@ -12,7 +12,8 @@ import Image from 'next/image';
 
 const POPUP_DELAY_MS = 2500;
 const CLOSE_BUTTON_DELAY_MS = 3000;
-const SESSION_KEY = 'wordHuntPromoSeen';
+const STORAGE_KEY = 'wordHuntPromoCount';
+const MAX_SHOWS = 2;
 
 interface WordHuntPromoPopupProps {
   /** Delay before popup appears (ms) */
@@ -33,9 +34,13 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (sessionStorage.getItem(SESSION_KEY)) return;
+    const count = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+    if (count >= MAX_SHOWS) return;
 
-    const showTimer = setTimeout(() => setIsVisible(true), delayMs);
+    const showTimer = setTimeout(() => {
+      setIsVisible(true);
+      localStorage.setItem(STORAGE_KEY, String(count + 1));
+    }, delayMs);
     const closeTimer = setTimeout(
       () => setShowCloseButton(true),
       delayMs + CLOSE_BUTTON_DELAY_MS
@@ -49,11 +54,9 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
 
   const handleClose = useCallback(() => {
     setIsVisible(false);
-    sessionStorage.setItem(SESSION_KEY, '1');
   }, []);
 
   const handlePlay = useCallback(() => {
-    sessionStorage.setItem(SESSION_KEY, '1');
     clearSessionPreservingUsername();
     router.push(`/${language}/multiplayer?mode=word-hunt&autoCreate=true`);
   }, [language, router]);
