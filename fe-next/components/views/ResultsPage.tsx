@@ -356,6 +356,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     onSelectGameMode: setSelectedGameMode,
     seriesStandings,
     seriesRoundNumber,
+    gameMode: resolvedGameMode,
   };
 
   // Word Hunt results data (shared between tabs)

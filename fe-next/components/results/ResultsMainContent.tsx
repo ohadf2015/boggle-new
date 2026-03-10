@@ -21,6 +21,7 @@ import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
+const WordHuntAnnouncementBanner = dynamic(() => import('@/components/results/WordHuntAnnouncementBanner'), { ssr: false });
 import { AdPlaceholder } from '@/components/ads';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 import ShareButton from '@/components/results/ShareButton';
@@ -125,6 +126,8 @@ export interface ResultsMainContentProps {
   seriesStandings?: SeriesStanding[];
   /** Current series round number */
   seriesRoundNumber?: number;
+  /** Current game mode (to show Word Hunt promo when not playing word-hunt) */
+  gameMode?: string;
 }
 
 // ==============================================
@@ -172,6 +175,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   onSelectGameMode,
   seriesStandings,
   seriesRoundNumber,
+  gameMode,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -353,6 +357,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           onPlayAgain={isHost ? onStartGame : onMarkReady}
           compact
         />
+      )}
+
+      {/* Word Hunt Announcement - show when not already playing word-hunt */}
+      {gameCode && gameMode && gameMode !== 'word-hunt' && (
+        <WordHuntAnnouncementBanner />
       )}
 
       {/* Compact Stats Row */}

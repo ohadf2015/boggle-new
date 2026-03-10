@@ -7297,6 +7297,11 @@ const en = {
   ads: {
     label: "Advertisement"
   },
+  wordHuntAnnouncement: {
+    badge: "New in Multiplayer",
+    title: "Try Word Hunt Mode!",
+    subtitle: "Race to find the hidden target word before your opponents. Lives, elimination, and pure chaos!",
+  },
   gameModes: {
     classic: {
       name: "Classic",

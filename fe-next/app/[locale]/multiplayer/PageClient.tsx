@@ -29,7 +29,8 @@ import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotif
 import { useMultiplayerEventNotifications } from '@/hooks/useMultiplayerEventNotifications';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
-import type { Language, ActiveRoom, Avatar } from '@/shared/types/game';
+import { useGameActions } from '@/hooks/gameState';
+import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
 
 // Dynamic imports for code splitting
 const HostView = nextDynamic(() => import('@/host/HostView'), {
@@ -66,6 +67,9 @@ function ViewLoadingSkeleton(): React.JSX.Element {
 export default function MultiplayerPageClient(): React.JSX.Element {
   const searchParams = useSearchParams();
   const isClassroomMode = searchParams?.get('classroom') === 'true';
+  const preselectedMode = searchParams?.get('mode') as GameMode | null;
+  const validModes: GameMode[] = ['classic', 'blast', 'word-hunt'];
+  const { setGameMode: setStoreGameMode } = useGameActions();
 
   const [gameCode, setGameCode] = useState<string>('');
   const [roomName, setRoomName] = useState<string>('');
@@ -84,6 +88,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+
+  // Pre-select game mode from URL param (e.g., ?mode=word-hunt)
+  useEffect(() => {
+    if (preselectedMode && validModes.includes(preselectedMode)) {
+      setStoreGameMode(preselectedMode);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useConnectionToasts();
 

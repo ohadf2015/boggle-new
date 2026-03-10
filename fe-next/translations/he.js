@@ -7203,6 +7203,11 @@ const he = {
   ads: {
     label: "פרסומת"
   },
+  wordHuntAnnouncement: {
+    badge: "חדש במולטיפלייר",
+    title: "נסו את מצב ציד מילים!",
+    subtitle: "מצאו את מילת המטרה הנסתרת לפני היריבים. חיים, הדחה, וכאוס מוחלט!",
+  },
   gameModes: {
     classic: {
       name: "קלאסי",

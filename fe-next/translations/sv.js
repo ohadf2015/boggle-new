@@ -7248,6 +7248,11 @@ const sv = {
   ads: {
     label: "Annons"
   },
+  wordHuntAnnouncement: {
+    badge: "Nytt i Multiplayer",
+    title: "Testa Word Hunt-läget!",
+    subtitle: "Hitta det dolda målordet före dina motståndare. Liv, eliminering och rent kaos!",
+  },
   gameModes: {
     classic: {
       name: "Klassiskt",

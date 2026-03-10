@@ -7221,6 +7221,11 @@ const ja = {
   ads: {
     label: "広告"
   },
+  wordHuntAnnouncement: {
+    badge: "マルチプレイヤーに新登場",
+    title: "ワードハントモードを試そう！",
+    subtitle: "対戦相手より先に隠されたターゲットワードを見つけよう。ライフ、脱落、そして大混乱！",
+  },
   gameModes: {
     classic: {
       name: "クラシック",
