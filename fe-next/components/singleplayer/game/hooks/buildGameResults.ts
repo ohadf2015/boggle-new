@@ -97,7 +97,7 @@ export function buildGameResults(params: BuildResultsParams): SinglePlayerResult
     achievements: finalAchievements,
     botWordsForValidation,
     gameSessionId,
-    language,
+    language: language as Language,
   };
 }
 
@@ -144,6 +144,6 @@ export function buildFallbackResults(params: BuildResultsParams): SinglePlayerRe
     achievements: [],
     botWordsForValidation: fallbackBotWords,
     gameSessionId: fallbackSessionId,
-    language,
+    language: language as Language,
   };
 }

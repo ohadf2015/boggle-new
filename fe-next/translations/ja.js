@@ -2275,6 +2275,14 @@ const ja = {
       "divider": "またはメールで続行",
       "noPassword": "パスワード不要"
     },
+    "otp": {
+      "sendCode": "コードを送信",
+      "noPassword": "パスワード不要",
+      "codeSentTo": "コード送信先",
+      "verify": "コードを確認",
+      "changeEmail": "メールアドレスを変更",
+      "resend": "再送信"
+    },
     "trustBadge": "安全＆プライベート",
     "callback": {
       "completingSignIn": "サインイン中...",

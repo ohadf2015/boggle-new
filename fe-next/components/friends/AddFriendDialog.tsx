@@ -54,7 +54,7 @@ export function AddFriendDialog({
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 2000);
     }
-  }, [profile?.username, language]);
+  }, [profile, language]);
 
   // Debounced search
   useEffect(() => {

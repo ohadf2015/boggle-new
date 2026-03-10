@@ -33,17 +33,19 @@ function getFirebaseApp() {
       return admin.app();
     }
 
-    const projectId = process.env.FIREBASE_PROJECT_ID;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
-    if (!projectId || !clientEmail || !privateKey) {
-      logger.warn('FCM', 'Firebase credentials not configured — push notifications disabled');
+    const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON;
+    if (!credentialsJson) {
+      logger.warn('FCM', 'GOOGLE_CREDENTIALS_JSON not configured — push notifications disabled');
       return null;
     }
 
+    const credentials = JSON.parse(credentialsJson);
     return admin.initializeApp({
-      credential: admin.credential.cert({ projectId, clientEmail, privateKey }),
+      credential: admin.credential.cert({
+        projectId: credentials.project_id,
+        clientEmail: credentials.client_email,
+        privateKey: credentials.private_key,
+      }),
     });
   } catch (error) {
     logger.error('FCM', `Failed to initialize Firebase: ${(error as Error).message}`);
@@ -60,6 +62,8 @@ export async function sendToUser(userId: string, payload: FCMPayload): Promise<v
     if (!isSupabaseConfigured()) return;
 
     const supabase = getSupabase();
+    if (!supabase) return;
+
     const { data: tokens, error } = await supabase
       .from('user_push_tokens')
       .select('id, token, platform')

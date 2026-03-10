@@ -2274,6 +2274,14 @@ const sv = {
       "divider": "eller fortsätt med e-post",
       "noPassword": "Inget lösenord behövs"
     },
+    "otp": {
+      "sendCode": "Skicka mig en kod",
+      "noPassword": "Inget lösenord behövs",
+      "codeSentTo": "Kod skickad till",
+      "verify": "Verifiera kod",
+      "changeEmail": "Ändra e-post",
+      "resend": "Skicka igen"
+    },
     "trustBadge": "Säker & privat",
     "callback": {
       "completingSignIn": "Slutför inloggning...",

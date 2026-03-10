@@ -2292,6 +2292,14 @@ const he = {
       "divider": "או המשיכו עם אימייל",
       "noPassword": "לא צריך סיסמה"
     },
+    "otp": {
+      "sendCode": "שלחו לי קוד",
+      "noPassword": "לא צריך סיסמה",
+      "codeSentTo": "הקוד נשלח אל",
+      "verify": "אימות קוד",
+      "changeEmail": "שינוי אימייל",
+      "resend": "שליחה מחדש"
+    },
     "trustBadge": "מאובטח ופרטי",
     "callback": {
       "completingSignIn": "משלים התחברות...",

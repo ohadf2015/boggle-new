@@ -5,9 +5,8 @@
  */
 
 import logger from '../utils/logger';
-import { sendToUser } from './fcmService';
+import { sendToUser, type FCMPayload } from './fcmService';
 import { getSupabase, isSupabaseConfigured } from './supabase';
-import type { FCMPayload } from './fcmService';
 
 export type PushNotificationType =
   | 'friend_request'
@@ -31,6 +30,8 @@ async function saveNotificationHistory(
     if (!isSupabaseConfigured()) return;
 
     const supabase = getSupabase();
+    if (!supabase) return;
+
     const { error } = await supabase.from('user_notifications').insert({
       user_id: userId,
       notification_type: type === 'friend_request' || type === 'friend_accepted' ? 'social' : 'system',
