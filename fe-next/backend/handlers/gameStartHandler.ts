@@ -191,7 +191,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     // Default blast MP to 90s when host didn't set an explicit timer (fell back to 180s)
     if (resolvedMode === 'blast' && (!timerSeconds || validTimer === 180)) {
-      const { BLAST_MP_DEFAULT_TIMER } = await import('@/shared/constants/gameConstants.js');
+      const { BLAST_MP_DEFAULT_TIMER } = await import('@/shared/constants/gameConstants');
       validTimer = BLAST_MP_DEFAULT_TIMER;
     }
 
