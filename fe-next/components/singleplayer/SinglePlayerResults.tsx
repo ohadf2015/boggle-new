@@ -49,6 +49,7 @@ import { TrainingAnalysisModal } from '@/components/training';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
+const WordHuntAnnouncementBanner = dynamic(() => import('@/components/results/WordHuntAnnouncementBanner'), { ssr: false });
 
 const RANK_CONFETTI_COLORS: Record<number, string[]> = {
   1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'],
@@ -269,6 +270,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             winStreakData={winStreakData}
             achievementCount={results.achievements?.length || 0}
           />
+
+          {/* Word Hunt Multiplayer Promotion */}
+          <WordHuntAnnouncementBanner />
 
           {/* 7. Desktop What's Next + Challenge - 70/30 split */}
           <div className="hidden md:flex gap-4">

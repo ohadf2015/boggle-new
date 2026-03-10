@@ -36,6 +36,8 @@ import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/mascotConfig';
 import { WinCinematic } from './WinCinematic';
+import dynamic from 'next/dynamic';
+const WordHuntAnnouncementBanner = dynamic(() => import('@/components/results/WordHuntAnnouncementBanner'), { ssr: false });
 
 // Import from results module
 import {
@@ -386,6 +388,15 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           isGeneratingImage={shareHandlers.isGeneratingImage}
           t={t}
         />
+      </motion.div>
+
+      {/* Word Hunt Multiplayer Promotion — prominent placement after share */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.8, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <WordHuntAnnouncementBanner className="ring-2 ring-neo-purple/40 ring-offset-2 ring-offset-neo-navy" />
       </motion.div>
 
       {/* Inline signup for guests */}

@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 3413,
+    "totalKeysInCode": 3416,
     "keyCountByLanguage": {
-      "en": 5726,
-      "he": 5755,
-      "sv": 5788,
-      "ja": 5775,
+      "en": 5729,
+      "he": 5758,
+      "sv": 5791,
+      "ja": 5778,
       "es": 5763
     },
     "missingFromEnglish": 0,
@@ -172,7 +172,10 @@
       "friends.headToHead.wins",
       "friends.headToHead.losses",
       "friends.headToHead.draws",
-      "friends.headToHead.totalGames"
+      "friends.headToHead.totalGames",
+      "wordHuntAnnouncement.badge",
+      "wordHuntAnnouncement.title",
+      "wordHuntAnnouncement.subtitle"
     ]
   },
   "keysNotInEnglish": {
