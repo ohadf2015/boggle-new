@@ -18,10 +18,13 @@ const MAX_SHOWS = 2;
 interface WordHuntPromoPopupProps {
   /** Delay before popup appears (ms) */
   delayMs?: number;
+  /** Skip localStorage show-limit check */
+  alwaysShow?: boolean;
 }
 
 const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
   delayMs = POPUP_DELAY_MS,
+  alwaysShow = false,
 }) => {
   const { t, language, dir } = useLanguage();
   const router = useRouter();
@@ -35,7 +38,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const count = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
-    if (count >= MAX_SHOWS) return;
+    if (!alwaysShow && count >= MAX_SHOWS) return;
 
     const showTimer = setTimeout(() => {
       setIsVisible(true);
@@ -50,7 +53,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
       clearTimeout(showTimer);
       clearTimeout(closeTimer);
     };
-  }, [delayMs]);
+  }, [delayMs, alwaysShow]);
 
   const handleClose = useCallback(() => {
     setIsVisible(false);

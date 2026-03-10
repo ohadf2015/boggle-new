@@ -582,7 +582,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       />
 
       {/* Word Hunt Multiplayer Promotion Popup */}
-      {isNewCompletion && <WordHuntPromoPopup />}
+      <WordHuntPromoPopup alwaysShow />
 
       {/* Spend animation portal */}
       {typeof document !== 'undefined' && showSpendAnimation && createPortal(
