@@ -211,10 +211,10 @@ jest.mock('@/utils/mascotConfig', () => ({
   ENCOURAGING_SCORE_THRESHOLD: 0.4,
 }));
 
-jest.mock('@/components/results/WordHuntAnnouncementBanner', () => {
+jest.mock('@/components/results/WordHuntPromoPopup', () => {
   const React = require('react');
-  return React.forwardRef(function MockWordHuntAnnouncementBanner(props: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) {
-    return React.createElement('div', { ...props, ref, 'data-testid': 'word-hunt-announcement-banner' });
+  return React.forwardRef(function MockWordHuntPromoPopup(props: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) {
+    return React.createElement('div', { ...props, ref, 'data-testid': 'word-hunt-promo-popup' });
   });
 });
 
