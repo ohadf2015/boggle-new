@@ -14,6 +14,8 @@ import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 import { NotificationBell } from '../notifications/NotificationBell';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
+import Avatar from '../Avatar';
+import { getStoredCustomAvatar } from '../../utils/profileStorage';
 
 interface HeaderMobileMenuProps {
     unclaimedCount: number;
@@ -61,10 +63,25 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const handleSignUp = useCallback(() => { closeMenu(); onSignUp(); }, [closeMenu, onSignUp]);
     const handleOpenGift = useCallback(() => { closeMenu(); onOpenGiftModal(); }, [closeMenu, onOpenGiftModal]);
 
+    const guestAvatar = !isAuthenticated ? getStoredCustomAvatar() : null;
+    const avatarConfig = profile?.avatar_config ?? guestAvatar;
+
     return (
         <>
-            {/* Mobile: Volume + Notifications + Hamburger */}
+            {/* Mobile: Avatar + Volume + Notifications + Hamburger */}
             <div className="sm:hidden flex items-center gap-2 min-w-0 flex-shrink-0" ref={mobileMenuRef}>
+                <Link
+                    href={`/${language}/profile`}
+                    className="flex-shrink-0 rounded-full border-2 border-neo-black shadow-hard-sm"
+                    aria-label={t('profile.viewProfile')}
+                >
+                    <Avatar
+                        customAvatar={avatarConfig}
+                        avatarImage={profile?.avatar_image}
+                        profilePictureUrl={profile?.profile_picture_url}
+                        size="sm"
+                    />
+                </Link>
                 <MusicControls />
                 {isAuthenticated && <NotificationBell />}
                 <button

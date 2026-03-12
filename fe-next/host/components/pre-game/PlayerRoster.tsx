@@ -88,8 +88,9 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                     AVATAR_COLORS[index % AVATAR_COLORS.length],
                     isMe ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : ''
                   )}>
-                    {avatar?.profilePictureUrl || avatar?.avatarImage ? (
+                    {avatar?.customAvatar || avatar?.profilePictureUrl || avatar?.avatarImage ? (
                       <Avatar
+                        customAvatar={avatar?.customAvatar ?? undefined}
                         profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                         avatarImage={avatar?.avatarImage}
                         size="md"

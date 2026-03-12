@@ -213,24 +213,6 @@ describe('Exit Confirmation - All Game Modes', () => {
     });
   });
 
-  describe('Buzz Game Mode', () => {
-    it('should always enable navigation guard during active gameplay', () => {
-      const onNavigationAttempt = jest.fn(() => false);
-
-      // Simulating BuzzGameScreen.tsx line 93-100
-      // Component only exists during active gameplay, so enabled is always true
-      renderHook(() =>
-        useNavigationGuard({
-          enabled: true,
-          message: 'Test warning',
-          onNavigationAttempt,
-        })
-      );
-
-      expect(mockPushState).toHaveBeenCalled();
-    });
-  });
-
   describe('Word Hunt Survival Mode', () => {
     it('should enable navigation guard when game is not over', () => {
       const onNavigationAttempt = jest.fn(() => false);

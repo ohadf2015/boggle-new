@@ -4,12 +4,14 @@ import { Gift, Newspaper } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
+import Avatar from '../Avatar';
 import { CoinBalance } from '../CoinBalance';
 import { GiftNotificationBadge } from '../gift/GiftNotificationBadge';
 import { NotificationBell } from '../notifications/NotificationBell';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 import MusicControls from '../MusicControls';
 import HeaderMenuDropdown from '../HeaderMenuDropdown';
+import { getStoredCustomAvatar } from '../../utils/profileStorage';
 
 interface HeaderDesktopControlsProps {
     unclaimedCount: number;
@@ -20,8 +22,31 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
     const { t, language } = useLanguage();
     const { isAuthenticated, profile } = useAuth();
 
+    const guestAvatar = !isAuthenticated ? getStoredCustomAvatar() : null;
+    const avatarConfig = profile?.avatar_config ?? guestAvatar;
+
     return (
         <div className="hidden sm:flex items-center gap-3 md:gap-3 lg:gap-4 xl:gap-4 2xl:gap-5 flex-shrink-0">
+            {/* User Avatar */}
+            <Link
+                href={`/${language}/profile`}
+                className={cn(
+                    "flex items-center justify-center",
+                    "rounded-full border-3 border-neo-black",
+                    "shadow-hard-sm",
+                    "hover:scale-110 active:scale-95",
+                    "transition-all duration-100"
+                )}
+                aria-label={t('profile.viewProfile')}
+            >
+                <Avatar
+                    customAvatar={avatarConfig}
+                    avatarImage={profile?.avatar_image}
+                    profilePictureUrl={profile?.profile_picture_url}
+                    size="sm"
+                />
+            </Link>
+
             {isAuthenticated && profile && (
                 <Link
                     href={`/${language}/profile`}

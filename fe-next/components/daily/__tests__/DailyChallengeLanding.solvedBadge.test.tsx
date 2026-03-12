@@ -100,15 +100,6 @@ describe('DailyChallengeLanding Solved Badge', () => {
           json: () => Promise.resolve({ data: { played: true } }),
         });
       }
-      if (url.includes('/api/buzz/')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({
-            success: true,
-            data: { imageUrl: 'https://example.com/image.jpg', trendingSummary: 'Test' },
-          }),
-        });
-      }
       if (url.includes('daily-streak')) {
         return Promise.resolve({
           ok: true,
@@ -131,7 +122,6 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -152,7 +142,6 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -174,7 +163,6 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -199,7 +187,6 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 

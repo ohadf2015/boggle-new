@@ -2,39 +2,34 @@
 
 import React, { useState } from 'react';
 import Avatar from '@/components/Avatar';
-import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
-import { getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
+import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { Pencil } from 'lucide-react';
 
 export interface AvatarSelectorButtonProps {
-  selectedAvatarId?: string;
-  onAvatarSelect: (avatarConfig: AvatarConfig) => void;
+  selectedAvatar?: CustomAvatarConfig | null;
+  onAvatarSelect: (config: CustomAvatarConfig) => void;
   t: (key: string) => string;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
-/**
- * Circular Avatar Selector Button
- * Displays current avatar with edit indicator overlay
- */
 const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
-  selectedAvatarId,
+  selectedAvatar,
   onAvatarSelect,
   t,
   className = '',
   size = 'md'
 }) => {
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
 
-  const selectedAvatar = selectedAvatarId ? getAvatarById(selectedAvatarId) : undefined;
+  const currentConfig = selectedAvatar ?? getStoredCustomAvatar() ?? getRandomAvatarConfig();
 
-  const handleAvatarSave = ({ avatarImage }: { avatarImage: string; emoji?: string; color?: string }) => {
-    const avatar = getAvatarById(avatarImage);
-    if (avatar) {
-      onAvatarSelect(avatar);
-    }
-    setIsPickerOpen(false);
+  const handleSave = (config: CustomAvatarConfig) => {
+    onAvatarSelect(config);
+    setStoredCustomAvatar(config);
+    setIsBuilderOpen(false);
   };
 
   const sizeClasses = {
@@ -53,7 +48,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
     <>
       <button
         type="button"
-        onClick={() => setIsPickerOpen(true)}
+        onClick={() => setIsBuilderOpen(true)}
         aria-label={t('joinView.selectAvatar')}
         className={`
           relative group
@@ -69,19 +64,12 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
           ${className}
         `}
       >
-        {selectedAvatar ? (
-          <Avatar
-            avatarImage={selectedAvatar.id}
-            size={size === 'lg' ? 'xl' : size === 'md' ? 'lg' : 'md'}
-            className="w-full h-full"
-          />
-        ) : (
-          <div className="w-full h-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center">
-            <span className="text-xl">?</span>
-          </div>
-        )}
+        <Avatar
+          customAvatar={currentConfig}
+          size={size === 'lg' ? 'xl' : size === 'md' ? 'lg' : 'md'}
+          className="w-full h-full"
+        />
 
-        {/* Edit indicator overlay */}
         <div className={`
           absolute bottom-0 right-0
           ${iconSizeClasses[size]}
@@ -96,11 +84,11 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
         </div>
       </button>
 
-      <EmojiAvatarPicker
-        isOpen={isPickerOpen}
-        onClose={() => setIsPickerOpen(false)}
-        onSave={handleAvatarSave}
-        currentAvatarImage={selectedAvatarId}
+      <AvatarBuilderModal
+        isOpen={isBuilderOpen}
+        onClose={() => setIsBuilderOpen(false)}
+        onSave={handleSave}
+        initialConfig={currentConfig}
       />
     </>
   );

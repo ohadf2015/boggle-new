@@ -135,7 +135,6 @@ describe('invalidWordTracker', () => {
         'multiplayer',
         'adventure',
         'daily_word_hunt',
-        'daily_buzz',
         'single_player',
         'drill',
       ] as const;
@@ -149,7 +148,7 @@ describe('invalidWordTracker', () => {
         });
       });
 
-      expect(mockFetch).toHaveBeenCalledTimes(6);
+      expect(mockFetch).toHaveBeenCalledTimes(5);
     });
 
     it('supports Hebrew language', () => {
@@ -224,7 +223,7 @@ describe('invalidWordTracker', () => {
 
   describe('recordNotInDictionary', () => {
     it('calls recordInvalidWord with not_in_dictionary reason', () => {
-      recordNotInDictionary('notindictword', 'ja', 'daily_buzz');
+      recordNotInDictionary('notindictword', 'ja', 'daily_word_hunt');
 
       expect(mockFetch).toHaveBeenCalledWith('/api/invalid-word/record', {
         method: 'POST',
@@ -233,7 +232,7 @@ describe('invalidWordTracker', () => {
           word: 'notindictword',
           language: 'ja',
           reason: 'not_in_dictionary',
-          gameMode: 'daily_buzz',
+          gameMode: 'daily_word_hunt',
         }),
       });
     });

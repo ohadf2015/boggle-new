@@ -3,12 +3,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, User } from 'lucide-react';
+import { Check, X, User, Paintbrush } from 'lucide-react';
 import Image from 'next/image';
 import { AVATARS, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import dynamic from 'next/dynamic';
+
+const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 
 // Special constant for "use profile avatar" selection
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
@@ -18,7 +22,10 @@ export const PROFILE_AVATAR_ID = '__profile_avatar__';
  */
 export interface AvatarSelection {
   avatarImage: string; // Avatar image ID (e.g., 'broccoli-bob') or PROFILE_AVATAR_ID
+  customAvatar?: CustomAvatarConfig; // Custom avatar config (when avatarImage is CUSTOM_AVATAR_ID)
 }
+
+export const CUSTOM_AVATAR_ID = '__custom_avatar__';
 
 /**
  * Profile avatar info for authenticated users
@@ -85,6 +92,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
 
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig | null>(getInitialAvatar());
   const [useProfileAvatar, setUseProfileAvatar] = useState<boolean>(isUsingProfileAvatar && hasProfilePicture);
+  const [showBuilder, setShowBuilder] = useState(false);
 
   // Reset state when modal opens to reflect current profile state
   useEffect(() => {
@@ -112,6 +120,12 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
     } else if (selectedAvatar) {
       onSave({ avatarImage: selectedAvatar.id });
     }
+    onClose();
+  };
+
+  const handleCustomAvatarSave = (config: CustomAvatarConfig) => {
+    onSave({ avatarImage: CUSTOM_AVATAR_ID, customAvatar: config });
+    setShowBuilder(false);
     onClose();
   };
 
@@ -205,6 +219,22 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
             )}>
               {getPreviewName()}
             </p>
+          </div>
+
+          {/* Build Custom Button */}
+          <div className="px-4 pt-4">
+            <button
+              type="button"
+              onClick={() => setShowBuilder(true)}
+              className={cn(
+                'w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all',
+                'bg-neo-purple text-neo-white hover:bg-neo-purple/90',
+                'border-2 border-neo-black shadow-hard-sm'
+              )}
+            >
+              <Paintbrush className="w-4 h-4" />
+              {t('avatarBuilder.buildCustom')}
+            </button>
           </div>
 
           {/* Avatar Gallery Grid */}
@@ -314,6 +344,13 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
           </div>
         </motion.div>
       </motion.div>
+      )}
+      {showBuilder && (
+        <AvatarBuilderModal
+          isOpen={showBuilder}
+          onClose={() => setShowBuilder(false)}
+          onSave={handleCustomAvatarSave}
+        />
       )}
     </AnimatePresence>,
     document.body

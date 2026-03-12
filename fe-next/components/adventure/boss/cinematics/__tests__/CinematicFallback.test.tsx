@@ -198,4 +198,77 @@ describe('CinematicFallback', () => {
       expect(screen.getByText('World Unlocked!')).toBeInTheDocument();
     });
   });
+
+  describe('boss image and name display', () => {
+    const bossProps: CinematicFallbackProps = {
+      cinematicType: 'bossEntrance',
+      compositionProps: {
+        bossImagePath: '/images/bosses/dragon.png',
+        bossName: 'Fire Dragon',
+      },
+      durationSeconds: 8,
+      onComplete: jest.fn(),
+    };
+
+    it('should render boss image when cinematicType is bossEntrance', () => {
+      render(<CinematicFallback {...bossProps} />);
+
+      const img = screen.getByTestId('fallback-boss-image');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', '/images/bosses/dragon.png');
+    });
+
+    it('should render boss name when cinematicType is bossEntrance', () => {
+      render(<CinematicFallback {...bossProps} />);
+
+      expect(screen.getByTestId('fallback-boss-name')).toBeInTheDocument();
+      expect(screen.getByText('Fire Dragon')).toBeInTheDocument();
+    });
+
+    it('should render boss image when cinematicType is bossDefeat', () => {
+      render(
+        <CinematicFallback
+          {...bossProps}
+          cinematicType="bossDefeat"
+        />
+      );
+
+      const img = screen.getByTestId('fallback-boss-image');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', '/images/bosses/dragon.png');
+    });
+
+    it('should render boss name when cinematicType is bossDefeat', () => {
+      render(
+        <CinematicFallback
+          {...bossProps}
+          cinematicType="bossDefeat"
+        />
+      );
+
+      expect(screen.getByText('Fire Dragon')).toBeInTheDocument();
+    });
+
+    it('should not render boss image for non-boss cinematics', () => {
+      render(
+        <CinematicFallback
+          {...bossProps}
+          cinematicType="victory"
+        />
+      );
+
+      expect(screen.queryByTestId('fallback-boss-image')).not.toBeInTheDocument();
+    });
+
+    it('should not render boss section when bossImagePath is missing', () => {
+      render(
+        <CinematicFallback
+          {...defaultProps}
+          cinematicType="bossEntrance"
+        />
+      );
+
+      expect(screen.queryByTestId('fallback-boss-image')).not.toBeInTheDocument();
+    });
+  });
 });

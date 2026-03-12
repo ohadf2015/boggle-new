@@ -35,8 +35,11 @@ jest.mock('@/utils/avatarConfig', () => ({
   getAvatarEmojiAndColor: jest.fn(() => ({ emoji: '🎮', color: '#FF6B6B' })),
 }));
 
-jest.mock('@/components/EmojiAvatarPicker', () => ({
-  PROFILE_AVATAR_ID: 'profile-avatar',
+jest.mock('@/shared/types/customAvatar', () => ({
+  getRandomAvatarConfig: () => ({
+    base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18',
+    eyes: 'round', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#1a1a2e',
+  }),
 }));
 
 // Mock child components

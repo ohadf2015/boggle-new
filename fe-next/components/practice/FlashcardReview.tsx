@@ -64,7 +64,7 @@ export default function FlashcardReview({
   const currentWord = words[currentIndex];
   const progress = ((currentIndex + 1) / words.length) * 100;
 
-  // Enrich vocabulary words with Daily Buzz context on mount
+  // Enrich vocabulary words with contextual data on mount
   useEffect(() => {
     if (words.length === 0) return;
 

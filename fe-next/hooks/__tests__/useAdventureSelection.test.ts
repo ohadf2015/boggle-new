@@ -140,23 +140,63 @@ describe('useAdventureSelection', () => {
       expect(result.current.currentWord).toBe('C');
     });
 
-    it('should reject already selected tile (not last)', () => {
+    it('should truncate path when dragging back to already-selected tile (backtracking)', () => {
       // GIVEN
       const { result } = renderHook(() =>
         useAdventureSelection({ tiles: mockTiles, gridSize: 4 })
       );
 
-      // WHEN - select C, A, T then try to select A again
+      // WHEN - select C, A, T then drag back to A
       act(() => {
         result.current.selectTile(0); // C
         result.current.selectTile(1); // A
         result.current.selectTile(2); // T
-        result.current.selectTile(1); // A - already selected (middle)
+        result.current.selectTile(1); // A - already selected (middle), should truncate
       });
 
-      // THEN - should not add duplicate
-      expect(result.current.selectedIndices).toEqual([0, 1, 2]);
-      expect(result.current.currentWord).toBe('CAT');
+      // THEN - path should be truncated to [C, A]
+      expect(result.current.selectedIndices).toEqual([0, 1]);
+      expect(result.current.currentWord).toBe('CA');
+    });
+
+    it('should truncate to first tile when dragging back to start', () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        useAdventureSelection({ tiles: mockTiles, gridSize: 4 })
+      );
+
+      // WHEN - select C, A, T then drag back to C
+      act(() => {
+        result.current.selectTile(0); // C
+        result.current.selectTile(1); // A
+        result.current.selectTile(2); // T
+        result.current.selectTile(0); // C - first tile, should truncate to just [C]
+      });
+
+      // THEN
+      expect(result.current.selectedIndices).toEqual([0]);
+      expect(result.current.currentWord).toBe('C');
+    });
+
+    it('should truncate longer paths correctly when backtracking', () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        useAdventureSelection({ tiles: mockTiles, gridSize: 4 })
+      );
+
+      // WHEN - select C(0), A(1), T(2), G(6), O(5) then drag back to A(1)
+      act(() => {
+        result.current.selectTile(0);  // C
+        result.current.selectTile(1);  // A
+        result.current.selectTile(2);  // T
+        result.current.selectTile(6);  // G (adjacent to T)
+        result.current.selectTile(5);  // O (adjacent to G)
+        result.current.selectTile(1);  // A - backtrack to index 1
+      });
+
+      // THEN - should truncate to [C, A]
+      expect(result.current.selectedIndices).toEqual([0, 1]);
+      expect(result.current.currentWord).toBe('CA');
     });
 
     it('should build word from multiple adjacent tiles', () => {

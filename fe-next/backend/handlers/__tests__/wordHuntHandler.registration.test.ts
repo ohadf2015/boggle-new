@@ -28,7 +28,6 @@ jest.mock('../scorecardHandler', () => ({ registerScorecardHandlers: jest.fn() }
 jest.mock('../vocabularyHandler', () => ({ registerVocabularyHandlers: jest.fn() }));
 jest.mock('../classroomGameHandler', () => ({ registerClassroomGameHandlers: jest.fn() }));
 jest.mock('../avatarHandler', () => ({ registerAvatarHandlers: jest.fn() }));
-jest.mock('../vocabularyEnrichmentHandler', () => ({ vocabularyEnrichmentHandler: jest.fn() }));
 jest.mock('../wordHuntHandler', () => ({ registerWordHuntHandlers: jest.fn() }));
 jest.mock('../shared', () => ({
   startGameTimer: jest.fn(),

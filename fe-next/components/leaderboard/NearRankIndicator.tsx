@@ -15,6 +15,7 @@ interface LeaderboardEntry {
   avatar_color?: string;
   avatar_image?: string;
   profile_picture_url?: string;
+  custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   total_score?: number;
   games_played?: number;
 }
@@ -194,12 +195,12 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
             {playerAbove && (
               <div className="mt-2 flex items-center gap-2 text-xs text-white/70">
                 <span>{t('leaderboard.beat')}:</span>
-                <div className="w-5 h-5">
+                <div className="w-7 h-7 rounded-full overflow-hidden border border-white/30 flex-shrink-0">
                   <Avatar
                     profilePictureUrl={playerAbove.profile_picture_url ?? undefined}
                     avatarImage={playerAbove.avatar_image ?? undefined}
-                    size="sm"
-                    className="w-5 h-5"
+                    customAvatar={playerAbove.custom_avatar ?? undefined}
+                    size="md"
                   />
                 </div>
                 <span className="font-medium truncate">
@@ -262,11 +263,14 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
                     <span className="text-xs font-bold text-white/60 w-8">
                       #{playerRank}
                     </span>
-                    <Avatar
-                      profilePictureUrl={player.profile_picture_url ?? undefined}
-                      avatarImage={player.avatar_image ?? undefined}
-                      size="sm"
-                    />
+                    <div className="w-8 h-8 flex-shrink-0 rounded-full overflow-hidden border-2 border-white/20">
+                      <Avatar
+                        profilePictureUrl={player.profile_picture_url ?? undefined}
+                        avatarImage={player.avatar_image ?? undefined}
+                        customAvatar={player.custom_avatar ?? undefined}
+                        size="md"
+                      />
+                    </div>
                     <span className="text-white text-sm font-medium truncate flex-1">
                       {player.display_name || player.username}
                     </span>

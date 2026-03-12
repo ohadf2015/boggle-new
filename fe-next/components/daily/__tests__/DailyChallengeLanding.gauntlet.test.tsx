@@ -107,7 +107,6 @@ beforeEach(() => {
 
 const defaultProps = {
   onSelectWordHunt: jest.fn(),
-  onSelectBuzz: jest.fn(),
   currentLanguage: 'en' as const,
 };
 

@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import type { Language } from '@/types';
 
 export interface QuestCardProps {
-  challengeId: 'wordHunt' | 'buzz';
+  challengeId: string;
   icon: ReactNode;
   title: string;
   tagline: string;
@@ -312,9 +312,9 @@ function UnavailableButton({ requestState }: { requestState: string }) {
       {requestState === 'loading' ? (
         <><Loader2 className="w-4 h-4 animate-spin" />{t('common.loading')}</>
       ) : requestState === 'sent' ? (
-        <><Check className="w-4 h-4" />{t('buzz.requestSent')}</>
+        <><Check className="w-4 h-4" />{t('daily.requestSent')}</>
       ) : (
-        <><Bell className="w-4 h-4" />{t('buzz.requestChallenge')}</>
+        <><Bell className="w-4 h-4" />{t('daily.requestChallenge')}</>
       )}
     </div>
   );

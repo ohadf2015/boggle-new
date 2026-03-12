@@ -15,12 +15,12 @@ interface FeatureFlagResult {
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { enabled, loading } = useFeatureFlag('daily_buzz_images', user?.id);
+ *   const { enabled, loading } = useFeatureFlag('my_feature', user?.id);
  *
  *   if (loading) return <Spinner />;
  *   if (!enabled) return null;
  *
- *   return <ImageFeature />;
+ *   return <FeatureComponent />;
  * }
  * ```
  */
@@ -81,26 +81,4 @@ export function useFeatureFlag(
   }, [flagName, userId]);
 
   return { enabled, loading, error };
-}
-
-/**
- * Specific hook for checking Daily Buzz images feature
- * @param userId User ID (optional)
- * @returns Object with enabled status, loading state, and error
- *
- * @example
- * ```tsx
- * function BuzzChallengeCard() {
- *   const { enabled: showImages } = useDailyBuzzImages(user?.id);
- *
- *   return (
- *     <div>
- *       {showImages && <img src={challenge.imageUrl} />}
- *     </div>
- *   );
- * }
- * ```
- */
-export function useDailyBuzzImages(userId?: string | null): FeatureFlagResult {
-  return useFeatureFlag('daily_buzz_images', userId);
 }

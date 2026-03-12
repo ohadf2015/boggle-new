@@ -10,8 +10,9 @@ import type { Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
-import { setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
+import { setStoredUsername, getStoredAvatarId, getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { sanitizeRoomName } from '@/utils/consts';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import type { Language, Avatar } from '@/shared/types/game';
@@ -29,23 +30,42 @@ function sanitizeAvatarColor(
   return DEFAULT_AVATAR_COLOR;
 }
 
+function resolveCustomAvatar(
+  profile: { avatar_config?: CustomAvatarConfig | null } | null,
+  isGuest: boolean
+): CustomAvatarConfig | undefined {
+  if (profile?.avatar_config) return profile.avatar_config;
+  if (isGuest) {
+    const stored = getStoredCustomAvatar();
+    if (stored) return stored;
+    const generated = getRandomAvatarConfig();
+    setStoredCustomAvatar(generated);
+    return generated;
+  }
+  return undefined;
+}
+
 function buildAvatar(
-  profile: { avatar_emoji?: string; avatar_color?: string; avatar_image?: string } | null,
+  profile: { avatar_emoji?: string; avatar_color?: string; avatar_image?: string; avatar_config?: CustomAvatarConfig | null } | null,
   fallbackAvatar: { emoji: string; color: string },
-  avatarImageId: string | null
-): { emoji?: string; color: string; avatarImage?: string } {
+  avatarImageId: string | null,
+  isGuest: boolean
+): { emoji?: string; color: string; avatarImage?: string; customAvatar?: CustomAvatarConfig } {
   const effectiveAvatarImage = avatarImageId || profile?.avatar_image;
+  const customAvatar = resolveCustomAvatar(profile, isGuest);
   if (profile) {
     return {
       emoji: profile.avatar_emoji,
       color: sanitizeAvatarColor(profile.avatar_color, effectiveAvatarImage),
       avatarImage: effectiveAvatarImage,
+      customAvatar,
     };
   }
   return {
     ...fallbackAvatar,
     color: sanitizeAvatarColor(fallbackAvatar.color, avatarImageId),
     avatarImage: avatarImageId || undefined,
+    customAvatar,
   };
 }
 
@@ -59,7 +79,7 @@ interface UseMultiplayerJoinOptions {
   t: (path: string, params?: Record<string, string | number>) => string;
   isSupabaseEnabled: boolean;
   user: { id?: string; email?: string; user_metadata?: { full_name?: string; name?: string } } | null;
-  profile: { display_name?: string; avatar_emoji?: string; avatar_color?: string; avatar_image?: string; profile_picture_url?: string | null } | null;
+  profile: { display_name?: string; avatar_emoji?: string; avatar_color?: string; avatar_image?: string; avatar_config?: CustomAvatarConfig | null; profile_picture_url?: string | null } | null;
   loading: boolean;
   authLoadingStartTime: number | null;
   guestAvatar: { emoji: string; color: string } | null;
@@ -163,8 +183,9 @@ export function useMultiplayerJoin({
       }
 
       const avatarImageId = getStoredAvatarId();
+      const isGuest = !user;
       const fallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername);
-      const effectiveAvatar = buildAvatar(profile, fallbackAvatar, avatarImageId);
+      const effectiveAvatar = buildAvatar(profile, fallbackAvatar, avatarImageId, isGuest);
 
       setError('');
       setIsJoining(true);
@@ -203,7 +224,7 @@ export function useMultiplayerJoin({
         const finalHostUsername = user ? effectiveUsername : hostUsername || effectiveUsername;
         const finalRoomName = sanitizeRoomName(overrideRoomName || roomName || `${finalHostUsername} Room`);
         const hostFallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername);
-        const hostAvatar = buildAvatar(profile, hostFallbackAvatar, avatarImageId);
+        const hostAvatar = buildAvatar(profile, hostFallbackAvatar, avatarImageId, isGuest);
 
         socket.emit('createGame', {
           gameCode: codeToUse,

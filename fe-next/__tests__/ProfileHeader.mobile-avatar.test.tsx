@@ -24,6 +24,16 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
+jest.mock('@/components/avatar/AvatarBuilderModal', () => ({
+  __esModule: true,
+  default: ({ isOpen }: any) => isOpen ? <div data-testid="avatar-builder-modal" /> : null,
+}));
+
+jest.mock('@/components/Avatar', () => ({
+  __esModule: true,
+  default: (props: any) => <div data-testid="avatar" {...props} />,
+}));
+
 const mockProfile: ProfileData = {
   id: 'test-user-id',
   username: 'testuser',
@@ -46,7 +56,6 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
     isUploading: false,
     onProfilePictureUpload: jest.fn(),
     onRemoveProfilePicture: jest.fn(),
-    onShowEmojiPicker: jest.fn(),
     updateProfile: jest.fn(),
     refreshProfile: jest.fn(),
   };
@@ -64,10 +73,10 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
       expect(classes).toMatch(/min-h-\[44px\]/);
     });
 
-    it('edit emoji button should have min-w-[44px] min-h-[44px] classes for mobile touch', () => {
+    it('edit avatar button should have min-w-[44px] min-h-[44px] classes for mobile touch', () => {
       render(<ProfileHeader {...mockProps} />);
 
-      const editButton = screen.getByTitle('profile.chooseEmoji');
+      const editButton = screen.getByTitle('profile.chooseAvatar');
       const classes = editButton.className;
 
       expect(classes).toMatch(/min-w-\[44px\]/);
@@ -95,7 +104,7 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
       render(<ProfileHeader {...mockProps} />);
 
       const cameraButton = screen.getByTitle('profile.uploadPhoto');
-      const editButton = screen.getByTitle('profile.chooseEmoji');
+      const editButton = screen.getByTitle('profile.chooseAvatar');
 
       // Buttons should be siblings in a flex container with gap
       const controlsContainer = cameraButton.parentElement;
@@ -148,7 +157,7 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
       render(<ProfileHeader {...mockProps} />);
 
       const cameraButton = screen.getByTitle('profile.uploadPhoto');
-      const editButton = screen.getByTitle('profile.chooseEmoji');
+      const editButton = screen.getByTitle('profile.chooseAvatar');
 
       // Buttons should have aria-label or title for accessibility
       expect(cameraButton).toHaveAttribute('title');

@@ -46,6 +46,7 @@ import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 
 import type { Player, WordToVote, PlayerViewProps } from './types';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // ==========================================
 // Component
@@ -153,6 +154,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     showStartAnimation,
     onUsernameChange,
   });
+
+  // Avatar change handler — emits socket event so other players see the update
+  const handleAvatarChange = useCallback((config: CustomAvatarConfig) => {
+    socket?.emit('updateAvatar', { customAvatar: config });
+  }, [socket]);
 
   // UI state
   const [showQR, setShowQR] = useState<boolean>(false);
@@ -499,6 +505,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           onExitRoom={handleExitRoom}
           onConfirmExit={confirmExitRoom}
           onNameChange={handleNameChange}
+          onAvatarChange={handleAvatarChange}
         />
     );
   }

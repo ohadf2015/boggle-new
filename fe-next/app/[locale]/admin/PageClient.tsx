@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe, AlertTriangle, Database, RefreshCw, BookCheck } from 'lucide-react';
+import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Mail, Globe, AlertTriangle, Database, RefreshCw, BookCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -200,16 +200,6 @@ export default function AdminPageClient() {
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <Database className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-500" />
               <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.wordBank')}</span>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/daily-buzz`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.dailyBuzz')}</span>
             </CardContent>
           </Card>
 

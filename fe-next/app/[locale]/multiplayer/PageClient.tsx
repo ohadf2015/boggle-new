@@ -302,8 +302,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             handleJoin={handleJoin} refreshRooms={refreshRooms}
             activeRooms={activeRooms} roomsLoading={roomsLoading}
             isJoining={isJoining} isAuthenticated={isAuthenticated} autoCreate={autoCreate}
-            displayName={profile?.display_name ?? ''} profileAvatarId={profile?.avatar_image}
-            profilePictureUrl={profile?.profile_picture_url}
+            displayName={profile?.display_name ?? ''} profileAvatar={profile?.avatar_config}
             prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}
             setGameCode={setGameCode} setUsername={setUsername}
             setRoomName={setRoomName} setHostUsername={setHostUsername}

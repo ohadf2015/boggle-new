@@ -110,7 +110,6 @@ describe('QuestCard', () => {
     renderWithProviders(
       <QuestCard
         {...defaultProps}
-        challengeId="buzz"
         status="unavailable"
         onRequestChallenge={onRequest}
         requestState="idle"
@@ -138,7 +137,7 @@ describe('QuestCard', () => {
 
   test('renders badge when provided', () => {
     renderWithProviders(
-      <QuestCard {...defaultProps} challengeId="buzz" color="yellow" badge="NEW" />
+      <QuestCard {...defaultProps} color="yellow" badge="NEW" />
     );
 
     expect(screen.getByText('NEW')).toBeInTheDocument();

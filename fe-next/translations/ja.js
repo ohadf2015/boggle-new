@@ -1107,6 +1107,7 @@ const ja = {
     "readyUp": "準備OK!",
     "readyConfirmed": "準備完了!",
     "editName": "名前を変更",
+    "editAvatar": "アバターを変更",
     "hostDisconnected": "ホストが切断されました。再接続を待っています...",
     "isNowHost": "が新しいホストになりました",
     "disconnected": "が切断されました。再接続を待っています...",
@@ -3074,7 +3075,10 @@ const ja = {
     "wordSolver": "ワードソルバー",
     "howToPlay": "遊び方",
     "guides": "ガイド",
-    "glossary": "用語集"
+    "glossary": "用語集",
+    "explore": "探索",
+    "resources": "リソース",
+    "connect": "つながる"
   },
   "support": {
     "kofiFooter": "コーヒーをおごる",
@@ -3132,6 +3136,24 @@ const ja = {
     "shareTextAuth": "LexiClashで一緒に遊ぼう！私の招待コードを使ってね: {code}",
     "shareTextGuest": "LexiClashをプレイしよう - 最高のマルチプレイヤー単語ゲーム！",
     "shareNativeTitle": "LexiClashに参加",
+    "playNowFree": "今すぐプレイ — 無料！",
+    "gameModes": "ゲームモード",
+    "languages": "言語",
+    "activePlayers": "アクティブプレイヤー",
+    "todaysTopPlayers": "トッププレイヤー",
+    "viewFullLeaderboard": "全ランキングを見る",
+    "readyToCompete": "競争する準備はできた？",
+    "startPlaying": "プレイ開始",
+    "createAvatar": "アバターを作成",
+    "designYourLook": "ユニークな外見をデザイン",
+    "yourRank": "あなたのランク",
+    "totalScore": "合計スコア",
+    "solvedPercent": "今日は{percent}%だけが解決",
+    "todaysTopWords": "今日のトップワード",
+    "hallOfFame": "殿堂入り",
+    "gamesToday": "今日のゲーム数",
+    "wordHuntMode": "ワードハント",
+    "wordHuntModeDesc": "できるだけ早くターゲットワードを見つけよう — 毎日新しいパズル！",
     "seo": {
       "whatIsTitle": "LexiClashとは？",
       "whatIsContent": "LexiClashは、ブラウザで直接プレイできる無料の高速マルチプレイヤーワードゲームです。共有された文字グリッド上でリアルタイムのワードバトルで友達と競い合いましょう。単語を見つけ、コンボを構築し、リーダーボードを上りましょう。BoggleとWordleが合体したようなマルチプレイヤーゲームです。ダウンロード不要、登録不要。英語、ヘブライ語、スウェーデン語、日本語、スペイン語で利用可能。",
@@ -3633,137 +3655,9 @@ const ja = {
       "multiplayerTitle": "🎮 もっとプレイ？",
       "multiplayerDesc": "友達に挑戦するか、リアルタイムでボットと戦おう！",
       "multiplayerCTA": "マルチプレイヤーをプレイ"
-    }
-  },
-  "buzz": {
-    "title": "デイリーバズ",
-    "tagline": "今日のトレンドがワードパズルに",
-    "subtitle": "今日のバズは？",
-    "details": "まったり、タイマーなし。あなた対今日のバズ！",
-    "badge": "NEW",
-    "breaking": "速報",
-    "tapToCelebrate": "タップしてお祝い",
-    "challenges": "チャレンジ",
-    "letters": "文字",
-    "noTimeLimit": "タイマーなし",
-    "maxScore": "最高スコア",
-    "searches": "検索",
-    "preview": {
-      "title": "今日のトピック",
-      "subtitle": "チャレンジ内容...",
-      "play": "バズスタート"
     },
-    "viewResults": "結果を見る",
-    "helpText": "今日のトレンドで言葉パズル。時間制限なし！",
-    "loading": "チャレンジ読み込み中...",
-    "error": {
-      "title": "エラー！",
-      "description": "チャレンジの読み込み中に問題が発生しました。",
-      "helpText": "接続を確認してもう一度お試しください。",
-      "loading": "チャレンジを読み込み中...",
-      "failed": "チャレンジの読み込みに失敗",
-      "noInternet": "インターネット接続がありません",
-      "noOptions": "選択肢がありません"
-    },
-    "topicIs": "今日のトピック",
-    "yourAnswer": "あなたの答え",
-    "typeYourAnswer": "答えを入力...",
-    "yourScore": "あなたのスコア",
-    "noChallenge": "利用可能なチャレンジがありません",
-    "total": "合計",
-    "challengeTrend": "今日のパズルに登場",
-    "finish": "完了",
-    "quitConfirmTitle": "デイリーバズを終了？",
-    "quitConfirm": "本当に終了しますか？",
-    "fillTheBlank": "空欄を埋める",
-    "connectingWord": "つなぐ単語",
-    "trio": {
-      "hint": "この3つの単語をつなぐものを見つけよう"
-    },
-    "scrambled": {
-      "unscramble": "文字を並べ替えよう！"
-    },
-    "chain": {
-      "instruction": "つなぐ言葉を見つけよう！",
-      "compoundHint": "両隣と複合語を作る言葉",
-      "exampleHint": "例: 太陽→花→鉢（ひまわり + 花鉢）",
-      "thinkCompound": "複合語を考えてみて！"
-    },
-    "type": {
-      "scrambled": "バラバラ",
-      "fillBlank": "穴埋め",
-      "chain": "チェーン",
-      "spotOn": "ピタリ",
-      "trio": "トリオ",
-      "wordle": "ワードル",
-      "definition_match": "定義",
-      "anagram": "アナグラム",
-      "riddle": "なぞなぞ",
-      "fill_blank": "空欄"
-    },
-    "wordle": {
-      "instruction": "5文字の単語を当てよう",
-      "attemptsLeft": "回残り",
-      "solved": "正解！",
-      "failed": "残念、チャンスなし",
-      "useDeviceKeyboard": "タップして入力"
-    },
-    "challenge": "{number}/{total}",
-    "correct": "できた!",
-    "hint": "ヒント?",
-    "skip": "スキップ",
-    "back": "戻る",
-    "swipeToNavigate": "スワイプでナビゲート",
-    "submit": "送信",
-    "prevChallenge": "前のチャレンジ",
-    "nextChallenge": "次のチャレンジ",
-    "results": {
-      "title": "クリア！",
-      "perfect": "完璧！💯",
-      "trending": "今日のトレンド:",
-      "share": "スコアをシェア",
-      "reviewTitle": "チャレンジレビュー",
-      "yourAnswer": "あなたの回答:",
-      "correctAnswer": "正解:",
-      "skipped": "スキップ"
-    },
-    "feedback": {
-      "correct": "正解！",
-      "incorrect": "不正解",
-      "answerWas": "正解は:",
-      "nice": "ナイス!",
-      "streak": "{count}連続!",
-      "onFire": "絶好調!",
-      "perfect": "パーフェクト!",
-      "allCorrect": "5問全問正解 - すごい!"
-    },
-    "fillBlank": {
-      "firstLetterHint": "最初の文字がヒントとして表示されます",
-      "hintLetter": "ヒント",
-      "validAlternatives": "複数の正解が受け入れられます"
-    },
-    "share": {
-      "text": "デイリーバズ: {topic} | {score}/100 | 挑戦する？🔥"
-    },
-    "alreadyPlayed": "今日はもうプレイしました！明日また来てください。",
-    "challengeCompleted": "チャレンジ完了",
-    "lockedYourAnswer": "あなたの回答",
-    "lockedCorrectAnswer": "正解",
-    "notAvailable": "利用不可",
-    "unavailableTagline": "この言語ではまだ利用できません",
     "requestChallenge": "チャレンジをリクエスト",
-    "requestSent": "リクエスト送信済み！",
-    "skipToAnswers": "答えにスキップ",
-    "skipConfirmTitle": "チャレンジをスキップしますか？",
-    "skipConfirmMessage": "プレイせずに答えを見ます。スコアは0になります。",
-    "skipConfirm": "答えにスキップ",
-    "history": {
-      "title": "過去のチャレンジ",
-      "browse": "過去のDaily Buzzを見る",
-      "available": "チャレンジあり",
-      "empty": "まだ過去のチャレンジはありません",
-      "selectDate": "日付を選んでプレイ"
-    }
+    "requestSent": "リクエスト送信済み"
   },
   "wordHunt": {
     "title": "ワードハント",
@@ -4661,7 +4555,6 @@ const ja = {
       "dailyChallenge": "デイリーチャレンジ",
       "wikipediaWords": "Wikipedia単語",
       "wordBank": "単語バンク",
-      "dailyBuzz": "デイリーバズ",
       "webVitals": "Webパフォーマンス",
       "email": "メール",
       "milogWords": "Milog辞書"
@@ -7382,6 +7275,22 @@ const ja = {
       "ads": "Google AdSenseと提携して関連性のある広告を表示しています。広告はゲームを無料で提供し続けるために役立っています。広告のパーソナライズやオプトアウトについてはプライバシーポリシーをご覧ください。",
       "optOut": "一部のデータ収集はゲームの機能に必要です（ユーザー名やスコアなど）が、設定 > プライバシーで分析とパーソナライズ広告をオプトアウトできます。"
     }
+  },
+  avatarBuilder: {
+    title: "アバタービルダー",
+    base: "形",
+    hair: "髪",
+    eyes: "目",
+    mouth: "口",
+    accessories: "アクセサリー",
+    skinColor: "肌の色",
+    hairColor: "髪の色",
+    accessoryColor: "色",
+    randomize: "ランダム",
+    save: "保存",
+    cancel: "キャンセル",
+    buildCustom: "自分だけのアバター",
+    bgColor: "背景"
   }
 };
 

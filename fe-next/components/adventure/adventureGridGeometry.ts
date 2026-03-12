@@ -7,6 +7,7 @@
  */
 
 import type { GridTileState } from '@/types/adventure';
+import { getDeadzoneThreshold } from '@/utils/consts';
 
 // ==============================================
 // CONSTANTS
@@ -25,11 +26,10 @@ export const CELL_SELECTION_THRESHOLD = 0.65;
 export const DIAGONAL_SELECTION_THRESHOLD = 0.75;
 
 /**
- * Deadzone threshold in pixels.
- * Movement must exceed this distance before selection begins.
- * Prevents accidental selections from finger jitter.
+ * Deadzone threshold - delegates to adaptive getDeadzoneThreshold()
+ * from utils/consts which adjusts based on device screen size.
+ * Previously hardcoded to 12px.
  */
-export const DEADZONE_THRESHOLD = 12;
 
 // ==============================================
 // TYPES
@@ -183,8 +183,8 @@ export function isWithinSelectionThreshold(
   const threshold = isDiagonal ? DIAGONAL_SELECTION_THRESHOLD : CELL_SELECTION_THRESHOLD;
   const selectionThreshold = cellPosition.cellRadius * threshold;
 
-  // Fast swipes get minimal lenient threshold (5% bonus max, reduced from 10%)
-  const velocityBonus = swipeVelocity > 0.5 ? 0.05 : 0;
+  // Fast swipes get more lenient threshold (matching regular mode)
+  const velocityBonus = swipeVelocity > 0.3 ? 0.1 : 0;
 
   return cellPosition.distanceFromCenter <= selectionThreshold * (1 + velocityBonus);
 }
@@ -225,5 +225,5 @@ export function hasExceededDeadzone(
   const deltaX = currentX - startX;
   const deltaY = currentY - startY;
   const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-  return totalMovement > DEADZONE_THRESHOLD;
+  return totalMovement > getDeadzoneThreshold();
 }

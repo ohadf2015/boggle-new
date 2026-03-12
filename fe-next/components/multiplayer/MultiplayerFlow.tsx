@@ -8,13 +8,11 @@ import type { Language, ActiveRoom } from '@/shared/types/game';
 import toast from 'react-hot-toast';
 import {
   getStoredUsername,
-  getStoredAvatarId,
   hasCompleteStoredProfile,
 } from '@/utils/profileStorage';
 import { getJoinUrl } from '@/utils/share';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
-import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
-import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
 
@@ -41,9 +39,8 @@ interface MultiplayerFlowProps {
   // Auto-create room on mount (e.g., from Word Hunt banner)
   autoCreate?: boolean;
 
-  // Profile avatar info for authenticated users
-  profileAvatarId?: string;
-  profilePictureUrl?: string | null;
+  // Profile avatar for authenticated users
+  profileAvatar?: CustomAvatarConfig | null;
 
   // Form state setters (for compatibility)
   setGameCode: (code: string) => void;
@@ -67,8 +64,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   prefilledRoom,
   autoCreate,
   defaultLanguage,
-  profileAvatarId,
-  profilePictureUrl,
+  profileAvatar,
   setGameCode,
   setUsername,
   setRoomName,
@@ -99,24 +95,18 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // Check if user has a complete profile for auto-join
   const hasProfile = useCallback(() => {
     if (isAuthenticated) {
-      return !!(displayName && profileAvatarId);
+      return !!displayName;
     }
     return hasCompleteStoredProfile();
-  }, [isAuthenticated, displayName, profileAvatarId]);
+  }, [isAuthenticated, displayName]);
 
   // Get user profile data for auto-join
   const getProfileData = useCallback(() => {
     if (isAuthenticated && displayName) {
-      return {
-        username: displayName,
-        avatarId: profileAvatarId || PROFILE_AVATAR_ID,
-      };
+      return { username: displayName };
     }
-    return {
-      username: getStoredUsername() || '',
-      avatarId: getStoredAvatarId() || '',
-    };
-  }, [isAuthenticated, displayName, profileAvatarId]);
+    return { username: getStoredUsername() || '' };
+  }, [isAuthenticated, displayName]);
 
   // Handle auto-join for invitation links
   const handleInvitationAutoJoin = useCallback(
@@ -180,16 +170,13 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // Handle join from modal
   const handleJoinFromModal = useCallback(
-    (username: string, avatarId: string) => {
+    (username: string) => {
       if (!selectedRoom) return;
 
       setGameCode(selectedRoom.gameCode);
       setUsername(username);
 
-      // Store avatar so handleJoin can pick it up via getStoredAvatarId()
-      // (JoinRoomModal already calls setStoredAvatarId, but ensure consistency)
-
-      // Pass username as override to avoid stale closure in handleJoin
+      // Custom avatar is already stored in localStorage by JoinRoomModal
       handleJoin(false, null, selectedRoom.gameCode, undefined, username);
     },
     [selectedRoom, handleJoin, setGameCode, setUsername]
@@ -209,7 +196,6 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   const handleCreateFromModal = useCallback(
     (config: {
       hostUsername: string;
-      avatarId: string;
       roomName: string;
       language: Language;
     }) => {
@@ -286,8 +272,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         onJoin={handleJoinFromModal}
         isAuthenticated={isAuthenticated}
         displayName={displayName || null}
-        profilePictureUrl={profilePictureUrl}
-        profileAvatarId={profileAvatarId}
+        profileAvatar={profileAvatar}
       />
 
       {/* Create Room Modal */}
@@ -299,8 +284,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         defaultLanguage={defaultLanguage}
         isAuthenticated={isAuthenticated}
         displayName={displayName || null}
-        profilePictureUrl={profilePictureUrl}
-        profileAvatarId={profileAvatarId}
+        profileAvatar={profileAvatar}
       />
     </>
   );

@@ -114,7 +114,7 @@ export function createInitialState(
   };
 }
 
-function calculateStars(objectives: LevelObjective[]): 0 | 1 | 2 | 3 {
+export function calculateStars(objectives: LevelObjective[]): 0 | 1 | 2 | 3 {
   const primaryObjectives = objectives.filter((o) => o.isPrimary);
   const secondaryObjectives = objectives.filter((o) => !o.isPrimary);
 
@@ -127,7 +127,18 @@ function calculateStars(objectives: LevelObjective[]): 0 | 1 | 2 | 3 {
     (o) => (o.current ?? 0) >= o.target
   ).length;
 
-  if (secondaryCompleted === secondaryObjectives.length) {
+  const totalSecondaries = secondaryObjectives.length;
+
+  if (totalSecondaries === 0) {
+    return 3;
+  }
+
+  // For 1-2 secondaries, all must be completed for 3 stars.
+  // For 3+ secondaries, at least 2 must be completed for 3 stars.
+  const thresholdForThreeStars =
+    totalSecondaries <= 2 ? totalSecondaries : Math.max(2, totalSecondaries - 1);
+
+  if (secondaryCompleted >= thresholdForThreeStars) {
     return 3;
   } else if (secondaryCompleted > 0) {
     return 2;

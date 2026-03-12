@@ -13,6 +13,7 @@ export interface CompactPlayer {
   isCurrentUser?: boolean;
   profilePictureUrl?: string | null;
   avatarImage?: string;
+  customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   avatarEmoji?: string;
   avatarColor?: string;
   previousRank?: number;
@@ -277,7 +278,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
               <div
                 key={player.username}
                 className={cn(
-                  'relative flex items-center gap-1.5 h-8 rounded-neo overflow-hidden transition-all duration-200',
+                  'relative flex items-center gap-1.5 h-10 rounded-neo overflow-hidden transition-all duration-200',
                   isMe
                     ? 'bg-neo-cyan/30 border-2 border-neo-cyan'
                     : 'bg-neo-black/5 border border-neo-black/20'
@@ -313,11 +314,12 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                       </span>
                     )}
 
-                    {/* Avatar - smaller for race view */}
+                    {/* Avatar */}
                     <Avatar
                       profilePictureUrl={player.profilePictureUrl ?? undefined}
                       avatarImage={player.avatarImage}
-                      size="sm"
+                      customAvatar={player.customAvatar}
+                      size="md"
                     />
 
                     {/* Score */}

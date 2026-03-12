@@ -24,25 +24,11 @@ jest.mock('../../Header', () => ({
 // Mock DailyChallengeLanding
 jest.mock('../DailyChallengeLanding', () => ({
   __esModule: true,
-  DailyChallengeLanding: ({ onSelectWordHunt, onSelectBuzz }: {
+  DailyChallengeLanding: ({ onSelectWordHunt }: {
     onSelectWordHunt: () => void;
-    onSelectBuzz: () => void;
   }) => (
     <div>
       <button data-testid="select-word-hunt" onClick={onSelectWordHunt}>Word Hunt</button>
-      <button data-testid="select-buzz" onClick={onSelectBuzz}>Buzz</button>
-    </div>
-  ),
-}));
-
-// Mock BuzzHistoryList
-jest.mock('../../buzz/BuzzHistoryList', () => ({
-  __esModule: true,
-  default: ({ onSelectDate }: { onSelectDate: (date: string) => void }) => (
-    <div>
-      <button data-testid="select-past-buzz" onClick={() => onSelectDate('2024-01-15')}>
-        Past Buzz
-      </button>
     </div>
   ),
 }));
@@ -121,43 +107,6 @@ describe('DailyChallengeRouter - Language Routing', () => {
       fireEvent.click(wordHuntButton);
 
       expect(mockPush).toHaveBeenCalledWith('/he/daily/word-hunt');
-    });
-  });
-
-  describe('Daily Buzz navigation', () => {
-    it('should navigate to Buzz with Swedish locale prefix', () => {
-      renderWithLanguage('sv');
-
-      const buzzButton = screen.getByTestId('select-buzz');
-      fireEvent.click(buzzButton);
-
-      expect(mockPush).toHaveBeenCalledWith('/sv/daily/buzz');
-    });
-
-    it('should navigate to Buzz with Japanese locale prefix', () => {
-      renderWithLanguage('ja');
-
-      const buzzButton = screen.getByTestId('select-buzz');
-      fireEvent.click(buzzButton);
-
-      expect(mockPush).toHaveBeenCalledWith('/ja/daily/buzz');
-    });
-  });
-
-  describe('Past Buzz navigation', () => {
-    it('should navigate to past Buzz with locale prefix and date param', () => {
-      // Directly test the handler logic by simulating what happens
-      // when a date is selected from the history list
-      renderWithLanguage('sv');
-
-      // The component uses onShowBuzzHistory callback which shows BuzzHistoryList
-      // Then BuzzHistoryList calls onSelectDate which triggers navigation
-      // We can't easily test the full modal flow due to AnimatePresence,
-      // but we verified the handler includes locale in handleSelectPastBuzz
-
-      // Verify the navigation call format by checking other tests passed
-      // This test validates the implementation logic is correct
-      expect(mockPush).toHaveBeenCalledTimes(0); // No navigation yet
     });
   });
 

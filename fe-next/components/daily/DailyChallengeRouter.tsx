@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { AnimatePresence } from 'framer-motion';
 import { DailyChallengeLanding } from './DailyChallengeLanding';
-import BuzzHistoryList from '../buzz/BuzzHistoryList';
 import Header from '../Header';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,12 +14,11 @@ type RouterState = 'loading' | 'landing' | 'redirecting';
 /**
  * DailyChallengeRouter - Smart landing page for daily challenges.
  * Auto-redirects to word hunt if user hasn't played today;
- * shows landing with results + Buzz if already played.
+ * shows landing with results if already played.
  */
 export default function DailyChallengeRouter() {
   const { language, t } = useLanguage();
   const router = useRouter();
-  const [showBuzzHistory, setShowBuzzHistory] = useState(false);
   const [routerState, setRouterState] = useState<RouterState>('loading');
 
   useEffect(() => {
@@ -48,40 +45,14 @@ export default function DailyChallengeRouter() {
     router.push(`/${language}/daily/word-hunt`);
   };
 
-  const handleSelectBuzz = () => {
-    router.push(`/${language}/daily/buzz`);
-  };
-
-  const handleShowBuzzHistory = () => {
-    setShowBuzzHistory(true);
-  };
-
-  const handleSelectPastBuzz = (date: string) => {
-    setShowBuzzHistory(false);
-    router.push(`/${language}/daily/buzz?date=${date}`);
-  };
-
   return (
     <div className="flex-1 flex flex-col bg-neo-navy">
       <Header />
 
       <DailyChallengeLanding
         onSelectWordHunt={handleSelectWordHunt}
-        onSelectBuzz={handleSelectBuzz}
-        onShowBuzzHistory={handleShowBuzzHistory}
         currentLanguage={language as Language}
       />
-
-      {/* Buzz History Modal */}
-      <AnimatePresence>
-        {showBuzzHistory && (
-          <BuzzHistoryList
-            language={language as Language}
-            onSelectDate={handleSelectPastBuzz}
-            onClose={() => setShowBuzzHistory(false)}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

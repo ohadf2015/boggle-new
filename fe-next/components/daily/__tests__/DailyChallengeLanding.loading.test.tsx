@@ -88,15 +88,6 @@ describe('DailyChallengeLanding Loading State', () => {
           json: () => Promise.resolve({ data: { played: false } }),
         }), 100));
       }
-      if (url.includes('/api/buzz/')) {
-        return new Promise(resolve => setTimeout(() => resolve({
-          ok: true,
-          json: () => Promise.resolve({
-            success: true,
-            data: { imageUrl: 'https://example.com/image.jpg', trendingSummary: 'Test' },
-          }),
-        }), 100));
-      }
       if (url.includes('daily-streak')) {
         return Promise.resolve({
           ok: true,
@@ -116,7 +107,6 @@ describe('DailyChallengeLanding Loading State', () => {
   test('cards should render immediately without waiting for API calls', () => {
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -127,9 +117,6 @@ describe('DailyChallengeLanding Loading State', () => {
     const wordHuntElements = screen.getAllByText(/word hunt/i);
     expect(wordHuntElements.length).toBeGreaterThan(0);
 
-    const buzzElements = screen.getAllByText(/buzz/i);
-    expect(buzzElements.length).toBeGreaterThan(0);
-
     // Play buttons should be visible immediately (not showing "Loading...")
     const playButtons = screen.getAllByText(/start quest/i);
     expect(playButtons.length).toBeGreaterThan(0);
@@ -138,7 +125,6 @@ describe('DailyChallengeLanding Loading State', () => {
   test('cards should NOT have reduced opacity while status is loading', () => {
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -154,7 +140,6 @@ describe('DailyChallengeLanding Loading State', () => {
   test('status badge should show loading indicator while checking status', () => {
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -173,7 +158,6 @@ describe('DailyChallengeLanding Loading State', () => {
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -192,7 +176,6 @@ describe('DailyChallengeLanding Loading State', () => {
   test('card title and tagline should be visible immediately', () => {
     const mockProps = {
       onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -202,11 +185,8 @@ describe('DailyChallengeLanding Loading State', () => {
     const wordHuntElements = screen.getAllByText(/word hunt/i);
     expect(wordHuntElements.length).toBeGreaterThan(0);
 
-    // Time mode badges should be visible (uses translation keys)
+    // Time mode badge should be visible (Word Hunt is a timed quest)
     const timedElements = screen.getAllByText(/timed quest/i);
     expect(timedElements.length).toBeGreaterThan(0);
-
-    const untimedElements = screen.getAllByText(/untimed quest/i);
-    expect(untimedElements.length).toBeGreaterThan(0);
   });
 });

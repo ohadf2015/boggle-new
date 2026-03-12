@@ -14,29 +14,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AvatarSelector } from '@/components/multiplayer/AvatarSelector';
-import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import {
   getStoredUsername,
-  getStoredAvatarId,
+  getStoredCustomAvatar,
   setStoredUsername,
-  setStoredAvatarId,
+  setStoredCustomAvatar,
 } from '@/utils/profileStorage';
-import { getRandomAvatar } from '@/utils/avatarConfig';
 import { cn } from '@/lib/utils';
 import type { ActiveRoom } from '@/shared/types/game';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface JoinRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
   room: ActiveRoom | null;
   isJoining: boolean;
-  onJoin: (username: string, avatarId: string) => void;
+  onJoin: (username: string) => void;
   isAuthenticated: boolean;
   displayName: string | null;
-  profilePictureUrl?: string | null;
-  profileAvatarId?: string;
+  profileAvatar?: CustomAvatarConfig | null;
 }
 
 const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
@@ -47,58 +45,44 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   onJoin,
   isAuthenticated,
   displayName,
-  profilePictureUrl,
-  profileAvatarId,
+  profileAvatar,
 }) => {
   const { t } = useLanguage();
 
   const [username, setUsername] = useState<string>('');
-  const [avatarId, setAvatarId] = useState<string>('');
+  const [customAvatar, setCustomAvatar] = useState<CustomAvatarConfig | null>(null);
   const [isEditingName, setIsEditingName] = useState(false);
 
-  // Initialize state when modal opens - only runs when modal opens, not on state changes
+  // Initialize state when modal opens
   useEffect(() => {
     if (!isOpen) return;
 
     if (isAuthenticated && displayName) {
       setUsername(displayName);
-      setAvatarId(profileAvatarId || PROFILE_AVATAR_ID);
+      setCustomAvatar(profileAvatar ?? getRandomAvatarConfig());
     } else {
       const storedUsername = getStoredUsername();
-      const storedAvatarId = getStoredAvatarId();
+      const storedAvatar = getStoredCustomAvatar();
 
-      if (storedUsername) {
-        setUsername(storedUsername);
-      } else {
-        const randomAvatar = getRandomAvatar();
-        setUsername(randomAvatar.name);
-        setAvatarId(randomAvatar.id);
-      }
-
-      if (storedAvatarId) {
-        setAvatarId(storedAvatarId);
-      } else {
-        const randomAvatar = getRandomAvatar();
-        setAvatarId(randomAvatar.id);
-      }
+      setUsername(storedUsername || '');
+      setCustomAvatar(storedAvatar ?? getRandomAvatarConfig());
     }
-  }, [isOpen, isAuthenticated, displayName, profileAvatarId]);
+  }, [isOpen, isAuthenticated, displayName, profileAvatar]);
 
   const handleJoin = useCallback(() => {
-    if (!username.trim() || !avatarId) return;
+    if (!username.trim() || !customAvatar) return;
 
-    // Always store avatar selection (even for authenticated users) so it's available when joining
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
     }
-    setStoredAvatarId(avatarId);
+    setStoredCustomAvatar(customAvatar);
 
-    onJoin(username.trim(), avatarId);
-  }, [username, avatarId, isAuthenticated, onJoin]);
+    onJoin(username.trim());
+  }, [username, customAvatar, isAuthenticated, onJoin]);
 
   if (!room) return null;
 
-  const isValid = username.trim().length >= 2 && avatarId;
+  const isValid = username.trim().length >= 2 && customAvatar;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -124,9 +108,8 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
           {/* Avatar Selector */}
           <AvatarSelector
-            selectedAvatarId={avatarId}
-            onAvatarChange={setAvatarId}
-            profilePictureUrl={profilePictureUrl}
+            selectedAvatar={customAvatar}
+            onAvatarChange={setCustomAvatar}
           />
 
           {/* Username Input */}

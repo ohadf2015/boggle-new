@@ -115,23 +115,20 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('DailyChallengeLanding - Quest Card Layout', () => {
   const mockProps = {
     onSelectWordHunt: jest.fn(),
-    onSelectBuzz: jest.fn(),
     currentLanguage: 'en' as const,
   };
 
-  it('should render both quest cards in vertical layout', () => {
+  it('should render word hunt quest card', () => {
     render(
       <Wrapper>
         <DailyChallengeLanding {...mockProps} />
       </Wrapper>
     );
 
-    // Both quest cards should exist
     expect(screen.getByTestId('quest-card-wordHunt')).toBeInTheDocument();
-    expect(screen.getByTestId('quest-card-buzz')).toBeInTheDocument();
   });
 
-  it('should NOT have fixed min-height on quest cards', () => {
+  it('should NOT have fixed min-height on quest card', () => {
     render(
       <Wrapper>
         <DailyChallengeLanding {...mockProps} />
@@ -139,31 +136,8 @@ describe('DailyChallengeLanding - Quest Card Layout', () => {
     );
 
     const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
-    const buzzCard = screen.getByTestId('quest-card-buzz');
 
     // Cards should not have fixed min-height
     expect(wordHuntCard.className).not.toMatch(/\bmin-h-\[420px\]/);
-    expect(buzzCard.className).not.toMatch(/\bmin-h-\[420px\]/);
-  });
-
-  it('should use vertical stack layout for quest cards (not grid)', () => {
-    render(
-      <Wrapper>
-        <DailyChallengeLanding {...mockProps} />
-      </Wrapper>
-    );
-
-    // Both quest cards should be rendered vertically, not in a side-by-side grid
-    const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
-    const buzzCard = screen.getByTestId('quest-card-buzz');
-
-    // Cards should NOT share a parent with grid-cols-2
-    const wordHuntParent = wordHuntCard.parentElement;
-    const buzzParent = buzzCard.parentElement;
-
-    // If both share the same parent, that parent shouldn't have grid-cols-2
-    if (wordHuntParent === buzzParent && wordHuntParent) {
-      expect(wordHuntParent.className).not.toContain('grid-cols-2');
-    }
   });
 });

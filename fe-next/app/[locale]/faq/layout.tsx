@@ -64,7 +64,7 @@ function buildFAQSchemas(localePath: string): string {
         name: 'What game modes are available?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'LexiClash offers multiplayer (2-20+ players), single player vs AI bots, daily challenges (Word Hunt Survival and Daily Buzz), blast mode, and adventure mode with boss battles.',
+          text: 'LexiClash offers multiplayer (2-20+ players), single player vs AI bots, daily challenges (Word Hunt Survival), blast mode, and adventure mode with boss battles.',
         },
       },
       {
@@ -72,7 +72,7 @@ function buildFAQSchemas(localePath: string): string {
         name: 'What is the Daily Challenge?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Two daily challenges: Word Hunt Survival is a Wordle-style puzzle with 10 attempts to find a hidden word (same board worldwide, shareable emoji results). Daily Buzz is an AI-generated puzzle based on trending topics.',
+          text: 'Word Hunt Survival is a Wordle-style daily puzzle with 10 attempts to find a hidden word. Same board worldwide, shareable emoji results.',
         },
       },
       {

@@ -12,7 +12,7 @@
  * - Diagonal vs adjacent selection thresholds
  */
 
-import { useCallback, useRef, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, type RefObject } from 'react';
 import type { GridTileState } from '@/types/adventure';
 import {
   type GridMeasurements,
@@ -23,6 +23,8 @@ import {
   isDiagonalMove,
   hasExceededDeadzone,
 } from './adventureGridGeometry';
+import { vibrateCellTap, vibrateCellDrag } from '@/components/grid/hapticFeedback';
+import { createVelocityTracker } from '@/components/grid/velocityTracker';
 
 // ==============================================
 // TYPES
@@ -97,6 +99,9 @@ export function useGridGestures({
   // Cache grid measurements to avoid layout thrashing
   const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
 
+  // Velocity tracker for adaptive selection threshold
+  const velocityTrackerRef = useRef(createVelocityTracker());
+
   // Get cached or fresh grid measurements
   const getGridMeasurements = useCallback((): GridMeasurements | null => {
     if (!gridRef.current) return null;
@@ -137,9 +142,12 @@ export function useGridGestures({
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
       startPosRef.current = { x: clientX, y: clientY };
+      velocityTrackerRef.current.start(clientX, clientY);
 
       // Cache grid measurements at start of drag
       getGridMeasurements();
+
+      vibrateCellTap(false);
 
       if (onDragStart) {
         onDragStart(index, tile);
@@ -153,6 +161,7 @@ export function useGridGestures({
     (index: number, tile: GridTileState) => {
       if (disabled || tile.isCleared || !interactive) return;
       if (isDraggingRef.current && onDragEnter) {
+        vibrateCellDrag(false);
         onDragEnter(index, tile);
       }
     },
@@ -166,6 +175,7 @@ export function useGridGestures({
       lastTouchTileIndexRef.current = null;
       hasExceededDeadzoneRef.current = false;
       startPosRef.current = null;
+      velocityTrackerRef.current.reset();
       if (onDragEnd) {
         onDragEnd();
       }
@@ -216,6 +226,10 @@ export function useGridGestures({
         return;
       }
 
+      // Track velocity
+      velocityTrackerRef.current.recordPosition(touchX, touchY);
+      const velocity = velocityTrackerRef.current.getVelocity();
+
       // Use precise cell detection with selection threshold
       const cellPosition = getCellAtPosition(touchX, touchY, tiles, gridSize, measurements);
       if (!cellPosition) return;
@@ -234,8 +248,8 @@ export function useGridGestures({
         ? isDiagonalMove(lastTile, { row: cellPosition.row, col: cellPosition.col })
         : false;
 
-      // Apply selection threshold - must be close to cell center
-      if (!isWithinSelectionThreshold(cellPosition, isDiagonal)) {
+      // Apply selection threshold with velocity awareness
+      if (!isWithinSelectionThreshold(cellPosition, isDiagonal, velocity)) {
         return; // Touch too far from cell center, don't select
       }
 
@@ -244,7 +258,8 @@ export function useGridGestures({
       const tile = tiles[newTileIndex];
       if (!tile || tile.isCleared) return;
 
-      // Trigger drag enter
+      // Trigger drag enter with haptic feedback
+      vibrateCellDrag(false);
       if (onDragEnter) {
         onDragEnter(newTileIndex, tile);
       }
@@ -256,6 +271,102 @@ export function useGridGestures({
   const handleMouseUp = useCallback(() => {
     handleDragEnd();
   }, [handleDragEnd]);
+
+  // Global mouseup/touchend listeners to catch releases outside the grid
+  useEffect(() => {
+    const handleGlobalEnd = () => handleDragEnd();
+    window.addEventListener('mouseup', handleGlobalEnd);
+    window.addEventListener('touchend', handleGlobalEnd);
+    return () => {
+      window.removeEventListener('mouseup', handleGlobalEnd);
+      window.removeEventListener('touchend', handleGlobalEnd);
+    };
+  }, [handleDragEnd]);
+
+  // Register native non-passive touchmove listener for preventDefault during drag
+  useEffect(() => {
+    const element = gridRef.current;
+    if (!element) return;
+
+    const nativeTouchMoveHandler = (e: TouchEvent) => {
+      if (!isDraggingRef.current || disabled || !interactive) return;
+      e.preventDefault();
+
+      const touch = e.touches[0];
+      if (!touch) return;
+
+      const touchX = touch.clientX;
+      const touchY = touch.clientY;
+
+      // Check deadzone
+      if (!hasExceededDeadzoneRef.current && startPosRef.current) {
+        if (!hasExceededDeadzone(startPosRef.current.x, startPosRef.current.y, touchX, touchY)) {
+          return;
+        }
+        hasExceededDeadzoneRef.current = true;
+      }
+
+      // Get grid measurements for precise cell detection
+      const measurements = getGridMeasurements();
+      if (!measurements) {
+        // Fallback to element-based detection
+        const elementUnderTouch = document.elementFromPoint(touchX, touchY);
+        if (!elementUnderTouch) return;
+
+        const tileElement = elementUnderTouch.closest('[role="gridcell"]');
+        if (!tileElement) return;
+
+        const allTiles = gridRef.current?.querySelectorAll('[role="gridcell"]');
+        if (!allTiles) return;
+
+        const tileIndex = Array.from(allTiles).indexOf(tileElement);
+        if (tileIndex === -1 || tileIndex === lastTouchTileIndexRef.current) return;
+
+        const tile = tiles[tileIndex];
+        if (!tile || tile.isCleared) return;
+
+        lastTouchTileIndexRef.current = tileIndex;
+        if (onDragEnter) onDragEnter(tileIndex, tile);
+        return;
+      }
+
+      // Track velocity
+      velocityTrackerRef.current.recordPosition(touchX, touchY);
+      const velocity = velocityTrackerRef.current.getVelocity();
+
+      // Use precise cell detection with selection threshold
+      const cellPosition = getCellAtPosition(touchX, touchY, tiles, gridSize, measurements);
+      if (!cellPosition) return;
+
+      const newTileIndex = getTileIndex(cellPosition.row, cellPosition.col, gridSize);
+
+      if (newTileIndex === lastTouchTileIndexRef.current) return;
+
+      const lastIndex = lastTouchTileIndexRef.current;
+      const lastTile = lastIndex !== null ? tiles[lastIndex] : null;
+
+      const diagonal = lastTile
+        ? isDiagonalMove(lastTile, { row: cellPosition.row, col: cellPosition.col })
+        : false;
+
+      if (!isWithinSelectionThreshold(cellPosition, diagonal, velocity)) {
+        return;
+      }
+
+      lastTouchTileIndexRef.current = newTileIndex;
+
+      const tile = tiles[newTileIndex];
+      if (!tile || tile.isCleared) return;
+
+      vibrateCellDrag(false);
+      if (onDragEnter) {
+        onDragEnter(newTileIndex, tile);
+      }
+    };
+
+    element.addEventListener('touchmove', nativeTouchMoveHandler, { passive: false });
+    return () => element.removeEventListener('touchmove', nativeTouchMoveHandler);
+  }, [gridRef, disabled, interactive, tiles, gridSize, onDragEnter, getGridMeasurements]);
 
   return {
     handleTileClick,

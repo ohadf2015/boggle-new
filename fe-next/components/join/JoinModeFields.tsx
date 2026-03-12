@@ -10,11 +10,11 @@ import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
-import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
-import { getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
+import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
-import { getStoredAvatarId, setStoredAvatarId, setStoredUsername } from '@/utils/profileStorage';
+import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar, setStoredUsername } from '@/utils/profileStorage';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface JoinModeFieldsProps {
   gameCode: string;
@@ -49,39 +49,23 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
 }) => {
   const { profile, updateProfile } = useAuth();
 
-  // Avatar selection state
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(undefined);
+  const [selectedAvatar, setSelectedAvatar] = useState<CustomAvatarConfig | null>(null);
   const [isAuthAvatarPickerOpen, setIsAuthAvatarPickerOpen] = useState(false);
 
-  // Ref for auto-focus on username input
   const usernameInputRef = useRef<HTMLInputElement>(null);
 
-  // Load avatar from profile (for auth users) or localStorage (for guests) on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (isAuthenticated) {
-        // Authenticated users: only use profile avatar_image if explicitly set
-        // Don't fall back to localStorage game avatars - use profile picture or emoji/color fallback instead
-        if (profile?.avatar_image) {
-          setSelectedAvatarId(profile.avatar_image);
-        } else {
-          // Clear any guest avatar to prevent showing wrong avatar
-          setSelectedAvatarId(undefined);
-        }
+        setSelectedAvatar((profile?.avatar_config as CustomAvatarConfig) ?? getRandomAvatarConfig());
       } else {
-        // Guest users: load from localStorage
-        const saved = getStoredAvatarId();
-        if (saved) {
-          setSelectedAvatarId(saved);
-        }
+        setSelectedAvatar(getOrCreateStoredCustomAvatar());
       }
     }
-  }, [isAuthenticated, profile?.avatar_image]);
+  }, [isAuthenticated, profile?.avatar_config]);
 
-  // Auto-focus username input for guests
   useEffect(() => {
     if (!isAuthenticated && usernameInputRef.current) {
-      // Small delay to ensure DOM is ready
       const timer = setTimeout(() => {
         usernameInputRef.current?.focus();
       }, 100);
@@ -90,42 +74,26 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
     return undefined;
   }, [isAuthenticated]);
 
-  // Handle avatar selection
-  const handleAvatarSelect = async (avatar: AvatarConfig) => {
-    setSelectedAvatarId(avatar.id);
+  const handleAvatarSelect = async (config: CustomAvatarConfig) => {
+    setSelectedAvatar(config);
 
     if (isAuthenticated && updateProfile) {
-      // Authenticated users: save to profile
-      await updateProfile({ avatar_image: avatar.id });
+      await updateProfile({ avatar_config: config });
     } else {
-      // Guest users: save to localStorage
-      setStoredAvatarId(avatar.id);
-      // Pre-fill username with avatar name ONLY if username is empty
-      // Don't override if user has already entered a name (even if it matches an avatar name)
-      if (!username || username.trim() === '') {
-        setUsername(avatar.name);
-        // Save the avatar name to localStorage to persist across page reloads
-        setStoredUsername(avatar.name);
-      }
+      setStoredCustomAvatar(config);
     }
   };
 
-  // Handle avatar selection from picker for authenticated users
-  const handleAuthAvatarSave = ({ avatarImage }: { avatarImage: string; emoji?: string; color?: string }) => {
-    if (avatarImage === PROFILE_AVATAR_ID) {
-      // User selected their profile avatar - clear the game avatar
-      setSelectedAvatarId(PROFILE_AVATAR_ID);
-      // No need to update profile - PROFILE_AVATAR_ID means use profile picture/emoji
-    } else {
-      const avatar = getAvatarById(avatarImage);
-      if (avatar) {
-        handleAvatarSelect(avatar);
-      }
-    }
+  const handleAuthAvatarSave = (config: CustomAvatarConfig) => {
+    handleAvatarSelect(config);
     setIsAuthAvatarPickerOpen(false);
   };
 
-  // Real-time validation with debounce
+  const handleGuestAvatarSelect = (config: CustomAvatarConfig) => {
+    setSelectedAvatar(config);
+    setStoredCustomAvatar(config);
+  };
+
   const gameCodeValidation = useDebouncedValidation(gameCode, {
     validate: validateGameCode,
     delay: 200,
@@ -138,15 +106,15 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
     minLength: 2,
   });
 
-  // Combine real-time and submit-time errors
   const showGameCodeError = gameCodeError || gameCodeValidation.hasError;
   const showUsernameError = usernameError || usernameValidation.hasError;
   const gameCodeErrorMessage = gameCodeErrorKey || gameCodeValidation.errorKey;
   const usernameErrorMessage = usernameErrorKey || usernameValidation.errorKey;
 
+  const currentConfig = selectedAvatar ?? getRandomAvatarConfig();
+
   return (
     <div className="space-y-3">
-      {/* Room Code - inline with paste button */}
       <div className="space-y-1.5">
         <Label htmlFor="gameCode" className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
           {t('hostView.roomCode')}
@@ -210,21 +178,18 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
         )}
       </div>
 
-      {/* Show "Joining as" for authenticated users with their profile avatar */}
       {isAuthenticated && displayName && (
         <div className="p-3 rounded-neo bg-neo-navy border-2 border-neo-cyan/50 shadow-hard-sm">
           <div className="flex items-center gap-3">
-            {/* Clickable avatar - allows authenticated users to change to a game avatar */}
             <button
               type="button"
               onClick={() => setIsAuthAvatarPickerOpen(true)}
               className="relative group flex-shrink-0"
               aria-label={t('joinView.changeAvatar')}
             >
-              {/* Show selected game avatar if set (not PROFILE_AVATAR_ID), otherwise profile picture or emoji fallback */}
-              {selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID ? (
+              {selectedAvatar ? (
                 <Avatar
-                  avatarImage={selectedAvatarId}
+                  customAvatar={selectedAvatar}
                   size="lg"
                   className="border-3 border-neo-black shadow-hard-sm group-hover:border-neo-cyan transition-colors"
                 />
@@ -239,12 +204,11 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                 </div>
               ) : (
                 <Avatar
-                  avatarImage={profile?.avatar_image}
+                  customAvatar={getRandomAvatarConfig()}
                   size="lg"
                   className="border-3 border-neo-black shadow-hard-sm group-hover:border-neo-cyan transition-colors"
                 />
               )}
-              {/* Edit indicator */}
               <div className="absolute -bottom-0.5 -right-0.5 rtl:-right-auto rtl:-left-0.5 w-5 h-5 bg-neo-lime text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
                 <Pencil className="w-2 h-2" />
               </div>
@@ -264,20 +228,13 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
         </div>
       )}
 
-      {/* Avatar picker for authenticated users */}
-      <EmojiAvatarPicker
+      <AvatarBuilderModal
         isOpen={isAuthAvatarPickerOpen}
         onClose={() => setIsAuthAvatarPickerOpen(false)}
         onSave={handleAuthAvatarSave}
-        currentAvatarImage={selectedAvatarId}
-        profileAvatar={isAuthenticated ? {
-          profilePictureUrl: profile?.profile_picture_url,
-          avatarImage: profile?.avatar_image,
-          displayName: displayName,
-        } : undefined}
+        initialConfig={currentConfig}
       />
 
-      {/* Guest: Avatar + Username inline */}
       {!isAuthenticated && (
         <div className="space-y-1.5">
           <Label htmlFor="username-main" className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
@@ -285,8 +242,8 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
           </Label>
           <div className="flex gap-2">
             <AvatarSelectorButton
-              selectedAvatarId={selectedAvatarId}
-              onAvatarSelect={handleAvatarSelect}
+              selectedAvatar={selectedAvatar}
+              onAvatarSelect={handleGuestAvatarSelect}
               t={t}
             />
             <div className="relative flex-1">

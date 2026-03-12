@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { GraduationCap, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -13,19 +13,29 @@ import { useMobilePortrait } from '@/hooks/useMobilePortrait';
 import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
+import { useTopPlayers } from '@/hooks/useTopPlayers';
+import { useLandingStats } from '@/hooks/useLandingStats';
+import { useDailySolveRate } from '@/hooks/useDailySolveRate';
+import { useHallOfFame } from '@/hooks/useHallOfFame';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
-import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import { AdPlaceholder } from '@/components/ads';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
+import { LandingHero } from './LandingHero';
+import { LandingSocialProofBar } from './LandingSocialProofBar';
+import { LandingAvatarTeaser } from './LandingAvatarTeaser';
+import { LandingChallengeCards } from './LandingChallengeCards';
+import { LandingYourRank } from './LandingYourRank';
+import { LandingBottomCTA } from './LandingBottomCTA';
+import { LandingTopWords } from './LandingTopWords';
+import { LandingHallOfFame } from './LandingHallOfFame';
+import { LandingShareBanner } from './LandingShareBanner';
+import { LandingMobileCards } from './LandingMobileCards';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
 import { useEvents } from '@/hooks/useEvents';
-import { LandingMobileCards } from './LandingMobileCards';
-import { LandingDesktopCards } from './LandingDesktopCards';
 
 const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -39,33 +49,6 @@ const PlayfulBackground = dynamic(
   { ssr: false }
 );
 
-interface HeroMascotProps {
-  isMobilePortrait?: boolean;
-}
-
-const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMascotProps) {
-  return (
-    <div className={`relative mx-auto ${isMobilePortrait ? 'mb-0' : 'mb-1'}`}>
-      <IdleMascotWithEntrance
-        baseVariant="happy"
-        size="xl"
-        sizeClassName={isMobilePortrait
-          ? 'w-24 h-24'
-          : 'w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40'
-        }
-        enableHover={!isMobilePortrait}
-        enableClick
-        hoverVariant="excited"
-        clickVariant="celebrating"
-        clickAnimation="bounce"
-        priority
-        fetchPriority="high"
-        delay={0.1}
-      />
-    </div>
-  );
-});
-
 const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
@@ -77,9 +60,12 @@ const LandingView: React.FC = () => {
   const { allTimeBest: playerAllTimeBest } = usePlayerStats();
   const dailyChallengeStatus = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
   const { activeEvents, myEvents, joinEvent: joinEventAction } = useEvents();
+  const { players: topPlayers, loading: topPlayersLoading } = useTopPlayers(5);
+  const { activePlayers, gamesToday, gameModes, languages: langCount } = useLandingStats();
+  const { solveRate } = useDailySolveRate(language);
+  const { champions, loading: hallLoading } = useHallOfFame(5);
   const [dismissedEventIds, setDismissedEventIds] = useState<Set<string>>(new Set());
   const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
-  const mouseParallax = useMouseParallax(15);
 
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
     onRefresh: async () => {
@@ -115,8 +101,7 @@ const LandingView: React.FC = () => {
     setShowTutorialCallout(isFirstTime);
   }, [isAuthenticated]);
 
-  const handleSinglePlayerClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handlePlayClick = () => {
     unlockAudio();
     router.push(`/${language}/singleplayer?autoStart=bots`);
   };
@@ -152,15 +137,38 @@ const LandingView: React.FC = () => {
     loading: dailyChallengeStatus.loading,
   };
 
+  // Mobile landscape uses the compact card layout
+  if (isLandscape && !isDesktopWidth) {
+    return (
+      <div className="flex-1 flex flex-col bg-gray-100 dark:bg-neo-navy relative page-content-safe landscape-full-height">
+        <Header />
+        <section className="flex-1 flex items-center justify-center px-2 sm:px-4 py-2">
+          <LandingMobileCards
+            language={language}
+            isLandscape={isLandscape}
+            isMobilePortrait={isMobilePortrait}
+            isAdmin={isAdmin}
+            hasBlastAccess={!!profile?.blast_access}
+            activePlayers={liveRoomStats.activePlayers}
+            t={t}
+            onSinglePlayerClick={handlePlayClick}
+            onShareClick={() => setShowShareModal(true)}
+            dailyChallengeStats={dailyChallengeStats}
+          />
+        </section>
+        <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
         'flex-1 flex flex-col bg-gray-100 dark:bg-neo-navy relative page-content-safe',
-        isLandscape && 'landscape-full-height'
       )}
       {...pullToRefreshHandlers}
     >
-      {enableHeavyBackground && !isLandscape && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
+      {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
@@ -179,83 +187,60 @@ const LandingView: React.FC = () => {
         </div>
       )}
 
+      {/* Main content */}
       <section className={cn(
-        'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex flex-col',
-        isLandscape && 'flex-1 justify-center px-2 sm:px-4 py-2',
-        isMobilePortrait && 'px-2 py-2',
-        !isLandscape && !isMobilePortrait && 'justify-start px-2 sm:px-3 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8'
+        'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex flex-col gap-6 sm:gap-8',
+        isMobilePortrait ? 'px-2 py-3' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8'
       )}>
-        <>
-          {/* Hero section with mascot */}
-          {(!isLandscape || isDesktopWidth) && (
-            <motion.div
-              className={cn(
-                "text-center animate-fade-in-fast relative",
-                "max-w-3xl mx-auto",
-                isMobilePortrait ? "mb-2" : "mb-3 sm:mb-4 lg:mb-5"
-              )}
-              style={!isMobilePortrait ? {
-                transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,
-              } : undefined}
-            >
-              <HeroMascot isMobilePortrait={isMobilePortrait} />
-              <h1
-                className={cn(
-                  "font-black uppercase tracking-tight text-neo-black dark:text-neo-white animate-fade-in-up",
-                  isMobilePortrait
-                    ? "text-lg mb-0.5"
-                    : "text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl mb-1 sm:mb-1.5 lg:mb-2"
-                )}
-              >
-                <span className="sr-only">LexiClash — </span>{t('landing.welcomeTitle')}
-              </h1>
-              <p
-                className={cn(
-                  "font-medium text-neo-black/80 dark:text-neo-white/90 animate-fade-in-up",
-                  "max-w-xl mx-auto",
-                  isMobilePortrait ? "text-sm" : "text-sm sm:text-base lg:text-lg xl:text-xl"
-                )}
-                style={{ animationDelay: '0.1s' }}
-              >
-                {t('landing.welcomeSubtitle')}
-              </p>
-            </motion.div>
-          )}
+        {/* Hero: Mascot + Title + CTA + Leaderboard Preview */}
+        <LandingHero
+          players={topPlayers}
+          playersLoading={topPlayersLoading}
+          isMobilePortrait={isMobilePortrait}
+          onPlayClick={handlePlayClick}
+        />
 
-          {/* Mode cards */}
-          <div className={cn(
-            "flex items-center gap-2 sm:gap-4 justify-center",
-            !isMobilePortrait && !isDesktopWidth && "flex-1"
-          )}>
-            {(!isDesktopWidth && (isLandscape || isMobilePortrait)) ? (
-              <LandingMobileCards
-                language={language}
-                isLandscape={isLandscape}
-                isMobilePortrait={isMobilePortrait}
-                isAdmin={isAdmin}
-                hasBlastAccess={!!profile?.blast_access}
-                activePlayers={liveRoomStats.activePlayers}
-                t={t}
-                onSinglePlayerClick={handleSinglePlayerClick}
-                onShareClick={() => setShowShareModal(true)}
-                dailyChallengeStats={dailyChallengeStats}
-              />
-            ) : (
-              <LandingDesktopCards
-                language={language}
-                isAdmin={isAdmin}
-                hasBlastAccess={!!profile?.blast_access}
-                activePlayers={liveRoomStats.activePlayers}
-                openRooms={liveRoomStats.openRooms}
-                totalPlayers={liveRoomStats.totalPlayers}
-                playerAllTimeBest={playerAllTimeBest}
-                t={t}
-                onShareClick={() => setShowShareModal(true)}
-                dailyChallengeStats={dailyChallengeStats}
-              />
-            )}
-          </div>
-        </>
+        {/* Social Proof Bar */}
+        <LandingSocialProofBar
+          activePlayers={activePlayers}
+          gamesToday={gamesToday}
+          gameModes={gameModes}
+          languages={langCount}
+        />
+
+        {/* Challenge / Mode Cards */}
+        <LandingChallengeCards
+          language={language}
+          isAdmin={isAdmin}
+          hasBlastAccess={!!profile?.blast_access}
+          activePlayers={liveRoomStats.activePlayers}
+          openRooms={liveRoomStats.openRooms}
+          totalPlayers={liveRoomStats.totalPlayers}
+          playerAllTimeBest={playerAllTimeBest}
+          t={t}
+          dailyChallengeStats={dailyChallengeStats}
+          solveRate={solveRate}
+        />
+
+        {/* Top Words */}
+        <LandingTopWords />
+
+        {/* Your Rank (auth'd users only) */}
+        <LandingYourRank />
+
+        {/* Avatar Teaser */}
+        <LandingAvatarTeaser />
+
+        {/* Hall of Fame */}
+        <LandingHallOfFame champions={champions} loading={hallLoading} />
+
+        {/* Share Banner */}
+        <div className="w-full max-w-4xl mx-auto">
+          <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
+        </div>
+
+        {/* Bottom CTA */}
+        <LandingBottomCTA onPlayClick={handlePlayClick} />
       </section>
 
       {!isLandscape && <ScrollIndicator />}
@@ -266,7 +251,7 @@ const LandingView: React.FC = () => {
         </div>
       )}
 
-      <LandingSEOSection className={isLandscape ? 'sr-only' : undefined} />
+      <LandingSEOSection />
 
       {/* Tutorial FAB with Callout */}
       <div className={cn(

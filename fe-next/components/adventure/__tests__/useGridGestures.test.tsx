@@ -15,7 +15,18 @@
 import { renderHook, act, fireEvent } from '@testing-library/react';
 import type { GridTileState } from '@/types/adventure';
 
-// Import hook AFTER defining test structure (TDD RED - will fail to import)
+// Mock adaptive deadzone to return a stable value for tests
+jest.mock('@/utils/consts', () => ({
+  getDeadzoneThreshold: () => 10,
+}));
+
+// Mock haptic feedback to avoid side effects in tests
+jest.mock('@/components/grid/hapticFeedback', () => ({
+  vibrateCellTap: jest.fn(),
+  vibrateCellDrag: jest.fn(),
+}));
+
+// Import hook AFTER mocks are defined
 import { useGridGestures } from '../useGridGestures';
 
 describe('useGridGestures', () => {
@@ -463,6 +474,104 @@ describe('useGridGestures', () => {
       
       // onDragEnter should have been called from drag start
       expect(onDragEnter).toHaveBeenCalledTimes(0); // Not called yet (just started drag)
+    });
+  });
+
+  describe('Global mouseup/touchend listeners (Fix 1)', () => {
+    it('should end drag when mouseup fires on window', () => {
+      const onDragEnd = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
+
+      // Start drag
+      const mockStartEvent = { clientX: 100, clientY: 100 } as React.MouseEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+
+      // Fire mouseup on window (simulating release outside grid)
+      act(() => {
+        window.dispatchEvent(new Event('mouseup'));
+      });
+
+      expect(onDragEnd).toHaveBeenCalled();
+    });
+
+    it('should end drag when touchend fires on window', () => {
+      const onDragEnd = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
+
+      // Start drag
+      const mockStartEvent = {
+        touches: [{ clientX: 100, clientY: 100 }],
+      } as unknown as React.TouchEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+
+      // Fire touchend on window (simulating release outside grid)
+      act(() => {
+        window.dispatchEvent(new Event('touchend'));
+      });
+
+      expect(onDragEnd).toHaveBeenCalled();
+    });
+
+    it('should clean up global listeners on unmount', () => {
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      const { unmount } = renderHook(() => useGridGestures(defaultProps));
+
+      unmount();
+
+      const removedEvents = removeEventListenerSpy.mock.calls.map(c => c[0]);
+      expect(removedEvents).toContain('mouseup');
+      expect(removedEvents).toContain('touchend');
+
+      removeEventListenerSpy.mockRestore();
+    });
+
+    it('should not call onDragEnd on window mouseup if not dragging', () => {
+      const onDragEnd = jest.fn();
+      renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
+
+      // Fire mouseup without starting a drag
+      act(() => {
+        window.dispatchEvent(new Event('mouseup'));
+      });
+
+      expect(onDragEnd).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Native touchmove listener (Fix 2)', () => {
+    it('should register native touchmove listener on grid element', () => {
+      const gridElement = document.createElement('div');
+      const addEventListenerSpy = jest.spyOn(gridElement, 'addEventListener');
+      const testGridRef = { current: gridElement };
+
+      renderHook(() => useGridGestures({ ...defaultProps, gridRef: testGridRef }));
+
+      const touchmoveCall = addEventListenerSpy.mock.calls.find(
+        c => c[0] === 'touchmove'
+      );
+      expect(touchmoveCall).toBeDefined();
+      expect(touchmoveCall![2]).toEqual({ passive: false });
+
+      addEventListenerSpy.mockRestore();
+    });
+
+    it('should remove native touchmove listener on unmount', () => {
+      const gridElement = document.createElement('div');
+      const removeEventListenerSpy = jest.spyOn(gridElement, 'removeEventListener');
+      const testGridRef = { current: gridElement };
+
+      const { unmount } = renderHook(() => useGridGestures({ ...defaultProps, gridRef: testGridRef }));
+
+      unmount();
+
+      const removedEvents = removeEventListenerSpy.mock.calls.map(c => c[0]);
+      expect(removedEvents).toContain('touchmove');
+
+      removeEventListenerSpy.mockRestore();
     });
   });
 

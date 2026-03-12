@@ -203,6 +203,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
               <Avatar
                 profilePictureUrl={avatar?.profilePictureUrl}
                 avatarImage={avatar?.avatarImage}
+                customAvatar={avatar?.customAvatar}
                 size="2xl"
                 className="flex-shrink-0"
               />

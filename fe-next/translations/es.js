@@ -1290,7 +1290,8 @@ const es = {
     "mobileNavigation": "Navegación Móvil",
     "readyUp": "¡Prepararse!",
     "readyConfirmed": "¡Listo!",
-    "editName": "Cambiar nombre"
+    "editName": "Cambiar nombre",
+    "editAvatar": "Cambiar avatar"
   },
   "waiting": {
     "milestoneFirst": "¡Primer jugador!",
@@ -3125,7 +3126,10 @@ const es = {
     "wordSolver": "Buscador de Palabras",
     "howToPlay": "Cómo jugar",
     "guides": "Guías",
-    "glossary": "Glosario"
+    "glossary": "Glosario",
+    "explore": "Explorar",
+    "resources": "Recursos",
+    "connect": "Conectar"
   },
   "support": {
     "kofiFooter": "Invítanos un Café",
@@ -3182,6 +3186,24 @@ const es = {
     "shareTextAuth": "¡Únete a LexiClash! Usa mi código de referido: {code}",
     "shareTextGuest": "¡Juega LexiClash - el mejor juego de palabras multijugador!",
     "shareNativeTitle": "Únete a LexiClash",
+    "playNowFree": "¡Juega ahora — Gratis!",
+    "gameModes": "Modos de juego",
+    "languages": "Idiomas",
+    "activePlayers": "Jugadores activos",
+    "todaysTopPlayers": "Mejores jugadores",
+    "viewFullLeaderboard": "Ver clasificación completa",
+    "readyToCompete": "¿Listo para competir?",
+    "startPlaying": "Empezar a jugar",
+    "createAvatar": "Crea tu avatar",
+    "designYourLook": "Diseña tu look único",
+    "yourRank": "Tu ranking",
+    "totalScore": "Puntuación total",
+    "solvedPercent": "Solo el {percent}% lo resolvió hoy",
+    "todaysTopWords": "Palabras top de hoy",
+    "hallOfFame": "Salón de la Fama",
+    "gamesToday": "Juegos hoy",
+    "wordHuntMode": "Caza de Palabras",
+    "wordHuntModeDesc": "¡Encuentra la palabra objetivo lo más rápido posible — un nuevo rompecabezas cada día!",
     "seo": {
       "whatIsTitle": "Que es LexiClash?",
       "whatIsContent": "LexiClash es un juego de palabras multijugador gratuito y rapido que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real en una cuadricula de letras compartida: encuentra palabras, construye combos y sube en la clasificacion. Es como Boggle y Wordle, pero multijugador. Sin descargas, sin registro. Disponible en ingles, hebreo, sueco, japones y espanol.",
@@ -3623,136 +3645,6 @@ const es = {
     "wordPlaceholder": "Escribe una palabra...",
     "bonusChallenge": "Desafío Bonus",
     "continueMissions": "Continúa tus misiones diarias"
-  },
-  "buzz": {
-    "title": "Daily Buzz",
-    "tagline": "Temas de hoy convertidos en rompecabezas",
-    "subtitle": "¿Qué está buzzeando hoy?",
-    "details": "Sin prisa, sin reloj. Solo tú contra el buzz de hoy!",
-    "type": {
-      "scrambled": "REVUELTO",
-      "fillBlank": "COMPLETA",
-      "chain": "CADENA",
-      "spotOn": "ADIVINA",
-      "trio": "TRÍO",
-      "wordle": "WORDLE",
-      "definition_match": "DEFINICIÓN",
-      "anagram": "ANAGRAMA",
-      "riddle": "ACERTIJO",
-      "fill_blank": "LLENA EL HUECO"
-    },
-    "wordle": {
-      "instruction": "Adivina la palabra de 5 letras",
-      "attemptsLeft": "intentos restantes",
-      "solved": "¡Resuelto!",
-      "failed": "Sin intentos",
-      "useDeviceKeyboard": "Toca para escribir"
-    },
-    "challenge": "{number}/{total}",
-    "correct": "¡ESO!",
-    "hint": "¿PISTA?",
-    "skip": "SALTAR",
-    "back": "ATRÁS",
-    "swipeToNavigate": "Desliza para navegar",
-    "submit": "ENVIAR",
-    "prevChallenge": "Desafío anterior",
-    "nextChallenge": "Siguiente desafío",
-    "results": {
-      "title": "¡BUZZ COMPLETO!",
-      "trending": "Trends de hoy:",
-      "share": "COMPARTIR",
-      "perfect": "¡IMPECABLE! 💯",
-      "reviewTitle": "RESUMEN DE RETOS",
-      "yourAnswer": "Tu respuesta:",
-      "correctAnswer": "Respuesta:",
-      "skipped": "SALTADO"
-    },
-    "feedback": {
-      "correct": "¡CORRECTO!",
-      "incorrect": "INCORRECTO",
-      "answerWas": "La respuesta era:",
-      "nice": "¡Bien!",
-      "streak": "¡{count} seguidas!",
-      "onFire": "¡EN LLAMAS!",
-      "perfect": "¡PERFECTO!",
-      "allCorrect": "5 de 5 - ¡impresionante!"
-    },
-    "fillBlank": {
-      "firstLetterHint": "Primera letra revelada como pista",
-      "hintLetter": "Pista",
-      "validAlternatives": "Se aceptan múltiples respuestas válidas"
-    },
-    "share": {
-      "text": "Daily Buzz: {topic} | {score}/100 | ¿Le entras? 🔥"
-    },
-    "error": {
-      "title": "¡Ups!",
-      "description": "Algo salió mal al cargar el desafío.",
-      "helpText": "Verifica tu conexión e inténtalo de nuevo.",
-      "noOptions": "No hay opciones disponibles para este desafío",
-      "loading": "Cargando el buzz de hoy...",
-      "failed": "No pudimos cargar el buzz. ¿Reintentar?",
-      "noInternet": "Sin conexión. Revisa tu internet."
-    },
-    "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
-    "challengeCompleted": "Reto completado",
-    "lockedYourAnswer": "Tu respuesta",
-    "lockedCorrectAnswer": "Respuesta correcta",
-    "badge": "NUEVO",
-    "breaking": "ÚLTIMA HORA",
-    "tapToCelebrate": "Toca para celebrar",
-    "challenges": "Retos",
-    "letters": "letras",
-    "connectingWord": "PALABRA CONECTORA",
-    "fillTheBlank": "Completa el espacio",
-    "finish": "TERMINAR",
-    "helpText": "Resuelve retos de palabras basados en lo que está trending hoy. ¡Sin presión de tiempo!",
-    "loading": "Cargando Daily Buzz...",
-    "maxScore": "Puntaje Máx",
-    "noTimeLimit": "Sin Timer",
-    "preview": {
-      "play": "EMPEZAR BUZZ",
-      "subtitle": "Los retos incluyen...",
-      "title": "TOPICS DE HOY"
-    },
-    "quitConfirm": "¿Seguro que quieres salir? Perderás tu progreso.",
-    "quitConfirmTitle": "¿Abandonar Daily Buzz?",
-    "searches": "búsquedas",
-    "challengeTrend": "En los retos de hoy",
-    "topicIs": "El topic es: {topic}",
-    "total": "TOTAL",
-    "trio": {
-      "hint": "Encuentra la palabra que conecta los tres topics"
-    },
-    "scrambled": {
-      "unscramble": "¡Ordena las letras!"
-    },
-    "chain": {
-      "instruction": "¡Encuentra la palabra conectora!",
-      "compoundHint": "Forma una palabra compuesta con AMBOS vecinos",
-      "exampleHint": "Ejemplo: GIRASOL→FLOR→MACETA (girasol + florero)",
-      "thinkCompound": "¡Piensa en palabras compuestas!"
-    },
-    "viewResults": "VER RESULTADOS",
-    "yourAnswer": "TU RESPUESTA",
-    "typeYourAnswer": "Escribe tu respuesta...",
-    "yourScore": "TU PUNTAJE",
-    "noChallenge": "No hay desafío disponible",
-    "notAvailable": "No Disponible",
-    "unavailableTagline": "Aún no disponible para este idioma",
-    "requestChallenge": "Solicitar Desafío",
-    "requestSent": "¡Solicitud Enviada!",
-    "skipToAnswers": "Saltar a las respuestas",
-    "skipConfirmTitle": "¿Saltar los desafíos?",
-    "skipConfirmMessage": "Verás las respuestas sin jugar. Tu puntuación será 0.",
-    "skipConfirm": "Saltar a las respuestas",
-    "history": {
-      "title": "Desafíos Anteriores",
-      "browse": "Ver desafíos Daily Buzz anteriores",
-      "available": "desafíos disponibles",
-      "empty": "Aún no hay desafíos anteriores",
-      "selectDate": "Elige una fecha para jugar"
-    }
   },
   "wordHunt": {
     "title": "Caza de Palabras",
@@ -4564,7 +4456,6 @@ const es = {
       "dailyChallenge": "Desafío Diario",
       "wikipediaWords": "Palabras Wikipedia",
       "wordBank": "Banco de Palabras",
-      "dailyBuzz": "Buzz Diario",
       "webVitals": "Rendimiento Web",
       "email": "Correo",
       "milogWords": "Palabras Milog"
@@ -7409,6 +7300,22 @@ const es = {
       "ads": "Nos asociamos con Google AdSense para mostrar anuncios relevantes. Los anuncios nos ayudan a mantener el juego gratuito para todos. Puedes obtener más información sobre la personalización de anuncios y las opciones de exclusión en nuestra Política de Privacidad.",
       "optOut": "Si bien cierta recopilación de datos es necesaria para el funcionamiento del juego (como tu nombre de usuario y puntuaciones), puedes optar por no participar en análisis y anuncios personalizados en Configuración > Privacidad."
     }
+  },
+  avatarBuilder: {
+    title: "Constructor de Avatar",
+    base: "Forma",
+    hair: "Cabello",
+    eyes: "Ojos",
+    mouth: "Boca",
+    accessories: "Accesorios",
+    skinColor: "Color de piel",
+    hairColor: "Color de cabello",
+    accessoryColor: "Color",
+    randomize: "Aleatorio",
+    save: "Guardar",
+    cancel: "Cancelar",
+    buildCustom: "Crea el tuyo",
+    bgColor: "Fondo"
   }
 };
 

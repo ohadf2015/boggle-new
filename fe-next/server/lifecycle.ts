@@ -61,7 +61,7 @@ export async function initializeServer(io: Server): Promise<void> {
     console.warn('[WORKER POOL] Failed to warm up:', errorMessage);
   }
 
-  // Start all cron schedulers (Daily Buzz, Wikipedia, Daily Words, Bot Difficulty)
+  // Start all cron schedulers (Wikipedia, Daily Words, Bot Difficulty)
   try {
     cronTasks = startAllCronJobs();
     console.log(`[STARTUP] Started ${cronTasks.length} cron schedulers`);

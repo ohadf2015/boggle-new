@@ -21,8 +21,9 @@ describe('Footer - Legal link', () => {
 
   it('renders a consolidated Legal link pointing to /legal', () => {
     render(<Footer />);
-    const link = screen.getByText('legal.title');
-    expect(link).toBeInTheDocument();
-    expect(link.closest('a')).toHaveAttribute('href', '/en/legal');
+    const links = screen.getAllByText('legal.title');
+    const legalLink = links.find(el => el.closest('a'));
+    expect(legalLink).toBeInTheDocument();
+    expect(legalLink!.closest('a')).toHaveAttribute('href', '/en/legal');
   });
 });

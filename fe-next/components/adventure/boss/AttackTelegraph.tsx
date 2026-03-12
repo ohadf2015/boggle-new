@@ -93,14 +93,14 @@ export function AttackTelegraph({
         >
           {/* Warning Banner */}
           <motion.div
-            className="
+            className={`
               absolute top-20 left-1/2 -translate-x-1/2
               px-6 py-3
               ${bossFightTheme.telegraphColor}
               border-3 border-black
               rounded-neo
               shadow-hard-lg
-            "
+            `}
             initial={{ y: -50, opacity: 0 }}
             animate={{
               y: 0,

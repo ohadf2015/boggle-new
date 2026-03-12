@@ -162,9 +162,9 @@ export function useAdventureSelection({
           return prev.slice(0, -1);
         }
 
-        // If tile is already selected (not last), reject
+        // If tile is already selected (not last), truncate path to that tile (backtracking)
         if (prev.includes(index)) {
-          return prev;
+          return prev.slice(0, prev.indexOf(index) + 1);
         }
 
         // Check if adjacent to last selected tile

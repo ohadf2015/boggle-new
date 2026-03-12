@@ -478,39 +478,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         text: 'LexiClash works on any device with a modern web browser! Play on desktop computers, laptops, tablets, and smartphones. No app download needed - just visit lexiclash.live. The game is optimized for touch screens and supports both portrait and landscape orientations on mobile.',
                     },
                 },
-                // Daily Buzz feature FAQ questions
-                {
-                    '@type': 'Question',
-                    name: 'What is Daily Buzz in LexiClash?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'Daily Buzz is an AI-generated word challenge in LexiClash based on trending topics and current events. Each day features a new topic - from sports to science to pop culture. Find words related to the daily buzz topic and compete on the leaderboard! You can also play past Daily Buzz challenges anytime.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'How does the AI word challenge work in LexiClash?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash\'s Daily Buzz uses AI to generate word puzzles based on trending topics. The AI analyzes current events, popular searches, and cultural moments to create themed word challenges. Each puzzle includes topic-related vocabulary that players need to find. It\'s a unique blend of word games and current events!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'Can I play previous Daily Buzz challenges?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'Yes! Unlike Word Hunt Survival which is once-daily, you can replay past Daily Buzz challenges anytime. Browse the history to see previous topics and try puzzles you missed. Perfect for practicing or competing with friends on the same topic!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What is the difference between Word Hunt and Daily Buzz?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash offers two daily challenges: Word Hunt Survival is a Wordle-style puzzle with 10 attempts to find a hidden word - same board for everyone, one attempt per day, shareable emoji results. Daily Buzz is an AI-generated themed challenge based on trending topics - find related words, replayable, with past challenges available anytime.',
-                    },
-                },
                 // Hebrew-specific FAQ questions for Israeli SEO
                 {
                     '@type': 'Question',
@@ -550,23 +517,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     acceptedAnswer: {
                         '@type': 'Answer',
                         text: 'כן! לקסיקלאש הוא משחק מילים חינמי לחלוטין שעובד מצוין בנייד. אין צורך להוריד אפליקציה - פשוט היכנסו ל-lexiclash.live מהדפדפן. דומה לבוגל, סקראבל ותפזורת אבל מרובה משתתפים. תומך ב-2 עד 20+ שחקנים, עם מילון עברית מקיף.',
-                    },
-                },
-                // Hebrew Daily Buzz FAQ questions
-                {
-                    '@type': 'Question',
-                    name: 'מה זה דיילי באזז בלקסיקלאש?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'דיילי באזז הוא אתגר מילים יומי המבוסס על טרנדים ואירועים עכשוויים, נוצר על ידי בינה מלאכותית. כל יום יש נושא חדש - מספורט ועד מדע ותרבות פופולרית. מצאו מילים הקשורות לנושא היומי והתחרו בלידרבורד! אפשר גם לשחק אתגרים מימים קודמים.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'מה ההבדל בין Word Hunt לדיילי באזז?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'לקסיקלאש מציע שני אתגרים יומיים: Word Hunt Survival הוא פאזל בסגנון וורדל עם 10 ניסיונות למצוא מילה מוסתרת - אותו לוח לכולם, ניסיון אחד ביום, אפשר לשתף תוצאות באמוג\'י. דיילי באזז הוא אתגר נושאי המבוסס על טרנדים - מצאו מילים קשורות, אפשר לשחק שוב, ואתגרים קודמים זמינים תמיד.',
                     },
                 },
             ],

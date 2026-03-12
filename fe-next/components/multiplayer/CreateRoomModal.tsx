@@ -14,23 +14,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AvatarSelector } from '@/components/multiplayer/AvatarSelector';
-import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { LanguageSelector } from '@/components/join/LanguageSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   getStoredUsername,
-  getStoredAvatarId,
+  getStoredCustomAvatar,
   setStoredUsername,
-  setStoredAvatarId,
+  setStoredCustomAvatar,
 } from '@/utils/profileStorage';
-import { getRandomAvatar } from '@/utils/avatarConfig';
 import { sanitizeRoomName } from '@/utils/consts';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface CreateRoomConfig {
   hostUsername: string;
-  avatarId: string;
   roomName: string;
   language: Language;
 }
@@ -43,8 +41,7 @@ interface CreateRoomModalProps {
   defaultLanguage: Language;
   isAuthenticated: boolean;
   displayName: string | null;
-  profilePictureUrl?: string | null;
-  profileAvatarId?: string;
+  profileAvatar?: CustomAvatarConfig | null;
 }
 
 const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
@@ -55,18 +52,17 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   defaultLanguage,
   isAuthenticated,
   displayName,
-  profilePictureUrl,
-  profileAvatarId,
+  profileAvatar,
 }) => {
   const { t } = useLanguage();
 
   const [username, setUsername] = useState<string>('');
-  const [avatarId, setAvatarId] = useState<string>('');
+  const [customAvatar, setCustomAvatar] = useState<CustomAvatarConfig | null>(null);
   const [roomName, setRoomName] = useState<string>('');
   const [language, setLanguage] = useState<Language>(defaultLanguage);
   const [isEditingName, setIsEditingName] = useState(false);
 
-  // Initialize state when modal opens - only runs when modal opens, not on state changes
+  // Initialize state when modal opens
   useEffect(() => {
     if (!isOpen) return;
 
@@ -75,31 +71,15 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
     if (isAuthenticated && displayName) {
       setUsername(displayName);
-      if (profilePictureUrl) {
-        setAvatarId(PROFILE_AVATAR_ID);
-      } else {
-        setAvatarId(profileAvatarId || PROFILE_AVATAR_ID);
-      }
+      setCustomAvatar(profileAvatar ?? getRandomAvatarConfig());
     } else {
       const storedUsername = getStoredUsername();
-      const storedAvatarId = getStoredAvatarId();
+      const storedAvatar = getStoredCustomAvatar();
 
-      if (storedUsername) {
-        setUsername(storedUsername);
-      } else {
-        const randomAvatar = getRandomAvatar();
-        setUsername(randomAvatar.name);
-        setAvatarId(randomAvatar.id);
-      }
-
-      if (storedAvatarId) {
-        setAvatarId(storedAvatarId);
-      } else {
-        const randomAvatar = getRandomAvatar();
-        setAvatarId(randomAvatar.id);
-      }
+      setUsername(storedUsername || '');
+      setCustomAvatar(storedAvatar ?? getRandomAvatarConfig());
     }
-  }, [isOpen, isAuthenticated, displayName, profileAvatarId, profilePictureUrl, defaultLanguage]);
+  }, [isOpen, isAuthenticated, displayName, profileAvatar, defaultLanguage]);
 
   const generateRoomName = useCallback((hostName: string): string => {
     const sanitized = hostName.replace(/[']/g, '').trim();
@@ -107,13 +87,12 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   }, []);
 
   const handleCreate = useCallback(() => {
-    if (!username.trim() || !avatarId) return;
+    if (!username.trim() || !customAvatar) return;
 
-    // Always store avatar selection (even for authenticated users) so it's available when joining
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
     }
-    setStoredAvatarId(avatarId);
+    setStoredCustomAvatar(customAvatar);
 
     const finalRoomName = roomName.trim()
       ? sanitizeRoomName(roomName.trim())
@@ -121,13 +100,12 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
     onCreate({
       hostUsername: username.trim(),
-      avatarId,
       roomName: finalRoomName,
       language,
     });
-  }, [username, avatarId, roomName, language, isAuthenticated, onCreate, generateRoomName]);
+  }, [username, customAvatar, roomName, language, isAuthenticated, onCreate, generateRoomName]);
 
-  const isValid = username.trim().length >= 2 && avatarId;
+  const isValid = username.trim().length >= 2 && customAvatar;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -141,9 +119,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         <DialogBody className="space-y-6">
           {/* Avatar Selector */}
           <AvatarSelector
-            selectedAvatarId={avatarId}
-            onAvatarChange={setAvatarId}
-            profilePictureUrl={profilePictureUrl}
+            selectedAvatar={customAvatar}
+            onAvatarChange={setCustomAvatar}
           />
 
           {/* Username Input */}

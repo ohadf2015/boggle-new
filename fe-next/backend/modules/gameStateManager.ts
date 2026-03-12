@@ -342,7 +342,7 @@ function addPlayerWord(gameCode: string, username: string, word: string, options
 const getFirstFinder = (gameCode: string, word: string, currentUsername: string) =>
   scoreManager.getFirstFinder(asBase<ScoreGameBase>(games[gameCode]), word, currentUsername);
 
-const recordFirstFinder = (gameCode: string, word: string, username: string, avatar?: { avatarImage?: string; emoji?: string; color?: string }): boolean =>
+const recordFirstFinder = (gameCode: string, word: string, username: string, avatar?: { avatarImage?: string; customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig; emoji?: string; color?: string }): boolean =>
   scoreManager.recordFirstFinder(asBase<ScoreGameBase>(games[gameCode]), word, username, avatar);
 
 const isFirstFinder = (gameCode: string, word: string, username: string): boolean =>

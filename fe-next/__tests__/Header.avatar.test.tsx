@@ -103,7 +103,7 @@ describe('Header - Avatar Display', () => {
   });
 
   describe('Mobile hamburger button display', () => {
-    it('should ALWAYS show Menu icon on hamburger button, never avatar (authenticated user with character avatar)', () => {
+    it('should show avatar as profile link (not on hamburger button) for authenticated user with character avatar', () => {
       const profile: ProfileData = {
         id: 'user-123',
         username: 'testuser',
@@ -124,15 +124,16 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Hamburger button should ALWAYS show Menu icon, never avatar
-      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+      // Avatar is rendered as profile links (desktop + mobile), not on the hamburger button
+      const avatars = screen.getAllByTestId('header-avatar');
+      expect(avatars.length).toBeGreaterThanOrEqual(1);
 
       // Menu icon should be present (multiple menu buttons exist, check at least one is present)
       const menuButtons = screen.getAllByLabelText(/menu/i);
       expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('should ALWAYS show Menu icon on hamburger button, never avatar (authenticated user with profile picture)', () => {
+    it('should show avatar as profile link for authenticated user with profile picture', () => {
       const profile: ProfileData = {
         id: 'user-123',
         username: 'testuser',
@@ -153,15 +154,16 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Hamburger button should ALWAYS show Menu icon, never avatar
-      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+      // Avatar is rendered as profile links (desktop + mobile)
+      const avatars = screen.getAllByTestId('header-avatar');
+      expect(avatars.length).toBeGreaterThanOrEqual(1);
 
       // Menu icon should be present (multiple menu buttons exist, check at least one is present)
       const menuButtons = screen.getAllByLabelText(/menu/i);
       expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('should ALWAYS show Menu icon on hamburger button (any authenticated user)', () => {
+    it('should show avatar as profile link for any authenticated user', () => {
       const selectedAvatarId = 'pizza-pete';
       const profile: ProfileData = {
         id: 'user-123',
@@ -183,15 +185,16 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Hamburger button should ALWAYS show Menu icon, never avatar
-      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+      // Avatar is rendered as profile links (desktop + mobile)
+      const avatars = screen.getAllByTestId('header-avatar');
+      expect(avatars.length).toBeGreaterThanOrEqual(1);
 
       // Menu icon should be present (multiple menu buttons exist, check at least one is present)
       const menuButtons = screen.getAllByLabelText(/menu/i);
       expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('should show Menu icon when user is not authenticated', () => {
+    it('should show avatar as profile link when user is not authenticated (guest avatar)', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: false,
         profile: null,
@@ -202,15 +205,16 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Avatar should NOT be in the document
-      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+      // Avatar is still rendered as a profile link for guests
+      const avatars = screen.getAllByTestId('header-avatar');
+      expect(avatars.length).toBeGreaterThanOrEqual(1);
 
       // Menu icon should be present (multiple menu buttons exist, check at least one is present)
       const menuButtons = screen.getAllByLabelText(/menu/i);
       expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('should show Menu icon when profile is null', () => {
+    it('should show avatar as profile link when profile is null', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         profile: null,
@@ -221,7 +225,9 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+      // Avatar is still rendered as a profile link
+      const avatars = screen.getAllByTestId('header-avatar');
+      expect(avatars.length).toBeGreaterThanOrEqual(1);
 
       // Menu icon should be present (multiple menu buttons exist, check at least one is present)
       const menuButtons = screen.getAllByLabelText(/menu/i);

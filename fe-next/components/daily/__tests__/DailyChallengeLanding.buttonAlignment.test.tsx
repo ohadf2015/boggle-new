@@ -89,7 +89,6 @@ global.fetch = jest.fn((url: string) => {
 describe('DailyChallengeLanding - Button Layout', () => {
   const mockProps = {
     onSelectWordHunt: jest.fn(),
-    onSelectBuzz: jest.fn(),
     currentLanguage: 'en' as const,
   };
 
@@ -107,29 +106,24 @@ describe('DailyChallengeLanding - Button Layout', () => {
     jest.clearAllMocks();
   });
 
-  it('should render quest cards with CTA buttons', () => {
+  it('should render quest card with CTA button', () => {
     renderComponent();
 
-    // Both quest cards should render
     const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
-    const buzzCard = screen.getByTestId('quest-card-buzz');
 
     expect(wordHuntCard).toBeInTheDocument();
-    expect(buzzCard).toBeInTheDocument();
 
     // CTA buttons should be present (START QUEST for new cards)
     const startButtons = screen.getAllByText(/start quest/i);
     expect(startButtons.length).toBeGreaterThan(0);
   });
 
-  it('should render clickable quest cards with role="button"', () => {
+  it('should render clickable quest card with role="button"', () => {
     renderComponent();
 
     const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
-    const buzzCard = screen.getByTestId('quest-card-buzz');
 
-    // Each quest card should be clickable (role="button")
+    // Quest card should be clickable (role="button")
     expect(wordHuntCard.querySelector('[role="button"]')).toBeTruthy();
-    expect(buzzCard.querySelector('[role="button"]')).toBeTruthy();
   });
 });

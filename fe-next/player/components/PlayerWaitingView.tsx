@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X } from 'lucide-react';
 import Avatar from '../../components/Avatar';
+import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import RoomChat from '../../components/RoomChat';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
@@ -11,6 +12,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { IdleMascot } from '@/components/ui/IdleMascot';
+import { getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -38,6 +41,8 @@ interface PlayerWaitingViewProps {
   onConfirmExit: () => void;
   /** Called when guest changes their display name */
   onNameChange?: (newName: string) => void;
+  /** Called when player changes their avatar */
+  onAvatarChange?: (config: CustomAvatarConfig) => void;
 }
 
 // Avatar color palette (matches host view)
@@ -70,8 +75,19 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onExitRoom,
   onConfirmExit,
   onNameChange,
+  onAvatarChange,
 }): React.ReactElement => {
   const { isAuthenticated } = useAuth();
+
+  // Avatar builder state
+  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const currentAvatar = getStoredCustomAvatar() ?? getRandomAvatarConfig();
+
+  const handleAvatarSave = (config: CustomAvatarConfig) => {
+    setStoredCustomAvatar(config);
+    onAvatarChange?.(config);
+    setIsAvatarBuilderOpen(false);
+  };
 
   // Rotating word facts
   const [factIndex, setFactIndex] = useState(0);
@@ -142,8 +158,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                     isMe ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : '',
                     AVATAR_COLORS[index % AVATAR_COLORS.length]
                   )}>
-                    {avatar?.profilePictureUrl || avatar?.avatarImage ? (
+                    {avatar?.customAvatar || avatar?.profilePictureUrl || avatar?.avatarImage ? (
                       <Avatar
+                        customAvatar={avatar?.customAvatar ?? undefined}
                         profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                         avatarImage={avatar?.avatarImage}
                         size="md"
@@ -218,50 +235,64 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         </motion.div>
       </AnimatePresence>
 
-      {/* Guest name editing */}
-      {!isAuthenticated && (
-        <div className="flex items-center justify-center gap-2">
-          {isEditingName ? (
-            <div className="flex items-center gap-2">
-              <input
-                data-testid="name-edit-input"
-                type="text"
-                value={editNameValue}
-                onChange={(e) => setEditNameValue(e.target.value)}
-                maxLength={20}
-                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neo-cyan"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSaveName();
-                  if (e.key === 'Escape') setIsEditingName(false);
-                }}
-              />
+      {/* Edit avatar + name */}
+      <div className="flex items-center justify-center gap-3">
+        {/* Avatar edit button — always available */}
+        <button
+          data-testid="edit-avatar-button"
+          onClick={() => setIsAvatarBuilderOpen(true)}
+          className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          <span>{t('playerView.editAvatar')}</span>
+        </button>
+
+        {/* Guest name editing */}
+        {!isAuthenticated && (
+          <>
+            <span className="text-slate-600">|</span>
+            {isEditingName ? (
+              <div className="flex items-center gap-2">
+                <input
+                  data-testid="name-edit-input"
+                  type="text"
+                  value={editNameValue}
+                  onChange={(e) => setEditNameValue(e.target.value)}
+                  maxLength={20}
+                  className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neo-cyan"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveName();
+                    if (e.key === 'Escape') setIsEditingName(false);
+                  }}
+                />
+                <button
+                  data-testid="name-save-button"
+                  onClick={handleSaveName}
+                  className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm"
+                >
+                  <Check className="w-4 h-4 text-neo-black" />
+                </button>
+                <button
+                  onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
+                  className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo"
+                >
+                  <X className="w-4 h-4 text-neo-cream" />
+                </button>
+              </div>
+            ) : (
               <button
-                data-testid="name-save-button"
-                onClick={handleSaveName}
-                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm"
+                data-testid="edit-name-button"
+                onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
+                className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
               >
-                <Check className="w-4 h-4 text-neo-black" />
+                <Pencil className="w-3.5 h-3.5" />
+                <span>{t('playerView.editName')}</span>
               </button>
-              <button
-                onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo"
-              >
-                <X className="w-4 h-4 text-neo-cream" />
-              </button>
-            </div>
-          ) : (
-            <button
-              data-testid="edit-name-button"
-              onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-              className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-              <span>{t('playerView.editName')}</span>
-            </button>
-          )}
-        </div>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </motion.div>
   );
 
@@ -366,6 +397,14 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           {renderMobileContent()}
         </div>
       </main>
+
+      {/* Avatar Builder Modal */}
+      <AvatarBuilderModal
+        isOpen={isAvatarBuilderOpen}
+        onClose={() => setIsAvatarBuilderOpen(false)}
+        onSave={handleAvatarSave}
+        initialConfig={currentAvatar}
+      />
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>

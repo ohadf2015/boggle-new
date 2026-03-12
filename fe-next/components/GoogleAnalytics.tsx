@@ -90,7 +90,7 @@ export const gameEvents = {
   languageChange: (from: string, to: string) => {
     trackEvent('language_change', { from_language: from, to_language: to });
   },
-  dailyChallengePlay: (challengeType: 'word_hunt' | 'buzz', score: number, difficulty?: string) => {
+  dailyChallengePlay: (challengeType: 'word_hunt', score: number, difficulty?: string) => {
     trackEvent('daily_challenge_played', { challenge_type: challengeType, score, difficulty: difficulty || 'normal' });
   },
   achievementMilestone: (tier: string, totalCount: number) => {

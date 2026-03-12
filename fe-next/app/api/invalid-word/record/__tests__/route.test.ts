@@ -149,7 +149,6 @@ describe('Record Invalid Word API Logic', () => {
       'multiplayer',
       'adventure',
       'daily_word_hunt',
-      'daily_buzz',
       'single_player',
       'drill',
     ];

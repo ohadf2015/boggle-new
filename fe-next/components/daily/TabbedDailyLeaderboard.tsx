@@ -22,6 +22,7 @@ export interface DailyParticipant {
   avatar_color: string;
   avatar_image?: string | null;
   profile_picture_url?: string | null;
+  custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   country_code?: string | null;
   score: number;
   word_count: number;
@@ -43,6 +44,7 @@ export interface AllTimeParticipant {
   avatar_color: string;
   avatar_image?: string | null;
   profile_picture_url?: string | null;
+  custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   country_code?: string | null;
   total_efficiency_score: number;
   total_games: number;       // Number of challenges played
@@ -135,17 +137,18 @@ const TodayParticipantRow = memo<{
 
       {/* Avatar with Country Flag */}
       <div className="relative">
-        <div className="w-9 h-9 sm:w-11 sm:h-11 border-2 border-neo-black/80 shadow-sm rounded-xl overflow-hidden">
+        <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
           <Avatar
             profilePictureUrl={participant.profile_picture_url ?? undefined}
             avatarImage={participant.avatar_image ?? undefined}
-            size="md"
+            customAvatar={participant.custom_avatar ?? undefined}
+            size="lg"
             className="w-full h-full"
           />
         </div>
         {/* Country Flag Badge */}
         {countryFlag && (
-          <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
             {countryFlag}
           </div>
         )}
@@ -259,17 +262,18 @@ const AllTimeParticipantRow = memo<{
 
       {/* Avatar with Country Flag */}
       <div className="relative">
-        <div className="w-9 h-9 sm:w-11 sm:h-11 border-2 border-neo-black/80 shadow-sm rounded-xl overflow-hidden">
+        <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
           <Avatar
             profilePictureUrl={participant.profile_picture_url ?? undefined}
             avatarImage={participant.avatar_image ?? undefined}
-            size="md"
+            customAvatar={participant.custom_avatar ?? undefined}
+            size="lg"
             className="w-full h-full"
           />
         </div>
         {/* Country Flag Badge */}
         {countryFlag && (
-          <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
             {countryFlag}
           </div>
         )}

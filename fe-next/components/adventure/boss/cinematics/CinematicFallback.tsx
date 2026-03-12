@@ -106,17 +106,54 @@ export function CinematicFallback({
   const score = compositionProps.finalScore as number | undefined;
   const wordsFound = compositionProps.wordsFound as number | undefined;
 
+  // Extract boss info for boss cinematics
+  const isBossCinematic = cinematicType === 'bossEntrance' || cinematicType === 'bossDefeat';
+  const bossImagePath = compositionProps.bossImagePath as string | undefined;
+  const bossName = compositionProps.bossName as string | undefined;
+  const showBoss = isBossCinematic && bossImagePath;
+
   return (
     <div
       className="fixed inset-0 z-50 bg-gradient-to-b from-[#0a0a1a] to-[#1a1a2e] flex flex-col items-center justify-center"
       data-testid="cinematic-fallback"
     >
+      {/* Boss Image + Name */}
+      {showBoss && (
+        <motion.div
+          className="flex flex-col items-center mb-6"
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 150, damping: 15, delay: 0.1 }}
+        >
+          <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-neo border-neo border-black shadow-hard-lg overflow-hidden bg-neo-navy mb-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={bossImagePath}
+              alt={bossName || ''}
+              className="w-full h-full object-contain"
+              data-testid="fallback-boss-image"
+            />
+          </div>
+          {bossName && (
+            <motion.span
+              className="text-2xl sm:text-3xl font-neo-display text-neo-white"
+              data-testid="fallback-boss-name"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {bossName}
+            </motion.span>
+          )}
+        </motion.div>
+      )}
+
       {/* Title */}
       <motion.h1
         className="text-4xl sm:text-6xl font-neo-display text-neo-yellow mb-8"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.3 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15, delay: showBoss ? 0.6 : 0.3 }}
       >
         {t(TITLE_KEYS[cinematicType])}
       </motion.h1>

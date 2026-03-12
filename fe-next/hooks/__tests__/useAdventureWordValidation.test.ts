@@ -427,11 +427,11 @@ describe('useAdventureWordValidation', () => {
         validationResult = await result.current.validateWord('CAT', validCatPath);
       });
 
-      // THEN - Score should be 3x the base score (30 * 3 = 90 for 3-letter word)
-      // Base score = 3 letters * 10 points = 30
-      // With gold multiplier = 30 * 3 = 90
+      // THEN - Score should be the BASE score only (no tile multiplier)
+      // Gold multiplier is applied in the reducer (processSpecialTileEffects), not here
+      // Base score = 3 letters * 10 points * 1x length bonus = 30
       expect(validationResult!.isValid).toBe(true);
-      expect(validationResult!.score).toBe(90); // 3x multiplier applied
+      expect(validationResult!.score).toBe(30); // No multiplier - reducer handles it
     });
 
     it('should return 1.25x score when word path contains rainbow tile', async () => {
@@ -484,9 +484,11 @@ describe('useAdventureWordValidation', () => {
         validationResult = await result.current.validateWord('CAT', validCatPath);
       });
 
-      // THEN - Score should be 1.25x the base score (30 * 1.25 = 37.5 -> 37)
+      // THEN - Score should be the BASE score only (no tile multiplier)
+      // Rainbow multiplier is applied in the reducer (processSpecialTileEffects), not here
+      // Base score = 3 letters * 10 points * 1x length bonus = 30
       expect(validationResult!.isValid).toBe(true);
-      expect(validationResult!.score).toBe(37); // 1.25x multiplier applied and floored
+      expect(validationResult!.score).toBe(30); // No multiplier - reducer handles it
     });
 
     it('should return higher score for longer words', async () => {

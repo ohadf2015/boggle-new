@@ -8,9 +8,9 @@
 'use client';
 
 import React, { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import type { GridTileState, TileType, TileActivationEffect } from '@/types/adventure';
+import type { GridTileState, TileType } from '@/types/adventure';
 import { WordPathTrail, SelectionSparkle } from '@/components/animations';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useCascadeAnimation } from '@/hooks/useCascadeAnimation';
@@ -164,8 +164,6 @@ const AdventureGrid = memo(
         handleTileClick: handleTileClickFromHook,
         handleDragStart: handleDragStartBase,
         handleDragEnter,
-        handleDragEnd,
-        handleTouchMove,
         handleMouseUp: handleMouseUpFromHook,
       } = useGridGestures({
         gridRef,
@@ -342,7 +340,7 @@ const AdventureGrid = memo(
           role="grid"
           aria-label="Adventure game board"
           onMouseUp={interactive ? handleMouseUp : undefined}
-          onTouchMove={interactive ? handleTouchMove : undefined}
+          /* touchmove registered as native non-passive listener in useGridGestures */
           onTouchEnd={interactive ? handleMouseUp : undefined}
           style={{
             padding: GRID_PADDING,

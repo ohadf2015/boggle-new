@@ -101,12 +101,6 @@ describe('DailyChallengeLanding Completion Indicator', () => {
           json: () => Promise.resolve({ data: { played: false } }),
         });
       }
-      if (url.includes('/api/buzz/')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ success: false }),
-        });
-      }
       if (url.includes('daily-streak')) {
         return Promise.resolve({
           ok: true,
@@ -130,7 +124,6 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: jest.fn(),
-        onSelectBuzz: jest.fn(),
         currentLanguage: 'en' as const,
       };
 
@@ -150,7 +143,6 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: jest.fn(),
-        onSelectBuzz: jest.fn(),
         currentLanguage: 'en' as const,
       };
 
@@ -174,7 +166,6 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: jest.fn(),
-        onSelectBuzz: jest.fn(),
         currentLanguage: 'en' as const,
       };
 
@@ -214,7 +205,6 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: jest.fn(),
-        onSelectBuzz: jest.fn(),
         currentLanguage: 'en' as const,
       };
 
@@ -235,7 +225,6 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: jest.fn(),
-        onSelectBuzz: jest.fn(),
         currentLanguage: 'en' as const,
       };
 

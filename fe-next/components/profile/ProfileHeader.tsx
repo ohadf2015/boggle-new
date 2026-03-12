@@ -2,17 +2,19 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, X, Edit, Check, Globe } from 'lucide-react';
+import { X, Edit, Check, Globe } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
 import { Input } from '@/components/ui/input';
 import Avatar from '@/components/Avatar';
+import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { CountrySelector } from '@/components/settings/CountrySelector';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface ProfileHeaderProps {
   profile: ProfileData | null;
@@ -21,7 +23,6 @@ interface ProfileHeaderProps {
   isUploading: boolean;
   onProfilePictureUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   onRemoveProfilePicture: () => Promise<void>;
-  onShowEmojiPicker: () => void;
   updateProfile: (updates: Partial<ProfileData>) => Promise<{ data: ProfileData | null; error: { message: string } | null }>;
   refreshProfile: () => Promise<void>;
 }
@@ -33,7 +34,6 @@ export function ProfileHeader({
   isUploading,
   onProfilePictureUpload,
   onRemoveProfilePicture,
-  onShowEmojiPicker,
   updateProfile,
   refreshProfile
 }: ProfileHeaderProps): React.ReactNode {
@@ -44,6 +44,7 @@ export function ProfileHeader({
   const [isSaving, setIsSaving] = useState(false);
   const [isEditingCountry, setIsEditingCountry] = useState(false);
   const [isSavingCountry, setIsSavingCountry] = useState(false);
+  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
 
   const startEditingName = (): void => {
     setEditDisplayName(profile?.display_name || profile?.username || '');
@@ -76,6 +77,18 @@ export function ProfileHeader({
     }
   };
 
+  const handleAvatarSave = async (config: CustomAvatarConfig): Promise<void> => {
+    try {
+      await updateProfile({ avatar_config: config });
+      await refreshProfile();
+      setIsAvatarBuilderOpen(false);
+      toast.success(t('profile.saved'));
+    } catch (err) {
+      console.error('Save avatar error:', err);
+      toast.error(t('profile.saveError'));
+    }
+  };
+
   const handleCountryChange = useCallback(async (countryCode: string | null): Promise<void> => {
     setIsSavingCountry(true);
 
@@ -103,11 +116,12 @@ export function ProfileHeader({
       )}
     >
       <div className={cn('flex', compact ? 'flex-col gap-3 items-start' : 'flex-row gap-6 items-center')}>
-        {/* Avatar with upload/edit controls - Improved mobile layout */}
+        {/* Avatar with edit controls */}
         <div className={cn('flex', compact ? 'flex-col gap-2' : 'flex-row gap-4 items-center')}>
           {/* Avatar */}
           <div className="flex-shrink-0">
             <Avatar
+              customAvatar={profile?.avatar_config ?? undefined}
               profilePictureUrl={profile?.profile_picture_url ?? undefined}
               avatarImage={profile?.avatar_image ?? undefined}
               size={compact ? 'md' : 'xl'}
@@ -115,12 +129,27 @@ export function ProfileHeader({
             />
           </div>
 
-          {/* Avatar Controls - Stacked for mobile, horizontal for desktop */}
+          {/* Avatar Controls */}
           <div className={cn(
             'flex gap-2',
             compact ? 'flex-row' : 'flex-col'
           )}>
-            {/* Upload Button (camera icon) */}
+            {/* Edit avatar button — opens builder */}
+            <button
+              onClick={() => setIsAvatarBuilderOpen(true)}
+              className={cn(
+                'rounded-full flex items-center justify-center shadow-md transition-colors',
+                'min-w-[44px] min-h-[44px] w-11 h-11',
+                'border-2',
+                isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500 border-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 border-gray-300'
+              )}
+              title={t('profile.chooseAvatar')}
+              aria-label={t('profile.chooseAvatar')}
+            >
+              <Edit size={20} />
+            </button>
+
+            {/* Upload photo button */}
             <label
               className={cn(
                 'rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors',
@@ -135,7 +164,7 @@ export function ProfileHeader({
               {isUploading ? (
                 <Loader size="sm" />
               ) : (
-                <Camera size={20} />
+                <span className="text-sm">📷</span>
               )}
               <input
                 type="file"
@@ -161,23 +190,6 @@ export function ProfileHeader({
                 aria-label={t('profile.removePhoto')}
               >
                 <X size={20} />
-              </button>
-            )}
-
-            {/* Edit emoji button (only show if no profile picture) */}
-            {!profile?.profile_picture_url && (
-              <button
-                onClick={onShowEmojiPicker}
-                className={cn(
-                  'rounded-full flex items-center justify-center shadow-md transition-colors',
-                  'min-w-[44px] min-h-[44px] w-11 h-11',
-                  'border-2',
-                  isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500 border-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 border-gray-300'
-                )}
-                title={t('profile.chooseEmoji')}
-                aria-label={t('profile.chooseEmoji')}
-              >
-                <Edit size={20} />
               </button>
             )}
           </div>
@@ -286,6 +298,14 @@ export function ProfileHeader({
           </div>
         </div>
       </div>
+
+      {/* Avatar Builder Modal */}
+      <AvatarBuilderModal
+        isOpen={isAvatarBuilderOpen}
+        onClose={() => setIsAvatarBuilderOpen(false)}
+        onSave={handleAvatarSave}
+        initialConfig={profile?.avatar_config ?? getRandomAvatarConfig()}
+      />
     </motion.div>
   );
 }

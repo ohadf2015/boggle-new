@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Timer, Hourglass, Trophy, Check, X, Eye } from 'lucide-react';
+import { Timer, Check, X, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -21,25 +21,15 @@ import { FloatingDecorations } from './landing/FloatingDecorations';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
-  onSelectBuzz: () => void;
-  onShowBuzzHistory?: () => void;
   currentLanguage: Language;
 }
 
 interface ChallengeStatus {
   wordHunt: 'new' | 'won' | 'lost';
-  buzz: 'new' | 'won' | 'lost' | 'unavailable';
 }
 
 interface LoadingState {
   wordHunt: boolean;
-  buzz: boolean;
-}
-
-interface BuzzPreviewData {
-  imageUrl?: string;
-  trendingSummary?: string;
-  available?: boolean;
 }
 
 /**
@@ -48,8 +38,6 @@ interface BuzzPreviewData {
  */
 export function DailyChallengeLanding({
   onSelectWordHunt,
-  onSelectBuzz,
-  onShowBuzzHistory,
   currentLanguage,
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
@@ -65,14 +53,10 @@ export function DailyChallengeLanding({
 
   const [status, setStatus] = useState<ChallengeStatus>({
     wordHunt: 'new',
-    buzz: 'new',
   });
   const [loadingStatus, setLoadingStatus] = useState<LoadingState>({
     wordHunt: true,
-    buzz: true,
   });
-  const [buzzPreview, setBuzzPreview] = useState<BuzzPreviewData>({});
-  const [requestState, setRequestState] = useState<'idle' | 'loading' | 'sent'>('idle');
   const [streak, setStreak] = useState(0);
 
   // Word Hunt status check - synchronous local storage check
@@ -87,89 +71,6 @@ export function DailyChallengeLanding({
       }));
     }
     setLoadingStatus(prev => ({ ...prev, wordHunt: false }));
-  };
-
-  // Buzz status check - async API calls
-  const checkBuzzStatus = async () => {
-    const today = new Date().toISOString().split('T')[0];
-
-    // Check buzz availability
-    let buzzAvailable = true;
-    try {
-      const availabilityResponse = await fetch(
-        `/api/buzz/check-availability/${currentLanguage}`
-      );
-      if (availabilityResponse.ok) {
-        const availabilityData = await availabilityResponse.json();
-        buzzAvailable = availabilityData.available;
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('Failed to check buzz availability:', errorMessage);
-    }
-
-    if (!buzzAvailable) {
-      setStatus(prev => ({ ...prev, buzz: 'unavailable' }));
-      setBuzzPreview({ available: false });
-      setLoadingStatus(prev => ({ ...prev, buzz: false }));
-      return;
-    }
-
-    let buzzPlayed = false;
-    let buzzCompleted = false;
-    try {
-      const checkParams = new URLSearchParams();
-      if (user?.id) {
-        checkParams.set('player_id', user.id);
-      } else {
-        const fingerprint = getGuestFingerprint();
-        if (fingerprint) {
-          checkParams.set('guest_fingerprint', fingerprint);
-        }
-      }
-
-      if (checkParams.toString()) {
-        const response = await fetch(
-          `/api/buzz/check-played/${today}/${currentLanguage}?${checkParams.toString()}`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          buzzPlayed = data.data?.played || false;
-          buzzCompleted = data.data?.completed || false;
-        }
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('Failed to check buzz status:', errorMessage);
-    }
-
-    // Fetch buzz preview data
-    try {
-      const buzzResponse = await fetch(`/api/buzz/${today}/${currentLanguage}`);
-      if (buzzResponse.ok) {
-        const buzzData = await buzzResponse.json();
-        if (buzzData.success && buzzData.data) {
-          setBuzzPreview({
-            imageUrl: buzzData.data.imageUrl,
-            trendingSummary: buzzData.data.trendingSummary,
-            available: true,
-          });
-        }
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('Failed to fetch buzz preview:', errorMessage);
-    }
-
-    if (!buzzPlayed) {
-      setStatus(prev => ({ ...prev, buzz: 'new' }));
-    } else {
-      setStatus(prev => ({
-        ...prev,
-        buzz: buzzCompleted ? 'won' : 'lost'
-      }));
-    }
-    setLoadingStatus(prev => ({ ...prev, buzz: false }));
   };
 
   // Fetch streak data
@@ -196,11 +97,9 @@ export function DailyChallengeLanding({
 
   // Initial status check
   useEffect(() => {
-    setLoadingStatus({ wordHunt: true, buzz: true });
+    setLoadingStatus({ wordHunt: true });
     checkWordHunt();
-    checkBuzzStatus();
     fetchStreak();
-    setRequestState('idle');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
@@ -209,7 +108,6 @@ export function DailyChallengeLanding({
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         checkWordHunt();
-        checkBuzzStatus();
         fetchStreak();
       }
     };
@@ -222,7 +120,6 @@ export function DailyChallengeLanding({
   useEffect(() => {
     const handlePopState = () => {
       checkWordHunt();
-      checkBuzzStatus();
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -233,44 +130,14 @@ export function DailyChallengeLanding({
   useEffect(() => {
     if (pathname && pathname.endsWith('/daily')) {
       checkWordHunt();
-      checkBuzzStatus();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Handle requesting a buzz challenge
-  const handleRequestChallenge = async () => {
-    if (requestState !== 'idle') return;
-    setRequestState('loading');
-    try {
-      const response = await fetch('/api/buzz/request-challenge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language: currentLanguage,
-          player_id: user?.id || null,
-          guest_fingerprint: !user?.id ? getGuestFingerprint() : null,
-        }),
-      });
-      if (response.ok) {
-        setRequestState('sent');
-      } else {
-        setRequestState('idle');
-        console.error('Failed to request challenge');
-      }
-    } catch (err) {
-      setRequestState('idle');
-      console.error('Error requesting challenge:', err);
-    }
-  };
-
   // Completion count for progress bar
-  const completedCount =
-    (status.wordHunt === 'won' ? 1 : 0) +
-    (status.buzz === 'won' ? 1 : 0);
+  const completedCount = status.wordHunt === 'won' ? 1 : 0;
 
   const wordHuntPlayed = status.wordHunt === 'won' || status.wordHunt === 'lost';
-  const bothWon = status.wordHunt === 'won' && status.buzz === 'won';
 
   return (
     <motion.div
@@ -383,40 +250,6 @@ export function DailyChallengeLanding({
 
           {/* Streak counter */}
           <StreakCounter streak={streak} />
-
-          <QuestPathLine />
-
-          {/* Buzz as secondary card */}
-          <QuestCard
-            challengeId="buzz"
-            icon={<Hourglass className="w-8 h-8" />}
-            title={t('buzz.title')}
-            tagline={
-              status.buzz === 'unavailable'
-                ? t('buzz.unavailableTagline')
-                : t('buzz.tagline')
-            }
-            details={status.buzz !== 'unavailable' ? t('buzz.details') : undefined}
-            color="yellow"
-            status={status.buzz}
-            isLoadingStatus={loadingStatus.buzz}
-            onPlay={onSelectBuzz}
-            timeMode="relaxed"
-            timeModeLabel={t('daily.untimedQuest')}
-            buttonText={
-              (status.buzz === 'won' || status.buzz === 'lost')
-                ? t('daily.viewResults')
-                : status.buzz === 'unavailable'
-                  ? t('buzz.requestChallenge')
-                  : t('daily.startQuest')
-            }
-            delay={0.3}
-            previewImageUrl={buzzPreview.imageUrl}
-            previewImageAlt={buzzPreview.trendingSummary}
-            onRequestChallenge={handleRequestChallenge}
-            requestState={requestState}
-            variant="secondary"
-          />
         </>
       ) : (
         <>
@@ -444,79 +277,7 @@ export function DailyChallengeLanding({
 
           {/* Streak counter between quests */}
           <StreakCounter streak={streak} />
-
-          {/* Quest path connector */}
-          <QuestPathLine />
-
-          {/* Quest 2: Daily Buzz */}
-          <QuestCard
-            challengeId="buzz"
-            icon={<Hourglass className="w-8 h-8" />}
-            title={t('buzz.title')}
-            tagline={
-              status.buzz === 'unavailable'
-                ? t('buzz.unavailableTagline')
-                : t('buzz.tagline')
-            }
-            details={status.buzz !== 'unavailable' ? t('buzz.details') : undefined}
-            color="yellow"
-            status={status.buzz}
-            isLoadingStatus={loadingStatus.buzz}
-            onPlay={onSelectBuzz}
-            timeMode="relaxed"
-            timeModeLabel={t('daily.untimedQuest')}
-            buttonText={
-              (status.buzz === 'won' || status.buzz === 'lost')
-                ? t('daily.viewResults')
-                : status.buzz === 'unavailable'
-                  ? t('buzz.requestChallenge')
-                  : t('daily.startQuest')
-            }
-            delay={0.3}
-            previewImageUrl={buzzPreview.imageUrl}
-            previewImageAlt={buzzPreview.trendingSummary}
-            onRequestChallenge={handleRequestChallenge}
-            requestState={requestState}
-          />
         </>
-      )}
-
-      {/* Browse Past Challenges */}
-      {onShowBuzzHistory && (
-        <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 26, delay: 0.4 }}
-          whileHover={{ scale: 1.02 }}
-          onClick={onShowBuzzHistory}
-          className="mt-4 text-sm text-slate-400 hover:text-neo-pink transition-colors underline underline-offset-4 decoration-slate-600 hover:decoration-neo-pink"
-        >
-          {t('daily.browseArchive')}
-        </motion.button>
-      )}
-
-      {/* Daily Double Achievement */}
-      {bothWon && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
-          className="mt-5 w-full"
-        >
-          <div className="px-5 py-3 bg-neo-navy-light border-3 border-neo-lime rounded-xl shadow-hard">
-            <div className="flex items-center gap-3">
-              <Trophy className="w-6 h-6 text-neo-lime" />
-              <div>
-                <span className="font-black text-neo-lime text-base tracking-wide uppercase block">
-                  {t('daily.dailyDouble')}
-                </span>
-                <span className="text-[10px] text-slate-400">
-                  {t('daily.dailyDoubleBonus')}
-                </span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       )}
 
       {/* Leaderboard Teaser */}

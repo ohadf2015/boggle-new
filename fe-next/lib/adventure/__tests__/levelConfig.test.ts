@@ -21,6 +21,8 @@ import {
   validateLevelConfig,
 } from '../levelConfig';
 import type { LevelConfig } from '@/types/adventure';
+import { hasPathOfLength } from '../gridValidator';
+import { getTimerDuration, LEVELS_PER_WORLD } from '../constants';
 
 describe('World Configuration', () => {
   describe('WORLD_CONFIGS', () => {
@@ -449,6 +451,99 @@ describe('Special Tile Generation', () => {
   });
 });
 
+describe('Grid-aware objective generation', () => {
+  describe('generateObjectives with grid', () => {
+    it('should replace longWords objective with fallback when grid has no long paths', () => {
+      // GIVEN: A 4x4 grid where no path of length 5 exists
+      // (impossible on 4x4, but we use a tiny grid to simulate)
+      // Actually 4x4 always has paths of 5+. Use a degenerate grid concept:
+      // We pass a grid to generateObjectives; if grid lacks paths >= 5, longWords replaced.
+      // Build a 2x2 grid (gridSize=2) — max path is 4, less than LONG_WORD_LENGTH=5
+      const tinyGrid = [
+        ['A', 'B'],
+        ['C', 'D'],
+      ];
+
+      // Level 3+ in world 1 normally gets longWords objective
+      const objectives = generateObjectives(1, 3, tinyGrid);
+      const hasLongWords = objectives.some((o) => o.type === 'longWords');
+
+      // THEN: Should NOT have longWords since grid can't support 5-letter paths
+      expect(hasLongWords).toBe(false);
+    });
+
+    it('should keep longWords objective when grid supports long paths', () => {
+      // GIVEN: A 4x4 grid (supports paths well over 5)
+      const grid = [
+        ['A', 'B', 'C', 'D'],
+        ['E', 'F', 'G', 'H'],
+        ['I', 'J', 'K', 'L'],
+        ['M', 'N', 'O', 'P'],
+      ];
+
+      // Level 3 in world 1 normally gets longWords
+      const objectives = generateObjectives(1, 3, grid);
+      const hasLongWords = objectives.some((o) => o.type === 'longWords');
+
+      expect(hasLongWords).toBe(true);
+    });
+
+    it('should still work without grid (backward compatibility)', () => {
+      // Without grid, longWords is always added for level >= 3
+      const objectives = generateObjectives(1, 3);
+      const hasLongWords = objectives.some((o) => o.type === 'longWords');
+      expect(hasLongWords).toBe(true);
+    });
+  });
+});
+
+describe('Hidden word grid validation', () => {
+  it('should clear hiddenWord when word cannot be formed on the grid', () => {
+    // GIVEN: A grid that does NOT contain MAGIC as a valid path
+    const grid = [
+      ['X', 'X', 'X', 'X'],
+      ['X', 'X', 'X', 'X'],
+      ['X', 'X', 'X', 'X'],
+      ['X', 'X', 'X', 'X'],
+    ];
+
+    // Level 1-4 normally has hiddenWord 'MAGIC'
+    const config = getLevelConfig(1, 4, grid);
+    expect(config.hiddenWord).toBeUndefined();
+  });
+
+  it('should keep hiddenWord when word CAN be formed on the grid', () => {
+    // GIVEN: A grid that contains MAGIC as a valid path
+    // M A G X
+    // X X I X
+    // X X C X
+    // X X X X
+    const grid = [
+      ['M', 'A', 'G', 'X'],
+      ['X', 'X', 'I', 'X'],
+      ['X', 'X', 'C', 'X'],
+      ['X', 'X', 'X', 'X'],
+    ];
+    // Path: M(0,0)->A(0,1)->G(0,2)->I(1,2)->C(2,2)
+
+    const config = getLevelConfig(1, 4, grid);
+    expect(config.hiddenWord).toBe('MAGIC');
+  });
+
+  it('should not affect levels without hidden words', () => {
+    const grid = [
+      ['X', 'X', 'X', 'X'],
+      ['X', 'X', 'X', 'X'],
+      ['X', 'X', 'X', 'X'],
+      ['X', 'X', 'X', 'X'],
+    ];
+
+    // Level 1 has no hidden word
+    const config = getLevelConfig(1, 1, grid);
+    expect(config.hiddenWord).toBeUndefined();
+  });
+});
+
 describe('Level Config Validation', () => {
   describe('validateLevelConfig', () => {
     it('should pass for valid config', () => {
@@ -497,6 +592,17 @@ describe('Level Config Validation', () => {
       expect(result.errors).toContain('At least one objective required');
     });
 
+    it('should validate all generated configs', () => {
+      // Every config from getLevelConfig should pass validation
+      for (let world = 1; world <= 10; world++) {
+        for (let level = 1; level <= 7; level++) {
+          const config = getLevelConfig(world, level);
+          const result = validateLevelConfig(config);
+          expect(result.valid).toBe(true);
+        }
+      }
+    });
+
     it('should fail for special tile outside grid', () => {
       const config: LevelConfig = {
         world: 1,
@@ -515,5 +621,102 @@ describe('Level Config Validation', () => {
       expect(result.valid).toBe(false);
       expect(result.errors.some((e) => e.includes('outside grid'))).toBe(true);
     });
+  });
+});
+
+describe('Score target calibration (Fix 1)', () => {
+  it('should base score targets on realistic word output given timer', () => {
+    // GIVEN: World 1 level 2 (even level = scoreTarget), timer=120s
+    const objectives = generateObjectives(1, 2);
+    const scoreObj = objectives.find((o) => o.type === 'scoreTarget');
+
+    // Average word ~3.5 letters => score ~45 pts
+    // estimatedWords = 120/5 = 24, difficultyFactor for world 1 = 0.5
+    // expected ~ 24 * 45 * 0.5 = 540
+    // Should be reasonable, not the old formula (200 + 2*30 = 260)
+    expect(scoreObj).toBeDefined();
+    expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
+    expect(scoreObj!.target).toBeLessThanOrEqual(700);
+  });
+
+  it('should produce higher score targets in later worlds', () => {
+    // Even levels: 2, 4, 6
+    const world1 = generateObjectives(1, 2);
+    const world5 = generateObjectives(5, 4);
+    const world10 = generateObjectives(10, 6);
+
+    const s1 = world1.find((o) => o.type === 'scoreTarget')!.target;
+    const s5 = world5.find((o) => o.type === 'scoreTarget')!.target;
+    const s10 = world10.find((o) => o.type === 'scoreTarget')!.target;
+
+    expect(s5).toBeGreaterThan(s1);
+    expect(s10).toBeGreaterThan(s5);
+  });
+
+  it('should cap score targets at a reasonable maximum', () => {
+    // Even in the hardest levels, score target should not exceed 1500
+    for (let world = 1; world <= 10; world++) {
+      for (let level = 2; level <= 6; level += 2) {
+        const objectives = generateObjectives(world, level);
+        const scoreObj = objectives.find((o) => o.type === 'scoreTarget');
+        if (scoreObj) {
+          expect(scoreObj.target).toBeLessThanOrEqual(1500);
+        }
+      }
+    }
+  });
+});
+
+describe('Word count backpressure from timer (Fix 2)', () => {
+  it('should cap wordCount target based on available timer', () => {
+    // GIVEN: Any world/level with wordCount objective (odd levels)
+    for (let world = 1; world <= 10; world++) {
+      for (let level = 1; level <= 6; level += 2) {
+        const objectives = generateObjectives(world, level);
+        const wordObj = objectives.find(
+          (o) => o.type === 'wordCount' && o.isPrimary
+        );
+        if (!wordObj) continue;
+
+        const timer = getTimerDuration(world);
+        const maxReasonableWords = timer / 4; // 1 word per 4s is very fast
+        const cap = Math.floor(maxReasonableWords * 0.8);
+
+        expect(wordObj.target).toBeLessThanOrEqual(cap);
+      }
+    }
+  });
+
+  it('should never require more than 1 word per 5 seconds', () => {
+    for (let world = 1; world <= 10; world++) {
+      for (let level = 1; level <= 6; level += 2) {
+        const objectives = generateObjectives(world, level);
+        const wordObj = objectives.find(
+          (o) => o.type === 'wordCount' && o.isPrimary
+        );
+        if (!wordObj) continue;
+
+        const timer = getTimerDuration(world);
+        const secondsPerWord = timer / wordObj.target;
+
+        // Player should have at least 5 seconds per word
+        expect(secondsPerWord).toBeGreaterThanOrEqual(5);
+      }
+    }
+  });
+
+  it('World 7 should not require 24 words in 90 seconds anymore', () => {
+    // GIVEN: World 7, level 1 (odd = wordCount)
+    // globalLevel = (7-1)*7 + 1 = 43
+    // Old formula: min(8 + floor(43/5)*2, 25) = min(8+16, 25) = 24
+    // Timer for world 7 = 90s. 24 words in 90s = 3.75s/word (too tight)
+    const objectives = generateObjectives(7, 1);
+    const wordObj = objectives.find(
+      (o) => o.type === 'wordCount' && o.isPrimary
+    );
+
+    expect(wordObj).toBeDefined();
+    // With 90s timer, cap = floor((90/4)*0.8) = floor(18) = 18
+    expect(wordObj!.target).toBeLessThanOrEqual(18);
   });
 });

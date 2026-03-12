@@ -162,25 +162,6 @@ describe('Result Pages Touch Scroll Compliance', () => {
     });
   });
 
-  describe('BuzzResultsScreen.tsx', () => {
-    const sourcePath = resolve(process.cwd(), 'components/buzz/BuzzResultsScreen.tsx');
-    const source = readFileSync(sourcePath, 'utf-8');
-
-    it('should have touch scrolling support on main content area', () => {
-      // Find scrollable content areas with overflow-y-auto
-      const overflowPatterns = source.match(
-        /className="[^"]*overflow-y-auto[^"]*"/g
-      ) || [];
-
-      expect(overflowPatterns.length).toBeGreaterThan(0);
-
-      overflowPatterns.forEach((match) => {
-        const hasTouchSupport = hasProperTouchScrolling(match);
-        expect(hasTouchSupport).toBe(true);
-      });
-    });
-  });
-
   describe('SharePanel.tsx', () => {
     const sourcePath = resolve(process.cwd(), 'components/daily/results/SharePanel.tsx');
     const source = readFileSync(sourcePath, 'utf-8');

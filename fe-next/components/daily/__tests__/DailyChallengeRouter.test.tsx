@@ -29,27 +29,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
 jest.mock('../DailyChallengeLanding', () => ({
   DailyChallengeLanding: ({
     onSelectWordHunt,
-    onSelectBuzz,
-    onShowBuzzHistory,
   }: {
     onSelectWordHunt: () => void;
-    onSelectBuzz: () => void;
-    onShowBuzzHistory: () => void;
   }) => (
     <div data-testid="daily-challenge-landing">
       <button onClick={onSelectWordHunt} data-testid="select-word-hunt">Select Word Hunt</button>
-      <button onClick={onSelectBuzz} data-testid="select-buzz">Select Buzz</button>
-      <button onClick={onShowBuzzHistory} data-testid="show-buzz-history">Show History</button>
-    </div>
-  ),
-}));
-
-jest.mock('../../buzz/BuzzHistoryList', () => ({
-  __esModule: true,
-  default: ({ onSelectDate, onClose }: { onSelectDate: (date: string) => void; onClose: () => void }) => (
-    <div data-testid="buzz-history-list">
-      <button onClick={() => onSelectDate('2024-01-15')} data-testid="select-past-buzz">Select Past Buzz</button>
-      <button onClick={onClose} data-testid="close-history">Close</button>
     </div>
   ),
 }));
@@ -145,45 +129,6 @@ describe('DailyChallengeRouter - Smart Routing', () => {
       fireEvent.click(screen.getByTestId('select-word-hunt'));
 
       expect(mockPush).toHaveBeenCalledWith('/en/daily/word-hunt');
-    });
-
-    test('selecting Buzz navigates to Buzz page', () => {
-      render(<DailyChallengeRouter />);
-
-      fireEvent.click(screen.getByTestId('select-buzz'));
-
-      expect(mockPush).toHaveBeenCalledWith('/en/daily/buzz');
-    });
-
-    test('showing buzz history opens modal', () => {
-      render(<DailyChallengeRouter />);
-
-      expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
-
-      fireEvent.click(screen.getByTestId('show-buzz-history'));
-
-      expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
-    });
-
-    test('selecting past buzz navigates to buzz page with date query', () => {
-      render(<DailyChallengeRouter />);
-
-      fireEvent.click(screen.getByTestId('show-buzz-history'));
-      fireEvent.click(screen.getByTestId('select-past-buzz'));
-
-      expect(mockPush).toHaveBeenCalledWith('/en/daily/buzz?date=2024-01-15');
-      expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
-    });
-
-    test('closing buzz history modal hides it', () => {
-      render(<DailyChallengeRouter />);
-
-      fireEvent.click(screen.getByTestId('show-buzz-history'));
-      expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
-
-      fireEvent.click(screen.getByTestId('close-history'));
-
-      expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
     });
   });
 });

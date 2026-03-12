@@ -23,6 +23,7 @@ export interface DailyParticipant {
   avatar_color: string;
   avatar_image?: string | null;
   profile_picture_url?: string | null;
+  custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   country_code?: string | null;
   score: number;
   word_count: number;
@@ -83,27 +84,31 @@ const ParticipantRow = memo<{
       {/* Rank Badge */}
       <div
         className={`
-          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
+          w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
           ${getRankBadgeClasses(rank)}
-          border-2 shadow-sm
+          border-2 shadow-sm flex-shrink-0
         `}
       >
         {getRankDisplay(rank)}
       </div>
 
-      {/* Avatar with Country Flag */}
-      <div className="relative">
-        <div className="w-9 h-9 sm:w-11 sm:h-11 border-2 border-neo-black/80 shadow-sm rounded-xl overflow-hidden">
+      {/* Avatar with Country Flag — prominent display */}
+      <div className="relative flex-shrink-0">
+        <div className={`
+          w-11 h-11 sm:w-14 sm:h-14 border-3 shadow-hard-sm rounded-full overflow-hidden
+          ${isCurrentUser ? 'border-neo-cyan' : isTopThree ? 'border-neo-orange' : 'border-neo-black/80'}
+        `}>
           <Avatar
             profilePictureUrl={participant.profile_picture_url ?? undefined}
             avatarImage={participant.avatar_image ?? undefined}
-            size="md"
+            customAvatar={participant.custom_avatar ?? undefined}
+            size="lg"
             className="w-full h-full"
           />
         </div>
         {/* Country Flag Badge */}
         {countryFlag && (
-          <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
             {countryFlag}
           </div>
         )}
@@ -485,11 +490,12 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <div className="w-6 h-6 rounded-lg border border-neo-black/50 overflow-hidden">
+                <div className="w-10 h-10 rounded-full border-2 border-neo-cyan overflow-hidden shadow-hard-sm flex-shrink-0">
                   <Avatar
                     profilePictureUrl={currentUserData.profile_picture_url ?? undefined}
                     avatarImage={currentUserData.avatar_image ?? undefined}
-                    size="sm"
+                    customAvatar={currentUserData.custom_avatar ?? undefined}
+                    size="lg"
                     className="w-full h-full"
                   />
                 </div>

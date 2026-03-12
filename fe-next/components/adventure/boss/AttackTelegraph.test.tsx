@@ -107,6 +107,15 @@ describe('AttackTelegraph', () => {
       // Warning emoji icon
       expect(screen.getByText('⚠️')).toBeInTheDocument();
     });
+
+    it('should apply theme telegraph color class to banner', () => {
+      renderWithProviders(<AttackTelegraph {...defaultProps} />);
+      const banner = screen.getByTestId('telegraph-banner');
+      // The theme mock returns 'bg-neo-red/20' as telegraphColor
+      // Ensure it's interpolated, not the literal string "${bossFightTheme.telegraphColor}"
+      expect(banner.className).toContain('bg-neo-red/20');
+      expect(banner.className).not.toContain('${');
+    });
   });
 
   describe('Countdown', () => {

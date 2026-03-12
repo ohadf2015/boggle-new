@@ -15,7 +15,7 @@ import type { Language } from '@/types';
 type InvalidWordReason = 'not_on_board' | 'not_in_dictionary' | 'peer_rejected' | 'too_short';
 
 /** Valid game modes */
-type GameMode = 'multiplayer' | 'adventure' | 'daily_word_hunt' | 'daily_buzz' | 'single_player' | 'drill';
+type GameMode = 'multiplayer' | 'adventure' | 'daily_word_hunt' | 'single_player' | 'drill';
 
 interface RecordInvalidWordRequest {
   word: string;

@@ -5,6 +5,7 @@
 
 import type { User, Session } from '@supabase/supabase-js';
 import type { Dispatch, SetStateAction } from 'react';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface ProfileData {
   id: string;
@@ -13,6 +14,7 @@ export interface ProfileData {
   avatar_image?: string; // New: Avatar image ID
   avatar_emoji?: string;
   avatar_color?: string;
+  avatar_config?: CustomAvatarConfig | null;
   profile_picture_url?: string | null;
   profile_picture_provider?: string | null;
   total_games?: number;

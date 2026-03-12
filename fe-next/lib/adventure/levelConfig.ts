@@ -23,6 +23,7 @@ import {
 } from './constants';
 import { VOWELS } from './gridGenerator';
 import { getBossConfig } from './bossConfig';
+import { hasPathOfLength, hasWordPath } from './gridValidator';
 
 // ==============================================
 // WORLD CONFIGURATION
@@ -245,7 +246,7 @@ export function getLevelConfig(
 
   // Generate level-specific content
   // Pass grid for vowel protection on ice tiles (prevents unfair levels)
-  const objectives = generateObjectives(world, level);
+  const objectives = generateObjectives(world, level, grid);
   const specialTiles = generateSpecialTiles(world, level, gridSize, grid);
 
   // Calculate chapter structure (2-2-3 pattern)
@@ -284,9 +285,14 @@ export function getLevelConfig(
   }
 
   // Add hidden word for milestone levels (5 and 10)
+  // Only include if the word can actually be formed on the grid
   const hiddenWordKey = `${world}-${level}`;
-  if (HIDDEN_WORDS[hiddenWordKey]) {
-    config.hiddenWord = HIDDEN_WORDS[hiddenWordKey];
+  const hiddenWord = HIDDEN_WORDS[hiddenWordKey];
+  if (hiddenWord) {
+    const wordValid = !grid || hasWordPath(grid.flat(), gridSize, hiddenWord);
+    if (wordValid) {
+      config.hiddenWord = hiddenWord;
+    }
   }
 
   // Add boss twist mechanic for boss levels
@@ -350,7 +356,8 @@ export function getAllLevelConfigs(): LevelConfig[] {
  */
 export function generateObjectives(
   world: number,
-  level: number
+  level: number,
+  grid?: string[][]
 ): LevelObjective[] {
   const objectives: LevelObjective[] = [];
   const isBossLevel = level === LEVELS_PER_WORLD; // Level 7 is boss
@@ -393,19 +400,37 @@ export function generateObjectives(
   const globalLevel = (world - 1) * LEVELS_PER_WORLD + level;
 
   // Primary objective: Alternate between wordCount and scoreTarget
+  const timerSeconds = getTimerDuration(world);
+
   if (level % 2 === 1) {
     // Odd levels: word count
     // Base: 8 words, +2 every 5 global levels, max 25
-    const target = Math.min(8 + Math.floor(globalLevel / 5) * 2, 25);
+    let target = Math.min(8 + Math.floor(globalLevel / 5) * 2, 25);
+
+    // Backpressure: cap wordCount based on available timer
+    // 1 word per 4 seconds is very fast; cap at 80% of that
+    const maxReasonableWords = Math.floor((timerSeconds / 4) * 0.8);
+    target = Math.min(target, maxReasonableWords);
+
     objectives.push({
       type: OBJECTIVE_TYPES.WORD_COUNT as ObjectiveType,
       target,
       isPrimary: true,
     });
   } else {
-    // Even levels: score target
-    // Base: 200, +30 per global level, max 1000
-    const target = Math.min(200 + globalLevel * 30, 1000);
+    // Even levels: score target calibrated to realistic word output
+    // Average word ~3.5 letters => score ~45 pts (3.5 * 10 * ~1.25 multiplier)
+    const AVERAGE_WORD_SCORE = 45;
+    const estimatedWordsInTime = timerSeconds / 5; // ~1 word per 5 seconds
+    // difficultyFactor scales from 0.5 (world 1) to 0.85 (world 10)
+    // Higher range compensates for shorter timers in later worlds
+    const difficultyFactor = 0.5 + (world - 1) * (0.35 / 9);
+    // Level progression bonus: +1.5% per global level beyond first
+    const levelBonus = 1 + (globalLevel - 1) * 0.015;
+    const target = Math.min(
+      Math.round(estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * levelBonus),
+      1500
+    );
     objectives.push({
       type: OBJECTIVE_TYPES.SCORE_TARGET as ObjectiveType,
       target,
@@ -416,14 +441,27 @@ export function generateObjectives(
   // Secondary objectives based on level progression
 
   // Long words objective (level 3+)
+  // Only add if grid supports paths of LONG_WORD_LENGTH (5)
+  const LONG_WORD_LENGTH = 5;
   if (level >= 3) {
-    // 1 long word at level 3, +1 every 3 levels, max 5
-    const target = Math.min(1 + Math.floor((level - 3) / 3), 5);
-    objectives.push({
-      type: OBJECTIVE_TYPES.LONG_WORDS as ObjectiveType,
-      target,
-      isPrimary: false,
-    });
+    const gridSupportsLongWords = !grid || hasPathOfLength(grid, LONG_WORD_LENGTH);
+    if (gridSupportsLongWords) {
+      // 1 long word at level 3, +1 every 3 levels, max 5
+      const target = Math.min(1 + Math.floor((level - 3) / 3), 5);
+      objectives.push({
+        type: OBJECTIVE_TYPES.LONG_WORDS as ObjectiveType,
+        target,
+        isPrimary: false,
+      });
+    } else {
+      // Fallback: add a wordCount secondary objective instead
+      const target = Math.min(3 + Math.floor(level / 2), 8);
+      objectives.push({
+        type: OBJECTIVE_TYPES.WORD_COUNT as ObjectiveType,
+        target,
+        isPrimary: false,
+      });
+    }
   }
 
   // Clear ice objective (world 2+, level 5+)

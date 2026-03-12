@@ -16,7 +16,6 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useProfilePictureUpload } from '@/hooks/useProfilePictureUpload';
 import { usePlayerCollectibles } from '@/hooks/usePlayerCollectibles';
 import AuthModal from '@/components/auth/AuthModal';
-import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
 import { ReferralCard } from '@/components/profile/ReferralCard';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
 import { cn } from '@/lib/utils';
@@ -62,7 +61,6 @@ export default function ProfilePageClient(): React.JSX.Element {
 
   // State
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
   const [activeSection, setActiveSection] = useState<ProfileSection>(getInitialSection);
   const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
@@ -135,19 +133,6 @@ export default function ProfilePageClient(): React.JSX.Element {
     }
   }, []);
 
-  // Handle avatar save
-  const handleSaveEmojiAvatar = async ({ avatarImage }: { avatarImage: string }): Promise<void> => {
-    try {
-      await updateProfile({
-        avatar_image: avatarImage,
-      });
-      await refreshProfile();
-      toast.success(t('profile.saved'));
-    } catch (err) {
-      console.error('Save avatar error:', err);
-      toast.error(t('profile.saveError'));
-    }
-  };
 
   // Not authenticated - show sign in prompt
   if (!loading && !isAuthenticated) {
@@ -229,7 +214,6 @@ export default function ProfilePageClient(): React.JSX.Element {
     isUploading,
     onProfilePictureUpload: handleProfilePictureUpload,
     onRemoveProfilePicture: handleRemoveProfilePicture,
-    onShowEmojiPicker: () => setShowEmojiPicker(true),
     updateProfile,
     refreshProfile
   };
@@ -361,17 +345,6 @@ export default function ProfilePageClient(): React.JSX.Element {
           </motion.div>
         </div>
 
-        <EmojiAvatarPicker
-          isOpen={showEmojiPicker}
-          onClose={() => setShowEmojiPicker(false)}
-          onSave={handleSaveEmojiAvatar}
-          currentAvatarImage={profile?.avatar_image}
-          profileAvatar={{
-            profilePictureUrl: profile?.profile_picture_url,
-            avatarImage: profile?.avatar_image,
-            displayName: profile?.display_name,
-          }}
-        />
       </div>
 
       {/* ===== DESKTOP VIEW ===== */}
@@ -425,17 +398,6 @@ export default function ProfilePageClient(): React.JSX.Element {
           <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />
         </div>
 
-        <EmojiAvatarPicker
-          isOpen={showEmojiPicker}
-          onClose={() => setShowEmojiPicker(false)}
-          onSave={handleSaveEmojiAvatar}
-          currentAvatarImage={profile?.avatar_image}
-          profileAvatar={{
-            profilePictureUrl: profile?.profile_picture_url,
-            avatarImage: profile?.avatar_image,
-            displayName: profile?.display_name,
-          }}
-        />
       </div>
     </>
   );

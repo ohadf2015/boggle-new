@@ -259,12 +259,3 @@ export async function listFeatureFlags(): Promise<FeatureFlag[]> {
     return [];
   }
 }
-
-/**
- * Specific helper for Daily Buzz images feature
- * @param userId User ID to check (optional - null for guest users)
- * @returns True if user can see Daily Buzz images
- */
-export async function canAccessDailyBuzzImages(userId: string | null): Promise<boolean> {
-  return canAccessFeature(userId, 'daily_buzz_images');
-}

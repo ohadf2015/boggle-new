@@ -1107,6 +1107,7 @@ const sv = {
     "readyUp": "Redo!",
     "readyConfirmed": "Redo!",
     "editName": "Byt namn",
+    "editAvatar": "Byt avatar",
     "hostDisconnected": "Värden kopplades bort. Väntar på återanslutning...",
     "isNowHost": "är nu värd",
     "disconnected": "kopplades bort. Väntar på återanslutning...",
@@ -3074,7 +3075,10 @@ const sv = {
     "wordSolver": "Ordlösare",
     "howToPlay": "Hur man spelar",
     "guides": "Guider",
-    "glossary": "Ordlista"
+    "glossary": "Ordlista",
+    "explore": "Utforska",
+    "resources": "Resurser",
+    "connect": "Kontakt"
   },
   "support": {
     "kofiFooter": "Köp oss en kaffe",
@@ -3132,6 +3136,24 @@ const sv = {
     "shareTextAuth": "Gå med mig i LexiClash! Använd min referenskod: {code}",
     "shareTextGuest": "Spela LexiClash - det bästa multiplayer-ordspelet!",
     "shareNativeTitle": "Gå med i LexiClash",
+    "playNowFree": "Spela nu — Gratis!",
+    "gameModes": "Spellägen",
+    "languages": "Språk",
+    "activePlayers": "Aktiva spelare",
+    "todaysTopPlayers": "Toppspelare",
+    "viewFullLeaderboard": "Visa hela topplistan",
+    "readyToCompete": "Redo att tävla?",
+    "startPlaying": "Börja spela",
+    "createAvatar": "Skapa din avatar",
+    "designYourLook": "Designa ditt unika utseende",
+    "yourRank": "Din ranking",
+    "totalScore": "Totalpoäng",
+    "solvedPercent": "Bara {percent}% löste idag",
+    "todaysTopWords": "Dagens toppord",
+    "hallOfFame": "Hall of Fame",
+    "gamesToday": "Spel idag",
+    "wordHuntMode": "Ordjakt",
+    "wordHuntModeDesc": "Hitta målordet så snabbt du kan — ett nytt pussel varje dag!",
     "seo": {
       "whatIsTitle": "Vad ar LexiClash?",
       "whatIsContent": "LexiClash ar ett gratis, snabbt multiplayer-ordspel som du kan spela direkt i webblasaren. Tavla mot vanner i ordstrider i realtid pa ett delat bokstavsrutn - hitta ord, bygg kombos och klatter pa topplistorna. Det ar som Boggle mots Wordle, men multiplayer. Inga nedladdningar, ingen registrering kravs. Tillgangligt pa engelska, hebreiska, svenska, japanska och spanska.",
@@ -3581,144 +3603,9 @@ const sv = {
       "multiplayerTitle": "🎮 Redo för Mer?",
       "multiplayerDesc": "Utmana vänner eller slåss mot bottar i realtid!",
       "multiplayerCTA": "Spela Multiplayer"
-    }
-  },
-  "buzz": {
-    "title": "Daily Buzz",
-    "tagline": "Dagens trender som ordpussel",
-    "subtitle": "Vad buzzer idag?",
-    "details": "Chill stämning, ingen timer. Bara du mot dagens buzz!",
-    "badge": "NYTT",
-    "breaking": "JUST NU",
-    "tapToCelebrate": "Tryck för att fira",
-    "challenges": "Utmaningar",
-    "letters": "bokstäver",
-    "connectingWord": "KOPPLINGSORDET",
-    "error": {
-      "title": "Ajdå!",
-      "loading": "Laddar dagens buzz...",
-      "failed": "Kunde inte ladda. Försök igen?",
-      "noInternet": "Ingen anslutning. Kolla internet.",
-      "noOptions": "Inga alternativ tillgängliga"
     },
-    "fillTheBlank": "Fyll i luckan",
-    "finish": "KLART",
-    "helpText": "Lös ordutmaningar från dagens trender. Ingen tidsgräns!",
-    "loading": "Laddar Daily Buzz...",
-    "maxScore": "Max Poäng",
-    "noTimeLimit": "Ingen Timer",
-    "preview": {
-      "title": "DAGENS ÄMNEN",
-      "subtitle": "Utmaningar med...",
-      "play": "STARTA BUZZ"
-    },
-    "quitConfirm": "Dina framsteg sparas, men ofullständiga utmaningar räknas inte i din poäng.",
-    "quitConfirmTitle": "Avsluta Daily Buzz?",
-    "error": {
-      "title": "Hoppsan!",
-      "description": "Något gick fel när utmaningen laddades.",
-      "helpText": "Kontrollera din anslutning och försök igen.",
-      "noOptions": "Inga alternativ tillgängliga för denna utmaning",
-      "loading": "Laddar dagens buzz...",
-      "failed": "Kunde inte ladda. Försök igen?",
-      "noInternet": "Ingen anslutning. Kolla internet."
-    },
-    "searches": "sökningar",
-    "challengeTrend": "I dagens pussel",
-    "topicIs": "Ämne: {topic}",
-    "total": "TOTALT",
-    "trio": {
-      "hint": "Hitta ordet som kopplar alla tre ämnen"
-    },
-    "scrambled": {
-      "unscramble": "Rätta till bokstäverna!"
-    },
-    "chain": {
-      "instruction": "Hitta det sammanbindande ordet!",
-      "compoundHint": "Bildar ett sammansatt ord med BÅDA grannarna",
-      "exampleHint": "Exempel: SOL→BLOMMA→KRUKA (solblomma + blomkruka)",
-      "thinkCompound": "Tänk på sammansatta ord!"
-    },
-    "viewResults": "VISA RESULTAT",
-    "yourAnswer": "DITT SVAR",
-    "typeYourAnswer": "Skriv ditt svar...",
-    "yourScore": "DIN POÄNG",
-    "noChallenge": "Ingen utmaning tillgänglig",
-    "type": {
-      "scrambled": "BLANDAD",
-      "fillBlank": "FYLL I",
-      "chain": "KEDJA",
-      "spotOn": "RÄTT PÅ",
-      "trio": "TRIO",
-      "wordle": "WORDLE",
-      "definition_match": "DEFINITION",
-      "anagram": "ANAGRAM",
-      "riddle": "GÅTA",
-      "fill_blank": "FYLL LUCKAN"
-    },
-    "wordle": {
-      "instruction": "Gissa ordet på 5 bokstäver",
-      "attemptsLeft": "försök kvar",
-      "solved": "Löst!",
-      "failed": "Inga försök kvar",
-      "useDeviceKeyboard": "Tryck för att skriva"
-    },
-    "challenge": "{number}/{total}",
-    "correct": "RÄTT!",
-    "hint": "LEDTRÅD?",
-    "skip": "HOPPA",
-    "back": "TILLBAKA",
-    "swipeToNavigate": "Svep för att navigera",
-    "submit": "SKICKA",
-    "prevChallenge": "Föregående utmaning",
-    "nextChallenge": "Nästa utmaning",
-    "results": {
-      "title": "KLART!",
-      "perfect": "FELFRITT! 💯",
-      "trending": "Dagens trender:",
-      "share": "DELA POÄNG",
-      "reviewTitle": "UTMANINGSÖVERSIKT",
-      "yourAnswer": "Du svarade:",
-      "correctAnswer": "Svar:",
-      "skipped": "HOPPADE ÖVER"
-    },
-    "feedback": {
-      "correct": "RÄTT!",
-      "incorrect": "FEL",
-      "answerWas": "Svaret var:",
-      "nice": "Snyggt!",
-      "streak": "{count} i rad!",
-      "onFire": "PÅ ELD!",
-      "perfect": "PERFEKT!",
-      "allCorrect": "Alla 5 rätt - grymma grejer!"
-    },
-    "fillBlank": {
-      "firstLetterHint": "Första bokstaven visas som ledtråd",
-      "hintLetter": "Ledtråd",
-      "validAlternatives": "Flera giltiga svar accepteras"
-    },
-    "share": {
-      "text": "Daily Buzz: {topic} | {score}/100 | Klarar du det? 🔥"
-    },
-    "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon.",
-    "challengeCompleted": "Utmaning avklarad",
-    "lockedYourAnswer": "Ditt svar",
-    "lockedCorrectAnswer": "Rätt svar",
-    "notAvailable": "Ej tillgängligt",
-    "unavailableTagline": "Inte tillgängligt för detta språk ännu",
     "requestChallenge": "Begär utmaning",
-    "requestSent": "Begäran skickad!",
-    "skipToAnswers": "Hoppa till svaren",
-    "skipConfirmTitle": "Hoppa över utmaningarna?",
-    "skipConfirmMessage": "Du ser svaren utan att spela. Din poäng blir 0.",
-    "skipConfirm": "Hoppa till svaren",
-    "history": {
-      "title": "Tidigare utmaningar",
-      "browse": "Bläddra bland tidigare Daily Buzz",
-      "available": "utmaningar tillgängliga",
-      "empty": "Inga tidigare utmaningar ännu",
-      "selectDate": "Välj datum att spela"
-    }
+    "requestSent": "Förfrågan skickad"
   },
   "wordHunt": {
     "title": "Ordjakt",
@@ -4549,7 +4436,6 @@ const sv = {
       "dailyChallenge": "Daglig Utmaning",
       "wikipediaWords": "Wikipedia-ord",
       "wordBank": "Ordbank",
-      "dailyBuzz": "Dagligt Buzz",
       "webVitals": "Webbprestanda",
       "email": "E-post",
       "milogWords": "Milog-ord"
@@ -7409,6 +7295,22 @@ const sv = {
       "ads": "Vi samarbetar med Google AdSense för att visa relevanta annonser. Annonser hjälper oss att hålla spelet gratis för alla. Du kan läsa mer om annonspersonalisering och avanmälningsalternativ i vår integritetspolicy.",
       "optOut": "Viss datainsamling är nödvändig för att spelet ska fungera (som ditt användarnamn och poäng), men du kan välja bort analys och personaliserade annonser i Inställningar > Integritet."
     }
+  },
+  avatarBuilder: {
+    title: "Avatarskapare",
+    base: "Form",
+    hair: "Hår",
+    eyes: "Ögon",
+    mouth: "Mun",
+    accessories: "Tillbehör",
+    skinColor: "Hudfärg",
+    hairColor: "Hårfärg",
+    accessoryColor: "Färg",
+    randomize: "Slumpa",
+    save: "Spara",
+    cancel: "Avbryt",
+    buildCustom: "Bygg din egen",
+    bgColor: "Bakgrund"
   }
 };
 

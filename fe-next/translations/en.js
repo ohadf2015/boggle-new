@@ -598,6 +598,30 @@ const en = {
     "saveButton": "Save",
     "skipButton": "Skip"
   },
+  "avatar": {
+    "builder": {
+      "title": "Make Your Look",
+      "base": "Face",
+      "hair": "Hair",
+      "eyes": "Eyes",
+      "mouth": "Mouth",
+      "accessories": "Flair",
+      "background": "Vibe",
+      "shape": "Shape",
+      "style": "Style",
+      "type": "Pick One",
+      "skinColor": "Skin Tone",
+      "hairColor": "Hair Color",
+      "accessoryColor": "Color",
+      "bgColor": "Backdrop",
+      "randomize": "Surprise Me",
+      "save": "Lock It In",
+      "cancel": "Nah",
+      "buildCustom": "Make Your Own",
+      "undo": "Undo",
+      "none": "Skip"
+    }
+  },
   "error": {
     "subscriptionFailed": "Hmm, that didn't go through. One more try?",
     "generic": "Oops, that didn't work!",
@@ -1232,6 +1256,7 @@ const en = {
     "readyUp": "Ready Up!",
     "readyConfirmed": "Ready!",
     "editName": "Change name",
+    "editAvatar": "Change avatar",
     "hostDisconnected": "Host disconnected. Waiting for reconnection...",
     "isNowHost": "is now the host",
     "disconnected": "disconnected. Waiting for reconnection...",
@@ -3193,7 +3218,10 @@ const en = {
     "wordSolver": "Word Solver",
     "howToPlay": "How to Play",
     "guides": "Guides",
-    "glossary": "Glossary"
+    "glossary": "Glossary",
+    "explore": "Explore",
+    "resources": "Resources",
+    "connect": "Connect"
   },
   "support": {
     "kofiFooter": "Buy Us a Coffee",
@@ -3251,6 +3279,24 @@ const en = {
     "shareTextAuth": "Join me on LexiClash! Use my referral code: {code}",
     "shareTextGuest": "Play LexiClash - the best multiplayer word game!",
     "shareNativeTitle": "Join LexiClash",
+    "playNowFree": "Play Now — Free!",
+    "gameModes": "Game Modes",
+    "languages": "Languages",
+    "activePlayers": "Active Players",
+    "todaysTopPlayers": "Top Players",
+    "viewFullLeaderboard": "View Full Leaderboard",
+    "readyToCompete": "Ready to Compete?",
+    "startPlaying": "Start Playing",
+    "createAvatar": "Create Your Avatar",
+    "designYourLook": "Design your unique look",
+    "yourRank": "Your Rank",
+    "totalScore": "Total Score",
+    "solvedPercent": "Only {percent}% solved today",
+    "todaysTopWords": "Top Words Today",
+    "hallOfFame": "Hall of Fame",
+    "gamesToday": "Games Today",
+    "wordHuntMode": "Word Hunt",
+    "wordHuntModeDesc": "Find the target word as fast as you can — a fresh puzzle every day!",
     "seo": {
       "whatIsTitle": "What is LexiClash?",
       "whatIsContent": "LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It's like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, and Spanish.",
@@ -3692,137 +3738,9 @@ const en = {
       "multiplayerTitle": "🎮 Ready for More?",
       "multiplayerDesc": "Challenge friends or battle bots in real-time!",
       "multiplayerCTA": "Play Multiplayer"
-    }
-  },
-  "buzz": {
-    "title": "Daily Buzz",
-    "tagline": "Today's trending topics as word puzzles",
-    "subtitle": "What's buzzing today?",
-    "badge": "NEW",
-    "details": "Chill vibes, no timer. Just you vs. today's buzz!",
-    "breaking": "BREAKING",
-    "tapToCelebrate": "Tap to celebrate",
-    "challenges": "challenges",
-    "letters": "letters",
-    "connectingWord": "Connecting word",
-    "fillTheBlank": "Fill in the blank",
-    "finish": "FINISH",
-    "helpText": "Quick word puzzles based on what's trending today. No timer, just think!",
-    "loading": "Loading buzz...",
-    "maxScore": "100 pts max",
-    "noTimeLimit": "No time limit",
-    "topicIs": "Topic:",
-    "total": "Total",
-    "yourAnswer": "Your answer...",
-    "typeYourAnswer": "Type your answer...",
-    "yourScore": "Your Score",
-    "noChallenge": "No challenge available",
-    "searches": "searches",
-    "challengeTrend": "In today's puzzles",
-    "quitConfirm": "Your progress will be lost!",
-    "quitConfirmTitle": "Quit Daily Buzz?",
-    "viewResults": "VIEW RESULTS",
-    "type": {
-      "scrambled": "SCRAMBLED",
-      "fillBlank": "FILL IT",
-      "chain": "CHAIN",
-      "spotOn": "SPOT ON",
-      "trio": "TRIO",
-      "wordle": "WORDLE",
-      "definition_match": "DEFINITION",
-      "anagram": "ANAGRAM",
-      "riddle": "RIDDLE",
-      "fill_blank": "FILL BLANK"
     },
-    "wordle": {
-      "instruction": "Guess the 5-letter word",
-      "attemptsLeft": "attempts left",
-      "solved": "Solved!",
-      "failed": "Out of attempts",
-      "useDeviceKeyboard": "Tap to type"
-    },
-    "trio": {
-      "hint": "What connects these 3?"
-    },
-    "scrambled": {
-      "unscramble": "Unscramble the letters!"
-    },
-    "chain": {
-      "instruction": "Find the connecting word!",
-      "compoundHint": "Forms a compound word with BOTH neighbors",
-      "exampleHint": "Example: SUN→FLOWER→POT (sunflower + flowerpot)",
-      "thinkCompound": "Think compound words!"
-    },
-    "fillBlank": {
-      "firstLetterHint": "First letter revealed as a hint",
-      "hintLetter": "Hint",
-      "validAlternatives": "Multiple valid answers accepted"
-    },
-    "preview": {
-      "title": "Today's Topics",
-      "subtitle": "Trending now",
-      "play": "START BUZZ"
-    },
-    "challenge": "{number}/{total}",
-    "correct": "GOT IT",
-    "hint": "HINT?",
-    "skip": "SKIP",
-    "back": "BACK",
-    "swipeToNavigate": "Swipe to navigate",
-    "submit": "SUBMIT",
-    "prevChallenge": "Previous challenge",
-    "nextChallenge": "Next challenge",
-    "results": {
-      "title": "BUZZ COMPLETE",
-      "perfect": "FLAWLESS! 💯",
-      "trending": "Today's trends:",
-      "share": "SHARE SCORE",
-      "reviewTitle": "CHALLENGE REVIEW",
-      "yourAnswer": "You said:",
-      "correctAnswer": "Answer:",
-      "skipped": "SKIPPED"
-    },
-    "feedback": {
-      "correct": "CORRECT!",
-      "incorrect": "INCORRECT",
-      "answerWas": "The answer was:",
-      "nice": "Nice!",
-      "streak": "{count} in a row!",
-      "onFire": "ON FIRE!",
-      "perfect": "PERFECT!",
-      "allCorrect": "All 5 correct - amazing!"
-    },
-    "share": {
-      "text": "Daily Buzz: {topic} | {score}/100 | Beat this? 🔥"
-    },
-    "error": {
-      "title": "Oops!",
-      "description": "Something went wrong while loading the challenge.",
-      "helpText": "Please check your connection and try again.",
-      "loading": "Loading today's buzz...",
-      "failed": "Couldn't load buzz. Try again?",
-      "noInternet": "No connection. Check your internet.",
-      "noOptions": "No options available"
-    },
-    "alreadyPlayed": "Already played today! Come back tomorrow.",
-    "challengeCompleted": "Challenge completed",
-    "lockedYourAnswer": "Your answer",
-    "lockedCorrectAnswer": "Correct answer",
-    "notAvailable": "Not Available",
-    "unavailableTagline": "Not available for this language yet",
     "requestChallenge": "Request Challenge",
-    "requestSent": "Request Sent!",
-    "skipToAnswers": "Skip to Answers",
-    "skipConfirmTitle": "Skip Challenges?",
-    "skipConfirmMessage": "You'll see the answers without playing. Your score will be 0.",
-    "skipConfirm": "Skip to Answers",
-    "history": {
-      "title": "Past Challenges",
-      "browse": "Browse past Daily Buzz challenges",
-      "available": "challenges available",
-      "empty": "No past challenges yet",
-      "selectDate": "Select a date to play"
-    }
+    "requestSent": "Request Sent"
   },
   "wordHunt": {
     "title": "Word Hunt",
@@ -4653,7 +4571,6 @@ const en = {
       "dailyChallenge": "Daily Challenge",
       "wikipediaWords": "Wikipedia Words",
       "wordBank": "Word Bank",
-      "dailyBuzz": "Daily Buzz",
       "webVitals": "Web Vitals",
       "email": "Email",
       "milogWords": "Milog Words"
@@ -7458,6 +7375,22 @@ const en = {
       "ads": "We partner with Google AdSense to display relevant advertisements. Ads help us keep the game free for everyone. You can learn more about ad personalization and opt-out options in our Privacy Policy.",
       "optOut": "While some data collection is necessary for the game to function (like your username and scores), you can opt out of analytics and personalized ads in Settings > Privacy."
     }
+  },
+  avatarBuilder: {
+    title: "Avatar Builder",
+    base: "Shape",
+    hair: "Hair",
+    eyes: "Eyes",
+    mouth: "Mouth",
+    accessories: "Accessories",
+    skinColor: "Skin Color",
+    hairColor: "Hair Color",
+    accessoryColor: "Color",
+    randomize: "Randomize",
+    save: "Save",
+    cancel: "Cancel",
+    buildCustom: "Build Your Own",
+    bgColor: "Background"
   }
 };
 

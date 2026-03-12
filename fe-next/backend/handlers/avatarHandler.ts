@@ -13,9 +13,12 @@ import { z } from 'zod';
 
 const AVATAR_WEIGHT = parseInt(process.env.RATE_WEIGHT_AVATAR || '2');
 
+import { customAvatarSchema } from '../../shared/types/customAvatar';
+
 const updateAvatarSchema = z.object({
   gameCode: z.string().min(1).max(20).optional(),
   avatarImage: z.string().min(1).max(100),
+  customAvatar: customAvatarSchema.optional(),
 });
 
 /**
@@ -36,7 +39,7 @@ function registerAvatarHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { avatarImage, gameCode: providedGameCode } = parsed.data;
+    const { avatarImage, customAvatar, gameCode: providedGameCode } = parsed.data;
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
@@ -55,12 +58,16 @@ function registerAvatarHandlers(io: Server, socket: Socket): void {
     const player = game.users?.[username];
     if (player && player.avatar) {
       player.avatar.avatarImage = avatarImage;
+      if (customAvatar) {
+        player.avatar.customAvatar = customAvatar;
+      }
     }
 
     // Broadcast to all room members
     broadcastToRoom(io, getGameRoom(gameCode), 'avatarUpdated', {
       username,
       avatarImage,
+      customAvatar,
     });
   });
 }

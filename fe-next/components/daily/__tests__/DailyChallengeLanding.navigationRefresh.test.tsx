@@ -39,11 +39,8 @@ const mockGetWordHuntStatusToday = getWordHuntStatusToday as jest.MockedFunction
 
 describe('DailyChallengeLanding - Navigation Refresh', () => {
   const mockOnSelectWordHunt = jest.fn();
-  const mockOnSelectBuzz = jest.fn();
-
   beforeEach(() => {
     jest.clearAllMocks();
-    // Mock fetch for buzz availability/preview
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ available: true, data: {} }),
@@ -62,7 +59,6 @@ describe('DailyChallengeLanding - Navigation Refresh', () => {
       render(
         <DailyChallengeLanding
           onSelectWordHunt={mockOnSelectWordHunt}
-          onSelectBuzz={mockOnSelectBuzz}
           currentLanguage="en"
         />
       );
@@ -97,7 +93,6 @@ describe('DailyChallengeLanding - Navigation Refresh', () => {
       render(
         <DailyChallengeLanding
           onSelectWordHunt={mockOnSelectWordHunt}
-          onSelectBuzz={mockOnSelectBuzz}
           currentLanguage="en"
         />
       );
@@ -125,7 +120,6 @@ describe('DailyChallengeLanding - Navigation Refresh', () => {
       render(
         <DailyChallengeLanding
           onSelectWordHunt={mockOnSelectWordHunt}
-          onSelectBuzz={mockOnSelectBuzz}
           currentLanguage="en"
         />
       );
@@ -151,7 +145,6 @@ describe('DailyChallengeLanding - Navigation Refresh', () => {
       render(
         <DailyChallengeLanding
           onSelectWordHunt={mockOnSelectWordHunt}
-          onSelectBuzz={mockOnSelectBuzz}
           currentLanguage="en"
         />
       );

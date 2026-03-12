@@ -10,7 +10,7 @@ import type { LanguageOption } from './types';
 
 /**
  * Supported languages for the admin dashboard
- * Used in: DailyWordManager, CommunityWordsManager, WikipediaWordsPanel, Buzz components
+ * Used in: DailyWordManager, CommunityWordsManager, WikipediaWordsPanel
  */
 export const ADMIN_LANGUAGES: LanguageOption[] = [
   { code: 'en', name: 'English', flag: '🇺🇸' },

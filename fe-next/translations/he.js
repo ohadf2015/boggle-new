@@ -1124,6 +1124,7 @@ const he = {
     "readyUp": "!מוכן",
     "readyConfirmed": "!מוכן",
     "editName": "שנה שם",
+    "editAvatar": "שנה אווטאר",
     "hostDisconnected": "המארח התנתק. ממתין לחיבור מחדש...",
     "isNowHost": "הוא עכשיו המארח",
     "disconnected": "התנתק. ממתין לחיבור מחדש...",
@@ -3092,7 +3093,10 @@ const he = {
     "wordSolver": "פותר מילים",
     "howToPlay": "איך לשחק",
     "guides": "מדריכים",
-    "glossary": "מילון מונחים"
+    "glossary": "מילון מונחים",
+    "explore": "גלו",
+    "resources": "משאבים",
+    "connect": "התחברו"
   },
   "support": {
     "kofiFooter": "קנה לנו קפה",
@@ -3150,6 +3154,24 @@ const he = {
     "shareTextAuth": "הצטרף אלי ב-LexiClash! השתמש בקוד ההפניה שלי: {code}",
     "shareTextGuest": "שחק LexiClash - משחק המילים הרב-משתתפים הכי טוב!",
     "shareNativeTitle": "הצטרף ל-LexiClash",
+    "playNowFree": "!שחקו עכשיו — חינם",
+    "gameModes": "מצבי משחק",
+    "languages": "שפות",
+    "activePlayers": "שחקנים פעילים",
+    "todaysTopPlayers": "השחקנים המובילים",
+    "viewFullLeaderboard": "צפו בטבלת המובילים המלאה",
+    "readyToCompete": "?מוכנים להתחרות",
+    "startPlaying": "התחילו לשחק",
+    "createAvatar": "צרו את הדמות שלכם",
+    "designYourLook": "עצבו מראה ייחודי",
+    "yourRank": "הדירוג שלכם",
+    "totalScore": "ניקוד כולל",
+    "solvedPercent": "רק {percent}% פתרו היום",
+    "todaysTopWords": "המילים המובילות היום",
+    "hallOfFame": "היכל התהילה",
+    "gamesToday": "משחקים היום",
+    "wordHuntMode": "ציד מילים",
+    "wordHuntModeDesc": "מצאו את מילת היעד כמה שיותר מהר — פאזל חדש כל יום!",
     "seo": {
       "whatIsTitle": "מה זה לקסיקלאש?",
       "whatIsContent": "לקסיקלאש הוא משחק מילים מרובה משתתפים חינמי ומהיר שאפשר לשחק ישירות בדפדפן. התחרו עם חברים בזמן אמת על לוח אותיות משותף — מצאו מילים, בנו קומבו וטפסו בטבלת המובילים. זה כמו בוגל וסקראבל, אבל מרובה משתתפים. ללא הורדות, ללא הרשמה. זמין בעברית, אנגלית, שוודית, יפנית וספרדית.",
@@ -3591,144 +3613,9 @@ const he = {
       "multiplayerTitle": "🎮 מוכן לעוד?",
       "multiplayerDesc": "אתגר חברים או הילחם בבוטים בזמן אמת!",
       "multiplayerCTA": "שחק מרובה משתתפים"
-    }
-  },
-  "buzz": {
-    "title": "באזז יומי",
-    "tagline": "הטרנדים של היום הפכו לחידות מילים",
-    "subtitle": "מה באזז היום?",
-    "details": "בריכול, בלי טיימר. רק אתם מול הבאזז של היום!",
-    "type": {
-      "scrambled": "מעורבב",
-      "fillBlank": "השלם",
-      "chain": "שרשרת",
-      "spotOn": "נכון",
-      "trio": "שלישייה",
-      "wordle": "וורדל",
-      "definition_match": "הגדרה",
-      "anagram": "אנגרמה",
-      "riddle": "חידה",
-      "fill_blank": "השלם את החסר"
     },
-    "wordle": {
-      "instruction": "נחשו את המילה בת 5 אותיות",
-      "attemptsLeft": "ניסיונות נותרו",
-      "solved": "פתרתם!",
-      "failed": "נגמרו הניסיונות",
-      "useDeviceKeyboard": "הקישו להקלדה"
-    },
-    "challenge": "{number}/{total}",
-    "correct": "יש!",
-    "hint": "רמז?",
-    "skip": "דלג",
-    "back": "חזור",
-    "swipeToNavigate": "החליקו לניווט",
-    "submit": "שלח",
-    "prevChallenge": "אתגר קודם",
-    "nextChallenge": "אתגר הבא",
-    "preview": {
-      "title": "נושאי היום",
-      "subtitle": "מה טרנדי עכשיו",
-      "play": "התחל באזז"
-    },
-    "results": {
-      "title": "סיימת!",
-      "perfect": "מושלם לגמרי! 💯",
-      "trending": "טרנדים של היום:",
-      "share": "שתף ציון",
-      "reviewTitle": "סיכום אתגרים",
-      "yourAnswer": "התשובה שלך:",
-      "correctAnswer": "תשובה:",
-      "skipped": "דילגת"
-    },
-    "trio": {
-      "hint": "מצאו את המילה שמחברת את שלושת הנושאים"
-    },
-    "scrambled": {
-      "unscramble": "סדרו את האותיות!"
-    },
-    "chain": {
-      "instruction": "מצאו את המילה המחברת!",
-      "compoundHint": "יוצרת מילה מורכבת עם שני השכנים",
-      "exampleHint": "דוגמה: שמש→פרח→עציץ (חמניה + עציץ-פרחים)",
-      "thinkCompound": "חשבו על מילים מורכבות!"
-    },
-    "feedback": {
-      "correct": "נכון!",
-      "incorrect": "לא נכון",
-      "answerWas": "התשובה הייתה:",
-      "nice": "יפה!",
-      "streak": "{count} ברצף!",
-      "onFire": "בוער!",
-      "perfect": "מושלם!",
-      "allCorrect": "5 מ-5 - מדהים!"
-    },
-    "fillBlank": {
-      "firstLetterHint": "האות הראשונה נחשפת כרמז",
-      "hintLetter": "רמז",
-      "validAlternatives": "מספר תשובות נכונות מתקבלות"
-    },
-    "share": {
-      "text": "באזז יומי: {topic} | {score}/100 | תנסה לנצח 🔥"
-    },
-    "error": {
-      "title": "אופס!",
-      "loading": "טוען את הבאזז של היום...",
-      "failed": "לא הצלחנו לטעון. לנסות שוב?",
-      "noInternet": "אין חיבור. בדקו את האינטרנט.",
-      "noOptions": "אין אפשרויות זמינות"
-    },
-    "alreadyPlayed": "כבר שיחקת היום! חזרו מחר.",
-    "challengeCompleted": "האתגר הושלם",
-    "lockedYourAnswer": "התשובה שלך",
-    "lockedCorrectAnswer": "התשובה הנכונה",
-    "badge": "חדש",
-    "breaking": "חדשות חמות",
-    "tapToCelebrate": "לחצו לחגוג",
-    "challenges": "אתגרים",
-    "letters": "אותיות",
-    "connectingWord": "המילה המקשרת",
-    "fillTheBlank": "מלא את החסר",
-    "finish": "סיים",
-    "helpText": "פתרו אתגרי מילים מהטרנדים של היום. בלי לחץ זמן!",
-    "loading": "טוען באזז יומי...",
-    "maxScore": "ניקוד מקסימלי",
-    "noTimeLimit": "ללא טיימר",
-    "quitConfirm": "ההתקדמות שלך תישמר, אבל אתגרים לא גמורים לא ייספרו בניקוד.",
-    "quitConfirmTitle": "לצאת מהבאזז?",
-    "error": {
-      "title": "אופס!",
-      "description": "משהו השתבש בטעינת האתגר.",
-      "helpText": "בדקו את החיבור ונסו שוב.",
-      "loading": "טוען את הבאזז של היום...",
-      "failed": "לא ניתן לטעון. לנסות שוב?",
-      "noInternet": "אין חיבור. בדוק את האינטרנט.",
-      "noOptions": "אין אפשרויות זמינות לאתגר זה"
-    },
-    "searches": "חיפושים",
-    "challengeTrend": "מופיע בחידות",
-    "topicIs": "הנושא: {topic}",
-    "total": "סה\"כ",
-    "viewResults": "צפה בתוצאות",
-    "yourAnswer": "התשובה שלך",
-    "typeYourAnswer": "הקלד את תשובתך...",
-    "yourScore": "הניקוד שלך",
-    "noChallenge": "אין אתגר זמין",
-    "notAvailable": "לא זמין",
-    "unavailableTagline": "עדיין לא זמין בשפה זו",
     "requestChallenge": "בקש אתגר",
-    "requestSent": "הבקשה נשלחה!",
-    "skipToAnswers": "דלג לתשובות",
-    "skipConfirmTitle": "לדלג על האתגרים?",
-    "skipConfirmMessage": "תראו את התשובות בלי לשחק. הניקוד שלכם יהיה 0.",
-    "skipConfirm": "דלג לתשובות",
-    "history": {
-      "title": "אתגרים קודמים",
-      "browse": "גלשו באתגרי באזז קודמים",
-      "available": "אתגרים זמינים",
-      "empty": "אין עדיין אתגרים קודמים",
-      "selectDate": "בחרו תאריך לשחק"
-    }
+    "requestSent": "הבקשה נשלחה"
   },
   "wordHunt": {
     "title": "ציד מילים",
@@ -4543,7 +4430,6 @@ const he = {
       "dailyChallenge": "אתגר יומי",
       "wikipediaWords": "מילות ויקיפדיה",
       "wordBank": "בנק מילים",
-      "dailyBuzz": "באזז יומי",
       "webVitals": "ביצועי אתר",
       "email": "אימייל",
       "milogWords": "מילים ממילוג"
@@ -7364,6 +7250,22 @@ const he = {
       "ads": "אנו משתפים פעולה עם Google AdSense להצגת פרסומות רלוונטיות. פרסומות עוזרות לנו לשמור על המשחק חינמי לכולם. למידע נוסף על התאמה אישית של פרסומות ואפשרויות ביטול, ראו את מדיניות הפרטיות.",
       "optOut": "בעוד שאיסוף נתונים מסוים הכרחי לתפקוד המשחק (כמו שם משתמש וציונים), אפשר לבטל ניתוח נתונים ופרסומות מותאמות אישית בהגדרות > פרטיות."
     }
+  },
+  avatarBuilder: {
+    title: "בונה דמויות",
+    base: "צורה",
+    hair: "שיער",
+    eyes: "עיניים",
+    mouth: "פה",
+    accessories: "אביזרים",
+    skinColor: "צבע עור",
+    hairColor: "צבע שיער",
+    accessoryColor: "צבע",
+    randomize: "אקראי",
+    save: "שמירה",
+    cancel: "ביטול",
+    buildCustom: "בנו דמות משלכם",
+    bgColor: "רקע"
   }
 };
 

@@ -4,6 +4,8 @@ import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { User } from 'lucide-react';
 import { getAvatarPath, AVATARS } from '@/utils/avatarConfig';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 
 // Special constant for "use profile avatar" selection - indicates profile picture should be used
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
@@ -28,6 +30,7 @@ interface SizeConfig {
 interface AvatarProps {
   profilePictureUrl?: string | null;
   avatarImage?: string; // Avatar image ID (e.g., 'broccoli-bob') or PROFILE_AVATAR_ID
+  customAvatar?: CustomAvatarConfig | null;
   size?: AvatarSize;
   className?: string;
 }
@@ -51,6 +54,7 @@ const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
 const Avatar = memo<AvatarProps>(({
   profilePictureUrl,
   avatarImage,
+  customAvatar,
   size = 'md',
   className = ''
 }) => {
@@ -63,6 +67,19 @@ const Avatar = memo<AvatarProps>(({
     setImageError(false);
     setAvatarError(false);
   }, [profilePictureUrl, avatarImage]);
+
+  // 0. Show custom SVG avatar if config exists (highest priority)
+  if (customAvatar) {
+    return (
+      <div
+        className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+        data-testid="header-avatar"
+        data-avatar-type="custom"
+      >
+        <AvatarRenderer config={customAvatar} size={config.px} />
+      </div>
+    );
+  }
 
   // 1. Show profile picture if available and using PROFILE_AVATAR_ID or explicitly provided
   const shouldShowProfilePicture = profilePictureUrl &&

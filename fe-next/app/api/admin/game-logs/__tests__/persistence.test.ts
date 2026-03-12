@@ -55,7 +55,7 @@ describe('Today games persistence', () => {
     // - Load dictionary
     // - Restore tournaments from Redis
     // - Warm up worker pool
-    // - Start Daily Buzz cron scheduler
+    // - Start cron schedulers
 
     // It does NOT:
     // - Clear any database tables

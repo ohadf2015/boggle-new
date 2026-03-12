@@ -4,6 +4,7 @@
  */
 
 import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState } from '@/shared/types/game';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Redis client interface
 export interface RedisClient {
@@ -17,7 +18,7 @@ export interface RedisClient {
 export interface GameUser {
   socketId: string;
   username?: string; // Optional - typically the key in Record<string, GameUser>
-  avatar: { avatarImage?: string; emoji?: string; color?: string } | null;
+  avatar: { avatarImage?: string; customAvatar?: CustomAvatarConfig; emoji?: string; color?: string } | null;
   isHost: boolean;
   authUserId: string | null;
   guestTokenHash: string | null;
@@ -34,7 +35,7 @@ export interface GameUser {
 // Spectator interface
 export interface Spectator {
   socketId: string;
-  avatar: { avatarImage?: string; emoji?: string; color?: string } | null;
+  avatar: { avatarImage?: string; customAvatar?: CustomAvatarConfig; emoji?: string; color?: string } | null;
   authUserId: string | null;
   guestTokenHash: string | null;
   joinedAt: number;

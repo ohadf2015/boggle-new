@@ -91,10 +91,19 @@ jest.mock('framer-motion', () => {
     button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
   };
+  const mockMotionValue = (init: number) => ({
+    get: () => init,
+    set: () => {},
+    on: () => () => {},
+  });
   return {
     motion: motionObj,
     m: motionObj,
     AnimatePresence: ({ children }: any) => <>{children}</>,
+    useMotionValue: mockMotionValue,
+    useSpring: (v: any) => v,
+    useInView: () => true,
+    animate: () => ({ stop: () => {} }),
   };
 });
 

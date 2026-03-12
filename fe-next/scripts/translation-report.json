@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3426,
+    "totalKeysInCode": 3380,
     "keyCountByLanguage": {
-      "en": 5739,
-      "he": 5768,
-      "sv": 5801,
-      "ja": 5788,
-      "es": 5768
+      "en": 5692,
+      "he": 5701,
+      "sv": 5734,
+      "ja": 5721,
+      "es": 5699
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 2,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
@@ -144,12 +144,114 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "daily.requestChallenge",
+      "usages": [
+        {
+          "file": "components/daily/landing/QuestCard.tsx",
+          "line": 317
+        }
+      ]
+    },
+    {
+      "key": "daily.requestSent",
+      "usages": [
+        {
+          "file": "components/daily/landing/QuestCard.tsx",
+          "line": 315
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
+    "he": [
+      "avatar.builder.title",
+      "avatar.builder.base",
+      "avatar.builder.hair",
+      "avatar.builder.eyes",
+      "avatar.builder.mouth",
+      "avatar.builder.accessories",
+      "avatar.builder.background",
+      "avatar.builder.shape",
+      "avatar.builder.style",
+      "avatar.builder.type",
+      "avatar.builder.skinColor",
+      "avatar.builder.hairColor",
+      "avatar.builder.accessoryColor",
+      "avatar.builder.bgColor",
+      "avatar.builder.randomize",
+      "avatar.builder.save",
+      "avatar.builder.cancel",
+      "avatar.builder.buildCustom",
+      "avatar.builder.undo",
+      "avatar.builder.none"
+    ],
+    "sv": [
+      "avatar.builder.title",
+      "avatar.builder.base",
+      "avatar.builder.hair",
+      "avatar.builder.eyes",
+      "avatar.builder.mouth",
+      "avatar.builder.accessories",
+      "avatar.builder.background",
+      "avatar.builder.shape",
+      "avatar.builder.style",
+      "avatar.builder.type",
+      "avatar.builder.skinColor",
+      "avatar.builder.hairColor",
+      "avatar.builder.accessoryColor",
+      "avatar.builder.bgColor",
+      "avatar.builder.randomize",
+      "avatar.builder.save",
+      "avatar.builder.cancel",
+      "avatar.builder.buildCustom",
+      "avatar.builder.undo",
+      "avatar.builder.none"
+    ],
+    "ja": [
+      "avatar.builder.title",
+      "avatar.builder.base",
+      "avatar.builder.hair",
+      "avatar.builder.eyes",
+      "avatar.builder.mouth",
+      "avatar.builder.accessories",
+      "avatar.builder.background",
+      "avatar.builder.shape",
+      "avatar.builder.style",
+      "avatar.builder.type",
+      "avatar.builder.skinColor",
+      "avatar.builder.hairColor",
+      "avatar.builder.accessoryColor",
+      "avatar.builder.bgColor",
+      "avatar.builder.randomize",
+      "avatar.builder.save",
+      "avatar.builder.cancel",
+      "avatar.builder.buildCustom",
+      "avatar.builder.undo",
+      "avatar.builder.none"
+    ],
     "es": [
+      "avatar.builder.title",
+      "avatar.builder.base",
+      "avatar.builder.hair",
+      "avatar.builder.eyes",
+      "avatar.builder.mouth",
+      "avatar.builder.accessories",
+      "avatar.builder.background",
+      "avatar.builder.shape",
+      "avatar.builder.style",
+      "avatar.builder.type",
+      "avatar.builder.skinColor",
+      "avatar.builder.hairColor",
+      "avatar.builder.accessoryColor",
+      "avatar.builder.bgColor",
+      "avatar.builder.randomize",
+      "avatar.builder.save",
+      "avatar.builder.cancel",
+      "avatar.builder.buildCustom",
+      "avatar.builder.undo",
+      "avatar.builder.none",
       "auth.otp.sendCode",
       "auth.otp.noPassword",
       "auth.otp.codeSentTo",
@@ -173,6 +275,8 @@
       "friends.headToHead.losses",
       "friends.headToHead.draws",
       "friends.headToHead.totalGames",
+      "challenges.daily.requestChallenge",
+      "challenges.daily.requestSent",
       "wordHuntAnnouncement.badge",
       "wordHuntAnnouncement.title",
       "wordHuntAnnouncement.subtitle",

@@ -147,7 +147,6 @@ function cacheHeaders(): RequestHandler {
  * timeout to these routes to avoid conflicts.
  *
  * Routes excluded from Express timeout:
- * - /api/admin/buzz/* - Next.js routes with maxDuration (60-70s)
  * - /api/cron/* - Next.js routes with maxDuration (120s+)
  */
 function requestTimeout(): RequestHandler {
@@ -155,9 +154,7 @@ function requestTimeout(): RequestHandler {
 
   // Routes that handle their own timeouts (Next.js maxDuration or long-running Express routes)
   const ROUTES_WITH_CUSTOM_TIMEOUT = [
-    '/api/admin/buzz/',
     '/api/cron/',
-    '/api/buzz/admin/',  // Express route for buzz admin operations (AI generation takes 60-90s)
   ];
 
   return (req: Request, res: Response, next: NextFunction): void => {

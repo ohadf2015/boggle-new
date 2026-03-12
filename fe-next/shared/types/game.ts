@@ -4,6 +4,7 @@
  */
 
 import type { BlastTileType } from './blast';
+import type { CustomAvatarConfig } from './customAvatar';
 
 // ==================== Core Types ====================
 
@@ -67,6 +68,8 @@ export interface Avatar {
   avatarImage?: string;
   /** Profile picture URL from OAuth provider (Google, Discord, etc.) */
   profilePictureUrl?: string | null;
+  /** Custom SVG avatar configuration */
+  customAvatar?: CustomAvatarConfig;
   /** @deprecated - kept for backward compatibility, will be removed */
   emoji?: string;
   /** @deprecated - kept for backward compatibility, will be removed */

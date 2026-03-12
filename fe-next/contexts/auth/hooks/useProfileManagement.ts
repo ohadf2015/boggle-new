@@ -22,6 +22,7 @@ import { getGuestSessionId, clearGuestData, hashToken } from '@/utils/guestManag
 import { getUtmDataForProfile } from '@/utils/utmCapture';
 import { syncGuestDailyResultsToAccount } from '@/utils/dailyChallenge';
 import { getRandomAvatar, getAvatarEmojiAndColor } from '@/utils/avatarConfig';
+import { getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import { captureBackgroundError } from '@/utils/sentry';
 import logger from '@/utils/logger';
 import { fetchGeolocation, fetchRandomPlayerName } from '../authUtils';
@@ -172,6 +173,8 @@ async function createNewProfile(
   // Get legacy emoji/color from the character avatar (for backward compatibility with DB)
   const { emoji: avatarEmoji, color: avatarColor } = getAvatarEmojiAndColor(avatarImage);
 
+  const randomCustomAvatar = getRandomAvatarConfig();
+
   const { data: newProfile, error: createError } = await createProfile({
     id: userId,
     username,
@@ -181,6 +184,7 @@ async function createNewProfile(
     avatar_image: finalAvatarImage, // Use profile picture if available, otherwise character avatar
     profile_picture_url: profilePictureUrl,
     profile_picture_provider: profilePictureProvider,
+    avatar_config: randomCustomAvatar,
     has_customized_profile: false, // Will prompt user to customize after sign-in
   });
 
@@ -242,6 +246,14 @@ export function useProfileManagement({
 
       if (profileData) {
         setProfile(profileData);
+
+        // Auto-assign random custom avatar for existing users who don't have one
+        if (!profileData.avatar_config) {
+          const randomConfig = getRandomAvatarConfig();
+          updateProfile(userId, { avatar_config: randomConfig }).then(({ data }) => {
+            if (data) setProfile(data);
+          }).catch(() => {});
+        }
 
         // Submit any pending daily challenge result (from pre-signup or returning user)
         submitPendingDailyResult(userId, profileData);
