@@ -7,6 +7,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateRoomModal from '../CreateRoomModal';
 import type { Language } from '@/shared/types/game';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
 jest.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
