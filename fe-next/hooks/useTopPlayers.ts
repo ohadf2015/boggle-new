@@ -14,9 +14,21 @@ export interface TopPlayer {
   profilePictureUrl: string | null;
 }
 
+// Module-level cache for top players
+const topPlayersCache: {
+  data: TopPlayer[] | null;
+  timestamp: number;
+  limit: number;
+} = { data: null, timestamp: 0, limit: 0 };
+
+const TOP_PLAYERS_CACHE_TTL_MS = 120_000; // 2 minutes
+
 export function useTopPlayers(limit = 5) {
-  const [players, setPlayers] = useState<TopPlayer[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = topPlayersCache.limit === limit ? topPlayersCache.data : null;
+  const isCacheFresh = cached && (Date.now() - topPlayersCache.timestamp) < TOP_PLAYERS_CACHE_TTL_MS;
+
+  const [players, setPlayers] = useState<TopPlayer[]>(cached || []);
+  const [loading, setLoading] = useState(!cached);
 
   useEffect(() => {
     if (!supabase) {
@@ -24,9 +36,14 @@ export function useTopPlayers(limit = 5) {
       return;
     }
 
+    if (isCacheFresh) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
-    async function fetch() {
+    async function fetchData() {
       const { data, error } = await supabase!
         .from('leaderboard')
         .select('username, display_name, total_score, avatar_image, avatar_config, profile_picture_url')
@@ -36,23 +53,25 @@ export function useTopPlayers(limit = 5) {
       if (cancelled) return;
 
       if (!error && data) {
-        setPlayers(
-          data.map((row: any) => ({
-            username: row.username,
-            displayName: row.display_name,
-            totalScore: row.total_score,
-            avatarImage: row.avatar_image,
-            avatarConfig: row.avatar_config,
-            profilePictureUrl: row.profile_picture_url,
-          }))
-        );
+        const mapped = data.map((row: any) => ({
+          username: row.username,
+          displayName: row.display_name,
+          totalScore: row.total_score,
+          avatarImage: row.avatar_image,
+          avatarConfig: row.avatar_config,
+          profilePictureUrl: row.profile_picture_url,
+        }));
+        setPlayers(mapped);
+        topPlayersCache.data = mapped;
+        topPlayersCache.timestamp = Date.now();
+        topPlayersCache.limit = limit;
       }
       setLoading(false);
     }
 
-    fetch();
+    fetchData();
     return () => { cancelled = true; };
-  }, [limit]);
+  }, [limit, isCacheFresh]);
 
   return { players, loading };
 }

@@ -262,6 +262,7 @@ const ja = {
     "bottomNavigation": "下部ナビゲーション",
     "home": "ホーム",
     "brain": "脳トレ",
+    "leaderboard": "ランキング",
     "profile": "プロフィール",
     "play": "プレイ"
   },

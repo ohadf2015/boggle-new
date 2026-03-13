@@ -262,6 +262,7 @@ const he = {
     "bottomNavigation": "ניווט תחתון",
     "home": "בית",
     "brain": "מוח",
+    "leaderboard": "דירוג",
     "profile": "פרופיל",
     "play": "שחק"
   },

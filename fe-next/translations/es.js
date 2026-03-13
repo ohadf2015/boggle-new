@@ -262,6 +262,7 @@ const es = {
     "bottomNavigation": "Navegación inferior",
     "home": "Inicio",
     "brain": "Cerebro",
+    "leaderboard": "Ranking",
     "profile": "Perfil",
     "play": "Jugar"
   },

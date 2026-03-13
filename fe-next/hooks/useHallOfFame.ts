@@ -12,13 +12,26 @@ export interface HallOfFameEntry {
   profilePictureUrl: string | null;
 }
 
+// Module-level cache for hall of fame data
+const hallOfFameCache: {
+  data: HallOfFameEntry[] | null;
+  timestamp: number;
+  limit: number;
+} = { data: null, timestamp: 0, limit: 0 };
+
+const HOF_CACHE_TTL_MS = 120_000; // 2 minutes
+
 /**
  * Fetches top players from the past 7 days for the "Hall of Fame" section.
  * Uses the leaderboard table ordered by score.
+ * Implements stale-while-revalidate caching for instant page loads.
  */
 export function useHallOfFame(limit = 5) {
-  const [champions, setChampions] = useState<HallOfFameEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = hallOfFameCache.limit === limit ? hallOfFameCache.data : null;
+  const isCacheFresh = cached && (Date.now() - hallOfFameCache.timestamp) < HOF_CACHE_TTL_MS;
+
+  const [champions, setChampions] = useState<HallOfFameEntry[]>(cached || []);
+  const [loading, setLoading] = useState(!cached);
 
   useEffect(() => {
     if (!supabase) {
@@ -26,11 +39,15 @@ export function useHallOfFame(limit = 5) {
       return;
     }
 
+    // Skip fetch if cache is fresh
+    if (isCacheFresh) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
-    async function fetch() {
-      // For now, use top leaderboard players as "champions"
-      // A proper weekly champions table can be added later
+    async function fetchData() {
       const { data, error } = await supabase!
         .from('leaderboard')
         .select('username, display_name, total_score, avatar_image, avatar_config, profile_picture_url')
@@ -40,23 +57,26 @@ export function useHallOfFame(limit = 5) {
       if (cancelled) return;
 
       if (!error && data) {
-        setChampions(
-          data.map((row: any) => ({
-            username: row.username,
-            displayName: row.display_name,
-            totalScore: row.total_score,
-            avatarImage: row.avatar_image,
-            avatarConfig: row.avatar_config,
-            profilePictureUrl: row.profile_picture_url,
-          }))
-        );
+        const mapped = data.map((row: any) => ({
+          username: row.username,
+          displayName: row.display_name,
+          totalScore: row.total_score,
+          avatarImage: row.avatar_image,
+          avatarConfig: row.avatar_config,
+          profilePictureUrl: row.profile_picture_url,
+        }));
+        setChampions(mapped);
+        // Update module-level cache
+        hallOfFameCache.data = mapped;
+        hallOfFameCache.timestamp = Date.now();
+        hallOfFameCache.limit = limit;
       }
       setLoading(false);
     }
 
-    fetch();
+    fetchData();
     return () => { cancelled = true; };
-  }, [limit]);
+  }, [limit, isCacheFresh]);
 
   return { champions, loading };
 }

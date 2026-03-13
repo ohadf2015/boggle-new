@@ -75,11 +75,22 @@ interface UserRankResult {
   refetch: () => Promise<void>;
 }
 
-// Removed unused type definitions for removed hooks
+// Module-level cache for leaderboard data (stale-while-revalidate pattern)
+// Persists across component mounts/unmounts for instant subsequent loads
+const leaderboardCache: {
+  data: any[] | null;
+  timestamp: number;
+  key: string;
+} = { data: null, timestamp: 0, key: '' };
+
+const userRankCache: Map<string, { data: any; timestamp: number }> = new Map();
+
+const CACHE_TTL_MS = 60_000; // 1 minute - serve cached data immediately, revalidate in background
 
 /**
  * Hook for live leaderboard updates
  * Uses singleton subscription pattern - multiple instances share the same WebSocket
+ * Implements stale-while-revalidate caching for instant page loads
  *
  * @param options - { limit, orderBy, enabled, debounceMs }
  * @returns { data, loading, error, subscriptionStatus, refetch }
@@ -87,8 +98,13 @@ interface UserRankResult {
 export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardResult {
   const { limit = 100, orderBy = 'total_score', enabled = true, debounceMs = 500 } = options;
 
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = `${limit}:${orderBy}`;
+  const cached = leaderboardCache.key === cacheKey ? leaderboardCache.data : null;
+  const isCacheFresh = cached && (Date.now() - leaderboardCache.timestamp) < CACHE_TTL_MS;
+
+  // Initialize with cached data if available (instant render)
+  const [data, setData] = useState<any[]>(cached || []);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState<any>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState('disconnected');
 
@@ -98,7 +114,10 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
   const fetchLeaderboard = useCallback(async () => {
     if (!enabled) return;
 
-    setLoading(true);
+    // Only show loading spinner if we have no cached data
+    if (!leaderboardCache.data || leaderboardCache.key !== cacheKey) {
+      setLoading(true);
+    }
     const result = await leaderboardOperations.getTop(limit, orderBy);
 
     if (!isMountedRef.current) return;
@@ -106,19 +125,31 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
     if (result.error) {
       setError(result.error);
     } else {
-      setData(result.data || []);
+      const freshData = result.data || [];
+      setData(freshData);
       setError(null);
+      // Update module-level cache
+      leaderboardCache.data = freshData;
+      leaderboardCache.timestamp = Date.now();
+      leaderboardCache.key = cacheKey;
     }
     setLoading(false);
-  }, [limit, orderBy, enabled, isMountedRef]);
+  }, [limit, orderBy, enabled, isMountedRef, cacheKey]);
 
   // Debounced refetch for realtime updates
   const debouncedRefetch = useDebouncedCallback(fetchLeaderboard, debounceMs);
 
-  // Trigger initial fetch - using void to acknowledge fire-and-forget pattern
+  // Trigger initial fetch - skip if cache is fresh, revalidate in background if stale
   useEffect(() => {
+    const cachedEntry = leaderboardCache.key === cacheKey ? leaderboardCache.data : null;
+    const isFresh = cachedEntry && (Date.now() - leaderboardCache.timestamp) < CACHE_TTL_MS;
+    if (isFresh) {
+      // Cache is fresh, skip fetch
+      setLoading(false);
+      return;
+    }
     void fetchLeaderboard();
-  }, [fetchLeaderboard]);
+  }, [fetchLeaderboard, cacheKey]);
 
   // Stable callback ref for subscription to prevent re-subscriptions
   const onRealtimeUpdateRef = useRef(debouncedRefetch);
@@ -161,8 +192,11 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
  * @returns { rank, loading, error, refetch }
  */
 export function useUserRank(userId: string | null | undefined): UserRankResult {
-  const [rank, setRank] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const cachedRank = userId ? userRankCache.get(userId) : null;
+  const isCachedRankFresh = cachedRank && (Date.now() - cachedRank.timestamp) < CACHE_TTL_MS;
+
+  const [rank, setRank] = useState<any>(cachedRank?.data || null);
+  const [loading, setLoading] = useState(!cachedRank);
   const [error, setError] = useState<any>(null);
 
   // Track if component is mounted
@@ -175,7 +209,9 @@ export function useUserRank(userId: string | null | undefined): UserRankResult {
       return;
     }
 
-    setLoading(true);
+    if (!userRankCache.has(userId)) {
+      setLoading(true);
+    }
     const result = await leaderboardOperations.getUserRank(userId);
 
     if (!isMountedRef.current) return;
@@ -183,8 +219,10 @@ export function useUserRank(userId: string | null | undefined): UserRankResult {
     if (result.error) {
       setError(result.error);
     } else {
-      setRank(result.data?.[0] || null);
+      const freshRank = result.data?.[0] || null;
+      setRank(freshRank);
       setError(null);
+      userRankCache.set(userId, { data: freshRank, timestamp: Date.now() });
     }
     setLoading(false);
   }, [userId, isMountedRef]);
@@ -193,8 +231,12 @@ export function useUserRank(userId: string | null | undefined): UserRankResult {
   const debouncedRefetch = useDebouncedCallback(fetchRank, 500);
 
   useEffect(() => {
+    if (isCachedRankFresh) {
+      setLoading(false);
+      return;
+    }
     void fetchRank();
-  }, [fetchRank]);
+  }, [fetchRank, isCachedRankFresh]);
 
   // Stable callback ref to prevent subscription churn
   const onRealtimeUpdateRef = useRef(debouncedRefetch);

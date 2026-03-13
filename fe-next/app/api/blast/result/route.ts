@@ -119,6 +119,29 @@ export async function POST(request: Request) {
     const isNewBestScore = !existing || data.score > existing.bestScore;
     const isNewBestCombo = !existing || data.maxCombo > existing.bestMaxCombo;
 
+    // Update profile stats so blast scores contribute to the main leaderboard
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('total_score, total_games, total_words')
+        .eq('id', userId)
+        .single();
+
+      if (profile) {
+        await supabase
+          .from('profiles')
+          .update({
+            total_score: (profile.total_score || 0) + data.score,
+            total_games: (profile.total_games || 0) + 1,
+            total_words: (profile.total_words || 0) + data.wordsFound.length,
+            last_game_at: new Date().toISOString(),
+          })
+          .eq('id', userId);
+      }
+    } catch (profileError) {
+      console.error('[BLAST API] Profile stats update error (non-fatal):', profileError);
+    }
+
     return NextResponse.json({
       success: true,
       personalBests: updated,
