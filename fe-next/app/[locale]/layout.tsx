@@ -716,8 +716,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                             className="relative z-10 overflow-auto main-content-safe min-h-0 flex-1 flex flex-col"
                             tabIndex={-1}
                         >
-                            {children}
-                            <AutoHideFooter className="relative z-0 flex-shrink-0 mt-auto" />
+                            <div className="flex-1 flex flex-col min-h-0">
+                                {children}
+                            </div>
+                            <AutoHideFooter className="relative z-0 flex-shrink-0" />
                         </main>
                         {/* Global bottom navigation - mobile only, hidden during gameplay */}
                         <GlobalBottomNav />

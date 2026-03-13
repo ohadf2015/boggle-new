@@ -262,6 +262,7 @@ const sv = {
     "bottomNavigation": "Nedre navigering",
     "home": "Hem",
     "brain": "Hjärna",
+    "leaderboard": "Rankning",
     "profile": "Profil",
     "play": "Spela"
   },

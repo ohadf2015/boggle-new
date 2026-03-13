@@ -193,10 +193,12 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
 
     logger.info('API', `[WordHunt Submit] SUCCESS: id=${data.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}`);
 
-    // Update leaderboard score for authenticated users who solved
-    if (playerId && solved && efficiencyScore !== undefined && efficiencyScore > 0) {
+    // Update profile stats for authenticated users (all attempts count for games played)
+    if (playerId) {
       try {
-        const scoreToAdd = Math.round(efficiencyScore);
+        const scoreToAdd = solved && efficiencyScore !== undefined && efficiencyScore > 0
+          ? Math.round(efficiencyScore)
+          : 0;
         const { data: profile } = await supabase
           .from('profiles')
           .select('total_score, total_games')
@@ -208,17 +210,21 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
           const newTotalGames = (profile.total_games || 0) + 1;
           const { error: updateError } = await supabase
             .from('profiles')
-            .update({ total_score: newTotalScore, total_games: newTotalGames })
+            .update({
+              total_score: newTotalScore,
+              total_games: newTotalGames,
+              last_game_at: new Date().toISOString(),
+            })
             .eq('id', playerId);
 
           if (updateError) {
-            logger.error('API', `[WordHunt] Failed to update leaderboard score for ${playerId}: ${updateError.message}`);
+            logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${updateError.message}`);
           } else {
-            logger.info('API', `[WordHunt] Updated leaderboard score for ${playerId}: +${scoreToAdd} efficiency points (total: ${newTotalScore}, games: ${newTotalGames})`);
+            logger.info('API', `[WordHunt] Updated profile stats for ${playerId}: +${scoreToAdd} points (total: ${newTotalScore}, games: ${newTotalGames})`);
           }
         }
       } catch (scoreError) {
-        logger.error('API', `[WordHunt] Failed to update leaderboard score for ${playerId}: ${(scoreError as Error).message}`);
+        logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
       }
     }
 

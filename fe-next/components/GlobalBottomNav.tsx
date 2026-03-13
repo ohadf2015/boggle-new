@@ -3,14 +3,14 @@
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Home, Swords, Brain, User } from 'lucide-react';
+import { Home, Swords, Trophy, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useSafeArea } from '../hooks/useSafeArea';
 
-// Lazy load AuthModal - only shown when unauthenticated users tap Brain/Profile
+// Lazy load AuthModal - only shown when unauthenticated users tap Profile
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 
 /**
@@ -45,7 +45,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
         if (cleanPath === '' || cleanPath === '/') return 'home';
         if (cleanPath.startsWith('/multiplayer')) return 'play';
-        if (cleanPath.startsWith('/brain')) return 'brain';
+        if (cleanPath.startsWith('/leaderboard')) return 'leaderboard';
         if (cleanPath.startsWith('/profile')) return 'profile';
 
         return 'home'; // Default to home if no match
@@ -60,14 +60,9 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         router.push(`/${language}/multiplayer`);
     }, [router, language]);
 
-    const navigateToBrain = useCallback(() => {
-        // Brain training requires authentication - show modal if not logged in
-        if (!isAuthenticated) {
-            setShowAuthModal(true);
-            return;
-        }
-        router.push(`/${language}/brain`);
-    }, [router, language, isAuthenticated]);
+    const navigateToLeaderboard = useCallback(() => {
+        router.push(`/${language}/leaderboard`);
+    }, [router, language]);
 
     const navigateToProfile = useCallback(() => {
         // Profile requires authentication - show modal if not logged in
@@ -198,39 +193,39 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                     )}
                 </button>
 
-                {/* Brain Training Tab */}
+                {/* Leaderboard Tab */}
                 <button
-                    onClick={navigateToBrain}
+                    onClick={navigateToLeaderboard}
                     className={cn(
                         "flex flex-col items-center justify-center",
                         "min-w-[64px] min-h-[48px]", // WCAG touch target size
                         "px-4 py-2",
                         "transition-all duration-100",
                         "relative",
-                        activeTab === 'brain'
-                            ? "text-neo-purple"
+                        activeTab === 'leaderboard'
+                            ? "text-neo-yellow"
                             : "text-neo-white/60 hover:text-neo-white/80"
                     )}
-                    aria-label={t('nav.brain')}
-                    aria-current={activeTab === 'brain' ? 'page' : undefined}
+                    aria-label={t('nav.leaderboard')}
+                    aria-current={activeTab === 'leaderboard' ? 'page' : undefined}
                 >
-                    <Brain
+                    <Trophy
                         className={cn(
                             "w-6 h-6 mb-1",
-                            activeTab === 'brain' && "animate-neo-pop"
+                            activeTab === 'leaderboard' && "animate-neo-pop"
                         )}
                         aria-hidden="true"
                     />
                     <span className={cn(
                         "text-[10px] font-bold uppercase tracking-wide",
-                        activeTab === 'brain' && "text-neo-purple"
+                        activeTab === 'leaderboard' && "text-neo-yellow"
                     )}>
-                        {t('nav.brain')}
+                        {t('nav.leaderboard')}
                     </span>
                     {/* Active indicator */}
-                    {activeTab === 'brain' && (
+                    {activeTab === 'leaderboard' && (
                         <div
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-purple rounded-b-full"
+                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-yellow rounded-b-full"
                             aria-hidden="true"
                         />
                     )}
@@ -275,7 +270,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 </button>
             </div>
 
-            {/* Auth Modal - shown when unauthenticated users tap Brain or Profile */}
+            {/* Auth Modal - shown when unauthenticated users tap Profile */}
             <AuthModal
                 isOpen={showAuthModal}
                 onClose={() => setShowAuthModal(false)}

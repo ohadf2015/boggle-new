@@ -262,6 +262,7 @@ const en = {
     "bottomNavigation": "Bottom navigation",
     "home": "Home",
     "brain": "Brain",
+    "leaderboard": "Ranks",
     "profile": "Profile",
     "play": "Play"
   },
