@@ -586,8 +586,10 @@ const en = {
   },
   "validation": {
     "enterGameCode": "Got a code? Drop it here!",
+    "usernameRequired": "Name is required!",
     "usernameTooShort": "Too short! Need 2+ chars",
     "usernameTooLong": "Whoa, max 20 characters!",
+    "usernameInvalidChars": "Letters, numbers & spaces only!",
     "invalidEmail": "That email looks funky - double check?",
     "invalidCharacters": "Letters only, champ!"
   },
@@ -1346,6 +1348,8 @@ const en = {
       "subtitle": "Learn by doing!",
       "tip1Title": "Swipe It",
       "tip1Text": "Drag across letters to build words",
+      "tip1TitleDesktop": "Select Letters",
+      "tip1TextDesktop": "Click tiles, type words, or drag to build",
       "tip2Title": "Go Long",
       "tip2Text": "Big words = big points",
       "tip3Title": "Stay Fast",
@@ -4040,7 +4044,7 @@ const en = {
     "typingHint": "Keep going..."
   },
   "keyboardQuickTip": {
-    "message": "Try typing a word!"
+    "message": "On desktop: click tiles or just type a word!"
   },
   "keyboardDesktopBadge": {
     "typeWords": "Type words",
@@ -4049,6 +4053,14 @@ const en = {
   "keyboardInlineHint": {
     "message": "Type + Enter",
     "fullMessage": "Type words on your keyboard and press Enter to submit"
+  },
+  "inputMode": {
+    "drag": "drag",
+    "click": "click",
+    "type": "type"
+  },
+  "desktopHint": {
+    "tip": "Tip: You can also click tiles or just type!"
   },
   "keyboardLanguageMismatch": "Please switch to {language} keyboard to match the board language",
   "enterKeyHint": {

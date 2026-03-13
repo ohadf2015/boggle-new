@@ -2,8 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Pointer, Star, Zap } from 'lucide-react';
+import { Pointer, Star, Zap, Mouse } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsDesktop } from '@/hooks/useMediaQuery';
 
 interface QuickTipsStepProps {
   selectedMode: 'single' | 'multi' | 'daily' | null;
@@ -18,6 +19,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
   onModeSelect,
 }) => {
   const { t } = useLanguage();
+  const isDesktop = useIsDesktop();
 
   // Auto-select training mode when component mounts
   useEffect(() => {
@@ -28,9 +30,9 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
 
   const tips = [
     {
-      icon: Pointer,
-      titleKey: 'onboarding.quickTips.tip1Title',
-      textKey: 'onboarding.quickTips.tip1Text',
+      icon: isDesktop ? Mouse : Pointer,
+      titleKey: isDesktop ? 'onboarding.quickTips.tip1TitleDesktop' : 'onboarding.quickTips.tip1Title',
+      textKey: isDesktop ? 'onboarding.quickTips.tip1TextDesktop' : 'onboarding.quickTips.tip1Text',
     },
     {
       icon: Star,

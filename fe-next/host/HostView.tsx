@@ -531,7 +531,7 @@ const HostView: React.FC<HostViewProps> = memo(({
       )}
 
       {/* In-Game View - Host Playing */}
-      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && settings.hostPlaying) && (
+      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && settings.hostPlaying && runtime.tableData) && (
         <HostInGameView
           gameCode={gameCode}
           username={username}
@@ -561,7 +561,7 @@ const HostView: React.FC<HostViewProps> = memo(({
       )}
 
       {/* TV Broadcast View - Host NOT Playing (Spectator Mode) */}
-      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && !settings.hostPlaying) && (
+      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && !settings.hostPlaying && runtime.tableData) && (
         <TvBroadcastView
           gameCode={gameCode}
           username={username}

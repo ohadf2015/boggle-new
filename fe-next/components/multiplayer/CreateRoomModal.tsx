@@ -23,6 +23,7 @@ import {
   setStoredCustomAvatar,
 } from '@/utils/profileStorage';
 import { sanitizeRoomName } from '@/utils/consts';
+import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -61,6 +62,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const [roomName, setRoomName] = useState<string>('');
   const [language, setLanguage] = useState<Language>(defaultLanguage);
   const [isEditingName, setIsEditingName] = useState(false);
+  const [showNameError, setShowNameError] = useState(false);
 
   // Initialize state when modal opens
   useEffect(() => {
@@ -103,7 +105,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     });
   }, [username, customAvatar, roomName, language, isAuthenticated, onCreate, generateRoomName]);
 
-  const isValid = username.trim().length >= 2 && customAvatar;
+  const usernameValidation = validateUsername(username);
+  const isValid = usernameValidation.isValid && customAvatar;
+  const nameError = showNameError && !usernameValidation.isValid ? usernameValidation.error : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -136,11 +140,14 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               <Input
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
+                onBlur={() => { setIsEditingName(false); setShowNameError(true); }}
                 onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
                 maxLength={20}
                 autoFocus
-                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50"
+                className={cn(
+                  'font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50',
+                  nameError && 'border-red-500'
+                )}
                 placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
               />
             ) : (
@@ -163,6 +170,11 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 </span>
                 <Pencil className="w-4 h-4 text-neo-cyan flex-shrink-0" />
               </button>
+            )}
+            {nameError && (
+              <p className="text-xs font-bold text-red-400 mt-1" role="alert">
+                {t(nameError)}
+              </p>
             )}
           </div>
 

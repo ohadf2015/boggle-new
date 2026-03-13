@@ -43,7 +43,7 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
                     customAvatar={avatarConfig}
                     avatarImage={profile?.avatar_image}
                     profilePictureUrl={profile?.profile_picture_url}
-                    size="sm"
+                    size="md"
                 />
             </Link>
 

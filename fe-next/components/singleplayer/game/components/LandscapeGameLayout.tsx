@@ -270,6 +270,7 @@ export function LandscapeGameLayout({
               earthquakeShaking={earthquakeState === 'shaking'}
               highlightedPath={gridHighlightedPath}
               language={language}
+              isTypingMode={keyboardInput.isTypingMode}
             />
           </div>
         </div>

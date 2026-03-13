@@ -518,6 +518,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 }
                 onSingleTapDetected={onSingleTapDetected}
                 language={gameLanguage}
+                isTypingMode={isTypingMode}
               />
               {/* Blast tile type badges */}
               {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (

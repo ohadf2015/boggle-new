@@ -117,6 +117,7 @@ export function EnhancedPlayerList({
                 {/* Avatar - larger on desktop */}
                 <div className="relative flex-shrink-0">
                   <Avatar
+                    customAvatar={avatar?.customAvatar ?? undefined}
                     profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                     avatarImage={avatar?.avatarImage}
                     size="md"

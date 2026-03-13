@@ -586,8 +586,10 @@ const he = {
   },
   "validation": {
     "enterGameCode": "יש קוד? הכניסו כאן",
+    "usernameRequired": "צריך לבחור שם!",
     "usernameTooShort": "צריך לפחות 2 תווים",
     "usernameTooLong": "עד 20 תווים",
+    "usernameInvalidChars": "רק אותיות, מספרים ורווחים!",
     "invalidEmail": "פורמט המייל לא נכון - בדקו שגיאות הקלדה",
     "invalidCharacters": "רק אותיות"
   },
@@ -1243,6 +1245,8 @@ const he = {
       "subtitle": "השאר תלמדו בזמן המשחק",
       "tip1Title": "החליקו אותיות",
       "tip1Text": "גררו על אותיות סמוכות ליצירת מילים",
+      "tip1TitleDesktop": "בחרו אותיות",
+      "tip1TextDesktop": "לחצו, הקלידו, או גררו ליצירת מילים",
       "tip2Title": "ארוך = טוב יותר",
       "tip2Text": "מילים ארוכות מקנות הרבה יותר נקודות",
       "tip3Title": "מהירות חשובה",
@@ -4092,7 +4096,7 @@ const he = {
     "typingHint": "המשך להקליד..."
   },
   "keyboardQuickTip": {
-    "message": "נסה להקליד מילה!"
+    "message": "במחשב: לחצו על אותיות או פשוט הקלידו!"
   },
   "keyboardDesktopBadge": {
     "typeWords": "הקלד מילים",
@@ -4101,6 +4105,14 @@ const he = {
   "keyboardInlineHint": {
     "message": "הקלד + Enter",
     "fullMessage": "הקלד מילים במקלדת ולחץ Enter לשליחה"
+  },
+  "inputMode": {
+    "drag": "גרירה",
+    "click": "לחיצה",
+    "type": "הקלדה"
+  },
+  "desktopHint": {
+    "tip": "טיפ: אפשר גם ללחוץ על אותיות או פשוט להקליד!"
   },
   "keyboardLanguageMismatch": "נא להחליף למקלדת {language} בהתאם לשפת הלוח",
   "enterKeyHint": {

@@ -7,11 +7,14 @@ export interface ToolContent {
   metaDescription: string;
   inputPlaceholder: string;
   inputLabel: string;
+  languageLabel: string;
   solveButton: string;
+  searchingText: string;
   clearButton: string;
   resultsTitle: string;
   noResults: string;
   wordsFound: string;
+  showingFirst: string;
   letterWords: string;
   ctaTitle: string;
   ctaButton: string;
@@ -19,6 +22,7 @@ export interface ToolContent {
   fullDictionaryNote: string;
   howToTitle: string;
   howToSteps: string[];
+  tipsTitle: string;
   faqTitle: string;
   faqs: { question: string; answer: string }[];
   tips: { title: string; body: string }[];
@@ -41,16 +45,19 @@ const content: Record<Locale, ToolContent> = {
       'Free anagram solver & word finder. Unscramble letters to find all possible words. Works for Scrabble, Boggle, Words With Friends. Try our word unscrambler now!',
     inputPlaceholder: 'Enter your letters (e.g. AELRST)',
     inputLabel: 'Your Letters',
+    languageLabel: 'Dictionary Language',
     solveButton: 'Find Words',
+    searchingText: 'Searching...',
     clearButton: 'Clear',
     resultsTitle: 'Words Found',
     noResults: 'No words found. Try different letters!',
     wordsFound: 'words found',
+    showingFirst: 'showing first',
     letterWords: '-letter words',
     ctaTitle: 'Practice Finding Words Faster',
     ctaButton: 'Play LexiClash Free',
     ctaDescription: 'Challenge friends in real-time word battles. Train your brain to spot words instantly!',
-    fullDictionaryNote: 'Showing results from a curated list of 500+ common words. For the full dictionary, play LexiClash!',
+    fullDictionaryNote: 'Showing results from the full LexiClash dictionary. Play LexiClash to test your word-finding skills!',
     howToTitle: 'How to Use the Word Solver',
     howToSteps: [
       'Type or paste your available letters into the input field above.',
@@ -59,6 +66,7 @@ const content: Record<Locale, ToolContent> = {
       'Use the results to discover words you might have missed in your game.',
       'Click "Play LexiClash" to practice finding words under time pressure!',
     ],
+    tipsTitle: 'Word Game Tips',
     faqTitle: 'Frequently Asked Questions',
     faqs: [
       {
@@ -130,11 +138,14 @@ const content: Record<Locale, ToolContent> = {
       'פותר אנגרמות ומוצא מילים חינמי. פענחו אותיות כדי למצוא את כל המילים האפשריות. נסו את הכלי שלנו עכשיו!',
     inputPlaceholder: 'הזינו אותיות (למשל AELRST)',
     inputLabel: 'האותיות שלכם',
+    languageLabel: 'שפת המילון',
     solveButton: 'מצא מילים',
+    searchingText: 'מחפש...',
     clearButton: 'נקה',
     resultsTitle: 'מילים שנמצאו',
     noResults: 'לא נמצאו מילים. נסו אותיות אחרות!',
     wordsFound: 'מילים נמצאו',
+    showingFirst: 'מציג ראשונים',
     letterWords: ' אותיות',
     ctaTitle: 'תרגלו מציאת מילים מהר יותר',
     ctaButton: 'שחקו ב-LexiClash בחינם',
@@ -148,6 +159,7 @@ const content: Record<Locale, ToolContent> = {
       'השתמשו בתוצאות כדי לגלות מילים שאולי פספסתם במשחק.',
       'לחצו "שחקו ב-LexiClash" כדי לתרגל מציאת מילים תחת לחץ זמן!',
     ],
+    tipsTitle: 'טיפים למשחקי מילים',
     faqTitle: 'שאלות נפוצות',
     faqs: [
       {
@@ -214,11 +226,14 @@ const content: Record<Locale, ToolContent> = {
       'Gratis anagramlösare och ordfinnare. Avkoda bokstäver för att hitta alla möjliga ord. Prova vår ordavkodare nu!',
     inputPlaceholder: 'Ange dina bokstäver (t.ex. AELRST)',
     inputLabel: 'Dina bokstäver',
+    languageLabel: 'Ordboksspråk',
     solveButton: 'Hitta ord',
+    searchingText: 'Söker...',
     clearButton: 'Rensa',
     resultsTitle: 'Hittade ord',
     noResults: 'Inga ord hittades. Prova andra bokstäver!',
     wordsFound: 'ord hittade',
+    showingFirst: 'visar första',
     letterWords: '-bokstavsord',
     ctaTitle: 'Öva på att hitta ord snabbare',
     ctaButton: 'Spela LexiClash gratis',
@@ -240,6 +255,7 @@ const content: Record<Locale, ToolContent> = {
       { question: 'Varför saknas vissa ord?', answer: 'Vårt gratisverktyg använder en lista med 500+ vanliga ord. För hela ordboken, spela LexiClash!' },
       { question: 'Hur blir man bättre på att hitta ord?', answer: 'Öva regelbundet med tidsbegränsade ordspel som LexiClash. Leta efter vanliga prefix och suffix.' },
     ],
+    tipsTitle: 'Tips för ordspel',
     tips: [
       { title: 'Börja med vokaler', body: 'Identifiera dina vokaler och högfrekventa konsonanter först. Dessa bildar grunden för de flesta ord. Prova att para varje vokal med omgivande konsonanter för att hitta korta ord först.' },
       { title: 'Leta efter vanliga mönster', body: 'Träna ögat att känna igen vanliga bokstavsmönster och ändelser. Om du ser dem bland dina bokstäver, arbeta bakåt för att hitta grundordet.' },
@@ -265,11 +281,14 @@ const content: Record<Locale, ToolContent> = {
       '無料アナグラムソルバーとワードファインダー。文字を解読してすべての可能な単語を見つけましょう。今すぐお試しください！',
     inputPlaceholder: '文字を入力（例：AELRST）',
     inputLabel: 'あなたの文字',
+    languageLabel: '辞書の言語',
     solveButton: '単語を検索',
+    searchingText: '検索中...',
     clearButton: 'クリア',
     resultsTitle: '見つかった単語',
     noResults: '単語が見つかりませんでした。別の文字を試してください！',
     wordsFound: '個の単語が見つかりました',
+    showingFirst: '最初の',
     letterWords: '文字の単語',
     ctaTitle: 'もっと速く単語を見つける練習をしよう',
     ctaButton: 'LexiClashを無料でプレイ',
@@ -283,6 +302,7 @@ const content: Record<Locale, ToolContent> = {
       '結果を使って、ゲームで見逃した単語を発見しましょう。',
       '「LexiClashをプレイ」をクリックして、制限時間内で単語探しの練習をしましょう！',
     ],
+    tipsTitle: 'ワードゲームのコツ',
     faqTitle: 'よくある質問',
     faqs: [
       { question: '7文字からいくつの単語が作れますか？', answer: '7つのランダムな文字から、通常20〜80個の有効な英単語を作ることができます。当ソルバーはすべての可能性を瞬時に見つけます。' },
@@ -316,11 +336,14 @@ const content: Record<Locale, ToolContent> = {
       'Solucionador de anagramas y buscador de palabras gratis. Descifra letras para encontrar todas las palabras posibles. ¡Prueba nuestro descifrador ahora!',
     inputPlaceholder: 'Ingresa tus letras (ej. AELRST)',
     inputLabel: 'Tus letras',
+    languageLabel: 'Idioma del diccionario',
     solveButton: 'Buscar palabras',
+    searchingText: 'Buscando...',
     clearButton: 'Limpiar',
     resultsTitle: 'Palabras encontradas',
     noResults: '¡No se encontraron palabras. Prueba con otras letras!',
     wordsFound: 'palabras encontradas',
+    showingFirst: 'mostrando primeras',
     letterWords: ' letras',
     ctaTitle: 'Practica encontrar palabras más rápido',
     ctaButton: 'Juega LexiClash gratis',
@@ -334,6 +357,7 @@ const content: Record<Locale, ToolContent> = {
       'Usa los resultados para descubrir palabras que pudiste haber pasado por alto.',
       '¡Haz clic en "Jugar LexiClash" para practicar bajo presión de tiempo!',
     ],
+    tipsTitle: 'Consejos para juegos de palabras',
     faqTitle: 'Preguntas frecuentes',
     faqs: [
       { question: '¿Cuántas palabras se pueden formar con 7 letras?', answer: 'Con 7 letras aleatorias, normalmente puedes formar entre 20 y 80 palabras válidas en inglés. Nuestro solucionador encuentra todas las posibilidades al instante.' },

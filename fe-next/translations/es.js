@@ -650,8 +650,10 @@ const es = {
   },
   "validation": {
     "enterGameCode": "¿Tienes código? Ponlo aquí",
+    "usernameRequired": "¡Se necesita un nombre!",
     "usernameTooShort": "Necesitas al menos 2 caracteres",
     "usernameTooLong": "Máximo 20 caracteres",
+    "usernameInvalidChars": "¡Solo letras, números y espacios!",
     "invalidEmail": "El formato del email no se ve bien - busca errores de tipeo",
     "invalidCharacters": "Solo letras"
   },
@@ -2859,6 +2861,8 @@ const es = {
       "subtitle": "El resto lo aprenderás jugando",
       "tip1Title": "Desliza letras",
       "tip1Text": "Arrastra sobre letras adyacentes para formar palabras",
+      "tip1TitleDesktop": "Selecciona letras",
+      "tip1TextDesktop": "Haz clic, escribe o arrastra para formar palabras",
       "tip2Title": "Más largo = Mejor",
       "tip2Text": "Las palabras largas dan exponencialmente más puntos",
       "tip3Title": "La velocidad importa",
@@ -4130,7 +4134,15 @@ const es = {
     "typingHint": "Sigue así..."
   },
   "keyboardQuickTip": {
-    "message": "¡Intenta escribir una palabra!"
+    "message": "En PC: ¡haz clic en letras o escribe!"
+  },
+  "inputMode": {
+    "drag": "arrastrar",
+    "click": "clic",
+    "type": "escribir"
+  },
+  "desktopHint": {
+    "tip": "Consejo: ¡También puedes hacer clic en letras o escribir!"
   },
   "emailPreferences": {
     "title": "Alertas del Puzzle Diario",

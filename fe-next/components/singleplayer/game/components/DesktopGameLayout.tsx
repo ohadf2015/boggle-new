@@ -5,6 +5,7 @@ import { ArrowLeft, Pause, Play, Coins } from 'lucide-react';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import GridComponent from '@/components/GridComponent';
+import DesktopInputHint from '@/components/grid/DesktopInputHint';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
@@ -324,7 +325,9 @@ export function DesktopGameLayout({
                 earthquakeShaking={earthquakeState === 'shaking'}
                 highlightedPath={gridHighlightedPath}
                 language={language}
+                isTypingMode={keyboardInput.isTypingMode}
               />
+              <DesktopInputHint wordSubmitted={foundWords.length > 0} />
             </div>
           </div>
         </div>

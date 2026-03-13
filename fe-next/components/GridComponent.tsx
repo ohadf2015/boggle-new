@@ -16,6 +16,7 @@ import {
 import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import GridCellEffects from './grid/GridCellEffects';
 import EarthquakeEffects from './grid/EarthquakeEffects';
+import InputModeIndicator, { type InputMode } from './grid/InputModeIndicator';
 import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -48,6 +49,8 @@ interface GridComponentProps {
   language?: Language;
   disableLetterKeyInput?: boolean;
   onSelectionChange?: (cells: SelectedCell[]) => void;
+  /** Whether keyboard typing mode is active (from useKeyboardWordInput) */
+  isTypingMode?: boolean;
 }
 
 const GridComponent = memo<GridComponentProps>(({
@@ -71,6 +74,7 @@ const GridComponent = memo<GridComponentProps>(({
   language = 'en',
   disableLetterKeyInput = false,
   onSelectionChange,
+  isTypingMode = false,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -121,6 +125,13 @@ const GridComponent = memo<GridComponentProps>(({
     language,
     disableLetterKeyInput,
   });
+
+  const inputMode: InputMode = useMemo(() => {
+    if (isTypingMode) return 'keyboard';
+    if (isDragging) return 'drag';
+    if (isSelecting) return 'click';
+    return 'idle';
+  }, [isTypingMode, isDragging, isSelecting]);
 
   const formedWord = useMemo(() => selectedCells.map(c => c.letter).join(''), [selectedCells]);
   const selectedCellsLength = useMemo(() => selectedCells.length, [selectedCells]);
@@ -490,6 +501,8 @@ const GridComponent = memo<GridComponentProps>(({
           particles={earthquakeParticles}
           dust={earthquakeDust}
         />
+
+        {interactive && <InputModeIndicator activeMode={inputMode} />}
       </motion.div>
     </div>
   );

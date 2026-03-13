@@ -7,7 +7,15 @@ import { cn } from '@/lib/utils';
 import { AdPlaceholder } from '@/components/ads';
 import { AutoHideHeader } from '@/components/AutoHideHeader';
 import { getContent } from './content';
-import { findWords, groupByLength } from './wordList';
+import { findWordsApi, groupByLength } from './wordList';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English', flag: '\u{1F1EC}\u{1F1E7}' },
+  { code: 'he', label: '\u05E2\u05D1\u05E8\u05D9\u05EA', flag: '\u{1F1EE}\u{1F1F1}' },
+  { code: 'sv', label: 'Svenska', flag: '\u{1F1F8}\u{1F1EA}' },
+  { code: 'ja', label: '\u65E5\u672C\u8A9E', flag: '\u{1F1EF}\u{1F1F5}' },
+  { code: 'es', label: 'Espa\u00F1ol', flag: '\u{1F1EA}\u{1F1F8}' },
+] as const;
 
 export default function WordSolverPageClient() {
   const params = useParams();
@@ -18,17 +26,39 @@ export default function WordSolverPageClient() {
   const [letters, setLetters] = useState('');
   const [results, setResults] = useState<string[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [wasCapped, setWasCapped] = useState(false);
+  const [solverLang, setSolverLang] = useState(
+    LANGUAGES.some(l => l.code === locale) ? locale : 'en'
+  );
 
-  const handleSolve = useCallback(() => {
-    const found = findWords(letters);
-    setResults(found);
-    setHasSearched(true);
-  }, [letters]);
+  const handleSolve = useCallback(async () => {
+    if (letters.length < 2) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await findWordsApi(letters, solverLang);
+      setResults(data.words);
+      setTotalCount(data.total);
+      setWasCapped(data.capped);
+      setHasSearched(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to search');
+      setResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [letters, solverLang]);
 
   const handleClear = useCallback(() => {
     setLetters('');
     setResults([]);
     setHasSearched(false);
+    setError(null);
+    setTotalCount(0);
+    setWasCapped(false);
   }, []);
 
   const handleKeyDown = useCallback(
@@ -39,13 +69,11 @@ export default function WordSolverPageClient() {
   );
 
   const grouped = useMemo(() => groupByLength(results), [results]);
-  const totalWords = results.length;
 
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'} className="min-h-dvh bg-neo-navy">
       <AutoHideHeader />
       <main className="max-w-4xl mx-auto px-4 py-8">
-        {/* Title */}
         <header className="mb-8 text-center">
           <h1
             className="font-neo-display text-3xl sm:text-4xl font-bold text-neo-yellow mb-2"
@@ -56,11 +84,37 @@ export default function WordSolverPageClient() {
           <p className="text-neo-cream/80 text-lg">{content.subtitle}</p>
         </header>
 
-        {/* Input Section */}
         <section
           className="bg-slate-800 border-3 border-neo-black shadow-hard rounded-neo p-6 mb-6"
           aria-label={content.inputLabel}
         >
+          <div className="mb-4">
+            <label
+              htmlFor="solver-language"
+              className="block font-neo-display text-sm font-bold text-neo-cream/70 mb-2"
+            >
+              {content.languageLabel}
+            </label>
+            <div className="flex flex-wrap gap-2" id="solver-language">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setSolverLang(lang.code)}
+                  className={cn(
+                    'px-3 py-1.5 font-neo-display font-bold text-sm',
+                    'border-2 border-neo-black rounded-neo transition-all duration-100',
+                    solverLang === lang.code
+                      ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
+                      : 'bg-slate-700 text-white hover:bg-slate-600'
+                  )}
+                >
+                  <span className="me-1">{lang.flag}</span>
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <label
             htmlFor="letter-input"
             className="block font-neo-display text-lg font-bold text-white mb-3"
@@ -72,10 +126,10 @@ export default function WordSolverPageClient() {
               id="letter-input"
               type="text"
               value={letters}
-              onChange={(e) => setLetters(e.target.value.toUpperCase())}
+              onChange={(e) => setLetters(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={content.inputPlaceholder}
-              maxLength={15}
+              maxLength={20}
               autoComplete="off"
               spellCheck={false}
               className={cn(
@@ -88,7 +142,7 @@ export default function WordSolverPageClient() {
             <div className="flex gap-2">
               <button
                 onClick={handleSolve}
-                disabled={letters.length < 2}
+                disabled={letters.length < 2 || isLoading}
                 className={cn(
                   'px-6 py-3 font-neo-display font-bold text-lg',
                   'bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo',
@@ -97,7 +151,7 @@ export default function WordSolverPageClient() {
                   'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard disabled:hover:translate-x-0 disabled:hover:translate-y-0'
                 )}
               >
-                {content.solveButton}
+                {isLoading ? content.searchingText : content.solveButton}
               </button>
               <button
                 onClick={handleClear}
@@ -114,24 +168,29 @@ export default function WordSolverPageClient() {
           </div>
         </section>
 
-        {/* Ad between input and results */}
         <AdPlaceholder zone="content-page" />
 
-        {/* Results */}
-        {hasSearched && (
+        {error && (
+          <div className="bg-red-900/50 border-3 border-red-500 rounded-neo p-4 mb-6 text-red-200">
+            {error}
+          </div>
+        )}
+
+        {hasSearched && !error && (
           <section className="mb-8" aria-live="polite">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-neo-display text-2xl font-bold text-white">
                 {content.resultsTitle}
               </h2>
-              {totalWords > 0 && (
+              {totalCount > 0 && (
                 <span className="bg-neo-cyan text-neo-black font-bold px-3 py-1 border-3 border-neo-black rounded-neo text-sm">
-                  {totalWords} {content.wordsFound}
+                  {totalCount} {content.wordsFound}
+                  {wasCapped && ` (${content.showingFirst} 500)`}
                 </span>
               )}
             </div>
 
-            {totalWords === 0 ? (
+            {totalCount === 0 ? (
               <p className="text-neo-cream/70 text-lg bg-slate-800 border-3 border-neo-black rounded-neo p-6 text-center">
                 {content.noResults}
               </p>
@@ -151,7 +210,7 @@ export default function WordSolverPageClient() {
                           <span
                             key={word}
                             className={cn(
-                              'px-3 py-1.5 font-mono font-bold uppercase text-sm',
+                              'px-3 py-1.5 font-mono font-bold text-sm',
                               'bg-neo-navy text-white border-2 border-neo-black rounded-neo',
                               'shadow-hard-sm'
                             )}
@@ -171,7 +230,6 @@ export default function WordSolverPageClient() {
           </section>
         )}
 
-        {/* CTA */}
         <section className="bg-neo-yellow border-3 border-neo-black shadow-hard rounded-neo p-6 mb-8 text-center">
           <h2
             className="font-neo-display text-2xl font-bold text-neo-black mb-2"
@@ -193,7 +251,6 @@ export default function WordSolverPageClient() {
           </Link>
         </section>
 
-        {/* How To Use */}
         <section
           className="bg-slate-800 border-3 border-neo-black rounded-neo p-6 mb-8"
           data-speakable="true"
@@ -208,10 +265,9 @@ export default function WordSolverPageClient() {
           </ol>
         </section>
 
-        {/* Tips */}
         <section className="mb-8">
           <h2 className="font-neo-display text-2xl font-bold text-white mb-4">
-            Word Game Tips
+            {content.tipsTitle}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {content.tips.map((tip, i) => (
@@ -230,7 +286,6 @@ export default function WordSolverPageClient() {
           </div>
         </section>
 
-        {/* FAQ */}
         <section className="mb-8" data-speakable="true">
           <h2 className="font-neo-display text-2xl font-bold text-white mb-4">
             {content.faqTitle}

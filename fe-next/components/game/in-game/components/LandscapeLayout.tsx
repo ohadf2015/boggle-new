@@ -366,6 +366,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                   }
                   onSingleTapDetected={onSingleTapDetected}
                   language={gameLanguage}
+                  isTypingMode={isTypingMode}
                 />
                 {/* Blast tile type badges */}
                 {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (

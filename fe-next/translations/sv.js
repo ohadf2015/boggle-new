@@ -586,8 +586,10 @@ const sv = {
   },
   "validation": {
     "enterGameCode": "Har du en kod? Ange den här",
+    "usernameRequired": "Namn krävs!",
     "usernameTooShort": "Behöver minst 2 tecken",
     "usernameTooLong": "Max 20 tecken",
+    "usernameInvalidChars": "Bara bokstäver, siffror och mellanslag!",
     "invalidEmail": "E-postformatet ser konstigt ut - kolla efter stavfel",
     "invalidCharacters": "Bara bokstäver"
   },
@@ -1227,6 +1229,8 @@ const sv = {
       "subtitle": "Resten lär du dig genom att spela",
       "tip1Title": "Svep bokstäver",
       "tip1Text": "Dra över angränsande bokstäver för att bilda ord",
+      "tip1TitleDesktop": "Välj bokstäver",
+      "tip1TextDesktop": "Klicka, skriv eller dra för att bilda ord",
       "tip2Title": "Längre = Bättre",
       "tip2Text": "Längre ord ger exponentiellt fler poäng",
       "tip3Title": "Snabbhet räknas",
@@ -4098,7 +4102,7 @@ const sv = {
     "typingHint": "Fortsätt..."
   },
   "keyboardQuickTip": {
-    "message": "Prova att skriva ett ord!"
+    "message": "På dator: klicka på bokstäver eller skriv!"
   },
   "keyboardDesktopBadge": {
     "typeWords": "Skriv ord",
@@ -4107,6 +4111,14 @@ const sv = {
   "keyboardInlineHint": {
     "message": "Skriv + Enter",
     "fullMessage": "Skriv ord på tangentbordet och tryck Enter för att skicka"
+  },
+  "inputMode": {
+    "drag": "dra",
+    "click": "klick",
+    "type": "skriv"
+  },
+  "desktopHint": {
+    "tip": "Tips: Du kan också klicka på bokstäver eller bara skriva!"
   },
   "keyboardLanguageMismatch": "Byt till {language}-tangentbord för att matcha brädspråket",
   "enterKeyHint": {

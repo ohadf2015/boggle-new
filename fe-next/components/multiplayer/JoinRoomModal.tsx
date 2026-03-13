@@ -22,6 +22,7 @@ import {
   setStoredUsername,
   setStoredCustomAvatar,
 } from '@/utils/profileStorage';
+import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
 import type { ActiveRoom } from '@/shared/types/game';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -52,6 +53,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   const [username, setUsername] = useState<string>('');
   const [customAvatar, setCustomAvatar] = useState<CustomAvatarConfig | null>(null);
   const [isEditingName, setIsEditingName] = useState(false);
+  const [showNameError, setShowNameError] = useState(false);
 
   // Initialize state when modal opens
   useEffect(() => {
@@ -80,7 +82,9 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
   if (!room) return null;
 
-  const isValid = username.trim().length >= 2 && customAvatar;
+  const usernameValidation = validateUsername(username);
+  const isValid = usernameValidation.isValid && customAvatar;
+  const nameError = showNameError && !usernameValidation.isValid ? usernameValidation.error : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -125,11 +129,14 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               <Input
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
+                onBlur={() => { setIsEditingName(false); setShowNameError(true); }}
                 onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
                 maxLength={20}
                 autoFocus
-                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50"
+                className={cn(
+                  'font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50',
+                  nameError && 'border-red-500'
+                )}
                 placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
               />
             ) : (
@@ -151,6 +158,11 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 </span>
                 <Pencil className="w-4 h-4 text-neo-cyan flex-shrink-0" />
               </button>
+            )}
+            {nameError && (
+              <p className="text-xs font-bold text-red-400 mt-1" role="alert">
+                {t(nameError)}
+              </p>
             )}
           </div>
         </DialogBody>

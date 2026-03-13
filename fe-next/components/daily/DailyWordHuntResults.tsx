@@ -385,6 +385,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           onDownloadImage={shareHandlers.handleDownloadShareImage}
           copied={shareHandlers.copied}
           isGeneratingImage={shareHandlers.isGeneratingImage}
+          onSpendStart={handleSpendStart}
           t={t}
         />
       </motion.div>

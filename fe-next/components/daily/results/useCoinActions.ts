@@ -18,7 +18,7 @@ interface UseCoinActionsProps {
   efficiencyScore: number;
   streakDays: number;
   userId?: string;
-  onRetry: () => void;
+  onRetry: () => void | Promise<void>;
 }
 
 export function useCoinActions({
@@ -90,7 +90,7 @@ export function useCoinActions({
     });
 
     if (success) {
-      onRetry();
+      await onRetry();
     }
   }, [puzzleDate, language, puzzleNumber, onRetry, spendCoins, costs]);
 

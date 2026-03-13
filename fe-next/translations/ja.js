@@ -586,8 +586,10 @@ const ja = {
   },
   "validation": {
     "enterGameCode": "コードある？ここに入力",
+    "usernameRequired": "名前を入力してね！",
     "usernameTooShort": "2文字以上必要だよ",
     "usernameTooLong": "20文字以内にしてね",
+    "usernameInvalidChars": "文字、数字、スペースのみ！",
     "invalidEmail": "メールの形式が違うみたい - タイポをチェック",
     "invalidCharacters": "英字のみ使えます"
   },
@@ -1226,6 +1228,8 @@ const ja = {
       "subtitle": "残りはプレイしながら学ぼう",
       "tip1Title": "文字をスワイプ",
       "tip1Text": "隣接する文字をドラッグして単語を作ろう",
+      "tip1TitleDesktop": "文字を選択",
+      "tip1TextDesktop": "クリック、入力、またはドラッグで単語を作ろう",
       "tip2Title": "長い＝良い",
       "tip2Text": "長い単語は指数関数的に高得点",
       "tip3Title": "スピードが大事",
@@ -4150,7 +4154,7 @@ const ja = {
     "typingHint": "続けて入力..."
   },
   "keyboardQuickTip": {
-    "message": "単語を入力してみて！"
+    "message": "PCではタイルをクリックするか入力してね！"
   },
   "keyboardDesktopBadge": {
     "typeWords": "単語を入力",
@@ -4159,6 +4163,14 @@ const ja = {
   "keyboardInlineHint": {
     "message": "入力 + Enter",
     "fullMessage": "キーボードで単語を入力し、Enterで送信"
+  },
+  "inputMode": {
+    "drag": "ドラッグ",
+    "click": "クリック",
+    "type": "入力"
+  },
+  "desktopHint": {
+    "tip": "ヒント：タイルをクリックするか入力もできるよ！"
   },
   "keyboardLanguageMismatch": "ボードの言語に合わせて{language}キーボードに切り替えてください",
   "enterKeyHint": {

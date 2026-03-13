@@ -2,8 +2,9 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pointer, Star, Zap, Play } from 'lucide-react';
+import { Pointer, Star, Zap, Play, Mouse } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { Mascot, MascotWithEntrance } from '@/components/ui/Mascot';
 import MiniGrid from '@/components/onboarding/MiniGrid';
 import { demoConfigs } from '@/components/onboarding/demoConfigs';
@@ -22,6 +23,7 @@ const TOTAL_STEPS = 3;
  */
 const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
   const { t, language } = useLanguage();
+  const isDesktop = useIsDesktop();
   const [currentStep, setCurrentStep] = useState(0);
 
   const demoConfig = useMemo(() => {
@@ -39,7 +41,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
   }, []);
 
   const tips = [
-    { icon: Pointer, titleKey: 'onboarding.quickTips.tip1Title', textKey: 'onboarding.quickTips.tip1Text' },
+    { icon: isDesktop ? Mouse : Pointer, titleKey: isDesktop ? 'onboarding.quickTips.tip1TitleDesktop' : 'onboarding.quickTips.tip1Title', textKey: isDesktop ? 'onboarding.quickTips.tip1TextDesktop' : 'onboarding.quickTips.tip1Text' },
     { icon: Star, titleKey: 'onboarding.quickTips.tip2Title', textKey: 'onboarding.quickTips.tip2Text' },
     { icon: Zap, titleKey: 'onboarding.quickTips.tip3Title', textKey: 'onboarding.quickTips.tip3Text' },
   ];
