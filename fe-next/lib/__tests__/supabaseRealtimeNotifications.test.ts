@@ -130,7 +130,7 @@ describe('supabaseRealtimeNotifications', () => {
 
     it('should handle regular channel errors with console.error', () => {
       // GIVEN: A subscription with error callback
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
       const onError = jest.fn();
 
       subscribeToNotifications('user-123', jest.fn(), onError);
@@ -139,11 +139,11 @@ describe('supabaseRealtimeNotifications', () => {
       const regularError = new Error('Connection failed');
       subscribeCallback?.('CHANNEL_ERROR', regularError);
 
-      // THEN: Should log error and call error callback
-      expect(errorSpy).toHaveBeenCalledWith('Error subscribing to notifications channel:', 'Connection failed');
+      // THEN: Should log warning and call error callback
+      expect(warnSpy).toHaveBeenCalledWith('Error subscribing to notifications channel:', 'Connection failed');
       expect(onError).toHaveBeenCalledWith('Connection failed');
 
-      errorSpy.mockRestore();
+      warnSpy.mockRestore();
     });
 
     it('should handle timeout with warning and error callback', () => {
