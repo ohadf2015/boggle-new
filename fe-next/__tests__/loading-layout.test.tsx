@@ -62,7 +62,6 @@ describe('Loading Layout', () => {
     // Should have header skeleton
     const header = container.querySelector('header');
     expect(header).toBeTruthy();
-    expect(header?.className).toContain('animate-pulse');
 
     // Should have main content area
     const main = container.querySelector('main');
@@ -73,15 +72,14 @@ describe('Loading Layout', () => {
   it('should have skeleton mode cards for seamless transition', () => {
     const { container } = render(<Loading />);
 
-    // Should render skeleton cards (4 mode cards + 1 daily banner)
-    // Check for the grid structure
+    // Should render skeleton cards in grid structure
     const grid = container.querySelector('.grid');
     expect(grid).toBeTruthy();
     expect(grid?.className).toContain('grid-cols-1');
     expect(grid?.className).toContain('sm:grid-cols-2');
 
-    // Should have multiple skeleton card elements with animate-pulse
-    const skeletonCards = container.querySelectorAll('.animate-pulse');
+    // Should have multiple shimmer skeleton elements (neo-shimmer replaces animate-pulse)
+    const skeletonCards = container.querySelectorAll('.neo-shimmer');
     expect(skeletonCards.length).toBeGreaterThan(0);
   });
 });
