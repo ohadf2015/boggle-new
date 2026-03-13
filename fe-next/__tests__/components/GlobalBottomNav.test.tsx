@@ -47,7 +47,8 @@ describe('GlobalBottomNav', () => {
         const translations: Record<string, string> = {
             'nav.bottomNavigation': 'Bottom navigation',
             'nav.home': 'Home',
-            'nav.brain': 'Brain',
+            'nav.play': 'Play',
+            'nav.leaderboard': 'Leaderboard',
             'nav.profile': 'Profile',
         };
         return translations[key] || key;
@@ -83,7 +84,7 @@ describe('GlobalBottomNav', () => {
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /brain/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /leaderboard/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
         });
 
@@ -95,11 +96,11 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should highlight active tab based on current path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/brain');
+            (usePathname as jest.Mock).mockReturnValue('/en/leaderboard');
             render(<GlobalBottomNav />);
 
-            const brainButton = screen.getByRole('button', { name: /brain/i });
-            expect(brainButton).toHaveAttribute('aria-current', 'page');
+            const leaderboardButton = screen.getByRole('button', { name: /leaderboard/i });
+            expect(leaderboardButton).toHaveAttribute('aria-current', 'page');
         });
 
         it('should apply safe area padding when present', () => {
@@ -126,15 +127,6 @@ describe('GlobalBottomNav', () => {
             expect(mockPush).toHaveBeenCalledWith('/en');
         });
 
-        it('should navigate to brain when brain tab is clicked (authenticated)', () => {
-            render(<GlobalBottomNav />);
-
-            const brainButton = screen.getByRole('button', { name: /brain/i });
-            fireEvent.click(brainButton);
-
-            expect(mockPush).toHaveBeenCalledWith('/en/brain');
-        });
-
         it('should navigate to profile when profile tab is clicked (authenticated)', () => {
             render(<GlobalBottomNav />);
 
@@ -142,20 +134,6 @@ describe('GlobalBottomNav', () => {
             fireEvent.click(profileButton);
 
             expect(mockPush).toHaveBeenCalledWith('/en/profile');
-        });
-
-        it('should not navigate when brain is clicked but user is not authenticated (disabled)', () => {
-            (useAuth as jest.Mock).mockReturnValue({
-                isAuthenticated: false,
-            });
-
-            render(<GlobalBottomNav />);
-
-            const brainButton = screen.getByRole('button', { name: /brain/i });
-            fireEvent.click(brainButton);
-
-            // Button is disabled, so no navigation should occur
-            expect(mockPush).not.toHaveBeenCalled();
         });
 
         it('should not navigate when profile is clicked but user is not authenticated (disabled)', () => {
@@ -182,17 +160,13 @@ describe('GlobalBottomNav', () => {
             expect(homeButton).toHaveAttribute('aria-current', 'page');
         });
 
-        it('should mark brain as active on brain path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/brain');
+        it('should mark leaderboard as active on leaderboard path', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/leaderboard');
             render(<GlobalBottomNav />);
 
-            const brainButton = screen.getByRole('button', { name: /brain/i });
-            expect(brainButton).toHaveAttribute('aria-current', 'page');
+            const leaderboardButton = screen.getByRole('button', { name: /leaderboard/i });
+            expect(leaderboardButton).toHaveAttribute('aria-current', 'page');
         });
-
-        // Note: Profile tab is no longer testable for activation because
-        // all /profile paths are now hidden (profile has its own MobileTabBar)
-        // This is tested in the "Visibility Control" section instead
 
         it('should default to home when path does not match any tab', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/some-other-page');
@@ -245,7 +219,6 @@ describe('GlobalBottomNav', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/profile');
 
             render(<GlobalBottomNav />);
-            // GlobalBottomNav should remain visible to maintain consistent navigation
             expect(screen.getByRole('navigation')).toBeInTheDocument();
             expect(screen.getByLabelText(/profile/i)).toHaveAttribute('aria-current', 'page');
         });
@@ -254,7 +227,6 @@ describe('GlobalBottomNav', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/profile/settings');
 
             render(<GlobalBottomNav />);
-            // GlobalBottomNav should remain visible on all profile sub-paths
             expect(screen.getByRole('navigation')).toBeInTheDocument();
             expect(screen.getByLabelText(/profile/i)).toHaveAttribute('aria-current', 'page');
         });
@@ -303,26 +275,6 @@ describe('GlobalBottomNav', () => {
     });
 
     describe('Authentication State', () => {
-        it('should show AuthModal when brain button clicked while not authenticated', async () => {
-            (useAuth as jest.Mock).mockReturnValue({
-                isAuthenticated: false,
-            });
-
-            render(<GlobalBottomNav />);
-
-            const brainButton = screen.getByRole('button', { name: /brain/i });
-            // Button should not be disabled
-            expect(brainButton).not.toBeDisabled();
-
-            // Click brain button
-            fireEvent.click(brainButton);
-
-            // AuthModal should appear
-            await waitFor(() => {
-                expect(screen.getByTestId('auth-modal')).toBeInTheDocument();
-            });
-        });
-
         it('should show AuthModal when profile button clicked while not authenticated', async () => {
             (useAuth as jest.Mock).mockReturnValue({
                 isAuthenticated: false,
@@ -331,13 +283,10 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             const profileButton = screen.getByRole('button', { name: /profile/i });
-            // Button should not be disabled
             expect(profileButton).not.toBeDisabled();
 
-            // Click profile button
             fireEvent.click(profileButton);
 
-            // AuthModal should appear
             await waitFor(() => {
                 expect(screen.getByTestId('auth-modal')).toBeInTheDocument();
             });
@@ -347,11 +296,9 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             const homeButton = screen.getByRole('button', { name: /home/i });
-            const brainButton = screen.getByRole('button', { name: /brain/i });
             const profileButton = screen.getByRole('button', { name: /profile/i });
 
             expect(homeButton).not.toBeDisabled();
-            expect(brainButton).not.toBeDisabled();
             expect(profileButton).not.toBeDisabled();
         });
     });
@@ -361,7 +308,8 @@ describe('GlobalBottomNav', () => {
             const hebrewT = jest.fn((key: string) => {
                 const translations: Record<string, string> = {
                     'nav.home': 'בית',
-                    'nav.brain': 'מוח',
+                    'nav.play': 'שחק',
+                    'nav.leaderboard': 'טבלת מובילים',
                     'nav.profile': 'פרופיל',
                 };
                 return translations[key] || key;
@@ -376,7 +324,7 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             expect(screen.getByText('בית')).toBeInTheDocument();
-            expect(screen.getByText('מוח')).toBeInTheDocument();
+            expect(screen.getByText('שחק')).toBeInTheDocument();
             expect(screen.getByText('פרופיל')).toBeInTheDocument();
         });
 
@@ -408,13 +356,13 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should indicate active state for screen readers', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/brain');
+            (usePathname as jest.Mock).mockReturnValue('/en/leaderboard');
             render(<GlobalBottomNav />);
 
-            const brainButton = screen.getByRole('button', { name: /brain/i });
+            const leaderboardButton = screen.getByRole('button', { name: /leaderboard/i });
             const homeButton = screen.getByRole('button', { name: /home/i });
 
-            expect(brainButton).toHaveAttribute('aria-current', 'page');
+            expect(leaderboardButton).toHaveAttribute('aria-current', 'page');
             expect(homeButton).not.toHaveAttribute('aria-current');
         });
 
@@ -422,7 +370,8 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /brain/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /leaderboard/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
         });
     });
@@ -439,7 +388,6 @@ describe('GlobalBottomNav', () => {
             const { container } = render(<GlobalBottomNav />);
             const nav = container.querySelector('nav');
 
-            // Solid background (no transparency) - matches neo-brutalist design
             expect(nav).toHaveClass('bg-neo-navy');
         });
 
