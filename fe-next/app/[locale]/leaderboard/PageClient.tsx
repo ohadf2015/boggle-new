@@ -19,14 +19,14 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import NearRankIndicator from '@/components/leaderboard/NearRankIndicator';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface LeaderboardEntry {
   player_id: string;
   display_name?: string;
   username?: string;
-  avatar_emoji?: string;
-  avatar_color?: string;
   avatar_image?: string;
+  avatar_config?: CustomAvatarConfig | null;
   profile_picture_url?: string;
   total_score?: number;
   games_played?: number;
@@ -176,6 +176,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Avatar
+                    customAvatar={profile.avatar_config}
                     profilePictureUrl={profile.profile_picture_url ?? undefined}
                     avatarImage={profile.avatar_image ?? undefined}
                     size="lg"
@@ -298,6 +299,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                     <div className="flex items-center gap-2 w-full sm:w-auto sm:col-span-5">
                       <div className="sm:hidden flex-shrink-0 w-6 text-center">{getRankIcon(rank)}</div>
                       <Avatar
+                        customAvatar={entry.avatar_config}
                         profilePictureUrl={entry.profile_picture_url ?? undefined}
                         avatarImage={entry.avatar_image ?? undefined}
                         size="sm"
