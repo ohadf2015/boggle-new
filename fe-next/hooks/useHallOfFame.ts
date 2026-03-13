@@ -28,7 +28,7 @@ const HOF_CACHE_TTL_MS = 120_000; // 2 minutes
  */
 export function useHallOfFame(limit = 5) {
   const cached = hallOfFameCache.limit === limit ? hallOfFameCache.data : null;
-  const isCacheFresh = cached && (Date.now() - hallOfFameCache.timestamp) < HOF_CACHE_TTL_MS;
+  const isCacheFresh = () => cached && (Date.now() - hallOfFameCache.timestamp) < HOF_CACHE_TTL_MS;
 
   const [champions, setChampions] = useState<HallOfFameEntry[]>(cached || []);
   const [loading, setLoading] = useState(!cached);
@@ -40,7 +40,7 @@ export function useHallOfFame(limit = 5) {
     }
 
     // Skip fetch if cache is fresh
-    if (isCacheFresh) {
+    if (isCacheFresh()) {
       setLoading(false);
       return;
     }
@@ -76,7 +76,8 @@ export function useHallOfFame(limit = 5) {
 
     fetchData();
     return () => { cancelled = true; };
-  }, [limit, isCacheFresh]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limit]);
 
   return { champions, loading };
 }

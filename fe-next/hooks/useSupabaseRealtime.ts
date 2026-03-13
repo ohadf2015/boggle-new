@@ -100,8 +100,6 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
 
   const cacheKey = `${limit}:${orderBy}`;
   const cached = leaderboardCache.key === cacheKey ? leaderboardCache.data : null;
-  const isCacheFresh = cached && (Date.now() - leaderboardCache.timestamp) < CACHE_TTL_MS;
-
   // Initialize with cached data if available (instant render)
   const [data, setData] = useState<any[]>(cached || []);
   const [loading, setLoading] = useState(!cached);
@@ -193,7 +191,7 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
  */
 export function useUserRank(userId: string | null | undefined): UserRankResult {
   const cachedRank = userId ? userRankCache.get(userId) : null;
-  const isCachedRankFresh = cachedRank && (Date.now() - cachedRank.timestamp) < CACHE_TTL_MS;
+  const isCachedRankFresh = () => cachedRank && (Date.now() - cachedRank.timestamp) < CACHE_TTL_MS;
 
   const [rank, setRank] = useState<any>(cachedRank?.data || null);
   const [loading, setLoading] = useState(!cachedRank);
@@ -231,12 +229,13 @@ export function useUserRank(userId: string | null | undefined): UserRankResult {
   const debouncedRefetch = useDebouncedCallback(fetchRank, 500);
 
   useEffect(() => {
-    if (isCachedRankFresh) {
+    if (isCachedRankFresh()) {
       setLoading(false);
       return;
     }
     void fetchRank();
-  }, [fetchRank, isCachedRankFresh]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchRank]);
 
   // Stable callback ref to prevent subscription churn
   const onRealtimeUpdateRef = useRef(debouncedRefetch);

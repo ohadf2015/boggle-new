@@ -25,7 +25,7 @@ const TOP_PLAYERS_CACHE_TTL_MS = 120_000; // 2 minutes
 
 export function useTopPlayers(limit = 5) {
   const cached = topPlayersCache.limit === limit ? topPlayersCache.data : null;
-  const isCacheFresh = cached && (Date.now() - topPlayersCache.timestamp) < TOP_PLAYERS_CACHE_TTL_MS;
+  const isCacheFresh = () => cached && (Date.now() - topPlayersCache.timestamp) < TOP_PLAYERS_CACHE_TTL_MS;
 
   const [players, setPlayers] = useState<TopPlayer[]>(cached || []);
   const [loading, setLoading] = useState(!cached);
@@ -36,7 +36,7 @@ export function useTopPlayers(limit = 5) {
       return;
     }
 
-    if (isCacheFresh) {
+    if (isCacheFresh()) {
       setLoading(false);
       return;
     }
@@ -71,7 +71,8 @@ export function useTopPlayers(limit = 5) {
 
     fetchData();
     return () => { cancelled = true; };
-  }, [limit, isCacheFresh]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limit]);
 
   return { players, loading };
 }
