@@ -72,7 +72,7 @@ describe('Profile Navigation UX - Tab Consistency', () => {
 
     // THEN it should remain visible to maintain consistent navigation
     expect(screen.getByLabelText(/home/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/brain/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/play/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/profile/i)).toBeInTheDocument();
   });
 
@@ -85,7 +85,7 @@ describe('Profile Navigation UX - Tab Consistency', () => {
 
     // THEN all three main tabs should be visible
     expect(screen.getByLabelText(/home/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/brain/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/play/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/profile/i)).toBeInTheDocument();
   });
 
@@ -110,7 +110,7 @@ describe('Profile Navigation UX - Tab Consistency', () => {
       // Test that GlobalBottomNav appears on all main sections
       const paths = [
         '/en',           // Landing
-        '/en/brain',     // Brain (currently hidden, but should be visible)
+        '/en/leaderboard', // Leaderboard
         '/en/profile',   // Profile (currently hidden, needs fix)
       ];
 
