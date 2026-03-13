@@ -2,18 +2,18 @@
   "summary": {
     "totalKeysInCode": 3381,
     "keyCountByLanguage": {
-      "en": 5693,
-      "he": 5722,
-      "sv": 5755,
-      "ja": 5742,
-      "es": 5720
+      "en": 5708,
+      "he": 5734,
+      "sv": 5767,
+      "ja": 5754,
+      "es": 5732
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
       "fallbackUsages": 0,
-      "variableKeys": 9
+      "variableKeys": 10
     }
   },
   "runtimeRisks": {
@@ -134,6 +134,14 @@
         "line": 42,
         "context": "{t(titleKey)}",
         "type": "variable_key"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "file": "components/grid/InputModeIndicator.tsx",
+        "line": 42,
+        "context": "{t(labelKey)}",
+        "type": "variable_key"
       }
     ]
   },
@@ -146,9 +154,21 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
+    "he": [
+      "avatarBuilder.gender",
+      "avatarBuilder.male",
+      "avatarBuilder.female"
+    ],
+    "sv": [
+      "avatarBuilder.gender",
+      "avatarBuilder.male",
+      "avatarBuilder.female"
+    ],
+    "ja": [
+      "avatarBuilder.gender",
+      "avatarBuilder.male",
+      "avatarBuilder.female"
+    ],
     "es": [
       "auth.otp.sendCode",
       "auth.otp.noPassword",
@@ -182,7 +202,10 @@
       "wordHuntPromo.subtitle",
       "wordHuntPromo.cta",
       "wordHuntPromo.dismiss",
-      "wordHuntPromo.imageAlt"
+      "wordHuntPromo.imageAlt",
+      "avatarBuilder.gender",
+      "avatarBuilder.male",
+      "avatarBuilder.female"
     ]
   },
   "keysNotInEnglish": {

@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useEffect, useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Zap, TrendingUp, Flame, Gem, Snowflake, Bomb } from 'lucide-react';
+import { Crown, Zap, TrendingUp, Flame, Gem, Snowflake, Bomb, Keyboard, MousePointer, Hand } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 
@@ -17,6 +17,8 @@ export interface CompactPlayer {
   avatarEmoji?: string;
   avatarColor?: string;
   previousRank?: number;
+  /** Last input method used by this player */
+  inputMethod?: 'keyboard' | 'click' | 'drag' | null;
 }
 
 export interface ComboEvent {
@@ -396,6 +398,13 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                       </motion.div>
                     )}
                   </AnimatePresence>
+                  {player.inputMethod && (
+                    <span className="text-neo-black/40" title={player.inputMethod}>
+                      {player.inputMethod === 'keyboard' ? <Keyboard className="w-2.5 h-2.5" /> :
+                       player.inputMethod === 'click' ? <MousePointer className="w-2.5 h-2.5" /> :
+                       <Hand className="w-2.5 h-2.5" />}
+                    </span>
+                  )}
                   <span className={cn(
                     'text-[10px] font-bold truncate max-w-[60px]',
                     isMe ? 'text-neo-black' : 'text-neo-black/60'

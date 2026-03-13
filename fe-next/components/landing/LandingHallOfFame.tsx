@@ -30,13 +30,22 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
   if (loading) {
     return (
       <div className="w-full max-w-4xl mx-auto">
-        <div className="h-6 w-36 bg-neo-white/10 rounded mx-auto mb-4 animate-pulse" />
-        <div className="flex gap-3 justify-center">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="w-5 h-5 rounded bg-neo-yellow/30 animate-pulse" />
+          <div className="h-5 w-28 bg-neo-white/10 rounded animate-pulse" />
+        </div>
+        <div className="flex gap-3 justify-center flex-wrap">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="w-36 sm:w-40 bg-neo-cream/50 border-3 border-neo-black/20 rounded-neo-lg p-3 animate-pulse">
-              <div className="w-12 h-12 bg-neo-black/10 rounded-full mx-auto mb-2" />
-              <div className="h-4 w-20 bg-neo-black/10 rounded mx-auto mb-1" />
-              <div className="h-5 w-16 bg-neo-black/10 rounded mx-auto" />
+            <div
+              key={i}
+              className="w-32 sm:w-36 md:w-40 bg-neo-cream/20 border-3 border-neo-black/20 rounded-neo-lg shadow-hard p-3 flex flex-col items-center"
+              style={{ transform: `rotate(${[-3, 2, -2][i]}deg)` }}
+            >
+              {i === 0 && <div className="w-6 h-6 rounded bg-neo-yellow/30 mb-1 animate-pulse" />}
+              <div className="w-12 h-12 rounded-full bg-neo-white/10 mb-2 animate-pulse" />
+              <div className="h-4 w-20 bg-neo-black/10 rounded mb-1 animate-pulse" />
+              <div className="h-5 w-14 bg-neo-black/10 rounded mb-1 animate-pulse" />
+              <div className="h-2.5 w-16 bg-neo-black/5 rounded animate-pulse" />
             </div>
           ))}
         </div>

@@ -22,16 +22,51 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
   const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
 
   if (loading) {
-    return (
-      <div className="bg-neo-navy-light border-3 border-neo-black shadow-hard-lg rounded-neo-lg p-4 animate-pulse">
-        <div className="h-6 w-24 sm:w-32 bg-neo-white/10 rounded mb-4" />
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 py-2">
-            <div className="w-7 h-7 bg-neo-white/10 rounded-full" />
-            <div className="w-8 h-8 bg-neo-white/10 rounded-full" />
-            <div className="h-4 flex-1 bg-neo-white/10 rounded" />
-          </div>
-        ))}
+    return compact ? (
+      <div className="bg-neo-navy-light border-2 border-neo-black shadow-hard rounded-neo p-3">
+        <div className="flex items-center justify-center gap-1 mb-2">
+          <div className="w-4 h-4 rounded bg-neo-yellow/30 animate-pulse" />
+          <div className="h-3.5 w-24 bg-neo-white/10 rounded animate-pulse" />
+        </div>
+        <div className="flex justify-center gap-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <div className={cn(
+                'w-6 h-6 rounded-full border-2 border-neo-black/20 animate-pulse',
+                i === 0 ? 'bg-yellow-400/30' : i === 1 ? 'bg-gray-300/30' : 'bg-amber-600/30'
+              )} />
+              <div className="w-10 h-10 rounded-full bg-neo-white/10 animate-pulse" />
+              <div className="h-3 w-12 bg-neo-white/8 rounded animate-pulse" />
+              <div className="h-3 w-8 bg-neo-lime/15 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div className="bg-neo-navy-light border-3 border-neo-black shadow-hard-lg rounded-neo-lg p-4 sm:p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-5 h-5 rounded bg-neo-yellow/30 animate-pulse" />
+          <div className="h-5 w-28 bg-neo-white/10 rounded animate-pulse" />
+        </div>
+        <div className="space-y-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className={cn(
+              'flex items-center gap-3 py-1.5 px-2 rounded-neo',
+              i < 3 && 'bg-neo-white/5'
+            )}>
+              <div className={cn(
+                'w-7 h-7 rounded-full border-2 border-neo-black/20 shrink-0 animate-pulse',
+                i === 0 ? 'bg-yellow-400/30' : i === 1 ? 'bg-gray-300/30' : i === 2 ? 'bg-amber-600/30' : 'bg-neo-white/10'
+              )} />
+              <div className="w-8 h-8 rounded-full bg-neo-white/10 shrink-0 animate-pulse" />
+              <div className="flex-1 h-4 bg-neo-white/8 rounded animate-pulse" style={{ maxWidth: `${70 - i * 8}%` }} />
+              <div className="h-4 w-12 bg-neo-lime/15 rounded shrink-0 animate-pulse" />
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-center gap-1.5 mt-3 pt-3 border-t border-neo-white/10">
+          <div className="h-3.5 w-28 bg-neo-white/8 rounded animate-pulse" />
+        </div>
       </div>
     );
   }

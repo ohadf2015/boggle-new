@@ -117,6 +117,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     enabled: !state.isGameOver,
     onWordSubmit: actions.handleWordSubmit,
     minWordLength: MIN_DISCOVERY_WORD_LENGTH, // Accept 2+ letter words for discovery (target word min enforced separately)
+    disablePathHighlighting: true,
   });
 
   // Hide bottom navigation during active gameplay

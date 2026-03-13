@@ -419,6 +419,7 @@ const GridComponent = memo<GridComponentProps>(({
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-2 border-neo-black/60 z-10`
                       : isHighlighted
                         ? `bg-neo-lime text-neo-black border-2 border-neo-black/60 z-10 shadow-[0_0_12px_rgba(255,225,53,0.5)] ${
+                            isTypingMode ? 'animate-keyboard-light-up' :
                             hintAnimationPhase === 'blink' ? 'animate-hint-blink' :
                             hintAnimationPhase === 'fadeout' ? 'animate-hint-fadeout' :
                             ''
@@ -429,6 +430,10 @@ const GridComponent = memo<GridComponentProps>(({
                     isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
                     isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
                     isHovered && isLastSelected && selectedCells.length >= 2 && "ring-4 ring-neo-green ring-offset-2 scale-110",
+                    // Click-select: dim non-adjacent, non-selected tiles
+                    isSelecting && selectedCells.length > 0 && !isSelected && !isAdjacentHint && !isHighlighted && "opacity-40 cursor-not-allowed",
+                    // Click-select: pulse anchor (last selected) tile
+                    isLastSelected && isSelecting && !isDragging && "animate-anchor-pulse z-20",
                     isSelected && !isHovered && "shadow-hard-sm",
                     isFocused && !isSelected && "z-20 animate-keyboard-focus",
                     "transition-all",
@@ -458,6 +463,11 @@ const GridComponent = memo<GridComponentProps>(({
                       background: 'linear-gradient(135deg, #F97316, #EF4444)',
                     } : isSelected && comboColors.flicker ? {
                       animation: 'flicker 0.1s infinite alternate'
+                    } : {}),
+                    // Keyboard stagger: 50ms delay per cell index
+                    ...(isHighlighted && isTypingMode && highlightedOrder !== undefined ? {
+                      animationDelay: `${(highlightedOrder - 1) * 50}ms`,
+                      animationFillMode: 'both',
                     } : {})
                   }}
                 >

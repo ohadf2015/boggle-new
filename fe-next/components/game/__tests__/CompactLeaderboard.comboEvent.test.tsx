@@ -86,3 +86,43 @@ describe('CompactLeaderboard combo event badges', () => {
     expect(screen.getByTestId('combo-badge-bob')).toBeInTheDocument();
   });
 });
+
+describe('CompactLeaderboard input method icons', () => {
+  it('should show keyboard icon when player inputMethod is keyboard', () => {
+    const players: CompactPlayer[] = [
+      { username: 'alice', score: 300, rank: 1, inputMethod: 'keyboard' },
+      { username: 'bob', score: 200, rank: 2 },
+    ];
+
+    render(
+      <CompactLeaderboard
+        players={players}
+        currentUsername="alice"
+        t={defaultT}
+      />
+    );
+
+    // The keyboard icon title attribute
+    const icon = screen.getByTitle('keyboard');
+    expect(icon).toBeInTheDocument();
+  });
+
+  it('should not show input method icon when inputMethod is null', () => {
+    const players: CompactPlayer[] = [
+      { username: 'alice', score: 300, rank: 1, inputMethod: null },
+      { username: 'bob', score: 200, rank: 2 },
+    ];
+
+    render(
+      <CompactLeaderboard
+        players={players}
+        currentUsername="alice"
+        t={defaultT}
+      />
+    );
+
+    expect(screen.queryByTitle('keyboard')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('click')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('drag')).not.toBeInTheDocument();
+  });
+});

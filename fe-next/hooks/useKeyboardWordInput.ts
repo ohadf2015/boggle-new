@@ -39,6 +39,8 @@ export interface UseKeyboardWordInputOptions {
   onTypedWordChange?: (word: string) => void;
   /** Minimum word length for submission */
   minWordLength?: number;
+  /** Disable path highlighting (e.g. Word Hunt — showing the path reveals the answer) */
+  disablePathHighlighting?: boolean;
 }
 
 export interface UseKeyboardWordInputReturn {
@@ -233,6 +235,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
     onWordSubmit,
     onTypedWordChange,
     minWordLength = 2,
+    disablePathHighlighting = false,
   } = options;
 
   const [typedWord, setTypedWord] = useState('');
@@ -257,10 +260,12 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   }, [typedWord, grid, language]);
 
   // Calculate highlighted cells based on typed word
+  // Disabled in Word Hunt mode — showing the path would reveal the answer
   const highlightedCells = useMemo(() => {
+    if (disablePathHighlighting) return [];
     if (!typedWord || typedWord.length === 0) return [];
     return getPartialHighlight(grid, typedWord, language);
-  }, [typedWord, grid, language]);
+  }, [typedWord, grid, language, disablePathHighlighting]);
 
   // Clear typed word
   const clearTypedWord = useCallback(() => {

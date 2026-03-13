@@ -320,4 +320,61 @@ describe('useKeyboardWordInput - Desktop notifications', () => {
       });
     });
   });
+
+  describe('disablePathHighlighting (Word Hunt mode)', () => {
+    const englishGrid: LetterGrid = [
+      ['C', 'A', 'T'],
+      ['D', 'O', 'G'],
+      ['R', 'U', 'N'],
+    ];
+
+    it('should return empty highlightedCells when disablePathHighlighting is true', () => {
+      mockUseIsDesktop.mockReturnValue(true);
+
+      const { result } = renderHook(() =>
+        useKeyboardWordInput({
+          grid: englishGrid,
+          language: 'en',
+          enabled: true,
+          minWordLength: 2,
+          disablePathHighlighting: true,
+        })
+      );
+
+      // Type a word that exists on the grid
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }));
+      });
+
+      // Word should be typed but no highlighting
+      expect(result.current.typedWord).toBe('CAT');
+      expect(result.current.highlightedCells).toEqual([]);
+      expect(result.current.isTypingMode).toBe(true);
+    });
+
+    it('should return highlighted cells when disablePathHighlighting is false', () => {
+      mockUseIsDesktop.mockReturnValue(true);
+
+      const { result } = renderHook(() =>
+        useKeyboardWordInput({
+          grid: englishGrid,
+          language: 'en',
+          enabled: true,
+          minWordLength: 2,
+          disablePathHighlighting: false,
+        })
+      );
+
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }));
+      });
+
+      expect(result.current.typedWord).toBe('CAT');
+      expect(result.current.highlightedCells.length).toBeGreaterThan(0);
+    });
+  });
 });

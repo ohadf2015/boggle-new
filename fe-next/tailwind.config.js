@@ -426,6 +426,20 @@ module.exports = {
             transform: "scale(0.99)",
           },
         },
+        // Anchor tile pulse for click-select mode
+        "anchor-pulse": {
+          "0%, 100%": {
+            boxShadow: "0 0 0 3px rgb(var(--neo-cyan)), 0 0 8px rgba(0, 255, 255, 0.4)",
+          },
+          "50%": {
+            boxShadow: "0 0 0 5px rgb(var(--neo-cyan)), 0 0 16px rgba(0, 255, 255, 0.6)",
+          },
+        },
+        // Keyboard stagger light-up for typed path
+        "keyboard-light-up": {
+          "0%": { opacity: "0.3", transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
         // Fade out animation for hint trail
         "hint-fadeout": {
           "0%": {
@@ -463,6 +477,8 @@ module.exports = {
         "hint-glow": "hint-glow 2.5s ease-in-out infinite",
         "hint-blink": "hint-blink 1.5s ease-in-out 2",
         "hint-fadeout": "hint-fadeout 1s ease-out forwards",
+        "anchor-pulse": "anchor-pulse 1.5s ease-in-out infinite",
+        "keyboard-light-up": "keyboard-light-up 0.15s ease-out forwards",
         "keyboard-focus": "keyboard-focus 1.5s ease-in-out infinite",
         // Fast animations for landing page optimization
         "fade-in-fast": "fade-in-fast 0.15s ease-out forwards",

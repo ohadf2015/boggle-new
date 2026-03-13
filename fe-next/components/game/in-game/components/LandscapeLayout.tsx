@@ -390,6 +390,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                     avatarImage: p.avatar?.avatarImage,
                     avatarEmoji: p.avatar?.emoji,
                     avatarColor: p.avatar?.color,
+                    inputMethod: p.username === username && isTypingMode ? 'keyboard' as const : null,
                   }))}
                   currentUsername={username}
                   t={t}

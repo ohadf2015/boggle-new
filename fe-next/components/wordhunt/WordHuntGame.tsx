@@ -64,6 +64,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     enabled: gameActive && !bridge.isGameOver,
     onWordSubmit: handleWordSubmit,
     minWordLength,
+    disablePathHighlighting: true,
   });
 
   // Handle word change from grid swiping
