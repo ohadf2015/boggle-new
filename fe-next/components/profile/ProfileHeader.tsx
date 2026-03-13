@@ -115,16 +115,16 @@ export function ProfileHeader({
         isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
       )}
     >
-      <div className={cn('flex', compact ? 'flex-col gap-3 items-start' : 'flex-row gap-6 items-center')}>
+      <div className={cn('flex', compact ? 'flex-col gap-3 items-center' : 'flex-row gap-6 items-center')}>
         {/* Avatar with edit controls */}
-        <div className={cn('flex', compact ? 'flex-col gap-2' : 'flex-row gap-4 items-center')}>
+        <div className={cn('flex items-center', compact ? 'flex-row gap-3' : 'flex-row gap-4')}>
           {/* Avatar */}
           <div className="flex-shrink-0">
             <Avatar
               customAvatar={profile?.avatar_config ?? undefined}
               profilePictureUrl={profile?.profile_picture_url ?? undefined}
               avatarImage={profile?.avatar_image ?? undefined}
-              size={compact ? 'md' : 'xl'}
+              size={compact ? 'lg' : 'xl'}
               className="shadow-lg"
             />
           </div>
@@ -132,7 +132,7 @@ export function ProfileHeader({
           {/* Avatar Controls */}
           <div className={cn(
             'flex gap-2',
-            compact ? 'flex-row' : 'flex-col'
+            compact ? 'flex-col' : 'flex-col'
           )}>
             {/* Edit avatar button — opens builder */}
             <button

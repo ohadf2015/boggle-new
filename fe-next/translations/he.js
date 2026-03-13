@@ -619,7 +619,10 @@ const he = {
       "cancel": "לא",
       "buildCustom": "בנו דמות משלכם",
       "undo": "ביטול",
-      "none": "דלג"
+      "none": "דלג",
+      "gender": "סוג גוף",
+      "male": "זכר",
+      "female": "נקבה"
     }
   },
   "error": {

@@ -619,7 +619,10 @@ const ja = {
       "cancel": "やめる",
       "buildCustom": "オリジナルを作ろう",
       "undo": "元に戻す",
-      "none": "なし"
+      "none": "なし",
+      "gender": "体型",
+      "male": "男性",
+      "female": "女性"
     }
   },
   "error": {

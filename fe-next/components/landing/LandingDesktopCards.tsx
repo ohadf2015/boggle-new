@@ -45,9 +45,9 @@ export function LandingDesktopCards({
 }: LandingDesktopCardsProps): React.JSX.Element {
   return (
     <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
-      <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch px-4 lg:px-6">
+      <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-stretch px-4 lg:px-6">
         {/* Daily Challenge Banner */}
-        <div className="col-span-1 sm:col-span-2 w-full max-w-4xl mx-auto">
+        <div className="col-span-1 sm:col-span-2 lg:col-span-3 w-full max-w-4xl mx-auto">
           <Suspense fallback={
             <div
               className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
@@ -117,7 +117,7 @@ export function LandingDesktopCards({
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
-          className="col-span-1 sm:col-span-2 w-full"
+          className="col-span-1 sm:col-span-2 lg:col-span-1 w-full"
         >
           <ModeCard
             title={t('landing.adventureMode')}
@@ -131,7 +131,7 @@ export function LandingDesktopCards({
 
         {/* Blast Mode (admin/blast_access only) */}
         {(isAdmin || hasBlastAccess) && (
-          <div className="col-span-1 sm:col-span-2 w-full max-w-md mx-auto">
+          <div className="col-span-1 sm:col-span-2 lg:col-span-3 w-full max-w-md mx-auto">
             <ModeCard
               title={t('landing.blastMode')}
               description={t('landing.blastModeDesc')}
@@ -150,7 +150,7 @@ export function LandingDesktopCards({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
-          className="col-span-1 sm:col-span-2 flex justify-center"
+          className="col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center"
         >
           <Link
             href={`/${language}/leaderboard`}
@@ -170,7 +170,7 @@ export function LandingDesktopCards({
         </motion.div>
 
         {/* Share banner */}
-        <div className="col-span-1 sm:col-span-2">
+        <div className="col-span-1 sm:col-span-2 lg:col-span-3">
           <LandingShareBanner onShareClick={onShareClick} />
         </div>
       </div>

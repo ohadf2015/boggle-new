@@ -29,6 +29,20 @@ describe('customAvatarSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('should default gender to male when missing (backward compat)', () => {
+    // Given an old config without gender
+    const { gender, ...oldConfig } = DEFAULT_AVATAR_CONFIG;
+
+    // When parsing
+    const result = customAvatarSchema.safeParse(oldConfig);
+
+    // Then it succeeds with default gender
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.gender).toBe('male');
+    }
+  });
+
   it('should reject missing required field', () => {
     // Given a config missing the eyes field
     const { eyes, ...partial } = DEFAULT_AVATAR_CONFIG;
@@ -53,6 +67,7 @@ describe('getRandomAvatarConfig', () => {
 
   it('should contain all required keys', () => {
     const config = getRandomAvatarConfig();
+    expect(config).toHaveProperty('gender');
     expect(config).toHaveProperty('base');
     expect(config).toHaveProperty('skinColor');
     expect(config).toHaveProperty('hair');

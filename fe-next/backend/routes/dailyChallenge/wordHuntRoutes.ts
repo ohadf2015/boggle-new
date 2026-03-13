@@ -134,7 +134,8 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
         }
       }
     } catch (validationError) {
-      logger.error('API', `Word Hunt validation error: ${(validationError as Error).message}`);
+      // Dictionary validation is advisory-only — don't report as error
+      logger.warn('API', `Word Hunt dictionary validation error (advisory, non-blocking): ${(validationError as Error).message}`);
     }
 
     const supabase = getSupabase();

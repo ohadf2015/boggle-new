@@ -46,7 +46,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 jest.mock('@/utils/profileStorage', () => ({
   getStoredUsername: jest.fn().mockReturnValue('TestUser'),
   getStoredCustomAvatar: jest.fn().mockReturnValue(null),
-  getOrCreateStoredCustomAvatar: jest.fn().mockReturnValue({ base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4' }),
+  getOrCreateStoredCustomAvatar: jest.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4' }),
   setStoredUsername: jest.fn(),
   setStoredCustomAvatar: jest.fn(),
 }));

@@ -683,7 +683,10 @@ const es = {
       "cancel": "Nah",
       "buildCustom": "Crea el tuyo",
       "undo": "Deshacer",
-      "none": "Saltar"
+      "none": "Saltar",
+      "gender": "Tipo de cuerpo",
+      "male": "Masculino",
+      "female": "Femenino"
     }
   },
   "error": {

@@ -18,7 +18,7 @@ import { LanguageSelector } from '@/components/join/LanguageSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   getStoredUsername,
-  getStoredCustomAvatar,
+  getOrCreateStoredCustomAvatar,
   setStoredUsername,
   setStoredCustomAvatar,
 } from '@/utils/profileStorage';
@@ -74,10 +74,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
       setCustomAvatar(profileAvatar ?? getRandomAvatarConfig());
     } else {
       const storedUsername = getStoredUsername();
-      const storedAvatar = getStoredCustomAvatar();
-
       setUsername(storedUsername || '');
-      setCustomAvatar(storedAvatar ?? getRandomAvatarConfig());
+      setCustomAvatar(getOrCreateStoredCustomAvatar());
     }
   }, [isOpen, isAuthenticated, displayName, profileAvatar, defaultLanguage]);
 

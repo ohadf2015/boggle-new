@@ -8,6 +8,7 @@ import AvatarRenderer from './AvatarRenderer';
 import PartPreview from './PartPreview';
 import {
   type CustomAvatarConfig,
+  AVATAR_GENDERS,
   AVATAR_BASES,
   AVATAR_SKIN_COLORS,
   AVATAR_HAIR_STYLES,
@@ -262,6 +263,11 @@ function CategoryOptions({ category, config, updateConfig, t }: CategoryOptionsP
     case 'base':
       return (
         <div className="space-y-3">
+          <GenderToggle
+            selected={config.gender}
+            onSelect={v => updateConfig('gender', v)}
+            t={t}
+          />
           <PartPreviewGrid
             label={t('avatar.builder.shape')}
             partType="base"
@@ -427,6 +433,43 @@ interface ColorStripProps<T extends string> {
   onSelect: (value: T) => void;
   large?: boolean;
 }
+
+// ==================== Gender Toggle ====================
+
+interface GenderToggleProps {
+  selected: (typeof AVATAR_GENDERS)[number];
+  onSelect: (value: (typeof AVATAR_GENDERS)[number]) => void;
+  t: (key: string) => string;
+}
+
+function GenderToggle({ selected, onSelect, t }: GenderToggleProps) {
+  return (
+    <div>
+      <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">{t('avatar.builder.gender')}</p>
+      <div className="flex gap-2">
+        {AVATAR_GENDERS.map(gender => (
+          <AdaptiveMotion.button
+            key={gender}
+            onClick={() => onSelect(gender)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.92 }}
+            transition={BUTTON_SPRING}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 font-bold rounded-neo border-2 transition-colors ${
+              selected === gender
+                ? 'bg-neo-lime/15 border-neo-lime shadow-hard-sm text-neo-lime'
+                : 'bg-neo-navy-light border-neo-white/15 hover:border-neo-white/40 text-neo-white/70'
+            }`}
+          >
+            <span className="text-lg">{gender === 'male' ? '♂' : '♀'}</span>
+            <span className="text-sm">{t(`avatar.builder.${gender}`)}</span>
+          </AdaptiveMotion.button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ==================== Color Strip (with spring feedback) ====================
 
 function ColorStrip<T extends string>({ label, colors, selected, onSelect, large }: ColorStripProps<T>) {
   const size = large ? 'w-9 h-9 sm:w-11 sm:h-11' : 'w-7 h-7 sm:w-8 sm:h-8';

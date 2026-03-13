@@ -7,6 +7,7 @@ import { EYE_PARTS } from './parts/EyeParts';
 import { MOUTH_PARTS } from './parts/MouthParts';
 import { HAIR_PARTS } from './parts/HairParts';
 import { ACCESSORY_PARTS } from './parts/AccessoryParts';
+import { BODY_PARTS } from './parts/BodyParts';
 
 interface AvatarRendererProps {
   config: CustomAvatarConfig;
@@ -24,6 +25,7 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
   const MouthPart = MOUTH_PARTS[config.mouth] ?? MOUTH_PARTS.smile;
   const HairPart = HAIR_PARTS[config.hair] ?? HAIR_PARTS.none;
   const AccessoryPart = ACCESSORY_PARTS[config.accessory] ?? ACCESSORY_PARTS.none;
+  const BodyPart = BODY_PARTS[config.gender ?? 'male'];
 
   return (
     <svg
@@ -38,8 +40,11 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       {/* Background */}
       <rect x="0" y="0" width="100" height="100" rx="16" fill={config.bgColor} />
 
+      {/* Body (shoulders/torso at bottom) */}
+      <BodyPart fill={config.skinColor} />
+
       {/* Hair back layer (for styles that go behind the head) */}
-      {['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave'].includes(config.hair) ? (
+      {['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails'].includes(config.hair) ? (
         <HairPart fill={config.hairColor} />
       ) : null}
 
@@ -53,11 +58,33 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       {/* Eyes */}
       <EyePart />
 
+      {/* Female lashes overlay — adds lashes to all eye styles */}
+      {(config.gender ?? 'male') === 'female' && config.eyes !== 'lashes' && (
+        config.eyes === 'cyclops' ? (
+          <g>
+            <line x1="46" y1="34" x2="44" y2="31" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="50" y1="33" x2="50" y2="30" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="54" y1="34" x2="56" y2="31" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+          </g>
+        ) : (
+          <g>
+            {/* Left eye lashes */}
+            <line x1="34" y1="37" x2="32" y2="34" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="37" y1="36" x2="36" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="40" y1="36" x2="41" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            {/* Right eye lashes */}
+            <line x1="58" y1="37" x2="56" y2="34" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="61" y1="36" x2="60" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="64" y1="36" x2="65" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+          </g>
+        )
+      )}
+
       {/* Mouth */}
       <MouthPart />
 
       {/* Hair front layer (for styles that go on top) */}
-      {!['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'none'].includes(config.hair) ? (
+      {!['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'none'].includes(config.hair) ? (
         <HairPart fill={config.hairColor} />
       ) : null}
 

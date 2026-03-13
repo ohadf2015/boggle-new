@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+
 export interface TopPlayer {
   username: string;
   displayName: string | null;
   totalScore: number;
   avatarImage: string | null;
-  avatarConfig: Record<string, string> | null;
+  avatarConfig: CustomAvatarConfig | null;
   profilePictureUrl: string | null;
 }
 

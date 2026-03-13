@@ -10,9 +10,9 @@ import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 const SAMPLE_AVATARS: CustomAvatarConfig[] = [
-  { base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18', eyes: 'star', mouth: 'grin', accessory: 'sunglasses', accessoryColor: '#000000', bgColor: '#FF6B35' },
-  { base: 'square', skinColor: '#D08B5B', hair: 'afro', hairColor: '#2C1B18', eyes: 'happy', mouth: 'smile', accessory: 'crown', accessoryColor: '#FFD700', bgColor: '#8B5CF6' },
-  { base: 'heart', skinColor: '#EDB98A', hair: 'ponytail', hairColor: '#FF1493', eyes: 'sparkle', mouth: 'cat', accessory: 'headband', accessoryColor: '#00FFFF', bgColor: '#00897B' },
+  { gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18', eyes: 'star', mouth: 'grin', accessory: 'sunglasses', accessoryColor: '#000000', bgColor: '#FF6B35' },
+  { gender: 'male', base: 'square', skinColor: '#D08B5B', hair: 'afro', hairColor: '#2C1B18', eyes: 'happy', mouth: 'smile', accessory: 'crown', accessoryColor: '#FFD700', bgColor: '#8B5CF6' },
+  { gender: 'female', base: 'heart', skinColor: '#EDB98A', hair: 'ponytail', hairColor: '#FF1493', eyes: 'sparkle', mouth: 'cat', accessory: 'headband', accessoryColor: '#00FFFF', bgColor: '#00897B' },
 ];
 
 const WOBBLES = [

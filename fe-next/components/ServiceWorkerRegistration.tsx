@@ -54,7 +54,9 @@ async function registerServiceWorker() {
       }
     });
   } catch (error) {
-    console.error('[PWA] Service worker registration failed:', error);
+    // SW registration can fail for many legitimate reasons (HTTP context, incognito,
+    // iframe restrictions, browser settings). Use warn to avoid Sentry noise.
+    console.warn('[PWA] Service worker registration failed:', error);
   }
 }
 

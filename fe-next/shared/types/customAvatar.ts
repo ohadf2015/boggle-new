@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+// ==================== Gender ====================
+export const AVATAR_GENDERS = ['male', 'female'] as const;
+
 // ==================== Face Base Shapes ====================
 export const AVATAR_BASES = ['round', 'square', 'oval', 'heart', 'diamond', 'hexagon', 'blob'] as const;
 
@@ -11,7 +14,7 @@ export const AVATAR_SKIN_COLORS = [
 // ==================== Hair ====================
 export const AVATAR_HAIR_STYLES = [
   'none', 'spiky', 'curly', 'long', 'buzz', 'mohawk', 'bob', 'ponytail', 'afro', 'wavy',
-  'pigtails', 'topknot', 'sideshave', 'dreads',
+  'pigtails', 'topknot', 'sideshave', 'dreads', 'braids', 'bun', 'bangs', 'twintails',
 ] as const;
 
 export const AVATAR_HAIR_COLORS = [
@@ -48,6 +51,7 @@ export const AVATAR_BG_COLORS = [
 
 // ==================== Zod Schema ====================
 export const customAvatarSchema = z.object({
+  gender: z.enum(AVATAR_GENDERS).default('male'),
   base: z.enum(AVATAR_BASES),
   skinColor: z.enum(AVATAR_SKIN_COLORS),
   hair: z.enum(AVATAR_HAIR_STYLES),
@@ -59,11 +63,12 @@ export const customAvatarSchema = z.object({
   bgColor: z.enum(AVATAR_BG_COLORS),
 });
 
-export type CustomAvatarConfig = z.infer<typeof customAvatarSchema>;
+export type CustomAvatarConfig = z.output<typeof customAvatarSchema>;
 
 // ==================== Defaults & Helpers ====================
 
 export const DEFAULT_AVATAR_CONFIG: CustomAvatarConfig = {
+  gender: 'male',
   base: 'round',
   skinColor: '#FFDBB4',
   hair: 'spiky',
@@ -78,6 +83,7 @@ export const DEFAULT_AVATAR_CONFIG: CustomAvatarConfig = {
 export function getRandomAvatarConfig(): CustomAvatarConfig {
   const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
   return {
+    gender: pick(AVATAR_GENDERS),
     base: pick(AVATAR_BASES),
     skinColor: pick(AVATAR_SKIN_COLORS),
     hair: pick(AVATAR_HAIR_STYLES),

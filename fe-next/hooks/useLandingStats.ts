@@ -30,7 +30,7 @@ export function useLandingStats() {
   return {
     activePlayers,
     gamesToday,
-    gameModes: 5,   // static: Solo, Multiplayer, Daily, Adventure, Blast
+    gameModes: 4,   // static: Solo, Multiplayer, Daily Challenge, Adventure
     languages: 5,   // static: en, he, sv, ja, es
     loading: isLoading,
   };

@@ -619,7 +619,10 @@ const en = {
       "cancel": "Nah",
       "buildCustom": "Make Your Own",
       "undo": "Undo",
-      "none": "Skip"
+      "none": "Skip",
+      "gender": "Body Type",
+      "male": "Male",
+      "female": "Female"
     }
   },
   "error": {
@@ -7391,7 +7394,10 @@ const en = {
     save: "Save",
     cancel: "Cancel",
     buildCustom: "Build Your Own",
-    bgColor: "Background"
+    bgColor: "Background",
+    gender: "Body Type",
+    male: "Male",
+    female: "Female"
   }
 };
 

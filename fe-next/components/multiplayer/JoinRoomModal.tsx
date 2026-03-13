@@ -18,7 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import {
   getStoredUsername,
-  getStoredCustomAvatar,
+  getOrCreateStoredCustomAvatar,
   setStoredUsername,
   setStoredCustomAvatar,
 } from '@/utils/profileStorage';
@@ -62,10 +62,8 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
       setCustomAvatar(profileAvatar ?? getRandomAvatarConfig());
     } else {
       const storedUsername = getStoredUsername();
-      const storedAvatar = getStoredCustomAvatar();
-
       setUsername(storedUsername || '');
-      setCustomAvatar(storedAvatar ?? getRandomAvatarConfig());
+      setCustomAvatar(getOrCreateStoredCustomAvatar());
     }
   }, [isOpen, isAuthenticated, displayName, profileAvatar]);
 

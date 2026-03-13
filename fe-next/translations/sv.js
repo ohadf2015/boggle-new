@@ -619,7 +619,10 @@ const sv = {
       "cancel": "Avbryt",
       "buildCustom": "Skapa din egen",
       "undo": "Ångra",
-      "none": "Hoppa över"
+      "none": "Hoppa över",
+      "gender": "Kroppstyp",
+      "male": "Man",
+      "female": "Kvinna"
     }
   },
   "error": {

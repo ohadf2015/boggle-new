@@ -103,7 +103,7 @@ const LandingView: React.FC = () => {
 
   const handlePlayClick = () => {
     unlockAudio();
-    router.push(`/${language}/singleplayer?autoStart=bots`);
+    router.push(`/${language}/multiplayer?autoCreate=true`);
   };
 
   const handleOpenTutorial = () => {

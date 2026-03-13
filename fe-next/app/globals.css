@@ -695,6 +695,20 @@ body {
     text-shadow: 2px 2px 0px rgb(var(--neo-black));
   }
 
+  /* Hebrew titles: use Rubik (better Hebrew glyph support) and reduce stroke */
+  [dir="rtl"] .neo-title {
+    font-family: var(--font-rubik), Rubik, sans-serif;
+    -webkit-text-stroke: 1px rgb(var(--neo-black));
+    text-shadow: 3px 3px 0px rgb(var(--neo-black));
+    letter-spacing: 0;
+  }
+
+  [dir="rtl"] .neo-title-sm {
+    font-family: var(--font-rubik), Rubik, sans-serif;
+    -webkit-text-stroke: 0.5px rgb(var(--neo-black));
+    letter-spacing: 0;
+  }
+
   /* Neo-Brutalist Button Base */
   .btn-neo {
     display: inline-flex;

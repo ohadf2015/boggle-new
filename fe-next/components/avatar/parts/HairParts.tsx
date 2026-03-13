@@ -213,6 +213,98 @@ function Dreads({ fill }: HairPartProps) {
   );
 }
 
+function Braids({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Top hair */}
+      <path d="M25 35 Q25 14 50 12 Q75 14 75 35" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Left braid — zigzag rope */}
+      <path
+        d="M28 36 L24 46 L30 52 L24 58 L30 64 L24 70 L28 75"
+        fill="none" stroke={fill} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <path
+        d="M28 36 L24 46 L30 52 L24 58 L30 64 L24 70 L28 75"
+        fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+      />
+      {/* Right braid */}
+      <path
+        d="M72 36 L76 46 L70 52 L76 58 L70 64 L76 70 L72 75"
+        fill="none" stroke={fill} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <path
+        d="M72 36 L76 46 L70 52 L76 58 L70 64 L76 70 L72 75"
+        fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+      />
+      {/* Hair ties at bottom */}
+      <circle cx="28" cy="76" r="2.5" fill="#FF1493" stroke="#000" strokeWidth={1.5} />
+      <circle cx="72" cy="76" r="2.5" fill="#FF1493" stroke="#000" strokeWidth={1.5} />
+    </g>
+  );
+}
+
+function Bun({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Smooth hair swept back */}
+      <path d="M25 35 Q25 14 50 12 Q75 14 75 35 Q72 28 50 26 Q28 28 25 35Z" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Low bun at the back */}
+      <circle cx="50" cy="80" r="14" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Bun swirl detail */}
+      <path d="M46 76 Q50 80 54 76 Q52 84 48 84 Q44 82 46 76" fill="none" stroke="#000" strokeWidth={1.5} opacity="0.4" />
+      {/* Connecting neck hair */}
+      <path d="M38 35 Q40 60 42 72 Q50 78 58 72 Q60 60 62 35" fill={fill} stroke="#000" strokeWidth={1.5} />
+    </g>
+  );
+}
+
+function Bangs({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Full hair behind */}
+      <path
+        d="M22 30 Q22 14 50 12 Q78 14 78 30 L78 55 Q76 58 72 56 L72 35 Q50 25 28 35 L28 56 Q24 58 22 55Z"
+        fill={fill}
+        stroke="#000"
+        strokeWidth={S}
+        strokeLinejoin="round"
+      />
+      {/* Thick front bangs — the key visual feature */}
+      <path
+        d="M24 32 Q24 16 50 14 Q76 16 76 32 L72 38 L62 36 L54 40 L46 36 L38 40 L28 36Z"
+        fill={fill}
+        stroke="#000"
+        strokeWidth={S}
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+}
+
+function Twintails({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Top hair with center part */}
+      <path d="M25 35 Q25 14 50 12 Q75 14 75 35" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Center part line */}
+      <line x1="50" y1="12" x2="50" y2="25" stroke="#000" strokeWidth={1} opacity="0.3" />
+      {/* Left long tail */}
+      <path
+        d="M25 35 Q18 40 15 55 Q12 70 18 82 Q22 88 26 80 Q22 65 25 50 Q26 42 30 38"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round"
+      />
+      {/* Right long tail */}
+      <path
+        d="M75 35 Q82 40 85 55 Q88 70 82 82 Q78 88 74 80 Q78 65 75 50 Q74 42 70 38"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round"
+      />
+      {/* Hair ties high up */}
+      <circle cx="26" cy="37" r="3" fill="#FF1493" stroke="#000" strokeWidth={1.5} />
+      <circle cx="74" cy="37" r="3" fill="#FF1493" stroke="#000" strokeWidth={1.5} />
+    </g>
+  );
+}
+
 export const HAIR_PARTS = {
   none: None,
   spiky: Spiky,
@@ -228,6 +320,10 @@ export const HAIR_PARTS = {
   topknot: Topknot,
   sideshave: Sideshave,
   dreads: Dreads,
+  braids: Braids,
+  bun: Bun,
+  bangs: Bangs,
+  twintails: Twintails,
 } as const;
 
 export type HairPart = keyof typeof HAIR_PARTS;

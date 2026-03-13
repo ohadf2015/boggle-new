@@ -56,7 +56,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
         <span className="neo-title-sm">{t('landing.hallOfFame')}</span>
       </motion.h3>
 
-      <div className="flex gap-3 overflow-x-auto pb-2 px-2 snap-x snap-mandatory scrollbar-hide justify-center">
+      <div className="flex gap-3 pb-4 pt-4 px-2 justify-center flex-wrap">
         {champions.map((champ, i) => (
           <motion.div
             key={champ.username}
@@ -75,7 +75,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
             className={cn(
               'shrink-0 w-32 sm:w-36 md:w-40',
               'bg-neo-cream border-3 border-neo-black shadow-hard rounded-neo-lg',
-              'p-3 flex flex-col items-center text-center snap-center',
+              'p-3 flex flex-col items-center text-center',
               'cursor-default select-none'
             )}
           >

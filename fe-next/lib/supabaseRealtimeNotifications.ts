@@ -80,7 +80,9 @@ export function subscribeToNotifications(
             'Using polling fallback - no action needed.'
           );
         } else {
-          console.error('Error subscribing to notifications channel:', errorMessage);
+          // Use warn to avoid Sentry noise — subscription errors are non-fatal
+          // and handled with polling fallback
+          console.warn('Error subscribing to notifications channel:', errorMessage);
         }
 
         // Notify caller so they can implement fallback (e.g., polling)

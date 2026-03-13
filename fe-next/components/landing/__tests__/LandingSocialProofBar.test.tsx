@@ -22,33 +22,33 @@ jest.mock('framer-motion', () => {
 
 describe('LandingSocialProofBar', () => {
   it('renders game modes and languages pills always', () => {
-    render(<LandingSocialProofBar activePlayers={0} gamesToday={0} gameModes={5} languages={4} />);
+    render(<LandingSocialProofBar activePlayers={0} gamesToday={0} gameModes={4} languages={4} />);
     expect(screen.getByText('landing.gameModes')).toBeInTheDocument();
     expect(screen.getByText('landing.languages')).toBeInTheDocument();
   });
 
   it('shows active players pill only when > 10', () => {
-    render(<LandingSocialProofBar activePlayers={50} gamesToday={0} gameModes={5} languages={4} />);
+    render(<LandingSocialProofBar activePlayers={50} gamesToday={0} gameModes={4} languages={4} />);
     expect(screen.getByText('landing.activePlayers')).toBeInTheDocument();
   });
 
   it('hides active players pill when <= 10', () => {
-    render(<LandingSocialProofBar activePlayers={5} gamesToday={0} gameModes={5} languages={4} />);
+    render(<LandingSocialProofBar activePlayers={5} gamesToday={0} gameModes={4} languages={4} />);
     expect(screen.queryByText('landing.activePlayers')).not.toBeInTheDocument();
   });
 
   it('shows games today pill only when > 100', () => {
-    render(<LandingSocialProofBar activePlayers={0} gamesToday={200} gameModes={5} languages={4} />);
+    render(<LandingSocialProofBar activePlayers={0} gamesToday={200} gameModes={4} languages={4} />);
     expect(screen.getByText('landing.gamesToday')).toBeInTheDocument();
   });
 
   it('hides games today pill when <= 100', () => {
-    render(<LandingSocialProofBar activePlayers={0} gamesToday={50} gameModes={5} languages={4} />);
+    render(<LandingSocialProofBar activePlayers={0} gamesToday={50} gameModes={4} languages={4} />);
     expect(screen.queryByText('landing.gamesToday')).not.toBeInTheDocument();
   });
 
   it('renders animated numbers', () => {
-    render(<LandingSocialProofBar activePlayers={100} gamesToday={0} gameModes={5} languages={4} />);
+    render(<LandingSocialProofBar activePlayers={100} gamesToday={0} gameModes={4} languages={4} />);
     // AnimatedNumber renders span with initial text "0"
     const spans = screen.getAllByText('0');
     expect(spans.length).toBeGreaterThanOrEqual(2);

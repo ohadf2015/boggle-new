@@ -63,8 +63,8 @@ export async function POST(request: Request) {
       });
 
     if (insertError) {
-      console.error('[BLAST API] Insert result error:', insertError);
-      return NextResponse.json({ error: 'Failed to save result' }, { status: 500 });
+      console.error('[BLAST API] Insert result error:', insertError.message, insertError.code, { userId, difficulty: data.difficulty, score: data.score });
+      return NextResponse.json({ error: `Failed to save result: ${insertError.code || 'unknown'}` }, { status: 500 });
     }
 
     // Fetch existing personal bests for this difficulty

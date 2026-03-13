@@ -110,10 +110,10 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayC
           </motion.button>
         </div>
 
-        {/* Right: Leaderboard Preview (hidden on mobile) */}
+        {/* Right: Leaderboard Preview (visible on tablet+) */}
         {!isMobilePortrait && (
           <motion.div
-            className="hidden lg:block w-80 xl:w-96 shrink-0"
+            className="hidden md:block w-64 lg:w-80 xl:w-96 shrink-0"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}

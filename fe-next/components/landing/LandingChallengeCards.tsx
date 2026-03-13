@@ -2,7 +2,7 @@
 
 import { Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
-import { User, Users, Map, Bomb, Target } from 'lucide-react';
+import { User, Users, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
 
 const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
@@ -95,17 +95,6 @@ export function LandingChallengeCards({
             icon={<User className="w-6 h-6" />}
             variant="cyan"
             personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
-          />
-        </motion.div>
-
-        {/* Word Hunt (purple) */}
-        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.25 }} className="col-span-1 sm:col-span-2 w-full">
-          <ModeCard
-            title={t('landing.wordHuntMode')}
-            description={t('landing.wordHuntModeDesc')}
-            href={`/${language}/daily/word-hunt`}
-            icon={<Target className="w-6 h-6" />}
-            variant="purple"
           />
         </motion.div>
 

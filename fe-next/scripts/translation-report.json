@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3380,
+    "totalKeysInCode": 3381,
     "keyCountByLanguage": {
-      "en": 5692,
-      "he": 5701,
-      "sv": 5734,
-      "ja": 5721,
-      "es": 5699
+      "en": 5693,
+      "he": 5722,
+      "sv": 5755,
+      "ja": 5742,
+      "es": 5720
     },
-    "missingFromEnglish": 2,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
@@ -144,114 +144,12 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "daily.requestChallenge",
-      "usages": [
-        {
-          "file": "components/daily/landing/QuestCard.tsx",
-          "line": 317
-        }
-      ]
-    },
-    {
-      "key": "daily.requestSent",
-      "usages": [
-        {
-          "file": "components/daily/landing/QuestCard.tsx",
-          "line": 315
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "avatar.builder.title",
-      "avatar.builder.base",
-      "avatar.builder.hair",
-      "avatar.builder.eyes",
-      "avatar.builder.mouth",
-      "avatar.builder.accessories",
-      "avatar.builder.background",
-      "avatar.builder.shape",
-      "avatar.builder.style",
-      "avatar.builder.type",
-      "avatar.builder.skinColor",
-      "avatar.builder.hairColor",
-      "avatar.builder.accessoryColor",
-      "avatar.builder.bgColor",
-      "avatar.builder.randomize",
-      "avatar.builder.save",
-      "avatar.builder.cancel",
-      "avatar.builder.buildCustom",
-      "avatar.builder.undo",
-      "avatar.builder.none"
-    ],
-    "sv": [
-      "avatar.builder.title",
-      "avatar.builder.base",
-      "avatar.builder.hair",
-      "avatar.builder.eyes",
-      "avatar.builder.mouth",
-      "avatar.builder.accessories",
-      "avatar.builder.background",
-      "avatar.builder.shape",
-      "avatar.builder.style",
-      "avatar.builder.type",
-      "avatar.builder.skinColor",
-      "avatar.builder.hairColor",
-      "avatar.builder.accessoryColor",
-      "avatar.builder.bgColor",
-      "avatar.builder.randomize",
-      "avatar.builder.save",
-      "avatar.builder.cancel",
-      "avatar.builder.buildCustom",
-      "avatar.builder.undo",
-      "avatar.builder.none"
-    ],
-    "ja": [
-      "avatar.builder.title",
-      "avatar.builder.base",
-      "avatar.builder.hair",
-      "avatar.builder.eyes",
-      "avatar.builder.mouth",
-      "avatar.builder.accessories",
-      "avatar.builder.background",
-      "avatar.builder.shape",
-      "avatar.builder.style",
-      "avatar.builder.type",
-      "avatar.builder.skinColor",
-      "avatar.builder.hairColor",
-      "avatar.builder.accessoryColor",
-      "avatar.builder.bgColor",
-      "avatar.builder.randomize",
-      "avatar.builder.save",
-      "avatar.builder.cancel",
-      "avatar.builder.buildCustom",
-      "avatar.builder.undo",
-      "avatar.builder.none"
-    ],
+    "he": [],
+    "sv": [],
+    "ja": [],
     "es": [
-      "avatar.builder.title",
-      "avatar.builder.base",
-      "avatar.builder.hair",
-      "avatar.builder.eyes",
-      "avatar.builder.mouth",
-      "avatar.builder.accessories",
-      "avatar.builder.background",
-      "avatar.builder.shape",
-      "avatar.builder.style",
-      "avatar.builder.type",
-      "avatar.builder.skinColor",
-      "avatar.builder.hairColor",
-      "avatar.builder.accessoryColor",
-      "avatar.builder.bgColor",
-      "avatar.builder.randomize",
-      "avatar.builder.save",
-      "avatar.builder.cancel",
-      "avatar.builder.buildCustom",
-      "avatar.builder.undo",
-      "avatar.builder.none",
       "auth.otp.sendCode",
       "auth.otp.noPassword",
       "auth.otp.codeSentTo",
@@ -260,6 +158,8 @@
       "auth.otp.resend",
       "leaderboard.friends",
       "leaderboard.noFriendsPlayed",
+      "daily.requestChallenge",
+      "daily.requestSent",
       "friends.challenges.defaultMessage",
       "friends.challenges.modes.classic",
       "friends.challenges.modes.blitz",
@@ -275,8 +175,6 @@
       "friends.headToHead.losses",
       "friends.headToHead.draws",
       "friends.headToHead.totalGames",
-      "challenges.daily.requestChallenge",
-      "challenges.daily.requestSent",
       "wordHuntAnnouncement.badge",
       "wordHuntAnnouncement.title",
       "wordHuntAnnouncement.subtitle",

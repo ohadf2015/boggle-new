@@ -92,7 +92,8 @@ export function preloadAudioOnDemand(howl: Howl): Promise<void> {
     });
 
     howl.once('loaderror', (_id, err) => {
-      logger.debug('[AudioLoader] Failed to preload audio:', err);
+      // err is typically a numeric Howler error code (e.g., 4 = MEDIA_ERR_SRC_NOT_SUPPORTED)
+      logger.debug('[AudioLoader] Failed to preload audio, error code:', err);
       resolve(); // Gracefully degrade — audio is non-critical
     });
 

@@ -36,7 +36,6 @@ function AnimatedNumber({ value, className }: { value: number; className?: strin
 interface SocialProofPill {
   label: string;
   value: number;
-  bg: string;
 }
 
 interface LandingSocialProofBarProps {
@@ -57,45 +56,42 @@ export function LandingSocialProofBar({
   const pills: SocialProofPill[] = [];
 
   // Static — always show
-  pills.push({ label: t('landing.gameModes'), value: gameModes, bg: 'bg-neo-lime' });
-  pills.push({ label: t('landing.languages'), value: languages, bg: 'bg-neo-purple text-neo-white' });
+  pills.push({ label: t('landing.gameModes'), value: gameModes });
+  pills.push({ label: t('landing.languages'), value: languages });
 
   // Dynamic — threshold gated
   if (gamesToday > 100) {
-    pills.push({ label: t('landing.gamesToday'), value: gamesToday, bg: 'bg-neo-pink text-neo-white' });
+    pills.push({ label: t('landing.gamesToday'), value: gamesToday });
   }
   if (activePlayers > 10) {
-    pills.push({ label: t('landing.activePlayers'), value: activePlayers, bg: 'bg-neo-cyan' });
+    pills.push({ label: t('landing.activePlayers'), value: activePlayers });
   }
 
   if (pills.length < 2) return null;
 
   return (
     <motion.div
-      className="flex flex-wrap justify-center gap-2 sm:gap-3"
+      className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1 sm:gap-x-6"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: '-30px' }}
       variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
     >
-      {pills.map((pill) => (
+      {pills.map((pill, i) => (
         <motion.div
           key={pill.label}
           variants={{
-            hidden: { opacity: 0, y: 20, scale: 0.8 },
-            visible: { opacity: 1, y: 0, scale: 1 },
+            hidden: { opacity: 0, y: 10 },
+            visible: { opacity: 1, y: 0 },
           }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          whileHover={{ scale: 1.08, rotate: 2 }}
-          className={cn(
-            'inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2',
-            'border-2 border-neo-black shadow-hard-sm rounded-neo',
-            'font-bold text-sm sm:text-base text-neo-black cursor-default',
-            pill.bg
-          )}
+          className="inline-flex items-center gap-1.5 cursor-default text-neo-white/70"
         >
-          <AnimatedNumber value={pill.value} className="font-black text-lg sm:text-xl" />
-          <span>{pill.label}</span>
+          <AnimatedNumber value={pill.value} className="font-black text-lg sm:text-xl text-neo-white" />
+          <span className="text-sm sm:text-base font-medium">{pill.label}</span>
+          {i < pills.length - 1 && (
+            <span className="text-neo-white/20 ms-2 sm:ms-4 hidden sm:inline" aria-hidden="true">·</span>
+          )}
         </motion.div>
       ))}
     </motion.div>

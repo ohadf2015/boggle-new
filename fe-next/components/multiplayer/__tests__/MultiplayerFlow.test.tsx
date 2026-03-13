@@ -37,7 +37,7 @@ jest.mock('@/utils/avatarConfig', () => ({
 
 jest.mock('@/shared/types/customAvatar', () => ({
   getRandomAvatarConfig: () => ({
-    base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18',
+    gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18',
     eyes: 'round', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#1a1a2e',
   }),
 }));
