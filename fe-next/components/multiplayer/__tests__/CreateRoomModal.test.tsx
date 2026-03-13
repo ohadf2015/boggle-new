@@ -53,6 +53,21 @@ jest.mock('@/utils/profileStorage', () => ({
 
 jest.mock('@/utils/consts', () => ({
   sanitizeRoomName: jest.fn((name: string) => name),
+  NAME_VALID_PATTERN: /^[\p{L}\p{N}\s._-]+$/u,
+  USERNAME_MIN_LENGTH: 2,
+  USERNAME_MAX_LENGTH: 20,
+  ROOM_NAME_MIN_LENGTH: 2,
+  ROOM_NAME_MAX_LENGTH: 30,
+  GAME_CODE_MIN_LENGTH: 4,
+  GAME_CODE_MAX_LENGTH: 6,
+  WORD_MIN_LENGTH: 3,
+  WORD_MAX_LENGTH: 16,
+  PASSWORD_MIN_LENGTH: 6,
+  PASSWORD_MAX_LENGTH: 128,
+  EMAIL_VALID_PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  EMAIL_MAX_LENGTH: 254,
+  EMAIL_LOCAL_MAX_LENGTH: 64,
+  PASSWORD_STRENGTH_PATTERN: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
 }));
 
 jest.mock('@/lib/utils', () => ({

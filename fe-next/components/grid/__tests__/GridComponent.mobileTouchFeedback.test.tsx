@@ -14,6 +14,7 @@ import type { LetterGrid } from '@/types';
 // Mock dependencies
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
+  useLanguageSafe: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
 jest.mock('@/hooks/useMobileLandscape', () => ({
