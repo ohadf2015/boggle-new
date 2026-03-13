@@ -62,7 +62,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               <Avatar
                 avatarImage={player.avatarImage ?? undefined}
                 profilePictureUrl={player.profilePictureUrl}
-                customAvatar={player.avatarConfig}
+                customAvatar={player.avatarConfig as any}
                 size="sm"
               />
               <span className="font-bold text-neo-white text-xs truncate max-w-[60px] sm:max-w-[80px]">
@@ -112,7 +112,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             <Avatar
               avatarImage={player.avatarImage ?? undefined}
               profilePictureUrl={player.profilePictureUrl}
-              customAvatar={player.avatarConfig}
+              customAvatar={player.avatarConfig as any}
               size="sm"
             />
             <span className="flex-1 font-bold text-neo-white text-sm truncate">
