@@ -598,6 +598,30 @@ const ja = {
     "saveButton": "保存",
     "skipButton": "スキップ"
   },
+  "avatar": {
+    "builder": {
+      "title": "キミの見た目を作ろう",
+      "base": "顔",
+      "hair": "髪",
+      "eyes": "目",
+      "mouth": "口",
+      "accessories": "アクセサリー",
+      "background": "雰囲気",
+      "shape": "形",
+      "style": "スタイル",
+      "type": "選んでね",
+      "skinColor": "肌の色",
+      "hairColor": "髪の色",
+      "accessoryColor": "色",
+      "bgColor": "背景",
+      "randomize": "おまかせ",
+      "save": "決定！",
+      "cancel": "やめる",
+      "buildCustom": "オリジナルを作ろう",
+      "undo": "元に戻す",
+      "none": "なし"
+    }
+  },
   "error": {
     "subscriptionFailed": "あれ、うまくいかなかった。もう一回？",
     "generic": "おっと、うまくいかなかった！",
@@ -3151,6 +3175,7 @@ const ja = {
     "solvedPercent": "今日は{percent}%だけが解決",
     "todaysTopWords": "今日のトップワード",
     "hallOfFame": "殿堂入り",
+    "careerPoints": "キャリアポイント",
     "gamesToday": "今日のゲーム数",
     "wordHuntMode": "ワードハント",
     "wordHuntModeDesc": "できるだけ早くターゲットワードを見つけよう — 毎日新しいパズル！",

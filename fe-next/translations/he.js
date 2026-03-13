@@ -598,6 +598,30 @@ const he = {
     "saveButton": "שמור",
     "skipButton": "דלג"
   },
+  "avatar": {
+    "builder": {
+      "title": "צרו את המראה שלכם",
+      "base": "פנים",
+      "hair": "שיער",
+      "eyes": "עיניים",
+      "mouth": "פה",
+      "accessories": "אביזרים",
+      "background": "אווירה",
+      "shape": "צורה",
+      "style": "סגנון",
+      "type": "בחרו אחד",
+      "skinColor": "גוון עור",
+      "hairColor": "צבע שיער",
+      "accessoryColor": "צבע",
+      "bgColor": "רקע",
+      "randomize": "הפתיעו אותי",
+      "save": "נעילה",
+      "cancel": "לא",
+      "buildCustom": "בנו דמות משלכם",
+      "undo": "ביטול",
+      "none": "דלג"
+    }
+  },
   "error": {
     "subscriptionFailed": "אופס, משהו השתבש. ננסה שוב?",
     "generic": "אופס, זה לא עבד!",
@@ -3169,6 +3193,7 @@ const he = {
     "solvedPercent": "רק {percent}% פתרו היום",
     "todaysTopWords": "המילים המובילות היום",
     "hallOfFame": "היכל התהילה",
+    "careerPoints": "נקודות קריירה",
     "gamesToday": "משחקים היום",
     "wordHuntMode": "ציד מילים",
     "wordHuntModeDesc": "מצאו את מילת היעד כמה שיותר מהר — פאזל חדש כל יום!",

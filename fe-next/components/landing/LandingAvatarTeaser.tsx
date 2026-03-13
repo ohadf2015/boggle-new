@@ -64,7 +64,7 @@ export function LandingAvatarTeaser() {
         <p className="text-neo-white/60 text-xs flex items-center gap-1">
           {t('landing.designYourLook')}
           <motion.span
-            animate={{ x: [0, 4, 0] }}
+            animate={{ x: dir === 'rtl' ? [0, -4, 0] : [0, 4, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           >
             <ArrowIcon className="w-3 h-3" />

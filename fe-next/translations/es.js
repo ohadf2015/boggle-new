@@ -662,6 +662,30 @@ const es = {
     "saveButton": "Guardar",
     "skipButton": "Saltar"
   },
+  "avatar": {
+    "builder": {
+      "title": "Crea tu look",
+      "base": "Cara",
+      "hair": "Pelo",
+      "eyes": "Ojos",
+      "mouth": "Boca",
+      "accessories": "Accesorios",
+      "background": "Vibra",
+      "shape": "Forma",
+      "style": "Estilo",
+      "type": "Elige uno",
+      "skinColor": "Tono de piel",
+      "hairColor": "Color de pelo",
+      "accessoryColor": "Color",
+      "bgColor": "Fondo",
+      "randomize": "¡Sorpréndeme!",
+      "save": "¡Listo!",
+      "cancel": "Nah",
+      "buildCustom": "Crea el tuyo",
+      "undo": "Deshacer",
+      "none": "Saltar"
+    }
+  },
   "error": {
     "subscriptionFailed": "Hmm, algo falló. ¿Intentamos de nuevo?",
     "generic": "¡Ups, eso no funcionó!",
@@ -3201,6 +3225,7 @@ const es = {
     "solvedPercent": "Solo el {percent}% lo resolvió hoy",
     "todaysTopWords": "Palabras top de hoy",
     "hallOfFame": "Salón de la Fama",
+    "careerPoints": "Puntos de Carrera",
     "gamesToday": "Juegos hoy",
     "wordHuntMode": "Caza de Palabras",
     "wordHuntModeDesc": "¡Encuentra la palabra objetivo lo más rápido posible — un nuevo rompecabezas cada día!",

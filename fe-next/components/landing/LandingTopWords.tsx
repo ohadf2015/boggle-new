@@ -30,7 +30,7 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
         {t('landing.todaysTopWords')}
       </h3>
 
-      <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 px-2 snap-x snap-mandatory scrollbar-hide justify-center flex-wrap">
+      <div className="flex gap-3 sm:gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-2 px-2 snap-x snap-mandatory scrollbar-hide justify-center">
         {displayWords.map((entry, wi) => (
           <motion.div
             key={entry.word}
@@ -46,10 +46,10 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
                 variants={tileVariants}
                 whileHover={{ y: -4, scale: 1.15, transition: { type: 'spring', stiffness: 500, damping: 10 } }}
                 className={cn(
-                  'w-7 h-8 sm:w-8 sm:h-9',
+                  'w-7 h-8 sm:w-8 sm:h-9 md:w-9 md:h-10',
                   'bg-neo-navy border-2 border-neo-black shadow-hard-sm rounded-sm',
                   'flex items-center justify-center cursor-default',
-                  'font-black text-neo-white text-sm sm:text-base',
+                  'font-black text-neo-white text-sm sm:text-base md:text-lg',
                   'select-none'
                 )}
                 style={{ perspective: 600 }}

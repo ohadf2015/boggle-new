@@ -25,7 +25,24 @@ interface LandingHallOfFameProps {
 export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps) {
   const { t } = useLanguage();
 
-  if (loading || champions.length === 0) return null;
+  if (champions.length === 0 && !loading) return null;
+
+  if (loading) {
+    return (
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="h-6 w-36 bg-neo-white/10 rounded mx-auto mb-4 animate-pulse" />
+        <div className="flex gap-3 justify-center">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="w-36 sm:w-40 bg-neo-cream/50 border-3 border-neo-black/20 rounded-neo-lg p-3 animate-pulse">
+              <div className="w-12 h-12 bg-neo-black/10 rounded-full mx-auto mb-2" />
+              <div className="h-4 w-20 bg-neo-black/10 rounded mx-auto mb-1" />
+              <div className="h-5 w-16 bg-neo-black/10 rounded mx-auto" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -35,8 +52,8 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
       >
-        <Crown className="w-5 h-5 text-neo-yellow inline-block me-2" />
-        {t('landing.hallOfFame')}
+        <Crown className="w-5 h-5 text-neo-yellow inline-block me-2" aria-hidden="true" />
+        <span className="neo-title-sm">{t('landing.hallOfFame')}</span>
       </motion.h3>
 
       <div className="flex gap-3 overflow-x-auto pb-2 px-2 snap-x snap-mandatory scrollbar-hide justify-center">
@@ -56,7 +73,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
               transition: { type: 'spring', stiffness: 400, damping: 15 },
             }}
             className={cn(
-              'shrink-0 w-36 sm:w-40',
+              'shrink-0 w-32 sm:w-36 md:w-40',
               'bg-neo-cream border-3 border-neo-black shadow-hard rounded-neo-lg',
               'p-3 flex flex-col items-center text-center snap-center',
               'cursor-default select-none'
@@ -79,8 +96,11 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
             <p className="font-black text-neo-black text-sm mt-2 truncate w-full">
               {champ.displayName || champ.username}
             </p>
-            <p className="font-bold text-neo-navy text-xs">
+            <p className="font-black text-neo-navy text-lg">
               {champ.totalScore.toLocaleString()}
+            </p>
+            <p className="text-neo-navy/60 text-[10px] font-bold uppercase tracking-wider">
+              {t('landing.careerPoints')}
             </p>
           </motion.div>
         ))}

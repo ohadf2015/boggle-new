@@ -47,7 +47,7 @@ export function LandingYourRank() {
       </div>
       <div className="text-end">
         <p className="text-neo-white/60 text-xs">{t('landing.totalScore')}</p>
-        <p className="font-black text-neo-white text-lg">
+        <p className="font-black text-neo-white text-lg md:text-xl">
           {rank.total_score.toLocaleString()}
         </p>
       </div>

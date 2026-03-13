@@ -598,6 +598,30 @@ const sv = {
     "saveButton": "Spara",
     "skipButton": "Hoppa över"
   },
+  "avatar": {
+    "builder": {
+      "title": "Skapa din look",
+      "base": "Ansikte",
+      "hair": "Hår",
+      "eyes": "Ögon",
+      "mouth": "Mun",
+      "accessories": "Tillbehör",
+      "background": "Stämning",
+      "shape": "Form",
+      "style": "Stil",
+      "type": "Välj en",
+      "skinColor": "Hudfärg",
+      "hairColor": "Hårfärg",
+      "accessoryColor": "Färg",
+      "bgColor": "Bakgrund",
+      "randomize": "Överraska mig",
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "buildCustom": "Skapa din egen",
+      "undo": "Ångra",
+      "none": "Hoppa över"
+    }
+  },
   "error": {
     "subscriptionFailed": "Hmm, det gick inte. Testa igen?",
     "generic": "Hoppsan, det funkade inte!",
@@ -3151,6 +3175,7 @@ const sv = {
     "solvedPercent": "Bara {percent}% löste idag",
     "todaysTopWords": "Dagens toppord",
     "hallOfFame": "Hall of Fame",
+    "careerPoints": "Karriärpoäng",
     "gamesToday": "Spel idag",
     "wordHuntMode": "Ordjakt",
     "wordHuntModeDesc": "Hitta målordet så snabbt du kan — ett nytt pussel varje dag!",

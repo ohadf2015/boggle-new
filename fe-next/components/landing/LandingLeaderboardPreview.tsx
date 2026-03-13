@@ -7,7 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import Avatar from '@/components/Avatar';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 
-const RANK_COLORS = ['text-yellow-400', 'text-gray-300', 'text-amber-600'];
+const RANK_BG = ['bg-yellow-400', 'bg-gray-300', 'bg-amber-600'];
+const RANK_TEXT = ['text-neo-black', 'text-neo-black', 'text-neo-black'];
 
 interface LandingLeaderboardPreviewProps {
   players: TopPlayer[];
@@ -23,10 +24,10 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
   if (loading) {
     return (
       <div className="bg-neo-navy-light border-3 border-neo-black shadow-hard-lg rounded-neo-lg p-4 animate-pulse">
-        <div className="h-6 w-32 bg-neo-white/10 rounded mb-4" />
+        <div className="h-6 w-24 sm:w-32 bg-neo-white/10 rounded mb-4" />
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex items-center gap-3 py-2">
-            <div className="w-6 h-6 bg-neo-white/10 rounded" />
+            <div className="w-7 h-7 bg-neo-white/10 rounded-full" />
             <div className="w-8 h-8 bg-neo-white/10 rounded-full" />
             <div className="h-4 flex-1 bg-neo-white/10 rounded" />
           </div>
@@ -52,16 +53,19 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
         <div className="flex justify-center gap-3">
           {displayPlayers.map((player, i) => (
             <div key={player.username} className="flex flex-col items-center gap-1 min-w-0">
-              <span className={cn('font-black text-sm', RANK_COLORS[i])}>
+              <span className={cn(
+                'font-black text-xs w-6 h-6 rounded-full flex items-center justify-center border-2 border-neo-black',
+                RANK_BG[i], RANK_TEXT[i]
+              )}>
                 {i + 1}
               </span>
               <Avatar
                 avatarImage={player.avatarImage ?? undefined}
                 profilePictureUrl={player.profilePictureUrl}
-                customAvatar={player.avatarConfig as any}
+                customAvatar={player.avatarConfig}
                 size="sm"
               />
-              <span className="font-bold text-neo-white text-xs truncate max-w-[72px]">
+              <span className="font-bold text-neo-white text-xs truncate max-w-[60px] sm:max-w-[80px]">
                 {player.displayName || player.username}
               </span>
               <span className="font-black text-neo-lime text-xs">
@@ -85,7 +89,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
     <div className="bg-neo-navy-light border-3 border-neo-black shadow-hard-lg rounded-neo-lg p-4 sm:p-5">
       <div className="flex items-center gap-2 mb-3">
         <Trophy className="w-5 h-5 text-neo-yellow" />
-        <h3 className="font-black text-neo-white uppercase text-sm sm:text-base">
+        <h3 className="font-black text-neo-white uppercase text-sm sm:text-base neo-title-sm">
           {t('landing.todaysTopPlayers')}
         </h3>
       </div>
@@ -100,15 +104,15 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             )}
           >
             <span className={cn(
-              'font-black text-lg w-6 text-center',
-              i < 3 ? RANK_COLORS[i] : 'text-neo-white/50'
+              'font-black text-sm w-7 h-7 rounded-full flex items-center justify-center shrink-0 border-2 border-neo-black',
+              i < 3 ? `${RANK_BG[i]} ${RANK_TEXT[i]}` : 'bg-neo-white/10 text-neo-white/50'
             )}>
               {i + 1}
             </span>
             <Avatar
               avatarImage={player.avatarImage ?? undefined}
               profilePictureUrl={player.profilePictureUrl}
-              customAvatar={player.avatarConfig as any}
+              customAvatar={player.avatarConfig}
               size="sm"
             />
             <span className="flex-1 font-bold text-neo-white text-sm truncate">

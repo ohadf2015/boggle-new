@@ -190,7 +190,7 @@ const LandingView: React.FC = () => {
       {/* Main content */}
       <section className={cn(
         'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex flex-col gap-6 sm:gap-8',
-        isMobilePortrait ? 'px-2 py-3' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8'
+        isMobilePortrait ? 'px-2 py-3' : 'px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 py-4 sm:py-5 md:py-6 lg:py-8'
       )}>
         {/* Hero: Mascot + Title + CTA + Leaderboard Preview */}
         <LandingHero

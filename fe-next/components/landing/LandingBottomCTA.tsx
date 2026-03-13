@@ -24,7 +24,7 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.5 }}
     >
-      <h2 className="font-black text-neo-white uppercase text-xl sm:text-2xl lg:text-3xl mb-2">
+      <h2 className="font-black text-neo-white uppercase text-xl sm:text-2xl lg:text-3xl mb-2 neo-title">
         {t('landing.readyToCompete')}
       </h2>
       <p className="text-neo-white/80 font-medium text-sm sm:text-base mb-5">

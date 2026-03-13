@@ -3294,6 +3294,7 @@ const en = {
     "solvedPercent": "Only {percent}% solved today",
     "todaysTopWords": "Top Words Today",
     "hallOfFame": "Hall of Fame",
+    "careerPoints": "Career Points",
     "gamesToday": "Games Today",
     "wordHuntMode": "Word Hunt",
     "wordHuntModeDesc": "Find the target word as fast as you can — a fresh puzzle every day!",

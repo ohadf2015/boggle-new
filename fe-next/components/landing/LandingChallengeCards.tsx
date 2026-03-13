@@ -47,7 +47,7 @@ export function LandingChallengeCards({
 }: LandingChallengeCardsProps) {
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-stretch">
         {/* Daily Challenge Banner - full width */}
         <div className="col-span-1 sm:col-span-2">
           <Suspense fallback={

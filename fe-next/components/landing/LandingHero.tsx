@@ -20,7 +20,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePort
     <IdleMascotWithEntrance
       baseVariant="happy"
       size="xl"
-      sizeClassName={isMobilePortrait ? 'w-16 h-16' : 'w-28 h-28 lg:w-40 lg:h-40'}
+      sizeClassName={isMobilePortrait ? 'w-16 h-16' : 'w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40'}
       enableHover={!isMobilePortrait}
       enableClick
       hoverVariant="excited"
@@ -39,7 +39,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayC
   return (
     <div className={cn(
       'w-full max-w-5xl mx-auto',
-      isMobilePortrait ? 'px-2' : 'px-4 lg:px-6'
+      isMobilePortrait ? 'px-2' : 'px-4 md:px-5 lg:px-6'
     )}>
       <div className={cn(
         'flex items-start gap-6 lg:gap-10',
@@ -55,7 +55,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayC
             <div className="flex items-center gap-3 mb-2">
               <HeroMascot isMobilePortrait={isMobilePortrait} />
               <motion.h1
-                className="font-black uppercase tracking-tight text-neo-black dark:text-neo-white text-xl"
+                className="font-black uppercase tracking-tight text-neo-white text-xl neo-title"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.15 }}
@@ -68,7 +68,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayC
             <>
               <HeroMascot isMobilePortrait={isMobilePortrait} />
               <motion.h1
-                className="font-black uppercase tracking-tight text-neo-black dark:text-neo-white text-2xl sm:text-3xl lg:text-4xl xl:text-5xl mt-3 mb-2"
+                className="font-black uppercase tracking-tight text-neo-white text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl mt-3 mb-2 neo-title"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
@@ -82,7 +82,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayC
           <motion.p
             className={cn(
               'font-medium text-neo-black/80 dark:text-neo-white/90 max-w-md',
-              isMobilePortrait ? 'text-sm mb-3' : 'text-base lg:text-lg mb-5'
+              isMobilePortrait ? 'text-sm mb-3' : 'text-base md:text-lg mb-5'
             )}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -124,7 +124,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayC
       </div>
 
       {/* Leaderboard below CTA on mobile — compact 3-player view */}
-      {isMobilePortrait && players.length > 0 && (
+      {isMobilePortrait && (
         <motion.div
           className="mt-4"
           initial={{ opacity: 0, y: 20 }}
