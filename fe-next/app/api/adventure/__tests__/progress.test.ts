@@ -116,6 +116,10 @@ function transformProgression(
       completions: [],
       gold: 0,
       upgrades: {},
+      skillPoints: 0,
+      skillTree: {},
+      runeFragments: 0,
+      runes: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -131,6 +135,10 @@ function transformProgression(
     completions,
     gold: (dbRow.gold as number) ?? 0,
     upgrades: (dbRow.upgrades as Record<string, number>) ?? {},
+    skillPoints: (dbRow.skill_points as number) ?? 0,
+    skillTree: (dbRow.skill_tree as Record<string, number>) ?? {},
+    runeFragments: (dbRow.rune_fragments as number) ?? 0,
+    runes: (dbRow.runes as Array<{ runeId: string; equipped: boolean }>) ?? [],
     createdAt: dbRow.created_at as string,
     updatedAt: dbRow.updated_at as string,
   };

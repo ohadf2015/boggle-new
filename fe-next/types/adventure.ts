@@ -249,6 +249,14 @@ export interface PlayerProgression {
   gold: number;
   /** Purchased upgrades — map of upgradeId to tier level */
   upgrades: Record<string, number>;
+  /** Skill points available to spend */
+  skillPoints: number;
+  /** Skill tree — map of skillId to level */
+  skillTree: Record<string, number>;
+  /** Rune fragments available for forging */
+  runeFragments: number;
+  /** Forged runes inventory */
+  runes: PlayerRune[];
   /** Array of completed levels */
   completions: LevelCompletion[];
   /** ISO timestamp of creation */
@@ -548,4 +556,20 @@ export interface LootDrop {
   type: LootType;
   quantity: number;
   rarity: LootRarity;
+}
+
+// ==============================================
+// RUNE SYSTEM
+// ==============================================
+
+/** A forged rune in player inventory */
+export interface PlayerRune {
+  runeId: string;
+  equipped: boolean;
+}
+
+/** Player's rune inventory and fragment count */
+export interface RuneInventory {
+  fragments: number;
+  runes: PlayerRune[];
 }

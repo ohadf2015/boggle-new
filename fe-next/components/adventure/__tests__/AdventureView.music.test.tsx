@@ -166,6 +166,10 @@ const mockProgression: PlayerProgression = {
   playerLevel: 2,
   gold: 0,
   upgrades: {},
+  skillPoints: 0,
+  skillTree: {},
+  runeFragments: 0,
+  runes: [],
   completions: [
     {
       world: 1,

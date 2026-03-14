@@ -246,6 +246,10 @@ const createMockProgression = (overrides = {}): PlayerProgression => ({
   ],
   gold: 0,
   upgrades: {},
+  skillPoints: 0,
+  skillTree: {},
+  runeFragments: 0,
+  runes: [],
   ...overrides,
 });
 

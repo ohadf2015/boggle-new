@@ -7,16 +7,16 @@
 
 import {
   WORLD_NAMES,
-  type TileType,
-  type TileState,
-  type SpecialTile,
-  type ObjectiveType,
-  type LevelObjective,
-  type LevelConfig,
-  type LevelCompletion,
-  type PlayerProgression,
-  type AdventureGameState,
-  type WorldName,
+  TileType,
+  TileState,
+  SpecialTile,
+  ObjectiveType,
+  LevelObjective,
+  LevelConfig,
+  LevelCompletion,
+  PlayerProgression,
+  AdventureGameState,
+  WorldName,
 } from '../adventure';
 
 describe('Adventure Types', () => {
@@ -263,6 +263,10 @@ describe('Adventure Types', () => {
         totalStars: 24,
         gold: 150,
         upgrades: { timeBonus: 1, scoreBonus: 0, xpBonus: 0 },
+        skillPoints: 0,
+        skillTree: {},
+        runeFragments: 5,
+        runes: [{ runeId: 'rune-swiftword', equipped: true }],
         completions: [
           {
             world: 1,

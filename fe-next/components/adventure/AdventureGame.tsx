@@ -23,6 +23,9 @@ import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { useFlashChallenge } from '@/hooks/useFlashChallenge';
 import FlashChallengeToast from './FlashChallengeToast';
 import { neoInfoToast } from '@/components/NeoToast';
+import { getMasteryAura } from '@/lib/adventure/powerGrowth';
+import { getStoryBeat } from '@/lib/adventure/storyConfig';
+import { StoryBeatCard } from './StoryBeatCard';
 import AdventureEffectsLayer from './effects/AdventureEffectsLayer';
 import LevelCompleteModal from './LevelCompleteModal';
 import LevelEntryOverlay from './LevelEntryOverlay';
@@ -88,6 +91,9 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
+    const [showStoryBeat, setShowStoryBeat] = useState(false);
+    const masteryAura = useMemo(() => getMasteryAura(init.currentLevel), [init.currentLevel]);
+    const storyBeat = useMemo(() => getStoryBeat(levelConfig.world, levelConfig.level), [levelConfig.world, levelConfig.level]);
     const cinematics = useAdventureCinematics();
     const entryPhaseManager = useAdventureEntryPhase();
     const { entryPhase } = entryPhaseManager;
@@ -283,8 +289,17 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const handleCinematicComplete = useCallback(() => {
       cinematics.handleCinematicComplete();
+      if (storyBeat && gameState.stars > 0) {
+        setShowStoryBeat(true);
+      } else {
+        setShowLevelComplete(true);
+      }
+    }, [cinematics, storyBeat, gameState.stars]);
+
+    const handleStoryBeatContinue = useCallback(() => {
+      setShowStoryBeat(false);
       setShowLevelComplete(true);
-    }, [cinematics]);
+    }, []);
 
     const handleContinue = useCallback(() => {
       setShowLevelComplete(false);
@@ -334,7 +349,7 @@ const AdventureGame = memo<AdventureGameProps>(
     }
 
     return (
-      <div ref={effects.shakeRef} data-testid="adventure-game" role="main" aria-label="Adventure Mode Game" className="h-full w-full overflow-hidden relative">
+      <div ref={effects.shakeRef} data-testid="adventure-game" role="main" aria-label="Adventure Mode Game" className="h-full w-full overflow-hidden relative" style={{ '--mastery-aura': masteryAura } as React.CSSProperties}>
         <GameplayBackground className="absolute inset-0 -z-10" />
         <GameLayout
           header={
@@ -432,6 +447,16 @@ const AdventureGame = memo<AdventureGameProps>(
                   levelNumber={levelConfig.level} worldNumber={levelConfig.world}
                   onContinue={handleContinue} onRetry={handleRetry} onExit={onExit}
                   totalStars={totalStars} bestAttempt={bestAttempt} />
+              )}
+
+              {storyBeat && (
+                <StoryBeatCard
+                  worldId={levelConfig.world}
+                  characterName={t(storyBeat.characterKey)}
+                  dialogueKey={storyBeat.dialogueKey}
+                  isVisible={showStoryBeat}
+                  onContinue={handleStoryBeatContinue}
+                />
               )}
 
               <AdventureEffectsLayer currentPopup={effects.currentPopup}
