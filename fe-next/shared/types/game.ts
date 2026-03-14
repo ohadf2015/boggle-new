@@ -325,6 +325,8 @@ export interface BlastPlayerStats {
 /** Blast mode state tracked per game */
 export interface BlastModeState {
   overlay: BlastTileOverlay[];
+  /** Pre-built lookup map from "row,col" → tile type for O(1) path queries */
+  overlayMap: Map<string, string>;
   playerMoves: Record<string, number>;
   playerBonusMoves: Record<string, number>;
   /** Rich per-player stats for results page */

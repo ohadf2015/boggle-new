@@ -1,6 +1,7 @@
 /**
  * blastModeManager - overlayMap cache tests
- * TDD: RED phase — these tests must fail before the implementation
+ * Verifies that initBlastModeState populates an overlayMap cache
+ * and getTilesOnPath uses it when provided.
  */
 
 import {
@@ -8,11 +9,10 @@ import {
   getTilesOnPath,
 } from '../blastModeManager';
 
-import type { BlastTileOverlay, BlastModeState } from '@/shared/types/game';
+import type { BlastTileOverlay } from '@/shared/types/game';
 import type { BlastTileType } from '@/shared/types/blast';
 
-// TODO: RED phase — overlayMap cache not yet implemented
-describe.skip('blastModeManager - overlayMap cache (Fix 3)', () => {
+describe('blastModeManager - overlayMap cache (Fix 3)', () => {
   const grid: string[][] = [
     ['A', 'B', 'C'],
     ['D', 'E', 'F'],
@@ -22,41 +22,27 @@ describe.skip('blastModeManager - overlayMap cache (Fix 3)', () => {
   describe('initBlastModeState - populates overlayMap', () => {
     it('should include overlayMap on the returned BlastModeState', () => {
       const state = initBlastModeState(grid, players);
-      expect((state as any).overlayMap).toBeInstanceOf(Map);
+      expect(state.overlayMap).toBeInstanceOf(Map);
     });
 
     it('should populate overlayMap with all overlay tiles keyed as "row,col"', () => {
-      // Use 100% special chance to guarantee tiles appear
-      // We need to override the module's BLAST_SPECIAL_TILE_CHANCE indirectly.
-      // Instead, create overlay manually and test getTilesOnPath uses cached map.
-      const overlay: BlastTileOverlay[] = [
-        { row: 0, col: 0, type: 'gold' as BlastTileType },
-        { row: 1, col: 1, type: 'bomb' as BlastTileType },
-      ];
-      // Manually build a state that mimics what initBlastModeState should produce
-      // The overlay entries must map to the overlayMap correctly
       const state = initBlastModeState(grid, players);
-      const overlayMap = (state as any).overlayMap as Map<string, BlastTileType>;
       // Every tile in overlay should be present in overlayMap
       for (const tile of state.overlay) {
-        expect(overlayMap.has(`${tile.row},${tile.col}`)).toBe(true);
-        expect(overlayMap.get(`${tile.row},${tile.col}`)).toBe(tile.type);
+        expect(state.overlayMap.has(`${tile.row},${tile.col}`)).toBe(true);
+        expect(state.overlayMap.get(`${tile.row},${tile.col}`)).toBe(tile.type);
       }
     });
 
     it('should have overlayMap with same size as overlay array', () => {
       const state = initBlastModeState(grid, players);
-      const overlayMap = (state as any).overlayMap as Map<string, BlastTileType>;
-      expect(overlayMap.size).toBe(state.overlay.length);
+      expect(state.overlayMap.size).toBe(state.overlay.length);
     });
 
-    it('overlayMap should be empty when overlay is empty (0 special chance)', () => {
-      // We can test by inspecting that overlayMap is consistent regardless of size
-      // If overlay is [], overlayMap should be empty Map
+    it('overlayMap size should equal overlay length regardless of count', () => {
       const state = initBlastModeState(grid, players);
-      const overlayMap = (state as any).overlayMap as Map<string, BlastTileType>;
       // Map size should equal overlay length (could be 0 if no specials rolled)
-      expect(overlayMap.size).toBe(state.overlay.length);
+      expect(state.overlayMap.size).toBe(state.overlay.length);
     });
   });
 
@@ -66,7 +52,7 @@ describe.skip('blastModeManager - overlayMap cache (Fix 3)', () => {
         { row: 0, col: 0, type: 'gold' as BlastTileType },
         { row: 0, col: 1, type: 'rainbow' as BlastTileType },
       ];
-      const overlayMap = new Map<string, BlastTileType>([
+      const cachedMap = new Map<string, BlastTileType>([
         ['0,0', 'gold'],
         ['0,1', 'rainbow'],
       ]);
@@ -77,7 +63,7 @@ describe.skip('blastModeManager - overlayMap cache (Fix 3)', () => {
       ]);
 
       // When overlayMap is provided, it should be used instead of rebuilding
-      const result = getTilesOnPath('ab', positions, overlay);
+      const result = getTilesOnPath('ab', positions, overlay, cachedMap);
       expect(result).toContain('gold');
       expect(result).toContain('rainbow');
     });
@@ -95,10 +81,8 @@ describe.skip('blastModeManager - overlayMap cache (Fix 3)', () => {
       expect(result).toContain('gold');
     });
 
-    it('should not rebuild Map when cached overlayMap is provided', () => {
-      // Spy on Map constructor to verify it is NOT called with overlay data
-      // when a pre-built map is passed. We verify indirectly by mutating
-      // overlay after building the cache — cached map should still win.
+    it('should use cached map over overlay when both provided', () => {
+      // Overlay says 'gold', but cached map says 'bomb' — cache should win
       const overlay: BlastTileOverlay[] = [
         { row: 0, col: 0, type: 'gold' as BlastTileType },
       ];
@@ -109,7 +93,7 @@ describe.skip('blastModeManager - overlayMap cache (Fix 3)', () => {
         ['a', [{ row: 0, col: 0 }]],
       ]);
 
-      const result = getTilesOnPath('a', positions, overlay);
+      const result = getTilesOnPath('a', positions, overlay, cachedMap);
       // Should use cachedMap value ('bomb'), not overlay value ('gold')
       expect(result).toContain('bomb');
       expect(result).not.toContain('gold');

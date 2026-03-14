@@ -104,7 +104,13 @@ export function initBlastModeState(
   // Use >>> 0 to ensure unsigned 32-bit positive integer; || 1 avoids zero.
   const seed = (Date.now() ^ Math.floor(Math.random() * 0xFFFFFFFF)) >>> 0 || 1;
 
-  return { overlay, playerMoves, playerBonusMoves, playerStats, seed };
+  // Build cached overlay lookup map for O(1) getTilesOnPath queries
+  const overlayMap = new Map<string, BlastTileType>();
+  for (const tile of overlay) {
+    overlayMap.set(`${tile.row},${tile.col}`, tile.type);
+  }
+
+  return { overlay, overlayMap, playerMoves, playerBonusMoves, playerStats, seed };
 }
 
 /**
@@ -162,14 +168,17 @@ export function recordBlastMove(
 export function getTilesOnPath(
   word: string,
   letterPositions: Map<string, Array<{ row: number; col: number }>>,
-  overlay: BlastTileOverlay[]
+  overlay: BlastTileOverlay[],
+  cachedOverlayMap?: Map<string, BlastTileType>
 ): BlastTileType[] {
   const tiles: BlastTileType[] = [];
 
-  // Build a lookup map for overlay positions
-  const overlayMap = new Map<string, BlastTileType>();
-  for (const tile of overlay) {
-    overlayMap.set(`${tile.row},${tile.col}`, tile.type);
+  // Use cached map if provided, otherwise build one from overlay array
+  const overlayMap = cachedOverlayMap ?? new Map<string, BlastTileType>();
+  if (!cachedOverlayMap) {
+    for (const tile of overlay) {
+      overlayMap.set(`${tile.row},${tile.col}`, tile.type);
+    }
   }
 
   // Track used positions to handle duplicate letters

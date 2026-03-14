@@ -179,6 +179,7 @@ describe('blastModeManager', () => {
     beforeEach(() => {
       state = {
         overlay: [],
+        overlayMap: new Map(),
         playerMoves: { alice: 0, bob: 0 },
         playerBonusMoves: { alice: 0, bob: 0 },
         playerStats: {
