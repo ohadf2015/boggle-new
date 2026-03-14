@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 3381,
+    "totalKeysInCode": 3576,
     "keyCountByLanguage": {
-      "en": 5708,
-      "he": 5734,
-      "sv": 5767,
-      "ja": 5754,
-      "es": 5732
+      "en": 5866,
+      "he": 5851,
+      "sv": 5884,
+      "ja": 5871,
+      "es": 5849
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 107,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 6,
+      "templateLiterals": 7,
       "fallbackUsages": 0,
-      "variableKeys": 10
+      "variableKeys": 11
     }
   },
   "runtimeRisks": {
@@ -37,6 +37,13 @@
         "file": "components/achievements/AchievementPopup.tsx",
         "line": 91,
         "context": "description: t(`achievements.${achievement.key}.description`)",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "adventure.worlds.${world.name}",
+        "file": "components/adventure/LevelGridHeader.tsx",
+        "line": 32,
+        "context": "const worldName = t(`adventure.worlds.${world.name}`) || world.name;",
         "type": "template_literal"
       },
       {
@@ -136,6 +143,14 @@
         "type": "variable_key"
       },
       {
+        "pattern": "t(textKey)",
+        "variable": "textKey",
+        "file": "components/blast/BlastWordCelebration.tsx",
+        "line": 135,
+        "context": "{t(textKey)}",
+        "type": "variable_key"
+      },
+      {
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "file": "components/grid/InputModeIndicator.tsx",
@@ -152,19 +167,1162 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "adventure.chapterComplete",
+      "usages": [
+        {
+          "file": "components/adventure/MilestoneDivider.tsx",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.bossConqueror",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.bossHunter",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.bossLegend",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.bossSlayer",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.prestigeBronze",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.prestigeCosmic",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.prestigeGold",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.prestigeMaster",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "adventure.cosmetic.prestigeSilver",
+      "usages": [
+        {
+          "file": "lib/adventure/crossModeSynergy.ts",
+          "line": 50
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.confirmExit",
+      "usages": [
+        {
+          "file": "components/adventure/ui/PauseOverlay.tsx",
+          "line": 213
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.confirmExitDesc",
+      "usages": [
+        {
+          "file": "components/adventure/ui/PauseOverlay.tsx",
+          "line": 214
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.confirmRestart",
+      "usages": [
+        {
+          "file": "components/adventure/ui/PauseOverlay.tsx",
+          "line": 204
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.confirmRestartDesc",
+      "usages": [
+        {
+          "file": "components/adventure/ui/PauseOverlay.tsx",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "key": "adventure.lvl",
+      "usages": [
+        {
+          "file": "components/adventure/RPGLevelCard.tsx",
+          "line": 118
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.blitz.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.doubleOrNothing.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.goldRush.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.iceAge.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.longWords.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.marathon.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.speedDemon.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.treasureHunter.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.wordSmith.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "key": "adventure.weekly.zenMode.name",
+      "usages": [
+        {
+          "file": "lib/adventure/weeklyModifiers.ts",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "key": "blast.chain.badge",
+      "usages": [
+        {
+          "file": "components/blast/BlastChainBadge.tsx",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "key": "game.drawer.content",
+      "usages": [
+        {
+          "file": "components/game/MobileGameDrawer.tsx",
+          "line": 124
+        }
+      ]
+    },
+    {
+      "key": "game.drawer.toggle",
+      "usages": [
+        {
+          "file": "components/game/MobileGameDrawer.tsx",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "key": "ranked.toGo",
+      "usages": [
+        {
+          "file": "components/profile/ProfileRankedProgress.tsx",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.code",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 311
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.description",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 232
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.descriptionPlaceholder",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 238
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.generate",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 125
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.grid",
+      "usages": [
+        {
+          "file": "app/[locale]/community/[boardCode]/PageClient.tsx",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.gridSize",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.makeAnother",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 337
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.notFound",
+      "usages": [
+        {
+          "file": "app/[locale]/community/[boardCode]/PageClient.tsx",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.publish",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 267
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.seedWords",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 94
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.seedWordsHint",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.shareMessage",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 294
+        },
+        {
+          "file": "utils/share.ts",
+          "line": 585
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.shuffle",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 135
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.title",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 212
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.titlePlaceholder",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 219
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.tryIt",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 177
+        }
+      ]
+    },
+    {
+      "key": "ugc.board.wordsFound",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 189
+        }
+      ]
+    },
+    {
+      "key": "ugc.createBoard",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCreatorWizard.tsx",
+          "line": 63
+        },
+        {
+          "file": "components/ugc/CreateBoardCTA.tsx",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "ugc.creator.makeYourOwn",
+      "usages": [
+        {
+          "file": "components/ugc/CreateBoardCTA.tsx",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "key": "ugc.creator.myBoards",
+      "usages": [
+        {
+          "file": "components/ugc/CreatorProfileStats.tsx",
+          "line": 136
+        },
+        {
+          "file": "components/ugc/CreatorProfileStats.tsx",
+          "line": 138
+        }
+      ]
+    },
+    {
+      "key": "ugc.difficulty.easy",
+      "usages": [
+        {
+          "file": "app/[locale]/community/[boardCode]/PageClient.tsx",
+          "line": 52
+        },
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "key": "ugc.difficulty.hard",
+      "usages": [
+        {
+          "file": "app/[locale]/community/[boardCode]/PageClient.tsx",
+          "line": 54
+        },
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "key": "ugc.difficulty.medium",
+      "usages": [
+        {
+          "file": "app/[locale]/community/[boardCode]/PageClient.tsx",
+          "line": 53
+        },
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.boardCount",
+      "usages": [
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.createBoard",
+      "usages": [
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 152
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.createdBy",
+      "usages": [
+        {
+          "file": "app/[locale]/community/[boardCode]/PageClient.tsx",
+          "line": 80
+        },
+        {
+          "file": "components/ugc/BoardCard.tsx",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.createPack",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 141
+        },
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 215
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.empty",
+      "usages": [
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 146
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.empty.subtitle",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 207
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.empty.title",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 204
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.filterAll",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 33
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.improve",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCard.tsx",
+          "line": 142
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.languageFilter",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 170
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.loadMore",
+      "usages": [
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 174
+        },
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 235
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.noRating",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCard.tsx",
+          "line": 123
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.personalBest",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCard.tsx",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.play",
+      "usages": [
+        {
+          "file": "app/[locale]/community/[boardCode]/PageClient.tsx",
+          "line": 120
+        },
+        {
+          "file": "components/ugc/BoardCard.tsx",
+          "line": 142
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.sort.featured",
+      "usages": [
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.sort.newest",
+      "usages": [
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.sort.popular",
+      "usages": [
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.sort.topRated",
+      "usages": [
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.sortLabel",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 146
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.staffPick",
+      "usages": [
+        {
+          "file": "components/ugc/BoardCard.tsx",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "key": "ugc.gallery.title",
+      "usages": [
+        {
+          "file": "app/[locale]/community/PageClient.tsx",
+          "line": 39
+        },
+        {
+          "file": "components/ugc/BoardGallery.tsx",
+          "line": 98
+        },
+        {
+          "file": "components/ugc/WordPackGallery.tsx",
+          "line": 133
+        }
+      ]
+    },
+    {
+      "key": "ugc.myPacks",
+      "usages": [
+        {
+          "file": "app/[locale]/community/PageClient.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "ugc.nav.community",
+      "usages": [
+        {
+          "file": "components/header/HeaderDesktopControls.tsx",
+          "line": 99
+        },
+        {
+          "file": "components/header/HeaderDesktopControls.tsx",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "key": "ugc.nav.create",
+      "usages": [
+        {
+          "file": "components/GlobalBottomNav.tsx",
+          "line": 252
+        },
+        {
+          "file": "components/GlobalBottomNav.tsx",
+          "line": 266
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.addAll",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 285
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.addWord",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 208
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.bulkPaste",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 267
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.bulkPlaceholder",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 275
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.cancel",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 304
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.close",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 85
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.descriptionLabel",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.descriptionPlaceholder",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.duplicate",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 224
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.emojiLabel",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 144
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.languageLabel",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 127
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.minimum",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 233
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.nameLabel",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 96
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.namePlaceholder",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.publish",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 314
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.publishing",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 313
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.tagsLabel",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 160
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.title",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.wordAdded",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 226
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.wordInvalid",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 227
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.wordPlaceholder",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 199
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.builder.wordsLabel",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackBuilder.tsx",
+          "line": 190
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.card.play",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackCard.tsx",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.card.plays",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackCard.tsx",
+          "line": 95
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.card.upvote",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackCard.tsx",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.card.words",
+      "usages": [
+        {
+          "file": "components/ugc/WordPackCard.tsx",
+          "line": 91
+        }
+      ]
+    },
+    {
+      "key": "ugc.pack.shareMessage",
+      "usages": [
+        {
+          "file": "utils/share.ts",
+          "line": 619
+        }
+      ]
+    },
+    {
+      "key": "ugc.rewards.boardPlayed",
+      "usages": [
+        {
+          "file": "hooks/useCreatorNotifications.ts",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "key": "ugc.rewards.boardRated",
+      "usages": [
+        {
+          "file": "hooks/useCreatorNotifications.ts",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "key": "ugc.rewards.highScoreBeat",
+      "usages": [
+        {
+          "file": "hooks/useCreatorNotifications.ts",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "key": "ugc.rewards.milestone",
+      "usages": [
+        {
+          "file": "hooks/useCreatorNotifications.ts",
+          "line": 40
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
+      "playerProfile.title",
+      "admin.kpi.dau",
+      "admin.kpi.gamesToday",
+      "admin.kpi.signupsToday",
+      "admin.kpi.stickiness",
+      "admin.kpi.totalPlayers",
+      "admin.kpi.totalWords",
+      "admin.kpi.thisWeek",
+      "admin.system.ok",
+      "admin.system.down",
+      "admin.analytics.title",
+      "admin.analytics.retentionTitle",
+      "admin.analytics.cohort",
+      "admin.analytics.size",
+      "admin.analytics.funnelTitle",
+      "admin.analytics.funnelRegistered",
+      "admin.analytics.funnelFirstGame",
+      "admin.analytics.funnelDay7",
+      "admin.analytics.funnelDay30",
+      "admin.analytics.churnTitle",
+      "admin.analytics.churnTotal",
+      "admin.analytics.noChurnRisk",
+      "admin.analytics.games",
+      "admin.moderation.title",
+      "admin.moderation.queueTitle",
+      "admin.moderation.empty",
+      "admin.moderation.approve",
+      "admin.moderation.reject",
+      "admin.moderation.investigate",
+      "admin.moderation.banPlayer",
+      "admin.moderation.warnPlayer",
+      "admin.moderation.playerDetail",
+      "admin.moderation.moderationHistory",
+      "admin.moderation.recentGames",
+      "admin.moderation.cheatSignals",
+      "admin.moderation.flaggedPlayers",
+      "admin.moderation.noFlags",
+      "admin.content.pendingWords",
+      "admin.content.approvedWords",
+      "admin.content.topReported",
+      "admin.content.noReports",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
     ],
     "sv": [
+      "playerProfile.title",
+      "admin.kpi.dau",
+      "admin.kpi.gamesToday",
+      "admin.kpi.signupsToday",
+      "admin.kpi.stickiness",
+      "admin.kpi.totalPlayers",
+      "admin.kpi.totalWords",
+      "admin.kpi.thisWeek",
+      "admin.system.ok",
+      "admin.system.down",
+      "admin.analytics.title",
+      "admin.analytics.retentionTitle",
+      "admin.analytics.cohort",
+      "admin.analytics.size",
+      "admin.analytics.funnelTitle",
+      "admin.analytics.funnelRegistered",
+      "admin.analytics.funnelFirstGame",
+      "admin.analytics.funnelDay7",
+      "admin.analytics.funnelDay30",
+      "admin.analytics.churnTitle",
+      "admin.analytics.churnTotal",
+      "admin.analytics.noChurnRisk",
+      "admin.analytics.games",
+      "admin.moderation.title",
+      "admin.moderation.queueTitle",
+      "admin.moderation.empty",
+      "admin.moderation.approve",
+      "admin.moderation.reject",
+      "admin.moderation.investigate",
+      "admin.moderation.banPlayer",
+      "admin.moderation.warnPlayer",
+      "admin.moderation.playerDetail",
+      "admin.moderation.moderationHistory",
+      "admin.moderation.recentGames",
+      "admin.moderation.cheatSignals",
+      "admin.moderation.flaggedPlayers",
+      "admin.moderation.noFlags",
+      "admin.content.pendingWords",
+      "admin.content.approvedWords",
+      "admin.content.topReported",
+      "admin.content.noReports",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
     ],
     "ja": [
+      "playerProfile.title",
+      "admin.kpi.dau",
+      "admin.kpi.gamesToday",
+      "admin.kpi.signupsToday",
+      "admin.kpi.stickiness",
+      "admin.kpi.totalPlayers",
+      "admin.kpi.totalWords",
+      "admin.kpi.thisWeek",
+      "admin.system.ok",
+      "admin.system.down",
+      "admin.analytics.title",
+      "admin.analytics.retentionTitle",
+      "admin.analytics.cohort",
+      "admin.analytics.size",
+      "admin.analytics.funnelTitle",
+      "admin.analytics.funnelRegistered",
+      "admin.analytics.funnelFirstGame",
+      "admin.analytics.funnelDay7",
+      "admin.analytics.funnelDay30",
+      "admin.analytics.churnTitle",
+      "admin.analytics.churnTotal",
+      "admin.analytics.noChurnRisk",
+      "admin.analytics.games",
+      "admin.moderation.title",
+      "admin.moderation.queueTitle",
+      "admin.moderation.empty",
+      "admin.moderation.approve",
+      "admin.moderation.reject",
+      "admin.moderation.investigate",
+      "admin.moderation.banPlayer",
+      "admin.moderation.warnPlayer",
+      "admin.moderation.playerDetail",
+      "admin.moderation.moderationHistory",
+      "admin.moderation.recentGames",
+      "admin.moderation.cheatSignals",
+      "admin.moderation.flaggedPlayers",
+      "admin.moderation.noFlags",
+      "admin.content.pendingWords",
+      "admin.content.approvedWords",
+      "admin.content.topReported",
+      "admin.content.noReports",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
@@ -176,6 +1334,7 @@
       "auth.otp.verify",
       "auth.otp.changeEmail",
       "auth.otp.resend",
+      "playerProfile.title",
       "leaderboard.friends",
       "leaderboard.noFriendsPlayed",
       "daily.requestChallenge",
@@ -195,6 +1354,46 @@
       "friends.headToHead.losses",
       "friends.headToHead.draws",
       "friends.headToHead.totalGames",
+      "admin.kpi.dau",
+      "admin.kpi.gamesToday",
+      "admin.kpi.signupsToday",
+      "admin.kpi.stickiness",
+      "admin.kpi.totalPlayers",
+      "admin.kpi.totalWords",
+      "admin.kpi.thisWeek",
+      "admin.system.ok",
+      "admin.system.down",
+      "admin.analytics.title",
+      "admin.analytics.retentionTitle",
+      "admin.analytics.cohort",
+      "admin.analytics.size",
+      "admin.analytics.funnelTitle",
+      "admin.analytics.funnelRegistered",
+      "admin.analytics.funnelFirstGame",
+      "admin.analytics.funnelDay7",
+      "admin.analytics.funnelDay30",
+      "admin.analytics.churnTitle",
+      "admin.analytics.churnTotal",
+      "admin.analytics.noChurnRisk",
+      "admin.analytics.games",
+      "admin.moderation.title",
+      "admin.moderation.queueTitle",
+      "admin.moderation.empty",
+      "admin.moderation.approve",
+      "admin.moderation.reject",
+      "admin.moderation.investigate",
+      "admin.moderation.banPlayer",
+      "admin.moderation.warnPlayer",
+      "admin.moderation.playerDetail",
+      "admin.moderation.moderationHistory",
+      "admin.moderation.recentGames",
+      "admin.moderation.cheatSignals",
+      "admin.moderation.flaggedPlayers",
+      "admin.moderation.noFlags",
+      "admin.content.pendingWords",
+      "admin.content.approvedWords",
+      "admin.content.topReported",
+      "admin.content.noReports",
       "wordHuntAnnouncement.badge",
       "wordHuntAnnouncement.title",
       "wordHuntAnnouncement.subtitle",

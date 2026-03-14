@@ -160,7 +160,7 @@ export default function AssignmentTrackingPanel({
         <div className="flex gap-2">
           {[1, 2, 3, 4].map((i) => (
             <div
-              key={i}
+              key={`tab-skeleton-${i}`}
               data-testid="skeleton"
               className="h-10 bg-neo-black/20 rounded-neo flex-1 animate-pulse"
             />
@@ -169,7 +169,7 @@ export default function AssignmentTrackingPanel({
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
-              key={i}
+              key={`card-skeleton-${i}`}
               data-testid="skeleton"
               className="h-24 bg-neo-black/20 rounded-neo animate-pulse"
             />

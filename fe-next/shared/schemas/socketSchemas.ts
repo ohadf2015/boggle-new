@@ -515,3 +515,9 @@ export type KickPlayerData = z.infer<typeof KickPlayerSchema>;
 export type TransferHostData = z.infer<typeof TransferHostSchema>;
 export type CreateTournamentData = z.infer<typeof CreateTournamentSchema>;
 export type ReconnectData = z.infer<typeof ReconnectSchema>;
+
+// UGC Word Packs
+export const ApplyWordPackSchema = z.object({
+  packId: z.string().uuid(),
+});
+export type ApplyWordPackData = z.infer<typeof ApplyWordPackSchema>;

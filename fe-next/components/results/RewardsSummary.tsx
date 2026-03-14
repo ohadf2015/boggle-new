@@ -263,7 +263,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
           {/* Victory badge for winners */}
           {isWinner && (
             <motion.div
-              initial={{ opacity: 0, scale: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 22 }}
               className="absolute -top-2 -right-2 w-12 h-12 bg-neo-lime rounded-full border-3 border-neo-black shadow-hard flex items-center justify-center"

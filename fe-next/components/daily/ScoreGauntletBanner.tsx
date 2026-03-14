@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Swords } from 'lucide-react';
 
 export interface ScoreGauntletBannerProps {
@@ -20,7 +20,7 @@ export const ScoreGauntletBanner: React.FC<ScoreGauntletBannerProps> = ({
   if (!challengerName || challengerScore === null) return null;
 
   return (
-    <m.div
+    <motion.div
       data-testid="score-gauntlet-banner"
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -49,7 +49,7 @@ export const ScoreGauntletBanner: React.FC<ScoreGauntletBannerProps> = ({
           <Swords className="w-5 h-5 text-neo-pink" aria-hidden="true" />
         </div>
       </div>
-    </m.div>
+    </motion.div>
   );
 };
 

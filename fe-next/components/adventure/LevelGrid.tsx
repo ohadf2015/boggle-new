@@ -165,6 +165,7 @@ export default function LevelGrid({
             src={worldImage}
             alt=""
             fill
+            sizes="100vw"
             className="object-cover opacity-50"
             priority
           />
@@ -248,6 +249,7 @@ export default function LevelGrid({
               src={worldImage}
               alt=""
               fill
+              sizes="160px"
               className="object-contain"
             />
           </div>
@@ -393,8 +395,8 @@ export default function LevelGrid({
                       const isNewlyEarned = isEarned && i >= newStarsFrom;
                       return (
                       <motion.div
-                        key={i}
-                        initial={isNewlyEarned ? { scale: 0, rotate: -180 } : false}
+                        key={`star-${i}`}
+                        initial={isNewlyEarned ? { scale: 0.95, rotate: -180 } : false}
                         animate={isNewlyEarned ? { scale: 1, rotate: 0 } : undefined}
                         transition={isNewlyEarned ? { delay: levelNum * 0.03 + i * 0.08, type: 'spring', stiffness: 300, damping: 20 } : undefined}
                       >
@@ -418,9 +420,9 @@ export default function LevelGrid({
                       {config.objectives
                         .filter((o) => o.isPrimary)
                         .slice(0, 1)
-                        .map((obj, i) => (
+                        .map((obj) => (
                           <div
-                            key={i}
+                            key={obj.type}
                             className="text-xs text-neo-white/60 flex items-center gap-1.5 min-w-0"
                           >
                             <Target className="w-3 h-3 flex-shrink-0" />
@@ -474,8 +476,8 @@ export default function LevelGrid({
                   {/* Perfect completion indicator */}
                   {isPerfect && (
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 15 }}
                       className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-8 h-8 bg-neo-yellow rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-10"
                     >

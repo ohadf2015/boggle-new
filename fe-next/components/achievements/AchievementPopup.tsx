@@ -142,7 +142,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
           stiffness: 300,
           damping: 25,
         }}
-        className="fixed top-20 ltr:right-4 rtl:left-4 z-[9999] w-80 max-w-[calc(100vw-2rem)]"
+        className="fixed top-20 end-4 z-[9999] w-80 max-w-[calc(100vw-2rem)]"
         onClick={onComplete}
       >
         {/* Compact toast container - Neo-Brutalist */}
@@ -152,7 +152,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
             <div className="flex items-center gap-3">
               {/* Compact icon */}
               <motion.div
-                initial={{ scale: 0, rotate: -90 }}
+                initial={{ scale: 0.95, rotate: -90 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               >
@@ -190,7 +190,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
 
               {/* Action buttons */}
               <motion.div
-                initial={{ scale: 0 }}
+                initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
                 className="flex-shrink-0 flex gap-1.5"

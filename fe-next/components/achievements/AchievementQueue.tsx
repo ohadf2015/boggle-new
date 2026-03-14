@@ -148,7 +148,7 @@ function AchievementInlineToast({
   onDismiss: () => void;
 }) {
   const { t, dir } = useLanguage();
-  const isRtl = dir === 'rtl';
+
 
   const icon = getAchievementIcon(achievement.key);
   const name = t(`achievements.${achievement.key}.name`) || achievement.key;
@@ -176,11 +176,8 @@ function AchievementInlineToast({
       }}
     >
       <div
-        className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-navy pointer-events-auto"
+        className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-navy pointer-events-auto shadow-hard-yellow"
         style={{
-          boxShadow: isRtl
-            ? '-4px 4px 0px #FFE135'
-            : '4px 4px 0px #FFE135',
           minWidth: 'min(280px, calc(100vw - 2rem))',
           maxWidth: 'min(420px, calc(100vw - 2rem))',
         }}

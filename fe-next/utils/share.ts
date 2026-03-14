@@ -559,3 +559,72 @@ export const getShareMessageVariants = (
   const variants = generateVariants(gameCode, result, language, utmSource);
   return variants.map(v => v.message);
 };
+
+// ─── UGC Share Functions ─────────────────────────────────────────
+
+/**
+ * Get the URL for a community board
+ */
+export const getBoardUrl = (boardCode: string, locale: string = 'en'): string => {
+  if (typeof window === 'undefined') return '';
+  const baseUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+  return `${baseUrl}/${locale}/community/${boardCode}?utm_source=share&utm_medium=board`;
+};
+
+/**
+ * Share a community board via various channels
+ */
+export const shareBoard = (
+  boardCode: string,
+  title: string,
+  creatorName: string,
+  locale: string,
+  t: TranslationFunction
+): void => {
+  const url = getBoardUrl(boardCode, locale);
+  const message = `${t('ugc.board.shareMessage')}\n${t('ugc.board.createdBy').replace('{{name}}', creatorName)}\n\n${url}`;
+
+  if (navigator.share) {
+    navigator.share({ title, text: message, url }).catch(() => {
+      // Fallback to clipboard
+      navigator.clipboard.writeText(message).catch(() => {});
+    });
+  } else {
+    navigator.clipboard.writeText(message).then(() => {
+      toast.success(t('share.linkCopied') || 'Link copied!', { duration: 2000, icon: '✅' });
+    }).catch(() => {});
+  }
+};
+
+/**
+ * Get the URL for a word pack
+ */
+export const getWordPackUrl = (packId: string, locale: string = 'en'): string => {
+  if (typeof window === 'undefined') return '';
+  const baseUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+  return `${baseUrl}/${locale}/community?tab=packs&pack=${packId}&utm_source=share&utm_medium=pack`;
+};
+
+/**
+ * Share a word pack
+ */
+export const shareWordPack = (
+  packId: string,
+  name: string,
+  creatorName: string,
+  locale: string,
+  t: TranslationFunction
+): void => {
+  const url = getWordPackUrl(packId, locale);
+  const message = `${t('ugc.pack.shareMessage')}\n"${name}" ${t('ugc.board.createdBy').replace('{{name}}', creatorName)}\n\n${url}`;
+
+  if (navigator.share) {
+    navigator.share({ title: name, text: message, url }).catch(() => {
+      navigator.clipboard.writeText(message).catch(() => {});
+    });
+  } else {
+    navigator.clipboard.writeText(message).then(() => {
+      toast.success(t('share.linkCopied') || 'Link copied!', { duration: 2000, icon: '✅' });
+    }).catch(() => {});
+  }
+};

@@ -1,9 +1,13 @@
 'use client';
 
 // Note: Dynamic rendering is set in page.tsx (server component)
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Trophy, ArrowLeft, RefreshCw } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { Trophy, ArrowLeft, RefreshCw, PencilRuler } from 'lucide-react';
+
+const CreatorLeaderboard = dynamic(() => import('@/components/ugc/CreatorLeaderboard'), { ssr: false });
 import { Loader } from '@/components/ui/Loader';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
 import { ErrorState, EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
@@ -39,6 +43,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   const router = useRouter();
   const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
+  const [activeTab, setActiveTab] = useState<'players' | 'creators'>('players');
 
   // Use real-time hooks for live leaderboard updates
   const {
@@ -160,6 +165,38 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           </div>
         </motion.div>
 
+        {/* Tab Switcher */}
+        <div className="flex gap-2 mb-6 justify-center">
+          <button
+            onClick={() => setActiveTab('players')}
+            className={cn(
+              'px-4 py-2 font-bold text-sm rounded-neo border-3 border-neo-black transition-all',
+              activeTab === 'players'
+                ? 'bg-neo-yellow text-neo-black shadow-hard'
+                : 'bg-transparent text-gray-400 hover:text-white'
+            )}
+          >
+            <Trophy className="inline w-4 h-4 me-1" />
+            {t('leaderboard.title')}
+          </button>
+          <button
+            onClick={() => setActiveTab('creators')}
+            className={cn(
+              'px-4 py-2 font-bold text-sm rounded-neo border-3 border-neo-black transition-all',
+              activeTab === 'creators'
+                ? 'bg-neo-pink text-neo-black shadow-hard'
+                : 'bg-transparent text-gray-400 hover:text-white'
+            )}
+          >
+            <PencilRuler className="inline w-4 h-4 me-1" />
+            {t('ugc.creator.stats')}
+          </button>
+        </div>
+
+        {activeTab === 'creators' ? (
+          <CreatorLeaderboard />
+        ) : (
+        <>
         {/* User's Rank Card (if authenticated) */}
         {profile && userRank && (
           <div className="space-y-4 mb-6">
@@ -342,6 +379,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             </div>
           </motion.div>
         </PageStateHandler>
+
+        </>
+        )}
 
         {/* Back Button */}
         <div className="mt-8 text-center">

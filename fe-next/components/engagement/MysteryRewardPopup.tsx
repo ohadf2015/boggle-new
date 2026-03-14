@@ -33,35 +33,35 @@ const RARITY_STYLES = {
     bg: 'bg-gray-500',
     border: 'border-slate-500',
     text: 'text-slate-200',
-    glow: 'shadow-[0_0_30px_rgba(100,116,139,0.5)]',
+    glow: 'shadow-hard-sm',
     particle: '#94a3b8',
   },
   uncommon: {
-    bg: 'bg-gradient-to-br from-emerald-600 to-emerald-800',
+    bg: 'bg-neo-lime',
     border: 'border-emerald-400',
     text: 'text-emerald-200',
-    glow: 'shadow-[0_0_40px_rgba(52,211,153,0.5)]',
+    glow: 'shadow-hard',
     particle: '#34d399',
   },
   rare: {
-    bg: 'bg-gradient-to-br from-blue-600 to-blue-800',
+    bg: 'bg-neo-cyan',
     border: 'border-blue-400',
     text: 'text-blue-200',
-    glow: 'shadow-[0_0_50px_rgba(59,130,246,0.5)]',
+    glow: 'shadow-hard',
     particle: '#3b82f6',
   },
   epic: {
     bg: 'bg-neo-purple',
     border: 'border-purple-400',
     text: 'text-purple-200',
-    glow: 'shadow-[0_0_60px_rgba(168,85,247,0.6)]',
+    glow: 'shadow-hard-lg',
     particle: '#a855f7',
   },
   legendary: {
-    bg: 'bg-gradient-to-br from-amber-500 via-orange-500 to-red-600',
+    bg: 'bg-neo-orange',
     border: 'border-yellow-400',
     text: 'text-yellow-100',
-    glow: 'shadow-[0_0_80px_rgba(251,191,36,0.7)]',
+    glow: 'shadow-hard-lg',
     particle: '#fbbf24',
   },
 };
@@ -99,9 +99,21 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
   t,
 }) => {
   const [phase, setPhase] = useState<'chest' | 'opening' | 'reveal'>('chest');
+  const [canDismiss, setCanDismiss] = useState(false);
 
   const rarity = reward?.rarity || 'common';
   const styles = RARITY_STYLES[rarity];
+
+  // Allow dismiss after 1 second
+  useEffect(() => {
+    if (isOpen) {
+      setCanDismiss(false);
+      const timer = setTimeout(() => setCanDismiss(true), 1000);
+      return () => clearTimeout(timer);
+    }
+    setCanDismiss(false);
+    return;
+  }, [isOpen]);
 
   // Reset phase when popup opens
   useEffect(() => {
@@ -145,10 +157,10 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
   }, [phase, onClose]);
 
   const handleClose = useCallback(() => {
-    if (phase === 'reveal') {
+    if (canDismiss) {
       onClose();
     }
-  }, [phase, onClose]);
+  }, [canDismiss, onClose]);
 
   if (!reward) return null;
 
@@ -252,7 +264,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
               /* Reveal Phase - Show the reward */
               <motion.div
                 key="reveal"
-                initial={{ scale: 0, opacity: 0, rotateY: 180 }}
+                initial={{ scale: 0.95, opacity: 0, rotateY: 180 }}
                 animate={{ scale: 1, opacity: 1, rotateY: 0 }}
                 transition={{
                   type: 'spring',

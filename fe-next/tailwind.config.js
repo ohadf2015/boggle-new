@@ -228,6 +228,7 @@ module.exports = {
         'hard-yellow': '4px 4px 0px var(--neo-yellow)',
         'hard-pink': '4px 4px 0px var(--neo-pink)',
         'hard-cyan': '4px 4px 0px var(--neo-cyan)',
+        'hard-lime': '4px 4px 0px var(--neo-lime)',
         'hard-purple': '4px 4px 0px #581c87',
         'hard-purple-lg': '6px 6px 0px #581c87',
         // Remove default shadows

@@ -46,6 +46,9 @@ export function ProfileAchievements({
   const hallOfFameAchievements = allAchievements.filter(a => isHallOfFameAchievement(a.key));
   const regularAchievements = allAchievements.filter(a => !isHallOfFameAchievement(a.key));
 
+  const totalEarned = earnedAchievements.length;
+  const totalAchievements = allAchievementKeys.length;
+
   const renderAchievementBadge = ({ key, count, locked }: { key: string; count: number; locked: boolean }, index: number) => {
     const achievementData: Achievement = {
       icon: getAchievementIcon(key),
@@ -66,29 +69,35 @@ export function ProfileAchievements({
 
   return (
     <>
+      {/* Section header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay }}
+        className="flex items-end justify-between mb-3"
+      >
+        <h2 className="text-2xl font-black font-neo-display uppercase tracking-tight text-white">
+          {t('profile.achievements')}
+        </h2>
+        <span className="text-xs font-black uppercase text-neo-yellow bg-black px-3 py-1.5 rounded-full border-2 border-neo-yellow shadow-hard-sm">
+          {totalEarned} / {totalAchievements}
+        </span>
+      </motion.div>
+
       {/* Hall of Fame Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className={cn(
-          'rounded-2xl p-4 mb-4',
-          isDarkMode
-            ? 'bg-gradient-to-br from-amber-900/20 via-slate-800/50 to-yellow-900/20 border border-amber-500/30'
-            : 'bg-gradient-to-br from-amber-50 via-white to-yellow-50 border border-amber-200 shadow-lg'
-        )}
+        className="rounded-3xl p-6 mb-4 bg-slate-800/80 border-4 border-neo-yellow shadow-hard"
       >
-        <h2 className={cn(
-          'text-base font-bold mb-2 flex items-center gap-2',
-          isDarkMode ? 'text-amber-400' : 'text-amber-700'
-        )}>
-          <span className="text-lg">🏆</span>
-          {t('profile.hallOfFame')}
-        </h2>
-        <p className={cn(
-          'text-xs mb-3',
-          isDarkMode ? 'text-gray-400' : 'text-gray-600'
-        )}>
+        <div className="pb-3 border-b-2 border-neo-yellow/20 mb-4">
+          <h3 className="text-sm font-black uppercase text-neo-yellow tracking-widest flex items-center gap-2">
+            <span>🏆</span>
+            {t('profile.hallOfFame')}
+          </h3>
+        </div>
+        <p className="text-xs text-gray-400 mb-3">
           {t('profile.hallOfFameDescription')}
         </p>
         <div className="flex flex-wrap gap-2">
@@ -101,17 +110,8 @@ export function ProfileAchievements({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: delay + 0.05 }}
-        className={cn(
-          'rounded-2xl p-4',
-          isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
-        )}
+        className="rounded-3xl p-6 bg-slate-800/80 border-3 border-slate-600"
       >
-        <h2 className={cn(
-          'text-base font-bold mb-3',
-          isDarkMode ? 'text-white' : 'text-gray-900'
-        )}>
-          {t('profile.achievements')}
-        </h2>
         <div className="flex flex-wrap gap-2">
           {regularAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}
         </div>

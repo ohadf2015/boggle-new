@@ -6,7 +6,6 @@ import { Gift } from 'lucide-react';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { Loader } from '@/components/ui/Loader';
 import { Skeleton } from '@/components/ui/EnhancedLoading';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import type { PlayerCollectible } from '@/contexts/auth/authTypes';
@@ -31,24 +30,15 @@ export function ProfileCollection({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={cn(
-        'rounded-2xl p-4 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
-      )}
+      className="rounded-3xl p-6 mb-4 bg-slate-800/80 border-3 border-slate-600"
     >
-      <div className="flex items-center justify-between mb-3">
-        <h2 className={cn(
-          'text-base font-bold flex items-center gap-2',
-          isDarkMode ? 'text-white' : 'text-gray-900'
-        )}>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-black font-neo-display uppercase flex items-center gap-2 text-white">
           <Gift className="text-neo-pink" />
           {t('collectibles.title')}
         </h2>
         {collectibles.length > 0 && (
-          <span className={cn(
-            'text-xs px-2 py-1 rounded-full',
-            isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-gray-100 text-gray-600'
-          )}>
+          <span className="text-xs font-black uppercase px-3 py-1.5 rounded-full bg-black text-neo-pink border-2 border-neo-pink shadow-hard-sm">
             {collectibles.length} {t('collectibles.items')}
           </span>
         )}
@@ -71,11 +61,8 @@ export function ProfileCollection({
         <CollectionGrid collectibles={collectibles} />
       )}
 
-      <div className={cn(
-        'mt-3 pt-3 border-t text-center',
-        isDarkMode ? 'border-slate-700' : 'border-gray-200'
-      )}>
-        <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
+      <div className="mt-4 pt-3 border-t border-slate-700 text-center">
+        <p className="text-xs text-gray-500">
           {t('collectibles.shopComingSoon')}
         </p>
       </div>

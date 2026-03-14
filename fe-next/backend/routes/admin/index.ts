@@ -33,6 +33,11 @@ import playerRoutes from './playerRoutes';
 import gameRoutes from './gameRoutes';
 import wordModerationRoutes from './wordModerationRoutes';
 import utilityRoutes from './utilityRoutes';
+import ugcModerationRoutes from './ugcModerationRoutes';
+import systemHealthRoutes from './systemHealthRoutes';
+import analyticsRoutes from './analyticsRoutes';
+import moderationRoutes from './moderationRoutes';
+import cheatDetectionRoutes from './cheatDetectionRoutes';
 
 const router: Router = express.Router();
 
@@ -52,6 +57,21 @@ router.use('/', gameRoutes);
 
 // Word moderation routes (/api/admin/bot-words, /api/admin/community-words, /api/admin/invalid-words)
 router.use('/', wordModerationRoutes);
+
+// UGC moderation routes (/api/admin/ugc/*)
+router.use('/', ugcModerationRoutes);
+
+// Analytics routes (/api/admin/analytics/*)
+router.use('/', analyticsRoutes);
+
+// Moderation routes (/api/admin/moderation/*)
+router.use('/', moderationRoutes);
+
+// Cheat detection routes (/api/admin/cheat/*)
+router.use('/', cheatDetectionRoutes);
+
+// System health routes (/api/admin/system/*)
+router.use('/', systemHealthRoutes);
 
 // Utility routes (/api/admin/daily-word/*, /api/admin/send-test-email)
 router.use('/', utilityRoutes);

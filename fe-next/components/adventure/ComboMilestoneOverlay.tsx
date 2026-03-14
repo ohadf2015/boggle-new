@@ -90,7 +90,7 @@ export const ComboMilestoneOverlay = memo(function ComboMilestoneOverlay({
       {milestone && (
         <motion.div
           key={milestone.threshold}
-          className="fixed inset-0 z-[9000] pointer-events-none flex items-center justify-center"
+          className="fixed inset-0 z-40 pointer-events-none flex items-center justify-center"
           variants={overlayVariants}
           initial="initial"
           animate="animate"

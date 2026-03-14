@@ -3123,7 +3123,24 @@ const es = {
     "points": "pts",
     "hint": "Sigue subiendo posiciones",
     "multiplayerTip": "¡En multijugador, la velocidad importa!",
-    "wordsPerMin": "Palabras/min"
+    "wordsPerMin": "Palabras/min",
+    "topCreators": "Mejores Creadores"
+  },
+  "ugc": {
+    "board": { "createdBy": "Creado por {{name}}" },
+    "creator": {
+      "leaderboard": {
+        "title": "Mejores Creadores",
+        "spotlight": "Creador del Mes",
+        "boards": "Tableros",
+        "plays": "Partidas",
+        "rating": "Calificación",
+        "empty": "Aún no hay creadores",
+        "rank": "Rango",
+        "creator": "Creador"
+      },
+      "stats": "Mejores Creadores"
+    }
   },
   "ranked": {
     "title": "Modo Clasificatorio",
@@ -4525,6 +4542,14 @@ const es = {
       "webVitals": "Rendimiento Web",
       "email": "Correo",
       "milogWords": "Palabras Milog"
+    },
+    "sidebar": {
+      "overview": "Resumen",
+      "analytics": "Análisis",
+      "moderation": "Moderación",
+      "content": "Contenido",
+      "players": "Jugadores",
+      "system": "Sistema"
     },
     "invalidWords": {
       "title": "Revisión de Palabras Inválidas",

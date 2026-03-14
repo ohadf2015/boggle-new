@@ -27,11 +27,13 @@ interface AchievementDockProps {
   className?: string;
 }
 
+const EMPTY_ACHIEVEMENTS: Achievement[] = [];
+
 /**
  * Neo-Brutalist Achievement Dock
  * Features: Thick borders, hard shadows, bold uppercase text, vibrant colors
  */
-const AchievementDock = ({ achievements = [], className }: AchievementDockProps): React.ReactElement | null => {
+const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: AchievementDockProps): React.ReactElement | null => {
   const { t, dir } = useLanguage();
 
   // Localize achievements using player's language
@@ -156,7 +158,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
         transition={{ duration: 0.4, ease: 'easeInOut' }}
         className={cn(
           'relative w-14 h-14 rounded-lg flex items-center justify-center',
-          'bg-neo-lime border-4 border-neo-black',
+          'bg-neo-lime border-3 border-neo-black',
           'shadow-hard',
           'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
           'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',

@@ -68,11 +68,13 @@ interface QuickDrillsSectionProps {
   drillProgress?: DrillProgress[];
 }
 
+const EMPTY_DRILL_PROGRESS: DrillProgress[] = [];
+
 /**
  * Quick Drills Section
  * Grid of brain training drills with unlock status.
  */
-export default function QuickDrillsSection({ drillProgress: _drillProgress = [] }: QuickDrillsSectionProps) {
+export default function QuickDrillsSection({ drillProgress: _drillProgress = EMPTY_DRILL_PROGRESS }: QuickDrillsSectionProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const { t, language } = useLanguage();

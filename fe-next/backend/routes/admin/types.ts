@@ -11,6 +11,7 @@ export interface AdminUser {
   id: string;
   email: string;
   username?: string;
+  admin_role?: 'viewer' | 'moderator' | 'operator' | 'superadmin';
 }
 
 export interface AdminRequest extends Request {

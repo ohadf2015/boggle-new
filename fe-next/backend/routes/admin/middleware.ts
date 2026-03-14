@@ -59,18 +59,31 @@ export const adminRateLimiter = {
 // Run cleanup periodically
 setInterval(() => adminRateLimiter.cleanup(), 5 * 60 * 1000);
 
+// ==================== PII Scrubbing ====================
+
+const PII_KEYS = new Set(['email', 'phone', 'ip', 'ip_address', 'password', 'token']);
+
+/**
+ * Remove known PII keys from an object before logging.
+ */
+export function scrubPII(obj: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([k]) => !PII_KEYS.has(k.toLowerCase()))
+  );
+}
+
 // ==================== Audit Logging ====================
 
 /**
- * Log admin actions for audit trail
+ * Log admin actions for audit trail.
+ * PII is scrubbed from details. Admin email is NOT logged (only ID).
  */
 export function auditLog(adminUser: AdminUser | undefined, action: string, details: Record<string, unknown> = {}): void {
   logger.info('ADMIN_AUDIT', JSON.stringify({
     timestamp: new Date().toISOString(),
     adminId: adminUser?.id || 'unknown',
-    adminEmail: adminUser?.email || 'unknown',
     action,
-    details,
+    details: scrubPII(details),
   }));
 }
 
@@ -134,20 +147,24 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
     // Check if user is admin - server-side verification
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('is_admin, username')
+      .select('is_admin, username, admin_role')
       .eq('id', user.id)
       .single();
 
     if (profileError || !profile?.is_admin) {
-      logger.info('ADMIN_API', `Non-admin access attempt by ${user.email} [${requestId}]`);
+      logger.info('ADMIN_API', `Non-admin access attempt [${requestId}]`);
       res.status(403).json({ error: 'Admin access required', requestId });
       return;
     }
 
-    req.adminUser = { ...user, username: profile.username };
+    req.adminUser = {
+      ...user,
+      username: profile.username,
+      admin_role: profile.admin_role ?? 'viewer',
+    };
 
-    // Log successful admin access
-    logger.debug('ADMIN_API', `Admin access: ${user.email} -> ${req.method} ${req.path} [${requestId}]`);
+    // Log successful admin access (no PII — use admin ID only)
+    logger.debug('ADMIN_API', `Admin access: ${user.id} -> ${req.method} ${req.path} [${requestId}]`);
 
     next();
   } catch (error) {

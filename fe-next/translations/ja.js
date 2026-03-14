@@ -2705,7 +2705,24 @@ const ja = {
     "points": "pt",
     "hint": "💡 もっと単語を見つけて順位を上げよう！",
     "multiplayerTip": "ユニークな単語を見つけてスコア！他の人とかぶると0点だよ。",
-    "wordsPerMin": "語/分"
+    "wordsPerMin": "語/分",
+    "topCreators": "トップクリエイター"
+  },
+  "ugc": {
+    "board": { "createdBy": "作成者: {{name}}" },
+    "creator": {
+      "leaderboard": {
+        "title": "トップクリエイター",
+        "spotlight": "今月のクリエイター",
+        "boards": "ボード数",
+        "plays": "プレイ数",
+        "rating": "評価",
+        "empty": "まだクリエイターがいません",
+        "rank": "順位",
+        "creator": "クリエイター"
+      },
+      "stats": "トップクリエイター"
+    }
   },
   "ranked": {
     "title": "ランクマッチ",
@@ -4624,6 +4641,14 @@ const ja = {
       "webVitals": "Webパフォーマンス",
       "email": "メール",
       "milogWords": "Milog辞書"
+    },
+    "sidebar": {
+      "overview": "概要",
+      "analytics": "分析",
+      "moderation": "モデレーション",
+      "content": "コンテンツ",
+      "players": "プレイヤー",
+      "system": "システム"
     },
     "invalidWords": {
       "title": "無効な単語の確認",

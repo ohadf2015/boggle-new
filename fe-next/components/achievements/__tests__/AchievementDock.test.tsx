@@ -241,7 +241,7 @@ describe('AchievementDock', () => {
 
       const button = screen.getByRole('button');
       expect(button.className).toContain('bg-neo-lime');
-      expect(button.className).toContain('border-4');
+      expect(button.className).toContain('border-3');
       expect(button.className).toContain('border-neo-black');
     });
 

@@ -1,0 +1,578 @@
+/**
+ * UGC Boards API Route Tests
+ * Tests for /api/ugc/boards/* endpoints
+ *
+ * TDD: Tests written before implementation.
+ */
+
+import request from 'supertest';
+import express from 'express';
+
+// ---- Mock Supabase helpers ----
+jest.mock('../../modules/supabase/ugcBoards', () => ({
+  createBoard: jest.fn(),
+  getBoardByCode: jest.fn(),
+  getGallery: jest.fn(),
+  recordPlay: jest.fn(),
+  upsertRating: jest.fn(),
+  submitReport: jest.fn(),
+  getCreatorBoards: jest.fn(),
+  getFeaturedBoards: jest.fn(),
+  getBoardLeaderboard: jest.fn(),
+}));
+
+// ---- Mock grid generation & solver ----
+jest.mock('../../../utils/dailyChallenge/gridPathFinding', () => ({
+  embedMultipleWordsInGrid: jest.fn(() => [
+    ['c', 'a', 't', 's'],
+    ['d', 'o', 'g', 'x'],
+    ['r', 'u', 'n', 'z'],
+    ['p', 'l', 'a', 'y'],
+  ]),
+}));
+
+jest.mock('../../modules/boggleSolver', () => ({
+  findWordsForBots: jest.fn(() => ({
+    allWords: ['cat', 'dog', 'run', 'play', 'cats', 'dogs', 'runs', 'plays', 'plat', 'clan', 'gory', 'dory', 'alto', 'oral', 'trod', 'star'],
+    easy: ['cat', 'dog'],
+    medium: ['cats', 'dogs'],
+    hard: ['plat', 'clan'],
+  })),
+}));
+
+// ---- Mock UGC moderation ----
+jest.mock('../../modules/ugcModeration', () => ({
+  validateUgcText: jest.fn(() => ({ valid: true })),
+  REPORT_REASONS: ['inappropriate', 'spam', 'unplayable', 'offensive'],
+}));
+
+// ---- Mock customPuzzle utils ----
+jest.mock('../../../utils/customPuzzle', () => ({
+  generatePuzzleCode: jest.fn(() => 'abc12345'),
+  isValidPuzzleCode: jest.fn((code: string) => /^[a-z0-9]{8}$/.test(code)),
+}));
+
+// ---- Mock Supabase server for auth ----
+const mockAuthGetUser = jest.fn();
+jest.mock('../../modules/supabaseServer', () => ({
+  getSupabase: jest.fn(() => ({
+    auth: {
+      getUser: mockAuthGetUser,
+    },
+  })),
+  isSupabaseConfigured: jest.fn(() => true),
+}));
+
+// ---- Mock logger ----
+jest.mock('../../utils/logger', () => ({
+  info: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+}));
+
+import {
+  createBoard,
+  getBoardByCode,
+  getGallery,
+  recordPlay,
+  upsertRating,
+  submitReport,
+  getCreatorBoards,
+  getFeaturedBoards,
+} from '../../modules/supabase/ugcBoards';
+
+import ugcBoardsRouter from '../ugcBoards';
+
+// ---- App setup ----
+const app = express();
+app.use(express.json());
+app.use('/api/ugc/boards', ugcBoardsRouter);
+
+// ---- Mock data ----
+const MOCK_BOARD = {
+  id: 'board-123',
+  board_code: 'abc12345',
+  creator_id: 'user-456',
+  creator_display_name: 'TestUser',
+  creator_avatar: null,
+  creator_profile_picture_url: null,
+  language: 'en',
+  title: 'My Fun Board',
+  description: 'A test board',
+  grid: [['c','a','t','s'],['d','o','g','x'],['r','u','n','z'],['p','l','a','y']],
+  grid_size: 4,
+  seed_words: ['cat', 'dog'],
+  total_findable_words: 16,
+  difficulty: 'MEDIUM' as const,
+  timer_seconds: 120,
+  is_public: true,
+  moderation_status: 'approved',
+  play_count: 42,
+  rating_sum: 85,
+  rating_count: 20,
+  featured: false,
+  created_at: '2026-03-14T00:00:00Z',
+};
+
+const AUTH_HEADER = 'Bearer test-token-xyz';
+const AUTHED_USER = { id: 'user-456', email: 'test@example.com' };
+
+function setupAuth(user = AUTHED_USER) {
+  mockAuthGetUser.mockResolvedValue({ data: { user }, error: null });
+}
+
+function setupAuthFail() {
+  mockAuthGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'Invalid token' } });
+}
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+// ============================================================
+// POST /generate
+// ============================================================
+
+describe('POST /api/ugc/boards/generate', () => {
+  it('returns grid and stats for valid seed words', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/generate')
+      .send({ seedWords: ['cat', 'dog'], gridSize: 4, language: 'en' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      grid: expect.any(Array),
+      totalFindableWords: expect.any(Number),
+      difficulty: expect.stringMatching(/^(EASY|MEDIUM|HARD)$/),
+      seedWordsPlaced: expect.any(Array),
+    });
+  });
+
+  it('returns 400 for missing seedWords', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/generate')
+      .send({ gridSize: 4, language: 'en' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBeDefined();
+  });
+
+  it('returns 400 for invalid gridSize', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/generate')
+      .send({ seedWords: ['cat'], gridSize: 7, language: 'en' });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 for empty seedWords array', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/generate')
+      .send({ seedWords: [], gridSize: 4, language: 'en' });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('computes EASY difficulty when word count >= 30', async () => {
+    const { findWordsForBots } = require('../../modules/boggleSolver');
+    (findWordsForBots as jest.Mock).mockReturnValueOnce({
+      allWords: Array(35).fill('word'),
+      easy: [], medium: [], hard: [],
+    });
+
+    const res = await request(app)
+      .post('/api/ugc/boards/generate')
+      .send({ seedWords: ['cat'], gridSize: 4, language: 'en' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.difficulty).toBe('EASY');
+  });
+
+  it('computes HARD difficulty when word count < 15', async () => {
+    const { findWordsForBots } = require('../../modules/boggleSolver');
+    (findWordsForBots as jest.Mock).mockReturnValueOnce({
+      allWords: Array(10).fill('word'),
+      easy: [], medium: [], hard: [],
+    });
+
+    const res = await request(app)
+      .post('/api/ugc/boards/generate')
+      .send({ seedWords: ['cat'], gridSize: 4, language: 'en' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.difficulty).toBe('HARD');
+  });
+});
+
+// ============================================================
+// POST /publish
+// ============================================================
+
+describe('POST /api/ugc/boards/publish', () => {
+  it('creates board and returns board_code for authenticated user', async () => {
+    setupAuth();
+    (createBoard as jest.Mock).mockResolvedValue(MOCK_BOARD);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/publish')
+      .set('Authorization', AUTH_HEADER)
+      .send({
+        title: 'My Fun Board',
+        description: 'A test board',
+        grid: MOCK_BOARD.grid,
+        gridSize: 4,
+        language: 'en',
+        seedWords: ['cat', 'dog'],
+        totalFindableWords: 16,
+        difficulty: 'MEDIUM',
+        timerSeconds: 120,
+        isPublic: true,
+        creatorDisplayName: 'TestUser',
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.boardCode).toBe('abc12345');
+    expect(createBoard).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns 401 when no auth header', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/publish')
+      .send({ title: 'test' });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 401 for invalid token', async () => {
+    setupAuthFail();
+    const res = await request(app)
+      .post('/api/ugc/boards/publish')
+      .set('Authorization', AUTH_HEADER)
+      .send({ title: 'test' });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 400 for missing title', async () => {
+    setupAuth();
+
+    const res = await request(app)
+      .post('/api/ugc/boards/publish')
+      .set('Authorization', AUTH_HEADER)
+      .send({ grid: MOCK_BOARD.grid, gridSize: 4, language: 'en' });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when title fails moderation', async () => {
+    setupAuth();
+    const { validateUgcText } = require('../../modules/ugcModeration');
+    (validateUgcText as jest.Mock).mockReturnValueOnce({ valid: false, error: 'profanity', field: 'title' });
+
+    const res = await request(app)
+      .post('/api/ugc/boards/publish')
+      .set('Authorization', AUTH_HEADER)
+      .send({
+        title: 'Bad Title',
+        grid: MOCK_BOARD.grid,
+        gridSize: 4,
+        language: 'en',
+        totalFindableWords: 16,
+        difficulty: 'MEDIUM',
+        timerSeconds: 120,
+        isPublic: true,
+        creatorDisplayName: 'TestUser',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/profan/i);
+  });
+});
+
+// ============================================================
+// GET /:boardCode
+// ============================================================
+
+describe('GET /api/ugc/boards/:boardCode', () => {
+  it('returns board for valid code', async () => {
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+
+    const res = await request(app).get('/api/ugc/boards/abc12345');
+
+    expect(res.status).toBe(200);
+    expect(res.body.board_code).toBe('abc12345');
+  });
+
+  it('returns 404 when board not found', async () => {
+    (getBoardByCode as jest.Mock).mockResolvedValue(null);
+
+    const res = await request(app).get('/api/ugc/boards/zzzzzzzz');
+
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 400 for invalid board code format', async () => {
+    const res = await request(app).get('/api/ugc/boards/BAD-CODE!!');
+
+    expect(res.status).toBe(400);
+  });
+});
+
+// ============================================================
+// GET /gallery
+// ============================================================
+
+describe('GET /api/ugc/boards/gallery', () => {
+  it('returns paginated gallery with default params', async () => {
+    (getGallery as jest.Mock).mockResolvedValue({ boards: [MOCK_BOARD], total: 1 });
+
+    const res = await request(app).get('/api/ugc/boards/gallery');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      boards: expect.any(Array),
+      total: expect.any(Number),
+      page: 1,
+      limit: expect.any(Number),
+    });
+  });
+
+  it('passes sort, language, difficulty filters', async () => {
+    (getGallery as jest.Mock).mockResolvedValue({ boards: [], total: 0 });
+
+    const res = await request(app).get('/api/ugc/boards/gallery?sort=popular&language=en&difficulty=HARD&page=2&limit=10');
+
+    expect(res.status).toBe(200);
+    expect(getGallery).toHaveBeenCalledWith(expect.objectContaining({
+      sort: 'popular',
+      language: 'en',
+      difficulty: 'HARD',
+      page: 2,
+      limit: 10,
+    }));
+  });
+
+  it('caps limit at 50', async () => {
+    (getGallery as jest.Mock).mockResolvedValue({ boards: [], total: 0 });
+
+    await request(app).get('/api/ugc/boards/gallery?limit=999');
+
+    expect(getGallery).toHaveBeenCalledWith(expect.objectContaining({ limit: 50 }));
+  });
+
+  it('sets Cache-Control header', async () => {
+    (getGallery as jest.Mock).mockResolvedValue({ boards: [], total: 0 });
+
+    const res = await request(app).get('/api/ugc/boards/gallery');
+
+    expect(res.headers['cache-control']).toContain('60');
+  });
+});
+
+// ============================================================
+// POST /:boardCode/play
+// ============================================================
+
+describe('POST /api/ugc/boards/:boardCode/play', () => {
+  it('records play for authenticated user', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (recordPlay as jest.Mock).mockResolvedValue(undefined);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/play')
+      .set('Authorization', AUTH_HEADER)
+      .send({ displayName: 'TestUser', score: 500, wordCount: 10 });
+
+    expect(res.status).toBe(200);
+    expect(recordPlay).toHaveBeenCalledTimes(1);
+  });
+
+  it('records play for guest (no auth header)', async () => {
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (recordPlay as jest.Mock).mockResolvedValue(undefined);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/play')
+      .send({ displayName: 'Guest', score: 200, wordCount: 5, guestFingerprint: 'fp-xyz' });
+
+    expect(res.status).toBe(200);
+    expect(recordPlay).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns 400 for invalid board code', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/BAD!/play')
+      .send({ displayName: 'Test', score: 100, wordCount: 5 });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 404 when board not found', async () => {
+    (getBoardByCode as jest.Mock).mockResolvedValue(null);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/zzzzzzzz/play')
+      .send({ displayName: 'Test', score: 100, wordCount: 5 });
+
+    expect(res.status).toBe(404);
+  });
+});
+
+// ============================================================
+// POST /:boardCode/rate
+// ============================================================
+
+describe('POST /api/ugc/boards/:boardCode/rate', () => {
+  it('upserts rating for authenticated user', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (upsertRating as jest.Mock).mockResolvedValue(undefined);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/rate')
+      .set('Authorization', AUTH_HEADER)
+      .send({ rating: 4 });
+
+    expect(res.status).toBe(200);
+    expect(upsertRating).toHaveBeenCalledWith('board-123', 'user-456', 4);
+  });
+
+  it('returns 401 without auth', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/rate')
+      .send({ rating: 4 });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 400 for rating out of range', async () => {
+    setupAuth();
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/rate')
+      .set('Authorization', AUTH_HEADER)
+      .send({ rating: 6 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBeDefined();
+  });
+
+  it('returns 400 for rating = 0', async () => {
+    setupAuth();
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/rate')
+      .set('Authorization', AUTH_HEADER)
+      .send({ rating: 0 });
+
+    expect(res.status).toBe(400);
+  });
+});
+
+// ============================================================
+// POST /:boardCode/report
+// ============================================================
+
+describe('POST /api/ugc/boards/:boardCode/report', () => {
+  it('submits report for authenticated user', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (submitReport as jest.Mock).mockResolvedValue({ flagged: false });
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/report')
+      .set('Authorization', AUTH_HEADER)
+      .send({ reason: 'inappropriate' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ flagged: false });
+    expect(submitReport).toHaveBeenCalledWith('board-123', 'user-456', 'inappropriate');
+  });
+
+  it('returns 401 without auth', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/report')
+      .send({ reason: 'spam' });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 400 for invalid reason', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/report')
+      .set('Authorization', AUTH_HEADER)
+      .send({ reason: 'i_hate_this' });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('returns flagged: true when auto-flag triggered', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (submitReport as jest.Mock).mockResolvedValue({ flagged: true });
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/report')
+      .set('Authorization', AUTH_HEADER)
+      .send({ reason: 'spam' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.flagged).toBe(true);
+  });
+});
+
+// ============================================================
+// GET /mine
+// ============================================================
+
+describe('GET /api/ugc/boards/mine', () => {
+  it('returns creator boards for authenticated user', async () => {
+    setupAuth();
+    (getCreatorBoards as jest.Mock).mockResolvedValue([MOCK_BOARD]);
+
+    const res = await request(app)
+      .get('/api/ugc/boards/mine')
+      .set('Authorization', AUTH_HEADER);
+
+    expect(res.status).toBe(200);
+    expect(res.body.boards).toHaveLength(1);
+    expect(getCreatorBoards).toHaveBeenCalledWith('user-456');
+  });
+
+  it('returns 401 without auth', async () => {
+    const res = await request(app).get('/api/ugc/boards/mine');
+
+    expect(res.status).toBe(401);
+  });
+});
+
+// ============================================================
+// GET /featured
+// ============================================================
+
+describe('GET /api/ugc/boards/featured', () => {
+  it('returns featured boards', async () => {
+    const { getFeaturedBoards } = require('../../modules/supabase/ugcBoards');
+    (getFeaturedBoards as jest.Mock).mockResolvedValue([MOCK_BOARD]);
+
+    const res = await request(app).get('/api/ugc/boards/featured');
+
+    expect(res.status).toBe(200);
+    expect(res.body.boards).toHaveLength(1);
+    expect(getFeaturedBoards).toHaveBeenCalledWith(6);
+  });
+
+  it('sets 5-min Cache-Control header', async () => {
+    const { getFeaturedBoards } = require('../../modules/supabase/ugcBoards');
+    (getFeaturedBoards as jest.Mock).mockResolvedValue([]);
+
+    const res = await request(app).get('/api/ugc/boards/featured');
+
+    expect(res.headers['cache-control']).toContain('300');
+  });
+});

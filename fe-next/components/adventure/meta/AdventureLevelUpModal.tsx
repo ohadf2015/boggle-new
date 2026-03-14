@@ -9,10 +9,11 @@
 
 'use client';
 
-import { memo, useEffect, useId, useMemo } from 'react';
+import { memo, useEffect, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 
 // ==============================================
@@ -37,11 +38,7 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
     const { t } = useLanguage();
     const titleId = useId();
 
-    // Check for reduced motion preference
-    const prefersReducedMotion = useMemo(() => {
-      if (typeof window === 'undefined') return false;
-      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    }, []);
+    const prefersReducedMotion = usePrefersReducedMotion();
 
     // Handle escape key
     useEffect(() => {
@@ -72,6 +69,17 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
 
       return () => clearTimeout(timeout);
     }, [isOpen, onClose]);
+
+    // Scroll lock
+    useEffect(() => {
+      if (!isOpen) return;
+
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }, [isOpen]);
 
     // Don't render if not open
     if (!isOpen) {
@@ -104,17 +112,17 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
               'p-6 md:p-8',
               'text-center'
             )}
-            initial={{ scale: 0, rotate: -5 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, rotate: 5 }}
+            initial={{ opacity: 0, scale: 0.95, rotate: -5 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, scale: 0.95, rotate: 5 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Celebration Emoji */}
             <motion.span
               className="block text-6xl mb-4"
-              initial={{ scale: 0, rotate: -30 }}
-              animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
+              initial={{ opacity: 0, scale: 0.95, rotate: -30 }}
+              animate={{ opacity: 1, scale: [0.95, 1.3, 1], rotate: [30, -15, 0] }}
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
             >
               🎉
@@ -145,8 +153,8 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
                   'bg-neo-cyan/20 border-4 border-neo-cyan',
                   'rounded-full'
                 )}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
               >
                 <span

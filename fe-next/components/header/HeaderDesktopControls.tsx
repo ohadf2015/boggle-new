@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import Link from 'next/link';
-import { Gift, Newspaper } from 'lucide-react';
+import { Gift, Newspaper, Users } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
@@ -83,6 +83,24 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
             )}
 
             {isAuthenticated && <NotificationBell />}
+
+            <Link
+                href={`/${language}/community`}
+                className={cn(
+                    "flex items-center justify-center",
+                    "w-10 h-10",
+                    "bg-neo-pink/20 text-neo-pink",
+                    "border-3 border-neo-black",
+                    "rounded-neo shadow-hard-sm",
+                    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-pink/30",
+                    "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                    "transition-all duration-100"
+                )}
+                aria-label={t('ugc.nav.community')}
+                title={t('ugc.nav.community')}
+            >
+                <Users size={18} />
+            </Link>
 
             <Link
                 href={`/${language}/blog`}

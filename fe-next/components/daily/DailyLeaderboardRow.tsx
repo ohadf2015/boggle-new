@@ -1,0 +1,235 @@
+'use client';
+
+import React, { memo } from 'react';
+import { motion } from 'framer-motion';
+import { Clock, Sparkles, Crown } from 'lucide-react';
+import { getRankDisplay } from '@/utils/rankingStyles';
+import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
+import Avatar from '@/components/Avatar';
+import { getRankColors, getRankBadgeColors } from './leaderboardUtils';
+import type { DailyParticipant, AllTimeParticipant } from './TabbedDailyLeaderboard';
+
+// ==========================================
+// Today's Participant Row
+// ==========================================
+
+export const TodayParticipantRow = memo<{
+  participant: DailyParticipant;
+  index: number;
+  isCurrentUser: boolean;
+  compact: boolean;
+  t: (key: string) => string;
+}>(({ participant, index, isCurrentUser, compact, t }) => {
+  const rank = participant.rank_position;
+  const countryFlag = getCountryFlag(participant.country_code);
+
+  // Format time since completion
+  const timeAgo = formatDistanceToNow(participant.completed_at, t);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
+      className={`
+        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
+        ${getRankColors(rank, isCurrentUser)}
+        ${compact ? 'py-2' : ''}
+        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
+      `}
+    >
+      {/* Rank Badge */}
+      <div
+        className={`
+          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
+          ${getRankBadgeColors(rank)}
+          border-2 shadow-sm
+        `}
+      >
+        {getRankDisplay(rank)}
+      </div>
+
+      {/* Avatar with Country Flag */}
+      <div className="relative">
+        <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
+          <Avatar
+            profilePictureUrl={participant.profile_picture_url ?? undefined}
+            avatarImage={participant.avatar_image ?? undefined}
+            customAvatar={participant.custom_avatar ?? undefined}
+            size="lg"
+            className="w-full h-full"
+          />
+        </div>
+        {/* Country Flag Badge */}
+        {countryFlag && (
+          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+            {countryFlag}
+          </div>
+        )}
+      </div>
+
+      {/* Name & Stats */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
+            {participant.display_name || 'Player'}
+          </span>
+          {isCurrentUser && (
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
+              YOU
+            </span>
+          )}
+          {rank === 1 && (
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-tier-gold shrink-0 animate-pulse" />
+          )}
+        </div>
+        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
+          <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+            {participant.solved ? `✓ ${participant.attempts_used}/10` : `✗ X/10`}
+          </span>
+          {/* Show efficiency score */}
+          {participant.efficiency_score !== undefined && participant.efficiency_score > 0 && (
+            <>
+              <span className="text-slate-400 dark:text-slate-500">•</span>
+              <span className="text-purple-600 dark:text-purple-400 font-bold">
+                {participant.efficiency_score} {t('wordHunt.leaderboard.pts')}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Time */}
+      {!compact && (
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
+          <Clock className="w-3.5 h-3.5" />
+          <span>{timeAgo}</span>
+        </div>
+      )}
+    </motion.div>
+  );
+});
+
+TodayParticipantRow.displayName = 'TodayParticipantRow';
+
+// ==========================================
+// All-Time Participant Row
+// ==========================================
+
+export const AllTimeParticipantRow = memo<{
+  participant: AllTimeParticipant;
+  index: number;
+  isCurrentUser: boolean;
+  compact: boolean;
+  t: (key: string) => string;
+}>(({ participant, index, isCurrentUser, compact, t }) => {
+  const rank = participant.rank_position;
+  const countryFlag = getCountryFlag(participant.country_code);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
+      className={`
+        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
+        ${getRankColors(rank, isCurrentUser)}
+        ${compact ? 'py-2' : ''}
+        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
+      `}
+    >
+      {/* Rank Badge */}
+      <div
+        className={`
+          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
+          ${getRankBadgeColors(rank)}
+          border-2 shadow-sm
+        `}
+      >
+        {getRankDisplay(rank)}
+      </div>
+
+      {/* Avatar with Country Flag */}
+      <div className="relative">
+        <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
+          <Avatar
+            profilePictureUrl={participant.profile_picture_url ?? undefined}
+            avatarImage={participant.avatar_image ?? undefined}
+            customAvatar={participant.custom_avatar ?? undefined}
+            size="lg"
+            className="w-full h-full"
+          />
+        </div>
+        {/* Country Flag Badge */}
+        {countryFlag && (
+          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+            {countryFlag}
+          </div>
+        )}
+      </div>
+
+      {/* Name & Stats */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
+            {participant.display_name || 'Player'}
+          </span>
+          {isCurrentUser && (
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
+              YOU
+            </span>
+          )}
+          {rank === 1 && (
+            <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
+          )}
+        </div>
+        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
+          {/* Total efficiency score - primary stat */}
+          <span className="font-black text-purple-600 dark:text-purple-400">
+            {participant.total_efficiency_score} {t('wordHunt.leaderboard.pts')}
+          </span>
+          <span className="text-slate-400 dark:text-slate-500">•</span>
+          {/* Challenges solved */}
+          <span className="text-slate-600 dark:text-slate-300 font-medium">
+            {participant.games_won}/{participant.total_games} {t('wordHunt.leaderboard.solved')}
+          </span>
+        </div>
+      </div>
+
+      {/* Best Score Badge */}
+      {!compact && (
+        <div className="hidden sm:flex flex-col items-end text-xs">
+          <div className="text-slate-500 dark:text-slate-400">{t('wordHunt.leaderboard.best')}</div>
+          <div className="font-bold text-purple-600 dark:text-purple-400">{participant.best_efficiency}</div>
+        </div>
+      )}
+    </motion.div>
+  );
+});
+
+AllTimeParticipantRow.displayName = 'AllTimeParticipantRow';
+
+// ==========================================
+// Skeleton Loading Row
+// ==========================================
+
+export const SkeletonRow = memo<{ index: number }>(({ index }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
+    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50"
+  >
+    {/* Rank skeleton */}
+    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse" />
+    {/* Avatar skeleton */}
+    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse" />
+    {/* Name & stats skeleton */}
+    <div className="flex-1 space-y-2">
+      <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+      <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+    </div>
+  </motion.div>
+));
+
+SkeletonRow.displayName = 'SkeletonRow';

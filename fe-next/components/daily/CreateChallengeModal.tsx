@@ -262,8 +262,8 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         {boardSize === 5 && (
                           <motion.div
                             className="absolute -top-2 -right-2"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1, rotate: 360 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1, rotate: 360 }}
                             transition={{ type: 'spring', bounce: 0.6 }}
                           >
                             <div className="bg-neo-pink border-3 border-neo-black rounded-full p-1 shadow-hard-sm">
@@ -293,8 +293,8 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         {boardSize === 7 && (
                           <motion.div
                             className="absolute -top-2 -right-2"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1, rotate: 360 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1, rotate: 360 }}
                             transition={{ type: 'spring', bounce: 0.6 }}
                           >
                             <div className="bg-neo-pink border-3 border-neo-black rounded-full p-1 shadow-hard-sm">
@@ -411,7 +411,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     >
                       {[0, 1, 2].map((i) => (
                         <motion.div
-                          key={i}
+                          key={`dot-${i}`}
                           className="w-2 h-2 bg-neo-pink rounded-full"
                           variants={{
                             hidden: { opacity: 0.3, scale: 0.8 },
@@ -442,15 +442,15 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     {/* Background circle */}
                     <motion.div
                       className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-neo-lime to-neo-orange rounded-full border-neo-thick border-neo-black shadow-hard-lg"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: 'spring', bounce: 0.6, duration: 0.6 }}
                     />
 
                     {/* Mascot popping out of circle (3D effect) */}
                     <motion.div
-                      initial={{ scale: 0, rotate: -180, y: 20 }}
-                      animate={{ scale: 1, rotate: 0, y: -8 }}
+                      initial={{ opacity: 0, scale: 0.95, rotate: -180, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0, y: -8 }}
                       transition={{ type: 'spring', bounce: 0.6, duration: 0.8, delay: 0.1 }}
                       className="relative z-10"
                     >
@@ -465,9 +465,9 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     {/* Confetti particles */}
                     {[...Array(8)].map((_, i) => (
                       <motion.div
-                        key={i}
+                        key={`confetti-${i}`}
                         className="absolute top-1/2 left-1/2"
-                        initial={{ scale: 0, x: 0, y: 0 }}
+                        initial={{ scale: 0.95, x: 0, y: 0 }}
                         animate={{
                           scale: [0, 1, 0],
                           x: [0, (Math.cos((i * Math.PI) / 4) * 60)],

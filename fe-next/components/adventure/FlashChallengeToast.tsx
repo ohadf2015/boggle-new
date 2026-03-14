@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Coins, Check, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -26,7 +26,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
 
   return (
     <AnimatePresence>
-      <m.div
+      <motion.div
         key={challenge.id}
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -87,7 +87,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
             </div>
           )}
         </div>
-      </m.div>
+      </motion.div>
     </AnimatePresence>
   );
 });

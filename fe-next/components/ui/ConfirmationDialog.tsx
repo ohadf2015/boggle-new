@@ -49,8 +49,8 @@ const variantStyles: Record<ConfirmationDialogVariant, {
     confirm: 'flex-1 bg-neo-lime border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-110',
   },
   default: {
-    content: 'bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30',
-    confirm: 'bg-red-500 hover:bg-red-600',
+    content: 'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm',
+    confirm: 'flex-1 bg-neo-lime border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-110',
   },
 };
 
@@ -87,13 +87,13 @@ export function ConfirmationDialog({
   onOpenChange,
   title,
   description,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   onConfirm,
   variant = 'danger',
   className,
 }: ConfirmationDialogProps) {
-  const { dir } = useLanguage();
+  const { dir, t } = useLanguage();
   const styles = variantStyles[variant];
   const isRtl = dir === 'rtl';
 
@@ -124,13 +124,13 @@ export function ConfirmationDialog({
             (variant === 'danger' || variant === 'warning') &&
             'flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95'
           )}>
-            {cancelText}
+            {cancelText || t('common.cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             className={styles.confirm}
           >
-            {confirmText}
+            {confirmText || t('common.confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

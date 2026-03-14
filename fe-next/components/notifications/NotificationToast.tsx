@@ -5,7 +5,7 @@
  * Toast popup for new notifications (in-app)
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { NOTIFICATION_TYPE_ICONS, NOTIFICATION_TYPE_COLORS, type NotificationToastProps } from './types';
 
@@ -56,7 +56,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
   return (
     <div
       className={`
-        fixed top-20 right-4 z-[100]
+        fixed top-20 end-4 z-[100]
         w-80 max-w-[calc(100vw-2rem)]
         transition-all duration-200 ease-out
         ${isLeaving ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0'}
@@ -64,6 +64,14 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
     >
       <div
         onClick={handleClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+          }
+        }}
         className="
           relative flex gap-3 p-4 cursor-pointer
           bg-neo-navy border-3 border-black rounded-lg
@@ -99,7 +107,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
             handleDismiss();
           }}
           className="
-            absolute top-2 right-2
+            absolute top-2 end-2
             w-6 h-6 rounded-md flex items-center justify-center
             text-neo-white/50 hover:text-neo-white hover:bg-white/10
             transition-colors

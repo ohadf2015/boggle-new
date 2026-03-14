@@ -70,6 +70,14 @@ export const RoomList: React.FC<RoomListProps> = ({
         <div
           className="flex items-center justify-between gap-2 p-3 border-b-2 border-neo-black/30 cursor-pointer md:cursor-default"
           onClick={onToggleMobileExpand}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onToggleMobileExpand();
+            }
+          }}
         >
           <div className="flex items-center gap-2 min-w-0">
             <span className="font-black text-neo-white text-sm uppercase truncate">
@@ -281,7 +289,7 @@ const LoadingSkeleton: React.FC = () => (
   <div className="space-y-3" role="status" aria-label="Loading rooms">
     {[1, 2, 3].map((i) => (
       <div
-        key={i}
+        key={`room-skeleton-${i}`}
         className="w-full p-3 rounded-neo border-3 border-neo-cream/20 skeleton"
         style={{ animationDelay: `${i * 0.15}s` }}
       >

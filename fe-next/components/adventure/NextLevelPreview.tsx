@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Grid3X3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -34,7 +34,7 @@ export function NextLevelPreview({
   return (
     <AnimatePresence>
       {isVisible && (
-        <m.div
+        <motion.div
           initial={{ y: 200, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 200, opacity: 0 }}
@@ -70,19 +70,19 @@ export function NextLevelPreview({
               </button>
               <AnimatePresence>
                 {showPlayBtn && (
-                  <m.button
+                  <motion.button
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     onClick={onPlay}
                     className="bg-neo-lime text-neo-black px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard font-neo-display font-bold text-sm hover:shadow-hard-pressed active:shadow-hard-pressed"
                   >
                     {t('adventure.play')}
-                  </m.button>
+                  </motion.button>
                 )}
               </AnimatePresence>
             </div>
           </div>
-        </m.div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

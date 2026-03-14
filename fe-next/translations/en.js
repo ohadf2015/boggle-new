@@ -3193,7 +3193,26 @@ const en = {
     "points": "pts",
     "hint": "Tap names to see their words!",
     "multiplayerTip": "Unique words score more!",
-    "wordsPerMin": "Words/min"
+    "wordsPerMin": "Words/min",
+    "topCreators": "Top Creators"
+  },
+  "ugc": {
+    "board": {
+      "createdBy": "Created by {{name}}"
+    },
+    "creator": {
+      "leaderboard": {
+        "title": "Top Creators",
+        "spotlight": "Creator of the Month",
+        "boards": "Boards",
+        "plays": "Plays",
+        "rating": "Rating",
+        "empty": "No creators yet",
+        "rank": "Rank",
+        "creator": "Creator"
+      },
+      "stats": "Top Creators"
+    }
   },
   "ranked": {
     "title": "Ranked Mode",
@@ -4618,6 +4637,64 @@ const en = {
       "webVitals": "Web Vitals",
       "email": "Email",
       "milogWords": "Milog Words"
+    },
+    "sidebar": {
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "moderation": "Moderation",
+      "content": "Content",
+      "players": "Players",
+      "system": "System"
+    },
+    "kpi": {
+      "dau": "Active Today",
+      "gamesToday": "Games Today",
+      "signupsToday": "Signups",
+      "stickiness": "Stickiness",
+      "totalPlayers": "Total Players",
+      "totalWords": "Words Found",
+      "thisWeek": "This week"
+    },
+    "system": {
+      "ok": "OK",
+      "down": "Down"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "retentionTitle": "Retention Cohorts",
+      "cohort": "Cohort",
+      "size": "Size",
+      "funnelTitle": "Engagement Funnel (30d)",
+      "funnelRegistered": "Registered",
+      "funnelFirstGame": "First Game",
+      "funnelDay7": "Returned D7",
+      "funnelDay30": "Returned D30",
+      "churnTitle": "Churn Risk",
+      "churnTotal": "Total at risk",
+      "noChurnRisk": "No players at risk",
+      "games": "games"
+    },
+    "moderation": {
+      "title": "Moderation",
+      "queueTitle": "Moderation Queue",
+      "empty": "Queue is clear — no pending items",
+      "approve": "Approve",
+      "reject": "Reject",
+      "investigate": "Investigate",
+      "banPlayer": "Ban Player",
+      "warnPlayer": "Warn Player",
+      "playerDetail": "Player Detail",
+      "moderationHistory": "Moderation History",
+      "recentGames": "Recent Games",
+      "cheatSignals": "Cheat Signals",
+      "flaggedPlayers": "Flagged Players",
+      "noFlags": "No flagged players above threshold"
+    },
+    "content": {
+      "pendingWords": "Pending Review",
+      "approvedWords": "Approved",
+      "topReported": "Top Reported Words (Dictionary Gaps)",
+      "noReports": "No reported words"
     },
     "invalidWords": {
       "title": "Invalid Words Review",

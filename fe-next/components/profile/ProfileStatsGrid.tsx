@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Gamepad2, Trophy, Star, Clock } from 'lucide-react';
+import { Trophy, Star, Clock } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { formatTimePlayed } from '@/constants/achievementIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,43 +17,49 @@ interface ProfileStatsGridProps {
 export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileStatsGridProps): React.ReactNode {
   const { t } = useLanguage();
 
+  const totalScore = profile?.total_score || 0;
+  const totalWins = (profile?.ranked_wins || 0) + (profile?.casual_wins || 0);
+  const totalWords = profile?.total_words || 0;
+  const totalTime = profile?.total_time_played || 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4"
+      className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4"
     >
       <StatCard
-        icon={<Gamepad2 />}
-        label={t('profile.totalGames')}
-        value={profile?.total_games || 0}
+        icon={<Star />}
+        label={t('profile.totalScore')}
+        value={totalScore.toLocaleString()}
         isDarkMode={isDarkMode}
+        color="cyan"
+        progress={Math.min(100, (totalScore / 1000000) * 100)}
       />
       <StatCard
         icon={<Trophy />}
         label={t('profile.wins')}
-        value={(profile?.ranked_wins || 0) + (profile?.casual_wins || 0)}
+        value={totalWins}
         isDarkMode={isDarkMode}
-      />
-      <StatCard
-        icon={<Star />}
-        label={t('profile.totalScore')}
-        value={(profile?.total_score || 0).toLocaleString()}
-        isDarkMode={isDarkMode}
-        highlight
+        color="pink"
+        progress={Math.min(100, (totalWins / 500) * 100)}
       />
       <StatCard
         icon={<span className="text-lg">📝</span>}
         label={t('profile.wordsFound')}
-        value={profile?.total_words || 0}
+        value={(totalWords).toLocaleString()}
         isDarkMode={isDarkMode}
+        color="lime"
+        progress={Math.min(100, (totalWords / 50000) * 100)}
       />
       <StatCard
         icon={<Clock />}
         label={t('profile.timePlayed')}
-        value={formatTimePlayed(profile?.total_time_played)}
+        value={formatTimePlayed(totalTime)}
         isDarkMode={isDarkMode}
+        color="purple"
+        progress={Math.min(100, (totalTime / 500) * 100)}
       />
     </motion.div>
   );

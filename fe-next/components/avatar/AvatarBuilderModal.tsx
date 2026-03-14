@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { X, Shuffle, Undo2, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
@@ -117,11 +117,27 @@ export default function AvatarBuilderModal({
     onClose();
   }, [config, onSave, onClose]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" role="presentation" onClick={onClose}>
       <AdaptiveMotion.div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="avatar-builder-title"
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
@@ -130,7 +146,7 @@ export default function AvatarBuilderModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b-3 border-black">
-          <h2 className="font-neo-display text-neo-white text-xl font-bold">
+          <h2 id="avatar-builder-title" className="font-neo-display text-neo-white text-xl font-bold">
             {t('avatar.builder.title')}
           </h2>
           <button onClick={onClose} className="text-neo-white/60 hover:text-neo-white p-1 transition-colors" aria-label={t('common.close')}>

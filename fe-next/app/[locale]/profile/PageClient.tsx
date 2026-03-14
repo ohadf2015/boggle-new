@@ -358,37 +358,37 @@ export default function ProfilePageClient(): React.JSX.Element {
         <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
         <AutoHideHeader />
 
-        {/* Reduced padding for desktop view */}
-        <div className={cn('flex-1 max-w-6xl mx-auto px-4 lg:px-6 w-full', isLandscape ? 'py-2' : 'py-3 lg:py-4')}>
-          {/* Two-column layout on larger screens */}
-          {/* Reduced gap: mobile 12px, lg 16px (was 16/24px) */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 lg:gap-4">
-            {/* Left Column: Identity & Progress */}
-            <div className="space-y-3">
-              <ProfileHeader {...profileHeaderProps} />
-              <ProfileXpSection profile={profile} isDarkMode={isDarkMode} />
-              <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} />
-              {user && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.11 }}>
-                  <ReferralCard />
-                </motion.div>
-              )}
-            </div>
+        {/* Single column stacked layout */}
+        <div className={cn('flex-1 max-w-6xl mx-auto px-4 lg:px-6 w-full flex flex-col gap-6', isLandscape ? 'py-2' : 'py-6 lg:py-8')}>
+          {/* 1. Hero Banner */}
+          <ProfileHeader {...profileHeaderProps} />
 
-            {/* Right Column: Stats & Achievements */}
-            <div className="space-y-3">
-              <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} delay={0.15} />
-              <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />
-              <ProfileAchievements profile={profile} isDarkMode={isDarkMode} />
-            </div>
+          {/* 2. Stats Grid */}
+          <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} delay={0.1} />
+
+          {/* 3. XP + Coins side by side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ProfileXpSection profile={profile} isDarkMode={isDarkMode} delay={0.15} />
+            <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} delay={0.18} />
           </div>
 
-          {/* Full-width sections below */}
-          {/* Reduced margin: 12px (was 16px) */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-3">
-            <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} />
-          </motion.div>
+          {/* 4. Ranked Progress */}
+          <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} delay={0.2} />
 
+          {/* 5. Referral */}
+          {user && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+              <ReferralCard />
+            </motion.div>
+          )}
+
+          {/* 6. Achievements */}
+          <ProfileAchievements profile={profile} isDarkMode={isDarkMode} delay={0.3} />
+
+          {/* 7. Collection */}
+          <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} delay={0.35} />
+
+          {/* 8. Settings & Navigation */}
           {user && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
               <EmailPreferences isDarkMode={isDarkMode} />

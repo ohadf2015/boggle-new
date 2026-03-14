@@ -1,0 +1,79 @@
+'use client';
+
+import { useRouter, usePathname } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import {
+  LayoutDashboard,
+  BarChart3,
+  ShieldAlert,
+  BookOpen,
+  Users,
+  Settings,
+} from 'lucide-react';
+
+interface AdminBottomNavProps {
+  moderationCount?: number;
+}
+
+/**
+ * Mobile bottom tab bar for admin pages.
+ * Mirrors AdminSidebar sections as compact bottom tabs.
+ */
+export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { t, language } = useLanguage();
+
+  const basePath = `/${language}/admin`;
+
+  const tabs = [
+    { key: 'overview', icon: LayoutDashboard, label: t('admin.sidebar.overview'), path: '' },
+    { key: 'analytics', icon: BarChart3, label: t('admin.sidebar.analytics'), path: '/analytics' },
+    { key: 'moderation', icon: ShieldAlert, label: t('admin.sidebar.moderation'), path: '/moderation', badge: moderationCount },
+    { key: 'content', icon: BookOpen, label: t('admin.sidebar.content'), path: '/content' },
+    { key: 'players', icon: Users, label: t('admin.sidebar.players'), path: '/players' },
+    { key: 'system', icon: Settings, label: t('admin.sidebar.system'), path: '/system' },
+  ];
+
+  function isActive(path: string): boolean {
+    const fullPath = `${basePath}${path}`;
+    if (path === '') return pathname === basePath || pathname === `${basePath}/`;
+    return pathname.startsWith(fullPath);
+  }
+
+  return (
+    <nav
+      className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-slate-900 border-t border-slate-700/50 safe-area-pb"
+      aria-label="Admin navigation"
+    >
+      <div className="flex justify-around">
+        {tabs.map((tab) => {
+          const active = isActive(tab.path);
+          const Icon = tab.icon;
+
+          return (
+            <button
+              key={tab.key}
+              onClick={() => router.push(`${basePath}${tab.path}`)}
+              className={cn(
+                'flex flex-col items-center gap-0.5 py-2 px-1 flex-1 text-xs transition-colors',
+                active ? 'text-neo-lime' : 'text-slate-500'
+              )}
+            >
+              <div className="relative">
+                <Icon className="w-5 h-5" />
+                {tab.badge && tab.badge > 0 ? (
+                  <span className="absolute -top-1 -end-1.5 bg-neo-pink text-neo-white text-[10px] font-bold px-1 rounded-full min-w-[14px] text-center leading-tight">
+                    {tab.badge > 99 ? '99+' : tab.badge}
+                  </span>
+                ) : null}
+              </div>
+              <span className="truncate max-w-[56px]">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}

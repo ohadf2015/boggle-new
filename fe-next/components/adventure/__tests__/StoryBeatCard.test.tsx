@@ -1,0 +1,104 @@
+/**
+ * StoryBeatCard Component Tests
+ */
+
+import React from 'react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { StoryBeatCard } from '../StoryBeatCard';
+
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const map: Record<string, string> = {
+        'adventure.story.w1.lexi': 'Lexi',
+        'adventure.story.w1.after2': 'Welcome to the word realm!',
+        'adventure.continue': 'Continue',
+      };
+      return map[key] || key;
+    },
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
+jest.mock('framer-motion', () => {
+  const components = {
+    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
+      <div ref={ref} data-testid={props['data-testid']} className={props.className} onClick={props.onClick}>
+        {children}
+      </div>
+    )),
+    span: React.forwardRef(({ children, ...props }: any, ref: any) => (
+      <span ref={ref} data-testid={props['data-testid']} className={props.className}>
+        {children}
+      </span>
+    )),
+    button: React.forwardRef(({ children, ...props }: any, ref: any) => (
+      <button ref={ref} data-testid={props['data-testid']} className={props.className} onClick={props.onClick}>
+        {children}
+      </button>
+    )),
+  };
+  return {
+    motion: components,
+    m: components,
+    AnimatePresence: ({ children }: any) => <>{children}</>,
+  };
+});
+
+describe('StoryBeatCard', () => {
+  const defaultProps = {
+    worldId: 1,
+    levelNumber: 2,
+    characterName: 'Lexi',
+    dialogueKey: 'adventure.story.w1.after2',
+    isVisible: true,
+    onContinue: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => jest.useRealTimers());
+
+  it('renders when visible', () => {
+    render(<StoryBeatCard {...defaultProps} />);
+    expect(screen.getByText('Lexi')).toBeInTheDocument();
+  });
+
+  it('does not render when not visible', () => {
+    const { container } = render(<StoryBeatCard {...defaultProps} isVisible={false} />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('shows character name', () => {
+    render(<StoryBeatCard {...defaultProps} />);
+    expect(screen.getByText('Lexi')).toBeInTheDocument();
+  });
+
+  it('reveals dialogue text with typewriter effect', () => {
+    render(<StoryBeatCard {...defaultProps} />);
+    // Initially partial text
+    const dialogueText = 'Welcome to the word realm!';
+    // After enough ticks, full text should appear
+    act(() => { jest.runAllTimers(); });
+    expect(screen.getByText(dialogueText)).toBeInTheDocument();
+  });
+
+  it('shows continue button after text completes', () => {
+    render(<StoryBeatCard {...defaultProps} />);
+    const dialogueText = 'Welcome to the word realm!';
+    act(() => { jest.runAllTimers(); });
+    expect(screen.getByText('Continue')).toBeInTheDocument();
+  });
+
+  it('calls onContinue when continue clicked', () => {
+    render(<StoryBeatCard {...defaultProps} />);
+    const dialogueText = 'Welcome to the word realm!';
+    act(() => { jest.runAllTimers(); });
+    fireEvent.click(screen.getByText('Continue'));
+    expect(defaultProps.onContinue).toHaveBeenCalledTimes(1);
+  });
+});

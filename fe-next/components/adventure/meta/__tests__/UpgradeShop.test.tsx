@@ -18,6 +18,14 @@ jest.mock('../../../../contexts/LanguageContext', () => ({
 }));
 
 jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, layout, initial, animate, exit, ...props }: any) => (
+      <div {...props}>{children}</div>
+    ),
+    button: ({ children, whileHover, whileTap, ...props }: any) => (
+      <button {...props}>{children}</button>
+    ),
+  },
   m: {
     div: ({ children, layout, initial, animate, exit, ...props }: any) => (
       <div {...props}>{children}</div>

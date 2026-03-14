@@ -29,62 +29,38 @@ export function ProfileRankedProgress({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={cn(
-        'rounded-2xl p-4 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
-      )}
+      className="rounded-3xl p-6 mb-4 bg-slate-800/80 border-3 border-neo-pink shadow-hard-pink"
     >
-      <h2 className={cn(
-        'text-base font-bold mb-3 flex items-center gap-2',
-        isDarkMode ? 'text-white' : 'text-gray-900'
-      )}>
-        <Trophy className="text-yellow-500" />
+      <h2 className="text-xl font-black font-neo-display uppercase mb-4 flex items-center gap-2 text-white">
+        <Trophy className="text-neo-yellow" />
         {t('ranked.title')}
       </h2>
 
       {canPlayRanked ? (
-        <div className={cn(
-          'flex items-center gap-3 p-3 rounded-xl',
-          isDarkMode ? 'bg-green-900/20 border border-green-500/30' : 'bg-green-50 border border-green-200'
-        )}>
-          <span className="text-2xl">🏆</span>
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-green-900/30 border-3 border-green-500/50">
+          <span className="text-3xl">🏆</span>
           <div>
-            <p className={cn(
-              'font-semibold',
-              isDarkMode ? 'text-green-400' : 'text-green-700'
-            )}>
+            <p className="font-black text-green-400 uppercase">
               {t('ranked.unlocked')}
             </p>
-            <p className={cn(
-              'text-sm',
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-            )}>
-              MMR: {profile?.ranked_mmr || 1000}
+            <p className="text-sm text-gray-400">
+              MMR: <span className="font-black text-neo-cyan">{profile?.ranked_mmr || 1000}</span>
             </p>
           </div>
         </div>
       ) : (
         <div>
           <div className="flex justify-between mb-2">
-            <span className={cn(
-              'text-sm',
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-            )}>
+            <span className="text-sm text-gray-400">
               {t('ranked.unlockProgress', { current: profile?.casual_games || 0, required: 10 })}
             </span>
-            <span className={cn(
-              'text-sm font-medium',
-              isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
-            )}>
-              {gamesUntilRanked} to go
+            <span className="text-sm font-black text-neo-pink">
+              {gamesUntilRanked} {t('ranked.toGo')}
             </span>
           </div>
-          <div className={cn(
-            'h-3 rounded-full overflow-hidden',
-            isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-          )}>
+          <div className="h-3 rounded-full overflow-hidden bg-black border-3 border-neo-black">
             <div
-              className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-neo-pink to-neo-cyan transition-all duration-500"
               style={{ width: `${Math.min(100, ((profile?.casual_games || 0) / 10) * 100)}%` }}
             />
           </div>

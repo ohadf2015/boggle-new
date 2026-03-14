@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, Edit, Check, Globe } from 'lucide-react';
+import { X, Edit, Check, Globe, Sparkles, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -12,9 +12,13 @@ import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { CountrySelector } from '@/components/settings/CountrySelector';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import LevelBadge from '@/components/LevelBadge';
+import { getLevelFromXp } from '@/components/XpProgressBar';
 import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getCreatorStats } from '@/utils/creatorRewards';
+import CreatorProfileStats from '@/components/ugc/CreatorProfileStats';
 
 interface ProfileHeaderProps {
   profile: ProfileData | null;
@@ -38,6 +42,7 @@ export function ProfileHeader({
   refreshProfile
 }: ProfileHeaderProps): React.ReactNode {
   const { t } = useLanguage();
+  const creatorStats = getCreatorStats();
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [editDisplayName, setEditDisplayName] = useState('');
@@ -56,14 +61,11 @@ export function ProfileHeader({
       toast.error(t('validation.usernameTooShort'));
       return;
     }
-
     if (editDisplayName.trim().length > 20) {
       toast.error(t('validation.usernameTooLong'));
       return;
     }
-
     setIsSaving(true);
-
     try {
       await updateProfile({ display_name: editDisplayName.trim() });
       await refreshProfile();
@@ -91,7 +93,6 @@ export function ProfileHeader({
 
   const handleCountryChange = useCallback(async (countryCode: string | null): Promise<void> => {
     setIsSavingCountry(true);
-
     try {
       await updateProfile({ country_code: countryCode });
       await refreshProfile();
@@ -105,94 +106,84 @@ export function ProfileHeader({
     }
   }, [updateProfile, refreshProfile, t]);
 
+  const level = getLevelFromXp(profile?.total_xp || 0);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'rounded-2xl mb-4',
-        compact ? 'p-3' : 'p-6',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        'relative bg-neo-navy/60 border-3 border-neo-cream/20 rounded-neo-lg shadow-hard-lg overflow-hidden mb-4',
+        compact ? 'p-4' : 'p-8'
       )}
     >
-      <div className={cn('flex', compact ? 'flex-col gap-3 items-center' : 'flex-row gap-6 items-center')}>
+      {/* Sparkle decorations */}
+      <Sparkles className="absolute top-4 end-16 w-5 h-5 text-white/20 animate-pulse" aria-hidden="true" />
+      <Sparkles className="absolute bottom-6 start-4 w-4 h-4 text-white/15 animate-pulse" aria-hidden="true" />
+
+      {/* Level badge — top-right */}
+      {!compact && (
+        <div className="absolute top-4 end-4 bg-neo-yellow rounded-xl border-3 border-neo-black shadow-hard px-3 py-1.5 -rotate-6">
+          <span className="text-2xl font-black text-neo-black leading-none">{level}</span>
+          <span className="block text-[9px] font-bold uppercase tracking-wider text-neo-black/70">{t('xp.level')}</span>
+        </div>
+      )}
+
+      <div className={cn('flex', compact ? 'flex-row gap-3 items-center' : 'flex-row gap-6 items-center')}>
         {/* Avatar with edit controls */}
-        <div className={cn('flex items-center', compact ? 'flex-row gap-3' : 'flex-row gap-4')}>
-          {/* Avatar */}
-          <div className="flex-shrink-0">
+        <div className="relative flex-shrink-0">
+          <div className={cn(
+            'rounded-full border-3 border-neo-yellow shadow-hard-yellow overflow-hidden',
+            compact ? 'w-20 h-20' : 'w-32 h-32'
+          )}>
             <Avatar
               customAvatar={profile?.avatar_config ?? undefined}
               profilePictureUrl={profile?.profile_picture_url ?? undefined}
               avatarImage={profile?.avatar_image ?? undefined}
               size={compact ? 'lg' : 'xl'}
-              className="shadow-lg"
+              className="w-full h-full"
             />
           </div>
 
-          {/* Avatar Controls */}
-          <div className={cn(
-            'flex gap-2',
-            compact ? 'flex-col' : 'flex-col'
-          )}>
-            {/* Edit avatar button — opens builder */}
-            <button
-              onClick={() => setIsAvatarBuilderOpen(true)}
-              className={cn(
-                'rounded-full flex items-center justify-center shadow-md transition-colors',
-                'min-w-[44px] min-h-[44px] w-11 h-11',
-                'border-2',
-                isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500 border-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 border-gray-300'
-              )}
-              title={t('profile.chooseAvatar')}
-              aria-label={t('profile.chooseAvatar')}
-            >
-              <Edit size={20} />
-            </button>
-
-            {/* Upload photo button */}
-            <label
-              className={cn(
-                'rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors',
-                'min-w-[44px] min-h-[44px] w-11 h-11',
-                isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-white text-gray-600 hover:bg-gray-100',
-                'border-2',
-                isDarkMode ? 'border-slate-600' : 'border-gray-200'
-              )}
-              title={t('profile.uploadPhoto')}
-              aria-label={t('profile.uploadPhoto')}
-            >
-              {isUploading ? (
-                <Loader size="sm" />
-              ) : (
-                <span className="text-sm">📷</span>
-              )}
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={onProfilePictureUpload}
-                className="hidden"
-                disabled={isUploading}
-                aria-label={t('profile.uploadPhoto')}
-              />
-            </label>
-
-            {/* Remove profile picture button */}
-            {profile?.profile_picture_url && (
-              <button
-                onClick={onRemoveProfilePicture}
-                className={cn(
-                  'rounded-full flex items-center justify-center shadow-md transition-colors',
-                  'min-w-[44px] min-h-[44px] w-11 h-11',
-                  'border-2 border-red-600',
-                  isDarkMode ? 'bg-red-600 text-white hover:bg-red-500' : 'bg-red-500 text-white hover:bg-red-400'
-                )}
-                title={t('profile.removePhoto')}
-                aria-label={t('profile.removePhoto')}
-              >
-                <X size={20} />
-              </button>
+          {/* Edit avatar button — bottom-right */}
+          <button
+            onClick={() => setIsAvatarBuilderOpen(true)}
+            className={cn(
+              'absolute -bottom-1 -end-1 bg-neo-pink rounded-full border-3 border-neo-black shadow-hard',
+              'flex items-center justify-center transition-transform hover:scale-110',
+              compact ? 'w-8 h-8' : 'w-12 h-12'
             )}
-          </div>
+            title={t('profile.chooseAvatar')}
+            aria-label={t('profile.chooseAvatar')}
+          >
+            <Edit size={compact ? 14 : 20} className="text-white" />
+          </button>
+
+          {/* Upload photo — small icon */}
+          <label
+            className={cn(
+              'absolute -bottom-1 cursor-pointer transition-transform hover:scale-110',
+              compact ? '-start-1 w-7 h-7' : 'start-6 w-9 h-9',
+              'bg-slate-700 rounded-full border-2 border-slate-500 shadow-hard-sm',
+              'flex items-center justify-center'
+            )}
+            title={t('profile.uploadPhoto')}
+            aria-label={t('profile.uploadPhoto')}
+          >
+            {isUploading ? (
+              <Loader size="sm" />
+            ) : (
+              <Camera size={compact ? 12 : 16} className="text-gray-300" />
+            )}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={onProfilePictureUpload}
+              className="hidden"
+              disabled={isUploading}
+              aria-label={t('profile.uploadPhoto')}
+            />
+          </label>
         </div>
 
         {/* User Info */}
@@ -202,12 +193,9 @@ export function ProfileHeader({
               <Input
                 value={editDisplayName}
                 onChange={(e) => setEditDisplayName(e.target.value)}
-                className={cn(
-                  'h-10 text-lg font-bold',
-                  isDarkMode ? 'bg-slate-700 border-slate-600' : 'bg-gray-50 border-gray-300'
-                )}
+                className="h-10 text-lg font-bold bg-slate-700 border-slate-600"
                 maxLength={20}
-                autoFocus
+                
               />
               <Button
                 size="sm"
@@ -221,41 +209,38 @@ export function ProfileHeader({
                 size="sm"
                 variant="outline"
                 onClick={() => setIsEditingName(false)}
-                className={isDarkMode ? 'border-slate-600' : ''}
+                className="border-slate-600"
               >
                 <X />
               </Button>
             </div>
           ) : (
             <h1 className={cn(
-              'font-bold flex items-center gap-2 truncate',
-              compact ? 'text-lg' : 'text-2xl',
-              isDarkMode ? 'text-white' : 'text-gray-900'
+              'font-black font-neo-display uppercase tracking-tight text-white flex items-center gap-2 truncate',
+              compact ? 'text-xl' : 'text-4xl md:text-5xl'
             )}>
               <span className="truncate">{profile?.display_name || profile?.username || 'Player'}</span>
               <button
                 onClick={startEditingName}
-                className={cn(
-                  'p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0',
-                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                )}
+                className="p-1 rounded hover:bg-slate-700 transition-colors flex-shrink-0 text-gray-400"
                 title={t('profile.editName')}
               >
-                <Edit size={compact ? 12 : 14} />
+                <Edit size={compact ? 12 : 16} />
               </button>
             </h1>
           )}
-          <p className={cn(
-            'text-sm truncate',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            {t('profile.memberSince')} {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
-          </p>
 
-          {/* Country Display/Edit */}
-          <div className="mt-2">
+          {/* Compact level badge inline */}
+          {compact && (
+            <div className="inline-flex items-center mt-1">
+              <LevelBadge level={level} size="sm" showLabel />
+            </div>
+          )}
+
+          {/* Country + join date pills */}
+          <div className={cn('flex flex-wrap items-center gap-2', compact ? 'mt-1' : 'mt-3')}>
             {isEditingCountry ? (
-              <div className={cn('max-w-[200px]', compact && 'max-w-[160px]')}>
+              <div className="max-w-[200px]">
                 <CountrySelector
                   value={profile?.country_code}
                   onChange={handleCountryChange}
@@ -264,10 +249,7 @@ export function ProfileHeader({
                 />
                 <button
                   onClick={() => setIsEditingCountry(false)}
-                  className={cn(
-                    'mt-1 text-xs',
-                    isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-500 hover:text-gray-600'
-                  )}
+                  className="mt-1 text-xs text-gray-500 hover:text-gray-400"
                 >
                   {t('common.cancel')}
                 </button>
@@ -275,10 +257,7 @@ export function ProfileHeader({
             ) : (
               <button
                 onClick={() => setIsEditingCountry(true)}
-                className={cn(
-                  'flex items-center gap-1.5 text-sm transition-colors',
-                  isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-500 hover:text-gray-600'
-                )}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-700/60 text-sm text-gray-300 hover:bg-slate-600/60 transition-colors"
                 title={t('profile.changeCountry')}
               >
                 {profile?.country_code ? (
@@ -295,9 +274,31 @@ export function ProfileHeader({
                 <Edit className="w-3 h-3 opacity-60" />
               </button>
             )}
+
+            <span className="px-3 py-1 rounded-full bg-slate-700/60 text-sm text-gray-400">
+              {t('profile.memberSince')} {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
+            </span>
           </div>
+
+          {/* Remove profile picture */}
+          {!compact && profile?.profile_picture_url && (
+            <button
+              onClick={onRemoveProfilePicture}
+              className="mt-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+              title={t('profile.removePhoto')}
+              aria-label={t('profile.removePhoto')}
+            >
+              <X size={12} className="inline me-1" />
+              {t('profile.removePhoto')}
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Creator Stats */}
+      {creatorStats.boardsCreated > 0 && (
+        <CreatorProfileStats stats={creatorStats} className="mt-4" />
+      )}
 
       {/* Avatar Builder Modal */}
       <AvatarBuilderModal

@@ -22,6 +22,7 @@ export function ProfileXpSection({
   delay = 0.05
 }: ProfileXpSectionProps): React.ReactNode {
   const { t } = useLanguage();
+  const level = getLevelFromXp(profile?.total_xp || 0);
 
   return (
     <motion.div
@@ -29,25 +30,25 @@ export function ProfileXpSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
       className={cn(
-        'rounded-2xl mb-4',
-        compact ? 'p-3' : 'p-4 sm:p-6',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        'rounded-3xl mb-4 border-3 border-neo-cyan shadow-hard-cyan',
+        compact ? 'p-4' : 'p-6',
+        'bg-slate-800/80'
       )}
     >
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-4">
         <h2 className={cn(
-          'font-bold flex items-center gap-2',
+          'font-black font-neo-display uppercase flex items-center gap-2',
           compact ? 'text-lg' : 'text-xl',
-          isDarkMode ? 'text-white' : 'text-gray-900'
+          'text-white'
         )}>
-          <span className={compact ? 'text-xl' : 'text-2xl'}>⚡</span>
+          <span className="text-neo-cyan">⚡</span>
           {t('xp.title')}
         </h2>
-        <LevelBadge
-          level={getLevelFromXp(profile?.total_xp || 0)}
-          size={compact ? 'md' : 'lg'}
-          showLabel
-        />
+        <div className="bg-neo-yellow rounded-lg border-3 border-neo-black shadow-hard-sm px-3 py-1 rotate-2">
+          <span className="text-sm font-black text-neo-black">
+            {t('xp.level')} {level}
+          </span>
+        </div>
       </div>
 
       <XpProgressBar
@@ -55,20 +56,14 @@ export function ProfileXpSection({
         showNumbers
       />
 
-      {!compact && (profile?.current_level ?? 0) >= 5 && (
-        <div className={cn(
-          'mt-4 pt-4 border-t',
-          isDarkMode ? 'border-slate-700' : 'border-gray-200'
-        )}>
-          <p className={cn(
-            'text-sm font-medium',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            {t('xp.totalXpEarned')}: <span className={cn(
-              'font-bold',
-              isDarkMode ? 'text-neo-cyan' : 'text-neo-pink'
-            )}>{(profile?.total_xp || 0).toLocaleString()}</span>
-          </p>
+      {!compact && (
+        <div className="mt-4 p-3 bg-black/40 rounded-xl border-3 border-neo-black flex justify-between items-center">
+          <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+            {t('xp.totalXpEarned')}
+          </span>
+          <span className="text-lg font-black text-neo-cyan">
+            {(profile?.total_xp || 0).toLocaleString()}
+          </span>
         </div>
       )}
     </motion.div>

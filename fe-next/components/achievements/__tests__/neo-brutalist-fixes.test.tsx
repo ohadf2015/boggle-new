@@ -1,0 +1,211 @@
+/**
+ * Tests for neo-brutalist design fixes across achievement components
+ * and GuestBrainScorePreview.
+ *
+ * Validates:
+ * 1. AchievementQueue inline toast uses shadow-hard-yellow class (no inline boxShadow)
+ * 2. AchievementQueue inline toast has no backdrop-blur
+ * 3. AchievementToast uses shadow-hard-yellow class (no inline boxShadow with tier border)
+ * 4. AchievementToast achievement name uses neo-lime token class
+ * 5. AchievementDock uses border-3 (not border-4)
+ * 6. AchievementPopup uses end-4 logical property
+ * 7. GuestBrainScorePreview has no backdrop-blur, uses neo tokens
+ */
+
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+
+// Mock framer-motion
+jest.mock('framer-motion', () => {
+  const actual = jest.requireActual('framer-motion');
+  return {
+    ...actual,
+    m: new Proxy({}, {
+      get: (_target: unknown, prop: string) => {
+        return React.forwardRef(function MotionComponent(props: Record<string, unknown>, ref: React.Ref<HTMLElement>) {
+          const { children, initial: _i, animate: _a, exit: _e, transition: _t, whileHover: _wh, whileTap: _wt, ...rest } = props;
+          const Tag = prop as keyof JSX.IntrinsicElements;
+          return React.createElement(Tag, { ...rest, ref } as React.HTMLAttributes<HTMLElement>, children as React.ReactNode);
+        });
+      },
+    }),
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  };
+});
+
+// Mock react-dom createPortal to render in place
+jest.mock('react-dom', () => ({
+  ...jest.requireActual('react-dom'),
+  createPortal: (node: React.ReactNode) => node,
+}));
+
+// Mock contexts
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, dir: 'ltr', language: 'en' }),
+}));
+
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({ playAchievementSound: jest.fn() }),
+}));
+
+jest.mock('@/utils/confettiUtils', () => ({ fireConfetti: jest.fn() }));
+jest.mock('@/utils/ogShare', () => ({
+  getAchievementShareUrl: jest.fn(),
+  shareWithOgImage: jest.fn(),
+}));
+jest.mock('@/components/GoogleAnalytics', () => ({
+  gameEvents: { achievementUnlock: jest.fn(), share: jest.fn() },
+}));
+jest.mock('@/components/ui/Mascot', () => ({
+  Mascot: () => <div data-testid="mascot" />,
+}));
+jest.mock('@/components/CrazyGamesSDK', () => ({
+  shouldHideExternalLogin: () => false,
+}));
+jest.mock('@/lib/supabase', () => ({
+  signInWithGoogle: jest.fn(),
+  signInWithDiscord: jest.fn(),
+}));
+jest.mock('@/constants/achievementIcons', () => ({
+  getAchievementIcon: () => '🏆',
+}));
+jest.mock('../AchievementIcon', () => ({
+  AchievementIcon: ({ achievementKey }: { achievementKey: string }) => <span data-testid="achievement-icon">{achievementKey}</span>,
+}));
+jest.mock('@/utils/achievementTiers', () => ({
+  calculateTier: () => 'BRONZE',
+  TIER_COLORS: {
+    BRONZE: { bg: '#CD7F32', border: '#8B5A2B', text: '#000000', glow: '' },
+    SILVER: { bg: '#C0C0C0', border: '#808080', text: '#000000', glow: '' },
+    GOLD: { bg: '#FFD700', border: '#DAA520', text: '#000000', glow: '' },
+    PLATINUM: { bg: '#E5E4E2', border: '#B0B0B0', text: '#000000', glow: '' },
+  },
+  TIER_ICONS: { BRONZE: '🥉', SILVER: '🥈', GOLD: '🥇', PLATINUM: '💎' },
+}));
+
+// Mock tooltip
+jest.mock('@/components/ui/tooltip', () => ({
+  Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  TooltipContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  TooltipTrigger: React.forwardRef(({ children }: { children: React.ReactNode }, _ref: React.Ref<HTMLElement>) => <>{children}</>),
+}));
+
+// ---- Tests ----
+
+describe('AchievementQueue inline toast - neo-brutalist fixes', () => {
+  it('uses shadow-hard-yellow class instead of inline boxShadow', async () => {
+    // We need to render AchievementQueueProvider and trigger an achievement
+    const { AchievementQueueProvider, useAchievementQueue } = await import('../AchievementQueue');
+
+    function Trigger() {
+      const { queueAchievement } = useAchievementQueue();
+      React.useEffect(() => {
+        queueAchievement({ key: 'test-ach', icon: '🏆' });
+      }, [queueAchievement]);
+      return null;
+    }
+
+    render(
+      <AchievementQueueProvider>
+        <Trigger />
+      </AchievementQueueProvider>
+    );
+
+    // Wait for the toast to appear
+    await screen.findByTestId('achievement-inline-toast');
+    const toastContainer = screen.getByTestId('achievement-inline-toast');
+
+    // Find the inner div with the shadow
+    const innerDiv = toastContainer.querySelector('.shadow-hard-yellow');
+    expect(innerDiv).toBeTruthy();
+
+    // Should NOT have inline boxShadow with #FFE135
+    const allDivs = toastContainer.querySelectorAll('div');
+    allDivs.forEach((div) => {
+      expect(div.style.boxShadow).not.toContain('#FFE135');
+    });
+  });
+
+  it('has no backdrop-blur class', async () => {
+    const { AchievementQueueProvider, useAchievementQueue } = await import('../AchievementQueue');
+
+    function Trigger() {
+      const { queueAchievement } = useAchievementQueue();
+      React.useEffect(() => {
+        queueAchievement({ key: 'test-ach2', icon: '🏆' });
+      }, [queueAchievement]);
+      return null;
+    }
+
+    render(
+      <AchievementQueueProvider>
+        <Trigger />
+      </AchievementQueueProvider>
+    );
+
+    await screen.findByTestId('achievement-inline-toast');
+    const toast = screen.getByTestId('achievement-inline-toast');
+    expect(toast.innerHTML).not.toContain('backdrop-blur');
+  });
+});
+
+describe('AchievementDock - neo-brutalist fixes', () => {
+  it('uses border-3 not border-4 on trophy button', async () => {
+    const { default: AchievementDock } = await import('../AchievementDock');
+
+    const { container } = render(
+      <AchievementDock achievements={[{ key: 'test', icon: '🏆' }]} />
+    );
+
+    // The trophy button should have border-3
+    const button = container.querySelector('button');
+    expect(button?.className).toContain('border-3');
+    expect(button?.className).not.toContain('border-4');
+  });
+});
+
+describe('AchievementPopup - logical property fix', () => {
+  it('uses end-4 instead of ltr:right-4 rtl:left-4', async () => {
+    const { default: AchievementPopup } = await import('../AchievementPopup');
+
+    const { container } = render(
+      <AchievementPopup achievement={{ key: 'test', icon: '🏆' }} />
+    );
+
+    // The outer positioned div should use end-4
+    const fixedDiv = container.querySelector('.end-4');
+    expect(fixedDiv).toBeTruthy();
+
+    // Should NOT have ltr:right-4 or rtl:left-4
+    const allElements = container.querySelectorAll('*');
+    allElements.forEach((el) => {
+      expect(el.className).not.toContain('ltr:right-4');
+      expect(el.className).not.toContain('rtl:left-4');
+    });
+  });
+});
+
+describe('GuestBrainScorePreview - neo-brutalist fixes', () => {
+  it('has no backdrop-blur and uses neo tokens', async () => {
+    const { GuestBrainScorePreview } = await import('../../daily/results/GuestBrainScorePreview');
+
+    const { container } = render(
+      <GuestBrainScorePreview t={(k: string) => k} />
+    );
+
+    // No backdrop-blur anywhere
+    expect(container.innerHTML).not.toContain('backdrop-blur');
+
+    // No bg-white/30
+    expect(container.innerHTML).not.toContain('bg-white/30');
+
+    // Should have neo-cream token
+    expect(container.innerHTML).toContain('bg-neo-cream/30');
+
+    // Should use neo-purple tokens instead of purple-100/purple-800
+    expect(container.innerHTML).not.toContain('bg-purple-100');
+    expect(container.innerHTML).not.toContain('bg-purple-800/30');
+    expect(container.innerHTML).toContain('bg-neo-purple/20');
+  });
+});

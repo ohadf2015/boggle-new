@@ -150,12 +150,12 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 </div>
 
                 <div className="flex gap-2 mt-2">
-                  {nextRewards.map((reward, i) => (
+                  {nextRewards.map((reward, rewardIdx) => (
                     <motion.div
-                      key={i}
+                      key={reward.value}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 + i * 0.2 }}
+                      transition={{ delay: 0.5 + rewardIdx * 0.2 }}
                       className="text-3xl"
                     >
                       {reward.icon}
@@ -294,12 +294,12 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       </p>
 
                       <div className="grid gap-2">
-                        {nextRewards.map((reward, i) => (
+                        {nextRewards.map((reward, rewardIdx) => (
                           <motion.div
-                            key={i}
+                            key={reward.value}
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
+                            transition={{ delay: rewardIdx * 0.1 }}
                             className={cn(
                               'flex items-center gap-3 p-3 rounded-neo',
                               'bg-white/5 border-2',

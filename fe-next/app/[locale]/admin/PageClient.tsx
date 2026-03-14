@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Mail, Globe, AlertTriangle, Database, RefreshCw, BookCheck } from 'lucide-react';
+import { ArrowLeft, Shield, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -13,11 +12,16 @@ import { LiveMonitor } from '@/components/admin/LiveMonitor';
 import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
 import { GamesDiagnostic } from '@/components/admin/GamesDiagnostic';
 import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
+import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
+import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
 import { isMobileDevice } from '@/utils/mobileAccessibility';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useAdminDashboard } from '@/hooks/useAdminDashboard';
+import { KPICards } from '@/components/admin/overview/KPICards';
+import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 
 export default function AdminPageClient() {
   const router = useRouter();
@@ -25,19 +29,17 @@ export default function AdminPageClient() {
   const isRTL = language === 'he';
   const { user, profile, isAdmin, loading: authLoading } = useAuth();
 
-  // Use admin auth hook for automatic token management
   const { authToken, refreshToken, isLoading: tokenLoading, error: tokenError } = useAdminAuth();
+  const { stats, health } = useAdminDashboard(authToken);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check if mobile on mount
   useEffect(() => {
     setIsMobile(isMobileDevice());
   }, []);
 
-  // Still loading profile - wait before showing access denied
   const isProfileLoading = !authLoading && user && !profile;
 
-  // Not authenticated or not admin (but only check after profile has loaded)
+  // Access denied
   if (!authLoading && !isProfileLoading && (!user || !isAdmin)) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
@@ -46,9 +48,7 @@ export default function AdminPageClient() {
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">
             {t('admin.accessRequired')}
           </h1>
-          <p className="text-slate-400 mb-6">
-            {t('admin.accessDenied')}
-          </p>
+          <p className="text-slate-400 mb-6">{t('admin.accessDenied')}</p>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
             <ArrowLeft className="w-4 h-4 me-2" />
             {t('common.backToHome')}
@@ -58,34 +58,28 @@ export default function AdminPageClient() {
     );
   }
 
-  // Loading state - Show while checking auth/profile OR waiting for initial token
+  // Loading
   if (authLoading || isProfileLoading || tokenLoading) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
           <PageLoader size="lg" text={t('common.loading')} />
           {tokenLoading && !authLoading && (
-            <p className="text-slate-400 mt-4 text-sm">
-              {t('admin.loadingSession')}
-            </p>
+            <p className="text-slate-400 mt-4 text-sm">{t('admin.loadingSession')}</p>
           )}
         </div>
       </div>
     );
   }
 
-  // If token fetch failed after retries, show error
+  // Token error
   if (tokenError && !authToken) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-neo-display text-neo-white mb-2">
-            {t('admin.sessionError')}
-          </h1>
-          <p className="text-slate-400 mb-6 max-w-md">
-            {tokenError}
-          </p>
+          <h1 className="text-2xl font-neo-display text-neo-white mb-2">{t('admin.sessionError')}</h1>
+          <p className="text-slate-400 mb-6 max-w-md">{tokenError}</p>
           <Button onClick={() => window.location.reload()} variant="outline">
             <RefreshCw className="w-4 h-4 me-2" />
             {t('common.retry')}
@@ -95,183 +89,76 @@ export default function AdminPageClient() {
     );
   }
 
-  const content = (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
+  const mainContent = (
+    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden min-h-screen', isRTL && 'rtl')}>
       <Header />
 
-      <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
-        {/* Page Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={() => router.push(`/${language}`)}
-              variant="ghost"
-              size="sm"
-              className="text-slate-400 hover:text-neo-white"
-            >
-              <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
-              {t('common.back')}
-            </Button>
+      <div className="flex flex-1">
+        {/* Sidebar — hidden on mobile (bottom tabs used instead) */}
+        <AdminSidebar />
+
+        {/* Main content area */}
+        <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 pb-20 sm:pb-6">
+          {/* Page Header */}
+          <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-2xl font-neo-display text-neo-white">
                 {t('admin.dashboard')}
               </h1>
               <p className="text-sm text-slate-400">
-                {authToken ? (t('admin.live.subtitle')) : 'Loading...'}
+                {authToken ? t('admin.live.subtitle') : t('common.loading')}
               </p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
             <span className="text-sm text-slate-400">
-              <span className="hidden xs:inline">{t('admin.welcome')} </span>
               {profile?.display_name || profile?.username}
             </span>
           </div>
-        </div>
 
-        {/* Show navigation grid and content even if authToken is still loading */}
-        {/* Navigation Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/players`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.players')}</span>
-            </CardContent>
-          </Card>
+          {/* KPI Cards + System Health */}
+          <KPICards stats={stats} />
+          <SystemHealth health={health} />
 
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/dictionary`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.dictionary')}</span>
-            </CardContent>
-          </Card>
+          {/* Dashboard content */}
+          {authToken ? (
+            <>
+              <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
+              <TodayGamesHistory authToken={authToken} />
 
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/invalid-words`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.invalidWords')}</span>
-            </CardContent>
-          </Card>
+              <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
+                <GamesDiagnostic authToken={authToken} />
+              </div>
 
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/milog-words`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <BookCheck className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.milogWords')}</span>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/words`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.dailyChallenge')}</span>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/wikipedia-words`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-teal-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.wikipediaWords')}</span>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/word-bank`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Database className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.wordBank')}</span>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-            onClick={() => router.push(`/${language}/admin/web-vitals`)}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.webVitals')}</span>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors border-2 border-neo-pink/30"
-            onClick={() => {
-              const emailSection = document.getElementById('email-testing');
-              emailSection?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
-            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-neo-pink" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.email')}</span>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Live Monitor Component - show loading state if authToken not ready */}
-        {authToken ? (
-          <>
-            <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
-
-            {/* Today's Games History */}
-            <TodayGamesHistory authToken={authToken} />
-
-            {/* Database Diagnostic Tools */}
-            <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
-              <GamesDiagnostic authToken={authToken} />
+              <div id="email-testing" className="mt-8">
+                <EmailTestPanel
+                  authToken={authToken}
+                  userEmail={user?.email}
+                  userName={profile?.display_name || profile?.username}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="bg-slate-800/50 rounded-neo border-neo border-black p-12 text-center">
+              <Loader size="md" text={t('admin.loadingDashboard')} />
+              <p className="text-slate-400 mt-4 text-sm">{t('admin.preparingTools')}</p>
             </div>
-
-            {/* Email Testing Section */}
-            <div id="email-testing" className="mt-8">
-              <EmailTestPanel
-                authToken={authToken}
-                userEmail={user?.email}
-                userName={profile?.display_name || profile?.username}
-              />
-            </div>
-          </>
-        ) : (
-          <div className="bg-slate-800/50 rounded-neo border-neo border-black p-12 text-center">
-            <Loader size="md" text={t('admin.loadingDashboard')} />
-            <p className="text-slate-400 mt-4 text-sm">
-              {t('admin.preparingTools')}
-            </p>
-          </div>
-        )}
+          )}
+        </main>
       </div>
+
+      {/* Mobile bottom nav */}
+      <AdminBottomNav />
     </div>
   );
 
-  // Wrap with pull-to-refresh on mobile
   if (isMobile) {
     return (
       <PullToRefreshWrapper onRefresh={async () => {
-        // The LiveMonitor handles its own refresh
         await new Promise(resolve => setTimeout(resolve, 500));
       }}>
-        {content}
+        {mainContent}
       </PullToRefreshWrapper>
     );
   }
 
-  return content;
+  return mainContent;
 }

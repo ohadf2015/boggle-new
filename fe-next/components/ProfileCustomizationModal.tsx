@@ -133,8 +133,8 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                       ? 'border-neo-cyan shadow-hard-sm scale-105 ring-2 ring-neo-pink'
                       : 'border-neo-black shadow-hard-sm hover:shadow-hard-md'
                   )}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
+                  initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
                   transition={{ delay: 0.05 }}
                   whileHover={{ scale: isUsingProfilePicture ? 1.05 : 1.1 }}
                   whileTap={{ scale: 0.95 }}
@@ -143,6 +143,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                     src={profilePictureUrl}
                     alt="Your Profile"
                     fill
+                    sizes="48px"
                     className="object-cover"
                     referrerPolicy="no-referrer"
                   />
@@ -150,8 +151,8 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                   {/* Selected indicator */}
                   {isUsingProfilePicture && (
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center"
                     >
                       <div className="bg-neo-pink text-white border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-hard-sm">
@@ -183,8 +184,8 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                         ? 'border-neo-cyan shadow-hard-sm scale-105 ring-2 ring-neo-pink'
                         : 'border-neo-black shadow-hard-sm hover:shadow-hard-md'
                     )}
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
+                    initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
                     transition={{ delay: 0.05 + index * 0.015 }}
                     whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -193,14 +194,15 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                       src={getAvatarPath(avatar)}
                       alt={avatar.name}
                       fill
+                      sizes="48px"
                       className="object-cover"
                     />
 
                     {/* Selected indicator */}
                     {isSelected && (
                       <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
                         className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center"
                       >
                         <div className="bg-neo-pink text-white border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-hard-sm">
@@ -225,6 +227,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                       src={profilePictureUrl}
                       alt="Your Profile"
                       fill
+                      sizes="64px"
                       className="object-cover"
                       referrerPolicy="no-referrer"
                     />
@@ -233,6 +236,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                       src={getAvatarPath(selectedAvatar)}
                       alt={selectedAvatar.name}
                       fill
+                      sizes="64px"
                       className="object-cover"
                     />
                   )}
@@ -269,8 +273,8 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                   {/* Validation indicator */}
                   {displayName.length > 0 && (
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       className={cn(
                         'w-8 h-8 rounded-full border-2 flex items-center justify-center shadow-hard-sm shrink-0',
                         isNameValid

@@ -76,7 +76,7 @@ export default function FirstGameCelebration({
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {confettiValues.map((values, i) => (
               <motion.div
-                key={i}
+                key={`confetti-particle-${i}`}
                 className={cn(
                   'absolute w-2 h-2 rounded-full',
                   i % 5 === 0 ? 'bg-neo-lime' :
@@ -88,7 +88,7 @@ export default function FirstGameCelebration({
                 initial={{
                   x: '50vw',
                   y: '50vh',
-                  scale: 0,
+                  scale: 0.95,
                   rotate: 0
                 }}
                 animate={{

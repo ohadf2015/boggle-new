@@ -62,7 +62,7 @@ export interface DailyReadyScreenProps {
 // Component
 // ==========================================
 
-const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
+const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   puzzleNumber,
   puzzleDate,
   language,
@@ -128,9 +128,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
 
   // Calculate how many languages have been completed today
-  const completedLanguagesCount = useMemo(() => {
-    return LANGUAGE_OPTIONS.filter(option => hasPlayedWordHuntToday(option.code)).length;
-  }, []);
+  const completedLanguagesCount = LANGUAGE_OPTIONS.filter(option => hasPlayedWordHuntToday(option.code)).length;
 
   const formattedDate = useMemo(() => {
     try {
@@ -432,5 +430,11 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
     </motion.div>
   );
 };
+
+const DailyReadyScreen: React.FC<DailyReadyScreenProps> = (props) => (
+  <React.Suspense>
+    <DailyReadyScreenInner {...props} />
+  </React.Suspense>
+);
 
 export default DailyReadyScreen;

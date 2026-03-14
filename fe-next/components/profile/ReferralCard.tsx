@@ -133,8 +133,8 @@ export function ReferralCard() {
   if (loading) {
     return (
       <div className={cn(
-        'rounded-2xl p-6 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        'rounded-3xl p-6 mb-4',
+        'bg-slate-800/80 border-3 border-neo-pink shadow-hard-pink'
       )}>
         <div className="flex items-center justify-center py-6">
           <Loader size="md" />
@@ -146,8 +146,8 @@ export function ReferralCard() {
   if (error || !referralData) {
     return (
       <div className={cn(
-        'rounded-2xl p-6 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        'rounded-3xl p-6 mb-4',
+        'bg-slate-800/80 border-3 border-neo-pink shadow-hard-pink'
       )}>
         <p className="text-center text-red-500 text-sm">{error || 'Failed to load referral data'}</p>
       </div>
@@ -159,8 +159,8 @@ export function ReferralCard() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'rounded-2xl p-4 sm:p-6 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        'rounded-3xl p-4 sm:p-6 mb-4',
+        'bg-slate-800/80 border-3 border-neo-pink shadow-hard-pink'
       )}
     >
       {/* Header */}
@@ -222,7 +222,7 @@ export function ReferralCard() {
             )}>
               {t('profile.yourReferralCode')}
             </div>
-            <code className="text-xl font-black text-neo-pink tracking-wider">
+            <code className="text-xl font-black text-neo-black bg-neo-lime px-3 py-1 rounded-lg border-3 border-neo-black shadow-hard-sm tracking-wider">
               {referralData.referralCode}
             </code>
           </div>

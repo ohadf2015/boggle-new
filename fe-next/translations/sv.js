@@ -2705,7 +2705,24 @@ const sv = {
     "points": "poäng",
     "hint": "💡 Hitta fler ord för att klättra!",
     "multiplayerTip": "Hitta unika ord för att poänga! Delade ord ger 0.",
-    "wordsPerMin": "Ord/min"
+    "wordsPerMin": "Ord/min",
+    "topCreators": "Toppkreatörer"
+  },
+  "ugc": {
+    "board": { "createdBy": "Skapad av {{name}}" },
+    "creator": {
+      "leaderboard": {
+        "title": "Toppkreatörer",
+        "spotlight": "Månadens Kreatör",
+        "boards": "Brädor",
+        "plays": "Spelomgångar",
+        "rating": "Betyg",
+        "empty": "Inga kreatörer än",
+        "rank": "Rankning",
+        "creator": "Kreatör"
+      },
+      "stats": "Toppkreatörer"
+    }
   },
   "ranked": {
     "title": "Rankat läge",
@@ -4505,6 +4522,14 @@ const sv = {
       "webVitals": "Webbprestanda",
       "email": "E-post",
       "milogWords": "Milog-ord"
+    },
+    "sidebar": {
+      "overview": "Översikt",
+      "analytics": "Analys",
+      "moderation": "Moderering",
+      "content": "Innehåll",
+      "players": "Spelare",
+      "system": "System"
     },
     "invalidWords": {
       "title": "Granskning av Ogiltiga Ord",

@@ -103,6 +103,12 @@ export interface GameState {
   playersReadyForNextGame: Record<string, boolean>;
   selectedVocabulary?: Set<string>;
   lessonVocabulary?: Set<string>;
+  activeWordPack?: {
+    id: string;
+    name: string;
+    emoji: string | null;
+    wordCount: number;
+  } | null;
   chatHistory?: { username: string; message: string; timestamp: number; isHost?: boolean }[];
   totalBoardWords?: number;
   firstWordFound?: boolean;

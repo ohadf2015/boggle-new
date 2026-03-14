@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Coins, Lock, Check, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -137,7 +137,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
   const maxTier = upgrade.tiers.length;
 
   return (
-    <m.div
+    <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -216,7 +216,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
                 {nextCost!.toLocaleString()}
               </span>
             </div>
-            <m.button
+            <motion.button
               onClick={() => onPurchase(upgrade.id)}
               disabled={!canAfford}
               className={cn(
@@ -234,7 +234,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
                   {t('adventure.upgrades.needMore').replace('{amount}', ((nextCost ?? 0) - 0).toString())}
                 </span>
               )}
-            </m.button>
+            </motion.button>
           </>
         )}
       </div>
@@ -242,16 +242,16 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
       {/* Purchase flash */}
       <AnimatePresence>
         {isFlashing && (
-          <m.div
+          <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 flex items-center justify-center bg-neo-lime/20 rounded-neo pointer-events-none"
           >
             <span className="text-2xl font-neo-display font-black text-neo-lime">✓</span>
-          </m.div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </m.div>
+    </motion.div>
   );
 }

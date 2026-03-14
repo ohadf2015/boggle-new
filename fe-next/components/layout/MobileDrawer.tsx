@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
@@ -14,6 +14,8 @@ interface MobileDrawerProps {
   /** Height variant: 'auto' fits content, 'half' is 50vh, 'full' is nearly full screen */
   height?: 'auto' | 'half' | 'full';
   className?: string;
+  /** Accessible label for the close button (should be translated) */
+  closeLabel?: string;
 }
 
 /**
@@ -27,7 +29,16 @@ export function MobileDrawer({
   children,
   height = 'half',
   className,
+  closeLabel,
 }: MobileDrawerProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
   const heightClasses = {
     auto: 'max-h-[85vh]',
     half: 'h-[50vh]',
@@ -49,6 +60,8 @@ export function MobileDrawer({
 
           {/* Drawer */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -70,6 +83,7 @@ export function MobileDrawer({
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
+                  aria-label={closeLabel || 'Close'}
                   className="h-8 w-8 border-2 border-neo-black text-neo-black hover:bg-neo-black/10"
                 >
                   <X className="text-neo-black" />

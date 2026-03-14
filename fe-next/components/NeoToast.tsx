@@ -77,16 +77,16 @@ export type WordRejectionReason =
   | 'timeout'
   | 'unknown';
 
-const REJECTION_MESSAGES: Record<WordRejectionReason, { icon: string; message: string }> = {
-  not_in_dictionary: { icon: '📖', message: 'Not in dictionary' },
-  already_found: { icon: '🔄', message: 'Already found this word' },
-  too_short: { icon: '📏', message: 'Word too short' },
-  invalid_path: { icon: '🚫', message: 'Invalid letter path' },
-  outside_board: { icon: '⬜', message: 'Letters not on board' },
-  not_connected: { icon: '🔗', message: 'Letters not connected' },
-  duplicate: { icon: '👥', message: 'Already submitted' },
-  timeout: { icon: '⏱️', message: 'Validation timeout' },
-  unknown: { icon: '❓', message: 'Word not accepted' },
+const REJECTION_MESSAGES: Record<WordRejectionReason, { icon: string; messageKey: string }> = {
+  not_in_dictionary: { icon: '📖', messageKey: 'toast.rejection.notInDictionary' },
+  already_found: { icon: '🔄', messageKey: 'toast.rejection.alreadyFound' },
+  too_short: { icon: '📏', messageKey: 'toast.rejection.tooShort' },
+  invalid_path: { icon: '🚫', messageKey: 'toast.rejection.invalidPath' },
+  outside_board: { icon: '⬜', messageKey: 'toast.rejection.outsideBoard' },
+  not_connected: { icon: '🔗', messageKey: 'toast.rejection.notConnected' },
+  duplicate: { icon: '👥', messageKey: 'toast.rejection.duplicate' },
+  timeout: { icon: '⏱️', messageKey: 'toast.rejection.timeout' },
+  unknown: { icon: '❓', messageKey: 'toast.rejection.unknown' },
 };
 
 interface WordRejectedOptions {
@@ -118,8 +118,8 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
             <motion.span
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
+              initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300 }}
               className="text-2xl"
             >
@@ -131,8 +131,8 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             {/* Show score if provided and greater than 0 */}
             {typeof score === 'number' && score > 0 && (
               <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
                 className="px-2 py-1 bg-neo-cyan border-2 border-neo-black rounded font-black text-sm text-neo-black"
               >
@@ -142,8 +142,8 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             {/* Show fire round 2x multiplier badge */}
             {fireRoundActive && (
               <motion.span
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
+                initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
                 className="px-2 py-1 bg-gradient-to-r from-neo-red to-neo-pink border-2 border-neo-black rounded font-black text-xs text-neo-cream"
               >
@@ -153,8 +153,8 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             {/* Show combo bonus if present */}
             {typeof comboBonus === 'number' && comboBonus > 0 && (
               <motion.span
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
+                initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 15 }}
                 className="px-2 py-1 bg-neo-pink border-2 border-neo-black rounded font-black text-sm text-neo-white"
               >
@@ -259,10 +259,10 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
 };
 
 // Neo-Brutalist Word Rejected Toast (with detailed reason)
-export const wordRejectedToast = (word: string, options: WordRejectedOptions = {}): string => {
+export const wordRejectedToast = (word: string, options: WordRejectedOptions & { t?: (key: string) => string } = {}): string => {
   const { reason = 'unknown', customMessage, duration } = options;
   const rejectionInfo = REJECTION_MESSAGES[reason];
-  const displayMessage = customMessage || rejectionInfo.message;
+  const displayMessage = customMessage || (options.t ? options.t(rejectionInfo.messageKey) : rejectionInfo.messageKey);
 
   return toast.custom(
     (t) => (
@@ -287,8 +287,8 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions = {
             style={{ minWidth: '240px', pointerEvents: 'auto' }}
           >
             <motion.span
-              initial={{ scale: 0, rotate: -90 }}
-              animate={{ scale: 1, rotate: 0 }}
+              initial={{ opacity: 0, scale: 0.95, rotate: -90 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               className="text-2xl"
             >
@@ -303,8 +303,8 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions = {
               </span>
             </div>
             <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
               className="text-xl ms-auto"
             >
@@ -346,8 +346,8 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
             <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               className="text-2xl"
             >
@@ -383,8 +383,8 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
           >
             {options.icon && (
               <motion.span
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
+                initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.1, type: 'spring' }}
                 className="text-2xl"
               >
@@ -432,8 +432,8 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
           >
             {options.icon && (
               <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
                 className="text-2xl"
               >
@@ -470,8 +470,8 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
           >
             {options.icon && (
               <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1, type: 'spring' }}
                 className="text-2xl"
               >
@@ -518,8 +518,8 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
           >
             {options.icon && (
               <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: [1, 1.2, 1] }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: [1, 1.2, 1] }}
                 transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
                 className="text-2xl"
               >

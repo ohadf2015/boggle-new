@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion as m } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Zap, ChevronRight, Ghost, RefreshCw, HelpCircle } from 'lucide-react';
@@ -80,7 +80,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         />
 
         {/* Header */}
-        <m.header
+        <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between py-3 px-4 lg:px-6 flex-shrink-0"
@@ -106,20 +106,20 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           >
             <HelpCircle className="w-5 h-5 text-neo-white" />
           </button>
-        </m.header>
+        </motion.header>
 
         {/* Scrollable Content */}
         <div className="flex-1 flex flex-col px-4 lg:px-6 gap-6 overflow-y-auto pb-10 safe-area-bottom">
 
           {/* Quick Play CTA */}
           {onQuickPlay && (
-            <m.section
+            <motion.section
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
               className="flex flex-col items-center"
             >
-              <m.button
+              <motion.button
                 onClick={onQuickPlay}
                 disabled={isQuickPlayLoading}
                 className="w-full max-w-md py-6 flex flex-col items-center justify-center gap-1 bg-neo-lime border-4 border-neo-black rounded-2xl shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
@@ -139,7 +139,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 <span className="text-neo-black/60 font-bold text-[10px] uppercase tracking-widest">
                   {t('multiplayerFlow.roomList.hostAndPlay')}
                 </span>
-              </m.button>
+              </motion.button>
 
               <button
                 onClick={onCreateRoom}
@@ -148,11 +148,11 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 {t('multiplayerFlow.roomList.orCreateCustom')}
                 <ChevronRight className="w-3 h-3" />
               </button>
-            </m.section>
+            </motion.section>
           )}
 
           {/* Active Battles Section */}
-          <m.section
+          <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
@@ -193,7 +193,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 aria-label={t('multiplayerFlow.roomList.roomsListLabel')}
               >
                 {activeRooms.map((room, index) => (
-                  <m.button
+                  <motion.button
                     key={room.gameCode}
                     role="option"
                     aria-selected={false}
@@ -241,7 +241,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                     <span className="px-3 py-1.5 text-xs font-bold text-neo-black bg-neo-cyan rounded-neo border-2 border-neo-black shadow-hard-sm group-hover:shadow-hard group-hover:-translate-y-0.5 transition-all">
                       {t('common.join')}
                     </span>
-                  </m.button>
+                  </motion.button>
                 ))}
               </div>
             ) : (
@@ -265,7 +265,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 )}
               </div>
             )}
-          </m.section>
+          </motion.section>
         </div>
 
         {/* How to Play Dialog */}

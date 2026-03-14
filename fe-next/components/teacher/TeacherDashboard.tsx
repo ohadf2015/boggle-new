@@ -75,7 +75,7 @@ function XpDivider() {
       <div className="flex-1 bg-neo-gray border-3 border-black rounded-neo-pill h-full p-0.5 flex gap-0.5 overflow-hidden">
         {[0, 1, 2].map((i) => (
           <div
-            key={i}
+            key={`xp-segment-${i}`}
             className="flex-1 h-full bg-neo-yellow"
             style={{ clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' }}
           />

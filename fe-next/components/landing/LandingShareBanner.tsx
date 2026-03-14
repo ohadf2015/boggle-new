@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Gift, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,7 +16,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
   const { isAuthenticated } = useAuth();
 
   return (
-    <m.div
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
@@ -64,6 +64,6 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
           </span>
         </div>
       </button>
-    </m.div>
+    </motion.div>
   );
 }

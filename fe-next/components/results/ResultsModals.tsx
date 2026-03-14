@@ -15,9 +15,10 @@
 
 'use client';
 
-import React from 'react';
+import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { shouldHideExternalLogin } from '@/components/CrazyGamesSDK';
+import { useModalQueue } from '@/hooks/useModalQueue';
 import type { WordToVote } from '@/types/components';
 
 // Dynamic imports for modals (loaded after initial render)
@@ -113,7 +114,7 @@ export interface ResultsModalsProps {
 // COMPONENT
 // ==============================================
 
-export const ResultsModals: React.FC<ResultsModalsProps> = ({
+export function ResultsModals({
   wordFeedback,
   mysteryReward,
   referralMilestone,
@@ -121,12 +122,36 @@ export const ResultsModals: React.FC<ResultsModalsProps> = ({
   authModal,
   firstWinModal,
   t,
-}) => {
+}: ResultsModalsProps) {
+  const hideExternal = shouldHideExternalLogin();
+
+  const modals = useMemo(
+    () => [
+      { id: 'levelUp', priority: 1, isReady: levelUp.showLevelUpCelebration && !!levelUp.levelUpData },
+      { id: 'mysteryReward', priority: 2, isReady: mysteryReward.showMysteryReward },
+      { id: 'referralMilestone', priority: 3, isReady: referralMilestone.showReferralMilestone },
+      { id: 'firstWin', priority: 4, isReady: !hideExternal && firstWinModal.showFirstWinModal },
+      { id: 'auth', priority: 5, isReady: !hideExternal && authModal.showAuthModal },
+      { id: 'wordFeedback', priority: 6, isReady: wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null },
+    ],
+    [
+      levelUp.showLevelUpCelebration, levelUp.levelUpData,
+      mysteryReward.showMysteryReward,
+      referralMilestone.showReferralMilestone,
+      firstWinModal.showFirstWinModal,
+      authModal.showAuthModal,
+      wordFeedback.showWordFeedback, wordFeedback.wordToVote,
+      hideExternal,
+    ]
+  );
+
+  const { activeModalId, dismiss } = useModalQueue({ modals });
+
   return (
     <>
       {/* Word Feedback Modal - Self-healing dictionary validation */}
       <WordFeedbackModal
-        isOpen={wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null}
+        isOpen={activeModalId === 'wordFeedback'}
         word={wordFeedback.wordToVote?.word || ''}
         submittedBy={wordFeedback.wordToVote?.submittedBy || ''}
         submitterAvatar={wordFeedback.wordToVote?.submitterAvatar ?? undefined}
@@ -138,31 +163,31 @@ export const ResultsModals: React.FC<ResultsModalsProps> = ({
         }))}
         timeoutSeconds={wordFeedback.wordToVote?.timeoutSeconds || 15}
         onVote={wordFeedback.onVote}
-        onSkip={wordFeedback.onSkip}
-        onTimeout={wordFeedback.onSkip}
+        onSkip={() => { dismiss('wordFeedback'); wordFeedback.onSkip(); }}
+        onTimeout={() => { dismiss('wordFeedback'); wordFeedback.onSkip(); }}
       />
 
       {/* Mystery Reward Popup - Variable ratio reward system */}
       <MysteryRewardPopup
         reward={mysteryReward.reward}
-        isOpen={mysteryReward.showMysteryReward}
-        onClose={mysteryReward.onClose}
+        isOpen={activeModalId === 'mysteryReward'}
+        onClose={() => { dismiss('mysteryReward'); mysteryReward.onClose(); }}
         t={t}
       />
 
       {/* Referral Milestone Popup - Notify when friend hits milestone */}
       <ReferralMilestonePopup
         milestone={referralMilestone.milestone}
-        isOpen={referralMilestone.showReferralMilestone}
-        onClose={referralMilestone.onClose}
+        isOpen={activeModalId === 'referralMilestone'}
+        onClose={() => { dismiss('referralMilestone'); referralMilestone.onClose(); }}
       />
 
       {/* Epic Level Up Celebration - Full-screen GSAP animation */}
       {levelUp.levelUpData && (
         <LevelUpCelebration
           level={levelUp.levelUpData.newLevel}
-          show={levelUp.showLevelUpCelebration}
-          onDismiss={() => levelUp.setShowLevelUpCelebration(false)}
+          show={activeModalId === 'levelUp'}
+          onDismiss={() => { dismiss('levelUp'); levelUp.setShowLevelUpCelebration(false); }}
           autoDismissAfter={5000}
           rewards={{
             unlocks: levelUp.levelUpData.newTitles,
@@ -171,21 +196,22 @@ export const ResultsModals: React.FC<ResultsModalsProps> = ({
       )}
 
       {/* Sign Up Prompt for Guests (non-winners) - Hidden on CrazyGames */}
-      {!shouldHideExternalLogin() && (
+      {!hideExternal && (
         <AuthModal
-          isOpen={authModal.showAuthModal}
-          onClose={() => authModal.setShowAuthModal(false)}
+          isOpen={activeModalId === 'auth'}
+          onClose={() => { dismiss('auth'); authModal.setShowAuthModal(false); }}
           showGuestStats={true}
         />
       )}
 
       {/* Celebratory First Win Signup Prompt - Hidden on CrazyGames */}
-      {!shouldHideExternalLogin() && (
+      {/* TODO: Integrate EmailCaptureModal into this queue (it currently self-manages via localStorage) */}
+      {!hideExternal && (
         <FirstWinSignupModal
-          isOpen={firstWinModal.showFirstWinModal}
-          onClose={() => firstWinModal.setShowFirstWinModal(false)}
+          isOpen={activeModalId === 'firstWin'}
+          onClose={() => { dismiss('firstWin'); firstWinModal.setShowFirstWinModal(false); }}
         />
       )}
     </>
   );
-};
+}

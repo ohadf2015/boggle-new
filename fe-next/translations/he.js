@@ -3090,7 +3090,24 @@ const he = {
     "points": "נק'",
     "hint": "מצא מילים ארוכות כדי לעלות בדירוג! 💡",
     "multiplayerTip": "מילים ייחודיות = נקודות! מילים משותפות = אפס 🎯",
-    "wordsPerMin": "מילים/דקה"
+    "wordsPerMin": "מילים/דקה",
+    "topCreators": "יוצרים מובילים"
+  },
+  "ugc": {
+    "board": { "createdBy": "נוצר על ידי {{name}}" },
+    "creator": {
+      "leaderboard": {
+        "title": "יוצרים מובילים",
+        "spotlight": "יוצר החודש",
+        "boards": "לוחות",
+        "plays": "משחקים",
+        "rating": "דירוג",
+        "empty": "אין יוצרים עדיין",
+        "rank": "מקום",
+        "creator": "יוצר"
+      },
+      "stats": "יוצרים מובילים"
+    }
   },
   "ranked": {
     "title": "מצב מדורג",
@@ -4499,6 +4516,14 @@ const he = {
       "webVitals": "ביצועי אתר",
       "email": "אימייל",
       "milogWords": "מילים ממילוג"
+    },
+    "sidebar": {
+      "overview": "סקירה",
+      "analytics": "אנליטיקה",
+      "moderation": "מודרציה",
+      "content": "תוכן",
+      "players": "שחקנים",
+      "system": "מערכת"
     },
     "invalidWords": {
       "title": "בדיקת מילים לא תקינות",

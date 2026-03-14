@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -38,7 +39,19 @@ export function BlastCodexModal({ discoveredCombos, isOpen, onClose }: BlastCode
         exit={{ opacity: 0 }}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/70" onClick={onClose} />
+        <div
+          className="absolute inset-0 bg-black/70"
+          onClick={onClose}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClose();
+            }
+          }}
+          aria-label="close"
+        />
 
         {/* Modal card */}
         <motion.div

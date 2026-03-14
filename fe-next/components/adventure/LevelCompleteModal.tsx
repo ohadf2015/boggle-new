@@ -7,7 +7,7 @@
 
 'use client';
 
-import { memo, useMemo, useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Check, X, Trophy, RotateCcw, LogOut, Coins, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -108,10 +108,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     const particleBudget = useParticleBudget();
 
     // Count completed objectives
-    const completedCount = useMemo(
-      () => objectives.filter((o) => o.isComplete).length,
-      [objectives]
-    );
+    const completedCount = objectives.filter((o) => o.isComplete).length;
 
     // Fire victory confetti on mount (only for victory, not defeat)
     useEffect(() => {
@@ -122,6 +119,31 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
         }
       }
     }, [isOpen, isFailed, prefersReducedMotion, particleBudget.combo]);
+
+    // ESC key handler
+    useEffect(() => {
+      if (!isOpen) return;
+
+      function handleKeyDown(event: KeyboardEvent): void {
+        if (event.key === 'Escape') {
+          onExit();
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onExit]);
+
+    // Scroll lock
+    useEffect(() => {
+      if (!isOpen) return;
+
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -197,8 +219,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             {/* Lexi Celebration - celebrates alongside existing star animation */}
             <motion.div
               className="flex justify-center mb-4"
-              initial={{ scale: 0, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{
                 delay: 0.2,
                 type: 'spring',
@@ -231,8 +253,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             <div className="flex justify-center gap-3 mb-6">
               {[0, 1, 2].map((i) => (
                 <motion.div
-                  key={i}
-                  initial={{ scale: 0, opacity: 0 }}
+                  key={`star-${i}`}
+                  initial={{ scale: 0.95, opacity: 0 }}
                   animate={{
                     scale: i < stars ? 1 : 0.7,
                     opacity: i < stars ? 1 : 0.3,
@@ -306,8 +328,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             {/* High Score Badge */}
             {isHighScore && (
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8, type: 'spring' }}
                 className="flex justify-center mb-4"
               >

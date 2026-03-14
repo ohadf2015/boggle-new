@@ -76,7 +76,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
       {/* Blurred preview content */}
       <div className="relative p-5">
         {/* Blur overlay */}
-        <div className="absolute inset-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-10 flex flex-col items-center justify-center p-4">
+        <div className="absolute inset-0 bg-neo-cream/30 dark:bg-neo-navy/80 z-10 flex flex-col items-center justify-center p-4">
           <div className="bg-white dark:bg-neo-navy rounded-full p-3 shadow-lg mb-3">
             <Lock className="w-6 h-6 text-purple-600 dark:text-purple-400" />
           </div>
@@ -122,7 +122,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
         <div className="pointer-events-none select-none">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-purple-100 dark:bg-purple-800/30 rounded-lg">
+            <div className="p-2 bg-neo-purple/20 dark:bg-neo-purple/30 rounded-lg">
               <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
@@ -148,8 +148,8 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
 
           {/* Fake progress bars */}
           <div className="mt-4 space-y-2">
-            {[65, 78, 52, 89, 71].map((value, i) => (
-              <div key={i} className="flex items-center gap-2">
+            {[65, 78, 52, 89, 71].map((value) => (
+              <div key={`progress-bar-${value}`} className="flex items-center gap-2">
                 <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div
                     className="bg-purple-500 h-2 rounded-full"

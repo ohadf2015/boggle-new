@@ -1,0 +1,154 @@
+/**
+ * CreatorLeaderboard — TDD tests (RED phase first)
+ */
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+
+// Mock dependencies before importing component
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const map: Record<string, string> = {
+        'ugc.creator.leaderboard.title': 'Top Creators',
+        'ugc.creator.leaderboard.spotlight': 'Creator of the Month',
+        'ugc.creator.leaderboard.boards': 'Boards',
+        'ugc.creator.leaderboard.plays': 'Plays',
+        'ugc.creator.leaderboard.rating': 'Rating',
+        'ugc.creator.leaderboard.empty': 'No creators yet',
+        'ugc.creator.leaderboard.rank': 'Rank',
+        'ugc.creator.leaderboard.creator': 'Creator',
+        'common.loading': 'Loading...',
+      };
+      return map[key] ?? key;
+    },
+    language: 'en',
+  }),
+}));
+
+jest.mock('@/components/Avatar', () => {
+  const AvatarMock = ({ size }: { size?: string }) => (
+    <div data-testid="avatar" data-size={size} />
+  );
+  AvatarMock.displayName = 'Avatar';
+  return AvatarMock;
+});
+
+// Mock fetch
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
+const MOCK_CREATORS = [
+  {
+    creator_id: 'user-1',
+    display_name: 'WordWizard',
+    profile_picture_url: null,
+    avatar_config: null,
+    boards_created: 12,
+    total_plays: 3400,
+    avg_rating: 4.8,
+  },
+  {
+    creator_id: 'user-2',
+    display_name: 'PuzzlePro',
+    profile_picture_url: null,
+    avatar_config: null,
+    boards_created: 7,
+    total_plays: 1200,
+    avg_rating: 4.2,
+  },
+  {
+    creator_id: 'user-3',
+    display_name: 'GridGuru',
+    profile_picture_url: null,
+    avatar_config: null,
+    boards_created: 5,
+    total_plays: 800,
+    avg_rating: 3.9,
+  },
+];
+
+// Import AFTER mocks
+import CreatorLeaderboard from '../CreatorLeaderboard';
+
+describe('CreatorLeaderboard', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders Top Creators heading', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ creators: MOCK_CREATORS }),
+    });
+
+    render(<CreatorLeaderboard />);
+
+    expect(screen.getByText('Top Creators')).toBeInTheDocument();
+  });
+
+  it('shows loading state initially', () => {
+    // Never resolves during this test
+    mockFetch.mockReturnValueOnce(new Promise(() => {}));
+
+    render(<CreatorLeaderboard />);
+
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  });
+
+  it('renders creator rows with rank, name, boards, plays, rating', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ creators: MOCK_CREATORS }),
+    });
+
+    render(<CreatorLeaderboard />);
+
+    await waitFor(() => {
+      // WordWizard appears in spotlight + table row
+      expect(screen.getAllByText('WordWizard').length).toBeGreaterThan(0);
+    });
+
+    expect(screen.getByText('PuzzlePro')).toBeInTheDocument();
+    expect(screen.getByText('GridGuru')).toBeInTheDocument();
+
+    // Rank indicators
+    expect(screen.getByText('#1')).toBeInTheDocument();
+    expect(screen.getByText('#2')).toBeInTheDocument();
+    expect(screen.getByText('#3')).toBeInTheDocument();
+
+    // Stats — values may appear in spotlight + table rows
+    expect(screen.getAllByText('3,400').length).toBeGreaterThan(0); // total_plays formatted
+    expect(screen.getAllByText('12').length).toBeGreaterThan(0);    // boards_created
+    expect(screen.getAllByText('4.8').length).toBeGreaterThan(0);   // avg_rating
+  });
+
+  it('shows Creator of the Month spotlight for #1', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ creators: MOCK_CREATORS }),
+    });
+
+    render(<CreatorLeaderboard />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Creator of the Month')).toBeInTheDocument();
+    });
+
+    // Spotlight should show the #1 creator's name
+    const spotlightSection = screen.getByTestId('creator-spotlight');
+    expect(spotlightSection).toHaveTextContent('WordWizard');
+  });
+
+  it('handles empty state', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ creators: [] }),
+    });
+
+    render(<CreatorLeaderboard />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No creators yet')).toBeInTheDocument();
+    });
+  });
+});

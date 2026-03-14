@@ -33,6 +33,9 @@ jest.mock('../useReferralShare', () => ({
 }));
 
 jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  },
   m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
