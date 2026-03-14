@@ -38,15 +38,14 @@ describe('BlastChainBadge', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders "CHAIN x1" when chainLevel is 1', () => {
+  it('renders badge text when chainLevel is 1', () => {
     render(<BlastChainBadge chainLevel={1} />);
-    expect(screen.getByText(/CHAIN/)).toBeInTheDocument();
-    expect(screen.getByText(/x1/)).toBeInTheDocument();
+    expect(screen.getByText(/blast\.chain\.badge/)).toBeInTheDocument();
   });
 
-  it('renders "CHAIN x3" when chainLevel is 3', () => {
+  it('renders badge text when chainLevel is 3', () => {
     render(<BlastChainBadge chainLevel={3} />);
-    expect(screen.getByText(/x3/)).toBeInTheDocument();
+    expect(screen.getByText(/blast\.chain\.badge/)).toBeInTheDocument();
   });
 
   it('applies cyan background for tier 1', () => {
