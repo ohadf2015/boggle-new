@@ -5853,6 +5853,29 @@ const en = {
       "runeFragment": "Rune Fragment",
       "tapToOpen": "Tap to open",
       "xp": "Experience"
+    },
+    "later": "Later",
+    "nextLevel": "Next: Level",
+    "play": "Play",
+    "runes": {
+      "goldvein": {
+        "name": "Gold Vein"
+      },
+      "insight": {
+        "name": "Insight"
+      },
+      "momentum": {
+        "name": "Momentum"
+      },
+      "swiftword": {
+        "name": "Swift Word"
+      },
+      "timewarp": {
+        "name": "Time Warp"
+      },
+      "wrath": {
+        "name": "Wrath"
+      }
     }
   },
   "blast": {

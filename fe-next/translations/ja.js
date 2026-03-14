@@ -5810,6 +5810,29 @@ const ja = {
       "runeFragment": "ルーンの欠片",
       "tapToOpen": "タップして開く",
       "xp": "経験値"
+    },
+    "later": "あとで",
+    "nextLevel": "次: レベル",
+    "play": "プレイ",
+    "runes": {
+      "goldvein": {
+        "name": "金脈"
+      },
+      "insight": {
+        "name": "洞察"
+      },
+      "momentum": {
+        "name": "モメンタム"
+      },
+      "swiftword": {
+        "name": "疾風の言葉"
+      },
+      "timewarp": {
+        "name": "時空の歪み"
+      },
+      "wrath": {
+        "name": "憤怒"
+      }
     }
   },
   "blast": {

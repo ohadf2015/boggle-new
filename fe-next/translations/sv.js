@@ -5759,6 +5759,29 @@ const sv = {
       "runeFragment": "Runfragment",
       "tapToOpen": "Tryck för att öppna",
       "xp": "Erfarenhet"
+    },
+    "later": "Senare",
+    "nextLevel": "Nästa: Nivå",
+    "play": "Spela",
+    "runes": {
+      "goldvein": {
+        "name": "Guldåder"
+      },
+      "insight": {
+        "name": "Insikt"
+      },
+      "momentum": {
+        "name": "Momentum"
+      },
+      "swiftword": {
+        "name": "Snabbt ord"
+      },
+      "timewarp": {
+        "name": "Tidsförvrängning"
+      },
+      "wrath": {
+        "name": "Vrede"
+      }
     }
   },
   "blast": {

@@ -5809,6 +5809,29 @@ const es = {
       "runeFragment": "Fragmento de runa",
       "tapToOpen": "Toca para abrir",
       "xp": "Experiencia"
+    },
+    "later": "Más tarde",
+    "nextLevel": "Siguiente: Nivel",
+    "play": "Jugar",
+    "runes": {
+      "goldvein": {
+        "name": "Veta de oro"
+      },
+      "insight": {
+        "name": "Perspicacia"
+      },
+      "momentum": {
+        "name": "Impulso"
+      },
+      "swiftword": {
+        "name": "Palabra veloz"
+      },
+      "timewarp": {
+        "name": "Distorsión temporal"
+      },
+      "wrath": {
+        "name": "Ira"
+      }
     }
   },
   "blast": {

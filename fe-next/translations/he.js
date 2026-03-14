@@ -5734,6 +5734,29 @@ const he = {
       "runeFragment": "שבר רונה",
       "tapToOpen": "לחץ לפתיחה",
       "xp": "ניסיון"
+    },
+    "later": "אחר כך",
+    "nextLevel": "הבא: שלב",
+    "play": "שחק",
+    "runes": {
+      "goldvein": {
+        "name": "עורק זהב"
+      },
+      "insight": {
+        "name": "תובנה"
+      },
+      "momentum": {
+        "name": "מומנטום"
+      },
+      "swiftword": {
+        "name": "מילה מהירה"
+      },
+      "timewarp": {
+        "name": "עיוות זמן"
+      },
+      "wrath": {
+        "name": "זעם"
+      }
     }
   },
   "blast": {

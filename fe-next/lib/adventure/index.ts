@@ -94,3 +94,17 @@ export {
   calculateMasteryTier,
   calculateWorldMastery,
 } from './mastery';
+
+// Power growth system
+export {
+  getMasteryAura,
+  getComboCeiling,
+  getPowerRating,
+} from './powerGrowth';
+
+// Story beats
+export {
+  getStoryBeat,
+  STORY_BEATS,
+  type StoryBeat,
+} from './storyConfig';
