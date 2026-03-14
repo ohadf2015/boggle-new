@@ -12,6 +12,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useAdventureBossNew, type BossAttack } from '@/hooks/useAdventureBossNew';
 import { usePlayerHealth } from '@/hooks/usePlayerHealth';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
+import { useHaptics } from '@/hooks/useHaptics';
 import type { BossTauntEvent, BossMechanicResult } from '@/types/boss';
 import { type BossTier } from '@/components/celebration/BossDefeatFireworks';
 
@@ -130,6 +131,24 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     onAttack: handleAttack,
   });
 
+  // Haptic feedback
+  const { bossHit } = useHaptics();
+
+  // Phase change drama: freeze timer, screen shake, taunt
+  const prevPhaseRef = useRef(bossPhaseValue);
+  useEffect(() => {
+    if (prevPhaseRef.current !== bossPhaseValue && bossIsActive) {
+      // Phase changed — trigger drama sequence
+      shake(4);
+      bossTriggerTaunt('onMechanic');
+
+      // Compensate for 1.5s timer freeze by adding time back
+      // The visual "freeze" is achieved by the shake + taunt disruption
+      addTime(1.5);
+    }
+    prevPhaseRef.current = bossPhaseValue;
+  }, [bossPhaseValue, bossIsActive, shake, bossTriggerTaunt, addTime]);
+
   // Low time taunt
   const lowTimeTriggedRef = useRef(false);
   useEffect(() => {
@@ -181,8 +200,10 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   // Accepts old signature for compatibility but internally just uses score
   const dealBossDamage = useCallback((baseDamage: number, _combo: number, mechanicMultiplier: number, _comboBonus: number): number => {
     const damage = Math.floor(baseDamage * mechanicMultiplier);
-    return bossDealDamage(damage);
-  }, [bossDealDamage]);
+    const result = bossDealDamage(damage);
+    bossHit();
+    return result;
+  }, [bossDealDamage, bossHit]);
 
   // endBossBattle — compatible with old signature
   const endBossBattle = useCallback((isVictory: boolean) => {

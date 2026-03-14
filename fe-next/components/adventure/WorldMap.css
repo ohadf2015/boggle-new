@@ -320,6 +320,20 @@
   animation: scroll-hint-bob 1.5s ease-in-out infinite;
 }
 
+/* Fog of war shimmer for next locked world */
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.world-fog-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: shimmer-sweep 3s ease-in-out infinite;
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   .world-map-star,
@@ -330,7 +344,8 @@
   .world-map-pulse-ring,
   .world-map-crown,
   .world-map-mascot,
-  .world-map-scroll-hint {
+  .world-map-scroll-hint,
+  .world-fog-shimmer::after {
     animation: none;
   }
 }

@@ -532,3 +532,20 @@ export interface WorldMastery {
   tier: MasteryTier;
   criteria: MasteryCriteria;
 }
+
+// ==============================================
+// LOOT SYSTEM
+// ==============================================
+
+/** Types of loot drops from level completion */
+export type LootType = 'gold' | 'runeFragment' | 'loreScroll' | 'bossTrophy';
+
+/** Rarity tier for loot drops */
+export type LootRarity = 'common' | 'rare' | 'epic';
+
+/** A single loot drop from level completion */
+export interface LootDrop {
+  type: LootType;
+  quantity: number;
+  rarity: LootRarity;
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import {
@@ -66,26 +66,43 @@ export default function LevelGrid({
     ambientSpeed: 0.6,
   });
 
-  // Generate levels for this world (memoized to avoid recalculation on parallax re-renders)
-  const levels = useMemo(() => Array.from({ length: LEVELS_PER_WORLD }, (_, i) => {
-    const levelNum = i + 1;
-    const config = getLevelConfig(world.id, levelNum);
-    const completion = completions.find(
-      (c) => c.world === world.id && c.level === levelNum
-    );
-    const isUnlocked = isLevelUnlocked(world.id, levelNum, completions);
-    const stars = completion?.stars || 0;
-    const isPerfect = stars === MAX_STARS_PER_LEVEL;
+  // Track previous star counts to detect newly earned stars (skip animation for old completions)
+  const prevStarsRef = useRef<Record<number, number>>({});
 
-    return {
-      levelNum,
-      config,
-      completion,
-      isUnlocked,
-      stars,
-      isPerfect,
-    };
-  }), [world.id, completions]);
+  // Generate levels for this world (memoized to avoid recalculation on parallax re-renders)
+  const levels = useMemo(() => {
+    const result = Array.from({ length: LEVELS_PER_WORLD }, (_, i) => {
+      const levelNum = i + 1;
+      const config = getLevelConfig(world.id, levelNum);
+      const completion = completions.find(
+        (c) => c.world === world.id && c.level === levelNum
+      );
+      const isUnlocked = isLevelUnlocked(world.id, levelNum, completions);
+      const stars = completion?.stars || 0;
+      const isPerfect = stars === MAX_STARS_PER_LEVEL;
+      const prevStars = prevStarsRef.current[levelNum] ?? stars;
+      const newStarsFrom = prevStars;
+
+      return {
+        levelNum,
+        config,
+        completion,
+        isUnlocked,
+        stars,
+        isPerfect,
+        newStarsFrom,
+      };
+    });
+
+    // Update ref after computing diff
+    const nextPrev: Record<number, number> = {};
+    for (const l of result) {
+      nextPrev[l.levelNum] = l.stars;
+    }
+    prevStarsRef.current = nextPrev;
+
+    return result;
+  }, [world.id, completions]);
 
   // World name translation
   const worldName = t(`adventure.worlds.${world.name}`) || world.name;
@@ -323,7 +340,7 @@ export default function LevelGrid({
           animate="visible"
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5 lg:gap-6 lg:max-w-5xl lg:mx-auto"
         >
-          {levels.map(({ levelNum, config, isUnlocked, stars, isPerfect }) => {
+          {levels.map(({ levelNum, config, isUnlocked, stars, isPerfect, newStarsFrom }) => {
             // Determine card variant based on state
             const cardVariant = !isUnlocked 
               ? 'locked' 
@@ -371,12 +388,15 @@ export default function LevelGrid({
 
                   {/* Stars Display - shimmer on hover */}
                   <div className="flex items-center gap-1.5 mb-3 group-hover:animate-pulse-subtle">
-                    {Array.from({ length: MAX_STARS_PER_LEVEL }).map((_, i) => (
+                    {Array.from({ length: MAX_STARS_PER_LEVEL }).map((_, i) => {
+                      const isEarned = stars > i;
+                      const isNewlyEarned = isEarned && i >= newStarsFrom;
+                      return (
                       <motion.div
                         key={i}
-                        initial={stars > i ? { scale: 0, rotate: -180 } : false}
-                        animate={stars > i ? { scale: 1, rotate: 0 } : undefined}
-                        transition={stars > i ? { delay: levelNum * 0.03 + i * 0.08, type: 'spring', stiffness: 300, damping: 20 } : undefined}
+                        initial={isNewlyEarned ? { scale: 0, rotate: -180 } : false}
+                        animate={isNewlyEarned ? { scale: 1, rotate: 0 } : undefined}
+                        transition={isNewlyEarned ? { delay: levelNum * 0.03 + i * 0.08, type: 'spring', stiffness: 300, damping: 20 } : undefined}
                       >
                         <Star
                           className={cn(
@@ -387,7 +407,8 @@ export default function LevelGrid({
                           )}
                         />
                       </motion.div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   {/* Level Info - Only show when unlocked */}

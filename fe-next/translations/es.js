@@ -2653,7 +2653,20 @@ const es = {
       "bestRanked": "Mejor clasificado",
       "bestCasual": "Mejor casual",
       "share": "Compartir"
-    }
+    },
+    "level": "Nivel",
+    "winRate": "Porcentaje de victorias",
+    "gamesPlayed": "Partidas jugadas",
+    "totalWords": "Total de palabras",
+    "longestWord": "Palabra más larga",
+    "topPercent": "Top {{percent}}%",
+    "challenge": "Desafiar",
+    "addFriend": "Agregar amigo",
+    "games": "Partidas"
+  },
+  "playerProfile": {
+    "notFound": "Jugador no encontrado",
+    "error": "Error al cargar perfil"
   },
   "streaks": {
     "wager": {
@@ -5788,6 +5801,14 @@ const es = {
           "desc": "Completa {target} niveles con 3 estrellas"
         }
       }
+    },
+    "loot": {
+      "continue": "Continuar",
+      "gold": "Oro",
+      "loreScroll": "Pergamino de historia",
+      "runeFragment": "Fragmento de runa",
+      "tapToOpen": "Toca para abrir",
+      "xp": "Experiencia"
     }
   },
   "blast": {

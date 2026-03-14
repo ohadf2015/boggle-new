@@ -2479,7 +2479,20 @@ const ja = {
       "bestRanked": "ランク最高得点",
       "bestCasual": "カジュアル最高得点",
       "share": "共有"
-    }
+    },
+    "level": "レベル",
+    "winRate": "勝率",
+    "gamesPlayed": "プレイ回数",
+    "totalWords": "累計単語数",
+    "longestWord": "最長の単語",
+    "topPercent": "トップ {{percent}}%",
+    "challenge": "チャレンジ",
+    "addFriend": "フレンド追加",
+    "games": "ゲーム"
+  },
+  "playerProfile": {
+    "notFound": "プレイヤーが見つかりません",
+    "error": "プロフィール読み込みエラー"
   },
   "streaks": {
     "wager": {
@@ -5789,6 +5802,14 @@ const ja = {
           "desc": "3つ星で{target}レベルクリアしよう"
         }
       }
+    },
+    "loot": {
+      "continue": "続ける",
+      "gold": "ゴールド",
+      "loreScroll": "伝説の巻物",
+      "runeFragment": "ルーンの欠片",
+      "tapToOpen": "タップして開く",
+      "xp": "経験値"
     }
   },
   "blast": {

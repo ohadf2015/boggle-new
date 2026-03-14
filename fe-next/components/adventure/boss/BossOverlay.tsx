@@ -466,6 +466,19 @@ const BossOverlay = memo<BossOverlayProps>(
               </div>
             </div>
 
+            {/* Boss Rage Vignette (< 20% HP) */}
+            {hpPct < 20 && (
+              <motion.div
+                className="fixed inset-0 pointer-events-none z-20"
+                animate={{ opacity: [0.2, 0.4, 0.2] }}
+                transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
+                style={{
+                  boxShadow: 'inset 0 0 100px rgba(255, 0, 0, 0.3)',
+                }}
+                data-testid="boss-rage-vignette"
+              />
+            )}
+
             {/* Attack Telegraph (2s warning before ability) */}
             <AttackTelegraph
               isActive={isTelegraphing}

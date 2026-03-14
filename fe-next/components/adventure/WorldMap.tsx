@@ -57,6 +57,7 @@ const WorldNode = memo(function WorldNode({
   index,
   isLeft,
   isNextWorld,
+  fogState = 'none',
 }: {
   world: WorldConfig;
   isUnlocked: boolean;
@@ -68,6 +69,7 @@ const WorldNode = memo(function WorldNode({
   index: number;
   isLeft: boolean;
   isNextWorld?: boolean;
+  fogState?: 'none' | 'shimmer' | 'heavy';
 }): React.JSX.Element {
   const { t } = useLanguage();
   const isFinalWorld = world.id === 10;
@@ -150,6 +152,12 @@ const WorldNode = memo(function WorldNode({
               <div className="absolute inset-0 flex items-center justify-center bg-neo-black/50">
                 <Lock className="w-10 h-10 sm:w-12 sm:h-12 text-neo-white/70" />
               </div>
+            )}
+            {fogState === 'heavy' && (
+              <div className="absolute inset-0 rounded-full bg-neo-navy/70 opacity-30 blur-sm pointer-events-none" />
+            )}
+            {fogState === 'shimmer' && (
+              <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none world-fog-shimmer" />
             )}
           </div>
 
@@ -334,6 +342,15 @@ export default function WorldMap({
     return handlers;
   }, [onWorldSelect]);
 
+  // Furthest unlocked world ID for fog-of-war calculation
+  const furthestUnlockedId = useMemo(() => {
+    let max = 0;
+    for (const d of worldsData) {
+      if (d.isUnlocked && d.world.id > max) max = d.world.id;
+    }
+    return max;
+  }, [worldsData]);
+
   // Derive next world to play: first unlocked but not fully completed
   const nextWorldId = useMemo(() => {
     for (let i = worldsData.length - 1; i >= 0; i--) {
@@ -376,6 +393,12 @@ export default function WorldMap({
                 index={index}
                 isLeft={isLeft}
                 isNextWorld={data.world.id === nextWorldId}
+                fogState={
+                  data.isUnlocked ? 'none'
+                    : data.world.id === furthestUnlockedId + 1 ? 'shimmer'
+                    : data.world.id > furthestUnlockedId + 1 ? 'heavy'
+                    : 'none'
+                }
               />
 
               {index < worldsData.length - 1 && (

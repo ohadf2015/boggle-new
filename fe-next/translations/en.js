@@ -2965,7 +2965,22 @@ const en = {
       "bestRanked": "Best Ranked",
       "bestCasual": "Best Casual",
       "share": "Share"
-    }
+    },
+    "level": "Level",
+    "winRate": "Win Rate",
+    "gamesPlayed": "Games Played",
+    "totalWords": "Total Words",
+    "longestWord": "Longest Word",
+    "topPercent": "Top {{percent}}%",
+    "challenge": "Challenge",
+    "addFriend": "Add Friend",
+    "viewProfile": "View Profile",
+    "games": "Games"
+  },
+  "playerProfile": {
+    "notFound": "Player not found",
+    "error": "Couldn't load profile",
+    "title": "Player Profile"
   },
   "streaks": {
     "wager": {
@@ -5830,6 +5845,14 @@ const en = {
           "desc": "Complete {target} levels with 3 stars"
         }
       }
+    },
+    "loot": {
+      "continue": "Continue",
+      "gold": "Gold",
+      "loreScroll": "Lore Scroll",
+      "runeFragment": "Rune Fragment",
+      "tapToOpen": "Tap to open",
+      "xp": "Experience"
     }
   },
   "blast": {

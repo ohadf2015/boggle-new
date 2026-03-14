@@ -36,6 +36,7 @@ const VictoryCinematic = dynamic(() => import('./cinematics/VictoryCinematic').t
 const DefeatCinematic = dynamic(() => import('./cinematics/DefeatCinematic').then(mod => ({ default: mod.DefeatCinematic as React.ComponentType<any> })), { ssr: false });
 const CinematicPlayer = dynamic(() => import('./boss/cinematics/CinematicPlayer').then(mod => ({ default: mod.CinematicPlayer })), { ssr: false });
 import { GameHeader, GameSidebar, GameGridArea, PauseOverlay, GameLayout } from './ui';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
@@ -108,6 +109,16 @@ const AdventureGame = memo<AdventureGameProps>(
       timeRemaining,
       wordsFound: gameState.wordsFound,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
+    });
+
+    // CrazyGames SDK lifecycle — report gameplay and trigger happyTime on achievements
+    useCrazyGamesLifecycle({
+      isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,
+      isGameOver: gameState.isComplete,
+      isWinner: (gameState.stars ?? 0) >= 1,
+      score: gameState.score,
+      maxCombo: gameState.comboCount,
+      wordsFound: gameState.wordsFound.length,
     });
 
     const getScoreMultiplier = () => 1;

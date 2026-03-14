@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import { haptics } from '@/utils/haptics/HapticsManager';
-import { HapticPattern, CustomHapticPattern } from '@/utils/haptics/types';
+import { HapticPattern, CustomHapticPattern, HapticIntensity } from '@/utils/haptics/types';
 
 /**
  * React hook for haptic feedback.
@@ -42,6 +42,14 @@ export function useHaptics() {
     await haptics.selection();
   }, []);
 
+  const bossHit = useCallback(async () => {
+    await haptics.triggerCustom({ duration: 40, intensity: HapticIntensity.HEAVY });
+  }, []);
+
+  const levelComplete = useCallback(async () => {
+    await haptics.triggerCustom({ duration: 80, intensity: HapticIntensity.MEDIUM });
+  }, []);
+
   const isSupported = useCallback(() => {
     return haptics.isSupported();
   }, []);
@@ -54,6 +62,8 @@ export function useHaptics() {
     error,
     warning,
     selection,
+    bossHit,
+    levelComplete,
     isSupported,
   };
 }

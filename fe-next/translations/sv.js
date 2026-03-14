@@ -2401,7 +2401,20 @@ const sv = {
       "bestRanked": "Basta rankade",
       "bestCasual": "Basta casual",
       "share": "Dela"
-    }
+    },
+    "level": "Nivå",
+    "winRate": "Vinstfrekvens",
+    "gamesPlayed": "Spelade spel",
+    "totalWords": "Totalt antal ord",
+    "longestWord": "Längsta ord",
+    "topPercent": "Topp {{percent}}%",
+    "challenge": "Utmana",
+    "addFriend": "Lägg till vän",
+    "games": "Spel"
+  },
+  "playerProfile": {
+    "notFound": "Spelare hittades inte",
+    "error": "Fel vid laddning av profil"
   },
   "streaks": {
     "wager": {
@@ -5738,6 +5751,14 @@ const sv = {
           "desc": "Slutför {target} nivåer med 3 stjärnor"
         }
       }
+    },
+    "loot": {
+      "continue": "Fortsätt",
+      "gold": "Guld",
+      "loreScroll": "Berättelserulle",
+      "runeFragment": "Runfragment",
+      "tapToOpen": "Tryck för att öppna",
+      "xp": "Erfarenhet"
     }
   },
   "blast": {

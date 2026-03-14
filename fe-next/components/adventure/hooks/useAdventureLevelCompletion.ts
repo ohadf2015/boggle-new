@@ -10,6 +10,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
+import { generateLevelLoot } from '@/lib/adventure/lootGenerator';
+import type { LootDrop } from '@/types/adventure';
 import type { LevelUpPayload } from '@/components/education/LevelUpCelebration';
 import type { BossTauntEvent } from '@/types/boss';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
@@ -55,6 +57,7 @@ export interface UseAdventureLevelCompletionProps {
   playerIsDead: boolean;
   endBossBattle: (isVictory: boolean) => void;
   triggerBossTaunt: (event: BossTauntEvent) => void;
+  isFirstCompletion?: boolean;
 }
 
 export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionProps) {
@@ -70,6 +73,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
   const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
   const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
+  const [lootDrops, setLootDrops] = useState<LootDrop[]>([]);
   const completionProcessedRef = useRef(false);
 
   // Store callbacks in refs for stable references
@@ -112,6 +116,17 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       const goldMultiplier = upgradeEffects?.goldMultiplier ?? 1;
       const doubleFirst = upgradeEffects?.doubleFirstCompletionGold ? 2 : 1;
       addGold(Math.floor((baseGold + perfectClearGoldBonus) * goldMultiplier * doubleFirst));
+
+      // Generate loot drops
+      const drops = generateLevelLoot({
+        world: levelConfig.world,
+        level: levelConfig.level,
+        stars: gameState.stars as 0 | 1 | 2 | 3,
+        score: gameState.score,
+        isFirstCompletion: props.isFirstCompletion ?? true,
+        isBossLevel,
+      });
+      setLootDrops(drops);
 
       if (levelUpResult.leveledUp && levelUpResult.newLevel !== undefined) {
         setLevelUpData({ oldLevel, newLevel: levelUpResult.newLevel, newTitles: [] });
@@ -205,12 +220,14 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   // Reset rewards flag (needed for retry)
   const resetRewards = useCallback(() => {
     setHasAwardedLevelRewards(false);
+    setLootDrops([]);
     completionProcessedRef.current = false;
   }, []);
 
   return {
     levelUpData,
     hasAwardedLevelRewards,
+    lootDrops,
     handleLevelUpClose,
     resetRewards,
     completionProcessedRef,

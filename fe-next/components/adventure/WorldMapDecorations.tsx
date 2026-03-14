@@ -173,7 +173,7 @@ export function TrailPath({
               dur="3s"
               repeatCount="indefinite"
               path={path}
-              keyPoints="1;0"
+              keyPoints="0;1"
               keyTimes="0;1"
               calcMode="spline"
               keySplines="0.4 0 0.2 1"

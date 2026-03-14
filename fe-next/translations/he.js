@@ -2864,7 +2864,20 @@ const he = {
       "bestRanked": "ניקוד מדורג הכי טוב",
       "bestCasual": "ניקוד רגיל הכי טוב",
       "share": "שתף"
-    }
+    },
+    "level": "רמה",
+    "winRate": "אחוז ניצחון",
+    "gamesPlayed": "משחקים ששוחקו",
+    "totalWords": "סה״כ מילים",
+    "longestWord": "המילה הארוכה ביותר",
+    "topPercent": "טופ {{percent}}%",
+    "challenge": "אתגר",
+    "addFriend": "הוסף חבר",
+    "games": "משחקים"
+  },
+  "playerProfile": {
+    "notFound": "שחקן לא נמצא",
+    "error": "שגיאה בטעינת פרופיל"
   },
   "streaks": {
     "wager": {
@@ -5713,6 +5726,14 @@ const he = {
           "desc": "השלם {target} שלבים עם 3 כוכבים"
         }
       }
+    },
+    "loot": {
+      "continue": "המשך",
+      "gold": "זהב",
+      "loreScroll": "מגילת סיפור",
+      "runeFragment": "שבר רונה",
+      "tapToOpen": "לחץ לפתיחה",
+      "xp": "ניסיון"
     }
   },
   "blast": {
