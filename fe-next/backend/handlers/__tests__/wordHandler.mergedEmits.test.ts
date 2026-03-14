@@ -146,6 +146,7 @@ function makeBlastGame(overrides = {}) {
     users: { testUser: { isHost: false, socketId: 'socket-merge-test' } },
     blastModeState: {
       overlay: [],
+      overlayMap: new Map(),
       playerMoves: { testUser: 3 },
       playerBonusMoves: { testUser: 0 },
       playerStats: { testUser: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 } },

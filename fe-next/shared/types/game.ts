@@ -326,7 +326,7 @@ export interface BlastPlayerStats {
 export interface BlastModeState {
   overlay: BlastTileOverlay[];
   /** Pre-built lookup map from "row,col" → tile type for O(1) path queries */
-  overlayMap: Map<string, string>;
+  overlayMap: Map<string, BlastTileType>;
   playerMoves: Record<string, number>;
   playerBonusMoves: Record<string, number>;
   /** Rich per-player stats for results page */

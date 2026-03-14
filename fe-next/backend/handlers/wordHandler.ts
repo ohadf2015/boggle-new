@@ -549,7 +549,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     try {
       // blastModeManager imported at top level
       const blastState = game.blastModeState;
-      const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay);
+      const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay, blastState.overlayMap);
       blastTileBonus = calculateBlastTileBonus(tilesOnPath);
       blastTilesCleared = tilesOnPath;
       const gemCount = tilesOnPath.filter(t => t === 'gem').length;

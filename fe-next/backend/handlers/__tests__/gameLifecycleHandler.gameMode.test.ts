@@ -416,6 +416,7 @@ describe('gameLifecycleHandler - gameMode', () => {
         gameMode: 'blast',
         blastModeState: {
           overlay: [['normal', 'bomb'], ['ice', 'normal']],
+          overlayMap: new Map(),
           seed: 42,
         },
       });

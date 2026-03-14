@@ -719,8 +719,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                             <div className="flex-1 flex flex-col min-h-0">
                                 {children}
                             </div>
-                            <AutoHideFooter className="relative z-0 flex-shrink-0" />
                         </main>
+                        <AutoHideFooter className="relative z-0 flex-shrink-0" />
                         {/* Global bottom navigation - mobile only, hidden during gameplay */}
                         <GlobalBottomNav />
                     </div>
