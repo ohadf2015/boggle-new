@@ -1426,6 +1426,7 @@ const he = {
     "words": "מילים",
     "bestWord": "הטובה ביותר",
     "missedWords": "מילים שפספסת",
+    "wordLengths": "אורכי מילים",
     "missedOnBoard": "מילים שפספסת על הלוח",
     "everyoneReady": "כולם מוכנים!",
     "waitingForPlayers": "ממתין לשחקנים",
@@ -1471,7 +1472,8 @@ const he = {
       "title": "דירוג מצטבר",
       "gameCount": "משחק {count}",
       "round": "ס{num}"
-    }
+    },
+    "wordsFound": "מילים שנמצאו"
   },
   "nextStep": {
     "backToLobby": "חזרה ללובי",
@@ -3074,7 +3076,8 @@ const he = {
     "nearbyPlayers": "שחקנים קרובים",
     "points": "נק'",
     "hint": "מצא מילים ארוכות כדי לעלות בדירוג! 💡",
-    "multiplayerTip": "מילים ייחודיות = נקודות! מילים משותפות = אפס 🎯"
+    "multiplayerTip": "מילים ייחודיות = נקודות! מילים משותפות = אפס 🎯",
+    "wordsPerMin": "מילים/דקה"
   },
   "ranked": {
     "title": "מצב מדורג",
@@ -3297,6 +3300,7 @@ const he = {
     "comboBonus": "בונוס קומבו",
     "fireBonus": "בונוס אש",
     "highScore": "שיא",
+    "boardCoverage": "כיסוי לוח",
     "maxCombo": "קומבו מקסימלי",
     "submitWord": "שלח",
     "clearWord": "נקה",
@@ -3652,6 +3656,9 @@ const he = {
     "requestChallenge": "בקש אתגר",
     "requestSent": "הבקשה נשלחה"
   },
+  "dailyChallenge": {
+    "pointsPerWord": "נקודות למילה"
+  },
   "wordHunt": {
     "title": "ציד מילים",
     "alreadyGuessed": "כבר ניחשת את המילה הזאת!",
@@ -3874,7 +3881,8 @@ const he = {
       "scored": "קיבל",
       "canYouBeat": "תוכל לנצח?",
       "shareText": "האם תוכל לנצח את הניקוד שלי של {score}? אתגר מ-{name}!"
-    }
+    },
+    "attempts": "ניסיונות"
   },
   "keepPlaying": {
     "succeeded": {

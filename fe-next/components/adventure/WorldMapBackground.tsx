@@ -1,13 +1,14 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion, type MotionValue } from 'framer-motion';
+import { motion, useTransform, type MotionValue } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { Cloud } from './WorldMapDecorations';
 
 interface WorldMapBackgroundProps {
-  parallaxX: number;
-  parallaxY: number;
+  parallaxX: MotionValue<number>;
+  parallaxY: MotionValue<number>;
   starsY: MotionValue<number>;
   cloudsY: MotionValue<number>;
 }
@@ -19,6 +20,25 @@ export function WorldMapBackground({
   starsY,
   cloudsY,
 }: WorldMapBackgroundProps): React.JSX.Element {
+  const { isLowEnd, prefersReducedMotion } = useDevicePerformance();
+  const skipBlur = isLowEnd || prefersReducedMotion;
+
+  // Derive per-layer parallax from MotionValues (zero re-renders)
+  const bgX = useTransform(parallaxX, (v) => v * 0.05);
+  const bgY = useTransform(parallaxY, (v) => v * 0.05);
+  const milkyX = useTransform(parallaxX, (v) => v * 0.1);
+  const milkyY = useTransform(parallaxY, (v) => v * 0.1);
+  const dustX = useTransform(parallaxX, (v) => v * 0.15);
+  const dustY = useTransform(parallaxY, (v) => v * 0.15);
+  const nebulaX = useTransform(parallaxX, (v) => v * 0.25);
+  const nebulaY = useTransform(parallaxY, (v) => v * 0.25);
+  const shootingX = useTransform(parallaxX, (v) => v * 0.2);
+  const shootingY = useTransform(parallaxY, (v) => v * 0.2);
+  const starsParallaxX = useTransform(parallaxX, (v) => v * 0.4);
+  const starsParallaxY = useTransform(parallaxY, (v) => v * 0.4);
+  const cloudsParallaxX = useTransform(parallaxX, (v) => v * 0.6);
+  const cloudsParallaxY = useTransform(parallaxY, (v) => v * 0.6);
+
   // Pre-generate star positions for galaxy background
   const stars = useMemo(() => {
     const seededRandom = (seed: number) => {
@@ -38,11 +58,12 @@ export function WorldMapBackground({
     }));
   }, []);
 
+  // Nebula clouds — pre-blurred radial gradients replace blur(100-120px) filters
   const nebulaClouds = useMemo(() => [
-    { left: '10%', top: '10%', color: 'rgba(139, 92, 246, 0.08)', size: 300, blur: 120 },
-    { left: '75%', top: '35%', color: 'rgba(236, 72, 153, 0.06)', size: 280, blur: 100 },
-    { left: '5%', top: '60%', color: 'rgba(34, 211, 238, 0.07)', size: 260, blur: 110 },
-    { left: '70%', top: '80%', color: 'rgba(251, 191, 36, 0.06)', size: 250, blur: 100 },
+    { left: '10%', top: '10%', color: 'rgba(139, 92, 246, 0.08)', size: 500 },
+    { left: '75%', top: '35%', color: 'rgba(236, 72, 153, 0.06)', size: 480 },
+    { left: '5%', top: '60%', color: 'rgba(34, 211, 238, 0.07)', size: 460 },
+    { left: '70%', top: '80%', color: 'rgba(251, 191, 36, 0.06)', size: 450 },
   ], []);
 
   const shootingStars = useMemo(() => [
@@ -53,22 +74,23 @@ export function WorldMapBackground({
   return (
     <>
       {/* Deep space background gradient */}
-      <div
+      <motion.div
         className="fixed inset-0 bg-gradient-to-b from-[#050510] via-[#0a0a2a] to-[#0d1033] pointer-events-none"
-        style={{ transform: `translate(${parallaxX * 0.05}px, ${parallaxY * 0.05}px)` }}
+        style={{ x: bgX, y: bgY }}
       />
 
       {/* Milky Way band */}
-      <div
+      <motion.div
         className="fixed inset-0 pointer-events-none opacity-30"
         style={{
           background: 'linear-gradient(135deg, transparent 20%, rgba(139,92,246,0.1) 35%, rgba(236,72,153,0.08) 50%, rgba(34,211,238,0.1) 65%, transparent 80%)',
-          transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px)`,
+          x: milkyX,
+          y: milkyY,
         }}
       />
 
       {/* Cosmic dust particles */}
-      <div
+      <motion.div
         className="fixed inset-0 pointer-events-none opacity-40"
         style={{
           backgroundImage: `radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.3), transparent),
@@ -78,14 +100,15 @@ export function WorldMapBackground({
                            radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.3), transparent),
                            radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.15), transparent)`,
           backgroundSize: '200px 200px',
-          transform: `translate(${parallaxX * 0.15}px, ${parallaxY * 0.15}px)`,
+          x: dustX,
+          y: dustY,
         }}
       />
 
-      {/* Nebula clouds */}
-      <div
+      {/* Nebula clouds — radial-gradient only, blur capped at 40px (skip on low-end) */}
+      <motion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
-        style={{ transform: `translate(${parallaxX * 0.25}px, ${parallaxY * 0.25}px)` }}
+        style={{ x: nebulaX, y: nebulaY }}
       >
         {nebulaClouds.map((nebula, i) => (
           <div
@@ -96,18 +119,19 @@ export function WorldMapBackground({
               top: nebula.top,
               width: nebula.size,
               height: nebula.size,
-              background: `radial-gradient(circle, ${nebula.color} 0%, transparent 70%)`,
-              filter: `blur(${nebula.blur}px)`,
+              background: `radial-gradient(circle, ${nebula.color} 0%, transparent 60%)`,
+              filter: skipBlur ? 'none' : 'blur(40px)',
+              willChange: skipBlur ? 'auto' : 'transform',
               '--nebula-duration': `${12 + i * 2}s`,
             } as React.CSSProperties}
           />
         ))}
-      </div>
+      </motion.div>
 
       {/* Shooting stars */}
-      <div
+      <motion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
-        style={{ transform: `translate(${parallaxX * 0.2}px, ${parallaxY * 0.2}px)` }}
+        style={{ x: shootingX, y: shootingY }}
       >
         {shootingStars.map((star, i) => (
           <div
@@ -121,15 +145,15 @@ export function WorldMapBackground({
             } as React.CSSProperties}
           />
         ))}
-      </div>
+      </motion.div>
 
       {/* Starfield with parallax */}
       <motion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{
           y: starsY,
-          x: parallaxX * 0.4,
-          translateY: parallaxY * 0.4,
+          x: starsParallaxX,
+          translateY: starsParallaxY,
         }}
       >
         {stars.map((star) => (
@@ -163,8 +187,8 @@ export function WorldMapBackground({
         className="fixed inset-0 pointer-events-none"
         style={{
           y: cloudsY,
-          x: parallaxX * 0.6,
-          translateY: parallaxY * 0.6,
+          x: cloudsParallaxX,
+          translateY: cloudsParallaxY,
         }}
       >
         <Cloud className="top-[15%] left-[5%]" size="md" speed={0.5} />

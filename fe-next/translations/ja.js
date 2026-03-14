@@ -1409,6 +1409,7 @@ const ja = {
     "words": "単語",
     "bestWord": "ベスト",
     "missedWords": "見逃した単語",
+    "wordLengths": "単語の長さ",
     "missedOnBoard": "見逃した単語",
     "everyoneReady": "全員準備完了！",
     "waitingForPlayers": "プレイヤーを待っています",
@@ -1454,7 +1455,8 @@ const ja = {
       "title": "セッション順位",
       "gameCount": "ゲーム{count}",
       "round": "R{num}"
-    }
+    },
+    "wordsFound": "見つけた単語"
   },
   "nextStep": {
     "backToLobby": "ロビーに戻る",
@@ -2689,7 +2691,8 @@ const ja = {
     "nearbyPlayers": "近いプレイヤー",
     "points": "pt",
     "hint": "💡 もっと単語を見つけて順位を上げよう！",
-    "multiplayerTip": "ユニークな単語を見つけてスコア！他の人とかぶると0点だよ。"
+    "multiplayerTip": "ユニークな単語を見つけてスコア！他の人とかぶると0点だよ。",
+    "wordsPerMin": "語/分"
   },
   "ranked": {
     "title": "ランクマッチ",
@@ -3279,6 +3282,7 @@ const ja = {
     "comboBonus": "コンボボーナス",
     "fireBonus": "ファイアボーナス",
     "highScore": "ハイスコア",
+    "boardCoverage": "ボードカバー率",
     "maxCombo": "最大コンボ",
     "submitWord": "送信",
     "clearWord": "クリア",
@@ -3694,6 +3698,9 @@ const ja = {
     "requestChallenge": "チャレンジをリクエスト",
     "requestSent": "リクエスト送信済み"
   },
+  "dailyChallenge": {
+    "pointsPerWord": "単語あたりのポイント"
+  },
   "wordHunt": {
     "title": "ワードハント",
     "alreadyGuessed": "その単語は既に推測されています！",
@@ -3916,7 +3923,8 @@ const ja = {
       "scored": "が獲得",
       "canYouBeat": "超えられる？",
       "shareText": "{name}からの挑戦！{score}点を超えられる？"
-    }
+    },
+    "attempts": "試行回数"
   },
   "keepPlaying": {
     "succeeded": {

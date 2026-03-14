@@ -115,8 +115,8 @@ describe('AdventureGrid - Framer Layout Animations', () => {
     });
   });
 
-  describe('LayoutId Prop', () => {
-    it('should have layoutId matching tile id for shared layout animations', () => {
+  describe('Layout Position Prop', () => {
+    it('should have layout="position" with stable tile IDs for position animations', () => {
       const tiles = createTestTiles(4);
       const { container } = render(
         <AdventureGrid tiles={tiles} gridSize={4} />
@@ -132,7 +132,7 @@ describe('AdventureGrid - Framer Layout Animations', () => {
       });
     });
 
-    it('should pass layoutId from parent to tile component', () => {
+    it('should pass layout prop from parent to tile component', () => {
       const tiles = createTestTiles(4);
       const { container } = render(
         <AdventureGrid tiles={tiles} gridSize={4} />

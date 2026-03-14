@@ -27,9 +27,14 @@ import AdventureEffectsLayer from './effects/AdventureEffectsLayer';
 import LevelCompleteModal from './LevelCompleteModal';
 import LevelEntryOverlay from './LevelEntryOverlay';
 import { BossOverlay, PlayerHealthBar } from './boss';
-import { VictoryCinematic, VICTORY_DURATION_FRAMES, DefeatCinematic, DEFEAT_DURATION_FRAMES } from './cinematics';
-import { CinematicPlayer } from './boss/cinematics/CinematicPlayer';
+import dynamic from 'next/dynamic';
+import { VICTORY_DURATION_FRAMES, DEFEAT_DURATION_FRAMES } from './cinematics';
 import GameplayBackground from './themed/GameplayBackground';
+
+// Dynamic imports — cinematics are heavy (Remotion) and only shown on level complete/defeat
+const VictoryCinematic = dynamic(() => import('./cinematics/VictoryCinematic').then(mod => ({ default: mod.VictoryCinematic as React.ComponentType<any> })), { ssr: false });
+const DefeatCinematic = dynamic(() => import('./cinematics/DefeatCinematic').then(mod => ({ default: mod.DefeatCinematic as React.ComponentType<any> })), { ssr: false });
+const CinematicPlayer = dynamic(() => import('./boss/cinematics/CinematicPlayer').then(mod => ({ default: mod.CinematicPlayer })), { ssr: false });
 import { GameHeader, GameSidebar, GameGridArea, PauseOverlay, GameLayout } from './ui';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 

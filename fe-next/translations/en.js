@@ -1527,6 +1527,7 @@ const en = {
     "words": "Words",
     "bestWord": "Best",
     "missedWords": "Missed",
+    "wordLengths": "Word Lengths",
     "missedOnBoard": "Words You Missed on the Board",
     "everyoneReady": "All Set!",
     "waitingForPlayers": "Waiting...",
@@ -1572,7 +1573,8 @@ const en = {
       "title": "Session Standings",
       "gameCount": "Game {count}",
       "round": "R{num}"
-    }
+    },
+    "wordsFound": "Words found"
   },
   "nextStep": {
     "backToLobby": "Back to Lobby",
@@ -3175,7 +3177,8 @@ const en = {
     "nearbyPlayers": "Nearby Players",
     "points": "pts",
     "hint": "Tap names to see their words!",
-    "multiplayerTip": "Unique words score more!"
+    "multiplayerTip": "Unique words score more!",
+    "wordsPerMin": "Words/min"
   },
   "ranked": {
     "title": "Ranked Mode",
@@ -3398,6 +3401,7 @@ const en = {
     "comboBonus": "Combo Bonus",
     "fireBonus": "Fire Bonus",
     "highScore": "High Score",
+    "boardCoverage": "Board Coverage",
     "maxCombo": "Max Combo",
     "submitWord": "Submit",
     "clearWord": "Clear",
@@ -3753,6 +3757,9 @@ const en = {
     "requestChallenge": "Request Challenge",
     "requestSent": "Request Sent"
   },
+  "dailyChallenge": {
+    "pointsPerWord": "Points per word"
+  },
   "wordHunt": {
     "title": "Word Hunt",
     "alreadyGuessed": "Already tried that!",
@@ -3975,7 +3982,8 @@ const en = {
       "scored": "scored",
       "canYouBeat": "Can you beat it?",
       "shareText": "Can you beat my score of {score}? Challenge from {name}!"
-    }
+    },
+    "attempts": "Attempts"
   },
   "keepPlaying": {
     "succeeded": {

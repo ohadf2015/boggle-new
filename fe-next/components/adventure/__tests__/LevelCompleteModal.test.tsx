@@ -86,10 +86,11 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock useParallax hook
+const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
 jest.mock('@/hooks/useParallax', () => ({
   useParallax: () => ({
-    x: 0,
-    y: 0,
+    x: mockMotionValue(0),
+    y: mockMotionValue(0),
     isGyroActive: false,
   }),
 }));

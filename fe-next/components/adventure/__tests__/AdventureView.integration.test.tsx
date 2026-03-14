@@ -29,6 +29,15 @@ jest.mock('framer-motion', () => {
             filteredProps[key] = props[key];
           }
         });
+        // Filter MotionValue objects out of style prop (they're framer-motion specific)
+        if (filteredProps.style && typeof filteredProps.style === 'object') {
+          const cleanStyle: Record<string, unknown> = {};
+          for (const [k, v] of Object.entries(filteredProps.style as Record<string, unknown>)) {
+            if (v && typeof v === 'object' && 'get' in (v as object)) continue;
+            cleanStyle[k] = v;
+          }
+          filteredProps.style = cleanStyle;
+        }
         return React.createElement(element, { ...filteredProps, ref }, children);
       }
     );
@@ -63,6 +72,24 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock Next.js Link
+// Mock next/dynamic to render components synchronously in tests
+jest.mock('next/dynamic', () => {
+  return (loader: () => Promise<any>, _opts?: any) => {
+    let Component: any = null;
+    // Eagerly resolve the dynamic import
+    const promise = loader();
+    promise.then((mod: any) => {
+      Component = mod.default || mod;
+    });
+    const DynamicComponent = (props: any) => {
+      if (!Component) return null;
+      return React.createElement(Component, props);
+    };
+    DynamicComponent.displayName = 'DynamicComponent';
+    return DynamicComponent;
+  };
+});
+
 jest.mock('next/link', () => {
   const MockLink = ({ children, href, ...props }: any) => {
     return React.createElement('a', { href, ...props }, children);
@@ -82,10 +109,11 @@ jest.mock('next/image', () => {
 });
 
 // Mock useParallax hook
+const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
 jest.mock('@/hooks/useParallax', () => ({
   useParallax: () => ({
-    x: 0,
-    y: 0,
+    x: mockMotionValue(0),
+    y: mockMotionValue(0),
     isGyroActive: false,
   }),
 }));
@@ -463,8 +491,9 @@ describe('AdventureView Integration', () => {
       // GIVEN
       renderAdventureView();
       fireEvent.click(screen.getByTestId('world-1'));
+      await waitFor(() => expect(screen.getByTestId('level-grid')).toBeInTheDocument());
       fireEvent.click(screen.getByTestId('level-button-1'));
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByTestId('adventure-game')).toBeInTheDocument());
 
       // WHEN - simulate browser back button via popstate with levelGrid state
       const levelGridState = { adventureView: 'levelGrid', worldId: 1, levelId: null };

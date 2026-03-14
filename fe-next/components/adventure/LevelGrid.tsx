@@ -56,8 +56,9 @@ export default function LevelGrid({
   const { t } = useLanguage();
 
   // Interactive parallax from gyroscope/mouse/touch
-  // Higher intensity (1.0) and faster ambient (0.6) for more reactive movement
-  const { x: parallaxX, y: parallaxY } = useParallax({
+  // Sets --parallax-x / --parallax-y CSS custom properties on :root
+  // We use CSS calc() with these properties instead of JS values to avoid re-renders
+  useParallax({
     intensity: 1.0,
     enableGyroscope: true,
     enableGesture: true,
@@ -65,8 +66,8 @@ export default function LevelGrid({
     ambientSpeed: 0.6,
   });
 
-  // Generate levels for this world
-  const levels = Array.from({ length: LEVELS_PER_WORLD }, (_, i) => {
+  // Generate levels for this world (memoized to avoid recalculation on parallax re-renders)
+  const levels = useMemo(() => Array.from({ length: LEVELS_PER_WORLD }, (_, i) => {
     const levelNum = i + 1;
     const config = getLevelConfig(world.id, levelNum);
     const completion = completions.find(
@@ -84,19 +85,22 @@ export default function LevelGrid({
       stars,
       isPerfect,
     };
-  });
+  }), [world.id, completions]);
 
   // World name translation
   const worldName = t(`adventure.worlds.${world.name}`) || world.name;
-  const worldStars = completions
-    .filter((c) => c.world === world.id)
-    .reduce((sum, c) => sum + c.stars, 0);
-  const maxWorldStars = LEVELS_PER_WORLD * MAX_STARS_PER_LEVEL;
-  const completedLevels = completions.filter((c) => c.world === world.id).length;
 
-  // Get world-specific colors for consistent theming
-  const worldColors = getWorldColors(world.colorPrimary);
-  const glowColor = getWorldGlow(world.colorPrimary);
+  // Memoize aggregate stats — avoids recomputing on every parallax/scroll render
+  const { worldStars, maxWorldStars, completedLevels, worldColors, glowColor } = useMemo(() => ({
+    worldStars: completions
+      .filter((c) => c.world === world.id)
+      .reduce((sum, c) => sum + c.stars, 0),
+    maxWorldStars: LEVELS_PER_WORLD * MAX_STARS_PER_LEVEL,
+    completedLevels: completions.filter((c) => c.world === world.id).length,
+    worldColors: getWorldColors(world.colorPrimary),
+    glowColor: getWorldGlow(world.colorPrimary),
+  }), [world.id, world.colorPrimary, completions]);
+
   const worldImage = WORLD_IMAGES[world.id];
   const particleConfig = WORLD_PARTICLES[world.id];
 
@@ -125,19 +129,20 @@ export default function LevelGrid({
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {/* Layer 1: Solid dark base with world accent */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 level-grid-parallax-css"
           style={{
-            transform: `translate(${parallaxX * 0.05}px, ${parallaxY * 0.05}px)`,
+            '--parallax-depth': '0.05',
             backgroundColor: 'rgb(12, 12, 35)',
-          }}
+          } as React.CSSProperties}
         />
 
         {/* Layer 2: Main world image - the hero background */}
         <div
-          className="absolute inset-0 level-grid-parallax-layer"
+          className="absolute inset-0 level-grid-parallax-layer level-grid-parallax-css-scaled"
           style={{
-            transform: `translate(${parallaxX * 0.12}px, ${parallaxY * 0.12}px) scale(1.15)`,
-          }}
+            '--parallax-depth': '0.12',
+            '--parallax-scale': '1.15',
+          } as React.CSSProperties}
         >
           <Image
             src={worldImage}
@@ -157,10 +162,10 @@ export default function LevelGrid({
 
         {/* Layer 3: Subtle accent highlight - solid color with opacity */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 level-grid-parallax-css"
           style={{
-            transform: `translate(${parallaxX * 0.2}px, ${parallaxY * 0.2}px)`,
-          }}
+            '--parallax-depth': '0.2',
+          } as React.CSSProperties}
         >
           <div
             className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[300px] h-[200px] rounded-full"
@@ -369,9 +374,9 @@ export default function LevelGrid({
                     {Array.from({ length: MAX_STARS_PER_LEVEL }).map((_, i) => (
                       <motion.div
                         key={i}
-                        initial={stars > i ? { scale: 0, rotate: -180 } : { scale: 0.5 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ delay: levelNum * 0.05 + i * 0.1, type: 'spring' }}
+                        initial={stars > i ? { scale: 0, rotate: -180 } : false}
+                        animate={stars > i ? { scale: 1, rotate: 0 } : undefined}
+                        transition={stars > i ? { delay: levelNum * 0.03 + i * 0.08, type: 'spring', stiffness: 300, damping: 20 } : undefined}
                       >
                         <Star
                           className={cn(

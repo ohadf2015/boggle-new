@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback, memo } from 'react';
 import { motion, useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css';
 import { Star, Lock, Crown } from 'lucide-react';
@@ -27,6 +27,7 @@ interface WorldMapProps {
 }
 
 // Motion variants - extracted to constants to prevent re-creation on every render
+const NOOP = () => {};
 const WORLD_HOVER_VARIANT = { scale: 1.08, y: -4, rotate: 2 };
 const WORLD_TAP_VARIANT = { scale: 0.95, rotate: -1 };
 
@@ -45,7 +46,7 @@ const WORLD_IMAGES: Record<number, string> = {
 };
 
 // World node on the trail
-function WorldNode({
+const WorldNode = memo(function WorldNode({
   world,
   isUnlocked,
   unlockRequirement,
@@ -238,7 +239,7 @@ function WorldNode({
       </motion.div>
     </motion.div>
   );
-}
+});
 
 /**
  * WorldMap - Trail-based adventure map with word game elements
@@ -323,6 +324,16 @@ export default function WorldMap({
     });
   }, [totalStars, completions]);
 
+  // Stable per-world click handlers to preserve WorldNode memo
+  const worldClickHandlers = useMemo(() => {
+    const handlers: Record<number, () => void> = {};
+    for (const config of WORLD_CONFIGS) {
+      const id = config.id;
+      handlers[id] = () => onWorldSelect(id);
+    }
+    return handlers;
+  }, [onWorldSelect]);
+
   // Derive next world to play: first unlocked but not fully completed
   const nextWorldId = useMemo(() => {
     for (let i = worldsData.length - 1; i >= 0; i--) {
@@ -361,7 +372,7 @@ export default function WorldMap({
                 currentStars={data.currentStars}
                 completedLevels={data.completedLevels}
                 totalWorldStars={data.totalWorldStars}
-                onClick={() => data.isUnlocked && onWorldSelect(data.world.id)}
+                onClick={data.isUnlocked ? (worldClickHandlers[data.world.id] ?? NOOP) : NOOP}
                 index={index}
                 isLeft={isLeft}
                 isNextWorld={data.world.id === nextWorldId}

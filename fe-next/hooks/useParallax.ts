@@ -9,14 +9,16 @@
  * Respects prefers-reduced-motion and device capabilities.
  *
  * Performance optimizations:
- * - Uses refs + CSS custom properties to avoid React re-renders
+ * - Uses Framer Motion MotionValues to avoid React re-renders entirely
+ * - Event handlers write directly to MotionValues (no setState/forceUpdate)
  * - Pauses RAF loop when tab is hidden (Page Visibility API)
- * - Returns stable reference to prevent consumer re-renders
+ * - Gyroscope throttled to 16ms minimum between updates
  */
 
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { useMotionValue, type MotionValue } from 'framer-motion';
 import { useDevicePerformance } from './useDevicePerformance';
 
 export interface ParallaxOptions {
@@ -35,10 +37,10 @@ export interface ParallaxOptions {
 }
 
 export interface ParallaxOutput {
-  /** Horizontal parallax offset */
-  x: number;
-  /** Vertical parallax offset */
-  y: number;
+  /** Horizontal parallax offset (MotionValue for zero re-renders) */
+  x: MotionValue<number>;
+  /** Vertical parallax offset (MotionValue for zero re-renders) */
+  y: MotionValue<number>;
   /** Whether gyroscope is active */
   isGyroActive: boolean;
 }
@@ -52,17 +54,12 @@ const DEFAULT_OPTIONS: Required<ParallaxOptions> = {
   cssTarget: ':root',
 };
 
-/**
- * Clamp value between min and max
- */
+/** Clamp value between min and max */
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-/**
- * Update CSS custom properties on target element
- * This moves animation to compositor thread, avoiding React re-renders
- */
+/** Update CSS custom properties on target element */
 function updateCSSProperties(x: number, y: number, target: string): void {
   const element = target === ':root' ? document.documentElement : document.querySelector(target);
   if (element instanceof HTMLElement) {
@@ -71,16 +68,30 @@ function updateCSSProperties(x: number, y: number, target: string): void {
   }
 }
 
+/** Minimum interval between gyroscope updates (ms) */
+const GYRO_THROTTLE_MS = 16;
+
 export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
-  const opts = { ...DEFAULT_OPTIONS, ...options };
+  const opts = useMemo(() => ({ ...DEFAULT_OPTIONS, ...options }), [
+    options.intensity,
+    options.enableGyroscope,
+    options.enableGesture,
+    options.enableAmbient,
+    options.ambientSpeed,
+    options.cssTarget,
+  ]);
   const { prefersReducedMotion, isMobile, enableComplexAnimations } = useDevicePerformance();
 
-  // Use refs for values that update frequently to avoid re-renders
+  // MotionValues for output — consumers bind directly, no re-renders
+  const motionX = useMotionValue(0);
+  const motionY = useMotionValue(0);
+
+  // Refs for per-source values
   const gyroRef = useRef({ x: 0, y: 0 });
   const gestureRef = useRef({ x: 0, y: 0 });
   const ambientRef = useRef({ x: 0, y: 0 });
 
-  // State only for values that consumers need to react to
+  // State only for values that consumers need to react to (rare changes)
   const [isGyroActive, setIsGyroActive] = useState(false);
 
   // Track visibility for pausing RAF
@@ -88,36 +99,20 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
   const animationFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
 
-  // Stable output ref to avoid consumer re-renders
-  const outputRef = useRef<ParallaxOutput>({ x: 0, y: 0, isGyroActive: false });
+  // Gyroscope throttle timestamp
+  const lastGyroTimeRef = useRef(0);
 
-  // Force update trigger for when consumers need the latest values
-  const [, forceUpdate] = useState(0);
-
-  // Previous output values for change detection (avoid unnecessary re-renders)
-  const prevOutputRef = useRef({ x: 0, y: 0 });
-  const EPSILON = 0.1; // Minimum change to trigger a re-render
-
-  // Update combined output and CSS properties
+  // Combine sources and write to MotionValues
   const updateOutput = useCallback(() => {
     const x = gyroRef.current.x + gestureRef.current.x + ambientRef.current.x;
     const y = gyroRef.current.y + gestureRef.current.y + ambientRef.current.y;
 
-    outputRef.current.x = x;
-    outputRef.current.y = y;
-    outputRef.current.isGyroActive = isGyroActive;
+    motionX.set(x);
+    motionY.set(y);
 
-    // Update CSS custom properties (moves animation to compositor thread)
+    // Also update CSS custom properties for CSS-driven consumers
     updateCSSProperties(x, y, opts.cssTarget);
-
-    // Only trigger React re-render when output values meaningfully change
-    const dx = Math.abs(x - prevOutputRef.current.x);
-    const dy = Math.abs(y - prevOutputRef.current.y);
-    if (dx > EPSILON || dy > EPSILON) {
-      prevOutputRef.current = { x, y };
-      forceUpdate((n) => n + 1);
-    }
-  }, [isGyroActive, opts.cssTarget]);
+  }, [motionX, motionY, opts.cssTarget]);
 
   // Visibility API - pause RAF when tab is hidden
   useEffect(() => {
@@ -129,7 +124,7 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // Gyroscope input (mobile only)
+  // Gyroscope input (mobile only) with 16ms throttle
   useEffect(() => {
     if (!opts.enableGyroscope || !isMobile || prefersReducedMotion || !enableComplexAnimations) {
       setIsGyroActive(false);
@@ -142,8 +137,10 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
     }
 
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      // gamma: left-right tilt (-90 to 90)
-      // beta: front-back tilt (-180 to 180)
+      const now = performance.now();
+      if (now - lastGyroTimeRef.current < GYRO_THROTTLE_MS) return;
+      lastGyroTimeRef.current = now;
+
       const x = ((e.gamma || 0) / 45) * 15 * opts.intensity;
       const y = ((e.beta || 0) / 45) * 15 * opts.intensity;
       gyroRef.current = {
@@ -156,7 +153,6 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
 
     // Request permission on iOS 13+
     const requestPermission = async () => {
-      // Type assertion for iOS-specific API
       const DeviceOrientationEventWithPermission = DeviceOrientationEvent as typeof DeviceOrientationEvent & {
         requestPermission?: () => Promise<'granted' | 'denied'>;
       };
@@ -168,16 +164,13 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
             window.addEventListener('deviceorientation', handleOrientation, { passive: true });
           }
         } catch {
-          // Permission denied or error - fallback to gesture-only
           setIsGyroActive(false);
         }
       } else {
-        // Non-iOS or older iOS - add listener directly
         window.addEventListener('deviceorientation', handleOrientation, { passive: true });
       }
     };
 
-    // Request permission on first user interaction
     const handleFirstInteraction = () => {
       requestPermission();
       window.removeEventListener('touchstart', handleFirstInteraction);
@@ -222,10 +215,7 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
     }
   }, [opts.enableGesture, opts.intensity, isMobile, prefersReducedMotion, enableComplexAnimations, updateOutput]);
 
-  // Ambient drift (always-on oscillation for 3D effect)
-  // Uses Lissajous-like curves (overlapping sine waves) for organic, non-repeating motion
-  // Performance: Uses refs and CSS custom properties to avoid React re-renders
-  // Also pauses when tab is hidden to save CPU
+  // Ambient drift (always-on Lissajous oscillation)
   useEffect(() => {
     if (!opts.enableAmbient || prefersReducedMotion) {
       return;
@@ -234,7 +224,6 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
     startTimeRef.current = performance.now();
 
     const animate = (time: number) => {
-      // Skip animation when tab is hidden (save CPU)
       if (!isVisibleRef.current) {
         animationFrameRef.current = requestAnimationFrame(animate);
         return;
@@ -244,26 +233,17 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
       const speed = opts.ambientSpeed;
       const intensity = opts.intensity;
 
-      // Primary slow oscillation (main drift)
       const primaryX = Math.sin(elapsed * 0.0002 * speed) * 12;
       const primaryY = Math.cos(elapsed * 0.00015 * speed) * 10;
-
-      // Secondary faster oscillation (adds organic feel)
       const secondaryX = Math.sin(elapsed * 0.0005 * speed + 0.5) * 5;
       const secondaryY = Math.cos(elapsed * 0.00045 * speed + 0.3) * 4;
-
-      // Tertiary subtle tremor (micro-movement for "alive" feel)
       const tertiaryX = Math.sin(elapsed * 0.001 * speed) * 2;
       const tertiaryY = Math.cos(elapsed * 0.0012 * speed) * 1.5;
 
-      // Combine all waves with intensity multiplier
       const x = (primaryX + secondaryX + tertiaryX) * intensity;
       const y = (primaryY + secondaryY + tertiaryY) * intensity;
 
-      // Update ref (no re-render)
       ambientRef.current = { x, y };
-
-      // Update combined output and CSS properties
       updateOutput();
 
       animationFrameRef.current = requestAnimationFrame(animate);
@@ -278,13 +258,12 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
     };
   }, [opts.enableAmbient, opts.ambientSpeed, opts.intensity, prefersReducedMotion, updateOutput]);
 
-  // Return static values for reduced motion
+  // Return static zero MotionValues for reduced motion
   if (prefersReducedMotion) {
-    return { x: 0, y: 0, isGyroActive: false };
+    return { x: motionX, y: motionY, isGyroActive: false };
   }
 
-  // Return current output (stable reference pattern)
-  return outputRef.current;
+  return { x: motionX, y: motionY, isGyroActive };
 }
 
 export default useParallax;

@@ -73,10 +73,11 @@ jest.mock('next/image', () => {
 });
 
 // Mock useParallax hook
+const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
 jest.mock('@/hooks/useParallax', () => ({
   useParallax: () => ({
-    x: 10,
-    y: 10,
+    x: mockMotionValue(10),
+    y: mockMotionValue(10),
     isGyroActive: false,
   }),
 }));

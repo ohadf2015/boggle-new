@@ -1408,6 +1408,7 @@ const sv = {
     "words": "Ord",
     "bestWord": "Bästa",
     "missedWords": "Ord du missade",
+    "wordLengths": "Ordlängder",
     "missedOnBoard": "Ord du missade på brädet",
     "everyoneReady": "Alla redo!",
     "waitingForPlayers": "Väntar på spelare",
@@ -1453,7 +1454,8 @@ const sv = {
       "title": "Sammanlagd ställning",
       "gameCount": "Spel {count}",
       "round": "R{num}"
-    }
+    },
+    "wordsFound": "Ord hittade"
   },
   "nextStep": {
     "backToLobby": "Tillbaka till Lobbyn",
@@ -2689,7 +2691,8 @@ const sv = {
     "nearbyPlayers": "Närliggande spelare",
     "points": "poäng",
     "hint": "💡 Hitta fler ord för att klättra!",
-    "multiplayerTip": "Hitta unika ord för att poänga! Delade ord ger 0."
+    "multiplayerTip": "Hitta unika ord för att poänga! Delade ord ger 0.",
+    "wordsPerMin": "Ord/min"
   },
   "ranked": {
     "title": "Rankat läge",
@@ -3279,6 +3282,7 @@ const sv = {
     "comboBonus": "Kombobonus",
     "fireBonus": "Eldbonus",
     "highScore": "Rekord",
+    "boardCoverage": "Bräcktäckning",
     "maxCombo": "Max kombo",
     "submitWord": "Skicka",
     "clearWord": "Rensa",
@@ -3642,6 +3646,9 @@ const sv = {
     "requestChallenge": "Begär utmaning",
     "requestSent": "Förfrågan skickad"
   },
+  "dailyChallenge": {
+    "pointsPerWord": "Poäng per ord"
+  },
   "wordHunt": {
     "title": "Ordjakt",
     "alreadyGuessed": "Du har redan gissat det ordet!",
@@ -3864,7 +3871,8 @@ const sv = {
       "scored": "fick",
       "canYouBeat": "Kan du slå det?",
       "shareText": "Kan du slå min poäng på {score}? Utmaning från {name}!"
-    }
+    },
+    "attempts": "Försök"
   },
   "keepPlaying": {
     "succeeded": {

@@ -72,10 +72,11 @@ jest.mock('next/image', () => {
 });
 
 // Mock useParallax hook
+const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
 jest.mock('@/hooks/useParallax', () => ({
   useParallax: () => ({
-    x: 10,
-    y: 10,
+    x: mockMotionValue(10),
+    y: mockMotionValue(10),
     isGyroActive: false,
   }),
 }));
@@ -192,24 +193,17 @@ describe('LevelGrid Scroll Behavior', () => {
         />
       );
 
-      // THEN - parallax layers should have different transform multipliers
-      // The transform should include parallax values (not just 0px, 0px)
-      const transformElements = container.querySelectorAll('[style*="transform"]');
+      // THEN - parallax layers use CSS custom properties (--parallax-depth) for GPU-driven transforms
+      // instead of inline JS transforms, avoiding React re-renders on every animation frame
+      const cssParallaxLayers = container.querySelectorAll('.level-grid-parallax-css, .level-grid-parallax-css-scaled');
+      expect(cssParallaxLayers.length).toBeGreaterThanOrEqual(2);
 
-      // Should have at least 2 parallax layers (background, glow)
-      // Note: Particles layer uses CSS custom properties (--parallax-x/y) instead of inline transforms
-      // This is a performance optimization to avoid React re-renders
-      expect(transformElements.length).toBeGreaterThanOrEqual(2);
-
-      // At least one layer should show parallax effect (non-zero transform)
-      // Since we mocked useParallax to return x=10, y=10, transforms should show this
-      const hasParallaxEffect = Array.from(transformElements).some(el => {
-        const style = el.getAttribute('style') || '';
-        // Check for translate with non-zero values
-        return style.includes('translate') && !style.includes('translate(0px, 0px)');
-      });
-
-      expect(hasParallaxEffect).toBe(true);
+      // Each layer should have a different --parallax-depth value for varied speeds
+      const depths = Array.from(cssParallaxLayers).map(el =>
+        (el as HTMLElement).style.getPropertyValue('--parallax-depth')
+      );
+      const uniqueDepths = new Set(depths);
+      expect(uniqueDepths.size).toBeGreaterThanOrEqual(2);
     });
 
     it('should have parallax layers contained within the scroll container', () => {

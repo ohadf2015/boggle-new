@@ -16,12 +16,15 @@ import {
   getLevelSeed,
   getGridSize,
 } from '@/lib/adventure';
-import WorldMap from './WorldMap';
-import LevelGrid from './LevelGrid';
-import AdventureGame from './AdventureGame';
+import dynamic from 'next/dynamic';
 // WorldBackground is handled internally by LevelGrid for proper parallax layering
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import MusicControls from '@/components/MusicControls';
+
+import WorldMap from './WorldMap';
+import LevelGrid from './LevelGrid';
+// AdventureGame loads on demand (contains heavy cinematic/Remotion imports)
+const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 
 // View state type for navigation
 type ViewState = 'worldMap' | 'levelGrid' | 'playing';

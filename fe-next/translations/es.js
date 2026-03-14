@@ -1473,6 +1473,7 @@ const es = {
     "words": "Palabras",
     "bestWord": "Mejor",
     "missedWords": "Palabras que Perdiste",
+    "wordLengths": "Longitudes de palabras",
     "missedOnBoard": "Palabras que se te escaparon",
     "everyoneReady": "¡Todos listos!",
     "waitingForPlayers": "Esperando jugadores",
@@ -1518,7 +1519,8 @@ const es = {
       "title": "Tabla de la Sesión",
       "gameCount": "Juego {count}",
       "round": "R{num}"
-    }
+    },
+    "wordsFound": "Palabras encontradas"
   },
   "nextStep": {
     "backToLobby": "Volver al Lobby",
@@ -3107,7 +3109,8 @@ const es = {
     "nearbyPlayers": "Jugadores Cercanos",
     "points": "pts",
     "hint": "Sigue subiendo posiciones",
-    "multiplayerTip": "¡En multijugador, la velocidad importa!"
+    "multiplayerTip": "¡En multijugador, la velocidad importa!",
+    "wordsPerMin": "Palabras/min"
   },
   "ranked": {
     "title": "Modo Clasificatorio",
@@ -3329,6 +3332,7 @@ const es = {
     "comboBonus": "Bono de combo",
     "fireBonus": "Bono de fuego",
     "highScore": "Récord",
+    "boardCoverage": "Cobertura del tablero",
     "maxCombo": "Combo máximo",
     "submitWord": "Enviar",
     "clearWord": "Borrar",
@@ -3681,6 +3685,9 @@ const es = {
     "bonusChallenge": "Desafío Bonus",
     "continueMissions": "Continúa tus misiones diarias"
   },
+  "dailyChallenge": {
+    "pointsPerWord": "Puntos por palabra"
+  },
   "wordHunt": {
     "title": "Caza de Palabras",
     "alreadyGuessed": "¡Ya adivinaste esa palabra!",
@@ -3903,7 +3910,8 @@ const es = {
       "palindrome": "¡Un palíndromo! Igual al derecho y al revés.",
       "rareLetter": "¿Una palabra con '{letter}'? Letras raras, habilidad más rara.",
       "longWord": "¿Objetivo de {length} letras? Eso sí es un reto."
-    }
+    },
+    "attempts": "Intentos"
   },
   "keepPlaying": {
     "succeeded": {

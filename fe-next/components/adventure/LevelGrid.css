@@ -18,6 +18,28 @@
   -webkit-backface-visibility: hidden;
 }
 
+/* CSS-driven parallax using custom properties from useParallax hook
+ * Avoids React re-renders by reading --parallax-x/--parallax-y from :root */
+.level-grid-parallax-css {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translate(
+    calc(var(--parallax-x, 0px) * var(--parallax-depth, 0.1)),
+    calc(var(--parallax-y, 0px) * var(--parallax-depth, 0.1))
+  );
+}
+
+.level-grid-parallax-css-scaled {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translate(
+    calc(var(--parallax-x, 0px) * var(--parallax-depth, 0.1)),
+    calc(var(--parallax-y, 0px) * var(--parallax-depth, 0.1))
+  ) scale(var(--parallax-scale, 1));
+}
+
 /* Glow orb breathing animation - subtle pulsing for atmosphere */
 /* Neo-brutalist: no blur filters, solid colors with opacity changes */
 @keyframes glow-orb-breathe {
@@ -214,6 +236,8 @@
   }
 
   .level-grid-parallax-layer,
+  .level-grid-parallax-css,
+  .level-grid-parallax-css-scaled,
   .level-grid-foreground-edge,
   .level-grid-foreground-vignette {
     transition: none;

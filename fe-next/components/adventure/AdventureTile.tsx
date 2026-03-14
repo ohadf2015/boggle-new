@@ -112,7 +112,7 @@ export const AdventureTile = memo(({
   return (
     <motion.div
       key={tile.id}
-      layoutId={tile.id}
+      layout="position"
       data-row={tile.row}
       data-col={tile.col}
       role="gridcell"

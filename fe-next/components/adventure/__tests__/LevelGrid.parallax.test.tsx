@@ -82,7 +82,8 @@ jest.mock('next/image', () => {
 });
 
 // Mock useParallax hook with controllable values
-const mockParallaxValues = { x: 10, y: 5, isGyroActive: false };
+const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
+const mockParallaxValues = { x: mockMotionValue(10), y: mockMotionValue(5), isGyroActive: false };
 jest.mock('@/hooks/useParallax', () => ({
   useParallax: () => mockParallaxValues,
 }));
@@ -410,12 +411,10 @@ describe('LevelGrid Parallax System', () => {
         />
       );
 
-      // THEN - parallax layers should have transform styles applied
-      const parallaxLayers = container.querySelectorAll('.level-grid-parallax-layer');
-      parallaxLayers.forEach((layer) => {
-        const style = (layer as HTMLElement).style;
-        expect(style.transform).toBeTruthy();
-      });
+      // THEN - parallax layers should use CSS custom properties for GPU-driven transforms
+      // Layers use --parallax-depth CSS custom property instead of inline transforms
+      const cssParallaxLayers = container.querySelectorAll('.level-grid-parallax-css, .level-grid-parallax-css-scaled');
+      expect(cssParallaxLayers.length).toBeGreaterThanOrEqual(2);
     });
   });
 });
