@@ -316,6 +316,14 @@ export interface WordAcceptedPayload {
   fireRoundActive?: boolean;
   fireRoundMultiplier?: number;
   fireRoundBonus?: number;
+  /** Merged blast data (Fix 2) — present when gameMode is blast */
+  blast?: {
+    tileBonus: number;
+    tilesCleared: string[];
+    movesUsed: number;
+    bonusMove: boolean;
+    comboType?: string | null;
+  };
 }
 
 export interface AchievementPayload {

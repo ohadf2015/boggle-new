@@ -44,7 +44,7 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       <BodyPart fill={config.skinColor} />
 
       {/* Hair back layer (for styles that go behind the head) */}
-      {['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails'].includes(config.hair) ? (
+      {['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet'].includes(config.hair) ? (
         <HairPart fill={config.hairColor} />
       ) : null}
 

@@ -298,6 +298,75 @@ function Twintails({ fill }: HairPartProps) {
   );
 }
 
+function Mullet({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Short on top */}
+      <path d="M25 35 Q25 16 50 14 Q75 16 75 35" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Business in the front — neat bangs */}
+      <path d="M30 35 Q35 28 45 30 Q55 28 65 30 Q70 28 72 35" fill={fill} stroke="#000" strokeWidth={1.5} />
+      {/* Party in the back — long flowing back */}
+      <path d="M68 32 Q80 35 84 55 Q86 75 80 88 Q75 92 72 82 Q78 65 74 45" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M32 32 Q20 35 16 55 Q14 75 20 88 Q25 92 28 82 Q22 65 26 45" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+    </g>
+  );
+}
+
+function Combover({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Bald top — just skin showing through */}
+      <path d="M30 35 Q30 28 42 26 Q38 22 50 20 Q62 22 58 26 Q70 28 70 35" fill={fill} stroke="#000" strokeWidth={S} opacity="0.4" />
+      {/* Dramatic combover sweep from left */}
+      <path d="M20 38 Q18 20 30 14 Q40 10 52 14 Q60 18 65 28 Q58 22 48 20 Q35 18 25 28 Q22 34 24 40" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Side hair */}
+      <path d="M20 35 Q20 50 22 55" fill={fill} stroke="#000" strokeWidth={S} />
+      <path d="M80 35 Q80 50 78 55" fill={fill} stroke="#000" strokeWidth={S} />
+    </g>
+  );
+}
+
+function Elvis({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Base hair swept back */}
+      <path d="M22 35 Q22 14 50 10 Q78 14 78 35" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* The iconic pompadour — big swooping quiff */}
+      <path d="M30 30 Q28 8 42 2 Q52 0 56 8 Q58 14 52 22 Q46 28 40 30" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Volume highlight */}
+      <path d="M36 14 Q42 6 48 10" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
+      {/* Sideburns */}
+      <rect x="20" y="35" width="5" height="18" rx="2" fill={fill} stroke="#000" strokeWidth={1.5} />
+      <rect x="75" y="35" width="5" height="18" rx="2" fill={fill} stroke="#000" strokeWidth={1.5} />
+    </g>
+  );
+}
+
+function Ramen({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* A bowl of ramen on the head */}
+      {/* Bowl */}
+      <path d="M20 28 Q20 38 50 40 Q80 38 80 28" fill="#fff" stroke="#000" strokeWidth={S} />
+      <path d="M20 28 Q50 20 80 28" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Broth */}
+      <path d="M24 28 Q50 22 76 28 Q76 34 50 36 Q24 34 24 28Z" fill="#F5DEB3" stroke="none" />
+      {/* Noodle squiggles */}
+      <path d="M30 30 Q35 26 40 30 Q45 34 50 30 Q55 26 60 30 Q65 34 70 30" fill="none" stroke={fill} strokeWidth={2} strokeLinecap="round" />
+      <path d="M34 34 Q39 30 44 34 Q49 38 54 34 Q59 30 64 34" fill="none" stroke={fill} strokeWidth={2} strokeLinecap="round" />
+      {/* Egg slice */}
+      <ellipse cx="60" cy="28" rx="5" ry="4" fill="#fff" stroke="#000" strokeWidth={1} />
+      <circle cx="60" cy="28" r="2" fill="#FFD700" />
+      {/* Chopsticks */}
+      <line x1="42" y1="26" x2="36" y2="6" stroke="#8B6E4E" strokeWidth={2} strokeLinecap="round" />
+      <line x1="46" y1="26" x2="44" y2="6" stroke="#8B6E4E" strokeWidth={2} strokeLinecap="round" />
+      {/* Steam */}
+      <path d="M35 22 Q33 16 36 12" fill="none" stroke="#ddd" strokeWidth={1.5} opacity="0.4" />
+      <path d="M55 20 Q53 14 56 10" fill="none" stroke="#ddd" strokeWidth={1.5} opacity="0.4" />
+    </g>
+  );
+}
+
 export const HAIR_PARTS = {
   none: None,
   spiky: Spiky,
@@ -317,6 +386,10 @@ export const HAIR_PARTS = {
   bun: Bun,
   bangs: Bangs,
   twintails: Twintails,
+  mullet: Mullet,
+  combover: Combover,
+  elvis: Elvis,
+  ramen: Ramen,
 } as const;
 
 export type HairPart = keyof typeof HAIR_PARTS;

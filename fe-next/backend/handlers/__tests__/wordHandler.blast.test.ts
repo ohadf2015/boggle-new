@@ -223,21 +223,21 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
   });
 
   describe('blastComboSync broadcast', () => {
-    it('should broadcast blastComboSync to room when comboType is provided', (done) => {
+    it('should include comboSync in playerFoundWord when comboType is provided', (done) => {
       // GIVEN: A valid blast-mode game and a word with comboType
       // WHEN: Player submits word with comboType 'bomb_bomb'
       clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_bomb' });
 
-      // THEN: broadcastToRoom should be called with blastComboSync event
+      // THEN: playerFoundWord broadcast should include comboSync field (merged Fix 2)
       clientSocket.once('wordAccepted', () => {
-        // blastComboSync is called synchronously in the handler after wordAccepted
         setTimeout(() => {
           const calls = broadcastToRoom.mock.calls;
-          const comboSyncCall = calls.find((call: any[]) => call[2] === 'blastComboSync');
-          expect(comboSyncCall).toBeDefined();
-          const payload = comboSyncCall[3];
-          expect(payload.comboType).toBe('bomb_bomb');
-          expect(payload.username).toBe('testUser');
+          const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
+          expect(foundWordCall).toBeDefined();
+          const payload = foundWordCall[3];
+          expect(payload.comboSync).toBeDefined();
+          expect(payload.comboSync.comboType).toBe('bomb_bomb');
+          expect(payload.comboSync.username).toBe('testUser');
           done();
         }, 100);
       });
@@ -275,19 +275,19 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       });
     });
 
-    it('should include comboType in blastComboSync payload with correct room', (done) => {
+    it('should include comboSync in playerFoundWord with correct room', (done) => {
       // GIVEN: A game with known game code
       // WHEN: Player submits a word with comboType 'lightning_prism'
       clientSocket.emit('submitWord', { word: 'test', comboType: 'lightning_prism' });
 
-      // THEN: broadcastToRoom called with correct room and payload
+      // THEN: playerFoundWord broadcast includes comboSync with correct room (merged Fix 2)
       clientSocket.once('wordAccepted', () => {
         setTimeout(() => {
           const calls = broadcastToRoom.mock.calls;
-          const comboSyncCall = calls.find((call: any[]) => call[2] === 'blastComboSync');
-          expect(comboSyncCall).toBeDefined();
-          expect(comboSyncCall[1]).toBe('game:BLAST1'); // correct room
-          expect(comboSyncCall[3]).toEqual({
+          const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
+          expect(foundWordCall).toBeDefined();
+          expect(foundWordCall[1]).toBe('game:BLAST1'); // correct room
+          expect(foundWordCall[3].comboSync).toEqual({
             comboType: 'lightning_prism',
             username: 'testUser',
           });
@@ -297,45 +297,46 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
     });
   });
 
-  describe('blastWordAccepted payload includes comboType', () => {
-    it('should include comboType in blastWordAccepted payload when blast mode is active', (done) => {
-      // GIVEN: A game in blast mode with blastModeState
-      const mockBlastState = {
-        playerMoves: { testUser: 3 },
-        totalMovesAllowed: 10,
-      };
+  describe('wordAccepted blast field includes comboType (merged Fix 2)', () => {
+    beforeEach(() => {
+      // Re-establish blast module mocks (clearAllMocks in parent beforeEach wipes return values)
+      const blastMod = jest.requireMock('../../../backend/modules/blastModeManager');
+      blastMod.recordBlastMove.mockReturnValue({ movesUsed: 4, bonusMove: true });
+      blastMod.calculateBlastTileBonus.mockReturnValue(10);
+      blastMod.getTilesOnPath.mockReturnValue(['bomb']);
+    });
 
-      // Mock blast module
-      jest.mock('../../../backend/modules/blastModeManager', () => ({
-        calculateBlastTileBonus: jest.fn().mockReturnValue(10),
-        getTilesOnPath: jest.fn().mockReturnValue(['bomb']),
-        recordBlastMove: jest.fn().mockReturnValue({ movesUsed: 4, bonusMove: false }),
-      }), { virtual: true });
-
+    it('should include blast field with comboType in wordAccepted when blast mode is active', (done) => {
+      // GIVEN: A game in blast mode with full blastModeState
       getGame.mockReturnValue(makeBlastGame({
-        blastModeState: mockBlastState,
+        blastModeState: {
+          overlay: [],
+          overlayMap: new Map(),
+          playerMoves: { testUser: 3 },
+          playerBonusMoves: { testUser: 0 },
+          playerStats: { testUser: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 } },
+          seed: 12345,
+        },
       }));
 
       clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_lightning' });
 
       const timeout = setTimeout(() => {
-        // If blastWordAccepted fires, verify comboType is included
-        done();
-      }, 1000);
+        done(new Error('Timeout waiting for wordAccepted'));
+      }, 2000);
 
-      clientSocket.once('blastWordAccepted', (data: any) => {
+      clientSocket.once('wordAccepted', (data: any) => {
         clearTimeout(timeout);
-        expect(data.comboType).toBe('bomb_lightning');
-        done();
-      });
-
-      clientSocket.once('wordAccepted', () => {
-        // Blast mode must be active for blastWordAccepted to emit
-        // If no blastModeState branch triggers, at least verify no crash
-        setTimeout(() => {
-          clearTimeout(timeout);
+        try {
+          // Blast data is now merged into wordAccepted payload (Fix 2)
+          expect(data.blast).toBeDefined();
+          expect(data.blast.comboType).toBe('bomb_lightning');
+          expect(typeof data.blast.movesUsed).toBe('number');
+          expect(typeof data.blast.bonusMove).toBe('boolean');
           done();
-        }, 200);
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });

@@ -201,10 +201,10 @@ export default function WordPackGallery() {
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <span className="text-5xl mb-4" aria-hidden="true">📦</span>
           <p className="font-neo-display text-xl text-neo-white mb-2">
-            {t('ugc.gallery.empty.title')}
+            {t('ugc.gallery.emptyTitle')}
           </p>
           <p className="text-sm text-neo-white/60 font-neo-body mb-6">
-            {t('ugc.gallery.empty.subtitle')}
+            {t('ugc.gallery.emptySubtitle')}
           </p>
           <button
             type="button"

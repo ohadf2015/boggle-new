@@ -152,6 +152,115 @@ function Lashes() {
   );
 }
 
+function MonocleEye() {
+  return (
+    <g>
+      {/* Normal left eye */}
+      <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="39" cy="41" r="2.5" fill="#000" />
+      {/* Right eye with monocle */}
+      <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="63" cy="41" r="2.5" fill="#000" />
+      <circle cx="62" cy="42" r="8" fill="none" stroke="#FFD700" strokeWidth={S} />
+      {/* Chain dangling */}
+      <path d="M70 42 Q74 52 72 62 Q70 68 68 65" stroke="#FFD700" strokeWidth={1.5} fill="none" strokeLinecap="round" />
+      {/* Raised eyebrow */}
+      <path d="M55 32 Q62 28 70 33" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+    </g>
+  );
+}
+
+function CrossEyed() {
+  return (
+    <g>
+      {/* Eyes looking inward */}
+      <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Pupils pointing toward nose */}
+      <circle cx="42" cy="42" r="2.5" fill="#000" />
+      <circle cx="58" cy="42" r="2.5" fill="#000" />
+    </g>
+  );
+}
+
+function Laser() {
+  return (
+    <g>
+      {/* Glowing red eyes */}
+      <circle cx="38" cy="42" r="5" fill="#FF0000" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="5" fill="#FF0000" stroke="#000" strokeWidth={S} />
+      {/* Bright centers */}
+      <circle cx="38" cy="42" r="2" fill="#FFD700" />
+      <circle cx="62" cy="42" r="2" fill="#FFD700" />
+      {/* Laser beams shooting out */}
+      <line x1="33" y1="42" x2="10" y2="42" stroke="#FF0000" strokeWidth={2} opacity="0.6" />
+      <line x1="67" y1="42" x2="90" y2="42" stroke="#FF0000" strokeWidth={2} opacity="0.6" />
+      {/* Glow effect */}
+      <circle cx="38" cy="42" r="7" fill="#FF0000" opacity="0.15" />
+      <circle cx="62" cy="42" r="7" fill="#FF0000" opacity="0.15" />
+    </g>
+  );
+}
+
+function Hypno() {
+  return (
+    <g>
+      {/* Spiral hypnotic eyes */}
+      <circle cx="38" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Spirals */}
+      <path d="M38 42 m0,-5 a5,5 0 1,1 0,10 a3,3 0 1,0 0,-6 a1,1 0 1,1 0,2" fill="none" stroke="#8B5CF6" strokeWidth={1.5} />
+      <path d="M62 42 m0,-5 a5,5 0 1,1 0,10 a3,3 0 1,0 0,-6 a1,1 0 1,1 0,2" fill="none" stroke="#8B5CF6" strokeWidth={1.5} />
+    </g>
+  );
+}
+
+function Money() {
+  return (
+    <g>
+      {/* Dollar sign eyes */}
+      <circle cx="38" cy="42" r="7" fill="#BFFF00" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill="#BFFF00" stroke="#000" strokeWidth={S} />
+      <text x="34" y="46" fontSize="10" fontWeight="bold" fill="#228B22" fontFamily="Arial">$</text>
+      <text x="58" y="46" fontSize="10" fontWeight="bold" fill="#228B22" fontFamily="Arial">$</text>
+    </g>
+  );
+}
+
+function Alien() {
+  return (
+    <g>
+      {/* Big almond-shaped alien eyes */}
+      <ellipse cx="36" cy="42" rx="10" ry="7" fill="#000" stroke="#00FF00" strokeWidth={S} transform="rotate(-10 36 42)" />
+      <ellipse cx="64" cy="42" rx="10" ry="7" fill="#000" stroke="#00FF00" strokeWidth={S} transform="rotate(10 64 42)" />
+      {/* Glowing pupils */}
+      <ellipse cx="38" cy="42" rx="3" ry="4" fill="#00FF00" opacity="0.7" />
+      <ellipse cx="62" cy="42" rx="3" ry="4" fill="#00FF00" opacity="0.7" />
+      {/* Reflection */}
+      <circle cx="35" cy="40" r="1.5" fill="#fff" opacity="0.4" />
+      <circle cx="61" cy="40" r="1.5" fill="#fff" opacity="0.4" />
+    </g>
+  );
+}
+
+function Crying() {
+  return (
+    <g>
+      {/* Sad round eyes */}
+      <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="39" cy="43" r="2.5" fill="#000" />
+      <circle cx="63" cy="43" r="2.5" fill="#000" />
+      {/* Sad eyebrows */}
+      <path d="M33 36 Q38 34 43 37" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M57 37 Q62 34 67 36" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Tear drops */}
+      <path d="M34 48 Q33 54 34 58 Q36 60 38 58 Q39 54 38 48" fill="#87CEEB" stroke="#000" strokeWidth={1} opacity="0.7" />
+      <path d="M62 48 Q61 54 62 58 Q64 60 66 58 Q67 54 66 48" fill="#87CEEB" stroke="#000" strokeWidth={1} opacity="0.7" />
+    </g>
+  );
+}
+
 export const EYE_PARTS = {
   round: Round,
   sleepy: Sleepy,
@@ -165,6 +274,13 @@ export const EYE_PARTS = {
   dizzy: Dizzy,
   cyclops: Cyclops,
   lashes: Lashes,
+  monocleEye: MonocleEye,
+  crossEyed: CrossEyed,
+  laser: Laser,
+  hypno: Hypno,
+  money: Money,
+  alien: Alien,
+  crying: Crying,
 } as const;
 
 export type EyePart = keyof typeof EYE_PARTS;

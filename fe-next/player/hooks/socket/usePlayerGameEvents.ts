@@ -473,7 +473,18 @@ export function usePlayerGameEvents({
     };
 
     // Handle playerFoundWord broadcast — shows opponent word activity in blast MP feed
-    const handlePlayerFoundWord = (data: { username: string; word: string; score: number; comboLevel: number; wordCount: number }) => {
+    const handlePlayerFoundWord = (data: { username: string; word: string; score: number; comboLevel: number; wordCount: number; comboSync?: { comboType: string; username: string } }) => {
+      // Handle merged comboSync (Fix 2) — extract from playerFoundWord instead of separate event
+      if (data.comboSync && data.comboSync.username !== username) {
+        setBlastComboSync({ ...data.comboSync, id: `combo-sync-${Date.now()}` });
+        useGameStore.getState().pushBlastOpponentActivity({
+          id: `combo-${Date.now()}`,
+          username: data.comboSync.username,
+          type: 'combo',
+          message: data.comboSync.comboType,
+        });
+      }
+
       if (data.username === username) return; // Skip own words
       const store = useGameStore.getState();
       store.pushBlastOpponentActivity({

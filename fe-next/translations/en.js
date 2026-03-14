@@ -3197,8 +3197,67 @@ const en = {
     "topCreators": "Top Creators"
   },
   "ugc": {
+    "createBoard": "Create Board",
+    "myPacks": "My Packs",
+    "nav": {
+      "community": "Community",
+      "create": "Create"
+    },
     "board": {
-      "createdBy": "Created by {{name}}"
+      "createdBy": "Created by {{name}}",
+      "notFound": "Board not found",
+      "grid": "grid",
+      "gridSize": "Grid Size",
+      "seedWords": "Seed Words",
+      "seedWordsHint": "Enter words to include (optional)",
+      "generate": "Generate Board",
+      "shuffle": "Shuffle",
+      "tryIt": "Try It",
+      "wordsFound": "{{count}} words found",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard",
+      "title": "Board Title",
+      "titlePlaceholder": "Give your board a name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your board (optional)",
+      "publish": "Publish Board",
+      "shareMessage": "Check out my custom LexiClash board!",
+      "code": "Board Code",
+      "makeAnother": "Make Another"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "gallery": {
+      "title": "Community Boards",
+      "boardCount": "boards",
+      "empty": "No boards yet. Be the first to create one!",
+      "emptyTitle": "No boards yet",
+      "emptySubtitle": "Be the first to create one!",
+      "createBoard": "Create a Board",
+      "loadMore": "Load More",
+      "createdBy": "Created by",
+      "play": "Play",
+      "improve": "Improve",
+      "staffPick": "Staff Pick",
+      "noRating": "No ratings yet",
+      "personalBest": "Personal Best",
+      "createPack": "Create Word Pack",
+      "sortLabel": "Sort by",
+      "languageFilter": "Filter by language",
+      "filterAll": "All",
+      "sortPopular": "Popular",
+      "sortNewest": "Newest",
+      "sortUpvoted": "Most Upvoted",
+      "sort": {
+        "featured": "Featured",
+        "popular": "Popular",
+        "newest": "Newest",
+        "topRated": "Top Rated"
+      }
     },
     "creator": {
       "leaderboard": {
@@ -3211,7 +3270,51 @@ const en = {
         "rank": "Rank",
         "creator": "Creator"
       },
-      "stats": "Top Creators"
+      "stats": "Top Creators",
+      "boardsCreated": "Boards Created",
+      "totalPlays": "Total Plays",
+      "totalRatings": "Total Ratings",
+      "avgRating": "Avg Rating",
+      "myBoards": "My Boards",
+      "makeYourOwn": "Want to create your own?",
+      "tier": {
+        "apprentice": "Apprentice",
+        "puzzleMaker": "Puzzle Maker",
+        "crowdPleaser": "Crowd Pleaser",
+        "masterCrafter": "Master Crafter"
+      }
+    },
+    "pack": {
+      "builder": {
+        "title": "Create Word Pack",
+        "close": "Close",
+        "nameLabel": "Pack Name",
+        "namePlaceholder": "Enter a name for your word pack",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Describe your word pack",
+        "languageLabel": "Language",
+        "emojiLabel": "Emoji",
+        "tagsLabel": "Tags",
+        "wordsLabel": "Words",
+        "wordPlaceholder": "Type a word",
+        "addWord": "Add",
+        "duplicate": "Already added",
+        "wordAdded": "Word added!",
+        "wordInvalid": "Invalid word",
+        "minimum": "minimum",
+        "bulkPaste": "Bulk Paste",
+        "bulkPlaceholder": "Paste words, one per line",
+        "addAll": "Add All",
+        "cancel": "Cancel",
+        "publishing": "Publishing...",
+        "publish": "Publish"
+      },
+      "card": {
+        "words": "words",
+        "plays": "plays",
+        "play": "Play",
+        "upvote": "Upvote"
+      }
     }
   },
   "ranked": {

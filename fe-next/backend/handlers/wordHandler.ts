@@ -580,31 +580,18 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     fireRoundMultiplier: fireRoundMultiplier,
     fireRoundBonus: fireRoundBonus,
     autoValidated: true,
-    fromLesson: fromLesson
+    fromLesson: fromLesson,
+    // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit
+    ...(blastMoveResult ? {
+      blast: {
+        tileBonus: blastTileBonus,
+        tilesCleared: blastTilesCleared,
+        movesUsed: blastMoveResult.movesUsed,
+        bonusMove: blastMoveResult.bonusMove,
+        comboType: comboType ?? null,
+      },
+    } : {}),
   });
-
-  // Emit blast-specific data if in blast mode
-  if (blastMoveResult) {
-    socket.emit('blastWordAccepted', {
-      word: normalizedWord,
-      score: wordScore + blastTileBonus,
-      tileBonus: blastTileBonus,
-      tilesCleared: blastTilesCleared,
-      movesUsed: blastMoveResult.movesUsed,
-      bonusMove: blastMoveResult.bonusMove,
-      comboLevel: safeComboLevel,
-      comboType: comboType ?? null,
-    });
-  }
-
-  // Broadcast combo type to all players in room so they see the flash effect.
-  // Trust client-reported comboType (server has no tile state to detect combos).
-  if (comboType) {
-    broadcastToRoom(io, getGameRoom(gameCode), 'blastComboSync', {
-      comboType,
-      username,
-    });
-  }
 
   // Restore life in word-hunt mode when a word is accepted
   if (game.gameMode === 'word-hunt' && game.wordHuntState) {
@@ -646,6 +633,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     wordCount: playerWordCount,
     score: totalScore,
     comboLevel: safeComboLevel,
+    // Merged combo sync (Fix 2): combo type embedded in playerFoundWord instead of separate event
+    ...(comboType ? { comboSync: { comboType, username } } : {}),
   });
 
   // Check achievements

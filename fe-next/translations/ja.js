@@ -2709,19 +2709,124 @@ const ja = {
     "topCreators": "トップクリエイター"
   },
   "ugc": {
-    "board": { "createdBy": "作成者: {{name}}" },
+    "createBoard": "ボードを作成",
+    "myPacks": "マイパック",
+    "nav": {
+      "community": "コミュニティ",
+      "create": "作成"
+    },
+    "board": {
+      "createdBy": "{{name}}が作成",
+      "notFound": "ボードが見つかりません",
+      "grid": "グリッド",
+      "gridSize": "グリッドサイズ",
+      "seedWords": "シードワード",
+      "seedWordsHint": "含める単語を入力（任意）",
+      "generate": "ボードを生成",
+      "shuffle": "シャッフル",
+      "tryIt": "試す",
+      "wordsFound": "{{count}}語発見",
+      "easy": "簡単",
+      "medium": "普通",
+      "hard": "難しい",
+      "title": "ボードタイトル",
+      "titlePlaceholder": "ボードに名前を付けてください",
+      "description": "説明",
+      "descriptionPlaceholder": "ボードの説明（任意）",
+      "publish": "ボードを公開",
+      "shareMessage": "LexiClashのカスタムボードをチェック！",
+      "code": "ボードコード",
+      "makeAnother": "もう1つ作る"
+    },
+    "difficulty": {
+      "easy": "簡単",
+      "medium": "普通",
+      "hard": "難しい"
+    },
+    "gallery": {
+      "title": "コミュニティボード",
+      "boardCount": "ボード",
+      "empty": "まだボードがありません。最初に作成しましょう！",
+      "emptyTitle": "まだボードがありません",
+      "emptySubtitle": "最初に作成しましょう！",
+      "createBoard": "ボードを作成",
+      "loadMore": "もっと見る",
+      "createdBy": "作成者",
+      "play": "プレイ",
+      "improve": "改善",
+      "staffPick": "スタッフおすすめ",
+      "noRating": "まだ評価がありません",
+      "personalBest": "自己ベスト",
+      "createPack": "ワードパック作成",
+      "sortLabel": "並び替え",
+      "languageFilter": "言語フィルター",
+      "filterAll": "すべて",
+      "sortPopular": "人気順",
+      "sortNewest": "新しい順",
+      "sortUpvoted": "高評価順",
+      "sort": {
+        "featured": "おすすめ",
+        "popular": "人気",
+        "newest": "新着",
+        "topRated": "高評価"
+      }
+    },
     "creator": {
       "leaderboard": {
         "title": "トップクリエイター",
         "spotlight": "今月のクリエイター",
-        "boards": "ボード数",
+        "boards": "ボード",
         "plays": "プレイ数",
         "rating": "評価",
         "empty": "まだクリエイターがいません",
-        "rank": "順位",
+        "rank": "ランク",
         "creator": "クリエイター"
       },
-      "stats": "トップクリエイター"
+      "stats": "トップクリエイター",
+      "boardsCreated": "作成ボード数",
+      "totalPlays": "総プレイ数",
+      "totalRatings": "総評価数",
+      "avgRating": "平均評価",
+      "myBoards": "マイボード",
+      "makeYourOwn": "自分だけのボードを作りませんか？",
+      "tier": {
+        "apprentice": "見習い",
+        "puzzleMaker": "パズルメイカー",
+        "crowdPleaser": "人気者",
+        "masterCrafter": "マスタークラフター"
+      }
+    },
+    "pack": {
+      "builder": {
+        "title": "ワードパック作成",
+        "close": "閉じる",
+        "nameLabel": "パック名",
+        "namePlaceholder": "ワードパックの名前を入力",
+        "descriptionLabel": "説明",
+        "descriptionPlaceholder": "ワードパックの説明",
+        "languageLabel": "言語",
+        "emojiLabel": "絵文字",
+        "tagsLabel": "タグ",
+        "wordsLabel": "単語",
+        "wordPlaceholder": "単語を入力",
+        "addWord": "追加",
+        "duplicate": "追加済み",
+        "wordAdded": "追加しました！",
+        "wordInvalid": "無効な単語",
+        "minimum": "最低",
+        "bulkPaste": "一括貼り付け",
+        "bulkPlaceholder": "単語を1行ずつ貼り付け",
+        "addAll": "すべて追加",
+        "cancel": "キャンセル",
+        "publishing": "公開中...",
+        "publish": "公開"
+      },
+      "card": {
+        "words": "語",
+        "plays": "プレイ",
+        "play": "プレイ",
+        "upvote": "いいね"
+      }
     }
   },
   "ranked": {

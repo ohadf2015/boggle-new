@@ -3094,7 +3094,68 @@ const he = {
     "topCreators": "יוצרים מובילים"
   },
   "ugc": {
-    "board": { "createdBy": "נוצר על ידי {{name}}" },
+    "createBoard": "צור לוח",
+    "myPacks": "החבילות שלי",
+    "nav": {
+      "community": "קהילה",
+      "create": "יצירה"
+    },
+    "board": {
+      "createdBy": "נוצר על ידי {{name}}",
+      "notFound": "הלוח לא נמצא",
+      "grid": "משבצות",
+      "gridSize": "גודל לוח",
+      "seedWords": "מילים מנחות",
+      "seedWordsHint": "הזן מילים לכלול (אופציונלי)",
+      "generate": "צור לוח",
+      "shuffle": "ערבב",
+      "tryIt": "נסה",
+      "wordsFound": "נמצאו {{count}} מילים",
+      "easy": "קל",
+      "medium": "בינוני",
+      "hard": "קשה",
+      "title": "שם הלוח",
+      "titlePlaceholder": "תן שם ללוח שלך",
+      "description": "תיאור",
+      "descriptionPlaceholder": "תאר את הלוח שלך (אופציונלי)",
+      "publish": "פרסם לוח",
+      "shareMessage": "בדקו את הלוח המותאם שלי ב-LexiClash!",
+      "code": "קוד לוח",
+      "makeAnother": "צור עוד"
+    },
+    "difficulty": {
+      "easy": "קל",
+      "medium": "בינוני",
+      "hard": "קשה"
+    },
+    "gallery": {
+      "title": "לוחות הקהילה",
+      "boardCount": "לוחות",
+      "empty": "אין לוחות עדיין. היה הראשון ליצור!",
+      "emptyTitle": "אין לוחות עדיין",
+      "emptySubtitle": "היה הראשון ליצור!",
+      "createBoard": "צור לוח",
+      "loadMore": "טען עוד",
+      "createdBy": "נוצר על ידי",
+      "play": "שחק",
+      "improve": "שפר",
+      "staffPick": "בחירת הצוות",
+      "noRating": "אין דירוגים עדיין",
+      "personalBest": "שיא אישי",
+      "createPack": "צור חבילת מילים",
+      "sortLabel": "מיין לפי",
+      "languageFilter": "סנן לפי שפה",
+      "filterAll": "הכל",
+      "sortPopular": "פופולרי",
+      "sortNewest": "חדש ביותר",
+      "sortUpvoted": "מדורג ביותר",
+      "sort": {
+        "featured": "מומלצים",
+        "popular": "פופולרי",
+        "newest": "חדשים",
+        "topRated": "מדורגים"
+      }
+    },
     "creator": {
       "leaderboard": {
         "title": "יוצרים מובילים",
@@ -3103,10 +3164,54 @@ const he = {
         "plays": "משחקים",
         "rating": "דירוג",
         "empty": "אין יוצרים עדיין",
-        "rank": "מקום",
+        "rank": "דירוג",
         "creator": "יוצר"
       },
-      "stats": "יוצרים מובילים"
+      "stats": "יוצרים מובילים",
+      "boardsCreated": "לוחות שנוצרו",
+      "totalPlays": "סה״כ משחקים",
+      "totalRatings": "סה״כ דירוגים",
+      "avgRating": "דירוג ממוצע",
+      "myBoards": "הלוחות שלי",
+      "makeYourOwn": "רוצה ליצור משלך?",
+      "tier": {
+        "apprentice": "חניך",
+        "puzzleMaker": "יוצר חידות",
+        "crowdPleaser": "משמח קהל",
+        "masterCrafter": "אומן מאסטר"
+      }
+    },
+    "pack": {
+      "builder": {
+        "title": "צור חבילת מילים",
+        "close": "סגור",
+        "nameLabel": "שם החבילה",
+        "namePlaceholder": "הזן שם לחבילת המילים",
+        "descriptionLabel": "תיאור",
+        "descriptionPlaceholder": "תאר את חבילת המילים",
+        "languageLabel": "שפה",
+        "emojiLabel": "אימוג׳י",
+        "tagsLabel": "תגיות",
+        "wordsLabel": "מילים",
+        "wordPlaceholder": "הקלד מילה",
+        "addWord": "הוסף",
+        "duplicate": "כבר הוספת",
+        "wordAdded": "מילה נוספה!",
+        "wordInvalid": "מילה לא תקינה",
+        "minimum": "מינימום",
+        "bulkPaste": "הדבקה מרובה",
+        "bulkPlaceholder": "הדבק מילים, אחת בכל שורה",
+        "addAll": "הוסף הכל",
+        "cancel": "ביטול",
+        "publishing": "מפרסם...",
+        "publish": "פרסם"
+      },
+      "card": {
+        "words": "מילים",
+        "plays": "משחקים",
+        "play": "שחק",
+        "upvote": "הצבע"
+      }
     }
   },
   "ranked": {

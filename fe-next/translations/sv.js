@@ -2709,19 +2709,124 @@ const sv = {
     "topCreators": "Toppkreatörer"
   },
   "ugc": {
-    "board": { "createdBy": "Skapad av {{name}}" },
+    "createBoard": "Skapa bräda",
+    "myPacks": "Mina paket",
+    "nav": {
+      "community": "Community",
+      "create": "Skapa"
+    },
+    "board": {
+      "createdBy": "Skapad av {{name}}",
+      "notFound": "Brädan hittades inte",
+      "grid": "rutnät",
+      "gridSize": "Storlek",
+      "seedWords": "Nyckelord",
+      "seedWordsHint": "Ange ord att inkludera (valfritt)",
+      "generate": "Generera bräda",
+      "shuffle": "Blanda",
+      "tryIt": "Prova",
+      "wordsFound": "{{count}} ord hittade",
+      "easy": "Lätt",
+      "medium": "Medel",
+      "hard": "Svår",
+      "title": "Brädans titel",
+      "titlePlaceholder": "Ge din bräda ett namn",
+      "description": "Beskrivning",
+      "descriptionPlaceholder": "Beskriv din bräda (valfritt)",
+      "publish": "Publicera bräda",
+      "shareMessage": "Kolla in mitt anpassade LexiClash-bräda!",
+      "code": "Brädkod",
+      "makeAnother": "Skapa en till"
+    },
+    "difficulty": {
+      "easy": "Lätt",
+      "medium": "Medel",
+      "hard": "Svår"
+    },
+    "gallery": {
+      "title": "Community-brädor",
+      "boardCount": "brädor",
+      "empty": "Inga brädor ännu. Bli först att skapa en!",
+      "emptyTitle": "Inga brädor ännu",
+      "emptySubtitle": "Bli först att skapa en!",
+      "createBoard": "Skapa en bräda",
+      "loadMore": "Ladda fler",
+      "createdBy": "Skapad av",
+      "play": "Spela",
+      "improve": "Förbättra",
+      "staffPick": "Redaktionens val",
+      "noRating": "Inga betyg ännu",
+      "personalBest": "Personligt bästa",
+      "createPack": "Skapa ordpaket",
+      "sortLabel": "Sortera efter",
+      "languageFilter": "Filtrera efter språk",
+      "filterAll": "Alla",
+      "sortPopular": "Populära",
+      "sortNewest": "Nyaste",
+      "sortUpvoted": "Mest uppröstade",
+      "sort": {
+        "featured": "Utvalda",
+        "popular": "Populära",
+        "newest": "Nyaste",
+        "topRated": "Högst betyg"
+      }
+    },
     "creator": {
       "leaderboard": {
         "title": "Toppkreatörer",
-        "spotlight": "Månadens Kreatör",
+        "spotlight": "Månadens skapare",
         "boards": "Brädor",
-        "plays": "Spelomgångar",
+        "plays": "Spelningar",
         "rating": "Betyg",
-        "empty": "Inga kreatörer än",
-        "rank": "Rankning",
-        "creator": "Kreatör"
+        "empty": "Inga skapare ännu",
+        "rank": "Rank",
+        "creator": "Skapare"
       },
-      "stats": "Toppkreatörer"
+      "stats": "Toppkreatörer",
+      "boardsCreated": "Skapade brädor",
+      "totalPlays": "Totalt spelningar",
+      "totalRatings": "Totalt betyg",
+      "avgRating": "Snittbetyg",
+      "myBoards": "Mina brädor",
+      "makeYourOwn": "Vill du skapa en egen?",
+      "tier": {
+        "apprentice": "Lärling",
+        "puzzleMaker": "Pusselbyggare",
+        "crowdPleaser": "Publikfavorit",
+        "masterCrafter": "Mästerkonstruktör"
+      }
+    },
+    "pack": {
+      "builder": {
+        "title": "Skapa ordpaket",
+        "close": "Stäng",
+        "nameLabel": "Paketnamn",
+        "namePlaceholder": "Ange namn",
+        "descriptionLabel": "Beskrivning",
+        "descriptionPlaceholder": "Beskriv paketet",
+        "languageLabel": "Språk",
+        "emojiLabel": "Emoji",
+        "tagsLabel": "Taggar",
+        "wordsLabel": "Ord",
+        "wordPlaceholder": "Skriv ett ord",
+        "addWord": "Lägg till",
+        "duplicate": "Redan tillagt",
+        "wordAdded": "Ord tillagt!",
+        "wordInvalid": "Ogiltigt ord",
+        "minimum": "minimum",
+        "bulkPaste": "Klistra in flera",
+        "bulkPlaceholder": "Klistra in ord, ett per rad",
+        "addAll": "Lägg till alla",
+        "cancel": "Avbryt",
+        "publishing": "Publicerar...",
+        "publish": "Publicera"
+      },
+      "card": {
+        "words": "ord",
+        "plays": "spelningar",
+        "play": "Spela",
+        "upvote": "Rösta upp"
+      }
     }
   },
   "ranked": {

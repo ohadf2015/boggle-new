@@ -3127,19 +3127,124 @@ const es = {
     "topCreators": "Mejores Creadores"
   },
   "ugc": {
-    "board": { "createdBy": "Creado por {{name}}" },
+    "createBoard": "Crear tablero",
+    "myPacks": "Mis paquetes",
+    "nav": {
+      "community": "Comunidad",
+      "create": "Crear"
+    },
+    "board": {
+      "createdBy": "Creado por {{name}}",
+      "notFound": "Tablero no encontrado",
+      "grid": "cuadrícula",
+      "gridSize": "Tamaño",
+      "seedWords": "Palabras clave",
+      "seedWordsHint": "Ingresa palabras para incluir (opcional)",
+      "generate": "Generar tablero",
+      "shuffle": "Mezclar",
+      "tryIt": "Probar",
+      "wordsFound": "{{count}} palabras encontradas",
+      "easy": "Fácil",
+      "medium": "Medio",
+      "hard": "Difícil",
+      "title": "Título del tablero",
+      "titlePlaceholder": "Dale un nombre a tu tablero",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describe tu tablero (opcional)",
+      "publish": "Publicar tablero",
+      "shareMessage": "¡Mira mi tablero personalizado de LexiClash!",
+      "code": "Código del tablero",
+      "makeAnother": "Crear otro"
+    },
+    "difficulty": {
+      "easy": "Fácil",
+      "medium": "Medio",
+      "hard": "Difícil"
+    },
+    "gallery": {
+      "title": "Tableros de la comunidad",
+      "boardCount": "tableros",
+      "empty": "Aún no hay tableros. ¡Sé el primero en crear uno!",
+      "emptyTitle": "Aún no hay tableros",
+      "emptySubtitle": "¡Sé el primero en crear uno!",
+      "createBoard": "Crear un tablero",
+      "loadMore": "Cargar más",
+      "createdBy": "Creado por",
+      "play": "Jugar",
+      "improve": "Mejorar",
+      "staffPick": "Selección del equipo",
+      "noRating": "Sin calificaciones aún",
+      "personalBest": "Mejor marca",
+      "createPack": "Crear paquete de palabras",
+      "sortLabel": "Ordenar por",
+      "languageFilter": "Filtrar por idioma",
+      "filterAll": "Todos",
+      "sortPopular": "Populares",
+      "sortNewest": "Más recientes",
+      "sortUpvoted": "Más votados",
+      "sort": {
+        "featured": "Destacados",
+        "popular": "Populares",
+        "newest": "Recientes",
+        "topRated": "Mejor valorados"
+      }
+    },
     "creator": {
       "leaderboard": {
-        "title": "Mejores Creadores",
-        "spotlight": "Creador del Mes",
+        "title": "Mejores creadores",
+        "spotlight": "Creador del mes",
         "boards": "Tableros",
-        "plays": "Partidas",
+        "plays": "Jugadas",
         "rating": "Calificación",
         "empty": "Aún no hay creadores",
         "rank": "Rango",
         "creator": "Creador"
       },
-      "stats": "Mejores Creadores"
+      "stats": "Mejores creadores",
+      "boardsCreated": "Tableros creados",
+      "totalPlays": "Total de jugadas",
+      "totalRatings": "Total de calificaciones",
+      "avgRating": "Calificación promedio",
+      "myBoards": "Mis tableros",
+      "makeYourOwn": "¿Quieres crear el tuyo?",
+      "tier": {
+        "apprentice": "Aprendiz",
+        "puzzleMaker": "Creador de puzzles",
+        "crowdPleaser": "Favorito del público",
+        "masterCrafter": "Maestro artesano"
+      }
+    },
+    "pack": {
+      "builder": {
+        "title": "Crear paquete de palabras",
+        "close": "Cerrar",
+        "nameLabel": "Nombre del paquete",
+        "namePlaceholder": "Ingresa un nombre",
+        "descriptionLabel": "Descripción",
+        "descriptionPlaceholder": "Describe tu paquete",
+        "languageLabel": "Idioma",
+        "emojiLabel": "Emoji",
+        "tagsLabel": "Etiquetas",
+        "wordsLabel": "Palabras",
+        "wordPlaceholder": "Escribe una palabra",
+        "addWord": "Agregar",
+        "duplicate": "Ya agregada",
+        "wordAdded": "¡Palabra agregada!",
+        "wordInvalid": "Palabra inválida",
+        "minimum": "mínimo",
+        "bulkPaste": "Pegar en lote",
+        "bulkPlaceholder": "Pega palabras, una por línea",
+        "addAll": "Agregar todo",
+        "cancel": "Cancelar",
+        "publishing": "Publicando...",
+        "publish": "Publicar"
+      },
+      "card": {
+        "words": "palabras",
+        "plays": "jugadas",
+        "play": "Jugar",
+        "upvote": "Votar"
+      }
     }
   },
   "ranked": {

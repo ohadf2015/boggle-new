@@ -6,7 +6,7 @@ import { useEffect, useCallback, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 // Note: Word feedback toasts removed - WordFormingArea now handles visual feedback
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
-import type { WordAcceptedPayload, BlastWordAcceptedPayload, BoardTheme } from '@/shared/types/socket';
+import type { WordAcceptedPayload, BoardTheme } from '@/shared/types/socket';
 import { useGameStore } from '@/hooks/gameState/store';
 
 interface UseHostWordEventsProps {
@@ -97,6 +97,14 @@ export function useHostWordEvents({
       resetCombo();
     }
 
+    // Handle merged blast data (Fix 2) — extract from wordAccepted instead of separate blastWordAccepted
+    if (data.blast) {
+      const store = useGameStore.getState();
+      store.setBlastMovesUsed(data.blast.movesUsed);
+      store.setBlastTotalTileBonus((prev: number) => prev + (data.blast!.tileBonus || 0));
+      store.setBlastTotalTilesCleared((prev: number) => prev + (data.blast!.tilesCleared?.length || 0));
+    }
+
     // Note: WordFormingArea now handles accepted feedback visually
   }, [hostPlaying, playComboSound, setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, resetCombo]);
 
@@ -159,15 +167,6 @@ export function useHostWordEvents({
     };
 
     // Handle blast word accepted (update moves counter and accumulated stats for host)
-    const handleBlastWordAccepted = (data: BlastWordAcceptedPayload) => {
-      if (hostPlaying) {
-        const store = useGameStore.getState();
-        store.setBlastMovesUsed(data.movesUsed);
-        store.setBlastTotalTileBonus(prev => prev + (data.tileBonus || 0));
-        store.setBlastTotalTilesCleared(prev => prev + (data.tilesCleared?.length || 0));
-      }
-    };
-
     const handleWordsForBoard = (data: any) => {
       if (data?.words) {
         setWordsForBoard(data.words);
@@ -185,11 +184,9 @@ export function useHostWordEvents({
     socket.on('wordRejected', handleWordRejected);
     socket.on('wordTooShort', handleWordTooShort);
     socket.on('wordsForBoard', handleWordsForBoard);
-    socket.on('blastWordAccepted', handleBlastWordAccepted);
 
     return () => {
       socket.off('wordAccepted', handleWordAccepted);
-      socket.off('blastWordAccepted', handleBlastWordAccepted);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordRejected', handleWordRejected);

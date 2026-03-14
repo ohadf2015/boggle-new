@@ -15,7 +15,7 @@ import {
   neoWarningToast,
 } from '../../../components/NeoToast';
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
-import { useFoundWords, useGameActions } from '@/hooks/gameState';
+import { useFoundWords, useGameActions, useGameStore } from '@/hooks/gameState';
 import { useSafeSocketEvents } from '@/hooks/useSafeSocketEvent';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import logger from '@/utils/logger';
@@ -177,6 +177,14 @@ export function usePlayerWordEvents({
         }, comboTimeout);
       } else {
         resetCombo();
+      }
+
+      // Handle merged blast data (Fix 2) — extract from wordAccepted instead of separate blastWordAccepted
+      if (data.blast) {
+        const store = useGameStore.getState();
+        store.setBlastMovesUsed(data.blast.movesUsed);
+        store.setBlastTotalTileBonus((prev: number) => prev + (data.blast!.tileBonus || 0));
+        store.setBlastTotalTilesCleared((prev: number) => prev + (data.blast!.tilesCleared?.length || 0));
       }
 
       // Note: WordFormingArea now handles word accepted feedback visually

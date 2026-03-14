@@ -15,6 +15,7 @@ export const AVATAR_SKIN_COLORS = [
 export const AVATAR_HAIR_STYLES = [
   'none', 'spiky', 'curly', 'long', 'buzz', 'mohawk', 'bob', 'ponytail', 'afro', 'wavy',
   'pigtails', 'topknot', 'sideshave', 'dreads', 'braids', 'bun', 'bangs', 'twintails',
+  'mullet', 'combover', 'elvis', 'ramen',
 ] as const;
 
 export const AVATAR_HAIR_COLORS = [
@@ -25,19 +26,23 @@ export const AVATAR_HAIR_COLORS = [
 // ==================== Eyes ====================
 export const AVATAR_EYE_STYLES = [
   'round', 'sleepy', 'star', 'wink', 'happy', 'angry', 'cool', 'sparkle',
-  'hearts', 'dizzy', 'cyclops', 'lashes',
+  'hearts', 'dizzy', 'cyclops', 'lashes', 'monocleEye', 'crossEyed', 'laser',
+  'hypno', 'money', 'alien', 'crying',
 ] as const;
 
 // ==================== Mouth ====================
 export const AVATAR_MOUTH_STYLES = [
   'smile', 'grin', 'tongue', 'oh', 'smirk', 'flat', 'teeth', 'cat',
-  'vampire', 'kiss', 'braces', 'drool',
+  'vampire', 'kiss', 'braces', 'drool', 'goldTooth', 'mustache', 'whistle',
+  'zipper', 'blowfish', 'gap', 'pipe',
 ] as const;
 
 // ==================== Accessories ====================
 export const AVATAR_ACCESSORIES = [
   'none', 'glasses', 'sunglasses', 'hat', 'cap', 'headband', 'crown', 'earring', 'bandana', 'horns',
   'monocle', 'eyepatch', 'tiara', 'antenna', 'halo', 'mask', 'scarf', 'bowtie',
+  'keffiyeh', 'fez', 'mustacheGlasses', 'sombrero', 'turban', 'noseRing', 'clownNose', 'partyHat',
+  'propellerHat', 'viking', 'devilHorns', 'headphones', 'chefHat', 'cucumberFace', 'monkeyEars', 'plunger',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
