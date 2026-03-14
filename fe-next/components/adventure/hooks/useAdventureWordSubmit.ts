@@ -10,6 +10,7 @@ import { useCallback, useState, useRef, useEffect } from 'react';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { BossTauntEvent } from '@/types/boss';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
+import { evaluateWorldMechanic } from '@/lib/adventure/worldMechanics';
 
 interface ValidationFeedback {
   error: string | null;
@@ -61,6 +62,8 @@ export interface UseAdventureWordSubmitProps {
   };
   t: (key: string) => string;
   getPopupStartPosition: () => { x: number; y: number };
+  /** Current world mechanic (null for world 1) */
+  worldMechanic?: string | null;
 }
 
 export interface UseAdventureWordSubmitReturn {
@@ -83,6 +86,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     handleEarnAchievement, recordAIWord, handleAITransition,
     addScorePopup, getScoreMultiplier,
     upgradeBonuses, skillEffects, t, getPopupStartPosition,
+    worldMechanic,
   } = props;
 
   const [validationFeedback, setValidationFeedback] = useState<ValidationFeedback>({
@@ -134,6 +138,12 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         const startPos = getPopupStartPosition();
         let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus * getScoreMultiplier());
 
+        // World mechanic bonus
+        const mechanicEval = evaluateWorldMechanic(word, worldMechanic ?? null, wordsFound);
+        if (mechanicEval.bonus) {
+          scoreValue = Math.floor(scoreValue * mechanicEval.multiplier);
+        }
+
         let bossBonus: string | undefined;
         if (isBossActive && bossConfig) {
           const mechResult = checkBossWord(word);
@@ -158,6 +168,9 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         }
 
         const comboBonus = comboCount > 1 ? `${comboCount}x` : undefined;
+        const mechanicBonus = mechanicEval.bonus && mechanicEval.feedbackKey
+          ? t(mechanicEval.feedbackKey)
+          : undefined;
 
         addScorePopup({
           id: Date.now(),
@@ -165,7 +178,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
           x: startPos.x,
           y: startPos.y,
           word,
-          bonus: bossBonus || comboBonus,
+          bonus: bossBonus || mechanicBonus || comboBonus,
         });
 
         setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
@@ -223,7 +236,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         }, 2000);
       }
     },
-    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier]
+    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic]
   );
 
   return {

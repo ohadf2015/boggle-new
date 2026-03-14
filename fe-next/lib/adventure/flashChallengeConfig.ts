@@ -1,15 +1,75 @@
 import type { FlashChallenge } from '@/types/adventure';
 
+/** All available flash challenges across all 10 types */
 export const FLASH_CHALLENGES: FlashChallenge[] = [
-  { id: 'flash-long-word-6', type: 'longWord', descriptionKey: 'adventure.quests.flash.longWord', param: 6, durationSeconds: 30, rewardCoins: 50, rewardScore: 100 },
+  // longWord
+  { id: 'flash-long-5', type: 'longWord', descriptionKey: 'adventure.quests.flash.longWord', param: 5, durationSeconds: 30, rewardCoins: 30, rewardScore: 60 },
+  { id: 'flash-long-6', type: 'longWord', descriptionKey: 'adventure.quests.flash.longWord', param: 6, durationSeconds: 30, rewardCoins: 50, rewardScore: 100 },
+  { id: 'flash-long-7', type: 'longWord', descriptionKey: 'adventure.quests.flash.longWord', param: 7, durationSeconds: 30, rewardCoins: 70, rewardScore: 150 },
+
+  // comboStreak
+  { id: 'flash-combo-2', type: 'comboStreak', descriptionKey: 'adventure.quests.flash.comboStreak', param: 2, durationSeconds: 30, rewardCoins: 30, rewardScore: 60 },
   { id: 'flash-combo-3', type: 'comboStreak', descriptionKey: 'adventure.quests.flash.comboStreak', param: 3, durationSeconds: 30, rewardCoins: 40, rewardScore: 80 },
+  { id: 'flash-combo-4', type: 'comboStreak', descriptionKey: 'adventure.quests.flash.comboStreak', param: 4, durationSeconds: 25, rewardCoins: 60, rewardScore: 120 },
+  { id: 'flash-combo-5', type: 'comboStreak', descriptionKey: 'adventure.quests.flash.comboStreak', param: 5, durationSeconds: 25, rewardCoins: 80, rewardScore: 160 },
+
+  // specificLetter
   { id: 'flash-letter-q', type: 'specificLetter', descriptionKey: 'adventure.quests.flash.specificLetter', param: 'Q', durationSeconds: 30, rewardCoins: 60, rewardScore: 120 },
-  { id: 'flash-fast-word', type: 'fastWord', descriptionKey: 'adventure.quests.flash.fastWord', param: 10, durationSeconds: 10, rewardCoins: 30, rewardScore: 60 },
-  { id: 'flash-long-word-7', type: 'longWord', descriptionKey: 'adventure.quests.flash.longWord', param: 7, durationSeconds: 30, rewardCoins: 70, rewardScore: 150 },
+
+  // fastWord
+  { id: 'flash-fast-10', type: 'fastWord', descriptionKey: 'adventure.quests.flash.fastWord', param: 10, durationSeconds: 10, rewardCoins: 30, rewardScore: 60 },
+
+  // startsWith
+  { id: 'flash-starts-s', type: 'startsWith', descriptionKey: 'adventure.quests.flash.startsWith', param: 'S', durationSeconds: 30, rewardCoins: 35, rewardScore: 70 },
+  { id: 'flash-starts-r', type: 'startsWith', descriptionKey: 'adventure.quests.flash.startsWith', param: 'R', durationSeconds: 30, rewardCoins: 35, rewardScore: 70 },
+
+  // endsWith
+  { id: 'flash-ends-ing', type: 'endsWith', descriptionKey: 'adventure.quests.flash.endsWith', param: 'ING', durationSeconds: 30, rewardCoins: 45, rewardScore: 90 },
+  { id: 'flash-ends-ed', type: 'endsWith', descriptionKey: 'adventure.quests.flash.endsWith', param: 'ED', durationSeconds: 30, rewardCoins: 40, rewardScore: 80 },
+
+  // doubleLetters
+  { id: 'flash-double', type: 'doubleLetters', descriptionKey: 'adventure.quests.flash.doubleLetters', param: 1, durationSeconds: 30, rewardCoins: 45, rewardScore: 90 },
+
+  // palindrome
+  { id: 'flash-palindrome', type: 'palindrome', descriptionKey: 'adventure.quests.flash.palindrome', param: 3, durationSeconds: 45, rewardCoins: 100, rewardScore: 200 },
+
+  // exactLength
+  { id: 'flash-exact-5', type: 'exactLength', descriptionKey: 'adventure.quests.flash.exactLength', param: 5, durationSeconds: 30, rewardCoins: 40, rewardScore: 80 },
+  { id: 'flash-exact-6', type: 'exactLength', descriptionKey: 'adventure.quests.flash.exactLength', param: 6, durationSeconds: 30, rewardCoins: 55, rewardScore: 110 },
+  { id: 'flash-exact-7', type: 'exactLength', descriptionKey: 'adventure.quests.flash.exactLength', param: 7, durationSeconds: 30, rewardCoins: 70, rewardScore: 140 },
+
+  // useGoldTile
+  { id: 'flash-gold-tile', type: 'useGoldTile', descriptionKey: 'adventure.quests.flash.useGoldTile', param: 1, durationSeconds: 30, rewardCoins: 60, rewardScore: 120 },
 ];
 
+function byId(id: string): FlashChallenge {
+  const c = FLASH_CHALLENGES.find(ch => ch.id === id);
+  if (!c) throw new Error(`Unknown flash challenge: ${id}`);
+  return c;
+}
+
+/** World-tier challenge pools: 3-4 candidates each, randomly selected at runtime */
+const WORLD_POOLS: Record<string, FlashChallenge[]> = {
+  // Worlds 1-2: easy
+  easy: [byId('flash-long-5'), byId('flash-combo-2'), byId('flash-starts-s'), byId('flash-fast-10')],
+  // Worlds 3-4: medium
+  medium: [byId('flash-long-6'), byId('flash-double'), byId('flash-ends-ing'), byId('flash-ends-ed')],
+  // Worlds 5-6: hard
+  hard: [byId('flash-palindrome'), byId('flash-exact-6'), byId('flash-gold-tile'), byId('flash-combo-3')],
+  // Worlds 7-8: harder
+  harder: [byId('flash-long-7'), byId('flash-combo-4'), byId('flash-palindrome'), byId('flash-letter-q')],
+  // Worlds 9-10: expert
+  expert: [byId('flash-exact-7'), byId('flash-combo-5'), byId('flash-palindrome'), byId('flash-starts-r')],
+};
+
+/**
+ * Returns world-appropriate flash challenges (3-4 candidates).
+ * Caller picks one at random at runtime.
+ */
 export function getFlashChallengeForWorld(worldId: number): FlashChallenge[] {
-  if (worldId <= 3) return [FLASH_CHALLENGES[0], FLASH_CHALLENGES[3]];
-  if (worldId <= 6) return [FLASH_CHALLENGES[1], FLASH_CHALLENGES[3]];
-  return [FLASH_CHALLENGES[4], FLASH_CHALLENGES[2]];
+  if (worldId <= 2) return WORLD_POOLS.easy;
+  if (worldId <= 4) return WORLD_POOLS.medium;
+  if (worldId <= 6) return WORLD_POOLS.hard;
+  if (worldId <= 8) return WORLD_POOLS.harder;
+  return WORLD_POOLS.expert;
 }

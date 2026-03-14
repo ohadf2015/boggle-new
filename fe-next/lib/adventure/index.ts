@@ -87,3 +87,10 @@ export {
   TITLE_FADE_MS,
   TITLE_TOTAL_MS,
 } from './entryTiming';
+
+// World mastery system
+export {
+  calculateMasteryCriteria,
+  calculateMasteryTier,
+  calculateWorldMastery,
+} from './mastery';

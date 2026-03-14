@@ -446,10 +446,18 @@ export interface SkillTreeState {
 
 /** Type of flash challenge (mid-level ephemeral) */
 export type FlashChallengeType =
+  // Word pattern challenges
   | 'longWord'
   | 'comboStreak'
   | 'specificLetter'
-  | 'fastWord';
+  | 'fastWord'
+  | 'palindrome'
+  | 'doubleLetters'
+  | 'startsWith'
+  | 'endsWith'
+  // Board mechanic challenges
+  | 'useGoldTile'
+  | 'exactLength';
 
 export interface FlashChallenge {
   id: string;
@@ -466,7 +474,12 @@ export type ChapterQuestType =
   | 'defeatBossNoHint'
   | 'fullComboLevels'
   | 'perfectLevels'
-  | 'longWordCount';
+  | 'longWordCount'
+  | 'worldMechanicUse'
+  | 'flashChallengeMaster'
+  | 'bossHighHealth'
+  | 'streakMaster'
+  | 'scoreChallenge';
 
 export interface QuestReward {
   coins: number;
@@ -490,4 +503,32 @@ export interface ChapterQuestProgress {
   current: number;
   isComplete: boolean;
   rewardClaimed: boolean;
+}
+
+// ==============================================
+// WORLD MASTERY
+// ==============================================
+
+/** Mastery tier for a world (0 = not started, 5 = complete mastery) */
+export type MasteryTier = 0 | 1 | 2 | 3 | 4 | 5;
+
+/** Criteria that contribute to world mastery */
+export interface MasteryCriteria {
+  /** All 7 levels completed with at least 1 star */
+  allLevelsCompleted: boolean;
+  /** All 7 levels completed with 3 stars */
+  allLevelsPerfect: boolean;
+  /** All chapter quests completed for this world */
+  allQuestsCompleted: boolean;
+  /** Boss defeated with 50%+ health remaining */
+  bossHighHealth: boolean;
+  /** Completed 3+ flash challenges in this world */
+  flashChallengesMastered: boolean;
+}
+
+/** Per-world mastery state */
+export interface WorldMastery {
+  worldId: number;
+  tier: MasteryTier;
+  criteria: MasteryCriteria;
 }
