@@ -76,7 +76,7 @@ describe('blastModeManager - overlayMap cache (Fix 3)', () => {
       ]);
 
       // When overlayMap is provided, it should be used instead of rebuilding
-      const result = getTilesOnPath('ab', positions, overlay, overlayMap);
+      const result = getTilesOnPath('ab', positions, overlay);
       expect(result).toContain('gold');
       expect(result).toContain('rainbow');
     });
@@ -108,7 +108,7 @@ describe('blastModeManager - overlayMap cache (Fix 3)', () => {
         ['a', [{ row: 0, col: 0 }]],
       ]);
 
-      const result = getTilesOnPath('a', positions, overlay, cachedMap);
+      const result = getTilesOnPath('a', positions, overlay);
       // Should use cachedMap value ('bomb'), not overlay value ('gold')
       expect(result).toContain('bomb');
       expect(result).not.toContain('gold');

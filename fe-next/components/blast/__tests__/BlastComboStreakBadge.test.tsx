@@ -30,10 +30,11 @@ import { BlastComboStreakBadge } from '../BlastComboStreakBadge';
 
 // ==================== Helpers ====================
 
+const mockArcRef = { current: null } as React.RefObject<SVGCircleElement | null>;
+
 function makeStreak(overrides: Partial<ComboStreakState> = {}): ComboStreakState {
   return {
     level: 0,
-    timeRemaining: 0,
     isActive: false,
     multiplier: 1,
     ...overrides,
@@ -48,7 +49,7 @@ describe('BlastComboStreakBadge — inactive streak', () => {
     const streak = makeStreak({ level: 0, isActive: false });
 
     // When rendered
-    const { container } = render(<BlastComboStreakBadge streak={streak} />);
+    const { container } = render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then nothing is rendered
     expect(container.firstChild).toBeNull();
@@ -59,7 +60,7 @@ describe('BlastComboStreakBadge — inactive streak', () => {
     const streak = makeStreak({ level: 2, isActive: false });
 
     // When rendered
-    const { container } = render(<BlastComboStreakBadge streak={streak} />);
+    const { container } = render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then nothing is rendered
     expect(container.firstChild).toBeNull();
@@ -69,10 +70,10 @@ describe('BlastComboStreakBadge — inactive streak', () => {
 describe('BlastComboStreakBadge — active streak rendering', () => {
   it('renders combo badge when streak is active', () => {
     // Given an active streak at level 2
-    const streak = makeStreak({ level: 2, isActive: true, timeRemaining: 3000, multiplier: 1.5 });
+    const streak = makeStreak({ level: 2, isActive: true, multiplier: 1.5 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then badge is present
     expect(screen.getByTestId('combo-streak-badge')).toBeInTheDocument();
@@ -80,10 +81,10 @@ describe('BlastComboStreakBadge — active streak rendering', () => {
 
   it('renders "x2" text for level 2 streak', () => {
     // Given streak at level 2
-    const streak = makeStreak({ level: 2, isActive: true, timeRemaining: 3000, multiplier: 1.5 });
+    const streak = makeStreak({ level: 2, isActive: true, multiplier: 1.5 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then "x2" is shown (combo numbers are exempt from i18n)
     expect(screen.getByText('x2')).toBeInTheDocument();
@@ -91,10 +92,10 @@ describe('BlastComboStreakBadge — active streak rendering', () => {
 
   it('renders "x5" text for level 5 streak', () => {
     // Given streak at level 5
-    const streak = makeStreak({ level: 5, isActive: true, timeRemaining: 2000, multiplier: 2.25 });
+    const streak = makeStreak({ level: 5, isActive: true, multiplier: 2.25 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then "x5" is shown
     expect(screen.getByText('x5')).toBeInTheDocument();
@@ -102,10 +103,10 @@ describe('BlastComboStreakBadge — active streak rendering', () => {
 
   it('renders "x10" text at max level 10', () => {
     // Given max streak
-    const streak = makeStreak({ level: 10, isActive: true, timeRemaining: 1000, multiplier: 3.5 });
+    const streak = makeStreak({ level: 10, isActive: true, multiplier: 3.5 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then "x10" is shown
     expect(screen.getByText('x10')).toBeInTheDocument();
@@ -113,10 +114,10 @@ describe('BlastComboStreakBadge — active streak rendering', () => {
 
   it('renders SVG countdown arc', () => {
     // Given an active streak
-    const streak = makeStreak({ level: 3, isActive: true, timeRemaining: 3000, multiplier: 1.75 });
+    const streak = makeStreak({ level: 3, isActive: true, multiplier: 1.75 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then SVG is present for countdown
     const svg = screen.getByTestId('combo-streak-badge').querySelector('svg');
@@ -127,10 +128,10 @@ describe('BlastComboStreakBadge — active streak rendering', () => {
 describe('BlastComboStreakBadge — color tiers', () => {
   it('applies green tier class/data for level 1 (x1)', () => {
     // Given level 1 streak (tier: green)
-    const streak = makeStreak({ level: 1, isActive: true, timeRemaining: 4000, multiplier: 1.25 });
+    const streak = makeStreak({ level: 1, isActive: true, multiplier: 1.25 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then badge has green tier attribute
     const badge = screen.getByTestId('combo-streak-badge');
@@ -139,10 +140,10 @@ describe('BlastComboStreakBadge — color tiers', () => {
 
   it('applies green tier for level 2 (x2)', () => {
     // Given level 2 streak
-    const streak = makeStreak({ level: 2, isActive: true, timeRemaining: 4000, multiplier: 1.5 });
+    const streak = makeStreak({ level: 2, isActive: true, multiplier: 1.5 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then green tier
     expect(screen.getByTestId('combo-streak-badge').getAttribute('data-tier')).toBe('green');
@@ -150,10 +151,10 @@ describe('BlastComboStreakBadge — color tiers', () => {
 
   it('applies yellow tier for level 3 (x3)', () => {
     // Given level 3 streak
-    const streak = makeStreak({ level: 3, isActive: true, timeRemaining: 4000, multiplier: 1.75 });
+    const streak = makeStreak({ level: 3, isActive: true, multiplier: 1.75 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then yellow tier
     expect(screen.getByTestId('combo-streak-badge').getAttribute('data-tier')).toBe('yellow');
@@ -161,10 +162,10 @@ describe('BlastComboStreakBadge — color tiers', () => {
 
   it('applies yellow tier for level 4 (x4)', () => {
     // Given level 4 streak
-    const streak = makeStreak({ level: 4, isActive: true, timeRemaining: 4000, multiplier: 2.0 });
+    const streak = makeStreak({ level: 4, isActive: true, multiplier: 2.0 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then yellow tier
     expect(screen.getByTestId('combo-streak-badge').getAttribute('data-tier')).toBe('yellow');
@@ -172,10 +173,10 @@ describe('BlastComboStreakBadge — color tiers', () => {
 
   it('applies red tier for level 5 (x5)', () => {
     // Given level 5 streak
-    const streak = makeStreak({ level: 5, isActive: true, timeRemaining: 4000, multiplier: 2.25 });
+    const streak = makeStreak({ level: 5, isActive: true, multiplier: 2.25 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then red tier (orange/red for x5+)
     expect(screen.getByTestId('combo-streak-badge').getAttribute('data-tier')).toBe('red');
@@ -183,10 +184,10 @@ describe('BlastComboStreakBadge — color tiers', () => {
 
   it('applies red tier for level 10 (x10)', () => {
     // Given max level streak
-    const streak = makeStreak({ level: 10, isActive: true, timeRemaining: 4000, multiplier: 3.5 });
+    const streak = makeStreak({ level: 10, isActive: true, multiplier: 3.5 });
 
     // When rendered
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then red tier
     expect(screen.getByTestId('combo-streak-badge').getAttribute('data-tier')).toBe('red');
@@ -205,10 +206,10 @@ describe('BlastComboStreakBadge — reduced motion', () => {
     }));
 
     // Given active streak
-    const streak = makeStreak({ level: 3, isActive: true, timeRemaining: 2000, multiplier: 1.75 });
+    const streak = makeStreak({ level: 3, isActive: true, multiplier: 1.75 });
 
     // When rendered (even with reduced motion, badge still shows)
-    render(<BlastComboStreakBadge streak={streak} />);
+    render(<BlastComboStreakBadge streak={streak} arcRef={mockArcRef} />);
 
     // Then badge is present (gameplay continues, only animations skip)
     expect(screen.getByTestId('combo-streak-badge')).toBeInTheDocument();

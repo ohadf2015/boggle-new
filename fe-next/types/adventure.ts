@@ -573,3 +573,13 @@ export interface RuneInventory {
   fragments: number;
   runes: PlayerRune[];
 }
+
+/** Shareable snapshot of adventure progress */
+export interface AdventureShareData {
+  worldsCompleted: number;
+  totalStars: number;
+  maxStars: number;
+  bossesDefeated: number;
+  bestStreak: number;
+  masteryTiers: MasteryTier[];
+}

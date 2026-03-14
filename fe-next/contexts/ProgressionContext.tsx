@@ -198,6 +198,12 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
                     completedAt: data.completion.completedAt,
                   },
                 ],
+                gold: data.progression.gold ?? 0,
+                upgrades: data.progression.upgrades ?? {},
+                skillPoints: data.progression.skillPoints ?? 0,
+                skillTree: data.progression.skillTree ?? {},
+                runeFragments: data.progression.runeFragments ?? 0,
+                runes: data.progression.runes ?? [],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
               };

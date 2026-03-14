@@ -24,8 +24,7 @@ jest.mock('framer-motion', () => {
       get: (_target: unknown, prop: string) => {
         return React.forwardRef(function MotionComponent(props: Record<string, unknown>, ref: React.Ref<HTMLElement>) {
           const { children, initial: _i, animate: _a, exit: _e, transition: _t, whileHover: _wh, whileTap: _wt, ...rest } = props;
-          const Tag = prop as keyof JSX.IntrinsicElements;
-          return React.createElement(Tag, { ...rest, ref } as React.HTMLAttributes<HTMLElement>, children as React.ReactNode);
+          return React.createElement(prop, { ...rest, ref } as React.HTMLAttributes<HTMLElement>, children as React.ReactNode);
         });
       },
     }),

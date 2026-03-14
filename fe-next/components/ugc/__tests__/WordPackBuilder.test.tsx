@@ -25,7 +25,7 @@ const defaultHookState = {
   setThemeEmoji: jest.fn(),
   tags: [],
   setTags: jest.fn(),
-  words: [],
+  words: [] as string[],
   addWord: mockAddWord,
   removeWord: jest.fn(),
   bulkAddWords: mockBulkAddWords,

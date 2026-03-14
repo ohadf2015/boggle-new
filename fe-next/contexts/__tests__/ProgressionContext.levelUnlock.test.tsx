@@ -42,6 +42,10 @@ function createMockProgression(overrides?: Partial<PlayerProgression>): PlayerPr
     updatedAt: '2025-01-20T12:30:00Z',
     gold: 0,
     upgrades: {},
+    skillPoints: 0,
+    skillTree: {},
+    runeFragments: 0,
+    runes: [],
     ...overrides,
   };
 }
