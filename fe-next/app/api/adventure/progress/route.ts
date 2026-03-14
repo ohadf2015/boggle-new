@@ -29,6 +29,8 @@ function transformProgression(
       currentLevel: 1,
       totalStars: 0,
       completions: [],
+      gold: 0,
+      upgrades: {},
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -42,6 +44,8 @@ function transformProgression(
     currentLevel: dbRow.current_level as number,
     totalStars: dbRow.total_stars as number,
     completions,
+    gold: (dbRow.gold as number) ?? 0,
+    upgrades: (dbRow.upgrades as Record<string, number>) ?? {},
     createdAt: dbRow.created_at as string,
     updatedAt: dbRow.updated_at as string,
   };

@@ -1,208 +1,257 @@
 /**
- * UpgradeShop Component
+ * Word Forge — Upgrade Shop Component
  *
- * Displays available stat upgrades and handles purchase interactions.
- * Shows costs, stack counts, and validation feedback.
+ * Displays upgrade categories with tiered items, purchase buttons,
+ * and visual icons. Inspired by Gold Miner / Motherload shop screens.
  */
 
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useLanguage } from '../../../contexts/LanguageContext';
-import type { UpgradeId, PurchaseResult } from '../../../shared/types/progression';
-import { STAT_UPGRADES, getUpgradeCost } from '../../../shared/utils/currencyUtils';
+import { useState, useMemo } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import { Coins, Lock, Check, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
+import {
+  UPGRADE_CATEGORIES,
+  getAvailableUpgrades,
+  getUpgradeTier,
+  getNextTierCost,
+  canAffordUpgrade,
+  purchaseUpgrade,
+  type UpgradeCategory,
+  type UpgradeState,
+  type UpgradeDefinition,
+} from '@/lib/adventure/upgradeConfig';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 
-/**
- * Component props
- */
 export interface UpgradeShopProps {
-  /** Player's current gold balance */
   gold: number;
-  /** Current upgrade stacks by ID */
-  upgrades: Record<UpgradeId, number>;
-  /** Callback when upgrade is purchased */
-  onPurchase: (upgradeId: UpgradeId) => PurchaseResult;
-  /** Additional CSS classes */
+  upgrades: UpgradeState;
+  currentWorld: number;
+  onPurchase: (upgradeId: string, newState: UpgradeState, newGold: number) => void;
   className?: string;
 }
 
-/**
- * Shop interface for purchasing stat upgrades.
- *
- * Features:
- * - List of available upgrades with descriptions
- * - Cost and stack count display
- * - Purchase validation (gold check, max stacks)
- * - Visual feedback on purchase/error
- * - Neo-brutalist styling
- *
- * @example
- * ```tsx
- * <UpgradeShop
- *   gold={1500}
- *   upgrades={{ timeBonus: 2, scoreBonus: 1, xpBonus: 0 }}
- *   onPurchase={handlePurchase}
- * />
- * ```
- */
 export function UpgradeShop({
   gold,
   upgrades,
+  currentWorld,
   onPurchase,
   className = '',
 }: UpgradeShopProps) {
   const { t } = useLanguage();
-  const [purchaseStatus, setPurchaseStatus] = useState<{
-    upgradeId: UpgradeId;
-    success: boolean;
-  } | null>(null);
+  const [activeCategory, setActiveCategory] = useState<UpgradeCategory>('excavation');
+  const [flashId, setFlashId] = useState<string | null>(null);
 
-  // Handle purchase click
-  const handlePurchase = (upgradeId: UpgradeId) => {
-    const result = onPurchase(upgradeId);
+  const available = useMemo(() => getAvailableUpgrades(currentWorld), [currentWorld]);
+  const categoryUpgrades = useMemo(
+    () => available.filter(u => u.category === activeCategory),
+    [available, activeCategory]
+  );
 
-    // Show feedback animation
-    setPurchaseStatus({ upgradeId, success: result.success });
-    setTimeout(() => setPurchaseStatus(null), 1000);
-  };
-
-  // Render upgrade card
-  const renderUpgradeCard = (upgradeId: UpgradeId) => {
-    const upgrade = STAT_UPGRADES[upgradeId];
-    const currentStacks = upgrades[upgradeId];
-    const cost = getUpgradeCost(upgradeId, currentStacks);
-    const canAfford = gold >= cost;
-    const isMaxed = currentStacks >= upgrade.maxStacks;
-    const goldNeeded = Math.max(0, cost - gold);
-
-    // Translation keys based on upgrade ID
-    const nameKey = `adventure.upgrades.${upgradeId}`;
-    const descKey = `adventure.upgrades.${upgradeId}Desc`;
-
-    return (
-      <div
-        key={upgradeId}
-        data-testid="upgrade-card"
-        className="
-          bg-neo-navy border-3 border-black rounded-neo
-          shadow-hard p-4
-          flex flex-col gap-3
-        "
-      >
-        {/* Header: Name and Icon */}
-        <div className="flex items-center gap-2">
-          <span className="text-2xl" role="img" aria-label={upgrade.icon}>
-            {upgrade.icon === 'clock' && '⏱️'}
-            {upgrade.icon === 'star' && '⭐'}
-            {upgrade.icon === 'lightning' && '⚡'}
-          </span>
-          <h3 className="font-neo-display font-bold text-lg">
-            {t(nameKey)}
-          </h3>
-        </div>
-
-        {/* Description */}
-        <p className="font-neo-body text-sm text-neo-white/70">
-          {t(descKey)}
-        </p>
-
-        {/* Stack count */}
-        <div className="text-sm font-neo-body">
-          {currentStacks}/{upgrade.maxStacks} stacks
-        </div>
-
-        {/* Cost and Purchase */}
-        <div className="flex items-center justify-between mt-2">
-          {/* Cost */}
-          <div className="flex items-center gap-1">
-            <span className="text-lg" role="img" aria-label="coin">
-              🪙
-            </span>
-            <span className="font-neo-display font-bold">
-              {cost.toLocaleString('en-US')}
-            </span>
-          </div>
-
-          {/* Purchase button or status */}
-          {isMaxed ? (
-            <div className="
-              bg-neo-navy/80 text-neo-white/50
-              px-4 py-2 rounded-neo
-              border-2 border-black
-              font-neo-display font-bold text-sm
-            ">
-              {t('adventure.upgrades.maxLevel')}
-            </div>
-          ) : (
-            <motion.button
-              onClick={() => handlePurchase(upgradeId)}
-              disabled={!canAfford}
-              className={`
-                px-4 py-2 rounded-neo
-                border-2 border-black
-                font-neo-display font-bold text-sm
-                transition-all
-                ${
-                  canAfford
-                    ? 'bg-neo-lime hover:bg-neo-lime/90 shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed'
-                    : 'bg-neo-navy/60 text-neo-white/40 cursor-not-allowed'
-                }
-              `}
-              whileHover={canAfford ? { scale: 1.05 } : {}}
-              whileTap={canAfford ? { scale: 0.95 } : {}}
-            >
-              {t('adventure.upgrades.purchase')}
-            </motion.button>
-          )}
-        </div>
-
-        {/* Insufficient gold message */}
-        {!isMaxed && !canAfford && goldNeeded > 0 && (
-          <div className="text-xs text-neo-orange font-neo-body">
-            {t('adventure.upgrades.needMore').replace('{amount}', goldNeeded.toString())}
-          </div>
-        )}
-
-        {/* Purchase feedback */}
-        {purchaseStatus?.upgradeId === upgradeId && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            className={`
-              text-center text-sm font-neo-display font-bold py-1 rounded
-              ${
-                purchaseStatus.success
-                  ? 'bg-neo-lime/20 text-neo-lime'
-                  : 'bg-neo-orange/20 text-neo-orange'
-              }
-            `}
-          >
-            {purchaseStatus.success ? '✓ Purchased!' : '✗ Failed'}
-          </motion.div>
-        )}
-      </div>
-    );
+  const handlePurchase = (upgradeId: string) => {
+    const result = purchaseUpgrade(upgrades, upgradeId, gold);
+    if (!result) return;
+    setFlashId(upgradeId);
+    setTimeout(() => setFlashId(null), 800);
+    onPurchase(upgradeId, result.state, result.gold);
   };
 
   return (
-    <div className={`flex flex-col gap-4 ${className}`}>
-      {/* Shop header — Lexi acts as the friendly shopkeeper */}
+    <div className={cn('flex flex-col gap-4', className)}>
+      {/* Header */}
       <div className="flex items-center gap-3">
         <MascotWithEntrance variant="shopkeeper" size="md" delay={0.2} />
-        <h2 className="font-neo-display font-bold text-xl">
-          {t('adventure.shop.title')}
-        </h2>
+        <div>
+          <h2 className="font-neo-display font-bold text-xl">{t('adventure.shop.title')}</h2>
+          <div className="flex items-center gap-1.5 mt-1">
+            <Coins className="w-4 h-4 text-neo-yellow" />
+            <span className="font-neo-display font-bold text-neo-yellow">{gold.toLocaleString()}</span>
+          </div>
+        </div>
       </div>
 
-      {/* Upgrade cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {(['timeBonus', 'scoreBonus', 'xpBonus'] as UpgradeId[]).map(
-          renderUpgradeCard
-        )}
+      {/* Category tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {UPGRADE_CATEGORIES.map(cat => {
+          const catCount = available.filter(u => u.category === cat.id).length;
+          if (catCount === 0) return null;
+          return (
+            <button
+              key={cat.id}
+              data-testid={`category-${cat.id}`}
+              onClick={() => setActiveCategory(cat.id)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-2 rounded-neo border-3 font-neo-display font-bold text-sm whitespace-nowrap transition-all',
+                activeCategory === cat.id
+                  ? 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-pressed'
+                  : 'bg-neo-navy text-neo-white border-neo-black/50 shadow-hard hover:shadow-hard-pressed'
+              )}
+            >
+              <span>{cat.icon}</span>
+              <span>{t(cat.nameKey)}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Upgrade cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <AnimatePresence mode="popLayout">
+          {categoryUpgrades.map(upgrade => (
+            <UpgradeCard
+              key={upgrade.id}
+              upgrade={upgrade}
+              tier={getUpgradeTier(upgrades, upgrade.id)}
+              nextCost={getNextTierCost(upgrades, upgrade.id)}
+              canAfford={canAffordUpgrade(upgrades, upgrade.id, gold)}
+              isFlashing={flashId === upgrade.id}
+              onPurchase={handlePurchase}
+              t={t}
+            />
+          ))}
+        </AnimatePresence>
       </div>
     </div>
+  );
+}
+
+// ==============================================
+// UPGRADE CARD
+// ==============================================
+
+interface UpgradeCardProps {
+  upgrade: UpgradeDefinition;
+  tier: number;
+  nextCost: number | null;
+  canAfford: boolean;
+  isFlashing: boolean;
+  onPurchase: (id: string) => void;
+  t: (key: string) => string;
+}
+
+function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchase, t }: UpgradeCardProps) {
+  const isMaxed = nextCost === null;
+  const maxTier = upgrade.tiers.length;
+
+  return (
+    <m.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      data-testid="upgrade-card"
+      className={cn(
+        'relative bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4 flex flex-col gap-3',
+        isFlashing && 'ring-2 ring-neo-lime'
+      )}
+    >
+      {/* Icon + Name */}
+      <div className="flex items-center gap-3">
+        <div className="relative w-12 h-12 shrink-0">
+          <Image
+            src={`/images/upgrades/${upgrade.icon}`}
+            alt={t(upgrade.nameKey)}
+            fill
+            className="object-contain"
+            sizes="48px"
+          />
+        </div>
+        <div className="min-w-0">
+          <h3 className="font-neo-display font-bold text-sm leading-tight truncate">
+            {t(upgrade.nameKey)}
+          </h3>
+          <p className="text-xs text-neo-white/60 font-neo-body leading-snug mt-0.5">
+            {t(upgrade.descriptionKey)}
+          </p>
+        </div>
+      </div>
+
+      {/* Tier pips */}
+      <div className="flex items-center gap-1">
+        {upgrade.tiers.map((_, i) => (
+          <div
+            key={i}
+            className={cn(
+              'h-2 flex-1 rounded-full border border-neo-black/40',
+              i < tier ? 'bg-neo-lime' : 'bg-neo-white/10'
+            )}
+          />
+        ))}
+        <span className="text-xs font-mono font-bold text-neo-white/50 ms-1.5">
+          {tier}/{maxTier}
+        </span>
+      </div>
+
+      {/* Current tier effect */}
+      {tier > 0 && (
+        <div className="text-xs text-neo-cyan font-neo-body flex items-center gap-1">
+          <Check className="w-3 h-3" />
+          <span>{t(upgrade.tiers[tier - 1].effectKey)}</span>
+        </div>
+      )}
+
+      {/* Next tier preview */}
+      {!isMaxed && tier < maxTier && (
+        <div className="text-xs text-neo-white/40 font-neo-body flex items-center gap-1">
+          <ChevronRight className="w-3 h-3" />
+          <span>{t(upgrade.tiers[tier].effectKey)}</span>
+        </div>
+      )}
+
+      {/* Purchase row */}
+      <div className="flex items-center justify-between mt-auto pt-2 border-t border-neo-white/10">
+        {isMaxed ? (
+          <div className="flex items-center gap-1 text-neo-white/40">
+            <Check className="w-4 h-4" />
+            <span className="text-xs font-neo-display font-bold">{t('adventure.upgrades.maxLevel')}</span>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-1">
+              <Coins className="w-3.5 h-3.5 text-neo-yellow" />
+              <span className={cn('text-sm font-neo-display font-bold', canAfford ? 'text-neo-yellow' : 'text-neo-orange')}>
+                {nextCost!.toLocaleString()}
+              </span>
+            </div>
+            <m.button
+              onClick={() => onPurchase(upgrade.id)}
+              disabled={!canAfford}
+              className={cn(
+                'px-3 py-1.5 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs transition-all',
+                canAfford
+                  ? 'bg-neo-lime text-neo-black shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed'
+                  : 'bg-neo-navy/60 text-neo-white/30 cursor-not-allowed'
+              )}
+              whileHover={canAfford ? { scale: 1.05 } : {}}
+              whileTap={canAfford ? { scale: 0.95 } : {}}
+            >
+              {canAfford ? t('adventure.upgrades.purchase') : (
+                <span className="flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  {t('adventure.upgrades.needMore').replace('{amount}', ((nextCost ?? 0) - 0).toString())}
+                </span>
+              )}
+            </m.button>
+          </>
+        )}
+      </div>
+
+      {/* Purchase flash */}
+      <AnimatePresence>
+        {isFlashing && (
+          <m.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center bg-neo-lime/20 rounded-neo pointer-events-none"
+          >
+            <span className="text-2xl font-neo-display font-black text-neo-lime">✓</span>
+          </m.div>
+        )}
+      </AnimatePresence>
+    </m.div>
   );
 }

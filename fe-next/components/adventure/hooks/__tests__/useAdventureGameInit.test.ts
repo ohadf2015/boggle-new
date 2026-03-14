@@ -18,6 +18,20 @@ import { useComboMilestone } from '@/hooks/useComboMilestone';
 import { registerAllAbilities } from '@/lib/adventure/abilities';
 import { showAchievementToast } from '@/components/achievements/AchievementToast';
 
+jest.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: { id: 'test-user-id' } }),
+}));
+jest.mock('@/contexts/ProgressionContext', () => ({
+  useProgression: () => ({ progression: { xp: 0, gold: 0, upgrades: {} } }),
+}));
+jest.mock('@/hooks/useUpgradeEffects', () => ({
+  useUpgradeEffects: () => ({
+    bonusTimeSeconds: 0,
+    comboScoreMultiplier: 1,
+    startingHints: 0,
+    reviveCount: 0,
+  }),
+}));
 jest.mock('@/hooks/useAdaptiveDifficulty');
 jest.mock('@/hooks/useAIDirector');
 jest.mock('@/hooks/useAdventureXp');
@@ -74,7 +88,7 @@ describe('useAdventureGameInit', () => {
 
   const mockCurrency = {
     gold: 0,
-    upgrades: { timeBonus: 0, scoreBonus: 0, xpBonus: 0 },
+    upgrades: {},
     addGold: jest.fn(),
     purchase: jest.fn(),
     getUpgradeEffect: jest.fn().mockReturnValue({ multiplier: 1 }),
@@ -122,19 +136,21 @@ describe('useAdventureGameInit', () => {
     expect(result.current.recordCompletion).toBe(mockAdaptiveDifficulty.recordCompletion);
   });
 
-  it('should compute adjustedLevelConfig with time bonus', () => {
-    mockCurrency.getUpgradeEffect.mockReturnValue({ multiplier: 1.2 });
+  it('should compute adjustedLevelConfig with upgrade time bonus', () => {
+    // bonusTimeSeconds from useUpgradeEffects is 0 by default (mocked above)
     const { result } = renderHook(() => useAdventureGameInit(defaultProps));
-    // timeBonus multiplier 1.2, bonus = floor(120 * (1.2 - 1)) = floor(23.999...) = 23
-    expect(result.current.adjustedLevelConfig.timerSeconds).toBe(143);
+    // base 120 + 0 bonus = 120
+    expect(result.current.adjustedLevelConfig.timerSeconds).toBe(120);
   });
 
-  it('should return upgrade bonuses', () => {
-    mockCurrency.getUpgradeEffect.mockReturnValue({ multiplier: 1.5 });
+  it('should return upgrade bonuses from useUpgradeEffects', () => {
     const { result } = renderHook(() => useAdventureGameInit(defaultProps));
-    expect(result.current.upgradeBonuses.timeBonus).toBe(1.5);
-    expect(result.current.upgradeBonuses.scoreBonus).toBe(1.5);
-    expect(result.current.upgradeBonuses.xpBonus).toBe(1.5);
+    // timeBonus is hardcoded to 1 (handled via bonusTimeSeconds)
+    expect(result.current.upgradeBonuses.timeBonus).toBe(1);
+    // scoreBonus comes from upgradeEffects.comboScoreMultiplier (mocked as 1)
+    expect(result.current.upgradeBonuses.scoreBonus).toBe(1);
+    // xpBonus is hardcoded to 1
+    expect(result.current.upgradeBonuses.xpBonus).toBe(1);
   });
 
   it('should return AI director controls', () => {

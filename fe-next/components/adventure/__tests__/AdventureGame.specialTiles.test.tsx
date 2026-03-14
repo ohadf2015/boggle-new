@@ -96,7 +96,7 @@ jest.mock('@/hooks/useAdventureXp', () => ({
 jest.mock('@/hooks/useAdventureCurrency', () => ({
   useAdventureCurrency: () => ({
     gold: 0,
-    upgrades: { timeBonus: 0, scoreBonus: 0, xpBonus: 0 },
+    upgrades: {},
     addGold: jest.fn(),
     purchase: jest.fn(),
     getUpgradeEffect: jest.fn((type: string) => ({

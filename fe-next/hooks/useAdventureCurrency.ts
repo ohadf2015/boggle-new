@@ -1,181 +1,83 @@
 /**
  * useAdventureCurrency Hook
  *
- * Manages gold currency and stat upgrades for Adventure Mode progression.
- * Handles purchase validation, effect calculations, and persistence tracking.
+ * Manages gold currency and Word Forge upgrades for Adventure Mode.
+ * Uses the new flexible upgrade system from upgradeConfig.ts.
  */
 
 import { useState, useCallback } from 'react';
-import type { UpgradeId, PurchaseResult } from '../shared/types/progression';
-import { purchaseUpgrade, STAT_UPGRADES } from '../shared/utils/currencyUtils';
+import {
+  getUpgradeTier,
+  getUpgradeEffect as getConfigEffect,
+  purchaseUpgrade as configPurchase,
+  type UpgradeState,
+} from '@/lib/adventure/upgradeConfig';
 
-/**
- * Hook options
- */
 export interface UseAdventureCurrencyOptions {
-  /** User ID for persistence tracking */
   userId: string;
-  /** Initial gold amount (default: 0) */
   initialGold?: number;
-  /** Initial upgrade stacks (default: all zeros) */
-  initialUpgrades?: Record<UpgradeId, number>;
+  initialUpgrades?: UpgradeState;
 }
 
-/**
- * Hook return value
- */
 export interface UseAdventureCurrencyReturn {
-  /** Current gold balance */
   gold: number;
-  /** Current upgrade stacks by ID */
-  upgrades: Record<UpgradeId, number>;
-  /** Add gold to balance */
+  upgrades: UpgradeState;
   addGold: (amount: number) => void;
-  /** Attempt to purchase an upgrade */
-  purchase: (upgradeId: UpgradeId) => PurchaseResult;
-  /** Get current effect of an upgrade */
-  getUpgradeEffect: (upgradeId: UpgradeId) => {
-    multiplier: number;
-    description: string;
-  };
-  /** Pending update for database persistence (null if nothing pending) */
-  pendingUpdate: {
-    userId: string;
-    gold: number;
-    upgrades: Record<UpgradeId, number>;
-  } | null;
-  /** Acknowledge that pending update has been persisted */
+  purchase: (upgradeId: string) => boolean;
+  getUpgradeEffect: (upgradeId: string) => { multiplier: number; description: string };
+  pendingUpdate: { userId: string; gold: number; upgrades: UpgradeState } | null;
   acknowledgePersistence: () => void;
 }
 
-/**
- * Hook for managing adventure currency and upgrades.
- *
- * Provides state management for gold, upgrade purchases, and persistence tracking.
- *
- * @param options - Hook configuration
- * @returns Currency state and actions
- *
- * @example
- * ```tsx
- * const { gold, upgrades, purchase, addGold } = useAdventureCurrency({
- *   userId: 'user-123',
- *   initialGold: 1000,
- * });
- *
- * // Add gold after level completion
- * addGold(150);
- *
- * // Purchase upgrade
- * const result = purchase('timeBonus');
- * if (result.success) {
- *   console.log('Purchase successful!');
- * }
- * ```
- */
 export function useAdventureCurrency(
   options: UseAdventureCurrencyOptions
 ): UseAdventureCurrencyReturn {
-  const { userId, initialGold = 0, initialUpgrades } = options;
+  const { userId, initialGold = 0, initialUpgrades = {} } = options;
 
-  // Initialize upgrades with zeros if not provided
-  const defaultUpgrades: Record<UpgradeId, number> = {
-    timeBonus: 0,
-    scoreBonus: 0,
-    xpBonus: 0,
-  };
-
-  // State
   const [gold, setGold] = useState(initialGold);
-  const [upgrades, setUpgrades] = useState<Record<UpgradeId, number>>(
-    initialUpgrades || defaultUpgrades
-  );
+  const [upgrades, setUpgrades] = useState<UpgradeState>(initialUpgrades);
   const [pendingUpdate, setPendingUpdate] = useState<{
     userId: string;
     gold: number;
-    upgrades: Record<UpgradeId, number>;
+    upgrades: UpgradeState;
   } | null>(null);
 
-  /**
-   * Add gold to the player's balance
-   */
   const addGold = useCallback(
     (amount: number) => {
-      setGold((current) => {
+      setGold(current => {
         const newGold = current + amount;
-        // Track pending update
-        setPendingUpdate({
-          userId,
-          gold: newGold,
-          upgrades,
-        });
+        setPendingUpdate({ userId, gold: newGold, upgrades });
         return newGold;
       });
     },
     [userId, upgrades]
   );
 
-  /**
-   * Attempt to purchase an upgrade
-   */
   const purchase = useCallback(
-    (upgradeId: UpgradeId): PurchaseResult => {
-      // Get current stacks
-      const currentStacks = upgrades[upgradeId];
+    (upgradeId: string): boolean => {
+      const result = configPurchase(upgrades, upgradeId, gold);
+      if (!result) return false;
 
-      // Validate purchase
-      const result = purchaseUpgrade(upgradeId, gold, currentStacks);
-
-      if (result.success) {
-        // Update gold
-        setGold(result.newGold);
-
-        // Update upgrades
-        const newUpgrades = {
-          ...upgrades,
-          [upgradeId]: result.newStacks,
-        };
-        setUpgrades(newUpgrades);
-
-        // Track pending update
-        setPendingUpdate({
-          userId,
-          gold: result.newGold,
-          upgrades: newUpgrades,
-        });
-      }
-
-      return result;
+      setGold(result.gold);
+      setUpgrades(result.state);
+      setPendingUpdate({ userId, gold: result.gold, upgrades: result.state });
+      return true;
     },
     [userId, gold, upgrades]
   );
 
-  /**
-   * Get the current effect of an upgrade based on stacks owned
-   */
   const getUpgradeEffect = useCallback(
-    (upgradeId: UpgradeId) => {
-      const upgrade = STAT_UPGRADES[upgradeId];
-      const stacks = upgrades[upgradeId];
-
-      // Calculate multiplier: 1 + (stacks * benefitPerStack / 100)
-      const benefitDecimal = upgrade.benefitPerStack / 100;
-      const multiplier = 1 + stacks * benefitDecimal;
-
-      // Calculate percentage for description
-      const percentage = stacks * upgrade.benefitPerStack;
-
+    (upgradeId: string) => {
+      const tier = getUpgradeTier(upgrades, upgradeId);
+      const value = getConfigEffect(upgrades, upgradeId);
       return {
-        multiplier,
-        description: `+${percentage}%`,
+        multiplier: 1 + value,
+        description: tier > 0 ? `Tier ${tier}` : 'Not purchased',
       };
     },
     [upgrades]
   );
 
-  /**
-   * Clear pending update after persistence
-   */
   const acknowledgePersistence = useCallback(() => {
     setPendingUpdate(null);
   }, []);

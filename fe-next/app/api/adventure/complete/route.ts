@@ -7,6 +7,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -79,21 +80,6 @@ function validateRequestBody(body: Record<string, unknown>): {
   };
 }
 
-/**
- * Calculate player level from total XP
- * Uses curved progression: Level N requires N^1.5 * 100 XP
- */
-function calculatePlayerLevel(totalXp: number): number {
-  let level = 1;
-  while (level < 50) {
-    const xpRequired = Math.floor(Math.pow(level, 1.5) * 100);
-    if (totalXp < xpRequired) {
-      return level;
-    }
-    level++;
-  }
-  return 50;
-}
 
 /**
  * POST /api/adventure/complete
@@ -210,7 +196,14 @@ export async function POST(request: Request) {
     const currentTotalStars = existingProgression?.total_stars ?? 0;
     const newTotalXp = currentXp + xpEarned;
     const newTotalStars = currentTotalStars + starsGained;
-    const newPlayerLevel = calculatePlayerLevel(newTotalXp);
+    const newPlayerLevel = getLevelFromXp(newTotalXp);
+
+    // Calculate gold earned (mirrors useAdventureLevelCompletion formula)
+    const baseGold = 10 * stars;
+    const perfectClearGoldBonus = stars === 3 ? 50 : 0;
+    const goldEarned = isFirstCompletion ? baseGold + perfectClearGoldBonus : 0;
+    const currentGold = (existingProgression?.gold as number) ?? 0;
+    const newGold = currentGold + goldEarned;
 
     // Calculate next unlocked level
     let nextWorld = world;
@@ -231,6 +224,7 @@ export async function POST(request: Request) {
         player_level: newPlayerLevel,
         xp: newTotalXp,
         total_stars: newTotalStars,
+        gold: newGold,
         current_world: Math.max(existingProgression?.current_world ?? 1, nextWorld),
         current_level: Math.max(existingProgression?.current_level ?? 1, nextLevel),
         updated_at: new Date().toISOString(),
@@ -257,6 +251,7 @@ export async function POST(request: Request) {
         completedAt: completion.completed_at,
       },
       xpEarned,
+      goldEarned,
       starsGained,
       progression: {
         playerLevel: newPlayerLevel,

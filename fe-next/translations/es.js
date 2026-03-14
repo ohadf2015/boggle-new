@@ -2170,7 +2170,8 @@ const es = {
       "displayName": "Tu nombre de usuario",
       "namePlaceholder": "Ingresa tu nombre...",
       "saving": "Guardando...",
-      "showMeLeaderboard": "¡Muéstrame en la tabla!"
+      "showMeLeaderboard": "¡Muéstrame en la tabla!",
+      "avatarAssigned": "Avatar asignado"
     },
     "inlineSignup": {
       "title": "¡Únete a los Guerreros de Palabras!",
@@ -2841,7 +2842,8 @@ const es = {
       "demoComplete": "¡Lo tienes! Ahora sabes cómo jugar.",
       "startHere": "Empieza aquí",
       "watchMe": "¡Mira esto!",
-      "yourTurn": "¡Tu turno! Deletrea:"
+      "yourTurn": "¡Tu turno! Deletrea:",
+      "letterCount": "{current}/{total}"
     },
     "name": {
       "placeholder": "Ingresa tu nombre",
@@ -3687,6 +3689,8 @@ const es = {
     "foundTarget": "encontró la palabra objetivo",
     "submit": "Enviar",
     "lifeBar": "Barra de vida",
+    "duplicate": "Palabra duplicada",
+    "invalid": "Palabra inválida",
     "multiplayer": {
       "targetWord": "Palabra Objetivo",
       "firstFinder": "¡Primer Descubridor!",
@@ -5439,12 +5443,100 @@ const es = {
       "cascadeBlocked": "Espera a que termine la cascada"
     },
     "upgrades": {
-      "maxLevel": "Nivel máximo",
+      "maxLevel": "MÁX",
       "purchase": "Comprar",
-      "needMore": "Necesitas {amount} más de oro"
+      "needMore": "Necesitas {amount} más",
+      "category": {
+        "excavation": "Excavación",
+        "survival": "Supervivencia",
+        "fortune": "Fortuna",
+        "mastery": "Maestría"
+      },
+      "wordRadar": {
+        "name": "Radar de Palabras",
+        "desc": "Encuentra palabras más rápido con escaneo mejorado",
+        "t1": "Las pistas se recargan un 30% más rápido",
+        "t2": "Las pistas se recargan un 50% más rápido",
+        "t3": "2 pistas por nivel",
+        "t4": "3 pistas por nivel",
+        "t5": "Pista gratis al empezar el nivel"
+      },
+      "deepDrill": {
+        "name": "Perforación Profunda",
+        "desc": "Llega más profundo en la cuadrícula de letras",
+        "t1": "Palabras de 2 letras válidas (mundos 1-3)",
+        "t2": "Envoltura diagonal activada",
+        "t3": "Salta un hueco en los caminos",
+        "t4": "Atraviesa fichas usadas una vez"
+      },
+      "gemDetector": {
+        "name": "Detector de Gemas",
+        "desc": "Aparecen más fichas especiales en la cuadrícula",
+        "t1": "+20% fichas doradas",
+        "t2": "+fichas arcoíris y en cadena",
+        "t3": "Ficha dorada garantizada por cascada"
+      },
+      "fuelTank": {
+        "name": "Tanque de Combustible",
+        "desc": "Más tiempo para encontrar palabras",
+        "t1": "+10 segundos",
+        "t2": "+20 segundos",
+        "t3": "+30 segundos",
+        "t4": "+5s por nivel de 3 estrellas en el mundo"
+      },
+      "armorPlating": {
+        "name": "Blindaje",
+        "desc": "Recibe menos daño en peleas de jefes",
+        "t1": "-10% daño de jefe",
+        "t2": "-20% daño de jefe",
+        "t3": "Bloquea el primer ataque de cada pelea",
+        "t4": "Recupera 5 HP por palabra encontrada"
+      },
+      "blastShield": {
+        "name": "Escudo Antichoque",
+        "desc": "Protección contra peligros de la cuadrícula",
+        "t1": "Las fichas de hielo se rompen más rápido",
+        "t2": "Las bombas dan tiempo en vez de quitarlo",
+        "t3": "Inmune a ataques de mezcla"
+      },
+      "luckyPickaxe": {
+        "name": "Pico de la Suerte",
+        "desc": "Gana más oro en cada nivel",
+        "t1": "+10% oro ganado",
+        "t2": "+25% oro ganado",
+        "t3": "Oro extra por palabras de 6+ letras",
+        "t4": "Doble oro en la primera completación"
+      },
+      "cargoBay": {
+        "name": "Bahía de Carga",
+        "desc": "Mantén los combos más tiempo",
+        "t1": "El combo decae un 30% más lento",
+        "t2": "El combo decae un 50% más lento",
+        "t3": "Bonificación de combo ×1.5"
+      },
+      "salvageClaw": {
+        "name": "Garra de Rescate",
+        "desc": "Recupera valor de intentos fallidos",
+        "t1": "Gana 5 oro en intentos de 0 estrellas",
+        "t2": "Conserva el 50% del puntaje para el siguiente intento",
+        "t3": "1 reintento gratis por mundo"
+      },
+      "wordDynamite": {
+        "name": "Dinamita de Palabras",
+        "desc": "Explota la cuadrícula para encontrar nuevas palabras",
+        "t1": "Mezcla 1 fila una vez por nivel",
+        "t2": "Mezcla cualquier área de 3×3",
+        "t3": "Detona palabras para limpiar fichas cercanas"
+      },
+      "timeFreeze": {
+        "name": "Congelar Tiempo",
+        "desc": "Detén el reloj para pensar",
+        "t1": "Pausa el temporizador 5 segundos",
+        "t2": "Pausa de 10s + muestra la palabra más larga"
+      }
     },
     "shop": {
-      "title": "Tienda de mejoras"
+      "title": "Forja de Palabras"
     },
     "cinematics": {
       "victory": "¡VICTORIA!",

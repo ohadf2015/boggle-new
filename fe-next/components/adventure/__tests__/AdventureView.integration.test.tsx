@@ -216,6 +216,8 @@ const createMockProgression = (overrides = {}): PlayerProgression => ({
     { world: 1, level: 4, stars: 2, bestScore: 1100, bestWords: 11, completedAt: new Date().toISOString() },
     { world: 1, level: 5, stars: 2, bestScore: 1300, bestWords: 13, completedAt: new Date().toISOString() },
   ],
+  gold: 0,
+  upgrades: {},
   ...overrides,
 });
 

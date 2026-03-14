@@ -25,9 +25,6 @@ import {
   GRID_SIZES,
   TIMER_DURATIONS,
   // Utility functions
-  getXpForLevel,
-  getLevelFromXp,
-  getXpProgressInLevel,
   getWorldUnlockRequirement,
   isWorldUnlocked,
   isLevelUnlocked,
@@ -123,109 +120,6 @@ describe('Adventure Constants', () => {
       // Verify linear progression
       for (let world = 2; world <= 10; world++) {
         expect(TIMER_DURATIONS[world]).toBe(TIMER_DURATIONS[world - 1] - 5);
-      }
-    });
-  });
-});
-
-describe('XP Calculation Functions', () => {
-  describe('getXpForLevel', () => {
-    it('should return 0 for level 1', () => {
-      // GIVEN
-      const level = 1;
-
-      // WHEN
-      const result = getXpForLevel(level);
-
-      // THEN
-      expect(result).toBe(0);
-    });
-
-    it('should return 0 for level 0 or negative', () => {
-      expect(getXpForLevel(0)).toBe(0);
-      expect(getXpForLevel(-1)).toBe(0);
-    });
-
-    it('should use curved progression formula (N^1.5 * 100)', () => {
-      // GIVEN - Level 10
-
-      // WHEN
-      const result = getXpForLevel(10);
-
-      // THEN - Level 10 requires 10^1.5 * 100 ≈ 3162 XP
-      const expected = Math.floor(Math.pow(10, 1.5) * 100);
-      expect(result).toBe(expected);
-    });
-
-    it('should cap at level 50', () => {
-      // Levels above 50 should return same as level 50
-      const level50Xp = getXpForLevel(50);
-      const level51Xp = getXpForLevel(51);
-      const level100Xp = getXpForLevel(100);
-
-      expect(level51Xp).toBe(level50Xp);
-      expect(level100Xp).toBe(level50Xp);
-    });
-  });
-
-  describe('getLevelFromXp', () => {
-    it('should return level 1 for 0 XP', () => {
-      expect(getLevelFromXp(0)).toBe(1);
-    });
-
-    it('should return level 1 for negative XP', () => {
-      expect(getLevelFromXp(-100)).toBe(1);
-    });
-
-    it('should calculate correct level from XP', () => {
-      // Just under level 2 threshold
-      const level2Threshold = getXpForLevel(2);
-      expect(getLevelFromXp(level2Threshold - 1)).toBe(1);
-      expect(getLevelFromXp(level2Threshold)).toBe(2);
-    });
-
-    it('should cap at level 50', () => {
-      // Even with massive XP, cap at 50
-      expect(getLevelFromXp(999999999)).toBe(50);
-    });
-
-    it('should be inverse of getXpForLevel', () => {
-      // getLevelFromXp(getXpForLevel(N)) should return N
-      for (let level = 1; level <= 50; level++) {
-        const xp = getXpForLevel(level);
-        expect(getLevelFromXp(xp)).toBe(level);
-      }
-    });
-  });
-
-  describe('getXpProgressInLevel', () => {
-    it('should return progress percentage within current level', () => {
-      // GIVEN - Exactly at level 5
-      const xpAtLevel5 = getXpForLevel(5);
-      const xpAtLevel6 = getXpForLevel(6);
-      const midwayXp = xpAtLevel5 + (xpAtLevel6 - xpAtLevel5) / 2;
-
-      // WHEN
-      const progress = getXpProgressInLevel(midwayXp);
-
-      // THEN - Should be approximately 50%
-      expect(progress).toBeGreaterThanOrEqual(0.49);
-      expect(progress).toBeLessThanOrEqual(0.51);
-    });
-
-    it('should return 0 at level boundary', () => {
-      const xpAtLevel3 = getXpForLevel(3);
-      const progress = getXpProgressInLevel(xpAtLevel3);
-      expect(progress).toBeCloseTo(0, 1);
-    });
-
-    it('should return value between 0 and 1', () => {
-      // Test various XP values
-      const testXps = [0, 100, 500, 1000, 5000, 10000];
-      for (const xp of testXps) {
-        const progress = getXpProgressInLevel(xp);
-        expect(progress).toBeGreaterThanOrEqual(0);
-        expect(progress).toBeLessThanOrEqual(1);
       }
     });
   });

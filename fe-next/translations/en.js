@@ -1328,7 +1328,8 @@ const en = {
       "demoComplete": "You got it! Let's clash!",
       "startHere": "Start Here",
       "watchMe": "Watch this!",
-      "yourTurn": "Your turn! Spell:"
+      "yourTurn": "Your turn! Spell:",
+      "letterCount": "{current}/{total}"
     },
     "name": {
       "placeholder": "Your name",
@@ -2395,7 +2396,8 @@ const en = {
       "displayName": "Your Display Name",
       "namePlaceholder": "Enter your name...",
       "saving": "Saving...",
-      "showMeLeaderboard": "Show Me On The Leaderboard!"
+      "showMeLeaderboard": "Show Me On The Leaderboard!",
+      "avatarAssigned": "Avatar assigned"
     },
     "inlineSignup": {
       "title": "Join the Word Warriors!",
@@ -3759,6 +3761,8 @@ const en = {
     "foundTarget": "found the target word",
     "submit": "Submit",
     "lifeBar": "Life bar",
+    "duplicate": "Duplicate word",
+    "invalid": "Invalid word",
     "multiplayer": {
       "targetWord": "Target Word",
       "firstFinder": "First Finder!",
@@ -5215,12 +5219,100 @@ const en = {
       "cascadeBlocked": "Wait for cascade to complete"
     },
     "upgrades": {
-      "maxLevel": "Max Level",
-      "purchase": "Purchase",
-      "needMore": "Need {amount} more gold"
+      "maxLevel": "MAX",
+      "purchase": "Buy",
+      "needMore": "Need {amount} more",
+      "category": {
+        "excavation": "Excavation",
+        "survival": "Survival",
+        "fortune": "Fortune",
+        "mastery": "Mastery"
+      },
+      "wordRadar": {
+        "name": "Word Radar",
+        "desc": "Find words faster with enhanced scanning",
+        "t1": "Hints recharge 30% faster",
+        "t2": "Hints recharge 50% faster",
+        "t3": "2 hints per level",
+        "t4": "3 hints per level",
+        "t5": "Free hint on level start"
+      },
+      "deepDrill": {
+        "name": "Deep Drill",
+        "desc": "Reach deeper into the letter grid",
+        "t1": "2-letter words valid (worlds 1-3)",
+        "t2": "Diagonal wrapping enabled",
+        "t3": "Skip one gap in paths",
+        "t4": "Tunnel through used tiles once"
+      },
+      "gemDetector": {
+        "name": "Gem Detector",
+        "desc": "More special tiles appear on the grid",
+        "t1": "+20% gold tiles",
+        "t2": "+rainbow and chain tiles",
+        "t3": "Guaranteed gold tile per cascade"
+      },
+      "fuelTank": {
+        "name": "Fuel Tank",
+        "desc": "More time to find words",
+        "t1": "+10 seconds",
+        "t2": "+20 seconds",
+        "t3": "+30 seconds",
+        "t4": "+5s per 3-star level in world"
+      },
+      "armorPlating": {
+        "name": "Armor Plating",
+        "desc": "Take less damage in boss fights",
+        "t1": "-10% boss damage",
+        "t2": "-20% boss damage",
+        "t3": "Block first attack each fight",
+        "t4": "Heal 5 HP per word found"
+      },
+      "blastShield": {
+        "name": "Blast Shield",
+        "desc": "Protection from grid hazards",
+        "t1": "Ice tiles break faster",
+        "t2": "Bombs give time instead of taking",
+        "t3": "Immune to scramble attacks"
+      },
+      "luckyPickaxe": {
+        "name": "Lucky Pickaxe",
+        "desc": "Earn more gold from every level",
+        "t1": "+10% gold earned",
+        "t2": "+25% gold earned",
+        "t3": "Bonus gold for 6+ letter words",
+        "t4": "Double gold on first completion"
+      },
+      "cargoBay": {
+        "name": "Cargo Bay",
+        "desc": "Keep combos going longer",
+        "t1": "Combo decays 30% slower",
+        "t2": "Combo decays 50% slower",
+        "t3": "Combo score bonus ×1.5"
+      },
+      "salvageClaw": {
+        "name": "Salvage Claw",
+        "desc": "Recover value from failed attempts",
+        "t1": "Earn 5 gold on 0-star attempts",
+        "t2": "Keep 50% score toward next try",
+        "t3": "1 free retry per world"
+      },
+      "wordDynamite": {
+        "name": "Word Dynamite",
+        "desc": "Blow up the grid to find new words",
+        "t1": "Shuffle 1 row once per level",
+        "t2": "Shuffle any 3×3 area",
+        "t3": "Detonate words to clear nearby tiles"
+      },
+      "timeFreeze": {
+        "name": "Time Freeze",
+        "desc": "Stop the clock to think",
+        "t1": "Pause timer for 5 seconds",
+        "t2": "10s pause + show longest word"
+      }
     },
     "shop": {
-      "title": "Upgrade Shop"
+      "title": "Word Forge"
     },
     "bosses": {
       "fightBoss": "Fight Boss",

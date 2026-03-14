@@ -36,6 +36,7 @@ export interface UseAdventureLevelCompletionProps {
   objectives: ObjectiveSlice[];
   currentLevel: number;
   upgradeBonuses: { xpBonus: number; timeBonus: number; scoreBonus: number };
+  upgradeEffects?: { goldMultiplier: number; doubleFirstCompletionGold: boolean; failureGold: number };
   awardXp: (xp: number) => { leveledUp: boolean; newLevel?: number };
   addGold: (amount: number) => void;
   recordAttempt: (...args: any[]) => void;
@@ -59,7 +60,7 @@ export interface UseAdventureLevelCompletionProps {
 export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionProps) {
   const {
     gameState, timeRemaining, timerSeconds, levelConfig, objectives,
-    currentLevel, upgradeBonuses, awardXp, addGold,
+    currentLevel, upgradeBonuses, upgradeEffects, awardXp, addGold,
     recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement,
     pauseGame, showVictory, showDefeat,
     showLevelComplete, showVictoryCinematic, showDefeatCinematic,
@@ -108,7 +109,9 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
       const baseGold = 10 * gameState.stars;
       const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
-      addGold(baseGold + perfectClearGoldBonus);
+      const goldMultiplier = upgradeEffects?.goldMultiplier ?? 1;
+      const doubleFirst = upgradeEffects?.doubleFirstCompletionGold ? 2 : 1;
+      addGold(Math.floor((baseGold + perfectClearGoldBonus) * goldMultiplier * doubleFirst));
 
       if (levelUpResult.leveledUp && levelUpResult.newLevel !== undefined) {
         setLevelUpData({ oldLevel, newLevel: levelUpResult.newLevel, newTitles: [] });

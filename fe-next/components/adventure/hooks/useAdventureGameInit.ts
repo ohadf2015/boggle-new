@@ -7,12 +7,15 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProgression } from '@/contexts/ProgressionContext';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { useAIDirector } from '@/hooks/useAIDirector';
 import { useAdventureXp } from '@/hooks/useAdventureXp';
 import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
 import { useSkillPoints } from '@/hooks/useSkillPoints';
 import { useSkillEffects } from '@/hooks/useSkillEffects';
+import { useUpgradeEffects } from '@/hooks/useUpgradeEffects';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 import { useComboMilestone } from '@/hooks/useComboMilestone';
 import { registerAllAbilities } from '@/lib/adventure/abilities';
@@ -26,6 +29,10 @@ export interface UseAdventureGameInitProps {
 }
 
 export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventureGameInitProps) {
+  const { user } = useAuth();
+  const { progression } = useProgression();
+  const userId = user?.id ?? 'anonymous';
+
   // Register abilities once on mount
   useEffect(() => {
     registerAllAbilities();
@@ -69,11 +76,9 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
     currentLevel,
     xpProgress,
     awardXp,
-    pendingUpdate: xpPendingUpdate,
-    acknowledgePersistence: acknowledgeXpPersistence,
   } = useAdventureXp({
-    userId: 'temp-user-id',
-    initialXp: 0,
+    userId,
+    initialXp: progression?.xp ?? 0,
   });
 
   // Currency system
@@ -83,12 +88,10 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
     addGold,
     purchase,
     getUpgradeEffect,
-    pendingUpdate: currencyPendingUpdate,
-    acknowledgePersistence: acknowledgeCurrencyPersistence,
   } = useAdventureCurrency({
-    userId: 'temp-user-id',
-    initialGold: 0,
-    initialUpgrades: { timeBonus: 0, scoreBonus: 0, xpBonus: 0 },
+    userId,
+    initialGold: progression?.gold ?? 0,
+    initialUpgrades: progression?.upgrades ?? {},
   });
 
   // Skill points (side-effect only)
@@ -124,21 +127,21 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
   // Combo milestone
   const { currentMilestone, checkMilestone } = useComboMilestone();
 
-  // Upgrade bonuses
-  const upgradeBonuses = useMemo(() => ({
-    timeBonus: getUpgradeEffect('timeBonus').multiplier,
-    scoreBonus: getUpgradeEffect('scoreBonus').multiplier,
-    xpBonus: getUpgradeEffect('xpBonus').multiplier,
-  }), [getUpgradeEffect]);
+  // Word Forge upgrade effects
+  const upgradeEffects = useUpgradeEffects(upgrades);
 
-  // Adjusted level config with time bonus
-  const adjustedLevelConfig = useMemo(() => {
-    const bonusTime = Math.floor(adjustedConfig.timerSeconds * (upgradeBonuses.timeBonus - 1));
-    return {
-      ...adjustedConfig,
-      timerSeconds: adjustedConfig.timerSeconds + bonusTime,
-    };
-  }, [adjustedConfig, upgradeBonuses.timeBonus]);
+  // Backwards-compatible upgrade bonuses (consumed by level completion + word submit)
+  const upgradeBonuses = useMemo(() => ({
+    timeBonus: 1, // handled via bonusTimeSeconds below
+    scoreBonus: upgradeEffects.comboScoreMultiplier,
+    xpBonus: 1, // XP bonus removed from upgrade system
+  }), [upgradeEffects.comboScoreMultiplier]);
+
+  // Adjusted level config with Fuel Tank time bonus
+  const adjustedLevelConfig = useMemo(() => ({
+    ...adjustedConfig,
+    timerSeconds: adjustedConfig.timerSeconds + upgradeEffects.bonusTimeSeconds,
+  }), [adjustedConfig, upgradeEffects.bonusTimeSeconds]);
 
   // Adjusted inactivity threshold from AI director
   const adjustedInactivityThresholdMs = useMemo(() => {
@@ -169,13 +172,14 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
     xpProgress,
     awardXp,
 
-    // Currency
+    // Currency & Upgrades
     gold,
     upgrades,
     addGold,
     purchase,
     getUpgradeEffect,
     upgradeBonuses,
+    upgradeEffects,
 
     // Skills
     skillEffects,

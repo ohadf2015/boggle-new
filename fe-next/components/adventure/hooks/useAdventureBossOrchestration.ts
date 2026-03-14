@@ -11,6 +11,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useAdventureBossNew, type BossAttack } from '@/hooks/useAdventureBossNew';
 import { usePlayerHealth } from '@/hooks/usePlayerHealth';
+import { useBossMechanics } from '@/hooks/useBossMechanics';
 import type { BossTauntEvent, BossMechanicResult } from '@/types/boss';
 import { type BossTier } from '@/components/celebration/BossDefeatFireworks';
 
@@ -25,6 +26,9 @@ export interface UseAdventureBossOrchestrationProps {
   startAIDirector: () => void;
   addTime: (seconds: number) => void;
   shake: (intensity: number) => void;
+  bossDamageMultiplier?: number;
+  blockFirstAttack?: boolean;
+  scrambleImmunity?: boolean;
 }
 
 export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrationProps) {
@@ -32,6 +36,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     isBossLevel, worldId, levelNumber, showBossIntroConfig,
     timeRemaining, isPlaying, startGame, startAIDirector,
     addTime, shake,
+    bossDamageMultiplier = 1, blockFirstAttack = false, scrambleImmunity = false,
   } = props;
 
   // Boss intro state
@@ -49,19 +54,31 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   // Player health (for boss levels with player damage) — must be before handleAttack
   const playerHealth = usePlayerHealth(isBossLevel ? 100 : 0);
 
-  // Attack handler — applies boss attacks to the game
+  // Track first attack for blockFirstAttack upgrade
+  const firstAttackBlockedRef = useRef(false);
+
+  // Attack handler — applies boss attacks to the game (with upgrade effects)
   const handleAttack = useCallback((attack: BossAttack) => {
+    // Block first attack (Armor Plating T3)
+    if (blockFirstAttack && !firstAttackBlockedRef.current) {
+      firstAttackBlockedRef.current = true;
+      shake(1); // visual feedback that attack was blocked
+      return;
+    }
+
     if (attack.type === 'timePenalty' && attack.seconds) {
       addTime(-attack.seconds);
     } else if (attack.type === 'scramble') {
+      if (scrambleImmunity) return; // Blast Shield T3
       shake(3);
     } else if (attack.type === 'lockTiles') {
       shake(2);
     } else if (attack.type === 'damage' && attack.damage) {
-      playerHealth.takeDamage(attack.damage);
+      const reducedDamage = Math.floor(attack.damage * bossDamageMultiplier);
+      playerHealth.takeDamage(reducedDamage);
       shake(2);
     }
-  }, [addTime, shake, playerHealth]);
+  }, [addTime, shake, playerHealth, bossDamageMultiplier, blockFirstAttack, scrambleImmunity]);
 
   // Victory handler
   const handleVictory = useCallback(() => {
@@ -87,6 +104,9 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   const handleDefeat = useCallback(() => {
     setBattleResult('defeat');
   }, []);
+
+  // Boss twist mechanics (palindrome, anagram, etymology, etc.)
+  const bossMechanics = useBossMechanics({ worldId: isBossLevel ? worldId : null });
 
   // New simplified boss hook
   const {
@@ -148,15 +168,14 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     }
   }, [isPlaying, startGame, startAIDirector, bossStartBattle]);
 
-  // Simplified checkBossWord — no complex mechanics, just bonus for long words
+  // Check word against boss twist mechanics (delegates to useBossMechanics)
   const checkBossWord = useCallback((word: string): BossMechanicResult => {
-    const isGood = word.length >= 5;
-    return {
-      meetsRequirement: isGood,
-      scoreMultiplier: isGood ? 1.5 : 1.0,
-      triggerTaunt: isGood ? 'onGoodWord' : undefined,
-    };
-  }, []);
+    const result = bossMechanics.checkWord(word);
+    if (result.triggerTaunt) {
+      bossMechanics.triggerTaunt(result.triggerTaunt);
+    }
+    return result;
+  }, [bossMechanics]);
 
   // Simplified dealBossDamage — wraps the new hook's dealDamage
   // Accepts old signature for compatibility but internally just uses score

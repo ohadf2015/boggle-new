@@ -1,7 +1,9 @@
 import type { ChapterQuest } from '@/types/adventure';
 
 export function getChapterNumber(levelNumber: number): number {
-  return Math.ceil(levelNumber / 5);
+  if (levelNumber <= 2) return 1;  // Chapter 1: levels 1-2
+  if (levelNumber <= 4) return 2;  // Chapter 2: levels 3-4
+  return 3;                         // Chapter 3: levels 5-7
 }
 
 export const CHAPTER_QUESTS: ChapterQuest[] = [

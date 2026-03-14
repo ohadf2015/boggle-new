@@ -248,14 +248,17 @@ jest.mock('framer-motion', () => {
     return result;
   };
 
+  const motionComponents = {
+    div: createMockMotion('div'),
+    button: createMockMotion('button'),
+    ul: createMockMotion('ul'),
+    li: createMockMotion('li'),
+    span: createMockMotion('span'),
+  };
+
   return {
-    motion: {
-      div: createMockMotion('div'),
-      button: createMockMotion('button'),
-      ul: createMockMotion('ul'),
-      li: createMockMotion('li'),
-      span: createMockMotion('span'),
-    },
+    motion: motionComponents,
+    m: motionComponents,
     AnimatePresence: ({ children }: any) => children,
     useSpring,
     useTransform,
@@ -344,6 +347,23 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
     }),
   };
 });
+
+// Mock useFlashChallenge (wired in AdventureGame.tsx)
+jest.mock('@/hooks/useFlashChallenge', () => ({
+  useFlashChallenge: () => ({
+    activeChallenge: null,
+    isChallengeComplete: false,
+    dismiss: jest.fn(),
+  }),
+}));
+
+// Mock useBossMechanics (used by useAdventureBossOrchestration)
+jest.mock('@/hooks/useBossMechanics', () => ({
+  useBossMechanics: () => ({
+    checkWord: () => ({ meetsRequirement: false, scoreMultiplier: 1.0 }),
+    triggerTaunt: jest.fn(),
+  }),
+}));
 
 // Mock SoundEffectsContext for UnifiedAchievementModal
 jest.mock('@/contexts/SoundEffectsContext', () => ({

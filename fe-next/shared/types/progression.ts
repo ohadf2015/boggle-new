@@ -6,42 +6,37 @@
  */
 
 /**
- * Unique identifiers for stat upgrade types
+ * Upgrade state — map of upgrade IDs to tier levels
+ * @see upgradeConfig.ts for the full upgrade catalog
  */
-export type UpgradeId = 'timeBonus' | 'scoreBonus' | 'xpBonus';
+export type UpgradeState = Record<string, number>;
 
 /**
- * Configuration for a single stat upgrade type
+ * @deprecated Use string upgrade IDs from upgradeConfig.ts instead
+ */
+export type UpgradeId = string;
+
+/**
+ * @deprecated Use UpgradeDefinition from upgradeConfig.ts instead
  */
 export interface StatUpgrade {
-  /** Unique identifier for this upgrade */
-  id: UpgradeId;
-  /** Display name for the upgrade */
+  id: string;
   name: string;
-  /** Description of what the upgrade does */
   description: string;
-  /** Base cost in gold for the first purchase */
   baseCost: number;
-  /** Benefit percentage per stack (e.g., 10 = +10%) */
   benefitPerStack: number;
-  /** Maximum number of times this upgrade can be purchased */
   maxStacks: number;
-  /** Icon identifier for UI display */
   icon: string;
 }
 
 /**
- * Player progression data structure
+ * @deprecated Use PlayerProgression from types/adventure.ts instead
  */
 export interface PlayerProgression {
-  /** Current gold balance */
   gold: number;
-  /** Current experience points */
   xp: number;
-  /** Current level (derived from XP) */
   level: number;
-  /** Upgrade stacks purchased by upgrade ID */
-  upgrades: Record<UpgradeId, number>;
+  upgrades: Record<string, number>;
 }
 
 /**
@@ -49,17 +44,12 @@ export interface PlayerProgression {
  */
 export type PurchaseResult =
   | {
-      /** Purchase was successful */
       success: true;
-      /** New gold balance after purchase */
       newGold: number;
-      /** New stack count after purchase */
       newStacks: number;
     }
   | {
-      /** Purchase failed */
       success: false;
-      /** Reason for failure */
       error: 'insufficient_gold' | 'max_stacks_reached' | 'invalid_upgrade';
     };
 

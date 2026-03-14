@@ -11,6 +11,15 @@ import { usePlayerHealth } from '@/hooks/usePlayerHealth';
 
 jest.mock('@/hooks/useAdventureBossNew');
 jest.mock('@/hooks/usePlayerHealth');
+jest.mock('@/hooks/useBossMechanics', () => ({
+  useBossMechanics: jest.fn().mockReturnValue({
+    checkWord: (word: string) => ({
+      meetsRequirement: word.length >= 5,
+      scoreMultiplier: word.length >= 5 ? 1.5 : 1.0,
+    }),
+    triggerTaunt: jest.fn(),
+  }),
+}));
 jest.mock('@/lib/adventure/bossConfig', () => ({
   getBossConfig: jest.fn().mockReturnValue({ id: 'test-boss' }),
   getBossTaunt: jest.fn().mockReturnValue('taunt_key'),

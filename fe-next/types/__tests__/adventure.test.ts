@@ -261,6 +261,8 @@ describe('Adventure Types', () => {
         currentWorld: 2,
         currentLevel: 3,
         totalStars: 24,
+        gold: 150,
+        upgrades: { timeBonus: 1, scoreBonus: 0, xpBonus: 0 },
         completions: [
           {
             world: 1,

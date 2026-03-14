@@ -46,6 +46,8 @@ function createMockProgression(overrides?: Partial<PlayerProgression>): PlayerPr
     ],
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-20T12:30:00Z',
+    gold: 0,
+    upgrades: {},
     ...overrides,
   };
 }

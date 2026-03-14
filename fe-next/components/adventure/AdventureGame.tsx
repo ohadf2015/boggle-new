@@ -20,6 +20,8 @@ import { useAdventureWordSubmit } from './hooks/useAdventureWordSubmit';
 import { useAdventureLevelCompletion } from './hooks/useAdventureLevelCompletion';
 import { useAdventureBossOrchestration } from './hooks/useAdventureBossOrchestration';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
+import { useFlashChallenge } from '@/hooks/useFlashChallenge';
+import FlashChallengeToast from './FlashChallengeToast';
 import { neoInfoToast } from '@/components/NeoToast';
 import AdventureEffectsLayer from './effects/AdventureEffectsLayer';
 import LevelCompleteModal from './LevelCompleteModal';
@@ -90,6 +92,17 @@ const AdventureGame = memo<AdventureGameProps>(
       showBossIntroConfig: levelConfig.showBossIntro === true,
       timeRemaining, isPlaying, startGame, startAIDirector: init.startAIDirector,
       addTime, shake: (intensity: number) => effects.shake(intensity),
+      bossDamageMultiplier: init.upgradeEffects.bossDamageMultiplier,
+      blockFirstAttack: init.upgradeEffects.blockFirstAttack,
+      scrambleImmunity: init.upgradeEffects.scrambleImmunity,
+    });
+
+    const flashChallenge = useFlashChallenge({
+      worldId: levelConfig.world,
+      totalTimeSeconds: levelConfig.timerSeconds ?? 120,
+      timeRemaining,
+      wordsFound: gameState.wordsFound,
+      isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
     });
 
     const getScoreMultiplier = () => 1;
@@ -146,7 +159,8 @@ const AdventureGame = memo<AdventureGameProps>(
     const levelCompletion = useAdventureLevelCompletion({
       gameState, timeRemaining, timerSeconds: init.adjustedLevelConfig.timerSeconds,
       levelConfig, objectives, currentLevel: init.currentLevel,
-      upgradeBonuses: init.upgradeBonuses, awardXp: init.awardXp, addGold: init.addGold,
+      upgradeBonuses: init.upgradeBonuses, upgradeEffects: init.upgradeEffects,
+      awardXp: init.awardXp, addGold: init.addGold,
       recordAttempt, recordCompletion: init.recordCompletion,
       endAIDirector: init.endAIDirector, handleEarnAchievement: init.handleEarnAchievement,
       pauseGame, showVictory: cinematics.showVictory, showDefeat: cinematics.showDefeat,
@@ -363,6 +377,15 @@ const AdventureGame = memo<AdventureGameProps>(
                 <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">
                   <PlayerHealthBar healthState={bossOrch.playerHealthState} />
                 </div>
+              )}
+
+              {flashChallenge.activeChallenge && (
+                <FlashChallengeToast
+                  challenge={flashChallenge.activeChallenge}
+                  isComplete={flashChallenge.isChallengeComplete}
+                  onDismiss={flashChallenge.dismiss}
+                  timeLeft={flashChallenge.activeChallenge.durationSeconds}
+                />
               )}
 
               <PauseOverlay isOpen={isPaused && !showLevelComplete}

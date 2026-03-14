@@ -1,329 +1,123 @@
 /**
- * Tests for UpgradeShop component
+ * UpgradeShop — Word Forge Tests
  *
- * Tests stat upgrade purchase UI with validation and feedback.
+ * Tests the new category-based upgrade shop with tiered upgrades.
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { UpgradeShop } from '../UpgradeShop';
-import type { UpgradeId, PurchaseResult } from '../../../../shared/types/progression';
 import '@testing-library/jest-dom';
 
-// Mock translations
-jest.mock('../../../../contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'adventure.upgrades.timeBonus': 'Time Bonus',
-        'adventure.upgrades.scoreBonus': 'Score Bonus',
-        'adventure.upgrades.xpBonus': 'XP Bonus',
-        'adventure.upgrades.timeBonusDesc': '+10% time per level',
-        'adventure.upgrades.scoreBonusDesc': '+5% score per level',
-        'adventure.upgrades.xpBonusDesc': '+10% XP per level',
-        'adventure.upgrades.purchase': 'Purchase',
-        'adventure.upgrades.maxLevel': 'MAX',
-        'adventure.upgrades.needMore': 'Need {amount} more gold',
-        'adventure.upgrades.stack': '{current}/{max} stacks',
-      };
-      return translations[key] || key;
-    },
-  }),
+jest.mock('@/components/ui/Mascot', () => ({
+  MascotWithEntrance: ({ variant }: { variant: string }) => (
+    <div data-testid={`mascot-${variant}`} />
+  ),
 }));
 
-// Mock Framer Motion
+jest.mock('../../../../contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (key: string) => key }),
+}));
+
 jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, whileHover, whileTap, initial, animate, exit, ...props }: any) => (
+  m: {
+    div: ({ children, layout, initial, animate, exit, ...props }: any) => (
       <div {...props}>{children}</div>
     ),
     button: ({ children, whileHover, whileTap, ...props }: any) => (
       <button {...props}>{children}</button>
     ),
   },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: ({ alt, ...props }: any) => <img alt={alt} {...props} />,
+}));
+
+import { UpgradeShop } from '../UpgradeShop';
+
 describe('UpgradeShop', () => {
-  const mockOnPurchase = jest.fn();
+  const defaultProps = {
+    gold: 500,
+    upgrades: {},
+    currentWorld: 1,
+    onPurchase: jest.fn(),
+  };
 
-  beforeEach(() => {
-    mockOnPurchase.mockClear();
-  });
+  beforeEach(() => jest.clearAllMocks());
 
-  describe('Basic rendering', () => {
-    it('should render all upgrade options', () => {
-      // GIVEN: Upgrade shop with upgrades
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={1000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should display all three upgrades
-      expect(screen.getByText('Time Bonus')).toBeInTheDocument();
-      expect(screen.getByText('Score Bonus')).toBeInTheDocument();
-      expect(screen.getByText('XP Bonus')).toBeInTheDocument();
-    });
-
-    it('should display upgrade descriptions', () => {
-      // GIVEN: Upgrade shop
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={1000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should show descriptions
-      expect(screen.getByText('+10% time per level')).toBeInTheDocument();
-      expect(screen.getByText('+5% score per level')).toBeInTheDocument();
-      expect(screen.getByText('+10% XP per level')).toBeInTheDocument();
-    });
-
-    it('should display current stack count', () => {
-      // GIVEN: Some upgrades already purchased
-      const upgrades = { timeBonus: 2, scoreBonus: 1, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={1000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should show stack counts
-      expect(screen.getByText('2/5 stacks')).toBeInTheDocument();
-      expect(screen.getByText('1/5 stacks')).toBeInTheDocument();
-      expect(screen.getByText('0/5 stacks')).toBeInTheDocument();
-    });
-
-    it('should display upgrade costs', () => {
-      // GIVEN: Upgrades with different costs
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={5000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should show costs (timeBonus: 500, scoreBonus: 750, xpBonus: 1000)
+  describe('rendering', () => {
+    it('should show gold balance', () => {
+      render(<UpgradeShop {...defaultProps} />);
       expect(screen.getByText('500')).toBeInTheDocument();
-      expect(screen.getByText('750')).toBeInTheDocument();
-      expect(screen.getByText('1,000')).toBeInTheDocument();
+    });
+
+    it('should show upgrade cards for world 1 upgrades', () => {
+      render(<UpgradeShop {...defaultProps} />);
+      const cards = screen.getAllByTestId('upgrade-card');
+      expect(cards.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should show category tabs', () => {
+      render(<UpgradeShop {...defaultProps} currentWorld={5} />);
+      expect(screen.getByTestId('category-excavation')).toBeInTheDocument();
+      expect(screen.getByTestId('category-survival')).toBeInTheDocument();
+      expect(screen.getByTestId('category-fortune')).toBeInTheDocument();
+    });
+
+    it('should show mastery category when world >= 5', () => {
+      render(<UpgradeShop {...defaultProps} currentWorld={5} />);
+      expect(screen.getByTestId('category-mastery')).toBeInTheDocument();
+    });
+
+    it('should NOT show mastery category when world < 5', () => {
+      render(<UpgradeShop {...defaultProps} currentWorld={3} />);
+      expect(screen.queryByTestId('category-mastery')).not.toBeInTheDocument();
     });
   });
 
-  describe('Purchase button state', () => {
-    it('should enable purchase button when affordable', () => {
-      // GIVEN: Enough gold for timeBonus (costs 500)
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={1000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Time Bonus purchase button should be enabled
-      const buttons = screen.getAllByText('Purchase');
-      expect(buttons[0]).not.toBeDisabled();
+  describe('tier display', () => {
+    it('should show 0/N for unpurchased upgrades', () => {
+      render(<UpgradeShop {...defaultProps} />);
+      expect(screen.getByText('0/5')).toBeInTheDocument();
     });
 
-    it('should disable purchase button when not affordable', () => {
-      // GIVEN: Not enough gold for any upgrade
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={400}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: All purchase buttons should be disabled
-      const buttons = screen.getAllByText('Purchase');
-      buttons.forEach((button) => {
-        expect(button).toBeDisabled();
-      });
-    });
-
-    it('should show "Need more gold" message when insufficient', () => {
-      // GIVEN: Not enough gold (need 100 more for timeBonus)
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={400}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should show how much more gold is needed
-      expect(screen.getByText(/Need.*100.*more gold/)).toBeInTheDocument();
-    });
-
-    it('should show MAX badge when at max stacks', () => {
-      // GIVEN: Max stacks of timeBonus
-      const upgrades = { timeBonus: 5, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={10000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should show MAX badge instead of purchase button
-      expect(screen.getByText('MAX')).toBeInTheDocument();
+    it('should show current tier for purchased upgrades', () => {
+      render(<UpgradeShop {...defaultProps} upgrades={{ wordRadar: 3 }} />);
+      expect(screen.getByText('3/5')).toBeInTheDocument();
     });
   });
 
-  describe('Purchase interaction', () => {
-    it('should call onPurchase with correct upgradeId', () => {
-      // GIVEN: Affordable upgrade
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-      mockOnPurchase.mockReturnValue({ success: true, newGold: 500, newStacks: 1 });
-
-      // WHEN: Clicking purchase button for timeBonus
-      render(
-        <UpgradeShop
-          gold={1000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
+  describe('purchasing', () => {
+    it('should call onPurchase with new state when buying', () => {
+      render(<UpgradeShop {...defaultProps} gold={100} />);
+      const purchaseButtons = screen.getAllByText('adventure.upgrades.purchase');
+      fireEvent.click(purchaseButtons[0]);
+      expect(defaultProps.onPurchase).toHaveBeenCalledWith(
+        'wordRadar',
+        { wordRadar: 1 },
+        40
       );
-
-      const buttons = screen.getAllByText('Purchase');
-      fireEvent.click(buttons[0]); // First button is timeBonus
-
-      // THEN: Should call onPurchase with timeBonus
-      expect(mockOnPurchase).toHaveBeenCalledWith('timeBonus');
     });
 
-    it('should handle purchase success', () => {
-      // GIVEN: Successful purchase
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-      mockOnPurchase.mockReturnValue({ success: true, newGold: 500, newStacks: 1 });
-
-      // WHEN: Purchasing upgrade
-      const { rerender } = render(
-        <UpgradeShop
-          gold={1000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      const buttons = screen.getAllByText('Purchase');
-      fireEvent.click(buttons[0]);
-
-      // THEN: Should call onPurchase
-      expect(mockOnPurchase).toHaveBeenCalled();
+    it('should disable purchase button when insufficient gold', () => {
+      render(<UpgradeShop {...defaultProps} gold={10} />);
+      const buttons = screen.getAllByRole('button');
+      const disabledBtns = buttons.filter(b => (b as HTMLButtonElement).disabled);
+      expect(disabledBtns.length).toBeGreaterThan(0);
     });
 
-    it('should not call onPurchase when button is disabled', () => {
-      // GIVEN: Insufficient gold (button disabled)
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Attempting to click disabled button
-      render(
-        <UpgradeShop
-          gold={400}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      const buttons = screen.getAllByText('Purchase');
-      fireEvent.click(buttons[0]); // Button is disabled, so click is ignored
-
-      // THEN: Should not call onPurchase when disabled
-      expect(mockOnPurchase).not.toHaveBeenCalled();
+    it('should show max level badge when upgrade is maxed', () => {
+      render(<UpgradeShop {...defaultProps} upgrades={{ wordRadar: 5 }} />);
+      expect(screen.getByText('adventure.upgrades.maxLevel')).toBeInTheDocument();
     });
   });
 
-  describe('Cost calculation', () => {
-    it('should show increased cost for subsequent purchases', () => {
-      // GIVEN: One stack already purchased (next costs 750)
-      const upgrades = { timeBonus: 1, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      const { container } = render(
-        <UpgradeShop
-          gold={2000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should show increased cost for timeBonus (first card)
-      const upgradeCards = container.querySelectorAll('[data-testid="upgrade-card"]');
-      const timeBonusCard = upgradeCards[0]; // timeBonus is first
-      expect(timeBonusCard.textContent).toContain('750'); // Stack 2 costs 750
-    });
-
-    it('should show different costs for different upgrades', () => {
-      // GIVEN: Different upgrade types
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      render(
-        <UpgradeShop
-          gold={5000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should show different base costs
-      expect(screen.getByText('500')).toBeInTheDocument(); // timeBonus
-      expect(screen.getByText('750')).toBeInTheDocument(); // scoreBonus
-      expect(screen.getByText('1,000')).toBeInTheDocument(); // xpBonus
-    });
-  });
-
-  describe('Neo-brutalist styling', () => {
-    it('should apply neo-brutalist styles', () => {
-      // GIVEN: Upgrade shop
-      const upgrades = { timeBonus: 0, scoreBonus: 0, xpBonus: 0 };
-
-      // WHEN: Rendering component
-      const { container } = render(
-        <UpgradeShop
-          gold={1000}
-          upgrades={upgrades}
-          onPurchase={mockOnPurchase}
-        />
-      );
-
-      // THEN: Should have neo-brutalist classes
-      const upgradeCards = container.querySelectorAll('[data-testid="upgrade-card"]');
-      expect(upgradeCards.length).toBeGreaterThan(0);
-      expect(upgradeCards[0]).toHaveClass('border-black');
-      expect(upgradeCards[0]).toHaveClass('shadow-hard');
+  describe('category switching', () => {
+    it('should switch displayed upgrades when clicking category tab', () => {
+      render(<UpgradeShop {...defaultProps} currentWorld={5} />);
+      fireEvent.click(screen.getByTestId('category-survival'));
+      expect(screen.getByText('adventure.upgrades.fuelTank.name')).toBeInTheDocument();
     });
   });
 });

@@ -5,8 +5,45 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
+
+// Mock upgradeConfig before importing hook
+jest.mock('@/lib/adventure/upgradeConfig', () => ({
+  getUpgradeTier: jest.fn((state: Record<string, number>, id: string) => state[id] ?? 0),
+  getUpgradeEffect: jest.fn((state: Record<string, number>, id: string) => {
+    const tier = state[id] ?? 0;
+    if (tier === 0) return 0;
+    // Simulate config values for known upgrades
+    const values: Record<string, number[]> = {
+      fuelTank: [10, 20, 30, 5],
+      wordRadar: [0.3, 0.5, 2, 3, 1],
+      luckyPickaxe: [0.1, 0.25, 1, 2],
+    };
+    const tiers = values[id];
+    if (!tiers || tier > tiers.length) return 0;
+    return tiers[tier - 1];
+  }),
+  purchaseUpgrade: jest.fn(
+    (state: Record<string, number>, id: string, gold: number) => {
+      // Simulate costs for fuelTank: 50, 100, 200, 400
+      const costs: Record<string, number[]> = {
+        fuelTank: [50, 100, 200, 400],
+        wordRadar: [60, 120, 200, 350, 500],
+      };
+      const tierCosts = costs[id];
+      if (!tierCosts) return null;
+      const current = state[id] ?? 0;
+      if (current >= tierCosts.length) return null;
+      const cost = tierCosts[current];
+      if (gold < cost) return null;
+      return {
+        state: { ...state, [id]: current + 1 },
+        gold: gold - cost,
+      };
+    }
+  ),
+}));
+
 import { useAdventureCurrency } from '../useAdventureCurrency';
-import type { UpgradeId } from '../../shared/types/progression';
 
 describe('useAdventureCurrency', () => {
   describe('Initial state', () => {
@@ -19,22 +56,14 @@ describe('useAdventureCurrency', () => {
 
       // THEN: Should have zero gold and empty upgrades
       expect(result.current.gold).toBe(0);
-      expect(result.current.upgrades).toEqual({
-        timeBonus: 0,
-        scoreBonus: 0,
-        xpBonus: 0,
-      });
+      expect(result.current.upgrades).toEqual({});
       expect(result.current.pendingUpdate).toBeNull();
     });
 
     it('should initialize with provided initial values', () => {
       // GIVEN: Initial gold and upgrades
       const initialGold = 1500;
-      const initialUpgrades = {
-        timeBonus: 2,
-        scoreBonus: 1,
-        xpBonus: 0,
-      };
+      const initialUpgrades = { fuelTank: 2, wordRadar: 1 };
 
       // WHEN: Rendering hook with initial values
       const { result } = renderHook(() =>
@@ -47,11 +76,7 @@ describe('useAdventureCurrency', () => {
 
       // THEN: Should reflect initial values
       expect(result.current.gold).toBe(1500);
-      expect(result.current.upgrades).toEqual({
-        timeBonus: 2,
-        scoreBonus: 1,
-        xpBonus: 0,
-      });
+      expect(result.current.upgrades).toEqual({ fuelTank: 2, wordRadar: 1 });
     });
   });
 
@@ -86,106 +111,87 @@ describe('useAdventureCurrency', () => {
       expect(result.current.pendingUpdate).toEqual({
         userId: 'user-123',
         gold: 150,
-        upgrades: {
-          timeBonus: 0,
-          scoreBonus: 0,
-          xpBonus: 0,
-        },
+        upgrades: {},
       });
     });
   });
 
   describe('purchase', () => {
-    it('should succeed when player has sufficient gold', () => {
-      // GIVEN: Hook with enough gold for timeBonus (costs 500)
+    it('should return true when player has sufficient gold', () => {
+      // GIVEN: Hook with enough gold for fuelTank tier 1 (costs 50)
       const { result } = renderHook(() =>
         useAdventureCurrency({ userId: 'user-123', initialGold: 1000 })
       );
 
-      // WHEN: Purchasing timeBonus upgrade
-      let purchaseResult;
+      // WHEN: Purchasing fuelTank upgrade
+      let purchaseResult: boolean | undefined;
       act(() => {
-        purchaseResult = result.current.purchase('timeBonus');
+        purchaseResult = result.current.purchase('fuelTank');
       });
 
       // THEN: Purchase should succeed
-      expect(purchaseResult).toEqual({
-        success: true,
-        newGold: 500,
-        newStacks: 1,
-      });
-      expect(result.current.gold).toBe(500);
-      expect(result.current.upgrades.timeBonus).toBe(1);
+      expect(purchaseResult).toBe(true);
+      expect(result.current.gold).toBe(950);
+      expect(result.current.upgrades.fuelTank).toBe(1);
     });
 
-    it('should fail when player has insufficient gold', () => {
-      // GIVEN: Hook with not enough gold (timeBonus costs 500)
+    it('should return false when player has insufficient gold', () => {
+      // GIVEN: Hook with not enough gold (fuelTank costs 50)
       const { result } = renderHook(() =>
-        useAdventureCurrency({ userId: 'user-123', initialGold: 400 })
+        useAdventureCurrency({ userId: 'user-123', initialGold: 30 })
       );
 
-      // WHEN: Attempting to purchase timeBonus upgrade
-      let purchaseResult;
+      // WHEN: Attempting to purchase fuelTank upgrade
+      let purchaseResult: boolean | undefined;
       act(() => {
-        purchaseResult = result.current.purchase('timeBonus');
+        purchaseResult = result.current.purchase('fuelTank');
       });
 
       // THEN: Purchase should fail
-      expect(purchaseResult).toEqual({
-        success: false,
-        error: 'insufficient_gold',
-      });
-      expect(result.current.gold).toBe(400);
-      expect(result.current.upgrades.timeBonus).toBe(0);
+      expect(purchaseResult).toBe(false);
+      expect(result.current.gold).toBe(30);
     });
 
-    it('should fail when upgrade is at max stacks', () => {
-      // GIVEN: Hook with max stacks of timeBonus
+    it('should return false when upgrade is at max tiers', () => {
+      // GIVEN: Hook with max tiers of fuelTank (4 tiers)
       const { result } = renderHook(() =>
         useAdventureCurrency({
           userId: 'user-123',
           initialGold: 10000,
-          initialUpgrades: {
-            timeBonus: 5,
-            scoreBonus: 0,
-            xpBonus: 0,
-          },
+          initialUpgrades: { fuelTank: 4 },
         })
       );
 
-      // WHEN: Attempting to purchase another timeBonus stack
-      let purchaseResult;
+      // WHEN: Attempting to purchase another fuelTank tier
+      let purchaseResult: boolean | undefined;
       act(() => {
-        purchaseResult = result.current.purchase('timeBonus');
+        purchaseResult = result.current.purchase('fuelTank');
       });
 
       // THEN: Purchase should fail
-      expect(purchaseResult).toEqual({
-        success: false,
-        error: 'max_stacks_reached',
-      });
+      expect(purchaseResult).toBe(false);
       expect(result.current.gold).toBe(10000);
-      expect(result.current.upgrades.timeBonus).toBe(5);
+      expect(result.current.upgrades.fuelTank).toBe(4);
     });
 
-    it('should increase cost for subsequent purchases', () => {
+    it('should deduct correct cost for subsequent purchases', () => {
       // GIVEN: Hook with enough gold for multiple purchases
       const { result } = renderHook(() =>
         useAdventureCurrency({ userId: 'user-123', initialGold: 3000 })
       );
 
-      // WHEN: Purchasing timeBonus twice (sequential, not simultaneous)
+      // WHEN: Purchasing fuelTank twice (tier 1 = 50, tier 2 = 100)
       act(() => {
-        result.current.purchase('timeBonus'); // 500 gold
+        result.current.purchase('fuelTank');
       });
 
       act(() => {
-        result.current.purchase('timeBonus'); // 750 gold
+        result.current.purchase('fuelTank');
       });
 
-      // THEN: Should have spent 1250 total (500 + 750)
-      expect(result.current.gold).toBe(1750);
-      expect(result.current.upgrades.timeBonus).toBe(2);
+      // THEN: Should have spent 150 total (50 + 100)
+      expect(result.current.gold).toBe(2850);
+      expect(result.current.upgrades.fuelTank).toBe(2);
     });
 
     it('should track pending update after purchase', () => {
@@ -196,50 +202,52 @@ describe('useAdventureCurrency', () => {
 
       // WHEN: Purchasing upgrade
       act(() => {
-        result.current.purchase('timeBonus');
+        result.current.purchase('fuelTank');
       });
 
       // THEN: Should have pending update
       expect(result.current.pendingUpdate).toEqual({
         userId: 'user-123',
-        gold: 500,
-        upgrades: {
-          timeBonus: 1,
-          scoreBonus: 0,
-          xpBonus: 0,
-        },
+        gold: 950,
+        upgrades: { fuelTank: 1 },
       });
     });
   });
 
   describe('getUpgradeEffect', () => {
-    it('should calculate multiplier based on stacks', () => {
+    it('should return multiplier and description based on tier', () => {
       // GIVEN: Hook with some upgrades
       const { result } = renderHook(() =>
         useAdventureCurrency({
           userId: 'user-123',
-          initialUpgrades: {
-            timeBonus: 2, // +20%
-            scoreBonus: 3, // +15%
-            xpBonus: 0,
-          },
+          initialUpgrades: { fuelTank: 2, wordRadar: 1 },
         })
       );
 
       // WHEN: Getting upgrade effects
-      const timeEffect = result.current.getUpgradeEffect('timeBonus');
-      const scoreEffect = result.current.getUpgradeEffect('scoreBonus');
-      const xpEffect = result.current.getUpgradeEffect('xpBonus');
+      const fuelEffect = result.current.getUpgradeEffect('fuelTank');
+      const radarEffect = result.current.getUpgradeEffect('wordRadar');
 
-      // THEN: Should return correct multipliers
-      expect(timeEffect.multiplier).toBe(1.2); // 1 + (2 * 0.1)
-      expect(timeEffect.description).toContain('20%');
+      // THEN: multiplier = 1 + config value
+      expect(fuelEffect.multiplier).toBe(21); // 1 + 20
+      expect(fuelEffect.description).toBe('Tier 2');
 
-      expect(scoreEffect.multiplier).toBe(1.15); // 1 + (3 * 0.05)
-      expect(scoreEffect.description).toContain('15%');
+      expect(radarEffect.multiplier).toBe(1.3); // 1 + 0.3
+      expect(radarEffect.description).toBe('Tier 1');
+    });
 
-      expect(xpEffect.multiplier).toBe(1.0); // 1 + (0 * 0.1)
-      expect(xpEffect.description).toContain('0%');
+    it('should return multiplier 1 and "Not purchased" for unpurchased upgrades', () => {
+      // GIVEN: Hook with no upgrades
+      const { result } = renderHook(() =>
+        useAdventureCurrency({ userId: 'user-123' })
+      );
+
+      // WHEN: Getting effect for unpurchased upgrade
+      const effect = result.current.getUpgradeEffect('fuelTank');
+
+      // THEN: Should return base multiplier
+      expect(effect.multiplier).toBe(1);
+      expect(effect.description).toBe('Not purchased');
     });
   });
 

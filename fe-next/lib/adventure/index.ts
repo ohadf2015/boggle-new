@@ -30,11 +30,6 @@ export {
   TIMER_DURATIONS,
   getGridSize,
   getTimerDuration,
-  // XP calculation functions
-  getXpForLevel,
-  getLevelFromXp,
-  getXpProgressInLevel,
-  getXpToNextLevel,
   // World unlock functions
   getWorldUnlockRequirement,
   isWorldUnlocked,

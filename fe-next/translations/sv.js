@@ -1209,7 +1209,8 @@ const sv = {
       "demoComplete": "Du förstår! Nu vet du hur man spelar.",
       "startHere": "Börja här",
       "watchMe": "Titta!",
-      "yourTurn": "Din tur! Stava:"
+      "yourTurn": "Din tur! Stava:",
+      "letterCount": "{current}/{total}"
     },
     "name": {
       "placeholder": "Ange ditt namn",
@@ -2276,7 +2277,8 @@ const sv = {
       "displayName": "Ditt visningsnamn",
       "namePlaceholder": "Ange ditt namn...",
       "saving": "Sparar...",
-      "showMeLeaderboard": "Visa mig på topplistan!"
+      "showMeLeaderboard": "Visa mig på topplistan!",
+      "avatarAssigned": "Avatar tilldelad"
     },
     "inlineSignup": {
       "title": "Gå med i Ordkrigarna!",
@@ -3648,6 +3650,8 @@ const sv = {
     "foundTarget": "hittade målordet",
     "submit": "Skicka",
     "lifeBar": "Livstapel",
+    "duplicate": "Dubblettord",
+    "invalid": "Ogiltigt ord",
     "multiplayer": {
       "targetWord": "Målord",
       "firstFinder": "Första hittaren!",
@@ -5123,12 +5127,100 @@ const sv = {
       "cascadeBlocked": "Vänta tills kaskaden är klar"
     },
     "upgrades": {
-      "maxLevel": "Maxnivå",
+      "maxLevel": "MAX",
       "purchase": "Köp",
-      "needMore": "Behöver {amount} mer guld"
+      "needMore": "Behöver {amount} till",
+      "category": {
+        "excavation": "Utgrävning",
+        "survival": "Överlevnad",
+        "fortune": "Tur",
+        "mastery": "Mästerskap"
+      },
+      "wordRadar": {
+        "name": "Ordradar",
+        "desc": "Hitta ord snabbare med förbättrad skanning",
+        "t1": "Ledtrådar laddas 30% snabbare",
+        "t2": "Ledtrådar laddas 50% snabbare",
+        "t3": "2 ledtrådar per nivå",
+        "t4": "3 ledtrådar per nivå",
+        "t5": "Gratis ledtråd vid nivåstart"
+      },
+      "deepDrill": {
+        "name": "Djupborr",
+        "desc": "Nå djupare in i bokstavsrutnätet",
+        "t1": "2-bokstavsord giltiga (värld 1-3)",
+        "t2": "Diagonal omslutning aktiverad",
+        "t3": "Hoppa över ett gap i vägar",
+        "t4": "Tunnla genom använda rutor en gång"
+      },
+      "gemDetector": {
+        "name": "Ädelstendetektor",
+        "desc": "Fler specialrutor dyker upp i rutnätet",
+        "t1": "+20% guldrutor",
+        "t2": "+regnbågs- och kedjerutor",
+        "t3": "Garanterad guldruta per kaskad"
+      },
+      "fuelTank": {
+        "name": "Bränsletank",
+        "desc": "Mer tid att hitta ord",
+        "t1": "+10 sekunder",
+        "t2": "+20 sekunder",
+        "t3": "+30 sekunder",
+        "t4": "+5s per 3-stjärnig nivå i världen"
+      },
+      "armorPlating": {
+        "name": "Pansarplåt",
+        "desc": "Ta mindre skada i bossstrider",
+        "t1": "-10% bossskada",
+        "t2": "-20% bossskada",
+        "t3": "Blockera första attacken per strid",
+        "t4": "Hela 5 HP per hittat ord"
+      },
+      "blastShield": {
+        "name": "Sprängningssköld",
+        "desc": "Skydd mot rutnätsfaror",
+        "t1": "Isrutor bryts snabbare",
+        "t2": "Bomber ger tid istället för att ta",
+        "t3": "Immun mot blandningsattacker"
+      },
+      "luckyPickaxe": {
+        "name": "Turhacka",
+        "desc": "Tjäna mer guld från varje nivå",
+        "t1": "+10% guld",
+        "t2": "+25% guld",
+        "t3": "Bonusguld för 6+ bokstavsord",
+        "t4": "Dubbelt guld vid första avklarning"
+      },
+      "cargoBay": {
+        "name": "Lastrum",
+        "desc": "Håll kombon igång längre",
+        "t1": "Kombo avtar 30% långsammare",
+        "t2": "Kombo avtar 50% långsammare",
+        "t3": "Kombopoängbonus ×1.5"
+      },
+      "salvageClaw": {
+        "name": "Bärgningsklo",
+        "desc": "Återvinn värde från misslyckade försök",
+        "t1": "Tjäna 5 guld vid 0-stjärniga försök",
+        "t2": "Behåll 50% poäng till nästa försök",
+        "t3": "1 gratis omförsök per värld"
+      },
+      "wordDynamite": {
+        "name": "Orddynamit",
+        "desc": "Spräng rutnätet för att hitta nya ord",
+        "t1": "Blanda 1 rad en gång per nivå",
+        "t2": "Blanda valfritt 3×3-område",
+        "t3": "Detonera ord för att rensa närliggande rutor"
+      },
+      "timeFreeze": {
+        "name": "Tidsfrys",
+        "desc": "Stoppa klockan för att tänka",
+        "t1": "Pausa timern i 5 sekunder",
+        "t2": "10s paus + visa längsta ordet"
+      }
     },
     "shop": {
-      "title": "Uppgraderingsaffär"
+      "title": "Ordsmedjan"
     },
     "bosses": {
       "fightBoss": "Bekampa bossen",

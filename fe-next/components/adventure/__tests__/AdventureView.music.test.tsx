@@ -163,6 +163,8 @@ const mockProgression: PlayerProgression = {
   updatedAt: new Date().toISOString(),
   totalStars: 10,
   playerLevel: 2,
+  gold: 0,
+  upgrades: {},
   completions: [
     {
       world: 1,

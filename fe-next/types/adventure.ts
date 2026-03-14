@@ -245,6 +245,10 @@ export interface PlayerProgression {
   currentLevel: number;
   /** Total stars collected across all levels */
   totalStars: number;
+  /** Gold currency */
+  gold: number;
+  /** Purchased upgrades — map of upgradeId to tier level */
+  upgrades: Record<string, number>;
   /** Array of completed levels */
   completions: LevelCompletion[];
   /** ISO timestamp of creation */
