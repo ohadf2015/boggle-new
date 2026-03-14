@@ -3,7 +3,9 @@ import { BlastWordCelebration } from '../BlastWordCelebration';
 
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...rest },
+    div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
+    span: ({ children, ...rest }: any) => <span {...rest}>{children}</span>,
+  },
   m: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
     span: ({ children, ...rest }: any) => <span {...rest}>{children}</span>,

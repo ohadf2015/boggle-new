@@ -30,9 +30,9 @@ jest.mock('../results', () => ({
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
 }));
-jest.mock('../TabbedDailyLeaderboard', () => () => <div data-testid="leaderboard" />);
-jest.mock('@/components/auth/DailyChallengeInlineSignup', () => () => <div data-testid="inline-signup" />);
-jest.mock('../WatchAdButton', () => () => <div data-testid="watch-ad" />);
+jest.mock('../TabbedDailyLeaderboard', () => function MockLeaderboard() { return <div data-testid="leaderboard" />; });
+jest.mock('@/components/auth/DailyChallengeInlineSignup', () => function MockInlineSignup() { return <div data-testid="inline-signup" />; });
+jest.mock('../WatchAdButton', () => function MockWatchAdButton() { return <div data-testid="watch-ad" />; });
 
 import { WordHuntResultsContent, type WordHuntResultsContentProps } from '../WordHuntResultsContent';
 

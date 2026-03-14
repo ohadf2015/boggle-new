@@ -84,9 +84,9 @@ export default function PlayerProfilePageClient() {
         <h2 className="text-xl font-black text-white">
           {error === 'PLAYER_NOT_FOUND' ? t('playerProfile.notFound') : t('playerProfile.error')}
         </h2>
-        <a href="/" className="text-neo-cyan hover:underline font-bold">
+        <button onClick={() => window.location.href = '/'} className="text-neo-cyan hover:underline font-bold">
           {t('common.backHome')}
-        </a>
+        </button>
       </div>
     );
   }

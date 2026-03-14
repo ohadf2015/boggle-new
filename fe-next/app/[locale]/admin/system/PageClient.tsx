@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield } from 'lucide-react';
+import { Shield, Activity, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,6 @@ import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
-import { Activity, Mail } from 'lucide-react';
 
 /** System page — health monitoring, diagnostics, web vitals link, email testing */
 export default function SystemPageClient() {

@@ -88,7 +88,7 @@ jest.mock('@/components/ui/tooltip', () => ({
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   TooltipContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  TooltipTrigger: React.forwardRef(({ children }: { children: React.ReactNode }, _ref: React.Ref<HTMLElement>) => <>{children}</>),
+  TooltipTrigger: React.forwardRef(function TooltipTrigger({ children }: { children: React.ReactNode }, _ref: React.Ref<HTMLElement>) { return <>{children}</>; }),
 }));
 
 // ---- Tests ----

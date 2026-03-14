@@ -8,7 +8,14 @@ import { render, screen } from '@testing-library/react';
 jest.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MockDiv(
-      { children, ...rest },
+      { children, ...rest }: React.PropsWithChildren<Record<string, unknown>>,
+      ref: React.Ref<HTMLDivElement>
+    ) {
+      const { initial, animate, exit, transition, ...htmlProps } = rest as Record<string, unknown>;
+      void initial; void animate; void exit; void transition;
+      return <div ref={ref} {...htmlProps}>{children}</div>;
+    }),
+  },
   m: {
     div: React.forwardRef(function MockDiv(
       { children, ...rest }: React.PropsWithChildren<Record<string, unknown>>,

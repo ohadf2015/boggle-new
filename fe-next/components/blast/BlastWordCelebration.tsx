@@ -43,6 +43,14 @@ const TIER_GLOW: Record<number, string> = {
 const BEAM_DURATION: Record<number, number> = { 1: 300, 2: 400, 3: 500, 4: 600 };
 const AUTO_DISMISS: Record<number, number> = { 1: 500, 2: 1000, 3: 1200, 4: 1600 };
 
+/** Seeded random offsets for particle animations (avoids Math.random in render) */
+const PARTICLE_OFFSETS = Array.from({ length: 16 }, (_, i) => ({
+  distOffset: ((i * 37 + 13) % 60),
+  sizeOffset: ((i * 23 + 7) % 4),
+  durationOffset: ((i * 41 + 11) % 30) / 100,
+  delayOffset: ((i * 19 + 3) % 10) / 100,
+}));
+
 // ==================== Component ====================
 
 /**
@@ -139,11 +147,13 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
 
       {/* Star particles (tier 2+) */}
       {tier >= 2 && Array.from({ length: tier === 4 ? 16 : tier === 3 ? 10 : 6 }, (_, i) => {
-        const angle = (i / (tier === 4 ? 16 : tier === 3 ? 10 : 6)) * Math.PI * 2;
-        const dist = 40 + Math.random() * 60;
+        const count = tier === 4 ? 16 : tier === 3 ? 10 : 6;
+        const angle = (i / count) * Math.PI * 2;
+        const offsets = PARTICLE_OFFSETS[i];
+        const dist = 40 + offsets.distOffset;
         const tx = Math.cos(angle) * dist;
         const ty = Math.sin(angle) * dist;
-        const size = 4 + Math.random() * 4;
+        const size = 4 + offsets.sizeOffset;
         const starColor = PARTICLE_COLORS[i % PARTICLE_COLORS.length];
         return (
           <motion.div
@@ -159,7 +169,7 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
             }}
             initial={{ scale: 0, x: 0, y: 0, opacity: 1 }}
             animate={{ scale: [0, 1.2, 0], x: tx, y: ty, opacity: [1, 0.8, 0] }}
-            transition={{ duration: 0.5 + Math.random() * 0.3, delay: Math.random() * 0.1 }}
+            transition={{ duration: 0.5 + offsets.durationOffset, delay: offsets.delayOffset }}
           />
         );
       })}

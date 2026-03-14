@@ -7,11 +7,9 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BoardCreatorWizard } from '../BoardCreatorWizard';
-import type { UseBoardCreatorReturn, GeneratedBoard } from '@/hooks/useBoardCreator';
-
 // Mock the hook
 jest.mock('@/hooks/useBoardCreator');
-import { useBoardCreator } from '@/hooks/useBoardCreator';
+import { useBoardCreator, type UseBoardCreatorReturn, type GeneratedBoard } from '@/hooks/useBoardCreator';
 const mockUseBoardCreator = useBoardCreator as jest.MockedFunction<typeof useBoardCreator>;
 
 jest.mock('@/contexts/LanguageContext', () => ({

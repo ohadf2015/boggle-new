@@ -23,21 +23,27 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 jest.mock('framer-motion', () => {
   const components = {
-    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <div ref={ref} data-testid={props['data-testid']} className={props.className} onClick={props.onClick}>
-        {children}
-      </div>
-    )),
-    span: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <span ref={ref} data-testid={props['data-testid']} className={props.className}>
-        {children}
-      </span>
-    )),
-    button: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <button ref={ref} data-testid={props['data-testid']} className={props.className} onClick={props.onClick}>
-        {children}
-      </button>
-    )),
+    div: React.forwardRef(function MockDiv({ children, ...props }: any, ref: any) {
+      return (
+        <div ref={ref} data-testid={props['data-testid']} className={props.className} onClick={props.onClick}>
+          {children}
+        </div>
+      );
+    }),
+    span: React.forwardRef(function MockSpan({ children, ...props }: any, ref: any) {
+      return (
+        <span ref={ref} data-testid={props['data-testid']} className={props.className}>
+          {children}
+        </span>
+      );
+    }),
+    button: React.forwardRef(function MockButton({ children, ...props }: any, ref: any) {
+      return (
+        <button ref={ref} data-testid={props['data-testid']} className={props.className} onClick={props.onClick}>
+          {children}
+        </button>
+      );
+    }),
   };
   return {
     motion: components,

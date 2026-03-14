@@ -37,7 +37,10 @@ jest.mock('@/components/Avatar', () => {
 
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props },
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <div {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'transition', 'whileHover', 'whileTap'].includes(k)))}>{children}</div>
+    ),
+  },
   m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'transition', 'whileHover', 'whileTap'].includes(k)))}>{children}</div>

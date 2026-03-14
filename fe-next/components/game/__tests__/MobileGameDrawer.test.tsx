@@ -4,7 +4,24 @@ import { MobileGameDrawer } from '../MobileGameDrawer';
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, onClick, onDragEnd, animate, ...props },
+    div: ({ children, onClick, onDragEnd, animate, ...props }: Record<string, unknown>) => {
+      const filteredProps = Object.fromEntries(
+        Object.entries(props).filter(([key]) =>
+          !['drag', 'dragConstraints', 'dragElastic', 'transition', 'initial', 'exit'].includes(key)
+        )
+      );
+      return (
+        <div
+          {...filteredProps}
+          onClick={onClick as React.MouseEventHandler}
+          data-animate={JSON.stringify(animate)}
+        >
+          {children as React.ReactNode}
+        </div>
+      );
+    },
+    span: ({ children, ...props }: Record<string, unknown>) => <span {...props}>{children as React.ReactNode}</span>,
+  },
   m: {
     div: ({ children, onClick, onDragEnd, animate, ...props }: Record<string, unknown>) => {
       const filteredProps = Object.fromEntries(

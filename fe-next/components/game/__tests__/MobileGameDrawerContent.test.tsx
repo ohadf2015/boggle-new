@@ -5,7 +5,15 @@ import type { FoundWord } from '@/shared/types/view';
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props },
+    div: ({ children, ...props }: Record<string, unknown>) => {
+      const filteredProps = Object.fromEntries(
+        Object.entries(props).filter(([key]) =>
+          !['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap'].includes(key)
+        )
+      );
+      return <div {...filteredProps}>{children as React.ReactNode}</div>;
+    },
+  },
   m: {
     div: ({ children, ...props }: Record<string, unknown>) => {
       const filteredProps = Object.fromEntries(

@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield } from 'lucide-react';
+import { Shield, BookOpen, AlertTriangle, Calendar, Globe, Database, BookCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,6 @@ import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import {
-  BookOpen, AlertTriangle, Calendar, Globe, Database, BookCheck,
-} from 'lucide-react';
 
 /** Content hub — links to existing admin sub-pages for word management */
 export default function ContentPageClient() {

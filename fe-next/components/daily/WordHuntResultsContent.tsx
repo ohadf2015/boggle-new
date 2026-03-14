@@ -17,7 +17,6 @@ import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
-import type { WordHuntStats, CoinReward } from './results';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
 import {
@@ -29,6 +28,8 @@ import {
   ShareSection,
   CoinUnlockCard,
   MoreOptionsAccordion,
+  type WordHuntStats,
+  type CoinReward,
 } from './results';
 
 export interface WordHuntResultsContentProps {

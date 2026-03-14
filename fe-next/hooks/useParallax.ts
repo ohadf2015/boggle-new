@@ -72,14 +72,7 @@ function updateCSSProperties(x: number, y: number, target: string): void {
 const GYRO_THROTTLE_MS = 16;
 
 export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
-  const opts = useMemo(() => ({ ...DEFAULT_OPTIONS, ...options }), [
-    options.intensity,
-    options.enableGyroscope,
-    options.enableGesture,
-    options.enableAmbient,
-    options.ambientSpeed,
-    options.cssTarget,
-  ]);
+  const opts = useMemo(() => ({ ...DEFAULT_OPTIONS, ...options }), [options]);
   const { prefersReducedMotion, isMobile, enableComplexAnimations } = useDevicePerformance();
 
   // MotionValues for output — consumers bind directly, no re-renders

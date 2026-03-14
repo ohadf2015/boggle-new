@@ -16,11 +16,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 jest.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef(({ children, ...props },
+    div: React.forwardRef(function MockDiv({ children, ...props }: any, ref: any) {
+      return <div ref={ref} {...props}>{children}</div>;
+    }),
+  },
   m: {
-    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <div ref={ref} {...props}>{children}</div>
-    )),
+    div: React.forwardRef(function MockMDiv({ children, ...props }: any, ref: any) {
+      return <div ref={ref} {...props}>{children}</div>;
+    }),
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));

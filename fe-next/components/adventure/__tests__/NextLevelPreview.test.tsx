@@ -15,16 +15,20 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 jest.mock('framer-motion', () => {
-  const MockDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
-    <div ref={ref} data-testid={props['data-testid']} {...filterMotionProps(props)}>
-      {children}
-    </div>
-  ));
-  const MockButton = React.forwardRef(({ children, ...props }: any, ref: any) => (
-    <button ref={ref} data-testid={props['data-testid']} onClick={props.onClick} {...filterMotionProps(props)}>
-      {children}
-    </button>
-  ));
+  const MockDiv = React.forwardRef(function MockDiv({ children, ...props }: any, ref: any) {
+    return (
+      <div ref={ref} data-testid={props['data-testid']} {...filterMotionProps(props)}>
+        {children}
+      </div>
+    );
+  });
+  const MockButton = React.forwardRef(function MockButton({ children, ...props }: any, ref: any) {
+    return (
+      <button ref={ref} data-testid={props['data-testid']} onClick={props.onClick} {...filterMotionProps(props)}>
+        {children}
+      </button>
+    );
+  });
   const components = { div: MockDiv, button: MockButton };
   return {
     motion: components,

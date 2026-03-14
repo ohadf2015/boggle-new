@@ -12,7 +12,8 @@ import type { ComboStreakState } from '../hooks/useBlastComboStreak';
 
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...rest },
+    div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
+  },
   m: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
   },
