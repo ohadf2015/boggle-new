@@ -47,7 +47,7 @@ describe('usePublicProfile', () => {
 
     expect(result.current.profile).toEqual(MOCK_PROFILE);
     expect(result.current.error).toBeNull();
-    expect(global.fetch).toHaveBeenCalledWith('/api/player/WordMaster');
+    expect(global.fetch).toHaveBeenCalledWith('/api/player-profile/WordMaster');
   });
 
   it('handles 404 error', async () => {
@@ -100,7 +100,7 @@ describe('usePublicProfile', () => {
     renderHook(() => usePublicProfile('Word Master'));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/player/Word%20Master');
+      expect(global.fetch).toHaveBeenCalledWith('/api/player-profile/Word%20Master');
     });
   });
 });
