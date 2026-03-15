@@ -605,6 +605,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         playerLives: huntState.playerLives,
         eliminatedPlayers: huntState.eliminatedPlayers,
       });
+      // Mark last broadcast time so gameTimer skips the redundant tick broadcast
+      huntState.lastLifeUpdateAt = Date.now();
 
       // Compute and broadcast discovery clues to ALL players (cooperative mechanic)
       const clues = computeDiscoveryClues(huntState.targetWord, normalizedWord);

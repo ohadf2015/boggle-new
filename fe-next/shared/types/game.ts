@@ -274,6 +274,8 @@ export interface WordHuntModeState {
   targetFoundBy: string | null;
   isFirstFinderClaimed: boolean;
   discoveryWordCount?: number;
+  /** Timestamp of last wordHandler life broadcast (prevents double broadcast with timer) */
+  lastLifeUpdateAt?: number;
 }
 
 // ==================== Tournament Types ====================

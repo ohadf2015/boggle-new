@@ -103,8 +103,8 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
 
       {/* Presence and Score */}
       <div className="flex items-center gap-2">
-        {/* Presence indicator (only show for others when host) */}
-        {isHost && !player.isMe && player.presenceStatus && (
+        {/* Presence indicator (show for all non-self players) */}
+        {!player.isMe && player.presenceStatus && (
           <PresenceIndicator
             status={player.presenceStatus}
             isWindowFocused={player.isWindowFocused}

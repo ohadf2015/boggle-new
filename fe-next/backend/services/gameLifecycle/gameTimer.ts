@@ -92,8 +92,9 @@ export function startGameTimer(
         });
       }
 
-      // Only broadcast life updates when the second actually changed (syncs with timer ticks)
-      if (secondChanged) {
+      // Skip broadcast if wordHandler already sent one within the last 500ms (prevents double updates)
+      const recentlyBroadcast = huntState.lastLifeUpdateAt && (Date.now() - huntState.lastLifeUpdateAt < 500);
+      if (secondChanged && !recentlyBroadcast) {
         broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
           playerLives: updatedLives,
           eliminatedPlayers: huntState.eliminatedPlayers,

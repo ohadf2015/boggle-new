@@ -12,6 +12,8 @@ export interface ScoreGameBase {
   users: Record<string, GameUser>;
   playerScores: Record<string, number>;
   playerWords: Record<string, string[]>;
+  /** O(1) lookup set parallel to playerWords — used for duplicate checking */
+  playerWordSets?: Record<string, Set<string>>;
 
   playerWordDetails?: Record<string, any[]>;
 
@@ -90,8 +92,16 @@ export function addPlayerWord(
     game.playerAchievements[username] = [];
   }
 
-  // Only add if not already present
-  if (!game.playerWords[username].includes(normalizedWord)) {
+  // Ensure the O(1) lookup set exists
+  if (!game.playerWordSets) game.playerWordSets = {};
+  if (!game.playerWordSets[username]) {
+    // Bootstrap from existing array (handles mid-game initialization)
+    game.playerWordSets[username] = new Set(game.playerWords[username]);
+  }
+
+  // Only add if not already present (O(1) Set lookup instead of O(n) array scan)
+  if (!game.playerWordSets[username].has(normalizedWord)) {
+    game.playerWordSets[username].add(normalizedWord);
     game.playerWords[username].push(normalizedWord);
 
     // Calculate time since game start
@@ -136,7 +146,12 @@ export function addPlayerWord(
 export function playerHasWord(game: ScoreGameBase | null, username: string, word: string): boolean {
   if (!game) return false;
   if (!word || typeof word !== 'string') return false;
-  return game.playerWords[username]?.includes(word.toLowerCase()) || false;
+  const normalized = word.toLowerCase();
+  // Use O(1) Set when available, fallback to array scan
+  if (game.playerWordSets?.[username]) {
+    return game.playerWordSets[username].has(normalized);
+  }
+  return game.playerWords[username]?.includes(normalized) || false;
 }
 
 /**
@@ -264,6 +279,7 @@ export function resetScoresForNewRound(game: ScoreGameBase | null): void {
   // COMPLETELY clear all game data first to prevent stale data from previous games
   game.playerScores = {};
   game.playerWords = {};
+  game.playerWordSets = {};
   game.playerWordDetails = {};
   game.playerAchievements = {};
   game.playerCombos = {}; // Reset combo tracking for new round
