@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { ImagePlus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -310,10 +311,13 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
         />
         {coverImagePreview ? (
           <div className="relative">
-            <img
+            <Image
               src={coverImagePreview}
               alt={t('ugc.board.coverImageAlt')}
               data-testid="cover-image-preview"
+              width={600}
+              height={160}
+              unoptimized
               className="w-full h-40 object-cover rounded-neo border-neo border-black"
             />
             <button

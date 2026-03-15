@@ -335,7 +335,7 @@ export function useAdventureBossNew({
     if (hp <= 0 && isActive) {
       endBattle('victory');
     }
-  }, [hp, maxHP, isActive, phase, worldId, showTaunt, startAttackTimer, endBattle]);
+  }, [hp, maxHP, isActive, phase, worldId, boss?.phases, showTaunt, startAttackTimer, endBattle]);
 
   // Reset function
   const reset = useCallback(() => {

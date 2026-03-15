@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import Image from 'next/image';
 import { Play, Star, Users } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -94,11 +95,12 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay }) => {
       {/* Cover image or mini grid preview */}
       <div className="flex justify-center px-3 pb-2">
         {board.cover_image_url ? (
-          <img
+          <Image
             src={board.cover_image_url}
             alt={board.title}
+            width={400}
+            height={128}
             className="w-full h-32 object-cover rounded-neo border border-neo-white/20"
-            loading="lazy"
           />
         ) : (
           <BoardPreviewGrid grid={board.grid} size="sm" />

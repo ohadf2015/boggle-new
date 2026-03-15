@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Play, ArrowLeft } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -88,9 +89,11 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
         {/* Cover image or grid preview */}
         {board.cover_image_url ? (
           <div className="py-2">
-            <img
+            <Image
               src={board.cover_image_url}
               alt={board.title}
+              width={600}
+              height={192}
               className="w-full h-48 object-cover rounded-neo border-neo border-black"
             />
           </div>
