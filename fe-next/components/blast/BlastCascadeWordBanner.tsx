@@ -40,19 +40,16 @@ export function BlastCascadeWordBanner({ highlightData }: BlastCascadeWordBanner
         <motion.div
           key={`banner-${idx}`}
           data-testid={`cascade-word-banner-${idx}`}
-          initial={{ opacity: 0, scale: 0.5, y: 10 }}
+          initial={{ opacity: 0, scale: 0.9, y: 6 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 1.3, y: -10 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 20, delay: idx * 0.1 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.2, ease: 'easeOut', delay: idx * 0.06 }}
           className={cn(
             'px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-lg',
             'flex items-center gap-3 text-white',
             getBannerGradient(wordData.chainLevel),
             idx > 0 ? 'mt-2' : '',
           )}
-          style={{
-            transform: `rotate(${wordData.chainLevel >= 3 ? '-1' : '1'}deg)`,
-          }}
         >
           {/* Word text */}
           <span className="font-black text-xl uppercase tracking-wider drop-shadow-md">

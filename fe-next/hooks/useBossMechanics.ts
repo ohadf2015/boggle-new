@@ -146,10 +146,14 @@ function evaluatePopQuiz(
     case 'doubleLetters':
       meets = hasDoubleLetters(word);
       break;
-    case 'startsWith':
-      // Check if word starts with a common consonant
-      meets = /^[BCDFGHJKLMNPQRSTVWXYZ]/i.test(word);
+    case 'startsWith': {
+      // Check if word starts with the required letter from params
+      const requiredLetter = (params.startsWithLetter as string) ?? '';
+      meets = requiredLetter
+        ? word.toUpperCase().startsWith(requiredLetter.toUpperCase())
+        : /^[BCDFGHJKLMNPQRSTVWXYZ]/i.test(word); // fallback: any consonant
       break;
+    }
     case 'exactLength':
       meets = word.length === 5;
       break;
@@ -343,13 +347,21 @@ function evaluateFinalWord(
   const phaseOrder =
     (boss.twistMechanic.params.phaseOrder as string[]) ?? [];
 
-  // Create a temporary boss-like config for the current phase mechanic
+  // Create a temporary boss-like config for the current phase mechanic.
+  // Find the world whose boss uses this mechanic type to get correct params.
+  const phaseWorldId = (() => {
+    for (let w = 1; w <= 10; w++) {
+      const cfg = getBossConfig(w);
+      if (cfg?.twistMechanic.type === currentPhase) return w;
+    }
+    return null;
+  })();
   const phaseBoss: BossConfig = {
     ...boss,
     twistMechanic: {
       ...boss.twistMechanic,
       type: currentPhase as BossTwistType,
-      params: getBossConfig(phaseOrder.indexOf(currentPhase) + 1)
+      params: (phaseWorldId ? getBossConfig(phaseWorldId) : null)
         ?.twistMechanic.params ?? {},
     },
   };

@@ -95,16 +95,16 @@ function CountdownArc({
 // ==================== Animation variants ====================
 
 const ENTRANCE_VARIANTS = {
-  initial: { scale: 0, opacity: 0 },
+  initial: { scale: 0.7, opacity: 0 },
   animate: {
-    scale: [0, 1.3, 1.0],
+    scale: 1,
     opacity: 1,
-    transition: { duration: 0.2, times: [0, 0.7, 1.0] },
+    transition: { duration: 0.15, ease: 'easeOut' },
   },
   exit: {
-    scale: 0,
+    scale: 0.8,
     opacity: 0,
-    transition: { duration: 0.15 },
+    transition: { duration: 0.12, ease: 'easeIn' },
   },
 };
 
@@ -147,7 +147,7 @@ export function BlastComboStreakBadge({ streak, arcRef }: BlastComboStreakBadgeP
         variants={variants}
         initial="initial"
         animate={!shouldReduceMotion && streak.level > 1
-          ? { scale: [1.0, 1.15, 1.0], opacity: 1, transition: { duration: 0.15 } }
+          ? { scale: [1.0, 1.06, 1.0], opacity: 1, transition: { duration: 0.15, ease: 'easeOut' } }
           : "animate"
         }
         exit="exit"

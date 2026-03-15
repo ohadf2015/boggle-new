@@ -15,6 +15,12 @@ export interface BossStateMachineContext {
   totalDamageDealt: number;
   /** Boss ID for ability lookup */
   bossId: string;
+  /** Seconds elapsed since battle start (for ability time_elapsed conditions) */
+  timeElapsed?: number;
+  /** Number of words found by player (for ability words_found conditions) */
+  wordsFound?: number;
+  /** Current player combo count (for ability combo_count conditions) */
+  comboCount?: number;
 }
 
 /** Events that trigger state transitions */

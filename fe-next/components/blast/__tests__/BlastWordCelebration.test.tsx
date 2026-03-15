@@ -28,24 +28,14 @@ describe('BlastWordCelebration', () => {
     expect(container.innerHTML).toBe('');
   });
 
-  it('renders celebration container for tier 1', () => {
-    render(
+  it('skips tier 1 — normal words should not trigger celebration', () => {
+    const { container } = render(
       <BlastWordCelebration
         celebration={{ id: '1', tier: 1, wordLength: 5, word: 'HELLO', position: { x: 100, y: 100 } }}
         onComplete={noop}
       />,
     );
-    expect(screen.getByTestId('blast-word-celebration')).toBeInTheDocument();
-  });
-
-  it('renders light beam for tier 1+', () => {
-    render(
-      <BlastWordCelebration
-        celebration={{ id: '1', tier: 1, wordLength: 5, word: 'HELLO', position: { x: 100, y: 100 } }}
-        onComplete={noop}
-      />,
-    );
-    expect(screen.getByTestId('celebration-light-beam')).toBeInTheDocument();
+    expect(container.innerHTML).toBe('');
   });
 
   it('renders celebration text for tier 2+', () => {
@@ -68,13 +58,15 @@ describe('BlastWordCelebration', () => {
     expect(screen.getByTestId('celebration-text')).toBeInTheDocument();
   });
 
-  it('renders tier 4 with background flash', () => {
+  it('renders tier 4 without background flash (removed to prevent double-flash with ComboFlash)', () => {
     render(
       <BlastWordCelebration
         celebration={{ id: '4', tier: 4, wordLength: 8, word: 'ABSOLUTE', position: { x: 100, y: 100 } }}
         onComplete={noop}
       />,
     );
-    expect(screen.getByTestId('celebration-bg-flash')).toBeInTheDocument();
+    // Background flash was removed — verify celebration still renders
+    expect(screen.getByTestId('blast-word-celebration')).toBeInTheDocument();
+    expect(screen.queryByTestId('celebration-bg-flash')).not.toBeInTheDocument();
   });
 });

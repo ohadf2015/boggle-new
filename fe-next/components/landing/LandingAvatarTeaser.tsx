@@ -34,40 +34,45 @@ export function LandingAvatarTeaser() {
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsBuilderOpen(true); } }}
       className={cn(
-        'flex items-center gap-4 px-4 py-3',
-        'bg-neo-purple/20 border-2 border-neo-purple/40 rounded-neo-lg',
-        'max-w-md mx-auto cursor-pointer',
-        'hover:bg-neo-purple/30 transition-colors'
+        'flex items-center gap-4 sm:gap-5 px-5 py-4 sm:px-6 sm:py-5',
+        'bg-gradient-to-r from-neo-purple/25 to-neo-pink/15',
+        'border-3 border-neo-black rounded-neo-lg shadow-hard',
+        'max-w-lg mx-auto cursor-pointer',
+        'hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-[2px]',
+        'transition-all duration-150',
+        'group'
       )}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true }}
-      whileHover={{ scale: 1.03 }}
       transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
     >
-      <div className="flex -space-x-2 rtl:space-x-reverse shrink-0">
+      <div className="flex -space-x-3 rtl:space-x-reverse shrink-0">
         {SAMPLE_AVATARS.map((config, i) => (
           <motion.div
             key={i}
-            className="border-2 border-neo-black rounded-full overflow-hidden"
+            className={cn(
+              'border-3 border-neo-black rounded-full overflow-hidden shadow-hard-sm',
+              'group-hover:border-neo-purple transition-colors',
+            )}
             animate={WOBBLES[i]}
             transition={{ duration: 2 + i * 0.3, repeat: Infinity, repeatDelay: 3 + i, ease: 'easeInOut' }}
           >
-            <AvatarRenderer config={config} size={40} />
+            <AvatarRenderer config={config} size={48} />
           </motion.div>
         ))}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-neo-white text-sm">
+        <p className="font-black text-neo-white text-sm sm:text-base uppercase">
           {t('landing.createAvatar')}
         </p>
-        <p className="text-neo-white/60 text-xs flex items-center gap-1">
+        <p className="text-neo-white/50 text-xs sm:text-sm font-medium flex items-center gap-1.5 mt-0.5">
           {t('landing.designYourLook')}
           <motion.span
-            animate={{ x: dir === 'rtl' ? [0, -4, 0] : [0, 4, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{ x: dir === 'rtl' ? [0, -5, 0] : [0, 5, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <ArrowIcon className="w-3 h-3" />
+            <ArrowIcon className="w-3.5 h-3.5 text-neo-purple" />
           </motion.span>
         </p>
       </div>

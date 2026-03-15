@@ -66,6 +66,9 @@ interface GameGridAreaProps {
   // Boss grid effect
   bossGridEffect?: { name: string; id: number } | null;
 
+  /** Indices of tiles adjacent to the last selected tile (for selection hints) */
+  adjacentIndices?: number[];
+
   className?: string;
 }
 
@@ -99,6 +102,7 @@ export const GameGridArea = memo(function GameGridArea({
   currentWord: currentWordProp,
   hintLevel,
   bossGridEffect,
+  adjacentIndices,
   className,
 }: GameGridAreaProps) {
   const { t } = useLanguage();
@@ -214,7 +218,7 @@ export const GameGridArea = memo(function GameGridArea({
             - On landscape/desktop the sidebar eats width, so 80vh naturally caps.
             - On portrait mobile the sidebar is only h-16, so 80vh ≈ useful space.
         */}
-        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 80vh)' }}>
+        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 80vh, 500px)' }}>
           <motion.div
             className={cn(
               'w-full aspect-square max-h-full rounded-neo-lg',
@@ -242,6 +246,7 @@ export const GameGridArea = memo(function GameGridArea({
                 showCascade={showCascade}
                 onCascadeComplete={onCascadeComplete}
                 hintHighlightIndices={hintHighlightIndices}
+                adjacentIndices={adjacentIndices}
                 bossGridEffect={bossGridEffect}
                 className="h-full"
               />

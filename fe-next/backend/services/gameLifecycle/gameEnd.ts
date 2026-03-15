@@ -6,7 +6,7 @@
  */
 
 import type { Server } from 'socket.io';
-import type { Game } from '@/shared/types';
+
 import { getGame, transitionGameState } from '../../modules/gameStateManager';
 import {
   collectNonDictionaryWords,
@@ -41,6 +41,19 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
   const game = getGame(gameCode);
   if (!game) return;
 
+  // Record end timestamp BEFORE state transition so the grace period
+  // is active immediately when gameState becomes 'finished'
+  game.gameEndedAt = Date.now();
+
+  // Transition game state FIRST — guards against concurrent calls (e.g., timer
+  // expiry + target-found firing simultaneously). Only the first caller proceeds.
+  const transitionResult = transitionGameState(gameCode, 'END', { immediate: true });
+  if (!transitionResult.success) {
+    game.gameEndedAt = null; // Reset if transition failed
+    logger.debug('GAME', `Game ${gameCode} already ended, skipping: ${transitionResult.error}`);
+    return;
+  }
+
   // Stop timer
   timerManager.clearTimer(gameCode);
 
@@ -53,18 +66,6 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
   // Emit cleanup event - handlers subscribe to this to clean their state
   // This breaks circular dependencies (earthquakeHandler, hintHandler subscribe)
   gameCleanupEmitter.emitGameEnd(gameCode);
-
-  // Record end timestamp BEFORE state transition so the grace period
-  // is active immediately when gameState becomes 'finished'
-  game.gameEndedAt = Date.now();
-
-  // Transition game state using state machine (guards against invalid transitions)
-  const transitionResult = transitionGameState(gameCode, 'END', { immediate: true });
-  if (!transitionResult.success) {
-    game.gameEndedAt = null; // Reset if transition failed
-    logger.warn('GAME', `Failed to end game ${gameCode}: ${transitionResult.error}`);
-    return;
-  }
 
   // Notify clients that game has ended (sets up waiting state)
   broadcastToRoom(io, getGameRoom(gameCode), 'endGame', {});
@@ -92,20 +93,25 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
       nonDictWords.length
     );
 
+    // Snapshot user data NOW so the timeout doesn't reference stale game.users
+    // (game may be reset/deleted before the 20s delay elapses)
+    const userSnapshot = Object.entries(game.users).map(([username, userData]) => ({
+      username,
+      socketId: (userData as { socketId: string }).socketId,
+    }));
+    const gameLang = game.language || 'en';
+
     setTimeout(() => {
-      for (const [username, userData] of Object.entries(game.users) as [
-        string,
-        { socketId: string; avatar?: { emoji: string; color: string } }
-      ][]) {
+      for (const { username, socketId } of userSnapshot) {
         const wordsForPlayer = getWordsForPlayer(
           nonDictWords,
           username,
-          game.language || 'en',
+          gameLang,
           wordsPerPlayer
         );
 
         if (wordsForPlayer.length > 0) {
-          const playerSocket = getSocketById(io, userData.socketId);
+          const playerSocket = getSocketById(io, socketId);
           if (playerSocket) {
             safeEmit(playerSocket, 'showWordFeedback', {
               word: wordsForPlayer[0].word,
@@ -115,7 +121,7 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
               wordQueue: wordsForPlayer,
               timeoutSeconds: FEEDBACK_TIMEOUT_SECONDS,
               gameCode,
-              language: game.language || 'en',
+              language: gameLang,
             });
           }
         }

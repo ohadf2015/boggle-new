@@ -12,7 +12,7 @@ import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Lightbulb, Target, Check, FileText, Star, Snowflake,
-  Clock, Gem, Swords, Heart, Zap, Shield,
+  Clock, Gem, Swords, Heart, Zap, Shield, Timer, Shuffle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -62,6 +62,18 @@ interface GameSidebarProps {
   showAutoHint: boolean;
   currentHint: { word: string } | null;
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
+  /** Time Freeze upgrade: seconds available (0 = no upgrade) */
+  freezeSeconds?: number;
+  /** Whether freeze has been used this level */
+  freezeUsed?: boolean;
+  /** Whether time is currently frozen */
+  isFrozen?: boolean;
+  /** Callback to activate time freeze */
+  onFreezeClick?: () => void;
+  /** Shuffle uses remaining (0 = no upgrade or exhausted) */
+  shufflesRemaining?: number;
+  /** Callback to use shuffle */
+  onShuffleClick?: () => void;
   className?: string;
 }
 
@@ -78,6 +90,12 @@ export const GameSidebar = memo(function GameSidebar({
   showAutoHint,
   currentHint,
   hintLevel,
+  freezeSeconds = 0,
+  freezeUsed = false,
+  isFrozen = false,
+  onFreezeClick,
+  shufflesRemaining = 0,
+  onShuffleClick,
   className,
 }: GameSidebarProps) {
   const { t } = useLanguage();
@@ -164,6 +182,41 @@ export const GameSidebar = memo(function GameSidebar({
           <Lightbulb className="w-3 h-3" />
           <span className="text-[10px] font-bold">{t('adventure.game.hint')}</span>
         </button>
+
+        {/* Time Freeze chip (only if upgrade purchased) */}
+        {freezeSeconds > 0 && (
+          <button
+            onClick={onFreezeClick}
+            disabled={freezeUsed}
+            className={cn(
+              'flex-shrink-0 flex items-center gap-1 px-2 py-1',
+              'rounded-neo border-2 min-w-[44px] min-h-[44px]',
+              !freezeUsed
+                ? isFrozen
+                  ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse'
+                  : 'bg-neo-cyan/80 text-neo-black border-neo-black shadow-hard-sm'
+                : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
+            )}
+          >
+            <Timer className="w-3 h-3" />
+            <span className="text-[10px] font-bold">{freezeSeconds}s</span>
+          </button>
+        )}
+
+        {/* Shuffle chip (only if upgrade purchased) */}
+        {shufflesRemaining > 0 && (
+          <button
+            onClick={onShuffleClick}
+            className={cn(
+              'flex-shrink-0 flex items-center gap-1 px-2 py-1',
+              'rounded-neo border-2 min-w-[44px] min-h-[44px]',
+              'bg-neo-orange text-neo-black border-neo-black shadow-hard-sm'
+            )}
+          >
+            <Shuffle className="w-3 h-3" />
+            <span className="text-[10px] font-bold">×{shufflesRemaining}</span>
+          </button>
+        )}
       </div>
 
       {/* Desktop: Vertical stack layout */}
@@ -217,6 +270,47 @@ export const GameSidebar = memo(function GameSidebar({
             <Lightbulb className="w-4 h-4" />
             <span>{t('adventure.game.hint')}</span>
           </motion.button>
+
+          {/* Time Freeze Button (desktop — only if upgrade purchased) */}
+          {freezeSeconds > 0 && (
+            <motion.button
+              onClick={onFreezeClick}
+              disabled={freezeUsed}
+              whileHover={!freezeUsed ? { scale: 1.02 } : {}}
+              whileTap={!freezeUsed ? { scale: 0.98 } : {}}
+              className={cn(
+                'w-full flex items-center justify-center gap-2',
+                'px-4 py-2.5 rounded-neo-lg',
+                'font-bold text-sm border-3 transition-all duration-200 shadow-hard',
+                !freezeUsed
+                  ? isFrozen
+                    ? 'bg-neo-cyan text-neo-black border-neo-black animate-pulse'
+                    : 'bg-neo-cyan/80 text-neo-black border-neo-black hover:shadow-hard-lg'
+                  : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
+              )}
+            >
+              <Timer className="w-4 h-4" />
+              <span>{isFrozen ? t('adventure.game.frozen') : `${t('adventure.game.freeze')} (${freezeSeconds}s)`}</span>
+            </motion.button>
+          )}
+
+          {/* Shuffle Button (desktop — only if upgrade purchased) */}
+          {shufflesRemaining > 0 && (
+            <motion.button
+              onClick={onShuffleClick}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={cn(
+                'w-full flex items-center justify-center gap-2',
+                'px-4 py-2.5 rounded-neo-lg',
+                'font-bold text-sm border-3 transition-all duration-200 shadow-hard',
+                'bg-neo-orange text-neo-black border-neo-black hover:shadow-hard-lg'
+              )}
+            >
+              <Shuffle className="w-4 h-4" />
+              <span>{t('adventure.game.shuffle')} (×{shufflesRemaining})</span>
+            </motion.button>
+          )}
 
           {/* Auto Hint Prompt */}
           <AnimatePresence>

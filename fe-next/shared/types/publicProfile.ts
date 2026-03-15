@@ -6,10 +6,11 @@
 import type { CustomAvatarConfig } from './customAvatar';
 
 /**
- * Public profile data returned by /api/player/:username
+ * Public profile data returned by /api/player-profile/:id
  * Only includes data that is safe to show publicly
  */
 export interface PublicProfile {
+  id: string;
   username: string;
   displayName: string;
   customAvatar?: CustomAvatarConfig | null;

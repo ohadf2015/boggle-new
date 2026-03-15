@@ -1,5 +1,5 @@
 /**
- * Hook to fetch a public player profile by username
+ * Hook to fetch a public player profile by ID
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -12,13 +12,13 @@ interface UsePublicProfileResult {
   refetch: () => void;
 }
 
-export function usePublicProfile(username: string | undefined): UsePublicProfileResult {
+export function usePublicProfile(playerId: string | undefined): UsePublicProfileResult {
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async () => {
-    if (!username) {
+    if (!playerId) {
       setLoading(false);
       return;
     }
@@ -27,7 +27,7 @@ export function usePublicProfile(username: string | undefined): UsePublicProfile
     setError(null);
 
     try {
-      const res = await fetch(`/api/player/${encodeURIComponent(username)}`);
+      const res = await fetch(`/api/player-profile/${encodeURIComponent(playerId)}`);
       if (!res.ok) {
         setError(res.status === 404 ? 'PLAYER_NOT_FOUND' : 'FETCH_ERROR');
         setProfile(null);
@@ -41,7 +41,7 @@ export function usePublicProfile(username: string | undefined): UsePublicProfile
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, [playerId]);
 
   useEffect(() => {
     fetchProfile();

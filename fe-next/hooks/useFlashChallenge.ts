@@ -55,6 +55,15 @@ export function useFlashChallenge({
   const challengeStartWords = useRef<string[]>([]);
   const challengeStartTime = useRef<number>(0);
   const usedGoldTile = useRef(false);
+  // Track the timestamp when words are found (for fastWord race condition fix)
+  const lastWordTimestamp = useRef<number>(0);
+
+  // Update word timestamp on every new word
+  useEffect(() => {
+    if (wordsFound.length > 0) {
+      lastWordTimestamp.current = Date.now();
+    }
+  }, [wordsFound.length]);
 
   // Trigger at 30% elapsed
   useEffect(() => {
@@ -116,8 +125,9 @@ export function useFlashChallenge({
         complete = newWords.length >= (param as number);
         break;
       case 'fastWord': {
-        // Find a word within param seconds of challenge start
-        const elapsedSec = (Date.now() - challengeStartTime.current) / 1000;
+        // Use word submission timestamp (not effect-run time) to avoid React batching race condition
+        const wordSubmitTime = lastWordTimestamp.current;
+        const elapsedSec = wordSubmitTime > 0 ? (wordSubmitTime - challengeStartTime.current) / 1000 : Infinity;
         complete = newWords.length > 0 && elapsedSec <= (param as number);
         break;
       }

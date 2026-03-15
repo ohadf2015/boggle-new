@@ -500,12 +500,15 @@ jest.mock('../hooks/useAdventureGameInit', () => ({
       bombTimerInvert: false, scrambleImmunity: false, shuffleUsesPerLevel: 0,
       canDetonateWords: false, timeFreezeSeconds: 0, freezeHighlightsWord: false,
     },
-    skillEffects: {},
+    skillEffects: { bossDamageMultiplier: 1, comboMultiplierBonus: 0, getLongWordDamageMultiplier: () => 1 },
     handleEarnAchievement: jest.fn(),
     recordAttempt: jest.fn(),
     checkMilestone: jest.fn(),
     comboMilestone: null,
     dismissMilestone: jest.fn(),
+    runeEffects: { scoreMultiplier: 1, goldMultiplier: 1, timeBonus: 0, comboDecay: 1, hintBonus: 0, bossDamage: 1 },
+    streakMultiplier: 1,
+    weeklyModifiers: [],
   }),
 }));
 
@@ -524,6 +527,9 @@ jest.mock('../hooks/useAdventureLevelCompletion', () => ({
     showLevelComplete: false,
     handleContinue: jest.fn(),
     handleRetry: jest.fn(),
+    lootDrops: [],
+    resetRewards: jest.fn(),
+    completionProcessedRef: { current: false },
   }),
 }));
 
@@ -578,6 +584,16 @@ jest.mock('@/hooks/useBossMechanics', () => ({
     })),
     triggerTaunt: jest.fn(),
     bossState: null,
+  }),
+}));
+
+jest.mock('@/lib/adventure/weeklyModifiers', () => ({
+  getWeeklyModifiers: () => [],
+  applyModifiers: (config: any) => config,
+}));
+jest.mock('@/lib/adventure/runeSystem', () => ({
+  getEquippedRuneEffects: () => ({
+    scoreMultiplier: 1, goldMultiplier: 1, timeBonus: 0, comboDecay: 1, hintBonus: 0, bossDamage: 1,
   }),
 }));
 

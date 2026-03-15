@@ -36,36 +36,20 @@ describe('BlastBoardIntensity', () => {
     expect(screen.getByTestId('blast-border-glow')).toBeInTheDocument();
   });
 
-  it('shows vignette at intensity 2+', () => {
+  it('shows vignette at intensity 3+ (raised threshold for cleaner look)', () => {
     const { rerender } = render(
-      <BlastBoardIntensity intensity={1}>
+      <BlastBoardIntensity intensity={2}>
         <div>Test</div>
       </BlastBoardIntensity>
     );
     expect(screen.queryByTestId('blast-vignette')).not.toBeInTheDocument();
 
     rerender(
-      <BlastBoardIntensity intensity={2}>
-        <div>Test</div>
-      </BlastBoardIntensity>
-    );
-    expect(screen.getByTestId('blast-vignette')).toBeInTheDocument();
-  });
-
-  it('shows corner flares at intensity 3+', () => {
-    const { rerender } = render(
-      <BlastBoardIntensity intensity={2}>
-        <div>Test</div>
-      </BlastBoardIntensity>
-    );
-    expect(screen.queryByTestId('blast-corner-flares')).not.toBeInTheDocument();
-
-    rerender(
       <BlastBoardIntensity intensity={3}>
         <div>Test</div>
       </BlastBoardIntensity>
     );
-    expect(screen.getByTestId('blast-corner-flares')).toBeInTheDocument();
+    expect(screen.getByTestId('blast-vignette')).toBeInTheDocument();
   });
 
   it('skips all effects when reduced motion is preferred', () => {
@@ -79,7 +63,6 @@ describe('BlastBoardIntensity', () => {
     );
     expect(screen.queryByTestId('blast-border-glow')).not.toBeInTheDocument();
     expect(screen.queryByTestId('blast-vignette')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('blast-corner-flares')).not.toBeInTheDocument();
 
     useReducedMotion.mockReturnValue(false);
   });

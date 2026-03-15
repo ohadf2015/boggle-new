@@ -3,7 +3,7 @@
  * Manages results display and spectator state
  */
 
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import { recordGameCompleted } from '@/utils/multiplayerProgressStorage';
 import type { Language } from '@/shared/types/game';
@@ -35,7 +35,7 @@ interface GameStartData {
 }
 
 interface UseMultiplayerGameFlowOptions {
-  socket: Socket | null;
+  socketRef: React.RefObject<Socket | null>;
   gameCode: string;
   isAuthenticated: boolean;
   refreshProfile?: () => void;
@@ -67,7 +67,7 @@ export function useMultiplayerGameFlow(
   options: UseMultiplayerGameFlowOptions
 ): UseMultiplayerGameFlowReturn {
   const {
-    socket,
+    socketRef,
     gameCode,
     isAuthenticated,
     refreshProfile,
@@ -82,26 +82,20 @@ export function useMultiplayerGameFlow(
   const [pendingGameStart, setPendingGameStart] = useState<GameStartData | null>(null);
   const [gameStartTime, setGameStartTime] = useState<number | null>(null);
 
-  // Store calculated game duration when results are shown
-  const gameDurationRef = useRef<number | null>(null);
+  // Calculated game duration — stored in state so it's reactive
+  const [gameDuration, setGameDuration] = useState<number>(180);
 
-  // Calculate and store game duration when results are first shown
+  // Calculate game duration when results are first shown
   useEffect(() => {
-    if (showResults && resultsData && gameDurationRef.current === null) {
+    if (showResults && resultsData) {
       if (gameStartTime && pendingGameStart?.timerSeconds) {
         const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-        gameDurationRef.current = Math.min(elapsed, pendingGameStart.timerSeconds);
+        setGameDuration(Math.min(elapsed, pendingGameStart.timerSeconds));
       } else {
-        gameDurationRef.current = pendingGameStart?.timerSeconds || 180;
+        setGameDuration(pendingGameStart?.timerSeconds || 180);
       }
     }
   }, [showResults, resultsData, gameStartTime, pendingGameStart]);
-
-  // Memoized game duration - uses ref value calculated in effect
-  // Fallback to configured duration if ref not set yet
-  const gameDuration = useMemo(() => {
-    return gameDurationRef.current ?? pendingGameStart?.timerSeconds ?? 180;
-  }, [pendingGameStart?.timerSeconds]);
 
   const handleShowResults = useCallback(
     (data: unknown) => {
@@ -117,23 +111,23 @@ export function useMultiplayerGameFlow(
   );
 
   const handleReturnToRoom = useCallback(() => {
-    if (socket && gameCode) {
-      socket.emit('confirmReadyForNextGame');
+    if (socketRef.current && gameCode) {
+      socketRef.current.emit('confirmReadyForNextGame');
     }
     setShowResults(false);
     setResultsData(null);
     setPendingGameStart(null);
     setGameStartTime(null);
-    gameDurationRef.current = null;
-  }, [socket, gameCode]);
+    setGameDuration(180);
+  }, [socketRef, gameCode]);
 
   const handleUpgradeToPlayer = useCallback(() => {
-    if (!socket || !gameCode) {
+    if (!socketRef.current || !gameCode) {
       return;
     }
 
-    socket.emit('upgradeToPlayer', { gameCode });
-  }, [socket, gameCode]);
+    socketRef.current.emit('upgradeToPlayer', { gameCode });
+  }, [socketRef, gameCode]);
 
   return {
     showResults,

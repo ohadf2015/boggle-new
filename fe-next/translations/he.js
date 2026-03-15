@@ -3386,6 +3386,8 @@ const he = {
     "hallOfFame": "היכל התהילה",
     "careerPoints": "נקודות קריירה",
     "gamesToday": "משחקים היום",
+    "gameModes": "מצבי משחק",
+    "freeToPlay": "חינם לשחק",
     "wordHuntMode": "ציד מילים",
     "wordHuntModeDesc": "מצאו את מילת היעד כמה שיותר מהר — פאזל חדש כל יום!",
     "communityBoards": "לוחות הקהילה",
@@ -5372,7 +5374,10 @@ const he = {
       "confirmRestart": "להתחיל מחדש?",
       "confirmRestartDesc": "ההתקדמות הנוכחית תאבד.",
       "confirmExit": "לצאת מהשלב?",
-      "confirmExitDesc": "ההתקדמות הנוכחית תאבד. בטוח שברצונך לצאת?"
+      "confirmExitDesc": "ההתקדמות הנוכחית תאבד. בטוח שברצונך לצאת?",
+      "freeze": "הקפאה",
+      "frozen": "מוקפא!",
+      "shuffle": "ערבוב"
     },
     "hints": {
       "minLetters2": "2+ אותיות",
@@ -6048,6 +6053,12 @@ const he = {
         "comboStreak": "בנה רצף של {param} מילים",
         "specificLetter": "השתמש באות {param}",
         "fastWord": "מצא מילה ב-{param} שניות",
+        "startsWith": "מצא מילה שמתחילה ב-{param}",
+        "endsWith": "מצא מילה שנגמרת ב-{param}",
+        "doubleLetters": "מצא מילה עם אותיות כפולות",
+        "palindrome": "מצא פלינדרום ({param}+ אותיות)",
+        "exactLength": "מצא מילה בדיוק עם {param} אותיות",
+        "useGoldTile": "השתמש באריח זהב במילה",
         "complete": "הושלם!"
       },
       "chapter": {

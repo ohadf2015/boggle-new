@@ -48,6 +48,15 @@ jest.mock('@/hooks/useAdventureAchievements');
 jest.mock('@/hooks/useComboMilestone');
 jest.mock('@/lib/adventure/abilities');
 jest.mock('@/components/achievements/AchievementToast');
+jest.mock('@/lib/adventure/weeklyModifiers', () => ({
+  getWeeklyModifiers: () => [],
+  applyModifiers: (config: any) => config,
+}));
+jest.mock('@/lib/adventure/runeSystem', () => ({
+  getEquippedRuneEffects: () => ({
+    scoreMultiplier: 1, goldMultiplier: 1, timeBonus: 0, comboDecay: 1, hintBonus: 0, bossDamage: 1,
+  }),
+}));
 
 const mockUseAdaptiveDifficulty = useAdaptiveDifficulty as jest.MockedFunction<typeof useAdaptiveDifficulty>;
 const mockUseAIDirector = useAIDirector as jest.MockedFunction<typeof useAIDirector>;

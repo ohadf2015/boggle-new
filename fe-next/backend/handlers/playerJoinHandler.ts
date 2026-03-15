@@ -48,6 +48,7 @@ import { emitError, ErrorMessages } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { clearGameTimer } from '../utils/timerManager.js';
 import { cleanupGameBots } from '../modules/botManager.js';
+import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { addPlayerMidTournament, getTournament, getTournamentStandings } from '../modules/tournamentManager.js';
 import { generateRandomAvatar } from '../utils/gameUtils.js';
 import { ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
@@ -300,6 +301,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       logger.info('SOCKET', `Room ${gameCode} is empty after ${username} left - closing immediately`);
       clearGameTimer(gameCode);
       cleanupGameBots(gameCode);
+      gameStartCoordinator.cleanupSequence(gameCode);
       deleteGame(gameCode);
       broadcastActiveRooms(io, getActiveRooms());
       return;
@@ -325,6 +327,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         logger.info('SOCKET', `No eligible host found for game ${gameCode} after host ${username} left - closing room`);
         clearGameTimer(gameCode);
         cleanupGameBots(gameCode);
+        gameStartCoordinator.cleanupSequence(gameCode);
 
         broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
           message: 'Host left and no other players available. Room is closing.'
@@ -637,8 +640,13 @@ function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: 
     lateJoinPayload.blastSeed = game.blastModeState.seed ?? null;
   }
 
-  // Include word hunt state for late joiners
+  // Include word hunt state for late joiners — also initialize their lives
   if (game.gameMode === 'word-hunt' && game.wordHuntState) {
+    // Add late-joiner to playerLives if not already present
+    if (!(username in game.wordHuntState.playerLives)) {
+      const { HUNT_INITIAL_LIFE } = require('@/shared/constants/wordHuntMultiplayerConstants');
+      game.wordHuntState.playerLives[username] = HUNT_INITIAL_LIFE;
+    }
     lateJoinPayload.wordHuntTargetLength = game.wordHuntState.targetWordLength ?? 0;
     lateJoinPayload.wordHuntEliminatedPlayers = game.wordHuntState.eliminatedPlayers || [];
     lateJoinPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};

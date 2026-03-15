@@ -28,26 +28,26 @@ function getPercentileTier(percentile: number) {
 
 /**
  * Full public player profile page
- * Route: /[locale]/player/[username]
+ * Route: /[locale]/player/[id]
  */
 export default function PlayerProfilePageClient() {
   const { t } = useLanguage();
-  const { username } = useParams<{ username: string }>();
+  const { id } = useParams<{ id: string }>();
   const { profile: myProfile, isAuthenticated } = useAuth();
 
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const isOwnProfile = myProfile?.username === username;
+  const isOwnProfile = myProfile?.id === id;
 
   const fetchProfile = useCallback(async () => {
-    if (!username) return;
+    if (!id) return;
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetch(`/api/player/${encodeURIComponent(username)}`);
+      const res = await fetch(`/api/player-profile/${encodeURIComponent(id)}`);
       if (!res.ok) {
         if (res.status === 404) {
           setError('PLAYER_NOT_FOUND');
@@ -63,7 +63,7 @@ export default function PlayerProfilePageClient() {
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, [id]);
 
   useEffect(() => {
     fetchProfile();

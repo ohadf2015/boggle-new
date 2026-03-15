@@ -14,11 +14,11 @@ function getNebulaColor(intensity: number): string {
   return NEBULA_COLORS[Math.min(Math.max(Math.round(intensity), 0), 5)] ?? NEBULA_COLORS[0];
 }
 
+// Fewer particles — ambient atmosphere, not a particle system
 function getParticleCount(intensity: number): number {
-  if (intensity < 2) return 0;
-  if (intensity < 3) return 8;
-  if (intensity < 5) return 12;
-  return 15;
+  if (intensity < 3) return 0; // Raised threshold
+  if (intensity < 5) return 5;
+  return 8;
 }
 
 function getGridOpacity(intensity: number): number {
@@ -49,7 +49,6 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
   }, [intensity]);
 
   const gridOpacity = intensity >= 1 ? getGridOpacity(intensity) : 0;
-  const waveDuration = intensity >= 5 ? '1s' : '2s';
 
   return (
     <div
@@ -102,8 +101,8 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
         />
       )}
 
-      {/* Layer 3: Ambient particles */}
-      {!reducedMotion && intensity >= 2 && (
+      {/* Layer 3: Ambient particles — only at high intensity */}
+      {!reducedMotion && intensity >= 3 && (
         <div data-testid="blast-particles" className="absolute inset-0">
           {particles.map((p) => (
             <div
@@ -126,28 +125,7 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
         </div>
       )}
 
-      {/* Layer 4: Energy waves */}
-      {!reducedMotion && intensity >= 4 && (
-        <div
-          data-testid="blast-waves"
-          className="absolute inset-0 flex items-center justify-center"
-        >
-          <div
-            className="w-[100px] h-[100px] rounded-full border border-cyan-400/30"
-            style={{
-              willChange: 'transform, opacity',
-              animation: `blast-energy-wave ${waveDuration} ease-out infinite`,
-            }}
-          />
-          <div
-            className="absolute w-[100px] h-[100px] rounded-full border border-pink-400/20"
-            style={{
-              willChange: 'transform, opacity',
-              animation: `blast-energy-wave ${waveDuration} ease-out 0.5s infinite`,
-            }}
-          />
-        </div>
-      )}
+      {/* Energy waves layer removed — competed with grid focus and added visual clutter */}
 
       {/* CSS Keyframes */}
       <style jsx>{`
@@ -170,10 +148,6 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
           100% { transform: translateY(-20px) translateX(var(--drift)); opacity: 0; }
         }
 
-        @keyframes blast-energy-wave {
-          0% { transform: scale(0); opacity: 0.3; }
-          100% { transform: scale(3); opacity: 0; }
-        }
       `}</style>
     </div>
   );

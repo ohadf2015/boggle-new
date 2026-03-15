@@ -33,6 +33,8 @@ export interface AdventureTileProps {
   isSelected: boolean;
   /** Whether tile is highlighted as hint */
   isHintHighlighted: boolean;
+  /** Whether tile is adjacent to the last selected tile (selectable next) */
+  isAdjacentHint?: boolean;
   /** Whether tile can be interacted with */
   canInteract: boolean;
   /** World ID for theming (1-3) */
@@ -89,6 +91,7 @@ export const AdventureTile = memo(({
   index,
   isSelected,
   isHintHighlighted,
+  isAdjacentHint = false,
   canInteract,
   worldId,
   bombRowPreview,
@@ -198,6 +201,9 @@ export const AdventureTile = memo(({
 
         // Bomb row preview: highlight tiles in bomb's row when bomb is selected
         bombRowPreview !== null && tile.row === bombRowPreview && 'bomb-row-preview',
+
+        // Adjacent hint: subtle ring showing which tiles can be selected next (classic grid behavior)
+        isAdjacentHint && !isSelected && !isHintHighlighted && 'ring-2 ring-neo-lime/40 z-[5]',
 
         // Hint highlight: match GridComponent's lime bg + yellow glow style
         isHintHighlighted && !isSelected && [

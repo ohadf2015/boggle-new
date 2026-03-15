@@ -8,6 +8,7 @@ jest.mock('../../../backend/modules/gameStateManager', () => ({
   getGame: jest.fn(),
   getGameBySocketId: jest.fn(),
   getUsernameBySocketId: jest.fn(),
+  updatePlayerScore: jest.fn(),
 }));
 
 jest.mock('../../../backend/modules/wordValidatorPool', () => ({

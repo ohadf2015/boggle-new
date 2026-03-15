@@ -52,9 +52,9 @@ export function BlastMoveCounter({
           urgency.includes('shake') && 'animate-neo-shake',
         )}
         key={movesRemaining}
-        initial={{ scale: 1.15 }}
+        initial={{ scale: 1.06 }}
         animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+        transition={{ duration: 0.15, ease: 'easeOut' }}
         aria-label={`${movesRemaining} ${t('blast.movesLeft')}`}
       >
         <div className="text-center">
@@ -71,10 +71,10 @@ export function BlastMoveCounter({
       <AnimatePresence>
         {bonusText && (
           <motion.span
-            initial={{ opacity: 0, y: 10, scale: 0.7 }}
-            animate={{ opacity: 1, y: -20, scale: 1 }}
-            exit={{ opacity: 0, y: -40, scale: 0.7 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+            initial={{ opacity: 0, y: 8, scale: 0.8 }}
+            animate={{ opacity: 1, y: -18, scale: 1 }}
+            exit={{ opacity: 0, y: -32 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
             className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap font-black text-sm text-neo-lime drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] pointer-events-none z-10"
           >
             {bonusText}

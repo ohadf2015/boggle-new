@@ -518,9 +518,30 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Check if word is from lesson vocabulary (classroom games)
   const fromLesson = game.lessonVocabulary?.has(normalizedWord.toUpperCase()) || false;
 
+  // Calculate blast mode tile bonus BEFORE storing word details so the stored
+  // score includes tile bonuses (used by scoringEngine for final results).
+  let blastTileBonus = 0;
+  let blastTilesCleared: string[] = [];
+  let blastMoveResult: { movesUsed: number; bonusMove: boolean } | null = null;
+
+  if (game.gameMode === 'blast' && game.blastModeState) {
+    try {
+      const blastState = game.blastModeState;
+      const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay, blastState.overlayMap);
+      blastTileBonus = calculateBlastTileBonus(tilesOnPath);
+      blastTilesCleared = tilesOnPath;
+      const gemCount = tilesOnPath.filter(t => t === 'gem').length;
+      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount);
+    } catch (err: unknown) {
+      const error = err as Error;
+      logger.error('BLAST', `Blast bonus calculation error: ${error.message}`);
+      blastTileBonus = 0;
+    }
+  }
+
   addPlayerWord(gameCode, username, normalizedWord, {
     autoValidated: true,
-    score: wordScore,
+    score: wordScore + blastTileBonus,
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,
     fireRoundMultiplier: fireRoundMultiplier,
@@ -540,32 +561,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     });
   }
 
-  // Apply blast mode tile bonus if applicable
-  let blastTileBonus = 0;
-  let blastTilesCleared: string[] = [];
-  let blastMoveResult: { movesUsed: number; bonusMove: boolean } | null = null;
-
-  if (game.gameMode === 'blast' && game.blastModeState) {
-    try {
-      // blastModeManager imported at top level
-      const blastState = game.blastModeState;
-      const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay, blastState.overlayMap);
-      blastTileBonus = calculateBlastTileBonus(tilesOnPath);
-      blastTilesCleared = tilesOnPath;
-      const gemCount = tilesOnPath.filter(t => t === 'gem').length;
-      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount);
-
-      // Add tile bonus to score
-      if (blastTileBonus > 0) {
-        updatePlayerScore(gameCode, username, blastTileBonus, true);
-      }
-    } catch (err: unknown) {
-      const error = err as Error;
-      logger.error('BLAST', `Blast bonus calculation error: ${error.message}`);
-    }
-  }
-
-  updatePlayerScore(gameCode, username, wordScore, true);
+  // Single atomic score update: word score + blast tile bonus (if any)
+  updatePlayerScore(gameCode, username, wordScore + blastTileBonus, true);
 
   inc('wordAccepted');
   incPerGame(gameCode, 'wordAccepted');
@@ -608,16 +605,29 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
       // Mark last broadcast time so gameTimer skips the redundant tick broadcast
       huntState.lastLifeUpdateAt = Date.now();
 
-      // Compute and broadcast discovery clues to ALL players (cooperative mechanic)
-      const clues = computeDiscoveryClues(huntState.targetWord, normalizedWord);
-      if (clues.greenPositions.length > 0 || clues.knownLetters.length > 0) {
-        // Track discovery word count for results summary
-        huntState.discoveryWordCount = (huntState.discoveryWordCount || 0) + 1;
-        broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntDiscoveryClues', {
-          word: normalizedWord,
-          greenPositions: clues.greenPositions,
-          knownLetters: clues.knownLetters,
-        });
+      // Compute discovery clues — sent only to the player who found the word (competitive)
+      const gameStartedAt = game.gameStartedAt || 0;
+      const elapsed = Date.now() - gameStartedAt;
+      const CLUE_DELAY = 15_000; // 15s before clues start
+      const CLUE_THROTTLE = 5_000; // 5s between clue broadcasts per player
+
+      if (elapsed >= CLUE_DELAY) {
+        const clues = computeDiscoveryClues(huntState.targetWord, normalizedWord);
+        if (clues.greenPositions.length > 0 || clues.knownLetters.length > 0) {
+          // Per-player throttle: don't flood clues
+          if (!huntState.lastClueAt) huntState.lastClueAt = {};
+          const lastClue = huntState.lastClueAt[username] || 0;
+          if (Date.now() - lastClue >= CLUE_THROTTLE) {
+            huntState.lastClueAt[username] = Date.now();
+            huntState.discoveryWordCount = (huntState.discoveryWordCount || 0) + 1;
+            // Send only to the submitting player, not the whole room
+            socket.emit('wordHuntDiscoveryClues', {
+              word: normalizedWord,
+              greenPositions: clues.greenPositions,
+              knownLetters: clues.knownLetters,
+            });
+          }
+        }
       }
     } catch (err: unknown) {
       const error = err as Error;

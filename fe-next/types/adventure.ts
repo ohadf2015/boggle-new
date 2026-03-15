@@ -257,6 +257,18 @@ export interface PlayerProgression {
   runeFragments: number;
   /** Forged runes inventory */
   runes: PlayerRune[];
+  /** Adventure streak (consecutive play days) */
+  streak?: { currentStreak: number; bestStreak: number; lastPlayedDate: string | null };
+  /** Boss trophies earned (boss defeats across all modes) */
+  bossTrophies?: number;
+  /** Prestige level (resets after completing all worlds) */
+  prestigeLevel?: number;
+  /** Highest endless mode floor reached */
+  endlessHighFloor?: number;
+  /** Daily quest progress — map of questId to current count (resets daily) */
+  dailyQuestProgress?: Record<string, number>;
+  /** Last date daily quests were active (YYYY-MM-DD) — for reset detection */
+  dailyQuestDate?: string;
   /** Array of completed levels */
   completions: LevelCompletion[];
   /** ISO timestamp of creation */

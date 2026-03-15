@@ -21,6 +21,9 @@ import { useComboMilestone } from '@/hooks/useComboMilestone';
 import { registerAllAbilities } from '@/lib/adventure/abilities';
 import { showAchievementToast } from '@/components/achievements/AchievementToast';
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
+import { getStreakMultiplier } from '@/lib/adventure/adventureStreak';
+import { getWeeklyModifiers, applyModifiers } from '@/lib/adventure/weeklyModifiers';
+import { getEquippedRuneEffects, type RuneState } from '@/lib/adventure/runeSystem';
 
 export interface UseAdventureGameInitProps {
   world: number;
@@ -97,8 +100,8 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
   // Skill points (side-effect only)
   useSkillPoints({
     currentLevel,
-    onLevelUp: ({ pointsAwarded }) => {
-      console.log(`Earned ${pointsAwarded} skill point(s)!`);
+    onLevelUp: () => {
+      // Skill points are tracked internally by useSkillPoints
     },
   });
 
@@ -130,26 +133,57 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
   // Word Forge upgrade effects
   const upgradeEffects = useUpgradeEffects(upgrades);
 
+  // Rune effects — aggregated from all equipped runes
+  const runeEffects = useMemo(
+    () => getEquippedRuneEffects((progression?.runes ?? []) as RuneState[]),
+    [progression?.runes]
+  );
+
+  // Streak multiplier — scales gold/XP based on consecutive play days
+  const streakMultiplier = useMemo(
+    () => getStreakMultiplier(progression?.streak?.currentStreak ?? 0),
+    [progression?.streak?.currentStreak]
+  );
+
+  // Weekly modifiers — 3 rotating gameplay mutators per week (same for all players)
+  const weeklyModifiers = useMemo(() => {
+    const now = new Date();
+    const jan1 = new Date(now.getFullYear(), 0, 1);
+    const week = Math.ceil(((now.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7);
+    return getWeeklyModifiers(now.getFullYear(), week);
+  }, []);
+
   // Backwards-compatible upgrade bonuses (consumed by level completion + word submit)
+  // Stacks: upgrade scoreBonus × rune scoreMultiplier × weekly scoreMultiplier
+  const weeklyApplied = useMemo(
+    () => applyModifiers({ timerSeconds: 0, scoreMultiplier: 1, minWordLength: 3 }, weeklyModifiers),
+    [weeklyModifiers]
+  );
   const upgradeBonuses = useMemo(() => ({
     timeBonus: 1, // handled via bonusTimeSeconds below
-    scoreBonus: upgradeEffects.comboScoreMultiplier,
-    xpBonus: 1, // XP bonus removed from upgrade system
-  }), [upgradeEffects.comboScoreMultiplier]);
+    scoreBonus: upgradeEffects.comboScoreMultiplier * runeEffects.scoreMultiplier * weeklyApplied.scoreMultiplier,
+    xpBonus: streakMultiplier, // streak boosts XP
+  }), [upgradeEffects.comboScoreMultiplier, runeEffects.scoreMultiplier, weeklyApplied.scoreMultiplier, streakMultiplier]);
 
-  // Adjusted level config with Fuel Tank time bonus
-  const adjustedLevelConfig = useMemo(() => ({
-    ...adjustedConfig,
-    timerSeconds: adjustedConfig.timerSeconds + upgradeEffects.bonusTimeSeconds,
-  }), [adjustedConfig, upgradeEffects.bonusTimeSeconds]);
+  // Adjusted level config with Fuel Tank + rune time bonuses + weekly timer modifier
+  const adjustedLevelConfig = useMemo(() => {
+    const baseTimer = adjustedConfig.timerSeconds + upgradeEffects.bonusTimeSeconds + runeEffects.timeBonus;
+    const weeklyTimerMod = weeklyModifiers.reduce((m, mod) => m * (mod.effects.timerMultiplier ?? 1), 1);
+    return {
+      ...adjustedConfig,
+      timerSeconds: Math.round(baseTimer * weeklyTimerMod),
+      minWordLength: Math.max(adjustedConfig.minWordLength ?? 3, weeklyApplied.minWordLength) as 2 | 3,
+    };
+  }, [adjustedConfig, upgradeEffects.bonusTimeSeconds, runeEffects.timeBonus, weeklyModifiers, weeklyApplied.minWordLength]);
 
-  // Adjusted inactivity threshold from AI director + Word Radar upgrade
+  // Adjusted inactivity threshold from AI director + Word Radar upgrade + rune hint bonus
   const adjustedInactivityThresholdMs = useMemo(() => {
     const baseThreshold = 15000;
     const aiAdjusted = baseThreshold / intensityAdjustments.hintEscalationRate;
-    // Word Radar upgrade: hintRechargeMultiplier > 1 means faster hint recharge (shorter threshold)
-    return Math.floor(aiAdjusted / upgradeEffects.hintRechargeMultiplier);
-  }, [intensityAdjustments.hintEscalationRate, upgradeEffects.hintRechargeMultiplier]);
+    // Word Radar upgrade + rune insight hint bonus
+    const hintMultiplier = upgradeEffects.hintRechargeMultiplier + (runeEffects.hintBonus > 0 ? 0.3 : 0);
+    return Math.floor(aiAdjusted / hintMultiplier);
+  }, [intensityAdjustments.hintEscalationRate, upgradeEffects.hintRechargeMultiplier, runeEffects.hintBonus]);
 
   return {
     // Adaptive difficulty
@@ -195,5 +229,10 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
 
     // Hints
     adjustedInactivityThresholdMs,
+
+    // Rune, streak & weekly modifier systems
+    runeEffects,
+    streakMultiplier,
+    weeklyModifiers,
   };
 }

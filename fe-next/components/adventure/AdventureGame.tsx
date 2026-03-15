@@ -21,6 +21,7 @@ import { useAdventureLevelCompletion } from './hooks/useAdventureLevelCompletion
 import { useAdventureBossOrchestration } from './hooks/useAdventureBossOrchestration';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { useFlashChallenge } from '@/hooks/useFlashChallenge';
+import { useDailyQuests } from '@/hooks/useDailyQuests';
 import FlashChallengeToast from './FlashChallengeToast';
 import { neoInfoToast } from '@/components/NeoToast';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
@@ -28,6 +29,7 @@ import { getStoryBeat } from '@/lib/adventure/storyConfig';
 import { StoryBeatCard } from './StoryBeatCard';
 import AdventureEffectsLayerFull, { AdventureEffectsLayer as EdgeVignetteLayer } from './effects/AdventureEffectsLayer';
 import LevelCompleteModal from './LevelCompleteModal';
+import LootChestReveal from './LootChestReveal';
 import LevelEntryOverlay from './LevelEntryOverlay';
 import { BossOverlay, PlayerHealthBar } from './boss';
 import dynamic from 'next/dynamic';
@@ -79,11 +81,22 @@ const AdventureGame = memo<AdventureGameProps>(
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining, canComplete,
       isPlaying, cascadeComplete, submitWordWithPath, startGame, pauseGame, completeLevel,
       resetGame, markCascadeComplete, isCascading, cascadePhase, addTime, regenerateGrid,
-    } = useAdventureGame({ levelConfig: init.adjustedLevelConfig, initialGrid });
+      activateFreeze, isFrozen, freezeRemaining, freezeUsed, useShuffle, shufflesRemaining,
+    } = useAdventureGame({
+      levelConfig: init.adjustedLevelConfig, initialGrid,
+      comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
+      upgradeConfig: {
+        bombTimerInvert: init.upgradeEffects.bombTimerInvert,
+        specialTileBoost: init.upgradeEffects.specialTileBoost,
+        guaranteedGoldTile: init.upgradeEffects.guaranteedGoldTile,
+        shuffleUses: init.upgradeEffects.shuffleUsesPerLevel,
+        iceTileReduction: init.upgradeEffects.iceTileReduction,
+      },
+    });
 
     const tiles = useMemoizedFlatTiles(tiles2D, tilesVersion);
     const { t, language } = useLanguage();
-    const { recordAttempt, getLevelAttempt } = useProgression();
+    const { recordAttempt, getLevelAttempt, progression } = useProgression();
     const bestAttempt = useMemo(
       () => getLevelAttempt(levelConfig.world, levelConfig.level),
       [getLevelAttempt, levelConfig.world, levelConfig.level]
@@ -91,6 +104,8 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
+    const [showLootChest, setShowLootChest] = useState(false);
+    const [retriesUsed, setRetriesUsed] = useState(0);
     const [showStoryBeat, setShowStoryBeat] = useState(false);
     const masteryAura = useMemo(() => getMasteryAura(init.currentLevel), [init.currentLevel]);
     const storyBeat = useMemo(() => getStoryBeat(levelConfig.world, levelConfig.level), [levelConfig.world, levelConfig.level]);
@@ -129,6 +144,12 @@ const AdventureGame = memo<AdventureGameProps>(
       lastWordTileTypes,
     });
 
+    // Daily quests — track progress for today's 3 quests
+    const { recordProgress: recordQuestProgress } = useDailyQuests({
+      initialProgress: (progression as any)?.dailyQuestProgress,
+      lastQuestDate: (progression as any)?.dailyQuestDate,
+    });
+
     // CrazyGames SDK lifecycle — report gameplay and trigger happyTime on achievements
     useCrazyGamesLifecycle({
       isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,
@@ -139,21 +160,36 @@ const AdventureGame = memo<AdventureGameProps>(
       wordsFound: gameState.wordsFound.length,
     });
 
-    const getScoreMultiplier = () => 1;
+    // Score multiplier: currently 1x base. AI director adjusts pacing (not score),
+    // and upgrade-based score bonus is already applied via upgradeBonuses.scoreBonus.
+    // This hook point remains for future world-specific or event-based score scaling.
+    const getScoreMultiplier = useCallback(() => 1, []);
+
+    // Augment skill effects with rune boss damage multiplier
+    const augmentedSkillEffects = useMemo(() => ({
+      ...init.skillEffects,
+      bossDamageMultiplier: init.skillEffects.bossDamageMultiplier * init.runeEffects.bossDamage,
+    }), [init.skillEffects, init.runeEffects.bossDamage]);
 
     const minWordLength = levelConfig.minWordLength ?? 3;
     const { validateWord, isValidating } = useAdventureWordValidation({
       grid: initialGrid, language: language || 'en', minWordLength, foundWords: gameState.wordsFound, tiles: tiles2D,
     });
     const gridRef = useRef<HTMLDivElement>(null);
-    const { selectedIndices, currentWord, selectTile, clearSelection, getPath, pathPoints } = useAdventureSelection({
+    const clickSubmitRef = useRef<(word: string, indices: number[]) => void>(null);
+    const handleClickSubmit = useCallback((word: string, indices: number[]) => {
+      clickSubmitRef.current?.(word, indices);
+    }, []);
+    const { selectedIndices, currentWord, selectTile, clearSelection, getPath, pathPoints, adjacentIndices } = useAdventureSelection({
       tiles, gridSize: levelConfig.gridSize, disabled: !isPlaying || isPaused || isValidating, gridRef,
+      onClickSubmit: handleClickSubmit,
     });
     const effectiveCurrentWord = currentWord;
 
-    const { hasHintsAvailable, getHint, currentHint, clearCurrentHint, recordActivity, showAutoHint, dismissAutoHint } = useAdventureHints({
+    const { hasHintsAvailable, getHint, currentHint, clearCurrentHint, recordActivity, showAutoHint, dismissAutoHint, remainingHintWords, findPathForWord } = useAdventureHints({
       grid: initialGrid, language: language || 'en', foundWords: gameState.wordsFound,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused, inactivityThresholdMs: init.adjustedInactivityThresholdMs,
+      maxHintsPerLevel: init.upgradeEffects.hintsPerLevel,
     });
 
     const isModalOpen = showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic || bossOrch.showBossIntro || bossOrch.showBossFireworks;
@@ -181,7 +217,8 @@ const AdventureGame = memo<AdventureGameProps>(
       triggerBossTaunt: bossOrch.triggerBossTaunt, handleEarnAchievement: init.handleEarnAchievement,
       recordAIWord: init.recordAIWord, handleAITransition: init.handleAITransition,
       addScorePopup: effects.addScorePopup, getScoreMultiplier,
-      upgradeBonuses: init.upgradeBonuses, skillEffects: init.skillEffects,
+      upgradeBonuses: init.upgradeBonuses, skillEffects: augmentedSkillEffects,
+      worldMechanic: levelConfig.worldMechanic ?? null,
       bossHealPerWord: init.upgradeEffects.bossHealPerWord,
       healPlayerHealth: bossOrch.isBossActive ? bossOrch.healPlayer : undefined,
       t, getPopupStartPosition: () => {
@@ -192,10 +229,15 @@ const AdventureGame = memo<AdventureGameProps>(
       },
     });
 
+    // Wire click-to-submit ref now that wordSubmit is available
+    clickSubmitRef.current = wordSubmit.handleWordSubmit;
+
     const levelCompletion = useAdventureLevelCompletion({
       gameState, timeRemaining, timerSeconds: init.adjustedLevelConfig.timerSeconds,
       levelConfig, objectives, currentLevel: init.currentLevel,
       upgradeBonuses: init.upgradeBonuses, upgradeEffects: init.upgradeEffects,
+      bonusGoldMultiplier: init.runeEffects.goldMultiplier * init.streakMultiplier,
+      isFirstCompletion: !bestAttempt,
       awardXp: init.awardXp, addGold: init.addGold,
       recordAttempt, recordCompletion: init.recordCompletion,
       endAIDirector: init.endAIDirector, handleEarnAchievement: init.handleEarnAchievement,
@@ -231,6 +273,23 @@ const AdventureGame = memo<AdventureGameProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gameState.comboCount, isPlaying, entryPhase, isPaused, init]);
 
+    // Daily quest progress: track words found, long words, and combos
+    const prevQuestWordsRef = useRef(gameState.wordsFound.length);
+    useEffect(() => {
+      const newWords = gameState.wordsFound.length - prevQuestWordsRef.current;
+      if (newWords > 0) {
+        recordQuestProgress('wordCount', newWords);
+        // Check for long words (6+ letters)
+        const latestWord = gameState.wordsFound[gameState.wordsFound.length - 1];
+        if (latestWord && latestWord.length >= 6) recordQuestProgress('longWord');
+      }
+      prevQuestWordsRef.current = gameState.wordsFound.length;
+    }, [gameState.wordsFound, recordQuestProgress]);
+
+    useEffect(() => {
+      if (gameState.comboCount >= 5) recordQuestProgress('comboStreak');
+    }, [gameState.comboCount, recordQuestProgress]);
+
     const handleCascadeComplete = useCallback(() => {
       markCascadeComplete();
       entryPhaseManager.advanceToObjectives();
@@ -243,7 +302,11 @@ const AdventureGame = memo<AdventureGameProps>(
     const handleTitleComplete = useCallback(() => {
       entryPhaseManager.advanceToPlaying();
       if (!isPlaying) { startGame(); init.startAIDirector(); }
-    }, [isPlaying, startGame, init, entryPhaseManager]);
+      // Word Radar T5: free hint on level start
+      if (init.upgradeEffects.freeStartHint) {
+        setTimeout(() => getHint(), 500); // slight delay for UX
+      }
+    }, [isPlaying, startGame, init, entryPhaseManager, getHint]);
 
     const calculateTileCenter = useCallback((row: number, col: number) => {
       if (!gridRef.current) return { x: 0, y: 0 };
@@ -302,17 +365,31 @@ const AdventureGame = memo<AdventureGameProps>(
       }, [isPlaying, isPaused, isValidating, selectTile]
     );
 
+    // Flow: cinematic → story beat → loot chest → level complete
+    const showLootOrComplete = useCallback(() => {
+      if (levelCompletion.lootDrops.length > 0 && gameState.stars > 0) {
+        setShowLootChest(true);
+      } else {
+        setShowLevelComplete(true);
+      }
+    }, [levelCompletion.lootDrops, gameState.stars]);
+
     const handleCinematicComplete = useCallback(() => {
       cinematics.handleCinematicComplete();
       if (storyBeat && gameState.stars > 0) {
         setShowStoryBeat(true);
       } else {
-        setShowLevelComplete(true);
+        showLootOrComplete();
       }
-    }, [cinematics, storyBeat, gameState.stars]);
+    }, [cinematics, storyBeat, gameState.stars, showLootOrComplete]);
 
     const handleStoryBeatContinue = useCallback(() => {
       setShowStoryBeat(false);
+      showLootOrComplete();
+    }, [showLootOrComplete]);
+
+    const handleLootChestComplete = useCallback(() => {
+      setShowLootChest(false);
       setShowLevelComplete(true);
     }, []);
 
@@ -323,11 +400,17 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const handleRetry = useCallback(() => {
       setShowLevelComplete(false);
+      setRetriesUsed(prev => prev + 1);
       levelCompletion.resetRewards();
-      clearSelection(); resetGame();
+      clearSelection();
+      // Salvage Claw T2: retain a fraction of score on retry
+      const retainedScore = init.upgradeEffects.retryScoreRetention > 0
+        ? Math.floor(gameState.score * init.upgradeEffects.retryScoreRetention)
+        : 0;
+      resetGame({ retainedScore });
       bossOrch.resetBossHealth(); bossOrch.resetPlayerHealth();
       cinematics.resetCinematics(); startGame();
-    }, [resetGame, startGame, clearSelection, bossOrch, cinematics, levelCompletion]);
+    }, [resetGame, startGame, clearSelection, bossOrch, cinematics, levelCompletion, init.upgradeEffects.retryScoreRetention, gameState.score]);
 
     const handleHintClick = useCallback(() => {
       if (hasHintsAvailable) { getHint(); dismissAutoHint(); }
@@ -337,9 +420,15 @@ const AdventureGame = memo<AdventureGameProps>(
       if (init.hintData.level !== 'none' && (init.hintData.highlightTiles?.length ?? 0) > 0) {
         return init.hintData.highlightTiles!.map(pos => pos.row * levelConfig.gridSize + pos.col);
       }
+      // Time Freeze T2: highlight longest findable word while frozen
+      if (isFrozen && init.upgradeEffects.freezeHighlightsWord && remainingHintWords.length > 0) {
+        const longestWord = remainingHintWords.reduce((a, b) => b.length > a.length ? b : a, '');
+        const path = findPathForWord(longestWord);
+        if (path) return path.map(pos => pos.row * levelConfig.gridSize + pos.col);
+      }
       if (!currentHint?.path) return [];
       return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
-    }, [init.hintData, currentHint, levelConfig.gridSize]);
+    }, [init.hintData, currentHint, levelConfig.gridSize, isFrozen, init.upgradeEffects.freezeHighlightsWord, remainingHintWords, findPathForWord]);
 
     const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const handlePopupComplete = useCallback(() => {
@@ -382,7 +471,7 @@ const AdventureGame = memo<AdventureGameProps>(
               isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating}
               entryPhase={entryPhase} showCascade={entryPhase === 'cascade'}
               onCascadeComplete={handleCascadeComplete}
-              hintHighlightIndices={hintHighlightIndices} pathPoints={pathPoints}
+              hintHighlightIndices={hintHighlightIndices} adjacentIndices={adjacentIndices} pathPoints={pathPoints}
               validationError={wordSubmit.validationFeedback.error}
               isValidating={isValidating}
               isWordValid={wordSubmit.validationFeedback.isValid}
@@ -401,6 +490,12 @@ const AdventureGame = memo<AdventureGameProps>(
               hasHintsAvailable={hasHintsAvailable} onHintClick={handleHintClick}
               showAutoHint={showAutoHint} currentHint={currentHint}
               hintLevel={init.hintData.level}
+              freezeSeconds={init.upgradeEffects.timeFreezeSeconds}
+              freezeUsed={freezeUsed}
+              isFrozen={isFrozen}
+              onFreezeClick={() => activateFreeze(init.upgradeEffects.timeFreezeSeconds)}
+              shufflesRemaining={shufflesRemaining}
+              onShuffleClick={useShuffle}
               className="border-t-2 lg:border-t-0 lg:border-l-2 border-neo-black/30" />
           }
           overlays={
@@ -470,6 +565,12 @@ const AdventureGame = memo<AdventureGameProps>(
                   durationSeconds={DEFEAT_DURATION_FRAMES / 30} onComplete={handleCinematicComplete}
                   fallbackType="defeat" />
               )}
+
+              <LootChestReveal
+                isOpen={showLootChest}
+                drops={levelCompletion.lootDrops}
+                onComplete={handleLootChestComplete}
+              />
 
               {!isBossLevel && (
                 <LevelCompleteModal isOpen={showLevelComplete && cinematics.cinematicComplete}

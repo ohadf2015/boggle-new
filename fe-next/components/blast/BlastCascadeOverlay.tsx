@@ -109,8 +109,9 @@ export function BlastCascadeOverlay({
               },
               0,
             ],
-            scaleY: [0.92, 1.08, 0.98, 1.0],
-            scaleX: [1.05, 0.94, 1.01, 1.0],
+            // Squash & stretch on landing — tiles compress then bounce (AAA puzzle game standard)
+            scaleY: [0.85, 1.12, 0.96, 1.0],
+            scaleX: [1.10, 0.90, 1.02, 1.0],
             duration: function (el: Element) {
               const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
               return BLAST_ANIM.fall.baseDuration + dist * BLAST_ANIM.fall.perRowDuration;

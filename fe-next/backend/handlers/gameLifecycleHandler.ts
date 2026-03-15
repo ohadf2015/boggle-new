@@ -239,7 +239,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     if (result.valid && result.allReady) {
       const game = getGame(gameCode);
-      startGameTimer(io, gameCode, game?.timerSeconds || 180);
+      // Use game.gameDuration (validated timer set during startGame) rather than
+      // game.timerSeconds which could be stale or fall back to a wrong default
+      startGameTimer(io, gameCode, game?.gameDuration || game?.timerSeconds || 180);
     }
   });
 

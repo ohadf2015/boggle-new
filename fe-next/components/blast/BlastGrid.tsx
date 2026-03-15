@@ -120,7 +120,7 @@ export function BlastGrid({
   return (
     <div
       ref={containerRef}
-      className="blast-game blast-grid-frame relative w-full aspect-square max-w-[360px]"
+      className="blast-game blast-grid-frame relative w-full aspect-square max-w-[360px] md:max-w-[480px]"
       style={{ contain: 'layout paint' }}
       data-cascade={cascadePhase !== 'idle' ? 'active' : 'idle'}
       aria-label={ariaLabel}
@@ -169,7 +169,7 @@ export function BlastGrid({
                 gridColumn: cell.col + 1,
                 border: '2px solid rgba(255, 225, 53, 0.85)',
                 boxShadow: '0 0 8px rgba(255, 225, 53, 0.6), inset 0 0 8px rgba(255, 225, 53, 0.2)',
-                animation: 'nearMissPulse 1.5s ease-out forwards',
+                animation: 'nearMissPulse 0.9s ease-out forwards',
               }}
             />
           ))}

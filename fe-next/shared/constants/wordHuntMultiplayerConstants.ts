@@ -11,6 +11,11 @@ export const HUNT_TARGET_MIN_LENGTH = 4;
 export const HUNT_TARGET_MAX_LENGTH = 5;
 export const HUNT_LIFE_DRAIN_INTERVAL_MS = 1000;
 
+/** Minimum seconds before discovery clues start being revealed */
+export const HUNT_CLUE_DELAY_MS = 15_000;
+/** Minimum interval between clue broadcasts per player (ms) */
+export const HUNT_CLUE_THROTTLE_MS = 5_000;
+
 /** Life restored per word length */
 export const HUNT_LIFE_RESTORE: Record<number, number> = {
   3: 3,

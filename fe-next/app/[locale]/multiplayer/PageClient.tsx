@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation';
@@ -31,6 +31,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
 import { useGameActions } from '@/hooks/gameState';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
+import type { Socket } from 'socket.io-client';
 
 // Dynamic imports for code splitting
 const HostView = nextDynamic(() => import('@/host/HostView'), {
@@ -114,6 +115,9 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     language: Language; templateSettings?: { timerSeconds: number; difficulty: string; minWordLength: number; allowLateJoin: boolean } | null;
   } | null>(null);
 
+  // Ref bridge: allows hooks called before useMultiplayerSocket to access the socket
+  const socketRef = useRef<Socket | null>(null);
+
   const handleSetLessonData = useCallback((data: typeof lessonDataState) => { setLessonDataState(data); }, []);
   const handleSetAttemptingReconnect = useCallback(() => {}, []);
 
@@ -133,7 +137,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     isSpectator, setIsSpectator, spectators, setSpectators,
     pendingGameStart, setPendingGameStart, setGameStartTime,
     gameDuration, handleShowResults, handleReturnToRoom, handleUpgradeToPlayer,
-  } = useMultiplayerGameFlow({ socket: null, gameCode, isAuthenticated, refreshProfile });
+  } = useMultiplayerGameFlow({ socketRef, gameCode, isAuthenticated, refreshProfile });
 
   const seriesTracker = useSeriesTracker();
 
@@ -249,6 +253,9 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     t,
   });
 
+  // Sync ref bridge so hooks called before useMultiplayerSocket get the latest socket
+  socketRef.current = socket;
+
   const handleJoin = useMultiplayerJoin({
     socket, gameCode, username, roomName, hostUsername,
     language: language as Language, t, isSupabaseEnabled,
@@ -351,16 +358,16 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       {/* Show full banner during active game for better reconnection context; minimal dot otherwise */}
       {isActive ? <ConnectionBanner showScoreSafe /> : <ConnectionDot />}
       <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
-      {isClassroomMode ? (
-        <>
-          <EducationHeader showBackButton title={t('education.classroomGame.title')} />
-          <ClassroomModeBanner lessonData={lessonDataState} />
-        </>
-      ) : (
-        <AutoHideHeader />
-      )}
       <ErrorBoundary>
         <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-hidden">
+          {isClassroomMode ? (
+            <>
+              <EducationHeader showBackButton title={t('education.classroomGame.title')} />
+              <ClassroomModeBanner lessonData={lessonDataState} />
+            </>
+          ) : (
+            <AutoHideHeader />
+          )}
           {renderView()}
         </div>
       </ErrorBoundary>

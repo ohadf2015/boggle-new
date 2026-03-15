@@ -3487,6 +3487,8 @@ const en = {
     "hallOfFame": "Hall of Fame",
     "careerPoints": "Career Points",
     "gamesToday": "Games Today",
+    "gameModes": "Game Modes",
+    "freeToPlay": "Free to Play",
     "wordHuntMode": "Word Hunt",
     "wordHuntModeDesc": "Find the target word as fast as you can — a fresh puzzle every day!",
     "communityBoards": "Community Boards",
@@ -5440,7 +5442,10 @@ const en = {
       "confirmRestart": "Restart Level?",
       "confirmRestartDesc": "Your current progress will be lost.",
       "confirmExit": "Exit Level?",
-      "confirmExitDesc": "Your current progress will be lost. Are you sure you want to exit?"
+      "confirmExitDesc": "Your current progress will be lost. Are you sure you want to exit?",
+      "freeze": "Freeze",
+      "frozen": "Frozen!",
+      "shuffle": "Shuffle"
     },
     "hints": {
       "minLetters2": "2+ letters",
@@ -6116,6 +6121,12 @@ const en = {
         "comboStreak": "Build a {param}-word streak",
         "specificLetter": "Use the letter {param}",
         "fastWord": "Find any word in {param}s",
+        "startsWith": "Find a word starting with {param}",
+        "endsWith": "Find a word ending with {param}",
+        "doubleLetters": "Find a word with double letters",
+        "palindrome": "Find a palindrome ({param}+ letters)",
+        "exactLength": "Find a {param}-letter word exactly",
+        "useGoldTile": "Use a gold tile in a word",
         "complete": "Complete!"
       },
       "chapter": {

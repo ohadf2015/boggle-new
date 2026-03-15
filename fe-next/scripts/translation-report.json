@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3612,
+    "totalKeysInCode": 3617,
     "keyCountByLanguage": {
-      "en": 6069,
-      "he": 6095,
-      "sv": 6128,
-      "ja": 6115,
-      "es": 6093
+      "en": 6076,
+      "he": 6102,
+      "sv": 6135,
+      "ja": 6122,
+      "es": 6100
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 3,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -146,7 +146,7 @@
         "pattern": "t(textKey)",
         "variable": "textKey",
         "file": "components/blast/BlastWordCelebration.tsx",
-        "line": 143,
+        "line": 146,
         "context": "{t(textKey)}",
         "type": "variable_key"
       },
@@ -167,7 +167,35 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "adventure.game.freeze",
+      "usages": [
+        {
+          "file": "components/adventure/ui/GameSidebar.tsx",
+          "line": 293
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.frozen",
+      "usages": [
+        {
+          "file": "components/adventure/ui/GameSidebar.tsx",
+          "line": 293
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.shuffle",
+      "usages": [
+        {
+          "file": "components/adventure/ui/GameSidebar.tsx",
+          "line": 311
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "avatarBuilder.gender",

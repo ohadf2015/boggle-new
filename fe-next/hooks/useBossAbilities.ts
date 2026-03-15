@@ -82,12 +82,35 @@ function checkCondition(
       return hpPercent === threshold;
     }
 
-    // Future condition types can be added here
-    case 'time_elapsed':
-    case 'words_found':
-    case 'combo_count':
-      // Not implemented yet - return false
-      return false;
+    case 'time_elapsed': {
+      const elapsed = context.timeElapsed ?? 0;
+      const target = condition.value as number;
+      if (condition.operator === '>=') return elapsed >= target;
+      if (condition.operator === '>') return elapsed > target;
+      if (condition.operator === '<=') return elapsed <= target;
+      if (condition.operator === '<') return elapsed < target;
+      return elapsed === target;
+    }
+
+    case 'words_found': {
+      const words = context.wordsFound ?? 0;
+      const target = condition.value as number;
+      if (condition.operator === '>=') return words >= target;
+      if (condition.operator === '>') return words > target;
+      if (condition.operator === '<=') return words <= target;
+      if (condition.operator === '<') return words < target;
+      return words === target;
+    }
+
+    case 'combo_count': {
+      const combo = context.comboCount ?? 0;
+      const target = condition.value as number;
+      if (condition.operator === '>=') return combo >= target;
+      if (condition.operator === '>') return combo > target;
+      if (condition.operator === '<=') return combo <= target;
+      if (condition.operator === '<') return combo < target;
+      return combo === target;
+    }
 
     default:
       return false;

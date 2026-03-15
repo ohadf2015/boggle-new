@@ -13,36 +13,96 @@ import {
   getHuntLifeBonus,
 } from '@/shared/constants/wordHuntMultiplayerConstants';
 
+import * as fs from 'fs';
+import * as path from 'path';
+
+/**
+ * Per-language common word sets for Word Hunt target selection.
+ * English: ~2100 words from Google's 10,000 most-used, filtered to 4-5 letters.
+ * Other languages: loaded from common_hunt_words_{lang}.txt if available.
+ * Loaded lazily on first use.
+ */
+const commonWordsByLang: Record<string, Set<string>> = {};
+
+function loadWordFile(filename: string): Set<string> {
+  try {
+    const filePath = path.join(__dirname, '..', filename);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return new Set(
+      content.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0),
+    );
+  } catch {
+    return new Set<string>();
+  }
+}
+
+export function getCommonWords(lang = 'en'): Set<string> {
+  if (commonWordsByLang[lang]) return commonWordsByLang[lang];
+
+  const fileMap: Record<string, string> = {
+    en: 'common_hunt_words.txt',
+    he: 'common_hunt_words_he.txt',
+    sv: 'common_hunt_words_sv.txt',
+    ja: 'common_hunt_words_ja.txt',
+  };
+
+  commonWordsByLang[lang] = loadWordFile(fileMap[lang] || `common_hunt_words_${lang}.txt`);
+  return commonWordsByLang[lang];
+}
+
 /**
  * Pick a random word from validWords that is between minLen and maxLen characters.
+ * When commonOnly is true, prefers words from the language-specific common words set.
  * Returns null if none found.
  */
 export function selectTargetWord(
   validWords: string[],
   minLen: number,
   maxLen: number,
+  commonOnly = false,
+  lang = 'en',
 ): string | null {
   const candidates = validWords.filter(
     (w) => w.length >= minLen && w.length <= maxLen,
   );
   if (candidates.length === 0) return null;
+
+  if (commonOnly) {
+    const common = getCommonWords(lang);
+    if (common.size > 0) {
+      const commonCandidates = candidates.filter(w => common.has(w.toLowerCase()));
+      if (commonCandidates.length > 0) {
+        return commonCandidates[Math.floor(Math.random() * commonCandidates.length)];
+      }
+    }
+  }
+
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
 /**
  * Pick a target word with progressive fallback to shorter lengths.
- * Tries preferred range first, then falls back to minLen-1, minLen-2, etc.
- * Minimum fallback length is 3.
+ * Prefers common words first, then falls back to any dictionary word.
+ * Minimum fallback length is 4 (3-letter words are too trivial).
  */
 export function selectTargetWordWithFallback(
   validWords: string[],
   preferredMinLen: number,
   maxLen: number,
+  lang = 'en',
 ): string | null {
+  // Try common words in preferred range first
+  const commonResult = selectTargetWord(validWords, preferredMinLen, maxLen, true, lang);
+  if (commonResult) return commonResult;
+
+  // Fall back to any word in preferred range
   const result = selectTargetWord(validWords, preferredMinLen, maxLen);
   if (result) return result;
 
-  for (let min = preferredMinLen - 1; min >= 3; min--) {
+  // Progressive fallback, minimum 4 letters
+  for (let min = preferredMinLen - 1; min >= 4; min--) {
+    const commonFallback = selectTargetWord(validWords, min, min, true, lang);
+    if (commonFallback) return commonFallback;
     const fallback = selectTargetWord(validWords, min, min);
     if (fallback) return fallback;
   }

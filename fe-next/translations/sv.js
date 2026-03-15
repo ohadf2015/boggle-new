@@ -3368,6 +3368,8 @@ const sv = {
     "hallOfFame": "Hall of Fame",
     "careerPoints": "Karriärpoäng",
     "gamesToday": "Spel idag",
+    "gameModes": "Spellägen",
+    "freeToPlay": "Gratis att spela",
     "wordHuntMode": "Ordjakt",
     "wordHuntModeDesc": "Hitta målordet så snabbt du kan — ett nytt pussel varje dag!",
     "communityBoards": "Communitybraden",
@@ -5347,7 +5349,10 @@ const sv = {
       "confirmRestart": "Starta om nivån?",
       "confirmRestartDesc": "Din nuvarande framsteg kommer att försvinna.",
       "confirmExit": "Lämna nivån?",
-      "confirmExitDesc": "Din nuvarande framsteg kommer att försvinna. Är du säker?"
+      "confirmExitDesc": "Din nuvarande framsteg kommer att försvinna. Är du säker?",
+      "freeze": "Frys",
+      "frozen": "Fryst!",
+      "shuffle": "Blanda"
     },
     "hints": {
       "minLetters2": "2+ bokstäver",
@@ -6023,6 +6028,12 @@ const sv = {
         "comboStreak": "Bygg en streak med {param} ord",
         "specificLetter": "Använd bokstaven {param}",
         "fastWord": "Hitta ett ord på {param}s",
+        "startsWith": "Hitta ett ord som börjar med {param}",
+        "endsWith": "Hitta ett ord som slutar med {param}",
+        "doubleLetters": "Hitta ett ord med dubbelbokstäver",
+        "palindrome": "Hitta ett palindrom ({param}+ bokstäver)",
+        "exactLength": "Hitta ett ord med exakt {param} bokstäver",
+        "useGoldTile": "Använd en guldbricka i ett ord",
         "complete": "Klart!"
       },
       "chapter": {

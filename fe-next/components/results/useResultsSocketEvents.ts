@@ -53,6 +53,7 @@ export interface ResultsSocketEventsActions {
   handleReferralMilestoneClose: () => void;
   handleMarkReady: () => void;
   setShowLevelUpCelebration: (show: boolean) => void;
+  setLevelUpData: (data: LevelUpData | null) => void;
 }
 
 export interface UseResultsSocketEventsProps {
@@ -82,6 +83,7 @@ export function useResultsSocketEvents({
   const [showMysteryReward, setShowMysteryReward] = useState(false);
   const mysteryRewardQueueRef = useRef<MysteryReward[]>([]);
   const hasShownMysteryRewardRef = useRef<boolean>(false); // Track if ANY reward was shown this session
+  const hasShownLevelUpRef = useRef<boolean>(false); // Prevent duplicate level-up celebrations
 
   // Referral milestone state
   const [referralMilestone, setReferralMilestone] = useState<ReferralMilestone | null>(null);
@@ -143,6 +145,8 @@ export function useResultsSocketEvents({
     };
 
     const handleLevelUp = (data: LevelUpData) => {
+      if (hasShownLevelUpRef.current) return;
+      hasShownLevelUpRef.current = true;
       logger.log('[RESULTS] Level up!', data);
       setLevelUpData(data);
       setShowLevelUpCelebration(true);
@@ -192,7 +196,7 @@ export function useResultsSocketEvents({
       socket.off('engagement:mysteryReward', handleMysteryReward);
       socket.off('engagement:referralMilestone', handleReferralMilestone);
     };
-  }, [socket, showMysteryReward]);
+  }, [socket]);
 
   // Socket listener for players ready for next game updates
   useEffect(() => {
@@ -303,6 +307,7 @@ export function useResultsSocketEvents({
     handleReferralMilestoneClose,
     handleMarkReady,
     setShowLevelUpCelebration,
+    setLevelUpData,
   };
 }
 

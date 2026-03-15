@@ -40,8 +40,8 @@ const TIER_GLOW: Record<number, string> = {
   4: '0 0 40px rgba(255,20,147,0.6), 0 0 80px rgba(255,225,53,0.3)',
 };
 
-const BEAM_DURATION: Record<number, number> = { 1: 300, 2: 400, 3: 500, 4: 600 };
-const AUTO_DISMISS: Record<number, number> = { 1: 500, 2: 1000, 3: 1200, 4: 1600 };
+const BEAM_DURATION: Record<number, number> = { 1: 200, 2: 250, 3: 300, 4: 400 };
+const AUTO_DISMISS: Record<number, number> = { 1: 250, 2: 600, 3: 800, 4: 1000 };
 
 /** Seeded random offsets for particle animations (avoids Math.random in render) */
 const PARTICLE_OFFSETS = Array.from({ length: 16 }, (_, i) => ({
@@ -72,6 +72,9 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
 
   if (!celebration) return null;
   if (reduceMotion) return null;
+
+  // Skip tier 1 — a light beam for every normal word is noise, not celebration
+  if (celebration.tier === 1) return null;
 
   const { tier, position } = celebration;
   const beamMs = BEAM_DURATION[tier] ?? 400;
@@ -146,8 +149,8 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
       )}
 
       {/* Star particles (tier 2+) */}
-      {tier >= 2 && Array.from({ length: tier === 4 ? 16 : tier === 3 ? 10 : 6 }, (_, i) => {
-        const count = tier === 4 ? 16 : tier === 3 ? 10 : 6;
+      {tier >= 2 && Array.from({ length: tier === 4 ? 8 : tier === 3 ? 6 : 4 }, (_, i) => {
+        const count = tier === 4 ? 8 : tier === 3 ? 6 : 4;
         const angle = (i / count) * Math.PI * 2;
         const offsets = PARTICLE_OFFSETS[i];
         const dist = 40 + offsets.distOffset;
@@ -174,17 +177,7 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
         );
       })}
 
-      {/* Background flash (tier 4) */}
-      {tier === 4 && (
-        <motion.div
-          data-testid="celebration-bg-flash"
-          className="absolute inset-0"
-          style={{ background: 'rgba(255,255,255,0.08)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 0] }}
-          transition={{ duration: 0.4 }}
-        />
-      )}
+      {/* Background flash removed — was stacking with BlastComboFlash creating double-flash */}
     </div>
   );
 }

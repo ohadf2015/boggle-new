@@ -126,8 +126,12 @@ jest.mock('../../../backend/modules/boggleSolver', () => ({
 }));
 
 jest.mock('../../../backend/utils/socketValidation', () => ({
-  validatePayload: jest.fn().mockReturnValue({ success: true, data: {} }),
+  validatePayload: jest.fn().mockImplementation((_schema: unknown, data: unknown) => ({
+    success: true,
+    data,
+  })),
   createGameSchema: {},
+  startGameSchema: {},
 }));
 
 jest.mock('../../../backend/modules/botManager', () => ({

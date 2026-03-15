@@ -14,7 +14,7 @@ import type {
 } from '@/types/adventure';
 import { WORLDS_COUNT, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { useCascadeLoop, type CascadePhase } from './useCascadeLoop';
-import { gameReducer, createInitialState } from './adventureGameReducer';
+import { gameReducer, createInitialState, type ReducerUpgradeConfig } from './adventureGameReducer';
 
 
 // ==============================================
@@ -24,6 +24,10 @@ import { gameReducer, createInitialState } from './adventureGameReducer';
 interface UseAdventureGameProps {
   levelConfig: LevelConfig;
   initialGrid: string[][];
+  /** Multiplier for combo decay timeout, e.g. 0.7 = 30% slower decay (longer timeout). From Cargo Bay upgrade. */
+  comboDecayMultiplier?: number;
+  /** Upgrade config for tile effect processing in the reducer */
+  upgradeConfig?: ReducerUpgradeConfig;
 }
 
 interface UseAdventureGameReturn {
@@ -44,7 +48,7 @@ interface UseAdventureGameReturn {
   startGame: () => void;
   pauseGame: () => void;
   completeLevel: () => void;
-  resetGame: () => void;
+  resetGame: (options?: { retainedScore?: number }) => void;
   isWildcard: (row: number, col: number) => boolean;
   markCascadeComplete: () => void;
   clearActivationEffects: () => void;
@@ -52,6 +56,18 @@ interface UseAdventureGameReturn {
   cascadePhase: CascadePhase;
   addTime: (seconds: number) => void;
   regenerateGrid: (grid: string[][]) => void;
+  /** Activate time freeze (Time Freeze upgrade) */
+  activateFreeze: (seconds: number) => void;
+  /** Whether time is currently frozen */
+  isFrozen: boolean;
+  /** Seconds remaining in freeze */
+  freezeRemaining: number;
+  /** Whether freeze has been used this level */
+  freezeUsed: boolean;
+  /** Use a shuffle action (Word Dynamite upgrade) */
+  useShuffle: () => void;
+  /** Shuffles remaining this level */
+  shufflesRemaining: number;
 }
 
 // ==============================================
@@ -67,6 +83,8 @@ const COMBO_TIMEOUT_MS = 3000;
 export function useAdventureGame({
   levelConfig,
   initialGrid,
+  comboDecayMultiplier = 1,
+  upgradeConfig,
 }: UseAdventureGameProps): UseAdventureGameReturn {
   if (levelConfig.world < 1 || levelConfig.world > WORLDS_COUNT) {
     throw new Error(`Invalid world: ${levelConfig.world}`);
@@ -76,7 +94,8 @@ export function useAdventureGame({
   }
 
   const initialState = useMemo(
-    () => createInitialState(levelConfig, initialGrid),
+    () => createInitialState(levelConfig, initialGrid, upgradeConfig),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [levelConfig, initialGrid]
   );
 
@@ -127,6 +146,9 @@ export function useAdventureGame({
     dispatch({ type: 'PAUSE_GAME' });
   }, []);
 
+  // comboDecayMultiplier < 1 means slower decay (longer timeout)
+  const effectiveComboTimeout = Math.floor(COMBO_TIMEOUT_MS / comboDecayMultiplier);
+
   const submitWord = useCallback((word: string, score: number) => {
     if (comboTimeoutRef.current) {
       clearTimeout(comboTimeoutRef.current);
@@ -136,8 +158,8 @@ export function useAdventureGame({
 
     comboTimeoutRef.current = setTimeout(() => {
       dispatch({ type: 'COMBO_TIMEOUT' });
-    }, COMBO_TIMEOUT_MS);
-  }, []);
+    }, effectiveComboTimeout);
+  }, [effectiveComboTimeout]);
 
   const submitWordWithPath = useCallback(
     (word: string, score: number, path: Array<{ row: number; col: number }>) => {
@@ -152,24 +174,25 @@ export function useAdventureGame({
 
       comboTimeoutRef.current = setTimeout(() => {
         dispatch({ type: 'COMBO_TIMEOUT' });
-      }, COMBO_TIMEOUT_MS);
+      }, effectiveComboTimeout);
     },
-    [cascade]
+    [cascade, effectiveComboTimeout]
   );
 
   const completeLevel = useCallback(() => {
     dispatch({ type: 'COMPLETE_LEVEL' });
   }, []);
 
-  const resetGame = useCallback(() => {
+  const resetGame = useCallback((options?: { retainedScore?: number }) => {
     if (comboTimeoutRef.current) {
       clearTimeout(comboTimeoutRef.current);
     }
 
-    dispatch({
-      type: 'RESET_GAME',
-      payload: { initialState: createInitialState(levelConfig, initialGrid) },
-    });
+    const fresh = createInitialState(levelConfig, initialGrid, upgradeConfig);
+    if (options?.retainedScore && options.retainedScore > 0) {
+      fresh.gameState = { ...fresh.gameState, score: options.retainedScore };
+    }
+    dispatch({ type: 'RESET_GAME', payload: { initialState: fresh } });
   }, [levelConfig, initialGrid]);
 
   const isWildcard = useCallback(
@@ -195,6 +218,27 @@ export function useAdventureGame({
     dispatch({ type: 'REGENERATE_GRID', payload: { grid } });
   }, []);
 
+  const activateFreeze = useCallback((seconds: number) => {
+    dispatch({ type: 'ACTIVATE_TIME_FREEZE', payload: { seconds } });
+  }, []);
+
+  const useShuffle = useCallback(() => {
+    if (state.shufflesRemaining <= 0) return;
+    dispatch({ type: 'USE_SHUFFLE' });
+    // Regenerate the grid with fresh letters (keeping special tile positions)
+    const newGrid = levelConfig.gridSize;
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const freshGrid: string[][] = [];
+    for (let r = 0; r < newGrid; r++) {
+      const row: string[] = [];
+      for (let c = 0; c < newGrid; c++) {
+        row.push(letters[Math.floor(Math.random() * letters.length)]);
+      }
+      freshGrid.push(row);
+    }
+    dispatch({ type: 'REGENERATE_GRID', payload: { grid: freshGrid } });
+  }, [state.shufflesRemaining, levelConfig.gridSize]);
+
   return {
     gameState: state.gameState,
     tiles: state.tiles,
@@ -217,5 +261,11 @@ export function useAdventureGame({
     cascadePhase: cascade.state.phase,
     addTime,
     regenerateGrid,
+    activateFreeze,
+    isFrozen: state.freezeRemaining > 0,
+    freezeRemaining: state.freezeRemaining,
+    freezeUsed: state.freezeUsed,
+    useShuffle,
+    shufflesRemaining: state.shufflesRemaining,
   };
 }

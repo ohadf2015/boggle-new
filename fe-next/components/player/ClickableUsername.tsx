@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ClickableUsernameProps {
-  username: string;
+  playerId: string;
   displayName?: string;
   className?: string;
   /** If true, navigate to profile page on click. Default: true */
@@ -18,13 +18,13 @@ interface ClickableUsernameProps {
  * Drop-in replacement for raw username text across the app
  */
 const ClickableUsername = memo<ClickableUsernameProps>(({
-  username,
+  playerId,
   displayName,
   className,
   linked = true,
 }) => {
   const { language } = useLanguage();
-  const label = displayName || username;
+  const label = displayName || playerId;
 
   if (!linked) {
     return <span className={className}>{label}</span>;
@@ -32,7 +32,7 @@ const ClickableUsername = memo<ClickableUsernameProps>(({
 
   return (
     <Link
-      href={`/${language}/player/${encodeURIComponent(username)}`}
+      href={`/${language}/player/${encodeURIComponent(playerId)}`}
       className={cn(
         'hover:underline hover:text-neo-cyan transition-colors cursor-pointer',
         className

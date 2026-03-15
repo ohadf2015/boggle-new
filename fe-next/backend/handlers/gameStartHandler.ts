@@ -34,6 +34,7 @@ import { ensureGame } from '../utils/metrics.js';
 import { generateRandomTable } from '../utils/gameUtils.js';
 import { ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
+import { validatePayload, startGameSchema } from '../utils/socketValidation.js';
 import { startGameTimer } from './shared.js';
 import { findAllWords, getCachedTrie } from '../modules/boggleSolver.js';
 import { stopAllBots } from '../modules/botManager.js';
@@ -148,8 +149,16 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       return;
     }
 
-    let { letterGrid } = data;
-    const { timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode } = data;
+    // Validate payload to prevent arbitrary gameMode/boardTheme injection
+    const validation = validatePayload(startGameSchema, data);
+    if (!validation.success) {
+      emitError(socket, `Invalid start game request: ${validation.error}`);
+      return;
+    }
+
+    const validatedData = validation.data as StartGamePayload;
+    let { letterGrid } = validatedData;
+    const { timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode } = validatedData;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -171,9 +180,17 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     const currentGameState = game.gameState;
     logger.info('SOCKET', `Starting game ${gameCode} - current state: ${currentGameState}`);
 
-    // Self-healing: if not in 'waiting' state, force a reset first
+    // Guard: reject startGame if game is currently in-progress to prevent
+    // silently discarding players' scores and words
+    if (currentGameState === 'in-progress') {
+      logger.warn('SOCKET', `Rejected startGame for ${gameCode}: game is already in-progress`);
+      emitError(socket, 'Game is already in progress');
+      return;
+    }
+
+    // Self-healing: if in 'finished' or 'validating' state, reset first
     if (!canTransitionGameState(gameCode, 'START')) {
-      logger.info('SOCKET', `Game ${gameCode} in unexpected state ${currentGameState}, auto-resetting before start`);
+      logger.info('SOCKET', `Game ${gameCode} in state ${currentGameState}, auto-resetting before start`);
 
       clearGameTimer(gameCode);
       gameStartCoordinator.cleanupSequence(gameCode);
@@ -279,7 +296,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     if (resolvedMode === 'word-hunt') {
       const trie = getCachedTrie(gameLang);
       const allValidWords = findAllWords(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
-      const targetWord = selectTargetWordWithFallback(allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH);
+      const targetWord = selectTargetWordWithFallback(allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH, gameLang);
       if (targetWord) {
         const huntState = initWordHuntState(targetWord, playerUsernames);
         const currentGame = getGame(gameCode);

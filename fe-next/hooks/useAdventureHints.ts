@@ -36,6 +36,8 @@ export interface UseAdventureHintsOptions {
   isPlaying: boolean;
   /** Inactivity threshold in milliseconds (default: 15000) */
   inactivityThresholdMs?: number;
+  /** Max hints per level from Word Radar upgrade (undefined = unlimited) */
+  maxHintsPerLevel?: number;
   /** Callback when auto-hint is triggered */
   onAutoHint?: (hint: HintResult) => void;
 }
@@ -63,6 +65,8 @@ export interface UseAdventureHintsReturn {
   currentHint: HintResult | null;
   /** Clear the current hint */
   clearCurrentHint: () => void;
+  /** Remaining hint budget (undefined = unlimited) */
+  hintsRemaining?: number;
 }
 
 // Direction vectors for 8-way adjacent movement (matching boggleSolver)
@@ -201,8 +205,13 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     foundWords,
     isPlaying,
     inactivityThresholdMs = 15000,
+    maxHintsPerLevel,
     onAutoHint,
   } = options;
+
+  // Hint budget tracking (undefined = unlimited)
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const hintsRemaining = maxHintsPerLevel !== undefined ? Math.max(0, maxHintsPerLevel - hintsUsed) : undefined;
 
   // State
   const [isLoading, setIsLoading] = useState(true);
@@ -308,8 +317,9 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     remainingHintWordsRef.current = remainingHintWords;
   }, [remainingHintWords]);
 
-  // Check if hints are available
-  const hasHintsAvailable = !isLoading && !error && remainingHintWords.length > 0;
+  // Check if hints are available (respects hint budget from Word Radar upgrade)
+  const hasHintsAvailable = !isLoading && !error && remainingHintWords.length > 0
+    && (hintsRemaining === undefined || hintsRemaining > 0);
 
   // Find path for word
   const findPathForWord = useCallback((word: string): GridPosition[] | null => {
@@ -332,6 +342,7 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
 
     const hint = { word, path };
     setCurrentHint(hint);
+    setHintsUsed(prev => prev + 1);
     return hint;
   }, [hasHintsAvailable, remainingHintWords, findPathForWord]);
 
@@ -413,5 +424,6 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     dismissAutoHint,
     currentHint,
     clearCurrentHint,
+    hintsRemaining,
   };
 }

@@ -232,14 +232,14 @@ describe('useAdventureSelection', () => {
       });
       expect(result.current.currentWord).toBe('CAT');
 
-      // WHEN - click on last tile again
+      // WHEN - click on last tile again (classic grid behavior: submit + clear)
       act(() => {
         result.current.selectTile(2);
       });
 
-      // THEN - should deselect last tile
-      expect(result.current.selectedIndices).toEqual([0, 1]);
-      expect(result.current.currentWord).toBe('CA');
+      // THEN - should submit and clear selection (classic grid click-to-submit)
+      expect(result.current.selectedIndices).toEqual([]);
+      expect(result.current.currentWord).toBe('');
     });
 
     it('should deselect all remaining tiles when first tile is clicked again', () => {

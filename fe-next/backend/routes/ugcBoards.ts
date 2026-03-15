@@ -125,8 +125,8 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
         );
 
     const result = findWordsForBots(grid, language);
-    const totalFindableWords = result.easy.length + result.medium.length + result.hard.length;
-    const difficulty = computeDifficulty(totalFindableWords);
+    const totalFindableWords = result ? result.easy.length + result.medium.length + result.hard.length : 0;
+    const difficulty = result ? computeDifficulty(totalFindableWords) : 'HARD';
 
     res.json({
       grid,
@@ -534,7 +534,7 @@ router.get('/creators/top', async (req: Request, res: Response): Promise<void> =
 
     const { data, error } = await supabase
       .from('community_board_creator_stats')
-      .select('creator_id, boards_created, total_plays, avg_rating')
+      .select('creator_id, boards_created, total_plays')
       .order('total_plays', { ascending: false })
       .limit(limit);
 
@@ -566,7 +566,7 @@ router.get('/creators/top', async (req: Request, res: Response): Promise<void> =
       avatar_config: profileMap[row.creator_id]?.avatar_config ?? null,
       boards_created: row.boards_created ?? 0,
       total_plays: row.total_plays ?? 0,
-      avg_rating: row.avg_rating ? Number(Number(row.avg_rating).toFixed(1)) : null,
+      avg_rating: null,
     }));
 
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');

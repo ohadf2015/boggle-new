@@ -66,7 +66,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
 
         {/* Description */}
         <p className={cn('text-sm font-bold', isComplete ? 'text-neo-black' : 'text-neo-white')}>
-          {t(challenge.descriptionKey)}
+          {t(challenge.descriptionKey, { param: String(challenge.param) })}
         </p>
 
         {/* Reward row */}

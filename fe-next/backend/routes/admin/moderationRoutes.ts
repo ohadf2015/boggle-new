@@ -58,7 +58,7 @@ export async function fetchModerationQueue(supabase: SupabaseClient, limit: numb
   const { data, count, error } = result as { data: unknown[] | null; count: number | null; error: { message: string } | null };
 
   if (error) {
-    logger.error('ADMIN_MOD', `Queue fetch failed: ${error.message}`);
+    logger.warn('ADMIN_MOD', `Queue fetch failed: ${error.message}`);
     return { items: [], total: 0, pagination: buildPaginationMeta(0, { limit, offset }) };
   }
 

@@ -104,9 +104,9 @@ export function BlastComboFlash({ activeFlash, onComplete }: BlastComboFlashProp
         data-testid="combo-flash"
         className="absolute inset-0 pointer-events-none z-40"
         style={{ background }}
-        initial={{ opacity: tier === 3 ? 0.5 : tier === 2 ? 0.35 : 0.2 }}
+        initial={{ opacity: tier === 3 ? 0.25 : tier === 2 ? 0.18 : 0.1 }}
         animate={{ opacity: 0 }}
-        transition={{ duration: tier === 3 ? 0.5 : tier === 2 ? 0.3 : 0.2, ease: 'easeOut' }}
+        transition={{ duration: tier === 3 ? 0.35 : tier === 2 ? 0.25 : 0.15, ease: 'easeOut' }}
         onAnimationComplete={() => onComplete(activeFlash.id)}
       />
     </AnimatePresence>

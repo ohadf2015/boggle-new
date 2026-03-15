@@ -39,6 +39,8 @@ export interface UseAdventureLevelCompletionProps {
   currentLevel: number;
   upgradeBonuses: { xpBonus: number; timeBonus: number; scoreBonus: number };
   upgradeEffects?: { goldMultiplier: number; doubleFirstCompletionGold: boolean; failureGold: number; longWordGoldBonus: number };
+  /** Combined gold multiplier from rune + streak + weekly (stacks with upgradeEffects.goldMultiplier) */
+  bonusGoldMultiplier?: number;
   awardXp: (xp: number) => { leveledUp: boolean; newLevel?: number };
   addGold: (amount: number) => void;
   recordAttempt: (...args: any[]) => void;
@@ -118,7 +120,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       const longWordBonus = (upgradeEffects?.longWordGoldBonus ?? 0) * gameState.wordsFound.filter(w => w.length >= 6).length;
       const goldMultiplier = upgradeEffects?.goldMultiplier ?? 1;
       const doubleFirst = upgradeEffects?.doubleFirstCompletionGold ? 2 : 1;
-      addGold(Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst));
+      const bonusGold = props.bonusGoldMultiplier ?? 1;
+      addGold(Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst * bonusGold));
 
       // Generate loot drops
       const drops = generateLevelLoot({

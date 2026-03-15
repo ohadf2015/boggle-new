@@ -3418,6 +3418,8 @@ const es = {
     "hallOfFame": "Salón de la Fama",
     "careerPoints": "Puntos de Carrera",
     "gamesToday": "Juegos hoy",
+    "gameModes": "Modos de juego",
+    "freeToPlay": "Gratis para jugar",
     "wordHuntMode": "Caza de Palabras",
     "wordHuntModeDesc": "¡Encuentra la palabra objetivo lo más rápido posible — un nuevo rompecabezas cada día!",
     "communityBoards": "Tableros de la comunidad",
@@ -5671,7 +5673,10 @@ const es = {
       "confirmRestart": "¿Reiniciar nivel?",
       "confirmRestartDesc": "Se perderá tu progreso actual.",
       "confirmExit": "¿Salir del nivel?",
-      "confirmExitDesc": "Se perderá tu progreso actual. ¿Estás seguro de que quieres salir?"
+      "confirmExitDesc": "Se perderá tu progreso actual. ¿Estás seguro de que quieres salir?",
+      "freeze": "Congelar",
+      "frozen": "¡Congelado!",
+      "shuffle": "Mezclar"
     },
     "hints": {
       "minLetters2": "2+ letras",
@@ -6073,6 +6078,12 @@ const es = {
         "comboStreak": "Arma una racha de {param} palabras",
         "specificLetter": "Usa la letra {param}",
         "fastWord": "Encuentra una palabra en {param}s",
+        "startsWith": "Encuentra una palabra que empiece con {param}",
+        "endsWith": "Encuentra una palabra que termine con {param}",
+        "doubleLetters": "Encuentra una palabra con letras dobles",
+        "palindrome": "Encuentra un palíndromo ({param}+ letras)",
+        "exactLength": "Encuentra una palabra de exactamente {param} letras",
+        "useGoldTile": "Usa una ficha dorada en una palabra",
         "complete": "¡Completo!"
       },
       "chapter": {

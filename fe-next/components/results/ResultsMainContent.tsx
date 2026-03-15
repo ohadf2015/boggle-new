@@ -278,7 +278,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
 
       {/* Primary CTA - Play Again / Ready / Next Step (above the fold) */}
       {gameCode && onReturnToRoom && (
-        isBotsOnlyGame ? (
+        isBotsOnlyGame && !isHost ? (
           <NextStepPrompt
             currentMode="multiplayer-bots"
             onBackToLobby={onExit}

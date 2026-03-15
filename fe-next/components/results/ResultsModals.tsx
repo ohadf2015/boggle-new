@@ -75,6 +75,8 @@ interface LevelUpState {
   showLevelUpCelebration: boolean;
   /** Close handler callback */
   setShowLevelUpCelebration: (show: boolean) => void;
+  /** Clear level up data after display */
+  setLevelUpData?: (data: any) => void;
 }
 
 /** Auth modal state */
@@ -187,7 +189,7 @@ export function ResultsModals({
         <LevelUpCelebration
           level={levelUp.levelUpData.newLevel}
           show={activeModalId === 'levelUp'}
-          onDismiss={() => { dismiss('levelUp'); levelUp.setShowLevelUpCelebration(false); }}
+          onDismiss={() => { dismiss('levelUp'); levelUp.setShowLevelUpCelebration(false); levelUp.setLevelUpData?.(null); }}
           autoDismissAfter={5000}
           rewards={{
             unlocks: levelUp.levelUpData.newTitles,

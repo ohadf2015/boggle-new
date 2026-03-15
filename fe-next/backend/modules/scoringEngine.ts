@@ -33,6 +33,7 @@ export interface PlayerScoreResult {
   wordCount: number;
   avatar: Avatar | null;
   isBot: boolean;
+  isHost: boolean;
   achievements: string[];
 }
 
@@ -182,6 +183,7 @@ export function calculateGameScores(
       wordCount: uniqueWords.length,
       avatar: userData?.avatar || null,
       isBot: userData?.isBot || false,
+      isHost: username === game.hostUsername,
       achievements: game.playerAchievements?.[username] || []
     });
   }

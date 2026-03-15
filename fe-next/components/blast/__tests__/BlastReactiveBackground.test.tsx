@@ -37,42 +37,33 @@ describe('BlastReactiveBackground', () => {
     expect(screen.getByTestId('blast-grid')).toBeInTheDocument();
   });
 
-  it('no particles at intensity 0 or 1', () => {
+  it('no particles at intensity 0-2 (raised threshold for cleaner look)', () => {
     const { rerender } = render(<BlastReactiveBackground intensity={0} />);
     expect(screen.queryByTestId('blast-particles')).not.toBeInTheDocument();
 
     rerender(<BlastReactiveBackground intensity={1} />);
     expect(screen.queryByTestId('blast-particles')).not.toBeInTheDocument();
+
+    rerender(<BlastReactiveBackground intensity={2} />);
+    expect(screen.queryByTestId('blast-particles')).not.toBeInTheDocument();
   });
 
-  it('shows particles at intensity 2+', () => {
-    const { rerender } = render(<BlastReactiveBackground intensity={2} />);
+  it('shows fewer particles at intensity 3+ (reduced for cleaner ambiance)', () => {
+    const { rerender } = render(<BlastReactiveBackground intensity={3} />);
     const container = screen.getByTestId('blast-particles');
     expect(container).toBeInTheDocument();
-    // 8 particles at intensity 2
-    expect(container.children).toHaveLength(8);
-
-    rerender(<BlastReactiveBackground intensity={3} />);
-    expect(screen.getByTestId('blast-particles').children).toHaveLength(12);
+    expect(container.children).toHaveLength(5);
 
     rerender(<BlastReactiveBackground intensity={5} />);
-    expect(screen.getByTestId('blast-particles').children).toHaveLength(15);
+    expect(screen.getByTestId('blast-particles').children).toHaveLength(8);
   });
 
-  it('no energy waves at intensity below 4', () => {
-    const { rerender } = render(<BlastReactiveBackground intensity={0} />);
-    expect(screen.queryByTestId('blast-waves')).not.toBeInTheDocument();
-
-    rerender(<BlastReactiveBackground intensity={3} />);
-    expect(screen.queryByTestId('blast-waves')).not.toBeInTheDocument();
-  });
-
-  it('shows energy waves at intensity 4+', () => {
+  it('energy waves removed (no blast-waves element at any intensity)', () => {
     const { rerender } = render(<BlastReactiveBackground intensity={4} />);
-    expect(screen.getByTestId('blast-waves')).toBeInTheDocument();
+    expect(screen.queryByTestId('blast-waves')).not.toBeInTheDocument();
 
     rerender(<BlastReactiveBackground intensity={5} />);
-    expect(screen.getByTestId('blast-waves')).toBeInTheDocument();
+    expect(screen.queryByTestId('blast-waves')).not.toBeInTheDocument();
   });
 
   it('respects reduced motion — only static nebula, no animations', () => {
@@ -85,7 +76,6 @@ describe('BlastReactiveBackground', () => {
     // No animated layers
     expect(screen.queryByTestId('blast-grid')).not.toBeInTheDocument();
     expect(screen.queryByTestId('blast-particles')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('blast-waves')).not.toBeInTheDocument();
   });
 
   it('all layers have aria-hidden', () => {

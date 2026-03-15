@@ -152,10 +152,10 @@ describe('useBlastNearMiss', () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(500);
     });
 
-    // At 1000ms, should still be showing
+    // At 500ms (within 900ms window), should still be showing
     expect(result.current.shimmerCells.length).toBeGreaterThan(0);
   });
 
@@ -174,9 +174,9 @@ describe('useBlastNearMiss', () => {
       result.current.check(path, grid, tileStates, gridSize);
     });
 
-    // Advance 1000ms (not yet cleared)
+    // Advance 500ms (not yet cleared within 900ms window)
     act(() => {
-      jest.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(500);
     });
 
     // Call check again — resets timer
@@ -184,9 +184,9 @@ describe('useBlastNearMiss', () => {
       result.current.check(path, grid, tileStates, gridSize);
     });
 
-    // Advance another 1000ms (only 1000ms since last check, not 1500ms total)
+    // Advance another 500ms (only 500ms since last check, not 900ms total)
     act(() => {
-      jest.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(500);
     });
 
     // Should still be active

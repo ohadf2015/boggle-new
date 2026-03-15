@@ -1,0 +1,66 @@
+/**
+ * useBossRush Hook
+ *
+ * Manages boss rush mode — fight 5 bosses in sequence.
+ * Defeat ends the run. Full clear gives bonus rewards.
+ */
+
+'use client';
+
+import { useState, useCallback, useMemo } from 'react';
+import {
+  createBossRushState,
+  advanceBossRush,
+  getBossRushReward,
+  type BossRushState,
+  type BossRushReward,
+} from '@/lib/adventure/bossRush';
+
+export interface UseBossRushReturn {
+  /** Current boss rush state */
+  state: BossRushState;
+  /** Current boss world ID (null if complete) */
+  currentBossWorldId: number | null;
+  /** Whether the rush is active (started, not complete) */
+  isActive: boolean;
+  /** Start a new boss rush */
+  startRush: () => void;
+  /** Report a fight result */
+  reportResult: (result: 'victory' | 'defeat') => void;
+  /** Get rewards for current progress */
+  rewards: BossRushReward;
+  /** Reset to allow starting a new rush */
+  reset: () => void;
+}
+
+export function useBossRush(): UseBossRushReturn {
+  const [state, setState] = useState<BossRushState>(createBossRushState);
+  const [isActive, setIsActive] = useState(false);
+
+  const startRush = useCallback(() => {
+    setState(createBossRushState());
+    setIsActive(true);
+  }, []);
+
+  const reportResult = useCallback((result: 'victory' | 'defeat') => {
+    setState(prev => {
+      const next = advanceBossRush(prev, result);
+      if (next.isComplete) setIsActive(false);
+      return next;
+    });
+  }, []);
+
+  const rewards = useMemo(() => getBossRushReward(state.defeatedCount), [state.defeatedCount]);
+
+  const currentBossWorldId = useMemo(() => {
+    if (state.isComplete || state.currentBossIndex >= state.bossSequence.length) return null;
+    return state.bossSequence[state.currentBossIndex];
+  }, [state]);
+
+  const reset = useCallback(() => {
+    setState(createBossRushState());
+    setIsActive(false);
+  }, []);
+
+  return { state, currentBossWorldId, isActive, startRush, reportResult, rewards, reset };
+}

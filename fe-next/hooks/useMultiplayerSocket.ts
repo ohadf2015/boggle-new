@@ -86,26 +86,8 @@ export function useMultiplayerSocket(
   const {
     language,
     gameCode,
-    username,
-    roomName,
     isActive,
     isHost,
-    roomLanguage,
-    onJoined,
-    onUpdateUsers,
-    onActiveRooms,
-    onJoinedAsSpectator,
-    onSpectatorList,
-    onSpectatorUpgraded,
-    onError,
-    onGameStart,
-    onGameReset,
-    onHostLeftRoomClosing,
-    onSessionMigrated,
-    onWarning,
-    onRateLimited,
-    onHostTransferred,
-    t,
   } = options;
 
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -117,6 +99,12 @@ export function useMultiplayerSocket(
   const wasConnectedRef = useRef<boolean>(false);
   const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
+  const hostLeftReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Latest-ref pattern: keeps a stable ref to the latest options so socket
+  // callbacks (registered once) always read fresh values without re-registering
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   useEffect(() => {
     attemptingReconnectRef.current = attemptingReconnect;
@@ -192,7 +180,7 @@ export function useMultiplayerSocket(
             const parsedSession = JSON.parse(savedSession);
             if (parsedSession.gameCode && parsedSession.username) {
               logger.log('[SOCKET.IO] Reconnecting to game:', parsedSession.gameCode);
-              toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
+              toast.success(optionsRef.current.t('common.reconnecting') || 'Reconnecting to game...', {
                 id: 'socket-reconnecting-to-game',
                 duration: 2000,
               });
@@ -224,9 +212,9 @@ export function useMultiplayerSocket(
       logger.error('[SOCKET.IO] Connection error:', error.message);
       captureSocketError(error, {
         event: 'connect_error',
-        gameCode: gameCode || undefined,
+        gameCode: optionsRef.current.gameCode || undefined,
         socketId: socketInstance.id || undefined,
-        username: username || undefined,
+        username: optionsRef.current.username || undefined,
       });
     });
 
@@ -239,9 +227,9 @@ export function useMultiplayerSocket(
       logger.error('[SOCKET.IO] Reconnection failed');
       captureSocketError(new Error('Reconnection exhausted after max attempts'), {
         event: 'reconnect_failed',
-        gameCode: gameCode || undefined,
+        gameCode: optionsRef.current.gameCode || undefined,
         socketId: socketInstance.id || undefined,
-        username: username || undefined,
+        username: optionsRef.current.username || undefined,
       });
     });
 
@@ -253,7 +241,7 @@ export function useMultiplayerSocket(
         isHost: data.isHost,
         username: data.username,
       });
-      onJoined(data);
+      optionsRef.current.onJoined(data);
       setAttemptingReconnect(false);
 
       // Safety net: if this is a reconnection, the server sends startGame immediately after joined.
@@ -275,30 +263,30 @@ export function useMultiplayerSocket(
 
     socketInstance.on('updateUsers', (data) => {
       if (data.users) {
-        onUpdateUsers(data.users);
+        optionsRef.current.onUpdateUsers(data.users);
       }
     });
 
     socketInstance.on('activeRooms', (data) => {
-      onActiveRooms(data.rooms || []);
+      optionsRef.current.onActiveRooms(data.rooms || []);
       setRoomsLoading(false);
     });
 
     socketInstance.on('joinedAsSpectator', (data) => {
       logger.log('[SPECTATOR] Joined as spectator:', data);
-      onJoinedAsSpectator(data);
+      optionsRef.current.onJoinedAsSpectator(data);
       setAttemptingReconnect(false);
     });
 
     socketInstance.on('spectatorList', (data) => {
       logger.log('[SPECTATOR] Spectator list updated:', data.spectators?.length || 0);
-      onSpectatorList(data.spectators || []);
+      optionsRef.current.onSpectatorList(data.spectators || []);
     });
 
     socketInstance.on('spectatorUpgraded', (data) => {
-      if (data.success && data.username === username) {
+      if (data.success && data.username === optionsRef.current.username) {
         logger.log('[SPECTATOR] Upgraded to player, late join:', data.lateJoin);
-        onSpectatorUpgraded(data);
+        optionsRef.current.onSpectatorUpgraded(data);
       }
     });
 
@@ -336,9 +324,9 @@ export function useMultiplayerSocket(
         logger.error('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
         captureSocketError(errorToCapture, {
           event: 'error',
-          gameCode: gameCode || undefined,
+          gameCode: optionsRef.current.gameCode || undefined,
           socketId: socketInstance.id || undefined,
-          username: username || undefined,
+          username: optionsRef.current.username || undefined,
         });
       }
 
@@ -353,7 +341,7 @@ export function useMultiplayerSocket(
         return;
       }
 
-      onError(data);
+      optionsRef.current.onError(data);
     });
 
     socketInstance.on('startGame', (data) => {
@@ -363,22 +351,24 @@ export function useMultiplayerSocket(
         timerSeconds: data.timerSeconds,
         gridSize: data.letterGrid?.length,
       });
-      onGameStart(data);
+      optionsRef.current.onGameStart(data);
     });
 
     socketInstance.on('resetGame', () => {
       logger.log('[SOCKET.IO] Game reset - staying in room for new game');
-      onGameReset();
+      optionsRef.current.onGameReset();
     });
 
     socketInstance.on('hostLeftRoomClosing', (data) => {
-      toast.error(data.message || t('playerView.roomClosed'), {
+      const opts = optionsRef.current;
+      toast.error(data.message || opts.t('playerView.roomClosed'), {
         icon: '🚪',
         duration: 5000,
       });
-      clearSessionPreservingUsername(username);
-      onHostLeftRoomClosing(data);
-      setTimeout(() => window.location.reload(), 2000);
+      clearSessionPreservingUsername(opts.username);
+      opts.onHostLeftRoomClosing(data);
+      // Store timeout so it can be cancelled on unmount
+      hostLeftReloadTimerRef.current = setTimeout(() => window.location.reload(), 2000);
     });
 
     socketInstance.on('sessionMigrated', (data) => {
@@ -387,8 +377,8 @@ export function useMultiplayerSocket(
         icon: '🔄',
         duration: 5000,
       });
-      clearSessionPreservingUsername(username);
-      onSessionMigrated(data);
+      clearSessionPreservingUsername(optionsRef.current.username);
+      optionsRef.current.onSessionMigrated(data);
     });
 
     socketInstance.on('warning', (data) => {
@@ -408,36 +398,38 @@ export function useMultiplayerSocket(
           duration: 4000,
         });
       }
-      onWarning(data);
+      optionsRef.current.onWarning(data);
     });
 
     socketInstance.on('rateLimited', () => {
       logger.warn('[SOCKET.IO] Rate limited by server');
+      const opts = optionsRef.current;
       toast.error(
-        t('errors.rateLimited') ||
+        opts.t('errors.rateLimited') ||
           'Too many requests. Please wait a moment and try again.',
         {
           icon: '⏳',
           duration: 4000,
         }
       );
-      onRateLimited();
+      opts.onRateLimited();
     });
 
     socketInstance.on('hostTransferred', (data) => {
-      if (data.newHost === username) {
+      const opts = optionsRef.current;
+      if (data.newHost === opts.username) {
         saveSession({
-          gameCode,
-          username,
+          gameCode: opts.gameCode,
+          username: opts.username,
           isHost: true,
-          roomName: roomName || username,
-          language: roomLanguage || 'en',
+          roomName: opts.roomName || opts.username,
+          language: opts.roomLanguage || 'en',
         });
-        toast.success(t('hostView.youAreNowHost'), { duration: 5000, icon: '👑' });
+        toast.success(opts.t('hostView.youAreNowHost'), { duration: 5000, icon: '👑' });
       } else {
-        toast(`${data.newHost} ${t('hostView.newHostAssigned')}`, { duration: 3000, icon: '🔄' });
+        toast(`${data.newHost} ${opts.t('hostView.newHostAssigned')}`, { duration: 3000, icon: '🔄' });
       }
-      onHostTransferred(data);
+      opts.onHostTransferred(data);
     });
 
     socketInstance.on('pong', () => {
@@ -451,13 +443,16 @@ export function useMultiplayerSocket(
     return () => {
       logger.log('[SOCKET.IO] MultiplayerPage cleaning up');
       clearTimeout(roomsLoadingTimeout);
+      if (hostLeftReloadTimerRef.current) {
+        clearTimeout(hostLeftReloadTimerRef.current);
+        hostLeftReloadTimerRef.current = null;
+      }
       eventNames.forEach((event) => socketInstance.off(event));
       if (!isReusingSocket) {
         releaseSharedSocket();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t, language]);
+  }, [language]);
 
   // Host keep-alive
   useEffect(() => {

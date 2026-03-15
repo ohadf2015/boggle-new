@@ -267,6 +267,13 @@ export function useGridGestures({
         if (!hasExceededDeadzone(startPosRef.current.x, startPosRef.current.y, touchX, touchY)) {
           return;
         }
+        // Scroll disambiguation: if vertical movement dominates, treat as scroll (classic grid behavior)
+        const deltaX = Math.abs(touchX - startPosRef.current.x);
+        const deltaY = Math.abs(touchY - startPosRef.current.y);
+        if (deltaY > deltaX * 1.5 && lastTouchTileIndexRef.current !== null) {
+          isDraggingRef.current = false;
+          return;
+        }
         hasExceededDeadzoneRef.current = true;
       }
 
@@ -309,6 +316,13 @@ export function useGridGestures({
       // Check deadzone
       if (!hasExceededDeadzoneRef.current && startPosRef.current) {
         if (!hasExceededDeadzone(startPosRef.current.x, startPosRef.current.y, touchX, touchY)) {
+          return;
+        }
+        // Scroll disambiguation (classic grid behavior)
+        const deltaX = Math.abs(touchX - startPosRef.current.x);
+        const deltaY = Math.abs(touchY - startPosRef.current.y);
+        if (deltaY > deltaX * 1.5 && lastTouchTileIndexRef.current !== null) {
+          isDraggingRef.current = false;
           return;
         }
         hasExceededDeadzoneRef.current = true;

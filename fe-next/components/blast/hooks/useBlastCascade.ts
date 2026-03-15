@@ -20,9 +20,12 @@ export interface CascadeAnimationData {
 // Shared between this hook (timing) and BlastCascadeOverlay (animation params).
 
 export const BLAST_ANIM = {
-  clear: { duration: 240, stagger: 8, easing: 'cubicBezier(0.55, 0, 1, 0.45)' },
-  fall: { baseDuration: 200, perRowDuration: 45, easing: 'cubicBezier(0.34, 1.56, 0.64, 1)' },
-  appear: { duration: 180, stagger: 10, easing: 'cubicBezier(0.22, 1, 0.36, 1)' },
+  clear: { duration: 200, stagger: 6, easing: 'cubicBezier(0.55, 0, 1, 0.45)' },
+  /** Inter-phase pause — creates a "heartbeat" rhythm between cascade steps.
+   * Research: 80-100ms gap lets the brain register each step separately (flow state). */
+  pauseBeforeFall: 80,
+  fall: { baseDuration: 180, perRowDuration: 40, easing: 'cubicBezier(0.34, 1.56, 0.64, 1)' },
+  appear: { duration: 160, stagger: 8, easing: 'cubicBezier(0.22, 1, 0.36, 1)' },
   buffer: 20, // safety margin (ms)
 } as const;
 
@@ -181,20 +184,23 @@ export function useBlastCascade({
     setCascadePhase('clearing');
 
     // Use cumulative delays (flat scheduling) instead of nested timeouts
-    // to avoid timer drift from nested setTimeout chains
+    // to avoid timer drift from nested setTimeout chains.
+    // pauseBeforeFall creates a "heartbeat" gap between clear and fall for rhythm.
+    const pause = BLAST_ANIM.pauseBeforeFall;
+
     const t1 = setTimeout(() => {
       setCascadePhase('falling');
-    }, timing.clear);
+    }, timing.clear + pause);
 
     const t2 = setTimeout(() => {
       setCascadePhase('appearing');
-    }, timing.clear + timing.fall);
+    }, timing.clear + pause + timing.fall);
 
     const t3 = setTimeout(() => {
       setCascadePhase('idle');
       setAnimationData(null);
       onComplete(result.newGrid, result.newTileStates, affectedColumns);
-    }, timing.clear + timing.fall + timing.appear);
+    }, timing.clear + pause + timing.fall + timing.appear);
 
     timersRef.current = [t1, t2, t3];
   }, [gridSize, language, specialTileChance, customDistribution, reducedMotion, blastSeed, clearTimers]);

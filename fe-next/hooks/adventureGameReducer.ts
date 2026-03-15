@@ -27,7 +27,23 @@ export type GameAction =
   | { type: 'COMBO_TIMEOUT' }
   | { type: 'CASCADE_COMPLETE' }
   | { type: 'CLEAR_ACTIVATION_EFFECTS' }
-  | { type: 'REGENERATE_GRID'; payload: { grid: string[][] } };
+  | { type: 'REGENERATE_GRID'; payload: { grid: string[][] } }
+  | { type: 'ACTIVATE_TIME_FREEZE'; payload: { seconds: number } }
+  | { type: 'USE_SHUFFLE' };
+
+/** Lightweight upgrade config stored in reducer state for tile effect processing */
+export interface ReducerUpgradeConfig {
+  /** Blast Shield T2: bomb tiles give time instead of removing it */
+  bombTimerInvert?: boolean;
+  /** Gem Detector: boost to special tile spawn rate (0-1) */
+  specialTileBoost?: number;
+  /** Gem Detector T3: guarantee a gold tile on cascade refill */
+  guaranteedGoldTile?: boolean;
+  /** Word Dynamite: shuffle uses per level */
+  shuffleUses?: number;
+  /** Blast Shield T1: ice tiles take fewer hits to melt */
+  iceTileReduction?: boolean;
+}
 
 export interface GameState {
   gameState: AdventureGameState;
@@ -39,6 +55,14 @@ export interface GameState {
   isPlaying: boolean;
   levelConfig: LevelConfig;
   cascadeComplete: boolean;
+  /** Upgrade config for tile effect processing (optional, defaults to empty) */
+  upgradeConfig?: ReducerUpgradeConfig;
+  /** Time freeze: seconds remaining (0 = not frozen) */
+  freezeRemaining: number;
+  /** Whether time freeze has been used this level */
+  freezeUsed: boolean;
+  /** Shuffle uses remaining this level */
+  shufflesRemaining: number;
 }
 
 const GOLD_MULTIPLIER = 3;
@@ -90,7 +114,8 @@ function initializeObjectives(levelConfig: LevelConfig): LevelObjective[] {
 
 export function createInitialState(
   levelConfig: LevelConfig,
-  grid: string[][]
+  grid: string[][],
+  upgradeConfig?: ReducerUpgradeConfig,
 ): GameState {
   return {
     gameState: {
@@ -111,6 +136,10 @@ export function createInitialState(
     isPlaying: false,
     levelConfig,
     cascadeComplete: false,
+    upgradeConfig,
+    freezeRemaining: 0,
+    freezeUsed: false,
+    shufflesRemaining: upgradeConfig?.shuffleUses ?? 0,
   };
 }
 
@@ -156,7 +185,8 @@ function processSpecialTileEffects(
   newTiles: TileState[][],
   gridSize: number,
   comboCount: number,
-  baseScore: number
+  baseScore: number,
+  upgradeConfig?: ReducerUpgradeConfig,
 ): { finalScore: number; iceClearedCount: number; timeBonusSeconds: number } {
   let finalScore = baseScore;
   let iceClearedCount = 0;
@@ -236,22 +266,33 @@ function processSpecialTileEffects(
     }
   }
 
-  // Bomb tile - clear entire row
+  // Bomb tile - clear entire row (Blast Shield T2: give time instead)
   const bombPos = path.find(
     (pos) => newTiles[pos.row]?.[pos.col]?.type === 'bomb'
   );
   if (bombPos) {
-    for (let col = 0; col < newTiles[bombPos.row].length; col++) {
-      const tile = newTiles[bombPos.row][col];
-      if (tile.type === 'ice' && !tile.isCleared) {
-        iceClearedCount++;
-        tile.isFrozen = false;
-        tile.activationEffect = 'melt';
-      } else {
-        tile.activationEffect = 'explode';
+    if (upgradeConfig?.bombTimerInvert) {
+      // Blast Shield T2: bomb gives +5s instead of clearing row
+      timeBonusSeconds += TIME_TILE_BONUS_SECONDS;
+      const tile = newTiles[bombPos.row][bombPos.col];
+      if (tile) {
+        tile.activationEffect = 'timeBonus';
+        tile.activationTimestamp = activationTimestamp;
+        tile.isCleared = true;
       }
-      tile.activationTimestamp = activationTimestamp;
-      tile.isCleared = true;
+    } else {
+      for (let col = 0; col < newTiles[bombPos.row].length; col++) {
+        const tile = newTiles[bombPos.row][col];
+        if (tile.type === 'ice' && !tile.isCleared) {
+          iceClearedCount++;
+          tile.isFrozen = false;
+          tile.activationEffect = 'melt';
+        } else {
+          tile.activationEffect = 'explode';
+        }
+        tile.activationTimestamp = activationTimestamp;
+        tile.isCleared = true;
+      }
     }
   }
 
@@ -327,6 +368,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'TICK': {
       if (!state.isPlaying) return state;
+
+      // Time Freeze: decrement freeze counter instead of game timer
+      if (state.freezeRemaining > 0) {
+        return { ...state, freezeRemaining: state.freezeRemaining - 1 };
+      }
 
       const newTime = Math.max(0, state.timeRemaining - 1);
       if (newTime === 0) {
@@ -413,7 +459,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           newTiles,
           gridSize,
           state.gameState.comboCount,
-          score
+          score,
+          state.upgradeConfig,
         );
         finalScore = effects.finalScore;
         iceClearedCount = effects.iceClearedCount;
@@ -562,6 +609,25 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'RESET_GAME':
       return action.payload.initialState;
+
+    case 'ACTIVATE_TIME_FREEZE': {
+      if (state.freezeUsed || state.freezeRemaining > 0) return state;
+      return {
+        ...state,
+        freezeRemaining: action.payload.seconds,
+        freezeUsed: true,
+      };
+    }
+
+    case 'USE_SHUFFLE': {
+      if (state.shufflesRemaining <= 0) return state;
+      // Shuffle regenerates the grid — the actual grid regen is handled
+      // by the caller dispatching REGENERATE_GRID after USE_SHUFFLE
+      return {
+        ...state,
+        shufflesRemaining: state.shufflesRemaining - 1,
+      };
+    }
 
     default:
       return state;

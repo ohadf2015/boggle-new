@@ -13,35 +13,29 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 describe('ClickableUsername', () => {
   it('renders displayName when provided', () => {
-    render(<ClickableUsername username="user1" displayName="Cool Player" />);
+    render(<ClickableUsername playerId="abc-123" displayName="Cool Player" />);
     expect(screen.getByText('Cool Player')).toBeInTheDocument();
   });
 
-  it('renders username as fallback', () => {
-    render(<ClickableUsername username="user1" />);
-    expect(screen.getByText('user1')).toBeInTheDocument();
+  it('renders playerId as fallback when no displayName', () => {
+    render(<ClickableUsername playerId="abc-123" />);
+    expect(screen.getByText('abc-123')).toBeInTheDocument();
   });
 
-  it('links to profile page', () => {
-    render(<ClickableUsername username="WordMaster" />);
+  it('links to profile page by ID', () => {
+    render(<ClickableUsername playerId="abc-123" displayName="WordMaster" />);
     const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', '/en/player/WordMaster');
-  });
-
-  it('encodes special characters in URL', () => {
-    render(<ClickableUsername username="Word Master" />);
-    const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', '/en/player/Word%20Master');
+    expect(link).toHaveAttribute('href', '/en/player/abc-123');
   });
 
   it('renders as plain text when linked=false', () => {
-    render(<ClickableUsername username="user1" linked={false} />);
+    render(<ClickableUsername playerId="abc-123" displayName="user1" linked={false} />);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(screen.getByText('user1')).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
-    render(<ClickableUsername username="user1" className="custom-class" />);
+    render(<ClickableUsername playerId="abc-123" className="custom-class" />);
     const link = screen.getByRole('link');
     expect(link).toHaveClass('custom-class');
   });

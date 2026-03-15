@@ -5,7 +5,7 @@
  * Handles path building, deselection, and coordinate conversion.
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import type { GridTileState } from '@/types/adventure';
 
 // ==============================================
@@ -27,6 +27,8 @@ export interface UseAdventureSelectionProps {
   disabled?: boolean;
   /** Grid container ref for coordinate calculation */
   gridRef?: React.RefObject<HTMLDivElement | null>;
+  /** Callback to submit word on click (classic grid behavior: click last tile to submit) */
+  onClickSubmit?: (word: string, indices: number[]) => void;
 }
 
 export interface UseAdventureSelectionReturn {
@@ -44,6 +46,8 @@ export interface UseAdventureSelectionReturn {
   getPath: () => Array<{ row: number; col: number }>;
   /** Path points for trail animation */
   pathPoints: PathPoint[];
+  /** Indices of tiles adjacent to the last selected tile (for visual hints) */
+  adjacentIndices: number[];
 }
 
 // ==============================================
@@ -79,8 +83,11 @@ export function useAdventureSelection({
   gridSize,
   disabled = false,
   gridRef,
+  onClickSubmit,
 }: UseAdventureSelectionProps): UseAdventureSelectionReturn {
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+  const lastClickTimeRef = useRef(0);
+  const lastClickIndexRef = useRef<number | null>(null);
 
   // Build current word from selected tiles
   const currentWord = useMemo(() => {
@@ -138,7 +145,7 @@ export function useAdventureSelection({
       .filter((p): p is PathPoint => p !== null);
   }, [selectedIndices, tiles, gridRef, gridSize]);
 
-  // Select a tile by index
+  // Select a tile by index (supports click-to-submit like classic grid)
   const selectTile = useCallback(
     (index: number) => {
       if (disabled) return;
@@ -150,14 +157,40 @@ export function useAdventureSelection({
       const targetTile = tiles[index];
       if (targetTile.isFrozen) return;
 
+      const now = Date.now();
+      const sameCell = lastClickIndexRef.current === index;
+      const isDoubleClick = sameCell && now - lastClickTimeRef.current < 500;
+      lastClickTimeRef.current = now;
+      lastClickIndexRef.current = index;
+
       setSelectedIndices((prev) => {
         // If this is the first tile, select it
         if (prev.length === 0) {
           return [index];
         }
 
-        // If clicking the last selected tile, deselect it
         const lastIndex = prev[prev.length - 1];
+
+        // Classic grid behavior: clicking the last tile OR double-clicking with ≥2 tiles submits the word
+        if (index === lastIndex && prev.length >= 2) {
+          if (onClickSubmit) {
+            const word = prev.map(i => tiles[i]?.letter || '').join('');
+            // Submit async (after state update) to avoid stale closure
+            setTimeout(() => onClickSubmit(word, prev), 0);
+          }
+          return [];
+        }
+
+        // Double-click on any selected tile with ≥2 tiles also submits
+        if (isDoubleClick && prev.includes(index) && prev.length >= 2) {
+          if (onClickSubmit) {
+            const word = prev.map(i => tiles[i]?.letter || '').join('');
+            setTimeout(() => onClickSubmit(word, prev), 0);
+          }
+          return [];
+        }
+
+        // If clicking the last selected tile with only 1 tile, deselect it
         if (index === lastIndex) {
           return prev.slice(0, -1);
         }
@@ -176,13 +209,26 @@ export function useAdventureSelection({
         return [...prev, index];
       });
     },
-    [disabled, tiles]
+    [disabled, tiles, onClickSubmit]
   );
 
   // Clear all selections
   const clearSelection = useCallback(() => {
     setSelectedIndices([]);
   }, []);
+
+  // Compute indices of tiles adjacent to the last selected tile (for visual hints)
+  const adjacentIndices = useMemo(() => {
+    if (selectedIndices.length === 0) return [];
+    const lastIdx = selectedIndices[selectedIndices.length - 1];
+    const adjacent: number[] = [];
+    for (let i = 0; i < tiles.length; i++) {
+      if (selectedIndices.includes(i)) continue;
+      if (tiles[i]?.isCleared || tiles[i]?.isFrozen) continue;
+      if (isAdjacent(lastIdx, i, tiles)) adjacent.push(i);
+    }
+    return adjacent;
+  }, [selectedIndices, tiles]);
 
   // Get path as row/col coordinates
   const getPath = useCallback(() => {
@@ -200,5 +246,6 @@ export function useAdventureSelection({
     clearSelection,
     getPath,
     pathPoints,
+    adjacentIndices,
   };
 }

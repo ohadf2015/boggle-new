@@ -67,6 +67,8 @@ interface AdventureGridProps {
   hintHighlightIndices?: number[];
   /** Boss grid effect (CSS-driven visual disruption) */
   bossGridEffect?: { name: string; id: number } | null;
+  /** Indices of tiles adjacent to the last selected tile (for selection hints) */
+  adjacentIndices?: number[];
 }
 
 // ==============================================
@@ -113,6 +115,7 @@ const AdventureGrid = memo(
         onCascadeComplete,
         hintHighlightIndices = [],
         bossGridEffect,
+        adjacentIndices = [],
       },
       ref
     ) => {
@@ -273,6 +276,12 @@ const AdventureGrid = memo(
       [hintHighlightIndices]
     );
 
+    // Build adjacent tile set for selection hints (classic grid behavior)
+    const adjacentSet = useMemo(
+      () => new Set(adjacentIndices),
+      [adjacentIndices]
+    );
+
     // Detect if a bomb tile is selected and get its row for preview highlighting
     const bombRowPreview = useMemo(() => {
       for (const idx of selectedIndices) {
@@ -375,6 +384,7 @@ const AdventureGrid = memo(
           {tiles.map((tile, index) => {
             const isSelected = selectedSet.has(index);
             const isHintHighlighted = hintSet.has(index);
+            const isAdjacentHint = adjacentSet.has(index);
             const canInteract = interactive && !disabled && !tile.isCleared;
 
             // Chain cascade delay for chained tiles (takes priority over tile.cascadeDelay)
@@ -387,6 +397,7 @@ const AdventureGrid = memo(
                 index={index}
                 isSelected={isSelected}
                 isHintHighlighted={isHintHighlighted}
+                isAdjacentHint={isAdjacentHint}
                 canInteract={canInteract}
                 worldId={worldId}
                 bombRowPreview={bombRowPreview}

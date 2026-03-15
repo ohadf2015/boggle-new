@@ -55,15 +55,16 @@ export function ScorePopup({
 }: ScorePopupProps) {
   const { prefersReducedMotion } = useDevicePerformance();
 
-  // Calculate default target if not provided (50px above, same x)
+  // Default target: arc upward and toward the score counter (top-left).
+  // This creates a visual connection between action and reward (AAA game standard).
   const target = targetPosition || {
-    x: position.x,
-    y: position.y - 50,
+    x: position.x - 30,
+    y: position.y - 70,
   };
 
   // Call onComplete when animation finishes
   useEffect(() => {
-    const duration = prefersReducedMotion ? 300 : 800;
+    const duration = prefersReducedMotion ? 200 : 550;
     const timer = setTimeout(() => {
       onComplete?.();
     }, duration);
@@ -111,17 +112,17 @@ export function ScorePopup({
       initial={{
         x: 0,
         y: 0,
-        scale: 0.8,
+        scale: 0.5,
         opacity: 0,
       }}
       animate={{
         x: [0, arcMidX - position.x, target.x - position.x],
         y: [0, arcMidY - position.y, target.y - position.y],
-        scale: [0.8, 1.2, 1],
+        scale: [0.5, 1.15, 0.9],
         opacity: [0, 1, 1, 0],
       }}
       transition={{
-        duration: 0.8,
+        duration: 0.55,
         times: [0, 0.3, 1],
         ease: 'easeOut',
       }}

@@ -13,6 +13,7 @@ import { z, ZodSchema, ZodError } from 'zod';
 import type { Socket } from 'socket.io';
 import { ErrorCodes, AppError, emitError } from './errorHandler';
 import logger from './logger';
+import { customAvatarSchema } from '@/shared/types/customAvatar';
 
 // ==========================================
 // Type Definitions
@@ -134,13 +135,15 @@ export const avatarSchema = compiledSchemas?.avatarSchema || z.object({
       // Check for excessive zero-width joiners
       const zwjCount = (val.match(/\u200D/g) || []).length;
       return zwjCount <= 3;
-    }, 'Invalid emoji format'),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+    }, 'Invalid emoji format')
+    .optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
   avatarImage: z.string()
     .max(100)
     .regex(/^[a-z0-9_\-\/]+$/i, 'Avatar image must contain only alphanumeric characters, hyphens, underscores, and slashes')
     .optional()
     .nullable(),
+  customAvatar: customAvatarSchema.optional().nullable(),
   profilePictureUrl: z.string()
     .url()
     .nullable()
@@ -267,13 +270,21 @@ export const leaveRoomSchema = compiledSchemas?.leaveRoomSchema || z.object({
   username: usernameSchema,
 });
 
-export const startGameSchema = compiledSchemas?.startGameSchema || z.object({
+// Always use inline schema (not compiled) — the compiled version lacks
+// boardTheme/gameMode validation and has restrictive min(30) on timerSeconds
+export const startGameSchema = z.object({
   gameCode: gameCodeSchema.optional(),
   letterGrid: z.array(z.array(z.string())),
-  timerSeconds: z.number().int().min(30).max(600).optional().default(180),
+  timerSeconds: z.number().int().optional().default(180),
   language: languageSchema.optional(),
   difficulty: difficultySchema.optional().default('MEDIUM'),
   minWordLength: z.number().int().min(2).max(5).optional().default(3),
+  boardTheme: z.object({
+    nameKey: z.string(),
+    emoji: z.string(),
+    isHoliday: z.boolean().optional(),
+  }).nullable().optional(),
+  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'random']).optional(),
 });
 
 export const startGameAckSchema = compiledSchemas?.startGameAckSchema || z.object({

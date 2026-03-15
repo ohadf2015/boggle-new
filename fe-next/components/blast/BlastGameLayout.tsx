@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
 import ComboDisplay from '@/components/game/ComboDisplay';
-import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { BlastGrid } from './BlastGrid';
 import { BlastProgressBar } from './BlastProgressBar';
@@ -19,12 +18,13 @@ import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
 import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, CascadeHighlightData, CascadeHighlightPhase, BlastObjectiveProgress } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
-import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
+// ComboMilestoneAnnouncement removed — ComboDisplay already shows combo level; milestone banners added noise
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { Mascot } from '@/components/ui/Mascot';
 import { BlastMoveCounter } from './BlastMoveCounter';
 import { BlastObjectiveDisplay } from './BlastObjectiveDisplay';
+// BlastChainCounter kept as sole chain indicator (BlastChainBadge removed — was duplicate)
 import { BlastChainCounter } from './BlastChainCounter';
 import { BlastCodexModal } from './BlastCodexModal';
 import CircularTimer from '@/components/CircularTimer';
@@ -189,7 +189,6 @@ export function BlastGameLayout({
   const [showCodex, setShowCodex] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [shakeClass, setShakeClass] = useState('');
-  const [cascadeAnnouncement, setCascadeAnnouncement] = useState<string | null>(null);
   const [showMpCelebration, setShowMpCelebration] = useState(false);
   const prevExplosionsRef = useRef(0);
   const prevCascadeRef = useRef(0);
@@ -212,7 +211,7 @@ export function BlastGameLayout({
       if (hasPrism) vibrateBlastPrism();
       else if (hasBomb) vibrateBlastBomb();
       else if (hasLightning) vibrateBlastLightning();
-      const timer = setTimeout(() => setShakeClass(''), 250);
+      const timer = setTimeout(() => setShakeClass(''), 180);
       prevExplosionsRef.current = shakeCount;
       return () => clearTimeout(timer);
     }
@@ -220,20 +219,16 @@ export function BlastGameLayout({
     return undefined;
   }, [explosions, shakeClass]);
 
-  // Cascade chain announcement + haptic
+  // Cascade haptic feedback (text announcement removed — BlastChainCounter handles visual)
   useEffect(() => {
     if (cascadeChainLevel > prevCascadeRef.current && cascadeChainLevel >= 1) {
-      setCascadeAnnouncement(t('blast.cascadeChain')?.replace('{level}', String(cascadeChainLevel)) || `CASCADE x${cascadeChainLevel}`);
       vibrateBlastCascade();
-      const timer = setTimeout(() => setCascadeAnnouncement(null), 1500);
       prevCascadeRef.current = cascadeChainLevel;
-      return () => clearTimeout(timer);
     }
     if (cascadeChainLevel === 0) {
       prevCascadeRef.current = 0;
     }
-    return undefined;
-  }, [cascadeChainLevel, t]);
+  }, [cascadeChainLevel]);
 
   // Auto-clear hint after 2000ms
   useEffect(() => {
@@ -259,17 +254,18 @@ export function BlastGameLayout({
 
   // Combo-based grid glow color
   // Glow shadows are symmetric (0 x-offset) so they work in both LTR and RTL
+  // Subtle combo glow — AAA games use soft ambient cues, not hard glows
   const comboGlow = comboLevel >= 7
-    ? 'shadow-[0_0_20px_rgba(255,0,255,0.4)]'
+    ? 'shadow-[0_0_12px_rgba(255,0,255,0.25)]'
     : comboLevel >= 5
-    ? 'shadow-[0_0_15px_rgba(255,225,53,0.4)]'
+    ? 'shadow-[0_0_10px_rgba(255,225,53,0.2)]'
     : comboLevel >= 3
-    ? 'shadow-[0_0_10px_rgba(0,255,255,0.3)]'
+    ? 'shadow-[0_0_8px_rgba(0,255,255,0.15)]'
     : '';
 
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
-      <DynamicEnergyBackground />
+      {/* Background handled by BlastReactiveBackground in parent — no duplicate energy bg */}
 
       {/* Powerup mascot — overlays when hint path is active */}
       {hintPath && hintPath.length > 0 && (
@@ -365,43 +361,17 @@ export function BlastGameLayout({
         />
       </div>
 
-      {/* Combo milestone announcement — suppressed during active cascade to reduce visual overload */}
-      {cascadePhase === 'idle' && cascadeHighlightPhase !== 'highlighting' && (
-        <ComboMilestoneAnnouncement comboLevel={comboLevel} />
-      )}
-
-      {/* Cascade word showcase banner (replaces simple text announcement) */}
+      {/* Cascade word showcase banner — sole cascade notification (milestone + fallback text removed to reduce noise) */}
       <AnimatePresence>
         {cascadeHighlightPhase === 'highlighting' && cascadeHighlightData && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
             className="absolute bottom-2 sm:bottom-4 start-1/2 -translate-x-1/2 z-50 pointer-events-none"
           >
             <BlastCascadeWordBanner highlightData={cascadeHighlightData} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Fallback cascade chain announcement (when no highlight data, e.g. chain level text) */}
-      <AnimatePresence>
-        {cascadeAnnouncement && cascadeHighlightPhase !== 'highlighting' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 1.5, y: -10 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="absolute top-32 start-1/2 -translate-x-1/2 z-50 pointer-events-none"
-          >
-            <div className={cn(
-              'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-xl uppercase tracking-wider',
-              cascadeChainLevel >= 4 ? 'bg-gradient-to-r from-fuchsia-500 via-cyan-400 to-purple-500 text-white' :
-              cascadeChainLevel >= 2 ? 'bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white' :
-              'bg-gradient-to-r from-fuchsia-400 to-purple-500 text-white'
-            )}>
-              {cascadeAnnouncement}
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -414,10 +384,10 @@ export function BlastGameLayout({
         {/* Score — SP only */}
         {!isMultiplayer && (
           <motion.div
-            key={Math.floor(score / 50)}
-            initial={{ scale: 1.1, rotate: -1 }}
-            animate={{ scale: 1, rotate: -1.5 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            key={Math.floor(score / 100)}
+            initial={{ scale: 1.04 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className="border-3 border-neo-black rounded-neo shadow-hard px-3 py-1.5 min-w-[80px]"
             style={{
               background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
@@ -512,7 +482,7 @@ export function BlastGameLayout({
       {/* Word Forming Area */}
       <div className={cn(
         'flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-2',
-        'max-w-[360px] mx-auto w-full overflow-visible',
+        'max-w-[360px] md:max-w-[480px] mx-auto w-full overflow-visible',
         'min-h-[40px] rounded-neo',
         formedWord ? 'bg-white/5 border border-white/10' : ''
       )}>
@@ -531,7 +501,7 @@ export function BlastGameLayout({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden relative z-30 px-4 max-w-[360px] mx-auto w-full"
+            className="overflow-hidden relative z-30 px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full"
           >
             <BlastFoundWords words={wordsFound} t={t} />
           </motion.div>
@@ -546,7 +516,7 @@ export function BlastGameLayout({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="overflow-hidden relative z-30 px-4 max-w-[360px] mx-auto w-full"
+            className="overflow-hidden relative z-30 px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full"
           >
             <div className={cn(
               'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',

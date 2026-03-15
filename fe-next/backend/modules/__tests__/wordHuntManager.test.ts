@@ -17,6 +17,7 @@ import {
   penalizeWrongGuess,
   areAllPlayersEliminated,
   computeDiscoveryClues,
+  getCommonWords,
 } from '../wordHuntManager';
 
 import type { WordHuntModeState } from '@/shared/types/game';
@@ -82,15 +83,14 @@ describe('wordHuntManager', () => {
       expect(result!.length).toBe(4);
     });
 
-    it('should fall back to 3-letter words when no 4+ letter words exist', () => {
+    it('should NOT fall back to 3-letter words (minimum is 4)', () => {
       const words = ['cat', 'dog', 'hi'];
       const result = selectTargetWordWithFallback(words, 5, 8);
-      expect(result).not.toBeNull();
-      expect(result!.length).toBe(3);
+      expect(result).toBeNull();
     });
 
-    it('should return null only when no words of length >= 3 exist', () => {
-      const words = ['hi', 'a', 'be'];
+    it('should return null when no words of length >= 4 exist', () => {
+      const words = ['hi', 'a', 'be', 'cat'];
       const result = selectTargetWordWithFallback(words, 5, 8);
       expect(result).toBeNull();
     });
@@ -98,6 +98,65 @@ describe('wordHuntManager', () => {
     it('should return null for empty word list', () => {
       const result = selectTargetWordWithFallback([], 5, 8);
       expect(result).toBeNull();
+    });
+  });
+
+  // ==========================================
+  // selectTargetWord with commonOnly
+  // ==========================================
+  describe('selectTargetWord with commonOnly', () => {
+    it('should prefer common words when commonOnly is true', () => {
+      const commonWords = getCommonWords();
+      // Mix of common and obscure 5-letter words
+      const words = ['aalii', 'abaft', 'house', 'xeric', 'stone', 'zoeal'];
+      const commonOnes = words.filter(w => commonWords.has(w));
+
+      // If common words exist, result should be one of them
+      if (commonOnes.length > 0) {
+        for (let i = 0; i < 20; i++) {
+          const result = selectTargetWord(words, 4, 5, true);
+          expect(result).not.toBeNull();
+          expect(commonOnes).toContain(result);
+        }
+      }
+    });
+
+    it('should fall back to any word when no common words match', () => {
+      const words = ['aalii', 'abaft', 'xeric'];
+      const result = selectTargetWord(words, 4, 5, true);
+      // Should still return something even if none are common
+      expect(result).not.toBeNull();
+    });
+
+    it('should work normally when commonOnly is false', () => {
+      const words = ['aalii', 'hello'];
+      const result = selectTargetWord(words, 4, 5, false);
+      expect(result).not.toBeNull();
+    });
+  });
+
+  // ==========================================
+  // getCommonWords
+  // ==========================================
+  describe('getCommonWords', () => {
+    it('should load common words set', () => {
+      const common = getCommonWords();
+      expect(common.size).toBeGreaterThan(1000);
+    });
+
+    it('should contain well-known English words', () => {
+      const common = getCommonWords();
+      expect(common.has('house')).toBe(true);
+      expect(common.has('water')).toBe(true);
+      expect(common.has('game')).toBe(true);
+      expect(common.has('time')).toBe(true);
+    });
+
+    it('should NOT contain obscure words', () => {
+      const common = getCommonWords();
+      expect(common.has('aalii')).toBe(false);
+      expect(common.has('abaft')).toBe(false);
+      expect(common.has('zoeal')).toBe(false);
     });
   });
 

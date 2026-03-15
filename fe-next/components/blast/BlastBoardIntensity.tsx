@@ -8,19 +8,21 @@ interface BlastBoardIntensityProps {
   children: React.ReactNode;
 }
 
+// Subtler glow — AAA games use gentle ambient borders, not aggressive box-shadows
 const GLOW_CONFIG: Record<number, { boxShadow: string; pulseDuration: string }> = {
-  1: { boxShadow: '0 0 8px rgba(0,255,255,0.15)', pulseDuration: '3s' },
-  2: { boxShadow: '0 0 15px rgba(0,255,255,0.25)', pulseDuration: '2s' },
-  3: { boxShadow: '0 0 20px rgba(255,225,53,0.3), 0 0 40px rgba(255,225,53,0.1)', pulseDuration: '1.5s' },
-  4: { boxShadow: '0 0 25px rgba(255,107,53,0.35), 0 0 50px rgba(255,20,147,0.15)', pulseDuration: '1s' },
-  5: { boxShadow: '0 0 30px rgba(255,107,53,0.4), 0 0 60px rgba(255,20,147,0.2)', pulseDuration: '0.5s' },
+  1: { boxShadow: '0 0 6px rgba(0,255,255,0.08)', pulseDuration: '4s' },
+  2: { boxShadow: '0 0 8px rgba(0,255,255,0.12)', pulseDuration: '3s' },
+  3: { boxShadow: '0 0 12px rgba(255,225,53,0.15)', pulseDuration: '2.5s' },
+  4: { boxShadow: '0 0 15px rgba(255,107,53,0.2)', pulseDuration: '2s' },
+  5: { boxShadow: '0 0 18px rgba(255,107,53,0.25)', pulseDuration: '1.5s' },
 };
 
+// Lighter vignette — enough to frame the board without darkening gameplay
 const VIGNETTE_CONFIG: Record<number, { base: number; peak: number }> = {
-  2: { base: 0.3, peak: 0.3 },
-  3: { base: 0.4, peak: 0.4 },
-  4: { base: 0.4, peak: 0.6 },
-  5: { base: 0.5, peak: 0.7 },
+  2: { base: 0.15, peak: 0.15 },
+  3: { base: 0.2, peak: 0.2 },
+  4: { base: 0.25, peak: 0.3 },
+  5: { base: 0.3, peak: 0.4 },
 };
 
 const KEYFRAMES_STYLE = `
@@ -32,22 +34,12 @@ const KEYFRAMES_STYLE = `
   0% { filter: hue-rotate(0deg); }
   100% { filter: hue-rotate(360deg); }
 }
-@keyframes blast-corner-flare {
-  0%, 100% { transform: scale(1); opacity: 0.4; }
-  50% { transform: scale(1.5); opacity: 0.8; }
-}
 @keyframes blast-vignette-pulse {
   0%, 100% { opacity: var(--vignette-base); }
   50% { opacity: var(--vignette-peak); }
 }
 `;
 
-const CORNER_POSITIONS = [
-  { top: 0, left: 0 },
-  { top: 0, right: 0 },
-  { bottom: 0, left: 0 },
-  { bottom: 0, right: 0 },
-] as const;
 
 export default function BlastBoardIntensity({ intensity, children }: BlastBoardIntensityProps) {
   const shouldReduceMotion = useReducedMotion();
@@ -60,9 +52,8 @@ export default function BlastBoardIntensity({ intensity, children }: BlastBoardI
   const glow = GLOW_CONFIG[clampedIntensity];
   const vignette = VIGNETTE_CONFIG[clampedIntensity] ?? VIGNETTE_CONFIG[Math.min(clampedIntensity, 5)];
   const showGlow = clampedIntensity >= 1;
-  const showVignette = clampedIntensity >= 2;
-  const showCornerFlares = clampedIntensity >= 3;
-  const vignetteAnimated = clampedIntensity >= 4;
+  const showVignette = clampedIntensity >= 3; // Raised threshold — vignette only at high intensity
+  const vignetteAnimated = clampedIntensity >= 5; // Only pulse at max
 
   return (
     <div className="relative" data-testid="blast-board-intensity">
@@ -107,30 +98,7 @@ export default function BlastBoardIntensity({ intensity, children }: BlastBoardI
         />
       )}
 
-      {showCornerFlares && (
-        <div data-testid="blast-corner-flares" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' as const, zIndex: 10 }}>
-          {CORNER_POSITIONS.map((pos, i) => (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                ...pos,
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                background: clampedIntensity >= 5
-                  ? 'radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,200,50,0.4))'
-                  : 'radial-gradient(circle, rgba(255,255,255,0.7), rgba(255,225,53,0.3))',
-                boxShadow: clampedIntensity >= 5
-                  ? '0 0 12px rgba(255,200,50,0.6)'
-                  : '0 0 6px rgba(255,225,53,0.4)',
-                animation: `blast-corner-flare ${clampedIntensity >= 5 ? '0.8s' : '1.5s'} ease-in-out infinite`,
-                animationDelay: `${i * 0.2}s`,
-              }}
-            />
-          ))}
-        </div>
-      )}
+      {/* Corner flares removed — too subtle to notice, but added DOM noise */}
 
       {children}
     </div>

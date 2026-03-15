@@ -66,10 +66,11 @@ export function useBlastNearMiss(): UseBlastNearMissReturn {
 
       setShimmerCells(result.cells);
 
+      // Quick pulse — research shows near-miss should be a brief "what if" moment, not lingering
       timerRef.current = setTimeout(() => {
         setShimmerCells([]);
         timerRef.current = null;
-      }, 1500);
+      }, 900);
     },
     [],
   );

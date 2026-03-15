@@ -3368,6 +3368,8 @@ const ja = {
     "hallOfFame": "殿堂入り",
     "careerPoints": "キャリアポイント",
     "gamesToday": "今日のゲーム数",
+    "gameModes": "ゲームモード",
+    "freeToPlay": "無料プレイ",
     "wordHuntMode": "ワードハント",
     "wordHuntModeDesc": "できるだけ早くターゲットワードを見つけよう — 毎日新しいパズル！",
     "communityBoards": "コミュニティボード",
@@ -5398,7 +5400,10 @@ const ja = {
       "confirmRestart": "レベルをやり直しますか？",
       "confirmRestartDesc": "現在の進捗が失われます。",
       "confirmExit": "レベルを終了しますか？",
-      "confirmExitDesc": "現在の進捗が失われます。本当に終了しますか？"
+      "confirmExitDesc": "現在の進捗が失われます。本当に終了しますか？",
+      "freeze": "フリーズ",
+      "frozen": "凍結中！",
+      "shuffle": "シャッフル"
     },
     "hints": {
       "minLetters2": "2文字以上",
@@ -6074,6 +6079,12 @@ const ja = {
         "comboStreak": "{param}連続ストリークを作ろう",
         "specificLetter": "{param}の文字を使おう",
         "fastWord": "{param}秒以内に単語を見つけよう",
+        "startsWith": "{param}で始まる単語を見つけよう",
+        "endsWith": "{param}で終わる単語を見つけよう",
+        "doubleLetters": "二重文字のある単語を見つけよう",
+        "palindrome": "回文を見つけよう（{param}文字以上）",
+        "exactLength": "ちょうど{param}文字の単語を見つけよう",
+        "useGoldTile": "ゴールドタイルを使って単語を作ろう",
         "complete": "完了!"
       },
       "chapter": {

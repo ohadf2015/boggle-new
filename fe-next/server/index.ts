@@ -51,6 +51,7 @@ import adminGiftRoutes from '../backend/routes/adminGift';
 import adminNotificationRoutes from '../backend/routes/adminNotification';
 import ugcPacksRoutes from '../backend/routes/ugcPacks';
 import ugcBoardsRoutes from '../backend/routes/ugcBoards';
+import playerProfileRoutes from '../backend/routes/playerProfile';
 
 // Configuration
 const dev: boolean = process.env.NODE_ENV !== 'production';
@@ -105,6 +106,7 @@ async function start(): Promise<void> {
   app.use('/api/daily-challenge', dailyChallengeRoutes);
   app.use('/api/ugc/packs', ugcPacksRoutes);
   app.use('/api/ugc/boards', ugcBoardsRoutes);
+  app.use('/api/player-profile', playerProfileRoutes);
   app.use('/api', aiHintsRoutes);
 
   // Next.js request handler (catch-all)

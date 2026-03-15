@@ -76,8 +76,8 @@ export const GameLayout = memo(function GameLayout({
           className={cn(
             'flex-shrink-0',
             'h-16 md:h-20',
-            'landscape:h-full landscape:w-56',
-            'lg:h-full lg:w-64 xl:w-72',
+            'landscape:h-full landscape:w-64',
+            'lg:h-full lg:w-80 xl:w-96',
             'overflow-hidden lg:overflow-y-auto',
             'z-10'
           )}

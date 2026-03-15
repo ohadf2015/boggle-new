@@ -78,26 +78,35 @@ export function ExplosionEffect({
     const originX = position.x / (typeof window !== 'undefined' ? window.innerWidth : 1000);
     const originY = position.y / (typeof window !== 'undefined' ? window.innerHeight : 1000);
 
-    // Fire radial burst with multi-color palette
-    fireConfetti({
-      particleCount,
-      startVelocity: config.velocity,
-      spread: 360, // Full radial burst
-      origin: { x: originX, y: originY },
-      colors: buildPalette(color),
-      gravity: 1.5,
-      ticks: 60,
-      scalar: 0.9,
-    });
+    // Hit-stop: 40ms freeze-frame before particles fire.
+    // Research: the brain has a ~100ms perception window — a brief pause before the
+    // burst makes it feel more impactful (standard in AAA puzzle games).
+    const hitStopMs = intensity >= 3 ? 50 : 40;
 
-    // Fire onComplete after particle animation (150 ticks ~= 150ms)
+    const hitStopTimer = setTimeout(() => {
+      fireConfetti({
+        particleCount,
+        startVelocity: config.velocity,
+        spread: 360, // Full radial burst
+        origin: { x: originX, y: originY },
+        colors: buildPalette(color),
+        gravity: 1.5,
+        ticks: 60,
+        scalar: 0.9,
+      });
+    }, hitStopMs);
+
+    // Fire onComplete after hit-stop + particle animation
     const timer = setTimeout(() => {
       if (onComplete) {
         onComplete();
       }
-    }, 200);
+    }, hitStopMs + 200);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(hitStopTimer);
+      clearTimeout(timer);
+    };
   }, [position, intensity, color, budget.max, onComplete]);
 
   // Render glow effect at explosion origin

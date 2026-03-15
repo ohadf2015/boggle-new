@@ -8,6 +8,7 @@ import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
+  updatePlayerScore,
 } from '../modules/gameStateManager.js';
 import {
   validateTargetGuess,
@@ -100,6 +101,11 @@ export function handleSubmitTargetWord(
     // Target found
     const result = recordTargetFound(huntState, username);
 
+    // Apply first-finder bonus to player's score
+    if (result.bonus > 0) {
+      updatePlayerScore(gameCode, username, result.bonus, true);
+    }
+
     socket.emit('wordHuntTargetResult', {
       guess,
       feedback,
@@ -166,7 +172,7 @@ export function handleSubmitTargetWord(
  */
 export function registerWordHuntHandlers(io: Server, socket: Socket): void {
   socket.on('submitTargetWord', (data: SubmitTargetWordPayload) => {
-    if (!checkRateLimit(socket.id, 1)) {
+    if (!checkRateLimit(socket.id, 5)) {
       socket.emit('rateLimited', { message: 'Too many guesses, slow down' });
       return;
     }

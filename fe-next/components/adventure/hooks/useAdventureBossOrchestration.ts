@@ -102,11 +102,12 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   const handleVictory = useCallback(() => {
     setBattleResult('victory');
 
-    // Determine boss tier for fireworks
+    // Determine boss tier based on world progression
+    // worldId 1-3 = mini, 4-6 = standard, 7+ = elite
     let tier: BossTier = 'mini';
-    if (levelNumber >= 20 || levelNumber % 20 === 0) {
+    if (worldId && worldId >= 7) {
       tier = 'elite';
-    } else if (levelNumber >= 15 || levelNumber % 15 === 0) {
+    } else if (worldId && worldId >= 4) {
       tier = 'standard';
     }
     setDefeatedBossTier(tier);
@@ -116,7 +117,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
       mini: 3500, standard: 5500, elite: 8500,
     };
     setTimeout(() => setShowBossFireworks(false), durations[tier]);
-  }, [levelNumber]);
+  }, [worldId]);
 
   // Defeat handler
   const handleDefeat = useCallback(() => {

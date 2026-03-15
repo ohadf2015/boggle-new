@@ -276,6 +276,8 @@ export interface WordHuntModeState {
   discoveryWordCount?: number;
   /** Timestamp of last wordHandler life broadcast (prevents double broadcast with timer) */
   lastLifeUpdateAt?: number;
+  /** Per-player timestamp of last clue broadcast (throttling) */
+  lastClueAt?: Record<string, number>;
 }
 
 // ==================== Tournament Types ====================

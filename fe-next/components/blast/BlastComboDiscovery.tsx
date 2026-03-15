@@ -14,8 +14,9 @@ export interface BlastComboDiscoveryProps {
 
 // ==================== Constants ====================
 
-const NORMAL_DISMISS_MS = 1800;
-const REDUCED_DISMISS_MS = 300;
+// Shortened from 1800ms — discovery should inform, not block gameplay
+const NORMAL_DISMISS_MS = 1200;
+const REDUCED_DISMISS_MS = 200;
 
 // ==================== Component ====================
 
@@ -48,8 +49,8 @@ export function BlastComboDiscovery({ pendingDiscovery, onComplete }: BlastCombo
         exit={{ opacity: 0 }}
         transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
       >
-        {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/60" />
+        {/* Backdrop — lighter to maintain game awareness */}
+        <div className="absolute inset-0 bg-black/40" />
 
         {/* Card */}
         <motion.div

@@ -1,6 +1,6 @@
 /**
  * Player Profile API Routes
- * Handles /api/player/:username — public profile endpoint
+ * Handles /api/player-profile/:id — public profile endpoint
  */
 
 import express, { Request, Response, Router } from 'express';
@@ -18,22 +18,22 @@ const PUBLIC_PROFILE_COLUMNS = [
 ].join(', ');
 
 /**
- * Validate username format
+ * Validate player ID format (UUID)
  */
-function isValidUsername(username: string): boolean {
-  return /^[a-zA-Z0-9_\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\u00C0-\u024F]{2,30}$/.test(username);
+function isValidPlayerId(id: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
 /**
- * GET /api/player/:username
- * Returns public profile data for a player
+ * GET /api/player-profile/:id
+ * Returns public profile data for a player by ID
  */
-router.get('/:username', async (req: Request, res: Response): Promise<void> => {
-  const { username } = req.params;
+router.get('/:id', async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
 
-  // Validate username
-  if (!username || !isValidUsername(username)) {
-    res.status(400).json({ error: 'INVALID_USERNAME', message: 'Invalid username format' });
+  // Validate player ID
+  if (!id || !isValidPlayerId(id)) {
+    res.status(400).json({ error: 'INVALID_PLAYER_ID', message: 'Invalid player ID format' });
     return;
   }
 
@@ -44,11 +44,11 @@ router.get('/:username', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // Fetch profile by username
+    // Fetch profile by ID
     const { data: profile, error } = await supabase
       .from('profiles')
       .select(PUBLIC_PROFILE_COLUMNS)
-      .eq('username', username)
+      .eq('id', id)
       .single();
 
     if (error || !profile) {
@@ -81,6 +81,7 @@ router.get('/:username', async (req: Request, res: Response): Promise<void> => {
     const memberSince = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
 
     const publicProfile = {
+      id: profile.id,
       username: profile.username,
       displayName: profile.display_name || profile.username,
       customAvatar: profile.avatar_config || null,
@@ -101,7 +102,7 @@ router.get('/:username', async (req: Request, res: Response): Promise<void> => {
 
     res.json(publicProfile);
   } catch (err) {
-    logger.error('PLAYER_PROFILE', `Error fetching profile for ${username}`, err);
+    logger.error('PLAYER_PROFILE', `Error fetching profile for ${id}`, err);
     res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Failed to fetch profile' });
   }
 });
