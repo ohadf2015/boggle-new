@@ -106,7 +106,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayC
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            {t('landing.playNowFree')}
+            {t('landing.letsPlay')}
           </motion.button>
         </div>
 

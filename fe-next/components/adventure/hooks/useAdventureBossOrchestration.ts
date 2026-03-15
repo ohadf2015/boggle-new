@@ -62,6 +62,10 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   const [showEdgeVignette, setShowEdgeVignette] = useState(false);
   const vignetteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Boss grid effect state (triggered on phase transitions)
+  const [gridEffectTrigger, setGridEffectTrigger] = useState<{ name: string; id: number } | null>(null);
+  const gridEffectIdRef = useRef(0);
+
   // Attack handler — applies boss attacks to the game (with upgrade effects)
   const handleAttack = useCallback((attack: BossAttack) => {
     // Block first attack (Armor Plating T3)
@@ -87,6 +91,10 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
       const reducedDamage = Math.floor(attack.damage * bossDamageMultiplier);
       playerHealth.takeDamage(reducedDamage);
       shake(2);
+    } else if (attack.type === 'gridEffect' && attack.gridEffect) {
+      gridEffectIdRef.current += 1;
+      setGridEffectTrigger({ name: attack.gridEffect, id: gridEffectIdRef.current });
+      shake(3);
     }
   }, [addTime, shake, playerHealth, bossDamageMultiplier, blockFirstAttack, scrambleImmunity]);
 
@@ -304,5 +312,8 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
 
     // Edge vignette flash on boss attacks
     showEdgeVignette,
+
+    // Boss grid effect (phase transition visual)
+    gridEffectTrigger,
   };
 }

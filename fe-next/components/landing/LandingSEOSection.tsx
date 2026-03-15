@@ -1,50 +1,33 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { motion, type Variants } from 'framer-motion';
-import { Swords, CalendarDays, Map, Globe, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
+import {
+  Swords, CalendarDays, Map, Sparkles, ChevronDown, Plus, Minus,
+  Smartphone, BookOpen, Users, Zap,
+} from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
 /* ── Animation variants ─────────────────────────────────── */
 
 const easeOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
-const easeOutQuart: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
-// SSR-safe variants: initial state is visible (opacity: 1) so crawlers
-// that don't execute JS still see the content. The whileInView animation
-// enhances the experience for real users without gating visibility.
+// SSR-safe: initial = visible for crawlers
 const sectionReveal: Variants = {
   hidden: { opacity: 1, y: 0 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: easeOut },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: easeOut } },
 };
 
 const staggerContainer: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.08 } },
 };
 
 const staggerItem: Variants = {
   hidden: { opacity: 1, y: 0, scale: 1 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.45, ease: easeOutQuart },
-  },
-};
-
-const stepItem: Variants = {
-  hidden: { opacity: 1, x: 0 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.4, ease: easeOut },
-  },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: easeOut } },
 };
 
 /* ── Scroll indicator (bouncing chevron) ────────────────── */
@@ -57,9 +40,6 @@ export function ScrollIndicator() {
       animate={{ opacity: 1 }}
       transition={{ delay: 1.2, duration: 0.6 }}
     >
-      <span className="text-xs font-bold uppercase tracking-wider text-neo-black/40 dark:text-neo-white/40">
-        {/* Intentionally no t() — decorative scroll cue, not content */}
-      </span>
       <motion.div
         animate={{ y: [0, 6, 0] }}
         transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
@@ -70,14 +50,108 @@ export function ScrollIndicator() {
   );
 }
 
-/* ── Feature data ───────────────────────────────────────── */
+/* ── Game mode cards ────────────────────────────────────── */
 
-const FEATURES = [
-  { icon: Swords, titleKey: 'landing.seo.feature1Title', descKey: 'landing.seo.feature1Desc', fallbackTitle: 'Real-Time Multiplayer', fallbackDesc: 'Compete head-to-head with 2-20 players simultaneously.', color: 'from-neo-pink to-pink-400' },
-  { icon: CalendarDays, titleKey: 'landing.seo.feature2Title', descKey: 'landing.seo.feature2Desc', fallbackTitle: 'Daily Challenges', fallbackDesc: 'Same puzzle for everyone worldwide, every day.', color: 'from-neo-yellow to-amber-400' },
-  { icon: Map, titleKey: 'landing.seo.feature3Title', descKey: 'landing.seo.feature3Desc', fallbackTitle: 'Adventure Mode', fallbackDesc: '100 levels across 10 themed worlds.', color: 'from-neo-lime to-lime-400' },
-  { icon: Globe, titleKey: 'landing.seo.feature4Title', descKey: 'landing.seo.feature4Desc', fallbackTitle: '5 Languages', fallbackDesc: 'Play in English, Hebrew, Swedish, Japanese, or Spanish.', color: 'from-neo-cyan to-cyan-400' },
+const GAME_MODES = [
+  {
+    icon: Swords,
+    titleKey: 'landing.seo.feature1Title',
+    tagKey: 'landing.seo.modeTagMultiplayer',
+    fallbackTitle: 'Real-Time Multiplayer',
+    fallbackTag: '2-20 players',
+    color: 'from-neo-pink to-pink-400',
+    rotate: -2,
+  },
+  {
+    icon: CalendarDays,
+    titleKey: 'landing.seo.feature2Title',
+    tagKey: 'landing.seo.modeTagDaily',
+    fallbackTitle: 'Daily Challenges',
+    fallbackTag: 'New puzzle daily',
+    color: 'from-neo-yellow to-amber-400',
+    rotate: 1.5,
+  },
+  {
+    icon: Map,
+    titleKey: 'landing.seo.feature3Title',
+    tagKey: 'landing.seo.modeTagAdventure',
+    fallbackTitle: 'Adventure Mode',
+    fallbackTag: '100 levels',
+    color: 'from-neo-lime to-lime-400',
+    rotate: -1,
+  },
+  {
+    icon: Sparkles,
+    titleKey: 'landing.seo.feature4TitleShort',
+    tagKey: 'landing.seo.modeTagBlast',
+    fallbackTitle: 'Blast Mode',
+    fallbackTag: 'Chain reactions',
+    color: 'from-neo-cyan to-cyan-400',
+    rotate: 2,
+  },
 ] as const;
+
+/* ── How to Play steps ──────────────────────────────────── */
+
+const STEP_COLORS = ['bg-neo-pink', 'bg-neo-yellow', 'bg-neo-lime', 'bg-neo-cyan'];
+const STEP_EMOJIS = ['👆', '🔤', '🔥', '🏆'];
+
+/* ── FAQ Accordion item ─────────────────────────────────── */
+
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <motion.div
+      className={cn(
+        'border-3 border-neo-black rounded-neo overflow-hidden',
+        'bg-neo-navy/50 dark:bg-neo-white/5',
+        'transition-colors duration-200',
+        open && 'shadow-hard-sm'
+      )}
+      variants={staggerItem}
+    >
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          'w-full flex items-center justify-between gap-3 p-3 sm:p-4',
+          'text-start font-bold text-sm sm:text-base text-neo-white',
+          'hover:bg-neo-white/5 transition-colors'
+        )}
+        aria-expanded={open}
+      >
+        <span>{question}</span>
+        <motion.span
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="shrink-0"
+        >
+          {open ? (
+            <Minus className="w-4 h-4 text-neo-pink" />
+          ) : (
+            <Plus className="w-4 h-4 text-neo-lime" />
+          )}
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: easeOut }}
+            className="overflow-hidden"
+          >
+            <p className="px-3 sm:px-4 pb-3 sm:pb-4 text-sm text-neo-white/70 leading-relaxed">
+              {answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+/* ── Blog data ──────────────────────────────────────────── */
 
 const BLOG_LINKS = [
   { slug: 'science-behind-word-games', key: 'blog.scienceTitle', fallback: 'The Science Behind Word Games', category: 'Science', color: 'bg-neo-lime' },
@@ -86,6 +160,15 @@ const BLOG_LINKS = [
   { slug: 'word-games-for-brain-training', key: 'blog.brainTrainingTitle', fallback: 'Word Games for Brain Training', category: 'Brain Health', color: 'bg-neo-cyan' },
   { slug: 'best-boggle-alternatives-2026', key: 'blog.alternativesTitle', fallback: 'Best Boggle Alternatives 2026', category: 'Reviews', color: 'bg-neo-orange' },
   { slug: 'improve-word-game-skills', key: 'blog.improveTitle', fallback: 'Improve Your Word Game Skills', category: 'Strategy', color: 'bg-neo-purple' },
+] as const;
+
+/* ── Highlight pills (replaces "Who Can Play" wall of text) */
+
+const HIGHLIGHTS = [
+  { icon: Smartphone, key: 'landing.seo.highlightMobile', fallback: 'Any device, any browser', color: 'border-neo-pink' },
+  { icon: Users, key: 'landing.seo.highlightAges', fallback: 'Ages 6+', color: 'border-neo-yellow' },
+  { icon: BookOpen, key: 'landing.seo.highlightEdu', fallback: 'Used in classrooms', color: 'border-neo-lime' },
+  { icon: Zap, key: 'landing.seo.highlightNoSignup', fallback: 'No signup needed', color: 'border-neo-cyan' },
 ] as const;
 
 /* ── Main component ─────────────────────────────────────── */
@@ -105,198 +188,175 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
   ];
 
   return (
-    <section className={cn("w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 sm:pb-12 relative z-20", className)}>
+    <section className={cn('w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 sm:pb-12 relative z-20', className)}>
 
-      {/* ── What is LexiClash ────────────────────────────── */}
+      {/* ── What is LexiClash — short & punchy ────────── */}
       <motion.div
-        className="mb-8 sm:mb-10"
+        className="mb-10 sm:mb-12 text-center"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-white mb-3 neo-title">
           {t('landing.seo.whatIsTitle')}
         </h2>
-        <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
-          {t('landing.seo.whatIsContent')}
+        <p className="text-sm sm:text-base text-neo-white/75 leading-relaxed max-w-2xl mx-auto">
+          {t('landing.seo.whatIsShort')}
         </p>
       </motion.div>
 
-      {/* ── Feature Highlights (staggered grid) ──────────── */}
+      {/* ── Game Modes — visual cards, not paragraphs ── */}
       <motion.div
-        className="mb-8 sm:mb-10"
+        className="mb-10 sm:mb-12"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
+        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-5 neo-title-sm">
           {t('landing.seo.featuresTitle')}
         </h2>
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          {FEATURES.map(({ icon: Icon, titleKey, descKey, fallbackTitle, fallbackDesc, color }) => (
+          {GAME_MODES.map(({ icon: Icon, titleKey, tagKey, fallbackTitle, fallbackTag, color, rotate }) => (
             <motion.div
               key={titleKey}
               variants={staggerItem}
+              whileHover={{ y: -6, rotate: 0, scale: 1.04, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
               className={cn(
-                'p-4 rounded-neo border-3 border-neo-black shadow-hard-sm',
+                'p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-sm',
                 'bg-gradient-to-br', color,
-                'hover:shadow-hard hover:-translate-y-0.5 transition-all duration-200'
+                'flex flex-col items-center text-center gap-2',
+                'cursor-default select-none'
               )}
+              style={{ transform: `rotate(${rotate}deg)` }}
             >
-              <div className="flex items-start gap-3">
-                <Icon className="w-6 h-6 text-neo-black shrink-0 mt-0.5" aria-hidden="true" />
-                <div>
-                  <h3 className="font-bold text-neo-black text-sm sm:text-base">{t(titleKey) || fallbackTitle}</h3>
-                  <p className="text-sm text-neo-black/70 mt-1">{t(descKey) || fallbackDesc}</p>
-                </div>
-              </div>
+              <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black" aria-hidden="true" />
+              <h3 className="font-black text-neo-black text-xs sm:text-sm uppercase leading-tight">
+                {t(titleKey) || fallbackTitle}
+              </h3>
+              <span className={cn(
+                'text-[10px] sm:text-xs font-bold text-neo-black/60 uppercase tracking-wider'
+              )}>
+                {t(tagKey) || fallbackTag}
+              </span>
             </motion.div>
           ))}
         </motion.div>
       </motion.div>
 
-      {/* ── How to Play (staggered steps) ────────────────── */}
+      {/* ── How to Play — horizontal step pills ─────── */}
       <motion.div
-        className="mb-8 sm:mb-10"
+        className="mb-10 sm:mb-12"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
+        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-5 neo-title-sm">
           {t('landing.seo.howToPlayTitle')}
         </h2>
-        <motion.ol
-          className="space-y-2 sm:space-y-3 max-w-2xl"
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
           {steps.map((step, i) => (
-            <motion.li key={i} variants={stepItem} className="flex items-center gap-3">
+            <motion.div
+              key={i}
+              variants={staggerItem}
+              className={cn(
+                'flex flex-col items-center gap-2 p-3 sm:p-4',
+                'rounded-neo border-3 border-neo-black shadow-hard-sm',
+                STEP_COLORS[i],
+                'text-center'
+              )}
+            >
+              <span className="text-2xl" role="img" aria-hidden="true">{STEP_EMOJIS[i]}</span>
               <span className={cn(
-                'shrink-0 w-8 h-8 flex items-center justify-center',
-                'bg-neo-purple text-neo-white font-black text-sm',
-                'border-2 border-neo-black rounded-neo shadow-hard-xs'
+                'w-6 h-6 flex items-center justify-center',
+                'bg-neo-black text-neo-white font-black text-xs rounded-full'
               )}>
                 {i + 1}
               </span>
-              <span className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 font-medium">
+              <span className="text-xs sm:text-sm font-bold text-neo-black leading-tight">
                 {step}
               </span>
-            </motion.li>
+            </motion.div>
           ))}
-        </motion.ol>
+        </motion.div>
       </motion.div>
 
-      {/* ── Who Can Play ──────────────────────────────────── */}
+      {/* ── Highlight pills (replaces Who Can Play + Education) */}
       <motion.div
-        className="mb-8 sm:mb-10"
+        className="mb-10 sm:mb-12"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.whoCanPlayTitle')}
-        </h2>
-        <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
-          {t('landing.seo.whoCanPlayContent')}
-        </p>
-      </motion.div>
-
-      {/* ── Game Modes Explained ──────────────────────────── */}
-      <motion.div
-        className="mb-8 sm:mb-10"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
-          {t('landing.seo.gameModesTitle')}
-        </h2>
-        <div className="space-y-3 max-w-3xl">
-          {[
-            { key: 'gameModesMultiplayer', fallback: 'Multiplayer Rooms — Create a private room and share the code with up to 20 friends.' },
-            { key: 'gameModesSingle', fallback: 'Single Player vs. Bots — Practice your word-finding skills against AI opponents.' },
-            { key: 'gameModesDaily', fallback: 'Daily Challenge — A fresh puzzle every day, identical for all players worldwide.' },
-            { key: 'gameModesAdventure', fallback: 'Adventure Mode — Journey through 10 themed worlds with 100 levels.' },
-          ].map(({ key, fallback }) => (
-            <p key={key} className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed">
-              {t(`landing.seo.${key}`) || fallback}
-            </p>
+        <motion.div
+          className="flex flex-wrap justify-center gap-3"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-30px' }}
+        >
+          {HIGHLIGHTS.map(({ icon: Icon, key, fallback, color }) => (
+            <motion.div
+              key={key}
+              variants={staggerItem}
+              className={cn(
+                'inline-flex items-center gap-2 px-4 py-2',
+                'rounded-neo border-3 border-neo-black shadow-hard-xs',
+                'bg-neo-navy', color,
+                'text-neo-white font-bold text-xs sm:text-sm uppercase tracking-wide'
+              )}
+            >
+              <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+              {t(key) || fallback}
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </motion.div>
 
-      {/* ── Built for Learning ────────────────────────────── */}
+      {/* ── FAQ — Accordion ─────────────────────────── */}
       <motion.div
-        className="mb-8 sm:mb-10"
+        className="mb-10 sm:mb-12"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.educationTitle')}
-        </h2>
-        <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
-          {t('landing.seo.educationContent')}
-        </p>
-      </motion.div>
-
-      {/* ── FAQ Section ───────────────────────────────────── */}
-      <motion.div
-        className="mb-8 sm:mb-10"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
+        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-5 neo-title-sm">
           {t('landing.seo.faqTitle')}
         </h2>
-        <dl className="space-y-4 max-w-3xl">
+        <motion.div
+          className="space-y-2 max-w-2xl mx-auto"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-30px' }}
+        >
           {[1, 2, 3, 4, 5].map((n) => (
-            <div key={n}>
-              <dt className="text-sm sm:text-base font-bold text-neo-black dark:text-neo-white mb-1">
-                {t(`landing.seo.faq${n}Q`) || `Question ${n}`}
-              </dt>
-              <dd className="text-sm sm:text-base text-neo-black/75 dark:text-neo-white/75 leading-relaxed">
-                {t(`landing.seo.faq${n}A`) || `Answer ${n}`}
-              </dd>
-            </div>
+            <FAQItem
+              key={n}
+              question={t(`landing.seo.faq${n}Q`) || `Question ${n}`}
+              answer={t(`landing.seo.faq${n}A`) || `Answer ${n}`}
+            />
           ))}
-        </dl>
+        </motion.div>
       </motion.div>
 
-      {/* ── Community ─────────────────────────────────────── */}
-      <motion.div
-        className="mb-8 sm:mb-10"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
-          {t('landing.seo.communityTitle')}
-        </h2>
-        <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
-          {t('landing.seo.communityContent')}
-        </p>
-      </motion.div>
-
-      {/* ── Blog Links ───────────────────────────────────── */}
+      {/* ── Blog Links (kept as-is) ────────────────── */}
       <motion.div
         variants={sectionReveal}
         initial="hidden"
@@ -304,7 +364,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         viewport={{ once: true, margin: '-40px' }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg sm:text-xl font-black uppercase text-neo-black dark:text-neo-white">
+          <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white">
             {t('landing.seo.blogTitle')}
           </h2>
           <Link

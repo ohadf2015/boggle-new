@@ -17,6 +17,7 @@ import {
   submitReport,
   getCreatorBoards,
   getFeaturedBoards,
+  uploadBoardCoverImage,
   type GalleryParams,
 } from '../modules/supabase/ugcBoards';
 import {
@@ -291,6 +292,7 @@ router.post('/publish', async (req: Request, res: Response): Promise<void> => {
       difficulty: difficulty ?? 'MEDIUM',
       timer_seconds: resolvedTimer,
       is_public: isPublic ?? true,
+      cover_image_url: null,
     });
 
     res.status(201).json({ boardCode: board.board_code, board });
@@ -298,6 +300,83 @@ router.post('/publish', async (req: Request, res: Response): Promise<void> => {
     const err = error as Error;
     logger.error('UGC', `publish error: ${err.message}`);
     res.status(500).json({ error: 'Failed to publish board' });
+  }
+});
+
+// ---- Image upload constants ----
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+const MAGIC_BYTES: Record<string, number[][]> = {
+  'image/jpeg': [[0xFF, 0xD8, 0xFF]],
+  'image/png': [[0x89, 0x50, 0x4E, 0x47]],
+  'image/webp': [[0x52, 0x49, 0x46, 0x46]],
+};
+
+function validateMagicBytes(buffer: Buffer, declaredType: string): boolean {
+  const signatures = MAGIC_BYTES[declaredType];
+  if (!signatures) return false;
+  return signatures.some(sig =>
+    sig.every((byte, i) => buffer.length > i && buffer[i] === byte)
+  );
+}
+
+/**
+ * POST /:boardCode/cover-image
+ * Upload a cover image for a board. Requires auth + board ownership.
+ */
+router.post('/:boardCode/cover-image', express.raw({ type: ALLOWED_MIME_TYPES, limit: '2mb' }), async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = await getAuthUser(req);
+    if (!user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    const { boardCode } = req.params;
+    if (!isValidPuzzleCode(boardCode)) {
+      res.status(400).json({ error: 'Invalid board code format' });
+      return;
+    }
+
+    const contentType = req.headers['content-type'] ?? '';
+    if (!ALLOWED_MIME_TYPES.includes(contentType)) {
+      res.status(400).json({ error: `Unsupported image type. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}` });
+      return;
+    }
+
+    const buffer = req.body as Buffer;
+    if (!buffer || buffer.length === 0) {
+      res.status(400).json({ error: 'No image data received' });
+      return;
+    }
+
+    if (buffer.length > MAX_IMAGE_SIZE) {
+      res.status(400).json({ error: 'Image too large. Maximum size is 2MB' });
+      return;
+    }
+
+    if (!validateMagicBytes(buffer, contentType)) {
+      res.status(400).json({ error: 'File content does not match declared type' });
+      return;
+    }
+
+    const board = await getBoardByCode(boardCode);
+    if (!board) {
+      res.status(404).json({ error: 'Board not found' });
+      return;
+    }
+    if (board.creator_id !== user.id) {
+      res.status(403).json({ error: 'You can only upload images to your own boards' });
+      return;
+    }
+
+    const publicUrl = await uploadBoardCoverImage(user.id, boardCode, buffer, contentType);
+    res.json({ coverImageUrl: publicUrl });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('UGC', `cover-image upload error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to upload image' });
   }
 });
 

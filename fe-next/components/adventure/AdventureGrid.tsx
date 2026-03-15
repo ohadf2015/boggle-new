@@ -21,6 +21,8 @@ import './AdventureTile.css';
 import { useGridGestures } from './useGridGestures';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+import { useBossGridEffect } from '@/hooks/useBossGridEffect';
+import './BossGridEffectStyles.css';
 
 // ==============================================
 // TYPES
@@ -63,6 +65,8 @@ interface AdventureGridProps {
   onCascadeComplete?: () => void;
   /** Indices of tiles to highlight as hint */
   hintHighlightIndices?: number[];
+  /** Boss grid effect (CSS-driven visual disruption) */
+  bossGridEffect?: { name: string; id: number } | null;
 }
 
 // ==============================================
@@ -108,6 +112,7 @@ const AdventureGrid = memo(
         showCascade = false,
         onCascadeComplete,
         hintHighlightIndices = [],
+        bossGridEffect,
       },
       ref
     ) => {
@@ -137,6 +142,9 @@ const AdventureGrid = memo(
 
       // Device performance detection for adaptive animations
       const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
+
+      // Boss grid effect (CSS-driven, no per-tile state)
+      const { gridClass: bossGridClass } = useBossGridEffect(bossGridEffect ?? null, prefersReducedMotion);
 
       // Sparkle state for selection feedback
       const [sparkleState, setSparkleState] = useState<{
@@ -342,6 +350,7 @@ const AdventureGrid = memo(
           onMouseUp={interactive ? handleMouseUp : undefined}
           /* touchmove registered as native non-passive listener in useGridGestures */
           onTouchEnd={interactive ? handleMouseUp : undefined}
+          data-boss-effect={bossGridEffect?.name ?? undefined}
           style={{
             padding: GRID_PADDING,
             gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
@@ -353,9 +362,13 @@ const AdventureGrid = memo(
             'adventure-grid',
             'relative grid flex-1',
             GRID_GAP_CLASS,
-            'bg-neo-cream rounded-neo',
+            // Board visual treatment: dark inset background, neo-brutalist border, rounded container
+            'bg-black/30 rounded-neo-lg',
+            'border-2 border-black/50',
+            'shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)]',
             'select-none touch-none',
-            disabled && 'adventure-grid-disabled pointer-events-none'
+            disabled && 'adventure-grid-disabled pointer-events-none',
+            bossGridClass,
           )}
         >
           <AnimatePresence mode="popLayout">

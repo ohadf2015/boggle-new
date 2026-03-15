@@ -78,6 +78,11 @@ function makeHookReturn(overrides: Partial<UseBoardCreatorReturn> = {}): UseBoar
     publishError: null,
     publishedBoard: null,
     publishBoard: jest.fn().mockResolvedValue(undefined),
+    coverImage: null,
+    coverImagePreview: null,
+    setCoverImage: jest.fn(),
+    isUploadingImage: false,
+    imageUploadError: null,
     ...overrides,
   };
 }

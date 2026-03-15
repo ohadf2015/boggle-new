@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ImagePlus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBoardCreator, type UseBoardCreatorReturn } from '@/hooks/useBoardCreator';
@@ -171,6 +172,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
 
 function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
   const { t } = useLanguage();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     generatedBoard,
     gridSize,
@@ -183,6 +185,10 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
     shuffleBoard,
     isGenerating,
     setStep,
+    coverImagePreview,
+    setCoverImage,
+    isUploadingImage,
+    imageUploadError,
   } = creator;
 
   const handlePublish = useCallback(() => { void publishBoard(); }, [publishBoard]);
@@ -285,6 +291,62 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
         />
       </div>
 
+      {/* Cover Image Upload */}
+      <div className="flex flex-col gap-2">
+        <label className="font-neo-body text-sm text-neo-white/80">
+          {t('ugc.board.coverImage')}
+        </label>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          data-testid="cover-image-input"
+          onChange={e => {
+            const file = e.target.files?.[0] ?? null;
+            setCoverImage(file);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+          }}
+        />
+        {coverImagePreview ? (
+          <div className="relative">
+            <img
+              src={coverImagePreview}
+              alt={t('ugc.board.coverImageAlt')}
+              data-testid="cover-image-preview"
+              className="w-full h-40 object-cover rounded-neo border-neo border-black"
+            />
+            <button
+              data-testid="remove-cover-image"
+              onClick={() => setCoverImage(null)}
+              className="absolute top-2 end-2 bg-black/70 text-white rounded-full p-1 hover:bg-black transition-colors"
+              aria-label={t('ugc.board.removeCoverImage')}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        ) : (
+          <button
+            data-testid="add-cover-image"
+            onClick={() => fileInputRef.current?.click()}
+            className={cn(
+              'w-full h-32 border-2 border-dashed border-neo-white/30 rounded-neo',
+              'flex flex-col items-center justify-center gap-2',
+              'text-neo-white/50 hover:text-neo-white/70 hover:border-neo-white/50',
+              'transition-colors cursor-pointer'
+            )}
+          >
+            <ImagePlus size={24} />
+            <span className="font-neo-body text-xs">{t('ugc.board.addCoverImage')}</span>
+          </button>
+        )}
+        {imageUploadError && (
+          <p data-testid="image-upload-error" className="text-neo-red font-neo-body text-xs">
+            {imageUploadError}
+          </p>
+        )}
+      </div>
+
       {/* Publish error */}
       {publishError && (
         <p data-testid="publish-error" className="text-neo-red font-neo-body text-sm">
@@ -300,10 +362,10 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
         <NeoButton
           data-testid="publish-btn"
           onClick={handlePublish}
-          disabled={isPublishing}
+          disabled={isPublishing || isUploadingImage}
           className="bg-neo-lime text-black"
         >
-          {isPublishing ? '...' : t('ugc.board.publish')}
+          {isPublishing || isUploadingImage ? '...' : t('ugc.board.publish')}
         </NeoButton>
       </div>
     </div>
@@ -392,7 +454,13 @@ function PublishedStep({ creator }: { creator: UseBoardCreatorReturn }) {
  * Steps: configure (live grid) → preview → published
  */
 export function BoardCreatorWizard() {
+  const { language: appLanguage } = useLanguage();
   const creator = useBoardCreator();
+
+  // Sync board language with app locale
+  useEffect(() => {
+    creator.setLanguage(appLanguage);
+  }, [appLanguage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen bg-neo-navy p-4 md:p-8">

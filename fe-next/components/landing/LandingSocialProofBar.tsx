@@ -33,11 +33,6 @@ function AnimatedNumber({ value, className }: { value: number; className?: strin
   return <span ref={ref} className={cn('tabular-nums', className)}>0</span>;
 }
 
-interface SocialProofPill {
-  label: string;
-  value: number;
-}
-
 interface LandingSocialProofBarProps {
   activePlayers: number;
   gamesToday: number;
@@ -48,26 +43,20 @@ interface LandingSocialProofBarProps {
 export function LandingSocialProofBar({
   activePlayers,
   gamesToday,
-  gameModes,
-  languages,
 }: LandingSocialProofBarProps) {
   const { t } = useLanguage();
 
-  const pills: SocialProofPill[] = [];
+  const pills: { label: string; value: number }[] = [];
 
-  // Static — always show
-  pills.push({ label: t('landing.gameModes'), value: gameModes });
-  pills.push({ label: t('landing.languages'), value: languages });
-
-  // Dynamic — threshold gated
-  if (gamesToday > 100) {
-    pills.push({ label: t('landing.gamesToday'), value: gamesToday });
-  }
+  // Only show dynamic, meaningful stats
   if (activePlayers > 10) {
     pills.push({ label: t('landing.activePlayers'), value: activePlayers });
   }
+  if (gamesToday > 100) {
+    pills.push({ label: t('landing.gamesToday'), value: gamesToday });
+  }
 
-  if (pills.length < 2) return null;
+  if (pills.length === 0) return null;
 
   return (
     <motion.div

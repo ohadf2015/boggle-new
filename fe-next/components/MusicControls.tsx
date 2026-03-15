@@ -53,7 +53,7 @@ const MusicControls: React.FC = memo(() => {
   }, [hapticsEnabled, setHapticsEnabled]);
 
   // Responsive icon class for consistent sizing with button
-  const iconClass = "w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6";
+  const iconClass = "w-[18px] h-[18px]";
 
   // Memoized volume icon
   const volumeIcon = useMemo(() => {
@@ -122,7 +122,7 @@ const MusicControls: React.FC = memo(() => {
         variant="outline"
         size="icon"
         onClick={handleClick}
-        className={`relative w-11 h-11 min-w-[44px] min-h-[44px] sm:w-11 sm:h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14 border-2 sm:border-3 lg:border-3 2xl:border-3 rounded-neo lg:rounded-neo shadow-hard-sm sm:shadow-hard lg:shadow-hard 2xl:shadow-hard-lg flex-shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream text-neo-black'}`}
+        className={`relative flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] border-3 border-neo-black dark:border-slate-500 rounded-neo shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all duration-100 flex-shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white'}`}
         aria-label={hasMounted ? (isMuted ? (t('music.unmute')) : (t('music.mute'))) : (t('music.mute'))}
         aria-pressed={hasMounted ? !isMuted : true}
         title={hasMounted ? (isMuted ? (t('music.soundOff')) : (t('music.soundOn'))) : (t('music.sound'))}

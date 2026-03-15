@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3581,
+    "totalKeysInCode": 3612,
     "keyCountByLanguage": {
-      "en": 6013,
-      "he": 6039,
-      "sv": 6072,
-      "ja": 6059,
-      "es": 6037
+      "en": 6069,
+      "he": 6095,
+      "sv": 6128,
+      "ja": 6115,
+      "es": 6093
     },
-    "missingFromEnglish": 1,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -167,17 +167,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "back",
-      "usages": [
-        {
-          "file": "app/[locale]/community/PageClient.tsx",
-          "line": 41
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "avatarBuilder.gender",

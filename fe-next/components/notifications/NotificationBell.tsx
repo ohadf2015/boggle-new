@@ -66,14 +66,19 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       <button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         className="
-          relative p-2 rounded-lg
-          text-neo-white/70 hover:text-neo-white
-          hover:bg-white/10 transition-colors
-          focus:outline-none focus:ring-2 focus:ring-neo-yellow/50
+          relative flex items-center justify-center
+          w-10 h-10
+          bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white
+          border-3 border-neo-black dark:border-slate-500
+          rounded-neo shadow-hard-sm
+          hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-yellow/30
+          active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+          transition-all duration-100
+          focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
         "
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >
-        <Bell size={22} />
+        <Bell size={18} />
 
         {/* Unread badge */}
         {unreadCount > 0 && (

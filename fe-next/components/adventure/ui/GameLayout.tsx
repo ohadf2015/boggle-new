@@ -51,19 +51,33 @@ export const GameLayout = memo(function GameLayout({
         {header}
       </div>
 
-      {/* Main Content Area - Takes remaining height, no scroll */}
-      <div className="flex-1 min-h-0 flex flex-col lg:flex-row relative">
+      {/*
+        Main Content Area — takes remaining height, no scroll.
+        Layout stack:
+          - portrait mobile/tablet: column (grid on top, sidebar strip below)
+          - landscape mobile:       row (grid left, sidebar right — same as desktop)
+          - desktop (lg+):          row (grid left, sidebar right)
+        Landscape detection uses the `landscape` Tailwind variant which maps to
+        the @media (orientation: landscape) query.
+      */}
+      <div className="flex-1 min-h-0 flex flex-col landscape:flex-row lg:flex-row relative">
         {/* Grid Area - Main gameplay space, takes priority */}
         <div className="flex-1 min-h-0 relative overflow-hidden">
           {gridArea}
         </div>
 
-        {/* Sidebar - Bottom on mobile (compact), right on desktop */}
+        {/* Sidebar
+            - Portrait mobile:  h-16 (64px) compact chip bar
+            - Portrait tablet:  h-20 (80px) slightly taller
+            - Landscape mobile: full height, w-56 column (mirrors desktop)
+            - Desktop (lg+):    full height, w-64 / xl:w-72
+        */}
         <div
           className={cn(
             'flex-shrink-0',
-            // Mobile: fixed 96px (h-24) chip bar; desktop: full sidebar height
-            'h-24 lg:h-full lg:w-64 xl:w-72',
+            'h-16 md:h-20',
+            'landscape:h-full landscape:w-56',
+            'lg:h-full lg:w-64 xl:w-72',
             'overflow-hidden lg:overflow-y-auto',
             'z-10'
           )}

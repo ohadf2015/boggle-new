@@ -30,6 +30,7 @@ export interface CommunityBoard {
   rating_sum: number;
   rating_count: number;
   featured: boolean;
+  cover_image_url: string | null;
   created_at: string;
 }
 
@@ -277,6 +278,46 @@ export async function getFeaturedBoards(limit: number): Promise<CommunityBoard[]
   }
 
   return (data ?? []) as CommunityBoard[];
+}
+
+export async function uploadBoardCoverImage(
+  userId: string,
+  boardCode: string,
+  buffer: Buffer,
+  contentType: string
+): Promise<string> {
+  const supabase = requireSupabase();
+
+  const ext = contentType === 'image/png' ? 'png' : contentType === 'image/webp' ? 'webp' : 'jpg';
+  const path = `${userId}/${boardCode}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('board-covers')
+    .upload(path, buffer, { contentType, upsert: true });
+
+  if (uploadError) {
+    logger.error('UGC', `uploadBoardCoverImage storage error: ${uploadError.message}`);
+    throw new Error(`Failed to upload image: ${uploadError.message}`);
+  }
+
+  const { data: urlData } = supabase.storage
+    .from('board-covers')
+    .getPublicUrl(path);
+
+  const publicUrl = urlData.publicUrl;
+
+  const { error: updateError } = await supabase
+    .from('community_boards')
+    .update({ cover_image_url: publicUrl })
+    .eq('board_code', boardCode)
+    .eq('creator_id', userId);
+
+  if (updateError) {
+    logger.error('UGC', `uploadBoardCoverImage update error: ${updateError.message}`);
+    throw new Error(`Failed to update board: ${updateError.message}`);
+  }
+
+  return publicUrl;
 }
 
 export async function getBoardLeaderboard(

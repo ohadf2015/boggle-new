@@ -19,6 +19,7 @@ jest.mock('../../modules/supabase/ugcBoards', () => ({
   getCreatorBoards: jest.fn(),
   getFeaturedBoards: jest.fn(),
   getBoardLeaderboard: jest.fn(),
+  uploadBoardCoverImage: jest.fn(),
 }));
 
 // ---- Mock grid generation & solver ----
@@ -79,6 +80,7 @@ import {
   submitReport,
   getCreatorBoards,
   getFeaturedBoards,
+  uploadBoardCoverImage,
 } from '../../modules/supabase/ugcBoards';
 
 import ugcBoardsRouter from '../ugcBoards';
@@ -111,6 +113,7 @@ const MOCK_BOARD = {
   rating_sum: 85,
   rating_count: 20,
   featured: false,
+  cover_image_url: null,
   created_at: '2026-03-14T00:00:00Z',
 };
 
@@ -575,5 +578,122 @@ describe('GET /api/ugc/boards/featured', () => {
     const res = await request(app).get('/api/ugc/boards/featured');
 
     expect(res.headers['cache-control']).toContain('300');
+  });
+});
+
+// ============================================================
+// POST /:boardCode/cover-image
+// ============================================================
+
+// JPEG magic bytes: FF D8 FF
+const JPEG_BUFFER = Buffer.from([0xFF, 0xD8, 0xFF, 0xE0, ...Array(100).fill(0)]);
+// PNG magic bytes: 89 50 4E 47
+const PNG_BUFFER = Buffer.from([0x89, 0x50, 0x4E, 0x47, ...Array(100).fill(0)]);
+
+describe('POST /api/ugc/boards/:boardCode/cover-image', () => {
+  it('uploads image and returns public URL for board owner', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (uploadBoardCoverImage as jest.Mock).mockResolvedValue('https://storage.example.com/board-covers/user-456/abc12345.jpg');
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/cover-image')
+      .set('Authorization', AUTH_HEADER)
+      .set('Content-Type', 'image/jpeg')
+      .send(JPEG_BUFFER);
+
+    expect(res.status).toBe(200);
+    expect(res.body.coverImageUrl).toBe('https://storage.example.com/board-covers/user-456/abc12345.jpg');
+    expect(uploadBoardCoverImage).toHaveBeenCalledWith(
+      'user-456', 'abc12345', expect.any(Buffer), 'image/jpeg'
+    );
+  });
+
+  it('accepts PNG images', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (uploadBoardCoverImage as jest.Mock).mockResolvedValue('https://storage.example.com/board-covers/user-456/abc12345.png');
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/cover-image')
+      .set('Authorization', AUTH_HEADER)
+      .set('Content-Type', 'image/png')
+      .send(PNG_BUFFER);
+
+    expect(res.status).toBe(200);
+    expect(res.body.coverImageUrl).toContain('.png');
+  });
+
+  it('returns 401 without auth', async () => {
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/cover-image')
+      .set('Content-Type', 'image/jpeg')
+      .send(JPEG_BUFFER);
+
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 400 for invalid board code', async () => {
+    setupAuth();
+
+    const res = await request(app)
+      .post('/api/ugc/boards/BAD-CODE/cover-image')
+      .set('Authorization', AUTH_HEADER)
+      .set('Content-Type', 'image/jpeg')
+      .send(JPEG_BUFFER);
+
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 404 when board not found', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(null);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/zzzzzzzz/cover-image')
+      .set('Authorization', AUTH_HEADER)
+      .set('Content-Type', 'image/jpeg')
+      .send(JPEG_BUFFER);
+
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 403 when user does not own the board', async () => {
+    setupAuth({ id: 'different-user', email: 'other@example.com' });
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/cover-image')
+      .set('Authorization', AUTH_HEADER)
+      .set('Content-Type', 'image/jpeg')
+      .send(JPEG_BUFFER);
+
+    expect(res.status).toBe(403);
+  });
+
+  it('rejects unsupported content types', async () => {
+    setupAuth();
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/cover-image')
+      .set('Authorization', AUTH_HEADER)
+      .set('Content-Type', 'image/gif')
+      .send(Buffer.from([0x47, 0x49, 0x46, 0x38]));
+
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects magic bytes mismatch', async () => {
+    setupAuth();
+    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+
+    const res = await request(app)
+      .post('/api/ugc/boards/abc12345/cover-image')
+      .set('Authorization', AUTH_HEADER)
+      .set('Content-Type', 'image/jpeg')
+      .send(PNG_BUFFER);
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/content does not match/i);
   });
 });

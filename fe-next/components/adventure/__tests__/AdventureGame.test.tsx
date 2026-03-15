@@ -411,13 +411,11 @@ describe('AdventureGame', () => {
       // GIVEN / WHEN
       render(<AdventureGame {...defaultProps} />);
 
-      // THEN - Level info is in the header
-      // Component renders level info in a div with the level number visible
+      // THEN - Level badge shows compact "W1 · L1" format
       const gameContainer = screen.getByTestId('adventure-game');
       expect(gameContainer).toBeInTheDocument();
-      // Level 1 should be visible somewhere in the game (may have multiple due to responsive design)
-      const levelNumbers = screen.getAllByText('1');
-      expect(levelNumbers.length).toBeGreaterThan(0);
+      const levelBadge = screen.getByText(/W1\s*·\s*L1/);
+      expect(levelBadge).toBeInTheDocument();
     });
 
     it('should render the game grid', () => {

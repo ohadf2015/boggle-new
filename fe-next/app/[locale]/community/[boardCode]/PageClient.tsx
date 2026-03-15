@@ -85,23 +85,33 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
         {/* Title */}
         <h1 className="font-neo-display font-bold text-2xl text-neo-white">{board.title}</h1>
 
-        {/* Grid preview */}
-        <div className="flex justify-center py-2">
-          <div className="flex flex-col gap-1">
-            {board.grid.map((row, ri) => (
-              <div key={ri} className="flex gap-1">
-                {row.map((cell, ci) => (
-                  <div
-                    key={ci}
-                    className="w-8 h-8 flex items-center justify-center bg-neo-navy border-2 border-neo-white/30 rounded font-neo-body font-bold text-neo-white text-sm"
-                  >
-                    {cell}
-                  </div>
-                ))}
-              </div>
-            ))}
+        {/* Cover image or grid preview */}
+        {board.cover_image_url ? (
+          <div className="py-2">
+            <img
+              src={board.cover_image_url}
+              alt={board.title}
+              className="w-full h-48 object-cover rounded-neo border-neo border-black"
+            />
           </div>
-        </div>
+        ) : (
+          <div className="flex justify-center py-2">
+            <div className="flex flex-col gap-1">
+              {board.grid.map((row, ri) => (
+                <div key={ri} className="flex gap-1">
+                  {row.map((cell, ci) => (
+                    <div
+                      key={ci}
+                      className="w-8 h-8 flex items-center justify-center bg-neo-navy border-2 border-neo-white/30 rounded font-neo-body font-bold text-neo-white text-sm"
+                    >
+                      {cell}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Difficulty & info */}
         <div className="flex items-center gap-3 text-sm font-neo-body text-neo-white/70">

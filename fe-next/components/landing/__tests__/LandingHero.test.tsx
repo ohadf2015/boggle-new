@@ -47,12 +47,12 @@ describe('LandingHero', () => {
 
   it('renders play button', () => {
     render(<LandingHero {...baseProps} />);
-    expect(screen.getByText('landing.playNowFree')).toBeInTheDocument();
+    expect(screen.getByText('landing.letsPlay')).toBeInTheDocument();
   });
 
   it('calls onPlayClick when button clicked', () => {
     render(<LandingHero {...baseProps} />);
-    fireEvent.click(screen.getByText('landing.playNowFree'));
+    fireEvent.click(screen.getByText('landing.letsPlay'));
     expect(baseProps.onPlayClick).toHaveBeenCalledTimes(1);
   });
 

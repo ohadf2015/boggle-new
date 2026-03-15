@@ -63,6 +63,9 @@ interface GameGridAreaProps {
   // Hint
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
 
+  // Boss grid effect
+  bossGridEffect?: { name: string; id: number } | null;
+
   className?: string;
 }
 
@@ -95,6 +98,7 @@ export const GameGridArea = memo(function GameGridArea({
   wordFeedback,
   currentWord: currentWordProp,
   hintLevel,
+  bossGridEffect,
   className,
 }: GameGridAreaProps) {
   const { t } = useLanguage();
@@ -112,90 +116,105 @@ export const GameGridArea = memo(function GameGridArea({
         className
       )}
     >
-      {/* Top Section: Word Preview & Feedback — pinned above the board */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-1 px-2 sm:px-4 pt-1 sm:pt-2 pb-0">
-        {/* Word Preview — uses shared WordFormingArea for consistent feedback */}
-        <div className="h-8 sm:h-10 flex items-center justify-center">
-          <WordFormingArea
-            word={currentWord}
-            letterCount={selectedLength}
-            feedback={wordFeedback}
-            compact
-          />
-        </div>
+      {/*
+        Top Section: Word Preview + Feedback.
+        Mobile: single flex row (word left, feedback right) — saves ~24px of height.
+        sm+:    stacked column, each row gets a fixed height.
+        Total cost: h-8 on mobile vs h-8+h-7=h-15 on sm+.
+      */}
+      <div className="flex-shrink-0 px-2 sm:px-4 pt-1 sm:pt-2 pb-0">
+        <div className="flex sm:flex-col items-center justify-between sm:justify-start gap-x-2 sm:gap-y-1">
+          {/* Word Preview */}
+          <div className="h-8 flex items-center justify-center shrink-0 sm:w-full">
+            <WordFormingArea
+              word={currentWord}
+              letterCount={selectedLength}
+              feedback={wordFeedback}
+              compact
+            />
+          </div>
 
-        {/* Feedback Area */}
-        <div data-testid="feedback-container" className="h-6 sm:h-8 flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            {/* Validation Error */}
-            {validationError && (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0, y: -10, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                className={cn(
-                  'px-3 py-1.5 rounded-neo',
-                  'bg-neo-red/20 border-2 border-neo-red',
-                  'text-neo-red font-bold text-sm',
-                  'animate-neo-shake'
-                )}
-              >
-                {validationError}
-              </motion.div>
-            )}
+          {/* Feedback Area */}
+          <div data-testid="feedback-container" className="h-7 flex items-center justify-center sm:w-full">
+            <AnimatePresence mode="wait">
+              {/* Validation Error */}
+              {validationError && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, y: -8, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.9 }}
+                  className={cn(
+                    'px-3 py-1 rounded-neo',
+                    'bg-neo-red/20 border-2 border-neo-red',
+                    'text-neo-red font-bold text-xs sm:text-sm',
+                    'animate-neo-shake'
+                  )}
+                >
+                  {validationError}
+                </motion.div>
+              )}
 
-            {/* Validating Indicator */}
-            {!validationError && isValidating && (
-              <motion.div
-                key="validating"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-neo-cyan font-bold text-sm animate-pulse"
-              >
-                {t('common.validating')}
-              </motion.div>
-            )}
+              {/* Validating Indicator */}
+              {!validationError && isValidating && (
+                <motion.div
+                  key="validating"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-neo-cyan font-bold text-xs sm:text-sm animate-pulse"
+                >
+                  {t('common.validating')}
+                </motion.div>
+              )}
 
-            {/* Word Length Hint */}
-            {!validationError && !isValidating && selectedLength > 0 && selectedLength < minWordLength && (
-              <motion.div
-                key="hint"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className={cn(
-                  'px-3 py-1 rounded-full',
-                  'bg-neo-white/10 border border-neo-white/20',
-                  'text-neo-white/70 text-sm font-medium',
-                  'flex items-center gap-2'
-                )}
-              >
-                <span>
-                  {minWordLength === 2
-                    ? t('adventure.hints.minLetters2')
-                    : t('adventure.hints.minLetters3')
-                  }
-                </span>
-                <span className="font-black text-neo-lime">
-                  {selectedLength}/{minWordLength}
-                </span>
-              </motion.div>
-            )}
+              {/* Word Length Hint */}
+              {!validationError && !isValidating && selectedLength > 0 && selectedLength < minWordLength && (
+                <motion.div
+                  key="hint"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className={cn(
+                    'px-2 py-0.5 rounded-full',
+                    'bg-neo-white/10 border border-neo-white/20',
+                    'text-neo-white/70 text-xs font-medium',
+                    'flex items-center gap-1.5'
+                  )}
+                >
+                  <span>
+                    {minWordLength === 2
+                      ? t('adventure.hints.minLetters2')
+                      : t('adventure.hints.minLetters3')
+                    }
+                  </span>
+                  <span className="font-black text-neo-lime">
+                    {selectedLength}/{minWordLength}
+                  </span>
+                </motion.div>
+              )}
 
-            {/* Empty spacer */}
-            {!validationError && !isValidating && (selectedLength === 0 || selectedLength >= minWordLength) && (
-              <div key="empty" className="w-full" />
-            )}
-          </AnimatePresence>
+              {/* Empty spacer */}
+              {!validationError && !isValidating && (selectedLength === 0 || selectedLength >= minWordLength) && (
+                <div key="empty" className="w-full" />
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
       {/* Main Content - Centered vertically and horizontally (grid only) */}
       <div className="flex-1 flex flex-col items-center justify-center min-h-0 px-2 sm:px-4 py-1">
-        {/* Grid Container - Takes available space but doesn't overflow */}
-        <div className="flex-1 flex items-center justify-center min-h-0 w-full max-w-md lg:max-w-lg">
+        {/*
+          Grid Container.
+          Old: max-w-md (448px) — too narrow on phone, leaves dead space on tablet.
+          New: w-full with a square clamp.
+            - `min(100%, 80vh)` lets the grid grow to full container width but
+              never exceed 80% of the viewport height (keeps it square & visible).
+            - On landscape/desktop the sidebar eats width, so 80vh naturally caps.
+            - On portrait mobile the sidebar is only h-16, so 80vh ≈ useful space.
+        */}
+        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 80vh)' }}>
           <motion.div
             className={cn(
               'w-full aspect-square max-h-full rounded-neo-lg',
@@ -223,6 +242,7 @@ export const GameGridArea = memo(function GameGridArea({
                 showCascade={showCascade}
                 onCascadeComplete={onCascadeComplete}
                 hintHighlightIndices={hintHighlightIndices}
+                bossGridEffect={bossGridEffect}
                 className="h-full"
               />
           </motion.div>

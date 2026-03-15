@@ -161,12 +161,20 @@ export const AdventureTile = memo(({
         animationDelay: effectiveCascadeDelay
           ? `${effectiveCascadeDelay}ms`
           : undefined,
+        // CSS custom properties used by boss grid effect CSS
+        ['--tile-index' as string]: index,
+        ['--tile-row' as string]: tile.row,
+        ['--tile-col' as string]: tile.col,
       }}
       className={cn(
         // Base tile styles — match GridComponent baseline
         'relative aspect-square flex items-center justify-center',
         'font-black cursor-pointer overflow-hidden',
-        'border-2 border-neo-black/30',
+        // Neo-brutalist corners + definition border + hard drop shadow for depth
+        'rounded-neo border-2 border-black/40',
+        'shadow-[2px_2px_0px_rgba(0,0,0,0.85)]',
+        // Hover: brightness lift to signal interactivity (no new shadow needed)
+        canInteract && 'hover:brightness-110',
 
         // Type-specific classes
         TILE_TYPE_CLASSES[tile.type],
@@ -364,24 +372,32 @@ export const AdventureTile = memo(({
 
       {/* ========== SELECTION RIPPLE EFFECT ========== */}
       {/* Contained ripple that stays within cell bounds - no blur, no overflow */}
-      {isSelected && enableComplexAnimations && !prefersReducedMotion && (
+      {/* Selection glow ring — prominent inset highlight + radial fill */}
+      {isSelected && !prefersReducedMotion && (
         <motion.div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none z-10"
           style={{
             borderRadius: '6px',
-            background: 'radial-gradient(circle at center, rgba(255, 200, 100, 0.6) 0%, rgba(255, 200, 100, 0.2) 50%, transparent 70%)',
+            // Strong golden inset ring for clear selection feedback
+            boxShadow: 'inset 0 0 0 2px rgba(255,225,53,0.9), inset 0 0 12px rgba(255,200,80,0.5)',
+            background: 'radial-gradient(circle at center, rgba(255,210,80,0.35) 0%, rgba(255,200,80,0.12) 55%, transparent 75%)',
           }}
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 0.6] }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
+          animate={{ opacity: [0, 1, 0.85] }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
         />
       )}
 
       {/* Letter — inherits theme fonts (Fredoka/Rubik) like GridComponent */}
       <span
         className={cn(
-          'relative z-10 select-none',
-          'drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]',
+          'relative z-20 select-none',
+          // Stronger text shadow for legibility against all tile backgrounds
+          'drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]',
+          // Extra contrast on dark tiles where text is light
+          (tile.type === 'bomb' || tile.type === 'chain' || tile.type === 'time') &&
+            'drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]',
+          // Keep existing gold/rainbow shadow
           (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
         )}
       >

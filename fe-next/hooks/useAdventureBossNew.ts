@@ -19,7 +19,7 @@ import type { BossConfig, BossTauntEvent } from '@/types/boss';
 
 export type BossPhaseNew = 'normal' | 'angry' | 'desperate';
 
-export type BossAttackType = 'lockTiles' | 'scramble' | 'timePenalty' | 'damage';
+export type BossAttackType = 'lockTiles' | 'scramble' | 'timePenalty' | 'damage' | 'gridEffect';
 
 export interface BossAttack {
   type: BossAttackType;
@@ -29,6 +29,8 @@ export interface BossAttack {
   seconds?: number;
   /** For damage: HP damage to deal to player */
   damage?: number;
+  /** For gridEffect: effect name from bossConfig phase modifiers */
+  gridEffect?: string;
 }
 
 export interface UseAdventureBossNewProps {
@@ -306,6 +308,16 @@ export function useAdventureBossNew({
 
       // Restart attack timer with new frequency
       startAttackTimer(newPhase);
+
+      // Emit grid effect for this phase (boss visual signature)
+      if (boss?.phases) {
+        const phaseIndex = newPhase === 'normal' ? 0 : newPhase === 'angry' ? 1 : 2;
+        const phaseConfig = boss.phases[phaseIndex];
+        const gridEffectName = phaseConfig?.mechanicModifiers?.gridEffect as string | undefined;
+        if (gridEffectName) {
+          onAttackRef.current?.({ type: 'gridEffect', gridEffect: gridEffectName });
+        }
+      }
 
       // Trigger phase change taunt
       if (worldId !== null) {

@@ -392,7 +392,8 @@ const AdventureGame = memo<AdventureGameProps>(
               wordFeedback={wordSubmit.wordFeedback}
               currentWord={effectiveCurrentWord}
               worldId={levelConfig.world}
-              hintLevel={init.hintData.level} />
+              hintLevel={init.hintData.level}
+              bossGridEffect={bossOrch.gridEffectTrigger} />
           }
           sidebar={
             <GameSidebar objectives={objectives}

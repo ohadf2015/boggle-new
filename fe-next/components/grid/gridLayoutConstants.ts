@@ -6,5 +6,19 @@
 /** Inner padding of the grid container */
 export const GRID_PADDING = '0.4rem';
 
-/** Responsive gap classes: 2px → 4px → 6px → 8px */
-export const GRID_GAP_CLASS = 'gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2';
+/**
+ * Responsive gap strategy — viewport breakpoints map to tile-gap sizes:
+ *
+ *   default (≤639px / mobile portrait):  gap-1    →  4px
+ *   sm      (640-767px / large phone):   gap-1.5  →  6px
+ *   md      (768-1023px / tablet):       gap-2    →  8px
+ *   lg      (1024px+ / desktop):         gap-2    →  8px
+ *
+ * These gaps are intentionally small — tiles are touch targets first.
+ * The grid container is sized via `aspect-square` + `min(100%, 80vh)` in
+ * GameGridArea so it always fills available space without overflowing.
+ * Viewport breakpoints (not container-query units) are appropriate here
+ * because the grid is the primary content and tracks viewport width in
+ * portrait orientation and viewport height in landscape.
+ */
+export const GRID_GAP_CLASS = 'gap-1 sm:gap-1.5 md:gap-2 lg:gap-2';

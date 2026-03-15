@@ -89,8 +89,8 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
                 className={cn(
                     "flex items-center justify-center",
                     "w-10 h-10",
-                    "bg-neo-pink/20 text-neo-pink",
-                    "border-3 border-neo-black",
+                    "bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white",
+                    "border-3 border-neo-black dark:border-slate-500",
                     "rounded-neo shadow-hard-sm",
                     "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-pink/30",
                     "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",

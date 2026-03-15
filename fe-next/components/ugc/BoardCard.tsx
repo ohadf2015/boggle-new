@@ -19,6 +19,7 @@ export interface BoardCardBoard {
   creator_display_name: string;
   creator_avatar?: Record<string, unknown> | null;
   creator_profile_picture_url?: string | null;
+  cover_image_url?: string | null;
 }
 
 interface BoardCardProps {
@@ -90,9 +91,18 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay }) => {
         </span>
       </div>
 
-      {/* Mini grid preview */}
+      {/* Cover image or mini grid preview */}
       <div className="flex justify-center px-3 pb-2">
-        <BoardPreviewGrid grid={board.grid} size="sm" />
+        {board.cover_image_url ? (
+          <img
+            src={board.cover_image_url}
+            alt={board.title}
+            className="w-full h-32 object-cover rounded-neo border border-neo-white/20"
+            loading="lazy"
+          />
+        ) : (
+          <BoardPreviewGrid grid={board.grid} size="sm" />
+        )}
       </div>
 
       {/* Board title */}

@@ -21,10 +21,9 @@ jest.mock('framer-motion', () => {
 });
 
 describe('LandingSocialProofBar', () => {
-  it('renders game modes and languages pills always', () => {
-    render(<LandingSocialProofBar activePlayers={0} gamesToday={0} gameModes={4} languages={4} />);
-    expect(screen.getByText('landing.gameModes')).toBeInTheDocument();
-    expect(screen.getByText('landing.languages')).toBeInTheDocument();
+  it('renders nothing when no dynamic stats pass threshold', () => {
+    const { container } = render(<LandingSocialProofBar activePlayers={0} gamesToday={0} gameModes={4} languages={4} />);
+    expect(container.innerHTML).toBe('');
   });
 
   it('shows active players pill only when > 10', () => {
@@ -47,10 +46,9 @@ describe('LandingSocialProofBar', () => {
     expect(screen.queryByText('landing.gamesToday')).not.toBeInTheDocument();
   });
 
-  it('renders animated numbers', () => {
-    render(<LandingSocialProofBar activePlayers={100} gamesToday={0} gameModes={4} languages={4} />);
-    // AnimatedNumber renders span with initial text "0"
-    const spans = screen.getAllByText('0');
-    expect(spans.length).toBeGreaterThanOrEqual(2);
+  it('shows both pills when both pass threshold', () => {
+    render(<LandingSocialProofBar activePlayers={50} gamesToday={200} gameModes={4} languages={4} />);
+    expect(screen.getByText('landing.activePlayers')).toBeInTheDocument();
+    expect(screen.getByText('landing.gamesToday')).toBeInTheDocument();
   });
 });

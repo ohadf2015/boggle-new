@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { getSession } from '@/lib/supabase';
 
 export type CreatorStep = 'configure' | 'preview' | 'published';
 export type GridSize = 4 | 5 | 6;
@@ -46,9 +47,16 @@ export interface UseBoardCreatorReturn {
   publishError: string | null;
   publishedBoard: PublishedBoard | null;
   publishBoard: () => Promise<void>;
+  coverImage: File | null;
+  coverImagePreview: string | null;
+  setCoverImage: (file: File | null) => void;
+  isUploadingImage: boolean;
+  imageUploadError: string | null;
 }
 
 const DEBOUNCE_MS = 600;
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export function useBoardCreator(): UseBoardCreatorReturn {
   const [step, setStep] = useState<CreatorStep>('configure');
@@ -64,6 +72,10 @@ export function useBoardCreator(): UseBoardCreatorReturn {
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [publishedBoard, setPublishedBoard] = useState<PublishedBoard | null>(null);
+  const [coverImage, setCoverImageState] = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   // Backward-compat: comma-separated string from tags
@@ -91,6 +103,41 @@ export function useBoardCreator(): UseBoardCreatorReturn {
       return next;
     });
   }, []);
+
+  // Cover image management
+  const setCoverImage = useCallback((file: File | null) => {
+    setImageUploadError(null);
+
+    if (coverImagePreview) {
+      URL.revokeObjectURL(coverImagePreview);
+      setCoverImagePreview(null);
+    }
+
+    if (!file) {
+      setCoverImageState(null);
+      return;
+    }
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setImageUploadError('Only JPEG, PNG, and WebP images are supported');
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      setImageUploadError('Image must be under 2MB');
+      return;
+    }
+
+    setCoverImageState(file);
+    setCoverImagePreview(URL.createObjectURL(file));
+  }, [coverImagePreview]);
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (coverImagePreview) URL.revokeObjectURL(coverImagePreview);
+    };
+  }, [coverImagePreview]);
 
   // Core generate function
   const runGenerate = useCallback(async (
@@ -191,6 +238,35 @@ export function useBoardCreator(): UseBoardCreatorReturn {
       }
 
       if (data.boardCode) {
+        // Upload cover image after successful publish
+        if (coverImage) {
+          setIsUploadingImage(true);
+          try {
+            const { data: sessionData } = await getSession();
+            const accessToken = sessionData?.session?.access_token;
+
+            if (accessToken) {
+              const uploadRes = await fetch(`/api/ugc/boards/${data.boardCode}/cover-image`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': coverImage.type,
+                  'Authorization': `Bearer ${accessToken}`,
+                },
+                body: coverImage,
+              });
+
+              if (!uploadRes.ok) {
+                const uploadData = await uploadRes.json();
+                setImageUploadError(uploadData.error ?? 'Image upload failed');
+              }
+            }
+          } catch {
+            setImageUploadError('Image upload failed');
+          } finally {
+            setIsUploadingImage(false);
+          }
+        }
+
         setPublishedBoard({ boardCode: data.boardCode, title: data.title ?? title });
         setStep('published');
       }
@@ -199,7 +275,7 @@ export function useBoardCreator(): UseBoardCreatorReturn {
     } finally {
       setIsPublishing(false);
     }
-  }, [generatedBoard, title, description, language, gridSize]);
+  }, [generatedBoard, title, description, language, gridSize, coverImage]);
 
   return {
     step,
@@ -228,5 +304,10 @@ export function useBoardCreator(): UseBoardCreatorReturn {
     publishError,
     publishedBoard,
     publishBoard,
+    coverImage,
+    coverImagePreview,
+    setCoverImage,
+    isUploadingImage,
+    imageUploadError,
   };
 }

@@ -2,7 +2,7 @@
  * GameSidebar Component
  *
  * Organized sidebar with objectives, combo display, and hints.
- * Mobile: horizontal scrollable chip bar fitting in fixed 96px height.
+ * Mobile: horizontal scrollable chip bar fitting in compact 64px height.
  * Desktop: vertical stack with full card layout.
  */
 
@@ -91,8 +91,8 @@ export const GameSidebar = memo(function GameSidebar({
         className
       )}
     >
-      {/* Mobile: Horizontal scrollable chip bar */}
-      <div className="lg:hidden flex flex-row items-center gap-2 p-2 h-full overflow-x-auto scrollbar-hide">
+      {/* Mobile: Compact horizontal scrollable chip bar (fits h-16) */}
+      <div className="lg:hidden flex flex-row items-center gap-1.5 px-2 py-1.5 h-full overflow-x-auto scrollbar-hide">
         {objectives.map((obj) => {
           const current = obj.current ?? 0;
           const pct = Math.min((current / obj.target) * 100, 100);
@@ -102,8 +102,8 @@ export const GameSidebar = memo(function GameSidebar({
               key={obj.type}
               data-testid={`objective-${obj.type}`}
               className={cn(
-                'flex-shrink-0 flex items-center gap-1.5 px-2 py-1',
-                'rounded-neo border-2 min-w-[80px]',
+                'flex-shrink-0 flex items-center gap-1 px-1.5 py-0.5',
+                'rounded-neo border-2 min-w-[70px]',
                 'transition-all duration-300',
                 obj.isComplete
                   ? 'bg-neo-lime/20 border-neo-lime'
@@ -114,20 +114,20 @@ export const GameSidebar = memo(function GameSidebar({
             >
               <Icon
                 className={cn(
-                  'w-3.5 h-3.5 flex-shrink-0',
+                  'w-3 h-3 flex-shrink-0',
                   obj.isComplete ? 'text-neo-lime' : OBJECTIVE_COLORS[obj.type]
                 )}
               />
-              <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+              <div className="flex flex-col gap-px flex-1 min-w-0">
                 <span
                   className={cn(
-                    'text-[10px] font-mono font-black tabular-nums',
+                    'text-[9px] font-mono font-black tabular-nums leading-tight',
                     obj.isComplete ? 'text-neo-lime' : 'text-neo-white/80'
                   )}
                 >
                   {current}/{obj.target}
                 </span>
-                <div className="h-1 bg-neo-black/50 rounded-full overflow-hidden">
+                <div className="h-0.5 bg-neo-black/50 rounded-full overflow-hidden">
                   <div
                     data-testid={`progress-bar-${obj.type}`}
                     className={cn(
@@ -139,14 +139,14 @@ export const GameSidebar = memo(function GameSidebar({
                 </div>
               </div>
               {obj.isComplete && (
-                <Check className="w-3 h-3 text-neo-lime flex-shrink-0" strokeWidth={3} />
+                <Check className="w-2.5 h-2.5 text-neo-lime flex-shrink-0" strokeWidth={3} />
               )}
             </div>
           );
         })}
 
         {/* Divider */}
-        <div className="flex-shrink-0 w-px h-8 bg-neo-white/10" />
+        <div className="flex-shrink-0 w-px h-6 bg-neo-white/15" />
 
         {/* Hint chip */}
         <button
@@ -155,12 +155,13 @@ export const GameSidebar = memo(function GameSidebar({
           className={cn(
             'flex-shrink-0 flex items-center gap-1 px-2 py-1',
             'rounded-neo border-2',
+            'min-w-[44px] min-h-[44px]',
             hasHintsAvailable
-              ? 'bg-neo-yellow text-neo-black border-neo-black'
+              ? 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
               : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
           )}
         >
-          <Lightbulb className="w-3.5 h-3.5" />
+          <Lightbulb className="w-3 h-3" />
           <span className="text-[10px] font-bold">{t('adventure.game.hint')}</span>
         </button>
       </div>
