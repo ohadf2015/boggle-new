@@ -1431,6 +1431,7 @@ const ja = {
     "personalBest": "自己ベスト！",
     "personalTipLongWord": "すごい発見！{{word}}で{{score}}点 — 6文字以上の単語を探し続けよう！",
     "personalTipShortWord": "{{word}}で{{score}}点 — より長い単語でもっと高得点を！",
+    "streakUrgency": "{{streak}}日連続！{{hours}}時間以内にプレイして記録を維持しよう",
     "markReadyDescription": "ボタンをタップして次のゲームの準備完了を伝えましょう",
     "allReadyHostCanStart": "🎉 全員準備完了！次のラウンドを開始できます。",
     "allPlayersReadyWaitingHost": "✓ 全員準備完了 — ホストの開始を待っています",

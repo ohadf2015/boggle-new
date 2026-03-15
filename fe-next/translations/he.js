@@ -1453,6 +1453,7 @@ const he = {
     "personalBest": "שיא אישי!",
     "personalTipLongWord": "מצאת מילה מעולה! {{word}} הרוויחה {{score}} נק׳ — המשיכו למצוא מילים עם 6+ אותיות!",
     "personalTipShortWord": "{{word}} הרוויחה {{score}} נק׳ — נסו מילים ארוכות יותר לניקוד גבוה!",
+    "streakUrgency": "רצף {{streak}} ימים! שחקו שוב תוך {{hours}} שעות כדי לשמור עליו",
     "markReadyDescription": "לחץ על הכפתור כדי לסמן שאתה מוכן למשחק הבא",
     "allReadyHostCanStart": "🎉 כל השחקנים מוכנים! אתה יכול להתחיל את הסיבוב הבא.",
     "allPlayersReadyWaitingHost": "✓ כל השחקנים מוכנים — ממתין למארח להתחיל",

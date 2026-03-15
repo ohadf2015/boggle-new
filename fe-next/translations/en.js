@@ -1549,6 +1549,7 @@ const en = {
     "personalBest": "Personal Best!",
     "personalTipLongWord": "Great find! {{word}} scored {{score}} pts — keep finding 6+ letter words!",
     "personalTipShortWord": "{{word}} scored {{score}} pts — try longer words for bigger scores!",
+    "streakUrgency": "{{streak}}-day streak! Play again within {{hours}}h to keep it",
     "markReadyDescription": "Tap when ready",
     "allReadyHostCanStart": "All set! Start anytime.",
     "allPlayersReadyWaitingHost": "Ready — host's turn",

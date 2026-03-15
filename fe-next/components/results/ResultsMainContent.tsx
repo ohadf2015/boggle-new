@@ -51,6 +51,51 @@ import type { NearMiss } from '@/components/results/NearMissCard';
 /** Translation function type */
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
 
+/** Streak urgency countdown — shows time remaining to keep streak alive */
+const StreakUrgencyDisplay: React.FC<{
+  currentStreak: number;
+  t: TFunction;
+}> = ({ currentStreak, t }) => {
+  const [hoursLeft, setHoursLeft] = React.useState(() => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    return Math.ceil((midnight.getTime() - now.getTime()) / (1000 * 60 * 60));
+  });
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      setHoursLeft(Math.ceil((midnight.getTime() - now.getTime()) / (1000 * 60 * 60)));
+    }, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  if (currentStreak < 1) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 }}
+      className="flex items-center justify-center gap-2 px-3 py-2 bg-neo-orange/15 border-2 border-neo-orange/40 rounded-neo"
+    >
+      <motion.span
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
+        className="text-base"
+      >
+        🔥
+      </motion.span>
+      <span className="text-xs font-bold text-neo-orange">
+        {t('results.streakUrgency', { streak: currentStreak, hours: hoursLeft })}
+      </span>
+    </motion.div>
+  );
+};
+
 export interface ResultsMainContentProps {
   /** Banner player to display (current user or winner) */
   bannerPlayer: Player | null;
@@ -166,6 +211,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   readyUsernames,
   duplicateRuleDisabled,
   onShowDetails,
+  winStreakData,
   t,
   showBanner = true,
   bannerSize = '320x50',
@@ -317,6 +363,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
             )}
           </>
         )
+      )}
+
+      {/* Streak Urgency — motivate continued play */}
+      {winStreakData && winStreakData.currentStreak >= 1 && (
+        <StreakUrgencyDisplay
+          currentStreak={winStreakData.currentStreak}
+          t={t}
+        />
       )}
 
       {/* Players Ready Status - Compact */}

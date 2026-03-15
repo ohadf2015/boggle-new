@@ -1,7 +1,8 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
+import { getXpProgress } from '@/shared/utils/adventureXpUtils';
 
 interface XpBreakdown {
   gameCompletion: number;
@@ -33,6 +34,13 @@ interface XpBreakdownCardProps {
 const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData, isWinner }) => {
   const { t, dir } = useLanguage();
   const { xpBreakdown, xpEarned, newTotalXp, newLevel } = xpGainedData;
+
+  // Calculate XP progress for the animated bar
+  const xpProgress = useMemo(() => getXpProgress(newTotalXp), [newTotalXp]);
+  const previousProgress = useMemo(() => {
+    const prevXp = Math.max(0, newTotalXp - xpEarned);
+    return getXpProgress(prevXp);
+  }, [newTotalXp, xpEarned]);
   // Arrow for level up indicator - use ← in RTL and → in LTR to show progression
   // In RTL languages, left arrow indicates "going up/forward"
   const levelArrow = dir === 'rtl' ? '←' : '→';
@@ -108,14 +116,38 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
         ))}
       </div>
 
-      {/* Level info */}
-      <div className="flex items-center justify-between pt-2 border-t-2 border-neo-black/20 dark:border-neo-cream/30 relative z-10">
-        <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream uppercase">
-          {t('xp.level')} {newLevel}
-        </span>
-        <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream">
-          {t('xp.totalXpEarned')}: {newTotalXp.toLocaleString()}
-        </span>
+      {/* Level info + XP progress bar */}
+      <div className="pt-2 border-t-2 border-neo-black/20 relative z-10 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-neo-black/70 uppercase">
+            {t('xp.level')} {newLevel}
+          </span>
+          <span className="text-xs font-bold text-neo-black/70">
+            {xpProgress.isMaxLevel
+              ? t('xp.maxLevel')
+              : `${xpProgress.xpInCurrentLevel} / ${xpProgress.xpNeededForNextLevel}`
+            }
+          </span>
+        </div>
+
+        {/* Animated XP bar — fills from previous level progress to current */}
+        {!xpProgress.isMaxLevel && (
+          <div className="h-3 bg-neo-black/20 rounded-full overflow-hidden border border-neo-black/30">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-neo-purple via-neo-pink to-neo-purple"
+              initial={{ width: `${previousProgress.progressPercent}%` }}
+              animate={{ width: `${xpProgress.progressPercent}%` }}
+              transition={{ delay: 1.0, duration: 1.2, ease: 'easeOut' }}
+              style={{ boxShadow: '0 0 8px var(--neo-purple, #8B5CF6)' }}
+            />
+          </div>
+        )}
+
+        <div className="flex justify-end">
+          <span className="text-[10px] font-bold text-neo-black/50">
+            {t('xp.totalXpEarned')}: {newTotalXp.toLocaleString()}
+          </span>
+        </div>
       </div>
 
       {/* Level Up celebration */}

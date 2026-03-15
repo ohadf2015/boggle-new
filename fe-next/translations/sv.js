@@ -1430,6 +1430,7 @@ const sv = {
     "personalBest": "Personligt rekord!",
     "personalTipLongWord": "Bra fynd! {{word}} gav {{score}} poäng — fortsätt hitta ord med 6+ bokstäver!",
     "personalTipShortWord": "{{word}} gav {{score}} poäng — prova längre ord för högre poäng!",
+    "streakUrgency": "{{streak}}-dagars svit! Spela igen inom {{hours}}h för att behålla den",
     "markReadyDescription": "Tryck på knappen för att markera dig redo för nästa spel",
     "allReadyHostCanStart": "🎉 Alla spelare redo! Du kan starta nästa runda.",
     "allPlayersReadyWaitingHost": "✓ Alla spelare redo — väntar på att värden startar",

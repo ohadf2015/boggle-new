@@ -1495,6 +1495,7 @@ const es = {
     "personalBest": "¡Mejor marca personal!",
     "personalTipLongWord": "¡Gran hallazgo! {{word}} dio {{score}} pts — ¡sigue buscando palabras de 6+ letras!",
     "personalTipShortWord": "{{word}} dio {{score}} pts — ¡prueba palabras más largas para más puntos!",
+    "streakUrgency": "¡Racha de {{streak}} días! Juega de nuevo en {{hours}}h para mantenerla",
     "markReadyDescription": "Toca el botón para indicar que estás listo para el próximo juego",
     "allReadyHostCanStart": "🎉 ¡Todos los jugadores listos! Puedes iniciar la siguiente ronda.",
     "allPlayersReadyWaitingHost": "✓ Todos los jugadores listos — esperando al anfitrión",
