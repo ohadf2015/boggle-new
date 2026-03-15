@@ -71,22 +71,17 @@ jest.mock('framer-motion', () => {
   };
 });
 
-// Mock Next.js Link
-// Mock next/dynamic to render components synchronously in tests
+// Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
 jest.mock('next/dynamic', () => {
-  return (loader: () => Promise<any>, _opts?: any) => {
-    let Component: any = null;
-    // Eagerly resolve the dynamic import
-    const promise = loader();
-    promise.then((mod: any) => {
-      Component = mod.default || mod;
-    });
-    const DynamicComponent = (props: any) => {
-      if (!Component) return null;
-      return React.createElement(Component, props);
+  const React = require('react');
+  return (_importFn: unknown, _opts?: unknown) => {
+    const Dynamic = (props: Record<string, unknown>) => {
+      const AdventureGame = require('../AdventureGame');
+      const Comp = AdventureGame.default || AdventureGame;
+      return React.createElement(Comp, props);
     };
-    DynamicComponent.displayName = 'DynamicComponent';
-    return DynamicComponent;
+    Dynamic.displayName = 'NextDynamic';
+    return Dynamic;
   };
 });
 
@@ -223,6 +218,187 @@ jest.mock('@/hooks/useAdventureHints', () => ({
     findPathForWord: jest.fn(() => null),
   }),
 }));
+
+// Mock useAdventureMusic hook
+jest.mock('@/hooks/useAdventureMusic', () => ({
+  useAdventureMusic: () => ({
+    currentTrack: 1,
+    stopMusic: jest.fn(),
+    hasMusic: true,
+  }),
+}));
+
+// Mock AdventureThemeProvider to avoid context errors
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  AdventureThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+  useAdventureTheme: () => ({
+    worldId: 1,
+    currentLevel: 1,
+    theme: {
+      background: {
+        baseColor: '#000',
+        gradient: 'linear-gradient(180deg, #000 0%, #111 100%)',
+        layers: [],
+        texture: { type: 'none', opacity: 0, blendMode: 'normal' },
+        particles: { type: 'none', count: 0, colors: [], speed: 1, sizeRange: [1, 2] },
+        ambientColor: '#000',
+        ambientIntensity: 0,
+      },
+      containerClass: '',
+      colors: { primary: '#000', secondary: '#fff', accent: '#f00' },
+    },
+    isTransitioning: false,
+    setWorld: jest.fn(),
+    setLevel: jest.fn(),
+    getTileConfig: jest.fn(),
+    getChapter: jest.fn(),
+    isBoss: jest.fn(() => false),
+    getLevelPosition: jest.fn(() => 1),
+  }),
+  useHUDTheme: () => ({
+    headerBg: 'bg-neo-navy/90',
+    headerBorder: 'border-neo-black/40',
+    sidebarBg: 'bg-neo-black/40',
+    scoreAccent: 'text-neo-cyan',
+    levelBadgeColor: 'bg-neo-black/40',
+    levelBadgeText: 'text-neo-cyan',
+    objectiveAccent: 'text-neo-lime',
+    hintActiveColor: 'bg-neo-lime',
+    hintActiveText: 'text-neo-black',
+  }),
+  useTimerTheme: () => ({
+    normal: { bg: 'bg-neo-navy/80', text: 'text-neo-white', shadow: '' },
+    warning: { bg: 'bg-neo-orange/20', text: 'text-neo-orange', shadow: '' },
+    danger: { bg: 'bg-neo-red/20', text: 'text-neo-red', shadow: '' },
+    critical: { bg: 'bg-neo-red/30', text: 'text-neo-red', shadow: '' },
+  }),
+  useBossFightTheme: () => ({
+    dialogueBg: 'bg-neo-navy/95',
+    dialogueBorder: 'border-neo-white/20',
+    bossNameColor: 'text-neo-red',
+    hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+    telegraphColor: 'bg-neo-red/20',
+    telegraphProgressColor: 'bg-neo-red',
+    playerHealthNormal: 'bg-neo-lime',
+    playerHealthLow: 'bg-neo-red',
+    phaseColors: {
+      phase1: { bg: 'bg-neo-lime/20', text: 'text-neo-lime' },
+      phase2: { bg: 'bg-neo-orange/20', text: 'text-neo-orange' },
+      enraged: { bg: 'bg-neo-red/20', text: 'text-neo-red' },
+    },
+    avatarGlow: 'rgba(239, 68, 68, 0.4)',
+    victoryGlow: 'rgba(163, 230, 53, 0.6)',
+    arenaEffect: 'none',
+  }),
+}));
+
+// Mock adventure lib to provide grid/level config for gameplay
+jest.mock('@/lib/adventure', () => ({
+  getWorldConfig: (worldId: number) => ({
+    id: worldId,
+    name: `World ${worldId}`,
+    nameKey: 'adventure.worlds.alphabetMeadows',
+    description: 'Test world',
+    world: worldId,
+    levels: 7,
+    requiredStars: 0,
+    theme: 'forest',
+  }),
+  getLevelConfig: () => ({
+    world: 1,
+    level: 1,
+    gridSize: 4,
+    timeLimit: 120,
+    objectives: { minScore: 100 },
+    specialTiles: [],
+  }),
+  generateAdventureGrid: () => [
+    ['A', 'B', 'C', 'D'],
+    ['E', 'F', 'G', 'H'],
+    ['I', 'J', 'K', 'L'],
+    ['M', 'N', 'O', 'P'],
+  ],
+  getLevelSeed: () => 'test-seed',
+  getGridSize: () => 4,
+  WORLDS: [{ id: 1, name: 'World 1', requiredStars: 0 }],
+}));
+
+// Mock WorldMap to provide clickable world buttons with expected testids
+jest.mock('../WorldMap', () => {
+  const MockWorldMap = ({
+    onWorldSelect,
+  }: {
+    onWorldSelect: (worldId: number) => void;
+  }) => (
+    <div data-testid="world-map">
+      <button data-testid="world-1" onClick={() => onWorldSelect(1)}>World 1</button>
+      <button data-testid="world-2" onClick={() => onWorldSelect(2)}>World 2</button>
+    </div>
+  );
+  MockWorldMap.displayName = 'MockWorldMap';
+  return MockWorldMap;
+});
+
+// Mock LevelGrid to provide clickable level buttons with expected testids
+// Level 7 is always "locked" (doesn't call onLevelSelect) to test locked-level handling
+jest.mock('../LevelGrid', () => {
+  function MockLevelGrid({
+    onLevelSelect,
+    world,
+  }: {
+    onLevelSelect: (worldId: number, levelId: number) => void;
+    world: { id: number; name: string; nameKey?: string };
+  }) {
+    const translations: Record<string, string> = {
+      'adventure.worlds.alphabetMeadows': 'Alphabet Meadows',
+    };
+    const name = world.nameKey ? (translations[world.nameKey] || world.nameKey) : world.name;
+    return (
+      <div data-testid="level-grid">
+        <h2>{name}</h2>
+        <button data-testid="level-button-1" onClick={() => onLevelSelect(world.id, 1)}>
+          Level 1
+        </button>
+        <button data-testid="level-button-7" aria-disabled="true">
+          Level 7 (locked)
+        </button>
+      </div>
+    );
+  }
+  MockLevelGrid.displayName = 'MockLevelGrid';
+  return MockLevelGrid;
+});
+
+// Mock AdventureGame to simplify testing of AdventureView integration
+jest.mock('../AdventureGame', () => {
+  const MockAdventureGame = ({
+    onExit,
+    onTimerStateChange,
+  }: {
+    onExit: () => void;
+    onTimerStateChange?: (state: unknown) => void;
+  }) => {
+    React.useEffect(() => {
+      onTimerStateChange?.({
+        timeRemaining: 60,
+        totalTime: 120,
+        isPlaying: true,
+        isPaused: false,
+      });
+    }, [onTimerStateChange]);
+
+    return (
+      <div data-testid="adventure-game">
+        <div role="grid">
+          <div role="row"><div role="gridcell">A</div></div>
+        </div>
+        <button onClick={onExit}>Exit</button>
+      </div>
+    );
+  };
+  MockAdventureGame.displayName = 'MockAdventureGame';
+  return MockAdventureGame;
+});
 
 // ==============================================
 // TEST FIXTURES

@@ -14,16 +14,15 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getSession } from '@/lib/supabase';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import AdminPage from '@/app/[locale]/admin/page';
 
 // Mock dependencies
 jest.mock('@/contexts/AuthContext');
 jest.mock('@/contexts/LanguageContext');
-jest.mock('@/lib/supabase');
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
@@ -55,11 +54,45 @@ jest.mock('@/components/ui/PullToRefreshWrapper', () => ({
 jest.mock('@/utils/mobileAccessibility', () => ({
   isMobileDevice: () => false,
 }));
+jest.mock('@/components/admin/overview/KPICards', () => ({
+  KPICards: () => <div data-testid="kpi-cards">KPICards</div>,
+}));
+jest.mock('@/components/admin/overview/SystemHealth', () => ({
+  SystemHealth: () => <div data-testid="system-health">SystemHealth</div>,
+}));
+jest.mock('@/components/admin/sidebar/AdminSidebar', () => ({
+  AdminSidebar: () => <div data-testid="admin-sidebar">AdminSidebar</div>,
+}));
+jest.mock('@/components/admin/sidebar/AdminBottomNav', () => ({
+  AdminBottomNav: () => <div data-testid="admin-bottom-nav">AdminBottomNav</div>,
+}));
+jest.mock('@/components/ui/Loader', () => ({
+  Loader: ({ text }: { text?: string }) => <div>{text}</div>,
+}));
+jest.mock('@/components/ui/PageLoader', () => ({
+  PageLoader: ({ text }: { text?: string }) => <div>{text}</div>,
+}));
+jest.mock('@/hooks/useAdminAuth', () => ({
+  useAdminAuth: jest.fn(() => ({
+    authToken: null,
+    refreshToken: jest.fn(),
+    isLoading: false,
+    error: null,
+  })),
+}));
+jest.mock('@/hooks/useAdminDashboard', () => ({
+  useAdminDashboard: jest.fn(() => ({
+    stats: null,
+    health: null,
+    loading: false,
+    error: null,
+  })),
+}));
 
 describe('Admin Page - authToken loading issue', () => {
   const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
   const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
-  const mockGetSession = getSession as jest.MockedFunction<typeof getSession>;
+  const mockUseAdminAuth = useAdminAuth as jest.MockedFunction<typeof useAdminAuth>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -87,35 +120,33 @@ describe('Admin Page - authToken loading issue', () => {
       loading: false,
     } as any);
 
-    // Simulate SLOW authToken fetch (takes 5 seconds)
-    mockGetSession.mockImplementation(
-      () =>
-        new Promise((resolve) =>
-          setTimeout(
-            () =>
-              resolve({
-                data: { session: { access_token: 'mock-token-123' } },
-                error: null,
-              } as any),
-            5000
-          )
-        )
-    );
+    // Simulate SLOW authToken fetch — initially loading
+    mockUseAdminAuth.mockReturnValue({
+      authToken: null,
+      refreshToken: jest.fn(),
+      isLoading: true,
+      isRefreshing: false,
+      error: null,
+    });
 
-    render(<AdminPage />);
+    const { rerender } = render(<AdminPage />);
 
     // Initially shows loading
     expect(screen.getByText(/common\.loading/i)).toBeInTheDocument();
 
-    // Advance timers to complete the slow fetch (5 seconds)
-    await act(async () => {
-      jest.advanceTimersByTime(5000);
-      await Promise.resolve(); // Flush promises
+    // Token fetch completes
+    mockUseAdminAuth.mockReturnValue({
+      authToken: 'mock-token-123',
+      refreshToken: jest.fn(),
+      isLoading: false,
+      isRefreshing: false,
+      error: null,
     });
+
+    rerender(<AdminPage />);
 
     // After fetch completes, page should render
     await waitFor(() => {
-      // Dashboard header should appear (page rendered)
       expect(screen.getByText(/admin\.dashboard/i)).toBeInTheDocument();
     });
 
@@ -132,20 +163,18 @@ describe('Admin Page - authToken loading issue', () => {
       loading: false,
     } as any);
 
-    // authToken will eventually resolve, but starts null
-    mockGetSession.mockResolvedValue({
-      data: { session: { access_token: 'mock-token-123' } },
+    // authToken is null but not loading (token not yet available)
+    mockUseAdminAuth.mockReturnValue({
+      authToken: null,
+      refreshToken: jest.fn(),
+      isLoading: false,
+      isRefreshing: false,
       error: null,
-    } as any);
+    });
 
     render(<AdminPage />);
 
-    // Flush promises to let the token fetch complete
-    await act(async () => {
-      await Promise.resolve();
-    });
-
-    // Dashboard should appear eventually
+    // Dashboard should appear (not stuck loading)
     await waitFor(() => {
       expect(screen.getByTestId('header')).toBeInTheDocument();
     });
@@ -159,21 +188,19 @@ describe('Admin Page - authToken loading issue', () => {
       loading: false,
     } as any);
 
-    mockGetSession.mockResolvedValue({
-      data: { session: { access_token: 'mock-token-123' } },
+    // Token already available
+    mockUseAdminAuth.mockReturnValue({
+      authToken: 'mock-token-123',
+      refreshToken: jest.fn(),
+      isLoading: false,
+      isRefreshing: false,
       error: null,
-    } as any);
+    });
 
     render(<AdminPage />);
 
-    // Flush promises to let the token fetch complete
-    await act(async () => {
-      await Promise.resolve();
-    });
-
-    // Should not show loading after token fetch completes
+    // Should not show loading
     await waitFor(() => {
-      // Either content or access denied (not stuck loading)
       const loading = screen.queryByText(/common\.loading/i);
       expect(loading).not.toBeInTheDocument();
     });

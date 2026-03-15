@@ -40,12 +40,12 @@ describe('BlastChainBadge', () => {
 
   it('renders badge text when chainLevel is 1', () => {
     render(<BlastChainBadge chainLevel={1} />);
-    expect(screen.getByText(/blast\.chain\.badge/)).toBeInTheDocument();
+    expect(screen.getByText(/Chain x1/)).toBeInTheDocument();
   });
 
   it('renders badge text when chainLevel is 3', () => {
     render(<BlastChainBadge chainLevel={3} />);
-    expect(screen.getByText(/blast\.chain\.badge/)).toBeInTheDocument();
+    expect(screen.getByText(/Chain x3/)).toBeInTheDocument();
   });
 
   it('applies cyan background for tier 1', () => {
