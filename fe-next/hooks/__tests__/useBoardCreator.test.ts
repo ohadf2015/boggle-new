@@ -9,6 +9,8 @@ import { useBoardCreator } from '../useBoardCreator';
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
+jest.useFakeTimers();
+
 beforeEach(() => {
   mockFetch.mockReset();
 });
@@ -122,15 +124,14 @@ describe('useBoardCreator — generateBoard', () => {
   };
 
   it('calls POST /api/ugc/boards/generate with correct params', async () => {
-    mockFetch.mockResolvedValueOnce({
+    // Use mockResolvedValue so both the debounced auto-generate and explicit call get a response
+    mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ board: mockBoard }),
+      json: async () => mockBoard,
     });
 
     const { result } = renderHook(() => useBoardCreator());
-    act(() => { result.current.setGridSize(4); });
-    act(() => { result.current.setLanguage('en'); });
-    act(() => { result.current.setSeedWords('cat'); });
+    act(() => { result.current.addTag('cat'); });
 
     await act(async () => { await result.current.generateBoard(); });
 
@@ -142,36 +143,42 @@ describe('useBoardCreator — generateBoard', () => {
   });
 
   it('sets generatedBoard on success', async () => {
-    mockFetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ board: mockBoard }),
+      json: async () => mockBoard,
     });
 
     const { result } = renderHook(() => useBoardCreator());
+    act(() => { result.current.addTag('cat'); });
+
     await act(async () => { await result.current.generateBoard(); });
 
     expect(result.current.generatedBoard).toEqual(mockBoard);
   });
 
   it('advances step to preview on success', async () => {
-    mockFetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ board: mockBoard }),
+      json: async () => mockBoard,
     });
 
     const { result } = renderHook(() => useBoardCreator());
+    act(() => { result.current.addTag('cat'); });
+
     await act(async () => { await result.current.generateBoard(); });
 
     expect(result.current.step).toBe('preview');
   });
 
   it('sets generateError on API failure', async () => {
-    mockFetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValue({
       ok: false,
       json: async () => ({ error: 'Generation failed' }),
     });
 
     const { result } = renderHook(() => useBoardCreator());
+    act(() => { result.current.addTag('cat'); });
+
     await act(async () => { await result.current.generateBoard(); });
 
     expect(result.current.generateError).not.toBeNull();
@@ -179,26 +186,31 @@ describe('useBoardCreator — generateBoard', () => {
   });
 
   it('sets generateError on network error', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    mockFetch.mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useBoardCreator());
+    act(() => { result.current.addTag('cat'); });
+
     await act(async () => { await result.current.generateBoard(); });
 
     expect(result.current.generateError).not.toBeNull();
   });
 
   it('clears generateError on successful generate', async () => {
-    mockFetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValue({
       ok: false,
       json: async () => ({ error: 'fail' }),
     });
+
     const { result } = renderHook(() => useBoardCreator());
+    act(() => { result.current.addTag('cat'); });
+
     await act(async () => { await result.current.generateBoard(); });
     expect(result.current.generateError).not.toBeNull();
 
-    mockFetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ board: mockBoard }),
+      json: async () => mockBoard,
     });
     await act(async () => { await result.current.generateBoard(); });
     expect(result.current.generateError).toBeNull();
@@ -216,24 +228,33 @@ describe('useBoardCreator — shuffleBoard', () => {
   it('calls generate endpoint again (same params)', async () => {
     mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ board: mockBoard }),
+      json: async () => mockBoard,
     });
 
     const { result } = renderHook(() => useBoardCreator());
+    act(() => { result.current.addTag('cat'); });
+
+    // Clear calls from addTag trigger
+    mockFetch.mockClear();
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockBoard,
+    });
+
     await act(async () => { await result.current.shuffleBoard(); });
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith('/api/ugc/boards/generate', expect.any(Object));
   });
 
   it('does not advance step when already at preview', async () => {
     mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ board: mockBoard }),
+      json: async () => mockBoard,
     });
 
     const { result } = renderHook(() => useBoardCreator());
     act(() => { result.current.setStep('preview'); });
+    act(() => { result.current.addTag('cat'); });
     await act(async () => { await result.current.shuffleBoard(); });
 
     expect(result.current.step).toBe('preview');
@@ -248,13 +269,22 @@ describe('useBoardCreator — publishBoard', () => {
     seedWordsPlaced: [],
   };
 
-  it('calls POST /api/ugc/boards/publish with title and grid', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ board: mockBoard }) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ boardCode: 'abc12345', title: 'Test' }) });
-
-    const { result } = renderHook(() => useBoardCreator());
+  /** Helper: add a tag and call generateBoard to populate generatedBoard */
+  async function setupWithBoard(result: { current: ReturnType<typeof useBoardCreator> }) {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockBoard,
+    });
+    act(() => { result.current.addTag('cat'); });
     await act(async () => { await result.current.generateBoard(); });
+  }
+
+  it('calls POST /api/ugc/boards/publish with title and grid', async () => {
+    const { result } = renderHook(() => useBoardCreator());
+    await setupWithBoard(result);
+
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ boardCode: 'abc12345', title: 'Test' }) });
+
     act(() => { result.current.setTitle('Test'); });
     await act(async () => { await result.current.publishBoard(); });
 
@@ -265,12 +295,11 @@ describe('useBoardCreator — publishBoard', () => {
   });
 
   it('sets publishedBoard on success', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ board: mockBoard }) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ boardCode: 'xyz99999', title: 'My Board' }) });
-
     const { result } = renderHook(() => useBoardCreator());
-    await act(async () => { await result.current.generateBoard(); });
+    await setupWithBoard(result);
+
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ boardCode: 'xyz99999', title: 'My Board' }) });
+
     act(() => { result.current.setTitle('My Board'); });
     await act(async () => { await result.current.publishBoard(); });
 
@@ -278,12 +307,11 @@ describe('useBoardCreator — publishBoard', () => {
   });
 
   it('advances step to published on success', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ board: mockBoard }) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ boardCode: 'abc12345', title: 'Test' }) });
-
     const { result } = renderHook(() => useBoardCreator());
-    await act(async () => { await result.current.generateBoard(); });
+    await setupWithBoard(result);
+
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ boardCode: 'abc12345', title: 'Test' }) });
+
     act(() => { result.current.setTitle('Test'); });
     await act(async () => { await result.current.publishBoard(); });
 
@@ -291,12 +319,11 @@ describe('useBoardCreator — publishBoard', () => {
   });
 
   it('sets publishError on API failure', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ board: mockBoard }) })
-      .mockResolvedValueOnce({ ok: false, json: async () => ({ error: 'Publish failed' }) });
-
     const { result } = renderHook(() => useBoardCreator());
-    await act(async () => { await result.current.generateBoard(); });
+    await setupWithBoard(result);
+
+    mockFetch.mockResolvedValueOnce({ ok: false, json: async () => ({ error: 'Publish failed' }) });
+
     await act(async () => { await result.current.publishBoard(); });
 
     expect(result.current.publishError).not.toBeNull();

@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import AdventureView from '../AdventureView';
 import type { PlayerProgression } from '@/types/adventure';
 
@@ -78,6 +78,24 @@ jest.mock('next/link', () => {
   };
   MockLink.displayName = 'MockLink';
   return MockLink;
+});
+
+// Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
+// We intercept this and return the jest-mocked AdventureGame synchronously
+jest.mock('next/dynamic', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require('react');
+  return (_importFn: unknown, _opts?: unknown) => {
+    // Return a component that renders the mocked AdventureGame
+    const Dynamic = (props: Record<string, unknown>) => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const AdventureGame = require('../AdventureGame');
+      const Comp = AdventureGame.default || AdventureGame;
+      return React.createElement(Comp, props);
+    };
+    Dynamic.displayName = 'NextDynamic';
+    return Dynamic;
+  };
 });
 
 // Mock Next.js Image
@@ -262,6 +280,74 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
     arenaEffect: 'none',
   }),
 }));
+
+// Mock adventure lib to provide grid/level config for gameplay
+jest.mock('@/lib/adventure', () => ({
+  getWorldConfig: (worldId: number) => ({
+    id: worldId,
+    name: `World ${worldId}`,
+    description: 'Test world',
+    world: worldId,
+    levels: 7,
+    requiredStars: 0,
+    theme: 'forest',
+  }),
+  getLevelConfig: () => ({
+    world: 1,
+    level: 1,
+    gridSize: 4,
+    timeLimit: 120,
+    objectives: { minScore: 100 },
+    specialTiles: [],
+  }),
+  generateAdventureGrid: () => [
+    ['A', 'B', 'C', 'D'],
+    ['E', 'F', 'G', 'H'],
+    ['I', 'J', 'K', 'L'],
+    ['M', 'N', 'O', 'P'],
+  ],
+  getLevelSeed: () => 'test-seed',
+  getGridSize: () => 4,
+  WORLDS: [{ id: 1, name: 'World 1', requiredStars: 0 }],
+}));
+
+// Mock WorldMap to provide clickable world buttons with expected testids
+jest.mock('../WorldMap', () => {
+  const MockWorldMap = ({
+    onWorldSelect,
+  }: {
+    onWorldSelect: (worldId: number) => void;
+  }) => (
+    <div data-testid="world-map">
+      <button data-testid="world-1" onClick={() => onWorldSelect(1)}>World 1</button>
+      <button data-testid="world-2" onClick={() => onWorldSelect(2)}>World 2</button>
+    </div>
+  );
+  MockWorldMap.displayName = 'MockWorldMap';
+  return MockWorldMap;
+});
+
+// Mock LevelGrid to provide clickable level buttons with expected testids
+jest.mock('../LevelGrid', () => {
+  const MockLevelGrid = ({
+    onLevelSelect,
+    worldId,
+  }: {
+    onLevelSelect: (worldId: number, levelId: number) => void;
+    worldId: number;
+  }) => (
+    <div data-testid="level-grid">
+      <button
+        data-testid="level-button-1"
+        onClick={() => onLevelSelect(worldId, 1)}
+      >
+        Level 1
+      </button>
+    </div>
+  );
+  MockLevelGrid.displayName = 'MockLevelGrid';
+  return MockLevelGrid;
+});
 
 // Mock AdventureGame to simplify testing of AdventureView music integration
 jest.mock('../AdventureGame', () => {
@@ -454,8 +540,14 @@ describe('AdventureView Music Integration', () => {
 
       mockUseAdventureMusic.mockClear();
 
-      // WHEN - exit game
-      fireEvent.click(screen.getByRole('button', { name: /exit to map/i }));
+      // WHEN - simulate browser back to exit game (triggers popstate → levelGrid)
+      act(() => {
+        window.dispatchEvent(
+          new PopStateEvent('popstate', {
+            state: { adventureView: 'levelGrid', worldId: 1, levelId: null },
+          })
+        );
+      });
 
       // THEN - should be back in ambient mode (timeRemaining/totalTime = 0)
       const lastCall =

@@ -79,9 +79,9 @@ describe('AchievementPopup - RTL Positioning', () => {
     // The popup should use RTL-aware classes
     const classNames = popup?.className || '';
 
-    // Should have RTL-aware positioning (either ltr:right-4 rtl:left-4 OR conditional classes)
-    // The key test: should NOT have bare "right-4" without RTL handling
-    expect(classNames).toMatch(/rtl:left-4|ltr:right-4/);
+    // Should have RTL-aware positioning via logical property (end-4)
+    // end-4 maps to right in LTR and left in RTL — correct approach
+    expect(classNames).toMatch(/end-4/);
   });
 
   test('should position popup on RIGHT side in LTR (English) mode', () => {
@@ -92,8 +92,8 @@ describe('AchievementPopup - RTL Positioning', () => {
 
     const classNames = popup?.className || '';
 
-    // In LTR mode, should have right positioning
-    expect(classNames).toMatch(/right-4|ltr:right-4/);
+    // In LTR mode, end-4 resolves to right — correct logical property
+    expect(classNames).toMatch(/end-4/);
   });
 
   test('should NOT use bare right-4 without RTL handling', () => {

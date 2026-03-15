@@ -25,6 +25,7 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
   }),
+  usePathname: jest.fn(() => '/en/admin'),
 }));
 
 jest.mock('@/lib/supabase', () => ({

@@ -29,6 +29,7 @@ jest.mock('next/navigation', () => ({
     push: jest.fn(),
     refresh: jest.fn(),
   }),
+  usePathname: jest.fn(() => '/en/admin'),
 }));
 
 // Mock child components
