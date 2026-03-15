@@ -83,13 +83,13 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 18,
   },
-  // Wave 3 — prism + mirror unlock (16 moves)
+  // Wave 3 — prism + mirror unlock (17 moves, no score threshold — learn new mechanics freely)
   {
     minWordLength: 3, specialTileChance: 0.19, iceDistribution: 0.23, goldDistribution: 0.18,
-    vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: 30,
+    vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: true, silverEnabled: true, diamondEnabled: false, movesAllowed: 16,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: false, movesAllowed: 17,
   },
   // Wave 4 — frost + lightning + diamond unlock (15 moves)
   {
@@ -102,7 +102,7 @@ const WAVE_TABLE: WaveConfig[] = [
   // Wave 5 — all minus vortex (14 moves)
   {
     minWordLength: 4, specialTileChance: 0.23, iceDistribution: 0.28, goldDistribution: 0.14,
-    vowelModifier: 0.80, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 80,
+    vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 80,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 14,
@@ -110,7 +110,7 @@ const WAVE_TABLE: WaveConfig[] = [
   // Wave 6+ — everything unlocked (12 moves — tight, requires strategy)
   {
     minWordLength: 4, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12,
-    vowelModifier: 0.75, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 120,
+    vowelModifier: 0.82, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 120,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 12,
@@ -276,13 +276,12 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     ice: iceDistribution,
     silver,
     lightning,
-    // vortex is the renamed magnet; keep both keys for backward compatibility
-    vortex,
+    // Use canonical BlastTileType key 'magnet' (vortex was a legacy alias that
+    // doesn't exist in the type union and would produce unhandled tiles)
     magnet: vortex,
     gem,
     prism,
-    // frost is the renamed frozen; keep both keys for backward compatibility
-    frost,
+    // Use canonical BlastTileType key 'frozen' (frost was a legacy alias)
     frozen: frost,
     mirror,
     diamond,

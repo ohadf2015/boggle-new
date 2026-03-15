@@ -457,11 +457,13 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
     }
 
     case 'prism_mirror': {
-      // Twin Cross: cross-clear from prism twice (double-damage)
+      // Twin Cross: cross-clear from prism, then second pass applies another hit to survivors
       const pt2 = combo.tiles.find(t => t.tileType === 'prism') ?? combo.tiles[0];
       if (!pt2) break;
       fireCrossClear(pt2.row, pt2.col, ctx);
-      fireCrossClear(pt2.row, pt2.col, ctx);
+      // Second pass: apply another hit to tiles in the cross that survived the first pass
+      for (let c = 0; c < gridSize; c++) applyToTile(next[pt2.row][c], ctx);
+      for (let r = 0; r < gridSize; r++) applyToTile(next[r][pt2.col], ctx);
       pushExplosion(`combo-pmr-${now}`, pt2.row, pt2.col, result, now);
       break;
     }

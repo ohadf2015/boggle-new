@@ -11,7 +11,8 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { BlastGrid } from './BlastGrid';
 import { BlastProgressBar } from './BlastProgressBar';
 import { BlastFoundWords } from './BlastFoundWords';
-import { BlastHelpModal } from './BlastHelpModal';
+import dynamic from 'next/dynamic';
+const BlastHelpModal = dynamic(() => import('./BlastHelpModal').then(m => m.BlastHelpModal), { ssr: false });
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
@@ -342,8 +343,10 @@ export function BlastGameLayout({
         />
       </div>
 
-      {/* Combo milestone announcement */}
-      <ComboMilestoneAnnouncement comboLevel={comboLevel} />
+      {/* Combo milestone announcement — suppressed during active cascade to reduce visual overload */}
+      {cascadePhase === 'idle' && cascadeHighlightPhase !== 'highlighting' && (
+        <ComboMilestoneAnnouncement comboLevel={comboLevel} />
+      )}
 
       {/* Cascade word showcase banner (replaces simple text announcement) */}
       <AnimatePresence>
@@ -352,7 +355,7 @@ export function BlastGameLayout({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute top-16 short:top-8 sm:top-32 start-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            className="absolute bottom-2 sm:bottom-4 start-1/2 -translate-x-1/2 z-50 pointer-events-none"
           >
             <BlastCascadeWordBanner highlightData={cascadeHighlightData} />
           </motion.div>
@@ -453,7 +456,7 @@ export function BlastGameLayout({
       {/* Score threshold progress (visible on wave 3+) */}
       {scoreThreshold && score < scoreThreshold && (
         <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
-          <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider text-center">
+          <div className="text-[10px] font-bold text-white/90 bg-white/10 rounded-md px-2 py-0.5 uppercase tracking-wider text-center">
             {t('blast.needScore')} {scoreThreshold - score} {t('blast.morePoints')}
           </div>
         </div>

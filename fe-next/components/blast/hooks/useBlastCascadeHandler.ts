@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState, type RefObject } from 'react';
-import { detectVerticalWords } from '../utils/blastVerticalScanner';
+import { detectVerticalWords, detectHorizontalWords } from '../utils/blastVerticalScanner';
 import {
   MAX_CASCADE_CHAIN,
   MAX_CASCADE_WORDS_PER_LEVEL,
@@ -90,7 +90,26 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
         const foundSet = new Set<string>();
         const columnFilter = affectedColumns.length > 0 ? new Set(affectedColumns) : undefined;
         const allVerticalWords = detectVerticalWords(newGrid, newTileStates, checkWordInDict, foundSet, CASCADE_MIN_WORD_LENGTH, columnFilter);
-        const verticalWords = allVerticalWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
+        // Horizontal: derive affected rows from affected columns (rows that received new/moved tiles)
+        const rowFilter = affectedColumns.length > 0
+          ? new Set(newTileStates.flatMap((row, ri) =>
+              row.some((t, ci) => columnFilter!.has(ci) && !t.isCleared) ? [ri] : []
+            ))
+          : undefined;
+        const allHorizontalWords = detectHorizontalWords(newGrid, newTileStates, checkWordInDict, foundSet, CASCADE_MIN_WORD_LENGTH, rowFilter);
+        // Merge and deduplicate by position (vertical takes priority), cap total
+        const usedCells = new Set<string>();
+        for (const vw of allVerticalWords) {
+          for (const cell of vw.path) usedCells.add(`${cell.row},${cell.col}`);
+        }
+        const nonOverlappingHorizontal = allHorizontalWords.filter(hw =>
+          !hw.path.some(cell => usedCells.has(`${cell.row},${cell.col}`))
+        );
+        const allCascadeWords = [
+          ...allVerticalWords.map(vw => ({ ...vw, column: vw.column })),
+          ...nonOverlappingHorizontal.map(hw => ({ word: hw.word, column: hw.startCol, startRow: hw.row, endRow: hw.row, path: hw.path })),
+        ];
+        const verticalWords = allCascadeWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
 
         if (verticalWords.length > 0) {
           const chainLevel = cascadeChainLevelRef.current + 1;
@@ -114,6 +133,7 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
           if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
           highlightTimerRef.current = setTimeout(() => {
             const newExplosions: BlastExplosion[] = [];
+            const newPopups: BlastScorePopup[] = [];
             const now = Date.now();
             let totalCascadeScore = 0;
             let newlyClearedCount = 0;
@@ -156,16 +176,22 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
                 timestamp: now,
               });
 
-              setScorePopups(prev => [...prev, {
+              // Collect popups instead of calling setScorePopups per word (batched below)
+              newPopups.push({
                 id: `cascade-score-${now}-${vw.column}-${vw.startRow}`,
                 score: wordScore,
                 row: vw.path[midIdx].row,
                 col: vw.path[midIdx].col,
                 isSpecial: true,
                 timestamp: now,
-              }]);
+              });
 
               onAutoCascadeWordRef.current?.(vw.word, wordScore, chainLevel);
+            }
+
+            // Batch all cascade score popups into a single state update
+            if (newPopups.length > 0) {
+              setScorePopups(prev => [...prev, ...newPopups]);
             }
 
             setGameState(prev => {

@@ -157,8 +157,35 @@ export function BlastShatterEffect({
   const processedRef = useRef<Set<string>>(new Set());
   const rafRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
+  const mountedRef = useRef(true);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
+
+  // Mark unmounted to prevent setState calls from stale RAF callbacks
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
+
+  // Size canvas to match parent container (avoid fixed 800×800 waste)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.scale(dpr, dpr);
+    });
+    ro.observe(parent);
+    return () => ro.disconnect();
+  }, []);
 
   // Spawn particles for new triggers
   useEffect(() => {
@@ -189,6 +216,7 @@ export function BlastShatterEffect({
   // Animation loop stored in ref to avoid dependency issues
   const animateRef = useRef<(time: number) => void>(undefined);
   animateRef.current = (time: number) => {
+    if (!mountedRef.current) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -253,8 +281,6 @@ export function BlastShatterEffect({
       ref={canvasRef}
       data-testid="blast-shatter-canvas"
       className="pointer-events-none absolute inset-0 z-25"
-      width={800}
-      height={800}
     />
   );
 }

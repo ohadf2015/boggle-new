@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { BLAST_ANIM, type BlastCascadePhase, type CascadeAnimationData } from './hooks/useBlastCascade';
 import type { BlastTileType } from './types';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
@@ -49,17 +49,27 @@ export function BlastCascadeOverlay({
   gridSize,
 }: BlastCascadeOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  // Measure actual cell height from DOM for precise translateY calculations
-  const [cellHeight, setCellHeight] = useState(0);
+  // Cached row step (cell height + gap) — only remeasured when gridSize changes or first mount
+  const rowStepRef = useRef(0);
+  const lastGridSizeRef = useRef(gridSize);
 
   // Measure a grid cell's actual rendered height (accounts for padding + gaps)
+  // Only remeasure when gridSize changes or on first valid measurement
   useEffect(() => {
     if (!overlayRef.current || phase === 'idle') return;
+    if (rowStepRef.current > 0 && lastGridSizeRef.current === gridSize) return;
     const firstCell = overlayRef.current.querySelector('[data-cascade-cell]') as HTMLElement | null;
     if (firstCell) {
-      setCellHeight(firstCell.offsetHeight);
+      const measuredHeight = firstCell.offsetHeight;
+      const el = overlayRef.current;
+      const totalHeight = el.clientHeight;
+      const computedGap = gridSize > 1
+        ? (totalHeight - parseFloat(getComputedStyle(el).paddingTop) * 2 - measuredHeight * gridSize) / (gridSize - 1)
+        : 0;
+      rowStepRef.current = measuredHeight + Math.max(0, computedGap);
+      lastGridSizeRef.current = gridSize;
     }
-  }, [phase, data]);
+  }, [phase, data, gridSize]);
 
   // Run anime.js animations when phase changes — preloaded at module level
   useEffect(() => {
@@ -86,16 +96,7 @@ export function BlastCascadeOverlay({
       }
 
       if (phase === 'falling') {
-        // Measure actual cell height from the first rendered falling tile
-        const firstFall = el.querySelector('.blast-cascade-fall') as HTMLElement | null;
-        const measuredHeight = firstFall?.offsetHeight || cellHeight;
-        // Compute gap from grid: total column height minus cells / (gridSize - 1)
-        const gridEl = el;
-        const totalHeight = gridEl.clientHeight;
-        const computedGap = gridSize > 1
-          ? (totalHeight - parseFloat(getComputedStyle(gridEl).paddingTop) * 2 - measuredHeight * gridSize) / (gridSize - 1)
-          : 0;
-        const rowStep = measuredHeight + Math.max(0, computedGap);
+        const rowStep = rowStepRef.current;
 
         const fallTargets = el.querySelectorAll('.blast-cascade-fall');
         if (fallTargets.length > 0) {
@@ -120,13 +121,7 @@ export function BlastCascadeOverlay({
       }
 
       if (phase === 'appearing') {
-        const firstNew = el.querySelector('.blast-cascade-new') as HTMLElement | null;
-        const measuredHeight = firstNew?.offsetHeight || cellHeight;
-        const totalHeight = el.clientHeight;
-        const computedGap = gridSize > 1
-          ? (totalHeight - parseFloat(getComputedStyle(el).paddingTop) * 2 - measuredHeight * gridSize) / (gridSize - 1)
-          : 0;
-        const rowStep = measuredHeight + Math.max(0, computedGap);
+        const rowStep = rowStepRef.current;
 
         const newTargets = el.querySelectorAll('.blast-cascade-new');
         if (newTargets.length > 0) {
@@ -148,7 +143,7 @@ export function BlastCascadeOverlay({
         }
       }
     });
-  }, [phase, data, cellHeight, gridSize]);
+  }, [phase, data, gridSize]);
 
   if (!data || phase === 'idle') return null;
 

@@ -24,8 +24,8 @@ describe('WaveConfig movesAllowed', () => {
     expect(getWaveConfig(2).movesAllowed).toBe(18);
   });
 
-  it('wave 3 allows 16 moves', () => {
-    expect(getWaveConfig(3).movesAllowed).toBe(16);
+  it('wave 3 allows 17 moves (extra move for learning new mechanics)', () => {
+    expect(getWaveConfig(3).movesAllowed).toBe(17);
   });
 
   it('wave 4 allows 15 moves', () => {

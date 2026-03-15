@@ -23,7 +23,8 @@ export interface UseBlastGameReturn {
   clearTilesForWord: (
     path: Array<{ row: number; col: number }>,
     word: string,
-    baseScore: number
+    baseScore: number,
+    preDetectedCombos?: SpecialCombo[],
   ) => void;
   noWordsRemaining: boolean;
   endGame: () => void;

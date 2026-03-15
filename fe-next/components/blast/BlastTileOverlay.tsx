@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Star, Bomb, Rainbow, Snowflake, Shuffle,
@@ -96,9 +97,9 @@ const TILE_BACKGROUNDS: Record<string, {
     animationClass: 'blast-tile-gem',
   },
   frozen: {
-    background: 'linear-gradient(135deg, rgba(200,220,255,0.6) 0%, rgba(160,200,240,0.5) 50%, rgba(220,240,255,0.55) 100%)',
-    border: '4px solid rgba(180,220,255,0.8)',
-    shadow: 'inset 0 0 22px rgba(180,220,255,0.4), 0 0 16px rgba(200,230,255,0.35), 0 0 30px rgba(150,200,255,0.15)',
+    background: 'linear-gradient(135deg, rgba(180,180,240,0.6) 0%, rgba(140,140,220,0.5) 50%, rgba(200,190,255,0.55) 100%)',
+    border: '4px solid rgba(160,140,240,0.8)',
+    shadow: 'inset 0 0 22px rgba(160,140,240,0.4), 0 0 16px rgba(180,160,255,0.35), 0 0 30px rgba(140,120,240,0.15)',
     animationClass: 'blast-tile-frozen',
   },
 };
@@ -114,9 +115,9 @@ const TILE_ICONS: Record<string, { Icon: LucideIcon; color: string; label: strin
   diamond:   { Icon: Diamond,   color: 'text-cyan-200',    label: '5×',   labelBg: 'bg-cyan-500/90 text-white' },
   lightning: { Icon: Zap,       color: 'text-yellow-300',  label: 'col',  labelBg: 'bg-yellow-400/90 text-yellow-900' },
   magnet:    { Icon: Magnet,    color: 'text-white',       label: 'pull', labelBg: 'bg-purple-600/90 text-white' },
-  prism:     { Icon: Sparkles,  color: 'text-white',       label: '×2',   labelBg: 'bg-pink-400/90 text-white' },
-  gem:       { Icon: Diamond,   color: 'text-white',       label: '+3',   labelBg: 'bg-emerald-500/90 text-white' },
-  frozen:    { Icon: Snowflake, color: 'text-blue-400',    label: '×2',   labelBg: 'bg-blue-300/90 text-blue-900' },
+  prism:     { Icon: Sparkles,  color: 'text-white',       label: '+',    labelBg: 'bg-pink-400/90 text-white' },
+  gem:       { Icon: Diamond,   color: 'text-white',       label: '×3',   labelBg: 'bg-emerald-500/90 text-white' },
+  frozen:    { Icon: Snowflake, color: 'text-indigo-300',  label: '×2',   labelBg: 'bg-indigo-400/90 text-white' },
 };
 
 /**
@@ -124,7 +125,7 @@ const TILE_ICONS: Record<string, { Icon: LucideIcon; color: string; label: strin
  * Uses CSS Grid aligned to GridComponent's layout for pixel-perfect tile alignment.
  * Cleared cells render as dark inset gaps so the board visually "breathes" during cascade.
  */
-export function BlastTileOverlay({
+export const BlastTileOverlay = memo(function BlastTileOverlay({
   tileStates,
   gridSize,
   selectedPositions,
@@ -235,13 +236,13 @@ export function BlastTileOverlay({
               {iconEntry && (
                 <span
                   className={cn(
-                    'absolute bottom-0 right-0 flex items-center gap-px rounded-tl-md rounded-br-lg px-1 py-px',
-                    'text-[8px] font-black leading-none',
+                    'absolute bottom-0 right-0 flex items-center gap-0.5 rounded-tl-md rounded-br-lg px-1 py-0.5',
+                    'text-[10px] font-black leading-none',
                     iconEntry.labelBg,
                   )}
                   data-testid={`badge-${tile.type}`}
                 >
-                  <iconEntry.Icon className="w-2.5 h-2.5" />
+                  <iconEntry.Icon className="w-3 h-3" />
                   <span>{iconEntry.label}</span>
                 </span>
               )}
@@ -269,4 +270,4 @@ export function BlastTileOverlay({
       </AnimatePresence>
     </div>
   );
-}
+});

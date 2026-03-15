@@ -78,10 +78,11 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(4).frozenEnabled).toBe(true);
   });
 
-  it('has scoreThreshold starting at wave 3', () => {
+  it('has scoreThreshold starting at wave 4 (wave 3 is threshold-free for learning)', () => {
     expect(getWaveConfig(1).scoreThreshold).toBeUndefined();
     expect(getWaveConfig(2).scoreThreshold).toBeUndefined();
-    expect(getWaveConfig(3).scoreThreshold).toBe(30);
+    expect(getWaveConfig(3).scoreThreshold).toBeUndefined();
+    expect(getWaveConfig(4).scoreThreshold).toBe(50);
   });
 
   it('increases scoreThreshold for later waves', () => {

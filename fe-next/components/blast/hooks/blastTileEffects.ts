@@ -375,7 +375,8 @@ export function handleFrostFinalHit(
   return { bonusScore, rainbowBoost };
 }
 
-/** Spawn special tiles on gem completion */
+/** Spawn special tiles on gem completion.
+ *  Pass a seeded `rng` in multiplayer to keep clients in sync. */
 export function spawnGemSpecials(
   gemsCompleted: number,
   currentWave: number,
@@ -383,6 +384,7 @@ export function spawnGemSpecials(
   gridSize: number,
   path: Array<{ row: number; col: number }>,
   rollFn: (roll: number, dist: Record<string, number>) => BlastTileType,
+  rng: () => number = Math.random,
 ): void {
   if (gemsCompleted <= 0) return;
 
@@ -409,15 +411,15 @@ export function spawnGemSpecials(
     }
   }
 
-  // Shuffle
+  // Shuffle (use seeded rng for multiplayer determinism)
   for (let i = candidates.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
   }
 
   const spawnCount = gemsCompleted * TREASURE_GEM_SPAWN_COUNT;
   for (const candidate of candidates.slice(0, spawnCount)) {
-    const roll = Math.random();
+    const roll = rng();
     const newType = rollFn(roll, spawnDist);
     candidate.type = newType;
     candidate.hitsRemaining = getInitialHitsRemaining(newType);

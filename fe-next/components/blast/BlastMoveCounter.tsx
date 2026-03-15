@@ -55,7 +55,7 @@ export function BlastMoveCounter({
         initial={{ scale: 1.15 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-        aria-label={`${movesRemaining} ${t('blast.movesLeft')} ${t('blast.movesLeft')}`}
+        aria-label={`${movesRemaining} ${t('blast.movesLeft')}`}
       >
         <div className="text-center">
           <div className="font-black text-neo-black text-xl sm:text-2xl leading-tight tabular-nums">

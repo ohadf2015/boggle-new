@@ -174,6 +174,9 @@ export function useBlastGame(
 
   // The effective grid = currentGrid (post-cascade) or initialGrid (pre-first-cascade)
   const effectiveGrid = currentGrid || initialGrid;
+  // Ref for cascade setTimeout — avoids stale closure over effectiveGrid
+  const effectiveGridRef = useRef(effectiveGrid);
+  effectiveGridRef.current = effectiveGrid;
 
   // Display grid: show letters for non-cleared tiles, empty for cleared
   const displayGrid = useMemo<LetterGrid | null>(() => {
@@ -218,14 +221,16 @@ export function useBlastGame(
   const [noWordsRemaining, setNoWordsRemaining] = useState(false);
 
 
+  // Extract specific fields to avoid re-running effects on unrelated gameState changes (e.g. score)
+  const { tilesCleared, totalTiles, isComplete, isDeadEnd, movesRemaining: gsMovesRemaining, movesUsed, totalMoves: gsTotalMoves } = gameState;
+
   // Auto-complete when cumulative tilesCleared reaches the board size
   // Award leftover move bonus (Sugar Crush equivalent)
   // Skipped in multiplayer — server timer is authoritative; tiles keep cascading/refilling
   useEffect(() => {
     if (options?.isMultiplayer) return;
-    const { tilesCleared, totalTiles, isComplete, isDeadEnd, movesRemaining } = gameState;
     if (!isComplete && !isDeadEnd && tilesCleared >= totalTiles && totalTiles > 0) {
-      const bonus = calculateLeftoverMoveBonus(movesRemaining);
+      const bonus = calculateLeftoverMoveBonus(gsMovesRemaining);
       setGameState(prev => ({
         ...prev,
         isComplete: true,
@@ -233,23 +238,21 @@ export function useBlastGame(
         score: prev.score + bonus,
       }));
     }
-  }, [gameState, options?.isMultiplayer]);
+  }, [tilesCleared, totalTiles, isComplete, isDeadEnd, gsMovesRemaining, options?.isMultiplayer]);
 
   // Game over when moves exhausted (only if move limit is finite)
   // Skipped in multiplayer — moves are unlimited, timer controls game end
   useEffect(() => {
     if (options?.isMultiplayer) return;
-    const { movesRemaining, isComplete, isDeadEnd, movesUsed } = gameState;
-    if (!isComplete && !isDeadEnd && movesUsed > 0 && movesRemaining <= 0 && isFinite(gameState.totalMoves)) {
+    if (!isComplete && !isDeadEnd && movesUsed > 0 && gsMovesRemaining <= 0 && isFinite(gsTotalMoves)) {
       if (options?.onMovesExhausted) {
-        // Delegate to caller (e.g. BlastGame Sugar Crush sequence)
         options.onMovesExhausted();
       } else {
         setGameState(prev => ({ ...prev, isDeadEnd: true }));
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState, options?.isMultiplayer]);
+  }, [isComplete, isDeadEnd, movesUsed, gsMovesRemaining, gsTotalMoves, options?.isMultiplayer]);
 
   // Dead-end detection: check after cascade settles
   useEffect(() => {
@@ -297,7 +300,8 @@ export function useBlastGame(
   const clearTilesForWord = useCallback((
     path: Array<{ row: number; col: number }>,
     word: string,
-    baseScore: number
+    baseScore: number,
+    preDetectedCombos?: import('../utils/blastCombos').SpecialCombo[],
   ) => {
     // Track word success for DDA (invisible assist)
     ddaStateRef.current = updateDDA(ddaStateRef.current, 'success');
@@ -360,8 +364,8 @@ export function useBlastGame(
         markCleared, isMultiHitAlive, hitMultiHitTile,
       };
 
-      // ── Combo detection ──
-      const detectedCombos = detectSpecialCombos(path, next);
+      // ── Combo detection (skip if caller already detected) ──
+      const detectedCombos = preDetectedCombos ?? detectSpecialCombos(path, next);
       let comboMultiplier = 1;
       if (detectedCombos.length > 0) {
         for (const combo of detectedCombos) {
@@ -509,11 +513,15 @@ export function useBlastGame(
       const effectiveBase = baseScore * rainbowSoloMultiplier * mirrorSoloMultiplier;
       const goldBonusScore = effectiveBase * goldMultiplier - effectiveBase;
       if (goldMultiplier > 1) {
-        for (const cell of path) {
+        // Count gold/silver/diamond tiles to split the bonus display per tile
+        const multiplierTiles = path.filter(cell => {
           const t = next[cell.row]?.[cell.col];
-          if (t?.type === 'gold') {
-            pendingPopups.push({ id: `gold-bonus-${now}-${cell.row}-${cell.col}`, score: goldBonusScore, row: cell.row, col: cell.col, isSpecial: true, timestamp: now, tileType: 'gold' as const });
-          }
+          return t?.type === 'gold' || t?.type === 'silver' || t?.type === 'diamond';
+        });
+        const perTileBonus = multiplierTiles.length > 0 ? Math.round(goldBonusScore / multiplierTiles.length) : goldBonusScore;
+        for (const cell of multiplierTiles) {
+          const t = next[cell.row]?.[cell.col];
+          pendingPopups.push({ id: `gold-bonus-${now}-${cell.row}-${cell.col}`, score: perTileBonus, row: cell.row, col: cell.col, isSpecial: true, timestamp: now, tileType: (t?.type ?? 'gold') as 'gold' });
         }
       }
       const totalScore = effectiveBase * goldMultiplier + bonusScore;
@@ -538,21 +546,27 @@ export function useBlastGame(
       if (newExplosions.length > 0) setExplosions(prev => [...prev, ...newExplosions]);
 
       // Trigger cascade — apply vortex letter swaps to grid
-      let gridForCascade = effectiveGrid;
-      if (gridForCascade && vortexLetterSwaps.length > 0) {
-        const swappedGrid = gridForCascade.map(row => [...row]);
-        for (const swap of vortexLetterSwaps) {
-          const tmp = swappedGrid[swap.fromR][swap.fromC];
-          swappedGrid[swap.fromR][swap.fromC] = swappedGrid[swap.toR][swap.toC];
-          swappedGrid[swap.toR][swap.toC] = tmp;
+      if (vortexLetterSwaps.length > 0) {
+        const baseGrid = effectiveGridRef.current;
+        if (baseGrid) {
+          const swappedGrid = baseGrid.map(row => [...row]);
+          for (const swap of vortexLetterSwaps) {
+            const tmp = swappedGrid[swap.fromR][swap.fromC];
+            swappedGrid[swap.fromR][swap.fromC] = swappedGrid[swap.toR][swap.toC];
+            swappedGrid[swap.toR][swap.toC] = tmp;
+          }
+          setCurrentGrid(swappedGrid);
+          effectiveGridRef.current = swappedGrid;
         }
-        gridForCascade = swappedGrid;
-        setCurrentGrid(swappedGrid);
       }
-      if (gridForCascade) {
-        const ddaModifier = getDDASpawnModifier(ddaStateRef.current);
-        setTimeout(() => { cascade.startCascade(gridForCascade, next, handleCascadeComplete, ddaModifier); }, 80);
-      }
+      // Read grid from ref inside setTimeout to avoid stale closure
+      const ddaModifier = getDDASpawnModifier(ddaStateRef.current);
+      setTimeout(() => {
+        const gridForCascade = effectiveGridRef.current;
+        if (gridForCascade) {
+          cascade.startCascade(gridForCascade, next, handleCascadeComplete, ddaModifier);
+        }
+      }, 80);
 
       return next;
     });

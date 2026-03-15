@@ -309,17 +309,17 @@ export function BlastGame({
     if (lastPathRef.current.length > 0) {
       const path = lastPathRef.current;
 
-      // Detect whether the submitted word triggered a combo (used to skip near-miss shimmer)
+      // Detect combos once — pass to clearTilesForWord to avoid redundant O(P²) detection
       const detectedCombos = detectSpecialCombos(path, blast.tileStates);
       const hadCombo = detectedCombos.length > 0;
 
       // Report detected comboType to parent for multiplayer socket emit
       if (onWordWithComboTypeRef.current) {
-        const comboType = detectedCombos.length > 0 ? detectedCombos[0].type : null;
+        const comboType = hadCombo ? detectedCombos[0].type : null;
         onWordWithComboTypeRef.current(data.word, comboType);
       }
 
-      blast.clearTilesForWord(path, data.word, data.score);
+      blast.clearTilesForWord(path, data.word, data.score, detectedCombos);
       lastPathRef.current = [];
 
       // Trigger near-miss shimmer if no combo was already triggered

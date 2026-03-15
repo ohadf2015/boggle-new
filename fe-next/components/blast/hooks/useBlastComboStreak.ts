@@ -4,7 +4,16 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 
 // ==================== Constants ====================
 
-export const COMBO_WINDOW_MS = 4000;
+/** Base combo window (2-letter min). Scales +500ms per minWordLength above 2. */
+export const COMBO_WINDOW_BASE_MS = 4000;
+/** @deprecated Use COMBO_WINDOW_BASE_MS */
+export const COMBO_WINDOW_MS = COMBO_WINDOW_BASE_MS;
+
+/** Compute combo window duration scaled by minimum word length.
+ *  2-letter → 4s, 3-letter → 4.5s, 4-letter → 5s */
+export function getComboWindowMs(minWordLength: number = 2): number {
+  return COMBO_WINDOW_BASE_MS + Math.max(0, minWordLength - 2) * 500;
+}
 export const COMBO_TICK_MS = 50;
 export const COMBO_MULTIPLIER_PER_LEVEL = 0.25;
 export const MAX_COMBO_LEVEL = 10;
@@ -56,7 +65,7 @@ function makeInactiveState(): ComboStreakState {
  * React state only changes when level or isActive changes (~once per word).
  * This eliminates ~3500 unnecessary re-renders per combo window.
  */
-export function useBlastComboStreak(): UseBlastComboStreakReturn {
+export function useBlastComboStreak(comboWindowMs: number = COMBO_WINDOW_BASE_MS): UseBlastComboStreakReturn {
   const [streak, setStreak] = useState<ComboStreakState>(makeInactiveState);
 
   // Refs to avoid stale closures inside RAF loop
@@ -91,7 +100,7 @@ export function useBlastComboStreak(): UseBlastComboStreakReturn {
     }
 
     // Restart a fresh window for the remaining level
-    windowEndRef.current = performance.now() + COMBO_WINDOW_MS;
+    windowEndRef.current = performance.now() + comboWindowMs;
     setStreak({
       level: newLevel,
       isActive: true,
@@ -111,7 +120,7 @@ export function useBlastComboStreak(): UseBlastComboStreakReturn {
 
       // Drive the SVG arc directly via DOM — zero React re-renders
       if (arcRef.current) {
-        const progress = remaining / COMBO_WINDOW_MS;
+        const progress = remaining / comboWindowMs;
         arcRef.current.setAttribute(
           'stroke-dashoffset',
           String(CIRCLE_CIRCUMFERENCE * (1 - progress))
@@ -134,7 +143,7 @@ export function useBlastComboStreak(): UseBlastComboStreakReturn {
   const onWordSubmitted = useCallback(() => {
     const newLevel = Math.min(levelRef.current + 1, MAX_COMBO_LEVEL);
     levelRef.current = newLevel;
-    windowEndRef.current = performance.now() + COMBO_WINDOW_MS;
+    windowEndRef.current = performance.now() + comboWindowMs;
 
     // Reset arc to full
     if (arcRef.current) {
