@@ -4057,7 +4057,14 @@ const es = {
     "mp": {
       "players": "Jugadores",
       "eliminated": "Eliminado",
-      "youEliminated": "¡Te eliminaron!"
+      "youEliminated": "¡Te eliminaron!",
+      "youFoundIt": "¡La encontraste!",
+      "targetFound": "¡Palabra encontrada!",
+      "playerStatus": "Estado de jugadores",
+      "gameEnding": "Terminando juego...",
+      "watchOthers": "Observa a los jugadores restantes",
+      "viewBoard": "Ver tablero",
+      "boardReview": "Revisión del tablero",
     },
     "facts": {
       "title": "Datos Curiosos",

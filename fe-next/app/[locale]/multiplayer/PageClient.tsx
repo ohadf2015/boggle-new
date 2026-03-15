@@ -190,11 +190,18 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       if (data.message?.includes('not found') || data.message?.includes('Game not found') || data.message?.includes('closed')) {
         if (attemptingReconnect) {
           setError(t('errors.sessionExpired'));
-          toast.error(t('errors.sessionExpired'), { duration: 4000, icon: '⚠️' });
+          toast.error(t('errors.sessionExpired'), { duration: 5000, icon: '⚠️' });
         } else {
-          const errorKey = data.message?.includes('closed') ? 'errors.roomClosed' : 'errors.gameCodeNotExist';
+          const isClosed = data.message?.includes('closed');
+          const errorKey = isClosed ? 'errors.roomClosed' : 'errors.gameCodeNotExist';
           setError(t(errorKey) || t('errors.gameCodeNotExist'));
-          toast.error(t('errors.roomNoLongerExists') || t('errors.gameCodeNotExist'), { duration: 4000, icon: '❌' });
+          // Show a helpful error with longer duration so the user can read it
+          toast.error(
+            t(isClosed ? 'errors.roomClosedJoinAnother' : 'errors.roomNotFoundJoinAnother')
+              || t('errors.roomNoLongerExists')
+              || t('errors.gameCodeNotExist'),
+            { duration: 6000, icon: isClosed ? '🚪' : '❌' }
+          );
         }
         setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
         socket?.emit('getActiveRooms');
@@ -246,7 +253,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     socket, gameCode, username, roomName, hostUsername,
     language: language as Language, t, isSupabaseEnabled,
     user, profile, loading, authLoadingStartTime,
-    guestAvatar, setGuestAvatar, setUsername, setError, setIsJoining,
+    setUsername, setError, setIsJoining,
   });
 
   // Series tracking
@@ -341,7 +348,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   return (
     <SocketContext.Provider value={socketContextValue}>
       {/* Show full banner during active game for better reconnection context; minimal dot otherwise */}
-      {isActive ? <ConnectionBanner /> : <ConnectionDot />}
+      {isActive ? <ConnectionBanner showScoreSafe /> : <ConnectionDot />}
       <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
       {isClassroomMode ? (
         <>

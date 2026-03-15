@@ -255,9 +255,11 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
  */
 interface ConnectionBannerProps {
   className?: string;
+  /** Show "Your score is safe" reassurance during active game */
+  showScoreSafe?: boolean;
 }
 
-export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className }) => {
+export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, showScoreSafe }) => {
   const {
     isConnected,
     isReconnecting,
@@ -334,6 +336,13 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
                 {status === 'disconnected' && connectionError && (
                   <span className="text-neo-white/80 text-xs">
                     {t('connection.checkConnection')}
+                  </span>
+                )}
+
+                {/* Reassurance during active game */}
+                {showScoreSafe && (
+                  <span className="text-neo-lime/90 text-xs font-bold">
+                    {t('connection.scoreSafe')}
                   </span>
                 )}
               </div>

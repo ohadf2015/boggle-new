@@ -155,10 +155,27 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   }, [inviteRoomId, prefilledRoom, handleInvitationAutoJoin]);
 
   // Handle room click from list
+  // Auth users with profile skip the modal entirely — instant join
   const handleRoomClick = useCallback((room: ActiveRoom) => {
+    if (isAuthenticated && displayName) {
+      // Fast-join: skip modal for authenticated users
+      setGameCode(room.gameCode);
+      setUsername(displayName);
+      handleJoin(false, null, room.gameCode, undefined, displayName);
+      return;
+    }
+    if (hasProfile()) {
+      // Guest with stored profile — also fast-join
+      const profile = getProfileData();
+      setGameCode(room.gameCode);
+      setUsername(profile.username);
+      handleJoin(false, null, room.gameCode, undefined, profile.username);
+      return;
+    }
+    // No profile — show modal to collect username/avatar
     setSelectedRoom(room);
     setFlowState('join-modal');
-  }, []);
+  }, [isAuthenticated, displayName, hasProfile, getProfileData, handleJoin, setGameCode, setUsername]);
 
   // Handle create room button
   const handleCreateClick = useCallback(() => {

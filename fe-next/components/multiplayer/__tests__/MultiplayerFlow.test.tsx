@@ -217,8 +217,23 @@ describe('MultiplayerFlow', () => {
   });
 
   describe('Join Room Flow', () => {
-    it('should open join modal when room is clicked', async () => {
+    it('should fast-join when room is clicked and user has profile', async () => {
       render(<MultiplayerFlow {...defaultProps} />);
+
+      const roomButton = screen.getByTestId('room-ROOM01');
+      await userEvent.click(roomButton);
+
+      // Fast-join: no modal, direct handleJoin call
+      expect(screen.queryByTestId('join-room-modal')).not.toBeInTheDocument();
+      expect(defaultProps.setGameCode).toHaveBeenCalledWith('ROOM01');
+      expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, 'TestPlayer');
+    });
+
+    it('should open join modal when room is clicked and no profile', async () => {
+      const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
+      (hasCompleteStoredProfile as jest.Mock).mockReturnValue(false);
+
+      render(<MultiplayerFlow {...defaultProps} isAuthenticated={false} displayName="" />);
 
       const roomButton = screen.getByTestId('room-ROOM01');
       await userEvent.click(roomButton);
@@ -228,9 +243,12 @@ describe('MultiplayerFlow', () => {
     });
 
     it('should close join modal when close button clicked', async () => {
-      render(<MultiplayerFlow {...defaultProps} />);
+      const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
+      (hasCompleteStoredProfile as jest.Mock).mockReturnValue(false);
 
-      // Open modal
+      render(<MultiplayerFlow {...defaultProps} isAuthenticated={false} displayName="" />);
+
+      // Open modal (no profile → shows modal)
       const roomButton = screen.getByTestId('room-ROOM01');
       await userEvent.click(roomButton);
       expect(screen.getByTestId('join-room-modal')).toBeInTheDocument();
@@ -242,34 +260,17 @@ describe('MultiplayerFlow', () => {
       expect(screen.queryByTestId('join-room-modal')).not.toBeInTheDocument();
     });
 
-    it('should call handleJoin when joining a room', async () => {
-      // Ensure mock returns correct value
-      const avatarConfig = require('@/utils/avatarConfig');
-      avatarConfig.getAvatarEmojiAndColor.mockReturnValue({ emoji: '🎮', color: '#FF6B6B' });
+    it('should fast-join for authenticated users without showing modal', async () => {
+      render(<MultiplayerFlow {...defaultProps} isAuthenticated={true} displayName="AuthUser" />);
 
-      render(<MultiplayerFlow {...defaultProps} />);
-
-      // Open modal
       const roomButton = screen.getByTestId('room-ROOM01');
       await userEvent.click(roomButton);
 
-      // Click join
-      const joinButton = screen.getByText('Join');
-      await userEvent.click(joinButton);
-
+      // Direct join — no modal
+      expect(screen.queryByTestId('join-room-modal')).not.toBeInTheDocument();
       expect(defaultProps.setGameCode).toHaveBeenCalledWith('ROOM01');
-      expect(defaultProps.setUsername).toHaveBeenCalledWith('TestPlayer');
-      expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, 'TestPlayer');
-    });
-
-    it('should show joining state in modal', async () => {
-      render(<MultiplayerFlow {...defaultProps} isJoining={true} />);
-
-      // Open modal
-      const roomButton = screen.getByTestId('room-ROOM01');
-      await userEvent.click(roomButton);
-
-      expect(screen.getByText('Joining...')).toBeInTheDocument();
+      expect(defaultProps.setUsername).toHaveBeenCalledWith('AuthUser');
+      expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, 'AuthUser');
     });
   });
 
