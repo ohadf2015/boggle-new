@@ -754,7 +754,8 @@ const sv = {
       "noRoomsAvailable": "Inga aktiva rum. Starta ett!",
       "joinRoomAction": "Gå med i {{roomName}}",
       "availableRooms": "Tillgängliga rum",
-      "roomsListLabel": "Lista över tillgängliga spelrum"
+      "roomsListLabel": "Lista över tillgängliga spelrum",
+      "linkCopied": "Inbjudningslänk kopierad — skicka till vänner!"
     },
     "joinModal": {
       "title": "Gå med i striden",
@@ -2414,6 +2415,8 @@ const sv = {
     "topPercent": "Topp {{percent}}%",
     "challenge": "Utmana",
     "addFriend": "Lägg till vän",
+    "viewProfile": "Visa profil",
+    "viewPublicProfile": "Visa offentlig profil",
     "games": "Spel"
   },
   "playerProfile": {
@@ -3345,7 +3348,12 @@ const sv = {
     "gamesToday": "Spel idag",
     "wordHuntMode": "Ordjakt",
     "wordHuntModeDesc": "Hitta målordet så snabbt du kan — ett nytt pussel varje dag!",
+    "communityBoards": "Communitybraden",
+    "viewAllBoards": "Visa alla →",
+    "createYourBoard": "Skapa ditt eget brade",
+    "createBoardDesc": "Designa ett pussel och dela det med varlden",
     "seo": {
+      "stepLabel": "Steg",
       "whatIsTitle": "Vad ar LexiClash?",
       "whatIsContent": "LexiClash ar ett gratis, snabbt multiplayer-ordspel som du kan spela direkt i webblasaren. Tavla mot vanner i ordstrider i realtid pa ett delat bokstavsrutn - hitta ord, bygg kombos och klatter pa topplistorna. Det ar som Boggle mots Wordle, men multiplayer. Inga nedladdningar, ingen registrering kravs. Tillgangligt pa engelska, hebreiska, svenska, japanska och spanska.",
       "featuresTitle": "Darfor alskar spelare LexiClash",
@@ -5124,6 +5132,17 @@ const sv = {
     "hint": {
       "title": "Ledtråd"
     },
+    "cinematic": {
+      "victory": "SEGER!",
+      "defeat": "Tiden är slut!",
+      "encourageText": "Bra försök! Du hade det nästan!",
+      "encourageSubtext": "Kolla vad du åstadkom:",
+      "wordsFound": "Ord hittade",
+      "score": "Poäng",
+      "timeLeft": "Tid kvar",
+      "bestWord": "Bästa ord",
+      "stars": "Stjärnor"
+    },
     "cinematics": {
       "victory": "SEGER!",
       "timesUp": "Tiden Är Slut!",
@@ -6104,7 +6123,7 @@ const sv = {
       "moves": "Drag",
       "bonusMove": "Bonusdrag!",
       "tileBonus": "Brickbonus",
-      "tilesCleared": "Rensade brickor",
+      "tilesCleared": "Använda brickor",
       "moveCounter": "Dragräknare",
       "maxCombo": "Max kombo",
       "gems": "Ädelstenar",

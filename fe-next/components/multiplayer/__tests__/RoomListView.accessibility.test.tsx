@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  *
  * Tests for RoomListView accessibility:
- * - ARIA listbox pattern for room list
+ * - ARIA list pattern for room list
  * - Keyboard navigation
  * - Color contrast (via class checks)
  */
@@ -109,23 +109,23 @@ describe('RoomListView accessibility', () => {
     jest.clearAllMocks();
   });
 
-  describe('ARIA listbox pattern', () => {
-    it('should have role="listbox" on the room list container', () => {
+  describe('ARIA list pattern', () => {
+    it('should have role="list" on the room list container', () => {
       render(<RoomListView {...defaultProps} />);
-      const listbox = screen.getByRole('listbox');
-      expect(listbox).toBeInTheDocument();
+      const list = screen.getByRole('list');
+      expect(list).toBeInTheDocument();
     });
 
-    it('should have role="option" on each room card', () => {
+    it('should have role="listitem" on each room card', () => {
       render(<RoomListView {...defaultProps} />);
-      const options = screen.getAllByRole('option');
-      expect(options).toHaveLength(2);
+      const items = screen.getAllByRole('listitem');
+      expect(items).toHaveLength(2);
     });
 
-    it('should have aria-label on the listbox', () => {
+    it('should have aria-label on the list', () => {
       render(<RoomListView {...defaultProps} />);
-      const listbox = screen.getByRole('listbox');
-      expect(listbox).toHaveAttribute('aria-label', 'multiplayerFlow.roomList.roomsListLabel');
+      const list = screen.getByRole('list');
+      expect(list).toHaveAttribute('aria-label', 'multiplayerFlow.roomList.roomsListLabel');
     });
   });
 
@@ -150,28 +150,28 @@ describe('RoomListView accessibility', () => {
   });
 
   describe('room cards are keyboard accessible', () => {
-    it('should call onRoomClick when Enter is pressed on a room option', () => {
+    it('should call onRoomClick when Enter is pressed on a room item', () => {
       render(<RoomListView {...defaultProps} />);
-      const options = screen.getAllByRole('option');
-      fireEvent.keyDown(options[0], { key: 'Enter' });
+      const items = screen.getAllByRole('listitem');
+      fireEvent.keyDown(items[0], { key: 'Enter' });
       expect(defaultProps.onRoomClick).toHaveBeenCalledWith(mockRooms[0]);
     });
 
-    it('should call onRoomClick when Space is pressed on a room option', () => {
+    it('should call onRoomClick when Space is pressed on a room item', () => {
       render(<RoomListView {...defaultProps} />);
-      const options = screen.getAllByRole('option');
-      fireEvent.keyDown(options[0], { key: ' ' });
+      const items = screen.getAllByRole('listitem');
+      fireEvent.keyDown(items[0], { key: ' ' });
       expect(defaultProps.onRoomClick).toHaveBeenCalledWith(mockRooms[0]);
     });
 
     it('should navigate between rooms with arrow keys', () => {
       render(<RoomListView {...defaultProps} />);
-      const options = screen.getAllByRole('option');
+      const items = screen.getAllByRole('listitem');
 
-      // Focus first option and press ArrowDown
-      options[0].focus();
-      fireEvent.keyDown(options[0], { key: 'ArrowDown' });
-      expect(document.activeElement).toBe(options[1]);
+      // Focus first item and press ArrowDown
+      items[0].focus();
+      fireEvent.keyDown(items[0], { key: 'ArrowDown' });
+      expect(document.activeElement).toBe(items[1]);
     });
   });
 
@@ -179,8 +179,8 @@ describe('RoomListView accessibility', () => {
     it('should render without maxPlayers property', () => {
       // ActiveRoom type does not have maxPlayers
       render(<RoomListView {...defaultProps} />);
-      const options = screen.getAllByRole('option');
-      expect(options).toHaveLength(2);
+      const items = screen.getAllByRole('listitem');
+      expect(items).toHaveLength(2);
     });
   });
 });

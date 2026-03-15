@@ -41,6 +41,10 @@ import { notifyGameStarted } from '../modules/notificationService.js';
 import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
 import { initializePlayerData } from './gameLifecycleHandler.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
+import { BLAST_MP_DEFAULT_TIMER } from '@/shared/constants/gameConstants';
+import { getClassroomGame } from '../modules/classroomGameManager.js';
+import { initBlastModeState } from '../modules/blastModeManager.js';
+import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
 
 interface StartGamePayload {
   letterGrid: LetterGrid;
@@ -192,7 +196,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     // Default blast MP to 90s when host didn't set an explicit timer (fell back to 180s)
     if (resolvedMode === 'blast' && (!timerSeconds || validTimer === 180)) {
-      const { BLAST_MP_DEFAULT_TIMER } = await import('@/shared/constants/gameConstants');
       validTimer = BLAST_MP_DEFAULT_TIMER;
     }
 
@@ -216,7 +219,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     // Check if this is a classroom game
-    const { getClassroomGame } = await import('../modules/classroomGameManager.js');
     const classroomGame = await getClassroomGame(gameCode);
     const lessonVocabulary = classroomGame?.vocabularyWords
       ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
@@ -263,7 +265,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     // Initialize blast mode state if needed
     if (resolvedMode === 'blast') {
-      const { initBlastModeState } = await import('../modules/blastModeManager.js');
       const mpBlastWave = playerUsernames.length >= 2 ? 3 : 1;
       const blastState = initBlastModeState(letterGrid, playerUsernames, mpBlastWave);
       const currentGame = getGame(gameCode);
@@ -274,7 +275,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     // Initialize word hunt mode state if needed
     if (resolvedMode === 'word-hunt') {
-      const { initWordHuntState, selectTargetWordWithFallback } = await import('../modules/wordHuntManager.js');
       const trie = getCachedTrie(gameLang);
       const allValidWords = findAllWords(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
       const targetWord = selectTargetWordWithFallback(allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH);

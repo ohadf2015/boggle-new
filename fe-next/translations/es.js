@@ -787,7 +787,8 @@ const es = {
       "noRoomsAvailable": "No hay salas activas. ¡Crea una!",
       "joinRoomAction": "Unirse a {{roomName}}",
       "availableRooms": "Salas disponibles",
-      "roomsListLabel": "Lista de salas disponibles"
+      "roomsListLabel": "Lista de salas disponibles",
+      "linkCopied": "Enlace de invitación copiado — ¡envíalo a tus amigos!"
     },
     "joinModal": {
       "title": "Únete al combate",
@@ -2666,6 +2667,8 @@ const es = {
     "topPercent": "Top {{percent}}%",
     "challenge": "Desafiar",
     "addFriend": "Agregar amigo",
+    "viewProfile": "Ver perfil",
+    "viewPublicProfile": "Ver perfil público",
     "games": "Partidas"
   },
   "playerProfile": {
@@ -3395,7 +3398,12 @@ const es = {
     "gamesToday": "Juegos hoy",
     "wordHuntMode": "Caza de Palabras",
     "wordHuntModeDesc": "¡Encuentra la palabra objetivo lo más rápido posible — un nuevo rompecabezas cada día!",
+    "communityBoards": "Tableros de la comunidad",
+    "viewAllBoards": "Ver todos →",
+    "createYourBoard": "Crea tu propio tablero",
+    "createBoardDesc": "Disena un rompecabezas y compartelo con el mundo",
     "seo": {
+      "stepLabel": "Paso",
       "whatIsTitle": "Que es LexiClash?",
       "whatIsContent": "LexiClash es un juego de palabras multijugador gratuito y rapido que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real en una cuadricula de letras compartida: encuentra palabras, construye combos y sube en la clasificacion. Es como Boggle y Wordle, pero multijugador. Sin descargas, sin registro. Disponible en ingles, hebreo, sueco, japones y espanol.",
       "featuresTitle": "Por que a los jugadores les encanta LexiClash",
@@ -5140,6 +5148,17 @@ const es = {
     "hint": {
       "title": "Pista"
     },
+    "cinematic": {
+      "victory": "¡VICTORIA!",
+      "defeat": "¡Se acabó el tiempo!",
+      "encourageText": "¡Buen intento! ¡Casi lo logras!",
+      "encourageSubtext": "Mira lo que conseguiste:",
+      "wordsFound": "Palabras encontradas",
+      "score": "Puntuación",
+      "timeLeft": "Tiempo restante",
+      "bestWord": "Mejor palabra",
+      "stars": "Estrellas"
+    },
     "combo": {
       "nice": "¡Bien!",
       "great": "¡Genial!",
@@ -6144,7 +6163,7 @@ const es = {
       "moves": "Movimientos",
       "bonusMove": "Movimiento Extra!",
       "tileBonus": "Bonus de Ficha",
-      "tilesCleared": "Fichas Limpiadas",
+      "tilesCleared": "Fichas Usadas",
       "moveCounter": "Contador de Movimientos",
       "maxCombo": "Combo Máximo",
       "gems": "Gemas",

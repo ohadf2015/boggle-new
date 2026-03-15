@@ -260,6 +260,13 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // This allows the player to rejoin and continue
     if (isInProgress(game.gameState) || game.gameState === 'finished') {
       if (game.users[username]) {
+        // Cancel any pending reconnection timeout from a prior disconnect
+        const userWithTimeout = game.users[username] as GameUser & { reconnectionTimeout?: ReturnType<typeof setTimeout> };
+        if (userWithTimeout.reconnectionTimeout) {
+          clearTimeout(userWithTimeout.reconnectionTimeout);
+          delete userWithTimeout.reconnectionTimeout;
+        }
+
         game.users[username].disconnected = true;
         game.users[username].disconnectedAt = Date.now();
 

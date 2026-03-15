@@ -754,7 +754,8 @@ const en = {
       "noRoomsAvailable": "No active rooms. Host one!",
       "joinRoomAction": "Join {{roomName}}",
       "availableRooms": "Available Rooms",
-      "roomsListLabel": "List of available game rooms"
+      "roomsListLabel": "List of available game rooms",
+      "linkCopied": "Invite link copied — send it to friends!"
     },
     "joinModal": {
       "title": "Join the Fight",
@@ -2979,6 +2980,7 @@ const en = {
     "challenge": "Challenge",
     "addFriend": "Add Friend",
     "viewProfile": "View Profile",
+    "viewPublicProfile": "View Public Profile",
     "games": "Games"
   },
   "playerProfile": {
@@ -3465,7 +3467,13 @@ const en = {
     "gamesToday": "Games Today",
     "wordHuntMode": "Word Hunt",
     "wordHuntModeDesc": "Find the target word as fast as you can — a fresh puzzle every day!",
+    "communityBoards": "Community Boards",
+    "viewAllBoards": "View all →",
+    "createYourBoard": "Create Your Own Board",
+    "createBoardDesc": "Design a puzzle and share it with the world",
     "seo": {
+      "stepLabel": "Step",
+
       "whatIsTitle": "What is LexiClash?",
       "whatIsContent": "LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It's like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, and Spanish.",
       "featuresTitle": "Why Players Love LexiClash",
@@ -5210,6 +5218,17 @@ const en = {
     "hint": {
       "title": "Hint"
     },
+    "cinematic": {
+      "victory": "VICTORY!",
+      "defeat": "Time's Up!",
+      "encourageText": "Nice try! You almost had it!",
+      "encourageSubtext": "Check out what you achieved:",
+      "wordsFound": "Words Found",
+      "score": "Score",
+      "timeLeft": "Time Left",
+      "bestWord": "Best Word",
+      "stars": "Stars"
+    },
     "combo": {
       "nice": "Nice!",
       "great": "Great!",
@@ -6197,7 +6216,7 @@ const en = {
       "moves": "Moves",
       "bonusMove": "Bonus Move!",
       "tileBonus": "Tile Bonus",
-      "tilesCleared": "Tiles Cleared",
+      "tilesCleared": "Tiles Used",
       "moveCounter": "Move Counter",
       "maxCombo": "Max Combo",
       "gems": "Gems",

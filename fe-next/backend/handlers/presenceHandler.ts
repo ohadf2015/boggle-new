@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, PresenceStatus, GameUser } from '@/shared/types';
+import type { PresenceStatus } from '@/shared/types';
 
 import {
   getGame,
@@ -16,8 +16,9 @@ import {
 } from '../modules/gameStateManager.js';
 
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
-import { validatePayload, presenceUpdateSchema, heartbeatSchema } from '../utils/socketValidation.js';
+import { validatePayload, presenceUpdateSchema } from '../utils/socketValidation.js';
 
 // Types for payloads
 interface PresenceUpdatePayload {
@@ -38,6 +39,8 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
 
   // Handle presence update (active/idle/afk status)
   socket.on('presenceUpdate', (data: PresenceUpdatePayload) => {
+    if (!checkRateLimit(socket.id, 0.2)) return;
+
     // Validate payload using standard schema
     const validation = validatePayload(presenceUpdateSchema, data);
     if (!validation.success) {
@@ -72,6 +75,8 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
 
   // Handle presence heartbeat
   socket.on('presenceHeartbeat', () => {
+    if (!checkRateLimit(socket.id, 0.1)) return;
+
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
@@ -84,28 +89,22 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
 
 /**
  * Start connection health check interval
- * Checks for stale connections and cleans them up
+ * Logs stale connections for operational visibility.
+ * Actual disconnect handling is done by Socket.IO's native ping/pong timeout.
  * @param io - Socket.IO server instance
  */
-function startConnectionHealthCheck(io: Server): void {
+function startConnectionHealthCheck(_io: Server): void {
   const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
   const STALE_THRESHOLD = 60000; // 1 minute without heartbeat
 
   setInterval(() => {
     forEachGame((gameCode, game) => {
       for (const [username, userData] of Object.entries(game.users || {})) {
-        // Skip if user is already marked disconnected
-        if (userData.disconnected) continue;
-
-        // Skip bots
-        if (userData.isBot) continue;
+        if (userData.disconnected || userData.isBot) continue;
 
         const lastHeartbeat = userData.lastHeartbeat || userData.lastActivity || 0;
-        const now = Date.now();
-
-        if (now - lastHeartbeat > STALE_THRESHOLD) {
-          // Mark user as potentially stale
-          logger.debug('PRESENCE', `User ${username} in game ${gameCode} may be stale (${Math.round((now - lastHeartbeat) / 1000)}s since last heartbeat)`);
+        if (Date.now() - lastHeartbeat > STALE_THRESHOLD) {
+          logger.info('PRESENCE', `Stale user ${username} in game ${gameCode} (${Math.round((Date.now() - lastHeartbeat) / 1000)}s since last heartbeat)`);
         }
       }
     });

@@ -59,13 +59,14 @@ export function startGameTimer(
     const remainingMs = Math.max(0, endTimestamp - now);
     const remainingTime = Math.ceil(remainingMs / 1000);
 
-    // Update remaining time in game state for late joiners
-     
-    updateGame(gameCode, { remainingTime } as any);
+    // Only update game state when the second actually changed (avoids no-op Redis persist debounces)
+    const secondChanged = remainingTime !== lastBroadcastSecond;
+    if (secondChanged) {
+      updateGame(gameCode, { remainingTime } as any);
+    }
 
     // Broadcast every second for accurate client timer display
     // Previous "smart broadcasting" (every 10s) caused player timers to stutter
-    const secondChanged = remainingTime !== lastBroadcastSecond;
     if (secondChanged) {
       broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
         remainingTime,
@@ -91,11 +92,13 @@ export function startGameTimer(
         });
       }
 
-      // Broadcast updated lives to all players in room (include eliminatedPlayers for reconnecting clients)
-      broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
-        playerLives: updatedLives,
-        eliminatedPlayers: huntState.eliminatedPlayers,
-      });
+      // Only broadcast life updates when the second actually changed (syncs with timer ticks)
+      if (secondChanged) {
+        broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
+          playerLives: updatedLives,
+          eliminatedPlayers: huntState.eliminatedPlayers,
+        });
+      }
 
       // End game early if all players are eliminated
       if (areAllPlayersEliminated(huntState)) {

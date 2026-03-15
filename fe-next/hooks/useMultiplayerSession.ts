@@ -264,9 +264,9 @@ export function useMultiplayerSession(
       return;
     }
 
-    // Check if session is too old (more than 5 minutes of inactivity)
+    // Check if session is too old — align with server's PLAYER_RECONNECTION_GRACE_PERIOD (120s)
     const sessionAge = Date.now() - savedSession.timestamp;
-    const maxInactivity = 5 * 60 * 1000; // 5 minutes
+    const maxInactivity = 2 * 60 * 1000; // 2 minutes (matches server grace period)
 
     if (sessionAge > maxInactivity) {
       logger.log('[SESSION] Session too old for auto-reconnect, clearing session');

@@ -52,7 +52,7 @@ export function SpectatorBanner({
       style={{
         paddingTop: 'max(env(safe-area-inset-top), 0px)',
       }}
-      role="alert"
+      role="status"
       aria-live="polite"
       aria-atomic="true"
     >

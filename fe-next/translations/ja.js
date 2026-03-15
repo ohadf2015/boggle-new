@@ -754,7 +754,8 @@ const ja = {
       "noRoomsAvailable": "アクティブなルームがありません。ホストしよう！",
       "joinRoomAction": "{{roomName}}に参加",
       "availableRooms": "利用可能なルーム",
-      "roomsListLabel": "利用可能なゲームルームの一覧"
+      "roomsListLabel": "利用可能なゲームルームの一覧",
+      "linkCopied": "招待リンクをコピーしました — 友達に送ろう！"
     },
     "joinModal": {
       "title": "バトルに参戦",
@@ -2492,6 +2493,8 @@ const ja = {
     "topPercent": "トップ {{percent}}%",
     "challenge": "チャレンジ",
     "addFriend": "フレンド追加",
+    "viewProfile": "プロフィールを見る",
+    "viewPublicProfile": "公開プロフィールを見る",
     "games": "ゲーム"
   },
   "playerProfile": {
@@ -3345,7 +3348,12 @@ const ja = {
     "gamesToday": "今日のゲーム数",
     "wordHuntMode": "ワードハント",
     "wordHuntModeDesc": "できるだけ早くターゲットワードを見つけよう — 毎日新しいパズル！",
+    "communityBoards": "コミュニティボード",
+    "viewAllBoards": "すべて表示 →",
+    "createYourBoard": "自分だけのボードを作ろう",
+    "createBoardDesc": "パズルをデザインして世界中にシェア",
     "seo": {
+      "stepLabel": "ステップ",
       "whatIsTitle": "LexiClashとは？",
       "whatIsContent": "LexiClashは、ブラウザで直接プレイできる無料の高速マルチプレイヤーワードゲームです。共有された文字グリッド上でリアルタイムのワードバトルで友達と競い合いましょう。単語を見つけ、コンボを構築し、リーダーボードを上りましょう。BoggleとWordleが合体したようなマルチプレイヤーゲームです。ダウンロード不要、登録不要。英語、ヘブライ語、スウェーデン語、日本語、スペイン語で利用可能。",
       "featuresTitle": "プレイヤーがLexiClashを愛する理由",
@@ -5193,6 +5201,17 @@ const ja = {
     "hint": {
       "title": "ヒント"
     },
+    "cinematic": {
+      "victory": "勝利！",
+      "defeat": "タイムアップ！",
+      "encourageText": "惜しかった！もう少しだったよ！",
+      "encourageSubtext": "あなたの成果をチェック：",
+      "wordsFound": "見つけた単語",
+      "score": "スコア",
+      "timeLeft": "残り時間",
+      "bestWord": "ベストワード",
+      "stars": "スター"
+    },
     "combo": {
       "nice": "ナイス!",
       "great": "グレイト!",
@@ -6155,7 +6174,7 @@ const ja = {
       "moves": "手数",
       "bonusMove": "ボーナスムーブ！",
       "tileBonus": "タイルボーナス",
-      "tilesCleared": "クリアしたタイル",
+      "tilesCleared": "使用タイル",
       "moveCounter": "手数カウンター",
       "maxCombo": "最大コンボ",
       "gems": "宝石",

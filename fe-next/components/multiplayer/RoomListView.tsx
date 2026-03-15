@@ -189,14 +189,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             ) : hasRooms ? (
               <div
                 className="flex flex-col gap-2"
-                role="listbox"
+                role="list"
                 aria-label={t('multiplayerFlow.roomList.roomsListLabel')}
               >
                 {activeRooms.map((room, index) => (
                   <motion.button
                     key={room.gameCode}
-                    role="option"
-                    aria-selected={false}
+                    role="listitem"
                     aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: room.roomName || room.gameCode })}
                     initial={{ x: dir === 'rtl' ? 10 : -10, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}

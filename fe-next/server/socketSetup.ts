@@ -6,6 +6,7 @@
 import { Server } from 'socket.io';
 import { initializeSocketHandlers } from '../backend/socketHandlers';
 import { cleanupStaleGames, cleanupEmptyRooms, getActiveRooms } from '../backend/modules/gameStateManager';
+import { broadcastActiveRooms } from '../backend/utils/socketHelpers';
 import { registerDuelHandlers } from '../backend/handlers/duel';
 
 import type { Server as HttpServer } from 'http';
@@ -145,7 +146,7 @@ export function setupCleanupTimers(io: Server): void {
     const cleaned = cleanupEmptyRooms();
     if (cleaned > 0) {
       console.log(`[CLEANUP] Removed ${cleaned} empty room(s)`);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
     }
   }, 30 * 1000);
   cleanupTimers.add(emptyRoomsTimer);

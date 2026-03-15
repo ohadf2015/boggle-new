@@ -12,6 +12,7 @@ import {
 } from '@/utils/profileStorage';
 import { getJoinUrl } from '@/utils/share';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
@@ -70,6 +71,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   setRoomName,
   setHostUsername,
 }) => {
+  const { t } = useLanguage();
+
   // Flow state - simplified to room-list with modal overlays
   const [flowState, setFlowState] = useState<FlowState>(autoCreate ? 'create-modal' : 'room-list');
   const [selectedRoom, setSelectedRoom] = useState<ActiveRoom | null>(null);
@@ -236,11 +239,11 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     try {
       const joinUrl = getJoinUrl(gameCode, 'quick-play');
       navigator.clipboard.writeText(joinUrl);
-      toast.success('Invite link copied — send it to friends!', { duration: 3000, icon: '\uD83D\uDD17' });
+      toast.success(t('multiplayerFlow.roomList.linkCopied'), { duration: 3000, icon: '\uD83D\uDD17' });
     } catch {
       // Clipboard API not available — no-op
     }
-  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
+  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, t]);
 
   // Show brief loading while CrazyGames SDK initializes (prevents flash of wrong UI)
   if (!isCrazyGamesReady) {

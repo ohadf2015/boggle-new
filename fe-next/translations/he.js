@@ -754,7 +754,8 @@ const he = {
       "noRoomsAvailable": "אין חדרים פעילים. תארח אחד!",
       "joinRoomAction": "הצטרף ל-{{roomName}}",
       "availableRooms": "חדרים זמינים",
-      "roomsListLabel": "רשימת חדרי משחק זמינים"
+      "roomsListLabel": "רשימת חדרי משחק זמינים",
+      "linkCopied": "קישור ההזמנה הועתק — שלחו לחברים!"
     },
     "joinModal": {
       "title": "הצטרף לקרב",
@@ -2877,6 +2878,8 @@ const he = {
     "topPercent": "טופ {{percent}}%",
     "challenge": "אתגר",
     "addFriend": "הוסף חבר",
+    "viewProfile": "צפה בפרופיל",
+    "viewPublicProfile": "צפה בפרופיל הציבורי",
     "games": "משחקים"
   },
   "playerProfile": {
@@ -3363,7 +3366,12 @@ const he = {
     "gamesToday": "משחקים היום",
     "wordHuntMode": "ציד מילים",
     "wordHuntModeDesc": "מצאו את מילת היעד כמה שיותר מהר — פאזל חדש כל יום!",
+    "communityBoards": "לוחות הקהילה",
+    "viewAllBoards": "הצג הכל →",
+    "createYourBoard": "צרו לוח משלכם",
+    "createBoardDesc": "עצבו פאזל ושתפו אותו עם העולם",
     "seo": {
+      "stepLabel": "שלב",
       "whatIsTitle": "מה זה לקסיקלאש?",
       "whatIsContent": "לקסיקלאש הוא משחק מילים מרובה משתתפים חינמי ומהיר שאפשר לשחק ישירות בדפדפן. התחרו עם חברים בזמן אמת על לוח אותיות משותף — מצאו מילים, בנו קומבו וטפסו בטבלת המובילים. זה כמו בוגל וסקראבל, אבל מרובה משתתפים. ללא הורדות, ללא הרשמה. זמין בעברית, אנגלית, שוודית, יפנית וספרדית.",
       "featuresTitle": "למה שחקנים אוהבים את לקסיקלאש",
@@ -4648,6 +4656,56 @@ const he = {
       "players": "שחקנים",
       "system": "מערכת"
     },
+    "kpi": {
+      "dau": "פעילים היום",
+      "gamesToday": "משחקים היום",
+      "signupsToday": "הרשמות",
+      "stickiness": "דביקות",
+      "totalPlayers": "סה״כ שחקנים",
+      "totalWords": "מילים שנמצאו",
+      "thisWeek": "השבוע"
+    },
+    "system": {
+      "ok": "תקין",
+      "down": "מושבת"
+    },
+    "analytics": {
+      "title": "אנליטיקה",
+      "retentionTitle": "קוהורטות שימור",
+      "cohort": "קוהורט",
+      "size": "גודל",
+      "funnelTitle": "משפך מעורבות (30 יום)",
+      "funnelRegistered": "נרשמו",
+      "funnelFirstGame": "משחק ראשון",
+      "funnelDay7": "חזרו יום 7",
+      "funnelDay30": "חזרו יום 30",
+      "churnTitle": "סיכון נטישה",
+      "churnTotal": "סה״כ בסיכון",
+      "noChurnRisk": "אין שחקנים בסיכון",
+      "games": "משחקים"
+    },
+    "moderation": {
+      "title": "מודרציה",
+      "queueTitle": "תור מודרציה",
+      "empty": "התור ריק — אין פריטים ממתינים",
+      "approve": "אשר",
+      "reject": "דחה",
+      "investigate": "חקור",
+      "banPlayer": "חסום שחקן",
+      "warnPlayer": "הזהר שחקן",
+      "playerDetail": "פרטי שחקן",
+      "moderationHistory": "היסטוריית מודרציה",
+      "recentGames": "משחקים אחרונים",
+      "cheatSignals": "סימני רמאות",
+      "flaggedPlayers": "שחקנים מסומנים",
+      "noFlags": "אין שחקנים מסומנים מעל הסף"
+    },
+    "content": {
+      "pendingWords": "ממתין לבדיקה",
+      "approvedWords": "אושרו",
+      "topReported": "מילים מדווחות (חוסרים במילון)",
+      "noReports": "אין מילים מדווחות"
+    },
     "invalidWords": {
       "title": "בדיקת מילים לא תקינות",
       "subtitle": "מילים שהוגשו 3+ פעמים אך לא אומתו",
@@ -5087,6 +5145,17 @@ const he = {
     "victory": "ניצחון!",
     "hint": {
       "title": "רמז"
+    },
+    "cinematic": {
+      "victory": "ניצחון!",
+      "defeat": "נגמר הזמן!",
+      "encourageText": "ניסיון טוב! כמעט הצלחת!",
+      "encourageSubtext": "בדקו מה השגתם:",
+      "wordsFound": "מילים שנמצאו",
+      "score": "ניקוד",
+      "timeLeft": "זמן שנותר",
+      "bestWord": "המילה הטובה ביותר",
+      "stars": "כוכבים"
     },
     "hiddenWord": "מילה נסתרת",
     "devPreview": "תצוגה מקדימה",
@@ -6079,7 +6148,7 @@ const he = {
       "moves": "מהלכים",
       "bonusMove": "מהלך בונוס!",
       "tileBonus": "בונוס אריח",
-      "tilesCleared": "אריחים שנוקו",
+      "tilesCleared": "אריחים שנוצלו",
       "moveCounter": "מונה מהלכים",
       "maxCombo": "קומבו מקסימלי",
       "gems": "אבני חן",
