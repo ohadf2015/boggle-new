@@ -146,7 +146,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       if (failureGold > 0) addGold(failureGold);
       setHasAwardedLevelRewards(true);
     }
-  }, [gameState.isComplete, gameState.stars, gameState.comboCount, gameState.score, gameState.wordsFound, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.world, timerSeconds, awardXp, addGold, currentLevel, upgradeBonuses.xpBonus, upgradeEffects, isBossLevel, props.isFirstCompletion]);
+  }, [gameState.isComplete, gameState.stars, gameState.comboCount, gameState.score, gameState.wordsFound, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.world, timerSeconds, awardXp, addGold, currentLevel, upgradeBonuses.xpBonus, upgradeEffects, isBossLevel, props.isFirstCompletion, props.bonusGoldMultiplier]);
 
   // Victory/Defeat Detection & Cinematic Trigger
   useEffect(() => {

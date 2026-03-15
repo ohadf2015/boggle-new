@@ -193,7 +193,7 @@ export function useAdventureGame({
       fresh.gameState = { ...fresh.gameState, score: options.retainedScore };
     }
     dispatch({ type: 'RESET_GAME', payload: { initialState: fresh } });
-  }, [levelConfig, initialGrid]);
+  }, [levelConfig, initialGrid, upgradeConfig]);
 
   const isWildcard = useCallback(
     (row: number, col: number): boolean => {
