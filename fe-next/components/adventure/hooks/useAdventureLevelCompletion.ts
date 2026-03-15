@@ -38,7 +38,7 @@ export interface UseAdventureLevelCompletionProps {
   objectives: ObjectiveSlice[];
   currentLevel: number;
   upgradeBonuses: { xpBonus: number; timeBonus: number; scoreBonus: number };
-  upgradeEffects?: { goldMultiplier: number; doubleFirstCompletionGold: boolean; failureGold: number };
+  upgradeEffects?: { goldMultiplier: number; doubleFirstCompletionGold: boolean; failureGold: number; longWordGoldBonus: number };
   awardXp: (xp: number) => { leveledUp: boolean; newLevel?: number };
   addGold: (amount: number) => void;
   recordAttempt: (...args: any[]) => void;
@@ -58,6 +58,8 @@ export interface UseAdventureLevelCompletionProps {
   endBossBattle: (isVictory: boolean) => void;
   triggerBossTaunt: (event: BossTauntEvent) => void;
   isFirstCompletion?: boolean;
+  /** Player health percentage (0-100) for boss no-damage achievement */
+  playerHealthPercent?: number;
 }
 
 export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionProps) {
@@ -113,9 +115,10 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
       const baseGold = 10 * gameState.stars;
       const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
+      const longWordBonus = (upgradeEffects?.longWordGoldBonus ?? 0) * gameState.wordsFound.filter(w => w.length >= 6).length;
       const goldMultiplier = upgradeEffects?.goldMultiplier ?? 1;
       const doubleFirst = upgradeEffects?.doubleFirstCompletionGold ? 2 : 1;
-      addGold(Math.floor((baseGold + perfectClearGoldBonus) * goldMultiplier * doubleFirst));
+      addGold(Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst));
 
       // Generate loot drops
       const drops = generateLevelLoot({
@@ -134,7 +137,13 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
       setHasAwardedLevelRewards(true);
     }
-  }, [gameState.isComplete, gameState.stars, gameState.comboCount, timeRemaining, hasAwardedLevelRewards, levelConfig.level, timerSeconds, awardXp, addGold, currentLevel, upgradeBonuses.xpBonus]);
+    // Failure gold (Salvage Claw) — award consolation gold on 0-star attempts
+    if ((gameState.isComplete || timeRemaining === 0) && !hasAwardedLevelRewards && gameState.stars === 0) {
+      const failureGold = upgradeEffects?.failureGold ?? 0;
+      if (failureGold > 0) addGold(failureGold);
+      setHasAwardedLevelRewards(true);
+    }
+  }, [gameState.isComplete, gameState.stars, gameState.comboCount, gameState.score, gameState.wordsFound, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.world, timerSeconds, awardXp, addGold, currentLevel, upgradeBonuses.xpBonus, upgradeEffects, isBossLevel, props.isFirstCompletion]);
 
   // Victory/Defeat Detection & Cinematic Trigger
   useEffect(() => {
@@ -179,8 +188,16 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
     if (isVictory) {
       handleEarnAchievementRef.current('BOSS_SLAYER');
+      // Boss Speedrun: defeat boss with >50% time remaining
+      if (timeRemaining > timerSeconds * 0.5) {
+        handleEarnAchievementRef.current('BOSS_SPEEDRUN');
+      }
+      // Boss No Damage: defeat boss without taking any damage (player HP = max)
+      if (!playerDied && props.playerHealthPercent === 100) {
+        handleEarnAchievementRef.current('BOSS_NO_DAMAGE');
+      }
     }
-  }, [isBossActive, isBossLevel, bossHealthPhase, playerIsDead, endBossBattle, triggerBossTaunt]);
+  }, [isBossActive, isBossLevel, bossHealthPhase, playerIsDead, endBossBattle, triggerBossTaunt, timeRemaining, timerSeconds, props.playerHealthPercent]);
 
   // Achievement & Progress Recording
   useEffect(() => {

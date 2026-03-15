@@ -315,7 +315,8 @@ const es = {
     "attempt": "Intento",
     "checkConnection": "¡Parece que estás sin conexión!",
     "retry": "Reintentar",
-    "retryNow": "Reintentar ahora"
+    "retryNow": "Reintentar ahora",
+    "scoreSafe": "Tu puntuación está segura en el servidor"
   },
   "game": {
     "combo": "Combo",
@@ -591,6 +592,8 @@ const es = {
     "slowConnection": "Conexión lenta - trabajando",
     "sessionExpired": "Sesión terminada. ¡Hora de empezar de nuevo!",
     "roomNoLongerExists": "Sala cerrada - todos se fueron",
+    "roomClosedJoinAnother": "Esta sala ha terminado. ¡Únete a otra abajo!",
+    "roomNotFoundJoinAnother": "Sala no encontrada — puede haber terminado. ¡Busca abajo!",
     "roomClosed": "Sala cerrada - hora de crear una nueva",
     "gameCodeNotExist": "Código no encontrado. ¡Verifica!",
     "usernameTaken": "¡Alguien fue más rápido! Prueba otro nombre",

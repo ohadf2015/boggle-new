@@ -315,7 +315,8 @@ const ja = {
     "attempt": "試行",
     "checkConnection": "オフラインみたい！",
     "retry": "再接続",
-    "retryNow": "今すぐ再試行"
+    "retryNow": "今すぐ再試行",
+    "scoreSafe": "スコアはサーバーに保存されています"
   },
   "game": {
     "combo": "コンボ",
@@ -527,6 +528,8 @@ const ja = {
     "slowConnection": "接続遅い - 対応中",
     "sessionExpired": "セッション終了。新しく始めよう！",
     "roomNoLongerExists": "ルーム閉鎖 - みんな退室したよ",
+    "roomClosedJoinAnother": "このルームは終了しました。下の別のルームに参加しよう！",
+    "roomNotFoundJoinAnother": "ルームが見つかりません — 終了した可能性があります。下をチェック！",
     "roomClosed": "ルーム閉鎖 - 新しいの作ろう",
     "gameCodeNotExist": "コードが見つからない。確認して！",
     "usernameTaken": "先を越された！別の名前で",

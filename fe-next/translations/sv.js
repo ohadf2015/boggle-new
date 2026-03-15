@@ -315,7 +315,8 @@ const sv = {
     "attempt": "Försök",
     "checkConnection": "Du verkar vara offline!",
     "retry": "Försök igen",
-    "retryNow": "Försök nu"
+    "retryNow": "Försök nu",
+    "scoreSafe": "Din poäng är sparad på servern"
   },
   "game": {
     "combo": "Kombo",
@@ -527,6 +528,8 @@ const sv = {
     "slowConnection": "Långsam anslutning - vi jobbar på det",
     "sessionExpired": "Sessionen slutade. Dags att börja om!",
     "roomNoLongerExists": "Rummet stängdes - alla gick",
+    "roomClosedJoinAnother": "Det här rummet har avslutats. Gå med i ett annat nedan!",
+    "roomNotFoundJoinAnother": "Rummet hittades inte — det kan ha avslutats. Bläddra nedan!",
     "roomClosed": "Rummet stängdes - dags för ett nytt",
     "loadFailed": "Gick inte att ladda. Försök igen!",
     "gameCodeNotExist": "Koden hittades inte. Kolla och försök!",

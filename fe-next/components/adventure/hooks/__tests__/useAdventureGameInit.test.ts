@@ -30,6 +30,12 @@ jest.mock('@/hooks/useUpgradeEffects', () => ({
     comboScoreMultiplier: 1,
     startingHints: 0,
     reviveCount: 0,
+    hintRechargeMultiplier: 1,
+    bossDamageMultiplier: 1,
+    blockFirstAttack: false,
+    scrambleImmunity: false,
+    bossHealPerWord: 0,
+    longWordGoldBonus: 0,
   }),
 }));
 jest.mock('@/hooks/useAdaptiveDifficulty');

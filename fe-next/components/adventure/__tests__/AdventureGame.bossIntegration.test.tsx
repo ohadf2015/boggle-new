@@ -77,7 +77,6 @@ jest.mock('@/hooks/useAdventureSelection');
 jest.mock('@/hooks/useLexiReactions');
 jest.mock('@/hooks/useAdventureHints');
 jest.mock('@/hooks/useBossMechanics');
-jest.mock('@/hooks/useBossHealth');
 jest.mock('@/hooks/useAdventureBossNew');
 
 import { useAdventureGame } from '@/hooks/useAdventureGame';
@@ -86,7 +85,6 @@ import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { useLexiReactions } from '@/hooks/useLexiReactions';
 import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
-import { useBossHealth } from '@/hooks/useBossHealth';
 import { useAdventureBossNew } from '@/hooks/useAdventureBossNew';
 
 // Type the mocks
@@ -96,7 +94,6 @@ const mockUseAdventureSelection = useAdventureSelection as jest.MockedFunction<t
 const mockUseLexiReactions = useLexiReactions as jest.MockedFunction<typeof useLexiReactions>;
 const mockUseAdventureHints = useAdventureHints as jest.MockedFunction<typeof useAdventureHints>;
 const mockUseBossMechanics = useBossMechanics as jest.MockedFunction<typeof useBossMechanics>;
-const mockUseBossHealth = useBossHealth as jest.MockedFunction<typeof useBossHealth>;
 const mockUseAdventureBossNew = useAdventureBossNew as jest.MockedFunction<typeof useAdventureBossNew>;
 
 // Helper function to wrap component with providers
@@ -287,23 +284,6 @@ describe('AdventureGame - Boss Battle Integration', () => {
       },
     });
 
-    // Boss health mock (intro phase by default)
-    mockUseBossHealth.mockReturnValue({
-      healthState: {
-        currentHP: 100,
-        maxHP: 100,
-        phase: 'intro',
-        totalDamageDealt: 0,
-        isActive: false,
-      },
-      dealDamage: mockDealDamage,
-      startBattle: mockStartBattle,
-      endBattle: mockEndBattle,
-      resetHealth: jest.fn(),
-      hpPercentage: 100,
-      isEnraged: false,
-    });
-
     // New boss hook mock (used by orchestration)
     mockUseAdventureBossNew.mockReturnValue({
       isActive: false,
@@ -402,23 +382,6 @@ describe('AdventureGame - Boss Battle Integration', () => {
           introShown: false,
           isActive: true,
         },
-      });
-
-      // Intro phase
-      mockUseBossHealth.mockReturnValue({
-        healthState: {
-          currentHP: 100,
-          maxHP: 100,
-          phase: 'intro',
-          totalDamageDealt: 0,
-          isActive: false,
-        },
-        dealDamage: mockDealDamage,
-        startBattle: mockStartBattle,
-        endBattle: mockEndBattle,
-        resetHealth: jest.fn(),
-        hpPercentage: 100,
-        isEnraged: false,
       });
 
       renderWithProviders(
@@ -521,7 +484,6 @@ describe('AdventureGame - Boss Battle Integration', () => {
 
 // Import real hooks for integration testing using requireActual to bypass mocks
 const { useBossMechanics: realUseBossMechanics } = jest.requireActual('@/hooks/useBossMechanics');
-const { useBossHealth: realUseBossHealth } = jest.requireActual('@/hooks/useBossHealth');
 import { getBossConfig } from '@/lib/adventure/bossConfig';
 
 // Boss test data for all 10 worlds
@@ -924,104 +886,6 @@ describe('Boss Mechanic Hook Integration', () => {
           result.current.bossState.mechanicState.currentPhase
         );
       }
-    });
-  });
-
-  // ==============================================
-  // BOSS HEALTH INTEGRATION
-  // ==============================================
-
-  describe('Boss Health Integration', () => {
-    it('should initialize with correct max HP', () => {
-      // GIVEN
-      const maxHP = 1000;
-      const { result } = renderHook(() => realUseBossHealth(maxHP));
-
-      // THEN
-      expect(result.current.healthState.maxHP).toBe(1000);
-      expect(result.current.healthState.currentHP).toBe(1000);
-      expect(result.current.healthState.phase).toBe('intro');
-    });
-
-    it('should calculate damage with combo and mechanic multipliers', () => {
-      // GIVEN
-      const { result } = renderHook(() => realUseBossHealth(1000));
-
-      // Start the battle first
-      hookAct(() => {
-        result.current.startBattle();
-      });
-
-      // WHEN dealing damage with multipliers
-      // baseDamage=100, comboCount=5 (1.5x), mechanicMultiplier=2.0
-      // Expected: 100 * 1.5 * 2.0 = 300
-      let actualDamage: number = 0;
-      hookAct(() => {
-        actualDamage = result.current.dealDamage(100, 5, 2.0);
-      });
-
-      // THEN damage should be 100 * 1.5 * 2.0 = 300
-      expect(actualDamage).toBe(300);
-      expect(result.current.healthState.currentHP).toBe(700);
-    });
-
-    it('should transition to enraged at 25% HP', () => {
-      // GIVEN
-      const { result } = renderHook(() => realUseBossHealth(1000));
-
-      // Start the battle
-      hookAct(() => {
-        result.current.startBattle();
-      });
-
-      // First deal 740 damage to get to 26%
-      hookAct(() => {
-        result.current.dealDamage(740, 0, 1.0);
-      });
-      expect(result.current.healthState.phase).toBe('active');
-
-      // WHEN dealing enough damage to drop below 25%
-      hookAct(() => {
-        result.current.dealDamage(20, 0, 1.0); // HP now at 240 (24%)
-      });
-
-      // THEN should be enraged
-      expect(result.current.healthState.phase).toBe('enraged');
-      expect(result.current.isEnraged).toBe(true);
-    });
-
-    it('should transition to victory when HP reaches 0', () => {
-      // GIVEN
-      const { result } = renderHook(() => realUseBossHealth(1000));
-
-      // Start the battle
-      hookAct(() => {
-        result.current.startBattle();
-      });
-
-      // WHEN dealing lethal damage
-      hookAct(() => {
-        result.current.dealDamage(1000, 0, 1.0);
-      });
-
-      // THEN should be in victory phase
-      expect(result.current.healthState.phase).toBe('victory');
-      expect(result.current.healthState.currentHP).toBe(0);
-    });
-
-    it('should not deal damage during intro phase', () => {
-      // GIVEN
-      const { result } = renderHook(() => realUseBossHealth(1000));
-
-      // WHEN trying to deal damage without starting battle
-      let actualDamage: number = 0;
-      hookAct(() => {
-        actualDamage = result.current.dealDamage(500, 0, 1.0);
-      });
-
-      // THEN no damage should be dealt
-      expect(actualDamage).toBe(0);
-      expect(result.current.healthState.currentHP).toBe(1000);
     });
   });
 

@@ -58,6 +58,10 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   // Track first attack for blockFirstAttack upgrade
   const firstAttackBlockedRef = useRef(false);
 
+  // Edge vignette flash on boss attacks
+  const [showEdgeVignette, setShowEdgeVignette] = useState(false);
+  const vignetteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Attack handler — applies boss attacks to the game (with upgrade effects)
   const handleAttack = useCallback((attack: BossAttack) => {
     // Block first attack (Armor Plating T3)
@@ -66,6 +70,11 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
       shake(1); // visual feedback that attack was blocked
       return;
     }
+
+    // Flash edge vignette on all boss attacks
+    if (vignetteTimeoutRef.current) clearTimeout(vignetteTimeoutRef.current);
+    setShowEdgeVignette(true);
+    vignetteTimeoutRef.current = setTimeout(() => setShowEdgeVignette(false), 400);
 
     if (attack.type === 'timePenalty' && attack.seconds) {
       addTime(-attack.seconds);
@@ -287,9 +296,13 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     // Player health
     playerHealthState: playerHealth.healthState,
     takePlayerDamage: playerHealth.takeDamage,
+    healPlayer: playerHealth.heal,
     resetPlayerHealth: playerHealth.resetHealth,
 
     // Effect callbacks (unused but kept for compat)
     bossEffectCallbacks,
+
+    // Edge vignette flash on boss attacks
+    showEdgeVignette,
   };
 }

@@ -315,7 +315,8 @@ const en = {
     "attempt": "Attempt",
     "checkConnection": "Hmm, you went offline!",
     "retry": "Try again",
-    "retryNow": "Reconnect!"
+    "retryNow": "Reconnect!",
+    "scoreSafe": "Your score is safe on the server"
   },
   "game": {
     "combo": "Combo",
@@ -529,6 +530,8 @@ const en = {
     "gameCodeNotExist": "Code not found. Check and try again!",
     "roomNoLongerExists": "Room closed - everyone left",
     "roomClosed": "Room closed - time to start a new one",
+    "roomClosedJoinAnother": "This room has ended. Join another room below!",
+    "roomNotFoundJoinAnother": "Room not found — it may have ended. Browse rooms below!",
     "usernameTaken": "Someone beat you to it! Try another name",
     "gameCodeExists": "That code's taken. Pick a new one!",
     "somethingWentWrong": "Quick Timeout!",

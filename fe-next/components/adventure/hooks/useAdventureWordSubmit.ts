@@ -56,6 +56,10 @@ export interface UseAdventureWordSubmitProps {
   addScorePopup: (popup: ScorePopup) => void;
   getScoreMultiplier: () => number;
   upgradeBonuses: { scoreBonus: number; timeBonus: number; xpBonus: number };
+  /** HP healed per word in boss fights (Armor Plating T4) */
+  bossHealPerWord?: number;
+  /** Player health heal function for boss heal-per-word */
+  healPlayerHealth?: (amount: number) => void;
   skillEffects: {
     bossDamageMultiplier: number;
     comboMultiplierBonus: number;
@@ -88,6 +92,8 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     addScorePopup, getScoreMultiplier,
     upgradeBonuses, skillEffects, t, getPopupStartPosition,
     worldMechanic,
+    bossHealPerWord = 0,
+    healPlayerHealth,
   } = props;
 
   const { tap, success: hapticSuccess } = useHaptics();
@@ -170,6 +176,11 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
           if (mechResult.meetsRequirement) {
             bossBonus = 'BOSS!';
           }
+
+          // Armor Plating T4: heal player on every word during boss fight
+          if (bossHealPerWord > 0 && healPlayerHealth) {
+            healPlayerHealth(bossHealPerWord);
+          }
         }
 
         const comboBonus = comboCount > 1 ? `${comboCount}x` : undefined;
@@ -214,6 +225,9 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         if (comboCount >= 10) {
           handleEarnAchievement('WORD_STREAK_10');
         }
+        if (comboCount >= 15) {
+          handleEarnAchievement('COMBO_KING');
+        }
 
         wordSubmittedTimeoutRef.current = setTimeout(() => {
           setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
@@ -242,7 +256,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         }, 2000);
       }
     },
-    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess]
+    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth]
   );
 
   return {

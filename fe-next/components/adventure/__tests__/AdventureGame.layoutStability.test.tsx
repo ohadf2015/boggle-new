@@ -377,6 +377,7 @@ jest.mock('../cinematics', () => ({
 jest.mock('../effects/AdventureEffectsLayer', () => ({
   __esModule: true,
   default: () => null,
+  AdventureEffectsLayer: () => null,
 }));
 
 jest.mock('../hooks/useAdventureBossOrchestration', () => ({

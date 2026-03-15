@@ -384,30 +384,6 @@ jest.mock('@/hooks/useAdventureHints', () => ({
   }),
 }));
 
-jest.mock('../hooks/useAdventureBoss', () => ({
-  useAdventureBoss: () => ({
-    isBossActive: false,
-    bossConfig: null,
-    bossTaunt: null,
-    showBossTaunt: false,
-    bossHealthState: { phase: 'idle', current: 0, max: 100 },
-    bossHPPercentage: 100,
-    isEnraged: false,
-    bossState: 'idle',
-    showBossIntro: false,
-    showBossFireworks: false,
-    defeatedBossTier: undefined,
-    checkBossWord: jest.fn(() => ({ scoreMultiplier: 1, meetsRequirement: false })),
-    dealBossDamage: jest.fn(() => 0),
-    triggerBossTaunt: jest.fn(),
-    startBossBattle: jest.fn(),
-    endBossBattle: jest.fn(),
-    resetBossHealth: jest.fn(),
-    handleBossIntroStart: jest.fn(),
-    handleBossIntroSkip: jest.fn(),
-  }),
-}));
-
 jest.mock('../hooks/useAdventureCinematics', () => ({
   useAdventureCinematics: () => ({
     showVictoryCinematic: false,
@@ -546,6 +522,7 @@ jest.mock('../HintMessage', () => ({
 jest.mock('../effects/AdventureEffectsLayer', () => ({
   __esModule: true,
   default: () => null,
+  AdventureEffectsLayer: () => null,
 }));
 
 jest.mock('@/components/animations/ComboTierBadge', () => ({

@@ -315,7 +315,8 @@ const he = {
     "attempt": "ניסיון",
     "checkConnection": "נראה שאתה לא מחובר!",
     "retry": "נסה שוב",
-    "retryNow": "נסה עכשיו"
+    "retryNow": "נסה עכשיו",
+    "scoreSafe": "הניקוד שלך שמור בשרת"
   },
   "game": {
     "combo": "קומבו",
@@ -528,6 +529,8 @@ const he = {
     "sessionExpired": "הסשן נגמר. התחלה חדשה!",
     "gameCodeNotExist": "קוד לא נמצא. בדוק ונסה שוב!",
     "roomNoLongerExists": "החדר נסגר - כולם עזבו",
+    "roomClosedJoinAnother": "החדר הזה הסתיים. הצטרפו לחדר אחר למטה!",
+    "roomNotFoundJoinAnother": "החדר לא נמצא — ייתכן שהסתיים. עיינו בחדרים למטה!",
     "roomClosed": "החדר נסגר - זמן לפתוח חדר חדש",
     "usernameTaken": "מישהו הקדים! נסה שם אחר",
     "gameCodeExists": "הקוד תפוס. בחר חדש!",

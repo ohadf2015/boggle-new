@@ -382,10 +382,9 @@ const AdventureGrid = memo(
                 getCascadeDelay={getCascadeDelay}
                 prefersReducedMotion={prefersReducedMotion}
                 enableComplexAnimations={enableComplexAnimations}
-                onClick={() => handleTileClick(index, tile)}
-                onMouseDown={(e) => handleDragStart(e, index, tile)}
-                onMouseEnter={() => handleDragEnter(index, tile)}
-                onTouchStart={(e) => handleDragStart(e, index, tile)}
+                onTileClick={handleTileClick}
+                onTileDragStart={handleDragStart}
+                onTileDragEnter={handleDragEnter}
                 getTileAriaLabel={getTileAriaLabel}
                 chainCascadeDelay={chainCascadeDelay}
               />

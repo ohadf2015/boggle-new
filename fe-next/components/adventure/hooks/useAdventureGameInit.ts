@@ -143,11 +143,13 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
     timerSeconds: adjustedConfig.timerSeconds + upgradeEffects.bonusTimeSeconds,
   }), [adjustedConfig, upgradeEffects.bonusTimeSeconds]);
 
-  // Adjusted inactivity threshold from AI director
+  // Adjusted inactivity threshold from AI director + Word Radar upgrade
   const adjustedInactivityThresholdMs = useMemo(() => {
     const baseThreshold = 15000;
-    return Math.floor(baseThreshold / intensityAdjustments.hintEscalationRate);
-  }, [intensityAdjustments.hintEscalationRate]);
+    const aiAdjusted = baseThreshold / intensityAdjustments.hintEscalationRate;
+    // Word Radar upgrade: hintRechargeMultiplier > 1 means faster hint recharge (shorter threshold)
+    return Math.floor(aiAdjusted / upgradeEffects.hintRechargeMultiplier);
+  }, [intensityAdjustments.hintEscalationRate, upgradeEffects.hintRechargeMultiplier]);
 
   return {
     // Adaptive difficulty

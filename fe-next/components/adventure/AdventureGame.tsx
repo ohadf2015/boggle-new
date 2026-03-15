@@ -26,7 +26,7 @@ import { neoInfoToast } from '@/components/NeoToast';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
 import { StoryBeatCard } from './StoryBeatCard';
-import AdventureEffectsLayer from './effects/AdventureEffectsLayer';
+import AdventureEffectsLayerFull, { AdventureEffectsLayer as EdgeVignetteLayer } from './effects/AdventureEffectsLayer';
 import LevelCompleteModal from './LevelCompleteModal';
 import LevelEntryOverlay from './LevelEntryOverlay';
 import { BossOverlay, PlayerHealthBar } from './boss';
@@ -109,12 +109,24 @@ const AdventureGame = memo<AdventureGameProps>(
       scrambleImmunity: init.upgradeEffects.scrambleImmunity,
     });
 
+    // Track tile types used in last word for flash challenges (useGoldTile)
+    const [lastWordTileTypes, setLastWordTileTypes] = useState<string[]>([]);
+    const prevWordsFoundLenRef = useRef(gameState.wordsFound.length);
+    useEffect(() => {
+      if (gameState.wordsFound.length > prevWordsFoundLenRef.current) {
+        const activatedTypes = tiles.filter(t => t.activationEffect).map(t => t.type);
+        setLastWordTileTypes(activatedTypes);
+      }
+      prevWordsFoundLenRef.current = gameState.wordsFound.length;
+    }, [gameState.wordsFound.length, tiles]);
+
     const flashChallenge = useFlashChallenge({
       worldId: levelConfig.world,
       totalTimeSeconds: levelConfig.timerSeconds ?? 120,
       timeRemaining,
       wordsFound: gameState.wordsFound,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
+      lastWordTileTypes,
     });
 
     // CrazyGames SDK lifecycle — report gameplay and trigger happyTime on achievements
@@ -170,6 +182,8 @@ const AdventureGame = memo<AdventureGameProps>(
       recordAIWord: init.recordAIWord, handleAITransition: init.handleAITransition,
       addScorePopup: effects.addScorePopup, getScoreMultiplier,
       upgradeBonuses: init.upgradeBonuses, skillEffects: init.skillEffects,
+      bossHealPerWord: init.upgradeEffects.bossHealPerWord,
+      healPlayerHealth: bossOrch.isBossActive ? bossOrch.healPlayer : undefined,
       t, getPopupStartPosition: () => {
         if (selectedIndices.length === 0) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
         const el = gridRef.current?.querySelectorAll('[role="gridcell"]')[selectedIndices[selectedIndices.length - 1]];
@@ -191,6 +205,7 @@ const AdventureGame = memo<AdventureGameProps>(
       isBossActive: bossOrch.isBossActive, bossHealthPhase: bossOrch.bossHealthState.phase,
       playerIsDead: bossOrch.playerHealthState.isDead, endBossBattle: bossOrch.endBossBattle,
       triggerBossTaunt: bossOrch.triggerBossTaunt,
+      playerHealthPercent: bossOrch.playerHealthState.maxHP > 0 ? Math.round((bossOrch.playerHealthState.currentHP / bossOrch.playerHealthState.maxHP) * 100) : 100,
     });
     const lastReportedStateRef = useRef<LastReportedTimerState | null>(null);
     useEffect(() => {
@@ -415,7 +430,7 @@ const AdventureGame = memo<AdventureGameProps>(
                   challenge={flashChallenge.activeChallenge}
                   isComplete={flashChallenge.isChallengeComplete}
                   onDismiss={flashChallenge.dismiss}
-                  timeLeft={flashChallenge.activeChallenge.durationSeconds}
+                  timeLeft={flashChallenge.challengeTimeLeft}
                 />
               )}
 
@@ -428,7 +443,13 @@ const AdventureGame = memo<AdventureGameProps>(
               {cinematics.showVictoryCinematic && (
                 <CinematicPlayer
                   composition={VictoryCinematic as unknown as React.ComponentType<Record<string, unknown>>}
-                  compositionProps={{ starsEarned: gameState.stars, wordsFound: gameState.wordsFound.length, finalScore: gameState.score, timeRemaining }}
+                  compositionProps={{
+                    starsEarned: gameState.stars, wordsFound: gameState.wordsFound.length,
+                    finalScore: gameState.score, timeRemaining,
+                    titleText: t('adventure.cinematic.victory'),
+                    statLabels: { wordsFound: t('adventure.cinematic.wordsFound'), finalScore: t('adventure.cinematic.score'), timeRemaining: t('adventure.cinematic.timeLeft') },
+                    starsLabel: t('adventure.cinematic.stars'),
+                  }}
                   durationSeconds={VICTORY_DURATION_FRAMES / 30} onComplete={handleCinematicComplete}
                   fallbackType="victory" />
               )}
@@ -436,7 +457,15 @@ const AdventureGame = memo<AdventureGameProps>(
               {cinematics.showDefeatCinematic && (
                 <CinematicPlayer
                   composition={DefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
-                  compositionProps={{ wordsFound: gameState.wordsFound.length, bestWord: gameState.wordsFound.reduce((best, word) => word.length > best.length ? word : best, ''), finalScore: gameState.score }}
+                  compositionProps={{
+                    wordsFound: gameState.wordsFound.length,
+                    bestWord: gameState.wordsFound.reduce((best, word) => word.length > best.length ? word : best, ''),
+                    finalScore: gameState.score,
+                    titleText: t('adventure.cinematic.defeat'),
+                    encourageText: t('adventure.cinematic.encourageText'),
+                    encourageSubtext: t('adventure.cinematic.encourageSubtext'),
+                    statLabels: { wordsFound: t('adventure.cinematic.wordsFound'), finalScore: t('adventure.cinematic.score'), bestWord: t('adventure.cinematic.bestWord') },
+                  }}
                   durationSeconds={DEFEAT_DURATION_FRAMES / 30} onComplete={handleCinematicComplete}
                   fallbackType="defeat" />
               )}
@@ -459,7 +488,9 @@ const AdventureGame = memo<AdventureGameProps>(
                 />
               )}
 
-              <AdventureEffectsLayer currentPopup={effects.currentPopup}
+              <EdgeVignetteLayer showEdgeVignetteFlash={bossOrch.showEdgeVignette} />
+
+              <AdventureEffectsLayerFull currentPopup={effects.currentPopup}
                 onPopupComplete={handlePopupComplete} scoreDisplayRef={effects.scoreDisplayRef}
                 reaction={effects.reaction} onDismissReaction={effects.dismissReaction}
                 chainBurstConfig={effects.chainBurstConfig}

@@ -89,10 +89,9 @@ describe('AdventureTile', () => {
     getCascadeDelay: () => 0,
     prefersReducedMotion: false,
     enableComplexAnimations: true,
-    onClick: jest.fn(),
-    onMouseDown: jest.fn(),
-    onMouseEnter: jest.fn(),
-    onTouchStart: jest.fn(),
+    onTileClick: jest.fn(),
+    onTileDragStart: jest.fn(),
+    onTileDragEnter: jest.fn(),
     getTileAriaLabel: (tile: GridTileState) => `Letter ${tile.letter}`,
   };
 
@@ -458,36 +457,36 @@ describe('AdventureTile', () => {
   });
 
   describe('Event Handlers', () => {
-    it('should call onClick when tile is clicked', () => {
-      const onClick = jest.fn();
-      const { container } = render(<AdventureTile {...defaultProps} onClick={onClick} />);
+    it('should call onTileClick when tile is clicked', () => {
+      const onTileClick = jest.fn();
+      const { container } = render(<AdventureTile {...defaultProps} onTileClick={onTileClick} />);
       const tile = container.querySelector('[role="gridcell"]');
       fireEvent.click(tile!);
-      expect(onClick).toHaveBeenCalled();
+      expect(onTileClick).toHaveBeenCalledWith(0, baseTile);
     });
 
-    it('should call onMouseDown when mouse pressed', () => {
-      const onMouseDown = jest.fn();
-      const { container } = render(<AdventureTile {...defaultProps} onMouseDown={onMouseDown} />);
+    it('should call onTileDragStart when mouse pressed', () => {
+      const onTileDragStart = jest.fn();
+      const { container } = render(<AdventureTile {...defaultProps} onTileDragStart={onTileDragStart} />);
       const tile = container.querySelector('[role="gridcell"]');
       fireEvent.mouseDown(tile!);
-      expect(onMouseDown).toHaveBeenCalled();
+      expect(onTileDragStart).toHaveBeenCalled();
     });
 
-    it('should call onMouseEnter when mouse enters', () => {
-      const onMouseEnter = jest.fn();
-      const { container } = render(<AdventureTile {...defaultProps} onMouseEnter={onMouseEnter} />);
+    it('should call onTileDragEnter when mouse enters', () => {
+      const onTileDragEnter = jest.fn();
+      const { container } = render(<AdventureTile {...defaultProps} onTileDragEnter={onTileDragEnter} />);
       const tile = container.querySelector('[role="gridcell"]');
       fireEvent.mouseEnter(tile!);
-      expect(onMouseEnter).toHaveBeenCalled();
+      expect(onTileDragEnter).toHaveBeenCalledWith(0, baseTile);
     });
 
-    it('should call onTouchStart when touch starts', () => {
-      const onTouchStart = jest.fn();
-      const { container } = render(<AdventureTile {...defaultProps} onTouchStart={onTouchStart} />);
+    it('should call onTileDragStart when touch starts', () => {
+      const onTileDragStart = jest.fn();
+      const { container } = render(<AdventureTile {...defaultProps} onTileDragStart={onTileDragStart} />);
       const tile = container.querySelector('[role="gridcell"]');
       fireEvent.touchStart(tile!);
-      expect(onTouchStart).toHaveBeenCalled();
+      expect(onTileDragStart).toHaveBeenCalled();
     });
   });
 

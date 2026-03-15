@@ -338,18 +338,6 @@ jest.mock('@/hooks/useBossMechanics', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useBossHealth', () => ({
-  useBossHealth: () => ({
-    healthState: { phase: 'inactive', currentHP: 0, maxHP: 0 },
-    dealDamage: jest.fn(),
-    startBattle: jest.fn(),
-    endBattle: jest.fn(),
-    resetHealth: jest.fn(),
-    hpPercentage: 0,
-    isEnraged: false,
-  }),
-}));
-
 jest.mock('@/hooks/useAdventureXp', () => ({
   useAdventureXp: () => ({
     totalXp: 0,

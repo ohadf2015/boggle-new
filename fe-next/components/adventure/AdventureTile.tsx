@@ -13,7 +13,7 @@
  * - Performance-aware rendering
  */
 
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { GridTileState, TileType } from '@/types/adventure';
@@ -49,14 +49,12 @@ export interface AdventureTileProps {
   prefersReducedMotion: boolean;
   /** Whether complex animations are enabled (performance) */
   enableComplexAnimations: boolean;
-  /** Click handler */
-  onClick: () => void;
-  /** Mouse down handler */
-  onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void;
-  /** Mouse enter handler */
-  onMouseEnter: () => void;
-  /** Touch start handler */
-  onTouchStart: (e: React.TouchEvent) => void;
+  /** Stable click handler — receives (index, tile) */
+  onTileClick: (index: number, tile: GridTileState) => void;
+  /** Stable drag start handler — receives (e, index, tile) */
+  onTileDragStart: (e: React.MouseEvent | React.TouchEvent, index: number, tile: GridTileState) => void;
+  /** Stable drag enter handler — receives (index, tile) */
+  onTileDragEnter: (index: number, tile: GridTileState) => void;
   /** Function to generate aria-label for tile */
   getTileAriaLabel: (tile: GridTileState) => string;
   /** Optional chain cascade delay (overrides tile.cascadeDelay) */
@@ -99,13 +97,18 @@ export const AdventureTile = memo(({
   getCascadeDelay,
   prefersReducedMotion,
   enableComplexAnimations,
-  onClick,
-  onMouseDown,
-  onMouseEnter,
-  onTouchStart,
+  onTileClick,
+  onTileDragStart,
+  onTileDragEnter,
   getTileAriaLabel,
   chainCascadeDelay,
 }: AdventureTileProps) => {
+  // Stable handlers that don't create new closures per render
+  const handleClick = useCallback(() => onTileClick(index, tile), [onTileClick, index, tile]);
+  const handleMouseDown = useCallback((e: React.MouseEvent) => onTileDragStart(e, index, tile), [onTileDragStart, index, tile]);
+  const handleMouseEnter = useCallback(() => onTileDragEnter(index, tile), [onTileDragEnter, index, tile]);
+  const handleTouchStart = useCallback((e: React.TouchEvent) => onTileDragStart(e, index, tile), [onTileDragStart, index, tile]);
+
   // Chain cascade delay takes priority over tile.cascadeDelay
   const effectiveCascadeDelay = chainCascadeDelay ?? tile.cascadeDelay;
 
@@ -118,10 +121,10 @@ export const AdventureTile = memo(({
       role="gridcell"
       aria-label={getTileAriaLabel(tile)}
       aria-selected={isSelected}
-      onClick={onClick}
-      onMouseDown={onMouseDown}
-      onMouseEnter={onMouseEnter}
-      onTouchStart={onTouchStart}
+      onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      onMouseEnter={handleMouseEnter}
+      onTouchStart={handleTouchStart}
       initial={showCascade && !cascadeComplete ? {
         y: -100,
         opacity: 0,

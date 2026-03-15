@@ -171,24 +171,6 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useBossHealth', () => ({
-  useBossHealth: () => ({
-    healthState: {
-      currentHP: 100,
-      maxHP: 100,
-      phase: 'intro',
-      totalDamageDealt: 0,
-      isActive: false,
-    },
-    dealDamage: jest.fn(),
-    startBattle: jest.fn(),
-    endBattle: jest.fn(),
-    resetHealth: jest.fn(),
-    hpPercentage: 100,
-    isEnraged: false,
-  }),
-}));
-
 jest.mock('@/utils/confettiUtils', () => ({
   fireVictoryConfetti: jest.fn(),
 }));
@@ -278,30 +260,6 @@ jest.mock('../hooks/useAdventureEntryPhase', () => ({
     isEntryComplete: true,
     currentPhase: 'game',
     onPhaseComplete: jest.fn(),
-  }),
-}));
-
-jest.mock('../hooks/useAdventureBoss', () => ({
-  useAdventureBoss: () => ({
-    bossState: null,
-    isBossLevel: false,
-    showBossIntro: false,
-    showBossVictory: false,
-    bossHealth: null,
-    bossHealthState: {
-      phase: 'intro',
-      currentHP: 100,
-      maxHP: 100,
-      totalDamageDealt: 0,
-      isActive: false,
-    },
-    dealDamageToBoss: jest.fn(),
-    startBossBattle: jest.fn(),
-    handleBossDefeat: jest.fn(),
-    handleBossVictoryClose: jest.fn(),
-    handleWordSubmit: jest.fn(),
-    initializeBoss: jest.fn(),
-    bossIntroComplete: jest.fn(),
   }),
 }));
 
@@ -494,6 +452,7 @@ jest.mock('../cinematics', () => ({
 jest.mock('../effects/AdventureEffectsLayer', () => ({
   __esModule: true,
   default: () => null,
+  AdventureEffectsLayer: () => null,
 }));
 
 jest.mock('../hooks/useAdventureBossOrchestration', () => ({
