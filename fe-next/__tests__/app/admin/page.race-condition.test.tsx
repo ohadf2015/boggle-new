@@ -9,7 +9,7 @@
  * Then profile loads → isAdmin becomes true → but user already saw Access Denied
  */
 
-import React from 'react';
+
 import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AdminPage from '@/app/[locale]/admin/page';
@@ -23,6 +23,7 @@ jest.mock('@/contexts/AuthContext');
 jest.mock('@/contexts/LanguageContext');
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  usePathname: jest.fn(() => '/en/admin'),
 }));
 jest.mock('@/lib/supabase', () => ({
   getSession: jest.fn(),
@@ -64,6 +65,41 @@ jest.mock('@/components/admin/EmailTestPanel', () => {
 });
 jest.mock('@/utils/mobileAccessibility', () => ({
   isMobileDevice: jest.fn(() => false),
+}));
+jest.mock('@/components/admin/overview/KPICards', () => ({
+  KPICards: () => <div data-testid="kpi-cards">KPICards</div>,
+}));
+jest.mock('@/components/admin/overview/SystemHealth', () => ({
+  SystemHealth: () => <div data-testid="system-health">SystemHealth</div>,
+}));
+jest.mock('@/components/admin/sidebar/AdminSidebar', () => ({
+  AdminSidebar: () => <div data-testid="admin-sidebar">AdminSidebar</div>,
+}));
+jest.mock('@/components/admin/sidebar/AdminBottomNav', () => ({
+  AdminBottomNav: () => <div data-testid="admin-bottom-nav">AdminBottomNav</div>,
+}));
+jest.mock('@/components/ui/Loader', () => ({
+  Loader: ({ text }: { text?: string }) => <div>{text}</div>,
+}));
+jest.mock('@/components/ui/PageLoader', () => ({
+  PageLoader: ({ text }: { text?: string }) => <div>{text}</div>,
+}));
+jest.mock('@/hooks/useAdminAuth', () => ({
+  useAdminAuth: jest.fn(() => ({
+    authToken: null,
+    refreshToken: jest.fn(),
+    isLoading: false,
+    isRefreshing: false,
+    error: null,
+  })),
+}));
+jest.mock('@/hooks/useAdminDashboard', () => ({
+  useAdminDashboard: jest.fn(() => ({
+    stats: null,
+    health: null,
+    loading: false,
+    error: null,
+  })),
 }));
 jest.mock('@/components/ui/PullToRefreshWrapper', () => {
   return {
