@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, memo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Medal, Star, Zap } from 'lucide-react';
+import { Crown, Medal, Star, Zap, SkipForward } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireRankConfetti } from '@/utils/confettiUtils';
@@ -41,7 +42,7 @@ interface ScoreRevealAnimationProps {
 const RANK_STYLES: Record<number, { bg: string; text: string; icon: typeof Crown }> = {
   1: { bg: 'bg-neo-lime', text: 'text-neo-black', icon: Crown },
   2: { bg: 'bg-slate-300', text: 'text-slate-700', icon: Medal },
-  3: { bg: 'bg-orange-400', text: 'text-neo-black', icon: Medal },
+  3: { bg: 'bg-neo-orange', text: 'text-neo-black', icon: Medal },
 };
 
 /**
@@ -79,6 +80,8 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
   // If reduced motion or no animation, skip
   const shouldAnimate = animate && !prefersReducedMotion;
 
+  const { t } = useLanguage();
+
   // State: current displayed scores (animated from 0 to final)
   const [displayedScores, setDisplayedScores] = useState<Record<string, number>>(() => {
     if (!shouldAnimate) {
@@ -93,11 +96,26 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
   const [isRevealing, setIsRevealing] = useState(shouldAnimate);
   const [lastPositionSwap, setLastPositionSwap] = useState<{ from: number; to: number } | null>(null);
 
-  // Get max score for progress calculation
-  const maxScore = useMemo(() =>
-    Math.max(...players.map(p => p.finalScore), 1),
-    [players]
-  );
+  // Skip mechanism — allow tap-to-skip after 1s
+  const [canSkip, setCanSkip] = useState(false);
+  const skipTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    if (!shouldAnimate) return;
+    skipTimerRef.current = setTimeout(() => setCanSkip(true), 1000);
+    return () => { if (skipTimerRef.current) clearTimeout(skipTimerRef.current); };
+  }, [shouldAnimate]);
+
+  const handleSkip = useCallback(() => {
+    if (!isRevealing) return;
+    setDisplayedScores(players.reduce((acc, p) => ({ ...acc, [p.username]: p.finalScore }), {}));
+    setIsRevealing(false);
+    if (enableComplexAnimations) {
+      playAchievementSound();
+      fireRankConfetti(1, 'light');
+    }
+    onComplete?.();
+  }, [isRevealing, players, enableComplexAnimations, playAchievementSound, onComplete]);
 
   // Calculate current positions based on displayed scores
   const sortedByDisplayed = useMemo(() => {
@@ -213,7 +231,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         }}
         className={cn(
           'flex items-center gap-3 p-2 rounded-neo border-2 border-neo-black transition-colors duration-300',
-          isTop3 ? rankStyle.bg : 'bg-white dark:bg-slate-800',
+          isTop3 ? rankStyle.bg : 'bg-neo-cream',
           isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-1',
           'shadow-hard-sm',
           // Flash highlight when position just swapped
@@ -223,7 +241,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         {/* Rank badge */}
         <div className={cn(
           'w-8 h-8 rounded-full flex items-center justify-center border-2 border-neo-black',
-          isTop3 ? 'bg-neo-cream' : 'bg-slate-100'
+          isTop3 ? 'bg-neo-cream' : 'bg-neo-cream/80'
         )}>
           {isTop3 ? (
             <RankIcon className={cn('w-4 h-4', rankStyle.text)} />
@@ -244,7 +262,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         <div className="flex-1 min-w-0">
           <p className={cn(
             'font-bold truncate',
-            isTop3 ? rankStyle.text : 'text-neo-black dark:text-white'
+            isTop3 ? rankStyle.text : 'text-neo-black'
           )}>
             {player.username}
             {isCurrentPlayer && <span className="text-neo-cyan ms-1">*</span>}
@@ -259,7 +277,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className={cn(
             'px-3 py-1 rounded-neo border-2 border-neo-black font-black text-lg',
-            isTop3 ? 'bg-neo-cream text-neo-black' : 'bg-slate-100 text-neo-black'
+            isTop3 ? 'bg-neo-cream text-neo-black' : 'bg-neo-cream/80 text-neo-black'
           )}
         >
           {score}
@@ -291,7 +309,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-3"
+          className="h-1 bg-white/10 rounded-full overflow-hidden mb-3"
         >
           <motion.div
             className="h-full bg-neo-lime"
@@ -311,13 +329,29 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
       {/* "Trading places" indicator during reveal */}
       {isRevealing && lastPositionSwap && enableComplexAnimations && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          className="text-center text-xs font-bold text-neo-pink uppercase tracking-wide py-1"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 40 }}
+          className="flex justify-end"
         >
-          Position swap!
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-neo border-2 border-neo-pink bg-neo-pink/20 text-xs font-bold text-neo-pink uppercase tracking-wide shadow-hard-sm">
+            <Zap className="w-3 h-3" />
+            {t('results.positionSwap')}
+          </div>
         </motion.div>
+      )}
+
+      {/* Skip button — appears after 1s */}
+      {isRevealing && canSkip && (
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={handleSkip}
+          className="flex items-center justify-center gap-1.5 mx-auto mt-1 px-3 py-1.5 rounded-neo border-2 border-white/20 bg-white/5 hover:bg-white/10 text-[10px] font-bold text-neo-cream/60 uppercase tracking-wide transition-colors"
+        >
+          <SkipForward className="w-3 h-3" />
+          {t('results.skipReveal')}
+        </motion.button>
       )}
     </div>
   );

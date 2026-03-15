@@ -9,7 +9,7 @@ import Avatar from '../Avatar';
 import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
 import type { Player } from './types';
 import { fireConfetti, RANK_COLORS } from '@/utils/confettiUtils';
-import { RANK_CONFIG, getRankConfig } from '@/utils/rankingStyles';
+import { RANK_CONFIG } from '@/utils/rankingStyles';
 
 // Fire confetti burst for a specific rank with custom origin
 const fireConfettiForRank = (rank: number, intensity: number = 1): void => {
@@ -174,7 +174,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
       )}
 
       {/* Podium Layout: 2nd - 1st - 3rd */}
-      <div className="flex items-end justify-center gap-1.5">
+      <div className="flex items-end justify-center gap-2 sm:gap-3">
         {podiumOrder.map((participant, displayIndex) => {
           if (!participant) return null;
           // Determine actual rank from original position
@@ -200,8 +200,8 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCardClick(rank)}
                 className={cn(
-                  'relative rounded-neo border-2 border-neo-black shadow-hard-sm overflow-hidden cursor-pointer',
-                  'bg-white dark:bg-slate-800',
+                  'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden cursor-pointer',
+                  'bg-neo-cream',
                   compact ? 'w-20 p-1.5' : 'w-24 p-2',
                   isCurrentPlayer && 'ring-2 ring-neo-cyan'
                 )}
@@ -245,7 +245,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                   side="bottom"
                 >
                   <p className={cn(
-                    'font-bold text-center truncate text-neo-black dark:text-white',
+                    'font-bold text-center truncate text-neo-black',
                     compact ? 'text-[10px]' : 'text-xs',
                     !isCurrentPlayer && 'cursor-pointer hover:text-neo-cyan'
                   )}>
@@ -289,7 +289,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
       </div>
 
       {/* Podium Floor */}
-      <div className="w-full h-2 bg-slate-700 dark:bg-slate-600 border-2 border-neo-black rounded-b-neo -mt-[2px]" />
+      <div className="w-full h-3 bg-neo-black border-2 border-neo-black rounded-b-neo -mt-[2px]" />
     </motion.div>
   );
 });

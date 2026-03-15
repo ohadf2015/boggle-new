@@ -1544,6 +1544,8 @@ const en = {
     "imReady": "Ready for Next Game",
     "youAreReady": "You're ready!",
     "waitingForHostToStart": "Waiting for host...",
+    "positionSwap": "Position Swap!",
+    "skipReveal": "Skip",
     "markReadyDescription": "Tap when ready",
     "allReadyHostCanStart": "All set! Start anytime.",
     "allPlayersReadyWaitingHost": "Ready — host's turn",
@@ -3239,7 +3241,11 @@ const en = {
       "share": "Share",
       "preview": "Preview & Publish",
       "words": "words",
-      "seedWordsHelp": "Press Enter or comma to add words. Click a tag to edit."
+      "seedWordsHelp": "Press Enter or comma to add words. Click a tag to edit.",
+      "coverImage": "Cover Image (optional)",
+      "coverImageAlt": "Board cover image preview",
+      "addCoverImage": "Add a cover image (JPEG, PNG, WebP, max 2MB)",
+      "removeCoverImage": "Remove cover image"
     },
     "difficulty": {
       "easy": "Easy",

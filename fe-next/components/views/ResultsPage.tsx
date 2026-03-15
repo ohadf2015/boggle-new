@@ -431,6 +431,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     ...(resolvedGameMode === 'word-hunt' && wordHuntResultsData ? {
       wordHuntResults: wordHuntResultsData,
     } : {}),
+    isCurrentPlayerReady,
+    onMarkReady: handleMarkReady,
   };
 
   // Render Details Tab Content using shared component

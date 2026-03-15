@@ -2,7 +2,8 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Trophy, Star, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Trophy, Star, Users, Check } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import RoomChat from '@/components/RoomChat';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
@@ -20,8 +21,6 @@ const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt
 const MissedWordsComponent = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
-const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
-const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -98,6 +97,10 @@ export interface ResultsDetailsContentProps {
   blastResults?: { movesUsed: number; tilesCleared: number; tileBonus: number; playerStats?: Record<string, import('@/shared/types/game').BlastPlayerStats> };
   /** Word Hunt mode results data */
   wordHuntResults?: { targetWord: string; foundTarget: boolean; isFirstFinder: boolean; survivalTime: number; discoveryWords: number; playerResults?: Array<{ username: string; score: number; survived: boolean; lifeRemaining: number }>; currentUsername?: string };
+  /** Whether the current player has marked ready (multiplayer) */
+  isCurrentPlayerReady?: boolean;
+  /** Handler to mark ready from details tab */
+  onMarkReady?: () => void;
 }
 
 // ==============================================
@@ -136,9 +139,11 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
   hideRankAndScore = false,
   showBanner = false,
   bannerSize = '300x250',
-  gameMode,
-  blastResults,
-  wordHuntResults,
+  gameMode: _gameMode,
+  blastResults: _blastResults,
+  wordHuntResults: _wordHuntResults,
+  isCurrentPlayerReady,
+  onMarkReady,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -159,14 +164,6 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
           duplicateRuleDisabled={duplicateRuleDisabled}
           hideRankAndScore={hideRankAndScore}
         />
-      )}
-
-      {/* Mode-specific results summary */}
-      {gameMode === 'blast' && blastResults && (
-        <BlastResultsSummary {...blastResults} />
-      )}
-      {gameMode === 'word-hunt' && wordHuntResults && (
-        <WordHuntResultsSummary {...wordHuntResults} />
       )}
 
       {/* Share Prompt */}
@@ -257,6 +254,21 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
       {showBanner && (
         <div className="flex justify-center py-2">
           <CrazyGamesBanner size={bannerSize} />
+        </div>
+      )}
+
+      {/* Sticky Ready chip — lets multiplayer users mark ready without tab-switching */}
+      {gameCode && onMarkReady && isCurrentPlayerReady === false && (
+        <div className="sticky bottom-4 z-20 flex justify-center pointer-events-none">
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={onMarkReady}
+            className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 bg-neo-lime text-neo-black font-black text-sm uppercase border-3 border-neo-black rounded-neo shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all"
+          >
+            <Check className="w-4 h-4" />
+            {t('results.imReady')}
+          </motion.button>
         </div>
       )}
     </div>

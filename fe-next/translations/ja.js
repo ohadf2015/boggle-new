@@ -1426,6 +1426,8 @@ const ja = {
     "imReady": "次のゲーム準備完了",
     "youAreReady": "準備完了！",
     "waitingForHostToStart": "ホストが次のラウンドを開始するのを待っています...",
+    "positionSwap": "順位入れ替え！",
+    "skipReveal": "スキップ",
     "markReadyDescription": "ボタンをタップして次のゲームの準備完了を伝えましょう",
     "allReadyHostCanStart": "🎉 全員準備完了！次のラウンドを開始できます。",
     "allPlayersReadyWaitingHost": "✓ 全員準備完了 — ホストの開始を待っています",
@@ -2753,7 +2755,11 @@ const ja = {
       "share": "共有",
       "preview": "プレビューして公開",
       "words": "単語",
-      "seedWordsHelp": "Enterまたはカンマで単語を追加。タグをクリックして編集。"
+      "seedWordsHelp": "Enterまたはカンマで単語を追加。タグをクリックして編集。",
+      "coverImage": "カバー画像（任意）",
+      "coverImageAlt": "カバー画像プレビュー",
+      "addCoverImage": "カバー画像を追加（JPEG、PNG、WebP、最大2MB）",
+      "removeCoverImage": "カバー画像を削除"
     },
     "difficulty": {
       "easy": "簡単",

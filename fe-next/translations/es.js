@@ -1490,6 +1490,8 @@ const es = {
     "imReady": "Listo para el siguiente",
     "youAreReady": "¡Estás listo!",
     "waitingForHostToStart": "Esperando a que el anfitrión inicie la siguiente ronda...",
+    "positionSwap": "¡Cambio de posición!",
+    "skipReveal": "Saltar",
     "markReadyDescription": "Toca el botón para indicar que estás listo para el próximo juego",
     "allReadyHostCanStart": "🎉 ¡Todos los jugadores listos! Puedes iniciar la siguiente ronda.",
     "allPlayersReadyWaitingHost": "✓ Todos los jugadores listos — esperando al anfitrión",
@@ -3171,7 +3173,11 @@ const es = {
       "share": "Compartir",
       "preview": "Vista previa y publicar",
       "words": "palabras",
-      "seedWordsHelp": "Presiona Enter o coma para agregar palabras. Haz clic en una etiqueta para editar."
+      "seedWordsHelp": "Presiona Enter o coma para agregar palabras. Haz clic en una etiqueta para editar.",
+      "coverImage": "Imagen de portada (opcional)",
+      "coverImageAlt": "Vista previa de imagen de portada",
+      "addCoverImage": "Añadir imagen de portada (JPEG, PNG, WebP, máx. 2MB)",
+      "removeCoverImage": "Eliminar imagen de portada"
     },
     "difficulty": {
       "easy": "Fácil",

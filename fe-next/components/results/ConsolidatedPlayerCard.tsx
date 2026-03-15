@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, Hash, Award, TrendingUp, ChevronDown, Zap, BarChart3, Sparkles } from 'lucide-react';
+import { Target, Hash, Award, TrendingUp, ChevronDown, Zap, BarChart3, Sparkles, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
@@ -138,7 +138,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
       <div
         className={cn(
           'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-lg',
-          'bg-neo-navy',
+          'bg-[#1e1e35]',
           '-rotate-[0.5deg]'
         )}
       >
@@ -289,7 +289,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               className="mb-2 sm:mb-3 p-2 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30"
             >
               <div className="text-[10px] sm:text-xs text-neo-cyan font-bold flex items-center gap-1.5 mb-1">
-                💡 {t('results.scoringTip')}
+                <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" />
+                {t('results.scoringTip')}
               </div>
               <p className="text-[9px] sm:text-[10px] text-neo-cream/70 leading-relaxed">
                 {t('results.scoringTipText')}
@@ -297,42 +298,11 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             </motion.div>
           )}
 
-          {/* Collapsible: Performance Details */}
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            aria-expanded={showDetails}
-            className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-cyan/50 bg-neo-cyan/10 hover:bg-neo-cyan/20 transition-colors mb-1.5 sm:mb-2"
-          >
-            <span className="flex items-center gap-1.5 sm:gap-2">
-              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t('results.viewDetails')}</span>
-              <span className="sm:hidden">{t('results.details')}</span>
-            </span>
-            <motion.div animate={{ rotate: showDetails ? 180 : 0 }} transition={{ duration: 0.2 }}>
-              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.div>
-          </button>
-          <AnimatePresence>
-            {showDetails && playerInsights && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden mb-2"
-              >
-                <div className="bg-white/5 text-neo-black rounded-neo border border-white/10 p-2">
-                  <PlayerInsights insights={playerInsights} />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Collapsible: Words */}
+          {/* Collapsible: Words (most wanted — first) */}
           <button
             onClick={() => setShowWords(!showWords)}
             aria-expanded={showWords}
-            className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-white/20 bg-white/5 hover:bg-white/10 transition-colors mb-1.5 sm:mb-2"
+            className="w-full flex items-center justify-between p-2 sm:p-3 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border-2 border-neo-lime/50 bg-neo-lime/10 hover:bg-neo-lime/20 transition-colors mb-2"
           >
             <span className="flex items-center gap-1.5 sm:gap-2">
               <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -377,13 +347,51 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             )}
           </AnimatePresence>
 
+          {/* Collapsible: Achievements (auto-expanded when earned) */}
+          {gameAchievements.length > 0 && (
+            <>
+              <button
+                onClick={() => setShowAchievements(!showAchievements)}
+                aria-expanded={showAchievements}
+                className="w-full flex items-center justify-between p-2 sm:p-3 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border-2 border-neo-lime/50 bg-neo-lime/10 hover:bg-neo-lime/20 transition-colors mb-2"
+              >
+                <span className="flex items-center gap-1.5 sm:gap-2">
+                  <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">{t('hostView.achievements')}</span>
+                  <span className="sm:hidden">{t('results.badges')}</span>
+                  <span className="text-slate-300">({gameAchievements.length})</span>
+                </span>
+                <motion.div animate={{ rotate: showAchievements ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
+                </motion.div>
+              </button>
+              <AnimatePresence>
+                {showAchievements && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      {gameAchievements.map((ach, i) => (
+                        <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
+
           {/* Collapsible: XP Breakdown (only if authenticated) */}
           {xpGainedData && (
             <>
               <button
                 onClick={() => setShowXp(!showXp)}
                 aria-expanded={showXp}
-                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-pink/50 bg-neo-pink/10 hover:bg-neo-pink/20 transition-colors mb-1.5 sm:mb-2"
+                className="w-full flex items-center justify-between p-2 sm:p-3 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border-2 border-neo-purple/50 bg-neo-purple/10 hover:bg-neo-purple/20 transition-colors mb-2"
               >
                 <span className="flex items-center gap-1.5 sm:gap-2">
                   <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -414,43 +422,36 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             </>
           )}
 
-          {/* Collapsible: Achievements */}
-          {gameAchievements.length > 0 && (
-            <>
-              <button
-                onClick={() => setShowAchievements(!showAchievements)}
-                aria-expanded={showAchievements}
-                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-lime/50 bg-neo-lime/10 hover:bg-neo-lime/20 transition-colors"
+          {/* Collapsible: Performance Details (analytical — last) */}
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            aria-expanded={showDetails}
+            className="w-full flex items-center justify-between p-2 sm:p-3 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border-2 border-neo-cyan/50 bg-neo-cyan/10 hover:bg-neo-cyan/20 transition-colors mb-2"
+          >
+            <span className="flex items-center gap-1.5 sm:gap-2">
+              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t('results.viewDetails')}</span>
+              <span className="sm:hidden">{t('results.details')}</span>
+            </span>
+            <motion.div animate={{ rotate: showDetails ? 180 : 0 }} transition={{ duration: 0.2 }}>
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
+            </motion.div>
+          </button>
+          <AnimatePresence>
+            {showDetails && playerInsights && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden mb-2"
               >
-                <span className="flex items-center gap-1.5 sm:gap-2">
-                  <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">{t('hostView.achievements')}</span>
-                  <span className="sm:hidden">{t('results.badges')}</span>
-                  <span className="text-slate-300">({gameAchievements.length})</span>
-                </span>
-                <motion.div animate={{ rotate: showAchievements ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
-                </motion.div>
-              </button>
-              <AnimatePresence>
-                {showAchievements && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="overflow-hidden mt-2"
-                  >
-                    <div className="flex flex-wrap gap-2">
-                      {gameAchievements.map((ach, i) => (
-                        <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </>
-          )}
+                <div className="bg-white/5 text-neo-black rounded-neo border border-white/10 p-2">
+                  <PlayerInsights insights={playerInsights} />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </motion.div>

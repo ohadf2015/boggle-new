@@ -3,7 +3,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { Trophy, Star, Play, Check } from 'lucide-react';
+import { Star, Play, Check } from 'lucide-react';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import type { Player } from '@/components/results/types';
 
@@ -340,22 +340,22 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Comparative Insights */}
-      {allPlayerWords && username && sortedScores.length > 1 && (
-        <ComparativeInsights
-          allPlayerWords={allPlayerWords}
-          currentUsername={username}
-          t={t}
-        />
-      )}
-
-      {/* Near-Miss Notifications - Motivate "one more game" */}
+      {/* Near-Miss Notifications - Motivate "one more game" (before analysis) */}
       {nearMisses.length > 0 && (
         <NearMissCard
           nearMisses={nearMisses}
           t={t}
           onPlayAgain={isHost ? onStartGame : onMarkReady}
           compact
+        />
+      )}
+
+      {/* Comparative Insights (analysis after motivation) */}
+      {allPlayerWords && username && sortedScores.length > 1 && (
+        <ComparativeInsights
+          allPlayerWords={allPlayerWords}
+          currentUsername={username}
+          t={t}
         />
       )}
 

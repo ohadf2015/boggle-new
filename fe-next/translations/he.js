@@ -1448,6 +1448,8 @@ const he = {
     "imReady": "מוכן למשחק הבא",
     "youAreReady": "אתה מוכן!",
     "waitingForHostToStart": "ממתין למארח להתחיל את הסיבוב הבא...",
+    "positionSwap": "החלפת מיקומים!",
+    "skipReveal": "דלג",
     "markReadyDescription": "לחץ על הכפתור כדי לסמן שאתה מוכן למשחק הבא",
     "allReadyHostCanStart": "🎉 כל השחקנים מוכנים! אתה יכול להתחיל את הסיבוב הבא.",
     "allPlayersReadyWaitingHost": "✓ כל השחקנים מוכנים — ממתין למארח להתחיל",
@@ -3138,7 +3140,11 @@ const he = {
       "share": "שתף",
       "preview": "תצוגה מקדימה ופרסום",
       "words": "מילים",
-      "seedWordsHelp": "לחץ Enter או פסיק כדי להוסיף מילים. לחץ על תגית כדי לערוך."
+      "seedWordsHelp": "לחץ Enter או פסיק כדי להוסיף מילים. לחץ על תגית כדי לערוך.",
+      "coverImage": "תמונת כיסוי (אופציונלי)",
+      "coverImageAlt": "תצוגה מקדימה של תמונת כיסוי",
+      "addCoverImage": "הוספת תמונת כיסוי (JPEG, PNG, WebP, עד 2MB)",
+      "removeCoverImage": "הסרת תמונת כיסוי"
     },
     "difficulty": {
       "easy": "קל",

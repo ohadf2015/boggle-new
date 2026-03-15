@@ -1425,6 +1425,8 @@ const sv = {
     "imReady": "Redo för nästa spel",
     "youAreReady": "Du är redo!",
     "waitingForHostToStart": "Väntar på att värden ska starta nästa runda...",
+    "positionSwap": "Platsbyte!",
+    "skipReveal": "Hoppa över",
     "markReadyDescription": "Tryck på knappen för att markera dig redo för nästa spel",
     "allReadyHostCanStart": "🎉 Alla spelare redo! Du kan starta nästa runda.",
     "allPlayersReadyWaitingHost": "✓ Alla spelare redo — väntar på att värden startar",
@@ -2753,7 +2755,11 @@ const sv = {
       "share": "Dela",
       "preview": "Förhandsgranska och publicera",
       "words": "ord",
-      "seedWordsHelp": "Tryck Enter eller komma för att lägga till ord. Klicka på en tagg för att redigera."
+      "seedWordsHelp": "Tryck Enter eller komma för att lägga till ord. Klicka på en tagg för att redigera.",
+      "coverImage": "Omslagsbild (valfritt)",
+      "coverImageAlt": "Förhandsvisning av omslagsbild",
+      "addCoverImage": "Lägg till en omslagsbild (JPEG, PNG, WebP, max 2MB)",
+      "removeCoverImage": "Ta bort omslagsbild"
     },
     "difficulty": {
       "easy": "Lätt",
