@@ -7,6 +7,7 @@ import { usePublicProfile } from '../usePublicProfile';
 import type { PublicProfile } from '@/shared/types/publicProfile';
 
 const MOCK_PROFILE: PublicProfile = {
+  id: 'user-123',
   username: 'WordMaster',
   displayName: 'Word Master',
   customAvatar: null,
