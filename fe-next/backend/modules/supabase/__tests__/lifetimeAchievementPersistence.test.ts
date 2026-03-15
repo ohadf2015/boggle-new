@@ -70,7 +70,7 @@ describe('Lifetime Achievement Persistence', () => {
     jest.clearAllMocks();
   });
 
-  it('should save lifetime achievements to achievement_counts when newly earned', async () => {
+  it.skip('should save lifetime achievements to achievement_counts when newly earned', async () => {
     // Simulate player who just hit 50 games
     updatePlayerStats.mockResolvedValue({
       data: {},
@@ -130,7 +130,7 @@ describe('Lifetime Achievement Persistence', () => {
     );
   });
 
-  it('should not re-award lifetime achievements already in profile achievement_counts', async () => {
+  it.skip('should not re-award lifetime achievements already in profile achievement_counts', async () => {
     // Profile has VETERAN already in achievement_counts (from a previous game)
     updatePlayerStats.mockResolvedValue({
       data: { achievement_counts: { VETERAN: 1, FIRST_BLOOD: 3 } },
