@@ -1438,6 +1438,7 @@ const ja = {
     "leadChanges": "このゲームで{{count}}回リードが入れ替わった",
     "shareNarrativeWin": "LexiClashで{{word}}を見つけて{{score}}点獲得！",
     "shareNarrativeLoss": "LexiClashで{{words}}語見つけて{{score}}点獲得！",
+    "revengeRematch": "{{player}}にリベンジ？",
     "markReadyDescription": "ボタンをタップして次のゲームの準備完了を伝えましょう",
     "allReadyHostCanStart": "🎉 全員準備完了！次のラウンドを開始できます。",
     "allPlayersReadyWaitingHost": "✓ 全員準備完了 — ホストの開始を待っています",

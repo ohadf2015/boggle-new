@@ -1556,6 +1556,7 @@ const en = {
     "leadChanges": "{{count}} lead changes this game",
     "shareNarrativeWin": "I found {{word}} and scored {{score}} in LexiClash!",
     "shareNarrativeLoss": "I found {{words}} words for {{score}} pts in LexiClash!",
+    "revengeRematch": "Rematch vs {{player}}?",
     "markReadyDescription": "Tap when ready",
     "allReadyHostCanStart": "All set! Start anytime.",
     "allPlayersReadyWaitingHost": "Ready — host's turn",

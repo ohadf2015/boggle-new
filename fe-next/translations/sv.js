@@ -1437,6 +1437,7 @@ const sv = {
     "leadChanges": "{{count}} ledningsbyten i spelet",
     "shareNarrativeWin": "Jag hittade {{word}} och fick {{score}} poäng i LexiClash!",
     "shareNarrativeLoss": "Jag hittade {{words}} ord för {{score}} poäng i LexiClash!",
+    "revengeRematch": "Revansch mot {{player}}?",
     "markReadyDescription": "Tryck på knappen för att markera dig redo för nästa spel",
     "allReadyHostCanStart": "🎉 Alla spelare redo! Du kan starta nästa runda.",
     "allPlayersReadyWaitingHost": "✓ Alla spelare redo — väntar på att värden startar",

@@ -1460,6 +1460,7 @@ const he = {
     "leadChanges": "{{count}} החלפות הובלה במשחק",
     "shareNarrativeWin": "מצאתי את {{word}} וצברתי {{score}} נק׳ ב-LexiClash!",
     "shareNarrativeLoss": "מצאתי {{words}} מילים ל-{{score}} נק׳ ב-LexiClash!",
+    "revengeRematch": "רוונג׳ נגד {{player}}?",
     "markReadyDescription": "לחץ על הכפתור כדי לסמן שאתה מוכן למשחק הבא",
     "allReadyHostCanStart": "🎉 כל השחקנים מוכנים! אתה יכול להתחיל את הסיבוב הבא.",
     "allPlayersReadyWaitingHost": "✓ כל השחקנים מוכנים — ממתין למארח להתחיל",

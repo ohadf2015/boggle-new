@@ -3,7 +3,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { Star, Play, Check } from 'lucide-react';
+import { Star, Play, Check, Swords } from 'lucide-react';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import type { Player } from '@/components/results/types';
 
@@ -327,15 +327,28 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <motion.button
-                    onClick={onMarkReady}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
-                  >
-                    <Star className="w-6 h-6" />
-                    {t('results.imReady')}
-                  </motion.button>
+                  {/* Revenge framing when player lost — "Rematch vs @winner?" activates competitive drive */}
+                  {currentPlayerRank > 1 && sortedScores.length > 1 && sortedScores[0]?.username ? (
+                    <motion.button
+                      onClick={onMarkReady}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full bg-neo-pink text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                    >
+                      <Swords className="w-6 h-6" />
+                      {t('results.revengeRematch', { player: sortedScores[0].username })}
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      onClick={onMarkReady}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                    >
+                      <Star className="w-6 h-6" />
+                      {t('results.imReady')}
+                    </motion.button>
+                  )}
                   <p className="text-center text-xs text-neo-cream/60">
                     {t('results.readyExplanation')}
                   </p>

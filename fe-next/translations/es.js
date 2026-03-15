@@ -1502,6 +1502,7 @@ const es = {
     "leadChanges": "{{count}} cambios de líder en el juego",
     "shareNarrativeWin": "¡Encontré {{word}} y anoté {{score}} en LexiClash!",
     "shareNarrativeLoss": "¡Encontré {{words}} palabras por {{score}} pts en LexiClash!",
+    "revengeRematch": "¿Revancha contra {{player}}?",
     "markReadyDescription": "Toca el botón para indicar que estás listo para el próximo juego",
     "allReadyHostCanStart": "🎉 ¡Todos los jugadores listos! Puedes iniciar la siguiente ronda.",
     "allPlayersReadyWaitingHost": "✓ Todos los jugadores listos — esperando al anfitrión",
