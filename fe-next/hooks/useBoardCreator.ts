@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 export type CreatorStep = 'configure' | 'preview' | 'published';
 export type GridSize = 4 | 5 | 6;
@@ -23,13 +23,21 @@ export interface UseBoardCreatorReturn {
   setGridSize: (size: GridSize) => void;
   language: string;
   setLanguage: (lang: string) => void;
+  /** @deprecated Use seedTags instead */
   seedWords: string;
+  /** @deprecated Use addTag/removeTag instead */
   setSeedWords: (words: string) => void;
+  seedTags: string[];
+  addTag: (word: string) => void;
+  removeTag: (index: number) => void;
+  updateTag: (index: number, value: string) => void;
   generatedBoard: GeneratedBoard | null;
   isGenerating: boolean;
   generateError: string | null;
   generateBoard: () => Promise<void>;
   shuffleBoard: () => Promise<void>;
+  /** Increments on each new grid to trigger animation resets */
+  gridRevision: number;
   title: string;
   setTitle: (title: string) => void;
   description: string;
@@ -40,61 +48,121 @@ export interface UseBoardCreatorReturn {
   publishBoard: () => Promise<void>;
 }
 
+const DEBOUNCE_MS = 600;
+
 export function useBoardCreator(): UseBoardCreatorReturn {
   const [step, setStep] = useState<CreatorStep>('configure');
   const [gridSize, setGridSize] = useState<GridSize>(4);
   const [language, setLanguage] = useState<string>('en');
-  const [seedWords, setSeedWords] = useState<string>('');
+  const [seedTags, setSeedTags] = useState<string[]>([]);
   const [generatedBoard, setGeneratedBoard] = useState<GeneratedBoard | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
+  const [gridRevision, setGridRevision] = useState(0);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [publishedBoard, setPublishedBoard] = useState<PublishedBoard | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const runGenerate = useCallback(async (advanceStep: boolean): Promise<void> => {
+  // Backward-compat: comma-separated string from tags
+  const seedWords = seedTags.join(', ');
+  const setSeedWords = useCallback((raw: string) => {
+    setSeedTags(raw.split(',').map(w => w.trim()).filter(Boolean));
+  }, []);
+
+  const addTag = useCallback((word: string) => {
+    const trimmed = word.trim();
+    if (!trimmed) return;
+    setSeedTags(prev => [...prev, trimmed]);
+  }, []);
+
+  const removeTag = useCallback((index: number) => {
+    setSeedTags(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const updateTag = useCallback((index: number, value: string) => {
+    const trimmed = value.trim();
+    setSeedTags(prev => {
+      if (!trimmed) return prev.filter((_, i) => i !== index);
+      const next = [...prev];
+      next[index] = trimmed;
+      return next;
+    });
+  }, []);
+
+  // Core generate function
+  const runGenerate = useCallback(async (
+    seeds: string[],
+    size: GridSize,
+    lang: string,
+    signal?: AbortSignal,
+  ): Promise<void> => {
+    if (seeds.length === 0) {
+      setGeneratedBoard(null);
+      return;
+    }
     setIsGenerating(true);
     setGenerateError(null);
     try {
-      const seeds = seedWords
-        .split(',')
-        .map(w => w.trim())
-        .filter(Boolean);
-
       const res = await fetch('/api/ugc/boards/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gridSize, language, seedWords: seeds }),
+        body: JSON.stringify({ gridSize: size, language: lang, seedWords: seeds }),
+        signal,
       });
 
-      const data = await res.json() as { board?: GeneratedBoard; error?: string };
+      const data = await res.json() as (GeneratedBoard & { error?: string });
       if (!res.ok) {
         setGenerateError(data.error ?? 'Generation failed');
         return;
       }
 
-      if (data.board) {
-        setGeneratedBoard(data.board);
-        if (advanceStep) {
-          setStep('preview');
-        }
+      if (data.grid) {
+        setGeneratedBoard({
+          grid: data.grid,
+          totalFindableWords: data.totalFindableWords,
+          difficulty: data.difficulty,
+          seedWordsPlaced: data.seedWordsPlaced,
+        });
+        setGridRevision(r => r + 1);
       }
     } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
       setGenerateError(err instanceof Error ? err.message : 'Generation failed');
     } finally {
       setIsGenerating(false);
     }
-  }, [gridSize, language, seedWords]);
+  }, []);
+
+  // Auto-generate on tag/gridSize/language changes (debounced)
+  useEffect(() => {
+    if (step !== 'configure') return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const timer = setTimeout(() => {
+      void runGenerate(seedTags, gridSize, language, controller.signal);
+    }, DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [seedTags, gridSize, language, step, runGenerate]);
 
   const generateBoard = useCallback((): Promise<void> => {
-    return runGenerate(true);
-  }, [runGenerate]);
+    return runGenerate(seedTags, gridSize, language).then(() => {
+      if (seedTags.length > 0) setStep('preview');
+    });
+  }, [runGenerate, seedTags, gridSize, language]);
 
   const shuffleBoard = useCallback((): Promise<void> => {
-    return runGenerate(false);
-  }, [runGenerate]);
+    return runGenerate(seedTags, gridSize, language);
+  }, [runGenerate, seedTags, gridSize, language]);
 
   const publishBoard = useCallback(async (): Promise<void> => {
     if (!generatedBoard) return;
@@ -111,7 +179,7 @@ export function useBoardCreator(): UseBoardCreatorReturn {
           gridSize,
           grid: generatedBoard.grid,
           difficulty: generatedBoard.difficulty,
-          seedWordsPlaced: generatedBoard.seedWordsPlaced,
+          seedWords: generatedBoard.seedWordsPlaced,
           totalFindableWords: generatedBoard.totalFindableWords,
         }),
       });
@@ -142,11 +210,16 @@ export function useBoardCreator(): UseBoardCreatorReturn {
     setLanguage,
     seedWords,
     setSeedWords,
+    seedTags,
+    addTag,
+    removeTag,
+    updateTag,
     generatedBoard,
     isGenerating,
     generateError,
     generateBoard,
     shuffleBoard,
+    gridRevision,
     title,
     setTitle,
     description,

@@ -19,6 +19,12 @@ import {
   getFeaturedBoards,
   type GalleryParams,
 } from '../modules/supabase/ugcBoards';
+import {
+  hebrewLetters,
+  swedishLetters,
+  spanishLetterPool,
+  japaneseLetters,
+} from '../utils/gameUtils';
 
 // Lazy imports to avoid startup cost
 let _embedMultipleWordsInGrid: ((...args: unknown[]) => string[][]) | null = null;
@@ -96,7 +102,14 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
 
     // Use first seed word as primary, rest as bonus
     const [primary, ...bonus] = seedWords as string[];
-    const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    const letterPoolByLang: Record<string, string[]> = {
+      en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+      he: hebrewLetters,
+      sv: swedishLetters,
+      ja: japaneseLetters,
+      es: spanishLetterPool,
+    };
+    const letters = letterPoolByLang[language] ?? letterPoolByLang.en;
     const seededRandom = () => Math.random();
 
     const rawGrid = embedMultipleWordsInGrid(

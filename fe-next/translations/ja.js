@@ -320,7 +320,11 @@ const ja = {
   "game": {
     "combo": "コンボ",
     "comboHint": "素早く単語を見つけてコンボ！",
-    "calculatingResults": "結果を計算中..."
+    "calculatingResults": "結果を計算中...",
+    "drawer": {
+      "content": "ゲームコンテンツ",
+      "toggle": "ゲームドロワーを切り替え"
+    }
   },
   "leadChange": {
     "tookLead": "トップに立った！",
@@ -2491,6 +2495,7 @@ const ja = {
     "games": "ゲーム"
   },
   "playerProfile": {
+    "title": "プレイヤープロフィール",
     "notFound": "プレイヤーが見つかりません",
     "error": "プロフィール読み込みエラー"
   },
@@ -2736,7 +2741,12 @@ const ja = {
       "publish": "ボードを公開",
       "shareMessage": "LexiClashのカスタムボードをチェック！",
       "code": "ボードコード",
-      "makeAnother": "もう1つ作る"
+      "makeAnother": "もう1つ作る",
+      "copyCode": "コードをコピー",
+      "share": "共有",
+      "preview": "プレビューして公開",
+      "words": "単語",
+      "seedWordsHelp": "Enterまたはカンマで単語を追加。タグをクリックして編集。"
     },
     "difficulty": {
       "easy": "簡単",
@@ -2826,13 +2836,21 @@ const ja = {
         "plays": "プレイ",
         "play": "プレイ",
         "upvote": "いいね"
-      }
+      },
+      "shareMessage": "LexiClashのこのワードパックをチェック!"
+    },
+    "rewards": {
+      "boardPlayed": "あなたのボードがプレイされました!",
+      "boardRated": "あなたのボードが評価されました!",
+      "highScoreBeat": "誰かがあなたのボードのハイスコアを更新しました!",
+      "milestone": "クリエイターのマイルストーンに到達しました!"
     }
   },
   "ranked": {
     "title": "ランクマッチ",
     "unlocked": "解除済み",
-    "unlockProgress": "解放まであと{required}ゲーム中{current}"
+    "unlockProgress": "解放まであと{required}ゲーム中{current}",
+    "toGo": "あと"
   },
   "legal": {
     "title": "法的情報",
@@ -4960,6 +4978,56 @@ const ja = {
         "lastSynced": "最終同期"
       }
     },
+    "kpi": {
+      "dau": "本日のアクティブ",
+      "gamesToday": "本日のゲーム",
+      "signupsToday": "登録",
+      "stickiness": "定着率",
+      "totalPlayers": "総プレイヤー数",
+      "totalWords": "発見された単語",
+      "thisWeek": "今週"
+    },
+    "system": {
+      "ok": "OK",
+      "down": "ダウン"
+    },
+    "analytics": {
+      "title": "アナリティクス",
+      "retentionTitle": "リテンションコホート",
+      "cohort": "コホート",
+      "size": "サイズ",
+      "funnelTitle": "エンゲージメントファネル（30日）",
+      "funnelRegistered": "登録済み",
+      "funnelFirstGame": "初回ゲーム",
+      "funnelDay7": "7日目に復帰",
+      "funnelDay30": "30日目に復帰",
+      "churnTitle": "離脱リスク",
+      "churnTotal": "リスク合計",
+      "noChurnRisk": "リスクのあるプレイヤーはいません",
+      "games": "ゲーム"
+    },
+    "moderation": {
+      "title": "モデレーション",
+      "queueTitle": "モデレーションキュー",
+      "empty": "キューは空です — 保留中のアイテムはありません",
+      "approve": "承認",
+      "reject": "却下",
+      "investigate": "調査",
+      "banPlayer": "プレイヤーをBAN",
+      "warnPlayer": "プレイヤーに警告",
+      "playerDetail": "プレイヤー詳細",
+      "moderationHistory": "モデレーション履歴",
+      "recentGames": "最近のゲーム",
+      "cheatSignals": "不正シグナル",
+      "flaggedPlayers": "フラグ付きプレイヤー",
+      "noFlags": "閾値を超えるフラグ付きプレイヤーはいません"
+    },
+    "content": {
+      "pendingWords": "レビュー待ち",
+      "approvedWords": "承認済み",
+      "topReported": "報告の多い単語（辞書のギャップ）",
+      "noReports": "報告された単語はありません"
+    },
     "milogWords": {
       "title": "Milog辞書エンリッチメント",
       "subtitle": "milog.co.ilで検証されたヘブライ語単語"
@@ -5033,6 +5101,39 @@ const ja = {
     "of": "/"
   },
   "adventure": {
+    "story": {
+      "lexi": "レキシ",
+      "w1": {
+        "boss": "グラマー先生",
+        "after2": "よくできました！この草原には簡単な単語がいっぱいです。",
+        "after4": "この先の文字はもっと難しくなります。気を引き締めて！",
+        "postBoss": "グラマー先生にルールをマスターできることを証明しました！"
+      },
+      "w2": {
+        "boss": "スペリングビー",
+        "after2": "泉は類義語で溢れています — 全部見つけられますか？",
+        "after4": "泉の奥深くへ…ここでは言葉がもっと速く流れます。",
+        "postBoss": "スペリングビーの巣を制覇！あなたの語彙力は蜜のように甘い！"
+      },
+      "w3": {
+        "boss": "シソーラス教授",
+        "after2": "この洞窟には古代の語根が眠っています。深く掘りましょう！",
+        "after4": "語源が複雑になってきました。教授が見ています…",
+        "postBoss": "教授が認めました — あなたの語彙力は本当に…印象的です。"
+      },
+      "w4": {
+        "boss": "メタファー船長",
+        "after2": "島々には比喩的なお宝が散らばっています！",
+        "after4": "メタファー船長の艦隊が近づいています。文字通りに話しましょう！",
+        "postBoss": "船長の慣用句艦隊を沈めました！ここからは順風満帆です！"
+      },
+      "w5": {
+        "boss": "ビルダワード男爵",
+        "after2": "渓谷に複合語がこだましています。組み合わせましょう！",
+        "after4": "男爵の組立ラインが加速しています…",
+        "postBoss": "ビルダワード男爵の工場を解体しました！あなたは究極のワードエンジニアです！"
+      }
+    },
     "title": "アドベンチャーモード",
     "subtitle": "10のテーマワールドを旅し、100レベルを制覇して、究極のワードマスターになろう！",
     "adminOnly": "管理者のみ",
@@ -5235,7 +5336,11 @@ const ja = {
       "selectWord": "文字をなぞって単語を探す",
       "hintFullReveal": "まず短い単語を探してみましょう！",
       "hintLengthAndStart": "特定の文字で始まる単語を探しましょう！",
-      "hintGeneral": "頑張って！よくあるパターンを探しましょう。"
+      "hintGeneral": "頑張って！よくあるパターンを探しましょう。",
+      "confirmRestart": "レベルをやり直しますか？",
+      "confirmRestartDesc": "現在の進捗が失われます。",
+      "confirmExit": "レベルを終了しますか？",
+      "confirmExitDesc": "現在の進捗が失われます。本当に終了しますか？"
     },
     "hints": {
       "minLetters2": "2文字以上",
@@ -5963,9 +6068,37 @@ const ja = {
       "wrath": {
         "name": "憤怒"
       }
+    },
+    "chapterComplete": "チャプター{{chapter}}クリア!",
+    "lvl": "LV",
+    "cosmetic": {
+      "bossSlayer": "ボススレイヤー",
+      "bossHunter": "ボスハンター",
+      "bossConqueror": "ボスコンカラー",
+      "bossLegend": "ボスレジェンド",
+      "prestigeBronze": "ブロンズプレステージ",
+      "prestigeSilver": "シルバープレステージ",
+      "prestigeGold": "ゴールドプレステージ",
+      "prestigeMaster": "プレステージマスター",
+      "prestigeCosmic": "コスミックプレステージ"
+    },
+    "weekly": {
+      "speedDemon": { "name": "スピードデーモン" },
+      "longWords": { "name": "ロングワード" },
+      "goldRush": { "name": "ゴールドラッシュ" },
+      "iceAge": { "name": "アイスエイジ" },
+      "marathon": { "name": "マラソン" },
+      "doubleOrNothing": { "name": "ダブルオアナッシング" },
+      "wordSmith": { "name": "ワードスミス" },
+      "treasureHunter": { "name": "トレジャーハンター" },
+      "blitz": { "name": "ブリッツ" },
+      "zenMode": { "name": "禅モード" }
     }
   },
   "blast": {
+    "chain": {
+      "badge": "チェイン x{level}"
+    },
     "title": "ブラストモード",
     "description": "ボードをクリア！単語でタイルを爆破。",
     "progress": "クリア済み",

@@ -320,7 +320,11 @@ const sv = {
   "game": {
     "combo": "Kombo",
     "comboHint": "Hitta ord snabbt för kombo!",
-    "calculatingResults": "Beräknar resultat..."
+    "calculatingResults": "Beräknar resultat...",
+    "drawer": {
+      "content": "Spelinnehåll",
+      "toggle": "Visa/dölj spellåda"
+    }
   },
   "leadChange": {
     "tookLead": "Du leder!",
@@ -2413,6 +2417,7 @@ const sv = {
     "games": "Spel"
   },
   "playerProfile": {
+    "title": "Spelarprofil",
     "notFound": "Spelare hittades inte",
     "error": "Fel vid laddning av profil"
   },
@@ -2736,7 +2741,12 @@ const sv = {
       "publish": "Publicera bräda",
       "shareMessage": "Kolla in mitt anpassade LexiClash-bräda!",
       "code": "Brädkod",
-      "makeAnother": "Skapa en till"
+      "makeAnother": "Skapa en till",
+      "copyCode": "Kopiera kod",
+      "share": "Dela",
+      "preview": "Förhandsgranska och publicera",
+      "words": "ord",
+      "seedWordsHelp": "Tryck Enter eller komma för att lägga till ord. Klicka på en tagg för att redigera."
     },
     "difficulty": {
       "easy": "Lätt",
@@ -2826,13 +2836,21 @@ const sv = {
         "plays": "spelningar",
         "play": "Spela",
         "upvote": "Rösta upp"
-      }
+      },
+      "shareMessage": "Kolla in detta ordpaket på LexiClash!"
+    },
+    "rewards": {
+      "boardPlayed": "Ditt bräde spelades!",
+      "boardRated": "Ditt bräde betygsattes!",
+      "highScoreBeat": "Någon slog rekordet på ditt bräde!",
+      "milestone": "Du nådde en skaparmilstolpe!"
     }
   },
   "ranked": {
     "title": "Rankat läge",
     "unlocked": "Upplåst",
-    "unlockProgress": "{current}/{required} spel för att låsa upp"
+    "unlockProgress": "{current}/{required} spel för att låsa upp",
+    "toGo": "kvar"
   },
   "legal": {
     "title": "Juridiskt",
@@ -4841,6 +4859,56 @@ const sv = {
         "lastSynced": "Senast synkroniserad"
       }
     },
+    "kpi": {
+      "dau": "Aktiva idag",
+      "gamesToday": "Spel idag",
+      "signupsToday": "Registreringar",
+      "stickiness": "Engagemang",
+      "totalPlayers": "Totalt spelare",
+      "totalWords": "Ord hittade",
+      "thisWeek": "Denna vecka"
+    },
+    "system": {
+      "ok": "OK",
+      "down": "Nere"
+    },
+    "analytics": {
+      "title": "Analys",
+      "retentionTitle": "Retentionskohorter",
+      "cohort": "Kohort",
+      "size": "Storlek",
+      "funnelTitle": "Engagemangstratt (30d)",
+      "funnelRegistered": "Registrerade",
+      "funnelFirstGame": "Första spelet",
+      "funnelDay7": "Återkom D7",
+      "funnelDay30": "Återkom D30",
+      "churnTitle": "Churnrisk",
+      "churnTotal": "Totalt i riskzonen",
+      "noChurnRisk": "Inga spelare i riskzonen",
+      "games": "spel"
+    },
+    "moderation": {
+      "title": "Moderering",
+      "queueTitle": "Modereringskö",
+      "empty": "Kön är tom — inga väntande ärenden",
+      "approve": "Godkänn",
+      "reject": "Avslå",
+      "investigate": "Undersök",
+      "banPlayer": "Blockera spelare",
+      "warnPlayer": "Varna spelare",
+      "playerDetail": "Spelardetaljer",
+      "moderationHistory": "Modereringshistorik",
+      "recentGames": "Senaste spel",
+      "cheatSignals": "Fusksignaler",
+      "flaggedPlayers": "Flaggade spelare",
+      "noFlags": "Inga flaggade spelare över tröskeln"
+    },
+    "content": {
+      "pendingWords": "Väntar på granskning",
+      "approvedWords": "Godkända",
+      "topReported": "Mest rapporterade ord (ordlistluckor)",
+      "noReports": "Inga rapporterade ord"
+    },
     "milogWords": {
       "title": "Milog-ordboksanrikning",
       "subtitle": "Hebreiska ord verifierade mot milog.co.il"
@@ -4981,6 +5049,39 @@ const sv = {
     "of": "av"
   },
   "adventure": {
+    "story": {
+      "lexi": "Lexi",
+      "w1": {
+        "boss": "Fru Grammatik",
+        "after2": "Bra jobbat! Ängarna är fulla av enkla ord att hitta.",
+        "after4": "Bokstäverna blir knepigare. Var skarp!",
+        "postBoss": "Du visade Fru Grammatik att regler är till för att bemästras!"
+      },
+      "w2": {
+        "boss": "Stavningsbiet",
+        "after2": "Källorna bubblar med synonymer — kan du hitta alla?",
+        "after4": "Djupare in i källorna... orden flödar snabbare här.",
+        "postBoss": "Stavningsbiets kupan är besegrad! Ditt ordförråd är sött som honung!"
+      },
+      "w3": {
+        "boss": "Professor Thesaurus",
+        "after2": "Grottorna gömmer uråldriga ordrötter. Gräv djupt!",
+        "after4": "Etymologierna blir komplexa. Professorn vaktar...",
+        "postBoss": "Professorn erkänner — ditt ordförråd är verkligen... imponerande."
+      },
+      "w4": {
+        "boss": "Kapten Metafor",
+        "after2": "Öarna är spridda med bildliga skatter!",
+        "after4": "Kapten Metafors flotta närmar sig. Tala bokstavligt!",
+        "postBoss": "Du sänkte Kaptenens flotta av idiom! Lugn segling härifrån!"
+      },
+      "w5": {
+        "boss": "Baron Byggaord",
+        "after2": "Kanjonen ekar av sammansatta ord. Kombinera dem!",
+        "after4": "Baronens löpande band accelererar...",
+        "postBoss": "Baron Byggaords fabrik är nedmonterad! Du är den ultimata ordingenjören!"
+      }
+    },
     "title": "Äventyrsläge",
     "subtitle": "Res genom 10 temavärldar, erövra 100 nivåer och bli den ultimata ordmästaren!",
     "adminOnly": "Endast admin",
@@ -5184,7 +5285,11 @@ const sv = {
       "hint": "Tips",
       "hintAvailable": "Behöver du ett tips?",
       "hintUsed": "Prova det här ordet!",
-      "noHints": "Inga fler tips tillgängliga"
+      "noHints": "Inga fler tips tillgängliga",
+      "confirmRestart": "Starta om nivån?",
+      "confirmRestartDesc": "Din nuvarande framsteg kommer att försvinna.",
+      "confirmExit": "Lämna nivån?",
+      "confirmExitDesc": "Din nuvarande framsteg kommer att försvinna. Är du säker?"
     },
     "hints": {
       "minLetters2": "2+ bokstäver",
@@ -5912,9 +6017,37 @@ const sv = {
       "wrath": {
         "name": "Vrede"
       }
+    },
+    "chapterComplete": "Kapitel {{chapter}} klart!",
+    "lvl": "NIV",
+    "cosmetic": {
+      "bossSlayer": "Bossbesegrare",
+      "bossHunter": "Bossjägare",
+      "bossConqueror": "Bosserövrare",
+      "bossLegend": "Bosslegend",
+      "prestigeBronze": "Brons Prestige",
+      "prestigeSilver": "Silver Prestige",
+      "prestigeGold": "Guld Prestige",
+      "prestigeMaster": "Prestigemästare",
+      "prestigeCosmic": "Kosmisk Prestige"
+    },
+    "weekly": {
+      "speedDemon": { "name": "Fartdemon" },
+      "longWords": { "name": "Långa Ord" },
+      "goldRush": { "name": "Guldrush" },
+      "iceAge": { "name": "Istiden" },
+      "marathon": { "name": "Maraton" },
+      "doubleOrNothing": { "name": "Dubbelt eller Inget" },
+      "wordSmith": { "name": "Ordsmed" },
+      "treasureHunter": { "name": "Skattjägare" },
+      "blitz": { "name": "Blixt" },
+      "zenMode": { "name": "Zenläge" }
     }
   },
   "blast": {
+    "chain": {
+      "badge": "Kedja x{level}"
+    },
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
     "progress": "Rensat",

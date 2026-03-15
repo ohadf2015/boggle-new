@@ -9,7 +9,7 @@ import express, { Application, Request, Response, NextFunction, RequestHandler }
 import { geolocationMiddleware } from '../backend/utils/geolocation';
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
-const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints'];
+const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc'];
 
 /**
  * Middleware configuration options

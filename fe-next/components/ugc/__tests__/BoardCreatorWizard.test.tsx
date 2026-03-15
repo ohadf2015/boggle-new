@@ -1,13 +1,13 @@
 /**
  * Tests for BoardCreatorWizard component
- * TDD: RED phase
+ * Updated for live-grid + tag input architecture
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BoardCreatorWizard } from '../BoardCreatorWizard';
-// Mock the hook
+
 jest.mock('@/hooks/useBoardCreator');
 import { useBoardCreator, type UseBoardCreatorReturn, type GeneratedBoard } from '@/hooks/useBoardCreator';
 const mockUseBoardCreator = useBoardCreator as jest.MockedFunction<typeof useBoardCreator>;
@@ -20,6 +20,21 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+// Mock framer-motion to avoid animation issues in tests
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  return {
+    motion: new Proxy({}, {
+      get: (_target: unknown, prop: string) =>
+        React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+          const { initial, animate, exit, transition, whileInView, whileTap, whileHover, whileDrag, layout, ...rest } = props;
+          return React.createElement(prop, { ...rest, ref });
+        }),
+    }),
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+    useReducedMotion: () => false,
+  };
+});
 
 const mockBoard: GeneratedBoard = {
   grid: [['A','B','C','D'],['E','F','G','H'],['I','J','K','L'],['M','N','O','P']],
@@ -38,11 +53,16 @@ function makeHookReturn(overrides: Partial<UseBoardCreatorReturn> = {}): UseBoar
     setLanguage: jest.fn(),
     seedWords: '',
     setSeedWords: jest.fn(),
+    seedTags: [],
+    addTag: jest.fn(),
+    removeTag: jest.fn(),
+    updateTag: jest.fn(),
     generatedBoard: null,
     isGenerating: false,
     generateError: null,
     generateBoard: jest.fn().mockResolvedValue(undefined),
     shuffleBoard: jest.fn().mockResolvedValue(undefined),
+    gridRevision: 0,
     title: '',
     setTitle: jest.fn(),
     description: '',
@@ -86,47 +106,36 @@ describe('BoardCreatorWizard — step 1 (configure)', () => {
     expect(setGridSize).toHaveBeenCalledWith(6);
   });
 
-  it('seed words textarea is present', () => {
+  it('shows animated board grid placeholder when no board', () => {
     mockUseBoardCreator.mockReturnValue(makeHookReturn());
     render(<BoardCreatorWizard />);
-    expect(screen.getByTestId('seed-words-input')).toBeInTheDocument();
+    expect(screen.getByTestId('animated-board-grid')).toBeInTheDocument();
   });
 
-  it('typing in seed words calls setSeedWords', async () => {
-    const setSeedWords = jest.fn();
-    mockUseBoardCreator.mockReturnValue(makeHookReturn({ setSeedWords }));
+  it('shows animated board grid with letters when board generated', () => {
+    mockUseBoardCreator.mockReturnValue(makeHookReturn({ generatedBoard: mockBoard, seedTags: ['cat'] }));
     render(<BoardCreatorWizard />);
-    const input = screen.getByTestId('seed-words-input');
-    await userEvent.type(input, 'a');
-    expect(setSeedWords).toHaveBeenCalled();
+    expect(screen.getByTestId('animated-board-grid')).toBeInTheDocument();
   });
 
-  it('clicking generate button calls generateBoard', async () => {
-    const generateBoard = jest.fn().mockResolvedValue(undefined);
-    mockUseBoardCreator.mockReturnValue(makeHookReturn({ generateBoard }));
+  it('proceed button is disabled when no board', () => {
+    mockUseBoardCreator.mockReturnValue(makeHookReturn());
     render(<BoardCreatorWizard />);
-    await userEvent.click(screen.getByTestId('generate-btn'));
-    expect(generateBoard).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('proceed-btn')).toBeDisabled();
   });
 
-  it('shuffle button is not visible when no board generated', () => {
-    mockUseBoardCreator.mockReturnValue(makeHookReturn({ generatedBoard: null }));
+  it('proceed button is enabled when board exists and has tags', () => {
+    mockUseBoardCreator.mockReturnValue(makeHookReturn({ generatedBoard: mockBoard, seedTags: ['cat'] }));
     render(<BoardCreatorWizard />);
-    expect(screen.queryByTestId('shuffle-btn')).not.toBeInTheDocument();
+    expect(screen.getByTestId('proceed-btn')).not.toBeDisabled();
   });
 
-  it('shuffle button is visible when board is generated', () => {
-    mockUseBoardCreator.mockReturnValue(makeHookReturn({ generatedBoard: mockBoard }));
+  it('clicking proceed calls setStep preview', async () => {
+    const setStep = jest.fn();
+    mockUseBoardCreator.mockReturnValue(makeHookReturn({ generatedBoard: mockBoard, seedTags: ['cat'], setStep }));
     render(<BoardCreatorWizard />);
-    expect(screen.getByTestId('shuffle-btn')).toBeInTheDocument();
-  });
-
-  it('clicking shuffle calls shuffleBoard', async () => {
-    const shuffleBoard = jest.fn().mockResolvedValue(undefined);
-    mockUseBoardCreator.mockReturnValue(makeHookReturn({ generatedBoard: mockBoard, shuffleBoard }));
-    render(<BoardCreatorWizard />);
-    await userEvent.click(screen.getByTestId('shuffle-btn'));
-    expect(shuffleBoard).toHaveBeenCalledTimes(1);
+    await userEvent.click(screen.getByTestId('proceed-btn'));
+    expect(setStep).toHaveBeenCalledWith('preview');
   });
 
   it('shows generateError when present', () => {
@@ -143,10 +152,10 @@ describe('BoardCreatorWizard — step 2 (preview)', () => {
     expect(screen.getByTestId('step-preview')).toBeInTheDocument();
   });
 
-  it('shows grid preview', () => {
+  it('shows animated board grid in preview', () => {
     mockUseBoardCreator.mockReturnValue(makeHookReturn({ step: 'preview', generatedBoard: mockBoard }));
     render(<BoardCreatorWizard />);
-    expect(screen.getByTestId('board-preview-grid')).toBeInTheDocument();
+    expect(screen.getByTestId('animated-board-grid')).toBeInTheDocument();
   });
 
   it('shows word count stat', () => {
@@ -196,6 +205,14 @@ describe('BoardCreatorWizard — step 2 (preview)', () => {
     render(<BoardCreatorWizard />);
     await userEvent.click(screen.getByTestId('back-btn'));
     expect(setStep).toHaveBeenCalledWith('configure');
+  });
+
+  it('shuffle button calls shuffleBoard', async () => {
+    const shuffleBoard = jest.fn().mockResolvedValue(undefined);
+    mockUseBoardCreator.mockReturnValue(makeHookReturn({ step: 'preview', generatedBoard: mockBoard, shuffleBoard }));
+    render(<BoardCreatorWizard />);
+    await userEvent.click(screen.getByTestId('shuffle-btn'));
+    expect(shuffleBoard).toHaveBeenCalledTimes(1);
   });
 
   it('shows publishError when present', () => {

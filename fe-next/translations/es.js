@@ -320,7 +320,11 @@ const es = {
   "game": {
     "combo": "Combo",
     "comboHint": "¡Rápido! Encadena palabras",
-    "calculatingResults": "Calculando resultados..."
+    "calculatingResults": "Calculando resultados...",
+    "drawer": {
+      "content": "Contenido del juego",
+      "toggle": "Mostrar/ocultar cajón del juego"
+    }
   },
   "countdown": {
     "hint": "¡Desliza letras para formar palabras!",
@@ -2665,6 +2669,7 @@ const es = {
     "games": "Partidas"
   },
   "playerProfile": {
+    "title": "Perfil de Jugador",
     "notFound": "Jugador no encontrado",
     "error": "Error al cargar perfil"
   },
@@ -3154,7 +3159,12 @@ const es = {
       "publish": "Publicar tablero",
       "shareMessage": "¡Mira mi tablero personalizado de LexiClash!",
       "code": "Código del tablero",
-      "makeAnother": "Crear otro"
+      "makeAnother": "Crear otro",
+      "copyCode": "Copiar código",
+      "share": "Compartir",
+      "preview": "Vista previa y publicar",
+      "words": "palabras",
+      "seedWordsHelp": "Presiona Enter o coma para agregar palabras. Haz clic en una etiqueta para editar."
     },
     "difficulty": {
       "easy": "Fácil",
@@ -3244,13 +3254,21 @@ const es = {
         "plays": "jugadas",
         "play": "Jugar",
         "upvote": "Votar"
-      }
+      },
+      "shareMessage": "¡Mira este paquete de palabras en LexiClash!"
+    },
+    "rewards": {
+      "boardPlayed": "¡Tu tablero fue jugado!",
+      "boardRated": "¡Tu tablero fue calificado!",
+      "highScoreBeat": "¡Alguien superó el récord en tu tablero!",
+      "milestone": "¡Alcanzaste un hito de creador!"
     }
   },
   "ranked": {
     "title": "Modo Clasificatorio",
     "unlocked": "Desbloqueado",
-    "unlockProgress": "{current}/{required} partidas para desbloquear"
+    "unlockProgress": "{current}/{required} partidas para desbloquear",
+    "toGo": "restantes"
   },
   "growth": {
     "dayStreak": "racha de días",
@@ -4861,6 +4879,56 @@ const es = {
         "lastSynced": "Última sincronización"
       }
     },
+    "kpi": {
+      "dau": "Activos hoy",
+      "gamesToday": "Juegos hoy",
+      "signupsToday": "Registros",
+      "stickiness": "Fidelización",
+      "totalPlayers": "Total de jugadores",
+      "totalWords": "Palabras encontradas",
+      "thisWeek": "Esta semana"
+    },
+    "system": {
+      "ok": "OK",
+      "down": "Caído"
+    },
+    "analytics": {
+      "title": "Analítica",
+      "retentionTitle": "Cohortes de retención",
+      "cohort": "Cohorte",
+      "size": "Tamaño",
+      "funnelTitle": "Embudo de engagement (30d)",
+      "funnelRegistered": "Registrados",
+      "funnelFirstGame": "Primer juego",
+      "funnelDay7": "Regresaron D7",
+      "funnelDay30": "Regresaron D30",
+      "churnTitle": "Riesgo de abandono",
+      "churnTotal": "Total en riesgo",
+      "noChurnRisk": "No hay jugadores en riesgo",
+      "games": "juegos"
+    },
+    "moderation": {
+      "title": "Moderación",
+      "queueTitle": "Cola de moderación",
+      "empty": "La cola está vacía — no hay elementos pendientes",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "investigate": "Investigar",
+      "banPlayer": "Bloquear jugador",
+      "warnPlayer": "Advertir jugador",
+      "playerDetail": "Detalle del jugador",
+      "moderationHistory": "Historial de moderación",
+      "recentGames": "Juegos recientes",
+      "cheatSignals": "Señales de trampa",
+      "flaggedPlayers": "Jugadores marcados",
+      "noFlags": "No hay jugadores marcados por encima del umbral"
+    },
+    "content": {
+      "pendingWords": "Pendientes de revisión",
+      "approvedWords": "Aprobadas",
+      "topReported": "Palabras más reportadas (lagunas del diccionario)",
+      "noReports": "No hay palabras reportadas"
+    },
     "milogWords": {
       "title": "Enriquecimiento del Diccionario Milog",
       "subtitle": "Palabras en hebreo verificadas contra milog.co.il"
@@ -5001,6 +5069,39 @@ const es = {
     "of": "de"
   },
   "adventure": {
+    "story": {
+      "lexi": "Lexi",
+      "w1": {
+        "boss": "Sra. Gramática",
+        "after2": "¡Lo estás haciendo genial! Estos prados están llenos de palabras simples.",
+        "after4": "Las letras se vuelven más difíciles. ¡Mantente alerta!",
+        "postBoss": "¡Le demostraste a la Sra. Gramática que las reglas se dominan!"
+      },
+      "w2": {
+        "boss": "Abeja Ortográfica",
+        "after2": "Los manantiales burbujean con sinónimos — ¿puedes encontrarlos todos?",
+        "after4": "Más profundo en los manantiales... las palabras fluyen más rápido aquí.",
+        "postBoss": "¡La colmena de la Abeja Ortográfica ha caído! ¡Tu vocabulario es dulce como la miel!"
+      },
+      "w3": {
+        "boss": "Profesor Tesauro",
+        "after2": "Estas cavernas guardan raíces de palabras antiguas. ¡Excava profundo!",
+        "after4": "Las etimologías se complican. El Profesor observa...",
+        "postBoss": "El Profesor concede — tu léxico es realmente... impresionante."
+      },
+      "w4": {
+        "boss": "Capitán Metáfora",
+        "after2": "¡Las islas están dispersas con tesoros figurativos!",
+        "after4": "La flota del Capitán Metáfora se acerca. ¡Habla literalmente!",
+        "postBoss": "¡Hundiste la flota de modismos del Capitán! ¡Navegación tranquila de aquí en adelante!"
+      },
+      "w5": {
+        "boss": "Barón Construyepalabras",
+        "after2": "El cañón retumba con palabras compuestas. ¡Combínalas!",
+        "after4": "La línea de ensamblaje del Barón se acelera...",
+        "postBoss": "¡La fábrica del Barón fue desmantelada! ¡Eres el ingeniero de palabras definitivo!"
+      }
+    },
     "title": "Modo Aventura",
     "subtitle": "¡Viaja por 10 mundos temáticos, conquista 100 niveles y conviértete en el maestro de palabras definitivo!",
     "adminOnly": "Solo administradores",
@@ -5508,7 +5609,11 @@ const es = {
       "selectWord": "Selecciona una palabra",
       "hintFullReveal": "¡Intenta buscar palabras más cortas primero!",
       "hintLengthAndStart": "¡Busca palabras que empiecen con letras específicas!",
-      "hintGeneral": "¡Sigue intentando! Busca patrones comunes."
+      "hintGeneral": "¡Sigue intentando! Busca patrones comunes.",
+      "confirmRestart": "¿Reiniciar nivel?",
+      "confirmRestartDesc": "Se perderá tu progreso actual.",
+      "confirmExit": "¿Salir del nivel?",
+      "confirmExitDesc": "Se perderá tu progreso actual. ¿Estás seguro de que quieres salir?"
     },
     "hints": {
       "minLetters2": "2+ letras",
@@ -5962,9 +6067,37 @@ const es = {
       "wrath": {
         "name": "Ira"
       }
+    },
+    "chapterComplete": "¡Capítulo {{chapter}} completado!",
+    "lvl": "NIV",
+    "cosmetic": {
+      "bossSlayer": "Cazador de Jefes",
+      "bossHunter": "Rastreador de Jefes",
+      "bossConqueror": "Conquistador de Jefes",
+      "bossLegend": "Leyenda de Jefes",
+      "prestigeBronze": "Prestigio Bronce",
+      "prestigeSilver": "Prestigio Plata",
+      "prestigeGold": "Prestigio Oro",
+      "prestigeMaster": "Maestro de Prestigio",
+      "prestigeCosmic": "Prestigio Cósmico"
+    },
+    "weekly": {
+      "speedDemon": { "name": "Demonio Veloz" },
+      "longWords": { "name": "Palabras Largas" },
+      "goldRush": { "name": "Fiebre del Oro" },
+      "iceAge": { "name": "Era de Hielo" },
+      "marathon": { "name": "Maratón" },
+      "doubleOrNothing": { "name": "Doble o Nada" },
+      "wordSmith": { "name": "Forjador de Palabras" },
+      "treasureHunter": { "name": "Cazador de Tesoros" },
+      "blitz": { "name": "Blitz" },
+      "zenMode": { "name": "Modo Zen" }
     }
   },
   "blast": {
+    "chain": {
+      "badge": "Cadena x{level}"
+    },
     "title": "Modo Blast",
     "description": "¡Limpia el tablero! Las palabras explotan fichas.",
     "progress": "Limpiado",

@@ -320,7 +320,11 @@ const he = {
   "game": {
     "combo": "קומבו",
     "comboHint": "מצא מילים מהר לקומבו!",
-    "calculatingResults": "מחשב תוצאות..."
+    "calculatingResults": "מחשב תוצאות...",
+    "drawer": {
+      "content": "תוכן המשחק",
+      "toggle": "פתח/סגור מגירת משחק"
+    }
   },
   "leadChange": {
     "tookLead": "אתם מובילים!",
@@ -2876,6 +2880,7 @@ const he = {
     "games": "משחקים"
   },
   "playerProfile": {
+    "title": "פרופיל שחקן",
     "notFound": "שחקן לא נמצא",
     "error": "שגיאה בטעינת פרופיל"
   },
@@ -3121,7 +3126,12 @@ const he = {
       "publish": "פרסם לוח",
       "shareMessage": "בדקו את הלוח המותאם שלי ב-LexiClash!",
       "code": "קוד לוח",
-      "makeAnother": "צור עוד"
+      "makeAnother": "צור עוד",
+      "copyCode": "העתק קוד",
+      "share": "שתף",
+      "preview": "תצוגה מקדימה ופרסום",
+      "words": "מילים",
+      "seedWordsHelp": "לחץ Enter או פסיק כדי להוסיף מילים. לחץ על תגית כדי לערוך."
     },
     "difficulty": {
       "easy": "קל",
@@ -3211,13 +3221,21 @@ const he = {
         "plays": "משחקים",
         "play": "שחק",
         "upvote": "הצבע"
-      }
+      },
+      "shareMessage": "בדקו את חבילת המילים הזו ב-LexiClash!"
+    },
+    "rewards": {
+      "boardPlayed": "הלוח שלך שוחק!",
+      "boardRated": "הלוח שלך דורג!",
+      "highScoreBeat": "מישהו שבר את השיא בלוח שלך!",
+      "milestone": "הגעת לאבן דרך של יוצר!"
     }
   },
   "ranked": {
     "title": "מצב מדורג",
     "unlocked": "פתוח",
-    "unlockProgress": "{current}/{required} משחקים לפתיחה"
+    "unlockProgress": "{current}/{required} משחקים לפתיחה",
+    "toGo": "נשאר"
   },
   "growth": {
     "dayStreak": "ימי רצף",
@@ -4817,6 +4835,56 @@ const he = {
         "success": "סונכרנו {{files}} קבצים, יובאו {{words}} מילים"
       }
     },
+    "kpi": {
+      "dau": "פעילים היום",
+      "gamesToday": "משחקים היום",
+      "signupsToday": "הרשמות",
+      "stickiness": "דביקות",
+      "totalPlayers": "סה\"כ שחקנים",
+      "totalWords": "מילים שנמצאו",
+      "thisWeek": "השבוע"
+    },
+    "system": {
+      "ok": "תקין",
+      "down": "לא זמין"
+    },
+    "analytics": {
+      "title": "אנליטיקה",
+      "retentionTitle": "קוהורטות שימור",
+      "cohort": "קוהורט",
+      "size": "גודל",
+      "funnelTitle": "משפך מעורבות (30 יום)",
+      "funnelRegistered": "נרשמו",
+      "funnelFirstGame": "משחק ראשון",
+      "funnelDay7": "חזרו ביום 7",
+      "funnelDay30": "חזרו ביום 30",
+      "churnTitle": "סיכון נטישה",
+      "churnTotal": "סה\"כ בסיכון",
+      "noChurnRisk": "אין שחקנים בסיכון",
+      "games": "משחקים"
+    },
+    "moderation": {
+      "title": "מודרציה",
+      "queueTitle": "תור מודרציה",
+      "empty": "התור ריק — אין פריטים ממתינים",
+      "approve": "אשר",
+      "reject": "דחה",
+      "investigate": "חקור",
+      "banPlayer": "חסום שחקן",
+      "warnPlayer": "הזהר שחקן",
+      "playerDetail": "פרטי שחקן",
+      "moderationHistory": "היסטוריית מודרציה",
+      "recentGames": "משחקים אחרונים",
+      "cheatSignals": "סימני רמאות",
+      "flaggedPlayers": "שחקנים מסומנים",
+      "noFlags": "אין שחקנים מסומנים מעל הסף"
+    },
+    "content": {
+      "pendingWords": "ממתינים לבדיקה",
+      "approvedWords": "אושרו",
+      "topReported": "מילים מדווחות (פערים במילון)",
+      "noReports": "אין מילים מדווחות"
+    },
     "milogWords": {
       "title": "העשרת מילון מילוג",
       "subtitle": "מילים בעברית שאומתו מול milog.co.il"
@@ -4957,6 +5025,39 @@ const he = {
     "of": "מתוך"
   },
   "adventure": {
+    "story": {
+      "lexi": "לקסי",
+      "w1": {
+        "boss": "גב' דקדוק",
+        "after2": "כל הכבוד! האחוות האלה מלאות במילים פשוטות למציאה.",
+        "after4": "האותיות נהיות מסובכות יותר. היו חדים!",
+        "postBoss": "הראיתם לגב' דקדוק שאפשר לשלוט בחוקים!"
+      },
+      "w2": {
+        "boss": "דבורת האיות",
+        "after2": "המעיינות בועטים במילים נרדפות — תמצאו את כולן?",
+        "after4": "עמוק יותר במעיינות... המילים זורמות מהר כאן.",
+        "postBoss": "הכוורת של דבורת האיות נוצחה! אוצר המילים שלכם מתוק כדבש!"
+      },
+      "w3": {
+        "boss": "פרופסור תזאורוס",
+        "after2": "במערות האלה מסתתרים שורשי מילים עתיקים. חפרו עמוק!",
+        "after4": "האטימולוגיות נהיות מורכבות. הפרופסור צופה...",
+        "postBoss": "הפרופסור מודה — אוצר המילים שלכם באמת... מרשים."
+      },
+      "w4": {
+        "boss": "קפטן מטאפורה",
+        "after2": "האיים פזורים באוצרות של ביטויים!",
+        "after4": "הצי של קפטן מטאפורה מתקרב. דברו מילולית!",
+        "postBoss": "הטבעתם את צי הניבים של הקפטן! הפלגה חלקה מכאן!"
+      },
+      "w5": {
+        "boss": "הברון בנה-מילה",
+        "after2": "הקניון מהדהד במילים מורכבות. שלבו אותן!",
+        "after4": "פס הייצור של הברון מאיץ...",
+        "postBoss": "המפעל של הברון פורק! אתם מהנדסי המילים האולטימטיביים!"
+      }
+    },
     "title": "מצב הרפתקה",
     "subtitle": "מסע דרך 10 עולמות, כבשו 100 שלבים, והפכו לאדון המילים האולטימטיבי!",
     "adminOnly": "מנהלים בלבד",
@@ -5159,7 +5260,11 @@ const he = {
       "selectWord": "החליקו על אותיות למציאת מילים",
       "hintFullReveal": "נסה לחפש מילים קצרות יותר!",
       "hintLengthAndStart": "חפש מילים שמתחילות באותיות ספציפיות!",
-      "hintGeneral": "המשך לנסות! חפש תבניות נפוצות."
+      "hintGeneral": "המשך לנסות! חפש תבניות נפוצות.",
+      "confirmRestart": "להתחיל מחדש?",
+      "confirmRestartDesc": "ההתקדמות הנוכחית תאבד.",
+      "confirmExit": "לצאת מהשלב?",
+      "confirmExitDesc": "ההתקדמות הנוכחית תאבד. בטוח שברצונך לצאת?"
     },
     "hints": {
       "minLetters2": "2+ אותיות",
@@ -5887,9 +5992,37 @@ const he = {
       "wrath": {
         "name": "זעם"
       }
+    },
+    "chapterComplete": "פרק {{chapter}} הושלם!",
+    "lvl": "רמה",
+    "cosmetic": {
+      "bossSlayer": "קוטל בוסים",
+      "bossHunter": "צייד בוסים",
+      "bossConqueror": "כובש בוסים",
+      "bossLegend": "אגדת בוסים",
+      "prestigeBronze": "יוקרה ארד",
+      "prestigeSilver": "יוקרה כסף",
+      "prestigeGold": "יוקרה זהב",
+      "prestigeMaster": "אמן יוקרה",
+      "prestigeCosmic": "יוקרה קוסמית"
+    },
+    "weekly": {
+      "speedDemon": { "name": "שד המהירות" },
+      "longWords": { "name": "מילים ארוכות" },
+      "goldRush": { "name": "בהלת זהב" },
+      "iceAge": { "name": "עידן הקרח" },
+      "marathon": { "name": "מרתון" },
+      "doubleOrNothing": { "name": "הכל או כלום" },
+      "wordSmith": { "name": "צורף מילים" },
+      "treasureHunter": { "name": "צייד אוצרות" },
+      "blitz": { "name": "בליץ" },
+      "zenMode": { "name": "מצב זן" }
     }
   },
   "blast": {
+    "chain": {
+      "badge": "שרשרת x{level}"
+    },
     "title": "מצב פיצוץ",
     "description": "נקו את הלוח! מילים מפוצצות אריחים.",
     "progress": "נוקה",

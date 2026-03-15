@@ -1,10 +1,12 @@
 'use client';
 
 import { useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useBoardCreator } from '@/hooks/useBoardCreator';
-import { BoardPreviewGrid } from './BoardPreviewGrid';
+import { useBoardCreator, type UseBoardCreatorReturn } from '@/hooks/useBoardCreator';
+import { AnimatedBoardGrid } from './AnimatedBoardGrid';
+import { SeedWordTags } from './SeedWordTags';
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
 
@@ -38,24 +40,23 @@ function NeoButton({
   );
 }
 
-// ── Step 1: Configure ───────────────────────────────────────────────────────
+// ── Step 1: Configure (Live Grid) ───────────────────────────────────────────
 
-function ConfigureStep() {
+function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
   const { t } = useLanguage();
   const {
     gridSize, setGridSize,
-    seedWords, setSeedWords,
+    seedTags, addTag, removeTag, updateTag,
     generatedBoard,
     isGenerating,
     generateError,
-    generateBoard,
-    shuffleBoard,
-  } = useBoardCreator();
-
-  const handleGenerate = useCallback(() => { void generateBoard(); }, [generateBoard]);
-  const handleShuffle = useCallback(() => { void shuffleBoard(); }, [shuffleBoard]);
+    gridRevision,
+    setStep,
+  } = creator;
 
   const SIZES = [4, 5, 6] as const;
+
+  const canProceed = generatedBoard !== null && seedTags.length > 0;
 
   return (
     <div data-testid="step-configure" className="flex flex-col gap-6">
@@ -70,103 +71,122 @@ function ConfigureStep() {
         </label>
         <div className="flex gap-2">
           {SIZES.map(size => (
-            <button
+            <motion.button
               key={size}
               data-testid={`grid-size-${size}`}
               onClick={() => setGridSize(size)}
+              whileTap={{ scale: 0.92 }}
               className={cn(
                 'border-neo border-black shadow-hard-sm font-neo-display font-bold',
-                'px-4 py-2 rounded-neo transition-all',
+                'px-4 py-2 rounded-neo transition-colors',
                 gridSize === size
                   ? 'bg-neo-lime text-black'
-                  : 'bg-neo-navy text-neo-white hover:bg-neo-navy/80'
+                  : 'bg-neo-navy text-neo-white hover:bg-neo-navy-light'
               )}
             >
               {size}x{size}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
 
-      {/* Seed words */}
-      <div className="flex flex-col gap-2">
-        <label className="font-neo-body text-sm text-neo-white/80">
-          {t('ugc.board.seedWords')}
-        </label>
-        <textarea
-          data-testid="seed-words-input"
-          value={seedWords}
-          onChange={e => setSeedWords(e.target.value)}
-          placeholder={t('ugc.board.seedWordsHint')}
-          rows={2}
-          className={cn(
-            'border-neo border-black bg-neo-navy text-neo-white',
-            'font-neo-body text-sm rounded-neo px-3 py-2 resize-none',
-            'placeholder:text-neo-white/40 focus:outline-none focus:ring-2 focus:ring-neo-cyan'
-          )}
+      {/* Seed words tag input */}
+      <SeedWordTags
+        tags={seedTags}
+        onAdd={addTag}
+        onRemove={removeTag}
+        onUpdate={updateTag}
+        disabled={isGenerating}
+      />
+
+      {/* Live animated grid */}
+      <div className="flex flex-col items-center gap-3">
+        <AnimatedBoardGrid
+          grid={generatedBoard?.grid ?? null}
+          gridSize={gridSize}
+          revision={gridRevision}
+          isGenerating={isGenerating}
         />
+
+        {/* Stats HUD — appears when grid is generated */}
+        <AnimatePresence>
+          {generatedBoard && (
+            <motion.div
+              initial={{ opacity: 0, y: 12, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="flex items-center gap-3 flex-wrap justify-center"
+            >
+              <span className={cn(
+                'font-neo-display text-sm font-bold px-2 py-1 rounded-neo border-2 border-black shadow-hard-sm',
+                generatedBoard.totalFindableWords >= 15 ? 'bg-neo-lime text-black'
+                  : generatedBoard.totalFindableWords >= 5 ? 'bg-neo-orange text-black'
+                  : 'bg-neo-red text-white'
+              )}>
+                {generatedBoard.totalFindableWords} {t('ugc.board.words') || 'words'}
+              </span>
+              <span className={cn(
+                'font-neo-display text-xs font-bold px-2 py-1 rounded-neo border-2 border-black shadow-hard-sm',
+                generatedBoard.difficulty === 'EASY' ? 'bg-neo-lime text-black'
+                  : generatedBoard.difficulty === 'MEDIUM' ? 'bg-neo-orange text-black'
+                  : 'bg-neo-red text-white'
+              )}>
+                {t(`ugc.board.${generatedBoard.difficulty.toLowerCase()}`)}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Error */}
-      {generateError && (
-        <p data-testid="generate-error" className="text-neo-red font-neo-body text-sm">
-          {generateError}
-        </p>
-      )}
-
-      {/* Actions */}
-      <div className="flex gap-3 flex-wrap">
-        <NeoButton
-          data-testid="generate-btn"
-          onClick={handleGenerate}
-          disabled={isGenerating}
-          className="bg-neo-lime text-black"
-        >
-          {isGenerating ? '...' : t('ugc.board.generate')}
-        </NeoButton>
-
-        {generatedBoard && (
-          <NeoButton
-            data-testid="shuffle-btn"
-            onClick={handleShuffle}
-            disabled={isGenerating}
-            className="bg-neo-orange text-black"
+      <AnimatePresence>
+        {generateError && (
+          <motion.p
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0 }}
+            data-testid="generate-error"
+            className="text-neo-red font-neo-body text-sm"
           >
-            {t('ugc.board.shuffle')}
-          </NeoButton>
+            {generateError}
+          </motion.p>
         )}
-      </div>
+      </AnimatePresence>
+
+      {/* Proceed to preview */}
+      <NeoButton
+        data-testid="proceed-btn"
+        onClick={() => setStep('preview')}
+        disabled={!canProceed}
+        className="bg-neo-lime text-black"
+      >
+        {t('ugc.board.preview') || 'Preview & Publish'}
+      </NeoButton>
     </div>
   );
 }
 
 // ── Step 2: Preview ─────────────────────────────────────────────────────────
 
-const DIFFICULTY_COLORS: Record<string, string> = {
-  EASY: 'bg-neo-lime text-black',
-  MEDIUM: 'bg-neo-orange text-black',
-  HARD: 'bg-neo-red text-white',
-};
-
-function wordCountColor(count: number): string {
-  if (count >= 15) return 'text-neo-lime';
-  if (count >= 5) return 'text-neo-orange';
-  return 'text-neo-red';
-}
-
-function PreviewStep() {
+function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
   const { t } = useLanguage();
   const {
     generatedBoard,
+    gridSize,
+    gridRevision,
     title, setTitle,
     description, setDescription,
     isPublishing,
     publishError,
     publishBoard,
+    shuffleBoard,
+    isGenerating,
     setStep,
-  } = useBoardCreator();
+  } = creator;
 
   const handlePublish = useCallback(() => { void publishBoard(); }, [publishBoard]);
+  const handleShuffle = useCallback(() => { void shuffleBoard(); }, [shuffleBoard]);
   const handleBack = useCallback(() => { setStep('configure'); }, [setStep]);
 
   if (!generatedBoard) return null;
@@ -177,9 +197,22 @@ function PreviewStep() {
         {t('ugc.board.tryIt')}
       </h2>
 
-      {/* Grid preview */}
-      <div className="flex justify-center">
-        <BoardPreviewGrid grid={generatedBoard.grid} size="md" />
+      {/* Grid preview with shuffle */}
+      <div className="flex flex-col items-center gap-3">
+        <AnimatedBoardGrid
+          grid={generatedBoard.grid}
+          gridSize={gridSize}
+          revision={gridRevision}
+          isGenerating={isGenerating}
+        />
+        <NeoButton
+          data-testid="shuffle-btn"
+          onClick={handleShuffle}
+          disabled={isGenerating}
+          className="bg-neo-orange text-black text-sm"
+        >
+          {t('ugc.board.shuffle')}
+        </NeoButton>
       </div>
 
       {/* Stats HUD */}
@@ -188,17 +221,23 @@ function PreviewStep() {
           <span className="font-neo-body text-xs text-neo-white/60">
             {t('ugc.board.wordsFound').replace('{{count}}', String(generatedBoard.totalFindableWords))}
           </span>
-          <span className={cn('font-neo-display text-xl font-bold', wordCountColor(generatedBoard.totalFindableWords))}>
+          <span className={cn(
+            'font-neo-display text-xl font-bold',
+            generatedBoard.totalFindableWords >= 15 ? 'text-neo-lime'
+              : generatedBoard.totalFindableWords >= 5 ? 'text-neo-orange'
+              : 'text-neo-red'
+          )}>
             {generatedBoard.totalFindableWords}
           </span>
         </div>
-
         <div className="flex flex-col justify-center">
           <span
             data-testid="difficulty-badge"
             className={cn(
               'border-neo border-black rounded-neo px-2 py-1 text-xs font-neo-display font-bold',
-              DIFFICULTY_COLORS[generatedBoard.difficulty] ?? 'bg-neo-navy text-white'
+              generatedBoard.difficulty === 'EASY' ? 'bg-neo-lime text-black'
+                : generatedBoard.difficulty === 'MEDIUM' ? 'bg-neo-orange text-black'
+                : 'bg-neo-red text-white'
             )}
           >
             {t(`ugc.board.${generatedBoard.difficulty.toLowerCase()}`)}
@@ -273,9 +312,9 @@ function PreviewStep() {
 
 // ── Step 3: Published ───────────────────────────────────────────────────────
 
-function PublishedStep() {
+function PublishedStep({ creator }: { creator: UseBoardCreatorReturn }) {
   const { t } = useLanguage();
-  const { publishedBoard, setStep } = useBoardCreator();
+  const { publishedBoard, setStep } = creator;
 
   const handleMakeAnother = useCallback(() => { setStep('configure'); }, [setStep]);
 
@@ -300,7 +339,13 @@ function PublishedStep() {
   if (!publishedBoard) return null;
 
   return (
-    <div data-testid="step-published" className="flex flex-col items-center gap-6 text-center">
+    <motion.div
+      data-testid="step-published"
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      className="flex flex-col items-center gap-6 text-center"
+    >
       <h2 className="font-neo-display text-2xl font-bold text-neo-lime">
         {publishedBoard.title}
       </h2>
@@ -321,10 +366,10 @@ function PublishedStep() {
       {/* Share buttons */}
       <div data-testid="share-buttons" className="flex gap-3 flex-wrap justify-center">
         <NeoButton onClick={handleCopy} className="bg-neo-cyan text-black">
-          Copy Code
+          {t('ugc.board.copyCode') || 'Copy Code'}
         </NeoButton>
         <NeoButton onClick={handleShare} className="bg-neo-orange text-black">
-          Share
+          {t('ugc.board.share') || 'Share'}
         </NeoButton>
       </div>
 
@@ -336,7 +381,7 @@ function PublishedStep() {
       >
         {t('ugc.board.makeAnother')}
       </NeoButton>
-    </div>
+    </motion.div>
   );
 }
 
@@ -344,17 +389,31 @@ function PublishedStep() {
 
 /**
  * BoardCreatorWizard — 3-step wizard for creating and publishing custom boards.
- * Steps: configure → preview → published
+ * Steps: configure (live grid) → preview → published
  */
 export function BoardCreatorWizard() {
-  const { step } = useBoardCreator();
+  const creator = useBoardCreator();
 
   return (
     <div className="min-h-screen bg-neo-navy p-4 md:p-8">
       <div className="max-w-lg mx-auto border-neo border-black bg-neo-navy shadow-hard rounded-neo p-6">
-        {step === 'configure' && <ConfigureStep />}
-        {step === 'preview' && <PreviewStep />}
-        {step === 'published' && <PublishedStep />}
+        <AnimatePresence mode="wait">
+          {creator.step === 'configure' && (
+            <motion.div key="configure" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+              <ConfigureStep creator={creator} />
+            </motion.div>
+          )}
+          {creator.step === 'preview' && (
+            <motion.div key="preview" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+              <PreviewStep creator={creator} />
+            </motion.div>
+          )}
+          {creator.step === 'published' && (
+            <motion.div key="published" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+              <PublishedStep creator={creator} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

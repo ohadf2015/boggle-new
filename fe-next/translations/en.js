@@ -320,7 +320,11 @@ const en = {
   "game": {
     "combo": "Combo",
     "comboHint": "Find words fast for combo!",
-    "calculatingResults": "Calculating Results..."
+    "calculatingResults": "Calculating Results...",
+    "drawer": {
+      "content": "Game content",
+      "toggle": "Toggle game drawer"
+    }
   },
   "leadChange": {
     "tookLead": "You're in the lead!",
@@ -3224,7 +3228,12 @@ const en = {
       "publish": "Publish Board",
       "shareMessage": "Check out my custom LexiClash board!",
       "code": "Board Code",
-      "makeAnother": "Make Another"
+      "makeAnother": "Make Another",
+      "copyCode": "Copy Code",
+      "share": "Share",
+      "preview": "Preview & Publish",
+      "words": "words",
+      "seedWordsHelp": "Press Enter or comma to add words. Click a tag to edit."
     },
     "difficulty": {
       "easy": "Easy",
@@ -3314,13 +3323,21 @@ const en = {
         "plays": "plays",
         "play": "Play",
         "upvote": "Upvote"
-      }
+      },
+      "shareMessage": "Check out this word pack on LexiClash!"
+    },
+    "rewards": {
+      "boardPlayed": "Your board was played!",
+      "boardRated": "Your board was rated!",
+      "highScoreBeat": "Someone beat the high score on your board!",
+      "milestone": "You reached a creator milestone!"
     }
   },
   "ranked": {
     "title": "Ranked Mode",
     "unlocked": "Unlocked",
-    "unlockProgress": "{current}/{required} games to unlock"
+    "unlockProgress": "{current}/{required} games to unlock",
+    "toGo": "to go"
   },
   "growth": {
     "dayStreak": "day streak",
@@ -5126,6 +5143,39 @@ const en = {
     "of": "of"
   },
   "adventure": {
+    "story": {
+      "lexi": "Lexi",
+      "w1": {
+        "boss": "Ms. Grammar",
+        "after2": "You're doing great! These meadows are full of simple words to find.",
+        "after4": "The letters grow trickier ahead. Stay sharp!",
+        "postBoss": "You showed Ms. Grammar that rules are made to be mastered!"
+      },
+      "w2": {
+        "boss": "Spelling Bee",
+        "after2": "The springs bubble with synonyms — can you find them all?",
+        "after4": "Deeper into the springs... the words flow faster here.",
+        "postBoss": "The Spelling Bee's hive is defeated! Your vocabulary is sweet as honey!"
+      },
+      "w3": {
+        "boss": "Professor Thesaurus",
+        "after2": "These caverns hold ancient word roots. Dig deep!",
+        "after4": "The etymologies grow complex. The Professor watches...",
+        "postBoss": "The Professor concedes — your lexicon is truly... impressive."
+      },
+      "w4": {
+        "boss": "Captain Metaphor",
+        "after2": "The islands are scattered with figurative treasures!",
+        "after4": "Captain Metaphor's fleet draws near. Speak literally!",
+        "postBoss": "You sank the Captain's fleet of idioms! Smooth sailing ahead!"
+      },
+      "w5": {
+        "boss": "Baron Buildaword",
+        "after2": "The canyon echoes with compound words. Combine them!",
+        "after4": "The Baron's assembly line is speeding up...",
+        "postBoss": "Baron Buildaword's factory is dismantled! You're the ultimate word engineer!"
+      }
+    },
     "title": "Adventure Mode",
     "subtitle": "10 worlds. 100 levels. One ultimate word master.",
     "adminOnly": "Admin Only",
@@ -5328,7 +5378,11 @@ const en = {
       "selectWord": "Swipe letters to find words",
       "hintFullReveal": "Try looking for shorter words first!",
       "hintLengthAndStart": "Look for words starting with specific letters!",
-      "hintGeneral": "Keep trying! Look for common patterns."
+      "hintGeneral": "Keep trying! Look for common patterns.",
+      "confirmRestart": "Restart Level?",
+      "confirmRestartDesc": "Your current progress will be lost.",
+      "confirmExit": "Exit Level?",
+      "confirmExitDesc": "Your current progress will be lost. Are you sure you want to exit?"
     },
     "hints": {
       "minLetters2": "2+ letters",
@@ -6056,9 +6110,37 @@ const en = {
       "wrath": {
         "name": "Wrath"
       }
+    },
+    "chapterComplete": "Chapter {{chapter}} Complete!",
+    "lvl": "LVL",
+    "cosmetic": {
+      "bossSlayer": "Boss Slayer",
+      "bossHunter": "Boss Hunter",
+      "bossConqueror": "Boss Conqueror",
+      "bossLegend": "Boss Legend",
+      "prestigeBronze": "Bronze Prestige",
+      "prestigeSilver": "Silver Prestige",
+      "prestigeGold": "Gold Prestige",
+      "prestigeMaster": "Prestige Master",
+      "prestigeCosmic": "Cosmic Prestige"
+    },
+    "weekly": {
+      "speedDemon": { "name": "Speed Demon" },
+      "longWords": { "name": "Long Words" },
+      "goldRush": { "name": "Gold Rush" },
+      "iceAge": { "name": "Ice Age" },
+      "marathon": { "name": "Marathon" },
+      "doubleOrNothing": { "name": "Double or Nothing" },
+      "wordSmith": { "name": "Word Smith" },
+      "treasureHunter": { "name": "Treasure Hunter" },
+      "blitz": { "name": "Blitz" },
+      "zenMode": { "name": "Zen Mode" }
     }
   },
   "blast": {
+    "chain": {
+      "badge": "Chain x{level}"
+    },
     "title": "Blast Mode",
     "description": "Clear the board! Words explode tiles.",
     "progress": "Cleared",
