@@ -6250,6 +6250,7 @@ const ja = {
     "moveBonus": "手数ボーナス",
     "nextWave": "次のウェーブ",
     "celebrateAgain": "また祝おう",
+    "best": "ベスト",
     "movesLeft": "残り手数",
     "bonusMove": "+1 手!",
     "bonusMoves": "+{count} 手!",

@@ -13,6 +13,7 @@ import { useBlastSugarCrush } from './hooks/useBlastSugarCrush';
 import { BlastComboFlash } from './BlastComboFlash';
 import { BlastComboDiscovery } from './BlastComboDiscovery';
 import { useBlastHint } from './hooks/useBlastHint';
+import { useBlastPersonalBest } from './hooks/useBlastPersonalBest';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { useBlastNearMiss } from './hooks/useBlastNearMiss';
 import { calculateBonusMoves } from './utils/blastMoveUtils';
@@ -49,6 +50,8 @@ interface BlastGameProps {
    * Parent can use this to include comboType in the socket submitWord emit.
    */
   onWordWithComboType?: (word: string, comboType: string | null) => void;
+  /** Discovered combos for in-game codex access */
+  discoveredCombos?: Set<import('./utils/blastCombos').BlastComboType>;
   /**
    * Pre-built tile states from server overlay (multiplayer).
    * When provided, useBlastGame skips generateTileStates and uses these directly.
@@ -89,6 +92,7 @@ export function BlastGame({
   pendingDiscovery,
   acknowledgeDiscovery,
   onWordWithComboType,
+  discoveredCombos,
   initialTileStates,
   blastSeed,
   remainingTime,
@@ -213,6 +217,9 @@ export function BlastGame({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blastComboSync?.id]);
 
+  // Personal best (loss aversion hook: shows target to beat)
+  const personalBest = useBlastPersonalBest();
+
   // Near-miss shimmer (psychological hook: shows what the player almost got)
   const nearMiss = useBlastNearMiss();
 
@@ -260,7 +267,7 @@ export function BlastGame({
     }
   }, []);
 
-  // Confetti burst on board complete — fires once per wave clear (SP only)
+  // Confetti burst + celebration Sugar Crush on board complete (SP only)
   const confettiFiredRef = useRef(false);
   useEffect(() => {
     if (isMultiplayer) return;
@@ -272,9 +279,20 @@ export function BlastGame({
         origin: { y: 0.6 },
         colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
       });
+      // Celebration Sugar Crush: fire when ≥3 moves remain (reward, not consolation)
+      if (blast.gameState.movesRemaining >= 3 && isFinite(blast.gameState.totalMoves)) {
+        sugarCrushStartRef.current(
+          blastTileStatesRef.current,
+          config.gridSize,
+          blastSetTileStatesRef.current,
+          blastAddExplosionRef.current,
+          blastAddBonusScoreRef.current,
+          () => {}, // no-op onComplete — board already complete
+        );
+      }
     }
     // Reset guard when wave resets (waveNumber prop changes)
-  }, [blast.gameState.isComplete, isMultiplayer]);
+  }, [blast.gameState.isComplete, blast.gameState.movesRemaining, blast.gameState.totalMoves, isMultiplayer, config.gridSize]);
 
   // Word forming state (from GridComponent drag)
   const [formedWord, setFormedWord] = useState('');
@@ -500,6 +518,8 @@ export function BlastGame({
       hasHintAvailable={hasHintAvailable}
       onRequestHint={requestHint}
       onClearHint={clearHint}
+      discoveredCombos={discoveredCombos}
+      personalBestScore={personalBest?.bestScore ?? null}
       t={(key: string) => t(key) || undefined}
     />
     </div>

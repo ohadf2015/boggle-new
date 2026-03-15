@@ -6292,6 +6292,7 @@ const en = {
     "moveBonus": "Move Bonus",
     "nextWave": "Next Wave",
     "celebrateAgain": "Celebrate again",
+    "best": "Best",
     "movesLeft": "Moves",
     "bonusMove": "+1 Move!",
     "bonusMoves": "+{count} Moves!",

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Bomb, HelpCircle, Lightbulb, Shuffle, Star } from 'lucide-react';
+import { ArrowLeft, Bomb, BookOpen, HelpCircle, Lightbulb, Shuffle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
@@ -26,7 +26,9 @@ import { Mascot } from '@/components/ui/Mascot';
 import { BlastMoveCounter } from './BlastMoveCounter';
 import { BlastObjectiveDisplay } from './BlastObjectiveDisplay';
 import { BlastChainCounter } from './BlastChainCounter';
+import { BlastCodexModal } from './BlastCodexModal';
 import CircularTimer from '@/components/CircularTimer';
+import type { BlastComboType } from './utils/blastCombos';
 import { LeadChangeBanner } from '@/components/game/LeadChangeBanner';
 import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 import { BlastOpponentFeed } from './BlastOpponentFeed';
@@ -109,6 +111,10 @@ interface BlastGameLayoutProps {
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: any }>;
   /** Multiplayer: current player's username */
   username?: string;
+  /** Discovered combos for in-game codex access */
+  discoveredCombos?: Set<BlastComboType>;
+  /** Player's personal best score (null if not loaded) */
+  personalBestScore?: number | null;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -166,6 +172,8 @@ export function BlastGameLayout({
   totalTime,
   leaderboard,
   username,
+  discoveredCombos,
+  personalBestScore,
   t,
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
@@ -178,6 +186,7 @@ export function BlastGameLayout({
   );
 
   const [showHelp, setShowHelp] = useState(false);
+  const [showCodex, setShowCodex] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [shakeClass, setShakeClass] = useState('');
   const [cascadeAnnouncement, setCascadeAnnouncement] = useState<string | null>(null);
@@ -309,15 +318,28 @@ export function BlastGameLayout({
           </motion.div>
         )}
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowHelp(true)}
-          className="text-white/60 hover:text-white"
-          aria-label={t('blast.helpTitle')}
-        >
-          <HelpCircle className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          {discoveredCombos && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCodex(true)}
+              className="text-white/60 hover:text-white"
+              aria-label={t('blast.comboCodex')}
+            >
+              <BookOpen className="h-5 w-5" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowHelp(true)}
+            className="text-white/60 hover:text-white"
+            aria-label={t('blast.helpTitle')}
+          >
+            <HelpCircle className="h-5 w-5" />
+          </Button>
+        </div>
 
         {/* End Game button — SP only */}
         {!isMultiplayer && (
@@ -409,6 +431,15 @@ export function BlastGameLayout({
                 {t('common.score')}
               </div>
             </div>
+            {/* Personal best anchor — loss aversion hook */}
+            {personalBestScore != null && personalBestScore > 0 && (
+              <div className={cn(
+                'text-[9px] font-bold uppercase tracking-wider text-center mt-0.5',
+                score > personalBestScore ? 'text-neo-lime' : 'text-neo-black/40',
+              )}>
+                {score > personalBestScore ? '★ NEW BEST' : `${t('blast.best')}: ${personalBestScore}`}
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -709,6 +740,15 @@ export function BlastGameLayout({
         onOpenChange={setShowHelp}
         t={t}
       />
+
+      {/* Combo Codex Modal — in-game access */}
+      {discoveredCombos && (
+        <BlastCodexModal
+          isOpen={showCodex}
+          onClose={() => setShowCodex(false)}
+          discoveredCombos={discoveredCombos}
+        />
+      )}
     </div>
   );
 }

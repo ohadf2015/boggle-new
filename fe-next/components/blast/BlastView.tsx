@@ -165,6 +165,7 @@ const BlastView: React.FC = () => {
           onGameEnd={handleGameEnd}
           onQuit={handleQuit}
           onComboDetected={onComboDetected}
+          discoveredCombos={discoveredCombos}
           pendingDiscovery={pendingDiscovery}
           acknowledgeDiscovery={acknowledgeDiscovery}
         />

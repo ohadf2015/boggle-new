@@ -6249,6 +6249,7 @@ const es = {
     "moveBonus": "Bonus de Movimiento",
     "nextWave": "Siguiente Oleada",
     "celebrateAgain": "Celebrar de nuevo",
+    "best": "Mejor",
     "movesLeft": "Movimientos",
     "bonusMove": "¡+1 Movimiento!",
     "bonusMoves": "¡+{count} Movimientos!",

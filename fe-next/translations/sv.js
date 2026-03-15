@@ -6199,6 +6199,7 @@ const sv = {
     "moveBonus": "Dragbonus",
     "nextWave": "Nästa våg",
     "celebrateAgain": "Fira igen",
+    "best": "Bäst",
     "movesLeft": "Drag",
     "bonusMove": "+1 Drag!",
     "bonusMoves": "+{count} Drag!",

@@ -6224,6 +6224,7 @@ const he = {
     "moveBonus": "בונוס מהלכים",
     "nextWave": "גל הבא",
     "celebrateAgain": "חגוג שוב",
+    "best": "שיא",
     "movesLeft": "מהלכים",
     "bonusMove": "+1 מהלך!",
     "bonusMoves": "+{count} מהלכים!",
