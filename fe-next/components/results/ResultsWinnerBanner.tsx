@@ -367,10 +367,16 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                 flex flex-col items-center justify-center
                 ${compact ? 'px-2.5 py-1.5' : 'px-3 py-2 sm:px-4 sm:py-2.5'}
               `}>
-                <ScoreCounter
-                  target={winner.score}
-                  className={`font-black text-neo-black leading-none ${compact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'}`}
-                />
+                <motion.div
+                  initial={{ scale: 1 }}
+                  animate={{ scale: [1, 1.15, 1] }}
+                  transition={{ delay: 1.8, duration: 0.3, ease: 'easeOut' }}
+                >
+                  <ScoreCounter
+                    target={winner.score}
+                    className={`font-black text-neo-black leading-none ${compact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'}`}
+                  />
+                </motion.div>
                 <span className={`font-bold text-neo-black/60 uppercase ${compact ? 'text-[8px]' : 'text-[9px] sm:text-[10px]'}`}>
                   {t('results.points')}
                 </span>

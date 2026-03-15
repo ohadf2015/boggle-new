@@ -140,8 +140,8 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showConfetti, top3.length]); // Intentionally using length, not full array - only re-fire when count changes
 
-  const handleCardClick = useCallback((rank: number) => {
-    fireConfettiForRank(rank, 0.7);
+  const handleCardClick = useCallback((rank: number, isCurrentPlayer: boolean) => {
+    fireConfettiForRank(rank, isCurrentPlayer ? 1.2 : 0.7);
   }, []);
 
   if (top3.length === 0) return null;
@@ -167,7 +167,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
       {/* Header - hidden in compact mode */}
       {!compact && (
         <div className="flex items-center justify-center gap-2 mb-2">
-          <span className="text-xs font-black uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <span className="text-xs font-black uppercase tracking-wide text-neo-cream/50">
             {headerText || t('results.topPlayers')}
           </span>
         </div>
@@ -188,21 +188,30 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
           return (
             <motion.div
               key={participant.name}
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: compact ? 0.05 * displayIndex : 0.1 + displayIndex * 0.1, type: 'spring', stiffness: 200 }}
+              initial={{
+                opacity: 0,
+                y: rank === 1 ? -40 : 30,
+                x: rank === 2 ? -30 : rank === 3 ? 30 : 0,
+                rotate: rank === 1 ? -10 : rank === 2 ? 8 : -8,
+                scale: 0.8,
+              }}
+              animate={{
+                opacity: 1, y: 0, x: 0, scale: 1,
+                rotate: rank === 1 ? -2 : rank === 2 ? 1.5 : -1.5,
+              }}
+              transition={{ delay: compact ? 0.05 * displayIndex : 0.15 + displayIndex * 0.12, type: 'spring', stiffness: 220, damping: 18 }}
               style={{ order: podium.order }}
-              className={cn('flex flex-col items-center', podium.mt)}
+              className={cn('flex flex-col items-center', podium.mt, rank === 1 && '-mx-1 z-10')}
             >
               {/* Player Card */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleCardClick(rank)}
+                onClick={() => handleCardClick(rank, isCurrentPlayer)}
                 className={cn(
                   'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden cursor-pointer',
                   'bg-neo-cream',
-                  compact ? 'w-20 p-1.5' : 'w-24 p-2',
+                  compact ? 'w-20 p-1.5' : rank === 1 ? 'w-28 p-2.5' : 'w-24 p-2',
                   isCurrentPlayer && 'ring-2 ring-neo-cyan'
                 )}
               >
@@ -210,10 +219,10 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 <div className="flex justify-center relative mb-1">
                   {participant.isBot ? (
                     <div className={cn(
-                      'rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-neo-black flex items-center justify-center',
+                      'rounded-full bg-slate-200 border-2 border-neo-black flex items-center justify-center',
                       compact ? 'w-8 h-8' : 'w-10 h-10'
                     )}>
-                      <Bot className={cn('text-slate-500 dark:text-slate-400', compact ? 'text-sm' : 'text-lg')} />
+                      <Bot className={cn('text-slate-500', compact ? 'text-sm' : 'text-lg')} />
                     </div>
                   ) : (
                     <Avatar
@@ -269,7 +278,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
               {/* Podium Base */}
               <div className={cn(
                 'w-full rounded-t-neo border-2 border-neo-black border-b-0 flex items-center justify-center',
-                compact ? 'w-20' : 'w-24',
+                compact ? 'w-20' : rank === 1 ? 'w-28' : 'w-24',
                 podium.podiumHeight,
                 config.bg
               )}>

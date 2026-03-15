@@ -263,7 +263,18 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 </div>
               </div>
               <div className="text-xs sm:text-sm font-black text-white uppercase truncate">
-                {bestWord ? applyHebrewFinalLetters(bestWord.word) : '-'}
+                {bestWord ? (
+                  applyHebrewFinalLetters(bestWord.word).split('').map((char, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 + i * 0.05, duration: 0.15 }}
+                    >
+                      {char}
+                    </motion.span>
+                  ))
+                ) : '-'}
               </div>
               <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">
                 {bestWord?.score ? `${bestWord.score} ${t('results.points')}` : (t('results.bestWord'))}
