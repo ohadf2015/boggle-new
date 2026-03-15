@@ -23,14 +23,21 @@ jest.mock('@/contexts/LanguageContext', () => ({
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => {
   const React = require('react');
+  const motionCache: Record<string, React.FC> = {};
+  function getMotionComponent(el: string) {
+    if (!motionCache[el]) {
+      // eslint-disable-next-line react/display-name
+      const Comp = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+        const { initial, animate, exit, transition, whileInView, whileTap, whileHover, whileDrag, layout, ...rest } = props;
+        return React.createElement(el, { ...rest, ref });
+      });
+      Comp.displayName = `motion.${el}`;
+      motionCache[el] = Comp;
+    }
+    return motionCache[el];
+  }
   return {
-    motion: new Proxy({}, {
-      get: (_target: unknown, prop: string) =>
-        React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
-          const { initial, animate, exit, transition, whileInView, whileTap, whileHover, whileDrag, layout, ...rest } = props;
-          return React.createElement(prop, { ...rest, ref });
-        }),
-    }),
+    motion: new Proxy({}, { get: (_t: unknown, prop: string) => getMotionComponent(prop) }),
     AnimatePresence: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
     useReducedMotion: () => false,
   };
