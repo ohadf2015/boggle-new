@@ -22,6 +22,7 @@ import NextStepPrompt from '@/components/results/NextStepPrompt';
 import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 const WordHuntPromoPopup = dynamic(() => import('@/components/results/WordHuntPromoPopup'), { ssr: false });
+const TurningPointCard = dynamic(() => import('@/components/results/TurningPointCard'), { ssr: false });
 import { AdPlaceholder } from '@/components/ads';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 import ShareButton from '@/components/results/ShareButton';
@@ -342,24 +343,41 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
               )}
             </div>
 
-            {/* Share Button */}
+            {/* Share Button with narrative preview */}
             {currentPlayerData && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
-              <ShareButton
-                params={{
-                  gameMode: 'multiplayer',
-                  score: currentPlayerData.score || 0,
-                  wordsFound: currentPlayerValidWords.length,
-                  longestWord: currentPlayerValidWords.length > 0
-                    ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word
-                    : undefined,
-                  won: currentPlayerRank === 1,
-                  opponentScore: sortedScores.length > 1
-                    ? sortedScores.find(p => normalizeUsername(p.username) !== normalizeUsername(username))?.score
-                    : undefined,
-                } satisfies ShareParams}
-                t={t}
-                className="w-full"
-              />
+              <div className="space-y-1.5">
+                {/* Auto-generated narrative — gives the share context */}
+                {currentPlayerValidWords.length > 0 && (
+                  <p className="text-[10px] text-neo-cream/40 text-center italic px-2">
+                    {currentPlayerRank === 1
+                      ? t('results.shareNarrativeWin', {
+                          word: currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase(),
+                          score: currentPlayerData.score || 0,
+                        })
+                      : t('results.shareNarrativeLoss', {
+                          words: currentPlayerValidWords.length,
+                          score: currentPlayerData.score || 0,
+                        })
+                    }
+                  </p>
+                )}
+                <ShareButton
+                  params={{
+                    gameMode: 'multiplayer',
+                    score: currentPlayerData.score || 0,
+                    wordsFound: currentPlayerValidWords.length,
+                    longestWord: currentPlayerValidWords.length > 0
+                      ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word
+                      : undefined,
+                    won: currentPlayerRank === 1,
+                    opponentScore: sortedScores.length > 1
+                      ? sortedScores.find(p => normalizeUsername(p.username) !== normalizeUsername(username))?.score
+                      : undefined,
+                  } satisfies ShareParams}
+                  t={t}
+                  className="w-full"
+                />
+              </div>
             )}
           </>
         )
@@ -401,6 +419,15 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           t={t}
           onPlayAgain={isHost ? onStartGame : onMarkReady}
           compact
+        />
+      )}
+
+      {/* Turning Point — the moment that decided the game */}
+      {allPlayerWords && username && sortedScores.length > 1 && sortedScores.length <= 6 && (
+        <TurningPointCard
+          allPlayerWords={allPlayerWords as Record<string, import('./types').WordObject[]>}
+          currentUsername={username}
+          t={t}
         />
       )}
 
