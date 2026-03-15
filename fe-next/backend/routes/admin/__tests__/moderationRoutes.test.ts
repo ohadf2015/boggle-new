@@ -6,6 +6,7 @@ const mockInsert = jest.fn().mockResolvedValue({ error: null });
 const mockUpdate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) });
 const mockSelectChain = {
   eq: jest.fn().mockReturnThis(),
+  is: jest.fn().mockReturnThis(),
   order: jest.fn().mockReturnThis(),
   limit: jest.fn().mockResolvedValue({ data: [], error: null }),
   single: jest.fn().mockResolvedValue({ data: { id: '1', username: 'alice' }, error: null }),
