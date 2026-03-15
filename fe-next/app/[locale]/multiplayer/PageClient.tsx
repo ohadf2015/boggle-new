@@ -9,7 +9,7 @@ import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
-import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
+import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
 import SpectatorBanner from '@/components/SpectatorBanner';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
@@ -289,7 +289,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             gridSize={Array.isArray(resultsData?.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4}
             gameDuration={gameDuration} seriesStandings={seriesTracker.standings}
             seriesRoundNumber={seriesTracker.roundNumber}
-            wordHuntSummary={(resultsData as any)?.wordHuntSummary}
+            wordHuntSummary={resultsData?.wordHuntSummary}
+            blastSummary={resultsData?.blastSummary}
           />
         </FeatureErrorBoundary>
       );
@@ -339,7 +340,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   return (
     <SocketContext.Provider value={socketContextValue}>
-      <ConnectionDot />
+      {/* Show full banner during active game for better reconnection context; minimal dot otherwise */}
+      {isActive ? <ConnectionBanner /> : <ConnectionDot />}
       <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
       {isClassroomMode ? (
         <>

@@ -396,8 +396,20 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       lateJoin: isLateJoin
     });
 
-    // If game is in progress, send current state
+    // If game is in progress, initialize player data and send current state
     if (isLateJoin) {
+      // Initialize score/word tracking for the new player (prevents undefined access in results)
+      const currentGame = getGame(gameCode);
+      if (currentGame) {
+        if (!currentGame.playerScores) currentGame.playerScores = {};
+        if (!currentGame.playerWords) currentGame.playerWords = {};
+        if (!currentGame.playerWordDetails) currentGame.playerWordDetails = {};
+        if (!currentGame.playerAchievements) currentGame.playerAchievements = {};
+        currentGame.playerScores[username] = 0;
+        currentGame.playerWords[username] = [];
+        currentGame.playerWordDetails[username] = [];
+        currentGame.playerAchievements[username] = [];
+      }
       handleLateJoin(socket, game as unknown as Game, gameCode, username);
     }
 

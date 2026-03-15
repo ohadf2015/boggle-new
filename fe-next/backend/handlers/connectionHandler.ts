@@ -53,6 +53,12 @@ function registerConnectionHandlers(io: Server, socket: Socket): void {
 
   // Handle disconnect
   socket.on('disconnect', (reason: string) => {
+    // Clean up migration timeout if set (prevents timer accumulation)
+    if (socket.data?.migrationTimeout) {
+      clearTimeout(socket.data.migrationTimeout);
+      delete socket.data.migrationTimeout;
+    }
+
     // Skip if this socket was migrating (multi-tab scenario)
     if (socket.data && socket.data.migrating) {
       logger.debug('SOCKET', `Socket ${socket.id} disconnect skipped (was migrating)`);
