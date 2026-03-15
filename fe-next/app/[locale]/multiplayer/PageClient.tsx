@@ -253,6 +253,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     socket, gameCode, username, roomName, hostUsername,
     language: language as Language, t, isSupabaseEnabled,
     user, profile, loading, authLoadingStartTime,
+    guestAvatar, setGuestAvatar,
     setUsername, setError, setIsJoining,
   });
 
