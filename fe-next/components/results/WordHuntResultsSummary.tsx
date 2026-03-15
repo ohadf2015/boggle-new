@@ -45,7 +45,7 @@ export default function WordHuntResultsSummary({
   return (
     <div className="space-y-3">
       {/* Target word reveal — prominent hero display */}
-      <div className="flex flex-col items-center gap-2 p-4 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard">
+      <div className="flex flex-col items-center gap-2 p-4 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard border-t-4 border-t-purple-500">
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-neo-yellow" />
           <span className="text-sm font-bold text-neo-cream/70 uppercase tracking-wide">{t('wordHunt.multiplayer.targetWord')}</span>

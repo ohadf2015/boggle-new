@@ -29,8 +29,8 @@ export default function BlastResultsSummary({ movesUsed, tilesCleared, tileBonus
 
   return (
     <div className="space-y-2">
-      {/* Basic stats grid (always shown) */}
-      <div className="grid grid-cols-3 gap-2 p-3 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm">
+      {/* Mode badge + Basic stats grid */}
+      <div className="grid grid-cols-3 gap-2 p-3 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm border-t-4 border-t-neo-orange">
         <StatCell icon={<Zap className="w-5 h-5 text-neo-yellow" />} value={movesUsed} label={t('blast.multiplayer.moves')} />
         <StatCell icon={<Target className="w-5 h-5 text-neo-orange" />} value={tilesCleared} label={t('blast.multiplayer.tilesCleared')} />
         <StatCell icon={<Sparkles className="w-5 h-5 text-neo-cyan" />} value={`+${tileBonus}`} label={t('blast.multiplayer.tileBonus')} />

@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, Hash, Award, TrendingUp, ChevronDown, Zap, BarChart3, Sparkles, Lightbulb } from 'lucide-react';
+import { Target, Hash, Award, TrendingUp, ChevronDown, Zap, BarChart3, Sparkles, Lightbulb, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
@@ -16,6 +16,7 @@ import { useWordCategories } from './useWordCategories';
 import BonusBadgesRow from './BonusBadgesRow';
 import { calculatePlayerInsights } from '@/utils/gameInsights';
 import { applyHebrewFinalLetters } from '@/utils/utils';
+import { getGuestStats } from '@/utils/guestManager';
 import type { Player, WordObject, XpGainedData, LevelUpData } from './types';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
@@ -103,6 +104,15 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
     accuracy,
     bestWord,
   } = useWordCategories(player.allWords);
+
+  // Personal best detection — compare against stored guest stats
+  const personalBests = useMemo(() => {
+    const stats = getGuestStats();
+    return {
+      isScorePB: player.score > 0 && player.score >= (stats.bestGameScore || 0),
+      isWordCountPB: validWords.length > 0 && validWords.length >= (stats.bestWordCount || 0),
+    };
+  }, [player.score, validWords.length]);
 
   // Summary stats for display (with Hebrew final letters applied)
   const summaryStats = useMemo(() => ({
@@ -234,7 +244,18 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           {/* Key Stats Grid - Always visible (2 cols mobile, 3 cols larger) */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 mb-2 sm:mb-3">
             {/* Words Found */}
-            <div className="bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center">
+            <div className="bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center relative">
+              {personalBests.isWordCountPB && validWords.length > 0 && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.6, type: 'spring', stiffness: 400, damping: 15 }}
+                  className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-tier-gold rounded-full border border-neo-black flex items-center justify-center shadow-hard-sm z-10"
+                  title={t('results.personalBest')}
+                >
+                  <Star className="w-3 h-3 text-neo-black" />
+                </motion.div>
+              )}
               <div className="flex justify-center mb-0.5 sm:mb-1">
                 <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-neo-lime text-neo-black border border-neo-black flex items-center justify-center">
                   <Hash className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-black" />
@@ -291,8 +312,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             className="mb-2 sm:mb-3"
           />
 
-          {/* Scoring Tips for new players - only show if no bonuses earned */}
-          {totalComboBonus === 0 && totalFireRoundBonus === 0 && (
+          {/* Personalized learning callout — uses actual game data instead of generic tip */}
+          {totalComboBonus === 0 && totalFireRoundBonus === 0 && bestWord && (
             <motion.div
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
@@ -304,7 +325,10 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 {t('results.scoringTip')}
               </div>
               <p className="text-[9px] sm:text-[10px] text-neo-cream/70 leading-relaxed">
-                {t('results.scoringTipText')}
+                {bestWord.word.length >= 6
+                  ? t('results.personalTipLongWord', { word: applyHebrewFinalLetters(bestWord.word).toUpperCase(), score: bestWord.score })
+                  : t('results.personalTipShortWord', { word: applyHebrewFinalLetters(bestWord.word).toUpperCase(), score: bestWord.score })
+                }
               </p>
             </motion.div>
           )}

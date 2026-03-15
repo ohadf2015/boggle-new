@@ -26,6 +26,10 @@ export interface GuestStats {
   archetypeCounts?: Record<string, number>; // Track archetype frequency
   averageWordLength?: number;
   bestCombo?: number;
+  // Personal bests for results page badges
+  bestGameScore?: number;
+  bestWordCount?: number;
+  bestAccuracy?: number;
 }
 
 export interface GameResult {
@@ -165,6 +169,14 @@ export function updateGuestStatsAfterGame(gameResult: GameResult): GuestStats {
   // Track best combo
   if (gameResult.maxCombo && gameResult.maxCombo > (stats.bestCombo || 0)) {
     stats.bestCombo = gameResult.maxCombo;
+  }
+
+  // Track personal bests for results page badges
+  if (gameResult.score && gameResult.score > (stats.bestGameScore || 0)) {
+    stats.bestGameScore = gameResult.score;
+  }
+  if (gameResult.wordCount && gameResult.wordCount > (stats.bestWordCount || 0)) {
+    stats.bestWordCount = gameResult.wordCount;
   }
 
   // Update average word length (running average)
