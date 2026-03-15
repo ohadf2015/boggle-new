@@ -1,8 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BLAST_ANIM, type BlastCascadePhase, type CascadeAnimationData } from './hooks/useBlastCascade';
 import type { BlastTileType } from './types';
+import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+
+// Preload anime.js on module load to eliminate cold-start lag on first cascade
+const animePromise = typeof window !== 'undefined'
+  ? import('animejs').then(m => m.default)
+  : null;
 
 /** Clearing phase background color per tile type — gives visual feedback about what cleared */
 const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string; border: string }>> = {
@@ -27,17 +33,13 @@ interface BlastCascadeOverlayProps {
   data: CascadeAnimationData | null;
   /** Grid dimensions */
   gridSize: number;
-  /** Container width in pixels */
-  containerWidth: number;
 }
 
 /**
  * BlastCascadeOverlay - Renders anime.js-powered cascade animations.
  *
- * During cascade phases, this overlay renders animated tile representations:
- * - clearing: cleared tiles scale up then shrink away with staggered rotation
- * - falling: surviving tiles slide down with gravity-proportional duration
- * - appearing: new tiles pop in from above with subtle overshoot
+ * Uses CSS Grid aligned to GridComponent for pixel-perfect tile positioning.
+ * anime.js handles transform animations (scale, translate, rotate) on top.
  *
  * Animation parameters stay synchronized with useBlastCascade via BLAST_ANIM config.
  */
@@ -45,18 +47,27 @@ export function BlastCascadeOverlay({
   phase,
   data,
   gridSize,
-  containerWidth,
 }: BlastCascadeOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const cellSize = containerWidth / gridSize;
+  // Measure actual cell height from DOM for precise translateY calculations
+  const [cellHeight, setCellHeight] = useState(0);
 
-  // Run anime.js animations when phase changes — dynamically imported to save ~6KB
+  // Measure a grid cell's actual rendered height (accounts for padding + gaps)
   useEffect(() => {
-    if (!overlayRef.current || !data || phase === 'idle') return;
+    if (!overlayRef.current || phase === 'idle') return;
+    const firstCell = overlayRef.current.querySelector('[data-cascade-cell]') as HTMLElement | null;
+    if (firstCell) {
+      setCellHeight(firstCell.offsetHeight);
+    }
+  }, [phase, data]);
+
+  // Run anime.js animations when phase changes — preloaded at module level
+  useEffect(() => {
+    if (!overlayRef.current || !data || phase === 'idle' || !animePromise) return;
 
     const el = overlayRef.current;
 
-    import('animejs').then(({ default: anime }) => {
+    animePromise.then(anime => {
       if (!el.isConnected) return;
 
       if (phase === 'clearing') {
@@ -75,6 +86,17 @@ export function BlastCascadeOverlay({
       }
 
       if (phase === 'falling') {
+        // Measure actual cell height from the first rendered falling tile
+        const firstFall = el.querySelector('.blast-cascade-fall') as HTMLElement | null;
+        const measuredHeight = firstFall?.offsetHeight || cellHeight;
+        // Compute gap from grid: total column height minus cells / (gridSize - 1)
+        const gridEl = el;
+        const totalHeight = gridEl.clientHeight;
+        const computedGap = gridSize > 1
+          ? (totalHeight - parseFloat(getComputedStyle(gridEl).paddingTop) * 2 - measuredHeight * gridSize) / (gridSize - 1)
+          : 0;
+        const rowStep = measuredHeight + Math.max(0, computedGap);
+
         const fallTargets = el.querySelectorAll('.blast-cascade-fall');
         if (fallTargets.length > 0) {
           anime({
@@ -82,7 +104,7 @@ export function BlastCascadeOverlay({
             translateY: [
               function (el: Element) {
                 const dist = Number((el as HTMLElement).dataset.fallDistance || 0);
-                return -dist * cellSize;
+                return -dist * rowStep;
               },
               0,
             ],
@@ -98,6 +120,14 @@ export function BlastCascadeOverlay({
       }
 
       if (phase === 'appearing') {
+        const firstNew = el.querySelector('.blast-cascade-new') as HTMLElement | null;
+        const measuredHeight = firstNew?.offsetHeight || cellHeight;
+        const totalHeight = el.clientHeight;
+        const computedGap = gridSize > 1
+          ? (totalHeight - parseFloat(getComputedStyle(el).paddingTop) * 2 - measuredHeight * gridSize) / (gridSize - 1)
+          : 0;
+        const rowStep = measuredHeight + Math.max(0, computedGap);
+
         const newTargets = el.querySelectorAll('.blast-cascade-new');
         if (newTargets.length > 0) {
           anime({
@@ -105,7 +135,7 @@ export function BlastCascadeOverlay({
             translateY: [
               function (el: Element) {
                 const offset = Number((el as HTMLElement).dataset.spawnOffset || 1);
-                return -offset * cellSize;
+                return -offset * rowStep;
               },
               0,
             ],
@@ -118,27 +148,32 @@ export function BlastCascadeOverlay({
         }
       }
     });
-  }, [phase, data, cellSize]);
+  }, [phase, data, cellHeight, gridSize]);
 
   if (!data || phase === 'idle') return null;
 
-  const inset = 3;
-
   return (
-    <div ref={overlayRef} className="absolute inset-0 pointer-events-none z-20">
+    <div
+      ref={overlayRef}
+      dir="ltr"
+      className={`absolute inset-0 pointer-events-none z-20 grid ${GRID_GAP_CLASS}`}
+      style={{
+        padding: GRID_PADDING,
+        gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
+      }}
+    >
       {/* Clearing phase: render ghost tiles at cleared positions that animate away */}
       {phase === 'clearing' && data.clearedTiles.map(tile => {
         const colorConfig = CLEARING_COLORS[tile.type];
         return (
           <div
             key={`clear-${tile.row}-${tile.col}`}
-            className={`blast-cascade-clear absolute flex items-center justify-center rounded-lg font-black ${colorConfig ? 'text-white' : 'text-neo-black letter-tile-gradient'}`}
+            data-cascade-cell
+            className={`blast-cascade-clear flex items-center justify-center rounded-lg font-black ${colorConfig ? 'text-white' : 'text-neo-black letter-tile-gradient'}`}
             style={{
-              left: tile.col * cellSize + inset,
-              top: tile.row * cellSize + inset,
-              width: cellSize - inset * 2,
-              height: cellSize - inset * 2,
-              fontSize: cellSize * 0.45,
+              gridRow: tile.row + 1,
+              gridColumn: tile.col + 1,
               willChange: 'transform, opacity',
               ...(colorConfig ? { background: colorConfig.background, border: colorConfig.border } : { border: '2px solid rgba(0,0,0,0.3)' }),
             }}
@@ -152,14 +187,12 @@ export function BlastCascadeOverlay({
       {phase === 'falling' && data.fallingTiles.map(tile => (
         <div
           key={`fall-${tile.row}-${tile.col}`}
-          className="blast-cascade-fall absolute flex items-center justify-center rounded-lg font-black text-neo-black letter-tile-gradient"
+          data-cascade-cell
+          className="blast-cascade-fall flex items-center justify-center rounded-lg font-black text-neo-black letter-tile-gradient"
           data-fall-distance={tile.fallDistance}
           style={{
-            left: tile.col * cellSize + inset,
-            top: tile.row * cellSize + inset,
-            width: cellSize - inset * 2,
-            height: cellSize - inset * 2,
-            fontSize: cellSize * 0.45,
+            gridRow: tile.row + 1,
+            gridColumn: tile.col + 1,
             border: '2px solid rgba(0,0,0,0.3)',
             willChange: 'transform',
           }}
@@ -172,14 +205,12 @@ export function BlastCascadeOverlay({
       {phase === 'appearing' && data.newTiles.map(tile => (
         <div
           key={`new-${tile.row}-${tile.col}`}
-          className="blast-cascade-new absolute flex items-center justify-center rounded-lg font-black text-neo-black letter-tile-gradient opacity-0"
+          data-cascade-cell
+          className="blast-cascade-new flex items-center justify-center rounded-lg font-black text-neo-black letter-tile-gradient opacity-0"
           data-spawn-offset={tile.spawnOffset}
           style={{
-            left: tile.col * cellSize + inset,
-            top: tile.row * cellSize + inset,
-            width: cellSize - inset * 2,
-            height: cellSize - inset * 2,
-            fontSize: cellSize * 0.45,
+            gridRow: tile.row + 1,
+            gridColumn: tile.col + 1,
             border: '2px solid rgba(0,0,0,0.3)',
             willChange: 'transform, opacity',
           }}

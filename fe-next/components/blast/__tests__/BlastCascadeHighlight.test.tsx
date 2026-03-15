@@ -19,7 +19,6 @@ import { BlastCascadeHighlight } from '../BlastCascadeHighlight';
 describe('BlastCascadeHighlight', () => {
   const defaultProps = {
     gridSize: 6,
-    cellSize: 60,
   };
 
   it('renders nothing when highlightData is null', () => {
@@ -88,7 +87,7 @@ describe('BlastCascadeHighlight', () => {
     expect(glowCells).toHaveLength(8);
   });
 
-  it('positions glow cells at correct pixel coordinates', () => {
+  it('positions glow cells using CSS Grid (gridRow/gridColumn)', () => {
     const highlightData: CascadeHighlightData = {
       words: [{
         word: 'ab',
@@ -106,13 +105,12 @@ describe('BlastCascadeHighlight', () => {
     );
 
     const firstCell = screen.getByTestId('cascade-glow-2-3');
-    // col=3, cellSize=60, inset=2 → left = 3*60 + 2 = 182
-    // row=2, cellSize=60, inset=2 → top = 2*60 + 2 = 122
-    expect(firstCell.style.left).toContain('182');
-    expect(firstCell.style.top).toContain('122');
+    // CSS Grid: row+1, col+1
+    expect(firstCell.style.gridRow).toBe('3');
+    expect(firstCell.style.gridColumn).toBe('4');
   });
 
-  it('renders connecting line through word tiles', () => {
+  it('renders overlay container with CSS Grid layout', () => {
     const highlightData: CascadeHighlightData = {
       words: [{
         word: 'test',
@@ -131,7 +129,7 @@ describe('BlastCascadeHighlight', () => {
       <BlastCascadeHighlight {...defaultProps} highlightData={highlightData} />
     );
 
-    const connectors = screen.getAllByTestId(/^cascade-connector-/);
-    expect(connectors.length).toBeGreaterThan(0);
+    const overlay = screen.getByTestId('cascade-highlight-overlay');
+    expect(overlay.style.gridTemplateColumns).toContain('repeat(6');
   });
 });

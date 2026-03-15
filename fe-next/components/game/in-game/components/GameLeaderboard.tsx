@@ -4,6 +4,7 @@ import React, { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Trophy, Crown, Type } from 'lucide-react';
 import Avatar from '@/components/Avatar';
+import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import PresenceIndicator from '@/components/PresenceIndicator';
 import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer } from '@/shared/types/view';
@@ -72,9 +73,21 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
               className="w-4 h-4 text-neo-lime flex-shrink-0 drop-shadow-[1px_1px_0px_rgb(var(--neo-black))]"
             />
           )}
-          <span className="truncate" title={player.username}>
-            {player.username}
-          </span>
+          <PlayerProfileTooltip
+            player={{
+              username: player.username,
+              profilePictureUrl: player.avatar?.profilePictureUrl,
+              avatarImage: player.avatar?.avatarImage,
+              customAvatar: player.avatar?.customAvatar,
+              score: player.score,
+            }}
+            isCurrentUser={player.isMe}
+            side="left"
+          >
+            <span className={`truncate ${!player.isMe ? 'cursor-pointer hover:underline' : ''}`} title={player.username}>
+              {player.username}
+            </span>
+          </PlayerProfileTooltip>
           {player.isMe && (
             <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
               {t('playerView.me')}

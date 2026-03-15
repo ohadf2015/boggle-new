@@ -117,7 +117,7 @@ const mockCompletions = [
 
 describe('LevelGrid Scroll Behavior', () => {
   describe('Scrollability', () => {
-    it('should have overflow-y-auto on the container to enable scrolling', () => {
+    it('should have overflow-y-auto on the scrollable content layer', () => {
       // GIVEN / WHEN
       render(
         <LevelGrid
@@ -128,13 +128,13 @@ describe('LevelGrid Scroll Behavior', () => {
         />
       );
 
-      // THEN - find the scrollable container
+      // THEN - the scroll container is a child of level-grid (not level-grid itself)
+      // This separation prevents fixed-inside-overflow bugs on mobile
       const levelGrid = screen.getByTestId('level-grid');
+      const scrollLayer = levelGrid.querySelector('.overflow-y-auto');
 
-      // The level-grid should have overflow-y-auto for scrolling
-      // It should NOT have overflow-hidden which prevents scrolling
-      expect(levelGrid.className).toMatch(/overflow-y-auto|overflow-auto/);
-      expect(levelGrid.className).not.toMatch(/overflow-hidden/);
+      expect(scrollLayer).toBeInTheDocument();
+      expect(scrollLayer?.className).not.toMatch(/overflow-hidden/);
     });
 
     it('should have proper height constraint to enable scroll', () => {
@@ -206,9 +206,9 @@ describe('LevelGrid Scroll Behavior', () => {
       expect(uniqueDepths.size).toBeGreaterThanOrEqual(2);
     });
 
-    it('should have parallax layers contained within the scroll container', () => {
+    it('should have parallax layers in an absolute container separate from scroll layer', () => {
       // GIVEN / WHEN
-      const { container } = render(
+      render(
         <LevelGrid
           world={mockWorld}
           completions={mockCompletions}
@@ -220,15 +220,16 @@ describe('LevelGrid Scroll Behavior', () => {
       // THEN
       const levelGrid = screen.getByTestId('level-grid');
 
-      // Parallax layers should be inside a fixed container with overflow-hidden
-      // This keeps parallax stationary while content scrolls
-      const parallaxContainer = levelGrid.querySelector('.fixed');
-      expect(parallaxContainer).toBeInTheDocument();
-      expect(parallaxContainer?.className).toContain('overflow-hidden');
+      // Background uses absolute (not fixed) to avoid fixed-inside-overflow bugs
+      // The background and scroll layer are siblings, not nested
+      const bgContainer = levelGrid.querySelector(':scope > .absolute');
+      expect(bgContainer).toBeInTheDocument();
+      expect(bgContainer?.className).toContain('overflow-hidden');
+      expect(bgContainer?.className).toContain('pointer-events-none');
 
-      // Parallax layers inside the fixed container use absolute positioning
-      const absoluteLayers = parallaxContainer?.querySelectorAll('.absolute');
-      expect(absoluteLayers?.length).toBeGreaterThanOrEqual(3); // background, glow, particles
+      // Parallax layers inside the background container
+      const absoluteLayers = bgContainer?.querySelectorAll('.absolute');
+      expect(absoluteLayers?.length).toBeGreaterThanOrEqual(3);
     });
   });
 
@@ -246,7 +247,7 @@ describe('LevelGrid Scroll Behavior', () => {
 
       // THEN - 7 levels per world (LEVELS_PER_WORLD constant)
       for (let i = 1; i <= 7; i++) {
-        expect(screen.getByTestId(`level-button-${i}`)).toBeInTheDocument();
+        expect(screen.getByTestId(`level-card-${i}`)).toBeInTheDocument();
       }
     });
 
@@ -261,16 +262,12 @@ describe('LevelGrid Scroll Behavior', () => {
         />
       );
 
-      // THEN - should have scrollbar-related classes for smooth scrolling
+      // THEN - scrollbar styling is on the scroll layer child
       const levelGrid = screen.getByTestId('level-grid');
+      const scrollLayer = levelGrid.querySelector('.overflow-y-auto');
 
-      // Check for scrollbar styling classes
-      const hasScrollbarStyling = levelGrid.className.includes('scrollbar');
-
-      // If no scrollbar classes, at least overflow should be set
-      if (!hasScrollbarStyling) {
-        expect(levelGrid.className).toMatch(/overflow/);
-      }
+      expect(scrollLayer).toBeInTheDocument();
+      expect(scrollLayer?.className).toContain('scrollbar');
     });
   });
 });

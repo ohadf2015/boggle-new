@@ -35,7 +35,7 @@ function getGridEmbedder() {
   return _embedMultipleWordsInGrid!;
 }
 
-let _findWordsForBots: ((grid: string[][], language: string) => { allWords: string[] }) | null = null;
+let _findWordsForBots: ((grid: string[][], language: string) => { easy: string[]; medium: string[]; hard: string[] }) | null = null;
 function getSolver() {
   if (!_findWordsForBots) {
     _findWordsForBots = require('../modules/boggleSolver').findWordsForBots;
@@ -124,7 +124,7 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
         );
 
     const result = findWordsForBots(grid, language);
-    const totalFindableWords = result.allWords.length;
+    const totalFindableWords = result.easy.length + result.medium.length + result.hard.length;
     const difficulty = computeDifficulty(totalFindableWords);
 
     res.json({

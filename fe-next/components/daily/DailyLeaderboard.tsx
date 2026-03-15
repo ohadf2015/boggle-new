@@ -9,6 +9,7 @@ import { getRankDisplay, getRankRowClasses, getRankBadgeClasses } from '@/utils/
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
+import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import type { Language } from '@/types';
 
 // ==========================================
@@ -117,9 +118,21 @@ const ParticipantRow = memo<{
       {/* Name & Score */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
-            {participant.display_name || 'Player'}
-          </span>
+          <PlayerProfileTooltip
+            player={{
+              username: participant.display_name || 'Player',
+              profilePictureUrl: participant.profile_picture_url,
+              avatarImage: participant.avatar_image ?? undefined,
+              customAvatar: participant.custom_avatar,
+              countryCode: participant.country_code,
+            }}
+            isCurrentUser={isCurrentUser}
+            side="bottom"
+          >
+            <span className={`font-bold truncate text-sm sm:text-base cursor-pointer ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white hover:text-neo-cyan dark:hover:text-neo-cyan'}`}>
+              {participant.display_name || 'Player'}
+            </span>
+          </PlayerProfileTooltip>
           {isCurrentUser && (
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
               YOU

@@ -44,7 +44,7 @@ describe('BlastHotTileOverlay', () => {
 
   it('should render a golden overlay for each hot tile', () => {
     const hotTiles = makeHotTiles(2);
-    render(<BlastHotTileOverlay hotTiles={hotTiles} cellSize={48} />);
+    render(<BlastHotTileOverlay hotTiles={hotTiles} gridSize={5} />);
 
     const overlays = screen.getAllByTestId('hot-tile-overlay');
     expect(overlays).toHaveLength(2);
@@ -52,14 +52,14 @@ describe('BlastHotTileOverlay', () => {
 
   it('should render "3x" badge for each hot tile', () => {
     const hotTiles = makeHotTiles(1);
-    render(<BlastHotTileOverlay hotTiles={hotTiles} cellSize={48} />);
+    render(<BlastHotTileOverlay hotTiles={hotTiles} gridSize={5} />);
 
     expect(screen.getByTestId('hot-tile-badge')).toHaveTextContent('3x');
   });
 
   it('should render nothing when no hot tiles', () => {
     const { container } = render(
-      <BlastHotTileOverlay hotTiles={[]} cellSize={48} />,
+      <BlastHotTileOverlay hotTiles={[]} gridSize={5} />,
     );
 
     expect(screen.queryAllByTestId('hot-tile-overlay')).toHaveLength(0);

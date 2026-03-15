@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Zap, TrendingUp, Flame, Gem, Snowflake, Bomb, Keyboard, MousePointer, Hand } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
+import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
 
 export interface CompactPlayer {
   username: string;
@@ -405,12 +406,24 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                        <Hand className="w-2.5 h-2.5" />}
                     </span>
                   )}
-                  <span className={cn(
-                    'text-[10px] font-bold truncate max-w-[60px]',
-                    isMe ? 'text-neo-black' : 'text-neo-black/60'
-                  )}>
-                    {isMe ? (t('leaderboard.you')) : player.username}
-                  </span>
+                  <PlayerProfileTooltip
+                    player={{
+                      username: player.username,
+                      profilePictureUrl: player.profilePictureUrl,
+                      avatarImage: player.avatarImage,
+                      customAvatar: player.customAvatar,
+                      score: player.score,
+                    }}
+                    isCurrentUser={isMe}
+                    side="bottom"
+                  >
+                    <span className={cn(
+                      'text-[10px] font-bold truncate max-w-[60px]',
+                      isMe ? 'text-neo-black' : 'text-neo-black/60 cursor-pointer hover:text-neo-black hover:underline'
+                    )}>
+                      {isMe ? (t('leaderboard.you')) : player.username}
+                    </span>
+                  </PlayerProfileTooltip>
                 </div>
               </div>
             );

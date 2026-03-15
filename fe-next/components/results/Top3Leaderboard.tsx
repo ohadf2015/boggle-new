@@ -6,6 +6,7 @@ import { Bot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
+import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
 import type { Player } from './types';
 import { fireConfetti, RANK_COLORS } from '@/utils/confettiUtils';
 import { RANK_CONFIG, getRankConfig } from '@/utils/rankingStyles';
@@ -233,13 +234,25 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 </div>
 
                 {/* Name */}
-                <p className={cn(
-                  'font-bold text-center truncate text-neo-black dark:text-white',
-                  compact ? 'text-[10px]' : 'text-xs'
-                )}>
-                  {participant.name}
-                  {isCurrentPlayer && <span className="text-neo-cyan"> ★</span>}
-                </p>
+                <PlayerProfileTooltip
+                  player={{
+                    username: participant.name,
+                    profilePictureUrl: participant.avatar?.profilePictureUrl,
+                    avatarImage: participant.avatar?.avatarImage,
+                    score: participant.score,
+                  }}
+                  isCurrentUser={isCurrentPlayer}
+                  side="bottom"
+                >
+                  <p className={cn(
+                    'font-bold text-center truncate text-neo-black dark:text-white',
+                    compact ? 'text-[10px]' : 'text-xs',
+                    !isCurrentPlayer && 'cursor-pointer hover:text-neo-cyan'
+                  )}>
+                    {participant.name}
+                    {isCurrentPlayer && <span className="text-neo-cyan"> ★</span>}
+                  </p>
+                </PlayerProfileTooltip>
 
                 {/* Score */}
                 <div className={cn(

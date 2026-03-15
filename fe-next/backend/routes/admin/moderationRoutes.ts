@@ -51,7 +51,7 @@ export async function fetchModerationQueue(supabase: SupabaseClient, limit: numb
   // Fetch pending items from invalid_word_submissions as primary queue
   const result = await (supabase.from('invalid_word_submissions') as Record<string, Function>)
     .select('*', { count: 'exact' })
-    .in('status', ['pending', 'flagged'])
+    .is('approved_at', null)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 

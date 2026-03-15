@@ -2,10 +2,11 @@
 
 import { HOT_TILE_DURATION_MS, type HotTile } from './hooks/useBlastHotTiles';
 import { useEffect, useRef, useState } from 'react';
+import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 
 interface BlastHotTileOverlayProps {
   hotTiles: HotTile[];
-  cellSize: number;
+  gridSize: number;
   /** Current timestamp for expiry calculations. Pass from parent to keep render pure. */
   now?: number;
   onExpired?: (row: number, col: number) => void;
@@ -22,7 +23,7 @@ const EXPIRING_THRESHOLD_MS = 2000;
  */
 export function BlastHotTileOverlay({
   hotTiles,
-  cellSize,
+  gridSize,
   now = 0,
   onExpired,
 }: BlastHotTileOverlayProps) {
@@ -105,8 +106,14 @@ export function BlastHotTileOverlay({
         }
       `}</style>
       <div
-        className="absolute inset-0 pointer-events-none z-[12]"
+        dir="ltr"
+        className={`absolute inset-0 pointer-events-none z-[12] grid ${GRID_GAP_CLASS}`}
         data-testid="blast-hot-tile-container"
+        style={{
+          padding: GRID_PADDING,
+          gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+          gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
+        }}
       >
         {hotTiles.map(tile => {
           const key = `hot-${tile.row}-${tile.col}`;
@@ -117,12 +124,10 @@ export function BlastHotTileOverlay({
             <div
               key={key}
               data-testid="hot-tile-overlay"
-              className="absolute rounded-lg hot-tile-active"
+              className="rounded-lg hot-tile-active"
               style={{
-                top: tile.row * cellSize,
-                left: tile.col * cellSize,
-                width: cellSize,
-                height: cellSize,
+                gridRow: tile.row + 1,
+                gridColumn: tile.col + 1,
                 border: `2px solid ${GOLD}`,
                 boxShadow: `0 0 12px ${GOLD}80, inset 0 0 8px ${GOLD}40${isExpiring ? `, 0 0 6px rgba(255,0,0,0.4)` : ''}`,
                 background: isExpiring
@@ -144,12 +149,10 @@ export function BlastHotTileOverlay({
         {Array.from(exitingTiles.entries()).map(([key, tile]) => (
           <div
             key={`exit-${key}`}
-            className="absolute rounded-lg hot-tile-exiting"
+            className="rounded-lg hot-tile-exiting"
             style={{
-              top: tile.row * cellSize,
-              left: tile.col * cellSize,
-              width: cellSize,
-              height: cellSize,
+              gridRow: tile.row + 1,
+              gridColumn: tile.col + 1,
               border: `2px solid ${GOLD}`,
               boxShadow: `0 0 12px ${GOLD}80, inset 0 0 8px ${GOLD}40`,
               background: 'rgba(255, 215, 0, 0.1)',

@@ -33,10 +33,9 @@ jest.mock('../../../utils/dailyChallenge/gridPathFinding', () => ({
 
 jest.mock('../../modules/boggleSolver', () => ({
   findWordsForBots: jest.fn(() => ({
-    allWords: ['cat', 'dog', 'run', 'play', 'cats', 'dogs', 'runs', 'plays', 'plat', 'clan', 'gory', 'dory', 'alto', 'oral', 'trod', 'star'],
-    easy: ['cat', 'dog'],
-    medium: ['cats', 'dogs'],
-    hard: ['plat', 'clan'],
+    easy: ['cat', 'dog', 'run', 'play', 'cats', 'dogs', 'runs', 'plays'],
+    medium: ['plat', 'clan', 'gory', 'dory'],
+    hard: ['alto', 'oral', 'trod', 'star'],
   })),
 }));
 
@@ -177,8 +176,9 @@ describe('POST /api/ugc/boards/generate', () => {
   it('computes EASY difficulty when word count >= 30', async () => {
     const { findWordsForBots } = require('../../modules/boggleSolver');
     (findWordsForBots as jest.Mock).mockReturnValueOnce({
-      allWords: Array(35).fill('word'),
-      easy: [], medium: [], hard: [],
+      easy: Array(15).fill('word'),
+      medium: Array(10).fill('word'),
+      hard: Array(10).fill('word'),
     });
 
     const res = await request(app)
@@ -192,8 +192,9 @@ describe('POST /api/ugc/boards/generate', () => {
   it('computes HARD difficulty when word count < 15', async () => {
     const { findWordsForBots } = require('../../modules/boggleSolver');
     (findWordsForBots as jest.Mock).mockReturnValueOnce({
-      allWords: Array(10).fill('word'),
-      easy: [], medium: [], hard: [],
+      easy: Array(5).fill('word'),
+      medium: Array(3).fill('word'),
+      hard: Array(2).fill('word'),
     });
 
     const res = await request(app)

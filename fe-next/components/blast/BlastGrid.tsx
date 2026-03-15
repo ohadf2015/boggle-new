@@ -10,6 +10,7 @@ import { BlastCascadeHighlight } from './BlastCascadeHighlight';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastExplosion, BlastScorePopup, CascadeHighlightData } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
+import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 
 interface BlastGridProps {
   /** Modified grid (cleared cells are empty strings) */
@@ -149,39 +150,46 @@ export function BlastGrid({
       />
 
       {/* Near-miss shimmer: pulse overlay on cells the player almost used */}
-      {containerWidth > 0 && shimmerCells.length > 0 && shimmerCells.map(cell => (
+      {shimmerCells.length > 0 && (
         <div
-          key={`shimmer-${cell.row}-${cell.col}`}
-          className="absolute pointer-events-none near-miss-pulse"
+          dir="ltr"
+          className={`absolute inset-0 pointer-events-none z-[13] grid ${GRID_GAP_CLASS}`}
           style={{
-            left: cell.col * cellSize,
-            top: cell.row * cellSize,
-            width: cellSize,
-            height: cellSize,
-            borderRadius: 4,
-            border: '2px solid rgba(255, 225, 53, 0.85)',
-            boxShadow: '0 0 8px rgba(255, 225, 53, 0.6), inset 0 0 8px rgba(255, 225, 53, 0.2)',
-            animation: 'nearMissPulse 1.5s ease-out forwards',
+            padding: GRID_PADDING,
+            gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
           }}
-        />
-      ))}
+        >
+          {shimmerCells.map(cell => (
+            <div
+              key={`shimmer-${cell.row}-${cell.col}`}
+              className="near-miss-pulse rounded"
+              style={{
+                gridRow: cell.row + 1,
+                gridColumn: cell.col + 1,
+                border: '2px solid rgba(255, 225, 53, 0.85)',
+                boxShadow: '0 0 8px rgba(255, 225, 53, 0.6), inset 0 0 8px rgba(255, 225, 53, 0.2)',
+                animation: 'nearMissPulse 1.5s ease-out forwards',
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Cascade word highlight glow (z-15, between tile overlay and cascade overlay) */}
-      {containerWidth > 0 && cascadeHighlightData && (
+      {cascadeHighlightData && (
         <BlastCascadeHighlight
           highlightData={cascadeHighlightData}
           gridSize={gridSize}
-          cellSize={cellSize}
         />
       )}
 
       {/* Cascade gravity/refill animations */}
-      {containerWidth > 0 && cascadePhase !== 'idle' && (
+      {cascadePhase !== 'idle' && (
         <BlastCascadeOverlay
           phase={cascadePhase}
           data={cascadeAnimationData}
           gridSize={gridSize}
-          containerWidth={containerWidth}
         />
       )}
 

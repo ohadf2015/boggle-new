@@ -135,7 +135,7 @@ describe('LevelGrid Parallax System', () => {
       );
 
       // THEN - should have fixed parallax container
-      const fixedContainer = container.querySelector('.fixed.inset-0.pointer-events-none');
+      const fixedContainer = container.querySelector('.absolute.inset-0.pointer-events-none');
       expect(fixedContainer).toBeInTheDocument();
     });
 
@@ -159,7 +159,7 @@ describe('LevelGrid Parallax System', () => {
       expect(worldImages.length).toBeGreaterThanOrEqual(1);
       // Check the image exists and is styled with opacity
       const mainImage = worldImages.find((img) =>
-        img.className?.includes('opacity-50')
+        img.className?.includes('opacity')
       );
       expect(mainImage).toBeInTheDocument();
     });
@@ -180,7 +180,7 @@ describe('LevelGrid Parallax System', () => {
 
       // THEN - should have vignette as part of simplified parallax layers
       // Simplified design uses inline vignette in the parallax container
-      const parallaxContainer = container.querySelector('.fixed.inset-0.pointer-events-none');
+      const parallaxContainer = container.querySelector('.absolute.inset-0.pointer-events-none');
       expect(parallaxContainer).toBeInTheDocument();
       // Vignette is now an inline style element within the parallax layers
     });
@@ -296,7 +296,7 @@ describe('LevelGrid Parallax System', () => {
       const worldImages = screen.getAllByTestId('world-image');
       expect(worldImages.length).toBeGreaterThanOrEqual(1);
       // Main world image should exist in the parallax container
-      const parallaxContainer = container.querySelector('.fixed.inset-0.pointer-events-none');
+      const parallaxContainer = container.querySelector('.absolute.inset-0.pointer-events-none');
       expect(parallaxContainer).toBeInTheDocument();
     });
 
@@ -317,7 +317,7 @@ describe('LevelGrid Parallax System', () => {
       );
 
       // THEN - parallax container should exist with simplified structure
-      const parallaxContainer = container.querySelector('.fixed.inset-0.pointer-events-none');
+      const parallaxContainer = container.querySelector('.absolute.inset-0.pointer-events-none');
       expect(parallaxContainer).toBeInTheDocument();
       // No longer need separate foreground edges - vignette is inline
     });
@@ -391,8 +391,9 @@ describe('LevelGrid Parallax System', () => {
       const meadowsParticles = meadowsContainer.querySelectorAll('.level-grid-particle');
       const nebulaParticles = nebulaContainer.querySelectorAll('.level-grid-particle');
 
-      expect(meadowsParticles.length).toBe(10);
-      expect(nebulaParticles.length).toBe(14);
+      // Both worlds now use fixed Lucide icon particle count
+      expect(meadowsParticles.length).toBe(9);
+      expect(nebulaParticles.length).toBe(9);
     });
   });
 

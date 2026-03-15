@@ -5,6 +5,7 @@ import { Trophy, ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Avatar from '@/components/Avatar';
+import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 
 const RANK_BG = ['bg-yellow-400', 'bg-gray-300', 'bg-amber-600'];
@@ -100,9 +101,20 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
                 customAvatar={player.avatarConfig as any}
                 size="sm"
               />
-              <span className="font-bold text-neo-white text-xs truncate max-w-[60px] sm:max-w-[80px]">
-                {player.displayName || player.username}
-              </span>
+              <PlayerProfileTooltip
+                player={{
+                  username: player.username,
+                  displayName: player.displayName ?? undefined,
+                  profilePictureUrl: player.profilePictureUrl,
+                  avatarImage: player.avatarImage ?? undefined,
+                  customAvatar: player.avatarConfig,
+                }}
+                side="bottom"
+              >
+                <span className="font-bold text-neo-white text-xs truncate max-w-[60px] sm:max-w-[80px] cursor-pointer hover:text-neo-cyan transition-colors">
+                  {player.displayName || player.username}
+                </span>
+              </PlayerProfileTooltip>
               <span className="font-black text-neo-lime text-xs">
                 {player.totalScore.toLocaleString()}
               </span>
@@ -150,9 +162,20 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               customAvatar={player.avatarConfig as any}
               size="sm"
             />
-            <span className="flex-1 font-bold text-neo-white text-sm truncate">
-              {player.displayName || player.username}
-            </span>
+            <PlayerProfileTooltip
+              player={{
+                username: player.username,
+                displayName: player.displayName ?? undefined,
+                profilePictureUrl: player.profilePictureUrl,
+                avatarImage: player.avatarImage ?? undefined,
+                customAvatar: player.avatarConfig,
+              }}
+              side="right"
+            >
+              <span className="flex-1 font-bold text-neo-white text-sm truncate cursor-pointer hover:text-neo-cyan transition-colors">
+                {player.displayName || player.username}
+              </span>
+            </PlayerProfileTooltip>
             <span className="font-black text-neo-lime text-sm">
               {player.totalScore.toLocaleString()}
             </span>

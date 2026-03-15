@@ -15,15 +15,17 @@ import { getDeadzoneThreshold } from '@/utils/consts';
 
 /**
  * Selection threshold - must be within this % of cell radius to select.
- * 0.65 = 65% of cell radius from center (more focused, deliberate selection).
+ * 0.85 = 85% of cell radius from center (matches classic mode for forgiving selection).
+ * Previously 0.65 which was too strict and caused missed tiles during fast swipes.
  */
-export const CELL_SELECTION_THRESHOLD = 0.65;
+export const CELL_SELECTION_THRESHOLD = 0.85;
 
 /**
  * Diagonal selection threshold - slightly more lenient for diagonal movement.
- * Diagonals are harder to hit precisely, so we allow 75% of cell radius.
+ * 0.95 = 95% of cell radius (matches classic mode).
+ * Previously 0.75 which made diagonal drags frustratingly imprecise.
  */
-export const DIAGONAL_SELECTION_THRESHOLD = 0.75;
+export const DIAGONAL_SELECTION_THRESHOLD = 0.95;
 
 /**
  * Deadzone threshold - delegates to adaptive getDeadzoneThreshold()

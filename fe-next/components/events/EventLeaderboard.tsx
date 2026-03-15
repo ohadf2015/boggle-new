@@ -5,6 +5,7 @@ import { Trophy, Medal, Award } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
+import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 
 interface LeaderboardParticipant {
   id: string;
@@ -108,17 +109,26 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
 
                   {/* Name */}
                   <div className="flex-1 min-w-0">
-                    <span className={cn(
-                      'text-sm font-medium truncate block',
-                      isCurrentUser ? 'text-neo-yellow font-bold' : 'text-white'
-                    )}>
-                      {p.username}
-                      {isCurrentUser && (
-                        <span className="ms-1 text-xs text-neo-yellow/70">
-                          ({t('events.you')})
-                        </span>
-                      )}
-                    </span>
+                    <PlayerProfileTooltip
+                      player={{
+                        username: p.username,
+                        score: p.score,
+                      }}
+                      isCurrentUser={isCurrentUser}
+                      side="right"
+                    >
+                      <span className={cn(
+                        'text-sm font-medium truncate block',
+                        isCurrentUser ? 'text-neo-yellow font-bold' : 'text-white cursor-pointer hover:underline'
+                      )}>
+                        {p.username}
+                        {isCurrentUser && (
+                          <span className="ms-1 text-xs text-neo-yellow/70">
+                            ({t('events.you')})
+                          </span>
+                        )}
+                      </span>
+                    </PlayerProfileTooltip>
                   </div>
 
                   {/* Score */}

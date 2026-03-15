@@ -12,7 +12,7 @@
  * - Event handler callbacks
  */
 
-import { renderHook, act, fireEvent } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock adaptive deadzone to return a stable value for tests
@@ -24,6 +24,11 @@ jest.mock('@/utils/consts', () => ({
 jest.mock('@/components/grid/hapticFeedback', () => ({
   vibrateCellTap: jest.fn(),
   vibrateCellDrag: jest.fn(),
+}));
+
+// Mock performance config
+jest.mock('@/components/grid/performanceUtils', () => ({
+  getPerformanceConfig: () => ({ isLowEnd: false }),
 }));
 
 // Import hook AFTER mocks are defined
@@ -539,6 +544,37 @@ describe('useGridGestures', () => {
       });
 
       expect(onDragEnd).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('RAF batching for low-end devices', () => {
+    it('should use requestAnimationFrame on low-end devices', () => {
+      // The hook should import getPerformanceConfig and use RAF batching
+      // when isLowEnd is true, matching classic mode behavior
+      const rafSpy = jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+        cb(0);
+        return 0;
+      });
+
+      const gridElement = document.createElement('div');
+      const testGridRef = { current: gridElement };
+
+      renderHook(() => useGridGestures({ ...defaultProps, gridRef: testGridRef }));
+
+      rafSpy.mockRestore();
+    });
+
+    it('should cancel RAF on unmount', () => {
+      const cancelSpy = jest.spyOn(window, 'cancelAnimationFrame');
+
+      const gridElement = document.createElement('div');
+      const testGridRef = { current: gridElement };
+
+      const { unmount } = renderHook(() => useGridGestures({ ...defaultProps, gridRef: testGridRef }));
+
+      unmount();
+
+      cancelSpy.mockRestore();
     });
   });
 

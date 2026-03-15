@@ -150,7 +150,6 @@ describe('BlastExplosionLayer', () => {
 describe('BlastCascadeOverlay', () => {
   const baseProps = {
     gridSize: 4,
-    containerWidth: 240,
   };
 
   const sampleData: CascadeAnimationData = {

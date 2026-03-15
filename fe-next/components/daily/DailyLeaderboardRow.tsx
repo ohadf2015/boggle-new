@@ -6,6 +6,7 @@ import { Clock, Sparkles, Crown } from 'lucide-react';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
+import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import { getRankColors, getRankBadgeColors } from './leaderboardUtils';
 import type { DailyParticipant, AllTimeParticipant } from './TabbedDailyLeaderboard';
 
@@ -71,9 +72,21 @@ export const TodayParticipantRow = memo<{
       {/* Name & Stats */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
-            {participant.display_name || 'Player'}
-          </span>
+          <PlayerProfileTooltip
+            player={{
+              username: participant.display_name || 'Player',
+              profilePictureUrl: participant.profile_picture_url,
+              avatarImage: participant.avatar_image ?? undefined,
+              customAvatar: participant.custom_avatar,
+              countryCode: participant.country_code,
+            }}
+            isCurrentUser={isCurrentUser}
+            side="bottom"
+          >
+            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white cursor-pointer hover:underline'}`}>
+              {participant.display_name || 'Player'}
+            </span>
+          </PlayerProfileTooltip>
           {isCurrentUser && (
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
               YOU
@@ -171,9 +184,25 @@ export const AllTimeParticipantRow = memo<{
       {/* Name & Stats */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
-            {participant.display_name || 'Player'}
-          </span>
+          <PlayerProfileTooltip
+            player={{
+              username: participant.display_name || 'Player',
+              profilePictureUrl: participant.profile_picture_url,
+              avatarImage: participant.avatar_image ?? undefined,
+              customAvatar: participant.custom_avatar,
+              countryCode: participant.country_code,
+              totalGames: participant.total_games,
+              winRate: participant.total_games > 0
+                ? Math.round((participant.games_won / participant.total_games) * 100)
+                : undefined,
+            }}
+            isCurrentUser={isCurrentUser}
+            side="bottom"
+          >
+            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white cursor-pointer hover:underline'}`}>
+              {participant.display_name || 'Player'}
+            </span>
+          </PlayerProfileTooltip>
           {isCurrentUser && (
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
               YOU

@@ -83,12 +83,12 @@ jest.mock('next/link', () => {
 // Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
 // We intercept this and return the jest-mocked AdventureGame synchronously
 jest.mock('next/dynamic', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+   
   const React = require('react');
   return (_importFn: unknown, _opts?: unknown) => {
     // Return a component that renders the mocked AdventureGame
     const Dynamic = (props: Record<string, unknown>) => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+       
       const AdventureGame = require('../AdventureGame');
       const Comp = AdventureGame.default || AdventureGame;
       return React.createElement(Comp, props);

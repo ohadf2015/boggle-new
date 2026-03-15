@@ -54,39 +54,43 @@ describe('adventureGridGeometry', () => {
       cellRadius,
     });
 
+    it('should match classic mode thresholds (0.85 straight, 0.95 diagonal)', () => {
+      expect(CELL_SELECTION_THRESHOLD).toBe(0.85);
+      expect(DIAGONAL_SELECTION_THRESHOLD).toBe(0.95);
+    });
+
     it('should give 10% velocity bonus when velocity > 0.3 (matching regular mode)', () => {
-      // cellRadius=50, threshold=0.65 => base=32.5, with 10% bonus=35.75
-      const cell = makeCellPosition(34);
-      // Without velocity: 34 > 32.5 => false
+      // cellRadius=50, threshold=0.85 => base=42.5, with 10% bonus=46.75
+      const cell = makeCellPosition(44);
+      // Without velocity: 44 > 42.5 => false
       expect(isWithinSelectionThreshold(cell, false, 0)).toBe(false);
-      // With high velocity: 34 <= 35.75 => true
+      // With high velocity: 44 <= 46.75 => true
       expect(isWithinSelectionThreshold(cell, false, 0.5)).toBe(true);
     });
 
     it('should NOT give velocity bonus when velocity <= 0.3', () => {
-      const cell = makeCellPosition(34);
-      // velocity 0.2 should not give bonus: 34 > 32.5 => false
+      const cell = makeCellPosition(44);
+      // velocity 0.2 should not give bonus: 44 > 42.5 => false
       expect(isWithinSelectionThreshold(cell, false, 0.2)).toBe(false);
     });
 
     it('should accept velocity parameter (not just swipeVelocity > 0.5)', () => {
-      const cell = makeCellPosition(34);
+      const cell = makeCellPosition(44);
       // velocity 0.31 should trigger the bonus (threshold is 0.3, not 0.5)
       expect(isWithinSelectionThreshold(cell, false, 0.31)).toBe(true);
     });
 
     it('should apply diagonal threshold with velocity bonus', () => {
-      // cellRadius=50, diagonal threshold=0.75 => base=37.5, with 10% bonus=41.25
-      const cell = makeCellPosition(39);
-      // Without velocity: 39 > 37.5 => false... wait 39 > 37.5 is true for distance
-      // Actually 39 > 37.5 means outside threshold => false
+      // cellRadius=50, diagonal threshold=0.95 => base=47.5, with 10% bonus=52.25
+      const cell = makeCellPosition(49);
+      // Without velocity: 49 > 47.5 => false
       expect(isWithinSelectionThreshold(cell, true, 0)).toBe(false);
-      // With velocity: 39 <= 41.25 => true
+      // With velocity: 49 <= 52.25 => true
       expect(isWithinSelectionThreshold(cell, true, 0.5)).toBe(true);
     });
 
     it('should still work with zero velocity', () => {
-      const cell = makeCellPosition(30); // within base threshold of 32.5
+      const cell = makeCellPosition(40); // within base threshold of 42.5
       expect(isWithinSelectionThreshold(cell, false, 0)).toBe(true);
     });
   });
