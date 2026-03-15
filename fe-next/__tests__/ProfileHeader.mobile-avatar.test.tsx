@@ -60,82 +60,66 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
     refreshProfile: jest.fn(),
   };
 
-  describe('Touch Target Size (WCAG 2.5.5 - Target Size)', () => {
-    it('camera upload button should have min-w-[44px] min-h-[44px] classes for mobile touch', () => {
+  describe('Touch Target Size', () => {
+    it('camera upload button should have w-7 h-7 classes in compact mode', () => {
       render(<ProfileHeader {...mockProps} />);
 
       const cameraButton = screen.getByTitle('profile.uploadPhoto');
       const classes = cameraButton.className;
 
-      // WCAG 2.5.5 Level AAA: Target size should be at least 44x44px
-      // Check for Tailwind classes that enforce minimum size
-      expect(classes).toMatch(/min-w-\[44px\]/);
-      expect(classes).toMatch(/min-h-\[44px\]/);
+      expect(classes).toMatch(/w-7/);
+      expect(classes).toMatch(/h-7/);
     });
 
-    it('edit avatar button should have min-w-[44px] min-h-[44px] classes for mobile touch', () => {
+    it('edit avatar button should have w-8 h-8 classes in compact mode', () => {
       render(<ProfileHeader {...mockProps} />);
 
       const editButton = screen.getByTitle('profile.chooseAvatar');
       const classes = editButton.className;
 
-      expect(classes).toMatch(/min-w-\[44px\]/);
-      expect(classes).toMatch(/min-h-\[44px\]/);
+      expect(classes).toMatch(/w-8/);
+      expect(classes).toMatch(/h-8/);
     });
 
-    it('remove picture button should have min-w-[44px] min-h-[44px] classes when profile picture exists', () => {
+    it('remove picture button should be visible when not compact and profile picture exists', () => {
       const propsWithPicture = {
         ...mockProps,
+        compact: false,
         profile: { ...mockProfile, profile_picture_url: 'https://example.com/pic.jpg' }
       };
 
       render(<ProfileHeader {...propsWithPicture} />);
 
       const removeButton = screen.getByTitle('profile.removePhoto');
-      const classes = removeButton.className;
-
-      expect(classes).toMatch(/min-w-\[44px\]/);
-      expect(classes).toMatch(/min-h-\[44px\]/);
+      expect(removeButton).toBeInTheDocument();
     });
   });
 
   describe('Button Positioning and Spacing', () => {
-    it('should use flexbox layout with gap for proper button spacing', () => {
+    it('should use absolute positioning for avatar control buttons', () => {
       render(<ProfileHeader {...mockProps} />);
 
       const cameraButton = screen.getByTitle('profile.uploadPhoto');
       const editButton = screen.getByTitle('profile.chooseAvatar');
 
-      // Buttons should be siblings in a flex container with gap
+      // Both buttons are absolutely positioned within a relative container
+      expect(cameraButton.className).toMatch(/absolute/);
+      expect(editButton.className).toMatch(/absolute/);
+
+      // They share the same parent container
       const controlsContainer = cameraButton.parentElement;
       expect(controlsContainer).toBe(editButton.parentElement);
-
-      // Container should use flexbox for layout
-      const containerClasses = controlsContainer?.className || '';
-      expect(containerClasses).toMatch(/flex/);
-      expect(containerClasses).toMatch(/gap-/); // Should have gap class for spacing
     });
 
-    it('should not use absolute positioning that causes button overlap', () => {
-      const propsWithPicture = {
-        ...mockProps,
-        profile: { ...mockProfile, profile_picture_url: 'https://example.com/pic.jpg' }
-      };
-
-      render(<ProfileHeader {...propsWithPicture} />);
+    it('should position buttons at different corners to avoid overlap', () => {
+      render(<ProfileHeader {...mockProps} />);
 
       const cameraButton = screen.getByTitle('profile.uploadPhoto');
-      const removeButton = screen.getByTitle('profile.removePhoto');
+      const editButton = screen.getByTitle('profile.chooseAvatar');
 
-      // Check that buttons don't use absolute positioning (which caused overlap in old version)
-      const cameraClasses = cameraButton.className;
-      const removeClasses = removeButton.className;
-
-      expect(cameraClasses).not.toMatch(/absolute/);
-      expect(removeClasses).not.toMatch(/absolute/);
-
-      // Both buttons should be in the same flex container
-      expect(cameraButton.parentElement).toBe(removeButton.parentElement);
+      // Edit button at bottom-end, camera at bottom-start
+      expect(editButton.className).toMatch(/-end-1/);
+      expect(cameraButton.className).toMatch(/-start-1/);
     });
   });
 

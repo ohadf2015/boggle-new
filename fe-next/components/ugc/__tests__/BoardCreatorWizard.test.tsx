@@ -26,7 +26,7 @@ jest.mock('framer-motion', () => {
   const motionCache: Record<string, React.FC> = {};
   function getMotionComponent(el: string) {
     if (!motionCache[el]) {
-      // eslint-disable-next-line react/display-name
+       
       const Comp = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
         const { initial, animate, exit, transition, whileInView, whileTap, whileHover, whileDrag, layout, ...rest } = props;
         return React.createElement(el, { ...rest, ref });
