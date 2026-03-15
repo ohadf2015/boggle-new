@@ -231,7 +231,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
               {canAfford ? t('adventure.upgrades.purchase') : (
                 <span className="flex items-center gap-1">
                   <Lock className="w-3 h-3" />
-                  {t('adventure.upgrades.needMore').replace('{amount}', ((nextCost ?? 0) - 0).toString())}
+                  {t('adventure.upgrades.needMore').replace('{{amount}}', String(nextCost ?? 0))}
                 </span>
               )}
             </motion.button>
