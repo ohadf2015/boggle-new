@@ -110,6 +110,9 @@ export function ResultsActionButtons({
             <Check className="w-5 h-5" />
             {t('results.ready')}
           </button>
+          <p className="text-center text-[10px] text-neo-cream/50">
+            {t('results.waitingForHost')}
+          </p>
           <button
             onClick={onExit}
             className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"

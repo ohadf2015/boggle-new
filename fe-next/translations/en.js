@@ -1553,6 +1553,7 @@ const en = {
     "readyForNextRound": "Ready?",
     "hostStartDescription": "Start anytime!",
     "readyExplanation": "Ready up to show you're in!",
+    "waitingForHost": "Waiting for host to start next round...",
     "scoringTip": "Scoring Tip",
     "scoringTipText": "Longer words = bigger points!",
     "sharedWordsExplanation": "Same word as someone else? Zero points. Be unique!",

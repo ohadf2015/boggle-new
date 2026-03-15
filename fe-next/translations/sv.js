@@ -1434,6 +1434,7 @@ const sv = {
     "readyForNextRound": "Redo för nästa runda?",
     "hostStartDescription": "Starta ett nytt spel när alla är redo!",
     "readyExplanation": "Tryck för att visa att du vill köra igen",
+    "waitingForHost": "Väntar på att värden startar nästa runda...",
     "scoringTip": "Poängtips",
     "scoringTipText": "Hitta ord snabbt i rad för kombobonus (⚡). Längre ord ger mycket mer poäng!",
     "sharedWordsExplanation": "Dessa ord hittades av andra spelare också, så de ger 0 poäng. Försök hitta unika ord!",

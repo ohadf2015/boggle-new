@@ -274,6 +274,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     // Initialize word hunt mode state if needed
+    // Also reuse the solve result for totalBoardWords to avoid double graph traversal
+    let wordHuntSolveReused = false;
     if (resolvedMode === 'word-hunt') {
       const trie = getCachedTrie(gameLang);
       const allValidWords = findAllWords(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
@@ -283,6 +285,10 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         const currentGame = getGame(gameCode);
         if (currentGame) {
           (currentGame as any).wordHuntState = huntState;
+          // Reuse solve result for totalBoardWords (avoids second findAllWords call)
+          const MIN_DISPLAY_WORD_LENGTH = 5;
+          currentGame.totalBoardWords = allValidWords.filter((w: string) => w.length >= MIN_DISPLAY_WORD_LENGTH).length;
+          wordHuntSolveReused = true;
         }
       } else {
         logger.error('WORD_HUNT', `No target word found for game ${gameCode} - falling back to classic mode`);
@@ -298,8 +304,15 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       buildStartGamePayload(gameCode, letterGrid, validTimer, gameLang, effectiveMinWordLength, messageId, game.gameSessionId, boardTheme, resolvedMode)
     );
 
-    // Calculate and emit total words on board
-    emitTotalBoardWords(io, gameCode, letterGrid, gameLang, effectiveMinWordLength);
+    // Calculate and emit total words on board (skip if word-hunt already computed it)
+    if (wordHuntSolveReused) {
+      const currentGame = getGame(gameCode);
+      broadcastToRoom(io, getGameRoom(gameCode), 'totalBoardWords', {
+        count: currentGame?.totalBoardWords || 0
+      });
+    } else {
+      emitTotalBoardWords(io, gameCode, letterGrid, gameLang, effectiveMinWordLength);
+    }
 
     // Schedule retries for players who don't acknowledge quickly
     gameStartCoordinator.scheduleRetries(gameCode, playerUsernames, (username: string) => {

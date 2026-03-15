@@ -1435,6 +1435,7 @@ const ja = {
     "readyForNextRound": "次のラウンドの準備はいい？",
     "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！",
     "readyExplanation": "タップしてホストに「もう一回やりたい！」を伝えよう",
+    "waitingForHost": "ホストが次のラウンドを始めるのを待っています...",
     "scoringTip": "スコアのコツ",
     "scoringTipText": "連続で単語を見つけてコンボボーナス(⚡)ゲット！長い単語はポイント爆上げだよ！",
     "sharedWordsExplanation": "これらは他のプレイヤーも見つけた単語だから0点。ユニークな単語を狙おう！",

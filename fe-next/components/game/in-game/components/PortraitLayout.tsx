@@ -556,7 +556,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Mobile: Split-view with compact leaderboard + words */}
           {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 flex-shrink-0 overflow-y-auto max-h-[120px] short:max-h-[80px]">
+            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 flex-shrink-0 overflow-y-auto max-h-[140px] short:max-h-[90px] scrollbar-thin">
               <CompactLeaderboard
                 players={leaderboard.map((p) => ({
                   username: p.username,

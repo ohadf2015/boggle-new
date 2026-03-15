@@ -1498,6 +1498,7 @@ const es = {
     "of": "de",
     "readyForNextRound": "¿Listos para la siguiente ronda?",
     "readyExplanation": "Marca listo para la siguiente ronda",
+    "waitingForHost": "Esperando a que el anfitrión inicie la siguiente ronda...",
     "scoringTip": "Tip de puntuación",
     "scoringTipText": "Palabras más largas = más puntos",
     "sharedWordsExplanation": "Las palabras repetidas no dan puntos",
