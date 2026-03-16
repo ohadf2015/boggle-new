@@ -160,12 +160,12 @@ describe('GlobalBottomNav', () => {
             expect(homeButton).toHaveAttribute('aria-current', 'page');
         });
 
-        it('should mark leaderboard as active on leaderboard path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/leaderboard');
+        it('should mark play as active on play path', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/play');
             render(<GlobalBottomNav />);
 
-            const leaderboardButton = screen.getByRole('button', { name: /leaderboard/i });
-            expect(leaderboardButton).toHaveAttribute('aria-current', 'page');
+            const playButton = screen.getByRole('button', { name: /play/i });
+            expect(playButton).toHaveAttribute('aria-current', 'page');
         });
 
         it('should default to home when path does not match any tab', () => {
@@ -356,13 +356,13 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should indicate active state for screen readers', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/leaderboard');
+            (usePathname as jest.Mock).mockReturnValue('/en/play');
             render(<GlobalBottomNav />);
 
-            const leaderboardButton = screen.getByRole('button', { name: /leaderboard/i });
+            const playButton = screen.getByRole('button', { name: /play/i });
             const homeButton = screen.getByRole('button', { name: /home/i });
 
-            expect(leaderboardButton).toHaveAttribute('aria-current', 'page');
+            expect(playButton).toHaveAttribute('aria-current', 'page');
             expect(homeButton).not.toHaveAttribute('aria-current');
         });
 
@@ -371,7 +371,6 @@ describe('GlobalBottomNav', () => {
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /leaderboard/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
         });
     });

@@ -45,15 +45,9 @@ describe('LandingHero', () => {
     expect(screen.getByText('landing.welcomeTitle')).toBeInTheDocument();
   });
 
-  it('renders play button', () => {
+  it('renders welcome subtitle', () => {
     render(<LandingHero {...baseProps} />);
-    expect(screen.getByText('landing.letsPlay')).toBeInTheDocument();
-  });
-
-  it('calls onPlayClick when button clicked', () => {
-    render(<LandingHero {...baseProps} />);
-    fireEvent.click(screen.getByText('landing.letsPlay'));
-    expect(baseProps.onPlayClick).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('landing.welcomeSubtitle')).toBeInTheDocument();
   });
 
   it('shows leaderboard preview on desktop', () => {
