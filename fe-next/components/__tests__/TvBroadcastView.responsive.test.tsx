@@ -126,20 +126,13 @@ describe('TvBroadcastView - Responsive Layout', () => {
     expect(mainContent).toHaveClass('flex-1', 'min-h-0', 'grid');
   });
 
-  it('should have grid and leaderboard with proper overflow handling', () => {
+  it('should have activity panel with proper overflow handling', () => {
     render(<TvBroadcastView {...defaultProps} />);
 
-    const grid = screen.getByTestId('tv-grid').parentElement;
-    const leaderboard = screen.getByTestId('tv-leaderboard').parentElement;
+    const activityPanel = screen.getByTestId('tv-activity-panel-placeholder');
 
-    // Grid uses min-h-[180px] for mobile, leaderboard uses min-h-[120px]
-    // On desktop (md:), both use min-h-0 to fill CSS Grid cells
-    expect(grid).toHaveClass('min-h-[180px]');
-    expect(leaderboard).toHaveClass('min-h-[120px]');
-
-    // Grid uses overflow-hidden, leaderboard uses overflow-auto for scrolling
-    expect(grid).toHaveClass('overflow-hidden');
-    expect(leaderboard).toHaveClass('overflow-auto');
+    expect(activityPanel).toHaveClass('min-h-[180px]');
+    expect(activityPanel).toHaveClass('overflow-hidden');
   });
 
   it('should constrain content within parent container', () => {
