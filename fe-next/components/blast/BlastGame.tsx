@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import confetti from 'canvas-confetti';
+// canvas-confetti is lazy-loaded on board completion (saves ~3kB from initial chunk)
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
@@ -24,6 +24,9 @@ import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './u
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
 import { useBlastComboSync } from '@/hooks/gameState';
+import { useBlastComboStreak, getComboWindowMs } from './hooks/useBlastComboStreak';
+import { useBlastHotTiles } from './hooks/useBlastHotTiles';
+import { useBlastIntensity } from './hooks/useBlastIntensity';
 
 interface BlastGameProps {
   config: BlastGameConfig;
@@ -163,8 +166,9 @@ export function BlastGame({
     movesAllowed: waveConfig?.movesAllowed,
     waveObjectives,
     isMultiplayer,
-    onSynergyDetected: useCallback((_comboType: BlastComboType) => {
-      playComboSound(3);
+    onSynergyDetected: useCallback((_comboType: BlastComboType, scoreMultiplier: number) => {
+      // Scale audio intensity with combo power: 2x→1, 3x→2, 4-5x→3, 6x→4
+      playComboSound(Math.min(5, Math.ceil(scoreMultiplier / 1.5)));
     }, [playComboSound]),
     onComboDetected: useCallback((combos: SpecialCombo[]) => {
       onComboDetected?.(combos);
@@ -218,20 +222,40 @@ export function BlastGame({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blastComboSync?.id]);
 
+  // Min word length from wave config (defaults to 2) — hoisted for use by combo streak
+  const minWordLength = waveConfig?.minWordLength ?? 2;
+
   // Personal best (loss aversion hook: shows target to beat)
   const personalBest = useBlastPersonalBest();
 
   // Near-miss shimmer (psychological hook: shows what the player almost got)
   const nearMiss = useBlastNearMiss();
 
+  // Combo streak — tracks consecutive word submissions within a time window
+  const comboStreak = useBlastComboStreak(getComboWindowMs(minWordLength));
+
+  // Hot tiles — bonus multiplier tiles in the last 25% of timed rounds (SP only)
+  const hotTiles = useBlastHotTiles({
+    gridSize: config.gridSize,
+    roundDuration: (totalTime ?? 120) * 1000,
+    tileStates: blast.tileStates,
+    enabled: !isMultiplayer,
+  });
+
+  // Intensity — drives reactive background and board glow based on game state
+  const intensity = useBlastIntensity({
+    comboLevel: combo.comboLevel,
+    cascadeChainLevel: blast.cascadeChainLevel ?? 0,
+    comboStreakLevel: comboStreak.streak.level,
+    isHotPhase: hotTiles.isHotPhase,
+    wordsFoundCount: blast.gameState.wordsFound.length,
+  });
+
   // Spam detection
   const spamDetection = useSpamDetection();
 
   // Dictionary for hint system
   const { checkWord } = useDictionaryCache(config.language);
-
-  // Min word length from wave config (defaults to 2)
-  const minWordLength = waveConfig?.minWordLength ?? 2;
 
   // Hint system — gated in multiplayer (no hints in MP)
   const foundWordsSet = useMemo(
@@ -268,17 +292,29 @@ export function BlastGame({
     }
   }, []);
 
+  // Hot tile timer update — check elapsed time every second to activate hot phase
+  useEffect(() => {
+    if (isMultiplayer || !gameStartTimeRef.current) return;
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - gameStartTimeRef.current;
+      hotTiles.onTimerUpdate(elapsed);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isMultiplayer, hotTiles]);
+
   // Confetti burst + celebration Sugar Crush on board complete (SP only)
   const confettiFiredRef = useRef(false);
   useEffect(() => {
     if (isMultiplayer) return;
     if (blast.gameState.isComplete && !confettiFiredRef.current) {
       confettiFiredRef.current = true;
-      confetti({
-        particleCount: 40,
-        spread: 50,
-        origin: { y: 0.6 },
-        colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
+      import('canvas-confetti').then(({ default: confetti }) => {
+        confetti({
+          particleCount: 40,
+          spread: 50,
+          origin: { y: 0.6 },
+          colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
+        });
       });
       // Celebration Sugar Crush: fire when ≥3 moves remain (reward, not consolation)
       if (blast.gameState.movesRemaining >= 3 && isFinite(blast.gameState.totalMoves)) {
@@ -344,7 +380,10 @@ export function BlastGame({
       // Trigger near-miss shimmer if no combo was already triggered
       nearMiss.check(path, blast.modifiedGrid ?? [], blast.tileStates, config.gridSize, hadCombo);
     }
-  }, [blast, nearMiss, config.gridSize]);
+
+    // Track combo streak — consecutive word submissions within time window
+    comboStreak.onWordSubmitted();
+  }, [blast, nearMiss, config.gridSize, comboStreak]);
 
   // Word submission hook - reuses proven validation pipeline
   const wordSubmission = useWordSubmission({
@@ -521,6 +560,11 @@ export function BlastGame({
       onClearHint={clearHint}
       discoveredCombos={discoveredCombos}
       personalBestScore={personalBest?.bestScore ?? null}
+      streak={comboStreak.streak}
+      arcRef={comboStreak.arcRef}
+      hotTiles={hotTiles.hotTiles}
+      isHotPhase={hotTiles.isHotPhase}
+      intensity={intensity}
       t={(key: string) => t(key) || undefined}
     />
     </div>

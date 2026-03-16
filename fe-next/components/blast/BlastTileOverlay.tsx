@@ -1,10 +1,10 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import {
   Star, Bomb, Rainbow, Snowflake, Shuffle,
-  Zap, Magnet, Sparkles, Diamond,
+  Zap, Magnet, Sparkles, Diamond, Gem, CircleDollarSign,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -31,93 +31,93 @@ const TILE_BACKGROUNDS: Record<string, {
   animationClass: string;
 }> = {
   gold: {
-    background: 'linear-gradient(135deg, rgba(255,215,0,0.55) 0%, rgba(255,180,0,0.4) 40%, rgba(255,230,80,0.55) 100%)',
+    background: 'linear-gradient(135deg, rgba(255,215,0,0.30) 0%, rgba(255,180,0,0.22) 40%, rgba(255,230,80,0.30) 100%)',
     border: '3px solid rgba(255,215,0,0.75)',
-    shadow: 'inset 0 0 20px rgba(255,215,0,0.45), 0 0 14px rgba(255,200,0,0.35), 0 0 28px rgba(255,215,0,0.15)',
+    shadow: 'inset 0 0 14px rgba(255,215,0,0.25), 0 0 10px rgba(255,200,0,0.2), 0 0 20px rgba(255,215,0,0.08)',
     animationClass: 'blast-tile-gold',
   },
   bomb: {
-    background: 'radial-gradient(circle at 35% 35%, rgba(255,100,60,0.55) 0%, rgba(200,30,0,0.45) 55%, rgba(100,0,0,0.35) 100%)',
+    background: 'radial-gradient(circle at 35% 35%, rgba(255,100,60,0.30) 0%, rgba(200,30,0,0.25) 55%, rgba(100,0,0,0.18) 100%)',
     border: '3px solid rgba(255,70,40,0.7)',
-    shadow: 'inset 0 0 18px rgba(255,30,0,0.4), 0 0 12px rgba(255,50,20,0.3), 0 0 24px rgba(255,0,0,0.15)',
+    shadow: 'inset 0 0 12px rgba(255,30,0,0.22), 0 0 8px rgba(255,50,20,0.18), 0 0 16px rgba(255,0,0,0.08)',
     animationClass: 'blast-tile-bomb',
   },
   rainbow: {
-    background: 'linear-gradient(135deg, rgba(255,100,200,0.5) 0%, rgba(160,80,255,0.5) 25%, rgba(80,200,255,0.5) 50%, rgba(100,255,160,0.5) 75%, rgba(255,200,80,0.5) 100%)',
+    background: 'linear-gradient(135deg, rgba(255,100,200,0.28) 0%, rgba(160,80,255,0.28) 25%, rgba(80,200,255,0.28) 50%, rgba(100,255,160,0.28) 75%, rgba(255,200,80,0.28) 100%)',
     border: '3px solid rgba(168,85,247,0.7)',
-    shadow: 'inset 0 0 18px rgba(168,85,247,0.35), 0 0 14px rgba(168,85,247,0.3), 0 0 28px rgba(255,100,200,0.15)',
+    shadow: 'inset 0 0 12px rgba(168,85,247,0.2), 0 0 10px rgba(168,85,247,0.18), 0 0 20px rgba(255,100,200,0.08)',
     animationClass: 'blast-tile-rainbow',
   },
   ice: {
-    background: 'linear-gradient(135deg, rgba(180,230,255,0.55) 0%, rgba(130,200,255,0.45) 50%, rgba(200,240,255,0.5) 100%)',
+    background: 'linear-gradient(135deg, rgba(180,230,255,0.30) 0%, rgba(130,200,255,0.25) 50%, rgba(200,240,255,0.28) 100%)',
     border: '3px solid rgba(150,220,255,0.75)',
-    shadow: 'inset 0 0 20px rgba(150,220,255,0.4), 0 0 12px rgba(180,230,255,0.3), 0 0 24px rgba(100,200,255,0.15)',
+    shadow: 'inset 0 0 14px rgba(150,220,255,0.22), 0 0 8px rgba(180,230,255,0.18), 0 0 16px rgba(100,200,255,0.08)',
     animationClass: 'blast-tile-ice',
   },
   mirror: {
-    background: 'radial-gradient(circle at 50% 50%, rgba(224,224,255,0.5) 0%, rgba(136,136,255,0.35) 60%, rgba(100,100,200,0.25) 100%)',
+    background: 'radial-gradient(circle at 50% 50%, rgba(224,224,255,0.28) 0%, rgba(136,136,255,0.2) 60%, rgba(100,100,200,0.15) 100%)',
     border: '3px solid rgba(136,136,255,0.7)',
-    shadow: 'inset 0 0 18px rgba(136,136,255,0.35), 0 0 12px rgba(180,180,255,0.25)',
+    shadow: 'inset 0 0 12px rgba(136,136,255,0.2), 0 0 8px rgba(180,180,255,0.15)',
     animationClass: 'blast-tile-mirror',
   },
   silver: {
-    background: 'radial-gradient(circle at 40% 35%, rgba(232,232,232,0.55) 0%, rgba(176,176,176,0.4) 55%, rgba(140,140,140,0.3) 100%)',
+    background: 'radial-gradient(circle at 40% 35%, rgba(232,232,232,0.30) 0%, rgba(176,176,176,0.22) 55%, rgba(140,140,140,0.16) 100%)',
     border: '3px solid rgba(192,192,192,0.75)',
-    shadow: 'inset 0 0 18px rgba(200,200,200,0.4), 0 0 12px rgba(192,192,192,0.25)',
+    shadow: 'inset 0 0 12px rgba(200,200,200,0.22), 0 0 8px rgba(192,192,192,0.15)',
     animationClass: 'blast-tile-silver',
   },
   diamond: {
-    background: 'radial-gradient(circle at 40% 35%, rgba(185,242,255,0.6) 0%, rgba(0,206,209,0.45) 55%, rgba(0,150,160,0.3) 100%)',
+    background: 'radial-gradient(circle at 40% 35%, rgba(185,242,255,0.33) 0%, rgba(0,206,209,0.25) 55%, rgba(0,150,160,0.16) 100%)',
     border: '3px solid rgba(0,206,209,0.8)',
-    shadow: 'inset 0 0 22px rgba(0,206,209,0.4), 0 0 16px rgba(100,255,255,0.3), 0 0 30px rgba(0,206,209,0.15)',
+    shadow: 'inset 0 0 15px rgba(0,206,209,0.22), 0 0 10px rgba(100,255,255,0.18), 0 0 20px rgba(0,206,209,0.08)',
     animationClass: 'blast-tile-diamond',
   },
   lightning: {
-    background: 'linear-gradient(135deg, rgba(255,225,0,0.55) 0%, rgba(0,191,255,0.45) 50%, rgba(255,255,0,0.5) 100%)',
+    background: 'linear-gradient(135deg, rgba(255,225,0,0.30) 0%, rgba(0,191,255,0.25) 50%, rgba(255,255,0,0.28) 100%)',
     border: '3px solid rgba(255,225,0,0.75)',
-    shadow: 'inset 0 0 20px rgba(255,255,0,0.4), 0 0 14px rgba(0,191,255,0.3), 0 0 28px rgba(255,255,0,0.15)',
+    shadow: 'inset 0 0 14px rgba(255,255,0,0.22), 0 0 10px rgba(0,191,255,0.18), 0 0 20px rgba(255,255,0,0.08)',
     animationClass: 'blast-tile-lightning',
   },
   magnet: {
-    background: 'radial-gradient(circle at 40% 40%, rgba(139,0,255,0.55) 0%, rgba(255,0,64,0.45) 55%, rgba(139,0,255,0.35) 100%)',
+    background: 'radial-gradient(circle at 40% 40%, rgba(139,0,255,0.30) 0%, rgba(255,0,64,0.25) 55%, rgba(139,0,255,0.18) 100%)',
     border: '3px solid rgba(139,0,255,0.75)',
-    shadow: 'inset 0 0 18px rgba(139,0,255,0.4), 0 0 14px rgba(255,0,64,0.3), 0 0 28px rgba(139,0,255,0.15)',
+    shadow: 'inset 0 0 12px rgba(139,0,255,0.22), 0 0 10px rgba(255,0,64,0.18), 0 0 20px rgba(139,0,255,0.08)',
     animationClass: 'blast-tile-magnet',
   },
   prism: {
-    background: 'conic-gradient(from 0deg, rgba(255,0,0,0.45), rgba(255,165,0,0.45), rgba(255,255,0,0.45), rgba(0,255,0,0.45), rgba(0,100,255,0.45), rgba(148,0,211,0.45), rgba(255,0,0,0.45))',
+    background: 'conic-gradient(from 0deg, rgba(255,0,0,0.25), rgba(255,165,0,0.25), rgba(255,255,0,0.25), rgba(0,255,0,0.25), rgba(0,100,255,0.25), rgba(148,0,211,0.25), rgba(255,0,0,0.25))',
     border: '3px solid rgba(255,255,255,0.75)',
-    shadow: 'inset 0 0 20px rgba(255,255,255,0.4), 0 0 14px rgba(168,85,247,0.35), 0 0 28px rgba(255,100,200,0.15)',
+    shadow: 'inset 0 0 14px rgba(255,255,255,0.22), 0 0 10px rgba(168,85,247,0.2), 0 0 20px rgba(255,100,200,0.08)',
     animationClass: 'blast-tile-prism',
   },
   gem: {
-    background: 'radial-gradient(circle at 40% 35%, rgba(80,200,120,0.6) 0%, rgba(0,148,80,0.45) 55%, rgba(0,100,50,0.35) 100%)',
+    background: 'radial-gradient(circle at 40% 35%, rgba(80,200,120,0.33) 0%, rgba(0,148,80,0.25) 55%, rgba(0,100,50,0.18) 100%)',
     border: '3px solid rgba(80,200,120,0.75)',
-    shadow: 'inset 0 0 18px rgba(80,200,120,0.4), 0 0 14px rgba(0,200,100,0.3), 0 0 28px rgba(0,255,100,0.12)',
+    shadow: 'inset 0 0 12px rgba(80,200,120,0.22), 0 0 10px rgba(0,200,100,0.18), 0 0 20px rgba(0,255,100,0.07)',
     animationClass: 'blast-tile-gem',
   },
   frozen: {
-    background: 'linear-gradient(135deg, rgba(180,180,240,0.6) 0%, rgba(140,140,220,0.5) 50%, rgba(200,190,255,0.55) 100%)',
+    background: 'linear-gradient(135deg, rgba(180,180,240,0.33) 0%, rgba(140,140,220,0.28) 50%, rgba(200,190,255,0.30) 100%)',
     border: '4px solid rgba(160,140,240,0.8)',
-    shadow: 'inset 0 0 22px rgba(160,140,240,0.4), 0 0 16px rgba(180,160,255,0.35), 0 0 30px rgba(140,120,240,0.15)',
+    shadow: 'inset 0 0 15px rgba(160,140,240,0.22), 0 0 10px rgba(180,160,255,0.2), 0 0 20px rgba(140,120,240,0.08)',
     animationClass: 'blast-tile-frozen',
   },
 };
 
 /** Icon, color, and short effect label for each special tile type */
 const TILE_ICONS: Record<string, { Icon: LucideIcon; color: string; label: string; labelBg: string }> = {
-  gold:      { Icon: Star,      color: 'text-yellow-900',  label: '3×',   labelBg: 'bg-yellow-400/90 text-yellow-900' },
-  bomb:      { Icon: Bomb,      color: 'text-white',       label: '8',    labelBg: 'bg-red-500/90 text-white' },
-  rainbow:   { Icon: Rainbow,   color: 'text-white',       label: '+5',   labelBg: 'bg-purple-500/90 text-white' },
-  ice:       { Icon: Snowflake, color: 'text-blue-200',    label: '×2',   labelBg: 'bg-blue-400/90 text-white' },
-  mirror:    { Icon: Shuffle,   color: 'text-indigo-200',  label: '2×',   labelBg: 'bg-indigo-500/90 text-white' },
-  silver:    { Icon: Star,      color: 'text-gray-300',    label: '1.5×', labelBg: 'bg-gray-400/90 text-gray-900' },
-  diamond:   { Icon: Diamond,   color: 'text-cyan-200',    label: '5×',   labelBg: 'bg-cyan-500/90 text-white' },
-  lightning: { Icon: Zap,       color: 'text-yellow-300',  label: 'col',  labelBg: 'bg-yellow-400/90 text-yellow-900' },
-  magnet:    { Icon: Magnet,    color: 'text-white',       label: 'pull', labelBg: 'bg-purple-600/90 text-white' },
-  prism:     { Icon: Sparkles,  color: 'text-white',       label: '+',    labelBg: 'bg-pink-400/90 text-white' },
-  gem:       { Icon: Diamond,   color: 'text-white',       label: '×3',   labelBg: 'bg-emerald-500/90 text-white' },
-  frozen:    { Icon: Snowflake, color: 'text-indigo-300',  label: '×2',   labelBg: 'bg-indigo-400/90 text-white' },
+  gold:      { Icon: Star,              color: 'text-yellow-900',  label: '3×',   labelBg: 'bg-yellow-400/70 text-yellow-900' },
+  bomb:      { Icon: Bomb,              color: 'text-white',       label: '8',    labelBg: 'bg-red-500/70 text-white' },
+  rainbow:   { Icon: Rainbow,           color: 'text-white',       label: '+5',   labelBg: 'bg-purple-500/70 text-white' },
+  ice:       { Icon: Snowflake,         color: 'text-blue-200',    label: '×2',   labelBg: 'bg-blue-400/70 text-white' },
+  mirror:    { Icon: Shuffle,           color: 'text-indigo-200',  label: '2×',   labelBg: 'bg-indigo-500/70 text-white' },
+  silver:    { Icon: CircleDollarSign,  color: 'text-gray-300',    label: '1.5×', labelBg: 'bg-gray-400/70 text-gray-900' },
+  diamond:   { Icon: Diamond,           color: 'text-cyan-200',    label: '5×',   labelBg: 'bg-cyan-500/70 text-white' },
+  lightning: { Icon: Zap,               color: 'text-yellow-300',  label: 'col',  labelBg: 'bg-yellow-400/70 text-yellow-900' },
+  magnet:    { Icon: Magnet,            color: 'text-white',       label: 'pull', labelBg: 'bg-purple-600/70 text-white' },
+  prism:     { Icon: Sparkles,          color: 'text-white',       label: '+',    labelBg: 'bg-pink-400/70 text-white' },
+  gem:       { Icon: Gem,               color: 'text-white',       label: '×3',   labelBg: 'bg-emerald-500/70 text-white' },
+  frozen:    { Icon: Snowflake,         color: 'text-indigo-300',  label: '×2',   labelBg: 'bg-indigo-400/70 text-white' },
 };
 
 /**
@@ -142,7 +142,7 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
         gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
       }}
     >
-      <AnimatePresence mode="sync">
+      <AdaptiveAnimatePresence>
         {tileStates.flat().map(tile => {
           const posKey = `${tile.row}-${tile.col}`;
           const isSelected = selectedPositions?.has(posKey) ?? false;
@@ -150,7 +150,7 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
           // Cleared tile → dark void cell
           if (tile.isCleared) {
             return (
-              <motion.div
+              <AdaptiveMotion.div
                 key={`gap-${posKey}`}
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -187,37 +187,37 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
           let border = config.border;
           let shadow = config.shadow;
           if (isCrackedIce) {
-            background = 'linear-gradient(135deg, rgba(180,230,255,0.35) 0%, rgba(100,180,220,0.25) 50%, rgba(180,230,255,0.35) 100%)';
+            background = 'linear-gradient(135deg, rgba(180,230,255,0.2) 0%, rgba(100,180,220,0.15) 50%, rgba(180,230,255,0.2) 100%)';
             border = '3px solid rgba(255,255,255,0.5)';
-            shadow = 'inset 0 0 16px rgba(150,220,255,0.3), 0 0 10px rgba(180,230,255,0.25)';
+            shadow = 'inset 0 0 10px rgba(150,220,255,0.18), 0 0 6px rgba(180,230,255,0.15)';
           } else if (isCrackedPrism) {
-            background = 'conic-gradient(from 0deg, rgba(255,0,0,0.35), rgba(255,165,0,0.35), rgba(255,255,0,0.35), rgba(0,255,0,0.35), rgba(0,100,255,0.35), rgba(148,0,211,0.35), rgba(255,0,0,0.35))';
+            background = 'conic-gradient(from 0deg, rgba(255,0,0,0.2), rgba(255,165,0,0.2), rgba(255,255,0,0.2), rgba(0,255,0,0.2), rgba(0,100,255,0.2), rgba(148,0,211,0.2), rgba(255,0,0,0.2))';
             border = '3px solid rgba(255,255,255,0.85)';
-            shadow = 'inset 0 0 24px rgba(255,255,255,0.5), 0 0 18px rgba(255,200,100,0.4), 0 0 32px rgba(168,85,247,0.25)';
+            shadow = 'inset 0 0 16px rgba(255,255,255,0.3), 0 0 12px rgba(255,200,100,0.22), 0 0 22px rgba(168,85,247,0.14)';
           } else if (isCrackedFrozen) {
             background = tile.hitsRemaining === 1
-              ? 'linear-gradient(135deg, rgba(200,220,255,0.35) 0%, rgba(140,180,220,0.25) 30%, rgba(255,200,150,0.15) 60%, rgba(200,220,255,0.35) 100%)'
-              : 'linear-gradient(135deg, rgba(200,220,255,0.45) 0%, rgba(160,200,240,0.35) 50%, rgba(220,240,255,0.4) 100%)';
+              ? 'linear-gradient(135deg, rgba(200,220,255,0.2) 0%, rgba(140,180,220,0.15) 30%, rgba(255,200,150,0.08) 60%, rgba(200,220,255,0.2) 100%)'
+              : 'linear-gradient(135deg, rgba(200,220,255,0.25) 0%, rgba(160,200,240,0.2) 50%, rgba(220,240,255,0.22) 100%)';
             border = tile.hitsRemaining === 1
               ? '3px solid rgba(255,255,255,0.6)'
               : '3px solid rgba(180,220,255,0.6)';
             shadow = tile.hitsRemaining === 1
-              ? 'inset 0 0 18px rgba(255,200,150,0.2), 0 0 14px rgba(200,230,255,0.3), 0 0 24px rgba(255,180,100,0.1)'
-              : 'inset 0 0 20px rgba(180,220,255,0.35), 0 0 14px rgba(200,230,255,0.3)';
+              ? 'inset 0 0 12px rgba(255,200,150,0.12), 0 0 10px rgba(200,230,255,0.18), 0 0 16px rgba(255,180,100,0.06)'
+              : 'inset 0 0 14px rgba(180,220,255,0.2), 0 0 10px rgba(200,230,255,0.18)';
           }
 
           // Gem glow intensifies dramatically across 3 stages
           if (gemGlowIntensity > 0) {
-            const glowBase = 16 + gemGlowIntensity * 6;
-            const outerBase = 10 + gemGlowIntensity * 6;
-            const haloBase = 20 + gemGlowIntensity * 8;
-            shadow = `inset 0 0 ${glowBase}px rgba(80,200,120,${0.25 + gemGlowIntensity * 0.12}), 0 0 ${outerBase}px rgba(0,255,100,${0.2 + gemGlowIntensity * 0.12}), 0 0 ${haloBase}px rgba(0,255,100,${0.05 + gemGlowIntensity * 0.08})`;
+            const glowBase = 11 + gemGlowIntensity * 4;
+            const outerBase = 7 + gemGlowIntensity * 4;
+            const haloBase = 14 + gemGlowIntensity * 6;
+            shadow = `inset 0 0 ${glowBase}px rgba(80,200,120,${0.18 + gemGlowIntensity * 0.08}), 0 0 ${outerBase}px rgba(0,255,100,${0.14 + gemGlowIntensity * 0.08}), 0 0 ${haloBase}px rgba(0,255,100,${0.04 + gemGlowIntensity * 0.06})`;
           }
 
           const iconEntry = TILE_ICONS[tile.type];
 
           return (
-            <motion.div
+            <AdaptiveMotion.div
               key={`bg-${posKey}`}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -236,13 +236,13 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
               {iconEntry && (
                 <span
                   className={cn(
-                    'absolute bottom-0 right-0 flex items-center gap-0.5 rounded-tl-md rounded-br-lg px-1 py-0.5',
+                    'absolute bottom-0 right-0 flex items-center gap-0.5 rounded-tl-md rounded-br-lg px-1 py-0.5 opacity-90',
                     'text-[10px] font-black leading-none',
                     iconEntry.labelBg,
                   )}
                   data-testid={`badge-${tile.type}`}
                 >
-                  <iconEntry.Icon className="w-3 h-3" />
+                  <iconEntry.Icon className="w-3.5 h-3.5" />
                   <span>{iconEntry.label}</span>
                 </span>
               )}
@@ -252,22 +252,22 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
                 <span
                   className={cn(
                     'absolute top-0 left-0 flex items-center justify-center rounded-br-md rounded-tl-lg',
-                    'w-4 h-4 text-[9px] font-black leading-none animate-neo-pop',
+                    'w-4 h-4 text-[10px] font-black leading-none animate-neo-pop',
                     tile.hitsRemaining === 1
-                      ? 'bg-red-500/90 text-white'
+                      ? 'bg-red-500/75 text-white'
                       : tile.hitsRemaining === 2
-                      ? 'bg-amber-400/90 text-black'
-                      : 'bg-white/80 text-black',
+                      ? 'bg-amber-400/75 text-black'
+                      : 'bg-white/65 text-black',
                   )}
                   data-testid={`hits-${tile.type}`}
                 >
                   {tile.hitsRemaining}
                 </span>
               )}
-            </motion.div>
+            </AdaptiveMotion.div>
           );
         })}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 });

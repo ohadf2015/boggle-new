@@ -22,6 +22,8 @@ import { useAdventureBossOrchestration } from './hooks/useAdventureBossOrchestra
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { useFlashChallenge } from '@/hooks/useFlashChallenge';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
+import { useChapterQuests } from '@/hooks/useChapterQuests';
+import { getChapterNumber } from '@/lib/adventure/questConfig';
 import FlashChallengeToast from './FlashChallengeToast';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
@@ -208,6 +210,10 @@ const AdventureGame = memo<AdventureGameProps>(
       lastQuestDate: (progression as any)?.dailyQuestDate,
     });
 
+    // Chapter quests — track progress for current chapter
+    const chapterNumber = getChapterNumber(levelConfig.level);
+    const chapterQuests = useChapterQuests({ worldId: levelConfig.world, chapterNumber });
+
     // CrazyGames SDK lifecycle — report gameplay and trigger happyTime on achievements
     useCrazyGamesLifecycle({
       isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,
@@ -339,12 +345,16 @@ const AdventureGame = memo<AdventureGameProps>(
       const newWords = gameState.wordsFound.length - prevQuestWordsRef.current;
       if (newWords > 0) {
         recordQuestProgress('wordCount', newWords);
+        chapterQuests.recordWordsFound(newWords);
         // Check for long words (6+ letters)
         const latestWord = gameState.wordsFound[gameState.wordsFound.length - 1];
-        if (latestWord && latestWord.length >= 6) recordQuestProgress('longWord');
+        if (latestWord && latestWord.length >= 6) {
+          recordQuestProgress('longWord');
+          chapterQuests.recordLongWord();
+        }
       }
       prevQuestWordsRef.current = gameState.wordsFound.length;
-    }, [gameState.wordsFound, recordQuestProgress]);
+    }, [gameState.wordsFound, recordQuestProgress, chapterQuests]);
 
     useEffect(() => {
       if (gameState.comboCount >= 5) recordQuestProgress('comboStreak');
@@ -438,6 +448,13 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [levelCompletion.lootDrops, gameState.stars]);
 
+    // Non-boss levels: show results UI when completion hook signals done
+    useEffect(() => {
+      if (levelCompletion.nonBossCompleted) {
+        showLootOrComplete();
+      }
+    }, [levelCompletion.nonBossCompleted, showLootOrComplete]);
+
     const handleCinematicComplete = useCallback(() => {
       cinematics.handleCinematicComplete();
       if (storyBeat && gameState.stars > 0) {
@@ -457,10 +474,15 @@ const AdventureGame = memo<AdventureGameProps>(
       setShowLevelComplete(true);
     }, []);
 
+    const hintsUsedRef = useRef(0);
     const handleContinue = useCallback(() => {
+      if (gameState.stars >= 3) chapterQuests.recordLevelPerfect();
+      if (isBossLevel && bossOrch.bossHealthState.phase === 'victory' && hintsUsedRef.current === 0) {
+        chapterQuests.recordBossDefeatedNoHint();
+      }
       setShowLevelComplete(false);
       onLevelComplete(gameState.stars, gameState.score, gameState.wordsFound.length, levelCompletion.earnedGold);
-    }, [gameState.stars, gameState.score, gameState.wordsFound.length, levelCompletion.earnedGold, onLevelComplete]);
+    }, [gameState.stars, gameState.score, gameState.wordsFound.length, levelCompletion.earnedGold, onLevelComplete, chapterQuests, isBossLevel, bossOrch.bossHealthState.phase]);
 
     const handleRetry = useCallback(() => {
       setShowLevelComplete(false);
@@ -477,7 +499,7 @@ const AdventureGame = memo<AdventureGameProps>(
     }, [resetGame, startGame, clearSelection, bossOrch, cinematics, levelCompletion, init.upgradeEffects.retryScoreRetention, gameState.score]);
 
     const handleHintClick = useCallback(() => {
-      if (hasHintsAvailable) { getHint(); dismissAutoHint(); }
+      if (hasHintsAvailable) { getHint(); dismissAutoHint(); hintsUsedRef.current += 1; }
     }, [hasHintsAvailable, getHint, dismissAutoHint]);
 
     const hintHighlightIndices = useMemo(() => {

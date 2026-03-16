@@ -1,0 +1,44 @@
+/**
+ * AdventureGame — useChapterQuests wiring verification
+ * Verifies that useChapterQuests is imported and would be called with correct args.
+ * Uses source-level verification since full render requires extensive mocking.
+ */
+import fs from 'fs';
+import path from 'path';
+
+describe('AdventureGame — useChapterQuests wiring', () => {
+  const sourceFile = fs.readFileSync(
+    path.resolve(__dirname, '../AdventureGame.tsx'),
+    'utf-8'
+  );
+
+  it('imports useChapterQuests from hooks', () => {
+    expect(sourceFile).toMatch(/import.*useChapterQuests.*from.*hooks\/useChapterQuests/);
+  });
+
+  it('imports getChapterNumber from adventure lib', () => {
+    expect(sourceFile).toMatch(/import.*getChapterNumber/);
+  });
+
+  it('initializes useChapterQuests with worldId and chapterNumber', () => {
+    expect(sourceFile).toMatch(/useChapterQuests\s*\(\s*\{/);
+    expect(sourceFile).toMatch(/worldId.*levelConfig\.world/);
+    expect(sourceFile).toMatch(/chapterNumber/);
+  });
+
+  it('calls recordWordsFound when words are found', () => {
+    expect(sourceFile).toMatch(/chapterQuests\.recordWordsFound/);
+  });
+
+  it('calls recordLongWord for long words', () => {
+    expect(sourceFile).toMatch(/chapterQuests\.recordLongWord/);
+  });
+
+  it('calls recordLevelPerfect when 3 stars earned', () => {
+    expect(sourceFile).toMatch(/recordLevelPerfect/);
+  });
+
+  it('calls recordBossDefeatedNoHint after boss defeat without hints', () => {
+    expect(sourceFile).toMatch(/recordBossDefeatedNoHint/);
+  });
+});

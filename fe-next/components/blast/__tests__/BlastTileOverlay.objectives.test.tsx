@@ -12,6 +12,13 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
+jest.mock('@/components/motion/AdaptiveMotion', () => ({
+  AdaptiveMotion: {
+    div: ({ children, className, ...rest }: any) => <div className={className} {...rest}>{children}</div>,
+  },
+  AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
 jest.mock('lucide-react', () => ({
   Star: () => <span />,
   Bomb: () => <span />,
@@ -22,6 +29,8 @@ jest.mock('lucide-react', () => ({
   Magnet: () => <span />,
   Sparkles: () => <span />,
   Diamond: () => <span />,
+  Gem: () => <span />,
+  CircleDollarSign: () => <span />,
 }));
 
 import { BlastTileOverlay } from '../BlastTileOverlay';

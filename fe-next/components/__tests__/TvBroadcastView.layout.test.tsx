@@ -16,6 +16,7 @@ jest.mock('framer-motion', () => ({
     },
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 // Mock lucide-react icons
@@ -23,14 +24,6 @@ jest.mock('lucide-react', () => ({
   Maximize: () => <div data-testid="maximize-icon">Maximize</div>,
   Minimize: () => <div data-testid="minimize-icon">Minimize</div>,
   HelpCircle: () => <div data-testid="help-icon">?</div>,
-  ChevronRight: () => <span data-testid="chevron-right">→</span>,
-  ChevronLeft: () => <span data-testid="chevron-left">←</span>,
-  X: () => <span data-testid="x-icon">✕</span>,
-  Tv: () => <span data-testid="tv-icon">TV</span>,
-  QrCode: () => <span data-testid="qr-icon">QR</span>,
-  LayoutGrid: () => <span data-testid="grid-icon">Grid</span>,
-  Trophy: () => <span data-testid="trophy-icon">Trophy</span>,
-  Timer: () => <span data-testid="timer-icon">Timer</span>,
 }));
 
 // Mock the subcomponents
@@ -44,9 +37,14 @@ jest.mock('@/host/components/tv-broadcast/TvGameHeader', () => ({
   default: () => <div data-testid="tv-game-header">TvGameHeader</div>,
 }));
 
-jest.mock('@/host/components/tv-broadcast/TvGrid', () => ({
+jest.mock('@/host/components/tv-broadcast/TvActivityPanel', () => ({
   __esModule: true,
-  default: () => <div data-testid="tv-grid">TvGrid</div>,
+  default: () => <div data-testid="tv-activity-panel">TvActivityPanel</div>,
+}));
+
+jest.mock('@/host/components/tv-broadcast/TvMomentumTicker', () => ({
+  __esModule: true,
+  default: () => <div data-testid="momentum-ticker">Ticker</div>,
 }));
 
 jest.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({
@@ -68,11 +66,25 @@ jest.mock('@/host/components/tv-broadcast/TvTutorialOverlay', () => ({
   ),
 }));
 
-// Mock hooks using jest.fn() pattern in factory
+// Mock hooks
 jest.mock('@/host/hooks/useTvFullscreen');
 jest.mock('@/host/hooks/useTvPlayerCombos');
 jest.mock('@/host/hooks/useTvSounds');
 jest.mock('@/host/hooks/useTvNotifications');
+jest.mock('@/host/hooks/useTvFinalMinute', () => ({
+  useTvFinalMinute: () => ({
+    isFinalMinute: false,
+    isFinalStretch: false,
+    isCritical: false,
+    urgencyLevel: 'normal',
+    heartbeatInterval: 0,
+    bgTintClass: '',
+  }),
+}));
+
+jest.mock('@/hooks/gameState/store', () => ({
+  useGameMode: () => 'classic',
+}));
 
 describe('TvBroadcastView Layout Issues', () => {
   const mockProps = {
@@ -99,7 +111,6 @@ describe('TvBroadcastView Layout Issues', () => {
   };
 
   beforeEach(() => {
-    // Setup default mock implementations
     const { useTvFullscreen } = require('@/host/hooks/useTvFullscreen');
     const { useTvPlayerCombos } = require('@/host/hooks/useTvPlayerCombos');
     const { useTvSounds } = require('@/host/hooks/useTvSounds');
@@ -138,26 +149,22 @@ describe('TvBroadcastView Layout Issues', () => {
 
     // Check root uses flex-1 to fill parent flex container
     expect(rootDiv).toHaveClass('flex-1');
-    expect(rootDiv).toHaveClass('min-h-0'); // Prevents overflow in flex containers
+    expect(rootDiv).toHaveClass('min-h-0');
     expect(rootDiv).toHaveClass('overflow-hidden');
 
-    // Main content should use CSS Grid layout (grid instead of flex)
+    // Main content should use CSS Grid layout
     const mainContent = container.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
     expect(mainContent).toBeInTheDocument();
     expect(mainContent).toHaveClass('flex-1');
     expect(mainContent).toHaveClass('min-h-0');
 
-    // Check responsive padding (smaller on mobile, larger on desktop)
+    // Check responsive padding
     expect(mainContent).toHaveClass('p-2');
     expect(mainContent).toHaveClass('md:p-4');
 
-    // Check responsive gap (smaller on mobile, larger on desktop)
+    // Check responsive gap
     expect(mainContent).toHaveClass('gap-2');
     expect(mainContent).toHaveClass('md:gap-4');
-
-    // Check that root flex layout is properly configured
-    expect(rootDiv).toHaveClass('flex');
-    expect(rootDiv).toHaveClass('flex-col');
   });
 
   it('should properly handle fullscreen layout', () => {
@@ -172,31 +179,22 @@ describe('TvBroadcastView Layout Issues', () => {
 
     const { container } = render(<TvBroadcastView {...mockProps} />);
 
-    // Note: Join bar is now always visible (changed in refactor)
-    // Game header with timer is still visible
     const rootDiv = container.firstChild as HTMLElement;
     expect(rootDiv).toHaveClass('flex-1');
     expect(rootDiv).toHaveClass('min-h-0');
 
-    // The main content area should expand to fill available space using CSS Grid
     const mainContent = container.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
     expect(mainContent).toBeInTheDocument();
     expect(mainContent).toHaveClass('flex-1');
     expect(mainContent).toHaveClass('min-h-0');
   });
 
-  it('should maintain proper aspect ratio for grid cells', () => {
+  it('should render activity panel and leaderboard in grid', () => {
     const { container } = render(<TvBroadcastView {...mockProps} />);
 
-    // Grid container now uses min-h for mobile, not flex-1
-    // On desktop (md:), it uses min-h-0
-    const gridContainer = container.querySelector('.min-h-\\[180px\\].md\\:min-h-0.flex.items-center.justify-center');
-    expect(gridContainer).toBeInTheDocument();
-
-    // Should have overflow-hidden to prevent content from spilling
-    expect(gridContainer).toHaveClass('overflow-hidden');
-
-    // Verify it's a grid cell child (not using flex-1 anymore)
-    expect(gridContainer).toHaveClass('min-h-[180px]');
+    // Activity panel container
+    const activityContainer = container.querySelector('.min-h-\\[180px\\].md\\:min-h-0');
+    expect(activityContainer).toBeInTheDocument();
+    expect(activityContainer).toHaveClass('overflow-hidden');
   });
 });

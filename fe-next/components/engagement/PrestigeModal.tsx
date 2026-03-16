@@ -50,7 +50,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
   canPrestige,
   maxPrestige,
   t,
-  language = 'en',
+  // language prop kept for backwards compat, t() handles locale
   onPrestigeSuccess,
 }) => {
   const [isConfirming, setIsConfirming] = useState(false);
@@ -60,6 +60,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
 
   const nextPrestigeLevel = currentPrestige + 1;
   const colors = PRESTIGE_COLORS[nextPrestigeLevel as keyof typeof PRESTIGE_COLORS] || PRESTIGE_COLORS[1];
+  const pm = (key: string) => t(`xp.prestigeModal.${key}`);
 
   const handlePrestige = useCallback(async () => {
     setIsLoading(true);
@@ -126,9 +127,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
         >
           <Sparkles className={cn('w-6 h-6', colors.text)} />
           <DialogTitle className={cn('text-xl font-black uppercase tracking-wide', colors.text)}>
-            {prestigeComplete
-              ? (language === 'he' ? 'יופי! הגעת!' : 'Prestige Achieved!')
-              : (language === 'he' ? 'מערכת פרסטיג\'' : 'Prestige System')}
+            {prestigeComplete ? pm('achieved') : pm('title')}
           </DialogTitle>
           <Sparkles className={cn('w-6 h-6', colors.text)} />
         </div>
@@ -157,7 +156,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     Prestige {toRoman(nextPrestigeLevel)}
                   </p>
                   <p className="text-white/70 text-sm mt-1">
-                    {language === 'he' ? 'הפרסים שלך נפתחו!' : 'Your rewards have been unlocked!'}
+                    {pm('rewardsUnlocked')}
                   </p>
                 </div>
 
@@ -188,12 +187,10 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   <AlertTriangle className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold text-yellow-300">
-                      {language === 'he' ? 'שים לב!' : 'Warning!'}
+                      {pm('warning')}
                     </p>
                     <p className="text-sm text-yellow-200/80 mt-1">
-                      {language === 'he'
-                        ? 'האיפוס יחזיר אותך לרמה 1. כל ה-XP הנוכחי יאופס, אבל תקבל את כל הפרסים למטה.'
-                        : 'This will reset you to Level 1. All current XP will be reset, but you will gain all rewards below.'}
+                      {pm('warningText')}
                     </p>
                   </div>
                 </div>
@@ -216,7 +213,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       'disabled:opacity-50'
                     )}
                   >
-                    {language === 'he' ? 'ביטול' : 'Cancel'}
+                    {pm('cancel')}
                   </button>
                   <button
                     onClick={handlePrestige}
@@ -236,7 +233,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     ) : (
                       <>
                         <Check className="w-4 h-4 inline me-1" />
-                        {language === 'he' ? 'אשר פרסטיג\'' : 'Confirm Prestige'}
+                        {pm('confirmPrestige')}
                       </>
                     )}
                   </button>
@@ -255,13 +252,13 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 <div className="flex items-center justify-between p-4 rounded-neo bg-white/5 border-2 border-white/10">
                   <div>
                     <p className="text-xs text-white/70 uppercase tracking-wide">
-                      {language === 'he' ? 'רמה נוכחית' : 'Current Level'}
+                      {pm('currentLevel')}
                     </p>
                     <p className="text-2xl font-black text-white">{currentLevel}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs text-white/70 uppercase tracking-wide">
-                      {language === 'he' ? 'פרסטיג\'' : 'Prestige'}
+                      {pm('prestige')}
                     </p>
                     <p className="text-2xl font-black">
                       {currentPrestige > 0 ? (
@@ -275,7 +272,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-white/70 uppercase tracking-wide">
-                      {language === 'he' ? 'מכפיל XP' : 'XP Multiplier'}
+                      {pm('xpMultiplier')}
                     </p>
                     <p className="text-2xl font-black text-neo-lime">
                       {prestigeMultiplier > 1 ? `${Math.round((prestigeMultiplier - 1) * 100)}%` : '-'}
@@ -288,12 +285,10 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   <div className="text-center py-6">
                     <div className="text-5xl mb-3">{PRESTIGE_ICONS[5]}</div>
                     <p className="text-xl font-black text-purple-400">
-                      {language === 'he' ? 'פרסטיג\' מקסימלי!' : 'Maximum Prestige!'}
+                      {pm('maxPrestige')}
                     </p>
                     <p className="text-white/60 text-sm mt-1">
-                      {language === 'he'
-                        ? 'הגעת לרמה הגבוהה ביותר. אתה אגדה!'
-                        : 'You have reached the highest level. You are a legend!'}
+                      {pm('maxPrestigeText')}
                     </p>
                   </div>
                 ) : (
@@ -302,7 +297,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     <div className="space-y-2">
                       <p className="text-xs text-white/70 uppercase tracking-wide flex items-center gap-1">
                         <Star className="w-3 h-3" />
-                        {language === 'he' ? `פרסים לפרסטיג' ${toRoman(nextPrestigeLevel)}` : `Prestige ${toRoman(nextPrestigeLevel)} Rewards`}
+                        {pm('rewardsFor').replace('{{level}}', toRoman(nextPrestigeLevel))}
                       </p>
 
                       <div className="grid gap-2">
@@ -352,19 +347,15 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                         )}
                       >
                         <Sparkles className="w-5 h-5 inline me-2" />
-                        {language === 'he' ? `קפוץ לפרסטיג' ${toRoman(nextPrestigeLevel)}` : `Prestige to ${toRoman(nextPrestigeLevel)}`}
+                        {pm('prestigeTo').replace('{{level}}', toRoman(nextPrestigeLevel))}
                       </motion.button>
                     ) : (
                       <div className="p-4 rounded-neo bg-white/5 border-2 border-white/10 text-center">
                         <p className="text-white/70 text-sm">
-                          {language === 'he'
-                            ? `הגע לרמה 100 כדי לבצע פרסטיג'`
-                            : `Reach Level 100 to Prestige`}
+                          {pm('reachLevel')}
                         </p>
                         <p className="text-white/60 text-xs mt-1">
-                          {language === 'he'
-                            ? `${100 - currentLevel} רמות נותרו`
-                            : `${100 - currentLevel} levels remaining`}
+                          {pm('levelsRemaining').replace('{{count}}', String(100 - currentLevel))}
                         </p>
                       </div>
                     )}

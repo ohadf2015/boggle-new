@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { RotateCcw, Home, Trophy, Zap, Grid3X3, Star } from 'lucide-react';
-import confetti from 'canvas-confetti';
+// canvas-confetti is lazy-loaded (only fires on 3 stars or retrigger)
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BlastResultsData, BlastDifficulty } from './types';
 import { useBlastResultSaver } from './hooks/useBlastResultSaver';
 import { StarRating, StatCard, WaveBreakdown } from './BlastResultsComponents';
+import { BlastSkillBreakdown } from './BlastSkillBreakdown';
 
 interface BlastResultsProps {
   results: BlastResultsData;
@@ -47,11 +48,13 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
   // Auto-fire confetti on mount when 3 stars — only once
   useEffect(() => {
     if (results.stars === 3) {
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.5 },
-        colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
+      import('canvas-confetti').then(({ default: confettiFn }) => {
+        confettiFn({
+          particleCount: 150,
+          spread: 80,
+          origin: { y: 0.5 },
+          colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
+        });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,7 +67,9 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
       : (t('blast.stars1'));
 
   const handleRetrigger = () => {
-    confetti({ particleCount: 80, spread: 60, origin: { y: 0.5 } });
+    import('canvas-confetti').then(({ default: confettiFn }) => {
+      confettiFn({ particleCount: 80, spread: 60, origin: { y: 0.5 } });
+    });
   };
 
   return (
@@ -164,8 +169,11 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
           )}
         </div>
 
-        {/* Wave-by-wave breakdown */}
-        <div>
+        {/* Skill breakdown */}
+        <div className="space-y-6">
+          <BlastSkillBreakdown results={results} t={t} />
+
+          {/* Wave-by-wave breakdown */}
           <WaveBreakdown
             waveResults={results.waveResults ?? []}
             label={t('blast.waveBreakdown')}

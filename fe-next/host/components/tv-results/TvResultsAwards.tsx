@@ -73,7 +73,7 @@ function seededRandom(seed: number): () => number {
 /**
  * TvResultsAwards - Fun awards section
  * Recognizes players for special achievements beyond just winning.
- * Calculates ~14 possible awards, then randomly selects 6 to display
+ * Calculates ~14 possible awards, then randomly selects 3 to display
  * (seeded by score sum for deterministic results).
  */
 const TvResultsAwards = memo<TvResultsAwardsProps>(({
@@ -449,8 +449,8 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
       awardedPlayers.add(socialButterfly.player.username);
     }
 
-    // Randomly select 6 from the pool using seeded RNG
-    if (allAwards.length <= 6) return allAwards;
+    // Randomly select 3 from the pool using seeded RNG for variety
+    if (allAwards.length <= 3) return allAwards;
 
     const rng = seededRandom(seed);
     const shuffled = [...allAwards];
@@ -458,7 +458,7 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
       const j = Math.floor(rng() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.slice(0, 6);
+    return shuffled.slice(0, 3);
   }, [players, gameDuration, t, seed]);
 
   if (awards.length === 0) return null;

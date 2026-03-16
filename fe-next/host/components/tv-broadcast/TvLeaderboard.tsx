@@ -1,10 +1,11 @@
 'use client';
 
-import React, { memo, useMemo, useRef, useEffect } from 'react';
+import { memo, useMemo, useRef, useEffect, Fragment } from 'react';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Users } from 'lucide-react';
 import TvPlayerCard from './TvPlayerCard';
+import TvGapIndicator from './TvGapIndicator';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 interface LeaderboardEntry {
@@ -96,21 +97,32 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
             {t('tvBroadcast.leaderboard')}
           </h3>
           {sortedPlayers.map((player, index) => (
-            <TvPlayerCard
-              key={player.username}
-              username={player.username}
-              avatar={player.avatar}
-              score={player.score}
-              wordCount={player.wordCount}
-              rank={index + 1}
-              comboLevel={playerCombos[player.username]?.level || 0}
-              isHost={player.username === hostUsername || player.isHost}
-              isBot={player.isBot}
-              presenceStatus={player.presenceStatus}
-              disconnected={player.disconnected}
-              index={index}
-              t={t}
-            />
+            <Fragment key={player.username}>
+              <TvPlayerCard
+                username={player.username}
+                avatar={player.avatar}
+                score={player.score}
+                wordCount={player.wordCount}
+                rank={index + 1}
+                leaderScore={sortedPlayers[0]?.score || 0}
+                comboLevel={playerCombos[player.username]?.level || 0}
+                isHost={player.username === hostUsername || player.isHost}
+                isBot={player.isBot}
+                presenceStatus={player.presenceStatus}
+                disconnected={player.disconnected}
+                index={index}
+                t={t}
+              />
+              {index === 0 && sortedPlayers.length >= 2 && (
+                <TvGapIndicator
+                  leaderScore={sortedPlayers[0].score}
+                  secondScore={sortedPlayers[1].score}
+                  leaderName={sortedPlayers[0].username}
+                  secondName={sortedPlayers[1].username}
+                  t={t}
+                />
+              )}
+            </Fragment>
           ))}
         </motion.div>
       </LayoutGroup>
@@ -158,6 +170,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
                   score={player.score}
                   wordCount={player.wordCount}
                   rank={virtualRow.index + 1}
+                  leaderScore={sortedPlayers[0]?.score || 0}
                   comboLevel={playerCombos[player.username]?.level || 0}
                   isHost={player.username === hostUsername || player.isHost}
                   isBot={player.isBot}

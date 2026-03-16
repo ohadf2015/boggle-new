@@ -55,7 +55,7 @@ export interface UseBlastGameOptions {
   movesAllowed?: number;
   waveObjectives?: BlastObjective[];
   currentWave?: number;
-  onSynergyDetected?: (comboType: BlastComboType) => void;
+  onSynergyDetected?: (comboType: BlastComboType, scoreMultiplier: number) => void;
   onComboDetected?: (combos: SpecialCombo[]) => void;
   onMovesExhausted?: () => void;
   /** When true, disables board-clear auto-complete and dead-end detection (server timer is authoritative) */

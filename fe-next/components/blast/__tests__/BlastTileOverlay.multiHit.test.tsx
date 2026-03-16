@@ -23,6 +23,13 @@ jest.mock('framer-motion', () => {
   };
 });
 
+jest.mock('@/components/motion/AdaptiveMotion', () => ({
+  AdaptiveMotion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  },
+  AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
 // Mock lucide-react icons
 jest.mock('lucide-react', () => {
   const React = require('react');
@@ -43,6 +50,8 @@ jest.mock('lucide-react', () => {
     Sparkles: Icon('sparkles'),
     Diamond: Icon('diamond'),
     Magnet: Icon('magnet'),
+    Gem: Icon('gem'),
+    CircleDollarSign: Icon('circle-dollar-sign'),
   };
 });
 

@@ -151,6 +151,16 @@ const GridComponent = memo<GridComponentProps>(({
   useEffect(() => { onWordChange?.(formedWord, selectedCellsLength); }, [formedWord, selectedCellsLength, onWordChange]);
   useEffect(() => { onSelectionChange?.(selectedCells); }, [selectedCells, onSelectionChange]);
 
+  // Pre-compute Sets for O(1) lookups instead of O(n) .some() per cell during render
+  const selectedCellsSet = useMemo(
+    () => new Set(selectedCells.map(c => `${c.row}-${c.col}`)),
+    [selectedCells],
+  );
+  const fadingCellsSet = useMemo(
+    () => new Set(fadingCells.map(c => `${c.row}-${c.col}`)),
+    [fadingCells],
+  );
+
   const adjacentHintCells = useMemo(() => {
     if (selectedCells.length === 0) return new Set<string>();
     const lastCell = selectedCells[selectedCells.length - 1];
@@ -164,15 +174,14 @@ const GridComponent = memo<GridComponentProps>(({
         const newCol = lastCell.col + dc;
         if (newRow >= 0 && newRow < grid.length &&
           newCol >= 0 && newCol < (grid[0]?.length || 0)) {
-          const isAlreadySelected = selectedCells.some(c => c.row === newRow && c.col === newCol);
-          if (!isAlreadySelected) {
+          if (!selectedCellsSet.has(`${newRow}-${newCol}`)) {
             hints.add(`${newRow}-${newCol}`);
           }
         }
       }
     }
     return hints;
-  }, [selectedCells, grid]);
+  }, [selectedCells, selectedCellsSet, grid]);
 
   const { highlightedCellsSet, highlightedCellOrder } = useMemo(() => {
     const set = new Set<string>();
@@ -338,10 +347,10 @@ const GridComponent = memo<GridComponentProps>(({
           {grid.map((row, i) =>
             row.map((cell, j) => {
               const cellKey = `${i}-${j}`;
-              const isSelected = selectedCells.some(c => c.row === i && c.col === j);
+              const isSelected = selectedCellsSet.has(cellKey);
               const firstSelected = selectedCells[0];
               const isFirstSelected = firstSelected !== undefined && firstSelected.row === i && firstSelected.col === j;
-              const isFading = fadingCells.some(c => c.row === i && c.col === j);
+              const isFading = fadingCellsSet.has(cellKey);
               const isFocused = focusedCell?.row === i && focusedCell?.col === j;
               const isAdjacentHint = adjacentHintCells.has(cellKey);
               const isHighlighted = highlightedCellsSet.has(cellKey);

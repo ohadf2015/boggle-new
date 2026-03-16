@@ -10,9 +10,6 @@ import InGameScreen from '../../components/game/InGameScreen';
 import { BlastGame } from '@/components/blast/BlastGame';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
 import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
-import { QuickReactions, FloatingReaction } from '@/components/game/QuickReactions';
-import { AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { useQuickReactions } from '@/hooks/useQuickReactions';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { cn } from '@/lib/utils';
@@ -211,12 +208,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
 
-  // Quick emoji reactions for multiplayer
-  const { floatingReactions, sendReaction, dismissReaction } = useQuickReactions({
-    socket: socket ?? null,
-    username,
-  });
-
   // Blast multiplayer bridge — converts Zustand state to BlastGame props
   const blastBridge = useBlastMultiplayerBridge({
     letterGrid: letterGrid || shufflingGrid,
@@ -266,22 +257,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
       gameMode === 'blast' ? 'bg-neo-navy p-0' : 'bg-neo-cream dark:bg-neo-navy p-0 md:p-4'
     )}>
 
-      {/* Quick Reactions overlay */}
-      {leaderboard.length > 1 && (
-        <>
-          <div className="absolute inset-0 pointer-events-none z-40">
-            <AdaptiveAnimatePresence>
-              {floatingReactions.map((r) => (
-                <FloatingReaction key={r.id} id={r.id} emoji={r.emoji} username={r.username} x={r.x} y={r.y} onComplete={dismissReaction} />
-              ))}
-            </AdaptiveAnimatePresence>
-          </div>
-          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 md:bottom-auto md:top-1/2 md:left-auto md:right-2 md:-translate-y-1/2 md:translate-x-0">
-            <QuickReactions onReaction={sendReaction} layout="bar" className="md:hidden" />
-            <QuickReactions onReaction={sendReaction} layout="vertical" className="hidden md:flex" />
-          </div>
-        </>
-      )}
 
       {/* Main Game Content — Blast/WordHunt use dedicated components, others use InGameScreen */}
       {gameMode === 'blast' ? (

@@ -21,6 +21,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import NearRankIndicator from '@/components/leaderboard/NearRankIndicator';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -341,9 +342,10 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         avatarImage={entry.avatar_image ?? undefined}
                         size="sm"
                       />
-                      <span
+                      <Link
+                        href={`/${language}/player/${encodeURIComponent(entry.player_id)}`}
                         className={cn(
-                          'font-medium truncate text-sm flex-1',
+                          'font-medium truncate text-sm flex-1 hover:underline',
                           isCurrentUser
                             ? isDarkMode
                               ? 'text-cyan-400'
@@ -354,7 +356,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         )}
                       >
                         {entry.display_name || entry.username}
-                      </span>
+                      </Link>
                       <div className={cn(
                         'sm:hidden font-semibold text-sm',
                         isDarkMode ? 'text-white' : 'text-gray-900'

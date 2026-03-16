@@ -77,16 +77,18 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onNameChange,
   onAvatarChange,
 }): React.ReactElement => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, updateProfile } = useAuth();
 
   // Avatar builder state
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const currentAvatar = getStoredCustomAvatar() ?? getRandomAvatarConfig();
 
-  const handleAvatarSave = (config: CustomAvatarConfig) => {
+  const handleAvatarSave = async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
     onAvatarChange?.(config);
     setIsAvatarBuilderOpen(false);
+    // Persist to DB for authenticated users so header/menu avatar updates
+    await updateProfile({ avatar_config: config }).catch(() => {});
   };
 
   // Rotating word facts

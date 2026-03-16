@@ -2941,6 +2941,8 @@ const he = {
     "topPercent": "טופ {{percent}}%",
     "challenge": "אתגר",
     "addFriend": "הוסף חבר",
+    "friends": "חברים",
+    "requestSent": "בקשה נשלחה",
     "viewProfile": "צפה בפרופיל",
     "viewPublicProfile": "צפה בפרופיל הציבורי",
     "games": "משחקים"

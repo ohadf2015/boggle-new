@@ -2,6 +2,7 @@
 
 import { memo, useRef, useState, useEffect } from 'react';
 import { Skull, X } from 'lucide-react';
+import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 
 export interface LeaderboardPlayer {
   username: string;
@@ -81,11 +82,20 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
               }`}
             >
               {/* Player name */}
-              <span className={`text-sm font-bold truncate flex-shrink min-w-0 ${
-                isCurrent ? 'text-neo-yellow' : 'text-neo-white'
-              }`}>
-                {player.username}
-              </span>
+              <PlayerProfileTooltip
+                player={{
+                  username: player.username,
+                  score: player.score,
+                }}
+                isCurrentUser={isCurrent}
+                side="right"
+              >
+                <span className={`text-sm font-bold truncate flex-shrink min-w-0 ${
+                  isCurrent ? 'text-neo-yellow' : 'text-neo-white cursor-pointer hover:underline'
+                }`}>
+                  {player.username}
+                </span>
+              </PlayerProfileTooltip>
 
               {/* Life bar */}
               <div className="flex-1 min-w-[40px]">

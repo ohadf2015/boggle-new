@@ -80,6 +80,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const [lootDrops, setLootDrops] = useState<LootDrop[]>([]);
   const [earnedXp, setEarnedXp] = useState<number>(0);
   const [earnedGold, setEarnedGold] = useState<number>(0);
+  const [nonBossCompleted, setNonBossCompleted] = useState(false);
   const completionProcessedRef = useRef(false);
 
   // Store callbacks in refs for stable references
@@ -178,6 +179,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       else showDefeat();
     }
     pauseGame();
+    setNonBossCompleted(!isBossLevel);
   }, [showLevelComplete, showVictoryCinematic, showDefeatCinematic, gameState.isComplete, gameState.stars, timeRemaining, pauseGame, isBossLevel, bossHealthPhase, playerIsDead, showVictory, showDefeat]);
 
   // Boss Battle Completion
@@ -248,6 +250,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     setLootDrops([]);
     setEarnedXp(0);
     setEarnedGold(0);
+    setNonBossCompleted(false);
     completionProcessedRef.current = false;
   }, []);
 
@@ -257,6 +260,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     lootDrops,
     earnedXp,
     earnedGold,
+    nonBossCompleted,
     handleLevelUpClose,
     resetRewards,
     completionProcessedRef,

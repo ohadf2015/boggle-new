@@ -2729,6 +2729,8 @@ const es = {
     "topPercent": "Top {{percent}}%",
     "challenge": "Desafiar",
     "addFriend": "Agregar amigo",
+    "friends": "Amigos",
+    "requestSent": "Solicitud enviada",
     "viewProfile": "Ver perfil",
     "viewPublicProfile": "Ver perfil público",
     "games": "Partidas"

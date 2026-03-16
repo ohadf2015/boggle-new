@@ -1,7 +1,8 @@
 /**
  * AttackTelegraph Component Tests
  *
- * Tests for the attack telegraph warning UI component.
+ * Tests for the simplified edge-glow attack warning component.
+ * The countdown ring has been moved to BossOverlay HUD strip.
  */
 
 import { render, screen } from '@testing-library/react';
@@ -13,36 +14,11 @@ jest.mock('../../../hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: jest.fn(() => false),
 }));
 
-// Mock the theme context
-jest.mock('@/contexts/AdventureThemeContext', () => ({
-  useBossFightTheme: () => ({
-    telegraphColor: 'bg-neo-red/20',
-    telegraphProgressColor: 'bg-neo-red',
-    dialogueBg: 'bg-neo-navy/95',
-    dialogueBorder: 'border-neo-white/20',
-    bossNameColor: 'text-neo-red',
-    hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
-    playerHealthNormal: 'bg-neo-lime',
-    playerHealthLow: 'bg-neo-red',
-    phaseColors: {
-      phase1: { bg: 'bg-neo-lime/20', text: 'text-neo-lime' },
-      phase2: { bg: 'bg-neo-orange/20', text: 'text-neo-orange' },
-      enraged: { bg: 'bg-neo-red/20', text: 'text-neo-red' },
-    },
-    avatarGlow: 'rgba(239, 68, 68, 0.4)',
-    victoryGlow: 'rgba(163, 230, 53, 0.6)',
-    arenaEffect: 'none',
-  }),
-}));
-
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>
-    ),
-    span: ({ children, ...props }: React.ComponentProps<'span'>) => (
-      <span {...props}>{children}</span>
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => (
@@ -77,87 +53,50 @@ describe('AttackTelegraph', () => {
     });
   });
 
-  describe('Warning Banner', () => {
-    it('should render warning banner', () => {
+  describe('Edge Glow', () => {
+    it('should render edge glow overlay when active', () => {
       renderWithProviders(<AttackTelegraph {...defaultProps} />);
-      expect(screen.getByTestId('telegraph-banner')).toBeInTheDocument();
+      const telegraph = screen.getByTestId('attack-telegraph');
+      expect(telegraph).toBeInTheDocument();
+      // Edge glow is a child div with boxShadow style
+      const glowDiv = telegraph.querySelector('[aria-hidden="true"]');
+      expect(glowDiv).toBeInTheDocument();
     });
 
-    it('should show warning text', () => {
-      renderWithProviders(<AttackTelegraph {...defaultProps} />);
-      // Uses t() for translation - check the banner exists
-      const banner = screen.getByTestId('telegraph-banner');
-      expect(banner).toBeInTheDocument();
-    });
-
-    it('should show ability name when provided', () => {
-      renderWithProviders(
-        <AttackTelegraph
-          {...defaultProps}
-          abilityName="adventure.bosses.abilities.scramble"
-        />
+    it('should intensify edge glow as progress increases', () => {
+      const { rerender } = renderWithProviders(
+        <AttackTelegraph {...defaultProps} progress={0.1} />
       );
-      // Ability name would be rendered via translation
-      const banner = screen.getByTestId('telegraph-banner');
-      expect(banner).toBeInTheDocument();
-    });
+      const telegraph1 = screen.getByTestId('attack-telegraph');
+      const glow1 = telegraph1.querySelector('[aria-hidden="true"]');
+      const shadow1 = (glow1 as HTMLElement)?.style.boxShadow || '';
 
-    it('should render warning icon', () => {
-      renderWithProviders(<AttackTelegraph {...defaultProps} />);
-      // Warning emoji icon
-      expect(screen.getByText('⚠️')).toBeInTheDocument();
-    });
+      rerender(
+        <LanguageProvider>
+          <AttackTelegraph {...defaultProps} progress={0.9} />
+        </LanguageProvider>
+      );
+      const telegraph2 = screen.getByTestId('attack-telegraph');
+      const glow2 = telegraph2.querySelector('[aria-hidden="true"]');
+      const shadow2 = (glow2 as HTMLElement)?.style.boxShadow || '';
 
-    it('should apply theme telegraph color class to banner', () => {
-      renderWithProviders(<AttackTelegraph {...defaultProps} />);
-      const banner = screen.getByTestId('telegraph-banner');
-      // The theme mock returns 'bg-neo-red/20' as telegraphColor
-      // Ensure it's interpolated, not the literal string "${bossFightTheme.telegraphColor}"
-      expect(banner.className).toContain('bg-neo-red/20');
-      expect(banner.className).not.toContain('${');
+      // Higher progress = larger spread value in box-shadow
+      expect(shadow1).not.toBe(shadow2);
     });
   });
 
-  describe('Countdown', () => {
-    it('should show countdown in seconds', () => {
-      renderWithProviders(
-        <AttackTelegraph {...defaultProps} timeRemaining={1500} />
-      );
-      expect(screen.getByTestId('telegraph-countdown')).toHaveTextContent('2');
-    });
+  describe('Reduced Motion', () => {
+    it('should show static fallback when reduced motion preferred', () => {
+      const { usePrefersReducedMotion } = require('../../../hooks/usePrefersReducedMotion');
+      usePrefersReducedMotion.mockReturnValue(true);
 
-    it('should show 1 second when under 1000ms remaining', () => {
-      renderWithProviders(
-        <AttackTelegraph {...defaultProps} timeRemaining={500} />
-      );
-      expect(screen.getByTestId('telegraph-countdown')).toHaveTextContent('1');
-    });
-
-    it('should show 2 seconds at start', () => {
-      renderWithProviders(
-        <AttackTelegraph {...defaultProps} timeRemaining={2000} />
-      );
-      expect(screen.getByTestId('telegraph-countdown')).toHaveTextContent('2');
-    });
-
-    it('should show 0 seconds when complete', () => {
-      renderWithProviders(
-        <AttackTelegraph {...defaultProps} timeRemaining={0} />
-      );
-      expect(screen.getByTestId('telegraph-countdown')).toHaveTextContent('0');
-    });
-  });
-
-  describe('Progress Bar', () => {
-    it('should render progress bar', () => {
       renderWithProviders(<AttackTelegraph {...defaultProps} />);
-      expect(screen.getByTestId('telegraph-progress-bar')).toBeInTheDocument();
-    });
+      const telegraph = screen.getByTestId('attack-telegraph');
+      // Should have a static glow div
+      const fallback = telegraph.querySelector('[aria-hidden="true"]');
+      expect(fallback).toBeInTheDocument();
 
-    it('should render progress fill', () => {
-      renderWithProviders(<AttackTelegraph {...defaultProps} progress={0.5} />);
-      const progressBar = screen.getByTestId('telegraph-progress-bar');
-      expect(progressBar).toBeInTheDocument();
+      usePrefersReducedMotion.mockReturnValue(false);
     });
   });
 
@@ -166,7 +105,6 @@ describe('AttackTelegraph', () => {
       renderWithProviders(
         <AttackTelegraph {...defaultProps} targetTiles={[5, 6, 7, 8, 9]} />
       );
-      // Component receives tiles - integration with grid happens at parent level
       expect(screen.getByTestId('attack-telegraph')).toBeInTheDocument();
     });
 
@@ -214,6 +152,19 @@ describe('AttackTelegraph', () => {
         <AttackTelegraph {...defaultProps} progress={0.75} />
       );
       expect(screen.getByTestId('attack-telegraph')).toBeInTheDocument();
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should have alert role', () => {
+      renderWithProviders(<AttackTelegraph {...defaultProps} />);
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    it('should have aria-label for screen readers', () => {
+      renderWithProviders(<AttackTelegraph {...defaultProps} />);
+      const telegraph = screen.getByTestId('attack-telegraph');
+      expect(telegraph).toHaveAttribute('aria-label');
     });
   });
 });

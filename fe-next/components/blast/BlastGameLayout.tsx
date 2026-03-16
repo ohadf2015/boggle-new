@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { ArrowLeft, Bomb, BookOpen, HelpCircle, Lightbulb, Shuffle, Star } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
 import ComboDisplay from '@/components/game/ComboDisplay';
@@ -33,6 +33,12 @@ import type { BlastComboType } from './utils/blastCombos';
 import { LeadChangeBanner } from '@/components/game/LeadChangeBanner';
 import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 import { BlastOpponentFeed } from './BlastOpponentFeed';
+import { BlastComboStreakBadge } from './BlastComboStreakBadge';
+import type { ComboStreakState } from './hooks/useBlastComboStreak';
+import { BlastHotTileOverlay } from './BlastHotTileOverlay';
+import type { HotTile } from './hooks/useBlastHotTiles';
+import BlastReactiveBackground from './BlastReactiveBackground';
+import BlastBoardIntensity from './BlastBoardIntensity';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -116,6 +122,19 @@ interface BlastGameLayoutProps {
   discoveredCombos?: Set<BlastComboType>;
   /** Player's personal best score (null if not loaded) */
   personalBestScore?: number | null;
+  // Combo streak badge
+  /** Current combo streak state from useBlastComboStreak */
+  streak?: ComboStreakState;
+  /** Ref to SVG countdown arc element driven by useBlastComboStreak */
+  arcRef?: React.RefObject<SVGCircleElement | null>;
+  // Hot tiles
+  /** Active hot tiles for overlay display */
+  hotTiles?: HotTile[];
+  /** Whether the hot tile phase is active */
+  isHotPhase?: boolean;
+  // Intensity
+  /** Game intensity level 0-5 for reactive background and board glow */
+  intensity?: number;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -175,10 +194,17 @@ export function BlastGameLayout({
   username,
   discoveredCombos,
   personalBestScore,
+  streak,
+  arcRef,
+  hotTiles,
+  // isHotPhase available for future UI indicator
+  isHotPhase: _isHotPhase,
+  intensity,
   t,
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
   const earnedStars = calculateEarnedStars(tilesCleared, totalTiles);
+  const shouldReduceMotion = useReducedMotion();
 
   // Lead change detection for multiplayer pop-up banners
   const leadChangeEvent = useLeadChangeDetection(
@@ -203,7 +229,7 @@ export function BlastGameLayout({
   }, [explosions]);
 
   useEffect(() => {
-    if (shakeRelevantCount > prevExplosionsRef.current && !shakeClass) {
+    if (shakeRelevantCount > prevExplosionsRef.current && !shakeClass && !shouldReduceMotion) {
       const hasPrism = explosions.some(e => e.type === 'prism');
       const hasBomb = explosions.some(e => e.type === 'bomb');
       const hasLightning = explosions.some(e => e.type === 'lightning');
@@ -222,7 +248,7 @@ export function BlastGameLayout({
     }
     prevExplosionsRef.current = shakeRelevantCount;
     return undefined;
-  }, [shakeRelevantCount, shakeClass, explosions]);
+  }, [shakeRelevantCount, shakeClass, explosions, shouldReduceMotion]);
 
   // Cascade haptic feedback (text announcement removed — BlastChainCounter handles visual)
   useEffect(() => {
@@ -270,7 +296,10 @@ export function BlastGameLayout({
 
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
-      {/* Background handled by BlastReactiveBackground in parent — no duplicate energy bg */}
+      {/* Reactive background — intensity-driven ambient visuals */}
+      {!shouldReduceMotion && intensity != null && intensity > 0 && (
+        <BlastReactiveBackground intensity={intensity} />
+      )}
 
       {/* Powerup mascot — overlays when hint path is active */}
       {hintPath && hintPath.length > 0 && (
@@ -356,8 +385,11 @@ export function BlastGameLayout({
         )}
       </header>
 
-      {/* Combo Display */}
-      <div className="h-6 flex items-center justify-center shrink-0 relative z-30">
+      {/* Combo Display + Streak Badge */}
+      <div className="h-6 flex items-center justify-center shrink-0 relative z-30 gap-2">
+        {streak && arcRef && (
+          <BlastComboStreakBadge streak={streak} arcRef={arcRef} />
+        )}
         <ComboDisplay
           comboLevel={comboLevel}
           compact
@@ -374,7 +406,8 @@ export function BlastGameLayout({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="absolute bottom-2 sm:bottom-4 start-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            className="absolute start-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
           >
             <BlastCascadeWordBanner highlightData={cascadeHighlightData} />
           </motion.div>
@@ -446,18 +479,18 @@ export function BlastGameLayout({
       </div>
 
       {/* MP Lead Change Banner — pop-up style like classic game */}
-      {isMultiplayer && (
+      {isMultiplayer ? (
         <div className="relative z-50">
           <LeadChangeBanner event={leadChangeEvent} />
         </div>
-      )}
+      ) : null}
 
       {/* MP Opponent Activity Feed — subtle ticker showing opponent words/combos */}
-      {isMultiplayer && (
+      {isMultiplayer ? (
         <div className="relative h-0">
           <BlastOpponentFeed />
         </div>
-      )}
+      ) : null}
 
       {/* Score threshold progress (visible on wave 3+) */}
       {scoreThreshold && score < scoreThreshold && (
@@ -479,7 +512,7 @@ export function BlastGameLayout({
 
       {/* Objective progress */}
       {objectiveProgress && objectiveProgress.length > 0 && (
-        <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
+        <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1 flex-shrink-0">
           <BlastObjectiveDisplay objectiveProgress={objectiveProgress} t={t} />
         </div>
       )}
@@ -506,7 +539,7 @@ export function BlastGameLayout({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden relative z-30 px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full"
+            className="overflow-hidden relative z-30 px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full flex-shrink-0"
           >
             <BlastFoundWords words={wordsFound} t={t} />
           </motion.div>
@@ -521,7 +554,7 @@ export function BlastGameLayout({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="overflow-hidden relative z-30 px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full"
+            className="overflow-hidden relative z-30 px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full flex-shrink-0"
           >
             <div className={cn(
               'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',
@@ -567,7 +600,13 @@ export function BlastGameLayout({
       </AnimatePresence>
 
       {/* Game grid with overlays */}
+      {(() => {
+        const gridContent = (
       <div className={cn('flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0 transition-shadow duration-500', comboGlow, shakeClass)}>
+        {/* Hot tile overlay — golden pulsing overlays for bonus tiles */}
+        {hotTiles && hotTiles.length > 0 && (
+          <BlastHotTileOverlay hotTiles={hotTiles} gridSize={gridSize} />
+        )}
         {/* Cascade chain counter — shown above grid during active cascades */}
         {cascadeChainLevel > 0 && (
           <div className="absolute top-2 start-1/2 -translate-x-1/2 z-50 pointer-events-none">
@@ -690,6 +729,12 @@ export function BlastGameLayout({
           onWordSubmit={onWordSubmit}
         />
       </div>
+        );
+        // Wrap grid in BlastBoardIntensity when intensity is active
+        return !shouldReduceMotion && intensity != null && intensity > 0
+          ? <BlastBoardIntensity intensity={intensity}>{gridContent}</BlastBoardIntensity>
+          : gridContent;
+      })()}
 
       {/* Quit Confirmation */}
       <ConfirmationDialog

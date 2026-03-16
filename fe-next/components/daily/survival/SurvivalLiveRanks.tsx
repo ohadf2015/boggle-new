@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
+import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import type { Language } from '@/types';
 
@@ -142,12 +143,24 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
               </div>
 
               {/* Name */}
-              <span className={cn(
-                'flex-1 truncate text-sm font-medium',
-                isCurrentPlayer(entry) ? 'text-neo-cyan font-bold' : 'text-neo-cream'
-              )}>
-                {entry.displayName}
-              </span>
+              <PlayerProfileTooltip
+                player={{
+                  id: entry.playerId,
+                  username: entry.displayName,
+                  profilePictureUrl: entry.profile_picture_url,
+                  avatarImage: entry.avatar_image ?? undefined,
+                  score: entry.score,
+                }}
+                isCurrentUser={isCurrentPlayer(entry)}
+                side="right"
+              >
+                <span className={cn(
+                  'flex-1 truncate text-sm font-medium',
+                  isCurrentPlayer(entry) ? 'text-neo-cyan font-bold' : 'text-neo-cream cursor-pointer hover:underline'
+                )}>
+                  {entry.displayName}
+                </span>
+              </PlayerProfileTooltip>
 
               {/* Score */}
               <span className="font-black text-sm tabular-nums text-neo-lime flex-shrink-0">

@@ -49,6 +49,7 @@ jest.mock('lucide-react', () => ({
   Shuffle: () => <span data-testid="shuffle-icon" />,
   Magnet: () => <span data-testid="magnet-icon" />,
   Zap: () => <span data-testid="zap-icon" />,
+  CircleDollarSign: () => <span data-testid="circle-dollar-sign-icon" />,
   RotateCcw: () => <span />,
   Home: () => <span />,
   Trophy: () => <span />,

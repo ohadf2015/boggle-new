@@ -1,12 +1,13 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo, memo } from 'react';
 import GridComponent from '@/components/GridComponent';
 import { BlastTileOverlay } from './BlastTileOverlay';
 import type { SelectedCell } from '@/components/grid';
 import { BlastExplosionLayer } from './BlastExplosionLayer';
 import { BlastCascadeOverlay } from './BlastCascadeOverlay';
 import { BlastCascadeHighlight } from './BlastCascadeHighlight';
+import { BlastSelectionPath } from './BlastSelectionPath';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastExplosion, BlastScorePopup, CascadeHighlightData } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
@@ -60,7 +61,7 @@ interface BlastGridProps {
  * 3. BlastCascadeOverlay — gravity/refill animations (anime.js)
  * 4. BlastExplosionLayer — particle effects
  */
-export function BlastGrid({
+export const BlastGrid = memo(function BlastGrid({
   grid,
   tileStates,
   gridSize,
@@ -122,7 +123,7 @@ export function BlastGrid({
   return (
     <div
       ref={containerRef}
-      className="blast-game blast-grid-frame relative w-full aspect-square max-w-[360px] md:max-w-[480px]"
+      className={`blast-game blast-grid-frame relative w-full aspect-square max-w-[360px] md:max-w-[480px] transition-shadow duration-300 ${!isInteractive ? 'ring-2 ring-cyan-400/30 ring-offset-1 ring-offset-transparent' : ''}`}
       style={{ contain: 'layout paint' }}
       data-cascade={cascadePhase !== 'idle' ? 'active' : 'idle'}
       aria-label={ariaLabel}
@@ -150,6 +151,9 @@ export function BlastGrid({
         selectedPositions={selectedPositions}
         objectiveTileTypes={objectiveTileTypes}
       />
+
+      {/* Selection path connector line */}
+      <BlastSelectionPath selectedCells={selectedCells} gridSize={gridSize} />
 
       {/* Near-miss shimmer: pulse overlay on cells the player almost used */}
       {shimmerCells.length > 0 && (
@@ -208,4 +212,4 @@ export function BlastGrid({
       )}
     </div>
   );
-}
+});

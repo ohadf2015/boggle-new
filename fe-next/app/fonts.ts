@@ -94,10 +94,49 @@ export const rubikHebrew = localFont({
 });
 
 /**
- * Legacy combined exports — used by app/[locale]/layout.tsx.
- * Keep for backward compatibility until locale-conditional wiring is done.
- * These combine all scripts into one CSS variable; the Hebrew woff2 files
- * will be downloaded on demand by the browser (not preloaded).
+ * Combined exports — used by app/[locale]/layout.tsx.
+ * Include both Latin and Hebrew sources so the browser can load
+ * the correct glyphs on demand via unicode-range matching.
  */
-export const fredoka = fredokaLatin;
-export const rubik = rubikLatin;
+export const fredoka = localFont({
+  src: [
+    {
+      path: '../public/fonts/fredoka-latin.woff2',
+      weight: '400 700',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/fredoka-hebrew.woff2',
+      weight: '400 700',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-fredoka',
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
+  preload: true,
+});
+
+export const rubik = localFont({
+  src: [
+    {
+      path: '../public/fonts/rubik-latin.woff2',
+      weight: '400 700',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/rubik-latin-ext.woff2',
+      weight: '400 700',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/rubik-hebrew.woff2',
+      weight: '400 700',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-rubik',
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
+  preload: true,
+});

@@ -1,7 +1,6 @@
-import { useCallback, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { detectVerticalWords, detectHorizontalWords } from '../utils/blastVerticalScanner';
 import {
-  MAX_CASCADE_CHAIN,
   MAX_CASCADE_WORDS_PER_LEVEL,
   CASCADE_MIN_WORD_LENGTH,
   CASCADE_DETECTION_DELAY,
@@ -31,6 +30,7 @@ export interface CascadeHandlerDeps {
   setGameState: (updater: (prev: BlastGameState) => BlastGameState) => void;
   setExplosions: (updater: (prev: BlastExplosion[]) => BlastExplosion[]) => void;
   setScorePopups: (updater: (prev: BlastScorePopup[]) => BlastScorePopup[]) => void;
+  maxCascadeChain: number;
 }
 
 export interface CascadeHandlerReturn {
@@ -77,7 +77,7 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
     setTileStates(newTileStates);
 
     if (
-      cascadeChainLevelRef.current < MAX_CASCADE_CHAIN &&
+      cascadeChainLevelRef.current < deps.maxCascadeChain &&
       isDictLoaded &&
       !gameStateRef.current.isComplete &&
       !gameStateRef.current.isDeadEnd
@@ -237,9 +237,17 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
       cascadeChainLevelRef.current = 0;
       setGameState(prev => ({ ...prev, cascadeChainLevel: 0 }));
     }
-  }, [isDictLoaded, checkWordInDict, cascade, gameStateRef, tileStatesRef, onAutoCascadeWordRef, setTileStates, setCurrentGrid, setGameState, setExplosions, setScorePopups]);
+  }, [isDictLoaded, checkWordInDict, cascade, gameStateRef, tileStatesRef, onAutoCascadeWordRef, setTileStates, setCurrentGrid, setGameState, setExplosions, setScorePopups, deps.maxCascadeChain]);
 
   handleCascadeCompleteRef.current = handleCascadeComplete;
+
+  // Cleanup timers on unmount to prevent setState-on-unmounted-component
+  useEffect(() => {
+    return () => {
+      if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
+      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+    };
+  }, []);
 
   return {
     handleCascadeComplete,

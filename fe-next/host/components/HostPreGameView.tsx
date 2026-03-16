@@ -343,7 +343,7 @@ function HostPreGameView({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 min-h-0 overflow-hidden bg-neo-navy/95 flex flex-col">
+      <main className="flex-1 min-h-0 overflow-y-auto bg-neo-navy/95 flex flex-col">
         {/* Desktop Layout */}
         <div className="hidden lg:flex lg:flex-col flex-1 min-h-0">
           <DesktopLobbyLayout

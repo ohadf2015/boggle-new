@@ -1,9 +1,11 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import CircularTimer from '../../../components/CircularTimer';
+
+type UrgencyLevel = 'normal' | 'urgent' | 'critical' | 'extreme';
 
 interface TvGameHeaderProps {
   remainingTime: number | null;
@@ -11,12 +13,33 @@ interface TvGameHeaderProps {
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
   earthquakeState?: 'idle' | 'warning' | 'shaking' | 'fire-round';
+  urgencyLevel?: UrgencyLevel;
+  gameMode?: string | null;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
+const HEARTBEAT_DURATION: Record<UrgencyLevel, number> = {
+  normal: 0,
+  urgent: 1,
+  critical: 0.5,
+  extreme: 0.15,
+};
+
+const MODE_COLORS: Record<string, string> = {
+  classic: 'bg-neo-cyan text-neo-black',
+  blast: 'bg-neo-orange text-neo-black',
+  'word-hunt': 'bg-neo-pink text-neo-cream',
+};
+
+const MODE_KEYS: Record<string, string> = {
+  classic: 'tvBroadcast.modeClassic',
+  blast: 'tvBroadcast.modeBlast',
+  'word-hunt': 'tvBroadcast.modeWordHunt',
+};
+
 /**
  * TvGameHeader - Game header for TV broadcast mode
- * Shows LIVE badge, large timer, and fire round indicator
+ * Shows LIVE badge, large timer with heartbeat pulse, game mode, and fire round indicator
  */
 const TvGameHeader = memo<TvGameHeaderProps>(({
   remainingTime,
@@ -24,14 +47,17 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
   fireRoundActive = false,
   fireRoundRemaining = 0,
   earthquakeState = 'idle',
+  urgencyLevel = 'normal',
+  gameMode,
   t,
 }) => {
   const totalTimeSeconds = timerValue * 60;
+  const showHeartbeat = urgencyLevel !== 'normal';
 
   return (
     <div className="w-full px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Left: LIVE badge */}
+        {/* Left: LIVE badge + Mode badge */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -62,16 +88,48 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
             />
             <span className="font-black text-lg uppercase tracking-wider">{t('tvBroadcast.live')}</span>
           </motion.div>
+
+          {/* Game Mode Badge */}
+          {gameMode && (
+            <motion.div
+              data-testid="mode-badge"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className={`px-3 py-1 rounded-neo border-2 border-neo-black shadow-hard-sm font-bold text-sm uppercase ${MODE_COLORS[gameMode] || 'bg-neo-navy text-neo-cream'}`}
+            >
+              {t(MODE_KEYS[gameMode] || `tvBroadcast.mode.${gameMode}`)}
+            </motion.div>
+          )}
         </motion.div>
 
-        {/* Center: Timer (extra large for TV) */}
+        {/* Center: Timer with heartbeat pulse */}
         <div className="flex-1 flex justify-center">
           {remainingTime !== null && (
-            <CircularTimer
-              remainingTime={remainingTime}
-              totalTime={totalTimeSeconds}
-              size="lg"
-            />
+            showHeartbeat ? (
+              <motion.div
+                data-testid="timer-heartbeat"
+                data-urgency={urgencyLevel}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{
+                  duration: HEARTBEAT_DURATION[urgencyLevel],
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                className={urgencyLevel === 'extreme' ? 'rounded-full ring-4 ring-red-500/60' : ''}
+              >
+                <CircularTimer
+                  remainingTime={remainingTime}
+                  totalTime={totalTimeSeconds}
+                  size="lg"
+                />
+              </motion.div>
+            ) : (
+              <CircularTimer
+                remainingTime={remainingTime}
+                totalTime={totalTimeSeconds}
+                size="lg"
+              />
+            )
           )}
         </div>
 

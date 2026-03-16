@@ -2478,6 +2478,8 @@ const sv = {
     "topPercent": "Topp {{percent}}%",
     "challenge": "Utmana",
     "addFriend": "Lägg till vän",
+    "friends": "Vänner",
+    "requestSent": "Förfrågan skickad",
     "viewProfile": "Visa profil",
     "viewPublicProfile": "Visa offentlig profil",
     "games": "Spel"

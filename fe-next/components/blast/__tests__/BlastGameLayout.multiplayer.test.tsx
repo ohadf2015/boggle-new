@@ -15,6 +15,7 @@ jest.mock('framer-motion', () => ({
     span: ({ children, ...rest }: any) => <span {...rest}>{children}</span>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 jest.mock('@/contexts/LanguageContext', () => ({

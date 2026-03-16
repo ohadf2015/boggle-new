@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -10,7 +10,9 @@ interface LandingBottomCTAProps {
 }
 
 export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const isRTL = dir === 'rtl';
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   return (
     <motion.div
@@ -54,7 +56,7 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
           whileTap={{ scale: 0.95 }}
         >
           {t('landing.startPlaying')}
-          <ArrowRight className="w-5 h-5" />
+          <ArrowIcon className="w-5 h-5" />
         </motion.button>
       </div>
     </motion.div>

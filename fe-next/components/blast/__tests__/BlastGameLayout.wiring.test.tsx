@@ -5,15 +5,6 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
-// Capture props passed to Mascot for assertion
-const MockMascot = jest.fn(({ variant }: { variant: string }) => (
-  <div data-testid={`mascot-${variant}`} />
-));
-
-jest.mock('@/components/ui/Mascot', () => ({
-  Mascot: (props: any) => MockMascot(props),
-}));
-
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
@@ -24,10 +15,6 @@ jest.mock('framer-motion', () => ({
 
 jest.mock('@/lib/utils', () => ({
   cn: (...args: any[]) => args.filter(Boolean).join(' '),
-}));
-
-jest.mock('@/components/singleplayer/game/components/DynamicEnergyBackground', () => ({
-  DynamicEnergyBackground: () => <div data-testid="energy-bg" />,
 }));
 
 jest.mock('../BlastGrid', () => ({
@@ -81,6 +68,37 @@ jest.mock('@/components/grid/hapticFeedback', () => ({
 
 jest.mock('../utils/blastStarCalculator', () => ({
   calculateEarnedStars: jest.fn().mockReturnValue(2),
+}));
+
+jest.mock('@/components/ui/Mascot', () => ({
+  Mascot: () => <div data-testid="mascot" />,
+}));
+
+// Mock the new orphaned components to verify they render
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const MockBlastComboStreakBadge = jest.fn((_props: any) => <div data-testid="combo-streak-badge" />);
+jest.mock('../BlastComboStreakBadge', () => ({
+  BlastComboStreakBadge: (props: any) => MockBlastComboStreakBadge(props),
+}));
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const MockBlastHotTileOverlay = jest.fn((_props: any) => <div data-testid="blast-hot-tile-container" />);
+jest.mock('../BlastHotTileOverlay', () => ({
+  BlastHotTileOverlay: (props: any) => MockBlastHotTileOverlay(props),
+}));
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const MockBlastReactiveBackground = jest.fn((_props: any) => <div data-testid="blast-reactive-bg" />);
+jest.mock('../BlastReactiveBackground', () => ({
+  __esModule: true,
+  default: (props: any) => MockBlastReactiveBackground(props),
+}));
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const MockBlastBoardIntensity = jest.fn(({ children }: any) => <div data-testid="blast-board-intensity">{children}</div>);
+jest.mock('../BlastBoardIntensity', () => ({
+  __esModule: true,
+  default: (props: any) => MockBlastBoardIntensity(props),
 }));
 
 // ---------------------------------------------------------------------------
@@ -163,70 +181,74 @@ const baseProps = {
   setShowQuitConfirm: jest.fn(),
   showEndGameConfirm: false,
   setShowEndGameConfirm: jest.fn(),
-  hintPath: null,
-  hasHintAvailable: false,
-  onRequestHint: jest.fn(),
-  onClearHint: jest.fn(),
   t,
 };
 
-beforeEach(() => {
-  MockMascot.mockClear();
-});
-
 // ---------------------------------------------------------------------------
-// Tests
+// Tests: Wiring of orphaned features
 // ---------------------------------------------------------------------------
 
-describe('BlastGameLayout - powerup mascot', () => {
-  it('shows powerup mascot when a hint path is active (power-up active)', () => {
+describe('BlastGameLayout orphaned feature wiring', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders BlastComboStreakBadge when streak prop is provided with active streak', () => {
     render(
       <BlastGameLayout
         {...baseProps}
-        hintPath={[{ row: 0, col: 0 }, { row: 0, col: 1 }]}
+        streak={{ level: 3, isActive: true, multiplier: 1.6 }}
+        arcRef={{ current: null }}
       />,
     );
-    expect(screen.getByTestId('mascot-powerup')).toBeInTheDocument();
-  });
-
-  it('hides powerup mascot when no hint path is active (no power-up)', () => {
-    render(<BlastGameLayout {...baseProps} hintPath={null} />);
-    expect(screen.queryByTestId('mascot-powerup')).not.toBeInTheDocument();
-  });
-
-  it('renders powerup mascot with animated prop so the GIF has CSS enhancement', () => {
-    render(
-      <BlastGameLayout
-        {...baseProps}
-        hintPath={[{ row: 0, col: 0 }, { row: 0, col: 1 }]}
-      />,
-    );
-    expect(MockMascot).toHaveBeenCalledWith(
-      expect.objectContaining({ variant: 'powerup', animated: true }),
+    expect(MockBlastComboStreakBadge).toHaveBeenCalledWith(
+      expect.objectContaining({
+        streak: { level: 3, isActive: true, multiplier: 1.6 },
+      }),
     );
   });
 
-  it('renders powerup mascot container with pointer-events-none so it cannot block tile selection', () => {
-    render(
-      <BlastGameLayout
-        {...baseProps}
-        hintPath={[{ row: 0, col: 0 }, { row: 0, col: 1 }]}
-      />,
-    );
-    const mascot = screen.getByTestId('mascot-powerup');
-    const container = mascot.parentElement;
-    expect(container?.className).toContain('pointer-events-none');
+  it('does not render BlastComboStreakBadge when streak is not provided', () => {
+    render(<BlastGameLayout {...baseProps} />);
+    expect(MockBlastComboStreakBadge).not.toHaveBeenCalled();
   });
 
-  it('renders powerup mascot container with absolute positioning as an overlay', () => {
-    render(
-      <BlastGameLayout
-        {...baseProps}
-        hintPath={[{ row: 0, col: 0 }, { row: 0, col: 1 }]}
-      />,
+  it('renders BlastHotTileOverlay when hotTiles are provided', () => {
+    const hotTiles = [{ row: 0, col: 1, multiplier: 3, createdAt: 1000, expiresAt: 9000 }];
+    render(<BlastGameLayout {...baseProps} hotTiles={hotTiles} isHotPhase={true} />);
+    expect(MockBlastHotTileOverlay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hotTiles,
+        gridSize: 4,
+      }),
     );
-    const mascot = screen.getByTestId('mascot-powerup');
-    const container = mascot.parentElement;
-    expect(container?.className).toContain('absolute');
+  });
+
+  it('does not render BlastHotTileOverlay when hotTiles not provided', () => {
+    render(<BlastGameLayout {...baseProps} />);
+    expect(MockBlastHotTileOverlay).not.toHaveBeenCalled();
+  });
+
+  it('renders BlastReactiveBackground when intensity is provided', () => {
+    render(<BlastGameLayout {...baseProps} intensity={3} />);
+    expect(MockBlastReactiveBackground).toHaveBeenCalledWith(
+      expect.objectContaining({ intensity: 3 }),
+    );
+  });
+
+  it('wraps grid in BlastBoardIntensity when intensity is provided', () => {
+    render(<BlastGameLayout {...baseProps} intensity={4} />);
+    expect(MockBlastBoardIntensity).toHaveBeenCalledWith(
+      expect.objectContaining({ intensity: 4 }),
+    );
+    // Board intensity should contain the blast grid
+    const boardIntensity = screen.getByTestId('blast-board-intensity');
+    expect(boardIntensity.querySelector('[data-testid="blast-grid"]')).toBeTruthy();
+  });
+
+  it('does not render reactive background or board intensity when intensity is 0 or not provided', () => {
+    render(<BlastGameLayout {...baseProps} />);
+    expect(MockBlastReactiveBackground).not.toHaveBeenCalled();
+    expect(MockBlastBoardIntensity).not.toHaveBeenCalled();
   });
 });

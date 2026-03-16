@@ -112,9 +112,12 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
                 }}
                 side="bottom"
               >
-                <span className="font-bold text-neo-white text-xs truncate max-w-[60px] sm:max-w-[80px] cursor-pointer hover:text-neo-cyan transition-colors">
+                <Link
+                  href={`/${language}/player/${encodeURIComponent(player.id)}`}
+                  className="font-bold text-neo-white text-xs truncate max-w-[60px] sm:max-w-[80px] cursor-pointer hover:text-neo-cyan transition-colors"
+                >
                   {player.displayName || player.username}
-                </span>
+                </Link>
               </PlayerProfileTooltip>
               <span className="font-black text-neo-lime text-xs">
                 {player.totalScore.toLocaleString()}
@@ -165,6 +168,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             />
             <PlayerProfileTooltip
               player={{
+                id: player.id,
                 username: player.username,
                 displayName: player.displayName ?? undefined,
                 profilePictureUrl: player.profilePictureUrl,
@@ -173,9 +177,12 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               }}
               side="right"
             >
-              <span className="flex-1 font-bold text-neo-white text-sm truncate cursor-pointer hover:text-neo-cyan transition-colors">
+              <Link
+                href={`/${language}/player/${encodeURIComponent(player.id)}`}
+                className="flex-1 font-bold text-neo-white text-sm truncate cursor-pointer hover:text-neo-cyan transition-colors"
+              >
                 {player.displayName || player.username}
-              </span>
+              </Link>
             </PlayerProfileTooltip>
             <span className="font-black text-neo-lime text-sm">
               {player.totalScore.toLocaleString()}

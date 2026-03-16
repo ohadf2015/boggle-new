@@ -17,6 +17,7 @@ jest.mock('framer-motion', () => ({
     },
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 // Mock lucide-react icons
@@ -31,6 +32,21 @@ jest.mock('@/host/hooks/useTvPlayerCombos');
 jest.mock('@/host/hooks/useTvNotifications');
 jest.mock('@/host/hooks/useTvSounds');
 jest.mock('@/host/hooks/useTvFullscreen');
+jest.mock('@/host/hooks/useTvFinalMinute', () => ({
+  useTvFinalMinute: () => ({
+    isFinalMinute: false,
+    isFinalStretch: false,
+    isCritical: false,
+    urgencyLevel: 'normal',
+    heartbeatInterval: 0,
+    bgTintClass: '',
+  }),
+}));
+
+// Mock game state store
+jest.mock('@/hooks/gameState/store', () => ({
+  useGameMode: () => 'classic',
+}));
 
 // Mock child components
 jest.mock('@/host/components/tv-broadcast/TvTutorialOverlay', () => ({
@@ -50,9 +66,14 @@ jest.mock('@/host/components/tv-broadcast/TvGameHeader', () => ({
   default: () => <div data-testid="tv-game-header">Game Header with Timer</div>,
 }));
 
-jest.mock('@/host/components/tv-broadcast/TvGrid', () => ({
+jest.mock('@/host/components/tv-broadcast/TvActivityPanel', () => ({
   __esModule: true,
-  default: () => <div data-testid="tv-grid">Grid</div>,
+  default: () => <div data-testid="tv-activity-panel">Activity Panel</div>,
+}));
+
+jest.mock('@/host/components/tv-broadcast/TvMomentumTicker', () => ({
+  __esModule: true,
+  default: () => <div data-testid="momentum-ticker">Ticker</div>,
 }));
 
 jest.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({
@@ -120,35 +141,38 @@ describe('TvBroadcastView - Responsive Layout', () => {
   it('should render main content area with proper grid layout', () => {
     const { container } = render(<TvBroadcastView {...defaultProps} />);
 
-    // Find the main content container (Grid + Leaderboard) - uses CSS Grid now
+    // Find the main content container (Activity Panel + Leaderboard) - uses CSS Grid
     const mainContent = container.querySelector('.flex-1.min-h-0.grid');
     expect(mainContent).toBeInTheDocument();
     expect(mainContent).toHaveClass('flex-1', 'min-h-0', 'grid');
   });
 
-  it('should have activity panel with proper overflow handling', () => {
+  it('should have activity panel rendered', () => {
     render(<TvBroadcastView {...defaultProps} />);
 
-    const activityPanel = screen.getByTestId('tv-activity-panel-placeholder');
-
-    expect(activityPanel).toHaveClass('min-h-[180px]');
-    expect(activityPanel).toHaveClass('overflow-hidden');
+    const activityPanel = screen.getByTestId('tv-activity-panel');
+    expect(activityPanel).toBeInTheDocument();
   });
 
   it('should constrain content within parent container', () => {
     const { container } = render(<TvBroadcastView {...defaultProps} />);
 
-    // Root uses flex-1 to fill parent flex container (better than h-full)
+    // Root uses flex-1 to fill parent flex container
     const root = container.firstChild as HTMLElement;
     expect(root).toHaveClass('flex', 'flex-col');
     expect(root).toHaveClass('flex-1');
-    expect(root).toHaveClass('min-h-0'); // Prevents overflow in flex containers
+    expect(root).toHaveClass('min-h-0');
 
-    // Join bar and game header should NOT have fixed heights that overflow
+    // Join bar and game header should be present
     const joinBar = screen.getByTestId('tv-join-bar');
     const gameHeader = screen.getByTestId('tv-game-header');
     expect(joinBar).toBeInTheDocument();
     expect(gameHeader).toBeInTheDocument();
+  });
+
+  it('should render momentum ticker', () => {
+    render(<TvBroadcastView {...defaultProps} />);
+    expect(screen.getByTestId('momentum-ticker')).toBeInTheDocument();
   });
 });
 
@@ -165,7 +189,6 @@ describe('TvBroadcastView - Fullscreen Behavior', () => {
 
     render(<TvBroadcastView {...defaultProps} />);
 
-    // Join bar is now always visible (changed in refactor for better UX)
     expect(screen.getByTestId('tv-join-bar')).toBeInTheDocument();
   });
 
@@ -181,8 +204,6 @@ describe('TvBroadcastView - Fullscreen Behavior', () => {
 
     render(<TvBroadcastView {...defaultProps} />);
 
-    // Game header with timer should STILL be visible in fullscreen
-    // (only join bar is hidden, not the timer)
     expect(screen.getByTestId('tv-game-header')).toBeInTheDocument();
   });
 
@@ -198,9 +219,7 @@ describe('TvBroadcastView - Fullscreen Behavior', () => {
 
     render(<TvBroadcastView {...defaultProps} />);
 
-    // Game header should be visible
     expect(screen.getByTestId('tv-game-header')).toBeInTheDocument();
-    // Join bar should also be visible
     expect(screen.getByTestId('tv-join-bar')).toBeInTheDocument();
   });
 
@@ -217,7 +236,6 @@ describe('TvBroadcastView - Fullscreen Behavior', () => {
 
     render(<TvBroadcastView {...defaultProps} />);
 
-    // Find and click fullscreen button (Maximize icon)
     const fullscreenButton = screen.getByRole('button', { name: /fullscreen/i });
     fireEvent.click(fullscreenButton);
 

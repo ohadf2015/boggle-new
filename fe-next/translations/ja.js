@@ -2556,6 +2556,8 @@ const ja = {
     "topPercent": "トップ {{percent}}%",
     "challenge": "チャレンジ",
     "addFriend": "フレンド追加",
+    "friends": "フレンド",
+    "requestSent": "リクエスト送信済み",
     "viewProfile": "プロフィールを見る",
     "viewPublicProfile": "公開プロフィールを見る",
     "games": "ゲーム"

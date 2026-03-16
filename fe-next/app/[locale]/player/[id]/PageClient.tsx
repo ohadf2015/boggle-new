@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Trophy, Hash, Target, TrendingUp, Calendar,
-  Swords, UserPlus, ArrowLeft, Star, Award,
+  Swords, UserPlus, UserCheck, Clock, ArrowLeft, Star, Award,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
@@ -13,7 +13,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { Loader } from '@/components/ui/Loader';
+import { sendFriendRequest } from '@/utils/friends';
+import { isHallOfFameAchievement } from '@/utils/achievementTiers';
+import { getAchievementIcon } from '@/constants/achievementIcons';
+import { createClient } from '@/utils/supabase/client';
 import type { PublicProfile } from '@/shared/types/publicProfile';
+
+type FriendshipState = 'none' | 'pending' | 'accepted' | 'blocked' | 'loading';
 
 /**
  * Percentile tier styling
@@ -31,13 +37,16 @@ function getPercentileTier(percentile: number) {
  * Route: /[locale]/player/[id]
  */
 export default function PlayerProfilePageClient() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const router = useRouter();
   const { id } = useParams<{ id: string }>();
   const { profile: myProfile, isAuthenticated } = useAuth();
 
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [friendshipState, setFriendshipState] = useState<FriendshipState>('none');
+  const [friendActionLoading, setFriendActionLoading] = useState(false);
 
   const isOwnProfile = myProfile?.id === id;
 
@@ -65,9 +74,50 @@ export default function PlayerProfilePageClient() {
     }
   }, [id]);
 
+  // Fetch friendship status between current user and profile user
+  const fetchFriendshipStatus = useCallback(async () => {
+    if (!id || !isAuthenticated || !myProfile?.id || isOwnProfile) return;
+    setFriendshipState('loading');
+
+    try {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('friends')
+        .select('status')
+        .or(
+          `and(user_id.eq.${myProfile.id},friend_id.eq.${id}),and(user_id.eq.${id},friend_id.eq.${myProfile.id})`
+        )
+        .single();
+
+      setFriendshipState(data?.status ?? 'none');
+    } catch {
+      setFriendshipState('none');
+    }
+  }, [id, isAuthenticated, myProfile?.id, isOwnProfile]);
+
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  useEffect(() => {
+    fetchFriendshipStatus();
+  }, [fetchFriendshipStatus]);
+
+  const handleAddFriend = async () => {
+    if (!id || friendActionLoading) return;
+    setFriendActionLoading(true);
+    const result = await sendFriendRequest(id);
+    if (result.success) {
+      setFriendshipState('pending');
+    }
+    setFriendActionLoading(false);
+  };
+
+  const handleChallenge = () => {
+    if (!id) return;
+    // Navigate to multiplayer lobby with challenge pre-filled
+    router.push(`/${language}/play?challenge=${id}`);
+  };
 
   if (loading) {
     return (
@@ -92,6 +142,15 @@ export default function PlayerProfilePageClient() {
   }
 
   const tier = getPercentileTier(profile.percentile);
+
+  // Sort achievements: Hall of Fame first, then by count descending
+  const sortedAchievements = Object.entries(profile.achievementCounts)
+    .sort(([keyA, countA], [keyB, countB]) => {
+      const aHof = isHallOfFameAchievement(keyA);
+      const bHof = isHallOfFameAchievement(keyB);
+      if (aHof !== bHof) return aHof ? -1 : 1;
+      return countB - countA;
+    });
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
@@ -156,28 +215,25 @@ export default function PlayerProfilePageClient() {
         {/* Action buttons */}
         {!isOwnProfile && (
           <div className="flex gap-2 mt-4">
-            <button className={cn(
-              'flex-1 flex items-center justify-center gap-1.5',
-              'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
-              'bg-neo-orange text-neo-black font-black text-sm uppercase',
-              'hover:brightness-110 active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
-              'transition-all'
-            )}>
+            <button
+              onClick={handleChallenge}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5',
+                'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
+                'bg-neo-orange text-neo-black font-black text-sm uppercase',
+                'hover:brightness-110 active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
+                'transition-all'
+              )}
+            >
               <Swords className="w-4 h-4" />
               {t('profile.challenge')}
             </button>
-            {isAuthenticated && (
-              <button className={cn(
-                'flex items-center justify-center gap-1.5',
-                'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
-                'bg-neo-cyan text-neo-black font-black text-sm uppercase',
-                'hover:brightness-110 active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
-                'transition-all'
-              )}>
-                <UserPlus className="w-4 h-4" />
-                {t('profile.addFriend')}
-              </button>
-            )}
+            {isAuthenticated && <FriendButton
+              state={friendshipState}
+              loading={friendActionLoading}
+              onAdd={handleAddFriend}
+              t={t}
+            />}
           </div>
         )}
       </motion.div>
@@ -223,7 +279,7 @@ export default function PlayerProfilePageClient() {
       </motion.div>
 
       {/* Achievement Counts */}
-      {Object.keys(profile.achievementCounts).length > 0 && (
+      {sortedAchievements.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -235,21 +291,104 @@ export default function PlayerProfilePageClient() {
             {t('profile.achievements')}
           </h3>
           <div className="flex flex-wrap gap-2">
-            {Object.entries(profile.achievementCounts).map(([key, count]) => (
-              <div
-                key={key}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-neo border-2 border-neo-black bg-white/10 text-white"
-              >
-                <span className="text-xs font-bold">{key.replace(/_/g, ' ')}</span>
-                <span className="text-[10px] font-black bg-neo-lime text-neo-black px-1 rounded">
-                  x{count}
-                </span>
-              </div>
-            ))}
+            {sortedAchievements.map(([key, count]) => {
+              const isRare = isHallOfFameAchievement(key);
+              const icon = getAchievementIcon(key);
+              return (
+                <div
+                  key={key}
+                  className={cn(
+                    'flex items-center gap-1.5 px-2.5 py-1 rounded-neo border-2 border-neo-black',
+                    isRare
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-200'
+                      : 'bg-white/5 text-slate-400'
+                  )}
+                >
+                  <span className="text-xs">{icon}</span>
+                  <span className={cn(
+                    'text-xs',
+                    isRare ? 'font-black' : 'font-medium'
+                  )}>
+                    {t(`achievements.${key}.name`, key.replace(/_/g, ' '))}
+                  </span>
+                  <span className={cn(
+                    'text-[10px] font-black px-1 rounded',
+                    isRare
+                      ? 'bg-amber-400 text-neo-black'
+                      : 'bg-white/10 text-slate-300'
+                  )}>
+                    x{count}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
       )}
     </div>
+  );
+}
+
+/**
+ * Friend button with state-aware display
+ */
+function FriendButton({
+  state,
+  loading,
+  onAdd,
+  t,
+}: {
+  state: FriendshipState;
+  loading: boolean;
+  onAdd: () => void;
+  t: (key: string) => string;
+}) {
+  const base = cn(
+    'flex items-center justify-center gap-1.5',
+    'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
+    'font-black text-sm uppercase transition-all',
+  );
+
+  if (state === 'loading') {
+    return (
+      <div className={cn(base, 'bg-slate-600 text-slate-300 cursor-default')}>
+        <Loader size="sm" />
+      </div>
+    );
+  }
+
+  if (state === 'accepted') {
+    return (
+      <div className={cn(base, 'bg-neo-lime/20 text-neo-lime border-neo-lime/50 cursor-default')}>
+        <UserCheck className="w-4 h-4" />
+        {t('profile.friends')}
+      </div>
+    );
+  }
+
+  if (state === 'pending') {
+    return (
+      <div className={cn(base, 'bg-slate-700 text-slate-300 cursor-default')}>
+        <Clock className="w-4 h-4" />
+        {t('profile.requestSent')}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={onAdd}
+      disabled={loading}
+      className={cn(
+        base,
+        'bg-neo-cyan text-neo-black',
+        'hover:brightness-110 active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
+        loading && 'opacity-60 pointer-events-none'
+      )}
+    >
+      {loading ? <Loader size="sm" /> : <UserPlus className="w-4 h-4" />}
+      {t('profile.addFriend')}
+    </button>
   );
 }
 

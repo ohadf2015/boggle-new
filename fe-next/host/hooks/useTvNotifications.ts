@@ -225,18 +225,18 @@ export function useTvNotifications({
       if (word) {
         const wordLength = word.length;
         if (wordLength >= 8) {
-          addNotification('rare_word', 'mega', t('tvBroadcast.notifications.rareWord'), `"${word.toUpperCase()}"`, username);
+          addNotification('rare_word', 'mega', t('tvBroadcast.notifications.rareWord'), t('tvBroadcast.notifications.nLetters', { count: wordLength }), username);
         } else if (wordLength >= 7) {
-          addNotification('epic_word', 'medium', t('tvBroadcast.notifications.epicWord'), `"${word.toUpperCase()}"`, username);
+          addNotification('epic_word', 'medium', t('tvBroadcast.notifications.epicWord'), t('tvBroadcast.notifications.nLetters', { count: wordLength }), username);
         } else if (wordLength >= 5) {
-          addNotification('long_word', 'subtle', t('tvBroadcast.notifications.longWord'), `"${word.toUpperCase()}"`, username);
+          addNotification('long_word', 'subtle', t('tvBroadcast.notifications.longWord'), t('tvBroadcast.notifications.nLetters', { count: wordLength }), username);
         }
 
         // Word snipe detection (same word within 2 seconds)
         const now = Date.now();
         for (const [player, wordData] of Object.entries(lastWordPerPlayerRef.current)) {
           if (player !== username && wordData.word.toLowerCase() === word.toLowerCase() && now - wordData.time < 2000) {
-            addNotification('word_snipe', 'medium', t('tvBroadcast.notifications.wordSnipe'), `${t('tvBroadcast.notifications.bothFound')} "${word.toUpperCase()}"`, `${username} & ${player}`);
+            addNotification('word_snipe', 'medium', t('tvBroadcast.notifications.wordSnipe'), t('tvBroadcast.notifications.sameWordFound', { length: word.length }), `${username} & ${player}`);
           }
         }
         lastWordPerPlayerRef.current[username] = { word, time: now };

@@ -33,6 +33,7 @@ import {
 import { useBlastCascade } from './useBlastCascade';
 import { useBlastCascadeHandler } from './useBlastCascadeHandler';
 import { generateTileStates, rollSpecialFromDistribution } from '../utils/blastTileGeneration';
+import { getWaveConfig } from '../utils/blastWaveConfig';
 import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import {
   type TileEffectContext,
@@ -215,6 +216,7 @@ export function useBlastGame(
     setGameState,
     setExplosions,
     setScorePopups,
+    maxCascadeChain: getWaveConfig(currentWave).maxCascadeChain,
   });
 
   // Dead-end detection state
@@ -266,11 +268,19 @@ export function useBlastGame(
     // Only check after at least one word has been found (skip initial load)
     if (wordsFoundCount === 0) return;
 
-    // Debounce to avoid checking during rapid interactions
+    // Debounce + requestIdleCallback to avoid blocking the main thread post-cascade.
+    // The DFS over a 6x6 grid can take 15-25ms — enough to cause a jank spike.
     const timer = setTimeout(() => {
-      const foundSet = new Set(gameState.wordsFound);
-      const valid = hasValidWords(displayGrid, language, checkWordInDict, foundSet);
-      setNoWordsRemaining(!valid);
+      const run = () => {
+        const foundSet = new Set(gameState.wordsFound);
+        const valid = hasValidWords(displayGrid, language, checkWordInDict, foundSet);
+        setNoWordsRemaining(!valid);
+      };
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(run, { timeout: 500 });
+      } else {
+        run();
+      }
     }, 300);
 
     return () => clearTimeout(timer);
@@ -389,7 +399,7 @@ export function useBlastGame(
         }
         bonusScore += baseScore * (comboMultiplier - 1);
         setActiveComboFlash({ id: `combo-flash-${now}`, comboType: detectedCombos[0].type });
-        onSynergyDetectedRef.current?.(detectedCombos[0].type);
+        onSynergyDetectedRef.current?.(detectedCombos[0].type, detectedCombos[0].scoreMultiplier);
         onComboDetectedRef.current?.(detectedCombos);
       }
 
@@ -536,6 +546,20 @@ export function useBlastGame(
       }
 
       if (word.length > bestWordRef.current.length) bestWordRef.current = word;
+
+      // Row-clear reward for 7+ letter words: clear the entire row of the middle tile
+      if (word.length >= 7 && path.length > 0) {
+        const midCell = path[Math.floor(path.length / 2)];
+        const targetRow = midCell.row;
+        for (let c = 0; c < gridSize; c++) {
+          const tile = next[targetRow]?.[c];
+          if (tile && !tile.isCleared && tile.type === 'standard') {
+            tile.isCleared = true;
+            newlyClearedCount++;
+            newExplosions.push({ id: `row-clear-${now}-${targetRow}-${c}`, type: 'clear', row: targetRow, col: c, intensity: 2, timestamp: now });
+          }
+        }
+      }
 
       const bonusMoveCount = calculateBonusMoves(word.length);
       setGameState(prev => {

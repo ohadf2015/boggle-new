@@ -144,9 +144,20 @@ export const useGameStore = create<GameStore>()(
       players: state.players.filter(p => p.username !== username)
     })),
 
-    setLeaderboard: (value) => set((state) => ({
-      leaderboard: applySetState(value, state.leaderboard)
-    })),
+    setLeaderboard: (value) => set((state) => {
+      const next = applySetState(value, state.leaderboard);
+      // Skip update if leaderboard entries are identical (prevents cascading re-renders)
+      if (
+        next.length === state.leaderboard.length &&
+        next.every((p, i) => {
+          const prev = state.leaderboard[i];
+          return prev && p.username === prev.username && p.score === prev.score;
+        })
+      ) {
+        return state;
+      }
+      return { leaderboard: next };
+    }),
 
     // ==========================================
     // Word Actions

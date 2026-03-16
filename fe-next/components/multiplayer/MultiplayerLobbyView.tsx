@@ -128,7 +128,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   onAvatarChange,
   maxPlayers = MAX_PLAYERS_DEFAULT,
 }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, updateProfile } = useAuth();
 
   // Display players: use filteredPlayers if provided, otherwise filter out host for players
   const displayPlayers = filteredPlayers ?? (
@@ -144,11 +144,13 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const currentAvatar = getStoredCustomAvatar() ?? getRandomAvatarConfig();
 
-  const handleAvatarSave = useCallback((config: CustomAvatarConfig) => {
+  const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
     onAvatarChange?.(config);
     setIsAvatarBuilderOpen(false);
-  }, [onAvatarChange]);
+    // Persist to DB for authenticated users so header/menu avatar updates
+    await updateProfile({ avatar_config: config }).catch(() => {});
+  }, [onAvatarChange, updateProfile]);
 
   // Word fact rotation (player-only)
   const [factIndex, setFactIndex] = useState(0);

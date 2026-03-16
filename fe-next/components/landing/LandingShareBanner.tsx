@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Users, ArrowRight } from 'lucide-react';
+import { Users, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -11,8 +11,10 @@ interface LandingShareBannerProps {
 }
 
 export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { isAuthenticated } = useAuth();
+  const isRTL = dir === 'rtl';
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   return (
     <motion.div
@@ -65,7 +67,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
           <span className="hidden sm:inline">
             {t('landing.shareButton')}
           </span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowIcon className="w-4 h-4" />
         </motion.div>
       </button>
     </motion.div>

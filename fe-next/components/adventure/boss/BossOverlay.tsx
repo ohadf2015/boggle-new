@@ -315,25 +315,26 @@ const BossOverlay = memo<BossOverlayProps>(
         {/* ACTIVE BATTLE UI */}
         {showingActivePhase && !showingVictory && !showingDefeat && (
           <>
-            {/* Boss HP Bar + Avatar Row */}
+            {/* Compact Combat HUD Strip */}
             <div className="fixed top-12 sm:top-14 left-0 right-0 z-30 pointer-events-none">
-              <div className="w-full max-w-2xl mx-auto px-4 pt-3">
-                <div className="flex items-center gap-3 mb-2">
-                  {/* Boss Avatar */}
+              <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 pt-2">
+                {/* Boss Avatar + HP Bar row */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  {/* Boss Avatar — compact */}
                   <div className="relative flex-shrink-0">
                     <motion.div
-                      className={`relative w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-neo border-3 ${borderClass} shadow-hard-sm overflow-hidden bg-neo-navy-light`}
+                      className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-3 ${borderClass} shadow-hard-sm overflow-hidden bg-neo-navy-light`}
                       animate={
                         bossReaction === 'attacking'
-                          ? { scale: [1, 1.15, 1], rotate: [0, -5, 5, 0] }
+                          ? { scale: [1, 1.12, 1], rotate: [0, -4, 4, 0] }
                           : bossReaction === 'hit'
-                            ? { x: [0, -3, 3, -2, 2, 0], scale: [1, 0.95, 1] }
-                            : { scale: [1, 1.03, 1], rotate: 0, x: 0 }
+                            ? { x: [0, -2, 2, -1, 1, 0], scale: [1, 0.95, 1] }
+                            : { scale: [1, 1.02, 1], rotate: 0, x: 0 }
                       }
                       transition={
                         bossReaction === 'idle'
                           ? { duration: 3, repeat: Infinity, ease: 'easeInOut' }
-                          : { duration: 0.3 }
+                          : { duration: 0.25 }
                       }
                       data-testid="boss-avatar"
                     >
@@ -343,45 +344,43 @@ const BossOverlay = memo<BossOverlayProps>(
                           alt={t(boss.displayName)}
                           fill
                           className="object-cover"
-                          sizes="(min-width: 1024px) 64px, 56px"
+                          sizes="48px"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-2xl">
-                          <Swords className="w-6 h-6 text-neo-yellow" />
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Swords className="w-5 h-5 text-neo-yellow" />
                         </div>
                       )}
-
-                      {/* Phase-specific glow overlay on enraged */}
                       {derivedPhase === 'enraged' && (
                         <motion.div
                           className="absolute inset-0 border-2 border-neo-red rounded-neo"
-                          animate={{ opacity: [0.4, 0.9, 0.4] }}
-                          transition={{ repeat: Infinity, duration: 0.5 }}
+                          animate={{ opacity: [0.4, 0.8, 0.4] }}
+                          transition={{ repeat: Infinity, duration: 0.6 }}
                         />
                       )}
                     </motion.div>
 
-                    {/* "+N DMG" floating text near avatar */}
+                    {/* Floating damage text */}
                     <AnimatePresence>
                       {playerDmgFloat && (
                         <motion.div
                           key={playerDmgFloat.id}
                           className="absolute -top-1 -end-1 pointer-events-none z-10"
                           initial={{ y: 0, opacity: 1, scale: 0.8 }}
-                          animate={{ y: -24, opacity: 0, scale: 1.1 }}
+                          animate={{ y: -20, opacity: 0, scale: 1.1 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.8, ease: 'easeOut' }}
+                          transition={{ duration: 0.7, ease: 'easeOut' }}
                           aria-hidden="true"
                         >
-                          <span className="font-neo-display text-xs font-black text-neo-lime drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
-                            +{playerDmgFloat.amount} DMG
+                          <span className="font-neo-display text-[10px] font-black text-neo-lime drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                            +{playerDmgFloat.amount}
                           </span>
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
 
-                  {/* HP Bar */}
+                  {/* HP Bar — no taunt inline, keeps it tight */}
                   <div className="flex-1 min-w-0">
                     <SegmentedHPBar
                       currentHP={currentHP}
@@ -389,35 +388,79 @@ const BossOverlay = memo<BossOverlayProps>(
                       phase={derivedPhase}
                       bossName={boss.displayName}
                     />
-                    {showTaunt && currentTaunt && (
+                  </div>
+
+                  {/* Inline attack countdown — replaces separate telegraph banner */}
+                  <AnimatePresence>
+                    {isTelegraphing && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                        className="flex-shrink-0 pointer-events-none"
+                      >
+                        <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center">
+                          <svg
+                            width="44" height="44" viewBox="0 0 44 44"
+                            className="-rotate-90"
+                            aria-hidden="true"
+                          >
+                            <circle cx="22" cy="22" r="18" fill="rgba(239,68,68,0.15)" stroke="rgba(239,68,68,0.3)" strokeWidth="3" />
+                            <circle
+                              cx="22" cy="22" r="18"
+                              fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round"
+                              strokeDasharray={2 * Math.PI * 18}
+                              strokeDashoffset={2 * Math.PI * 18 * telegraphState.progress}
+                              style={{ transition: 'stroke-dashoffset 0.1s linear' }}
+                            />
+                          </svg>
+                          <span className="absolute inset-0 flex items-center justify-center font-neo-display font-bold text-sm text-neo-red">
+                            {Math.ceil(telegraphState.timeRemaining / 1000)}
+                          </span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Boss taunt — below the HUD strip, fades in/out */}
+                <AnimatePresence>
+                  {showTaunt && currentTaunt && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: 'auto' }}
+                      exit={{ opacity: 0, y: -8, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-1.5 ms-12 sm:ms-14"
+                    >
                       <BossDialogueInline
                         dialogue={t(currentTaunt)}
                         bossAvatarUrl={boss.imagePath}
                         bossName={t(boss.displayName)}
-                        className="mt-2"
                       />
-                    )}
-                  </div>
-                </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
-            {/* Phase Transition Banner */}
+            {/* Phase Transition Banner — centered, brief */}
             <AnimatePresence>
               {phaseBanner && (
                 <motion.div
                   className="fixed inset-x-0 top-1/3 z-50 flex items-center justify-center pointer-events-none"
-                  initial={{ opacity: 0, scaleX: 0.5, scaleY: 0.5 }}
-                  animate={{ opacity: 1, scaleX: 1, scaleY: 1 }}
-                  exit={{ opacity: 0, scale: 1.2 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
                   aria-live="assertive"
                   role="status"
                 >
-                  <div className="px-8 py-4 bg-neo-red border-3 border-neo-black rounded-neo shadow-hard-lg">
+                  <div className="px-6 py-3 bg-neo-red border-3 border-neo-black rounded-neo shadow-hard-lg">
                     <span
-                      className="font-neo-display text-4xl font-black text-neo-white tracking-widest uppercase"
-                      style={{ textShadow: '0 3px 8px rgba(0,0,0,0.7)' }}
+                      className="font-neo-display text-3xl sm:text-4xl font-black text-neo-white tracking-widest uppercase"
+                      style={{ textShadow: '0 2px 6px rgba(0,0,0,0.7)' }}
                     >
                       {phaseBanner}
                     </span>
@@ -426,18 +469,18 @@ const BossOverlay = memo<BossOverlayProps>(
               )}
             </AnimatePresence>
 
-            {/* Boss Rage Vignette (< 20% HP) */}
-            {hpPct < 20 && (
+            {/* Subtle rage vignette — only when NOT telegraphing (avoid double overlay) */}
+            {hpPct < 20 && !isTelegraphing && (
               <motion.div
                 className="fixed inset-0 pointer-events-none z-20"
-                animate={{ opacity: [0.2, 0.4, 0.2] }}
-                transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
-                style={{ boxShadow: 'inset 0 0 100px rgba(255, 0, 0, 0.3)' }}
+                animate={{ opacity: [0.15, 0.3, 0.15] }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+                style={{ boxShadow: 'inset 0 0 80px rgba(255, 0, 0, 0.25)' }}
                 data-testid="boss-rage-vignette"
               />
             )}
 
-            {/* Attack Telegraph */}
+            {/* Simplified Attack Telegraph — edge glow only, no banner */}
             <AttackTelegraph
               isActive={isTelegraphing}
               progress={telegraphState.progress}
