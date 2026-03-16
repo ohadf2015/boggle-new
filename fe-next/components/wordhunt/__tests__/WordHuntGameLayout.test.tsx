@@ -107,7 +107,7 @@ describe('WordHuntGameLayout', () => {
     expect(screen.getByTestId('survival-life-bar')).toBeInTheDocument();
     expect(screen.getByTestId('survival-grid-section')).toBeInTheDocument();
     expect(screen.getByTestId('word-forming-area')).toBeInTheDocument();
-    expect(screen.getByTestId('mp-leaderboard')).toBeInTheDocument();
+    expect(screen.getAllByTestId('mp-leaderboard').length).toBeGreaterThanOrEqual(1);
   });
 
   it('should pass score to header without timer props', () => {

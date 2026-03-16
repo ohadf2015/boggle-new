@@ -63,6 +63,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
     language: 'en',
     setLanguage: jest.fn(),
   }),
+  useLanguageSafe: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
 jest.mock('@/contexts/SoundEffectsContext', () => ({

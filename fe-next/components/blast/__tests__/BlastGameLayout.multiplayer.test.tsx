@@ -19,6 +19,7 @@ jest.mock('framer-motion', () => ({
 
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
+  useLanguageSafe: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
 jest.mock('@/lib/utils', () => ({
