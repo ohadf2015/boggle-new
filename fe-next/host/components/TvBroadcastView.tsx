@@ -1,19 +1,19 @@
 'use client';
 
-import { memo, useMemo, useState, useEffect } from 'react';
+import { memo, useMemo, useState, useRef, useEffect } from 'react';
 import type { Socket } from 'socket.io-client';
 import { Maximize, Minimize } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import TvTutorialOverlay, { isTvTutorialComplete, TvHelpButton } from './tv-broadcast/TvTutorialOverlay';
+import TvTutorialOverlay, { TvHelpButton } from './tv-broadcast/TvTutorialOverlay';
 import TvJoinBar from './tv-broadcast/TvJoinBar';
 import TvGameHeader from './tv-broadcast/TvGameHeader';
-import TvGrid from './tv-broadcast/TvGrid';
 import TvLeaderboard from './tv-broadcast/TvLeaderboard';
 import TvNotificationQueue from './tv-broadcast/TvNotificationQueue';
 import { useTvPlayerCombos } from '../hooks/useTvPlayerCombos';
 import { useTvNotifications } from '../hooks/useTvNotifications';
 import { useTvSounds } from '../hooks/useTvSounds';
 import { useTvFullscreen } from '../hooks/useTvFullscreen';
+import { useTvFinalMinute } from '../hooks/useTvFinalMinute';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { Language, LetterGrid, Avatar as AvatarType } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
@@ -36,9 +36,10 @@ interface TvBroadcastViewProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 
   // Game state
-  tableData: LetterGrid;
+  tableData?: LetterGrid;
   remainingTime: number | null;
   timerValue: number; // in minutes
+  gameMode?: string | null;
 
   // Players
   playersReady: (string | PlayerData)[];
@@ -61,8 +62,8 @@ interface TvBroadcastViewProps {
  * Shows when host is NOT playing - perfect for TV/projector display
  * Features:
  * - Kahoot-style join bar with QR code
- * - Large letter grid
  * - Live leaderboard with combo indicators
+ * - Final minute urgency effects
  * - Exciting real-time notifications
  */
 const TvBroadcastView = memo<TvBroadcastViewProps>(({
@@ -73,9 +74,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   t,
 
   // Game state
-  tableData,
   remainingTime,
   timerValue,
+  gameMode,
 
   // Players
   playersReady,
@@ -102,8 +103,10 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   const showFullscreenButton = isFullscreenSupported && !isOnCrazyGamesPlatform;
 
   // Tutorial state - only shown when help button is clicked
-  // Note: Initial tutorial trigger is handled by HostPreGameView when user toggles TV mode
   const [showTutorial, setShowTutorial] = useState(false);
+  // Final minute banner state
+  const [showFinalMinuteBanner, setShowFinalMinuteBanner] = useState(false);
+  const finalMinuteBannerShownRef = useRef(false);
 
   const handleTutorialComplete = () => {
     setShowTutorial(false);
@@ -112,6 +115,20 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   const handleShowTutorial = () => {
     setShowTutorial(true);
   };
+
+  // Final minute hook
+  const { isFinalMinute, urgencyLevel, bgTintClass } = useTvFinalMinute(remainingTime);
+
+  // Show "FINAL MINUTE" banner once when isFinalMinute turns true
+  useEffect(() => {
+    if (isFinalMinute && !finalMinuteBannerShownRef.current) {
+      finalMinuteBannerShownRef.current = true;
+      setShowFinalMinuteBanner(true);
+      const timer = setTimeout(() => setShowFinalMinuteBanner(false), 2500);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isFinalMinute]);
 
   // Track player combos
   const { playerCombos } = useTvPlayerCombos({
@@ -152,7 +169,6 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
     })
       .filter(p => {
         // Filter out Host from TV leaderboard if they haven't found any words
-        // This is crucial for "Broadcast Mode" where host is just managing
         if (p.isHost && p.wordCount === 0) {
           return false;
         }
@@ -160,10 +176,37 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       });
   }, [playersReady, playerScores, playerWordCounts, username]);
 
-  const isEarthquakeShaking = earthquakeState === 'shaking';
-
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden relative">
+      {/* Background tint overlay for final minute urgency */}
+      {bgTintClass && (
+        <div
+          className={`absolute inset-0 ${bgTintClass} pointer-events-none z-10 transition-colors duration-1000`}
+          data-testid="urgency-tint"
+        />
+      )}
+
+      {/* Final Minute Banner */}
+      <AnimatePresence>
+        {showFinalMinuteBanner && (
+          <motion.div
+            initial={{ y: -80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -80, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-neo-red text-neo-cream px-8 py-4 rounded-neo border-3 border-neo-black shadow-hard-lg"
+            data-testid="final-minute-banner"
+          >
+            <p className="font-black text-2xl uppercase tracking-wider text-center">
+              {t('tvBroadcast.notifications.finalMinute')}
+            </p>
+            <p className="text-sm font-bold text-center opacity-80">
+              {t('tvBroadcast.notifications.everySecondCounts')}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Top Right Controls: Help + Fullscreen */}
       <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
         {/* Tutorial Help Button */}
@@ -211,25 +254,22 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
         earthquakeState={earthquakeState}
+        urgencyLevel={urgencyLevel}
+        gameMode={gameMode}
         t={t}
       />
 
-      {/* Main Content: Grid + Leaderboard (50/50) - Using CSS Grid for reliable height distribution */}
-      {/* On mobile portrait, stack vertically with more space for the grid */}
-      <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[minmax(45%,1fr)_minmax(35%,auto)] md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
-        {/* Left: Grid - fills grid cell and centers the square grid inside */}
-        <div className="min-h-[180px] md:min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-hidden">
-          {tableData && Array.isArray(tableData) && tableData.length > 0 && tableData[0] && tableData[0].length > 0 ? (
-            <TvGrid
-              grid={tableData}
-              fireRoundActive={fireRoundActive}
-              earthquakeShaking={isEarthquakeShaking}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center p-4" role="status" aria-live="polite">
-              <p className="text-neo-black/50 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.waitingForGame')}</p>
-            </div>
-          )}
+      {/* Main Content: Activity Panel + Leaderboard */}
+      <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[1fr_1fr] md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
+        {/* Left: Activity Panel placeholder (anti-spoiler: grid removed) */}
+        {/* TODO: Replace with TvActivityPanel once created by the other agent */}
+        <div
+          className="min-h-[180px] md:min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-hidden"
+          data-testid="tv-activity-panel-placeholder"
+        >
+          <p className="text-neo-black/50 font-bold text-lg md:text-xl text-center">
+            {t('tvBroadcast.waitingForGame')}
+          </p>
         </div>
 
         {/* Right: Leaderboard - fills grid cell, needs overflow-auto for scrolling */}
