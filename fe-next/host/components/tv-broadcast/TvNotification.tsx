@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import {
   Flame,
   Zap,
@@ -16,7 +16,16 @@ import {
   AlertTriangle,
   type LucideIcon,
 } from 'lucide-react';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
 import type { MascotVariant } from '../../../components/ui/Mascot';
+
+// Hype banner images for specific notification types
+const HYPE_BANNER_IMAGES: Partial<Record<TvNotificationType, string>> = {
+  overtake: '/images/tv-broadcast/hype-overtake-banner.png',
+  comeback: '/images/tv-broadcast/hype-comeback-banner.png',
+  first_blood: '/images/tv-broadcast/hype-first-blood.png',
+};
 import {
   MascotBubbleLayout,
   ExplosiveBurstLayout,
@@ -278,7 +287,11 @@ const TvNotification = memo<TvNotificationProps>(({
     borderColor: config.borderColor,
   };
 
+  // Hype banner image for overtake/comeback
+  const hypeBanner = HYPE_BANNER_IMAGES[notification.type];
+
   // Render appropriate layout based on notification type
+  const content = (() => {
   switch (notification.layout) {
     case 'mascot':
       return (
@@ -346,6 +359,33 @@ const TvNotification = memo<TvNotificationProps>(({
         />
       );
   }
+  })();
+
+  // Wrap with hype banner image if applicable
+  if (hypeBanner) {
+    return (
+      <div className="relative">
+        <motion.div
+          className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] pointer-events-none z-0"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.9 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+          aria-hidden="true"
+        >
+          <Image
+            src={hypeBanner}
+            alt=""
+            width={500}
+            height={120}
+            className="drop-shadow-[0_0_20px_rgba(255,200,0,0.5)]"
+          />
+        </motion.div>
+        <div className="relative z-10">{content}</div>
+      </div>
+    );
+  }
+
+  return content;
 });
 
 TvNotification.displayName = 'TvNotification';

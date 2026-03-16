@@ -2,6 +2,7 @@
 
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { Mascot, type MascotVariant } from '../../../../components/ui/Mascot';
@@ -100,6 +101,23 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
           }}
         />
       ))}
+
+      {/* Combo burst image behind content */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: [0, 1.8, 1.5], opacity: [0, 0.8, 0.4] }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        aria-hidden="true"
+      >
+        <Image
+          src="/images/tv-broadcast/fx-combo-burst.png"
+          alt=""
+          width={400}
+          height={400}
+          className="opacity-70"
+        />
+      </motion.div>
 
       {/* Glow effect */}
       <motion.div

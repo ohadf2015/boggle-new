@@ -3,10 +3,18 @@
 import { memo, useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Crown, Medal, Award, WifiOff, Clock, ArrowUp, ArrowDown } from 'lucide-react';
+import Image from 'next/image';
 import Avatar from '../../../components/Avatar';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { cn } from '../../../lib/utils';
+
+// Illustrated rank badge images
+const RANK_BADGE_IMAGES: Record<number, string> = {
+  1: '/images/tv-broadcast/rank-crown-gold.png',
+  2: '/images/tv-broadcast/rank-medal-silver.png',
+  3: '/images/tv-broadcast/rank-award-bronze.png',
+};
 
 interface TvPlayerCardProps {
   username: string;
@@ -20,6 +28,7 @@ interface TvPlayerCardProps {
   presenceStatus?: PresenceStatus;
   disconnected?: boolean;
   index: number;
+  leaderScore?: number;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -48,6 +57,13 @@ const RANK_CONFIGS = {
   },
 };
 
+// Score bar colors by rank
+const SCORE_BAR_COLORS: Record<number, string> = {
+  1: 'bg-neo-yellow',
+  2: 'bg-gray-300',
+  3: 'bg-amber-600',
+};
+
 /**
  * TvPlayerCard - Individual player card for TV broadcast leaderboard
  * Shows avatar, name, score, combo level, rank, and animated transitions
@@ -64,10 +80,16 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   presenceStatus = 'active',
   disconnected = false,
   index: _index,
+  leaderScore = 0,
   t,
 }) => {
   const rankConfig = RANK_CONFIGS[rank as keyof typeof RANK_CONFIGS];
   const isTopThree = rank <= 3;
+
+  // Score bar
+  const barPercentage = leaderScore > 0 ? Math.round((score / leaderScore) * 100) : 0;
+  const barColor = SCORE_BAR_COLORS[rank] || 'bg-neo-cyan/30';
+
   const isAway = disconnected || presenceStatus === 'afk' || presenceStatus === 'idle';
 
   // Track previous score for flash effect
@@ -75,11 +97,14 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   const isFirstRender = useRef(true);
   const [isFlashing, setIsFlashing] = useState(false);
 
+  // Track score delta for badge
+  const [scoreDelta, setScoreDelta] = useState<number | null>(null);
+
   // Track previous rank for rank change arrows
   const prevRankRef = useRef(rank);
   const [rankChange, setRankChange] = useState<'up' | 'down' | null>(null);
 
-  // Score change flash
+  // Score change flash + delta
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -87,10 +112,16 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
     }
 
     if (score !== prevScoreRef.current) {
+      const delta = score - prevScoreRef.current;
       setIsFlashing(true);
-      const timer = setTimeout(() => setIsFlashing(false), 600);
+      if (delta > 0) setScoreDelta(delta);
+      const flashTimer = setTimeout(() => setIsFlashing(false), 600);
+      const deltaTimer = setTimeout(() => setScoreDelta(null), 2500);
       prevScoreRef.current = score;
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(flashTimer);
+        clearTimeout(deltaTimer);
+      };
     }
     return undefined;
   }, [score]);
@@ -113,7 +144,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       layoutId={`player-${username}`}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className={cn(
-        'flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black transition-colors',
+        'relative flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black transition-colors overflow-hidden',
         isTopThree
           ? `${rankConfig?.bgColor} ${rankConfig?.shadowColor}`
           : 'bg-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-0.5 hover:-translate-y-0.5',
@@ -124,11 +155,19 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       <div className="relative">
         <div
           className={cn(
-            'w-10 h-10 flex items-center justify-center rounded-neo border-2 border-neo-black font-black text-lg',
+            'w-10 h-10 flex items-center justify-center rounded-neo border-2 border-neo-black font-black text-lg relative overflow-hidden',
             isTopThree ? 'bg-neo-black text-neo-cream' : 'bg-neo-white text-neo-black'
           )}
         >
-          {isTopThree && rankConfig?.icon ? (
+          {isTopThree && RANK_BADGE_IMAGES[rank] ? (
+            <Image
+              src={RANK_BADGE_IMAGES[rank]}
+              alt={`Rank ${rank}`}
+              fill
+              className="object-contain p-0.5"
+              sizes="40px"
+            />
+          ) : isTopThree && rankConfig?.icon ? (
             <rankConfig.icon className="w-5 h-5" />
           ) : (
             `#${rank}`
@@ -163,6 +202,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         <Avatar
           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
           avatarImage={avatar?.avatarImage}
+          customAvatar={avatar?.customAvatar ?? undefined}
           size="lg"
           className={cn(
             "border-2 border-neo-black",
@@ -219,44 +259,86 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
 
       {/* Combo Indicator */}
       {comboLevel > 0 && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-          className={cn(
-            'flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
-            comboLevel >= 10
-              ? 'bg-gradient-to-r from-neo-red to-neo-pink text-neo-cream'
-              : comboLevel >= 5
-              ? 'bg-neo-orange text-neo-black'
-              : 'bg-neo-yellow text-neo-black'
+        <div className="relative">
+          {/* Combo glow aura for high combos */}
+          {comboLevel >= 5 && (
+            <motion.div
+              className="absolute -inset-3 pointer-events-none"
+              animate={{ opacity: [0.4, 0.8, 0.4], scale: [0.95, 1.05, 0.95] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              aria-hidden="true"
+            >
+              <Image
+                src="/images/tv-broadcast/fx-combo-glow.png"
+                alt=""
+                width={60}
+                height={60}
+                className="opacity-80"
+              />
+            </motion.div>
           )}
-        >
-          <Flame className="w-4 h-4" />
-          <span className="font-black text-sm">{comboLevel}x</span>
-        </motion.div>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+            className={cn(
+              'relative flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
+              comboLevel >= 10
+                ? 'bg-gradient-to-r from-neo-red to-neo-pink text-neo-cream'
+                : comboLevel >= 5
+                ? 'bg-neo-orange text-neo-black'
+                : 'bg-neo-yellow text-neo-black'
+            )}
+          >
+            <Flame className="w-4 h-4" />
+            <span className="font-black text-sm">{comboLevel}x</span>
+          </motion.div>
+        </div>
       )}
 
-      {/* Score — uses AnimatedCounter for spring-based counting */}
-      <div className="text-right">
-        <AnimatedCounter
-          value={score}
-          className={cn(
-            'font-black text-2xl',
-            isTopThree ? rankConfig?.textColor : 'text-neo-black'
+      {/* Score Delta Badge + Score */}
+      <div className="text-right flex items-center gap-2">
+        <AnimatePresence>
+          {scoreDelta !== null && (
+            <motion.div
+              data-testid="score-delta"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-green-400 text-neo-black font-black text-sm"
+            >
+              +{scoreDelta}
+            </motion.div>
           )}
-          size="xl"
-          formatValue={(v) => Math.round(v).toLocaleString()}
-        />
-        <p
-          className={cn(
-            'text-xs font-bold uppercase',
-            isTopThree ? `${rankConfig?.textColor} opacity-70` : 'text-neo-black/50'
-          )}
-        >
-          {t('tvResults.pts')}
-        </p>
+        </AnimatePresence>
+        <div>
+          <AnimatedCounter
+            value={score}
+            className={cn(
+              'font-black text-2xl',
+              isTopThree ? rankConfig?.textColor : 'text-neo-black'
+            )}
+            size="xl"
+            formatValue={(v) => Math.round(v).toLocaleString()}
+          />
+          <p
+            className={cn(
+              'text-xs font-bold uppercase',
+              isTopThree ? `${rankConfig?.textColor} opacity-70` : 'text-neo-black/50'
+            )}
+          >
+            {t('tvResults.pts')}
+          </p>
+        </div>
       </div>
+
+      {/* Score Bar */}
+      <motion.div
+        data-testid="score-bar"
+        className={cn('absolute bottom-0 left-0 h-1 rounded-b-neo', barColor)}
+        animate={{ width: `${barPercentage}%` }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+      />
     </motion.div>
   );
 });

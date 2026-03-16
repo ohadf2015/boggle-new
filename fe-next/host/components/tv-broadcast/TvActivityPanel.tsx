@@ -1,7 +1,8 @@
 'use client';
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import Image from 'next/image';
 import type { Socket } from 'socket.io-client';
 import { useGameMode } from '@/hooks/gameState/store';
 import { cn } from '@/lib/utils';
@@ -207,12 +208,12 @@ const MODE_BADGE_KEYS: Record<string, string> = {
 };
 
 const TvActivityPanel = memo<TvActivityPanelProps>(({
-  playerScores,
+  playerScores: _playerScores,
   playerWordCounts,
   socket,
   t,
-  fireRoundActive: _fireRoundActive,
-  earthquakeShaking: _earthquakeShaking,
+  fireRoundActive = false,
+  earthquakeShaking = false,
   activityPulse,
 }) => {
   const gameMode = useGameMode() || 'classic';
@@ -230,6 +231,11 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
   const [highestCombo, setHighestCombo] = useState(0);
   const [wordsHunted, setWordsHunted] = useState(0);
   const [blipCount, setBlipCount] = useState(0);
+
+  // Hype mascot — appears during intense action bursts
+  const [showHypeMascot, setShowHypeMascot] = useState(false);
+  const recentActivityRef = useRef(0);
+  const hypeCooldownRef = useRef(false);
 
   // Compute aggregate stats
   const totalWords = Object.values(playerWordCounts).reduce((sum, c) => sum + c, 0);
@@ -268,6 +274,16 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
     // Word hunt: increment
     setWordsHunted((prev) => prev + 1);
     setBlipCount((prev) => prev + 1);
+
+    // Hype mascot trigger — 3+ words in 3s window
+    recentActivityRef.current += 1;
+    setTimeout(() => { recentActivityRef.current = Math.max(0, recentActivityRef.current - 1); }, 3000);
+    if (recentActivityRef.current >= 3 && !hypeCooldownRef.current) {
+      hypeCooldownRef.current = true;
+      setShowHypeMascot(true);
+      setTimeout(() => setShowHypeMascot(false), 2500);
+      setTimeout(() => { hypeCooldownRef.current = false; }, 8000);
+    }
   }, []);
 
   // Socket listener
@@ -298,9 +314,40 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
   return (
     <div
       data-testid="tv-activity-panel"
-      className="h-full flex flex-col bg-neo-navy rounded-neo border-3 border-neo-black overflow-hidden"
+      className={cn(
+        'h-full flex flex-col bg-neo-navy rounded-neo border-3 border-neo-black overflow-hidden relative',
+        fireRoundActive && 'ring-2 ring-orange-500/60',
+        earthquakeShaking && !reducedMotion && 'animate-neo-shake',
+      )}
       aria-label={t('tvBroadcast.activityPanel')}
     >
+      {/* Fire round glow overlay */}
+      {fireRoundActive && (
+        <div className="absolute inset-0 bg-gradient-to-b from-orange-500/15 via-transparent to-red-500/10 pointer-events-none z-10" />
+      )}
+
+      {/* Hype mascot — pops in during intense action bursts (uses existing game mascot) */}
+      <AnimatePresence>
+        {showHypeMascot && !reducedMotion && (
+          <motion.div
+            initial={{ y: 100, opacity: 0, scale: 0.5 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 80, opacity: 0, scale: 0.8 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+            className="absolute bottom-12 right-4 z-20 pointer-events-none"
+            aria-hidden="true"
+          >
+            <Image
+              src="/mascot/celebration-nobg.gif"
+              alt=""
+              width={100}
+              height={100}
+              className="drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]"
+              unoptimized
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Mode badge */}
       <div className="relative">
         <div

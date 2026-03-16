@@ -8,6 +8,8 @@ import TvTutorialOverlay, { TvHelpButton } from './tv-broadcast/TvTutorialOverla
 import TvJoinBar from './tv-broadcast/TvJoinBar';
 import TvGameHeader from './tv-broadcast/TvGameHeader';
 import TvLeaderboard from './tv-broadcast/TvLeaderboard';
+import TvActivityPanel from './tv-broadcast/TvActivityPanel';
+import TvMomentumTicker from './tv-broadcast/TvMomentumTicker';
 import TvNotificationQueue from './tv-broadcast/TvNotificationQueue';
 import { useTvPlayerCombos } from '../hooks/useTvPlayerCombos';
 import { useTvNotifications } from '../hooks/useTvNotifications';
@@ -15,8 +17,17 @@ import { useTvSounds } from '../hooks/useTvSounds';
 import { useTvFullscreen } from '../hooks/useTvFullscreen';
 import { useTvFinalMinute } from '../hooks/useTvFinalMinute';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useGameMode } from '@/hooks/gameState/store';
+import Image from 'next/image';
 import type { Language, LetterGrid, Avatar as AvatarType } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
+
+// ==================== Background Assets ====================
+const MODE_BACKGROUNDS: Record<string, string> = {
+  classic: '/images/tv-broadcast/bg-classic-arena.png',
+  blast: '/images/tv-broadcast/bg-blast-volcano.png',
+  'word-hunt': '/images/tv-broadcast/bg-wordhunt-jungle.png',
+};
 
 // ==================== Types ====================
 
@@ -39,8 +50,6 @@ interface TvBroadcastViewProps {
   tableData?: LetterGrid;
   remainingTime: number | null;
   timerValue: number; // in minutes
-  gameMode?: string | null;
-
   // Players
   playersReady: (string | PlayerData)[];
   playerScores: Record<string, number>;
@@ -76,7 +85,6 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   // Game state
   remainingTime,
   timerValue,
-  gameMode,
 
   // Players
   playersReady,
@@ -116,6 +124,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
     setShowTutorial(true);
   };
 
+  // Game mode from store
+  const gameMode = useGameMode();
+
   // Final minute hook
   const { isFinalMinute, urgencyLevel, bgTintClass } = useTvFinalMinute(remainingTime);
 
@@ -142,12 +153,22 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
     volume: 0.7,
   });
 
+  // Confetti state for mega events
+  const [showConfetti, setShowConfetti] = useState(false);
+  const confettiTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Notifications with sound integration
   const { notifications, dismissNotification } = useTvNotifications({
     socket,
     enabled: true,
     onNotification: (notification) => {
       playSound(notification.tier);
+      // Trigger confetti on mega events
+      if (notification.tier === 'mega') {
+        setShowConfetti(true);
+        if (confettiTimeoutRef.current) clearTimeout(confettiTimeoutRef.current);
+        confettiTimeoutRef.current = setTimeout(() => setShowConfetti(false), 3000);
+      }
     },
     t,
   });
@@ -178,6 +199,43 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden relative">
+      {/* Dynamic mode background */}
+      {gameMode && MODE_BACKGROUNDS[gameMode] && (
+        <div className="absolute inset-0 z-0" aria-hidden="true">
+          <Image
+            src={MODE_BACKGROUNDS[gameMode]}
+            alt=""
+            fill
+            className="object-cover opacity-20"
+            priority
+            sizes="100vw"
+          />
+          {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-neo-navy/60" />
+        </div>
+      )}
+
+      {/* Earthquake cracks overlay */}
+      <AnimatePresence>
+        {earthquakeState === 'shaking' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-15 pointer-events-none mix-blend-screen"
+            aria-hidden="true"
+          >
+            <Image
+              src="/images/tv-broadcast/fx-earthquake-cracks.png"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Background tint overlay for final minute urgency */}
       {bgTintClass && (
         <div
@@ -259,17 +317,71 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         t={t}
       />
 
+      {/* Momentum Ticker — auto-generated commentary */}
+      <TvMomentumTicker
+        playerScores={playerScores}
+        playerWordCounts={playerWordCounts}
+        t={t}
+      />
+
+      {/* Fire Round Overlay — dramatic flame image + edge gradients */}
+      <AnimatePresence>
+        {fireRoundActive && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 pointer-events-none z-20"
+            data-testid="fire-round-overlay"
+            aria-hidden="true"
+          >
+            {/* Fire frame overlay — illustrated flames on all edges */}
+            <motion.div
+              className="absolute inset-0"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Image
+                src="/images/tv-broadcast/fx-fire-frame.png"
+                alt=""
+                fill
+                className="object-cover mix-blend-screen"
+                sizes="100vw"
+              />
+            </motion.div>
+            {/* Bottom fire flames */}
+            <motion.div
+              className="absolute bottom-0 left-0 right-0 h-48"
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Image
+                src="/images/tv-broadcast/tv-fire-overlay.png"
+                alt=""
+                fill
+                className="object-cover object-top mix-blend-screen"
+                sizes="100vw"
+              />
+            </motion.div>
+            {/* Heat vignette */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_40%,_rgba(255,80,0,0.2)_100%)]" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Main Content: Activity Panel + Leaderboard */}
       <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[1fr_1fr] md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
-        {/* Left: Activity Panel placeholder (anti-spoiler: grid removed) */}
-        {/* TODO: Replace with TvActivityPanel once created by the other agent */}
-        <div
-          className="min-h-[180px] md:min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-hidden"
-          data-testid="tv-activity-panel-placeholder"
-        >
-          <p className="text-neo-black/50 font-bold text-lg md:text-xl text-center">
-            {t('tvBroadcast.waitingForGame')}
-          </p>
+        {/* Left: Mode-specific Activity Panel (anti-spoiler: grid removed) */}
+        <div className="min-h-[180px] md:min-h-0 overflow-hidden">
+          <TvActivityPanel
+            playerScores={playerScores}
+            playerWordCounts={playerWordCounts}
+            socket={socket}
+            t={t}
+            fireRoundActive={fireRoundActive}
+            earthquakeShaking={earthquakeState === 'shaking'}
+          />
         </div>
 
         {/* Right: Leaderboard - fills grid cell, needs overflow-auto for scrolling */}
@@ -282,6 +394,28 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           />
         </div>
       </div>
+
+      {/* Confetti celebration overlay for mega events */}
+      <AnimatePresence>
+        {showConfetti && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 pointer-events-none z-30"
+            aria-hidden="true"
+          >
+            <Image
+              src="/images/tv-broadcast/fx-confetti-celebration.png"
+              alt=""
+              fill
+              className="object-cover mix-blend-screen"
+              sizes="100vw"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Notification Overlay */}
       <TvNotificationQueue
