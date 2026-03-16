@@ -104,7 +104,7 @@ export default function WordPackGallery() {
   const handlePlay = useCallback((packId: string) => {
     // Navigate to multiplayer with word pack pre-selected
     router.push(`/${uiLanguage}/multiplayer?autoCreate=true&wordPack=${packId}`);
-  }, [router, language]);
+  }, [router, uiLanguage]);
 
   const handleUpvote = useCallback(async (packId: string) => {
     setUpvotedIds((prev) => {

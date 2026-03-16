@@ -377,6 +377,7 @@ export function useSinglePlayerCore({
       setGrid(generateRandomTable(rows, cols, settings.language, wordsToEmbed));
     };
     initGrid(); initializeBotUsedWords(settings.bots); resetBots(); resetSpamDetection();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.difficulty, settings.language, settings.bots, settings.mode, initializeBotUsedWords, resetBots, resetSpamDetection]);
 
   useEffect(() => {

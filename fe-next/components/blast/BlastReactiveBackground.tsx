@@ -82,12 +82,13 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
   // Cleanup all pulse rings + timers on unmount
   useEffect(() => {
     const timers = pulseTimersRef.current;
+    const pulseEl = pulseRef.current;
     return () => {
       for (const t of timers) clearTimeout(t);
       // Remove any lingering pulse ring DOM nodes
-      if (pulseRef.current) {
-        while (pulseRef.current.firstChild) {
-          pulseRef.current.removeChild(pulseRef.current.firstChild);
+      if (pulseEl) {
+        while (pulseEl.firstChild) {
+          pulseEl.removeChild(pulseEl.firstChild);
         }
       }
     };
