@@ -64,7 +64,7 @@ describe('NextStepPrompt Integration - ResultsPage Context', () => {
 
     // Verify router.push was called with correct route
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/en/brain');
+      expect(mockPush).toHaveBeenCalledWith('/en/daily');
     });
 
     // Verify onBackToLobby was NOT called (that's for the back button)
@@ -120,7 +120,7 @@ describe('NextStepPrompt Integration - ResultsPage Context', () => {
       fireEvent.click(mainButton);
 
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith('/en/brain');
+        expect(mockPush).toHaveBeenCalledWith('/en/daily');
       });
 
       expect(clearSessionPreservingUsername).toHaveBeenCalled();
@@ -132,7 +132,7 @@ describe('NextStepPrompt Integration - ResultsPage Context', () => {
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots' },
       { mode: 'solo-bots' as const, expectedHref: '/en/daily' },
       { mode: 'daily' as const, expectedHref: '/en/multiplayer' },
-      { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain' },
+      { mode: 'multiplayer-bots' as const, expectedHref: '/en/daily' },
     ];
 
     for (const { mode, expectedHref } of testCases) {

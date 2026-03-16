@@ -58,7 +58,7 @@ describe('NextStepPrompt - Routing Bug', () => {
 
     // Verify router.push was called with the correct route
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/en/brain');
+      expect(mockPush).toHaveBeenCalledWith('/en/daily');
     });
   });
 
