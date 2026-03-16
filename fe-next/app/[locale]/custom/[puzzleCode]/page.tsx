@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const description = customPuzzle.description || 'Can you solve this custom word puzzle?';
 
   return {
+    robots: { index: false, follow: false },
     title: `${title} - LexiClash`,
     description,
     openGraph: {

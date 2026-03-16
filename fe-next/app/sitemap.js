@@ -1,19 +1,38 @@
 export default function sitemap() {
   const baseUrl = 'https://www.lexiclash.live';
   const locales = ['he', 'en', 'sv', 'ja', 'es'];
-  const now = new Date();
 
-  // Use explicit locale paths for all languages for SEO consistency
-  const languageAlternates = {
-    'x-default': `${baseUrl}/en`,
-    he: `${baseUrl}/he`,
-    en: `${baseUrl}/en`,
-    sv: `${baseUrl}/sv`,
-    ja: `${baseUrl}/ja`,
-    es: `${baseUrl}/es`,
-  };
+  // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
+  // Update these dates when actual content changes are deployed.
+  const LAST_DEPLOYED = '2026-03-16T00:00:00.000Z';
+  const BLOG_UPDATED = '2026-03-10T00:00:00.000Z';
+  const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
+  const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
 
-  // Common images for sitemap (helps Google discover and index images)
+  const routes = [];
+
+  // Helper: generate hreflang alternates for a given path
+  function langAlternates(path) {
+    const alts = { 'x-default': `${baseUrl}/en${path}` };
+    locales.forEach((l) => { alts[l] = `${baseUrl}/${l}${path}`; });
+    return alts;
+  }
+
+  // Helper: add a route for all locales
+  function addForAllLocales(path, opts) {
+    locales.forEach((locale) => {
+      routes.push({
+        url: `${baseUrl}/${locale}${path}`,
+        lastModified: opts.lastModified,
+        changeFrequency: opts.changeFrequency,
+        priority: opts.priority,
+        alternates: { languages: langAlternates(path) },
+        ...(opts.images ? { images: opts.images } : {}),
+      });
+    });
+  }
+
+  // Common images for home pages
   const commonImages = [
     `${baseUrl}/og-image.jpg`,
     `${baseUrl}/og-image-en.jpg`,
@@ -24,644 +43,138 @@ export default function sitemap() {
     `${baseUrl}/apple-touch-icon.png`,
   ];
 
-  const routes = [];
-
-  // Home pages for each locale with comprehensive image entries
-  // Use explicit locale paths for all languages
-  routes.push({
-    url: `${baseUrl}/he`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 1,
-    alternates: {
-      languages: languageAlternates,
-    },
-    images: [...commonImages, `${baseUrl}/og-image-he.jpg`],
-  });
-
-  routes.push({
-    url: `${baseUrl}/en`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 1,
-    alternates: {
-      languages: languageAlternates,
-    },
-    images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
-  });
-
-  routes.push({
-    url: `${baseUrl}/sv`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.9,
-    alternates: {
-      languages: languageAlternates,
-    },
-    images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
-  });
-
-  routes.push({
-    url: `${baseUrl}/ja`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.9,
-    alternates: {
-      languages: languageAlternates,
-    },
-    images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
-  });
-
-  routes.push({
-    url: `${baseUrl}/es`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.9,
-    alternates: {
-      languages: languageAlternates,
-    },
-    images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
-  });
-
-  // Rules pages for all locales (Game mechanics, How to Play)
+  // ─── Home pages ───
   locales.forEach((locale) => {
-    // Always use explicit locale path
-    const localePath = `/${locale}`;
+    const priority = (locale === 'he' || locale === 'en') ? 1 : 0.9;
     routes.push({
-      url: `${baseUrl}${localePath}/rules`,
-      lastModified: now,
+      url: `${baseUrl}/${locale}`,
+      lastModified: LAST_DEPLOYED,
+      changeFrequency: 'weekly',
+      priority,
+      alternates: { languages: langAlternates('') },
+      images: [...commonImages, `${baseUrl}/og-image-${locale === 'he' ? 'he' : 'en'}.jpg`],
+    });
+  });
+
+  // ─── Core game mode pages ───
+  addForAllLocales('/singleplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales('/multiplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales('/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
+  addForAllLocales('/blast', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales('/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
+  addForAllLocales('/daily/word-hunt', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
+
+  // ─── Brain training ───
+  addForAllLocales('/brain', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
+  const drills = ['combo-master', 'lightning-round', 'memory-hunt', 'pattern-switcher', 'rare-gems'];
+  drills.forEach((drill) => {
+    addForAllLocales(`/brain/drills/${drill}`, { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+  });
+
+  // ─── Tools ───
+  addForAllLocales('/tools', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+  addForAllLocales('/tools/word-solver', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+
+  // ─── Community ───
+  addForAllLocales('/community', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
+
+  // ─── Education ───
+  addForAllLocales('/education', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
+
+  // ─── Content pages ───
+  addForAllLocales('/how-to-play', { lastModified: GUIDES_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales('/rules', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
+  addForAllLocales('/word-of-the-day', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
+  addForAllLocales('/leaderboard', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
+
+  // ─── Guides & Glossary ───
+  addForAllLocales('/guides', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
+  const guideSlugs = ['classic-strategy', 'blast-strategy', 'word-hunt-strategy'];
+  guideSlugs.forEach((slug) => {
+    addForAllLocales(`/guides/${slug}`, { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
+  });
+  addForAllLocales('/glossary', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
+
+  // ─── Blog ───
+  addForAllLocales('/blog', { lastModified: BLOG_UPDATED, changeFrequency: 'weekly', priority: 0.8 });
+  const blogArticles = [
+    '10-surprising-benefits-word-games',
+    'science-behind-word-games',
+    'daily-challenge-strategies',
+    'multilingual-word-learning',
+    'top-player-secrets',
+    'improve-word-game-skills',
+    'why-word-games-are-addictive',
+    'best-boggle-alternatives-2026',
+    'word-games-for-brain-training',
+    // Previously missing from sitemap:
+    'hebrew-word-games-guide',
+    'multiplayer-word-games-social',
+    'vocabulary-building-strategies',
+    'word-game-history',
+    'word-games-and-mental-health',
+    'word-games-for-kids-education',
+  ];
+  blogArticles.forEach((slug) => {
+    addForAllLocales(`/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
+  });
+
+  // ─── Info pages ───
+  addForAllLocales('/faq', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
+  addForAllLocales('/about', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.6 });
+  addForAllLocales('/contact', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.5 });
+  addForAllLocales('/profile', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.6 });
+  addForAllLocales('/accessibility', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
+
+  // ─── Legal pages ───
+  addForAllLocales('/legal', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
+  addForAllLocales('/legal/terms', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForAllLocales('/legal/privacy', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForAllLocales('/legal/disclaimer', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForAllLocales('/legal/cookies', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+
+  // ─── SEO landing pages (market-specific, single locale) ───
+  const seoLandings = [
+    { locale: 'he', path: '/hebrew-multiplayer-word-game', img: 'he' },
+    { locale: 'sv', path: '/swedish-multiplayer-word-game', img: 'sv' },
+    { locale: 'ja', path: '/japanese-word-game', img: 'ja' },
+    { locale: 'en', path: '/multiplayer-word-game-online', img: 'en' },
+    { locale: 'es', path: '/juego-de-palabras-multijugador', img: 'es' },
+  ];
+  seoLandings.forEach(({ locale, path, img }) => {
+    routes.push({
+      url: `${baseUrl}/${locale}${path}`,
+      lastModified: LAST_DEPLOYED,
+      changeFrequency: 'weekly',
+      priority: 0.95,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/${locale}${path}`,
+          [locale]: `${baseUrl}/${locale}${path}`,
+        },
+      },
+      images: [`${baseUrl}/og-image-${img}.jpg`],
+    });
+  });
+
+  // ─── Programmatic SEO: N-letter word pages (30 URLs) ───
+  const wordLengths = [3, 4, 5, 6, 7, 8];
+  wordLengths.forEach((n) => {
+    addForAllLocales(`/words/${n}-letter-words`, {
+      lastModified: LAST_DEPLOYED,
       changeFrequency: 'monthly',
       priority: 0.7,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/rules`,
-          he: `${baseUrl}/he/rules`,
-          en: `${baseUrl}/en/rules`,
-          sv: `${baseUrl}/sv/rules`,
-          ja: `${baseUrl}/ja/rules`,
-          es: `${baseUrl}/es/rules`,
-        },
-      },
     });
   });
 
-  // Leaderboard pages for all locales
-  locales.forEach((locale) => {
-    // Always use explicit locale path
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/leaderboard`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.8,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/leaderboard`,
-          he: `${baseUrl}/he/leaderboard`,
-          en: `${baseUrl}/en/leaderboard`,
-          sv: `${baseUrl}/sv/leaderboard`,
-          ja: `${baseUrl}/ja/leaderboard`,
-          es: `${baseUrl}/es/leaderboard`,
-        },
-      },
-    });
-  });
-
-  // Profile pages for all locales
-  locales.forEach((locale) => {
-    // Always use explicit locale path
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/profile`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.6,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/profile`,
-          he: `${baseUrl}/he/profile`,
-          en: `${baseUrl}/en/profile`,
-          sv: `${baseUrl}/sv/profile`,
-          ja: `${baseUrl}/ja/profile`,
-          es: `${baseUrl}/es/profile`,
-        },
-      },
-    });
-  });
-
-  // Game mode pages for all locales
-  // Singleplayer - Solo vs Bots, Practice, Challenge
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/singleplayer`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/singleplayer`,
-          he: `${baseUrl}/he/singleplayer`,
-          en: `${baseUrl}/en/singleplayer`,
-          sv: `${baseUrl}/sv/singleplayer`,
-          ja: `${baseUrl}/ja/singleplayer`,
-          es: `${baseUrl}/es/singleplayer`,
-        },
-      },
-    });
-  });
-
-  // Daily Challenge - Same puzzle for everyone worldwide each day
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/daily`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.9,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/daily`,
-          he: `${baseUrl}/he/daily`,
-          en: `${baseUrl}/en/daily`,
-          sv: `${baseUrl}/sv/daily`,
-          ja: `${baseUrl}/ja/daily`,
-          es: `${baseUrl}/es/daily`,
-        },
-      },
-    });
-  });
-
-  // Multiplayer - Real-time multiplayer word game
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/multiplayer`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/multiplayer`,
-          he: `${baseUrl}/he/multiplayer`,
-          en: `${baseUrl}/en/multiplayer`,
-          sv: `${baseUrl}/sv/multiplayer`,
-          ja: `${baseUrl}/ja/multiplayer`,
-          es: `${baseUrl}/es/multiplayer`,
-        },
-      },
-    });
-  });
-
-  // How to Play pages for all locales (AEO/GEO target page)
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/how-to-play`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/how-to-play`,
-          he: `${baseUrl}/he/how-to-play`,
-          en: `${baseUrl}/en/how-to-play`,
-          sv: `${baseUrl}/sv/how-to-play`,
-          ja: `${baseUrl}/ja/how-to-play`,
-          es: `${baseUrl}/es/how-to-play`,
-        },
-      },
-    });
-  });
-
-  // Blog pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-
-    // Blog index
-    routes.push({
-      url: `${baseUrl}${localePath}/blog`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/blog`,
-          he: `${baseUrl}/he/blog`,
-          en: `${baseUrl}/en/blog`,
-          sv: `${baseUrl}/sv/blog`,
-          ja: `${baseUrl}/ja/blog`,
-          es: `${baseUrl}/es/blog`,
-        },
-      },
-    });
-
-    // Individual blog articles
-    const blogArticles = [
-      '10-surprising-benefits-word-games',
-      'science-behind-word-games',
-      'daily-challenge-strategies',
-      'multilingual-word-learning',
-      'top-player-secrets',
-      'improve-word-game-skills',
-      'why-word-games-are-addictive',
-      'best-boggle-alternatives-2026',
-      'word-games-for-brain-training',
-    ];
-
-    blogArticles.forEach((slug) => {
-      routes.push({
-        url: `${baseUrl}${localePath}/blog/${slug}`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.7,
-        alternates: {
-          languages: {
-            'x-default': `${baseUrl}/en/blog/${slug}`,
-            he: `${baseUrl}/he/blog/${slug}`,
-            en: `${baseUrl}/en/blog/${slug}`,
-            sv: `${baseUrl}/sv/blog/${slug}`,
-            ja: `${baseUrl}/ja/blog/${slug}`,
-            es: `${baseUrl}/es/blog/${slug}`,
-          },
-        },
-      });
-    });
-  });
-
-  // FAQ pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/faq`,
-      lastModified: now,
+  // ─── Programmatic SEO: Words starting with letter (130 URLs) ───
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  alphabet.forEach((letter) => {
+    addForAllLocales(`/words/starting-with/${letter}`, {
+      lastModified: LAST_DEPLOYED,
       changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/faq`,
-          he: `${baseUrl}/he/faq`,
-          en: `${baseUrl}/en/faq`,
-          sv: `${baseUrl}/sv/faq`,
-          ja: `${baseUrl}/ja/faq`,
-          es: `${baseUrl}/es/faq`,
-        },
-      },
+      priority: 0.65,
     });
-  });
-
-  // Legal pages for all locales
-  locales.forEach((locale) => {
-    // Always use explicit locale path
-    const localePath = `/${locale}`;
-
-    // Legal index page
-    routes.push({
-      url: `${baseUrl}${localePath}/legal`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.4,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/legal`,
-          he: `${baseUrl}/he/legal`,
-          en: `${baseUrl}/en/legal`,
-          sv: `${baseUrl}/sv/legal`,
-          ja: `${baseUrl}/ja/legal`,
-          es: `${baseUrl}/es/legal`,
-        },
-      },
-    });
-
-    // Terms of Service
-    routes.push({
-      url: `${baseUrl}${localePath}/legal/terms`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.3,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/legal/terms`,
-          he: `${baseUrl}/he/legal/terms`,
-          en: `${baseUrl}/en/legal/terms`,
-          sv: `${baseUrl}/sv/legal/terms`,
-          ja: `${baseUrl}/ja/legal/terms`,
-          es: `${baseUrl}/es/legal/terms`,
-        },
-      },
-    });
-
-    // Privacy Policy
-    routes.push({
-      url: `${baseUrl}${localePath}/legal/privacy`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.3,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/legal/privacy`,
-          he: `${baseUrl}/he/legal/privacy`,
-          en: `${baseUrl}/en/legal/privacy`,
-          sv: `${baseUrl}/sv/legal/privacy`,
-          ja: `${baseUrl}/ja/legal/privacy`,
-          es: `${baseUrl}/es/legal/privacy`,
-        },
-      },
-    });
-
-    // Disclaimer
-    routes.push({
-      url: `${baseUrl}${localePath}/legal/disclaimer`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.3,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/legal/disclaimer`,
-          he: `${baseUrl}/he/legal/disclaimer`,
-          en: `${baseUrl}/en/legal/disclaimer`,
-          sv: `${baseUrl}/sv/legal/disclaimer`,
-          ja: `${baseUrl}/ja/legal/disclaimer`,
-          es: `${baseUrl}/es/legal/disclaimer`,
-        },
-      },
-    });
-  });
-
-  // About pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/about`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/about`,
-          he: `${baseUrl}/he/about`,
-          en: `${baseUrl}/en/about`,
-          sv: `${baseUrl}/sv/about`,
-          ja: `${baseUrl}/ja/about`,
-          es: `${baseUrl}/es/about`,
-        },
-      },
-    });
-  });
-
-  // Contact pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/contact`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/contact`,
-          he: `${baseUrl}/he/contact`,
-          en: `${baseUrl}/en/contact`,
-          sv: `${baseUrl}/sv/contact`,
-          ja: `${baseUrl}/ja/contact`,
-          es: `${baseUrl}/es/contact`,
-        },
-      },
-    });
-  });
-
-  // Guides pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-
-    // Guides index
-    routes.push({
-      url: `${baseUrl}${localePath}/guides`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/guides`,
-          he: `${baseUrl}/he/guides`,
-          en: `${baseUrl}/en/guides`,
-          sv: `${baseUrl}/sv/guides`,
-          ja: `${baseUrl}/ja/guides`,
-          es: `${baseUrl}/es/guides`,
-        },
-      },
-    });
-
-    // Strategy guides
-    const guidesSlugs = ['classic-strategy', 'blast-strategy', 'word-hunt-strategy'];
-    guidesSlugs.forEach((slug) => {
-      routes.push({
-        url: `${baseUrl}${localePath}/guides/${slug}`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.85,
-        alternates: {
-          languages: {
-            'x-default': `${baseUrl}/en/guides/${slug}`,
-            he: `${baseUrl}/he/guides/${slug}`,
-            en: `${baseUrl}/en/guides/${slug}`,
-            sv: `${baseUrl}/sv/guides/${slug}`,
-            ja: `${baseUrl}/ja/guides/${slug}`,
-            es: `${baseUrl}/es/guides/${slug}`,
-          },
-        },
-      });
-    });
-
-    // Glossary
-    routes.push({
-      url: `${baseUrl}${localePath}/glossary`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/glossary`,
-          he: `${baseUrl}/he/glossary`,
-          en: `${baseUrl}/en/glossary`,
-          sv: `${baseUrl}/sv/glossary`,
-          ja: `${baseUrl}/ja/glossary`,
-          es: `${baseUrl}/es/glossary`,
-        },
-      },
-    });
-  });
-
-  // Cookie Policy pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/legal/cookies`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.3,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/legal/cookies`,
-          he: `${baseUrl}/he/legal/cookies`,
-          en: `${baseUrl}/en/legal/cookies`,
-          sv: `${baseUrl}/sv/legal/cookies`,
-          ja: `${baseUrl}/ja/legal/cookies`,
-          es: `${baseUrl}/es/legal/cookies`,
-        },
-      },
-    });
-  });
-
-  // Word of the Day pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/word-of-the-day`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.9,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/word-of-the-day`,
-          he: `${baseUrl}/he/word-of-the-day`,
-          en: `${baseUrl}/en/word-of-the-day`,
-          sv: `${baseUrl}/sv/word-of-the-day`,
-          ja: `${baseUrl}/ja/word-of-the-day`,
-          es: `${baseUrl}/es/word-of-the-day`,
-        },
-      },
-    });
-  });
-
-  // Adventure mode pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/adventure`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/adventure`,
-          he: `${baseUrl}/he/adventure`,
-          en: `${baseUrl}/en/adventure`,
-          sv: `${baseUrl}/sv/adventure`,
-          ja: `${baseUrl}/ja/adventure`,
-          es: `${baseUrl}/es/adventure`,
-        },
-      },
-    });
-  });
-
-  // Tools pages for all locales
-  locales.forEach((locale) => {
-    const localePath = `/${locale}`;
-    routes.push({
-      url: `${baseUrl}${localePath}/tools`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/tools`,
-          he: `${baseUrl}/he/tools`,
-          en: `${baseUrl}/en/tools`,
-          sv: `${baseUrl}/sv/tools`,
-          ja: `${baseUrl}/ja/tools`,
-          es: `${baseUrl}/es/tools`,
-        },
-      },
-    });
-
-    routes.push({
-      url: `${baseUrl}${localePath}/tools/word-solver`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-      alternates: {
-        languages: {
-          'x-default': `${baseUrl}/en/tools/word-solver`,
-          he: `${baseUrl}/he/tools/word-solver`,
-          en: `${baseUrl}/en/tools/word-solver`,
-          sv: `${baseUrl}/sv/tools/word-solver`,
-          ja: `${baseUrl}/ja/tools/word-solver`,
-          es: `${baseUrl}/es/tools/word-solver`,
-        },
-      },
-    });
-  });
-
-  // SEO landing pages (keyword-targeted, high priority per market)
-  routes.push({
-    url: `${baseUrl}/he/hebrew-multiplayer-word-game`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.95,
-    alternates: {
-      languages: {
-        'x-default': `${baseUrl}/he/hebrew-multiplayer-word-game`,
-        he: `${baseUrl}/he/hebrew-multiplayer-word-game`,
-      },
-    },
-    images: [`${baseUrl}/og-image-he.jpg`],
-  });
-
-  routes.push({
-    url: `${baseUrl}/sv/swedish-multiplayer-word-game`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.95,
-    alternates: {
-      languages: {
-        'x-default': `${baseUrl}/sv/swedish-multiplayer-word-game`,
-        sv: `${baseUrl}/sv/swedish-multiplayer-word-game`,
-      },
-    },
-    images: [`${baseUrl}/og-image-sv.jpg`],
-  });
-
-  routes.push({
-    url: `${baseUrl}/ja/japanese-word-game`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.95,
-    alternates: {
-      languages: {
-        'x-default': `${baseUrl}/ja/japanese-word-game`,
-        ja: `${baseUrl}/ja/japanese-word-game`,
-      },
-    },
-    images: [`${baseUrl}/og-image-ja.jpg`],
-  });
-
-  routes.push({
-    url: `${baseUrl}/en/multiplayer-word-game-online`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.95,
-    alternates: {
-      languages: {
-        'x-default': `${baseUrl}/en/multiplayer-word-game-online`,
-        en: `${baseUrl}/en/multiplayer-word-game-online`,
-      },
-    },
-    images: [`${baseUrl}/og-image-en.jpg`],
-  });
-
-  routes.push({
-    url: `${baseUrl}/es/juego-de-palabras-multijugador`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.95,
-    alternates: {
-      languages: {
-        'x-default': `${baseUrl}/es/juego-de-palabras-multijugador`,
-        es: `${baseUrl}/es/juego-de-palabras-multijugador`,
-      },
-    },
-    images: [`${baseUrl}/og-image-es.jpg`],
   });
 
   return routes;

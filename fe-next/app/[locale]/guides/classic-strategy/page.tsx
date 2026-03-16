@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import ClassicStrategyPageClient from './PageClient';
 import { contentByLocale } from './content';
 
@@ -79,15 +80,6 @@ export default async function ClassicStrategyPage({ params }: PageProps) {
     })),
   };
 
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Guides', item: `${SITE_URL}/${locale}/guides` },
-      { '@type': 'ListItem', position: 3, name: content.title, item: `${SITE_URL}/${locale}/guides/${SLUG}` },
-    ],
-  };
 
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -103,7 +95,11 @@ export default async function ClassicStrategyPage({ params }: PageProps) {
     <>
       {/* Safe: all content is from static blog data constants, not user input */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <BreadcrumbJsonLd items={[
+        { name: 'Home', url: `${SITE_URL}/${locale}` },
+        { name: 'Guides', url: `${SITE_URL}/${locale}/guides` },
+        { name: content.title, url: `${SITE_URL}/${locale}/guides/${SLUG}` },
+      ]} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <ClassicStrategyPageClient />
     </>

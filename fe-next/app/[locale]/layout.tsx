@@ -183,13 +183,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 priceCurrency: 'USD',
                 availability: 'https://schema.org/InStock',
             },
-            aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.8',
-                ratingCount: '500',
-                bestRating: '5',
-                worstRating: '1',
-            },
+            // aggregateRating removed — hardcoded ratings risk a Google manual action.
+            // TODO: Wire to real user ratings from Supabase when available.
             description: seo.description,
             url: `https://www.lexiclash.live${localePath}`,
             image: {
@@ -608,8 +603,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             description: languageCode === 'he'
                 ? 'פאזל מילים יומי - אותו לוח לכולם ברחבי העולם! שתפו את התוצאות שלכם כמו וורדל'
                 : 'Daily word puzzle - same board for everyone worldwide! Share your results like Wordle',
-            startDate: new Date().toISOString().split('T')[0],
-            endDate: new Date().toISOString().split('T')[0],
+            startDate: '2024-01-01',
+            endDate: '2099-12-31',
             eventStatus: 'https://schema.org/EventScheduled',
             eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
             location: {

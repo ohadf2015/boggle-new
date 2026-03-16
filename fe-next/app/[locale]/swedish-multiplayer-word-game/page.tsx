@@ -1,44 +1,201 @@
-import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Multiplayer Ordspel Online - Spela Boggle, Scrabble & Ordspel Gratis | LexiClash',
-  description: 'Gillar du Wordfeud, Boggle eller Scrabble? LexiClash ar ett multiplayer ordspel online pa svenska! Skapa ett rum, skicka en lank till vanner och tavla i realtid. 10 000+ svenska ord, ingen registrering, helt gratis. Perfekt for spelkvall med vanner och familj.',
-  keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vanner, ordspel i realtid, svensk ordlek, ordpussel online, gratis ordspel, ordspel utan nedladdning, ordspel multiplayer gratis, tavlingsspel ord, ordspel pa natet',
-  openGraph: {
-    title: 'Multiplayer Ordspel - Boggle & Scrabble Online pa Svenska | LexiClash',
-    description: 'Gillar du Wordfeud eller Boggle? Testa LexiClash - multiplayer ordspel pa svenska! Skapa rum, bjud in vanner, tavla i realtid. Gratis och utan registrering.',
-    locale: 'sv_SE',
-    type: 'website',
-    images: [
-      {
-        url: 'https://www.lexiclash.live/og-image-sv.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'LexiClash - Multiplayer Ordspel pa Svenska',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Multiplayer Ordspel Online pa Svenska - LexiClash',
-    description: 'Gillar du Wordfeud eller Boggle? Testa LexiClash - multiplayer ordspel pa svenska! Skapa rum, bjud in vanner och tavla i realtid. Gratis!',
-    images: ['https://www.lexiclash.live/og-image-sv.jpg'],
-  },
-  alternates: {
-    canonical: 'https://www.lexiclash.live/sv',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+import Link from 'next/link';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-export default async function SwedishMultiplayerWordGamePage({ params }: PageProps): Promise<never> {
+const BASE_URL = 'https://www.lexiclash.live';
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  redirect(`/${locale}/multiplayer`);
+  const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
+
+  return {
+    title: 'Multiplayer Ordspel Online - Spela Boggle, Scrabble & Ordspel Gratis | LexiClash',
+    description: 'Gillar du Wordfeud, Boggle eller Scrabble? LexiClash är ett multiplayer ordspel online på svenska! Skapa ett rum, skicka en länk till vänner och tävla i realtid. 10 000+ svenska ord, ingen registrering, helt gratis.',
+    keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid',
+    openGraph: {
+      title: 'Multiplayer Ordspel - Boggle & Scrabble Online på Svenska | LexiClash',
+      description: 'Gillar du Wordfeud eller Boggle? Testa LexiClash - multiplayer ordspel på svenska! Skapa rum, bjud in vänner, tävla i realtid. Gratis!',
+      locale: 'sv_SE',
+      type: 'website',
+      url: pageUrl,
+      images: [
+        {
+          url: `${BASE_URL}/og-image-sv.jpg`,
+          width: 1200,
+          height: 630,
+          alt: 'LexiClash - Multiplayer Ordspel på Svenska',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Multiplayer Ordspel Online på Svenska - LexiClash',
+      description: 'Gillar du Wordfeud eller Boggle? Testa LexiClash - multiplayer ordspel på svenska! Skapa rum, bjud in vänner och tävla i realtid. Gratis!',
+      images: [`${BASE_URL}/og-image-sv.jpg`],
+    },
+    alternates: {
+      canonical: pageUrl,
+      languages: {
+        'x-default': `${BASE_URL}/en/multiplayer-word-game-online`,
+        en: `${BASE_URL}/en/multiplayer-word-game-online`,
+        he: `${BASE_URL}/he/hebrew-multiplayer-word-game`,
+        sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
+        ja: `${BASE_URL}/ja/japanese-word-game`,
+        es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
+      },
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+export default async function SwedishMultiplayerWordGamePage({ params }: PageProps) {
+  const { locale } = await params;
+
+  const faqs = [
+    {
+      q: 'Hur börjar jag spela multiplayer ordspel?',
+      a: 'Klicka helt enkelt på "Skapa rum" eller "Gå med i rum" på multiplayer-sidan. Dela rumslänken med vänner, så kan ni börja tävla i realtid!',
+    },
+    {
+      q: 'Vad gör LexiClash olika från andra ordspel?',
+      a: 'LexiClash kombinerar det bästa från Boggle, Scrabble och Wordle. Tävla i realtid med omedelbar poängåterkoppling, flera spellägen, bosskamper och dagliga utmaningar.',
+    },
+    {
+      q: 'Kan jag spela med vänner online gratis?',
+      a: 'Ja! LexiClash är helt gratis. Skapa rum, bjud in vänner via länk, och tävla utan nedladdning eller registrering.',
+    },
+    {
+      q: 'Hur många svenska ord innehåller LexiClash?',
+      a: 'LexiClash innehåller över 10 000 svenska ord. Vår ordbok uppdateras kontinuerligt.',
+    },
+    {
+      q: 'Vilka spellägen finns?',
+      a: 'Spela multiplayer-rum, dagliga utmaningar, ordletare, blastläge och mer. Varje läge har unika regler och poängberäkning.',
+    },
+  ];
+
+  return (
+    <main className="min-h-screen bg-neo-navy text-neo-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqs.map((faq) => ({
+              '@type': 'Question',
+              name: faq.q,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: faq.a,
+              },
+            })),
+          }),
+        }}
+      />
+
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
+          Multiplayer Ordspel Online - Spela Boggle & Scrabble på Svenska
+        </h1>
+
+        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
+          Välkommen till LexiClash, det ultimata gratis multiplayer ordspelet online på svenska! Om du älskar Boggle,
+          Scrabble eller Wordfeud kommer vår realtidsplattform att kombinera det bästa av varje spel. Skapa ett rum,
+          skicka en länk till dina vänner och tävla i spännande ordkamper direkt. Med 10 000+ ord i vår svenska ordbok,
+          ingen nedladdning krävs och helt gratis tillgång, LexiClash är ditt ultimata ordspel för rolig tävling.
+        </p>
+
+        <section className="mb-12">
+          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
+            Varför spela LexiClash Multiplayer?
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              'Realtids multiplayer-kamper med omedelbar poängåterkoppling',
+              'Skapa rum och bjud in vänner via delbar länk',
+              '10 000+ svenska ord i ordförrådet',
+              'Flera spellägen (Boggle, Letare, Blast)',
+              'Dagliga utmaningar med poängtabeller',
+              'Bosskamper med unika vändningar',
+              'Helt gratis, ingen nedladdning behövs',
+              'Spela på 5 språk (EN, HE, SV, JA, ES)',
+            ].map((feature, idx) => (
+              <div
+                key={idx}
+                className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard"
+              >
+                <span className="text-neo-yellow">✓</span>
+                <p className="text-sm sm:text-base">{feature}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <Link
+            href={`/${locale}/multiplayer`}
+            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
+          >
+            Börja Spela Multiplayer
+          </Link>
+          <Link
+            href={`/${locale}/singleplayer`}
+            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
+          >
+            Spela Ensam
+          </Link>
+          <Link
+            href={`/${locale}/daily`}
+            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4"
+          >
+            Daglig Utmaning
+          </Link>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Vanliga Frågor</h2>
+          <div className="space-y-4">
+            {faqs.map((faq, idx) => (
+              <details
+                key={idx}
+                className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
+              >
+                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
+                  <span>{faq.q}</span>
+                  <span className="text-neo-yellow transition-transform group-open:rotate-180">▼</span>
+                </summary>
+                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-12 max-w-none">
+          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Om LexiClash Multiplayer</h2>
+          <p className="mt-4 text-neo-gray-200">
+            LexiClash revolutionerar onlinespel med ord genom att kombinera det strategiska djupet av Scrabble,
+            realtidshastigheten av Boggle och pussel-nöjet av Wordle. Vår plattform är utformad för ordentusiaster,
+            casual gamers och tävlande spelare.
+          </p>
+          <p className="mt-4 text-neo-gray-200">
+            Spela multiplayer ordspel online med vänner, familj eller främlingar världen över. Oavsett om du vill ha en
+            snabb 15-minuters match eller en längre tävlingssession, LexiClash passar alla spelstillar. Det intuitiva
+            gränssnittet fungerar på både dator och mobil, så att du kan spela ordspel var som helst, när som helst.
+          </p>
+          <p className="mt-4 text-neo-gray-200">
+            Tävla på globala poängtabeller, tjäna prestationer och lås upp specialspellägen. Våra bosskamper lägger till
+            en unik PvE-vändning där spelare samarbetar mot AI-motståndare. Dagliga utmaningar erbjuder nya pussel
+            varje dag med exklusiva belöningar.
+          </p>
+        </section>
+      </div>
+    </main>
+  );
 }

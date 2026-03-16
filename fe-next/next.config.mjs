@@ -63,7 +63,16 @@ const nextConfig = {
   // optimizePackageImports automatically tree-shakes common packages like lucide-react
   experimental: {
     turbopackUseSystemTlsCerts: true,
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      'date-fns',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-tooltip',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-tabs',
+    ],
   },
 
   // Transpile packages to fix HMR/ESM issues with Turbopack
@@ -119,38 +128,18 @@ const nextConfig = {
         destination: 'https://www.lexiclash.live/:path*',
         permanent: true,
       },
-      // Redirect bare /legal path without locale to default locale
+      // Catch-all: redirect any path without a locale prefix to /en/...
+      // This prevents 308s from the app router and gives Google clean 301s.
+      // Must be AFTER the non-www redirect and root redirect above.
       {
-        source: '/legal',
-        destination: '/en/legal',
+        source: '/:path((?!en|he|sv|ja|es|api|_next|favicon\\.ico|.*\\..*).*)',
+        destination: '/en/:path',
         permanent: true,
       },
+      // Also handle nested paths without locale (e.g. /legal/privacy → /en/legal/privacy)
       {
-        source: '/legal/terms',
-        destination: '/en/legal/terms',
-        permanent: true,
-      },
-      {
-        source: '/legal/privacy',
-        destination: '/en/legal/privacy',
-        permanent: true,
-      },
-      // Redirect bare /rules path without locale to default locale
-      {
-        source: '/rules',
-        destination: '/en/rules',
-        permanent: true,
-      },
-      // Redirect bare /leaderboard path without locale to default locale
-      {
-        source: '/leaderboard',
-        destination: '/en/leaderboard',
-        permanent: true,
-      },
-      // Redirect bare /profile path without locale to default locale
-      {
-        source: '/profile',
-        destination: '/en/profile',
+        source: '/:path((?!en|he|sv|ja|es|api|_next|favicon\\.ico|.*\\..*).*?)/:rest*',
+        destination: '/en/:path/:rest*',
         permanent: true,
       },
     ];
@@ -208,6 +197,34 @@ const nextConfig = {
   // Security headers and API caching
   async headers() {
     return [
+      // Static asset caching — 1 year immutable for fingerprinted assets
+      {
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/sounds/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       // Static asset caching (mascot images, icons, etc.)
       {
         source: '/mascot/:path*',
@@ -229,6 +246,24 @@ const nextConfig = {
       },
       {
         source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/logos/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/winner-celebration/:path*',
         headers: [
           {
             key: 'Cache-Control',

@@ -3,10 +3,16 @@
 import React, { useState, useCallback, useRef, useEffect, createContext, useContext, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { UnifiedAchievementModal } from './UnifiedAchievementModal';
-import { CinematicPlayer } from '../adventure/boss/cinematics/CinematicPlayer';
+import type { CinematicPlayerProps } from '../adventure/boss/cinematics/CinematicPlayer';
 import { AchievementCinematic, ACHIEVEMENT_DURATION_FRAMES } from './cinematics/AchievementCinematic';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+const CinematicPlayer = dynamic(
+  () => import('../adventure/boss/cinematics/CinematicPlayer').then((m) => m.CinematicPlayer),
+  { ssr: false }
+) as React.ComponentType<CinematicPlayerProps>;
 import { getAchievementIcon } from '@/constants/achievementIcons';
 import { calculateTier, TIER_COLORS } from '@/utils/achievementTiers';
 import type { AchievementPayload } from '@/shared/types/socket';

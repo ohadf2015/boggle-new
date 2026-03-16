@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import BenefitsPageClient from './PageClient';
 import { contentByLocale } from './content';
 
@@ -38,8 +39,14 @@ export default async function BenefitsPage({ params }: PageProps) {
   const { locale } = await params;
   const content = contentByLocale[locale] || contentByLocale.en;
 
+  const siteUrl = 'https://www.lexiclash.live';
   return (
     <>
+      <BreadcrumbJsonLd items={[
+        { name: 'Home', url: `${siteUrl}/${locale}` },
+        { name: 'Blog', url: `${siteUrl}/${locale}/blog` },
+        { name: content.title, url: `${siteUrl}/${locale}/blog/${SLUG}` },
+      ]} />
       <BlogPostingJsonLd
         title={content.title}
         description={metaDescriptions[locale] || metaDescriptions.en}

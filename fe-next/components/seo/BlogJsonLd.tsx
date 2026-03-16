@@ -62,9 +62,10 @@ export function BlogPostingJsonLd({
             height: 630,
         },
         author: {
-            '@type': 'Organization',
-            name: 'LexiClash Editorial Team',
-            url: SITE_URL,
+            '@type': 'Person',
+            name: 'The Word Nerd',
+            url: `${SITE_URL}/about`,
+            jobTitle: 'Word Game Expert',
         },
         publisher: {
             '@type': 'Organization',

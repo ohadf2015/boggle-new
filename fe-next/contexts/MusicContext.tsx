@@ -416,6 +416,45 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   );
 }
 
+/**
+ * MusicProviderStub - No-op context provider used while the real MusicProvider
+ * (which pulls in Howler.js) is loading via dynamic import.
+ * Keeps useMusic() safe to call with zero-cost stubs.
+ */
+const NOOP = (): void => {};
+const NOOP_ASYNC = async (): Promise<void> => {};
+const STUB_TRACKS = {
+  LOBBY: 'lobby' as const,
+  BEFORE_GAME: 'beforeGame' as const,
+  IN_GAME: 'inGame' as const,
+  ALMOST_OUT_OF_TIME: 'almostOutOfTime' as const,
+  BOSSA_ARCADE: 'bossaArcade' as const,
+  BOSSA: 'bossa' as const,
+};
+const stubValue: MusicContextType = {
+  currentTrack: null,
+  volume: 0.5,
+  isMuted: false,
+  isPlaying: false,
+  audioUnlocked: false,
+  playTrack: NOOP,
+  stopMusic: NOOP,
+  fadeToTrack: NOOP,
+  setVolume: NOOP,
+  toggleMute: NOOP,
+  unlockAudio: NOOP,
+  preloadMusicTrack: NOOP_ASYNC,
+  TRACKS: STUB_TRACKS,
+};
+
+export function MusicProviderStub({ children }: { children: React.ReactNode }): React.ReactElement {
+  return (
+    <MusicContext.Provider value={stubValue}>
+      {children}
+    </MusicContext.Provider>
+  );
+}
+
 export function useMusic(): MusicContextType {
   const context = useContext(MusicContext);
   if (!context) {
