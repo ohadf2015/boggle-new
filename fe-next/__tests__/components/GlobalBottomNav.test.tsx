@@ -79,12 +79,11 @@ describe('GlobalBottomNav', () => {
     });
 
     describe('Rendering', () => {
-        it('should render all four navigation tabs', () => {
+        it('should render all three navigation tabs', () => {
             render(<GlobalBottomNav />);
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /leaderboard/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
         });
 
@@ -96,11 +95,11 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should highlight active tab based on current path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/leaderboard');
+            (usePathname as jest.Mock).mockReturnValue('/en/profile');
             render(<GlobalBottomNav />);
 
-            const leaderboardButton = screen.getByRole('button', { name: /leaderboard/i });
-            expect(leaderboardButton).toHaveAttribute('aria-current', 'page');
+            const profileButton = screen.getByRole('button', { name: /profile/i });
+            expect(profileButton).toHaveAttribute('aria-current', 'page');
         });
 
         it('should apply safe area padding when present', () => {
@@ -160,12 +159,12 @@ describe('GlobalBottomNav', () => {
             expect(homeButton).toHaveAttribute('aria-current', 'page');
         });
 
-        it('should mark play as active on play path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/play');
+        it('should mark profile as active on profile path', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/profile');
             render(<GlobalBottomNav />);
 
-            const playButton = screen.getByRole('button', { name: /play/i });
-            expect(playButton).toHaveAttribute('aria-current', 'page');
+            const profileButton = screen.getByRole('button', { name: /profile/i });
+            expect(profileButton).toHaveAttribute('aria-current', 'page');
         });
 
         it('should default to home when path does not match any tab', () => {
@@ -356,13 +355,13 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should indicate active state for screen readers', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/play');
+            (usePathname as jest.Mock).mockReturnValue('/en/profile');
             render(<GlobalBottomNav />);
 
-            const playButton = screen.getByRole('button', { name: /play/i });
+            const profileButton = screen.getByRole('button', { name: /profile/i });
             const homeButton = screen.getByRole('button', { name: /home/i });
 
-            expect(playButton).toHaveAttribute('aria-current', 'page');
+            expect(profileButton).toHaveAttribute('aria-current', 'page');
             expect(homeButton).not.toHaveAttribute('aria-current');
         });
 
