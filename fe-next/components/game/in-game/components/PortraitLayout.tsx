@@ -1,13 +1,13 @@
 'use client';
 
-import { memo, useState, useEffect, useCallback, useRef, type ReactNode, type RefObject } from 'react';
+import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode, type RefObject } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
 import { Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import GridComponent from '@/components/GridComponent';
+import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
 import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import CircularTimer from '@/components/CircularTimer';
 import RoomChat from '@/components/RoomChat';
@@ -36,6 +36,9 @@ import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
 import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
 import { ComboMilestoneAnnouncement } from '../../ComboMilestoneAnnouncement';
 import { ScreenFlashOverlay } from '../../ScreenFlashOverlay';
+
+/** Stable empty array to avoid breaking GridComponent memo on every render */
+const EMPTY_HIGHLIGHTED_PATH: HighlightedCell[] = [];
 
 interface TournamentData {
   name?: string;
@@ -229,6 +232,13 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
     setFloatingScore(null);
     setIsFireRoundScore(false);
   }, []);
+
+  // Stable highlighted path for GridComponent — avoids new [] ref every render
+  const showTrails = shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed);
+  const gridHighlightedPath = useMemo(
+    () => showTrails ? highlightedCells : EMPTY_HIGHLIGHTED_PATH,
+    [showTrails, highlightedCells]
+  );
 
   // Combo glow class based on combo level
   const comboGlow = comboLevel >= 7
@@ -512,11 +522,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 hideWordPreview={true}
                 fireRoundActive={fireRoundActive}
                 earthquakeShaking={earthquakeState === 'shaking'}
-                highlightedPath={
-                  shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed)
-                    ? highlightedCells
-                    : []
-                }
+                highlightedPath={gridHighlightedPath}
                 onSingleTapDetected={onSingleTapDetected}
                 language={gameLanguage}
                 isTypingMode={isTypingMode}

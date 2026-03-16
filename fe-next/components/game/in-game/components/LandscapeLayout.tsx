@@ -1,11 +1,11 @@
 'use client';
 
-import { memo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
 import CircularTimer from '@/components/CircularTimer';
-import GridComponent from '@/components/GridComponent';
+import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
 import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
 import ComboDisplay from '../../ComboDisplay';
@@ -29,6 +29,9 @@ import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
 import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
 import { ComboMilestoneAnnouncement } from '../../ComboMilestoneAnnouncement';
 import { ScreenFlashOverlay } from '../../ScreenFlashOverlay';
+
+/** Stable empty array to avoid breaking GridComponent memo on every render */
+const EMPTY_HIGHLIGHTED_PATH: HighlightedCell[] = [];
 
 interface LandscapeLayoutProps {
   // Core props
@@ -202,6 +205,13 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
     setIsFireRoundScore(false);
   }, []);
 
+  // Stable highlighted path for GridComponent — avoids new [] ref every render
+  const showTrails = shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed);
+  const gridHighlightedPath = useMemo(
+    () => showTrails ? highlightedCells : EMPTY_HIGHLIGHTED_PATH,
+    [showTrails, highlightedCells]
+  );
+
   // Combo glow class based on combo level
   const comboGlow = comboLevel >= 7
     ? 'shadow-[0_0_20px_rgba(255,0,255,0.4)]'
@@ -360,10 +370,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                   largeText
                   fireRoundActive={fireRoundActive}
                   earthquakeShaking={earthquakeState === 'shaking'}
-                  highlightedPath={
-                    shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed)
-                      ? highlightedCells
-                      : []
+                  highlightedPath={gridHighlightedPath
                   }
                   onSingleTapDetected={onSingleTapDetected}
                   language={gameLanguage}
