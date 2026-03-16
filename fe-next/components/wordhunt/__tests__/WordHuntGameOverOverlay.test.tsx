@@ -4,16 +4,16 @@ import { render, screen, act } from '@testing-library/react';
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown }>(
-      ({ children, initial, animate, exit, transition, ...props }, ref) => (
-        <div ref={ref} {...props}>{children}</div>
-      )
-    ),
-    p: React.forwardRef<HTMLParagraphElement, React.HTMLProps<HTMLParagraphElement> & { initial?: unknown; animate?: unknown; transition?: unknown }>(
-      ({ children, initial, animate, transition, ...props }, ref) => (
-        <p ref={ref} {...props}>{children}</p>
-      )
-    ),
+    div: Object.assign(React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown }>(
+      function MotionDiv({ children, initial, animate, exit, transition, ...props }, ref) {
+        return <div ref={ref} {...props}>{children}</div>;
+      }
+    ), { displayName: 'motion.div' }),
+    p: Object.assign(React.forwardRef<HTMLParagraphElement, React.HTMLProps<HTMLParagraphElement> & { initial?: unknown; animate?: unknown; transition?: unknown }>(
+      function MotionP({ children, initial, animate, transition, ...props }, ref) {
+        return <p ref={ref} {...props}>{children}</p>;
+      }
+    ), { displayName: 'motion.p' }),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

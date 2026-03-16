@@ -304,7 +304,7 @@ export function useGridGestures({
 
       processTouchMove(touchX, touchY);
     },
-    [disabled, interactive, processTouchMove]
+    [disabled, interactive, processTouchMove, gridRef]
   );
 
   // Handle mouse up (ends drag)

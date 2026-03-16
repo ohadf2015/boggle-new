@@ -182,18 +182,26 @@ const SpectatorContent: React.FC<{ t: (key: string) => string }> = ({ t }) => (
 );
 
 /** Floating sparkle particles for the victory burst */
+/** Simple seeded random for deterministic particles */
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 9301 + 49297) * 233280;
+  return x - Math.floor(x);
+}
+
+const PARTICLES = Array.from({ length: 12 }, (_, i) => {
+  const angle = (i / 12) * Math.PI * 2;
+  const distance = 100 + seededRandom(i) * 80;
+  return {
+    id: i,
+    x: Math.cos(angle) * distance,
+    y: Math.sin(angle) * distance,
+    delay: i * 0.05,
+    size: 12 + seededRandom(i + 100) * 8,
+  };
+});
+
 const VictoryParticles: React.FC = () => {
-  const particles = Array.from({ length: 12 }, (_, i) => {
-    const angle = (i / 12) * Math.PI * 2;
-    const distance = 100 + Math.random() * 80;
-    return {
-      id: i,
-      x: Math.cos(angle) * distance,
-      y: Math.sin(angle) * distance,
-      delay: i * 0.05,
-      size: 12 + Math.random() * 8,
-    };
-  });
+  const particles = PARTICLES;
 
   return (
     <>
