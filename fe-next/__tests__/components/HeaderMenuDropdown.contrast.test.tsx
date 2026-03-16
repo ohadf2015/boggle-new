@@ -36,23 +36,15 @@ jest.mock('../../components/MusicControls', () => {
 });
 
 describe('HeaderMenuDropdown - Contrast Issues', () => {
-  it('should have sufficient contrast for Brain Training link', () => {
+  it('should not render Brain Training link (feature disabled)', () => {
     render(<HeaderMenuDropdown />);
 
     // Open the dropdown
     const menuButton = screen.getByRole('button', { name: /menu/i });
     fireEvent.click(menuButton);
 
-    // Find Brain Training link
-    const brainLink = screen.getByRole('link', { name: /brain.?training/i });
-
-    // Get computed styles
-    const styles = window.getComputedStyle(brainLink);
-
-    // Brain Training link should NOT use low-opacity purple with black text
-    // It should use solid colors with good contrast
-    expect(styles.backgroundColor).not.toMatch(/rgba.*0\.[0-8]\)/); // No low opacity backgrounds
-    expect(styles.color).not.toBe('rgb(26, 26, 46)'); // Should not be neo-black with purple background
+    // Brain Training link is temporarily disabled
+    expect(screen.queryByRole('link', { name: /brain.?training/i })).not.toBeInTheDocument();
   });
 
   it('should have z-index higher than GlobalBottomNav (z-50)', () => {

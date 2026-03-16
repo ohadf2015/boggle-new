@@ -212,7 +212,8 @@ describe('HeaderMenuDropdown', () => {
 
             // Should show authenticated items
             expect(screen.getByText(/brain.nav.profile/i)).toBeInTheDocument();
-            expect(screen.getByText(/landing.brainTraining/i)).toBeInTheDocument();
+            // Brain Training is temporarily disabled (wrapped in {false && ...})
+            expect(screen.queryByText(/landing.brainTraining/i)).not.toBeInTheDocument();
 
             // Should still show public items
             expect(screen.getByText(/settings.accessibility/i)).toBeInTheDocument();
