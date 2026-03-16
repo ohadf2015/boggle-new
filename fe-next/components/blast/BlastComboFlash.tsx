@@ -102,13 +102,45 @@ export function BlastComboFlash({ activeFlash, onComplete }: BlastComboFlashProp
       <motion.div
         key={activeFlash.id}
         data-testid="combo-flash"
-        className="absolute inset-0 pointer-events-none z-40"
-        style={{ background }}
-        initial={{ opacity: tier === 3 ? 0.25 : tier === 2 ? 0.18 : 0.1 }}
+        className="absolute inset-0 pointer-events-none z-40 overflow-hidden"
+        initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}
-        transition={{ duration: tier === 3 ? 0.35 : tier === 2 ? 0.25 : 0.15, ease: 'easeOut' }}
+        transition={{ duration: tier === 3 ? 0.45 : tier === 2 ? 0.3 : 0.2, ease: 'easeOut' }}
         onAnimationComplete={() => onComplete(activeFlash.id)}
-      />
+      >
+        {/* Radial flash — expands from center like a shockwave */}
+        <motion.div
+          className="absolute"
+          style={{
+            inset: '-50%',
+            background: tier === 3
+              ? `radial-gradient(circle, ${background}, transparent 70%)`
+              : `radial-gradient(circle, ${background}, transparent 60%)`,
+          }}
+          initial={{ scale: 0.3, opacity: tier === 3 ? 0.35 : tier === 2 ? 0.25 : 0.15 }}
+          animate={{ scale: 1.5, opacity: 0 }}
+          transition={{ duration: tier === 3 ? 0.4 : tier === 2 ? 0.28 : 0.18, ease: 'easeOut' }}
+        />
+        {/* Horizontal sweep line for tier 2+ */}
+        {tier >= 2 && (
+          <motion.div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: 0,
+              width: '100%',
+              height: tier === 3 ? 4 : 2,
+              background: tier === 3
+                ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)'
+                : `linear-gradient(90deg, transparent, ${background}80, transparent)`,
+              transform: 'translateY(-50%)',
+            }}
+            initial={{ scaleX: 0, opacity: 1 }}
+            animate={{ scaleX: 1, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          />
+        )}
+      </motion.div>
     </AnimatePresence>
   );
 }

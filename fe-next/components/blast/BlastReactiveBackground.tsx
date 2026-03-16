@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
 interface BlastReactiveBackgroundProps {
@@ -14,41 +14,68 @@ function getNebulaColor(intensity: number): string {
   return NEBULA_COLORS[Math.min(Math.max(Math.round(intensity), 0), 5)] ?? NEBULA_COLORS[0];
 }
 
-// Fewer particles — ambient atmosphere, not a particle system
+/** Secondary nebula color for dual-glow effect at high intensity */
+function getNebulaSecondaryColor(intensity: number): string {
+  const SECONDARY: Record<number, string> = {
+    0: 'transparent', 1: 'transparent', 2: 'transparent',
+    3: '#1a0a3e', 4: '#4a0e4e', 5: '#ff1493',
+  };
+  return SECONDARY[Math.min(Math.max(Math.round(intensity), 0), 5)] ?? 'transparent';
+}
+
+// More particles earlier — creates more atmosphere at lower intensities
 function getParticleCount(intensity: number): number {
-  if (intensity < 3) return 0; // Raised threshold
-  if (intensity < 5) return 5;
-  return 8;
+  if (intensity < 2) return 0;
+  if (intensity < 3) return 3;
+  if (intensity < 5) return 7;
+  return 12;
 }
 
 function getGridOpacity(intensity: number): number {
-  return 0.03 + (Math.min(intensity, 5) - 1) * 0.0125;
+  return 0.03 + (Math.min(intensity, 5) - 1) * 0.015;
 }
 
 function getNebulaSpeed(intensity: number): string {
-  const base = 30;
-  const speed = base - intensity * 4;
-  return `${Math.max(speed, 10)}s`;
+  const base = 25;
+  const speed = base - intensity * 3;
+  return `${Math.max(speed, 8)}s`;
 }
 
 export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundProps): React.ReactElement {
   const reducedMotion = useReducedMotion();
+  const prevIntensityRef = useRef(intensity);
+  const pulseRef = useRef<HTMLDivElement>(null);
 
   const particles = useMemo(() => {
     const count = getParticleCount(intensity);
     return Array.from({ length: count }, (_, i) => {
       const color = PARTICLE_COLORS[i % PARTICLE_COLORS.length];
-      const size = 2 + (i % 3);
+      const size = 2 + (i % 4); // Slightly larger range
       const left = (i * 7 + 5) % 100;
-      const delay = (i * 1.3) % 8;
-      const duration = 8 + (i % 5) * 2;
-      const drift = ((i % 2 === 0 ? 1 : -1) * (10 + (i % 4) * 5));
-      const opacity = 0.15 + (i % 4) * 0.08;
+      const delay = (i * 1.1) % 6;
+      const duration = 6 + (i % 5) * 2; // Faster rise
+      // Sine-wave drift for organic floating motion
+      const drift = ((i % 2 === 0 ? 1 : -1) * (15 + (i % 4) * 8));
+      const opacity = 0.2 + (i % 4) * 0.1;
       return { color, size, left, delay, duration, drift, opacity, key: i };
     });
   }, [intensity]);
 
+  // Energy pulse ring when intensity increases
+  useEffect(() => {
+    if (reducedMotion) return;
+    if (intensity > prevIntensityRef.current && pulseRef.current) {
+      const ring = document.createElement('div');
+      ring.className = 'blast-energy-pulse-ring';
+      pulseRef.current.appendChild(ring);
+      // Auto-cleanup after animation
+      setTimeout(() => ring.remove(), 1200);
+    }
+    prevIntensityRef.current = intensity;
+  }, [intensity, reducedMotion]);
+
   const gridOpacity = intensity >= 1 ? getGridOpacity(intensity) : 0;
+  const secondaryColor = getNebulaSecondaryColor(intensity);
 
   return (
     <div
@@ -57,7 +84,7 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
       className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
       style={{ contain: 'strict' }}
     >
-      {/* Layer 1: Nebula glow */}
+      {/* Layer 1: Primary nebula glow */}
       <div
         data-testid="blast-nebula"
         className="absolute inset-0 flex items-center justify-center"
@@ -72,6 +99,22 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
           }}
         />
       </div>
+
+      {/* Layer 1b: Secondary nebula (offset, counter-rotates) — creates depth at high intensity */}
+      {!reducedMotion && intensity >= 3 && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="w-[50vmax] h-[50vmax] rounded-full"
+            style={{
+              background: `radial-gradient(circle, ${secondaryColor} 0%, transparent 60%)`,
+              filter: 'blur(60px)',
+              opacity: 0.5,
+              willChange: 'transform',
+              animation: `blast-nebula-drift-reverse ${getNebulaSpeed(intensity)} ease-in-out infinite`,
+            }}
+          />
+        </div>
+      )}
 
       {/* Layer 2: Grid lines */}
       {!reducedMotion && intensity >= 1 && (
@@ -101,8 +144,8 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
         />
       )}
 
-      {/* Layer 3: Ambient particles — only at high intensity */}
-      {!reducedMotion && intensity >= 3 && (
+      {/* Layer 3: Ambient particles — now appears earlier for more atmosphere */}
+      {!reducedMotion && intensity >= 2 && (
         <div data-testid="blast-particles" className="absolute inset-0">
           {particles.map((p) => (
             <div
@@ -114,18 +157,26 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
                 left: `${p.left}%`,
                 bottom: '-10px',
                 backgroundColor: p.color,
-                filter: 'blur(2px)',
+                filter: `blur(${p.size > 4 ? 3 : 1}px)`,
                 willChange: 'transform, opacity',
-                animation: `blast-particle-rise ${p.duration}s linear ${p.delay}s infinite`,
+                animation: `blast-particle-rise-wave ${p.duration}s linear ${p.delay}s infinite`,
                 ['--particle-opacity' as string]: p.opacity,
                 ['--drift' as string]: `${p.drift}px`,
+                ['--wave-amp' as string]: `${8 + (p.key % 3) * 4}px`,
               }}
             />
           ))}
         </div>
       )}
 
-      {/* Energy waves layer removed — competed with grid focus and added visual clutter */}
+      {/* Layer 4: Energy pulse container — rings spawn on intensity increase */}
+      {!reducedMotion && (
+        <div
+          ref={pulseRef}
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ pointerEvents: 'none' }}
+        />
+      )}
 
       {/* CSS Keyframes */}
       <style jsx>{`
@@ -136,18 +187,43 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
           100% { transform: translate(-10%, -10%) scale(1); }
         }
 
-        @keyframes blast-grid-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+        @keyframes blast-nebula-drift-reverse {
+          0% { transform: translate(8%, 8%) scale(0.95); }
+          33% { transform: translate(-8%, -3%) scale(1.05); }
+          66% { transform: translate(4%, -8%) scale(1); }
+          100% { transform: translate(8%, 8%) scale(0.95); }
         }
 
-        @keyframes blast-particle-rise {
+        @keyframes blast-grid-pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+
+        @keyframes blast-particle-rise-wave {
           0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-          10% { opacity: var(--particle-opacity); }
+          5% { opacity: var(--particle-opacity); }
+          25% { transform: translateY(75vh) translateX(var(--wave-amp)); }
+          50% { transform: translateY(50vh) translateX(calc(var(--drift) * -0.5)); }
+          75% { transform: translateY(25vh) translateX(var(--wave-amp)); }
           90% { opacity: var(--particle-opacity); }
           100% { transform: translateY(-20px) translateX(var(--drift)); opacity: 0; }
         }
 
+        :global(.blast-energy-pulse-ring) {
+          position: absolute;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 2px solid rgba(0, 255, 255, 0.6);
+          box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.1);
+          animation: blast-energy-pulse 1.2s ease-out forwards;
+          pointer-events: none;
+        }
+
+        @keyframes blast-energy-pulse {
+          0% { transform: scale(0.5); opacity: 1; }
+          100% { transform: scale(15); opacity: 0; }
+        }
       `}</style>
     </div>
   );

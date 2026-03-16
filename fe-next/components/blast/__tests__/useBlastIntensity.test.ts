@@ -22,23 +22,23 @@ describe('useBlastIntensity', () => {
     expect(result.current).toBe(0);
   });
 
-  it('combo level 3 gives intensity 1', () => {
+  it('combo level 4 gives intensity 1', () => {
     const { result } = renderHook(() =>
-      useBlastIntensity({ ...defaultOptions, comboLevel: 3 })
+      useBlastIntensity({ ...defaultOptions, comboLevel: 4 })
     );
     expect(result.current).toBe(1);
   });
 
-  it('combo level 5 gives intensity 2', () => {
+  it('combo level 6 gives intensity 2', () => {
     const { result } = renderHook(() =>
-      useBlastIntensity({ ...defaultOptions, comboLevel: 5 })
+      useBlastIntensity({ ...defaultOptions, comboLevel: 6 })
     );
     expect(result.current).toBe(2);
   });
 
-  it('combo level 7 gives intensity 3', () => {
+  it('combo level 8 gives intensity 3', () => {
     const { result } = renderHook(() =>
-      useBlastIntensity({ ...defaultOptions, comboLevel: 7 })
+      useBlastIntensity({ ...defaultOptions, comboLevel: 8 })
     );
     expect(result.current).toBe(3);
   });
@@ -55,9 +55,9 @@ describe('useBlastIntensity', () => {
     expect(result2.current).toBe(2);
   });
 
-  it('combo streak adds intensity', () => {
+  it('combo streak adds intensity at level 4+', () => {
     const { result } = renderHook(() =>
-      useBlastIntensity({ ...defaultOptions, comboStreakLevel: 3 })
+      useBlastIntensity({ ...defaultOptions, comboStreakLevel: 4 })
     );
     expect(result.current).toBe(1);
   });
@@ -72,9 +72,9 @@ describe('useBlastIntensity', () => {
   it('caps at 5', () => {
     const { result } = renderHook(() =>
       useBlastIntensity({
-        comboLevel: 7,
+        comboLevel: 8,
         cascadeChainLevel: 3,
-        comboStreakLevel: 3,
+        comboStreakLevel: 4,
         isHotPhase: true,
         wordsFoundCount: 50,
       })
@@ -85,7 +85,7 @@ describe('useBlastIntensity', () => {
   it('decays intensity by 1 every 2 seconds when target drops', () => {
     const { result, rerender } = renderHook(
       (props) => useBlastIntensity(props),
-      { initialProps: { ...defaultOptions, comboLevel: 7 } }
+      { initialProps: { ...defaultOptions, comboLevel: 8 } }
     );
     expect(result.current).toBe(3);
 

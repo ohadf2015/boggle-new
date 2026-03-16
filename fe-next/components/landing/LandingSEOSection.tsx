@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   Swords, CalendarDays, Map, Sparkles, ChevronDown, Plus, Minus,
-  Smartphone, BookOpen, Users, Zap,
+  Smartphone, BookOpen, Users, Zap, MousePointerClick, Layers, Trophy, Target,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -14,7 +14,6 @@ import { cn } from '@/lib/utils';
 
 const easeOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
-// SSR-safe: initial = visible for crawlers
 const sectionReveal: Variants = {
   hidden: { opacity: 1, y: 0 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: easeOut } },
@@ -59,8 +58,6 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagMultiplayer',
     fallbackTitle: 'Real-Time Multiplayer',
     fallbackTag: '2-20 players',
-    color: 'from-neo-pink to-pink-400',
-    rotate: -2,
   },
   {
     icon: CalendarDays,
@@ -68,8 +65,6 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagDaily',
     fallbackTitle: 'Daily Challenges',
     fallbackTag: 'New puzzle daily',
-    color: 'from-neo-yellow to-amber-400',
-    rotate: 1.5,
   },
   {
     icon: Map,
@@ -77,8 +72,6 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagAdventure',
     fallbackTitle: 'Adventure Mode',
     fallbackTag: '100 levels',
-    color: 'from-neo-lime to-lime-400',
-    rotate: -1,
   },
   {
     icon: Sparkles,
@@ -86,15 +79,12 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagBlast',
     fallbackTitle: 'Blast Mode',
     fallbackTag: 'Chain reactions',
-    color: 'from-neo-cyan to-cyan-400',
-    rotate: 2,
   },
 ] as const;
 
 /* ── How to Play steps ──────────────────────────────────── */
 
-const STEP_COLORS = ['bg-neo-pink', 'bg-neo-yellow', 'bg-neo-lime', 'bg-neo-cyan'];
-const STEP_EMOJIS = ['👆', '🔤', '🔥', '🏆'];
+const STEP_ICONS = [MousePointerClick, Layers, Target, Trophy];
 
 /* ── FAQ Accordion item ─────────────────────────────────── */
 
@@ -103,10 +93,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
     <motion.div
       className={cn(
-        'border-3 border-neo-black rounded-neo overflow-hidden',
-        'bg-neo-navy/50 dark:bg-neo-white/5',
+        'border-2 border-neo-white/10 rounded-neo overflow-hidden',
+        'bg-neo-white/[0.03]',
         'transition-colors duration-200',
-        open && 'shadow-hard-sm'
+        open && 'border-neo-white/20 shadow-hard-sm'
       )}
       variants={staggerItem}
     >
@@ -126,9 +116,9 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
           className="shrink-0"
         >
           {open ? (
-            <Minus className="w-4 h-4 text-neo-pink" />
+            <Minus className="w-4 h-4 text-neo-white/40" />
           ) : (
-            <Plus className="w-4 h-4 text-neo-lime" />
+            <Plus className="w-4 h-4 text-neo-white/40" />
           )}
         </motion.span>
       </button>
@@ -141,7 +131,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             transition={{ duration: 0.25, ease: easeOut }}
             className="overflow-hidden"
           >
-            <p className="px-3 sm:px-4 pb-3 sm:pb-4 text-sm text-neo-white/70 leading-relaxed">
+            <p className="px-3 sm:px-4 pb-3 sm:pb-4 text-sm text-neo-white/60 leading-relaxed">
               {answer}
             </p>
           </motion.div>
@@ -154,21 +144,21 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 /* ── Blog data ──────────────────────────────────────────── */
 
 const BLOG_LINKS = [
-  { slug: 'science-behind-word-games', key: 'blog.scienceTitle', fallback: 'The Science Behind Word Games', category: 'Science', color: 'bg-neo-lime' },
-  { slug: 'why-word-games-are-addictive', key: 'blog.addictiveTitle', fallback: 'Why Word Games Are So Addictive', category: 'Psychology', color: 'bg-neo-pink' },
-  { slug: 'daily-challenge-strategies', key: 'blog.strategiesTitle', fallback: 'Daily Challenge Strategies', category: 'Strategy', color: 'bg-neo-yellow' },
-  { slug: 'word-games-for-brain-training', key: 'blog.brainTrainingTitle', fallback: 'Word Games for Brain Training', category: 'Brain Health', color: 'bg-neo-cyan' },
-  { slug: 'best-boggle-alternatives-2026', key: 'blog.alternativesTitle', fallback: 'Best Boggle Alternatives 2026', category: 'Reviews', color: 'bg-neo-orange' },
-  { slug: 'improve-word-game-skills', key: 'blog.improveTitle', fallback: 'Improve Your Word Game Skills', category: 'Strategy', color: 'bg-neo-purple' },
+  { slug: 'science-behind-word-games', key: 'blog.scienceTitle', fallback: 'The Science Behind Word Games', category: 'Science' },
+  { slug: 'why-word-games-are-addictive', key: 'blog.addictiveTitle', fallback: 'Why Word Games Are So Addictive', category: 'Psychology' },
+  { slug: 'daily-challenge-strategies', key: 'blog.strategiesTitle', fallback: 'Daily Challenge Strategies', category: 'Strategy' },
+  { slug: 'word-games-for-brain-training', key: 'blog.brainTrainingTitle', fallback: 'Word Games for Brain Training', category: 'Brain Health' },
+  { slug: 'best-boggle-alternatives-2026', key: 'blog.alternativesTitle', fallback: 'Best Boggle Alternatives 2026', category: 'Reviews' },
+  { slug: 'improve-word-game-skills', key: 'blog.improveTitle', fallback: 'Improve Your Word Game Skills', category: 'Strategy' },
 ] as const;
 
-/* ── Highlight pills (replaces "Who Can Play" wall of text) */
+/* ── Highlight pills ──────────────────────────────────── */
 
 const HIGHLIGHTS = [
-  { icon: Smartphone, key: 'landing.seo.highlightMobile', fallback: 'Any device, any browser', color: 'border-neo-pink' },
-  { icon: Users, key: 'landing.seo.highlightAges', fallback: 'Ages 6+', color: 'border-neo-yellow' },
-  { icon: BookOpen, key: 'landing.seo.highlightEdu', fallback: 'Used in classrooms', color: 'border-neo-lime' },
-  { icon: Zap, key: 'landing.seo.highlightNoSignup', fallback: 'No signup needed', color: 'border-neo-cyan' },
+  { icon: Smartphone, key: 'landing.seo.highlightMobile', fallback: 'Any device, any browser' },
+  { icon: Users, key: 'landing.seo.highlightAges', fallback: 'Ages 6+' },
+  { icon: BookOpen, key: 'landing.seo.highlightEdu', fallback: 'Used in classrooms' },
+  { icon: Zap, key: 'landing.seo.highlightNoSignup', fallback: 'No signup needed' },
 ] as const;
 
 /* ── Main component ─────────────────────────────────────── */
@@ -190,31 +180,31 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
   return (
     <section className={cn('w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 sm:pb-12 relative z-20', className)}>
 
-      {/* ── What is LexiClash — short & punchy ────────── */}
+      {/* ── What is LexiClash ────────── */}
       <motion.div
-        className="mb-10 sm:mb-12 text-center"
+        className="mb-12 sm:mb-14 text-center"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-white mb-3 neo-title">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-white mb-4 neo-title">
           {t('landing.seo.whatIsTitle')}
         </h2>
-        <p className="text-sm sm:text-base text-neo-white/75 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base text-neo-white/60 leading-relaxed max-w-2xl mx-auto">
           {t('landing.seo.whatIsShort')}
         </p>
       </motion.div>
 
-      {/* ── Game Modes — visual cards, not paragraphs ── */}
+      {/* ── Game Modes ── */}
       <motion.div
-        className="mb-10 sm:mb-12"
+        className="mb-12 sm:mb-14"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-5 neo-title-sm">
+        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-6 neo-title-sm">
           {t('landing.seo.featuresTitle')}
         </h2>
         <motion.div
@@ -224,26 +214,26 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          {GAME_MODES.map(({ icon: Icon, titleKey, tagKey, fallbackTitle, fallbackTag, color, rotate }) => (
+          {GAME_MODES.map(({ icon: Icon, titleKey, tagKey, fallbackTitle, fallbackTag }) => (
             <motion.div
               key={titleKey}
               variants={staggerItem}
-              whileHover={{ y: -6, rotate: 0, scale: 1.04, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
+              whileHover={{ y: -4, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
               className={cn(
-                'p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-sm',
-                'bg-gradient-to-br', color,
-                'flex flex-col items-center text-center gap-2',
-                'cursor-default select-none'
+                'p-4 sm:p-5 rounded-neo border-2 border-neo-white/10',
+                'bg-neo-white/[0.03]',
+                'hover:border-neo-white/20 hover:bg-neo-white/[0.06]',
+                'flex flex-col items-center text-center gap-2.5',
+                'transition-colors duration-200 cursor-default select-none'
               )}
-              style={{ transform: `rotate(${rotate}deg)` }}
             >
-              <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black" aria-hidden="true" />
-              <h3 className="font-black text-neo-black text-xs sm:text-sm uppercase leading-tight">
+              <div className="p-2.5 bg-neo-lime/10 rounded-neo border border-neo-lime/20">
+                <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-neo-lime" aria-hidden="true" />
+              </div>
+              <h3 className="font-black text-neo-white text-xs sm:text-sm uppercase leading-tight">
                 {t(titleKey) || fallbackTitle}
               </h3>
-              <span className={cn(
-                'text-[10px] sm:text-xs font-bold text-neo-black/60 uppercase tracking-wider'
-              )}>
+              <span className="text-[10px] sm:text-xs font-medium text-neo-white/40 uppercase tracking-wider">
                 {t(tagKey) || fallbackTag}
               </span>
             </motion.div>
@@ -251,15 +241,15 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         </motion.div>
       </motion.div>
 
-      {/* ── How to Play — horizontal step pills ─────── */}
+      {/* ── How to Play ─────── */}
       <motion.div
-        className="mb-10 sm:mb-12"
+        className="mb-12 sm:mb-14"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-5 neo-title-sm">
+        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-6 neo-title-sm">
           {t('landing.seo.howToPlayTitle')}
         </h2>
         <motion.div
@@ -269,35 +259,40 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              variants={staggerItem}
-              className={cn(
-                'flex flex-col items-center gap-2 p-3 sm:p-4',
-                'rounded-neo border-3 border-neo-black shadow-hard-sm',
-                STEP_COLORS[i],
-                'text-center'
-              )}
-            >
-              <span className="text-2xl" role="img" aria-hidden="true">{STEP_EMOJIS[i]}</span>
-              <span className={cn(
-                'w-6 h-6 flex items-center justify-center',
-                'bg-neo-black text-neo-white font-black text-xs rounded-full'
-              )}>
-                {i + 1}
-              </span>
-              <span className="text-xs sm:text-sm font-bold text-neo-black leading-tight">
-                {step}
-              </span>
-            </motion.div>
-          ))}
+          {steps.map((step, i) => {
+            const StepIcon = STEP_ICONS[i];
+            return (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                className={cn(
+                  'flex flex-col items-center gap-3 p-4 sm:p-5',
+                  'rounded-neo border-2 border-neo-white/10',
+                  'bg-neo-white/[0.03]',
+                  'text-center'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={cn(
+                    'w-6 h-6 flex items-center justify-center',
+                    'bg-neo-white/10 text-neo-white font-black text-xs rounded-full'
+                  )}>
+                    {i + 1}
+                  </span>
+                </div>
+                <StepIcon className="w-5 h-5 text-neo-white/40" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-bold text-neo-white/80 leading-tight">
+                  {step}
+                </span>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </motion.div>
 
-      {/* ── Highlight pills (replaces Who Can Play + Education) */}
+      {/* ── Highlight pills ── */}
       <motion.div
-        className="mb-10 sm:mb-12"
+        className="mb-12 sm:mb-14"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
@@ -310,33 +305,33 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          {HIGHLIGHTS.map(({ icon: Icon, key, fallback, color }) => (
+          {HIGHLIGHTS.map(({ icon: Icon, key, fallback }) => (
             <motion.div
               key={key}
               variants={staggerItem}
               className={cn(
-                'inline-flex items-center gap-2 px-4 py-2',
-                'rounded-neo border-3 border-neo-black shadow-hard-xs',
-                'bg-neo-navy', color,
-                'text-neo-white font-bold text-xs sm:text-sm uppercase tracking-wide'
+                'inline-flex items-center gap-2 px-4 py-2.5',
+                'rounded-neo border-2 border-neo-white/10',
+                'bg-neo-white/[0.03]',
+                'text-neo-white/70 font-bold text-xs sm:text-sm'
               )}
             >
-              <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <Icon className="w-4 h-4 shrink-0 text-neo-white/40" aria-hidden="true" />
               {t(key) || fallback}
             </motion.div>
           ))}
         </motion.div>
       </motion.div>
 
-      {/* ── FAQ — Accordion ─────────────────────────── */}
+      {/* ── FAQ ─────────────────────────── */}
       <motion.div
-        className="mb-10 sm:mb-12"
+        className="mb-12 sm:mb-14"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-5 neo-title-sm">
+        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-6 neo-title-sm">
           {t('landing.seo.faqTitle')}
         </h2>
         <motion.div
@@ -356,14 +351,14 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         </motion.div>
       </motion.div>
 
-      {/* ── Blog Links (kept as-is) ────────────────── */}
+      {/* ── Blog Links ────────────────── */}
       <motion.div
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white">
             {t('landing.seo.blogTitle')}
           </h2>
@@ -371,11 +366,11 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
             href={`/${language}/blog`}
             className={cn(
               'text-xs sm:text-sm font-bold',
-              'text-neo-cyan hover:text-neo-yellow transition-colors',
+              'text-neo-white/40 hover:text-neo-white transition-colors',
               'underline underline-offset-2'
             )}
           >
-            {t('landing.seo.viewAllPosts') || 'View all posts →'}
+            {t('landing.seo.viewAllPosts') || 'View all posts'}
           </Link>
         </div>
         <motion.div
@@ -385,24 +380,21 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          {BLOG_LINKS.map(({ slug, key, fallback, category, color }) => (
+          {BLOG_LINKS.map(({ slug, key, fallback, category }) => (
             <motion.div key={slug} variants={staggerItem}>
               <Link
                 href={`/${language}/blog/${slug}`}
                 className={cn(
-                  'group block p-3 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20',
-                  'bg-neo-navy/5 dark:bg-neo-white/5',
-                  'hover:border-neo-cyan/60 hover:bg-neo-cyan/10 hover:-translate-y-0.5',
+                  'group block p-4 rounded-neo border-2 border-neo-white/10',
+                  'bg-neo-white/[0.03]',
+                  'hover:border-neo-white/20 hover:bg-neo-white/[0.06] hover:-translate-y-0.5',
                   'transition-all duration-200'
                 )}
               >
-                <span className={cn(
-                  'inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-neo border border-neo-black text-neo-black mb-2',
-                  color
-                )}>
+                <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase text-neo-white/40 mb-2 tracking-wider">
                   {category}
                 </span>
-                <p className="text-sm font-bold text-neo-black dark:text-neo-white group-hover:text-neo-cyan transition-colors line-clamp-2">
+                <p className="text-sm font-bold text-neo-white/80 group-hover:text-neo-white transition-colors line-clamp-2">
                   {t(key) || fallback}
                 </p>
               </Link>

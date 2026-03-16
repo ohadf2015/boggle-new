@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3617,
+    "totalKeysInCode": 3615,
     "keyCountByLanguage": {
-      "en": 6076,
-      "he": 6102,
-      "sv": 6135,
-      "ja": 6122,
-      "es": 6100
+      "en": 6079,
+      "he": 6105,
+      "sv": 6138,
+      "ja": 6125,
+      "es": 6103
     },
-    "missingFromEnglish": 3,
+    "missingFromEnglish": 2,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -98,7 +98,7 @@
         "pattern": "t(bossName)",
         "variable": "bossName",
         "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 263,
+        "line": 324,
         "context": "{t(bossName) || bossName}",
         "type": "variable_key"
       },
@@ -106,7 +106,7 @@
         "pattern": "t(bossName)",
         "variable": "bossName",
         "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 284,
+        "line": 356,
         "context": "aria-label={`${t(bossName) || bossName} health: ${hpPercentage}%`}",
         "type": "variable_key"
       },
@@ -146,7 +146,7 @@
         "pattern": "t(textKey)",
         "variable": "textKey",
         "file": "components/blast/BlastWordCelebration.tsx",
-        "line": 146,
+        "line": 169,
         "context": "{t(textKey)}",
         "type": "variable_key"
       },
@@ -169,29 +169,20 @@
   },
   "missingFromEnglish": [
     {
-      "key": "adventure.game.freeze",
+      "key": "adventure.bosses.enragedBanner",
       "usages": [
         {
-          "file": "components/adventure/ui/GameSidebar.tsx",
-          "line": 293
+          "file": "components/adventure/boss/BossOverlay.tsx",
+          "line": 182
         }
       ]
     },
     {
-      "key": "adventure.game.frozen",
+      "key": "adventure.bosses.phases.phase2Banner",
       "usages": [
         {
-          "file": "components/adventure/ui/GameSidebar.tsx",
-          "line": 293
-        }
-      ]
-    },
-    {
-      "key": "adventure.game.shuffle",
-      "usages": [
-        {
-          "file": "components/adventure/ui/GameSidebar.tsx",
-          "line": 311
+          "file": "components/adventure/boss/BossOverlay.tsx",
+          "line": 181
         }
       ]
     }

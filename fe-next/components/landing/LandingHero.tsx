@@ -12,7 +12,6 @@ interface LandingHeroProps {
   players: TopPlayer[];
   playersLoading: boolean;
   isMobilePortrait: boolean;
-  onPlayClick: () => void;
 }
 
 const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePortrait: boolean }) {
@@ -33,7 +32,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePort
   );
 });
 
-export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayClick }: LandingHeroProps) {
+export function LandingHero({ players, playersLoading, isMobilePortrait }: LandingHeroProps) {
   const { t } = useLanguage();
 
   return (
@@ -91,23 +90,6 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, onPlayC
             {t('landing.welcomeSubtitle')}
           </motion.p>
 
-          <motion.button
-            onClick={onPlayClick}
-            className={cn(
-              isMobilePortrait ? 'px-6 py-2.5 w-full' : 'px-8 py-3 sm:px-10 sm:py-4',
-              'bg-neo-lime text-neo-black font-black uppercase text-lg sm:text-xl',
-              'border-3 border-neo-black rounded-neo shadow-hard-lg',
-              'hover:shadow-hard-xl active:shadow-hard-pressed active:translate-y-[2px]',
-              'transition-all duration-150'
-            )}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 20 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {t('landing.letsPlay')}
-          </motion.button>
         </div>
 
         {/* Right: Leaderboard Preview (visible on tablet+) */}

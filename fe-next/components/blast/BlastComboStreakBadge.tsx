@@ -43,6 +43,13 @@ const TIER_STROKE: Record<StreakTier, string> = {
   red: '#dc2626',    // red-600
 };
 
+/** Neon glow shadow per tier — makes the badge "pop" off the dark background */
+const TIER_GLOW: Record<StreakTier, string> = {
+  green: '0 0 8px rgba(22,163,74,0.4), 0 0 16px rgba(22,163,74,0.2)',
+  yellow: '0 0 10px rgba(217,119,6,0.5), 0 0 20px rgba(217,119,6,0.25)',
+  red: '0 0 12px rgba(220,38,38,0.6), 0 0 24px rgba(255,107,53,0.3), 0 0 40px rgba(255,20,147,0.15)',
+};
+
 // ==================== Sub-components ====================
 
 /**
@@ -143,11 +150,20 @@ export function BlastComboStreakBadge({ streak, arcRef }: BlastComboStreakBadgeP
           'border-3 border-neo-black shadow-hard-sm rounded-full',
           bgClass,
         ].join(' ')}
-        style={{ width: BADGE_SIZE, height: BADGE_SIZE }}
+        style={{
+          width: BADGE_SIZE,
+          height: BADGE_SIZE,
+          boxShadow: !shouldReduceMotion ? TIER_GLOW[tier] : undefined,
+        }}
         variants={variants}
         initial="initial"
         animate={!shouldReduceMotion && streak.level > 1
-          ? { scale: [1.0, 1.06, 1.0], opacity: 1, transition: { duration: 0.15, ease: 'easeOut' } }
+          ? {
+              scale: [1.0, 1.15, 0.95, 1.0],
+              opacity: 1,
+              rotate: streak.level >= 5 ? [0, -3, 3, 0] : 0,
+              transition: { duration: 0.2, ease: 'easeOut' },
+            }
           : "animate"
         }
         exit="exit"

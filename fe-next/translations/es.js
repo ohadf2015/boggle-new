@@ -5283,6 +5283,12 @@ const es = {
       "skipIntro": "Saltar",
       "readyToFight": "¡Vamos!",
       "enraged": "¡ENFURECIDO!",
+      "enragedBanner": "¡ENFURECIDO!",
+      "phases": {
+        "phase1": "FASE 1",
+        "phase2": "FASE 2",
+        "phase2Banner": "¡FASE 2!"
+      },
       "common": {
         "anagramPair": "¡Par de anagramas encontrado! ¡Golpe crítico!",
         "requirementMet": "¡Requisito cumplido!",

@@ -5550,10 +5550,12 @@ const sv = {
       "skipIntro": "Hoppa over",
       "readyToFight": "Kör igång!",
       "enraged": "RASANDE!",
+      "enragedBanner": "RASANDE!",
       "mechanicProgress": "Mekanikframsteg",
       "phases": {
         "phase1": "FAS 1",
-        "phase2": "FAS 2"
+        "phase2": "FAS 2",
+        "phase2Banner": "FAS 2!"
       },
       "telegraph": {
         "incoming": "Inkommande Attack!",

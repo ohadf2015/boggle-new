@@ -100,6 +100,12 @@ export const GameSidebar = memo(function GameSidebar({
 }: GameSidebarProps) {
   const { t } = useLanguage();
 
+  // Derive completion progress for the desktop objectives card glow
+  const completedCount = objectives.filter(o => o.isComplete).length;
+  const totalCount = objectives.length;
+  const allComplete = totalCount > 0 && completedCount === totalCount;
+  const partiallyComplete = completedCount > 0 && !allComplete;
+
   return (
     <aside
       className={cn(
@@ -121,7 +127,7 @@ export const GameSidebar = memo(function GameSidebar({
               data-testid={`objective-${obj.type}`}
               className={cn(
                 'flex-shrink-0 flex items-center gap-1 px-1.5 py-0.5',
-                'rounded-neo border-2 min-w-[70px]',
+                'rounded-neo border-2 min-w-[70px] min-h-[44px]',
                 'transition-all duration-300',
                 obj.isComplete
                   ? 'bg-neo-lime/20 border-neo-lime'
@@ -228,9 +234,14 @@ export const GameSidebar = memo(function GameSidebar({
           transition={{ delay: 0.1 }}
           className={cn(
             'bg-neo-black/40 backdrop-blur-sm',
-            'border-3 border-neo-black/50',
-            'rounded-neo-lg p-3',
-            'shadow-hard'
+            'border-3 rounded-neo-lg p-3',
+            'transition-all duration-500',
+            // Objectives card border glow: grey → neo-yellow (partial) → neo-lime (all done)
+            allComplete
+              ? 'border-neo-lime shadow-[0_0_16px_2px_rgba(163,230,53,0.4)]'
+              : partiallyComplete
+                ? 'border-neo-yellow/70 shadow-[0_0_12px_2px_rgba(255,225,53,0.25)]'
+                : 'border-neo-black/50 shadow-hard'
           )}
         >
           <div className="flex items-center gap-2 mb-2">

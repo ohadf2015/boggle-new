@@ -26,6 +26,7 @@ jest.mock('../adventureGridGeometry', () => ({
   getTileIndex: (row: number, col: number, gridSize: number) => row * gridSize + col,
   isWithinSelectionThreshold: (...args: unknown[]) => mockIsWithinSelectionThreshold(...args),
   isDiagonalMove: jest.fn().mockReturnValue(false),
+  isAdjacentCell: jest.fn().mockReturnValue(true),
   hasExceededDeadzone: (...args: unknown[]) => mockHasExceededDeadzone(...args),
   DEADZONE_THRESHOLD: 8,
   CELL_SELECTION_THRESHOLD: 0.85,

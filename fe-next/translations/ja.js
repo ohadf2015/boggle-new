@@ -5601,10 +5601,12 @@ const ja = {
       "skipIntro": "スキップ",
       "readyToFight": "いくぞ！",
       "enraged": "激怒!",
+      "enragedBanner": "激怒!",
       "mechanicProgress": "メカニクス進捗",
       "phases": {
         "phase1": "フェーズ1",
-        "phase2": "フェーズ2"
+        "phase2": "フェーズ2",
+        "phase2Banner": "フェーズ2!"
       },
       "telegraph": {
         "incoming": "攻撃が来る!",

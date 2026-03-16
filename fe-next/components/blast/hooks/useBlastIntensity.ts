@@ -8,17 +8,22 @@ export interface UseBlastIntensityOptions {
   wordsFoundCount: number;
 }
 
+/** Higher thresholds — max intensity requires truly exceptional play.
+ * This makes the visual escalation feel earned, not handed out. */
 function calculateRawIntensity(options: UseBlastIntensityOptions): number {
   let intensity = 0;
 
-  if (options.comboLevel >= 7) intensity += 3;
-  else if (options.comboLevel >= 5) intensity += 2;
-  else if (options.comboLevel >= 3) intensity += 1;
+  // Combo level thresholds raised — need bigger combos to drive visuals
+  if (options.comboLevel >= 8) intensity += 3;
+  else if (options.comboLevel >= 6) intensity += 2;
+  else if (options.comboLevel >= 4) intensity += 1;
 
+  // Cascade chain — unchanged, cascades are already hard to trigger
   if (options.cascadeChainLevel >= 3) intensity += 2;
   else if (options.cascadeChainLevel >= 1) intensity += 1;
 
-  if (options.comboStreakLevel >= 3) intensity += 1;
+  // Combo streak requires level 4+ instead of 3+
+  if (options.comboStreakLevel >= 4) intensity += 1;
 
   if (options.isHotPhase) intensity += 1;
 

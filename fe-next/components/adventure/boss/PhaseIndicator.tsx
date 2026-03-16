@@ -5,15 +5,17 @@
  * Uses neo-brutalist styling with phase-appropriate colors and animations.
  *
  * Features:
- * - Phase 1: Cyan badge (normal combat)
- * - Phase 2: Lime badge (escalated mechanics)
- * - Enraged: Red badge with shake animation (maximum intensity)
+ * - Phase 1: Cyan badge with Shield icon
+ * - Phase 2: Lime badge with Flame icon
+ * - Enraged: Larger red badge with Skull icon, shake + scale pulse animation
  * - Respects reduced motion preferences
  */
 
 'use client';
 
 import { memo } from 'react';
+import { motion } from 'framer-motion';
+import { Shield, Flame, Skull } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
 
@@ -31,16 +33,15 @@ export interface PhaseIndicatorProps {
 // ==============================================
 
 interface PhaseConfig {
-  /** Translation key for phase label */
   labelKey: string;
-  /** Background color class */
   bgColor: string;
-  /** Text color class */
   textColor: string;
-  /** Animation class (empty for non-animated phases) */
+  /** Static Tailwind animation class (shake, etc.) — empty for non-animated */
   animation: string;
-  /** Aria label for accessibility */
   ariaLabel: string;
+  Icon: React.ElementType;
+  /** Extra padding for enraged badge */
+  paddingClass: string;
 }
 
 const PHASE_CONFIGS: Record<'phase1' | 'phase2' | 'enraged', PhaseConfig> = {
@@ -50,6 +51,8 @@ const PHASE_CONFIGS: Record<'phase1' | 'phase2' | 'enraged', PhaseConfig> = {
     textColor: 'text-neo-black',
     animation: '',
     ariaLabel: 'Phase 1',
+    Icon: Shield,
+    paddingClass: 'px-3 py-1',
   },
   phase2: {
     labelKey: 'adventure.bosses.phases.phase2',
@@ -57,6 +60,8 @@ const PHASE_CONFIGS: Record<'phase1' | 'phase2' | 'enraged', PhaseConfig> = {
     textColor: 'text-neo-black',
     animation: '',
     ariaLabel: 'Phase 2',
+    Icon: Flame,
+    paddingClass: 'px-3 py-1',
   },
   enraged: {
     labelKey: 'adventure.bosses.enraged',
@@ -64,6 +69,8 @@ const PHASE_CONFIGS: Record<'phase1' | 'phase2' | 'enraged', PhaseConfig> = {
     textColor: 'text-neo-white',
     animation: 'animate-neo-shake motion-reduce:animate-none',
     ariaLabel: 'Enraged',
+    Icon: Skull,
+    paddingClass: 'px-4 py-1.5',
   },
 };
 
@@ -71,22 +78,20 @@ const PHASE_CONFIGS: Record<'phase1' | 'phase2' | 'enraged', PhaseConfig> = {
 // COMPONENT
 // ==============================================
 
-/**
- * PhaseIndicator - Badge showing current boss battle phase
- */
 const PhaseIndicator = memo<PhaseIndicatorProps>(({ phase }) => {
   const { t } = useLanguage();
   const bossFightTheme = useBossFightTheme();
   const config = PHASE_CONFIGS[phase];
   const themePhase = bossFightTheme.phaseColors[phase];
+  const { Icon } = config;
 
-  return (
+  const badge = (
     <div
       role="status"
       aria-label={`Boss ${config.ariaLabel}`}
       className={`
-        inline-flex items-center justify-center
-        px-3 py-1
+        inline-flex items-center justify-center gap-1
+        ${config.paddingClass}
         ${themePhase.bg}
         ${themePhase.text}
         border-3 border-neo-black
@@ -95,11 +100,27 @@ const PhaseIndicator = memo<PhaseIndicatorProps>(({ phase }) => {
         ${config.animation}
       `.trim().replace(/\s+/g, ' ')}
     >
+      <Icon className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
       <span className="font-neo-display text-sm font-bold uppercase tracking-wide">
         {t(config.labelKey)}
       </span>
     </div>
   );
+
+  // Enraged badge: add framer-motion scale pulse on top of CSS shake
+  if (phase === 'enraged') {
+    return (
+      <motion.div
+        animate={{ scale: [1, 1.08, 1] }}
+        transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
+        className="motion-reduce:animate-none"
+      >
+        {badge}
+      </motion.div>
+    );
+  }
+
+  return badge;
 });
 
 PhaseIndicator.displayName = 'PhaseIndicator';

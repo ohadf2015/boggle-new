@@ -174,7 +174,7 @@ export const LexiReaction = memo<LexiReactionProps>(
           data-testid="lexi-reaction"
           className={cn(
             'fixed z-40',
-            'bottom-20',
+            'bottom-20 lg:bottom-6',
             isRTL ? 'left-4' : 'right-4',
             className
           )}
@@ -222,7 +222,7 @@ export const LexiReaction = memo<LexiReactionProps>(
             data-testid="lexi-reaction"
             className={cn(
               'fixed z-40',
-              'bottom-20',
+              'bottom-20 lg:bottom-6',
               isRTL ? 'left-4' : 'right-4',
               'cursor-pointer',
               className

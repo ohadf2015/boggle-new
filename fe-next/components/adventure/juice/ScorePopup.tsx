@@ -55,11 +55,21 @@ export function ScorePopup({
 }: ScorePopupProps) {
   const { prefersReducedMotion } = useDevicePerformance();
 
+  // Clamp position to keep popup within visible viewport area.
+  // Uses window dimensions with safe-area fallback so popups never render off-screen.
+  const viewportW = typeof window !== 'undefined' ? window.innerWidth : 375;
+  const viewportH = typeof window !== 'undefined' ? window.innerHeight : 667;
+  const POPUP_W = 120; // approximate rendered width
+  const POPUP_H = 48;  // approximate rendered height
+  const clampedX = Math.max(0, Math.min(position.x, viewportW - POPUP_W));
+  const clampedY = Math.max(0, Math.min(position.y, viewportH - POPUP_H));
+  const clampedPosition = { x: clampedX, y: clampedY };
+
   // Default target: arc upward and toward the score counter (top-left).
   // This creates a visual connection between action and reward (AAA game standard).
   const target = targetPosition || {
-    x: position.x - 30,
-    y: position.y - 70,
+    x: clampedPosition.x - 30,
+    y: Math.max(8, clampedPosition.y - 70),
   };
 
   // Call onComplete when animation finishes
@@ -79,8 +89,8 @@ export function ScorePopup({
         className="fixed z-50 pointer-events-none"
         data-testid="score-popup-fly"
         style={{
-          left: position.x,
-          top: position.y,
+          left: clampedPosition.x,
+          top: clampedPosition.y,
         }}
         initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}
@@ -98,16 +108,16 @@ export function ScorePopup({
 
   // Full animation variant - arc trajectory
   // Calculate arc midpoint (rise 50px, curve toward target)
-  const arcMidX = position.x + (target.x - position.x) * 0.5;
-  const arcMidY = Math.min(position.y, target.y) - 50;
+  const arcMidX = clampedPosition.x + (target.x - clampedPosition.x) * 0.5;
+  const arcMidY = Math.min(clampedPosition.y, target.y) - 50;
 
   return (
     <motion.div
       className="fixed z-50 pointer-events-none"
       data-testid="score-popup-fly"
       style={{
-        left: position.x,
-        top: position.y,
+        left: clampedPosition.x,
+        top: clampedPosition.y,
       }}
       initial={{
         x: 0,
@@ -116,8 +126,8 @@ export function ScorePopup({
         opacity: 0,
       }}
       animate={{
-        x: [0, arcMidX - position.x, target.x - position.x],
-        y: [0, arcMidY - position.y, target.y - position.y],
+        x: [0, arcMidX - clampedPosition.x, target.x - clampedPosition.x],
+        y: [0, arcMidY - clampedPosition.y, target.y - clampedPosition.y],
         scale: [0.5, 1.15, 0.9],
         opacity: [0, 1, 1, 0],
       }}

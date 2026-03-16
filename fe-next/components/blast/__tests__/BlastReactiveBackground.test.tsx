@@ -37,25 +37,25 @@ describe('BlastReactiveBackground', () => {
     expect(screen.getByTestId('blast-grid')).toBeInTheDocument();
   });
 
-  it('no particles at intensity 0-2 (raised threshold for cleaner look)', () => {
+  it('no particles at intensity 0-1', () => {
     const { rerender } = render(<BlastReactiveBackground intensity={0} />);
     expect(screen.queryByTestId('blast-particles')).not.toBeInTheDocument();
 
     rerender(<BlastReactiveBackground intensity={1} />);
     expect(screen.queryByTestId('blast-particles')).not.toBeInTheDocument();
-
-    rerender(<BlastReactiveBackground intensity={2} />);
-    expect(screen.queryByTestId('blast-particles')).not.toBeInTheDocument();
   });
 
-  it('shows fewer particles at intensity 3+ (reduced for cleaner ambiance)', () => {
-    const { rerender } = render(<BlastReactiveBackground intensity={3} />);
+  it('shows particles at intensity 2+ with increasing count', () => {
+    const { rerender } = render(<BlastReactiveBackground intensity={2} />);
     const container = screen.getByTestId('blast-particles');
     expect(container).toBeInTheDocument();
-    expect(container.children).toHaveLength(5);
+    expect(container.children).toHaveLength(3);
+
+    rerender(<BlastReactiveBackground intensity={3} />);
+    expect(screen.getByTestId('blast-particles').children).toHaveLength(7);
 
     rerender(<BlastReactiveBackground intensity={5} />);
-    expect(screen.getByTestId('blast-particles').children).toHaveLength(8);
+    expect(screen.getByTestId('blast-particles').children).toHaveLength(12);
   });
 
   it('energy waves removed (no blast-waves element at any intensity)', () => {

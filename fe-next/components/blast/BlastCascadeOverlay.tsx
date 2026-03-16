@@ -83,15 +83,30 @@ export function BlastCascadeOverlay({
       if (phase === 'clearing') {
         const clearTargets = el.querySelectorAll('.blast-cascade-clear');
         if (clearTargets.length > 0) {
+          // Hit-stop: brief scale-up before vanishing makes impact feel powerful
           anime({
             targets: clearTargets,
-            scale: [1, 1.15, 0],
-            opacity: [1, 0.9, 0],
-            rotate: anime.stagger([-6, 6]),
+            scale: [1, 1.25, 0],
+            opacity: [1, 1, 0],
+            rotate: anime.stagger([-12, 12]),
+            // Flash white briefly on clear for "energy release" feel
+            filter: ['brightness(1)', 'brightness(1.6)', 'brightness(0.5)'],
             duration: BLAST_ANIM.clear.duration,
             easing: 'cubicBezier(0.55, 0, 1, 0.45)',
             delay: anime.stagger(BLAST_ANIM.clear.stagger, { from: 'center' }),
           });
+
+          // Screen shake for big clears (6+ tiles)
+          if (clearTargets.length >= 6 && el.parentElement) {
+            const shakeIntensity = Math.min(clearTargets.length * 0.5, 4);
+            anime({
+              targets: el.parentElement,
+              translateX: [0, shakeIntensity, -shakeIntensity, shakeIntensity * 0.5, 0],
+              translateY: [0, shakeIntensity * 0.5, -shakeIntensity * 0.3, 0],
+              duration: 200,
+              easing: 'easeOutQuad',
+            });
+          }
         }
       }
 
@@ -109,9 +124,15 @@ export function BlastCascadeOverlay({
               },
               0,
             ],
-            // Squash & stretch on landing — tiles compress then bounce (AAA puzzle game standard)
-            scaleY: [0.85, 1.12, 0.96, 1.0],
-            scaleX: [1.10, 0.90, 1.02, 1.0],
+            // Dramatic squash & stretch — AAA match-3 standard. Tiles compress hard on landing
+            // then bounce back with overshoot. Values tuned for satisfying "thud" feel.
+            scaleY: [0.75, 1.28, 0.92, 1.03, 1.0],
+            scaleX: [1.18, 0.78, 1.06, 0.98, 1.0],
+            // Subtle rotation on landing adds organic feel
+            rotate: function (el: Element) {
+              const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
+              return [0, dist > 2 ? (Math.random() > 0.5 ? 2 : -2) : 0, 0];
+            },
             duration: function (el: Element) {
               const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
               return BLAST_ANIM.fall.baseDuration + dist * BLAST_ANIM.fall.perRowDuration;
@@ -135,8 +156,11 @@ export function BlastCascadeOverlay({
               },
               0,
             ],
-            scale: [0.6, 1],
-            opacity: [0, 1],
+            // Pop-in with slight overshoot for bouncy feel
+            scale: [0.4, 1.08, 1],
+            opacity: [0, 1, 1],
+            // Slight rotation on entry adds playfulness
+            rotate: [anime.stagger([-3, 3]), 0],
             duration: BLAST_ANIM.appear.duration,
             easing: 'cubicBezier(0.22, 1, 0.36, 1)',
             delay: anime.stagger(BLAST_ANIM.appear.stagger, { from: 'first' }),

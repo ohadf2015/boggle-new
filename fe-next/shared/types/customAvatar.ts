@@ -54,18 +54,24 @@ export const AVATAR_BG_COLORS = [
   '#1a1a2e', '#FF6B35', '#FF1493', '#00FFFF', '#BFFF00', '#8B5CF6', '#FFE135', '#00897B',
 ] as const;
 
+// ==================== Hex Color Schema ====================
+// Color fields accept any valid hex color, not just palette values.
+// The palette arrays above are UI picker constraints only — saved avatars
+// may contain colors from older or customized palettes.
+const hexColorSchema = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
+
 // ==================== Zod Schema ====================
 export const customAvatarSchema = z.object({
   gender: z.enum(AVATAR_GENDERS).default('male'),
   base: z.enum(AVATAR_BASES),
-  skinColor: z.enum(AVATAR_SKIN_COLORS),
+  skinColor: hexColorSchema,
   hair: z.enum(AVATAR_HAIR_STYLES),
-  hairColor: z.enum(AVATAR_HAIR_COLORS),
+  hairColor: hexColorSchema,
   eyes: z.enum(AVATAR_EYE_STYLES),
   mouth: z.enum(AVATAR_MOUTH_STYLES),
   accessory: z.enum(AVATAR_ACCESSORIES),
-  accessoryColor: z.enum(AVATAR_ACCESSORY_COLORS),
-  bgColor: z.enum(AVATAR_BG_COLORS),
+  accessoryColor: hexColorSchema,
+  bgColor: hexColorSchema,
 });
 
 export type CustomAvatarConfig = z.output<typeof customAvatarSchema>;

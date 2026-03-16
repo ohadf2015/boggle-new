@@ -4,18 +4,19 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 
 // ==================== Constants ====================
 
-/** Base combo window (2-letter min). Scales +500ms per minWordLength above 2. */
-export const COMBO_WINDOW_BASE_MS = 4000;
+/** Base combo window (2-letter min). Tighter for competitive play — rewards fast word-finding. */
+export const COMBO_WINDOW_BASE_MS = 3000;
 /** @deprecated Use COMBO_WINDOW_BASE_MS */
 export const COMBO_WINDOW_MS = COMBO_WINDOW_BASE_MS;
 
 /** Compute combo window duration scaled by minimum word length.
- *  2-letter → 4s, 3-letter → 4.5s, 4-letter → 5s */
+ *  2-letter → 3s, 3-letter → 3.4s, 4-letter → 3.8s */
 export function getComboWindowMs(minWordLength: number = 2): number {
-  return COMBO_WINDOW_BASE_MS + Math.max(0, minWordLength - 2) * 500;
+  return COMBO_WINDOW_BASE_MS + Math.max(0, minWordLength - 2) * 400;
 }
 export const COMBO_TICK_MS = 50;
-export const COMBO_MULTIPLIER_PER_LEVEL = 0.25;
+/** Lower multiplier per level — high combos still rewarding but require sustained play */
+export const COMBO_MULTIPLIER_PER_LEVEL = 0.20;
 export const MAX_COMBO_LEVEL = 10;
 
 // ==================== Types ====================

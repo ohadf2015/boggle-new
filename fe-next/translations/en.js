@@ -5643,10 +5643,12 @@ const en = {
       "skipIntro": "Skip",
       "readyToFight": "Let's Go!",
       "enraged": "ENRAGED!",
+      "enragedBanner": "ENRAGED!",
       "mechanicProgress": "Mechanic progress",
       "phases": {
         "phase1": "PHASE 1",
-        "phase2": "PHASE 2"
+        "phase2": "PHASE 2",
+        "phase2Banner": "PHASE 2!"
       },
       "telegraph": {
         "incoming": "Incoming Attack!",

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Gift, Share2 } from 'lucide-react';
+import { Users, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -16,17 +16,16 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, rotate: -1 }}
-      whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
     >
       <button
         onClick={onShareClick}
         className={cn(
-          'w-full flex items-center gap-3 sm:gap-4 p-4 sm:p-5 relative overflow-hidden',
-          'bg-gradient-to-r from-neo-pink via-purple-500 to-neo-purple',
-          'border-3 border-neo-black rounded-neo-lg shadow-hard-lg',
+          'w-full flex items-center gap-4 p-5 sm:p-6 relative overflow-hidden',
+          'bg-neo-navy border-3 border-neo-black rounded-neo-lg shadow-hard-lg',
           'hover:shadow-hard-xl hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-[2px]',
           'transition-all duration-150',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
@@ -34,24 +33,18 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
         )}
         aria-label={t('landing.shareTitle')}
       >
-        {/* Diagonal stripe texture */}
-        <div
-          className="absolute inset-0 opacity-[0.06] pointer-events-none"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(-45deg, white 0px, white 1px, transparent 1px, transparent 8px)',
-          }}
-          aria-hidden="true"
-        />
+        {/* Subtle accent line */}
+        <div className="absolute inset-y-0 start-0 w-1.5 bg-neo-cyan" aria-hidden="true" />
 
-        <div className="relative p-2.5 bg-white/20 rounded-neo border-2 border-white/30 shrink-0 shadow-hard-sm">
-          <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden="true" />
+        <div className="relative p-3 bg-neo-cyan/15 rounded-neo border-2 border-neo-cyan/30 shrink-0">
+          <Users className="w-5 h-5 sm:w-6 sm:h-6 text-neo-cyan" aria-hidden="true" />
         </div>
 
         <div className="relative flex-1 min-w-0">
-          <div className="font-black text-white text-sm sm:text-base uppercase leading-tight">
+          <div className="font-black text-neo-white text-sm sm:text-base uppercase leading-tight">
             {t('landing.shareTitle')}
           </div>
-          <div data-testid="banner-subtitle" className="text-xs text-white/80 font-medium mt-0.5">
+          <div data-testid="banner-subtitle" className="text-xs text-neo-white/60 font-medium mt-1">
             {isAuthenticated
               ? (t('landing.shareSubtitle'))
               : (t('landing.shareSubtitleGuest'))}
@@ -61,7 +54,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
         <motion.div
           className={cn(
             'relative flex items-center gap-1.5 shrink-0',
-            'bg-neo-lime text-neo-black',
+            'bg-neo-cyan text-neo-black',
             'px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
             'group-hover:shadow-hard group-hover:-translate-y-0.5',
             'transition-all duration-150',
@@ -69,10 +62,10 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
           )}
           aria-hidden="true"
         >
-          <Share2 className="w-4 h-4" />
           <span className="hidden sm:inline">
             {t('landing.shareButton')}
           </span>
+          <ArrowRight className="w-4 h-4" />
         </motion.div>
       </button>
     </motion.div>

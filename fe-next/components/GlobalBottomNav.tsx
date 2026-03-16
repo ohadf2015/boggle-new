@@ -1,9 +1,9 @@
 'use client';
 
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Home, PencilRuler, Swords, Trophy, User } from 'lucide-react';
+import { Home, Swords, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -45,8 +45,6 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
         if (cleanPath === '' || cleanPath === '/') return 'home';
         if (cleanPath.startsWith('/multiplayer')) return 'play';
-        if (cleanPath.startsWith('/leaderboard')) return 'leaderboard';
-        if (cleanPath.startsWith('/create') || cleanPath.startsWith('/community')) return 'create';
         if (cleanPath.startsWith('/profile')) return 'profile';
 
         return 'home'; // Default to home if no match
@@ -61,13 +59,6 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         router.push(`/${language}/multiplayer`);
     }, [router, language]);
 
-    const navigateToLeaderboard = useCallback(() => {
-        router.push(`/${language}/leaderboard`);
-    }, [router, language]);
-
-    const navigateToCreate = useCallback(() => {
-        router.push(`/${language}/community`);
-    }, [router, language]);
 
     const navigateToProfile = useCallback(() => {
         // Profile requires authentication - show modal if not logged in
@@ -198,80 +189,6 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                     )}
                 </button>
 
-                {/* Leaderboard Tab */}
-                <button
-                    onClick={navigateToLeaderboard}
-                    className={cn(
-                        "flex flex-col items-center justify-center",
-                        "min-w-[64px] min-h-[48px]", // WCAG touch target size
-                        "px-4 py-2",
-                        "transition-all duration-100",
-                        "relative",
-                        activeTab === 'leaderboard'
-                            ? "text-neo-yellow"
-                            : "text-neo-white/60 hover:text-neo-white/80"
-                    )}
-                    aria-label={t('nav.leaderboard')}
-                    aria-current={activeTab === 'leaderboard' ? 'page' : undefined}
-                >
-                    <Trophy
-                        className={cn(
-                            "w-6 h-6 mb-1",
-                            activeTab === 'leaderboard' && "animate-neo-pop"
-                        )}
-                        aria-hidden="true"
-                    />
-                    <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide",
-                        activeTab === 'leaderboard' && "text-neo-yellow"
-                    )}>
-                        {t('nav.leaderboard')}
-                    </span>
-                    {/* Active indicator */}
-                    {activeTab === 'leaderboard' && (
-                        <div
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-yellow rounded-b-full"
-                            aria-hidden="true"
-                        />
-                    )}
-                </button>
-
-                {/* Create/Community Tab */}
-                <button
-                    onClick={navigateToCreate}
-                    className={cn(
-                        "flex flex-col items-center justify-center",
-                        "min-w-[64px] min-h-[48px]",
-                        "px-3 py-2",
-                        "transition-all duration-100",
-                        "relative",
-                        activeTab === 'create'
-                            ? "text-neo-pink"
-                            : "text-neo-white/60 hover:text-neo-white/80"
-                    )}
-                    aria-label={t('ugc.nav.create')}
-                    aria-current={activeTab === 'create' ? 'page' : undefined}
-                >
-                    <PencilRuler
-                        className={cn(
-                            "w-6 h-6 mb-1",
-                            activeTab === 'create' && "animate-neo-pop"
-                        )}
-                        aria-hidden="true"
-                    />
-                    <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide",
-                        activeTab === 'create' && "text-neo-pink"
-                    )}>
-                        {t('ugc.nav.create')}
-                    </span>
-                    {activeTab === 'create' && (
-                        <div
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-pink rounded-b-full"
-                            aria-hidden="true"
-                        />
-                    )}
-                </button>
 
                 {/* Profile Tab */}
                 <button

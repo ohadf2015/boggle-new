@@ -8,13 +8,13 @@ interface BlastBoardIntensityProps {
   children: React.ReactNode;
 }
 
-// Subtler glow — AAA games use gentle ambient borders, not aggressive box-shadows
-const GLOW_CONFIG: Record<number, { boxShadow: string; pulseDuration: string }> = {
-  1: { boxShadow: '0 0 6px rgba(0,255,255,0.08)', pulseDuration: '4s' },
-  2: { boxShadow: '0 0 8px rgba(0,255,255,0.12)', pulseDuration: '3s' },
-  3: { boxShadow: '0 0 12px rgba(255,225,53,0.15)', pulseDuration: '2.5s' },
-  4: { boxShadow: '0 0 15px rgba(255,107,53,0.2)', pulseDuration: '2s' },
-  5: { boxShadow: '0 0 18px rgba(255,107,53,0.25)', pulseDuration: '1.5s' },
+// Progressive glow — builds excitement as intensity rises. Dual-layer (outer glow + inner highlight)
+const GLOW_CONFIG: Record<number, { boxShadow: string; innerShadow: string; pulseDuration: string }> = {
+  1: { boxShadow: '0 0 8px rgba(0,255,255,0.1), 0 0 2px rgba(0,255,255,0.15)', innerShadow: 'inset 0 0 6px rgba(0,255,255,0.05)', pulseDuration: '4s' },
+  2: { boxShadow: '0 0 12px rgba(0,255,255,0.15), 0 0 4px rgba(0,255,255,0.2)', innerShadow: 'inset 0 0 10px rgba(0,255,255,0.08)', pulseDuration: '3s' },
+  3: { boxShadow: '0 0 18px rgba(255,225,53,0.2), 0 0 6px rgba(255,225,53,0.3)', innerShadow: 'inset 0 0 15px rgba(255,225,53,0.1)', pulseDuration: '2.5s' },
+  4: { boxShadow: '0 0 24px rgba(255,107,53,0.25), 0 0 8px rgba(255,107,53,0.35)', innerShadow: 'inset 0 0 20px rgba(255,107,53,0.12)', pulseDuration: '2s' },
+  5: { boxShadow: '0 0 30px rgba(255,20,147,0.3), 0 0 12px rgba(255,107,53,0.4), 0 0 60px rgba(255,20,147,0.15)', innerShadow: 'inset 0 0 25px rgba(255,20,147,0.15)', pulseDuration: '1.2s' },
 };
 
 // Lighter vignette — enough to frame the board without darkening gameplay
@@ -60,22 +60,37 @@ export default function BlastBoardIntensity({ intensity, children }: BlastBoardI
       <style>{KEYFRAMES_STYLE}</style>
 
       {showGlow && glow && (
-        <div
-          data-testid="blast-border-glow"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: 'inherit',
-            boxShadow: clampedIntensity === 5
-              ? glow.boxShadow
-              : glow.boxShadow,
-            animation: clampedIntensity === 5
-              ? `blast-border-pulse ${glow.pulseDuration} ease-in-out infinite, blast-rainbow-border 2s linear infinite`
-              : `blast-border-pulse ${glow.pulseDuration} ease-in-out infinite`,
-            pointerEvents: 'none' as const,
-            zIndex: 10,
-          }}
-        />
+        <>
+          {/* Outer glow */}
+          <div
+            data-testid="blast-border-glow"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 'inherit',
+              boxShadow: glow.boxShadow,
+              animation: clampedIntensity === 5
+                ? `blast-border-pulse ${glow.pulseDuration} ease-in-out infinite, blast-rainbow-border 2s linear infinite`
+                : `blast-border-pulse ${glow.pulseDuration} ease-in-out infinite`,
+              pointerEvents: 'none' as const,
+              zIndex: 10,
+            }}
+          />
+          {/* Inner glow highlight — gives the board a "lit from within" feel */}
+          <div
+            data-testid="blast-inner-glow"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 'inherit',
+              boxShadow: glow.innerShadow,
+              animation: `blast-border-pulse ${glow.pulseDuration} ease-in-out infinite`,
+              animationDelay: `-${parseFloat(glow.pulseDuration) / 2}s`,
+              pointerEvents: 'none' as const,
+              zIndex: 10,
+            }}
+          />
+        </>
       )}
 
       {showVignette && vignette && (

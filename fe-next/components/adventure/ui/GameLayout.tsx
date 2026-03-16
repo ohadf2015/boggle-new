@@ -66,6 +66,23 @@ export const GameLayout = memo(function GameLayout({
           {gridArea}
         </div>
 
+        {/*
+          Gradient divider — portrait: horizontal rule above sidebar chip bar;
+          landscape/desktop: vertical rule between grid and sidebar column.
+        */}
+        <div
+          className={cn(
+            'flex-shrink-0 pointer-events-none',
+            // Portrait: thin horizontal line
+            'h-px w-full',
+            'bg-gradient-to-r from-transparent via-neo-white/20 to-transparent',
+            // Landscape / desktop: thin vertical line
+            'landscape:h-full landscape:w-px landscape:bg-gradient-to-b',
+            'lg:h-full lg:w-px lg:bg-gradient-to-b'
+          )}
+          aria-hidden="true"
+        />
+
         {/* Sidebar
             - Portrait mobile:  h-16 (64px) compact chip bar
             - Portrait tablet:  h-20 (80px) slightly taller
@@ -79,6 +96,8 @@ export const GameLayout = memo(function GameLayout({
             'landscape:h-full landscape:w-64',
             'lg:h-full lg:w-80 xl:w-96',
             'overflow-hidden lg:overflow-y-auto',
+            // Subtle background treatment to separate sidebar from grid
+            'bg-neo-black/20 landscape:bg-neo-black/30 lg:bg-neo-black/30',
             'z-10'
           )}
         >

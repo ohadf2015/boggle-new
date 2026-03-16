@@ -8,7 +8,10 @@
  * - Chunked/segmented HP display (old-school RPG style)
  * - Color gradient per segment: red (danger) → lime (phase 2) → green (phase 1)
  * - Flash animation on hit
- * - Glow/pulse when HP is critically low (< 25%)
+ * - Floating damage numbers on HP drop
+ * - Phase transition flash at 66% and 33% thresholds
+ * - Intensified red outer glow when HP is critically low (< 25%)
+ * - Swords icon next to boss name when enraged
  * - Boss name above the bar with HP numbers
  * - Neo-brutalist: border-3, shadow-hard, rounded-neo
  * - Phase indicator badge
@@ -18,7 +21,8 @@
 'use client';
 
 import { memo, useMemo, useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Swords } from 'lucide-react';
 import PhaseIndicator from './PhaseIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
@@ -195,6 +199,30 @@ const Divider = memo<DividerProps>(({ threshold }) => {
 
 Divider.displayName = 'Divider';
 
+interface FloatingDamageNumberProps {
+  id: number;
+  amount: number;
+}
+
+/** Floating "-N" damage number that rises and fades */
+const FloatingDamageNumber = memo<FloatingDamageNumberProps>(({ id, amount }) => (
+  <motion.div
+    key={id}
+    className="absolute -top-2 end-2 pointer-events-none z-20"
+    initial={{ y: 0, opacity: 1 }}
+    animate={{ y: -28, opacity: 0 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.8, ease: 'easeOut' }}
+    aria-hidden="true"
+  >
+    <span className="font-neo-display text-sm font-black text-neo-red drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+      -{amount}
+    </span>
+  </motion.div>
+));
+
+FloatingDamageNumber.displayName = 'FloatingDamageNumber';
+
 // ==============================================
 // MAIN COMPONENT
 // ==============================================
@@ -237,21 +265,53 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
 
   // Flash effect when HP drops
   const prevHPRef = useRef(currentHP);
+  const prevHpPctRef = useRef(hpPercentage);
   const [isFlashing, setIsFlashing] = useState(false);
+  const [isPhaseFlashing, setIsPhaseFlashing] = useState(false);
   const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const phaseFlashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Floating damage numbers state
+  const [damageNumbers, setDamageNumbers] = useState<{ id: number; amount: number }[]>([]);
+  const damageIdRef = useRef(0);
 
   useEffect(() => {
-    if (currentHP < prevHPRef.current) {
+    const prevHP = prevHPRef.current;
+    const prevPct = prevHpPctRef.current;
+
+    if (currentHP < prevHP) {
+      const delta = prevHP - currentHP;
+
+      // Hit flash
       setIsFlashing(true);
       if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
       flashTimeoutRef.current = setTimeout(() => setIsFlashing(false), 200);
+
+      // Floating damage number
+      const newId = ++damageIdRef.current;
+      setDamageNumbers(prev => [...prev, { id: newId, amount: delta }]);
+      setTimeout(() => {
+        setDamageNumbers(prev => prev.filter(n => n.id !== newId));
+      }, 900);
+
+      // Phase transition flash — crossed 66% or 33% threshold
+      const crossedPhase2 = prevPct >= THRESHOLDS.PHASE2 && hpPercentage < THRESHOLDS.PHASE2;
+      const crossedEnraged = prevPct >= THRESHOLDS.ENRAGED && hpPercentage < THRESHOLDS.ENRAGED;
+      if (crossedPhase2 || crossedEnraged) {
+        setIsPhaseFlashing(true);
+        if (phaseFlashTimeoutRef.current) clearTimeout(phaseFlashTimeoutRef.current);
+        phaseFlashTimeoutRef.current = setTimeout(() => setIsPhaseFlashing(false), 400);
+      }
     }
+
     prevHPRef.current = currentHP;
+    prevHpPctRef.current = hpPercentage;
 
     return () => {
       if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+      if (phaseFlashTimeoutRef.current) clearTimeout(phaseFlashTimeoutRef.current);
     };
-  }, [currentHP]);
+  }, [currentHP, hpPercentage]);
 
   const displayHP = Math.max(0, currentHP);
 
@@ -259,9 +319,21 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
     <div className="w-full">
       {/* Header: Boss name + Phase indicator */}
       <div className="flex items-center justify-between mb-1">
-        <h2 className="font-neo-display text-sm sm:text-base font-black text-neo-white truncate">
-          {t(bossName) || bossName}
-        </h2>
+        <div className="flex items-center gap-1.5">
+          <h2 className="font-neo-display text-sm sm:text-base font-black text-neo-white truncate">
+            {t(bossName) || bossName}
+          </h2>
+          {/* Swords icon when enraged */}
+          {phase === 'enraged' && (
+            <motion.span
+              animate={{ rotate: [-8, 8, -8], scale: [1, 1.15, 1] }}
+              transition={{ duration: 0.4, repeat: Infinity }}
+              aria-hidden="true"
+            >
+              <Swords className="w-3.5 h-3.5 text-neo-red flex-shrink-0" />
+            </motion.span>
+          )}
+        </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* HP numbers */}
           <span
@@ -290,11 +362,19 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
           overflow-hidden flex
         `}
         animate={
-          isFlashing
-            ? { backgroundColor: ['rgba(255,255,255,0.5)', 'rgba(0,0,0,0)'] }
-            : {}
+          isPhaseFlashing
+            ? { backgroundColor: ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0)'], scale: [1, 1.03, 1] }
+            : isFlashing
+              ? { backgroundColor: ['rgba(255,255,255,0.5)', 'rgba(0,0,0,0)'] }
+              : {}
         }
-        transition={isFlashing ? { duration: 0.2 } : {}}
+        transition={
+          isPhaseFlashing
+            ? { duration: 0.4 }
+            : isFlashing
+              ? { duration: 0.2 }
+              : {}
+        }
       >
         {/* Segments */}
         {segmentFills.map(segment => (
@@ -312,20 +392,27 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         <Divider threshold={33} />
         <Divider threshold={66} />
 
-        {/* Low HP outer glow */}
+        {/* Low HP outer glow — intensifies as HP decreases */}
         {isLowHP && (
           <motion.div
             className="absolute inset-0 rounded-neo pointer-events-none"
             animate={{
               boxShadow: [
-                'inset 0 0 6px rgba(255,0,0,0.5)',
-                'inset 0 0 14px rgba(255,0,0,0.8)',
-                'inset 0 0 6px rgba(255,0,0,0.5)',
+                `inset 0 0 ${8 + (1 - hpPercentage / 25) * 10}px rgba(255,0,0,0.6), 0 0 ${12 + (1 - hpPercentage / 25) * 16}px rgba(255,0,0,0.5)`,
+                `inset 0 0 ${18 + (1 - hpPercentage / 25) * 14}px rgba(255,0,0,0.95), 0 0 ${24 + (1 - hpPercentage / 25) * 20}px rgba(255,0,0,0.8)`,
+                `inset 0 0 ${8 + (1 - hpPercentage / 25) * 10}px rgba(255,0,0,0.6), 0 0 ${12 + (1 - hpPercentage / 25) * 16}px rgba(255,0,0,0.5)`,
               ],
             }}
-            transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
+
+        {/* Floating damage numbers */}
+        <AnimatePresence>
+          {damageNumbers.map(n => (
+            <FloatingDamageNumber key={n.id} id={n.id} amount={n.amount} />
+          ))}
+        </AnimatePresence>
       </motion.div>
     </div>
   );

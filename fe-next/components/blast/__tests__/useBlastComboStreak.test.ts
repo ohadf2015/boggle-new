@@ -11,8 +11,8 @@ import { useBlastComboStreak } from '../hooks/useBlastComboStreak';
 
 // ==================== Constants (mirror implementation) ====================
 
-const COMBO_WINDOW_MS = 4000;
-const COMBO_MULTIPLIER_PER_LEVEL = 0.25;
+const COMBO_WINDOW_MS = 3000;
+const COMBO_MULTIPLIER_PER_LEVEL = 0.20;
 
 // ==================== Helpers ====================
 
@@ -62,7 +62,7 @@ describe('useBlastComboStreak — first word submitted', () => {
     expect(result.current.streak.isActive).toBe(true);
   });
 
-  it('calculates multiplier as 1 + level * 0.25 for level 1 (1.25)', () => {
+  it('calculates multiplier as 1 + level * 0.20 for level 1 (1.20)', () => {
     // Given a hook
     const { result } = renderHook(() => useBlastComboStreak());
 
@@ -90,7 +90,7 @@ describe('useBlastComboStreak — streak increments', () => {
 
     // When second word submitted before window expires
     act(() => {
-      advance(1000); // 1s elapsed — still within 4s window
+      advance(1000); // 1s elapsed — still within 3s window
       result.current.onWordSubmitted();
     });
 
@@ -98,14 +98,14 @@ describe('useBlastComboStreak — streak increments', () => {
     expect(result.current.streak.level).toBe(2);
   });
 
-  it('multiplier for level 2 is 1.5', () => {
+  it('multiplier for level 2 is 1.4', () => {
     // Given two words submitted quickly
     const { result } = renderHook(() => useBlastComboStreak());
     act(() => { result.current.onWordSubmitted(); });
     act(() => { result.current.onWordSubmitted(); });
 
-    // Then multiplier = 1 + 2 * 0.25 = 1.5
-    expect(result.current.streak.multiplier).toBeCloseTo(1.5);
+    // Then multiplier = 1 + 2 * 0.20 = 1.4
+    expect(result.current.streak.multiplier).toBeCloseTo(1.4);
   });
 
   it('builds combo correctly through rapid word submissions', () => {
@@ -123,7 +123,7 @@ describe('useBlastComboStreak — streak increments', () => {
 
     // Then level is 5
     expect(result.current.streak.level).toBe(5);
-    expect(result.current.streak.multiplier).toBeCloseTo(2.25); // 1 + 5*0.25
+    expect(result.current.streak.multiplier).toBeCloseTo(2.0); // 1 + 5*0.20
   });
 });
 
@@ -217,7 +217,7 @@ describe('useBlastComboStreak — max combo level cap', () => {
     expect(result.current.streak.level).toBe(10);
   });
 
-  it('multiplier is capped at 1 + 10 * 0.25 = 3.5 at max level', () => {
+  it('multiplier is capped at 1 + 10 * 0.20 = 3.0 at max level', () => {
     // Given max combo reached
     const { result } = renderHook(() => useBlastComboStreak());
     act(() => {
@@ -226,8 +226,8 @@ describe('useBlastComboStreak — max combo level cap', () => {
       }
     });
 
-    // Then multiplier does not exceed 3.5
-    expect(result.current.streak.multiplier).toBeCloseTo(3.5);
+    // Then multiplier does not exceed 3.0
+    expect(result.current.streak.multiplier).toBeCloseTo(3.0);
   });
 });
 

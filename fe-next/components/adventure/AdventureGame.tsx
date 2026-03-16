@@ -516,7 +516,7 @@ const AdventureGame = memo<AdventureGameProps>(
                 effectCallbacks={bossOrch.bossEffectCallbacks} />
 
               {isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete && !bossOrch.playerHealthState.isDead && (
-                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">
+                <div className="fixed bottom-20 lg:bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">
                   <PlayerHealthBar healthState={bossOrch.playerHealthState} />
                 </div>
               )}

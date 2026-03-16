@@ -197,7 +197,6 @@ const LandingView: React.FC = () => {
           players={topPlayers}
           playersLoading={topPlayersLoading}
           isMobilePortrait={isMobilePortrait}
-          onPlayClick={handlePlayClick}
         />
 
         {/* Social Proof Bar */}

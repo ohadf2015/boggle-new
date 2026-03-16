@@ -53,7 +53,7 @@ export const GameHeader = memo(function GameHeader({
     <header
       className={cn(
         'flex items-center justify-between relative',
-        'px-3 py-2',
+        'px-3 py-1.5',
         hudTheme.headerBg, 'backdrop-blur-md',
         'border-b-3', hudTheme.headerBorder,
         'flex-shrink-0',
@@ -79,9 +79,12 @@ export const GameHeader = memo(function GameHeader({
         </span>
       </motion.div>
 
-      {/* Center: Score — single display, always visible, absolutely centered */}
+      {/* Center: Score — single display, always visible, absolutely centered.
+          pointer-events-none prevents the absolutely-positioned element from
+          intercepting clicks on the level badge or control buttons beneath it
+          on narrow screens. */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
+        className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none"
         aria-live="polite"
         aria-atomic="true"
         data-testid="score-display"
@@ -97,7 +100,7 @@ export const GameHeader = memo(function GameHeader({
       </div>
 
       {/* Right: Timer & Controls */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         {/* Timer — most important game state indicator, visually prominent */}
         <AdventureTimer
           timeRemaining={timeRemaining}

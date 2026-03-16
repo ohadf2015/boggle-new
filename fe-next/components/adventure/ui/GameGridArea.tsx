@@ -126,8 +126,8 @@ export const GameGridArea = memo(function GameGridArea({
         sm+:    stacked column, each row gets a fixed height.
         Total cost: h-8 on mobile vs h-8+h-7=h-15 on sm+.
       */}
-      <div className="flex-shrink-0 px-2 sm:px-4 pt-1 sm:pt-2 pb-0">
-        <div className="flex sm:flex-col items-center justify-between sm:justify-start gap-x-2 sm:gap-y-1">
+      <div className="flex-shrink-0 px-1.5 sm:px-4 pt-0.5 sm:pt-2 pb-0">
+        <div className="flex sm:flex-col items-center justify-between sm:justify-start gap-x-1.5 sm:gap-y-1">
           {/* Word Preview */}
           <div className="h-8 flex items-center justify-center shrink-0 sm:w-full">
             <WordFormingArea
@@ -218,11 +218,14 @@ export const GameGridArea = memo(function GameGridArea({
             - On landscape/desktop the sidebar eats width, so 80vh naturally caps.
             - On portrait mobile the sidebar is only h-16, so 80vh ≈ useful space.
         */}
-        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 80vh, 500px)' }}>
+        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 75dvh, 520px)' }}>
           <motion.div
             className={cn(
               'w-full aspect-square max-h-full rounded-neo-lg',
-              wasWordSubmitted && lastAccepted && 'ring-2 ring-neo-lime/60'
+              // Stronger glow when a word is accepted — ring + outer shadow pulse
+              wasWordSubmitted && lastAccepted
+                ? 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy/80 shadow-[0_0_24px_4px_rgba(163,230,53,0.45)]'
+                : 'ring-0'
             )}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

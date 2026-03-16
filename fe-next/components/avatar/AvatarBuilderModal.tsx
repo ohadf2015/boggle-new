@@ -141,11 +141,11 @@ export default function AvatarBuilderModal({
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-neo-navy border-3 border-black shadow-hard-lg rounded-neo-lg w-full max-w-[95vw] sm:max-w-lg mx-4 max-h-[90vh] flex flex-col"
+        className="bg-neo-navy border-3 border-black shadow-hard-lg rounded-neo-lg w-full max-w-[95vw] sm:max-w-lg mx-4 max-h-[85dvh] sm:max-h-[90vh] flex flex-col"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b-3 border-black">
+        <div className="flex items-center justify-between px-4 py-3 sm:p-4 border-b-3 border-black">
           <h2 id="avatar-builder-title" className="font-neo-display text-neo-white text-xl font-bold">
             {t('avatar.builder.title')}
           </h2>
@@ -155,20 +155,20 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Preview — jelly wobble on every change */}
-        <div className="flex justify-center py-3 sm:py-5">
+        <div className="flex justify-center py-2 sm:py-5">
           <AdaptiveMotion.div
             key={previewKey}
             initial={{ scaleX: 1.06, scaleY: 0.94, rotate: -1.5 }}
             animate={{ scaleX: 1, scaleY: 1, rotate: 0 }}
             transition={JELLY_SPRING}
-            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[120px] h-[120px] sm:w-[160px] sm:h-[160px]"
+            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] sm:w-[160px] sm:h-[160px]"
           >
             <AvatarRenderer config={config} size={160} />
           </AdaptiveMotion.div>
         </div>
 
         {/* Category Tabs with icons + spring bounce */}
-        <div className="flex px-4 gap-0.5">
+        <div className="flex px-3 sm:px-4 gap-0.5">
           {CATEGORIES.map(cat => (
             <AdaptiveMotion.button
               key={cat.key}
@@ -188,7 +188,7 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Options Grid — animated category transition */}
-        <div className="flex-1 overflow-y-auto p-4 min-h-[200px]">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-[120px] sm:min-h-[200px]">
           <AdaptiveAnimatePresence mode="wait">
             <AdaptiveMotion.div
               key={activeCategory}
@@ -208,7 +208,7 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Actions — spring bounce buttons */}
-        <div className="flex flex-wrap gap-2 p-4 border-t-3 border-black">
+        <div className="flex flex-wrap gap-2 p-3 sm:p-4 border-t-3 border-black">
           <AdaptiveMotion.button
             onClick={handleRandomize}
             whileHover={{ scale: 1.05 }}

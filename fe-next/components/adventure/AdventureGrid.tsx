@@ -182,6 +182,7 @@ const AdventureGrid = memo(
         tiles,
         interactive: interactive ?? true,
         disabled: disabled ?? false,
+        selectedIndices,
         onTileSelect,
         onDragStart: handleDragStartWithSparkle,
         onDragEnter,

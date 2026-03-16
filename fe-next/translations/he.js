@@ -5575,10 +5575,12 @@ const he = {
       "skipIntro": "דלג",
       "readyToFight": "קדימה!",
       "enraged": "זועם!",
+      "enragedBanner": "זועם!",
       "mechanicProgress": "התקדמות מכניקה",
       "phases": {
         "phase1": "שלב 1",
-        "phase2": "שלב 2"
+        "phase2": "שלב 2",
+        "phase2Banner": "!שלב 2"
       },
       "telegraph": {
         "incoming": "התקפה מתקרבת!",

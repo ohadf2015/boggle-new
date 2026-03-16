@@ -43,6 +43,28 @@ describe('customAvatarSchema', () => {
     }
   });
 
+  it('should accept non-palette hex colors (backward compat)', () => {
+    // Given a config with valid hex colors not in the predefined palette
+    const config = { ...DEFAULT_AVATAR_CONFIG, hairColor: '#AABBCC', bgColor: '#112233' };
+
+    // When parsing
+    const result = customAvatarSchema.safeParse(config);
+
+    // Then it succeeds — palette is a UI constraint, not a data constraint
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject invalid hex color format', () => {
+    // Given a config with an invalid color string
+    const config = { ...DEFAULT_AVATAR_CONFIG, hairColor: 'not-a-color' };
+
+    // When parsing
+    const result = customAvatarSchema.safeParse(config);
+
+    // Then it fails
+    expect(result.success).toBe(false);
+  });
+
   it('should reject missing required field', () => {
     // Given a config missing the eyes field
     const { eyes, ...partial } = DEFAULT_AVATAR_CONFIG;

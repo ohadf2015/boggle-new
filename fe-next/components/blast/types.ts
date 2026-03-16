@@ -10,14 +10,16 @@ export type { BlastTileType, BlastTileState };
 
 export type BlastDifficulty = 'easy' | 'medium' | 'hard';
 
-/** Preset configs per difficulty level */
+/** Preset configs per difficulty level — tuned for competitive play.
+ * Medium is tighter: fewer specials means more strategic word-finding required.
+ * Hard has more specials but smaller grid = harder to find long words. */
 export const BLAST_DIFFICULTY_PRESETS: Record<BlastDifficulty, {
   specialTileChance: number;
   gridSize: number;
 }> = {
   easy:   { specialTileChance: 0.08, gridSize: 6 },
-  medium: { specialTileChance: 0.15, gridSize: 6 },
-  hard:   { specialTileChance: 0.25, gridSize: 6 },
+  medium: { specialTileChance: 0.12, gridSize: 6 },
+  hard:   { specialTileChance: 0.20, gridSize: 5 },
 };
 
 /** Resolve a full BlastGameConfig from language + optional difficulty */

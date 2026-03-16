@@ -21,6 +21,7 @@ import {
   getTileIndex,
   isWithinSelectionThreshold,
   isDiagonalMove,
+  isAdjacentCell,
   hasExceededDeadzone,
 } from './adventureGridGeometry';
 import { vibrateCellTap, vibrateCellDrag } from '@/components/grid/hapticFeedback';
@@ -42,6 +43,8 @@ export interface UseGridGesturesProps {
   interactive: boolean;
   /** Whether grid is disabled */
   disabled: boolean;
+  /** Currently selected tile indices (used to sync gesture tracking with selection state) */
+  selectedIndices?: number[];
   /** Callback when tile is selected (click) */
   onTileSelect?: (index: number, tile: GridTileState) => void;
   /** Callback when drag selection starts */
@@ -71,6 +74,8 @@ export interface UseGridGesturesReturn {
 // HOOK
 // ==============================================
 
+const EMPTY_INDICES: number[] = [];
+
 /**
  * Manages grid gesture handling (touch/mouse drag for word selection)
  */
@@ -80,6 +85,7 @@ export function useGridGestures({
   tiles,
   interactive,
   disabled,
+  selectedIndices = EMPTY_INDICES,
   onTileSelect,
   onDragStart,
   onDragEnter,
@@ -227,14 +233,27 @@ export function useGridGestures({
 
       if (newTileIndex === lastTouchTileIndexRef.current) return;
 
-      const lastIndex = lastTouchTileIndexRef.current;
-      const lastTile = lastIndex !== null ? tiles[lastIndex] : null;
+      // Use the last SELECTED tile (not last touched) for diagonal/threshold calculation
+      // This prevents desync when selectTile rejects a non-adjacent tile
+      const lastSelectedIndex = selectedIndices.length > 0
+        ? selectedIndices[selectedIndices.length - 1]
+        : lastTouchTileIndexRef.current;
+      const lastSelectedTile = lastSelectedIndex !== null ? tiles[lastSelectedIndex] : null;
 
-      const diagonal = lastTile
-        ? isDiagonalMove(lastTile, { row: cellPosition.row, col: cellPosition.col })
+      const diagonal = lastSelectedTile
+        ? isDiagonalMove(lastSelectedTile, { row: cellPosition.row, col: cellPosition.col })
         : false;
 
       if (!isWithinSelectionThreshold(cellPosition, diagonal, velocity)) {
+        return;
+      }
+
+      // Check adjacency against the last selected tile before accepting
+      // This prevents lastTouchTileIndexRef from desyncing with the actual selection
+      // Allow backtracking (tile already in selection) — selectTile handles truncation
+      const isBacktrack = selectedIndices.includes(newTileIndex);
+      if (!isBacktrack && lastSelectedTile && !isAdjacentCell(lastSelectedTile, { row: cellPosition.row, col: cellPosition.col })) {
+        // Don't update lastTouchTileIndexRef — tile was not accepted
         return;
       }
 
@@ -248,7 +267,7 @@ export function useGridGestures({
         onDragEnter(newTileIndex, tile);
       }
     },
-    [tiles, gridSize, onDragEnter, gridRef, getGridMeasurements]
+    [tiles, gridSize, selectedIndices, onDragEnter, gridRef, getGridMeasurements]
   );
 
   // Handle touch move - delegates to shared processTouchMove with deadzone check

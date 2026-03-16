@@ -17,8 +17,14 @@ interface ShatterParticle {
   rotationSpeed: number;
   size: number;
   color: string;
-  shape: 'square' | 'triangle' | 'circle';
+  shape: 'square' | 'triangle' | 'circle' | 'star' | 'diamond';
   opacity: number;
+  /** Trail: previous positions for motion blur effect */
+  trail: { x: number; y: number; opacity: number }[];
+  /** Age in seconds — used for glow intensity curve */
+  age: number;
+  /** Initial burst scale — particles start big and shrink */
+  scale: number;
 }
 
 export interface ShatterTrigger {
@@ -38,13 +44,15 @@ export interface BlastShatterEffectProps {
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const MAX_PARTICLES = 80;
-const PARTICLES_PER_TILE_MIN = 6;
-const PARTICLES_PER_TILE_MAX = 12;
-const GRAVITY = 600; // px/s²
-const LIFETIME = 0.5; // seconds
+const MAX_PARTICLES = 120;
+const PARTICLES_PER_TILE_MIN = 8;
+const PARTICLES_PER_TILE_MAX = 16;
+const GRAVITY = 450; // px/s² — slower gravity = particles float longer for more visual presence
+const AIR_RESISTANCE = 0.97; // Per-frame velocity damping — creates natural deceleration
+const LIFETIME = 0.7; // seconds — longer lifetime for more satisfying trails
+const GLOW_FADE_POWER = 1.8; // Exponential fade for glow — stays bright longer, then snaps off
 
-const SHAPES: ShatterParticle['shape'][] = ['square', 'triangle', 'circle'];
+const SHAPES: ShatterParticle['shape'][] = ['square', 'triangle', 'circle', 'star', 'diamond'];
 
 import { SHATTER_COLORS } from './blastColorTokens';
 
@@ -78,39 +86,100 @@ function spawnParticles(
   );
   const particles: ShatterParticle[] = [];
   for (let i = 0; i < count; i++) {
+    // Radial burst pattern — particles fly outward from center in all directions
+    const angle = (i / count) * Math.PI * 2 + rand(-0.3, 0.3);
+    const speed = rand(120, 280);
     particles.push({
       id: `${trigger.id}-${i}`,
       triggerId: trigger.id,
       x: cx,
       y: cy,
-      vx: rand(-150, 150),
-      vy: rand(-200, 50),
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - rand(50, 150), // Upward bias
       rotation: rand(0, 360),
-      rotationSpeed: rand(-360, 360),
-      size: rand(3, 8),
+      rotationSpeed: rand(-540, 540), // Faster spin
+      size: rand(3, 10),
       color: pick(colors),
       shape: pick(SHAPES),
       opacity: 1,
+      trail: [],
+      age: 0,
+      scale: rand(1.2, 1.8), // Start oversized, shrink over lifetime
     });
   }
   return particles;
 }
 
+/** Draw a 5-pointed star path */
+function drawStarPath(ctx: CanvasRenderingContext2D, r: number) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const angle = (i * Math.PI) / 5 - Math.PI / 2;
+    const radius = i % 2 === 0 ? r : r * 0.4;
+    const method = i === 0 ? 'moveTo' : 'lineTo';
+    ctx[method](Math.cos(angle) * radius, Math.sin(angle) * radius);
+  }
+  ctx.closePath();
+}
+
 function drawParticle(ctx: CanvasRenderingContext2D, p: ShatterParticle) {
+  const scaledSize = p.size * p.scale;
+  const half = scaledSize / 2;
+
+  // Draw motion trail (fading ghost positions)
+  for (let i = 0; i < p.trail.length; i++) {
+    const t = p.trail[i];
+    ctx.save();
+    ctx.globalAlpha = t.opacity * 0.3;
+    ctx.fillStyle = p.color;
+    ctx.translate(t.x, t.y);
+    const trailSize = half * (0.3 + (i / p.trail.length) * 0.5);
+    ctx.beginPath();
+    ctx.arc(0, 0, trailSize, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Draw glow halo (stays bright longer via exponential curve)
+  const glowAlpha = Math.pow(p.opacity, GLOW_FADE_POWER) * 0.4;
+  if (glowAlpha > 0.02) {
+    ctx.save();
+    ctx.globalAlpha = glowAlpha;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = scaledSize * 2;
+    ctx.translate(p.x, p.y);
+    ctx.beginPath();
+    ctx.arc(0, 0, half * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Draw main particle
   ctx.save();
   ctx.globalAlpha = p.opacity;
   ctx.fillStyle = p.color;
   ctx.translate(p.x, p.y);
   ctx.rotate((p.rotation * Math.PI) / 180);
-  const half = p.size / 2;
 
   if (p.shape === 'square') {
-    ctx.fillRect(-half, -half, p.size, p.size);
+    ctx.fillRect(-half, -half, scaledSize, scaledSize);
   } else if (p.shape === 'triangle') {
     ctx.beginPath();
     ctx.moveTo(0, -half);
     ctx.lineTo(half, half);
     ctx.lineTo(-half, half);
+    ctx.closePath();
+    ctx.fill();
+  } else if (p.shape === 'star') {
+    drawStarPath(ctx, half);
+    ctx.fill();
+  } else if (p.shape === 'diamond') {
+    ctx.beginPath();
+    ctx.moveTo(0, -half);
+    ctx.lineTo(half * 0.6, 0);
+    ctx.lineTo(0, half);
+    ctx.lineTo(-half * 0.6, 0);
     ctx.closePath();
     ctx.fill();
   } else {
@@ -232,11 +301,22 @@ export function BlastShatterEffect({
 
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
+
+      // Store trail position before updating (max 4 trail points)
+      if (p.trail.length >= 4) p.trail.shift();
+      p.trail.push({ x: p.x, y: p.y, opacity: p.opacity });
+
+      // Physics: air resistance + gravity
+      p.vx *= AIR_RESISTANCE;
+      p.vy *= AIR_RESISTANCE;
       p.x += p.vx * dt;
       p.y += p.vy * dt;
       p.vy += GRAVITY * dt;
       p.rotation += p.rotationSpeed * dt;
+      p.age += dt;
       p.opacity -= dt / LIFETIME;
+      // Scale shrinks over lifetime (starts big, ends tiny)
+      p.scale = Math.max(0.2, p.scale - dt * 1.2);
 
       if (p.opacity <= 0) {
         particles.splice(i, 1);

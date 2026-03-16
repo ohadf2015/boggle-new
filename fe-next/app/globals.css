@@ -2035,3 +2035,9 @@ body.crazygames-embed .game-view-container,
 .no-overscroll {
   overscroll-behavior: none;
 }
+
+/* Barber-pole stripe animation for AttackTelegraph progress bar */
+@keyframes barberpole {
+  from { background-position: 0 0; }
+  to { background-position: 14px 0; }
+}

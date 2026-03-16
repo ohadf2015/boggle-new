@@ -98,24 +98,47 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
           70% { opacity: 0.8; }
           100% { transform: scale(1) rotate(180deg); opacity: 0; }
         }
+        @keyframes celebration-shockwave {
+          0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+          100% { transform: translate(-50%, -50%) scale(12); opacity: 0; }
+        }
       `}</style>
 
-      {/* Light beam sweep */}
+      {/* Light beam sweep — wider and more dramatic */}
       <div
         data-testid="celebration-light-beam"
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
-          width: tier >= 3 ? 40 : 20,
+          width: tier >= 3 ? 60 : tier >= 2 ? 35 : 20,
           height: '100%',
           background: isRainbow
-            ? 'linear-gradient(90deg, transparent, rgba(255,20,147,0.25), rgba(255,225,53,0.2), rgba(0,255,255,0.25), transparent)'
-            : `linear-gradient(90deg, transparent, rgba(255,215,0,${tier >= 2 ? 0.2 : 0.12}), transparent)`,
+            ? 'linear-gradient(90deg, transparent, rgba(255,20,147,0.3), rgba(255,225,53,0.25), rgba(0,255,255,0.3), transparent)'
+            : `linear-gradient(90deg, transparent, rgba(255,215,0,${tier >= 2 ? 0.25 : 0.15}), transparent)`,
           animation: `celebration-beam ${beamMs}ms ease-in-out forwards`,
           willChange: 'transform',
         }}
       />
+
+      {/* Shockwave ring — expands from word position (tier 3+) */}
+      {tier >= 3 && (
+        <div
+          data-testid="celebration-shockwave"
+          style={{
+            position: 'absolute',
+            left: position.x,
+            top: position.y,
+            width: 20,
+            height: 20,
+            transform: 'translate(-50%, -50%)',
+            borderRadius: '50%',
+            border: `2px solid ${isRainbow ? 'rgba(255,20,147,0.6)' : 'rgba(255,215,0,0.6)'}`,
+            boxShadow: `0 0 15px ${isRainbow ? 'rgba(255,20,147,0.3)' : 'rgba(255,215,0,0.3)'}`,
+            animation: 'celebration-shockwave 0.6s ease-out forwards',
+          }}
+        />
+      )}
 
       {/* Celebration text (tier 2+) */}
       {tier >= 2 && textKey && (
@@ -148,31 +171,38 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
         </AnimatePresence>
       )}
 
-      {/* Star particles (tier 2+) */}
-      {tier >= 2 && Array.from({ length: tier === 4 ? 8 : tier === 3 ? 6 : 4 }, (_, i) => {
-        const count = tier === 4 ? 8 : tier === 3 ? 6 : 4;
+      {/* Star particles (tier 2+) — more particles, larger travel, brighter glow */}
+      {tier >= 2 && Array.from({ length: tier === 4 ? 12 : tier === 3 ? 8 : 5 }, (_, i) => {
+        const count = tier === 4 ? 12 : tier === 3 ? 8 : 5;
         const angle = (i / count) * Math.PI * 2;
         const offsets = PARTICLE_OFFSETS[i];
-        const dist = 40 + offsets.distOffset;
+        const dist = 50 + offsets.distOffset * 1.5; // Travel further
         const tx = Math.cos(angle) * dist;
         const ty = Math.sin(angle) * dist;
-        const size = 4 + offsets.sizeOffset;
+        const size = 5 + offsets.sizeOffset;
         const starColor = PARTICLE_COLORS[i % PARTICLE_COLORS.length];
+        const isOdd = i % 2 === 1;
         return (
           <motion.div
             key={i}
-            className="absolute rounded-sm"
+            className={isOdd ? 'absolute rounded-full' : 'absolute rounded-sm'}
             style={{
               left: position.x,
               top: position.y,
               width: size,
               height: size,
               backgroundColor: starColor,
-              boxShadow: `0 0 6px ${starColor}`,
+              boxShadow: `0 0 ${size * 2}px ${starColor}, 0 0 ${size * 4}px ${starColor}50`,
             }}
-            initial={{ scale: 0, x: 0, y: 0, opacity: 1 }}
-            animate={{ scale: [0, 1.2, 0], x: tx, y: ty, opacity: [1, 0.8, 0] }}
-            transition={{ duration: 0.5 + offsets.durationOffset, delay: offsets.delayOffset }}
+            initial={{ scale: 0, x: 0, y: 0, opacity: 1, rotate: 0 }}
+            animate={{
+              scale: [0, 1.5, 0],
+              x: tx,
+              y: ty,
+              opacity: [1, 0.9, 0],
+              rotate: isOdd ? 180 : -90,
+            }}
+            transition={{ duration: 0.6 + offsets.durationOffset, delay: offsets.delayOffset }}
           />
         );
       })}

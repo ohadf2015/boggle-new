@@ -31,9 +31,10 @@ describe('BLAST_DIFFICULTY_PRESETS', () => {
     }
   });
 
-  it('should use 6x6 grid for all difficulties', () => {
+  it('should use valid grid sizes for all difficulties', () => {
     for (const preset of Object.values(BLAST_DIFFICULTY_PRESETS)) {
-      expect(preset.gridSize).toBe(6);
+      expect(preset.gridSize).toBeGreaterThanOrEqual(5);
+      expect(preset.gridSize).toBeLessThanOrEqual(8);
     }
   });
 });
@@ -42,7 +43,7 @@ describe('resolveBlastConfig', () => {
   it('should resolve medium difficulty by default', () => {
     const config = resolveBlastConfig('en');
     expect(config.specialTileChance).toBe(BLAST_DIFFICULTY_PRESETS.medium.specialTileChance);
-    expect(config.gridSize).toBe(6);
+    expect(config.gridSize).toBe(BLAST_DIFFICULTY_PRESETS.medium.gridSize);
     expect(config.language).toBe('en');
   });
 
