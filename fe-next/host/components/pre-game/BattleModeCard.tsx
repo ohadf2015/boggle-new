@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Monitor, ChevronDown, Zap, PartyPopper, Trophy } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Monitor, Shuffle, FileText, Bomb, Target, Check } from 'lucide-react';
 import { Checkbox } from '../../../components/ui/checkbox';
 import BotControls from '../../../components/BotControls';
 import { cn } from '../../../lib/utils';
 import { useSocket } from '../../../utils/SocketContext';
-import { GAME_PRESETS, type PresetKey } from './PresetSelector';
-import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
+import type { GameModeOption } from '@/components/GameModeSelector';
 
 interface PlayerData {
   username: string;
@@ -17,175 +16,141 @@ interface PlayerData {
 }
 
 interface BattleModeCardProps {
-  selectedPreset: PresetKey;
-  timerValue: number;
   hostPlaying: boolean;
   setHostPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
-  onApplyPreset: (key: PresetKey) => void;
   gameCode: string;
   playersReady: (string | PlayerData)[];
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-const PRESET_ACTIVE_COLORS: Record<string, string> = {
-  fast: 'bg-neo-cyan text-neo-black',
-  party: 'bg-neo-pink text-white',
-  challenge: 'bg-neo-orange text-neo-black',
-};
-
-const PRESET_ICONS: Record<PresetKey, React.ReactNode> = {
-  fast: <Zap className="w-5 h-5" />,
-  party: <PartyPopper className="w-5 h-5" />,
-  challenge: <Trophy className="w-5 h-5" />,
-};
+const GAME_MODE_CARDS: {
+  mode: GameModeOption;
+  icon: React.ReactNode;
+  nameKey: string;
+  descKey: string;
+  color: { bg: string; border: string; text: string; activeBg: string };
+}[] = [
+  {
+    mode: 'random',
+    icon: <Shuffle className="w-5 h-5" />,
+    nameKey: 'gameModes.random',
+    descKey: 'gameModes.randomizing',
+    color: { bg: 'bg-neo-purple/20', border: 'border-neo-purple', text: 'text-neo-purple', activeBg: 'bg-neo-purple/30' },
+  },
+  {
+    mode: 'classic',
+    icon: <FileText className="w-5 h-5" />,
+    nameKey: 'gameModes.classic.name',
+    descKey: 'gameModes.classic.description',
+    color: { bg: 'bg-neo-cyan/20', border: 'border-neo-cyan', text: 'text-neo-cyan', activeBg: 'bg-neo-cyan/30' },
+  },
+  {
+    mode: 'blast',
+    icon: <Bomb className="w-5 h-5" />,
+    nameKey: 'gameModes.blast.name',
+    descKey: 'gameModes.blast.description',
+    color: { bg: 'bg-neo-orange/20', border: 'border-neo-orange', text: 'text-neo-orange', activeBg: 'bg-neo-orange/30' },
+  },
+  {
+    mode: 'word-hunt',
+    icon: <Target className="w-5 h-5" />,
+    nameKey: 'gameModes.wordHunt.name',
+    descKey: 'gameModes.wordHunt.description',
+    color: { bg: 'bg-neo-pink/20', border: 'border-neo-pink', text: 'text-neo-pink', activeBg: 'bg-neo-pink/30' },
+  },
+];
 
 export function BattleModeCard({
-  selectedPreset,
-  timerValue,
   hostPlaying,
   setHostPlaying,
   selectedGameMode,
   setSelectedGameMode,
-  onApplyPreset,
   gameCode,
   playersReady,
   t,
 }: BattleModeCardProps): React.ReactElement {
   const { socket } = useSocket();
-  const [showBattleSettings, setShowBattleSettings] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
-    <section>
+    <section className="space-y-3">
+      {/* Game Mode Cards */}
       <div className="bg-neo-navy-light text-neo-cream p-4 rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-neo-purple/10 via-transparent to-neo-cyan/5 pointer-events-none" />
 
-        <button
-          onClick={() => setShowBattleSettings(!showBattleSettings)}
-          className="relative w-full flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-neo-pink/20 border-2 border-neo-pink/40 flex items-center justify-center text-neo-pink">
-              {PRESET_ICONS[selectedPreset]}
-            </div>
-            <div className="text-start">
-              <h2 className="font-neo-display font-bold text-xl leading-none uppercase text-neo-white">
-                {t('hostView.battleMode')}
-              </h2>
-              <p className="text-xs font-bold uppercase text-neo-cream/50 tracking-widest mt-1">
-                {t('hostView.preset')}: {t(GAME_PRESETS[selectedPreset].nameKey)}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex flex-col items-end gap-1">
-              <span className="bg-neo-cyan/20 text-neo-cyan px-2 py-0.5 border-2 border-neo-cyan/40 rounded text-xs font-black">
-                {timerValue}:00 {t('common.minutes')}
-              </span>
-              <span className="bg-neo-pink/20 text-neo-pink px-2 py-0.5 border-2 border-neo-pink/40 rounded text-xs font-black">
-                {GAME_PRESETS[selectedPreset].difficulty}
-              </span>
-            </div>
-            <ChevronDown className={cn('w-5 h-5 text-neo-cream/50 transition-transform', showBattleSettings && 'rotate-180')} />
-          </div>
-        </button>
+        <p className="relative text-xs font-black uppercase text-neo-cream/50 tracking-widest mb-3">
+          {t('gameModes.nextMode')}
+        </p>
 
-        <AnimatePresence>
-        {showBattleSettings && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          className="overflow-hidden"
-        >
-        <div className="mt-4">
-          <div className="relative grid grid-cols-3 gap-2">
-            {(Object.keys(GAME_PRESETS) as Array<keyof typeof GAME_PRESETS>).map((key) => {
-              const preset = GAME_PRESETS[key];
-              const isActive = selectedPreset === key;
-              return (
-                <motion.button
-                  key={key}
-                  onClick={() => onApplyPreset(key)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.92 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                  className={cn(
-                    'py-2.5 rounded-lg font-bold text-xs uppercase border-2 border-neo-black transition-colors flex flex-col items-center gap-1',
-                    isActive
-                      ? `${PRESET_ACTIVE_COLORS[key]} shadow-hard-sm`
-                      : 'bg-neo-navy/60 text-neo-cream/70 border-neo-white/20 hover:bg-neo-navy hover:text-neo-cream hover:border-neo-white/40'
-                  )}
-                >
-                  {PRESET_ICONS[key]}
-                  <span>{t(preset.nameKey)}</span>
-                </motion.button>
-              );
-            })}
-          </div>
-
-          <div className="relative mt-3 pt-3 border-t border-neo-white/10">
-            <p className="text-xs font-black uppercase text-neo-cream/50 tracking-widest mb-2">
-              {t('gameModes.nextMode')}
-            </p>
-            <GameModeSelector
-              selectedMode={selectedGameMode}
-              onSelectMode={(mode) => setSelectedGameMode(mode)}
-              t={t}
-              showRandom
-            />
-          </div>
-
-          <div className="relative mt-3 pt-3 border-t border-neo-white/10 hidden lg:flex items-center gap-2">
-            <Monitor className="w-4 h-4 text-neo-cream/50 flex-shrink-0" />
-            <Checkbox
-              id="broadcastMode"
-              checked={!hostPlaying}
-              onCheckedChange={(checked) => setHostPlaying(checked !== true)}
-            />
-            <label
-              htmlFor="broadcastMode"
-              className="text-xs font-bold uppercase text-neo-cream/80 cursor-pointer flex-1"
-            >
-              {t('hostView.broadcastModeTitle')}
-            </label>
-          </div>
-
-          <button
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="relative w-full mt-3 py-1 flex items-center justify-center gap-1 text-xs font-black uppercase border-t border-neo-white/10 pt-3 text-neo-cream/70 hover:text-neo-cream transition-colors"
-            aria-expanded={showAdvanced}
-            aria-controls="advanced-settings-panel"
-          >
-            {t('common.advancedSettings')}
-            <ChevronDown className={cn('w-3 h-3 transition-transform', showAdvanced && 'rotate-180')} aria-hidden="true" />
-          </button>
+        <div className="relative grid grid-cols-2 gap-2">
+          {GAME_MODE_CARDS.map(({ mode, icon, nameKey, descKey, color }) => {
+            const isActive = selectedGameMode === mode;
+            return (
+              <motion.button
+                key={mode}
+                onClick={() => setSelectedGameMode(mode)}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                data-testid={`game-mode-${mode}`}
+                className={cn(
+                  'relative flex items-center gap-3 p-3 rounded-neo border-2 transition-all text-start',
+                  isActive
+                    ? `${color.activeBg} ${color.border} shadow-hard-sm`
+                    : 'bg-neo-navy/60 border-neo-white/20 hover:border-neo-white/40 shadow-hard-sm hover:shadow-hard'
+                )}
+              >
+                <div className={cn(
+                  'p-2 rounded-neo shrink-0',
+                  isActive ? color.text : 'text-neo-cream/70'
+                )}>
+                  {icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    'font-bold text-sm leading-tight',
+                    isActive ? color.text : 'text-neo-cream'
+                  )}>
+                    {t(nameKey)}
+                  </p>
+                  <p className="text-[10px] text-neo-cream/50 leading-tight mt-0.5 line-clamp-2">
+                    {t(descKey)}
+                  </p>
+                </div>
+                {isActive && (
+                  <Check className={cn('w-4 h-4 shrink-0', color.text)} />
+                )}
+              </motion.button>
+            );
+          })}
         </div>
-        </motion.div>
-        )}
-        </AnimatePresence>
+
+        {/* Broadcast Mode - desktop only */}
+        <div className="relative mt-3 pt-3 border-t border-neo-white/10 hidden lg:flex items-center gap-2">
+          <Monitor className="w-4 h-4 text-neo-cream/50 flex-shrink-0" />
+          <Checkbox
+            id="broadcastMode"
+            checked={!hostPlaying}
+            onCheckedChange={(checked) => setHostPlaying(checked !== true)}
+          />
+          <label
+            htmlFor="broadcastMode"
+            className="text-xs font-bold uppercase text-neo-cream/80 cursor-pointer flex-1"
+          >
+            {t('hostView.broadcastModeTitle')}
+          </label>
+        </div>
       </div>
 
-      <AnimatePresence>
-        {showAdvanced && (
-          <motion.div
-            id="advanced-settings-panel"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mt-2"
-          >
-            <BotControls
-              socket={socket}
-              gameCode={gameCode}
-              players={playersReady.filter((p): p is PlayerData => typeof p !== 'string')}
-              disabled={false}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Bot Controls - always visible, no extra collapse */}
+      <BotControls
+        socket={socket}
+        gameCode={gameCode}
+        players={playersReady.filter((p): p is PlayerData => typeof p !== 'string')}
+        disabled={false}
+        defaultCollapsed={false}
+      />
     </section>
   );
 }

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface TopPlayer {
+  id: string;
   username: string;
   displayName: string | null;
   totalScore: number;
@@ -46,7 +47,7 @@ export function useTopPlayers(limit = 5) {
     async function fetchData() {
       const { data, error } = await supabase!
         .from('leaderboard')
-        .select('username, display_name, total_score, avatar_image, avatar_config, profile_picture_url')
+        .select('player_id, username, display_name, total_score, avatar_image, avatar_config, profile_picture_url')
         .order('total_score', { ascending: false })
         .limit(limit);
 
@@ -54,6 +55,7 @@ export function useTopPlayers(limit = 5) {
 
       if (!error && data) {
         const mapped = data.map((row: any) => ({
+          id: row.player_id,
           username: row.username,
           displayName: row.display_name,
           totalScore: row.total_score,

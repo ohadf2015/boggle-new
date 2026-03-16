@@ -69,6 +69,8 @@ interface AdventureGridProps {
   bossGridEffect?: { name: string; id: number } | null;
   /** Indices of tiles adjacent to the last selected tile (for selection hints) */
   adjacentIndices?: number[];
+  /** Indices of tiles locked by boss abilities (prevents selection) */
+  lockedTileIndices?: number[];
 }
 
 // ==============================================
@@ -116,6 +118,7 @@ const AdventureGrid = memo(
         hintHighlightIndices = [],
         bossGridEffect,
         adjacentIndices = [],
+        lockedTileIndices = [],
       },
       ref
     ) => {
@@ -283,6 +286,12 @@ const AdventureGrid = memo(
       [adjacentIndices]
     );
 
+    // Build locked tile set for boss abilities
+    const lockedSet = useMemo(
+      () => new Set(lockedTileIndices),
+      [lockedTileIndices]
+    );
+
     // Detect if a bomb tile is selected and get its row for preview highlighting
     const bombRowPreview = useMemo(() => {
       for (const idx of selectedIndices) {
@@ -386,7 +395,8 @@ const AdventureGrid = memo(
             const isSelected = selectedSet.has(index);
             const isHintHighlighted = hintSet.has(index);
             const isAdjacentHint = adjacentSet.has(index);
-            const canInteract = interactive && !disabled && !tile.isCleared;
+            const isLocked = lockedSet.has(index);
+            const canInteract = interactive && !disabled && !tile.isCleared && !isLocked;
 
             // Chain cascade delay for chained tiles (takes priority over tile.cascadeDelay)
             const chainCascadeDelay = tile.isChained ? chainCascade.delays.get(index) : undefined;
@@ -412,6 +422,7 @@ const AdventureGrid = memo(
                 onTileDragEnter={handleDragEnter}
                 getTileAriaLabel={getTileAriaLabel}
                 chainCascadeDelay={chainCascadeDelay}
+                isLocked={isLocked}
               />
             );
           })}

@@ -108,12 +108,10 @@ function HostPreGameView({
   lessonData,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
-  const [selectedPreset, setSelectedPreset] = useState<PresetKey>('party');
   const [hasInitialized, setHasInitialized] = useState(false);
-  const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
   const storeGameMode = useGameMode();
-  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(storeGameMode || 'classic');
+  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(storeGameMode || 'random');
   const { setGameMode: setStoreGameMode } = useGameActions();
 
   useEffect(() => {
@@ -156,25 +154,8 @@ function HostPreGameView({
     prevHostPlayingRef.current = hostPlaying;
   }, [hostPlaying, tvTutorialInitialized]);
 
-  const handleApplyPreset = useCallback(
-    (key: PresetKey) => {
-      const preset = GAME_PRESETS[key];
-      setTimerValue(preset.timer);
-      setDifficulty(preset.difficulty);
-      setMinWordLength(2);
-      setTimerDirection(0);
-      setSelectedPreset(key);
-    },
-    [setTimerValue, setDifficulty, setMinWordLength, setTimerDirection]
-  );
-
-  const handleSelectAndApplyPreset = useCallback(
-    (key: PresetKey) => {
-      handleApplyPreset(key);
-      setPresetInfoOpen(null);
-    },
-    [handleApplyPreset]
-  );
+  // Preset info drawer for long-press info (still available)
+  const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
 
   // Filter out host when TV mode is enabled
   const filteredPlayersForDisplay = useMemo(() => {
@@ -371,7 +352,7 @@ function HostPreGameView({
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
                 <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} t={t} />
                 <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
-                <BattleModeCard selectedPreset={selectedPreset} timerValue={timerValue} hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} onApplyPreset={handleApplyPreset} gameCode={gameCode} playersReady={playersReady} t={t} />
+                <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} />
               </>
             }
             rightContent={
@@ -396,7 +377,7 @@ function HostPreGameView({
               <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
             </motion.div>
             <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
-              <BattleModeCard selectedPreset={selectedPreset} timerValue={timerValue} hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} onApplyPreset={handleApplyPreset} gameCode={gameCode} playersReady={playersReady} t={t} />
+              <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} />
             </motion.div>
             <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
               <MobileShareSection gameCode={gameCode} t={t} />
@@ -410,7 +391,7 @@ function HostPreGameView({
         </div>
       </main>
 
-      <PresetInfoDrawer openPreset={presetInfoOpen} onClose={() => setPresetInfoOpen(null)} onSelectPreset={handleSelectAndApplyPreset} t={t} />
+      <PresetInfoDrawer openPreset={presetInfoOpen} onClose={() => setPresetInfoOpen(null)} onSelectPreset={() => setPresetInfoOpen(null)} t={t} />
       <TvTutorialOverlay onComplete={() => setShowTvTutorial(false)} onSkip={() => setShowTvTutorial(false)} t={t} forceShow={showTvTutorial} />
     </div>
   );

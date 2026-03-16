@@ -45,7 +45,8 @@ interface ProgressionContextType {
     level: number,
     stars: 0 | 1 | 2 | 3,
     score: number,
-    words: number
+    words: number,
+    goldEarned?: number
   ) => Promise<void>;
   /** Record a level attempt (including failures) */
   recordAttempt: (
@@ -150,7 +151,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       level: number,
       stars: 0 | 1 | 2 | 3,
       score: number,
-      words: number
+      words: number,
+      goldEarned?: number
     ) => {
       if (!user?.id) {
         throw new Error('User not authenticated');
@@ -169,6 +171,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             stars,
             score,
             words,
+            ...(goldEarned !== undefined && { goldEarned }),
           }),
         });
 

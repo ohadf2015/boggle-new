@@ -76,7 +76,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
   if (boards.length === 0) return null;
 
   return (
-    <div className={cn('w-full max-w-4xl mx-auto', className)}>
+    <div className={cn('w-full max-w-4xl mx-auto xl:max-w-5xl', className)}>
       {/* Section header */}
       <motion.div
         className="flex items-center justify-between mb-4"
@@ -103,8 +103,8 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
         </Link>
       </motion.div>
 
-      {/* Board cards — horizontal scroll on mobile, grid on desktop */}
-      <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0">
+      {/* Board cards — horizontal scroll on mobile, grid on tablet+ */}
+      <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 lg:gap-4 xl:gap-5">
         {boards.map((board, i) => {
           const avgRating = board.rating_count > 0
             ? (board.rating_sum / board.rating_count).toFixed(1)

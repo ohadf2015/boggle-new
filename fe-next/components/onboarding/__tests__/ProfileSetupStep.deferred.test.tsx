@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ProfileSetupStep from '../ProfileSetupStep';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
 // Mock framer-motion
 jest.mock('framer-motion', () => {
@@ -9,42 +10,30 @@ jest.mock('framer-motion', () => {
   const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
     return <div ref={ref} {...props}>{children}</div>;
   });
-  const MotionButton = React.forwardRef(function MotionButton({ children, ...props }: any, ref: any) {
-    return <button ref={ref} {...props}>{children}</button>;
-  });
   return {
-    motion: { div: MotionDiv, button: MotionButton },
+    motion: { div: MotionDiv },
     AnimatePresence: function AnimatePresence({ children }: any) { return <>{children}</>; },
   };
 });
-
-// Mock next/image
-jest.mock('next/image', () => ({
-  __esModule: true,
-  // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-  default: function MockImage(props: any) { return <img {...props} />; },
-}));
 
 // Mock lucide-react
 jest.mock('lucide-react', () => ({
   Check: () => <div>Check</div>,
   X: () => <div>X</div>,
-  Save: () => <div>Save</div>,
+  Pencil: () => <div>Pencil</div>,
 }));
 
-// Mock avatar config
-jest.mock('@/utils/avatarConfig', () => ({
-  AVATARS: [
-    { id: 'avatar1', name: 'Fox' },
-    { id: 'avatar2', name: 'Bear' },
-  ],
-  getAvatarPath: (avatar: any) => `/avatars/${avatar.id}.png`,
-  getAvatarById: (id: string) => ({ id, name: id === 'avatar1' ? 'Fox' : 'Bear' }),
+// Mock AvatarSelectorButton
+jest.mock('@/components/join/AvatarSelectorButton', () => ({
+  __esModule: true,
+  default: function MockAvatarSelectorButton() {
+    return <div data-testid="avatar-selector-button">AvatarSelector</div>;
+  },
 }));
 
 describe('ProfileSetupStep - deferred mode', () => {
   const defaultProps = {
-    selectedAvatarId: 'avatar1',
+    customAvatar: DEFAULT_AVATAR_CONFIG,
     displayName: 'Fox',
     onAvatarSelect: jest.fn(),
     onNameChange: jest.fn(),
@@ -57,8 +46,8 @@ describe('ProfileSetupStep - deferred mode', () => {
       </LanguageProvider>
     );
 
-    // Should show the full profile setup UI (avatar grid, name input)
     expect(screen.getByDisplayValue('Fox')).toBeInTheDocument();
+    expect(screen.getByTestId('avatar-selector-button')).toBeInTheDocument();
   });
 
   test('should render gentle prompt when deferred is true', () => {
@@ -68,7 +57,6 @@ describe('ProfileSetupStep - deferred mode', () => {
       </LanguageProvider>
     );
 
-    // Should show deferred prompt instead of full setup
     expect(screen.getByTestId('deferred-profile-prompt')).toBeInTheDocument();
   });
 
@@ -79,7 +67,6 @@ describe('ProfileSetupStep - deferred mode', () => {
       </LanguageProvider>
     );
 
-    // Default behavior - full setup
     expect(screen.getByDisplayValue('Fox')).toBeInTheDocument();
   });
 });

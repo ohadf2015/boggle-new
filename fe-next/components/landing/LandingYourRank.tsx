@@ -29,7 +29,7 @@ export function LandingYourRank() {
   return (
     <motion.div
       className={cn(
-        'w-full max-w-md mx-auto',
+        'w-full max-w-md mx-auto lg:max-w-none',
         'bg-gradient-to-r from-neo-navy-light to-neo-navy',
         'border-3 border-neo-black shadow-hard-lg rounded-neo-lg',
         'p-4 sm:p-5 flex items-center gap-4',

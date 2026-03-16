@@ -227,7 +227,7 @@ export default function AdventureView(): React.JSX.Element {
 
   // Handle game completion
   const handleLevelComplete = useCallback(
-    async (stars: number, score: number) => {
+    async (stars: number, score: number, wordsFound: number, goldEarned: number) => {
       if (selectedWorld && selectedLevel) {
         try {
           await completeLevel(
@@ -235,7 +235,8 @@ export default function AdventureView(): React.JSX.Element {
             selectedLevel,
             stars as 0 | 1 | 2 | 3,
             score,
-            0 // words count - can be expanded later
+            wordsFound,
+            goldEarned
           );
         } catch (err) {
           console.error('Failed to save progress:', err instanceof Error ? err.message : String(err));
@@ -252,6 +253,14 @@ export default function AdventureView(): React.JSX.Element {
     },
     [selectedWorld, selectedLevel, completeLevel]
   );
+
+  // Handle "Next World" — navigate back to world map
+  const handleNextWorld = useCallback(() => {
+    setViewState('worldMap');
+    setSelectedWorld(null);
+    setSelectedLevel(null);
+    pushHistoryState('worldMap', null, null);
+  }, [pushHistoryState]);
 
   // Handle exit from game
   const handleGameExit = useCallback(() => {
@@ -384,7 +393,7 @@ export default function AdventureView(): React.JSX.Element {
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-purple/20 border-2 border-neo-purple rounded-neo">
               <Zap className="w-4 h-4 text-neo-purple" />
               <span className="font-bold text-neo-purple text-sm">
-                Lv.{playerLevel}
+                {t('adventure.levelShort')}{playerLevel}
               </span>
             </div>
 
@@ -427,8 +436,8 @@ export default function AdventureView(): React.JSX.Element {
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className={cn(
-                'relative w-full max-w-lg max-h-[80vh] overflow-y-auto',
-                'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4'
+                'relative w-full max-w-lg lg:max-w-2xl max-h-[80vh] lg:max-h-[85vh] overflow-y-auto',
+                'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4 lg:p-6'
               )}
               onClick={(e) => e.stopPropagation()}
             >
@@ -514,13 +523,14 @@ export default function AdventureView(): React.JSX.Element {
                 onExit={handleGameExit}
                 onTimerStateChange={handleTimerStateChange}
                 totalStars={totalStars}
+                onNextWorld={handleNextWorld}
               />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Floating Word Forge FAB — visible on worldMap and levelGrid */}
+      {/* Floating Word Forge FAB — visible on worldMap and levelGrid, hidden on desktop (header has shop button) */}
       {viewState !== 'playing' && (
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
@@ -528,7 +538,7 @@ export default function AdventureView(): React.JSX.Element {
           transition={{ delay: 0.5, type: 'spring', damping: 15 }}
           onClick={() => setShowShop(true)}
           className={cn(
-            'fixed bottom-6 z-20',
+            'fixed bottom-6 z-20 lg:hidden',
             isRTL ? 'left-6' : 'right-6',
             'flex items-center gap-2 px-5 py-3',
             'bg-neo-orange text-neo-black font-black text-sm uppercase tracking-wide',

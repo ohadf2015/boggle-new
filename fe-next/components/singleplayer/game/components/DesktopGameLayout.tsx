@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { ArrowLeft, Pause, Play, Coins } from 'lucide-react';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import GridComponent from '@/components/GridComponent';
 import DesktopInputHint from '@/components/grid/DesktopInputHint';
+import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
@@ -146,12 +147,25 @@ export function DesktopGameLayout({
   const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
   const isPracticeMode = mode === 'practice';
 
-  // Compute highlighted path for grid
-  const gridHighlightedPath = shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
-    ? keyboardInput.highlightedCells
-    : tutorialPath
-      ? tutorialPath.map(p => ({ row: p.row, col: p.col }))
-      : highlightedPath;
+  // Desktop input state — highlight from visible text input
+  const [desktopInputHighlight, setDesktopInputHighlight] = useState<Array<{ row: number; col: number }>>([]);
+  const [isDesktopInputTyping, setIsDesktopInputTyping] = useState(false);
+
+  const handleDesktopHighlight = useCallback((cells: Array<{ row: number; col: number }>) => {
+    setDesktopInputHighlight(cells);
+  }, []);
+  const handleDesktopTypingMode = useCallback((typing: boolean) => {
+    setIsDesktopInputTyping(typing);
+  }, []);
+
+  // Compute highlighted path for grid — desktop input takes priority over keyboard global listener
+  const gridHighlightedPath = isDesktopInputTyping && desktopInputHighlight.length > 0
+    ? desktopInputHighlight
+    : shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
+      ? keyboardInput.highlightedCells
+      : tutorialPath
+        ? tutorialPath.map(p => ({ row: p.row, col: p.col }))
+        : highlightedPath;
 
   return (
     <div className="game-view-container relative flex h-full w-full bg-neo-navy">
@@ -325,9 +339,17 @@ export function DesktopGameLayout({
                 earthquakeShaking={earthquakeState === 'shaking'}
                 highlightedPath={gridHighlightedPath}
                 language={language}
-                isTypingMode={keyboardInput.isTypingMode}
+                isTypingMode={keyboardInput.isTypingMode || isDesktopInputTyping}
               />
               <DesktopInputHint wordSubmitted={foundWords.length > 0} />
+              <DesktopWordInput
+                grid={grid}
+                language={language}
+                enabled={!isPaused && !isGameOver}
+                onWordSubmit={onWordSubmit}
+                onHighlightChange={handleDesktopHighlight}
+                onTypingModeChange={handleDesktopTypingMode}
+              />
             </div>
           </div>
         </div>

@@ -148,10 +148,10 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start pt-4 sm:pt-6 page-content-safe px-4 pb-28"
+      className="flex-1 flex flex-col items-center justify-start pt-4 sm:pt-6 page-content-safe px-4 pb-28 lg:pb-10"
     >
       {/* Top bar with back and language */}
-      <div className="absolute top-20 sm:top-24 left-4 right-4 flex items-center justify-between">
+      <div className="absolute top-20 sm:top-24 left-4 right-4 lg:left-8 lg:right-8 xl:left-16 xl:right-16 flex items-center justify-between">
         {/* Back button */}
         <Button
           variant="ghost"
@@ -219,8 +219,10 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         </div>
       </div>
 
-      {/* Main content - COMPACT */}
-      <div className="max-w-md w-full text-center space-y-3 mt-14 sm:mt-16">
+      {/* Main content - COMPACT on mobile, two-column on desktop */}
+      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl mt-14 sm:mt-16 lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 xl:gap-12 lg:items-start">
+      {/* Left column: primary content */}
+      <div className="text-center space-y-3">
         {/* Explorer mascot — sets adventure tone before the word hunt */}
         <div className="flex justify-center">
           <MascotWithEntrance variant="explorer" size="md" delay={0.1} />
@@ -403,14 +405,65 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         >
           {t('daily.samePuzzle')}
         </motion.p>
+
+        {/* Desktop inline play button — replaces sticky footer on lg+ */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+          className="hidden lg:block pt-2"
+        >
+          <button
+            onClick={onStart}
+            className="group relative w-full py-5 text-2xl font-black uppercase rounded-neo border-4 border-neo-black overflow-hidden transition-all duration-200 hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm shadow-hard-lg"
+          >
+            <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-neo-cyan to-emerald-400 bg-[length:200%_100%] animate-shimmer" />
+            <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10" />
+            <span className="relative flex items-center justify-center gap-3 text-neo-black drop-shadow-sm">
+              <Target className="w-6 h-6" />
+              {t('daily.playButton')}
+            </span>
+          </button>
+        </motion.div>
       </div>
 
-      {/* STICKY PLAY BUTTON */}
+      {/* Right column: desktop-only persistent leaderboard sidebar */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.25, type: 'spring', stiffness: 280, damping: 26 }}
+        className="hidden lg:flex lg:flex-col lg:gap-4 lg:sticky lg:top-4"
+      >
+        <div className="rounded-neo border-3 border-neo-black shadow-hard overflow-hidden bg-neo-cream">
+          <div className="flex items-center gap-2 px-4 py-3 bg-neo-black">
+            <Trophy className="w-4 h-4 text-neo-yellow" />
+            <span className="font-black text-sm text-neo-white uppercase tracking-wide">
+              {t('daily.todaysPlayers')}
+            </span>
+          </div>
+          <div className="p-3">
+            <TabbedDailyLeaderboard
+              puzzleDate={puzzleDate}
+              language={language}
+              currentPlayerId={currentPlayerId}
+              currentGuestFingerprint={guestFingerprint}
+              maxVisible={8}
+              compact
+              t={t}
+              defaultTab="today"
+            />
+          </div>
+        </div>
+      </motion.div>
+
+      </div>
+
+      {/* STICKY PLAY BUTTON — mobile only */}
       <motion.div
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
-        className="fixed bottom-0 inset-x-0 z-50 pointer-events-none"
+        className="fixed bottom-0 inset-x-0 z-50 pointer-events-none lg:hidden"
       >
         <div className="bg-gradient-to-t from-neo-navy via-neo-navy/95 to-transparent pt-8 px-4 pointer-events-auto" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
           <div className="max-w-md mx-auto">

@@ -241,12 +241,12 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {(results.achievements && results.achievements.length > 0) || totalComboBonus > 0 || totalFireRoundBonus > 0 ? (
             <div className="space-y-2">
               {results.achievements && results.achievements.length > 0 && (
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {results.achievements.slice(0, 6).map((ach, i) => (
+                <div className="flex flex-wrap gap-2 justify-center lg:grid lg:grid-cols-3 xl:grid-cols-4 lg:gap-3">
+                  {results.achievements.slice(0, 8).map((ach, i) => (
                     <AchievementBadge key={ach.key} achievement={ach} index={i} />
                   ))}
-                  {results.achievements.length > 6 && (
-                    <span className="text-xs text-neo-cyan font-bold">+{results.achievements.length - 6} more</span>
+                  {results.achievements.length > 8 && (
+                    <span className="text-xs text-neo-cyan font-bold lg:col-span-3 xl:col-span-4 text-center">+{results.achievements.length - 8} more</span>
                   )}
                 </div>
               )}
@@ -318,7 +318,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             </Button>
           </div>
 
-          {/* 9. Detailed Analysis - collapsed sections */}
+          {/* 9. Detailed Analysis - collapsed sections, 2-col on desktop */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <div className="w-1 h-6 bg-neo-lime rounded-full" />
@@ -327,58 +327,66 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               </h3>
             </div>
 
-            {results.playerWordData && results.playerWordData.length > 0 && (
-              <YourWordsSection
-                wordsByPoints={wordsByPoints}
-                sortedPointGroups={sortedPointGroups}
-                invalidWords={invalidWords}
-                wordCount={results.playerWordData.length}
-                title={t('results.yourWords')}
-                t={t}
-                defaultExpanded={false}
-              />
-            )}
+            <div className="lg:grid lg:grid-cols-2 lg:gap-4 lg:items-start space-y-3 lg:space-y-0">
+              {/* Left analysis column */}
+              <div className="space-y-3">
+                {results.playerWordData && results.playerWordData.length > 0 && (
+                  <YourWordsSection
+                    wordsByPoints={wordsByPoints}
+                    sortedPointGroups={sortedPointGroups}
+                    invalidWords={invalidWords}
+                    wordCount={results.playerWordData.length}
+                    title={t('results.yourWords')}
+                    t={t}
+                    defaultExpanded={false}
+                  />
+                )}
 
-            {playerInsights && (
-              <PerformanceSection
-                insights={playerInsights}
-                title={t('results.performanceDetails')}
-                archetype={playerArchetype}
-              />
-            )}
+                {playerInsights && (
+                  <PerformanceSection
+                    insights={playerInsights}
+                    title={t('results.performanceDetails')}
+                    archetype={playerArchetype}
+                  />
+                )}
 
-            {mode === 'solo-bots' && missedWords.length > 0 && (
-              <MissedWords missedWords={missedWords} maxDisplay={5} />
-            )}
+                <CollapsibleSection
+                  title={t('results.performanceHistory')}
+                  icon={<TrendingUp className="w-4 h-4" />}
+                  defaultExpanded={false}
+                  variant="tertiary"
+                  className="shadow-hard"
+                >
+                  <PerformanceChart currentScore={results.playerScore} gamesLimit={10} />
+                </CollapsibleSection>
+              </div>
 
-            {mode === 'solo-bots' && botWordDetails.length > 0 && (
-              <BotWordsSection
-                botWordDetails={botWordDetails}
-                language={gameLanguage}
-                title={t('singlePlayer.botWordsFound')}
-                t={t}
-                defaultExpanded={false}
-              />
-            )}
+              {/* Right analysis column */}
+              <div className="space-y-3">
+                {mode === 'solo-bots' && missedWords.length > 0 && (
+                  <MissedWords missedWords={missedWords} maxDisplay={5} />
+                )}
 
-            <CollapsibleSection
-              title={t('results.performanceHistory')}
-              icon={<TrendingUp className="w-4 h-4" />}
-              defaultExpanded={false}
-              variant="tertiary"
-              className="shadow-hard"
-            >
-              <PerformanceChart currentScore={results.playerScore} gamesLimit={10} />
-            </CollapsibleSection>
+                {mode === 'solo-bots' && botWordDetails.length > 0 && (
+                  <BotWordsSection
+                    botWordDetails={botWordDetails}
+                    language={gameLanguage}
+                    title={t('singlePlayer.botWordsFound')}
+                    t={t}
+                    defaultExpanded={false}
+                  />
+                )}
 
-            {results.achievements && results.achievements.length > 4 && (
-              <AchievementsSection
-                achievements={results.achievements}
-                title={t('hostView.achievements')}
-                disclaimer={t('singlePlayer.achievementsNotSaved')}
-                defaultExpanded={false}
-              />
-            )}
+                {results.achievements && results.achievements.length > 4 && (
+                  <AchievementsSection
+                    achievements={results.achievements}
+                    title={t('hostView.achievements')}
+                    disclaimer={t('singlePlayer.achievementsNotSaved')}
+                    defaultExpanded={false}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

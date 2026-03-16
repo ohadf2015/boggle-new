@@ -12,7 +12,8 @@ import type {
   LevelObjective,
   AdventureGameState,
 } from '@/types/adventure';
-import { WORLDS_COUNT, LEVELS_PER_WORLD } from '@/lib/adventure';
+import { WORLDS_COUNT, LEVELS_PER_WORLD, generateAdventureGrid } from '@/lib/adventure';
+import type { Language } from '@/types';
 import { useCascadeLoop, type CascadePhase } from './useCascadeLoop';
 import { gameReducer, createInitialState, type ReducerUpgradeConfig } from './adventureGameReducer';
 
@@ -28,6 +29,8 @@ interface UseAdventureGameProps {
   comboDecayMultiplier?: number;
   /** Upgrade config for tile effect processing in the reducer */
   upgradeConfig?: ReducerUpgradeConfig;
+  /** Language for grid generation (used by shuffle). Defaults to 'en'. */
+  language?: Language;
 }
 
 interface UseAdventureGameReturn {
@@ -88,6 +91,7 @@ export function useAdventureGame({
   initialGrid,
   comboDecayMultiplier = 1,
   upgradeConfig,
+  language = 'en',
 }: UseAdventureGameProps): UseAdventureGameReturn {
   if (levelConfig.world < 1 || levelConfig.world > WORLDS_COUNT) {
     throw new Error(`Invalid world: ${levelConfig.world}`);
@@ -232,19 +236,11 @@ export function useAdventureGame({
   const useShuffle = useCallback(() => {
     if (state.shufflesRemaining <= 0) return;
     dispatch({ type: 'USE_SHUFFLE' });
-    // Regenerate the grid with fresh letters (keeping special tile positions)
-    const newGrid = levelConfig.gridSize;
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const freshGrid: string[][] = [];
-    for (let r = 0; r < newGrid; r++) {
-      const row: string[] = [];
-      for (let c = 0; c < newGrid; c++) {
-        row.push(letters[Math.floor(Math.random() * letters.length)]);
-      }
-      freshGrid.push(row);
-    }
+    // Regenerate the grid with language-aware letter distribution
+    const gridSize = levelConfig.gridSize as 4 | 5 | 6 | 7;
+    const freshGrid = generateAdventureGrid(gridSize, undefined, language);
     dispatch({ type: 'REGENERATE_GRID', payload: { grid: freshGrid } });
-  }, [state.shufflesRemaining, levelConfig.gridSize]);
+  }, [state.shufflesRemaining, levelConfig.gridSize, language]);
 
   return {
     gameState: state.gameState,

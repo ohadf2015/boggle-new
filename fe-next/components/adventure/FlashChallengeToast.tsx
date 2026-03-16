@@ -2,7 +2,7 @@
 
 import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Coins, Check, Zap } from 'lucide-react';
+import { X, Coins, Check, Zap, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { FlashChallenge } from '@/types/adventure';
@@ -10,6 +10,7 @@ import type { FlashChallenge } from '@/types/adventure';
 interface FlashChallengeToastProps {
   challenge: FlashChallenge | null;
   isComplete: boolean;
+  isFailed?: boolean;
   onDismiss: () => void;
   timeLeft: number;
 }
@@ -17,6 +18,7 @@ interface FlashChallengeToastProps {
 export const FlashChallengeToast = memo(function FlashChallengeToast({
   challenge,
   isComplete,
+  isFailed = false,
   onDismiss,
   timeLeft,
 }: FlashChallengeToastProps) {
@@ -27,66 +29,65 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
   return (
     <AnimatePresence>
       <motion.div
-        key={challenge.id}
-        initial={{ y: 80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 80, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+        key={isFailed ? `${challenge.id}-failed` : challenge.id}
+        initial={{ x: 60, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: 60, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         className={cn(
-          'fixed bottom-24 sm:bottom-28 lg:bottom-8 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50',
-          'sm:w-[calc(100vw-2rem)] max-w-sm',
-          'max-h-[calc(100dvh-10rem)] overflow-y-auto',
-          'rounded-neo border-3 shadow-hard',
-          'p-3',
-          isComplete
-            ? 'bg-neo-lime border-neo-black'
-            : 'bg-neo-navy border-neo-yellow'
+          // Compact chip pinned to top-right corner, doesn't block gameplay
+          'fixed top-16 end-2 z-40',
+          'w-auto max-w-[220px]',
+          'rounded-neo border-2 shadow-hard-sm',
+          'px-2.5 py-1.5',
+          isFailed
+            ? 'bg-neo-red/20 border-neo-red'
+            : isComplete
+              ? 'bg-neo-lime border-neo-black'
+              : 'bg-neo-navy/95 border-neo-yellow/70 backdrop-blur-sm'
         )}
       >
-        {/* Header row */}
-        <div className="flex items-center justify-between gap-2 mb-1.5">
-          <div className="flex items-center gap-1.5">
-            <Zap className={cn('w-4 h-4', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
-            <span className={cn('text-xs font-black uppercase tracking-wide', isComplete ? 'text-neo-black' : 'text-neo-yellow')}>
-              {t('adventure.quests.flash.title')}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {!isComplete && (
-              <span className="text-xs font-mono font-black text-neo-white/60">{timeLeft}s</span>
-            )}
-            <button
-              data-testid="challenge-dismiss"
-              onClick={onDismiss}
-              className={cn('w-5 h-5 flex items-center justify-center rounded-full border-2', isComplete ? 'border-neo-black text-neo-black' : 'border-neo-white/40 text-neo-white/60')}
-            >
-              <X className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
-
-        {/* Description */}
-        <p className={cn('text-sm font-bold', isComplete ? 'text-neo-black' : 'text-neo-white')}>
-          {t(challenge.descriptionKey, { param: String(challenge.param) })}
-        </p>
-
-        {/* Reward row */}
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center gap-1">
-            <Coins className={cn('w-3.5 h-3.5', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
-            <span className={cn('text-xs font-black', isComplete ? 'text-neo-black' : 'text-neo-yellow')}>
-              +{challenge.rewardCoins}
-            </span>
-          </div>
-          {isComplete && (
-            <div
-              data-testid="challenge-complete-badge"
-              className="flex items-center gap-1 bg-neo-black/20 rounded-neo px-2 py-0.5"
-            >
-              <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
-              <span className="text-xs font-black text-neo-black">{t('adventure.quests.flash.complete')}</span>
-            </div>
+        {/* Single-row compact layout */}
+        <div className="flex items-center gap-1.5">
+          {isFailed ? (
+            <XCircle className="w-3.5 h-3.5 flex-shrink-0 text-neo-red" />
+          ) : (
+            <Zap className={cn('w-3.5 h-3.5 flex-shrink-0', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
           )}
+          <div className="flex-1 min-w-0">
+            {isFailed ? (
+              <p className="text-[10px] font-bold leading-tight text-neo-red" data-testid="challenge-failed-text">
+                {t('adventure.quests.flash.missed')}
+              </p>
+            ) : (
+              <>
+                <p className={cn('text-[10px] font-bold leading-tight truncate', isComplete ? 'text-neo-black' : 'text-neo-white')}>
+                  {t(challenge.descriptionKey, { param: String(challenge.param) })}
+                </p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <Coins className={cn('w-3 h-3', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
+                  <span className={cn('text-[10px] font-black', isComplete ? 'text-neo-black' : 'text-neo-yellow')}>
+                    +{challenge.rewardCoins}
+                  </span>
+                  {!isComplete && (
+                    <span className="text-[10px] font-mono font-bold text-neo-white/50">{timeLeft}s</span>
+                  )}
+                  {isComplete && (
+                    <Check data-testid="challenge-complete-badge" className="w-3 h-3 text-neo-black" strokeWidth={3} />
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+          <button
+            data-testid="challenge-dismiss"
+            onClick={onDismiss}
+            className={cn('w-4 h-4 flex items-center justify-center flex-shrink-0',
+              isFailed ? 'text-neo-red/50' : isComplete ? 'text-neo-black/50' : 'text-neo-white/40'
+            )}
+          >
+            <X className="w-3 h-3" />
+          </button>
         </div>
       </motion.div>
     </AnimatePresence>

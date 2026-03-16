@@ -78,6 +78,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
   const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
   const [lootDrops, setLootDrops] = useState<LootDrop[]>([]);
+  const [earnedXp, setEarnedXp] = useState<number>(0);
+  const [earnedGold, setEarnedGold] = useState<number>(0);
   const completionProcessedRef = useRef(false);
 
   // Store callbacks in refs for stable references
@@ -110,10 +112,11 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
         Math.max(1, gameState.comboCount),
         { perfectClear: isPerfectClear, timeBonus: hasTimeBonus ? 0.1 : 0 }
       );
-      const earnedXp = Math.floor(baseXp * upgradeBonuses.xpBonus);
+      const computedXp = Math.floor(baseXp * upgradeBonuses.xpBonus);
+      setEarnedXp(computedXp);
 
       const oldLevel = currentLevel;
-      const levelUpResult = awardXp(earnedXp);
+      const levelUpResult = awardXp(computedXp);
 
       const baseGold = 10 * gameState.stars;
       const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
@@ -121,7 +124,9 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       const goldMultiplier = upgradeEffects?.goldMultiplier ?? 1;
       const doubleFirst = upgradeEffects?.doubleFirstCompletionGold ? 2 : 1;
       const bonusGold = props.bonusGoldMultiplier ?? 1;
-      addGold(Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst * bonusGold));
+      const computedGold = Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst * bonusGold);
+      setEarnedGold(computedGold);
+      addGold(computedGold);
 
       // Generate loot drops
       const drops = generateLevelLoot({
@@ -167,10 +172,10 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       ? bossHealthPhase === 'victory' && !playerDied
       : gameState.stars > 0;
 
-    if (isVictory) {
-      showVictory();
-    } else {
-      showDefeat();
+    // Boss levels get cinematic treatment; non-boss levels skip straight to results
+    if (isBossLevel) {
+      if (isVictory) showVictory();
+      else showDefeat();
     }
     pauseGame();
   }, [showLevelComplete, showVictoryCinematic, showDefeatCinematic, gameState.isComplete, gameState.stars, timeRemaining, pauseGame, isBossLevel, bossHealthPhase, playerIsDead, showVictory, showDefeat]);
@@ -241,6 +246,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const resetRewards = useCallback(() => {
     setHasAwardedLevelRewards(false);
     setLootDrops([]);
+    setEarnedXp(0);
+    setEarnedGold(0);
     completionProcessedRef.current = false;
   }, []);
 
@@ -248,6 +255,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     levelUpData,
     hasAwardedLevelRewards,
     lootDrops,
+    earnedXp,
+    earnedGold,
     handleLevelUpClose,
     resetRewards,
     completionProcessedRef,

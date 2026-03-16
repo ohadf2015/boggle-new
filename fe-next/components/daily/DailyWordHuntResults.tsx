@@ -333,7 +333,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     >
       {/* Compact Header */}
       <div className="flex-shrink-0 px-3 py-2 border-b border-slate-700/50 bg-neo-navy">
-        <div className="max-w-md mx-auto lg:max-w-5xl">
+        <div className="max-w-md mx-auto lg:max-w-5xl xl:max-w-6xl">
           <div className="flex items-center justify-between gap-2">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-white -ms-2 py-1">
               <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -361,9 +361,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           {activeTab === 'stats' && renderStatsContent()}
         </div>
 
-        {/* Desktop: Single column layout */}
-        <div className="hidden md:block max-w-md mx-auto pt-4">
-          <WordHuntResultsContent {...resultsContentProps} />
+        {/* Desktop: Two-column layout — results left, stats right */}
+        <div className="hidden md:block max-w-md lg:max-w-5xl xl:max-w-6xl mx-auto pt-4">
+          <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-8 xl:gap-10 lg:items-start">
+            <WordHuntResultsContent {...resultsContentProps} />
+            <div className="hidden lg:block lg:sticky lg:top-4">
+              {renderStatsContent()}
+            </div>
+          </div>
         </div>
       </div>
 

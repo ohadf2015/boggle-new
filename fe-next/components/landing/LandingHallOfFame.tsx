@@ -87,7 +87,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
         <span className="neo-title-sm">{t('landing.hallOfFame')}</span>
       </motion.h3>
 
-      <div className="flex gap-3 sm:gap-4 pb-4 pt-4 px-2 justify-center items-end flex-wrap">
+      <div className="flex gap-3 sm:gap-4 lg:gap-6 pb-4 pt-4 px-2 justify-center items-end flex-wrap">
         {podiumOrder.map((champ, idx) => {
           const originalIndex = podiumIndices[idx];
           const config = PODIUM_CONFIG[originalIndex % PODIUM_CONFIG.length];
@@ -108,12 +108,12 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
                 transition: { type: 'spring', stiffness: 400, damping: 14 },
               }}
               className={cn(
-                'shrink-0 w-28 sm:w-34 md:w-38',
+                'shrink-0 w-28 sm:w-34 md:w-38 lg:w-44 xl:w-48',
                 'border-3 border-neo-black shadow-hard rounded-neo-lg',
-                'p-3 sm:p-4 flex flex-col items-center text-center',
+                'p-3 sm:p-4 lg:p-5 flex flex-col items-center text-center',
                 'cursor-default select-none',
                 config.accent, config.glow,
-                config.elevated && 'sm:-mt-6 sm:w-38 md:w-44 sm:p-5',
+                config.elevated && 'sm:-mt-6 sm:w-38 md:w-44 lg:w-52 xl:w-56 sm:p-5 lg:p-6',
               )}
             >
               <motion.div

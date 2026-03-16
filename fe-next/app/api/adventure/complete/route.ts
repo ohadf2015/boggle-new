@@ -34,9 +34,10 @@ function validateRequestBody(body: Record<string, unknown>): {
     stars: number;
     score: number;
     words: number;
+    goldEarned?: number;
   };
 } {
-  const { world, level, stars, score, words } = body;
+  const { world, level, stars, score, words, goldEarned } = body;
 
   // Check required fields
   if (
@@ -47,6 +48,11 @@ function validateRequestBody(body: Record<string, unknown>): {
     typeof words !== 'number'
   ) {
     return { valid: false, error: 'Missing required fields: world, level, stars, score, words' };
+  }
+
+  // Validate optional goldEarned (non-negative integer if provided)
+  if (goldEarned !== undefined && (typeof goldEarned !== 'number' || goldEarned < 0)) {
+    return { valid: false, error: 'Invalid goldEarned: must be a non-negative number' };
   }
 
   // Validate world range (1-10)
@@ -76,7 +82,7 @@ function validateRequestBody(body: Record<string, unknown>): {
 
   return {
     valid: true,
-    data: { world, level, stars, score, words },
+    data: { world, level, stars, score, words, ...(typeof goldEarned === 'number' && { goldEarned }) },
   };
 }
 
@@ -110,7 +116,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const { world, level, stars, score, words } = validation.data;
+    const { world, level, stars, score, words, goldEarned: clientGoldEarned } = validation.data;
 
     // Use service role client for database operations (bypasses RLS)
     const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
@@ -198,10 +204,15 @@ export async function POST(request: Request) {
     const newTotalStars = currentTotalStars + starsGained;
     const newPlayerLevel = getLevelFromXp(newTotalXp);
 
-    // Calculate gold earned (mirrors useAdventureLevelCompletion formula)
-    const baseGold = 10 * stars;
-    const perfectClearGoldBonus = stars === 3 ? 50 : 0;
-    const goldEarned = isFirstCompletion ? baseGold + perfectClearGoldBonus : 0;
+    // Calculate gold earned — use client-provided value (includes upgrade bonuses) or fall back to base formula
+    let goldEarned: number;
+    if (clientGoldEarned !== undefined) {
+      goldEarned = isFirstCompletion ? clientGoldEarned : 0;
+    } else {
+      const baseGold = 10 * stars;
+      const perfectClearGoldBonus = stars === 3 ? 50 : 0;
+      goldEarned = isFirstCompletion ? baseGold + perfectClearGoldBonus : 0;
+    }
     const currentGold = (existingProgression?.gold as number) ?? 0;
     const newGold = currentGold + goldEarned;
 

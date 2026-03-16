@@ -24,11 +24,12 @@ import {
   Timer,
   Lock,
   Zap,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
-import type { LevelConfig, LevelAttempt, TileType, ObjectiveType } from '@/types/adventure';
+import type { LevelConfig, LevelAttempt, TileType } from '@/types/adventure';
 
 // ==============================================
 // TYPES
@@ -189,6 +190,52 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Star Requirements */}
+        <div className="p-4 border-b-2 border-neo-black/20">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-neo-white/70 uppercase tracking-wide mb-3">
+            <Star className="w-4 h-4" />
+            {t('adventure.preview.stars.title')}
+          </h3>
+          <div className="space-y-2">
+            {/* 1 Star */}
+            <div className={cn('flex items-center gap-3 p-2 rounded-neo bg-neo-black/20')}>
+              <div className="flex items-center gap-0.5 shrink-0">
+                <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
+              </div>
+              <span className="text-sm text-neo-white/80">
+                {t('adventure.preview.stars.oneStar')}
+              </span>
+            </div>
+            {/* 2 Stars */}
+            <div className={cn('flex items-center gap-3 p-2 rounded-neo bg-neo-black/20')}>
+              <div className="flex items-center gap-0.5 shrink-0">
+                <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
+                <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
+              </div>
+              <span className="text-sm text-neo-white/80">
+                {t('adventure.preview.stars.twoStars')}
+              </span>
+            </div>
+            {/* 3 Stars */}
+            <div className={cn('flex items-center gap-3 p-2 rounded-neo bg-neo-black/20')}>
+              <div className="flex items-center gap-0.5 shrink-0">
+                <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
+                <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
+                <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
+              </div>
+              <span className="text-sm text-neo-white/80">
+                {(() => {
+                  const secondaryCount = levelConfig.objectives.filter(o => !o.isPrimary).length;
+                  if (secondaryCount >= 3) {
+                    return t('adventure.preview.stars.threeStarsPartial', { count: secondaryCount - 1 });
+                  }
+                  return t('adventure.preview.stars.threeStars');
+                })()}
+              </span>
+            </div>
           </div>
         </div>
 

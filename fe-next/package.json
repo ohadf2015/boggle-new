@@ -88,6 +88,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-pdf/renderer": "^4.3.2",
     "@remotion/google-fonts": "4.0.414",
+    "@remotion/media": "4.0.414",
     "@remotion/player": "^4.0.414",
     "@remotion/transitions": "4.0.414",
     "@sentry/nextjs": "^10.32.1",

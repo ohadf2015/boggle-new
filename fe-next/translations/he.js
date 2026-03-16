@@ -1247,7 +1247,8 @@ const he = {
       "title": "צרו את הפרופיל שלכם",
       "subtitle": "אווטאר + שם = מוכנים לקרב",
       "deferredTitle": "לשמור את ההתקדמות?",
-      "deferredSubtitle": "הגדירו פרופיל כדי לשמור את הסטטיסטיקות!"
+      "deferredSubtitle": "הגדירו פרופיל כדי לשמור את הסטטיסטיקות!",
+      "tapToCustomize": "לחצו להתאמה אישית"
     },
     "quickTips": {
       "title": "טיפים מקצוענים",
@@ -4353,6 +4354,14 @@ const he = {
   "desktopHint": {
     "tip": "טיפ: אפשר גם ללחוץ על אותיות או פשוט להקליד!"
   },
+  "desktopInput": {
+    "placeholder": "הקלד מילה...",
+    "ariaLabel": "הקלד מילה לשליחה",
+    "submit": "שלח מילה",
+    "hint": "הקלד אותיות כדי למצוא מילים · Enter לשליחה · Esc לניקוי",
+    "doubleClick": "לחיצה כפולה",
+    "releaseToSubmit": "שחרר לשליחה"
+  },
   "keyboardLanguageMismatch": "נא להחליף למקלדת {language} בהתאם לשפת הלוח",
   "enterKeyHint": {
     "pressEnter": "לחץ Enter לשליחה"
@@ -5232,6 +5241,7 @@ const he = {
     "levelComplete": "השלב הושלם!",
     "starsEarned": "כוכבים שנצברו",
     "continueToNext": "המשך",
+    "nextWorld": "העולם הבא",
     "retryLevel": "נסה שוב",
     "loadError": "נכשל לטעון התקדמות",
     "cinematics": {
@@ -5432,7 +5442,14 @@ const he = {
       "start": "התחל שלב",
       "back": "חזור",
       "bestAttempt": "השיא שלכם",
-      "notAttempted": "עדיין לא ניסיתם"
+      "notAttempted": "עדיין לא ניסיתם",
+      "stars": {
+        "title": "דרישות כוכבים",
+        "oneStar": "השלימו את המטרה הראשית",
+        "twoStars": "השלימו את המטרה הראשית + 1 מטרת בונוס",
+        "threeStars": "השלימו את כל המטרות",
+        "threeStarsPartial": "השלימו את המטרה הראשית + {{count}} מטרות בונוס"
+      }
     },
     "tiles": {
       "gold": "זהב (×3 נקודות)",
@@ -5486,7 +5503,8 @@ const he = {
       "levelUp": "עליית רמה!",
       "newLevel": "הגעת לרמה",
       "continue": "המשך",
-      "maxLevel": "רמה מקסימלית!"
+      "maxLevel": "רמה מקסימלית!",
+      "progress": "התקדמות ניסיון"
     },
     "powerUps": {
       "freezeTime": "הקפא זמן",
@@ -6088,7 +6106,8 @@ const he = {
         "palindrome": "מצא פלינדרום ({param}+ אותיות)",
         "exactLength": "מצא מילה בדיוק עם {param} אותיות",
         "useGoldTile": "השתמש באריח זהב במילה",
-        "complete": "הושלם!"
+        "complete": "הושלם!",
+        "missed": "פספסת!"
       },
       "chapter": {
         "panelTitle": "משימות פרק",

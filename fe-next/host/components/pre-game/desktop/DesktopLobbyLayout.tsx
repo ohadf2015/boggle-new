@@ -38,16 +38,16 @@ export function DesktopLobbyLayout({
       animate={{ opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
-        'grid h-full p-6 bg-neo-navy',
+        'grid h-full p-6 xl:p-8 bg-neo-navy',
         'grid-cols-12',
-        'gap-5 xl:gap-6',
+        'gap-5 xl:gap-8',
         className
       )}
     >
       {/* Left Column - Hero Start + Players + Settings */}
       <div
         data-testid="desktop-left-column"
-        className="col-span-7 flex flex-col gap-5 overflow-y-auto overscroll-contain scrollable-area min-h-0"
+        className="col-span-7 xl:col-span-8 flex flex-col gap-5 xl:gap-6 overflow-y-auto overscroll-contain scrollable-area min-h-0"
       >
         {leftContent}
       </div>
@@ -55,7 +55,7 @@ export function DesktopLobbyLayout({
       {/* Right Column - QR + Share + Chat */}
       <div
         data-testid="desktop-right-column"
-        className="col-span-5 flex flex-col gap-4 overflow-hidden min-h-0"
+        className="col-span-5 xl:col-span-4 flex flex-col gap-4 overflow-hidden min-h-0"
       >
         {rightContent}
       </div>

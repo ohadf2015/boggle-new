@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3617,
+    "totalKeysInCode": 3626,
     "keyCountByLanguage": {
-      "en": 6094,
-      "he": 6120,
-      "sv": 6153,
-      "ja": 6140,
-      "es": 6117
+      "en": 6132,
+      "he": 6158,
+      "sv": 6191,
+      "ja": 6178,
+      "es": 6155
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -167,7 +167,17 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "onboarding.profile.tapToCustomize",
+      "usages": [
+        {
+          "file": "components/onboarding/ProfileSetupStep.tsx",
+          "line": 101
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "avatarBuilder.gender",

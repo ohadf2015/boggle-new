@@ -49,6 +49,18 @@ interface LevelCompleteModalProps {
   totalStars?: number;
   /** Best attempt data for this level (shows partial progress on failure) */
   bestAttempt?: LevelAttempt | null;
+  /** Actual XP earned (from useAdventureLevelCompletion) */
+  xpEarned?: number;
+  /** Actual gold earned (from useAdventureLevelCompletion) */
+  goldEarned?: number;
+  /** Whether this is the last level in the world */
+  isLastLevelOfWorld?: boolean;
+  /** Callback to go to next world */
+  onNextWorld?: () => void;
+  /** Loot drops earned this level (shown inline) */
+  lootDrops?: Array<{ type: string; rarity: string; label?: string }>;
+  /** Story beat text to show inline */
+  storyBeatText?: string;
 }
 
 /**
@@ -100,6 +112,12 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     onExit,
     totalStars: _totalStars = 0,
     bestAttempt,
+    xpEarned,
+    goldEarned,
+    isLastLevelOfWorld = false,
+    onNextWorld,
+    lootDrops = [],
+    storyBeatText,
   }) => {
     const { t } = useLanguage();
     const isPerfect = stars === 3;
@@ -302,7 +320,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   +{t('common.xp')}
                 </div>
                 <RollingNumber 
-                  value={Math.floor(score / 100)} 
+                  value={xpEarned ?? Math.floor(score / 100)}
                   variant="default"
                   className="text-xl md:text-2xl text-neo-purple"
                 />
@@ -318,7 +336,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   {t('adventure.gold')}
                 </div>
                 <RollingNumber 
-                  value={stars > 0 ? stars * 10 + (stars === 3 ? 50 : 0) : 0} 
+                  value={goldEarned ?? (stars > 0 ? stars * 10 + (stars === 3 ? 50 : 0) : 0)}
                   variant="gold"
                   className="text-xl md:text-2xl"
                 />
@@ -375,6 +393,40 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               </ul>
             </div>
 
+            {/* Loot Drops (inline — no separate animation) */}
+            {lootDrops.length > 0 && !isFailed && (
+              <div className="flex flex-wrap gap-2 mb-4 justify-center">
+                {lootDrops.map((drop, i) => (
+                  <motion.div
+                    key={`loot-${i}`}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.8 + i * 0.1, type: 'spring', stiffness: 300 }}
+                    className={cn(
+                      'px-3 py-1.5 rounded-neo border-2 text-xs font-bold',
+                      drop.rarity === 'legendary' ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow' :
+                      drop.rarity === 'rare' ? 'bg-neo-purple/20 border-neo-purple text-neo-purple' :
+                      'bg-neo-cyan/20 border-neo-cyan/50 text-neo-cyan'
+                    )}
+                  >
+                    {drop.label || drop.type}
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            {/* Story Beat (inline — no separate overlay) */}
+            {storyBeatText && !isFailed && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9 }}
+                className="mb-4 p-3 rounded-neo bg-neo-white/5 border border-neo-white/10"
+              >
+                <p className="text-xs text-neo-white/70 italic leading-relaxed">{storyBeatText}</p>
+              </motion.div>
+            )}
+
             {/* Partial Progress Display (for failed attempts) */}
             {isFailed && bestAttempt && bestAttempt.attemptCount > 1 && (
               <motion.div
@@ -412,7 +464,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               {/* Continue Button (hidden when failed) */}
               {!isFailed && (
                 <button
-                  onClick={onContinue}
+                  onClick={isLastLevelOfWorld && onNextWorld ? onNextWorld : onContinue}
                   className={cn(
                     'btn-primary',
                     'w-full py-3 px-4',
@@ -425,7 +477,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     'transition-all duration-200'
                   )}
                 >
-                  {t('adventure.continueToNext')}
+                  {isLastLevelOfWorld ? t('adventure.nextWorld') : t('adventure.continueToNext')}
                 </button>
               )}
 

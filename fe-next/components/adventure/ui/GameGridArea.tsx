@@ -63,6 +63,7 @@ interface GameGridAreaProps {
   // Hint
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
 
+
   // Boss grid effect
   bossGridEffect?: { name: string; id: number } | null;
 
@@ -103,6 +104,7 @@ export const GameGridArea = memo(function GameGridArea({
   hintLevel,
   bossGridEffect,
   adjacentIndices,
+  lockedTileIndices,
   className,
 }: GameGridAreaProps) {
   const { t } = useLanguage();
@@ -251,6 +253,7 @@ export const GameGridArea = memo(function GameGridArea({
                 hintHighlightIndices={hintHighlightIndices}
                 adjacentIndices={adjacentIndices}
                 bossGridEffect={bossGridEffect}
+                lockedTileIndices={lockedTileIndices}
                 className="h-full"
               />
           </motion.div>

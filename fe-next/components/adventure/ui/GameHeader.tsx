@@ -10,7 +10,7 @@
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Pause, Play, LogOut, MapPin } from 'lucide-react';
+import { Pause, Play, LogOut, MapPin, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -29,6 +29,10 @@ interface GameHeaderProps {
   isPaused: boolean;
   onPauseToggle: () => void;
   onExit: () => void;
+  /** Current gold amount */
+  gold?: number;
+  /** XP progress within current level (0-1) */
+  xpProgress?: number;
   className?: string;
 }
 
@@ -44,19 +48,21 @@ export const GameHeader = memo(function GameHeader({
   isPaused,
   onPauseToggle,
   onExit,
+  gold,
+  xpProgress,
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
   const hudTheme = useHUDTheme();
 
   return (
+    <div className="flex-shrink-0">
     <header
       className={cn(
         'flex items-center justify-between relative',
         'px-3 py-1.5',
         hudTheme.headerBg, 'backdrop-blur-md',
         'border-b-3', hudTheme.headerBorder,
-        'flex-shrink-0',
         'shadow-hard-sm',
         className
       )}
@@ -98,6 +104,14 @@ export const GameHeader = memo(function GameHeader({
           className="text-lg sm:text-xl font-black leading-tight tabular-nums"
         />
       </div>
+
+      {/* Gold Badge */}
+      {gold !== undefined && (
+        <div className="flex items-center gap-1 px-2 py-0.5 bg-neo-yellow/20 rounded-neo">
+          <Coins className="w-3 h-3 text-neo-yellow" />
+          <span className="text-xs font-bold text-neo-yellow">{gold}</span>
+        </div>
+      )}
 
       {/* Right: Timer & Controls */}
       <div className="flex items-center gap-1 sm:gap-2">
@@ -150,6 +164,20 @@ export const GameHeader = memo(function GameHeader({
         </div>
       </div>
     </header>
+    {xpProgress !== undefined && (
+      <div className="h-0.5 bg-neo-black/30">
+        <div
+          className="h-full bg-neo-purple transition-all duration-500"
+          style={{ width: `${xpProgress * 100}%` }}
+          role="progressbar"
+          aria-valuenow={Math.round(xpProgress * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={t('adventure.xp.progress')}
+        />
+      </div>
+    )}
+    </div>
   );
 });
 

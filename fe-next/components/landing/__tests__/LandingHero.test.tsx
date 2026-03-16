@@ -32,7 +32,7 @@ jest.mock('../LandingLeaderboardPreview', () => {
   return { LandingLeaderboardPreview };
 });
 
-const player = { username: 'alice', displayName: 'Alice', totalScore: 100, avatarImage: null, avatarConfig: null, profilePictureUrl: null };
+const player = { id: '1', username: 'alice', displayName: 'Alice', totalScore: 100, avatarImage: null, avatarConfig: null, profilePictureUrl: null };
 
 describe('LandingHero', () => {
   const baseProps = { players: [player], playersLoading: false, isMobilePortrait: false, onPlayClick: jest.fn() };

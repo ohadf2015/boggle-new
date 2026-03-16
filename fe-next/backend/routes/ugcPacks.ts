@@ -40,7 +40,7 @@ async function getAuthUser(req: Request): Promise<{ id: string } | null> {
 
 async function requireAuth(req: Request, res: Response): Promise<string | null> {
   // Check middleware-injected userId first (e.g. from upstream auth middleware)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const midwareId = (req as any).userId as string | undefined;
   if (midwareId) return midwareId;
 

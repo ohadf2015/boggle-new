@@ -1231,7 +1231,8 @@ const sv = {
       "title": "Skapa Din Profil",
       "subtitle": "Avatar + namn = redo för strid",
       "deferredTitle": "Spara dina framsteg?",
-      "deferredSubtitle": "Skapa en profil for att behålla din statistik!"
+      "deferredSubtitle": "Skapa en profil for att behålla din statistik!",
+      "tapToCustomize": "Tryck för att anpassa"
     },
     "quickTips": {
       "title": "Proffstips",
@@ -4359,6 +4360,14 @@ const sv = {
   "desktopHint": {
     "tip": "Tips: Du kan också klicka på bokstäver eller bara skriva!"
   },
+  "desktopInput": {
+    "placeholder": "Skriv ett ord...",
+    "ariaLabel": "Skriv ett ord att skicka",
+    "submit": "Skicka ord",
+    "hint": "Skriv bokstäver för att hitta ord · Enter för att skicka · Esc för att rensa",
+    "doubleClick": "2×klick",
+    "releaseToSubmit": "Släpp för att skicka"
+  },
   "keyboardLanguageMismatch": "Byt till {language}-tangentbord för att matcha brädspråket",
   "enterKeyHint": {
     "pressEnter": "Tryck Enter för att skicka"
@@ -5185,6 +5194,7 @@ const sv = {
     "levelComplete": "Nivå klar!",
     "starsEarned": "Stjärnor intjänade",
     "continueToNext": "Fortsätt",
+    "nextWorld": "Nästa värld",
     "retryLevel": "Försök igen",
     "loadError": "Kunde inte ladda framsteg",
     "allStars": "Alla stjärnor",
@@ -5407,7 +5417,14 @@ const sv = {
       "start": "Starta nivå",
       "back": "Tillbaka",
       "bestAttempt": "Ditt bästa",
-      "notAttempted": "Ej försökt ännu"
+      "notAttempted": "Ej försökt ännu",
+      "stars": {
+        "title": "Stjärnkrav",
+        "oneStar": "Klara huvudmålet",
+        "twoStars": "Klara huvudmålet + 1 bonusmål",
+        "threeStars": "Klara alla mål",
+        "threeStarsPartial": "Klara huvudmålet + {{count}} bonusmål"
+      }
     },
     "tiles": {
       "gold": "Guld (3x poäng)",
@@ -5461,7 +5478,8 @@ const sv = {
       "levelUp": "Nivå Upp!",
       "newLevel": "Du nådde nivå",
       "continue": "Fortsätt",
-      "maxLevel": "MAXNIVÅ!"
+      "maxLevel": "MAXNIVÅ!",
+      "progress": "XP-framsteg"
     },
     "powerUps": {
       "freezeTime": "Frys tid",
@@ -6063,7 +6081,8 @@ const sv = {
         "palindrome": "Hitta ett palindrom ({param}+ bokstäver)",
         "exactLength": "Hitta ett ord med exakt {param} bokstäver",
         "useGoldTile": "Använd en guldbricka i ett ord",
-        "complete": "Klart!"
+        "complete": "Klart!",
+        "missed": "Missad!"
       },
       "chapter": {
         "panelTitle": "Kapiteluppdrag",

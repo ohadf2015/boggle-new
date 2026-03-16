@@ -20,20 +20,20 @@ const PUBLIC_PROFILE_COLUMNS = [
 /**
  * Validate player ID format (UUID)
  */
-function isValidPlayerId(id: string): boolean {
+function isValidUuid(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
 /**
  * GET /api/player-profile/:id
- * Returns public profile data for a player by ID
+ * Returns public profile data for a player by ID (UUID) or username
  */
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
 
-  // Validate player ID
-  if (!id || !isValidPlayerId(id)) {
-    res.status(400).json({ error: 'INVALID_PLAYER_ID', message: 'Invalid player ID format' });
+  // Reject empty, too long, or suspicious identifiers
+  if (!id || id.length > 100 || /[<>"';]/.test(id)) {
+    res.status(400).json({ error: 'INVALID_PLAYER_ID', message: 'Invalid player identifier' });
     return;
   }
 
@@ -44,12 +44,15 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // Fetch profile by ID
-    const { data: profile, error } = await supabase
+    // Look up by UUID if valid, otherwise by username
+    const isUuid = isValidUuid(id);
+    const query = supabase
       .from('profiles')
       .select(PUBLIC_PROFILE_COLUMNS)
-      .eq('id', id)
+      .eq(isUuid ? 'id' : 'username', id)
       .single();
+
+    const { data: profile, error } = await query;
 
     if (error || !profile) {
       res.status(404).json({ error: 'PLAYER_NOT_FOUND', message: 'Player not found' });

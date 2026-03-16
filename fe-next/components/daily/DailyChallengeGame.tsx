@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
+import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import CircularTimer from '@/components/CircularTimer';
 import WordFormingArea from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
@@ -495,6 +496,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
               ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
               : undefined
           }
+        />
+        <DesktopWordInput
+          grid={grid}
+          language={language}
+          enabled={!isGameOver}
+          onWordSubmit={handleWordSubmit}
         />
       </div>
 

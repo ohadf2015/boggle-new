@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Lightbulb, Target, Check, FileText, Star, Snowflake,
@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureObjectives from '../AdventureObjectives';
+import { calculateStars } from '@/hooks/adventureGameReducer';
 import type { LevelObjective, ObjectiveType } from '@/types/adventure';
 
 // ==============================================
@@ -114,6 +115,7 @@ export const GameSidebar = memo(function GameSidebar({
   const totalCount = objectives.length;
   const allComplete = totalCount > 0 && completedCount === totalCount;
   const partiallyComplete = completedCount > 0 && !allComplete;
+  const currentStars = useMemo(() => calculateStars(objectives), [objectives]);
 
   return (
     <aside
@@ -126,6 +128,19 @@ export const GameSidebar = memo(function GameSidebar({
     >
       {/* Mobile: Compact horizontal scrollable chip bar (fits h-16) */}
       <div className="lg:hidden flex flex-row items-center gap-1 px-1.5 py-1 h-full overflow-x-auto scrollbar-hide">
+        {/* Star projection chip */}
+        <div className={cn(
+          'flex-shrink-0 flex items-center gap-0.5 px-2 py-1',
+          'rounded-neo border-2 min-h-[40px]',
+          currentStars === 3 ? 'bg-neo-yellow/20 border-neo-yellow' :
+          currentStars > 0 ? 'bg-neo-yellow/10 border-neo-yellow/40' :
+          'bg-neo-black/40 border-neo-white/10'
+        )}>
+          {[0, 1, 2].map(i => (
+            <Star key={i} className={cn('w-3 h-3 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/25')} />
+          ))}
+        </div>
+
         {objectives.map((obj) => {
           const current = obj.current ?? 0;
           const pct = Math.min((current / obj.target) * 100, 100);
@@ -181,7 +196,7 @@ export const GameSidebar = memo(function GameSidebar({
         {/* Divider */}
         <div className="flex-shrink-0 w-px h-6 bg-neo-white/15" />
 
-        {/* Hint chip */}
+        {/* Hint chip — glows when auto-hint suggests using it */}
         <button
           onClick={onHintClick}
           disabled={!hasHintsAvailable}
@@ -189,8 +204,11 @@ export const GameSidebar = memo(function GameSidebar({
             'flex-shrink-0 flex items-center gap-1 px-2 py-1',
             'rounded-neo border-2',
             'min-w-[40px] min-h-[40px]',
+            'transition-all duration-500',
             hasHintsAvailable
-              ? 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
+              ? showAutoHint
+                ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse'
+                : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
               : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
           )}
         >
@@ -253,6 +271,16 @@ export const GameSidebar = memo(function GameSidebar({
 
       {/* Desktop: Vertical stack layout */}
       <div className="hidden lg:flex flex-col gap-3 p-3 h-full overflow-y-auto">
+        {/* Star Projection */}
+        <div className="flex items-center justify-center gap-2 py-2">
+          {[0, 1, 2].map(i => (
+            <Star key={i} className={cn(
+              'w-5 h-5 transition-all duration-300',
+              i < currentStars ? 'text-neo-yellow fill-neo-yellow scale-110' : 'text-neo-white/25 scale-90'
+            )} />
+          ))}
+        </div>
+
         {/* Objectives Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -287,7 +315,7 @@ export const GameSidebar = memo(function GameSidebar({
 
         {/* Hint Section */}
         <div className="space-y-2">
-          {/* Hint Button */}
+          {/* Hint Button — glows subtly when auto-hint is active */}
           <motion.button
             onClick={onHintClick}
             disabled={!hasHintsAvailable}
@@ -297,10 +325,11 @@ export const GameSidebar = memo(function GameSidebar({
               'w-full flex items-center justify-center gap-2',
               'px-4 py-2.5 rounded-neo-lg',
               'font-bold text-sm',
-              'border-3 transition-all duration-200',
-              'shadow-hard',
+              'border-3 transition-all duration-500',
               hasHintsAvailable
-                ? 'bg-neo-yellow text-neo-black border-neo-black hover:shadow-hard-lg'
+                ? showAutoHint
+                  ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_16px_3px_rgba(255,225,53,0.5)] animate-pulse'
+                  : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg'
                 : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
             )}
           >
@@ -369,26 +398,6 @@ export const GameSidebar = memo(function GameSidebar({
               <span>{t('adventure.game.detonate')}</span>
             </motion.button>
           )}
-
-          {/* Auto Hint Prompt */}
-          <AnimatePresence>
-            {showAutoHint && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className={cn(
-                  'p-2 rounded-neo',
-                  'bg-neo-yellow/20 border-2 border-neo-yellow/50',
-                  'text-center'
-                )}
-              >
-                <p className="text-xs font-bold text-neo-yellow">
-                  {t('adventure.game.hintAvailable')}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* Current Hint Display */}
           <AnimatePresence>

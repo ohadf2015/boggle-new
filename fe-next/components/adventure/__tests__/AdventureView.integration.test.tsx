@@ -127,6 +127,7 @@ const mockT = (key: string) => {
     'common.exit': 'Exit',
     'common.pause': 'Pause',
     'common.resume': 'Resume',
+    'adventure.levelShort': 'Lv.',
   };
   return translations[key] || key;
 };

@@ -55,12 +55,12 @@ const RPGLevelCard = memo(function RPGLevelCard({
   isPerfect,
   isCurrent,
   isBoss,
-  glowColor,
+  glowColor: _glowColor,
   onClick,
 }: RPGLevelCardProps) {
   const { t } = useLanguage();
   const isLocked = !isUnlocked;
-  const effectiveMaxStars = isBoss ? 5 : maxStars;
+  const effectiveMaxStars = maxStars;
 
   const bannerClasses = getBannerClasses(isPerfect, isCurrent, isUnlocked, isBoss);
   const bannerText = getBannerTextColor(isPerfect, isBoss, isUnlocked);

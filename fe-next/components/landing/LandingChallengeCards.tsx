@@ -46,10 +46,10 @@ export function LandingChallengeCards({
   solveRate,
 }: LandingChallengeCardsProps) {
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-stretch">
+    <div className="w-full max-w-4xl mx-auto xl:max-w-5xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-stretch">
         {/* Daily Challenge Banner - full width */}
-        <div className="col-span-1 sm:col-span-2">
+        <div className="col-span-1 sm:col-span-2 xl:col-span-4">
           <Suspense fallback={
             <div
               className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
@@ -98,8 +98,8 @@ export function LandingChallengeCards({
           />
         </motion.div>
 
-        {/* Adventure Mode - full width */}
-        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.35 }} className="col-span-1 sm:col-span-2 w-full">
+        {/* Adventure Mode - full width on mobile/tablet, single col on xl */}
+        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.35 }} className="col-span-1 sm:col-span-2 xl:col-span-1 w-full">
           <ModeCard
             title={t('landing.adventureMode')}
             description={t('landing.adventureModeDesc')}
@@ -111,7 +111,7 @@ export function LandingChallengeCards({
 
         {/* Blast Mode (admin only) */}
         {(isAdmin || hasBlastAccess) && (
-          <div className="col-span-1 sm:col-span-2 w-full max-w-md mx-auto">
+          <div className="col-span-1 sm:col-span-2 xl:col-span-1 w-full xl:max-w-none max-w-md mx-auto">
             <ModeCard
               title={t('landing.blastMode')}
               description={t('landing.blastModeDesc')}

@@ -124,11 +124,21 @@ describe('GET /api/player-profile/:id', () => {
     expect(res.body.error).toBe('PLAYER_NOT_FOUND');
   });
 
-  it('returns 400 for invalid ID format', async () => {
+  it('returns 404 for non-existent username', async () => {
+    mockSupabase.from.mockReturnValueOnce({
+      select: jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({
+            data: null,
+            error: { code: 'PGRST116', message: 'Not found' },
+          }),
+        }),
+      }),
+    });
     const res = await request(app).get('/api/player-profile/not-a-uuid');
 
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe('INVALID_PLAYER_ID');
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('PLAYER_NOT_FOUND');
   });
 
   it('sanitizes ID to prevent injection', async () => {

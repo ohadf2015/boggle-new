@@ -212,7 +212,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       : gameMode as GameMode;
 
     // Default blast MP to 90s when host didn't set an explicit timer
-    if (resolvedMode === 'blast' && (!timerSeconds || validTimer === 120)) {
+    if (resolvedMode === 'blast' && !timerSeconds) {
       validTimer = BLAST_MP_DEFAULT_TIMER;
     }
 

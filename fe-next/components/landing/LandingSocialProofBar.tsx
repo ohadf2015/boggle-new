@@ -104,7 +104,7 @@ export function LandingSocialProofBar({
             transition={{ type: 'spring', stiffness: 400, damping: 18 }}
             whileHover={{ y: -4, scale: 1.05, rotate: 1, transition: { type: 'spring', stiffness: 500, damping: 12 } }}
             className={cn(
-              'inline-flex items-center gap-2.5 px-4 py-2.5',
+              'inline-flex items-center gap-2.5 px-4 py-2.5 lg:px-5 lg:py-3',
               'border-3 border-neo-black rounded-neo shadow-hard-sm',
               'cursor-default select-none',
               STAT_COLORS[pill.iconIdx],
@@ -118,7 +118,7 @@ export function LandingSocialProofBar({
               <Icon className={cn('w-4 h-4', STAT_ICON_COLORS[pill.iconIdx])} aria-hidden="true" />
             </div>
             <div className="flex flex-col">
-              <AnimatedNumber value={pill.value} className="font-black text-lg sm:text-xl text-neo-white leading-tight" />
+              <AnimatedNumber value={pill.value} className="font-black text-lg sm:text-xl lg:text-2xl text-neo-white leading-tight" />
               <span className="text-[10px] sm:text-xs font-bold text-neo-white/60 uppercase tracking-wider leading-tight">
                 {pill.label}
               </span>

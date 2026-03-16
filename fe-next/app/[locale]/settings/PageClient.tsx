@@ -173,9 +173,9 @@ export default function SettingsPageClient(): React.JSX.Element {
       <AutoHideHeader />
 
       <div className={cn(
-        "max-w-2xl mx-auto px-4 page-content-safe",
+        "max-w-2xl mx-auto px-4 page-content-safe lg:max-w-4xl xl:max-w-5xl",
         // Reduced padding: mobile 12px, desktop 16px (was 24px)
-        isLandscape ? "py-2" : "py-3 sm:py-4"
+        isLandscape ? "py-2" : "py-3 sm:py-4 lg:py-6"
       )}>
         {/* Header */}
         <motion.div
@@ -197,7 +197,7 @@ export default function SettingsPageClient(): React.JSX.Element {
             {t('common.back')}
           </Button>
           <h1 className={cn(
-            'text-2xl font-black uppercase',
+            'text-2xl font-black uppercase lg:text-3xl',
             isDarkMode ? 'text-white' : 'text-neo-black'
           )}>
             {t('settings.title')}
@@ -205,8 +205,10 @@ export default function SettingsPageClient(): React.JSX.Element {
         </motion.div>
 
         {/* Settings Sections */}
-        {/* Reduced spacing: mobile 12px, sm 16px (was 24px) */}
-        <div className="space-y-3 sm:space-y-4">
+        {/* Mobile: single column stack. xl: 2-column grid (Appearance+Audio left, Accessibility+Support right) */}
+        <div className="xl:grid xl:grid-cols-2 xl:gap-6 space-y-3 sm:space-y-4 xl:space-y-0">
+          {/* Left column on xl: Appearance + Audio */}
+          <div className="space-y-3 sm:space-y-4">
           {/* Appearance */}
           <motion.section
             initial={{ opacity: 0, y: 10 }}
@@ -309,7 +311,10 @@ export default function SettingsPageClient(): React.JSX.Element {
               </SettingRow>
             </div>
           </motion.section>
+          </div>{/* end left column */}
 
+          {/* Right column on xl: Accessibility + Support */}
+          <div className="space-y-3 sm:space-y-4">
           {/* Accessibility */}
           <motion.section
             id="accessibility"
@@ -419,7 +424,8 @@ export default function SettingsPageClient(): React.JSX.Element {
               <ChevronRight className={cn('w-5 h-5 rtl:rotate-180', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
             </Link>
           </motion.section>
-        </div>
+          </div>{/* end right column */}
+        </div>{/* end grid */}
 
         {/* Footer */}
         <motion.div

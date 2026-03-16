@@ -223,11 +223,15 @@ const LandingView: React.FC = () => {
         {/* Top Words */}
         <LandingTopWords />
 
-        {/* Your Rank (auth'd users only) */}
-        <LandingYourRank />
-
-        {/* Avatar Teaser */}
-        <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
+        {/* Your Rank + Avatar Teaser — side-by-side on desktop */}
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
+          <div className="lg:flex-1">
+            <LandingYourRank />
+          </div>
+          <div className="lg:flex-1">
+            <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
+          </div>
+        </div>
 
         {/* Community Boards Showcase */}
         <LandingCommunityShowcase />

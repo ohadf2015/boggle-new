@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, Plus, X, Wand2, ChevronDown } from 'lucide-react';
+import { Bot, Plus, X, Wand2 } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { cn } from '../lib/utils';
@@ -68,14 +68,11 @@ const BotControls: React.FC<BotControlsProps> = ({
   players = [] as BotControlsPlayer[],
   disabled = false,
   maxPlayers = 8,
-  defaultCollapsed = true,
 }) => {
   const { t } = useLanguage();
   const [addingDifficulty, setAddingDifficulty] = useState<BotDifficulty | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState<string>('');
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
-
   const bots = players.filter(p => p.isBot === true);
   const playerCount = players.length;
   const canAddMore = playerCount < maxPlayers;
@@ -141,8 +138,6 @@ const BotControls: React.FC<BotControlsProps> = ({
   const handleAddBot = useCallback((difficulty: BotDifficulty): void => {
     if (!socket || !canAddMore || addingDifficulty || disabled) return;
 
-    // Auto-expand when adding bots
-    setIsCollapsed(false);
     setAddingDifficulty(difficulty);
     setError(null);
     socket.emit('addBot', { difficulty });
@@ -150,55 +145,30 @@ const BotControls: React.FC<BotControlsProps> = ({
     setTimeout(() => setAddingDifficulty(null), 3000);
   }, [socket, canAddMore, addingDifficulty, disabled]);
 
-  // Auto-expand when auto-fill is enabled
-  useEffect(() => {
-    if (autoFillEnabled) {
-      setIsCollapsed(false);
-    }
-  }, [autoFillEnabled]);
-
   const getDifficultyConfig = (difficulty: BotDifficulty | undefined): BotDifficultyOption => {
     return BOT_DIFFICULTIES.find(d => d.value === difficulty) || BOT_DIFFICULTIES[1];
   };
 
   return (
-    <div className="space-y-3">
+    <div className="bg-neo-navy-light text-neo-cream p-4 rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden space-y-3">
+      <div className="absolute inset-0 bg-gradient-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
+
       {/* Screen reader announcements */}
       <div role="status" aria-live="polite" className="sr-only">
         {announcement}
       </div>
 
-      {/* Collapsible Header */}
-      <button
-        type="button"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-neo-cream uppercase border-2 border-neo-cream/30 bg-transparent hover:bg-white/5 transition-all"
-        aria-expanded={!isCollapsed}
-      >
-        <div className="flex items-center gap-2">
-          <Bot className="text-neo-cyan" aria-hidden="true" />
-          <span>{t('bots.title')}</span>
-          {bots.length > 0 && (
-            <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
-              {bots.length}
-            </Badge>
-          )}
-        </div>
-        <motion.div animate={{ rotate: isCollapsed ? 0 : 180 }} transition={{ duration: 0.2 }}>
-          <ChevronDown className="text-neo-cream/70" />
-        </motion.div>
-      </button>
+      {/* Header - always visible */}
+      <div className="relative flex items-center gap-2">
+        <Bot className="text-neo-cyan" aria-hidden="true" />
+        <span className="text-sm font-bold text-neo-cream uppercase">{t('bots.title')}</span>
+        {bots.length > 0 && (
+          <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
+            {bots.length}
+          </Badge>
+        )}
+      </div>
 
-      {/* Collapsible Content */}
-      <AnimatePresence>
-        {!isCollapsed && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden space-y-3"
-          >
       {/* Error Message */}
       <AnimatePresence>
         {error && (
@@ -215,8 +185,8 @@ const BotControls: React.FC<BotControlsProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Auto-fill Card - Promoted to top */}
-      <div className="bg-neo-pink/10 text-white border-2 border-neo-pink rounded-neo p-3 shadow-hard-sm">
+      {/* Auto-fill Card */}
+      <div className="relative bg-neo-pink/10 text-white border-2 border-neo-pink rounded-neo p-3 shadow-hard-sm">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <Wand2 className="text-neo-pink shrink-0" aria-hidden="true" />
@@ -243,7 +213,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       </div>
 
       {/* Manual Add Section */}
-      <div className="space-y-2">
+      <div className="relative space-y-2">
         <p className="text-xs text-neo-cream/60">
           {t('bots.orAddManually')}
         </p>
@@ -288,7 +258,7 @@ const BotControls: React.FC<BotControlsProps> = ({
 
       {/* Current Bots List */}
       {bots.length > 0 && (
-        <div className="space-y-2">
+        <div className="relative space-y-2">
           <p className="text-xs text-neo-cream/60">
             {t('bots.currentBots')}
           </p>
@@ -354,15 +324,12 @@ const BotControls: React.FC<BotControlsProps> = ({
 
       {/* Empty State */}
       {bots.length === 0 && !autoFillEnabled && (
-        <div className="text-center py-2">
+        <div className="relative text-center py-2">
           <p className="text-sm text-neo-cream/50">
             {t('bots.emptyState')}
           </p>
         </div>
       )}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

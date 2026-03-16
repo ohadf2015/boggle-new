@@ -56,6 +56,12 @@ jest.mock('lucide-react', () => ({
   Swords: () => null,
   Zap: () => null,
   PartyPopper: () => null,
+  Shuffle: () => null,
+  FileText: () => null,
+  Bomb: () => null,
+  Target: () => null,
+  Check: () => null,
+  Wand2: () => null,
 }));
 
 jest.mock('../../components/ui/button', () => ({

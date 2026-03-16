@@ -128,7 +128,7 @@ export default function LevelGrid({
         <RPGLevelCard
           levelNum={level.levelNum}
           stars={level.stars}
-          maxStars={level.isBoss ? 5 : MAX_STARS_PER_LEVEL}
+          maxStars={MAX_STARS_PER_LEVEL}
           isUnlocked={level.isUnlocked}
           isPerfect={level.isPerfect}
           isCurrent={level.isCurrent}

@@ -403,8 +403,17 @@ export function useGridInteraction({
       if (isDraggingRef.current) { isDraggingRef.current = false; handleTouchEnd(); }
       isTouchingRef.current = false;
     };
+    const handleGlobalTouchEnd = () => {
+      if (isTouchingRef.current) handleTouchEnd();
+    };
     window.addEventListener('mouseup', handleMouseUp);
-    return () => window.removeEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchend', handleGlobalTouchEnd);
+    window.addEventListener('touchcancel', handleGlobalTouchEnd);
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchend', handleGlobalTouchEnd);
+      window.removeEventListener('touchcancel', handleGlobalTouchEnd);
+    };
   }, [handleTouchEnd]);
 
   useEffect(() => {

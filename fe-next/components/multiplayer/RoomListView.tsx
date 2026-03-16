@@ -70,7 +70,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
       <div
         dir={dir}
-        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-lg lg:max-w-xl mx-auto"
+        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-lg lg:max-w-xl xl:max-w-5xl mx-auto"
         {...pullToRefreshHandlers}
       >
         <PullToRefreshIndicator
@@ -109,7 +109,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         </motion.header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 flex flex-col px-4 lg:px-6 gap-6 overflow-y-auto pb-10 safe-area-bottom">
+        <div className="flex-1 flex flex-col xl:flex-row px-4 lg:px-6 gap-6 xl:gap-8 overflow-y-auto pb-10 safe-area-bottom xl:items-start">
 
           {/* Quick Play CTA */}
           {onQuickPlay && (
@@ -117,7 +117,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="flex flex-col items-center"
+              className="flex flex-col items-center xl:sticky xl:top-0 xl:w-[340px] xl:flex-shrink-0"
             >
               <motion.button
                 onClick={onQuickPlay}
@@ -156,7 +156,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
-            className="flex flex-col gap-3"
+            className="flex flex-col gap-3 xl:flex-1 xl:min-w-0"
             aria-busy={roomsLoading}
           >
             <div className="flex items-center justify-between">
@@ -188,7 +188,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               </div>
             ) : hasRooms ? (
               <div
-                className="flex flex-col gap-2"
+                className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3"
                 role="list"
                 aria-label={t('multiplayerFlow.roomList.roomsListLabel')}
               >

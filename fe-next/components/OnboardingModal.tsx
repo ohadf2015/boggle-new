@@ -11,8 +11,8 @@ import { useMusic } from '../contexts/MusicContext';
 import { useAuth } from '../contexts/AuthContext';
 import OnboardingProgress from './onboarding/OnboardingProgress';
 import { markOnboardingComplete, markOnboardingSkipped } from '../utils/onboardingStorage';
-import { AVATARS } from '../utils/avatarConfig';
-import { hasCompleteStoredProfile, getStoredProfile } from '../utils/profileStorage';
+import { hasCompleteStoredProfile, getStoredProfile, setStoredCustomAvatar } from '../utils/profileStorage';
+import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { triggerHaptic } from '../utils/hapticFeedback';
 
@@ -28,6 +28,7 @@ interface OnboardingModalProps {
 
 interface FormData {
   avatarId: string;
+  customAvatar: CustomAvatarConfig | null;
   displayName: string;
   selectedMode: 'single' | 'multi' | 'daily' | null;
 }
@@ -61,61 +62,27 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
   const [currentStep, setCurrentStep] = useState(0);
   const [demoCompleted, setDemoCompleted] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    avatarId: '',
-    displayName: profile?.display_name || '',
-    selectedMode: null,
+  const [formData, setFormData] = useState<FormData>(() => {
+    // Priority: (1) stored guest custom avatar, (2) random
+    const storedProfile = getStoredProfile();
+    const initialAvatar = storedProfile.customAvatar ?? getRandomAvatarConfig();
+    return {
+      avatarId: storedProfile.avatarId || '',
+      customAvatar: initialAvatar,
+      displayName: profile?.display_name || storedProfile.username || '',
+      selectedMode: null,
+    };
   });
 
-  // Set avatar and name defaults on mount
-  // Priority: (1) authenticated profile, (2) stored guest profile, (3) random
+  // Sync from authenticated profile on mount
   useEffect(() => {
-    // If authenticated with complete profile, use that data
-    if (isAuthenticated && profile?.avatar_image && profile?.display_name) {
+    if (isAuthenticated && profile?.display_name) {
       setFormData((prev) => ({
         ...prev,
         avatarId: profile.avatar_image || prev.avatarId,
         displayName: profile.display_name || prev.displayName,
       }));
-      return;
     }
-
-    // If guest has stored profile, use that data
-    const storedProfile = getStoredProfile();
-    if (storedProfile.avatarId && storedProfile.username) {
-      setFormData((prev) => ({
-        ...prev,
-        avatarId: storedProfile.avatarId || prev.avatarId,
-        displayName: storedProfile.username || prev.displayName,
-      }));
-      return;
-    }
-
-    // Otherwise, use session storage to prevent re-selection within the same session
-    const sessionKey = 'lexiclash_onboarding_session_avatar';
-    const storedData = sessionStorage.getItem(sessionKey);
-
-    let avatarToUse: typeof AVATARS[0];
-
-    if (storedData) {
-      try {
-        const parsed = JSON.parse(storedData);
-        // Find the stored avatar or fallback to random
-        avatarToUse = AVATARS.find(a => a.id === parsed.avatarId) || AVATARS[Math.floor(Math.random() * AVATARS.length)];
-      } catch {
-        avatarToUse = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-      }
-    } else {
-      // First time in session - pick random and store it
-      avatarToUse = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-      sessionStorage.setItem(sessionKey, JSON.stringify({ avatarId: avatarToUse.id }));
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      avatarId: avatarToUse.id,
-      displayName: prev.displayName || avatarToUse.name,
-    }));
   }, [isAuthenticated, profile?.avatar_image, profile?.display_name]);
 
   // Play bossa music when modal opens (after audio unlock)
@@ -177,9 +144,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
   });
 
   const handleComplete = async () => {
+    // Save custom avatar to localStorage
+    if (formData.customAvatar) {
+      setStoredCustomAvatar(formData.customAvatar);
+    }
+
     // Save to localStorage - always set to single/training mode
     markOnboardingComplete({
-      avatarId: formData.avatarId,
+      avatarId: formData.avatarId || 'custom',
       displayName: formData.displayName,
       selectedMode: 'single', // Always training mode
     });
@@ -187,7 +159,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     // Save to profile if authenticated
     if (profile && formData.displayName.trim()) {
       await updateProfile({
-        avatar_image: formData.avatarId,
+        avatar_image: formData.avatarId || 'custom',
         display_name: formData.displayName.trim(),
       });
     }
@@ -219,10 +191,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         // Step 2: Profile setup - avatar + name combined (skipped for authenticated/stored users)
         return (
           <ProfileSetupStep
-            selectedAvatarId={formData.avatarId}
+            customAvatar={formData.customAvatar ?? getRandomAvatarConfig()}
             displayName={formData.displayName}
-            onAvatarSelect={(avatarId) =>
-              setFormData((prev) => ({ ...prev, avatarId }))
+            onAvatarSelect={(config) =>
+              setFormData((prev) => ({ ...prev, customAvatar: config }))
             }
             onNameChange={(name) =>
               setFormData((prev) => ({ ...prev, displayName: name }))

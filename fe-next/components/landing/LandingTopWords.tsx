@@ -25,7 +25,7 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
   const displayWords = words;
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto xl:max-w-5xl">
       <h3 className="font-black text-neo-white/60 uppercase text-xs sm:text-sm text-center mb-3">
         {t('landing.todaysTopWords')}
       </h3>
@@ -46,10 +46,10 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
                 variants={tileVariants}
                 whileHover={{ y: -4, scale: 1.15, transition: { type: 'spring', stiffness: 500, damping: 10 } }}
                 className={cn(
-                  'w-7 h-8 sm:w-8 sm:h-9 md:w-9 md:h-10',
+                  'w-7 h-8 sm:w-8 sm:h-9 md:w-9 md:h-10 lg:w-10 lg:h-11',
                   'bg-neo-navy border-2 border-neo-black shadow-hard-sm rounded-sm',
                   'flex items-center justify-center cursor-default',
-                  'font-black text-neo-white text-sm sm:text-base md:text-lg',
+                  'font-black text-neo-white text-sm sm:text-base md:text-lg lg:text-xl',
                   'select-none'
                 )}
                 style={{ perspective: 600 }}

@@ -11,6 +11,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface PlayerTooltipData {
+  /** Player UUID — preferred for profile links */
+  id?: string;
   username: string;
   displayName?: string;
   profilePictureUrl?: string | null;
@@ -88,7 +90,7 @@ const PlayerProfileTooltipContent = memo<{
 
       {/* View Profile Link */}
       <Link
-        href={`/${language}/player/${encodeURIComponent(player.username)}`}
+        href={`/${language}/player/${encodeURIComponent(player.id || player.username)}`}
         className={cn(
           'flex items-center justify-center gap-1',
           'text-[11px] font-black uppercase',

@@ -29,17 +29,16 @@ describe('HostPreGameView UX improvements', () => {
     expect(source).not.toContain("t('hostView.battleFeed')");
   });
 
-  it('TV Mode toggle appears outside the advanced settings accordion', () => {
-    // TV Mode should be visible without expanding "Advanced Settings"
-    // broadcastMode was extracted to BattleModeCard — check that file
+  it('TV Mode toggle appears directly in the card (no accordion)', () => {
+    // TV Mode should be visible without expanding any accordion
+    // BattleModeCard no longer has collapsible sections
     const battleModeSource = fs.readFileSync(
       path.join(__dirname, '../host/components/pre-game/BattleModeCard.tsx'),
       'utf-8'
     );
-    const broadcastIdx = battleModeSource.indexOf('broadcastMode');
-    const advancedIdx = battleModeSource.indexOf('showAdvanced &&');
-    expect(broadcastIdx).toBeGreaterThan(-1);
-    expect(advancedIdx).toBeGreaterThan(-1);
-    expect(broadcastIdx).toBeLessThan(advancedIdx);
+    expect(battleModeSource).toContain('broadcastMode');
+    // No "showAdvanced" or "showBattleSettings" collapsible gates
+    expect(battleModeSource).not.toContain('showAdvanced');
+    expect(battleModeSource).not.toContain('showBattleSettings');
   });
 });

@@ -17,6 +17,8 @@ import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import GridCellEffects from './grid/GridCellEffects';
 import EarthquakeEffects from './grid/EarthquakeEffects';
 import InputModeIndicator, { type InputMode } from './grid/InputModeIndicator';
+import DoubleClickIndicator from './grid/DoubleClickIndicator';
+import DragReleaseHint from './grid/DragReleaseHint';
 import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -80,6 +82,8 @@ const GridComponent = memo<GridComponentProps>(({
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
   const gridRef = useRef<HTMLDivElement>(null);
 
+  const [dragSubmitCount, setDragSubmitCount] = useState(0);
+  const prevSelectedLengthRef = useRef(0);
   const [hintAnimationPhase, setHintAnimationPhase] = useState<'blink' | 'fadeout' | null>(null);
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -135,6 +139,14 @@ const GridComponent = memo<GridComponentProps>(({
 
   const formedWord = useMemo(() => selectedCells.map(c => c.letter).join(''), [selectedCells]);
   const selectedCellsLength = useMemo(() => selectedCells.length, [selectedCells]);
+
+  // Track drag submissions (cells went from >1 to 0 = word submitted)
+  useEffect(() => {
+    if (prevSelectedLengthRef.current >= 2 && selectedCellsLength === 0) {
+      setDragSubmitCount(c => c + 1);
+    }
+    prevSelectedLengthRef.current = selectedCellsLength;
+  }, [selectedCellsLength]);
 
   useEffect(() => { onWordChange?.(formedWord, selectedCellsLength); }, [formedWord, selectedCellsLength, onWordChange]);
   useEffect(() => { onSelectionChange?.(selectedCells); }, [selectedCells, onSelectionChange]);
@@ -501,6 +513,11 @@ const GridComponent = memo<GridComponentProps>(({
                       {highlightedOrder}
                     </span>
                   )}
+
+                  {/* Double-click submit hint on last selected cell */}
+                  <DoubleClickIndicator
+                    visible={isLastSelected && isSelecting && !isDragging && selectedCells.length >= 2}
+                  />
                 </motion.div>
               );
             })
@@ -512,7 +529,16 @@ const GridComponent = memo<GridComponentProps>(({
           dust={earthquakeDust}
         />
 
-        {interactive && <InputModeIndicator activeMode={inputMode} />}
+        {interactive && (
+          <>
+            <DragReleaseHint
+              isDragging={isDragging}
+              selectedCellCount={selectedCells.length}
+              wordSubmitted={dragSubmitCount > 0}
+            />
+            <InputModeIndicator activeMode={inputMode} />
+          </>
+        )}
       </motion.div>
     </div>
   );

@@ -1,16 +1,10 @@
 /**
- * Tests for HostPreGameView preset selection functionality
+ * Tests for HostPreGameView game mode selection and default settings.
  *
- * Tests that clicking preset buttons directly applies settings:
- * - Clicking preset applies timer, difficulty, and minWordLength
- * - Default preset (party) is applied on mount
- * - Each preset applies its correct settings
- * - Preset drawer component exists but is not currently wired to open
- *
- * Note: The PresetInfoDrawer component exists in the code but
- * presetInfoOpen is never set to a non-null value, so the drawer
- * never opens. All preset buttons directly apply settings via
- * handleApplyPreset.
+ * - Default "party" preset settings are applied on mount (timer=2, MEDIUM)
+ * - Game mode cards are always visible (no collapsible)
+ * - Default game mode is "random"
+ * - Game mode buttons render for both desktop and mobile
  */
 
 import React from 'react';
@@ -37,12 +31,10 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
-// Mock socket context
 jest.mock('../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),
 }));
 
-// Mock CrazyGames invite hook
 jest.mock('../hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
     showInviteButton: jest.fn(),
@@ -51,62 +43,30 @@ jest.mock('../hooks/useCrazyGamesInvite', () => ({
   }),
 }));
 
-// Mock toast
 jest.mock('react-hot-toast', () => ({
   __esModule: true,
-  default: {
-    success: jest.fn(),
-    error: jest.fn(),
-  },
+  default: { success: jest.fn(), error: jest.fn() },
 }));
 
-// Mock child components
 jest.mock('../components/Avatar', () => {
-  return function MockAvatar() {
-    return <div data-testid="avatar" />;
-  };
+  return function MockAvatar() { return <div data-testid="avatar" />; };
 });
-
 jest.mock('../components/RoomChat', () => {
-  return function MockRoomChat() {
-    return <div data-testid="room-chat" />;
-  };
+  return function MockRoomChat() { return <div data-testid="room-chat" />; };
 });
-
 jest.mock('../components/PresenceIndicator', () => {
-  return function MockPresenceIndicator() {
-    return <div data-testid="presence-indicator" />;
-  };
+  return function MockPresenceIndicator() { return <div data-testid="presence-indicator" />; };
 });
-
 jest.mock('../components/BotControls', () => {
-  return function MockBotControls() {
-    return <div data-testid="bot-controls" />;
-  };
+  return function MockBotControls() { return <div data-testid="bot-controls" />; };
 });
-
-// Mock MobileDrawer
 jest.mock('@/components/layout/MobileDrawer', () => ({
-  MobileDrawer: ({ isOpen, onClose, title, children }: {
-    isOpen: boolean;
-    onClose: () => void;
-    title: string;
-    children: React.ReactNode;
-  }) => isOpen ? (
-    <div data-testid="mobile-drawer">
-      <div data-testid="drawer-backdrop" onClick={onClose} />
-      <div data-testid="drawer-title">{title}</div>
-      <div data-testid="drawer-content">{children}</div>
-    </div>
-  ) : null,
+  MobileDrawer: ({ isOpen, children }: { isOpen: boolean; children: React.ReactNode }) =>
+    isOpen ? <div data-testid="mobile-drawer">{children}</div> : null,
 }));
-
-// Mock cn utility
 jest.mock('../lib/utils', () => ({
   cn: (...classes: (string | undefined | boolean)[]) => classes.filter(Boolean).join(' '),
 }));
-
-// Mock TvTutorialOverlay to avoid UI library dependency issues in tests
 jest.mock('../host/components/tv-broadcast/TvTutorialOverlay', () => ({
   __esModule: true,
   default: () => null,
@@ -114,46 +74,23 @@ jest.mock('../host/components/tv-broadcast/TvTutorialOverlay', () => ({
   TvHelpButton: () => null,
 }));
 
-// Translation mock with preset-related keys
-const mockTranslations: Record<string, string> = {
-  'hostView.presetFast': 'Quick',
-  'hostView.presetFastDesc': '1 min fast game',
-  'hostView.presetFastDetails': 'Perfect for quick rounds!',
-  'hostView.presetParty': 'Party',
-  'hostView.presetPartyDesc': '2 min party mode',
-  'hostView.presetPartyDetails': 'The classic party experience!',
-  'hostView.presetChallenge': 'Challenge',
-  'hostView.presetChallengeDesc': '3 min hard mode',
-  'hostView.presetChallengeDetails': 'For serious word hunters!',
-  'hostView.presetDrawerTimer': 'Timer',
-  'hostView.presetDrawerBoard': 'Board Size',
-  'hostView.presetDrawerMinWord': 'Min Word Length',
-  'hostView.presetDrawerUseMode': 'Use This Mode',
-  'hostView.presetDrawerBoardMedium': '7×7 (Medium)',
-  'hostView.presetDrawerBoardHard': '9×9 (Hard)',
-  'hostView.presetDrawerLetters': 'letters',
-  'hostView.startGame': 'Start Game',
-  'hostView.lobby': 'Lobby',
-  'hostView.chat': 'Chat',
-  'hostView.playersJoined': 'Players Joined',
-  'hostView.waitingForPlayers': 'Waiting for players...',
-  'hostView.broadcastModeTitle': 'TV Mode',
-  'common.settings': 'Settings',
-  'common.advancedSettings': 'More Options',
-  'roomCode.copied': 'Copied!',
-  'common.error': 'Error',
-  'playerView.me': 'You',
-  'hostView.battleMode': 'Battle Mode',
-  'hostView.preset': 'Preset',
-  'hostView.playersInRoom': 'Players in Room',
-  'hostView.noOneYet': 'No one yet',
-  'hostView.startingWithBots': 'Starting with bots in {seconds}s...',
-  'hostView.shareCodeHint': 'Share the room code above so friends can join!',
-  'hostView.inviteFriends': 'Invite Friends',
-  'common.minutes': 'MIN',
+const mockT = (key: string) => {
+  const translations: Record<string, string> = {
+    'gameModes.random': 'Random',
+    'gameModes.randomizing': 'Surprise!',
+    'gameModes.classic.name': 'Classic',
+    'gameModes.classic.description': 'Find as many words as you can!',
+    'gameModes.blast.name': 'Blast',
+    'gameModes.blast.description': 'Clear tiles with combos!',
+    'gameModes.wordHunt.name': 'Word Hunt',
+    'gameModes.wordHunt.description': 'Race to find the target word!',
+    'gameModes.nextMode': 'Game Mode',
+    'hostView.broadcastModeTitle': 'TV Mode',
+    'hostView.battleMode': 'Battle Mode',
+    'common.minutes': 'MIN',
+  };
+  return translations[key] || key;
 };
-
-const mockT = (key: string) => mockTranslations[key] || key;
 
 const defaultProps = {
   gameCode: 'ABC123',
@@ -187,16 +124,16 @@ const defaultProps = {
   tournamentCreating: false,
 };
 
-// Helper: Battle Mode card is collapsed by default (progressive disclosure).
-// Tests that interact with preset buttons must expand it first.
-const expandBattleModeCard = () => {
-  // Both desktop and mobile layouts render the Battle Mode card.
-  // Click only the first one to toggle showBattleSettings to true.
-  const battleModeButtons = screen.getAllByRole('button', { name: /battle mode/i });
-  fireEvent.click(battleModeButtons[0]);
-};
+jest.mock('@/hooks/gameState', () => ({
+  useGameMode: () => null,
+  useGameActions: () => ({ setGameMode: jest.fn() }),
+}));
 
-describe('HostPreGameView Preset Selection', () => {
+jest.mock('@/components/ui/DJMascot', () => ({
+  DJMascotWithEntrance: () => null,
+}));
+
+describe('HostPreGameView Game Mode Selection', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -215,7 +152,6 @@ describe('HostPreGameView Preset Selection', () => {
       />
     );
 
-    // Default preset (party) should be applied on mount
     await waitFor(() => {
       expect(setTimerValue).toHaveBeenCalledWith(2);
       expect(setDifficulty).toHaveBeenCalledWith('MEDIUM');
@@ -223,174 +159,28 @@ describe('HostPreGameView Preset Selection', () => {
     });
   });
 
-  it('directly applies Quick preset settings when clicking Quick button', async () => {
-    const setTimerValue = jest.fn();
-    const setDifficulty = jest.fn();
-    const setMinWordLength = jest.fn();
-
-    render(
-      <HostPreGameView
-        {...defaultProps}
-        setTimerValue={setTimerValue}
-        setDifficulty={setDifficulty}
-        setMinWordLength={setMinWordLength}
-      />
-    );
-
-    // Wait for initial mount to complete
-    await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(2); // party default
-    });
-
-    jest.clearAllMocks();
-
-    // Expand Battle Mode card to reveal preset buttons
-    expandBattleModeCard();
-
-    // Click a Quick preset button (both desktop and mobile buttons directly apply)
-    const quickButtons = screen.getAllByRole('button', { name: /quick/i });
-    fireEvent.click(quickButtons[0]);
-
-    // Quick preset: 1 min timer, MEDIUM difficulty, 2 min word length
-    await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(1);
-      expect(setDifficulty).toHaveBeenCalledWith('MEDIUM');
-      expect(setMinWordLength).toHaveBeenCalledWith(2);
-    });
-  });
-
-  it('directly applies Challenge preset settings when clicking Challenge button', async () => {
-    const setTimerValue = jest.fn();
-    const setDifficulty = jest.fn();
-    const setMinWordLength = jest.fn();
-
-    render(
-      <HostPreGameView
-        {...defaultProps}
-        setTimerValue={setTimerValue}
-        setDifficulty={setDifficulty}
-        setMinWordLength={setMinWordLength}
-      />
-    );
-
-    // Wait for initial mount
-    await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(2);
-    });
-
-    jest.clearAllMocks();
-
-    // Expand Battle Mode card to reveal preset buttons
-    expandBattleModeCard();
-
-    // Click a Challenge preset button
-    const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
-    fireEvent.click(challengeButtons[0]);
-
-    // Challenge preset: 2 min timer, HARD difficulty, 2 min word length
-    await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(2);
-      expect(setDifficulty).toHaveBeenCalledWith('HARD');
-      expect(setMinWordLength).toHaveBeenCalledWith(2);
-    });
-  });
-
-  it('directly applies Party preset settings when clicking Party button', async () => {
-    const setTimerValue = jest.fn();
-    const setDifficulty = jest.fn();
-    const setMinWordLength = jest.fn();
-
-    render(
-      <HostPreGameView
-        {...defaultProps}
-        setTimerValue={setTimerValue}
-        setDifficulty={setDifficulty}
-        setMinWordLength={setMinWordLength}
-      />
-    );
-
-    // Wait for initial mount
-    await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(2);
-    });
-
-    jest.clearAllMocks();
-
-    // Expand Battle Mode card to reveal preset buttons
-    expandBattleModeCard();
-
-    // Click a Party preset button (skip toggle buttons that also contain "Party" in their name)
-    const partyButtons = screen.getAllByRole('button', { name: /party/i })
-      .filter(btn => !btn.textContent?.includes('Battle Mode'));
-    fireEvent.click(partyButtons[0]);
-
-    // Party preset: 2 min timer, MEDIUM difficulty, 2 min word length
-    await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(2);
-      expect(setDifficulty).toHaveBeenCalledWith('MEDIUM');
-      expect(setMinWordLength).toHaveBeenCalledWith(2);
-    });
-  });
-
-  it('does not open preset drawer (drawer is not wired to open)', async () => {
+  it('renders game mode buttons visible without needing to expand', () => {
     render(<HostPreGameView {...defaultProps} />);
 
-    // Expand Battle Mode card to reveal preset buttons
-    expandBattleModeCard();
-
-    // Click any preset button
-    const quickButtons = screen.getAllByRole('button', { name: /quick/i });
-    fireEvent.click(quickButtons[0]);
-
-    // Drawer should NOT be visible since presetInfoOpen is never set to non-null
-    expect(screen.queryByTestId('mobile-drawer')).not.toBeInTheDocument();
+    // Game mode cards should be visible immediately (no collapse)
+    const gameModeButtons = screen.getAllByTestId(/^game-mode-/);
+    expect(gameModeButtons.length).toBeGreaterThanOrEqual(4); // random, classic, blast, word-hunt (×2 for mobile+desktop)
   });
 
-  it('renders preset buttons in both desktop and mobile layouts', () => {
+  it('renders bot controls visible without needing to expand', () => {
     render(<HostPreGameView {...defaultProps} />);
 
-    // Expand Battle Mode card to reveal preset buttons
-    expandBattleModeCard();
-
-    // Both desktop and mobile layouts should have preset buttons
-    // Desktop is in hidden lg:block div, mobile is in lg:hidden div
-    // In jsdom, CSS is not applied, so both are rendered
-    const quickButtons = screen.getAllByRole('button', { name: /quick/i });
-    const partyButtons = screen.getAllByRole('button', { name: /party/i });
-    const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
-
-    // Each preset button renders (consolidated into single responsive layout)
-    expect(quickButtons.length).toBeGreaterThanOrEqual(1);
-    expect(partyButtons.length).toBeGreaterThanOrEqual(1);
-    expect(challengeButtons.length).toBeGreaterThanOrEqual(1);
+    // Bot controls should be visible immediately
+    const botControls = screen.getAllByTestId('bot-controls');
+    expect(botControls.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('applies preset settings immediately on click (no intermediate step)', async () => {
-    const setTimerValue = jest.fn();
+  it('game mode buttons are clickable', () => {
+    render(<HostPreGameView {...defaultProps} />);
 
-    render(
-      <HostPreGameView
-        {...defaultProps}
-        setTimerValue={setTimerValue}
-      />
-    );
+    const blastButtons = screen.getAllByTestId('game-mode-blast');
+    fireEvent.click(blastButtons[0]);
 
-    // Wait for initial useEffect to run (party preset initialization)
-    await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(2); // party preset timer
-    });
-
-    const initialCallCount = setTimerValue.mock.calls.length;
-
-    // Expand Battle Mode card to reveal preset buttons
-    expandBattleModeCard();
-
-    // Click a Quick preset button
-    const quickButtons = screen.getAllByRole('button', { name: /quick/i });
-    fireEvent.click(quickButtons[0]);
-
-    // setTimerValue should have been called again immediately (no drawer step)
-    expect(setTimerValue).toHaveBeenCalledTimes(initialCallCount + 1);
-    expect(setTimerValue).toHaveBeenLastCalledWith(1); // Quick = 1 min
+    // Should not throw — mode selection is handled via state
   });
 });

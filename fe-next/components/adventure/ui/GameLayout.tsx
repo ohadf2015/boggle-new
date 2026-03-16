@@ -61,47 +61,46 @@ export const GameLayout = memo(function GameLayout({
         the @media (orientation: landscape) query.
       */}
       <div className="flex-1 min-h-0 flex flex-col landscape:flex-row lg:flex-row relative">
-        {/* Grid Area - Main gameplay space, takes priority */}
-        <div className="flex-1 min-h-0 relative overflow-hidden">
-          {gridArea}
+        {/*
+          Sidebar — on portrait mobile/tablet it sits ABOVE the grid so
+          objectives are always visible (not clipped below).
+          On landscape/desktop it stays as a right column.
+        */}
+        <div
+          className={cn(
+            'flex-shrink-0',
+            // Portrait: compact bar above grid (visible objectives)
+            'h-16 md:h-20',
+            // Landscape / desktop: full-height column to the right (order-last)
+            'landscape:h-full landscape:w-64 landscape:order-last',
+            'lg:h-full lg:w-80 xl:w-96 lg:order-last',
+            'overflow-x-auto overflow-y-hidden landscape:overflow-y-auto landscape:overflow-x-hidden',
+            'lg:overflow-y-auto lg:overflow-x-hidden',
+            'bg-neo-black/20 landscape:bg-neo-black/30 lg:bg-neo-black/30',
+            'z-10'
+          )}
+        >
+          {sidebar}
         </div>
 
         {/*
-          Gradient divider — portrait: horizontal rule above sidebar chip bar;
+          Gradient divider — portrait: horizontal rule below sidebar chip bar;
           landscape/desktop: vertical rule between grid and sidebar column.
         */}
         <div
           className={cn(
             'flex-shrink-0 pointer-events-none',
-            // Portrait: thin horizontal line
             'h-px w-full',
             'bg-gradient-to-r from-transparent via-neo-white/20 to-transparent',
-            // Landscape / desktop: thin vertical line
             'landscape:h-full landscape:w-px landscape:bg-gradient-to-b',
             'lg:h-full lg:w-px lg:bg-gradient-to-b'
           )}
           aria-hidden="true"
         />
 
-        {/* Sidebar
-            - Portrait mobile:  h-16 (64px) compact chip bar
-            - Portrait tablet:  h-20 (80px) slightly taller
-            - Landscape mobile: full height, w-56 column (mirrors desktop)
-            - Desktop (lg+):    full height, w-64 / xl:w-72
-        */}
-        <div
-          className={cn(
-            'flex-shrink-0',
-            'h-16 md:h-20',
-            'landscape:h-full landscape:w-64',
-            'lg:h-full lg:w-80 xl:w-96',
-            'overflow-hidden lg:overflow-y-auto',
-            // Subtle background treatment to separate sidebar from grid
-            'bg-neo-black/20 landscape:bg-neo-black/30 lg:bg-neo-black/30',
-            'z-10'
-          )}
-        >
-          {sidebar}
+        {/* Grid Area - Main gameplay space, takes remaining height */}
+        <div className="flex-1 min-h-0 relative overflow-hidden">
+          {gridArea}
         </div>
       </div>
 

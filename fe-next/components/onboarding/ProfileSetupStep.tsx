@@ -1,27 +1,27 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { Check, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AVATARS, getAvatarPath, getAvatarById } from '@/utils/avatarConfig';
+import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
 import { cn } from '@/lib/utils';
 
 interface ProfileSetupStepProps {
-  selectedAvatarId: string;
+  customAvatar: CustomAvatarConfig;
   displayName: string;
-  onAvatarSelect: (avatarId: string) => void;
+  onAvatarSelect: (config: CustomAvatarConfig) => void;
   onNameChange: (name: string) => void;
   deferred?: boolean;
 }
 
 /**
- * ProfileSetupStep - Combined avatar selection and name input
- * Avatar picker comes first - selecting an avatar auto-fills the name
+ * ProfileSetupStep - Avatar builder + name input
+ * Clicking the avatar opens the full AvatarBuilderModal
  */
 const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
-  selectedAvatarId,
+  customAvatar,
   displayName,
   onAvatarSelect,
   onNameChange,
@@ -29,36 +29,6 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
 }) => {
   const { t } = useLanguage();
   const [nameTouched, setNameTouched] = useState(false);
-  const [hasManuallyEditedName, setHasManuallyEditedName] = useState(false);
-
-  // Check if current name is a default avatar name
-  const isDefaultAvatarName = (name: string): boolean => {
-    return AVATARS.some(avatar => avatar.name === name);
-  };
-
-  // Auto-fill name from avatar on initial load (if name is empty)
-  useEffect(() => {
-    if (!displayName && selectedAvatarId && !hasManuallyEditedName) {
-      const avatar = getAvatarById(selectedAvatarId);
-      if (avatar) {
-        onNameChange(avatar.name);
-      }
-    }
-  }, [selectedAvatarId, displayName, hasManuallyEditedName, onNameChange]);
-
-  // Handle avatar selection - auto-fill name if not manually edited OR if current name is a default avatar name
-  const handleAvatarSelect = (avatarId: string) => {
-    onAvatarSelect(avatarId);
-    // Update name if user hasn't manually edited OR if current name is a default avatar name
-    if (!hasManuallyEditedName || isDefaultAvatarName(displayName)) {
-      const avatar = getAvatarById(avatarId);
-      if (avatar) {
-        onNameChange(avatar.name);
-        // Reset manual edit flag since we're using a default name
-        setHasManuallyEditedName(false);
-      }
-    }
-  };
 
   // Name validation
   const minLength = 2;
@@ -74,8 +44,6 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
     if (displayName.length > maxLength) return t('onboarding.name.errorTooLong');
     return '';
   };
-
-  const selectedAvatar = AVATARS.find((a) => a.id === selectedAvatarId) || AVATARS[0];
 
   // Deferred mode: gentle prompt after first game
   if (deferred) {
@@ -113,81 +81,24 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
         </p>
       </motion.div>
 
-      {/* Avatar grid - FIRST (pick your character) */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
-        className="w-full"
-      >
-        <div className="grid grid-cols-6 sm:grid-cols-6 gap-1.5 sm:gap-2">
-          {AVATARS.map((avatar, index) => {
-            const isSelected = avatar.id === selectedAvatarId;
-
-            return (
-              <motion.button
-                key={avatar.id}
-                onClick={() => handleAvatarSelect(avatar.id)}
-                className={cn(
-                  'relative aspect-square rounded-neo border-2 overflow-hidden',
-                  'transition-all hover:scale-105 active:scale-95',
-                  'min-h-[40px] min-w-[40px]',
-                  isSelected
-                    ? 'border-neo-cyan shadow-hard-sm scale-105 ring-2 ring-neo-pink'
-                    : 'border-neo-black shadow-hard-sm hover:shadow-hard-md'
-                )}
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.2 + index * 0.015, type: 'spring', stiffness: 500, damping: 28 }}
-                whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Image
-                  src={getAvatarPath(avatar)}
-                  alt={avatar.name}
-                  fill
-                  className="object-cover"
-                />
-
-                {/* Selected indicator */}
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                    className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center"
-                  >
-                    <div className="bg-neo-pink text-white border-2 border-neo-black rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-black text-[10px] shadow-hard-sm">
-                      ✓
-                    </div>
-                  </motion.div>
-                )}
-              </motion.button>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* Selected avatar preview + Name input row - SECOND */}
+      {/* Avatar builder button + Name input */}
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
+        transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full bg-neo-cream border-3 border-neo-black rounded-neo p-3 sm:p-4 shadow-hard-md"
       >
         <div className="flex items-start gap-3 sm:gap-4">
-          {/* Avatar preview */}
+          {/* Avatar preview — tap to open builder */}
           <div className="flex flex-col items-center gap-2 shrink-0">
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm bg-neo-lime text-neo-black">
-              <Image
-                src={getAvatarPath(selectedAvatar)}
-                alt={selectedAvatar.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="text-[10px] sm:text-xs text-neo-black/60 text-center max-w-[80px] truncate">
-              {selectedAvatar.name}
+            <AvatarSelectorButton
+              selectedAvatar={customAvatar}
+              onAvatarSelect={onAvatarSelect}
+              t={t}
+              size="lg"
+            />
+            <div className="text-[10px] sm:text-xs text-neo-black/60 text-center">
+              {t('onboarding.profile.tapToCustomize', 'Tap to customize')}
             </div>
           </div>
 
@@ -199,7 +110,6 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
                 value={displayName}
                 onChange={(e) => {
                   setNameTouched(true);
-                  setHasManuallyEditedName(true);
                   onNameChange(e.target.value);
                 }}
                 onBlur={() => setNameTouched(true)}

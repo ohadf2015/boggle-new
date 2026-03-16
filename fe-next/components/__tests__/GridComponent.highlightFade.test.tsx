@@ -36,6 +36,15 @@ jest.mock('@/contexts/LanguageContext', () => ({
     language: 'en',
     dir: 'ltr',
   }),
+  useLanguageSafe: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
+jest.mock('@/hooks/useMediaQuery', () => ({
+  useIsDesktop: () => true,
 }));
 
 jest.mock('@/contexts/AccessibilityContext', () => ({

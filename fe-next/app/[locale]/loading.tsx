@@ -31,7 +31,7 @@ export default function Loading() {
       </header>
 
       {/* Main content */}
-      <main className="w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 flex flex-col px-2 sm:px-3 lg:px-6 xl:px-8 py-3 sm:py-5 lg:py-8 gap-6 sm:gap-8">
+      <div className="w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 flex flex-col px-2 sm:px-3 lg:px-6 xl:px-8 py-3 sm:py-5 lg:py-8 gap-6 sm:gap-8">
 
         {/* Hero section */}
         <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
@@ -103,7 +103,7 @@ export default function Loading() {
             <ModeCardSkeleton color="neo-purple" secondary />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

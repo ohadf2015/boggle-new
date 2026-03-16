@@ -120,6 +120,7 @@ const ParticipantRow = memo<{
         <div className="flex items-center gap-1.5 flex-wrap">
           <PlayerProfileTooltip
             player={{
+              id: participant.player_id ?? undefined,
               username: participant.display_name || 'Player',
               profilePictureUrl: participant.profile_picture_url,
               avatarImage: participant.avatar_image ?? undefined,

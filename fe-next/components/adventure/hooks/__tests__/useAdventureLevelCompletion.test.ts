@@ -168,7 +168,7 @@ describe('useAdventureLevelCompletion', () => {
   });
 
   describe('victory/defeat detection', () => {
-    it('should trigger victory cinematic when stars > 0', () => {
+    it('should skip cinematics for non-boss levels and just pause', () => {
       renderHook(() =>
         useAdventureLevelCompletion({
           ...defaultProps,
@@ -176,11 +176,13 @@ describe('useAdventureLevelCompletion', () => {
         })
       );
 
-      expect(mockShowVictory).toHaveBeenCalled();
+      // Non-boss levels skip cinematics — go straight to level complete
+      expect(mockShowVictory).not.toHaveBeenCalled();
+      expect(mockShowDefeat).not.toHaveBeenCalled();
       expect(mockPauseGame).toHaveBeenCalled();
     });
 
-    it('should trigger defeat cinematic when time runs out with 0 stars', () => {
+    it('should skip cinematics on defeat for non-boss levels', () => {
       renderHook(() =>
         useAdventureLevelCompletion({
           ...defaultProps,
@@ -189,7 +191,8 @@ describe('useAdventureLevelCompletion', () => {
         })
       );
 
-      expect(mockShowDefeat).toHaveBeenCalled();
+      expect(mockShowVictory).not.toHaveBeenCalled();
+      expect(mockShowDefeat).not.toHaveBeenCalled();
       expect(mockPauseGame).toHaveBeenCalled();
     });
 

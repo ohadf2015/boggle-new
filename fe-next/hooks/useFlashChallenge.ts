@@ -19,6 +19,7 @@ interface UseFlashChallengeProps {
 interface UseFlashChallengeReturn {
   activeChallenge: FlashChallenge | null;
   isChallengeComplete: boolean;
+  isChallengeFailed: boolean;
   challengeTimeLeft: number;
   dismiss: () => void;
 }
@@ -53,7 +54,9 @@ export function useFlashChallenge({
 }: UseFlashChallengeProps): UseFlashChallengeReturn {
   const [activeChallenge, setActiveChallenge] = useState<FlashChallenge | null>(null);
   const [isChallengeComplete, setIsChallengeComplete] = useState(false);
+  const [isChallengeFailed, setIsChallengeFailed] = useState(false);
   const [challengeTimeLeft, setChallengeTimeLeft] = useState(0);
+  const failedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasTriggered = useRef(false);
   const challengeStartWords = useRef<string[]>([]);
   const challengeStartTime = useRef<number>(0);
@@ -93,8 +96,12 @@ export function useFlashChallenge({
       const remaining = Math.max(0, activeChallenge.durationSeconds - elapsed);
       setChallengeTimeLeft(Math.ceil(remaining));
       if (remaining <= 0) {
-        setActiveChallenge(null);
+        setIsChallengeFailed(true);
         clearInterval(interval);
+        failedTimerRef.current = setTimeout(() => {
+          setActiveChallenge(null);
+          setIsChallengeFailed(false);
+        }, 1500);
       }
     }, 200);
     return () => clearInterval(interval);
@@ -162,11 +169,23 @@ export function useFlashChallenge({
     if (complete) setIsChallengeComplete(true);
   }, [wordsFound, activeChallenge, isChallengeComplete]);
 
+  // Cleanup failed timer on unmount
+  useEffect(() => {
+    return () => {
+      if (failedTimerRef.current) clearTimeout(failedTimerRef.current);
+    };
+  }, []);
+
   const dismiss = useCallback(() => {
+    if (failedTimerRef.current) {
+      clearTimeout(failedTimerRef.current);
+      failedTimerRef.current = null;
+    }
     setActiveChallenge(null);
     setIsChallengeComplete(false);
+    setIsChallengeFailed(false);
     setChallengeTimeLeft(0);
   }, []);
 
-  return { activeChallenge, isChallengeComplete, challengeTimeLeft, dismiss };
+  return { activeChallenge, isChallengeComplete, isChallengeFailed, challengeTimeLeft, dismiss };
 }

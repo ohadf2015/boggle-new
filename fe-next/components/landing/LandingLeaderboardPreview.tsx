@@ -103,6 +103,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               />
               <PlayerProfileTooltip
                 player={{
+                  id: player.id,
                   username: player.username,
                   displayName: player.displayName ?? undefined,
                   profilePictureUrl: player.profilePictureUrl,

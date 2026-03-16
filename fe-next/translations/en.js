@@ -1350,7 +1350,8 @@ const en = {
       "title": "Suit Up!",
       "subtitle": "Pick your look and name",
       "deferredTitle": "Save your progress?",
-      "deferredSubtitle": "Set up your profile to keep your stats!"
+      "deferredSubtitle": "Set up your profile to keep your stats!",
+      "tapToCustomize": "Tap to customize"
     },
     "quickTips": {
       "title": "Pro Tips",
@@ -4302,6 +4303,14 @@ const en = {
   "desktopHint": {
     "tip": "Tip: You can also click tiles or just type!"
   },
+  "desktopInput": {
+    "placeholder": "Type a word...",
+    "ariaLabel": "Type a word to submit",
+    "submit": "Submit word",
+    "hint": "Type letters to find words · Enter to submit · Esc to clear",
+    "doubleClick": "2×click",
+    "releaseToSubmit": "Release to submit"
+  },
   "keyboardLanguageMismatch": "Please switch to {language} keyboard to match the board language",
   "enterKeyHint": {
     "pressEnter": "Press Enter to submit"
@@ -5418,6 +5427,7 @@ const en = {
     "levelComplete": "Level Complete!",
     "starsEarned": "Stars Earned",
     "continueToNext": "Continue",
+    "nextWorld": "Next World",
     "retryLevel": "Retry",
     "loadError": "Failed to load progress",
     "cinematics": {
@@ -5500,7 +5510,14 @@ const en = {
       "start": "Start Level",
       "back": "Back",
       "bestAttempt": "Your Best",
-      "notAttempted": "Not attempted yet"
+      "notAttempted": "Not attempted yet",
+      "stars": {
+        "title": "Star Requirements",
+        "oneStar": "Complete main objective",
+        "twoStars": "Complete main + 1 bonus objective",
+        "threeStars": "Complete all objectives",
+        "threeStarsPartial": "Complete main + {{count}} bonus objectives"
+      }
     },
     "tiles": {
       "gold": "Gold (3x points)",
@@ -5554,7 +5571,8 @@ const en = {
       "levelUp": "Level Up!",
       "newLevel": "You reached level",
       "continue": "Continue",
-      "maxLevel": "MAX LEVEL!"
+      "maxLevel": "MAX LEVEL!",
+      "progress": "XP Progress"
     },
     "powerUps": {
       "freezeTime": "Freeze Time",
@@ -6156,7 +6174,8 @@ const en = {
         "palindrome": "Find a palindrome ({param}+ letters)",
         "exactLength": "Find a {param}-letter word exactly",
         "useGoldTile": "Use a gold tile in a word",
-        "complete": "Complete!"
+        "complete": "Complete!",
+        "missed": "Missed!"
       },
       "chapter": {
         "panelTitle": "Chapter Quests",

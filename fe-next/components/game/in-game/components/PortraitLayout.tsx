@@ -8,6 +8,7 @@ import { Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
+import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import CircularTimer from '@/components/CircularTimer';
 import RoomChat from '@/components/RoomChat';
 import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
@@ -528,6 +529,14 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 />
               )}
             </div>
+
+            {/* Desktop word input - visible typing field */}
+            <DesktopWordInput
+              grid={letterGrid}
+              language={gameLanguage}
+              enabled={isPlaying && !showStartAnimation}
+              onWordSubmit={onWordSubmit}
+            />
 
             {/* Desktop keyboard input hint - appears below grid */}
             {isPlaying && isDesktop && (

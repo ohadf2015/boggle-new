@@ -21,12 +21,12 @@ jest.mock('framer-motion', () => ({
 
 describe('SettingsPanel', () => {
   const mockT = (key: string) => key;
-  const mockOnPresetClick = jest.fn();
+  const mockOnGameModeClick = jest.fn();
   const mockOnTvModeToggle = jest.fn();
 
   const defaultProps = {
-    selectedPreset: 'party' as const,
-    onPresetClick: mockOnPresetClick,
+    selectedGameMode: 'random' as const,
+    onGameModeClick: mockOnGameModeClick,
     tvMode: false,
     onTvModeToggle: mockOnTvModeToggle,
     t: mockT,
@@ -42,27 +42,27 @@ describe('SettingsPanel', () => {
     expect(screen.getByTestId('settings-panel')).toBeInTheDocument();
   });
 
-  it('should render all three preset options', () => {
+  it('should render all four game mode options', () => {
     render(<SettingsPanel {...defaultProps} />);
 
-    expect(screen.getByTestId('preset-fast')).toBeInTheDocument();
-    expect(screen.getByTestId('preset-party')).toBeInTheDocument();
-    expect(screen.getByTestId('preset-challenge')).toBeInTheDocument();
+    expect(screen.getByTestId('game-mode-random')).toBeInTheDocument();
+    expect(screen.getByTestId('game-mode-classic')).toBeInTheDocument();
+    expect(screen.getByTestId('game-mode-blast')).toBeInTheDocument();
+    expect(screen.getByTestId('game-mode-word-hunt')).toBeInTheDocument();
   });
 
-  it('should highlight the selected preset', () => {
-    render(<SettingsPanel {...defaultProps} selectedPreset="fast" />);
+  it('should highlight the selected game mode', () => {
+    render(<SettingsPanel {...defaultProps} selectedGameMode="classic" />);
 
-    const fastPreset = screen.getByTestId('preset-fast');
-    // Check if it has some kind of selected styling
-    expect(fastPreset).toHaveAttribute('data-selected', 'true');
+    const classicMode = screen.getByTestId('game-mode-classic');
+    expect(classicMode).toHaveAttribute('data-selected', 'true');
   });
 
-  it('should call onPresetClick when a preset is clicked', () => {
+  it('should call onGameModeClick when a mode is clicked', () => {
     render(<SettingsPanel {...defaultProps} />);
 
-    fireEvent.click(screen.getByTestId('preset-fast'));
-    expect(mockOnPresetClick).toHaveBeenCalledWith('fast');
+    fireEvent.click(screen.getByTestId('game-mode-blast'));
+    expect(mockOnGameModeClick).toHaveBeenCalledWith('blast');
   });
 
   it('should render TV mode toggle', () => {

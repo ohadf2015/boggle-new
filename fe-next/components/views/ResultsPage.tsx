@@ -517,7 +517,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         {/* Two-Column Layout */}
         <div className="flex-1 w-full max-w-6xl mx-auto flex flex-row gap-6">
           {/* LEFT COLUMN: Results (Winner banner, stats, leaderboard, actions) */}
-          <div className="flex-1 min-w-0 max-w-xl space-y-4">
+          <div className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4">
             <ResultsMainContent
               {...mainContentProps}
               showBanner={false}
@@ -525,7 +525,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
 
           {/* RIGHT COLUMN: Details (Your words, other players, charts, chat) */}
-          <div className="flex-1 min-w-0 max-w-xl space-y-4">
+          <div className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4">
             <ResultsDetailsContent
               {...detailsContentProps}
               hideRankAndScore={true}

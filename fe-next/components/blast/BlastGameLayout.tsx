@@ -18,6 +18,7 @@ import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
 import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, CascadeHighlightData, CascadeHighlightPhase, BlastObjectiveProgress } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
+import DesktopWordInput from '@/components/grid/DesktopWordInput';
 // ComboMilestoneAnnouncement removed — ComboDisplay already shows combo level; milestone banners added noise
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
@@ -681,6 +682,12 @@ export function BlastGameLayout({
           highlightedPath={hintPath ?? undefined}
           shimmerCells={shimmerCells}
           objectiveTileTypes={objectiveTileTypes}
+        />
+        <DesktopWordInput
+          grid={grid}
+          language={language}
+          enabled={!isComplete && !isDiscoveryActive}
+          onWordSubmit={onWordSubmit}
         />
       </div>
 

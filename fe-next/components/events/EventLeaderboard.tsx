@@ -111,6 +111,7 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
                   <div className="flex-1 min-w-0">
                     <PlayerProfileTooltip
                       player={{
+                        id: p.user_id || p.id,
                         username: p.username,
                         score: p.score,
                       }}

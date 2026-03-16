@@ -23,9 +23,8 @@ import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { useFlashChallenge } from '@/hooks/useFlashChallenge';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
 import FlashChallengeToast from './FlashChallengeToast';
-import { neoInfoToast } from '@/components/NeoToast';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
-import { applyGemDetectorBoost } from '@/lib/adventure';
+import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
 import { StoryBeatCard } from './StoryBeatCard';
 import AdventureEffectsLayerFull, { AdventureEffectsLayer as EdgeVignetteLayer } from './effects/AdventureEffectsLayer';
@@ -50,10 +49,12 @@ export interface GameTimerState { timeRemaining: number; totalTime: number; isPl
 interface AdventureGameProps {
   levelConfig: LevelConfig;
   initialGrid: string[][];
-  onLevelComplete: (stars: number, score: number) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number) => void;
   onExit: () => void;
   onTimerStateChange?: (timerState: GameTimerState) => void;
   totalStars?: number;
+  /** Callback to navigate to world map (used on last level of world) */
+  onNextWorld?: () => void;
 }
 
 interface LastReportedTimerState { isPlaying: boolean; isPaused: boolean; phase: string; timeRemaining: number; }
@@ -74,7 +75,7 @@ function useMemoizedFlatTiles(tiles2D: TileState[][], tilesVersion: number): Gri
 }
 
 const AdventureGame = memo<AdventureGameProps>(
-  ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, totalStars }) => {
+  ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, totalStars, onNextWorld }) => {
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
 
     const init = useAdventureGameInit({ world: levelConfig.world, level: levelConfig.level, timerSeconds: levelConfig.timerSeconds ?? 120 });
@@ -94,6 +95,8 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [init.adjustedLevelConfig, init.upgradeEffects]);
 
+    const { t, language } = useLanguage();
+
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining, canComplete,
       isPlaying, cascadeComplete, submitWordWithPath, startGame, pauseGame, completeLevel,
@@ -109,10 +112,10 @@ const AdventureGame = memo<AdventureGameProps>(
         shuffleUses: init.upgradeEffects.shuffleUsesPerLevel,
         iceTileReduction: init.upgradeEffects.iceTileReduction,
       },
+      language: language || 'en',
     });
 
     const tiles = useMemoizedFlatTiles(tiles2D, tilesVersion);
-    const { t, language } = useLanguage();
     const { recordAttempt, getLevelAttempt, progression } = useProgression();
     const bestAttempt = useMemo(
       () => getLevelAttempt(levelConfig.world, levelConfig.level),
@@ -162,6 +165,13 @@ const AdventureGame = memo<AdventureGameProps>(
       lastWordTileTypes,
       locale: language,
     });
+
+    // Award flash challenge gold when completed
+    useEffect(() => {
+      if (flashChallenge.isChallengeComplete && flashChallenge.activeChallenge) {
+        init.addGold(flashChallenge.activeChallenge.rewardCoins);
+      }
+    }, [flashChallenge.isChallengeComplete, flashChallenge.activeChallenge, init]);
 
     // Boss objective tracking — sync boss state to reducer objectives
     // defeatBoss: track boss HP depletion as percentage
@@ -241,8 +251,9 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const isModalOpen = showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic || bossOrch.showBossIntro || bossOrch.showBossFireworks;
+    // Stuck detection: auto-reveal a hint instead of firing an intrusive toast
     const { resetOnGameAction } = useLexiStuckDetection({
-      onStuck: () => { neoInfoToast(t('adventure.lexi.stuckHint'), { icon: '💡', duration: 5000 }); },
+      onStuck: () => { if (hasHintsAvailable) { getHint(); dismissAutoHint(); } },
       isPlaying: isPlaying && entryPhase === 'playing', isPaused, isModalOpen, isBossLevel,
     });
 
@@ -339,23 +350,27 @@ const AdventureGame = memo<AdventureGameProps>(
       if (gameState.comboCount >= 5) recordQuestProgress('comboStreak');
     }, [gameState.comboCount, recordQuestProgress]);
 
+    // Streamlined entry: cascade → playing (skip objectives parade + title burst)
     const handleCascadeComplete = useCallback(() => {
       markCascadeComplete();
-      entryPhaseManager.advanceToObjectives();
-    }, [markCascadeComplete, entryPhaseManager]);
-
-    const handleObjectivesComplete = useCallback(() => {
-      entryPhaseManager.advanceToTitle();
-    }, [entryPhaseManager]);
-
-    const handleTitleComplete = useCallback(() => {
       entryPhaseManager.advanceToPlaying();
       if (!isPlaying) { startGame(); init.startAIDirector(); }
       // Word Radar T5: free hint on level start
       if (init.upgradeEffects.freeStartHint) {
-        setTimeout(() => getHint(), 500); // slight delay for UX
+        setTimeout(() => getHint(), 500);
       }
-    }, [isPlaying, startGame, init, entryPhaseManager, getHint]);
+    }, [markCascadeComplete, entryPhaseManager, isPlaying, startGame, init, getHint]);
+
+    // Keep callbacks for backward compat but they're no longer triggered in the normal flow
+    const handleObjectivesComplete = useCallback(() => {
+      entryPhaseManager.advanceToPlaying();
+      if (!isPlaying) { startGame(); init.startAIDirector(); }
+    }, [entryPhaseManager, isPlaying, startGame, init]);
+
+    const handleTitleComplete = useCallback(() => {
+      entryPhaseManager.advanceToPlaying();
+      if (!isPlaying) { startGame(); init.startAIDirector(); }
+    }, [isPlaying, startGame, init, entryPhaseManager]);
 
     const calculateTileCenter = useCallback((row: number, col: number) => {
       if (!gridRef.current) return { x: 0, y: 0 };
@@ -444,8 +459,8 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const handleContinue = useCallback(() => {
       setShowLevelComplete(false);
-      onLevelComplete(gameState.stars, gameState.score);
-    }, [gameState.stars, gameState.score, onLevelComplete]);
+      onLevelComplete(gameState.stars, gameState.score, gameState.wordsFound.length, levelCompletion.earnedGold);
+    }, [gameState.stars, gameState.score, gameState.wordsFound.length, levelCompletion.earnedGold, onLevelComplete]);
 
     const handleRetry = useCallback(() => {
       setShowLevelComplete(false);
@@ -508,7 +523,8 @@ const AdventureGame = memo<AdventureGameProps>(
           header={
             <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}
               score={gameState.score} timeRemaining={timeRemaining} isPaused={isPaused}
-              onPauseToggle={handlePauseToggle} onExit={onExit} />
+              onPauseToggle={handlePauseToggle} onExit={onExit}
+              gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100} />
           }
           gridArea={
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}
@@ -531,7 +547,8 @@ const AdventureGame = memo<AdventureGameProps>(
               currentWord={effectiveCurrentWord}
               worldId={levelConfig.world}
               hintLevel={init.hintData.level}
-              bossGridEffect={bossOrch.gridEffectTrigger} />
+              bossGridEffect={bossOrch.gridEffectTrigger}
+              lockedTileIndices={bossOrch.lockedTiles} />
           }
           sidebar={
             <GameSidebar objectives={objectives}
@@ -548,7 +565,7 @@ const AdventureGame = memo<AdventureGameProps>(
               canDetonate={init.upgradeEffects.canDetonateWords}
               detonateActive={detonateActive}
               onDetonateToggle={() => setDetonateActive(prev => !prev)}
-              className="border-t-2 lg:border-t-0 lg:border-l-2 border-neo-black/30" />
+              className="border-b-2 lg:border-b-0 lg:border-s-2 border-neo-black/30" />
           }
           overlays={
             <>
@@ -629,7 +646,10 @@ const AdventureGame = memo<AdventureGameProps>(
                   stars={gameState.stars} score={gameState.score} objectives={objectives}
                   levelNumber={levelConfig.level} worldNumber={levelConfig.world}
                   onContinue={handleContinue} onRetry={handleRetry} onExit={onExit}
-                  totalStars={totalStars} bestAttempt={bestAttempt} />
+                  totalStars={totalStars} bestAttempt={bestAttempt}
+                  xpEarned={levelCompletion.earnedXp} goldEarned={levelCompletion.earnedGold}
+                  isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD}
+                  onNextWorld={onNextWorld} />
               )}
 
               {storyBeat && (

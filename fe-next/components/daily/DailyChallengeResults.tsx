@@ -206,7 +206,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       </motion.div>
 
       {/* Main content - Cleaner design */}
-      <div className="max-w-md w-full text-center space-y-5 py-6">
+      {/* On desktop: 2-column grid with score/share left, leaderboard right */}
+      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl py-6">
+      <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+
+      {/* LEFT COLUMN on desktop: score, stats, share, words (all existing stacked content) */}
+      <div className="text-center space-y-5">
 
         {/* Completion badge - Simplified */}
         <motion.div
@@ -461,27 +466,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           </p>
         </motion.div>
 
-        {/* Today's Players Leaderboard */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.7 }}
-        >
-          <DailyLeaderboard
-            key={leaderboardKey}
-            puzzleDate={result.puzzleDate}
-            language={result.language}
-            currentPlayerId={isAuthenticated && profile ? profile.id : null}
-            currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-            onCurrentUserRankChange={handleCurrentUserRankChange}
-            onParticipantCountChange={setTotalPlayers}
-            maxVisible={10}
-            t={t}
-            gameType="puzzle"
-          />
-        </motion.div>
-
-        {/* Words found - Collapsible */}
+        {/* Words found - Collapsible (left column on desktop) */}
         {words.length > 0 && (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -524,7 +509,33 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             </AnimatePresence>
           </motion.div>
         )}
-      </div>
+      </div>{/* end left column */}
+
+      {/* RIGHT COLUMN on desktop: leaderboard (on mobile rendered below via normal flow) */}
+      <div>
+        {/* Today's Players Leaderboard */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          <DailyLeaderboard
+            key={leaderboardKey}
+            puzzleDate={result.puzzleDate}
+            language={result.language}
+            currentPlayerId={isAuthenticated && profile ? profile.id : null}
+            currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+            onCurrentUserRankChange={handleCurrentUserRankChange}
+            onParticipantCountChange={setTotalPlayers}
+            maxVisible={10}
+            t={t}
+            gameType="puzzle"
+          />
+        </motion.div>
+      </div>{/* end right column */}
+
+      </div>{/* end lg:grid */}
+      </div>{/* end outer width wrapper */}
 
       {/* Share panel for browsers without native share */}
       <AnimatePresence>

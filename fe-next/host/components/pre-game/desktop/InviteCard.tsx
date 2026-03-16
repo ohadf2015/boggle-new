@@ -92,19 +92,19 @@ export function InviteCard({
         {/* Decorative accent */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-neo-lime" />
 
-        <div className="p-6 pt-8">
+        <div className="p-5 xl:p-4 pt-7 xl:pt-6">
           {/* Two-column layout: QR + Content side by side */}
-          <div className="grid grid-cols-[auto_1fr] gap-6 items-start">
+          <div className="grid grid-cols-[auto_1fr] gap-5 xl:gap-4 items-start">
             {/* Left: QR Code - larger for desktop visibility */}
             <div className="flex flex-col items-center gap-3">
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="p-4 bg-white rounded-neo border-4 border-neo-black shadow-hard"
+                className="p-3 xl:p-2.5 bg-white rounded-neo border-4 border-neo-black shadow-hard"
               >
                 <QRCodeSVG
                   value={joinUrl}
-                  size={180}
+                  size={150}
                   level="H"
                   includeMargin={false}
                   bgColor="#ffffff"
@@ -121,7 +121,7 @@ export function InviteCard({
             </div>
 
             {/* Right: Header + Share Options */}
-            <div className="flex flex-col justify-between h-full min-h-[220px] py-1">
+            <div className="flex flex-col justify-between h-full min-h-[180px] xl:min-h-[160px] py-1">
               {/* Header */}
               <div>
                 <div className="flex items-center gap-2 mb-2">

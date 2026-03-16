@@ -101,78 +101,85 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         )}
       </motion.div>
 
-      {/* Stats grid */}
-      <div className="w-full max-w-sm space-y-2 mb-8">
-        <StatCard
-          icon={<Trophy className="w-5 h-5" />}
-          label={t('common.score')}
-          value={<span data-testid="blast-score-display">{displayScore.toLocaleString()}</span>}
-          accentColor="#FFD700"
-          delay={0.5}
-          index={0}
-          isNewBest={isNewBestScore}
-        />
-        <StatCard
-          icon={<Grid3X3 className="w-5 h-5" />}
-          label={t('blast.progress')}
-          value={`${results.clearPercentage}% (${results.tilesCleared}/${results.totalTiles})`}
-          accentColor="#00FFFF"
-          delay={0.6}
-          index={1}
-        />
-        <StatCard
-          icon={<Zap className="w-5 h-5" />}
-          label={t('common.words')}
-          value={results.wordsFound.length}
-          accentColor="#BFFF00"
-          delay={0.7}
-          index={2}
-        />
-        {results.bestWord && (
-          <StatCard
-            icon={<Star className="w-5 h-5" />}
-            label={t('results.bestWord')}
-            value={results.bestWord.toUpperCase()}
-            accentColor="#FF6B35"
-            delay={0.8}
-            index={3}
-          />
-        )}
-        {results.maxCombo > 0 && (
-          <StatCard
-            icon={<Zap className="w-5 h-5" />}
-            label={t('results.maxCombo')}
-            value={`${results.maxCombo}x`}
-            accentColor="#FF1493"
-            delay={0.9}
-            index={4}
-            isNewBest={isNewBestCombo}
-          />
-        )}
-        {(results.wavesCompleted ?? 0) > 0 && (
-          <StatCard
-            icon={<Zap className="w-5 h-5" />}
-            label={t('blast.wavesCompleted')}
-            value={results.wavesCompleted}
-            accentColor="#A855F7"
-            delay={1.0}
-            index={5}
-          />
-        )}
-      </div>
+      {/* Desktop: stats + wave breakdown side by side; mobile: stacked */}
+      <div className="w-full max-w-sm lg:max-w-3xl xl:max-w-4xl lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start mb-8">
 
-      {/* Wave-by-wave breakdown */}
-      <WaveBreakdown
-        waveResults={results.waveResults ?? []}
-        label={t('blast.waveBreakdown')}
-      />
+        {/* Stats grid */}
+        <div className="space-y-2 mb-8 lg:mb-0">
+          <StatCard
+            icon={<Trophy className="w-5 h-5" />}
+            label={t('common.score')}
+            value={<span data-testid="blast-score-display">{displayScore.toLocaleString()}</span>}
+            accentColor="#FFD700"
+            delay={0.5}
+            index={0}
+            isNewBest={isNewBestScore}
+          />
+          <StatCard
+            icon={<Grid3X3 className="w-5 h-5" />}
+            label={t('blast.progress')}
+            value={`${results.clearPercentage}% (${results.tilesCleared}/${results.totalTiles})`}
+            accentColor="#00FFFF"
+            delay={0.6}
+            index={1}
+          />
+          <StatCard
+            icon={<Zap className="w-5 h-5" />}
+            label={t('common.words')}
+            value={results.wordsFound.length}
+            accentColor="#BFFF00"
+            delay={0.7}
+            index={2}
+          />
+          {results.bestWord && (
+            <StatCard
+              icon={<Star className="w-5 h-5" />}
+              label={t('results.bestWord')}
+              value={results.bestWord.toUpperCase()}
+              accentColor="#FF6B35"
+              delay={0.8}
+              index={3}
+            />
+          )}
+          {results.maxCombo > 0 && (
+            <StatCard
+              icon={<Zap className="w-5 h-5" />}
+              label={t('results.maxCombo')}
+              value={`${results.maxCombo}x`}
+              accentColor="#FF1493"
+              delay={0.9}
+              index={4}
+              isNewBest={isNewBestCombo}
+            />
+          )}
+          {(results.wavesCompleted ?? 0) > 0 && (
+            <StatCard
+              icon={<Zap className="w-5 h-5" />}
+              label={t('blast.wavesCompleted')}
+              value={results.wavesCompleted}
+              accentColor="#A855F7"
+              delay={1.0}
+              index={5}
+            />
+          )}
+        </div>
+
+        {/* Wave-by-wave breakdown */}
+        <div>
+          <WaveBreakdown
+            waveResults={results.waveResults ?? []}
+            label={t('blast.waveBreakdown')}
+          />
+        </div>
+
+      </div>{/* end desktop grid */}
 
       {/* Action buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 1.0 }}
-        className="flex flex-col gap-3 w-full max-w-sm"
+        className="flex flex-col gap-3 w-full max-w-sm lg:max-w-md"
       >
         <Button
           variant="success"

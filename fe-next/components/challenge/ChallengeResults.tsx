@@ -107,7 +107,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-6"
+        className="max-w-md lg:max-w-3xl xl:max-w-4xl w-full space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start"
       >
         {/* Result Card - Click to fire confetti */}
         <motion.div
@@ -307,7 +307,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="space-y-3"
+          className="space-y-3 lg:self-center"
         >
           {/* Try Again */}
           <Button

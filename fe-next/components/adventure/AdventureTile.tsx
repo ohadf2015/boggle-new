@@ -61,6 +61,8 @@ export interface AdventureTileProps {
   getTileAriaLabel: (tile: GridTileState) => string;
   /** Optional chain cascade delay (overrides tile.cascadeDelay) */
   chainCascadeDelay?: number;
+  /** Whether tile is locked by boss ability (prevents selection, shows lock overlay) */
+  isLocked?: boolean;
 }
 
 // ==============================================
@@ -105,6 +107,7 @@ export const AdventureTile = memo(({
   onTileDragEnter,
   getTileAriaLabel,
   chainCascadeDelay,
+  isLocked = false,
 }: AdventureTileProps) => {
   // Stable handlers that don't create new closures per render
   const handleClick = useCallback(() => onTileClick(index, tile), [onTileClick, index, tile]);
@@ -195,6 +198,7 @@ export const AdventureTile = memo(({
 
         // State classes
         tile.isCleared && 'tile-cleared opacity-40 pointer-events-none cursor-not-allowed',
+        isLocked && 'opacity-50 pointer-events-none cursor-not-allowed ring-2 ring-neo-red/60',
         // Enhanced selection: CSS handles glow, ring, and animation
         isSelected && 'tile-selected-enhanced',
         tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
@@ -412,6 +416,13 @@ export const AdventureTile = memo(({
 
       {/* Tile badge (gold, rainbow, bomb, chain, time, frost overlay) */}
       <TileBadge type={tile.type} isFrozen={tile.isFrozen} />
+
+      {/* Boss lock overlay */}
+      {isLocked && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none rounded-neo bg-black/30">
+          <span className="text-neo-red text-[0.6em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">🔒</span>
+        </div>
+      )}
     </motion.div>
   );
 });

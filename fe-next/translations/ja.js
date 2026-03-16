@@ -1230,7 +1230,8 @@ const ja = {
       "title": "プロフィールを作成",
       "subtitle": "アバター + 名前 = バトル準備完了",
       "deferredTitle": "進捗を保存しますか？",
-      "deferredSubtitle": "プロフィールを設定して統計を保存しよう！"
+      "deferredSubtitle": "プロフィールを設定して統計を保存しよう！",
+      "tapToCustomize": "タップしてカスタマイズ"
     },
     "quickTips": {
       "title": "プロのヒント",
@@ -4411,6 +4412,14 @@ const ja = {
   "desktopHint": {
     "tip": "ヒント：タイルをクリックするか入力もできるよ！"
   },
+  "desktopInput": {
+    "placeholder": "単語を入力...",
+    "ariaLabel": "送信する単語を入力",
+    "submit": "単語を送信",
+    "hint": "文字を入力して単語を探す · Enterで送信 · Escでクリア",
+    "doubleClick": "2×クリック",
+    "releaseToSubmit": "離して送信"
+  },
   "keyboardLanguageMismatch": "ボードの言語に合わせて{language}キーボードに切り替えてください",
   "enterKeyHint": {
     "pressEnter": "Enterで送信"
@@ -5237,6 +5246,7 @@ const ja = {
     "levelComplete": "レベルクリア！",
     "starsEarned": "獲得した星",
     "continueToNext": "続ける",
+    "nextWorld": "次のワールド",
     "retryLevel": "リトライ",
     "loadError": "進捗の読み込みに失敗しました",
     "cinematics": {
@@ -5458,7 +5468,14 @@ const ja = {
       "start": "スタート",
       "back": "戻る",
       "bestAttempt": "あなたのベスト",
-      "notAttempted": "まだ挑戦していません"
+      "notAttempted": "まだ挑戦していません",
+      "stars": {
+        "title": "星の獲得条件",
+        "oneStar": "メイン目標を達成",
+        "twoStars": "メイン目標 + ボーナス目標1つを達成",
+        "threeStars": "すべての目標を達成",
+        "threeStarsPartial": "メイン目標 + ボーナス目標{{count}}つを達成"
+      }
     },
     "tiles": {
       "gold": "ゴールド (3倍ポイント)",
@@ -5512,7 +5529,8 @@ const ja = {
       "levelUp": "レベルアップ！",
       "newLevel": "レベル到達",
       "continue": "続ける",
-      "maxLevel": "最大レベル！"
+      "maxLevel": "最大レベル！",
+      "progress": "XP進捗"
     },
     "powerUps": {
       "freezeTime": "タイム凍結",
@@ -6114,7 +6132,8 @@ const ja = {
         "palindrome": "回文を見つけよう（{param}文字以上）",
         "exactLength": "ちょうど{param}文字の単語を見つけよう",
         "useGoldTile": "ゴールドタイルを使って単語を作ろう",
-        "complete": "完了!"
+        "complete": "完了!",
+        "missed": "失敗!"
       },
       "chapter": {
         "panelTitle": "チャプタークエスト",

@@ -65,7 +65,7 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
       </motion.div>
 
       {/* Infographic steps */}
-      <div className="w-full max-w-sm space-y-3">
+      <div className="w-full max-w-sm lg:max-w-3xl xl:max-w-4xl lg:grid lg:grid-cols-3 lg:gap-4 space-y-3 lg:space-y-0">
         {STEPS.map((step, i) => (
           <motion.div
             key={step.key}
@@ -73,7 +73,7 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 + i * 0.1, type: 'spring', stiffness: 300, damping: 25 }}
-            className={`flex items-center gap-4 px-4 py-3 rounded-neo border-3 ${step.border} ${step.bg}`}
+            className={`flex items-center gap-4 px-4 py-3 lg:flex-col lg:items-start lg:gap-3 lg:py-5 rounded-neo border-3 ${step.border} ${step.bg}`}
           >
             <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-neo bg-white/10">
               <step.Icon className={`h-6 w-6 ${step.iconColor}`} />
@@ -95,7 +95,7 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, type: 'spring', stiffness: 300, damping: 25 }}
-        className="w-full max-w-sm space-y-3"
+        className="w-full max-w-sm lg:max-w-md space-y-3"
       >
         <Button
           data-testid="play-button"

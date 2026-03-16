@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
 import CircularTimer from '@/components/CircularTimer';
 import GridComponent from '@/components/GridComponent';
+import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
 import ComboDisplay from '../../ComboDisplay';
 import HintButton from '@/components/HintButton';
@@ -375,6 +376,12 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                     gridSize={{ rows: letterGrid.length, cols: letterGrid[0]?.length ?? 4 }}
                   />
                 )}
+                <DesktopWordInput
+                  grid={letterGrid}
+                  language={gameLanguage}
+                  enabled={isPlaying && !showStartAnimation}
+                  onWordSubmit={onWordSubmit}
+                />
               </div>
             </div>
 

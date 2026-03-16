@@ -2899,7 +2899,8 @@ const es = {
       "title": "Crea tu Perfil",
       "subtitle": "Avatar + nombre = listo para batallar",
       "deferredTitle": "¿Guardar tu progreso?",
-      "deferredSubtitle": "¡Arma tu perfil para conservar tus stats!"
+      "deferredSubtitle": "¡Arma tu perfil para conservar tus stats!",
+      "tapToCustomize": "Toca para personalizar"
     },
     "quickTips": {
       "title": "Tips Pro",
@@ -4383,6 +4384,14 @@ const es = {
   "desktopHint": {
     "tip": "Consejo: ¡También puedes hacer clic en letras o escribir!"
   },
+  "desktopInput": {
+    "placeholder": "Escribe una palabra...",
+    "ariaLabel": "Escribe una palabra para enviar",
+    "submit": "Enviar palabra",
+    "hint": "Escribe letras para encontrar palabras · Enter para enviar · Esc para borrar",
+    "doubleClick": "2×clic",
+    "releaseToSubmit": "Suelta para enviar"
+  },
   "emailPreferences": {
     "title": "Alertas del Puzzle Diario",
     "sendingTo": "Enviando a",
@@ -5201,6 +5210,7 @@ const es = {
     "levelComplete": "¡Nivel completado!",
     "starsEarned": "Estrellas ganadas",
     "continueToNext": "Continuar",
+    "nextWorld": "Siguiente mundo",
     "retryLevel": "Reintentar",
     "loadError": "Error al cargar el progreso",
     "boss": "Jefe",
@@ -5737,7 +5747,14 @@ const es = {
       "start": "Comenzar nivel",
       "back": "Volver",
       "bestAttempt": "Tu mejor intento",
-      "notAttempted": "No intentado aún"
+      "notAttempted": "No intentado aún",
+      "stars": {
+        "title": "Requisitos de estrellas",
+        "oneStar": "Completa el objetivo principal",
+        "twoStars": "Completa el principal + 1 objetivo bonus",
+        "threeStars": "Completa todos los objetivos",
+        "threeStarsPartial": "Completa el principal + {{count}} objetivos bonus"
+      }
     },
     "cutscene": {
       "skip": "Omitir"
@@ -5783,7 +5800,8 @@ const es = {
       "levelUp": "¡Subiste de Nivel!",
       "newLevel": "Alcanzaste el nivel",
       "continue": "Continuar",
-      "maxLevel": "¡NIVEL MÁXIMO!"
+      "maxLevel": "¡NIVEL MÁXIMO!",
+      "progress": "Progreso de XP"
     },
     "powerUps": {
       "freezeTime": "Congelar tiempo",
@@ -6117,7 +6135,8 @@ const es = {
         "palindrome": "Encuentra un palíndromo ({param}+ letras)",
         "exactLength": "Encuentra una palabra de exactamente {param} letras",
         "useGoldTile": "Usa una ficha dorada en una palabra",
-        "complete": "¡Completo!"
+        "complete": "¡Completo!",
+        "missed": "¡Perdido!"
       },
       "chapter": {
         "panelTitle": "Misiones del Capítulo",
