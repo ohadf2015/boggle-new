@@ -16,6 +16,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useFeatureUnlockNotifications } from '@/hooks/useFeatureUnlockNotifications';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
+import { awardCreatorCoins } from '@/utils/creatorRewards';
 import { getMinWordLength, getDefaultPreset, getPresetById, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -169,6 +170,8 @@ const SinglePlayerView: React.FC = () => {
   const autoStart = searchParams?.get('autoStart') || null;
   // Check for preset param (e.g., preset=bots from NextStepPrompt after practice)
   const presetParam = searchParams?.get('preset') || null;
+  // Check for boardCode param (e.g., boardCode=ABC123 from community board play)
+  const boardCode = searchParams?.get('boardCode') || null;
 
   const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
     mode: 'solo-bots',
@@ -346,6 +349,42 @@ const SinglePlayerView: React.FC = () => {
     }
   }, [presetParam, autoStart, phase, uiLanguage]);
 
+  // Auto-load community board when boardCode param is provided
+  useEffect(() => {
+    if (!boardCode || hasAutoStartedRef.current) return;
+    hasAutoStartedRef.current = true;
+
+    const loadCommunityBoard = async () => {
+      try {
+        const res = await fetch(`/api/ugc/boards/${boardCode}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const board = data.board;
+        if (!board?.grid) return;
+
+        const difficulty: DifficultyLevel = board.difficulty === 'EASY' ? 'EASY' : board.difficulty === 'HARD' ? 'HARD' : 'MEDIUM';
+        const timerSeconds = board.timer_seconds || 120;
+        const minWordLength = getMinWordLength(board.language || uiLanguage, difficulty);
+
+        setGameState(prev => ({
+          ...prev,
+          mode: 'solo-bots',
+          difficulty,
+          timerSeconds,
+          bots: [],
+          language: (board.language || uiLanguage) as Language,
+          grid: board.grid as LetterGrid,
+          minWordLength,
+        }));
+        setPhase('playing');
+      } catch {
+        // Silently fall back to normal game
+      }
+    };
+
+    loadCommunityBoard();
+  }, [boardCode, uiLanguage]);
+
   // Get current high score for challenge mode
   const currentHighScore = useMemo(() => {
     if (gameState.mode !== 'challenge') return null;
@@ -456,13 +495,23 @@ const SinglePlayerView: React.FC = () => {
     results.previousHighScore = highScoreResult.previousBest;
     results.isNewAllTimeBest = highScoreResult.isNewAllTimeBest;
 
+    // Record community board play and award creator coins
+    if (boardCode) {
+      awardCreatorCoins('BOARD_PLAYED', { boardCode });
+      fetch(`/api/ugc/boards/${boardCode}/play`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score: results.playerScore, words_found: (results.playerWords || []).length }),
+      }).catch(() => { /* non-critical */ });
+    }
+
     setResultsData(results);
     setPhase('results');
     // Note: We intentionally do NOT reset hasAutoStartedRef here.
     // If user navigates to a new URL (e.g., ?preset=bots), the component remounts
     // and hasAutoStartedRef resets naturally. Resetting here would cause infinite
     // game loops because the useEffects would re-trigger with the existing URL params.
-  }, [gameState.mode, gameState.difficulty, gameState.timerSeconds]);
+  }, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode]);
 
   const handlePlayAgain = () => {
     // Navigate back to landing page

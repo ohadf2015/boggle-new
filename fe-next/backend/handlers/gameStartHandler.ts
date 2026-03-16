@@ -205,14 +205,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       logger.info('SOCKET', `Game ${gameCode} auto-reset successful, state now: ${game.gameState}`);
     }
 
-    let validTimer = Math.max(30, Math.min(600, parseInt(String(timerSeconds), 10) || 180));
+    let validTimer = Math.max(30, Math.min(120, parseInt(String(timerSeconds), 10) || 120));
 
     const resolvedMode: GameMode = (!gameMode || gameMode === 'random')
       ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
       : gameMode as GameMode;
 
-    // Default blast MP to 90s when host didn't set an explicit timer (fell back to 180s)
-    if (resolvedMode === 'blast' && (!timerSeconds || validTimer === 180)) {
+    // Default blast MP to 90s when host didn't set an explicit timer
+    if (resolvedMode === 'blast' && (!timerSeconds || validTimer === 120)) {
       validTimer = BLAST_MP_DEFAULT_TIMER;
     }
 

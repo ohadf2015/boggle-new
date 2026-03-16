@@ -59,49 +59,49 @@ export function evaluateWorldMechanic(
   switch (mechanic) {
     case 'synonymPairs':
       if (word.length >= 5) {
-        return { bonus: true, multiplier: 1.25, feedbackKey: 'adventure.mechanic.synonymPairs' };
+        return { bonus: true, multiplier: 1.25, feedbackKey: 'adventure.mechanics.synonymPairs' };
       }
       return none;
 
     case 'etymologyRoots':
       if (containsLatinGreekRoot(word)) {
-        return { bonus: true, multiplier: 1.3, feedbackKey: 'adventure.mechanic.etymologyRoots' };
+        return { bonus: true, multiplier: 1.3, feedbackKey: 'adventure.mechanics.etymologyRoots' };
       }
       return none;
 
     case 'idioms':
       if (word.length >= 6) {
-        return { bonus: true, multiplier: 1.25, feedbackKey: 'adventure.mechanic.idioms' };
+        return { bonus: true, multiplier: 1.25, feedbackKey: 'adventure.mechanics.idioms' };
       }
       return none;
 
     case 'compounds':
       if (word.length >= 5 && hasDoubleLetters(word)) {
-        return { bonus: true, multiplier: 1.3, feedbackKey: 'adventure.mechanic.compounds' };
+        return { bonus: true, multiplier: 1.3, feedbackKey: 'adventure.mechanics.compounds' };
       }
       return none;
 
     case 'anagrams':
       if (isAnagramOfPrevious(word, previousWords)) {
-        return { bonus: true, multiplier: 1.5, feedbackKey: 'adventure.mechanic.anagrams' };
+        return { bonus: true, multiplier: 1.5, feedbackKey: 'adventure.mechanics.anagrams' };
       }
       return none;
 
     case 'palindromes':
       if (isPalindrome(word)) {
-        return { bonus: true, multiplier: 1.5, feedbackKey: 'adventure.mechanic.palindromes' };
+        return { bonus: true, multiplier: 1.5, feedbackKey: 'adventure.mechanics.palindromes' };
       }
       return none;
 
     case 'rareWords':
       if (word.length >= 7) {
-        return { bonus: true, multiplier: 1.4, feedbackKey: 'adventure.mechanic.rareWords' };
+        return { bonus: true, multiplier: 1.4, feedbackKey: 'adventure.mechanics.rareWords' };
       }
       return none;
 
     case 'multilingual':
       if (word.length >= 6) {
-        return { bonus: true, multiplier: 1.25, feedbackKey: 'adventure.mechanic.multilingual' };
+        return { bonus: true, multiplier: 1.25, feedbackKey: 'adventure.mechanics.multilingual' };
       }
       return none;
 

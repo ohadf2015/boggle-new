@@ -26,7 +26,7 @@ router.get('/', async (req: AdminRequest, res: Response): Promise<void> => {
 
     let query = supabase
       .from('invalid_word_submissions')
-      .select('id, word, language, submission_count, reason, first_submitted_at, last_submitted_at, approved_at, approved_by', { count: 'exact' })
+      .select('id, word, language, submission_count, player_appeal_count, reason, first_submitted_at, last_submitted_at, first_appealed_at, last_appealed_at, approved_at, approved_by', { count: 'exact' })
       .is('approved_at', null)
       .gte('submission_count', minCount)
       .order('submission_count', { ascending: false });

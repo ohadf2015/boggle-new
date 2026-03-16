@@ -132,6 +132,7 @@ export function useHostGameEvents({
   // This is critical for ensuring the countdown continues even if useEffect re-runs
   const fireRoundIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+
   // Helper to reset combo state using shared utility
   const resetComboState = useCallback(() => {
     resetComboStateUtil(
@@ -243,6 +244,12 @@ export function useHostGameEvents({
       // Ignore stale events from previous sessions
       if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
         logger.log('[HOST] Ignoring stale timeUpdate from old session:', data.gameSessionId);
+        return;
+      }
+
+      // Skip timer sync while 3-2-1-GO countdown is playing.
+      // gameStarted becomes true only after the countdown animation completes.
+      if (!gameStarted) {
         return;
       }
 

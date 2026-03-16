@@ -10,7 +10,16 @@ interface WordPackBuilderProps {
   onClose: () => void;
 }
 
-const PREDEFINED_TAGS = ['Animals', 'Food', 'Science', 'Sports', 'Travel', 'Music', 'Tech', 'Nature'];
+const PREDEFINED_TAG_KEYS = [
+  'ugc.pack.tags.animals',
+  'ugc.pack.tags.food',
+  'ugc.pack.tags.science',
+  'ugc.pack.tags.sports',
+  'ugc.pack.tags.travel',
+  'ugc.pack.tags.music',
+  'ugc.pack.tags.tech',
+  'ugc.pack.tags.nature',
+] as const;
 const LANGUAGES = [
   { value: 'en', label: 'English' },
   { value: 'es', label: 'Spanish' },
@@ -160,15 +169,16 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
               {t('ugc.pack.builder.tagsLabel')}
             </label>
             <div className="flex flex-wrap gap-2">
-              {PREDEFINED_TAGS.map((tag) => {
-                const active = hook.tags.includes(tag);
+              {PREDEFINED_TAG_KEYS.map((tagKey) => {
+                const tagLabel = t(tagKey);
+                const active = hook.tags.includes(tagLabel);
                 return (
                   <button
-                    key={tag}
+                    key={tagKey}
                     type="button"
                     onClick={() =>
                       hook.setTags(
-                        active ? hook.tags.filter((t) => t !== tag) : [...hook.tags, tag]
+                        active ? hook.tags.filter((existing) => existing !== tagLabel) : [...hook.tags, tagLabel]
                       )
                     }
                     className={`px-3 py-1 text-sm rounded-neo border-neo border-black font-neo-body transition-colors ${
@@ -177,7 +187,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
                         : 'bg-neo-navy/60 text-neo-white/70 hover:bg-neo-navy'
                     }`}
                   >
-                    {tag}
+                    {tagLabel}
                   </button>
                 );
               })}

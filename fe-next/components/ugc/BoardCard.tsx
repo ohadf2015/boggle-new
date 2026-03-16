@@ -2,9 +2,10 @@
 
 import { memo } from 'react';
 import Image from 'next/image';
-import { Play, Star, Users } from 'lucide-react';
+import { Play, Star, Users, Share2 } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { shareBoard } from '@/utils/share';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface BoardCardBoard {
@@ -56,7 +57,7 @@ function BoardPreviewGrid({ grid, size }: { grid: string[][]; size: 'sm' | 'md' 
 }
 
 const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const avgRating =
     board.rating_count > 0
@@ -144,14 +145,21 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay }) => {
         </div>
       )}
 
-      {/* CTA button */}
-      <div className="px-3 pb-3 mt-auto">
+      {/* CTA buttons */}
+      <div className="px-3 pb-3 mt-auto flex gap-2">
         <button
           onClick={() => onPlay?.(board.board_code)}
-          className="w-full bg-neo-lime text-black font-neo-body font-bold text-sm py-2 rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed transition-all duration-100 flex items-center justify-center gap-1"
+          className="flex-1 bg-neo-lime text-black font-neo-body font-bold text-sm py-2 rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed transition-all duration-100 flex items-center justify-center gap-1"
         >
           <Play size={14} />
           {personalBest != null ? t('ugc.gallery.improve') : t('ugc.gallery.play')}
+        </button>
+        <button
+          onClick={() => shareBoard(board.board_code, board.title, board.creator_display_name, language, t)}
+          className="bg-neo-navy text-neo-white font-neo-body font-bold text-sm py-2 px-3 rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed transition-all duration-100 flex items-center justify-center"
+          aria-label={t('ugc.board.share')}
+        >
+          <Share2 size={14} />
         </button>
       </div>
     </div>

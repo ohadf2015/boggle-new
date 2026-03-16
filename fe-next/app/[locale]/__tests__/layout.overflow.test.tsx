@@ -79,8 +79,8 @@ describe('Layout Mobile Scroll Architecture', () => {
 
     if (mainMatch) {
       const mainClasses = mainMatch[1];
-      // Main uses overflow-auto for scrollable content
-      expect(mainClasses).toContain('overflow-auto');
+      // Main uses main-content-safe for scroll handling
+      expect(mainClasses).toContain('main-content-safe');
       // Main has flex-1 and min-h-0 for proper flex sizing
       expect(mainClasses).toContain('flex-1');
       expect(mainClasses).toContain('min-h-0');

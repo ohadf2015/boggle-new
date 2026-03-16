@@ -287,11 +287,11 @@ describe('HostPreGameView Preset Selection', () => {
     const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
     fireEvent.click(challengeButtons[0]);
 
-    // Challenge preset: 3 min timer, HARD difficulty, 3 min word length
+    // Challenge preset: 2 min timer, HARD difficulty, 2 min word length
     await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(3);
+      expect(setTimerValue).toHaveBeenCalledWith(2);
       expect(setDifficulty).toHaveBeenCalledWith('HARD');
-      expect(setMinWordLength).toHaveBeenCalledWith(3);
+      expect(setMinWordLength).toHaveBeenCalledWith(2);
     });
   });
 

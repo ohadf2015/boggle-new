@@ -254,13 +254,17 @@ export function useBlastGame(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isComplete, isDeadEnd, movesUsed, gsMovesRemaining, gsTotalMoves, options?.isMultiplayer]);
 
-  // Dead-end detection: check after cascade settles
+  // Dead-end detection: check after cascade settles AND auto-detection completes.
+  // Skip during cascade/auto-detect phases — no interactive dead-end is possible while cascading.
+  // Use wordsFound.length (not array ref) to avoid re-running on every push.
+  const wordsFoundCount = gameState.wordsFound.length;
   useEffect(() => {
     if (!isDictLoaded || !displayGrid) return;
     if (gameState.isComplete || gameState.isDeadEnd) return;
     if (cascade.cascadePhase !== 'idle') return;
+    if (isAutoDetecting) return;
     // Only check after at least one word has been found (skip initial load)
-    if (gameState.wordsFound.length === 0) return;
+    if (wordsFoundCount === 0) return;
 
     // Debounce to avoid checking during rapid interactions
     const timer = setTimeout(() => {
@@ -270,7 +274,7 @@ export function useBlastGame(
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [isDictLoaded, displayGrid, cascade.cascadePhase, gameState.isComplete, gameState.isDeadEnd, gameState.wordsFound, language, checkWordInDict]);
+  }, [isDictLoaded, displayGrid, cascade.cascadePhase, isAutoDetecting, gameState.isComplete, gameState.isDeadEnd, wordsFoundCount, gameState.wordsFound, language, checkWordInDict]);
 
   /**
    * Shuffle remaining (uncleared) tiles to create new word possibilities.

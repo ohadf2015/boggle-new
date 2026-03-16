@@ -50,7 +50,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   duplicateRuleDisabled: _duplicateRuleDisabled,
   hideRankAndScore = false,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Expanded states for collapsible sections
   const [showDetails, setShowDetails] = useState(false);
@@ -190,6 +190,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <Avatar
                 profilePictureUrl={player.avatar.profilePictureUrl}
                 avatarImage={player.avatar.avatarImage}
+                customAvatar={player.avatar.customAvatar}
                 size="xl"
                 className="flex-shrink-0 border-2 border-neo-black w-12 h-12 sm:w-14 sm:h-14"
               />
@@ -376,6 +377,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                     t={t}
                     getPlayerCountForWord={getPlayerCountForWord}
                     mode="chip"
+                    language={language}
                   />
                 </div>
               </motion.div>

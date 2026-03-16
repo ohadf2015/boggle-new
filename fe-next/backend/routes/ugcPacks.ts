@@ -5,6 +5,7 @@
 
 import express, { Request, Response, Router } from 'express';
 import logger from '../utils/logger';
+import { getSupabase } from '../modules/supabaseServer';
 import {
   createPack,
   getPackById,
@@ -24,22 +25,38 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 // ─── Auth helper ─────────────────────────────────────────────────────────────
 
-interface AuthRequest extends Request {
-  userId?: string;
+async function getAuthUser(req: Request): Promise<{ id: string } | null> {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+
+  const token = authHeader.slice(7);
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data?.user) return null;
+  return { id: data.user.id };
 }
 
-function requireAuth(req: AuthRequest, res: Response): string | null {
-  if (!req.userId) {
+async function requireAuth(req: Request, res: Response): Promise<string | null> {
+  // Check middleware-injected userId first (e.g. from upstream auth middleware)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const midwareId = (req as any).userId as string | undefined;
+  if (midwareId) return midwareId;
+
+  const user = await getAuthUser(req);
+  if (!user) {
     res.status(401).json({ error: 'UNAUTHORIZED', message: 'Authentication required' });
     return null;
   }
-  return req.userId;
+  return user.id;
 }
 
 // ─── Word format validator ────────────────────────────────────────────────────
 
 function isValidWordFormat(word: string): boolean {
-  return /^[a-zA-Z]{2,}$/.test(word);
+  // Support Latin (en/sv/es), Hebrew, and Japanese (hiragana/katakana/kanji)
+  return /^[\p{L}]{2,}$/u.test(word);
 }
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
@@ -80,9 +97,9 @@ router.post('/validate', async (req: Request, res: Response): Promise<void> => {
  * Returns all packs created by the authenticated user.
  * Must be before /:packId to avoid conflict.
  */
-router.get('/mine', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/mine', async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = requireAuth(req, res);
+    const userId = await requireAuth(req, res);
     if (!userId) return;
 
     const packs = await getCreatorPacks(userId);
@@ -98,9 +115,9 @@ router.get('/mine', async (req: AuthRequest, res: Response): Promise<void> => {
  * POST /
  * Create a new word pack. Requires auth.
  */
-router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/', async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = requireAuth(req, res);
+    const userId = await requireAuth(req, res);
     if (!userId) return;
 
     const {
@@ -222,9 +239,9 @@ router.get('/:packId', async (req: Request, res: Response): Promise<void> => {
  * PATCH /:packId
  * Update a pack. Owner only.
  */
-router.patch('/:packId', async (req: AuthRequest, res: Response): Promise<void> => {
+router.patch('/:packId', async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = requireAuth(req, res);
+    const userId = await requireAuth(req, res);
     if (!userId) return;
 
     const { packId } = req.params;
@@ -265,9 +282,9 @@ router.patch('/:packId', async (req: AuthRequest, res: Response): Promise<void> 
  * DELETE /:packId
  * Soft-delete a pack. Owner only.
  */
-router.delete('/:packId', async (req: AuthRequest, res: Response): Promise<void> => {
+router.delete('/:packId', async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = requireAuth(req, res);
+    const userId = await requireAuth(req, res);
     if (!userId) return;
 
     const { packId } = req.params;
@@ -300,9 +317,9 @@ router.delete('/:packId', async (req: AuthRequest, res: Response): Promise<void>
  * POST /:packId/upvote
  * Toggle upvote. Requires auth.
  */
-router.post('/:packId/upvote', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/:packId/upvote', async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = requireAuth(req, res);
+    const userId = await requireAuth(req, res);
     if (!userId) return;
 
     const { packId } = req.params;
@@ -324,9 +341,9 @@ router.post('/:packId/upvote', async (req: AuthRequest, res: Response): Promise<
  * POST /:packId/report
  * Submit a moderation report. Requires auth.
  */
-router.post('/:packId/report', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/:packId/report', async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = requireAuth(req, res);
+    const userId = await requireAuth(req, res);
     if (!userId) return;
 
     const { packId } = req.params;

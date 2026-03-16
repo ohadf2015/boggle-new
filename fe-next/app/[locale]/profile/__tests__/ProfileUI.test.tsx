@@ -222,8 +222,8 @@ describe('Profile UI Styling', () => {
       );
 
       if (activeTab) {
-        // Should use border-2 (chunky border for tabs)
-        expect(activeTab.className).toContain('border-2');
+        // Should use border-3 (chunky neo-brutalist border for tabs)
+        expect(activeTab.className).toContain('border-3');
         expect(activeTab.className).toContain('border-neo-black');
       }
     });

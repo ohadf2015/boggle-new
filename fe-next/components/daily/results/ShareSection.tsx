@@ -82,7 +82,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
 
       {/* Failed players: Retry is primary, Share is secondary */}
       {!solved ? (
-        <div className="max-w-btn space-y-2">
+        <div className="max-w-btn mx-auto space-y-2">
           {/* Inline coin balance row */}
           <div className="flex justify-end">
             <CoinBalanceBadge

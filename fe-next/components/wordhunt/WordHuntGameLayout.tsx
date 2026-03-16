@@ -108,7 +108,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   gameDir,
 }) => {
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ ['--game-chrome-height' as string]: '300px' } as React.CSSProperties}>
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ ['--game-chrome-height' as string]: '400px' } as React.CSSProperties}>
       {/* Score + Quit */}
       <WordHuntMPHeader
         score={score}
@@ -117,7 +117,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
       />
 
       {/* Clue Boxes (target word blanks with accumulated feedback) */}
-      <div className={`px-3 py-1${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
+      <div className={`px-3 py-1 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
         <SurvivalClueBoxes
           currentHint={currentHint}
           targetWord={'?'.repeat(targetLength)}
@@ -135,7 +135,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
       </div>
 
       {/* Life Bar */}
-      <div className="px-3 py-1">
+      <div className="px-3 py-1 flex-shrink-0">
         <SurvivalLifeBar
           lifePoints={lifePoints}
           isGameOver={isGameOver}
@@ -146,8 +146,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         />
       </div>
 
-      {/* Grid — fills remaining space */}
-      <div className="flex-1 min-h-0 px-2 relative">
+      {/* Grid — fills remaining space, overflow-hidden prevents grid from pushing siblings off-screen */}
+      <div className="flex-1 min-h-0 px-2 relative overflow-hidden">
         <SurvivalGridSection
           grid={grid}
           isGameOver={isGameOver}

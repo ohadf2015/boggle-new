@@ -46,6 +46,7 @@ export interface AiValidationResult {
 
 export interface CalculateScoresOptions {
   playerCount?: number;
+  gameMode?: string;
 }
 
 /**
@@ -59,10 +60,13 @@ export function calculateGameScores(
   aiValidatedWords: Map<string, AiValidationResult> = new Map(),
   options: CalculateScoresOptions = {}
 ): PlayerScoreResult[] {
-  const { playerCount = 0 } = options;
+  const { playerCount = 0, gameMode } = options;
 
   // Disable duplicate rule for large rooms (more than 7 players)
   const duplicateRuleDisabled = playerCount > 7;
+
+  // Blast mode skips rarity multiplier — tile bonuses already reward unique paths
+  const rarityDisabled = gameMode === 'blast';
   if (!game) return [];
 
   const results: PlayerScoreResult[] = [];
@@ -106,7 +110,7 @@ export function calculateGameScores(
       let rarityMultiplier = 1.0;
       let wordRarity: 'common' | 'uncommon' | 'rare' | 'legendary' = 'common';
 
-      if (playerCount > 1 && !duplicateRuleDisabled) {
+      if (playerCount > 1 && !duplicateRuleDisabled && !rarityDisabled) {
         const playersWhoFoundThis = wordCountMap[word] || 1;
         const percentageWhoFound = (playersWhoFoundThis / playerCount) * 100;
 

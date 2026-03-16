@@ -110,13 +110,13 @@ describe('Phase 4: Gradient Standardization', () => {
       expect(content).toContain('gradient:');
     });
 
-    it('TabbedDailyLeaderboard.tsx should keep rank badge gradients', () => {
+    it('TabbedDailyLeaderboard.tsx should keep semantic gradients', () => {
       const filePath = path.join(process.cwd(), 'components', 'daily', 'TabbedDailyLeaderboard.tsx');
       const content = fs.readFileSync(filePath, 'utf-8');
 
-      // Should have rank-specific gradients (1st, 2nd, 3rd place)
-      expect(content).toMatch(/from-amber.*to-yellow/); // 1st place
-      expect(content).toMatch(/from-orange.*to-amber/); // 3rd place
+      // Should have semantic gradient (header icon)
+      expect(content).toMatch(/bg-gradient-to-br/);
+      expect(content).toMatch(/from-indigo.*to-purple/);
     });
 
     it('CollectionGrid.tsx should keep rarity gradients', () => {

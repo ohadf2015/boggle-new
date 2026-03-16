@@ -16,6 +16,7 @@ jest.mock('../parts/MouthParts', () => ({
 }));
 jest.mock('../parts/HairParts', () => ({
   HAIR_PARTS: { none: ({ fill }: any) => <g data-testid="hair" fill={fill} />, spiky: ({ fill }: any) => <g data-testid="hair" fill={fill} /> },
+  HAIR_FRONT_PARTS: {},
 }));
 jest.mock('../parts/AccessoryParts', () => ({
   ACCESSORY_PARTS: { none: ({ fill }: any) => <g data-testid="accessory" fill={fill} /> },

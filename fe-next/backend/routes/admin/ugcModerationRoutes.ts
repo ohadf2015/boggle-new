@@ -14,7 +14,7 @@ const router: Router = express.Router();
 
 // ==================== Table Validation (SQL Injection Fix) ====================
 
-export const UGC_TABLES = ['community_boards', 'chat_messages', 'word_votes'] as const;
+export const UGC_TABLES = ['community_boards', 'word_packs', 'chat_messages', 'word_votes'] as const;
 type UGCTable = typeof UGC_TABLES[number];
 
 /**

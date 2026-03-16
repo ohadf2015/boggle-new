@@ -31,6 +31,7 @@ import { LandingBottomCTA } from './LandingBottomCTA';
 import { LandingTopWords } from './LandingTopWords';
 import { LandingHallOfFame } from './LandingHallOfFame';
 import { LandingShareBanner } from './LandingShareBanner';
+import { LandingCommunityShowcase } from './LandingCommunityShowcase';
 import { LandingMobileCards } from './LandingMobileCards';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
@@ -82,6 +83,7 @@ const LandingView: React.FC = () => {
   const [showTutorialCallout, setShowTutorialCallout] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
 
   // Check for room parameter and redirect to multiplayer page
   useEffect(() => {
@@ -225,7 +227,10 @@ const LandingView: React.FC = () => {
         <LandingYourRank />
 
         {/* Avatar Teaser */}
-        <LandingAvatarTeaser />
+        <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
+
+        {/* Community Boards Showcase */}
+        <LandingCommunityShowcase />
 
         {/* Hall of Fame */}
         <LandingHallOfFame champions={champions} loading={hallLoading} />
@@ -249,8 +254,8 @@ const LandingView: React.FC = () => {
 
       <LandingSEOSection />
 
-      {/* Tutorial FAB with Callout */}
-      <div className={cn(
+      {/* Tutorial FAB with Callout — hidden when avatar builder is open */}
+      {!isAvatarBuilderOpen && <div className={cn(
         "fixed bottom-20 right-[max(env(safe-area-inset-right,0px),1rem)] z-[55] sm:bottom-24 sm:right-6 lg:right-8",
         "flex flex-col items-end gap-2",
         "rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8 rtl:items-start"
@@ -315,7 +320,7 @@ const LandingView: React.FC = () => {
           <GraduationCap className="w-5 h-5" />
           <span className="text-xs sm:text-sm">{t('landing.tutorial')}</span>
         </motion.button>
-      </div>
+      </div>}
     </div>
   );
 };

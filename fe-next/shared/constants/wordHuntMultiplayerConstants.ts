@@ -5,7 +5,7 @@
 
 export const HUNT_LIFE_DRAIN_RATE = 1.2;
 export const HUNT_INITIAL_LIFE = 100;
-export const HUNT_FIRST_FINDER_BONUS = 50;
+export const HUNT_FIRST_FINDER_BONUS = 35;
 export const HUNT_WRONG_GUESS_PENALTY = 5;
 export const HUNT_TARGET_MIN_LENGTH = 4;
 export const HUNT_TARGET_MAX_LENGTH = 5;

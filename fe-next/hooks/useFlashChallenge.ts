@@ -12,6 +12,8 @@ interface UseFlashChallengeProps {
   isPlaying: boolean;
   /** Tile types used in the most recently submitted word (for useGoldTile challenge) */
   lastWordTileTypes?: string[];
+  /** Current locale for filtering language-specific challenges */
+  locale?: string;
 }
 
 interface UseFlashChallengeReturn {
@@ -47,6 +49,7 @@ export function useFlashChallenge({
   wordsFound,
   isPlaying,
   lastWordTileTypes,
+  locale = 'en',
 }: UseFlashChallengeProps): UseFlashChallengeReturn {
   const [activeChallenge, setActiveChallenge] = useState<FlashChallenge | null>(null);
   const [isChallengeComplete, setIsChallengeComplete] = useState(false);
@@ -72,7 +75,7 @@ export function useFlashChallenge({
     const pct = elapsed / totalTimeSeconds;
     if (pct >= 0.30) {
       hasTriggered.current = true;
-      const candidates = getFlashChallengeForWorld(worldId);
+      const candidates = getFlashChallengeForWorld(worldId, locale);
       const challenge = candidates[Math.floor(Math.random() * candidates.length)];
       setActiveChallenge(challenge);
       setChallengeTimeLeft(challenge.durationSeconds);
@@ -80,7 +83,7 @@ export function useFlashChallenge({
       challengeStartTime.current = Date.now();
       usedGoldTile.current = false;
     }
-  }, [timeRemaining, isPlaying, totalTimeSeconds, worldId, activeChallenge, wordsFound]);
+  }, [timeRemaining, isPlaying, totalTimeSeconds, worldId, locale, activeChallenge, wordsFound]);
 
   // Live countdown timer
   useEffect(() => {

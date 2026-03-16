@@ -38,7 +38,7 @@ export interface UseAdventureWordSubmitProps {
   gridSize: number;
   minWordLength: number;
   validateWord: (word: string, path: Array<{ row: number; col: number }>) => Promise<{ isValid: boolean; score?: number; errorKey?: string }>;
-  submitWordWithPath: (word: string, score: number, path: Array<{ row: number; col: number }>) => void;
+  submitWordWithPath: (word: string, score: number, path: Array<{ row: number; col: number }>, options?: { detonate?: boolean }) => void;
   clearSelection: () => void;
   clearCurrentHint: () => void;
   recordActivity: () => void;
@@ -69,6 +69,8 @@ export interface UseAdventureWordSubmitProps {
   getPopupStartPosition: () => { x: number; y: number };
   /** Current world mechanic (null for world 1) */
   worldMechanic?: string | null;
+  /** Word Dynamite T3: detonate mode active */
+  detonateActive?: boolean;
 }
 
 export interface UseAdventureWordSubmitReturn {
@@ -94,6 +96,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     worldMechanic,
     bossHealPerWord = 0,
     healPlayerHealth,
+    detonateActive = false,
   } = props;
 
   const { tap, success: hapticSuccess } = useHaptics();
@@ -203,7 +206,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         setWordFeedback({ id: `${Date.now()}`, type: 'accepted', word, score: scoreValue, timestamp: Date.now() });
         lastSubmittedWordRef.current = { word, path };
 
-        submitWordWithPath(word, scoreValue, path);
+        submitWordWithPath(word, scoreValue, path, { detonate: detonateActive });
         clearSelection();
         clearCurrentHint();
         recordActivity();
@@ -256,7 +259,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         }, 2000);
       }
     },
-    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth]
+    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
   );
 
   return {

@@ -12,7 +12,7 @@
  * - 'simple': Uses simple styled spans (singleplayer results)
  */
 
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getPointColor, getTextColor } from './utils';
@@ -279,6 +279,8 @@ export interface InvalidWordsSectionProps {
   getPlayerCountForWord?: (word: string) => number;
   /** Whether to use WordChip (multiplayer) or simple spans (singleplayer) */
   mode?: 'chip' | 'simple';
+  /** Language code for appeal API */
+  language?: string;
   className?: string;
 }
 
@@ -287,9 +289,32 @@ export const InvalidWordsSection = memo<InvalidWordsSectionProps>(({
   t,
   getPlayerCountForWord,
   mode = 'chip',
+  language,
   className,
 }) => {
+  const [appealedWords, setAppealedWords] = useState<Set<string>>(new Set());
+  const [appealingWord, setAppealingWord] = useState<string | null>(null);
+
+  const handleAppeal = useCallback(async (word: string) => {
+    if (appealedWords.has(word) || !language) return;
+    setAppealingWord(word);
+    try {
+      await fetch('/api/appeal-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word, language }),
+      });
+      setAppealedWords(prev => new Set(prev).add(word));
+    } catch {
+      // Silent fail — non-critical
+    } finally {
+      setAppealingWord(null);
+    }
+  }, [appealedWords, language]);
+
   if (invalidWords.length === 0) return null;
+
+  const showAppeal = mode === 'chip' && !!language;
 
   return (
     <div className={cn(
@@ -303,11 +328,32 @@ export const InvalidWordsSection = memo<InvalidWordsSectionProps>(({
       <div className="flex flex-wrap gap-1">
         {invalidWords.map((wordObj, i) => (
           mode === 'chip' ? (
-            <WordChip
-              key={`invalid-${i}`}
-              wordObj={wordObj}
-              playerCount={getPlayerCountForWord?.(wordObj.word) ?? 0}
-            />
+            <div key={`invalid-${i}`} className="inline-flex items-center gap-1">
+              <WordChip
+                wordObj={wordObj}
+                playerCount={getPlayerCountForWord?.(wordObj.word) ?? 0}
+              />
+              {showAppeal && (
+                <button
+                  onClick={() => handleAppeal(wordObj.word)}
+                  disabled={appealedWords.has(wordObj.word) || appealingWord === wordObj.word}
+                  className={cn(
+                    'text-[10px] font-black uppercase px-2 py-1 rounded-neo border-2 border-neo-black transition-all min-h-[32px]',
+                    appealedWords.has(wordObj.word)
+                      ? 'bg-neo-lime text-neo-black cursor-default'
+                      : 'bg-neo-orange text-neo-black hover:bg-neo-yellow active:translate-y-[1px] active:shadow-none shadow-hard-sm cursor-pointer'
+                  )}
+                  aria-label={`${t('results.appealWord')} ${wordObj.word}`}
+                >
+                  {appealedWords.has(wordObj.word)
+                    ? t('results.appealed')
+                    : appealingWord === wordObj.word
+                      ? '...'
+                      : t('results.appealWord')
+                  }
+                </button>
+              )}
+            </div>
           ) : (
             <span
               key={`invalid-${i}`}
@@ -322,6 +368,11 @@ export const InvalidWordsSection = memo<InvalidWordsSectionProps>(({
           )
         ))}
       </div>
+      {showAppeal && invalidWords.length > 0 && (
+        <p className="text-[10px] text-neo-black/50 dark:text-slate-400 mt-1.5 leading-tight">
+          {t('results.appealExplanation')}
+        </p>
+      )}
     </div>
   );
 });

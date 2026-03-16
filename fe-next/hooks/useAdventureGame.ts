@@ -43,7 +43,8 @@ interface UseAdventureGameReturn {
   submitWordWithPath: (
     word: string,
     score: number,
-    path: Array<{ row: number; col: number }>
+    path: Array<{ row: number; col: number }>,
+    options?: { detonate?: boolean }
   ) => void;
   startGame: () => void;
   pauseGame: () => void;
@@ -68,6 +69,8 @@ interface UseAdventureGameReturn {
   useShuffle: () => void;
   /** Shuffles remaining this level */
   shufflesRemaining: number;
+  /** Update a specific objective (for boss events, collectGems, etc.) */
+  updateObjective: (objectiveType: string, value: number, mode?: 'set' | 'increment') => void;
 }
 
 // ==============================================
@@ -162,12 +165,12 @@ export function useAdventureGame({
   }, [effectiveComboTimeout]);
 
   const submitWordWithPath = useCallback(
-    (word: string, score: number, path: Array<{ row: number; col: number }>) => {
+    (word: string, score: number, path: Array<{ row: number; col: number }>, options?: { detonate?: boolean }) => {
       if (comboTimeoutRef.current) {
         clearTimeout(comboTimeoutRef.current);
       }
 
-      dispatch({ type: 'SUBMIT_WORD', payload: { word, score, path } });
+      dispatch({ type: 'SUBMIT_WORD', payload: { word, score, path, detonate: options?.detonate } });
 
       const removedIndices = path.map((pos) => `tile-${pos.row}-${pos.col}`);
       cascade.startCascade(removedIndices);
@@ -222,6 +225,10 @@ export function useAdventureGame({
     dispatch({ type: 'ACTIVATE_TIME_FREEZE', payload: { seconds } });
   }, []);
 
+  const updateObjective = useCallback((objectiveType: string, value: number, mode: 'set' | 'increment' = 'set') => {
+    dispatch({ type: 'UPDATE_OBJECTIVE', payload: { objectiveType, value, mode } });
+  }, []);
+
   const useShuffle = useCallback(() => {
     if (state.shufflesRemaining <= 0) return;
     dispatch({ type: 'USE_SHUFFLE' });
@@ -267,5 +274,6 @@ export function useAdventureGame({
     freezeUsed: state.freezeUsed,
     useShuffle,
     shufflesRemaining: state.shufflesRemaining,
+    updateObjective,
   };
 }

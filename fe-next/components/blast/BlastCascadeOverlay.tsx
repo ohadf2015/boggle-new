@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { BLAST_ANIM, type BlastCascadePhase, type CascadeAnimationData } from './hooks/useBlastCascade';
 import type { BlastTileType } from './types';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 // Preload anime.js on module load to eliminate cold-start lag on first cascade
 const animePromise = typeof window !== 'undefined'
@@ -49,6 +50,7 @@ export function BlastCascadeOverlay({
   gridSize,
 }: BlastCascadeOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   // Cached row step (cell height + gap) — only remeasured when gridSize changes or first mount
   const rowStepRef = useRef(0);
   const lastGridSizeRef = useRef(gridSize);
@@ -72,8 +74,9 @@ export function BlastCascadeOverlay({
   }, [phase, data, gridSize]);
 
   // Run anime.js animations when phase changes — preloaded at module level
+  // Skip animations entirely for reduced-motion users (accessibility)
   useEffect(() => {
-    if (!overlayRef.current || !data || phase === 'idle' || !animePromise) return;
+    if (!overlayRef.current || !data || phase === 'idle' || !animePromise || prefersReducedMotion) return;
 
     const el = overlayRef.current;
 
@@ -90,23 +93,15 @@ export function BlastCascadeOverlay({
             opacity: [1, 1, 0],
             rotate: anime.stagger([-12, 12]),
             // Flash white briefly on clear for "energy release" feel
-            filter: ['brightness(1)', 'brightness(1.6)', 'brightness(0.5)'],
+            // Brightness reduced from 1.6→1.25 to prevent motion sickness from simultaneous luminance spikes
+            filter: ['brightness(1)', 'brightness(1.25)', 'brightness(0.5)'],
             duration: BLAST_ANIM.clear.duration,
             easing: 'cubicBezier(0.55, 0, 1, 0.45)',
             delay: anime.stagger(BLAST_ANIM.clear.stagger, { from: 'center' }),
           });
 
-          // Screen shake for big clears (6+ tiles)
-          if (clearTargets.length >= 6 && el.parentElement) {
-            const shakeIntensity = Math.min(clearTargets.length * 0.5, 4);
-            anime({
-              targets: el.parentElement,
-              translateX: [0, shakeIntensity, -shakeIntensity, shakeIntensity * 0.5, 0],
-              translateY: [0, shakeIntensity * 0.5, -shakeIntensity * 0.3, 0],
-              duration: 200,
-              easing: 'easeOutQuad',
-            });
-          }
+          // Screen shake removed — BlastGameLayout's CSS shake system (animate-neo-shake/wobble)
+          // handles this with queue-depth-1 guard. Having both caused compound jitter.
         }
       }
 
@@ -168,7 +163,7 @@ export function BlastCascadeOverlay({
         }
       }
     });
-  }, [phase, data, gridSize]);
+  }, [phase, data, gridSize, prefersReducedMotion]);
 
   if (!data || phase === 'idle') return null;
 

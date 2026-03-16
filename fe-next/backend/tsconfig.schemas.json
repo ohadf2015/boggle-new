@@ -14,7 +14,7 @@
     "declaration": true,
     "declarationMap": false,
     "sourceMap": false,
-    "noEmit": true,
+    "noEmit": false,
     "noImplicitAny": false,
     "allowJs": false,
     "baseUrl": "..",

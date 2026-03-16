@@ -1,5 +1,5 @@
 /**
- * Tests for enhanced Wordle-style emoji grid in share text
+ * Tests for Word Hunt shareable result text generation
  */
 import { generateWordHuntShareableResult } from '../shareUtils';
 import type { WordHuntResult } from '../types';
@@ -56,57 +56,8 @@ function makeResult(overrides: Partial<WordHuntResult> = {}): WordHuntResult {
   };
 }
 
-describe('generateWordHuntShareableResult emoji grid', () => {
-  it('includes emoji grid rows from attempt feedback', () => {
-    const result = makeResult();
-    const text = generateWordHuntShareableResult(result);
-
-    // Should contain emoji rows for each attempt
-    expect(text).toContain('🟨🟨🟨🟨🟨⬜');
-    expect(text).toContain('🟩🟨🟩🟩🟩⬜');
-    expect(text).toContain('🟩🟩🟩🟩🟩🟩');
-  });
-
-  it('includes streak in share text when streak > 1', () => {
-    const result = makeResult({ streakDays: 7 });
-    const text = generateWordHuntShareableResult(result);
-
-    expect(text).toContain('🔥');
-    expect(text).toMatch(/7/);
-  });
-
-  it('omits streak when streakDays <= 1', () => {
-    const result = makeResult({ streakDays: 0 });
-    const text = generateWordHuntShareableResult(result);
-
-    expect(text).not.toContain('🔥');
-  });
-
-  it('shows X/10 for unsolved puzzles', () => {
-    const result = makeResult({
-      solved: false,
-      attemptsUsed: 10,
-      attempts: Array.from({ length: 10 }, (_, i) => ({
-        word: 'FAILED',
-        feedback: [
-          { letter: 'F', feedback: 'gray' as const, position: 0 },
-          { letter: 'A', feedback: 'yellow' as const, position: 1 },
-          { letter: 'I', feedback: 'gray' as const, position: 2 },
-          { letter: 'L', feedback: 'yellow' as const, position: 3 },
-          { letter: 'E', feedback: 'green' as const, position: 4 },
-          { letter: 'D', feedback: 'gray' as const, position: 5 },
-        ],
-        timestamp: i * 1000,
-      })),
-    });
-    const text = generateWordHuntShareableResult(result);
-
-    expect(text).toContain('X/10');
-    // Should still have emoji grid rows
-    expect(text).toContain('⬜🟨⬜🟨🟩⬜');
-  });
-
-  it('includes puzzle number in header', () => {
+describe('generateWordHuntShareableResult', () => {
+  it('includes header with puzzle number', () => {
     const result = makeResult({ puzzleNumber: 247 });
     const text = generateWordHuntShareableResult(result);
 
@@ -114,12 +65,29 @@ describe('generateWordHuntShareableResult emoji grid', () => {
     expect(text).toContain('Word Hunt');
   });
 
-  it('handles empty attempts gracefully', () => {
-    const result = makeResult({ attempts: [], attemptsUsed: 0, solved: false });
+  it('shows solved attempt count for solved puzzles', () => {
+    const result = makeResult({ attemptsUsed: 3 });
     const text = generateWordHuntShareableResult(result);
 
-    // Should not crash, should still have header
-    expect(text).toContain('Word Hunt');
+    expect(text).toContain('Solved in 3/10');
+  });
+
+  it('shows X/10 for unsolved puzzles', () => {
+    const result = makeResult({
+      solved: false,
+      attemptsUsed: 10,
+      attempts: [],
+    });
+    const text = generateWordHuntShareableResult(result);
+
+    expect(text).toContain('X/10');
+  });
+
+  it('includes game link emoji at end', () => {
+    const result = makeResult();
+    const text = generateWordHuntShareableResult(result);
+
+    expect(text).toContain('🎮');
   });
 
   it('does not reveal the target word (spoiler-free)', () => {
@@ -128,5 +96,13 @@ describe('generateWordHuntShareableResult emoji grid', () => {
 
     expect(text).not.toContain('CASTLE');
     expect(text).not.toContain('castle');
+  });
+
+  it('handles empty attempts gracefully', () => {
+    const result = makeResult({ attempts: [], attemptsUsed: 0, solved: false });
+    const text = generateWordHuntShareableResult(result);
+
+    // Should not crash, should still have header
+    expect(text).toContain('Word Hunt');
   });
 });

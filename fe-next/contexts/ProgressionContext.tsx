@@ -67,6 +67,8 @@ interface ProgressionContextType {
   getLevelCompletion: (worldId: number, levelId: number) => LevelCompletion | undefined;
   /** Get attempt data for a specific level (includes failed attempts) */
   getLevelAttempt: (worldId: number, levelId: number) => LevelAttempt | undefined;
+  /** Update gold and upgrades (optimistic + persisted to API) */
+  updateCurrency: (gold: number, upgrades: Record<string, number>) => Promise<void>;
 }
 
 // ==============================================
@@ -391,6 +393,32 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [attempts]
   );
 
+  // Update currency (gold + upgrades) — optimistic local update + API persist
+  const updateCurrency = useCallback(
+    async (newGold: number, newUpgrades: Record<string, number>) => {
+      // Optimistic update
+      setProgression((prev) => {
+        if (!prev) return prev;
+        return { ...prev, gold: newGold, upgrades: newUpgrades };
+      });
+
+      // Persist to server
+      if (user?.id) {
+        try {
+          await fetch('/api/adventure/purchase', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ gold: newGold, upgrades: newUpgrades }),
+          });
+        } catch (err) {
+          console.error('[ProgressionContext] Purchase persist error:', err);
+        }
+      }
+    },
+    [user?.id]
+  );
+
   // Initial fetch on mount (when auth is ready)
   useEffect(() => {
     if (!authLoading) {
@@ -413,6 +441,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       getWorldStars,
       getLevelCompletion,
       getLevelAttempt,
+      updateCurrency,
     }),
     [
       progression,
@@ -427,6 +456,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       getWorldStars,
       getLevelCompletion,
       getLevelAttempt,
+      updateCurrency,
     ]
   );
 

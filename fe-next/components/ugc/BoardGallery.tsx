@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
+import Link from 'next/link';
 import { Layout } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import BoardCard, { type BoardCardBoard } from './BoardCard';
@@ -35,7 +36,7 @@ interface BoardGalleryProps {
 }
 
 const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [sort, setSort] = useState<SortOption>('featured');
   const [difficulty, setDifficulty] = useState<DifficultyFilter | null>(null);
@@ -145,12 +146,12 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
           <p className="font-neo-body text-neo-white/60 text-sm">
             {t('ugc.gallery.empty')}
           </p>
-          <a
-            href="../community/create"
+          <Link
+            href={`/${language}/create/board`}
             className="px-5 py-2 bg-neo-yellow text-black font-neo-body font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-all"
           >
             {t('ugc.gallery.createBoard')}
-          </a>
+          </Link>
         </div>
       ) : (
         <>

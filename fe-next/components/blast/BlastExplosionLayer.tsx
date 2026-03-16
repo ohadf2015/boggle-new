@@ -39,6 +39,8 @@ function getScoreIntensity(score: number): number {
  * Excess explosions are dropped — the player won't notice missing particles
  * in a sea of 15 simultaneous detonations, but they WILL notice the jank. */
 const MAX_VISIBLE_EXPLOSIONS = 6;
+/** Cap simultaneous score popups to prevent unreadable stacking at grid center */
+const MAX_VISIBLE_SCORE_POPUPS = 3;
 
 interface BlastExplosionLayerProps {
   explosions: BlastExplosion[];
@@ -66,24 +68,29 @@ export function BlastExplosionLayer({
 }: BlastExplosionLayerProps) {
   return (
     <div className="absolute inset-0 pointer-events-none z-30">
-      {/* Particle explosions — capped to prevent GPU overload during bomb chains */}
-      {explosions.slice(0, MAX_VISIBLE_EXPLOSIONS).map(exp => {
+      {/* Particle explosions — capped to prevent GPU overload during bomb chains.
+        * Staggered by timestamp so chain bombs ripple visually instead of detonating at once. */}
+      {explosions.slice(0, MAX_VISIBLE_EXPLOSIONS).map((exp, _i, arr) => {
         const x = containerOffset.x + exp.col * cellSize + cellSize / 2;
         const y = containerOffset.y + exp.row * cellSize + cellSize / 2;
+        // Use timestamp delta from first explosion as animation delay for visual sequencing
+        const minTimestamp = arr.length > 0 ? arr[0].timestamp : exp.timestamp;
+        const delayMs = Math.max(0, exp.timestamp - minTimestamp);
 
         return (
-          <ExplosionEffect
-            key={exp.id}
-            position={{ x, y }}
-            intensity={exp.intensity}
-            color={EXPLOSION_COLORS[exp.type]}
-            onComplete={() => onExplosionComplete(exp.id)}
-          />
+          <div key={exp.id} style={delayMs > 0 ? { animationDelay: `${delayMs}ms` } : undefined}>
+            <ExplosionEffect
+              position={{ x, y }}
+              intensity={exp.intensity}
+              color={EXPLOSION_COLORS[exp.type]}
+              onComplete={() => onExplosionComplete(exp.id)}
+            />
+          </div>
         );
       })}
 
-      {/* Score popups — scaled by score value, with tier labels for high scores */}
-      {scorePopups.map(popup => {
+      {/* Score popups — scaled by score value, capped + staggered for readability */}
+      {scorePopups.slice(0, MAX_VISIBLE_SCORE_POPUPS).map((popup, popupIdx) => {
         const x = containerOffset.x + popup.col * cellSize + cellSize / 2;
         const y = containerOffset.y + popup.row * cellSize + cellSize / 2;
         const intensity = getScoreIntensity(popup.score);
@@ -97,6 +104,8 @@ export function BlastExplosionLayer({
             style={{
               transform: intensity === 3 ? 'scale(1.5)' : intensity === 2 ? 'scale(1.2)' : 'scale(0.9)',
               color: scoreColor,
+              // Stagger secondary popups by 200ms each for readability
+              ...(popupIdx > 0 ? { animationDelay: `${popupIdx * 200}ms` } : {}),
             }}
           >
             {/* Tier label above popup — "AMAZING!" / "INCREDIBLE!" for high scores */}

@@ -17,6 +17,7 @@ import {
   // Generators
   generateObjectives,
   generateSpecialTiles,
+  applyGemDetectorBoost,
   // Validation
   validateLevelConfig,
 } from '../levelConfig';
@@ -447,6 +448,57 @@ describe('Special Tile Generation', () => {
 
       // Ice tiles should still be generated
       expect(iceTiles.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('applyGemDetectorBoost', () => {
+    it('should return same tiles when no boost and no guarantee', () => {
+      const tiles = [{ row: 0, col: 0, type: 'gold' as const }];
+      const result = applyGemDetectorBoost(tiles, 5, 0, false);
+      expect(result).toBe(tiles); // same reference, no copy
+    });
+
+    it('should add extra gold tiles with specialTileBoost', () => {
+      const tiles = [
+        { row: 0, col: 0, type: 'gold' as const },
+        { row: 1, col: 1, type: 'gold' as const },
+      ];
+      const result = applyGemDetectorBoost(tiles, 5, 0.3, false);
+      const goldCount = result.filter(t => t.type === 'gold').length;
+      // 2 original + at least 1 extra (Math.round(2 * 0.3) = 1)
+      expect(goldCount).toBeGreaterThan(2);
+    });
+
+    it('should add at least 1 extra gold even with small boost', () => {
+      const tiles = [{ row: 0, col: 0, type: 'ice' as const }];
+      const result = applyGemDetectorBoost(tiles, 5, 0.2, false);
+      const goldCount = result.filter(t => t.type === 'gold').length;
+      // 0 gold tiles * 0.2 = 0, but Math.max(1, ...) ensures at least 1
+      expect(goldCount).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should guarantee a gold tile when guaranteedGoldTile is true', () => {
+      const tiles = [{ row: 0, col: 0, type: 'ice' as const }];
+      const result = applyGemDetectorBoost(tiles, 5, 0, true);
+      const hasGold = result.some(t => t.type === 'gold');
+      expect(hasGold).toBe(true);
+    });
+
+    it('should not duplicate positions', () => {
+      const tiles = generateSpecialTiles(5, 7, 5);
+      const result = applyGemDetectorBoost(tiles, 5, 0.3, true);
+      const positions = new Set(result.map(t => `${t.row},${t.col}`));
+      expect(positions.size).toBe(result.length);
+    });
+
+    it('should preserve original tiles', () => {
+      const tiles = [
+        { row: 0, col: 0, type: 'ice' as const },
+        { row: 1, col: 1, type: 'bomb' as const },
+      ];
+      const result = applyGemDetectorBoost(tiles, 5, 0.2, false);
+      expect(result[0]).toEqual({ row: 0, col: 0, type: 'ice' });
+      expect(result[1]).toEqual({ row: 1, col: 1, type: 'bomb' });
     });
   });
 });

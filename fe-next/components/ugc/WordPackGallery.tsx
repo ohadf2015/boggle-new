@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Plus, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import WordPackCard from './WordPackCard';
@@ -45,7 +46,8 @@ const SORT_TABS: { value: SortOption; labelKey: string }[] = [
 ];
 
 export default function WordPackGallery() {
-  const { t } = useLanguage();
+  const { t, language: uiLanguage } = useLanguage();
+  const router = useRouter();
   const [sort, setSort] = useState<SortOption>('popular');
   const [language, setLanguage] = useState('all');
   const [upvotedIds, setUpvotedIds] = useState<Set<string>>(new Set());
@@ -100,9 +102,9 @@ export default function WordPackGallery() {
   }, [fetchPacks, state.page]);
 
   const handlePlay = useCallback((packId: string) => {
-    // Navigation to game page with pack will be handled by the page layer
-    window.location.href = `/play?pack=${packId}`;
-  }, []);
+    // Navigate to multiplayer with word pack pre-selected
+    router.push(`/${uiLanguage}/multiplayer?autoCreate=true&wordPack=${packId}`);
+  }, [router, language]);
 
   const handleUpvote = useCallback(async (packId: string) => {
     setUpvotedIds((prev) => {

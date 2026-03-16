@@ -601,6 +601,60 @@ export function generateSpecialTiles(
   return tiles;
 }
 
+/**
+ * Apply Gem Detector upgrade boost to special tiles.
+ * - specialTileBoost (T1-2): adds extra gold tiles proportional to boost %
+ * - guaranteedGoldTile (T3): ensures at least 1 gold tile after cascade
+ *
+ * Called at game init time (after upgrade effects are available).
+ */
+export function applyGemDetectorBoost(
+  tiles: SpecialTile[],
+  gridSize: number,
+  specialTileBoost: number,
+  guaranteedGoldTile: boolean
+): SpecialTile[] {
+  if (specialTileBoost <= 0 && !guaranteedGoldTile) return tiles;
+
+  const result = [...tiles];
+  const usedPositions = new Set(tiles.map(t => `${t.row},${t.col}`));
+
+  const addGoldTile = (): boolean => {
+    let attempts = 0;
+    while (attempts < 100) {
+      const row = Math.floor(Math.random() * gridSize);
+      const col = Math.floor(Math.random() * gridSize);
+      const posKey = `${row},${col}`;
+      if (!usedPositions.has(posKey)) {
+        usedPositions.add(posKey);
+        result.push({ row, col, type: TILE_TYPES.GOLD as TileType });
+        return true;
+      }
+      attempts++;
+    }
+    return false;
+  };
+
+  // specialTileBoost: add extra gold tiles (e.g. 0.2 = +20% → ~1 extra, 0.3 = ~1-2 extra)
+  if (specialTileBoost > 0) {
+    const currentGoldCount = tiles.filter(t => t.type === 'gold').length;
+    const extraGold = Math.max(1, Math.round(currentGoldCount * specialTileBoost));
+    for (let i = 0; i < extraGold; i++) {
+      addGoldTile();
+    }
+  }
+
+  // guaranteedGoldTile: ensure at least 1 gold tile exists
+  if (guaranteedGoldTile) {
+    const hasGold = result.some(t => t.type === 'gold');
+    if (!hasGold) {
+      addGoldTile();
+    }
+  }
+
+  return result;
+}
+
 // ==============================================
 // VALIDATION
 // ==============================================

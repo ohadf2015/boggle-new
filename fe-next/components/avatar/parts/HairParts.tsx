@@ -257,17 +257,9 @@ function Bun({ fill }: HairPartProps) {
 function Bangs({ fill }: HairPartProps) {
   return (
     <g>
-      {/* Full voluminous hair behind — longer */}
+      {/* Full voluminous hair behind — longer (back layer only, bangs render in front layer) */}
       <path
         d="M18 30 Q18 12 50 8 Q82 12 82 30 L82 60 Q80 66 76 62 L76 38 Q50 24 24 38 L24 62 Q20 66 18 60Z"
-        fill={fill}
-        stroke="#000"
-        strokeWidth={S}
-        strokeLinejoin="round"
-      />
-      {/* Thick front bangs with wispy edges */}
-      <path
-        d="M20 34 Q20 14 50 10 Q80 14 80 34 L74 40 L66 36 L58 42 L50 36 L42 42 L34 36 L26 40Z"
         fill={fill}
         stroke="#000"
         strokeWidth={S}
@@ -393,3 +385,73 @@ export const HAIR_PARTS = {
 } as const;
 
 export type HairPart = keyof typeof HAIR_PARTS;
+
+// ==================== Front-layer hair (renders ON TOP of face) ====================
+// These add bangs, side-framing strands, or other elements that should appear
+// in front of the face for styles that primarily render behind the head.
+
+function BangsFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Thick front bangs with wispy edges — sits on top of forehead */}
+      <path
+        d="M20 34 Q20 14 50 10 Q80 14 80 34 L74 40 L66 36 L58 42 L50 36 L42 42 L34 36 L26 40Z"
+        fill={fill}
+        stroke="#000"
+        strokeWidth={S}
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+}
+
+function LongFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Side strands framing the face */}
+      <path d="M22 32 Q20 28 22 38 L24 52 Q22 56 20 52 L18 38 Q18 30 22 32Z" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M78 32 Q80 28 78 38 L76 52 Q78 56 80 52 L82 38 Q82 30 78 32Z" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+    </g>
+  );
+}
+
+function BobFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Side pieces that frame the face in front */}
+      <path d="M20 32 L22 50 Q24 56 28 52 L26 38 Q24 32 20 32Z" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M80 32 L78 50 Q76 56 72 52 L74 38 Q76 32 80 32Z" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+    </g>
+  );
+}
+
+function WavyFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Side wave strands framing face */}
+      <path d="M20 34 Q18 40 20 48 Q22 52 24 48 Q22 42 22 36Z" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M80 34 Q82 40 80 48 Q78 52 76 48 Q78 42 78 36Z" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+    </g>
+  );
+}
+
+function SideshaveFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Framing strand on the long side */}
+      <path d="M78 32 Q80 36 80 44 Q78 48 76 44 L76 36Z" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+    </g>
+  );
+}
+
+/**
+ * Front-layer hair parts. Only styles that need elements rendered
+ * ON TOP of the face have entries here. Others return null implicitly.
+ */
+export const HAIR_FRONT_PARTS: Partial<Record<keyof typeof HAIR_PARTS, React.FC<HairPartProps>>> = {
+  bangs: BangsFront,
+  long: LongFront,
+  bob: BobFront,
+  wavy: WavyFront,
+  sideshave: SideshaveFront,
+};

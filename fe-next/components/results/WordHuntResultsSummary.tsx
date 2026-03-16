@@ -3,12 +3,17 @@
 import { Heart, Clock, Skull, Shield, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import WordHuntTipBadge from './WordHuntTipBadge';
 
 export interface WordHuntPlayerResult {
   username: string;
   score: number;
   survived: boolean;
   lifeRemaining: number;
+  validWordCount?: number;
+  invalidWordCount?: number;
+  avgWordLength?: number;
+  longestWordLength?: number;
 }
 
 interface WordHuntResultsSummaryProps {
@@ -98,12 +103,26 @@ export default function WordHuntResultsSummary({
             </span>
           </div>
           <div className="space-y-1">
-            {survivors.map((player) => (
+            {survivors.map((player, idx) => (
               <PlayerRow
                 key={player.username}
                 player={player}
                 isCurrentUser={player.username === currentUsername}
                 variant="survivor"
+                tipStats={{
+                  score: player.score,
+                  survived: true,
+                  lifeRemaining: player.lifeRemaining,
+                  discoveryWords,
+                  foundTarget,
+                  isFirstFinder: isFirstFinder && player.username === currentUsername,
+                  totalPlayers: (playerResults?.length ?? 0),
+                  rank: idx + 1,
+                  validWordCount: player.validWordCount ?? 0,
+                  invalidWordCount: player.invalidWordCount ?? 0,
+                  avgWordLength: player.avgWordLength ?? 0,
+                  longestWordLength: player.longestWordLength ?? 0,
+                }}
               />
             ))}
           </div>
@@ -126,6 +145,20 @@ export default function WordHuntResultsSummary({
                 player={player}
                 isCurrentUser={player.username === currentUsername}
                 variant="eliminated"
+                tipStats={{
+                  score: player.score,
+                  survived: false,
+                  lifeRemaining: 0,
+                  discoveryWords,
+                  foundTarget,
+                  isFirstFinder: false,
+                  totalPlayers: (playerResults?.length ?? 0),
+                  rank: (survivors?.length ?? 0) + (eliminated?.indexOf(player) ?? 0) + 1,
+                  validWordCount: player.validWordCount ?? 0,
+                  invalidWordCount: player.invalidWordCount ?? 0,
+                  avgWordLength: player.avgWordLength ?? 0,
+                  longestWordLength: player.longestWordLength ?? 0,
+                }}
               />
             ))}
           </div>
@@ -139,51 +172,56 @@ function PlayerRow({
   player,
   isCurrentUser,
   variant,
+  tipStats,
 }: {
   player: WordHuntPlayerResult;
   isCurrentUser: boolean;
   variant: 'survivor' | 'eliminated';
+  tipStats: import('./getWordHuntTip').WordHuntTipInput;
 }) {
   const isSurvivor = variant === 'survivor';
 
   return (
-    <div
-      data-testid={`player-row-${player.username}`}
-      className={`flex items-center justify-between p-2 rounded-neo border-3 border-neo-black shadow-hard-sm ${
-        isCurrentUser
-          ? 'bg-neo-yellow/20 border-neo-yellow'
-          : isSurvivor
-          ? 'bg-green-900/30'
-          : 'bg-red-900/20 opacity-70'
-      }`}
-    >
-      <div className="flex items-center gap-2 min-w-0">
-        {!isSurvivor && <Skull className="w-4 h-4 text-red-400 flex-shrink-0" />}
-        <span
-          className={`text-sm font-bold truncate ${
-            isCurrentUser ? 'text-neo-yellow' : 'text-neo-white'
-          }`}
-        >
-          {player.username}
-        </span>
-      </div>
-      <div className="flex items-center gap-3 flex-shrink-0">
-        {isSurvivor && (
-          <div
-            role="progressbar"
-            aria-valuenow={player.lifeRemaining}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            className="w-16 h-2 bg-neo-black/50 rounded-full overflow-hidden"
+    <div>
+      <div
+        data-testid={`player-row-${player.username}`}
+        className={`flex items-center justify-between p-2 rounded-neo border-3 border-neo-black shadow-hard-sm ${
+          isCurrentUser
+            ? 'bg-neo-yellow/20 border-neo-yellow'
+            : isSurvivor
+            ? 'bg-green-900/30'
+            : 'bg-red-900/20 opacity-70'
+        }`}
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          {!isSurvivor && <Skull className="w-4 h-4 text-red-400 flex-shrink-0" />}
+          <span
+            className={`text-sm font-bold truncate ${
+              isCurrentUser ? 'text-neo-yellow' : 'text-neo-white'
+            }`}
           >
+            {player.username}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {isSurvivor && (
             <div
-              className="h-full bg-green-400 rounded-full"
-              style={{ width: `${player.lifeRemaining}%` }}
-            />
-          </div>
-        )}
-        <span className="text-sm font-bold text-neo-white">{player.score}</span>
+              role="progressbar"
+              aria-valuenow={player.lifeRemaining}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              className="w-16 h-2 bg-neo-black/50 rounded-full overflow-hidden"
+            >
+              <div
+                className="h-full bg-green-400 rounded-full"
+                style={{ width: `${player.lifeRemaining}%` }}
+              />
+            </div>
+          )}
+          <span className="text-sm font-bold text-neo-white">{player.score}</span>
+        </div>
       </div>
+      {isCurrentUser && <WordHuntTipBadge stats={tipStats} />}
     </div>
   );
 }

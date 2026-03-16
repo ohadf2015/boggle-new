@@ -13,13 +13,14 @@ import {
   getHuntLifeBonus,
 } from '@/shared/constants/wordHuntMultiplayerConstants';
 
+import { isWordHuntQuality } from '@/shared/utils/wordQuality';
 import * as fs from 'fs';
 import * as path from 'path';
 
 /**
- * Per-language common word sets for Word Hunt target selection.
- * English: ~2100 words from Google's 10,000 most-used, filtered to 4-5 letters.
- * Other languages: loaded from common_hunt_words_{lang}.txt if available.
+ * Per-language curated word sets for Word Hunt target selection.
+ * ~600-800 words per language, hand-curated for imageability,
+ * discovery satisfaction, and age-appropriate familiarity.
  * Loaded lazily on first use.
  */
 const commonWordsByLang: Record<string, Set<string>> = {};
@@ -44,6 +45,7 @@ export function getCommonWords(lang = 'en'): Set<string> {
     he: 'common_hunt_words_he.txt',
     sv: 'common_hunt_words_sv.txt',
     ja: 'common_hunt_words_ja.txt',
+    es: 'common_hunt_words_es.txt',
   };
 
   commonWordsByLang[lang] = loadWordFile(fileMap[lang] || `common_hunt_words_${lang}.txt`);
@@ -75,6 +77,13 @@ export function selectTargetWord(
         return commonCandidates[Math.floor(Math.random() * commonCandidates.length)];
       }
     }
+  }
+
+  // Filter out low-quality words (jargon, medical, offensive, boring)
+  // before falling back to any dictionary word
+  const qualityCandidates = candidates.filter(w => isWordHuntQuality(w));
+  if (qualityCandidates.length > 0) {
+    return qualityCandidates[Math.floor(Math.random() * qualityCandidates.length)];
   }
 
   return candidates[Math.floor(Math.random() * candidates.length)];

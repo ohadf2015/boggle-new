@@ -161,7 +161,7 @@ function HostPreGameView({
       const preset = GAME_PRESETS[key];
       setTimerValue(preset.timer);
       setDifficulty(preset.difficulty);
-      setMinWordLength(preset.difficulty === 'HARD' ? 3 : 2);
+      setMinWordLength(2);
       setTimerDirection(0);
       setSelectedPreset(key);
     },

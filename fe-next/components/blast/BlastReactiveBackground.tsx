@@ -46,9 +46,12 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
   const prevIntensityRef = useRef(intensity);
   const pulseRef = useRef<HTMLDivElement>(null);
 
+  // Memoize by particle COUNT TIER (0/3/7/12) not raw intensity.
+  // Prevents DOM node destruction/recreation on every intensity integer change,
+  // which was resetting CSS animations mid-cycle and causing visual discontinuity.
+  const particleCount = getParticleCount(intensity);
   const particles = useMemo(() => {
-    const count = getParticleCount(intensity);
-    return Array.from({ length: count }, (_, i) => {
+    return Array.from({ length: particleCount }, (_, i) => {
       const color = PARTICLE_COLORS[i % PARTICLE_COLORS.length];
       const size = 2 + (i % 4); // Slightly larger range
       const left = (i * 7 + 5) % 100;
@@ -59,20 +62,36 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
       const opacity = 0.2 + (i % 4) * 0.1;
       return { color, size, left, delay, duration, drift, opacity, key: i };
     });
-  }, [intensity]);
+  }, [particleCount]);
 
   // Energy pulse ring when intensity increases
+  // Track timer IDs for cleanup on unmount (prevents DOM node leaks in long sessions)
+  const pulseTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   useEffect(() => {
     if (reducedMotion) return;
     if (intensity > prevIntensityRef.current && pulseRef.current) {
       const ring = document.createElement('div');
       ring.className = 'blast-energy-pulse-ring';
       pulseRef.current.appendChild(ring);
-      // Auto-cleanup after animation
-      setTimeout(() => ring.remove(), 1200);
+      const timerId = setTimeout(() => ring.remove(), 1200);
+      pulseTimersRef.current.push(timerId);
     }
     prevIntensityRef.current = intensity;
   }, [intensity, reducedMotion]);
+
+  // Cleanup all pulse rings + timers on unmount
+  useEffect(() => {
+    const timers = pulseTimersRef.current;
+    return () => {
+      for (const t of timers) clearTimeout(t);
+      // Remove any lingering pulse ring DOM nodes
+      if (pulseRef.current) {
+        while (pulseRef.current.firstChild) {
+          pulseRef.current.removeChild(pulseRef.current.firstChild);
+        }
+      }
+    };
+  }, []);
 
   const gridOpacity = intensity >= 1 ? getGridOpacity(intensity) : 0;
   const secondaryColor = getNebulaSecondaryColor(intensity);

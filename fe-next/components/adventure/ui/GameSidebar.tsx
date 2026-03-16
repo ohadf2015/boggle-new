@@ -12,7 +12,7 @@ import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Lightbulb, Target, Check, FileText, Star, Snowflake,
-  Clock, Gem, Swords, Heart, Zap, Shield, Timer, Shuffle,
+  Clock, Gem, Swords, Heart, Zap, Shield, Timer, Shuffle, Bomb,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -74,6 +74,12 @@ interface GameSidebarProps {
   shufflesRemaining?: number;
   /** Callback to use shuffle */
   onShuffleClick?: () => void;
+  /** Word Dynamite T3: can detonate words? */
+  canDetonate?: boolean;
+  /** Whether detonate mode is active */
+  detonateActive?: boolean;
+  /** Toggle detonate mode */
+  onDetonateToggle?: () => void;
   className?: string;
 }
 
@@ -96,6 +102,9 @@ export const GameSidebar = memo(function GameSidebar({
   onFreezeClick,
   shufflesRemaining = 0,
   onShuffleClick,
+  canDetonate = false,
+  detonateActive = false,
+  onDetonateToggle,
   className,
 }: GameSidebarProps) {
   const { t } = useLanguage();
@@ -223,6 +232,23 @@ export const GameSidebar = memo(function GameSidebar({
             <span className="text-[10px] font-bold">×{shufflesRemaining}</span>
           </button>
         )}
+
+        {/* Detonate chip (Word Dynamite T3) */}
+        {canDetonate && (
+          <button
+            onClick={onDetonateToggle}
+            className={cn(
+              'flex-shrink-0 flex items-center gap-1 px-2 py-1',
+              'rounded-neo border-2 min-w-[40px] min-h-[40px]',
+              detonateActive
+                ? 'bg-neo-red text-neo-white border-neo-black shadow-hard-sm animate-pulse'
+                : 'bg-neo-red/60 text-neo-black border-neo-black shadow-hard-sm'
+            )}
+            aria-pressed={detonateActive}
+          >
+            <Bomb className="w-3 h-3" />
+          </button>
+        )}
       </div>
 
       {/* Desktop: Vertical stack layout */}
@@ -320,6 +346,27 @@ export const GameSidebar = memo(function GameSidebar({
             >
               <Shuffle className="w-4 h-4" />
               <span>{t('adventure.game.shuffle')} (×{shufflesRemaining})</span>
+            </motion.button>
+          )}
+
+          {/* Detonate Toggle (desktop — Word Dynamite T3) */}
+          {canDetonate && (
+            <motion.button
+              onClick={onDetonateToggle}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              aria-pressed={detonateActive}
+              className={cn(
+                'w-full flex items-center justify-center gap-2',
+                'px-4 py-2.5 rounded-neo-lg',
+                'font-bold text-sm border-3 transition-all duration-200 shadow-hard',
+                detonateActive
+                  ? 'bg-neo-red text-neo-white border-neo-black animate-pulse'
+                  : 'bg-neo-red/60 text-neo-black border-neo-black hover:shadow-hard-lg'
+              )}
+            >
+              <Bomb className="w-4 h-4" />
+              <span>{t('adventure.game.detonate')}</span>
             </motion.button>
           )}
 

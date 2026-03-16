@@ -148,7 +148,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start pt-4 sm:pt-6 page-content-safe px-4"
+      className="flex-1 flex flex-col items-center justify-start pt-4 sm:pt-6 page-content-safe px-4 pb-28"
     >
       {/* Top bar with back and language */}
       <div className="absolute top-20 sm:top-24 left-4 right-4 flex items-center justify-between">
@@ -219,11 +219,11 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         </div>
       </div>
 
-      {/* Main content - SIMPLIFIED */}
-      <div className="max-w-md w-full text-center space-y-5 mt-16 sm:mt-20">
+      {/* Main content - COMPACT */}
+      <div className="max-w-md w-full text-center space-y-3 mt-14 sm:mt-16">
         {/* Explorer mascot — sets adventure tone before the word hunt */}
         <div className="flex justify-center">
-          <MascotWithEntrance variant="explorer" size="lg" delay={0.1} />
+          <MascotWithEntrance variant="explorer" size="md" delay={0.1} />
         </div>
 
         {/* Guest Mode Notice - Show only for anonymous users */}
@@ -315,19 +315,8 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           </motion.div>
         )}
 
-        {/* START BUTTON - PROMINENT */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
-        >
-          <Button
-            onClick={onStart}
-            className="w-full py-7 text-2xl font-black uppercase bg-emerald-500 text-white border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all"
-          >
-            {t('daily.playButton')}
-          </Button>
-        </motion.div>
+        {/* Spacer for sticky button */}
+        <div className="h-2" />
 
         {/* Create Challenge Section - Different UI for authenticated vs unauthenticated */}
         {isAuthenticated ? (
@@ -415,6 +404,33 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           {t('daily.samePuzzle')}
         </motion.p>
       </div>
+
+      {/* STICKY PLAY BUTTON */}
+      <motion.div
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+        className="fixed bottom-0 inset-x-0 z-50 pointer-events-none"
+      >
+        <div className="bg-gradient-to-t from-neo-navy via-neo-navy/95 to-transparent pt-8 px-4 pointer-events-auto" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
+          <div className="max-w-md mx-auto">
+            <button
+              onClick={onStart}
+              className="group relative w-full py-5 text-2xl font-black uppercase rounded-neo border-4 border-neo-black overflow-hidden transition-all duration-200 hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm shadow-hard-lg"
+            >
+              {/* Animated gradient background */}
+              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-neo-cyan to-emerald-400 bg-[length:200%_100%] animate-shimmer" />
+              {/* Glow effect */}
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10" />
+              {/* Text */}
+              <span className="relative flex items-center justify-center gap-3 text-neo-black drop-shadow-sm">
+                <Target className="w-6 h-6" />
+                {t('daily.playButton')}
+              </span>
+            </button>
+          </div>
+        </div>
+      </motion.div>
 
       <CreateChallengeModal
         isOpen={showCreateChallenge}

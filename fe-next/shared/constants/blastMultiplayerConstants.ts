@@ -19,20 +19,22 @@ export const BLAST_TILE_TYPES: readonly BlastTileType[] = BLAST_TILE_TYPE_LIST;
 export type BlastMPTileType = BlastTileType;
 
 // Tile bonus multipliers (full canonical set — 'normal' renamed to 'standard')
+// Normalized (2026-03-16) to bring Blast total scores in line with Classic mode.
+// Previous values inflated Blast scores ~1.5-2× above Classic.
 export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   standard: 1,
-  gold: 3,
-  rainbow: 1, // rainbow adds flat +5 instead (see BLAST_RAINBOW_FLAT_BONUS)
-  bomb: 2,
-  ice: 1.5,
-  gem: 2.5,
-  lightning: 2,
-  magnet: 1.5,
-  prism: 2,
-  frozen: 1.5,
-  mirror: 2,
-  silver: 4,
-  diamond: 5,
+  gold: 1.5,
+  rainbow: 1, // rainbow adds flat bonus instead (see BLAST_RAINBOW_FLAT_BONUS)
+  bomb: 1.25,
+  ice: 1,
+  gem: 1.5,
+  lightning: 1.25,
+  magnet: 1,
+  prism: 1.25,
+  frozen: 1,
+  mirror: 1.25,
+  silver: 2,
+  diamond: 2.5,
 };
 
-export const BLAST_RAINBOW_FLAT_BONUS = 5;
+export const BLAST_RAINBOW_FLAT_BONUS = 3;

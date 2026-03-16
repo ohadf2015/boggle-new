@@ -112,11 +112,12 @@ export function BlastGame({
     timerIntervalMs: isLowEnd ? 500 : 250,
   });
 
-  // Auto-cascade word callback: increment combo + play sound for each cascade word
+  // Auto-cascade word callback: play sound but do NOT increment player combo.
+  // Cascades are game-generated events — boosting the player's combo for them
+  // creates phantom feedback that cheapens intentional combos.
   const handleAutoCascadeWord = useCallback(() => {
-    combo.incrementCombo(true);
     playWordAcceptedSound();
-  }, [combo, playWordAcceptedSound]);
+  }, [playWordAcceptedSound]);
 
   // Memoize wave objectives so they don't cause re-initialization
   // MP doesn't use wave objectives — skip computation entirely

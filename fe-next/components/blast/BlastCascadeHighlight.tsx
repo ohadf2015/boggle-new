@@ -51,9 +51,10 @@ export function BlastCascadeHighlight({
               style={{
                 gridRow: cell.row + 1,
                 gridColumn: cell.col + 1,
-                background: 'radial-gradient(circle, rgba(255,0,255,0.35) 0%, rgba(168,85,247,0.2) 60%, transparent 100%)',
-                border: '2px solid rgba(255,0,255,0.5)',
-                boxShadow: '0 0 12px rgba(255,0,255,0.4), inset 0 0 8px rgba(255,0,255,0.2)',
+                // Warm amber for cascade highlights — distinct from player cyan selection
+                background: 'radial-gradient(circle, rgba(255,180,50,0.35) 0%, rgba(255,140,0,0.2) 60%, transparent 100%)',
+                border: '2px solid rgba(255,180,50,0.5)',
+                boxShadow: '0 0 12px rgba(255,180,50,0.4), inset 0 0 8px rgba(255,140,0,0.2)',
               }}
             />
           ))

@@ -1503,6 +1503,9 @@ const en = {
     "noPoints": "No Points",
     "aiVerified": "AI Verified",
     "aiRejected": "AI Rejected",
+    "appealWord": "Appeal",
+    "appealed": "Sent",
+    "appealExplanation": "Think a word was wrongly rejected? Appeal it and we'll review.",
     "levelUp": "Level Up!",
     "pendingValidation": "Checking...",
     "autoRejoinIn": "Rejoining...",
@@ -3347,7 +3350,17 @@ const en = {
         "play": "Play",
         "upvote": "Upvote"
       },
-      "shareMessage": "Check out this word pack on LexiClash!"
+      "shareMessage": "Check out this word pack on LexiClash!",
+      "tags": {
+        "animals": "Animals",
+        "food": "Food",
+        "science": "Science",
+        "sports": "Sports",
+        "travel": "Travel",
+        "music": "Music",
+        "tech": "Tech",
+        "nature": "Nature"
+      }
     },
     "rewards": {
       "boardPlayed": "Your board was played!",
@@ -3515,6 +3528,8 @@ const en = {
       "modeTagDaily": "New puzzle daily",
       "modeTagAdventure": "100 levels",
       "modeTagBlast": "Chain reactions",
+      "feature5Title": "Community Boards",
+      "modeTagCommunity": "Player-made puzzles",
       "highlightMobile": "Any device, any browser",
       "highlightAges": "Ages 6+",
       "highlightEdu": "Used in classrooms",
@@ -3546,6 +3561,8 @@ const en = {
       "faq4A": "Absolutely. LexiClash is fully responsive and works on any modern mobile browser. Swipe letters to form words — the touch controls are designed specifically for mobile play.",
       "faq5Q": "Is it safe for children?",
       "faq5A": "Yes. LexiClash is designed for players ages 6 and up. We comply with COPPA regulations, serve only non-personalized ads, and do not track children's browsing behavior.",
+      "faq6Q": "Can I create my own board?",
+      "faq6A": "Yes! Use the Community Board Builder to design custom letter grids with your own seed words. Publish them for others to play, rate, and compete on. Top boards get featured on the home page.",
       "communityTitle": "Join Thousands of Word Game Enthusiasts",
       "communityContent": "LexiClash players span over 40 countries and five languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights."
     }
@@ -5453,7 +5470,8 @@ const en = {
       "confirmExitDesc": "Your current progress will be lost. Are you sure you want to exit?",
       "freeze": "Freeze",
       "frozen": "Frozen!",
-      "shuffle": "Shuffle"
+      "shuffle": "Shuffle",
+      "detonate": "Detonate"
     },
     "hints": {
       "minLetters2": "2+ letters",
@@ -5640,7 +5658,8 @@ const en = {
       }
     },
     "shop": {
-      "title": "Word Forge"
+      "title": "Word Forge",
+      "open": "Open Word Forge Shop"
     },
     "bosses": {
       "fightBoss": "Fight Boss",
@@ -7728,6 +7747,20 @@ const en = {
     badge: "New in Multiplayer",
     title: "Try Word Hunt Mode!",
     subtitle: "Race to find the hidden target word before your opponents. Lives, elimination, and pure chaos!",
+  },
+  wordHuntTips: {
+    needMoreWords: "You only found {{count}} words. Each word refills your life bar — scan rows and diagonals for quick 3-letter words before guessing the target.",
+    accuracyDrainsLife: "{{invalid}} invalid words ({{accuracy}}% accuracy) — each miss costs life. Stick to words you're sure about and save risky guesses for when your life is full.",
+    longerWordsSurvive: "Your avg word was {{avg}} letters. Words with 5+ letters score 2-3x more and give more life back — look for prefixes like UN-, RE-, or endings like -ING, -TION.",
+    shortWordsBetweenGuesses: "Between target guesses, find 2-3 short discovery words to refill your life bar. That buffer lets you survive wrong guesses.",
+    firstFinderPush: "You found it first with {{words}} words. To score even higher, rack up discovery words before going for the target — each one adds points.",
+    winnerLongerWords: "You won, but your avg word was {{avg}} letters. Aim for 5+ letter words — they score 2-3x more and could double your score.",
+    winnerMoreWords: "You won with {{count}} words. Scan the board faster — try reading diagonals and backwards to find words others miss.",
+    tooManyInvalid: "{{invalid}} invalid attempts ({{accuracy}}% accuracy). Each miss drains your life. Focus on certain words first, then try risky ones only with a full life bar.",
+    lifeManagement: "You finished at {{life}}% life — one more miss and you're out. Mix in short discovery words between target guesses to keep your life topped up.",
+    pushWordLength: "Your avg was {{avg}} letters (longest: {{longest}}). Try building on shorter words — if you see \"RAN\", look for \"RANGE\" or \"RANCH\" nearby.",
+    scanMoreWords: "Only {{count}} words found. Before guessing the target, spend 15-20 seconds scanning for easy 3-4 letter words — they give life and reveal letter clues.",
+    pushForFirst: "You placed #{{rank}}. To close the gap, find longer words (5+ letters) and keep your accuracy high — invalid words cost life without scoring.",
   },
   wordHuntPromo: {
     title: "Challenge Your Friends to Word Hunt!",

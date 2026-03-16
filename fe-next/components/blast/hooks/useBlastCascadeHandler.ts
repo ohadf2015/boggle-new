@@ -140,7 +140,15 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
             const cascadeWords: string[] = [];
             const cascadeClearedTypes: Partial<Record<BlastTileType, number>> = {};
 
-            const nextTileStates = tileStatesRef.current!.map((row: BlastTileState[]) => row.map((tile: BlastTileState) => ({ ...tile })));
+            // Structural sharing: only deep-copy rows containing cascade word cells.
+            // Cascade words only affect cells in their known paths (no BFS/bomb side-effects).
+            const cascadeAffectedRows = new Set<number>();
+            for (const vw of verticalWords) {
+              for (const cell of vw.path) cascadeAffectedRows.add(cell.row);
+            }
+            const nextTileStates = tileStatesRef.current!.map((row: BlastTileState[], ri: number) =>
+              cascadeAffectedRows.has(ri) ? row.map((tile: BlastTileState) => ({ ...tile })) : row
+            );
 
             for (const vw of verticalWords) {
               const baseScore = vw.word.length - 1;

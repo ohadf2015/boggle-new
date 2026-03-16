@@ -135,7 +135,7 @@ export const AdventureTile = memo(({
       } : undefined}
       animate={{
         y: isSelected ? -2 : 0,
-        opacity: 1,
+        opacity: tile.isCleared ? 0.4 : 1,
         scale: isSelected ? 1.05 : 1,
       }}
       transition={
@@ -194,7 +194,7 @@ export const AdventureTile = memo(({
         enableComplexAnimations && tile.activationEffect && `tile-effect-${tile.activationEffect}`,
 
         // State classes
-        tile.isCleared && 'tile-cleared opacity-40 cursor-not-allowed',
+        tile.isCleared && 'tile-cleared opacity-40 pointer-events-none cursor-not-allowed',
         // Enhanced selection: CSS handles glow, ring, and animation
         isSelected && 'tile-selected-enhanced',
         tile.isFrozen && tile.type === 'ice' && 'tile-frozen',

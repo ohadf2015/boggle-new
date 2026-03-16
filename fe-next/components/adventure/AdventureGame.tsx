@@ -25,6 +25,7 @@ import { useDailyQuests } from '@/hooks/useDailyQuests';
 import FlashChallengeToast from './FlashChallengeToast';
 import { neoInfoToast } from '@/components/NeoToast';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
+import { applyGemDetectorBoost } from '@/lib/adventure';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
 import { StoryBeatCard } from './StoryBeatCard';
 import AdventureEffectsLayerFull, { AdventureEffectsLayer as EdgeVignetteLayer } from './effects/AdventureEffectsLayer';
@@ -77,13 +78,29 @@ const AdventureGame = memo<AdventureGameProps>(
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
 
     const init = useAdventureGameInit({ world: levelConfig.world, level: levelConfig.level, timerSeconds: levelConfig.timerSeconds ?? 120 });
+
+    // Gem Detector upgrade: boost special tile spawning
+    const boostedLevelConfig = useMemo(() => {
+      const { specialTileBoost, guaranteedGoldTile } = init.upgradeEffects;
+      if (specialTileBoost <= 0 && !guaranteedGoldTile) return init.adjustedLevelConfig;
+      return {
+        ...init.adjustedLevelConfig,
+        specialTiles: applyGemDetectorBoost(
+          init.adjustedLevelConfig.specialTiles,
+          init.adjustedLevelConfig.gridSize,
+          specialTileBoost,
+          guaranteedGoldTile
+        ),
+      };
+    }, [init.adjustedLevelConfig, init.upgradeEffects]);
+
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining, canComplete,
       isPlaying, cascadeComplete, submitWordWithPath, startGame, pauseGame, completeLevel,
       resetGame, markCascadeComplete, isCascading, cascadePhase, addTime, regenerateGrid,
-      activateFreeze, isFrozen, freezeRemaining, freezeUsed, useShuffle, shufflesRemaining,
+      activateFreeze, isFrozen, freezeRemaining, freezeUsed, useShuffle, shufflesRemaining, updateObjective,
     } = useAdventureGame({
-      levelConfig: init.adjustedLevelConfig, initialGrid,
+      levelConfig: boostedLevelConfig, initialGrid,
       comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
       upgradeConfig: {
         bombTimerInvert: init.upgradeEffects.bombTimerInvert,
@@ -107,6 +124,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const [showLootChest, setShowLootChest] = useState(false);
     const [retriesUsed, setRetriesUsed] = useState(0);
     const [showStoryBeat, setShowStoryBeat] = useState(false);
+    const [detonateActive, setDetonateActive] = useState(false);
     const masteryAura = useMemo(() => getMasteryAura(init.currentLevel), [init.currentLevel]);
     const storyBeat = useMemo(() => getStoryBeat(levelConfig.world, levelConfig.level), [levelConfig.world, levelConfig.level]);
     const cinematics = useAdventureCinematics();
@@ -142,7 +160,37 @@ const AdventureGame = memo<AdventureGameProps>(
       wordsFound: gameState.wordsFound,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
       lastWordTileTypes,
+      locale: language,
     });
+
+    // Boss objective tracking — sync boss state to reducer objectives
+    // defeatBoss: track boss HP depletion as percentage
+    useEffect(() => {
+      if (!isBossLevel || !bossOrch.isBossActive) return;
+      const depleted = bossOrch.bossMaxHP > 0
+        ? Math.round(((bossOrch.bossMaxHP - bossOrch.bossCurrentHP) / bossOrch.bossMaxHP) * 100)
+        : 0;
+      updateObjective('defeatBoss', depleted, 'set');
+    }, [isBossLevel, bossOrch.isBossActive, bossOrch.bossCurrentHP, bossOrch.bossMaxHP, updateObjective]);
+
+    // surviveBattle: track player health percentage (updated continuously)
+    useEffect(() => {
+      if (!isBossLevel || !bossOrch.isBossActive) return;
+      const healthPct = bossOrch.playerHealthState.maxHP > 0
+        ? Math.round((bossOrch.playerHealthState.currentHP / bossOrch.playerHealthState.maxHP) * 100)
+        : 100;
+      updateObjective('surviveBattle', healthPct, 'set');
+    }, [isBossLevel, bossOrch.isBossActive, bossOrch.playerHealthState.currentHP, bossOrch.playerHealthState.maxHP, updateObjective]);
+
+    // mechanicTrigger: increment when boss grid effect triggers
+    const prevGridEffectRef = useRef(bossOrch.gridEffectTrigger);
+    useEffect(() => {
+      if (!isBossLevel) return;
+      if (bossOrch.gridEffectTrigger !== prevGridEffectRef.current && bossOrch.gridEffectTrigger) {
+        updateObjective('mechanicTrigger', 1, 'increment');
+      }
+      prevGridEffectRef.current = bossOrch.gridEffectTrigger;
+    }, [isBossLevel, bossOrch.gridEffectTrigger, updateObjective]);
 
     // Daily quests — track progress for today's 3 quests
     const { recordProgress: recordQuestProgress } = useDailyQuests({
@@ -221,6 +269,7 @@ const AdventureGame = memo<AdventureGameProps>(
       worldMechanic: levelConfig.worldMechanic ?? null,
       bossHealPerWord: init.upgradeEffects.bossHealPerWord,
       healPlayerHealth: bossOrch.isBossActive ? bossOrch.healPlayer : undefined,
+      detonateActive,
       t, getPopupStartPosition: () => {
         if (selectedIndices.length === 0) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
         const el = gridRef.current?.querySelectorAll('[role="gridcell"]')[selectedIndices[selectedIndices.length - 1]];
@@ -496,6 +545,9 @@ const AdventureGame = memo<AdventureGameProps>(
               onFreezeClick={() => activateFreeze(init.upgradeEffects.timeFreezeSeconds)}
               shufflesRemaining={shufflesRemaining}
               onShuffleClick={useShuffle}
+              canDetonate={init.upgradeEffects.canDetonateWords}
+              detonateActive={detonateActive}
+              onDetonateToggle={() => setDetonateActive(prev => !prev)}
               className="border-t-2 lg:border-t-0 lg:border-l-2 border-neo-black/30" />
           }
           overlays={

@@ -51,6 +51,7 @@ export {
   getAllLevelConfigs,
   generateObjectives,
   generateSpecialTiles,
+  applyGemDetectorBoost,
   validateLevelConfig,
   type WorldConfig,
   type ValidationResult,

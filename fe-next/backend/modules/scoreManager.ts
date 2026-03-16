@@ -13,7 +13,7 @@ export interface ScoreGameBase {
   playerScores: Record<string, number>;
   playerWords: Record<string, string[]>;
   /** O(1) lookup set parallel to playerWords — used for duplicate checking */
-  playerWordSets?: Record<string, Set<string>>;
+  playerWordsSet?: Record<string, Set<string>>;
 
   playerWordDetails?: Record<string, any[]>;
 
@@ -93,15 +93,15 @@ export function addPlayerWord(
   }
 
   // Ensure the O(1) lookup set exists
-  if (!game.playerWordSets) game.playerWordSets = {};
-  if (!game.playerWordSets[username]) {
+  if (!game.playerWordsSet) game.playerWordsSet = {};
+  if (!game.playerWordsSet[username]) {
     // Bootstrap from existing array (handles mid-game initialization)
-    game.playerWordSets[username] = new Set(game.playerWords[username]);
+    game.playerWordsSet[username] = new Set(game.playerWords[username]);
   }
 
   // Only add if not already present (O(1) Set lookup instead of O(n) array scan)
-  if (!game.playerWordSets[username].has(normalizedWord)) {
-    game.playerWordSets[username].add(normalizedWord);
+  if (!game.playerWordsSet[username].has(normalizedWord)) {
+    game.playerWordsSet[username].add(normalizedWord);
     game.playerWords[username].push(normalizedWord);
 
     // Calculate time since game start
@@ -148,8 +148,8 @@ export function playerHasWord(game: ScoreGameBase | null, username: string, word
   if (!word || typeof word !== 'string') return false;
   const normalized = word.toLowerCase();
   // Use O(1) Set when available, fallback to array scan
-  if (game.playerWordSets?.[username]) {
-    return game.playerWordSets[username].has(normalized);
+  if (game.playerWordsSet?.[username]) {
+    return game.playerWordsSet[username].has(normalized);
   }
   return game.playerWords[username]?.includes(normalized) || false;
 }
@@ -279,7 +279,7 @@ export function resetScoresForNewRound(game: ScoreGameBase | null): void {
   // COMPLETELY clear all game data first to prevent stale data from previous games
   game.playerScores = {};
   game.playerWords = {};
-  game.playerWordSets = {};
+  game.playerWordsSet = {};
   game.playerWordDetails = {};
   game.playerAchievements = {};
   game.playerCombos = {}; // Reset combo tracking for new round
@@ -293,6 +293,7 @@ export function resetScoresForNewRound(game: ScoreGameBase | null): void {
     game.playerWordDetails[username] = [];
     game.playerAchievements[username] = [];
     game.playerCombos[username] = 0; // Initialize combo tracking
+    game.playerWordsSet[username] = new Set<string>();
   }
 }
 

@@ -20,6 +20,8 @@ export type GameAction =
         word: string;
         score: number;
         path?: Array<{ row: number; col: number }>;
+        /** Word Dynamite T3: clear adjacent tiles around the word path */
+        detonate?: boolean;
       };
     }
   | { type: 'COMPLETE_LEVEL' }
@@ -29,7 +31,8 @@ export type GameAction =
   | { type: 'CLEAR_ACTIVATION_EFFECTS' }
   | { type: 'REGENERATE_GRID'; payload: { grid: string[][] } }
   | { type: 'ACTIVATE_TIME_FREEZE'; payload: { seconds: number } }
-  | { type: 'USE_SHUFFLE' };
+  | { type: 'USE_SHUFFLE' }
+  | { type: 'UPDATE_OBJECTIVE'; payload: { objectiveType: string; value: number; mode: 'set' | 'increment' } };
 
 /** Lightweight upgrade config stored in reducer state for tile effect processing */
 export interface ReducerUpgradeConfig {
@@ -403,7 +406,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'SUBMIT_WORD': {
-      const { word, score, path } = action.payload;
+      const { word, score, path, detonate } = action.payload;
 
       if (state.gameState.wordsFound.includes(word)) {
         return state;
@@ -465,6 +468,45 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         finalScore = effects.finalScore;
         iceClearedCount = effects.iceClearedCount;
         timeBonusSeconds = effects.timeBonusSeconds;
+      }
+
+      // Word Dynamite T3: detonate clears all tiles adjacent to the word path
+      if (detonate && path && path.length > 0) {
+        const pathSet = new Set(path.map(p => `${p.row},${p.col}`));
+        const detonatedPositions: Array<{ row: number; col: number }> = [];
+
+        for (const pos of path) {
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              if (dr === 0 && dc === 0) continue;
+              const nr = pos.row + dr;
+              const nc = pos.col + dc;
+              if (nr < 0 || nr >= gridSize || nc < 0 || nc >= gridSize) continue;
+              const key = `${nr},${nc}`;
+              if (pathSet.has(key)) continue; // already part of word
+              pathSet.add(key); // prevent duplicates
+              const tile = newTiles[nr]?.[nc];
+              if (tile && !tile.isCleared && !tile.isFrozen) {
+                detonatedPositions.push({ row: nr, col: nc });
+              }
+            }
+          }
+        }
+
+        // Clone additional rows and mark detonated tiles
+        for (const pos of detonatedPositions) {
+          if (!rowsToClone.has(pos.row)) {
+            rowsToClone.add(pos.row);
+            newTiles[pos.row] = newTiles[pos.row].map(t => ({ ...t }));
+          }
+          const tile = newTiles[pos.row][pos.col];
+          tile.isCleared = true;
+          tile.activationEffect = 'explode' as TileActivationEffect;
+          tile.activationTimestamp = Date.now();
+        }
+
+        // Bonus score for detonated tiles (10 points each)
+        finalScore += detonatedPositions.length * 10;
       }
 
       const newTimeRemaining = Math.min(
@@ -626,6 +668,27 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         shufflesRemaining: state.shufflesRemaining - 1,
+      };
+    }
+
+    case 'UPDATE_OBJECTIVE': {
+      const { objectiveType, value, mode } = action.payload;
+      const hasType = state.objectives.some(o => o.type === objectiveType);
+      if (!hasType) return state;
+
+      const newObjectives = state.objectives.map((obj) => {
+        if (obj.type !== objectiveType) return obj;
+        const newCurrent = mode === 'set' ? value : (obj.current ?? 0) + value;
+        return { ...obj, current: newCurrent, isComplete: newCurrent >= obj.target };
+      });
+
+      return {
+        ...state,
+        objectives: newObjectives,
+        gameState: {
+          ...state.gameState,
+          stars: calculateStars(newObjectives),
+        },
       };
     }
 

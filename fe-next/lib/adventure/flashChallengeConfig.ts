@@ -62,14 +62,23 @@ const WORLD_POOLS: Record<string, FlashChallenge[]> = {
   expert: [byId('flash-exact-7'), byId('flash-combo-5'), byId('flash-palindrome'), byId('flash-starts-r')],
 };
 
+/** Challenge types that require English-specific letter params */
+const ENGLISH_ONLY_TYPES = new Set(['startsWith', 'endsWith', 'specificLetter']);
+
 /**
  * Returns world-appropriate flash challenges (3-4 candidates).
  * Caller picks one at random at runtime.
+ * For non-English locales, filters out letter-based challenges that use English params.
  */
-export function getFlashChallengeForWorld(worldId: number): FlashChallenge[] {
-  if (worldId <= 2) return WORLD_POOLS.easy;
-  if (worldId <= 4) return WORLD_POOLS.medium;
-  if (worldId <= 6) return WORLD_POOLS.hard;
-  if (worldId <= 8) return WORLD_POOLS.harder;
-  return WORLD_POOLS.expert;
+export function getFlashChallengeForWorld(worldId: number, locale: string = 'en'): FlashChallenge[] {
+  let pool: FlashChallenge[];
+  if (worldId <= 2) pool = WORLD_POOLS.easy;
+  else if (worldId <= 4) pool = WORLD_POOLS.medium;
+  else if (worldId <= 6) pool = WORLD_POOLS.hard;
+  else if (worldId <= 8) pool = WORLD_POOLS.harder;
+  else pool = WORLD_POOLS.expert;
+
+  if (locale === 'en') return pool;
+
+  return pool.filter(c => !ENGLISH_ONLY_TYPES.has(c.type));
 }

@@ -1385,6 +1385,9 @@ const ja = {
     "foundWords": "の発見した単語",
     "aiVerified": "AIで検証済み",
     "aiRejected": "AIにより却下",
+    "appealWord": "異議申立",
+    "appealed": "送信済",
+    "appealExplanation": "単語が誤って却下されたと思いますか？異議を申し立てて確認します。",
     "levelUp": "レベルアップ!",
     "pendingValidation": "コミュニティチェック待ち",
     "autoRejoinIn": "自動再参加まで",
@@ -2861,7 +2864,17 @@ const ja = {
         "play": "プレイ",
         "upvote": "いいね"
       },
-      "shareMessage": "LexiClashのこのワードパックをチェック!"
+      "shareMessage": "LexiClashのこのワードパックをチェック!",
+      "tags": {
+        "animals": "動物",
+        "food": "食べ物",
+        "science": "科学",
+        "sports": "スポーツ",
+        "travel": "旅行",
+        "music": "音楽",
+        "tech": "テクノロジー",
+        "nature": "自然"
+      }
     },
     "rewards": {
       "boardPlayed": "あなたのボードがプレイされました!",
@@ -3395,6 +3408,8 @@ const ja = {
       "modeTagDaily": "毎日新しいパズル",
       "modeTagAdventure": "100レベル",
       "modeTagBlast": "連鎖反応",
+      "feature5Title": "コミュニティボード",
+      "modeTagCommunity": "プレイヤー作成パズル",
       "highlightMobile": "あらゆるデバイス・ブラウザ対応",
       "highlightAges": "6歳以上",
       "highlightEdu": "教室でも活用",
@@ -3426,6 +3441,8 @@ const ja = {
       "faq4A": "もちろん。LexiClashは完全レスポンシブで、あらゆるモダンモバイルブラウザで動作します。文字をスワイプして単語を作成 — タッチ操作はモバイルプレイ専用に設計されています。",
       "faq5Q": "子供にも安全ですか？",
       "faq5A": "はい。LexiClashは6歳以上のプレイヤー向けに設計されています。COPPA規制に準拠し、パーソナライズされていない広告のみを表示し、子供のブラウジング行動を追跡しません。",
+      "faq6Q": "自分のボードを作れますか？",
+      "faq6A": "はい！コミュニティボードビルダーを使って、オリジナルの文字グリッドをデザインできます。公開して他のプレイヤーにプレイ、評価、競争してもらいましょう。トップボードはホームページで紹介されます。",
       "communityTitle": "数千人のワードゲーム愛好家に参加",
       "communityContent": "LexiClashのプレイヤーは40カ国以上、5言語にわたります。グローバルリーダーボードで競い合い、デイリーチャレンジの結果を共有し、新しいワード戦略を発見するコミュニティに参加しましょう。ヒント、アップデート、コミュニティハイライトはInstagram @lexi.clashをフォロー。"
     }
@@ -5411,7 +5428,8 @@ const ja = {
       "confirmExitDesc": "現在の進捗が失われます。本当に終了しますか？",
       "freeze": "フリーズ",
       "frozen": "凍結中！",
-      "shuffle": "シャッフル"
+      "shuffle": "シャッフル",
+      "detonate": "爆破"
     },
     "hints": {
       "minLetters2": "2文字以上",
@@ -5598,7 +5616,8 @@ const ja = {
       }
     },
     "shop": {
-      "title": "ワードフォージ"
+      "title": "ワードフォージ",
+      "open": "ワードフォージを開く"
     },
     "bosses": {
       "fightBoss": "ボスと戦う",
@@ -7651,6 +7670,20 @@ const ja = {
     badge: "マルチプレイヤーに新登場",
     title: "ワードハントモードを試そう！",
     subtitle: "対戦相手より先に隠されたターゲットワードを見つけよう。ライフ、脱落、そして大混乱！",
+  },
+  wordHuntTips: {
+    needMoreWords: "見つけた単語は{{count}}個だけ。各単語でライフが回復するよ — ターゲットを推測する前に、行や対角線で3文字の単語をスキャンしよう。",
+    accuracyDrainsLife: "無効な単語が{{invalid}}個（正確度{{accuracy}}%）— ミスするたびにライフが減るよ。確実な単語を優先して、リスクのある推測はライフが満タンの時だけにしよう。",
+    longerWordsSurvive: "平均単語長は{{avg}}文字。5文字以上の単語は2-3倍のスコアとライフ回復がもらえるよ。",
+    shortWordsBetweenGuesses: "ターゲット推測の間に、2-3個の短い単語を見つけてライフを補充しよう。そのバッファーで間違った推測を乗り越えられるよ。",
+    firstFinderPush: "{{words}}個の単語で最初に見つけた！さらに高スコアを狙うなら、ターゲットを狙う前に発見単語を集めよう。",
+    winnerLongerWords: "勝利！でも平均単語長は{{avg}}文字。5文字以上を狙えばスコアが2-3倍になるよ。",
+    winnerMoreWords: "{{count}}個の単語で勝利。ボードをもっと速くスキャンしよう — 対角線や逆読みも試してみて。",
+    tooManyInvalid: "無効な試行が{{invalid}}回（正確度{{accuracy}}%）。ミスするたびにライフが減る。まず確実な単語に集中しよう。",
+    lifeManagement: "ライフ{{life}}%で終了 — あと1ミスでアウトだったよ。ターゲット推測の間に短い単語を混ぜてライフを維持しよう。",
+    pushWordLength: "平均{{avg}}文字（最長: {{longest}}文字）。短い単語を発展させてみよう — 「走」を見つけたら近くに「走者」がないか探してみて。",
+    scanMoreWords: "見つけた単語は{{count}}個だけ。ターゲットを推測する前に15-20秒かけて簡単な3-4文字の単語をスキャン — ライフとヒントがもらえるよ。",
+    pushForFirst: "{{rank}}位でフィニッシュ。差を縮めるには、長い単語（5文字以上）を見つけて正確度を高く保とう。",
   },
   wordHuntPromo: {
     title: "友達にワードハントで挑戦しよう！",

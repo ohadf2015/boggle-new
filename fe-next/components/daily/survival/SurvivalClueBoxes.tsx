@@ -178,8 +178,8 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
       key="feedback-overlay"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.15 }}
       className="flex justify-center flex-wrap gap-2 sm:gap-2.5"
     >
       {normalizedFeedback.map((letterFb, idx) => {
@@ -258,8 +258,8 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
       key="hint-boxes"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.15 }}
       className="flex justify-center flex-wrap gap-2 sm:gap-2.5"
     >
       {hintChars.map((char, idx) => {

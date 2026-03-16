@@ -1384,6 +1384,9 @@ const sv = {
     "noPoints": "Inga poäng",
     "aiVerified": "Verifierad av AI",
     "aiRejected": "Avvisad av AI",
+    "appealWord": "Överklaga",
+    "appealed": "Skickat",
+    "appealExplanation": "Tycker du att ett ord avvisades felaktigt? Överklaga så granskar vi.",
     "levelUp": "Nivå upp!",
     "pendingValidation": "Väntar på gemenskapens validering",
     "autoRejoinIn": "Automatiskt återansluter om",
@@ -2861,7 +2864,17 @@ const sv = {
         "play": "Spela",
         "upvote": "Rösta upp"
       },
-      "shareMessage": "Kolla in detta ordpaket på LexiClash!"
+      "shareMessage": "Kolla in detta ordpaket på LexiClash!",
+      "tags": {
+        "animals": "Djur",
+        "food": "Mat",
+        "science": "Vetenskap",
+        "sports": "Sport",
+        "travel": "Resor",
+        "music": "Musik",
+        "tech": "Teknik",
+        "nature": "Natur"
+      }
     },
     "rewards": {
       "boardPlayed": "Ditt bräde spelades!",
@@ -3395,6 +3408,8 @@ const sv = {
       "modeTagDaily": "Nytt pussel varje dag",
       "modeTagAdventure": "100 nivaer",
       "modeTagBlast": "Kedjereaktioner",
+      "feature5Title": "Communitybrädor",
+      "modeTagCommunity": "Spelargjorda pussel",
       "highlightMobile": "Alla enheter, alla webblasare",
       "highlightAges": "Fran 6 ar",
       "highlightEdu": "Anvands i klassrum",
@@ -3426,6 +3441,8 @@ const sv = {
       "faq4A": "Absolut. LexiClash är helt responsivt och fungerar i alla moderna mobilwebbläsare. Svep bokstäver för att bilda ord — pekskärmskontrollerna är designade specifikt för mobilspel.",
       "faq5Q": "Är det säkert för barn?",
       "faq5A": "Ja. LexiClash är designat för spelare från 6 år och uppåt. Vi följer COPPA-regler, visar enbart icke-personaliserade annonser och spårar inte barns surfbeteende.",
+      "faq6Q": "Kan jag skapa mitt eget bräde?",
+      "faq6A": "Ja! Använd Communitybrädbyggaren för att designa egna bokstavsrutnät. Publicera dem så att andra kan spela, betygsätta och tävla. Topprankade brädor visas på startsidan.",
       "communityTitle": "Gå med tusentals ordspelsentusiaster",
       "communityContent": "LexiClash-spelare finns i över 40 länder och fem språk. Gå med i communityt för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäcka nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och community-höjdpunkter."
     }
@@ -5360,7 +5377,8 @@ const sv = {
       "confirmExitDesc": "Din nuvarande framsteg kommer att försvinna. Är du säker?",
       "freeze": "Frys",
       "frozen": "Fryst!",
-      "shuffle": "Blanda"
+      "shuffle": "Blanda",
+      "detonate": "Detonera"
     },
     "hints": {
       "minLetters2": "2+ bokstäver",
@@ -5547,7 +5565,8 @@ const sv = {
       }
     },
     "shop": {
-      "title": "Ordsmedjan"
+      "title": "Ordsmedjan",
+      "open": "Öppna Ordsmedjan"
     },
     "bosses": {
       "fightBoss": "Bekampa bossen",
@@ -7671,6 +7690,20 @@ const sv = {
     badge: "Nytt i Multiplayer",
     title: "Testa Word Hunt-läget!",
     subtitle: "Hitta det dolda målordet före dina motståndare. Liv, eliminering och rent kaos!",
+  },
+  wordHuntTips: {
+    needMoreWords: "Du hittade bara {{count}} ord. Varje ord fyller på ditt liv — skanna rader och diagonaler efter snabba 3-bokstavsord innan du gissar målet.",
+    accuracyDrainsLife: "{{invalid}} ogiltiga ord ({{accuracy}}% träffsäkerhet) — varje miss kostar liv. Satsa på säkra ord och spara riskfyllda gissningar tills livet är fullt.",
+    longerWordsSurvive: "Ditt snittord var {{avg}} bokstäver. Ord med 5+ bokstäver ger 2-3x mer poäng och mer liv tillbaka.",
+    shortWordsBetweenGuesses: "Mellan målgissningar, hitta 2-3 korta ord för att fylla på livet. Den bufferten låter dig överleva felgissningar.",
+    firstFinderPush: "Du hittade det först med {{words}} ord. För ännu högre poäng, samla upptäcktsord innan du går på målet.",
+    winnerLongerWords: "Du vann, men ditt snittord var {{avg}} bokstäver. Sikta på 5+ bokstäver — de ger 2-3x mer poäng.",
+    winnerMoreWords: "Du vann med {{count}} ord. Skanna brädet snabbare — prova diagonaler och baklänges.",
+    tooManyInvalid: "{{invalid}} ogiltiga försök ({{accuracy}}% träffsäkerhet). Varje miss dränerar liv. Fokusera på säkra ord först.",
+    lifeManagement: "Du slutade på {{life}}% liv — en miss till och du var ute. Blanda in korta ord mellan målgissningar.",
+    pushWordLength: "Ditt snitt var {{avg}} bokstäver (längsta: {{longest}}). Bygg vidare på korta ord — ser du \"RAN\", leta efter \"RANGE\" i närheten.",
+    scanMoreWords: "Bara {{count}} ord hittade. Innan du gissar målet, spendera 15-20 sekunder på att skanna efter enkla 3-4 bokstavsord.",
+    pushForFirst: "Du kom {{rank}}:a. För att stänga gapet, hitta längre ord (5+ bokstäver) och håll träffsäkerheten hög.",
   },
   wordHuntPromo: {
     title: "Utmana dina vänner i Word Hunt!",

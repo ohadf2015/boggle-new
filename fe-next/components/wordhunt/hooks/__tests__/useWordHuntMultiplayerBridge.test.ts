@@ -203,7 +203,7 @@ describe('useWordHuntMultiplayerBridge', () => {
       expect(result.current.showFeedbackOverlay).toBe(true);
     });
 
-    it('should hide feedback overlay after 3 seconds', () => {
+    it('should hide feedback overlay after duration elapses', () => {
       const { result, rerender } = renderHook(() => useWordHuntMultiplayerBridge());
 
       mockWordHuntState.targetAttempts = [
@@ -213,7 +213,7 @@ describe('useWordHuntMultiplayerBridge', () => {
       expect(result.current.showFeedbackOverlay).toBe(true);
 
       act(() => {
-        jest.advanceTimersByTime(3000);
+        jest.advanceTimersByTime(1200);
       });
 
       expect(result.current.showFeedbackOverlay).toBe(false);

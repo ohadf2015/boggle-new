@@ -25,7 +25,7 @@ import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival
 import type { HintLevel } from '@/utils/aiHintGenerator';
 import { inferTargetLetterCounts, computeYellowState } from '@/utils/wordHuntYellowLogic';
 
-const FEEDBACK_OVERLAY_DURATION = 3000;
+import { FEEDBACK_OVERLAY_DURATION } from '@/components/daily/survival/constants';
 const WRONG_GUESS_SHAKE_DURATION = 400;
 
 /** Map MP feedback string to SP feedback string */

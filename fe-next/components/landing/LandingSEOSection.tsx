@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
-  Swords, CalendarDays, Map, Sparkles, ChevronDown, Plus, Minus,
+  Swords, CalendarDays, Map, Sparkles, ChevronDown, Plus, Minus, PencilRuler,
   Smartphone, BookOpen, Users, Zap, MousePointerClick, Layers, Trophy, Target,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -80,6 +80,13 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagBlast',
     fallbackTitle: 'Blast Mode',
     fallbackTag: 'Chain reactions',
+  },
+  {
+    icon: PencilRuler,
+    titleKey: 'landing.seo.feature5Title',
+    tagKey: 'landing.seo.modeTagCommunity',
+    fallbackTitle: 'Community Boards',
+    fallbackTag: 'Player-made puzzles',
   },
 ] as const;
 
@@ -206,7 +213,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           {t('landing.seo.featuresTitle')}
         </h2>
         <motion.div
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -341,7 +348,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          {[1, 2, 3, 4, 5].map((n) => (
+          {[1, 2, 3, 4, 5, 6].map((n) => (
             <FAQItem
               key={n}
               question={t(`landing.seo.faq${n}Q`) || `Question ${n}`}

@@ -362,6 +362,11 @@ export function useSinglePlayerCore({
     const wordCount = settings.mode === 'practice' ? Math.min(50, baseWordCount * 2) : baseWordCount;
     const maxWordLen = Math.min(12, Math.max(rows, cols));
     const initGrid = async () => {
+      // If settings already has a grid (e.g. community board), use it directly
+      if (settings.grid) {
+        setGrid(settings.grid);
+        return;
+      }
       let wordsToEmbed: string[] = [];
       if (settings.language !== 'ja') {
         try {

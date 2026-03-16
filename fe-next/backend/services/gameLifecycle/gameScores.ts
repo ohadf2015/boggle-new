@@ -139,7 +139,7 @@ export async function calculateAndBroadcastFinalScores(
     dictionaryValidatedWords,
     communityValidatedWords,
     aiValidatedWords,
-    { playerCount }
+    { playerCount, gameMode: game.gameMode }
   );
 
   // Update game state with final scores

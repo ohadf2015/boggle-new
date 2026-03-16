@@ -104,8 +104,10 @@ export function BlastGrid({
 
   const cellSize = containerWidth / gridSize;
 
-  // Block interaction during cascade
-  const isInteractive = interactive && cascadePhase === 'idle';
+  // Block interaction during clearing/falling phases but allow during appearing.
+  // By the 'appearing' phase, grid data has fully settled (gravity computed, tiles placed).
+  // This reduces the dead-hands lockout by ~160ms per cascade without data risk.
+  const isInteractive = interactive && (cascadePhase === 'idle' || cascadePhase === 'appearing');
 
   // Track selected cells for overlay selection glow
   const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);

@@ -1450,6 +1450,9 @@ const es = {
     "noPoints": "Sin Puntos",
     "aiVerified": "Verificado por IA",
     "aiRejected": "Rechazado por IA",
+    "appealWord": "Apelar",
+    "appealed": "Enviado",
+    "appealExplanation": "¿Crees que una palabra fue rechazada por error? Apela y lo revisaremos.",
     "levelUp": "¡Subiste de Nivel!",
     "pendingValidation": "En verificación comunitaria",
     "autoRejoinIn": "Auto-unión en",
@@ -3279,7 +3282,17 @@ const es = {
         "play": "Jugar",
         "upvote": "Votar"
       },
-      "shareMessage": "¡Mira este paquete de palabras en LexiClash!"
+      "shareMessage": "¡Mira este paquete de palabras en LexiClash!",
+      "tags": {
+        "animals": "Animales",
+        "food": "Comida",
+        "science": "Ciencia",
+        "sports": "Deportes",
+        "travel": "Viajes",
+        "music": "Música",
+        "tech": "Tecnología",
+        "nature": "Naturaleza"
+      }
     },
     "rewards": {
       "boardPlayed": "¡Tu tablero fue jugado!",
@@ -3445,6 +3458,8 @@ const es = {
       "modeTagDaily": "Nuevo puzzle cada dia",
       "modeTagAdventure": "100 niveles",
       "modeTagBlast": "Reacciones en cadena",
+      "feature5Title": "Tableros de la comunidad",
+      "modeTagCommunity": "Puzzles creados por jugadores",
       "highlightMobile": "Cualquier dispositivo, cualquier navegador",
       "highlightAges": "Desde 6 anos",
       "highlightEdu": "Usado en aulas",
@@ -3476,6 +3491,8 @@ const es = {
       "faq4A": "Por supuesto. LexiClash es totalmente responsivo y funciona en cualquier navegador móvil moderno. Desliza letras para formar palabras — los controles táctiles están diseñados específicamente para el juego móvil.",
       "faq5Q": "¿Es seguro para niños?",
       "faq5A": "Sí. LexiClash está diseñado para jugadores a partir de 6 años. Cumplimos con las regulaciones COPPA, mostramos solo anuncios no personalizados y no rastreamos el comportamiento de navegación de los niños.",
+      "faq6Q": "¿Puedo crear mi propio tablero?",
+      "faq6A": "¡Sí! Usa el Constructor de Tableros Comunitarios para diseñar cuadrículas de letras personalizadas. Publícalos para que otros jugadores jueguen, califiquen y compitan. Los mejores tableros aparecen en la página principal.",
       "communityTitle": "Únete a miles de entusiastas de juegos de palabras",
       "communityContent": "Los jugadores de LexiClash abarcan más de 40 países y cinco idiomas. Únete a la comunidad para competir en clasificaciones globales, compartir resultados del desafío diario y descubrir nuevas estrategias de palabras. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y eventos de la comunidad."
     }
@@ -5690,7 +5707,8 @@ const es = {
       "confirmExitDesc": "Se perderá tu progreso actual. ¿Estás seguro de que quieres salir?",
       "freeze": "Congelar",
       "frozen": "¡Congelado!",
-      "shuffle": "Mezclar"
+      "shuffle": "Mezclar",
+      "detonate": "Detonar"
     },
     "hints": {
       "minLetters2": "2+ letras",
@@ -5869,7 +5887,8 @@ const es = {
       }
     },
     "shop": {
-      "title": "Forja de Palabras"
+      "title": "Forja de Palabras",
+      "open": "Abrir Forja de Palabras"
     },
     "cinematics": {
       "victory": "¡VICTORIA!",
@@ -7848,6 +7867,20 @@ const es = {
     cancel: "Cancelar",
     buildCustom: "Crea el tuyo",
     bgColor: "Fondo"
+  },
+  wordHuntTips: {
+    needMoreWords: "Solo encontraste {{count}} palabras. Cada palabra recarga tu vida — escanea filas y diagonales para palabras cortas de 3 letras antes de adivinar el objetivo.",
+    accuracyDrainsLife: "{{invalid}} palabras inválidas ({{accuracy}}% de precisión) — cada fallo cuesta vida. Usa palabras seguras y guarda las arriesgadas para cuando tu vida esté llena.",
+    longerWordsSurvive: "Tu promedio fue de {{avg}} letras. Las palabras de 5+ letras dan 2-3x más puntos y más vida.",
+    shortWordsBetweenGuesses: "Entre intentos del objetivo, encuentra 2-3 palabras cortas para recargar vida. Ese colchón te permite sobrevivir fallos.",
+    firstFinderPush: "La encontraste primero con {{words}} palabras. Para más puntos, acumula palabras de descubrimiento antes de ir por el objetivo.",
+    winnerLongerWords: "Ganaste, pero tu promedio fue {{avg}} letras. Apunta a 5+ letras — dan 2-3x más puntos.",
+    winnerMoreWords: "Ganaste con {{count}} palabras. Escanea el tablero más rápido — prueba diagonales y al revés.",
+    tooManyInvalid: "{{invalid}} intentos inválidos ({{accuracy}}% de precisión). Cada fallo drena vida. Enfócate primero en palabras seguras.",
+    lifeManagement: "Terminaste con {{life}}% de vida — un fallo más y estabas fuera. Mezcla palabras cortas entre intentos del objetivo.",
+    pushWordLength: "Tu promedio fue {{avg}} letras (más larga: {{longest}}). Intenta expandir palabras cortas — si ves \"MAR\", busca \"MARCA\" o \"MARCHA\" cerca.",
+    scanMoreWords: "Solo {{count}} palabras encontradas. Antes de adivinar el objetivo, dedica 15-20 segundos a escanear palabras fáciles de 3-4 letras — dan vida y pistas.",
+    pushForFirst: "Quedaste en el puesto #{{rank}}. Para cerrar la brecha, encuentra palabras más largas (5+ letras) y mantén alta la precisión.",
   }
 };
 

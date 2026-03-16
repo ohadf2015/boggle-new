@@ -141,7 +141,7 @@ describe('wordHuntManager', () => {
   describe('getCommonWords', () => {
     it('should load common words set', () => {
       const common = getCommonWords();
-      expect(common.size).toBeGreaterThan(1000);
+      expect(common.size).toBeGreaterThan(500);
     });
 
     it('should contain well-known English words', () => {

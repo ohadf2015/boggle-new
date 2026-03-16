@@ -21,18 +21,31 @@ const WOBBLES = [
   { rotate: [0, -3, 6, -2, 0], y: [0, -2, 0] },
 ];
 
-export function LandingAvatarTeaser() {
+interface LandingAvatarTeaserProps {
+  onBuilderOpenChange?: (isOpen: boolean) => void;
+}
+
+export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaserProps) {
   const { t, dir } = useLanguage();
   const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
 
+  const openBuilder = () => {
+    setIsBuilderOpen(true);
+    onBuilderOpenChange?.(true);
+  };
+  const closeBuilder = () => {
+    setIsBuilderOpen(false);
+    onBuilderOpenChange?.(false);
+  };
+
   return (
     <>
     <motion.div
-      onClick={() => setIsBuilderOpen(true)}
+      onClick={openBuilder}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsBuilderOpen(true); } }}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBuilder(); } }}
       className={cn(
         'flex items-center gap-4 sm:gap-5 px-5 py-4 sm:px-6 sm:py-5',
         'bg-gradient-to-r from-neo-purple/25 to-neo-pink/15',
@@ -79,8 +92,8 @@ export function LandingAvatarTeaser() {
     </motion.div>
     <AvatarBuilderModal
       isOpen={isBuilderOpen}
-      onClose={() => setIsBuilderOpen(false)}
-      onSave={() => setIsBuilderOpen(false)}
+      onClose={closeBuilder}
+      onSave={closeBuilder}
     />
     </>
   );

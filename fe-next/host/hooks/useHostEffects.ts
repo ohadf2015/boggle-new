@@ -113,8 +113,8 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
       !hasTriggeredUrgentMusicRef.current
     ) {
       // Calculate total time from timerValue (minutes to seconds)
-      // timerValue defaults to 3 minutes
-      const totalTimeSeconds = (options.timerValue || 3) * 60;
+      // timerValue defaults to 2 minutes
+      const totalTimeSeconds = (options.timerValue || 2) * 60;
       // Trigger when 33% of time has elapsed (67% remaining)
       const triggerThreshold = totalTimeSeconds * 0.67;
 

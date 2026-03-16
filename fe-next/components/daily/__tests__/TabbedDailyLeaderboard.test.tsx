@@ -39,6 +39,23 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren<Record<string, unknown>>) => <>{children}</>,
 }));
 
+// Mock Avatar component
+jest.mock('@/components/Avatar', () => ({
+  __esModule: true,
+  default: ({ profilePictureUrl, avatarImage, ...props }: {
+    profilePictureUrl?: string;
+    avatarImage?: string;
+    [key: string]: unknown;
+  }) => {
+    const src = profilePictureUrl || (avatarImage ? `/avatars/${avatarImage}.png` : null);
+    if (src) {
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src={src} alt="avatar" data-testid="avatar-image" />;
+    }
+    return <div data-testid="avatar-emoji">avatar</div>;
+  },
+}));
+
 // Mock avatar config utilities
 jest.mock('@/utils/avatarConfig', () => ({
   AVATARS: [

@@ -94,8 +94,8 @@ describe('blastModeManager', () => {
     });
 
     it('should sum bonuses for multiple tiles', () => {
-      // gold=3, bomb=2 => total 5
-      expect(calculateBlastTileBonus(['gold', 'bomb'])).toBe(5);
+      // gold=1.5, bomb=1.25 => total 2.75
+      expect(calculateBlastTileBonus(['gold', 'bomb'])).toBe(BLAST_TILE_BONUSES.gold + BLAST_TILE_BONUSES.bomb);
     });
 
     it('should add BLAST_RAINBOW_FLAT_BONUS when rainbow is in path', () => {
@@ -111,9 +111,12 @@ describe('blastModeManager', () => {
     });
 
     it('should handle mixed tile types correctly', () => {
-      // standard=1, gold=3, rainbow=1, ice=1.5 => sum=6.5 + flat 5 = 11.5
       const result = calculateBlastTileBonus(['standard', 'gold', 'rainbow', 'ice']);
-      expect(result).toBe(1 + 3 + 1 + 1.5 + BLAST_RAINBOW_FLAT_BONUS);
+      expect(result).toBe(
+        BLAST_TILE_BONUSES.standard + BLAST_TILE_BONUSES.gold +
+        BLAST_TILE_BONUSES.rainbow + BLAST_TILE_BONUSES.ice +
+        BLAST_RAINBOW_FLAT_BONUS
+      );
     });
   });
 

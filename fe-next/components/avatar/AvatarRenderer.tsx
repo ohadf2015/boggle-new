@@ -5,7 +5,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { BASE_PARTS } from './parts/BaseParts';
 import { EYE_PARTS } from './parts/EyeParts';
 import { MOUTH_PARTS } from './parts/MouthParts';
-import { HAIR_PARTS } from './parts/HairParts';
+import { HAIR_PARTS, HAIR_FRONT_PARTS } from './parts/HairParts';
 import { ACCESSORY_PARTS } from './parts/AccessoryParts';
 import { BODY_PARTS } from './parts/BodyParts';
 
@@ -19,13 +19,18 @@ interface AvatarRendererProps {
  * Renders a custom avatar from a CustomAvatarConfig as composable SVG layers.
  * Layer order: background -> hair(back) -> base(face) -> eyes -> mouth -> accessory -> hair(front)
  */
+/** Styles that render their main body behind the head */
+const BACK_LAYER_STYLES = ['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet'];
+
 const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '' }) => {
   const BasePart = BASE_PARTS[config.base] ?? BASE_PARTS.round;
   const EyePart = EYE_PARTS[config.eyes] ?? EYE_PARTS.round;
   const MouthPart = MOUTH_PARTS[config.mouth] ?? MOUTH_PARTS.smile;
   const HairPart = HAIR_PARTS[config.hair] ?? HAIR_PARTS.none;
+  const HairFrontPart = HAIR_FRONT_PARTS[config.hair] ?? null;
   const AccessoryPart = ACCESSORY_PARTS[config.accessory] ?? ACCESSORY_PARTS.none;
   const BodyPart = BODY_PARTS[config.gender ?? 'male'];
+  const isBackStyle = BACK_LAYER_STYLES.includes(config.hair);
 
   return (
     <svg
@@ -43,10 +48,8 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       {/* Body (shoulders/torso at bottom) */}
       <BodyPart fill={config.skinColor} />
 
-      {/* Hair back layer (for styles that go behind the head) */}
-      {['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet'].includes(config.hair) ? (
-        <HairPart fill={config.hairColor} />
-      ) : null}
+      {/* Hair back layer (bulk/volume behind the head) */}
+      {isBackStyle && <HairPart fill={config.hairColor} />}
 
       {/* Face base */}
       <BasePart fill={config.skinColor} />
@@ -83,10 +86,11 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       {/* Mouth */}
       <MouthPart />
 
-      {/* Hair front layer (for styles that go on top) */}
-      {!['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'none'].includes(config.hair) ? (
-        <HairPart fill={config.hairColor} />
-      ) : null}
+      {/* Hair front layer — bangs/framing strands ON TOP of face */}
+      {isBackStyle && HairFrontPart && <HairFrontPart fill={config.hairColor} />}
+
+      {/* Hair that sits entirely on top (spiky, buzz, mohawk, etc.) */}
+      {!isBackStyle && config.hair !== 'none' && <HairPart fill={config.hairColor} />}
 
       {/* Accessories (always on top) */}
       <AccessoryPart fill={config.accessoryColor} />

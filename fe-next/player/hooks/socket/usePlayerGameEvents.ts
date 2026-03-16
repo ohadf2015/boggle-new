@@ -246,6 +246,8 @@ export function usePlayerGameEvents({
       useGameStore.setState(storeUpdates);
 
       // Non-store operations (refs, timer, toast)
+      // Set the timer to the correct initial value. The timer is paused (isPaused: !gameActive)
+      // so it won't tick until the countdown animation completes and gameActive becomes true.
       if (data.timerSeconds) {
         if (totalGameTimeRef) totalGameTimeRef.current = data.timerSeconds;
         if (gameTimerRef.current) {
@@ -280,6 +282,16 @@ export function usePlayerGameEvents({
         return;
       }
 
+      const isCountdownShowing = showStartAnimationRef.current;
+
+      // Skip timer sync while 3-2-1-GO countdown animation is playing.
+      // The server starts its timer after all players ACK, but the client ACKs
+      // immediately — so timeUpdate events arrive during the countdown animation.
+      // Syncing here would make the timer visually tick during the countdown.
+      if (isCountdownShowing) {
+        return;
+      }
+
       // CRITICAL: Sync timer with server time to prevent drift
       // The local timer counts down smoothly, but server updates keep it accurate
       // Use ref to get latest timer methods (avoids socket listener re-registration)
@@ -299,7 +311,6 @@ export function usePlayerGameEvents({
 
       const isGameActive = gameActiveRef.current;
       const hasGrid = letterGridRef.current || data.letterGrid;
-      const isCountdownShowing = showStartAnimationRef.current;
       // Only activate game if:
       // 1. Game is not already active
       // 2. There's remaining time

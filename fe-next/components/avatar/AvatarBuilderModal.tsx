@@ -11,7 +11,6 @@ import {
   AVATAR_GENDERS,
   AVATAR_BASES,
   AVATAR_SKIN_COLORS,
-  AVATAR_HAIR_STYLES,
   AVATAR_HAIR_COLORS,
   AVATAR_EYE_STYLES,
   AVATAR_MOUTH_STYLES,
@@ -20,6 +19,10 @@ import {
   AVATAR_BG_COLORS,
   DEFAULT_AVATAR_CONFIG,
   getRandomAvatarConfig,
+  FEMALE_HAIR_STYLES,
+  MALE_HAIR_STYLES,
+  DEFAULT_FEMALE_HAIR,
+  DEFAULT_MALE_HAIR,
 } from '@/shared/types/customAvatar';
 
 type Category = 'base' | 'hair' | 'eyes' | 'mouth' | 'accessories' | 'background';
@@ -92,7 +95,15 @@ export default function AvatarBuilderModal({
   const updateConfig = useCallback(<K extends keyof CustomAvatarConfig>(key: K, value: CustomAvatarConfig[K]) => {
     setConfig(prev => {
       pushHistory(prev);
-      return { ...prev, [key]: value };
+      const next = { ...prev, [key]: value };
+      // Auto-switch hair when changing gender if current hair isn't available
+      if (key === 'gender') {
+        const hairList = value === 'female' ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES;
+        if (!(hairList as readonly string[]).includes(prev.hair)) {
+          next.hair = value === 'female' ? DEFAULT_FEMALE_HAIR : DEFAULT_MALE_HAIR;
+        }
+      }
+      return next;
     });
     setPreviewKey(k => k + 1);
   }, [pushHistory]);
@@ -300,13 +311,14 @@ function CategoryOptions({ category, config, updateConfig, t }: CategoryOptionsP
           />
         </div>
       );
-    case 'hair':
+    case 'hair': {
+      const hairOptions = config.gender === 'female' ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES;
       return (
         <div className="space-y-3">
           <PartPreviewGrid
             label={t('avatar.builder.style')}
             partType="hair"
-            options={AVATAR_HAIR_STYLES}
+            options={hairOptions}
             selected={config.hair}
             onSelect={v => updateConfig('hair', v)}
             config={config}
@@ -320,6 +332,7 @@ function CategoryOptions({ category, config, updateConfig, t }: CategoryOptionsP
           />
         </div>
       );
+    }
     case 'eyes':
       return (
         <PartPreviewGrid

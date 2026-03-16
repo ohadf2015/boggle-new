@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { User, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { User, ArrowLeft, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Trophy, Gem } from 'lucide-react';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -17,6 +17,8 @@ import { useProfilePictureUpload } from '@/hooks/useProfilePictureUpload';
 import { usePlayerCollectibles } from '@/hooks/usePlayerCollectibles';
 import AuthModal from '@/components/auth/AuthModal';
 import { ReferralCard } from '@/components/profile/ReferralCard';
+import CreatorProfileStats from '@/components/ugc/CreatorProfileStats';
+import { getCreatorStats } from '@/utils/creatorRewards';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
 import { cn } from '@/lib/utils';
 import { getSession } from '@/utils/session';
@@ -231,25 +233,35 @@ export default function ProfilePageClient(): React.JSX.Element {
         <AutoHideHeader />
 
         {/* Tab navigation for mobile */}
-        <div className="flex items-center justify-center px-2 pt-3 pb-2">
-          <div className="flex items-center gap-1 bg-neo-navy/80 border-2 border-neo-black rounded-neo p-1">
-            {sections.map((section, index) => (
-              <button
-                key={section}
-                onClick={() => setActiveSection(section)}
-                className={cn(
-                  'px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide rounded-neo transition-all duration-150',
-                  index === currentIndex
-                    ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm'
-                    : 'text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10'
-                )}
-                aria-label={`Go to ${section} section`}
-                aria-selected={index === currentIndex}
-                role="tab"
-              >
-                {t(`profile.sections.${section}`)}
-              </button>
-            ))}
+        <div className="px-4 pt-3 pb-1" role="tablist" aria-label={t('profile.title')}>
+          <div className="flex items-stretch gap-1.5">
+            {sections.map((section, index) => {
+              const isActive = index === currentIndex;
+              const icons = {
+                overview: LayoutDashboard,
+                stats: BarChart3,
+                achievements: Trophy,
+                collection: Gem,
+              };
+              const Icon = icons[section];
+              return (
+                <button
+                  key={section}
+                  onClick={() => setActiveSection(section)}
+                  className={cn(
+                    'flex-1 flex flex-col items-center gap-1 py-2.5 rounded-neo font-neo-display text-xs font-bold uppercase tracking-wide transition-all duration-150',
+                    isActive
+                      ? 'bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard-sm scale-[1.02]'
+                      : 'bg-neo-white/8 text-neo-white/60 border-2 border-neo-white/15 active:scale-95'
+                  )}
+                  aria-selected={isActive}
+                  role="tab"
+                >
+                  <Icon className={cn('w-5 h-5', isActive ? 'text-neo-black' : 'text-neo-white/50')} />
+                  <span>{t(`profile.sections.${section}`)}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -297,6 +309,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 <ProfileHeader {...profileHeaderProps} compact />
                 <ProfileXpSection profile={profile} isDarkMode={isDarkMode} compact />
                 <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} compact />
+                <CreatorProfileStats stats={getCreatorStats()} className="mt-4" />
                 <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />
               </motion.div>
             )}
@@ -374,6 +387,9 @@ export default function ProfilePageClient(): React.JSX.Element {
 
           {/* 4. Ranked Progress */}
           <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} delay={0.2} />
+
+          {/* 4b. Creator Stats */}
+          <CreatorProfileStats stats={getCreatorStats()} />
 
           {/* 5. Referral */}
           {user && (

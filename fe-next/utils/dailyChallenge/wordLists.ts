@@ -59,93 +59,154 @@ export const BONUS_WORD_LISTS: Record<Language, string[]> = {
 };
 
 /**
- * Curated lists of quality target words for Word Hunt mode
- * Organized by language and difficulty
+ * Curated lists of quality target words for Word Hunt mode.
+ *
+ * WORD SELECTION CRITERIA (all words must score well on):
+ * 1. Imageability — player can instantly picture it
+ * 2. Discovery satisfaction — finding it feels like a small victory
+ * 3. Age-range familiarity — known to ages 10+
+ * 4. Cultural safety — appropriate across all cultures
+ * 5. Theme resonance — fits a vivid category (animals, nature, fantasy, etc.)
+ *
+ * BLACKLISTED categories: jargon (admin, usage), medical distress (acne),
+ * violence-primary (abuse), purely functional (about, also, their).
+ * See wordQuality.ts for the full blacklist.
  */
 export const TARGET_WORD_LISTS: Record<Language, string[]> = {
   en: [
-    // 4-letter words - varied and interesting (main target pool)
-    'BIRD', 'FISH', 'MOON', 'STAR', 'RAIN', 'WIND', 'SNOW', 'TREE',
-    'BOOK', 'DOOR', 'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND',
-    'BOAT', 'GAME', 'WOLF', 'BEAR', 'FROG', 'DEER', 'DUCK', 'HAWK',
-    'CAKE', 'MILK', 'SOUP', 'RICE', 'BEAN', 'CORN', 'PLUM', 'PEAR',
-    'GOLD', 'IRON', 'JADE', 'RUBY', 'SILK', 'WOOL', 'CLAY', 'COAL',
-    'HILL', 'LAKE', 'WAVE', 'CAVE', 'PATH', 'PEAK', 'POND', 'REEF',
-    'SONG', 'DRUM', 'HORN', 'BELL', 'POEM', 'TALE', 'MYTH', 'PLAY',
-    'KING', 'DUKE', 'HERO', 'SAGE', 'MONK', 'CHEF', 'MAGE', 'BARD',
-    'SHIP', 'CART', 'BIKE', 'SLED', 'RAFT', 'KITE', 'DOME', 'ARCH',
-    'ROSE', 'FERN', 'VINE', 'LEAF', 'STEM', 'ROOT', 'PALM', 'PINE',
-    'DAWN', 'DUSK', 'NOON', 'GLOW', 'BEAM', 'BLUR', 'MIST', 'HAZE',
-    'HOPE', 'WISH', 'CALM', 'ZEAL', 'GRIT', 'SOUL', 'MIND', 'WILL',
-    'NEST', 'HIVE', 'LAIR', 'FORT', 'TENT', 'BARN', 'MILL', 'PIER',
-    'WAND', 'COIN', 'MASK', 'RING', 'CAPE', 'HELM', 'CLAW', 'FANG',
-    'FIRE', 'TIDE', 'GUST', 'BOLT', 'SURF', 'FOAM', 'SAND', 'DUST',
-    // Additional unique 4-letter words
-    'MAZE', 'GRID', 'CODE', 'QUIZ', 'ECHO', 'VOID', 'FLUX', 'APEX',
+    // ── Animals & Creatures (30) ──
+    'BIRD', 'FISH', 'WOLF', 'BEAR', 'FROG', 'DEER', 'DUCK', 'HAWK',
     'LYNX', 'SWAN', 'CROW', 'MOTH', 'WASP', 'CRAB', 'SEAL', 'TOAD',
-    'BREW', 'STEW', 'BAKE', 'ROAM', 'SOAR', 'DIVE', 'LEAP', 'SPIN',
+    'DOVE', 'MOLE', 'NEWT', 'WREN', 'OTTER', 'RAVEN', 'CRANE', 'BISON',
+    'SHARK', 'WHALE', 'EAGLE', 'TIGER', 'HORSE', 'SNAKE',
+    // ── Nature & Landscape (28) ──
+    'MOON', 'STAR', 'RAIN', 'WIND', 'SNOW', 'TREE', 'ROCK', 'SAND',
+    'HILL', 'LAKE', 'WAVE', 'CAVE', 'PATH', 'PEAK', 'POND', 'REEF',
+    'LEAF', 'FERN', 'VINE', 'MOSS', 'DUNE', 'GLEN', 'TIDE', 'MIST',
+    'CLOUD', 'RIVER', 'OCEAN', 'BEACH',
+    // ── Food & Flavor (20) ──
+    'CAKE', 'MILK', 'SOUP', 'RICE', 'BEAN', 'CORN', 'PLUM', 'PEAR',
+    'LIME', 'MINT', 'PEACH', 'GRAPE', 'LEMON', 'BREAD', 'OLIVE', 'CREAM',
+    'FEAST', 'SPICE', 'MANGO', 'COCOA',
+    // ── Magic & Fantasy (20) ──
+    'WAND', 'RUNE', 'GLOW', 'FIRE', 'BOLT', 'FLAME', 'SPARK', 'CHARM',
+    'SPELL', 'GHOST', 'FAIRY', 'QUEST', 'REALM', 'CURSE', 'FORGE',
+    'DRAGON', 'KNIGHT', 'WIZARD', 'PIRATE', 'CASTLE',
+    // ── Colors & Materials (16) ──
+    'GOLD', 'IRON', 'JADE', 'RUBY', 'SILK', 'WOOL', 'CLAY', 'COAL',
+    'TEAL', 'OPAL', 'PEARL', 'CORAL', 'AMBER', 'IVORY', 'SILVER', 'BRONZE',
+    // ── Actions & Movement (16) ──
+    'DASH', 'LEAP', 'SPIN', 'DIVE', 'SOAR', 'ROAM', 'BREW', 'BAKE',
+    'DANCE', 'BLOOM', 'BLAZE', 'SURGE', 'SWOOP', 'GLIDE', 'SWIFT', 'BRAVE',
+    // ── Emotions & Character (14) ──
+    'HOPE', 'WISH', 'CALM', 'GRIT', 'SOUL', 'BOLD', 'KIND',
+    'DREAM', 'PRIDE', 'HEART', 'PEACE', 'NOBLE', 'GRACE', 'GRAND',
+    // ── Objects & Tools (16) ──
+    'DRUM', 'BELL', 'HORN', 'SONG', 'COIN', 'MASK', 'RING', 'KITE',
+    'SHIP', 'ARCH', 'DOME', 'HELM', 'CROWN', 'SWORD', 'TORCH', 'SHELL',
+    // ── Places & Structures (18) ──
+    'NEST', 'FORT', 'BARN', 'MILL', 'PIER', 'TENT', 'LAIR', 'HIVE',
+    'TOWER', 'GROVE', 'TRAIL', 'SHORE', 'CLIFF', 'ARENA', 'GARDEN',
+    'FOREST', 'ISLAND', 'VALLEY',
+    // ── Weather & Sky (12) ──
+    'DAWN', 'DUSK', 'GUST', 'FOAM', 'DUST', 'FROST', 'STORM', 'SHADE',
+    'SUNSET', 'BREEZE', 'MEADOW', 'STREAM',
+    // ── Extra vivid words (10) ──
+    'MAZE', 'ECHO', 'HERO', 'SAGE', 'CHEF', 'KING', 'TALE', 'MYTH',
+    'SCOUT', 'MEDAL',
   ],
   he: [
-    // Hebrew target words - minimum 4 characters for adequate challenge
-    // (2-3 char words like הר, ים, אש, בית, מים, זאב, נהר, אגם moved to SAME_LENGTH_HELPER_WORDS)
-    'עולם', 'חלון', 'כוכב', 'ציפור', 'דגים',
-    'ארנב', 'אריה', 'עוגה', 'נחושת', 'ברזל',
-    'גבעה', 'מכתב', 'סיפור', 'חלום', 'גיבור',
-    'אדמה', 'שמים', 'לילה', 'בוקר', 'שולחן',
-    'מחשב', 'טלפון', 'חיוך', 'משפחה', 'חברים',
-    'אהבה', 'שמחה', 'בריאות', 'תפוח', 'ילדים',
-    'מורה', 'תלמיד', 'כיסא', 'מנורה', 'חתול',
+    // ── Hebrew 4-letter targets (min 4 chars for adequate challenge) ──
+    // 3-letter words (בית, מים, etc.) are in SAME_LENGTH_HELPER_WORDS
+    'עולם', 'חלון', 'כוכב', 'ציפור', 'דגים', 'ארנב', 'אריה', 'עוגה',
+    'ברזל', 'גבעה', 'מכתב', 'סיפור', 'חלום', 'גיבור', 'אדמה', 'שמים',
+    'לילה', 'בוקר', 'שולחן', 'מנורה', 'חתול', 'מורה', 'כיסא', 'תפוח',
+    'מטבע', 'טירה', 'משחק', 'סירה',
+    'מגדל', 'ילדים', 'גלידה', 'תפוז',
+    // ── Hebrew 5-letter ──
+    'נחושת', 'מחשב', 'טלפון', 'חיוך', 'משפחה', 'חברים', 'אהבה', 'שמחה',
+    'בריאות', 'תלמיד', 'ארמון', 'אביב', 'חורף', 'אומץ', 'שלום',
+    'חופש', 'שוקולד', 'פסנתר', 'מוזיקה', 'כדורגל',
+    'הרפתקה', 'מדבר', 'סתיו', 'מלכה',
   ],
   sv: [
-    // Swedish target words - minimum 4 letters
-    // (3-letter words like HUS, DAG, ÖGA moved to SAME_LENGTH_HELPER_WORDS)
-    'HUND', 'KATT', 'STEN', 'FÅGEL', 'BLOM',
-    'VATTEN', 'VÄRLD', 'PLATS', 'LJUD', 'KRAFT',
-    'BÄSTA', 'FÖRSTA', 'SISTA', 'RUNDA', 'KLAR',
-    'SLOTT', 'TRÄDGÅRD', 'MARKNAD', 'FÖNSTER',
-    'NATUR', 'HIMMEL', 'VINTER', 'SOMMAR',
-    'MORGON', 'KVÄLL', 'PERFEKT', 'FANTASTISK',
+    // ── Swedish 4-letter (concrete nouns) ──
+    'HUND', 'KATT', 'STEN', 'BERG', 'REGN', 'VIND', 'NATT', 'LJUS',
+    'DÖRR', 'BORD', 'STOL', 'GLAS', 'BOLL', 'FISK', 'BLAD', 'SNÖN',
+    'MÖRK', 'TÄLT', 'KUNG', 'BORG', 'TORN', 'SÅNG', 'DANS', 'GULL',
+    'HJUL', 'MASK', 'BÅGE', 'VÄGG', 'GOLV', 'SÄNG',
+    // ── Swedish 5-letter ──
+    'FÅGEL', 'SOLEN', 'KRAFT', 'PLATS', 'DRAKE', 'SVÄRD', 'SLOTT',
+    'NATUR', 'BJÖRN', 'MOLN', 'FLOD', 'FRUKT', 'BRÖD', 'FROST',
+    'DRÖM', 'LJUD', 'HÄST', 'BLOM', 'HIMMEL', 'STRAND',
+    'BÄVER', 'HJÄLM', 'STRID', 'GULD', 'MÅNEN',
+    'KLAR', 'RUNDA', 'VATTEN', 'VÄRLD', 'VALEN',
+    // ── Swedish 6-letter ──
+    'MORGON', 'KVÄLL', 'VINTER', 'SOMMAR', 'FÖNSTER', 'MARKNAD',
+    'TRÄDGÅRD', 'ÄVENTYR', 'RIDDARE', 'SKOGEN', 'FJÄRIL',
+    'KANIN', 'REGNBÅGE', 'GNISTA', 'HONUNG',
+    'SILVER', 'BLOMMA', 'SOLNEDGÅNG', 'DJUNGEL', 'SJÖMAN',
   ],
   ja: [
-    // Japanese target words - minimum 2 characters (kanji compounds)
-    // (1-char kanji like 本, 犬, 猫, 花, 山 moved to SAME_LENGTH_HELPER_WORDS)
-    '日本', '東京', '学校', '先生', '学生',
-    '友達', '家族', '会社', '仕事', '時間',
-    '天気', '音楽', '映画', '料理', '旅行',
-    '電車', '新聞', '大学', '病院', '空港',
-    '公園', '銀行', '美術館',
-    // 3-4 character compound words
-    '日本語', '図書館', '郵便局',
+    // ── Japanese 2-character (common compounds) ──
+    '日本', '東京', '学校', '先生', '学生', '友達', '家族', '会社',
+    '仕事', '時間', '天気', '音楽', '映画', '料理', '旅行', '電車',
+    '新聞', '大学', '病院', '空港', '公園', '銀行', '地図', '切符',
+    '動物', '花火', '海岸', '山道', '夕日', '朝日', '温泉', '祭り',
+    '太鼓', '忍者', '武士', '宝石', '冒険', '勇気', '平和', '自然',
+    // ── Japanese 3-character ──
+    '日本語', '図書館', '郵便局', '美術館', '動物園', '水族館', '遊園地',
+    '新幹線', '富士山', '花見', '七夕', '風鈴', '折紙', '将棋',
+    '柔道', '空手', '弓道', '剣道', '紅葉',
+    // ── Japanese 4-character ──
+    'お正月', 'お花見', '運動会', '文化祭', '北海道',
+    '沖縄県', '東京都', '大阪府', '京都府', '回転寿司',
+    '味噌汁', 'お弁当', '花吹雪', '満開桜', '修学旅行',
   ],
   es: [
-    // Spanish target words - minimum 4 letters
-    // (3-letter words like SOL, MAR, PAN moved to SAME_LENGTH_HELPER_WORDS)
-    'CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LIBRO', 'PERRO', 'GATO',
-    'MUNDO', 'LUGAR', 'TIEMPO', 'GENTE', 'NOCHE',
-    'PLANTA', 'TIERRA', 'CIELO', 'FIESTA', 'AMIGO',
-    'CASTILLO', 'JARDÍN', 'MERCADO', 'PUENTE',
-    'VENTANA', 'SIMPLE', 'MODERNO', 'DORADO',
-    'COCINA', 'MAÑANA', 'PERFECTO', 'NATURAL', 'FANTÁSTICO',
+    // ── Spanish 4-letter (vivid nouns) ──
+    'CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LUNA', 'FLOR', 'ROSA',
+    'GATO', 'PATO', 'PERA', 'MANO', 'CARA', 'BOCA', 'LAGO', 'RANA',
+    'LOBO', 'NIDO', 'VELA', 'RAYO', 'ARCO', 'MAPA', 'NUBE', 'MIEL',
+    'PIEL', 'NAVE', 'COPO', 'HILO', 'DADO', 'VINO',
+    // ── Spanish 5-letter ──
+    'LIBRO', 'MUNDO', 'NOCHE', 'PLAYA', 'CAMPO', 'MONTE', 'LECHE', 'AMIGO',
+    'CIELO', 'ARBOL', 'TIGRE', 'PERRO', 'FUEGO', 'HIELO', 'NIEVE',
+    'BARCO', 'TORRE', 'REINA', 'BRUJA', 'MAGIA', 'PIEDRA', 'ARENA',
+    'SELVA', 'BOSQUE', 'CUEVA', 'GLOBO', 'DANZA', 'CANTO', 'FRESA',
+    'LIMON', 'MANGO', 'ABEJA', 'BUHO', 'CORAL', 'CONCHA', 'ESPADA',
+    'ISLA', 'VIENTO', 'CABRA', 'TIERRA',
+    // ── Spanish 6-letter ──
+    'FIESTA', 'COCINA', 'JARDIN', 'TIEMPO', 'PLANTA', 'MERCADO', 'VENTANA',
+    'DRAGON', 'PIRATA', 'TESORO', 'CORONA', 'ESCUDO', 'CAMINO', 'ESTRELLA',
+    'CASCADA', 'VOLCAN', 'OCEANO', 'DELFIN', 'TORTUGA', 'CONEJO', 'CABALLO',
+    'HALCON', 'MADERA', 'CUERDA', 'MUSICA', 'BANDERA', 'FUENTE', 'MOLINO',
+    'REGALO', 'SONRISA',
   ],
   fr: [
-    // French 3-4 letter words
-    'CHAT', 'PAIN', 'LUNE', 'ÉTOILE', 'ARBRE', 'FLEUR', 'JOUR', 'NUIT',
+    // French 4-letter words
+    'CHAT', 'PAIN', 'LUNE', 'JOUR', 'NUIT', 'ROSE', 'BLEU', 'NOIR',
+    'VENT', 'BEAU', 'DOUX', 'LOUP', 'CERF', 'PORC',
     // French 5-letter words
-    'MAISON', 'MONDE', 'TEMPS', 'VILLE', 'GRAND',
-    'PETIT', 'BELLE', 'FORCE', 'PLACE', 'CHOSE',
-    'LIVRE', 'CHIEN', 'AMOUR', 'JOLIE', 'RÊVE',
+    'ARBRE', 'FLEUR', 'MONDE', 'TEMPS', 'VILLE', 'GRAND', 'PETIT',
+    'BELLE', 'FORCE', 'PLACE', 'CHOSE', 'LIVRE', 'CHIEN', 'AMOUR',
+    'JOLIE', 'RÊVE', 'ÉTOILE', 'NEIGE', 'NUAGE', 'HERBE',
     // French 6-letter words
-    'JARDIN', 'SOLEIL', 'NATURE', 'MONTAGNE', 'RIVIÈRE'
+    'MAISON', 'JARDIN', 'SOLEIL', 'NATURE', 'RIVIÈRE', 'FORÊT',
+    'CHÂTEAU', 'MONTAGNE', 'DRAGON', 'TRÉSOR', 'PLAGE', 'OCÉAN',
   ],
   de: [
-    // German 3-4 letter words
-    'HAUS', 'BAUM', 'BUCH', 'HUND', 'KATZE', 'SONNE', 'MOND', 'STERN',
+    // German 4-letter words
+    'HAUS', 'BAUM', 'BUCH', 'HUND', 'MOND', 'BERG', 'WALD', 'MEER',
+    'LAND', 'WELT', 'ZEIT', 'BROT', 'WEIN', 'ROSE', 'BLAU', 'GOLD',
+    'WOLF', 'BIER', 'BURG', 'TURM',
     // German 5-letter words
-    'WELT', 'ZEIT', 'STADT', 'GROSS', 'KLEIN',
-    'KRAFT', 'PLATZ', 'SACHE', 'WASSER', 'LIEBE',
+    'KATZE', 'SONNE', 'STERN', 'STADT', 'KRAFT', 'PLATZ', 'LIEBE',
+    'WASSER', 'FLUSS', 'ADLER', 'PFERD', 'FEUER', 'TRAUM', 'STURM',
     // German 6-letter words
-    'GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER'
-  ]
+    'GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER', 'WINTER',
+    'HERBST', 'SCHULE', 'KIRCHE', 'BRÜCKE', 'DRACHE', 'RITTER',
+  ],
 };
 
 /**

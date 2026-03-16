@@ -2,12 +2,14 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star, Sparkles, Map, Zap, Loader2 } from 'lucide-react';
+import { ArrowLeft, Star, Sparkles, Map, Zap, Loader2, Coins, Hammer, X } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { UpgradeShop } from './meta/UpgradeShop';
+import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import {
   getWorldConfig,
@@ -52,8 +54,15 @@ export default function AdventureView(): React.JSX.Element {
   const { t, dir, language } = useLanguageSafe();
   const isRTL = dir === 'rtl';
 
-  // Get progression data from context
-  const { progression, isLoading, error, completeLevel } = useProgression();
+  // Get progression data from context (includes currency)
+  const { progression, isLoading, error, completeLevel, updateCurrency } = useProgression();
+
+  // Derived currency values from shared progression state
+  const gold = progression?.gold ?? 0;
+  const upgrades = (progression?.upgrades ?? {}) as Record<string, number>;
+
+  // Shop modal state
+  const [showShop, setShowShop] = useState(false);
 
   // Global music context - stop main game music when adventure starts
   const { stopMusic: stopGlobalMusic } = useMusic();
@@ -195,6 +204,11 @@ export default function AdventureView(): React.JSX.Element {
     };
     window.history.pushState(state, '');
   }, []);
+
+  // Handle shop purchase — optimistic update + persist via context
+  const handleShopPurchase = useCallback((_upgradeId: string, newState: UpgradeState, newGold: number) => {
+    updateCurrency(newGold, newState);
+  }, [updateCurrency]);
 
   // Handle world selection from WorldMap
   const handleWorldSelect = useCallback((worldId: number) => {
@@ -374,11 +388,71 @@ export default function AdventureView(): React.JSX.Element {
               </span>
             </div>
 
+            {/* Gold + Word Forge Shop */}
+            <button
+              onClick={() => setShowShop(true)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5',
+                'bg-neo-orange/20 border-2 border-neo-orange rounded-neo',
+                'hover:bg-neo-orange/30 transition-colors',
+                'font-bold text-neo-orange text-sm'
+              )}
+              aria-label={t('adventure.shop.open')}
+            >
+              <Coins className="w-4 h-4" />
+              <span>{gold}</span>
+              <Hammer className="w-3.5 h-3.5 ms-1 opacity-70" />
+            </button>
+
             {/* Sound Controller */}
             <MusicControls />
           </div>
         </div>
       </header>}
+
+      {/* Word Forge Shop Modal */}
+      <AnimatePresence>
+        {showShop && viewState !== 'playing' && (
+          <motion.div
+            key="shop-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowShop(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className={cn(
+                'relative w-full max-w-lg max-h-[80vh] overflow-y-auto',
+                'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4'
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowShop(false)}
+                className={cn(
+                  'absolute top-3 end-3 z-10 p-1.5',
+                  'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
+                  'text-neo-white hover:bg-neo-red/30 transition-colors'
+                )}
+                aria-label={t('common.close')}
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <UpgradeShop
+                gold={gold}
+                upgrades={upgrades}
+                currentWorld={selectedWorld ?? 1}
+                onPurchase={handleShopPurchase}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Spacer for fixed header (approx 56px height), hidden during gameplay */}
       {viewState !== 'playing' && <div className="h-14 flex-shrink-0" />}
@@ -445,6 +519,33 @@ export default function AdventureView(): React.JSX.Element {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Floating Word Forge FAB — visible on worldMap and levelGrid */}
+      {viewState !== 'playing' && (
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.5, type: 'spring', damping: 15 }}
+          onClick={() => setShowShop(true)}
+          className={cn(
+            'fixed bottom-6 z-20',
+            isRTL ? 'left-6' : 'right-6',
+            'flex items-center gap-2 px-5 py-3',
+            'bg-neo-orange text-neo-black font-black text-sm uppercase tracking-wide',
+            'border-3 border-neo-black rounded-neo shadow-hard-lg',
+            'hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
+            'transition-all duration-150'
+          )}
+          aria-label={t('adventure.shop.open')}
+        >
+          <Hammer className="w-5 h-5" />
+          <span>{t('adventure.shop.title')}</span>
+          <div className="flex items-center gap-1 ms-1 px-2 py-0.5 bg-neo-black/20 rounded-neo">
+            <Coins className="w-3.5 h-3.5 text-neo-yellow" />
+            <span className="text-neo-yellow font-bold">{gold}</span>
+          </div>
+        </motion.button>
+      )}
     </div>
     </AdventureThemeProvider>
   );

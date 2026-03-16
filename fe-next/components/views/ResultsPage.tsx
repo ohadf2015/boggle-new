@@ -368,18 +368,37 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     isFirstFinder: wordHuntSummary?.targetFoundBy === username,
     survivalTime: wordHuntSummary?.survivalTime ?? 0,
     discoveryWords: wordHuntSummary?.discoveryWords ?? 0,
-    playerResults: (sortedScores || []).map((p) => ({
-      username: p.username,
-      score: p.score || 0,
-      survived: !(wordHuntSummary?.eliminatedPlayers || wordHuntEliminatedPlayers).includes(p.username),
-      lifeRemaining: (wordHuntSummary?.playerLives || wordHuntPlayerLives)[p.username] ?? 0,
-    })),
+    playerResults: (sortedScores || []).map((p) => {
+      const words = p.allWords || [];
+      const validWords = words.filter(w => w && !w.isDuplicate && w.validated);
+      const invalidWords = words.filter(w => w && !w.isDuplicate && !w.validated);
+      const avgLen = validWords.length > 0
+        ? Math.round((validWords.reduce((s, w) => s + w.word.length, 0) / validWords.length) * 10) / 10
+        : 0;
+      const longestLen = validWords.reduce((max, w) => Math.max(max, w.word.length), 0);
+      return {
+        username: p.username,
+        score: p.score || 0,
+        survived: !(wordHuntSummary?.eliminatedPlayers || wordHuntEliminatedPlayers).includes(p.username),
+        lifeRemaining: (wordHuntSummary?.playerLives || wordHuntPlayerLives)[p.username] ?? 0,
+        validWordCount: validWords.length,
+        invalidWordCount: invalidWords.length,
+        avgWordLength: avgLen,
+        longestWordLength: longestLen,
+      };
+    }),
     currentUsername: username,
   } : undefined;
 
   // Render Results Tab Content using shared component
   const renderResultsTab = () => (
     <>
+      {/* Word Hunt summary on top for immediate game context */}
+      {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
+        <div className="mb-3">
+          <WordHuntResultsSummary {...wordHuntResultsData} />
+        </div>
+      )}
       <ResultsMainContent
         {...mainContentProps}
         onShowDetails={() => setMobileActiveTab('details')}
@@ -387,12 +406,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         bannerSize="320x50"
         isMobile
       />
-      {/* Word Hunt summary after CTA buttons so host controls stay above the fold */}
-      {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
-        <div className="mt-3">
-          <WordHuntResultsSummary {...wordHuntResultsData} />
-        </div>
-      )}
     </>
   );
 

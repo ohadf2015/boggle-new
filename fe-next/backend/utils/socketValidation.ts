@@ -275,7 +275,7 @@ export const leaveRoomSchema = compiledSchemas?.leaveRoomSchema || z.object({
 export const startGameSchema = z.object({
   gameCode: gameCodeSchema.optional(),
   letterGrid: z.array(z.array(z.string())),
-  timerSeconds: z.number().int().optional().default(180),
+  timerSeconds: z.number().int().optional().default(120),
   language: languageSchema.optional(),
   difficulty: difficultySchema.optional().default('MEDIUM'),
   minWordLength: z.number().int().min(2).max(5).optional().default(3),
@@ -370,7 +370,7 @@ export const createTournamentSchema = compiledSchemas?.createTournamentSchema ||
   name: z.string().min(1).max(100),
   totalRounds: z.number().int().min(2).max(10).default(3),
   settings: z.object({
-    timerSeconds: z.number().int().min(30).max(600).optional(),
+    timerSeconds: z.number().int().min(30).max(120).optional(),
     difficulty: difficultySchema.optional(),
     minWordLength: z.number().int().min(2).max(5).optional(),
   }).optional(),
@@ -402,7 +402,7 @@ export const reconnectSchema = compiledSchemas?.reconnectSchema || z.object({
 export const updateGameSettingsSchema = compiledSchemas?.updateGameSettingsSchema || z.object({
   gameCode: gameCodeSchema,
   settings: z.object({
-    timerSeconds: z.number().int().min(30).max(600).optional(),
+    timerSeconds: z.number().int().min(30).max(120).optional(),
     difficulty: difficultySchema.optional(),
     minWordLength: z.number().int().min(2).max(5).optional(),
     language: languageSchema.optional(),

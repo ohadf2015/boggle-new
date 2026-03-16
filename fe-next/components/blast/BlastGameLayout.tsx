@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { ArrowLeft, Bomb, BookOpen, HelpCircle, Lightbulb, Shuffle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -195,15 +195,19 @@ export function BlastGameLayout({
 
   // Screen shake on bomb, prism, and lightning explosions
   // Shake queue depth = 1: if already shaking, drop new triggers to avoid compound chaos
-  useEffect(() => {
+  // Uses a derived count to avoid re-running on every explosion add/dismiss (was 12x per word)
+  const shakeRelevantCount = useMemo(() => {
     const shakeTypes = new Set(['bomb', 'prism', 'lightning']);
-    const shakeCount = explosions.filter(e => shakeTypes.has(e.type)).length;
-    if (shakeCount > prevExplosionsRef.current && !shakeClass) {
+    return explosions.filter(e => shakeTypes.has(e.type)).length;
+  }, [explosions]);
+
+  useEffect(() => {
+    if (shakeRelevantCount > prevExplosionsRef.current && !shakeClass) {
       const hasPrism = explosions.some(e => e.type === 'prism');
       const hasBomb = explosions.some(e => e.type === 'bomb');
       const hasLightning = explosions.some(e => e.type === 'lightning');
       // Prism = strongest shake, bomb cluster = strong, lightning/single = wobble
-      const intensity = hasPrism || (hasBomb && shakeCount >= 4)
+      const intensity = hasPrism || (hasBomb && shakeRelevantCount >= 4)
         ? 'animate-neo-shake'
         : 'animate-neo-wobble';
       setShakeClass(intensity);
@@ -212,12 +216,12 @@ export function BlastGameLayout({
       else if (hasBomb) vibrateBlastBomb();
       else if (hasLightning) vibrateBlastLightning();
       const timer = setTimeout(() => setShakeClass(''), 180);
-      prevExplosionsRef.current = shakeCount;
+      prevExplosionsRef.current = shakeRelevantCount;
       return () => clearTimeout(timer);
     }
-    prevExplosionsRef.current = shakeCount;
+    prevExplosionsRef.current = shakeRelevantCount;
     return undefined;
-  }, [explosions, shakeClass]);
+  }, [shakeRelevantCount, shakeClass, explosions]);
 
   // Cascade haptic feedback (text announcement removed — BlastChainCounter handles visual)
   useEffect(() => {
@@ -384,7 +388,7 @@ export function BlastGameLayout({
         {/* Score — SP only */}
         {!isMultiplayer && (
           <motion.div
-            key={Math.floor(score / 100)}
+            key={Math.floor(score / 500)}
             initial={{ scale: 1.04 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}

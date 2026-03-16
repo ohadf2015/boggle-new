@@ -233,7 +233,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">
                   {t('wordHunt.results.targetWord')}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 select-none">
                   <div className="flex gap-1 justify-center flex-wrap">
                     {wordHidden ? (
                       /* Hidden: dot placeholders */
@@ -277,7 +277,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                       e.stopPropagation();
                       setWordHidden(!wordHidden);
                     }}
-                    className="p-1.5 rounded-lg hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200"
+                    className="p-1.5 rounded-lg hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200 select-none"
                     aria-label={wordHidden ? 'Show word' : 'Hide word'}
                   >
                     {wordHidden ? (

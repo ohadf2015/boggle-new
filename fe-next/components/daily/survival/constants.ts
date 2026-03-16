@@ -71,14 +71,14 @@ export const MIN_TOKENS_FOR_HINT = 1;
 /**
  * Duration to show feedback overlay in milliseconds
  */
-export const FEEDBACK_OVERLAY_DURATION = 3000;
+export const FEEDBACK_OVERLAY_DURATION = 1200;
 
 /**
  * Delay before gray (non-clue) letters fade to '?' in the feedback overlay.
  * Gray letters flash briefly so the player sees what they guessed,
  * then fade out to keep focus on green/yellow clue letters.
  */
-export const GRAY_LETTER_FADE_DELAY = 1000;
+export const GRAY_LETTER_FADE_DELAY = 400;
 
 /**
  * Duration to auto-dismiss shop hint in milliseconds

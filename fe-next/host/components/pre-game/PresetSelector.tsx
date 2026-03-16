@@ -37,9 +37,9 @@ export const GAME_PRESETS: Record<PresetKey, GamePreset> = {
     nameKey: 'hostView.presetChallenge',
     detailsKey: 'hostView.presetChallengeDetails',
     icon: '🏆',
-    timer: 3,
+    timer: 2,
     difficulty: 'HARD',
-    minWordLength: 3,
+    minWordLength: 2,
   },
 } as const;
 

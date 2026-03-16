@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Brain, BarChart3, Info, HelpCircle, Mail, Cookie, Gift, Newspaper } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Brain, BarChart3, Info, HelpCircle, Mail, Cookie, Gift, Newspaper, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -232,6 +232,18 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 <Settings className="w-4 h-4" aria-hidden="true" />
                                             </MobileMenuIcon>
                                             <span>{t('settings.moreSettings')}</span>
+                                        </MobileMenuLink>
+                                    </MobileMenuSection>
+
+                                    <MenuDivider />
+
+                                    {/* Community */}
+                                    <MobileMenuSection label={t('ugc.nav.community')}>
+                                        <MobileMenuLink href={`/${language}/community`} onClick={closeMenu}>
+                                            <MobileMenuIcon className="bg-neo-pink/50">
+                                                <Users className="w-4 h-4" aria-hidden="true" />
+                                            </MobileMenuIcon>
+                                            <span>{t('ugc.nav.community')}</span>
                                         </MobileMenuLink>
                                     </MobileMenuSection>
 

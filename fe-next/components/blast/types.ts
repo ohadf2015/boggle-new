@@ -179,7 +179,7 @@ export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
 export const CASCADE_MIN_WORD_LENGTH = 4;
 /** Delay (ms) before scanning for cascade words after grid settles.
  * Reduced from 700ms → 400ms to eliminate the "frozen board" dead gap. */
-export const CASCADE_DETECTION_DELAY = 400;
+export const CASCADE_DETECTION_DELAY = 200;
 /** Bonus multiplier per chain level: base * chainLevel * this */
 export const CASCADE_CHAIN_BONUS_MULTIPLIER = 0.5;
 
