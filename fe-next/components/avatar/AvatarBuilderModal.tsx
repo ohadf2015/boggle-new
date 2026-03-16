@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Shuffle, Undo2, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
@@ -143,8 +144,8 @@ export default function AvatarBuilderModal({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" role="presentation" onClick={onClose}>
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60" role="presentation" onClick={onClose}>
       <AdaptiveMotion.div
         role="dialog"
         aria-modal="true"
@@ -267,7 +268,8 @@ export default function AvatarBuilderModal({
           </AdaptiveMotion.button>
         </div>
       </AdaptiveMotion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

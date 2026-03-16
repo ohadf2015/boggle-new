@@ -130,12 +130,14 @@ export function ProfileHeader({
       )}
 
       <div className={cn('flex', compact ? 'flex-row gap-3 items-center' : 'flex-row gap-6 items-center')}>
-        {/* Avatar with edit controls */}
+        {/* Avatar with overlay control buttons */}
         <div className="relative flex-shrink-0">
-          <div className={cn(
-            'rounded-full border-3 border-neo-yellow shadow-hard-yellow overflow-hidden',
-            compact ? 'w-20 h-20' : 'w-32 h-32'
-          )}>
+          <div
+            className={cn(
+              'relative rounded-full border-3 border-neo-yellow shadow-hard-yellow overflow-hidden',
+              compact ? 'w-20 h-20' : 'w-28 h-28'
+            )}
+          >
             <Avatar
               customAvatar={profile?.avatar_config ?? undefined}
               profilePictureUrl={profile?.profile_picture_url ?? undefined}
@@ -145,45 +147,48 @@ export function ProfileHeader({
             />
           </div>
 
-          {/* Edit avatar button — bottom-right */}
-          <button
-            onClick={() => setIsAvatarBuilderOpen(true)}
-            className={cn(
-              'absolute -bottom-1 -end-1 bg-neo-pink rounded-full border-3 border-neo-black shadow-hard',
-              'flex items-center justify-center transition-transform hover:scale-110',
-              compact ? 'w-8 h-8' : 'w-12 h-12'
-            )}
-            title={t('profile.chooseAvatar')}
-            aria-label={t('profile.chooseAvatar')}
-          >
-            <Edit size={compact ? 14 : 20} className="text-white" />
-          </button>
-
-          {/* Upload photo — small icon */}
-          <label
-            className={cn(
-              'absolute -bottom-1 cursor-pointer transition-transform hover:scale-110',
-              compact ? '-start-1 w-7 h-7' : 'start-6 w-9 h-9',
-              'bg-slate-700 rounded-full border-2 border-slate-500 shadow-hard-sm',
-              'flex items-center justify-center'
-            )}
-            title={t('profile.uploadPhoto')}
-            aria-label={t('profile.uploadPhoto')}
-          >
-            {isUploading ? (
-              <Loader size="sm" />
-            ) : (
-              <Camera size={compact ? 12 : 16} className="text-gray-300" />
-            )}
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={onProfilePictureUpload}
-              className="hidden"
-              disabled={isUploading}
+          {/* Overlay control buttons */}
+          <div className="absolute inset-0">
+            {/* Upload photo button — bottom-start */}
+            <label
+              className={cn(
+                'absolute bottom-0 -start-1 flex items-center justify-center cursor-pointer',
+                'rounded-full bg-slate-700 border-2 border-neo-black shadow-hard-sm',
+                'text-white hover:bg-slate-600 transition-colors',
+                compact ? 'w-7 h-7' : 'w-9 h-9'
+              )}
+              title={t('profile.uploadPhoto')}
               aria-label={t('profile.uploadPhoto')}
-            />
-          </label>
+            >
+              {isUploading ? (
+                <Loader size="sm" />
+              ) : (
+                <Camera size={compact ? 12 : 14} />
+              )}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={onProfilePictureUpload}
+                className="hidden"
+                disabled={isUploading}
+              />
+            </label>
+
+            {/* Edit avatar button — bottom-end */}
+            <button
+              onClick={() => setIsAvatarBuilderOpen(true)}
+              className={cn(
+                'absolute bottom-0 -end-1 flex items-center justify-center',
+                'rounded-full bg-neo-pink border-2 border-neo-black shadow-hard-sm',
+                'text-white hover:bg-neo-pink/80 transition-colors',
+                compact ? 'w-8 h-8' : 'w-10 h-10'
+              )}
+              title={t('profile.chooseAvatar')}
+              aria-label={t('profile.chooseAvatar')}
+            >
+              <Edit size={compact ? 14 : 16} />
+            </button>
+          </div>
         </div>
 
         {/* User Info */}

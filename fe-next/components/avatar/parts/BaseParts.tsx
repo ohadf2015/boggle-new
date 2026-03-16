@@ -11,26 +11,26 @@ interface BasePartProps {
 
 function Round({ fill }: BasePartProps) {
   return (
-    <circle cx="50" cy="52" r="35" fill={fill} stroke="#000" strokeWidth={S} />
+    <circle cx="50" cy="52" r="30" fill={fill} stroke="#000" strokeWidth={S} />
   );
 }
 
 function Square({ fill }: BasePartProps) {
   return (
-    <rect x="16" y="18" width="68" height="68" rx="8" fill={fill} stroke="#000" strokeWidth={S} />
+    <rect x="20" y="22" width="60" height="60" rx="8" fill={fill} stroke="#000" strokeWidth={S} />
   );
 }
 
 function Oval({ fill }: BasePartProps) {
   return (
-    <ellipse cx="50" cy="52" rx="32" ry="38" fill={fill} stroke="#000" strokeWidth={S} />
+    <ellipse cx="50" cy="52" rx="28" ry="33" fill={fill} stroke="#000" strokeWidth={S} />
   );
 }
 
 function Heart({ fill }: BasePartProps) {
   return (
     <path
-      d="M50 85 C20 65 10 45 20 32 C28 22 40 22 50 35 C60 22 72 22 80 32 C90 45 80 65 50 85Z"
+      d="M50 82 C24 64 15 48 23 36 C30 27 42 27 50 38 C58 27 70 27 77 36 C85 48 76 64 50 82Z"
       fill={fill}
       stroke="#000"
       strokeWidth={S}
@@ -42,7 +42,7 @@ function Heart({ fill }: BasePartProps) {
 function Diamond({ fill }: BasePartProps) {
   return (
     <path
-      d="M50 14 L82 52 L50 88 L18 52Z"
+      d="M50 18 L78 52 L50 84 L22 52Z"
       fill={fill}
       stroke="#000"
       strokeWidth={S}
@@ -54,7 +54,7 @@ function Diamond({ fill }: BasePartProps) {
 function Hexagon({ fill }: BasePartProps) {
   return (
     <polygon
-      points="50,14 82,30 82,70 50,86 18,70 18,30"
+      points="50,18 78,32 78,68 50,84 22,68 22,32"
       fill={fill}
       stroke="#000"
       strokeWidth={S}
@@ -66,7 +66,7 @@ function Hexagon({ fill }: BasePartProps) {
 function Blob({ fill }: BasePartProps) {
   return (
     <path
-      d="M50 16 C72 14 88 28 86 50 C88 72 74 88 52 86 C30 90 12 74 14 52 C10 30 28 14 50 16Z"
+      d="M50 20 C70 18 84 30 82 50 C84 70 72 84 52 82 C32 86 16 72 18 52 C14 32 30 18 50 20Z"
       fill={fill}
       stroke="#000"
       strokeWidth={S}

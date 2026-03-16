@@ -55,8 +55,8 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       <BasePart fill={config.skinColor} />
 
       {/* Cheek blush (subtle) */}
-      <circle cx="32" cy="54" r="5" fill="#FF6B6B" opacity="0.15" />
-      <circle cx="68" cy="54" r="5" fill="#FF6B6B" opacity="0.15" />
+      <circle cx="34" cy="54" r="5" fill="#FF6B6B" opacity="0.15" />
+      <circle cx="66" cy="54" r="5" fill="#FF6B6B" opacity="0.15" />
 
       {/* Eyes */}
       <EyePart />
@@ -72,13 +72,13 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
         ) : (
           <g>
             {/* Left eye lashes */}
-            <line x1="34" y1="37" x2="32" y2="34" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
-            <line x1="37" y1="36" x2="36" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
-            <line x1="40" y1="36" x2="41" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="35" y1="37" x2="33" y2="34" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="38" y1="36" x2="37" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="41" y1="36" x2="42" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
             {/* Right eye lashes */}
-            <line x1="58" y1="37" x2="56" y2="34" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
-            <line x1="61" y1="36" x2="60" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
-            <line x1="64" y1="36" x2="65" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="57" y1="37" x2="55" y2="34" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="60" y1="36" x2="59" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+            <line x1="63" y1="36" x2="64" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
           </g>
         )
       )}
