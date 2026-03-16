@@ -18,6 +18,8 @@ import { useResultsSocketEvents } from '@/components/results/useResultsSocketEve
 import { useResultsData } from '@/hooks/useResultsData';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { QuickReactions, FloatingReaction } from '@/components/game/QuickReactions';
+import { useQuickReactions } from '@/hooks/useQuickReactions';
 
 // Dynamic import for landscape layout
 const ResultsLandscapeLayout = dynamic(() => import('@/components/results/ResultsLandscapeLayout'), { ssr: false });
@@ -33,6 +35,7 @@ import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats } from '@/hooks/gameState/store';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
+const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, wordHuntSummary }) => {
   const { t, dir } = useLanguage();
@@ -70,18 +73,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     setShowLevelUpCelebration,
     setLevelUpData,
     nearMisses,
-    mysteryReward,
-    showMysteryReward,
     referralMilestone,
     showReferralMilestone,
     readyUsernames,
     isCurrentPlayerReady,
     handleVote,
     handleFeedbackSkip,
-    handleMysteryRewardClose,
     handleReferralMilestoneClose,
     handleMarkReady,
   } = useResultsSocketEvents({ socket, username });
+
+  // Quick emoji reactions for multiplayer results
+  const { floatingReactions, sendReaction, dismissReaction } = useQuickReactions({
+    socket: socket ?? null,
+    username: username || '',
+  });
 
   // Mobile tab navigation state - Consolidated to 2 tabs for reduced cognitive load
   type MobileTab = 'results' | 'details';
@@ -255,11 +261,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         onVote: handleVote,
         onSkip: handleFeedbackSkip,
       }}
-      mysteryReward={{
-        reward: mysteryReward,
-        showMysteryReward,
-        onClose: handleMysteryRewardClose,
-      }}
       referralMilestone={{
         milestone: referralMilestone,
         showReferralMilestone,
@@ -393,10 +394,19 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Render Results Tab Content using shared component
   const renderResultsTab = () => (
     <>
-      {/* Word Hunt summary on top for immediate game context */}
+      {/* Game mode summary on top for immediate context */}
       {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
         <div className="mb-3">
           <WordHuntResultsSummary {...wordHuntResultsData} />
+        </div>
+      )}
+      {resolvedGameMode === 'blast' && (
+        <div className="mb-3">
+          <BlastResultsSummary
+            movesUsed={blastMovesUsed}
+            tilesCleared={blastTotalTilesCleared}
+            tileBonus={blastTotalTileBonus}
+          />
         </div>
       )}
       <ResultsMainContent
@@ -469,6 +479,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           }}
         />
 
+      {/* Floating emoji reactions overlay */}
+      <div className="absolute inset-0 pointer-events-none z-40">
+        <AnimatePresence>
+          {floatingReactions.map((r) => (
+            <FloatingReaction key={r.id} id={r.id} emoji={r.emoji} username={r.username} x={r.x} y={r.y} onComplete={dismissReaction} />
+          ))}
+        </AnimatePresence>
+      </div>
+
       {/* MOBILE VIEW - Tab-based layout (hidden on lg+) */}
       <div className="md:hidden flex flex-col flex-1 min-h-0">
         {/* Exit Button Header */}
@@ -497,6 +516,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
         </div>
 
+        {/* Quick Reactions bar above tab bar */}
+        {sortedScores.length > 1 && (
+          <div className="flex-shrink-0 fixed bottom-14 inset-x-0 z-50 flex justify-center pb-1 safe-area-bottom">
+            <QuickReactions onReaction={sendReaction} layout="bar" />
+          </div>
+        )}
+
         {/* Fixed Bottom Tab Bar */}
         <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-bottom">
           <MobileTabBar
@@ -509,8 +535,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* DESKTOP/TABLET VIEW - Two-column side-by-side layout (hidden on mobile) */}
       <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 md:overflow-y-auto md:overscroll-contain scrollable-area p-4 xl:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
-        {/* Top Bar with Exit Button */}
-        <div className="w-full max-w-6xl mx-auto flex items-center justify-end mb-4">
+        {/* Top Bar with Exit Button and Reactions */}
+        <div className="w-full max-w-6xl mx-auto flex items-center justify-between mb-4">
+          {sortedScores.length > 1 && (
+            <QuickReactions onReaction={sendReaction} layout="bar" />
+          )}
+          <div className="flex-1" />
           <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />
         </div>
 

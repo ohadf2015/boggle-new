@@ -15,7 +15,6 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import type { NearMiss } from './NearMissCard';
-import type { MysteryReward } from '@/components/engagement/MysteryRewardPopup';
 import type { ReferralMilestone } from '@/shared/types/socket';
 import type { WordToVote, XpGainedData, LevelUpData } from '@/types/components';
 
@@ -33,10 +32,6 @@ export interface ResultsSocketEventsState {
   // Near-miss notifications
   nearMisses: NearMiss[];
 
-  // Mystery reward state
-  mysteryReward: MysteryReward | null;
-  showMysteryReward: boolean;
-
   // Referral milestone state
   referralMilestone: ReferralMilestone | null;
   showReferralMilestone: boolean;
@@ -49,7 +44,6 @@ export interface ResultsSocketEventsState {
 export interface ResultsSocketEventsActions {
   handleVote: (voteType: 'like' | 'dislike', votedWord?: string) => void;
   handleFeedbackSkip: () => void;
-  handleMysteryRewardClose: () => void;
   handleReferralMilestoneClose: () => void;
   handleMarkReady: () => void;
   setShowLevelUpCelebration: (show: boolean) => void;
@@ -78,11 +72,6 @@ export function useResultsSocketEvents({
   // Near-miss notifications
   const [nearMisses, setNearMisses] = useState<NearMiss[]>([]);
 
-  // Mystery reward state
-  const [mysteryReward, setMysteryReward] = useState<MysteryReward | null>(null);
-  const [showMysteryReward, setShowMysteryReward] = useState(false);
-  const mysteryRewardQueueRef = useRef<MysteryReward[]>([]);
-  const hasShownMysteryRewardRef = useRef<boolean>(false); // Track if ANY reward was shown this session
   const hasShownLevelUpRef = useRef<boolean>(false); // Prevent duplicate level-up celebrations
 
   // Referral milestone state
@@ -159,18 +148,6 @@ export function useResultsSocketEvents({
       }
     };
 
-    const handleMysteryReward = (data: { reward: MysteryReward }) => {
-      logger.log('[RESULTS] Mystery reward received:', data);
-      // Only show ONE mystery reward per game session to avoid overwhelming users
-      // Use ref to track if any reward was already shown (persists across closes)
-      if (data.reward && !hasShownMysteryRewardRef.current) {
-        hasShownMysteryRewardRef.current = true;
-        mysteryRewardQueueRef.current.push(data.reward);
-        setMysteryReward(data.reward);
-        setShowMysteryReward(true);
-      }
-    };
-
     const handleReferralMilestone = (data: { milestone: ReferralMilestone }) => {
       logger.log('[RESULTS] Referral milestone received:', data);
       if (data.milestone) {
@@ -184,7 +161,6 @@ export function useResultsSocketEvents({
     socket.on('xpGained', handleXpGained);
     socket.on('levelUp', handleLevelUp);
     socket.on('engagement:nearMisses', handleNearMisses);
-    socket.on('engagement:mysteryReward', handleMysteryReward);
     socket.on('engagement:referralMilestone', handleReferralMilestone);
 
     return () => {
@@ -193,7 +169,6 @@ export function useResultsSocketEvents({
       socket.off('xpGained', handleXpGained);
       socket.off('levelUp', handleLevelUp);
       socket.off('engagement:nearMisses', handleNearMisses);
-      socket.off('engagement:mysteryReward', handleMysteryReward);
       socket.off('engagement:referralMilestone', handleReferralMilestone);
     };
   }, [socket]);
@@ -257,20 +232,6 @@ export function useResultsSocketEvents({
     setWordQueue([]);
   }, []);
 
-  // Handle mystery reward popup close
-  const handleMysteryRewardClose = useCallback(() => {
-    setShowMysteryReward(false);
-    mysteryRewardQueueRef.current.shift();
-    if (mysteryRewardQueueRef.current.length > 0) {
-      setTimeout(() => {
-        setMysteryReward(mysteryRewardQueueRef.current[0]);
-        setShowMysteryReward(true);
-      }, 500);
-    } else {
-      setMysteryReward(null);
-    }
-  }, []);
-
   // Handle referral milestone popup close
   const handleReferralMilestoneClose = useCallback(() => {
     setShowReferralMilestone(false);
@@ -294,8 +255,6 @@ export function useResultsSocketEvents({
     levelUpData,
     showLevelUpCelebration,
     nearMisses,
-    mysteryReward,
-    showMysteryReward,
     referralMilestone,
     showReferralMilestone,
     readyUsernames,
@@ -303,7 +262,6 @@ export function useResultsSocketEvents({
     // Actions
     handleVote,
     handleFeedbackSkip,
-    handleMysteryRewardClose,
     handleReferralMilestoneClose,
     handleMarkReady,
     setShowLevelUpCelebration,

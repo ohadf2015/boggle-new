@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { getCloseLossMessage } from '@/shared/utils/closeLossDetector';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 export type NextStepMode = 'practice' | 'solo-bots' | 'daily' | 'multiplayer-bots';
 
@@ -60,6 +61,8 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   onRematch,
 }) => {
   const { t, language, dir } = useLanguage();
+  const reducedMotion = useReducedMotion();
+  const inf = reducedMotion ? 0 : Infinity;
   const isRTL = dir === 'rtl';
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
   const router = useRouter();
@@ -248,7 +251,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2 }}
+            transition={{ duration: 3, repeat: inf, ease: 'easeInOut', repeatDelay: 2 }}
           />
 
           <div className="relative z-10 flex items-center gap-4">
@@ -268,7 +271,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             </div>
             <motion.div
               animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              transition={{ duration: 1.5, repeat: inf, ease: 'easeInOut' }}
             >
               <ArrowIcon className="w-6 h-6 text-neo-black" />
             </motion.div>
@@ -312,7 +315,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
       <motion.div
         className="absolute top-4 right-4 text-neo-black/50"
         animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 4, repeat: inf, ease: 'easeInOut' }}
       >
         <Sparkles className="w-6 h-6" />
       </motion.div>
@@ -326,7 +329,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
               config.iconBg
             )}
             animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 2, repeat: inf, ease: 'easeInOut' }}
           >
             {config.icon}
           </motion.div>
@@ -365,13 +368,13 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
+            transition={{ duration: 2, repeat: inf, ease: 'easeInOut', repeatDelay: 1 }}
           />
           <span className="relative z-10">{t('nextStep.letsGo')}</span>
           <motion.span
             className="relative z-10"
             animate={{ x: [0, 5, 0] }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 1, repeat: inf, ease: 'easeInOut' }}
           >
             <ArrowIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </motion.span>

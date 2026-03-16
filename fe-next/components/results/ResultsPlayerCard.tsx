@@ -19,10 +19,7 @@ import { filterGameAchievements } from './utils';
 import type { WordObject, ResultsPlayerCardProps } from './types';
 
 const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled, archetype }) => {
-  const { t, dir } = useLanguage();
-  // Arrow for level up indicator - use ← in RTL and → in LTR to show progression
-  // In RTL languages, left arrow indicates "going up/forward"
-  const levelArrow = dir === 'rtl' ? '←' : '→';
+  const { t } = useLanguage();
 
   // Check if this is the current player
   const isCurrentPlayer = currentUsername && player.username === currentUsername;

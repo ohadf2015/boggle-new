@@ -64,13 +64,6 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   const isWinner = rank === 1;
   const pointsFromWinner = winnerScore - player.score;
 
-  const getRankSuffix = (r: number) => {
-    if (r === 1) return 'st';
-    if (r === 2) return 'nd';
-    if (r === 3) return 'rd';
-    return 'th';
-  };
-
   // Rank-specific styling
   const rankColors: Record<number, { bg: string; text: string }> = {
     1: { bg: 'bg-amber-400', text: 'text-neo-black' },
@@ -202,7 +195,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                 {!hideRankAndScore && (
                   <span className="text-[10px] sm:text-xs text-slate-300 font-bold">
-                    {rank}{getRankSuffix(rank)} of {totalPlayers}
+                    {t('results.yourPlace', { place: rank, total: totalPlayers })}
                   </span>
                 )}
                 {archetype && (

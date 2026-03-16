@@ -20,6 +20,9 @@ jest.mock('../../../contexts/LanguageContext', () => ({
         // Simulate the real translation with interpolation
         return `${params.place} of ${params.total}`;
       }
+      if (key === 'results.yourPlaceSimple' && params) {
+        return `#${params.place}`;
+      }
       return key;
     },
     language: 'en',
@@ -142,8 +145,8 @@ describe('ResultsWinnerBanner Interpolation', () => {
         />
       );
 
-      // Should use the fallback which shows ordinal - look for the announcement text
-      expect(screen.getByText('You finished 4th')).toBeInTheDocument();
+      // Should use the i18n fallback for placement without total
+      expect(screen.getByText('#4')).toBeInTheDocument();
     });
   });
 });

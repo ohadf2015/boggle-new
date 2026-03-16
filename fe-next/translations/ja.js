@@ -1011,9 +1011,25 @@ const ja = {
       "ptsApart": "ポイント差",
       "bothFound": "両者発見",
       "secondsLeft": "秒残り!",
-      "gridShuffle": "グリッドシャッフル!"
+      "gridShuffle": "グリッドシャッフル!",
+      "nLetters": "{count}文字!",
+      "sameWordFound": "同じ{length}文字の単語!",
+      "finalMinute": "ラストミニッツ！",
+      "everySecondCounts": "一秒一秒が大切！"
     },
-    "moreNotifications": "+{count}件"
+    "modeClassic": "クラシック",
+    "modeBlast": "ブラスト",
+    "modeWordHunt": "ワードハント",
+    "moreNotifications": "+{count}件",
+    "gap": "差",
+    "closingFast": "急接近中",
+    "ptsGap": "{gap}ポイント差",
+    "leadsWithPts": "{player}が{score}ポイントでリード",
+    "playersWithinPts": "{count}人が{gap}ポイント以内",
+    "wordsAndCounting": "{player}が{count}語発見",
+    "anyonesGame": "誰が勝つかわからない！",
+    "raceHeatingUp": "レースが白熱！",
+    "noActivityYet": "アクション開始を待っています..."
   },
   "tvResults": {
     "title": "勝者誕生!",
@@ -1460,6 +1476,14 @@ const ja = {
     "scoringTipText": "連続で単語を見つけてコンボボーナス(⚡)ゲット！長い単語はポイント爆上げだよ！",
     "sharedWordsExplanation": "これらは他のプレイヤーも見つけた単語だから0点。ユニークな単語を狙おう！",
     "yourPlace": "{total}人中{place}位",
+    "yourPlaceSimple": "{place}位",
+    "mvp": {
+      "longestWord": "最長",
+      "comboKing": "コンボ",
+      "uniqueFinder": "ユニーク",
+      "accuracyStar": "精度",
+      "speedDemon": "スピード"
+    },
     "pointsFromFirst": "1位まで{points}点",
     "potentialScore": "+{points}点の可能性",
     "comparativeInsights": {
@@ -2174,7 +2198,25 @@ const ja = {
       "lexiconAdept": "レキシコンアデプト",
       "linguisticLegend": "リングイスティックレジェンド"
     },
-    "canPrestige": "プレステージ可能！"
+    "canPrestige": "プレステージ可能！",
+    "prestigeModal": {
+      "title": "プレステージシステム",
+      "achieved": "プレステージ達成！",
+      "rewardsUnlocked": "報酬がアンロックされました！",
+      "warning": "注意！",
+      "warningText": "レベル1にリセットされます。現在のXPはすべてリセットされますが、以下のすべての報酬を獲得できます。",
+      "cancel": "キャンセル",
+      "confirmPrestige": "プレステージを確認",
+      "currentLevel": "現在のレベル",
+      "prestige": "プレステージ",
+      "xpMultiplier": "XP倍率",
+      "maxPrestige": "最大プレステージ！",
+      "maxPrestigeText": "最高レベルに到達しました。あなたは伝説です！",
+      "rewardsFor": "プレステージ{{level}}の報酬",
+      "prestigeTo": "{{level}}にプレステージ",
+      "reachLevel": "プレステージするにはレベル100に到達してください",
+      "levelsRemaining": "残り{{count}}レベル"
+    }
   },
   "nearMiss": {
     "almostThere": "もう少し！",
@@ -6268,6 +6310,11 @@ const ja = {
     "totalScore": "合計",
     "waveBreakdown": "ウェーブ詳細",
     "wavesCompleted": "ウェーブ",
+    "skillBreakdown": "スキル分析",
+    "skillAvgLength": "平均単語長",
+    "skillLongWords": "長い単語（6文字以上）",
+    "skillEfficiency": "手数効率",
+    "skillBoardClear": "盤面クリア率",
     "multiplayer": {
       "moves": "手数",
       "bonusMove": "ボーナスムーブ！",

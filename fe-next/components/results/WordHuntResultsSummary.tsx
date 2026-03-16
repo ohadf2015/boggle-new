@@ -40,6 +40,11 @@ export default function WordHuntResultsSummary({
   // Apply Hebrew final letters for display (e.g., כ→ך at end of word)
   const displayTargetWord = language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord;
 
+  // Format survival time as mm:ss or just Xs for short times
+  const formattedSurvivalTime = survivalTime >= 60
+    ? `${Math.floor(survivalTime / 60)}:${String(survivalTime % 60).padStart(2, '0')}`
+    : `${survivalTime}s`;
+
   const survivors = playerResults
     ?.filter((p) => p.survived)
     .sort((a, b) => b.score - a.score);
@@ -80,7 +85,7 @@ export default function WordHuntResultsSummary({
         <div className="flex items-center gap-2 p-3 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm">
           <Clock className="w-5 h-5 text-neo-orange" />
           <div className="flex flex-col">
-            <span className="text-lg font-bold text-neo-white">{survivalTime}s</span>
+            <span className="text-lg font-bold text-neo-white">{formattedSurvivalTime}</span>
             <span className="text-xs text-neo-cream/70">{t('wordHunt.multiplayer.survivalTime')}</span>
           </div>
         </div>

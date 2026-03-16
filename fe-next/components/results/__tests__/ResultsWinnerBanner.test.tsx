@@ -99,8 +99,8 @@ describe('ResultsWinnerBanner', () => {
       expect(contentDiv).toBeInTheDocument();
     });
 
-    it('hides mascot in compact mode', () => {
-      render(
+    it('shows scaled-down mascot in compact mode', () => {
+      const { container } = render(
         <ResultsWinnerBanner
           winner={mockWinner}
           isCurrentUserWinner={true}
@@ -108,8 +108,11 @@ describe('ResultsWinnerBanner', () => {
         />
       );
 
-      // Mascot should not be present
-      expect(screen.queryByTestId('mascot')).not.toBeInTheDocument();
+      // Mascot should be present but scaled down
+      expect(screen.queryByTestId('mascot')).toBeInTheDocument();
+      // Container should have scale-75 for compact
+      const mascotContainer = container.querySelector('.scale-75');
+      expect(mascotContainer).toBeInTheDocument();
     });
 
     it('uses smaller text sizes in compact mode', () => {

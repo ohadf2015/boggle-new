@@ -20,6 +20,10 @@ const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/Consol
 const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt'), { ssr: false });
 const MissedWordsComponent = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
+const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
+const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
+const TurningPointCard = dynamic(() => import('@/components/results/TurningPointCard'), { ssr: false });
+import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 
 // ==============================================
@@ -139,9 +143,9 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
   hideRankAndScore = false,
   showBanner = false,
   bannerSize = '300x250',
-  gameMode: _gameMode,
-  blastResults: _blastResults,
-  wordHuntResults: _wordHuntResults,
+  gameMode,
+  blastResults,
+  wordHuntResults,
   isCurrentPlayerReady,
   onMarkReady,
 }) => {
@@ -150,6 +154,27 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
 
   return (
     <div className="space-y-3">
+      {/* Game-mode specific summary */}
+      {gameMode === 'blast' && blastResults && (
+        <BlastResultsSummary
+          movesUsed={blastResults.movesUsed}
+          tilesCleared={blastResults.tilesCleared}
+          tileBonus={blastResults.tileBonus}
+          playerStats={blastResults.playerStats}
+        />
+      )}
+      {gameMode === 'word-hunt' && wordHuntResults && (
+        <WordHuntResultsSummary
+          targetWord={wordHuntResults.targetWord}
+          foundTarget={wordHuntResults.foundTarget}
+          isFirstFinder={wordHuntResults.isFirstFinder}
+          survivalTime={wordHuntResults.survivalTime}
+          discoveryWords={wordHuntResults.discoveryWords}
+          playerResults={wordHuntResults.playerResults}
+          currentUsername={wordHuntResults.currentUsername}
+        />
+      )}
+
       {/* Full Player Performance Card - Shows detailed breakdown */}
       {currentPlayerData && currentPlayerRank > 0 && (
         <ConsolidatedPlayerCard
@@ -218,6 +243,24 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
             })}
           </div>
         </CollapsibleSection>
+      )}
+
+      {/* Turning Point + Comparative Insights (moved from Results tab on mobile) */}
+      {sortedScores.length > 1 && username && (
+        <>
+          {sortedScores.length <= 6 && (
+            <TurningPointCard
+              allPlayerWords={allPlayerWords}
+              currentUsername={username}
+              t={t}
+            />
+          )}
+          <ComparativeInsights
+            allPlayerWords={allPlayerWords}
+            currentUsername={username}
+            t={t}
+          />
+        </>
       )}
 
       {/* Performance Chart */}

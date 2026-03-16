@@ -26,6 +26,7 @@ const TurningPointCard = dynamic(() => import('@/components/results/TurningPoint
 import { AdPlaceholder } from '@/components/ads';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 import ShareButton from '@/components/results/ShareButton';
+import MvpAwards from '@/components/results/MvpAwards';
 import type { ShareParams } from '@/shared/utils/shareResultGenerator';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
@@ -259,7 +260,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
               }))}
             />
           ) : (
-            <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+            <Top3Leaderboard players={sortedScores} currentUsername={username} compact showConfetti={!bannerPlayer} />
           )
         ) : (
           <ScoreRevealAnimation
@@ -274,6 +275,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
             onComplete={() => setScoreRevealComplete(true)}
           />
         )
+      )}
+
+      {/* MVP Awards — every player wins something */}
+      {scoreRevealComplete && sortedScores.length > 1 && allPlayerWords && (
+        <MvpAwards
+          players={sortedScores}
+          allPlayerWords={allPlayerWords as Record<string, import('./types').WordObject[]>}
+        />
       )}
 
       {/* Primary CTA - Play Again / Ready / Next Step (above the fold) */}
@@ -435,26 +444,28 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Turning Point — the moment that decided the game */}
-      {allPlayerWords && username && sortedScores.length > 1 && sortedScores.length <= 6 && (
-        <TurningPointCard
-          allPlayerWords={allPlayerWords as Record<string, import('./types').WordObject[]>}
-          currentUsername={username}
-          t={t}
-        />
+      {/* Turning Point + Comparative Insights — desktop only (mobile: in Details tab) */}
+      {!isMobile && (
+        <>
+          {allPlayerWords && username && sortedScores.length > 1 && sortedScores.length <= 6 && (
+            <TurningPointCard
+              allPlayerWords={allPlayerWords as Record<string, import('./types').WordObject[]>}
+              currentUsername={username}
+              t={t}
+            />
+          )}
+          {allPlayerWords && username && sortedScores.length > 1 && (
+            <ComparativeInsights
+              allPlayerWords={allPlayerWords}
+              currentUsername={username}
+              t={t}
+            />
+          )}
+        </>
       )}
 
-      {/* Comparative Insights (analysis after motivation) */}
-      {allPlayerWords && username && sortedScores.length > 1 && (
-        <ComparativeInsights
-          allPlayerWords={allPlayerWords}
-          currentUsername={username}
-          t={t}
-        />
-      )}
-
-      {/* Word Hunt Promo Popup - show when not already playing word-hunt */}
-      {gameCode && gameMode && gameMode !== 'word-hunt' && (
+      {/* Word Hunt Promo Popup - desktop only (mobile: too much scroll) */}
+      {!isMobile && gameCode && gameMode && gameMode !== 'word-hunt' && (
         <WordHuntPromoPopup />
       )}
 

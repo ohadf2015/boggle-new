@@ -1044,9 +1044,25 @@ const es = {
       "ptsApart": "pts de diferencia",
       "bothFound": "Ambos encontraron",
       "secondsLeft": "¡segundos restantes!",
-      "gridShuffle": "¡La cuadrícula se mezcla!"
+      "gridShuffle": "¡La cuadrícula se mezcla!",
+      "nLetters": "¡{count} letras!",
+      "sameWordFound": "¡Misma palabra de {length} letras!",
+      "finalMinute": "¡ÚLTIMO MINUTO!",
+      "everySecondCounts": "¡Cada segundo cuenta!"
     },
-    "moreNotifications": "+{count} más"
+    "modeClassic": "CLÁSICO",
+    "modeBlast": "BLAST",
+    "modeWordHunt": "CAZA DE PALABRAS",
+    "moreNotifications": "+{count} más",
+    "gap": "BRECHA",
+    "closingFast": "ACERCÁNDOSE RÁPIDO",
+    "ptsGap": "brecha de {gap} pts",
+    "leadsWithPts": "{player} lidera con {score} pts",
+    "playersWithinPts": "{count} jugadores dentro de {gap} pts",
+    "wordsAndCounting": "{player} encontró {count} palabras",
+    "anyonesGame": "¡Cualquiera puede ganar!",
+    "raceHeatingUp": "¡La carrera se calienta!",
+    "noActivityYet": "Esperando que comience la acción..."
   },
   "tvResults": {
     "title": "¡TENEMOS UN GANADOR!",
@@ -1523,6 +1539,14 @@ const es = {
     "sharedWordsExplanation": "Las palabras repetidas no dan puntos",
     "hostStartDescription": "¡Inicia una nueva partida cuando todos estén listos!",
     "yourPlace": "{place} de {total}",
+    "yourPlaceSimple": "#{place}",
+    "mvp": {
+      "longestWord": "Más larga",
+      "comboKing": "Combo",
+      "uniqueFinder": "Única",
+      "accuracyStar": "Precisión",
+      "speedDemon": "Velocidad"
+    },
     "pointsFromFirst": "{points} pts del 1°",
     "potentialScore": "+{points} pts potencial",
     "comparativeInsights": {
@@ -2079,7 +2103,25 @@ const es = {
       "lexiconAdept": "Adepto del Léxico",
       "linguisticLegend": "Leyenda Lingüística"
     },
-    "canPrestige": "¡Prestigio Disponible!"
+    "canPrestige": "¡Prestigio Disponible!",
+    "prestigeModal": {
+      "title": "Sistema de Prestigio",
+      "achieved": "¡Prestigio Alcanzado!",
+      "rewardsUnlocked": "¡Tus recompensas han sido desbloqueadas!",
+      "warning": "¡Advertencia!",
+      "warningText": "Esto te reiniciará al Nivel 1. Todo el XP actual se reiniciará, pero obtendrás todas las recompensas a continuación.",
+      "cancel": "Cancelar",
+      "confirmPrestige": "Confirmar Prestigio",
+      "currentLevel": "Nivel Actual",
+      "prestige": "Prestigio",
+      "xpMultiplier": "Multiplicador de XP",
+      "maxPrestige": "¡Prestigio Máximo!",
+      "maxPrestigeText": "Has alcanzado el nivel más alto. ¡Eres una leyenda!",
+      "rewardsFor": "Recompensas de Prestigio {{level}}",
+      "prestigeTo": "Prestigio a {{level}}",
+      "reachLevel": "Alcanza el Nivel 100 para Prestigio",
+      "levelsRemaining": "{{count}} niveles restantes"
+    }
   },
   "nearMiss": {
     "almostThere": "¡Casi lo logras!",
@@ -6261,6 +6303,11 @@ const es = {
     "totalScore": "Total",
     "waveBreakdown": "Desglose de oleadas",
     "wavesCompleted": "Oleadas",
+    "skillBreakdown": "Análisis de habilidad",
+    "skillAvgLength": "Longitud promedio",
+    "skillLongWords": "Palabras largas (6+)",
+    "skillEfficiency": "Eficiencia de movimientos",
+    "skillBoardClear": "Tablero limpiado",
     "multiplayer": {
       "moves": "Movimientos",
       "bonusMove": "Movimiento Extra!",

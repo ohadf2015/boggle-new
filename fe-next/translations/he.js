@@ -69,7 +69,7 @@ const he = {
       "title": "קרב מילים מרובה משתתפים - תחרות בזמן אמת",
       "description": "אוהבים בוגל, סקראבל או וורדל? לקסיקלאש הוא משחק מילים מרובה משתתפים בעברית! צרו חדר, שלחו לינק והתחרו בזמן אמת - מי ימצא יותר מילים? 10,000+ מילים, ללא הרשמה, מושלם למסיבות. פותח בישראל.",
       "ogTitle": "משחק מילים כמו בוגל וסקראבל - מרובה משתתפים בעברית",
-      "ogDescription": "אוהבים בוגל או סקראבל? נסו לקסיקלאש - משחק מילים מרובה משתתפים בעברית! צרו חדר → שלחו לינק → התחרו. חינם! 🇮🇱"
+      "ogDescription": "אוהבים בוגל או סקראבל? נסו לקסיקלאש - משחק מילים מרובה משתתפים בעברית! צרו חדר ← שלחו לינק ← התחרו. חינם! 🇮🇱"
     },
     "about": {
       "title": "אודות - הסיפור והמשימה שלנו",
@@ -333,11 +333,11 @@ const he = {
   },
   "countdown": {
     "hint": "גררו אותיות כדי ליצור מילים!",
-    "go": "!קדימה",
+    "go": "קדימה!",
     "modeReveal": {
-      "blast": "!פיצוץ",
-      "wordHunt": "!ציד מילים",
-      "classic": "!קלאסי"
+      "blast": "פיצוץ!",
+      "wordHunt": "ציד מילים!",
+      "classic": "קלאסי!"
     }
   },
   "help": {
@@ -534,17 +534,17 @@ const he = {
     "roomClosed": "החדר נסגר - זמן לפתוח חדר חדש",
     "usernameTaken": "מישהו הקדים! נסה שם אחר",
     "gameCodeExists": "הקוד תפוס. בחר חדש!",
-    "somethingWentWrong": "!פסק זמן קצר",
-    "unexpectedError": "!תקלה קטנה - אבל המשחק שלך בטוח לגמרי",
+    "somethingWentWrong": "פסק זמן קצר!",
+    "unexpectedError": "תקלה קטנה - אבל המשחק שלך בטוח לגמרי!",
     "errorDetails": "פרטים",
     "refreshPage": "רענון",
-    "errorHeading": "!יאללה, חוזרים למשחק",
-    "errorMessage": "!תקלה זעירה, אל דאגה - כל המילים שלך שמורות",
-    "errorProgress": "!הכל נשמר",
-    "updateHeading": "!עדכון חדש מוכן",
-    "updateMessage": "!דברים חדשים הגיעו! רענון מהיר וחוזרים לפעולה",
-    "updateProgress": "!לוקח שתי שניות",
-    "globalErrorEncouragement": "!אל דאגה - המשחק שלך מאובטח",
+    "errorHeading": "יאללה, חוזרים למשחק!",
+    "errorMessage": "תקלה זעירה, אל דאגה - כל המילים שלך שמורות!",
+    "errorProgress": "הכל נשמר!",
+    "updateHeading": "עדכון חדש מוכן!",
+    "updateMessage": "דברים חדשים הגיעו! רענון מהיר וחוזרים לפעולה!",
+    "updateProgress": "לוקח שתי שניות!",
+    "globalErrorEncouragement": "אל דאגה - המשחק שלך מאובטח!",
     "connectionTimeout": "לוקח יותר מדי זמן להתחבר",
     "rateLimited": "לאט, ספרינטר!",
     "connectionLost": "איבדנו את החיבור - מתחברים מחדש",
@@ -749,7 +749,7 @@ const he = {
       "invitePrompt": "התחל מסיבה על ידי שליחת קישור",
       "inviteFriends": "הזמן חברים",
       "noRoomsYet": "אין קרבות בתהליך",
-      "beTheLegend": "!תהיה האגדה שמתחילה את הקרב הראשון",
+      "beTheLegend": "תהיה האגדה שמתחילה את הקרב הראשון!",
       "hostAndPlay": "ארח ושחק — שתף את הקוד עם חברים",
       "startBattle": "התחל קרב",
       "inProgress": "פעיל",
@@ -854,12 +854,12 @@ const he = {
     "lobby": "חדר מלחמה",
     "waitingForPlayers": "אוספים לוחמים...",
     "startGame": "GO!",
-    "startBattle": "!התחל קרב",
+    "startBattle": "התחל קרב!",
     "commandersJoined": "לוחמים שהצטרפו",
     "playersInRoom": "שחקנים בחדר",
-    "noOneYet": "?עוד אף אחד",
+    "noOneYet": "עוד אף אחד?",
     "startingWithBots": "מתחיל עם בוטים בעוד",
-    "shareCodeHint": "!שתפו את קוד החדר למעלה כדי שחברים יצטרפו",
+    "shareCodeHint": "שתפו את קוד החדר למעלה כדי שחברים יצטרפו!",
     "battleMode": "מצב קרב",
     "preset": "הגדרה",
     "ofMaxWarriors": "מתוך {{max}} לוחמים מוכנים",
@@ -1027,9 +1027,25 @@ const he = {
       "ptsApart": "נקודות הפרש",
       "bothFound": "שניהם מצאו",
       "secondsLeft": "שניות נותרו!",
-      "gridShuffle": "הלוח מתערבב!"
+      "gridShuffle": "הלוח מתערבב!",
+      "nLetters": "{count} אותיות!",
+      "sameWordFound": "אותה מילה בת {length} אותיות!",
+      "finalMinute": "הדקה האחרונה!",
+      "everySecondCounts": "כל שנייה חשובה!"
     },
-    "moreNotifications": "+{count} עוד"
+    "modeClassic": "קלאסי",
+    "modeBlast": "בלאסט",
+    "modeWordHunt": "ציד מילים",
+    "moreNotifications": "+{count} עוד",
+    "gap": "פער",
+    "closingFast": "מתקרב מהר",
+    "ptsGap": "פער של {gap} נק'",
+    "leadsWithPts": "{player} מוביל עם {score} נק'",
+    "playersWithinPts": "{count} שחקנים בפער של {gap} נק'",
+    "wordsAndCounting": "{player} מצא {count} מילים",
+    "anyonesGame": "הכל פתוח!",
+    "raceHeatingUp": "המרוץ מתחמם!",
+    "noActivityYet": "מחכים שהפעולה תתחיל..."
   },
   "tvResults": {
     "title": "יש לנו מנצח!",
@@ -1159,8 +1175,8 @@ const he = {
     "swipeHintShort": "החליקו על אותיות למצוא מילים!",
     "waitingForHostToStart": "ממתינים למארח שיתחיל את המשחק...",
     "hostWillStart": "המארח יתחיל את המשחק כשכולם מוכנים",
-    "readyUp": "!מוכן",
-    "readyConfirmed": "!מוכן",
+    "readyUp": "מוכן!",
+    "readyConfirmed": "מוכן!",
     "editName": "שנה שם",
     "editAvatar": "שנה אווטאר",
     "hostDisconnected": "המארח התנתק. ממתין לחיבור מחדש...",
@@ -1287,18 +1303,18 @@ const he = {
 
   "preGameTutorial": {
     "welcome": {
-      "title": "!היי",
-      "subtitle": "!אני לקסי! בואו אראה לכם איך לשחק"
+      "title": "היי!",
+      "subtitle": "אני לקסי! בואו אראה לכם איך לשחק!"
     },
     "practice": {
       "instruction": ":החליקו על האותיות כדי לאיית",
-      "success": "!מושלם! אתם תופסים את זה"
+      "success": "מושלם! אתם תופסים את זה!"
     },
     "tips": {
-      "title": "!אתם טבעיים",
+      "title": "אתם טבעיים!",
       "subtitle": "כמה טיפים לפני שנתחיל"
     },
-    "letsPlay": "!בואו נשחק",
+    "letsPlay": "בואו נשחק!",
     "skip": "דלג על ההדרכה",
     "next": "הבא",
     "step": "שלב {current} מתוך {total}"
@@ -1477,6 +1493,14 @@ const he = {
     "readyForNextRound": "מוכנים לסיבוב הבא?",
     "hostStartDescription": "התחילו משחק חדש כשכולם מוכנים!",
     "yourPlace": "{place} מתוך {total}",
+    "yourPlaceSimple": "מקום {place}",
+    "mvp": {
+      "longestWord": "הארוכה",
+      "comboKing": "קומבו",
+      "uniqueFinder": "ייחודי",
+      "accuracyStar": "דיוק",
+      "speedDemon": "מהירות"
+    },
     "pointsFromFirst": "{points} נק' מראשון",
     "potentialScore": "+{points} נק' פוטנציאל",
     "comparativeInsights": {
@@ -1713,7 +1737,7 @@ const he = {
     "newPlayer": {
       "welcomeTitle": "ברוכים הבאים ללקסיקלאש!",
       "dontShowAgain": "אל תראה שוב",
-      "letsPlay": "!בואו נשחק"
+      "letsPlay": "בואו נשחק!"
     }
   },
   "tutorialPrompt": {
@@ -1753,7 +1777,7 @@ const he = {
         "noAttempt": "3 אותיות = בלי ניסיון, רק חיים!",
         "keyInsight": "💡 מצא מילים קצרות בחינם לחיים בלי לבזבז ניסיונות!",
         "gotIt": "הבנתי!",
-        "bonusTitle": "!בונוס",
+        "bonusTitle": "בונוס!",
         "revealsClue": "מילים של 3+ אותיות גם חושפות רמזים!"
       },
       "letterFeedback": {
@@ -1771,7 +1795,7 @@ const he = {
       }
     },
     "welcome": {
-      "title": "!ברוכים הבאים ל-LexiClash",
+      "title": "ברוכים הבאים ל-LexiClash!",
       "description": "החליקו על אותיות בלוח כדי ליצור מילים. בואו נלמד את הבסיס!"
     },
     "grid": {
@@ -1795,7 +1819,7 @@ const he = {
       "description": "עקבו אחרי הניקוד שלכם מול שחקנים אחרים. מילים ארוכות שוות יותר נקודות!"
     },
     "ready": {
-      "title": "!מוכנים",
+      "title": "מוכנים!",
       "description": "התחילו להחליק ותהנו. בהצלחה!"
     },
     "swipeHint": "החלק לניווט → ←",
@@ -1879,7 +1903,7 @@ const he = {
     "unlocked": "הישג נפתח!",
     "upgraded": "הישג שודרג!",
     "cinematic": {
-      "unlocked": "!הישג נפתח",
+      "unlocked": "הישג נפתח!",
       "gold": "זהב",
       "platinum": "פלטינום"
     },
@@ -2191,7 +2215,25 @@ const he = {
       "lexiconAdept": "מומחה לקסיקון",
       "linguisticLegend": "אגדת הלשון"
     },
-    "canPrestige": "פרסטיג' זמין!"
+    "canPrestige": "פרסטיג' זמין!",
+    "prestigeModal": {
+      "title": "מערכת פרסטיג'",
+      "achieved": "יופי! הגעת!",
+      "rewardsUnlocked": "הפרסים שלך נפתחו!",
+      "warning": "שים לב!",
+      "warningText": "האיפוס יחזיר אותך לרמה 1. כל ה-XP הנוכחי יאופס, אבל תקבל את כל הפרסים למטה.",
+      "cancel": "ביטול",
+      "confirmPrestige": "אשר פרסטיג'",
+      "currentLevel": "רמה נוכחית",
+      "prestige": "פרסטיג'",
+      "xpMultiplier": "מכפיל XP",
+      "maxPrestige": "פרסטיג' מקסימלי!",
+      "maxPrestigeText": "הגעת לרמה הגבוהה ביותר. אתה אגדה!",
+      "rewardsFor": "פרסים לפרסטיג' {{level}}",
+      "prestigeTo": "קפוץ לפרסטיג' {{level}}",
+      "reachLevel": "הגע לרמה 100 כדי לבצע פרסטיג'",
+      "levelsRemaining": "{{count}} רמות נותרו"
+    }
   },
   "nearMiss": {
     "almostThere": "כמעט שם!",
@@ -3382,14 +3424,14 @@ const he = {
     "shareTextAuth": "הצטרף אלי ב-LexiClash! השתמש בקוד ההפניה שלי: {code}",
     "shareTextGuest": "שחק LexiClash - משחק המילים הרב-משתתפים הכי טוב!",
     "shareNativeTitle": "הצטרף ל-LexiClash",
-    "playNowFree": "!שחקו עכשיו — חינם",
-    "letsPlay": "!בואו נשחק",
+    "playNowFree": "שחקו עכשיו — חינם!",
+    "letsPlay": "בואו נשחק!",
     "gameModes": "מצבי משחק",
     "languages": "שפות",
     "activePlayers": "שחקנים פעילים",
     "todaysTopPlayers": "השחקנים המובילים",
     "viewFullLeaderboard": "צפו בטבלת המובילים המלאה",
-    "readyToCompete": "?מוכנים להתחרות",
+    "readyToCompete": "מוכנים להתחרות?",
     "startPlaying": "התחילו לשחק",
     "createAvatar": "צרו את הדמות שלכם",
     "designYourLook": "עצבו מראה ייחודי",
@@ -3405,7 +3447,7 @@ const he = {
     "wordHuntMode": "ציד מילים",
     "wordHuntModeDesc": "מצאו את מילת היעד כמה שיותר מהר — פאזל חדש כל יום!",
     "communityBoards": "לוחות הקהילה",
-    "viewAllBoards": "הצג הכל →",
+    "viewAllBoards": "הצג הכל ←",
     "createYourBoard": "צרו לוח משלכם",
     "createBoardDesc": "עצבו פאזל ושתפו אותו עם העולם",
     "seo": {
@@ -3687,9 +3729,9 @@ const he = {
     "streak": "רצף",
     "streakDays": "רצף של {count} ימים!",
     "streakCinematic": {
-      "streakDays": "!רצף של {count} ימים",
-      "milestone": "!אבן דרך",
-      "keepGoing": "!המשיכו כך"
+      "streakDays": "רצף של {count} ימים!",
+      "milestone": "אבן דרך!",
+      "keepGoing": "המשיכו כך!"
     },
     "shareScore": "שתפו את הניקוד",
     "copyToClipboard": "העתק ללוח",
@@ -3964,10 +4006,10 @@ const he = {
       "triesLeft": "ניסיונות נותרו",
       "knownLetters": "מקום שגוי:",
       "accumulatedScore": "ניקוד",
-      "autoClueUnlocked": "!רמז נפתח",
-      "clueRevealLetter": "!אות נחשפה",
-      "clueRevealCategory": "!קטגוריה נפתחה",
-      "clueExampleSentence": "!משפט לדוגמה נפתח",
+      "autoClueUnlocked": "רמז נפתח!",
+      "clueRevealLetter": "אות נחשפה!",
+      "clueRevealCategory": "קטגוריה נפתחה!",
+      "clueExampleSentence": "משפט לדוגמה נפתח!",
       "clueAutoMessage": "נפתח אוטומטית ב-{cost} אסימונים",
       "scoreBreakdownTooltip": "לחץ לפרטים"
     },
@@ -5245,9 +5287,9 @@ const he = {
     "retryLevel": "נסה שוב",
     "loadError": "נכשל לטעון התקדמות",
     "cinematics": {
-      "victory": "!ניצחון",
-      "timesUp": "!הזמן נגמר",
-      "almostHadIt": "!ניסיון טוב! כמעט הצלחת",
+      "victory": "ניצחון!",
+      "timesUp": "הזמן נגמר!",
+      "almostHadIt": "ניסיון טוב! כמעט הצלחת!",
       "checkProgress": ":בדוק מה השגת",
       "wordsFound": "מילים שנמצאו",
       "bestWord": "המילה הטובה ביותר",
@@ -5256,21 +5298,21 @@ const he = {
       "timeRemaining": "זמן שנותר",
       "stars": "כוכבים",
       "worldUnlock": {
-        "newWorld": "!עולם חדש נפתח",
+        "newWorld": "עולם חדש נפתח!",
         "chapters": "פרקים",
-        "prepare": "!התכוננו לאתגרים חדשים"
+        "prepare": "התכוננו לאתגרים חדשים!"
       }
     },
     "boss": "בוס",
     "combo": {
-      "nice": "!יפה",
-      "great": "!מעולה",
-      "amazing": "!מדהים",
-      "incredible": "!מדהים",
-      "unstoppable": "!בלתי ניתן לעצירה",
-      "legendary": "!אגדי",
-      "mythic": "!מיתי",
-      "transcendent": "!על-טבעי"
+      "nice": "יפה!",
+      "great": "מעולה!",
+      "amazing": "מדהים!",
+      "incredible": "מדהים!",
+      "unstoppable": "בלתי ניתן לעצירה!",
+      "legendary": "אגדי!",
+      "mythic": "מיתי!",
+      "transcendent": "על-טבעי!"
     },
     "worlds": {
       "alphabetMeadows": "אחו האותיות",
@@ -5625,7 +5667,7 @@ const he = {
       "phases": {
         "phase1": "שלב 1",
         "phase2": "שלב 2",
-        "phase2Banner": "!שלב 2"
+        "phase2Banner": "שלב 2!"
       },
       "telegraph": {
         "incoming": "התקפה מתקרבת!",
@@ -5654,11 +5696,11 @@ const he = {
         "errorPressEscToSkip": "טעינת הסצנה נכשלה. לחץ ESC או המתן כדי לדלג.",
         "retry": "נסה שוב",
         "fallbackTitle": {
-          "victory": "!ניצחון",
-          "defeat": "!נגמר הזמן",
-          "bossEntrance": "!בוס מתקרב",
-          "bossDefeat": "!הבוס הובס",
-          "worldUnlock": "!עולם חדש נפתח"
+          "victory": "ניצחון!",
+          "defeat": "נגמר הזמן!",
+          "bossEntrance": "בוס מתקרב!",
+          "bossDefeat": "הבוס הובס!",
+          "worldUnlock": "עולם חדש נפתח!"
         },
         "fallbackStats": {
           "score": "ניקוד",
@@ -6235,13 +6277,18 @@ const he = {
     "helpFrozenLabel": "קפוא",
     "helpFrozen": "דורש 3 פגיעות לשבירה. חוסם זיהוי מפל.",
     "foundWords": "מילים שנמצאו",
-    "noWordsLeft": "!לא נשארו מילים",
+    "noWordsLeft": "לא נשארו מילים!",
     "shuffle": "ערבב",
     "morePoints": "נק' נוספות",
     "needScore": "צריך {score}",
     "totalScore": "סה\"כ",
     "waveBreakdown": "פירוט גלים",
     "wavesCompleted": "גלים",
+    "skillBreakdown": "ניתוח מיומנות",
+    "skillAvgLength": "אורך מילה ממוצע",
+    "skillLongWords": "מילים ארוכות (6+)",
+    "skillEfficiency": "יעילות מהלכים",
+    "skillBoardClear": "לוח נוקה",
     "multiplayer": {
       "moves": "מהלכים",
       "bonusMove": "מהלך בונוס!",
@@ -6293,7 +6340,7 @@ const he = {
     "waveIntro": {
       "title": "גל {wave}",
       "objectives": "משימות",
-      "go": "!קדימה",
+      "go": "קדימה!",
       "moves": "{moves} מהלכים"
     },
     "objective": {
@@ -6303,45 +6350,45 @@ const he = {
       "wordLength": "{target} מילים של {minWordLength}+ אותיות"
     },
     "combo": {
-      "bomb_bomb": "!מגה פיצוץ",
-      "bomb_lightning": "!פצצת רעם",
-      "bomb_prism": "!סערת ניפוץ",
-      "bomb_rainbow": "!פצצת קשת",
-      "bomb_mirror": "!פצצת מראה",
-      "bomb_magnet": "!פיצוץ מגנטי",
-      "bomb_gem": "!ניפוץ גביש",
-      "bomb_frozen": "!פיצוץ הפשרה",
-      "lightning_lightning": "!ברק משורשר",
-      "lightning_prism": "!רעם צולב",
-      "lightning_rainbow": "!סערת קשת",
-      "lightning_mirror": "!מכה כפולה",
-      "lightning_magnet": "!גל משיכה",
-      "lightning_gem": "!ניצוץ גביש",
-      "lightning_frozen": "!הפשרת גלים",
-      "prism_prism": "!הרס מוחלט",
-      "prism_rainbow": "!נובה קשתי",
-      "prism_mirror": "!צלב אינסופי",
-      "prism_magnet": "!צלב מערבולת",
-      "prism_gem": "!פריזמת גביש",
-      "prism_frozen": "!הפשרת פריזמה",
-      "rainbow_mirror": "!קשת מראה",
-      "rainbow_magnet": "!קשת משיכה",
-      "rainbow_gem": "!גביש קשת",
-      "rainbow_frozen": "!הפשרת קשת",
-      "mirror_magnet": "!מערבולת כפולה",
-      "mirror_gem": "!גביש מראה",
-      "mirror_frozen": "!הקפאה מהודהדת",
-      "magnet_gem": "!משיכת גביש",
-      "magnet_frozen": "!מערבולת קפואה",
-      "gem_frozen": "!גביש קרח",
-      "gold_special": "!כוח זהב",
-      "rainbow_special": "!קשת כפולה",
-      "triple_special": "!איום משולש"
+      "bomb_bomb": "מגה פיצוץ!",
+      "bomb_lightning": "פצצת רעם!",
+      "bomb_prism": "סערת ניפוץ!",
+      "bomb_rainbow": "פצצת קשת!",
+      "bomb_mirror": "פצצת מראה!",
+      "bomb_magnet": "פיצוץ מגנטי!",
+      "bomb_gem": "ניפוץ גביש!",
+      "bomb_frozen": "פיצוץ הפשרה!",
+      "lightning_lightning": "ברק משורשר!",
+      "lightning_prism": "רעם צולב!",
+      "lightning_rainbow": "סערת קשת!",
+      "lightning_mirror": "מכה כפולה!",
+      "lightning_magnet": "גל משיכה!",
+      "lightning_gem": "ניצוץ גביש!",
+      "lightning_frozen": "הפשרת גלים!",
+      "prism_prism": "הרס מוחלט!",
+      "prism_rainbow": "נובה קשתי!",
+      "prism_mirror": "צלב אינסופי!",
+      "prism_magnet": "צלב מערבולת!",
+      "prism_gem": "פריזמת גביש!",
+      "prism_frozen": "הפשרת פריזמה!",
+      "rainbow_mirror": "קשת מראה!",
+      "rainbow_magnet": "קשת משיכה!",
+      "rainbow_gem": "גביש קשת!",
+      "rainbow_frozen": "הפשרת קשת!",
+      "mirror_magnet": "מערבולת כפולה!",
+      "mirror_gem": "גביש מראה!",
+      "mirror_frozen": "הקפאה מהודהדת!",
+      "magnet_gem": "משיכת גביש!",
+      "magnet_frozen": "מערבולת קפואה!",
+      "gem_frozen": "גביש קרח!",
+      "gold_special": "כוח זהב!",
+      "rainbow_special": "קשת כפולה!",
+      "triple_special": "איום משולש!"
     },
     "comboCodex": "קודקס קומבו",
     "codexProgress": "{discovered}/{total} התגלו",
     "codexLocked": "???",
-    "comboDiscovered": "!קומבו התגלה",
+    "comboDiscovered": "קומבו התגלה!",
     "chainCounter": "רצף x{{count}}"
   },
   "student": {
@@ -6836,7 +6883,7 @@ const he = {
       "duelTeaser": {
         "headline": "אתגר חבר לכיתה",
         "subtext": "שחק אחד על אחד ותטפס בדירוג הכיתה",
-        "cta": "התחל דואל →"
+        "cta": "← התחל דואל"
       },
       "roleTeacher": "מורה",
       "roleStudent": "תלמיד",
@@ -6933,9 +6980,9 @@ const he = {
       "correctSpelling": "נכון!",
       "incorrectSpelling": "המילה הנכונה היא:",
       "blitzTitle": "בליץ מתוזמן",
-      "getReady": "!התכונן",
-      "go": "!קדימה",
-      "timesUp": "!נגמר הזמן",
+      "getReady": "התכונן!",
+      "go": "קדימה!",
+      "timesUp": "נגמר הזמן!",
       "maxCombo": "קומבו מקסימלי",
       "blitzScore": "ציון בליץ",
       "needsMoreWords": "שיעור זה צריך לפחות 4 מילים עם הגדרות למצב זה",
@@ -7601,7 +7648,7 @@ const he = {
   "yourScore": "הניקוד שלך",
   "opponentScore": "ניקוד היריב",
   "wordsFound": "מילים נמצאו",
-  "wordAccepted": "!המילה אושרה",
+  "wordAccepted": "המילה אושרה!",
   "wordRejected": "מילה לא תקפה",
   "notOnBoard": "לא על הלוח",
   "notInDictionary": "לא במילון",
@@ -7609,18 +7656,18 @@ const he = {
   "opponentDisconnected": "היריב התנתק",
   "autoForfeitMessage": "תנצחו אוטומטית אם לא יתחברו מחדש",
   "reconnecting": "...מתחבר מחדש",
-  "opponentReconnected": "!היריב חזר",
+  "opponentReconnected": "היריב חזר!",
   "waitingReconnect": "ממתינים לחיבור מחדש",
   "secondsLeft": "שניות נותרו",
   "forfeit": "פרישה",
-  "forfeitTitle": "?לפרוש מהדו-קרב",
+  "forfeitTitle": "לפרוש מהדו-קרב?",
   "forfeitDescription": ".תפסידו בדו-קרב הזה והיריב ינצח. לא ניתן לבטל",
   "forfeitConfirm": "כן, לפרוש",
   "forfeitCancel": "ביטול",
   "wonByForfeit": "ניצחון בפרישת יריב",
   "lostByForfeit": "הפסד בפרישה",
   "realtimeDuel": "דו-קרב בזמן אמת",
-  "duelComplete": "!הדו-קרב הסתיים",
+  "duelComplete": "הדו-קרב הסתיים!",
   "duels": {
     "addWord": "הוסף מילה",
     "backToLobby": "חזרה ללובי",
@@ -7776,7 +7823,7 @@ const he = {
     "vs": "מול"
   },
   "events": {
-    "joinNow": "!הצטרף עכשיו",
+    "joinNow": "הצטרף עכשיו!",
     "timeRemaining": "זמן שנותר",
     "dismiss": "סגור",
     "endsIn": "נגמר בעוד",
@@ -7800,7 +7847,7 @@ const he = {
     "promotionZone": "אזור עלייה",
     "safeZone": "אזור בטוח",
     "relegationZone": "אזור ירידה",
-    "promoted": "!עלית",
+    "promoted": "עלית!",
     "relegated": "ירדת",
     "stayed": "נשארת",
     "weeklyRewards": "פרסים שבועיים",
@@ -7810,7 +7857,7 @@ const he = {
     "yourPosition": "המיקום שלך",
     "top": "טופ",
     "standings": "טבלה",
-    "noLeague": "!הצטרף לליגה כדי להתחרות",
+    "noLeague": "הצטרף לליגה כדי להתחרות!",
     "finalResults": "תוצאות סופיות",
     "viewStandings": "צפה בטבלה"
   },

@@ -1011,9 +1011,32 @@ const en = {
       "ptsApart": "pts apart",
       "bothFound": "Both found",
       "secondsLeft": "seconds left!",
-      "gridShuffle": "Grid shuffle incoming!"
+      "gridShuffle": "Grid shuffle incoming!",
+      "nLetters": "{count} letters!",
+      "sameWordFound": "Same {length}-letter word!",
+      "finalMinute": "FINAL MINUTE!",
+      "everySecondCounts": "Every second counts!"
     },
-    "moreNotifications": "+{count} more"
+    "modeClassic": "CLASSIC",
+    "modeBlast": "BLAST",
+    "modeWordHunt": "WORD HUNT",
+    "moreNotifications": "+{count} more",
+    "gap": "GAP",
+    "closingFast": "CLOSING FAST",
+    "ptsGap": "{gap} pts gap",
+    "leadsWithPts": "{player} leads with {score} pts",
+    "playersWithinPts": "{count} players within {gap} pts",
+    "wordsAndCounting": "{player} found {count} words",
+    "anyonesGame": "Anyone's game!",
+    "raceHeatingUp": "The race is heating up!",
+    "noActivityYet": "Waiting for the action to begin...",
+    "totalWords": "Total Words",
+    "avgLength": "Avg Length",
+    "activeCombos": "Active Combos",
+    "highestCombo": "Highest Combo",
+    "hunting": "Hunting",
+    "wordsHunted": "Words Hunted",
+    "activityPanel": "Activity"
   },
   "tvResults": {
     "title": "WE HAVE A WINNER!",
@@ -1578,6 +1601,14 @@ const en = {
     "scoringTipText": "Longer words = bigger points!",
     "sharedWordsExplanation": "Same word as someone else? Zero points. Be unique!",
     "yourPlace": "{place} of {total}",
+    "yourPlaceSimple": "#{place}",
+    "mvp": {
+      "longestWord": "Longest",
+      "comboKing": "Combo",
+      "uniqueFinder": "Unique",
+      "accuracyStar": "Accuracy",
+      "speedDemon": "Speed"
+    },
     "pointsFromFirst": "{points} pts from 1st",
     "potentialScore": "+{points} pts potential",
     "comparativeInsights": {
@@ -2292,7 +2323,25 @@ const en = {
       "lexiconAdept": "Lexicon Adept",
       "linguisticLegend": "Linguistic Legend"
     },
-    "canPrestige": "Prestige Available!"
+    "canPrestige": "Prestige Available!",
+    "prestigeModal": {
+      "title": "Prestige System",
+      "achieved": "Prestige Achieved!",
+      "rewardsUnlocked": "Your rewards have been unlocked!",
+      "warning": "Warning!",
+      "warningText": "This will reset you to Level 1. All current XP will be reset, but you will gain all rewards below.",
+      "cancel": "Cancel",
+      "confirmPrestige": "Confirm Prestige",
+      "currentLevel": "Current Level",
+      "prestige": "Prestige",
+      "xpMultiplier": "XP Multiplier",
+      "maxPrestige": "Maximum Prestige!",
+      "maxPrestigeText": "You have reached the highest level. You are a legend!",
+      "rewardsFor": "Prestige {{level}} Rewards",
+      "prestigeTo": "Prestige to {{level}}",
+      "reachLevel": "Reach Level 100 to Prestige",
+      "levelsRemaining": "{{count}} levels remaining"
+    }
   },
   "nearMiss": {
     "almostThere": "Almost There!",
@@ -2957,6 +3006,8 @@ const en = {
     "uploadError": "Upload hiccup - try again!",
     "photoRemoved": "Pic removed!",
     "removeError": "Couldn't remove - try again!",
+    "friends": "Friends",
+    "requestSent": "Request Sent",
     "saved": "Saved!",
     "saveError": "Hmm, couldn't save. Try again!",
     "editName": "Change Name",
@@ -3000,6 +3051,8 @@ const en = {
     "topPercent": "Top {{percent}}%",
     "challenge": "Challenge",
     "addFriend": "Add Friend",
+    "friends": "Friends",
+    "requestSent": "Request Sent",
     "viewProfile": "View Profile",
     "viewPublicProfile": "View Public Profile",
     "games": "Games"
@@ -6310,6 +6363,11 @@ const en = {
     "totalScore": "Total",
     "waveBreakdown": "Wave Breakdown",
     "wavesCompleted": "Waves",
+    "skillBreakdown": "Skill Breakdown",
+    "skillAvgLength": "Avg Word Length",
+    "skillLongWords": "Long Words (6+)",
+    "skillEfficiency": "Move Efficiency",
+    "skillBoardClear": "Board Cleared",
     "multiplayer": {
       "moves": "Moves",
       "bonusMove": "Bonus Move!",

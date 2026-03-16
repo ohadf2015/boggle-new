@@ -6,6 +6,7 @@ import { Check, Hourglass, Bot } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import { useLanguage } from '@/contexts/LanguageContext';
+import useReducedMotion from '@/hooks/useReducedMotion';
 import type { Avatar as AvatarType } from '@/types';
 
 interface PlayerInfo {
@@ -33,6 +34,8 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
   isHost = false,
 }) => {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
+  const inf = reducedMotion ? 0 : Infinity;
   const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
 
   // Exclude host from player list — host clicks "Start Game", not "Ready"
@@ -89,7 +92,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
             <div className="flex items-center gap-1.5 shrink-0">
               <motion.div
                 animate={allReady ? { scale: [1, 1.2, 1] } : { rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.5 }}
+                transition={{ duration: 1.5, repeat: inf, repeatDelay: 0.5 }}
               >
                 {allReady ? (
                   <span className="text-sm">🎉</span>
@@ -163,7 +166,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                           ) : (
                             <motion.div
                               animate={{ opacity: [0.3, 1, 0.3] }}
-                              transition={{ duration: 1.5, repeat: Infinity }}
+                              transition={{ duration: 1.5, repeat: inf }}
                               className="w-1.5 h-1.5 rounded-full bg-slate-400"
                             />
                           )}

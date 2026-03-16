@@ -1,17 +1,17 @@
 {
   "summary": {
-    "totalKeysInCode": 3626,
+    "totalKeysInCode": 3651,
     "keyCountByLanguage": {
-      "en": 6133,
-      "he": 6159,
-      "sv": 6192,
-      "ja": 6179,
-      "es": 6156
+      "en": 6178,
+      "he": 6202,
+      "sv": 6235,
+      "ja": 6222,
+      "es": 6199
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 7,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 7,
+      "templateLiterals": 8,
       "fallbackUsages": 0,
       "variableKeys": 11
     }
@@ -51,6 +51,13 @@
         "file": "components/adventure/SkillTree/SkillPath.tsx",
         "line": 116,
         "context": "{t(`adventure.skills.paths.${path}`) || path}",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "xp.prestigeModal.${key}",
+        "file": "components/engagement/PrestigeModal.tsx",
+        "line": 63,
+        "context": "const pm = (key: string) => t(`xp.prestigeModal.${key}`);",
         "type": "template_literal"
       },
       {
@@ -167,19 +174,89 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "tvBroadcast.activeCombos",
+      "usages": [
+        {
+          "file": "host/components/tv-broadcast/TvActivityPanel.tsx",
+          "line": 133
+        }
+      ]
+    },
+    {
+      "key": "tvBroadcast.activityPanel",
+      "usages": [
+        {
+          "file": "host/components/tv-broadcast/TvActivityPanel.tsx",
+          "line": 322
+        }
+      ]
+    },
+    {
+      "key": "tvBroadcast.avgLength",
+      "usages": [
+        {
+          "file": "host/components/tv-broadcast/TvActivityPanel.tsx",
+          "line": 79
+        }
+      ]
+    },
+    {
+      "key": "tvBroadcast.highestCombo",
+      "usages": [
+        {
+          "file": "host/components/tv-broadcast/TvActivityPanel.tsx",
+          "line": 137
+        }
+      ]
+    },
+    {
+      "key": "tvBroadcast.hunting",
+      "usages": [
+        {
+          "file": "host/components/tv-broadcast/TvActivityPanel.tsx",
+          "line": 193
+        }
+      ]
+    },
+    {
+      "key": "tvBroadcast.totalWords",
+      "usages": [
+        {
+          "file": "host/components/tv-broadcast/TvActivityPanel.tsx",
+          "line": 75
+        }
+      ]
+    },
+    {
+      "key": "tvBroadcast.wordsHunted",
+      "usages": [
+        {
+          "file": "host/components/tv-broadcast/TvActivityPanel.tsx",
+          "line": 185
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
+      "profile.friends",
+      "profile.requestSent",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
     ],
     "sv": [
+      "profile.friends",
+      "profile.requestSent",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
     ],
     "ja": [
+      "profile.friends",
+      "profile.requestSent",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
@@ -191,6 +268,8 @@
       "auth.otp.verify",
       "auth.otp.changeEmail",
       "auth.otp.resend",
+      "profile.friends",
+      "profile.requestSent",
       "leaderboard.friends",
       "leaderboard.noFriendsPlayed",
       "daily.requestChallenge",

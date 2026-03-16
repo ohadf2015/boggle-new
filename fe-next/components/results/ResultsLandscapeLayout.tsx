@@ -113,9 +113,9 @@ export function ResultsLandscapeLayout({
   return (
     <>
       {overlayModals}
-      <div className="flex h-screen w-full overflow-hidden bg-neo-cream text-neo-black p-3 gap-3 landscape-full-height">
+      <div className="flex h-screen w-full overflow-hidden bg-neo-navy text-neo-cream p-3 gap-3 landscape-full-height">
       {/* Left column: Winner Banner + Action Buttons (Hero Area) */}
-      <div className="w-[55%] flex flex-col items-center justify-center gap-4 p-4 border-2 border-neo-black rounded-neo bg-white/50 shadow-hard-sm">
+      <div className="w-[55%] flex flex-col items-center justify-center gap-4 p-4 border-2 border-neo-black rounded-neo bg-white/5 shadow-hard-sm">
         {/* Winner Banner - prominent */}
         {winner && (
           <div className="w-full max-w-sm">
@@ -227,16 +227,16 @@ export function ResultsLandscapeLayout({
       </div>
 
       {/* Right column: Player Cards + Chat */}
-      <div className="w-[45%] flex flex-col gap-2 p-3 border-2 border-neo-black rounded-neo bg-white/50 shadow-hard-sm">
+      <div className="w-[45%] flex flex-col gap-2 p-3 border-2 border-neo-black rounded-neo bg-white/5 shadow-hard-sm">
         {/* Header: Final Scores + Ready indicator */}
-        <div className="flex items-center justify-between gap-2 pb-2 border-b-2 border-slate-200 dark:border-slate-700">
+        <div className="flex items-center justify-between gap-2 pb-2 border-b-2 border-white/10">
           <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-600" />
-            <h2 className="text-base font-black text-neo-black uppercase tracking-wide">{t('results.finalScores')}</h2>
+            <Trophy className="w-5 h-5 text-neo-yellow" />
+            <h2 className="text-base font-black text-neo-cream uppercase tracking-wide">{t('results.finalScores')}</h2>
           </div>
           {/* Compact ready indicator */}
           {gameCode && sortedScores.length > 1 && (
-            <span className="text-xs font-bold text-neo-black/70 bg-neo-lime/30 px-2 py-1 rounded-full">
+            <span className="text-xs font-bold text-neo-cream/70 bg-neo-lime/30 px-2 py-1 rounded-full">
               {readyUsernames.length}/{sortedScores.length} {t('results.ready')}
             </span>
           )}
@@ -262,7 +262,7 @@ export function ResultsLandscapeLayout({
 
         {/* Room Chat - bottom of right column */}
         {gameCode && sortedScores.length > 1 && (
-          <div className="pt-2 border-t-2 border-slate-200 dark:border-slate-700">
+          <div className="pt-2 border-t-2 border-white/10">
             <RoomChat
               username={username}
               isHost={isHost}

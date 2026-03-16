@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import WinStreakDisplay from './WinStreakDisplay';
 import { fireConfetti } from '@/utils/confettiUtils';
+import useReducedMotion from '@/hooks/useReducedMotion';
 import type { CoinReward } from './CoinRewardDisplay';
 
 export interface RewardsSummaryProps {
@@ -52,6 +53,8 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
   className,
 }) => {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
+  const inf = reducedMotion ? 0 : Infinity;
   const [showRewards, setShowRewards] = useState(false);
   const [celebrationFired, setCelebrationFired] = useState(false);
 
@@ -63,7 +66,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
 
   // Fire celebration confetti for wins with significant rewards
   useEffect(() => {
-    if (celebrationFired) return;
+    if (celebrationFired || reducedMotion) return;
 
     const hasSignificantRewards =
       (coinReward && coinReward.awarded >= 50) ||
@@ -81,7 +84,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
         });
       }, 500);
     }
-  }, [isWinner, coinReward, winStreak, achievementsUnlocked, celebrationFired]);
+  }, [isWinner, coinReward, winStreak, achievementsUnlocked, celebrationFired, reducedMotion]);
 
   const hasCoins = coinReward && coinReward.awarded > 0;
   const hasStreak = winStreak && winStreak.currentStreak > 0;
@@ -117,7 +120,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                 'radial-gradient(circle at 20% 50%, #FFE135 0%, transparent 50%)',
               ],
             }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 4, repeat: inf, ease: 'easeInOut' }}
           />
 
           {/* Header */}
@@ -125,7 +128,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
             <div className="flex items-center justify-center gap-2">
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                transition={{ duration: 1.5, repeat: inf, repeatDelay: 2 }}
               >
                 <Sparkles className="w-5 h-5 text-neo-lime" />
               </motion.div>
@@ -134,7 +137,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
               </h3>
               <motion.div
                 animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                transition={{ duration: 1.5, repeat: inf, repeatDelay: 2 }}
               >
                 <Sparkles className="w-5 h-5 text-neo-lime" />
               </motion.div>

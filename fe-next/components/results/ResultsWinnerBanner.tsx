@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Crown, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { fireRankConfetti } from '@/utils/confettiUtils';
+import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
 import { MascotWithEntrance, MascotVariant } from '@/components/ui/Mascot';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
@@ -120,9 +121,10 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
   compact = false,
 }) => {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
 
-  // Determine if confetti should fire
-  const shouldShowConfetti = showConfettiProp ?? (variant === 'ranking' ? rank <= 3 : variant !== 'completion');
+  // Determine if confetti should fire (skip in reduced-motion)
+  const shouldShowConfetti = !reducedMotion && (showConfettiProp ?? (variant === 'ranking' ? rank <= 3 : variant !== 'completion'));
 
   // Normalize rank for styling (4+ all use the same style)
   // For non-ranking variants, use rank 1 style for victories/records
@@ -209,10 +211,10 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
     if (rank === 3) return t('results.bronzeMedalist');
     // For 4th+ place, show placement explicitly (e.g., "5 of 8")
     if (totalPlayers) {
-      return t('results.yourPlace', { place: rank, total: totalPlayers }) || `You finished ${getOrdinalSuffix(rank)}`;
+      return t('results.yourPlace', { place: rank, total: totalPlayers });
     }
     // Fallback if totalPlayers not provided
-    return `You finished ${getOrdinalSuffix(rank)}`;
+    return t('results.yourPlaceSimple', { place: rank });
   };
 
   if (!winner) return null;
@@ -386,7 +388,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
         </div>
 
         {/* Winner pulse ring - visible for 1st place */}
-        {rank === 1 && variant === 'ranking' && (
+        {rank === 1 && variant === 'ranking' && !reducedMotion && (
           <>
             <div
               className="absolute inset-0 rounded-neo-lg pointer-events-none"
@@ -401,9 +403,8 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
           </>
         )}
 
-        {/* Mascot - Hidden in compact mode */}
-        {!compact && (
-          <div className="absolute -bottom-2 -right-2 sm:bottom-0 sm:right-0 z-20 pointer-events-none">
+        {/* Mascot — scaled down in compact (mobile) mode */}
+        <div className={`absolute z-20 pointer-events-none ${compact ? '-bottom-1 -right-1 scale-75 origin-bottom-right' : '-bottom-2 -right-2 sm:bottom-0 sm:right-0'}`}>
             {(rank <= 3 || variant === 'highScore' || variant === 'newRecord') && winner?.score !== 0 ? (
               <CelebrationMascotWithEntrance
                 variant="trophy"
@@ -419,8 +420,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                 className="drop-shadow-lg"
               />
             )}
-          </div>
-        )}
+        </div>
       </div>
     </motion.div>
   );

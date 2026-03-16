@@ -6,7 +6,6 @@
  *
  * Modals included:
  * - WordFeedbackModal: Self-healing dictionary validation
- * - MysteryRewardPopup: Variable ratio reward system
  * - ReferralMilestonePopup: Friend milestone notifications
  * - LevelUpCelebration: Epic full-screen GSAP animation
  * - AuthModal: Guest signup prompt
@@ -23,7 +22,6 @@ import type { WordToVote } from '@/types/components';
 
 // Dynamic imports for modals (loaded after initial render)
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
-const MysteryRewardPopup = dynamic(() => import('@/components/engagement/MysteryRewardPopup'), { ssr: false });
 const ReferralMilestonePopup = dynamic(() => import('@/components/engagement/ReferralMilestonePopup'), { ssr: false });
 const LevelUpCelebration = dynamic(() => import('@/components/animations/LevelUpCelebration'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -45,16 +43,6 @@ interface WordFeedbackState {
   onVote: (voteType: 'like' | 'dislike', word?: string) => void;
   /** Skip/timeout handler callback */
   onSkip: () => void;
-}
-
-/** Mystery reward modal state */
-interface MysteryRewardState {
-  /** Reward data (coins, XP, etc.) */
-  reward: any;
-  /** Whether reward modal is visible */
-  showMysteryReward: boolean;
-  /** Close handler callback */
-  onClose: () => void;
 }
 
 /** Referral milestone modal state */
@@ -98,8 +86,6 @@ interface FirstWinModalState {
 export interface ResultsModalsProps {
   /** Word feedback modal state and handlers */
   wordFeedback: WordFeedbackState;
-  /** Mystery reward modal state and handlers */
-  mysteryReward: MysteryRewardState;
   /** Referral milestone modal state and handlers */
   referralMilestone: ReferralMilestoneState;
   /** Level up celebration state and handlers */
@@ -118,7 +104,6 @@ export interface ResultsModalsProps {
 
 export function ResultsModals({
   wordFeedback,
-  mysteryReward,
   referralMilestone,
   levelUp,
   authModal,
@@ -130,15 +115,13 @@ export function ResultsModals({
   const modals = useMemo(
     () => [
       { id: 'levelUp', priority: 1, isReady: levelUp.showLevelUpCelebration && !!levelUp.levelUpData },
-      { id: 'mysteryReward', priority: 2, isReady: mysteryReward.showMysteryReward },
-      { id: 'referralMilestone', priority: 3, isReady: referralMilestone.showReferralMilestone },
-      { id: 'firstWin', priority: 4, isReady: !hideExternal && firstWinModal.showFirstWinModal },
-      { id: 'auth', priority: 5, isReady: !hideExternal && authModal.showAuthModal },
-      { id: 'wordFeedback', priority: 6, isReady: wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null },
+      { id: 'referralMilestone', priority: 2, isReady: referralMilestone.showReferralMilestone },
+      { id: 'firstWin', priority: 3, isReady: !hideExternal && firstWinModal.showFirstWinModal },
+      { id: 'auth', priority: 4, isReady: !hideExternal && authModal.showAuthModal },
+      { id: 'wordFeedback', priority: 5, isReady: wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null },
     ],
     [
       levelUp.showLevelUpCelebration, levelUp.levelUpData,
-      mysteryReward.showMysteryReward,
       referralMilestone.showReferralMilestone,
       firstWinModal.showFirstWinModal,
       authModal.showAuthModal,
@@ -167,14 +150,6 @@ export function ResultsModals({
         onVote={wordFeedback.onVote}
         onSkip={() => { dismiss('wordFeedback'); wordFeedback.onSkip(); }}
         onTimeout={() => { dismiss('wordFeedback'); wordFeedback.onSkip(); }}
-      />
-
-      {/* Mystery Reward Popup - Variable ratio reward system */}
-      <MysteryRewardPopup
-        reward={mysteryReward.reward}
-        isOpen={activeModalId === 'mysteryReward'}
-        onClose={() => { dismiss('mysteryReward'); mysteryReward.onClose(); }}
-        t={t}
       />
 
       {/* Referral Milestone Popup - Notify when friend hits milestone */}

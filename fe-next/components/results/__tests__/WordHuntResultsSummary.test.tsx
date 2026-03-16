@@ -45,11 +45,12 @@ describe('WordHuntResultsSummary', () => {
     expect(screen.queryByText('wordHunt.multiplayer.firstFinder')).not.toBeInTheDocument();
   });
 
-  it('should show survival time', () => {
+  it('should show formatted survival time', () => {
     render(
       <WordHuntResultsSummary {...baseProps} survivalTime={95} />
     );
-    expect(screen.getByText('95s')).toBeInTheDocument();
+    // 95 seconds = 1:35
+    expect(screen.getByText('1:35')).toBeInTheDocument();
   });
 
   it('should show discovery words count', () => {

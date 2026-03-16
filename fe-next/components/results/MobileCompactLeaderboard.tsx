@@ -3,6 +3,8 @@
 import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
 import { RankBadge } from '@/components/ui/RankBadge';
+import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Participant {
   name: string;
@@ -28,6 +30,7 @@ const MobileCompactLeaderboard: React.FC<MobileCompactLeaderboardProps> = memo((
   participants,
   className,
 }) => {
+  const { t } = useLanguage();
   // Limit to top 3
   const top3 = participants.slice(0, 3);
 
@@ -51,14 +54,23 @@ const MobileCompactLeaderboard: React.FC<MobileCompactLeaderboardProps> = memo((
         >
           <div className="flex items-center gap-2">
             <RankBadge rank={index + 1} />
-            <span className={cn(
-              'font-bold text-sm',
-              participant.isCurrentPlayer ? 'text-neo-cyan' : 'text-white'
-            )}>
-              {participant.name}
-            </span>
+            <PlayerProfileTooltip
+              player={{
+                username: participant.name,
+                score: participant.score,
+              }}
+              isCurrentUser={participant.isCurrentPlayer}
+              side="right"
+            >
+              <span className={cn(
+                'font-bold text-sm',
+                participant.isCurrentPlayer ? 'text-neo-cyan' : 'text-white cursor-pointer hover:underline'
+              )}>
+                {participant.name}
+              </span>
+            </PlayerProfileTooltip>
             {participant.isCurrentPlayer && (
-              <span className="text-neo-cyan text-xs">←</span>
+              <span className="text-neo-cyan text-[10px] font-black uppercase bg-neo-cyan/20 px-1.5 py-0.5 rounded">{t('results.you')}</span>
             )}
           </div>
           <span className={cn(

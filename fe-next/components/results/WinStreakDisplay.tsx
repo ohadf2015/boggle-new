@@ -7,6 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
 import { fireConfetti } from '@/utils/confettiUtils';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 interface WinStreakDisplayProps {
   currentStreak: number;
@@ -52,6 +53,8 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
 }) => {
   const { t } = useLanguage();
   const { theme } = useTheme();
+  const reducedMotion = useReducedMotion();
+  const inf = reducedMotion ? 0 : Infinity;
   const isDarkMode = theme === 'dark';
   const [showMilestone, setShowMilestone] = useState(false);
   const hasShownMilestoneRef = useRef(false);
@@ -69,8 +72,8 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
       hasShownMilestoneRef.current = true;
       setShowMilestone(true);
 
-      // Trigger celebration confetti
-      fireConfetti({
+      // Trigger celebration confetti (skip in reduced-motion)
+      if (!reducedMotion) fireConfetti({
         particleCount: 50,
         spread: 60,
         origin: { y: 0.7 },
@@ -81,7 +84,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [isNewMilestone, tierChanged, isNewBest]);
+  }, [isNewMilestone, tierChanged, isNewBest, reducedMotion]);
 
   if (currentStreak === 0) return null;
 
@@ -143,7 +146,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
             }
             transition={{
               duration: showMilestone ? 0.5 : 2,
-              repeat: showMilestone ? 2 : Infinity,
+              repeat: showMilestone ? 2 : inf,
               repeatDelay: showMilestone ? 0 : 1,
             }}
             className={cn(

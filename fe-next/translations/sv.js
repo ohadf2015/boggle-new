@@ -1011,9 +1011,25 @@ const sv = {
       "ptsApart": "poäng isär",
       "bothFound": "Båda hittade",
       "secondsLeft": "sekunder kvar!",
-      "gridShuffle": "Rutnätet blandas!"
+      "gridShuffle": "Rutnätet blandas!",
+      "nLetters": "{count} bokstäver!",
+      "sameWordFound": "Samma {length}-bokstavsord!",
+      "finalMinute": "SISTA MINUTEN!",
+      "everySecondCounts": "Varje sekund räknas!"
     },
-    "moreNotifications": "+{count} till"
+    "modeClassic": "KLASSISK",
+    "modeBlast": "BLAST",
+    "modeWordHunt": "ORDJAKT",
+    "moreNotifications": "+{count} till",
+    "gap": "GAP",
+    "closingFast": "NÄRMAR SIG SNABBT",
+    "ptsGap": "{gap} poängs gap",
+    "leadsWithPts": "{player} leder med {score} poäng",
+    "playersWithinPts": "{count} spelare inom {gap} poäng",
+    "wordsAndCounting": "{player} hittade {count} ord",
+    "anyonesGame": "Vem som helst kan vinna!",
+    "raceHeatingUp": "Loppet hettar till!",
+    "noActivityYet": "Väntar på att spelet ska börja..."
   },
   "tvResults": {
     "title": "VI HAR EN VINNARE!",
@@ -1459,6 +1475,14 @@ const sv = {
     "scoringTipText": "Hitta ord snabbt i rad för kombobonus (⚡). Längre ord ger mycket mer poäng!",
     "sharedWordsExplanation": "Dessa ord hittades av andra spelare också, så de ger 0 poäng. Försök hitta unika ord!",
     "yourPlace": "{place} av {total}",
+    "yourPlaceSimple": "#{place}",
+    "mvp": {
+      "longestWord": "Längst",
+      "comboKing": "Kombo",
+      "uniqueFinder": "Unik",
+      "accuracyStar": "Precision",
+      "speedDemon": "Snabbast"
+    },
     "pointsFromFirst": "{points} poäng från 1:a",
     "potentialScore": "+{points} möjliga poäng",
     "comparativeInsights": {
@@ -2173,7 +2197,25 @@ const sv = {
       "lexiconAdept": "Lexikonadept",
       "linguisticLegend": "Lingvistisk Legend"
     },
-    "canPrestige": "Prestige tillgänglig!"
+    "canPrestige": "Prestige tillgänglig!",
+    "prestigeModal": {
+      "title": "Prestigesystem",
+      "achieved": "Prestige uppnådd!",
+      "rewardsUnlocked": "Dina belöningar har låsts upp!",
+      "warning": "Varning!",
+      "warningText": "Detta återställer dig till nivå 1. All nuvarande XP återställs, men du får alla belöningar nedan.",
+      "cancel": "Avbryt",
+      "confirmPrestige": "Bekräfta Prestige",
+      "currentLevel": "Nuvarande nivå",
+      "prestige": "Prestige",
+      "xpMultiplier": "XP-multiplikator",
+      "maxPrestige": "Maximal Prestige!",
+      "maxPrestigeText": "Du har nått den högsta nivån. Du är en legend!",
+      "rewardsFor": "Prestige {{level}}-belöningar",
+      "prestigeTo": "Prestige till {{level}}",
+      "reachLevel": "Nå nivå 100 för Prestige",
+      "levelsRemaining": "{{count}} nivåer kvar"
+    }
   },
   "nearMiss": {
     "almostThere": "Nästan där!",
@@ -6217,6 +6259,11 @@ const sv = {
     "totalScore": "Totalt",
     "waveBreakdown": "Vågöversikt",
     "wavesCompleted": "Vågor",
+    "skillBreakdown": "Färdighetsanalys",
+    "skillAvgLength": "Snittordlängd",
+    "skillLongWords": "Långa ord (6+)",
+    "skillEfficiency": "Drageffektivitet",
+    "skillBoardClear": "Brädet rensat",
     "multiplayer": {
       "moves": "Drag",
       "bonusMove": "Bonusdrag!",

@@ -10,6 +10,7 @@ import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
 import type { Player } from './types';
 import { fireConfetti, RANK_COLORS } from '@/utils/confettiUtils';
 import { RANK_CONFIG } from '@/utils/rankingStyles';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 // Fire confetti burst for a specific rank with custom origin
 const fireConfettiForRank = (rank: number, intensity: number = 1): void => {
@@ -102,6 +103,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   compact = false,
 }) => {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
 
   // Normalize to unified participant format
   const normalizedParticipants: LeaderboardParticipant[] = React.useMemo(() => {
@@ -125,7 +127,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
 
   // Fire staggered confetti bursts for top 3 on mount
   useEffect(() => {
-    if (!showConfetti || top3.length === 0) return;
+    if (!showConfetti || top3.length === 0 || reducedMotion) return;
 
     const timers: ReturnType<typeof setTimeout>[] = [];
     top3.forEach((_, index) => {
@@ -141,8 +143,8 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   }, [showConfetti, top3.length]); // Intentionally using length, not full array - only re-fire when count changes
 
   const handleCardClick = useCallback((rank: number, isCurrentPlayer: boolean) => {
-    fireConfettiForRank(rank, isCurrentPlayer ? 1.2 : 0.7);
-  }, []);
+    if (!reducedMotion) fireConfettiForRank(rank, isCurrentPlayer ? 1.2 : 0.7);
+  }, [reducedMotion]);
 
   if (top3.length === 0) return null;
 
