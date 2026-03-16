@@ -29,8 +29,6 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
-        'nextStep.brainTraining': 'Train Your Brain',
-        'nextStep.brainTrainingDesc': 'Track your cognitive growth',
         'nextStep.backToLobby': 'Back to Lobby',
         'nextStep.letsGo': "Let's Go!",
       };
@@ -155,7 +153,7 @@ describe('NextStepPrompt Navigation', () => {
       const buttonElement = screen.getByRole('button', { name: /let's go/i });
       await user.click(buttonElement);
 
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/brain');
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
     });
 
     it('should navigate when clicking on text inside the desktop CTA button', async () => {
@@ -182,7 +180,7 @@ describe('NextStepPrompt Navigation', () => {
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots', titleText: 'Challenge the Bots!' },
       { mode: 'solo-bots' as const, expectedHref: '/en/daily', titleText: 'Try Daily Challenge' },
       { mode: 'daily' as const, expectedHref: '/en/multiplayer', titleText: 'Go Multiplayer!' },
-      { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain', titleText: 'Train Your Brain' },
+      { mode: 'multiplayer-bots' as const, expectedHref: '/en/daily', titleText: 'Try Daily Challenge' },
     ];
 
     testCases.forEach(({ mode, expectedHref, titleText }) => {

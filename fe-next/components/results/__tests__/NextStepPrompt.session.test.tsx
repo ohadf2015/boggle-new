@@ -1,7 +1,7 @@
 /**
  * Test for session cleanup when navigating from NextStepPrompt
  *
- * Bug: When clicking "Train Your Brain" (or other navigation buttons) from the
+ * Bug: When clicking "Try Daily Challenge" (or other navigation buttons) from the
  * results page, the component should clear the current game session before navigating.
  * Without this, players get stuck on the results page even after clicking the button.
  */
@@ -38,8 +38,6 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
-        'nextStep.brainTraining': 'Train Your Brain',
-        'nextStep.brainTrainingDesc': 'Track your cognitive growth',
         'nextStep.letsGo': "Let's Go!",
         'nextStep.backToLobby': 'Back to Lobby',
       };
@@ -72,7 +70,7 @@ describe('NextStepPrompt - Session Cleanup on Navigation', () => {
   });
 
   describe('Bug: Navigation from multiplayer-bots mode should clear session', () => {
-    it('should clear session before navigating to brain training (desktop)', async () => {
+    it('should clear session before navigating to daily challenge (desktop)', async () => {
       const user = userEvent.setup();
 
       render(
@@ -83,7 +81,7 @@ describe('NextStepPrompt - Session Cleanup on Navigation', () => {
         />
       );
 
-      // Click the "Let's Go!" button that navigates to brain training
+      // Click the "Let's Go!" button that navigates to daily challenge
       const buttonElement = screen.getByRole('button', { name: /let's go/i });
       await user.click(buttonElement);
 
@@ -91,10 +89,10 @@ describe('NextStepPrompt - Session Cleanup on Navigation', () => {
       expect(mockClearSessionPreservingUsername).toHaveBeenCalledTimes(1);
 
       // Navigation should happen after session is cleared
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/brain');
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
     });
 
-    it('should clear session before navigating to brain training (mobile)', async () => {
+    it('should clear session before navigating to daily challenge (mobile)', async () => {
       const user = userEvent.setup();
 
       render(
@@ -106,17 +104,17 @@ describe('NextStepPrompt - Session Cleanup on Navigation', () => {
       );
 
       // Click the mobile navigation button
-      const buttonElement = screen.getByText('Train Your Brain');
+      const buttonElement = screen.getByText('Try Daily Challenge');
       await user.click(buttonElement);
 
       // CRITICAL: Session should be cleared BEFORE navigation
       expect(mockClearSessionPreservingUsername).toHaveBeenCalledTimes(1);
 
       // Navigation should happen after session is cleared
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/brain');
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
     });
 
-    it('should clear session before navigating to brain training (landscape)', async () => {
+    it('should clear session before navigating to daily challenge (landscape)', async () => {
       const user = userEvent.setup();
 
       render(
@@ -128,14 +126,14 @@ describe('NextStepPrompt - Session Cleanup on Navigation', () => {
       );
 
       // Click the landscape navigation button
-      const buttonElement = screen.getByText('Train Your Brain');
+      const buttonElement = screen.getByText('Try Daily Challenge');
       await user.click(buttonElement);
 
       // CRITICAL: Session should be cleared BEFORE navigation
       expect(mockClearSessionPreservingUsername).toHaveBeenCalledTimes(1);
 
       // Navigation should happen after session is cleared
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/brain');
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
     });
   });
 
@@ -144,7 +142,7 @@ describe('NextStepPrompt - Session Cleanup on Navigation', () => {
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots' },
       { mode: 'solo-bots' as const, expectedHref: '/en/daily' },
       { mode: 'daily' as const, expectedHref: '/en/multiplayer' },
-      { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain' },
+      { mode: 'multiplayer-bots' as const, expectedHref: '/en/daily' },
     ];
 
     testCases.forEach(({ mode, expectedHref }) => {

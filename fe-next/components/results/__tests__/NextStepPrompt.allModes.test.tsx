@@ -5,7 +5,7 @@
  * - Practice → Challenge Bots (singleplayer?preset=bots)
  * - Solo-Bots → Try Daily Challenge (daily)
  * - Daily → Go Multiplayer (multiplayer)
- * - Multiplayer-Bots → Train Your Brain (brain)
+ * - Multiplayer-Bots → Try Daily Challenge (daily)
  *
  * Each navigation MUST clear the session before navigating to prevent
  * players from getting stuck on the results page.
@@ -43,8 +43,6 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
-        'nextStep.brainTraining': 'Train Your Brain',
-        'nextStep.brainTrainingDesc': 'Track your cognitive growth',
         'nextStep.backToLobby': 'Back to Lobby',
         'nextStep.letsGo': "Let's Go!",
       };
@@ -200,11 +198,11 @@ describe('NextStepPrompt - All Navigation Modes', () => {
     });
   });
 
-  describe('Multiplayer-Bots Mode → Train Your Brain', () => {
+  describe('Multiplayer-Bots Mode → Try Daily Challenge', () => {
     const testVariants = ['desktop', 'mobile', 'landscape'] as const;
 
     testVariants.forEach((variant) => {
-      it(`should clear session and navigate to /en/brain (${variant})`, async () => {
+      it(`should clear session and navigate to /en/daily (${variant})`, async () => {
         const user = userEvent.setup();
 
         render(
@@ -218,13 +216,13 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         // Find and click the navigation button
         const navButton = variant === 'desktop'
           ? screen.getByRole('button', { name: /let's go/i })
-          : screen.getByText('Train Your Brain');
+          : screen.getByText('Try Daily Challenge');
 
         await user.click(navButton);
 
         // Verify session was cleared BEFORE navigation
         expect(mockClearSession).toHaveBeenCalledTimes(1);
-        expect(mockRouterPush).toHaveBeenCalledWith('/en/brain');
+        expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
 
         // Verify correct order
         const clearCallOrder = mockClearSession.mock.invocationCallOrder[0];

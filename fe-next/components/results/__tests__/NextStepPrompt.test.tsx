@@ -25,8 +25,6 @@ jest.mock('@/contexts/LanguageContext', () => ({
       'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
       'nextStep.goMultiplayer': 'Go Multiplayer!',
       'nextStep.goMultiplayerDesc': 'Compete with real players',
-      'nextStep.brainTraining': 'Train Your Brain',
-      'nextStep.brainTrainingDesc': 'Track your cognitive growth',
       'nextStep.backToLobby': 'Back to Lobby',
       'nextStep.letsGo': "Let's Go!",
     };
@@ -119,7 +117,7 @@ describe('NextStepPrompt', () => {
   });
 
   describe('Multiplayer-Bots Mode', () => {
-    it('renders Brain Training CTA for multiplayer-bots mode', () => {
+    it('renders Try Daily Challenge CTA for multiplayer-bots mode', () => {
       render(
         <NextStepPrompt
           currentMode="multiplayer-bots"
@@ -127,8 +125,8 @@ describe('NextStepPrompt', () => {
         />
       );
 
-      expect(screen.getByText('Train Your Brain')).toBeInTheDocument();
-      expect(screen.getByText('Track your cognitive growth')).toBeInTheDocument();
+      expect(screen.getByText('Try Daily Challenge')).toBeInTheDocument();
+      expect(screen.getByText('Same puzzle for everyone worldwide - compete globally!')).toBeInTheDocument();
     });
   });
 
