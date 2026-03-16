@@ -132,7 +132,7 @@ describe('LandingView', () => {
       playTrack: mockPlayTrack,
       unlockAudio: jest.fn(),
       stopMusic: jest.fn(),
-      TRACKS: { LOBBY: 'lobby' },
+      TRACKS: { LOBBY: 'lobby', BOSSA: 'bossa', BOSSA_ARCADE: 'bossaArcade' },
       currentTrack: null,
       isPlaying: false,
     });
@@ -155,7 +155,7 @@ describe('LandingView', () => {
   it('plays lobby music on mount', () => {
     render(<LandingView />);
 
-    expect(mockPlayTrack).toHaveBeenCalledWith('lobby');
+    expect(mockPlayTrack).toHaveBeenCalledWith('bossa');
   });
 
   it('has accessible navigation links', () => {
