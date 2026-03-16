@@ -7,6 +7,7 @@ import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSec
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { WordHuntMPHeader } from './WordHuntMPHeader';
 import { WordHuntMPLeaderboard, type LeaderboardPlayer } from './WordHuntMPLeaderboard';
+import { WordHuntGameOverOverlay } from './WordHuntGameOverOverlay';
 import type { LetterGrid } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival/types';
@@ -30,6 +31,7 @@ export interface WordHuntGameLayoutProps {
   // Life bar
   lifePoints: number;
   isGameOver: boolean;
+  targetFound: boolean;
   isLifeGaining: boolean;
   lifeGainAmount: number | null;
 
@@ -76,6 +78,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   // Life bar
   lifePoints,
   isGameOver,
+  targetFound,
   isLifeGaining,
   lifeGainAmount,
 
@@ -167,6 +170,12 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
             </div>
           </div>
         )}
+
+        {/* Game over overlay — death or victory, then spectator mode */}
+        <WordHuntGameOverOverlay
+          reason={isGameOver ? (targetFound ? 'found' : 'eliminated') : null}
+          t={t}
+        />
       </div>
 
       {/* Word Forming Area */}

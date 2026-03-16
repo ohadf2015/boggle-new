@@ -140,7 +140,7 @@ export function QuestCard({
           'shadow-hard overflow-hidden cursor-pointer',
           isSecondary
             ? 'flex flex-row items-center gap-3 p-3'
-            : 'flex flex-col gap-4 p-5',
+            : 'flex flex-col gap-3 p-4',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
           'transition-shadow duration-200 group',
           requestState === 'loading' && 'opacity-50 cursor-not-allowed',
@@ -157,7 +157,7 @@ export function QuestCard({
         {/* Gradient overlay */}
         {!isSecondary && (
           <div className={cn(
-            'absolute inset-x-0 top-0 h-24 bg-gradient-to-b to-transparent pointer-events-none',
+            'absolute inset-x-0 top-0 h-16 bg-gradient-to-b to-transparent pointer-events-none',
             colorConfig.gradient
           )} />
         )}
@@ -218,12 +218,12 @@ export function QuestCard({
 
               <div className="relative">
                 <div className={cn(
-                  'w-12 h-12 rounded-full border-2 border-neo-black',
+                  'w-10 h-10 rounded-full border-2 border-neo-black',
                   'flex items-center justify-center text-neo-black',
                   'shadow-hard-xs group-hover:scale-110 transition-transform',
                   colorConfig.iconBg
                 )}>
-                  <span className="[&>svg]:w-6 [&>svg]:h-6">{icon}</span>
+                  <span className="[&>svg]:w-5 [&>svg]:h-5">{icon}</span>
                 </div>
 
                 {!isLoadingStatus && isCompleted && (
@@ -286,7 +286,7 @@ export function QuestCard({
             'active:translate-y-0.5 active:shadow-none transition-all',
             isSecondary
               ? 'py-2.5 text-[10px] px-4 shrink-0'
-              : 'w-full py-3.5 text-xs'
+              : 'w-full py-3 text-xs'
           )}>
             {buttonText}
           </div>

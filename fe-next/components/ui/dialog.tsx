@@ -73,15 +73,15 @@ const DialogContent = React.forwardRef<
 }, ref) => (
   <DialogPortal>
     <DialogOverlay />
+    {/* Flex-centering wrapper — immune to transform-based animation conflicts */}
+    <div className="fixed inset-0 z-90 flex items-center justify-center pointer-events-none">
     <DialogPrimitive.Content
       ref={ref}
       // Suppress accessibility warning when dialog intentionally has no description
       aria-describedby={noDescription ? undefined : props['aria-describedby']}
       className={cn(
-        // Mobile-first positioning - constrained on mobile, centered modal on desktop
-        "fixed z-90 grid w-[calc(100%-2rem)] max-w-[95vw]",
-        // Positioning
-        "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]",
+        // Sizing — centered by parent flex container
+        "relative grid w-[calc(100%-2rem)] max-w-[95vw] pointer-events-auto",
         "sm:max-w-lg lg:max-w-xl xl:max-w-2xl",
         // Height constraints - prevent overflow
         "max-h-[90vh] sm:max-h-[85vh]",
@@ -97,13 +97,11 @@ const DialogContent = React.forwardRef<
         "p-0 gap-0",
         // Overflow for scrolling
         "overflow-y-auto overflow-x-hidden",
-        // Animations
+        // Animations — fade + zoom only (no slide, which conflicts with centering)
         "duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
-        "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
         className
       )}
       style={{
@@ -159,6 +157,7 @@ const DialogContent = React.forwardRef<
         </DialogPrimitive.Close>
       )}
     </DialogPrimitive.Content>
+    </div>
   </DialogPortal>
 ));
 DialogContent.displayName = DialogPrimitive.Content.displayName;

@@ -116,7 +116,7 @@ export const GameSidebar = memo(function GameSidebar({
       )}
     >
       {/* Mobile: Compact horizontal scrollable chip bar (fits h-16) */}
-      <div className="lg:hidden flex flex-row items-center gap-1.5 px-2 py-1.5 h-full overflow-x-auto scrollbar-hide">
+      <div className="lg:hidden flex flex-row items-center gap-1 px-1.5 py-1 h-full overflow-x-auto scrollbar-hide">
         {objectives.map((obj) => {
           const current = obj.current ?? 0;
           const pct = Math.min((current / obj.target) * 100, 100);
@@ -127,7 +127,7 @@ export const GameSidebar = memo(function GameSidebar({
               data-testid={`objective-${obj.type}`}
               className={cn(
                 'flex-shrink-0 flex items-center gap-1 px-1.5 py-0.5',
-                'rounded-neo border-2 min-w-[70px] min-h-[44px]',
+                'rounded-neo border-2 min-w-[56px] min-h-[40px]',
                 'transition-all duration-300',
                 obj.isComplete
                   ? 'bg-neo-lime/20 border-neo-lime'
@@ -179,7 +179,7 @@ export const GameSidebar = memo(function GameSidebar({
           className={cn(
             'flex-shrink-0 flex items-center gap-1 px-2 py-1',
             'rounded-neo border-2',
-            'min-w-[44px] min-h-[44px]',
+            'min-w-[40px] min-h-[40px]',
             hasHintsAvailable
               ? 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
               : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
@@ -196,7 +196,7 @@ export const GameSidebar = memo(function GameSidebar({
             disabled={freezeUsed}
             className={cn(
               'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-              'rounded-neo border-2 min-w-[44px] min-h-[44px]',
+              'rounded-neo border-2 min-w-[40px] min-h-[40px]',
               !freezeUsed
                 ? isFrozen
                   ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse'
@@ -215,7 +215,7 @@ export const GameSidebar = memo(function GameSidebar({
             onClick={onShuffleClick}
             className={cn(
               'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-              'rounded-neo border-2 min-w-[44px] min-h-[44px]',
+              'rounded-neo border-2 min-w-[40px] min-h-[40px]',
               'bg-neo-orange text-neo-black border-neo-black shadow-hard-sm'
             )}
           >

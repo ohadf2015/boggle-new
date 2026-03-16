@@ -2,13 +2,13 @@
   "summary": {
     "totalKeysInCode": 3615,
     "keyCountByLanguage": {
-      "en": 6079,
-      "he": 6105,
-      "sv": 6138,
-      "ja": 6125,
-      "es": 6103
+      "en": 6081,
+      "he": 6107,
+      "sv": 6140,
+      "ja": 6127,
+      "es": 6104
     },
-    "missingFromEnglish": 2,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -167,26 +167,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "adventure.bosses.enragedBanner",
-      "usages": [
-        {
-          "file": "components/adventure/boss/BossOverlay.tsx",
-          "line": 182
-        }
-      ]
-    },
-    {
-      "key": "adventure.bosses.phases.phase2Banner",
-      "usages": [
-        {
-          "file": "components/adventure/boss/BossOverlay.tsx",
-          "line": 181
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "avatarBuilder.gender",
@@ -229,6 +210,7 @@
       "friends.headToHead.losses",
       "friends.headToHead.draws",
       "friends.headToHead.totalGames",
+      "adventure.bosses.phases.phase2Banner",
       "wordHuntAnnouncement.badge",
       "wordHuntAnnouncement.title",
       "wordHuntAnnouncement.subtitle",

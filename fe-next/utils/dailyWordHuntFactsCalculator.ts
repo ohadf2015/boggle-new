@@ -56,6 +56,8 @@ const WORD_EXPLORER_MIN = 5;
 const LONG_WORD_MIN_LENGTH = 7;
 const RARE_LETTERS = ['Q', 'X', 'Z', 'J'];
 const MAX_FACTS = 4;
+/** Minimum players before showing percentage-based facts (solveRate, percentile) */
+const MIN_PLAYERS_FOR_STATS = 5;
 
 // ---------------------------------------------------------------------------
 // Fact Generators
@@ -67,6 +69,18 @@ export function getFirstTryFact(
   stats: WordHuntStats
 ): WordHuntFact | null {
   if (!result.solved || result.attemptsUsed !== 1) return null;
+
+  // Only show percentage comparison when enough players exist for meaningful stats
+  if (stats.totalPlayers < MIN_PLAYERS_FOR_STATS) {
+    return {
+      type: 'firstTry',
+      translationKey: 'wordHunt.facts.firstTryPersonal',
+      translationParams: {},
+      icon: 'Sparkles',
+      color: 'neo-yellow',
+      value: 1,
+    };
+  }
 
   return {
     type: 'firstTry',
@@ -107,6 +121,7 @@ export function getTopPerformerFact(
   _result: WordHuntResult,
   stats: WordHuntStats
 ): WordHuntFact | null {
+  if (stats.totalPlayers < MIN_PLAYERS_FOR_STATS) return null;
   if (!stats.yourStats?.percentile) return null;
   if (stats.yourStats.percentile > TOP_PERCENTILE_THRESHOLD) return null;
 
@@ -133,6 +148,7 @@ export function getEliteClubFact(
   stats: WordHuntStats
 ): WordHuntFact | null {
   if (!result.solved) return null;
+  if (stats.totalPlayers < MIN_PLAYERS_FOR_STATS) return null;
   if (stats.solveRate >= ELITE_SOLVE_RATE_THRESHOLD) return null;
 
   return {
@@ -265,6 +281,7 @@ export function getFewerGuessesFact(
   stats: WordHuntStats
 ): WordHuntFact | null {
   if (!result.solved) return null;
+  if (stats.totalPlayers < MIN_PLAYERS_FOR_STATS) return null;
   if (stats.avgAttemptsSolved == null) return null;
   if (result.attemptsUsed >= stats.avgAttemptsSolved) return null;
 

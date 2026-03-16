@@ -32,28 +32,34 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
 
   return (
     <div
-      className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mb-4"
+      className="flex items-center gap-3 w-full mb-3 bg-slate-900/90 rounded-xl border-3 border-black shadow-hard px-3 py-2.5"
       data-testid="daily-missions-header"
     >
-      {/* Left: Daily Missions + XP Progress */}
-      <div className="bg-slate-900/90 rounded-2xl border-4 border-black shadow-hard p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h2 className="text-sm font-black text-neo-lime uppercase tracking-wider">
-              {t('daily.dailyMissions')}
-            </h2>
-            <p className="text-[10px] text-slate-400 uppercase tracking-wide">
-              {t('daily.journeyProgress')}
-            </p>
-          </div>
-          <span className="text-xs font-bold text-neo-lime">
-            {completedCount}/2 {t('daily.completedCount')}
+      {/* Date card - compact */}
+      <div
+        className="flex flex-col items-center bg-white/10 rounded-lg border-2 border-black px-2 py-1 min-w-[44px] animate-date-flip"
+        data-testid="date-card"
+      >
+        <span className="text-[9px] font-bold text-neo-pink uppercase leading-none">
+          {monthAbbr}
+        </span>
+        <span className="text-lg font-black text-white leading-none mt-0.5">
+          {dayNum}
+        </span>
+      </div>
+
+      {/* Middle: missions progress */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-xs font-black text-neo-lime uppercase tracking-wider truncate">
+            {t('daily.dailyMissions')}
+          </h2>
+          <span className="text-[10px] font-bold text-neo-lime shrink-0 ms-2">
+            {completedCount}/2
           </span>
         </div>
-
-        {/* Progress bar */}
         <div
-          className="h-6 bg-black/40 rounded-full border-2 border-black overflow-hidden"
+          className="h-4 bg-black/40 rounded-full border-2 border-black overflow-hidden"
           role="progressbar"
           aria-valuenow={progressPercent}
           aria-valuemin={0}
@@ -70,33 +76,17 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
         </div>
       </div>
 
-      {/* Right: Calendar + Countdown */}
-      <div className="bg-slate-900/90 rounded-2xl border-4 border-black border-b-neo-pink shadow-hard p-4 flex items-center gap-4">
-        {/* Flip-style date card */}
-        <div
-          className="flex flex-col items-center bg-white/10 rounded-xl border-2 border-black px-3 py-2 min-w-[56px] animate-date-flip"
-          data-testid="date-card"
+      {/* Right: countdown */}
+      <div className="shrink-0 text-end">
+        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">
+          {t('daily.nextQuestsIn')}
+        </p>
+        <p
+          className="text-sm font-black text-white font-mono tracking-wider"
+          data-testid="countdown-timer"
         >
-          <span className="text-[10px] font-bold text-neo-pink uppercase leading-none">
-            {monthAbbr}
-          </span>
-          <span className="text-2xl font-black text-white leading-none mt-0.5">
-            {dayNum}
-          </span>
-        </div>
-
-        {/* Countdown */}
-        <div className="flex-1">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">
-            {t('daily.nextQuestsIn')}
-          </p>
-          <p
-            className="text-xl font-black text-white font-mono tracking-wider"
-            data-testid="countdown-timer"
-          >
-            {formatTimeHHMMSS(countdown)}
-          </p>
-        </div>
+          {formatTimeHHMMSS(countdown)}
+        </p>
       </div>
     </div>
   );

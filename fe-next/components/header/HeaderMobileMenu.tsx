@@ -237,8 +237,8 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
                                     <MenuDivider />
 
-                                    {/* Brain Training */}
-                                    {isAuthenticated && (
+                                    {/* Brain Training - hidden, feature temporarily disabled */}
+                                    {false && isAuthenticated && (
                                         <MobileMenuSection label={t('landing.brainTraining')}>
                                             <Link
                                                 href={`/${language}/brain`}

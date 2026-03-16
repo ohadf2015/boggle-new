@@ -19,19 +19,19 @@ export function StreakCounter({ streak }: StreakCounterProps) {
 
   return (
     <div
-      className="flex flex-col items-center gap-0.5 py-2"
+      className="flex items-center justify-center gap-2 py-1.5"
       data-testid="streak-counter"
     >
-      <div className="flex items-center gap-2 px-5 py-2 bg-neo-navy-light border-4 border-black rounded-full shadow-hard">
+      <div className="flex items-center gap-1.5 px-4 py-1.5 bg-neo-navy-light border-3 border-black rounded-full shadow-hard-sm">
         <Flame
-          className="w-5 h-5 text-neo-orange animate-flame-pulse"
+          className="w-4 h-4 text-neo-orange animate-flame-pulse"
           aria-hidden="true"
         />
-        <span className="font-black text-white text-sm uppercase tracking-wide">
+        <span className="font-black text-white text-xs uppercase tracking-wide">
           {t('daily.streakDays', { count: streak })}
         </span>
       </div>
-      <span className="text-[10px] font-bold text-neo-lime uppercase tracking-widest">
+      <span className="text-[9px] font-bold text-neo-lime uppercase tracking-widest">
         {t('daily.keepFireBurning')}
       </span>
     </div>

@@ -215,8 +215,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               x: { duration: 0.5, ease: 'easeInOut' }
             }}
             className={cn(
-              'relative border-3 border-neo-black rounded-neo shadow-hard flex items-center gap-2 whitespace-nowrap overflow-visible',
-              compact ? 'px-3 py-1.5' : 'px-4 py-2',
+              'relative border-3 border-neo-black rounded-neo shadow-hard flex items-center gap-1.5 sm:gap-2 whitespace-nowrap overflow-visible',
+              compact ? 'px-2 sm:px-3 py-1.5' : 'px-4 py-2',
               getBgColor()
             )}
           >

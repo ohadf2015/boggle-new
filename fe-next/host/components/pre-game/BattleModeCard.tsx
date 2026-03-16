@@ -138,7 +138,7 @@ export function BattleModeCard({
             />
           </div>
 
-          <div className="relative mt-3 pt-3 border-t border-neo-white/10 flex items-center gap-2">
+          <div className="relative mt-3 pt-3 border-t border-neo-white/10 hidden lg:flex items-center gap-2">
             <Monitor className="w-4 h-4 text-neo-cream/50 flex-shrink-0" />
             <Checkbox
               id="broadcastMode"

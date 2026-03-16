@@ -7,7 +7,6 @@
 
 import React from 'react';
 import { Trophy, X } from 'lucide-react';
-import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/types';
 
 export interface ScoreBadgeProps {
@@ -22,9 +21,9 @@ export interface ScoreBadgeProps {
 export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
   solved,
   attemptsUsed,
-  targetWord,
+  targetWord: _targetWord,
   streakDays,
-  language,
+  language: _language,
   onClick,
 }) => (
   <div
@@ -41,11 +40,6 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
         <X className="w-4 h-4 text-neo-white" />
         <span className="font-black text-neo-white text-sm">X/10</span>
       </div>
-    )}
-    {solved && targetWord && (
-      <span className="font-black text-neo-lime text-sm">
-        {language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord.toUpperCase()}
-      </span>
     )}
     {streakDays > 0 && (
       <span className="text-xs bg-neo-orange text-neo-black px-1.5 py-0.5 rounded-neo border border-neo-black font-bold">

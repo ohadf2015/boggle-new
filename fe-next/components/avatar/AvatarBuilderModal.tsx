@@ -161,9 +161,9 @@ export default function AvatarBuilderModal({
             initial={{ scaleX: 1.06, scaleY: 0.94, rotate: -1.5 }}
             animate={{ scaleX: 1, scaleY: 1, rotate: 0 }}
             transition={JELLY_SPRING}
-            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] sm:w-[160px] sm:h-[160px]"
+            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[100px] h-[100px] sm:w-[160px] sm:h-[160px]"
           >
-            <AvatarRenderer config={config} size={160} />
+            <AvatarRenderer config={config} size={160} className="w-full h-full" />
           </AdaptiveMotion.div>
         </div>
 

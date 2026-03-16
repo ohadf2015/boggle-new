@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   Swords, CalendarDays, Map, Sparkles, ChevronDown, Plus, Minus,
@@ -144,12 +145,9 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 /* ── Blog data ──────────────────────────────────────────── */
 
 const BLOG_LINKS = [
-  { slug: 'science-behind-word-games', key: 'blog.scienceTitle', fallback: 'The Science Behind Word Games', category: 'Science' },
-  { slug: 'why-word-games-are-addictive', key: 'blog.addictiveTitle', fallback: 'Why Word Games Are So Addictive', category: 'Psychology' },
-  { slug: 'daily-challenge-strategies', key: 'blog.strategiesTitle', fallback: 'Daily Challenge Strategies', category: 'Strategy' },
-  { slug: 'word-games-for-brain-training', key: 'blog.brainTrainingTitle', fallback: 'Word Games for Brain Training', category: 'Brain Health' },
-  { slug: 'best-boggle-alternatives-2026', key: 'blog.alternativesTitle', fallback: 'Best Boggle Alternatives 2026', category: 'Reviews' },
-  { slug: 'improve-word-game-skills', key: 'blog.improveTitle', fallback: 'Improve Your Word Game Skills', category: 'Strategy' },
+  { slug: 'science-behind-word-games', key: 'blog.scienceTitle', fallback: 'The Science Behind Word Games', category: 'Science', image: '/images/blog/science-brain.jpg' },
+  { slug: 'why-word-games-are-addictive', key: 'blog.addictiveTitle', fallback: 'Why Word Games Are So Addictive', category: 'Psychology', image: '/images/blog/why-addictive.jpg' },
+  { slug: 'daily-challenge-strategies', key: 'blog.strategiesTitle', fallback: 'Daily Challenge Strategies', category: 'Strategy', image: '/images/blog/daily-strategies.jpg' },
 ] as const;
 
 /* ── Highlight pills ──────────────────────────────────── */
@@ -280,7 +278,9 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                     {i + 1}
                   </span>
                 </div>
-                <StepIcon className="w-5 h-5 text-neo-white/40" aria-hidden="true" />
+                <div className="p-2 rounded-full bg-gradient-to-br from-neo-yellow via-neo-orange to-neo-pink">
+                  <StepIcon className="w-5 h-5 text-neo-black" aria-hidden="true" />
+                </div>
                 <span className="text-xs sm:text-sm font-bold text-neo-white/80 leading-tight">
                   {step}
                 </span>
@@ -380,23 +380,34 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          {BLOG_LINKS.map(({ slug, key, fallback, category }) => (
+          {BLOG_LINKS.map(({ slug, key, fallback, category, image }) => (
             <motion.div key={slug} variants={staggerItem}>
               <Link
                 href={`/${language}/blog/${slug}`}
                 className={cn(
-                  'group block p-4 rounded-neo border-2 border-neo-white/10',
+                  'group block rounded-neo border-2 border-neo-white/10 overflow-hidden',
                   'bg-neo-white/[0.03]',
                   'hover:border-neo-white/20 hover:bg-neo-white/[0.06] hover:-translate-y-0.5',
                   'transition-all duration-200'
                 )}
               >
-                <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase text-neo-white/40 mb-2 tracking-wider">
-                  {category}
-                </span>
-                <p className="text-sm font-bold text-neo-white/80 group-hover:text-neo-white transition-colors line-clamp-2">
-                  {t(key) || fallback}
-                </p>
+                <div className="relative aspect-[16/9] overflow-hidden">
+                  <Image
+                    src={image}
+                    alt={fallback}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <span className="absolute top-2 start-2 inline-block px-2 py-0.5 text-[10px] font-bold uppercase text-neo-white bg-neo-black/60 rounded-neo tracking-wider">
+                    {category}
+                  </span>
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-bold text-neo-white/80 group-hover:text-neo-white transition-colors line-clamp-2">
+                    {t(key) || fallback}
+                  </p>
+                </div>
               </Link>
             </motion.div>
           ))}

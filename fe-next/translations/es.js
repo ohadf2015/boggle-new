@@ -3968,6 +3968,13 @@ const es = {
     "results": {
       "gameOver": "Fin del juego",
       "tapToCelebrate": "¡Toca para celebrar!",
+      "tierGenius": "¡Genio!",
+      "tierMagnificent": "¡Magnífico!",
+      "tierImpressive": "¡Impresionante!",
+      "tierSplendid": "¡Espléndido!",
+      "tierGreat": "¡Genial!",
+      "tierNice": "¡Bien!",
+      "tierPhew": "¡Uf!",
       "targetWord": "Palabra Objetivo",
       "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
       "nextChallengeIn": "Próximo desafío en",
@@ -4099,6 +4106,7 @@ const es = {
     "facts": {
       "title": "Datos Curiosos",
       "firstTry": "¡A la primera! Solo {solveRate}% lo logra al primer intento.",
+      "firstTryPersonal": "¡A la primera! ¡Lo clavaste en el primer intento!",
       "speedSolver": "Listo en {seconds}s. Tu cerebro ni sudó.",
       "topPerformer": "¡Top {percentile}%! Superaste a {others} jugadores.",
       "eliteClub": "Solo {solveRate}% resolvió hoy. Estás en la élite.",

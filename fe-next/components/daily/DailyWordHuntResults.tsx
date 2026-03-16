@@ -103,12 +103,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   }, [result.wordsDiscovered]);
 
   const emojiWords = useMemo(() => {
+    // For Word Hunt, use attempt history with per-letter feedback (green/yellow/gray)
+    if (result.attempts && result.attempts.length > 0) {
+      return result.attempts.map((attempt) => ({
+        word: attempt.word || '',
+        found: attempt.feedback?.every((f) => f.feedback === 'green') ?? false,
+        feedback: attempt.feedback,
+      }));
+    }
+    // Fallback: discovered words without feedback
     if (!result.wordsDiscovered) return [];
     return result.wordsDiscovered.map((w: { word: string }) => ({
       word: w.word || '',
       found: true,
     }));
-  }, [result.wordsDiscovered]);
+  }, [result.attempts, result.wordsDiscovered]);
 
   const efficiency = result.efficiencyScore ?? 0;
   const showFlexing = efficiency >= FLEXING_SCORE_THRESHOLD;
@@ -286,12 +295,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     t,
   };
 
-  /** Stats tab - Shows in-depth attempt history and statistics */
+  /** Stats tab - Shows immersive attempt history and animated statistics */
   const renderStatsContent = () => (
-    <div className="space-y-4">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-5 pb-4"
+    >
       <AttemptHistory attempts={result.attempts} attemptsUsed={result.attemptsUsed} t={t} />
       {stats && <StatsSection stats={stats} result={result} t={t} />}
-    </div>
+    </motion.div>
   );
 
   // ============================================================================

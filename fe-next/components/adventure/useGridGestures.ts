@@ -286,12 +286,18 @@ export function useGridGestures({
         if (!hasExceededDeadzone(startPosRef.current.x, startPosRef.current.y, touchX, touchY)) {
           return;
         }
-        // Scroll disambiguation: if vertical movement dominates, treat as scroll (classic grid behavior)
+        // Scroll disambiguation: only treat as scroll if the touch has left the grid area vertically
+        // Pure vertical drags within the grid are legitimate tile selections
         const deltaX = Math.abs(touchX - startPosRef.current.x);
         const deltaY = Math.abs(touchY - startPosRef.current.y);
-        if (deltaY > deltaX * 1.5 && lastTouchTileIndexRef.current !== null) {
-          isDraggingRef.current = false;
-          return;
+        const gridElement = gridRef.current;
+        if (deltaY > deltaX * 1.5 && lastTouchTileIndexRef.current !== null && gridElement) {
+          const gridRect = gridElement.getBoundingClientRect();
+          const isOutsideGrid = touchY < gridRect.top || touchY > gridRect.bottom;
+          if (isOutsideGrid) {
+            isDraggingRef.current = false;
+            return;
+          }
         }
         hasExceededDeadzoneRef.current = true;
       }
@@ -337,12 +343,17 @@ export function useGridGestures({
         if (!hasExceededDeadzone(startPosRef.current.x, startPosRef.current.y, touchX, touchY)) {
           return;
         }
-        // Scroll disambiguation (classic grid behavior)
+        // Scroll disambiguation: only treat as scroll if touch has left the grid vertically
         const deltaX = Math.abs(touchX - startPosRef.current.x);
         const deltaY = Math.abs(touchY - startPosRef.current.y);
-        if (deltaY > deltaX * 1.5 && lastTouchTileIndexRef.current !== null) {
-          isDraggingRef.current = false;
-          return;
+        const gridElement = gridRef.current;
+        if (deltaY > deltaX * 1.5 && lastTouchTileIndexRef.current !== null && gridElement) {
+          const gridRect = gridElement.getBoundingClientRect();
+          const isOutsideGrid = touchY < gridRect.top || touchY > gridRect.bottom;
+          if (isOutsideGrid) {
+            isDraggingRef.current = false;
+            return;
+          }
         }
         hasExceededDeadzoneRef.current = true;
       }

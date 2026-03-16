@@ -31,6 +31,12 @@ jest.mock('@/components/daily/survival/SurvivalGridSection', () => ({
   ),
 }));
 
+jest.mock('../WordHuntGameOverOverlay', () => ({
+  WordHuntGameOverOverlay: (props: Record<string, unknown>) => (
+    <div data-testid="game-over-overlay" data-reason={props.reason || 'none'} />
+  ),
+}));
+
 jest.mock('@/components/game/WordFormingArea', () => {
   const MockWordFormingArea = (props: Record<string, unknown>) => (
     <div data-testid="word-forming-area" data-word={props.word} />
@@ -65,6 +71,7 @@ describe('WordHuntGameLayout', () => {
     // Life bar
     lifePoints: 75,
     isGameOver: false,
+    targetFound: false,
     isLifeGaining: false,
     lifeGainAmount: null,
 

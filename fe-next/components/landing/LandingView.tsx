@@ -127,7 +127,7 @@ const LandingView: React.FC = () => {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  useEffect(() => { playTrack(TRACKS.LOBBY); }, [playTrack, TRACKS]);
+  useEffect(() => { playTrack(TRACKS.BOSSA); }, [playTrack, TRACKS]);
 
   const dailyChallengeStats = {
     hasPlayed: dailyChallengeStatus.hasPlayed,

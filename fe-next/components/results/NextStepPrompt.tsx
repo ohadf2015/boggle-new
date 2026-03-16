@@ -3,7 +3,7 @@
 import React, { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Bot, Users, Brain, ArrowLeft, ArrowRight, Sparkles, Trophy, Swords } from 'lucide-react';
+import { Bot, Users, ArrowLeft, ArrowRight, Sparkles, Trophy, Swords } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -107,13 +107,14 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           iconBg: 'bg-neo-navy text-neo-pink',
         };
       case 'multiplayer-bots':
+        // Brain training hidden — suggest daily challenge instead
         return {
-          titleKey: 'nextStep.brainTraining',
-          descKey: 'nextStep.brainTrainingDesc',
-          href: `/${language}/brain`,
-          icon: <Brain className="w-6 h-6 sm:w-7 sm:h-7" />,
-          gradient: 'from-neo-purple to-neo-purple-dark',
-          iconBg: 'bg-neo-navy text-neo-purple',
+          titleKey: 'nextStep.tryDailyChallenge',
+          descKey: 'nextStep.tryDailyChallengeDesc',
+          href: `/${language}/daily`,
+          icon: <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />,
+          gradient: 'from-amber-400 to-amber-600',
+          iconBg: 'bg-neo-navy text-amber-400',
         };
     }
   };

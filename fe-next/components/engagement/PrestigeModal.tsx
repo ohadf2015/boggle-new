@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { Sparkles, Star, Crown, Zap, AlertTriangle, Check } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
+import { supabase } from '@/lib/supabase';
 
 interface PrestigeReward {
   type: 'title' | 'multiplier' | 'border' | 'icon';
@@ -65,9 +66,20 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
     setError(null);
 
     try {
+      if (!supabase) {
+        throw new Error('Not authenticated');
+      }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
       const response = await fetch('/api/engagement/prestige', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
       });
 
       const data = await response.json();

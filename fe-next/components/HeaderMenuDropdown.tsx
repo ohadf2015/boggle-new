@@ -144,8 +144,8 @@ const HeaderMenuDropdown = memo(() => {
                                     </span>
                                 </Link>
 
-                                {/* Brain Training */}
-                                <Link
+                                {/* Brain Training - hidden, feature temporarily disabled */}
+                                {false && <Link
                                     href={`/${language}/brain`}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
@@ -175,7 +175,7 @@ const HeaderMenuDropdown = memo(() => {
                                     <span className="relative group-hover:translate-x-0.5 transition-transform duration-150">
                                         {t('landing.brainTraining')}
                                     </span>
-                                </Link>
+                                </Link>}
 
                                 {/* Decorative divider */}
                                 <div className="flex items-center gap-2 px-2">

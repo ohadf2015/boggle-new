@@ -33,8 +33,8 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
         exit={{ y: 80, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 28 }}
         className={cn(
-          'fixed bottom-20 lg:bottom-8 left-1/2 -translate-x-1/2 z-50',
-          'w-[calc(100vw-2rem)] max-w-sm',
+          'fixed bottom-24 sm:bottom-28 lg:bottom-8 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50',
+          'sm:w-[calc(100vw-2rem)] max-w-sm',
           'max-h-[calc(100dvh-10rem)] overflow-y-auto',
           'rounded-neo border-3 shadow-hard',
           'p-3',

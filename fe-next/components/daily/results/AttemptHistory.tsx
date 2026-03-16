@@ -1,13 +1,13 @@
 /**
  * AttemptHistory Component
- * Collapsible Wordle-style attempt history grid
+ * Immersive Wordle-style attempt history with staggered flip animations,
+ * proximity heatmap coloring, and interactive tile tap feedback.
  */
 
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { WordHuntResult } from '@/utils/dailyChallenge';
 
@@ -17,76 +17,189 @@ export interface AttemptHistoryProps {
   t: (key: string) => string;
 }
 
+const FEEDBACK_COLORS = {
+  green: {
+    bg: 'bg-emerald-500',
+    border: 'border-emerald-400',
+    glow: 'shadow-[0_0_8px_rgba(16,185,129,0.4)]',
+    text: 'text-white',
+  },
+  yellow: {
+    bg: 'bg-amber-500',
+    border: 'border-amber-400',
+    glow: 'shadow-[0_0_8px_rgba(245,158,11,0.4)]',
+    text: 'text-white',
+  },
+  gray: {
+    bg: 'bg-slate-600',
+    border: 'border-slate-500',
+    glow: '',
+    text: 'text-slate-300',
+  },
+} as const;
+
+/** Get attempt label badge based on row index */
+function getAttemptBadge(idx: number, total: number, isCorrect: boolean): { emoji: string; color: string } | null {
+  if (isCorrect) {
+    if (idx === 0) return { emoji: '🧠', color: 'text-neo-yellow' };
+    if (idx <= 2) return { emoji: '⚡', color: 'text-neo-cyan' };
+    if (idx <= 4) return { emoji: '💪', color: 'text-neo-lime' };
+    if (idx >= total - 1) return { emoji: '😅', color: 'text-neo-orange' };
+  }
+  return null;
+}
+
 export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
   attempts,
   attemptsUsed,
   t,
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [tappedTile, setTappedTile] = useState<string | null>(null);
 
-  if (attempts.length === 0) return null;
+  const handleTileTap = useCallback((id: string) => {
+    setTappedTile(id);
+    setTimeout(() => setTappedTile(null), 600);
+  }, []);
+
+  if (!attempts || attempts.length === 0) return null;
 
   return (
-    <div className="rounded-neo border-2 border-neo-black overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-      >
-        <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
-          {t('wordHunt.title')} - {attemptsUsed} {t('common.attempts')}
-        </span>
-        <motion.div animate={{ rotate: expanded ? 180 : 0 }}>
-          <ChevronDown className="w-4 h-4 text-gray-500" />
+    <div className="space-y-3">
+      {/* Section header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-5 bg-neo-cyan rounded-full" />
+          <h3 className="text-sm font-black text-neo-white uppercase tracking-wider">
+            {t('wordHunt.title')}
+          </h3>
+        </div>
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
+          className="px-2.5 py-0.5 bg-neo-cyan/20 border border-neo-cyan/40 rounded-full"
+        >
+          <span className="text-xs font-black text-neo-cyan tabular-nums">
+            {attemptsUsed} {t('common.attempts')}
+          </span>
         </motion.div>
-      </button>
+      </div>
 
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="p-2.5 space-y-0.5 bg-white dark:bg-slate-800 text-neo-black dark:text-neo-white">
-              {attempts.map((attempt, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.08, type: 'spring', stiffness: 400, damping: 25 }}
-                  className="flex items-center justify-center gap-1.5"
+      {/* Attempt grid */}
+      <div className="relative bg-slate-800/60 rounded-neo border-2 border-neo-black p-3 space-y-1.5 overflow-hidden">
+        {/* Subtle grid background pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+            backgroundSize: '16px 16px',
+          }}
+        />
+
+        {attempts.map((attempt, rowIdx) => {
+          const isCorrectRow = attempt.feedback?.every((f) => f.feedback === 'green') ?? false;
+          const greenCount = attempt.feedback?.filter((f) => f.feedback === 'green').length ?? 0;
+          const badge = getAttemptBadge(rowIdx, attemptsUsed, isCorrectRow);
+
+          return (
+            <motion.div
+              key={rowIdx}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{
+                delay: rowIdx * 0.1,
+                type: 'spring',
+                stiffness: 300,
+                damping: 22,
+              }}
+              className={cn(
+                "relative flex items-center justify-center gap-1.5 py-1 rounded-md transition-colors",
+                isCorrectRow && "bg-emerald-500/10"
+              )}
+            >
+              {/* Row number */}
+              <span className={cn(
+                "text-[11px] font-bold w-5 text-right tabular-nums",
+                isCorrectRow ? "text-emerald-400" : "text-slate-500"
+              )}>
+                {rowIdx + 1}
+              </span>
+
+              {/* Letter tiles */}
+              <div className="flex gap-1">
+                {attempt.feedback.map((letterFb, letterIdx) => {
+                  const tileId = `${rowIdx}-${letterIdx}`;
+                  const isTapped = tappedTile === tileId;
+                  const colors = FEEDBACK_COLORS[letterFb.feedback as keyof typeof FEEDBACK_COLORS] || FEEDBACK_COLORS.gray;
+
+                  return (
+                    <motion.button
+                      key={letterIdx}
+                      initial={{ scale: 0, rotateX: -180 }}
+                      animate={{
+                        scale: isTapped ? [1, 1.2, 1] : 1,
+                        rotateX: 0,
+                      }}
+                      transition={{
+                        delay: rowIdx * 0.1 + letterIdx * 0.06,
+                        type: 'spring',
+                        stiffness: 500,
+                        damping: 25,
+                      }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleTileTap(tileId)}
+                      className={cn(
+                        "w-8 h-8 flex items-center justify-center font-black text-sm rounded-[4px] border-2 transition-shadow cursor-pointer select-none",
+                        colors.bg,
+                        colors.border,
+                        colors.text,
+                        letterFb.feedback !== 'gray' && colors.glow
+                      )}
+                      style={{ perspective: '400px' }}
+                    >
+                      {letterFb.letter}
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              {/* Green count indicator */}
+              {!isCorrectRow && greenCount > 0 && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: rowIdx * 0.1 + 0.4 }}
+                  className="text-[10px] font-bold text-emerald-400/70 w-5"
                 >
-                  <span className="text-[10px] text-gray-700 dark:text-gray-400 w-5">{idx + 1}.</span>
-                  <div className="flex gap-0.5">
-                    {attempt.feedback.map((letterFb, letterIdx) => (
-                      <motion.div
-                        key={letterIdx}
-                        initial={{ scale: 0, rotateX: -90 }}
-                        animate={{ scale: 1, rotateX: 0 }}
-                        transition={{
-                          delay: idx * 0.08 + letterIdx * 0.04,
-                          type: 'spring',
-                          stiffness: 500,
-                          damping: 20,
-                        }}
-                        className={cn(
-                          "w-7 h-7 flex items-center justify-center font-bold text-white rounded border border-neo-black text-sm",
-                          letterFb.feedback === 'green' && "bg-green-500",
-                          letterFb.feedback === 'yellow' && "bg-yellow-500",
-                          letterFb.feedback === 'gray' && "bg-gray-400"
-                        )}
-                      >
-                        {letterFb.letter}
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  {greenCount}✓
+                </motion.span>
+              )}
+
+              {/* Correct row badge */}
+              {badge && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0, rotate: -20 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{
+                    delay: rowIdx * 0.1 + 0.5,
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 10,
+                  }}
+                  className={cn("text-sm w-5", badge.color)}
+                >
+                  {badge.emoji}
+                </motion.span>
+              )}
+
+              {/* Non-badge spacer for alignment */}
+              {!badge && !(!isCorrectRow && greenCount > 0) && (
+                <span className="w-5" />
+              )}
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 };

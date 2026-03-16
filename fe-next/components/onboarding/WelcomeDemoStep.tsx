@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Pointer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
@@ -98,27 +98,18 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
         />
       </motion.div>
 
-      {/* Celebration + Let's Play button */}
-      <AnimatePresence>
-        {demoCompleted && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          >
-            <motion.button
-              data-testid="lets-play-button"
-              onClick={onDemoComplete}
-              className="bg-neo-lime border-3 border-neo-black rounded-neo px-8 py-3 font-black text-lg uppercase shadow-hard text-neo-black hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {t('onboarding.letsPlay')}
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Celebration — auto-proceed after brief delay */}
+      {demoCompleted && (
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          onAnimationComplete={() => {
+            setTimeout(onDemoComplete, 800);
+          }}
+          data-testid="lets-play-button"
+        />
+      )}
 
       {/* Skip button - always visible */}
       {!demoCompleted && (

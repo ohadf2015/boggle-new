@@ -144,7 +144,7 @@ export function DailyChallengeLanding({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ type: 'spring', stiffness: 280, damping: 26 }}
-      className="flex-1 flex flex-col items-center px-3 py-3 sm:px-4 sm:py-4 max-w-3xl mx-auto w-full relative"
+      className="flex-1 flex flex-col items-center px-3 py-2 sm:px-4 sm:py-3 max-w-3xl mx-auto w-full relative"
     >
       {/* Ambient effects */}
       <ConfettiBackground />
@@ -223,12 +223,13 @@ export function DailyChallengeLanding({
 
               {/* View Results CTA */}
               <div className={cn(
-                'shrink-0 py-2.5 px-4 text-[10px] font-black uppercase rounded-lg text-center',
+                'shrink-0 py-2 px-5 text-xs font-black uppercase rounded-lg text-center',
                 'bg-neo-orange text-neo-black border-2 border-neo-black shadow-hard-sm',
                 'active:translate-y-0.5 active:shadow-none transition-all',
-                'flex items-center gap-1.5'
+                'flex items-center gap-1.5',
+                'group-hover:scale-105 transition-transform'
               )}>
-                <Eye className="w-3.5 h-3.5" />
+                <Eye className="w-4 h-4" />
                 {t('daily.viewResults')}
               </div>
             </div>
@@ -239,7 +240,7 @@ export function DailyChallengeLanding({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
-            className="w-full flex items-center gap-3 my-4"
+            className="w-full flex items-center gap-3 my-2.5"
           >
             <div className="flex-1 h-px bg-slate-700" />
             <span className="text-xs text-slate-500 font-bold uppercase tracking-wider whitespace-nowrap">
@@ -272,35 +273,15 @@ export function DailyChallengeLanding({
             delay={0.15}
           />
 
-          {/* Quest path connector */}
-          <QuestPathLine />
-
-          {/* Streak counter between quests */}
+          {/* Streak counter */}
           <StreakCounter streak={streak} />
         </>
       )}
 
       {/* Leaderboard Teaser */}
-      <div className="mt-5 w-full">
+      <div className="mt-3 w-full">
         <LeaderboardTeaser currentLanguage={currentLanguage} />
       </div>
     </motion.div>
-  );
-}
-
-/** SVG quest path connecting line between quest nodes */
-function QuestPathLine() {
-  return (
-    <div className="flex justify-center py-1" aria-hidden="true">
-      <svg width="4" height="32" viewBox="0 0 4 32" className="overflow-visible">
-        <line
-          x1="2" y1="0" x2="2" y2="32"
-          stroke="currentColor"
-          className="text-slate-600 animate-quest-path"
-          strokeWidth="2"
-          strokeDasharray="8 6"
-        />
-      </svg>
-    </div>
   );
 }

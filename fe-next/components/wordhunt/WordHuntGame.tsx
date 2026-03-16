@@ -169,6 +169,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       // Life bar (from bridge)
       lifePoints={bridge.lifePoints}
       isGameOver={bridge.isGameOver}
+      targetFound={bridge.targetFound}
       isLifeGaining={false}
       lifeGainAmount={null}
       isClueGaining={bridge.isClueGaining}

@@ -9,7 +9,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Clock, Eye, EyeOff, Skull, Zap, Target, BookOpen } from 'lucide-react';
+import { Flame, Clock, Eye, EyeOff, Skull, Zap, Target, BookOpen, Sparkles } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -53,6 +53,19 @@ const CHIP_STYLES: Record<string, string> = {
   'neo-pink': 'bg-neo-pink/10 border-neo-pink/30 text-neo-pink shadow-hard-sm',
 };
 
+/** Wordle-style attempt tier labels */
+type AttemptTier = { key: string; gradient: string; glow: string };
+
+function getAttemptTier(attempts: number): AttemptTier | null {
+  if (attempts === 1) return { key: 'wordHunt.results.tierGenius', gradient: 'from-amber-400 via-yellow-300 to-amber-400', glow: 'rgba(255,225,53,0.4)' };
+  if (attempts === 2) return { key: 'wordHunt.results.tierMagnificent', gradient: 'from-neo-cyan via-cyan-300 to-neo-cyan', glow: 'rgba(0,255,255,0.3)' };
+  if (attempts === 3) return { key: 'wordHunt.results.tierImpressive', gradient: 'from-neo-lime via-green-300 to-neo-lime', glow: 'rgba(191,255,0,0.3)' };
+  if (attempts === 4) return { key: 'wordHunt.results.tierSplendid', gradient: 'from-purple-400 via-purple-300 to-purple-400', glow: 'rgba(192,132,252,0.3)' };
+  if (attempts <= 6) return { key: 'wordHunt.results.tierGreat', gradient: 'from-neo-orange via-orange-300 to-neo-orange', glow: 'rgba(255,107,53,0.25)' };
+  if (attempts <= 8) return { key: 'wordHunt.results.tierNice', gradient: 'from-slate-400 via-slate-300 to-slate-400', glow: 'rgba(148,163,184,0.2)' };
+  return { key: 'wordHunt.results.tierPhew', gradient: 'from-neo-pink via-pink-300 to-neo-pink', glow: 'rgba(255,20,147,0.25)' };
+}
+
 /** Chip entrance variant: staggered slide-up with scale pop */
 const chipVariants = {
   hidden: { opacity: 0, y: 12, scale: 0.8 },
@@ -81,7 +94,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   wordsDiscovered = 0,
   t,
 }) => {
-  const [wordHidden, setWordHidden] = useState(false);
+  const [wordHidden, setWordHidden] = useState(true);
 
   const scoreBreakdown = useMemo(() =>
     getScoreBreakdown(lifeRemaining, attemptsUsed, wordsDiscovered, solved),
@@ -179,6 +192,36 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   delay={0.3}
                 />
               </motion.div>
+
+              {/* Attempt tier badge — Wordle-style "Genius!" label */}
+              {(() => {
+                const tier = getAttemptTier(attemptsUsed);
+                if (!tier) return null;
+                return (
+                  <motion.div
+                    initial={{ scale: 0, rotate: -8 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.35, type: 'spring', stiffness: 400, damping: 12 }}
+                    className="relative"
+                  >
+                    <div
+                      className={`inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r ${tier.gradient} rounded-neo border-3 border-neo-black shadow-hard`}
+                      style={{ boxShadow: `0 0 20px ${tier.glow}, 4px 4px 0px black` }}
+                    >
+                      {attemptsUsed === 1 && <Sparkles className="w-5 h-5 text-neo-black" />}
+                      <span className="font-black text-neo-black text-lg uppercase tracking-wider">
+                        {t(tier.key)}
+                      </span>
+                      {attemptsUsed === 1 && <Sparkles className="w-5 h-5 text-neo-black" />}
+                    </div>
+                    <div className="text-center mt-1">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">
+                        {attemptsUsed}/10
+                      </span>
+                    </div>
+                  </motion.div>
+                );
+              })()}
 
               {/* Target Word with Eye Toggle */}
               <motion.div

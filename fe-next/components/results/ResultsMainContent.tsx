@@ -396,15 +396,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         )
       )}
 
-      {/* Streak Urgency — motivate continued play */}
-      {winStreakData && winStreakData.currentStreak >= 1 && (
-        <StreakUrgencyDisplay
-          currentStreak={winStreakData.currentStreak}
-          t={t}
-        />
-      )}
-
-      {/* Players Ready Status - Compact */}
+      {/* Players Ready Status - right after CTA for visibility */}
       {gameCode && sortedScores.length > 1 && (
         <PlayersReadyIndicator
           players={sortedScores
@@ -412,6 +404,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           readyUsernames={readyUsernames}
           currentUsername={username}
           isHost={isHost}
+        />
+      )}
+
+      {/* Streak Urgency — motivate continued play */}
+      {winStreakData && winStreakData.currentStreak >= 1 && (
+        <StreakUrgencyDisplay
+          currentStreak={winStreakData.currentStreak}
+          t={t}
         />
       )}
 

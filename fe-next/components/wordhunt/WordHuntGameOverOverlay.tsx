@@ -1,0 +1,222 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Skull, Eye, Trophy, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export type GameOverReason = 'eliminated' | 'found' | null;
+
+export interface WordHuntGameOverOverlayProps {
+  reason: GameOverReason;
+  t: (key: string) => string;
+}
+
+const SPECTATOR_DELAY = 2800;
+
+/**
+ * Dramatic game-over overlay for Word Hunt multiplayer.
+ *
+ * Two modes:
+ * - **Eliminated**: Red vignette, skull slam, screen shake → spectator fade
+ * - **Found target**: Gold burst, trophy, confetti-like particles → spectator fade
+ *
+ * Both transition to a semi-transparent spectator state so the player
+ * can still watch the board and leaderboard.
+ */
+export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = ({
+  reason,
+  t,
+}) => {
+  const [phase, setPhase] = useState<'impact' | 'spectator'>('impact');
+
+  useEffect(() => {
+    if (!reason) {
+      setPhase('impact');
+      return;
+    }
+    const timer = setTimeout(() => setPhase('spectator'), SPECTATOR_DELAY);
+    return () => clearTimeout(timer);
+  }, [reason]);
+
+  if (!reason) return null;
+
+  const isEliminated = reason === 'eliminated';
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        key="gameover-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center overflow-hidden"
+      >
+        {/* Vignette — red for death, gold for victory */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: phase === 'impact' ? 1 : 0.2 }}
+          transition={{ duration: 0.8 }}
+          className="absolute inset-0"
+          style={{
+            background: isEliminated
+              ? 'radial-gradient(ellipse at center, transparent 30%, rgba(220, 38, 38, 0.6) 100%)'
+              : 'radial-gradient(ellipse at center, transparent 30%, rgba(234, 179, 8, 0.5) 100%)',
+          }}
+        />
+
+        {/* Dark overlay for spectator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: phase === 'spectator' ? 0.4 : 0.15 }}
+          transition={{ duration: 0.6, delay: phase === 'spectator' ? 0 : 0.3 }}
+          className="absolute inset-0 bg-neo-black"
+        />
+
+        {/* Floating particles for victory */}
+        {!isEliminated && phase === 'impact' && <VictoryParticles />}
+
+        {/* Content */}
+        <AnimatePresence mode="wait">
+          {phase === 'impact' ? (
+            <ImpactContent key="impact" isEliminated={isEliminated} t={t} />
+          ) : (
+            <SpectatorContent key="spectator" t={t} />
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+WordHuntGameOverOverlay.displayName = 'WordHuntGameOverOverlay';
+
+/** Dramatic impact animation — skull for death, trophy for victory */
+const ImpactContent: React.FC<{ isEliminated: boolean; t: (key: string) => string }> = ({
+  isEliminated,
+  t,
+}) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0, y: -20, transition: { duration: 0.4 } }}
+    className="relative flex flex-col items-center gap-4"
+  >
+    {/* Icon — skull or trophy */}
+    <motion.div
+      initial={{ scale: 0, rotate: isEliminated ? -15 : 0 }}
+      animate={{
+        scale: [0, 1.4, 1],
+        rotate: isEliminated ? [-15, 10, -5, 0] : [0, -8, 8, 0],
+      }}
+      transition={{ duration: 0.6, times: [0, 0.6, 1], ease: 'easeOut' }}
+    >
+      {isEliminated ? (
+        <Skull
+          size={72}
+          className="text-neo-red drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]"
+          strokeWidth={2.5}
+        />
+      ) : (
+        <Trophy
+          size={72}
+          className="text-yellow-400 drop-shadow-[0_0_20px_rgba(234,179,8,0.8)]"
+          strokeWidth={2.5}
+        />
+      )}
+    </motion.div>
+
+    {/* Banner text */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ delay: 0.4, duration: 0.5, type: 'spring', stiffness: 200 }}
+      className={cn(
+        'px-6 py-3 rounded-neo border-3 shadow-hard-lg',
+        'font-neo-display text-2xl sm:text-3xl font-black uppercase tracking-wider',
+        isEliminated
+          ? 'border-neo-red bg-neo-red/90 text-neo-cream'
+          : 'border-yellow-500 bg-yellow-500/90 text-neo-black',
+      )}
+    >
+      {isEliminated ? t('wordHunt.mp.youEliminated') : t('wordHunt.mp.youFoundIt')}
+    </motion.div>
+
+    {/* Subtitle */}
+    <motion.p
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1.2, duration: 0.5 }}
+      className="text-neo-white/80 font-neo-body text-sm"
+    >
+      {t('wordHunt.mp.watchOthers')}
+    </motion.p>
+
+    {/* Screen shake for elimination */}
+    {isEliminated && (
+      <motion.div
+        initial={{ x: 0 }}
+        animate={{ x: [0, -8, 8, -6, 6, -3, 3, 0] }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="absolute inset-0 pointer-events-none"
+      />
+    )}
+  </motion.div>
+);
+
+/** Spectator mode — subtle watching indicator at top */
+const SpectatorContent: React.FC<{ t: (key: string) => string }> = ({ t }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    className="relative flex flex-col items-center gap-2"
+  >
+    <div className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-white/30 bg-neo-black/60 backdrop-blur-sm">
+      <Eye size={18} className="text-neo-white/70" />
+      <span className="text-neo-white/70 font-neo-body text-sm font-medium">
+        {t('wordHunt.mp.watchOthers')}
+      </span>
+    </div>
+  </motion.div>
+);
+
+/** Floating sparkle particles for the victory burst */
+const VictoryParticles: React.FC = () => {
+  const particles = Array.from({ length: 12 }, (_, i) => {
+    const angle = (i / 12) * Math.PI * 2;
+    const distance = 100 + Math.random() * 80;
+    return {
+      id: i,
+      x: Math.cos(angle) * distance,
+      y: Math.sin(angle) * distance,
+      delay: i * 0.05,
+      size: 12 + Math.random() * 8,
+    };
+  });
+
+  return (
+    <>
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+          animate={{
+            opacity: [0, 1, 0],
+            scale: [0, 1.2, 0],
+            x: p.x,
+            y: p.y,
+          }}
+          transition={{
+            duration: 1.2,
+            delay: 0.3 + p.delay,
+            ease: 'easeOut',
+          }}
+          className="absolute z-10"
+        >
+          <Sparkles size={p.size} className="text-yellow-300" />
+        </motion.div>
+      ))}
+    </>
+  );
+};

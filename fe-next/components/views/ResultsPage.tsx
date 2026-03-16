@@ -380,18 +380,19 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Render Results Tab Content using shared component
   const renderResultsTab = () => (
     <>
-      {/* Word Hunt summary at top of results tab for immediate visibility */}
-      {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
-        <div className="mb-3">
-          <WordHuntResultsSummary {...wordHuntResultsData} />
-        </div>
-      )}
       <ResultsMainContent
         {...mainContentProps}
         onShowDetails={() => setMobileActiveTab('details')}
         showBanner={true}
         bannerSize="320x50"
+        isMobile
       />
+      {/* Word Hunt summary after CTA buttons so host controls stay above the fold */}
+      {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
+        <div className="mt-3">
+          <WordHuntResultsSummary {...wordHuntResultsData} />
+        </div>
+      )}
     </>
   );
 
@@ -475,7 +476,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
                 transition={{ duration: 0.15 }}
-                style={{ minHeight: 0 }}
               >
                 {mobileActiveTab === 'results' && renderResultsTab()}
                 {mobileActiveTab === 'details' && renderDetailsTab()}

@@ -12,7 +12,7 @@
 /* Shimmer sweep effect - diagonal light ray */
 @keyframes gold-shimmer {
   0% {
-    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    transform: translateX(-50%) rotate(45deg);
     opacity: 0;
   }
   20% {
@@ -22,7 +22,7 @@
     opacity: 0.8;
   }
   100% {
-    transform: translateX(200%) translateY(200%) rotate(45deg);
+    transform: translateX(150%) rotate(45deg);
     opacity: 0;
   }
 }
@@ -51,14 +51,14 @@
 @keyframes gold-glow-pulse {
   0%, 100% {
     box-shadow:
-      0 0 8px rgba(255, 225, 53, 0.4),
-      0 0 16px rgba(255, 193, 7, 0.2),
+      inset 0 0 6px rgba(255, 225, 53, 0.4),
+      inset 0 0 12px rgba(255, 193, 7, 0.2),
       inset 0 0 8px rgba(255, 255, 255, 0.3);
   }
   50% {
     box-shadow:
-      0 0 20px rgba(255, 225, 53, 0.7),
-      0 0 40px rgba(255, 193, 7, 0.4),
+      inset 0 0 10px rgba(255, 225, 53, 0.7),
+      inset 0 0 20px rgba(255, 193, 7, 0.4),
       inset 0 0 12px rgba(255, 255, 255, 0.5);
   }
 }
@@ -82,10 +82,10 @@
 .tile-gold-enhanced::before {
   content: '';
   position: absolute;
-  top: -100%;
-  left: -100%;
-  width: 50%;
-  height: 300%;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
   background: linear-gradient(
     90deg,
     transparent 0%,
