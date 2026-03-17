@@ -1503,6 +1503,7 @@ const sv = {
     "missedWordsSummary": "{count} ord på brädet som du inte hittade",
     "wordLengths": "Ordlängder",
     "missedOnBoard": "Ord du missade på brädet",
+    "topMissedWord": "Bästa missade",
     "everyoneReady": "Alla redo!",
     "waitingForPlayers": "Väntar på spelare",
     "ready": "Redo!",

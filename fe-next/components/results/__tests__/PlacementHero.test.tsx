@@ -51,10 +51,7 @@ jest.mock('../../Avatar', () => ({
   default: ({ size }: { size: string }) => <div data-testid="avatar" data-size={size} />,
 }));
 
-jest.mock('../PlacementMascot', () => ({
-  __esModule: true,
-  default: ({ rank }: { rank: number }) => <div data-testid="placement-mascot" data-rank={rank} />,
-}));
+// PlacementMascot no longer used — replaced with mascot GIFs
 
 describe('PlacementHero', () => {
    
@@ -147,16 +144,20 @@ describe('PlacementHero', () => {
     jest.useRealTimers();
   });
 
-  it('renders the placement mascot', () => {
-    render(<PlacementHero {...defaultProps} />);
-    const mascots = screen.getAllByTestId('placement-mascot');
-    expect(mascots.length).toBeGreaterThanOrEqual(1);
+  it('renders the mascot GIF for 1st place', () => {
+    render(<PlacementHero {...defaultProps} rank={1} />);
+    const imgs = screen.getAllByRole('img');
+    expect(imgs.some(img => img.getAttribute('src') === '/mascot/trophy-nobg.gif')).toBe(true);
   });
 
-  it('passes rank to mascot', () => {
-    render(<PlacementHero {...defaultProps} rank={3} />);
-    const mascots = screen.getAllByTestId('placement-mascot');
-    expect(mascots[0].getAttribute('data-rank')).toBe('3');
+  it('renders different mascot GIF per rank', () => {
+    const { rerender } = render(<PlacementHero {...defaultProps} rank={2} />);
+    let imgs = screen.getAllByRole('img');
+    expect(imgs.some(img => img.getAttribute('src') === '/mascot/flexing-nobg.gif')).toBe(true);
+
+    rerender(<PlacementHero {...defaultProps} rank={5} />);
+    imgs = screen.getAllByRole('img');
+    expect(imgs.some(img => img.getAttribute('src') === '/mascot/oops-nobg.gif')).toBe(true);
   });
 
   it('renders correct ordinal for 2nd, 3rd, 4th', () => {

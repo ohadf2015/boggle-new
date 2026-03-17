@@ -1567,6 +1567,7 @@ const es = {
     "missedWordsSummary": "{count} palabras en el tablero que no encontraste",
     "wordLengths": "Longitudes de palabras",
     "missedOnBoard": "Palabras que se te escaparon",
+    "topMissedWord": "Mejor palabra perdida",
     "everyoneReady": "¡Todos listos!",
     "waitingForPlayers": "Esperando jugadores",
     "ready": "¡Listo!",

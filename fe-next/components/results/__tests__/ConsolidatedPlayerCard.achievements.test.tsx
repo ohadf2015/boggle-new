@@ -102,7 +102,6 @@ const defaultProps = {
   rank: 1,
   totalPlayers: 3,
   winnerScore: 100,
-  allPlayerWords: {},
   xpGainedData: null,
   levelUpData: null,
   archetype: null,

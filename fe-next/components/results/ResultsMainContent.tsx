@@ -392,8 +392,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         </div>
       )}
 
-      {/* Streak Urgency — motivate continued play */}
-      {winStreakData && winStreakData.currentStreak >= 1 && (
+      {/* Streak Urgency — motivate continued play (singleplayer only) */}
+      {!gameCode && winStreakData && winStreakData.currentStreak >= 1 && (
         <StreakUrgencyDisplay
           currentStreak={winStreakData.currentStreak}
           t={t}
@@ -420,8 +420,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Word Hunt promo — only for non-WH games, max 3 impressions */}
-      {gameMode !== 'word-hunt' && <WordHuntAnnouncementBanner className="mt-2" />}
+      {/* Word Hunt promo — singleplayer only, non-WH games, max 3 impressions */}
+      {!gameCode && gameMode !== 'word-hunt' && <WordHuntAnnouncementBanner className="mt-2" />}
 
       {/* Stats Row — unified grid */}
       {currentPlayerData && currentPlayerRank > 0 && (

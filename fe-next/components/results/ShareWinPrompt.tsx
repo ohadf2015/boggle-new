@@ -395,41 +395,6 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           </motion.div>
         )}
 
-        {/* Stats display */}
-        <div className={cn(
-          'flex items-center justify-center gap-4 mb-4 p-3 rounded-xl border-2',
-          isDarkMode ? 'bg-black/30 border-white/10' : 'bg-white/60 border-gray-200'
-        )}>
-          <div className="text-center px-3">
-            <div className={cn('text-2xl font-black', isDarkMode ? 'text-yellow-400' : 'text-yellow-600')}>
-              {score}
-            </div>
-            <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-              {t('results.points')}
-            </div>
-          </div>
-          <div className={cn('w-0.5 h-10 rounded-full', isDarkMode ? 'bg-white/20' : 'bg-gray-300')} />
-          <div className="text-center px-3">
-            <div className={cn('text-2xl font-black', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
-              {wordCount}
-            </div>
-            <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-              {t('results.wordsLabel')}
-            </div>
-          </div>
-          {achievements.length > 0 && (
-            <>
-              <div className={cn('w-0.5 h-10 rounded-full', isDarkMode ? 'bg-white/20' : 'bg-gray-300')} />
-              <div className="text-center px-3">
-                <div className="text-2xl">{achievements.slice(0, 3).map(a => a.icon || '🏆').join('')}</div>
-                <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                  {achievements.length} {t('results.badges')}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
         {/* Streak Encouragement - motivate sharing near milestones */}
         {streakEncouragement && (
           <motion.div

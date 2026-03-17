@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, memo, useCallback } from 'react';
+import React, { useMemo, useState, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Hash, Award, TrendingUp, ChevronDown, Zap, BarChart3, Sparkles, Lightbulb, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,14 +10,13 @@ import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import PlayerInsights from './PlayerInsights';
 import { AchievementBadge } from '../AchievementBadge';
 import XpBreakdownCard from './XpBreakdownCard';
-import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
 import { filterGameAchievements } from './utils';
 import { useWordCategories } from './useWordCategories';
 import BonusBadgesRow from './BonusBadgesRow';
 import { calculatePlayerInsights } from '@/utils/gameInsights';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import { getGuestStats } from '@/utils/guestManager';
-import type { Player, WordObject, XpGainedData, LevelUpData } from './types';
+import type { Player, XpGainedData, LevelUpData } from './types';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
 interface ConsolidatedPlayerCardProps {
@@ -25,7 +24,6 @@ interface ConsolidatedPlayerCardProps {
   rank: number;
   totalPlayers: number;
   winnerScore: number;
-  allPlayerWords: Record<string, WordObject[]>;
   xpGainedData: XpGainedData | null;
   levelUpData: LevelUpData | null;
   archetype: PlayerArchetype | null;
@@ -43,18 +41,16 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   rank,
   totalPlayers,
   winnerScore,
-  allPlayerWords,
   xpGainedData,
   levelUpData,
   archetype,
   duplicateRuleDisabled: _duplicateRuleDisabled,
   hideRankAndScore = false,
 }) => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   // Expanded states for collapsible sections
   const [showDetails, setShowDetails] = useState(false);
-  const [showWords, setShowWords] = useState(false);
   const [showXp, setShowXp] = useState(false);
   // Default-expand achievements when player earned some this game
   const [showAchievements, setShowAchievements] = useState(
@@ -72,25 +68,9 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   };
   const rankStyle = rankColors[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black' };
 
-  // Calculate how many players found each word - memoized callback
-  const getPlayerCountForWord = useCallback((word: string): number => {
-    if (!allPlayerWords || !word) return 1;
-    let count = 0;
-    Object.values(allPlayerWords).forEach(playerWordList => {
-      if (Array.isArray(playerWordList) && playerWordList.some(w => w?.word?.toLowerCase() === word.toLowerCase())) {
-        count++;
-      }
-    });
-    return count;
-  }, [allPlayerWords]);
-
   // Use shared hook for word categorization
   const {
     validWords,
-    duplicateWords,
-    invalidWords,
-    wordsByPoints,
-    sortedPointGroups,
     totalComboBonus,
     totalFireRoundBonus,
     longestWord,
@@ -326,56 +306,6 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               </p>
             </motion.div>
           )}
-
-          {/* Collapsible: Words (most wanted — first) */}
-          <button
-            onClick={() => setShowWords(!showWords)}
-            aria-expanded={showWords}
-            className="w-full flex items-center justify-between p-2 sm:p-3 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border-2 border-neo-lime/50 bg-neo-lime/10 hover:bg-neo-lime/20 transition-colors mb-2"
-          >
-            <span className="flex items-center gap-1.5 sm:gap-2">
-              <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t('results.viewAllWords')}</span>
-              <span className="sm:hidden">{t('results.words')}</span>
-              <span className="text-slate-300">({player.allWords?.length || 0})</span>
-            </span>
-            <motion.div animate={{ rotate: showWords ? 180 : 0 }} transition={{ duration: 0.2 }}>
-              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.div>
-          </button>
-          <AnimatePresence>
-            {showWords && player.allWords && player.allWords.length > 0 && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden mb-2"
-              >
-                <div className="bg-white/5 text-neo-black rounded-neo border border-white/10 p-2 space-y-2">
-                  <WordPointsGroup
-                    wordsByPoints={wordsByPoints}
-                    sortedPointGroups={sortedPointGroups}
-                    t={t}
-                    getPlayerCountForWord={getPlayerCountForWord}
-                    mode="chip"
-                  />
-                  <SharedWordsSection
-                    duplicateWords={duplicateWords}
-                    t={t}
-                    getPlayerCountForWord={getPlayerCountForWord}
-                  />
-                  <InvalidWordsSection
-                    invalidWords={invalidWords}
-                    t={t}
-                    getPlayerCountForWord={getPlayerCountForWord}
-                    mode="chip"
-                    language={language}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* Collapsible: Achievements (auto-expanded when earned) */}
           {gameAchievements.length > 0 && (

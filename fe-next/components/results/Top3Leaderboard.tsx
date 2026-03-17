@@ -153,9 +153,16 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   // Podium order: 2nd (left), 1st (center), 3rd (right)
   // Podium heights (relative): 1st = tallest, 2nd = medium, 3rd = shortest
   const podiumConfig = {
-    1: { order: 1, height: compact ? 'h-24' : 'h-28', mt: 'mt-0', podiumHeight: compact ? 'h-10' : 'h-12' },
-    2: { order: 0, height: compact ? 'h-20' : 'h-24', mt: compact ? 'mt-4' : 'mt-4', podiumHeight: compact ? 'h-6' : 'h-8' },
-    3: { order: 2, height: compact ? 'h-16' : 'h-20', mt: compact ? 'mt-8' : 'mt-8', podiumHeight: compact ? 'h-4' : 'h-5' },
+    1: { order: 1, mt: 'mt-0', podiumHeight: compact ? 'h-16' : 'h-20' },
+    2: { order: 0, mt: compact ? 'mt-6' : 'mt-8', podiumHeight: compact ? 'h-10' : 'h-12' },
+    3: { order: 2, mt: compact ? 'mt-10' : 'mt-12', podiumHeight: compact ? 'h-7' : 'h-8' },
+  };
+
+  // Card background styling per rank
+  const cardStyles = {
+    1: 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500',
+    2: 'bg-gradient-to-b from-slate-200 via-slate-300 to-slate-400',
+    3: 'bg-gradient-to-b from-orange-300 via-orange-400 to-orange-500',
   };
 
   // Reorder for podium display: [2nd, 1st, 3rd]
@@ -196,55 +203,68 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 opacity: 0,
                 y: rank === 1 ? -40 : 30,
                 x: rank === 2 ? -30 : rank === 3 ? 30 : 0,
-                rotate: rank === 1 ? -10 : rank === 2 ? 8 : -8,
                 scale: 0.8,
               }}
               animate={{
                 opacity: 1, y: 0, x: 0, scale: 1,
-                rotate: rank === 1 ? -2 : rank === 2 ? 1.5 : -1.5,
               }}
               transition={{ delay: compact ? 0.05 * displayIndex : 0.15 + displayIndex * 0.12, type: 'spring', stiffness: 220, damping: 18 }}
               style={{ order: podium.order }}
-              className={cn('flex flex-col items-center', podium.mt, rank === 1 && '-mx-1 z-10')}
+              className={cn('flex flex-col items-center', podium.mt, rank === 1 && 'z-10')}
             >
+              {/* Crown/Medal icon above card for winner */}
+              <motion.div
+                initial={{ scale: 0, y: 10 }}
+                animate={{ scale: 1, y: 0 }}
+                transition={{ delay: compact ? 0.1 : 0.4 + displayIndex * 0.1, type: 'spring', stiffness: 300, damping: 15 }}
+                className="mb--1 relative z-10"
+              >
+                <Icon className={cn(
+                  rank === 1 ? 'w-8 h-8 text-amber-400 drop-shadow-[0_2px_4px_rgba(251,191,36,0.5)]' :
+                  rank === 2 ? 'w-6 h-6 text-slate-300 drop-shadow-[0_2px_4px_rgba(148,163,184,0.5)]' :
+                  'w-6 h-6 text-orange-400 drop-shadow-[0_2px_4px_rgba(251,146,60,0.5)]',
+                  compact && 'scale-75'
+                )} />
+              </motion.div>
+
               {/* Player Card */}
               <motion.div
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, y: -4 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCardClick(rank, isCurrentPlayer)}
                 className={cn(
                   'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden cursor-pointer',
-                  'bg-neo-cream',
-                  compact ? 'w-22 p-1.5' : rank === 1 ? 'w-32 p-3' : 'w-28 p-2.5',
-                  isCurrentPlayer && 'ring-2 ring-neo-cyan'
+                  cardStyles[rank as 1 | 2 | 3],
+                  compact ? 'w-24 p-2' : rank === 1 ? 'w-36 p-3' : 'w-28 p-2.5',
+                  isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-navy'
                 )}
               >
-                {/* Avatar with rank badge overlay */}
-                <div className="flex justify-center relative mb-1">
+                {/* Subtle halftone texture */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,black_1px,transparent_1px)] bg-[length:8px_8px]" />
+
+                {/* Avatar */}
+                <div className="flex justify-center relative mb-1.5">
                   {participant.isBot ? (
                     <div className={cn(
-                      'rounded-full bg-slate-200 border-2 border-neo-black flex items-center justify-center',
-                      compact ? 'w-8 h-8' : 'w-10 h-10'
+                      'rounded-full bg-white/80 border-3 border-neo-black flex items-center justify-center shadow-hard-sm',
+                      compact ? 'w-10 h-10' : rank === 1 ? 'w-14 h-14' : 'w-12 h-12'
                     )}>
-                      <Bot className={cn('text-slate-500', compact ? 'text-sm' : 'text-lg')} />
+                      <Bot className={cn('text-slate-500', compact ? 'w-5 h-5' : 'w-6 h-6')} />
                     </div>
                   ) : (
-                    <Avatar
-                      profilePictureUrl={participant.avatar?.profilePictureUrl ?? undefined}
-                      avatarImage={participant.avatar?.avatarImage}
-                      customAvatar={participant.avatar?.customAvatar}
-                      size={compact ? 'md' : rank === 1 ? 'xl' : 'lg'}
-                      className={cn('border-2 border-neo-black', compact ? 'w-8 h-8' : rank === 1 ? 'w-14 h-14' : 'w-12 h-12')}
-                    />
+                    <div className={cn(
+                      'rounded-full border-3 border-neo-black shadow-hard-sm bg-white/90 p-0.5',
+                      compact ? '' : rank === 1 ? 'p-1' : ''
+                    )}>
+                      <Avatar
+                        profilePictureUrl={participant.avatar?.profilePictureUrl ?? undefined}
+                        avatarImage={participant.avatar?.avatarImage}
+                        customAvatar={participant.avatar?.customAvatar}
+                        size={compact ? 'md' : rank === 1 ? 'xl' : 'lg'}
+                        className={cn(compact ? 'w-9 h-9' : rank === 1 ? 'w-12 h-12' : 'w-10 h-10')}
+                      />
+                    </div>
                   )}
-                  {/* Rank badge overlay */}
-                  <div className={cn(
-                    'absolute -top-1 -end-1 rounded-full flex items-center justify-center border border-neo-black',
-                    compact ? 'w-5 h-5' : 'w-6 h-6',
-                    config.bg
-                  )}>
-                    <Icon className={cn(compact ? 'w-3 h-3' : 'w-3.5 h-3.5', config.text)} />
-                  </div>
                 </div>
 
                 {/* Name */}
@@ -260,22 +280,21 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                   side="bottom"
                 >
                   <p className={cn(
-                    'font-bold text-center truncate text-neo-black',
-                    compact ? 'text-[10px]' : 'text-xs',
-                    !isCurrentPlayer && 'cursor-pointer hover:text-neo-cyan'
+                    'font-black text-center truncate text-neo-black',
+                    compact ? 'text-[10px]' : rank === 1 ? 'text-sm' : 'text-xs',
+                    !isCurrentPlayer && 'cursor-pointer'
                   )}>
                     {participant.name}
                     {isCurrentPlayer && <span className="text-neo-cyan"> ★</span>}
                   </p>
                 </PlayerProfileTooltip>
 
-                {/* Score */}
+                {/* Score - prominent display */}
                 <div className={cn(
-                  'text-center rounded-neo border border-neo-black mt-1',
-                  compact ? 'py-0.5' : 'py-1',
-                  config.bg
+                  'text-center rounded-neo border-2 border-neo-black mt-1.5 bg-white/90 shadow-hard-sm',
+                  compact ? 'py-0.5 px-1' : 'py-1 px-2',
                 )}>
-                  <span className={cn('font-black', compact ? 'text-xs' : 'text-sm', config.text)}>
+                  <span className={cn('font-black text-neo-black', compact ? 'text-sm' : rank === 1 ? 'text-xl' : 'text-lg')}>
                     {participant.score}
                   </span>
                 </div>
@@ -283,17 +302,19 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
 
               {/* Podium Base */}
               <div className={cn(
-                'w-full rounded-t-neo border-2 border-neo-black border-b-0 flex items-center justify-center',
-                compact ? 'w-22' : rank === 1 ? 'w-32' : 'w-28',
+                'w-full border-x-3 border-t-3 border-neo-black flex items-start justify-center pt-2',
+                compact ? 'w-24 rounded-t-lg' : rank === 1 ? 'w-36 rounded-t-lg' : 'w-28 rounded-t-lg',
                 podium.podiumHeight,
-                config.bg
+                rank === 1 ? 'bg-gradient-to-b from-amber-400 to-amber-500' :
+                rank === 2 ? 'bg-gradient-to-b from-slate-300 to-slate-400' :
+                'bg-gradient-to-b from-orange-400 to-orange-500',
               )}>
                 <span className={cn(
-                  'inline-flex items-center justify-center rounded-full border-2 font-black',
-                  compact ? 'w-6 h-6 text-xs' : 'w-7 h-7 text-sm',
-                  rank === 1 ? 'bg-amber-400 border-amber-600 text-neo-black' :
-                  rank === 2 ? 'bg-slate-300 border-slate-500 text-neo-black' :
-                  'bg-orange-300 border-orange-500 text-neo-black',
+                  'font-black',
+                  compact ? 'text-lg' : 'text-2xl',
+                  rank === 1 ? 'text-amber-800' :
+                  rank === 2 ? 'text-slate-600' :
+                  'text-orange-800',
                 )}>
                   {rank}
                 </span>
@@ -304,7 +325,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
       </div>
 
       {/* Podium Floor */}
-      <div className="w-full h-3 bg-neo-black border-2 border-neo-black rounded-b-neo -mt-[2px]" />
+      <div className="w-full h-2 bg-neo-black rounded-b-neo -mt-[2px]" />
     </motion.div>
   );
 });

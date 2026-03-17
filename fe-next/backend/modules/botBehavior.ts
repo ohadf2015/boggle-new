@@ -10,6 +10,7 @@ import type { LetterGrid, Language } from '@/shared/types/game';
 const { findWordsForBots } = require('./boggleSolver');
 const { calculateWordScore } = require('./scoringEngine');
 const { BOT_CONFIG } = require('./botConfig');
+const { ensureLanguageLoaded } = require('../dictionary');
 const logger = require('../utils/logger');
 
 // Re-export cache module
@@ -165,6 +166,11 @@ export async function prepareBotWords(bot: Bot, grid: LetterGrid, language: Lang
     bot.wordsToFind = [];
     return;
   }
+
+  // Ensure the dictionary for this language is loaded before solving
+  // Without this, lazy-loaded languages (non-English) may have empty word sets,
+  // causing the solver to find 0 words
+  await ensureLanguageLoaded(language);
 
   const categorizedWords = findWordsForBots(grid, language, {
     minLength: 3,

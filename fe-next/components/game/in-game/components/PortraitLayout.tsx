@@ -347,7 +347,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center relative min-h-[70px] short:min-h-[60px] md:min-h-[80px] lg:min-h-[80px] xl:min-h-[100px]"
+                className="flex w-full items-center justify-center relative min-h-[70px] short:min-h-[60px] md:min-h-[80px] lg:min-h-[120px] xl:min-h-[130px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}

@@ -1521,6 +1521,7 @@ const he = {
     "missedWordsSummary": "{count} מילים על הלוח שלא מצאת",
     "wordLengths": "אורכי מילים",
     "missedOnBoard": "מילים שפספסת על הלוח",
+    "topMissedWord": "המילה שפספסת",
     "everyoneReady": "כולם מוכנים!",
     "waitingForPlayers": "ממתין לשחקנים",
     "ready": "מוכן!",

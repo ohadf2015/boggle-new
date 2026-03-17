@@ -2,13 +2,12 @@
 
 import React, { useEffect, useState, memo } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Crown, Medal, TrendingUp } from 'lucide-react';
+import { Crown, Medal, TrendingUp, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
 import { fireRankConfetti } from '@/utils/confettiUtils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import PlacementMascot from './PlacementMascot';
 
 // ============================================================
 // TYPES
@@ -43,8 +42,10 @@ interface RankTheme {
   rankText: string;
   scoreBg: string;
   glowColor: string;
+  textShadow: string;
   icon: typeof Crown;
   message: string;
+  mascotGif: string;
 }
 
 const RANK_THEMES: Record<number, RankTheme> = {
@@ -57,8 +58,10 @@ const RANK_THEMES: Record<number, RankTheme> = {
     rankText: 'text-amber-400',
     scoreBg: 'bg-neo-cream',
     glowColor: 'rgba(255,225,53,0.4)',
+    textShadow: '2px 2px 0px rgba(0,0,0,0.15)',
     icon: Crown,
     message: 'results.youWon',
+    mascotGif: '/mascot/trophy-nobg.gif',
   },
   2: {
     bg: 'from-slate-400 via-slate-300 to-slate-500',
@@ -69,8 +72,10 @@ const RANK_THEMES: Record<number, RankTheme> = {
     rankText: 'text-slate-300',
     scoreBg: 'bg-neo-cream',
     glowColor: 'rgba(148,163,184,0.4)',
+    textShadow: '2px 2px 0px rgba(0,0,0,0.15)',
     icon: Medal,
     message: 'results.secondPlace',
+    mascotGif: '/mascot/flexing-nobg.gif',
   },
   3: {
     bg: 'from-amber-600 via-orange-400 to-amber-600',
@@ -81,10 +86,11 @@ const RANK_THEMES: Record<number, RankTheme> = {
     rankText: 'text-amber-500',
     scoreBg: 'bg-neo-cream',
     glowColor: 'rgba(245,158,11,0.4)',
+    textShadow: '2px 2px 0px rgba(0,0,0,0.15)',
     icon: Medal,
     message: 'results.thirdPlace',
+    mascotGif: '/mascot/encouraging-nobg.gif',
   },
-  // 4+ fallback
   0: {
     bg: 'from-neo-pink via-purple-500 to-neo-pink',
     accent: 'border-purple-700',
@@ -94,10 +100,30 @@ const RANK_THEMES: Record<number, RankTheme> = {
     rankText: 'text-white',
     scoreBg: 'bg-neo-cream',
     glowColor: 'rgba(255,20,147,0.3)',
+    textShadow: '2px 2px 0px rgba(0,0,0,0.15)',
     icon: TrendingUp,
     message: 'results.betterLuckNextTime',
+    mascotGif: '/mascot/oops-nobg.gif',
   },
 };
+
+// ============================================================
+// MASCOT GIF
+// ============================================================
+
+const MascotGif: React.FC<{ src: string; alt: string; size: number; className?: string }> = ({
+  src, alt, size, className = '',
+}) => (
+  /* eslint-disable-next-line @next/next/no-img-element */
+  <img
+    src={src}
+    alt={alt}
+    width={size}
+    height={size}
+    className={`object-contain drop-shadow-lg ${className}`}
+    loading="eager"
+  />
+);
 
 // ============================================================
 // ANIMATED SCORE COUNTER
@@ -129,6 +155,45 @@ const AnimatedScore: React.FC<{ target: number; className?: string; delay?: numb
 
   return <span className={className}>{display.toLocaleString()}</span>;
 };
+
+// ============================================================
+// FLOATING SPARKLES (winner only)
+// ============================================================
+
+const SPARKLES = [
+  { x: '12%', y: '18%', size: 8, delay: 0 },
+  { x: '85%', y: '25%', size: 6, delay: 0.4 },
+  { x: '22%', y: '72%', size: 7, delay: 0.8 },
+  { x: '78%', y: '68%', size: 5, delay: 1.2 },
+  { x: '50%', y: '12%', size: 9, delay: 0.6 },
+  { x: '92%', y: '50%', size: 6, delay: 1.0 },
+];
+
+const FloatingSparkles: React.FC = () => (
+  <>
+    {SPARKLES.map((s, i) => (
+      <motion.div
+        key={i}
+        className="absolute pointer-events-none text-neo-cream/60"
+        style={{ left: s.x, top: s.y, fontSize: s.size }}
+        animate={{
+          y: [0, -8, 0],
+          opacity: [0.3, 0.8, 0.3],
+          scale: [0.8, 1.3, 0.8],
+          rotate: [0, 180, 360],
+        }}
+        transition={{
+          duration: 2.5,
+          delay: s.delay,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      >
+        ✦
+      </motion.div>
+    ))}
+  </>
+);
 
 // ============================================================
 // ORDINAL SUFFIX
@@ -167,27 +232,60 @@ const PlacementHero = memo<PlacementHeroProps>(({
   }, [rank, reducedMotion]);
 
   const containerVariants = {
-    hidden: { opacity: 0, scale: 0.9, y: 15 },
+    hidden: { opacity: 0, scale: 0.85, y: 20 },
     visible: {
       opacity: 1,
       scale: 1,
       y: 0,
       transition: {
         type: 'spring' as const,
-        stiffness: 200,
-        damping: 22,
-        staggerChildren: 0.14,
+        stiffness: 180,
+        damping: 20,
+        staggerChildren: 0.12,
       },
     },
   };
 
   const childVariants = {
-    hidden: { opacity: 0, y: 24, scale: 0.95 },
+    hidden: { opacity: 0, y: 28, scale: 0.9 },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
       transition: { type: 'spring' as const, stiffness: 300, damping: 22 },
+    },
+  };
+
+  // Rank number slam-in: overshoots then settles
+  const rankSlamVariants = {
+    hidden: { opacity: 0, scale: 3, rotate: -15 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: {
+        type: 'spring' as const,
+        stiffness: 350,
+        damping: 15,
+        mass: 0.6,
+        delay: 0.3,
+      },
+    },
+  };
+
+  // Mascot slides in from the side with rotation
+  const mascotVariants = {
+    hidden: { opacity: 0, x: -30, rotate: -12 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      rotate: 0,
+      transition: {
+        type: 'spring' as const,
+        stiffness: 250,
+        damping: 18,
+        delay: 0.5,
+      },
     },
   };
 
@@ -210,13 +308,16 @@ const PlacementHero = memo<PlacementHeroProps>(({
         {/* Halftone texture */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.05] bg-[radial-gradient(circle,rgb(var(--neo-black))_1px,transparent_1px)] bg-[length:10px_10px]" />
 
+        {/* Floating sparkles for winner */}
+        {rank === 1 && !reducedMotion && <FloatingSparkles />}
+
         {/* Shimmer sweep */}
         {!reducedMotion && (
           <motion.div
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.2) 50%, transparent 65%)',
+                'linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.25) 50%, transparent 65%)',
               backgroundSize: '200% 100%',
             }}
             animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
@@ -240,13 +341,26 @@ const PlacementHero = memo<PlacementHeroProps>(({
         )}
 
         {/* Main content */}
-        <div className="relative z-10 px-4 py-5 sm:px-6 sm:py-7 flex flex-col items-center text-center gap-3 sm:gap-4">
-          {/* Row 1: Mascot + Rank badge */}
+        <div className="relative z-10 px-4 py-7 sm:px-6 sm:py-10 flex flex-col items-center text-center gap-4 sm:gap-5">
+          {/* Row 1: Mascot GIF + Rank badge */}
           <motion.div variants={childVariants} className="flex items-center gap-3 sm:gap-4">
-            {/* Mascot character */}
-            <PlacementMascot rank={rank} size={72} className="shrink-0 hidden xs:block sm:block" />
+            {/* Mascot GIF — desktop */}
+            <motion.div
+              className="shrink-0 hidden xs:block sm:block"
+              variants={reducedMotion ? undefined : mascotVariants}
+            >
+              <motion.div
+                animate={!reducedMotion ? { y: [0, -6, 0], rotate: [0, 2, -2, 0] } : undefined}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <MascotGif src={theme.mascotGif} alt={t(theme.message)} size={80} />
+              </motion.div>
+            </motion.div>
 
-            <div className="relative">
+            <motion.div
+              className="relative"
+              variants={reducedMotion ? childVariants : rankSlamVariants}
+            >
               {/* Rank circle */}
               <motion.div
                 className={`
@@ -275,6 +389,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
               >
                 <span
                   className={`${theme.rankText} font-black text-4xl sm:text-5xl leading-none`}
+                  style={{ textShadow: theme.textShadow }}
                 >
                   {rank}
                 </span>
@@ -289,14 +404,24 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 `}
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 5 }}
-                transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 15 }}
+                transition={{ delay: 0.7, type: 'spring', stiffness: 400, damping: 12 }}
               >
                 <RankIcon className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
               </motion.div>
-            </div>
+            </motion.div>
 
-            {/* Mascot on mobile (smaller) */}
-            <PlacementMascot rank={rank} size={56} className="shrink-0 xs:hidden sm:hidden" />
+            {/* Mascot GIF — mobile (smaller) */}
+            <motion.div
+              className="shrink-0 xs:hidden sm:hidden"
+              variants={reducedMotion ? undefined : mascotVariants}
+            >
+              <motion.div
+                animate={!reducedMotion ? { y: [0, -4, 0] } : undefined}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <MascotGif src={theme.mascotGif} alt={t(theme.message)} size={56} />
+              </motion.div>
+            </motion.div>
           </motion.div>
 
           {/* Row 2: Ordinal placement text */}
@@ -318,18 +443,28 @@ const PlacementHero = memo<PlacementHeroProps>(({
             className="flex items-center gap-2.5"
           >
             {avatar && (
-              <div className="border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5">
+              <motion.div
+                className="border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5"
+                animate={!reducedMotion ? {
+                  boxShadow: [
+                    '4px 4px 0px rgba(0,0,0,1)',
+                    '4px 4px 0px rgba(0,204,204,0.6)',
+                    '4px 4px 0px rgba(0,0,0,1)',
+                  ],
+                } : undefined}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+              >
                 <Avatar
                   profilePictureUrl={avatar.profilePictureUrl ?? undefined}
                   avatarImage={avatar.avatarImage}
                   customAvatar={avatar.customAvatar}
                   size="lg"
                 />
-              </div>
+              </motion.div>
             )}
             <h2
               className={`font-black text-xl sm:text-2xl uppercase ${theme.textPrimary} leading-tight`}
-              style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.1)' }}
+              style={{ textShadow: theme.textShadow }}
             >
               {username}
             </h2>
@@ -343,13 +478,31 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 px-6 py-3 sm:px-8 sm:py-4 inline-flex flex-col items-center
                 relative overflow-hidden
               `}
+              animate={
+                !reducedMotion
+                  ? {
+                      boxShadow: rank === 1
+                        ? [
+                            '6px 6px 0px rgba(0,0,0,1)',
+                            '6px 6px 0px rgba(0,204,204,0.8), 0 0 20px rgba(0,255,255,0.3)',
+                            '6px 6px 0px rgba(0,0,0,1)',
+                          ]
+                        : [
+                            '6px 6px 0px rgba(0,0,0,1)',
+                            `6px 6px 0px ${theme.glowColor}`,
+                            '6px 6px 0px rgba(0,0,0,1)',
+                          ],
+                    }
+                  : undefined
+              }
+              transition={{ duration: 2, delay: 2, repeat: Infinity, ease: 'easeInOut' }}
               {...(!reducedMotion && rank === 1
                 ? {
-                    animate: {
-                      x: [0, -3, 4, -2, 3, -1, 0],
-                      rotate: [0, -0.5, 0.5, -0.3, 0.3, 0],
+                    whileHover: {
+                      scale: 1.05,
+                      rotate: [-1, 1, 0],
+                      transition: { duration: 0.3 },
                     },
-                    transition: { delay: 2.2, duration: 0.5, ease: 'easeOut' },
                   }
                 : {})}
             >
@@ -371,7 +524,9 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 animate={
                   !reducedMotion && rank === 1
                     ? { scale: [1, 1.15, 0.95, 1.05, 1] }
-                    : { scale: [1, 1.08, 1] }
+                    : !reducedMotion
+                      ? { scale: [1, 1.08, 1] }
+                      : undefined
                 }
                 transition={{ delay: 2, duration: rank === 1 ? 0.6 : 0.4, ease: 'easeOut' }}
               >
@@ -387,16 +542,36 @@ const PlacementHero = memo<PlacementHeroProps>(({
             </motion.div>
           </motion.div>
 
-          {/* Row 5: Rank message */}
-          <motion.div variants={childVariants}>
+          {/* Row 5: Rank message with icon */}
+          <motion.div
+            variants={childVariants}
+            className="flex items-center gap-2"
+          >
+            {rank === 1 && (
+              <motion.div
+                animate={!reducedMotion ? { rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] } : undefined}
+                transition={{ duration: 1.5, delay: 1.8, repeat: Infinity, repeatDelay: 3 }}
+              >
+                <Zap className={`w-5 h-5 sm:w-6 sm:h-6 ${theme.textPrimary} fill-current`} />
+              </motion.div>
+            )}
             <span
               className={`
                 inline-block font-black uppercase text-base sm:text-lg tracking-wide
                 ${theme.textPrimary}
               `}
+              style={{ textShadow: theme.textShadow }}
             >
               {t(theme.message)}
             </span>
+            {rank === 1 && (
+              <motion.div
+                animate={!reducedMotion ? { rotate: [0, -15, 15, 0], scale: [1, 1.2, 1] } : undefined}
+                transition={{ duration: 1.5, delay: 2, repeat: Infinity, repeatDelay: 3 }}
+              >
+                <Zap className={`w-5 h-5 sm:w-6 sm:h-6 ${theme.textPrimary} fill-current`} />
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Row 6: Gap to winner (only for non-winners) */}

@@ -1504,6 +1504,7 @@ const ja = {
     "missedWordsSummary": "ボード上の{count}個の単語を見つけられませんでした",
     "wordLengths": "単語の長さ",
     "missedOnBoard": "見逃した単語",
+    "topMissedWord": "最高の見逃し",
     "everyoneReady": "全員準備完了！",
     "waitingForPlayers": "プレイヤーを待っています",
     "ready": "準備完了！",

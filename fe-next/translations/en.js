@@ -1622,6 +1622,7 @@ const en = {
     "missedWordsSummary": "{count} words on the board you didn't find",
     "wordLengths": "Word Lengths",
     "missedOnBoard": "Words You Missed on the Board",
+    "topMissedWord": "Top missed",
     "everyoneReady": "All Set!",
     "waitingForPlayers": "Waiting...",
     "ready": "Ready!",

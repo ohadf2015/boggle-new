@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { Trophy, Star, Users, Check } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import RoomChat from '@/components/RoomChat';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import type {
   WordObject,
@@ -17,8 +19,6 @@ import type {
 // Dynamic imports for heavy components
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
 const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/ConsolidatedPlayerCard'), { ssr: false });
-const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt'), { ssr: false });
-const MissedWordsComponent = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
@@ -147,9 +147,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
   isCurrentPlayerReady,
   onMarkReady,
 }) => {
-  // Derived state
-  const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
-
+  const { language } = useLanguage();
   return (
     <div className="space-y-3">
       {/* Game-mode specific summary */}
@@ -180,7 +178,6 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
           rank={currentPlayerRank}
           totalPlayers={sortedScores.length}
           winnerScore={winner?.score || 0}
-          allPlayerWords={allPlayerWords}
           xpGainedData={xpGainedData}
           levelUpData={levelUpData}
           archetype={currentPlayerArchetype}
@@ -189,24 +186,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         />
       )}
 
-      {/* Share Prompt */}
-      {currentPlayerData && gameCode && username && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (isCurrentUserWinner || (currentPlayerData.score || 0) >= 30) && (
-        <ShareWinPrompt
-          isWinner={isCurrentUserWinner}
-          username={username}
-          score={currentPlayerData.score || 0}
-          wordCount={currentPlayerValidWords.length}
-          achievements={achievements}
-          gameCode={gameCode}
-          streakDays={isCurrentUserWinner ? currentStreakCount : 0}
-          compact={!isCurrentUserWinner}
-          maxCombo={shareCardStats.maxCombo}
-          archetype={currentPlayerArchetype}
-          placement={currentPlayerRank}
-          totalPlayers={sortedScores.length}
-          longestWord={shareCardStats.longestWord}
-        />
-      )}
+      {/* Share Prompt removed from multiplayer results — decluttered per redesign */}
 
       {/* Other Players — auto-expand in 1v1 for natural word comparison */}
       {otherPlayers.length > 0 && (
@@ -256,20 +236,27 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
       </CollapsibleSection>
 
-      {/* Missed Words — auto-expand when few missed words (likely interesting ones) */}
-      {missedWords.length > 0 && (
-        <CollapsibleSection
-          title={t('results.missedWords')}
-          icon={<Star className="w-4 h-4" />}
-          badge={missedWords.length}
-          summary={t('results.missedWordsSummary', { count: missedWords.length })}
-          defaultExpanded={missedWords.length <= 5}
-          variant="tertiary"
-          className="shadow-hard"
-        >
-          <MissedWordsComponent missedWords={missedWords} maxDisplay={10} />
-        </CollapsibleSection>
-      )}
+      {/* Top Missed Word — single highlight instead of full list */}
+      {missedWords.length > 0 && (() => {
+        const topMissed = [...missedWords].sort((a, b) => b.score - a.score)[0];
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
+            className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-neo border border-white/10"
+          >
+            <Star className="w-4 h-4 text-neo-lime flex-shrink-0" />
+            <span className="text-xs font-bold text-slate-300 uppercase">{t('results.topMissedWord')}</span>
+            <span className="font-black text-sm text-white uppercase tracking-wide">
+              {language === 'he' ? applyHebrewFinalLetters(topMissed.word) : topMissed.word}
+            </span>
+            <span className="text-xs font-black bg-neo-lime/20 text-neo-lime px-1.5 py-0.5 rounded-sm">
+              +{topMissed.score}
+            </span>
+          </motion.div>
+        );
+      })()}
 
       {/* Room Chat */}
       {gameCode && sortedScores.length > 1 && username && (
@@ -284,7 +271,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
       )}
 
       {/* Sticky Ready chip — lets multiplayer users mark ready without tab-switching */}
-      {gameCode && onMarkReady && isCurrentPlayerReady === false && (
+      {gameCode && !isHost && onMarkReady && isCurrentPlayerReady === false && (
         <div className="sticky bottom-4 z-20 flex justify-center pointer-events-none">
           <motion.button
             initial={{ opacity: 0, y: 10 }}
