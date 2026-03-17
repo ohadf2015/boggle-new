@@ -4051,7 +4051,8 @@ const ja = {
       "multiplayerCTA": "マルチプレイヤーをプレイ"
     },
     "requestChallenge": "チャレンジをリクエスト",
-    "requestSent": "リクエスト送信済み"
+    "requestSent": "リクエスト送信済み",
+    "watchAdRetry": "広告を見てリトライ"
   },
   "dailyChallenge": {
     "pointsPerWord": "単語あたりのポイント"

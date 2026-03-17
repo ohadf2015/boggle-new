@@ -4009,7 +4009,8 @@ const he = {
       "multiplayerCTA": "שחק מרובה משתתפים"
     },
     "requestChallenge": "בקש אתגר",
-    "requestSent": "הבקשה נשלחה"
+    "requestSent": "הבקשה נשלחה",
+    "watchAdRetry": "צפו בפרסומת כדי לנסות שוב"
   },
   "dailyChallenge": {
     "pointsPerWord": "נקודות למילה"

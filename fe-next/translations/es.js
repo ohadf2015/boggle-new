@@ -4040,7 +4040,8 @@ const es = {
     "errorWordTooLong": "La palabra debe tener máximo {max} letras",
     "wordPlaceholder": "Escribe una palabra...",
     "bonusChallenge": "Desafío Bonus",
-    "continueMissions": "Continúa tus misiones diarias"
+    "continueMissions": "Continúa tus misiones diarias",
+    "watchAdRetry": "Ver anuncio para reintentar"
   },
   "dailyChallenge": {
     "pointsPerWord": "Puntos por palabra"

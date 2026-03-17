@@ -3999,7 +3999,8 @@ const sv = {
       "multiplayerCTA": "Spela Multiplayer"
     },
     "requestChallenge": "Begär utmaning",
-    "requestSent": "Förfrågan skickad"
+    "requestSent": "Förfrågan skickad",
+    "watchAdRetry": "Se reklam för att försöka igen"
   },
   "dailyChallenge": {
     "pointsPerWord": "Poäng per ord"

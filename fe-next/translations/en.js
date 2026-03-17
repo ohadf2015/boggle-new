@@ -4120,7 +4120,8 @@ const en = {
       "multiplayerCTA": "Play Multiplayer"
     },
     "requestChallenge": "Request Challenge",
-    "requestSent": "Request Sent"
+    "requestSent": "Request Sent",
+    "watchAdRetry": "Watch Ad to Retry"
   },
   "dailyChallenge": {
     "pointsPerWord": "Points per word"
