@@ -2,6 +2,7 @@
  * Bot Game Service
  *
  * Handles bot initialization and submission handling for multiplayer games.
+ * Includes score capping to ensure bots never outscore the best human player.
  */
 
 import type { Server } from 'socket.io';
@@ -11,12 +12,53 @@ import {
   updatePlayerScore,
   trackBotWord,
   getLeaderboard,
+  getGame,
 } from '../../modules/gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
 import type { BotSubmission } from './types';
 import type { Bot } from '../../modules/botBehavior';
+import { startBotsForWordHunt } from './botWordHunt';
+
+/** Score buffer when no human has scored yet — creates initial pressure */
+const BOT_SCORE_BUFFER = 20;
+
+/**
+ * Get the best human (non-bot) player's score in a game.
+ */
+export function getBestHumanScore(gameCode: string): number {
+  const leaderboard = getLeaderboard(gameCode);
+  let best = 0;
+  for (const entry of leaderboard) {
+    if (!entry.isBot && entry.score > best) {
+      best = entry.score;
+    }
+  }
+  return best;
+}
+
+/**
+ * Check whether a bot should be allowed to score.
+ * Bots must never exceed the best human player's score.
+ * When no human has scored, bots get a small buffer to create pressure.
+ */
+export function shouldBotScore(
+  gameCode: string,
+  _botUsername: string,
+  currentBotScore: number,
+  pendingScore: number
+): boolean {
+  const bestHuman = getBestHumanScore(gameCode);
+  const projectedScore = currentBotScore + pendingScore;
+
+  if (bestHuman === 0) {
+    // No human scored yet — allow up to buffer
+    return projectedScore <= BOT_SCORE_BUFFER;
+  }
+
+  return projectedScore <= bestHuman;
+}
 
 /**
  * Start bots for a game
@@ -34,6 +76,13 @@ export function startBotsForGame(
   const bots: Bot[] = botManager.getGameBots(gameCode);
   if (bots.length === 0) return;
 
+  // Word-hunt mode: bots need a different strategy (target guessing)
+  const game = getGame(gameCode);
+  if (game?.gameMode === 'word-hunt' && (game as any).wordHuntState) {
+    startBotsForWordHunt(io, gameCode, bots, (game as any).wordHuntState, language, timerSeconds);
+    return;
+  }
+
   // Safety check: ensure letterGrid is valid before starting bots
   if (!letterGrid || !Array.isArray(letterGrid) || letterGrid.length === 0) {
     logger.error('BOT', `Cannot start bots for game ${gameCode}: letterGrid is invalid`);
@@ -46,9 +95,6 @@ export function startBotsForGame(
   const gameStartTime = Date.now();
 
   for (const bot of bots) {
-    // Start each bot with its own callback
-    // Note: startBot is async but we intentionally don't await it here
-    // to allow bots to initialize in parallel without blocking
     botManager.startBot(
       bot,
       letterGrid,
@@ -56,12 +102,16 @@ export function startBotsForGame(
       async (submission: BotSubmission) => {
         const { username, word, score, comboLevel } = submission;
 
-        // Use the bot from closure - it's the same bot object
         if (!bot || !bot.isActive) return;
 
-        // Safety check: ensure word is valid
         if (!word || typeof word !== 'string') {
           logger.warn('BOT', `Bot "${username}" submitted invalid word: ${word}`);
+          return;
+        }
+
+        // Score cap: don't let bot outscore best human
+        if (!shouldBotScore(gameCode, username, bot.score, score)) {
+          logger.debug('BOT', `Bot "${username}" score capped (would exceed best human)`);
           return;
         }
 

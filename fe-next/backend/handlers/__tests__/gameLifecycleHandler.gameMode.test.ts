@@ -136,6 +136,15 @@ jest.mock('../../../backend/utils/socketValidation', () => ({
 
 jest.mock('../../../backend/modules/botManager', () => ({
   stopAllBots: jest.fn(),
+  getGameBots: jest.fn(() => []),
+  addBot: jest.fn(() => ({
+    id: 'bot-1', username: 'TestBot', difficulty: 'medium',
+    avatar: { avatarImage: 'pizza' },
+  })),
+  addBotWithAdaptiveDifficulty: jest.fn(async () => ({
+    id: 'bot-1', username: 'TestBot', difficulty: 'medium',
+    avatar: { avatarImage: 'pizza' },
+  })),
 }));
 
 jest.mock('../../../backend/modules/spamDetector', () => ({

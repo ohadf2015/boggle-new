@@ -17,6 +17,8 @@ export { handleTournamentCompletion } from './tournamentEnd';
 
 // Bot management
 export { startBotsForGame } from './botGame';
+export { autoAddBotsForSoloPlayer } from './autoAddBots';
+export { startBotsForWordHunt } from './botWordHunt';
 
 // Types
 export type {

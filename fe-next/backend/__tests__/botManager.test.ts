@@ -308,7 +308,7 @@ describe('Bot Manager', () => {
       expect(result.name).toBeDefined();
       expect(result.name.length).toBeGreaterThan(0);
       expect(result.avatar).toBeDefined();
-      expect(result.avatar.avatarImage).toBeDefined();
+      expect(result.avatar.customAvatar).toBeDefined();
     });
 
     test('generateRandomPlayerName avoids existing names', () => {
@@ -331,7 +331,7 @@ describe('Bot Manager', () => {
       const avatar = getRandomGenericAvatar();
 
       expect(avatar).toBeDefined();
-      expect(avatar.avatarImage).toBeDefined();
+      expect(avatar.customAvatar).toBeDefined();
       expect(avatar.emoji).toBeDefined();
       expect(avatar.color).toBeDefined();
     });

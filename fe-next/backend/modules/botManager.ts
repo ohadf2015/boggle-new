@@ -11,6 +11,7 @@
  */
 
 import type { LetterGrid, Language } from '@/shared/types/game';
+import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { Bot, WordSubmissionData } from './botBehavior';
 
  
@@ -26,7 +27,6 @@ const {
   getCacheStats,
   addWordToBlacklist,
 } = require('./botBehavior');
-const { getRandomAvatar } = require('./avatarConfig');
 const logger = require('../utils/logger');
 
 // Re-export Bot type
@@ -37,7 +37,8 @@ export { addWordToBlacklist };
 
 // Avatar interface
 export interface BotAvatar {
-  avatarImage: string;
+  avatarImage?: string;
+  customAvatar?: CustomAvatarConfig;
   emoji?: string;
   color?: string;
 }
@@ -129,14 +130,15 @@ function generateBotName(difficulty: string, existingNames: string[] = [], langu
 
   // Add localized "Bot" suffix and maybe a number
   const suffix = Math.random() > 0.5 ? ` ${Math.floor(Math.random() * 99) + 1}` : '';
+  const botName = `${entry.name} ${botSuffix}${suffix}`.trim();
 
-  // Get random avatar image
-  const avatarImage = getRandomAvatar();
+  // Generate a unique custom avatar seeded from the bot name (deterministic)
+  const customAvatar = getSeededAvatarConfig(hashString(botName));
 
   return {
-    name: `${entry.name} ${botSuffix}${suffix}`.trim(),
+    name: botName,
     avatar: {
-      avatarImage: avatarImage.id,
+      customAvatar,
       // Keep emoji/color for backward compatibility
       emoji: entry.emoji,
       color: entry.color,
@@ -164,13 +166,13 @@ export function generateRandomPlayerName(existingNames: string[] = [], language:
     ? availableEntries[Math.floor(Math.random() * availableEntries.length)]
     : namePool[Math.floor(Math.random() * namePool.length)];
 
-  // Get random avatar image
-  const avatarImage = getRandomAvatar();
+  // Generate a unique custom avatar seeded from the name
+  const customAvatar = getSeededAvatarConfig(hashString(entry.name));
 
   return {
     name: entry.name,
     avatar: {
-      avatarImage: avatarImage.id,
+      customAvatar,
       // Keep emoji/color for backward compatibility
       emoji: entry.emoji,
       color: entry.color,
@@ -187,11 +189,11 @@ export function getRandomGenericAvatar(): BotAvatar {
   const avatars = BOT_CONFIG.GENERIC_AVATARS;
   const legacyAvatar = avatars[Math.floor(Math.random() * avatars.length)];
 
-  // Get random avatar image
-  const avatarImage = getRandomAvatar();
+  // Generate random custom avatar
+  const customAvatar = getSeededAvatarConfig(hashString(`generic-${Date.now()}-${Math.random()}`));
 
   return {
-    avatarImage: avatarImage.id,
+    customAvatar,
     // Keep emoji/color for backward compatibility
     emoji: legacyAvatar.emoji,
     color: legacyAvatar.color,

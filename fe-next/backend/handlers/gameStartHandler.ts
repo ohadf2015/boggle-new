@@ -46,6 +46,7 @@ import { BLAST_MP_DEFAULT_TIMER } from '@/shared/constants/gameConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
+import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 
 interface StartGamePayload {
   letterGrid: LetterGrid;
@@ -276,6 +277,18 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     ensureGame(gameCode);
 
     initializePlayerData(game as unknown as Game, gameCode);
+
+    // Auto-add bots if solo player started the game
+    const autoAddResult = await autoAddBotsForSoloPlayer(gameCode, game as any);
+    if (autoAddResult.botsAdded > 0) {
+      // Re-initialize player data to include bots
+      initializePlayerData(game as unknown as Game, gameCode);
+      // Broadcast updated user list so clients see the bots
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode),
+      });
+      logger.info('BOT', `Auto-added ${autoAddResult.botsAdded} bots for solo player in ${gameCode}`);
+    }
 
     const users = getGameUsers(gameCode);
     const playerUsernames = users.map(u => u.username);
