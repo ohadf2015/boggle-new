@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, renderHook } from '@testing-library/react';
 
 // ─── Shared mocks ────────────────────────────────────────────────
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -101,7 +101,6 @@ describe('Fix 1: LevelCompleteModal canRetryFree prop', () => {
 });
 
 // ─── Fix 2 & 3: useAdventureLevelCompletion sends loot + retainedScore ──
-import { renderHook } from '@testing-library/react';
 import { useAdventureLevelCompletion } from '../hooks/useAdventureLevelCompletion';
 
 jest.mock('@/shared/utils/adventureXpUtils', () => ({
