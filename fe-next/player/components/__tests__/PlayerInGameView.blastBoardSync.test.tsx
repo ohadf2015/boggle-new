@@ -26,6 +26,7 @@ jest.mock('@/hooks/gameState/store', () => ({
   useWordHuntTargetFound: () => false,
   useWordHuntPlayerLives: () => ({}),
   useWordHuntEliminatedPlayers: () => [],
+  useGameStore: (selector: (s: any) => any) => selector({ gameDuration: 120 }),
 }));
 
 jest.mock('@/components/game/InGameScreen', () => ({

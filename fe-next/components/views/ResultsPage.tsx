@@ -515,7 +515,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Quick Reactions bar above tab bar */}
         {sortedScores.length > 1 && (
-          <div className="flex-shrink-0 fixed bottom-14 inset-x-0 z-50 flex justify-center pb-1 safe-area-bottom">
+          <div className="flex-shrink-0 fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] inset-x-0 z-40 flex justify-center pb-1">
             <QuickReactions onReaction={sendReaction} layout="bar" />
           </div>
         )}

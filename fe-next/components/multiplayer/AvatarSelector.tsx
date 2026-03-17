@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Pencil } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
@@ -12,22 +12,52 @@ interface AvatarSelectorProps {
   selectedAvatar: CustomAvatarConfig | null;
   onAvatarChange: (config: CustomAvatarConfig) => void;
   className?: string;
+  /** Compact mode: circular avatar only, no wide button. Used inline with name input. */
+  compact?: boolean;
 }
 
 export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
   selectedAvatar,
   onAvatarChange,
   className,
+  compact,
 }) => {
   const { t } = useLanguage();
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
 
   const currentConfig = selectedAvatar ?? getRandomAvatarConfig();
 
-  const handleSave = (config: CustomAvatarConfig) => {
+  const handleSave = useCallback((config: CustomAvatarConfig) => {
     onAvatarChange(config);
     setIsBuilderOpen(false);
-  };
+  }, [onAvatarChange]);
+
+  if (compact) {
+    return (
+      <div className={cn('flex-shrink-0', className)}>
+        <button
+          type="button"
+          onClick={() => setIsBuilderOpen(true)}
+          className="group relative"
+          aria-label={t('profile.chooseAvatar')}
+        >
+          <div className="w-16 h-16 rounded-full border-3 border-neo-black shadow-hard-sm overflow-hidden group-hover:border-neo-cyan transition-colors">
+            <AvatarRenderer config={currentConfig} size={64} />
+          </div>
+          <div className="absolute -bottom-0.5 -end-0.5 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+            <Pencil className="w-3 h-3 text-neo-black" />
+          </div>
+        </button>
+
+        <AvatarBuilderModal
+          isOpen={isBuilderOpen}
+          onClose={() => setIsBuilderOpen(false)}
+          onSave={handleSave}
+          initialConfig={currentConfig}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={cn('space-y-2', className)}>

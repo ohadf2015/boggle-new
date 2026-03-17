@@ -35,6 +35,7 @@ jest.mock('@/hooks/gameState/store', () => ({
   useWordHuntTargetFound: () => mockWordHuntTargetFound.value,
   useWordHuntPlayerLives: () => ({}),
   useWordHuntEliminatedPlayers: () => [],
+  useGameStore: (selector: (s: any) => any) => selector({ gameDuration: 120 }),
 }));
 
 // Mock cn utility

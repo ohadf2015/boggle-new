@@ -54,7 +54,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   // Game state
   letterGrid,
   remainingTime,
-  timerValue = 3,
+  timerValue = 2,
   gameActive = true,
   showStartAnimation = false,
   gameLanguage = 'en',

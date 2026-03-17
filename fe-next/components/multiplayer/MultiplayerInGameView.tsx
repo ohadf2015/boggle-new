@@ -356,7 +356,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           // Game state
           letterGrid={effectiveGrid}
           remainingTime={remainingTime}
-          timerValue={timerValue ?? 3}
+          timerValue={timerValue ?? 2}
           gameActive={gameActive}
           showStartAnimation={showStartAnimation}
           gameLanguage={gameLanguage}

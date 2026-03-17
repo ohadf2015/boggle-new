@@ -32,6 +32,7 @@ const initialState: GameState = {
   gameActive: false,
   letterGrid: null,
   remainingTime: null,
+  gameDuration: null,
   gameLanguage: null,
   minWordLength: 2,
   totalBoardWords: null,
@@ -102,6 +103,8 @@ export const useGameStore = create<GameStore>()(
     setRemainingTime: (value) => set((state) => ({
       remainingTime: applySetState(value, state.remainingTime)
     })),
+
+    setGameDuration: (value) => set({ gameDuration: value }),
 
     setGameLanguage: (value) => set((state) => ({
       gameLanguage: applySetState(value, state.gameLanguage)
@@ -384,7 +387,7 @@ export const useGameStore = create<GameStore>()(
         foundWords: [],
         achievements: [],
         ...(data.letterGrid !== undefined && { letterGrid: data.letterGrid }),
-        ...(data.remainingTime !== undefined && { remainingTime: data.remainingTime }),
+        ...(data.remainingTime !== undefined && { remainingTime: data.remainingTime, gameDuration: data.remainingTime }),
         ...(data.gameLanguage !== undefined && { gameLanguage: data.gameLanguage }),
         ...(data.minWordLength !== undefined && { minWordLength: data.minWordLength }),
         ...(data.boardTheme !== undefined && { boardTheme: data.boardTheme }),
@@ -421,6 +424,7 @@ export const useGameStore = create<GameStore>()(
         gameActive: false,
         letterGrid: null,
         remainingTime: null,
+        gameDuration: null,
         totalBoardWords: null,
         foundWords: [],
         achievements: [],

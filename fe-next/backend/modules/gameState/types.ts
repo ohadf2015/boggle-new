@@ -86,6 +86,7 @@ export interface GameState {
   boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null;
   tournamentId: string | null;
   reconnectionTimeout: ReturnType<typeof setTimeout> | null;
+  hostReconnectionTimeout?: ReturnType<typeof setTimeout> | null;
   validationTimeout?: ReturnType<typeof setTimeout> | null;
   isRanked: boolean;
   allowLateJoin: boolean;
@@ -117,6 +118,7 @@ export interface GameState {
   modeHistory?: GameMode[];
   blastModeState?: BlastModeState | null;
   wordHuntState?: WordHuntState | null;
+  kickedPlayers?: Set<string>;
 }
 
 // Game creation data interface

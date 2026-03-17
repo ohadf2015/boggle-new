@@ -5,7 +5,6 @@
  * Extracted from AdventureGrid.tsx to improve maintainability.
  */
 
-import React from 'react';
 import { Bomb, Link2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TileType } from '@/types/adventure';
@@ -37,10 +36,10 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
         className={cn(
           'tile-gold-badge',
           'absolute -top-1.5 -right-1.5 z-20',
-          'min-w-[20px] h-[20px]',
+          'min-w-[24px] h-[24px]',
           'flex items-center justify-center',
           'bg-neo-black text-neo-yellow',
-          'text-[10px] font-black',
+          'text-[11px] font-black',
           'rounded-full border-2 border-neo-yellow',
           'shadow-[0_0_10px_rgba(255,225,53,0.7)]'
         )}
@@ -56,10 +55,10 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
       <span
         className={cn(
           'absolute -top-1.5 -right-1.5 z-20',
-          'min-w-[20px] h-[20px]',
+          'min-w-[24px] h-[24px]',
           'flex items-center justify-center',
           'bg-neo-black text-neo-white',
-          'text-[14px] font-black',
+          'text-[15px] font-black',
           'rounded-full border-2 border-purple-400',
           'shadow-[0_0_10px_rgba(168,85,247,0.6)]'
         )}
@@ -76,7 +75,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
         <div
           className={cn(
             'absolute -top-1 -right-1 z-20',
-            'w-5 h-5',
+            'w-6 h-6',
             'flex items-center justify-center',
             'bg-neo-black rounded-full',
             'border-2 border-orange-500',
@@ -99,7 +98,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
       <div
         className={cn(
           'absolute -top-1 -right-1 z-20',
-          'w-5 h-5',
+          'w-6 h-6',
           'flex items-center justify-center',
           'bg-neo-black rounded-full',
           'border-2 border-purple-400',
@@ -117,7 +116,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
       <div
         className={cn(
           'absolute -top-1 -right-1 z-20',
-          'w-5 h-5',
+          'w-6 h-6',
           'flex items-center justify-center',
           'bg-neo-black rounded-full',
           'border-2 border-emerald-400',

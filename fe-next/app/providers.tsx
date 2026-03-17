@@ -20,7 +20,6 @@
 import React, { useEffect, ReactNode } from 'react';
 import { AchievementQueueProvider } from '@/components/achievements';
 import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
-import { CoinProvider } from '@/contexts/CoinContext';
 import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { NativeAppProvider } from '@/components/native/NativeAppProvider';
 import { NetworkStatusHandler } from '@/components/native/NetworkStatusHandler';
@@ -78,12 +77,11 @@ if (typeof window !== 'undefined') {
     initHowler();
 }
 
-// Core game feature providers (achievements, coins, announcer)
-// Note: CoinProvider requires AuthProvider which is in EssentialProviders
+// Core game feature providers (achievements, announcer)
+// Note: CoinProvider moved to EssentialProviders (needed on profile page for avatar purchases)
 const CoreGameProviders = composeProviders([
     [GameAnnouncerProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AchievementQueueProvider as React.ComponentType<{ children: ReactNode }>, {}],
-    [CoinProvider as React.ComponentType<{ children: ReactNode }>, {}],
 ]);
 
 interface GameSpecificProvidersProps {

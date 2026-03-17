@@ -23,6 +23,7 @@ import {
   useWordHuntTargetFound,
   useWordHuntPlayerLives,
   useWordHuntEliminatedPlayers,
+  useGameStore,
 } from '@/hooks/gameState/store';
 
 // ==================== Hint Types ====================
@@ -199,6 +200,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Game mode state from Zustand
   const gameMode = useGameMode();
+  const gameDuration = useGameStore((s) => s.gameDuration);
   const blastTileOverlay = useBlastTileOverlay();
 
   const wordHuntTargetLength = useWordHuntTargetLength();
@@ -303,7 +305,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           // Game state
           letterGrid={effectiveGrid}
           remainingTime={remainingTime}
-          timerValue={3}
+          timerValue={gameDuration ? gameDuration / 60 : 2}
           gameActive={gameActive}
           showStartAnimation={showStartAnimation}
           gameLanguage={gameLanguage}

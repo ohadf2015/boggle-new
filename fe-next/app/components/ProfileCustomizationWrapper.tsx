@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
-import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import logger from '@/utils/logger';
 
 // Dynamic import for ProfileCustomizationModal (not needed on initial page load)
@@ -46,18 +46,13 @@ export default function ProfileCustomizationWrapper() {
   }, [isMounted, needsProfileCustomization]);
 
   // Handle profile customization save
-  const handleSave = useCallback(async (name: string, avatarId: string) => {
-    logger.info('ProfileCustomizationWrapper: Saving profile', { name, avatarId });
-
-    // Get emoji and color for the selected avatar
-    const { emoji, color } = getAvatarEmojiAndColor(avatarId);
+  const handleSave = useCallback(async (name: string, avatarConfig: CustomAvatarConfig) => {
+    logger.info('ProfileCustomizationWrapper: Saving profile', { name });
 
     await updateProfile({
       display_name: name,
       username: name,
-      avatar_image: avatarId,
-      avatar_emoji: emoji,
-      avatar_color: color,
+      avatar_config: avatarConfig,
       has_customized_profile: true,
     });
 
@@ -85,7 +80,7 @@ export default function ProfileCustomizationWrapper() {
       isOpen={showModal}
       onClose={handleClose}
       defaultName={profile.display_name || profile.username || ''}
-      profilePictureUrl={profile.profile_picture_url ?? undefined}
+      initialAvatar={profile.avatar_config}
       onSave={handleSave}
     />
   );

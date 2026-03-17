@@ -186,6 +186,7 @@ export function useHostGameEvents({
       }
       if (data.timerSeconds !== undefined) {
         setRemainingTime(data.timerSeconds);
+        useGameStore.getState().setGameDuration(data.timerSeconds);
       }
 
       // Sync language from server broadcast (mirrors player handler)

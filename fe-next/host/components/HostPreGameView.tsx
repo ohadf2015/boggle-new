@@ -418,7 +418,7 @@ function HostPreGameView({
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.85, y: -5 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                    className="absolute top-full end-0 mt-2 z-30 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[150px]"
+                    className="absolute top-full end-0 mt-2 z-50 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[150px]"
                   >
                     {([
                       { key: 'easy' as const, icon: Sparkles, color: 'text-neo-lime', bg: 'bg-neo-lime', emoji: '🌱' },
@@ -490,25 +490,27 @@ function HostPreGameView({
 
         {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col flex-1 min-h-0">
-          <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0">
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0 pb-24">
             <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
             <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={0}>
-              <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} maxPlayers={maxPlayers} t={t} />
-            </motion.div>
-            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={1}>
               <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
             </motion.div>
-            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
+            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={1}>
               <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} />
             </motion.div>
-            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
+            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
               <MobileShareSection gameCode={gameCode} t={t} />
             </motion.div>
-            <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={4}>
+            <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
               <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64 sm:h-80">
                 <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
               </div>
             </motion.div>
+          </div>
+
+          {/* Sticky Start Button at bottom */}
+          <div className="sticky bottom-0 z-20 px-4 py-3 bg-neo-navy/95 border-t-3 border-neo-black backdrop-blur-sm">
+            <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} maxPlayers={maxPlayers} t={t} />
           </div>
         </div>
       </main>

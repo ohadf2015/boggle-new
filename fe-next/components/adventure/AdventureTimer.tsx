@@ -92,13 +92,13 @@ const AdventureTimer = memo<AdventureTimerProps>(
 
     // Size classes
     const sizeClasses = {
-      compact: 'text-xs sm:text-sm px-2 py-1 gap-1',
+      compact: 'text-sm sm:text-base px-2.5 py-1.5 gap-1.5',
       normal: 'text-lg px-3 py-2 gap-2',
       large: 'text-3xl px-4 py-3 gap-3',
     };
 
     const iconSizes = {
-      compact: 'w-3 h-3 sm:w-4 sm:h-4',
+      compact: 'w-4 h-4 sm:w-5 sm:h-5',
       normal: 'w-5 h-5',
       large: 'w-8 h-8',
     };

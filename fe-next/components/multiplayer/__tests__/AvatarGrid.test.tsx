@@ -163,7 +163,8 @@ describe('Avatar Builder Integration', () => {
 
     it('should render AvatarSelector with builder button', () => {
       render(<JoinRoomModal {...joinProps} />);
-      expect(screen.getByText('Choose Avatar')).toBeInTheDocument();
+      // JoinRoomModal uses compact AvatarSelector — text is in aria-label, not visible
+      expect(screen.getByLabelText('Choose Avatar')).toBeInTheDocument();
       expect(screen.getByTestId('avatar-renderer')).toBeInTheDocument();
     });
 
@@ -171,8 +172,8 @@ describe('Avatar Builder Integration', () => {
       const user = userEvent.setup();
       render(<JoinRoomModal {...joinProps} />);
 
-      const avatarButton = screen.getByText('Choose Avatar').closest('button');
-      await user.click(avatarButton!);
+      const avatarButton = screen.getByLabelText('Choose Avatar');
+      await user.click(avatarButton);
 
       expect(screen.getByTestId('avatar-builder-modal')).toBeInTheDocument();
     });
@@ -202,7 +203,8 @@ describe('Avatar Builder Integration', () => {
 
     it('should render AvatarSelector with builder button', () => {
       render(<CreateRoomModal {...createProps} />);
-      expect(screen.getByText('Choose Avatar')).toBeInTheDocument();
+      // CreateRoomModal uses compact AvatarSelector — text is in aria-label, not visible
+      expect(screen.getByLabelText('Choose Avatar')).toBeInTheDocument();
       expect(screen.getByTestId('avatar-renderer')).toBeInTheDocument();
     });
 

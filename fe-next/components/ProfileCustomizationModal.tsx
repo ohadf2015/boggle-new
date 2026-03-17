@@ -2,40 +2,38 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { Check, X } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AVATARS, getAvatarPath, getAvatarById, getRandomAvatar } from '@/utils/avatarConfig';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
 import { cn } from '@/lib/utils';
-import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 
 interface ProfileCustomizationModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultName: string;
-  profilePictureUrl?: string;
-  onSave: (name: string, avatarId: string) => Promise<void>;
+  initialAvatar?: CustomAvatarConfig | null;
+  onSave: (name: string, avatarConfig: CustomAvatarConfig) => Promise<void>;
 }
 
 /**
  * ProfileCustomizationModal - Compact modal for new users to customize their profile
- * Shows avatar grid + name input together for quick personalization
+ * Uses the AvatarBuilderModal (via AvatarSelectorButton) for avatar customization
  */
 const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   isOpen,
   onClose,
   defaultName,
-  profilePictureUrl,
+  initialAvatar,
   onSave,
 }) => {
   const { t, dir } = useLanguage();
 
-  // Pre-select profile picture if available, otherwise random avatar
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string>(() =>
-    profilePictureUrl ? PROFILE_AVATAR_ID : getRandomAvatar().id
+  const [selectedAvatar, setSelectedAvatar] = useState<CustomAvatarConfig>(
+    () => initialAvatar ?? getRandomAvatarConfig()
   );
   const [displayName, setDisplayName] = useState(defaultName);
   const [isSaving, setIsSaving] = useState(false);
@@ -45,10 +43,10 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setDisplayName(defaultName);
-      setSelectedAvatarId(profilePictureUrl ? PROFILE_AVATAR_ID : getRandomAvatar().id);
+      setSelectedAvatar(initialAvatar ?? getRandomAvatarConfig());
       setNameTouched(false);
     }
-  }, [isOpen, defaultName, profilePictureUrl]);
+  }, [isOpen, defaultName, initialAvatar]);
 
   // Name validation
   const minLength = 2;
@@ -66,11 +64,11 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   };
 
   const handleSave = async () => {
-    if (!isNameValid || !selectedAvatarId) return;
+    if (!isNameValid) return;
 
     setIsSaving(true);
     try {
-      await onSave(displayName.trim(), selectedAvatarId);
+      await onSave(displayName.trim(), selectedAvatar);
       onClose();
     } catch (error) {
       console.error('Failed to save profile:', error);
@@ -80,10 +78,9 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   };
 
   const handleSkip = async () => {
-    // Use current defaults and mark as customized
     setIsSaving(true);
     try {
-      await onSave(defaultName, selectedAvatarId);
+      await onSave(defaultName, selectedAvatar);
       onClose();
     } catch (error) {
       console.error('Failed to skip:', error);
@@ -91,9 +88,6 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
       setIsSaving(false);
     }
   };
-
-  const selectedAvatar = getAvatarById(selectedAvatarId) || AVATARS[0];
-  const isUsingProfilePicture = selectedAvatarId === PROFILE_AVATAR_ID;
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
@@ -115,134 +109,19 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
             {t('profileCustomization.subtitle')}
           </p>
 
-          {/* Avatar grid */}
-          <div className="w-full">
-            <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-2">
-              {t('profileCustomization.avatarLabel')}
-            </label>
-            <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-2">
-              {/* Profile Picture Option (if available) */}
-              {profilePictureUrl && (
-                <motion.button
-                  onClick={() => setSelectedAvatarId(PROFILE_AVATAR_ID)}
-                  className={cn(
-                    'relative aspect-square rounded-neo border-2 overflow-hidden',
-                    'transition-all hover:scale-105 active:scale-95',
-                    'min-h-[48px] min-w-[48px] sm:min-h-[40px] sm:min-w-[40px]',
-                    isUsingProfilePicture
-                      ? 'border-neo-cyan shadow-hard-sm scale-105 ring-2 ring-neo-pink'
-                      : 'border-neo-black shadow-hard-sm hover:shadow-hard-md'
-                  )}
-                  initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.05 }}
-                  whileHover={{ scale: isUsingProfilePicture ? 1.05 : 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Image
-                    src={profilePictureUrl}
-                    alt="Your Profile"
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-
-                  {/* Selected indicator */}
-                  {isUsingProfilePicture && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center"
-                    >
-                      <div className="bg-neo-pink text-white border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-hard-sm">
-                        ✓
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Label */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[8px] font-bold text-center py-0.5">
-                    YOU
-                  </div>
-                </motion.button>
-              )}
-
-              {/* Regular Character Avatars */}
-              {AVATARS.map((avatar, index) => {
-                const isSelected = !isUsingProfilePicture && avatar.id === selectedAvatarId;
-
-                return (
-                  <motion.button
-                    key={avatar.id}
-                    onClick={() => setSelectedAvatarId(avatar.id)}
-                    className={cn(
-                      'relative aspect-square rounded-neo border-2 overflow-hidden',
-                      'transition-all hover:scale-105 active:scale-95',
-                      'min-h-[48px] min-w-[48px] sm:min-h-[40px] sm:min-w-[40px]',
-                      isSelected
-                        ? 'border-neo-cyan shadow-hard-sm scale-105 ring-2 ring-neo-pink'
-                        : 'border-neo-black shadow-hard-sm hover:shadow-hard-md'
-                    )}
-                    initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
-                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.05 + index * 0.015 }}
-                    whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Image
-                      src={getAvatarPath(avatar)}
-                      alt={avatar.name}
-                      fill
-                      sizes="48px"
-                      className="object-cover"
-                    />
-
-                    {/* Selected indicator */}
-                    {isSelected && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center"
-                      >
-                        <div className="bg-neo-pink text-white border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-hard-sm">
-                          ✓
-                        </div>
-                      </motion.div>
-                    )}
-                  </motion.button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Selected avatar preview + Name input */}
+          {/* Avatar + Name input */}
           <div className="bg-neo-cream dark:bg-slate-700 border-3 border-neo-black dark:border-slate-600 rounded-neo p-3 shadow-hard-md">
-            <div className="flex items-start gap-3">
-              {/* Avatar preview */}
-              <div className="flex flex-col items-center gap-1 shrink-0">
-                <div className="relative w-16 h-16 sm:w-14 sm:h-14 rounded-full overflow-hidden border-3 border-neo-black dark:border-slate-500 shadow-hard-sm">
-                  {isUsingProfilePicture && profilePictureUrl ? (
-                    <Image
-                      src={profilePictureUrl}
-                      alt="Your Profile"
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <Image
-                      src={getAvatarPath(selectedAvatar)}
-                      alt={selectedAvatar.name}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                    />
-                  )}
-                </div>
-                <div className="text-[10px] text-neo-black/60 dark:text-gray-400 text-center max-w-[60px] truncate">
-                  {isUsingProfilePicture ? 'Your Profile' : selectedAvatar.name}
+            <div className="flex items-start gap-3 sm:gap-4">
+              {/* Avatar builder button */}
+              <div className="flex flex-col items-center gap-2 shrink-0">
+                <AvatarSelectorButton
+                  selectedAvatar={selectedAvatar}
+                  onAvatarSelect={setSelectedAvatar}
+                  t={t}
+                  size="lg"
+                />
+                <div className="text-[10px] sm:text-xs text-neo-black/60 dark:text-gray-400 text-center">
+                  {t('onboarding.profile.tapToCustomize', 'Tap to customize')}
                 </div>
               </div>
 
@@ -299,7 +178,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                       showNameError ? 'text-neo-red' : 'text-neo-black/60 dark:text-gray-400'
                     )}
                   >
-                    {showNameError ? getErrorMessage() : `${minLength}-${maxLength} chars`}
+                    {showNameError ? getErrorMessage() : `${minLength}-${maxLength} ${t('onboarding.name.characterCount', 'chars')}`}
                   </div>
                   <div
                     className={cn(

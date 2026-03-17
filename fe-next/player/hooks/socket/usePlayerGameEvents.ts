@@ -217,7 +217,10 @@ export function usePlayerGameEvents({
         achievements: [],
       };
       if (data.letterGrid) storeUpdates.letterGrid = data.letterGrid;
-      if (data.timerSeconds) storeUpdates.remainingTime = data.timerSeconds;
+      if (data.timerSeconds) {
+        storeUpdates.remainingTime = data.timerSeconds;
+        storeUpdates.gameDuration = data.timerSeconds;
+      }
       if (data.language) storeUpdates.gameLanguage = data.language;
       if (data.minWordLength) storeUpdates.minWordLength = data.minWordLength;
       if ((data as any).boardTheme) storeUpdates.boardTheme = (data as any).boardTheme;

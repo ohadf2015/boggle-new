@@ -96,12 +96,10 @@ function registerConnectionHandlers(io: Server, socket: Socket): void {
 function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: string, username: string, reason: string): void {
   logger.info('SOCKET', `Host (${username}) disconnected from game ${gameCode}`);
 
-  // Clear any existing host reconnection timeout
-  // NOTE: Stored as hostReconnectionTimeout to avoid conflicts if multiple
-  // disconnect events fire simultaneously (per-user isolation)
-  if ((game as any).hostReconnectionTimeout) {
-    clearTimeout((game as any).hostReconnectionTimeout);
-    (game as any).hostReconnectionTimeout = null;
+  // Clear any existing host reconnection timeout to prevent double-fire
+  if (game.hostReconnectionTimeout) {
+    clearTimeout(game.hostReconnectionTimeout);
+    game.hostReconnectionTimeout = null;
   }
 
   // Notify game start coordinator so ack sequence adjusts for the missing player
@@ -164,7 +162,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   });
 
   // Start grace period for host reconnection
-  (game as any).hostReconnectionTimeout = setTimeout(() => {
+  game.hostReconnectionTimeout = setTimeout(() => {
     const currentGame = getGame(gameCode);
     if (!currentGame) return;
 

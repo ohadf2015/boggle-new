@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, Plus, X, Wand2 } from 'lucide-react';
+import { Bot, X, Wand2 } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { cn } from '../lib/utils';
@@ -70,12 +70,10 @@ const BotControls: React.FC<BotControlsProps> = ({
   maxPlayers = 8,
 }) => {
   const { t } = useLanguage();
-  const [addingDifficulty, setAddingDifficulty] = useState<BotDifficulty | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState<string>('');
   const bots = players.filter(p => p.isBot === true);
   const playerCount = players.length;
-  const canAddMore = playerCount < maxPlayers;
 
   const {
     autoFillEnabled,
@@ -93,7 +91,6 @@ const BotControls: React.FC<BotControlsProps> = ({
     if (!socket) return;
 
     const handleBotAdded = (data: { username?: string; difficulty?: string }): void => {
-      setAddingDifficulty(null);
       setError(null);
       if (data?.username) {
         setAnnouncement(`${data.username} bot added`);
@@ -111,7 +108,6 @@ const BotControls: React.FC<BotControlsProps> = ({
     };
 
     const handleError = (message: string | { message: string }): void => {
-      setAddingDifficulty(null);
       const errorMsg = typeof message === 'string' ? message : message.message;
       if (errorMsg && errorMsg.toLowerCase().includes('bot')) {
         setError(errorMsg);
@@ -134,16 +130,6 @@ const BotControls: React.FC<BotControlsProps> = ({
     if (!socket || disabled) return;
     socket.emit('removeBot', { botUsername });
   }, [socket, disabled]);
-
-  const handleAddBot = useCallback((difficulty: BotDifficulty): void => {
-    if (!socket || !canAddMore || addingDifficulty || disabled) return;
-
-    setAddingDifficulty(difficulty);
-    setError(null);
-    socket.emit('addBot', { difficulty });
-
-    setTimeout(() => setAddingDifficulty(null), 3000);
-  }, [socket, canAddMore, addingDifficulty, disabled]);
 
   const getDifficultyConfig = (difficulty: BotDifficulty | undefined): BotDifficultyOption => {
     return BOT_DIFFICULTIES.find(d => d.value === difficulty) || BOT_DIFFICULTIES[1];
@@ -212,50 +198,6 @@ const BotControls: React.FC<BotControlsProps> = ({
         </div>
       </div>
 
-      {/* Manual Add Section */}
-      <div className="relative space-y-2">
-        <p className="text-xs text-neo-cream/60">
-          {t('bots.orAddManually')}
-        </p>
-
-        <div className="flex flex-wrap gap-2">
-          {BOT_DIFFICULTIES.map((diff) => {
-            const isAdding = addingDifficulty === diff.value;
-            const isDisabled = !canAddMore || isAdding || disabled || addingDifficulty !== null;
-
-            return (
-              <motion.button
-                key={diff.value}
-                type="button"
-                onClick={() => handleAddBot(diff.value)}
-                disabled={isDisabled}
-                whileTap={{ scale: 0.95 }}
-                aria-label={`Add ${diff.value} bot`}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 rounded-neo text-sm font-bold",
-                  "border-2 border-neo-black transition-all duration-100",
-                  "min-h-[44px]",
-                  diff.color,
-                  !isDisabled && "shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
-                  !isDisabled && "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
-                  isDisabled && "opacity-50 cursor-not-allowed shadow-none"
-                )}
-              >
-                <Plus size={10} aria-hidden="true" />
-                <span aria-hidden="true">{diff.icon}</span>
-                <span>{isAdding ? '...' : (t(diff.labelKey) || diff.value)}</span>
-              </motion.button>
-            );
-          })}
-        </div>
-
-        {!canAddMore && (
-          <p className="text-xs text-neo-cream/50">
-            {t('bots.roomFull')}
-          </p>
-        )}
-      </div>
-
       {/* Current Bots List */}
       {bots.length > 0 && (
         <div className="relative space-y-2">
@@ -322,14 +264,6 @@ const BotControls: React.FC<BotControlsProps> = ({
         </div>
       )}
 
-      {/* Empty State */}
-      {bots.length === 0 && !autoFillEnabled && (
-        <div className="relative text-center py-2">
-          <p className="text-sm text-neo-cream/50">
-            {t('bots.emptyState')}
-          </p>
-        </div>
-      )}
     </div>
   );
 };

@@ -79,8 +79,8 @@ export const GameHeader = memo(function GameHeader({
         whileHover={{ scale: 1.02 }}
         aria-label={`${t('adventure.world')} ${worldNumber}, ${t('adventure.level')} ${levelNumber}`}
       >
-        <MapPin className={cn('w-3.5 h-3.5', hudTheme.levelBadgeText)} />
-        <span className="text-[11px] font-mono font-black text-neo-white tabular-nums">
+        <MapPin className={cn('w-4 h-4', hudTheme.levelBadgeText)} />
+        <span className="text-xs sm:text-sm font-mono font-black text-neo-white tabular-nums">
           W{worldNumber} · L{levelNumber}
         </span>
       </motion.div>
@@ -95,7 +95,7 @@ export const GameHeader = memo(function GameHeader({
         aria-atomic="true"
         data-testid="score-display"
       >
-        <span className="text-[9px] font-mono text-neo-white/40 uppercase tracking-widest leading-none">
+        <span className="text-[10px] sm:text-xs font-mono text-neo-white/50 uppercase tracking-widest leading-none">
           {t('common.score')}
         </span>
         <RollingNumber
@@ -108,8 +108,8 @@ export const GameHeader = memo(function GameHeader({
       {/* Gold Badge */}
       {gold !== undefined && (
         <div className="flex items-center gap-1 px-2 py-0.5 bg-neo-yellow/20 rounded-neo">
-          <Coins className="w-3 h-3 text-neo-yellow" />
-          <span className="text-xs font-bold text-neo-yellow">{gold}</span>
+          <Coins className="w-4 h-4 text-neo-yellow" />
+          <span className="text-sm font-bold text-neo-yellow">{gold}</span>
         </div>
       )}
 
@@ -165,7 +165,7 @@ export const GameHeader = memo(function GameHeader({
       </div>
     </header>
     {xpProgress !== undefined && (
-      <div className="h-0.5 bg-neo-black/30">
+      <div className="h-1 bg-neo-black/30">
         <div
           className="h-full bg-neo-purple transition-all duration-500"
           style={{ width: `${xpProgress * 100}%` }}

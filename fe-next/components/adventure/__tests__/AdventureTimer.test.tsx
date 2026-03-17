@@ -269,7 +269,7 @@ describe('AdventureTimer', () => {
 
       // THEN - Compact uses smaller text classes
       const timer = container.firstChild as HTMLElement;
-      expect(timer.className).toContain('text-xs');
+      expect(timer.className).toContain('text-sm');
     });
 
     it('should support normal size with medium text', () => {

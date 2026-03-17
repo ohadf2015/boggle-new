@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { GameLayout } from '../GameLayout';
 
 describe('GameLayout', () => {
-  it('gives sidebar a compact fixed height on mobile (h-16)', () => {
+  it('gives sidebar a compact fixed height on mobile (h-20)', () => {
     const { container } = render(
       <GameLayout
         header={<div>header</div>}
@@ -12,7 +12,7 @@ describe('GameLayout', () => {
     );
     const sidebarChild = container.querySelector('[data-testid="sidebar"]');
     const sidebarWrapper = sidebarChild?.parentElement;
-    expect(sidebarWrapper?.className).toContain('h-16');
+    expect(sidebarWrapper?.className).toContain('h-20');
     expect(sidebarWrapper?.className).not.toContain('max-h-[20vh]');
   });
 

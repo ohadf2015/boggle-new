@@ -95,6 +95,9 @@ export interface ClientToServerEvents {
 
   // Spectator events
   upgradeToPlayer: (data: { gameCode: string }) => void;
+
+  // Kick events
+  kickPlayer: (data: { targetUsername: string }) => void;
 }
 
 // ==================== Hint Types ====================
@@ -228,6 +231,10 @@ export interface ServerToClientEvents {
   // Spectator events
   spectatorUpgraded: (data: SpectatorUpgradedPayload) => void;
   spectatorList: (data: { spectators: GameUser[] }) => void;
+
+  // Kick events
+  kicked: (data: { reason: 'host' | 'inactive' }) => void;
+  playerKicked: (data: { username: string; reason: 'host' | 'inactive' }) => void;
 }
 
 // ==================== Payload Types ====================

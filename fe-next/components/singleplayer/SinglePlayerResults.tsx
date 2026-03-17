@@ -13,6 +13,7 @@ import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
+import WordHuntAnnouncementBanner from '@/components/results/WordHuntAnnouncementBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
@@ -294,7 +295,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             achievementCount={results.achievements?.length || 0}
           />
 
-          {/* WordHuntAnnouncementBanner removed — marketing doesn't belong in results */}
+          {/* Word Hunt promo — shown max 3 times total, only for non-WH games */}
+          <WordHuntAnnouncementBanner className="mt-4" />
 
           {/* 7. Desktop What's Next + Challenge - 70/30 split */}
           <div className="hidden md:flex gap-4">

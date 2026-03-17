@@ -370,49 +370,55 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { word, voteType, gameCode: providedGameCode } = validation.data as SubmitWordVotePayload;
-    const gameCode = providedGameCode || getGameBySocketId(socket.id);
-    const username = getUsernameBySocketId(socket.id);
+    try {
+      const { word, voteType, gameCode: providedGameCode } = validation.data as SubmitWordVotePayload;
+      const gameCode = providedGameCode || getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
 
-    if (!gameCode) return;
+      if (!gameCode) return;
 
-    const game = getGame(gameCode);
-    if (!game) return;
-    if (!username) return;
+      const game = getGame(gameCode);
+      if (!game) return;
+      if (!username) return;
 
-    const userData = game.users?.[username];
-    const userId = userData?.authUserId || null;
-    const guestId = userData?.guestTokenHash || null;
+      const userData = game.users?.[username];
+      const userId = userData?.authUserId || null;
+      const guestId = userData?.guestTokenHash || null;
 
-    if (!userId && !guestId) {
-      logger.debug('VOTE', `No voter identifier for ${username}`);
-      return;
-    }
-
-    // Map 'valid'/'invalid' to 'like'/'dislike' for the community word system
-    const mappedVoteType: 'like' | 'dislike' = voteType === 'valid' ? 'like' : 'dislike';
-
-    const result = await recordVote({
-      word,
-      language: game.language || 'en',
-      userId,
-      guestId,
-      gameCode,
-      voteType: mappedVoteType,
-      submitter: data.submittedBy || 'unknown',
-      isBotWord: data.isBot === true
-    });
-
-    if (result.success) {
-      updatePendingCache(word, game.language || 'en', mappedVoteType);
-      socket.emit('voteRecorded', { word, success: true });
-      logger.info('VOTE', `${username} voted ${voteType} on "${word}"`);
-
-      if (result.isNowValid) {
-        handleWordBecameValid(io, socket, game, gameCode, word, data.submittedBy);
+      if (!userId && !guestId) {
+        logger.debug('VOTE', `No voter identifier for ${username}`);
+        return;
       }
-    } else {
-      socket.emit('voteRecorded', { word, success: false, error: result.error });
+
+      // Map 'valid'/'invalid' to 'like'/'dislike' for the community word system
+      const mappedVoteType: 'like' | 'dislike' = voteType === 'valid' ? 'like' : 'dislike';
+
+      const result = await recordVote({
+        word,
+        language: game.language || 'en',
+        userId,
+        guestId,
+        gameCode,
+        voteType: mappedVoteType,
+        submitter: data.submittedBy || 'unknown',
+        isBotWord: data.isBot === true
+      });
+
+      if (result.success) {
+        updatePendingCache(word, game.language || 'en', mappedVoteType);
+        socket.emit('voteRecorded', { word, success: true });
+        logger.info('VOTE', `${username} voted ${voteType} on "${word}"`);
+
+        if (result.isNowValid) {
+          handleWordBecameValid(io, socket, game, gameCode, word, data.submittedBy);
+        }
+      } else {
+        socket.emit('voteRecorded', { word, success: false, error: result.error });
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('VOTE', `Error in submitWordVote handler: ${err.message}`, { stack: err.stack });
+      socket.emit('voteRecorded', { word: data?.word, success: false, error: 'Vote failed' });
     }
   });
 
@@ -430,32 +436,38 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { word, isValid, gameCode: providedGameCode } = validation.data as SubmitPeerValidationVotePayload;
-    const gameCode = providedGameCode || getGameBySocketId(socket.id);
-    const username = getUsernameBySocketId(socket.id);
+    try {
+      const { word, isValid, gameCode: providedGameCode } = validation.data as SubmitPeerValidationVotePayload;
+      const gameCode = providedGameCode || getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
 
-    if (!gameCode) return;
-    if (!username) return;
+      if (!gameCode) return;
+      if (!username) return;
 
-    const game = getGame(gameCode);
-    if (!game) return;
+      const game = getGame(gameCode);
+      if (!game) return;
 
-    const result: PeerValidationResult = recordPeerValidationVote(gameCode, username, isValid);
+      const result: PeerValidationResult = recordPeerValidationVote(gameCode, username, isValid);
 
-    if (result.success) {
-      socket.emit('peerVoteRecorded', {
-        word,
-        success: true,
-        totalVotes: result.totalVotes,
-        invalidVotes: result.invalidVotes
-      });
-      logger.info('PEER_VALIDATION', `${username} voted ${isValid ? 'valid' : 'invalid'} on "${word}"`);
+      if (result.success) {
+        socket.emit('peerVoteRecorded', {
+          word,
+          success: true,
+          totalVotes: result.totalVotes,
+          invalidVotes: result.invalidVotes
+        });
+        logger.info('PEER_VALIDATION', `${username} voted ${isValid ? 'valid' : 'invalid'} on "${word}"`);
 
-      if (result.shouldReject) {
-        handlePeerRejection(io, gameCode, game, result);
+        if (result.shouldReject) {
+          handlePeerRejection(io, gameCode, game, result);
+        }
+      } else {
+        socket.emit('peerVoteRecorded', { word, success: false, error: result.error });
       }
-    } else {
-      socket.emit('peerVoteRecorded', { word, success: false, error: result.error });
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('PEER_VALIDATION', `Error in submitPeerValidationVote: ${err.message}`, { stack: err.stack });
+      socket.emit('peerVoteRecorded', { word: data?.word, success: false, error: 'Vote failed' });
     }
   });
 

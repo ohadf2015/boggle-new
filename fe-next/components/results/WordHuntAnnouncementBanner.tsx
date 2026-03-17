@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Target, Sparkles, Zap, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { useRouter } from 'next/navigation';
+import { useWordHuntPromo } from '@/hooks/useWordHuntPromo';
 
 interface WordHuntAnnouncementBannerProps {
   className?: string;
@@ -16,7 +17,7 @@ interface WordHuntAnnouncementBannerProps {
 /**
  * Promotional banner for Word Hunt multiplayer mode.
  * Shown on the results page after non-word-hunt games.
- * Arcade-style announcement with sparkles, glow, and shine effect.
+ * Respects shared impression limit (max 3 total across popup + banner).
  */
 const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
   className,
@@ -27,6 +28,17 @@ const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const canAnimate = enableComplexAnimations && !prefersReducedMotion;
+  const { canShow, recordImpression } = useWordHuntPromo();
+  const recorded = useRef(false);
+
+  useEffect(() => {
+    if (canShow && !recorded.current) {
+      recorded.current = true;
+      recordImpression();
+    }
+  }, [canShow, recordImpression]);
+
+  if (!canShow) return null;
 
   const handleClick = () => {
     clearSessionPreservingUsername();

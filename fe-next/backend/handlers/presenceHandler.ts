@@ -17,6 +17,7 @@ import {
 
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
+import { checkAutoKickInactive } from './kickHandler.js';
 import logger from '../utils/logger.js';
 import { validatePayload, presenceUpdateSchema } from '../utils/socketValidation.js';
 
@@ -93,11 +94,19 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
  * Actual disconnect handling is done by Socket.IO's native ping/pong timeout.
  * @param io - Socket.IO server instance
  */
-function startConnectionHealthCheck(_io: Server): void {
+// Module-level ref so the interval can be cleared on shutdown or re-init
+let _healthCheckInterval: ReturnType<typeof setInterval> | null = null;
+
+function startConnectionHealthCheck(io: Server): void {
   const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
   const STALE_THRESHOLD = 60000; // 1 minute without heartbeat
 
-  setInterval(() => {
+  // Prevent duplicate intervals if called more than once
+  if (_healthCheckInterval) {
+    clearInterval(_healthCheckInterval);
+  }
+
+  _healthCheckInterval = setInterval(() => {
     forEachGame((gameCode, game) => {
       for (const [username, userData] of Object.entries(game.users || {})) {
         if (userData.disconnected || userData.isBot) continue;
@@ -108,7 +117,20 @@ function startConnectionHealthCheck(_io: Server): void {
         }
       }
     });
+
+    // Auto-kick AFK players in lobby rooms
+    checkAutoKickInactive(io, forEachGame);
   }, HEALTH_CHECK_INTERVAL);
 }
 
-export { registerPresenceHandlers, startConnectionHealthCheck };
+/**
+ * Stop the connection health check interval (for graceful shutdown)
+ */
+function stopConnectionHealthCheck(): void {
+  if (_healthCheckInterval) {
+    clearInterval(_healthCheckInterval);
+    _healthCheckInterval = null;
+  }
+}
+
+export { registerPresenceHandlers, startConnectionHealthCheck, stopConnectionHealthCheck };

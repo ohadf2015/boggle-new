@@ -148,7 +148,7 @@ export default function PlayerHealthBar({
           max: maxHP,
           percentage: hpPercentage,
         })}
-        className="relative w-full h-6 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard overflow-hidden"
+        className="relative w-full h-7 sm:h-8 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard overflow-hidden"
       >
         {/* HP fill (animated) */}
         <motion.div
@@ -195,7 +195,7 @@ export default function PlayerHealthBar({
 
         {/* HP text overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-neo-display text-xs font-bold text-neo-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-10">
+          <span className="font-neo-display text-sm font-bold text-neo-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-10 tabular-nums">
             {currentHP} / {maxHP}
           </span>
         </div>

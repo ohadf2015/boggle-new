@@ -7,12 +7,14 @@ import { Star, Play, Check, Swords, BookOpen } from 'lucide-react';
 import type { Player } from '@/components/results/types';
 
 // Dynamic imports for heavy components
+const PlacementHero = dynamic(() => import('@/components/results/PlacementHero'), { ssr: false });
 const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboard'), { ssr: false });
 const ScoreRevealAnimation = dynamic(() => import('@/components/results/ScoreRevealAnimation'), { ssr: false });
 const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 
 import NextStepPrompt from '@/components/results/NextStepPrompt';
+import WordHuntAnnouncementBanner from '@/components/results/WordHuntAnnouncementBanner';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { AdPlaceholder } from '@/components/ads';
@@ -212,8 +214,24 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
     return total > 0 ? Math.round((valid / total) * 100) : 0;
   })();
 
+  // Calculate gap to winner for PlacementHero
+  const winnerScore = sortedScores[0]?.score ?? 0;
+  const gapToWinner = currentPlayerRank > 1 ? winnerScore - (currentPlayerData?.score ?? 0) : 0;
+
   return (
     <div className="space-y-3">
+      {/* Placement Hero — big, clear rank + score for the current player */}
+      {sortedScores.length > 1 && scoreRevealComplete && currentPlayerData && (
+        <PlacementHero
+          rank={currentPlayerRank}
+          score={currentPlayerData.score}
+          totalPlayers={sortedScores.length}
+          username={currentPlayerData.username}
+          avatar={currentPlayerData.avatar}
+          gapToWinner={gapToWinner}
+        />
+      )}
+
       {/* Top 3 Leaderboard / Podium - prominent placement */}
       {sortedScores.length > 1 && (
         scoreRevealComplete ? (
@@ -402,7 +420,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* TurningPointCard, ComparativeInsights, WordHuntPromoPopup removed — analysis belongs in Details tab */}
+      {/* Word Hunt promo — only for non-WH games, max 3 impressions */}
+      {gameMode !== 'word-hunt' && <WordHuntAnnouncementBanner className="mt-2" />}
 
       {/* Stats Row — unified grid */}
       {currentPlayerData && currentPlayerRank > 0 && (

@@ -33,6 +33,11 @@ jest.mock('@/utils/session', () => ({
   clearSessionPreservingUsername: jest.fn(),
 }));
 
+const mockRecordImpression = jest.fn();
+jest.mock('@/hooks/useWordHuntPromo', () => ({
+  useWordHuntPromo: () => ({ canShow: true, recordImpression: mockRecordImpression }),
+}));
+
 jest.mock('framer-motion', () => {
   const ReactMock = require('react');
   const MotionButton = ReactMock.forwardRef(({ children, onMouseEnter, onMouseLeave, ...props }: any, ref: any) => (
@@ -82,6 +87,16 @@ describe('WordHuntAnnouncementBanner', () => {
 
     const button = container.querySelector('button');
     expect(button?.className).toContain('mt-4');
+  });
+
+  it('returns null when impression limit reached', () => {
+    jest.spyOn(require('@/hooks/useWordHuntPromo'), 'useWordHuntPromo').mockReturnValue({
+      canShow: false,
+      recordImpression: jest.fn(),
+    });
+
+    const { container } = render(<WordHuntAnnouncementBanner />);
+    expect(container.innerHTML).toBe('');
   });
 
   it('respects reduced motion preferences', () => {

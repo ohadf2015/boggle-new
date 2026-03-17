@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Bot, Plus, Minus, UserPlus, Sparkles, Brain, Zap } from 'lucide-react';
+import { Crown, Bot, Plus, Minus, UserPlus, Sparkles, Brain, Zap, X } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useNativeShare } from '../../../hooks/useNativeShare';
 import { getJoinUrl, copyJoinUrl } from '../../../utils/share';
@@ -95,6 +95,12 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
     setShowBotPicker(false);
   }, [socket, gameCode]);
 
+  const handleKick = useCallback((targetUsername: string) => {
+    if (confirm(t('hostView.kickConfirm').replace('{{name}}', targetUsername))) {
+      socket?.emit('kickPlayer', { targetUsername });
+    }
+  }, [socket, t]);
+
   const handleRemoveLastBot = useCallback(() => {
     const lastBot = bots[bots.length - 1];
     if (lastBot && typeof lastBot === 'object') {
@@ -117,7 +123,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
       </div>
 
       {/* Player avatars row */}
-      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide items-end">
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide items-end">
         <AnimatePresence mode="popLayout">
           {players.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
@@ -175,7 +181,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                     )}
 
                     <div className={cn(
-                      'w-20 h-20 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
+                      'w-14 h-14 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                       isMe && 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
                     )}>
@@ -187,12 +193,26 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                           size="lg"
                         />
                       ) : (
-                        <span className="text-3xl font-black text-neo-black">
+                        <span className="text-2xl font-black text-neo-black">
                           {name.charAt(0).toUpperCase()}
                         </span>
                       )}
                     </div>
                   </motion.div>
+
+                  {/* Kick button — visible on hover for non-self players */}
+                  {!isMe && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleKick(name)}
+                      className="absolute -top-1 -end-1 z-20 w-5 h-5 rounded-full bg-red-500 border-2 border-neo-black flex items-center justify-center opacity-0 group-hover/player:opacity-100 transition-opacity shadow-hard-sm"
+                      aria-label={t('hostView.kickPlayer')}
+                    >
+                      <X className="w-3 h-3 text-white stroke-[3]" />
+                    </motion.button>
+                  )}
 
                   {/* Bot indicator — small emoji only */}
                   {isBot && diffConfig && (
@@ -203,7 +223,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                 </div>
 
                 {/* Name */}
-                <span className="text-[11px] font-bold truncate w-20 text-center text-neo-cream">
+                <span className="text-[11px] font-bold truncate w-14 text-center text-neo-cream">
                   {name}
                 </span>
               </motion.div>
@@ -253,7 +273,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.85, y: -5 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                      className="absolute top-full start-1/2 -translate-x-1/2 mt-2 z-30 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[140px]"
+                      className="absolute top-full start-1/2 -translate-x-1/2 mt-2 z-50 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[140px]"
                     >
                       {([
                         { key: 'easy' as const, icon: Sparkles, color: 'text-neo-lime', bg: 'bg-neo-lime', emoji: '🌱' },

@@ -17,6 +17,7 @@ import { NavigationProvider } from '@/contexts/NavigationContext';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { HapticsProvider } from '@/contexts/HapticsContext';
+import { CoinProvider } from '@/contexts/CoinContext';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
@@ -152,6 +153,7 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
             <ThemeProvider>
                 <LanguageProvider initialLanguage={lang}>
                     <AuthProvider>
+                        <CoinProvider>
                         <AccessibilityProvider>
                             <MotionConfigProvider>
                                 {/* Active tier: changes during gameplay */}
@@ -182,6 +184,7 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
                                 </MusicProvider>
                             </MotionConfigProvider>
                         </AccessibilityProvider>
+                    </CoinProvider>
                     </AuthProvider>
                 </LanguageProvider>
             </ThemeProvider>

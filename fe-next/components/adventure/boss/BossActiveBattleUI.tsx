@@ -95,7 +95,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
           <div className="flex items-center gap-3 mb-2">
             {/* Boss Avatar */}
             <motion.div
-              className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-neo border-3 border-neo-black shadow-hard-sm overflow-hidden bg-neo-navy-light flex-shrink-0"
+              className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-black shadow-hard-sm overflow-hidden bg-neo-navy-light flex-shrink-0"
               animate={
                 bossReaction === 'hit'
                   ? { x: [0, -3, 3, -2, 2, 0], scale: [1, 0.95, 1] }
@@ -132,14 +132,14 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
             {/* Simple HP Bar */}
             <div className="flex-1 min-w-0" data-testid="boss-hp-bar-container">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-neo-body font-bold text-neo-white truncate">
+                <span className="text-sm font-neo-body font-bold text-neo-white truncate">
                   {t(boss.displayName)}
                 </span>
-                <span className="text-xs font-neo-body text-neo-white/70 ms-2">
+                <span className="text-sm font-neo-body text-neo-white/70 ms-2 tabular-nums">
                   {currentHP}/{maxHP}
                 </span>
               </div>
-              <div className="h-4 bg-neo-navy-dark rounded-neo border-2 border-neo-black overflow-hidden">
+              <div className="h-5 sm:h-6 bg-neo-navy-dark rounded-neo border-2 border-neo-black overflow-hidden">
                 <motion.div
                   className={`h-full rounded-sm ${PHASE_COLORS[phase]} ${PHASE_GLOW[phase]}`}
                   initial={{ width: '100%' }}

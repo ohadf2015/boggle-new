@@ -70,7 +70,7 @@ export const GameLayout = memo(function GameLayout({
           className={cn(
             'flex-shrink-0',
             // Portrait: compact bar above grid (visible objectives)
-            'h-16 md:h-20',
+            'h-20 md:h-24',
             // Landscape / desktop: full-height column to the right (order-last)
             'landscape:h-full landscape:w-64 landscape:order-last',
             'lg:h-full lg:w-80 xl:w-96 lg:order-last',

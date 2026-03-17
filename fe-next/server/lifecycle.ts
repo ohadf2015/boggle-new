@@ -13,6 +13,7 @@ import { pool as wordValidatorPool } from '../backend/modules/wordValidatorPool'
 import { setEventLoopLag } from '../backend/utils/metrics';
 import { setupRedisAdapter, cleanupRedisAdapter, type ExtendedSocketServer } from './redisAdapter';
 import { clearCleanupTimers } from './socketSetup';
+import { stopConnectionHealthCheck } from '../backend/handlers/presenceHandler';
 import * as gameStateManager from '../backend/modules/gameStateManager';
 import { startAllCronJobs, stopAllCronJobs } from '../backend/services/cronScheduler';
 import type { ScheduledTask } from 'node-cron';
@@ -129,8 +130,9 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
 
     console.log('[SHUTDOWN] Starting graceful shutdown...');
 
-    // Clear all cleanup timers
+    // Clear all cleanup timers and health checks
     clearCleanupTimers();
+    stopConnectionHealthCheck();
 
     // Persist all active games to Redis before shutdown
     // This ensures running games survive deployments

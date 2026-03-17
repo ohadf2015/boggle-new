@@ -241,6 +241,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     return () => {
       cancelled = true;
       // Cleanup on unmount
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- soundsRef is stable and not a React-rendered node
       const sounds = soundsRef.current;
       Object.values(sounds).forEach(howl => {
         howl.unload();

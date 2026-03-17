@@ -37,9 +37,9 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
         className={cn(
           // Compact chip below boss HUD, doesn't overlap HP bar
           'fixed top-28 sm:top-32 end-2 z-30',
-          'w-auto max-w-[220px]',
+          'w-auto max-w-[280px]',
           'rounded-neo border-2 shadow-hard-sm',
-          'px-2.5 py-1.5',
+          'px-3 py-2',
           isFailed
             ? 'bg-neo-red/20 border-neo-red'
             : isComplete
@@ -48,32 +48,32 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
         )}
       >
         {/* Single-row compact layout */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {isFailed ? (
-            <XCircle className="w-3.5 h-3.5 flex-shrink-0 text-neo-red" />
+            <XCircle className="w-4 h-4 flex-shrink-0 text-neo-red" />
           ) : (
-            <Zap className={cn('w-3.5 h-3.5 flex-shrink-0', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
+            <Zap className={cn('w-4 h-4 flex-shrink-0', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
           )}
           <div className="flex-1 min-w-0">
             {isFailed ? (
-              <p className="text-[10px] font-bold leading-tight text-neo-red" data-testid="challenge-failed-text">
+              <p className="text-xs font-bold leading-tight text-neo-red" data-testid="challenge-failed-text">
                 {t('adventure.quests.flash.missed')}
               </p>
             ) : (
               <>
-                <p className={cn('text-[10px] font-bold leading-tight truncate', isComplete ? 'text-neo-black' : 'text-neo-white')}>
+                <p className={cn('text-xs font-bold leading-tight truncate', isComplete ? 'text-neo-black' : 'text-neo-white')}>
                   {t(challenge.descriptionKey, { param: String(challenge.param) })}
                 </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <Coins className={cn('w-3 h-3', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
-                  <span className={cn('text-[10px] font-black', isComplete ? 'text-neo-black' : 'text-neo-yellow')}>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <Coins className={cn('w-3.5 h-3.5', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
+                  <span className={cn('text-xs font-black', isComplete ? 'text-neo-black' : 'text-neo-yellow')}>
                     +{challenge.rewardCoins}
                   </span>
                   {!isComplete && (
-                    <span className="text-[10px] font-mono font-bold text-neo-white/50">{timeLeft}s</span>
+                    <span className="text-xs font-mono font-bold text-neo-white/50">{timeLeft}s</span>
                   )}
                   {isComplete && (
-                    <Check data-testid="challenge-complete-badge" className="w-3 h-3 text-neo-black" strokeWidth={3} />
+                    <Check data-testid="challenge-complete-badge" className="w-3.5 h-3.5 text-neo-black" strokeWidth={3} />
                   )}
                 </div>
               </>
@@ -83,11 +83,11 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
             data-testid="challenge-dismiss"
             onClick={onDismiss}
             aria-label={t('common.dismiss')}
-            className={cn('w-4 h-4 flex items-center justify-center flex-shrink-0',
+            className={cn('w-5 h-5 flex items-center justify-center flex-shrink-0',
               isFailed ? 'text-neo-red/50' : isComplete ? 'text-neo-black/50' : 'text-neo-white/40'
             )}
           >
-            <X className="w-3 h-3" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </motion.div>

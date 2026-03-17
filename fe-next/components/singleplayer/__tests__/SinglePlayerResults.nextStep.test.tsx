@@ -84,6 +84,20 @@ jest.mock('@/hooks/useAutoShowWithInteraction', () => ({
   useAutoShowWithInteraction: jest.fn(),
 }));
 
+jest.mock('@/hooks/useWordHuntPromo', () => ({
+  useWordHuntPromo: () => ({
+    canShow: false,
+    recordImpression: jest.fn(),
+  }),
+}));
+
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    enableComplexAnimations: false,
+    prefersReducedMotion: true,
+  }),
+}));
+
 jest.mock('@/hooks/useSaveCognitiveScore', () => ({
   useSaveCognitiveScore: () => ({
     saveCognitiveScore: jest.fn().mockResolvedValue(null),
@@ -98,6 +112,9 @@ jest.mock('framer-motion', () => ({
     ),
     span: ({ children, className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
       <span className={className} {...props}>{children}</span>
+    ),
+    button: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLButtonElement>) => (
+      <button className={className} style={style} onClick={onClick} {...props}>{children}</button>
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,

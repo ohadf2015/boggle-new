@@ -12,6 +12,7 @@ import { useGameStore, type GameStore } from './store';
 export const useGameActive = (): boolean => useGameStore((state) => state.gameActive);
 export const useLetterGrid = () => useGameStore((state) => state.letterGrid);
 export const useRemainingTime = () => useGameStore((state) => state.remainingTime);
+export const useGameDuration = () => useGameStore((state) => state.gameDuration);
 export const useGameLanguage = () => useGameStore((state) => state.gameLanguage);
 export const useMinWordLength = (): number => useGameStore((state) => state.minWordLength);
 export const useTotalBoardWords = () => useGameStore((state) => state.totalBoardWords);

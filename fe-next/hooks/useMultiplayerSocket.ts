@@ -100,6 +100,7 @@ export function useMultiplayerSocket(
   const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
   const hostLeftReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectFallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Latest-ref pattern: keeps a stable ref to the latest options so socket
   // callbacks (registered once) always read fresh values without re-registering
@@ -161,6 +162,8 @@ export function useMultiplayerSocket(
       'warning',
       'rateLimited',
       'hostTransferred',
+      'kicked',
+      'playerKicked',
       'pong',
     ];
     eventNames.forEach((event) => socketInstance.off(event));
@@ -244,13 +247,26 @@ export function useMultiplayerSocket(
       // If we don't receive startGame within 3 seconds, request game state explicitly.
       // This handles edge cases where the startGame emit is lost.
       if (data.reconnected) {
+        // Clear any previous fallback timer to prevent accumulation on rapid reconnects
+        if (reconnectFallbackTimerRef.current) {
+          clearTimeout(reconnectFallbackTimerRef.current);
+          reconnectFallbackTimerRef.current = null;
+        }
+
         const fallbackTimer = setTimeout(() => {
+          reconnectFallbackTimerRef.current = null;
           logger.log('[SOCKET.IO] Requesting game state (startGame not received after reconnection)');
           socketInstance.emit('requestGameState');
         }, 3000);
+        reconnectFallbackTimerRef.current = fallbackTimer;
 
         // Cancel fallback if we receive startGame before timeout
-        const cancelFallback = () => clearTimeout(fallbackTimer);
+        const cancelFallback = () => {
+          if (reconnectFallbackTimerRef.current) {
+            clearTimeout(reconnectFallbackTimerRef.current);
+            reconnectFallbackTimerRef.current = null;
+          }
+        };
         socketInstance.once('startGame', cancelFallback);
         socketInstance.once('resetGame', cancelFallback);
         socketInstance.once('disconnect', cancelFallback);
@@ -367,6 +383,25 @@ export function useMultiplayerSocket(
       hostLeftReloadTimerRef.current = setTimeout(() => window.location.reload(), 2000);
     });
 
+    socketInstance.on('kicked', (data: { reason: 'host' | 'inactive' }) => {
+      const opts = optionsRef.current;
+      const message = data.reason === 'inactive'
+        ? opts.t('hostView.youWereKickedInactive')
+        : opts.t('hostView.youWereKicked');
+      toast.error(message, { icon: '🚫', duration: 5000 });
+      clearSessionPreservingUsername(opts.username);
+      opts.onHostLeftRoomClosing({ message });
+      setTimeout(() => window.location.reload(), 2000);
+    });
+
+    socketInstance.on('playerKicked', (data: { username: string; reason: string }) => {
+      const opts = optionsRef.current;
+      toast(opts.t('hostView.playerKicked').replace('{{name}}', data.username), {
+        icon: '👋',
+        duration: 3000,
+      });
+    });
+
     socketInstance.on('sessionMigrated', (data) => {
       logger.log('[SOCKET.IO] Session migrated:', data);
       toast(data.message || 'Your session was moved to another tab', {
@@ -442,6 +477,10 @@ export function useMultiplayerSocket(
       if (hostLeftReloadTimerRef.current) {
         clearTimeout(hostLeftReloadTimerRef.current);
         hostLeftReloadTimerRef.current = null;
+      }
+      if (reconnectFallbackTimerRef.current) {
+        clearTimeout(reconnectFallbackTimerRef.current);
+        reconnectFallbackTimerRef.current = null;
       }
       eventNames.forEach((event) => socketInstance.off(event));
       if (!isReusingSocket) {

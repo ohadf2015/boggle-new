@@ -232,6 +232,20 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
     }
 
     socket.emit('startGame', reconnectPayload);
+
+    // Send current leaderboard and player's achievements so UI is fully restored
+    const leaderboard = getLeaderboard(gameCode);
+    socket.emit('updateLeaderboard', { leaderboard });
+
+    const playerAchievementKeys: string[] = game.playerAchievements?.[username] || [];
+    if (playerAchievementKeys.length > 0) {
+      const achievements = playerAchievementKeys
+        .map((key: string) => ({ key, icon: ACHIEVEMENT_ICONS[key] }))
+        .filter((a: { key: string; icon: string | undefined }) => a.icon);
+      if (achievements.length > 0) {
+        socket.emit('liveAchievementUnlocked', { achievements });
+      }
+    }
   }
 
   broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {

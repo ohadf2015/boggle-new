@@ -125,6 +125,12 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       }
     }
 
+    // Block kicked players from re-joining
+    if (game.kickedPlayers?.has(username)) {
+      emitError(socket, 'You have been kicked from this room');
+      return;
+    }
+
     // Block late joins for ranked games (use state machine helper)
     if (game.isRanked && isInProgress(game.gameState) && !game.allowLateJoin) {
       const existingSocketId = getSocketIdByUsername(gameCode, username);

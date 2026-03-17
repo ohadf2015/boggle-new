@@ -75,9 +75,10 @@ jest.mock('@/lib/utils', () => ({
 }));
 
 jest.mock('@/components/multiplayer/AvatarSelector', () => ({
-  AvatarSelector: ({ selectedAvatar, onAvatarChange }: {
-    selectedAvatar: CustomAvatarConfig | null;
+  AvatarSelector: ({ onAvatarChange }: {
+    selectedAvatar?: CustomAvatarConfig | null;
     onAvatarChange: (config: CustomAvatarConfig) => void;
+    compact?: boolean;
   }) => (
     <div data-testid="avatar-selector">
       <button onClick={() => onAvatarChange({ ...DEFAULT_AVATAR_CONFIG, eyes: 'star' })}>
@@ -141,11 +142,11 @@ describe('CreateRoomModal', () => {
     expect(screen.getByTestId('avatar-selector')).toBeInTheDocument();
   });
 
-  it('should render username with edit button for guests', () => {
+  it('should render always-visible name input for guests', () => {
     render(<CreateRoomModal {...defaultProps} />);
-    const nameButton = screen.getByText('TestUser').closest('button');
-    expect(nameButton).toBeInTheDocument();
-    expect(nameButton?.className).toContain('text-start');
+    const nameInput = screen.getByDisplayValue('TestUser');
+    expect(nameInput.tagName).toBe('INPUT');
+    expect(nameInput).not.toBeDisabled();
   });
 
   it('should show disabled input for authenticated users', () => {
@@ -154,13 +155,19 @@ describe('CreateRoomModal', () => {
     expect(nameInput).toBeDisabled();
   });
 
-  it('should allow editing name for guests', async () => {
+  it('should show validation error on submit with empty name', async () => {
     const user = userEvent.setup();
-    render(<CreateRoomModal {...defaultProps} />);
+    const mockOnCreate = jest.fn();
+    // Override stored username to empty
+    const profileStorage = jest.requireMock('@/utils/profileStorage');
+    profileStorage.getStoredUsername.mockReturnValueOnce('');
+    render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
 
-    await user.click(screen.getByText('TestUser').closest('button')!);
-    const input = screen.getByDisplayValue('TestUser');
-    expect(input.tagName).toBe('INPUT');
+    const createButton = screen.getByRole('button', { name: /create room/i });
+    await user.click(createButton);
+
+    expect(mockOnCreate).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
   it('should render room name input with optional label', () => {

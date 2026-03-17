@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Pencil } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -61,8 +60,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const [customAvatar, setCustomAvatar] = useState<CustomAvatarConfig | null>(null);
   const [roomName, setRoomName] = useState<string>('');
   const [language, setLanguage] = useState<Language>(defaultLanguage);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [showNameError, setShowNameError] = useState(false);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [hasTouchedName, setHasTouchedName] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize state when modal opens
   useEffect(() => {
@@ -70,6 +70,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
     setLanguage(defaultLanguage);
     setRoomName('');
+    setHasAttemptedSubmit(false);
+    setHasTouchedName(false);
 
     if (isAuthenticated && displayName) {
       setUsername(displayName);
@@ -87,7 +89,16 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   }, []);
 
   const handleCreate = useCallback(() => {
-    if (!username.trim() || !customAvatar) return;
+    setHasAttemptedSubmit(true);
+
+    const validation = validateUsername(username);
+    if (!validation.isValid || !customAvatar) {
+      // Focus the name input if that's the problem
+      if (!validation.isValid) {
+        nameInputRef.current?.focus();
+      }
+      return;
+    }
 
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
@@ -106,85 +117,67 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   }, [username, customAvatar, roomName, language, isAuthenticated, onCreate, generateRoomName]);
 
   const usernameValidation = validateUsername(username);
-  const isValid = usernameValidation.isValid && customAvatar;
-  const nameError = showNameError && !usernameValidation.isValid ? usernameValidation.error : null;
+  const showError = (hasAttemptedSubmit || hasTouchedName) && !usernameValidation.isValid;
+  const nameError = showError ? usernameValidation.error : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85vh] overflow-y-auto">
+      <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {t('multiplayerFlow.createModal.title')}
           </DialogTitle>
         </DialogHeader>
 
-        <DialogBody className="space-y-6">
-          {/* Avatar Selector */}
-          <AvatarSelector
-            selectedAvatar={customAvatar}
-            onAvatarChange={setCustomAvatar}
-          />
-
-          {/* Username Input */}
-          <div className="space-y-2">
-            <Label htmlFor="create-username" className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
-              {t('multiplayerFlow.createModal.yourName')}
-            </Label>
-            {isAuthenticated ? (
-              <Input
-                id="create-username"
-                value={username}
-                disabled
-                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
-              />
-            ) : isEditingName ? (
-              <Input
-                id="create-username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                onBlur={() => { setIsEditingName(false); setShowNameError(true); }}
-                onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
-                maxLength={20}
-                autoFocus
-                className={cn(
-                  'font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50',
-                  nameError && 'border-red-500'
-                )}
-                placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsEditingName(true)}
-                className={cn(
-                  'w-full flex items-center justify-between px-4 py-3',
-                  'bg-neo-navy/40 hover:bg-neo-navy/60',
-                  'rounded-neo border-2 border-neo-black',
-                  'shadow-hard-sm hover:shadow-hard',
-                  'hover:translate-x-[-1px] hover:translate-y-[-1px]',
-                  'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
-                  'transition-all duration-200',
-                  'text-start'
-                )}
-              >
-                <span className="font-bold text-neo-white truncate">
-                  {username || t('multiplayerFlow.createModal.namePlaceholder')}
-                </span>
-                <Pencil className="w-4 h-4 text-neo-cyan flex-shrink-0" />
-              </button>
-            )}
-            {nameError && (
-              <p className="text-xs font-bold text-red-400 mt-1" role="alert">
-                {t(nameError)}
-              </p>
-            )}
+        <DialogBody className="space-y-5">
+          {/* Avatar + Name — compact inline layout */}
+          <div className="flex items-start gap-4">
+            <AvatarSelector
+              selectedAvatar={customAvatar}
+              onAvatarChange={setCustomAvatar}
+              compact
+            />
+            <div className="flex-1 space-y-1.5">
+              <Label htmlFor="create-username" className="text-xs font-bold uppercase text-neo-cyan">
+                {t('multiplayerFlow.createModal.yourName')}
+              </Label>
+              {isAuthenticated ? (
+                <Input
+                  id="create-username"
+                  value={username}
+                  disabled
+                  className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
+                />
+              ) : (
+                <Input
+                  ref={nameInputRef}
+                  id="create-username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  onBlur={() => setHasTouchedName(true)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                  maxLength={20}
+                  autoFocus
+                  className={cn(
+                    'font-bold bg-neo-navy/40 border-2 border-neo-black text-neo-white placeholder:text-neo-white/40',
+                    nameError && 'border-red-500 animate-neo-shake'
+                  )}
+                  placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
+                />
+              )}
+              {nameError && (
+                <p className="text-xs font-bold text-red-400" role="alert">
+                  {t(nameError)}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Room Name Input */}
-          <div className="space-y-2">
-            <Label htmlFor="create-room-name" className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
+          <div className="space-y-1.5">
+            <Label htmlFor="create-room-name" className="text-xs font-bold uppercase text-neo-cyan">
               {t('multiplayerFlow.createModal.roomNameLabel')}{' '}
-              <span className="font-normal text-slate-400 dark:text-slate-500">
+              <span className="font-normal text-neo-white/40">
                 ({t('multiplayerFlow.createModal.optional')})
               </span>
             </Label>
@@ -194,7 +187,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               onChange={(e) => setRoomName(e.target.value)}
               maxLength={30}
               placeholder={generateRoomName(username || 'Your')}
-              className="bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50"
+              className="bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/40"
             />
           </div>
 
@@ -207,7 +200,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             variant="success"
             size="lg"
             onClick={handleCreate}
-            disabled={!isValid || isCreating}
+            disabled={isCreating}
             className="w-full font-bold uppercase"
           >
             {isCreating

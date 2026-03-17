@@ -27,7 +27,7 @@ jest.mock('remotion', () => ({
   ),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const remotion = require('remotion');
 
 // Mock seededRandom util

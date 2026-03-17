@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const remotion = require('remotion');
 
 beforeEach(() => {

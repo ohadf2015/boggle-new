@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Pencil, Users } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Users } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -52,12 +52,16 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
   const [username, setUsername] = useState<string>('');
   const [customAvatar, setCustomAvatar] = useState<CustomAvatarConfig | null>(null);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [showNameError, setShowNameError] = useState(false);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [hasTouchedName, setHasTouchedName] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize state when modal opens
   useEffect(() => {
     if (!isOpen) return;
+
+    setHasAttemptedSubmit(false);
+    setHasTouchedName(false);
 
     if (isAuthenticated && displayName) {
       setUsername(displayName);
@@ -70,7 +74,15 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   }, [isOpen, isAuthenticated, displayName, profileAvatar]);
 
   const handleJoin = useCallback(() => {
-    if (!username.trim() || !customAvatar) return;
+    setHasAttemptedSubmit(true);
+
+    const validation = validateUsername(username);
+    if (!validation.isValid || !customAvatar) {
+      if (!validation.isValid) {
+        nameInputRef.current?.focus();
+      }
+      return;
+    }
 
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
@@ -83,8 +95,8 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   if (!room) return null;
 
   const usernameValidation = validateUsername(username);
-  const isValid = usernameValidation.isValid && customAvatar;
-  const nameError = showNameError && !usernameValidation.isValid ? usernameValidation.error : null;
+  const showError = (hasAttemptedSubmit || hasTouchedName) && !usernameValidation.isValid;
+  const nameError = showError ? usernameValidation.error : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -93,9 +105,9 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
           <DialogTitle>{t('multiplayerFlow.joinModal.title')}</DialogTitle>
         </DialogHeader>
 
-        <DialogBody className="space-y-6">
+        <DialogBody className="space-y-5">
           {/* Room Info Card */}
-          <div className="flex items-center gap-4 p-4 bg-neo-navy/40 rounded-neo border-2 border-neo-black shadow-hard-sm">
+          <div className="flex items-center gap-4 p-3 bg-neo-navy/40 rounded-neo border-2 border-neo-black shadow-hard-sm">
             <span className="text-3xl flex-shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
             <div className="flex-1 min-w-0">
               <p className="font-bold text-neo-white truncate text-lg">
@@ -108,64 +120,47 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
             </div>
           </div>
 
-          {/* Avatar Selector */}
-          <AvatarSelector
-            selectedAvatar={customAvatar}
-            onAvatarChange={setCustomAvatar}
-          />
-
-          {/* Username Input */}
-          <div className="space-y-2">
-            <Label htmlFor="join-username" className="text-xs font-bold uppercase text-neo-cyan">
-              {t('multiplayerFlow.joinModal.yourName')}
-            </Label>
-            {isAuthenticated ? (
-              <Input
-                id="join-username"
-                value={username}
-                disabled
-                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
-              />
-            ) : isEditingName ? (
-              <Input
-                id="join-username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                onBlur={() => { setIsEditingName(false); setShowNameError(true); }}
-                onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
-                maxLength={20}
-                autoFocus
-                className={cn(
-                  'font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50',
-                  nameError && 'border-red-500'
-                )}
-                placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsEditingName(true)}
-                className={cn(
-                  'w-full flex items-center justify-between px-4 py-3',
-                  'bg-neo-navy/40 hover:bg-neo-navy/60',
-                  'rounded-neo border-2 border-neo-black',
-                  'shadow-hard-sm hover:shadow-hard',
-                  'hover:translate-x-[-1px] hover:translate-y-[-1px]',
-                  'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
-                  'transition-all duration-200'
-                )}
-              >
-                <span className="font-bold text-neo-white truncate">
-                  {username || t('multiplayerFlow.joinModal.namePlaceholder')}
-                </span>
-                <Pencil className="w-4 h-4 text-neo-cyan flex-shrink-0" />
-              </button>
-            )}
-            {nameError && (
-              <p className="text-xs font-bold text-red-400 mt-1" role="alert">
-                {t(nameError)}
-              </p>
-            )}
+          {/* Avatar + Name — compact inline layout */}
+          <div className="flex items-start gap-4">
+            <AvatarSelector
+              selectedAvatar={customAvatar}
+              onAvatarChange={setCustomAvatar}
+              compact
+            />
+            <div className="flex-1 space-y-1.5">
+              <Label htmlFor="join-username" className="text-xs font-bold uppercase text-neo-cyan">
+                {t('multiplayerFlow.joinModal.yourName')}
+              </Label>
+              {isAuthenticated ? (
+                <Input
+                  id="join-username"
+                  value={username}
+                  disabled
+                  className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
+                />
+              ) : (
+                <Input
+                  ref={nameInputRef}
+                  id="join-username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  onBlur={() => setHasTouchedName(true)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+                  maxLength={20}
+                  autoFocus
+                  className={cn(
+                    'font-bold bg-neo-navy/40 border-2 border-neo-black text-neo-white placeholder:text-neo-white/40',
+                    nameError && 'border-red-500 animate-neo-shake'
+                  )}
+                  placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
+                />
+              )}
+              {nameError && (
+                <p className="text-xs font-bold text-red-400" role="alert">
+                  {t(nameError)}
+                </p>
+              )}
+            </div>
           </div>
         </DialogBody>
 
@@ -174,7 +169,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
             variant="default"
             size="lg"
             onClick={handleJoin}
-            disabled={!isValid || isJoining}
+            disabled={isJoining}
             className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase"
           >
             {isJoining

@@ -134,7 +134,7 @@ export const GameSidebar = memo(function GameSidebar({
       )}
     >
       {/* Mobile: Compact horizontal scrollable chip bar (fits h-16) */}
-      <div className="lg:hidden flex flex-row items-center gap-1 px-1.5 py-1 h-full overflow-x-auto scrollbar-hide">
+      <div className="lg:hidden flex flex-row items-center gap-1.5 px-2 py-1.5 h-full overflow-x-auto scrollbar-hide">
         {/* Star projection chip */}
         <div className={cn(
           'flex-shrink-0 flex items-center gap-0.5 px-2 py-1',
@@ -144,7 +144,7 @@ export const GameSidebar = memo(function GameSidebar({
           'bg-neo-black/40 border-neo-white/10'
         )}>
           {[0, 1, 2].map(i => (
-            <Star key={i} className={cn('w-3 h-3 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/25')} />
+            <Star key={i} className={cn('w-4 h-4 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/25')} />
           ))}
         </div>
 
@@ -157,8 +157,8 @@ export const GameSidebar = memo(function GameSidebar({
               key={obj.type}
               data-testid={`objective-${obj.type}`}
               className={cn(
-                'flex-shrink-0 flex items-center gap-1 px-1.5 py-0.5',
-                'rounded-neo border-2 min-w-[56px] min-h-[40px]',
+                'flex-shrink-0 flex items-center gap-1.5 px-2 py-1',
+                'rounded-neo border-2 min-w-[64px] min-h-[44px]',
                 'transition-all duration-300',
                 obj.isComplete
                   ? 'bg-neo-lime/20 border-neo-lime'
@@ -169,20 +169,20 @@ export const GameSidebar = memo(function GameSidebar({
             >
               <Icon
                 className={cn(
-                  'w-3 h-3 flex-shrink-0',
+                  'w-4 h-4 flex-shrink-0',
                   obj.isComplete ? 'text-neo-lime' : OBJECTIVE_COLORS[obj.type]
                 )}
               />
               <div className="flex flex-col gap-px flex-1 min-w-0">
                 <span
                   className={cn(
-                    'text-[9px] font-mono font-black tabular-nums leading-tight',
+                    'text-[11px] font-mono font-black tabular-nums leading-tight',
                     obj.isComplete ? 'text-neo-lime' : 'text-neo-white/80'
                   )}
                 >
                   {current}/{obj.target}
                 </span>
-                <div className="h-0.5 bg-neo-black/50 rounded-full overflow-hidden">
+                <div className="h-1 bg-neo-black/50 rounded-full overflow-hidden">
                   <div
                     data-testid={`progress-bar-${obj.type}`}
                     className={cn(
@@ -194,7 +194,7 @@ export const GameSidebar = memo(function GameSidebar({
                 </div>
               </div>
               {obj.isComplete && (
-                <Check className="w-2.5 h-2.5 text-neo-lime flex-shrink-0" strokeWidth={3} />
+                <Check className="w-3.5 h-3.5 text-neo-lime flex-shrink-0" strokeWidth={3} />
               )}
             </div>
           );
@@ -219,8 +219,8 @@ export const GameSidebar = memo(function GameSidebar({
               : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
           )}
         >
-          <Lightbulb className="w-3 h-3" />
-          <span className="text-[10px] font-bold">{t('adventure.game.hint')}</span>
+          <Lightbulb className="w-4 h-4" />
+          <span className="text-xs font-bold">{t('adventure.game.hint')}</span>
         </button>
 
         {/* Time Freeze chip (only if upgrade purchased) */}
@@ -238,8 +238,8 @@ export const GameSidebar = memo(function GameSidebar({
                 : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
             )}
           >
-            <Timer className="w-3 h-3" />
-            <span className="text-[10px] font-bold">{freezeSeconds}s</span>
+            <Timer className="w-4 h-4" />
+            <span className="text-xs font-bold">{freezeSeconds}s</span>
           </button>
         )}
 
@@ -253,8 +253,8 @@ export const GameSidebar = memo(function GameSidebar({
               'bg-neo-orange text-neo-black border-neo-black shadow-hard-sm'
             )}
           >
-            <Shuffle className="w-3 h-3" />
-            <span className="text-[10px] font-bold">×{shufflesRemaining}</span>
+            <Shuffle className="w-4 h-4" />
+            <span className="text-xs font-bold">×{shufflesRemaining}</span>
           </button>
         )}
 
@@ -271,7 +271,7 @@ export const GameSidebar = memo(function GameSidebar({
             )}
             aria-pressed={detonateActive}
           >
-            <Bomb className="w-3 h-3" />
+            <Bomb className="w-4 h-4" />
           </button>
         )}
       </div>

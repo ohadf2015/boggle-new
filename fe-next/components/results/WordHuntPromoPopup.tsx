@@ -9,40 +9,35 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useWordHuntPromo } from '@/hooks/useWordHuntPromo';
 
 const POPUP_DELAY_MS = 2500;
 const CLOSE_BUTTON_DELAY_MS = 3000;
-const STORAGE_KEY = 'wordHuntPromoCount';
-const MAX_SHOWS = 2;
 
 interface WordHuntPromoPopupProps {
   /** Delay before popup appears (ms) */
   delayMs?: number;
-  /** Skip localStorage show-limit check */
-  alwaysShow?: boolean;
 }
 
 const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
   delayMs = POPUP_DELAY_MS,
-  alwaysShow = false,
 }) => {
   const { t, language, dir } = useLanguage();
   const router = useRouter();
   const isRTL = dir === 'rtl';
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const canAnimate = enableComplexAnimations && !prefersReducedMotion;
+  const { canShow, recordImpression } = useWordHuntPromo();
 
   const [isVisible, setIsVisible] = useState(false);
   const [showCloseButton, setShowCloseButton] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const count = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
-    if (!alwaysShow && count >= MAX_SHOWS) return;
+    if (!canShow) return;
 
     const showTimer = setTimeout(() => {
       setIsVisible(true);
-      localStorage.setItem(STORAGE_KEY, String(count + 1));
+      recordImpression();
     }, delayMs);
     const closeTimer = setTimeout(
       () => setShowCloseButton(true),
@@ -53,7 +48,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
       clearTimeout(showTimer);
       clearTimeout(closeTimer);
     };
-  }, [delayMs, alwaysShow]);
+  }, [delayMs, canShow, recordImpression]);
 
   const handleClose = useCallback(() => {
     setIsVisible(false);

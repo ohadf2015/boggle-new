@@ -25,6 +25,8 @@ import { registerClassroomGameHandlers } from './classroomGameHandler.js';
 import { registerAvatarHandlers } from './avatarHandler.js';
 import { registerWordHuntHandlers } from './wordHuntHandler.js';
 import { registerWordPackHandler } from './wordPackHandler.js';
+import { registerKickHandler } from './kickHandler.js';
+import { registerReactionHandlers } from './reactionHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -55,6 +57,8 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerAvatarHandlers(io, socket);
   registerWordHuntHandlers(io, socket);
   registerWordPackHandler(io, socket);
+  registerKickHandler(io, socket);
+  registerReactionHandlers(io, socket);
 }
 
 export {

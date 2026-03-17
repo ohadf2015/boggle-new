@@ -16,6 +16,7 @@ export interface GameState {
   gameActive: boolean;
   letterGrid: LetterGrid | null;
   remainingTime: number | null;
+  gameDuration: number | null;
   gameLanguage: Language | null;
   minWordLength: number;
   totalBoardWords: number | null;
@@ -85,6 +86,7 @@ export interface GameActions {
   setGameActive: (value: boolean | ((prev: boolean) => boolean)) => void;
   setLetterGrid: (value: LetterGrid | null | ((prev: LetterGrid | null) => LetterGrid | null)) => void;
   setRemainingTime: (value: number | null | ((prev: number | null) => number | null)) => void;
+  setGameDuration: (value: number | null) => void;
   setGameLanguage: (value: Language | null | ((prev: Language | null) => Language | null)) => void;
   setMinWordLength: (value: number | ((prev: number) => number)) => void;
   setTotalBoardWords: (value: number | null | ((prev: number | null) => number | null)) => void;
