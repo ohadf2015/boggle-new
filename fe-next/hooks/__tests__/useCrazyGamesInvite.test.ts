@@ -51,6 +51,19 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       showAuthPrompt: jest.fn(),
       isUserAccountAvailable: jest.fn(),
       getSystemInfo: jest.fn(),
+      getInviteParams: jest.fn(),
+      addJoinRoomListener: jest.fn(),
+      removeJoinRoomListener: jest.fn(),
+      getSettings: jest.fn(),
+      addSettingsChangeListener: jest.fn(),
+      removeSettingsChangeListener: jest.fn(),
+      addAuthListener: jest.fn(),
+      removeAuthListener: jest.fn(),
+      getUserToken: jest.fn(),
+      listFriends: jest.fn(),
+      showAccountLinkPrompt: jest.fn(),
+      getXsollaUserToken: jest.fn(),
+      trackOrder: jest.fn(),
     });
   });
 
@@ -350,6 +363,19 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
         showAuthPrompt: jest.fn(),
         isUserAccountAvailable: jest.fn(),
         getSystemInfo: jest.fn(),
+        getInviteParams: jest.fn(),
+        addJoinRoomListener: jest.fn(),
+        removeJoinRoomListener: jest.fn(),
+        getSettings: jest.fn(),
+        addSettingsChangeListener: jest.fn(),
+        removeSettingsChangeListener: jest.fn(),
+        addAuthListener: jest.fn(),
+        removeAuthListener: jest.fn(),
+        getUserToken: jest.fn(),
+        listFriends: jest.fn(),
+        showAccountLinkPrompt: jest.fn(),
+        getXsollaUserToken: jest.fn(),
+        trackOrder: jest.fn(),
       });
 
       const onInstantMultiplayer = jest.fn();

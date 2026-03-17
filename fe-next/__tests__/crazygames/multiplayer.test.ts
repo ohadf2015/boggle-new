@@ -19,6 +19,9 @@ const mockInviteLink = jest.fn((params) => `https://crazygames.com/game/lexiclas
 const mockShowInviteButton = jest.fn();
 const mockHideInviteButton = jest.fn();
 
+const mockAddJoinRoomListener = jest.fn();
+const mockRemoveJoinRoomListener = jest.fn();
+
 jest.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
     isAvailable: true,
@@ -30,6 +33,8 @@ jest.mock('@/components/CrazyGamesSDK', () => ({
     inviteLink: mockInviteLink,
     showInviteButton: mockShowInviteButton,
     hideInviteButton: mockHideInviteButton,
+    addJoinRoomListener: mockAddJoinRoomListener,
+    removeJoinRoomListener: mockRemoveJoinRoomListener,
   }),
 }));
 

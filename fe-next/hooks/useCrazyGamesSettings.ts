@@ -1,27 +1,86 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+
+interface UseCrazyGamesSettingsReturn {
+  /** Whether audio should be muted (platform request) */
+  shouldMuteAudio: boolean;
+  /** Whether chat should be disabled (platform request) */
+  shouldDisableChat: boolean;
+  /** Whether settings are loaded */
+  isReady: boolean;
+}
+
 /**
- * Hook for CrazyGames platform utilities.
+ * Hook for CrazyGames platform settings integration.
  *
- * NOTE: Platform-level settings (audio mute, chat disable) are NOT exposed
- * by the CrazyGames SDK v3 API. This hook provides utility functions only.
+ * Listens for platform-level settings from CrazyGames:
+ * - muteAudio: Platform requests game to mute all audio
+ * - disableChat: Platform requests game to disable chat features
+ *
+ * These settings can change at runtime (e.g., parent mutes audio),
+ * so the hook listens for changes via addSettingsChangeListener.
  *
  * @example
  * ```tsx
- * // This hook is currently a placeholder
- * // Platform settings aren't available via CrazyGames SDK
- * const {} = useCrazyGamesSettings();
+ * const { shouldMuteAudio, shouldDisableChat } = useCrazyGamesSettings();
+ *
+ * useEffect(() => {
+ *   if (shouldMuteAudio) Howler.mute(true);
+ *   else Howler.mute(false);
+ * }, [shouldMuteAudio]);
  * ```
  */
-export function useCrazyGamesSettings() {
-  // NOTE: CrazyGames SDK does not expose platform settings like
-  // muteAudio or disableChat. These were planned features but don't
-  // exist in the actual SDK API (verified in CrazyGamesSDK.tsx types).
-  //
-  // Audio muting is handled by individual ad callbacks in useCrazyGamesAds.
-  // Chat features should be controlled by game logic, not platform settings.
+export function useCrazyGamesSettings(): UseCrazyGamesSettingsReturn {
+  const {
+    isAvailable,
+    isLoading,
+    getSettings,
+    addSettingsChangeListener,
+    removeSettingsChangeListener,
+  } = useCrazyGames();
 
-  return {};
+  const [shouldMuteAudio, setShouldMuteAudio] = useState(false);
+  const [shouldDisableChat, setShouldDisableChat] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  // Read initial settings
+  useEffect(() => {
+    if (isLoading || !isAvailable) {
+      if (!isLoading) setIsReady(true);
+      return;
+    }
+
+    const settings = getSettings();
+    if (settings) {
+      setShouldMuteAudio(!!settings.muteAudio);
+      setShouldDisableChat(!!settings.disableChat);
+    }
+    setIsReady(true);
+  }, [isAvailable, isLoading, getSettings]);
+
+  // Listen for runtime setting changes
+  useEffect(() => {
+    if (!isAvailable) return;
+
+    const handleSettingsChange = (key: string, value: unknown) => {
+      if (key === 'muteAudio') {
+        setShouldMuteAudio(!!value);
+      } else if (key === 'disableChat') {
+        setShouldDisableChat(!!value);
+      }
+    };
+
+    addSettingsChangeListener(handleSettingsChange);
+    return () => removeSettingsChangeListener(handleSettingsChange);
+  }, [isAvailable, addSettingsChangeListener, removeSettingsChangeListener]);
+
+  return {
+    shouldMuteAudio,
+    shouldDisableChat,
+    isReady,
+  };
 }
 
 /**
@@ -31,14 +90,6 @@ export function useCrazyGamesSettings() {
  * - High scores
  * - Level 10+ completion
  * - First boss battle victory
- *
- * @example
- * ```tsx
- * // On boss defeat
- * if (bossPhase === 'victory') {
- *   await triggerHappytime();
- * }
- * ```
  */
 export async function triggerHappytime() {
   if (typeof window === 'undefined' || !window.CrazyGames?.SDK) {
@@ -47,7 +98,7 @@ export async function triggerHappytime() {
 
   try {
     window.CrazyGames.SDK.game.happyTime();
-  } catch (error) {
+  } catch {
     // Silently fail if SDK not available
   }
 }

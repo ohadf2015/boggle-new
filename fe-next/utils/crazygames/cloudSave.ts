@@ -66,7 +66,20 @@ function getSDKContext() {
       showInviteButton: () => {},
       hideInviteButton: () => {},
       getInviteParam: () => null,
+      getInviteParams: () => null,
       isInstantMultiplayer: false,
+      addJoinRoomListener: () => {},
+      removeJoinRoomListener: () => {},
+      getSettings: () => null,
+      addSettingsChangeListener: () => {},
+      removeSettingsChangeListener: () => {},
+      addAuthListener: () => {},
+      removeAuthListener: () => {},
+      getUserToken: async () => null,
+      listFriends: async () => ({ friends: [], hasMore: false }),
+      showAccountLinkPrompt: async () => {},
+      getXsollaUserToken: async () => null,
+      trackOrder: async () => {},
     } as ReturnType<typeof useCrazyGames>;
   }
   return cachedContext;

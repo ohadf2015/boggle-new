@@ -83,6 +83,8 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
     inviteLink,
     showInviteButton: sdkShowInvite,
     hideInviteButton: sdkHideInvite,
+    addJoinRoomListener,
+    removeJoinRoomListener,
   } = useCrazyGames();
 
   const [inviteRoomId, setInviteRoomId] = useState<string | null>(null);
@@ -163,6 +165,23 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
       hideInviteButton();
     }
   }, [maxPlayers, currentPlayers, gameState, isInviteButtonVisible, hideInviteButton]);
+
+  // Listen for mid-session joins (someone clicks invite link while game is running)
+  useEffect(() => {
+    if (!isAvailable) return;
+
+    const handleJoinRoom = (params: Record<string, string>) => {
+      const roomId = params.roomId;
+      if (roomId) {
+        setInviteRoomId(roomId);
+        setIsInviteJoin(true);
+        onInviteJoin?.(roomId);
+      }
+    };
+
+    addJoinRoomListener(handleJoinRoom);
+    return () => removeJoinRoomListener(handleJoinRoom);
+  }, [isAvailable, addJoinRoomListener, removeJoinRoomListener, onInviteJoin]);
 
   // Cleanup on unmount
   useEffect(() => {

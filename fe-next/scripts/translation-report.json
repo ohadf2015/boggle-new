@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3707,
+    "totalKeysInCode": 3735,
     "keyCountByLanguage": {
-      "en": 6275,
-      "he": 6294,
-      "sv": 6327,
-      "ja": 6314,
-      "es": 6301
+      "en": 6332,
+      "he": 6340,
+      "sv": 6373,
+      "ja": 6360,
+      "es": 6347
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 5,
@@ -145,7 +145,17 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "hostView.bot",
+      "usages": [
+        {
+          "file": "host/components/pre-game/PlayerRoster.tsx",
+          "line": 199
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "tvBroadcast.totalWords",
@@ -155,6 +165,17 @@
       "tvBroadcast.hunting",
       "tvBroadcast.wordsHunted",
       "tvBroadcast.activityPanel",
+      "education.practice.points",
+      "education.practice.vocabularyWords",
+      "education.practice.vocabularyWordsFound",
+      "education.practice.vocabulary",
+      "education.practice.vocab",
+      "education.practice.foundWordsLabel",
+      "education.practice.more",
+      "education.practice.allVocabFound",
+      "education.practice.total",
+      "education.practice.canEmbed",
+      "education.practice.trackOnly",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
@@ -167,6 +188,17 @@
       "tvBroadcast.hunting",
       "tvBroadcast.wordsHunted",
       "tvBroadcast.activityPanel",
+      "education.practice.points",
+      "education.practice.vocabularyWords",
+      "education.practice.vocabularyWordsFound",
+      "education.practice.vocabulary",
+      "education.practice.vocab",
+      "education.practice.foundWordsLabel",
+      "education.practice.more",
+      "education.practice.allVocabFound",
+      "education.practice.total",
+      "education.practice.canEmbed",
+      "education.practice.trackOnly",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
@@ -179,6 +211,17 @@
       "tvBroadcast.hunting",
       "tvBroadcast.wordsHunted",
       "tvBroadcast.activityPanel",
+      "education.practice.points",
+      "education.practice.vocabularyWords",
+      "education.practice.vocabularyWordsFound",
+      "education.practice.vocabulary",
+      "education.practice.vocab",
+      "education.practice.foundWordsLabel",
+      "education.practice.more",
+      "education.practice.allVocabFound",
+      "education.practice.total",
+      "education.practice.canEmbed",
+      "education.practice.trackOnly",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"
@@ -215,6 +258,17 @@
       "friends.headToHead.draws",
       "friends.headToHead.totalGames",
       "adventure.bosses.phases.phase2Banner",
+      "education.practice.points",
+      "education.practice.vocabularyWords",
+      "education.practice.vocabularyWordsFound",
+      "education.practice.vocabulary",
+      "education.practice.vocab",
+      "education.practice.foundWordsLabel",
+      "education.practice.more",
+      "education.practice.allVocabFound",
+      "education.practice.total",
+      "education.practice.canEmbed",
+      "education.practice.trackOnly",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"

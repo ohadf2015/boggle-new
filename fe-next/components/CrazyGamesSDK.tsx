@@ -66,6 +66,31 @@ export interface SystemInfo {
   };
 }
 
+// CrazyGames friend object
+export interface CrazyGamesFriend {
+  id: string;
+  username: string;
+  profilePictureUrl: string;
+}
+
+// CrazyGames friends list response
+export interface FriendsListResponse {
+  friends: CrazyGamesFriend[];
+  hasMore: boolean;
+}
+
+// Platform settings from CrazyGames
+export interface CrazyGamesSettings {
+  muteAudio: boolean;
+  disableChat: boolean;
+}
+
+// Xsolla purchase tracking
+export interface XsollaOrder {
+  orderId: string;
+  [key: string]: unknown;
+}
+
 interface CrazyGamesSDK {
   getEnvironment: () => Promise<CrazyGamesEnvironment>;
   ad: {
@@ -91,22 +116,38 @@ interface CrazyGamesSDK {
     showInviteButton: (params: InviteLinkParams) => void;
     hideInviteButton: () => void;
     getInviteParam: (paramName: string) => string | null;
+    inviteParams?: Record<string, string>;
     // Instant multiplayer flag
     isInstantMultiplayer: boolean;
+    // Mid-session join room listener
+    addJoinRoomListener: (callback: (params: Record<string, string>) => void) => void;
+    removeJoinRoomListener: (callback: (params: Record<string, string>) => void) => void;
+    // Platform settings
+    settings: CrazyGamesSettings;
+    addSettingsChangeListener: (callback: (key: string, value: unknown) => void) => void;
+    removeSettingsChangeListener: (callback: (key: string, value: unknown) => void) => void;
   };
   user: {
     isUserAccountAvailable: () => Promise<boolean>;
     getUser: () => Promise<{ username: string; profilePictureUrl: string } | null>;
     showAuthPrompt: () => Promise<{ username: string; profilePictureUrl: string } | null>;
     getSystemInfo: () => Promise<SystemInfo>;
-    // Direct property access (v3 SDK)
     systemInfo?: SystemInfo;
+    getUserToken: () => Promise<string | null>;
+    listFriends: (page?: number, size?: number) => Promise<FriendsListResponse>;
+    addAuthListener: (callback: (user: { username: string; profilePictureUrl: string }) => void) => void;
+    removeAuthListener: (callback: (user: { username: string; profilePictureUrl: string }) => void) => void;
+    showAccountLinkPrompt: () => Promise<void>;
   };
   data: {
     getItem: (key: string) => Promise<string | null>;
     setItem: (key: string, value: string) => Promise<void>;
     removeItem: (key: string) => Promise<void>;
     clear: () => Promise<void>;
+  };
+  payment?: {
+    getXsollaUserToken: () => Promise<string | null>;
+    trackOrder: (provider: string, order: XsollaOrder) => Promise<void>;
   };
 }
 
@@ -148,12 +189,28 @@ interface CrazyGamesContextType {
   showAuthPrompt: () => Promise<{ username: string; profilePictureUrl: string } | null>;
   isUserAccountAvailable: () => Promise<boolean>;
   getSystemInfo: () => Promise<SystemInfo | null>;
+  getUserToken: () => Promise<string | null>;
+  listFriends: (page?: number, size?: number) => Promise<FriendsListResponse>;
+  showAccountLinkPrompt: () => Promise<void>;
   // Invite links & multiplayer
   inviteLink: (params: InviteLinkParams) => string | null;
   showInviteButton: (params: InviteLinkParams) => void;
   hideInviteButton: () => void;
   getInviteParam: (paramName: string) => string | null;
+  getInviteParams: () => Record<string, string> | null;
   isInstantMultiplayer: boolean;
+  addJoinRoomListener: (callback: (params: Record<string, string>) => void) => void;
+  removeJoinRoomListener: (callback: (params: Record<string, string>) => void) => void;
+  // Platform settings
+  getSettings: () => CrazyGamesSettings | null;
+  addSettingsChangeListener: (callback: (key: string, value: unknown) => void) => void;
+  removeSettingsChangeListener: (callback: (key: string, value: unknown) => void) => void;
+  // Auth listener
+  addAuthListener: (callback: (user: { username: string; profilePictureUrl: string }) => void) => void;
+  removeAuthListener: (callback: (user: { username: string; profilePictureUrl: string }) => void) => void;
+  // In-game purchases (Xsolla)
+  getXsollaUserToken: () => Promise<string | null>;
+  trackOrder: (provider: string, order: XsollaOrder) => Promise<void>;
 }
 
 const CrazyGamesContext = createContext<CrazyGamesContextType | null>(null);
@@ -173,7 +230,7 @@ export function CrazyGamesScript() {
 
   return (
     <Script
-      src="https://sdk.crazygames.com/crazygames-sdk-v2.js"
+      src="https://sdk.crazygames.com/crazygames-sdk-v3.js"
       strategy="afterInteractive"
       id="crazygames-sdk"
     />
@@ -363,8 +420,11 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
           const instantMultiplayer = window.CrazyGames.SDK.game.isInstantMultiplayer;
           setIsInstantMultiplayer(!!instantMultiplayer);
 
-          // Signal that game is ready to play
+          // Signal loading lifecycle to CrazyGames
           if (env === 'crazygames') {
+            // sdkGameLoadingStart must be called before sdkGameLoadingStop
+            // This signals to CrazyGames that the game is actively loading
+            window.CrazyGames.SDK.game.sdkGameLoadingStart();
             window.CrazyGames.SDK.game.sdkGameLoadingStop();
           }
         } catch {
@@ -552,6 +612,96 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     return null;
   }, [isAvailable]);
 
+  const getInviteParams = useCallback((): Record<string, string> | null => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      return window.CrazyGames.SDK.game.inviteParams ?? null;
+    }
+    return null;
+  }, [isAvailable]);
+
+  // Mid-session join room listener
+  const addJoinRoomListener = useCallback((callback: (params: Record<string, string>) => void) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.game.addJoinRoomListener(callback);
+    }
+  }, [isAvailable]);
+
+  const removeJoinRoomListener = useCallback((callback: (params: Record<string, string>) => void) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.game.removeJoinRoomListener(callback);
+    }
+  }, [isAvailable]);
+
+  // Platform settings
+  const getSettings = useCallback((): CrazyGamesSettings | null => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      return window.CrazyGames.SDK.game.settings ?? null;
+    }
+    return null;
+  }, [isAvailable]);
+
+  const addSettingsChangeListener = useCallback((callback: (key: string, value: unknown) => void) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.game.addSettingsChangeListener(callback);
+    }
+  }, [isAvailable]);
+
+  const removeSettingsChangeListener = useCallback((callback: (key: string, value: unknown) => void) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.game.removeSettingsChangeListener(callback);
+    }
+  }, [isAvailable]);
+
+  // Auth listener for mid-session login
+  const addAuthListener = useCallback((callback: (user: { username: string; profilePictureUrl: string }) => void) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.user.addAuthListener(callback);
+    }
+  }, [isAvailable]);
+
+  const removeAuthListener = useCallback((callback: (user: { username: string; profilePictureUrl: string }) => void) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.user.removeAuthListener(callback);
+    }
+  }, [isAvailable]);
+
+  // Server-side auth token
+  const getUserToken = useCallback(async (): Promise<string | null> => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      return window.CrazyGames.SDK.user.getUserToken();
+    }
+    return null;
+  }, [isAvailable]);
+
+  // Friends list
+  const listFriends = useCallback(async (page?: number, size?: number): Promise<FriendsListResponse> => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      return window.CrazyGames.SDK.user.listFriends(page, size);
+    }
+    return { friends: [], hasMore: false };
+  }, [isAvailable]);
+
+  // Account linking
+  const showAccountLinkPrompt = useCallback(async (): Promise<void> => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      await window.CrazyGames.SDK.user.showAccountLinkPrompt();
+    }
+  }, [isAvailable]);
+
+  // In-game purchases (Xsolla)
+  const getXsollaUserToken = useCallback(async (): Promise<string | null> => {
+    if (isAvailable && window.CrazyGames?.SDK?.payment) {
+      return window.CrazyGames.SDK.payment.getXsollaUserToken();
+    }
+    return null;
+  }, [isAvailable]);
+
+  const trackOrder = useCallback(async (provider: string, order: XsollaOrder): Promise<void> => {
+    if (isAvailable && window.CrazyGames?.SDK?.payment) {
+      await window.CrazyGames.SDK.payment.trackOrder(provider, order);
+    }
+  }, [isAvailable]);
+
   const value: CrazyGamesContextType = {
     isAvailable,
     isOnCrazyGamesPlatform: environment === 'crazygames',
@@ -590,7 +740,24 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     showInviteButton,
     hideInviteButton,
     getInviteParam,
+    getInviteParams,
     isInstantMultiplayer,
+    addJoinRoomListener,
+    removeJoinRoomListener,
+    // Platform settings
+    getSettings,
+    addSettingsChangeListener,
+    removeSettingsChangeListener,
+    // Auth listener
+    addAuthListener,
+    removeAuthListener,
+    // User (new)
+    getUserToken,
+    listFriends,
+    showAccountLinkPrompt,
+    // In-game purchases
+    getXsollaUserToken,
+    trackOrder,
   };
 
   return (
@@ -645,7 +812,24 @@ export function useCrazyGames(): CrazyGamesContextType {
       showInviteButton: () => {},
       hideInviteButton: () => {},
       getInviteParam: () => null,
+      getInviteParams: () => null,
       isInstantMultiplayer: false,
+      addJoinRoomListener: () => {},
+      removeJoinRoomListener: () => {},
+      // Platform settings
+      getSettings: () => null,
+      addSettingsChangeListener: () => {},
+      removeSettingsChangeListener: () => {},
+      // Auth listener
+      addAuthListener: () => {},
+      removeAuthListener: () => {},
+      // User (new)
+      getUserToken: async () => null,
+      listFriends: async () => ({ friends: [], hasMore: false }),
+      showAccountLinkPrompt: async () => {},
+      // In-game purchases
+      getXsollaUserToken: async () => null,
+      trackOrder: async () => {},
     };
   }
   return context;

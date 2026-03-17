@@ -75,7 +75,20 @@ describe('OAuth Hiding on CrazyGames Platform', () => {
         showInviteButton: jest.fn(),
         hideInviteButton: jest.fn(),
         getInviteParam: jest.fn(),
+        getInviteParams: jest.fn(),
         isInstantMultiplayer: false,
+        addJoinRoomListener: jest.fn(),
+        removeJoinRoomListener: jest.fn(),
+        getSettings: jest.fn(),
+        addSettingsChangeListener: jest.fn(),
+        removeSettingsChangeListener: jest.fn(),
+        addAuthListener: jest.fn(),
+        removeAuthListener: jest.fn(),
+        getUserToken: jest.fn(),
+        listFriends: jest.fn(),
+        showAccountLinkPrompt: jest.fn(),
+        getXsollaUserToken: jest.fn(),
+        trackOrder: jest.fn(),
       });
     });
 
@@ -162,7 +175,20 @@ describe('OAuth Hiding on CrazyGames Platform', () => {
         showInviteButton: jest.fn(),
         hideInviteButton: jest.fn(),
         getInviteParam: jest.fn(),
+        getInviteParams: jest.fn(),
         isInstantMultiplayer: false,
+        addJoinRoomListener: jest.fn(),
+        removeJoinRoomListener: jest.fn(),
+        getSettings: jest.fn(),
+        addSettingsChangeListener: jest.fn(),
+        removeSettingsChangeListener: jest.fn(),
+        addAuthListener: jest.fn(),
+        removeAuthListener: jest.fn(),
+        getUserToken: jest.fn(),
+        listFriends: jest.fn(),
+        showAccountLinkPrompt: jest.fn(),
+        getXsollaUserToken: jest.fn(),
+        trackOrder: jest.fn(),
       });
     });
 
