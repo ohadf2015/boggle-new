@@ -142,6 +142,7 @@ describe('Fix 2 & 3: completion payload includes lootDrops and retainedScore', (
       playerIsDead: false,
       endBossBattle: jest.fn(),
       triggerBossTaunt: jest.fn(),
+      completeLevel: jest.fn(),
       isFirstCompletion: true,
       retainedScore: 50,
     };

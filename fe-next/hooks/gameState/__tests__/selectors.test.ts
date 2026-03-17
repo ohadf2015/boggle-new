@@ -284,7 +284,7 @@ describe('selectors', () => {
       act(() => {
         useGameStore.getState().setGameActive(true);
         useGameStore.getState().setRemainingTime(60);
-        useGameStore.getState().setGameMode('wordHunt');
+        useGameStore.getState().setGameMode('word-hunt');
       });
 
       act(() => { useGameStore.getState().resetAll(); });

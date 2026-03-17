@@ -334,7 +334,7 @@ describe('useSafeSocketEvents', () => {
   });
 
   it('re-subscribes when events array structure changes', () => {
-    const { rerender } = renderHook(
+    const { rerender } = renderHook<void, { events: any }>(
       ({ events }) =>
         useSafeSocketEvents({ socket: socket as any, events }),
       {
@@ -359,7 +359,7 @@ describe('useSafeSocketEvents', () => {
   });
 
   it('does not re-subscribe when only handler references change (JSON.stringify dep)', () => {
-    const { rerender } = renderHook(
+    const { rerender } = renderHook<void, { h: any }>(
       ({ h }) =>
         useSafeSocketEvents({
           socket: socket as any,
