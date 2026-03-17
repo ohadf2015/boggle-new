@@ -5,14 +5,12 @@ import { cn } from '../lib/utils';
 import { Sparkles } from 'lucide-react';
 import PrestigeModal from './engagement/PrestigeModal';
 
-/**
- * XP calculation helpers (mirror of backend xpManager.js)
- */
-const XP_CONFIG = {
-  LEVEL_EXPONENT: 1.5,
-  LEVEL_BASE: 100,
-  MAX_LEVEL: 100,
-};
+import {
+  getXpProgress,
+  getLevelFromXp,
+  getXpForLevel,
+  type PrestigeReward,
+} from '@/backend/modules/xpManager';
 
 /**
  * Prestige display configuration
@@ -24,72 +22,6 @@ const PRESTIGE_DISPLAY = {
   4: { name: 'Prestige IV', color: '#B9F2FF', icon: '💫', gradient: 'from-cyan-500 to-cyan-300' },
   5: { name: 'Prestige V', color: '#9B59B6', icon: '🌌', gradient: 'from-purple-700 to-pink-500' },
 } as const;
-
-/**
- * XP Progress information
- */
-interface XpProgress {
-  currentLevel: number;
-  totalXp: number;
-  currentLevelXp: number;
-  nextLevelXp: number;
-  xpInCurrentLevel: number;
-  xpNeededForNextLevel: number;
-  progressPercent: number;
-  isMaxLevel: boolean;
-}
-
-function getXpForLevel(level: number): number {
-  if (level <= 1) return 0;
-  return Math.round(XP_CONFIG.LEVEL_BASE * Math.pow(level, XP_CONFIG.LEVEL_EXPONENT));
-}
-
-function getLevelFromXp(totalXp: number): number {
-  if (totalXp <= 0) return 1;
-  let low = 1;
-  let high = XP_CONFIG.MAX_LEVEL;
-  while (low < high) {
-    const mid = Math.floor((low + high + 1) / 2);
-    if (getXpForLevel(mid) <= totalXp) {
-      low = mid;
-    } else {
-      high = mid - 1;
-    }
-  }
-  return Math.min(low, XP_CONFIG.MAX_LEVEL);
-}
-
-function getXpProgress(totalXp: number): XpProgress {
-  const currentLevel = getLevelFromXp(totalXp);
-  const isMaxLevel = currentLevel >= XP_CONFIG.MAX_LEVEL;
-  const currentLevelXp = getXpForLevel(currentLevel);
-  const nextLevelXp = isMaxLevel ? currentLevelXp : getXpForLevel(currentLevel + 1);
-  const xpInCurrentLevel = totalXp - currentLevelXp;
-  const xpNeededForNextLevel = nextLevelXp - currentLevelXp;
-  const progressPercent = isMaxLevel ? 100 : Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100);
-
-  return {
-    currentLevel,
-    totalXp,
-    currentLevelXp,
-    nextLevelXp,
-    xpInCurrentLevel,
-    xpNeededForNextLevel,
-    progressPercent,
-    isMaxLevel,
-  };
-}
-
-/**
- * Prestige reward for modal display
- */
-interface PrestigeReward {
-  type: 'title' | 'multiplier' | 'border' | 'icon';
-  value: string;
-  displayName: string;
-  description: string;
-  icon: string;
-}
 
 /**
  * XpProgressBar Props
@@ -267,4 +199,4 @@ const XpProgressBar = memo<XpProgressBarProps>(({
 XpProgressBar.displayName = 'XpProgressBar';
 
 export default XpProgressBar;
-export { getXpProgress, getLevelFromXp, getXpForLevel };
+export { getLevelFromXp, getXpForLevel };

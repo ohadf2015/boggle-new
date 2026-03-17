@@ -7,14 +7,7 @@ import { cn } from '@/lib/utils';
 import { Sparkles, Star, Crown, Zap, AlertTriangle, Check } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { supabase } from '@/lib/supabase';
-
-interface PrestigeReward {
-  type: 'title' | 'multiplier' | 'border' | 'icon';
-  value: string;
-  displayName: string;
-  description: string;
-  icon: string;
-}
+import { toRoman, type PrestigeReward } from '@/backend/modules/xpManager';
 
 interface PrestigeModalProps {
   isOpen: boolean;
@@ -369,22 +362,5 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
     </Dialog>
   );
 };
-
-function toRoman(num: number): string {
-  const romanNumerals: [number, string][] = [
-    [5, 'V'],
-    [4, 'IV'],
-    [1, 'I'],
-  ];
-
-  let result = '';
-  for (const [value, numeral] of romanNumerals) {
-    while (num >= value) {
-      result += numeral;
-      num -= value;
-    }
-  }
-  return result;
-}
 
 export default PrestigeModal;

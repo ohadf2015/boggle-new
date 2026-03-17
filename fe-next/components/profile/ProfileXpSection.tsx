@@ -6,14 +6,7 @@ import XpProgressBar, { getLevelFromXp } from '@/components/XpProgressBar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
-
-interface PrestigeReward {
-  type: 'title' | 'multiplier' | 'border' | 'icon';
-  value: string;
-  displayName: string;
-  description: string;
-  icon: string;
-}
+import type { PrestigeReward } from '@/backend/modules/xpManager';
 
 interface ProfileXpSectionProps {
   profile: ProfileData | null;

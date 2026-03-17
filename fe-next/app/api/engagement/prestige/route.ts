@@ -3,8 +3,8 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import {
   canPrestige,
-  getPrestigeMultiplier,
   getNextPrestigeRewards,
+  toRoman,
   PRESTIGE_CONFIG,
 } from '@/backend/modules/xpManager';
 import { captureApiError } from '@/utils/sentry';
@@ -114,10 +114,30 @@ export async function POST(_request: NextRequest) {
 
     // Calculate new prestige values
     const newPrestigeLevel = currentPrestige + 1;
-    const newMultiplier = getPrestigeMultiplier(newPrestigeLevel);
     const rewards = getNextPrestigeRewards(currentPrestige);
 
-    // Build unlocked rewards array
+    // Use atomic RPC to apply prestige (race-condition safe)
+    const { data: rpcResult, error: rpcError } = await supabase
+      .rpc('apply_prestige', {
+        p_player_id: userId,
+        p_expected_prestige: currentPrestige,
+      });
+
+    if (rpcError) {
+      console.error('[PRESTIGE API] RPC error:', rpcError);
+      return NextResponse.json({ error: 'Failed to apply prestige' }, { status: 500 });
+    }
+
+    // Check if optimistic lock succeeded (rows_affected > 0)
+    const result = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
+    if (!result || result.rows_affected === 0) {
+      return NextResponse.json(
+        { error: 'Prestige already applied or conditions changed. Please refresh.' },
+        { status: 409 }
+      );
+    }
+
+    // Update prestige_unlocks separately (JSONB append)
     const existingUnlocks = profile.prestige_unlocks || [];
     const newUnlocks = [
       ...existingUnlocks,
@@ -129,27 +149,12 @@ export async function POST(_request: NextRequest) {
       })),
     ];
 
-    // Update profile - reset XP to 0, level to 1, increment prestige
-    const { error: updateError } = await supabase
+    await supabase
       .from('profiles')
-      .update({
-        current_level: 1,
-        total_xp: 0,
-        lifetime_xp: (profile.lifetime_xp || profile.total_xp || 0), // Keep lifetime XP
-        prestige_level: newPrestigeLevel,
-        prestige_multiplier: newMultiplier,
-        prestige_unlocks: newUnlocks,
-        // Set the new prestige title
-        player_title: PRESTIGE_CONFIG.TITLES[newPrestigeLevel] || null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', userId)
-      .eq('prestige_level', currentPrestige); // Optimistic lock: prevent double-prestige race
+      .update({ prestige_unlocks: newUnlocks })
+      .eq('id', userId);
 
-    if (updateError) {
-      console.error('[PRESTIGE API] Update error:', updateError);
-      return NextResponse.json({ error: 'Failed to apply prestige' }, { status: 500 });
-    }
+    const newMultiplier = result.new_multiplier;
 
     return NextResponse.json({
       success: true,
@@ -164,21 +169,4 @@ export async function POST(_request: NextRequest) {
     console.error('[PRESTIGE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
-
-function toRoman(num: number): string {
-  const romanNumerals: [number, string][] = [
-    [5, 'V'],
-    [4, 'IV'],
-    [1, 'I'],
-  ];
-
-  let result = '';
-  for (const [value, numeral] of romanNumerals) {
-    while (num >= value) {
-      result += numeral;
-      num -= value;
-    }
-  }
-  return result;
 }

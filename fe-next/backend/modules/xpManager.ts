@@ -441,7 +441,7 @@ function formatTitleName(title: string): string {
 /**
  * Convert number to Roman numeral (for prestige display)
  */
-function toRoman(num: number): string {
+export function toRoman(num: number): string {
   const romanNumerals: [number, string][] = [
     [5, 'V'],
     [4, 'IV'],
