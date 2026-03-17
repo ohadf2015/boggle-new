@@ -7,6 +7,7 @@
  */
 
 import { z } from 'zod';
+import { customAvatarSchema } from '../types/customAvatar';
 
 // ==================== Security Configuration ====================
 
@@ -72,6 +73,7 @@ export const AvatarSchema = z.object({
     }, 'Invalid emoji format'),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   avatarImage: z.string().max(100).regex(/^[a-z0-9_\-\/]+$/i).optional().nullable(),
+  customAvatar: customAvatarSchema.optional().nullable(),
   profilePictureUrl: z.string()
     .url()
     .nullable()
