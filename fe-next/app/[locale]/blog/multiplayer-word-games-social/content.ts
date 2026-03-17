@@ -33,7 +33,7 @@ I chose Option B. Obviously.
 
 And here's the thing — it wasn't just more fun. I played measurably better. My average word length went up. I found words I'd never have spotted alone. At one point I played QUIXOTIC and nearly blacked out from the dopamine rush, mostly because my friend Jake immediately called me a show-off, which somehow made it even better.
 
-This isn't just me being dramatic (though I am, famously, dramatic). There's a growing body of research showing that playing word games socially — whether cooperative or competitive — activates different neural circuits than playing alone. Your brain literally operates in a different mode when other humans are in the mix.
+This isn't just me being dramatic (though I am, famously, dramatic). Research shows that playing word games socially — whether cooperative or competitive — activates different neural circuits than playing alone. Your brain literally operates in a different mode when other humans are in the mix.
 
 Let me walk you through what we know, what we're still figuring out, and why game night might be the best thing you can do for your brain this week.`,
       },

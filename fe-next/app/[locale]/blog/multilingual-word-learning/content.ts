@@ -29,7 +29,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
       {
         content: `I was three rounds into a LexiClash session in English when my brain decided — completely unprompted — to spell "bibliotek." That's Swedish for library. I don't live in Sweden. I wasn't thinking about Sweden. I was trying to make "bottle" out of B-I-O-T-L-E-K and my brain went, "You know what fits? A Swedish word. You're welcome."
 
-If this has ever happened to you — mixing up languages mid-game, mid-sentence, mid-thought — congratulations. Your brain is not broken. It's actually doing something fascinating, and there's a growing body of research suggesting that the very thing that feels like a glitch might be a feature.
+If this has ever happened to you — mixing up languages mid-game, mid-sentence, mid-thought — congratulations. Your brain is not broken. It's actually doing something fascinating, and recent research suggests the very thing that feels like a glitch might be a feature.
 
 But let me be honest with you upfront: some of the claims about bilingual brains have been wildly overstated. The "bilingual advantage" is one of the most contested ideas in cognitive science right now. So I'm going to tell you what we actually know, what we think we know, and where the science gets plain weird.`,
       },
