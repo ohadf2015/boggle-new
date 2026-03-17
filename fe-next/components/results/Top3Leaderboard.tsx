@@ -161,7 +161,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   // Card background styling per rank
   const cardStyles = {
     1: 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500',
-    2: 'bg-gradient-to-b from-slate-200 via-slate-300 to-slate-400',
+    2: 'bg-gradient-to-b from-slate-300 to-slate-400',
     3: 'bg-gradient-to-b from-orange-300 via-orange-400 to-orange-500',
   };
 

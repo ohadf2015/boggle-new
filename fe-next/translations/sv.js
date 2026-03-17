@@ -652,6 +652,7 @@ const sv = {
       "type": "Välj en",
       "skinColor": "Hudfärg",
       "hairColor": "Hårfärg",
+      "shirtColor": "Skjortfärg",
       "accessoryColor": "Färg",
       "bgColor": "Bakgrund",
       "randomize": "Överraska mig",

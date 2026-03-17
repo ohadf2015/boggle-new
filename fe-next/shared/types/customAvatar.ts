@@ -4,11 +4,13 @@ import { z } from 'zod';
 export const AVATAR_GENDERS = ['male', 'female'] as const;
 
 // ==================== Face Base Shapes ====================
-export const AVATAR_BASES = ['round', 'square', 'oval', 'heart', 'diamond', 'hexagon', 'blob', 'skull', 'shield', 'star', 'dragonHead'] as const;
+export const AVATAR_BASES = ['round', 'square', 'oval', 'heart', 'diamond', 'hexagon', 'blob', 'skull', 'shield', 'dragonHead'] as const;
 
 // ==================== Skin Colors (inclusive range) ====================
 export const AVATAR_SKIN_COLORS = [
   '#FFDBB4', '#F8D5C2', '#EDB98A', '#D08B5B', '#AE5D29', '#694D3D',
+  '#FFE0BD', '#C68642', '#8D5524', '#4A2912',
+  '#87CEEB', '#98FB98', '#FFB6C1', '#E6E6FA', '#FFFACD',
 ] as const;
 
 // ==================== Hair ====================
@@ -42,14 +44,14 @@ export const AVATAR_HAIR_COLORS = [
 
 // ==================== Eyes ====================
 export const AVATAR_EYE_STYLES = [
-  'round', 'sleepy', 'star', 'wink', 'happy', 'angry', 'cool', 'sparkle',
+  'none', 'round', 'sleepy', 'star', 'wink', 'happy', 'angry', 'cool', 'sparkle',
   'hearts', 'dizzy', 'cyclops', 'lashes', 'monocleEye', 'crossEyed', 'laser',
   'hypno', 'money', 'alien', 'crying', 'galaxy', 'flame', 'robot', 'void', 'infinity',
 ] as const;
 
 // ==================== Mouth ====================
 export const AVATAR_MOUTH_STYLES = [
-  'smile', 'grin', 'tongue', 'oh', 'smirk', 'flat', 'teeth', 'cat',
+  'none', 'smile', 'grin', 'tongue', 'oh', 'smirk', 'flat', 'teeth', 'cat',
   'vampire', 'kiss', 'braces', 'drool', 'goldTooth', 'mustache', 'whistle',
   'zipper', 'blowfish', 'gap', 'pipe', 'dragon', 'diamond', 'glitch',
 ] as const;
@@ -59,12 +61,18 @@ export const AVATAR_ACCESSORIES = [
   'none', 'glasses', 'sunglasses', 'hat', 'cap', 'headband', 'crown', 'earring', 'bandana', 'horns',
   'monocle', 'eyepatch', 'tiara', 'antenna', 'halo', 'mask', 'scarf', 'bowtie',
   'keffiyeh', 'fez', 'mustacheGlasses', 'sombrero', 'turban', 'noseRing', 'clownNose', 'partyHat',
-  'propellerHat', 'viking', 'devilHorns', 'headphones', 'chefHat', 'cucumberFace', 'monkeyEars', 'plunger',
+  'propellerHat', 'viking', 'devilHorns', 'headphones', 'chefHat', 'cucumberFace', 'plunger',
   'samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown',
+  'monkeyEars',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
   '#000000', '#FFFFFF', '#FF1493', '#00FFFF', '#BFFF00', '#8B5CF6', '#FF6B35', '#FFD700',
+] as const;
+
+// ==================== Shirt Colors ====================
+export const AVATAR_SHIRT_COLORS = [
+  '#4A90D9', '#E85D9B', '#FF6B35', '#00897B', '#8B5CF6', '#C62828', '#FFD700', '#2C1B18',
 ] as const;
 
 // ==================== Background Colors ====================
@@ -90,6 +98,8 @@ export const customAvatarSchema = z.object({
   accessory: z.enum(AVATAR_ACCESSORIES),
   accessoryColor: hexColorSchema,
   bgColor: hexColorSchema,
+  /** Shirt/body color — defaults based on gender for backward compat */
+  shirtColor: hexColorSchema.optional(),
 });
 
 export type CustomAvatarConfig = z.output<typeof customAvatarSchema>;
@@ -107,6 +117,7 @@ export const DEFAULT_AVATAR_CONFIG: CustomAvatarConfig = {
   accessory: 'none',
   accessoryColor: '#000000',
   bgColor: '#1a1a2e',
+  shirtColor: '#4A90D9',
 };
 
 // ==================== Premium Part Definitions (VIP tier) ====================
@@ -147,9 +158,13 @@ export const EPIC_EYE_STYLES = ['galaxy', 'flame', 'robot', 'void', 'infinity'] 
 export const EPIC_MOUTH_STYLES = ['dragon', 'diamond', 'glitch'] as const;
 export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown'] as const;
 export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon'] as const;
-export const EPIC_BASES = ['skull', 'shield', 'star', 'dragonHead'] as const;
+export const EPIC_BASES = ['skull', 'shield', 'dragonHead'] as const;
 
-// Default prices per category (VIP tier)
+// ==================== Per-Part Pricing ====================
+// Every premium part has an explicit price. Fallback by category only for
+// parts accidentally missing from this map.
+
+// Category-level fallback (safety net)
 export const PREMIUM_PART_PRICES: Record<string, number> = {
   eyes: 400,
   mouth: 400,
@@ -159,22 +174,84 @@ export const PREMIUM_PART_PRICES: Record<string, number> = {
   base: 750,
 };
 
-// Epic per-part overrides (legendary pricing)
+// VIP per-part prices
+export const VIP_PART_PRICES: Record<string, number> = {
+  // ── Eyes (VIP) ──
+  'eyes:laser': 500,
+  'eyes:hypno': 450,
+  'eyes:money': 400,
+  'eyes:alien': 450,
+  'eyes:star': 300,
+  'eyes:sparkle': 300,
+  'eyes:hearts': 350,
+  'eyes:cyclops': 400,
+  'eyes:monocleEye': 350,
+  // ── Mouth (VIP) ──
+  'mouth:goldTooth': 500,
+  'mouth:pipe': 450,
+  'mouth:vampire': 400,
+  'mouth:cat': 300,
+  'mouth:zipper': 350,
+  'mouth:blowfish': 350,
+  'mouth:kiss': 300,
+  'mouth:mustache': 300,
+  // ── Accessories (VIP) ──
+  'accessory:crown': 800,
+  'accessory:tiara': 700,
+  'accessory:halo': 600,
+  'accessory:viking': 650,
+  'accessory:devilHorns': 500,
+  'accessory:headphones': 450,
+  'accessory:chefHat': 400,
+  'accessory:monocle': 500,
+  'accessory:eyepatch': 400,
+  'accessory:mask': 450,
+  'accessory:sombrero': 500,
+  'accessory:cucumberFace': 350,
+
+  'accessory:plunger': 300,
+  'accessory:mustacheGlasses': 400,
+  'accessory:propellerHat': 350,
+  // ── Hair (VIP) ──
+  'hair:elvis': 600,
+  'hair:ramen': 550,
+  'hair:mohawk': 400,
+  'hair:sideshave': 450,
+  'hair:twintails': 500,
+  // ── Bases (VIP) ──
+  'base:hexagon': 800,
+  'base:blob': 750,
+  'base:diamond': 900,
+  'base:heart': 700,
+  // ── Background Colors (VIP) ──
+  'bgColor:#FF0000': 250,
+  'bgColor:#000000': 300,
+  'bgColor:#4B0082': 250,
+  'bgColor:#FFD700': 350,
+};
+
+// Epic per-part prices (legendary tier)
 export const EPIC_PART_PRICES: Record<string, number> = {
+  // ── Eyes (Epic) ──
   'eyes:galaxy': 1500, 'eyes:flame': 1500, 'eyes:robot': 1200, 'eyes:void': 2000,
+  // ── Mouth (Epic) ──
   'mouth:dragon': 1500, 'mouth:diamond': 2000, 'mouth:glitch': 1200,
+  // ── Accessories (Epic) ──
   'accessory:samurai': 2500, 'accessory:astronaut': 2500, 'accessory:wizardHat': 2000, 'accessory:ninjaScarf': 1800,
+  // ── Hair (Epic) ──
   'hair:flame': 2000, 'hair:galaxy': 2500, 'hair:neon': 1800,
-  'base:skull': 3000, 'base:shield': 2500, 'base:star': 2000,
+  // ── Bases (Epic) ──
+  'base:skull': 3000, 'base:shield': 2500,
   // LEGENDARY — the 3 rarest items in the game
   'eyes:infinity': 7500,
   'accessory:phoenixCrown': 10000,
   'base:dragonHead': 10000,
 };
 
-/** Get price for a part (epic override > category default) */
+/** Get price for a part (epic > vip per-part > category default) */
 export function getPartPrice(category: string, partId: string): number {
-  return EPIC_PART_PRICES[`${category}:${partId}`] ?? PREMIUM_PART_PRICES[category] ?? 500;
+  const key = `${category}:${partId}`;
+  return EPIC_PART_PRICES[key] ?? VIP_PART_PRICES[key] ?? PREMIUM_PART_PRICES[category] ?? 500;
 }
 
 /** Check if a part is epic tier */
@@ -217,11 +294,12 @@ export function getPremiumParts(category: string): string[] {
 }
 
 // Free-only arrays (all premium+epic parts filtered out) for random generation
+// Also exclude 'none' from face parts so random avatars always have a complete face
 const FREE_BASES = AVATAR_BASES.filter(v => !PREMIUM_MAP.base.includes(v));
-const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => !PREMIUM_MAP.eyes.includes(v));
-const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => !PREMIUM_MAP.mouth.includes(v));
+const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.eyes.includes(v));
+const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.mouth.includes(v));
 const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v));
-const FREE_HAIR_STYLES = AVATAR_HAIR_STYLES.filter(v => !PREMIUM_MAP.hair.includes(v));
+const FREE_HAIR_STYLES = AVATAR_HAIR_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.hair.includes(v));
 
 export function getRandomAvatarConfig(): CustomAvatarConfig {
   const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -236,6 +314,7 @@ export function getRandomAvatarConfig(): CustomAvatarConfig {
     accessory: pick(FREE_ACCESSORIES),
     accessoryColor: pick(AVATAR_ACCESSORY_COLORS),
     bgColor: pick(AVATAR_BG_COLORS),
+    shirtColor: pick(AVATAR_SHIRT_COLORS),
   };
 }
 
@@ -264,6 +343,7 @@ export function getSeededAvatarConfig(seed: number): CustomAvatarConfig {
     accessory: pick(FREE_ACCESSORIES),
     accessoryColor: pick(AVATAR_ACCESSORY_COLORS),
     bgColor: pick(AVATAR_BG_COLORS),
+    shirtColor: pick(AVATAR_SHIRT_COLORS),
   };
 }
 

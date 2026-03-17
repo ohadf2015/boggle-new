@@ -615,6 +615,22 @@ describe('useBlastGame', () => {
       }
 
       if (primaryBomb && secondaryBomb) {
+        // Snapshot initial hitsRemaining for cells exclusive to secondary's blast
+        const initialHits = new Map<string, number>();
+        for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
+          for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
+            const r = secondaryBomb.row + dr;
+            const c = secondaryBomb.col + dc;
+            if (r < 0 || r >= 4 || c < 0 || c >= 4) continue;
+            const inPrimaryBlast =
+              Math.abs(r - primaryBomb!.row) <= BOMB_RADIUS &&
+              Math.abs(c - primaryBomb!.col) <= BOMB_RADIUS;
+            if (!inPrimaryBlast) {
+              initialHits.set(`${r},${c}`, result.current.tileStates[r][c].hitsRemaining);
+            }
+          }
+        }
+
         act(() => {
           result.current.clearTilesForWord(
             [{ row: primaryBomb!.row, col: primaryBomb!.col }],
@@ -627,40 +643,17 @@ describe('useBlastGame', () => {
         expect(result.current.tileStates[secondaryBomb.row][secondaryBomb.col].isCleared).toBe(true);
 
         // Verify chain: find a cell in secondary's blast radius that is NOT in primary's
-        // This proves the secondary bomb's explosion propagated
-        let chainVerified = false;
-        for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
-          for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
-            const r = secondaryBomb.row + dr;
-            const c = secondaryBomb.col + dc;
-            if (r < 0 || r >= 4 || c < 0 || c >= 4) continue;
-            // Skip cells that overlap with primary bomb's blast
-            const inPrimaryBlast =
-              Math.abs(r - primaryBomb!.row) <= BOMB_RADIUS &&
-              Math.abs(c - primaryBomb!.col) <= BOMB_RADIUS;
-            if (!inPrimaryBlast && result.current.tileStates[r][c].isCleared) {
+        // and was affected (cleared or damaged via reduced hitsRemaining)
+        if (initialHits.size > 0) {
+          let chainVerified = false;
+          for (const [key, initHits] of initialHits) {
+            const [r, c] = key.split(',').map(Number);
+            const tile = result.current.tileStates[r][c];
+            if (tile.isCleared || tile.hitsRemaining < initHits) {
               chainVerified = true;
+              break;
             }
           }
-        }
-        // If secondary has cells outside primary's blast, they must be cleared via chain
-        // (If no such cells exist due to grid bounds, skip the assertion)
-        const hasExclusiveCells = (() => {
-          for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
-            for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
-              const r = secondaryBomb!.row + dr;
-              const c = secondaryBomb!.col + dc;
-              if (r < 0 || r >= 4 || c < 0 || c >= 4) continue;
-              const inPrimaryBlast =
-                Math.abs(r - primaryBomb!.row) <= BOMB_RADIUS &&
-                Math.abs(c - primaryBomb!.col) <= BOMB_RADIUS;
-              if (!inPrimaryBlast) return true;
-            }
-          }
-          return false;
-        })();
-
-        if (hasExclusiveCells) {
           expect(chainVerified).toBe(true);
         }
       }

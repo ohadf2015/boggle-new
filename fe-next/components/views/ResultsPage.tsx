@@ -513,15 +513,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
         </div>
 
-        {/* Quick Reactions bar above tab bar */}
-        {sortedScores.length > 1 && (
-          <div className="flex-shrink-0 fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] inset-x-0 z-40 flex justify-center pb-1">
-            <QuickReactions onReaction={sendReaction} layout="bar" />
-          </div>
-        )}
-
-        {/* Fixed Bottom Tab Bar */}
+        {/* Fixed Bottom Tab Bar — reactions integrated into tab bar area */}
         <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-bottom">
+          {/* Quick Reactions row inside tab bar (above tabs, no overlap with content) */}
+          {sortedScores.length > 1 && (
+            <div className="flex justify-center py-1 border-b border-neo-white/10">
+              <QuickReactions onReaction={sendReaction} layout="bar" />
+            </div>
+          )}
           <MobileTabBar
             tabs={mobileTabs}
             activeTab={mobileActiveTab}

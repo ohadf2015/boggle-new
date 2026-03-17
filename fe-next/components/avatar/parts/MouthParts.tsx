@@ -1,21 +1,31 @@
 /**
  * Avatar Mouth Parts
- * 8 mouth styles, positioned at y≈58 within viewBox 0 0 100 100
+ * 22 mouth styles, positioned at y≈58 within viewBox 0 0 100 100
  */
 
 const S = 2.5;
 
 function Smile() {
   return (
-    <path d="M40 60 Q50 68 60 60" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+    <g>
+      <path d="M40 60 Q50 68 60 60" fill="#E85D75" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M42 61 Q50 66 58 61" fill="#FF8FA3" opacity="0.5" />
+      <path d="M44 60 Q50 63 56 60" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.5" strokeLinecap="round" />
+    </g>
   );
 }
 
 function Grin() {
   return (
     <g>
-      <path d="M37 58 Q50 70 63 58" fill="#fff" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <path d="M37 58 Q50 62 63 58" fill="none" stroke="#000" strokeWidth={1} />
+      <path d="M37 58 Q50 70 63 58" fill="#8B0000" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M37 58 Q50 62 63 58" fill="#fff" stroke="#000" strokeWidth={1} />
+      <line x1="43" y1="58" x2="43" y2="61" stroke="#000" strokeWidth={0.6} />
+      <line x1="48" y1="58" x2="48" y2="62" stroke="#000" strokeWidth={0.6} />
+      <line x1="52" y1="58" x2="52" y2="62" stroke="#000" strokeWidth={0.6} />
+      <line x1="57" y1="58" x2="57" y2="61" stroke="#000" strokeWidth={0.6} />
+      <path d="M38 59 Q50 61 62 59" fill="none" stroke="#FF9999" strokeWidth={0.8} opacity="0.5" />
+      <ellipse cx="50" cy="67" rx="5" ry="3" fill="#FF6B6B" opacity="0.6" />
     </g>
   );
 }
@@ -24,36 +34,65 @@ function Tongue() {
   return (
     <g>
       <path d="M38 58 Q50 68 62 58" fill="#fff" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <ellipse cx="50" cy="66" rx="5" ry="4" fill="#FF6B6B" stroke="#000" strokeWidth={1.5} />
+      <path d="M38 59 Q50 61 62 59" fill="none" stroke="#E8A0A0" strokeWidth={0.8} />
+      <ellipse cx="50" cy="66" rx="6" ry="5" fill="#FF6B6B" stroke="#000" strokeWidth={1.5} />
+      <path d="M50 63 L50 69" fill="none" stroke="#CC4444" strokeWidth={0.8} opacity="0.6" />
+      <path d="M47 65 Q50 67 53 65" fill="none" stroke="#CC4444" strokeWidth={0.6} opacity="0.5" />
+      <ellipse cx="48" cy="65" rx="1.5" ry="1" fill="#fff" opacity="0.3" />
     </g>
   );
 }
 
 function Oh() {
   return (
-    <ellipse cx="50" cy="62" rx="5" ry="7" fill="#fff" stroke="#000" strokeWidth={S} />
+    <g>
+      <defs>
+        <radialGradient id="ohShadow" cx="50%" cy="40%" r="50%">
+          <stop offset="0%" stopColor="#333" />
+          <stop offset="100%" stopColor="#000" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="50" cy="62" rx="5" ry="7" fill="url(#ohShadow)" stroke="#000" strokeWidth={S} />
+      <ellipse cx="50" cy="62" rx="5.8" ry="7.8" fill="none" stroke="#E88" strokeWidth={1} opacity="0.4" />
+      <path d="M46 56 Q44 54 45 53" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
+      <path d="M54 56 Q56 54 55 53" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
+    </g>
   );
 }
 
 function Smirk() {
   return (
-    <path d="M42 60 Q52 66 58 58" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+    <g>
+      <path d="M42 61 Q52 66 58 57" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M43 62 Q50 65 56 59" fill="#E85D75" opacity="0.3" />
+      <circle cx="59" cy="58" r="1" fill="#000" opacity="0.3" />
+      <path d="M60 56 Q62 58 60 60" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.25" />
+    </g>
   );
 }
 
 function Flat() {
   return (
-    <line x1="40" y1="62" x2="60" y2="62" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+    <g>
+      <line x1="40" y1="62" x2="60" y2="62" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M41 60.5 Q50 59.5 59 60.5" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.25" />
+      <line x1="42" y1="64" x2="44" y2="64" stroke="#000" strokeWidth={0.6} opacity="0.2" />
+      <line x1="56" y1="64" x2="58" y2="64" stroke="#000" strokeWidth={0.6} opacity="0.2" />
+    </g>
   );
 }
 
 function Teeth() {
   return (
     <g>
+      <path d="M39 57 Q39 55 41 55 L59 55 Q61 55 61 57" fill="#FF9999" stroke="#000" strokeWidth={1.2} />
       <rect x="39" y="57" width="22" height="10" rx="4" fill="#fff" stroke="#000" strokeWidth={S} />
-      <line x1="45" y1="57" x2="45" y2="67" stroke="#000" strokeWidth={1} />
-      <line x1="50" y1="57" x2="50" y2="67" stroke="#000" strokeWidth={1} />
-      <line x1="55" y1="57" x2="55" y2="67" stroke="#000" strokeWidth={1} />
+      <path d="M39 58 L41 60 L44 58 L47 60 L50 58 L53 60 L56 58 L59 60 L61 58" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.3" />
+      <line x1="44" y1="57" x2="44" y2="67" stroke="#000" strokeWidth={0.8} />
+      <line x1="50" y1="57" x2="50" y2="67" stroke="#000" strokeWidth={0.8} />
+      <line x1="55.5" y1="57" x2="55.5" y2="67" stroke="#000" strokeWidth={0.8} />
+      <path d="M37 58 Q39 56 39 58" fill="none" stroke="#000" strokeWidth={1.2} strokeLinecap="round" />
+      <path d="M63 58 Q61 56 61 58" fill="none" stroke="#000" strokeWidth={1.2} strokeLinecap="round" />
     </g>
   );
 }
@@ -61,8 +100,15 @@ function Teeth() {
 function Cat() {
   return (
     <g>
-      {/* w-shaped cat mouth */}
+      <polygon points="50,55 48,52 52,52" fill="#FFB6C1" stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
       <path d="M38 60 L44 64 L50 58 L56 64 L62 60" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M50 58 L50 61" fill="none" stroke="#000" strokeWidth={1} />
+      <circle cx="34" cy="60" r="0.8" fill="#000" />
+      <circle cx="32" cy="58" r="0.8" fill="#000" />
+      <circle cx="32" cy="62" r="0.8" fill="#000" />
+      <circle cx="66" cy="60" r="0.8" fill="#000" />
+      <circle cx="68" cy="58" r="0.8" fill="#000" />
+      <circle cx="68" cy="62" r="0.8" fill="#000" />
     </g>
   );
 }
@@ -70,13 +116,14 @@ function Cat() {
 function Vampire() {
   return (
     <g>
-      <path d="M38 58 Q50 68 62 58" fill="#fff" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Fangs */}
-      <path d="M42 58 L42 65" stroke="#fff" strokeWidth={2} />
-      <path d="M42 58 L40 66" fill="#fff" stroke="#000" strokeWidth={1} />
-      <path d="M42 58 L44 66" fill="#fff" stroke="#000" strokeWidth={1} />
-      <path d="M58 58 L56 66" fill="#fff" stroke="#000" strokeWidth={1} />
-      <path d="M58 58 L60 66" fill="#fff" stroke="#000" strokeWidth={1} />
+      <path d="M38 58 Q50 68 62 58" fill="#4A0000" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M40 58 Q50 62 60 58" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.4" />
+      <polygon points="41,58 43,67 39,67" fill="#fff" stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <polygon points="59,58 61,67 57,67" fill="#fff" stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <path d="M41 58 L41.5 61" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.4" />
+      <path d="M59 58 L59.5 61" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.4" />
+      <ellipse cx="43" cy="68" rx="1.2" ry="1.8" fill="#CC0000" stroke="#800" strokeWidth={0.5} />
+      <ellipse cx="43" cy="67.5" rx="0.5" ry="0.5" fill="#FF4444" opacity="0.5" />
     </g>
   );
 }
@@ -84,8 +131,13 @@ function Vampire() {
 function Kiss() {
   return (
     <g>
-      <ellipse cx="50" cy="62" rx="6" ry="4" fill="#FF1493" stroke="#000" strokeWidth={S} />
-      <ellipse cx="48" cy="61" rx="2" ry="1.5" fill="#FF69B4" opacity="0.5" />
+      <ellipse cx="50" cy="62" rx="6" ry="4.5" fill="#FF1493" stroke="#000" strokeWidth={S} />
+      <path d="M45 61 Q50 59 55 61" fill="none" stroke="#CC0066" strokeWidth={0.6} />
+      <path d="M45 63 Q50 65 55 63" fill="none" stroke="#CC0066" strokeWidth={0.6} />
+      <path d="M46 62 Q50 60.5 54 62" fill="none" stroke="#CC0066" strokeWidth={0.5} opacity="0.4" />
+      <ellipse cx="47" cy="61" rx="2" ry="1.5" fill="#FF69B4" opacity="0.5" />
+      <ellipse cx="53" cy="61" rx="1.2" ry="0.8" fill="#fff" opacity="0.35" />
+      <path d="M53 52 L54 50 L53.5 51 L55 50 L54 52 L54.5 50.5" fill="#FF1493" stroke="#CC0066" strokeWidth={0.6} />
     </g>
   );
 }
@@ -94,14 +146,16 @@ function Braces() {
   return (
     <g>
       <rect x="39" y="57" width="22" height="10" rx="4" fill="#fff" stroke="#000" strokeWidth={S} />
-      <line x1="45" y1="57" x2="45" y2="67" stroke="#000" strokeWidth={1} />
-      <line x1="50" y1="57" x2="50" y2="67" stroke="#000" strokeWidth={1} />
-      <line x1="55" y1="57" x2="55" y2="67" stroke="#000" strokeWidth={1} />
-      {/* Braces wire */}
-      <line x1="40" y1="62" x2="60" y2="62" stroke="#00BFFF" strokeWidth={1.5} />
-      <circle cx="43" cy="62" r="1" fill="#00BFFF" />
-      <circle cx="50" cy="62" r="1" fill="#00BFFF" />
-      <circle cx="57" cy="62" r="1" fill="#00BFFF" />
+      <line x1="44" y1="57" x2="44" y2="67" stroke="#000" strokeWidth={0.8} />
+      <line x1="50" y1="57" x2="50" y2="67" stroke="#000" strokeWidth={0.8} />
+      <line x1="55.5" y1="57" x2="55.5" y2="67" stroke="#000" strokeWidth={0.8} />
+      <line x1="40" y1="62" x2="60" y2="62" stroke="#C0C0C0" strokeWidth={1.8} />
+      <rect x="41.5" y="61" width="2" height="2" rx="0.3" fill="#C0C0C0" stroke="#888" strokeWidth={0.5} />
+      <rect x="48.5" y="61" width="2" height="2" rx="0.3" fill="#C0C0C0" stroke="#888" strokeWidth={0.5} />
+      <rect x="54" y="61" width="2" height="2" rx="0.3" fill="#C0C0C0" stroke="#888" strokeWidth={0.5} />
+      <circle cx="43" cy="62" r="0.8" fill="#FF4081" />
+      <circle cx="50" cy="62" r="0.8" fill="#448AFF" />
+      <circle cx="55.5" cy="62" r="0.8" fill="#69F0AE" />
     </g>
   );
 }
@@ -110,8 +164,12 @@ function Drool() {
   return (
     <g>
       <path d="M40 60 Q50 68 60 60" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Drool drop */}
-      <path d="M56 62 Q58 70 56 74 Q54 76 52 74 Q50 70 52 62" fill="#87CEEB" stroke="#000" strokeWidth={1} opacity="0.8" />
+      <path d="M55 63 Q57 70 55 75 Q53 77 51 75 Q49 70 51 63" fill="#87CEEB" stroke="#000" strokeWidth={1} opacity="0.8" />
+      <path d="M53 64 Q54 68 53 72" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.5" />
+      <path d="M58 64 Q60 68 59 71 Q58 72 57 71 Q56 68 57 64" fill="#87CEEB" stroke="#000" strokeWidth={0.8} opacity="0.6" />
+      <path d="M48 65 Q49 68 48 70 Q47.5 71 47 70 Q46.5 68 47 65" fill="#87CEEB" stroke="#000" strokeWidth={0.6} opacity="0.5" />
+      <ellipse cx="54" cy="74" rx="1.5" ry="1.5" fill="#B0E0FF" stroke="#87CEEB" strokeWidth={0.5} opacity="0.7" />
+      <ellipse cx="53.5" cy="73.5" rx="0.5" ry="0.5" fill="#fff" opacity="0.6" />
     </g>
   );
 }
@@ -119,14 +177,16 @@ function Drool() {
 function GoldTooth() {
   return (
     <g>
-      {/* Big grin showing teeth */}
       <rect x="39" y="57" width="22" height="10" rx="4" fill="#fff" stroke="#000" strokeWidth={S} />
-      <line x1="45" y1="57" x2="45" y2="67" stroke="#000" strokeWidth={1} />
-      <line x1="50" y1="57" x2="50" y2="67" stroke="#000" strokeWidth={1} />
-      <line x1="55" y1="57" x2="55" y2="67" stroke="#000" strokeWidth={1} />
-      {/* Gold tooth — bling! */}
-      <rect x="50" y="57" width="5" height="10" rx="1" fill="#FFD700" stroke="#000" strokeWidth={1} />
+      <line x1="44" y1="57" x2="44" y2="67" stroke="#000" strokeWidth={0.8} />
+      <line x1="50" y1="57" x2="50" y2="67" stroke="#000" strokeWidth={0.8} />
+      <line x1="55.5" y1="57" x2="55.5" y2="67" stroke="#000" strokeWidth={0.8} />
+      <rect x="50" y="57" width="5.5" height="10" rx="1" fill="#FFD700" stroke="#000" strokeWidth={1} />
       <rect x="51" y="58" width="2" height="3" rx="0.5" fill="#fff" opacity="0.4" />
+      <line x1="52" y1="54" x2="52" y2="56" stroke="#FFD700" strokeWidth={0.8} />
+      <line x1="49" y1="55" x2="50.5" y2="56.5" stroke="#FFD700" strokeWidth={0.8} />
+      <line x1="56" y1="55" x2="55" y2="56.5" stroke="#FFD700" strokeWidth={0.8} />
+      <circle cx="53" cy="55" r="0.6" fill="#FFD700" />
     </g>
   );
 }
@@ -134,14 +194,17 @@ function GoldTooth() {
 function Mustache() {
   return (
     <g>
-      {/* Subtle smile underneath */}
       <path d="M42 62 Q50 66 58 62" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
-      {/* Handlebar mustache */}
       <path d="M50 56 Q44 58 36 55 Q30 52 26 54" fill="#2C1B18" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <path d="M50 56 Q56 58 64 55 Q70 52 74 54" fill="#2C1B18" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Curl tips */}
-      <circle cx="26" cy="53" r="2" fill="#2C1B18" stroke="#000" strokeWidth={1} />
-      <circle cx="74" cy="53" r="2" fill="#2C1B18" stroke="#000" strokeWidth={1} />
+      <path d="M50 55 Q44 56.5 38 54.5" fill="none" stroke="#4A3328" strokeWidth={0.8} opacity="0.5" />
+      <path d="M50 55 Q56 56.5 62 54.5" fill="none" stroke="#4A3328" strokeWidth={0.8} opacity="0.5" />
+      <path d="M50 57 Q46 58 40 56" fill="none" stroke="#1A0F0A" strokeWidth={0.6} opacity="0.4" />
+      <path d="M50 57 Q54 58 60 56" fill="none" stroke="#1A0F0A" strokeWidth={0.6} opacity="0.4" />
+      <circle cx="26" cy="53" r="2.5" fill="#2C1B18" stroke="#000" strokeWidth={1.2} />
+      <circle cx="74" cy="53" r="2.5" fill="#2C1B18" stroke="#000" strokeWidth={1.2} />
+      <path d="M25 52 Q26 50 27 52" fill="none" stroke="#000" strokeWidth={0.8} />
+      <path d="M73 52 Q74 50 75 52" fill="none" stroke="#000" strokeWidth={0.8} />
     </g>
   );
 }
@@ -149,11 +212,15 @@ function Mustache() {
 function Whistle() {
   return (
     <g>
-      {/* Puckered lips */}
-      <ellipse cx="50" cy="60" rx="4" ry="3" fill="#FF6B6B" stroke="#000" strokeWidth={S} />
-      {/* Musical notes floating out */}
+      <ellipse cx="50" cy="60" rx="4.5" ry="3.5" fill="#FF6B6B" stroke="#000" strokeWidth={S} />
+      <path d="M46.5 59 Q50 57.5 53.5 59" fill="none" stroke="#CC4444" strokeWidth={0.6} />
+      <path d="M47 61 Q50 62.5 53 61" fill="none" stroke="#CC4444" strokeWidth={0.6} />
+      <ellipse cx="48" cy="59.5" rx="1.2" ry="0.8" fill="#FF9999" opacity="0.5" />
+      <path d="M56 58 Q58 56 60 58" fill="none" stroke="#000" strokeWidth={1} opacity="0.3" />
+      <path d="M58 56 Q60 54 62 56" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
       <text x="58" y="52" fontSize="8" fill="#000" opacity="0.6" fontFamily="serif">&#9835;</text>
       <text x="66" y="48" fontSize="6" fill="#000" opacity="0.4" fontFamily="serif">&#9834;</text>
+      <text x="62" y="44" fontSize="5" fill="#000" opacity="0.3" fontFamily="serif">&#9833;</text>
     </g>
   );
 }
@@ -161,17 +228,20 @@ function Whistle() {
 function Zipper() {
   return (
     <g>
-      {/* Zipped shut mouth */}
+      <defs>
+        <linearGradient id="zipperMetal" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#DDD" />
+          <stop offset="50%" stopColor="#999" />
+          <stop offset="100%" stopColor="#666" />
+        </linearGradient>
+      </defs>
       <line x1="38" y1="62" x2="62" y2="62" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Zipper teeth */}
-      <line x1="40" y1="60" x2="40" y2="64" stroke="#888" strokeWidth={1.5} />
-      <line x1="44" y1="60" x2="44" y2="64" stroke="#888" strokeWidth={1.5} />
-      <line x1="48" y1="60" x2="48" y2="64" stroke="#888" strokeWidth={1.5} />
-      <line x1="52" y1="60" x2="52" y2="64" stroke="#888" strokeWidth={1.5} />
-      <line x1="56" y1="60" x2="56" y2="64" stroke="#888" strokeWidth={1.5} />
-      <line x1="60" y1="60" x2="60" y2="64" stroke="#888" strokeWidth={1.5} />
-      {/* Zipper pull */}
-      <rect x="36" y="60" width="4" height="4" rx="1" fill="#FFD700" stroke="#000" strokeWidth={1} />
+      <path d="M39 60.5 Q50 59 61 60.5" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.15" />
+      {[40, 44, 48, 52, 56, 60].map(x => (
+        <rect key={x} x={x - 1} y={60} width={2} height={4} rx={0.3} fill="url(#zipperMetal)" stroke="#555" strokeWidth={0.5} />
+      ))}
+      <rect x="35" y="59.5" width="5" height="5" rx="1.5" fill="#FFD700" stroke="#000" strokeWidth={1.2} />
+      <rect x="36.5" y="61" width="2" height="1.5" rx="0.5" fill="#FFF" opacity="0.3" />
     </g>
   );
 }
@@ -179,14 +249,18 @@ function Zipper() {
 function Blowfish() {
   return (
     <g>
-      {/* Puffed-out cheeks */}
       <ellipse cx="50" cy="62" rx="14" ry="10" fill="#FFB6C1" stroke="#000" strokeWidth={S} />
-      {/* Tiny pursed lips in center */}
-      <ellipse cx="50" cy="60" rx="3" ry="2" fill="#FF6B6B" stroke="#000" strokeWidth={1.5} />
-      {/* Air puff lines */}
-      <line x1="66" y1="58" x2="72" y2="56" stroke="#000" strokeWidth={1} opacity="0.3" />
-      <line x1="66" y1="62" x2="74" y2="62" stroke="#000" strokeWidth={1} opacity="0.2" />
-      <line x1="66" y1="66" x2="72" y2="68" stroke="#000" strokeWidth={1} opacity="0.3" />
+      <path d="M40 58 Q42 60 40 62" fill="none" stroke="#E8899A" strokeWidth={0.6} opacity="0.5" />
+      <path d="M60 58 Q58 60 60 62" fill="none" stroke="#E8899A" strokeWidth={0.6} opacity="0.5" />
+      <path d="M44 64 Q46 66 44 68" fill="none" stroke="#E8899A" strokeWidth={0.5} opacity="0.4" />
+      <path d="M56 64 Q54 66 56 68" fill="none" stroke="#E8899A" strokeWidth={0.5} opacity="0.4" />
+      <ellipse cx="50" cy="60" rx="3.5" ry="2.5" fill="#FF6B6B" stroke="#000" strokeWidth={1.5} />
+      <ellipse cx="49" cy="59.5" rx="1" ry="0.6" fill="#FF9999" opacity="0.5" />
+      <path d="M66 57 L73 55" stroke="#000" strokeWidth={1} opacity="0.25" strokeLinecap="round" />
+      <path d="M66 61 L75 61" stroke="#000" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      <path d="M66 65 L73 67" stroke="#000" strokeWidth={1} opacity="0.25" strokeLinecap="round" />
+      <path d="M68 58 L71 58" stroke="#000" strokeWidth={0.6} opacity="0.15" strokeLinecap="round" />
+      <path d="M69 64 L72 65" stroke="#000" strokeWidth={0.6} opacity="0.15" strokeLinecap="round" />
     </g>
   );
 }
@@ -194,11 +268,15 @@ function Blowfish() {
 function Gap() {
   return (
     <g>
-      {/* Big smile with gap tooth */}
+      {/* Open smile showing teeth */}
       <path d="M37 58 Q50 70 63 58" fill="#fff" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <path d="M37 58 Q50 62 63 58" fill="none" stroke="#000" strokeWidth={1} />
-      {/* Gap — black rectangle in center */}
-      <rect x="48" y="58" width="4" height="6" fill="#000" />
+      {/* Gap between front teeth — wider and darker for visibility */}
+      <rect x="47.5" y="58" width="5" height="8" fill="#3D0000" rx="0.5" />
+      {/* Gum line hint */}
+      <path d="M38 59 Q50 61 62 59" fill="none" stroke="#FF9999" strokeWidth={0.8} opacity="0.4" />
+      {/* Tongue peek */}
+      <ellipse cx="50" cy="67" rx="3" ry="2.5" fill="#FF6B6B" opacity="0.7" />
     </g>
   );
 }
@@ -206,16 +284,19 @@ function Gap() {
 function Pipe() {
   return (
     <g>
-      {/* Subtle closed-mouth smile */}
       <path d="M42 60 Q50 64 54 60" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Smoking pipe */}
       <path d="M54 60 L68 56 L70 48" fill="none" stroke="#8B4513" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {/* Pipe bowl */}
+      <path d="M56 59 L64 56" fill="none" stroke="#6B3410" strokeWidth={0.6} opacity="0.4" />
+      <path d="M58 59 L66 55.5" fill="none" stroke="#A0522D" strokeWidth={0.5} opacity="0.3" />
       <rect x="66" y="40" width="8" height="10" rx="2" fill="#8B4513" stroke="#000" strokeWidth={S} />
-      {/* Smoke puffs */}
-      <circle cx="70" cy="34" r="3" fill="#ddd" opacity="0.5" />
-      <circle cx="74" cy="28" r="4" fill="#ddd" opacity="0.35" />
-      <circle cx="72" cy="20" r="3" fill="#ddd" opacity="0.2" />
+      <path d="M67 42 L67 48" fill="none" stroke="#6B3410" strokeWidth={0.5} opacity="0.3" />
+      <path d="M69 41 L69 49" fill="none" stroke="#A0522D" strokeWidth={0.4} opacity="0.25" />
+      <ellipse cx="70" cy="41" rx="3" ry="1.5" fill="#FF4500" opacity="0.6" />
+      <ellipse cx="70" cy="41" rx="1.5" ry="0.8" fill="#FFD700" opacity="0.4" />
+      <circle cx="69" cy="34" r="3" fill="#ddd" opacity="0.5" />
+      <circle cx="73" cy="28" r="4" fill="#ddd" opacity="0.35" />
+      <circle cx="67" cy="23" r="3" fill="#ddd" opacity="0.2" />
+      <circle cx="71" cy="20" r="2.5" fill="#ddd" opacity="0.15" />
     </g>
   );
 }
@@ -223,14 +304,25 @@ function Pipe() {
 function Dragon() {
   return (
     <g>
-      {/* Open jaw with fangs */}
-      <path d="M35 58 Q50 72 65 58" fill="#8B0000" stroke="#000" strokeWidth={S} />
-      {/* Top fangs */}
-      <polygon points="40,58 42,64 38,64" fill="#fff" stroke="#000" strokeWidth={1} />
-      <polygon points="60,58 62,64 58,64" fill="#fff" stroke="#000" strokeWidth={1} />
-      {/* Fire breath wisps */}
-      <path d="M43 65 Q45 60 48 66 Q50 58 52 66 Q55 60 57 65" fill="none" stroke="#FF6D00" strokeWidth={1.5} opacity="0.7" />
-      <path d="M46 67 Q48 62 50 68 Q52 62 54 67" fill="none" stroke="#FFD600" strokeWidth={1} opacity="0.5" />
+      <path d="M35 58 Q50 72 65 58" fill="#4A0000" stroke="#000" strokeWidth={S} />
+      <path d="M38 60 Q50 64 62 60" fill="none" stroke="#200" strokeWidth={0.8} opacity="0.5" />
+      <polygon points="39,58 42,66 36,66" fill="#fff" stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <polygon points="61,58 64,66 58,66" fill="#fff" stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <polygon points="46,58 48,63 44,63" fill="#fff" stroke="#000" strokeWidth={0.8} />
+      <polygon points="54,58 56,63 52,63" fill="#fff" stroke="#000" strokeWidth={0.8} />
+      <path d="M48 64 Q50 70 52 64" fill="#FF3333" stroke="#CC0000" strokeWidth={0.8} />
+      <path d="M49.5 68 L48.5 72 M50.5 68 L51.5 72" fill="none" stroke="#CC0000" strokeWidth={0.8} />
+      <path d="M40 68 Q42 60 45 68 Q47 58 50 68 Q53 58 55 68 Q58 60 60 68" fill="none" stroke="#FF6D00" strokeWidth={2}>
+        <animate attributeName="opacity" values="0.8;0.4;0.9;0.6;0.8" dur="0.5s" repeatCount="indefinite" />
+      </path>
+      <path d="M43 70 Q45 63 48 70 Q50 62 52 70 Q55 63 57 70" fill="none" stroke="#FFD600" strokeWidth={1.2}>
+        <animate attributeName="opacity" values="0.6;0.9;0.3;0.7;0.6" dur="0.6s" repeatCount="indefinite" />
+      </path>
+      <path d="M46 71 Q48 66 50 72 Q52 66 54 71" fill="none" stroke="#FFF176" strokeWidth={0.8}>
+        <animate attributeName="opacity" values="0.4;0.7;0.2;0.5;0.4" dur="0.45s" repeatCount="indefinite" />
+      </path>
+      <circle cx="42" cy="69" r="0.5" fill="#4CAF50" opacity="0.7" />
+      <path d="M42 69 L41 72" fill="none" stroke="#4CAF50" strokeWidth={0.5} opacity="0.5" />
     </g>
   );
 }
@@ -245,17 +337,24 @@ function DiamondMouth() {
           <stop offset="100%" stopColor="#00ACC1" />
         </linearGradient>
       </defs>
-      {/* Diamond-encrusted grin */}
       <path d="M37 58 Q50 68 63 58" fill="#fff" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Diamond teeth */}
-      <polygon points="42,58 44,63 40,63" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
-      <polygon points="48,59 50,65 46,65" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
-      <polygon points="54,59 56,65 52,65" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
-      <polygon points="60,58 62,63 58,63" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
-      {/* Sparkle accents */}
-      <circle cx="44" cy="61" r="0.5" fill="#fff" />
-      <circle cx="50" cy="62" r="0.5" fill="#fff" />
-      <circle cx="56" cy="61" r="0.5" fill="#fff" />
+      <polygon points="41,58 43,64 39,64" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      <polygon points="47,59 49,65 45,65" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      <polygon points="53,59 55,65 51,65" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      <polygon points="59,58 61,64 57,64" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      <line x1="41" y1="60" x2="43" y2="64" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.5" />
+      <line x1="47" y1="61" x2="49" y2="65" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.5" />
+      <line x1="53" y1="61" x2="55" y2="65" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.5" />
+      <line x1="59" y1="60" x2="61" y2="64" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.5" />
+      {[42, 48, 54, 60].map(x => (
+        <g key={x}>
+          <line x1={x} y1={58} x2={x} y2={56} stroke="#fff" strokeWidth={0.5} opacity="0.6" />
+          <line x1={x - 1.5} y1={59} x2={x - 2.5} y2={58} stroke="#fff" strokeWidth={0.5} opacity="0.4" />
+          <line x1={x + 1.5} y1={59} x2={x + 2.5} y2={58} stroke="#fff" strokeWidth={0.5} opacity="0.4" />
+        </g>
+      ))}
+      <path d="M44 56 Q50 54 56 56" fill="none" stroke="#FF7043" strokeWidth={0.4} opacity="0.3" />
+      <path d="M46 55 Q50 53 54 55" fill="none" stroke="#AB47BC" strokeWidth={0.4} opacity="0.3" />
     </g>
   );
 }
@@ -263,21 +362,47 @@ function DiamondMouth() {
 function Glitch() {
   return (
     <g>
-      {/* Glitched mouth — offset rectangles */}
-      <rect x="38" y="57" width="24" height="4" rx="1" fill="#000" />
-      {/* Glitch offset slices */}
-      <rect x="40" y="57" width="8" height="4" rx="1" fill="#FF0000" opacity="0.4" transform="translate(2, -1)" />
-      <rect x="52" y="57" width="8" height="4" rx="1" fill="#00FFFF" opacity="0.4" transform="translate(-2, 1)" />
+      <rect x="38" y="57" width="24" height="5" rx="1" fill="#000" />
+      {/* Glitch offset slices — jittering */}
+      <rect x="36" y="56" width="10" height="2" fill="#FF0000">
+        <animate attributeName="opacity" values="0.35;0;0.35;0.5;0" dur="0.3s" repeatCount="indefinite" />
+        <animate attributeName="x" values="36;38;35;36" dur="0.4s" repeatCount="indefinite" />
+      </rect>
+      <rect x="54" y="60" width="10" height="2" fill="#00FFFF">
+        <animate attributeName="opacity" values="0.35;0.5;0;0.35;0" dur="0.35s" repeatCount="indefinite" />
+        <animate attributeName="x" values="54;52;55;54" dur="0.45s" repeatCount="indefinite" />
+      </rect>
+      <rect x="42" y="59" width="6" height="1" fill="#FF00FF">
+        <animate attributeName="opacity" values="0.25;0;0.4;0;0.25" dur="0.25s" repeatCount="indefinite" />
+      </rect>
+      <rect x="40" y="57" width="8" height="5" rx="1" fill="#FF0000" opacity="0.3" transform="translate(2, -1)">
+        <animate attributeName="opacity" values="0.3;0;0.3;0.5;0.3" dur="0.5s" repeatCount="indefinite" />
+      </rect>
+      <rect x="52" y="57" width="8" height="5" rx="1" fill="#00FFFF" opacity="0.3" transform="translate(-2, 1)">
+        <animate attributeName="opacity" values="0.3;0.5;0.3;0;0.3" dur="0.4s" repeatCount="indefinite" />
+      </rect>
       {/* Pixel teeth */}
-      <rect x="41" y="57" width="3" height="2" fill="#fff" />
-      <rect x="46" y="57" width="3" height="2" fill="#fff" />
-      <rect x="51" y="57" width="3" height="2" fill="#fff" />
-      <rect x="56" y="57" width="3" height="2" fill="#fff" />
+      <rect x="41" y="57" width="3" height="2.5" fill="#fff" />
+      <rect x="46" y="57" width="3" height="2.5" fill="#fff" />
+      <rect x="51" y="57" width="3" height="2.5" fill="#fff" />
+      <rect x="56" y="57" width="3" height="2.5" fill="#fff" />
+      {/* Scan lines */}
+      <line x1="38" y1="58.5" x2="62" y2="58.5" stroke="#fff" strokeWidth={0.3} opacity="0.15" />
+      <line x1="38" y1="60" x2="62" y2="60" stroke="#fff" strokeWidth={0.3} opacity="0.1" />
+      <rect x="44" y="56" width="4" height="1" fill="#0F0">
+        <animate attributeName="opacity" values="0.2;0;0.3;0;0.2" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="52" y="62" width="5" height="1" fill="#F0F">
+        <animate attributeName="opacity" values="0.15;0.3;0;0.15" dur="0.5s" repeatCount="indefinite" />
+      </rect>
     </g>
   );
 }
 
+function None() { return <g />; }
+
 export const MOUTH_PARTS = {
+  none: None,
   smile: Smile,
   grin: Grin,
   tongue: Tongue,

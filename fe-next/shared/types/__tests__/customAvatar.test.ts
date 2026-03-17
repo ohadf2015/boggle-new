@@ -83,6 +83,28 @@ describe('customAvatarSchema', () => {
     // Then it fails
     expect(result.success).toBe(false);
   });
+
+  it('should accept none for eyes and mouth', () => {
+    // Given a config with no eyes and no mouth
+    const config = { ...DEFAULT_AVATAR_CONFIG, eyes: 'none', mouth: 'none' };
+
+    // When parsing
+    const result = customAvatarSchema.safeParse(config);
+
+    // Then it succeeds
+    expect(result.success).toBe(true);
+  });
+
+  it('should include fantasy skin colors', () => {
+    // Given a config with a fantasy skin color (light blue)
+    const config = { ...DEFAULT_AVATAR_CONFIG, skinColor: '#87CEEB' };
+
+    // When parsing
+    const result = customAvatarSchema.safeParse(config);
+
+    // Then it succeeds — skin color accepts any valid hex
+    expect(result.success).toBe(true);
+  });
 });
 
 describe('getRandomAvatarConfig', () => {
@@ -173,7 +195,7 @@ describe('Premium Parts', () => {
       expect(isPremiumPart('accessory', 'mask')).toBe(true);
       expect(isPremiumPart('accessory', 'sombrero')).toBe(true);
       expect(isPremiumPart('accessory', 'cucumberFace')).toBe(true);
-      expect(isPremiumPart('accessory', 'monkeyEars')).toBe(true);
+
       expect(isPremiumPart('accessory', 'plunger')).toBe(true);
       expect(isPremiumPart('accessory', 'mustacheGlasses')).toBe(true);
       expect(isPremiumPart('accessory', 'propellerHat')).toBe(true);
@@ -251,7 +273,7 @@ describe('Premium Parts', () => {
     test('returns all premium bases (VIP + Epic)', () => {
       expect(getPremiumParts('base')).toEqual([
         'hexagon', 'blob', 'diamond', 'heart',
-        'skull', 'shield', 'star', 'dragonHead',
+        'skull', 'shield', 'dragonHead',
       ]);
     });
     test('returns empty for unknown category', () => {
@@ -277,7 +299,6 @@ describe('Premium Parts', () => {
     test('identifies epic bases', () => {
       expect(isEpicPart('base', 'skull')).toBe(true);
       expect(isEpicPart('base', 'shield')).toBe(true);
-      expect(isEpicPart('base', 'star')).toBe(true);
       expect(isEpicPart('base', 'dragonHead')).toBe(true);
     });
     test('identifies legendary parts as epic', () => {
@@ -328,9 +349,12 @@ describe('Premium Parts', () => {
       expect(getPartPrice('base', 'skull')).toBe(3000);
       expect(getPartPrice('eyes', 'galaxy')).toBe(1500);
     });
-    test('getPartPrice returns category default for VIP parts', () => {
-      expect(getPartPrice('eyes', 'laser')).toBe(400);
-      expect(getPartPrice('base', 'hexagon')).toBe(750);
+    test('getPartPrice returns per-part price for VIP parts', () => {
+      expect(getPartPrice('eyes', 'laser')).toBe(500);
+      expect(getPartPrice('base', 'hexagon')).toBe(800);
+      expect(getPartPrice('hair', 'elvis')).toBe(600);
+      expect(getPartPrice('accessory', 'crown')).toBe(800);
+      expect(getPartPrice('mouth', 'goldTooth')).toBe(500);
     });
     test('all epic prices are higher than VIP category defaults', () => {
       Object.entries(EPIC_PART_PRICES).forEach(([key, price]) => {
@@ -362,6 +386,26 @@ describe('Premium Parts', () => {
         expect(isPremiumPart('mouth', config.mouth)).toBe(false);
         expect(isPremiumPart('accessory', config.accessory)).toBe(false);
         expect(isPremiumPart('hair', config.hair)).toBe(false);
+      }
+    });
+  });
+
+  describe('random avatars always have all visible face parts', () => {
+    test('getRandomAvatarConfig never returns none for eyes, mouth, or hair', () => {
+      for (let i = 0; i < 200; i++) {
+        const config = getRandomAvatarConfig();
+        expect(config.eyes).not.toBe('none');
+        expect(config.mouth).not.toBe('none');
+        expect(config.hair).not.toBe('none');
+      }
+    });
+
+    test('getSeededAvatarConfig never returns none for eyes, mouth, or hair', () => {
+      for (let seed = 0; seed < 200; seed++) {
+        const config = getSeededAvatarConfig(seed);
+        expect(config.eyes).not.toBe('none');
+        expect(config.mouth).not.toBe('none');
+        expect(config.hair).not.toBe('none');
       }
     });
   });

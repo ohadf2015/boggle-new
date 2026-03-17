@@ -716,6 +716,7 @@ const es = {
       "type": "Elige uno",
       "skinColor": "Tono de piel",
       "hairColor": "Color de pelo",
+      "shirtColor": "Color de camisa",
       "accessoryColor": "Color",
       "bgColor": "Fondo",
       "randomize": "¡Sorpréndeme!",

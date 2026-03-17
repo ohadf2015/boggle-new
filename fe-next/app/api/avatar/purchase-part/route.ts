@@ -52,11 +52,41 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: profile, error: fetchError } = await supabase
+    let { data: profile, error: fetchError } = await supabase
       .from('profiles')
       .select('total_coins, premium_avatar_parts')
       .eq('id', user.id)
       .single();
+
+    // Auto-create profile if it doesn't exist (OAuth users may not have one yet)
+    if (!profile && (!fetchError || fetchError.code === 'PGRST116')) {
+      const { error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          username: user.email?.split('@')[0] || `player_${user.id.slice(0, 8)}`,
+          display_name: user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Player',
+          avatar_emoji: '😊',
+          avatar_color: '#4F46E5',
+          total_coins: 0,
+          premium_avatar_parts: [],
+        });
+
+      if (createError && createError.code !== '23505') {
+        console.error('[AVATAR PURCHASE API] Failed to auto-create profile:', createError);
+        return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+      }
+
+      // Re-fetch the newly created (or concurrently created) profile
+      const refetch = await supabase
+        .from('profiles')
+        .select('total_coins, premium_avatar_parts')
+        .eq('id', user.id)
+        .single();
+
+      profile = refetch.data;
+      fetchError = refetch.error;
+    }
 
     if (fetchError || !profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });

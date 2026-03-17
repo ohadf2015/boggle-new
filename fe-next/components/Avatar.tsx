@@ -64,7 +64,7 @@ const Avatar = memo<AvatarProps>(({
         data-testid="header-avatar"
         data-avatar-type="custom"
       >
-        <AvatarRenderer config={customAvatar} size={config.px} />
+        <AvatarRenderer config={customAvatar} size={config.px} circular />
       </div>
     );
   }
@@ -105,7 +105,7 @@ const Avatar = memo<AvatarProps>(({
       data-testid="header-avatar"
       data-avatar-type="generated"
     >
-      <AvatarRenderer config={fallbackConfig} size={config.px} />
+      <AvatarRenderer config={fallbackConfig} size={config.px} circular />
     </div>
   );
 });

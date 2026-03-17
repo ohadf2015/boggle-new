@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3738,
+    "totalKeysInCode": 3736,
     "keyCountByLanguage": {
-      "en": 6340,
-      "he": 6369,
-      "sv": 6402,
-      "ja": 6389,
-      "es": 6400
+      "en": 6341,
+      "he": 6370,
+      "sv": 6403,
+      "ja": 6390,
+      "es": 6401
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 5,
@@ -35,7 +35,7 @@
       {
         "pattern": "xp.prestigeModal.${key}",
         "file": "components/engagement/PrestigeModal.tsx",
-        "line": 63,
+        "line": 56,
         "context": "const pm = (key: string) => t(`xp.prestigeModal.${key}`);",
         "type": "template_literal"
       },
@@ -145,7 +145,17 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "avatar.builder.shirtColor",
+      "usages": [
+        {
+          "file": "components/avatar/AvatarBuilderModal.tsx",
+          "line": 458
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

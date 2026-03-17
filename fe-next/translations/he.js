@@ -652,6 +652,7 @@ const he = {
       "type": "בחרו אחד",
       "skinColor": "גוון עור",
       "hairColor": "צבע שיער",
+      "shirtColor": "צבע חולצה",
       "accessoryColor": "צבע",
       "bgColor": "רקע",
       "randomize": "הפתיעו אותי",

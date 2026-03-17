@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Shuffle, Undo2, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette, Lock } from 'lucide-react';
+import { X, Shuffle, Undo2, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette, Lock, Coins } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import AvatarRenderer from './AvatarRenderer';
@@ -19,6 +19,7 @@ import {
   AVATAR_ACCESSORIES,
   AVATAR_ACCESSORY_COLORS,
   AVATAR_BG_COLORS,
+  AVATAR_SHIRT_COLORS,
   DEFAULT_AVATAR_CONFIG,
   getRandomAvatarConfig,
   FEMALE_HAIR_STYLES,
@@ -432,26 +433,34 @@ function CategoryOptions({ category, config, updateConfig, t, premium, onCoinSpe
     case 'background': {
       const allBgColors = [...AVATAR_BG_COLORS, ...PREMIUM_BG_COLORS] as const;
       return (
-        <ColorStrip
-          label={t('avatar.builder.bgColor')}
-          colors={allBgColors}
-          selected={config.bgColor}
-          onSelect={v => {
-            if (isPremiumPart('bgColor', v) && premium && !premium.isPartUnlocked('bgColor', v)) {
-              const price = getPartPrice('bgColor', v);
-              toast(
-                t('avatar.premium.locked') + ' — ' +
-                t('avatar.premium.buyWithGold').replace('{price}', String(price)),
-                { icon: '🔒', duration: 3000 }
-              );
-              return;
-            }
-            updateConfig('bgColor', v);
-          }}
-          large
-          premiumCategory="bgColor"
-          premium={premium}
-        />
+        <div className="space-y-4">
+          <ColorStrip
+            label={t('avatar.builder.bgColor')}
+            colors={allBgColors}
+            selected={config.bgColor}
+            onSelect={v => {
+              if (isPremiumPart('bgColor', v) && premium && !premium.isPartUnlocked('bgColor', v)) {
+                const price = getPartPrice('bgColor', v);
+                toast(
+                  t('avatar.premium.locked') + ' — ' +
+                  t('avatar.premium.buyWithGold').replace('{price}', String(price)),
+                  { icon: '🔒', duration: 3000 }
+                );
+                return;
+              }
+              updateConfig('bgColor', v);
+            }}
+            large
+            premiumCategory="bgColor"
+            premium={premium}
+          />
+          <ColorStrip
+            label={t('avatar.builder.shirtColor') || 'Shirt Color'}
+            colors={AVATAR_SHIRT_COLORS}
+            selected={config.shirtColor || (config.gender === 'female' ? '#E85D9B' : '#4A90D9')}
+            onSelect={v => updateConfig('shirtColor', v)}
+          />
+        </div>
       );
     }
   }
@@ -555,15 +564,25 @@ function PartPreviewGrid<T extends string>({
                 )}
               </div>
               {isLocked && (
-                <div className="absolute top-0.5 end-0.5">
-                  {isLegendary ? (
-                    <span className="text-[7px] font-black text-amber-300 bg-gradient-to-r from-amber-900/80 to-amber-800/80 px-1 rounded shadow-sm tracking-wide">LEGENDARY</span>
-                  ) : isEpic ? (
-                    <span className="text-[8px] font-black text-purple-400 bg-purple-900/60 px-1 rounded">EPIC</span>
-                  ) : (
-                    <Lock className="w-3 h-3 text-neo-yellow" />
-                  )}
-                </div>
+                <>
+                  <div className="absolute top-0.5 end-0.5">
+                    {isLegendary ? (
+                      <span className="text-[7px] font-black text-amber-300 bg-gradient-to-r from-amber-900/80 to-amber-800/80 px-1 rounded shadow-sm tracking-wide">LEGENDARY</span>
+                    ) : isEpic ? (
+                      <span className="text-[8px] font-black text-purple-400 bg-purple-900/60 px-1 rounded">EPIC</span>
+                    ) : (
+                      <Lock className="w-3 h-3 text-neo-yellow" />
+                    )}
+                  </div>
+                  <div className="absolute bottom-0.5 inset-x-0 flex items-center justify-center">
+                    <span className={`text-[9px] font-black flex items-center gap-0.5 px-1 rounded ${
+                      isLegendary ? 'text-amber-300 bg-amber-900/70' : isEpic ? 'text-purple-300 bg-purple-900/70' : 'text-neo-yellow bg-neo-navy/80'
+                    }`}>
+                      <Coins className="w-2.5 h-2.5" />
+                      {getPartPrice(cat, option)}
+                    </span>
+                  </div>
+                </>
               )}
               <span className={`text-[10px] font-bold capitalize truncate w-full text-center ${
                 selected === option ? 'text-neo-lime'
@@ -659,7 +678,14 @@ function ColorStrip<T extends string>({ label, colors, selected, onSelect, large
               aria-label={color}
             >
               {isLocked && (
-                <Lock className="absolute inset-0 m-auto w-3 h-3 text-white drop-shadow-md" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <Lock className="w-3 h-3 text-white drop-shadow-md" />
+                  {premiumCategory && (
+                    <span className="text-[7px] font-black text-neo-yellow drop-shadow-md leading-none mt-0.5">
+                      {getPartPrice(premiumCategory, color)}
+                    </span>
+                  )}
+                </div>
               )}
             </AdaptiveMotion.button>
           );

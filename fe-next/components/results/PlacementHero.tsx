@@ -273,18 +273,20 @@ const PlacementHero = memo<PlacementHeroProps>(({
     },
   };
 
-  // Mascot slides in from the side with rotation
+  // Mascot slides in from the side with bouncy overshoot
   const mascotVariants = {
-    hidden: { opacity: 0, x: -30, rotate: -12 },
+    hidden: { opacity: 0, x: -40, rotate: -15, scale: 0.7 },
     visible: {
       opacity: 1,
       x: 0,
       rotate: 0,
+      scale: 1,
       transition: {
         type: 'spring' as const,
-        stiffness: 250,
-        damping: 18,
-        delay: 0.5,
+        stiffness: 300,
+        damping: 14,
+        mass: 0.8,
+        delay: 0.4,
       },
     },
   };
@@ -341,19 +343,24 @@ const PlacementHero = memo<PlacementHeroProps>(({
         )}
 
         {/* Main content */}
-        <div className="relative z-10 px-4 py-7 sm:px-6 sm:py-10 flex flex-col items-center text-center gap-4 sm:gap-5">
-          {/* Row 1: Mascot GIF + Rank badge */}
-          <motion.div variants={childVariants} className="flex items-center gap-3 sm:gap-4">
-            {/* Mascot GIF — desktop */}
+        <div className="relative z-10 px-4 py-4 sm:px-6 sm:py-6 flex flex-col items-center text-center gap-2.5 sm:gap-3">
+          {/* Row 1: Mascot GIF + Rank badge — mascot is the star */}
+          <motion.div variants={childVariants} className="flex items-center gap-4 sm:gap-5">
+            {/* Mascot GIF — desktop (bigger!) */}
             <motion.div
               className="shrink-0 hidden xs:block sm:block"
               variants={reducedMotion ? undefined : mascotVariants}
             >
               <motion.div
-                animate={!reducedMotion ? { y: [0, -6, 0], rotate: [0, 2, -2, 0] } : undefined}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                animate={!reducedMotion ? {
+                  y: [0, -10, 0],
+                  rotate: [0, 3, -3, 0],
+                  scale: [1, 1.05, 1],
+                } : undefined}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ filter: rank === 1 ? `drop-shadow(0 0 12px ${theme.glowColor})` : undefined }}
               >
-                <MascotGif src={theme.mascotGif} alt={t(theme.message)} size={80} />
+                <MascotGif src={theme.mascotGif} alt={t(theme.message)} size={100} />
               </motion.div>
             </motion.div>
 
@@ -375,7 +382,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                         scale: [1, 1.06, 1],
                         boxShadow: [
                           `0 0 0 0px ${theme.glowColor}`,
-                          `0 0 0 8px ${theme.glowColor}`,
+                          `0 0 0 10px ${theme.glowColor}`,
                           `0 0 0 0px ${theme.glowColor}`,
                         ],
                       }
@@ -395,7 +402,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 </span>
               </motion.div>
 
-              {/* Rank icon floating top-right */}
+              {/* Rank icon floating top-right — bouncy entrance */}
               <motion.div
                 className={`
                   absolute -top-2 -end-2 sm:-top-3 sm:-end-3
@@ -403,23 +410,32 @@ const PlacementHero = memo<PlacementHeroProps>(({
                   w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center
                 `}
                 initial={{ scale: 0, rotate: -20 }}
-                animate={{ scale: 1, rotate: 5 }}
+                animate={{ scale: 1, rotate: [5, -3, 5] }}
                 transition={{ delay: 0.7, type: 'spring', stiffness: 400, damping: 12 }}
               >
-                <RankIcon className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
+                <motion.div
+                  animate={!reducedMotion ? { rotate: [0, 10, -10, 0] } : undefined}
+                  transition={{ duration: 2, delay: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <RankIcon className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
+                </motion.div>
               </motion.div>
             </motion.div>
 
-            {/* Mascot GIF — mobile (smaller) */}
+            {/* Mascot GIF — mobile (bigger than before: 56→72) */}
             <motion.div
               className="shrink-0 xs:hidden sm:hidden"
               variants={reducedMotion ? undefined : mascotVariants}
             >
               <motion.div
-                animate={!reducedMotion ? { y: [0, -4, 0] } : undefined}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                animate={!reducedMotion ? {
+                  y: [0, -8, 0],
+                  scale: [1, 1.04, 1],
+                } : undefined}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ filter: rank === 1 ? `drop-shadow(0 0 8px ${theme.glowColor})` : undefined }}
               >
-                <MascotGif src={theme.mascotGif} alt={t(theme.message)} size={56} />
+                <MascotGif src={theme.mascotGif} alt={t(theme.message)} size={72} />
               </motion.div>
             </motion.div>
           </motion.div>
@@ -443,24 +459,14 @@ const PlacementHero = memo<PlacementHeroProps>(({
             className="flex items-center gap-2.5"
           >
             {avatar && (
-              <motion.div
-                className="border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5"
-                animate={!reducedMotion ? {
-                  boxShadow: [
-                    '4px 4px 0px rgba(0,0,0,1)',
-                    '4px 4px 0px rgba(0,204,204,0.6)',
-                    '4px 4px 0px rgba(0,0,0,1)',
-                  ],
-                } : undefined}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-              >
+              <div className="border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5">
                 <Avatar
                   profilePictureUrl={avatar.profilePictureUrl ?? undefined}
                   avatarImage={avatar.avatarImage}
                   customAvatar={avatar.customAvatar}
                   size="lg"
                 />
-              </motion.div>
+              </div>
             )}
             <h2
               className={`font-black text-xl sm:text-2xl uppercase ${theme.textPrimary} leading-tight`}
@@ -475,7 +481,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
             <motion.div
               className={`
                 ${theme.scoreBg} border-4 border-neo-black rounded-neo shadow-hard-lg
-                px-6 py-3 sm:px-8 sm:py-4 inline-flex flex-col items-center
+                px-5 py-2 sm:px-7 sm:py-3 inline-flex flex-col items-center
                 relative overflow-hidden
               `}
               animate={

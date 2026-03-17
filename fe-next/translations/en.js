@@ -652,6 +652,7 @@ const en = {
       "type": "Pick One",
       "skinColor": "Skin Tone",
       "hairColor": "Hair Color",
+      "shirtColor": "Shirt Color",
       "accessoryColor": "Color",
       "bgColor": "Backdrop",
       "randomize": "Surprise Me",

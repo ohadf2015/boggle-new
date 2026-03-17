@@ -652,6 +652,7 @@ const ja = {
       "type": "選んでね",
       "skinColor": "肌の色",
       "hairColor": "髪の色",
+      "shirtColor": "シャツの色",
       "accessoryColor": "色",
       "bgColor": "背景",
       "randomize": "おまかせ",

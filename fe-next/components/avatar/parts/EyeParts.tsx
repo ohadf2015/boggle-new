@@ -10,8 +10,12 @@ function Round() {
     <g>
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="39" cy="41" r="2.5" fill="#000" />
-      <circle cx="63" cy="41" r="2.5" fill="#000" />
+      <circle cx="39" cy="41" r="3.2" fill="#4A6FA5" />
+      <circle cx="63" cy="41" r="3.2" fill="#4A6FA5" />
+      <circle cx="39" cy="41" r="2" fill="#000" />
+      <circle cx="63" cy="41" r="2" fill="#000" />
+      <circle cx="37.5" cy="39.5" r="1.2" fill="#fff" />
+      <circle cx="61.5" cy="39.5" r="1.2" fill="#fff" />
     </g>
   );
 }
@@ -19,8 +23,14 @@ function Round() {
 function Sleepy() {
   return (
     <g>
+      <path d="M33 40.5 Q36 41.5 39 40.5" fill="none" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.4" />
+      <path d="M61 40.5 Q64 41.5 67 40.5" fill="none" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.4" />
       <path d="M33 42 Q38 46 43 42" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <path d="M57 42 Q62 46 67 42" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <line x1="33" y1="44" x2="34" y2="45.5" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.5" />
+      <line x1="43" y1="44" x2="42" y2="45.5" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.5" />
+      <line x1="57" y1="44" x2="58" y2="45.5" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.5" />
+      <line x1="67" y1="44" x2="66" y2="45.5" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.5" />
     </g>
   );
 }
@@ -28,10 +38,16 @@ function Sleepy() {
 function Star() {
   return (
     <g>
-      {/* Left star */}
-      <polygon points="38,37 39.5,40.5 43,41 40.5,43.5 41,47 38,45 35,47 35.5,43.5 33,41 36.5,40.5" fill="#FFE135" stroke="#000" strokeWidth={1.5} />
-      {/* Right star */}
-      <polygon points="62,37 63.5,40.5 67,41 64.5,43.5 65,47 62,45 59,47 59.5,43.5 57,41 60.5,40.5" fill="#FFE135" stroke="#000" strokeWidth={1.5} />
+      <defs>
+        <linearGradient id="starEyeGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFF176" />
+          <stop offset="100%" stopColor="#FFB300" />
+        </linearGradient>
+      </defs>
+      <polygon points="38,37 39.5,40.5 43,41 40.5,43.5 41,47 38,45 35,47 35.5,43.5 33,41 36.5,40.5" fill="url(#starEyeGrad)" stroke="#000" strokeWidth={1.5} />
+      <polygon points="62,37 63.5,40.5 67,41 64.5,43.5 65,47 62,45 59,47 59.5,43.5 57,41 60.5,40.5" fill="url(#starEyeGrad)" stroke="#000" strokeWidth={1.5} />
+      <polygon points="38,39.5 38.8,41 40,41.3 39,42.3 39.2,43.5 38,42.8 36.8,43.5 37,42.3 36,41.3 37.2,41" fill="#fff" opacity="0.45" />
+      <polygon points="62,39.5 62.8,41 64,41.3 63,42.3 63.2,43.5 62,42.8 60.8,43.5 61,42.3 60,41.3 61.2,41" fill="#fff" opacity="0.45" />
     </g>
   );
 }
@@ -39,11 +55,13 @@ function Star() {
 function Wink() {
   return (
     <g>
-      {/* Open eye (left) */}
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="39" cy="41" r="2.5" fill="#000" />
-      {/* Winking eye (right) */}
+      <circle cx="39" cy="41" r="3.2" fill="#4A6FA5" />
+      <circle cx="39" cy="41" r="2" fill="#000" />
+      <circle cx="37.5" cy="39.5" r="1.2" fill="#fff" />
       <path d="M57 42 Q62 38 67 42" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <line x1="59" y1="40" x2="58" y2="38" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      <line x1="65" y1="40" x2="66" y2="38" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
     </g>
   );
 }
@@ -51,8 +69,12 @@ function Wink() {
 function Happy() {
   return (
     <g>
-      <path d="M33 44 Q38 38 43 44" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <path d="M57 44 Q62 38 67 44" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M33 44 Q38 38 43 44" fill="none" stroke="#000" strokeWidth={3} strokeLinecap="round" />
+      <path d="M57 44 Q62 38 67 44" fill="none" stroke="#000" strokeWidth={3} strokeLinecap="round" />
+      <line x1="32" y1="43" x2="30" y2="42" stroke="#000" strokeWidth={1.2} strokeLinecap="round" opacity="0.5" />
+      <line x1="32" y1="44.5" x2="30" y2="45" stroke="#000" strokeWidth={1.2} strokeLinecap="round" opacity="0.5" />
+      <line x1="68" y1="43" x2="70" y2="42" stroke="#000" strokeWidth={1.2} strokeLinecap="round" opacity="0.5" />
+      <line x1="68" y1="44.5" x2="70" y2="45" stroke="#000" strokeWidth={1.2} strokeLinecap="round" opacity="0.5" />
     </g>
   );
 }
@@ -60,14 +82,16 @@ function Happy() {
 function Angry() {
   return (
     <g>
-      {/* Angry brows */}
       <line x1="33" y1="35" x2="43" y2="37" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <line x1="67" y1="35" x2="57" y2="37" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Eyes */}
       <circle cx="38" cy="43" r="4" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="43" r="4" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="39" cy="43" r="2" fill="#000" />
-      <circle cx="63" cy="43" r="2" fill="#000" />
+      <circle cx="39" cy="43" r="2.8" fill="#5D4037" />
+      <circle cx="63" cy="43" r="2.8" fill="#5D4037" />
+      <circle cx="39" cy="43" r="1.5" fill="#000" />
+      <circle cx="63" cy="43" r="1.5" fill="#000" />
+      <circle cx="37.8" cy="41.8" r="0.8" fill="#fff" />
+      <circle cx="61.8" cy="41.8" r="0.8" fill="#fff" />
     </g>
   );
 }
@@ -75,15 +99,19 @@ function Angry() {
 function Cool() {
   return (
     <g>
-      {/* Sunglasses bridge */}
-      <path d="M44 41 L56 41" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Left lens */}
-      <rect x="29" y="37" width="16" height="10" rx="3" fill="#1a1a2e" stroke="#000" strokeWidth={S} />
-      {/* Right lens */}
-      <rect x="55" y="37" width="16" height="10" rx="3" fill="#1a1a2e" stroke="#000" strokeWidth={S} />
-      {/* Reflection */}
-      <line x1="32" y1="40" x2="36" y2="40" stroke="#fff" strokeWidth={1.5} strokeLinecap="round" opacity="0.6" />
-      <line x1="58" y1="40" x2="62" y2="40" stroke="#fff" strokeWidth={1.5} strokeLinecap="round" opacity="0.6" />
+      <defs>
+        <linearGradient id="lensGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#2a2a4e" />
+          <stop offset="100%" stopColor="#0a0a18" />
+        </linearGradient>
+      </defs>
+      <path d="M44 40 Q50 43 56 40" stroke="#000" strokeWidth={2} fill="none" strokeLinecap="round" />
+      <rect x="29" y="37" width="16" height="10" rx="3" fill="url(#lensGrad)" stroke="#000" strokeWidth={S} />
+      <rect x="55" y="37" width="16" height="10" rx="3" fill="url(#lensGrad)" stroke="#000" strokeWidth={S} />
+      <line x1="32" y1="39.5" x2="37" y2="39.5" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" opacity="0.5" />
+      <line x1="58" y1="39.5" x2="63" y2="39.5" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" opacity="0.5" />
+      <line x1="32" y1="41.5" x2="34" y2="41.5" stroke="#fff" strokeWidth={1} strokeLinecap="round" opacity="0.25" />
+      <line x1="58" y1="41.5" x2="60" y2="41.5" stroke="#fff" strokeWidth={1} strokeLinecap="round" opacity="0.25" />
     </g>
   );
 }
@@ -91,17 +119,20 @@ function Cool() {
 function Sparkle() {
   return (
     <g>
-      {/* Big sparkle eyes */}
-      <circle cx="38" cy="42" r="6" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="62" cy="42" r="6" fill="#fff" stroke="#000" strokeWidth={S} />
-      {/* Pupils */}
-      <circle cx="39" cy="41" r="3" fill="#000" />
-      <circle cx="63" cy="41" r="3" fill="#000" />
-      {/* Sparkle highlights */}
-      <circle cx="36" cy="39" r="1.5" fill="#fff" />
-      <circle cx="60" cy="39" r="1.5" fill="#fff" />
-      <circle cx="41" cy="43" r="0.8" fill="#fff" />
-      <circle cx="65" cy="43" r="0.8" fill="#fff" />
+      <circle cx="38" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="39" cy="41" r="4" fill="#4A6FA5" />
+      <circle cx="63" cy="41" r="4" fill="#4A6FA5" />
+      <circle cx="39" cy="41" r="2.5" fill="#000" />
+      <circle cx="63" cy="41" r="2.5" fill="#000" />
+      <circle cx="36" cy="39" r="2" fill="#fff" />
+      <circle cx="60" cy="39" r="2" fill="#fff" />
+      <circle cx="41" cy="43" r="1" fill="#fff" />
+      <circle cx="65" cy="43" r="1" fill="#fff" />
+      <circle cx="37" cy="44" r="0.5" fill="#fff" opacity="0.7" />
+      <circle cx="61" cy="44" r="0.5" fill="#fff" opacity="0.7" />
+      <path d="M34 37 L34.5 35.5 L35 37 L36.5 37.5 L35 38 L34.5 39.5 L34 38 L32.5 37.5Z" fill="#FFE135" />
+      <path d="M66 37 L66.5 35.5 L67 37 L68.5 37.5 L67 38 L66.5 39.5 L66 38 L64.5 37.5Z" fill="#FFE135" />
     </g>
   );
 }
@@ -109,8 +140,12 @@ function Sparkle() {
 function Hearts() {
   return (
     <g>
+      <circle cx="38" cy="42" r="8" fill="#FF1493" opacity="0.1" />
+      <circle cx="62" cy="42" r="8" fill="#FF1493" opacity="0.1" />
       <path d="M38 38 C36 35 32 35 32 39 C32 43 38 46 38 46 C38 46 44 43 44 39 C44 35 40 35 38 38Z" fill="#FF1493" stroke="#000" strokeWidth={1.5} />
       <path d="M62 38 C60 35 56 35 56 39 C56 43 62 46 62 46 C62 46 68 43 68 39 C68 35 64 35 62 38Z" fill="#FF1493" stroke="#000" strokeWidth={1.5} />
+      <path d="M36 37.5 C35 36.5 33.5 37 34 38.5" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" opacity="0.6" />
+      <path d="M60 37.5 C59 36.5 57.5 37 58 38.5" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" opacity="0.6" />
     </g>
   );
 }
@@ -118,8 +153,14 @@ function Hearts() {
 function Dizzy() {
   return (
     <g>
+      <circle cx="38" cy="42" r="6" fill="none" stroke="#000" strokeWidth={0.8} strokeDasharray="2 2" opacity="0.3" />
+      <circle cx="62" cy="42" r="6" fill="none" stroke="#000" strokeWidth={0.8} strokeDasharray="2 2" opacity="0.3" />
       <g transform="translate(38,42) rotate(15)"><line x1="-4" y1="-4" x2="4" y2="4" stroke="#000" strokeWidth={S} strokeLinecap="round" /><line x1="4" y1="-4" x2="-4" y2="4" stroke="#000" strokeWidth={S} strokeLinecap="round" /></g>
       <g transform="translate(62,42) rotate(-15)"><line x1="-4" y1="-4" x2="4" y2="4" stroke="#000" strokeWidth={S} strokeLinecap="round" /><line x1="4" y1="-4" x2="-4" y2="4" stroke="#000" strokeWidth={S} strokeLinecap="round" /></g>
+      <path d="M32 38 Q34 36 33 39" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.4" />
+      <path d="M44 38 Q42 36 43 39" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.4" />
+      <path d="M56 38 Q58 36 57 39" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.4" />
+      <path d="M68 38 Q66 36 67 39" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.4" />
     </g>
   );
 }
@@ -127,9 +168,12 @@ function Dizzy() {
 function Cyclops() {
   return (
     <g>
+      <path d="M42 38 Q50 35 58 38" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <circle cx="50" cy="42" r="8" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="51" cy="41" r="4" fill="#000" />
-      <circle cx="48" cy="39" r="2" fill="#fff" />
+      <circle cx="51" cy="41" r="5" fill="#4A6FA5" />
+      <circle cx="51" cy="41" r="3" fill="#000" />
+      <circle cx="48.5" cy="39" r="2" fill="#fff" />
+      <circle cx="52" cy="43" r="0.8" fill="#fff" opacity="0.5" />
     </g>
   );
 }
@@ -139,9 +183,12 @@ function Lashes() {
     <g>
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="39" cy="41" r="2.5" fill="#000" />
-      <circle cx="63" cy="41" r="2.5" fill="#000" />
-      {/* Lashes */}
+      <circle cx="39" cy="41" r="3.2" fill="#5D4037" />
+      <circle cx="63" cy="41" r="3.2" fill="#5D4037" />
+      <circle cx="39" cy="41" r="2" fill="#000" />
+      <circle cx="63" cy="41" r="2" fill="#000" />
+      <circle cx="37.5" cy="39.5" r="1" fill="#fff" />
+      <circle cx="61.5" cy="39.5" r="1" fill="#fff" />
       <line x1="34" y1="37" x2="32" y2="34" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
       <line x1="37" y1="36" x2="36" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
       <line x1="40" y1="36" x2="41" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
@@ -155,16 +202,14 @@ function Lashes() {
 function MonocleEye() {
   return (
     <g>
-      {/* Normal left eye */}
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="39" cy="41" r="2.5" fill="#000" />
-      {/* Right eye with monocle */}
+      <circle cx="37.5" cy="39.5" r="1" fill="#fff" />
       <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="63" cy="41" r="2.5" fill="#000" />
+      <circle cx="61.5" cy="39.5" r="1" fill="#fff" />
       <circle cx="62" cy="42" r="8" fill="none" stroke="#FFD700" strokeWidth={S} />
-      {/* Chain dangling */}
       <path d="M70 42 Q74 52 72 62 Q70 68 68 65" stroke="#FFD700" strokeWidth={1.5} fill="none" strokeLinecap="round" />
-      {/* Raised eyebrow */}
       <path d="M55 32 Q62 28 70 33" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
     </g>
   );
@@ -173,12 +218,14 @@ function MonocleEye() {
 function CrossEyed() {
   return (
     <g>
-      {/* Eyes looking inward */}
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
-      {/* Pupils pointing toward nose */}
-      <circle cx="42" cy="42" r="2.5" fill="#000" />
-      <circle cx="58" cy="42" r="2.5" fill="#000" />
+      <circle cx="42" cy="42" r="3" fill="#4A6FA5" />
+      <circle cx="58" cy="42" r="3" fill="#4A6FA5" />
+      <circle cx="42" cy="42" r="1.8" fill="#000" />
+      <circle cx="58" cy="42" r="1.8" fill="#000" />
+      <circle cx="41" cy="40.5" r="0.9" fill="#fff" />
+      <circle cx="57" cy="40.5" r="0.9" fill="#fff" />
     </g>
   );
 }
@@ -186,18 +233,20 @@ function CrossEyed() {
 function Laser() {
   return (
     <g>
-      {/* Glowing red eyes */}
+      <circle cx="38" cy="42" r="8" fill="#FF0000" opacity="0.12" />
+      <circle cx="62" cy="42" r="8" fill="#FF0000" opacity="0.12" />
       <circle cx="38" cy="42" r="5" fill="#FF0000" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="5" fill="#FF0000" stroke="#000" strokeWidth={S} />
-      {/* Bright centers */}
       <circle cx="38" cy="42" r="2" fill="#FFD700" />
       <circle cx="62" cy="42" r="2" fill="#FFD700" />
-      {/* Laser beams shooting out */}
-      <line x1="33" y1="42" x2="10" y2="42" stroke="#FF0000" strokeWidth={2} opacity="0.6" />
-      <line x1="67" y1="42" x2="90" y2="42" stroke="#FF0000" strokeWidth={2} opacity="0.6" />
-      {/* Glow effect */}
-      <circle cx="38" cy="42" r="7" fill="#FF0000" opacity="0.15" />
-      <circle cx="62" cy="42" r="7" fill="#FF0000" opacity="0.15" />
+      <circle cx="38" cy="42" r="0.8" fill="#fff" />
+      <circle cx="62" cy="42" r="0.8" fill="#fff" />
+      <polygon points="33,40.5 10,41.5 10,42.5 33,43.5" fill="#FF0000" opacity="0.5" />
+      <polygon points="67,40.5 90,41.5 90,42.5 67,43.5" fill="#FF0000" opacity="0.5" />
+      <line x1="33" y1="42" x2="10" y2="42" stroke="#FF6666" strokeWidth={1} opacity="0.8" />
+      <line x1="67" y1="42" x2="90" y2="42" stroke="#FF6666" strokeWidth={1} opacity="0.8" />
+      <circle cx="20" cy="42" r="1.5" fill="none" stroke="#FF0000" strokeWidth={0.5} opacity="0.4" />
+      <circle cx="80" cy="42" r="1.5" fill="none" stroke="#FF0000" strokeWidth={0.5} opacity="0.4" />
     </g>
   );
 }
@@ -205,12 +254,16 @@ function Laser() {
 function Hypno() {
   return (
     <g>
-      {/* Spiral hypnotic eyes */}
       <circle cx="38" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
-      {/* Spirals */}
-      <path d="M38 42 m0,-5 a5,5 0 1,1 0,10 a3,3 0 1,0 0,-6 a1,1 0 1,1 0,2" fill="none" stroke="#8B5CF6" strokeWidth={1.5} />
-      <path d="M62 42 m0,-5 a5,5 0 1,1 0,10 a3,3 0 1,0 0,-6 a1,1 0 1,1 0,2" fill="none" stroke="#8B5CF6" strokeWidth={1.5} />
+      <circle cx="38" cy="42" r="6" fill="none" stroke="#8B5CF6" strokeWidth={1.2} />
+      <circle cx="38" cy="42" r="4" fill="none" stroke="#D946EF" strokeWidth={1.2} />
+      <circle cx="38" cy="42" r="2" fill="none" stroke="#8B5CF6" strokeWidth={1.2} />
+      <circle cx="38" cy="42" r="0.6" fill="#000" />
+      <circle cx="62" cy="42" r="6" fill="none" stroke="#8B5CF6" strokeWidth={1.2} />
+      <circle cx="62" cy="42" r="4" fill="none" stroke="#D946EF" strokeWidth={1.2} />
+      <circle cx="62" cy="42" r="2" fill="none" stroke="#8B5CF6" strokeWidth={1.2} />
+      <circle cx="62" cy="42" r="0.6" fill="#000" />
     </g>
   );
 }
@@ -218,11 +271,14 @@ function Hypno() {
 function Money() {
   return (
     <g>
-      {/* Dollar sign eyes */}
       <circle cx="38" cy="42" r="7" fill="#BFFF00" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="7" fill="#BFFF00" stroke="#000" strokeWidth={S} />
-      <text x="34" y="46" fontSize="10" fontWeight="bold" fill="#228B22" fontFamily="Arial">$</text>
-      <text x="58" y="46" fontSize="10" fontWeight="bold" fill="#228B22" fontFamily="Arial">$</text>
+      <path d="M36 39 Q36 37.5 38 37.5 Q40 37.5 40 39 Q40 40 38 40.5 Q36 41 36 42.5 Q36 44.5 38 44.5 Q40 44.5 40 43" fill="none" stroke="#228B22" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="38" y1="36" x2="38" y2="46" stroke="#228B22" strokeWidth={1} />
+      <path d="M60 39 Q60 37.5 62 37.5 Q64 37.5 64 39 Q64 40 62 40.5 Q60 41 60 42.5 Q60 44.5 62 44.5 Q64 44.5 64 43" fill="none" stroke="#228B22" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="62" y1="36" x2="62" y2="46" stroke="#228B22" strokeWidth={1} />
+      <circle cx="35" cy="39" r="1" fill="#fff" opacity="0.4" />
+      <circle cx="59" cy="39" r="1" fill="#fff" opacity="0.4" />
     </g>
   );
 }
@@ -230,15 +286,22 @@ function Money() {
 function Alien() {
   return (
     <g>
-      {/* Big almond-shaped alien eyes */}
-      <ellipse cx="36" cy="42" rx="10" ry="7" fill="#000" stroke="#00FF00" strokeWidth={S} transform="rotate(-10 36 42)" />
-      <ellipse cx="64" cy="42" rx="10" ry="7" fill="#000" stroke="#00FF00" strokeWidth={S} transform="rotate(10 64 42)" />
-      {/* Glowing pupils */}
-      <ellipse cx="38" cy="42" rx="3" ry="4" fill="#00FF00" opacity="0.7" />
-      <ellipse cx="62" cy="42" rx="3" ry="4" fill="#00FF00" opacity="0.7" />
-      {/* Reflection */}
-      <circle cx="35" cy="40" r="1.5" fill="#fff" opacity="0.4" />
-      <circle cx="61" cy="40" r="1.5" fill="#fff" opacity="0.4" />
+      {/* Outer glow ring for contrast on dark bases */}
+      <ellipse cx="36" cy="42" rx="11" ry="8" fill="none" stroke="#00FF00" strokeWidth={0.8} opacity="0.25" transform="rotate(-10 36 42)" />
+      <ellipse cx="64" cy="42" rx="11" ry="8" fill="none" stroke="#00FF00" strokeWidth={0.8} opacity="0.25" transform="rotate(10 64 42)" />
+      <ellipse cx="36" cy="42" rx="10" ry="7" fill="#0a2a0a" stroke="#00FF00" strokeWidth={S} transform="rotate(-10 36 42)" />
+      <ellipse cx="64" cy="42" rx="10" ry="7" fill="#0a2a0a" stroke="#00FF00" strokeWidth={S} transform="rotate(10 64 42)" />
+      <ellipse cx="36" cy="42" rx="9" ry="6" fill="none" stroke="#00FF00" strokeWidth={0.5} opacity="0.25" transform="rotate(-10 36 42)" />
+      <path d="M30 40 Q33 42 30 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
+      <path d="M42 40 Q39 42 42 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
+      <path d="M58 40 Q61 42 58 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
+      <path d="M70 40 Q67 42 70 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
+      <ellipse cx="38" cy="42" rx="3" ry="4" fill="#00FF00" opacity="0.8" />
+      <ellipse cx="62" cy="42" rx="3" ry="4" fill="#00FF00" opacity="0.8" />
+      <ellipse cx="38" cy="42" rx="1.5" ry="3" fill="#88FF88" opacity="0.4" />
+      <ellipse cx="62" cy="42" rx="1.5" ry="3" fill="#88FF88" opacity="0.4" />
+      <circle cx="35" cy="39.5" r="1.5" fill="#fff" opacity="0.4" />
+      <circle cx="61" cy="39.5" r="1.5" fill="#fff" opacity="0.4" />
     </g>
   );
 }
@@ -246,17 +309,21 @@ function Alien() {
 function Crying() {
   return (
     <g>
-      {/* Sad round eyes */}
+      <path d="M33 36 Q38 34 43 37" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M57 37 Q62 34 67 36" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M33 40 Q38 38 43 40" fill="#FFCCCC" opacity="0.4" />
+      <path d="M57 40 Q62 38 67 40" fill="#FFCCCC" opacity="0.4" />
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="39" cy="43" r="2.5" fill="#000" />
       <circle cx="63" cy="43" r="2.5" fill="#000" />
-      {/* Sad eyebrows */}
-      <path d="M33 36 Q38 34 43 37" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <path d="M57 37 Q62 34 67 36" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      {/* Tear drops */}
-      <path d="M34 48 Q33 54 34 58 Q36 60 38 58 Q39 54 38 48" fill="#87CEEB" stroke="#000" strokeWidth={1} opacity="0.7" />
-      <path d="M62 48 Q61 54 62 58 Q64 60 66 58 Q67 54 66 48" fill="#87CEEB" stroke="#000" strokeWidth={1} opacity="0.7" />
+      <circle cx="37.5" cy="41.5" r="0.8" fill="#fff" />
+      <circle cx="61.5" cy="41.5" r="0.8" fill="#fff" />
+      <path d="M35 48 Q34 52 35 56 Q36 58 37 56 Q38 52 37 48" fill="#87CEEB" stroke="#5BA3D9" strokeWidth={0.5} opacity="0.7" />
+      <path d="M63 48 Q62 52 63 56 Q64 58 65 56 Q66 52 65 48" fill="#87CEEB" stroke="#5BA3D9" strokeWidth={0.5} opacity="0.7" />
+      <path d="M37 50 Q36.5 53 37.5 55" fill="none" stroke="#87CEEB" strokeWidth={1} opacity="0.4" strokeLinecap="round" />
+      <path d="M65 50 Q64.5 53 65.5 55" fill="none" stroke="#87CEEB" strokeWidth={1} opacity="0.4" strokeLinecap="round" />
+      <circle cx="50" cy="52" r="1.5" fill="#FFAAAA" opacity="0.3" />
     </g>
   );
 }
@@ -266,22 +333,33 @@ function Galaxy() {
     <g>
       <defs>
         <radialGradient id="galaxyEyeGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#E040FB" />
+          <stop offset="0%" stopColor="#E040FB"><animate attributeName="stopColor" values="#E040FB;#00BCD4;#E040FB" dur="3s" repeatCount="indefinite" /></stop>
           <stop offset="50%" stopColor="#7C4DFF" />
           <stop offset="100%" stopColor="#1A237E" />
         </radialGradient>
       </defs>
-      {/* Nebula eyes */}
       <circle cx="38" cy="42" r="7" fill="url(#galaxyEyeGrad)" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="7" fill="url(#galaxyEyeGrad)" stroke="#000" strokeWidth={S} />
-      {/* Tiny stars */}
-      <circle cx="36" cy="40" r="1" fill="#fff" opacity="0.9" />
-      <circle cx="40" cy="43" r="0.7" fill="#fff" opacity="0.7" />
-      <circle cx="60" cy="40" r="1" fill="#fff" opacity="0.9" />
-      <circle cx="64" cy="43" r="0.7" fill="#fff" opacity="0.7" />
-      {/* Center glow */}
-      <circle cx="38" cy="42" r="2" fill="#fff" opacity="0.5" />
-      <circle cx="62" cy="42" r="2" fill="#fff" opacity="0.5" />
+      <path d="M34 40 Q38 38 42 40" fill="none" stroke="#E040FB" strokeWidth={0.6} opacity="0.4">
+        <animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="8s" repeatCount="indefinite" />
+      </path>
+      <path d="M35 44 Q38 46 41 44" fill="none" stroke="#00BCD4" strokeWidth={0.5} opacity="0.3">
+        <animateTransform attributeName="transform" type="rotate" from="180 38 42" to="540 38 42" dur="10s" repeatCount="indefinite" />
+      </path>
+      <path d="M58 40 Q62 38 66 40" fill="none" stroke="#00BCD4" strokeWidth={0.6} opacity="0.4">
+        <animateTransform attributeName="transform" type="rotate" from="0 62 42" to="-360 62 42" dur="8s" repeatCount="indefinite" />
+      </path>
+      <path d="M59 44 Q62 46 65 44" fill="none" stroke="#E040FB" strokeWidth={0.5} opacity="0.3">
+        <animateTransform attributeName="transform" type="rotate" from="180 62 42" to="-180 62 42" dur="10s" repeatCount="indefinite" />
+      </path>
+      <circle cx="36" cy="40" r="1" fill="#fff"><animate attributeName="opacity" values="0.9;0.2;0.9" dur="2s" repeatCount="indefinite" /></circle>
+      <circle cx="40" cy="43" r="0.7" fill="#fff"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.8s" begin="0.5s" repeatCount="indefinite" /></circle>
+      <circle cx="60" cy="40" r="1" fill="#fff"><animate attributeName="opacity" values="0.9;0.2;0.9" dur="2.2s" begin="0.3s" repeatCount="indefinite" /></circle>
+      <circle cx="64" cy="43" r="0.7" fill="#fff"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.6s" begin="0.8s" repeatCount="indefinite" /></circle>
+      <circle cx="35" cy="44" r="0.5" fill="#E040FB"><animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" begin="1.2s" repeatCount="indefinite" /></circle>
+      <circle cx="65" cy="41" r="0.5" fill="#00BCD4"><animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" begin="0.7s" repeatCount="indefinite" /></circle>
+      <circle cx="38" cy="42" r="2" fill="#fff"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite" /><animate attributeName="r" values="2;2.5;2" dur="2s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="2" fill="#fff"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" begin="0.5s" repeatCount="indefinite" /><animate attributeName="r" values="2;2.5;2" dur="2s" begin="0.5s" repeatCount="indefinite" /></circle>
     </g>
   );
 }
@@ -296,12 +374,22 @@ function FlameEyes() {
           <stop offset="100%" stopColor="#FFD600" />
         </linearGradient>
       </defs>
-      {/* Fire-shaped eyes */}
-      <path d="M38 48 C32 44 32 38 38 34 C44 38 44 44 38 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5} />
-      <path d="M62 48 C56 44 56 38 62 34 C68 38 68 44 62 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5} />
-      {/* Inner flame */}
-      <path d="M38 45 C36 43 36 40 38 38 C40 40 40 43 38 45Z" fill="#fff" opacity="0.6" />
-      <path d="M62 45 C60 43 60 40 62 38 C64 40 64 43 62 45Z" fill="#fff" opacity="0.6" />
+      <circle cx="38" cy="42" r="9" fill="#FF6D00" opacity="0.08" />
+      <circle cx="62" cy="42" r="9" fill="#FF6D00" opacity="0.08" />
+      <path d="M38 48 C32 44 32 38 38 34 C44 38 44 44 38 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5}>
+        <animateTransform attributeName="transform" type="scale" values="1 1;1.02 1.06;0.98 1.03;1 1" dur="0.8s" repeatCount="indefinite" additive="sum" />
+      </path>
+      <path d="M62 48 C56 44 56 38 62 34 C68 38 68 44 62 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5}>
+        <animateTransform attributeName="transform" type="scale" values="1 1;0.98 1.04;1.02 1.07;1 1" dur="0.9s" repeatCount="indefinite" additive="sum" />
+      </path>
+      <path d="M38 46 C35 43 35 39 38 37 C41 39 41 43 38 46Z" fill="#FFD600" opacity="0.6" />
+      <path d="M62 46 C59 43 59 39 62 37 C65 39 65 43 62 46Z" fill="#FFD600" opacity="0.6" />
+      <path d="M38 44 C37 42 37 41 38 40 C39 41 39 42 38 44Z" fill="#fff" opacity="0.7" />
+      <path d="M62 44 C61 42 61 41 62 40 C63 41 63 42 62 44Z" fill="#fff" opacity="0.7" />
+      <circle cx="36" cy="36" r="0.6" fill="#FFD600"><animate attributeName="cy" values="36;32;28" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.8;0.4;0" dur="1.5s" repeatCount="indefinite" /></circle>
+      <circle cx="64" cy="35" r="0.5" fill="#FF9100"><animate attributeName="cy" values="35;30;26" dur="1.8s" begin="0.4s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.3;0" dur="1.8s" begin="0.4s" repeatCount="indefinite" /></circle>
+      <circle cx="40" cy="34" r="0.4" fill="#fff"><animate attributeName="cy" values="34;29;24" dur="1.3s" begin="0.8s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.2;0" dur="1.3s" begin="0.8s" repeatCount="indefinite" /></circle>
+      <circle cx="60" cy="34" r="0.4" fill="#FF9100"><animate attributeName="cy" values="34;28;22" dur="1.6s" begin="0.6s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.2;0" dur="1.6s" begin="0.6s" repeatCount="indefinite" /></circle>
     </g>
   );
 }
@@ -309,95 +397,86 @@ function FlameEyes() {
 function Robot() {
   return (
     <g>
-      {/* Rectangular screen eyes */}
       <rect x="31" y="37" width="14" height="10" rx="2" fill="#0D47A1" stroke="#000" strokeWidth={S} />
       <rect x="55" y="37" width="14" height="10" rx="2" fill="#0D47A1" stroke="#000" strokeWidth={S} />
-      {/* Scan lines */}
-      <line x1="33" y1="40" x2="43" y2="40" stroke="#00E5FF" strokeWidth={0.8} opacity="0.6" />
-      <line x1="33" y1="43" x2="43" y2="43" stroke="#00E5FF" strokeWidth={0.8} opacity="0.6" />
-      <line x1="57" y1="40" x2="67" y2="40" stroke="#00E5FF" strokeWidth={0.8} opacity="0.6" />
-      <line x1="57" y1="43" x2="67" y2="43" stroke="#00E5FF" strokeWidth={0.8} opacity="0.6" />
-      {/* Glowing pupils */}
-      <circle cx="38" cy="42" r="2.5" fill="#00E5FF" />
-      <circle cx="62" cy="42" r="2.5" fill="#00E5FF" />
-      {/* Reflection */}
-      <circle cx="37" cy="41" r="1" fill="#fff" opacity="0.5" />
-      <circle cx="61" cy="41" r="1" fill="#fff" opacity="0.5" />
+      <rect x="31" y="37" width="14" height="1.5" rx="1" fill="#1565C0" opacity="0.5" />
+      <rect x="55" y="37" width="14" height="1.5" rx="1" fill="#1565C0" opacity="0.5" />
+      <line x1="33" y1="38" x2="43" y2="38" stroke="#00E5FF" strokeWidth={1} opacity="0.5"><animate attributeName="y1" values="38;46;38" dur="2s" repeatCount="indefinite" /><animate attributeName="y2" values="38;46;38" dur="2s" repeatCount="indefinite" /></line>
+      <line x1="57" y1="38" x2="67" y2="38" stroke="#00E5FF" strokeWidth={1} opacity="0.5"><animate attributeName="y1" values="38;46;38" dur="2s" begin="0.5s" repeatCount="indefinite" /><animate attributeName="y2" values="38;46;38" dur="2s" begin="0.5s" repeatCount="indefinite" /></line>
+      <line x1="33" y1="40" x2="43" y2="40" stroke="#00E5FF" strokeWidth={0.5} opacity="0.3" />
+      <line x1="33" y1="43" x2="43" y2="43" stroke="#00E5FF" strokeWidth={0.5} opacity="0.3" />
+      <line x1="57" y1="40" x2="67" y2="40" stroke="#00E5FF" strokeWidth={0.5} opacity="0.3" />
+      <line x1="57" y1="43" x2="67" y2="43" stroke="#00E5FF" strokeWidth={0.5} opacity="0.3" />
+      <circle cx="38" cy="42" r="3" fill="#00E5FF" opacity="0.3" />
+      <circle cx="62" cy="42" r="3" fill="#00E5FF" opacity="0.3" />
+      <circle cx="38" cy="42" r="2" fill="#00E5FF"><animate attributeName="r" values="2;2.5;2" dur="1.5s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="2" fill="#00E5FF"><animate attributeName="r" values="2;2.5;2" dur="1.5s" begin="0.3s" repeatCount="indefinite" /></circle>
+      <circle cx="37" cy="41" r="0.8" fill="#fff" opacity="0.6" />
+      <circle cx="61" cy="41" r="0.8" fill="#fff" opacity="0.6" />
     </g>
   );
 }
 
 function Void() {
+  const vg = 'url(#voidEyeGrad)';
   return (
     <g>
       <defs>
         <radialGradient id="voidEyeGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#000" />
-          <stop offset="70%" stopColor="#1A0033" />
-          <stop offset="100%" stopColor="#4A0080" />
+          <stop offset="0%" stopColor="#000" /><stop offset="70%" stopColor="#1A0033" /><stop offset="100%" stopColor="#4A0080" />
         </radialGradient>
       </defs>
-      {/* Bottomless void eyes */}
-      <circle cx="38" cy="42" r="7" fill="url(#voidEyeGrad)" stroke="#4A0080" strokeWidth={S} />
-      <circle cx="62" cy="42" r="7" fill="url(#voidEyeGrad)" stroke="#4A0080" strokeWidth={S} />
-      {/* Spiral hints */}
-      <path d="M38 42 Q36 39 38 37 Q40 39 38 42" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.5" />
-      <path d="M62 42 Q60 39 62 37 Q64 39 62 42" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.5" />
-      {/* Tiny pinprick of light in center */}
-      <circle cx="38" cy="42" r="0.8" fill="#E040FB" />
-      <circle cx="62" cy="42" r="0.8" fill="#E040FB" />
+      <circle cx="38" cy="42" r="7" fill={vg} stroke="#4A0080" strokeWidth={S}><animate attributeName="r" values="7;7.3;7" dur="3s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="7" fill={vg} stroke="#4A0080" strokeWidth={S}><animate attributeName="r" values="7;7.3;7" dur="3s" begin="0.5s" repeatCount="indefinite" /></circle>
+      <path d="M38 42 Q36 39 38 37 Q40 39 38 42 Q36 45 38 47" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.5"><animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="6s" repeatCount="indefinite" /></path>
+      <path d="M62 42 Q60 39 62 37 Q64 39 62 42 Q60 45 62 47" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.5"><animateTransform attributeName="transform" type="rotate" from="0 62 42" to="-360 62 42" dur="6s" repeatCount="indefinite" /></path>
+      <circle cx="32" cy="38" r="0.5" fill="#E040FB" opacity="0.6"><animate attributeName="cx" values="32;38" dur="2s" repeatCount="indefinite" /><animate attributeName="cy" values="38;42" dur="2s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0" dur="2s" repeatCount="indefinite" /></circle>
+      <circle cx="68" cy="39" r="0.5" fill="#7C4DFF" opacity="0.5"><animate attributeName="cx" values="68;62" dur="2.2s" begin="0.5s" repeatCount="indefinite" /><animate attributeName="cy" values="39;42" dur="2.2s" begin="0.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.5;0" dur="2.2s" begin="0.5s" repeatCount="indefinite" /></circle>
+      <circle cx="38" cy="42" r="0.8" fill="#E040FB"><animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="0.8" fill="#E040FB"><animate attributeName="opacity" values="1;0.3;1" dur="1.5s" begin="0.4s" repeatCount="indefinite" /></circle>
     </g>
   );
 }
 
-// ==================== LEGENDARY: Infinity Eyes ====================
 function Infinity() {
+  const rb = 'url(#infinityRainbow)';
+  const vo = 'url(#infinityRing1)';
   return (
     <g>
       <defs>
         <radialGradient id="infinityRing1" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#000" />
-          <stop offset="30%" stopColor="#1A0033" />
-          <stop offset="60%" stopColor="#4A00E0" />
-          <stop offset="100%" stopColor="#000" />
+          <stop offset="0%" stopColor="#000" /><stop offset="30%" stopColor="#1A0033" /><stop offset="60%" stopColor="#4A00E0" /><stop offset="100%" stopColor="#000" />
         </radialGradient>
         <linearGradient id="infinityRainbow" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#FF0000" />
-          <stop offset="25%" stopColor="#FF8C00" />
-          <stop offset="50%" stopColor="#00FF88" />
-          <stop offset="75%" stopColor="#0088FF" />
-          <stop offset="100%" stopColor="#8B00FF" />
+          <stop offset="0%" stopColor="#FF0000"><animate attributeName="stopColor" values="#FF0000;#FF8C00;#00FF88;#0088FF;#8B00FF;#FF0000" dur="4s" repeatCount="indefinite" /></stop>
+          <stop offset="33%" stopColor="#00FF88"><animate attributeName="stopColor" values="#00FF88;#0088FF;#8B00FF;#FF0000;#FF8C00;#00FF88" dur="4s" repeatCount="indefinite" /></stop>
+          <stop offset="66%" stopColor="#0088FF"><animate attributeName="stopColor" values="#0088FF;#8B00FF;#FF0000;#FF8C00;#00FF88;#0088FF" dur="4s" repeatCount="indefinite" /></stop>
+          <stop offset="100%" stopColor="#8B00FF"><animate attributeName="stopColor" values="#8B00FF;#FF0000;#FF8C00;#00FF88;#0088FF;#8B00FF" dur="4s" repeatCount="indefinite" /></stop>
         </linearGradient>
       </defs>
-      {/* Outer rainbow ring — left */}
-      <circle cx="38" cy="42" r="8" fill="none" stroke="url(#infinityRainbow)" strokeWidth={2} />
-      <circle cx="38" cy="42" r="6" fill="none" stroke="url(#infinityRainbow)" strokeWidth={1} opacity="0.5" />
-      {/* Inner void — left */}
-      <circle cx="38" cy="42" r="5" fill="url(#infinityRing1)" />
-      {/* Orbiting particles — left */}
-      <circle cx="32" cy="38" r="0.8" fill="#FF0000" opacity="0.8" />
-      <circle cx="44" cy="39" r="0.8" fill="#00FF88" opacity="0.8" />
-      <circle cx="36" cy="48" r="0.6" fill="#0088FF" opacity="0.7" />
-      {/* Center singularity — left */}
-      <circle cx="38" cy="42" r="1.5" fill="#fff" opacity="0.8" />
-      <circle cx="38" cy="42" r="0.5" fill="#fff" />
-      {/* Outer rainbow ring — right */}
-      <circle cx="62" cy="42" r="8" fill="none" stroke="url(#infinityRainbow)" strokeWidth={2} />
-      <circle cx="62" cy="42" r="6" fill="none" stroke="url(#infinityRainbow)" strokeWidth={1} opacity="0.5" />
-      {/* Inner void — right */}
-      <circle cx="62" cy="42" r="5" fill="url(#infinityRing1)" />
-      {/* Orbiting particles — right */}
-      <circle cx="56" cy="38" r="0.8" fill="#8B00FF" opacity="0.8" />
-      <circle cx="68" cy="39" r="0.8" fill="#FF8C00" opacity="0.8" />
-      <circle cx="60" cy="48" r="0.6" fill="#FF0000" opacity="0.7" />
-      {/* Center singularity — right */}
-      <circle cx="62" cy="42" r="1.5" fill="#fff" opacity="0.8" />
-      <circle cx="62" cy="42" r="0.5" fill="#fff" />
+      <circle cx="38" cy="42" r="10" fill="#4A00E0" opacity="0.08" /><circle cx="62" cy="42" r="10" fill="#4A00E0" opacity="0.08" />
+      <circle cx="38" cy="42" r="8" fill="none" stroke={rb} strokeWidth={2}><animate attributeName="strokeWidth" values="2;2.5;2" dur="2s" repeatCount="indefinite" /></circle>
+      <circle cx="38" cy="42" r="6" fill="none" stroke={rb} strokeWidth={1} opacity="0.5" />
+      <circle cx="38" cy="42" r="5" fill={vo} />
+      <circle cx="62" cy="42" r="8" fill="none" stroke={rb} strokeWidth={2}><animate attributeName="strokeWidth" values="2;2.5;2" dur="2s" begin="0.5s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="6" fill="none" stroke={rb} strokeWidth={1} opacity="0.5" />
+      <circle cx="62" cy="42" r="5" fill={vo} />
+      <circle cx="38" cy="34" r="0.8" fill="#FF0000" opacity="0.8"><animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="3s" repeatCount="indefinite" /></circle>
+      <circle cx="46" cy="42" r="0.7" fill="#00FF88" opacity="0.7"><animateTransform attributeName="transform" type="rotate" from="120 38 42" to="480 38 42" dur="3s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="34" r="0.8" fill="#8B00FF" opacity="0.8"><animateTransform attributeName="transform" type="rotate" from="0 62 42" to="-360 62 42" dur="3.2s" repeatCount="indefinite" /></circle>
+      <circle cx="70" cy="42" r="0.7" fill="#FF8C00" opacity="0.7"><animateTransform attributeName="transform" type="rotate" from="120 62 42" to="-240 62 42" dur="3.2s" repeatCount="indefinite" /></circle>
+      <circle cx="38" cy="42" r="1.5" fill="#fff"><animate attributeName="opacity" values="0.8;1;0.6;0.8" dur="1.5s" repeatCount="indefinite" /><animate attributeName="r" values="1.5;2;1.5" dur="1.5s" repeatCount="indefinite" /></circle>
+      <circle cx="38" cy="42" r="0.5" fill="#fff" /><circle cx="62" cy="42" r="0.5" fill="#fff" />
+      <circle cx="62" cy="42" r="1.5" fill="#fff"><animate attributeName="opacity" values="0.8;1;0.6;0.8" dur="1.5s" begin="0.3s" repeatCount="indefinite" /><animate attributeName="r" values="1.5;2;1.5" dur="1.5s" begin="0.3s" repeatCount="indefinite" /></circle>
+      <path d="M45 42 Q50 36 55 42 Q50 48 45 42" fill="none" stroke={rb} strokeWidth={0.8} opacity="0.4"><animate attributeName="opacity" values="0.4;0.7;0.4" dur="2s" repeatCount="indefinite" /></path>
     </g>
   );
 }
 
+function None() { return <g />; }
+
 export const EYE_PARTS = {
+  none: None,
   round: Round,
   sleepy: Sleepy,
   star: Star,
