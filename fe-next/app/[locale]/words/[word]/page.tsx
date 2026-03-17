@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         ...LOCALES.map(l => [l, `${BASE_URL}/${l}/words/${word.toLowerCase()}`]),
       ]),
     },
-    robots: { index: true, follow: true },
+    robots: { index: false, follow: true },
   };
 }
 

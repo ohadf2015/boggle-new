@@ -12,6 +12,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { AdPlaceholder } from '@/components/ads';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { contentByLocale } from './content';
+import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
 
 export default function BenefitsPageClient(): React.ReactElement {
   const { language } = useLanguage();
@@ -103,13 +104,17 @@ export default function BenefitsPageClient(): React.ReactElement {
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
             {/* Author byline for E-E-A-T */}
-            <span className="flex items-center gap-1">
-              <User className="w-4 h-4" />
-              {content.authorName}
-            </span>
+            <div className="flex items-start gap-2">
+              <User className="w-4 h-4 mt-0.5 shrink-0" />
+              <div>
+                <span className="font-semibold">{content.authorName}</span>
+                <span className="mx-1">·</span>
+                <span className="italic">{content.authorBio}</span>
+              </div>
+            </div>
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              {new Date('2026-01-30').toLocaleDateString(language, { month: 'long', day: 'numeric', year: 'numeric' })}
+              {new Date('2025-06-15').toLocaleDateString(language, { month: 'long', day: 'numeric', year: 'numeric' })}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
@@ -202,6 +207,8 @@ export default function BenefitsPageClient(): React.ReactElement {
               </Link>
             </div>
           </div>
+
+          <AuthorBioCard />
 
           <RelatedArticles
             currentSlug="10-surprising-benefits-word-games"

@@ -9,7 +9,8 @@ interface PageProps {
 }
 
 const SLUG = 'top-player-secrets';
-const DATE_PUBLISHED = '2025-06-15';
+const DATE_PUBLISHED = '2025-08-28';
+const DATE_MODIFIED = '2026-02-25';
 
 const metaTitles: Record<string, string> = {
   en: '7 Word Game Secrets Top Players Use - Free Tips',
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED });
 }
 
 export default async function SecretsPage({ params }: PageProps) {
@@ -53,6 +54,7 @@ export default async function SecretsPage({ params }: PageProps) {
         slug={SLUG}
         locale={locale}
         datePublished={DATE_PUBLISHED}
+        dateModified={DATE_MODIFIED}
       />
       <SecretsPageClient />
     </>

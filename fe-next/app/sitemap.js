@@ -5,7 +5,7 @@ export default function sitemap() {
   // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
   // Update these dates when actual content changes are deployed.
   const LAST_DEPLOYED = '2026-03-16T00:00:00.000Z';
-  const BLOG_UPDATED = '2026-03-10T00:00:00.000Z';
+  const BLOG_UPDATED = '2026-03-16T00:00:00.000Z';
   const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
   const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
 
@@ -96,7 +96,7 @@ export default function sitemap() {
   addForAllLocales('/glossary', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
 
   // ─── Blog ───
-  addForAllLocales('/blog', { lastModified: BLOG_UPDATED, changeFrequency: 'weekly', priority: 0.8 });
+  addForAllLocales('/blog', { lastModified: BLOG_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
   const blogArticles = [
     '10-surprising-benefits-word-games',
     'science-behind-word-games',
@@ -116,7 +116,7 @@ export default function sitemap() {
     'word-games-for-kids-education',
   ];
   blogArticles.forEach((slug) => {
-    addForAllLocales(`/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
+    addForAllLocales(`/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
   });
 
   // ─── Info pages ───
@@ -156,6 +156,12 @@ export default function sitemap() {
       images: [`${baseUrl}/og-image-${img}.jpg`],
     });
   });
+
+  // ─── Author page ───
+  addForAllLocales('/about/the-word-nerd', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+
+  // ─── Words hub ───
+  addForAllLocales('/words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
   // ─── Programmatic SEO: N-letter word pages (30 URLs) ───
   const wordLengths = [3, 4, 5, 6, 7, 8];

@@ -9,7 +9,8 @@ interface PageProps {
 }
 
 const SLUG = 'why-word-games-are-addictive';
-const DATE_PUBLISHED = '2026-03-09';
+const DATE_PUBLISHED = '2025-11-12';
+const DATE_MODIFIED = '2026-03-12';
 
 const metaTitles: Record<string, string> = {
   en: "Why You Can't Stop Playing Word Games - The Psychology Explained",
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED });
 }
 
 export default async function WhyAddictivePage({ params }: PageProps) {
@@ -53,6 +54,7 @@ export default async function WhyAddictivePage({ params }: PageProps) {
         slug={SLUG}
         locale={locale}
         datePublished={DATE_PUBLISHED}
+        dateModified={DATE_MODIFIED}
       />
       <WhyAddictivePageClient />
     </>

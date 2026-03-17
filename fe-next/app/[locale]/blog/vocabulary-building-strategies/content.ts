@@ -63,6 +63,8 @@ A meta-analysis by Cepeda et al. (2006) published in Psychological Bulletin anal
 
 For my 30-day experiment, I used a simple spacing schedule. Every new word got reviewed at 1, 3, 7, 14, and 28 days after I first learned it. I didn't use an app — I used my notebook and a simple calendar system. Each word had a small grid of boxes next to it, and I'd check off each review.
 
+I'm embarrassed to admit how long I resisted this. I spent years thinking I could just... absorb words by playing enough games. Like osmosis, but for vocabulary. Spoiler: that's not how brains work. I'd "learn" PERSPICACIOUS on a Tuesday and by Friday I couldn't tell you if it meant sharp-sighted or related to sweating. (It means sharp-sighted. I know that now. Permanently.)
+
 The difference was dramatic. In previous vocabulary-building attempts, I'd learn 20 words in an evening and forget 15 of them by the next week. With spaced repetition, my retention rate was over 85% at the 30-day mark. Not perfect, but vastly better than anything I'd achieved before.`,
       },
       {
@@ -95,6 +97,8 @@ The implication for vocabulary building is profound. When you encounter an unfam
 
 I noticed this pattern repeatedly during my experiment. Words that I'd struggled with during word games — words where I thought "is that even a word?" before looking them up — stuck far better than words I'd simply read in a book and looked up casually. The struggle was the secret ingredient.
 
+Case in point: QUAHOG. I found Q-U-A-H-O-G on a board, played it as a desperate Hail Mary, and was genuinely shocked when it was accepted. Looked it up. A type of clam. I will never forget that word. Not ever. Meanwhile, I read SANGUINE in a novel the same week and had to look it up three separate times before it stuck. The difference? I fought for QUAHOG. SANGUINE was handed to me.
+
 This is why I tell people: don't be discouraged when a word game stumps you. Every word you don't know is an opportunity. Every failed retrieval attempt is priming your brain for the moment you learn the answer. The harder the struggle, the stronger the memory.`,
       },
       {
@@ -108,6 +112,8 @@ Here's an example. Let's say you learn the word EPHEMERAL (lasting a short time)
 Nation (2001), in his seminal work "Learning Vocabulary in Another Language" published by Cambridge University Press, estimated that knowledge of approximately 20 word families per week — where each "family" includes the root word plus its derived forms — can build vocabulary at roughly four times the rate of learning individual words in isolation.
 
 During my experiment, I started grouping new words by their roots. BENE- (good): BENEVOLENT, BENEFICIAL, BENEDICTION, BENEFACTOR. MAL- (bad): MALEVOLENT, MALICIOUS, MALADY, MALFEASANCE. CHRON- (time): CHRONOLOGICAL, CHRONIC, SYNCHRONIZE, ANACHRONISM.
+
+The thing about morphology — actually, let me back up. I tried this once before, years ago, and gave up after two days because I was doing it wrong. I was memorizing roots like flashcards. Isolated. Joyless. This time I stumbled into MAGNANIMOUS during a Boggle round, couldn't define it, looked it up, and went "wait — MAGN like MAGNIFICENT?" That one connection unlocked something. Suddenly I was hunting for roots in every new word like a kid flipping over rocks looking for bugs.
 
 This approach turned each new word into a node in a network rather than an isolated fact. When I encountered MAGNANIMOUS in a crossword, I already knew MAGN- (great) from MAGNIFICENT and MAGNITUDE, and ANIM- (spirit/mind) from ANIMATE and ANIMAL. So MAGNANIMOUS — great-spirited, generous — practically defined itself.
 

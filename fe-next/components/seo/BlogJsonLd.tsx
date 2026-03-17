@@ -64,8 +64,25 @@ export function BlogPostingJsonLd({
         author: {
             '@type': 'Person',
             name: 'The Word Nerd',
-            url: `${SITE_URL}/about`,
-            jobTitle: 'Word Game Expert',
+            url: `${SITE_URL}/about/the-word-nerd`,
+            jobTitle: 'Senior Word Game Researcher & Game Designer',
+            description:
+                'Cognitive science enthusiast with 8+ years researching word games, linguistics, and brain health. Creator of LexiClash.',
+            image: `${SITE_URL}/images/author-word-nerd.jpg`,
+            sameAs: ['https://www.lexiclash.live/about/the-word-nerd'],
+            knowsAbout: [
+                'Word Games',
+                'Cognitive Science',
+                'Linguistics',
+                'Brain Training',
+                'Game Design',
+                'Multilingual Learning',
+            ],
+            worksFor: {
+                '@type': 'Organization',
+                name: 'LexiClash Ltd',
+                url: SITE_URL,
+            },
         },
         publisher: {
             '@type': 'Organization',
@@ -123,7 +140,7 @@ export function generateBlogMetadata({
             images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
             publishedTime: datePublished,
             modifiedTime: dateModified || datePublished,
-            authors: ['LexiClash Editorial Team'],
+            authors: ['The Word Nerd'],
         },
         twitter: {
             card: 'summary_large_image',

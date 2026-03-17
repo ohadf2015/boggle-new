@@ -12,6 +12,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { AdPlaceholder } from '@/components/ads';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { contentByLocale } from './content';
+import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
 
 export default function StrategiesPageClient(): React.ReactElement {
   const { language } = useLanguage();
@@ -105,7 +106,7 @@ export default function StrategiesPageClient(): React.ReactElement {
           )}>
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              {new Date('2026-01-30').toLocaleDateString(language, { month: 'long', day: 'numeric', year: 'numeric' })}
+              {new Date('2025-07-22').toLocaleDateString(language, { month: 'long', day: 'numeric', year: 'numeric' })}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
@@ -223,6 +224,8 @@ export default function StrategiesPageClient(): React.ReactElement {
               </Link>
             </div>
           </div>
+
+          <AuthorBioCard />
 
           <RelatedArticles
             currentSlug="daily-challenge-strategies"

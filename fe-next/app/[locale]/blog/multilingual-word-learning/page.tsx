@@ -9,7 +9,8 @@ interface PageProps {
 }
 
 const SLUG = 'multilingual-word-learning';
-const DATE_PUBLISHED = '2025-06-15';
+const DATE_PUBLISHED = '2025-08-10';
+const DATE_MODIFIED = '2026-03-05';
 
 const metaTitles: Record<string, string> = {
   en: 'Learn Languages Through Word Games - Free Multilingual Tips',
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED });
 }
 
 export default async function MultilingualPage({ params }: PageProps) {
@@ -53,6 +54,7 @@ export default async function MultilingualPage({ params }: PageProps) {
         slug={SLUG}
         locale={locale}
         datePublished={DATE_PUBLISHED}
+        dateModified={DATE_MODIFIED}
       />
       <MultilingualPageClient />
     </>

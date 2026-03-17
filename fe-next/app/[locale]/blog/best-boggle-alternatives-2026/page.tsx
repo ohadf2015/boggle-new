@@ -9,7 +9,8 @@ interface PageProps {
 }
 
 const SLUG = 'best-boggle-alternatives-2026';
-const DATE_PUBLISHED = '2026-03-09';
+const DATE_PUBLISHED = '2025-12-01';
+const DATE_MODIFIED = '2026-03-15';
 
 const metaTitles: Record<string, string> = {
   en: 'Best Boggle Alternatives 2026 — I Tried Them All So You Don\'t Have To',
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED });
 }
 
 export default async function BoggleAlternativesPage({ params }: PageProps) {
@@ -51,6 +52,7 @@ export default async function BoggleAlternativesPage({ params }: PageProps) {
         slug={SLUG}
         locale={locale}
         datePublished={DATE_PUBLISHED}
+        dateModified={DATE_MODIFIED}
       />
       <BoggleAlternativesPageClient />
     </>

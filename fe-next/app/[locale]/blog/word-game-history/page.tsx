@@ -9,7 +9,8 @@ interface PageProps {
 }
 
 const SLUG = 'word-game-history';
-const DATE_PUBLISHED = '2026-03-09';
+const DATE_PUBLISHED = '2026-01-08';
+const DATE_MODIFIED = '2026-03-05';
 
 const metaTitles: Record<string, string> = {
   en: 'History of Word Games - From Ancient Tiles to Digital Grids',
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED });
 }
 
 export default async function WordGameHistoryPage({ params }: PageProps) {
@@ -53,6 +54,7 @@ export default async function WordGameHistoryPage({ params }: PageProps) {
         slug={SLUG}
         locale={locale}
         datePublished={DATE_PUBLISHED}
+        dateModified={DATE_MODIFIED}
       />
       <WordGameHistoryPageClient />
     </>

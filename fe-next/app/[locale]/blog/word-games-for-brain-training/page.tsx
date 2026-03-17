@@ -9,7 +9,8 @@ interface PageProps {
 }
 
 const SLUG = 'word-games-for-brain-training';
-const DATE_PUBLISHED = '2026-03-09';
+const DATE_PUBLISHED = '2025-12-20';
+const DATE_MODIFIED = '2026-03-10';
 
 const metaTitles: Record<string, string> = {
   en: 'Word Games for Brain Training - What the Research Actually Says',
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED });
 }
 
 export default async function BrainTrainingPage({ params }: PageProps) {
@@ -53,6 +54,7 @@ export default async function BrainTrainingPage({ params }: PageProps) {
         slug={SLUG}
         locale={locale}
         datePublished={DATE_PUBLISHED}
+        dateModified={DATE_MODIFIED}
       />
       <BrainTrainingPageClient />
     </>

@@ -12,6 +12,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { AdPlaceholder } from '@/components/ads';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { contentByLocale } from './content';
+import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
 
 export default function MultiplayerSocialPageClient(): React.ReactElement {
   const { language } = useLanguage();
@@ -104,13 +105,18 @@ export default function MultiplayerSocialPageClient(): React.ReactElement {
             'flex flex-wrap items-center gap-4 text-sm mb-6',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            <span className="flex items-center gap-1">
-              <User className="w-4 h-4" />
-              {content.authorName}
-            </span>
+            {/* Author byline for E-E-A-T */}
+            <div className="flex items-start gap-2">
+              <User className="w-4 h-4 mt-0.5 shrink-0" />
+              <div>
+                <span className="font-semibold">{content.authorName}</span>
+                <span className="mx-1">·</span>
+                <span className="italic">{content.authorBio}</span>
+              </div>
+            </div>
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              {new Date('2026-03-09').toLocaleDateString(language, { month: 'long', day: 'numeric', year: 'numeric' })}
+              {new Date('2026-02-15').toLocaleDateString(language, { month: 'long', day: 'numeric', year: 'numeric' })}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
@@ -203,6 +209,8 @@ export default function MultiplayerSocialPageClient(): React.ReactElement {
               </Link>
             </div>
           </div>
+
+          <AuthorBioCard />
 
           <RelatedArticles
             currentSlug="multiplayer-word-games-social"

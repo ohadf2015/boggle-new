@@ -32,6 +32,7 @@ import { LandingBottomCTA } from './LandingBottomCTA';
 import { LandingTopWords } from './LandingTopWords';
 import { LandingHallOfFame } from './LandingHallOfFame';
 import { LandingShareBanner } from './LandingShareBanner';
+import { LandingBlogSection } from './LandingBlogSection';
 import { LandingCommunityShowcase } from './LandingCommunityShowcase';
 import { LandingMobileCards } from './LandingMobileCards';
 import Header from '@/components/Header';
@@ -258,6 +259,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         <div className="w-full max-w-4xl mx-auto">
           <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
         </div>
+
+        {/* Latest Blog Posts */}
+        <LandingBlogSection />
 
         {/* Bottom CTA */}
         <LandingBottomCTA onPlayClick={handlePlayClick} />

@@ -9,7 +9,8 @@ interface PageProps {
 }
 
 const SLUG = 'word-games-for-kids-education';
-const DATE_PUBLISHED = '2026-03-09';
+const DATE_PUBLISHED = '2026-01-27';
+const DATE_MODIFIED = '2026-03-12';
 
 const metaTitles: Record<string, string> = {
   en: 'Word Games for Education - Why Teachers Need Them in 2026',
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED });
 }
 
 export default async function WordGamesEducationPage({ params }: PageProps) {
@@ -53,6 +54,7 @@ export default async function WordGamesEducationPage({ params }: PageProps) {
         slug={SLUG}
         locale={locale}
         datePublished={DATE_PUBLISHED}
+        dateModified={DATE_MODIFIED}
       />
       <WordGamesEducationPageClient />
     </>

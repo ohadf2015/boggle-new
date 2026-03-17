@@ -36,77 +36,77 @@ const blogPosts: BlogPost[] = [
   {
     slug: '10-surprising-benefits-word-games',
     image: '/images/blog/10-benefits.jpg',
-    date: '2026-01-30',
+    date: '2025-06-15',
   },
   {
     slug: 'science-behind-word-games',
     image: '/images/blog/science-brain.jpg',
-    date: '2026-01-30',
+    date: '2025-07-03',
   },
   {
     slug: 'daily-challenge-strategies',
     image: '/images/blog/daily-strategies.jpg',
-    date: '2026-01-30',
+    date: '2025-07-22',
   },
   {
     slug: 'multilingual-word-learning',
     image: '/images/blog/multilingual.jpg',
-    date: '2026-01-30',
+    date: '2025-08-10',
   },
   {
     slug: 'top-player-secrets',
     image: '/images/blog/top-secrets.jpg',
-    date: '2026-01-30',
+    date: '2025-08-28',
   },
   {
     slug: 'improve-word-game-skills',
     image: '/images/blog/improve-skills.jpg',
-    date: '2026-01-30',
-  },
-  {
-    slug: 'why-word-games-are-addictive',
-    image: '/images/blog/why-addictive.jpg',
-    date: '2026-03-09',
-  },
-  {
-    slug: 'best-boggle-alternatives-2026',
-    image: '/images/blog/boggle-alternatives.jpg',
-    date: '2026-03-09',
-  },
-  {
-    slug: 'word-games-for-brain-training',
-    image: '/images/blog/brain-training-words.jpg',
-    date: '2026-03-09',
-  },
-  {
-    slug: 'word-game-history',
-    image: '/images/blog/word-game-history.jpg',
-    date: '2026-03-09',
-  },
-  {
-    slug: 'word-games-for-kids-education',
-    image: '/images/blog/kids-education.jpg',
-    date: '2026-03-09',
+    date: '2025-09-15',
   },
   {
     slug: 'word-games-and-mental-health',
     image: '/images/blog/mental-health.jpg',
-    date: '2026-03-09',
+    date: '2025-10-05',
   },
   {
     slug: 'hebrew-word-games-guide',
     image: '/images/blog/hebrew-word-games.jpg',
-    date: '2026-03-09',
+    date: '2025-10-24',
+  },
+  {
+    slug: 'why-word-games-are-addictive',
+    image: '/images/blog/why-addictive.jpg',
+    date: '2025-11-12',
+  },
+  {
+    slug: 'best-boggle-alternatives-2026',
+    image: '/images/blog/boggle-alternatives.jpg',
+    date: '2025-12-01',
+  },
+  {
+    slug: 'word-games-for-brain-training',
+    image: '/images/blog/brain-training-words.jpg',
+    date: '2025-12-20',
+  },
+  {
+    slug: 'word-game-history',
+    image: '/images/blog/word-game-history.jpg',
+    date: '2026-01-08',
+  },
+  {
+    slug: 'word-games-for-kids-education',
+    image: '/images/blog/kids-education.jpg',
+    date: '2026-01-27',
   },
   {
     slug: 'multiplayer-word-games-social',
     image: '/images/blog/multiplayer-social.jpg',
-    date: '2026-03-09',
+    date: '2026-02-15',
   },
   {
     slug: 'vocabulary-building-strategies',
     image: '/images/blog/vocabulary-building.jpg',
-    date: '2026-03-09',
+    date: '2026-03-05',
   },
 ];
 

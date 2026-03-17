@@ -9,7 +9,8 @@ interface PageProps {
 }
 
 const SLUG = 'science-behind-word-games';
-const DATE_PUBLISHED = '2025-06-15';
+const DATE_PUBLISHED = '2025-07-03';
+const DATE_MODIFIED = '2026-03-01';
 
 const metaTitles: Record<string, string> = {
   en: 'Word Games & Brain Health - Scientific Benefits Explained',
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED });
 }
 
 export default async function SciencePage({ params }: PageProps) {
@@ -53,6 +54,7 @@ export default async function SciencePage({ params }: PageProps) {
         slug={SLUG}
         locale={locale}
         datePublished={DATE_PUBLISHED}
+        dateModified={DATE_MODIFIED}
       />
       <SciencePageClient />
     </>

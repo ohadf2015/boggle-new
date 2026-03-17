@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Brain, BarChart3, Info, HelpCircle, Mail, Cookie, Gift, Newspaper, Users } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Brain, BarChart3, Info, HelpCircle, Mail, Cookie, Gift, Newspaper, BookOpen, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -384,6 +384,10 @@ function MobileInfoLinks({ language, t, onClose }: { language: string; t: (key: 
                 <Link href={`/${language}/blog`} onClick={onClose} className={infoLinkClass}>
                     <SmallIcon className="bg-neo-orange"><Newspaper className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
                     <span>{t('footer.blog')}</span>
+                </Link>
+                <Link href={`/${language}/guides`} onClick={onClose} className={infoLinkClass}>
+                    <SmallIcon className="bg-neo-cyan"><BookOpen className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
+                    <span>{t('footer.guides')}</span>
                 </Link>
                 <Link href={`/${language}/leaderboard`} onClick={onClose} className={infoLinkClass}>
                     <SmallIcon className="bg-neo-lime"><Trophy className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
