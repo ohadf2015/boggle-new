@@ -114,9 +114,9 @@ jest.mock('@/utils/confettiUtils', () => ({
   fireVictoryConfetti: jest.fn(),
 }));
 
-// Mock ThemeContext (needed by RewardedAdButton)
-jest.mock('@/utils/ThemeContext', () => ({
-  useTheme: () => ({ theme: 'dark' }),
+// Mock RewardedAdButton (uses ThemeProvider internally)
+jest.mock('@/components/ads/RewardedAdButton', () => ({
+  RewardedAdButton: ({ children }: any) => children || null,
 }));
 
 // ==============================================
