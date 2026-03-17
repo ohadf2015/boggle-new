@@ -10,7 +10,7 @@ import { AchievementGrid } from './AchievementGrid';
 jest.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   AdaptiveMotion: {
-    div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => <div ref={ref} {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap'].includes(k)))}>{children}</div>),
+    div: Object.assign(React.forwardRef(function MotionDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) { return <div ref={ref} {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap'].includes(k)))}>{children}</div>; }), { displayName: 'motion.div' }),
   },
 }));
 

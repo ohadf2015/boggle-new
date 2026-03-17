@@ -11,10 +11,13 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
   const React = require('react');
   const createMotionProxy = () =>
     new Proxy({}, {
-      get: (_: any, tag: string) =>
-        React.forwardRef(({ children, ...props }: any, ref: any) =>
+      get: (_: any, tag: string) => {
+        const Comp = React.forwardRef(({ children, ...props }: any, ref: any) =>
           React.createElement(tag, { ...props, ref }, children)
-        ),
+        );
+        Comp.displayName = `motion.${tag}`;
+        return Comp;
+      },
     });
   return {
     __esModule: true,
