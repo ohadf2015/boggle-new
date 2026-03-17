@@ -1008,7 +1008,8 @@ const ja = {
     "presetDrawerBoardHard": "9×9（むずかしい）",
     "presetDrawerLetters": "文字",
     "difficultyTooltipGrid": "グリッドサイズで難易度が変わる",
-    "difficultyTooltipTimer": "長い時間＝たくさん見つかる"
+    "difficultyTooltipTimer": "長い時間＝たくさん見つかる",
+    "bot": "ボット"
   },
   "tvBroadcast": {
     "liveGameInProgress": "ライブゲーム進行中",
@@ -1078,7 +1079,14 @@ const ja = {
     "wordsAndCounting": "{player}が{count}語発見",
     "anyonesGame": "誰が勝つかわからない！",
     "raceHeatingUp": "レースが白熱！",
-    "noActivityYet": "アクション開始を待っています..."
+    "noActivityYet": "アクション開始を待っています...",
+    "totalWords": "合計単語数",
+    "avgLength": "平均文字数",
+    "activeCombos": "アクティブコンボ",
+    "highestCombo": "最高コンボ",
+    "hunting": "ハンティング中",
+    "wordsHunted": "捕獲した単語",
+    "activityPanel": "アクティビティ"
   },
   "tvResults": {
     "title": "勝者誕生!",
@@ -4099,6 +4107,7 @@ const ja = {
       "eliminated": "脱落",
       "youEliminated": "脱落しました！",
       "youFoundIt": "見つけた！",
+      "someoneFoundIt": "誰かが見つけた！",
       "targetFound": "ターゲット発見！",
       "playerStatus": "プレイヤー状況",
       "gameEnding": "ゲーム終了中...",
@@ -5543,6 +5552,17 @@ const ja = {
       "golden-library": "黄金の図書館"
     },
     "mechanics": {
+      "synonymPairs": "同義語ペアで+25%",
+      "etymologyRoots": "ラテン語/ギリシャ語の語源でボーナス",
+      "idioms": "隠し慣用句チャレンジ",
+      "compounds": "複合語で+30%",
+      "anagrams": "アナグラムを解いてボーナス",
+      "palindromes": "回文で+50%",
+      "rareWords": "珍しい/新しい単語で+40%",
+      "multilingual": "多言語ワードボーナス",
+      "allMechanics": "すべてのメカニクスを組み合わせ"
+    },
+    "mechanic": {
       "synonymPairs": "同義語ペアで+25%",
       "etymologyRoots": "ラテン語/ギリシャ語の語源でボーナス",
       "idioms": "隠し慣用句チャレンジ",
@@ -7163,7 +7183,18 @@ const ja = {
         "started": "開始済み",
         "practicing": "練習中",
         "mastered": "マスター"
-      }
+      },
+      "points": "ポイント",
+      "vocabularyWords": "語彙単語",
+      "vocabularyWordsFound": "見つけた語彙:",
+      "vocabulary": "語彙",
+      "vocab": "語彙",
+      "foundWordsLabel": "見つけた単語:",
+      "more": "もっと",
+      "allVocabFound": "すべての語彙を見つけました！",
+      "total": "合計",
+      "canEmbed": "埋め込み可能",
+      "trackOnly": "トラッキングのみ"
     },
     "student": {
       "dashboard": "マイレッスン",
@@ -7871,6 +7902,18 @@ const ja = {
       cooldown: "まもなく利用可能"
     }
   },
+  "features": {
+    "unlocked": {
+      "advancedSettings": "詳細設定がアンロック！",
+      "advancedSettingsDesc": "ゲーム設定をカスタマイズできます",
+      "customBotCount": "ボット数カスタムがアンロック！",
+      "customBotCountDesc": "対戦するボットの数を選択",
+      "challengeMode": "チャレンジモードがアンロック！",
+      "challengeModeDesc": "時間と戦ってレコードを樹立",
+      "practiceMode": "練習モードがアンロック！",
+      "practiceModeDesc": "タイマーなし - 自分のペースで学習"
+    }
+  },
   wordHuntAnnouncement: {
     badge: "マルチプレイヤーに新登場",
     title: "ワードハントモードを試そう！",
@@ -8056,7 +8099,10 @@ const ja = {
     save: "保存",
     cancel: "キャンセル",
     buildCustom: "自分だけのアバター",
-    bgColor: "背景"
+    bgColor: "背景",
+    gender: "体型",
+    male: "男性",
+    female: "女性"
   }
 };
 

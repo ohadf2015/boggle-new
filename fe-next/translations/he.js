@@ -1024,7 +1024,8 @@ const he = {
     "presetDrawerLetters": "אותיות",
     "difficultyTooltipGrid": "גודל הלוח משפיע על הקושי",
     "difficultyTooltipTimer": "יותר זמן = יותר מילים",
-    "roomChat": "צ'אט חדר"
+    "roomChat": "צ'אט חדר",
+    "bot": "בוט"
   },
   "tvBroadcast": {
     "liveGameInProgress": "משחק חי מתנהל",
@@ -1094,7 +1095,14 @@ const he = {
     "wordsAndCounting": "{player} מצא {count} מילים",
     "anyonesGame": "הכל פתוח!",
     "raceHeatingUp": "המרוץ מתחמם!",
-    "noActivityYet": "מחכים שהפעולה תתחיל..."
+    "noActivityYet": "מחכים שהפעולה תתחיל...",
+    "totalWords": "סה״כ מילים",
+    "avgLength": "אורך ממוצע",
+    "activeCombos": "קומבו פעיל",
+    "highestCombo": "קומבו הגבוה ביותר",
+    "hunting": "ציד",
+    "wordsHunted": "מילים שנצודו",
+    "activityPanel": "פעילות"
   },
   "tvResults": {
     "title": "יש לנו מנצח!",
@@ -4057,6 +4065,7 @@ const he = {
       "eliminated": "הודח",
       "youEliminated": "הודחת מהמשחק!",
       "youFoundIt": "מצאת את המילה!",
+      "someoneFoundIt": "מישהו מצא את המילה!",
       "targetFound": "המילה נמצאה!",
       "playerStatus": "סטטוס שחקנים",
       "gameEnding": "המשחק מסתיים...",
@@ -5517,6 +5526,17 @@ const he = {
       "golden-library": "ספרייה מוזהבת"
     },
     "mechanics": {
+      "synonymPairs": "+25% לזוגות נרדפים",
+      "etymologyRoots": "בונוס לשורשים לטיניים/יווניים",
+      "idioms": "אתגרי ביטויים נסתרים",
+      "compounds": "+30% למילים מורכבות",
+      "anagrams": "פתרו אנגרמות לבונוסים",
+      "palindromes": "+50% לפלינדרומים",
+      "rareWords": "+40% למילים נדירות/חדשות",
+      "multilingual": "בונוסים למילים רב-לשוניות",
+      "allMechanics": "כל המכניקות משולבות"
+    },
+    "mechanic": {
       "synonymPairs": "+25% לזוגות נרדפים",
       "etymologyRoots": "בונוס לשורשים לטיניים/יווניים",
       "idioms": "אתגרי ביטויים נסתרים",
@@ -7136,7 +7156,18 @@ const he = {
         "started": "מתחיל",
         "practicing": "מתרגל",
         "mastered": "שולט"
-      }
+      },
+      "points": "נקודות",
+      "vocabularyWords": "מילות אוצר מילים",
+      "vocabularyWordsFound": "מילות אוצר מילים שנמצאו:",
+      "vocabulary": "אוצר מילים",
+      "vocab": "אוצר מילים",
+      "foundWordsLabel": "מילים שנמצאו:",
+      "more": "עוד",
+      "allVocabFound": "כל מילות האוצר מילים נמצאו!",
+      "total": "סה״כ",
+      "canEmbed": "ניתן להטמיע",
+      "trackOnly": "מעקב בלבד"
     },
     "student": {
       "dashboard": "השיעורים שלי",
@@ -7896,6 +7927,18 @@ const he = {
       cooldown: "זמין בקרוב"
     }
   },
+  "features": {
+    "unlocked": {
+      "advancedSettings": "הגדרות מתקדמות נפתחו!",
+      "advancedSettingsDesc": "עכשיו אפשר להתאים אישית את המשחק",
+      "customBotCount": "מספר בוטים מותאם נפתח!",
+      "customBotCountDesc": "בחרו כמה בוטים להתמודד מולם",
+      "challengeMode": "מצב אתגר נפתח!",
+      "challengeModeDesc": "נגד השעון ושברו שיאים",
+      "practiceMode": "מצב תרגול נפתח!",
+      "practiceModeDesc": "ללא טיימר - למדו בקצב שלכם"
+    }
+  },
   wordHuntAnnouncement: {
     badge: "חדש במולטיפלייר",
     title: "נסו את מצב ציד מילים!",
@@ -8081,7 +8124,10 @@ const he = {
     save: "שמירה",
     cancel: "ביטול",
     buildCustom: "בנו דמות משלכם",
-    bgColor: "רקע"
+    bgColor: "רקע",
+    gender: "סוג גוף",
+    male: "זכר",
+    female: "נקבה"
   }
 };
 

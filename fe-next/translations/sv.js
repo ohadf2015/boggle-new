@@ -1008,7 +1008,8 @@ const sv = {
     "presetDrawerBoardHard": "9×9 (Svår)",
     "presetDrawerLetters": "bokstäver",
     "difficultyTooltipGrid": "Rutnätets storlek påverkar svårigheten",
-    "difficultyTooltipTimer": "Längre tid = fler ord hittade"
+    "difficultyTooltipTimer": "Längre tid = fler ord hittade",
+    "bot": "Bot"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Livespel pågår",
@@ -1078,7 +1079,14 @@ const sv = {
     "wordsAndCounting": "{player} hittade {count} ord",
     "anyonesGame": "Vem som helst kan vinna!",
     "raceHeatingUp": "Loppet hettar till!",
-    "noActivityYet": "Väntar på att spelet ska börja..."
+    "noActivityYet": "Väntar på att spelet ska börja...",
+    "totalWords": "Totalt ord",
+    "avgLength": "Snittlängd",
+    "activeCombos": "Aktiva kombos",
+    "highestCombo": "Högsta kombo",
+    "hunting": "Jagar",
+    "wordsHunted": "Ord jagade",
+    "activityPanel": "Aktivitet"
   },
   "tvResults": {
     "title": "VI HAR EN VINNARE!",
@@ -4047,6 +4055,7 @@ const sv = {
       "eliminated": "Eliminerad",
       "youEliminated": "Du har blivit eliminerad!",
       "youFoundIt": "Du hittade den!",
+      "someoneFoundIt": "Någon hittade ordet!",
       "targetFound": "Målord hittat!",
       "playerStatus": "Spelarstatus",
       "gameEnding": "Spelet avslutas...",
@@ -5492,6 +5501,17 @@ const sv = {
       "golden-library": "Gyllene Bibliotek"
     },
     "mechanics": {
+      "synonymPairs": "+25% för synonympar",
+      "etymologyRoots": "Bonus för latinska/grekiska rötter",
+      "idioms": "Dolda idiomutmaningar",
+      "compounds": "+30% för sammansatta ord",
+      "anagrams": "Lös anagram för bonusar",
+      "palindromes": "+50% för palindromer",
+      "rareWords": "+40% för sällsynta/nya ord",
+      "multilingual": "Flerspråkiga ordbonusar",
+      "allMechanics": "Alla mekaniker kombinerade"
+    },
+    "mechanic": {
       "synonymPairs": "+25% för synonympar",
       "etymologyRoots": "Bonus för latinska/grekiska rötter",
       "idioms": "Dolda idiomutmaningar",
@@ -7112,7 +7132,18 @@ const sv = {
         "started": "Påbörjad",
         "practicing": "Övar",
         "mastered": "Bemästrad"
-      }
+      },
+      "points": "poäng",
+      "vocabularyWords": "Ordförrådsord",
+      "vocabularyWordsFound": "Ordförrådsord hittade:",
+      "vocabulary": "Ordförråd",
+      "vocab": "ordförråd",
+      "foundWordsLabel": "Hittade ord:",
+      "more": "mer",
+      "allVocabFound": "Alla ordförrådsord hittade!",
+      "total": "totalt",
+      "canEmbed": "kan bädda in",
+      "trackOnly": "enbart spårning"
     },
     "duels": {
       "addWord": "Lägg till ord",
@@ -7891,6 +7922,18 @@ const sv = {
       cooldown: "Tillgänglig snart"
     }
   },
+  "features": {
+    "unlocked": {
+      "advancedSettings": "Avancerade Inställningar Upplåsta!",
+      "advancedSettingsDesc": "Du kan nu anpassa spelinställningar",
+      "customBotCount": "Anpassat Botantal Upplåst!",
+      "customBotCountDesc": "Välj hur många botar du möter",
+      "challengeMode": "Utmaningsläge Upplåst!",
+      "challengeModeDesc": "Slå klockan och sätt rekord",
+      "practiceMode": "Övningsläge Upplåst!",
+      "practiceModeDesc": "Ingen timer - lär dig i din takt"
+    }
+  },
   wordHuntAnnouncement: {
     badge: "Nytt i Multiplayer",
     title: "Testa Word Hunt-läget!",
@@ -8076,7 +8119,10 @@ const sv = {
     save: "Spara",
     cancel: "Avbryt",
     buildCustom: "Bygg din egen",
-    bgColor: "Bakgrund"
+    bgColor: "Bakgrund",
+    gender: "Kroppstyp",
+    male: "Man",
+    female: "Kvinna"
   }
 };
 

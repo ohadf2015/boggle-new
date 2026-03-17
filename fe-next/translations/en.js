@@ -1008,7 +1008,8 @@ const en = {
     "presetDrawerLetters": "letters",
     "difficultyTooltipGrid": "Grid size affects difficulty",
     "difficultyTooltipTimer": "Longer time = more words found",
-    "roomChat": "Room Chat"
+    "roomChat": "Room Chat",
+    "bot": "Bot"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Live Game in Progress",
@@ -4168,6 +4169,7 @@ const en = {
       "eliminated": "Eliminated",
       "youEliminated": "You've been eliminated!",
       "youFoundIt": "You Found It!",
+      "someoneFoundIt": "Someone Found It!",
       "targetFound": "Target Found!",
       "playerStatus": "Player Status",
       "gameEnding": "Game ending...",
@@ -5559,6 +5561,17 @@ const en = {
       "golden-library": "Golden Library"
     },
     "mechanics": {
+      "synonymPairs": "+25% for synonym pairs",
+      "etymologyRoots": "Bonus for Latin/Greek roots",
+      "idioms": "Hidden idiom challenges",
+      "compounds": "+30% for compound words",
+      "anagrams": "Solve anagrams for bonuses",
+      "palindromes": "+50% for palindromes",
+      "rareWords": "+40% for rare/new words",
+      "multilingual": "Multi-language word bonuses",
+      "allMechanics": "All mechanics combined"
+    },
+    "mechanic": {
       "synonymPairs": "+25% for synonym pairs",
       "etymologyRoots": "Bonus for Latin/Greek roots",
       "idioms": "Hidden idiom challenges",
@@ -7966,6 +7979,18 @@ const en = {
       earning: "Watching...",
       earned: "+{amount} gold earned!",
       cooldown: "Available soon"
+    }
+  },
+  "features": {
+    "unlocked": {
+      "advancedSettings": "Advanced Settings Unlocked!",
+      "advancedSettingsDesc": "You can now customize game settings",
+      "customBotCount": "Custom Bot Count Unlocked!",
+      "customBotCountDesc": "Choose how many bots to face",
+      "challengeMode": "Challenge Mode Unlocked!",
+      "challengeModeDesc": "Beat the clock and set records",
+      "practiceMode": "Practice Mode Unlocked!",
+      "practiceModeDesc": "No timer - learn at your pace"
     }
   },
   wordHuntAnnouncement: {

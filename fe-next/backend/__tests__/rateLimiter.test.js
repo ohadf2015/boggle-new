@@ -34,7 +34,8 @@ describe('RateLimiter', () => {
           address: '127.0.0.1'
         }
       };
-      expect(RateLimiter.getClientIp(socket)).toBe('192.168.1.1');
+      // Last IP is most trusted (added by proxy closest to server)
+      expect(RateLimiter.getClientIp(socket)).toBe('10.0.0.1');
     });
 
     it('should extract IP from x-real-ip header', () => {

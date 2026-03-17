@@ -1041,7 +1041,8 @@ const es = {
     "presetDrawerBoardHard": "9×9 (Difícil)",
     "presetDrawerLetters": "letras",
     "difficultyTooltipGrid": "El tamaño afecta la dificultad",
-    "difficultyTooltipTimer": "Más tiempo = más palabras"
+    "difficultyTooltipTimer": "Más tiempo = más palabras",
+    "bot": "Bot"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Juego en Vivo en Progreso",
@@ -1111,7 +1112,14 @@ const es = {
     "wordsAndCounting": "{player} encontró {count} palabras",
     "anyonesGame": "¡Cualquiera puede ganar!",
     "raceHeatingUp": "¡La carrera se calienta!",
-    "noActivityYet": "Esperando que comience la acción..."
+    "noActivityYet": "Esperando que comience la acción...",
+    "totalWords": "Total de palabras",
+    "avgLength": "Longitud promedio",
+    "activeCombos": "Combos activos",
+    "highestCombo": "Combo más alto",
+    "hunting": "Cazando",
+    "wordsHunted": "Palabras cazadas",
+    "activityPanel": "Actividad"
   },
   "tvResults": {
     "title": "¡TENEMOS UN GANADOR!",
@@ -2369,6 +2377,14 @@ const es = {
       "completingSignIn": "Completando inicio de sesión...",
       "takingTooLong": "Esto está tardando más de lo esperado. ¿Intentar de nuevo?",
       "tryAgain": "Intentar de nuevo"
+    },
+    "otp": {
+      "sendCode": "Envíame un código",
+      "noPassword": "No se necesita contraseña",
+      "codeSentTo": "Código enviado a",
+      "verify": "Verificar código",
+      "changeEmail": "Cambiar email",
+      "resend": "Reenviar código"
     },
     "trustBadge": "Seguro y privado"
   },
@@ -4056,6 +4072,8 @@ const es = {
     "wordPlaceholder": "Escribe una palabra...",
     "bonusChallenge": "Desafío Bonus",
     "continueMissions": "Continúa tus misiones diarias",
+    "requestChallenge": "Solicitar desafío",
+    "requestSent": "Solicitud enviada",
     "watchAdRetry": "Ver anuncio para reintentar"
   },
   "dailyChallenge": {
@@ -4274,6 +4292,7 @@ const es = {
       "eliminated": "Eliminado",
       "youEliminated": "¡Te eliminaron!",
       "youFoundIt": "¡La encontraste!",
+      "someoneFoundIt": "¡Alguien la encontró!",
       "targetFound": "¡Palabra encontrada!",
       "playerStatus": "Estado de jugadores",
       "gameEnding": "Terminando juego...",
@@ -4381,7 +4400,26 @@ const es = {
       "send": "Enviar Desafío",
       "pending": "Desafío Pendiente",
       "customMessage": "Añade un mensaje (opcional)",
-      "inviteMessage": "¡Desafío de {name}! ¿Puedes superar su puntuación?"
+      "inviteMessage": "¡Desafío de {name}! ¿Puedes superar su puntuación?",
+      "defaultMessage": "¡te desafía!",
+      "modes": {
+        "classic": "Clásico",
+        "blitz": "Blitz",
+        "survival": "Supervivencia"
+      }
+    },
+    "copyInviteLink": "Copiar enlace de invitación",
+    "linkCopied": "¡Enlace copiado!",
+    "seeAll": "Ver todos",
+    "cancelRequest": "Cancelar",
+    "signInTitle": "Inicia sesión para añadir amigos",
+    "signInDescription": "¡Crea una cuenta para desafiar amigos y ver quién gana!",
+    "headToHead": {
+      "title": "Cara a cara",
+      "wins": "Tus victorias",
+      "losses": "Sus victorias",
+      "draws": "Empates",
+      "totalGames": "partidas juntos"
     },
     "messageLimit": "{current}/{max} caracteres",
     "errors": {
@@ -5677,7 +5715,8 @@ const es = {
       "mechanicProgress": "Progreso de mecánica",
       "phases": {
         "phase1": "FASE 1",
-        "phase2": "FASE 2"
+        "phase2": "FASE 2",
+        "phase2Banner": "¡FASE 2!"
       },
       "telegraph": {
         "incoming": "¡Ataque entrante!",
@@ -5824,6 +5863,17 @@ const es = {
       "golden-library": "Biblioteca Dorada"
     },
     "mechanics": {
+      "synonymPairs": "+25% por pares de sinónimos",
+      "etymologyRoots": "Bonificación por raíces latinas/griegas",
+      "idioms": "Desafíos de modismos ocultos",
+      "compounds": "+30% por palabras compuestas",
+      "anagrams": "Resuelve anagramas para bonificaciones",
+      "palindromes": "+50% por palíndromos",
+      "rareWords": "+40% por palabras raras/nuevas",
+      "multilingual": "Bonificaciones de palabras multilingües",
+      "allMechanics": "Todas las mecánicas combinadas"
+    },
+    "mechanic": {
       "synonymPairs": "+25% por pares de sinónimos",
       "etymologyRoots": "Bonificación por raíces latinas/griegas",
       "idioms": "Desafíos de modismos ocultos",
@@ -7167,7 +7217,18 @@ const es = {
       "time": "Tiempo",
       "wordCount": "palabras",
       "hintsUsed": "Pistas Usadas",
-      "maxStreak": "Racha Máxima"
+      "maxStreak": "Racha Máxima",
+      "points": "puntos",
+      "vocabularyWords": "Palabras de vocabulario",
+      "vocabularyWordsFound": "Palabras de vocabulario encontradas:",
+      "vocabulary": "Vocabulario",
+      "vocab": "vocabulario",
+      "foundWordsLabel": "Palabras encontradas:",
+      "more": "más",
+      "allVocabFound": "¡Todas las palabras encontradas!",
+      "total": "total",
+      "canEmbed": "se puede incrustar",
+      "trackOnly": "solo seguimiento"
     },
     "student": {
       "dashboard": "Mis Lecciones",
@@ -8073,7 +8134,22 @@ const es = {
     save: "Guardar",
     cancel: "Cancelar",
     buildCustom: "Crea el tuyo",
-    bgColor: "Fondo"
+    bgColor: "Fondo",
+    gender: "Tipo de cuerpo",
+    male: "Masculino",
+    female: "Femenino"
+  },
+  "features": {
+    "unlocked": {
+      "advancedSettings": "Configuraciones Avanzadas Desbloqueadas!",
+      "advancedSettingsDesc": "Ahora puedes personalizar la configuración del juego",
+      "customBotCount": "Cantidad de Bots Personalizada Desbloqueada!",
+      "customBotCountDesc": "Elige cuántos bots enfrentar",
+      "challengeMode": "Modo Desafío Desbloqueado!",
+      "challengeModeDesc": "Contra el reloj y establece récords",
+      "practiceMode": "Modo Práctica Desbloqueado!",
+      "practiceModeDesc": "Sin temporizador - aprende a tu ritmo"
+    }
   },
   wordHuntAnnouncement: {
     badge: "Nuevo en Multijugador",
