@@ -40,6 +40,11 @@ jest.mock('@/utils/confettiUtils', () => ({
   fireConfetti: jest.fn(),
 }));
 
+// Mock ThemeContext (needed by RewardedAdButton)
+jest.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark' }),
+}));
+
 // Mock share image utilities
 jest.mock('@/utils/shareImageGenerator', () => ({
   shareImageWithNativeShare: jest.fn().mockResolvedValue(true),
