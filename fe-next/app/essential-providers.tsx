@@ -23,7 +23,7 @@ import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { linkLogRocketSession } from '@/utils/sentry';
-import { hasConsent } from '@/utils/cookieConsent';
+
 
 import type { Language } from '@/shared/types/game';
 
@@ -79,14 +79,12 @@ if (typeof window !== 'undefined') {
     initResizeObserverErrorHandler();
 }
 
-// Lazy load LogRocket — only when analytics consent is granted.
+// Lazy load LogRocket — always enabled (consent check bypassed for now).
 // Deferred to 3 seconds OR first user interaction (whichever comes first).
 let logRocketInitialized = false;
 const initLogRocket = () => {
     if (logRocketInitialized) return;
     if (typeof window === 'undefined' || window.location.hostname === 'localhost') return;
-    // Require analytics consent before session replay
-    if (!hasConsent('analytics')) return;
 
     logRocketInitialized = true;
     import('logrocket').then(({ default: LogRocket }) => {

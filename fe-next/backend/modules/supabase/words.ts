@@ -320,7 +320,7 @@ export async function recordPlayerWrongWord(
   if (!getSupabase()) return;
 
   const normalizedWord = word.toLowerCase().trim();
-  if (normalizedWord.length < 3) return;
+  if (normalizedWord.length < 2) return;
 
   wrongWordBuffer.push({ word: normalizedWord, language, reason });
 

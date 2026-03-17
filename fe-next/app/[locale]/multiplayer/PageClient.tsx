@@ -359,7 +359,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       {isActive ? <ConnectionBanner showScoreSafe /> : <ConnectionDot />}
       <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
       <ErrorBoundary>
-        <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-hidden">
+        <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-x-hidden">
           {isClassroomMode ? (
             <>
               <EducationHeader showBackButton title={t('education.classroomGame.title')} />

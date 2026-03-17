@@ -238,7 +238,7 @@ const AdventureGame = memo<AdventureGameProps>(
       bossDamageMultiplier: init.skillEffects.bossDamageMultiplier * init.runeEffects.bossDamage,
     }), [init.skillEffects, init.runeEffects.bossDamage]);
 
-    const minWordLength = levelConfig.minWordLength ?? 3;
+    const minWordLength = levelConfig.minWordLength ?? 2;
     const { validateWord, isValidating } = useAdventureWordValidation({
       grid: initialGrid, language: language || 'en', minWordLength, foundWords: gameState.wordsFound, tiles: tiles2D,
     });

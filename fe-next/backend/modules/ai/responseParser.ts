@@ -303,7 +303,7 @@ export function parseThemedBoardResponse(text: string, theme: string): string[] 
     .map((w) => w.toLowerCase().trim())
     .filter(
       (w) =>
-        w.length >= 3 &&
+        w.length >= 2 &&
         w.length <= 10 &&
         /^[a-zA-Z\u00C0-\u024F\u0590-\u05FF]+$/.test(w)
     );

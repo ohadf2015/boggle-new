@@ -54,9 +54,9 @@ describe('invalidWordTracker', () => {
       });
     });
 
-    it('skips very short words (< 3 chars)', () => {
+    it('skips very short words (< 2 chars)', () => {
       recordInvalidWord({
-        word: 'ab',
+        word: 'a',
         language: 'en',
         reason: 'not_in_dictionary',
       });

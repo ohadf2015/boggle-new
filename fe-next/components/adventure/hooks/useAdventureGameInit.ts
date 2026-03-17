@@ -156,7 +156,7 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
   // Backwards-compatible upgrade bonuses (consumed by level completion + word submit)
   // Stacks: upgrade scoreBonus × rune scoreMultiplier × weekly scoreMultiplier
   const weeklyApplied = useMemo(
-    () => applyModifiers({ timerSeconds: 0, scoreMultiplier: 1, minWordLength: 3 }, weeklyModifiers),
+    () => applyModifiers({ timerSeconds: 0, scoreMultiplier: 1, minWordLength: 2 }, weeklyModifiers),
     [weeklyModifiers]
   );
   const upgradeBonuses = useMemo(() => ({
@@ -172,7 +172,7 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
     return {
       ...adjustedConfig,
       timerSeconds: Math.round(baseTimer * weeklyTimerMod),
-      minWordLength: Math.max(adjustedConfig.minWordLength ?? 3, weeklyApplied.minWordLength) as 2 | 3,
+      minWordLength: Math.max(adjustedConfig.minWordLength ?? 2, weeklyApplied.minWordLength) as 2 | 3,
     };
   }, [adjustedConfig, upgradeEffects.bonusTimeSeconds, runeEffects.timeBonus, weeklyModifiers, weeklyApplied.minWordLength]);
 

@@ -214,7 +214,7 @@ function generateScoreCardData(game: GameState, username: string): ScoreCardData
     gameDuration: game.gameDuration || game.timerSeconds || 180,
     isRanked: game.isRanked || false,
     difficulty: game.difficulty,
-    minWordLength: game.minWordLength || 3
+    minWordLength: game.minWordLength || 2
   };
 
   // Get titles (may be stored in game state after calculation)

@@ -2,13 +2,13 @@
   "summary": {
     "totalKeysInCode": 3707,
     "keyCountByLanguage": {
-      "en": 6273,
-      "he": 6292,
-      "sv": 6325,
-      "ja": 6312,
-      "es": 6299
+      "en": 6275,
+      "he": 6294,
+      "sv": 6327,
+      "ja": 6314,
+      "es": 6301
     },
-    "missingFromEnglish": 3,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 5,
@@ -145,75 +145,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "common.errorOccurred",
-      "usages": [
-        {
-          "file": "components/auth/AuthModal.tsx",
-          "line": 165
-        },
-        {
-          "file": "components/auth/AuthModal.tsx",
-          "line": 230
-        },
-        {
-          "file": "components/auth/AuthModal.tsx",
-          "line": 258
-        },
-        {
-          "file": "components/auth/AuthModal.tsx",
-          "line": 293
-        },
-        {
-          "file": "components/auth/AuthModal.tsx",
-          "line": 314
-        },
-        {
-          "file": "components/auth/DailyChallengeInlineSignup.tsx",
-          "line": 106
-        },
-        {
-          "file": "components/auth/DailyChallengeInlineSignup.tsx",
-          "line": 181
-        },
-        {
-          "file": "components/auth/DailyChallengeInlineSignup.tsx",
-          "line": 210
-        },
-        {
-          "file": "components/custom-puzzle/CustomPuzzleGame.tsx",
-          "line": 84
-        },
-        {
-          "file": "components/custom-puzzle/CustomPuzzleGame.tsx",
-          "line": 93
-        }
-      ]
-    },
-    {
-      "key": "education.wordSelector.failedToSaveLesson",
-      "usages": [
-        {
-          "file": "components/multiplayer/HostWordSelector.tsx",
-          "line": 121
-        }
-      ]
-    },
-    {
-      "key": "multiplayerFlow.host",
-      "usages": [
-        {
-          "file": "components/multiplayer/MultiplayerLobbyView.tsx",
-          "line": 356
-        },
-        {
-          "file": "components/multiplayer/MultiplayerLobbyView.tsx",
-          "line": 382
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "tvBroadcast.totalWords",

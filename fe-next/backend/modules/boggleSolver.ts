@@ -428,7 +428,7 @@ export function shuffleArray<T>(array: T[]): T[] {
  * Words with excessive duplicates (like "aaaa", "mississippi") are often obscure
  */
 export function isSolidWord(word: string, maxDuplicates: number = 2): boolean {
-  if (!word || word.length < 3) return false;
+  if (!word || word.length < 2) return false;
 
   // Count letter occurrences
   const letterCounts: Record<string, number> = {};

@@ -109,7 +109,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RecordInv
     const normalizedWord = word.toLowerCase().trim();
 
     // Skip very short words (likely typos) - same logic as backend
-    if (normalizedWord.length < 3) {
+    if (normalizedWord.length < 2) {
       return NextResponse.json({ success: true }); // Silent success for short words
     }
 

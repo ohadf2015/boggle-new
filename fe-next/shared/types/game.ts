@@ -325,6 +325,7 @@ export interface BlastPlayerStats {
   wordsFound: string[];
   bestWord: string;
   tilesCleared: number;
+  totalTileBonus: number;
 }
 
 /** Blast mode state tracked per game */

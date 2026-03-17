@@ -314,7 +314,7 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
           overlayMap: new Map(),
           playerMoves: { testUser: 3 },
           playerBonusMoves: { testUser: 0 },
-          playerStats: { testUser: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 } },
+          playerStats: { testUser: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 } },
           seed: 12345,
         },
       }));

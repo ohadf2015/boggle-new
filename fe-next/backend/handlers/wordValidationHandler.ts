@@ -81,7 +81,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
       blastTileBonus = calculateBlastTileBonus(tilesOnPath);
       blastTilesCleared = tilesOnPath;
       const gemCount = tilesOnPath.filter(t => t === 'gem').length;
-      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount);
+      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount, blastTileBonus);
     } catch (err: unknown) {
       const error = err as Error;
       logger.error('BLAST', `Blast bonus calculation error: ${error.message}`);

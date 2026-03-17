@@ -119,7 +119,7 @@ export function generateWrongWords(grid: LetterGrid, count: number): string[] {
       col += dc;
     }
 
-    if (word.length >= 3 && !wrongWords.includes(word)) {
+    if (word.length >= 2 && !wrongWords.includes(word)) {
       wrongWords.push(word);
     }
   }

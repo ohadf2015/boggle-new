@@ -87,7 +87,7 @@ export function recordInvalidWord(params: RecordInvalidWordParams): void {
   const { word, language, reason, gameMode } = params;
 
   // Skip very short words (likely typos)
-  if (!word || word.length < 3) {
+  if (!word || word.length < 2) {
     return;
   }
 

@@ -29,7 +29,7 @@ jest.mock('../../services/gameLifecycle/gameResults', () => ({
   clearEngagementTimeouts: jest.fn(),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const gsm = require('../gameStateManager');
 
 function defaultCreationData(overrides: Record<string, any> = {}) {

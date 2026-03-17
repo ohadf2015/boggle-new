@@ -234,7 +234,7 @@ export function useBlastGame(
         setGameState(prev => ({ ...prev, isDeadEnd: true }));
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [isComplete, isDeadEnd, movesUsed, gsMovesRemaining, gsTotalMoves, options?.isMultiplayer]);
 
   // Dead-end detection: check after cascade settles AND auto-detection completes.

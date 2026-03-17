@@ -13,7 +13,7 @@ const LATIN_GREEK_ROOTS = [
 
 function isPalindrome(word: string): boolean {
   const w = word.toLowerCase();
-  if (w.length < 3) return false;
+  if (w.length < 2) return false;
   return w === w.split('').reverse().join('');
 }
 

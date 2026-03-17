@@ -96,7 +96,7 @@ export function initBlastModeState(
   for (const player of players) {
     playerMoves[player] = 0;
     playerBonusMoves[player] = 0;
-    playerStats[player] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 };
+    playerStats[player] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 };
   }
 
   // Generate a seed for deterministic multiplayer refills.
@@ -124,6 +124,7 @@ export function recordBlastMove(
   word?: string,
   tilesCleared?: number,
   gemCount?: number,
+  tileBonus?: number,
 ): { movesUsed: number; bonusMove: boolean } {
   // Initialize if unknown player
   if (state.playerMoves[username] === undefined) {
@@ -143,7 +144,7 @@ export function recordBlastMove(
   // Update rich per-player stats
   if (state.playerStats) {
     if (!state.playerStats[username]) {
-      state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 };
+      state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 };
     }
     const stats = state.playerStats[username];
     if (comboLevel > stats.maxCombo) stats.maxCombo = comboLevel;
@@ -153,6 +154,7 @@ export function recordBlastMove(
     }
     if (tilesCleared) stats.tilesCleared += tilesCleared;
     if (gemCount) stats.gemsCollected += gemCount;
+    if (tileBonus) stats.totalTileBonus = (stats.totalTileBonus || 0) + tileBonus;
   }
 
   return {

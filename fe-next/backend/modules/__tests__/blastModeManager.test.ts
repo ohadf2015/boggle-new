@@ -186,8 +186,8 @@ describe('blastModeManager', () => {
         playerMoves: { alice: 0, bob: 0 },
         playerBonusMoves: { alice: 0, bob: 0 },
         playerStats: {
-          alice: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 },
-          bob: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0 },
+          alice: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 },
+          bob: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 },
         },
       };
     });

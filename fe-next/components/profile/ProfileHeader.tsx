@@ -113,7 +113,7 @@ export function ProfileHeader({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'relative bg-neo-navy/60 border-3 border-neo-cream/20 rounded-neo-lg shadow-hard-lg overflow-hidden mb-4',
+        'relative bg-neo-navy/60 border-3 border-neo-cream/20 rounded-neo-lg shadow-hard-lg mb-4',
         compact ? 'p-4' : 'p-8'
       )}
     >
@@ -142,7 +142,7 @@ export function ProfileHeader({
               customAvatar={profile?.avatar_config ?? undefined}
               profilePictureUrl={profile?.profile_picture_url ?? undefined}
               avatarImage={profile?.avatar_image ?? undefined}
-              size={compact ? 'lg' : 'xl'}
+              size={compact ? 'lg' : '2xl'}
               className="w-full h-full"
             />
           </div>

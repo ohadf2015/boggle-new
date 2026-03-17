@@ -126,7 +126,7 @@ export function useSurvivalClues({
     const normalizedWord = word.toUpperCase();
     const targetLength = normalizedTarget.length;
 
-    if (normalizedWord.length < 3) return 0;
+    if (normalizedWord.length < 2) return 0;
 
     const checkLength = Math.min(normalizedWord.length, targetLength);
     let cluesRevealed = 0;
@@ -224,7 +224,7 @@ export function useSurvivalClues({
   const updateKnownLettersFromDiscovery = useCallback((word: string) => {
     const normalizedWord = word.toUpperCase();
 
-    if (normalizedWord.length < 3) return;
+    if (normalizedWord.length < 2) return;
 
     setKnownLetters(prev => {
       const updated = new Set(prev);

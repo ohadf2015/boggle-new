@@ -287,9 +287,23 @@ export function useHostGameEvents({
 
       logger.log('[HOST] Received validationComplete event:', data);
 
-      // Store rich blast player stats if available
-      if (data.blastSummary?.playerStats) {
-        useGameStore.getState().setBlastPlayerStats(data.blastSummary.playerStats);
+      // Sync blast stats from server — overrides locally accumulated values
+      if (data.blastSummary) {
+        const store = useGameStore.getState();
+        if (data.blastSummary.playerStats) {
+          store.setBlastPlayerStats(data.blastSummary.playerStats);
+          const myStats = data.blastSummary.playerStats[username];
+          if (myStats) {
+            store.setBlastTotalTilesCleared(myStats.tilesCleared || 0);
+            store.setBlastTotalTileBonus(myStats.totalTileBonus || 0);
+          }
+        }
+        if (data.blastSummary.playerMoves) {
+          const myMoves = data.blastSummary.playerMoves[username];
+          if (myMoves !== undefined) {
+            store.setBlastMovesUsed(myMoves);
+          }
+        }
       }
 
       // Transition directly to results — no validation modal delay

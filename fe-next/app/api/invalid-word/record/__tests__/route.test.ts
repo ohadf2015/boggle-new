@@ -89,15 +89,15 @@ describe('Record Invalid Word API Logic', () => {
   });
 
   describe('Word filtering rules', () => {
-    it('should skip words with length < 3', () => {
-      const word = 'ab';
-      const shouldSkip = word.length < 3;
+    it('should skip words with length < 2', () => {
+      const word = 'a';
+      const shouldSkip = word.length < 2;
       expect(shouldSkip).toBe(true);
     });
 
-    it('should not skip words with length >= 3', () => {
-      const word = 'abc';
-      const shouldSkip = word.length < 3;
+    it('should not skip words with length >= 2', () => {
+      const word = 'ab';
+      const shouldSkip = word.length < 2;
       expect(shouldSkip).toBe(false);
     });
 

@@ -180,7 +180,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const wordSubmission = useWordSubmission({
     grid,
     language,
-    minWordLength: 3,
+    minWordLength: 2,
     enableSpamDetection: false, // Daily challenge doesn't need spam detection
     fireRoundActive: false,
     comboLevel: combo.comboLevel,
@@ -336,7 +336,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     gameLanguage: language,
     enabled: !isGameOver,
     onWordSubmit: handleWordSubmit,
-    minWordLength: 3,
+    minWordLength: 2,
   });
 
   return (
