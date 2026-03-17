@@ -115,8 +115,8 @@ export default function PlayerProfilePageClient() {
 
   const handleChallenge = () => {
     if (!id) return;
-    // Navigate to multiplayer lobby with challenge pre-filled
-    router.push(`/${language}/play?challenge=${id}`);
+    // Navigate to multiplayer lobby with auto-create room
+    router.push(`/${language}/multiplayer?challenge=${id}&autoCreate=true`);
   };
 
   if (loading) {
