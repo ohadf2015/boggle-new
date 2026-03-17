@@ -1,0 +1,165 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { ScoreCountUp } from './ScoreCountUp';
+import { StatsCardGrid, type StatCardItem } from './StatsCardGrid';
+
+type HeroVariant = 'win' | 'loss' | 'neutral';
+
+interface HeroBadge {
+  text: string;
+  variant: 'completion' | 'milestone' | 'streak';
+}
+
+interface ResultsHeroProps {
+  /** Outcome text: "YOU WON", "2ND PLACE", "COMPLETED" */
+  outcomeLabel: string;
+  /** The score to display (counts up) */
+  score: number;
+  /** Subtitle text above score (e.g. "Puzzle #142") */
+  subtitle?: string;
+  /** Label below score (e.g. "points") */
+  pointsLabel?: string;
+  /** 3-stat row config */
+  stats: StatCardItem[];
+  /** Visual variant for background gradient */
+  variant?: HeroVariant;
+  /** Optional badge (completion, streak milestone) */
+  badge?: HeroBadge;
+  /** Click handler for score (e.g. fire confetti) */
+  onScoreClick?: () => void;
+  /** Score count-up duration in ms */
+  countUpDuration?: number;
+  /** Use inline stats variant (Daily Challenge style) */
+  inlineStats?: boolean;
+  className?: string;
+}
+
+const gradients: Record<HeroVariant, string> = {
+  win: 'from-[#BFFF00]/10 via-transparent to-transparent',
+  loss: 'from-neo-pink/10 via-transparent to-transparent',
+  neutral: 'from-neo-cyan/10 via-transparent to-transparent',
+};
+
+const badgeStyles: Record<string, string> = {
+  completion: 'bg-neo-cyan/20 border-neo-cyan/40 text-neo-cyan',
+  milestone: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/40 text-amber-400',
+  streak: 'bg-neo-orange/15 border-neo-orange/40 text-neo-orange',
+};
+
+/**
+ * ResultsHero — Unified hero zone for all results pages.
+ *
+ * Shows: outcome label → score (animated) → optional badge → 3-stat row.
+ * Used by: SinglePlayer, Daily Challenge, Multiplayer (post-reveal).
+ */
+export function ResultsHero({
+  outcomeLabel,
+  score,
+  subtitle,
+  pointsLabel,
+  stats,
+  variant = 'neutral',
+  badge,
+  onScoreClick,
+  countUpDuration = 1800,
+  inlineStats = false,
+  className,
+}: ResultsHeroProps) {
+  return (
+    <motion.div
+      data-testid="results-hero"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={cn(
+        'relative text-center bg-gradient-to-b py-6 md:py-10',
+        gradients[variant],
+        className,
+      )}
+    >
+      {/* Outcome label — h1 for a11y, first heading on page */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <h1 className={cn(
+          'text-xl sm:text-2xl font-black uppercase tracking-wider',
+          variant === 'win' ? 'text-neo-lime' : variant === 'loss' ? 'text-neo-pink' : 'text-neo-cyan',
+        )}>
+          {outcomeLabel}
+        </h1>
+      </motion.div>
+
+      {/* Subtitle (e.g. puzzle number) */}
+      {subtitle && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="text-xs text-slate-500 uppercase font-bold tracking-wider mt-1"
+        >
+          {subtitle}
+        </motion.div>
+      )}
+
+      {/* Score — the hero number */}
+      <motion.div
+        data-testid="score-area"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        onClick={onScoreClick}
+        className={cn(
+          'py-2',
+          onScoreClick && 'cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]',
+        )}
+      >
+        <ScoreCountUp
+          to={score}
+          delay={300}
+          duration={countUpDuration}
+          className="text-7xl md:text-8xl font-black text-white drop-shadow-[0_0_20px_rgba(255,225,53,0.3)]"
+        />
+        {pointsLabel && (
+          <div className="text-slate-400 text-sm font-medium mt-1">
+            {pointsLabel}
+          </div>
+        )}
+      </motion.div>
+
+      {/* Badge (completion, streak milestone) */}
+      {badge && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring' as const, delay: 0.3 }}
+          className="mb-3"
+        >
+          <span className={cn(
+            'inline-flex items-center gap-2 px-4 py-1.5 rounded-full border font-black text-sm',
+            badgeStyles[badge.variant] ?? badgeStyles.completion,
+          )}>
+            {badge.text}
+          </span>
+        </motion.div>
+      )}
+
+      {/* Stats row */}
+      {stats.length > 0 && (
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-3 px-4 max-w-md mx-auto"
+        >
+          <StatsCardGrid
+            cards={stats}
+            variant={inlineStats ? 'inline' : 'grid'}
+          />
+        </motion.div>
+      )}
+    </motion.div>
+  );
+}
