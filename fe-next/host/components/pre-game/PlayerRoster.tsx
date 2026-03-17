@@ -123,7 +123,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
       </div>
 
       {/* Player avatars row */}
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide items-end">
+      <div className="flex gap-3 flex-wrap pb-2 items-end">
         <AnimatePresence mode="popLayout">
           {players.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;

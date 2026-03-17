@@ -4,9 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Monitor, Shuffle, FileText, Bomb, Target, Check, Sparkles } from 'lucide-react';
 import { Checkbox } from '../../../components/ui/checkbox';
-import BotControls from '../../../components/BotControls';
 import { cn } from '../../../lib/utils';
-import { useSocket } from '../../../utils/SocketContext';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
 interface PlayerData {
@@ -20,8 +18,8 @@ interface BattleModeCardProps {
   setHostPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
-  gameCode: string;
-  playersReady: (string | PlayerData)[];
+  gameCode?: string;
+  playersReady?: (string | PlayerData)[];
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -211,11 +209,8 @@ export function BattleModeCard({
   setHostPlaying,
   selectedGameMode,
   setSelectedGameMode,
-  gameCode,
-  playersReady,
   t,
 }: BattleModeCardProps): React.ReactElement {
-  const { socket } = useSocket();
   const [sparkMode, setSparkMode] = useState<GameModeOption | null>(null);
 
   const handleSelect = useCallback((mode: GameModeOption) => {
@@ -364,14 +359,6 @@ export function BattleModeCard({
         </div>
       </div>
 
-      {/* Bot Controls */}
-      <BotControls
-        socket={socket}
-        gameCode={gameCode}
-        players={playersReady.filter((p): p is PlayerData => typeof p !== 'string')}
-        disabled={false}
-        defaultCollapsed={false}
-      />
     </section>
   );
 }
