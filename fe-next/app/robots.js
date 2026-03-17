@@ -22,7 +22,17 @@ export default function robots() {
 
   return {
     rules: [
-      // Single default rule covers all search engine bots
+      // AdSense crawler — must be explicitly allowed for ad serving
+      {
+        userAgent: 'Mediapartners-Google',
+        allow: '/',
+      },
+      // Google Display Ads crawler
+      {
+        userAgent: 'Google-Display-Ads-Bot',
+        allow: '/',
+      },
+      // Default rule for all other crawlers
       {
         userAgent: '*',
         allow: '/',

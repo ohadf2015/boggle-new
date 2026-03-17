@@ -28,7 +28,7 @@ export function GoogleAdSense() {
       async
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
       crossOrigin="anonymous"
-      strategy="lazyOnload"
+      strategy="afterInteractive"
     />
   );
 }
