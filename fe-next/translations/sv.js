@@ -663,7 +663,9 @@ const sv = {
       "none": "Hoppa över",
       "gender": "Kroppstyp",
       "male": "Man",
-      "female": "Kvinna"
+      "female": "Kvinna",
+      "eyebrows": "Ögonbryn",
+      "colorTheme": "Färgtema"
     },
     "premium": {
       "locked": "VIP-del",

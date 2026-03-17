@@ -47,6 +47,12 @@ export const AVATAR_EYE_STYLES = [
   'none', 'round', 'sleepy', 'star', 'wink', 'happy', 'angry', 'cool', 'sparkle',
   'hearts', 'dizzy', 'cyclops', 'lashes', 'monocleEye', 'crossEyed', 'laser',
   'hypno', 'money', 'alien', 'crying', 'galaxy', 'flame', 'robot', 'void', 'infinity',
+  'curious', 'determined', 'doe',
+] as const;
+
+// ==================== Eyebrows ====================
+export const AVATAR_EYEBROW_STYLES = [
+  'none', 'natural', 'thin', 'thick', 'angry', 'raised', 'unibrow', 'flat', 'worried',
 ] as const;
 
 // ==================== Mouth ====================
@@ -94,6 +100,8 @@ export const customAvatarSchema = z.object({
   hair: z.enum(AVATAR_HAIR_STYLES),
   hairColor: hexColorSchema,
   eyes: z.enum(AVATAR_EYE_STYLES),
+  /** Eyebrow style — optional for backward compatibility with saved avatars */
+  eyebrows: z.enum(AVATAR_EYEBROW_STYLES).optional(),
   mouth: z.enum(AVATAR_MOUTH_STYLES),
   accessory: z.enum(AVATAR_ACCESSORIES),
   accessoryColor: hexColorSchema,
@@ -113,6 +121,7 @@ export const DEFAULT_AVATAR_CONFIG: CustomAvatarConfig = {
   hair: 'spiky',
   hairColor: '#2C1B18',
   eyes: 'round',
+  eyebrows: 'none',
   mouth: 'smile',
   accessory: 'none',
   accessoryColor: '#000000',
@@ -310,6 +319,7 @@ export function getRandomAvatarConfig(): CustomAvatarConfig {
     hair: pick(FREE_HAIR_STYLES),
     hairColor: pick(AVATAR_HAIR_COLORS),
     eyes: pick(FREE_EYE_STYLES),
+    eyebrows: pick(AVATAR_EYEBROW_STYLES),
     mouth: pick(FREE_MOUTH_STYLES),
     accessory: pick(FREE_ACCESSORIES),
     accessoryColor: pick(AVATAR_ACCESSORY_COLORS),
@@ -339,6 +349,7 @@ export function getSeededAvatarConfig(seed: number): CustomAvatarConfig {
     hair: pick(FREE_HAIR_STYLES),
     hairColor: pick(AVATAR_HAIR_COLORS),
     eyes: pick(FREE_EYE_STYLES),
+    eyebrows: pick(AVATAR_EYEBROW_STYLES),
     mouth: pick(FREE_MOUTH_STYLES),
     accessory: pick(FREE_ACCESSORIES),
     accessoryColor: pick(AVATAR_ACCESSORY_COLORS),

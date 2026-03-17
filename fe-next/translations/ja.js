@@ -663,7 +663,9 @@ const ja = {
       "none": "なし",
       "gender": "体型",
       "male": "男性",
-      "female": "女性"
+      "female": "女性",
+      "eyebrows": "眉毛",
+      "colorTheme": "カラーテーマ"
     },
     "premium": {
       "locked": "VIPパーツ",

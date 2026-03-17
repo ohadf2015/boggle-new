@@ -1,6 +1,9 @@
 /** Avatar Hair Parts — viewBox 0 0 100 100. Face: cx=50 cy=52 r=30. */
+import { type FC } from 'react';
 
-const S = 3;
+import { STROKE_OUTER } from './avatarDesignConstants';
+
+const S = STROKE_OUTER;
 
 interface HairPartProps {
   fill: string;
@@ -585,8 +588,22 @@ function MulletFront({ fill }: HairPartProps) {
   );
 }
 
+function CurlyFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* 3 curl bumps along the forehead hairline */}
+      <circle cx="28" cy="28" r="12" fill={fill} stroke="#000" strokeWidth={S} />
+      <circle cx="50" cy="24" r="13" fill={fill} stroke="#000" strokeWidth={S} />
+      <circle cx="72" cy="28" r="12" fill={fill} stroke="#000" strokeWidth={S} />
+      <circle cx="36" cy="26" r="2.5" fill="#fff" opacity="0.1" />
+      <circle cx="58" cy="22" r="2.5" fill="#fff" opacity="0.1" />
+    </g>
+  );
+}
+
 /** Front-layer hair parts — rendered ON TOP of face */
-export const HAIR_FRONT_PARTS: Partial<Record<keyof typeof HAIR_PARTS, React.FC<HairPartProps>>> = {
+export const HAIR_FRONT_PARTS: Partial<Record<keyof typeof HAIR_PARTS, FC<HairPartProps>>> = {
+  curly: CurlyFront,
   bangs: BangsFront,
   long: LongFront,
   bob: BobFront,

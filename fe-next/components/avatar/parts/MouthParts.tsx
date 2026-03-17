@@ -3,14 +3,21 @@
  * 22 mouth styles, positioned at y≈58 within viewBox 0 0 100 100
  */
 
-const S = 2.5;
+import { STROKE_INNER } from './avatarDesignConstants';
+
+const S = STROKE_INNER;
 
 function Smile() {
   return (
     <g>
       <path d="M40 60 Q50 68 60 60" fill="#E85D75" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Inner lip highlight */}
       <path d="M42 61 Q50 66 58 61" fill="#FF8FA3" opacity="0.5" />
-      <path d="M44 60 Q50 63 56 60" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.5" strokeLinecap="round" />
+      {/* Lip shine */}
+      <path d="M44 60.5 Q50 63 56 60.5" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.45" strokeLinecap="round" />
+      {/* Dimple hints at corners */}
+      <circle cx="40" cy="60.5" r="0.6" fill="#000" opacity="0.12" />
+      <circle cx="60" cy="60.5" r="0.6" fill="#000" opacity="0.12" />
     </g>
   );
 }
@@ -100,8 +107,8 @@ function Teeth() {
 function Cat() {
   return (
     <g>
-      <polygon points="50,55 48,52 52,52" fill="#FFB6C1" stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
-      <path d="M38 60 L44 64 L50 58 L56 64 L62 60" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" strokeLinejoin="round" />
+      {/* No triangle nose here — BaseParts already renders one */}
+      <path d="M38 61 L44 65 L50 59 L56 65 L62 61" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" strokeLinejoin="round" />
       <path d="M50 58 L50 61" fill="none" stroke="#000" strokeWidth={1} />
       <circle cx="34" cy="60" r="0.8" fill="#000" />
       <circle cx="32" cy="58" r="0.8" fill="#000" />
@@ -249,13 +256,13 @@ function Zipper() {
 function Blowfish() {
   return (
     <g>
-      <ellipse cx="50" cy="62" rx="14" ry="10" fill="#FFB6C1" stroke="#000" strokeWidth={S} />
+      <ellipse cx="50" cy="66" rx="14" ry="9" fill="#FFB6C1" stroke="#000" strokeWidth={S} />
       <path d="M40 58 Q42 60 40 62" fill="none" stroke="#E8899A" strokeWidth={0.6} opacity="0.5" />
       <path d="M60 58 Q58 60 60 62" fill="none" stroke="#E8899A" strokeWidth={0.6} opacity="0.5" />
       <path d="M44 64 Q46 66 44 68" fill="none" stroke="#E8899A" strokeWidth={0.5} opacity="0.4" />
       <path d="M56 64 Q54 66 56 68" fill="none" stroke="#E8899A" strokeWidth={0.5} opacity="0.4" />
-      <ellipse cx="50" cy="60" rx="3.5" ry="2.5" fill="#FF6B6B" stroke="#000" strokeWidth={1.5} />
-      <ellipse cx="49" cy="59.5" rx="1" ry="0.6" fill="#FF9999" opacity="0.5" />
+      <ellipse cx="50" cy="64" rx="3.5" ry="2.5" fill="#FF6B6B" stroke="#000" strokeWidth={1.5} />
+      <ellipse cx="49" cy="63.5" rx="1" ry="0.6" fill="#FF9999" opacity="0.5" />
       <path d="M66 57 L73 55" stroke="#000" strokeWidth={1} opacity="0.25" strokeLinecap="round" />
       <path d="M66 61 L75 61" stroke="#000" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
       <path d="M66 65 L73 67" stroke="#000" strokeWidth={1} opacity="0.25" strokeLinecap="round" />

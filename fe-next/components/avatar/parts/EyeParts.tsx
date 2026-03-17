@@ -3,19 +3,31 @@
  * 8 eye styles, positioned at y≈38 within viewBox 0 0 100 100
  */
 
-const S = 2.5;
+import { STROKE_INNER } from './avatarDesignConstants';
+
+const S = STROKE_INNER;
 
 function Round() {
   return (
     <g>
+      {/* Sclera with subtle upper lid shadow */}
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <path d="M33 40 Q38 37.5 43 40" fill="#000" opacity="0.06" />
+      <path d="M57 40 Q62 37.5 67 40" fill="#000" opacity="0.06" />
+      {/* Iris — two-tone for depth */}
       <circle cx="39" cy="41" r="3.2" fill="#4A6FA5" />
       <circle cx="63" cy="41" r="3.2" fill="#4A6FA5" />
+      <circle cx="39" cy="42" r="2.8" fill="#3A5A8A" opacity="0.4" />
+      <circle cx="63" cy="42" r="2.8" fill="#3A5A8A" opacity="0.4" />
+      {/* Pupil */}
       <circle cx="39" cy="41" r="2" fill="#000" />
       <circle cx="63" cy="41" r="2" fill="#000" />
+      {/* Catchlight — two reflections for liveliness */}
       <circle cx="37.5" cy="39.5" r="1.2" fill="#fff" />
       <circle cx="61.5" cy="39.5" r="1.2" fill="#fff" />
+      <circle cx="40" cy="42.5" r="0.5" fill="#fff" opacity="0.5" />
+      <circle cx="64" cy="42.5" r="0.5" fill="#fff" opacity="0.5" />
     </g>
   );
 }
@@ -100,14 +112,14 @@ function Cool() {
   return (
     <g>
       <defs>
-        <linearGradient id="lensGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="coolLensGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#2a2a4e" />
           <stop offset="100%" stopColor="#0a0a18" />
         </linearGradient>
       </defs>
       <path d="M44 40 Q50 43 56 40" stroke="#000" strokeWidth={2} fill="none" strokeLinecap="round" />
-      <rect x="29" y="37" width="16" height="10" rx="3" fill="url(#lensGrad)" stroke="#000" strokeWidth={S} />
-      <rect x="55" y="37" width="16" height="10" rx="3" fill="url(#lensGrad)" stroke="#000" strokeWidth={S} />
+      <rect x="29" y="37" width="16" height="10" rx="3" fill="url(#coolLensGrad)" stroke="#000" strokeWidth={S} />
+      <rect x="55" y="37" width="16" height="10" rx="3" fill="url(#coolLensGrad)" stroke="#000" strokeWidth={S} />
       <line x1="32" y1="39.5" x2="37" y2="39.5" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" opacity="0.5" />
       <line x1="58" y1="39.5" x2="63" y2="39.5" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" opacity="0.5" />
       <line x1="32" y1="41.5" x2="34" y2="41.5" stroke="#fff" strokeWidth={1} strokeLinecap="round" opacity="0.25" />
@@ -119,20 +131,33 @@ function Cool() {
 function Sparkle() {
   return (
     <g>
+      {/* Larger eyes for kawaii feel */}
       <circle cx="38" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Upper lid shadow */}
+      <path d="M31 39 Q38 35 45 39" fill="#000" opacity="0.05" />
+      <path d="M55 39 Q62 35 69 39" fill="#000" opacity="0.05" />
+      {/* Two-tone iris */}
       <circle cx="39" cy="41" r="4" fill="#4A6FA5" />
       <circle cx="63" cy="41" r="4" fill="#4A6FA5" />
+      <circle cx="39" cy="42.5" r="3.5" fill="#3A5080" opacity="0.3" />
+      <circle cx="63" cy="42.5" r="3.5" fill="#3A5080" opacity="0.3" />
+      {/* Pupil */}
       <circle cx="39" cy="41" r="2.5" fill="#000" />
       <circle cx="63" cy="41" r="2.5" fill="#000" />
+      {/* Triple catchlights — big, medium, small for depth */}
       <circle cx="36" cy="39" r="2" fill="#fff" />
       <circle cx="60" cy="39" r="2" fill="#fff" />
       <circle cx="41" cy="43" r="1" fill="#fff" />
       <circle cx="65" cy="43" r="1" fill="#fff" />
       <circle cx="37" cy="44" r="0.5" fill="#fff" opacity="0.7" />
       <circle cx="61" cy="44" r="0.5" fill="#fff" opacity="0.7" />
-      <path d="M34 37 L34.5 35.5 L35 37 L36.5 37.5 L35 38 L34.5 39.5 L34 38 L32.5 37.5Z" fill="#FFE135" />
-      <path d="M66 37 L66.5 35.5 L67 37 L68.5 37.5 L67 38 L66.5 39.5 L66 38 L64.5 37.5Z" fill="#FFE135" />
+      {/* 4-point sparkle stars */}
+      <path d="M34 37 L34.5 35.5 L35 37 L36.5 37.5 L35 38 L34.5 39.5 L34 38 L32.5 37.5Z" fill="#FFE135" stroke="#FFC107" strokeWidth={0.3} />
+      <path d="M66 37 L66.5 35.5 L67 37 L68.5 37.5 L67 38 L66.5 39.5 L66 38 L64.5 37.5Z" fill="#FFE135" stroke="#FFC107" strokeWidth={0.3} />
+      {/* Smaller accent sparkles */}
+      <path d="M43 36 L43.3 35.2 L43.6 36 L44.4 36.3 L43.6 36.6 L43.3 37.4 L43 36.6 L42.2 36.3Z" fill="#FFE135" opacity="0.6" />
+      <path d="M57 36 L57.3 35.2 L57.6 36 L58.4 36.3 L57.6 36.6 L57.3 37.4 L57 36.6 L56.2 36.3Z" fill="#FFE135" opacity="0.6" />
     </g>
   );
 }
@@ -473,6 +498,78 @@ function Infinity() {
   );
 }
 
+/** Side-glancing curious eyes — pupils shifted right */
+function Curious() {
+  return (
+    <g>
+      <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Upper lid shadow */}
+      <path d="M33 40 Q38 37.5 43 40" fill="#000" opacity="0.06" />
+      <path d="M57 40 Q62 37.5 67 40" fill="#000" opacity="0.06" />
+      {/* Iris shifted right — looking to the side */}
+      <circle cx="40.5" cy="41.5" r="3.2" fill="#6B8E5A" />
+      <circle cx="64.5" cy="41.5" r="3.2" fill="#6B8E5A" />
+      <circle cx="40.5" cy="41.5" r="2" fill="#000" />
+      <circle cx="64.5" cy="41.5" r="2" fill="#000" />
+      <circle cx="39.5" cy="40" r="1" fill="#fff" />
+      <circle cx="63.5" cy="40" r="1" fill="#fff" />
+      {/* Raised eyebrow on one side for quizzical look */}
+      <path d="M33 36 Q38 34 43 36" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      <path d="M57 34 Q62 32 67 35" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** Narrow determined/focused eyes */
+function Determined() {
+  return (
+    <g>
+      {/* Flat top eyelid — focused look */}
+      <path d="M33 40 L43 40 Q43 47 38 47 Q33 47 33 40Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M57 40 L67 40 Q67 47 62 47 Q57 47 57 40Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Iris */}
+      <circle cx="38" cy="43" r="2.8" fill="#5D4037" />
+      <circle cx="62" cy="43" r="2.8" fill="#5D4037" />
+      <circle cx="38" cy="43" r="1.6" fill="#000" />
+      <circle cx="62" cy="43" r="1.6" fill="#000" />
+      <circle cx="37" cy="42" r="0.8" fill="#fff" />
+      <circle cx="61" cy="42" r="0.8" fill="#fff" />
+      {/* Strong brow line */}
+      <path d="M32 37 Q38 34 44 37" fill="none" stroke="#000" strokeWidth={2} strokeLinecap="round" />
+      <path d="M56 37 Q62 34 68 37" fill="none" stroke="#000" strokeWidth={2} strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** Soft doe eyes — large, round, innocent */
+function Doe() {
+  return (
+    <g>
+      {/* Extra large sclera */}
+      <circle cx="38" cy="42" r="7.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Large dark iris */}
+      <circle cx="38" cy="42.5" r="5.5" fill="#2C1810" />
+      <circle cx="62" cy="42.5" r="5.5" fill="#2C1810" />
+      {/* Iris ring */}
+      <circle cx="38" cy="42.5" r="4" fill="#4A2820" />
+      <circle cx="62" cy="42.5" r="4" fill="#4A2820" />
+      {/* Pupil */}
+      <circle cx="38" cy="42" r="3" fill="#000" />
+      <circle cx="62" cy="42" r="3" fill="#000" />
+      {/* Large catchlights */}
+      <circle cx="36" cy="40" r="2.2" fill="#fff" />
+      <circle cx="60" cy="40" r="2.2" fill="#fff" />
+      <circle cx="40" cy="44" r="1.2" fill="#fff" opacity="0.7" />
+      <circle cx="64" cy="44" r="1.2" fill="#fff" opacity="0.7" />
+      {/* Bottom lash line hint */}
+      <path d="M31.5 45 Q38 48 44.5 45" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.2" />
+      <path d="M55.5 45 Q62 48 68.5 45" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.2" />
+    </g>
+  );
+}
+
 function None() { return <g />; }
 
 export const EYE_PARTS = {
@@ -501,6 +598,9 @@ export const EYE_PARTS = {
   robot: Robot,
   void: Void,
   infinity: Infinity,
+  curious: Curious,
+  determined: Determined,
+  doe: Doe,
 } as const;
 
 export type EyePart = keyof typeof EYE_PARTS;

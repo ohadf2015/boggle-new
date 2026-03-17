@@ -663,7 +663,9 @@ const en = {
       "none": "Skip",
       "gender": "Body Type",
       "male": "Male",
-      "female": "Female"
+      "female": "Female",
+      "eyebrows": "Brows",
+      "colorTheme": "Color Theme"
     },
     "premium": {
       "locked": "VIP Part",

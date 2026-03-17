@@ -15,6 +15,7 @@ import {
   AVATAR_SKIN_COLORS,
   AVATAR_HAIR_COLORS,
   AVATAR_EYE_STYLES,
+  AVATAR_EYEBROW_STYLES,
   AVATAR_MOUTH_STYLES,
   AVATAR_ACCESSORIES,
   AVATAR_ACCESSORY_COLORS,
@@ -52,6 +53,24 @@ const CATEGORIES: { key: Category; labelKey: string }[] = [
   { key: 'mouth', labelKey: 'avatar.builder.mouth' },
   { key: 'accessories', labelKey: 'avatar.builder.accessories' },
   { key: 'background', labelKey: 'avatar.builder.background' },
+];
+
+// ==================== Color Theme Presets ====================
+// Curated harmonious palettes — apply coordinated colors in one tap
+interface ColorTheme {
+  name: string;
+  labelKey: string;
+  colors: { skinColor: string; hairColor: string; bgColor: string; shirtColor: string; accessoryColor: string };
+}
+
+const COLOR_THEMES: ColorTheme[] = [
+  // Bold primaries, high contrast, thick-outline energy
+  { name: 'classic', labelKey: 'avatar.theme.classic', colors: { skinColor: '#FFDBB4', hairColor: '#2C1B18', bgColor: '#1a1a2e', shirtColor: '#4A90D9', accessoryColor: '#000000' } },
+  { name: 'fire', labelKey: 'avatar.theme.fire', colors: { skinColor: '#EDB98A', hairColor: '#C62828', bgColor: '#FF6B35', shirtColor: '#FFD700', accessoryColor: '#000000' } },
+  { name: 'electric', labelKey: 'avatar.theme.electric', colors: { skinColor: '#F8D5C2', hairColor: '#FF1493', bgColor: '#1a1a2e', shirtColor: '#2C1B18', accessoryColor: '#00FFFF' } },
+  { name: 'toxic', labelKey: 'avatar.theme.toxic', colors: { skinColor: '#D08B5B', hairColor: '#4A3728', bgColor: '#00897B', shirtColor: '#2C1B18', accessoryColor: '#BFFF00' } },
+  { name: 'royal', labelKey: 'avatar.theme.royal', colors: { skinColor: '#694D3D', hairColor: '#2C1B18', bgColor: '#8B5CF6', shirtColor: '#FFD700', accessoryColor: '#FFD700' } },
+  { name: 'pop', labelKey: 'avatar.theme.pop', colors: { skinColor: '#FFE0BD', hairColor: '#FF1493', bgColor: '#FFE135', shirtColor: '#FF6B35', accessoryColor: '#FF1493' } },
 ];
 
 // Staggered grid entrance — cascading waterfall (from animate-ai: playful-staggered-list)
@@ -376,18 +395,33 @@ function CategoryOptions({ category, config, updateConfig, t, premium, onCoinSpe
     }
     case 'eyes':
       return (
-        <PartPreviewGrid
-          label={t('avatar.builder.style')}
-          partType="eyes"
-          premiumCategory="eyes"
-          options={AVATAR_EYE_STYLES}
-          selected={config.eyes}
-          onSelect={v => updateConfig('eyes', v)}
-          config={config}
-          premium={premium}
-          t={t}
-          onCoinSpend={onCoinSpend}
-        />
+        <div className="space-y-3">
+          <PartPreviewGrid
+            label={t('avatar.builder.style')}
+            partType="eyes"
+            premiumCategory="eyes"
+            options={AVATAR_EYE_STYLES}
+            selected={config.eyes}
+            onSelect={v => updateConfig('eyes', v)}
+            config={config}
+            premium={premium}
+            t={t}
+            onCoinSpend={onCoinSpend}
+          />
+          <PartPreviewGrid
+            label={t('avatar.builder.eyebrows') || 'Eyebrows'}
+            partType="eyebrows"
+            premiumCategory="eyebrows"
+            options={AVATAR_EYEBROW_STYLES}
+            selected={config.eyebrows ?? 'none'}
+            onSelect={v => updateConfig('eyebrows', v)}
+            config={config}
+            noneLabel={t('avatar.builder.none')}
+            premium={premium}
+            t={t}
+            onCoinSpend={onCoinSpend}
+          />
+        </div>
       );
     case 'mouth':
       return (
@@ -434,6 +468,36 @@ function CategoryOptions({ category, config, updateConfig, t, premium, onCoinSpe
       const allBgColors = [...AVATAR_BG_COLORS, ...PREMIUM_BG_COLORS] as const;
       return (
         <div className="space-y-4">
+          {/* Color Theme Presets */}
+          <div>
+            <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
+              {t('avatar.builder.colorTheme') || 'Color Theme'}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {COLOR_THEMES.map(theme => (
+                <button
+                  key={theme.name}
+                  onClick={() => {
+                    Object.entries(theme.colors).forEach(([key, value]) => {
+                      updateConfig(key as keyof CustomAvatarConfig, value);
+                    });
+                  }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-neo border-2 border-neo-white/15 hover:border-neo-white/40 bg-neo-navy-light hover:bg-neo-navy-light/80 transition-colors"
+                  title={t(theme.labelKey) || theme.name}
+                >
+                  {/* Mini color swatch preview */}
+                  <span className="flex -space-x-1">
+                    {[theme.colors.bgColor, theme.colors.shirtColor, theme.colors.hairColor].map((c, i) => (
+                      <span key={i} className="w-3 h-3 rounded-full border border-black/40" style={{ backgroundColor: c }} />
+                    ))}
+                  </span>
+                  <span className="text-neo-white/70 text-xs font-bold capitalize">
+                    {t(theme.labelKey) || theme.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
           <ColorStrip
             label={t('avatar.builder.bgColor')}
             colors={allBgColors}
@@ -470,7 +534,7 @@ function CategoryOptions({ category, config, updateConfig, t, premium, onCoinSpe
 
 interface PartPreviewGridProps<T extends string> {
   label: string;
-  partType: 'base' | 'eyes' | 'mouth' | 'hair' | 'accessory';
+  partType: 'base' | 'eyes' | 'eyebrows' | 'mouth' | 'hair' | 'accessory';
   /** The avatar config category key used for premium checks */
   premiumCategory?: string;
   options: readonly T[];

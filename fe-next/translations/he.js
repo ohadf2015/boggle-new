@@ -663,7 +663,9 @@ const he = {
       "none": "דלג",
       "gender": "סוג גוף",
       "male": "זכר",
-      "female": "נקבה"
+      "female": "נקבה",
+      "eyebrows": "גבות",
+      "colorTheme": "ערכת צבעים"
     },
     "premium": {
       "locked": "חלק VIP",

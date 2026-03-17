@@ -5,23 +5,14 @@
  * Designed to be clearly distinguishable even at small avatar sizes (64px).
  */
 
-const S = 3; // stroke width — neo-brutalist thick outlines
+import { STROKE_OUTER, darken } from './avatarDesignConstants';
+
+const S = STROKE_OUTER; // neo-brutalist thick outlines
 
 interface BodyPartProps {
   fill: string;
   /** Shirt/clothing color — overrides the default gender-based color */
   shirtColor?: string;
-}
-
-/** Darken a hex color by mixing toward black */
-function darken(hex: string, amount = 0.25): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const dr = Math.round(r * (1 - amount));
-  const dg = Math.round(g * (1 - amount));
-  const db = Math.round(b * (1 - amount));
-  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
 }
 
 function Male({ fill, shirtColor }: BodyPartProps) {

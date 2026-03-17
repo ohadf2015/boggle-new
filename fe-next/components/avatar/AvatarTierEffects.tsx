@@ -66,16 +66,24 @@ const AvatarTierEffects = memo<AvatarTierEffectsProps>(({
 }) => {
   const tier = forceTier ?? getAvatarTier(config);
 
-  if (tier === 'free' || isStatic) {
-    // No wrapper for free tier — className passthrough handled by parent
+  if (isStatic) {
     return <>{children}</>;
+  }
+
+  if (tier === 'free') {
+    // Free tier: idle breathing only — no sparkles or glow
+    return (
+      <div className={`avatar-idle-breathe ${className}`}>
+        {children}
+      </div>
+    );
   }
 
   const tierClass = TIER_CLASS[tier];
   const sparkleCount = SPARKLE_COUNTS[tier];
 
   return (
-    <div className={`relative ${tierClass} ${className}`}>
+    <div className={`relative avatar-idle-breathe ${tierClass} ${className}`}>
       {/* Rotating conic-gradient ring (legendary only) */}
       {tier === 'legendary' && <div className="avatar-ring" />}
 

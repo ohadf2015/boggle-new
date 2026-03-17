@@ -3,7 +3,9 @@
  * 11 face shapes, all centered on viewBox 0 0 100 100
  */
 
-const S = 3;
+import { STROKE_OUTER } from './avatarDesignConstants';
+
+const S = STROKE_OUTER;
 
 interface BasePartProps {
   fill: string;

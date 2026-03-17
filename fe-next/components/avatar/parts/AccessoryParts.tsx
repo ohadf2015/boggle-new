@@ -3,7 +3,11 @@
  * Avatar accessories, positioned within viewBox 0 0 100 100
  */
 
-const S = 2.5;
+import { STROKE_INNER, STROKE_OUTER } from './avatarDesignConstants';
+
+/** Most accessories use inner stroke; head accessories (hats, crowns) use outer */
+const S = STROKE_INNER;
+const SO = STROKE_OUTER;
 
 interface AccessoryPartProps {
   fill: string;
@@ -33,13 +37,13 @@ function Sunglasses({ fill }: AccessoryPartProps) {
   return (
     <g>
       <defs>
-        <linearGradient id="lensGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="sunglassLensGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={fill} />
           <stop offset="100%" stopColor="#000" stopOpacity="0.6" />
         </linearGradient>
       </defs>
-      <rect x="26" y="35" width="20" height="13" rx="4" fill="url(#lensGrad)" stroke="#000" strokeWidth={S} />
-      <rect x="54" y="35" width="20" height="13" rx="4" fill="url(#lensGrad)" stroke="#000" strokeWidth={S} />
+      <rect x="26" y="35" width="20" height="13" rx="4" fill="url(#sunglassLensGrad)" stroke="#000" strokeWidth={S} />
+      <rect x="54" y="35" width="20" height="13" rx="4" fill="url(#sunglassLensGrad)" stroke="#000" strokeWidth={S} />
       <path d="M46 41 L54 41" stroke="#000" strokeWidth={S + 0.5} />
       <path d="M26 39 L18 36" stroke="#000" strokeWidth={S + 0.5} strokeLinecap="round" />
       <path d="M74 39 L82 36" stroke="#000" strokeWidth={S + 0.5} strokeLinecap="round" />
@@ -54,8 +58,8 @@ function Sunglasses({ fill }: AccessoryPartProps) {
 function Hat({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <ellipse cx="50" cy="24" rx="38" ry="5" fill={fill} stroke="#000" strokeWidth={S} />
-      <path d="M28 24 Q28 6 50 4 Q72 6 72 24" fill={fill} stroke="#000" strokeWidth={S} />
+      <ellipse cx="50" cy="24" rx="38" ry="5" fill={fill} stroke="#000" strokeWidth={SO} />
+      <path d="M28 24 Q28 6 50 4 Q72 6 72 24" fill={fill} stroke="#000" strokeWidth={SO} />
       <rect x="28" y="19" width="44" height="5" fill="#000" opacity="0.3" />
       <rect x="47" y="19" width="6" height="5" fill="#FFD700" stroke="#000" strokeWidth={1} rx="1" />
       <path d="M30 24 L32 24" stroke="#000" strokeWidth={0.8} opacity="0.15" />
@@ -68,8 +72,8 @@ function Hat({ fill }: AccessoryPartProps) {
 function Cap({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M25 28 Q25 10 50 8 Q75 10 75 28" fill={fill} stroke="#000" strokeWidth={S} />
-      <path d="M25 28 L15 32 Q14 34 18 34 L25 30" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M25 28 Q25 10 50 8 Q75 10 75 28" fill={fill} stroke="#000" strokeWidth={SO} />
+      <path d="M25 28 L15 32 Q14 34 18 34 L25 30" fill={fill} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
       <circle cx="50" cy="8" r="2.5" fill={fill} stroke="#000" strokeWidth={1.5} />
       <path d="M50 8 L50 28" stroke="#000" strokeWidth={0.7} opacity="0.15" />
       <path d="M50 8 L32 24" stroke="#000" strokeWidth={0.7} opacity="0.12" />
@@ -93,7 +97,7 @@ function Headband({ fill }: AccessoryPartProps) {
 function Crown({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M24 30 L28 8 L38 22 L50 0 L62 22 L72 8 L76 30Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M24 30 L28 8 L38 22 L50 0 L62 22 L72 8 L76 30Z" fill={fill} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
       <path d="M26 28 L74 28" stroke="#000" strokeWidth={1.5} opacity="0.25" />
       <circle cx="38" cy="22" r="2.5" fill="#FF1493" stroke="#000" strokeWidth={1} />
       <circle cx="50" cy="12" r="3" fill="#00FFFF" stroke="#000" strokeWidth={1} />
@@ -272,7 +276,7 @@ function Bowtie({ fill }: AccessoryPartProps) {
 function Keffiyeh({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M18 28 Q18 10 50 6 Q82 10 82 28 L84 40 Q82 45 78 42 L78 30 Q50 18 22 30 L22 42 Q18 45 16 40Z" fill={fill} stroke="#000" strokeWidth={S} />
+      <path d="M18 28 Q18 10 50 6 Q82 10 82 28 L84 40 Q82 45 78 42 L78 30 Q50 18 22 30 L22 42 Q18 45 16 40Z" fill={fill} stroke="#000" strokeWidth={SO} />
       <ellipse cx="50" cy="22" rx="30" ry="4" fill="none" stroke="#000" strokeWidth={3} />
       <path d="M22 36 L18 70 Q20 75 24 72 L26 42" fill={fill} stroke="#000" strokeWidth={S} />
       <path d="M78 36 L82 70 Q80 75 76 72 L74 42" fill={fill} stroke="#000" strokeWidth={S} />
@@ -284,8 +288,8 @@ function Keffiyeh({ fill }: AccessoryPartProps) {
 function Fez({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M35 26 L35 10 Q50 6 65 10 L65 26" fill={fill} stroke="#000" strokeWidth={S} />
-      <ellipse cx="50" cy="26" rx="15" ry="4" fill={fill} stroke="#000" strokeWidth={S} />
+      <path d="M35 26 L35 10 Q50 6 65 10 L65 26" fill={fill} stroke="#000" strokeWidth={SO} />
+      <ellipse cx="50" cy="26" rx="15" ry="4" fill={fill} stroke="#000" strokeWidth={SO} />
       <line x1="50" y1="8" x2="50" y2="4" stroke="#000" strokeWidth={1.5} />
       <circle cx="50" cy="4" r="2" fill="#000" />
       <path d="M50 4 Q55 8 58 18" stroke="#000" strokeWidth={1.5} fill="none" strokeLinecap="round" />
@@ -314,8 +318,8 @@ function MustacheGlasses({ fill }: AccessoryPartProps) {
 function Sombrero({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <ellipse cx="50" cy="26" rx="46" ry="8" fill={fill} stroke="#000" strokeWidth={S} />
-      <path d="M32 26 Q32 6 50 2 Q68 6 68 26" fill={fill} stroke="#000" strokeWidth={S} />
+      <ellipse cx="50" cy="26" rx="46" ry="8" fill={fill} stroke="#000" strokeWidth={SO} />
+      <path d="M32 26 Q32 6 50 2 Q68 6 68 26" fill={fill} stroke="#000" strokeWidth={SO} />
       <path d="M34 20 Q50 16 66 20" fill="none" stroke="#FF6B35" strokeWidth={2} />
       <path d="M36 14 Q50 10 64 14" fill="none" stroke="#BFFF00" strokeWidth={2} />
       <circle cx="12" cy="30" r="3" fill="#FF1493" stroke="#000" strokeWidth={1} />
@@ -329,7 +333,7 @@ function Sombrero({ fill }: AccessoryPartProps) {
 function Turban({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M22 32 Q22 8 50 4 Q78 8 78 32" fill={fill} stroke="#000" strokeWidth={S} />
+      <path d="M22 32 Q22 8 50 4 Q78 8 78 32" fill={fill} stroke="#000" strokeWidth={SO} />
       <path d="M28 28 Q40 12 50 20 Q60 12 72 28" fill={fill} stroke="#000" strokeWidth={1.5} />
       <path d="M32 24 Q50 10 68 24" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
       <path d="M26 30 Q50 18 74 30" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
@@ -362,7 +366,7 @@ function ClownNose({ fill }: AccessoryPartProps) {
 function PartyHat({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M30 28 L50 -2 L70 28Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M30 28 L50 -2 L70 28Z" fill={fill} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
       <path d="M36 20 L50 2 L64 20" fill="none" stroke="#FF1493" strokeWidth={2} opacity="0.5" />
       <path d="M40 14 L50 2 L60 14" fill="none" stroke="#00FFFF" strokeWidth={2} opacity="0.5" />
       <circle cx="50" cy="-2" r="5" fill="#BFFF00" stroke="#000" strokeWidth={S} />
@@ -375,8 +379,8 @@ function PartyHat({ fill }: AccessoryPartProps) {
 function PropellerHat({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M28 28 Q28 10 50 6 Q72 10 72 28" fill={fill} stroke="#000" strokeWidth={S} />
-      <ellipse cx="50" cy="28" rx="22" ry="3" fill={fill} stroke="#000" strokeWidth={S} />
+      <path d="M28 28 Q28 10 50 6 Q72 10 72 28" fill={fill} stroke="#000" strokeWidth={SO} />
+      <ellipse cx="50" cy="28" rx="22" ry="3" fill={fill} stroke="#000" strokeWidth={SO} />
       <line x1="50" y1="6" x2="50" y2="0" stroke="#000" strokeWidth={2} />
       <ellipse cx="40" cy="-2" rx="12" ry="3" fill="#FF1493" stroke="#000" strokeWidth={1.5} transform="rotate(-20 50 0)" />
       <ellipse cx="60" cy="-2" rx="12" ry="3" fill="#00FFFF" stroke="#000" strokeWidth={1.5} transform="rotate(20 50 0)" />
@@ -390,10 +394,10 @@ function PropellerHat({ fill }: AccessoryPartProps) {
 function Viking({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M24 32 Q24 10 50 6 Q76 10 76 32" fill={fill} stroke="#000" strokeWidth={S} />
-      <path d="M48 32 L50 52 L52 32" fill={fill} stroke="#000" strokeWidth={S} />
-      <path d="M24 26 Q14 18 8 4 Q12 8 18 10 Q20 16 24 22" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M76 26 Q86 18 92 4 Q88 8 82 10 Q80 16 76 22" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M24 32 Q24 10 50 6 Q76 10 76 32" fill={fill} stroke="#000" strokeWidth={SO} />
+      <path d="M48 32 L50 52 L52 32" fill={fill} stroke="#000" strokeWidth={SO} />
+      <path d="M24 26 Q14 18 8 4 Q12 8 18 10 Q20 16 24 22" fill={fill} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <path d="M76 26 Q86 18 92 4 Q88 8 82 10 Q80 16 76 22" fill={fill} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
       <path d="M16 14 L19 12 M14 10 L17 9 M84 14 L81 12 M86 10 L83 9" stroke="#000" strokeWidth={0.8} opacity="0.25" />
       <circle cx="34" cy="28" r="2" fill="#888" stroke="#000" strokeWidth={1} />
       <circle cx="50" cy="26" r="2" fill="#888" stroke="#000" strokeWidth={1} />
@@ -420,10 +424,10 @@ function Headphones({ fill }: AccessoryPartProps) {
     <g>
       <path d="M18 42 Q18 10 50 4 Q82 10 82 42" fill="none" stroke={fill} strokeWidth={4} />
       <path d="M18 42 Q18 10 50 4 Q82 10 82 42" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
-      <rect x="12" y="38" width="12" height="16" rx="4" fill={fill} stroke="#000" strokeWidth={S} />
+      <rect x="12" y="38" width="12" height="16" rx="4" fill={fill} stroke="#000" strokeWidth={SO} />
       <rect x="14" y="41" width="8" height="10" rx="2" fill="#000" opacity="0.2" />
       <path d="M16 43 L16 49 M18 43 L18 49 M20 43 L20 49" stroke="#000" strokeWidth={0.5} opacity="0.15" />
-      <rect x="76" y="38" width="12" height="16" rx="4" fill={fill} stroke="#000" strokeWidth={S} />
+      <rect x="76" y="38" width="12" height="16" rx="4" fill={fill} stroke="#000" strokeWidth={SO} />
       <rect x="78" y="41" width="8" height="10" rx="2" fill="#000" opacity="0.2" />
       <path d="M80 43 L80 49 M82 43 L82 49 M84 43 L84 49" stroke="#000" strokeWidth={0.5} opacity="0.15" />
       <circle cx="14" cy="42" r="1" fill={fill} opacity="0.5" />
@@ -434,12 +438,12 @@ function Headphones({ fill }: AccessoryPartProps) {
 function ChefHat({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <circle cx="38" cy="6" r="13" fill={fill} stroke="#000" strokeWidth={S} />
-      <circle cx="62" cy="6" r="13" fill={fill} stroke="#000" strokeWidth={S} />
-      <circle cx="50" cy="2" r="14" fill={fill} stroke="#000" strokeWidth={S} />
-      <circle cx="44" cy="12" r="11" fill={fill} stroke="#000" strokeWidth={S} />
-      <circle cx="56" cy="12" r="11" fill={fill} stroke="#000" strokeWidth={S} />
-      <rect x="30" y="20" width="40" height="8" rx="2" fill={fill} stroke="#000" strokeWidth={S} />
+      <circle cx="38" cy="6" r="13" fill={fill} stroke="#000" strokeWidth={SO} />
+      <circle cx="62" cy="6" r="13" fill={fill} stroke="#000" strokeWidth={SO} />
+      <circle cx="50" cy="2" r="14" fill={fill} stroke="#000" strokeWidth={SO} />
+      <circle cx="44" cy="12" r="11" fill={fill} stroke="#000" strokeWidth={SO} />
+      <circle cx="56" cy="12" r="11" fill={fill} stroke="#000" strokeWidth={SO} />
+      <rect x="30" y="20" width="40" height="8" rx="2" fill={fill} stroke="#000" strokeWidth={SO} />
       <circle cx="45" cy="6" r="1" fill="#000" opacity="0.06" />
       <circle cx="55" cy="8" r="0.8" fill="#000" opacity="0.05" />
     </g>
@@ -522,8 +526,8 @@ function WizardHat({ fill }: AccessoryPartProps) {
           <stop offset="100%" stopColor="#1A0033" />
         </linearGradient>
       </defs>
-      <path d="M25 32 L50 -5 L75 32 Q62 28 50 30 Q38 28 25 32Z" fill="url(#wizardGrad)" stroke="#000" strokeWidth={S} />
-      <ellipse cx="50" cy="32" rx="30" ry="5" fill={fill} stroke="#000" strokeWidth={S} />
+      <path d="M25 32 L50 -5 L75 32 Q62 28 50 30 Q38 28 25 32Z" fill="url(#wizardGrad)" stroke="#000" strokeWidth={SO} />
+      <ellipse cx="50" cy="32" rx="30" ry="5" fill={fill} stroke="#000" strokeWidth={SO} />
       <polygon points="40,10 41,13 44,13 41.5,15 42.5,18 40,16 37.5,18 38.5,15 36,13 39,13" fill="#FFD700" />
       <polygon points="58,16 59,18 61,18 59.5,19.5 60,21.5 58,20 56,21.5 56.5,19.5 55,18 57,18" fill="#FFD700" />
       <circle cx="48" cy="22" r="1.5" fill="#E040FB" opacity="0.8" />

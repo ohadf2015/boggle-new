@@ -4,12 +4,13 @@ import { memo } from 'react';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { BASE_PARTS } from './parts/BaseParts';
 import { EYE_PARTS } from './parts/EyeParts';
+import { EYEBROW_PARTS } from './parts/EyebrowParts';
 import { MOUTH_PARTS } from './parts/MouthParts';
 import { HAIR_PARTS } from './parts/HairParts';
 import { ACCESSORY_PARTS } from './parts/AccessoryParts';
 
 interface PartPreviewProps {
-  partType: 'base' | 'eyes' | 'mouth' | 'hair' | 'accessory';
+  partType: 'base' | 'eyes' | 'eyebrows' | 'mouth' | 'hair' | 'accessory';
   partName: string;
   config: CustomAvatarConfig;
   size?: number;
@@ -37,6 +38,15 @@ function renderPart(partType: string, partName: string, config: CustomAvatarConf
     case 'eyes': {
       // Show eyes on a subtle face silhouette for context
       const Part = EYE_PARTS[partName as keyof typeof EYE_PARTS];
+      return Part ? (
+        <>
+          <circle cx="50" cy="52" r="32" fill="#d4a574" opacity="0.2" />
+          <Part />
+        </>
+      ) : null;
+    }
+    case 'eyebrows': {
+      const Part = EYEBROW_PARTS[partName as keyof typeof EYEBROW_PARTS];
       return Part ? (
         <>
           <circle cx="50" cy="52" r="32" fill="#d4a574" opacity="0.2" />

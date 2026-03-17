@@ -6,6 +6,18 @@
    - Legendary: holographic hue-rotate + breathing glow + particles
    ============================================ */
 
+/* ── All Avatars — Idle Breathing ── */
+
+@keyframes avatar-idle-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.012); }
+}
+
+/* Subtle idle breathing for ALL avatars — makes them feel alive */
+.avatar-idle-breathe {
+  animation: avatar-idle-breathe 4s ease-in-out infinite;
+}
+
 /* ── VIP Tier ── */
 
 @keyframes avatar-float {
@@ -193,6 +205,7 @@
 /* ── Reduced Motion ── */
 
 @media (prefers-reduced-motion: reduce) {
+  .avatar-idle-breathe,
   .avatar-tier-vip,
   .avatar-tier-epic,
   .avatar-tier-legendary {

@@ -33,8 +33,13 @@ export function useAvatarPremium() {
   const { coins, refreshCoins } = useCoinsFromContext();
   const { user, isAuthenticated } = useAuth();
   const [permanentUnlocks, setPermanentUnlocks] = useState<string[]>([]);
-  const [tempUnlocks, setTempUnlocks] = useState<TempUnlocks>(() => getTempUnlocks());
+  const [tempUnlocks, setTempUnlocks] = useState<TempUnlocks>({});
   const [isPurchasing, setIsPurchasing] = useState(false);
+
+  // Load temp unlocks from localStorage after hydration (avoid SSR mismatch)
+  useEffect(() => {
+    setTempUnlocks(getTempUnlocks());
+  }, []);
 
   // Load permanent unlocks from profile on mount
   useEffect(() => {

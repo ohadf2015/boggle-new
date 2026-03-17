@@ -727,7 +727,9 @@ const es = {
       "none": "Saltar",
       "gender": "Tipo de cuerpo",
       "male": "Masculino",
-      "female": "Femenino"
+      "female": "Femenino",
+      "eyebrows": "Cejas",
+      "colorTheme": "Tema de color"
     },
     "premium": {
       "locked": "Parte VIP",
