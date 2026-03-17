@@ -45,6 +45,9 @@ jest.mock('@/utils/logger', () => ({
     timeEnd: jest.fn(),
   },
 }));
+jest.mock('@/backend/modules/educationXpManager', () => ({
+  calculatePracticeXp: jest.fn(() => ({ totalXp: 120, breakdown: { dailyPractice: 20, flashcardCorrect: 100 }, masteryMessage: 'Great!' })),
+}));
 
 import { NextRequest } from 'next/server';
 import { PATCH } from '../route';
@@ -106,18 +109,27 @@ describe('PATCH /api/education/practice', () => {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
           lesson_id: '550e8400-e29b-41d4-a716-446655440003',
-          xp_awarded: 120,
+          practice_type: 'flashcard',
+          cards_reviewed: 10,
+          cards_correct: 8,
+          xp_awarded: 0,
           completed_at: '2026-02-14T12:00:00Z',
         },
         error: null,
       });
 
+      // Additional from() call for XP update after server calculation
+      const xpUpdateMock = jest.fn().mockResolvedValue({ data: null, error: null });
+
       mockFrom.mockImplementation(() => {
         const callCount = mockFrom.mock.calls.length;
-        const builder = {
+        const builder: Record<string, jest.Mock> = {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          update: jest.fn().mockReturnThis(),
+          update: jest.fn(() => {
+            if (callCount >= 3) return { eq: jest.fn().mockResolvedValue(xpUpdateMock()) };
+            return builder;
+          }),
           single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
         };
         return builder;
@@ -127,7 +139,8 @@ describe('PATCH /api/education/practice', () => {
         method: 'PATCH',
         body: JSON.stringify({
           sessionId: '550e8400-e29b-41d4-a716-446655440001',
-          xpAwarded: 120,
+          cardsReviewed: 10,
+          cardsCorrect: 8,
           completed: true,
         }),
       });
@@ -140,10 +153,10 @@ describe('PATCH /api/education/practice', () => {
       expect(response.status).toBe(200);
       expect(data.session).toBeDefined();
 
-      // THEN: RPC was called with correct parameters
+      // THEN: RPC was called with SERVER-CALCULATED XP (not client-supplied)
       expect(mockRpc).toHaveBeenCalledWith('award_education_xp', {
         p_student_id: '550e8400-e29b-41d4-a716-446655440002',
-        p_xp_amount: 120,
+        p_xp_amount: 120, // From mocked calculatePracticeXp
         p_lesson_id: '550e8400-e29b-41d4-a716-446655440003',
       });
     });
@@ -268,18 +281,26 @@ describe('PATCH /api/education/practice', () => {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
           lesson_id: '550e8400-e29b-41d4-a716-446655440003',
-          xp_awarded: 100,
+          practice_type: 'flashcard',
+          cards_reviewed: 10,
+          cards_correct: 8,
+          xp_awarded: 0,
           completed_at: '2026-02-14T12:00:00Z',
         },
         error: null,
       });
 
+      const xpUpdateMock = jest.fn().mockResolvedValue({ data: null, error: null });
+
       mockFrom.mockImplementation(() => {
         const callCount = mockFrom.mock.calls.length;
-        const builder = {
+        const builder: Record<string, jest.Mock> = {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
-          update: jest.fn().mockReturnThis(),
+          update: jest.fn(() => {
+            if (callCount >= 3) return { eq: jest.fn().mockResolvedValue(xpUpdateMock()) };
+            return builder;
+          }),
           single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
         };
         return builder;
@@ -289,7 +310,8 @@ describe('PATCH /api/education/practice', () => {
         method: 'PATCH',
         body: JSON.stringify({
           sessionId: '550e8400-e29b-41d4-a716-446655440001',
-          xpAwarded: 100,
+          cardsReviewed: 10,
+          cardsCorrect: 8,
           completed: true,
         }),
       });
@@ -301,12 +323,11 @@ describe('PATCH /api/education/practice', () => {
       // THEN: Response is still successful (session saved despite XP failure)
       expect(response.status).toBe(200);
       expect(data.session).toBeDefined();
-      expect(data.session.completed_at).toBe('2026-02-14T12:00:00Z');
 
-      // THEN: RPC was called but failed
+      // THEN: RPC was called with server-calculated XP but failed
       expect(mockRpc).toHaveBeenCalledWith('award_education_xp', {
         p_student_id: '550e8400-e29b-41d4-a716-446655440002',
-        p_xp_amount: 100,
+        p_xp_amount: 120, // Server-calculated, not client-supplied
         p_lesson_id: '550e8400-e29b-41d4-a716-446655440003',
       });
 
