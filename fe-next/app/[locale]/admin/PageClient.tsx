@@ -12,6 +12,7 @@ import { LiveMonitor } from '@/components/admin/LiveMonitor';
 import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
 import { GamesDiagnostic } from '@/components/admin/GamesDiagnostic';
 import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
+import { IndexNowPanel } from '@/components/admin/IndexNowPanel';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
@@ -126,6 +127,10 @@ export default function AdminPageClient() {
 
               <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
                 <GamesDiagnostic authToken={authToken} />
+              </div>
+
+              <div id="indexnow" className="mt-8">
+                <IndexNowPanel />
               </div>
 
               <div id="email-testing" className="mt-8">

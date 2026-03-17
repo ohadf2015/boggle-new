@@ -1,8 +1,51 @@
 import { translations } from '@/translations';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+
+const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
+  en: {
+    title: 'Global Leaderboard - Top Word Game Players',
+    description: 'See where you rank among the best word game players worldwide. Compete in LexiClash multiplayer matches and daily challenges to climb the rankings.',
+    features: [
+      'Live-updating global rankings with real-time scores',
+      'All-time leaderboard tracking total scores across all games',
+      'See your rank position and progress over time',
+      'Compare scores with friends and top players worldwide',
+      'Separate creator leaderboard for community content makers',
+    ],
+    faq: [
+      { question: 'How are leaderboard rankings calculated?', answer: 'Rankings are based on total score accumulated across all multiplayer games. Higher word scores, longer words, and bonus achievements contribute to your total.' },
+      { question: 'How often does the leaderboard update?', answer: 'The leaderboard updates in real-time. Your score changes are reflected immediately after each game finishes.' },
+    ],
+  },
+  he: {
+    title: 'טבלת מובילים עולמית - שחקני משחקי מילים מובילים',
+    description: 'ראו איפה אתם מדורגים בין שחקני משחקי המילים הטובים בעולם. התחרו במשחקים ואתגרים יומיים כדי לטפס בדירוגים.',
+    features: ['דירוגים עולמיים מתעדכנים בזמן אמת', 'מעקב אחרי ניקוד כולל לאורך כל המשחקים', 'השוו ניקוד עם חברים ושחקנים מובילים'],
+    faq: [],
+  },
+  ja: {
+    title: 'グローバルリーダーボード - トップワードゲームプレイヤー',
+    description: '世界中のワードゲームプレイヤーの中であなたの順位を確認しましょう。',
+    features: ['リアルタイム更新のグローバルランキング', '全ゲームの累計スコア追跡'],
+    faq: [],
+  },
+  sv: {
+    title: 'Global Topplista - Baesta Ordspelarna',
+    description: 'Se var du rankas bland vaerldens baesta ordspelare.',
+    features: ['Realtidsuppdaterade globala rankningar'],
+    faq: [],
+  },
+  es: {
+    title: 'Tabla de Clasificacion Global - Mejores Jugadores',
+    description: 'Descubre tu posicion entre los mejores jugadores de juegos de palabras del mundo.',
+    features: ['Rankings globales actualizados en tiempo real'],
+    faq: [],
+  },
+};
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;

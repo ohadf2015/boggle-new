@@ -1,8 +1,68 @@
 import { translations } from '@/translations';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+
+const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
+  en: {
+    title: 'Play Boggle Online Free - Single Player Word Game',
+    description: 'Practice word finding against AI bots, challenge yourself with multiple difficulty levels, and sharpen your vocabulary skills. No download required.',
+    features: [
+      'Multiple difficulty levels from beginner to expert',
+      'AI opponents that adapt to your skill level',
+      'Track your personal best scores and streaks',
+      'Supports English, Hebrew, Swedish, Japanese, and Spanish boards',
+      'Instant play in your browser - no app download needed',
+    ],
+    faq: [
+      { question: 'How does single player mode work?', answer: 'You play on a randomized letter grid and find as many words as possible within the time limit. Words must be formed by connecting adjacent letters. Longer words earn more points.' },
+      { question: 'Can I play offline?', answer: 'Yes, single player mode works offline once the page has loaded. Your scores are saved locally and sync when you reconnect.' },
+      { question: 'What grid sizes are available?', answer: 'Choose from 4x4 (classic), 5x5 (challenge), or 6x6 (expert) grids. Larger grids offer more word possibilities and higher potential scores.' },
+    ],
+  },
+  he: {
+    title: 'שחקו בוגל אונליין בחינם - משחק מילים ליחיד',
+    description: 'תרגלו מציאת מילים מול בוטים, אתגרו את עצמכם ברמות קושי שונות ושפרו את אוצר המילים שלכם. ללא הורדה.',
+    features: [
+      'רמות קושי מתחיל ועד מומחה',
+      'יריבי AI שמתאימים את עצמם לרמה שלכם',
+      'מעקב אחרי שיאים אישיים ורצפים',
+      'תמיכה בעברית, אנגלית, שוודית, יפנית וספרדית',
+      'משחק מיידי בדפדפן - ללא הורדת אפליקציה',
+    ],
+    faq: [
+      { question: 'איך עובד מצב שחקן יחיד?', answer: 'אתם משחקים על לוח אותיות אקראי ומוצאים כמה שיותר מילים בזמן הקצוב. מילים נוצרות על ידי חיבור אותיות סמוכות. מילים ארוכות יותר מזכות ביותר נקודות.' },
+      { question: 'אפשר לשחק אופליין?', answer: 'כן, מצב שחקן יחיד עובד אופליין לאחר שהדף נטען. הניקוד נשמר מקומית ומסתנכרן כשמתחברים מחדש.' },
+    ],
+  },
+  ja: {
+    title: 'ボグル オンライン無料 - ソロワードゲーム',
+    description: 'AIボットと対戦して単語力を鍛えましょう。複数の難易度レベルで語彙力を磨けます。ダウンロード不要。',
+    features: [
+      '初心者からエキスパートまでの難易度レベル',
+      'あなたのスキルに合わせて適応するAI対戦相手',
+      '個人ベストスコアとストリークの追跡',
+      '日本語、英語、ヘブライ語、スウェーデン語、スペイン語に対応',
+    ],
+    faq: [
+      { question: 'シングルプレイヤーモードの遊び方は?', answer: 'ランダムに生成された文字グリッド上で、制限時間内にできるだけ多くの単語を見つけます。隣接する文字をつなげて単語を作ります。' },
+    ],
+  },
+  sv: {
+    title: 'Spela Boggle Online Gratis - Enspelareordspel',
+    description: 'Traena ordsokning mot AI-motstaendare, utmana dig sjaelv med flera svaarighetsnivaaer och skaerp ditt ordfoerraad.',
+    features: ['Flera svaarighetsnivaaer', 'AI-motstaendare som anpassar sig', 'Spaaara dina personbaesta'],
+    faq: [],
+  },
+  es: {
+    title: 'Jugar Boggle Online Gratis - Juego de Palabras Individual',
+    description: 'Practica encontrando palabras contra bots de IA, desafiate con multiples niveles de dificultad y mejora tu vocabulario.',
+    features: ['Multiples niveles de dificultad', 'Oponentes IA que se adaptan', 'Seguimiento de mejores puntuaciones'],
+    faq: [],
+  },
+};
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;

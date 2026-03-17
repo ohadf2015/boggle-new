@@ -1,8 +1,65 @@
 import { translations } from '@/translations';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+
+const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
+  en: {
+    title: 'Daily Word Challenge - Same Puzzle Worldwide',
+    description: 'A new word puzzle every day at midnight UTC. Everyone plays the same board. Share your results and compete on the global daily leaderboard.',
+    features: [
+      'New puzzle every day at midnight UTC',
+      'Same board for all players worldwide - fair competition',
+      'Share emoji results with friends, just like Wordle',
+      'Word Hunt Survival: find the hidden word in 10 attempts',
+      'Daily streaks reward consistent play',
+      'Global leaderboard resets each day',
+    ],
+    faq: [
+      { question: 'When does the daily puzzle reset?', answer: 'A new puzzle is generated every day at midnight UTC. Your progress resets and a fresh leaderboard begins.' },
+      { question: 'Can I share my results?', answer: 'Yes! After completing the puzzle, tap the share button to copy an emoji grid summary. Share it on social media or messaging apps without spoiling the answer.' },
+      { question: 'What is Word Hunt Survival?', answer: 'Word Hunt is a daily word search challenge where you have 10 attempts to find the hidden target word on the board. Think of it as Wordle meets Boggle.' },
+    ],
+  },
+  he: {
+    title: 'אתגר מילים יומי - אותו פאזל לכל העולם',
+    description: 'פאזל מילים חדש כל יום בחצות UTC. כולם משחקים על אותו לוח. שתפו תוצאות והתחרו בטבלת המובילים היומית.',
+    features: [
+      'פאזל חדש כל יום בחצות',
+      'אותו לוח לכל השחקנים בעולם',
+      'שתפו תוצאות אמוג\'י עם חברים',
+      'מצא מילה: מצאו את המילה הנסתרת ב-10 ניסיונות',
+      'רצפים יומיים מתגמלים משחק עקבי',
+    ],
+    faq: [
+      { question: 'מתי מתאפס האתגר היומי?', answer: 'פאזל חדש נוצר כל יום בחצות UTC. ההתקדמות מתאפסת וטבלת מובילים חדשה מתחילה.' },
+    ],
+  },
+  ja: {
+    title: 'デイリーワードチャレンジ - 世界共通パズル',
+    description: '毎日UTC午前0時に新しいワードパズル。全プレイヤーが同じボードでプレイ。結果を共有してグローバルランキングで競いましょう。',
+    features: [
+      '毎日UTC午前0時に新パズル',
+      '世界中の全プレイヤーが同じボード',
+      '絵文字で結果を友達にシェア',
+    ],
+    faq: [],
+  },
+  sv: {
+    title: 'Daglig Ordutmaning - Samma Pussel Varldsomspannande',
+    description: 'Ett nytt ordpussel varje dag. Alla spelar paa samma braede.',
+    features: ['Nytt pussel varje dag', 'Samma braede foer alla spelare', 'Dela emoji-resultat'],
+    faq: [],
+  },
+  es: {
+    title: 'Desafio Diario de Palabras - Mismo Puzzle Mundial',
+    description: 'Un nuevo puzzle de palabras cada dia. Todos juegan el mismo tablero. Comparte resultados y compite en el ranking global.',
+    features: ['Nuevo puzzle cada dia', 'Mismo tablero para todos', 'Comparte resultados emoji'],
+    faq: [],
+  },
+};
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;
