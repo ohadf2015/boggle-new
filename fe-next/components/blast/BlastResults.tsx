@@ -6,6 +6,7 @@ import { RotateCcw, Home, Trophy, Zap, Grid3X3, Star } from 'lucide-react';
 // canvas-confetti is lazy-loaded (only fires on 3 stars or retrigger)
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAdPlacement } from '@/hooks/useAdPlacement';
 import type { BlastResultsData, BlastDifficulty } from './types';
 import { useBlastResultSaver } from './hooks/useBlastResultSaver';
 import { StarRating, StatCard, WaveBreakdown } from './BlastResultsComponents';
@@ -42,8 +43,14 @@ function useCountUp(finalValue: number): number {
  */
 export function BlastResults({ results, difficulty = 'medium', language = 'en', onPlayAgain, onBackToHome }: BlastResultsProps) {
   const { t } = useLanguage();
+  const { showInterstitial } = useAdPlacement();
   const { isNewBestScore, isNewBestCombo } = useBlastResultSaver(results, difficulty, language);
   const displayScore = useCountUp(results.finalScore);
+
+  // Show interstitial ad on mount
+  useEffect(() => {
+    showInterstitial('blast-complete');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-fire confetti on mount when 3 stars — only once
   useEffect(() => {

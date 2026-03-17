@@ -7,7 +7,7 @@
 
 'use client';
 
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Check, X, Trophy, RotateCcw, LogOut, Coins, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,7 @@ import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { RollingNumber } from './ui/RollingNumber';
+import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
 // ==============================================
@@ -127,6 +128,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     const dialogRef = useRef<HTMLDivElement>(null);
     const isPerfect = stars === 3;
     const isFailed = stars === 0;
+    const [goldDoubled, setGoldDoubled] = useState(false);
+    const baseGold = goldEarned ?? (stars > 0 ? stars * 10 + (stars === 3 ? 50 : 0) : 0);
+    const displayGold = goldDoubled ? baseGold * 2 : baseGold;
     const prefersReducedMotion = usePrefersReducedMotion();
     const particleBudget = useParticleBudget();
 
@@ -329,11 +333,14 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   <Coins className="w-3 h-3" />
                   {t('adventure.gold')}
                 </div>
-                <RollingNumber 
-                  value={goldEarned ?? (stars > 0 ? stars * 10 + (stars === 3 ? 50 : 0) : 0)}
+                <RollingNumber
+                  value={displayGold}
                   variant="gold"
                   className="text-xl md:text-2xl"
                 />
+                {goldDoubled && (
+                  <span className="text-neo-lime text-xs font-bold">x2!</span>
+                )}
               </div>
             </motion.div>
 
@@ -451,6 +458,19 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   </p>
                 )}
               </motion.div>
+            )}
+
+            {/* Double Coins Rewarded Ad */}
+            {stars > 0 && !goldDoubled && (
+              <div className="mb-4">
+                <RewardedAdButton
+                  name="adventure-double-coins"
+                  onReward={() => setGoldDoubled(true)}
+                  className="w-full"
+                >
+                  {t('adventure.watchAdDoubleCoins') || 'Watch Ad to Double Coins'}
+                </RewardedAdButton>
+              </div>
             )}
 
             {/* Action Buttons */}

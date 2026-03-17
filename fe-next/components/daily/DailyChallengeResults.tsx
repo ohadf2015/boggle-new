@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Trophy, Flame, Target, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
@@ -20,6 +20,8 @@ import {
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import { useDailyResultSubmission } from './results/useDailyResultSubmission';
 import {
   shareImageWithNativeShare,
@@ -67,6 +69,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [showSharePreview, setShowSharePreview] = useState(false);
   const [showWords, setShowWords] = useState(false);
   const { profile, isAuthenticated } = useAuth();
+  const { showInterstitial } = useAdPlacement();
+
+  useEffect(() => {
+    showInterstitial('daily-complete');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const {
     currentUserRank,
     totalPlayers,
@@ -411,6 +419,25 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               </motion.div>
             )}
           </AnimatePresence>
+        </motion.div>
+
+        {/* Rewarded Ad: Retry Daily Challenge */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.52 }}
+          className="pt-2"
+        >
+          <RewardedAdButton
+            name="daily-retry"
+            onReward={() => {
+              // Return to daily hub to retry the challenge
+              onBack();
+            }}
+            className="w-full max-w-btn"
+          >
+            {t('daily.watchAdRetry') || 'Watch Ad to Retry'}
+          </RewardedAdButton>
         </motion.div>
 
         {/* Next Step - Suggest Multiplayer */}

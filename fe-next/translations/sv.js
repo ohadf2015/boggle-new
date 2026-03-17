@@ -873,6 +873,13 @@ const sv = {
     "playersInRoom": "Spelare i rummet",
     "noOneYet": "Ingen ännu?",
     "startingWithBots": "Startar med bottar om",
+    "addBot": "Lägg till bot",
+    "removeBot": "Ta bort bot",
+    "botEasy": "Lätt",
+    "botMedium": "Medel",
+    "botHard": "Svår",
+    "quickFillBots": "Fyll snabbt med bottar",
+    "botCount": "{{count}} bot(tar) i rummet",
     "shareCodeHint": "Dela rumskoden ovan så att vänner kan gå med!",
     "battleMode": "Stridsläge",
     "preset": "Förinställning",
@@ -6306,7 +6313,8 @@ const sv = {
       "treasureHunter": { "name": "Skattjägare" },
       "blitz": { "name": "Blixt" },
       "zenMode": { "name": "Zenläge" }
-    }
+    },
+    "watchAdDoubleCoins": "Se reklam för att dubbla mynt"
   },
   "blast": {
     "chain": {
@@ -7849,7 +7857,8 @@ const sv = {
     completed: "Slutförd",
     easy: "Lätt",
     medium: "Medel",
-    hard: "Svår"
+    hard: "Svår",
+    watchAdRetry: "Se reklam för att försöka igen"
   },
   quests: {
     weeklyWordMastery: "Veckans Ordmästerskap",

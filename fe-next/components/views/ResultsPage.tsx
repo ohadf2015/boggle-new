@@ -33,6 +33,7 @@ import { ResultsDetailsContent } from '@/components/results/ResultsDetailsConten
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useAdPlacement } from '@/hooks/useAdPlacement';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats } from '@/hooks/gameState/store';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
@@ -49,6 +50,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+
+  const { showInterstitial } = useAdPlacement();
+  useEffect(() => {
+    showInterstitial('multiplayer-round-complete');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
   const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(false);

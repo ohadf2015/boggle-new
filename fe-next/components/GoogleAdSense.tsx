@@ -23,13 +23,19 @@ export function GoogleAdSense() {
   if (typeof window !== 'undefined' && window.location.hostname === 'localhost') return null;
 
   return (
-    <Script
-      id="google-adsense"
-      async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
-      crossOrigin="anonymous"
-      strategy="afterInteractive"
-    />
+    <>
+      <Script
+        id="google-adsense"
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
+      <Script id="ad-placement-init" strategy="afterInteractive">
+        {`window.adsbygoogle = window.adsbygoogle || [];
+          window.adBreak = window.adConfig = function(o) { adsbygoogle.push(o); };`}
+      </Script>
+    </>
   );
 }
 

@@ -873,6 +873,13 @@ const en = {
     "playersInRoom": "Players in Room",
     "noOneYet": "No one yet?",
     "startingWithBots": "Starting with bots in",
+    "addBot": "Add Bot",
+    "removeBot": "Remove bot",
+    "botEasy": "Easy",
+    "botMedium": "Medium",
+    "botHard": "Hard",
+    "quickFillBots": "Quick Fill with Bots",
+    "botCount": "{{count}} bot(s) in room",
     "shareCodeHint": "Share the room code above so friends can join!",
     "battleMode": "Battle Mode",
     "preset": "Preset",
@@ -6408,7 +6415,8 @@ const en = {
       "treasureHunter": { "name": "Treasure Hunter" },
       "blitz": { "name": "Blitz" },
       "zenMode": { "name": "Zen Mode" }
-    }
+    },
+    "watchAdDoubleCoins": "Watch Ad to Double Coins"
   },
   "blast": {
     "chain": {
@@ -7915,7 +7923,8 @@ const en = {
     completed: "Completed",
     easy: "Easy",
     medium: "Medium",
-    hard: "Hard"
+    hard: "Hard",
+    watchAdRetry: "Watch Ad to Retry"
   },
   quests: {
     weeklyWordMastery: "Weekly Word Mastery",

@@ -873,6 +873,13 @@ const ja = {
     "playersInRoom": "ルーム内のプレイヤー",
     "noOneYet": "まだ誰もいない？",
     "startingWithBots": "ボットで開始まで",
+    "addBot": "ボット追加",
+    "removeBot": "ボットを削除",
+    "botEasy": "かんたん",
+    "botMedium": "ふつう",
+    "botHard": "むずかしい",
+    "quickFillBots": "ボットで素早く埋める",
+    "botCount": "{{count}}体のボットがいます",
     "shareCodeHint": "上のルームコードを共有して友達を招待しよう！",
     "battleMode": "バトルモード",
     "preset": "プリセット",
@@ -6357,7 +6364,8 @@ const ja = {
       "treasureHunter": { "name": "トレジャーハンター" },
       "blitz": { "name": "ブリッツ" },
       "zenMode": { "name": "禅モード" }
-    }
+    },
+    "watchAdDoubleCoins": "広告を見てコイン2倍"
   },
   "blast": {
     "chain": {
@@ -7829,7 +7837,8 @@ const ja = {
     completed: "完了",
     easy: "簡単",
     medium: "普通",
-    hard: "難しい"
+    hard: "難しい",
+    watchAdRetry: "広告を見てリトライ"
   },
   quests: {
     weeklyWordMastery: "週間単語習得",

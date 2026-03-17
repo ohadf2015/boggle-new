@@ -906,6 +906,13 @@ const es = {
     "playersInRoom": "Jugadores en la sala",
     "noOneYet": "¿Nadie aún?",
     "startingWithBots": "Empezando con bots en",
+    "addBot": "Añadir Bot",
+    "removeBot": "Eliminar bot",
+    "botEasy": "Fácil",
+    "botMedium": "Medio",
+    "botHard": "Difícil",
+    "quickFillBots": "Llenar rápido con bots",
+    "botCount": "{{count}} bot(s) en la sala",
     "shareCodeHint": "¡Comparte el código de sala de arriba para que tus amigos se unan!",
     "battleMode": "Modo de batalla",
     "preset": "Configuración",
@@ -6362,7 +6369,8 @@ const es = {
       "treasureHunter": { "name": "Cazador de Tesoros" },
       "blitz": { "name": "Blitz" },
       "zenMode": { "name": "Modo Zen" }
-    }
+    },
+    "watchAdDoubleCoins": "Ver anuncio para duplicar monedas"
   },
   "blast": {
     "chain": {
@@ -7897,7 +7905,8 @@ const es = {
     "completed": "Completado",
     "easy": "Fácil",
     "medium": "Medio",
-    "hard": "Difícil"
+    "hard": "Difícil",
+    "watchAdRetry": "Ver anuncio para reintentar"
   },
   "quests": {
     "weeklyWordMastery": "Maestría Semanal de Palabras",

@@ -15,6 +15,7 @@ import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { Button } from '@/components/ui/button';
@@ -76,6 +77,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
+  const { showInterstitial } = useAdPlacement();
+
+  useEffect(() => {
+    showInterstitial('singleplayer-complete');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const nextStepMode: NextStepMode = mode === 'practice' ? 'practice' : 'solo-bots';
   const [showTrainingAnalysis, setShowTrainingAnalysis] = useState(false);

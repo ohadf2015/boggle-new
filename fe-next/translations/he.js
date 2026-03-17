@@ -889,6 +889,13 @@ const he = {
     "playersInRoom": "שחקנים בחדר",
     "noOneYet": "עוד אף אחד?",
     "startingWithBots": "מתחיל עם בוטים בעוד",
+    "addBot": "הוסף בוט",
+    "removeBot": "הסר בוט",
+    "botEasy": "קל",
+    "botMedium": "בינוני",
+    "botHard": "קשה",
+    "quickFillBots": "מילוי מהיר עם בוטים",
+    "botCount": "{{count}} בוטים בחדר",
     "shareCodeHint": "שתפו את קוד החדר למעלה כדי שחברים יצטרפו!",
     "battleMode": "מצב קרב",
     "preset": "הגדרה",
@@ -6331,7 +6338,8 @@ const he = {
       "treasureHunter": { "name": "צייד אוצרות" },
       "blitz": { "name": "בליץ" },
       "zenMode": { "name": "מצב זן" }
-    }
+    },
+    "watchAdDoubleCoins": "צפו בפרסומת כדי להכפיל מטבעות"
   },
   "blast": {
     "chain": {
@@ -7854,7 +7862,8 @@ const he = {
     completed: "הושלם",
     easy: "קל",
     medium: "בינוני",
-    hard: "קשה"
+    hard: "קשה",
+    watchAdRetry: "צפו בפרסומת כדי לנסות שוב"
   },
   quests: {
     weeklyWordMastery: "שליטה שבועית במילים",
