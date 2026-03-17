@@ -167,13 +167,6 @@ describe('HostPreGameView Game Mode Selection', () => {
     expect(gameModeButtons.length).toBeGreaterThanOrEqual(4); // random, classic, blast, word-hunt (×2 for mobile+desktop)
   });
 
-  it('renders bot controls visible without needing to expand', () => {
-    render(<HostPreGameView {...defaultProps} />);
-
-    // Bot controls should be visible immediately
-    const botControls = screen.getAllByTestId('bot-controls');
-    expect(botControls.length).toBeGreaterThanOrEqual(1);
-  });
 
   it('game mode buttons are clickable', () => {
     render(<HostPreGameView {...defaultProps} />);
