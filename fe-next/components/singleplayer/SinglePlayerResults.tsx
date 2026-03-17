@@ -11,7 +11,7 @@ import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import MissedWords from '@/components/results/MissedWords';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
-import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
+
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,7 +28,7 @@ import {
   useGameSessionLogging,
   useCoinRewards,
   useWinStreakTracking,
-  useCognitiveScoring,
+
   useSignupPrompt,
   useAchievementsSave,
   useWordValidation,
@@ -44,13 +44,13 @@ import {
   RankingsSection,
   ChallengeButton,
 } from './results';
-import { CelebrationHero } from './results/components/CelebrationHero';
 import { ResultsInfoCards } from './results/components/ResultsInfoCards';
 import { TrainingAnalysisModal } from '@/components/training';
+import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
+import { ResultsHero } from '@/components/results/shared';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
-const WordHuntAnnouncementBanner = dynamic(() => import('@/components/results/WordHuntAnnouncementBanner'), { ssr: false });
 
 const RANK_CONFETTI_COLORS: Record<number, string[]> = {
   1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'],
@@ -122,7 +122,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const { winStreakData } = useWinStreakTracking({ mode, isWinner });
 
-  const { brainPointsReward } = useCognitiveScoring({ userId: user?.id, mode, results });
 
   const { showSignupModal, setShowSignupModal } = useSignupPrompt({
     isAuthenticated, hasUser: !!user, authLoading,
@@ -140,8 +139,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   });
 
   const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
-  const totalAttempts = results.playerWordData?.length || 0;
-  const accuracy = totalAttempts > 0 ? Math.round((validWordCount / totalAttempts) * 100) : 0;
 
   const bannerConfig = useBannerConfig({
     playerScore: results.playerScore, validWordCount, mode,
@@ -198,7 +195,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             </div>
           )}
           <CoinRewardDisplay reward={coinReward} variant="inline" mode={isAuthenticated ? 'earned' : 'teasing'} />
-          <BrainPointsDisplay reward={brainPointsReward} variant="inline" />
         </div>
         <div className="w-1/2 flex flex-col gap-2 overflow-y-auto scrollable-area">
           <LandscapeWordsSection
@@ -227,21 +223,42 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       <div className="px-2 md:px-4 xl:px-6 pb-20 md:pb-6">
         <div className="mx-auto space-y-4 md:space-y-6 pt-2 md:pt-4">
 
-          {/* 1. Celebration Hero */}
-          <CelebrationHero
+          {/* 1. Hero Zone — unified score + stats */}
+          <ResultsHero
+            outcomeLabel={bannerConfig.message || t('results.finalScore')}
             score={results.playerScore}
-            wordCount={validWordCount}
-            accuracy={accuracy}
-            totalWords={totalAttempts}
-            coinReward={coinReward}
-            isAuthenticated={isAuthenticated}
-            variant={bannerConfig.variant}
-            rank={mode === 'solo-bots' ? playerRank : 1}
-            message={bannerConfig.message}
-            announcement={bannerConfig.announcement}
-            showConfetti={shouldShowConfetti}
-            compact={false}
+            subtitle={bannerConfig.announcement}
+            pointsLabel={t('common.points')}
+            variant={isWinner || results.isNewHighScore ? 'win' : results.playerScore === 0 ? 'neutral' : 'loss'}
+            onScoreClick={shouldShowConfetti ? () => {
+              const colors = (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3)
+                ? RANK_CONFETTI_COLORS[playerRank]
+                : ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7'];
+              fireConfetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors });
+            } : undefined}
+            stats={[
+              { label: t('results.words'), value: validWordCount, icon: '📝' },
+              {
+                label: t('results.bestWord'),
+                value: results.playerWordData && results.playerWordData.filter(w => w.isValid).length > 0
+                  ? results.playerWordData.filter(w => w.isValid).reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()
+                  : '-',
+                icon: '⭐',
+                accent: 'lime',
+              },
+              {
+                label: t('results.coinsEarned'),
+                value: coinReward ? `+${coinReward.awarded}` : '-',
+                icon: '🪙',
+                accent: 'amber',
+              },
+            ]}
           />
+
+          {/* 1.5. Rewarded Ad for Gold */}
+          <div className="flex justify-center">
+            <RewardedAdGoldButton goldAmount={25} />
+          </div>
 
           {/* 2. Achievements + Bonus - high visibility, right after hero */}
           {(results.achievements && results.achievements.length > 0) || totalComboBonus > 0 || totalFireRoundBonus > 0 ? (
@@ -277,8 +294,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             achievementCount={results.achievements?.length || 0}
           />
 
-          {/* Word Hunt Multiplayer Promotion */}
-          <WordHuntAnnouncementBanner />
+          {/* WordHuntAnnouncementBanner removed — marketing doesn't belong in results */}
 
           {/* 7. Desktop What's Next + Challenge - 70/30 split */}
           <div className="hidden md:flex gap-4">

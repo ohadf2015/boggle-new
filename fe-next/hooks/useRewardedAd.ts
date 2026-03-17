@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useCoinContext } from '@/contexts/CoinContext';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
@@ -33,6 +34,7 @@ interface UseRewardedAdReturn {
  *
  * Priority order:
  * 1. CrazyGames SDK - when running on CrazyGames platform
+ * 1.5. AdSense for Games - when running on web with ad placement API
  * 2. Simulation fallback - for development/testing
  *
  * @example
@@ -56,13 +58,17 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
 
   // Ad platform hooks
   const crazyGames = useCrazyGames();
+  const adPlacement = useAdPlacement();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
-  const shouldUseSimulation = !shouldUseCrazyGames;
+  const shouldUseAdSense = !shouldUseCrazyGames && adPlacement.isReady;
+  // Simulation only in development — never award free gold in production
+  const isDev = process.env.NODE_ENV === 'development';
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdSense;
 
-  // Ad is available if any platform is ready
-  const isAdAvailable = shouldUseCrazyGames || shouldUseSimulation;
+  // Ad is available only when a real platform is ready (or dev simulation)
+  const isAdAvailable = shouldUseCrazyGames || shouldUseAdSense || shouldUseSimulation;
 
   const rewardAmount = rewards.WATCH_AD;
 
@@ -75,7 +81,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     setError(null);
 
     // Determine platform for logging
-    const platform = shouldUseCrazyGames ? 'crazygames' : 'simulation';
+    const platform = shouldUseCrazyGames ? 'crazygames' : shouldUseAdSense ? 'adsense' : 'simulation';
 
     // Award coins helper - uses unified CoinContext for auth/guest sync
     const awardCoinsAndNotify = async () => {
@@ -114,9 +120,20 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
           handleAdError(errorMsg || 'Ad failed to load');
         },
       });
+    } else if (shouldUseAdSense) {
+      // Priority 1.5: AdSense for Games rewarded ads
+      setStatus('showing');
+      onAdStarted?.();
+      adPlacement.showRewarded('rewarded-gold', {
+        onReward: () => {
+          awardCoinsAndNotify();
+        },
+        onDismiss: () => {
+          handleAdError('Ad dismissed');
+        },
+      });
     } else {
       // Priority 2: Simulation fallback for development/testing
-      // This allows testing the flow without real ads
       console.log('[RewardedAd] Using simulation mode - no real ads configured');
       setStatus('showing');
       onAdStarted?.();
@@ -126,7 +143,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         awardCoinsAndNotify();
       }, 3000);
     }
-  }, [status, shouldUseCrazyGames, crazyGames, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
+  }, [status, shouldUseCrazyGames, shouldUseAdSense, crazyGames, adPlacement, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
 
   return {
     status,

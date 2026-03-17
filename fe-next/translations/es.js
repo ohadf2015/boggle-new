@@ -164,6 +164,7 @@ const es = {
     "today": "Hoy",
     "yesterday": "Ayer",
     "processing": "Procesando...",
+    "opponent": "Oponente",
     "offline": "sin conexión",
     "online": "en línea",
     "sending": "Enviando...",
@@ -726,6 +727,17 @@ const es = {
       "gender": "Tipo de cuerpo",
       "male": "Masculino",
       "female": "Femenino"
+    },
+    "premium": {
+      "locked": "Parte VIP",
+      "unlock": "Desbloquear esta parte",
+      "watchAd": "Ver anuncio para probar 24h",
+      "buyWithGold": "Desbloquear por {price} oro",
+      "unlocked": "¡Desbloqueado!",
+      "tempUnlock": "Desbloqueado por 24h",
+      "vipBadge": "VIP",
+      "filterAll": "Todos",
+      "filterVip": "Solo VIP"
     }
   },
   "error": {
@@ -1537,6 +1549,7 @@ const es = {
     "words": "Palabras",
     "bestWord": "Mejor",
     "missedWords": "Palabras que Perdiste",
+    "missedWordsSummary": "{count} palabras en el tablero que no encontraste",
     "wordLengths": "Longitudes de palabras",
     "missedOnBoard": "Palabras que se te escaparon",
     "everyoneReady": "¡Todos listos!",
@@ -6658,7 +6671,9 @@ const es = {
       "duelActivity": "Actividad de Duelos",
       "live": "EN VIVO",
       "selectClassroom": "Seleccionar Salón",
-      "createClassroomFirst": "Crea un salón primero para rastrear tareas y actividad de duelos"
+      "createClassroomFirst": "Crea un salón primero para rastrear tareas y actividad de duelos",
+      "analytics": "Analíticas",
+      "insights": "DATOS"
     },
     "game": {
       "qrCode": "Mostrar Código QR",
@@ -7778,7 +7793,13 @@ const es = {
     "forfeitCancel": "Cancelar"
   },
   "ads": {
-    "label": "Anuncio"
+    "label": "Anuncio",
+    "rewarded": {
+      "watchForGold": "Ver anuncio por +{amount} oro",
+      "earning": "Viendo...",
+      "earned": "+{amount} oro ganado!",
+      "cooldown": "Disponible pronto"
+    }
   },
   "gameModes": {
     "classic": {

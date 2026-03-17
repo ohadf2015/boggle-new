@@ -20,7 +20,7 @@ interface AvatarRendererProps {
  * Layer order: background -> hair(back) -> base(face) -> eyes -> mouth -> accessory -> hair(front)
  */
 /** Styles that render their main body behind the head */
-const BACK_LAYER_STYLES = ['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet'];
+const BACK_LAYER_STYLES = ['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon'];
 
 const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '' }) => {
   const BasePart = BASE_PARTS[config.base] ?? BASE_PARTS.round;

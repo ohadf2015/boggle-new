@@ -165,6 +165,7 @@ const ja = {
     "today": "今日",
     "yesterday": "昨日",
     "processing": "処理中...",
+    "opponent": "対戦相手",
     "offline": "オフライン",
     "online": "オンライン",
     "sending": "送信中...",
@@ -662,6 +663,17 @@ const ja = {
       "gender": "体型",
       "male": "男性",
       "female": "女性"
+    },
+    "premium": {
+      "locked": "VIPパーツ",
+      "unlock": "このパーツを解除",
+      "watchAd": "広告を見て24時間お試し",
+      "buyWithGold": "{price}ゴールドで解除",
+      "unlocked": "解除済み！",
+      "tempUnlock": "24時間解除中",
+      "vipBadge": "VIP",
+      "filterAll": "すべて",
+      "filterVip": "VIPのみ"
     }
   },
   "error": {
@@ -1474,6 +1486,7 @@ const ja = {
     "words": "単語",
     "bestWord": "ベスト",
     "missedWords": "見逃した単語",
+    "missedWordsSummary": "ボード上の{count}個の単語を見つけられませんでした",
     "wordLengths": "単語の長さ",
     "missedOnBoard": "見逃した単語",
     "everyoneReady": "全員準備完了！",
@@ -6666,7 +6679,9 @@ const ja = {
       "duelActivity": "デュエルアクティビティ",
       "live": "ライブ",
       "selectClassroom": "クラスを選択",
-      "createClassroomFirst": "課題とデュエルアクティビティを追跡するには、まずクラスを作成してください"
+      "createClassroomFirst": "課題とデュエルアクティビティを追跡するには、まずクラスを作成してください",
+      "analytics": "アナリティクス",
+      "insights": "インサイト"
     },
     "game": {
       "qrCode": "QRコードを表示",
@@ -7846,7 +7861,13 @@ const ja = {
     weeklyWordMasteryDesc: "今週{target}単語を習得する"
   },
   ads: {
-    label: "広告"
+    label: "広告",
+    rewarded: {
+      watchForGold: "広告を見て+{amount}ゴールド",
+      earning: "視聴中...",
+      earned: "+{amount}ゴールド獲得！",
+      cooldown: "まもなく利用可能"
+    }
   },
   wordHuntAnnouncement: {
     badge: "マルチプレイヤーに新登場",

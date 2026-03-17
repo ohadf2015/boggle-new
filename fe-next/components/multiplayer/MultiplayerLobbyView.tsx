@@ -7,6 +7,8 @@ import RoomChat from '../RoomChat';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 
 import AvatarBuilderModal from '../avatar/AvatarBuilderModal';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
+import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
 import { PlayerRoster } from '../../host/components/pre-game/PlayerRoster';
@@ -143,6 +145,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
 
   // Avatar builder (player-only)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const avatarPremium = useAvatarPremium();
   const currentAvatar = getStoredCustomAvatar() ?? getRandomAvatarConfig();
 
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
@@ -255,6 +258,11 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           {WORD_FACTS[factIndex].fact}
         </motion.div>
       </AnimatePresence>
+
+      {/* Bonus Gold Ad while waiting */}
+      <div className="flex justify-center">
+        <RewardedAdGoldButton goldAmount={20} />
+      </div>
 
       {/* Edit avatar + name */}
       <div className="flex items-center justify-center gap-3">
@@ -443,6 +451,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           onClose={() => setIsAvatarBuilderOpen(false)}
           onSave={handleAvatarSave}
           initialConfig={currentAvatar}
+          premium={avatarPremium}
         />
       )}
 

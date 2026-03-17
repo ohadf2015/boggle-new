@@ -20,6 +20,7 @@ import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { RollingNumber } from './ui/RollingNumber';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
+import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
 // ==============================================
@@ -472,6 +473,11 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 </RewardedAdButton>
               </div>
             )}
+
+            {/* Bonus Gold Ad */}
+            <div className="flex justify-center mb-4">
+              <RewardedAdGoldButton goldAmount={30} />
+            </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-3">

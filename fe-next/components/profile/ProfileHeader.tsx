@@ -9,6 +9,7 @@ import { Loader } from '@/components/ui/Loader';
 import { Input } from '@/components/ui/input';
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { CountrySelector } from '@/components/settings/CountrySelector';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -50,6 +51,7 @@ export function ProfileHeader({
   const [isEditingCountry, setIsEditingCountry] = useState(false);
   const [isSavingCountry, setIsSavingCountry] = useState(false);
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const avatarPremium = useAvatarPremium();
 
   const startEditingName = (): void => {
     setEditDisplayName(profile?.display_name || profile?.username || '');
@@ -311,6 +313,7 @@ export function ProfileHeader({
         onClose={() => setIsAvatarBuilderOpen(false)}
         onSave={handleAvatarSave}
         initialConfig={profile?.avatar_config ?? getRandomAvatarConfig()}
+        premium={avatarPremium}
       />
     </motion.div>
   );

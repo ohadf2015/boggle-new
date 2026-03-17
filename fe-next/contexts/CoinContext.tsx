@@ -28,6 +28,21 @@ import {
 import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 
+// Coin effect toasts — neo-brutalist styled visual feedback for earn/spend
+function coinEarnToast(amount: number, reason?: string) {
+  toast(
+    `+${amount} gold${reason ? ` \u00b7 ${reason}` : ''}`,
+    { duration: 2500, style: { fontWeight: 700, background: '#1a1a2e', color: '#FFE135', border: '2px solid #FFE135', fontSize: '0.875rem' } }
+  );
+}
+
+function coinSpendToast(amount: number, reason?: string) {
+  toast(
+    `-${amount} gold${reason ? ` \u00b7 ${reason}` : ''}`,
+    { duration: 2500, style: { fontWeight: 700, background: '#1a1a2e', color: '#FF6B35', border: '2px solid #FF6B35', fontSize: '0.875rem' } }
+  );
+}
+
 // Types
 export interface CoinRewardBreakdown {
   base: number;
@@ -169,6 +184,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       if (result.success) {
         await refreshProfile();
         const { data: freshProfile } = await getProfile(user.id);
+        coinEarnToast(amount, reason);
         return freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
       } else {
         console.error('[CoinContext] Failed to add coins:', result.error);
@@ -178,6 +194,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     } else {
       const newTotal = addLocalCoins(amount, reason, metadata);
       setLocalCoins(newTotal);
+      coinEarnToast(amount, reason);
       return newTotal;
     }
   }, [isAuthenticated, user, coins, refreshProfile]);
@@ -197,6 +214,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 
       if (result.success) {
         await refreshProfile();
+        coinSpendToast(amount, reason);
         return true;
       } else {
         console.error('[CoinContext] Failed to spend coins:', result.error);
@@ -207,6 +225,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       const success = spendLocalCoins(amount, reason, metadata);
       if (success) {
         setLocalCoins(getCoins());
+        coinSpendToast(amount, reason);
       }
       return success;
     }

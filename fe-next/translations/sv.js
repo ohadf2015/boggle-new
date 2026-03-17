@@ -165,6 +165,7 @@ const sv = {
     "today": "Idag",
     "yesterday": "Igår",
     "processing": "Bearbetar...",
+    "opponent": "Motståndare",
     "coins": "mynt",
     "xp": "XP",
     "chat": "Chatt",
@@ -662,6 +663,17 @@ const sv = {
       "gender": "Kroppstyp",
       "male": "Man",
       "female": "Kvinna"
+    },
+    "premium": {
+      "locked": "VIP-del",
+      "unlock": "Lås upp denna del",
+      "watchAd": "Se reklam för att prova i 24h",
+      "buyWithGold": "Lås upp för {price} guld",
+      "unlocked": "Upplåst!",
+      "tempUnlock": "Upplåst i 24h",
+      "vipBadge": "VIP",
+      "filterAll": "Alla",
+      "filterVip": "Bara VIP"
     }
   },
   "error": {
@@ -1473,6 +1485,7 @@ const sv = {
     "words": "Ord",
     "bestWord": "Bästa",
     "missedWords": "Ord du missade",
+    "missedWordsSummary": "{count} ord på brädet som du inte hittade",
     "wordLengths": "Ordlängder",
     "missedOnBoard": "Ord du missade på brädet",
     "everyoneReady": "Alla redo!",
@@ -6615,7 +6628,9 @@ const sv = {
       "duelActivity": "Duellaktivitet",
       "live": "LIVE",
       "selectClassroom": "Välj klassrum",
-      "createClassroomFirst": "Skapa ett klassrum först för att spåra uppgifter och duellaktivitet"
+      "createClassroomFirst": "Skapa ett klassrum först för att spåra uppgifter och duellaktivitet",
+      "analytics": "Analys",
+      "insights": "INSIKTER"
     },
     "game": {
       "qrCode": "Visa QR-kod",
@@ -7866,7 +7881,13 @@ const sv = {
     weeklyWordMasteryDesc: "Bemästra {target} ord den här veckan"
   },
   ads: {
-    label: "Annons"
+    label: "Annons",
+    rewarded: {
+      watchForGold: "Se reklam för +{amount} guld",
+      earning: "Tittar...",
+      earned: "+{amount} guld tjänat!",
+      cooldown: "Tillgänglig snart"
+    }
   },
   wordHuntAnnouncement: {
     badge: "Nytt i Multiplayer",

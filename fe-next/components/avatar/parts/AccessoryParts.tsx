@@ -460,6 +460,139 @@ function Plunger({ fill }: AccessoryPartProps) {
   );
 }
 
+function Samurai({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="samuraiGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={fill} />
+          <stop offset="100%" stopColor="#333" />
+        </linearGradient>
+      </defs>
+      {/* Kabuto (helmet dome) */}
+      <path d="M20 35 Q50 8 80 35 L75 30 Q50 12 25 30Z" fill="url(#samuraiGrad)" stroke="#000" strokeWidth={S} />
+      {/* Crest (maedate) */}
+      <path d="M50 8 L48 20 L52 20Z" fill="#FFD700" stroke="#000" strokeWidth={1.5} />
+      <circle cx="50" cy="22" r="3" fill="#FFD700" stroke="#000" strokeWidth={1} />
+      {/* Cheek guards (fukikaeshi) */}
+      <path d="M20 35 L15 45 L23 40Z" fill={fill} stroke="#000" strokeWidth={1.5} />
+      <path d="M80 35 L85 45 L77 40Z" fill={fill} stroke="#000" strokeWidth={1.5} />
+      {/* Brow plate */}
+      <path d="M25 33 L75 33" stroke="#FFD700" strokeWidth={2} strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Astronaut({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      {/* Helmet dome (glass) */}
+      <ellipse cx="50" cy="44" rx="34" ry="32" fill="none" stroke={fill} strokeWidth={3} />
+      {/* Visor reflection */}
+      <path d="M28 32 Q50 24 72 32" fill="none" stroke="#fff" strokeWidth={2} opacity="0.3" />
+      {/* Helmet details */}
+      <rect x="22" y="58" width="8" height="6" rx="2" fill={fill} stroke="#000" strokeWidth={1} />
+      <rect x="70" y="58" width="8" height="6" rx="2" fill={fill} stroke="#000" strokeWidth={1} />
+      {/* Antenna */}
+      <line x1="50" y1="12" x2="50" y2="6" stroke={fill} strokeWidth={2} />
+      <circle cx="50" cy="5" r="2.5" fill="#FF0000" stroke="#000" strokeWidth={1} />
+      {/* Visor tint */}
+      <ellipse cx="50" cy="42" rx="28" ry="24" fill="#1A237E" opacity="0.15" />
+    </g>
+  );
+}
+
+function WizardHat({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="wizardGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor={fill} />
+          <stop offset="100%" stopColor="#1A0033" />
+        </linearGradient>
+      </defs>
+      {/* Pointy wizard hat */}
+      <path d="M25 32 L50 -5 L75 32 Q62 28 50 30 Q38 28 25 32Z" fill="url(#wizardGrad)" stroke="#000" strokeWidth={S} />
+      {/* Brim */}
+      <ellipse cx="50" cy="32" rx="30" ry="5" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Stars on hat */}
+      <polygon points="40,10 41,13 44,13 41.5,15 42.5,18 40,16 37.5,18 38.5,15 36,13 39,13" fill="#FFD700" />
+      <polygon points="58,16 59,18 61,18 59.5,19.5 60,21.5 58,20 56,21.5 56.5,19.5 55,18 57,18" fill="#FFD700" />
+      <circle cx="48" cy="22" r="1.5" fill="#E040FB" opacity="0.8" />
+      {/* Hat tip curl */}
+      <path d="M50 -5 Q56 -2 52 4" fill="none" stroke="#FFD700" strokeWidth={1.5} strokeLinecap="round" />
+    </g>
+  );
+}
+
+function NinjaScarf({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      {/* Face mask covering lower face */}
+      <path d="M25 45 Q50 42 75 45 L75 70 Q50 75 25 70Z" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Fabric folds */}
+      <path d="M35 50 Q38 52 35 55" fill="none" stroke="#000" strokeWidth={1} opacity="0.3" />
+      <path d="M65 50 Q62 52 65 55" fill="none" stroke="#000" strokeWidth={1} opacity="0.3" />
+      {/* Trailing scarf ends */}
+      <path d="M75 55 Q82 58 85 70 Q88 78 82 80" fill={fill} stroke="#000" strokeWidth={1.5} />
+      <path d="M75 60 Q80 64 83 72" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
+      {/* Eye slit line */}
+      <line x1="30" y1="45" x2="70" y2="45" stroke="#000" strokeWidth={1.5} />
+    </g>
+  );
+}
+
+// ==================== LEGENDARY: Phoenix Crown ====================
+function PhoenixCrown({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="phoenixCrownGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#B71C1C" />
+          <stop offset="40%" stopColor="#FF6D00" />
+          <stop offset="100%" stopColor="#FFD600" />
+        </linearGradient>
+        <linearGradient id="phoenixWingGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor={fill} />
+          <stop offset="30%" stopColor="#FF6D00" />
+          <stop offset="60%" stopColor="#FFAB00" />
+          <stop offset="100%" stopColor="#FFD600" />
+        </linearGradient>
+        <radialGradient id="phoenixGemGrad" cx="50%" cy="30%" r="50%">
+          <stop offset="0%" stopColor="#fff" />
+          <stop offset="40%" stopColor="#FF1744" />
+          <stop offset="100%" stopColor="#B71C1C" />
+        </radialGradient>
+      </defs>
+      {/* Left flame wing — sweeping upward arc */}
+      <path d="M22 28 C14 18 8 6 18 -2 C22 8 26 4 28 12 C30 6 34 2 32 14 L28 26Z"
+        fill="url(#phoenixWingGrad)" stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      {/* Right flame wing */}
+      <path d="M78 28 C86 18 92 6 82 -2 C78 8 74 4 72 12 C70 6 66 2 68 14 L72 26Z"
+        fill="url(#phoenixWingGrad)" stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      {/* Crown base band */}
+      <path d="M25 30 L75 30 L73 26 L27 26Z" fill="url(#phoenixCrownGrad)" stroke="#000" strokeWidth={S} />
+      {/* Crown peaks (3 points) */}
+      <path d="M28 26 L35 14 L42 26" fill="url(#phoenixCrownGrad)" stroke="#000" strokeWidth={1.5} />
+      <path d="M42 26 L50 8 L58 26" fill="url(#phoenixCrownGrad)" stroke="#000" strokeWidth={1.5} />
+      <path d="M58 26 L65 14 L72 26" fill="url(#phoenixCrownGrad)" stroke="#000" strokeWidth={1.5} />
+      {/* Center gem */}
+      <circle cx="50" cy="18" r="4" fill="url(#phoenixGemGrad)" stroke="#000" strokeWidth={1.5} />
+      {/* Side gems */}
+      <circle cx="35" cy="22" r="2.5" fill="url(#phoenixGemGrad)" stroke="#000" strokeWidth={1} />
+      <circle cx="65" cy="22" r="2.5" fill="url(#phoenixGemGrad)" stroke="#000" strokeWidth={1} />
+      {/* Ember particles floating above */}
+      <circle cx="20" cy="8" r="1" fill="#FFD600" opacity="0.7" />
+      <circle cx="42" cy="2" r="0.8" fill="#FF6D00" opacity="0.6" />
+      <circle cx="58" cy="4" r="1" fill="#FFD600" opacity="0.7" />
+      <circle cx="80" cy="8" r="0.8" fill="#FF6D00" opacity="0.6" />
+      <circle cx="50" cy="0" r="1.2" fill="#fff" opacity="0.5" />
+      {/* Gold detail lines on band */}
+      <line x1="30" y1="28" x2="70" y2="28" stroke="#FFD600" strokeWidth={1} opacity="0.6" />
+    </g>
+  );
+}
+
 export const ACCESSORY_PARTS = {
   none: None,
   glasses: Glasses,
@@ -495,6 +628,11 @@ export const ACCESSORY_PARTS = {
   cucumberFace: CucumberFace,
   monkeyEars: MonkeyEars,
   plunger: Plunger,
+  samurai: Samurai,
+  astronaut: Astronaut,
+  wizardHat: WizardHat,
+  ninjaScarf: NinjaScarf,
+  phoenixCrown: PhoenixCrown,
 } as const;
 
 export type AccessoryPart = keyof typeof ACCESSORY_PARTS;

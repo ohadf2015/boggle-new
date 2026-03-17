@@ -1,9 +1,17 @@
 import {
   customAvatarSchema,
   getRandomAvatarConfig,
+  getSeededAvatarConfig,
   isValidCustomAvatar,
   DEFAULT_AVATAR_CONFIG,
   type CustomAvatarConfig,
+  isPremiumPart,
+  isEpicPart,
+  isLegendaryPart,
+  getPremiumParts,
+  getPartPrice,
+  PREMIUM_PART_PRICES,
+  EPIC_PART_PRICES,
 } from '../customAvatar';
 
 describe('customAvatarSchema', () => {
@@ -117,5 +125,244 @@ describe('isValidCustomAvatar', () => {
 
   it('should return false for non-object', () => {
     expect(isValidCustomAvatar('string')).toBe(false);
+  });
+});
+
+describe('Premium Parts', () => {
+  describe('isPremiumPart', () => {
+    test('identifies premium eye styles', () => {
+      expect(isPremiumPart('eyes', 'laser')).toBe(true);
+      expect(isPremiumPart('eyes', 'hypno')).toBe(true);
+      expect(isPremiumPart('eyes', 'money')).toBe(true);
+      expect(isPremiumPart('eyes', 'alien')).toBe(true);
+      expect(isPremiumPart('eyes', 'star')).toBe(true);
+      expect(isPremiumPart('eyes', 'sparkle')).toBe(true);
+      expect(isPremiumPart('eyes', 'hearts')).toBe(true);
+      expect(isPremiumPart('eyes', 'cyclops')).toBe(true);
+      expect(isPremiumPart('eyes', 'monocleEye')).toBe(true);
+    });
+    test('identifies free eye styles', () => {
+      expect(isPremiumPart('eyes', 'round')).toBe(false);
+      expect(isPremiumPart('eyes', 'happy')).toBe(false);
+      expect(isPremiumPart('eyes', 'sleepy')).toBe(false);
+    });
+    test('identifies premium mouth styles', () => {
+      expect(isPremiumPart('mouth', 'goldTooth')).toBe(true);
+      expect(isPremiumPart('mouth', 'pipe')).toBe(true);
+      expect(isPremiumPart('mouth', 'vampire')).toBe(true);
+      expect(isPremiumPart('mouth', 'cat')).toBe(true);
+      expect(isPremiumPart('mouth', 'zipper')).toBe(true);
+      expect(isPremiumPart('mouth', 'blowfish')).toBe(true);
+      expect(isPremiumPart('mouth', 'kiss')).toBe(true);
+      expect(isPremiumPart('mouth', 'mustache')).toBe(true);
+    });
+    test('identifies free mouth styles', () => {
+      expect(isPremiumPart('mouth', 'smile')).toBe(false);
+      expect(isPremiumPart('mouth', 'grin')).toBe(false);
+    });
+    test('identifies premium accessories', () => {
+      expect(isPremiumPart('accessory', 'crown')).toBe(true);
+      expect(isPremiumPart('accessory', 'tiara')).toBe(true);
+      expect(isPremiumPart('accessory', 'halo')).toBe(true);
+      expect(isPremiumPart('accessory', 'viking')).toBe(true);
+      expect(isPremiumPart('accessory', 'devilHorns')).toBe(true);
+      expect(isPremiumPart('accessory', 'headphones')).toBe(true);
+      expect(isPremiumPart('accessory', 'chefHat')).toBe(true);
+      expect(isPremiumPart('accessory', 'monocle')).toBe(true);
+      expect(isPremiumPart('accessory', 'eyepatch')).toBe(true);
+      expect(isPremiumPart('accessory', 'mask')).toBe(true);
+      expect(isPremiumPart('accessory', 'sombrero')).toBe(true);
+      expect(isPremiumPart('accessory', 'cucumberFace')).toBe(true);
+      expect(isPremiumPart('accessory', 'monkeyEars')).toBe(true);
+      expect(isPremiumPart('accessory', 'plunger')).toBe(true);
+      expect(isPremiumPart('accessory', 'mustacheGlasses')).toBe(true);
+      expect(isPremiumPart('accessory', 'propellerHat')).toBe(true);
+    });
+    test('identifies free accessories', () => {
+      expect(isPremiumPart('accessory', 'glasses')).toBe(false);
+      expect(isPremiumPart('accessory', 'none')).toBe(false);
+      expect(isPremiumPart('accessory', 'hat')).toBe(false);
+    });
+    test('identifies premium hair styles', () => {
+      expect(isPremiumPart('hair', 'elvis')).toBe(true);
+      expect(isPremiumPart('hair', 'ramen')).toBe(true);
+      expect(isPremiumPart('hair', 'mohawk')).toBe(true);
+      expect(isPremiumPart('hair', 'sideshave')).toBe(true);
+      expect(isPremiumPart('hair', 'twintails')).toBe(true);
+    });
+    test('identifies free hair styles', () => {
+      expect(isPremiumPart('hair', 'spiky')).toBe(false);
+      expect(isPremiumPart('hair', 'curly')).toBe(false);
+    });
+    test('identifies premium bg colors', () => {
+      expect(isPremiumPart('bgColor', '#FF0000')).toBe(true);
+      expect(isPremiumPart('bgColor', '#000000')).toBe(true);
+      expect(isPremiumPart('bgColor', '#4B0082')).toBe(true);
+      expect(isPremiumPart('bgColor', '#FFD700')).toBe(true);
+    });
+    test('identifies free bg colors', () => {
+      expect(isPremiumPart('bgColor', '#1a1a2e')).toBe(false);
+    });
+    test('identifies premium bases', () => {
+      expect(isPremiumPart('base', 'hexagon')).toBe(true);
+      expect(isPremiumPart('base', 'blob')).toBe(true);
+      expect(isPremiumPart('base', 'diamond')).toBe(true);
+      expect(isPremiumPart('base', 'heart')).toBe(true);
+    });
+    test('identifies free bases', () => {
+      expect(isPremiumPart('base', 'round')).toBe(false);
+    });
+    test('returns false for unknown categories', () => {
+      expect(isPremiumPart('unknown' as any, 'anything')).toBe(false);
+    });
+  });
+
+  describe('getPremiumParts', () => {
+    test('returns all premium eye styles (VIP + Epic)', () => {
+      expect(getPremiumParts('eyes')).toEqual([
+        'laser', 'hypno', 'money', 'alien', 'star', 'sparkle', 'hearts', 'cyclops', 'monocleEye',
+        'galaxy', 'flame', 'robot', 'void', 'infinity',
+      ]);
+    });
+    test('returns all premium mouth styles (VIP + Epic)', () => {
+      expect(getPremiumParts('mouth')).toEqual([
+        'goldTooth', 'pipe', 'vampire', 'cat', 'zipper', 'blowfish', 'kiss', 'mustache',
+        'dragon', 'diamond', 'glitch',
+      ]);
+    });
+    test('returns all premium accessories (VIP + Epic)', () => {
+      expect(getPremiumParts('accessory')).toEqual([
+        'crown', 'tiara', 'halo', 'viking', 'devilHorns', 'headphones', 'chefHat',
+        'monocle', 'eyepatch', 'mask', 'sombrero',
+        'cucumberFace', 'monkeyEars', 'plunger',
+        'mustacheGlasses', 'propellerHat',
+        'samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown',
+      ]);
+    });
+    test('returns all premium hair styles (VIP + Epic)', () => {
+      expect(getPremiumParts('hair')).toEqual([
+        'elvis', 'ramen', 'mohawk', 'sideshave', 'twintails',
+        'flame', 'galaxy', 'neon',
+      ]);
+    });
+    test('returns premium bg colors', () => {
+      expect(getPremiumParts('bgColor')).toEqual(['#FF0000', '#000000', '#4B0082', '#FFD700']);
+    });
+    test('returns all premium bases (VIP + Epic)', () => {
+      expect(getPremiumParts('base')).toEqual([
+        'hexagon', 'blob', 'diamond', 'heart',
+        'skull', 'shield', 'star', 'dragonHead',
+      ]);
+    });
+    test('returns empty for unknown category', () => {
+      expect(getPremiumParts('unknown' as any)).toEqual([]);
+    });
+  });
+
+  describe('isEpicPart', () => {
+    test('identifies epic eye styles', () => {
+      expect(isEpicPart('eyes', 'galaxy')).toBe(true);
+      expect(isEpicPart('eyes', 'void')).toBe(true);
+    });
+    test('VIP parts are not epic', () => {
+      expect(isEpicPart('eyes', 'laser')).toBe(false);
+    });
+    test('free parts are not epic', () => {
+      expect(isEpicPart('eyes', 'round')).toBe(false);
+    });
+    test('identifies epic accessories', () => {
+      expect(isEpicPart('accessory', 'samurai')).toBe(true);
+      expect(isEpicPart('accessory', 'astronaut')).toBe(true);
+    });
+    test('identifies epic bases', () => {
+      expect(isEpicPart('base', 'skull')).toBe(true);
+      expect(isEpicPart('base', 'shield')).toBe(true);
+      expect(isEpicPart('base', 'star')).toBe(true);
+      expect(isEpicPart('base', 'dragonHead')).toBe(true);
+    });
+    test('identifies legendary parts as epic', () => {
+      expect(isEpicPart('eyes', 'infinity')).toBe(true);
+      expect(isEpicPart('accessory', 'phoenixCrown')).toBe(true);
+      expect(isEpicPart('base', 'dragonHead')).toBe(true);
+    });
+  });
+
+  describe('isLegendaryPart', () => {
+    test('identifies the 3 legendary items', () => {
+      expect(isLegendaryPart('eyes', 'infinity')).toBe(true);
+      expect(isLegendaryPart('accessory', 'phoenixCrown')).toBe(true);
+      expect(isLegendaryPart('base', 'dragonHead')).toBe(true);
+    });
+    test('epic parts are not legendary', () => {
+      expect(isLegendaryPart('eyes', 'galaxy')).toBe(false);
+      expect(isLegendaryPart('accessory', 'samurai')).toBe(false);
+      expect(isLegendaryPart('base', 'skull')).toBe(false);
+    });
+    test('VIP/free parts are not legendary', () => {
+      expect(isLegendaryPart('eyes', 'laser')).toBe(false);
+      expect(isLegendaryPart('eyes', 'round')).toBe(false);
+    });
+  });
+
+  describe('pricing', () => {
+    test('PREMIUM_PART_PRICES has category defaults', () => {
+      expect(PREMIUM_PART_PRICES.eyes).toBeDefined();
+      expect(PREMIUM_PART_PRICES.base).toBeDefined();
+    });
+    test('all VIP prices are positive', () => {
+      Object.values(PREMIUM_PART_PRICES).forEach(price => {
+        expect(price).toBeGreaterThan(0);
+      });
+    });
+    test('epic parts have individual pricing via EPIC_PART_PRICES', () => {
+      expect(EPIC_PART_PRICES['base:skull']).toBe(3000);
+      expect(EPIC_PART_PRICES['accessory:samurai']).toBe(2500);
+      expect(EPIC_PART_PRICES['eyes:void']).toBe(2000);
+    });
+    test('legendary parts are the most expensive', () => {
+      expect(EPIC_PART_PRICES['eyes:infinity']).toBe(7500);
+      expect(EPIC_PART_PRICES['accessory:phoenixCrown']).toBe(10000);
+      expect(EPIC_PART_PRICES['base:dragonHead']).toBe(10000);
+    });
+    test('getPartPrice returns epic override for epic parts', () => {
+      expect(getPartPrice('base', 'skull')).toBe(3000);
+      expect(getPartPrice('eyes', 'galaxy')).toBe(1500);
+    });
+    test('getPartPrice returns category default for VIP parts', () => {
+      expect(getPartPrice('eyes', 'laser')).toBe(400);
+      expect(getPartPrice('base', 'hexagon')).toBe(750);
+    });
+    test('all epic prices are higher than VIP category defaults', () => {
+      Object.entries(EPIC_PART_PRICES).forEach(([key, price]) => {
+        const category = key.split(':')[0];
+        const vipPrice = PREMIUM_PART_PRICES[category] ?? 0;
+        expect(price).toBeGreaterThan(vipPrice);
+      });
+    });
+  });
+
+  describe('random avatars exclude premium parts', () => {
+    test('getRandomAvatarConfig never returns premium parts', () => {
+      // Run 200 times to be statistically confident
+      for (let i = 0; i < 200; i++) {
+        const config = getRandomAvatarConfig();
+        expect(isPremiumPart('base', config.base)).toBe(false);
+        expect(isPremiumPart('eyes', config.eyes)).toBe(false);
+        expect(isPremiumPart('mouth', config.mouth)).toBe(false);
+        expect(isPremiumPart('accessory', config.accessory)).toBe(false);
+        expect(isPremiumPart('hair', config.hair)).toBe(false);
+      }
+    });
+
+    test('getSeededAvatarConfig never returns premium parts', () => {
+      for (let seed = 0; seed < 200; seed++) {
+        const config = getSeededAvatarConfig(seed);
+        expect(isPremiumPart('base', config.base)).toBe(false);
+        expect(isPremiumPart('eyes', config.eyes)).toBe(false);
+        expect(isPremiumPart('mouth', config.mouth)).toBe(false);
+        expect(isPremiumPart('accessory', config.accessory)).toBe(false);
+        expect(isPremiumPart('hair', config.hair)).toBe(false);
+      }
+    });
   });
 });

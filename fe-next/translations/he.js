@@ -165,6 +165,7 @@ const he = {
     "today": "היום",
     "yesterday": "אתמול",
     "processing": "מעבד...",
+    "opponent": "יריב",
     "coins": "מטבעות",
     "xp": "XP",
     "chat": "צ'אט",
@@ -662,6 +663,17 @@ const he = {
       "gender": "סוג גוף",
       "male": "זכר",
       "female": "נקבה"
+    },
+    "premium": {
+      "locked": "חלק VIP",
+      "unlock": "פתחו חלק זה",
+      "watchAd": "צפו בפרסומת לניסיון 24 שעות",
+      "buyWithGold": "פתחו תמורת {price} זהב",
+      "unlocked": "נפתח!",
+      "tempUnlock": "פתוח ל-24 שעות",
+      "vipBadge": "VIP",
+      "filterAll": "הכל",
+      "filterVip": "VIP בלבד"
     }
   },
   "error": {
@@ -1491,6 +1503,7 @@ const he = {
     "words": "מילים",
     "bestWord": "הטובה ביותר",
     "missedWords": "מילים שפספסת",
+    "missedWordsSummary": "{count} מילים על הלוח שלא מצאת",
     "wordLengths": "אורכי מילים",
     "missedOnBoard": "מילים שפספסת על הלוח",
     "everyoneReady": "כולם מוכנים!",
@@ -6640,7 +6653,9 @@ const he = {
       "duelActivity": "פעילות דו-קרבות",
       "live": "חי",
       "selectClassroom": "בחר כיתה",
-      "createClassroomFirst": "צור כיתה ראשונה כדי לעקוב אחר משימות ופעילות דו-קרבות"
+      "createClassroomFirst": "צור כיתה ראשונה כדי לעקוב אחר משימות ופעילות דו-קרבות",
+      "analytics": "אנליטיקה",
+      "insights": "תובנות"
     },
     "game": {
       "qrCode": "הצג קוד QR",
@@ -7871,7 +7886,13 @@ const he = {
     weeklyWordMasteryDesc: "שלוט ב-{target} מילים השבוע"
   },
   ads: {
-    label: "פרסומת"
+    label: "פרסומת",
+    rewarded: {
+      watchForGold: "צפו בפרסומת ל-+{amount} זהב",
+      earning: "צופים...",
+      earned: "+{amount} זהב הרווחתם!",
+      cooldown: "זמין בקרוב"
+    }
   },
   wordHuntAnnouncement: {
     badge: "חדש במולטיפלייר",

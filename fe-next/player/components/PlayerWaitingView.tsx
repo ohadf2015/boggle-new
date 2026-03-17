@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import RoomChat from '../../components/RoomChat';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
@@ -81,6 +82,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
   // Avatar builder state
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const avatarPremium = useAvatarPremium();
   const currentAvatar = getStoredCustomAvatar() ?? getRandomAvatarConfig();
 
   const handleAvatarSave = async (config: CustomAvatarConfig) => {
@@ -406,6 +408,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         onClose={() => setIsAvatarBuilderOpen(false)}
         onSave={handleAvatarSave}
         initialConfig={currentAvatar}
+        premium={avatarPremium}
       />
 
       {/* Exit Confirmation Dialog */}

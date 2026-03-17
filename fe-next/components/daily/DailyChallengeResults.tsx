@@ -2,14 +2,14 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Flame, Target, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
 import { Loader } from '@/components/ui/Loader';
-import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { SharePanelModal, XTwitterIcon, WhatsAppIcon } from './results/SharePanelModal';
 import { ImagePreviewModal } from './results/ImagePreviewModal';
 import { Button } from '@/components/ui/button';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
+import { ResultsHero } from '@/components/results/shared';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import { LANGUAGE_OPTIONS } from './results/constants';
 import type { Language } from '@/types';
@@ -22,6 +22,7 @@ import DailyLeaderboard from './DailyLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
+import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import { useDailyResultSubmission } from './results/useDailyResultSubmission';
 import {
   shareImageWithNativeShare,
@@ -221,104 +222,25 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       {/* LEFT COLUMN on desktop: score, stats, share, words (all existing stacked content) */}
       <div className="text-center space-y-5">
 
-        {/* Completion badge - Simplified */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', delay: 0.1 }}
-        >
-          {isNewCompletion ? (
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-cyan/20 rounded-full border border-neo-cyan/40">
-              <Trophy className="w-4 h-4 text-neo-cyan" />
-              <span className="font-bold text-neo-cyan text-sm uppercase tracking-wide">
-                {t('daily.completed')}
-              </span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-700/50 rounded-full border border-slate-600">
-              <Target className="w-4 h-4 text-slate-400" />
-              <span className="font-bold text-slate-400 text-sm uppercase tracking-wide">
-                {t('daily.alreadyPlayed')}
-              </span>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Score - Clear focal point */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          onClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
-          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] py-2 relative"
-        >
-          <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">
-            {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
-          </div>
-          <div className="text-7xl md:text-8xl font-black text-neo-lime drop-shadow-[0_0_20px_rgba(255,225,53,0.3)] my-1">
-            {Math.round(result.score)}
-          </div>
-          <div className="text-slate-400 text-sm font-medium">
-            {t('common.points')}
-          </div>
-
-          {/* Trophy mascot for top 3 finishers */}
-          {currentUserRank !== null && currentUserRank <= 3 && isNewCompletion && (
-            <div className="absolute -right-2 sm:right-0 top-1/2 -translate-y-1/2 pointer-events-none">
-              <CelebrationMascotWithEntrance
-                variant="trophy"
-                size="sm"
-                delay={0.5}
-                className="drop-shadow-lg"
-              />
-            </div>
-          )}
-        </motion.div>
-
-        {/* Streak milestone - Simplified */}
-        {streakMilestone && isNewCompletion && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', delay: 0.3 }}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full border border-amber-500/40"
-          >
-            <Flame className="w-5 h-5 text-amber-400" />
-            <span className="font-black text-amber-400">
-              {t('daily.streakDays').replace('{count}', String(streakMilestone))}
-            </span>
-          </motion.div>
-        )}
-
-        {/* Stats - Unified row design */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-3"
-        >
-          <div className="flex items-center justify-around">
-            <div className="text-center px-3">
-              <div className="text-2xl font-black text-white">{result.wordCount}</div>
-              <div className="text-xs text-slate-400 font-medium">{t('common.words')}</div>
-            </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-3">
-              <div className="flex items-center justify-center gap-1">
-                <Flame className="w-4 h-4 text-amber-400" />
-                <span className="text-2xl font-black text-white">{streak?.currentStreak ?? 0}</span>
-              </div>
-              <div className="text-xs text-slate-400 font-medium">{t('daily.streak')}</div>
-            </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-3">
-              <div className="text-2xl font-black text-white">
-                {Math.floor((result.timeSeconds ?? 0) / 60)}:{((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}
-              </div>
-              <div className="text-xs text-slate-400 font-medium">{t('results.time')}</div>
-            </div>
-          </div>
-        </motion.div>
+        {/* Hero Zone — unified score + stats */}
+        <ResultsHero
+          outcomeLabel={isNewCompletion ? t('daily.completed') : t('daily.alreadyPlayed')}
+          score={Math.round(result.score)}
+          subtitle={t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
+          pointsLabel={t('common.points')}
+          variant={isNewCompletion ? 'win' : 'neutral'}
+          badge={streakMilestone && isNewCompletion ? {
+            text: `🔥 ${t('daily.streakDays').replace('{count}', String(streakMilestone))}`,
+            variant: 'milestone',
+          } : undefined}
+          onScoreClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
+          inlineStats
+          stats={[
+            { label: t('common.words'), value: result.wordCount },
+            { label: t('daily.streak'), value: streak?.currentStreak ?? 0, icon: <Flame className="w-4 h-4 text-amber-400" /> },
+            { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
+          ]}
+        />
 
         {/* Share Section - Streamlined */}
         <motion.div
@@ -438,6 +360,16 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           >
             {t('daily.watchAdRetry') || 'Watch Ad to Retry'}
           </RewardedAdButton>
+        </motion.div>
+
+        {/* Bonus Gold Ad */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.53 }}
+          className="flex justify-center"
+        >
+          <RewardedAdGoldButton goldAmount={25} />
         </motion.div>
 
         {/* Next Step - Suggest Multiplayer */}

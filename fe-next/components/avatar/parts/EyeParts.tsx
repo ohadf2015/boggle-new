@@ -261,6 +261,142 @@ function Crying() {
   );
 }
 
+function Galaxy() {
+  return (
+    <g>
+      <defs>
+        <radialGradient id="galaxyEyeGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#E040FB" />
+          <stop offset="50%" stopColor="#7C4DFF" />
+          <stop offset="100%" stopColor="#1A237E" />
+        </radialGradient>
+      </defs>
+      {/* Nebula eyes */}
+      <circle cx="38" cy="42" r="7" fill="url(#galaxyEyeGrad)" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill="url(#galaxyEyeGrad)" stroke="#000" strokeWidth={S} />
+      {/* Tiny stars */}
+      <circle cx="36" cy="40" r="1" fill="#fff" opacity="0.9" />
+      <circle cx="40" cy="43" r="0.7" fill="#fff" opacity="0.7" />
+      <circle cx="60" cy="40" r="1" fill="#fff" opacity="0.9" />
+      <circle cx="64" cy="43" r="0.7" fill="#fff" opacity="0.7" />
+      {/* Center glow */}
+      <circle cx="38" cy="42" r="2" fill="#fff" opacity="0.5" />
+      <circle cx="62" cy="42" r="2" fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
+function FlameEyes() {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="flameEyeGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#FF6D00" />
+          <stop offset="50%" stopColor="#FF9100" />
+          <stop offset="100%" stopColor="#FFD600" />
+        </linearGradient>
+      </defs>
+      {/* Fire-shaped eyes */}
+      <path d="M38 48 C32 44 32 38 38 34 C44 38 44 44 38 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5} />
+      <path d="M62 48 C56 44 56 38 62 34 C68 38 68 44 62 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5} />
+      {/* Inner flame */}
+      <path d="M38 45 C36 43 36 40 38 38 C40 40 40 43 38 45Z" fill="#fff" opacity="0.6" />
+      <path d="M62 45 C60 43 60 40 62 38 C64 40 64 43 62 45Z" fill="#fff" opacity="0.6" />
+    </g>
+  );
+}
+
+function Robot() {
+  return (
+    <g>
+      {/* Rectangular screen eyes */}
+      <rect x="31" y="37" width="14" height="10" rx="2" fill="#0D47A1" stroke="#000" strokeWidth={S} />
+      <rect x="55" y="37" width="14" height="10" rx="2" fill="#0D47A1" stroke="#000" strokeWidth={S} />
+      {/* Scan lines */}
+      <line x1="33" y1="40" x2="43" y2="40" stroke="#00E5FF" strokeWidth={0.8} opacity="0.6" />
+      <line x1="33" y1="43" x2="43" y2="43" stroke="#00E5FF" strokeWidth={0.8} opacity="0.6" />
+      <line x1="57" y1="40" x2="67" y2="40" stroke="#00E5FF" strokeWidth={0.8} opacity="0.6" />
+      <line x1="57" y1="43" x2="67" y2="43" stroke="#00E5FF" strokeWidth={0.8} opacity="0.6" />
+      {/* Glowing pupils */}
+      <circle cx="38" cy="42" r="2.5" fill="#00E5FF" />
+      <circle cx="62" cy="42" r="2.5" fill="#00E5FF" />
+      {/* Reflection */}
+      <circle cx="37" cy="41" r="1" fill="#fff" opacity="0.5" />
+      <circle cx="61" cy="41" r="1" fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
+function Void() {
+  return (
+    <g>
+      <defs>
+        <radialGradient id="voidEyeGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#000" />
+          <stop offset="70%" stopColor="#1A0033" />
+          <stop offset="100%" stopColor="#4A0080" />
+        </radialGradient>
+      </defs>
+      {/* Bottomless void eyes */}
+      <circle cx="38" cy="42" r="7" fill="url(#voidEyeGrad)" stroke="#4A0080" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill="url(#voidEyeGrad)" stroke="#4A0080" strokeWidth={S} />
+      {/* Spiral hints */}
+      <path d="M38 42 Q36 39 38 37 Q40 39 38 42" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.5" />
+      <path d="M62 42 Q60 39 62 37 Q64 39 62 42" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.5" />
+      {/* Tiny pinprick of light in center */}
+      <circle cx="38" cy="42" r="0.8" fill="#E040FB" />
+      <circle cx="62" cy="42" r="0.8" fill="#E040FB" />
+    </g>
+  );
+}
+
+// ==================== LEGENDARY: Infinity Eyes ====================
+function Infinity() {
+  return (
+    <g>
+      <defs>
+        <radialGradient id="infinityRing1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#000" />
+          <stop offset="30%" stopColor="#1A0033" />
+          <stop offset="60%" stopColor="#4A00E0" />
+          <stop offset="100%" stopColor="#000" />
+        </radialGradient>
+        <linearGradient id="infinityRainbow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#FF0000" />
+          <stop offset="25%" stopColor="#FF8C00" />
+          <stop offset="50%" stopColor="#00FF88" />
+          <stop offset="75%" stopColor="#0088FF" />
+          <stop offset="100%" stopColor="#8B00FF" />
+        </linearGradient>
+      </defs>
+      {/* Outer rainbow ring — left */}
+      <circle cx="38" cy="42" r="8" fill="none" stroke="url(#infinityRainbow)" strokeWidth={2} />
+      <circle cx="38" cy="42" r="6" fill="none" stroke="url(#infinityRainbow)" strokeWidth={1} opacity="0.5" />
+      {/* Inner void — left */}
+      <circle cx="38" cy="42" r="5" fill="url(#infinityRing1)" />
+      {/* Orbiting particles — left */}
+      <circle cx="32" cy="38" r="0.8" fill="#FF0000" opacity="0.8" />
+      <circle cx="44" cy="39" r="0.8" fill="#00FF88" opacity="0.8" />
+      <circle cx="36" cy="48" r="0.6" fill="#0088FF" opacity="0.7" />
+      {/* Center singularity — left */}
+      <circle cx="38" cy="42" r="1.5" fill="#fff" opacity="0.8" />
+      <circle cx="38" cy="42" r="0.5" fill="#fff" />
+      {/* Outer rainbow ring — right */}
+      <circle cx="62" cy="42" r="8" fill="none" stroke="url(#infinityRainbow)" strokeWidth={2} />
+      <circle cx="62" cy="42" r="6" fill="none" stroke="url(#infinityRainbow)" strokeWidth={1} opacity="0.5" />
+      {/* Inner void — right */}
+      <circle cx="62" cy="42" r="5" fill="url(#infinityRing1)" />
+      {/* Orbiting particles — right */}
+      <circle cx="56" cy="38" r="0.8" fill="#8B00FF" opacity="0.8" />
+      <circle cx="68" cy="39" r="0.8" fill="#FF8C00" opacity="0.8" />
+      <circle cx="60" cy="48" r="0.6" fill="#FF0000" opacity="0.7" />
+      {/* Center singularity — right */}
+      <circle cx="62" cy="42" r="1.5" fill="#fff" opacity="0.8" />
+      <circle cx="62" cy="42" r="0.5" fill="#fff" />
+    </g>
+  );
+}
+
 export const EYE_PARTS = {
   round: Round,
   sleepy: Sleepy,
@@ -281,6 +417,11 @@ export const EYE_PARTS = {
   money: Money,
   alien: Alien,
   crying: Crying,
+  galaxy: Galaxy,
+  flame: FlameEyes,
+  robot: Robot,
+  void: Void,
+  infinity: Infinity,
 } as const;
 
 export type EyePart = keyof typeof EYE_PARTS;

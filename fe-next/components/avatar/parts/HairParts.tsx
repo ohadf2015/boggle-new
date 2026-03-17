@@ -332,6 +332,73 @@ function Mullet({ fill }: HairPartProps) {
   );
 }
 
+function FlameHair({ fill }: HairPartProps) {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="flameHairGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor={fill} />
+          <stop offset="40%" stopColor="#FF6D00" />
+          <stop offset="70%" stopColor="#FF9100" />
+          <stop offset="100%" stopColor="#FFD600" />
+        </linearGradient>
+      </defs>
+      {/* Main flame mass */}
+      <path d="M22 45 C20 30 25 18 35 10 C30 20 35 15 40 5 C38 18 45 12 50 2 C55 12 62 18 60 5 C65 15 70 20 65 10 C75 18 80 30 78 45"
+        fill="url(#flameHairGrad)" stroke="#000" strokeWidth={S} />
+      {/* Inner flame detail */}
+      <path d="M30 40 C32 30 38 22 42 15 C40 25 45 20 48 12" fill="none" stroke="#FFD600" strokeWidth={1} opacity="0.5" />
+      <path d="M70 40 C68 30 62 22 58 15 C60 25 55 20 52 12" fill="none" stroke="#FFD600" strokeWidth={1} opacity="0.5" />
+    </g>
+  );
+}
+
+function GalaxyHair({ fill }: HairPartProps) {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="galaxyHairGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#1A237E" />
+          <stop offset="33%" stopColor="#4A148C" />
+          <stop offset="66%" stopColor="#880E4F" />
+          <stop offset="100%" stopColor={fill} />
+        </linearGradient>
+      </defs>
+      {/* Flowing cosmic hair */}
+      <path d="M22 40 C18 28 28 14 50 14 C72 14 82 28 78 40 L78 55 Q70 48 62 52 Q55 48 50 55 Q45 48 38 52 Q30 48 22 55Z"
+        fill="url(#galaxyHairGrad)" stroke="#000" strokeWidth={S} />
+      {/* Embedded stars */}
+      <circle cx="32" cy="28" r="1.2" fill="#fff" opacity="0.8" />
+      <circle cx="45" cy="20" r="0.8" fill="#fff" opacity="0.6" />
+      <circle cx="58" cy="22" r="1" fill="#fff" opacity="0.7" />
+      <circle cx="68" cy="30" r="1.2" fill="#fff" opacity="0.8" />
+      <circle cx="38" cy="35" r="0.6" fill="#E040FB" opacity="0.5" />
+      <circle cx="62" cy="34" r="0.6" fill="#00BCD4" opacity="0.5" />
+    </g>
+  );
+}
+
+function NeonHair({ fill }: HairPartProps) {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="neonHairGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#FF00FF" />
+          <stop offset="50%" stopColor="#00FFFF" />
+          <stop offset="100%" stopColor={fill} />
+        </linearGradient>
+      </defs>
+      {/* Spiky neon hair */}
+      <path d="M22 40 L28 10 L35 30 L42 5 L50 25 L58 5 L65 30 L72 10 L78 40"
+        fill="url(#neonHairGrad)" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Glow lines */}
+      <path d="M30 35 L33 18" stroke="#fff" strokeWidth={1} opacity="0.4" />
+      <path d="M50 30 L50 15" stroke="#fff" strokeWidth={1} opacity="0.4" />
+      <path d="M70 35 L67 18" stroke="#fff" strokeWidth={1} opacity="0.4" />
+    </g>
+  );
+}
+
 export const HAIR_PARTS = {
   none: None,
   spiky: Spiky,
@@ -355,6 +422,9 @@ export const HAIR_PARTS = {
   combover: Combover,
   elvis: Elvis,
   ramen: Ramen,
+  flame: FlameHair,
+  galaxy: GalaxyHair,
+  neon: NeonHair,
 } as const;
 
 export type HairPart = keyof typeof HAIR_PARTS;

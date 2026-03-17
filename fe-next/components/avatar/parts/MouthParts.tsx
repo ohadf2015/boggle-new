@@ -220,6 +220,63 @@ function Pipe() {
   );
 }
 
+function Dragon() {
+  return (
+    <g>
+      {/* Open jaw with fangs */}
+      <path d="M35 58 Q50 72 65 58" fill="#8B0000" stroke="#000" strokeWidth={S} />
+      {/* Top fangs */}
+      <polygon points="40,58 42,64 38,64" fill="#fff" stroke="#000" strokeWidth={1} />
+      <polygon points="60,58 62,64 58,64" fill="#fff" stroke="#000" strokeWidth={1} />
+      {/* Fire breath wisps */}
+      <path d="M43 65 Q45 60 48 66 Q50 58 52 66 Q55 60 57 65" fill="none" stroke="#FF6D00" strokeWidth={1.5} opacity="0.7" />
+      <path d="M46 67 Q48 62 50 68 Q52 62 54 67" fill="none" stroke="#FFD600" strokeWidth={1} opacity="0.5" />
+    </g>
+  );
+}
+
+function DiamondMouth() {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="diamondMouthGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#E0F7FA" />
+          <stop offset="50%" stopColor="#80DEEA" />
+          <stop offset="100%" stopColor="#00ACC1" />
+        </linearGradient>
+      </defs>
+      {/* Diamond-encrusted grin */}
+      <path d="M37 58 Q50 68 63 58" fill="#fff" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Diamond teeth */}
+      <polygon points="42,58 44,63 40,63" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      <polygon points="48,59 50,65 46,65" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      <polygon points="54,59 56,65 52,65" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      <polygon points="60,58 62,63 58,63" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      {/* Sparkle accents */}
+      <circle cx="44" cy="61" r="0.5" fill="#fff" />
+      <circle cx="50" cy="62" r="0.5" fill="#fff" />
+      <circle cx="56" cy="61" r="0.5" fill="#fff" />
+    </g>
+  );
+}
+
+function Glitch() {
+  return (
+    <g>
+      {/* Glitched mouth — offset rectangles */}
+      <rect x="38" y="57" width="24" height="4" rx="1" fill="#000" />
+      {/* Glitch offset slices */}
+      <rect x="40" y="57" width="8" height="4" rx="1" fill="#FF0000" opacity="0.4" transform="translate(2, -1)" />
+      <rect x="52" y="57" width="8" height="4" rx="1" fill="#00FFFF" opacity="0.4" transform="translate(-2, 1)" />
+      {/* Pixel teeth */}
+      <rect x="41" y="57" width="3" height="2" fill="#fff" />
+      <rect x="46" y="57" width="3" height="2" fill="#fff" />
+      <rect x="51" y="57" width="3" height="2" fill="#fff" />
+      <rect x="56" y="57" width="3" height="2" fill="#fff" />
+    </g>
+  );
+}
+
 export const MOUTH_PARTS = {
   smile: Smile,
   grin: Grin,
@@ -240,6 +297,9 @@ export const MOUTH_PARTS = {
   blowfish: Blowfish,
   gap: Gap,
   pipe: Pipe,
+  dragon: Dragon,
+  diamond: DiamondMouth,
+  glitch: Glitch,
 } as const;
 
 export type MouthPart = keyof typeof MOUTH_PARTS;

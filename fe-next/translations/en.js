@@ -170,6 +170,7 @@ const en = {
     "today": "Today",
     "yesterday": "Yesterday",
     "processing": "Processing...",
+    "opponent": "Opponent",
     "coins": "coins",
     "xp": "XP",
     "chat": "Chat",
@@ -662,6 +663,17 @@ const en = {
       "gender": "Body Type",
       "male": "Male",
       "female": "Female"
+    },
+    "premium": {
+      "locked": "VIP Part",
+      "unlock": "Unlock this part",
+      "watchAd": "Watch ad to try for 24h",
+      "buyWithGold": "Unlock for {price} gold",
+      "unlocked": "Unlocked!",
+      "tempUnlock": "Unlocked for 24h",
+      "vipBadge": "VIP",
+      "filterAll": "All",
+      "filterVip": "VIP Only"
     }
   },
   "error": {
@@ -1599,6 +1611,7 @@ const en = {
     "words": "Words",
     "bestWord": "Best",
     "missedWords": "Missed",
+    "missedWordsSummary": "{count} words on the board you didn't find",
     "wordLengths": "Word Lengths",
     "missedOnBoard": "Words You Missed on the Board",
     "everyoneReady": "All Set!",
@@ -6717,7 +6730,9 @@ const en = {
       "duelActivity": "Duel Activity",
       "live": "LIVE",
       "selectClassroom": "Select Classroom",
-      "createClassroomFirst": "Create a classroom first to track assignments and duel activity"
+      "createClassroomFirst": "Create a classroom first to track assignments and duel activity",
+      "analytics": "Analytics",
+      "insights": "INSIGHTS"
     },
     "game": {
       "qrCode": "Show QR Code",
@@ -7201,6 +7216,17 @@ const en = {
       "correct": "Correct!",
       "incorrect": "Incorrect",
       "correctAnswer": "Correct answer:",
+      "points": "points",
+      "vocabularyWords": "Vocabulary Words",
+      "vocabularyWordsFound": "Vocabulary words found:",
+      "vocabulary": "Vocabulary",
+      "vocab": "vocab",
+      "foundWordsLabel": "Found words:",
+      "more": "more",
+      "allVocabFound": "All vocabulary words found!",
+      "total": "total",
+      "canEmbed": "can embed",
+      "trackOnly": "track only",
       "streak": "Streak",
       "difficulty": {
         "easy": "Easy",
@@ -7932,7 +7958,13 @@ const en = {
     weeklyWordMasteryDesc: "Master {target} words this week"
   },
   ads: {
-    label: "Advertisement"
+    label: "Advertisement",
+    rewarded: {
+      watchForGold: "Watch ad for +{amount} gold",
+      earning: "Watching...",
+      earned: "+{amount} gold earned!",
+      cooldown: "Available soon"
+    }
   },
   wordHuntAnnouncement: {
     badge: "New in Multiplayer",
