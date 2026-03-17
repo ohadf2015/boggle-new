@@ -114,6 +114,11 @@ jest.mock('@/utils/confettiUtils', () => ({
   fireVictoryConfetti: jest.fn(),
 }));
 
+// Mock ThemeContext (needed by RewardedAdButton)
+jest.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark' }),
+}));
+
 // ==============================================
 // TEST FIXTURES
 // ==============================================
