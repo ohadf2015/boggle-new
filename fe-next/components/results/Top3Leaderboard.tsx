@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
 import type { Player } from './types';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { fireConfetti, RANK_COLORS } from '@/utils/confettiUtils';
 import { RANK_CONFIG } from '@/utils/rankingStyles';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -66,6 +67,7 @@ export interface LeaderboardParticipant {
     color?: string;
     profilePictureUrl?: string | null;
     avatarImage?: string;
+    customAvatar?: CustomAvatarConfig | null;
   };
 }
 
@@ -213,7 +215,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 className={cn(
                   'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden cursor-pointer',
                   'bg-neo-cream',
-                  compact ? 'w-20 p-1.5' : rank === 1 ? 'w-28 p-2.5' : 'w-24 p-2',
+                  compact ? 'w-22 p-1.5' : rank === 1 ? 'w-32 p-3' : 'w-28 p-2.5',
                   isCurrentPlayer && 'ring-2 ring-neo-cyan'
                 )}
               >
@@ -230,8 +232,9 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                     <Avatar
                       profilePictureUrl={participant.avatar?.profilePictureUrl ?? undefined}
                       avatarImage={participant.avatar?.avatarImage}
-                      size="sm"
-                      className={cn('border-2 border-neo-black', compact ? 'w-8 h-8' : 'w-10 h-10')}
+                      customAvatar={participant.avatar?.customAvatar}
+                      size={compact ? 'md' : rank === 1 ? 'xl' : 'lg'}
+                      className={cn('border-2 border-neo-black', compact ? 'w-8 h-8' : rank === 1 ? 'w-14 h-14' : 'w-12 h-12')}
                     />
                   )}
                   {/* Rank badge overlay */}
@@ -250,6 +253,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                     username: participant.name,
                     profilePictureUrl: participant.avatar?.profilePictureUrl,
                     avatarImage: participant.avatar?.avatarImage,
+                    customAvatar: participant.avatar?.customAvatar,
                     score: participant.score,
                   }}
                   isCurrentUser={isCurrentPlayer}
@@ -280,7 +284,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
               {/* Podium Base */}
               <div className={cn(
                 'w-full rounded-t-neo border-2 border-neo-black border-b-0 flex items-center justify-center',
-                compact ? 'w-20' : rank === 1 ? 'w-28' : 'w-24',
+                compact ? 'w-22' : rank === 1 ? 'w-32' : 'w-28',
                 podium.podiumHeight,
                 config.bg
               )}>

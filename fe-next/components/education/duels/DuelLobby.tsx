@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useDuelSocket, type OpponentInfo, type ChallengeReceivedData } from '@/hooks/useDuelSocket';
+import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 import { getPendingDuelsForStudent, type DuelRow } from '@/lib/supabase/education/duels';
 import { cn } from '@/lib/utils';
 import { Users, Swords } from 'lucide-react';
@@ -144,21 +144,26 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
     <div
       data-testid="duel-lobby-container"
       className={cn(
-        'p-6 rounded-neo border-3 border-neo border-neo-black',
-        'bg-neo-navy/80 shadow-hard-sm'
+        'p-6 rounded-neo border-3 border-neo-black',
+        'bg-neo-navy shadow-hard-sm'
       )}
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Swords className="w-8 h-8 text-neo-yellow" />
-        <h2 className="text-2xl font-neo-display font-black text-neo-white">
+        <div className="w-10 h-10 rounded-neo bg-neo-pink border-3 border-black flex items-center justify-center shadow-hard-sm">
+          <Swords className="w-5 h-5 text-white" />
+        </div>
+        <h2 className="text-2xl font-neo-display font-black text-neo-white uppercase tracking-tight italic">
           {t('duelLobbyTitle')}
         </h2>
+        <span className="px-3 py-1 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest bg-neo-pink text-white">
+          PVP
+        </span>
       </div>
 
       {/* Pending Challenges Section */}
       <section className="mb-8">
-        <h3 className="text-xl font-neo-display font-bold text-neo-white mb-4">
+        <h3 className="text-lg font-neo-display font-black text-neo-yellow uppercase tracking-wide mb-4">
           {t('pendingChallenges')}
         </h3>
 
@@ -174,16 +179,16 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
               <div
                 key={challenge.id}
                 className={cn(
-                  'p-4 rounded-neo border-neo border-neo-black',
-                  'bg-neo-navy shadow-hard-sm',
+                  'p-4 rounded-neo border-3 border-black',
+                  'bg-white shadow-hard-sm',
                   'flex items-center justify-between gap-4'
                 )}
               >
                 <div className="flex-1">
-                  <p className="text-neo-white font-bold">
+                  <p className="text-black font-neo-body font-black">
                     {t('challengeFrom', { name: challenge.challenger_id })}
                   </p>
-                  <p className="text-neo-white/70 text-sm">
+                  <p className="text-black/60 text-sm font-bold">
                     {lessons.find((l) => l.id === challenge.lesson_id)?.name || 'Unknown Lesson'}
                   </p>
                 </div>
@@ -192,10 +197,12 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                   <button
                     onClick={() => handleAccept(challenge.id)}
                     className={cn(
-                      'px-4 py-2 font-bold rounded-neo',
-                      'bg-neo-lime text-neo-black',
-                      'border-neo border-neo-black shadow-hard-sm',
-                      'hover:shadow-hard transition-all'
+                      'px-4 py-2 font-black rounded-neo',
+                      'bg-neo-cyan text-black',
+                      'border-3 border-black shadow-hard-sm',
+                      'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+                      'transition-all duration-100',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-yellow'
                     )}
                   >
                     {t('accept')}
@@ -203,10 +210,12 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                   <button
                     onClick={() => handleDecline(challenge.id)}
                     className={cn(
-                      'px-4 py-2 font-bold rounded-neo',
-                      'bg-neo-pink text-neo-white',
-                      'border-neo border-neo-black shadow-hard-sm',
-                      'hover:shadow-hard transition-all'
+                      'px-4 py-2 font-black rounded-neo',
+                      'bg-neo-pink text-white',
+                      'border-3 border-black shadow-hard-sm',
+                      'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+                      'transition-all duration-100',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-yellow'
                     )}
                   >
                     {t('decline')}
@@ -224,21 +233,23 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
           onClick={handleQuickMatch}
           disabled={opponents.length === 0}
           className={cn(
-            'w-full px-6 py-4 font-black text-lg rounded-neo',
-            'bg-neo-yellow text-neo-black',
-            'border-neo border-neo-black shadow-hard',
-            'hover:shadow-hard-lg transition-all',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
+            'w-full px-6 py-4 font-black text-lg rounded-neo font-neo-display uppercase tracking-tight',
+            'bg-neo-yellow text-black',
+            'border-3 border-black shadow-hard',
+            'hover:-translate-y-1 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
+            'animate-neo-press transition-all duration-100',
+            'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-hard',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan'
           )}
         >
-          <Users className="w-6 h-6 inline me-2" />
+          <Swords className="w-6 h-6 inline me-2" />
           {t('quickMatch')}
         </button>
       </div>
 
       {/* Available Opponents Section */}
       <section>
-        <h3 className="text-xl font-neo-display font-bold text-neo-white mb-4">
+        <h3 className="text-lg font-neo-display font-black text-neo-cyan uppercase tracking-wide mb-4">
           {t('availableOpponents')}
         </h3>
 
@@ -251,24 +262,26 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                 key={opponent.userId}
                 onClick={() => handleSelectOpponent(opponent)}
                 className={cn(
-                  'p-4 rounded-neo border-neo border-neo-black',
-                  'bg-neo-navy shadow-hard-sm',
-                  'hover:shadow-hard hover:bg-neo-navy/80',
-                  'transition-all cursor-pointer',
-                  'flex flex-col items-center gap-2'
+                  'p-4 rounded-neo border-3 border-black',
+                  'bg-white shadow-hard-sm',
+                  'hover:-translate-y-1 hover:shadow-hard',
+                  'active:translate-y-0.5 active:shadow-hard-pressed',
+                  'transition-all duration-100 cursor-pointer',
+                  'flex flex-col items-center gap-2',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan'
                 )}
               >
                 {/* Avatar placeholder */}
-                <div className="w-12 h-12 rounded-full bg-neo-cyan flex items-center justify-center relative">
-                  <span className="text-neo-black font-black text-xl">
+                <div className="w-12 h-12 rounded-neo bg-neo-cyan border-3 border-black flex items-center justify-center relative shadow-hard-sm">
+                  <span className="text-black font-black text-xl font-neo-display">
                     {(opponent.displayName ?? '?').charAt(0).toUpperCase()}
                   </span>
-                  {/* Online indicator */}
-                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime border-neo border-neo-black"></div>
+                  {/* Online indicator — neo-cyan glow */}
+                  <div className="absolute -top-1.5 -end-1.5 w-4 h-4 rounded-full bg-neo-cyan border-3 border-black shadow-[0_0_8px_theme(colors.neo-cyan)]" />
                 </div>
 
                 {/* Name */}
-                <span className="text-neo-white font-bold text-sm text-center">
+                <span className="text-black font-neo-body font-bold text-sm text-center">
                   {opponent.displayName ?? '?'}
                 </span>
               </button>

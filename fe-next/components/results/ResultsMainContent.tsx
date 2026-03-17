@@ -3,30 +3,22 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { Star, Play, Check, Swords } from 'lucide-react';
-import type { PlayerArchetype } from '@/utils/playerArchetypes';
+import { Star, Play, Check, Swords, BookOpen } from 'lucide-react';
 import type { Player } from '@/components/results/types';
 
 // Dynamic imports for heavy components
-const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
 const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboard'), { ssr: false });
 const ScoreRevealAnimation = dynamic(() => import('@/components/results/ScoreRevealAnimation'), { ssr: false });
-const PlayersReadyIndicator = dynamic(() => import('@/components/results/PlayersReadyIndicator'), { ssr: false });
 const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
-const CompactResultsStats = dynamic(() => import('@/components/results/CompactResultsStats'), { ssr: false });
-// Mobile compact components
-const MobileCompactStats = dynamic(() => import('@/components/results/MobileCompactStats'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
-import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
+
 import NextStepPrompt from '@/components/results/NextStepPrompt';
-import ComparativeInsights from '@/components/results/ComparativeInsights';
+import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
-const WordHuntPromoPopup = dynamic(() => import('@/components/results/WordHuntPromoPopup'), { ssr: false });
-const TurningPointCard = dynamic(() => import('@/components/results/TurningPointCard'), { ssr: false });
 import { AdPlaceholder } from '@/components/ads';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 import ShareButton from '@/components/results/ShareButton';
-import MvpAwards from '@/components/results/MvpAwards';
+import { StatsCardGrid } from '@/components/results/shared';
 import type { ShareParams } from '@/shared/utils/shareResultGenerator';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
@@ -42,10 +34,6 @@ interface WinStreakData {
   previousStreak: number;
 }
 
-interface BrainPointsReward {
-  scoreDelta: number;
-  newScore: number;
-}
 
 // Import NearMiss type from NearMissCard
 import type { NearMiss } from '@/components/results/NearMissCard';
@@ -99,12 +87,6 @@ const StreakUrgencyDisplay: React.FC<{
 };
 
 export interface ResultsMainContentProps {
-  /** Banner player to display (current user or winner) */
-  bannerPlayer: Player | null;
-  /** Whether current user is shown in banner */
-  isCurrentUserInBanner: boolean;
-  /** Banner player's rank */
-  bannerRank: number;
   /** Sorted scores array */
   sortedScores: Player[];
   /** Near-miss notifications */
@@ -128,11 +110,11 @@ export interface ResultsMainContentProps {
   /** Current player's valid words */
   currentPlayerValidWords: Array<{ word: string; score: number }>;
   /** Current player's archetype */
-  currentPlayerArchetype: PlayerArchetype | null;
+  /** @deprecated Kept for compatibility — no longer rendered in main content */
+  currentPlayerArchetype: import('@/utils/playerArchetypes').PlayerArchetype | null;
   /** Current player's rank */
   currentPlayerRank: number;
-  /** Brain points reward data */
-  brainPointsReward: BrainPointsReward | null;
+
   /** Whether score reveal animation is complete */
   scoreRevealComplete: boolean;
   /** Setter for score reveal complete state */
@@ -188,9 +170,6 @@ export interface ResultsMainContentProps {
  * Used across mobile, desktop, and landscape layouts.
  */
 export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
-  bannerPlayer,
-  isCurrentUserInBanner,
-  bannerRank,
   sortedScores,
   nearMisses,
   isHost,
@@ -201,7 +180,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   currentPlayerValidWords,
   currentPlayerArchetype,
   currentPlayerRank,
-  brainPointsReward,
   scoreRevealComplete,
   setScoreRevealComplete,
   normalizeUsername,
@@ -236,17 +214,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
 
   return (
     <div className="space-y-3">
-      {/* Compact Celebration Banner */}
-      {bannerPlayer && (
-        <ResultsWinnerBanner
-          winner={bannerPlayer}
-          isCurrentUserWinner={isCurrentUserInBanner}
-          rank={bannerRank}
-          totalPlayers={sortedScores.length}
-          compact={isMobile}
-        />
-      )}
-
       {/* Top 3 Leaderboard / Podium - prominent placement */}
       {sortedScores.length > 1 && (
         scoreRevealComplete ? (
@@ -259,7 +226,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
               }))}
             />
           ) : (
-            <Top3Leaderboard players={sortedScores} currentUsername={username} compact showConfetti={!bannerPlayer} />
+            <Top3Leaderboard players={sortedScores} currentUsername={username} compact showConfetti />
           )
         ) : (
           <ScoreRevealAnimation
@@ -276,13 +243,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         )
       )}
 
-      {/* MVP Awards — every player wins something */}
-      {scoreRevealComplete && sortedScores.length > 1 && allPlayerWords && (
-        <MvpAwards
-          players={sortedScores}
-          allPlayerWords={allPlayerWords as Record<string, import('./types').WordObject[]>}
-        />
-      )}
+      {/* MVP Awards removed — notable stats shown per-player in leaderboard instead */}
 
       {/* Primary CTA - Play Again / Ready / Next Step (above the fold) */}
       {gameCode && onReturnToRoom && (
@@ -404,15 +365,13 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         )
       )}
 
-      {/* Players Ready Status - right after CTA for visibility */}
-      {gameCode && sortedScores.length > 1 && (
-        <PlayersReadyIndicator
-          players={sortedScores
-            .map(p => ({ username: p.username, avatar: p.avatar, isBot: (p as any).isBot, isHost: (p as any).isHost }))}
-          readyUsernames={readyUsernames}
-          currentUsername={username}
-          isHost={isHost}
-        />
+      {/* Ready status — inline text instead of separate component */}
+      {gameCode && sortedScores.length > 1 && readyUsernames.length > 0 && (
+        <div className="text-center" aria-live="polite">
+          <span className="text-xs text-neo-cream/60 font-medium">
+            {t('results.playersReady', { count: readyUsernames.length, total: sortedScores.length })}
+          </span>
+        </div>
       )}
 
       {/* Streak Urgency — motivate continued play */}
@@ -443,54 +402,64 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Turning Point + Comparative Insights — desktop only (mobile: in Details tab) */}
-      {!isMobile && (
-        <>
-          {allPlayerWords && username && sortedScores.length > 1 && sortedScores.length <= 6 && (
-            <TurningPointCard
-              allPlayerWords={allPlayerWords as Record<string, import('./types').WordObject[]>}
-              currentUsername={username}
-              t={t}
-            />
-          )}
-          {allPlayerWords && username && sortedScores.length > 1 && (
-            <ComparativeInsights
-              allPlayerWords={allPlayerWords}
-              currentUsername={username}
-              t={t}
-            />
-          )}
-        </>
-      )}
+      {/* TurningPointCard, ComparativeInsights, WordHuntPromoPopup removed — analysis belongs in Details tab */}
 
-      {/* Word Hunt Promo Popup - desktop only (mobile: too much scroll) */}
-      {!isMobile && gameCode && gameMode && gameMode !== 'word-hunt' && (
-        <WordHuntPromoPopup />
-      )}
-
-      {/* Compact Stats Row */}
+      {/* Stats Row — unified grid */}
       {currentPlayerData && currentPlayerRank > 0 && (
-        isMobile ? (
-          <MobileCompactStats
-            wordCount={currentPlayerValidWords.length}
-            accuracy={accuracy}
-            totalWords={currentPlayerData?.allWords?.length || 0}
-            archetype={currentPlayerArchetype}
-            achievements={currentPlayerData?.achievements}
-          />
-        ) : (
-          <CompactResultsStats
-            wordCount={currentPlayerValidWords.length}
-            accuracy={accuracy}
-            totalWords={currentPlayerData?.allWords?.length || 0}
-            archetype={currentPlayerArchetype}
-            achievements={currentPlayerData?.achievements}
-          />
-        )
+        <StatsCardGrid
+          cards={[
+            { label: t('results.words'), value: currentPlayerValidWords.length, icon: '📝' },
+            {
+              label: t('results.bestCombo'),
+              value: (() => {
+                const words = currentPlayerData?.allWords ?? [];
+                const maxCombo = words.reduce((max, w) => Math.max(max, w.comboBonus ?? 0), 0);
+                return maxCombo > 0 ? `x${maxCombo}` : '-';
+              })(),
+              icon: '⚡',
+              accent: 'amber',
+            },
+            {
+              label: t('results.bestWord'),
+              value: currentPlayerValidWords.length > 0
+                ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()
+                : '-',
+              icon: '⭐',
+              accent: 'lime',
+            },
+          ]}
+          variant="inline"
+        />
       )}
 
-      {/* Brain Points Feedback */}
-      <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
+
+      {/* Your Words — collapsed by default, for players who want to investigate */}
+      {currentPlayerValidWords.length > 0 && (
+        <CollapsibleSection
+          title={t('results.yourWords')}
+          icon={<BookOpen className="w-4 h-4" />}
+          badge={currentPlayerValidWords.length}
+          summary={currentPlayerValidWords.length > 0
+            ? `${t('results.bestWord')}: ${currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()}`
+            : undefined}
+          defaultExpanded={false}
+          variant="tertiary"
+          className="shadow-hard"
+        >
+          <div className="flex flex-wrap gap-1">
+            {currentPlayerValidWords
+              .sort((a, b) => b.score - a.score)
+              .map((w) => (
+                <span
+                  key={w.word}
+                  className="px-2 py-1 text-xs font-medium rounded-md bg-slate-800 text-slate-300 border border-slate-700"
+                >
+                  {w.word.toUpperCase()} <span className="text-neo-lime/70">{w.score}</span>
+                </span>
+              ))}
+          </div>
+        </CollapsibleSection>
+      )}
 
       {/* Large Room Notice - Compact */}
       {duplicateRuleDisabled && (

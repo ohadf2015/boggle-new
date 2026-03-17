@@ -101,20 +101,39 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
   // ==================== ACTIVITY LIST ====================
 
   return (
-    <div
+    <motion.div
       className={cn(
         'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
         isRTL && 'rtl'
       )}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-40px' }}
+      variants={{
+        hidden: { opacity: 0, y: 16 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { type: 'spring', stiffness: 260, damping: 24, staggerChildren: 0.06, delayChildren: 0.15 },
+        },
+      }}
     >
-      <div className="flex items-center gap-3 mb-4">
+      <motion.div
+        className="flex items-center gap-3 mb-4"
+        variants={{ hidden: { opacity: 0, x: -12 }, visible: { opacity: 1, x: 0 } }}
+      >
         <h2 className="text-xl font-neo-display font-black text-black">
           {t('student.dashboard.classroomActivity')}
         </h2>
-        <span className="px-2 py-0.5 bg-neo-cyan border-2 border-black rounded-neo text-xs font-bold text-black shadow-hard-sm">
+        <motion.span
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 14, delay: 0.3 }}
+          className="px-2 py-0.5 bg-neo-cyan border-2 border-black rounded-neo text-xs font-bold text-black shadow-hard-sm"
+        >
           {activities.length}
-        </span>
-      </div>
+        </motion.span>
+      </motion.div>
 
       <div className="space-y-2">
         {activities.map((activity, index) => {
@@ -125,23 +144,38 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
             <motion.div
               key={activity.id}
               data-testid={`activity-item-${activity.id}`}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
+              variants={{
+                hidden: { opacity: 0, x: -10, scale: 0.96 },
+                visible: {
+                  opacity: 1,
+                  x: 0,
+                  scale: 1,
+                  transition: { type: 'spring', stiffness: 350, damping: 22 },
+                },
+              }}
+              whileHover={{
+                x: 4,
+                boxShadow: '4px 4px 0px black',
+                transition: { type: 'spring', stiffness: 400, damping: 20 },
+              }}
               className={cn(
-                'flex items-center gap-3 p-3 rounded-neo border-2 transition-all',
+                'flex items-center gap-3 p-3 rounded-neo border-2 cursor-default',
                 isCurrentUser
                   ? 'border-neo-cyan bg-neo-cyan/10 shadow-hard-sm'
-                  : 'border-black/20 bg-gray-50 hover:border-black hover:bg-gray-100'
+                  : 'border-black/20 bg-gray-50'
               )}
             >
               {/* Avatar */}
-              <div className={cn(
-                'flex-shrink-0 w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-lg shadow-hard-sm',
-                isCurrentUser ? 'bg-neo-cyan' : 'bg-neo-yellow'
-              )}>
+              <motion.div
+                className={cn(
+                  'flex-shrink-0 w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-lg shadow-hard-sm',
+                  isCurrentUser ? 'bg-neo-cyan' : 'bg-neo-yellow'
+                )}
+                whileHover={{ scale: 1.15, rotate: -8 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              >
                 {activity.actorAvatar || '👤'}
-              </div>
+              </motion.div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
@@ -157,23 +191,25 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
               </div>
 
               {/* Icon */}
-              <div
+              <motion.div
                 data-testid={`activity-icon-${activity.type}`}
                 className={cn(
                   'flex-shrink-0 w-9 h-9 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm',
                   isDuel ? 'bg-neo-yellow' : 'bg-neo-cyan'
                 )}
+                whileHover={{ scale: 1.2, rotate: 8 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
                 {isDuel ? (
                   <Trophy className="w-5 h-5 text-black" />
                 ) : (
                   <Award className="w-5 h-5 text-black" />
                 )}
-              </div>
+              </motion.div>
             </motion.div>
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -105,19 +105,14 @@ export function MetricCard({
     <div
       data-testid={testId}
       className={cn(
-        'rounded-neo border-3 shadow-hard overflow-hidden',
-        'flex flex-col',
-        {
-          info: 'border-neo-cyan',
-          warning: 'border-neo-orange',
-          urgent: 'border-neo-pink',
-        }[severity || 'info'] || 'border-neo-cyan'
+        'rounded-neo border-3 border-black shadow-hard-sm overflow-hidden',
+        'flex flex-col'
       )}
     >
       {/* Colored header */}
       <div className={cn('px-4 pt-4 pb-3 flex items-center gap-3', cardBg)}>
         <div className={cn(
-          'w-11 h-11 rounded-neo border-2 border-black flex items-center justify-center flex-shrink-0 shadow-hard-sm',
+          'w-11 h-11 rounded-neo border-3 border-black flex items-center justify-center flex-shrink-0 shadow-hard-sm',
           iconBg
         )}>
           <span className={iconFg}>{icon}</span>
@@ -128,13 +123,20 @@ export function MetricCard({
       </div>
 
       {/* White body */}
-      <div className="bg-white px-4 py-3 flex flex-col gap-2 flex-1">
+      <div className="bg-white px-4 py-3 flex flex-col gap-2 flex-1 border-t-3 border-black">
         {/* Title */}
         <div className="text-sm font-neo-body font-bold text-black">{title}</div>
 
         {/* Trend Indicator */}
         {trend && trendValue && (
-          <div className={cn('flex items-center gap-1 text-sm font-bold font-neo-body', trendColor)}>
+          <div className={cn(
+            'flex items-center gap-1 text-sm font-black font-neo-body px-2 py-0.5 rounded-neo w-fit',
+            {
+              up: 'text-black bg-neo-cyan/20',
+              down: 'text-neo-pink bg-neo-pink/10',
+              neutral: 'text-black/60 bg-black/5',
+            }[trend]
+          )}>
             {trendIcon}
             <span>{trendValue}</span>
           </div>
@@ -145,11 +147,11 @@ export function MetricCard({
           <button
             onClick={actionable.onClick}
             className={cn(
-              'mt-1 px-3 py-2 bg-black text-white',
-              'font-bold font-neo-body text-sm rounded-neo shadow-hard-sm',
-              'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
+              'mt-1 px-3 py-2 bg-black text-neo-yellow',
+              'font-black font-neo-body text-sm rounded-neo border-3 border-black shadow-hard-sm',
+              'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
               'transition-all duration-100',
-              'focus:outline-none focus:ring-2 focus:ring-black'
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-yellow'
             )}
           >
             {actionable.label}

@@ -22,8 +22,10 @@ import { NavigationProvider } from '@/contexts/NavigationContext';
 // Global store for captured props (accessible by hoisted mocks)
 declare global {
   var __TEST_BANNER_PROPS__: { rank?: number; winner?: { username: string; score: number } } | null;
+  var __TEST_MAIN_CONTENT_PROPS__: { currentPlayerRank?: number; username?: string } | null;
 }
 globalThis.__TEST_BANNER_PROPS__ = null;
+globalThis.__TEST_MAIN_CONTENT_PROPS__ = null;
 
 // Mock all heavy dependencies
 jest.mock('@/contexts/AuthContext', () => ({
@@ -58,6 +60,7 @@ jest.mock('framer-motion', () => ({
     ),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 jest.mock('canvas-confetti', () => ({
@@ -65,30 +68,30 @@ jest.mock('canvas-confetti', () => ({
   default: jest.fn(),
 }));
 
-// Mock next/dynamic - needs to handle ResultsWinnerBanner specially
+// Mock next/dynamic - return null components for all dynamic imports
 jest.mock('next/dynamic', () => ({
   __esModule: true,
-  default: (importFn: () => Promise<{ default: React.ComponentType<any> }>) => {
-    // Check if this is ResultsWinnerBanner based on the import function string
-    const importStr = importFn.toString();
-    if (importStr.includes('ResultsWinnerBanner')) {
-      // Return our mock component that captures props
-      const MockBanner = (props: { rank?: number; winner?: { username: string; score: number } }) => {
-        globalThis.__TEST_BANNER_PROPS__ = props;
-        const React = require('react');
-        return React.createElement('div', {
-          'data-testid': 'winner-banner',
-          'data-rank': props.rank,
-        }, `${props.winner?.username} - Rank: ${props.rank}`);
-      };
-      MockBanner.displayName = 'ResultsWinnerBanner';
-      return MockBanner;
-    }
-    // Return a component that renders nothing for other dynamic imports
+  default: () => {
     const React = require('react');
     const Component = React.forwardRef((_props: any, _ref: any) => null);
     Component.displayName = 'DynamicComponent';
     return Component;
+  },
+}));
+
+// Mock ResultsMainContent to capture currentPlayerRank
+jest.mock('@/components/results/ResultsMainContent', () => ({
+  __esModule: true,
+  ResultsMainContent: (props: any) => {
+    globalThis.__TEST_MAIN_CONTENT_PROPS__ = {
+      currentPlayerRank: props.currentPlayerRank,
+      username: props.username,
+    };
+    const React = require('react');
+    return React.createElement('div', {
+      'data-testid': 'results-main-content',
+      'data-rank': props.currentPlayerRank,
+    });
   },
 }));
 
@@ -254,6 +257,7 @@ const renderResultsPage = (props: {
 describe('ResultsPage Ranking', () => {
   beforeEach(() => {
     globalThis.__TEST_BANNER_PROPS__ = null;
+    globalThis.__TEST_MAIN_CONTENT_PROPS__ = null;
     jest.clearAllMocks();
   });
 
@@ -269,9 +273,8 @@ describe('ResultsPage Ranking', () => {
         username: 'PlayerOne', // Exact match
       });
 
-      // The winner banner should show rank 1 for the winning player
-      expect(globalThis.__TEST_BANNER_PROPS__?.rank).toBe(1);
-      expect(globalThis.__TEST_BANNER_PROPS__?.winner?.username).toBe('PlayerOne');
+      // The main content should receive rank 1 for the winning player
+      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
     });
 
     it('should show rank 2 when player has second highest score', () => {
@@ -285,7 +288,7 @@ describe('ResultsPage Ranking', () => {
         username: 'Runner',
       });
 
-      expect(globalThis.__TEST_BANNER_PROPS__?.rank).toBe(2);
+      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(2);
     });
 
     /**
@@ -312,8 +315,8 @@ describe('ResultsPage Ranking', () => {
       });
 
       // EXPECTED: rank should be 1 (player with highest score)
-      // BUG: Currently shows rank 4 because username doesn't match
-      expect(globalThis.__TEST_BANNER_PROPS__?.rank).toBe(1);
+      // Username normalization (trim) ensures match despite trailing space
+      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
     });
 
     it('should show rank 1 even when username case differs (bug fix)', () => {
@@ -328,16 +331,13 @@ describe('ResultsPage Ranking', () => {
       });
 
       // EXPECTED: rank should be 1 (player with highest score)
-      // BUG: Currently shows rank 4 because username doesn't match (case sensitive)
-      expect(globalThis.__TEST_BANNER_PROPS__?.rank).toBe(1);
+      // Username normalization (lowercase) ensures match despite case difference
+      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
     });
 
-    it('should show capped rank for zero-score player in multiplayer (encouraging banner)', () => {
-      // When a player has zero score in multiplayer, bannerRank is capped at totalPlayers.
-      // Formula: Math.min(Math.max(currentPlayerRank, 4), totalPlayers)
-      // With 2 players: Math.min(Math.max(1, 4), 2) = Math.min(4, 2) = 2
-      // The rank is capped at totalPlayers to avoid showing a rank higher than the
-      // number of participants, while still triggering the "encouraging" banner style.
+    it('should show rank 1 for zero-score player listed first in multiplayer', () => {
+      // When both players have zero score, sort is stable so first player stays first.
+      // currentPlayerRank reflects the raw position (1-based).
       const finalScores = [
         { username: 'ZeroScorePlayer', score: 0, allWords: [] },
         { username: 'OtherPlayer', score: 0, allWords: [] },
@@ -348,8 +348,8 @@ describe('ResultsPage Ranking', () => {
         username: 'ZeroScorePlayer',
       });
 
-      // With only 2 players, rank is capped at totalPlayers (2), not 4
-      expect(globalThis.__TEST_BANNER_PROPS__?.rank).toBe(2);
+      // ZeroScorePlayer is first in the sorted list (stable sort, both score 0)
+      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
     });
   });
 });

@@ -53,6 +53,7 @@ jest.mock('lucide-react', () => ({
   HelpCircle: () => null,
   Copy: () => null,
   Plus: () => null,
+  Minus: () => null,
   UserPlus: () => null,
   Brain: () => null,
   Sparkles: () => null,
@@ -131,6 +132,14 @@ jest.mock('../components/pre-game/PresetSelector', () => ({
     party: { timer: 3, difficulty: 'EASY', nameKey: 'hostView.presetParty' },
     challenge: { timer: 5, difficulty: 'HARD', nameKey: 'hostView.presetPro' },
   },
+}));
+
+jest.mock('../components/pre-game/PlayerRoster', () => ({
+  PlayerRoster: () => null,
+}));
+
+jest.mock('../components/pre-game/BattleModeCard', () => ({
+  BattleModeCard: () => null,
 }));
 
 jest.mock('../components/pre-game/StartButton', () => ({

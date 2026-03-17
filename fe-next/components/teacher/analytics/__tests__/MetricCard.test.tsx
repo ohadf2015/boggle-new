@@ -100,7 +100,8 @@ describe('MetricCard - Trend Indicator', () => {
     });
 
     const trendElement = screen.getByText('+5%').parentElement;
-    expect(trendElement).toHaveClass('text-green-400');
+    expect(trendElement).toHaveClass('text-black');
+    expect(trendElement).toHaveClass('bg-neo-cyan/20');
   });
 
   it('renders down trend with correct styling', () => {
@@ -113,7 +114,8 @@ describe('MetricCard - Trend Indicator', () => {
     });
 
     const trendElement = screen.getByText('-5%').parentElement;
-    expect(trendElement).toHaveClass('text-red-400');
+    expect(trendElement).toHaveClass('text-neo-pink');
+    expect(trendElement).toHaveClass('bg-neo-pink/10');
   });
 
   it('renders neutral trend with correct styling', () => {
@@ -126,7 +128,8 @@ describe('MetricCard - Trend Indicator', () => {
     });
 
     const trendElement = screen.getByText('0%').parentElement;
-    expect(trendElement).toHaveClass('text-neo-white/60');
+    expect(trendElement).toHaveClass('text-black/60');
+    expect(trendElement).toHaveClass('bg-black/5');
   });
 });
 
@@ -144,7 +147,11 @@ describe('MetricCard - Severity Styling', () => {
     });
 
     const card = screen.getByTestId('metric-card');
-    expect(card).toHaveClass('border-neo-cyan');
+    // Card has border-black; severity affects the colored header bg
+    expect(card).toHaveClass('border-black');
+    // Header should have bg-neo-cyan
+    const header = card.firstElementChild;
+    expect(header).toHaveClass('bg-neo-cyan');
   });
 
   it('applies warning severity styling', () => {
@@ -156,7 +163,8 @@ describe('MetricCard - Severity Styling', () => {
     });
 
     const card = screen.getByTestId('metric-card');
-    expect(card).toHaveClass('border-neo-orange');
+    const header = card.firstElementChild;
+    expect(header).toHaveClass('bg-neo-yellow');
   });
 
   it('applies urgent severity styling', () => {
@@ -168,7 +176,8 @@ describe('MetricCard - Severity Styling', () => {
     });
 
     const card = screen.getByTestId('metric-card');
-    expect(card).toHaveClass('border-neo-pink');
+    const header = card.firstElementChild;
+    expect(header).toHaveClass('bg-neo-pink');
   });
 
   it('applies default styling when no severity provided', () => {
@@ -179,8 +188,9 @@ describe('MetricCard - Severity Styling', () => {
     });
 
     const card = screen.getByTestId('metric-card');
-    // Default severity is 'info' which uses neo-cyan border
-    expect(card).toHaveClass('border-neo-cyan');
+    // Default severity is 'info' which uses neo-cyan header
+    const header = card.firstElementChild;
+    expect(header).toHaveClass('bg-neo-cyan');
   });
 });
 

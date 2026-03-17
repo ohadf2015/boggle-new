@@ -6,6 +6,14 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AchievementGrid } from './AchievementGrid';
 
+// Mock motion components to avoid AnimatePresence keeping exiting elements
+jest.mock('@/components/motion/AdaptiveMotion', () => ({
+  AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  AdaptiveMotion: {
+    div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => <div ref={ref} {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap'].includes(k)))}>{children}</div>),
+  },
+}));
+
 // Mock dependencies
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({

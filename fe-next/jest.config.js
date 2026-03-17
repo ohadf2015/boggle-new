@@ -60,6 +60,9 @@ const customJestConfig = {
     'MusicContext.duplicateProvider.test.tsx',
   ],
 
+  // Prevent jest-haste-map from indexing the local remotion/ folder as the 'remotion' module
+  modulePathIgnorePatterns: ['<rootDir>/remotion/', '<rootDir>/.next/'],
+
   // Module aliases matching tsconfig paths
   moduleNameMapper: {
     // Handle module aliases
@@ -70,6 +73,12 @@ const customJestConfig = {
     '^@/utils/(.*)$': '<rootDir>/utils/$1',
     '^@/shared/(.*)$': '<rootDir>/shared/$1',
     '^@/types/(.*)$': '<rootDir>/types/$1',
+
+    // Prevent bare 'remotion' import from resolving to local remotion/ folder
+    '^remotion$': '<rootDir>/node_modules/remotion/dist/cjs/index.js',
+    // Mock @remotion packages that fail in Jest (ESM-only or missing CJS)
+    '^@remotion/media$': '<rootDir>/__mocks__/@remotion/media.ts',
+    '^@remotion/player$': '<rootDir>/__mocks__/@remotion/player.ts',
 
     // Capacitor plugins (mock for web testing)
     '^@capgo/capacitor-social-login$': '<rootDir>/__mocks__/@capgo/capacitor-social-login.ts',

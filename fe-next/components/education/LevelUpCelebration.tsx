@@ -10,7 +10,7 @@
 'use client';
 
 import { memo, useEffect, useId } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
@@ -36,6 +36,10 @@ export interface LevelUpCelebrationProps {
 }
 
 // ==============================================
+// COUNT-UP HOOK
+// ==============================================
+
+// ==============================================
 // COMPONENT
 // ==============================================
 
@@ -43,7 +47,6 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
   ({ levelUpData, onClose }) => {
     const { t } = useLanguage();
     const titleId = useId();
-
     // Handle escape key
     useEffect(() => {
       const handleEscape = (event: KeyboardEvent) => {
@@ -68,13 +71,13 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
       return null;
     }
 
-    const { newLevel, newTitles = [] } = levelUpData;
+    const { newTitles = [] } = levelUpData;
     const hasTitleUnlocks = newTitles.length > 0;
 
     return (
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {/* Overlay */}
-        <motion.div
+        <AdaptiveMotion.div
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
@@ -89,7 +92,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
           onClick={onClose}
         >
           {/* Modal Card */}
-          <motion.div
+          <AdaptiveMotion.div
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',
@@ -101,17 +104,17 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 5 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             {/* Celebration Emoji */}
-            <motion.span
+            <AdaptiveMotion.span
               className="block text-6xl mb-4"
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
             >
               🎉
-            </motion.span>
+            </AdaptiveMotion.span>
 
             {/* Title */}
             <h2
@@ -131,7 +134,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               <p className="text-neo-white/70 font-bold text-lg mb-2">
                 {t('education.xp.newLevel')}
               </p>
-              <motion.div
+              <AdaptiveMotion.div
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
@@ -144,19 +147,19 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               >
                 <span
                   className={cn(
-                    'text-4xl md:text-5xl font-black',
+                    'text-4xl md:text-5xl font-black tabular-nums',
                     'text-neo-orange',
                     'drop-shadow-[0_0_10px_rgba(255,107,53,0.5)]'
                   )}
                 >
-                  {newLevel}
+                  {levelUpData.newLevel}
                 </span>
-              </motion.div>
+              </AdaptiveMotion.div>
             </div>
 
             {/* Title Unlock Section */}
             {hasTitleUnlocks && (
-              <motion.div
+              <AdaptiveMotion.div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
                   'bg-neo-orange/20 border-neo border-neo-orange'
@@ -170,7 +173,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 </p>
                 <div className="space-y-1">
                   {newTitles.map((title, index) => (
-                    <motion.p
+                    <AdaptiveMotion.p
                       key={title}
                       className={cn(
                         'text-lg md:text-xl font-black',
@@ -181,14 +184,14 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                       transition={{ delay: 0.7 + index * 0.1 }}
                     >
                       {title}
-                    </motion.p>
+                    </AdaptiveMotion.p>
                   ))}
                 </div>
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
             {/* Continue Button */}
-            <motion.button
+            <AdaptiveMotion.button
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
@@ -205,10 +208,10 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               transition={{ delay: 0.8 }}
             >
               {t('education.xp.continue')}
-            </motion.button>
-          </motion.div>
-        </motion.div>
-      </AnimatePresence>
+            </AdaptiveMotion.button>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveAnimatePresence>
     );
   }
 );

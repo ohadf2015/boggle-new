@@ -32,6 +32,32 @@ const mockTranslations: Record<string, string> = {
   'common.exit': 'Exit',
 };
 
+jest.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({
+    theme: 'dark',
+    setTheme: jest.fn(),
+  }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+jest.mock('@/contexts/CoinContext', () => ({
+  useCoinContext: () => ({
+    coins: 100,
+    spendCoins: jest.fn(),
+    refreshCoins: jest.fn(),
+    awardGameCompletion: jest.fn().mockResolvedValue(null),
+  }),
+}));
+
+jest.mock('@/components/ads/RewardedAdButton', () => ({
+  RewardedAdButton: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+  __esModule: true,
+  default: () => <div data-testid="rewarded-ad-gold-button">Ad</div>,
+}));
+
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,

@@ -69,6 +69,22 @@ const mockTranslations: Record<string, string> = {
   'common.validating': 'Checking...',
 };
 
+// Mock ad component to avoid deep provider chain (ThemeContext, CoinContext, useRewardedAd)
+jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+  __esModule: true,
+  default: () => null,
+  RewardedAdGoldButton: () => null,
+}));
+
+jest.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({
+    theme: 'dark',
+    setTheme: jest.fn(),
+    isDarkMode: true,
+  }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 jest.mock('@/contexts/LanguageContext', () => {
   const langValue = {
     t: (key: string) => mockTranslations[key] || key,

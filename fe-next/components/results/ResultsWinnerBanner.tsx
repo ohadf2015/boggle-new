@@ -5,6 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { fireRankConfetti } from '@/utils/confettiUtils';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
+import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { MascotWithEntrance, MascotVariant } from '@/components/ui/Mascot';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import type { PlayerResult } from '@/types/components';
@@ -38,6 +39,7 @@ interface WinnerData {
     color?: string;
     profilePictureUrl?: string | null;
     avatarImage?: string;
+    customAvatar?: CustomAvatarConfig | null;
   };
 }
 
@@ -320,7 +322,8 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                   <Avatar
                     profilePictureUrl={winner.avatar.profilePictureUrl ?? undefined}
                     avatarImage={winner.avatar.avatarImage}
-                    size={compact ? 'md' : 'lg'}
+                    customAvatar={winner.avatar.customAvatar}
+                    size={compact ? 'lg' : 'xl'}
                   />
                 </div>
               </motion.div>

@@ -13,6 +13,7 @@ jest.mock('@/contexts/AuthContext');
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
   },
 }));
 

@@ -6,12 +6,23 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 // Mock the hook
 jest.mock('@/hooks/useClassroomLeaderboard');
 
-// Mock Framer Motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  },
-}));
+// Mock AdaptiveMotion (used by the component instead of framer-motion directly)
+jest.mock('@/components/motion/AdaptiveMotion', () => {
+  const React = require('react');
+  const createMotionProxy = () =>
+    new Proxy({}, {
+      get: (_: any, tag: string) =>
+        React.forwardRef(({ children, ...props }: any, ref: any) =>
+          React.createElement(tag, { ...props, ref }, children)
+        ),
+    });
+  return {
+    __esModule: true,
+    AdaptiveMotion: createMotionProxy(),
+    AdaptiveAnimatePresence: ({ children }: any) => React.createElement(React.Fragment, null, children),
+    default: createMotionProxy(),
+  };
+});
 
 // Mock getLeaderboardTier used directly by TierBadge
 jest.mock('@/lib/supabase/education/leaderboard', () => ({

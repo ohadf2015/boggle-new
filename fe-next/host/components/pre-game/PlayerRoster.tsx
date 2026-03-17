@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Bot, X, UserPlus, Zap, Brain, Sparkles } from 'lucide-react';
+import { Crown, Bot, X, UserPlus } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useNativeShare } from '../../../hooks/useNativeShare';
 import { getJoinUrl, copyJoinUrl } from '../../../utils/share';
@@ -34,15 +34,13 @@ interface PlayerRosterProps {
 const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
 
 const DIFFICULTY_CONFIG: Record<BotDifficulty, {
-  icon: typeof Zap;
-  color: string;
   bgColor: string;
   glowColor: string;
   emoji: string;
 }> = {
-  easy: { icon: Sparkles, color: 'text-neo-lime', bgColor: 'bg-neo-lime', glowColor: 'rgba(132, 255, 0, 0.4)', emoji: '🌱' },
-  medium: { icon: Brain, color: 'text-neo-yellow', bgColor: 'bg-neo-yellow', glowColor: 'rgba(255, 225, 53, 0.4)', emoji: '🧠' },
-  hard: { icon: Zap, color: 'text-neo-orange', bgColor: 'bg-neo-orange', glowColor: 'rgba(255, 107, 53, 0.5)', emoji: '🔥' },
+  easy: { bgColor: 'bg-neo-lime', glowColor: 'rgba(132, 255, 0, 0.4)', emoji: '🌱' },
+  medium: { bgColor: 'bg-neo-yellow', glowColor: 'rgba(255, 225, 53, 0.4)', emoji: '🧠' },
+  hard: { bgColor: 'bg-neo-orange', glowColor: 'rgba(255, 107, 53, 0.5)', emoji: '🔥' },
 };
 
 /** Bot entrance: drops in with overshoot bounce */
@@ -74,32 +72,9 @@ const playerEntranceVariants = {
 export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
   const { tryNativeShare } = useNativeShare();
-  const [showBotPicker, setShowBotPicker] = useState(false);
   const [removingBot, setRemovingBot] = useState<string | null>(null);
-  const [justAdded, setJustAdded] = useState<string | null>(null);
-  const pickerRef = useRef<HTMLDivElement>(null);
 
   const isFull = players.length >= maxPlayers;
-  const botCount = players.filter(p => typeof p === 'object' && p.isBot).length;
-
-  // Close picker when clicking outside
-  useEffect(() => {
-    if (!showBotPicker) return;
-    const handleClick = (e: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setShowBotPicker(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [showBotPicker]);
-
-  // Flash "just added" effect
-  useEffect(() => {
-    if (!justAdded) return;
-    const timer = setTimeout(() => setJustAdded(null), 1200);
-    return () => clearTimeout(timer);
-  }, [justAdded]);
 
   const handleInvite = useCallback(async () => {
     const joinUrl = getJoinUrl(gameCode, 'lobby-slot');
@@ -113,26 +88,11 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
     }
   }, [gameCode, t, tryNativeShare]);
 
-  const handleAddBot = useCallback((difficulty: BotDifficulty) => {
-    socket?.emit('addBot', { difficulty, gameCode });
-    setShowBotPicker(false);
-    // Track last-added for flash effect (set on next re-render via socket event)
-    const handler = (data: { username?: string }) => {
-      if (data?.username) setJustAdded(data.username);
-    };
-    socket?.once('botAdded', handler);
-  }, [socket, gameCode]);
-
   const handleRemoveBot = useCallback((botUsername: string) => {
     setRemovingBot(botUsername);
     socket?.emit('removeBot', { username: botUsername, gameCode });
     setTimeout(() => setRemovingBot(null), 600);
   }, [socket, gameCode]);
-
-  const handleQuickFill = useCallback(() => {
-    handleAddBot('easy');
-    setTimeout(() => handleAddBot('medium'), 300);
-  }, [handleAddBot]);
 
   return (
     <section className="space-y-3">
@@ -158,7 +118,6 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
             const isBot = typeof player === 'object' ? player.isBot : false;
             const botDifficulty = (typeof player === 'object' ? player.botDifficulty : undefined) as BotDifficulty | undefined;
             const isMe = name === username;
-            const isJustAdded = justAdded === name;
             const diffConfig = botDifficulty ? DIFFICULTY_CONFIG[botDifficulty] : null;
 
             const variants = isBot ? botEntranceVariants : playerEntranceVariants;
@@ -193,7 +152,6 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                   <motion.div
                     animate={{
                       y: [0, -4, 0],
-                      ...(isJustAdded ? { scale: [1, 1.15, 1] } : {}),
                     }}
                     transition={{
                       y: { duration: isBot ? 2.5 : 3, repeat: Infinity, ease: 'easeInOut', delay: index * 0.2 },
@@ -215,7 +173,6 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                       'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                       isMe && 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
-                      isJustAdded && 'ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-navy'
                     )}>
                       {avatar?.customAvatar || avatar?.profilePictureUrl || avatar?.avatarImage ? (
                         <Avatar
@@ -272,83 +229,6 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
           })}
         </AnimatePresence>
 
-        {/* Add Bot button with breathing animation */}
-        {!isFull && (
-          <div ref={pickerRef} className="flex-shrink-0 flex flex-col items-center gap-2 relative">
-            <motion.button
-              onClick={() => setShowBotPicker(prev => !prev)}
-              animate={{
-                scale: showBotPicker ? 1.05 : [1, 1.06, 1],
-                borderColor: showBotPicker ? 'rgba(0, 255, 255, 0.8)' : 'rgba(0, 255, 255, 0.4)',
-              }}
-              transition={{
-                scale: { duration: 2, repeat: showBotPicker ? 0 : Infinity, ease: 'easeInOut' },
-              }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className={cn(
-                'w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center transition-colors cursor-pointer',
-                showBotPicker
-                  ? 'bg-neo-cyan/20 border-neo-cyan'
-                  : 'bg-neo-cyan/5 border-neo-cyan/40 hover:bg-neo-cyan/15'
-              )}
-              aria-label={t('hostView.addBot')}
-            >
-              <motion.div animate={showBotPicker ? { rotate: 180 } : { rotate: 0 }}>
-                <Bot className={cn('w-6 h-6 transition-colors', showBotPicker ? 'text-neo-cyan' : 'text-neo-cyan/60')} />
-              </motion.div>
-            </motion.button>
-            <span className="text-[11px] font-bold text-slate-600 uppercase transition-colors">
-              {t('hostView.addBot')}
-            </span>
-
-            {/* Difficulty picker with staggered entrance */}
-            <AnimatePresence>
-              {showBotPicker && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.85, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.85, y: -10 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                  className="absolute top-full mt-2 z-30 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[150px]"
-                >
-                  {(['easy', 'medium', 'hard'] as BotDifficulty[]).map((diff, i) => {
-                    const config = DIFFICULTY_CONFIG[diff];
-                    const Icon = config.icon;
-                    return (
-                      <motion.button
-                        key={diff}
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.06, type: 'spring', stiffness: 500, damping: 25 }}
-                        whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.1)' }}
-                        whileTap={{ scale: 0.96 }}
-                        onClick={() => handleAddBot(diff)}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-start transition-colors"
-                      >
-                        <motion.div
-                          whileHover={{ rotate: 15, scale: 1.1 }}
-                          className={cn('w-7 h-7 rounded-full flex items-center justify-center border-2 border-neo-black shadow-hard-sm', config.bgColor)}
-                        >
-                          <Icon className="w-4 h-4 text-neo-black" />
-                        </motion.div>
-                        <div className="flex flex-col">
-                          <span className={cn('text-xs font-bold uppercase leading-tight', config.color)}>
-                            {t(`hostView.bot${diff.charAt(0).toUpperCase() + diff.slice(1)}`)}
-                          </span>
-                          <span className="text-[9px] text-slate-500 leading-tight">
-                            {config.emoji}
-                          </span>
-                        </div>
-                      </motion.button>
-                    );
-                  })}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
         {/* Invite player */}
         {!isFull && (
           <motion.button
@@ -368,60 +248,6 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
         )}
       </div>
 
-      {/* Quick-fill bar — playful CTA when lobby is empty */}
-      <AnimatePresence>
-        {!isFull && players.length <= 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="px-1"
-          >
-            <motion.button
-              onClick={handleQuickFill}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-gradient-to-r from-neo-cyan/15 to-neo-pink/10 border-2 border-neo-cyan/30 rounded-lg hover:border-neo-cyan/60 transition-all"
-            >
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
-              >
-                <Bot className="w-5 h-5 text-neo-cyan" />
-              </motion.div>
-              <span className="text-sm font-bold text-neo-cyan">
-                {t('hostView.quickFillBots')}
-              </span>
-              <span className="text-xs text-neo-cyan/50">
-                🌱 + 🧠
-              </span>
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Bot count pill */}
-      <AnimatePresence>
-        {botCount > 0 && (
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            className="flex items-center gap-1.5 px-1"
-          >
-            <motion.div
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Bot className="w-3 h-3 text-neo-cyan/60" />
-            </motion.div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neo-cyan/60">
-              {t('hostView.botCount', { count: botCount })}
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }
