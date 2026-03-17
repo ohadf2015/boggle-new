@@ -18,7 +18,7 @@ interface BodyPartProps {
 function Male({ fill, shirtColor }: BodyPartProps) {
   const shirt = shirtColor || '#4A90D9';
   const shirtShadow = darken(shirt);
-  const neckShade = darken(fill, 0.12);
+  const neckShade = darken(fill, 0.25);
   return (
     <g>
       {/* Neck — wide, masculine, slightly darker than face for depth */}
@@ -46,7 +46,7 @@ function Male({ fill, shirtColor }: BodyPartProps) {
 function Female({ fill, shirtColor }: BodyPartProps) {
   const shirt = shirtColor || '#E85D9B';
   const shirtShadow = darken(shirt);
-  const neckShade = darken(fill, 0.12);
+  const neckShade = darken(fill, 0.25);
   return (
     <g>
       {/* Slender neck — slightly darker than face for depth */}

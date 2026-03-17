@@ -12,7 +12,7 @@ interface BasePartProps {
 }
 
 const Nose = () => (
-  <path d="M48 54 Q50 58 52 54" fill="none" stroke="#000" strokeWidth={1.2} opacity="0.3" />
+  <path d="M48 54 Q50 58 52 54" fill="none" stroke="#000" strokeWidth={1.5} opacity="0.45" />
 );
 
 function Round({ fill }: BasePartProps) {

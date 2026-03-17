@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useId } from 'react';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { darken, lighten } from './parts/avatarDesignConstants';
 import { BASE_PARTS } from './parts/BaseParts';
@@ -62,6 +62,9 @@ const SKIP_BLINK_EYES = new Set([
 ]);
 
 const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular }) => {
+  const uid = useId();
+  const faceShadowId = `fs${uid}`;
+  const blinkClipId = `bc${uid}`;
   const BasePart = BASE_PARTS[config.base] ?? BASE_PARTS.round;
   const EyePart = EYE_PARTS[config.eyes] ?? EYE_PARTS.round;
   const MouthPart = MOUTH_PARTS[config.mouth] ?? MOUTH_PARTS.smile;
@@ -74,8 +77,8 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
   const isBackAccessory = BACK_ACCESSORY_STYLES.has(config.accessory);
   const blushColor = getBlushColor(config.skinColor);
   const showDepth = !SKIP_BLUSH_BASES.has(config.base);
-  const skinShadow = darken(config.skinColor, 0.15);
-  const skinHighlight = lighten(config.skinColor, 0.2);
+  const skinShadow = darken(config.skinColor, 0.3);
+  const skinHighlight = lighten(config.skinColor, 0.25);
   const canBlink = !SKIP_BLINK_EYES.has(config.eyes) && !disableEffects;
 
   const svgElement = (
@@ -90,15 +93,11 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
     >
       {/* Shared filter definitions */}
       <defs>
-        <filter id="faceShadow" x="-10%" y="-10%" width="120%" height="130%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#000" floodOpacity="0.18" />
+        <filter id={faceShadowId} x="-10%" y="-10%" width="120%" height="130%">
+          <feDropShadow dx="0" dy="3" stdDeviation="2.5" floodColor="#000" floodOpacity="0.3" />
         </filter>
-        <radialGradient id="faceHighlight" cx="42%" cy="32%" r="45%">
-          <stop offset="0%" stopColor="#fff" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
-        </radialGradient>
         {canBlink && (
-          <clipPath id="blinkClip">
+          <clipPath id={blinkClipId}>
             <rect x="0" y="0" width="100" height="100">
               <animate
                 attributeName="height"
@@ -128,43 +127,43 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       {isBackStyle && <HairPart fill={config.hairColor} />}
 
       {/* Face base with drop shadow for depth */}
-      <g filter="url(#faceShadow)">
+      <g filter={`url(#${faceShadowId})`}>
         <BasePart fill={config.skinColor} />
       </g>
 
       {/* Forehead highlight — subtle 3D curvature on human faces */}
       {showDepth && CIRCULAR_BASES.has(config.base) && (
-        <ellipse cx="44" cy="40" rx="14" ry="10" fill={skinHighlight} opacity="0.12" />
+        <ellipse cx="44" cy="40" rx="14" ry="10" fill={skinHighlight} opacity="0.22" />
       )}
       {showDepth && ELLIPTICAL_BASES.has(config.base) && (
-        <ellipse cx="44" cy="38" rx="12" ry="12" fill={skinHighlight} opacity="0.12" />
+        <ellipse cx="44" cy="38" rx="12" ry="12" fill={skinHighlight} opacity="0.22" />
       )}
       {showDepth && config.base === 'heart' && (
-        <ellipse cx="44" cy="42" rx="10" ry="8" fill={skinHighlight} opacity="0.1" />
+        <ellipse cx="44" cy="42" rx="10" ry="8" fill={skinHighlight} opacity="0.18" />
       )}
       {showDepth && config.base === 'hexagon' && (
-        <ellipse cx="44" cy="38" rx="12" ry="8" fill={skinHighlight} opacity="0.1" />
+        <ellipse cx="44" cy="38" rx="12" ry="8" fill={skinHighlight} opacity="0.18" />
       )}
       {showDepth && config.base === 'square' && (
-        <ellipse cx="42" cy="36" rx="14" ry="8" fill={skinHighlight} opacity="0.1" />
+        <ellipse cx="42" cy="36" rx="14" ry="8" fill={skinHighlight} opacity="0.18" />
       )}
 
       {/* Chin shadow — depth below the face for jawline separation */}
       {showDepth && CIRCULAR_BASES.has(config.base) && (
-        <ellipse cx="50" cy="72" rx="16" ry="6" fill={skinShadow} opacity="0.35" />
+        <ellipse cx="50" cy="72" rx="16" ry="6" fill={skinShadow} opacity="0.55" />
       )}
       {showDepth && ELLIPTICAL_BASES.has(config.base) && (
-        <ellipse cx="50" cy="76" rx="14" ry="6" fill={skinShadow} opacity="0.32" />
+        <ellipse cx="50" cy="76" rx="14" ry="6" fill={skinShadow} opacity="0.5" />
       )}
       {showDepth && config.base === 'square' && (
-        <ellipse cx="50" cy="74" rx="18" ry="5" fill={skinShadow} opacity="0.28" />
+        <ellipse cx="50" cy="74" rx="18" ry="5" fill={skinShadow} opacity="0.45" />
       )}
 
       {/* Cheek blush (skin-tone-aware) — skip for non-human face shapes */}
       {showDepth && (
         <>
-          <circle cx="34" cy="50" r="6" fill={blushColor} opacity="0.15" />
-          <circle cx="66" cy="50" r="6" fill={blushColor} opacity="0.15" />
+          <circle cx="34" cy="50" r="6" fill={blushColor} opacity="0.22" />
+          <circle cx="66" cy="50" r="6" fill={blushColor} opacity="0.22" />
         </>
       )}
 
@@ -174,7 +173,7 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       {/* Eyes — with periodic blink for standard eye types */}
       {config.eyes !== 'none' && (
         canBlink ? (
-          <g clipPath="url(#blinkClip)">
+          <g clipPath={`url(#${blinkClipId})`}>
             <EyePart />
           </g>
         ) : (
