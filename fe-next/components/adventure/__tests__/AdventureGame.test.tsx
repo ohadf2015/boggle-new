@@ -98,6 +98,23 @@ jest.mock('@/contexts/LanguageContext', () => {
   };
 });
 
+// Mock CoinContext - needed by RewardedAdGoldButton in the component tree
+jest.mock('@/contexts/CoinContext', () => ({
+  useCoinContext: () => ({
+    coins: 100,
+    spendCoins: jest.fn(),
+    refreshCoins: jest.fn(),
+    awardGameCompletion: jest.fn().mockResolvedValue(null),
+    awardWatchedAd: jest.fn().mockResolvedValue(null),
+    rewards: { WATCH_AD: 50 },
+  }),
+}));
+
+jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+  __esModule: true,
+  default: () => <div data-testid="rewarded-ad-gold-button">Ad</div>,
+}));
+
 // Mock useAdventureWordValidation hook
 const mockValidateWord = jest.fn().mockResolvedValue({
   isValid: true,

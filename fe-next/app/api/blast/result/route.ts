@@ -95,8 +95,8 @@ export async function POST(request: NextRequest) {
 
     const { error: insertError } = insertResult;
     if (insertError) {
-      // PGRST205 = table/view not found — migration hasn't been applied yet
-      if (insertError.code === 'PGRST205') {
+      // PGRST205 / 42P01 = table/view not found — migration hasn't been applied yet
+      if (insertError.code === 'PGRST205' || insertError.code === '42P01' || insertError.message?.includes('not found in the schema cache')) {
         console.warn('[BLAST API] blast_results table not found (migration pending). Skipping save.');
         return NextResponse.json({ success: true, personalBests: null, isNewBestScore: false, isNewBestCombo: false, migrationPending: true });
       }

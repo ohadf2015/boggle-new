@@ -26,6 +26,7 @@ import { NativeAppProvider } from '@/components/native/NativeAppProvider';
 import { NetworkStatusHandler } from '@/components/native/NetworkStatusHandler';
 import { SocketProvider } from '@/utils/SocketContext';
 import { SocketEventBusProvider } from '@/contexts/SocketEventBusContext';
+import { CrazyGamesSettingsBridge } from '@/components/CrazyGamesSettingsBridge';
 import { composeProviders } from '@/utils/composeProviders';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { initializeHowlerConfig } from '@/lib/audio/howlerConfig';
@@ -105,6 +106,7 @@ export function GameSpecificProviders({ children }: GameSpecificProvidersProps) 
         <NetworkStatusHandler>
             <NativeAppProvider>
                 <CrazyGamesProvider>
+                    <CrazyGamesSettingsBridge>
                     <SocketProvider>
                         <SocketEventBusProvider>
                             <CoreGameProviders>
@@ -114,6 +116,7 @@ export function GameSpecificProviders({ children }: GameSpecificProvidersProps) 
                             </CoreGameProviders>
                         </SocketEventBusProvider>
                     </SocketProvider>
+                </CrazyGamesSettingsBridge>
                 </CrazyGamesProvider>
             </NativeAppProvider>
         </NetworkStatusHandler>

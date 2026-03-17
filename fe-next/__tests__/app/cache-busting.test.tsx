@@ -60,7 +60,8 @@ describe('Cache Busting Mechanisms', () => {
       const swCode = fs.readFileSync(swPath, 'utf8');
 
       // When: Extract CACHE_VERSION
-      const versionMatch = swCode.match(/CACHE_VERSION\s*=\s*['"]([^'"]+)['"]/);
+      const versionMatch = swCode.match(/CACHE_(?:VERSION|NAME)\s*=\s*['"]([^'"]+)['"]/);
+
 
       // Then: Should have semantic version format
       expect(versionMatch).toBeTruthy();

@@ -335,10 +335,14 @@ export function useGridInteraction({
     handleTouchStart(rowIndex, colIndex, letter, event);
   }, [handleCellClick, handleTouchStart, selectedCells.length, isClickSelectMode]);
 
+  const pendingMouseRef = useRef<{ x: number; y: number } | null>(null);
+  const mouseRafIdRef = useRef<number | null>(null);
+  const lastHoveredCellRef = useRef<{ row: number; col: number } | null>(null);
+
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!interactive) return;
-    const hoveredCellPos = getCellAtPos(e.clientX, e.clientY);
-    setHoveredCell(hoveredCellPos ? { row: hoveredCellPos.row, col: hoveredCellPos.col } : null);
+
+    // Dragging detection runs immediately (cheap)
     if (isTouchingRef.current && !isDraggingRef.current && !isTouchDeviceRef.current) {
       const deltaX = e.clientX - startPosRef.current.x;
       const deltaY = e.clientY - startPosRef.current.y;
@@ -348,6 +352,8 @@ export function useGridInteraction({
         hasMovedRef.current = true;
       }
     }
+
+    // Drag path selection runs immediately (needs low-latency response)
     if (isTouchingRef.current && isDraggingRef.current) {
       const mockEvent = {
         touches: [{ clientX: e.clientX, clientY: e.clientY }],
@@ -355,6 +361,23 @@ export function useGridInteraction({
         preventDefault: () => { }
       } as unknown as TouchEvent;
       handleTouchMove(mockEvent);
+    }
+
+    // Hover highlight is throttled via RAF to avoid unnecessary re-renders
+    pendingMouseRef.current = { x: e.clientX, y: e.clientY };
+    if (mouseRafIdRef.current === null) {
+      mouseRafIdRef.current = requestAnimationFrame(() => {
+        mouseRafIdRef.current = null;
+        const pending = pendingMouseRef.current;
+        if (!pending) return;
+        const hoveredCellPos = getCellAtPos(pending.x, pending.y);
+        const newHovered = hoveredCellPos ? { row: hoveredCellPos.row, col: hoveredCellPos.col } : null;
+        const prev = lastHoveredCellRef.current;
+        if (newHovered?.row !== prev?.row || newHovered?.col !== prev?.col) {
+          lastHoveredCellRef.current = newHovered;
+          setHoveredCell(newHovered);
+        }
+      });
     }
   }, [interactive, getCellAtPos, handleTouchMove]);
 
@@ -466,6 +489,7 @@ export function useGridInteraction({
   useEffect(() => {
     return () => {
       if (rafIdRef.current !== null) { cancelAnimationFrame(rafIdRef.current); rafIdRef.current = null; }
+      if (mouseRafIdRef.current !== null) { cancelAnimationFrame(mouseRafIdRef.current); mouseRafIdRef.current = null; }
     };
   }, []);
 

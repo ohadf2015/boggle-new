@@ -10,8 +10,9 @@ import {
   upgradeSpectatorToPlayer,
   isSpectator,
   getSpectatorCount,
+  type SpectatorGameBase,
+  type SpectatorOptions,
 } from '../spectatorManager';
-import type { SpectatorGameBase, SpectatorOptions } from '../spectatorManager';
 
 function createGame(overrides: Partial<SpectatorGameBase> = {}): SpectatorGameBase {
   return {

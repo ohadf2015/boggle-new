@@ -14,6 +14,7 @@ import {
   useWordHuntMyLife,
   useWordHuntTargetAttempts,
   useWordHuntTargetFound,
+  useWordHuntTargetFoundBy,
   useWordHuntPlayerLives,
   useWordHuntEliminatedPlayers,
   useWordHuntDiscoveryClues,
@@ -59,6 +60,8 @@ function convertAttempt(
 export interface WordHuntMultiplayerBridgeResult {
   lifePoints: number;
   targetFound: boolean;
+  /** Username of who found the target (null if not yet found) */
+  targetFoundBy: string | null;
   targetLength: number;
   playerLives: Record<string, number>;
   eliminatedPlayers: string[];
@@ -78,6 +81,7 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
   const myLife = useWordHuntMyLife();
   const targetAttempts = useWordHuntTargetAttempts();
   const targetFound = useWordHuntTargetFound();
+  const targetFoundBy = useWordHuntTargetFoundBy();
   const playerLives = useWordHuntPlayerLives();
   const eliminatedPlayers = useWordHuntEliminatedPlayers();
   const discoveryClues = useWordHuntDiscoveryClues();
@@ -188,6 +192,7 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
   return {
     lifePoints: myLife,
     targetFound,
+    targetFoundBy: targetFoundBy ?? null,
     targetLength,
     playerLives,
     eliminatedPlayers,

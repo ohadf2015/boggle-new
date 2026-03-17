@@ -168,7 +168,8 @@ jest.mock('@/lib/audio/audioLoader', () => ({
       }
       setTimeout(() => resolve(), 20);
     });
-  })
+  }),
+  ensureHowl: jest.fn().mockResolvedValue(jest.fn()),
 }));
 
 describe('MusicContext - Crossfade Looping', () => {

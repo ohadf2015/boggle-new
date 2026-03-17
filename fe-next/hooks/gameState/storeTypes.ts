@@ -69,6 +69,8 @@ export interface GameState {
   wordHuntPlayerLives: Record<string, number>;
   wordHuntTargetAttempts: Array<{ guess: string; feedback: LetterFeedback[]; isDiscovery?: boolean }>;
   wordHuntTargetFound: boolean;
+  /** Username of the player who found the target (null if not yet found) */
+  wordHuntTargetFoundBy: string | null;
   wordHuntEliminatedPlayers: string[];
   wordHuntDiscoveryClues: Array<{ position: number; letter: string }>;
   wordHuntKnownLetters: string[];
@@ -142,6 +144,7 @@ export interface GameActions {
   setWordHuntPlayerLives: (value: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
   setWordHuntTargetAttempts: (value: Array<{ guess: string; feedback: LetterFeedback[] }> | ((prev: Array<{ guess: string; feedback: LetterFeedback[] }>) => Array<{ guess: string; feedback: LetterFeedback[] }>)) => void;
   setWordHuntTargetFound: (value: boolean | ((prev: boolean) => boolean)) => void;
+  setWordHuntTargetFoundBy: (value: string | null) => void;
   setWordHuntEliminatedPlayers: (value: string[] | ((prev: string[]) => string[])) => void;
   addWordHuntDiscoveryClues: (greens: Array<{ position: number; letter: string }>, known: string[]) => void;
 

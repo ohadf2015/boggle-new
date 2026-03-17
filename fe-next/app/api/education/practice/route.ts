@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 import logger from '@/utils/logger';
+import { calculatePracticeXp, type PracticeSessionXp } from '@/backend/modules/educationXpManager';
 
 // Validation schemas
 const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz']);
@@ -199,19 +200,18 @@ export async function POST(request: NextRequest) {
 
     const { lessonId, practiceType } = parseResult.data;
 
-    // Verify student has access to this lesson (assigned via classroom)
+    // Verify student has access to this lesson (assigned via classroom membership)
     const { data: hasAccess } = await supabase
       .from('lesson_assignments')
       .select(`
         id,
         classroom:classrooms!inner(
           id,
-          students:classroom_students!inner(student_id)
+          members:classroom_memberships!inner(student_id)
         )
       `)
       .eq('lesson_id', lessonId)
-      .eq('classroom.students.student_id', user.id)
-      .eq('classroom.students.status', 'active')
+      .eq('classroom.members.student_id', user.id)
       .limit(1)
       .single();
 
@@ -326,22 +326,58 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
     }
 
-    // Award XP to student_lesson_progress when session is completed with XP
-    if (completed && session.xp_awarded && session.xp_awarded > 0) {
-      const { error: xpError } = await supabase.rpc('award_education_xp', {
-        p_student_id: session.student_id,
-        p_xp_amount: session.xp_awarded,
-        p_lesson_id: session.lesson_id,
-      });
+    // Server-side XP recalculation (H3 fix: never trust client-supplied xpAwarded)
+    if (completed) {
+      const practiceType = session.practice_type || session.mode;
+      const xpType = practiceType === 'solo_board' ? 'solo_board'
+        : practiceType === 'warmup' ? 'solo_board'
+        : practiceType === 'flashcard' ? 'flashcard'
+        : practiceType === 'matching' ? 'matching'
+        : practiceType === 'spelling' ? 'spelling'
+        : practiceType === 'blitz' ? 'blitz'
+        : 'flashcard';
 
-      if (xpError) {
-        logger.error('Failed to award education XP:', xpError);
-        // Don't fail the request - session already saved, XP can be backfilled
-      } else {
-        logger.info(
-          'EDUCATION',
-          `Awarded ${session.xp_awarded} XP to student ${session.student_id} for lesson ${session.lesson_id}`
-        );
+      const xpSession: PracticeSessionXp = {
+        type: xpType,
+        sessionData: {
+          cardsReviewed: session.cards_reviewed,
+          cardsCorrect: session.cards_correct,
+          vocabularyWordsFound: session.vocabulary_words_found || [],
+          pairsMatched: session.words_correct,
+          totalPairs: session.words_attempted,
+          wordsSpelled: session.words_correct,
+          spellingStreak: session.max_combo || 0,
+          blitzWordsFound: session.words_correct || (session.words_found?.length ?? 0),
+          blitzMaxCombo: session.max_combo || 0,
+        },
+      };
+
+      const { totalXp: serverCalculatedXp } = calculatePracticeXp(xpSession);
+
+      if (serverCalculatedXp > 0) {
+        // Update the session with server-calculated XP
+        await supabase
+          .from('practice_sessions')
+          .update({ xp_awarded: serverCalculatedXp })
+          .eq('id', sessionId);
+
+        const { error: xpError } = await supabase.rpc('award_education_xp', {
+          p_student_id: session.student_id,
+          p_xp_amount: serverCalculatedXp,
+          p_lesson_id: session.lesson_id,
+        });
+
+        if (xpError) {
+          logger.error('Failed to award education XP:', xpError);
+        } else {
+          logger.info(
+            'EDUCATION',
+            `Awarded ${serverCalculatedXp} XP (server-calculated) to student ${session.student_id} for lesson ${session.lesson_id}`
+          );
+        }
+
+        // Return updated session with server XP
+        session.xp_awarded = serverCalculatedXp;
       }
     }
 

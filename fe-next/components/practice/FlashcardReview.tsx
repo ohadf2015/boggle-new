@@ -195,7 +195,7 @@ export default function FlashcardReview({
             <div className="my-6">
               <p className="text-5xl font-neo-display text-neo-cyan">{percentage}%</p>
               <p className="text-slate-400 mt-2">
-                {correctCount} / {words.length} correct
+                {correctCount} / {words.length} {t('education.practice.correctCount')}
               </p>
 
               {/* XP Session Summary - Mastery message shown FIRST (research requirement) */}
@@ -395,9 +395,12 @@ export default function FlashcardReview({
         </div>
 
         {/* Flashcard */}
-        <div
+        <AdaptiveMotion.div
           className="relative h-64 sm:h-80 perspective-1000 cursor-pointer mb-8"
           onClick={handleFlip}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
         >
           <AdaptiveAnimatePresence mode="wait">
             <AdaptiveMotion.div
@@ -408,21 +411,20 @@ export default function FlashcardReview({
               transition={{ duration: 0.4 }}
               className="absolute inset-0"
             >
-              <Card
+              <div
                 className={cn(
-                  'h-full border-neo border-neo-black shadow-hard-lg',
+                  'h-full rounded-neo border-3 border-black shadow-hard-lg',
                   'flex items-center justify-center',
-                  isFlipped ? 'bg-neo-cyan/10' : 'bg-neo-navy/80'
+                  isFlipped ? 'bg-neo-cyan/15' : 'bg-neo-navy/80'
                 )}
               >
-                <CardContent className="p-6 text-center">
+                <div className="p-6 text-center">
                   {isFlipped ? (
-                    // Definition side with pronunciation
                     <div>
-                      <div className="flex items-center justify-center gap-3 mb-2">
-                        <p className="text-sm text-neo-cyan font-neo-body">
+                      <div className="flex items-center justify-center gap-3 mb-3">
+                        <span className="px-2 py-0.5 bg-neo-cyan/20 border-2 border-neo-cyan/40 rounded-neo text-xs font-black text-neo-cyan uppercase">
                           {t('education.practice.definition')}
-                        </p>
+                        </span>
                         <PronunciationButton
                           word={currentWord.word}
                           lang={language}
@@ -434,59 +436,66 @@ export default function FlashcardReview({
                       </p>
                     </div>
                   ) : (
-                    // Word side
                     <div>
-                      <p className="text-sm text-slate-400 mb-2 font-neo-body">
+                      <span className="inline-block px-2 py-0.5 bg-neo-yellow/20 border-2 border-neo-yellow/40 rounded-neo text-xs font-black text-neo-yellow uppercase mb-3">
                         {t('education.practice.word')}
-                      </p>
-                      <p className="text-3xl sm:text-4xl font-neo-display text-neo-white">
+                      </span>
+                      <p className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white">
                         {currentWord.word}
                       </p>
                       <WordContextRow
                         partOfSpeech={enrichedWords[currentIndex]?.partOfSpeech}
                         example={enrichedWords[currentIndex]?.examples?.[0]?.text}
                       />
-                      <p className="text-sm text-slate-500 mt-4">
+                      <p className="text-sm text-neo-white/40 mt-4 font-neo-body">
                         {t('education.practice.tapToFlip')}
                       </p>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </AdaptiveMotion.div>
           </AdaptiveAnimatePresence>
-        </div>
+        </AdaptiveMotion.div>
 
         {/* Answer buttons */}
         <div className="flex gap-4">
-          <Button
+          <AdaptiveMotion.button
             onClick={() => handleAnswer(false)}
             disabled={!isFlipped}
+            whileHover={isFlipped ? { scale: 1.04, y: -3, boxShadow: '6px 6px 0px black' } : undefined}
+            whileTap={isFlipped ? { scale: 0.96, y: 2, boxShadow: '2px 2px 0px black' } : undefined}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className={cn(
-              'flex-1 bg-neo-pink/20 text-neo-pink font-bold',
-              'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
+              'flex-1 flex items-center justify-center gap-2 py-3 rounded-neo',
+              'bg-neo-pink text-black font-neo-display font-black uppercase',
+              'border-3 border-black shadow-hard',
+              'disabled:opacity-40 disabled:cursor-not-allowed'
             )}
           >
-            <X className="w-5 h-5 me-2" />
+            <X className="w-5 h-5" />
             {t('education.practice.dontKnow')}
-          </Button>
-          <Button
+          </AdaptiveMotion.button>
+          <AdaptiveMotion.button
             onClick={() => handleAnswer(true)}
             disabled={!isFlipped}
+            whileHover={isFlipped ? { scale: 1.04, y: -3, boxShadow: '6px 6px 0px black' } : undefined}
+            whileTap={isFlipped ? { scale: 0.96, y: 2, boxShadow: '2px 2px 0px black' } : undefined}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className={cn(
-              'flex-1 bg-neo-cyan/20 text-neo-cyan font-bold',
-              'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
+              'flex-1 flex items-center justify-center gap-2 py-3 rounded-neo',
+              'bg-neo-cyan text-black font-neo-display font-black uppercase',
+              'border-3 border-black shadow-hard',
+              'disabled:opacity-40 disabled:cursor-not-allowed'
             )}
           >
-            <Check className="w-5 h-5 me-2" />
+            <Check className="w-5 h-5" />
             {t('education.practice.gotIt')}
-          </Button>
+          </AdaptiveMotion.button>
         </div>
 
         {/* Navigation hint */}
-        <p className="text-center text-xs text-slate-500 mt-4">
+        <p className="text-center text-xs text-neo-white/40 font-neo-body mt-4">
           {isFlipped
             ? t('education.practice.chooseAnswer')
             : t('education.practice.tapCard')}

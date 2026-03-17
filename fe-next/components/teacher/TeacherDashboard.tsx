@@ -25,9 +25,10 @@ import { useRecentGameSettings, type GameConfiguration } from '@/hooks/useRecent
 import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { DuelMonitoringPanel } from './dashboard';
+import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
 import {
   Gamepad2, BookPlus, ChevronDown, Swords, ClipboardList, Users,
-  ListTodo, Hammer,
+  ListTodo, Hammer, BarChart3,
 } from 'lucide-react';
 
 // --- Animation variants ---
@@ -69,27 +70,18 @@ const accordionBody = {
 
 // --- XP Bar decorative divider ---
 
-function XpDivider() {
+function SectionDivider() {
   return (
-    <div className="flex items-center gap-3 mb-10 h-5">
-      <div className="flex-1 bg-neo-gray border-3 border-black rounded-neo-pill h-full p-0.5 flex gap-0.5 overflow-hidden">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={`xp-segment-${i}`}
-            className="flex-1 h-full bg-neo-yellow"
-            style={{ clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' }}
-          />
-        ))}
-        <motion.div
-          className="w-[12%] h-full bg-neo-yellow/40"
-          style={{ clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' }}
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-        />
+    <div className="flex items-center gap-4 mb-10" aria-hidden="true">
+      <div className="flex-1 h-1 bg-neo-yellow/20 rounded-neo" />
+      <div className="flex items-center gap-2 px-4 py-1.5 bg-black border-3 border-neo-yellow/40 rounded-neo shadow-hard-sm">
+        <Hammer className="w-4 h-4 text-neo-yellow" />
+        <span className="font-neo-body font-black text-[10px] uppercase tracking-widest text-neo-yellow whitespace-nowrap">
+          {/* No hardcoded text — purely decorative divider */}
+          ▸ ▸ ▸
+        </span>
       </div>
-      <span className="font-neo-body font-black text-[10px] uppercase tracking-widest text-neo-yellow whitespace-nowrap">
-        LVL UP: 75%
-      </span>
+      <div className="flex-1 h-1 bg-neo-yellow/20 rounded-neo" />
     </div>
   );
 }
@@ -143,7 +135,7 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
         aria-expanded={isOpen}
         className={cn(
           'w-full flex items-center justify-between p-6 border-b-4 border-black transition-colors',
-          'focus:outline-none focus:ring-2 focus:ring-neo-yellow',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
           isOpen
             ? headerActiveBg[badgeColor]
             : cn('bg-white text-black', headerCollapsedHover[badgeColor])
@@ -161,7 +153,7 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
           {/* Game HUD: rotated icon box */}
           <div
             className={cn(
-              'w-10 h-10 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm',
+              'w-10 h-10 rounded-neo border-3 border-black flex items-center justify-center shadow-hard-sm',
               isOpen ? 'bg-black rotate-[-2deg]' : 'bg-black rotate-[2deg]'
             )}
           >
@@ -173,8 +165,8 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
           {/* Slanted badge */}
           <span
             className={cn(
-              'px-3 py-0.5 border-2 text-[10px] font-black rounded shadow-hard-sm uppercase tracking-widest',
-              isOpen ? 'bg-black text-neo-yellow border-black' : badgePalette[badgeColor],
+              'px-3 py-1 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest',
+              isOpen ? 'bg-black text-neo-yellow' : badgePalette[badgeColor],
               isOpen ? '' : 'rotate-2'
             )}
           >
@@ -197,7 +189,7 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
             style={{ overflow: 'hidden' }}
             className="bg-neo-gray/50"
           >
-            <div className="p-5">{children}</div>
+            <div className="p-6">{children}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -215,6 +207,7 @@ export default function TeacherDashboard() {
   const [showLessons, setShowLessons] = useState(false);
   const [showAssignments, setShowAssignments] = useState(false);
   const [showDuels, setShowDuels] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   const { classrooms } = useClassrooms();
@@ -360,9 +353,9 @@ export default function TeacherDashboard() {
           </motion.div>
         )}
 
-        {/* XP Bar divider */}
+        {/* Section divider */}
         <motion.div variants={slideInUp}>
-          <XpDivider />
+          <SectionDivider />
         </motion.div>
 
         {/* HUD Sections */}
@@ -424,6 +417,31 @@ export default function TeacherDashboard() {
                   </div>
                 )}
                 {selectedClassroomId && <DuelMonitoringPanel classroomId={selectedClassroomId} />}
+              </HudSection>
+            </motion.div>
+          )}
+
+          {/* Analytics */}
+          {classrooms.length > 0 && (
+            <motion.div variants={slideInUp}>
+              <HudSection
+                label={t('teacher.dashboard.analytics')}
+                badge={t('teacher.dashboard.insights')}
+                badgeColor="cyan"
+                emoji="📊"
+                icon={<BarChart3 className="w-5 h-5" />}
+                isOpen={showAnalytics}
+                onToggle={() => setShowAnalytics(!showAnalytics)}
+              >
+                {classrooms.length > 1 && (
+                  <div className="flex items-center gap-3 mb-4">
+                    <label className="text-neo-white font-neo-body font-bold">
+                      {t('teacher.dashboard.selectClassroom')}:
+                    </label>
+                    {classroomSelect}
+                  </div>
+                )}
+                {selectedClassroomId && <AnalyticsDashboard classroomId={selectedClassroomId} />}
               </HudSection>
             </motion.div>
           )}

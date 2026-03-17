@@ -13,6 +13,8 @@ interface CollapsibleSectionProps {
   defaultExpanded?: boolean;
   onToggle?: (isExpanded: boolean) => void;
   badge?: string | number;
+  /** One-line summary shown when collapsed — tells the player what's inside without opening */
+  summary?: string;
   variant?: 'primary' | 'secondary' | 'tertiary';
   className?: string;
   headerClassName?: string;
@@ -50,6 +52,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   defaultExpanded = false,
   onToggle,
   badge,
+  summary,
   variant = 'secondary',
   className,
   headerClassName,
@@ -108,6 +111,16 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           <ChevronDown className="w-5 h-5 flex-shrink-0" />
         </motion.div>
       </button>
+
+      {/* Summary line — visible only when collapsed, tells player what's inside */}
+      {summary && !isExpanded && (
+        <div className={cn(
+          'px-3 py-1.5 text-xs text-slate-400 italic border-t border-slate-700/30',
+          styles.content,
+        )}>
+          {summary}
+        </div>
+      )}
 
       {/* Collapsible Content */}
       <AnimatePresence initial={false}>

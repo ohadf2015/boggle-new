@@ -80,6 +80,7 @@ jest.mock('@/lib/audio/audioLoader', () => ({
     };
   }),
   preloadAudioOnDemand: jest.fn().mockResolvedValue(undefined),
+  ensureHowl: jest.fn().mockResolvedValue(jest.fn()),
 }));
 
 // Mock logger

@@ -14,6 +14,9 @@ import '@testing-library/jest-dom';
 // Mock Sentry
 // ==========================================
 
+// Remotion is mocked via moduleNameMapper -> __mocks__/remotion.js
+// That file uses jest.fn() so individual tests can override via .mockReturnValue()
+
 jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),
   captureMessage: jest.fn(),

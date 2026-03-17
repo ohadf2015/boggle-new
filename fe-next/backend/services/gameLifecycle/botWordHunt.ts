@@ -26,6 +26,9 @@ import logger from '../../utils/logger';
 /** Delay before ending game after bot finds target (ms) */
 const TARGET_FOUND_END_DELAY_MS = 3000;
 
+/** Score buffer when no human has scored yet (matches botGame.ts) */
+const BOT_SCORE_BUFFER = 20;
+
 /** Timing config per difficulty */
 const HUNT_TIMING: Record<string, { minDelay: number; maxDelay: number; startDelay: number }> = {
   easy:   { minDelay: 8000,  maxDelay: 15000, startDelay: 5000 },
@@ -69,11 +72,14 @@ export function filterCandidatesByFeedback(
         case 'absent':
           // Must NOT contain letter (unless it's correct/present elsewhere)
           if (word.includes(guessLetter)) {
-            // Check if letter appears in a 'correct' or 'present' slot
-            const isNeededElsewhere = feedback.some(
-              (f, j) => j !== i && guess[j] === guessLetter && (f === 'correct' || f === 'present')
-            );
-            if (!isNeededElsewhere) return false;
+            // Count how many times this letter is marked correct/present in the guess
+            const neededCount = feedback.filter(
+              (f, j) => guess[j] === guessLetter && (f === 'correct' || f === 'present')
+            ).length;
+            if (neededCount === 0) return false;
+            // Candidate must not have MORE of this letter than needed
+            const candidateCount = [...word].filter(c => c === guessLetter).length;
+            if (candidateCount > neededCount) return false;
           }
           break;
       }
@@ -200,11 +206,12 @@ function scheduleWordHuntGuess(
   const isCorrect = feedback.every(f => f === 'correct');
 
   if (isCorrect) {
-    // Score cap check
+    // Score cap: use buffer when no human has scored (matches Classic mode)
     const bestHuman = getBestHumanScore(gameCode);
     const result = recordTargetFound(huntState, bot.username);
+    const scoreLimit = bestHuman === 0 ? BOT_SCORE_BUFFER : bestHuman;
 
-    if (result.bonus > 0 && (bestHuman === 0 || bot.score + result.bonus <= bestHuman)) {
+    if (result.bonus > 0 && bot.score + result.bonus <= scoreLimit) {
       updatePlayerScore(gameCode, bot.username, result.bonus, true);
       bot.score += result.bonus;
     }
@@ -226,6 +233,13 @@ function scheduleWordHuntGuess(
     }, TARGET_FOUND_END_DELAY_MS);
     return;
   }
+
+  // Broadcast bot guess to room so other players can see bot activity
+  broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntBotGuess', {
+    username: bot.username,
+    guess,
+    feedback,
+  });
 
   // Wrong guess — apply penalty and filter candidates
   const penalty = penalizeWrongGuess(huntState, bot.username);

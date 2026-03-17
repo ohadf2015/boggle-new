@@ -1,41 +1,48 @@
 /**
  * Shared Remotion Primitives Tests
  *
- * Uses the same Remotion mock pattern as BossEntranceCinematic.test.tsx.
+ * Uses jest.mock('remotion') with jest.fn() exports so beforeEach can override values.
  */
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-// Mock Remotion
 jest.mock('remotion', () => ({
-  AbsoluteFill: ({ children, style, ...rest }: React.PropsWithChildren<{ style?: React.CSSProperties; 'data-testid'?: string }>) => (
-    <div data-testid={rest['data-testid'] || 'absolute-fill'} style={style}>
-      {children}
-    </div>
-  ),
-  interpolate: (
-    frame: number,
-    inputRange: number[],
-    outputRange: number[],
-  ) => {
+  __esModule: true,
+  useCurrentFrame: jest.fn(() => 0),
+  useVideoConfig: jest.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 })),
+  interpolate: jest.fn((frame: number, inputRange: number[], outputRange: number[]) => {
+    if (frame <= inputRange[0]) return outputRange[0];
+    if (frame >= inputRange[inputRange.length - 1]) return outputRange[outputRange.length - 1];
     const [inMin, inMax] = inputRange;
     const [outMin, outMax] = outputRange;
     const t = (frame - inMin) / (inMax - inMin);
     const clamped = Math.max(0, Math.min(1, t));
     return outMin + clamped * (outMax - outMin);
-  },
-  spring: () => 1,
-  staticFile: (path: string) => `/static/${path}`,
-  // Required by TitleReveal for responsive font sizing
-  useVideoConfig: () => ({ width: 1280, height: 720, fps: 30, durationInFrames: 240 }),
+  }),
+  spring: jest.fn(() => 0),
+  staticFile: jest.fn((path: string) => path),
+  AbsoluteFill: ({ children, style, ...rest }: any) => (
+    <div data-testid={rest['data-testid'] || 'absolute-fill'} style={style}>
+      {children}
+    </div>
+  ),
 }));
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const remotion = require('remotion');
 
 // Mock fonts
 jest.mock('../fonts', () => ({
   fredokaFamily: 'Fredoka, sans-serif',
   rubikFamily: 'Rubik, sans-serif',
 }));
+
+beforeEach(() => {
+  remotion.useVideoConfig.mockReturnValue({ width: 1280, height: 720, fps: 30, durationInFrames: 240 });
+  remotion.spring.mockReturnValue(1);
+  remotion.staticFile.mockImplementation((path: string) => `/static/${path}`);
+});
 
 import { BackgroundGlow } from '../primitives/BackgroundGlow';
 import { ParticleLayer } from '../primitives/ParticleLayer';

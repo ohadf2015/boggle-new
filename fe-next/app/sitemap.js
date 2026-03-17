@@ -15,6 +15,23 @@ export default function sitemap() {
   function langAlternates(path) {
     const alts = { 'x-default': `${baseUrl}/en${path}` };
     locales.forEach((l) => { alts[l] = `${baseUrl}/${l}${path}`; });
+    // Region-specific: show both English and Hebrew for Israeli users
+    alts['en-IL'] = `${baseUrl}/en${path}`;
+    alts['he-IL'] = `${baseUrl}/he${path}`;
+    alts['en-US'] = `${baseUrl}/en${path}`;
+    alts['es-US'] = `${baseUrl}/es${path}`;
+    alts['en-GB'] = `${baseUrl}/en${path}`;
+    alts['en-SE'] = `${baseUrl}/en${path}`;
+    alts['sv-SE'] = `${baseUrl}/sv${path}`;
+    alts['en-JP'] = `${baseUrl}/en${path}`;
+    alts['ja-JP'] = `${baseUrl}/ja${path}`;
+    alts['en-ES'] = `${baseUrl}/en${path}`;
+    alts['es-ES'] = `${baseUrl}/es${path}`;
+    alts['en-MX'] = `${baseUrl}/en${path}`;
+    alts['es-MX'] = `${baseUrl}/es${path}`;
+    alts['en-AU'] = `${baseUrl}/en${path}`;
+    alts['es-AR'] = `${baseUrl}/es${path}`;
+    alts['es-CO'] = `${baseUrl}/es${path}`;
     return alts;
   }
 
@@ -151,6 +168,22 @@ export default function sitemap() {
         languages: {
           'x-default': `${baseUrl}/${locale}${path}`,
           [locale]: `${baseUrl}/${locale}${path}`,
+          'en-IL': `${baseUrl}/en/multiplayer-word-game-online`,
+          'he-IL': `${baseUrl}/he/hebrew-multiplayer-word-game`,
+          'en-US': `${baseUrl}/en/multiplayer-word-game-online`,
+          'es-US': `${baseUrl}/es/juego-de-palabras-multijugador`,
+          'en-GB': `${baseUrl}/en/multiplayer-word-game-online`,
+          'en-SE': `${baseUrl}/en/multiplayer-word-game-online`,
+          'sv-SE': `${baseUrl}/sv/swedish-multiplayer-word-game`,
+          'en-JP': `${baseUrl}/en/multiplayer-word-game-online`,
+          'ja-JP': `${baseUrl}/ja/japanese-word-game`,
+          'en-ES': `${baseUrl}/en/multiplayer-word-game-online`,
+          'es-ES': `${baseUrl}/es/juego-de-palabras-multijugador`,
+          'en-MX': `${baseUrl}/en/multiplayer-word-game-online`,
+          'es-MX': `${baseUrl}/es/juego-de-palabras-multijugador`,
+          'en-AU': `${baseUrl}/en/multiplayer-word-game-online`,
+          'es-AR': `${baseUrl}/es/juego-de-palabras-multijugador`,
+          'es-CO': `${baseUrl}/es/juego-de-palabras-multijugador`,
         },
       },
       images: [`${baseUrl}/og-image-${img}.jpg`],

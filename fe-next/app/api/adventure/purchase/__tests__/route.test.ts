@@ -72,11 +72,18 @@ function setupDbMocks({
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
+        update: jest.fn().mockImplementation((payload: Record<string, unknown>) => ({
           eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockResolvedValue({ error: updateError }),
+            eq: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                maybeSingle: jest.fn().mockResolvedValue({
+                  data: updateError ? null : { gold: payload.gold, upgrades: payload.upgrades },
+                  error: updateError,
+                }),
+              }),
+            }),
           }),
-        }),
+        })),
       };
     }
     return {};

@@ -8,24 +8,26 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-// Mock remotion with portrait mobile dimensions (width=390)
 jest.mock('remotion', () => ({
-  useVideoConfig: () => ({ width: 390, height: 219, fps: 30, durationInFrames: 90 }),
-  interpolate: (
-    f: number,
-    [a, b]: number[],
-    [c, d]: number[],
-    _options?: unknown,
-  ) => {
-    const pct = Math.min(1, Math.max(0, (f - a) / (b - a)));
-    return c + pct * (d - c);
-  },
-  AbsoluteFill: ({ children, style, ...rest }: React.PropsWithChildren<{ style?: React.CSSProperties; 'data-testid'?: string }>) => (
-    <div data-testid={(rest as Record<string, unknown>)['data-testid'] as string || 'absolute-fill'} style={style}>
+  __esModule: true,
+  useVideoConfig: jest.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 })),
+  interpolate: jest.fn((frame: number, inputRange: number[], outputRange: number[]) => {
+    if (frame <= inputRange[0]) return outputRange[0];
+    if (frame >= inputRange[inputRange.length - 1]) return outputRange[outputRange.length - 1];
+    const [inMin, inMax] = inputRange;
+    const [outMin, outMax] = outputRange;
+    const pct = Math.min(1, Math.max(0, (frame - inMin) / (inMax - inMin)));
+    return outMin + pct * (outMax - outMin);
+  }),
+  AbsoluteFill: ({ children, style, ...rest }: any) => (
+    <div data-testid={rest['data-testid'] || 'absolute-fill'} style={style}>
       {children}
     </div>
   ),
 }));
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const remotion = require('remotion');
 
 // Mock seededRandom util
 jest.mock('../../utils/seededRandom', () => ({
@@ -39,6 +41,10 @@ jest.mock('../../utils/seededRandom', () => ({
 }));
 
 import { SparkleField } from '../SparkleField';
+
+beforeEach(() => {
+  remotion.useVideoConfig.mockReturnValue({ width: 390, height: 219, fps: 30, durationInFrames: 90 });
+});
 
 describe('SparkleField responsive scaling', () => {
   it('reduces sparkle count proportionally at portrait mobile width (390px)', () => {

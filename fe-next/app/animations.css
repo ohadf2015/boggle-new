@@ -2129,6 +2129,35 @@ html.reduce-motion *::after {
   transition: none !important;
 }
 
+/* Disable heavy blast tile animations (box-shadow + filter keyframes) */
+.low-end-device .blast-tile-ice,
+.low-end-device .blast-tile-wildcard,
+.low-end-device .blast-tile-lightning,
+.low-end-device .blast-tile-magnet,
+.low-end-device .blast-tile-prism,
+.low-end-device .blast-tile-gem,
+.low-end-device .blast-tile-frozen,
+.low-end-device .blast-tile-objective {
+  animation: none !important;
+  filter: none !important;
+}
+
+/* Disable adventure tile glow/shimmer animations */
+.low-end-device .adventure-tile-gold,
+.low-end-device .adventure-tile-rainbow,
+.low-end-device .adventure-tile-bomb,
+.low-end-device .adventure-tile-chain,
+.low-end-device .adventure-tile-time {
+  animation: none !important;
+  filter: none !important;
+}
+
+/* Simplify all inset box-shadows on game tiles */
+.low-end-device [class*="blast-tile-"],
+.low-end-device [class*="adventure-tile-"] {
+  box-shadow: none !important;
+}
+
 /* ==================== Enhanced Touch Interaction Styles ==================== */
 /* Improved touch targets and feedback for onboarding and general gameplay */
 
@@ -2524,6 +2553,39 @@ html.reduce-motion *::after {
 }
 
 .low-end-device .life-meter-pulse {
+  animation: none;
+}
+
+/* Life bar danger glow — red pulsing shadow at low health */
+.life-bar-danger-glow {
+  animation: life-bar-danger-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes life-bar-danger-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
+  }
+}
+
+/* Life bar low pulse — subtle brightness throb on the fill */
+.life-bar-low-pulse {
+  animation: life-bar-low-pulse 1s ease-in-out infinite;
+}
+
+@keyframes life-bar-low-pulse {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+}
+
+.low-end-device .life-bar-danger-glow,
+.low-end-device .life-bar-low-pulse {
   animation: none;
 }
 

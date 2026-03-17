@@ -369,9 +369,15 @@ export default function StudentPageClient() {
 
         {/* Quick Play Panel */}
         {classroomId && (
-          <div className="mb-6">
+          <motion.div
+            className="mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ type: 'spring', stiffness: 260, damping: 24, delay: 0.1 }}
+          >
             <QuickPlayPanel classroomId={classroomId} userId={user.id} />
-          </div>
+          </motion.div>
         )}
 
         {/* Streak Calendar */}
@@ -388,12 +394,18 @@ export default function StudentPageClient() {
 
         {/* Full Classroom Leaderboard */}
         {classroomId && (
-          <div className="mb-6">
+          <motion.div
+            className="mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+          >
             <ClassroomLeaderboard
               classroomId={classroomId}
               currentUserId={user.id}
             />
-          </div>
+          </motion.div>
         )}
 
         {/* Classroom Activity Feed */}
@@ -404,7 +416,14 @@ export default function StudentPageClient() {
         )}
 
         {/* Lesson List */}
-        <StudentLessonView />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+        >
+          <StudentLessonView />
+        </motion.div>
       </div>
     </div>
   );

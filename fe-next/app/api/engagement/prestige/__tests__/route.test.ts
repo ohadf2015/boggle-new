@@ -79,13 +79,17 @@ function mockProfileError(error = { message: 'DB down' }) {
 
 function mockUpdateSuccess() {
   mockUpdate.mockReturnValue({
-    eq: jest.fn().mockResolvedValue({ error: null }),
+    eq: jest.fn().mockReturnValue({
+      eq: jest.fn().mockResolvedValue({ error: null }),
+    }),
   });
 }
 
 function mockUpdateError(error = { message: 'update failed' }) {
   mockUpdate.mockReturnValue({
-    eq: jest.fn().mockResolvedValue({ error }),
+    eq: jest.fn().mockReturnValue({
+      eq: jest.fn().mockResolvedValue({ error }),
+    }),
   });
 }
 

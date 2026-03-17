@@ -20,6 +20,7 @@ import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { Send, MessageSquare, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
+import { useCrazyGamesChatDisabled } from '@/hooks/useCrazyGamesSettingsBridge';
 
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
 
@@ -53,6 +54,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   const { socket } = useSocket();
   const { playMessageSound } = useSoundEffects();
   const { announce } = useAnnouncer();
+  const isChatDisabled = useCrazyGamesChatDisabled();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
@@ -235,6 +237,9 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   };
+
+  // CrazyGames platform can disable chat (e.g., for child safety)
+  if (isChatDisabled) return null;
 
   return (
     <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>

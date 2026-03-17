@@ -9,12 +9,17 @@
  * These tests ensure we don't regress on bundle size optimization work.
  */
 
-import { createLazyHowl, preloadAudioOnDemand, AUDIO_LOAD_PRIORITY } from '@/lib/audio/audioLoader';
+import { createLazyHowl, preloadAudioOnDemand, ensureHowl, AUDIO_LOAD_PRIORITY } from '@/lib/audio/audioLoader';
 
 describe('CrazyGames Bundle Size Verification', () => {
   beforeEach(() => {
     // Reset fetch mock before each test
     jest.clearAllMocks();
+  });
+
+  // Ensure howler is loaded before tests that use createLazyHowl
+  beforeAll(async () => {
+    await ensureHowl();
   });
 
   describe('Initial Page Load - No Audio', () => {

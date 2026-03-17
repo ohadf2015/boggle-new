@@ -10,14 +10,12 @@ import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 
 // Dynamic imports for components
-const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
 const NextStepPrompt = dynamic(() => import('@/components/results/NextStepPrompt'), { ssr: false });
 
 export interface ResultsLandscapeLayoutProps {
   // Player Data
   sortedScores: PlayerResult[];
-  winner: PlayerResult | null;
   username: string;
   currentUsername: string;
 
@@ -84,7 +82,6 @@ export interface ResultsLandscapeLayoutProps {
  */
 export function ResultsLandscapeLayout({
   sortedScores,
-  winner,
   username,
   currentUsername,
   gameCode,
@@ -116,13 +113,6 @@ export function ResultsLandscapeLayout({
       <div className="flex h-screen w-full overflow-hidden bg-neo-navy text-neo-cream p-3 gap-3 landscape-full-height">
       {/* Left column: Winner Banner + Action Buttons (Hero Area) */}
       <div className="w-[55%] flex flex-col items-center justify-center gap-4 p-4 border-2 border-neo-black rounded-neo bg-white/5 shadow-hard-sm">
-        {/* Winner Banner - prominent */}
-        {winner && (
-          <div className="w-full max-w-sm">
-            <ResultsWinnerBanner winner={winner} isCurrentUserWinner={normalizeUsername(winner.username) === normalizeUsername(username)} />
-          </div>
-        )}
-
         {/* Action Buttons - prominent placement */}
         {gameCode && onReturnToRoom && (
           isBotsOnlyGame ? (

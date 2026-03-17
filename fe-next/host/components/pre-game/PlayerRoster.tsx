@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Bot, X, UserPlus } from 'lucide-react';
+import { Crown, Bot, Plus, Minus, UserPlus, Sparkles, Brain, Zap } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useNativeShare } from '../../../hooks/useNativeShare';
 import { getJoinUrl, copyJoinUrl } from '../../../utils/share';
@@ -72,9 +72,11 @@ const playerEntranceVariants = {
 export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
   const { tryNativeShare } = useNativeShare();
-  const [removingBot, setRemovingBot] = useState<string | null>(null);
+  const [showBotPicker, setShowBotPicker] = useState(false);
 
   const isFull = players.length >= maxPlayers;
+  const bots = players.filter(p => typeof p === 'object' && p.isBot);
+  const botCount = bots.length;
 
   const handleInvite = useCallback(async () => {
     const joinUrl = getJoinUrl(gameCode, 'lobby-slot');
@@ -88,11 +90,17 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
     }
   }, [gameCode, t, tryNativeShare]);
 
-  const handleRemoveBot = useCallback((botUsername: string) => {
-    setRemovingBot(botUsername);
-    socket?.emit('removeBot', { username: botUsername, gameCode });
-    setTimeout(() => setRemovingBot(null), 600);
+  const handleAddBot = useCallback((difficulty: 'easy' | 'medium' | 'hard') => {
+    socket?.emit('addBot', { difficulty, gameCode });
+    setShowBotPicker(false);
   }, [socket, gameCode]);
+
+  const handleRemoveLastBot = useCallback(() => {
+    const lastBot = bots[bots.length - 1];
+    if (lastBot && typeof lastBot === 'object') {
+      socket?.emit('removeBot', { username: lastBot.username, gameCode });
+    }
+  }, [socket, gameCode, bots]);
 
   return (
     <section className="space-y-3">
@@ -130,10 +138,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className={cn(
-                  'flex-shrink-0 flex flex-col items-center gap-2 group/player',
-                  removingBot === name && 'pointer-events-none'
-                )}
+                className="flex-shrink-0 flex flex-col items-center gap-2 group/player"
               >
                 <div className="relative">
                   {/* Host crown with wobble */}
@@ -170,7 +175,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                     )}
 
                     <div className={cn(
-                      'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
+                      'w-20 h-20 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                       isMe && 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
                     )}>
@@ -179,72 +184,128 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                           customAvatar={avatar?.customAvatar ?? undefined}
                           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                           avatarImage={avatar?.avatarImage}
-                          size="md"
+                          size="lg"
                         />
                       ) : (
-                        <span className="text-2xl font-black text-neo-black">
+                        <span className="text-3xl font-black text-neo-black">
                           {name.charAt(0).toUpperCase()}
                         </span>
                       )}
                     </div>
                   </motion.div>
 
-                  {/* Bot badge with difficulty color */}
-                  {isBot && (
-                    <>
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 600, damping: 15, delay: 0.2 }}
-                        className={cn(
-                          'absolute -bottom-1 -end-1 w-6 h-6 border-2 border-neo-black rounded-full flex items-center justify-center',
-                          diffConfig ? diffConfig.bgColor : 'bg-neo-cyan'
-                        )}
-                      >
-                        <Bot className="w-3.5 h-3.5 text-neo-black" />
-                      </motion.div>
-
-                      {/* Remove bot — appears on hover with bounce */}
-                      <motion.button
-                        onClick={() => handleRemoveBot(name)}
-                        disabled={removingBot === name}
-                        initial={{ scale: 0 }}
-                        whileHover={{ scale: 1.2, rotate: 90 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="absolute -top-1 -end-1 w-5 h-5 bg-neo-red border-2 border-neo-black rounded-full flex items-center justify-center opacity-0 group-hover/player:opacity-100 transition-opacity z-10"
-                        aria-label={t('hostView.removeBot')}
-                      >
-                        <X className="w-3 h-3 text-neo-black" />
-                      </motion.button>
-                    </>
+                  {/* Bot indicator — small emoji only */}
+                  {isBot && diffConfig && (
+                    <span className="absolute -bottom-1 -end-1 text-sm" aria-label={t('hostView.bot')}>
+                      {diffConfig.emoji}
+                    </span>
                   )}
                 </div>
 
-                {/* Name with difficulty emoji for bots */}
-                <span className="text-[11px] font-bold truncate w-16 text-center text-neo-cream">
-                  {isBot && diffConfig ? `${diffConfig.emoji} ` : ''}{name}
+                {/* Name */}
+                <span className="text-[11px] font-bold truncate w-20 text-center text-neo-cream">
+                  {name}
                 </span>
               </motion.div>
             );
           })}
         </AnimatePresence>
 
-        {/* Invite player */}
+        {/* Add players section */}
         {!isFull && (
-          <motion.button
-            onClick={handleInvite}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group/invite"
-            aria-label={t('hostView.invitePlayer')}
-          >
-            <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-pink/30 bg-white/5 flex items-center justify-center group-hover/invite:border-neo-pink/60 group-hover/invite:bg-white/10 transition-colors">
-              <UserPlus className="w-5 h-5 text-neo-pink/50 group-hover/invite:text-neo-pink transition-colors" />
+          <div className="flex-shrink-0 flex flex-col items-center gap-2">
+            {/* Invite + Bot buttons row */}
+            <div className="flex items-center gap-1.5">
+              {/* Invite player */}
+              <motion.button
+                onClick={handleInvite}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-9 h-9 rounded-full border-2 border-dashed border-neo-pink/30 bg-white/5 flex items-center justify-center hover:border-neo-pink/60 hover:bg-white/10 transition-colors"
+                aria-label={t('hostView.invitePlayer')}
+              >
+                <UserPlus className="w-4 h-4 text-neo-pink/50 hover:text-neo-pink transition-colors" />
+              </motion.button>
+
+              {/* Add bot */}
+              <div className="relative">
+                <motion.button
+                  onClick={() => setShowBotPicker(prev => !prev)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={cn(
+                    'w-9 h-9 rounded-full border-2 border-dashed bg-white/5 flex items-center justify-center transition-colors',
+                    showBotPicker ? 'border-neo-cyan/60 bg-white/10' : 'border-neo-cyan/30 hover:border-neo-cyan/60 hover:bg-white/10'
+                  )}
+                  aria-label={t('hostView.addBot')}
+                >
+                  <div className="relative">
+                    <Bot className="w-4 h-4 text-neo-cyan/50" />
+                    <Plus className="w-2.5 h-2.5 text-neo-cyan/70 absolute -bottom-0.5 -end-1 stroke-[3]" />
+                  </div>
+                </motion.button>
+
+                {/* Bot difficulty picker */}
+                <AnimatePresence>
+                  {showBotPicker && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.85, y: -5 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.85, y: -5 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                      className="absolute top-full start-1/2 -translate-x-1/2 mt-2 z-30 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[140px]"
+                    >
+                      {([
+                        { key: 'easy' as const, icon: Sparkles, color: 'text-neo-lime', bg: 'bg-neo-lime', emoji: '🌱' },
+                        { key: 'medium' as const, icon: Brain, color: 'text-neo-yellow', bg: 'bg-neo-yellow', emoji: '🧠' },
+                        { key: 'hard' as const, icon: Zap, color: 'text-neo-orange', bg: 'bg-neo-orange', emoji: '🔥' },
+                      ]).map((diff, i) => (
+                        <motion.button
+                          key={diff.key}
+                          initial={{ opacity: 0, x: -12 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.06, type: 'spring', stiffness: 500, damping: 25 }}
+                          whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.1)' }}
+                          whileTap={{ scale: 0.96 }}
+                          onClick={() => handleAddBot(diff.key)}
+                          className="flex items-center gap-2 px-2 py-2 rounded-md text-start transition-colors"
+                        >
+                          <div className={cn('w-6 h-6 rounded-full flex items-center justify-center border-2 border-neo-black shadow-hard-sm', diff.bg)}>
+                            <diff.icon className="w-3.5 h-3.5 text-neo-black" />
+                          </div>
+                          <span className={cn('text-xs font-bold uppercase', diff.color)}>
+                            {t(`hostView.bot${diff.key.charAt(0).toUpperCase() + diff.key.slice(1)}`)}
+                          </span>
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Remove last bot */}
+              {botCount > 0 && (
+                <motion.button
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  onClick={handleRemoveLastBot}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-9 h-9 rounded-full border-2 border-dashed border-neo-orange/30 bg-white/5 flex items-center justify-center hover:border-neo-orange/60 hover:bg-white/10 transition-colors"
+                  aria-label={t('hostView.removeBot')}
+                >
+                  <div className="relative">
+                    <Bot className="w-4 h-4 text-neo-orange/50" />
+                    <Minus className="w-2.5 h-2.5 text-neo-orange/70 absolute -bottom-0.5 -end-1 stroke-[3]" />
+                  </div>
+                </motion.button>
+              )}
             </div>
-            <span className="text-[11px] font-bold text-slate-600 uppercase group-hover/invite:text-slate-400 transition-colors">
+            <span className="text-[10px] font-bold text-slate-600 uppercase">
               {t('share.invite')}
             </span>
-          </motion.button>
+          </div>
         )}
       </div>
 

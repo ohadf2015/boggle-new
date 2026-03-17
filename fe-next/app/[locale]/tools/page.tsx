@@ -21,6 +21,22 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
   const languages: Record<string, string> = { 'x-default': `${BASE_URL}/en/tools` };
   for (const loc of LOCALES) languages[loc] = `${BASE_URL}/${loc}/tools`;
+  languages['en-IL'] = `${BASE_URL}/en/tools`;
+  languages['he-IL'] = `${BASE_URL}/he/tools`;
+  languages['en-US'] = `${BASE_URL}/en/tools`;
+  languages['es-US'] = `${BASE_URL}/es/tools`;
+  languages['en-GB'] = `${BASE_URL}/en/tools`;
+  languages['en-SE'] = `${BASE_URL}/en/tools`;
+  languages['sv-SE'] = `${BASE_URL}/sv/tools`;
+  languages['en-JP'] = `${BASE_URL}/en/tools`;
+  languages['ja-JP'] = `${BASE_URL}/ja/tools`;
+  languages['en-ES'] = `${BASE_URL}/en/tools`;
+  languages['es-ES'] = `${BASE_URL}/es/tools`;
+  languages['en-MX'] = `${BASE_URL}/en/tools`;
+  languages['es-MX'] = `${BASE_URL}/es/tools`;
+  languages['en-AU'] = `${BASE_URL}/en/tools`;
+  languages['es-AR'] = `${BASE_URL}/es/tools`;
+  languages['es-CO'] = `${BASE_URL}/es/tools`;
 
   return {
     title: `${content.toolsHub.title} | LexiClash`,

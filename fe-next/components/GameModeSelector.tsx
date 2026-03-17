@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Shuffle, FileText, Bomb, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GameMode } from '@/shared/types/game';
@@ -27,6 +28,20 @@ const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
   'word-hunt': <Target className="w-4 h-4" />,
 };
 
+const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
+  random: 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
+  classic: 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60',
+  blast: 'bg-neo-orange/30 text-neo-orange border-neo-orange/60',
+  'word-hunt': 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
+};
+
+const MODE_GLOW: Record<GameModeOption, string> = {
+  random: 'shadow-[0_0_10px_rgba(139,92,246,0.25)]',
+  classic: 'shadow-[0_0_10px_rgba(0,255,255,0.25)]',
+  blast: 'shadow-[0_0_10px_rgba(255,107,53,0.25)]',
+  'word-hunt': 'shadow-[0_0_10px_rgba(255,20,147,0.25)]',
+};
+
 function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']): string {
   const labels: Record<GameModeOption, string> = {
     random: t('gameModes.random'),
@@ -39,7 +54,7 @@ function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']): stri
 
 /**
  * Shared game mode selector used in lobby and results page.
- * Renders icon-based buttons for each game mode.
+ * Renders icon-based buttons with juicy selection animations.
  */
 export function GameModeSelector({
   selectedMode,
@@ -57,23 +72,32 @@ export function GameModeSelector({
       {modes.map((mode) => {
         const isActive = selectedMode === mode;
         return (
-          <button
+          <motion.button
             key={mode}
             onClick={() => onSelectMode(mode)}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
             data-testid={`game-mode-${mode}`}
             className={cn(
-              'rounded-lg font-bold text-[9px] uppercase border-2 border-neo-black transition-colors flex flex-col items-center gap-0.5',
+              'rounded-lg font-bold text-[9px] uppercase border-2 border-neo-black flex flex-col items-center gap-0.5',
+              'transition-[background-color,color,border-color,box-shadow] duration-200',
               compact ? 'py-1' : 'py-1.5',
               isActive
-                ? 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60 shadow-hard-sm'
+                ? `${MODE_ACTIVE_COLORS[mode]} ${MODE_GLOW[mode]} shadow-hard-sm`
                 : 'bg-neo-navy/60 text-neo-cream/70 border-neo-white/20 hover:bg-neo-navy hover:text-neo-cream'
             )}
           >
-            <span className={cn('flex items-center justify-center', compact ? 'text-xs' : 'text-sm')}>
+            {/* Icon with bounce on active */}
+            <motion.span
+              className={cn('flex items-center justify-center', compact ? 'text-xs' : 'text-sm')}
+              animate={isActive ? { y: [0, -2, 0] } : { y: 0 }}
+              transition={isActive ? { duration: 0.3, ease: 'easeOut' as const } : {}}
+            >
               {MODE_ICONS[mode]}
-            </span>
+            </motion.span>
             <span className="leading-none">{getModeLabel(mode, t)}</span>
-          </button>
+          </motion.button>
         );
       })}
     </div>

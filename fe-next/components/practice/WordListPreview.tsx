@@ -74,16 +74,16 @@ export default function WordListPreview({
           <CardContent className="py-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-400">
-                {words.length} {words.length === 1 ? 'word' : 'words'} total
+                {words.length} {t('education.practice.wordCount')} {t('education.practice.total')}
               </span>
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1 text-neo-cyan">
                   <CheckCircle className="w-4 h-4" />
-                  {words.filter((w) => w.canIntegrate).length} can embed
+                  {words.filter((w) => w.canIntegrate).length} {t('education.practice.canEmbed')}
                 </span>
                 <span className="flex items-center gap-1 text-neo-yellow">
                   <AlertCircle className="w-4 h-4" />
-                  {words.filter((w) => !w.canIntegrate).length} track only
+                  {words.filter((w) => !w.canIntegrate).length} {t('education.practice.trackOnly')}
                 </span>
               </div>
             </div>

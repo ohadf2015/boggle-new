@@ -55,7 +55,7 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
   ));
   MockDiv.displayName = 'MockDiv';
   return {
-    AdaptiveMotion: { div: MockDiv },
+    AdaptiveMotion: { div: MockDiv, button: MockDiv },
     AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
   };
 });

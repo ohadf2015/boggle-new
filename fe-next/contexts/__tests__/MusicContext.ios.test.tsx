@@ -43,6 +43,23 @@ jest.mock('howler', () => ({
   },
 }));
 
+// Mock audioLoader to use mocked Howl constructor
+jest.mock('@/lib/audio/audioLoader', () => {
+  const { Howl } = require('howler');
+  return {
+    ensureHowl: jest.fn().mockResolvedValue(Howl),
+    createLazyHowl: jest.fn((src: string | string[], options?: any) => {
+      return new Howl({
+        src: Array.isArray(src) ? src : [src],
+        preload: false,
+        html5: true,
+        ...options,
+      });
+    }),
+    preloadAudioOnDemand: jest.fn().mockResolvedValue(undefined),
+  };
+});
+
 // Mock logger
 jest.mock('@/utils/logger', () => ({
   __esModule: true,

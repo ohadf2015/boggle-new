@@ -2,12 +2,13 @@
  * StreakCalendar Component
  *
  * 7-day visual streak calendar showing which days the student was active.
- * Active days are highlighted based on current streak and last win date.
+ * Animated flame icons, staggered day entrances, pulsing streak counter.
  */
 
 'use client';
 
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,44 @@ interface DayInfo {
   index: number;
 }
 
+// --- Animation variants ---
+
+const containerEntrance = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring' as const, stiffness: 260, damping: 24, staggerChildren: 0.06, delayChildren: 0.15 },
+  },
+};
+
+const dayCell = {
+  hidden: { opacity: 0, scale: 0.7, y: 12 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: 'spring' as const, stiffness: 400, damping: 18 },
+  },
+};
+
+const streakBadgePop = {
+  hidden: { scale: 0, rotate: -15 },
+  visible: {
+    scale: 1,
+    rotate: 0,
+    transition: { type: 'spring' as const, stiffness: 500, damping: 14, delay: 0.3 },
+  },
+};
+
+const flameFlicker = {
+  animate: {
+    scale: [1, 1.15, 0.95, 1.1, 1],
+    rotate: [0, -6, 4, -3, 0],
+    transition: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' as const },
+  },
+};
+
 export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCalendarProps) {
   const { t } = useLanguage();
 
@@ -33,7 +72,6 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
     const today = new Date();
     const result: DayInfo[] = [];
 
-    // Generate array of last 7 days (6 days ago to today)
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(today.getDate() - i);
@@ -41,82 +79,101 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
       const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
       const isToday = i === 0;
 
-      // Determine if this day is active based on streak
       let isActive = false;
       if (lastWinDate && currentStreak > 0) {
         const lastWin = new Date(lastWinDate);
-        // Normalize dates to midnight for comparison
         const lastWinDay = new Date(lastWin.getFullYear(), lastWin.getMonth(), lastWin.getDate());
         const checkDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-        // Calculate days between last win and the day we're checking
         const daysSinceLastWin = Math.floor((lastWinDay.getTime() - checkDay.getTime()) / (1000 * 60 * 60 * 24));
 
-        // Day is active if it falls within the streak window
-        // Streak covers N consecutive days ending at lastWinDate
         if (daysSinceLastWin >= 0 && daysSinceLastWin < currentStreak) {
           isActive = true;
         }
       }
 
-      result.push({
-        date,
-        dayName,
-        isActive,
-        isToday,
-        index: 6 - i, // Index from 0 (oldest) to 6 (today)
-      });
+      result.push({ date, dayName, isActive, isToday, index: 6 - i });
     }
 
     return result;
   }, [currentStreak, lastWinDate]);
 
   return (
-    <div className="p-5 rounded-neo border-3 border-black bg-white shadow-hard-sm">
+    <motion.div
+      className="p-5 rounded-neo border-3 border-black bg-neo-navy shadow-hard"
+      variants={containerEntrance}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-40px' }}
+    >
       {/* Header: Streak count */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-neo bg-neo-pink border-2 border-black shadow-hard-sm flex items-center justify-center flex-shrink-0">
-          <Flame className="w-5 h-5 text-white" />
-        </div>
-        <p className="text-base font-neo-display font-bold text-black">
+      <div className="flex items-center gap-3 mb-5">
+        <motion.div
+          className="w-10 h-10 rounded-neo bg-neo-yellow border-3 border-black shadow-hard-sm flex items-center justify-center flex-shrink-0"
+          whileHover={{ scale: 1.15, rotate: -8 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        >
+          <Flame className="w-5 h-5 text-black" />
+        </motion.div>
+        <p className="text-base font-neo-display font-black text-neo-white uppercase tracking-tight">
           {t('student.dashboard.streakCalendar')}
         </p>
-        <div className="ms-auto flex items-center gap-2 bg-neo-pink border-2 border-black rounded-neo px-3 py-1 shadow-hard-sm">
-          <span className="text-xl font-neo-display font-black text-white tabular-nums">
+        <motion.div
+          variants={streakBadgePop}
+          className="ms-auto flex items-center gap-2 bg-neo-yellow border-3 border-black rounded-neo px-3 py-1 shadow-hard-sm"
+        >
+          <span className="text-xl font-neo-display font-black text-black tabular-nums">
             {currentStreak}
           </span>
-          <span className="text-lg">🔥</span>
-        </div>
+          <motion.div {...(currentStreak >= 3 ? flameFlicker : {})}>
+            <Flame className="w-5 h-5 text-neo-pink" />
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* 7-day calendar */}
       <div className="grid grid-cols-7 gap-2">
         {days.map((day) => (
-          <div
+          <motion.div
             key={day.index}
+            variants={dayCell}
             data-testid={`day-${day.index}`}
             data-active={day.isActive}
+            whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring', stiffness: 400, damping: 20 } }}
+            whileTap={{ scale: 0.95 }}
             className={cn(
-              'flex flex-col items-center gap-1 p-2 rounded-neo border-2',
+              'flex flex-col items-center gap-1.5 p-2 rounded-neo border-3 cursor-default',
               day.isActive
-                ? 'bg-neo-pink border-black shadow-hard-sm text-white'
-                : 'bg-gray-100 border-black/30 text-black/40',
-              day.isToday && !day.isActive && 'border-black bg-neo-yellow/30 text-black',
-              day.isToday && 'ring-2 ring-neo-cyan'
+                ? 'bg-neo-yellow border-black shadow-hard-sm text-black'
+                : 'bg-neo-navy border-black/40 text-neo-white/40',
+              day.isToday && !day.isActive && 'border-neo-cyan bg-neo-cyan/10 text-neo-white',
+              day.isToday && 'ring-2 ring-neo-cyan ring-offset-1 ring-offset-neo-navy'
             )}
           >
-            <span className="text-xs font-neo-body font-bold">
+            <span className="text-xs font-neo-body font-black uppercase">
               {day.dayName}
             </span>
             {day.isActive ? (
-              <Flame className="w-4 h-4 text-white" />
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                  rotate: [0, -5, 5, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: day.index * 0.15,
+                  ease: 'easeInOut',
+                }}
+              >
+                <Flame className="w-4 h-4 text-neo-pink" />
+              </motion.div>
             ) : (
-              <div className="w-3 h-3 rounded-full bg-black/20" />
+              <div className="w-3 h-3 rounded-full bg-neo-white/20 border border-black/20" />
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

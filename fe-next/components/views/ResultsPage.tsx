@@ -109,9 +109,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentPlayerData,
     currentPlayerValidWords,
     otherPlayers,
-    bannerPlayer,
-    bannerRank,
-    isCurrentUserInBanner,
     playerArchetypes,
     currentPlayerArchetype,
     missedWords,
@@ -126,7 +123,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Extract all side effects into a custom hook
   const {
-    brainPointsReward,
     winStreakData,
     showAuthModal,
     setShowAuthModal,
@@ -295,7 +291,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return (
       <ResultsLandscapeLayout
         sortedScores={sortedScores}
-        winner={winner ?? null}
         username={username || ''}
         currentUsername={username || ''}
         gameCode={gameCode}
@@ -332,9 +327,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Shared props for main content component
   const mainContentProps = {
-    bannerPlayer: bannerPlayer ?? null,
-    isCurrentUserInBanner,
-    bannerRank,
     sortedScores,
     nearMisses,
     isHost,
@@ -348,7 +340,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentPlayerValidWords,
     currentPlayerArchetype: currentPlayerArchetype ?? null,
     currentPlayerRank,
-    brainPointsReward: brainPointsReward ?? null,
     scoreRevealComplete,
     setScoreRevealComplete,
     normalizeUsername,

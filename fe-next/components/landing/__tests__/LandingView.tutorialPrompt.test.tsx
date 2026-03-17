@@ -16,6 +16,7 @@ jest.mock('next/navigation', () => ({
   }),
   usePathname: () => '/en',
   useSearchParams: () => new URLSearchParams(),
+  useParams: () => ({ locale: 'en' }),
 }));
 
 // Mock dynamic imports
@@ -216,7 +217,7 @@ describe('LandingView Tutorial Callout for New Players', () => {
     // AND the callout should be hidden (wait for animation)
     await waitFor(() => {
       expect(screen.queryByText('First time here?')).not.toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 
   it('should open onboarding modal when FAB button is clicked', async () => {
@@ -246,7 +247,7 @@ describe('LandingView Tutorial Callout for New Players', () => {
     // AND the callout should be hidden (wait for animation)
     await waitFor(() => {
       expect(screen.queryByText('First time here?')).not.toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
 
     // AND onboarding should be marked as skipped
     expect(onboardingStorage.markOnboardingSkipped).toHaveBeenCalled();

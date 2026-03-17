@@ -80,6 +80,7 @@ jest.mock('next/navigation', () => ({
     push: jest.fn(),
     replace: jest.fn(),
   }),
+  useParams: () => ({ locale: 'en' }),
 }));
 jest.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => true,

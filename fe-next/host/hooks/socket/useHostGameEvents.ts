@@ -421,6 +421,7 @@ export function useHostGameEvents({
       logger.log('[HOST] Word hunt target found by:', data.username);
       const store = useGameStore.getState();
       store.setWordHuntTargetFound(true);
+      store.setWordHuntTargetFoundBy(data.username);
       neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: '🎯', duration: 3000 });
     };
 

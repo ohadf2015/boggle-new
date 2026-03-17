@@ -302,7 +302,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         gameLanguage={gameLanguage}
       />
 
-      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out pb-16 lg:pb-4">
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden lg:overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-4">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -347,7 +347,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center relative min-h-[70px] short:min-h-[60px] md:min-h-[100px] lg:min-h-[110px]"
+                className="flex w-full items-center justify-center relative min-h-[70px] short:min-h-[60px] md:min-h-[80px] lg:min-h-[80px] xl:min-h-[100px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -437,7 +437,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Word Forming Area - tight spacing to board */}
           {isPlaying && (
-            <div className="relative flex items-center justify-center flex-shrink-0 -mt-2 lg:-mt-3 mb-0">
+            <div className="relative flex items-center justify-center flex-shrink-0 mt-1 lg:mt-2 mb-1">
               <LeadChangeBanner event={leadChangeEvent ?? null} />
               <WordFormingArea
                 word={isTypingMode ? typedWord : formedWord}

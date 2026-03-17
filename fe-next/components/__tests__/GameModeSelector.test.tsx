@@ -57,10 +57,12 @@ describe('GameModeSelector', () => {
     );
 
     const blastButton = screen.getByTestId('game-mode-blast');
-    expect(blastButton.className).toContain('bg-neo-cyan/30');
+    // Blast mode uses its own orange active color
+    expect(blastButton.className).toContain('bg-neo-orange/30');
 
     const classicButton = screen.getByTestId('game-mode-classic');
-    expect(classicButton.className).not.toContain('bg-neo-cyan/30');
+    // Non-selected modes use the navy inactive style
+    expect(classicButton.className).toContain('bg-neo-navy/60');
   });
 
   it('should call onSelectMode when a mode button is clicked', () => {

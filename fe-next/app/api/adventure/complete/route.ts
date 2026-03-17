@@ -219,6 +219,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to save completion' }, { status: 500 });
     }
 
+    if (!completion) {
+      console.error('[ADVENTURE COMPLETE API] Completion upsert returned null data');
+      return NextResponse.json({ error: 'Failed to save completion' }, { status: 500 });
+    }
+
     // Calculate XP earned
     const isFirstCompletion = !existingCompletion;
     let xpEarned = 0;

@@ -176,7 +176,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to complete level: ${response.status}`);
+          const errorBody = await response.text().catch(() => 'no body');
+          throw new Error(`Failed to complete level: ${response.status} - ${errorBody}`);
         }
 
         const data = await response.json();

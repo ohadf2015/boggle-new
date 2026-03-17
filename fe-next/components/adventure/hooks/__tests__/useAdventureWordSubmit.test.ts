@@ -25,6 +25,16 @@ describe('useAdventureWordSubmit', () => {
   const mockGetScoreMultiplier = jest.fn().mockReturnValue(1);
   const mockT = jest.fn().mockImplementation((key: string) => key);
 
+  // Generate a 5x5 tile grid with proper row/col
+  const mockTiles = Array.from({ length: 25 }, (_, i) => ({
+    id: `tile-${i}`,
+    letter: String.fromCharCode(65 + (i % 26)),
+    row: Math.floor(i / 5),
+    col: i % 5,
+    isCleared: false,
+    isFrozen: false,
+  }));
+
   const defaultProps = {
     isPlaying: true,
     isPaused: false,
@@ -32,6 +42,7 @@ describe('useAdventureWordSubmit', () => {
     isCascading: false,
     currentWord: '',
     selectedIndices: [] as number[],
+    tiles: mockTiles as any,
     gridSize: 5,
     minWordLength: 3,
     validateWord: mockValidateWord,

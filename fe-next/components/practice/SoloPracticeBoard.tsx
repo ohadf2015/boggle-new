@@ -11,6 +11,7 @@ import WordFormingArea from '@/components/game/WordFormingArea';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
+import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   RotateCcw,
@@ -142,92 +143,149 @@ export default function SoloPracticeBoard({
   if (showComplete) {
     return (
       <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
-        <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
-          <CardContent className="p-8 text-center">
-            <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0, y: 30 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          className="border-3 border-black rounded-neo shadow-hard-lg bg-neo-navy/90 max-w-md w-full overflow-hidden"
+        >
+          {/* Celebration header stripe */}
+          <div className="h-2 bg-gradient-to-r from-neo-cyan via-neo-yellow to-neo-pink" />
 
-            <h2 className="text-2xl font-neo-display text-neo-white mb-2">
+          <div className="p-8 text-center">
+            <motion.div
+              initial={{ scale: 0, rotate: -30 }}
+              animate={{ scale: 1, rotate: [0, 8, -5, 3, 0] }}
+              transition={{ type: 'spring', stiffness: 400, damping: 12, delay: 0.2 }}
+            >
+              <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
+            </motion.div>
+
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-2xl font-neo-display font-black text-neo-white uppercase mb-2"
+            >
               {t('education.practice.complete')}
-            </h2>
+            </motion.h2>
 
             <div className="my-6 space-y-4">
-              <div className="flex items-center justify-center gap-2">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 14, delay: 0.4 }}
+                className="flex items-center justify-center gap-2"
+              >
                 <Star className="w-6 h-6 text-neo-yellow" />
-                <span className="text-3xl font-neo-display text-neo-cyan">{score}</span>
-                <span className="text-slate-400">points</span>
-              </div>
+                <span className="text-4xl font-neo-display font-black text-neo-cyan tabular-nums">{score}</span>
+                <span className="text-neo-white/60 font-bold">{t('education.practice.points')}</span>
+              </motion.div>
 
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div className="p-3 bg-neo-black/30 rounded-neo">
-                  <p className="text-2xl font-neo-display text-neo-white">{validWordCount}</p>
-                  <p className="text-xs text-slate-400">
+              <motion.div
+                className="grid grid-cols-2 gap-4 text-center"
+                initial="hidden"
+                animate="visible"
+                variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.5 } } }}
+              >
+                <motion.div
+                  variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+                  className="p-3 bg-neo-yellow/10 rounded-neo border-2 border-black shadow-hard-sm"
+                >
+                  <p className="text-2xl font-neo-display font-black text-neo-white tabular-nums">{validWordCount}</p>
+                  <p className="text-xs text-neo-white/60 font-bold">
                     {t('education.practice.wordsFound')}
                   </p>
-                </div>
-                <div className="p-3 bg-neo-cyan/10 rounded-neo">
-                  <p className="text-2xl font-neo-display text-neo-cyan">{vocabularyFound.length}</p>
-                  <p className="text-xs text-slate-400">
-                    Vocabulary Words
+                </motion.div>
+                <motion.div
+                  variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+                  className="p-3 bg-neo-cyan/10 rounded-neo border-2 border-black shadow-hard-sm"
+                >
+                  <p className="text-2xl font-neo-display font-black text-neo-cyan tabular-nums">{vocabularyFound.length}</p>
+                  <p className="text-xs text-neo-white/60 font-bold">
+                    {t('education.practice.vocabularyWords')}
                   </p>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
 
-            {/* XP Session Summary - Mastery message shown FIRST (research requirement) */}
+            {/* XP Session Summary */}
             {xpSessionData && (
-              <div className="mb-4 pt-4 border-t border-neo-black/30">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="mb-4 pt-4 border-t-2 border-black/20"
+              >
                 {xpSessionData.sessionMasteryMessage && (
                   <p className="font-neo-display text-lg text-neo-yellow mb-2">
                     {xpSessionData.sessionMasteryMessage}
                   </p>
                 )}
-                <p className="text-neo-white/80 font-neo-body">
+                <motion.p
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: [1, 1.15, 1] }}
+                  transition={{ delay: 0.9, duration: 0.4 }}
+                  className="text-neo-white/80 font-neo-body font-bold"
+                >
                   +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
             )}
 
             {/* Vocabulary words found */}
             {vocabularyFound.length > 0 && (
-              <div className="bg-neo-black/30 rounded-neo p-4 mb-6 max-h-32 overflow-y-auto">
-                <p className="text-xs text-slate-400 mb-2">Vocabulary words found:</p>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="bg-black/20 rounded-neo border-2 border-black/30 p-4 mb-6 max-h-32 overflow-y-auto"
+              >
+                <p className="text-xs text-neo-white/50 font-bold mb-2">{t('education.practice.vocabularyWordsFound')}</p>
                 <div className="flex flex-wrap gap-2">
-                  {vocabularyFound.map((word) => (
-                    <span
+                  {vocabularyFound.map((word, i) => (
+                    <motion.span
                       key={word}
-                      className="px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-sm rounded font-neo-body"
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.9 + i * 0.05, type: 'spring', stiffness: 400, damping: 15 }}
+                      className="px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-sm rounded-neo border border-neo-cyan/30 font-neo-body font-bold"
                     >
                       {word}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
 
-            <div className="flex gap-3">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1 }}
+              className="flex gap-3"
+            >
               <Button
                 onClick={() => {
                   setShowComplete(false);
                   handleRegenerate();
                 }}
                 className={cn(
-                  'flex-1 bg-neo-cyan text-neo-black font-bold',
-                  'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
+                  'flex-1 bg-neo-cyan text-neo-black font-black uppercase',
+                  'border-3 border-neo-black shadow-hard hover:shadow-hard-pressed'
                 )}
               >
                 <RotateCcw className="w-4 h-4 me-2" />
                 {t('common.retry')}
               </Button>
               <Button
-                variant="outline"
                 onClick={onBack}
-                className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
+                className="border-3 border-neo-pink text-neo-pink bg-neo-pink/10 hover:bg-neo-pink/20 font-black uppercase"
               >
                 {t('common.back')}
               </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -274,14 +332,14 @@ export default function SoloPracticeBoard({
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-neo-cyan" />
                   <span className="text-sm text-slate-400">
-                    {validWordCount} words
+                    {validWordCount} {t('education.practice.wordCount')}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-neo-orange" />
                 <span className="text-sm text-slate-400">
-                  {vocabularyFound.length}/{vocabularyWords.length} vocab
+                  {vocabularyFound.length}/{vocabularyWords.length} {t('education.practice.vocab')}
                 </span>
               </div>
             </div>
@@ -310,7 +368,7 @@ export default function SoloPracticeBoard({
         {validWords.length > 0 && (
           <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80 mb-4">
             <CardContent className="py-3">
-              <p className="text-xs text-slate-400 mb-2">Found words:</p>
+              <p className="text-xs text-slate-400 mb-2">{t('education.practice.foundWordsLabel')}</p>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
                 {validWords.map((word) => (
                   <span

@@ -10,6 +10,7 @@ import { useCallback, useState, useRef, useEffect } from 'react';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { BossTauntEvent } from '@/types/boss';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
+import type { GridTileState } from '@/types/adventure';
 import { evaluateWorldMechanic } from '@/lib/adventure/worldMechanics';
 import { useHaptics } from '@/hooks/useHaptics';
 
@@ -35,6 +36,7 @@ export interface UseAdventureWordSubmitProps {
   isCascading: boolean;
   currentWord: string;
   selectedIndices: number[];
+  tiles: GridTileState[];
   gridSize: number;
   minWordLength: number;
   validateWord: (word: string, path: Array<{ row: number; col: number }>) => Promise<{ isValid: boolean; score?: number; errorKey?: string }>;
@@ -85,7 +87,7 @@ export interface UseAdventureWordSubmitReturn {
 export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseAdventureWordSubmitReturn {
   const {
     isPlaying, isPaused, isValidating, isCascading,
-    currentWord, selectedIndices, gridSize, minWordLength,
+    currentWord, selectedIndices, tiles, gridSize, minWordLength,
     validateWord, submitWordWithPath, clearSelection, clearCurrentHint,
     recordActivity, resetOnGameAction,
     comboCount, wordsFound,
@@ -143,8 +145,8 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       setValidationFeedback(prev => ({ ...prev, error: null }));
 
       const path = indices.map(i => ({
-        row: Math.floor(i / gridSize),
-        col: i % gridSize,
+        row: tiles[i]?.row ?? Math.floor(i / gridSize),
+        col: tiles[i]?.col ?? i % gridSize,
       }));
       const result = await validateWord(word, path);
 
@@ -259,7 +261,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         }, 2000);
       }
     },
-    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
+    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, tiles, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
   );
 
   return {

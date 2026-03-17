@@ -462,6 +462,28 @@ module.exports = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        // Game mode card animations
+        "mode-glow-breathe": {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "0.75" },
+        },
+        "mode-icon-bounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-3px)" },
+        },
+        "mode-bomb-wobble": {
+          "0%, 100%": { transform: "rotate(0deg) scale(1)" },
+          "15%": { transform: "rotate(-8deg) scale(1.05)" },
+          "30%": { transform: "rotate(6deg) scale(1.02)" },
+          "45%": { transform: "rotate(-4deg) scale(1.05)" },
+          "60%": { transform: "rotate(2deg) scale(1.02)" },
+          "75%": { transform: "rotate(-1deg) scale(1)" },
+        },
+        "mode-spark": {
+          "0%": { transform: "scale(0)", opacity: "1" },
+          "50%": { transform: "scale(1)", opacity: "0.6" },
+          "100%": { transform: "scale(1.5)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -498,6 +520,11 @@ module.exports = {
         "letter-bounce": "letter-bounce 0.6s ease-in-out infinite",
         "drift": "drift 6s ease-in-out infinite",
         "twinkle": "twinkle 2s ease-in-out infinite",
+        // Game mode card animations
+        "mode-glow-breathe": "mode-glow-breathe 2s ease-in-out infinite",
+        "mode-icon-bounce": "mode-icon-bounce 2s ease-in-out infinite",
+        "mode-bomb-wobble": "mode-bomb-wobble 1.2s ease-in-out infinite",
+        "mode-spark": "mode-spark 0.5s ease-out forwards",
       },
       // Custom rotation values for tilts
       rotate: {

@@ -74,11 +74,11 @@ const customJestConfig = {
     '^@/shared/(.*)$': '<rootDir>/shared/$1',
     '^@/types/(.*)$': '<rootDir>/types/$1',
 
-    // Prevent bare 'remotion' import from resolving to local remotion/ folder
-    '^remotion$': '<rootDir>/node_modules/remotion/dist/cjs/index.js',
-    // Mock @remotion packages that fail in Jest (ESM-only or missing CJS)
+    // Mock remotion packages that fail in Jest (internal state / ESM issues)
+    '^remotion$': '<rootDir>/__mocks__/remotion.cjs',
     '^@remotion/media$': '<rootDir>/__mocks__/@remotion/media.ts',
     '^@remotion/player$': '<rootDir>/__mocks__/@remotion/player.ts',
+    '^@remotion/transitions$': '<rootDir>/__mocks__/@remotion/transitions.ts',
 
     // Capacitor plugins (mock for web testing)
     '^@capgo/capacitor-social-login$': '<rootDir>/__mocks__/@capgo/capacitor-social-login.ts',

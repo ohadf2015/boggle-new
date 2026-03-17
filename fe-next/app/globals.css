@@ -818,14 +818,13 @@ body {
 
   /* On desktop screens, size grid to fill available space between sidebars */
   /* Each sidebar is ~256-320px, so we subtract ~550px total for both sidebars + gaps */
-  /* Vertical space reserved for: timer (~100px), stats/combo (~60px), word area (~40px), gaps (~50px) = ~250px */
+  /* Vertical chrome: timer + stats + word area + gaps. Use clamp to handle short viewports */
   @media (min-width: 769px) {
     .game-board-frame {
       /* Desktop: larger grid that fills available space between sidebars */
-      /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
-      /* FIX: Use CSS variable to GUARANTEE width === height for perfectly square grid */
-      /* This prevents cells from being stretched when flex containers affect dimensions */
-      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - 260px), 500px);
+      /* Use clamp for chrome height: shrinks on short viewports (min 160px), normal 260px */
+      --game-chrome-desktop: clamp(160px, 30dvh, 260px);
+      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - var(--game-chrome-desktop)), 500px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
@@ -836,9 +835,8 @@ body {
   /* Large desktop screens - more room, larger grid */
   @media (min-width: 1280px) {
     .game-board-frame {
-      /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
-      /* FIX: Single variable ensures square container */
-      --board-size: min(48vmin, calc(100vw - 620px), calc(100dvh - 250px), 500px);
+      --game-chrome-desktop: clamp(160px, 28dvh, 250px);
+      --board-size: min(48vmin, calc(100vw - 620px), calc(100dvh - var(--game-chrome-desktop)), 500px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
@@ -848,9 +846,8 @@ body {
   /* Extra large desktop screens - maximize grid utilization */
   @media (min-width: 1536px) {
     .game-board-frame {
-      /* 2xl desktops: sidebars are widest (320px each = ~680px), maximize grid */
-      /* FIX: Single variable ensures square container */
-      --board-size: min(52vmin, calc(100vw - 700px), calc(100dvh - 240px), 500px);
+      --game-chrome-desktop: clamp(160px, 26dvh, 240px);
+      --board-size: min(52vmin, calc(100vw - 700px), calc(100dvh - var(--game-chrome-desktop)), 500px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
@@ -901,6 +898,11 @@ body {
   .blast-tile-rainbow {
     animation: blast-rainbow 4s linear infinite;
     background-size: 300% 300% !important;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
   @keyframes blast-shimmer {
@@ -2034,6 +2036,59 @@ body.crazygames-embed .game-view-container,
 /* Prevent overscroll/pull-to-refresh */
 .no-overscroll {
   overscroll-behavior: none;
+}
+
+/* ====================================
+   GAME MODE CARD ANIMATIONS
+   ==================================== */
+
+/* Breathing glow for selected mode cards */
+@keyframes mode-glow-breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.75; }
+}
+
+/* Scan line for Word Hunt mode card */
+@keyframes mode-scan-line {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(400%); opacity: 0; }
+}
+
+/* Orbiting gradient for Random mode */
+@keyframes mode-orbit {
+  0% { transform: rotate(0deg) translateX(30%) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(30%) rotate(-360deg); }
+}
+
+/* Spark burst on mode selection */
+@keyframes mode-spark {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Icon idle bounce for selected mode */
+@keyframes mode-icon-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Bomb wobble for Blast mode */
+@keyframes mode-bomb-wobble {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(-8deg) scale(1.05); }
+  30% { transform: rotate(6deg) scale(1.02); }
+  45% { transform: rotate(-4deg) scale(1.05); }
+  60% { transform: rotate(2deg) scale(1.02); }
+  75% { transform: rotate(-1deg) scale(1); }
+}
+
+/* Shimmer sweep across card */
+@keyframes mode-shimmer-sweep {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%) skewX(-15deg); }
 }
 
 /* Barber-pole stripe animation for AttackTelegraph progress bar */

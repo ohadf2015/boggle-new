@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Skull, Eye, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export type GameOverReason = 'eliminated' | 'found' | null;
+export type GameOverReason = 'eliminated' | 'found' | 'otherFound' | null;
 
 export interface WordHuntGameOverOverlayProps {
   reason: GameOverReason;
@@ -42,6 +42,7 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
   if (!reason) return null;
 
   const isEliminated = reason === 'eliminated';
+  const isOtherFound = reason === 'otherFound';
 
   return (
     <AnimatePresence>
@@ -52,7 +53,7 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
         exit={{ opacity: 0 }}
         className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center overflow-hidden"
       >
-        {/* Vignette — red for death, gold for victory */}
+        {/* Vignette — red for death, gold for victory, blue for other found */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: phase === 'impact' ? 1 : 0.2 }}
@@ -61,6 +62,8 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
           style={{
             background: isEliminated
               ? 'radial-gradient(ellipse at center, transparent 30%, rgba(220, 38, 38, 0.6) 100%)'
+              : isOtherFound
+              ? 'radial-gradient(ellipse at center, transparent 30%, rgba(59, 130, 246, 0.5) 100%)'
               : 'radial-gradient(ellipse at center, transparent 30%, rgba(234, 179, 8, 0.5) 100%)',
           }}
         />
@@ -73,13 +76,13 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
           className="absolute inset-0 bg-neo-black"
         />
 
-        {/* Floating particles for victory */}
-        {!isEliminated && phase === 'impact' && <VictoryParticles />}
+        {/* Floating particles for personal victory only */}
+        {!isEliminated && !isOtherFound && phase === 'impact' && <VictoryParticles />}
 
         {/* Content */}
         <AnimatePresence mode="wait">
           {phase === 'impact' ? (
-            <ImpactContent key="impact" isEliminated={isEliminated} t={t} />
+            <ImpactContent key="impact" isEliminated={isEliminated} isOtherFound={isOtherFound} t={t} />
           ) : (
             <SpectatorContent key="spectator" t={t} />
           )}
@@ -91,9 +94,10 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
 
 WordHuntGameOverOverlay.displayName = 'WordHuntGameOverOverlay';
 
-/** Dramatic impact animation — skull for death, trophy for victory */
-const ImpactContent: React.FC<{ isEliminated: boolean; t: (key: string) => string }> = ({
+/** Dramatic impact animation — skull for death, trophy for victory, eye for other found */
+const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t: (key: string) => string }> = ({
   isEliminated,
+  isOtherFound,
   t,
 }) => (
   <motion.div
@@ -117,6 +121,12 @@ const ImpactContent: React.FC<{ isEliminated: boolean; t: (key: string) => strin
           className="text-neo-red drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]"
           strokeWidth={2.5}
         />
+      ) : isOtherFound ? (
+        <Eye
+          size={72}
+          className="text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.8)]"
+          strokeWidth={2.5}
+        />
       ) : (
         <Trophy
           size={72}
@@ -136,10 +146,12 @@ const ImpactContent: React.FC<{ isEliminated: boolean; t: (key: string) => strin
         'font-neo-display text-2xl sm:text-3xl font-black uppercase tracking-wider',
         isEliminated
           ? 'border-neo-red bg-neo-red/90 text-neo-cream'
+          : isOtherFound
+          ? 'border-blue-500 bg-blue-500/90 text-neo-cream'
           : 'border-yellow-500 bg-yellow-500/90 text-neo-black',
       )}
     >
-      {isEliminated ? t('wordHunt.mp.youEliminated') : t('wordHunt.mp.youFoundIt')}
+      {isEliminated ? t('wordHunt.mp.youEliminated') : isOtherFound ? t('wordHunt.mp.someoneFoundIt') : t('wordHunt.mp.youFoundIt')}
     </motion.div>
 
     {/* Subtitle */}

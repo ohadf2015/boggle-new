@@ -82,7 +82,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
 const OUTPUT_DIR = path.join(PROJECT_ROOT, 'public', 'videos');
 
 /** Path to Remotion entry file (if it exists) */
-const REMOTION_ENTRY = path.join(PROJECT_ROOT, 'remotion', 'index.ts');
+const REMOTION_ENTRY = path.join(PROJECT_ROOT, 'remotion-root', 'index.ts');
 
 /** Render settings optimized for web delivery */
 const RENDER_SETTINGS = {
@@ -173,7 +173,7 @@ OUTPUT:
   Files are written to: public/videos/{composition-name}.mp4
 
 REQUIREMENTS:
-  - Remotion project at remotion/index.ts
+  - Remotion project at remotion-root/index.ts
   - @remotion/bundler and @remotion/renderer packages installed
 `);
 }
@@ -197,11 +197,11 @@ function checkRemotionSetup(): { ready: boolean; message: string } {
       message: `Remotion entry file not found at: ${REMOTION_ENTRY}
 
 To set up Remotion for rendering:
-1. Create remotion/index.ts with your composition registrations
+1. Create remotion-root/index.ts with your composition registrations
 2. Install @remotion/bundler and @remotion/renderer:
    npm install @remotion/bundler @remotion/renderer
 
-Example remotion/index.ts:
+Example remotion-root/index.ts:
 \`\`\`typescript
 import { registerRoot } from 'remotion';
 import { RemotionRoot } from './Root';

@@ -167,6 +167,7 @@ function PracticeContent({
             {...commonProps}
             onComplete={handleBoardComplete}
             onWordFound={handleWordFound}
+            xpSessionData={xpSessionData}
           />
         );
       case 'matching':
@@ -181,6 +182,7 @@ function PracticeContent({
               });
             }}
             onBack={handleBack}
+            xpSessionData={xpSessionData}
           />
         );
       case 'spelling':
@@ -195,6 +197,7 @@ function PracticeContent({
               });
             }}
             onBack={handleBack}
+            xpSessionData={xpSessionData}
           />
         );
       case 'blitz':
@@ -209,6 +212,7 @@ function PracticeContent({
               });
             }}
             onBack={handleBack}
+            xpSessionData={xpSessionData}
           />
         );
       default:

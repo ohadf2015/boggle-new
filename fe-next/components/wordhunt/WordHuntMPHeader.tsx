@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { X } from 'lucide-react';
 
 export interface WordHuntMPHeaderProps {
@@ -15,7 +15,7 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
   t,
 }) => {
   return (
-    <div className="flex items-center justify-between px-3 py-1 gap-2">
+    <div className="flex items-center justify-between px-2 py-0.5 gap-2">
       {/* Spacer for layout balance */}
       <div className="w-10" />
 

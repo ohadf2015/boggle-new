@@ -100,6 +100,7 @@ jest.mock('next/navigation', () => ({
     replace: jest.fn(),
   }),
   usePathname: () => '/en',
+  useParams: () => ({ locale: 'en' }),
 }));
 
 // Mock components that aren't needed for this test

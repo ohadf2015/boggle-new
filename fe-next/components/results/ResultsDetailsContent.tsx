@@ -22,8 +22,6 @@ const MissedWordsComponent = dynamic(() => import('@/components/results/MissedWo
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
-const TurningPointCard = dynamic(() => import('@/components/results/TurningPointCard'), { ssr: false });
-import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 
 // ==============================================
@@ -245,23 +243,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         </CollapsibleSection>
       )}
 
-      {/* Turning Point + Comparative Insights (moved from Results tab on mobile) */}
-      {sortedScores.length > 1 && username && (
-        <>
-          {sortedScores.length <= 6 && (
-            <TurningPointCard
-              allPlayerWords={allPlayerWords}
-              currentUsername={username}
-              t={t}
-            />
-          )}
-          <ComparativeInsights
-            allPlayerWords={allPlayerWords}
-            currentUsername={username}
-            t={t}
-          />
-        </>
-      )}
+      {/* TurningPointCard + ComparativeInsights removed — decluttered per redesign */}
 
       {/* Performance Chart */}
       <CollapsibleSection
@@ -280,6 +262,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
           title={t('results.missedWords')}
           icon={<Star className="w-4 h-4" />}
           badge={missedWords.length}
+          summary={t('results.missedWordsSummary', { count: missedWords.length })}
           defaultExpanded={missedWords.length <= 5}
           variant="tertiary"
           className="shadow-hard"

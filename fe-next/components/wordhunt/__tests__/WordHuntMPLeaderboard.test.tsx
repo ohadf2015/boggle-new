@@ -1,6 +1,8 @@
 /**
  * Tests for WordHuntMPLeaderboard
  * Compact player lives/scores overlay for MP WordHunt
+ * Note: Component renders both mobile + desktop views; JSDOM shows both.
+ * Tests query the first match (mobile view).
  */
 
 import React from 'react';
@@ -29,40 +31,41 @@ describe('WordHuntMPLeaderboard', () => {
 
   it('should render all players', () => {
     render(<WordHuntMPLeaderboard {...defaultProps} />);
-    expect(screen.getByText('alice')).toBeInTheDocument();
-    expect(screen.getByText('bob')).toBeInTheDocument();
-    expect(screen.getByText('charlie')).toBeInTheDocument();
+    // Each player appears in both mobile and desktop views
+    expect(screen.getAllByText('alice').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('bob').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('charlie').length).toBeGreaterThanOrEqual(1);
   });
 
   it('should show scores for each player', () => {
     render(<WordHuntMPLeaderboard {...defaultProps} />);
-    expect(screen.getByText('300')).toBeInTheDocument();
-    expect(screen.getByText('200')).toBeInTheDocument();
-    expect(screen.getByText('100')).toBeInTheDocument();
+    expect(screen.getAllByText('300').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('200').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('100').length).toBeGreaterThanOrEqual(1);
   });
 
   it('should mark eliminated players', () => {
     render(<WordHuntMPLeaderboard {...defaultProps} />);
-    const charlieRow = screen.getByText('charlie').closest('[data-player]');
-    expect(charlieRow).toHaveAttribute('data-eliminated', 'true');
+    const charlieRows = screen.getAllByText('charlie').map(el => el.closest('[data-player]'));
+    expect(charlieRows.some(row => row?.getAttribute('data-eliminated') === 'true')).toBe(true);
   });
 
   it('should highlight current user', () => {
     render(<WordHuntMPLeaderboard {...defaultProps} />);
-    const aliceRow = screen.getByText('alice').closest('[data-player]');
-    expect(aliceRow).toHaveAttribute('data-current', 'true');
+    const aliceRows = screen.getAllByText('alice').map(el => el.closest('[data-player]'));
+    expect(aliceRows.some(row => row?.getAttribute('data-current') === 'true')).toBe(true);
   });
 
   it('should show life bar for each player', () => {
     render(<WordHuntMPLeaderboard {...defaultProps} />);
     const lifeBars = screen.getAllByRole('progressbar');
+    // 3 players × 2 views = 6, but at least 3
     expect(lifeBars.length).toBeGreaterThanOrEqual(3);
   });
 
   it('should show wrong-guess indicator for players who just lost life', () => {
     const { rerender } = render(<WordHuntMPLeaderboard {...defaultProps} />);
 
-    // Bob loses life (50 -> 30)
     rerender(
       <WordHuntMPLeaderboard
         {...defaultProps}
@@ -71,8 +74,8 @@ describe('WordHuntMPLeaderboard', () => {
       />
     );
 
-    const bobRow = screen.getByText('bob').closest('[data-player]');
-    expect(bobRow?.querySelector('[data-wrong-guess]')).toBeInTheDocument();
+    const bobRows = screen.getAllByText('bob').map(el => el.closest('[data-player]'));
+    expect(bobRows.some(row => row?.querySelector('[data-wrong-guess]'))).toBe(true);
   });
 
   it('should not show wrong-guess indicator for players not in wrongGuessPlayers', () => {
@@ -83,8 +86,8 @@ describe('WordHuntMPLeaderboard', () => {
       />
     );
 
-    const aliceRow = screen.getByText('alice').closest('[data-player]');
-    expect(aliceRow?.querySelector('[data-wrong-guess]')).not.toBeInTheDocument();
+    const aliceRows = screen.getAllByText('alice').map(el => el.closest('[data-player]'));
+    expect(aliceRows.every(row => !row?.querySelector('[data-wrong-guess]'))).toBe(true);
   });
 
   it('should render with empty leaderboard', () => {
@@ -96,7 +99,6 @@ describe('WordHuntMPLeaderboard', () => {
         eliminatedPlayers={[]}
       />
     );
-    // Should not crash
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
   });
 });

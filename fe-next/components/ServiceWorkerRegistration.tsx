@@ -34,6 +34,11 @@ async function registerServiceWorker() {
     if (!swResponse.ok) {
       return; // sw.js not available, skip registration silently
     }
+    // Next.js may return 200 with text/html for missing routes (soft 404)
+    const contentType = swResponse.headers.get('content-type') || '';
+    if (!contentType.includes('javascript')) {
+      return; // sw.js returned non-JS content (likely HTML 404 page)
+    }
 
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',

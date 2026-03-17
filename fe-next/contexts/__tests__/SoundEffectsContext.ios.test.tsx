@@ -45,6 +45,25 @@ jest.mock('howler', () => ({
   },
 }));
 
+// Mock audioLoader to use mocked Howl constructor
+jest.mock('@/lib/audio/audioLoader', () => {
+  const { Howl } = require('howler');
+  return {
+    ensureHowl: jest.fn().mockResolvedValue(Howl),
+    createLazyHowl: jest.fn((src: string | string[], options?: any) => {
+      return new Howl({
+        src: Array.isArray(src) ? src : [src],
+        preload: false,
+        html5: true,
+        ...options,
+      });
+    }),
+    preloadAudioOnDemand: jest.fn().mockResolvedValue(undefined),
+    preloadByPriority: jest.fn().mockResolvedValue(undefined),
+    AUDIO_LOAD_PRIORITY: { CRITICAL: 0, HIGH: 1, NORMAL: 2, LOW: 3 },
+  };
+});
+
 // Mock MusicContext - SoundEffectsProvider depends on it
 jest.mock('../MusicContext', () => ({
   useMusic: jest.fn(() => ({
@@ -100,8 +119,11 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
   });
 
   describe('Howl configuration for iOS', () => {
-    it('should use html5: true for iOS Safari sound effects', () => {
+    it('should use html5: true for iOS Safari sound effects', async () => {
       renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+
+      // Wait for ensureHowl().then() to resolve and create sound instances
+      await new Promise((r) => setTimeout(r, 0));
 
       // Sound effects should be configured for iOS
       expect(howlConstructorCalls.length).toBeGreaterThan(0);
@@ -114,8 +136,11 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
       expect(hasHtml5False).toBe(false);
     });
 
-    it('should configure all sound effects with html5: true', () => {
+    it('should configure all sound effects with html5: true', async () => {
       renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+
+      // Wait for ensureHowl().then() to resolve and create sound instances
+      await new Promise((r) => setTimeout(r, 0));
 
       // Expected sound effects
       const expectedSounds = [

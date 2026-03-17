@@ -163,7 +163,7 @@ function transitionGameState(gameCode: string, eventType: string, options: { imm
   const result = transition(currentState, eventType);
 
   if (!result.success) {
-    logger.debug('GAME_STATE', `Invalid transition for ${gameCode}: ${currentState} -> ${eventType}`);
+    logger.debug('GAME_STATE', `Transition rejected for ${gameCode}: ${currentState} -> ${eventType} (${result.error})`);
     return { success: false, previousState: currentState, newState: null, error: result.error };
   }
 

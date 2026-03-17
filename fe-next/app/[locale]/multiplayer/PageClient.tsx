@@ -355,11 +355,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   return (
     <SocketContext.Provider value={socketContextValue}>
-      {/* Show full banner during active game for better reconnection context; minimal dot otherwise */}
-      {isActive ? <ConnectionBanner showScoreSafe /> : <ConnectionDot />}
-      <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
       <ErrorBoundary>
         <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-x-hidden">
+          {/* Banners inside h-dvh so they participate in flex layout */}
+          {isActive ? <ConnectionBanner showScoreSafe /> : <ConnectionDot />}
+          <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
           {isClassroomMode ? (
             <>
               <EducationHeader showBackButton title={t('education.classroomGame.title')} />

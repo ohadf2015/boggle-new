@@ -101,6 +101,18 @@ jest.mock('framer-motion', () => ({
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useReducedMotion: () => false,
+}));
+
+// Mock RewardedAdGoldButton (uses ThemeProvider)
+jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark', toggleTheme: jest.fn() }),
+  ThemeProvider: ({ children }: any) => children,
 }));
 
 // Mock utilities

@@ -129,6 +129,7 @@ export function usePlayerGameEvents({
     setWordHuntPlayerLives,
     setWordHuntTargetAttempts,
     setWordHuntTargetFound,
+    setWordHuntTargetFoundBy,
     setWordHuntEliminatedPlayers,
     addWordHuntDiscoveryClues,
   } = useGameActions();
@@ -232,6 +233,7 @@ export function usePlayerGameEvents({
         storeUpdates.wordHuntPlayerLives = (data as any).wordHuntPlayerLives || {};
         storeUpdates.wordHuntTargetAttempts = [];
         storeUpdates.wordHuntTargetFound = false;
+        storeUpdates.wordHuntTargetFoundBy = null;
         storeUpdates.wordHuntEliminatedPlayers = (data as any).wordHuntEliminatedPlayers || [];
         storeUpdates.wordHuntDiscoveryClues = [];
         storeUpdates.wordHuntKnownLetters = [];
@@ -565,6 +567,8 @@ export function usePlayerGameEvents({
       logger.log('[PLAYER] Word hunt target found by:', data.username);
       // Mark target as found for all players (disables input for non-finders too)
       setWordHuntTargetFound(true);
+      // Store WHO found it so the overlay can distinguish "I found it" vs "someone else found it"
+      setWordHuntTargetFoundBy(data.username);
       // Show notification about who found it
       neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: '🎯', duration: 3000 });
     };

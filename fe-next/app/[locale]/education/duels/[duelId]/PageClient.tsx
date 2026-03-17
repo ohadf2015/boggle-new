@@ -9,6 +9,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { DuelGameView, RealTimeDuelGame } from '@/components/education/duels';
 import { cn } from '@/lib/utils';
 import { getDuelById } from '@/lib/supabase/education/duels';
+import { getProfile } from '@/lib/supabase';
 
 /**
  * Duel Game Page Client
@@ -59,9 +60,8 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
       // Set duel type and opponent name
       setDuelType(duel.duel_type || 'async');
       const opponentId = duel.challenger_id === user.id ? duel.opponent_id : duel.challenger_id;
-      // Note: In real implementation, fetch opponent profile to get display name
-      // For now, we'll use a placeholder
-      setOpponentName(opponentId);
+      const { data: opponentProfile } = await getProfile(opponentId, 'minimal');
+      setOpponentName(opponentProfile?.display_name || t('common.opponent'));
 
       setIsChecking(false);
     };

@@ -34,6 +34,19 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
  * };
  * ```
  */
+// CrazyGames ad error codes — handle each appropriately
+type CgAdErrorCode = 'adsDisabledBasicLaunch' | 'unfilled' | 'adblock' | 'adCooldown' | 'other';
+
+function extractAdErrorCode(errorData: unknown): CgAdErrorCode {
+  if (errorData && typeof errorData === 'object') {
+    const code = (errorData as Record<string, unknown>).code ?? (errorData as Record<string, unknown>).reason;
+    if (typeof code === 'string' && ['adsDisabledBasicLaunch', 'unfilled', 'adblock', 'adCooldown'].includes(code)) {
+      return code as CgAdErrorCode;
+    }
+  }
+  return 'other';
+}
+
 export function useCrazyGamesAds() {
   const {
     isAvailable,
@@ -46,6 +59,7 @@ export function useCrazyGamesAds() {
 
   const [isAdPlaying, setIsAdPlaying] = useState(false);
   const [hasAdblock, setHasAdblock] = useState(false);
+  const [adsDisabled, setAdsDisabled] = useState(false);
 
   // Check for adblock on mount
   useEffect(() => {
@@ -69,7 +83,7 @@ export function useCrazyGamesAds() {
    * Returns true if ad was shown and completed, false otherwise.
    */
   const requestMidgameAd = useCallback(async (): Promise<boolean> => {
-    if (!isAvailable || hasAdblock) return false;
+    if (!isAvailable || hasAdblock || adsDisabled) return false;
 
     setIsAdPlaying(true);
     gameplayStop();
@@ -89,14 +103,19 @@ export function useCrazyGamesAds() {
           Howler.mute(false);
           gameplayStart();
           setIsAdPlaying(false);
-          if (errorData && typeof errorData === 'object' && 'reason' in errorData) {
-            console.log('Midgame ad error:', errorData.reason);
+          const code = extractAdErrorCode(errorData);
+          if (code === 'adsDisabledBasicLaunch') {
+            setAdsDisabled(true);
+          } else if (code === 'adblock') {
+            setHasAdblock(true);
+          } else if (code !== 'adCooldown' && code !== 'unfilled') {
+            console.warn('Midgame ad error:', code, errorData);
           }
           resolve(false);
         },
       });
     });
-  }, [isAvailable, hasAdblock, showMidgameAd, gameplayStop, gameplayStart]);
+  }, [isAvailable, hasAdblock, adsDisabled, showMidgameAd, gameplayStop, gameplayStart]);
 
   /**
    * Request a rewarded ad for optional player boosts (extra lives, XP, etc.).
@@ -104,7 +123,7 @@ export function useCrazyGamesAds() {
    * Only grant reward if this returns true.
    */
   const requestRewardedAd = useCallback(async (): Promise<boolean> => {
-    if (!isAvailable || hasAdblock) return false;
+    if (!isAvailable || hasAdblock || adsDisabled) return false;
 
     setIsAdPlaying(true);
     gameplayStop();
@@ -124,14 +143,19 @@ export function useCrazyGamesAds() {
           Howler.mute(false);
           gameplayStart();
           setIsAdPlaying(false);
-          if (errorData && typeof errorData === 'object' && 'reason' in errorData) {
-            console.log('Rewarded ad error:', errorData.reason);
+          const code = extractAdErrorCode(errorData);
+          if (code === 'adsDisabledBasicLaunch') {
+            setAdsDisabled(true);
+          } else if (code === 'adblock') {
+            setHasAdblock(true);
+          } else if (code !== 'adCooldown' && code !== 'unfilled') {
+            console.warn('Rewarded ad error:', code, errorData);
           }
           resolve(false);
         },
       });
     });
-  }, [isAvailable, hasAdblock, showRewardedAd, gameplayStop, gameplayStart]);
+  }, [isAvailable, hasAdblock, adsDisabled, showRewardedAd, gameplayStop, gameplayStart]);
 
   return {
     /** Request midgame ad at natural break point */

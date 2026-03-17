@@ -108,6 +108,12 @@ jest.mock('../SinglePlayerResults', () => {
   return MockSinglePlayerResults;
 });
 
+jest.mock('../results/PracticeResults', () => {
+  const MockPracticeResults = () => <div data-testid="results">Practice Results</div>;
+  MockPracticeResults.displayName = 'MockPracticeResults';
+  return { __esModule: true, default: MockPracticeResults };
+});
+
 jest.mock('@/components/AutoHideHeader', () => {
   const MockAutoHideHeader = () => null;
   MockAutoHideHeader.displayName = 'MockAutoHideHeader';

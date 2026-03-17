@@ -121,6 +121,11 @@ function getConfettiCanvas(): HTMLCanvasElement | null {
  * Applies Neo-Brutalist defaults (flat squares, bold colors) unless overridden
  */
 export function fireConfetti(options: Options = {}): Promise<null> | null {
+  // Skip confetti entirely on low-end devices to prevent frame drops
+  if (typeof document !== 'undefined' && document.documentElement.classList.contains('low-end-device')) {
+    return null;
+  }
+
   // Ensure canvas exists
   getConfettiCanvas();
 

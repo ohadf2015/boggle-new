@@ -6,49 +6,15 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const remotion = require('remotion');
 
-// Mock Remotion hooks and components
-jest.mock('remotion', () => ({
-  AbsoluteFill: ({ children, style }: React.PropsWithChildren<{ style?: React.CSSProperties }>) => (
-    <div data-testid="absolute-fill" style={style}>
-      {children}
-    </div>
-  ),
-  Sequence: ({
-    children,
-    from,
-    durationInFrames,
-  }: React.PropsWithChildren<{ from: number; durationInFrames?: number }>) => (
-    <div data-testid="sequence" data-from={from} data-duration={durationInFrames}>
-      {children}
-    </div>
-  ),
-  Img: ({ src, style }: { src: string; style?: React.CSSProperties }) => (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img data-testid="remotion-img" src={src} style={style} alt="Boss" />
-  ),
-  useCurrentFrame: () => 150, // Mid-animation frame (victory text phase)
-  useVideoConfig: () => ({
-    fps: 30,
-    width: 1280,
-    height: 720,
-    durationInFrames: 240,
-  }),
-  interpolate: (
-    frame: number,
-    inputRange: number[],
-    outputRange: number[],
-  ) => {
-    // Simplified linear interpolation for testing
-    const [inMin, inMax] = inputRange;
-    const [outMin, outMax] = outputRange;
-    const t = (frame - inMin) / (inMax - inMin);
-    const clamped = Math.max(0, Math.min(1, t));
-    return outMin + clamped * (outMax - outMin);
-  },
-  spring: () => 1, // Fully sprung for testing
-  staticFile: (path: string) => `/static/${path}`,
-}));
+beforeEach(() => {
+  remotion.useCurrentFrame.mockReturnValue(150);
+  remotion.useVideoConfig.mockReturnValue({ fps: 30, width: 1280, height: 720, durationInFrames: 240 });
+  remotion.spring.mockReturnValue(1);
+  remotion.staticFile.mockImplementation((path: string) => `/static/${path}`);
+});
 
 import { BossDefeatCinematic, DEFEAT_DURATION_FRAMES } from '../BossDefeatCinematic';
 

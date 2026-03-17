@@ -143,6 +143,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     isGameActive: gameActive && !isGameOver,
     isGameOver,
     maxCombo: comboLevel,
+    wordsFound: foundWords.length,
   });
 
   // State

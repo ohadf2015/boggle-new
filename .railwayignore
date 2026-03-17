@@ -1,4 +1,5 @@
 # Dependencies
+**/node_modules/
 node_modules/
 fe-next/node_modules/
 package-lock.json
@@ -7,6 +8,7 @@ fe-next/package-lock.json
 # Build outputs
 build/
 dist/
+**/.next/
 fe-next/.next/
 fe-next/out/
 fe-next/build/
@@ -15,7 +17,9 @@ fe-next/build/
 .cache/
 .npm/
 .eslintcache
-fe-next/.next/cache/
+
+# Backup files
+*.bak
 
 # Test files
 coverage/
@@ -83,3 +87,7 @@ fe-next/playwright.config.*
 *~
 .tmp/
 temp/
+.superdesign/
+fe-next/remotion-root/
+fe-next/app/sw.js/
+fe-next/supabase/

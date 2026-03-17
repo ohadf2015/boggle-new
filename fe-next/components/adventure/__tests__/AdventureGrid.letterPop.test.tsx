@@ -227,16 +227,13 @@ describe('AdventureGrid - Letter Pop Animation', () => {
       const firstTile = screen.getAllByRole('gridcell')[0];
       fireEvent.mouseDown(firstTile, { clientX: 100, clientY: 150 });
 
-      // Sparkle position should be null (not triggered)
-      const sparkle = screen.getByTestId('selection-sparkle');
-      const positionData = sparkle.getAttribute('data-position');
-
-      expect(positionData).toBeNull();
+      // Sparkle component should not be rendered at all on low-end devices
+      expect(screen.queryByTestId('selection-sparkle')).not.toBeInTheDocument();
     });
   });
 
   describe('Sparkle respects device performance', () => {
-    it('should not set sparkle position on low-end devices', () => {
+    it('should not render sparkle on low-end devices', () => {
       mockUseDevicePerformance.mockReturnValue({
         isLowEnd: true,
         prefersReducedMotion: false,
@@ -261,10 +258,8 @@ describe('AdventureGrid - Letter Pop Animation', () => {
       const firstTile = screen.getAllByRole('gridcell')[0];
       fireEvent.mouseDown(firstTile, { clientX: 100, clientY: 150 });
 
-      // On low-end device with disabled animations, sparkle shouldn't trigger
-      const sparkle = screen.getByTestId('selection-sparkle');
-      const positionData = sparkle.getAttribute('data-position');
-      expect(positionData).toBeNull();
+      // Sparkle component should not be rendered at all on low-end devices
+      expect(screen.queryByTestId('selection-sparkle')).not.toBeInTheDocument();
     });
 
     it('should render sparkle on capable devices', () => {

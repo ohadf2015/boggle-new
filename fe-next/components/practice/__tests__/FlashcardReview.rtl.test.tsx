@@ -14,6 +14,7 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
   },
   AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
 }));

@@ -12,7 +12,7 @@ import {
   getSharedSocketIfExists,
   getSocketURL,
 } from '@/utils/SocketContext';
-import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
+import { saveSession, clearSessionPreservingUsername, getSession } from '@/utils/session';
 import logger from '@/utils/logger';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
@@ -173,27 +173,23 @@ export function useMultiplayerSocket(
       socketInstance.emit('getActiveRooms');
 
       // Handle reconnection to game - re-emit join to restore server-side state
+      // Uses getSession() which reads from the cookie (same source as saveSession)
+      // This is critical for CrazyGames iframe where the socket can disconnect/reconnect
+      // due to visibility changes, giving the socket a new ID and losing server mappings
       if (wasConnectedRef.current) {
-        const savedSession = window.sessionStorage.getItem('gameSession');
-        if (savedSession) {
-          try {
-            const parsedSession = JSON.parse(savedSession);
-            if (parsedSession.gameCode && parsedSession.username) {
-              logger.log('[SOCKET.IO] Reconnecting to game:', parsedSession.gameCode);
-              toast.success(optionsRef.current.t('common.reconnecting') || 'Reconnecting to game...', {
-                id: 'socket-reconnecting-to-game',
-                duration: 2000,
-              });
-              // Re-emit join to restore server-side socket mapping and get current game state
-              // The server's handleReconnection will send startGame if game is in progress
-              socketInstance.emit('join', {
-                gameCode: parsedSession.gameCode,
-                username: parsedSession.username,
-              });
-            }
-          } catch {
-            logger.error('[SOCKET.IO] Failed to parse saved session for reconnection');
-          }
+        const savedSession = getSession();
+        if (savedSession && savedSession.gameCode && savedSession.username) {
+          logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
+          toast.success(optionsRef.current.t('common.reconnecting') || 'Reconnecting to game...', {
+            id: 'socket-reconnecting-to-game',
+            duration: 2000,
+          });
+          // Re-emit join to restore server-side socket mapping and get current game state
+          // The server's handleReconnection will send startGame if game is in progress
+          socketInstance.emit('join', {
+            gameCode: savedSession.gameCode,
+            username: savedSession.username,
+          });
         }
       }
       wasConnectedRef.current = true;

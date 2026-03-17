@@ -1,5 +1,4 @@
-import { GameStartCoordinator } from '../gameStartCoordinator';
-import type { TimeoutStats } from '../gameStartCoordinator';
+import { GameStartCoordinator, type TimeoutStats } from '../gameStartCoordinator';
 
 jest.mock('../logger', () => ({
   debug: jest.fn(),

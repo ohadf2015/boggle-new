@@ -1,7 +1,7 @@
 /**
- * WordHuntLifeBar Danger Glow + Pulse Tests
+ * WordHuntLifeBar Danger Glow + Shake Tests
  *
- * Tests danger glow when life is low and pulse on life decrease.
+ * Tests danger glow class when life is low and shake on life decrease.
  */
 
 import React from 'react';
@@ -49,35 +49,35 @@ jest.mock('framer-motion', () => {
 import { WordHuntLifeBar } from '../WordHuntLifeBar';
 
 describe('WordHuntLifeBar Danger Glow', () => {
-  it('should not have danger glow when life is above 30%', () => {
+  it('should not have danger glow when life is above 33%', () => {
     render(<WordHuntLifeBar life={80} maxLife={100} />);
     const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).not.toContain('shadow-[0_0_');
+    expect(container.className).not.toContain('life-bar-danger-glow');
   });
 
-  it('should have red danger glow when life is at or below 30%', () => {
+  it('should have danger glow class when life is at or below 33%', () => {
     render(<WordHuntLifeBar life={25} maxLife={100} />);
     const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).toContain('shadow-[0_0_12px_rgba(255,0,0,0.4)]');
+    expect(container.className).toContain('life-bar-danger-glow');
   });
 
-  it('should have danger glow at exactly 30%', () => {
-    render(<WordHuntLifeBar life={30} maxLife={100} />);
+  it('should have danger glow at exactly 33%', () => {
+    render(<WordHuntLifeBar life={33} maxLife={100} />);
     const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).toContain('shadow-[0_0_12px_rgba(255,0,0,0.4)]');
+    expect(container.className).toContain('life-bar-danger-glow');
   });
 
-  it('should have pulse class when life decreases', () => {
+  it('should have shake class when life decreases', () => {
     const { rerender } = render(<WordHuntLifeBar life={80} maxLife={100} />);
     rerender(<WordHuntLifeBar life={60} maxLife={100} />);
 
     const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).toContain('animate-pulse-once');
+    expect(container.className).toContain('animate-neo-shake');
   });
 
-  it('should not have pulse class on initial render', () => {
+  it('should not have shake class on initial render', () => {
     render(<WordHuntLifeBar life={80} maxLife={100} />);
     const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).not.toContain('animate-pulse-once');
+    expect(container.className).not.toContain('animate-neo-shake');
   });
 });

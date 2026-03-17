@@ -19,6 +19,22 @@ function getHreflangAlternates(path: string) {
   for (const loc of LOCALES) {
     languages[loc] = `${BASE_URL}/${loc}${path}`;
   }
+  languages['en-IL'] = `${BASE_URL}/en${path}`;
+  languages['he-IL'] = `${BASE_URL}/he${path}`;
+  languages['en-US'] = `${BASE_URL}/en${path}`;
+  languages['es-US'] = `${BASE_URL}/es${path}`;
+  languages['en-GB'] = `${BASE_URL}/en${path}`;
+  languages['en-SE'] = `${BASE_URL}/en${path}`;
+  languages['sv-SE'] = `${BASE_URL}/sv${path}`;
+  languages['en-JP'] = `${BASE_URL}/en${path}`;
+  languages['ja-JP'] = `${BASE_URL}/ja${path}`;
+  languages['en-ES'] = `${BASE_URL}/en${path}`;
+  languages['es-ES'] = `${BASE_URL}/es${path}`;
+  languages['en-MX'] = `${BASE_URL}/en${path}`;
+  languages['es-MX'] = `${BASE_URL}/es${path}`;
+  languages['en-AU'] = `${BASE_URL}/en${path}`;
+  languages['es-AR'] = `${BASE_URL}/es${path}`;
+  languages['es-CO'] = `${BASE_URL}/es${path}`;
   return languages;
 }
 

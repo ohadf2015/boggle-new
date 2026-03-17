@@ -20,6 +20,11 @@ export interface TimedBlitzPracticeProps {
     score: number;
   }) => void;
   onBack: () => void;
+  /** XP session data to display on results screen (optional) */
+  xpSessionData?: {
+    sessionXpEarned: number;
+    sessionMasteryMessage: string | null;
+  };
 }
 
 type GamePhase = 'countdown' | 'playing' | 'timesup' | 'results';
@@ -40,6 +45,7 @@ export function TimedBlitzPractice({
   words,
   onComplete,
   onBack,
+  xpSessionData,
 }: TimedBlitzPracticeProps) {
   const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -347,7 +353,8 @@ export function TimedBlitzPractice({
             <PracticeResultsCard
               correct={wordsFound}
               total={wordsAttempted}
-              xpEarned={score}
+              xpEarned={xpSessionData?.sessionXpEarned}
+              masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
               onRestart={handleRestart}
               onBack={onBack}
             />

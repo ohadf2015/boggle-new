@@ -65,6 +65,7 @@ export const useWordHuntMyLife = (): number => useGameStore((state) => state.wor
 export const useWordHuntPlayerLives = () => useGameStore((state) => state.wordHuntPlayerLives);
 export const useWordHuntTargetAttempts = () => useGameStore((state) => state.wordHuntTargetAttempts);
 export const useWordHuntTargetFound = (): boolean => useGameStore((state) => state.wordHuntTargetFound);
+export const useWordHuntTargetFoundBy = (): string | null => useGameStore((state) => state.wordHuntTargetFoundBy);
 export const useWordHuntEliminatedPlayers = () => useGameStore((state) => state.wordHuntEliminatedPlayers);
 export const useWordHuntDiscoveryClues = () => useGameStore((state) => state.wordHuntDiscoveryClues);
 export const useWordHuntKnownLetters = () => useGameStore((state) => state.wordHuntKnownLetters);
@@ -120,6 +121,7 @@ const getActions = (state: GameStore) => ({
   setWordHuntPlayerLives: state.setWordHuntPlayerLives,
   setWordHuntTargetAttempts: state.setWordHuntTargetAttempts,
   setWordHuntTargetFound: state.setWordHuntTargetFound,
+  setWordHuntTargetFoundBy: state.setWordHuntTargetFoundBy,
   setWordHuntEliminatedPlayers: state.setWordHuntEliminatedPlayers,
   addWordHuntDiscoveryClues: state.addWordHuntDiscoveryClues,
   batchStartGame: state.batchStartGame,

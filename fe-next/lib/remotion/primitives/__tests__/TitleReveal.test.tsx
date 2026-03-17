@@ -8,27 +8,29 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-// Mock remotion with useVideoConfig returning portrait mobile dimensions
 jest.mock('remotion', () => ({
-  useCurrentFrame: () => 10,
-  useVideoConfig: () => ({ width: 390, height: 219, fps: 30, durationInFrames: 90 }),
-  interpolate: (
-    f: number,
-    [a, b]: number[],
-    [c, d]: number[],
-    _options?: unknown,
-  ) => {
-    const pct = Math.min(1, Math.max(0, (f - a) / (b - a)));
-    return c + pct * (d - c);
-  },
-  spring: () => 1,
+  __esModule: true,
+  useCurrentFrame: jest.fn(() => 0),
+  useVideoConfig: jest.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 })),
+  interpolate: jest.fn((frame: number, inputRange: number[], outputRange: number[]) => {
+    if (frame <= inputRange[0]) return outputRange[0];
+    if (frame >= inputRange[inputRange.length - 1]) return outputRange[outputRange.length - 1];
+    const [inMin, inMax] = inputRange;
+    const [outMin, outMax] = outputRange;
+    const pct = Math.min(1, Math.max(0, (frame - inMin) / (inMax - inMin)));
+    return outMin + pct * (outMax - outMin);
+  }),
+  spring: jest.fn(() => 0),
   Easing: { bezier: () => (t: number) => t },
-  AbsoluteFill: ({ children, style, ...rest }: React.PropsWithChildren<{ style?: React.CSSProperties; 'data-testid'?: string }>) => (
-    <div data-testid={(rest as Record<string, unknown>)['data-testid'] as string || 'absolute-fill'} style={style}>
+  AbsoluteFill: ({ children, style, ...rest }: any) => (
+    <div data-testid={rest['data-testid'] || 'absolute-fill'} style={style}>
       {children}
     </div>
   ),
 }));
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const remotion = require('remotion');
 
 // Mock fonts
 jest.mock('../../fonts', () => ({
@@ -37,6 +39,12 @@ jest.mock('../../fonts', () => ({
 }));
 
 import { TitleReveal } from '../TitleReveal';
+
+beforeEach(() => {
+  remotion.useCurrentFrame.mockReturnValue(10);
+  remotion.useVideoConfig.mockReturnValue({ width: 390, height: 219, fps: 30, durationInFrames: 90 });
+  remotion.spring.mockReturnValue(1);
+});
 
 describe('TitleReveal responsive scaling', () => {
   it('scales title font size based on composition width when no fontSize prop given', () => {

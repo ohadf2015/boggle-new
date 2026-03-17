@@ -65,7 +65,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AppealWor
 
     const normalizedWord = word.toLowerCase().trim();
 
-    if (normalizedWord.length < 2) {
+    if (normalizedWord.length < 3) {
       return NextResponse.json({ success: false, error: 'Word too short to appeal' }, { status: 400 });
     }
 

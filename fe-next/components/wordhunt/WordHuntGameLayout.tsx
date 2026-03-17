@@ -1,13 +1,13 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { SurvivalClueBoxes } from '@/components/daily/survival/SurvivalClueBoxes';
 import { SurvivalLifeBar } from '@/components/daily/survival/SurvivalLifeBar';
 import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSection';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { WordHuntMPHeader } from './WordHuntMPHeader';
 import { WordHuntMPLeaderboard, type LeaderboardPlayer } from './WordHuntMPLeaderboard';
-import { WordHuntGameOverOverlay } from './WordHuntGameOverOverlay';
+import { WordHuntGameOverOverlay, type GameOverReason } from './WordHuntGameOverOverlay';
 import type { LetterGrid } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival/types';
@@ -32,6 +32,8 @@ export interface WordHuntGameLayoutProps {
   lifePoints: number;
   isGameOver: boolean;
   targetFound: boolean;
+  /** Username of who found the target (null = not found yet). Used to show correct overlay. */
+  targetFoundBy?: string | null;
   isLifeGaining: boolean;
   lifeGainAmount: number | null;
 
@@ -79,6 +81,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   lifePoints,
   isGameOver,
   targetFound,
+  targetFoundBy,
   isLifeGaining,
   lifeGainAmount,
 
@@ -108,18 +111,18 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   gameDir,
 }) => {
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden" style={{ ['--game-chrome-height' as string]: '400px' } as React.CSSProperties}>
+    <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
       {/* Main game area */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        {/* Score + Quit */}
+        {/* Score + Quit — compact */}
         <WordHuntMPHeader
           score={score}
           onQuit={onQuit}
           t={t}
         />
 
-        {/* Clue Boxes (target word blanks with accumulated feedback) */}
-        <div className={`px-3 py-0.5 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
+        {/* Clue Boxes — tight vertical padding */}
+        <div className={`px-2 py-0 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
           <SurvivalClueBoxes
             currentHint={currentHint}
             targetWord={'?'.repeat(targetLength)}
@@ -136,8 +139,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           />
         </div>
 
-        {/* Life Bar */}
-        <div className="px-3 py-0.5 flex-shrink-0">
+        {/* Life Bar — compact wrapper */}
+        <div className="px-2 py-0 flex-shrink-0">
           <SurvivalLifeBar
             lifePoints={lifePoints}
             isGameOver={isGameOver}
@@ -148,8 +151,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           />
         </div>
 
-        {/* Grid — fills remaining space, overflow-hidden prevents grid from pushing siblings off-screen */}
-        <div className="flex-1 min-h-0 px-2 relative overflow-hidden">
+        {/* Grid — fills remaining space, auto-scales to fit */}
+        <div className="flex-1 min-h-0 px-1 relative overflow-hidden">
           <SurvivalGridSection
             grid={grid}
             isGameOver={isGameOver}
@@ -175,13 +178,13 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
 
           {/* Game over overlay — death or victory, then spectator mode */}
           <WordHuntGameOverOverlay
-            reason={isGameOver ? (targetFound ? 'found' : 'eliminated') : null}
+            reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
             t={t}
           />
         </div>
 
         {/* Word Forming Area */}
-        <div className="px-3 flex-shrink-0">
+        <div className="px-2 flex-shrink-0">
           <WordFormingArea
             word={formedWord}
             letterCount={letterCount}
@@ -190,8 +193,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           />
         </div>
 
-        {/* MP Leaderboard — mobile only (below game) */}
-        <div className="flex-shrink-0 max-h-[15vh] overflow-y-auto lg:hidden">
+        {/* MP Leaderboard — mobile: compact horizontal strip */}
+        <div className="flex-shrink-0 max-h-[10vh] overflow-y-auto lg:hidden">
           <WordHuntMPLeaderboard
             playerLives={playerLives}
             eliminatedPlayers={eliminatedPlayers}

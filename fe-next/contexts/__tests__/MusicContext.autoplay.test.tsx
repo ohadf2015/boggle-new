@@ -148,7 +148,8 @@ jest.mock('@/lib/audio/audioLoader', () => ({
       // Wait for load to complete
       setTimeout(() => resolve(), 20);
     });
-  })
+  }),
+  ensureHowl: jest.fn().mockResolvedValue(jest.fn()),
 }));
 
 describe('MusicContext - Auto-play and Transitions', () => {

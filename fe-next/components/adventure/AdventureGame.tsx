@@ -275,7 +275,7 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const wordSubmit = useAdventureWordSubmit({
-      isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices,
+      isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, tiles,
       gridSize: levelConfig.gridSize, minWordLength, validateWord, submitWordWithPath,
       clearSelection, clearCurrentHint, recordActivity, resetOnGameAction,
       comboCount: gameState.comboCount, wordsFound: gameState.wordsFound,

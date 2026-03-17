@@ -8,7 +8,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
@@ -129,20 +129,20 @@ export default function StudentLessonView() {
   }
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className="space-y-4"
       variants={listContainer}
       initial="hidden"
       animate="visible"
     >
       {/* Section header */}
-      <motion.div variants={headerEntrance} className="flex items-center gap-3 mb-2">
+      <AdaptiveMotion.div variants={headerEntrance} className="flex items-center gap-3 mb-2">
         <h2 className="text-2xl font-neo-display font-black text-neo-white">
           {t('student.dashboard.title')}
         </h2>
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {activeLessonCount > 0 && (
-            <motion.span
+            <AdaptiveMotion.span
               key="count"
               variants={countBadgePop}
               initial="hidden"
@@ -151,10 +151,10 @@ export default function StudentLessonView() {
               className="px-2.5 py-0.5 bg-neo-cyan border-2 border-black text-black text-sm font-black rounded-neo shadow-hard-sm tabular-nums"
             >
               {activeLessonCount}
-            </motion.span>
+            </AdaptiveMotion.span>
           )}
-        </AnimatePresence>
-      </motion.div>
+        </AdaptiveAnimatePresence>
+      </AdaptiveMotion.div>
 
       {lessons.map((studentLesson, index) => {
         const { status, lesson, progress } = studentLesson;
@@ -178,10 +178,10 @@ export default function StudentLessonView() {
         const cardTilt = index % 2 === 0 ? -0.4 : 0.4;
 
         return (
-          <motion.div
+          <AdaptiveMotion.div
             key={studentLesson.lessonId}
             variants={cardEntrance}
-            style={{ rotate: cardTilt }}
+            style={{ transform: `rotate(${cardTilt}deg)` }}
             whileHover={{
               rotate: 0,
               y: -5,
@@ -215,7 +215,7 @@ export default function StudentLessonView() {
                     </h3>
 
                     {status === 'assigned' && (
-                      <motion.span
+                      <AdaptiveMotion.span
                         animate={{
                           scale: [1, 1.08, 1],
                           boxShadow: [
@@ -229,18 +229,18 @@ export default function StudentLessonView() {
                       >
                         <Star className="w-3 h-3 fill-current" />
                         NEW
-                      </motion.span>
+                      </AdaptiveMotion.span>
                     )}
 
                     {status === 'completed' && (
-                      <motion.span
+                      <AdaptiveMotion.span
                         variants={doneBadge}
                         initial="hidden"
                         animate="visible"
                         className="flex-shrink-0 px-2 py-0.5 bg-neo-yellow border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
                       >
                         ✓ DONE
-                      </motion.span>
+                      </AdaptiveMotion.span>
                     )}
                   </div>
 
@@ -257,14 +257,14 @@ export default function StudentLessonView() {
                           <Award className="w-4 h-4 text-neo-cyan" />
                           {masteredWords} {t('student.lessons.mastered')}
                         </span>
-                        <motion.span
+                        <AdaptiveMotion.span
                           className="flex items-center gap-1.5 font-black text-black"
                           animate={masteryPercent === 100 ? { scale: [1, 1.15, 1] } : {}}
                           transition={{ duration: 0.6, delay: 0.8 }}
                         >
                           <Activity className="w-4 h-4 text-neo-yellow" />
                           {masteryPercent}%
-                        </motion.span>
+                        </AdaptiveMotion.span>
                       </>
                     )}
                   </div>
@@ -272,7 +272,7 @@ export default function StudentLessonView() {
                   {/* Animated progress bar */}
                   {status !== 'assigned' && progress && (
                     <div className="mt-3 w-full h-3 rounded-neo border-2 border-black bg-black/10 overflow-hidden">
-                      <motion.div
+                      <AdaptiveMotion.div
                         className={cn('h-full rounded-neo', fillColor)}
                         variants={progressBarFill}
                         custom={masteryPercent}
@@ -296,9 +296,9 @@ export default function StudentLessonView() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         );
       })}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 }

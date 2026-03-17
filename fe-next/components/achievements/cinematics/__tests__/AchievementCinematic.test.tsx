@@ -1,22 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('remotion', () => ({
-  AbsoluteFill: ({ children, style, ...rest }: React.PropsWithChildren<{ style?: React.CSSProperties; 'data-testid'?: string }>) => (
-    <div data-testid={rest['data-testid'] || 'absolute-fill'} style={style}>{children}</div>
-  ),
-  Sequence: ({ children, from }: React.PropsWithChildren<{ from: number }>) => (
-    <div data-testid="sequence" data-from={from}>{children}</div>
-  ),
-  useCurrentFrame: () => 120,
-  useVideoConfig: () => ({ fps: 30, width: 1280, height: 720, durationInFrames: 210 }),
-  interpolate: (frame: number, inputRange: number[], outputRange: number[]) => {
-    const [inMin, inMax] = inputRange;
-    const [outMin, outMax] = outputRange;
-    const t = Math.max(0, Math.min(1, (frame - inMin) / (inMax - inMin)));
-    return outMin + t * (outMax - outMin);
-  },
-  spring: () => 1,
+const remotion = require('remotion');
+
+// Mock @remotion/transitions (transitive dep via WordHuntPromoVideo)
+jest.mock('@remotion/transitions', () => ({
+  TransitionSeries: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  linearTiming: () => ({}),
 }));
 
 jest.mock('../../../../lib/remotion/fonts', () => ({
@@ -25,6 +15,18 @@ jest.mock('../../../../lib/remotion/fonts', () => ({
 }));
 
 import { AchievementCinematic, ACHIEVEMENT_DURATION_FRAMES } from '../AchievementCinematic';
+
+beforeEach(() => {
+  remotion.useCurrentFrame.mockReturnValue(120);
+  remotion.useVideoConfig.mockReturnValue({ fps: 30, width: 1280, height: 720, durationInFrames: 210 });
+  remotion.interpolate.mockImplementation((frame: number, inputRange: number[], outputRange: number[]) => {
+    const [inMin, inMax] = inputRange;
+    const [outMin, outMax] = outputRange;
+    const t = Math.max(0, Math.min(1, (frame - inMin) / (inMax - inMin)));
+    return outMin + t * (outMax - outMin);
+  });
+  remotion.spring.mockReturnValue(1);
+});
 
 describe('AchievementCinematic', () => {
   const goldProps = {

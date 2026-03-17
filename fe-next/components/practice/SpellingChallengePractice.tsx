@@ -16,6 +16,11 @@ export interface SpellingChallengePracticeProps {
   words: VocabularyWord[];
   onComplete: (results: { correct: number; total: number; accuracy: number }) => void;
   onBack: () => void;
+  /** XP session data to display on results screen (optional) */
+  xpSessionData?: {
+    sessionXpEarned: number;
+    sessionMasteryMessage: string | null;
+  };
 }
 
 /**
@@ -33,6 +38,7 @@ export function SpellingChallengePractice({
   words,
   onComplete,
   onBack,
+  xpSessionData,
 }: SpellingChallengePracticeProps) {
   const { t, dir, language } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -132,6 +138,8 @@ export function SpellingChallengePractice({
         <PracticeResultsCard
           correct={correctCount}
           total={attempts}
+          xpEarned={xpSessionData?.sessionXpEarned}
+          masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
           onRestart={handleRestart}
           onBack={handleComplete}
           timeSpent={timeSpent}

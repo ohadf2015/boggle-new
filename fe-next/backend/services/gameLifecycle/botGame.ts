@@ -15,6 +15,7 @@ import {
   getGame,
 } from '../../modules/gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../../modules/blastModeManager';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
 import type { BotSubmission } from './types';
@@ -109,22 +110,52 @@ export function startBotsForGame(
           return;
         }
 
+        // Get current game state for mode-specific logic
+        const currentGame = getGame(gameCode);
+
+        // Bug fix: Calculate blast mode tile bonus (same as human path)
+        let blastTileBonus = 0;
+        if (currentGame?.gameMode === 'blast' && currentGame.blastModeState) {
+          try {
+            const blastState = currentGame.blastModeState;
+            const tilesOnPath = getTilesOnPath(
+              word,
+              currentGame.letterPositions || new Map(),
+              blastState.overlay,
+              blastState.overlayMap
+            );
+            blastTileBonus = calculateBlastTileBonus(tilesOnPath);
+            const gemCount = tilesOnPath.filter((t: string) => t === 'gem').length;
+            recordBlastMove(blastState, username, comboLevel || 0, word, tilesOnPath.length, gemCount, blastTileBonus);
+          } catch (err) {
+            logger.error('BOT', `Blast bonus error for "${username}": ${(err as Error).message}`);
+          }
+        }
+
+        const totalScore = score + blastTileBonus;
+
         // Score cap: don't let bot outscore best human
-        if (!shouldBotScore(gameCode, username, bot.score, score)) {
+        if (!shouldBotScore(gameCode, username, bot.score, totalScore)) {
           logger.debug('BOT', `Bot "${username}" score capped (would exceed best human)`);
           return;
         }
 
+        // Bug fix: Sync combo to server state (mirrors wordValidationHandler)
+        if (currentGame) {
+          if (!currentGame.playerCombos) currentGame.playerCombos = {};
+          currentGame.playerCombos[username] = (comboLevel || 0) + 1;
+        }
+
         addPlayerWord(gameCode, username, word, {
           autoValidated: true,
-          score,
+          score: totalScore,
           comboBonus: 0,
           comboLevel: comboLevel || 0,
           isBot: true,
         });
 
-        trackBotWord(gameCode, word, username, score);
-        updatePlayerScore(gameCode, username, score, true);
+        trackBotWord(gameCode, word, username, totalScore);
+        updatePlayerScore(gameCode, username, totalScore, true);
 
         const leaderboard = getLeaderboard(gameCode);
         broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {

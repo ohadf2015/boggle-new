@@ -28,6 +28,11 @@ export interface WordMatchingPracticeProps {
   words: VocabularyWord[];
   onComplete: (results: { correct: number; total: number; accuracy: number }) => void;
   onBack: () => void;
+  /** XP session data to display on results screen (optional) */
+  xpSessionData?: {
+    sessionXpEarned: number;
+    sessionMasteryMessage: string | null;
+  };
 }
 
 interface DraggableWordCardProps {
@@ -119,7 +124,7 @@ const DroppableDefinitionSlot = memo<DroppableDefinitionSlotProps>(({
 DroppableDefinitionSlot.displayName = 'DroppableDefinitionSlot';
 
 export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
-  ({ words, onComplete, onBack }) => {
+  ({ words, onComplete, onBack, xpSessionData }) => {
     const { t, dir, language } = useLanguage();
     const isRTL = dir === 'rtl';
 
@@ -224,6 +229,8 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
           <PracticeResultsCard
             correct={correctCount}
             total={attempts}
+            xpEarned={xpSessionData?.sessionXpEarned}
+            masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
             onRestart={handleRestart}
             onBack={handleComplete}
           />

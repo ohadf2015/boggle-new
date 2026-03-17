@@ -49,7 +49,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "mx-auto max-w-3xl w-full px-3 py-3 mb-1 rounded-neo-lg transition-all duration-300",
+        "mx-auto max-w-3xl w-full px-3 py-2 mb-0.5 rounded-neo-lg transition-all duration-300",
         "bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20",
         showFeedbackOverlay
           ? "clue-feedback-active clue-container-attention"

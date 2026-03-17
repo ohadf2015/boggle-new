@@ -57,6 +57,7 @@ const CrazyGamesBanner = memo<CrazyGamesBannerProps>(({
   const containerId = `cg-banner-${uniqueId.replace(/:/g, '')}`;
   const containerRef = useRef<HTMLDivElement>(null);
   const hasRequestedRef = useRef(false);
+  const lastRequestTimeRef = useRef(0);
 
   const {
     isAvailable,
@@ -70,7 +71,13 @@ const CrazyGamesBanner = memo<CrazyGamesBannerProps>(({
   useEffect(() => {
     if (isLoading || !isAvailable || !show || hasRequestedRef.current) return;
 
-    // Small delay to ensure DOM is ready
+    // Enforce 30-second minimum between banner requests (CrazyGames requirement)
+    const BANNER_COOLDOWN_MS = 30000;
+    const timeSinceLastRequest = Date.now() - lastRequestTimeRef.current;
+    const delay = lastRequestTimeRef.current === 0
+      ? 100 // First request: small delay for DOM readiness
+      : Math.max(100, BANNER_COOLDOWN_MS - timeSinceLastRequest);
+
     const timeoutId = setTimeout(() => {
       if (responsive) {
         requestResponsiveBanner(containerId);
@@ -79,7 +86,8 @@ const CrazyGamesBanner = memo<CrazyGamesBannerProps>(({
         requestBanner(containerId, width, height);
       }
       hasRequestedRef.current = true;
-    }, 100);
+      lastRequestTimeRef.current = Date.now();
+    }, delay);
 
     return () => clearTimeout(timeoutId);
   }, [isAvailable, isLoading, show, responsive, size, containerId, requestBanner, requestResponsiveBanner]);

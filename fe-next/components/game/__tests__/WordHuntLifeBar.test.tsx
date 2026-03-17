@@ -61,10 +61,10 @@ describe('WordHuntLifeBar', () => {
     expect(fill.className).toContain('red');
   });
 
-  it('should handle zero life', () => {
+  it('should handle zero life with minimum visible width', () => {
     render(<WordHuntLifeBar life={0} maxLife={100} />);
     const fill = screen.getByTestId('word-hunt-life-bar-fill');
-    expect(fill).toHaveStyle({ width: '0%' });
+    expect(fill).toHaveStyle({ width: '8%' });
   });
 
   it('should handle life exceeding maxLife gracefully', () => {

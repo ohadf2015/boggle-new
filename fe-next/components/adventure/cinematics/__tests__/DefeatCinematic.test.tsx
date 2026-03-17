@@ -6,44 +6,14 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const remotion = require('remotion');
 
-// Mock Remotion hooks and components
-jest.mock('remotion', () => ({
-  AbsoluteFill: ({ children, style }: React.PropsWithChildren<{ style?: React.CSSProperties }>) => (
-    <div data-testid="absolute-fill" style={style}>
-      {children}
-    </div>
-  ),
-  Sequence: ({
-    children,
-    from,
-    durationInFrames,
-  }: React.PropsWithChildren<{ from: number; durationInFrames?: number }>) => (
-    <div data-testid="sequence" data-from={from} data-duration={durationInFrames}>
-      {children}
-    </div>
-  ),
-  useCurrentFrame: () => 75, // Mid-animation frame (2.5 seconds in)
-  useVideoConfig: () => ({
-    fps: 30,
-    width: 1280,
-    height: 720,
-    durationInFrames: 150,
-  }),
-  interpolate: (
-    frame: number,
-    inputRange: number[],
-    outputRange: number[],
-  ) => {
-    // Simplified linear interpolation for testing
-    const [inMin, inMax] = inputRange;
-    const [outMin, outMax] = outputRange;
-    const t = (frame - inMin) / (inMax - inMin);
-    const clamped = Math.max(0, Math.min(1, t));
-    return outMin + clamped * (outMax - outMin);
-  },
-  spring: () => 1, // Fully sprung for testing
-}));
+beforeEach(() => {
+  remotion.useCurrentFrame.mockReturnValue(75);
+  remotion.useVideoConfig.mockReturnValue({ fps: 30, width: 1280, height: 720, durationInFrames: 150 });
+  remotion.spring.mockReturnValue(1);
+});
 
 import { DefeatCinematic, DEFEAT_DURATION_FRAMES } from '../DefeatCinematic';
 

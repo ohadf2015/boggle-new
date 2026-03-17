@@ -18,9 +18,8 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureObjectives from '../AdventureObjectives';
 import { ChapterQuestProgress } from './ChapterQuestProgress';
-import type { ChapterQuest, ChapterQuestProgress as QuestProgressType } from '@/types/adventure';
+import type { ChapterQuest, ChapterQuestProgress as QuestProgressType, LevelObjective, ObjectiveType } from '@/types/adventure';
 import { calculateStars } from '@/hooks/adventureGameReducer';
-import type { LevelObjective, ObjectiveType } from '@/types/adventure';
 
 // ==============================================
 // CONSTANTS

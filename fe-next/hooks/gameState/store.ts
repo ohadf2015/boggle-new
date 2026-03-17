@@ -64,6 +64,7 @@ const initialState: GameState = {
   wordHuntPlayerLives: {},
   wordHuntTargetAttempts: [],
   wordHuntTargetFound: false,
+  wordHuntTargetFoundBy: null,
   wordHuntEliminatedPlayers: [],
   wordHuntDiscoveryClues: [],
   wordHuntKnownLetters: [],
@@ -351,6 +352,8 @@ export const useGameStore = create<GameStore>()(
       wordHuntTargetFound: applySetState(value, state.wordHuntTargetFound)
     })),
 
+    setWordHuntTargetFoundBy: (value) => set({ wordHuntTargetFoundBy: value }),
+
     setWordHuntEliminatedPlayers: (value) => set((state) => ({
       wordHuntEliminatedPlayers: applySetState(value, state.wordHuntEliminatedPlayers)
     })),
@@ -397,6 +400,7 @@ export const useGameStore = create<GameStore>()(
         wordHuntPlayerLives: {},
         wordHuntTargetAttempts: [],
         wordHuntTargetFound: false,
+        wordHuntTargetFoundBy: null,
         wordHuntDiscoveryClues: [],
         wordHuntKnownLetters: [],
       }));
@@ -496,6 +500,7 @@ export {
   useWordHuntPlayerLives,
   useWordHuntTargetAttempts,
   useWordHuntTargetFound,
+  useWordHuntTargetFoundBy,
   useWordHuntEliminatedPlayers,
   useWordHuntDiscoveryClues,
   useWordHuntKnownLetters,

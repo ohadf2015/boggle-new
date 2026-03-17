@@ -390,7 +390,7 @@ const AdventureGrid = memo(
             bossGridClass,
           )}
         >
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence mode={enableComplexAnimations ? 'popLayout' : 'sync'}>
           {tiles.map((tile, index) => {
             const isSelected = selectedSet.has(index);
             const isHintHighlighted = hintSet.has(index);
@@ -429,7 +429,7 @@ const AdventureGrid = memo(
           </AnimatePresence>
 
           {/* Word Path Trail - z-20 to render above tiles (which have z-10 when selected) */}
-          {pathPoints && pathPoints.length >= 2 && (
+          {enableComplexAnimations && pathPoints && pathPoints.length >= 2 && (
             <div className="absolute inset-0 pointer-events-none z-20" data-testid="word-path-trail">
               <WordPathTrail
                 points={pathPoints}
@@ -441,15 +441,17 @@ const AdventureGrid = memo(
             </div>
           )}
 
-          {/* Selection Sparkle Effect */}
-          <SelectionSparkle
-            position={sparkleState.position}
-            triggerKey={sparkleState.key}
-            colorScheme="valid"
-            particleCount={6}
-            spreadRadius={30}
-            useSquareParticles
-          />
+          {/* Selection Sparkle Effect - skip on low-end */}
+          {enableComplexAnimations && (
+            <SelectionSparkle
+              position={sparkleState.position}
+              triggerKey={sparkleState.key}
+              colorScheme="valid"
+              particleCount={6}
+              spreadRadius={30}
+              useSquareParticles
+            />
+          )}
           </div>
         </BoardFrame>
       </div>

@@ -33,6 +33,7 @@ jest.mock('framer-motion', () => ({
     span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <span {...props}>{children}</span>,
   },
   AnimatePresence: ({ children }: React.PropsWithChildren<unknown>) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 // Mock confetti
@@ -43,6 +44,16 @@ jest.mock('@/utils/confettiUtils', () => ({
 // Mock RewardedAdButton (uses ThemeProvider internally)
 jest.mock('@/components/ads/RewardedAdButton', () => ({
   RewardedAdButton: ({ children }: any) => children || null,
+}));
+
+jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark', toggleTheme: jest.fn() }),
+  ThemeProvider: ({ children }: any) => children,
 }));
 
 // Mock share image utilities
