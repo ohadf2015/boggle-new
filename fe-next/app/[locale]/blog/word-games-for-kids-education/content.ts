@@ -57,7 +57,7 @@ So what does work? Repeated exposure in varied contexts. Active engagement with 
         title: 'The Research: Game-Based Learning Actually Works',
         content: `I know, I know. "Game-based learning" has become such a buzzword that it's practically meaningless. Every edtech startup claims their product "gamifies" learning. Most of them just added a points system to a worksheet.
 
-But the research on actual word games — not gamified worksheets, but genuine games where language manipulation IS the gameplay — is surprisingly robust.
+But the research on actual word games — not gamified worksheets, but genuine games where language manipulation IS the gameplay — is stronger than you'd expect.
 
 A meta-analysis by Acquah and Katz (2020), published in Computers & Education, reviewed 30 studies on digital game-based language learning and found significant positive effects on vocabulary acquisition. The effect size was moderate to large (d = 0.67), which in educational research terms is meaningful.
 
@@ -87,7 +87,7 @@ They see the spelling (orthographic knowledge). They subvocalize the pronunciati
 
 A study by Aghlara and Tamjid (2011) found that Iranian EFL learners who used word games scored significantly higher on vocabulary tests than those who received traditional instruction. Critically, the word game group also reported dramatically lower anxiety levels. For ELL students, who often experience significant language anxiety, this reduction in stress is itself a learning advantage.
 
-I saw this firsthand with my ESL students. The ones who froze during oral exercises would come alive during word games. The pressure shifted from "perform language correctly in front of everyone" to "find words faster than your classmates." It's a subtle but profound reframe.`,
+I saw this firsthand with my ESL students. The ones who froze during oral exercises would come alive during word games. The pressure shifted from "perform language correctly in front of everyone" to "find words faster than your classmates." It's a subtle but important shift.`,
       },
       {
         title: 'Classroom Implementation: What Actually Works',
@@ -115,7 +115,7 @@ Word games solve this problem elegantly.
 
 In a game like Boggle or LexiClash, the challenge automatically scales to the player's level. A student with a limited vocabulary will find shorter, more common words: CAT, THE, RAN. A student with an advanced vocabulary will find longer, rarer words: THEREIN, CATCHER, STRANGE. Both students are engaged, both are challenged, and neither is bored or frustrated.
 
-This is what educational researchers call "naturally differentiated" instruction, and it's incredibly valuable because it requires no additional preparation from the teacher. You don't need to create tiered word lists or design different activities for different groups. The game mechanic does the differentiation for you.
+Educational researchers call this "naturally differentiated" instruction, and the best part is it requires no additional preparation from the teacher. You don't need to create tiered word lists or design different activities for different groups. The game mechanic does the differentiation for you.
 
 For students with learning disabilities, word games offer additional benefits. Research by Rosas et al. (2003) found that game-based instruction was particularly effective for students with attention difficulties, likely because the time pressure and competitive elements maintain engagement in ways that worksheets cannot.
 
@@ -155,7 +155,7 @@ They're tactile. For younger students especially, physically handling letter til
 
 They're social by default. Students are facing each other, talking, negotiating, laughing. The social dimension of learning is not just "nice to have" — it's a cognitive amplifier.
 
-They don't require technology. No charging, no Wi-Fi, no "my screen is broken." In under-resourced schools, this matters enormously.
+They don't require technology. No charging, no Wi-Fi, no "my screen is broken." In under-resourced schools, this matters a lot.
 
 Digital word games have different advantages:
 
@@ -165,11 +165,11 @@ Automatic difficulty scaling: Algorithms can adjust challenge level based on pla
 
 Data collection: Every word found, every score, every session is logged. This data is gold for teachers tracking student progress.
 
-Multilingual support: Digital platforms can offer word games in multiple languages, which is transformative for multilingual classrooms. A student can play in English, then switch to their home language, building vocabulary bridges between languages.
+Multilingual support: Digital platforms can offer word games in multiple languages, which is a big deal in multilingual classrooms. A student can play in English, then switch to their home language, building vocabulary bridges between languages.
 
 Accessibility: Text-to-speech, adjustable fonts, color-blind modes — digital platforms can accommodate diverse learning needs more readily than physical games.
 
-My recommendation: use physical games for social, collaborative activities and digital games for individual practice and assessment. The two formats complement each other beautifully.`,
+My recommendation: use physical games for social, collaborative activities and digital games for individual practice and assessment. The two formats cover each other's blind spots.`,
       },
       {
         title: 'LexiClash in the Classroom: What Makes It Different',
@@ -177,7 +177,7 @@ My recommendation: use physical games for social, collaborative activities and d
 
 The multilingual angle is the big one. LexiClash supports Hebrew, English, Swedish, Japanese, and Spanish. In a diverse classroom — which is most classrooms in 2026 — this matters. An ELL student can play in their home language to build confidence, then switch to English for challenge. The core mechanic is the same regardless of language, so the skills transfer.
 
-The real-time multiplayer is pedagogically significant. When students compete simultaneously on the same grid, you get peer modeling, social motivation, and natural differentiation all at once. It's Boggle's original insight — everyone plays at the same time — supercharged with modern technology.
+The real-time multiplayer is where it gets interesting for teachers. When students compete simultaneously on the same grid, you get peer modeling, social motivation, and natural differentiation all at once. It's Boggle's original insight — everyone plays at the same time — supercharged with modern technology.
 
 The daily challenge feature creates a routine. Teachers who use it report that students arrive in class already talking about the day's puzzle. It becomes a shared cultural reference point, which is exactly what classroom community-building research recommends.
 

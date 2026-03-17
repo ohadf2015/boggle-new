@@ -93,7 +93,7 @@ Here's the counterintuitive part: the testing effect works even when you get the
 
 Kornell, Hays, and Bjork (2009) demonstrated this in a study published in the Journal of Experimental Psychology: Learning, Memory, and Cognition. Participants who tried and failed to answer questions, then received the correct answer, performed better on a final test than participants who simply studied the answers without attempting retrieval first.
 
-The implication for vocabulary building is profound. When you encounter an unfamiliar word in a word game and think "I know this... I've seen this before... what does it mean..." — that struggle, even if you fail to produce the definition, is making your brain work harder. And that harder work creates a stronger memory trace for when you eventually look up the answer.
+This matters a lot for vocabulary building. When you encounter an unfamiliar word in a word game and think "I know this... I've seen this before... what does it mean..." — that struggle, even if you fail to produce the definition, is making your brain work harder. And that harder work creates a stronger memory trace for when you eventually look up the answer.
 
 I noticed this pattern repeatedly during my experiment. Words that I'd struggled with during word games — words where I thought "is that even a word?" before looking them up — stuck far better than words I'd simply read in a book and looked up casually. The struggle was the secret ingredient.
 

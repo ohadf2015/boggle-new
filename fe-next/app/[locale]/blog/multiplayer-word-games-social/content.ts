@@ -81,7 +81,7 @@ The neuroscience behind this involves mirror neurons and emotional contagion. Wh
       },
       {
         title: 'COVID and the Digital Connection Lifeline',
-        content: `I need to talk about 2020 and 2021. Because the pandemic fundamentally changed how we think about social gaming — and the research that came out of that period is fascinating.
+        content: `I need to talk about 2020 and 2021. Because the pandemic changed how we think about social gaming — and the research that came out of that period is fascinating.
 
 When lockdowns hit, board game sales skyrocketed. But so did online multiplayer word games. Words With Friends saw a 40% increase in daily active users in March 2020. Scrabble GO launched in the middle of the pandemic and was downloaded millions of times. People were desperately seeking social connection, and word games provided a unique form of it.
 
@@ -101,7 +101,7 @@ The data backs this up. Board game cafes have exploded globally — there were a
 
 Word games fit perfectly into this renaissance. You don't need expensive hardware. You don't need to learn complex rules. You need letters and humans, and you're good to go.
 
-I've started hosting monthly word game nights. Nothing fancy — a few friends, some snacks, a timer, and a letter grid. What strikes me every time is how different the energy is compared to our online sessions. There's something about physical proximity that changes the experience fundamentally.
+I've started hosting monthly word game nights. Nothing fancy — a few friends, some snacks, a timer, and a letter grid. What strikes me every time is how different the energy is compared to our online sessions. There's something about physical proximity that changes the whole experience.
 
 Part of it is nonverbal communication. A raised eyebrow when someone plays an unexpected word. The visible frustration of searching for a word you know is there. The synchronized groan when the timer runs out. These micro-interactions create a richer social experience than any chat window can replicate.
 
@@ -125,7 +125,7 @@ The research on shared experiences and relationship quality is clear: couples an
         title: 'Family Game Night: What the Research Actually Shows',
         content: `I grew up playing Scrabble with my parents every Sunday evening. At the time, I thought it was boring (I was twelve — everything was boring). Looking back, it was one of the most formative experiences of my childhood.
 
-The research on family game nights is surprisingly robust. A longitudinal study by Coyl-Shepherd and Newland (2013) published in the Journal of Family Issues found that families who regularly played games together reported stronger family cohesion, better parent-child communication, and higher family satisfaction — even controlling for other family activities.
+The research on family game nights is surprisingly solid. A longitudinal study by Coyl-Shepherd and Newland (2013) published in the Journal of Family Issues found that families who regularly played games together reported stronger family cohesion, better parent-child communication, and higher family satisfaction — even controlling for other family activities.
 
 Word games are particularly effective for families because they naturally accommodate different skill levels. A six-year-old finding CAT on the same grid where a parent finds CATASTROPHE isn't losing — they're playing a different game at a different level, and everyone can celebrate each other's victories.
 

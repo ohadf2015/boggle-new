@@ -31,13 +31,13 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 In English, you look at a grid of letters and your brain searches for familiar patterns. C-A-T, T-H-E, S-T-R. You scan left to right, top to bottom, and letter combinations jump out at you because you've seen them a million times.
 
-In Hebrew, you look at a grid of letters and your brain has to do something much more interesting. It has to reconstruct words from consonant skeletons, mentally insert vowels that aren't there, navigate a right-to-left reading direction that flips your spatial processing, and — this is the wild part — recognize that three seemingly random letters might share a root that connects them to dozens of different words.
+In Hebrew, you look at a grid of letters and your brain has to do something much more interesting. It has to reconstruct words from consonant skeletons, mentally insert vowels that aren't there, deal with a right-to-left reading direction that flips your spatial processing, and — this is the wild part — recognize that three seemingly random letters might share a root that connects them to dozens of different words.
 
-I fell in love with Hebrew word games about two years ago, when an Israeli friend invited me to a Scrabble night in Tel Aviv. I walked in knowing maybe 200 Hebrew words. I walked out four hours later having lost spectacularly, but understanding something profound about how the Hebrew language works — something no textbook had ever made click.
+I fell in love with Hebrew word games about two years ago, when an Israeli friend invited me to a Scrabble night in Tel Aviv. I walked in knowing maybe 200 Hebrew words. I walked out four hours later having lost spectacularly, but understanding something real about how the Hebrew language works — something no textbook had ever made click.
 
 This article is about that understanding. Whether you're a native Hebrew speaker curious about why your language is so unique for word games, a learner trying to level up, or a game designer wondering how to handle RTL languages, I think you'll find something here.
 
-Let me take you on a tour of the most beautiful linguistic chaos I've ever encountered.`,
+Here's what I've learned about the most beautiful linguistic chaos I've ever encountered.`,
       },
       {
         title: 'Why Hebrew Is Special for Word Games: The Shoresh System',
@@ -166,7 +166,7 @@ Social media has accelerated Hebrew word creation. Hebrew speakers have coined w
 
 The military contributes heavily to Hebrew slang as well, given that most Israelis serve in the IDF. Words like גרבי (garbi — useless/bad, from the word for sock), משופשף (meshupshaf — experienced/seasoned, literally "rubbed"), and סמנכ"ל (samankhal — deputy CEO, an acronym) all originated in military culture and migrated to general use.
 
-For word game players, the constantly evolving nature of Hebrew slang means the vocabulary is a living, breathing thing. New words become valid plays within years of their coinage. It keeps the game fresh in a way that more conservative languages don't experience.`,
+For word game players, Hebrew slang never sits still, so the vocabulary keeps growing. New words become valid plays within years of their coinage. It keeps the game fresh in a way that more conservative languages don't experience.`,
       },
       {
         title: 'LexiClash\'s Hebrew Experience: Design Decisions',

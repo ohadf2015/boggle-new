@@ -149,17 +149,17 @@ Here's what interests me most about Wordle: it proved that word games don't need
         title: 'Where Word Games Are Heading',
         content: `So where does this four-thousand-year story go next?
 
-I think we're at an inflection point. The history of word games has followed a clear arc: from magical/religious origins, to intellectual pursuit, to mass entertainment, to digital casual gaming. Each transition made word games more accessible but sometimes sacrificed depth.
+The history of word games has followed a clear arc: from magical/religious origins, to intellectual pursuit, to mass entertainment, to digital casual gaming. Each transition made word games more accessible but sometimes sacrificed depth.
 
-The next frontier is multiplayer, multilingual, and real-time.
+The next big shift is multiplayer, multilingual, and real-time.
 
 Think about it: for most of their history, word games were limited to one language at a time. You played Scrabble in English or French or Arabic, but never across languages. Now, platforms like LexiClash are building games where players compete in Hebrew, English, Swedish, Japanese, and Spanish — sometimes in the same session. A Japanese player and a Swedish player solving the same grid in their respective languages, comparing scores. That's something entirely new in the history of word games.
 
-Real-time multiplayer word games are also evolving rapidly. The Boggle model — everyone plays simultaneously — is being supercharged with features like live leaderboards, combo systems, blast mechanics, and boss battles. Word games are borrowing from action game design, and it works surprisingly well. The cognitive core is the same, but the wrapper is more engaging than ever.
+Real-time multiplayer word games are also changing fast. The Boggle model — everyone plays simultaneously — is getting layered with live leaderboards, combo systems, blast mechanics, and boss battles. Word games are borrowing from action game design, and it works surprisingly well. The cognitive core is the same, but the packaging is a lot more fun.
 
-I'm also watching the intersection of word games and language learning. Historically, these have been separate categories. But there's no reason they have to be. A word game that teaches you vocabulary in a new language while you're having fun? That's the holy grail of educational gaming, and we're closer to it than ever.
+I'm also watching the intersection of word games and language learning. Historically, these have been separate categories. But there's no reason they have to be. A word game that teaches you vocabulary in a new language while you're having fun? That's what every edtech company has been chasing for decades, and we're closer to it than ever.
 
-What excites me most is that word games are becoming social again. For a while, the mobile era turned them into solitary time-killers. Now, with real-time multiplayer and shared challenges, they're returning to their roots — bringing people together, creating shared experiences, sparking friendly competition.
+And word games are becoming social again, which is the part I care about most. For a while, the mobile era turned them into solitary time-killers. Now, with real-time multiplayer and shared challenges, they're returning to their roots — bringing people together, creating shared experiences, sparking friendly competition.
 
 From Roman soldiers scratching SATOR squares into walls, to twenties socialites arguing over crosswords on trains, to modern players racing each other on digital grids — the thread is the same. Humans love words. We love playing with them, competing over them, showing off our mastery of them.
 

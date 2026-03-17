@@ -57,7 +57,7 @@ The results were startling. When expert players looked at letter strings and had
 
 In plain English: experts don't think about words. They see them. The way a chess grandmaster sees board positions, a top Scrabble player sees letter combinations. The meaning pathway — the one you and I use when we read a book or have a conversation — gets largely bypassed.
 
-This isn't some trivial academic finding. It means that expert word recognition is a fundamentally different cognitive process from normal reading. These players have literally rewired how their brains handle language. Not through some genetic gift. Through practice.`,
+This isn't some trivial academic finding. It means that expert word recognition is a completely different cognitive process from normal reading. These players have literally rewired how their brains handle language. Not through some genetic gift. Through practice.`,
       },
       {
         title: 'Chunking: The 1973 Study That Explains Everything',
@@ -69,7 +69,7 @@ But here's the twist. When they showed randomly placed pieces — positions that
 
 The explanation: experts don't remember individual pieces. They remember "chunks" — clusters of pieces that form recognizable patterns. A specific pawn structure. A common opening formation. Their advantage isn't raw memory. It's pattern recognition built through thousands of hours of experience.
 
-Word games work identically. When I look at a rack of letters, I see seven individual tiles. When Diane looks at the same rack, she sees letter clusters: common prefixes like UN- or RE-, suffixes like -ING or -TION, high-value combinations like QU or ZA. The board transforms from a grid of isolated letters into a landscape of building blocks.
+Word games work identically. When I look at a rack of letters, I see seven individual tiles. When Diane looks at the same rack, she sees letter clusters: common prefixes like UN- or RE-, suffixes like -ING or -TION, high-value combinations like QU or ZA. The board stops being a grid of isolated letters and becomes a set of building blocks.
 
 I tested this on myself after the tournament. I started consciously looking for chunks instead of trying to build words from scratch. The improvement was almost immediate. Not because I suddenly knew more words, but because I was processing the information more efficiently. My brain had fewer things to juggle.`,
       },
