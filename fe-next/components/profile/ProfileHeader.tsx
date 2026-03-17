@@ -150,14 +150,14 @@ export function ProfileHeader({
           </div>
 
           {/* Overlay control buttons */}
-          <div className="absolute inset-0">
-            {/* Upload photo button — bottom-start */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Upload photo button — bottom-end */}
             <label
               className={cn(
-                'absolute bottom-0 -start-1 flex items-center justify-center cursor-pointer',
-                'rounded-full bg-slate-700 border-2 border-neo-black shadow-hard-sm',
-                'text-white hover:bg-slate-600 transition-colors',
-                compact ? 'w-7 h-7' : 'w-9 h-9'
+                'absolute -bottom-1 -end-1 flex items-center justify-center cursor-pointer pointer-events-auto',
+                'rounded-full bg-slate-700/90 border-2 border-slate-500/50',
+                'text-white/80 hover:bg-slate-600 hover:text-white transition-colors',
+                compact ? 'w-6 h-6' : 'w-7 h-7'
               )}
               title={t('profile.uploadPhoto')}
               aria-label={t('profile.uploadPhoto')}
@@ -165,7 +165,7 @@ export function ProfileHeader({
               {isUploading ? (
                 <Loader size="sm" />
               ) : (
-                <Camera size={compact ? 12 : 14} />
+                <Camera size={compact ? 10 : 12} />
               )}
               <input
                 type="file"
@@ -176,19 +176,19 @@ export function ProfileHeader({
               />
             </label>
 
-            {/* Edit avatar button — bottom-end */}
+            {/* Edit avatar button — bottom-start */}
             <button
               onClick={() => setIsAvatarBuilderOpen(true)}
               className={cn(
-                'absolute bottom-0 -end-1 flex items-center justify-center',
-                'rounded-full bg-neo-pink border-2 border-neo-black shadow-hard-sm',
-                'text-white hover:bg-neo-pink/80 transition-colors',
-                compact ? 'w-8 h-8' : 'w-10 h-10'
+                'absolute -bottom-1 -start-1 flex items-center justify-center pointer-events-auto',
+                'rounded-full bg-neo-pink/90 border-2 border-neo-pink/50',
+                'text-white/90 hover:bg-neo-pink hover:text-white transition-colors',
+                compact ? 'w-6 h-6' : 'w-7 h-7'
               )}
               title={t('profile.chooseAvatar')}
               aria-label={t('profile.chooseAvatar')}
             >
-              <Edit size={compact ? 14 : 16} />
+              <Edit size={compact ? 10 : 12} />
             </button>
           </div>
         </div>

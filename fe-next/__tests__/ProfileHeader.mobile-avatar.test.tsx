@@ -61,24 +61,24 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
   };
 
   describe('Touch Target Size', () => {
-    it('camera upload button should have w-7 h-7 classes in compact mode', () => {
+    it('camera upload button should have w-6 h-6 classes in compact mode', () => {
       render(<ProfileHeader {...mockProps} />);
 
       const cameraButton = screen.getByTitle('profile.uploadPhoto');
       const classes = cameraButton.className;
 
-      expect(classes).toMatch(/w-7/);
-      expect(classes).toMatch(/h-7/);
+      expect(classes).toMatch(/w-6/);
+      expect(classes).toMatch(/h-6/);
     });
 
-    it('edit avatar button should have w-8 h-8 classes in compact mode', () => {
+    it('edit avatar button should have w-6 h-6 classes in compact mode', () => {
       render(<ProfileHeader {...mockProps} />);
 
       const editButton = screen.getByTitle('profile.chooseAvatar');
       const classes = editButton.className;
 
-      expect(classes).toMatch(/w-8/);
-      expect(classes).toMatch(/h-8/);
+      expect(classes).toMatch(/w-6/);
+      expect(classes).toMatch(/h-6/);
     });
 
     it('remove picture button should be visible when not compact and profile picture exists', () => {
@@ -117,9 +117,9 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
       const cameraButton = screen.getByTitle('profile.uploadPhoto');
       const editButton = screen.getByTitle('profile.chooseAvatar');
 
-      // Edit button at bottom-end, camera at bottom-start
-      expect(editButton.className).toMatch(/-end-1/);
-      expect(cameraButton.className).toMatch(/-start-1/);
+      // Edit button at bottom-start, camera at bottom-end
+      expect(editButton.className).toMatch(/-start-1/);
+      expect(cameraButton.className).toMatch(/-end-1/);
     });
   });
 
