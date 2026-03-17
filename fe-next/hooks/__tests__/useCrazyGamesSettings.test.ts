@@ -1,7 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
-import { triggerHappytime } from '../useCrazyGamesSettings';
 
-// Mock useCrazyGames
+// Mock useCrazyGames - must be before import
 const mockGetSettings = jest.fn();
 const mockAddSettingsChangeListener = jest.fn();
 const mockRemoveSettingsChangeListener = jest.fn();
@@ -16,7 +15,7 @@ jest.mock('@/components/CrazyGamesSDK', () => ({
   }),
 }));
 
-import { useCrazyGamesSettings } from '../useCrazyGamesSettings';
+const { useCrazyGamesSettings, triggerHappytime } = require('../useCrazyGamesSettings');
 
 // Mock CrazyGames SDK on window for triggerHappytime
 const mockSDK = {
