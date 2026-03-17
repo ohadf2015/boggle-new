@@ -329,126 +329,126 @@ Your future self — the one who casually drops DEFENESTRATION in conversation a
     practice: 'תרגלו עכשיו',
   },
   sv: {
-    title: 'Jag larde mig 500 nya ord pa 30 dagar (Sa har gjorde jag)',
-    subtitle: 'Utspridd repetition, aktiv aterkallelse, morfologihacks och dagliga rutiner som faktiskt fastnar. Inga flashcard-appar kravs.',
-    category: 'Larande',
-    readTime: '12 min lasning',
-    authorName: 'Ordnorden',
-    authorBio: 'Sjalvlard ordforradsobsessiv som for en orddagbok, spelar ordspel tavlingsinriktat och en gang grdt av gladje over ordet "defenestration."',
+    title: 'Jag lärde mig 500 nya ord på 30 dagar (Så här gjorde jag)',
+    subtitle: 'Utspridd repetition, aktiv återkallelse, morfologihacks och dagliga rutiner som faktiskt fastnar. Inga flashcard-appar krävs.',
+    category: 'Lärande',
+    readTime: '12 min läsning',
+    authorName: 'Ordnörden',
+    authorBio: 'Självlärd ordförrådsbesatt som för en orddagbok, spelar ordspel tävlingsinriktat och en gång grät av glädje över ordet "defenestration."',
     sections: [
       {
-        content: `For trettio dagar sedan startade jag ett experiment. Reglerna var enkla: lar dig sa manga nya ord som mojligt pa en manad med bara ordspel och forskningsbaserade tekniker. Inga dyra kurser. Inga sprakkurser. Bara jag, en anteckningsbok, en timer och ett pinsamt antal timmar med Boggle.
+        content: `För trettio dagar sedan startade jag ett experiment. Reglerna var enkla: lär dig så många nya ord som möjligt på en månad med bara ordspel och forskningsbaserade tekniker. Inga dyra kurser. Inga språkkurser. Bara jag, en anteckningsbok, en timer och ett pinsamt antal timmar med Boggle.
 
-Resultatet? 500 nya ord. Inte "jag kannar vagt igen det har"-ord — ord jag kan definiera, stava, anvanda i en mening och (avgirande) anvanda i ett ordspel for att fa mina vanner att angra att de utmanade mig.
+Resultatet? 500 nya ord. Inte "jag känner vagt igen det här"-ord — ord jag kan definiera, stava, använda i en mening och (avgörande) använda i ett ordspel för att få mina vänner att ångra att de utmanade mig.
 
-Men det som gjorde detta experiment annorlunda an alla andra forsok att bygga ordforrad: jag anvande inte ratt kraft. Jag satt inte med flashcards i timmar. Istallet anvande jag en kombination av kognitionsvetenskapliga tekniker som forskare har forfinat i over ett sekel.`,
+Men det som gjorde detta experiment annorlunda än alla andra försök att bygga ordförråd: jag använde inte rå kraft. Jag satt inte med flashcards i timmar. Istället använde jag en kombination av kognitionsvetenskapliga tekniker som forskare har förfinat i över ett sekel.`,
       },
       {
         title: '30-dagarsexperimentet: Grundregler',
-        content: `Innan jag gar in pa teknikerna, lat mig lagga ut parametrarna. For "jag larde mig 500 ord" betyder ingenting utan sammanhang.
+        content: `Innan jag går in på teknikerna, låt mig lägga ut parametrarna. För "jag lärde mig 500 ord" betyder ingenting utan sammanhang.
 
-Definition av "lart mig": Jag kunde producera ordet fran minnet, definiera det korrekt, stava det korrekt och anvanda det i sammanhang. Detta ar vad forskare kallar "produktivt ordforrad" — till skillnad fran "receptivt ordforrad," som bara ar att kanna igen ett ord nar man ser det.
+Definition av "lärt mig": Jag kunde producera ordet från minnet, definiera det korrekt, stava det korrekt och använda det i sammanhang. Detta är vad forskare kallar "produktivt ordförråd" — till skillnad från "receptivt ordförråd," som bara är att känna igen ett ord när man ser det.
 
-Ordkalla: Framst ordspel (Boggle, Scrabble-ovning, korsord och dagliga ordpussel), kompletterat med lasning.
+Ordkälla: Främst ordspel (Boggle, Scrabble-övning, korsord och dagliga ordpussel), kompletterat med läsning.
 
-Tidsinvestering: Cirka 45 minuter per dag. Femton minuter ordspel, femton minuter repetition och femton minuter lasning. Teknikerna jag anvande ar utformade for att maximera bibehallande per minut av studier.
+Tidsinvestering: Cirka 45 minuter per dag. Femton minuter ordspel, femton minuter repetition och femton minuter läsning. Teknikerna jag använde är utformade för att maximera bibehållande per minut av studier.
 
-Vid dag 30 hade min anteckningsbok 523 poster. Nagra var obskyra. Nagra var praktiska. Och nagra var helt enkelt ljuvliga.`,
+Vid dag 30 hade min anteckningsbok 523 poster. Några var obskyra. Några var praktiska. Och några var helt enkelt ljuvliga.`,
       },
       {
-        title: 'Utspridd repetition: Ebbinghaus-kurvan som forandrade allt',
-        content: `1885 gjorde en tysk psykolog vid namn Hermann Ebbinghaus nagot ingen gjort forut: han matte systematiskt hur snabbt manniskor glommer saker. Hans metod var brutal — han memorerade listor av nonsensstavelser och testade sedan sig sjalv vid okande intervaller.
+        title: 'Utspridd repetition: Ebbinghaus-kurvan som förändrade allt',
+        content: `1885 gjorde en tysk psykolog vid namn Hermann Ebbinghaus något ingen gjort förut: han mätte systematiskt hur snabbt människor glömmer saker. Hans metod var brutal — han memorerade listor av nonsensstavelser och testade sedan sig själv vid ökande intervaller.
 
-Det han upptackte kallas nu "glomskekurvan," och det ar ett av de mest replikerade resultaten i hela psykologin. Utan nagon repetition glommer man cirka 70% av ny information inom 24 timmar. Inom en vecka har man forlorat cirka 90%.
+Det han upptäckte kallas nu "glömskekurvan," och det är ett av de mest replikerade resultaten i hela psykologin. Utan någon repetition glömmer man cirka 70% av ny information inom 24 timmar. Inom en vecka har man förlorat cirka 90%.
 
-Men — och detta ar den avgirande delen — varje gang man repeterar informationen vid ratt ogonblick plattas kurvan ut. Minnet blir starkare. Intervallen mellan nodvandiga repetitioner blir langre.
+Men — och detta är den avgörande delen — varje gång man repeterar informationen vid rätt ögonblick plattas kurvan ut. Minnet blir starkare. Intervallen mellan nödvändiga repetitioner blir längre.
 
-Detta ar utspridd repetition: att repetera information vid gradvis okande intervaller. Repetition efter 1 dag, sedan 3, sedan 7, sedan 14, sedan 30 dagar. Varje repetition cementerar minnet fastare.
+Detta är utspridd repetition: att repetera information vid gradvis ökande intervaller. Repetition efter 1 dag, sedan 3, sedan 7, sedan 14, sedan 30 dagar. Varje repetition cementerar minnet fastare.
 
-En metaanalys av Cepeda et al. (2006) analyserade 254 studier och fann att utspridd ovning producerade signifikant battre langsiktigt bibehallande an massad ovning i praktiskt taget varje typ av material och varje aldersgrupp.`,
+En metaanalys av Cepeda et al. (2006) analyserade 254 studier och fann att utspridd övning producerade signifikant bättre långsiktigt bibehållande än massad övning i praktiskt taget varje typ av material och varje åldersgrupp.`,
       },
       {
-        title: 'Aktiv aterkallelse: Varfor lasning inte racker',
-        content: `Har ar ett misstag jag gjorde i aratal: jag trodde att lasning var det basta sattet att bygga ordforrad. Stota pa ett ord, sla upp det, ga vidare. Naturlig, organisk ordforradstillvaxt.
+        title: 'Aktiv återkallelse: Varför läsning inte räcker',
+        content: `Här är ett misstag jag gjorde i åratal: jag trodde att läsning var det bästa sättet att bygga ordförråd. Stöta på ett ord, slå upp det, gå vidare. Naturlig, organisk ordförrådstillväxt.
 
-Det fungerar inte. Eller snarare, det fungerar, men det ar otroligt langsamt och ineffektivt.
+Det fungerar inte. Eller snarare, det fungerar, men det är otroligt långsamt och ineffektivt.
 
-Problemet ar att lasning ar passivt. Man kannar igen ord, producerar dem inte. Hjarnan gor minimalt arbete for att extrahera mening fran texten.
+Problemet är att läsning är passivt. Man känner igen ord, producerar dem inte. Hjärnan gör minimalt arbete för att extrahera mening från texten.
 
-Aktiv aterkallelse ar motsatsen. Istallet for att titta pa ett ord och komma ihag dess definition (igenkanning), borjar man med definitionen och forsoker producera ordet (aterkallelse). Eller sa tittar man pa en blandad uppsattning bokstaver och forsoker bilda ord — vilket ar exakt vad ordspel gor.
+Aktiv återkallelse är motsatsen. Istället för att titta på ett ord och komma ihåg dess definition (igenkänning), börjar man med definitionen och försöker producera ordet (återkallelse). Eller så tittar man på en blandad uppsättning bokstäver och försöker bilda ord — vilket är exakt vad ordspel gör.
 
-Karpicke och Roediger (2008) publicerade en banbrytande studie i Science som visade att aterkallelseoving producerade 80% battre langsiktigt bibehallande an upprepat studerande av samma material. Attio procent.
+Karpicke och Roediger (2008) publicerade en banbrytande studie i Science som visade att återkallelseövning producerade 80% bättre långsiktigt bibehållande än upprepat studerande av samma material. Åttio procent.
 
-Darfor ar ordspel sa effektiva ordforradsbryggare. Varje gang man skannar ett bokstavsrutndt och drar ut ett ord fran kaos av slumpvisa bokstaver gor man aktiv aterkallelse. Spelet ar studiesessionen — man inser det bara inte for att man har kul.`,
+Därför är ordspel så effektiva ordförrådsbyggare. Varje gång man skannar ett bokstavsrutnät och drar ut ett ord från kaos av slumpvisa bokstäver gör man aktiv återkallelse. Spelet är studiesessionen — man inser det bara inte för att man har kul.`,
       },
       {
-        title: 'Testeffekten: Misslyckande ar poangen',
-        content: `Testeffekten — ocksa kallad "aterkallelseforbattrad inlarning" — ar fyndet att testning pa material forbattrar minnet mer an ytterligare studietid.
+        title: 'Testeffekten: Misslyckande är poängen',
+        content: `Testeffekten — också kallad "återkallelseförbättrad inlärning" — är fyndet att testning på material förbättrar minnet mer än ytterligare studietid.
 
-Har ar den kontraintuitiva delen: testeffekten fungerar aven nar man svarar fel. Viss forskning tyder pa att misslyckade aterkallelseforsok, foljda av korrekt feedback, producerar starkare minnen an lyckad aterkallelse.
+Här är den kontraintuitiva delen: testeffekten fungerar även när man svarar fel. Viss forskning tyder på att misslyckade återkallelseförsök, följda av korrekt feedback, producerar starkare minnen än lyckad återkallelse.
 
-Kornell, Hays och Bjork (2009) demonstrerade detta i en studie. Deltagare som forsakte och misslyckades med att svara pa fragor, och sedan fick ratt svar, presterade battre pa ett slutprov an deltagare som helt enkelt studerade svaren.
+Kornell, Hays och Bjork (2009) demonstrerade detta i en studie. Deltagare som försökte och misslyckades med att svara på frågor, och sedan fick rätt svar, presterade bättre på ett slutprov än deltagare som helt enkelt studerade svaren.
 
-Implikationen for ordforrandsbyggande ar djupgaende. Nar man stoter pa ett okant ord i ett ordspel och tanker "jag vet det har... jag har sett det forut..." — den kampen, aven om man misslyckas, far hjarnan att arbeta hardare. Och det hardare arbetet skapar ett starkare minnesspar.
+Implikationen för ordförrådsbyggande är djupgående. När man stöter på ett okänt ord i ett ordspel och tänker "jag vet det här... jag har sett det förut..." — den kampen, även om man misslyckas, får hjärnan att arbeta hårdare. Och det hårdare arbetet skapar ett starkare minnesspår.
 
-Darfor sager jag till folk: bli inte avskrackt nar ett ordspel staller dig. Varje ord du inte kan ar en mojlighet. Varje misslyckat aterkallelseforsk grundar hjarnan for ogonblicket du lar dig svaret.`,
+Därför säger jag till folk: bli inte avskräckt när ett ordspel ställer dig. Varje ord du inte kan är en möjlighet. Varje misslyckat återkallelseförsök grundar hjärnan för ögonblicket du lär dig svaret.`,
       },
       {
         title: 'Ordfamiljer och morfologi: Fuskkoden ingen pratar om',
-        content: `Detta ar tekniken som gjorde den storsta enskilda skillnaden i mitt experiment. Och den ar chockerande underutnyttjad.
+        content: `Detta är tekniken som gjorde den största enskilda skillnaden i mitt experiment. Och den är chockerande underutnyttjad.
 
-Morfologi ar studiet av orddelar — prefix, suffix och rotter. Engelska ar ett Frankensteinsprak byggt fran latin, grekiska, germanska, franska och ett dussin andra kallor. Men de kallorna foljer monster. Nar man lar sig monstren slutar nya ord att vara slumpvisa bokstavsstrangar och borjar vara pussel man kan avkoda.
+Morfologi är studiet av orddelar — prefix, suffix och rötter. Engelska är ett Frankensteinspråk byggt från latin, grekiska, germanska, franska och ett dussin andra källor. Men de källorna följer mönster. När man lär sig mönstren slutar nya ord att vara slumpvisa bokstavssträngar och börjar vara pussel man kan avkoda.
 
-Har ar ett exempel. Anta att du lar dig ordet EPHEMERAL (kortvarigt). Om du ocksa lar dig att EPHEMER- kommer fran grekiskans "ephemeros" som betyder "varar en dag," har du just last upp en familj ord: EPHEMERA, EPHEMERIS, EPHEMERON. En rot, flera ord, alla sammankopplade.
+Här är ett exempel. Anta att du lär dig ordet EPHEMERAL (kortvarigt). Om du också lär dig att EPHEMER- kommer från grekiskans "ephemeros" som betyder "varar en dag," har du just låst upp en familj ord: EPHEMERA, EPHEMERIS, EPHEMERON. En rot, flera ord, alla sammankopplade.
 
-Nation (2001) uppskattade att kunskap om cirka 20 ordfamiljer per vecka kan bygga ordforrad i ungefar fyra ganger hastigheten av att lara sig enskilda ord isolerat.
+Nation (2001) uppskattade att kunskap om cirka 20 ordfamiljer per vecka kan bygga ordförråd i ungefär fyra gånger hastigheten av att lära sig enskilda ord isolerat.
 
-Under mitt experiment borjade jag gruppera nya ord efter deras rotter. BENE- (bra): BENEVOLENT, BENEFICIAL, BENEDICTION. MAL- (dalig): MALEVOLENT, MALICIOUS, MALADY. CHRON- (tid): CHRONOLOGICAL, CHRONIC, SYNCHRONIZE.
+Under mitt experiment började jag gruppera nya ord efter deras rötter. BENE- (bra): BENEVOLENT, BENEFICIAL, BENEDICTION. MAL- (dålig): MALEVOLENT, MALICIOUS, MALADY. CHRON- (tid): CHRONOLOGICAL, CHRONIC, SYNCHRONIZE.
 
-Vid vecka tva larde jag mig ord i nastan dubbelt sa snabb takt. Inte for att jag studerade hardare, utan for att varje nytt ord kom forankopplat till ord jag redan kande.`,
+Vid vecka två lärde jag mig ord i nästan dubbelt så snabb takt. Inte för att jag studerade hårdare, utan för att varje nytt ord kom förankopplat till ord jag redan kände.`,
       },
       {
-        title: 'Tvarlinguistisk overforing: Den flersprakiga fordelen',
-        content: `Nagot jag inte forvantade mig: att spela ordspel pa flera sprak gjorde mig battre pa engelskt ordforrad.
+        title: 'Tvärlingvistisk överföring: Den flerspråkiga fördelen',
+        content: `Något jag inte förväntade mig: att spela ordspel på flera språk gjorde mig bättre på engelskt ordförråd.
 
-Det later paradoxalt, men forskningen stodjer det. Kroll och Stewart (1994) foreslog att ord i olika sprak delar konceptuella kopplingar. Nar man lar sig ett ord pa ett sprak starker man det underliggande konceptet, vilket gor relaterade ord pa andra sprak lattare att lara sig.
+Det låter paradoxalt, men forskningen stödjer det. Kroll och Stewart (1994) föreslog att ord i olika språk delar konceptuella kopplingar. När man lär sig ett ord på ett språk stärker man det underliggande konceptet, vilket gör relaterade ord på andra språk lättare att lära sig.
 
-Jag testade detta genom att spela LexiClash pa svenska. Svenska delar germanska rotter med engelska, sa ord som HUND, HAND och VATTEN var omedelbart igenkannbara. Men den intressanta delen var de mindre uppenbara kopplingarna.
+Jag testade detta genom att spela LexiClash på svenska. Svenska delar germanska rötter med engelska, så ord som HUND, HAND och VATTEN var omedelbart igenkännbara. Men den intressanta delen var de mindre uppenbara kopplingarna.
 
-En metaanalys av Adesope et al. (2010) fann att tvasprakiga individer konsekvent overpresterade ensprakiga pa ordforradstester — aven pa sitt modersmal. Teorin ar att hanteringen av flera sprakliga system skapar ett mer flexibelt och sammankopplat mentalt lexikon.
+En metaanalys av Adesope et al. (2010) fann att tvåspråkiga individer konsekvent överpresterade enspråkiga på ordförrådstester — även på sitt modersmål. Teorin är att hanteringen av flera språkliga system skapar ett mer flexibelt och sammankopplat mentalt lexikon.
 
-Man behover inte vara flytande pa ett annat sprak for att dra nytta av detta. Grundlaggande exponering for kognater — ord som delar ursprung over sprak — kan starka ordforradnatverket.`,
+Man behöver inte vara flytande på ett annat språk för att dra nytta av detta. Grundläggande exponering för kognater — ord som delar ursprung över språk — kan stärka ordförrådsnätverket.`,
       },
       {
         title: 'Dagliga rutiner som faktiskt fungerar',
-        content: `Teknikerna ovan ar vetenskapen. Men vetenskap utan implementering ar bara trivia. Har ar den dagliga rutin jag anvande.
+        content: `Teknikerna ovan är vetenskapen. Men vetenskap utan implementering är bara trivia. Här är den dagliga rutin jag använde.
 
-Morgon (15 minuter): Ordspelssession. Jag spelade tva omgangar Boggle och anvande resterande tid till att sla upp ord jag stott pa men inte kunde definiera. Nya ord gick direkt i anteckningsboken.
+Morgon (15 minuter): Ordspelssession. Jag spelade två omgångar Boggle och använde resterande tid till att slå upp ord jag stött på men inte kunde definiera. Nya ord gick direkt i anteckningsboken.
 
-Mitt pa dagen (15 minuter): Utspridd repetition. Jag bladrade genom anteckningsboken och repeterade ord som var forfallna enligt mitt schema. Tackte definitionen, forsakte aterkalla den, kontrollerade, gick vidare.
+Mitt på dagen (15 minuter): Utspridd repetition. Jag bläddrade genom anteckningsboken och repeterade ord som var förfallna enligt mitt schema. Täckte definitionen, försökte återkalla den, kontrollerade, gick vidare.
 
-Kvall (15 minuter): Lasning. Jag laste femton minuter med anteckningsboken oppen. Varje okant ord loggades omedelbart.
+Kväll (15 minuter): Läsning. Jag läste femton minuter med anteckningsboken öppen. Varje okänt ord loggades omedelbart.
 
-Det ar allt. Fyrtiofem minuter om dagen, uppdelat i tre hanterbara bitar. Nyckelinsikten ar att frekvens spelar mer roll an varaktighet. Tre 15-minuterssessioner slar en 45-minuterssession varje gang.
+Det är allt. Fyrtiofem minuter om dagen, uppdelat i tre hanterbara bitar. Nyckelinsikten är att frekvens spelar mer roll än varaktighet. Tre 15-minuterssessioner slår en 45-minuterssession varje gång.
 
-Oforbandlingsbara regler: Skriv for hand. Anvand ordet inom 24 timmar. Spela med andra minst tva ganger i veckan. Ingen pluggning.`,
+Oförhandlingsbara regler: Skriv för hand. Använd ordet inom 24 timmar. Spela med andra minst två gånger i veckan. Ingen pluggning.`,
       },
       {
-        title: 'Mata framsteg (och varfor det inte ar vad du tror)',
-        content: `Vid slutet av 30 dagar hade jag 523 ord i min anteckningsbok. Men rasiffran ar nastan meningslos. Det som spelar roll ar bibehallande och anvandbarhet.
+        title: 'Mäta framsteg (och varför det inte är vad du tror)',
+        content: `Vid slutet av 30 dagar hade jag 523 ord i min anteckningsbok. Men råsiffran är nästan meningslös. Det som spelar roll är bibehållande och användbarhet.
 
-Jag testade mig pa tre satt. Kall aterkallelsetest: 447 av 523 korrekta (85,5%). Ordspelsprestanda: mina Boggle-poang okade med 22%, och min genomsnittliga ordlangd okade fran 4,2 till 5,1 bokstaver. Samtalsanvandning: vanner flaggade 31 tillfallen dar jag anvande ett ord de inte hart fran mig forut.
+Jag testade mig på tre sätt. Kall återkallelsetest: 447 av 523 korrekta (85,5%). Ordspelsprestanda: mina Boggle-poäng ökade med 22%, och min genomsnittliga ordlängd ökade från 4,2 till 5,1 bokstäver. Samtalsanvändning: vänner flaggade 31 tillfällen där jag använde ett ord de inte hört från mig förut.
 
-Men har ar vad jag verkligen vill betona. Siffran 500 ar imponerande men ocksa missvisande. Den foreslant att ordforrandsbyggande handlar om att samla diskreta objekt.
+Men här är vad jag verkligen vill betona. Siffran 500 är imponerande men också missvisande. Den antyder att ordförrådsbyggande handlar om att samla diskreta objekt.
 
-Det gor det inte. Det handlar om att bygga ett natverk. Vid slutet av experimentet kandes mitt mentala lexikon annorlunda. Ord jag redan kande hade nya kopplingar. De morfologiska och konceptuella kopplingarna hjalpte inte bara mig att komma ihag nya ord — de gjorde hela mitt ordforrad mer tillgangligt.
+Det gör det inte. Det handlar om att bygga ett nätverk. Vid slutet av experimentet kändes mitt mentala lexikon annorlunda. Ord jag redan kände hade nya kopplingar. De morfologiska och konceptuella kopplingarna hjälpte inte bara mig att komma ihåg nya ord — de gjorde hela mitt ordförråd mer tillgängligt.
 
-Du behover inte 30 dagar for att borja se resultat. Skaffa en fysisk anteckningsbok. Spela ett ordspel om dagen. Logga tre nya ord. Repetera med utspridd repetition. Anvand varje nytt ord inom 24 timmar. Femton till tjugo minuter om dagen.`,
+Du behöver inte 30 dagar för att börja se resultat. Skaffa en fysisk anteckningsbok. Spela ett ordspel om dagen. Logga tre nya ord. Repetera med utspridd repetition. Använd varje nytt ord inom 24 timmar. Femton till tjugo minuter om dagen.`,
       },
     ],
     backToBlog: 'Tillbaka till bloggen',
-    tryDaily: 'Prova daglig utmaning',
-    practice: 'Ova nu',
+    tryDaily: 'Prova dagliga utmaningen',
+    practice: 'Öva nu',
   },
   ja: {
     title: '30日で500の新しい単語を覚えた（具体的な方法はこれだ）',
