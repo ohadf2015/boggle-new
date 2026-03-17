@@ -94,22 +94,19 @@ describe('useAvatarPremium', () => {
     });
 
     test('purchaseWithGold returns false on API failure', async () => {
-      // First call is the useEffect mount fetch, second is the purchase
-      (global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ premiumAvatarParts: [] }),
-        })
-        .mockResolvedValueOnce({
-          ok: false,
-          json: () => Promise.resolve({ error: 'Cannot afford' }),
-        });
-
+      // Default fetch mock (set in beforeEach) handles mount effect.
+      // Override for the purchase call only.
       const { result } = renderHook(() => useAvatarPremium());
 
       // Flush mount effect
       await waitFor(() => {
         expect((global.fetch as jest.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
+      });
+
+      // Now override fetch to return failure for the purchase call
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        json: () => Promise.resolve({ error: 'Cannot afford' }),
       });
 
       const success = await result.current.purchaseWithGold('eyes', 'laser');
