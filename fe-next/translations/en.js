@@ -1610,6 +1610,8 @@ const en = {
     "place": "Place",
     "words": "Words",
     "bestWord": "Best",
+    "bestCombo": "Best Combo",
+    "playersReady": "{count}/{total} Ready",
     "missedWords": "Missed",
     "missedWordsSummary": "{count} words on the board you didn't find",
     "wordLengths": "Word Lengths",

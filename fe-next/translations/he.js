@@ -1502,6 +1502,8 @@ const he = {
     "place": "מקום",
     "words": "מילים",
     "bestWord": "הטובה ביותר",
+    "bestCombo": "קומבו הכי טוב",
+    "playersReady": "{count}/{total} מוכנים",
     "missedWords": "מילים שפספסת",
     "missedWordsSummary": "{count} מילים על הלוח שלא מצאת",
     "wordLengths": "אורכי מילים",

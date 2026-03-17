@@ -1548,6 +1548,8 @@ const es = {
     "place": "Lugar",
     "words": "Palabras",
     "bestWord": "Mejor",
+    "bestCombo": "Mejor Combo",
+    "playersReady": "{count}/{total} Listos",
     "missedWords": "Palabras que Perdiste",
     "missedWordsSummary": "{count} palabras en el tablero que no encontraste",
     "wordLengths": "Longitudes de palabras",

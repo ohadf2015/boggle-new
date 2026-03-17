@@ -1485,6 +1485,8 @@ const ja = {
     "place": "位",
     "words": "単語",
     "bestWord": "ベスト",
+    "bestCombo": "ベストコンボ",
+    "playersReady": "{count}/{total} 準備完了",
     "missedWords": "見逃した単語",
     "missedWordsSummary": "ボード上の{count}個の単語を見つけられませんでした",
     "wordLengths": "単語の長さ",

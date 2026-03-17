@@ -6,7 +6,7 @@ const mockRefreshCoins = jest.fn().mockResolvedValue(100);
 const mockCoins = 500;
 
 jest.mock('@/contexts/CoinContext', () => ({
-  useCoinContext: () => ({
+  useCoinsFromContext: () => ({
     coins: mockCoins,
     spendCoins: mockSpendCoins,
     refreshCoins: mockRefreshCoins,

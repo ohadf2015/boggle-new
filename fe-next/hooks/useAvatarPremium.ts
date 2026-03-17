@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useCoinContext } from '@/contexts/CoinContext';
+import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPremiumPart, getPartPrice } from '@/shared/types/customAvatar';
 import toast from 'react-hot-toast';
@@ -30,7 +30,7 @@ function saveTempUnlocks(unlocks: TempUnlocks): void {
 }
 
 export function useAvatarPremium() {
-  const { coins, refreshCoins } = useCoinContext();
+  const { coins, refreshCoins } = useCoinsFromContext();
   const { user, isAuthenticated } = useAuth();
   const [permanentUnlocks, setPermanentUnlocks] = useState<string[]>([]);
   const [tempUnlocks, setTempUnlocks] = useState<TempUnlocks>(() => getTempUnlocks());
