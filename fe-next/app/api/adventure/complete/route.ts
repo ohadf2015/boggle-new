@@ -4,13 +4,21 @@
  * POST - Complete a level and update progression
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
+import { getUpgradeEffect, type UpgradeState } from '@/lib/adventure/upgradeConfig';
+import { captureApiError } from '@/utils/sentry';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// Lazy-init to avoid crash on missing env vars
+function getSupabaseConfig() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return { url, key };
+}
 
 /**
  * XP awarded per star earned (new stars only)
@@ -34,10 +42,11 @@ function validateRequestBody(body: Record<string, unknown>): {
     stars: number;
     score: number;
     words: number;
-    goldEarned?: number;
+    lootDrops?: unknown[];
+    retainedScore?: number;
   };
 } {
-  const { world, level, stars, score, words, goldEarned } = body;
+  const { world, level, stars, score, words, lootDrops, retainedScore } = body;
 
   // Check required fields
   if (
@@ -48,11 +57,6 @@ function validateRequestBody(body: Record<string, unknown>): {
     typeof words !== 'number'
   ) {
     return { valid: false, error: 'Missing required fields: world, level, stars, score, words' };
-  }
-
-  // Validate optional goldEarned (non-negative integer if provided)
-  if (goldEarned !== undefined && (typeof goldEarned !== 'number' || goldEarned < 0)) {
-    return { valid: false, error: 'Invalid goldEarned: must be a non-negative number' };
   }
 
   // Validate world range (1-10)
@@ -82,7 +86,12 @@ function validateRequestBody(body: Record<string, unknown>): {
 
   return {
     valid: true,
-    data: { world, level, stars, score, words, ...(typeof goldEarned === 'number' && { goldEarned }) },
+    data: {
+      world, level, stars, score, words,
+      // TODO: persist lootDrops to inventory table once schema exists
+      ...(Array.isArray(lootDrops) && { lootDrops }),
+      ...(typeof retainedScore === 'number' && { retainedScore }),
+    },
   };
 }
 
@@ -91,7 +100,24 @@ function validateRequestBody(body: Record<string, unknown>): {
  * POST /api/adventure/complete
  * Complete a level and update progression
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // Rate limit: 10 requests per minute
+  const rateLimitResult = checkApiRateLimit(request, 'adventure-complete', {
+    maxRequests: 10,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests' },
+      { status: 429 }
+    );
+  }
+
+  const config = getSupabaseConfig();
+  if (!config) {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
+  }
+
   try {
     // Get authenticated user using proper Supabase SSR auth
     const authSupabase = await createClient();
@@ -116,17 +142,34 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const { world, level, stars, score, words, goldEarned: clientGoldEarned } = validation.data;
+    const { world, level, stars, score, words, lootDrops: _lootDrops, retainedScore: _retainedScore } = validation.data;
+
+    // TODO: persist lootDrops to a player_inventory table once the DB schema is created
+    // TODO: persist retainedScore once retry scoring schema exists
+    void _lootDrops;
+    void _retainedScore;
 
     // Use service role client for database operations (bypasses RLS)
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createServiceClient(config.url, config.key);
 
-    // Ensure progression exists
-    const { data: existingProgression, error: progressionError } = await supabase
-      .from('player_progression')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    // Fetch progression and existing completion in parallel
+    const [progressionResult, completionResult] = await Promise.all([
+      supabase
+        .from('player_progression')
+        .select('xp, total_stars, gold, current_world, current_level, player_level, upgrades')
+        .eq('user_id', userId)
+        .single(),
+      supabase
+        .from('level_completions')
+        .select('stars, best_score, best_words')
+        .eq('user_id', userId)
+        .eq('world', world)
+        .eq('level', level)
+        .single(),
+    ]);
+
+    const { data: existingProgression, error: progressionError } = progressionResult;
+    const { data: existingCompletion } = completionResult;
 
     // If no progression, create it
     if (progressionError && progressionError.code === 'PGRST116') {
@@ -142,15 +185,6 @@ export async function POST(request: Request) {
       console.error('[ADVENTURE COMPLETE API] Progression fetch error:', progressionError);
       return NextResponse.json({ error: 'Failed to fetch progression' }, { status: 500 });
     }
-
-    // Get existing completion for this level (if any)
-    const { data: existingCompletion } = await supabase
-      .from('level_completions')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('world', world)
-      .eq('level', level)
-      .single();
 
     const previousStars = existingCompletion?.stars ?? 0;
     const previousBestScore = existingCompletion?.best_score ?? 0;
@@ -204,14 +238,23 @@ export async function POST(request: Request) {
     const newTotalStars = currentTotalStars + starsGained;
     const newPlayerLevel = getLevelFromXp(newTotalXp);
 
-    // Calculate gold earned — use client-provided value (includes upgrade bonuses) or fall back to base formula
-    let goldEarned: number;
-    if (clientGoldEarned !== undefined) {
-      goldEarned = isFirstCompletion ? clientGoldEarned : 0;
-    } else {
+    // Calculate gold earned server-side (never trust client value)
+    let goldEarned = 0;
+    if (isFirstCompletion) {
       const baseGold = 10 * stars;
       const perfectClearGoldBonus = stars === 3 ? 50 : 0;
-      goldEarned = isFirstCompletion ? baseGold + perfectClearGoldBonus : 0;
+      goldEarned = baseGold + perfectClearGoldBonus;
+
+      // Apply luckyPickaxe upgrade bonus from DB if player has it
+      const playerUpgrades = (existingProgression?.upgrades as UpgradeState) ?? {};
+      const luckyPickaxeBonus = getUpgradeEffect(playerUpgrades, 'luckyPickaxe');
+      if (luckyPickaxeBonus > 0) {
+        goldEarned = Math.round(goldEarned * (1 + luckyPickaxeBonus));
+      }
+
+      // Cap gold per level to prevent edge-case abuse
+      const MAX_GOLD_PER_LEVEL = 500;
+      goldEarned = Math.min(goldEarned, MAX_GOLD_PER_LEVEL);
     }
     const currentGold = (existingProgression?.gold as number) ?? 0;
     const newGold = currentGold + goldEarned;
@@ -229,18 +272,30 @@ export async function POST(request: Request) {
     }
 
     // Update progression in database
-    const { error: updateError } = await supabase
+    const updatePayload: Record<string, unknown> = {
+      player_level: newPlayerLevel,
+      xp: newTotalXp,
+      total_stars: newTotalStars,
+      gold: newGold,
+      current_world: Math.max(existingProgression?.current_world ?? 1, nextWorld),
+      current_level: Math.max(existingProgression?.current_level ?? 1, nextLevel),
+      updated_at: new Date().toISOString(),
+    };
+
+    let { error: updateError } = await supabase
       .from('player_progression')
-      .update({
-        player_level: newPlayerLevel,
-        xp: newTotalXp,
-        total_stars: newTotalStars,
-        gold: newGold,
-        current_world: Math.max(existingProgression?.current_world ?? 1, nextWorld),
-        current_level: Math.max(existingProgression?.current_level ?? 1, nextLevel),
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq('user_id', userId);
+
+    // If gold column doesn't exist yet (migration pending), retry without it
+    if (updateError && (updateError.code === 'PGRST204' || updateError.message?.includes('gold'))) {
+      console.warn('[ADVENTURE COMPLETE API] gold column not found, retrying without gold');
+      delete updatePayload.gold;
+      ({ error: updateError } = await supabase
+        .from('player_progression')
+        .update(updatePayload)
+        .eq('user_id', userId));
+    }
 
     if (updateError) {
       console.error('[ADVENTURE COMPLETE API] Progression update error:', updateError);
@@ -275,6 +330,7 @@ export async function POST(request: Request) {
       previousLevel: leveledUp ? previousLevel : undefined,
     });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/complete', { method: 'POST' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[ADVENTURE COMPLETE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

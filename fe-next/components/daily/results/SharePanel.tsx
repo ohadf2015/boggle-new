@@ -6,6 +6,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Check, Send, ImageDown, Mail, MessageSquare, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -81,12 +82,12 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                       <Loader size="sm" />
                     </div>
                   )}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={ogImageUrl}
                     alt="Share preview"
                     width={1200}
                     height={630}
+                    unoptimized
                     className={`w-full h-auto ${imageLoaded ? 'block' : 'hidden'}`}
                     onLoad={() => setImageLoaded(true)}
                   />

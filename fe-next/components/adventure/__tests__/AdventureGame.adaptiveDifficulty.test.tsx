@@ -226,6 +226,7 @@ jest.mock('@/hooks/useAdventureGame', () => ({
     pauseGame: jest.fn(),
     completeLevel: jest.fn(),
     resetGame: jest.fn(),
+    updateObjective: jest.fn(),
     markCascadeComplete: jest.fn(),
     isCascading: false,
     cascadePhase: 'idle' as const,

@@ -1,0 +1,284 @@
+================================================================================
+SEO & WEB VITALS AUDIT - QUICK REFERENCE GUIDE
+================================================================================
+
+AUDIT DATE: 2026-03-17
+OVERALL GRADE: A- (87/100) → Target: A (95/100)
+TIME TO FIX: 5-6 hours
+
+================================================================================
+3 MOST CRITICAL FIXES (DO THESE FIRST)
+================================================================================
+
+1. ADD CANONICAL TAGS TO GAME PAGES
+   What: Game pages (singleplayer, multiplayer, daily, blast, adventure, brain)
+   Why: Prevents duplicate content confusion
+   Time: 20 min
+   Files: 6 page.tsx files
+   Example:
+     alternates: { canonical: `https://www.lexiclash.live/${locale}/singleplayer` }
+
+2. OPTIMIZE FONT LOADING (BIGGEST PERFORMANCE WIN)
+   What: Load Hebrew fonts ONLY for Hebrew users, Latin ONLY for others
+   Why: Saves 60-80KB per page (50-100ms faster LCP)
+   Time: 45 min
+   Files: /app/fonts.ts, /app/[locale]/layout.tsx
+   Impact: +5-10% speed improvement
+
+3. ADD NOINDEX TO ROOM JOIN PAGES
+   What: /app/[locale]/join/[code]/page.tsx
+   Why: Prevents thousands of unique room URLs from being indexed
+   Time: 10 min
+   Fix: robots: { index: false, follow: false }
+
+================================================================================
+ALL ISSUES AT A GLANCE
+================================================================================
+
+CRITICAL (Do in Week 1):
+  [ ] Add canonical tags to 6 game pages ........................... 20 min
+  [ ] Add noindex to room join pages .............................. 10 min
+  [ ] Wire keywords to home page .................................. 3 min
+  [ ] Add metadata to 4 legal pages ............................... 30 min
+  SUBTOTAL: 1 hour
+
+HIGH (Do in Week 2):
+  [ ] Optimize font loading (locale-specific) .................... 45 min
+  [ ] Convert mascot GIF to WebP .................................. 20 min
+  [ ] Audit heading hierarchy (H1, H2, H3 nesting) .............. 45 min
+  SUBTOTAL: 1.5 hours
+
+MEDIUM (Do in Week 3):
+  [ ] Expand breadcrumb schema to 10 pages ....................... 60 min
+  [ ] Move FAQPage schema from layout to /faq page .............. 20 min
+  [ ] Add hero images to blog schema ............................. 40 min
+  SUBTOTAL: 2 hours
+
+NICE-TO-HAVE:
+  [ ] Audit alt text on all images ............................... 60 min
+  [ ] Create heading hierarchy audit document ................... (included)
+  [ ] Monitor Core Web Vitals monthly ............................. 15 min/mo
+
+================================================================================
+FILE CHANGES SUMMARY
+================================================================================
+
+Files to MODIFY (add code):
+  /app/[locale]/layout.tsx .............. Line 21 (font imports)
+  /app/[locale]/page.tsx ............... Line 30 (add keywords)
+  /app/[locale]/singleplayer/page.tsx .. (add generateMetadata)
+  /app/[locale]/multiplayer/page.tsx ... (add generateMetadata)
+  /app/[locale]/daily/page.tsx ......... (add generateMetadata)
+  /app/[locale]/blast/page.tsx ......... (add generateMetadata)
+  /app/[locale]/adventure/page.tsx ..... (add generateMetadata)
+  /app/[locale]/brain/page.tsx ......... (add generateMetadata)
+  /app/[locale]/join/[code]/page.tsx ... (add generateMetadata + noindex)
+  /app/[locale]/legal/privacy/page.tsx . (add generateMetadata)
+  /app/[locale]/legal/terms/page.tsx ... (add generateMetadata)
+  /app/[locale]/legal/disclaimer/page.tsx (add generateMetadata)
+  /app/[locale]/legal/cookies/page.tsx . (add generateMetadata)
+  /app/fonts.ts ......................... Line 21 (review font exports)
+  /components/seo/BlogJsonLd.tsx ....... (add image parameter)
+
+Files to CREATE (new):
+  /components/seo/generateBreadcrumbSchema.ts
+
+Files to DELETE/MOVE:
+  FAQPage schema (move lines 326-517 from /app/[locale]/layout.tsx to /app/[locale]/faq/page.tsx)
+
+Files to CONVERT:
+  /public/mascot/main-nbg.gif → main-nbg.webp (use cwebp command)
+
+================================================================================
+VERIFICATION CHECKLIST
+================================================================================
+
+After each fix, verify with:
+
+Canonical tags:
+  curl https://www.lexiclash.live/en/singleplayer | grep canonical
+  Should show: <link rel="canonical" href="...">
+
+Noindex:
+  curl https://www.lexiclash.live/en/join/ABC123 | grep robots
+  Should show: <meta name="robots" content="noindex,nofollow">
+
+Metadata:
+  curl https://www.lexiclash.live/en/legal/privacy | grep -E "<title>|<meta name=\"description\""
+
+Font loading:
+  npm run dev, open DevTools > Network, filter images
+  Should show: Only fredoka-latin.woff2 for /en, only fredoka-hebrew.woff2 for /he
+
+JSON-LD:
+  curl https://www.lexiclash.live/en | grep -c "application/ld+json"
+  Should show: 8 (or more after fixes)
+
+================================================================================
+BEFORE/AFTER ESTIMATES
+================================================================================
+
+Core Web Vitals:
+  LCP:  2.2s → 2.0s (font optimization: 100ms, mascot: 50ms)
+  CLS:  0.05 → 0.02
+  INP:  Normal → Normal
+
+Search Results:
+  Indexed pages: 500 → 700+ (with breadcrumbs)
+  Canonical coverage: 70% → 100%
+  Metadata completeness: 85% → 95%
+
+Organic Traffic (estimated):
+  Month 1: No change (indexing updates take time)
+  Month 2: +10-15% (faster pages, better CTR)
+  Month 3: +20-30% (breadcrumbs, expanded content)
+
+================================================================================
+TOOLS & LINKS
+================================================================================
+
+Google Search Console: https://search.google.com/search-console
+PageSpeed Insights: https://pagespeed.web.dev
+Rich Results Test: https://search.google.com/test/rich-results
+Schema Validator: https://validator.schema.org
+Mobile-Friendly Test: https://search.google.com/mobile-friendly
+
+WebP Converter: brew install libwebp
+  cwebp -q 80 input.gif -o output.webp
+
+Performance Testing:
+  Lighthouse: npm install -g lighthouse
+  lighthouse https://www.lexiclash.live/en
+
+================================================================================
+DEPLOYMENT STEPS
+================================================================================
+
+1. Create branch:
+   git checkout -b feat/seo-improvements
+
+2. Make code changes (5-6 hours)
+
+3. Test locally:
+   npm run lint && npm run test && npm run build
+
+4. Verify metadata output:
+   npm run dev
+   curl http://localhost:3000/en | grep canonical
+   curl http://localhost:3000/en/singleplayer | grep canonical
+
+5. Commit:
+   git add .
+   git commit -m "feat: SEO improvements — canonical tags, font optimization, metadata"
+
+6. Push:
+   git push origin feat/seo-improvements
+
+7. Create PR & merge
+
+8. Monitor deployment:
+   curl https://www.lexiclash.live/en | grep canonical
+   Check Core Web Vitals in PageSpeed Insights
+
+================================================================================
+MONTHLY MONITORING
+================================================================================
+
+Do this first Monday of each month (15 minutes):
+
+1. Open Google Search Console
+   - Coverage report: Any new indexation errors?
+   - Enhancements: Verify hreflang, rich results
+   - Top queries: New keywords to target?
+
+2. Run PageSpeed Insights
+   - Check LCP, INP, CLS trends
+   - Note any regressions
+
+3. Monitor organic traffic
+   - Check Google Analytics 4
+   - Compare to previous month
+
+4. Review top pages
+   - Are high-value pages ranking well?
+   - Any unexpected ranking drops?
+
+5. Update monitoring spreadsheet:
+   /docs/audits/webvitals-monitoring-log.csv
+   (Create one if it doesn't exist)
+
+================================================================================
+QUICK WINS (5-10 MIN EACH)
+================================================================================
+
+Submit sitemap to GSC:
+  1. Go to https://search.google.com/search-console/sitemaps
+  2. Enter: https://www.lexiclash.live/sitemap.xml
+  3. Click Submit
+
+Test rich results:
+  1. Go to https://search.google.com/test/rich-results
+  2. Paste: https://www.lexiclash.live/en
+  3. Note any missing schema
+
+Verify mobile-friendly:
+  1. Go to https://search.google.com/mobile-friendly
+  2. Paste: https://www.lexiclash.live/en
+  3. Should show: Page is mobile-friendly
+
+Set up Core Web Vitals monitoring:
+  1. Open PageSpeed Insights: https://pagespeed.web.dev
+  2. Enter: https://www.lexiclash.live/en
+  3. Bookmark this page, check monthly
+
+================================================================================
+ESTIMATED RANKING IMPACT
+================================================================================
+
+Conservative estimate (after 1 month):
+  +5 to +10 ranking positions for main keywords
+  (depends on competition level and backlink profile)
+
+What affects ranking after technical SEO fixes:
+  1. Backlinks (40%) — press kit, partnerships, reviews
+  2. Content quality (30%) — 30+ blog articles
+  3. User signals (15%) — CTR, dwell time, bounce rate
+  4. Technical SEO (10%) — crawlability, indexability (FIXED)
+
+Actions to maximize impact:
+  → Improve title/description CTR (A/B test)
+  → Create 20+ blog articles on word game topics
+  → Get featured in game aggregator sites
+  → Partner with word game influencers
+  → Build backlinks from relevant communities (Reddit, Discord, etc.)
+
+================================================================================
+NEXT AUDIT
+================================================================================
+
+Schedule: 2026-06-17 (3 months from now)
+
+Check:
+  [ ] Have all Phase 1-3 fixes been deployed?
+  [ ] What are Core Web Vitals now? (Target: 95+ PageSpeed score)
+  [ ] Organic traffic impact? (Target: +20-30% by month 3)
+  [ ] Any new technical issues introduced?
+  [ ] What content has been published? (Target: 20+ articles)
+  [ ] Backlink growth? (Target: 10-20 new backlinks)
+
+================================================================================
+QUESTIONS?
+================================================================================
+
+For detailed information, see:
+  /docs/audits/seo-webvitals-audit-2026-03-17.md (FULL AUDIT)
+  /docs/audits/seo-action-plan-2026-03-17.txt (DETAILED ACTION PLAN)
+  /docs/audits/SEO-AUDIT-SUMMARY-2026-03-17.txt (EXECUTIVE SUMMARY)
+
+For specific code examples and fixes, refer to action plan.
+
+================================================================================
+Generated: 2026-03-17
+Grade: A- (87/100) → Target: A (95/100)
+Effort: 5-6 hours
+================================================================================

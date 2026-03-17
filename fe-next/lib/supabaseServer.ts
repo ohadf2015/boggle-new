@@ -1,0 +1,34 @@
+/**
+ * Server-side Supabase client for use in Server Components and Route Handlers.
+ * Uses @supabase/ssr createServerClient with Next.js cookies() for session-aware requests.
+ *
+ * NOTE: Only import this in Server Components or server-only modules.
+ * For client components, continue using `lib/supabase.ts`.
+ */
+
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+
+export async function createSupabaseServerClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null;
+  }
+
+  const cookieStore = await cookies();
+
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        // Server Components can't set cookies — no-op.
+        // Route Handlers that need to set cookies should create their own client.
+        void cookiesToSet;
+      },
+    },
+  });
+}

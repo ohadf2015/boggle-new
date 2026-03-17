@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -194,4 +195,12 @@ const BlastView: React.FC = () => {
   );
 };
 
-export default BlastView;
+function BlastViewWithErrorBoundary() {
+  return (
+    <FeatureErrorBoundary featureName="Blast Mode" showHomeButton={true}>
+      <BlastView />
+    </FeatureErrorBoundary>
+  );
+}
+
+export default BlastViewWithErrorBoundary;

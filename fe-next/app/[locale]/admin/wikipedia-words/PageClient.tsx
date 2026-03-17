@@ -3,17 +3,46 @@
 import { WikipediaWordsPanel } from '@/components/admin/wikipedia-words';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 export default function AdminWikipediaWordsPageClient() {
   const router = useRouter();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
+  const { user, profile, isAdmin, loading: authLoading } = useAuth();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
+
+  const isProfileLoading = !authLoading && user && !profile;
+
+  if (!authLoading && !isProfileLoading && (!user || !isAdmin)) {
+    return (
+      <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="w-16 h-16 text-neo-lime mx-auto mb-4" />
+          <h1 className="text-2xl font-neo-display text-neo-white mb-2">{t('admin.accessRequired')}</h1>
+          <p className="text-slate-400 mb-6">{t('admin.accessDenied')}</p>
+          <Button onClick={() => router.push(`/${language}`)} variant="outline">
+            <ArrowLeft className="w-4 h-4 me-2" />
+            {t('common.backToHome')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (authLoading || isProfileLoading) {
+    return (
+      <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
+        <PageLoader size="lg" text={t('common.loading')} />
+      </div>
+    );
+  }
 
   return (
     <div className={cn(

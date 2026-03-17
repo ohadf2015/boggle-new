@@ -1,9 +1,15 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo, ReactNode } from 'react';
-import { Howl, Howler } from 'howler';
+import type { Howl } from 'howler';
 import logger from '@/utils/logger';
-import { createLazyHowl, preloadAudioOnDemand } from '@/lib/audio/audioLoader';
+import { createLazyHowl, preloadAudioOnDemand, ensureHowl } from '@/lib/audio/audioLoader';
+
+/** Lazily resolve the Howler global without pulling the module at parse time. */
+async function getHowler(): Promise<typeof import('howler')['Howler']> {
+  const mod = await import('howler');
+  return mod.Howler;
+}
 import { useMusicFocusManager } from '@/lib/audio/useMusicFocusManager';
 
 type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa';
@@ -80,6 +86,12 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioUnlocked, setAudioUnlocked] = useState(false);
 
+  // Eagerly load howler module on mount (deferred from parse-time to runtime)
+  const howlReadyRef = useRef(false);
+  useEffect(() => {
+    ensureHowl().then(() => { howlReadyRef.current = true; }).catch(() => {});
+  }, []);
+
   const audioUnlockedRef = useRef(false);
   const howlsRef = useRef<Record<TrackKey, Howl>>({} as Record<TrackKey, Howl>);
   const currentHowlRef = useRef<Howl | null>(null);
@@ -117,17 +129,19 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       onloaderror: (_id, err) => { logger.log(`[Music] Failed to load ${key}:`, err); },
       onplayerror: (_id, err) => {
         logger.log(`[Music] Failed to play ${key}:`, err);
-        if (Howler.ctx && Howler.ctx.state === 'suspended') {
-          Howler.ctx.resume()
-            .then(() => {
-              try { howlsRef.current[key]?.play(); } catch (playErr) {
-                logger.log(`[Music] Retry play failed for ${key}:`, playErr);
-              }
-            })
-            .catch((resumeErr: Error) => {
-              logger.log(`[Music] AudioContext resume failed in onplayerror:`, resumeErr.message);
-            });
-        }
+        getHowler().then((H) => {
+          if (H.ctx && H.ctx.state === 'suspended') {
+            H.ctx.resume()
+              .then(() => {
+                try { howlsRef.current[key]?.play(); } catch (playErr) {
+                  logger.log(`[Music] Retry play failed for ${key}:`, playErr);
+                }
+              })
+              .catch((resumeErr: Error) => {
+                logger.log(`[Music] AudioContext resume failed in onplayerror:`, resumeErr.message);
+              });
+          }
+        }).catch(() => {});
       },
     });
     howlsRef.current[key] = howl;
@@ -165,16 +179,18 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     if (audioUnlockedRef.current) return;
     logger.log('[Music] unlockAudio called, unlocking audio...');
 
-    if (Howler.ctx && Howler.ctx.state === 'suspended') {
-      try {
-        const result = Howler.ctx.resume();
-        if (result && typeof result.catch === 'function') {
-          result.catch((err: Error) => { logger.log('[Music] unlockAudio - AudioContext resume failed:', err.message); });
+    getHowler().then((H) => {
+      if (H.ctx && H.ctx.state === 'suspended') {
+        try {
+          const result = H.ctx.resume();
+          if (result && typeof result.catch === 'function') {
+            result.catch((err: Error) => { logger.log('[Music] unlockAudio - AudioContext resume failed:', err.message); });
+          }
+        } catch (err) {
+          logger.log('[Music] unlockAudio - AudioContext error:', err);
         }
-      } catch (err) {
-        logger.log('[Music] unlockAudio - AudioContext error:', err);
       }
-    }
+    }).catch(() => {});
 
     audioUnlockedRef.current = true;
     setAudioUnlocked(true);
@@ -301,9 +317,12 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       if (audioUnlockedRef.current) return;
       logger.log('[Music] First user interaction detected, unlocking audio...');
 
-      if (Howler.ctx && Howler.ctx.state === 'suspended') {
-        try { await Howler.ctx.resume(); } catch (err) { logger.log('[Music] Failed to resume AudioContext:', err); }
-      }
+      try {
+        const H = await getHowler();
+        if (H.ctx && H.ctx.state === 'suspended') {
+          await H.ctx.resume();
+        }
+      } catch (err) { logger.log('[Music] Failed to resume AudioContext:', err); }
 
       audioUnlockedRef.current = true;
       setAudioUnlocked(true);

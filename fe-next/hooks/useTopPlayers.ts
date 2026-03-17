@@ -24,12 +24,30 @@ const topPlayersCache: {
 
 const TOP_PLAYERS_CACHE_TTL_MS = 120_000; // 2 minutes
 
-export function useTopPlayers(limit = 5) {
+interface UseTopPlayersOptions {
+  /** Pre-fetched server data — skips client fetch when fresh */
+  initialData?: TopPlayer[];
+}
+
+export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
+  const { initialData } = options;
+
+  // Seed module cache with server-provided data so subsequent renders skip fetch
+  if (
+    initialData &&
+    initialData.length > 0 &&
+    topPlayersCache.data === null
+  ) {
+    topPlayersCache.data = initialData;
+    topPlayersCache.timestamp = Date.now();
+    topPlayersCache.limit = limit;
+  }
+
   const cached = topPlayersCache.limit === limit ? topPlayersCache.data : null;
   const isCacheFresh = () => cached && (Date.now() - topPlayersCache.timestamp) < TOP_PLAYERS_CACHE_TTL_MS;
 
-  const [players, setPlayers] = useState<TopPlayer[]>(cached || []);
-  const [loading, setLoading] = useState(!cached);
+  const [players, setPlayers] = useState<TopPlayer[]>(cached || initialData || []);
+  const [loading, setLoading] = useState(!cached && !initialData);
 
   useEffect(() => {
     if (!supabase) {

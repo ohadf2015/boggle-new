@@ -1,40 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { createClient } from '@/utils/supabase/server';
 import {
   canPrestige,
   getPrestigeMultiplier,
   getNextPrestigeRewards,
   PRESTIGE_CONFIG,
 } from '@/backend/modules/xpManager';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '') || request.cookies.get('sb-access-token')?.value;
-
-  if (!token) return null;
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-
-  if (error || !user) return null;
-  return user.id;
-}
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * GET /api/engagement/prestige
  * Get current prestige status and rewards preview
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const userId = await getUserIdFromRequest(request);
-    if (!userId) {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const userId = user.id;
 
     const { data: profile, error } = await supabase
       .from('profiles')
@@ -63,6 +49,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/engagement/prestige', { method: 'GET' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[PRESTIGE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -73,14 +60,26 @@ export async function GET(request: NextRequest) {
  * POST /api/engagement/prestige
  * Apply prestige - resets level to 1, grants rewards
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
+  // Rate limit: 3 requests per minute (prestige is rare)
+  const rateLimitResult = checkApiRateLimit(_request, 'engagement-prestige', {
+    maxRequests: 3,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests' },
+      { status: 429 }
+    );
+  }
+
   try {
-    const userId = await getUserIdFromRequest(request);
-    if (!userId) {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const userId = user.id;
 
     // Get current profile
     const { data: profile, error: profileError } = await supabase
@@ -144,7 +143,8 @@ export async function POST(request: NextRequest) {
         player_title: PRESTIGE_CONFIG.TITLES[newPrestigeLevel] || null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', userId);
+      .eq('id', userId)
+      .eq('prestige_level', currentPrestige); // Optimistic lock: prevent double-prestige race
 
     if (updateError) {
       console.error('[PRESTIGE API] Update error:', updateError);
@@ -159,6 +159,7 @@ export async function POST(request: NextRequest) {
       message: `Congratulations! You are now Prestige ${toRoman(newPrestigeLevel)}!`,
     });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/engagement/prestige', { method: 'POST' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[PRESTIGE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

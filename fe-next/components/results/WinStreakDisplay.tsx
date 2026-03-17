@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef, memo } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Zap, Crown, Gem, Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';

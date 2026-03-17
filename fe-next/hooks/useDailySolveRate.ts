@@ -3,15 +3,27 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
+interface UseDailySolveRateOptions {
+  /** Pre-fetched server value — skips client fetch when provided */
+  initialSolveRate?: number | null;
+}
+
 /**
  * Fetches the solve rate for today's daily challenge.
  * Returns percentage of attempts that were solved.
+ * Pass `initialSolveRate` from a server component to eliminate the client-side fetch.
  */
-export function useDailySolveRate(language: string) {
-  const [solveRate, setSolveRate] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+export function useDailySolveRate(language: string, options: UseDailySolveRateOptions = {}) {
+  const { initialSolveRate } = options;
+  const [solveRate, setSolveRate] = useState<number | null>(
+    initialSolveRate !== undefined ? initialSolveRate : null
+  );
+  const [loading, setLoading] = useState(initialSolveRate === undefined);
 
   useEffect(() => {
+    // Skip client fetch when server data was provided
+    if (initialSolveRate !== undefined) return;
+
     if (!supabase) {
       setLoading(false);
       return;
@@ -39,7 +51,7 @@ export function useDailySolveRate(language: string) {
 
     fetch();
     return () => { cancelled = true; };
-  }, [language]);
+  }, [language, initialSolveRate]);
 
   return { solveRate, loading };
 }

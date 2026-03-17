@@ -3,6 +3,7 @@
 import React, { memo, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../ui/button';
+import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import {
   Dialog,
   DialogContent,
@@ -468,4 +469,12 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
 
 MultiplayerInGameView.displayName = 'MultiplayerInGameView';
 
-export default MultiplayerInGameView;
+function MultiplayerInGameViewWithErrorBoundary(props: MultiplayerInGameViewProps) {
+  return (
+    <FeatureErrorBoundary featureName="Multiplayer" showHomeButton={true}>
+      <MultiplayerInGameView {...props} />
+    </FeatureErrorBoundary>
+  );
+}
+
+export default MultiplayerInGameViewWithErrorBoundary;

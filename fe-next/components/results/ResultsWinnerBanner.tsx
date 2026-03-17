@@ -111,7 +111,6 @@ const RANK_STYLES: Record<number, {
 
 const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
   winner,
-  isCurrentUserWinner,
   rank = 1,
   totalPlayers,
   variant = 'ranking',

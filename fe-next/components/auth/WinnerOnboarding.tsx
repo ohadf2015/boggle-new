@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Trophy, Sparkles, Check } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '../ui/button';
@@ -193,7 +194,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
             className="text-center mb-8"
           >
             <h1 className="text-4xl font-black mb-3 text-neo-lime">
@@ -210,7 +211,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
             className="space-y-6"
           >
             {/* Avatar Selection */}

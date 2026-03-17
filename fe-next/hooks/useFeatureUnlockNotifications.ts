@@ -41,36 +41,37 @@ export function useFeatureUnlockNotifications() {
       'practiceMode',
     ];
 
+    // Find all newly unlocked features, but only show the most recent one
+    // (prevents toast spam when a returning user crosses multiple thresholds at once)
+    let latestUnlock: { feature: FeatureKey; threshold: number } | null = null;
+
     features.forEach(feature => {
       const isUnlocked = gates[feature];
       const threshold = getUnlockThreshold(feature);
       const storageKey = `${STORAGE_PREFIX}${feature}`;
       const hasSeenNotification = localStorage.getItem(storageKey) === 'true';
 
-      // Show notification if:
-      // 1. Feature is now unlocked
-      // 2. User has enough games to unlock it
-      // 3. Notification hasn't been shown before
       if (isUnlocked && threshold !== null && gamesPlayed >= threshold && !hasSeenNotification) {
-        // Mark as shown immediately to prevent duplicates
+        // Mark all as shown to prevent future spam
         localStorage.setItem(storageKey, 'true');
 
-        // Show success toast with feature info
-        toast.success(
-          `${t(`features.unlocked.${feature}`)} ${t(`features.unlocked.${feature}Desc`)}`,
-          {
-            duration: 5000,
-            icon: '🎉',
-            style: {
-              background: '#FFE135', // neo-yellow
-              color: '#1a1a2e', // neo-navy
-              border: '3px solid #000',
-              fontWeight: 'bold',
-              boxShadow: '4px 4px 0px #000',
-            },
-          }
-        );
+        // Track the highest-threshold unlock to show
+        if (!latestUnlock || threshold > latestUnlock.threshold) {
+          latestUnlock = { feature, threshold };
+        }
       }
     });
+
+    if (latestUnlock) {
+      const { feature } = latestUnlock;
+      toast.success(
+        `${t(`singlePlayer.features.unlocked.${feature}`)} ${t(`singlePlayer.features.unlocked.${feature}Desc`)}`,
+        {
+          duration: 5000,
+          icon: '🎉',
+          className: 'bg-neo-yellow text-neo-navy border-3 border-black shadow-hard font-bold',
+        }
+      );
+    }
   }, [userStats, isLoading, t]);
 }

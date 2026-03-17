@@ -1,12 +1,12 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useRef, useCallback, useMemo, useState, ReactNode } from 'react';
-import { Howl } from 'howler';
+import type { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
-import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY } from '@/lib/audio/audioLoader';
+import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY, ensureHowl } from '@/lib/audio/audioLoader';
 import { getCountdownBeepParams } from '@/utils/countdownBeepParams';
 
 interface SoundEffectOptions {
@@ -207,37 +207,41 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // Initialize sound effects
+  // Initialize sound effects — wait for howler module to load first
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (soundsLoadedRef.current) return; // Prevent re-initialization
 
-    // Create Howl instances for each sound effect using lazy loading
-    Object.entries(SOUND_EFFECTS).forEach(([key, src]) => {
-      soundsRef.current[key] = createLazyHowl(src, {
-        volume: 0.6,
-        // html5: true and preload: false set by createLazyHowl
-        onload: () => {
-          logger.log(`[SFX] Loaded: ${key}`);
-        },
-        onloaderror: (id, err) => {
-          logger.log(`[SFX] Failed to load ${key}:`, err);
-        },
-        onplayerror: (id, err) => {
-          // Silently handle iOS Safari audio device errors
-          // These occur when the device can't start audio (e.g., silent mode, bluetooth issues)
-          logger.log(`[SFX] Failed to play ${key}:`, err);
-        },
+    let cancelled = false;
+
+    ensureHowl().then(() => {
+      if (cancelled || soundsLoadedRef.current) return;
+
+      // Create Howl instances for each sound effect using lazy loading
+      Object.entries(SOUND_EFFECTS).forEach(([key, src]) => {
+        soundsRef.current[key] = createLazyHowl(src, {
+          volume: 0.6,
+          // html5: true and preload: false set by createLazyHowl
+          onload: () => {
+            logger.log(`[SFX] Loaded: ${key}`);
+          },
+          onloaderror: (_id, err) => {
+            logger.log(`[SFX] Failed to load ${key}:`, err);
+          },
+          onplayerror: (_id, err) => {
+            // Silently handle iOS Safari audio device errors
+            logger.log(`[SFX] Failed to play ${key}:`, err);
+          },
+        });
       });
-    });
 
-    soundsLoadedRef.current = true;
-
-    // Copy ref value for cleanup to avoid stale ref warnings
-    const sounds = soundsRef.current;
+      soundsLoadedRef.current = true;
+    }).catch(() => {});
 
     return () => {
+      cancelled = true;
       // Cleanup on unmount
+      const sounds = soundsRef.current;
       Object.values(sounds).forEach(howl => {
         howl.unload();
       });

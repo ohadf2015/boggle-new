@@ -75,26 +75,26 @@ jest.mock('@/components/ui/Mascot', () => ({
 }));
 
 // Mock the new orphaned components to verify they render
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const MockBlastComboStreakBadge = jest.fn((_props: any) => <div data-testid="combo-streak-badge" />);
 jest.mock('../BlastComboStreakBadge', () => ({
   BlastComboStreakBadge: (props: any) => MockBlastComboStreakBadge(props),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const MockBlastHotTileOverlay = jest.fn((_props: any) => <div data-testid="blast-hot-tile-container" />);
 jest.mock('../BlastHotTileOverlay', () => ({
   BlastHotTileOverlay: (props: any) => MockBlastHotTileOverlay(props),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const MockBlastReactiveBackground = jest.fn((_props: any) => <div data-testid="blast-reactive-bg" />);
 jest.mock('../BlastReactiveBackground', () => ({
   __esModule: true,
   default: (props: any) => MockBlastReactiveBackground(props),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const MockBlastBoardIntensity = jest.fn(({ children }: any) => <div data-testid="blast-board-intensity">{children}</div>);
 jest.mock('../BlastBoardIntensity', () => ({
   __esModule: true,

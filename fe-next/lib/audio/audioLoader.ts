@@ -7,8 +7,45 @@
  * CrazyGames requirement: Initial download <50MB (ideally <20MB for mobile homepage)
  */
 
-import { Howl, HowlOptions } from 'howler';
+import type { Howl as HowlType, HowlOptions } from 'howler';
 import logger from '@/utils/logger';
+
+// Re-export the Howl type so consumers can reference it without importing howler directly.
+export type { HowlType };
+
+/**
+ * Cached Howl constructor — populated on first call to ensureHowl().
+ * Keeps the ~50 KB howler runtime out of the initial JS bundle.
+ */
+let _HowlCtor: (typeof import('howler'))['Howl'] | null = null;
+let _howlPromise: Promise<(typeof import('howler'))['Howl']> | null = null;
+
+/**
+ * Ensure the howler module is loaded and return the Howl constructor.
+ * Multiple concurrent calls share a single import() promise.
+ */
+export async function ensureHowl(): Promise<(typeof import('howler'))['Howl']> {
+  if (_HowlCtor) return _HowlCtor;
+  if (!_howlPromise) {
+    _howlPromise = import('howler').then((mod) => {
+      _HowlCtor = mod.Howl;
+      return _HowlCtor;
+    });
+  }
+  return _howlPromise;
+}
+
+/**
+ * Return the cached Howl constructor **synchronously**.
+ * Throws if howler has not been loaded yet (call ensureHowl() first in an
+ * effect or event handler).
+ */
+function getHowlSync(): (typeof import('howler'))['Howl'] {
+  if (!_HowlCtor) {
+    throw new Error('[AudioLoader] Howl not loaded yet — call ensureHowl() first');
+  }
+  return _HowlCtor;
+}
 
 /**
  * Priority levels for progressive audio loading
@@ -30,22 +67,21 @@ export enum AUDIO_LOAD_PRIORITY {
  * Always sets preload: false and html5: true to prevent automatic loading
  * and enable streaming (reduces memory footprint).
  *
+ * IMPORTANT: ensureHowl() must have been awaited before calling this function.
+ *
  * @param src - Audio file path(s)
  * @param options - Optional Howl configuration (volume, loop, etc.)
  * @returns Configured Howl instance (not yet loaded)
  *
  * @example
+ * await ensureHowl();
  * const bgMusic = createLazyHowl('/music/background.mp3', { loop: true, volume: 0.5 });
- * // Audio not loaded yet - zero bytes downloaded
- *
- * // Later, when needed:
- * await preloadAudioOnDemand(bgMusic);
- * bgMusic.play();
  */
 export function createLazyHowl(
   src: string | string[],
   options?: Partial<HowlOptions>
-): Howl {
+): HowlType {
+  const Howl = getHowlSync();
   return new Howl({
     src: Array.isArray(src) ? src : [src],
     preload: false, // CRITICAL: Prevent automatic loading
@@ -62,15 +98,8 @@ export function createLazyHowl(
  *
  * @param howl - Howl instance to preload
  * @returns Promise that resolves when loaded or rejects on error
- *
- * @example
- * const sound = createLazyHowl('/sounds/effect.mp3');
- *
- * // Load when needed:
- * await preloadAudioOnDemand(sound);
- * sound.play();
  */
-export function preloadAudioOnDemand(howl: Howl): Promise<void> {
+export function preloadAudioOnDemand(howl: HowlType): Promise<void> {
   return new Promise((resolve) => {
     // Already loaded - no-op
     if (howl.state() === 'loaded') {
@@ -104,37 +133,16 @@ export function preloadAudioOnDemand(howl: Howl): Promise<void> {
 /**
  * Preload multiple sounds by priority level
  *
- * Used for progressive loading - load CRITICAL sounds on first interaction,
- * then HIGH priority during idle time, etc.
- *
  * @param sounds - Map of sound key to Howl instance
  * @param priorities - Map of sound key to priority level
  * @param priority - Priority level to load
- * @returns Promise that resolves when all sounds of the priority are loaded
- *
- * @example
- * const sounds = new Map([
- *   ['wordAccepted', createLazyHowl('/sounds/word.wav')],
- *   ['combo', createLazyHowl('/sounds/combo.wav')],
- * ]);
- *
- * const priorities = new Map([
- *   ['wordAccepted', AUDIO_LOAD_PRIORITY.CRITICAL],
- *   ['combo', AUDIO_LOAD_PRIORITY.HIGH],
- * ]);
- *
- * // Load critical sounds first:
- * await preloadByPriority(sounds, priorities, AUDIO_LOAD_PRIORITY.CRITICAL);
- *
- * // Later, during idle time:
- * await preloadByPriority(sounds, priorities, AUDIO_LOAD_PRIORITY.HIGH);
  */
 export async function preloadByPriority(
-  sounds: Map<string, Howl>,
+  sounds: Map<string, HowlType>,
   priorities: Map<string, AUDIO_LOAD_PRIORITY>,
   priority: AUDIO_LOAD_PRIORITY
 ): Promise<void> {
-  const soundsToLoad: Array<{ key: string; howl: Howl }> = [];
+  const soundsToLoad: Array<{ key: string; howl: HowlType }> = [];
 
   // Find all sounds matching the priority
   sounds.forEach((howl, key) => {

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Bot } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/utils/utils';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Loader } from '@/components/ui/Loader';
 
 /**
@@ -113,7 +114,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
@@ -182,7 +183,7 @@ export const wordNeedsValidationToast = (word: string, options: WordNeedsValidat
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
@@ -220,7 +221,7 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-pink border-3 border-neo-black shadow-hard"
             style={{ minWidth: '220px', pointerEvents: 'auto' }}
           >
@@ -377,7 +378,7 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
@@ -464,7 +465,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-cyan border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >

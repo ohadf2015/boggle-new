@@ -51,6 +51,11 @@ export interface ProfileData {
   last_daily_email_sent_at?: string | null;
   // Gift Modal Dismissal
   gift_modal_dismissed_at?: string | null;
+  // Prestige
+  prestige_level?: number;
+  prestige_multiplier?: number;
+  prestige_unlocks?: Array<{ prestigeLevel: number; type: string; value: string; unlockedAt: string }>;
+  lifetime_xp?: number;
   // Feature Access (admin-granted)
   blast_access?: boolean;
   // Role-based access control

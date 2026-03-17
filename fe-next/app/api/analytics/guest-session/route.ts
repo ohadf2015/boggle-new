@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
+import { createClient } from '@/utils/supabase/server';
 
 // Import backend services (dynamic to avoid server/client issues)
 let getOrCreateGuestSession: any;
@@ -49,6 +50,13 @@ export async function GET(request: NextRequest) {
     if (!sessionId) {
       return NextResponse.json(
         { error: 'sessionId is required' },
+        { status: 400 }
+      );
+    }
+
+    if (sessionId.length < 16 || sessionId.length > 256 || !/^[a-zA-Z0-9_-]+$/.test(sessionId)) {
+      return NextResponse.json(
+        { error: 'Invalid sessionId format' },
         { status: 400 }
       );
     }
@@ -96,7 +104,7 @@ export async function POST(request: NextRequest) {
     const {
       action, // 'create' or 'update' or 'link'
       sessionId,
-      userId, // For linking
+      userId: _userId, // For linking (unused — auth user.id is used instead)
       deviceType,
       browser,
       language,
@@ -106,6 +114,19 @@ export async function POST(request: NextRequest) {
       referrer,
       country,
     } = body;
+
+    // Validate sessionId format if provided
+    if (sessionId && (
+      typeof sessionId !== 'string' ||
+      sessionId.length < 16 ||
+      sessionId.length > 256 ||
+      !/^[a-zA-Z0-9_-]+$/.test(sessionId)
+    )) {
+      return NextResponse.json(
+        { error: 'Invalid sessionId format' },
+        { status: 400 }
+      );
+    }
 
     // Create or get existing session
     if (action === 'create' || !action) {
@@ -177,14 +198,24 @@ export async function POST(request: NextRequest) {
 
     // Link guest session to user
     if (action === 'link') {
-      if (!sessionId || !userId) {
+      if (!sessionId) {
         return NextResponse.json(
-          { error: 'sessionId and userId are required for linking' },
+          { error: 'sessionId is required for linking' },
           { status: 400 }
         );
       }
 
-      const success = await trackers.linkGuestSessionToUser(sessionId, userId);
+      // Auth check: only authenticated users can link sessions
+      const supabase = await createClient();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        return NextResponse.json(
+          { error: 'Authentication required to link sessions' },
+          { status: 401 }
+        );
+      }
+
+      const success = await trackers.linkGuestSessionToUser(sessionId, user.id);
 
       if (!success) {
         return NextResponse.json(

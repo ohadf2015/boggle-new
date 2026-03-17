@@ -114,7 +114,7 @@ jest.mock('@/hooks/useParallax', () => ({
 }));
 
 // Mock LanguageContext
-const mockT = (key: string) => {
+const mockT = (key: string, params?: Record<string, string | number>) => {
   const translations: Record<string, string> = {
     'adventure.title': 'Adventure',
     'adventure.exitToMap': 'Exit to Map',
@@ -128,8 +128,15 @@ const mockT = (key: string) => {
     'common.pause': 'Pause',
     'common.resume': 'Resume',
     'adventure.levelShort': 'Lv.',
+    'adventure.levelWithNumber': 'Lv. {level}',
   };
-  return translations[key] || key;
+  let result = translations[key] || key;
+  if (params && typeof params === 'object') {
+    Object.entries(params).forEach(([k, v]) => {
+      result = result.replace(`{${k}}`, String(v));
+    });
+  }
+  return result;
 };
 
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -512,7 +519,7 @@ describe('AdventureView Integration', () => {
 
       // THEN
       expect(screen.getByText('15')).toBeInTheDocument(); // Total stars
-      expect(screen.getByText('Lv.3')).toBeInTheDocument(); // Player level
+      expect(screen.getByText('Lv. 3')).toBeInTheDocument(); // Player level
     });
 
     it('should display adventure title', () => {
@@ -900,7 +907,7 @@ describe('AdventureView Integration', () => {
 
       // THEN
       expect(screen.getByText('42')).toBeInTheDocument();
-      expect(screen.getByText('Lv.7')).toBeInTheDocument();
+      expect(screen.getByText('Lv. 7')).toBeInTheDocument();
     });
   });
 

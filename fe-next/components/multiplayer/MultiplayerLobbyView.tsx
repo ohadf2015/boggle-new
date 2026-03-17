@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Copy, LogOut, Pencil, Check, X } from 'lucide-react';
 import RoomChat from '../RoomChat';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 
 import AvatarBuilderModal from '../avatar/AvatarBuilderModal';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
@@ -233,7 +234,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
       data-testid="waiting-status"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+      transition={SPRING_PRESETS.balanced}
       className="space-y-3"
     >
       <div className="flex justify-center">
@@ -352,7 +353,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
         )}
       >
         <RoomChat
-          username={isHost ? 'Host' : username}
+          username={isHost ? t('multiplayerFlow.host') : username}
           isHost={isHost}
           gameCode={gameCode}
           className="h-full"
@@ -378,7 +379,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           </motion.div>
           <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={4}>
             <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64 sm:h-80">
-              <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+              <RoomChat username={t('multiplayerFlow.host')} isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
             </div>
           </motion.div>
         </div>

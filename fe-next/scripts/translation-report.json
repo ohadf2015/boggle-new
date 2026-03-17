@@ -1,44 +1,23 @@
 {
   "summary": {
-    "totalKeysInCode": 3651,
+    "totalKeysInCode": 3707,
     "keyCountByLanguage": {
-      "en": 6185,
-      "he": 6204,
-      "sv": 6237,
-      "ja": 6224,
-      "es": 6201
+      "en": 6273,
+      "he": 6292,
+      "sv": 6325,
+      "ja": 6312,
+      "es": 6299
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 3,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 8,
+      "templateLiterals": 5,
       "fallbackUsages": 0,
-      "variableKeys": 11
+      "variableKeys": 10
     }
   },
   "runtimeRisks": {
     "templateLiterals": [
-      {
-        "pattern": "achievements.${achievement.key}.name",
-        "file": "components/achievements/AchievementPopup.tsx",
-        "line": 50,
-        "context": "? t(`achievements.${achievement.key}.name`) || achievement.key",
-        "type": "template_literal"
-      },
-      {
-        "pattern": "achievements.${achievement.key}.name",
-        "file": "components/achievements/AchievementPopup.tsx",
-        "line": 90,
-        "context": "name: t(`achievements.${achievement.key}.name`) || achievement.key,",
-        "type": "template_literal"
-      },
-      {
-        "pattern": "achievements.${achievement.key}.description",
-        "file": "components/achievements/AchievementPopup.tsx",
-        "line": 91,
-        "context": "description: t(`achievements.${achievement.key}.description`)",
-        "type": "template_literal"
-      },
       {
         "pattern": "adventure.worlds.${world.name}",
         "file": "components/adventure/LevelGridHeader.tsx",
@@ -61,17 +40,17 @@
         "type": "template_literal"
       },
       {
-        "pattern": "features.unlocked.${feature}",
+        "pattern": "singlePlayer.features.unlocked.${feature}",
         "file": "hooks/useFeatureUnlockNotifications.ts",
-        "line": 60,
-        "context": "`${t(`features.unlocked.${feature}`)} ${t(`features.unlocked.${feature}Desc`)}`,",
+        "line": 68,
+        "context": "`${t(`singlePlayer.features.unlocked.${feature}`)} ${t(`singlePlayer.features.unlocked.${feature}Des",
         "type": "template_literal"
       },
       {
-        "pattern": "features.unlocked.${feature}Desc",
+        "pattern": "singlePlayer.features.unlocked.${feature}Desc",
         "file": "hooks/useFeatureUnlockNotifications.ts",
-        "line": 60,
-        "context": "`${t(`features.unlocked.${feature}`)} ${t(`features.unlocked.${feature}Desc`)}`,",
+        "line": 68,
+        "context": "`${t(`singlePlayer.features.unlocked.${feature}`)} ${t(`singlePlayer.features.unlocked.${feature}Des",
         "type": "template_literal"
       }
     ],
@@ -118,27 +97,19 @@
         "type": "variable_key"
       },
       {
-        "pattern": "t(mechanicNameKey)",
-        "variable": "mechanicNameKey",
+        "pattern": "t(mechanicKey)",
+        "variable": "mechanicKey",
         "file": "components/adventure/themed/ModifierBadge.tsx",
         "line": 80,
-        "context": "{t(mechanicNameKey) || mechanic}",
+        "context": "{t(mechanicKey) || mechanic}",
         "type": "variable_key"
       },
       {
-        "pattern": "t(mechanicDescKey)",
-        "variable": "mechanicDescKey",
-        "file": "components/adventure/themed/ModifierBadge.tsx",
-        "line": 86,
-        "context": "{t(mechanicDescKey)}",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(mechanicNameKey)",
-        "variable": "mechanicNameKey",
+        "pattern": "t(mechanicKey)",
+        "variable": "mechanicKey",
         "file": "components/adventure/themed/ModifierBadge.tsx",
         "line": 97,
-        "context": "{t(mechanicNameKey) || mechanic}",
+        "context": "{t(mechanicKey) || mechanic}",
         "type": "variable_key"
       },
       {
@@ -174,7 +145,75 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "common.errorOccurred",
+      "usages": [
+        {
+          "file": "components/auth/AuthModal.tsx",
+          "line": 165
+        },
+        {
+          "file": "components/auth/AuthModal.tsx",
+          "line": 230
+        },
+        {
+          "file": "components/auth/AuthModal.tsx",
+          "line": 258
+        },
+        {
+          "file": "components/auth/AuthModal.tsx",
+          "line": 293
+        },
+        {
+          "file": "components/auth/AuthModal.tsx",
+          "line": 314
+        },
+        {
+          "file": "components/auth/DailyChallengeInlineSignup.tsx",
+          "line": 106
+        },
+        {
+          "file": "components/auth/DailyChallengeInlineSignup.tsx",
+          "line": 181
+        },
+        {
+          "file": "components/auth/DailyChallengeInlineSignup.tsx",
+          "line": 210
+        },
+        {
+          "file": "components/custom-puzzle/CustomPuzzleGame.tsx",
+          "line": 84
+        },
+        {
+          "file": "components/custom-puzzle/CustomPuzzleGame.tsx",
+          "line": 93
+        }
+      ]
+    },
+    {
+      "key": "education.wordSelector.failedToSaveLesson",
+      "usages": [
+        {
+          "file": "components/multiplayer/HostWordSelector.tsx",
+          "line": 121
+        }
+      ]
+    },
+    {
+      "key": "multiplayerFlow.host",
+      "usages": [
+        {
+          "file": "components/multiplayer/MultiplayerLobbyView.tsx",
+          "line": 356
+        },
+        {
+          "file": "components/multiplayer/MultiplayerLobbyView.tsx",
+          "line": 382
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "tvBroadcast.totalWords",
@@ -226,8 +265,6 @@
       "auth.otp.verify",
       "auth.otp.changeEmail",
       "auth.otp.resend",
-      "leaderboard.friends",
-      "leaderboard.noFriendsPlayed",
       "daily.requestChallenge",
       "daily.requestSent",
       "friends.challenges.defaultMessage",
@@ -246,14 +283,6 @@
       "friends.headToHead.draws",
       "friends.headToHead.totalGames",
       "adventure.bosses.phases.phase2Banner",
-      "wordHuntAnnouncement.badge",
-      "wordHuntAnnouncement.title",
-      "wordHuntAnnouncement.subtitle",
-      "wordHuntPromo.title",
-      "wordHuntPromo.subtitle",
-      "wordHuntPromo.cta",
-      "wordHuntPromo.dismiss",
-      "wordHuntPromo.imageAlt",
       "avatarBuilder.gender",
       "avatarBuilder.male",
       "avatarBuilder.female"

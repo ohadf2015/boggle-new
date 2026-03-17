@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { isValidPuzzleCode, calculateCustomPuzzleScore } from '@/utils/customPuzzle';
+import { captureApiError } from '@/utils/sentry';
 
 interface RouteParams {
   params: Promise<{ puzzleCode: string }>;
@@ -47,7 +49,19 @@ interface SubmitAttemptRequest {
  * POST /api/custom-puzzle/[puzzleCode]/submit
  * Submit an attempt for a custom puzzle
  */
-export async function POST(request: Request, { params }: RouteParams) {
+export async function POST(request: NextRequest, { params }: RouteParams) {
+  // Rate limit: 20 requests per minute
+  const rateLimitResult = checkApiRateLimit(request, 'custom-puzzle-submit', {
+    maxRequests: 20,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429 }
+    );
+  }
+
   try {
     const { puzzleCode } = await params;
     const body: SubmitAttemptRequest = await request.json();
@@ -67,7 +81,6 @@ export async function POST(request: Request, { params }: RouteParams) {
       clueTokensEarned,
       clueTokensSpent,
       hintsUnlocked,
-      efficiencyScore: providedEfficiencyScore,
     } = body;
 
     if (!isValidPuzzleCode(puzzleCode)) {
@@ -127,15 +140,13 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Calculate player's efficiency score
-    const efficiencyScore = providedEfficiencyScore !== undefined
-      ? providedEfficiencyScore
-      : calculateCustomPuzzleScore(
-          solved,
-          attemptsUsed,
-          wordsDiscovered?.length || 0,
-          lifeRemaining || 0
-        );
+    // Always server-recalculate efficiency score (never trust client)
+    const efficiencyScore = calculateCustomPuzzleScore(
+      solved,
+      attemptsUsed,
+      wordsDiscovered?.length || 0,
+      lifeRemaining || 0
+    );
 
     // Insert attempt (uses unique constraint to prevent duplicates)
     const insertData: any = {
@@ -209,6 +220,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       creatorScore: puzzle.creator_efficiency_score,
     });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/custom-puzzle/submit', { method: 'POST' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('Submit attempt error:', errorMessage);
     return NextResponse.json(

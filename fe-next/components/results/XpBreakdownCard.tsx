@@ -2,6 +2,7 @@ import React, { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { getXpProgress } from '@/shared/utils/adventureXpUtils';
 
 interface XpBreakdown {
@@ -87,7 +88,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.7, type: 'spring', stiffness: 300, damping: 26 }}
+          transition={{ delay: 0.7, ...SPRING_PRESETS.balanced }}
           className="bg-neo-black text-neo-cream px-3 py-1 rounded-neo font-black text-lg"
         >
           +{xpEarned}
@@ -101,7 +102,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
             key={item.key}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6 + index * 0.1, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.6 + index * 0.1, ...SPRING_PRESETS.balanced }}
             className={cn(
               "flex items-center justify-between px-2 py-1 rounded-neo border-2 border-neo-black/30 dark:border-neo-cream/30",
               item.highlight ? "bg-neo-lime" : "bg-neo-cream/50 dark:bg-slate-600/50"
@@ -155,7 +156,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
+          transition={{ delay: 0.9, ...SPRING_PRESETS.balanced }}
           className="mt-3 p-3 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard-sm text-center relative z-10"
         >
           <motion.div

@@ -125,6 +125,7 @@ const en = {
     "email": "Email",
     "loading": "Shuffling letters...",
     "error": "Whoops!",
+    "errorOccurred": "An error occurred",
     "retry": "Try Again",
     "creating": "Creating...",
     "guest": "Guest",
@@ -264,7 +265,15 @@ const en = {
     "brain": "Brain",
     "leaderboard": "Ranks",
     "profile": "Profile",
-    "play": "Play"
+    "play": "Play",
+    "howToPlay": "How to Play",
+    "blog": "Blog",
+    "faq": "FAQ",
+    "aboutLexiClash": "About LexiClash",
+    "contactUs": "Contact Us",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "disclaimer": "Disclaimer"
   },
   "skills": {
     "title": "Skill Tree",
@@ -521,7 +530,22 @@ const en = {
     "orShareVia": "Or share via",
     "telegram": "Telegram",
     "moreWays": "More ways to share",
-    "invite": "Invite"
+    "invite": "Invite",
+    "emailSubjectPostGame": "I crushed it at LexiClash!",
+    "emailSubjectInvite": "Join me for LexiClash!",
+    "challengeLinkCopied": "Challenge link copied!",
+    "errorCreatingChallenge": "Error creating challenge",
+    "pts": "pts",
+    "words": "words",
+    "combo": "combo",
+    "streak": "streak",
+    "longest": "Longest:"
+  },
+  "messaging": {
+    "timeNow": "now",
+    "timeMinutes": "m",
+    "timeHours": "h",
+    "timeDays": "d"
   },
   "errors": {
     "unstableConnection": "Connection's wobbling - getting you back in...",
@@ -545,6 +569,11 @@ const en = {
     "updateMessage": "Cool new stuff just dropped! Quick refresh and you're back in.",
     "updateProgress": "Takes 2 seconds!",
     "globalErrorEncouragement": "Don't worry - your game's secure!",
+    "goHome": "Go Home",
+    "failedToLoadLeaderboard": "Failed to load leaderboard",
+    "failedToLoadProfile": "Failed to load profile",
+    "unableToLoadData": "Unable to load data. Please try again.",
+    "tryAgainButton": "Try again",
     "connectionTimeout": "Taking too long to connect",
     "rateLimited": "Slow down, speedster!",
     "connectionLost": "Lost connection - reconnecting",
@@ -729,6 +758,7 @@ const en = {
     ]
   },
   "multiplayerFlow": {
+    "host": "Host",
     "roomClosed": "Room closed",
     "rateLimited": "Slow down, speedster!",
     "roomList": {
@@ -1631,7 +1661,17 @@ const en = {
       "gameCount": "Game {count}",
       "round": "R{num}"
     },
-    "wordsFound": "Words found"
+    "wordsFound": "Words found",
+    "shareVictoryPrompt": "Share your victory!",
+    "victory": "VICTORY!",
+    "wellPlayed": "WELL PLAYED!",
+    "wordsLabel": "words",
+    "shareYourVictory": "Share Your Victory!",
+    "challengeFriends": "Challenge your friends 😈",
+    "streakOneWeek": "One day from a full week!",
+    "streakTwoWeeks": "Almost two weeks!",
+    "streakOneMonth": "One day from a full month!",
+    "streakWeeks": "{{weeks}} week streak!"
   },
   "nextStep": {
     "backToLobby": "Back to Lobby",
@@ -1646,6 +1686,29 @@ const en = {
     "goMultiplayerDesc": "Real humans, real competition, real bragging rights",
     "brainTraining": "Brain Gym",
     "brainTrainingDesc": "Level up your mental game"
+  },
+  "practiceResults": {
+    "playAgain": "Play Again",
+    "orTrySomethingNew": "or try something new",
+    "wordsFound": "{count} words found",
+    "tryDaily": "Daily Challenge",
+    "tryDailyDesc": "Same puzzle, everyone competes",
+    "tryBots": "Fight Bots",
+    "tryBotsDesc": "Test your skills against AI opponents",
+    "tryMultiplayer": "Play with Friends",
+    "tryMultiplayerDesc": "Real-time word battles",
+    "encouragement": {
+      "legendary": "Incredible!",
+      "great": "Nice Work!",
+      "nice": "Good Stuff!",
+      "warmup": "Great Start!"
+    },
+    "subtitle": {
+      "legendary": "You're on fire — keep that momentum going!",
+      "great": "You've got serious word skills",
+      "nice": "Every game makes you sharper",
+      "warmup": "Practice makes perfect — you're getting there!"
+    }
   },
   "almostFound": {
     "title": "You Almost Found...",
@@ -2010,6 +2073,9 @@ const en = {
   "achievements": {
     "unlocked": "Achievement Unlocked!",
     "upgraded": "Achievement Upgraded!",
+    "shareText": "I just unlocked \"{{name}}\" in LexiClash! Come play!",
+    "shareButton": "Share",
+    "copied": "Copied!",
     "cinematic": {
       "unlocked": "ACHIEVEMENT UNLOCKED!",
       "gold": "GOLD",
@@ -3794,6 +3860,31 @@ const en = {
     "shareHint": "Share the same board with friends",
     "winnerPrompt": "You crushed it! Challenge your friends 😈"
   },
+  "challengeView": {
+    "oops": "Oops!",
+    "backToHome": "Back to Home",
+    "back": "Back",
+    "title": "Challenge!",
+    "beatScore": "Can you beat this score?",
+    "createdChallenge": "created this challenge",
+    "scoreToBeat": "Score to Beat",
+    "words": "words",
+    "longest": "Longest: ",
+    "attempts": "Attempts",
+    "beaten": "Beaten",
+    "winRate": "Win Rate",
+    "startChallenge": "Start Challenge!"
+  },
+  "challengeResults": {
+    "youWon": "You Won!",
+    "soClose": "So Close!",
+    "youBeat": "You beat {{name}}!",
+    "tryAgainMsg": "Try again!",
+    "you": "You",
+    "pts": "pts",
+    "words": "words",
+    "longest": "longest"
+  },
   "rules": {
     "pageTitle": "LexiClash: Real-Time Word Battle",
     "gameModes": "Game Modes",
@@ -5320,6 +5411,7 @@ const en = {
     "levels": "levels",
     "level": "Level",
     "levelShort": "Lv.",
+    "levelWithNumber": "Lv. {level}",
     "backToMap": "Back to World Map",
     "menu": {
       "skills": "Skills",
@@ -5482,6 +5574,15 @@ const en = {
     "continueToNext": "Continue",
     "nextWorld": "Next World",
     "retryLevel": "Retry",
+    "freeRetry": "Free Retry",
+    "quest": {
+      "title": "Chapter Quests",
+      "wordCount": "Find Words",
+      "perfectLevels": "Perfect Levels",
+      "defeatBossNoHint": "Boss No Hints",
+      "longWordCount": "Long Words",
+      "fullComboLevels": "Full Combo"
+    },
     "loadError": "Failed to load progress",
     "cinematics": {
       "victory": "VICTORY!",
@@ -5532,8 +5633,10 @@ const en = {
       "confirmExit": "Exit Level?",
       "confirmExitDesc": "Your current progress will be lost. Are you sure you want to exit?",
       "freeze": "Freeze",
+      "freezeWithTime": "Freeze ({seconds}s)",
       "frozen": "Frozen!",
       "shuffle": "Shuffle",
+      "shuffleWithCount": "Shuffle (×{count})",
       "detonate": "Detonate"
     },
     "hints": {
@@ -6862,7 +6965,8 @@ const en = {
       "saveLessonTitle": "Save Vocabulary Lesson",
       "lessonNamePlaceholder": "Enter lesson name...",
       "noClassroom": "No classroom (personal lesson)",
-      "selectWords": "Select words to create a vocabulary lesson"
+      "selectWords": "Select words to create a vocabulary lesson",
+      "failedToSaveLesson": "Failed to save lesson"
     },
     "reports": {
       "title": "Progress Report",

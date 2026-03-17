@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 
 // Hebrew final letters (sofit) mapping - non-final to final form
 const HEBREW_FINAL_LETTERS: Record<string, string> = {
@@ -211,7 +212,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             transition={{
               layout: { type: 'spring', stiffness: 500, damping: 30 },
               opacity: { duration: 0.15 },
-              scale: { type: 'spring', stiffness: 400, damping: 25 },
+              scale: SPRING_PRESETS.snappy,
               x: { duration: 0.5, ease: 'easeInOut' }
             }}
             className={cn(

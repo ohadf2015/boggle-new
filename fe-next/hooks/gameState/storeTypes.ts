@@ -109,7 +109,6 @@ export interface GameActions {
   // Combo actions
   incrementCombo: () => void;
   resetCombo: () => void;
-  useComboShield: () => boolean;
   updateLastWordTime: () => void;
 
   // Tournament actions
@@ -162,8 +161,6 @@ export interface GameActions {
     showStartAnimation?: boolean;
     gameActive?: boolean;
   }) => void;
-  batchResetGame: () => void;
-
   // Reset actions
   resetForNewRound: () => void;
   resetAll: () => void;

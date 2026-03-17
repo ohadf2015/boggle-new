@@ -9,7 +9,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import type { ComboState } from './types';
 import type { GameState, GameActions } from './storeTypes';
-import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
+// COMBO_SHIELD_INTERVAL removed — useComboShield was dead code (player flow uses local refs)
 
 // ==========================================
 // Constants & Types
@@ -242,19 +242,8 @@ export const useGameStore = create<GameStore>()(
       });
     },
 
-    useComboShield: () => {
-      const state = get();
-      const validWordCount = state.foundWords.filter(w => w.validated !== false).length;
-      const availableShields = Math.floor(validWordCount / COMBO_SHIELD_INTERVAL);
-
-      if (state.combo.shieldsUsed < availableShields) {
-        set({
-          combo: { ...state.combo, shieldsUsed: state.combo.shieldsUsed + 1 }
-        });
-        return true;
-      }
-      return false;
-    },
+    // NOTE: useComboShield removed — dead code. Player flow uses local ref system in PlayerView.tsx.
+    // combo.level in this store is used by HOST flow only.
 
     updateLastWordTime: () => set((state) => ({
       combo: { ...state.combo, lastWordTime: Date.now() }
@@ -404,55 +393,16 @@ export const useGameStore = create<GameStore>()(
         ...(data.wordHuntMyLife !== undefined && { wordHuntMyLife: data.wordHuntMyLife }),
         ...(data.showStartAnimation !== undefined && { showStartAnimation: data.showStartAnimation }),
         ...(data.gameActive !== undefined && { gameActive: data.gameActive }),
-        // Reset word hunt state if target length is set
-        ...(data.wordHuntTargetLength !== undefined && {
-          wordHuntPlayerLives: {},
-          wordHuntTargetAttempts: [],
-          wordHuntTargetFound: false,
-          wordHuntDiscoveryClues: [],
-          wordHuntKnownLetters: [],
-        }),
+        // Always reset word hunt state to avoid stale data from previous WH games
+        wordHuntPlayerLives: {},
+        wordHuntTargetAttempts: [],
+        wordHuntTargetFound: false,
+        wordHuntDiscoveryClues: [],
+        wordHuntKnownLetters: [],
       }));
     },
 
-    batchResetGame: () => {
-      if (_comboTimeoutId) {
-        clearTimeout(_comboTimeoutId);
-        _comboTimeoutId = null;
-      }
-      set({
-        gameActive: false,
-        letterGrid: null,
-        remainingTime: null,
-        showStartAnimation: false,
-        shufflingGrid: null,
-        waitingForResults: false,
-        foundWords: [],
-        achievements: [],
-        totalBoardWords: null,
-        tournamentData: null,
-        tournamentStandings: [],
-        showTournamentStandings: false,
-        xpGainedData: null,
-        levelUpData: null,
-        wordHuntEliminatedPlayers: [],
-        wordHuntTargetFound: false,
-        wordHuntTargetAttempts: [],
-        wordHuntPlayerLives: {},
-        wordHuntMyLife: 100,
-        wordHuntDiscoveryClues: [],
-        wordHuntKnownLetters: [],
-        blastTileOverlay: [],
-        blastMovesUsed: 0,
-        blastTotalTileBonus: 0,
-        blastTotalTilesCleared: 0,
-        blastSeed: null,
-        blastComboSync: null,
-        blastOpponentActivity: [],
-        blastPlayerStats: {},
-        combo: DEFAULT_COMBO_STATE,
-      });
-    },
+    // NOTE: batchResetGame removed — never called. Use resetForNewRound or resetAll instead.
 
     // ==========================================
     // Reset Actions

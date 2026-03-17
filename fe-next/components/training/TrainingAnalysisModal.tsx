@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import {
   X,
   Trophy,
@@ -200,7 +201,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
             className="text-center mb-6"
           >
             <h2 className={cn(
@@ -264,7 +265,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
             className="grid grid-cols-2 gap-3 mb-6"
           >
             {allSkills.map((skill, index) => {
@@ -326,7 +327,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
             className={cn(
               'p-4 rounded-xl mb-6',
               isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'

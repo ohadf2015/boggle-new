@@ -8,11 +8,12 @@
 
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import type { BossVictoryProps } from '@/types/boss';
 
 // ==============================================
@@ -65,6 +66,9 @@ BossStarDisplay.displayName = 'BossStarDisplay';
 const BossVictory = memo<BossVictoryProps>(
   ({ boss, isVictory, stars, score, wordsFound, onContinue, onRetry }) => {
     const { t } = useLanguage();
+    const dialogRef = useRef<HTMLDivElement>(null);
+
+    useFocusTrap(dialogRef, true);
 
     const formattedScore = useMemo(
       () => score.toLocaleString(),
@@ -82,6 +86,7 @@ const BossVictory = memo<BossVictoryProps>(
     return (
       <AnimatePresence>
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="boss-victory-title"

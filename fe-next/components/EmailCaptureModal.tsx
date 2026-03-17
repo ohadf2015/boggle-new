@@ -213,17 +213,21 @@ export function EmailCaptureModal() {
               {/* Email Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
+                  <label htmlFor="capture-email-input" className="sr-only">{t('email.placeholder')}</label>
                   <input
+                    id="capture-email-input"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('email.placeholder')}
+                    aria-invalid={error ? true : undefined}
+                    aria-describedby={error ? 'capture-email-error' : undefined}
                     className="w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-gray placeholder:opacity-75 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 transition-all"
                     required
                     disabled={isSubmitting}
                   />
                   {error && (
-                    <p className="mt-2 text-neo-red text-sm font-bold">{error}</p>
+                    <p id="capture-email-error" role="alert" className="mt-2 text-neo-red text-sm font-bold">{error}</p>
                   )}
                 </div>
 

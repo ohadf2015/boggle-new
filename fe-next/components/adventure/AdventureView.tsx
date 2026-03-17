@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star, Sparkles, Map, Zap, Loader2, Coins, Hammer, X } from 'lucide-react';
+import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -50,7 +51,7 @@ interface GameTimerState {
  * AdventureView - Main Adventure Mode with interactive floating islands world map
  * Shows all 10 worlds with visual progression and level selection
  */
-export default function AdventureView(): React.JSX.Element {
+function AdventureView(): React.JSX.Element {
   const { t, dir, language } = useLanguageSafe();
   const isRTL = dir === 'rtl';
 
@@ -100,10 +101,8 @@ export default function AdventureView(): React.JSX.Element {
     enabled: true,
   });
 
-  // Callback for AdventureGame to report timer state
-  const handleTimerStateChange = useCallback((timerState: GameTimerState) => {
-    setGameTimerState(timerState);
-  }, []);
+  // Callback for AdventureGame to report timer state (setState is already stable)
+  const handleTimerStateChange = setGameTimerState;
 
   // Derive player stats from progression
   const totalStars = progression?.totalStars ?? 0;
@@ -205,9 +204,9 @@ export default function AdventureView(): React.JSX.Element {
     window.history.pushState(state, '');
   }, []);
 
-  // Handle shop purchase — optimistic update + persist via context
-  const handleShopPurchase = useCallback((_upgradeId: string, newState: UpgradeState, newGold: number) => {
-    updateCurrency(newGold, newState);
+  // Handle shop purchase — optimistic update + server-side validation via context
+  const handleShopPurchase = useCallback((upgradeId: string, newState: UpgradeState, newGold: number) => {
+    updateCurrency(upgradeId, newGold, newState);
   }, [updateCurrency]);
 
   // Handle world selection from WorldMap
@@ -393,7 +392,7 @@ export default function AdventureView(): React.JSX.Element {
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-purple/20 border-2 border-neo-purple rounded-neo">
               <Zap className="w-4 h-4 text-neo-purple" />
               <span className="font-bold text-neo-purple text-sm">
-                {t('adventure.levelShort')}{playerLevel}
+                {t('adventure.levelWithNumber', { level: playerLevel })}
               </span>
             </div>
 
@@ -558,5 +557,13 @@ export default function AdventureView(): React.JSX.Element {
       )}
     </div>
     </AdventureThemeProvider>
+  );
+}
+
+export default function AdventureViewWithErrorBoundary(): React.JSX.Element {
+  return (
+    <FeatureErrorBoundary featureName="Adventure Mode" showHomeButton={true}>
+      <AdventureView />
+    </FeatureErrorBoundary>
   );
 }

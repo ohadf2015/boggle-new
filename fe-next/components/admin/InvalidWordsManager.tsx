@@ -125,7 +125,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
       setTotal(data.total);
       setStats(data.stats);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       console.error('Error fetching invalid words:', errorMessage, error);
       toast.error('Failed to load invalid words');
     } finally {
@@ -200,7 +200,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
         });
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       console.error('Error approving word:', errorMessage, error);
       toast.error('Failed to approve word');
     } finally {
@@ -243,7 +243,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
         });
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       console.error('Error dismissing word:', errorMessage, error);
       toast.error('Failed to dismiss word');
     } finally {

@@ -17,6 +17,8 @@ import {
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureObjectives from '../AdventureObjectives';
+import { ChapterQuestProgress } from './ChapterQuestProgress';
+import type { ChapterQuest, ChapterQuestProgress as QuestProgressType } from '@/types/adventure';
 import { calculateStars } from '@/hooks/adventureGameReducer';
 import type { LevelObjective, ObjectiveType } from '@/types/adventure';
 
@@ -81,6 +83,10 @@ interface GameSidebarProps {
   detonateActive?: boolean;
   /** Toggle detonate mode */
   onDetonateToggle?: () => void;
+  /** Chapter quests for progress display */
+  chapterQuests?: ChapterQuest[];
+  /** Chapter quest progress */
+  chapterQuestProgress?: QuestProgressType[];
   className?: string;
 }
 
@@ -106,6 +112,8 @@ export const GameSidebar = memo(function GameSidebar({
   canDetonate = false,
   detonateActive = false,
   onDetonateToggle,
+  chapterQuests = [],
+  chapterQuestProgress = [],
   className,
 }: GameSidebarProps) {
   const { t } = useLanguage();
@@ -313,6 +321,11 @@ export const GameSidebar = memo(function GameSidebar({
           />
         </motion.div>
 
+        {/* Chapter Quest Progress */}
+        {chapterQuests.length > 0 && (
+          <ChapterQuestProgress quests={chapterQuests} progress={chapterQuestProgress} />
+        )}
+
         {/* Hint Section */}
         <div className="space-y-2">
           {/* Hint Button — glows subtly when auto-hint is active */}
@@ -356,7 +369,7 @@ export const GameSidebar = memo(function GameSidebar({
               )}
             >
               <Timer className="w-4 h-4" />
-              <span>{isFrozen ? t('adventure.game.frozen') : `${t('adventure.game.freeze')} (${freezeSeconds}s)`}</span>
+              <span>{isFrozen ? t('adventure.game.frozen') : t('adventure.game.freezeWithTime', { seconds: freezeSeconds })}</span>
             </motion.button>
           )}
 
@@ -374,7 +387,7 @@ export const GameSidebar = memo(function GameSidebar({
               )}
             >
               <Shuffle className="w-4 h-4" />
-              <span>{t('adventure.game.shuffle')} (×{shufflesRemaining})</span>
+              <span>{t('adventure.game.shuffleWithCount', { count: shufflesRemaining })}</span>
             </motion.button>
           )}
 

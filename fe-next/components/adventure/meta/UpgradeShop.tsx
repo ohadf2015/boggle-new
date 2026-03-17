@@ -129,7 +129,7 @@ interface UpgradeCardProps {
   canAfford: boolean;
   isFlashing: boolean;
   onPurchase: (id: string) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchase, t }: UpgradeCardProps) {
@@ -231,7 +231,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
               {canAfford ? t('adventure.upgrades.purchase') : (
                 <span className="flex items-center gap-1">
                   <Lock className="w-3 h-3" />
-                  {t('adventure.upgrades.needMore').replace('{{amount}}', String(nextCost ?? 0))}
+                  {t('adventure.upgrades.needMore', { amount: nextCost ?? 0 })}
                 </span>
               )}
             </motion.button>

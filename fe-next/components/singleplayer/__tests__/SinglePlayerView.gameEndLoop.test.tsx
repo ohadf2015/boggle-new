@@ -53,6 +53,19 @@ jest.mock('@/contexts/NavigationContext', () => ({
   useHideNavigation: () => mockSetIsInGame,
 }));
 
+// Mock CoinContext (needed by PracticeResults)
+jest.mock('@/contexts/CoinContext', () => ({
+  useCoin: () => ({
+    coins: 0,
+    updateCoins: jest.fn(),
+  }),
+  useCoinContext: () => ({
+    coins: 0,
+    updateCoins: jest.fn(),
+    addCoins: jest.fn(),
+  }),
+}));
+
 // Mock MusicContext
 jest.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({

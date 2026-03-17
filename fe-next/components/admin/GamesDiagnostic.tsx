@@ -42,7 +42,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
       const result = await response.json();
       setData(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }

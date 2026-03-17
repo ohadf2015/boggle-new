@@ -244,6 +244,16 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
   return {
     title: seo.title,
     description: seo.description,
+    alternates: {
+      canonical: `${baseUrl}${localePath}/daily`,
+      languages: {
+        en: `${baseUrl}/en/daily`,
+        he: `${baseUrl}/he/daily`,
+        sv: `${baseUrl}/sv/daily`,
+        ja: `${baseUrl}/ja/daily`,
+        es: `${baseUrl}/es/daily`,
+      },
+    },
     openGraph: {
       type: 'website',
       url: `${baseUrl}${localePath}/daily`,

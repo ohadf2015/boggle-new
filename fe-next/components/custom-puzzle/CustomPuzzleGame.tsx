@@ -81,7 +81,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.error || 'Failed to load puzzle');
+          setError(data.error || t('common.errorOccurred'));
           setPhase('loading');
           return;
         }
@@ -90,12 +90,12 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
         setPhase('intro');
       } catch (err) {
         console.error('Error fetching puzzle:', err);
-        setError('Failed to load puzzle');
+        setError(t('common.errorOccurred'));
       }
     }
 
     fetchPuzzle();
-  }, [puzzleCode, setError, setPhase, setPuzzle]);
+  }, [puzzleCode, setError, setPhase, setPuzzle, t]);
 
   // Handle game completion
   const handleGameComplete = useCallback(async (result: SurvivalGameResult) => {

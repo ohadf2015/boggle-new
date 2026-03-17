@@ -30,7 +30,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
   onPlayAgain,
   onBackToHome,
 }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [copied, setCopied] = useState(false);
@@ -163,8 +163,8 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
               )}
             >
               {beatCreator
-                ? (language === 'he' ? 'ניצחת!' : 'You Won!')
-                : (language === 'he' ? 'כמעט!' : 'So Close!')}
+                ? t('challengeResults.youWon')
+                : t('challengeResults.soClose')}
             </motion.h1>
 
             <motion.p
@@ -177,8 +177,8 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
               )}
             >
               {beatCreator
-                ? (language === 'he' ? `ניצחת את ${challenge.creatorUsername}!` : `You beat ${challenge.creatorUsername}!`)
-                : (language === 'he' ? 'נסה שוב!' : 'Try again!')}
+                ? t('challengeResults.youBeat').replace('{{name}}', challenge.creatorUsername)
+                : t('challengeResults.tryAgainMsg')}
             </motion.p>
           </div>
 
@@ -193,7 +193,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
                 'text-xs font-bold uppercase mb-1',
                 beatCreator ? 'text-white/70' : isDark ? 'text-gray-400' : 'text-gray-500'
               )}>
-                {language === 'he' ? 'אתה' : 'You'}
+                {t('challengeResults.you')}
               </p>
               <p className={cn(
                 'text-3xl font-black',
@@ -256,7 +256,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
               'text-lg font-black',
               beatCreator ? 'text-white' : isDark ? 'text-red-400' : 'text-red-600'
             )}>
-              {scoreDiff > 0 ? '+' : ''}{scoreDiff} {language === 'he' ? 'נקודות' : 'pts'}
+              {scoreDiff > 0 ? '+' : ''}{scoreDiff} {t('challengeResults.pts')}
             </span>
           </motion.div>
 
@@ -279,7 +279,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
                 'text-xs',
                 beatCreator ? 'text-white/70' : isDark ? 'text-gray-400' : 'text-gray-500'
               )}>
-                {language === 'he' ? 'מילים' : 'words'}
+                {t('challengeResults.words')}
               </p>
             </div>
             <div className={cn(
@@ -296,7 +296,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
                 'text-xs',
                 beatCreator ? 'text-white/70' : isDark ? 'text-gray-400' : 'text-gray-500'
               )}>
-                {language === 'he' ? 'מילה ארוכה' : 'longest'}
+                {t('challengeResults.longest')}
               </p>
             </div>
           </div>
@@ -321,7 +321,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             )}
           >
             <RotateCw className="w-5 h-5" />
-            {language === 'he' ? 'נסה שוב' : 'Try Again'}
+            {t('common.playAgain')}
           </Button>
 
           {/* Share Challenge */}
@@ -337,7 +337,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
               )}
             >
               <Share2 className="w-4 h-4" />
-              {language === 'he' ? 'שתף' : 'Share'}
+              {t('common.share')}
             </Button>
             <Button
               onClick={handleCopyLink}
@@ -350,7 +350,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
               )}
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              {copied ? (language === 'he' ? 'הועתק!' : 'Copied!') : (language === 'he' ? 'העתק' : 'Copy')}
+              {copied ? t('common.copied') : t('common.copy')}
             </Button>
           </div>
 
@@ -365,7 +365,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             )}
           >
             <Home className="w-4 h-4" />
-            {language === 'he' ? 'חזרה לדף הבית' : 'Back to Home'}
+            {t('common.backToHome')}
           </Button>
         </motion.div>
       </motion.div>

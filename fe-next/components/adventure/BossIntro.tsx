@@ -8,12 +8,13 @@
 
 'use client';
 
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
 import { Mascot } from '@/components/ui/Mascot';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import type { BossIntroProps } from '@/types/boss';
 
 // ==============================================
@@ -23,6 +24,9 @@ import type { BossIntroProps } from '@/types/boss';
 const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onStart, onSkip }) => {
   const { t } = useLanguage();
   const bossFightTheme = useBossFightTheme();
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(dialogRef, true, onSkip);
 
   const bossName = t(boss.displayName);
   const mechanicDescription = t(boss.twistMechanic.description);
@@ -33,6 +37,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
   return (
     <AnimatePresence>
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="boss-intro-title"

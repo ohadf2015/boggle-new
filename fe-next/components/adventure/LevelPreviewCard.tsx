@@ -183,7 +183,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
                 )}
               >
                 <span className="text-neo-white/80">
-                  {t(OBJECTIVE_TRANSLATION_KEYS[objective.type])}
+                  {t(OBJECTIVE_TRANSLATION_KEYS[objective.type], { target: objective.target })}
                 </span>
                 <span className="font-black text-neo-lime">
                   {objective.target}
@@ -248,11 +248,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
           {uniqueSpecialTiles.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {uniqueSpecialTiles.map((tileType) => {
-                const tileKey = tileType as keyof typeof TILE_TYPE_INFO;
-                const info = TILE_TYPE_INFO[tileKey];
-                const Icon = info.icon;
-                const colorClass = info.color;
-                const translationKey = info.key;
+                const { icon: Icon, key, color } = TILE_TYPE_INFO[tileType];
                 return (
                   <div
                     key={tileType}
@@ -261,9 +257,9 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
                       'bg-neo-black/30 border border-neo-white/10'
                     )}
                   >
-                    <Icon className={cn('w-4 h-4', colorClass)} />
+                    <Icon className={cn('w-4 h-4', color)} />
                     <span className="text-sm text-neo-white/80">
-                      {t(translationKey)}
+                      {t(key)}
                     </span>
                   </div>
                 );

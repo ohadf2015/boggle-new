@@ -102,7 +102,7 @@ export default function WordListPreview({
             placeholder={t('education.practice.searchWords')}
             className={cn(
               'border-neo border-neo-black shadow-hard-sm bg-neo-navy/50',
-              isRTL ? 'pr-10' : 'pl-10'
+              'ps-10'
             )}
           />
         </div>

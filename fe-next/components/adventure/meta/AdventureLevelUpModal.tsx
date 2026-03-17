@@ -9,11 +9,12 @@
 
 'use client';
 
-import { memo, useEffect, useId } from 'react';
+import { memo, useEffect, useId, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 
 // ==============================================
@@ -37,20 +38,11 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
   ({ isOpen, newLevel, onClose }) => {
     const { t } = useLanguage();
     const titleId = useId();
+    const dialogRef = useRef<HTMLDivElement>(null);
 
     const prefersReducedMotion = usePrefersReducedMotion();
 
-    // Handle escape key
-    useEffect(() => {
-      const handleEscape = (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && isOpen) {
-          onClose();
-        }
-      };
-
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
-    }, [isOpen, onClose]);
+    useFocusTrap(dialogRef, isOpen, onClose);
 
     // Fire confetti when modal opens (unless reduced motion)
     useEffect(() => {
@@ -90,6 +82,7 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
       <AnimatePresence>
         {/* Overlay */}
         <motion.div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}

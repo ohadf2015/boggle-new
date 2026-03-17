@@ -40,8 +40,7 @@
 
 'use client';
 
-import { createContext, useContext, ReactNode, useMemo, useRef } from 'react';
-import { useGameStore } from '@/hooks/gameState/store';
+import { createContext, useContext, ReactNode } from 'react';
 import type { UseGameStateReturn } from '@/hooks/gameState/types';
 
 // ==========================================
@@ -59,120 +58,19 @@ interface GameStateProviderProps {
 }
 
 /**
- * GameStateProvider - Provides game state to child components
+ * GameStateProvider - Deprecated pass-through shell.
  *
- * This provider bridges the Zustand store with React Context for backward compatibility.
- * New code should prefer using Zustand hooks directly (useGameActive, useGameActions, etc.)
- * for better performance.
+ * All consumers have been migrated to Zustand selector hooks directly.
+ * This provider no longer subscribes to the store, so it adds zero overhead.
+ * It is kept only so any remaining import of <GameStateProvider> compiles without error.
+ *
+ * @deprecated Remove this from the provider tree. Use Zustand selector hooks directly.
  */
 export function GameStateProvider({ children }: GameStateProviderProps) {
-  // Get entire store state (for backward compatibility)
-  const storeState = useGameStore();
-
-  // Create stable refs for combo system (maintaining previous API)
-  const comboLevelRef = useRef(0);
-  const lastWordTimeRef = useRef<number | null>(null);
-  const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Keep refs in sync with store state
-  comboLevelRef.current = storeState.combo.level;
-  lastWordTimeRef.current = storeState.combo.lastWordTime;
-  // _comboTimeoutId moved to module-level variable in store.ts
-
-  // Memoize context value to reduce unnecessary re-renders
-  // Note: This still re-renders all consumers when any state changes.
-  // For better performance, use Zustand selector hooks directly.
-  const value = useMemo<UseGameStateReturn>(() => ({
-    // State values
-    gameActive: storeState.gameActive,
-    letterGrid: storeState.letterGrid,
-    remainingTime: storeState.remainingTime,
-    gameLanguage: storeState.gameLanguage,
-    minWordLength: storeState.minWordLength,
-    totalBoardWords: storeState.totalBoardWords,
-    players: storeState.players,
-    leaderboard: storeState.leaderboard,
-    foundWords: storeState.foundWords,
-    achievements: storeState.achievements,
-    waitingForResults: storeState.waitingForResults,
-    showStartAnimation: storeState.showStartAnimation,
-    shufflingGrid: storeState.shufflingGrid,
-    highlightedCells: storeState.highlightedCells,
-    combo: storeState.combo,
-    tournamentData: storeState.tournamentData,
-    tournamentStandings: storeState.tournamentStandings,
-    showTournamentStandings: storeState.showTournamentStandings,
-    xpGainedData: storeState.xpGainedData,
-    levelUpData: storeState.levelUpData,
-    boardTheme: storeState.boardTheme,
-
-    // Actions
-    setGameActive: storeState.setGameActive,
-    setLetterGrid: storeState.setLetterGrid,
-    setRemainingTime: storeState.setRemainingTime,
-    setGameLanguage: storeState.setGameLanguage,
-    setMinWordLength: storeState.setMinWordLength,
-    setTotalBoardWords: storeState.setTotalBoardWords,
-    setPlayers: storeState.setPlayers,
-    updatePlayer: storeState.updatePlayer,
-    addPlayer: storeState.addPlayer,
-    removePlayer: storeState.removePlayer,
-    setLeaderboard: storeState.setLeaderboard,
-    addFoundWord: storeState.addFoundWord,
-    setFoundWords: storeState.setFoundWords,
-    addAchievement: storeState.addAchievement,
-    setAchievements: storeState.setAchievements,
-    setWaitingForResults: storeState.setWaitingForResults,
-    setShowStartAnimation: storeState.setShowStartAnimation,
-    setShufflingGrid: storeState.setShufflingGrid,
-    setHighlightedCells: storeState.setHighlightedCells,
-    incrementCombo: storeState.incrementCombo,
-    resetCombo: storeState.resetCombo,
-    useComboShield: storeState.useComboShield,
-    updateLastWordTime: storeState.updateLastWordTime,
-    setTournamentData: storeState.setTournamentData,
-    setTournamentStandings: storeState.setTournamentStandings,
-    setShowTournamentStandings: storeState.setShowTournamentStandings,
-    setXpGainedData: storeState.setXpGainedData,
-    setLevelUpData: storeState.setLevelUpData,
-    setBoardTheme: storeState.setBoardTheme,
-    resetForNewRound: storeState.resetForNewRound,
-    resetAll: storeState.resetAll,
-
-    // Refs for callback stability
-    refs: {
-      comboLevel: comboLevelRef,
-      lastWordTime: lastWordTimeRef,
-      comboTimeout: comboTimeoutRef,
-    },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [
-    // Only track state values — Zustand action references are stable
-    storeState.gameActive,
-    storeState.letterGrid,
-    storeState.remainingTime,
-    storeState.gameLanguage,
-    storeState.minWordLength,
-    storeState.totalBoardWords,
-    storeState.players,
-    storeState.leaderboard,
-    storeState.foundWords,
-    storeState.achievements,
-    storeState.waitingForResults,
-    storeState.showStartAnimation,
-    storeState.shufflingGrid,
-    storeState.highlightedCells,
-    storeState.combo,
-    storeState.tournamentData,
-    storeState.tournamentStandings,
-    storeState.showTournamentStandings,
-    storeState.xpGainedData,
-    storeState.levelUpData,
-    storeState.boardTheme,
-  ]);
-
+  // No store subscription — value is null, provider is a no-op pass-through.
+  // useGameStateContext() will throw if called, enforcing the migration.
   return (
-    <GameStateContext.Provider value={value}>
+    <GameStateContext.Provider value={null}>
       {children}
     </GameStateContext.Provider>
   );
@@ -208,21 +106,13 @@ export function GameStateProvider({ children }: GameStateProviderProps) {
  * @returns Game state values and action methods
  */
 export function useGameStateContext(): UseGameStateReturn {
-  // Warn in development about deprecated usage
-  if (process.env.NODE_ENV === 'development') {
-    console.warn(
-      '[PERF] useGameStateContext is deprecated. ' +
-      'Use Zustand selector hooks (useGameActive, useFoundWords, useGameActions, etc.) ' +
-      'from @/hooks/gameState for better performance.'
-    );
-  }
-
   const context = useContext(GameStateContext);
 
   if (!context) {
     throw new Error(
-      'useGameStateContext must be used within a GameStateProvider. ' +
-      'Make sure your component is wrapped in <GameStateProvider>.'
+      'useGameStateContext is deprecated and no longer provides state. ' +
+      'Migrate to Zustand selector hooks: useGameActive, useFoundWords, useGameActions, etc. ' +
+      'from @/hooks/gameState.'
     );
   }
 

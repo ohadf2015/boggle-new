@@ -11,6 +11,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { captureApiError } from '@/utils/sentry';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -161,6 +162,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/attempt', { method: 'POST' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[ADVENTURE ATTEMPT API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -218,6 +220,7 @@ export async function GET() {
       attempts: transformedAttempts,
     });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/attempt', { method: 'GET' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[ADVENTURE ATTEMPT API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

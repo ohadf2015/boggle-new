@@ -280,34 +280,7 @@ describe('useGameState', () => {
       expect(result.current.combo.level).toBe(0);
     });
 
-    it('should provide combo shield when enough words found', () => {
-      const { result } = renderHook(() => useGameState());
-
-      // Add 10 valid words to earn a shield
-      act(() => {
-        for (let i = 0; i < 10; i++) {
-          result.current.addFoundWord({
-            word: `WORD${i}`,
-            score: 3,
-            validated: true,
-            isDuplicate: false,
-            autoValidated: true,
-          });
-        }
-      });
-
-      act(() => {
-        result.current.incrementCombo();
-      });
-
-      // Should be able to use combo shield
-      let shieldUsed = false;
-      act(() => {
-        shieldUsed = result.current.useComboShield();
-      });
-
-      expect(shieldUsed).toBe(true);
-    });
+    // useComboShield test removed — action was dead code (player flow uses local refs)
   });
 
   describe('reset actions', () => {

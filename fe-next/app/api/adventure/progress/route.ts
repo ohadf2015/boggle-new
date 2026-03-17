@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
+import { captureApiError } from '@/utils/sentry';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -132,6 +133,7 @@ export async function GET() {
 
     return NextResponse.json(progression);
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/progress', { method: 'GET' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[ADVENTURE API] GET error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -197,6 +199,7 @@ export async function POST() {
       { status: 201 }
     );
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/progress', { method: 'POST' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[ADVENTURE API] POST error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

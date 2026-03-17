@@ -6,8 +6,22 @@
  */
 
 import { useEffect, useRef, useCallback } from 'react';
-import { Howl, Howler } from 'howler';
+import type { Howl } from 'howler';
 import logger from '@/utils/logger';
+
+/** Cached Howler global — populated lazily */
+let _cachedHowler: typeof import('howler')['Howler'] | null = null;
+
+function getHowlerSync(): typeof import('howler')['Howler'] | null {
+  return _cachedHowler;
+}
+
+/** Eagerly load the Howler global (called once on mount) */
+async function loadHowler(): Promise<void> {
+  if (_cachedHowler) return;
+  const mod = await import('howler');
+  _cachedHowler = mod.Howler;
+}
 
 interface MusicFocusManagerOptions {
   currentHowlRef: React.RefObject<Howl | null>;
@@ -38,11 +52,15 @@ export function useMusicFocusManager({
   const pausedByBlurRef = useRef(false);
   const windowFocusedRef = useRef(typeof document !== 'undefined' ? document.hasFocus() : true);
 
+  // Load howler module on mount so Howler global is available for suspend/resume
+  useEffect(() => { loadHowler().catch(() => {}); }, []);
+
   const suspendAudio = useCallback((reason: string): boolean => {
     let suspended = false;
+    const H = getHowlerSync();
 
-    if (Howler.ctx && Howler.ctx.state === 'running') {
-      Howler.ctx.suspend();
+    if (H?.ctx && H.ctx.state === 'running') {
+      H.ctx.suspend();
       logger.log(`[Music] ${reason} - suspended AudioContext`);
       suspended = true;
     }
@@ -57,9 +75,10 @@ export function useMusicFocusManager({
   }, [currentHowlRef]);
 
   const resumeAudio = useCallback((reason: string): void => {
-    if (Howler.ctx && Howler.ctx.state === 'suspended' && audioUnlockedRef.current) {
+    const H = getHowlerSync();
+    if (H?.ctx && H.ctx.state === 'suspended' && audioUnlockedRef.current) {
       try {
-        const result = Howler.ctx.resume();
+        const result = H.ctx.resume();
         if (result && typeof result.catch === 'function') {
           result.catch((err: Error) => {
             logger.log(`[Music] ${reason} - AudioContext resume failed:`, err.message);

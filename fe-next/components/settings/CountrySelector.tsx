@@ -150,6 +150,8 @@ export function CountrySelector({
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
+        aria-label={t('profile.selectCountry')}
+        aria-expanded={isOpen}
         className={cn(
           'flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors w-full',
           'text-sm font-medium',
@@ -205,6 +207,7 @@ export function CountrySelector({
                 ref={inputRef}
                 type="text"
                 role="searchbox"
+                aria-label={t('profile.searchCountry')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('profile.searchCountry')}

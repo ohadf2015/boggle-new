@@ -3,6 +3,7 @@
 import React, { useMemo, useEffect, useState, useCallback, useDeferredValue } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { Trophy, BarChart2 } from 'lucide-react';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -280,7 +281,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         showFirstWinModal,
         setShowFirstWinModal,
       }}
-      t={t}
     />
   );
 
@@ -583,4 +583,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   );
 };
 
-export default ResultsPage;
+function ResultsPageWithErrorBoundary(props: ResultsPageProps) {
+  return (
+    <FeatureErrorBoundary featureName="Results" showHomeButton={true}>
+      <ResultsPage {...props} />
+    </FeatureErrorBoundary>
+  );
+}
+
+export default ResultsPageWithErrorBoundary;

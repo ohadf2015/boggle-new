@@ -57,7 +57,7 @@ const MACHINE_TO_STATE: Record<MachineState, GameState> = {
 const VALID_TRANSITIONS: Record<MachineState, EventType[]> = {
   'waiting': ['START'],
   'inProgress': ['END', 'TIMEOUT'],
-  'finished': ['VALIDATE', 'SKIP_VALIDATION', 'RESET'],
+  'finished': ['END', 'VALIDATE', 'SKIP_VALIDATION', 'RESET'],
   'validating': ['VALIDATION_COMPLETE'],
 };
 
@@ -71,6 +71,7 @@ const TRANSITION_TARGETS: Record<MachineState, Partial<Record<EventType, GameSta
     'TIMEOUT': 'finished',
   },
   'finished': {
+    'END': 'finished', // Idempotent: already finished, stay finished
     'VALIDATE': 'validating',
     'SKIP_VALIDATION': 'waiting',
     'RESET': 'waiting',

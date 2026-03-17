@@ -1,18 +1,37 @@
 /**
  * Adventure Purchase API
  *
- * POST - Purchase an upgrade or forge a rune
- * Persists gold, upgrades, rune fragments, and rune inventory to DB.
+ * POST - Purchase an upgrade by ID
+ * Server-side validation: fetches current gold/upgrades from DB,
+ * verifies cost from upgradeConfig, deducts gold, and persists.
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { purchaseUpgrade, getUpgrade, type UpgradeState } from '@/lib/adventure/upgradeConfig';
+import { captureApiError } from '@/utils/sentry';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+export async function POST(request: NextRequest) {
+  // Rate limit: 10 requests per minute
+  const rateLimitResult = checkApiRateLimit(request, 'adventure-purchase', {
+    maxRequests: 10,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests' },
+      { status: 429 }
+    );
+  }
 
-export async function POST(request: Request) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
+  }
+
   try {
     const authSupabase = await createClient();
     const { data: { user }, error: authError } = await authSupabase.auth.getUser();
@@ -29,43 +48,59 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    const { gold, upgrades, runeFragments, runes } = body;
+    const { upgradeId } = body;
 
-    if (typeof gold !== 'number' || gold < 0) {
-      return NextResponse.json({ error: 'Invalid gold value' }, { status: 400 });
+    if (typeof upgradeId !== 'string' || !getUpgrade(upgradeId)) {
+      return NextResponse.json({ error: 'Invalid upgrade ID' }, { status: 400 });
     }
 
     const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
-    const updateData: Record<string, unknown> = {
-      gold,
-      updated_at: new Date().toISOString(),
-    };
-
-    if (upgrades && typeof upgrades === 'object') {
-      updateData.upgrades = upgrades;
-    }
-
-    if (typeof runeFragments === 'number') {
-      updateData.rune_fragments = runeFragments;
-    }
-
-    if (Array.isArray(runes)) {
-      updateData.runes = runes;
-    }
-
-    const { error: updateError } = await supabase
+    // Fetch current progression from DB (server is source of truth)
+    const { data: progression, error: fetchError } = await supabase
       .from('player_progression')
-      .update(updateData)
-      .eq('user_id', userId);
+      .select('gold, upgrades')
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError || !progression) {
+      return NextResponse.json({ error: 'Progression not found' }, { status: 404 });
+    }
+
+    const currentGold = (progression.gold as number) ?? 0;
+    const currentUpgrades = (progression.upgrades as UpgradeState) ?? {};
+
+    // Server-side purchase validation using shared config
+    const result = purchaseUpgrade(currentUpgrades, upgradeId, currentGold);
+    if (!result) {
+      return NextResponse.json({ error: 'Cannot afford upgrade or already maxed' }, { status: 400 });
+    }
+
+    const { data: updatedRow, error: updateError } = await supabase
+      .from('player_progression')
+      .update({
+        gold: result.gold,
+        upgrades: result.state,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .eq('gold', currentGold) // optimistic lock: prevent double-purchase race
+      .select('gold, upgrades')
+      .maybeSingle();
 
     if (updateError) {
       console.error('[ADVENTURE PURCHASE API] Update error:', updateError);
       return NextResponse.json({ error: 'Failed to save purchase' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, gold });
+    // Optimistic lock failed — concurrent purchase changed gold between read and write
+    if (!updatedRow) {
+      return NextResponse.json({ error: 'Purchase conflict, please retry' }, { status: 409 });
+    }
+
+    return NextResponse.json({ success: true, gold: updatedRow.gold, upgrades: updatedRow.upgrades });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/purchase', { method: 'POST' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[ADVENTURE PURCHASE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

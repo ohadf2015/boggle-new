@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { translations } from '@/translations';
 import HomePageClient from './PageClient';
+import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 
 /**
  * Main landing page - Game mode selection
@@ -41,9 +42,13 @@ export default async function HomePage({ params }: PageProps) {
   const seo = t.landing?.seo;
   const legal = t.legal;
 
+  // Fetch non-realtime landing data server-side to eliminate client waterfall.
+  // Errors are swallowed — hooks fall back to client fetches when initialData is absent.
+  const initialData = await fetchLandingData(locale).catch(() => undefined);
+
   return (
     <>
-      <HomePageClient />
+      <HomePageClient initialData={initialData} />
 
       {/* Server-rendered SEO content — visible to crawlers without JS execution.
           Hidden visually since the client-side LandingSEOSection covers the same content

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion';
-import { memo, useState, useCallback, useMemo, useEffect } from 'react';
+import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { MascotVariant, getMascotImagePath, isGifVariant } from './Mascot';
@@ -374,6 +374,14 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear click timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    };
+  }, []);
 
   // Lazy preload hover/click variants when interaction is enabled
   // This ensures smooth transitions without upfront preloading cost
@@ -440,8 +448,10 @@ export const InteractiveMascot = memo(function InteractiveMascot({
     onClick?.();
 
     // Reset after duration
-    setTimeout(() => {
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    clickTimeoutRef.current = setTimeout(() => {
       setIsClicked(false);
+      clickTimeoutRef.current = null;
     }, clickDuration);
   }, [enableClick, onClick, clickDuration]);
 

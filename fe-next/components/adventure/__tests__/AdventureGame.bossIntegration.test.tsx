@@ -221,6 +221,7 @@ describe('AdventureGame - Boss Battle Integration', () => {
       resetGame: jest.fn(),
       markCascadeComplete: jest.fn(),
       clearCombo: jest.fn(),
+      updateObjective: jest.fn(),
     });
 
     // Validation hook mock

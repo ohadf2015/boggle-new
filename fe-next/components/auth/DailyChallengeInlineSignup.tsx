@@ -103,7 +103,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       }
       // OAuth will redirect, so no need to do anything else
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -178,7 +178,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       }
       // For signin, the auth context will handle the redirect
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -207,7 +207,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       }
       setIsLoading(null);
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -259,7 +259,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-1.5 rounded-full hover:bg-white/10 transition-colors z-10"
             aria-label={t('common.dismiss')}
           >
-            <X className="w-4 h-4 text-gray-400 hover:text-white" />
+            <X className="w-4 h-4 text-gray-300 hover:text-white" />
           </button>
         )}
 
@@ -309,7 +309,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
           <h3 className="text-xl font-black text-white">
             {t('auth.inlineSignup.title')}
           </h3>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-gray-300 mt-1">
             {t('auth.inlineSignup.subtitle')}
           </p>
         </motion.div>
@@ -359,6 +359,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-red-500/20 border-2 border-red-500 rounded-neo p-3 mb-4 text-center"
+              role="alert"
             >
               <p className="text-sm font-bold text-red-300">{error}</p>
             </motion.div>
@@ -412,7 +413,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
                 onClick={() => setShowEmailForm(true)}
-                className="w-full text-sm text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2 py-2"
+                className="w-full text-sm text-gray-300 hover:text-gray-200 transition-colors flex items-center justify-center gap-2 py-2"
               >
                 <Mail className="w-4 h-4" />
                 <span>{t('auth.inlineSignup.orContinueWith')}</span>
@@ -424,7 +425,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 className="space-y-3"
               >
                 {/* Divider */}
-                <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
                   <div className="flex-1 h-px bg-gray-600" />
                   <span>{t('auth.magicLink.divider')}</span>
                   <div className="flex-1 h-px bg-gray-600" />
@@ -434,12 +435,16 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                   /* Magic Link Form (default) */
                   <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
                     <div>
+                      <label htmlFor="dc-magic-email" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
                       <input
+                        id="dc-magic-email"
                         type="email"
                         autoComplete="email"
                         value={email}
                         onChange={(e) => handleEmailChange(e.target.value)}
                         placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                        aria-invalid={emailError ? true : undefined}
+                        aria-describedby={emailError ? 'dc-magic-email-error' : undefined}
                         className={cn(
                           "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
                           emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
@@ -447,7 +452,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         disabled={isAnyLoading}
                       />
                       {emailError && (
-                        <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                        <p id="dc-magic-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
                       )}
                     </div>
 
@@ -470,7 +475,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                     <button
                       type="button"
                       onClick={() => setUsePassword(true)}
-                      className="w-full text-xs text-gray-500 hover:text-gray-300"
+                      className="w-full text-xs text-gray-400 hover:text-gray-300"
                     >
                       {t('auth.magicLink.usePassword')}
                     </button>
@@ -479,11 +484,15 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                   /* Password Form */
                   <form onSubmit={handleEmailSubmit} className="space-y-3">
                     <div>
+                      <label htmlFor="dc-pwd-email" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
                       <input
+                        id="dc-pwd-email"
                         type="email"
                         value={email}
                         onChange={(e) => handleEmailChange(e.target.value)}
                         placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                        aria-invalid={emailError ? true : undefined}
+                        aria-describedby={emailError ? 'dc-pwd-email-error' : undefined}
                         className={cn(
                           "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
                           emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
@@ -491,17 +500,21 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         disabled={isAnyLoading}
                       />
                       {emailError && (
-                        <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                        <p id="dc-pwd-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
                       )}
                     </div>
 
                     <div>
+                      <label htmlFor="dc-pwd-password" className="sr-only">{t('auth.inlineSignup.passwordPlaceholder')}</label>
                       <div className="relative">
                         <input
+                          id="dc-pwd-password"
                           type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => handlePasswordChange(e.target.value)}
                           placeholder={t('auth.inlineSignup.passwordPlaceholder')}
+                          aria-invalid={passwordError ? true : undefined}
+                          aria-describedby={passwordError ? 'dc-pwd-password-error' : undefined}
                           className={cn(
                             "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan pe-12",
                             passwordError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
@@ -511,13 +524,13 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                          className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200"
                         >
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                       </div>
                       {passwordError && (
-                        <p className="mt-1 text-xs text-red-400">{passwordError}</p>
+                        <p id="dc-pwd-password-error" role="alert" className="mt-1 text-xs text-red-400">{passwordError}</p>
                       )}
                     </div>
 
@@ -540,7 +553,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                       <button
                         type="button"
                         onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
-                        className="text-xs text-gray-500 hover:text-gray-300"
+                        className="text-xs text-gray-400 hover:text-gray-300"
                       >
                         {authMode === 'signup'
                           ? t('auth.alreadyHaveAccount')
@@ -549,7 +562,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                       <button
                         type="button"
                         onClick={() => setUsePassword(false)}
-                        className="text-xs text-gray-500 hover:text-gray-300"
+                        className="text-xs text-gray-400 hover:text-gray-300"
                       >
                         {t('auth.magicLink.useMagicLink')}
                       </button>
@@ -566,7 +579,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
                 onClick={onDismiss}
-                className="w-full mt-4 text-sm text-gray-500 hover:text-gray-300 transition-colors group"
+                className="w-full mt-4 text-sm text-gray-400 hover:text-gray-300 transition-colors group"
               >
                 <span className="group-hover:hidden">
                   {t('auth.inlineSignup.skipForNow')}
@@ -580,7 +593,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
         )}
 
         {/* Terms & Privacy */}
-        <div className="mt-4 text-center text-[10px] text-gray-500">
+        <div className="mt-4 text-center text-[10px] text-gray-400">
           {t('auth.termsPrefix')}{' '}
           <Link href={`/${language}/legal/terms`} className="underline hover:text-gray-300 transition-colors">
             {t('auth.termsLink')}

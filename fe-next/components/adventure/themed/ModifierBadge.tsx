@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -29,9 +29,9 @@ interface ModifierBadgeProps {
 // ==============================================
 
 const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) => {
-  const { theme, worldId } = useAdventureTheme();
+  const { theme } = useAdventureTheme();
   const { t } = useLanguage();
-  const { modifierDisplay, mechanic, nameKey } = theme;
+  const { modifierDisplay, mechanic } = theme;
 
   // Don't render if modifier display is disabled or no mechanic
   if (!modifierDisplay.visible || !mechanic) {
@@ -40,9 +40,9 @@ const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) 
 
   const IconComponent = modifierDisplay.icon;
 
-  // Get translation keys for mechanic
-  const mechanicNameKey = `adventure.mechanics.${mechanic}.name`;
-  const mechanicDescKey = `adventure.mechanics.${mechanic}.description`;
+  // Translation keys are flat strings (e.g. adventure.mechanics.synonymPairs),
+  // not nested objects with .name/.description subkeys
+  const mechanicKey = `adventure.mechanics.${mechanic}`;
 
   return (
     <AnimatePresence>
@@ -77,13 +77,13 @@ const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) 
               'text-xs font-bold uppercase tracking-wide',
               modifierDisplay.textColor
             )}>
-              {t(mechanicNameKey) || mechanic}
+              {t(mechanicKey) || mechanic}
             </span>
             <span className={cn(
               'text-[10px] opacity-80',
               modifierDisplay.textColor
             )}>
-              {t(mechanicDescKey)}
+              {t(`${mechanicKey}Desc`, '')}
             </span>
           </div>
         )}
@@ -94,7 +94,7 @@ const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) 
             'text-xs font-bold',
             modifierDisplay.textColor
           )}>
-            {t(mechanicNameKey) || mechanic}
+            {t(mechanicKey) || mechanic}
           </span>
         )}
       </motion.div>

@@ -22,9 +22,6 @@
  * ```
  */
 
-// Legacy hook (backward compatibility)
-export { useGameState } from './useGameState';
-
 // Zustand store (RECOMMENDED)
 export { useGameStore } from './store';
 export type { GameStore } from './store';

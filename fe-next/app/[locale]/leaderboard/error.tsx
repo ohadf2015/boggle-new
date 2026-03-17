@@ -1,6 +1,33 @@
 'use client';
 
 import { useEffect } from 'react';
+import { captureError } from '@/utils/sentry';
+import { translations } from '../../../translations';
+
+type SupportedLocale = keyof typeof translations;
+
+function getLocale(): SupportedLocale {
+  try {
+    const match = window.location.pathname.match(/^\/(he|en|sv|ja|es)\b/);
+    return (match?.[1] as SupportedLocale) || 'en';
+  } catch {
+    return 'en';
+  }
+}
+
+function t(locale: SupportedLocale, path: string): string {
+  try {
+    const keys = path.split('.');
+    let current: unknown = translations[locale] || translations.en;
+    for (const key of keys) {
+      current = (current as Record<string, unknown>)[key];
+      if (current === undefined) return path;
+    }
+    return current as string;
+  } catch {
+    return path;
+  }
+}
 
 export default function LeaderboardError({
   error,
@@ -11,7 +38,10 @@ export default function LeaderboardError({
 }) {
   useEffect(() => {
     console.error('Leaderboard error:', error);
+    captureError(error, { errorBoundary: { type: 'leaderboard-error', digest: error.digest } });
   }, [error]);
+
+  const locale = getLocale();
 
   return (
     <div className="flex-1 bg-neo-navy">
@@ -19,16 +49,16 @@ export default function LeaderboardError({
         <div className="text-center py-12">
           <div className="mx-auto text-6xl text-gray-600 mb-4">🏆</div>
           <h2 className="text-2xl font-bold text-white mb-2">
-            Failed to load leaderboard
+            {t(locale, 'errors.failedToLoadLeaderboard')}
           </h2>
           <p className="text-gray-600 mb-6">
-            {error.message || 'Unable to fetch leaderboard data. Please try again.'}
+            {error.message || t(locale, 'errors.unableToLoadData')}
           </p>
           <button
             onClick={reset}
             className="px-5 py-2 rounded-lg font-bold bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white transition-all inline-flex items-center gap-2"
           >
-            🔄 Try again
+            🔄 {t(locale, 'errors.tryAgainButton')}
           </button>
         </div>
       </div>

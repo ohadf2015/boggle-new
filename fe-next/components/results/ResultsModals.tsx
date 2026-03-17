@@ -94,8 +94,7 @@ export interface ResultsModalsProps {
   authModal: AuthModalState;
   /** First win modal state and handlers */
   firstWinModal: FirstWinModalState;
-  /** Translation function */
-  t: (key: string) => string;
+
 }
 
 // ==============================================
@@ -108,7 +107,6 @@ export function ResultsModals({
   levelUp,
   authModal,
   firstWinModal,
-  t,
 }: ResultsModalsProps) {
   const hideExternal = shouldHideExternalLogin();
 

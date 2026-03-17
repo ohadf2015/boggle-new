@@ -162,7 +162,7 @@ export function useSinglePlayerCore({
     onTrainingComplete: handleTrainingAnalysisComplete,
   });
 
-  const handleTrainingSkillUnlock = useCallback((skillId: string) => { console.log(`Skill unlocked: ${skillId}`); }, []);
+  const handleTrainingSkillUnlock = useCallback((_skillId: string) => { /* noop */ }, []);
   const handleTrainingComplete = useCallback(() => { setShowCompletionPopup(true); }, []);
   const {
     completedSkills: trainingCompletedSkills, completedSkillsRef: trainingCompletedSkillsRef,
@@ -384,19 +384,20 @@ export function useSinglePlayerCore({
     if (!grid) return;
     gridVersionRef.current += 1;
     const currentVersion = gridVersionRef.current;
+    const controller = new AbortController();
     const timeoutId = setTimeout(() => { if (!availableWordsRef.current) setAvailableWords({ easy: [], medium: [], hard: [] }); }, 5000);
     const fetchGridWords = async () => {
       try {
-        const response = await fetch('/api/solve-grid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ grid, language: settings.language }) });
+        const response = await fetch('/api/solve-grid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ grid, language: settings.language }), signal: controller.signal });
         if (currentVersion !== gridVersionRef.current) return;
         if (!response.ok) { setAvailableWords({ easy: [], medium: [], hard: [] }); return; }
         const result = await response.json();
         if (result.success && result.words) setAvailableWords(result.words);
         else setAvailableWords({ easy: [], medium: [], hard: [] });
-      } catch { setAvailableWords({ easy: [], medium: [], hard: [] }); }
+      } catch (e) { if (!(e instanceof DOMException && e.name === 'AbortError')) setAvailableWords({ easy: [], medium: [], hard: [] }); }
     };
     fetchGridWords();
-    return () => clearTimeout(timeoutId);
+    return () => { clearTimeout(timeoutId); controller.abort(); };
   }, [grid, settings.language]);
 
   useEffect(() => {

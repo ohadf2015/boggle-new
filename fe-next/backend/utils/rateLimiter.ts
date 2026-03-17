@@ -62,46 +62,59 @@ interface RateLimiterStats {
 
 type HeaderValue = string | string[] | undefined;
 
-function extractFirstIp(value: HeaderValue): string | null {
+/**
+ * Extract the rightmost (proxy-appended) IP from a header value.
+ * In a proxy chain like "client, proxy1, proxy2", the rightmost IP
+ * is the one added by the trusted proxy closest to the server.
+ * Using the leftmost (first) IP is insecure — it's client-controlled.
+ */
+function extractLastIp(value: HeaderValue): string | null {
   if (!value) return null;
   const str = Array.isArray(value) ? value[0] : value;
-  const ips = str.split(',').map(ip => ip.trim());
-  return ips[0] || null;
+  const ips = str.split(',').map(ip => ip.trim()).filter(Boolean);
+  return ips[ips.length - 1] || null;
 }
 
 /**
- * Extract client IP from Socket.IO handshake headers
+ * Extract client IP from Socket.IO handshake headers.
+ * Prefers socket.handshake.address (TCP-level, set by proxy after trust proxy config),
+ * falls back to proxy headers using rightmost IP to prevent spoofing.
  */
 export function getIpFromSocket(socket: Socket): string {
   if (!socket?.handshake) return 'unknown';
 
+  // TCP-level address is most reliable when trust proxy is configured
+  const directAddr = socket.handshake.address;
+
   const headers = socket.handshake.headers || {};
 
-  const forwardedFor = extractFirstIp(headers['x-forwarded-for']);
-  if (forwardedFor) return forwardedFor;
-
-  const realIp = extractFirstIp(headers['x-real-ip']);
-  if (realIp) return realIp;
-
-  const cfIp = extractFirstIp(headers['cf-connecting-ip']);
+  // cf-connecting-ip is trustworthy when Cloudflare is the edge proxy
+  const cfIp = extractLastIp(headers['cf-connecting-ip']);
   if (cfIp) return cfIp;
 
-  return socket.handshake.address || 'unknown';
+  const forwardedFor = extractLastIp(headers['x-forwarded-for']);
+  if (forwardedFor) return forwardedFor;
+
+  const realIp = extractLastIp(headers['x-real-ip']);
+  if (realIp) return realIp;
+
+  return directAddr || 'unknown';
 }
 
 /**
- * Extract client IP from Express request headers
+ * Extract client IP from Express request headers.
+ * Uses rightmost IP from X-Forwarded-For to prevent spoofing.
  */
 export function getIpFromRequest(req: Request): string {
   const headers = req.headers || {};
 
-  const forwardedFor = extractFirstIp(headers['x-forwarded-for']);
-  if (forwardedFor) return forwardedFor;
-
-  const cfIp = extractFirstIp(headers['cf-connecting-ip']);
+  const cfIp = extractLastIp(headers['cf-connecting-ip']);
   if (cfIp) return cfIp;
 
-  const realIp = extractFirstIp(headers['x-real-ip']);
+  const forwardedFor = extractLastIp(headers['x-forwarded-for']);
+  if (forwardedFor) return forwardedFor;
+
+  const realIp = extractLastIp(headers['x-real-ip']);
   if (realIp) return realIp;
 
   return req.ip || req.socket?.remoteAddress || 'unknown';

@@ -34,8 +34,9 @@ export async function GET(request: NextRequest) {
     const isRanked = searchParams.get('isRanked');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
-    const sortBy = searchParams.get('sortBy') || 'created_at';
-    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const ALLOWED_SORT_COLUMNS = ['created_at', 'score', 'word_count', 'placement', 'game_mode', 'language'];
+    const sortBy = ALLOWED_SORT_COLUMNS.includes(searchParams.get('sortBy') ?? '') ? searchParams.get('sortBy')! : 'created_at';
+    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
     const includeGuests = searchParams.get('includeGuests') !== 'false'; // Include guests by default
 
     // Calculate offset

@@ -7,12 +7,13 @@
 
 'use client';
 
-import { memo, useEffect, useId, useState } from 'react';
+import { memo, useEffect, useId, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, RotateCcw, LogOut, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 // ==============================================
 // TYPES
@@ -39,22 +40,11 @@ export const PauseOverlay = memo(function PauseOverlay({
 }: PauseOverlayProps) {
   const { t } = useLanguage();
   const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
-  // ESC key handler
-  useEffect(() => {
-    if (!isOpen) return;
-
-    function handleKeyDown(event: KeyboardEvent): void {
-      if (event.key === 'Escape') {
-        onResume();
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onResume]);
+  useFocusTrap(dialogRef, isOpen, onResume);
 
   // Scroll lock
   useEffect(() => {
@@ -72,6 +62,7 @@ export const PauseOverlay = memo(function PauseOverlay({
   return (
     <>
       <motion.div
+        ref={dialogRef}
         data-testid="pause-overlay"
         role="dialog"
         aria-modal="true"

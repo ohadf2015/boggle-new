@@ -125,6 +125,7 @@ const he = {
     "email": "אימייל",
     "loading": "מערבב אותיות...",
     "error": "אופס!",
+    "errorOccurred": "אירעה שגיאה",
     "creating": "יוצר...",
     "guest": "אורח",
     "back": "חזור",
@@ -264,7 +265,15 @@ const he = {
     "brain": "מוח",
     "leaderboard": "דירוג",
     "profile": "פרופיל",
-    "play": "שחק"
+    "play": "שחק",
+    "howToPlay": "איך לשחק",
+    "blog": "בלוג",
+    "faq": "שאלות נפוצות",
+    "aboutLexiClash": "על LexiClash",
+    "contactUs": "צור קשר",
+    "privacyPolicy": "מדיניות פרטיות",
+    "termsOfService": "תנאי שימוש",
+    "disclaimer": "הצהרת אחריות"
   },
   "skills": {
     "title": "עץ כישורים",
@@ -521,7 +530,22 @@ const he = {
     "orShareVia": "או שתפו דרך",
     "telegram": "טלגרם",
     "moreWays": "עוד דרכים לשתף",
-    "invite": "הזמנה"
+    "invite": "הזמנה",
+    "emailSubjectPostGame": "הצלחתי ב-LexiClash!",
+    "emailSubjectInvite": "בואו לשחק LexiClash!",
+    "challengeLinkCopied": "קישור האתגר הועתק!",
+    "errorCreatingChallenge": "שגיאה ביצירת האתגר",
+    "pts": "נקודות",
+    "words": "מילים",
+    "combo": "קומבו",
+    "streak": "רצף",
+    "longest": "הכי ארוכה:"
+  },
+  "messaging": {
+    "timeNow": "עכשיו",
+    "timeMinutes": "ד",
+    "timeHours": "ש",
+    "timeDays": "י"
   },
   "errors": {
     "unstableConnection": "החיבור מתנדנד - מחזירים אותך...",
@@ -545,6 +569,11 @@ const he = {
     "updateMessage": "דברים חדשים הגיעו! רענון מהיר וחוזרים לפעולה!",
     "updateProgress": "לוקח שתי שניות!",
     "globalErrorEncouragement": "אל דאגה - המשחק שלך מאובטח!",
+    "goHome": "הביתה",
+    "failedToLoadLeaderboard": "טעינת טבלת המובילים נכשלה",
+    "failedToLoadProfile": "טעינת הפרופיל נכשלה",
+    "unableToLoadData": "לא ניתן לטעון נתונים. נסה שוב.",
+    "tryAgainButton": "נסה שוב",
     "connectionTimeout": "לוקח יותר מדי זמן להתחבר",
     "rateLimited": "לאט, ספרינטר!",
     "connectionLost": "איבדנו את החיבור - מתחברים מחדש",
@@ -729,6 +758,7 @@ const he = {
     ]
   },
   "multiplayerFlow": {
+    "host": "מארח",
     "roomClosed": "החדר נסגר",
     "rateLimited": "לאט לאט!",
     "roomList": {
@@ -1523,7 +1553,17 @@ const he = {
       "gameCount": "משחק {count}",
       "round": "ס{num}"
     },
-    "wordsFound": "מילים שנמצאו"
+    "wordsFound": "מילים שנמצאו",
+    "shareVictoryPrompt": "שתפו את הניצחון!",
+    "victory": "ניצחון!",
+    "wellPlayed": "משחק טוב!",
+    "wordsLabel": "מילים",
+    "shareYourVictory": "שתף את הניצחון!",
+    "challengeFriends": "תאתגרו את החברים 😈",
+    "streakOneWeek": "יום אחד לשבוע שלם!",
+    "streakTwoWeeks": "מחר שבועיים!",
+    "streakOneMonth": "יום אחד לחודש!",
+    "streakWeeks": "{{weeks}} שבועות ברצף!"
   },
   "nextStep": {
     "backToLobby": "חזרה ללובי",
@@ -1538,6 +1578,29 @@ const he = {
     "goMultiplayerDesc": "אתגרו שחקנים אמיתיים בקרבות מילים חיים",
     "brainTraining": "אימון מוחי",
     "brainTrainingDesc": "שפרו את הכישורים הקוגניטיביים שלכם עם תרגילים ממוקדים"
+  },
+  "practiceResults": {
+    "playAgain": "שחקו שוב",
+    "orTrySomethingNew": "או נסו משהו חדש",
+    "wordsFound": "{count} מילים נמצאו",
+    "tryDaily": "אתגר יומי",
+    "tryDailyDesc": "אותו פאזל, כולם מתחרים",
+    "tryBots": "נגד בוטים",
+    "tryBotsDesc": "בדקו את הכישורים שלכם מול יריבי AI",
+    "tryMultiplayer": "שחקו עם חברים",
+    "tryMultiplayerDesc": "קרבות מילים בזמן אמת",
+    "encouragement": {
+      "legendary": "מדהים!",
+      "great": "עבודה יפה!",
+      "nice": "כל הכבוד!",
+      "warmup": "התחלה מעולה!"
+    },
+    "subtitle": {
+      "legendary": "אתם על אש — שמרו על המומנטום!",
+      "great": "יש לכם כישורי מילים רציניים",
+      "nice": "כל משחק משפר אתכם",
+      "warmup": "תרגול עושה מושלם — אתם בדרך!"
+    }
   },
   "almostFound": {
     "title": "כמעט מצאת...",
@@ -1902,6 +1965,9 @@ const he = {
   "achievements": {
     "unlocked": "הישג נפתח!",
     "upgraded": "הישג שודרג!",
+    "shareText": "פתחתי את ההישג \"{{name}}\" ב-LexiClash! בוא לשחק גם!",
+    "shareButton": "שתף",
+    "copied": "הועתק!",
     "cinematic": {
       "unlocked": "הישג נפתח!",
       "gold": "זהב",
@@ -3683,6 +3749,31 @@ const he = {
     "shareHint": "שתפו את אותו הלוח עם חברים",
     "winnerPrompt": "שברת אותם! אתגר את החברים 😈"
   },
+  "challengeView": {
+    "oops": "אופס!",
+    "backToHome": "חזרה לדף הבית",
+    "back": "חזרה",
+    "title": "אתגר!",
+    "beatScore": "תנצחו את הניקוד הזה?",
+    "createdChallenge": "יצר את האתגר",
+    "scoreToBeat": "ניקוד לניצחון",
+    "words": "מילים",
+    "longest": "הכי ארוכה: ",
+    "attempts": "ניסיונות",
+    "beaten": "ניצחונות",
+    "winRate": "אחוז הצלחה",
+    "startChallenge": "התחל אתגר!"
+  },
+  "challengeResults": {
+    "youWon": "ניצחת!",
+    "soClose": "כמעט!",
+    "youBeat": "ניצחת את {{name}}!",
+    "tryAgainMsg": "נסה שוב!",
+    "you": "אתה",
+    "pts": "נקודות",
+    "words": "מילים",
+    "longest": "מילה ארוכה"
+  },
   "rules": {
     "pageTitle": "לקסיקלאש: קרב מילים בזמן אמת",
     "gameModes": "מצבי משחק",
@@ -5243,6 +5334,7 @@ const he = {
     "levels": "שלבים",
     "level": "שלב",
     "levelShort": "Lv.",
+    "levelWithNumber": "Lv. {level}",
     "backToMap": "חזרה למפת העולם",
     "menu": {
       "skills": "כישורים",
@@ -5287,6 +5379,15 @@ const he = {
     "continueToNext": "המשך",
     "nextWorld": "העולם הבא",
     "retryLevel": "נסה שוב",
+    "freeRetry": "ניסיון חינם",
+    "quest": {
+      "title": "משימות פרק",
+      "wordCount": "מצא מילים",
+      "perfectLevels": "שלבים מושלמים",
+      "defeatBossNoHint": "בוס ללא רמזים",
+      "longWordCount": "מילים ארוכות",
+      "fullComboLevels": "קומבו מלא"
+    },
     "loadError": "נכשל לטעון התקדמות",
     "cinematics": {
       "victory": "ניצחון!",
@@ -5455,8 +5556,10 @@ const he = {
       "confirmExit": "לצאת מהשלב?",
       "confirmExitDesc": "ההתקדמות הנוכחית תאבד. בטוח שברצונך לצאת?",
       "freeze": "הקפאה",
+      "freezeWithTime": "הקפאה ({seconds}ש)",
       "frozen": "מוקפא!",
       "shuffle": "ערבוב",
+      "shuffleWithCount": "ערבוב (×{count})",
       "detonate": "פיצוץ"
     },
     "hints": {
@@ -6769,7 +6872,8 @@ const he = {
       "saveLessonTitle": "שמירת שיעור",
       "lessonNamePlaceholder": "הקלידו שם שיעור...",
       "noClassroom": "ללא כיתה (שיעור אישי)",
-      "selectWords": "בחרו מילים ליצירת שיעור"
+      "selectWords": "בחרו מילים ליצירת שיעור",
+      "failedToSaveLesson": "שמירת השיעור נכשלה"
     },
     "reports": {
       "title": "דוח התקדמות",

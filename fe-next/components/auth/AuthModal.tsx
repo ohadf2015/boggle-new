@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, type MutableRefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Eye, EyeOff, Wand2, Shield } from 'lucide-react';
@@ -75,6 +75,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const [otpStep, setOtpStep] = useState<'enter-email' | 'enter-code'>('enter-email');
   const [otpCode, setOtpCode] = useState('');
   const [otpCooldown, setOtpCooldown] = useState(0);
+
+  const otpIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Clear OTP interval on unmount
+  useEffect(() => {
+    return () => {
+      if (otpIntervalRef.current) clearInterval(otpIntervalRef.current);
+    };
+  }, []);
 
   const guestStats: GuestStats | null = showGuestStats ? getGuestStatsSummary() : null;
 
@@ -153,7 +162,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         setIsLoading(null);
       }
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -218,7 +227,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         setIsLoading(null);
       }
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -246,7 +255,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       }
       setIsLoading(null);
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -271,16 +280,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         setOtpStep('enter-code');
         // Start 60s cooldown (Supabase rate limit)
         setOtpCooldown(60);
-        const interval = setInterval(() => {
+        if (otpIntervalRef.current) clearInterval(otpIntervalRef.current);
+        otpIntervalRef.current = setInterval(() => {
           setOtpCooldown((prev) => {
-            if (prev <= 1) { clearInterval(interval); return 0; }
+            if (prev <= 1) { if (otpIntervalRef.current) { clearInterval(otpIntervalRef.current); otpIntervalRef.current = null; } return 0; }
             return prev - 1;
           });
         }, 1000);
       }
       setIsLoading(null);
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -301,7 +311,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       }
       setIsLoading(null);
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -357,13 +367,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               >
                 {authMode === 'signup' ? (t('auth.signUp')) : (t('auth.signIn'))}
               </h2>
-              <p className="text-sm text-gray-400 mt-0.5">
+              <p className="text-sm text-gray-300 mt-0.5">
                 {t('auth.upgradePrompt')}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-slate-600 hover:border-white hover:bg-white/10 transition-all text-gray-400 hover:text-white"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-slate-600 hover:border-white hover:bg-white/10 transition-all text-gray-300 hover:text-white"
               aria-label={t('common.close')}
             >
               <X size={16} />
@@ -381,7 +391,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   <div className="font-black text-lg text-neo-cyan">
                     {guestStats.gamesPlayed}
                   </div>
-                  <div className="text-[10px] text-gray-400 uppercase tracking-wide">
+                  <div className="text-[10px] text-gray-300 uppercase tracking-wide">
                     {t('profile.totalGames')}
                   </div>
                 </div>
@@ -389,7 +399,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   <div className="font-black text-lg text-neo-pink">
                     {guestStats.totalScore}
                   </div>
-                  <div className="text-[10px] text-gray-400 uppercase tracking-wide">
+                  <div className="text-[10px] text-gray-300 uppercase tracking-wide">
                     {t('profile.totalScore')}
                   </div>
                 </div>
@@ -468,7 +478,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   {/* Divider */}
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex-1 h-px bg-slate-600" />
-                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                       {t('auth.magicLink.divider')}
                     </span>
                     <div className="flex-1 h-px bg-slate-600" />
@@ -480,12 +490,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       otpStep === 'enter-email' ? (
                         <form onSubmit={handleOtpSend} className="space-y-3">
                           <div>
+                            <label htmlFor="otp-email-input" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
                             <input
+                              id="otp-email-input"
                               type="email"
                               autoComplete="email"
                               value={email}
                               onChange={(e) => handleEmailChange(e.target.value)}
                               placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                              aria-invalid={emailError ? true : undefined}
+                              aria-describedby={emailError ? 'otp-email-error' : undefined}
                               className={cn(
                                 'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
                                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
@@ -495,7 +509,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                               spellCheck={false}
                             />
                             {emailError && (
-                              <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                              <p id="otp-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
                             )}
                           </div>
                           <Button
@@ -514,14 +528,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                             )}
                           </Button>
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                            <span className="text-[10px] text-gray-400 flex items-center gap-1">
                               <Mail className="w-3 h-3" />
                               {t('auth.otp.noPassword')}
                             </span>
                             <button
                               type="button"
                               onClick={() => setUsePassword(true)}
-                              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                              className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
                             >
                               {t('auth.magicLink.usePassword')}
                             </button>
@@ -533,7 +547,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                             {t('auth.otp.codeSentTo')} <span className="font-bold text-white">{email}</span>
                           </p>
                           <div>
+                            <label htmlFor="otp-code-input" className="sr-only">{t('auth.otp.codeSentTo')}</label>
                             <input
+                              id="otp-code-input"
                               type="text"
                               inputMode="numeric"
                               autoComplete="one-time-code"
@@ -561,7 +577,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                             <button
                               type="button"
                               onClick={() => { setOtpStep('enter-email'); setOtpCode(''); setError(null); }}
-                              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                              className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
                             >
                               {t('auth.otp.changeEmail')}
                             </button>
@@ -569,7 +585,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                               type="button"
                               onClick={handleOtpSend as unknown as React.MouseEventHandler}
                               disabled={otpCooldown > 0}
-                              className="text-xs text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-40"
+                              className="text-xs text-gray-400 hover:text-gray-300 transition-colors disabled:opacity-40"
                             >
                               {otpCooldown > 0 ? `${t('auth.otp.resend')} (${otpCooldown}s)` : t('auth.otp.resend')}
                             </button>
@@ -580,12 +596,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     /* Magic Link Form (web — no password needed) */
                     <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
                       <div>
+                        <label htmlFor="magic-email-input" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
                         <input
+                          id="magic-email-input"
                           type="email"
                           autoComplete="email"
                           value={email}
                           onChange={(e) => handleEmailChange(e.target.value)}
                           placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                          aria-invalid={emailError ? true : undefined}
+                          aria-describedby={emailError ? 'magic-email-error' : undefined}
                           className={cn(
                             'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
                             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
@@ -595,7 +615,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           spellCheck={false}
                         />
                         {emailError && (
-                          <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                          <p id="magic-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
                         )}
                       </div>
 
@@ -616,14 +636,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       </Button>
 
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
                           <Wand2 className="w-3 h-3" />
                           {t('auth.magicLink.noPassword')}
                         </span>
                         <button
                           type="button"
                           onClick={() => setUsePassword(true)}
-                          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                          className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
                         >
                           {t('auth.magicLink.usePassword')}
                         </button>
@@ -634,12 +654,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     /* Password Form */
                     <form onSubmit={handleEmailSubmit} className="space-y-3">
                       <div>
+                        <label htmlFor="pwd-email-input" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
                         <input
+                          id="pwd-email-input"
                           type="email"
                           autoComplete="email"
                           value={email}
                           onChange={(e) => handleEmailChange(e.target.value)}
                           placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                          aria-invalid={emailError ? true : undefined}
+                          aria-describedby={emailError ? 'pwd-email-error' : undefined}
                           className={cn(
                             'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
                             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
@@ -649,18 +673,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           spellCheck={false}
                         />
                         {emailError && (
-                          <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                          <p id="pwd-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
                         )}
                       </div>
 
                       <div>
+                        <label htmlFor="pwd-password-input" className="sr-only">{t('auth.inlineSignup.passwordPlaceholder')}</label>
                         <div className="relative">
                           <input
+                            id="pwd-password-input"
                             type={showPassword ? 'text' : 'password'}
                             autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
                             value={password}
                             onChange={(e) => handlePasswordChange(e.target.value)}
                             placeholder={t('auth.inlineSignup.passwordPlaceholder')}
+                            aria-invalid={passwordError ? true : undefined}
+                            aria-describedby={passwordError ? 'pwd-password-error' : undefined}
                             className={cn(
                               'w-full px-4 py-3 pe-12 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
                               'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
@@ -672,13 +700,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             aria-label={showPassword ? (t('auth.hidePassword')) : (t('auth.showPassword'))}
-                            className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                            className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
                           >
                             {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
                           </button>
                         </div>
                         {passwordError && (
-                          <p className="mt-1 text-xs text-red-400">{passwordError}</p>
+                          <p id="pwd-password-error" role="alert" className="mt-1 text-xs text-red-400">{passwordError}</p>
                         )}
                       </div>
 
@@ -701,7 +729,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         <button
                           type="button"
                           onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
-                          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                          className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
                         >
                           {authMode === 'signup'
                             ? (t('auth.alreadyHaveAccount'))
@@ -710,7 +738,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         <button
                           type="button"
                           onClick={() => setUsePassword(false)}
-                          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                          className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
                         >
                           {t('auth.magicLink.useMagicLink')}
                         </button>
@@ -728,6 +756,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
                     className="mt-4 p-3 rounded-neo border-2 border-red-500/50 bg-red-500/10 text-sm text-red-300"
+                    role="alert"
                   >
                     {error}
                   </motion.div>
@@ -740,7 +769,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           <div className="mt-5 text-center">
             <button
               onClick={onClose}
-              className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+              className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
             >
               {t('auth.continueAsGuest')}
             </button>
@@ -748,11 +777,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
           {/* Trust Signal + Terms */}
           <div className="mt-4 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
               <Shield className="w-3 h-3 text-emerald-500" />
               <span>{t('auth.trustBadge')}</span>
             </div>
-            <p className="text-[10px] text-gray-500 text-center">
+            <p className="text-[10px] text-gray-400 text-center">
               {t('auth.termsPrefix')}{' '}
               <Link
                 href={`/${language}/legal/terms`}

@@ -101,6 +101,7 @@ export function BulkImportModal({
           <button
             onClick={handleClose}
             className="p-1 hover:bg-gray-800 rounded transition-colors"
+            aria-label="Close"
           >
             <X className="w-5 h-5 text-gray-400" />
           </button>

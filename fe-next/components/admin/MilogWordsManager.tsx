@@ -115,7 +115,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
       setStats(data.stats);
       setPagination(data.pagination);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       console.error('Error fetching milog words:', errorMessage, error);
       toast.error('Failed to load milog words');
     } finally {
@@ -157,7 +157,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
       setRevokeReason('');
       fetchWords();
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : 'An unexpected error occurred';
       toast.error(`Revoke failed: ${msg}`);
     } finally {
       setRevoking(false);

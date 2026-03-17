@@ -240,7 +240,7 @@ export function PortraitGameLayout({
 
       {/* Training Progress Bar - shown in practice mode (portrait) */}
       {isPracticeMode && training && (
-        <div className="px-2 md:px-4 py-1 flex-shrink-0 max-h-[120px] overflow-y-auto">
+        <div className="px-2 md:px-4 py-1 flex-shrink-0 relative z-40">
           <TrainingProgressBar
             completedSkills={training.completedSkills}
             score={score}

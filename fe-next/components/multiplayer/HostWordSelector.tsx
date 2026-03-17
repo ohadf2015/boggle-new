@@ -118,7 +118,7 @@ export function HostWordSelector({
       setLessonName('');
       setSelectedClassroom(undefined);
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : 'Failed to save lesson');
+      setSaveError(error instanceof Error ? error.message : t('education.wordSelector.failedToSaveLesson'));
     }
   };
 

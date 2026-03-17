@@ -6,8 +6,6 @@
  */
 
 import { NextRequest } from 'next/server';
-import englishWords from 'an-array-of-english-words';
-import spanishWords from 'an-array-of-spanish-words';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
@@ -15,14 +13,26 @@ import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNo
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Pre-build dictionaries at module load (cached by Next.js)
-const englishDictionary = new Set(englishWords.map((w: string) => w.toLowerCase()));
-const spanishDictionary = new Set(spanishWords.map((w: string) => w.toLowerCase()));
-
-// Lazy-loaded dictionaries for Hebrew, Swedish, Japanese
+// Lazy-loaded dictionaries for all languages (populated on first request)
+let englishDictionary: Set<string> | null = null;
+let spanishDictionary: Set<string> | null = null;
 let hebrewDictionary: Set<string> | null = null;
 let swedishDictionary: Set<string> | null = null;
 let japaneseDictionary: Set<string> | null = null;
+
+function loadEnglishDictionary(): Set<string> {
+  if (englishDictionary) return englishDictionary;
+  const englishWords: string[] = require('an-array-of-english-words');
+  englishDictionary = new Set(englishWords.map((w) => w.toLowerCase()));
+  return englishDictionary;
+}
+
+function loadSpanishDictionary(): Set<string> {
+  if (spanishDictionary) return spanishDictionary;
+  const spanishWords: string[] = require('an-array-of-spanish-words');
+  spanishDictionary = new Set(spanishWords.map((w) => w.toLowerCase()));
+  return spanishDictionary;
+}
 
 function loadHebrewDictionary(): Set<string> {
   if (hebrewDictionary) return hebrewDictionary;
@@ -225,10 +235,10 @@ export async function POST(request: NextRequest) {
     let isInDictionary = false;
     switch (language) {
       case 'en':
-        isInDictionary = englishDictionary.has(normalizedWord);
+        isInDictionary = loadEnglishDictionary().has(normalizedWord);
         break;
       case 'es':
-        isInDictionary = spanishDictionary.has(normalizedWord);
+        isInDictionary = loadSpanishDictionary().has(normalizedWord);
         break;
       case 'he':
         isInDictionary = loadHebrewDictionary().has(normalizedWord);

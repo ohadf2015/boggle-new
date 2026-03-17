@@ -99,7 +99,6 @@ const getActions = (state: GameStore) => ({
   setHighlightedCells: state.setHighlightedCells,
   incrementCombo: state.incrementCombo,
   resetCombo: state.resetCombo,
-  useComboShield: state.useComboShield,
   updateLastWordTime: state.updateLastWordTime,
   setTournamentData: state.setTournamentData,
   setTournamentStandings: state.setTournamentStandings,
@@ -124,7 +123,6 @@ const getActions = (state: GameStore) => ({
   setWordHuntEliminatedPlayers: state.setWordHuntEliminatedPlayers,
   addWordHuntDiscoveryClues: state.addWordHuntDiscoveryClues,
   batchStartGame: state.batchStartGame,
-  batchResetGame: state.batchResetGame,
   resetForNewRound: state.resetForNewRound,
   resetAll: state.resetAll,
 });

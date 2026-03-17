@@ -3,13 +3,15 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
+import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import SinglePlayerGame from './SinglePlayerGame';
 import { TutorialProvider, TutorialOverlay } from '@/components/tutorial';
 import SinglePlayerResults from './SinglePlayerResults';
+import PracticeResults from './results/PracticeResults';
 import PreGameTutorial from './PreGameTutorial';
-import { getHighScore, getAllTimeBest } from './highScoreManager';
-import { recordGameResult, getConfigRecord } from '@/utils/playerStats';
+import { getHighScore } from './highScoreManager';
+import { recordGameResult } from '@/utils/playerStats';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useMusic } from '@/contexts/MusicContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,7 +19,7 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useFeatureUnlockNotifications } from '@/hooks/useFeatureUnlockNotifications';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { awardCreatorCoins } from '@/utils/creatorRewards';
-import { getMinWordLength, getDefaultPreset, getPresetById, type PresetConfig } from './presetConfig';
+import { getMinWordLength, getDefaultPreset, getPresetById } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import {
@@ -183,9 +185,6 @@ const SinglePlayerView: React.FC = () => {
     minWordLength: 2, // Default to 2 letters minimum
   }));
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
-
-  // Get challenge high score info
-  const challengeHighScore = useMemo(() => getAllTimeBest(), []);
 
   // Map SinglePlayerPhase to GamePhase for the music hook
   // 'playing' phase music is handled by SinglePlayerGame component
@@ -391,70 +390,6 @@ const SinglePlayerView: React.FC = () => {
     return getHighScore(gameState.difficulty, gameState.timerSeconds);
   }, [gameState.mode, gameState.difficulty, gameState.timerSeconds]);
 
-  // Generate bots for a preset
-  const generateBots = useCallback((count: number, difficulty: 'easy' | 'medium' | 'hard'): BotOpponent[] => {
-    const bots: BotOpponent[] = [];
-    const availableNames = [...BOT_NAMES];
-
-    for (let i = 0; i < count && availableNames.length > 0; i++) {
-      const randomIndex = Math.floor(Math.random() * availableNames.length);
-      const botName = availableNames.splice(randomIndex, 1)[0];
-      bots.push({
-        id: `bot-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
-        name: botName,
-        difficulty,
-        score: 0,
-        wordsFound: [],
-      });
-    }
-    return bots;
-  }, []);
-
-  // Handle preset selection - quick start with preset settings
-  const handleSelectPreset = useCallback((preset: PresetConfig) => {
-    // CRITICAL: Unlock audio immediately on user click
-    // This ensures browser autoplay policy is satisfied within the user gesture
-    unlockAudio();
-
-    // Determine mode based on preset
-    let mode: SinglePlayerMode = 'solo-bots';
-    if (preset.settings.bots === 0 && preset.settings.timerSeconds === 0) {
-      mode = 'practice';
-    } else if (preset.settings.bots === 0 && preset.settings.timerSeconds > 0) {
-      mode = 'challenge';
-    }
-
-    // Generate bots if needed
-    const bots = preset.settings.bots > 0
-      ? generateBots(preset.settings.bots, preset.settings.botDifficulty)
-      : [];
-
-    // Set game state and start immediately
-    // Calculate minWordLength based on language and difficulty
-    // Japanese: always 2+, Other languages: Hard = 3+, Easy/Medium = 2+
-    const minWordLength = getMinWordLength(uiLanguage, preset.settings.difficulty);
-
-    setGameState(prev => ({
-      ...prev,
-      mode,
-      difficulty: preset.settings.difficulty,
-      timerSeconds: preset.settings.timerSeconds,
-      bots,
-      language: (uiLanguage as Language) || 'en',
-      grid: null,
-      minWordLength,
-    }));
-    setPhase('playing');
-  }, [uiLanguage, generateBots, unlockAudio]);
-
-
-  const handleStartGame = useCallback((settings: Partial<SinglePlayerGameState>) => {
-    // Unlock audio on user gesture (required for browser autoplay policy)
-    unlockAudio();
-    setGameState(prev => ({ ...prev, ...settings }));
-    setPhase('playing');
-  }, [unlockAudio]);
-
   const handleGameEnd = useCallback((results: SinglePlayerResultsData) => {
     // Track training game completion for progressive mode discovery
     // Count all single player modes as "training" games
@@ -575,14 +510,23 @@ const SinglePlayerView: React.FC = () => {
 
         {phase === 'results' && resultsData && resultsData.playerWordData && (
           <>
-            <SinglePlayerResults
-              key={resultsData.gameSessionId || `results-${Date.now()}`}
-              results={resultsData}
-              mode={gameState.mode}
-              onPlayAgain={handlePlayAgain}
-              onQuickRematch={handleQuickRematch}
-              onBackToLobby={handleBackToLobby}
-            />
+            {gameState.mode === 'practice' ? (
+              <PracticeResults
+                key={resultsData.gameSessionId || `results-${Date.now()}`}
+                results={resultsData}
+                onPlayAgain={handlePlayAgain}
+                onBackToLobby={handleBackToLobby}
+              />
+            ) : (
+              <SinglePlayerResults
+                key={resultsData.gameSessionId || `results-${Date.now()}`}
+                results={resultsData}
+                mode={gameState.mode}
+                onPlayAgain={handlePlayAgain}
+                onQuickRematch={handleQuickRematch}
+                onBackToLobby={handleBackToLobby}
+              />
+            )}
             {/* Show redirect notice when coming from training suggestion */}
             {returnTo === 'daily' && (
               <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
@@ -598,4 +542,12 @@ const SinglePlayerView: React.FC = () => {
   );
 };
 
-export default SinglePlayerView;
+function SinglePlayerViewWithErrorBoundary() {
+  return (
+    <FeatureErrorBoundary featureName="Single Player" showHomeButton={true}>
+      <SinglePlayerView />
+    </FeatureErrorBoundary>
+  );
+}
+
+export default SinglePlayerViewWithErrorBoundary;

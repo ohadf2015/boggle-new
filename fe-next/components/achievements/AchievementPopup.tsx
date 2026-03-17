@@ -6,6 +6,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { Share } from 'lucide-react';
 import { Mascot } from '@/components/ui/Mascot';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { getAchievementShareUrl, shareWithOgImage } from '../../utils/ogShare';
 import { gameEvents } from '../GoogleAnalytics';
@@ -57,9 +58,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
     // Generate share URL with OG image
     const ogImageUrl = getAchievementShareUrl(achievementKey, language);
 
-    const shareText = language === 'he'
-      ? `🏆 פתחתי את ההישג "${achievementName}" ב-LexiClash! בוא לשחק גם!`
-      : `🏆 I just unlocked "${achievementName}" in LexiClash! Come play!`;
+    const shareText = `🏆 ${t('achievements.shareText', { name: achievementName })}`;
 
     const shared = await shareWithOgImage({
       title: `LexiClash - ${achievementName}`,
@@ -173,7 +172,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 <motion.h3
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+                  transition={{ delay: 0.15, ...SPRING_PRESETS.balanced }}
                   className="text-sm font-black uppercase text-neo-lime truncate"
                 >
                   {localizedAchievement.name}
@@ -181,7 +180,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 <motion.p
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
+                  transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
                   className="text-xs font-bold text-neo-white/90 line-clamp-1"
                 >
                   {localizedAchievement.description}
@@ -199,12 +198,12 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 <button
                   onClick={handleShare}
                   className="relative w-6 h-6 bg-neo-cyan border-2 border-neo-black rounded flex items-center justify-center text-xs font-black hover:bg-neo-lime transition-colors"
-                  title={language === 'he' ? 'שתף' : 'Share'}
+                  title={t('achievements.shareButton')}
                 >
                   <Share size={10} />
                   {showShareHint && (
                     <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] whitespace-nowrap bg-neo-black text-neo-white px-1.5 py-0.5 rounded">
-                      {language === 'he' ? 'הועתק!' : 'Copied!'}
+                      {t('achievements.copied')}
                     </span>
                   )}
                 </button>

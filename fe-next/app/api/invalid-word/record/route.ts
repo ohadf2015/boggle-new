@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import type { Language } from '@/types';
+import { captureApiError } from '@/utils/sentry';
 
 /** Valid reasons for invalid word submissions */
 type InvalidWordReason = 'not_on_board' | 'not_in_dictionary' | 'peer_rejected' | 'too_short';
@@ -146,6 +147,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RecordInv
     console.log(`[InvalidWord] Recorded "${normalizedWord}" (${language}, ${reason}, ${gameMode || 'unknown'})`);
     return NextResponse.json({ success: true });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/invalid-word/record', { method: 'POST' });
     const err = error as Error;
     console.error('[InvalidWord] Error:', err.message);
     // Return success even on error - this is non-critical functionality

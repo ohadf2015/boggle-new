@@ -79,6 +79,7 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
         <button
           onClick={onSkip}
           className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+          aria-label={t('common.close')}
         >
           <X className="w-5 h-5" />
         </button>

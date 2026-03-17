@@ -146,13 +146,13 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
   const handleEmail = useCallback(() => {
     trackShare('email', gameCode);
     const subject = isPostGame
-      ? (language === 'he' ? 'הצלחתי ב-LexiClash!' : 'I crushed it at LexiClash!')
-      : (language === 'he' ? 'בואו לשחק LexiClash!' : 'Join me for LexiClash!');
+      ? t('share.emailSubjectPostGame')
+      : t('share.emailSubjectInvite');
     const body = isPostGame && gameResult
       ? shareMessage
       : `${t('share.inviteTitle')}\n${t('share.inviteMessage')}\n\nRoom Code: ${gameCode}`;
     shareViaEmail(subject, body, joinUrl);
-  }, [shareMessage, joinUrl, isPostGame, gameResult, language, t, gameCode]);
+  }, [shareMessage, joinUrl, isPostGame, gameResult, t, gameCode]);
 
   const handleSms = useCallback(() => {
     trackShare('sms', gameCode);
@@ -186,26 +186,26 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
         await navigator.clipboard.writeText(challengeUrl);
         setChallengeCreated(true);
         toast.success(
-          language === 'he' ? 'קישור האתגר הועתק!' : 'Challenge link copied!',
+          t('share.challengeLinkCopied'),
           { icon: '🎯', duration: 3000 }
         );
         setTimeout(() => setChallengeCreated(false), 3000);
       } else {
         toast.error(
-          language === 'he' ? 'שגיאה ביצירת האתגר' : 'Error creating challenge',
+          t('share.errorCreatingChallenge'),
           { duration: 3000 }
         );
       }
     } catch (error) {
       console.error('Error creating challenge:', error);
       toast.error(
-        language === 'he' ? 'שגיאה ביצירת האתגר' : 'Error creating challenge',
+        t('share.errorCreatingChallenge'),
         { duration: 3000 }
       );
     } finally {
       setIsCreatingChallenge(false);
     }
-  }, [challengeData, language]);
+  }, [challengeData, t]);
 
   // Determine header color based on context
   const headerColor = isPostGame ? 'bg-neo-lime' : 'bg-neo-pink';
@@ -263,7 +263,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     {gameResult.score}
                   </div>
                   <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
-                    {language === 'he' ? 'נקודות' : 'pts'}
+                    {t('share.pts')}
                   </div>
                 </div>
                 <div className="w-0.5 h-10 rounded-full bg-white/20" />
@@ -272,7 +272,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     {gameResult.wordCount}
                   </div>
                   <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
-                    {language === 'he' ? 'מילים' : 'words'}
+                    {t('share.words')}
                   </div>
                 </div>
                 {gameResult.maxCombo && gameResult.maxCombo > 1 && (
@@ -283,7 +283,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                         {gameResult.maxCombo}x
                       </div>
                       <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
-                        {language === 'he' ? 'קומבו' : 'combo'}
+                        {t('share.combo')}
                       </div>
                     </div>
                   </>
@@ -296,7 +296,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                         <Flame className="w-5 h-5" /> {gameResult.streakDays}
                       </div>
                       <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
-                        {language === 'he' ? 'רצף' : 'streak'}
+                        {t('share.streak')}
                       </div>
                     </div>
                   </>
@@ -315,7 +315,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-purple-500/50 bg-purple-500/20"
                     >
                       <span className="text-purple-300 text-xs font-bold uppercase">
-                        {language === 'he' ? 'הכי ארוכה:' : 'Longest:'}
+                        {t('share.longest')}
                       </span>
                       <span className="text-white font-black text-sm uppercase">
                         {gameResult.longestWord}
@@ -614,7 +614,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 transition={{ delay: 0.42 }}
                 onClick={handleCreateChallenge}
                 disabled={isCreatingChallenge}
-                aria-label={language === 'he' ? 'אתגר חבר' : 'Challenge a Friend'}
+                aria-label={t('challenge.challengeFriend')}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-neo-black shadow-hard-sm',
@@ -635,8 +635,8 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 )}
                 <span>
                   {challengeCreated
-                    ? (language === 'he' ? 'קישור הועתק!' : 'Link Copied!')
-                    : (language === 'he' ? 'אתגר חבר' : 'Challenge a Friend')}
+                    ? t('share.linkCopied')
+                    : t('challenge.challengeFriend')}
                 </span>
               </motion.button>
             )}

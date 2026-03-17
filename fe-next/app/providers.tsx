@@ -25,7 +25,6 @@ import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { NativeAppProvider } from '@/components/native/NativeAppProvider';
 import { NetworkStatusHandler } from '@/components/native/NetworkStatusHandler';
 import { SocketProvider } from '@/utils/SocketContext';
-import { GameStateProvider } from '@/contexts/GameStateContext';
 import { SocketEventBusProvider } from '@/contexts/SocketEventBusContext';
 import { composeProviders } from '@/utils/composeProviders';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -107,15 +106,13 @@ export function GameSpecificProviders({ children }: GameSpecificProvidersProps) 
             <NativeAppProvider>
                 <CrazyGamesProvider>
                     <SocketProvider>
-                        <GameStateProvider>
-                            <SocketEventBusProvider>
-                                <CoreGameProviders>
-                                    {children}
-                                    <WinnerOnboardingWrapper />
-                                    <ProfileCustomizationWrapper />
-                                </CoreGameProviders>
-                            </SocketEventBusProvider>
-                        </GameStateProvider>
+                        <SocketEventBusProvider>
+                            <CoreGameProviders>
+                                {children}
+                                <WinnerOnboardingWrapper />
+                                <ProfileCustomizationWrapper />
+                            </CoreGameProviders>
+                        </SocketEventBusProvider>
                     </SocketProvider>
                 </CrazyGamesProvider>
             </NativeAppProvider>

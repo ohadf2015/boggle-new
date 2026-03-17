@@ -16,6 +16,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { captureApiError } from '@/utils/sentry';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -166,6 +167,7 @@ export async function POST(request: Request) {
     const result = await handlePostComboCodex(user.id, body, supabase as unknown as ComboCodexSupabase);
     return NextResponse.json(result.data, { status: result.status });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/blast/combo-codex', { method: 'POST' });
     const msg = error instanceof Error ? error.message : String(error);
     console.error('[COMBO CODEX API] Unexpected error:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -189,6 +191,7 @@ export async function GET() {
     const result = await handleGetComboCodex(user.id, supabase as unknown as ComboCodexSupabase);
     return NextResponse.json(result.data, { status: result.status });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/blast/combo-codex', { method: 'GET' });
     const msg = error instanceof Error ? error.message : String(error);
     console.error('[COMBO CODEX API] Unexpected error:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

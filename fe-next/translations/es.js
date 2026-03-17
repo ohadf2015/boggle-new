@@ -124,6 +124,7 @@ const es = {
   "common": {
     "loading": "Mezclando letras...",
     "error": "¡Ups!",
+    "errorOccurred": "Ocurrió un error",
     "creating": "Creando...",
     "guest": "Invitado",
     "back": "Atrás",
@@ -264,7 +265,15 @@ const es = {
     "brain": "Cerebro",
     "leaderboard": "Ranking",
     "profile": "Perfil",
-    "play": "Jugar"
+    "play": "Jugar",
+    "howToPlay": "Cómo jugar",
+    "blog": "Blog",
+    "faq": "Preguntas frecuentes",
+    "aboutLexiClash": "Sobre LexiClash",
+    "contactUs": "Contáctenos",
+    "privacyPolicy": "Política de privacidad",
+    "termsOfService": "Términos de servicio",
+    "disclaimer": "Descargo de responsabilidad"
   },
   "skills": {
     "title": "Árbol de Habilidades",
@@ -517,7 +526,22 @@ const es = {
     "beatMyScore": "¿Puedes superarme?",
     "invite": "Invitar",
     "share": "Compartir",
-    "qrCode": "Código QR"
+    "qrCode": "Código QR",
+    "emailSubjectPostGame": "¡Arrasé en LexiClash!",
+    "emailSubjectInvite": "¡Juega LexiClash conmigo!",
+    "challengeLinkCopied": "¡Enlace del desafío copiado!",
+    "errorCreatingChallenge": "Error al crear el desafío",
+    "pts": "pts",
+    "words": "palabras",
+    "combo": "combo",
+    "streak": "racha",
+    "longest": "Más larga:"
+  },
+  "messaging": {
+    "timeNow": "ahora",
+    "timeMinutes": "m",
+    "timeHours": "h",
+    "timeDays": "d"
   },
   "consent": {
     "title": "Consentimiento de Padres",
@@ -609,6 +633,11 @@ const es = {
     "updateMessage": "¡Cosas nuevas recién salidas! Refresca y sigues jugando.",
     "updateProgress": "¡Son 2 segundos!",
     "globalErrorEncouragement": "Tranqui - ¡tu juego está seguro!",
+    "goHome": "Ir al inicio",
+    "failedToLoadLeaderboard": "Error al cargar la tabla de posiciones",
+    "failedToLoadProfile": "Error al cargar el perfil",
+    "unableToLoadData": "No se pudieron cargar los datos. Intenta de nuevo.",
+    "tryAgainButton": "Intentar de nuevo",
     "connectionTimeout": "Tarda mucho en conectar",
     "rateLimited": "¡Más lento, campeón!",
     "connectionLost": "Conexión perdida - reconectando",
@@ -762,6 +791,7 @@ const es = {
     "defaultPlayerNames": ["Papa Astuta","Donut Travieso","Barón Waffle","Llama Dramática","Taco Turbo","Mochi Jefe","Pingüino Astuto","Morsa Sospechosa","Ganso Profesional","Capitán Pretzel","Aguacate Cósmico","Flamenco Loco","Dragón Secreto","Salmón Turbo","Oso Gruñón","Cebra Relajada","Koala Elegante","Mapache Chic","Hipo Híper","Medusa Relajada","Zorro Astuto","Galleta Junior","Perezoso Pro","Ninja Fideo","Pepinillo Disco","Falafel Royal","Robot Funky","Duque Donut","Banana Bandido","Tortuga Caótica"]
   },
   "multiplayerFlow": {
+    "host": "Anfitrión",
     "roomClosed": "Room closed",
     "rateLimited": "Slow down!",
     "roomList": {
@@ -1569,7 +1599,17 @@ const es = {
       "gameCount": "Juego {count}",
       "round": "R{num}"
     },
-    "wordsFound": "Palabras encontradas"
+    "wordsFound": "Palabras encontradas",
+    "shareVictoryPrompt": "¡Comparte tu victoria!",
+    "victory": "¡VICTORIA!",
+    "wellPlayed": "¡BIEN JUGADO!",
+    "wordsLabel": "palabras",
+    "shareYourVictory": "¡Comparte tu victoria!",
+    "challengeFriends": "Desafía a tus amigos 😈",
+    "streakOneWeek": "¡Un día para una semana completa!",
+    "streakTwoWeeks": "¡Casi dos semanas!",
+    "streakOneMonth": "¡Un día para un mes completo!",
+    "streakWeeks": "¡{{weeks}} semanas de racha!"
   },
   "nextStep": {
     "backToLobby": "Volver al Lobby",
@@ -1584,6 +1624,29 @@ const es = {
     "goMultiplayerDesc": "Desafía a jugadores reales en batallas de palabras en vivo",
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Mejora tus habilidades cognitivas con ejercicios enfocados"
+  },
+  "practiceResults": {
+    "playAgain": "Jugar de nuevo",
+    "orTrySomethingNew": "o prueba algo nuevo",
+    "wordsFound": "{count} palabras encontradas",
+    "tryDaily": "Desafío diario",
+    "tryDailyDesc": "Mismo puzzle, todos compiten",
+    "tryBots": "Contra bots",
+    "tryBotsDesc": "Pon a prueba tus habilidades contra IA",
+    "tryMultiplayer": "Jugar con amigos",
+    "tryMultiplayerDesc": "Batallas de palabras en tiempo real",
+    "encouragement": {
+      "legendary": "¡Increíble!",
+      "great": "¡Buen trabajo!",
+      "nice": "¡Genial!",
+      "warmup": "¡Buen comienzo!"
+    },
+    "subtitle": {
+      "legendary": "¡Estás en racha — mantén el impulso!",
+      "great": "Tienes habilidades de palabras serias",
+      "nice": "Cada juego te hace mejor",
+      "warmup": "¡La práctica hace al maestro — vas por buen camino!"
+    }
   },
   "almostFound": {
     "title": "Casi encontraste...",
@@ -1790,6 +1853,9 @@ const es = {
   "achievements": {
     "unlocked": "¡Logro Desbloqueado!",
     "upgraded": "¡Logro Mejorado!",
+    "shareText": "¡Desbloqueé \"{{name}}\" en LexiClash! ¡Ven a jugar!",
+    "shareButton": "Compartir",
+    "copied": "¡Copiado!",
     "FIRST_BLOOD": {
       "name": "Primera Sangre",
       "description": "Primero en encontrar una palabra"
@@ -3176,6 +3242,8 @@ const es = {
     "topPercent": "Top ${percent}%",
     "noRankYet": "¡Juega partidas para clasificarte!",
     "viewLeaderboard": "Ver Clasificación",
+    "friends": "Amigos",
+    "noFriendsPlayed": "¡Ninguno de tus amigos ha jugado hoy todavía!",
     "you": "TÚ",
     "liveRace": "Carrera en Vivo",
     "racing": "compitiendo",
@@ -3714,6 +3782,31 @@ const es = {
     "challengeFriend": "Desafía a un amigo",
     "shareHint": "Comparte el mismo tablero con amigos",
     "winnerPrompt": "¡Los aplastaste! Desafía a tus amigos 😈"
+  },
+  "challengeView": {
+    "oops": "¡Ups!",
+    "backToHome": "Volver al inicio",
+    "back": "Atrás",
+    "title": "¡Desafío!",
+    "beatScore": "¿Puedes superar esta puntuación?",
+    "createdChallenge": "creó este desafío",
+    "scoreToBeat": "Puntuación a superar",
+    "words": "palabras",
+    "longest": "Más larga: ",
+    "attempts": "Intentos",
+    "beaten": "Derrotados",
+    "winRate": "% Victoria",
+    "startChallenge": "¡Iniciar desafío!"
+  },
+  "challengeResults": {
+    "youWon": "¡Ganaste!",
+    "soClose": "¡Casi!",
+    "youBeat": "¡Venciste a {{name}}!",
+    "tryAgainMsg": "¡Inténtalo de nuevo!",
+    "you": "Tú",
+    "pts": "pts",
+    "words": "palabras",
+    "longest": "más larga"
   },
   "rules": {
     "pageTitle": "LexiClash: Batalla de Palabras en Tiempo Real",
@@ -5237,6 +5330,7 @@ const es = {
     "levels": "niveles",
     "level": "Nivel",
     "levelShort": "Lv.",
+    "levelWithNumber": "Lv. {level}",
     "backToMap": "Volver al mapa del mundo",
     "worldLabel": "Mundo",
     "world": "Mundo",
@@ -5256,6 +5350,15 @@ const es = {
     "continueToNext": "Continuar",
     "nextWorld": "Siguiente mundo",
     "retryLevel": "Reintentar",
+    "freeRetry": "Reintento gratis",
+    "quest": {
+      "title": "Misiones del cap.",
+      "wordCount": "Encontrar palabras",
+      "perfectLevels": "Niveles perfectos",
+      "defeatBossNoHint": "Jefe sin pistas",
+      "longWordCount": "Palabras largas",
+      "fullComboLevels": "Combo completo"
+    },
     "loadError": "Error al cargar el progreso",
     "boss": "Jefe",
     "allStars": "Todas las Estrellas",
@@ -5760,8 +5863,10 @@ const es = {
       "confirmExit": "¿Salir del nivel?",
       "confirmExitDesc": "Se perderá tu progreso actual. ¿Estás seguro de que quieres salir?",
       "freeze": "Congelar",
+      "freezeWithTime": "Congelar ({seconds}s)",
       "frozen": "¡Congelado!",
       "shuffle": "Mezclar",
+      "shuffleWithCount": "Mezclar (×{count})",
       "detonate": "Detonar"
     },
     "hints": {
@@ -6728,7 +6833,8 @@ const es = {
       "saveLessonTitle": "Guardar Lección",
       "lessonNamePlaceholder": "Nombre de la lección...",
       "noClassroom": "Sin aula (lección personal)",
-      "selectWords": "Selecciona palabras para crear una lección"
+      "selectWords": "Selecciona palabras para crear una lección",
+      "failedToSaveLesson": "Error al guardar la lección"
     },
     "reports": {
       "title": "Reporte de Progreso",
@@ -7935,6 +8041,18 @@ const es = {
     cancel: "Cancelar",
     buildCustom: "Crea el tuyo",
     bgColor: "Fondo"
+  },
+  wordHuntAnnouncement: {
+    badge: "Nuevo en Multijugador",
+    title: "¡Prueba el Modo Word Hunt!",
+    subtitle: "Encuentra la palabra objetivo antes que tus oponentes. ¡Vidas, eliminación y puro caos!",
+  },
+  wordHuntPromo: {
+    title: "¡Desafía a tus Amigos a Word Hunt!",
+    subtitle: "Encuentra la palabra oculta antes que tus oponentes. ¡Vidas, eliminación y caos absoluto!",
+    cta: "Jugar Ahora",
+    dismiss: "Quizás después",
+    imageAlt: "Dos jugadores en un épico duelo de palabras",
   },
   wordHuntTips: {
     needMoreWords: "Solo encontraste {{count}} palabras. Cada palabra recarga tu vida — escanea filas y diagonales para palabras cortas de 3 letras antes de adivinar el objetivo.",

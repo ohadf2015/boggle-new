@@ -5,14 +5,15 @@
  * Fixes JAVASCRIPT-NEXTJS-9J: HTML5 Audio pool exhausted
  */
 
-import { Howler } from 'howler';
 import logger from '@/utils/logger';
 
 /**
  * Configure Howler.js global settings
  * Call this once at app startup (e.g., in _app.tsx or layout.tsx)
  */
-export function initializeHowlerConfig(): void {
+export async function initializeHowlerConfig(): Promise<void> {
+  const { Howler } = await import('howler');
+
   // Increase HTML5 audio pool size from default 10 to 30
   // Adventure page has many concurrent sounds: ambient music, UI, game sounds
   // Fixes JAVASCRIPT-NEXTJS-9J (pool exhausted warnings)
@@ -27,7 +28,8 @@ export function initializeHowlerConfig(): void {
 /**
  * Get current Howler configuration (for debugging)
  */
-export function getHowlerConfig() {
+export async function getHowlerConfig() {
+  const { Howler } = await import('howler');
   return {
     html5PoolSize: Howler.html5PoolSize,
     autoUnlock: Howler.autoUnlock,

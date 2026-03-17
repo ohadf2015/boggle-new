@@ -106,7 +106,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
                 'font-neo-display font-black text-sm'
               )}
             >
-              {t('adventure.levelShort', 'Lv.')} {playerLevel}
+              {t('adventure.levelWithNumber', { level: playerLevel })}
             </div>
 
             {/* XP Progress */}

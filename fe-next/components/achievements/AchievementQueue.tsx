@@ -6,16 +6,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { UnifiedAchievementModal } from './UnifiedAchievementModal';
 import type { CinematicPlayerProps } from '../adventure/boss/cinematics/CinematicPlayer';
-import { AchievementCinematic, ACHIEVEMENT_DURATION_FRAMES } from './cinematics/AchievementCinematic';
+
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getAchievementIcon } from '@/constants/achievementIcons';
+import { calculateTier, TIER_COLORS } from '@/utils/achievementTiers';
+import type { AchievementPayload } from '@/shared/types/socket';
 
 const CinematicPlayer = dynamic(
   () => import('../adventure/boss/cinematics/CinematicPlayer').then((m) => m.CinematicPlayer),
   { ssr: false }
 ) as React.ComponentType<CinematicPlayerProps>;
-import { getAchievementIcon } from '@/constants/achievementIcons';
-import { calculateTier, TIER_COLORS } from '@/utils/achievementTiers';
-import type { AchievementPayload } from '@/shared/types/socket';
+
+// Lazy-load AchievementCinematic to keep Remotion (~200KB) out of the initial bundle.
+// It is only needed when a GOLD/PLATINUM achievement actually plays.
+const AchievementCinematic = dynamic(
+  () => import('./cinematics/AchievementCinematic').then((m) => ({ default: m.AchievementCinematic })),
+  { ssr: false }
+);
+
+// Duration constant inlined to avoid importing the Remotion module at parse time.
+const ACHIEVEMENT_DURATION_FRAMES = 210;
 
 interface AchievementQueueProps {
   children: ReactNode | ((props: { queueAchievement: (achievement: AchievementPayload) => void }) => ReactNode);
@@ -32,6 +42,16 @@ const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactEleme
   const [showCinematic, setShowCinematic] = useState(false);
   const isDisplayingRef = useRef<boolean>(false);
   const queueRef = useRef<AchievementPayload[]>([]);
+  const timerIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+  // Clear all pending timeouts on unmount
+  useEffect(() => {
+    const timerIds = timerIdsRef.current;
+    return () => {
+      timerIds.forEach(id => clearTimeout(id));
+      timerIds.clear();
+    };
+  }, []);
 
   // Keep queueRef in sync
   useEffect(() => {
@@ -62,9 +82,11 @@ const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactEleme
   const handlePopupComplete = useCallback(() => {
     setShowCinematic(false);
     // Small delay between achievements
-    setTimeout(() => {
+    const id = setTimeout(() => {
+      timerIdsRef.current.delete(id);
       processNext();
     }, 500);
+    timerIdsRef.current.add(id);
   }, [processNext]);
 
   // Queue a new achievement
@@ -79,11 +101,13 @@ const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactEleme
 
     // If not currently displaying, start immediately
     if (!isDisplayingRef.current) {
-      setTimeout(() => {
+      const id = setTimeout(() => {
+        timerIdsRef.current.delete(id);
         if (!isDisplayingRef.current && queueRef.current.length > 0) {
           processNext();
         }
       }, 100);
+      timerIdsRef.current.add(id);
     }
   }, [processNext]);
 
@@ -153,7 +177,7 @@ function AchievementInlineToast({
   achievement: AchievementPayload;
   onDismiss: () => void;
 }) {
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
 
 
   const icon = getAchievementIcon(achievement.key);
@@ -238,6 +262,16 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
   const [currentAchievement, setCurrentAchievement] = useState<AchievementPayload | null>(null);
   const isDisplayingRef = useRef<boolean>(false);
   const queueRef = useRef<AchievementPayload[]>([]);
+  const providerTimerIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+  // Clear all pending timeouts on unmount
+  useEffect(() => {
+    const providerTimerIds = providerTimerIdsRef.current;
+    return () => {
+      providerTimerIds.forEach(id => clearTimeout(id));
+      providerTimerIds.clear();
+    };
+  }, []);
 
   // Keep queueRef in sync
   useEffect(() => {
@@ -261,9 +295,11 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
   // Handle toast dismiss — wait a gap, then show next
   const handleDismiss = useCallback(() => {
     setCurrentAchievement(null);
-    setTimeout(() => {
+    const id = setTimeout(() => {
+      providerTimerIdsRef.current.delete(id);
       processNext();
     }, INLINE_TOAST_GAP);
+    providerTimerIdsRef.current.add(id);
   }, [processNext]);
 
   // Queue a new achievement (max 5)
@@ -274,11 +310,13 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
 
     // If not currently displaying, start immediately
     if (!isDisplayingRef.current) {
-      setTimeout(() => {
+      const id = setTimeout(() => {
+        providerTimerIdsRef.current.delete(id);
         if (!isDisplayingRef.current && queueRef.current.length > 0) {
           processNext();
         }
       }, 100);
+      providerTimerIdsRef.current.add(id);
     }
   }, [processNext]);
 

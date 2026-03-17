@@ -212,7 +212,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   isCurrentPlayerReady,
   readyUsernames,
   duplicateRuleDisabled,
-  onShowDetails,
   winStreakData,
   t,
   showBanner = true,

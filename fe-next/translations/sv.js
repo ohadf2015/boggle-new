@@ -125,6 +125,7 @@ const sv = {
     "email": "E-post",
     "loading": "Blandar bokstäver...",
     "error": "Hoppsan!",
+    "errorOccurred": "Ett fel uppstod",
     "creating": "Skapar...",
     "guest": "Gäst",
     "back": "Tillbaka",
@@ -264,7 +265,15 @@ const sv = {
     "brain": "Hjärna",
     "leaderboard": "Rankning",
     "profile": "Profil",
-    "play": "Spela"
+    "play": "Spela",
+    "howToPlay": "Hur man spelar",
+    "blog": "Blogg",
+    "faq": "Vanliga frågor",
+    "aboutLexiClash": "Om LexiClash",
+    "contactUs": "Kontakta oss",
+    "privacyPolicy": "Integritetspolicy",
+    "termsOfService": "Användarvillkor",
+    "disclaimer": "Ansvarsfriskrivning"
   },
   "skills": {
     "title": "Färdighetsträd",
@@ -521,7 +530,22 @@ const sv = {
     "orShareVia": "Eller dela via",
     "telegram": "Telegram",
     "moreWays": "Fler sätt att dela",
-    "invite": "Bjud in"
+    "invite": "Bjud in",
+    "emailSubjectPostGame": "Jag krossade det i LexiClash!",
+    "emailSubjectInvite": "Spela LexiClash med mig!",
+    "challengeLinkCopied": "Utmaningslank kopierad!",
+    "errorCreatingChallenge": "Fel vid skapande av utmaning",
+    "pts": "poang",
+    "words": "ord",
+    "combo": "kombo",
+    "streak": "svit",
+    "longest": "Langsta:"
+  },
+  "messaging": {
+    "timeNow": "nu",
+    "timeMinutes": "m",
+    "timeHours": "t",
+    "timeDays": "d"
   },
   "errors": {
     "unstableConnection": "Anslutningen vinglar - kopplar upp dig...",
@@ -546,6 +570,11 @@ const sv = {
     "updateMessage": "Coola grejer har kommit! Snabb uppdatering och du är tillbaka.",
     "updateProgress": "Tar 2 sekunder!",
     "globalErrorEncouragement": "Lugnt - ditt spel är säkert!",
+    "goHome": "Hem",
+    "failedToLoadLeaderboard": "Kunde inte ladda topplistan",
+    "failedToLoadProfile": "Kunde inte ladda profilen",
+    "unableToLoadData": "Kunde inte ladda data. Försök igen.",
+    "tryAgainButton": "Försök igen",
     "connectionTimeout": "Tar för lång tid att ansluta",
     "rateLimited": "Lugna ner dig, sprinter!",
     "connectionLost": "Förlorade anslutningen - återansluter",
@@ -729,6 +758,7 @@ const sv = {
     ]
   },
   "multiplayerFlow": {
+    "host": "Värd",
     "roomClosed": "Rummet stängt",
     "rateLimited": "Lugna ner dig!",
     "roomList": {
@@ -1505,7 +1535,17 @@ const sv = {
       "gameCount": "Spel {count}",
       "round": "R{num}"
     },
-    "wordsFound": "Ord hittade"
+    "wordsFound": "Ord hittade",
+    "shareVictoryPrompt": "Dela din seger!",
+    "victory": "SEGER!",
+    "wellPlayed": "BRA SPELAT!",
+    "wordsLabel": "ord",
+    "shareYourVictory": "Dela din seger!",
+    "challengeFriends": "Utmana dina vanner 😈",
+    "streakOneWeek": "En dag fran en hel vecka!",
+    "streakTwoWeeks": "Nastan tva veckor!",
+    "streakOneMonth": "En dag fran en hel manad!",
+    "streakWeeks": "{{weeks}} veckors svit!"
   },
   "nextStep": {
     "backToLobby": "Tillbaka till Lobbyn",
@@ -1520,6 +1560,29 @@ const sv = {
     "goMultiplayerDesc": "Utmana riktiga spelare i livekamper med ord",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Förbättra dina kognitiva förmågor med fokuserade övningar"
+  },
+  "practiceResults": {
+    "playAgain": "Spela igen",
+    "orTrySomethingNew": "eller prova något nytt",
+    "wordsFound": "{count} ord hittade",
+    "tryDaily": "Daglig utmaning",
+    "tryDailyDesc": "Samma pussel, alla tävlar",
+    "tryBots": "Mot bottar",
+    "tryBotsDesc": "Testa dina färdigheter mot AI",
+    "tryMultiplayer": "Spela med vänner",
+    "tryMultiplayerDesc": "Ordstrider i realtid",
+    "encouragement": {
+      "legendary": "Otroligt!",
+      "great": "Bra jobbat!",
+      "nice": "Snyggt!",
+      "warmup": "Bra start!"
+    },
+    "subtitle": {
+      "legendary": "Du är on fire — behåll momentumet!",
+      "great": "Du har riktiga ordkunskaper",
+      "nice": "Varje spel gör dig vassare",
+      "warmup": "Övning ger färdighet — du är på väg!"
+    }
   },
   "almostFound": {
     "title": "Du hittade nästan...",
@@ -1884,6 +1947,9 @@ const sv = {
   "achievements": {
     "unlocked": "Prestation Upplåst!",
     "upgraded": "Prestation Uppgraderad!",
+    "shareText": "Jag laste upp \"{{name}}\" i LexiClash! Kom och spela!",
+    "shareButton": "Dela",
+    "copied": "Kopierat!",
     "cinematic": {
       "unlocked": "PRESTATION UPPLÅST!",
       "gold": "GULD",
@@ -3665,6 +3731,31 @@ const sv = {
     "shareHint": "Dela samma bräde med vänner",
     "winnerPrompt": "Du krossade det! Utmana dina vänner 😈"
   },
+  "challengeView": {
+    "oops": "Hoppsan!",
+    "backToHome": "Tillbaka hem",
+    "back": "Tillbaka",
+    "title": "Utmaning!",
+    "beatScore": "Kan du sla detta resultat?",
+    "createdChallenge": "skapade utmaningen",
+    "scoreToBeat": "Resultat att sla",
+    "words": "ord",
+    "longest": "Langsta: ",
+    "attempts": "Forsok",
+    "beaten": "Besegrade",
+    "winRate": "Vinstfrekvens",
+    "startChallenge": "Starta utmaning!"
+  },
+  "challengeResults": {
+    "youWon": "Du vann!",
+    "soClose": "Nära!",
+    "youBeat": "Du slog {{name}}!",
+    "tryAgainMsg": "Försök igen!",
+    "you": "Du",
+    "pts": "poäng",
+    "words": "ord",
+    "longest": "längsta"
+  },
   "rules": {
     "pageTitle": "LexiClash: Ordstrid i Realtid",
     "gameModes": "Spellägen",
@@ -5217,6 +5308,7 @@ const sv = {
     "levels": "nivåer",
     "level": "Nivå",
     "levelShort": "Lv.",
+    "levelWithNumber": "Lv. {level}",
     "backToMap": "Tillbaka till världskartan",
     "menu": {
       "skills": "Färdigheter",
@@ -5240,6 +5332,15 @@ const sv = {
     "continueToNext": "Fortsätt",
     "nextWorld": "Nästa värld",
     "retryLevel": "Försök igen",
+    "freeRetry": "Gratis omstart",
+    "quest": {
+      "title": "Kapiteluppdrag",
+      "wordCount": "Hitta ord",
+      "perfectLevels": "Perfekta nivåer",
+      "defeatBossNoHint": "Boss utan ledtrådar",
+      "longWordCount": "Långa ord",
+      "fullComboLevels": "Full combo"
+    },
     "loadError": "Kunde inte ladda framsteg",
     "allStars": "Alla stjärnor",
     "continue": "Fortsätt",
@@ -5430,8 +5531,10 @@ const sv = {
       "confirmExit": "Lämna nivån?",
       "confirmExitDesc": "Din nuvarande framsteg kommer att försvinna. Är du säker?",
       "freeze": "Frys",
+      "freezeWithTime": "Frys ({seconds}s)",
       "frozen": "Fryst!",
       "shuffle": "Blanda",
+      "shuffleWithCount": "Blanda (×{count})",
       "detonate": "Detonera"
     },
     "hints": {
@@ -6744,7 +6847,8 @@ const sv = {
       "saveLessonTitle": "Spara gloslektion",
       "lessonNamePlaceholder": "Ange lektionsnamn...",
       "noClassroom": "Inget klassrum (privat lektion)",
-      "selectWords": "Välj ord för att skapa en gloslektion"
+      "selectWords": "Välj ord för att skapa en gloslektion",
+      "failedToSaveLesson": "Kunde inte spara lektionen"
     },
     "reports": {
       "title": "Framstegsrapport",

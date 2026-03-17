@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
 interface AuthModalCloseButtonProps {
@@ -16,6 +17,7 @@ interface AuthModalCloseButtonProps {
  */
 export function AuthModalCloseButton({ onClose, className }: AuthModalCloseButtonProps) {
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
 
   return (
@@ -33,7 +35,7 @@ export function AuthModalCloseButton({ onClose, className }: AuthModalCloseButto
           'rounded-full w-8 h-8',
           isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
         )}
-        aria-label="Close"
+        aria-label={t('common.close')}
       >
         <X className="w-5 h-5" />
       </Button>

@@ -25,16 +25,16 @@ interface MessageThreadListProps {
  * @param language - Language code for localization
  * @returns Formatted relative time string
  */
-function formatRelativeTime(now: number, timestamp: number, language: string): string {
+function formatRelativeTime(now: number, timestamp: number, t: (key: string) => string): string {
   const diff = now - timestamp;
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return language === 'he' ? 'עכשיו' : 'now';
-  if (minutes < 60) return `${minutes}${language === 'he' ? 'ד' : 'm'}`;
-  if (hours < 24) return `${hours}${language === 'he' ? 'ש' : 'h'}`;
-  return `${days}${language === 'he' ? 'י' : 'd'}`;
+  if (minutes < 1) return t('messaging.timeNow');
+  if (minutes < 60) return `${minutes}${t('messaging.timeMinutes')}`;
+  if (hours < 24) return `${hours}${t('messaging.timeHours')}`;
+  return `${days}${t('messaging.timeDays')}`;
 }
 
 /**
@@ -133,7 +133,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
                 isDark ? 'text-gray-400' : 'text-gray-500',
                 'me-2'
               )}>
-                {formatRelativeTime(now, thread.lastMessageAt, language)}
+                {formatRelativeTime(now, thread.lastMessageAt, t)}
               </span>
             </div>
             <p className={cn(

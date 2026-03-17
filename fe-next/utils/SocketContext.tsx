@@ -53,8 +53,23 @@ export const getSocketURL = (): string => {
 };
 
 /**
+ * Get the current Supabase access token (if authenticated)
+ */
+async function getAuthToken(): Promise<string | undefined> {
+  try {
+    const { createClient } = await import('@/utils/supabase/client');
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Get or create the shared socket instance
- * Uses reference counting to manage cleanup
+ * Uses reference counting to manage cleanup.
+ * Passes Supabase JWT in handshake auth for server-side verification.
  */
 export function getSharedSocket(): Socket {
   if (!sharedSocketInstance) {
@@ -67,8 +82,19 @@ export function getSharedSocket(): Socket {
       reconnectionDelay: SOCKET_CONFIG.reconnectionDelay,
       reconnectionDelayMax: SOCKET_CONFIG.reconnectionDelayMax,
       timeout: SOCKET_CONFIG.timeout,
-      autoConnect: true,
+      autoConnect: false, // Connect after setting auth
       forceNew: false,
+    });
+
+    // Attach auth token before connecting (async but non-blocking)
+    getAuthToken().then(token => {
+      if (token && sharedSocketInstance) {
+        sharedSocketInstance.auth = { token };
+      }
+      sharedSocketInstance?.connect();
+    }).catch(() => {
+      // Connect without auth on failure
+      sharedSocketInstance?.connect();
     });
   }
   sharedSocketRefCount++;

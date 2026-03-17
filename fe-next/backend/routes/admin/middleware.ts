@@ -17,7 +17,7 @@ const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseSer
  */
 export const adminRateLimiter = {
   requests: new Map<string, RateLimitRecord>(),
-  maxRequests: 300,       // Max requests per window (increased for LiveMonitor auto-refresh)
+  maxRequests: 60,        // Max requests per window (reduced from 300 for security)
   windowMs: 60 * 1000,    // 1 minute window
 
   isAllowed(ip: string): boolean {
@@ -93,8 +93,10 @@ export function auditLog(adminUser: AdminUser | undefined, action: string, detai
  * Rate limiting middleware for admin routes
  */
 export function adminRateLimit(req: AdminRequest, res: Response, next: NextFunction): void {
+  // Use rightmost IP from X-Forwarded-For (proxy-appended, not client-controlled)
   const forwardedFor = req.headers['x-forwarded-for'];
-  const ip = (typeof forwardedFor === 'string' ? forwardedFor.split(',')[0]?.trim() : undefined) ||
+  const forwardedIps = typeof forwardedFor === 'string' ? forwardedFor.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const ip = (forwardedIps.length > 0 ? forwardedIps[forwardedIps.length - 1] : undefined) ||
              (req.headers['x-real-ip'] as string) ||
              req.socket.remoteAddress ||
              'unknown';

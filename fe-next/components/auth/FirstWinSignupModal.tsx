@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Trophy, TrendingUp, Medal, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -134,7 +135,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
             className="text-center mb-6"
           >
             <h2 className="text-2xl font-bold mb-2 text-neo-lime">
@@ -154,7 +155,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
             className={cn('mb-6 p-4 rounded-xl', isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50')}
           >
             <p
@@ -192,7 +193,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 26 }}
+              transition={{ delay: 0.6, ...SPRING_PRESETS.balanced }}
               className={cn(
                 'mb-6 p-3 rounded-lg text-center text-sm',
                 isDarkMode
@@ -213,7 +214,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.7, ...SPRING_PRESETS.balanced }}
           >
             <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} />
           </motion.div>

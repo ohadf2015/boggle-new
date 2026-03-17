@@ -249,22 +249,20 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   // Streak encouragement - motivate users close to milestones
   const streakEncouragement = useMemo(() => {
     if (streakDays === 6) {
-      return language === 'he' ? '🔥 יום אחד לשבוע שלם!' : '🔥 One day from a full week!';
+      return `🔥 ${t('results.streakOneWeek')}`;
     }
     if (streakDays === 13) {
-      return language === 'he' ? '🔥 מחר שבועיים!' : '🔥 Almost two weeks!';
+      return `🔥 ${t('results.streakTwoWeeks')}`;
     }
     if (streakDays === 29) {
-      return language === 'he' ? '🔥 יום אחד לחודש!' : '🔥 One day from a full month!';
+      return `🔥 ${t('results.streakOneMonth')}`;
     }
     if (streakDays >= 7 && streakDays % 7 === 0) {
       const weeks = Math.floor(streakDays / 7);
-      return language === 'he'
-        ? `🎯 ${weeks} שבועות ברצף!`
-        : `🎯 ${weeks} week${weeks > 1 ? 's' : ''} streak!`;
+      return `🎯 ${t('results.streakWeeks', { weeks: String(weeks) })}`;
     }
     return null;
-  }, [streakDays, language]);
+  }, [streakDays, t]);
 
   // Don't show for non-winners with low scores
   if (!isWinner && score < 30) return null;
@@ -284,7 +282,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           )}
         >
           <span className={cn('text-sm font-bold', isDarkMode ? 'text-cyan-300' : 'text-cyan-700')}>
-            {language === 'he' ? 'שתפו את הניצחון!' : 'Share your victory!'}
+            {t('results.shareVictoryPrompt')}
           </span>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -297,10 +295,10 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               'bg-neo-lime text-neo-black',
               'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
             )}
-            aria-label={language === 'he' ? 'שתף' : 'Share'}
+            aria-label={t('results.share')}
           >
             <Share2 size={14} />
-            <span>{language === 'he' ? 'שתף' : 'Share'}</span>
+            <span>{t('results.share')}</span>
           </motion.button>
         </motion.div>
 
@@ -368,8 +366,8 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               isDarkMode ? 'text-white' : 'text-gray-900'
             )}>
               {isWinner
-                ? language === 'he' ? 'ניצחון!' : 'VICTORY!'
-                : language === 'he' ? 'משחק טוב!' : 'WELL PLAYED!'}
+                ? t('results.victory')
+                : t('results.wellPlayed')}
             </h3>
             <p className={cn(
               'text-sm font-medium italic',
@@ -407,7 +405,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               {score}
             </div>
             <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-              {language === 'he' ? 'נקודות' : 'pts'}
+              {t('results.points')}
             </div>
           </div>
           <div className={cn('w-0.5 h-10 rounded-full', isDarkMode ? 'bg-white/20' : 'bg-gray-300')} />
@@ -416,7 +414,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               {wordCount}
             </div>
             <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-              {language === 'he' ? 'מילים' : 'words'}
+              {t('results.wordsLabel')}
             </div>
           </div>
           {achievements.length > 0 && (
@@ -425,7 +423,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               <div className="text-center px-3">
                 <div className="text-2xl">{achievements.slice(0, 3).map(a => a.icon || '🏆').join('')}</div>
                 <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                  {achievements.length} {language === 'he' ? 'הישגים' : 'badges'}
+                  {achievements.length} {t('results.badges')}
                 </div>
               </div>
             </>
@@ -452,7 +450,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleShare}
-          aria-label={language === 'he' ? 'שתף את הניצחון' : 'Share Your Victory'}
+          aria-label={t('results.shareYourVictory')}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-4',
             'font-black text-lg uppercase tracking-wide rounded-neo',
@@ -464,7 +462,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           )}
         >
           <Share2 size={18} />
-          <span>{language === 'he' ? 'שתף את הניצחון!' : 'Share Your Victory!'}</span>
+          <span>{t('results.shareYourVictory')}</span>
         </motion.button>
 
         {/* Viral prompt */}
@@ -472,7 +470,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           'mt-3 text-center text-sm font-medium',
           isDarkMode ? 'text-gray-400' : 'text-gray-500'
         )}>
-          {language === 'he' ? 'תאתגרו את החברים 😈' : 'Challenge your friends 😈'}
+          {t('results.challengeFriends')}
         </p>
       </motion.div>
       </AnimatePresence>

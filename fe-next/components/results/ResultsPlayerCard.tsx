@@ -1,24 +1,24 @@
 import React, { useState, useMemo, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AchievementBadge } from '../AchievementBadge';
-import PlayerInsights from './PlayerInsights';
+
 import NoWordsFoundView from './NoWordsFoundView';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
-import { calculatePlayerInsights } from '../../utils/gameInsights';
+
 import { ChevronDown, ChevronUp, Award } from 'lucide-react';
 import Avatar from '../Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import logger from '@/utils/logger';
-import XpBreakdownCard from './XpBreakdownCard';
+
 import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
 import { getCardStyle } from '../../utils/rankingStyles';
 import { filterGameAchievements } from './utils';
 import type { WordObject, ResultsPlayerCardProps } from './types';
 
-const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled, archetype }) => {
+const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, archetype }) => {
   const { t } = useLanguage();
 
   // Check if this is the current player
@@ -118,32 +118,6 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
 
     return { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats };
   }, [player.allWords, player.username]);
-
-  // Calculate player insights (only for current player to avoid unnecessary computation)
-  const playerInsights = useMemo(() => {
-    if (!isCurrentPlayer || !player.allWords || player.allWords.length === 0) {
-      return null;
-    }
-
-    // Calculate effective game duration from word timing data
-    // Use the maximum timeSinceStart as a proxy for game duration
-    // This is more accurate than a fixed value since it reflects actual play time
-    let gameDuration = 180; // Default fallback
-    const timeSinceStartValues = player.allWords
-      .map(w => w.timeSinceStart)
-      .filter((t): t is number => typeof t === 'number' && t > 0);
-
-    if (timeSinceStartValues.length > 0) {
-      const maxTimeSinceStart = Math.max(...timeSinceStartValues);
-      // Round up to nearest 30 seconds to get a reasonable game duration estimate
-      // Add a small buffer (10 seconds) since last word might not be at the very end
-      gameDuration = Math.ceil((maxTimeSinceStart + 10) / 30) * 30;
-      // Ensure minimum of 60 seconds for pace calculation
-      gameDuration = Math.max(gameDuration, 60);
-    }
-
-    return calculatePlayerInsights(player.allWords, gameDuration, player.score);
-  }, [isCurrentPlayer, player.allWords, player.score]);
 
   // Filter out lifetime achievements and validate against player's actual round stats
   // This prevents showing stale achievements from previous games

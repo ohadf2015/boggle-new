@@ -68,7 +68,7 @@ describe('useFeatureUnlockNotifications', () => {
 
     // THEN - Toast shown for advanced settings unlock
     expect(toast.success).toHaveBeenCalledWith(
-      expect.stringContaining('features.unlocked.advancedSettings'),
+      expect.stringContaining('singlePlayer.features.unlocked.advancedSettings'),
       expect.any(Object)
     );
   });
@@ -86,7 +86,7 @@ describe('useFeatureUnlockNotifications', () => {
 
     // THEN - Toast shown for custom bot count unlock
     expect(toast.success).toHaveBeenCalledWith(
-      expect.stringContaining('features.unlocked.customBotCount'),
+      expect.stringContaining('singlePlayer.features.unlocked.customBotCount'),
       expect.any(Object)
     );
   });
@@ -134,7 +134,7 @@ describe('useFeatureUnlockNotifications', () => {
     expect(toast.success).not.toHaveBeenCalled();
   });
 
-  it('should handle multiple unlocks at once (e.g., returning user)', () => {
+  it('should only show the highest-threshold unlock when multiple are new (e.g., returning user)', () => {
     // GIVEN - User returns after playing many games offline (15 games total)
     // They've never seen any unlock notifications
     (useUserStats as jest.Mock).mockReturnValue({
@@ -145,19 +145,16 @@ describe('useFeatureUnlockNotifications', () => {
     // WHEN
     renderHook(() => useFeatureUnlockNotifications());
 
-    // THEN - Multiple toasts shown (advancedSettings, customBotCount, challengeMode)
-    expect(toast.success).toHaveBeenCalledTimes(3);
+    // THEN - Only ONE toast shown (the highest threshold: challengeMode at 15 games)
+    expect(toast.success).toHaveBeenCalledTimes(1);
     expect(toast.success).toHaveBeenCalledWith(
-      expect.stringContaining('features.unlocked.advancedSettings'),
+      expect.stringContaining('singlePlayer.features.unlocked.challengeMode'),
       expect.any(Object)
     );
-    expect(toast.success).toHaveBeenCalledWith(
-      expect.stringContaining('features.unlocked.customBotCount'),
-      expect.any(Object)
-    );
-    expect(toast.success).toHaveBeenCalledWith(
-      expect.stringContaining('features.unlocked.challengeMode'),
-      expect.any(Object)
-    );
+
+    // But all lower unlocks are still marked as seen in localStorage
+    expect(localStorage.getItem('feature_unlock_advancedSettings')).toBe('true');
+    expect(localStorage.getItem('feature_unlock_customBotCount')).toBe('true');
+    expect(localStorage.getItem('feature_unlock_challengeMode')).toBe('true');
   });
 });

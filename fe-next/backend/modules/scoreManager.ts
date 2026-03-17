@@ -30,6 +30,42 @@ const leaderboardThrottleTimers: Record<string, ReturnType<typeof setTimeout>> =
 const leaderboardLastBroadcast: Record<string, number> = {};
 const leaderboardPendingUpdate: Record<string, boolean> = {};
 
+// Leaderboard sort cache with dirty flag
+const leaderboardCache: Record<string, LeaderboardPlayer[]> = {};
+const leaderboardDirty: Record<string, boolean> = {};
+
+/**
+ * Periodic cleanup of stale leaderboard throttle state.
+ * Removes entries for game codes no longer in the provided active game set.
+ */
+let _staleCleanupInterval: ReturnType<typeof setInterval> | null = null;
+let _activeGamesRef: (() => Set<string>) | null = null;
+
+export function registerActiveGamesProvider(provider: () => Set<string>): void {
+  _activeGamesRef = provider;
+  if (!_staleCleanupInterval) {
+    _staleCleanupInterval = setInterval(() => {
+      if (!_activeGamesRef) return;
+      const activeGames = _activeGamesRef();
+      for (const key of Object.keys(leaderboardThrottleTimers)) {
+        if (!activeGames.has(key)) {
+          clearLeaderboardThrottle(key);
+          delete leaderboardCache[key];
+          delete leaderboardDirty[key];
+        }
+      }
+      for (const key of Object.keys(leaderboardLastBroadcast)) {
+        if (!activeGames.has(key)) {
+          delete leaderboardLastBroadcast[key];
+          delete leaderboardPendingUpdate[key];
+          delete leaderboardCache[key];
+          delete leaderboardDirty[key];
+        }
+      }
+    }, 5 * 60 * 1000); // Every 5 minutes
+  }
+}
+
 export interface AddWordOptions {
   autoValidated?: boolean;
   validated?: boolean | null;
@@ -161,7 +197,8 @@ export function updatePlayerScore(
   game: ScoreGameBase | null,
   username: string,
   score: number,
-  isDelta: boolean = false
+  isDelta: boolean = false,
+  gameCode?: string
 ): void {
   if (!game) return;
 
@@ -174,15 +211,25 @@ export function updatePlayerScore(
   } else {
     game.playerScores[username] = score;
   }
+
+  // Mark leaderboard cache as dirty
+  if (gameCode) {
+    leaderboardDirty[gameCode] = true;
+  }
 }
 
 /**
  * Get leaderboard for a game
  */
-export function getLeaderboard(game: ScoreGameBase | null): LeaderboardPlayer[] {
+export function getLeaderboard(game: ScoreGameBase | null, gameCode?: string): LeaderboardPlayer[] {
   if (!game) return [];
 
-  return Object.entries(game.playerScores)
+  // Return cached result if not dirty
+  if (gameCode && leaderboardCache[gameCode] && !leaderboardDirty[gameCode]) {
+    return leaderboardCache[gameCode];
+  }
+
+  const result = Object.entries(game.playerScores)
     .map(([username, score]) => ({
       username,
       score,
@@ -200,6 +247,14 @@ export function getLeaderboard(game: ScoreGameBase | null): LeaderboardPlayer[] 
       return true;
     })
     .sort((a, b) => b.score - a.score);
+
+  // Cache the result
+  if (gameCode) {
+    leaderboardCache[gameCode] = result;
+    leaderboardDirty[gameCode] = false;
+  }
+
+  return result;
 }
 
 /**
@@ -268,6 +323,8 @@ export function clearLeaderboardThrottle(gameCode: string): void {
   }
   delete leaderboardLastBroadcast[gameCode];
   delete leaderboardPendingUpdate[gameCode];
+  delete leaderboardCache[gameCode];
+  delete leaderboardDirty[gameCode];
 }
 
 /**
@@ -388,6 +445,7 @@ module.exports = {
 
   // Reset
   resetScoresForNewRound,
+  registerActiveGamesProvider,
 
   // First-finder tracking (for first-to-find scoring)
   getFirstFinder,

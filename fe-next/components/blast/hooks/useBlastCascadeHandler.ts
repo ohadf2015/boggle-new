@@ -66,6 +66,7 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
   const [isAutoDetecting, setIsAutoDetecting] = useState(false);
   const autoDetectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const innerCascadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [cascadeHighlightPhase, setCascadeHighlightPhase] = useState<CascadeHighlightPhase>('idle');
   const [cascadeHighlightData, setCascadeHighlightData] = useState<CascadeHighlightData | null>(null);
@@ -223,7 +224,8 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
             setCascadeHighlightPhase('idle');
             setCascadeHighlightData(null);
 
-            setTimeout(() => {
+            innerCascadeTimerRef.current = setTimeout(() => {
+              innerCascadeTimerRef.current = null;
               cascade.startCascade(newGrid, nextTileStates, handleCascadeCompleteRef.current, 0, chainLevel);
             }, 80);
           }, CASCADE_HIGHLIGHT_DURATION + CASCADE_HIGHLIGHT_LINGER);
@@ -246,6 +248,7 @@ export function useBlastCascadeHandler(deps: CascadeHandlerDeps): CascadeHandler
     return () => {
       if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
       if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+      if (innerCascadeTimerRef.current) clearTimeout(innerCascadeTimerRef.current);
     };
   }, []);
 

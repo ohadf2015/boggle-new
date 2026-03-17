@@ -1,0 +1,377 @@
+SEO & Web Vitals Action Plan
+Prepared: 2026-03-17
+Owner: Development Team
+Target Completion: 2026-04-15
+
+================================================================================
+PHASE 1: CRITICAL FIXES (SPRINT 1 - WEEK 1-2)
+================================================================================
+
+Task 1.1: Add Canonical Tags to Game Mode Pages
+Priority: CRITICAL | Time: 20 min | Files: 6 page.tsx
+
+Files to modify:
+- /app/[locale]/singleplayer/page.tsx
+- /app/[locale]/multiplayer/page.tsx
+- /app/[locale]/daily/page.tsx
+- /app/[locale]/blast/page.tsx
+- /app/[locale]/adventure/page.tsx
+- /app/[locale]/brain/page.tsx
+
+Change: Add generateMetadata function with canonical URL
+Pattern: alternates: { canonical: `https://www.lexiclash.live/{locale}/{pageName}` }
+
+Example for singleplayer:
+```
+export async function generateMetadata({ params }: PageProps) {
+  const { locale } = await params;
+  return {
+    title: 'Play Singleplayer',
+    description: '...',
+    alternates: {
+      canonical: `https://www.lexiclash.live/${locale}/singleplayer`,
+    },
+  };
+}
+```
+
+---
+
+Task 1.2: Add Noindex to Room Join Pages
+Priority: CRITICAL | Time: 10 min | File: 1 page.tsx
+
+File: /app/[locale]/join/[code]/page.tsx
+
+Change: Add generateMetadata with noindex robots directive
+
+Pattern:
+```
+robots: {
+  index: false,
+  follow: false,
+  nocache: true,
+},
+alternates: {
+  canonical: `https://www.lexiclash.live/${locale}/multiplayer`,
+},
+```
+
+Reason: Room pages create thousands of unique URLs with identical content
+
+---
+
+Task 1.3: Wire Keywords to Home Page
+Priority: HIGH | Time: 3 min | File: 1 page.tsx
+
+File: /app/[locale]/page.tsx
+
+Change: Line 33-35, add keywords field
+
+From:
+```
+return {
+  title: { absolute: titleMap[locale] || titleMap.en },
+  description: descriptionMap[locale] || descriptionMap.en,
+};
+```
+
+To:
+```
+const seo = translations[locale as keyof typeof translations]?.seo || translations.en.seo;
+return {
+  title: { absolute: titleMap[locale] || titleMap.en },
+  description: descriptionMap[locale] || descriptionMap.en,
+  keywords: seo.keywords,
+};
+```
+
+---
+
+Task 1.4: Add Metadata to Legal Pages
+Priority: HIGH | Time: 30 min | Files: 4 page.tsx
+
+Files:
+- /app/[locale]/legal/privacy/page.tsx
+- /app/[locale]/legal/terms/page.tsx
+- /app/[locale]/legal/disclaimer/page.tsx
+- /app/[locale]/legal/cookies/page.tsx
+
+Change: Add generateMetadata function to each
+
+Template:
+```
+export async function generateMetadata({ params }: PageProps) {
+  const { locale } = await params;
+  const baseUrl = 'https://www.lexiclash.live';
+
+  return {
+    title: '[PAGE TITLE]',
+    description: '[PAGE DESCRIPTION]',
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: `${baseUrl}/${locale}/legal/[page]`,
+    },
+  };
+}
+```
+
+Suggested titles/descriptions:
+- Privacy: "Privacy Policy - LexiClash"
+- Terms: "Terms of Service - LexiClash"
+- Disclaimer: "Disclaimer - LexiClash"
+- Cookies: "Cookie Policy - LexiClash"
+
+================================================================================
+PHASE 2: CORE WEB VITALS OPTIMIZATION (SPRINT 2 - WEEK 3-4)
+================================================================================
+
+Task 2.1: Localize Font Preloading
+Priority: HIGH | Time: 45 min | Impact: +50-100ms LCP improvement
+
+Current issue: All users preload both Hebrew AND Latin fonts (60-80KB waste)
+Solution: Load only relevant fonts per locale
+
+File: /app/[locale]/layout.tsx line 21-22
+
+Change imports from:
+```
+import { fredoka, rubik } from '../fonts';
+```
+
+To:
+```
+import {
+  fredokaLatin, fredokaHebrew,
+  rubikLatin, rubikHebrew
+} from '../fonts';
+```
+
+Then in LocaleLayout function:
+```
+const selectedFredoka = validLocale === 'he' ? fredokaHebrew : fredokaLatin;
+const selectedRubik = validLocale === 'he' ? rubikHebrew : rubikLatin;
+
+return (
+  <html
+    className={`dark ${selectedFredoka.variable || ''} ${selectedRubik.variable || ''}`}
+    ...
+  >
+```
+
+Expected savings:
+- Hebrew pages: Save 60-80KB Latin fonts
+- Latin pages: Save 60-80KB Hebrew fonts
+- LCP improvement: 50-100ms
+
+---
+
+Task 2.2: Optimize Mascot Image (GIF to WebP)
+Priority: HIGH | Time: 20 min | Impact: +30-50ms LCP
+
+Current: /public/mascot/main-nbg.gif (uncompressed, large)
+Solution: Convert to WebP + PNG fallback
+
+Commands:
+```bash
+cwebp -q 80 public/mascot/main-nbg.gif -o public/mascot/main-nbg.webp
+ffmpeg -i public/mascot/main-nbg.gif -vf 'fps=10' public/mascot/main-nbg.png
+```
+
+File: /app/[locale]/layout.tsx line 642
+
+Change from:
+```
+<link rel="preload" as="image" href="/mascot/main-nbg.gif" type="image/gif" fetchPriority="high" />
+```
+
+To:
+```
+<link rel="preload" as="image" href="/mascot/main-nbg.webp" type="image/webp" fetchPriority="high" />
+```
+
+Expected savings:
+- GIF to WebP: ~60% size reduction
+- LCP improvement: 30-50ms
+
+---
+
+Task 2.3: Audit & Fix Heading Hierarchy
+Priority: HIGH | Time: 45 min
+
+Create manual audit checklist for each page:
+
+Pages to check:
+- /en (Home) — H1 present? ✓/✗
+- /en/singleplayer — H1 present?
+- /en/multiplayer — H1 present?
+- /en/daily — H1 present?
+- /en/blast — H1 present?
+- /en/adventure — H1 present?
+- /en/brain — H1 present?
+- /en/blog/[article] — H1 + H2 + H3 nesting correct?
+- /en/faq — H1 present?
+- /en/tools/word-solver — H1 present?
+
+Verify for each page:
+- Exactly 1 H1
+- No heading level skips (H1 > H2 > H3, not H1 > H3)
+- Proper nesting structure
+
+Document findings in: /docs/audits/heading-hierarchy-audit-2026-03-17.md
+
+================================================================================
+PHASE 3: SCHEMA & CONTENT EXPANSION (SPRINT 3 - WEEK 5-6)
+================================================================================
+
+Task 3.1: Move FAQPage Schema to FAQ Page
+Priority: MEDIUM | Time: 20 min
+
+Current: FAQPage schema in /app/[locale]/layout.tsx (lines 326-517)
+Issue: Applies to ALL pages (adds noise)
+Solution: Move to /app/[locale]/faq/page.tsx only
+
+Steps:
+1. Copy FAQPage schema block from layout.tsx
+2. Add to faq/page.tsx in script tag
+3. Remove from layout.tsx
+
+---
+
+Task 3.2: Expand Breadcrumb Schema to All Deep Pages
+Priority: MEDIUM | Time: 60 min
+
+Current: Only home page has breadcrumb (1 item)
+Target: All pages with parents have breadcrumbs
+
+Pages to add breadcrumbs:
+- /blog/[article] → Home > Blog > Article Title
+- /guides/[slug] → Home > Guides > Guide Name
+- /tools/word-solver → Home > Tools > Word Solver
+- /faq → Home > FAQ
+- /legal/[page] → Home > Legal > Page Name
+
+Create helper file: /components/seo/generateBreadcrumbSchema.ts
+
+Function:
+```typescript
+export function generateBreadcrumbSchema(items: { name: string; url: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+```
+
+---
+
+Task 3.3: Wire Hero Images to BlogPostingJsonLd Schema
+Priority: MEDIUM | Time: 40 min
+
+Current: Blog posts have schema but no image field
+Solution: Add image parameter and render in schema
+
+File: /components/seo/BlogJsonLd.tsx
+
+Add image parameter:
+```typescript
+interface BlogJsonLdProps {
+  // ... existing fields ...
+  image?: string;
+}
+```
+
+Add to JSON output:
+```
+image: image ? {
+  '@type': 'ImageObject',
+  url: image,
+  width: 1200,
+  height: 630
+} : undefined,
+```
+
+Update each blog page call:
+```
+<BlogPostingJsonLd
+  ...
+  image={`https://www.lexiclash.live/blog/${slug}/hero.jpg`}
+/>
+```
+
+================================================================================
+PHASE 4: MONITORING & VALIDATION (ONGOING)
+================================================================================
+
+Monthly Tasks (First Monday of Each Month):
+
+1. Check Google Search Console
+   - Admin > Crawl > Coverage — any new indexation errors?
+   - Enhancements > International Targeting — hreflang correct?
+   - Top Queries > Review new search terms
+
+2. Core Web Vitals Monitoring
+   - Run Lighthouse on https://www.lexiclash.live/en
+   - Compare LCP, INP, CLS to baseline
+   - Note any regressions
+
+3. Content Quality
+   - New blog posts indexed?
+   - Old articles still getting traffic? If < 1000/month, consider noindex
+   - Check for broken links in search results
+
+4. Backlinks & Authority
+   - Check Ahrefs/SEMrush for new mentions
+   - Respond to partnership opportunities
+
+================================================================================
+SUCCESS METRICS
+================================================================================
+
+Target by 2026-04-15:
+
+Metric                    Baseline → Target
+Indexed Pages             ~500 → 700+
+LCP                       2.2s → 2.0s
+CLS                       0.05 → 0.02
+Canonical Coverage        70% → 100%
+Metadata Completeness     85% → 95%
+JSON-LD Schema Types      8 → 10+
+Organic Traffic (month 2) 100/mo → 150/mo
+Search Impressions (mo 3) 500/mo → 1000/mo
+
+================================================================================
+DEPLOYMENT CHECKLIST
+================================================================================
+
+Before deploying:
+
+[ ] npm run test — All tests passing?
+[ ] npm run lint — No lint errors?
+[ ] npm run build — Build succeeds?
+[ ] Verify metadata output: curl http://localhost:3000/en | grep canonical
+[ ] Verify JSON-LD: curl http://localhost:3000/en | grep "application/ld+json"
+
+After deploying to production:
+
+[ ] curl https://www.lexiclash.live/en | grep canonical
+[ ] curl https://www.lexiclash.live/en/singleplayer | grep canonical
+[ ] Run PageSpeed Insights: https://pagespeed.web.dev
+[ ] Submit sitemap to GSC: https://search.google.com/search-console/sitemaps
+
+================================================================================
+REFERENCE LINKS
+================================================================================
+
+Google Search Console: https://search.google.com/search-console
+PageSpeed Insights: https://pagespeed.web.dev
+Rich Results Test: https://search.google.com/test/rich-results
+Schema Validator: https://validator.schema.org
+Next.js Metadata API: https://nextjs.org/docs/app/building-your-application/optimizing/metadata
+
+================================================================================

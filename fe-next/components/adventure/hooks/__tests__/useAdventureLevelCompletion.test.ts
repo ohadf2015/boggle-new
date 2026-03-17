@@ -24,6 +24,7 @@ describe('useAdventureLevelCompletion', () => {
   const mockPauseGame = jest.fn();
   const mockShowVictory = jest.fn();
   const mockShowDefeat = jest.fn();
+  const mockCompleteLevel = jest.fn();
   const mockEndBossBattle = jest.fn();
   const mockTriggerBossTaunt = jest.fn();
 
@@ -48,6 +49,7 @@ describe('useAdventureLevelCompletion', () => {
     endAIDirector: mockEndAIDirector,
     handleEarnAchievement: mockHandleEarnAchievement,
     pauseGame: mockPauseGame,
+    completeLevel: mockCompleteLevel,
     showVictory: mockShowVictory,
     showDefeat: mockShowDefeat,
     showLevelComplete: false,
@@ -281,13 +283,15 @@ describe('useAdventureLevelCompletion', () => {
         })
       );
 
-      expect(mockRecordCompletion).toHaveBeenCalledWith({
-        isCompletion: true,
-        timeRemaining: 60,
-        timerSeconds: 120,
-        score: 100,
-        words: 2,
-      });
+      expect(mockRecordCompletion).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isCompletion: true,
+          timeRemaining: 60,
+          timerSeconds: 120,
+          score: 100,
+          words: 2,
+        })
+      );
     });
 
     it('should end AI director on completion', () => {

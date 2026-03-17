@@ -145,7 +145,7 @@ export default function AvatarBuilderModal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60" role="presentation" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <AdaptiveMotion.div
         role="dialog"
         aria-modal="true"

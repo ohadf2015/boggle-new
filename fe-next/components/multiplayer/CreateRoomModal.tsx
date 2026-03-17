@@ -127,17 +127,19 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
           {/* Username Input */}
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
+            <Label htmlFor="create-username" className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
               {t('multiplayerFlow.createModal.yourName')}
             </Label>
             {isAuthenticated ? (
               <Input
+                id="create-username"
                 value={username}
                 disabled
                 className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
               />
             ) : isEditingName ? (
               <Input
+                id="create-username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onBlur={() => { setIsEditingName(false); setShowNameError(true); }}
@@ -180,13 +182,14 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
           {/* Room Name Input */}
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
+            <Label htmlFor="create-room-name" className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
               {t('multiplayerFlow.createModal.roomNameLabel')}{' '}
               <span className="font-normal text-slate-400 dark:text-slate-500">
                 ({t('multiplayerFlow.createModal.optional')})
               </span>
             </Label>
             <Input
+              id="create-room-name"
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
               maxLength={30}

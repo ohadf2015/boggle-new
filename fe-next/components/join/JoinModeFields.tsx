@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
@@ -195,10 +196,11 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                 />
               ) : profile?.profile_picture_url ? (
                 <div className="w-12 h-12 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm group-hover:border-neo-cyan transition-colors">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={profile.profile_picture_url}
                     alt={displayName}
+                    width={48}
+                    height={48}
                     className="w-full h-full object-cover"
                   />
                 </div>

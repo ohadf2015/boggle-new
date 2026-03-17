@@ -5,19 +5,38 @@
  * GET  - Fetch recent blast results and personal bests for current user
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { validateBlastResult, calculatePersonalBests, type PersonalBests } from '../utils';
+import { captureApiError } from '@/utils/sentry';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// Lazy-init to avoid crash on missing env vars
+function getSupabaseConfig() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return { url, key };
+}
 
 /**
  * POST /api/blast/result
  * Save a blast game result and update personal bests
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // Rate limit: 20 requests per minute
+  const rateLimitResult = checkApiRateLimit(request, 'blast-result', {
+    maxRequests: 20,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests' },
+      { status: 429 }
+    );
+  }
+
   try {
     // Auth check
     const authSupabase = await createClient();
@@ -43,37 +62,49 @@ export async function POST(request: Request) {
     }
 
     const data = validation.data;
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
+    const config = getSupabaseConfig();
+    if (!config) {
+      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+    }
+    const supabase = createServiceClient(config.url, config.key);
 
-    // Insert game result
-    const { error: insertError } = await supabase
-      .from('blast_results')
-      .insert({
-        user_id: userId,
-        score: data.score,
-        tiles_cleared: data.tilesCleared,
-        total_tiles: data.totalTiles,
-        clear_percentage: data.clearPercentage,
-        words_found: data.wordsFound.length,
-        best_word: data.bestWord,
-        max_combo: data.maxCombo,
-        stars: data.stars,
-        difficulty: data.difficulty,
-        language: data.language,
-      });
+    // Insert game result and fetch personal bests in parallel
+    const [insertResult, bestsResult] = await Promise.all([
+      supabase
+        .from('blast_results')
+        .insert({
+          user_id: userId,
+          score: data.score,
+          tiles_cleared: data.tilesCleared,
+          total_tiles: data.totalTiles,
+          clear_percentage: data.clearPercentage,
+          words_found: data.wordsFound.length,
+          best_word: data.bestWord,
+          max_combo: data.maxCombo,
+          stars: data.stars,
+          difficulty: data.difficulty,
+          language: data.language,
+        }),
+      supabase
+        .from('blast_personal_bests')
+        .select('best_score, best_clear_percentage, best_max_combo, total_games, total_words')
+        .eq('user_id', userId)
+        .eq('difficulty', data.difficulty)
+        .single(),
+    ]);
 
+    const { error: insertError } = insertResult;
     if (insertError) {
+      // PGRST205 = table/view not found — migration hasn't been applied yet
+      if (insertError.code === 'PGRST205') {
+        console.warn('[BLAST API] blast_results table not found (migration pending). Skipping save.');
+        return NextResponse.json({ success: true, personalBests: null, isNewBestScore: false, isNewBestCombo: false, migrationPending: true });
+      }
       console.error('[BLAST API] Insert result error:', insertError.message, insertError.code, { userId, difficulty: data.difficulty, score: data.score });
       return NextResponse.json({ error: `Failed to save result: ${insertError.code || 'unknown'}` }, { status: 500 });
     }
 
-    // Fetch existing personal bests for this difficulty
-    const { data: existingBests } = await supabase
-      .from('blast_personal_bests')
-      .select('best_score, best_clear_percentage, best_max_combo, total_games, total_words')
-      .eq('user_id', userId)
-      .eq('difficulty', data.difficulty)
-      .single();
+    const { data: existingBests } = bestsResult;
 
     const existing: PersonalBests | null = existingBests
       ? {
@@ -149,6 +180,7 @@ export async function POST(request: Request) {
       isNewBestCombo,
     });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/blast/result', { method: 'POST' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[BLAST API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -170,7 +202,11 @@ export async function GET(request: Request) {
     }
 
     const userId = user.id;
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
+    const config = getSupabaseConfig();
+    if (!config) {
+      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+    }
+    const supabase = createServiceClient(config.url, config.key);
 
     // Parse optional difficulty filter from query
     const { searchParams } = new URL(request.url);
@@ -239,6 +275,7 @@ export async function GET(request: Request) {
       personalBests,
     });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/blast/result', { method: 'GET' });
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[BLAST API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

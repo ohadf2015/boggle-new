@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -68,8 +68,8 @@ interface ProgressionContextType {
   getLevelCompletion: (worldId: number, levelId: number) => LevelCompletion | undefined;
   /** Get attempt data for a specific level (includes failed attempts) */
   getLevelAttempt: (worldId: number, levelId: number) => LevelAttempt | undefined;
-  /** Update gold and upgrades (optimistic + persisted to API) */
-  updateCurrency: (gold: number, upgrades: Record<string, number>) => Promise<void>;
+  /** Purchase upgrade by ID — server validates cost, optimistic + reconcile */
+  updateCurrency: (upgradeId: string, optimisticGold: number, optimisticUpgrades: Record<string, number>) => Promise<void>;
 }
 
 // ==============================================
@@ -396,30 +396,42 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [attempts]
   );
 
-  // Update currency (gold + upgrades) — optimistic local update + API persist
+  // Purchase upgrade by ID — server validates cost and deducts gold
   const updateCurrency = useCallback(
-    async (newGold: number, newUpgrades: Record<string, number>) => {
-      // Optimistic update
+    async (upgradeId: string, optimisticGold: number, optimisticUpgrades: Record<string, number>) => {
+      // Optimistic update for instant UI feedback
       setProgression((prev) => {
         if (!prev) return prev;
-        return { ...prev, gold: newGold, upgrades: newUpgrades };
+        return { ...prev, gold: optimisticGold, upgrades: optimisticUpgrades };
       });
 
-      // Persist to server
+      // Server-side validation and persistence
       if (user?.id) {
         try {
-          await fetch('/api/adventure/purchase', {
+          const res = await fetch('/api/adventure/purchase', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ gold: newGold, upgrades: newUpgrades }),
+            body: JSON.stringify({ upgradeId }),
           });
+          if (res.ok) {
+            const data = await res.json();
+            // Reconcile with server-authoritative values
+            setProgression((prev) => {
+              if (!prev) return prev;
+              return { ...prev, gold: data.gold, upgrades: data.upgrades };
+            });
+          } else {
+            // Revert optimistic update on failure
+            fetchProgression();
+          }
         } catch (err) {
           console.error('[ProgressionContext] Purchase persist error:', err);
+          fetchProgression();
         }
       }
     },
-    [user?.id]
+    [user?.id, fetchProgression]
   );
 
   // Initial fetch on mount (when auth is ready)

@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useMobilePortrait } from '@/hooks/useMobilePortrait';
 import { cn } from '@/lib/utils';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
@@ -37,6 +38,7 @@ import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
 import { useEvents } from '@/hooks/useEvents';
+import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -50,7 +52,12 @@ const PlayfulBackground = dynamic(
   { ssr: false }
 );
 
-const LandingView: React.FC = () => {
+interface LandingViewProps {
+  /** Pre-fetched server data — eliminates client-side waterfall fetches */
+  initialData?: LandingInitialData;
+}
+
+const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, unlockAudio, TRACKS } = useMusic();
@@ -61,10 +68,18 @@ const LandingView: React.FC = () => {
   const { allTimeBest: playerAllTimeBest } = usePlayerStats();
   const dailyChallengeStatus = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
   const { activeEvents, myEvents, joinEvent: joinEventAction } = useEvents();
-  const { players: topPlayers, loading: topPlayersLoading } = useTopPlayers(5);
-  const { activePlayers, gamesToday, gameModes, languages: langCount } = useLandingStats();
-  const { solveRate } = useDailySolveRate(language);
-  const { champions, loading: hallLoading } = useHallOfFame(5);
+  const { players: topPlayers, loading: topPlayersLoading } = useTopPlayers(5, {
+    initialData: initialData?.topPlayers,
+  });
+  const { activePlayers, gamesToday, gameModes, languages: langCount } = useLandingStats({
+    initialGamesToday: initialData?.gamesToday,
+  });
+  const { solveRate } = useDailySolveRate(language, {
+    initialSolveRate: initialData?.solveRate,
+  });
+  const { champions, loading: hallLoading } = useHallOfFame(5, {
+    initialData: initialData?.topPlayers,
+  });
   const [dismissedEventIds, setDismissedEventIds] = useState<Set<string>>(new Set());
   const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
 
@@ -270,7 +285,7 @@ const LandingView: React.FC = () => {
               initial={{ opacity: 0, y: 10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 5, scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              transition={SPRING_PRESETS.gentle}
               className="relative"
             >
               <motion.div

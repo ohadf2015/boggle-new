@@ -4,15 +4,25 @@ import { useEffect, useState } from 'react';
 import { useLiveRoomStats } from './useLiveRoomStats';
 import { supabase } from '@/lib/supabase';
 
+interface UseLandingStatsOptions {
+  /** Pre-fetched server value — skips client fetch */
+  initialGamesToday?: number;
+}
+
 /**
  * Aggregates stats for the landing page social proof bar.
  * Uses live room stats for dynamic values, static values for game modes/languages.
+ * Pass `initialGamesToday` from server component to avoid a client-side Supabase round-trip.
  */
-export function useLandingStats() {
+export function useLandingStats(options: UseLandingStatsOptions = {}) {
+  const { initialGamesToday } = options;
   const { activePlayers, isLoading } = useLiveRoomStats();
-  const [gamesToday, setGamesToday] = useState(0);
+  const [gamesToday, setGamesToday] = useState(initialGamesToday ?? 0);
 
   useEffect(() => {
+    // Skip client fetch when server data was provided
+    if (initialGamesToday !== undefined) return;
+
     let cancelled = false;
     const today = new Date().toISOString().slice(0, 10);
 
@@ -25,7 +35,7 @@ export function useLandingStats() {
       });
 
     return () => { cancelled = true; };
-  }, []);
+  }, [initialGamesToday]);
 
   return {
     activePlayers,

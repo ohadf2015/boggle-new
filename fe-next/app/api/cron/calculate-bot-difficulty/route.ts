@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { captureApiError } from '@/utils/sentry';
 
@@ -33,7 +34,8 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const expected = `Bearer ${cronSecret}`;
+    if (!cronSecret || !authHeader || authHeader.length !== expected.length || !timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected))) {
       console.error('[Cron] Unauthorized: Invalid cron secret');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

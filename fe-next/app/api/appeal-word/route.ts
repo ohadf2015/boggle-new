@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { captureApiError } from '@/utils/sentry';
 
 interface AppealWordResponse {
   success: boolean;
@@ -88,6 +89,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AppealWor
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/appeal-word', { method: 'POST' });
     console.error('[AppealWord] Error:', (error as Error).message);
     return NextResponse.json({ success: true });
   }

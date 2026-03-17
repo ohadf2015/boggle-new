@@ -201,6 +201,7 @@ export interface Game {
   gameDuration?: number;
   tournamentId: string | null;
   reconnectionTimeout: ReturnType<typeof setTimeout> | null;
+  hostReconnectionTimeout?: ReturnType<typeof setTimeout> | null;
   validationTimeout?: ReturnType<typeof setTimeout> | null;
   isRanked: boolean;
   allowLateJoin: boolean;

@@ -82,6 +82,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
           <button
             data-testid="challenge-dismiss"
             onClick={onDismiss}
+            aria-label={t('common.dismiss')}
             className={cn('w-4 h-4 flex items-center justify-center flex-shrink-0',
               isFailed ? 'text-neo-red/50' : isComplete ? 'text-neo-black/50' : 'text-neo-white/40'
             )}

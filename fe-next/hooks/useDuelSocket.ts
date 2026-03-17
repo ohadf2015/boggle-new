@@ -115,16 +115,20 @@ export function useDuelSocket(): UseDuelSocketReturn {
     setIsConnected(socket.connected);
 
     // Connection handlers
-    socket.on('connect', () => {
+    const handleConnect = () => {
       setIsConnected(true);
-    });
-
-    socket.on('disconnect', () => {
+    };
+    const handleDisconnect = () => {
       setIsConnected(false);
-    });
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
 
     // Cleanup on unmount
     return () => {
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
       // Capture listeners map for cleanup
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const listeners = listenersRef.current;

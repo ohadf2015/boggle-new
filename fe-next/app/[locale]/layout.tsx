@@ -54,13 +54,13 @@ function getLocalePath(locale: string): string {
 }
 
 function getLanguageCode(locale: string): string {
-    return SUPPORTED_LOCALES.has(locale) ? locale : 'he';
+    return SUPPORTED_LOCALES.has(locale) ? locale : 'en';
 }
 
 export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
     const { locale } = await params;
-    const validLocale = (locale as Locale) || 'he';
-    const seo = translations[validLocale]?.seo || translations.he.seo;
+    const validLocale = (locale as Locale) || 'en';
+    const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
 
     // Use locale-specific OG image (WebP format for faster loading)
@@ -670,9 +670,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <a
                     href="#main-content"
                     className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-3 focus:min-h-[48px] focus:min-w-[48px] focus:bg-neo-lime focus:text-neo-black focus:font-bold focus:border-3 focus:border-neo-black focus:rounded-neo focus:shadow-hard focus:outline-none focus:flex focus:items-center focus:justify-center focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2"
-                    aria-label={validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
+                    aria-label={translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
                 >
-                    {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
+                    {translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
                 </a>
                 {/* Google Consent Mode v2 — MUST load before GA/AdSense */}
                 <GoogleConsentMode />
@@ -692,14 +692,14 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     privacy/terms/about links even without JS execution (AdSense requirement) */}
                 <nav aria-label="Site Navigation" className="sr-only">
                     <ul>
-                        <li><a href={`/${validLocale}/how-to-play`}>How to Play</a></li>
-                        <li><a href={`/${validLocale}/blog`}>Blog</a></li>
-                        <li><a href={`/${validLocale}/faq`}>FAQ</a></li>
-                        <li><a href={`/${validLocale}/about`}>About LexiClash</a></li>
-                        <li><a href={`/${validLocale}/contact`}>Contact Us</a></li>
-                        <li><a href={`/${validLocale}/legal/privacy`}>Privacy Policy</a></li>
-                        <li><a href={`/${validLocale}/legal/terms`}>Terms of Service</a></li>
-                        <li><a href={`/${validLocale}/legal/disclaimer`}>Disclaimer</a></li>
+                        <li><a href={`/${validLocale}/how-to-play`}>{translations[validLocale]?.nav?.howToPlay || 'How to Play'}</a></li>
+                        <li><a href={`/${validLocale}/blog`}>{translations[validLocale]?.nav?.blog || 'Blog'}</a></li>
+                        <li><a href={`/${validLocale}/faq`}>{translations[validLocale]?.nav?.faq || 'FAQ'}</a></li>
+                        <li><a href={`/${validLocale}/about`}>{translations[validLocale]?.nav?.aboutLexiClash || 'About LexiClash'}</a></li>
+                        <li><a href={`/${validLocale}/contact`}>{translations[validLocale]?.nav?.contactUs || 'Contact Us'}</a></li>
+                        <li><a href={`/${validLocale}/legal/privacy`}>{translations[validLocale]?.nav?.privacyPolicy || 'Privacy Policy'}</a></li>
+                        <li><a href={`/${validLocale}/legal/terms`}>{translations[validLocale]?.nav?.termsOfService || 'Terms of Service'}</a></li>
+                        <li><a href={`/${validLocale}/legal/disclaimer`}>{translations[validLocale]?.nav?.disclaimer || 'Disclaimer'}</a></li>
                     </ul>
                 </nav>
                 <ConditionalProviders lang={validLocale}>

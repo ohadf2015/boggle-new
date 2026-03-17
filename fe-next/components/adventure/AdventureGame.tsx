@@ -177,22 +177,25 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Boss objective tracking — sync boss state to reducer objectives
     // defeatBoss: track boss HP depletion as percentage
+    // NOTE: must NOT guard on isBossActive — when boss HP reaches 0,
+    // isActive becomes false in the same React batch as hp=0, so the
+    // guard would skip the final 100% update.
     useEffect(() => {
-      if (!isBossLevel || !bossOrch.isBossActive) return;
+      if (!isBossLevel) return;
       const depleted = bossOrch.bossMaxHP > 0
         ? Math.round(((bossOrch.bossMaxHP - bossOrch.bossCurrentHP) / bossOrch.bossMaxHP) * 100)
         : 0;
       updateObjective('defeatBoss', depleted, 'set');
-    }, [isBossLevel, bossOrch.isBossActive, bossOrch.bossCurrentHP, bossOrch.bossMaxHP, updateObjective]);
+    }, [isBossLevel, bossOrch.bossCurrentHP, bossOrch.bossMaxHP, updateObjective]);
 
     // surviveBattle: track player health percentage (updated continuously)
     useEffect(() => {
-      if (!isBossLevel || !bossOrch.isBossActive) return;
+      if (!isBossLevel) return;
       const healthPct = bossOrch.playerHealthState.maxHP > 0
         ? Math.round((bossOrch.playerHealthState.currentHP / bossOrch.playerHealthState.maxHP) * 100)
         : 100;
       updateObjective('surviveBattle', healthPct, 'set');
-    }, [isBossLevel, bossOrch.isBossActive, bossOrch.playerHealthState.currentHP, bossOrch.playerHealthState.maxHP, updateObjective]);
+    }, [isBossLevel, bossOrch.playerHealthState.currentHP, bossOrch.playerHealthState.maxHP, updateObjective]);
 
     // mechanicTrigger: increment when boss grid effect triggers
     const prevGridEffectRef = useRef(bossOrch.gridEffectTrigger);
@@ -248,7 +251,6 @@ const AdventureGame = memo<AdventureGameProps>(
       tiles, gridSize: levelConfig.gridSize, disabled: !isPlaying || isPaused || isValidating, gridRef,
       onClickSubmit: handleClickSubmit,
     });
-    const effectiveCurrentWord = currentWord;
 
     const { hasHintsAvailable, getHint, currentHint, clearCurrentHint, recordActivity, showAutoHint, dismissAutoHint, remainingHintWords, findPathForWord } = useAdventureHints({
       grid: initialGrid, language: language || 'en', foundWords: gameState.wordsFound,
@@ -307,7 +309,7 @@ const AdventureGame = memo<AdventureGameProps>(
       awardXp: init.awardXp, addGold: init.addGold,
       recordAttempt, recordCompletion: init.recordCompletion,
       endAIDirector: init.endAIDirector, handleEarnAchievement: init.handleEarnAchievement,
-      pauseGame, showVictory: cinematics.showVictory, showDefeat: cinematics.showDefeat,
+      pauseGame, completeLevel, showVictory: cinematics.showVictory, showDefeat: cinematics.showDefeat,
       showLevelComplete, showVictoryCinematic: cinematics.showVictoryCinematic,
       showDefeatCinematic: cinematics.showDefeatCinematic, isBossLevel,
       isBossActive: bossOrch.isBossActive, bossHealthPhase: bossOrch.bossHealthState.phase,
@@ -371,16 +373,12 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [markCascadeComplete, entryPhaseManager, isPlaying, startGame, init, getHint]);
 
-    // Keep callbacks for backward compat but they're no longer triggered in the normal flow
-    const handleObjectivesComplete = useCallback(() => {
+    // Shared handler for objectives/title entry phases (no longer triggered in normal flow,
+    // but still passed as props for backward compat)
+    const handleEntryPhaseComplete = useCallback(() => {
       entryPhaseManager.advanceToPlaying();
       if (!isPlaying) { startGame(); init.startAIDirector(); }
     }, [entryPhaseManager, isPlaying, startGame, init]);
-
-    const handleTitleComplete = useCallback(() => {
-      entryPhaseManager.advanceToPlaying();
-      if (!isPlaying) { startGame(); init.startAIDirector(); }
-    }, [isPlaying, startGame, init, entryPhaseManager]);
 
     const calculateTileCenter = useCallback((row: number, col: number) => {
       if (!gridRef.current) return { x: 0, y: 0 };
@@ -566,7 +564,7 @@ const AdventureGame = memo<AdventureGameProps>(
               lastAccepted={wordSubmit.lastAccepted}
               selectedLength={selectedIndices.length} minWordLength={minWordLength}
               wordFeedback={wordSubmit.wordFeedback}
-              currentWord={effectiveCurrentWord}
+              currentWord={currentWord}
               worldId={levelConfig.world}
               hintLevel={init.hintData.level}
               bossGridEffect={bossOrch.gridEffectTrigger}
@@ -574,7 +572,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }
           sidebar={
             <GameSidebar objectives={objectives}
-              showSlideIn={entryPhase === 'objectives'} onSlideInComplete={handleObjectivesComplete}
+              showSlideIn={entryPhase === 'objectives'} onSlideInComplete={handleEntryPhaseComplete}
               hasHintsAvailable={hasHintsAvailable} onHintClick={handleHintClick}
               showAutoHint={showAutoHint} currentHint={currentHint}
               hintLevel={init.hintData.level}
@@ -587,6 +585,8 @@ const AdventureGame = memo<AdventureGameProps>(
               canDetonate={init.upgradeEffects.canDetonateWords}
               detonateActive={detonateActive}
               onDetonateToggle={() => setDetonateActive(prev => !prev)}
+              chapterQuests={chapterQuests.quests}
+              chapterQuestProgress={chapterQuests.progress}
               className="border-b-2 lg:border-b-0 lg:border-s-2 border-neo-black/30" />
           }
           overlays={
@@ -625,7 +625,7 @@ const AdventureGame = memo<AdventureGameProps>(
                 onResume={handlePauseToggle} onRestart={handleRetry} onExit={onExit} />
 
               <LevelEntryOverlay levelNumber={levelConfig.level} worldNumber={levelConfig.world}
-                isVisible={entryPhase === 'title'} onComplete={handleTitleComplete} />
+                isVisible={entryPhase === 'title'} onComplete={handleEntryPhaseComplete} />
 
               {cinematics.showVictoryCinematic && (
                 <CinematicPlayer
@@ -664,14 +664,15 @@ const AdventureGame = memo<AdventureGameProps>(
               />
 
               {!isBossLevel && (
-                <LevelCompleteModal isOpen={showLevelComplete && cinematics.cinematicComplete}
+                <LevelCompleteModal isOpen={showLevelComplete}
                   stars={gameState.stars} score={gameState.score} objectives={objectives}
                   levelNumber={levelConfig.level} worldNumber={levelConfig.world}
                   onContinue={handleContinue} onRetry={handleRetry} onExit={onExit}
                   totalStars={totalStars} bestAttempt={bestAttempt}
                   xpEarned={levelCompletion.earnedXp} goldEarned={levelCompletion.earnedGold}
                   isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD}
-                  onNextWorld={onNextWorld} />
+                  onNextWorld={onNextWorld}
+                  canRetryFree={retriesUsed < (init.upgradeEffects.freeRetriesPerWorld ?? 0)} />
               )}
 
               {storyBeat && (

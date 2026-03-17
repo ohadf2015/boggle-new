@@ -7,7 +7,7 @@
 
 'use client';
 
-import { memo, useEffect } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Check, X, Trophy, RotateCcw, LogOut, Coins, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { InteractiveMascot, type ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { RollingNumber } from './ui/RollingNumber';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
@@ -61,6 +62,8 @@ interface LevelCompleteModalProps {
   lootDrops?: Array<{ type: string; rarity: string; label?: string }>;
   /** Story beat text to show inline */
   storyBeatText?: string;
+  /** Whether the player can retry for free (Salvage Claw upgrade) */
+  canRetryFree?: boolean;
 }
 
 /**
@@ -118,12 +121,16 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     onNextWorld,
     lootDrops = [],
     storyBeatText,
+    canRetryFree = false,
   }) => {
     const { t } = useLanguage();
+    const dialogRef = useRef<HTMLDivElement>(null);
     const isPerfect = stars === 3;
     const isFailed = stars === 0;
     const prefersReducedMotion = usePrefersReducedMotion();
     const particleBudget = useParticleBudget();
+
+    useFocusTrap(dialogRef, isOpen, onExit);
 
     // Count completed objectives
     const completedCount = objectives.filter((o) => o.isComplete).length;
@@ -137,20 +144,6 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
         }
       }
     }, [isOpen, isFailed, prefersReducedMotion, particleBudget.combo]);
-
-    // ESC key handler
-    useEffect(() => {
-      if (!isOpen) return;
-
-      function handleKeyDown(event: KeyboardEvent): void {
-        if (event.key === 'Escape') {
-          onExit();
-        }
-      }
-
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, onExit]);
 
     // Scroll lock
     useEffect(() => {
@@ -168,6 +161,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     return (
       <AnimatePresence>
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="level-complete-title"
@@ -384,7 +378,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     ) : (
                       <X className="w-4 h-4 flex-shrink-0" />
                     )}
-                    <span>{t(OBJECTIVE_TRANSLATION_KEYS[objective.type])}</span>
+                    <span>{t(OBJECTIVE_TRANSLATION_KEYS[objective.type], { target: objective.target })}</span>
                     <span className="ms-auto font-mono">
                       {objective.current}/{objective.target}
                     </span>
@@ -500,7 +494,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 )}
               >
                 <RotateCcw className="w-5 h-5" />
-                {t('adventure.retryLevel')}
+                {canRetryFree ? t('adventure.freeRetry') : t('adventure.retryLevel')}
               </button>
 
               {/* Exit Button */}

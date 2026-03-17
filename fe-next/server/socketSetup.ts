@@ -4,6 +4,7 @@
  */
 
 import { Server } from 'socket.io';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { initializeSocketHandlers } from '../backend/socketHandlers';
 import { cleanupStaleGames, cleanupEmptyRooms, getActiveRooms } from '../backend/modules/gameStateManager';
 import { broadcastActiveRooms } from '../backend/utils/socketHelpers';
@@ -57,6 +58,48 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
       console.warn(`[SOCKET.IO] Connection rejected: limit reached (${currentConnections}/${MAX_CONNECTIONS})`);
       return next(new Error('Server at capacity, please try again later'));
     }
+    next();
+  });
+
+  // Authentication middleware — verify Supabase JWT if provided.
+  // Guests (no token) are allowed but get no verifiedUserId.
+  // Authenticated users get their verified ID stored on socket.data.
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  io.use(async (socket, next) => {
+    const token = socket.handshake.auth?.token as string | undefined;
+
+    if (!token) {
+      // Guest connection — allowed but unverified
+      socket.data.verifiedUserId = null;
+      return next();
+    }
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.warn('[SOCKET.IO] Auth middleware: Supabase not configured, skipping verification');
+      socket.data.verifiedUserId = null;
+      return next();
+    }
+
+    try {
+      const supabase = createSupabaseClient(supabaseUrl, supabaseServiceKey);
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+
+      if (error || !user) {
+        console.warn(`[SOCKET.IO] Invalid auth token from ${socket.id}: ${error?.message || 'no user'}`);
+        socket.data.verifiedUserId = null;
+        // Don't reject — allow as guest, but log the failed auth attempt
+        return next();
+      }
+
+      socket.data.verifiedUserId = user.id;
+      socket.data.verifiedEmail = user.email;
+    } catch (err) {
+      console.error('[SOCKET.IO] Auth verification error:', err);
+      socket.data.verifiedUserId = null;
+    }
+
     next();
   });
 

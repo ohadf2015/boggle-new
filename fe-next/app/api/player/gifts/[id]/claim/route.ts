@@ -48,7 +48,7 @@ export async function POST(
 
     if (!claimResult.success) {
       return NextResponse.json(
-        { error: 'Gift not found, already claimed, or not yours' },
+        { error: 'Cannot claim gift' },
         { status: 400 }
       );
     }

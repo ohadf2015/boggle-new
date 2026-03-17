@@ -57,11 +57,21 @@ export default function GlobalError({
     });
   }, [error]);
 
-  // Use English as fallback for global errors
+  // Detect locale from URL path (e.g. /he/...) or fallback to 'en'
+  const detectedLocale = (() => {
+    try {
+      const match = window.location.pathname.match(/^\/(he|en|sv|ja|es)\b/);
+      return (match?.[1] as keyof typeof translations) || 'en';
+    } catch {
+      return 'en' as const;
+    }
+  })();
+  const isRTL = detectedLocale === 'he';
+
   const t = (path: string): string => {
     try {
       const keys = path.split(".");
-      let current: unknown = translations.en;
+      let current: unknown = translations[detectedLocale] || translations.en;
       for (const key of keys) {
         current = (current as Record<string, unknown>)[key];
         if (current === undefined) return path;
@@ -73,7 +83,7 @@ export default function GlobalError({
   };
 
   return (
-    <html lang="en">
+    <html lang={detectedLocale} dir={isRTL ? 'rtl' : 'ltr'}>
       <body className="antialiased">
         <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-cyan-50 via-lime-50 to-cyan-100">
           <div className="max-w-xl w-full text-center p-8 neo-card bg-neo-cream text-neo-black rotate-[-1deg] animate-neo-pop">
@@ -100,7 +110,7 @@ export default function GlobalError({
                 onClick={() => (window.location.href = "/")}
                 className="btn-neo-secondary px-6 py-3 text-lg"
               >
-                🏠 Go Home
+                🏠 {t("errors.goHome")}
               </button>
             </div>
 

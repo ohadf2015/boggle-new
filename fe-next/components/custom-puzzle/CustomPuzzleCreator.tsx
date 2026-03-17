@@ -303,6 +303,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 <button
                   onClick={onClose}
                   className="w-8 h-8 bg-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm hover:bg-neo-lime transition-colors"
+                  aria-label={t('common.close')}
                 >
                   <X className="w-4 h-4 text-neo-black" />
                 </button>

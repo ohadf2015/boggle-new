@@ -28,7 +28,7 @@ interface ChallengeViewProps {
  * Players compete on the exact same board as the challenge creator
  */
 const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { user, profile, isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const router = useRouter();
@@ -162,7 +162,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             'text-xl font-black uppercase mb-2',
             isDark ? 'text-white' : 'text-gray-900'
           )}>
-            {language === 'he' ? 'אופס!' : 'Oops!'}
+            {t('challengeView.oops')}
           </h2>
           <p className={cn('mb-6', isDark ? 'text-gray-300' : 'text-gray-600')}>
             {error}
@@ -171,7 +171,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             onClick={() => router.push(`/${language}`)}
             className="w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition-all font-bold"
           >
-            {language === 'he' ? 'חזרה לדף הבית' : 'Back to Home'}
+            {t('challengeView.backToHome')}
           </Button>
         </motion.div>
       </div>
@@ -200,7 +200,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             )}
           >
             <ArrowLeft size={16} className="rtl:rotate-180" />
-            {language === 'he' ? 'חזרה' : 'Back'}
+            {t('challengeView.back')}
           </button>
 
           {/* Challenge Card */}
@@ -227,10 +227,10 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                 'text-2xl font-black uppercase tracking-wide',
                 isDark ? 'text-white' : 'text-gray-900'
               )}>
-                {language === 'he' ? 'אתגר!' : 'Challenge!'}
+                {t('challengeView.title')}
               </h1>
               <p className={cn('text-sm mt-1', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                {language === 'he' ? 'תנצחו את הניקוד הזה?' : 'Can you beat this score?'}
+                {t('challengeView.beatScore')}
               </p>
             </div>
 
@@ -253,7 +253,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                   {challenge.creatorUsername}
                 </p>
                 <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'יצר את האתגר' : 'created this challenge'}
+                  {t('challengeView.createdChallenge')}
                 </p>
               </div>
             </div>
@@ -267,7 +267,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                 'text-sm font-bold uppercase tracking-wide mb-2',
                 isDark ? 'text-yellow-300' : 'text-yellow-700'
               )}>
-                {language === 'he' ? 'ניקוד לניצחון' : 'Score to Beat'}
+                {t('challengeView.scoreToBeat')}
               </p>
               <div className="flex items-center justify-center gap-2">
                 <Crown className="w-8 h-8 text-yellow-500" />
@@ -282,12 +282,12 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                 'text-sm mt-2',
                 isDark ? 'text-gray-300' : 'text-gray-600'
               )}>
-                {challenge.creatorWordCount} {language === 'he' ? 'מילים' : 'words'}
+                {challenge.creatorWordCount} {t('challengeView.words')}
                 {challenge.creatorLongestWord && (
                   <>
                     <span className="mx-2">|</span>
                     <span>
-                      {language === 'he' ? 'הכי ארוכה: ' : 'Longest: '}
+                      {t('challengeView.longest')}
                       <strong>{challenge.creatorLongestWord}</strong>
                     </span>
                   </>
@@ -305,7 +305,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                   {challenge.totalAttempts}
                 </p>
                 <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'ניסיונות' : 'Attempts'}
+                  {t('challengeView.attempts')}
                 </p>
               </div>
               <div className={cn(
@@ -316,7 +316,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                   {challenge.totalBeaten}
                 </p>
                 <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'ניצחונות' : 'Beaten'}
+                  {t('challengeView.beaten')}
                 </p>
               </div>
               <div className={cn(
@@ -327,7 +327,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                   {winRate}%
                 </p>
                 <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'אחוז הצלחה' : 'Win Rate'}
+                  {t('challengeView.winRate')}
                 </p>
               </div>
             </div>
@@ -358,7 +358,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
               )}
             >
               <Zap className="w-6 h-6" />
-              {language === 'he' ? 'התחל אתגר!' : 'Start Challenge!'}
+              {t('challengeView.startChallenge')}
             </motion.button>
           </motion.div>
         </motion.div>

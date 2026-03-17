@@ -36,7 +36,7 @@ import {
   disconnectSocket
 } from '../utils/socketHelpers.js';
 
-import { emitError, ErrorMessages } from '../utils/errorHandler.js';
+import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { clearGameTimer } from '../utils/timerManager.js';
@@ -46,7 +46,7 @@ import { generateRandomAvatar } from '../utils/gameUtils.js';
 import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
 import { startGameTimer, endGame } from './shared.js';
-import { validatePayload, createGameSchema } from '../utils/socketValidation.js';
+import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
 import { stopAllBots } from '../modules/botManager.js';
 import { spamDetector } from '../modules/spamDetector.js';
 import { notifyRoomCreated } from '../modules/notificationService.js';
@@ -211,7 +211,19 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
   // Handle request for words to embed in board
   socket.on('getWordsForBoard', (data: GetWordsForBoardPayload) => {
-    const { language, boardSize } = data;
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const validation = validatePayload(getWordsForBoardSchema, data);
+    if (!validation.success) {
+      logger.warn('SOCKET', `getWordsForBoard validation failed: ${validation.error}`, { data });
+      emitError(socket, `Invalid request: ${validation.error}`);
+      return;
+    }
+
+    const { language, boardSize } = validation.data as GetWordsForBoardPayload;
     const rows = boardSize?.rows || 5;
     const cols = boardSize?.cols || 5;
     const totalCells = rows * cols;
@@ -254,18 +266,18 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, ErrorMessages.ONLY_HOST_CAN_END);
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST);
       return;
     }
 
@@ -277,10 +289,13 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     const game = gameCode ? getGame(gameCode) : null;
+    const isHost = game?.hostSocketId === socket.id;
+    const isDev = process.env.NODE_ENV === 'development';
     socket.emit('debugGameStateResponse', {
       gameCode,
       gameState: game?.gameState || 'NO_GAME',
-      hostSocketId: game?.hostSocketId,
+      // Only expose hostSocketId to the host or in dev mode
+      ...(isHost || isDev ? { hostSocketId: game?.hostSocketId } : {}),
       mySocketId: socket.id,
       playerCount: game ? Object.keys(game.users || {}).length : 0,
       timestamp: Date.now()
@@ -325,56 +340,61 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
   // Handle reset game
   socket.on('resetGame', (_data: unknown, callback?: ResetGameCallback) => {
-    if (!checkRateLimit(socket.id)) {
-      socket.emit('rateLimited');
-      if (typeof callback === 'function') callback({ success: false, error: 'Rate limited' });
-      return;
-    }
+    try {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        if (typeof callback === 'function') callback({ success: false, error: 'Rate limited' });
+        return;
+      }
 
-    const gameCode = getGameBySocketId(socket.id);
-    if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
-      if (typeof callback === 'function') callback({ success: false, error: 'Not in game' });
-      return;
-    }
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) {
+        emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
+        if (typeof callback === 'function') callback({ success: false, error: 'Not in game' });
+        return;
+      }
 
-    const game = getGame(gameCode);
-    if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
-      if (typeof callback === 'function') callback({ success: false, error: 'Game not found' });
-      return;
-    }
+      const game = getGame(gameCode);
+      if (!game) {
+        emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+        if (typeof callback === 'function') callback({ success: false, error: 'Game not found' });
+        return;
+      }
 
-    if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only host can reset the game');
-      if (typeof callback === 'function') callback({ success: false, error: 'Only host can reset' });
-      return;
-    }
+      if (game.hostSocketId !== socket.id) {
+        emitError(socket, 'Only host can reset the game');
+        if (typeof callback === 'function') callback({ success: false, error: 'Only host can reset' });
+        return;
+      }
 
-    const stateBeforeReset = game.gameState;
-    clearGameTimer(gameCode);
-    gameStartCoordinator.cleanupSequence(gameCode);
-    stopAllBots(gameCode);
+      const stateBeforeReset = game.gameState;
+      clearGameTimer(gameCode);
+      gameStartCoordinator.cleanupSequence(gameCode);
+      stopAllBots(gameCode);
 
-    const resetSuccess = resetGameForNewRound(gameCode);
-    const gameAfterReset = getGame(gameCode);
-    const stateAfterReset = gameAfterReset?.gameState;
+      const resetSuccess = resetGameForNewRound(gameCode);
+      const gameAfterReset = getGame(gameCode);
+      const stateAfterReset = gameAfterReset?.gameState;
 
-    logger.info('SOCKET', `Game ${gameCode} reset: ${stateBeforeReset} -> ${stateAfterReset} (success: ${resetSuccess})`);
+      logger.info('SOCKET', `Game ${gameCode} reset: ${stateBeforeReset} -> ${stateAfterReset} (success: ${resetSuccess})`);
 
-    if (!resetSuccess) {
-      logger.error('SOCKET', `Failed to reset game ${gameCode} from state ${stateBeforeReset}`);
-      if (typeof callback === 'function') callback({ success: false, error: 'Reset failed' });
-      return;
-    }
+      if (!resetSuccess) {
+        logger.error('SOCKET', `Failed to reset game ${gameCode} from state ${stateBeforeReset}`);
+        if (typeof callback === 'function') callback({ success: false, error: 'Reset failed' });
+        return;
+      }
 
-    broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
-      users: getGameUsers(gameCode),
-      gameSessionId: gameAfterReset?.gameSessionId
-    });
+      broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
+        users: getGameUsers(gameCode),
+        gameSessionId: gameAfterReset?.gameSessionId
+      });
 
-    if (typeof callback === 'function') {
-      callback({ success: true, gameState: stateAfterReset });
+      if (typeof callback === 'function') {
+        callback({ success: true, gameState: stateAfterReset });
+      }
+    } catch (err) {
+      logger.error('SOCKET', `resetGame error: ${(err as Error).message}`);
+      if (typeof callback === 'function') callback({ success: false, error: 'Reset failed unexpectedly' });
     }
   });
 

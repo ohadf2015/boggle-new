@@ -17,6 +17,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -231,7 +232,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
             className={cn(
               'text-xl font-black text-center mb-2',
               'text-neo-white'
@@ -244,7 +245,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           <motion.h3
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
             className={cn('text-2xl font-black text-center mb-2')}
             style={{ color: tierColors?.text || '#BFFF00' }}
           >

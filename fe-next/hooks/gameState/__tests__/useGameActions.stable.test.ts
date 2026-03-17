@@ -71,7 +71,6 @@ describe('useGameActions stability', () => {
       'setHighlightedCells',
       'incrementCombo',
       'resetCombo',
-      'useComboShield',
       'updateLastWordTime',
       'setTournamentData',
       'setTournamentStandings',

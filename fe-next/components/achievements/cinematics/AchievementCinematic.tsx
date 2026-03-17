@@ -34,8 +34,7 @@ import {
 // CONSTANTS
 // ==============================================
 
-/** Total duration in frames (7 seconds @ 30fps) */
-export const ACHIEVEMENT_DURATION_FRAMES = 210;
+export { ACHIEVEMENT_DURATION_FRAMES } from './achievementCinematicConstants';
 
 const PHASE_FRAMES = {
   SILHOUETTE_START: 0,

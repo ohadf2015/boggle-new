@@ -66,6 +66,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const rewardCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; right: number } | null>(null);
 
   // Close dropdown when clicking outside
@@ -127,13 +128,17 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
       if (document.visibilityState === 'visible') checkUnclaimedReward();
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (rewardCheckTimeoutRef.current) { clearTimeout(rewardCheckTimeoutRef.current); rewardCheckTimeoutRef.current = null; }
+    };
   }, [user?.id, checkUnclaimedReward]);
 
   const handleCalendarClose = () => {
     setShowCalendarModal(false);
     setShowUserMenu(false);
-    setTimeout(checkUnclaimedReward, 500);
+    if (rewardCheckTimeoutRef.current) clearTimeout(rewardCheckTimeoutRef.current);
+    rewardCheckTimeoutRef.current = setTimeout(checkUnclaimedReward, 500);
   };
 
   const openSignIn = () => {

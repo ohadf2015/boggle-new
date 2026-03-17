@@ -43,11 +43,21 @@ export interface UseAdventureLevelCompletionProps {
   bonusGoldMultiplier?: number;
   awardXp: (xp: number) => { leveledUp: boolean; newLevel?: number };
   addGold: (amount: number) => void;
-  recordAttempt: (...args: any[]) => void;
+  recordAttempt: (
+    world: number,
+    level: number,
+    words: number,
+    score: number,
+    timeRemaining: number,
+    objectiveProgress: Record<string, number>,
+    isCompletion: boolean
+  ) => void;
   recordCompletion: (data: any) => void;
   endAIDirector: () => void;
   handleEarnAchievement: (id: AdventureAchievementId) => boolean;
   pauseGame: () => void;
+  /** Dispatch COMPLETE_LEVEL to the game reducer (sets isComplete + calculates stars) */
+  completeLevel: () => void;
   showVictory: () => void;
   showDefeat: () => void;
   showLevelComplete: boolean;
@@ -62,6 +72,8 @@ export interface UseAdventureLevelCompletionProps {
   isFirstCompletion?: boolean;
   /** Player health percentage (0-100) for boss no-damage achievement */
   playerHealthPercent?: number;
+  /** Score retained from a previous retry (Salvage Claw upgrade) */
+  retainedScore?: number;
 }
 
 export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionProps) {
@@ -69,7 +81,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     gameState, timeRemaining, timerSeconds, levelConfig, objectives,
     currentLevel, upgradeBonuses, upgradeEffects, awardXp, addGold,
     recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement,
-    pauseGame, showVictory, showDefeat,
+    pauseGame, completeLevel, showVictory, showDefeat,
     showLevelComplete, showVictoryCinematic, showDefeatCinematic,
     isBossLevel, isBossActive, bossHealthPhase, playerIsDead,
     endBossBattle, triggerBossTaunt,
@@ -178,9 +190,18 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       if (isVictory) showVictory();
       else showDefeat();
     }
+
+    // Ensure reducer marks game as complete (sets isComplete=true + calculates stars).
+    // For non-boss timer=0, the TICK handler already does this. For boss endings
+    // (HP=0, player death, timer=0 during boss), the reducer doesn't know the game
+    // ended — completeLevel() bridges that gap.
+    if (isBossLevel && !gameState.isComplete) {
+      completeLevel();
+    }
+
     pauseGame();
     setNonBossCompleted(!isBossLevel);
-  }, [showLevelComplete, showVictoryCinematic, showDefeatCinematic, gameState.isComplete, gameState.stars, timeRemaining, pauseGame, isBossLevel, bossHealthPhase, playerIsDead, showVictory, showDefeat]);
+  }, [showLevelComplete, showVictoryCinematic, showDefeatCinematic, gameState.isComplete, gameState.stars, timeRemaining, pauseGame, completeLevel, isBossLevel, bossHealthPhase, playerIsDead, showVictory, showDefeat]);
 
   // Boss Battle Completion
   useEffect(() => {
@@ -235,10 +256,12 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       timerSeconds,
       score: gameState.score,
       words: gameState.wordsFound.length,
+      lootDrops,
+      retainedScore: props.retainedScore ?? 0,
     });
 
     endAIDirectorRef.current();
-  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds]);
+  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore]);
 
   const handleLevelUpClose = useCallback(() => {
     setLevelUpData(null);

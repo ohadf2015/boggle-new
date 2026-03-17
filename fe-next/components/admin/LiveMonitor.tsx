@@ -134,7 +134,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
       setError(null);
       setLastRefresh(Date.now());
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }

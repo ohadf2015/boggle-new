@@ -182,7 +182,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                   )}
                 </div>
                 <Link
-                  href={`/${language}/community/play/${board.board_code}`}
+                  href={`/${language}/community/${board.board_code}`}
                   className={cn(
                     'flex items-center gap-1 px-2.5 py-1',
                     'bg-neo-lime text-black text-xs font-bold',

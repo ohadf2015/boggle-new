@@ -125,6 +125,7 @@ const ja = {
     "email": "メール",
     "loading": "文字をシャッフル中...",
     "error": "おっと！",
+    "errorOccurred": "エラーが発生しました",
     "creating": "作成中...",
     "guest": "ゲスト",
     "back": "戻る",
@@ -264,7 +265,15 @@ const ja = {
     "brain": "脳トレ",
     "leaderboard": "ランキング",
     "profile": "プロフィール",
-    "play": "プレイ"
+    "play": "プレイ",
+    "howToPlay": "遊び方",
+    "blog": "ブログ",
+    "faq": "よくある質問",
+    "aboutLexiClash": "LexiClashについて",
+    "contactUs": "お問い合わせ",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約",
+    "disclaimer": "免責事項"
   },
   "skills": {
     "title": "スキルツリー",
@@ -521,7 +530,22 @@ const ja = {
     "orShareVia": "または共有",
     "telegram": "Telegram",
     "moreWays": "他の共有方法",
-    "invite": "招待"
+    "invite": "招待",
+    "emailSubjectPostGame": "LexiClashで大活躍！",
+    "emailSubjectInvite": "LexiClashで一緒に遊ぼう！",
+    "challengeLinkCopied": "チャレンジリンクをコピーしました！",
+    "errorCreatingChallenge": "チャレンジの作成に失敗しました",
+    "pts": "点",
+    "words": "語",
+    "combo": "コンボ",
+    "streak": "連続",
+    "longest": "最長:"
+  },
+  "messaging": {
+    "timeNow": "今",
+    "timeMinutes": "分",
+    "timeHours": "時",
+    "timeDays": "日"
   },
   "errors": {
     "unstableConnection": "接続がふらついてる - 戻すね...",
@@ -545,6 +569,11 @@ const ja = {
     "updateMessage": "新機能が来たよ！更新してすぐ戻ろう。",
     "updateProgress": "2秒で終わるよ！",
     "globalErrorEncouragement": "安心して - ゲームは安全だよ！",
+    "goHome": "ホームへ",
+    "failedToLoadLeaderboard": "ランキングの読み込みに失敗",
+    "failedToLoadProfile": "プロフィールの読み込みに失敗",
+    "unableToLoadData": "データを読み込めませんでした。もう一度お試しください。",
+    "tryAgainButton": "もう一度",
     "connectionTimeout": "接続に時間かかりすぎ",
     "rateLimited": "落ち着いて、スプリンター！",
     "connectionLost": "接続切れ - 再接続中",
@@ -729,6 +758,7 @@ const ja = {
     ]
   },
   "multiplayerFlow": {
+    "host": "ホスト",
     "roomClosed": "ルームが閉鎖されました",
     "rateLimited": "落ち着いて！",
     "roomList": {
@@ -1506,7 +1536,17 @@ const ja = {
       "gameCount": "ゲーム{count}",
       "round": "R{num}"
     },
-    "wordsFound": "見つけた単語"
+    "wordsFound": "見つけた単語",
+    "shareVictoryPrompt": "勝利をシェアしよう！",
+    "victory": "勝利！",
+    "wellPlayed": "ナイスプレイ！",
+    "wordsLabel": "語",
+    "shareYourVictory": "勝利をシェア！",
+    "challengeFriends": "友達にチャレンジ 😈",
+    "streakOneWeek": "あと1日で1週間！",
+    "streakTwoWeeks": "もうすぐ2週間！",
+    "streakOneMonth": "あと1日で1ヶ月！",
+    "streakWeeks": "{{weeks}}週間連続！"
   },
   "nextStep": {
     "backToLobby": "ロビーに戻る",
@@ -1521,6 +1561,29 @@ const ja = {
     "goMultiplayerDesc": "リアルプレイヤーとライブワードバトルに挑戦",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "集中トレーニングで認知能力を向上"
+  },
+  "practiceResults": {
+    "playAgain": "もう一回",
+    "orTrySomethingNew": "他のモードも試してみよう",
+    "wordsFound": "{count}個の単語を発見",
+    "tryDaily": "デイリーチャレンジ",
+    "tryDailyDesc": "同じパズルでみんなと競争",
+    "tryBots": "ボットと対戦",
+    "tryBotsDesc": "AIと腕試し",
+    "tryMultiplayer": "フレンドと対戦",
+    "tryMultiplayerDesc": "リアルタイムワードバトル",
+    "encouragement": {
+      "legendary": "すごい！",
+      "great": "ナイス！",
+      "nice": "いいね！",
+      "warmup": "いいスタート！"
+    },
+    "subtitle": {
+      "legendary": "絶好調！この勢いを続けよう！",
+      "great": "素晴らしい語彙力です",
+      "nice": "プレイするたびに上達します",
+      "warmup": "練習あるのみ — その調子！"
+    }
   },
   "almostFound": {
     "title": "もう少しで見つかった...",
@@ -1885,6 +1948,9 @@ const ja = {
   "achievements": {
     "unlocked": "実績解除！",
     "upgraded": "実績アップグレード！",
+    "shareText": "LexiClashで「{{name}}」を達成！一緒に遊ぼう！",
+    "shareButton": "シェア",
+    "copied": "コピーしました！",
     "cinematic": {
       "unlocked": "実績解除！",
       "gold": "ゴールド",
@@ -3665,6 +3731,31 @@ const ja = {
     "shareHint": "チャレンジをシェア",
     "winnerPrompt": "この記録を超えられる？"
   },
+  "challengeView": {
+    "oops": "おっと！",
+    "backToHome": "ホームに戻る",
+    "back": "戻る",
+    "title": "チャレンジ！",
+    "beatScore": "このスコアを超えられる？",
+    "createdChallenge": "がチャレンジを作成",
+    "scoreToBeat": "目標スコア",
+    "words": "語",
+    "longest": "最長: ",
+    "attempts": "挑戦回数",
+    "beaten": "勝利",
+    "winRate": "勝率",
+    "startChallenge": "チャレンジ開始！"
+  },
+  "challengeResults": {
+    "youWon": "勝利!",
+    "soClose": "惜しい!",
+    "youBeat": "{{name}}に勝った!",
+    "tryAgainMsg": "もう一度!",
+    "you": "あなた",
+    "pts": "点",
+    "words": "単語",
+    "longest": "最長"
+  },
   "accept": "承諾",
   "availableOpponents": "対戦可能な相手",
   "cancel": "キャンセル",
@@ -5269,6 +5360,7 @@ const ja = {
     "levels": "レベル",
     "level": "レベル",
     "levelShort": "Lv.",
+    "levelWithNumber": "Lv. {level}",
     "backToMap": "ワールドマップに戻る",
     "menu": {
       "skills": "スキル",
@@ -5292,6 +5384,15 @@ const ja = {
     "continueToNext": "続ける",
     "nextWorld": "次のワールド",
     "retryLevel": "リトライ",
+    "freeRetry": "無料リトライ",
+    "quest": {
+      "title": "チャプタークエスト",
+      "wordCount": "単語を見つける",
+      "perfectLevels": "パーフェクトレベル",
+      "defeatBossNoHint": "ヒントなしボス",
+      "longWordCount": "長い単語",
+      "fullComboLevels": "フルコンボ"
+    },
     "loadError": "進捗の読み込みに失敗しました",
     "cinematics": {
       "victory": "勝利！",
@@ -5481,8 +5582,10 @@ const ja = {
       "confirmExit": "レベルを終了しますか？",
       "confirmExitDesc": "現在の進捗が失われます。本当に終了しますか？",
       "freeze": "フリーズ",
+      "freezeWithTime": "フリーズ ({seconds}秒)",
       "frozen": "凍結中！",
       "shuffle": "シャッフル",
+      "shuffleWithCount": "シャッフル (×{count})",
       "detonate": "爆破"
     },
     "hints": {
@@ -6795,7 +6898,8 @@ const ja = {
       "saveLessonTitle": "語彙レッスンを保存",
       "lessonNamePlaceholder": "レッスン名を入力...",
       "noClassroom": "クラスなし（個人レッスン）",
-      "selectWords": "単語を選んで語彙レッスンを作成"
+      "selectWords": "単語を選んで語彙レッスンを作成",
+      "failedToSaveLesson": "レッスンの保存に失敗しました"
     },
     "reports": {
       "title": "進捗レポート",

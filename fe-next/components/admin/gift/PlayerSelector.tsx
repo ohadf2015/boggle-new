@@ -132,6 +132,7 @@ export function PlayerSelector({
               <button
                 onClick={() => handleRemovePlayer(player.id)}
                 className="ms-1 hover:text-red-500 transition-colors"
+                aria-label={`Remove ${player.display_name || player.username}`}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
