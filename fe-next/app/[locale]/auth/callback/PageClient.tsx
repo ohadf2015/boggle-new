@@ -25,25 +25,10 @@ const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
 const RETRY_TIMEOUT_SECONDS = 6; // Show retry button after 6 seconds
 
 /**
- * Fetches user profile and returns a role-based redirect URL.
- * Students → /[locale]/student, teachers/admins → /[locale]/teacher
- * Falls back to /[locale] if role cannot be determined.
+ * Returns the default post-login redirect URL.
+ * All users land on the home page — education dashboards are manual entry only.
  */
-async function getRoleBasedRedirect(userId: string, locale: string): Promise<string> {
-  if (!supabase) return `/${locale}`;
-  try {
-    const { data } = await supabase
-      .from('profiles')
-      .select('user_role, is_admin')
-      .eq('id', userId)
-      .single();
-    if (!data) return `/${locale}`;
-    const isTeacher = data.is_admin === true || data.user_role === 'teacher' || data.user_role === 'admin';
-    if (isTeacher) return `/${locale}/teacher`;
-    if (data.user_role === 'student') return `/${locale}/student`;
-  } catch {
-    // Fall through to default
-  }
+function getDefaultRedirect(locale: string): string {
   return `/${locale}`;
 }
 
@@ -207,12 +192,11 @@ function AuthCallbackContent(): React.JSX.Element {
     router.replace(url);
   }, [router]);
 
-  // Helper to redirect with optional role-based routing.
-  // When no explicit destination was requested, route based on user_role.
-  const redirectWithRole = useCallback(async (userId: string | undefined, next: string, isDefault: boolean) => {
-    if (isDefault && userId) {
-      const roleUrl = await getRoleBasedRedirect(userId, locale);
-      safeRedirect(roleUrl);
+  // Helper to redirect after auth. When no explicit destination was requested,
+  // always go to home page — education dashboards are manual entry only.
+  const redirectWithRole = useCallback(async (_userId: string | undefined, next: string, isDefault: boolean) => {
+    if (isDefault) {
+      safeRedirect(getDefaultRedirect(locale));
     } else {
       safeRedirect(next);
     }
