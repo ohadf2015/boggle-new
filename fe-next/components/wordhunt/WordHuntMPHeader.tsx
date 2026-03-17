@@ -15,7 +15,7 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
   t,
 }) => {
   return (
-    <div className="flex items-center justify-between px-3 py-2 gap-2">
+    <div className="flex items-center justify-between px-3 py-1 gap-2">
       {/* Spacer for layout balance */}
       <div className="w-10" />
 

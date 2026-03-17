@@ -119,7 +119,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         />
 
         {/* Clue Boxes (target word blanks with accumulated feedback) */}
-        <div className={`px-3 py-1 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
+        <div className={`px-3 py-0.5 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
           <SurvivalClueBoxes
             currentHint={currentHint}
             targetWord={'?'.repeat(targetLength)}
@@ -137,7 +137,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* Life Bar */}
-        <div className="px-3 py-1 flex-shrink-0">
+        <div className="px-3 py-0.5 flex-shrink-0">
           <SurvivalLifeBar
             lifePoints={lifePoints}
             isGameOver={isGameOver}
@@ -191,7 +191,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* MP Leaderboard — mobile only (below game) */}
-        <div className="flex-shrink-0 max-h-[30vh] overflow-y-auto lg:hidden">
+        <div className="flex-shrink-0 max-h-[15vh] overflow-y-auto lg:hidden">
           <WordHuntMPLeaderboard
             playerLives={playerLives}
             eliminatedPlayers={eliminatedPlayers}
