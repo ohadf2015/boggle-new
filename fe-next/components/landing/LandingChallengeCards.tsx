@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Users, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
@@ -29,8 +29,8 @@ interface LandingChallengeCardsProps {
 }
 
 const cardMotion = {
-  initial: { opacity: 0, y: 20, scale: 0.96 },
-  animate: { opacity: 1, y: 0, scale: 1 },
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
 };
 
 export function LandingChallengeCards({
@@ -81,7 +81,7 @@ export function LandingChallengeCards({
         </motion.div>
 
         {/* Daily Challenge Banner */}
-        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.15 }} className="col-span-1 sm:col-span-2 xl:col-span-1">
+        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.15 }} className="w-full h-full">
           <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
           {solveRate !== null && (
             <p className="text-center text-neo-white/50 text-xs mt-1 font-medium">
@@ -90,8 +90,8 @@ export function LandingChallengeCards({
           )}
         </motion.div>
 
-        {/* Adventure Mode - full width on mobile/tablet, single col on xl */}
-        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.25 }} className="col-span-1 sm:col-span-2 xl:col-span-1 w-full">
+        {/* Adventure Mode */}
+        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.25 }} className="w-full h-full">
           <ModeCard
             title={t('landing.adventureMode')}
             description={t('landing.adventureModeDesc')}
@@ -103,7 +103,7 @@ export function LandingChallengeCards({
 
         {/* Blast Mode (admin only) */}
         {(isAdmin || hasBlastAccess) && (
-          <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.35 }} className="col-span-1 sm:col-span-2 xl:col-span-1 w-full xl:max-w-none max-w-md mx-auto">
+          <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.35 }} className="w-full h-full max-w-md mx-auto xl:max-w-none">
             <ModeCard
               title={t('landing.blastMode')}
               description={t('landing.blastModeDesc')}

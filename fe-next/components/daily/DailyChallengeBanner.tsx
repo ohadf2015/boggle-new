@@ -181,11 +181,10 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const isRTL = dir === 'rtl';
 
   if (!isClient) {
-    // SSR placeholder to prevent hydration mismatch and CLS
-    // Uses exact same structure as rendered content with fixed dimensions
+    // SSR placeholder — invisible to match motion wrapper's initial opacity:0
     return (
       <div className={cn(
-        "w-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500",
+        "w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500 opacity-0",
         compact ? "p-2 sm:p-3" : "p-3 sm:p-4",
         className
       )}>
@@ -211,7 +210,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const glowColor = 'rgba(255, 165, 0, 0.5)';
 
   return (
-    <Link href={`/${language}/daily`} className="block w-full group">
+    <Link href={`/${language}/daily`} className="block w-full h-full group">
       <div
         ref={tiltRef}
         className={cn(
