@@ -6650,7 +6650,8 @@ const es = {
       "hard": "Difícil",
       "easyDesc": "Menos especiales, cascadas relajadas",
       "mediumDesc": "Caos balanceado",
-      "hardDesc": "Especiales por todos lados, oleadas brutales"
+      "hardDesc": "Especiales por todos lados, oleadas brutales",
+      "resumeWave": "Empezar desde Oleada {wave}"
     },
     "helpIceLabel": "Hielo",
     "helpIce": "2 golpes para romper. Se agrieta en el primero.",

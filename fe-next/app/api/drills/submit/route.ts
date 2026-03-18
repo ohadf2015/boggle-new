@@ -328,10 +328,34 @@ export async function POST(request: NextRequest) {
         });
     }
 
+    // =====================================================
+    // Award profile XP based on drill performance
+    // =====================================================
+    const baseXp = 10 + Math.floor(score / 50);
+    const xpToAward = Math.min(baseXp, 50); // Cap at 50 XP per drill session
+    let xpAwarded = 0;
+
+    if (xpToAward > 0) {
+      const { data: xpData, error: xpError } = await supabase
+        .rpc('increment_player_xp', {
+          p_player_id: user.id,
+          p_xp_amount: xpToAward,
+        });
+
+      if (xpError) {
+        console.error('Error awarding drill XP:', xpError);
+      } else if (xpData && xpData.length > 0) {
+        xpAwarded = xpData[0].xp_granted ?? xpToAward;
+      } else {
+        xpAwarded = xpToAward;
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: sessionData,
       brainScore: updatedBrainScore,
+      xpAwarded,
     });
   } catch (error) {
     const err = error as Error;

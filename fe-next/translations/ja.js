@@ -6638,7 +6638,8 @@ const ja = {
       "hard": "むずかしい",
       "easyDesc": "特殊タイル少なめ、穏やかなカスケード",
       "mediumDesc": "バランスのとれた混沌",
-      "hardDesc": "特殊タイルだらけ、激しいウェーブ"
+      "hardDesc": "特殊タイルだらけ、激しいウェーブ",
+      "resumeWave": "ウェーブ{wave}から開始"
     },
     "hint": "ヒント",
     "stuck": "詰まった？",

@@ -17,6 +17,7 @@ import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveRe
 import type { Language } from '@/shared/types/game';
 import { BlastReadyScreen } from './BlastReadyScreen';
 import { useBlastComboDiscovery } from './hooks/useBlastComboDiscovery';
+import { useBlastWaveSave } from './hooks/useBlastWaveSave';
 
 /**
  * BlastView - Page orchestrator for Blast Mode.
@@ -42,6 +43,7 @@ const BlastView: React.FC = () => {
   const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
 
   const { discoveredCombos, pendingDiscovery, onComboDetected, acknowledgeDiscovery } = useBlastComboDiscovery({ userId: user?.id });
+  const { highestWave, hasSavedProgress, recordWave } = useBlastWaveSave();
 
   const baseConfig = resolveBlastConfig((language as Language) || 'en', 'medium');
 
@@ -73,12 +75,15 @@ const BlastView: React.FC = () => {
       clearPercentage: clearPct,
     };
 
+    // Persist highest wave reached
+    recordWave(currentWave + 1);
+
     setTotalScore(prev => prev + waveScore);
     setAllWordsFound(prev => [...prev, ...waveWords]);
     setWaveHistory(prev => [...prev, waveResult]);
     setLastWaveStats({ score: waveScore, words: waveWords.length, clearPct });
     setPhase('waveTransition');
-  }, [currentWave]);
+  }, [currentWave, recordWave]);
 
   /** Game ended (dead end, give up, or failed threshold) */
   const handleGameEnd = useCallback((resultsData: BlastResultsData) => {
@@ -114,6 +119,13 @@ const BlastView: React.FC = () => {
     setPhase('waveIntro');
   }, []);
 
+  /** Start from a saved wave (skip earlier waves) */
+  const handleStartFromWave = useCallback((wave: number) => {
+    setCurrentWave(wave);
+    gameKeyRef.current += 1;
+    setPhase('waveIntro');
+  }, []);
+
   /** Wave intro dismissed — start playing */
   const handleWaveIntroReady = useCallback(() => {
     setPhase('playing');
@@ -142,7 +154,12 @@ const BlastView: React.FC = () => {
       <PlayfulBackground intensity="low" colorScheme="game" />
 
       {phase === 'ready' && (
-        <BlastReadyScreen onStart={handleStart} discoveredCombos={discoveredCombos} />
+        <BlastReadyScreen
+          onStart={handleStart}
+          onStartFromWave={hasSavedProgress ? handleStartFromWave : undefined}
+          savedWave={hasSavedProgress ? highestWave : undefined}
+          discoveredCombos={discoveredCombos}
+        />
       )}
 
       {phase === 'waveIntro' && (

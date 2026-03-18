@@ -6587,7 +6587,8 @@ const sv = {
       "hard": "Svårt",
       "easyDesc": "Färre specialbrickor, lugna kaskader",
       "mediumDesc": "Balanserat kaos",
-      "hardDesc": "Specialbrickor överallt, brutala vågor"
+      "hardDesc": "Specialbrickor överallt, brutala vågor",
+      "resumeWave": "Börja från Våg {wave}"
     },
     "hint": "Tips",
     "stuck": "Fastnat?",

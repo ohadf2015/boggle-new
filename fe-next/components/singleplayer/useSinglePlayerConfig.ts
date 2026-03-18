@@ -1,0 +1,317 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useMusic } from '@/contexts/MusicContext';
+import { getMinWordLength, getDefaultPreset, getPresetById } from './presetConfig';
+import {
+  shouldShowGuidance,
+  markGuidanceShown,
+} from '@/utils/contextualGuidanceStorage';
+import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
+import type {
+  SinglePlayerMode,
+  SinglePlayerPhase,
+  SinglePlayerGameState,
+  BotOpponent,
+} from './SinglePlayerView';
+
+// ==========================================
+// Bot Configuration
+// ==========================================
+
+const DEFAULT_MEDIUM_BOT: BotOpponent = {
+  id: 'default-medium-bot',
+  name: 'WordBot',
+  difficulty: 'medium',
+  score: 0,
+  wordsFound: [],
+};
+
+const BOT_NAMES = [
+  'WordBot', 'LexiBot', 'AlphaBot', 'BrainBot', 'SpeedBot',
+  'CleverBot', 'QuickBot', 'SmartBot', 'ProBot', 'MasterBot',
+];
+
+/**
+ * Generate bot opponents for a preset
+ */
+export function generateBotsForPreset(count: number, difficulty: 'easy' | 'medium' | 'hard'): BotOpponent[] {
+  const bots: BotOpponent[] = [];
+  const availableNames = [...BOT_NAMES];
+
+  for (let i = 0; i < count && availableNames.length > 0; i++) {
+    const randomIndex = Math.floor(Math.random() * availableNames.length);
+    const botName = availableNames.splice(randomIndex, 1)[0];
+    bots.push({
+      id: `bot-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+      name: botName,
+      difficulty,
+      score: 0,
+      wordsFound: [],
+    });
+  }
+  return bots;
+}
+
+// ==========================================
+// Hook
+// ==========================================
+
+interface UseSinglePlayerConfigOptions {
+  searchParams: ReturnType<typeof import('next/navigation').useSearchParams>;
+}
+
+interface UseSinglePlayerConfigResult {
+  phase: SinglePlayerPhase;
+  setPhase: (phase: SinglePlayerPhase) => void;
+  gameState: SinglePlayerGameState;
+  setGameState: React.Dispatch<React.SetStateAction<SinglePlayerGameState>>;
+  returnTo: string | null;
+  boardCode: string | null;
+  handleTutorialComplete: () => void;
+  handlePlayAgain: () => void;
+  handleQuickRematch: () => void;
+  handleBackToLobby: () => void;
+  wasFirstTimerPracticeRef: React.MutableRefObject<boolean>;
+}
+
+export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOptions): UseSinglePlayerConfigResult {
+  const { language: uiLanguage } = useLanguage();
+  const { unlockAudio } = useMusic();
+  const router = useRouter();
+
+  const returnTo = searchParams?.get('returnTo') || null;
+  const autoStart = searchParams?.get('autoStart') || null;
+  const presetParam = searchParams?.get('preset') || null;
+  const boardCode = searchParams?.get('boardCode') || null;
+
+  const [phase, setPhase] = useState<SinglePlayerPhase>(() => {
+    const hasAutoStart = searchParams?.get('autoStart');
+    const hasPreset = searchParams?.get('preset');
+    if (hasAutoStart || hasPreset) return 'playing';
+    return shouldShowGuidance('firstPlayTutorialCompleted') ? 'pre-game' : 'playing';
+  });
+
+  const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
+    mode: 'solo-bots',
+    difficulty: 'MEDIUM',
+    language: (uiLanguage as Language) || 'en',
+    grid: null,
+    timerSeconds: 120,
+    bots: [DEFAULT_MEDIUM_BOT],
+    minWordLength: 2,
+  }));
+
+  const hasAutoStartedRef = useRef(false);
+  const wasFirstTimerPracticeRef = useRef(false);
+
+  // Auto-start practice mode (autoStart=practice)
+  useEffect(() => {
+    if (autoStart === 'practice' && !hasAutoStartedRef.current) {
+      hasAutoStartedRef.current = true;
+      const practicePreset = getDefaultPreset('practice');
+      if (practicePreset) {
+        const minWordLength = getMinWordLength(uiLanguage, practicePreset.settings.difficulty);
+        setGameState(prev => ({
+          ...prev,
+          mode: 'practice',
+          difficulty: practicePreset.settings.difficulty,
+          timerSeconds: practicePreset.settings.timerSeconds,
+          bots: [],
+          language: (uiLanguage as Language) || 'en',
+          grid: null,
+          minWordLength,
+        }));
+        setPhase('playing');
+      }
+    }
+  }, [autoStart, uiLanguage]);
+
+  // Auto-start bot game (autoStart=bots)
+  useEffect(() => {
+    if (autoStart === 'bots' && !hasAutoStartedRef.current) {
+      hasAutoStartedRef.current = true;
+      const botsPreset = getDefaultPreset('solo-bots');
+      if (botsPreset) {
+        const bots = generateBotsForPreset(botsPreset.settings.bots, botsPreset.settings.botDifficulty);
+        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
+        setGameState({
+          mode: 'solo-bots',
+          difficulty: botsPreset.settings.difficulty,
+          timerSeconds: botsPreset.settings.timerSeconds,
+          bots,
+          language: (uiLanguage as Language) || 'en',
+          grid: null,
+          minWordLength,
+        });
+        setPhase('playing');
+      }
+    }
+  }, [autoStart, uiLanguage]);
+
+  // Auto-start with preset param
+  useEffect(() => {
+    if (autoStart) return;
+    if (!presetParam || hasAutoStartedRef.current) return;
+    if (phase === 'playing') return;
+
+    hasAutoStartedRef.current = true;
+
+    if (presetParam === 'bots') {
+      const botsPreset = getDefaultPreset('solo-bots');
+      if (botsPreset) {
+        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
+        const bots = botsPreset.settings.bots > 0
+          ? generateBotsForPreset(botsPreset.settings.bots, botsPreset.settings.botDifficulty)
+          : [];
+        setGameState(prev => ({
+          ...prev,
+          mode: 'solo-bots',
+          difficulty: botsPreset.settings.difficulty,
+          timerSeconds: botsPreset.settings.timerSeconds,
+          bots,
+          language: (uiLanguage as Language) || 'en',
+          grid: null,
+          minWordLength,
+        }));
+        setPhase('playing');
+      }
+      return;
+    }
+
+    const preset = getPresetById(presetParam);
+    if (preset) {
+      let mode: SinglePlayerMode = 'solo-bots';
+      if (preset.settings.bots === 0 && preset.settings.timerSeconds === 0) {
+        mode = 'practice';
+      } else if (preset.settings.bots === 0 && preset.settings.timerSeconds > 0) {
+        mode = 'challenge';
+      }
+
+      const minWordLength = getMinWordLength(uiLanguage, preset.settings.difficulty);
+      const bots = preset.settings.bots > 0
+        ? generateBotsForPreset(preset.settings.bots, preset.settings.botDifficulty)
+        : [];
+
+      setGameState(prev => ({
+        ...prev,
+        mode,
+        difficulty: preset.settings.difficulty,
+        timerSeconds: preset.settings.timerSeconds,
+        bots,
+        language: (uiLanguage as Language) || 'en',
+        grid: null,
+        minWordLength,
+      }));
+      setPhase('playing');
+    }
+  }, [presetParam, autoStart, phase, uiLanguage]);
+
+  // Auto-load community board
+  useEffect(() => {
+    if (!boardCode || hasAutoStartedRef.current) return;
+    hasAutoStartedRef.current = true;
+
+    const loadCommunityBoard = async () => {
+      try {
+        const res = await fetch(`/api/ugc/boards/${boardCode}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const board = data.board;
+        if (!board?.grid) return;
+
+        const difficulty: DifficultyLevel = board.difficulty === 'EASY' ? 'EASY' : board.difficulty === 'HARD' ? 'HARD' : 'MEDIUM';
+        const timerSeconds = board.timer_seconds || 120;
+        const minWordLength = getMinWordLength(board.language || uiLanguage, difficulty);
+
+        setGameState(prev => ({
+          ...prev,
+          mode: 'solo-bots',
+          difficulty,
+          timerSeconds,
+          bots: [],
+          language: (board.language || uiLanguage) as Language,
+          grid: board.grid as LetterGrid,
+          minWordLength,
+        }));
+        setPhase('playing');
+      } catch {
+        // Silently fall back to normal game
+      }
+    };
+
+    loadCommunityBoard();
+  }, [boardCode, uiLanguage]);
+
+  // Handle pre-game tutorial completion
+  const handleTutorialComplete = useCallback(() => {
+    markGuidanceShown('firstPlayTutorialCompleted');
+    wasFirstTimerPracticeRef.current = true;
+    const practicePreset = getDefaultPreset('practice');
+    if (practicePreset) {
+      const minWordLength = getMinWordLength(uiLanguage, practicePreset.settings.difficulty);
+      setGameState(prev => ({
+        ...prev,
+        mode: 'practice',
+        difficulty: practicePreset.settings.difficulty,
+        timerSeconds: practicePreset.settings.timerSeconds,
+        bots: [],
+        language: (uiLanguage as Language) || 'en',
+        grid: null,
+        minWordLength,
+      }));
+    }
+    setPhase('playing');
+  }, [uiLanguage]);
+
+  // Handle play again
+  const handlePlayAgain = useCallback(() => {
+    if (wasFirstTimerPracticeRef.current) {
+      wasFirstTimerPracticeRef.current = false;
+      const botsPreset = getDefaultPreset('solo-bots');
+      if (botsPreset) {
+        unlockAudio();
+        const bots = generateBotsForPreset(botsPreset.settings.bots, botsPreset.settings.botDifficulty);
+        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
+        setGameState({
+          mode: 'solo-bots',
+          difficulty: botsPreset.settings.difficulty,
+          timerSeconds: botsPreset.settings.timerSeconds,
+          bots,
+          language: (uiLanguage as Language) || 'en',
+          grid: null,
+          minWordLength,
+        });
+        setPhase('playing');
+        return;
+      }
+    }
+    router.push(`/${uiLanguage}/`);
+  }, [uiLanguage, router, unlockAudio]);
+
+  // Quick rematch
+  const handleQuickRematch = useCallback(() => {
+    unlockAudio();
+    setGameState(prev => ({ ...prev, grid: null }));
+    setPhase('playing');
+  }, [unlockAudio]);
+
+  // Back to lobby
+  const handleBackToLobby = useCallback(() => {
+    router.push(`/${uiLanguage}/`);
+  }, [router, uiLanguage]);
+
+  return {
+    phase,
+    setPhase,
+    gameState,
+    setGameState,
+    returnTo,
+    boardCode,
+    handleTutorialComplete,
+    handlePlayAgain,
+    handleQuickRematch,
+    handleBackToLobby,
+    wasFirstTimerPracticeRef,
+  };
+}

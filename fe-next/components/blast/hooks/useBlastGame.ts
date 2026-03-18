@@ -310,63 +310,61 @@ export function useBlastGame(
     setCascadeHighlightPhase('idle');
     setCascadeHighlightData(null);
 
-    let pendingPopups: BlastScorePopup[] = [];
+    // Compute tile processing result eagerly using ref (avoids stale closure).
+    // All state updates happen in the outer scope where React 18 auto-batches them.
+    const currentTiles = tileStatesRef.current;
+    const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave, preDetectedCombos });
+    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, vortexLetterSwaps, detectedCombos, bonusMoveCount, pendingPopups } = result;
 
-    setTileStates(prev => {
-      // Delegate all tile processing to the pure function
-      const result = processTilesForWord({ prev, path, word, baseScore, gridSize, currentWave, preDetectedCombos });
-      const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, vortexLetterSwaps, detectedCombos, bonusMoveCount } = result;
-      pendingPopups = result.pendingPopups;
+    totalWordsClearedRef.current += path.length;
+    if (word.length > bestWordRef.current.length) bestWordRef.current = word;
 
-      // Handle combo flash + callbacks (side effects that need React refs)
-      if (detectedCombos.length > 0) {
-        setActiveComboFlash({ id: `combo-flash-${Date.now()}`, comboType: detectedCombos[0].type });
-        onSynergyDetectedRef.current?.(detectedCombos[0].type, detectedCombos[0].scoreMultiplier);
-        onComboDetectedRef.current?.(detectedCombos);
+    // All setState calls below are in the same synchronous scope — React 18 auto-batches them
+    setTileStates(next);
+
+    if (detectedCombos.length > 0) {
+      setActiveComboFlash({ id: `combo-flash-${Date.now()}`, comboType: detectedCombos[0].type });
+      onSynergyDetectedRef.current?.(detectedCombos[0].type, detectedCombos[0].scoreMultiplier);
+      onComboDetectedRef.current?.(detectedCombos);
+    }
+
+    setGameState(prevGS => {
+      const newMovesRemaining = Math.max(0, prevGS.movesRemaining - 1) + bonusMoveCount;
+      const mergedTypeClears = { ...prevGS.tileTypeClears };
+      for (const [tType, count] of Object.entries(clearedTypeCounts)) {
+        mergedTypeClears[tType as BlastTileType] = (mergedTypeClears[tType as BlastTileType] || 0) + (count as number);
       }
-
-      totalWordsClearedRef.current += path.length;
-      if (word.length > bestWordRef.current.length) bestWordRef.current = word;
-
-      setGameState(prev => {
-        const newMovesRemaining = Math.max(0, prev.movesRemaining - 1) + bonusMoveCount;
-        const mergedTypeClears = { ...prev.tileTypeClears };
-        for (const [tType, count] of Object.entries(clearedTypeCounts)) {
-          mergedTypeClears[tType as BlastTileType] = (mergedTypeClears[tType as BlastTileType] || 0) + (count as number);
-        }
-        return { ...prev, score: prev.score + totalScore, wordsFound: [...prev.wordsFound, word], tilesCleared: prev.tilesCleared + newlyClearedCount, movesRemaining: newMovesRemaining, movesUsed: prev.movesUsed + 1, tileTypeClears: mergedTypeClears };
-      });
-
-      if (newExplosions.length > 0) setExplosions(prev => [...prev, ...newExplosions]);
-
-      // Trigger cascade — apply vortex letter swaps to grid
-      if (vortexLetterSwaps.length > 0) {
-        const baseGrid = effectiveGridRef.current;
-        if (baseGrid) {
-          const swappedGrid = baseGrid.map(row => [...row]);
-          for (const swap of vortexLetterSwaps) {
-            const tmp = swappedGrid[swap.fromR][swap.fromC];
-            swappedGrid[swap.fromR][swap.fromC] = swappedGrid[swap.toR][swap.toC];
-            swappedGrid[swap.toR][swap.toC] = tmp;
-          }
-          setCurrentGrid(swappedGrid);
-          effectiveGridRef.current = swappedGrid;
-        }
-      }
-      // Read grid from ref inside setTimeout to avoid stale closure
-      const ddaModifier = getDDASpawnModifier(ddaStateRef.current);
-      cascadeTimerRef.current = window.setTimeout(() => {
-        cascadeTimerRef.current = null;
-        const gridForCascade = effectiveGridRef.current;
-        if (gridForCascade) {
-          cascade.startCascade(gridForCascade, next, handleCascadeComplete, ddaModifier);
-        }
-      }, 80);
-
-      return next;
+      return { ...prevGS, score: prevGS.score + totalScore, wordsFound: [...prevGS.wordsFound, word], tilesCleared: prevGS.tilesCleared + newlyClearedCount, movesRemaining: newMovesRemaining, movesUsed: prevGS.movesUsed + 1, tileTypeClears: mergedTypeClears };
     });
 
-    if (pendingPopups.length > 0) setScorePopups(prev => [...prev, ...pendingPopups]);
+    if (newExplosions.length > 0) setExplosions(prevExp => [...prevExp, ...newExplosions]);
+
+    // Trigger cascade — apply vortex letter swaps to grid
+    if (vortexLetterSwaps.length > 0) {
+      const baseGrid = effectiveGridRef.current;
+      if (baseGrid) {
+        const swappedGrid = baseGrid.map(row => [...row]);
+        for (const swap of vortexLetterSwaps) {
+          const tmp = swappedGrid[swap.fromR][swap.fromC];
+          swappedGrid[swap.fromR][swap.fromC] = swappedGrid[swap.toR][swap.toC];
+          swappedGrid[swap.toR][swap.toC] = tmp;
+        }
+        setCurrentGrid(swappedGrid);
+        effectiveGridRef.current = swappedGrid;
+      }
+    }
+
+    // Read grid from ref inside setTimeout to avoid stale closure
+    const ddaModifier = getDDASpawnModifier(ddaStateRef.current);
+    cascadeTimerRef.current = window.setTimeout(() => {
+      cascadeTimerRef.current = null;
+      const gridForCascade = effectiveGridRef.current;
+      if (gridForCascade) {
+        cascade.startCascade(gridForCascade, next, handleCascadeComplete, ddaModifier);
+      }
+    }, 80);
+
+    if (pendingPopups.length > 0) setScorePopups(prevPop => [...prevPop, ...pendingPopups]);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- refs and state setters are stable
   }, [gridSize, effectiveGrid, cascade, handleCascadeComplete, currentWave]);
 

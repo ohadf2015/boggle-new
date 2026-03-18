@@ -24,6 +24,7 @@ interface SaveDrillResultResponse {
   success: boolean;
   error?: string;
   brainScore?: DrillBrainScoreUpdate;
+  xpAwarded?: number;
 }
 
 interface UseSaveDrillResultReturn {
@@ -62,6 +63,7 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
           scoreDelta: data.brainScore.scoreDelta,
           targetDomain: data.brainScore.targetDomain,
         } : undefined,
+        xpAwarded: data.xpAwarded ?? 0,
       };
     } catch (error) {
       const err = error as Error;

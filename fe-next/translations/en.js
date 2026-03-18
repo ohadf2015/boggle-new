@@ -6682,7 +6682,8 @@ const en = {
       "hard": "Hard",
       "easyDesc": "Fewer specials, relaxed cascades",
       "mediumDesc": "Balanced chaos",
-      "hardDesc": "Specials everywhere, brutal waves"
+      "hardDesc": "Specials everywhere, brutal waves",
+      "resumeWave": "Start from Wave {wave}"
     },
     "hint": "Hint",
     "stuck": "Stuck?",

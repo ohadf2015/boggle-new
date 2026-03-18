@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Hand, Sparkles, Target, BookOpen } from 'lucide-react';
+import { Hand, Sparkles, Target, BookOpen, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BlastCodexModal } from './BlastCodexModal';
@@ -10,6 +10,8 @@ import type { BlastComboType } from './utils/blastCombos';
 
 interface BlastReadyScreenProps {
   onStart: () => void;
+  onStartFromWave?: (wave: number) => void;
+  savedWave?: number;
   discoveredCombos?: Set<BlastComboType>;
 }
 
@@ -43,7 +45,7 @@ const STEPS = [
   },
 ] as const;
 
-export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreenProps) {
+export function BlastReadyScreen({ onStart, onStartFromWave, savedWave, discoveredCombos }: BlastReadyScreenProps) {
   const { t } = useLanguage();
   const [isCodexOpen, setIsCodexOpen] = useState(false);
 
@@ -105,6 +107,16 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
         >
           {t('blast.ready.play')}
         </Button>
+        {onStartFromWave && savedWave && savedWave > 1 && (
+          <button
+            data-testid="resume-wave-button"
+            onClick={() => onStartFromWave(savedWave)}
+            className="flex items-center justify-center gap-2 w-full min-h-[48px] font-black text-sm uppercase border-3 border-neo-cyan/50 shadow-hard-sm rounded-neo bg-neo-cyan/15 hover:bg-neo-cyan/25 text-neo-cyan transition-colors"
+          >
+            <Zap className="h-4 w-4" />
+            {t('blast.ready.resumeWave', { wave: String(savedWave) })}
+          </button>
+        )}
         <button
           data-testid="codex-button"
           onClick={() => setIsCodexOpen(true)}

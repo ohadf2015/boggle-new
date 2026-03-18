@@ -17,25 +17,41 @@ export const LifeGainAnimation: React.FC<LifeGainAnimationProps> = ({
     <AnimatePresence>
       {amount !== null && amount > 0 && (
         <motion.div
-          initial={{ opacity: 1, y: 0, scale: 0.8 }}
-          animate={{ opacity: 0, y: -40, scale: 1.4 }}
+          initial={{ opacity: 1, y: 0, scale: 0.6 }}
+          animate={{ opacity: 0, y: -48, scale: 1.3 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
+          transition={{ duration: 1.0, ease: 'easeOut' }}
           onAnimationComplete={onComplete}
           className="absolute left-1/4 -translate-x-1/2 -top-10 pointer-events-none z-50"
         >
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500 border-3 border-neo-black rounded-neo shadow-hard">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500 border-3 border-neo-black rounded-neo shadow-hard relative overflow-hidden">
+            {/* Shimmer sweep across the badge */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+              initial={{ x: '-100%' }}
+              animate={{ x: '200%' }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            />
             <motion.div
               initial={{ scale: 1 }}
-              animate={{ scale: [1, 1.3, 1, 1.2, 1] }}
-              transition={{ duration: 0.6, times: [0, 0.2, 0.4, 0.6, 0.8] }}
+              animate={{ scale: [1, 1.4, 1, 1.2, 1] }}
+              transition={{ duration: 0.5, times: [0, 0.2, 0.4, 0.6, 0.8] }}
             >
-              <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white" />
+              <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
             </motion.div>
-            <span className="text-xl sm:text-2xl font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+            <span className="text-xl sm:text-2xl font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] relative">
               +{amount}
             </span>
           </div>
+          {/* Ring burst behind badge */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            initial={{ scale: 0.5, opacity: 0.7 }}
+            animate={{ scale: 2.5, opacity: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          >
+            <div className="w-8 h-8 rounded-full border-2 border-emerald-300" />
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

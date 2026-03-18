@@ -140,7 +140,11 @@ export function calculateGameScores(
         // else: common word (50%+ found it), no bonus
       }
 
-      // Get pre-calculated score from word details if available
+      // Get pre-calculated score from word details if available.
+      // During live gameplay, scoreManager.addWord() always sets `score` (including combo bonus)
+      // in playerWordDetails, so the `existingDetails.score` branch is the normal path.
+      // The fallback with comboLevel=0 is defensive — it only triggers if word details are
+      // missing (e.g., migrated data or test scenarios), accepting that combo bonus is lost.
       const existingDetails = playerWordDetailsMap[username]?.get(word);
       let score = 0;
 
