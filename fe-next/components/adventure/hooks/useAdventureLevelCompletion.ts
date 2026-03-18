@@ -120,6 +120,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     handleEarnAchievementRef.current = handleEarnAchievement;
     updateWordAlbumRef.current = props.updateWordAlbum;
     completionProcessedRef.current = false;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs synced intentionally without triggering re-render
   }, [recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
 
   // Award XP and gold on level completion
@@ -278,6 +279,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     if (gameState.wordsFound.length > 0) {
       updateWordAlbumRef.current?.(gameState.wordsFound);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- wordsFound accessed via ref; wordsFound.length in deps is sufficient
   }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore]);
 
   const handleLevelUpClose = useCallback(() => {
