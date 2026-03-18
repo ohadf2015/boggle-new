@@ -14,6 +14,10 @@ jest.mock('@/components/ui/dialog', () => ({
     open ? <div data-testid="dialog">{children}</div> : null,
   DialogContent: ({ children, className }: { children: React.ReactNode; className?: string; noDescription?: boolean }) =>
     <div className={className} data-testid="dialog-content">{children}</div>,
+  DialogHeader: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+    <div className={className} data-testid="dialog-header">{children}</div>,
+  DialogTitle: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+    <h2 className={className} data-testid="dialog-title">{children}</h2>,
 }));
 
 jest.mock('@/contexts/LanguageContext', () => ({

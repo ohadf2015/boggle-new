@@ -4910,6 +4910,25 @@ const he = {
     "leaderboard": "טבלת מובילים",
     "playDaily": "שחקו באתגר היומי"
   },
+  "puzzleBrowse": {
+    "title": "עיון בפאזלים",
+    "subtitle": "גלו פאזלים מותאמים מהקהילה",
+    "createYourOwn": "צרו משלכם",
+    "sortNewest": "חדשים",
+    "sortPopular": "הכי משוחקים",
+    "loading": "טוען פאזלים...",
+    "empty": "אין פאזלים עדיין",
+    "emptyHint": "היו הראשונים ליצור!",
+    "createFirst": "צרו פאזל",
+    "by": "מאת {name}",
+    "plays": "משחקים",
+    "difficultyEasy": "קל",
+    "difficultyMedium": "בינוני",
+    "difficultyHard": "קשה",
+    "minutesAgo": "לפני {n} דק׳",
+    "hoursAgo": "לפני {n} שע׳",
+    "daysAgo": "לפני {n} ימים"
+  },
   "admin": {
     "dashboard": "לוח בקרה",
     "accessRequired": "נדרשת הרשאת מנהל",

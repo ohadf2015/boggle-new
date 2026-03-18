@@ -4967,6 +4967,25 @@ const es = {
     "leaderboard": "Clasificación",
     "playDaily": "Jugar Desafío Diario"
   },
+  "puzzleBrowse": {
+    "title": "Explorar Puzzles",
+    "subtitle": "Descubre puzzles personalizados de la comunidad",
+    "createYourOwn": "Crea el tuyo",
+    "sortNewest": "Más nuevos",
+    "sortPopular": "Más jugados",
+    "loading": "Cargando puzzles...",
+    "empty": "No hay puzzles aún",
+    "emptyHint": "¡Sé el primero en crear uno!",
+    "createFirst": "Crear un puzzle",
+    "by": "Por {name}",
+    "plays": "partidas",
+    "difficultyEasy": "Fácil",
+    "difficultyMedium": "Medio",
+    "difficultyHard": "Difícil",
+    "minutesAgo": "hace {n}m",
+    "hoursAgo": "hace {n}h",
+    "daysAgo": "hace {n}d"
+  },
   "admin": {
     "dashboard": "Panel de Administración",
     "accessRequired": "Acceso de Administrador Requerido",

@@ -4916,6 +4916,25 @@ const sv = {
     "leaderboard": "Topplista",
     "playDaily": "Spela Daglig Utmaning"
   },
+  "puzzleBrowse": {
+    "title": "Bläddra bland pussel",
+    "subtitle": "Upptäck anpassade pussel från gemenskapen",
+    "createYourOwn": "Skapa ditt eget",
+    "sortNewest": "Nyaste",
+    "sortPopular": "Mest spelade",
+    "loading": "Laddar pussel...",
+    "empty": "Inga pussel ännu",
+    "emptyHint": "Bli den första att skapa ett!",
+    "createFirst": "Skapa ett pussel",
+    "by": "Av {name}",
+    "plays": "spelningar",
+    "difficultyEasy": "Lätt",
+    "difficultyMedium": "Medel",
+    "difficultyHard": "Svårt",
+    "minutesAgo": "{n}m sedan",
+    "hoursAgo": "{n}t sedan",
+    "daysAgo": "{n}d sedan"
+  },
   "admin": {
     "dashboard": "Adminpanel",
     "accessRequired": "Adminbehörighet krävs",

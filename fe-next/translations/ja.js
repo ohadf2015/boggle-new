@@ -5035,6 +5035,25 @@ const ja = {
     "lucia": "聖ルチア",
     "christmas": "クリスマス"
   },
+  "puzzleBrowse": {
+    "title": "パズルを探す",
+    "subtitle": "コミュニティのカスタムパズルを発見しよう",
+    "createYourOwn": "自分で作る",
+    "sortNewest": "新着順",
+    "sortPopular": "人気順",
+    "loading": "パズルを読み込み中...",
+    "empty": "パズルはまだありません",
+    "emptyHint": "最初のパズルを作ろう！",
+    "createFirst": "パズルを作成",
+    "by": "{name} 作",
+    "plays": "プレイ",
+    "difficultyEasy": "簡単",
+    "difficultyMedium": "普通",
+    "difficultyHard": "難しい",
+    "minutesAgo": "{n}分前",
+    "hoursAgo": "{n}時間前",
+    "daysAgo": "{n}日前"
+  },
   "admin": {
     "dashboard": "管理ダッシュボード",
     "accessRequired": "管理者アクセスが必要です",

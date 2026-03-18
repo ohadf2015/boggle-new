@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { AvatarSelector } from '@/components/multiplayer/AvatarSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -120,6 +122,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={!isAvatarBuilderOpen}>
       <DialogContent noDescription className="!max-w-[420px] sm:!max-w-[420px] lg:!max-w-[420px] xl:!max-w-[420px] max-h-[90dvh] overflow-y-auto !p-0 !gap-0 !border-4">
+        <DialogHeader className="sr-only">
+          <DialogTitle>{t('multiplayerFlow.createModal.title')}</DialogTitle>
+        </DialogHeader>
 
         {/* ── Battle Arena Banner ── */}
         <AdaptiveMotion.div
