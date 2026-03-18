@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Shuffle, Trophy, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -54,7 +54,7 @@ export default function PatternSwitcher({
   onExit,
 }: PatternSwitcherProps) {
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
 
@@ -87,15 +87,31 @@ export default function PatternSwitcher({
     .filter(len => len <= MAX_WORD_LENGTH)
     .sort();
 
-  // Generate random pattern
+  // Generate random pattern — only request lengths that have unfound words on the board
   const generatePattern = useCallback(() => {
     const lengths: number[] = [];
+    // Track which words are "used" within this pattern to avoid requesting
+    // more words of a length than actually exist on the board
+    const wordCountByLength: Record<number, number> = {};
+    for (const w of availableWords) {
+      const len = w.word.length;
+      if (len <= MAX_WORD_LENGTH) {
+        wordCountByLength[len] = (wordCountByLength[len] || 0) + 1;
+      }
+    }
+
+    const remainingByLength = { ...wordCountByLength };
+
     for (let i = 0; i < levelConfig.patternLength; i++) {
-      const randomLength = availableLengths[Math.floor(Math.random() * availableLengths.length)];
+      // Filter to lengths that still have available words
+      const validLengths = availableLengths.filter(len => (remainingByLength[len] || 0) > 0);
+      if (validLengths.length === 0) break; // No more valid lengths possible
+      const randomLength = validLengths[Math.floor(Math.random() * validLengths.length)];
       lengths.push(randomLength);
+      remainingByLength[randomLength] = (remainingByLength[randomLength] || 1) - 1;
     }
     return lengths;
-  }, [levelConfig.patternLength, availableLengths]);
+  }, [levelConfig.patternLength, availableLengths, availableWords]);
 
   // Start game
   const startGame = useCallback(() => {
@@ -233,7 +249,7 @@ export default function PatternSwitcher({
   }, [phase, getResults, onComplete]);
 
   return (
-    <div className={cn(
+    <div dir={dir} className={cn(
       'flex flex-col h-full',
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
@@ -245,7 +261,7 @@ export default function PatternSwitcher({
       )}>
         <div className="flex items-center gap-3">
           {/* Required length */}
-          <div className={cn(
+          <div role="status" className={cn(
             'px-4 py-2 rounded-neo border-3 border-neo-black font-black text-xl',
             'bg-neo-cyan text-neo-black'
           )}>
@@ -266,7 +282,7 @@ export default function PatternSwitcher({
           </div>
         </div>
 
-        <div className={cn(
+        <div aria-live="polite" className={cn(
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
           'bg-neo-cyan text-neo-black'
         )}>
@@ -299,7 +315,7 @@ export default function PatternSwitcher({
       {/* Game Area */}
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         {phase === 'ready' && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
@@ -324,14 +340,14 @@ export default function PatternSwitcher({
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.patternLength')}: {levelConfig.patternLength}</p>
             </div>
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={startGame}
               className="px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold text-lg uppercase bg-neo-cyan text-neo-black"
             >
               {t('brain.drills.start')}
-            </motion.button>
-          </motion.div>
+            </AdaptiveMotion.button>
+          </AdaptiveMotion.div>
         )}
 
         {(phase === 'playing' || phase === 'feedback') && (
@@ -374,9 +390,10 @@ export default function PatternSwitcher({
             )}
 
             {/* Finish Game Button */}
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={finishGame}
+              aria-label={t('brain.drills.finishGame')}
               className={cn(
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
@@ -385,17 +402,17 @@ export default function PatternSwitcher({
               )}
             >
               {t('brain.drills.finishGame')}
-            </motion.button>
+            </AdaptiveMotion.button>
           </div>
         )}
 
         {phase === 'complete' && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
           >
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', damping: 12, delay: 0.2 }}
@@ -404,8 +421,8 @@ export default function PatternSwitcher({
                 'w-20 h-20 mx-auto',
                 patternsCompleted > 0 ? 'text-neo-lime' : 'text-gray-400'
               )} />
-            </motion.div>
-            <motion.h2
+            </AdaptiveMotion.div>
+            <AdaptiveMotion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -415,8 +432,8 @@ export default function PatternSwitcher({
               )}
             >
               {lives > 0 ? t('brain.drills.complete') : t('brain.drills.gameOver')}
-            </motion.h2>
-            <motion.div
+            </AdaptiveMotion.h2>
+            <AdaptiveMotion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -426,24 +443,24 @@ export default function PatternSwitcher({
               )}
             >
               {/* Animated Score */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.7, type: 'spring' }}
                 className="text-3xl font-black text-neo-cyan"
               >
-                <motion.span
+                <AdaptiveMotion.span
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
                 >
                   {score}
-                </motion.span> {t('brain.drills.points')}
-              </motion.div>
+                </AdaptiveMotion.span> {t('brain.drills.points')}
+              </AdaptiveMotion.div>
               
               {/* Animated Stats Grid */}
               <div className="grid grid-cols-2 gap-3 mt-4">
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.9 }}
@@ -459,8 +476,8 @@ export default function PatternSwitcher({
                   <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
                     {t('brain.drills.patterns')}
                   </p>
-                </motion.div>
-                <motion.div
+                </AdaptiveMotion.div>
+                <AdaptiveMotion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1 }}
@@ -476,16 +493,16 @@ export default function PatternSwitcher({
                   <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
                     {t('brain.drills.wordsFound')}
                   </p>
-                </motion.div>
+                </AdaptiveMotion.div>
               </div>
-            </motion.div>
-            <motion.div
+            </AdaptiveMotion.div>
+            <AdaptiveMotion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.2 }}
               className="flex gap-3 justify-center"
             >
-              <motion.button
+              <AdaptiveMotion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setPhase('ready')}
                 className={cn(
@@ -495,18 +512,18 @@ export default function PatternSwitcher({
               >
                 <RotateCcw className="w-5 h-5" />
                 {t('brain.drills.playAgain')}
-              </motion.button>
+              </AdaptiveMotion.button>
               {onExit && (
-                <motion.button
+                <AdaptiveMotion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={onExit}
                   className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-cyan text-neo-black"
                 >
                   {t('brain.drills.exit')}
-                </motion.button>
+                </AdaptiveMotion.button>
               )}
-            </motion.div>
-          </motion.div>
+            </AdaptiveMotion.div>
+          </AdaptiveMotion.div>
         )}
       </div>
     </div>

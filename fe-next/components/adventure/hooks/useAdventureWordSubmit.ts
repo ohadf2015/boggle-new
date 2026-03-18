@@ -11,6 +11,7 @@ import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { BossTauntEvent } from '@/types/boss';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
 import type { GridTileState } from '@/types/adventure';
+import type { BossConfig, BossMechanicResult } from '@/types/boss';
 import { evaluateWorldMechanic } from '@/lib/adventure/worldMechanics';
 import { useHaptics } from '@/hooks/useHaptics';
 
@@ -48,8 +49,8 @@ export interface UseAdventureWordSubmitProps {
   comboCount: number;
   wordsFound: string[];
   isBossActive: boolean;
-  bossConfig: any;
-  checkBossWord: (word: string) => any;
+  bossConfig: BossConfig | null;
+  checkBossWord: (word: string) => BossMechanicResult;
   dealBossDamage: (baseDamage: number, combo: number, mechanicMultiplier: number, comboBonus: number) => number;
   triggerBossTaunt: (event: BossTauntEvent) => void;
   handleEarnAchievement: (id: AdventureAchievementId) => boolean;

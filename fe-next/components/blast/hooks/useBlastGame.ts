@@ -133,6 +133,7 @@ export function useBlastGame(
   // DDA state — invisible assist for special tile spawn (PSYC-04)
   // Ref-based so cascade callbacks always read the latest value without re-render
   const ddaStateRef = useRef(createDDAState());
+  const cascadeTimerRef = useRef<number | null>(null);
 
   const gameStateRef = useRef(gameState);
   gameStateRef.current = gameState;
@@ -354,7 +355,8 @@ export function useBlastGame(
       }
       // Read grid from ref inside setTimeout to avoid stale closure
       const ddaModifier = getDDASpawnModifier(ddaStateRef.current);
-      setTimeout(() => {
+      cascadeTimerRef.current = window.setTimeout(() => {
+        cascadeTimerRef.current = null;
         const gridForCascade = effectiveGridRef.current;
         if (gridForCascade) {
           cascade.startCascade(gridForCascade, next, handleCascadeComplete, ddaModifier);
@@ -447,6 +449,11 @@ export function useBlastGame(
    */
   const addBonusScore = useCallback((bonus: number) => {
     setGameState(prev => ({ ...prev, score: prev.score + bonus }));
+  }, []);
+
+  // Cleanup cascade timer on unmount
+  useEffect(() => {
+    return () => { if (cascadeTimerRef.current !== null) clearTimeout(cascadeTimerRef.current); };
   }, []);
 
   return {

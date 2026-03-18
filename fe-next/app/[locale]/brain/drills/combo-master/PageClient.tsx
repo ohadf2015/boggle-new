@@ -12,6 +12,7 @@ import ComboMaster from '@/components/drills/ComboMaster';
 import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
 import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
+import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 
 /**
  * Combo Master Drill Page
@@ -22,7 +23,7 @@ import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillR
 export default function ComboMasterPageClient() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const { setIsInGame } = useNavigation();
   const isDarkMode = theme === 'dark';
   const { saveDrillResult } = useSaveDrillResult();
@@ -92,7 +93,7 @@ export default function ComboMasterPageClient() {
   }
 
   return (
-    <div className={cn(
+    <div dir={dir} className={cn(
       'flex-1 flex flex-col',
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
@@ -127,14 +128,16 @@ export default function ComboMasterPageClient() {
 
       {/* Drill Content */}
       <div className="flex-1">
-        <ComboMaster
-          grid={grid}
-          availableWords={availableWords}
-          level={1}
-          language={language}
-          onComplete={handleComplete}
-          onExit={handleExit}
-        />
+        <FeatureErrorBoundary featureName="drill-combo-master">
+          <ComboMaster
+            grid={grid}
+            availableWords={availableWords}
+            level={1}
+            language={language}
+            onComplete={handleComplete}
+            onExit={handleExit}
+          />
+        </FeatureErrorBoundary>
       </div>
 
       {/* Brain Score Progression Overlay */}

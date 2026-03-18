@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Zap, Clock, Trophy, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -54,7 +54,7 @@ export default function LightningRound({
   onExit,
 }: LightningRoundProps) {
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
 
@@ -193,7 +193,7 @@ export default function LightningRound({
   };
 
   return (
-    <div className={cn(
+    <div dir={dir} className={cn(
       'flex flex-col h-full',
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
@@ -210,7 +210,7 @@ export default function LightningRound({
             isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
           )}>
             <Clock className={cn('w-4 h-4', getTimeColor())} />
-            <span className={cn('font-black text-lg tabular-nums', getTimeColor())}>
+            <span role="status" className={cn('font-black text-lg tabular-nums', getTimeColor())}>
               {timeRemaining}s
             </span>
           </div>
@@ -226,7 +226,7 @@ export default function LightningRound({
 
         {/* Score */}
         <div className="relative">
-          <div className={cn(
+          <div aria-live="polite" className={cn(
             'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
             isDarkMode ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black'
           )}>
@@ -234,18 +234,18 @@ export default function LightningRound({
           </div>
 
           {/* Score popup */}
-          <AnimatePresence>
+          <AdaptiveAnimatePresence>
             {lastWordScore && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: -20 }}
                 exit={{ opacity: 0 }}
                 className="absolute -top-2 right-0 text-neo-green font-bold text-sm"
               >
                 +{lastWordScore}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
         </div>
       </div>
 
@@ -253,7 +253,7 @@ export default function LightningRound({
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         {/* Ready Phase */}
         {phase === 'ready' && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
@@ -281,7 +281,7 @@ export default function LightningRound({
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.timeLimit')}: {levelConfig.timeLimit}s</p>
             </div>
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={startGame}
               className={cn(
@@ -292,8 +292,8 @@ export default function LightningRound({
               )}
             >
               {t('brain.drills.start')}
-            </motion.button>
-          </motion.div>
+            </AdaptiveMotion.button>
+          </AdaptiveMotion.div>
         )}
 
         {/* Playing Phase */}
@@ -320,7 +320,7 @@ export default function LightningRound({
 
             {/* Keyboard typed word display */}
             {keyboard.isTypingMode && keyboard.typedWord && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
@@ -331,13 +331,13 @@ export default function LightningRound({
                 )}
               >
                 {keyboard.typedWord}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
             {/* Feedback message */}
-            <AnimatePresence>
+            <AdaptiveAnimatePresence>
               {feedback && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -349,9 +349,9 @@ export default function LightningRound({
                   )}
                 >
                   {feedback.message}
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
-            </AnimatePresence>
+            </AdaptiveAnimatePresence>
 
             {/* Recent words */}
             {wordsFound.length > 0 && (
@@ -391,9 +391,10 @@ export default function LightningRound({
             )}
 
             {/* Finish Game Button */}
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={finishGame}
+              aria-label={t('brain.drills.finishGame')}
               className={cn(
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
@@ -402,25 +403,25 @@ export default function LightningRound({
               )}
             >
               {t('brain.drills.finishGame')}
-            </motion.button>
+            </AdaptiveMotion.button>
           </div>
         )}
 
         {/* Complete Phase */}
         {phase === 'complete' && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
           >
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', damping: 12, delay: 0.2 }}
             >
               <Trophy className="w-20 h-20 mx-auto text-neo-lime" />
-            </motion.div>
-            <motion.h2
+            </AdaptiveMotion.div>
+            <AdaptiveMotion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -430,8 +431,8 @@ export default function LightningRound({
               )}
             >
               {t('brain.drills.complete')}
-            </motion.h2>
-            <motion.div
+            </AdaptiveMotion.h2>
+            <AdaptiveMotion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -441,24 +442,24 @@ export default function LightningRound({
               )}
             >
               {/* Animated Score */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.7, type: 'spring' }}
                 className="text-3xl font-black text-neo-lime"
               >
-                <motion.span
+                <AdaptiveMotion.span
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
                 >
                   {score}
-                </motion.span> {t('brain.drills.points')}
-              </motion.div>
+                </AdaptiveMotion.span> {t('brain.drills.points')}
+              </AdaptiveMotion.div>
               
               {/* Animated Stats Grid */}
               <div className="grid grid-cols-2 gap-3 mt-4">
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.9 }}
@@ -474,8 +475,8 @@ export default function LightningRound({
                   <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
                     {t('brain.drills.wordsFound')}
                   </p>
-                </motion.div>
-                <motion.div
+                </AdaptiveMotion.div>
+                <AdaptiveMotion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1 }}
@@ -491,16 +492,16 @@ export default function LightningRound({
                   <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
                     {t('brain.drills.wpm')}
                   </p>
-                </motion.div>
+                </AdaptiveMotion.div>
               </div>
-            </motion.div>
-            <motion.div
+            </AdaptiveMotion.div>
+            <AdaptiveMotion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.2 }}
               className="flex gap-3 justify-center"
             >
-              <motion.button
+              <AdaptiveMotion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   setPhase('ready');
@@ -515,18 +516,18 @@ export default function LightningRound({
               >
                 <RotateCcw className="w-5 h-5" />
                 {t('brain.drills.playAgain')}
-              </motion.button>
+              </AdaptiveMotion.button>
               {onExit && (
-                <motion.button
+                <AdaptiveMotion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={onExit}
                   className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-lime text-neo-black"
                 >
                   {t('brain.drills.exit')}
-                </motion.button>
+                </AdaptiveMotion.button>
               )}
-            </motion.div>
-          </motion.div>
+            </AdaptiveMotion.div>
+          </AdaptiveMotion.div>
         )}
       </div>
     </div>

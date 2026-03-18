@@ -21,14 +21,14 @@ export const COIN_EARNING = {
   DAILY_BASE: 25,           // Base coins for completing daily challenge
   EFFICIENCY_MULTIPLIER: 0.5, // Coins per efficiency point
   STREAK_BONUS: 10,         // Coins per streak day
-  MAX_STREAK_BONUS_DAYS: 7, // Cap streak bonus at 7 days
+  MAX_STREAK_BONUS_DAYS: 30, // Cap streak bonus at 30 days (was 7)
 } as const;
 
 // Coin cost constants
 export const COIN_COSTS = {
   REVEAL_5_PLUS: 60,        // Cost to reveal a 5+ letter word (balances with daily earnings)
   REVEAL_TARGET_WORD: 250,  // Cost to reveal the target word in daily challenge when failed
-  DAILY_RETRY: 500,         // Cost to retry daily challenge (full reset, more expensive than reveal)
+  DAILY_RETRY: 200,         // Cost to retry daily challenge (reduced from 500 — was 4+ sessions of earning)
 } as const;
 
 // Coin reward constants for ads and bonuses
@@ -47,6 +47,14 @@ export const COIN_EARNING_OTHER = {
 
 // Free reveals per game
 export const FREE_REVEALS_PER_GAME = 2;
+
+// Streak milestone bonus rewards (one-time per milestone)
+export const STREAK_MILESTONES = [
+  { days: 7, bonus: 100 },
+  { days: 14, bonus: 200 },
+  { days: 30, bonus: 500 },
+  { days: 100, bonus: 1000 },
+] as const;
 
 // Combo milestone coin rewards
 export const COMBO_COIN_REWARDS = {

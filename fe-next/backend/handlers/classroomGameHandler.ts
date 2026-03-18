@@ -5,6 +5,7 @@
  * Teachers create games, students receive notifications and join.
  */
 
+import { z } from 'zod';
 import type { Server, Socket } from 'socket.io';
 import {
   createClassroomGame,
@@ -15,23 +16,49 @@ import {
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
+import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
 
-interface CreateClassroomGamePayload extends CreateClassroomGameData {}
+// ==========================================
+// Zod Schemas for classroom events
+// ==========================================
 
-interface GetActiveGamesPayload {
-  classroomId: string;
-}
+const classroomIdSchema = z.string()
+  .uuid('classroomId must be a valid UUID');
 
-interface JoinClassroomGamePayload {
-  gameCode: string;
-  userId: string;
-  username: string;
-}
+const createClassroomGameSchema = z.object({
+  classroomId: classroomIdSchema,
+  teacherId: z.string().uuid('teacherId must be a valid UUID'),
+  teacherName: usernameSchema,
+  gameCode: gameCodeSchema,
+  lessonNames: z.array(z.string().max(200)).max(20).optional(),
+  vocabularyWords: z.array(z.string().max(100)).max(500).optional(),
+  timerMinutes: z.number().int().min(1).max(30).optional(),
+  boardSize: z.enum(['small', 'medium', 'large']).optional(),
+  allowLateJoin: z.boolean().optional(),
+});
 
-interface LeaveClassroomGamePayload {
-  gameCode: string;
-  userId: string;
+const getActiveGamesSchema = z.object({
+  classroomId: classroomIdSchema,
+});
+
+const joinClassroomGameSchema = z.object({
+  gameCode: gameCodeSchema,
+  userId: z.string().uuid('userId must be a valid UUID'),
+  username: usernameSchema,
+});
+
+const leaveClassroomGameSchema = z.object({
+  gameCode: gameCodeSchema,
+  userId: z.string().uuid('userId must be a valid UUID'),
+});
+
+/**
+ * Extract authenticated user ID from socket handshake.
+ * Returns null if not authenticated.
+ */
+function getAuthUserId(socket: Socket): string | null {
+  return (socket.handshake.auth?.authUserId as string) || null;
 }
 
 /**
@@ -42,35 +69,50 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
    * Create a new classroom game
    * Broadcasts notification to all students in the classroom
    */
-  socket.on('createClassroomGame', async (data: CreateClassroomGamePayload) => {
+  socket.on('createClassroomGame', async (data: unknown) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
+    // Validate payload
+    const validation = validatePayload(createClassroomGameSchema, data);
+    if (!validation.success) {
+      socket.emit('classroomGameError', { error: `Invalid payload: ${validation.error}` });
+      return;
+    }
+    const payload = validation.data as z.infer<typeof createClassroomGameSchema>;
+
+    // Auth check: teacherId must match authenticated user
+    const authUserId = getAuthUserId(socket);
+    if (authUserId && authUserId !== payload.teacherId) {
+      socket.emit('classroomGameError', { error: 'Teacher ID does not match authenticated user' });
+      return;
+    }
+
     try {
       // Create the game in Redis
-      await createClassroomGame(data);
+      await createClassroomGame(payload as CreateClassroomGameData);
 
       // Join classroom room for notifications
-      socket.join(`classroom:${data.classroomId}`);
+      socket.join(`classroom:${payload.classroomId}`);
 
       // Broadcast to classroom that a game has been created
-      io.to(`classroom:${data.classroomId}`).emit('classroomGameCreated', {
-        gameCode: data.gameCode,
-        teacherName: data.teacherName,
-        lessonNames: data.lessonNames,
+      io.to(`classroom:${payload.classroomId}`).emit('classroomGameCreated', {
+        gameCode: payload.gameCode,
+        teacherName: payload.teacherName,
+        lessonNames: payload.lessonNames,
       });
 
       // Confirm creation to teacher
       socket.emit('classroomGameCreated', {
         success: true,
-        gameCode: data.gameCode,
+        gameCode: payload.gameCode,
       });
 
       logger.info(
         'CLASSROOM_GAME',
-        `Teacher ${data.teacherId} created game ${data.gameCode} for classroom ${data.classroomId}`
+        `Teacher ${payload.teacherId} created game ${payload.gameCode} for classroom ${payload.classroomId}`
       );
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to create classroom game: ${error}`);
@@ -83,17 +125,25 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
   /**
    * Get active classroom games for a classroom
    */
-  socket.on('getActiveClassroomGames', async (data: GetActiveGamesPayload) => {
+  socket.on('getActiveClassroomGames', async (data: unknown) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
+    // Validate payload
+    const gamesValidation = validatePayload(getActiveGamesSchema, data);
+    if (!gamesValidation.success) {
+      socket.emit('classroomGameError', { error: `Invalid payload: ${gamesValidation.error}` });
+      return;
+    }
+    const gamesPayload = gamesValidation.data as z.infer<typeof getActiveGamesSchema>;
+
     try {
-      const games = await getActiveClassroomGames(data.classroomId);
+      const games = await getActiveClassroomGames(gamesPayload.classroomId);
 
       // Join classroom room to receive future notifications
-      socket.join(`classroom:${data.classroomId}`);
+      socket.join(`classroom:${gamesPayload.classroomId}`);
 
       socket.emit('activeClassroomGames', { games });
     } catch (error) {
@@ -107,37 +157,52 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
   /**
    * Join a classroom game
    */
-  socket.on('joinClassroomGame', async (data: JoinClassroomGamePayload) => {
+  socket.on('joinClassroomGame', async (data: unknown) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
+    // Validate payload
+    const joinValidation = validatePayload(joinClassroomGameSchema, data);
+    if (!joinValidation.success) {
+      socket.emit('classroomGameError', { error: `Invalid payload: ${joinValidation.error}` });
+      return;
+    }
+    const joinPayload = joinValidation.data as { gameCode: string; userId: string; username: string };
+
+    // Auth check: userId must match authenticated user if present
+    const joinAuthUserId = getAuthUserId(socket);
+    if (joinAuthUserId && joinAuthUserId !== joinPayload.userId) {
+      socket.emit('classroomGameError', { error: 'User ID does not match authenticated user' });
+      return;
+    }
+
     try {
-      await addPlayerToClassroomGame(data.gameCode, {
-        userId: data.userId,
-        username: data.username,
+      await addPlayerToClassroomGame(joinPayload.gameCode, {
+        userId: joinPayload.userId,
+        username: joinPayload.username,
         socketId: socket.id,
       });
 
       // Get updated game state
-      const game = await getClassroomGame(data.gameCode);
+      const game = await getClassroomGame(joinPayload.gameCode);
 
       // Notify all players in the game
       if (game) {
         io.to(`classroom:${game.classroomId}`).emit('classroomGamePlayerJoined', {
-          gameCode: data.gameCode,
-          username: data.username,
+          gameCode: joinPayload.gameCode,
+          username: joinPayload.username,
           playerCount: game.players.length,
         });
       }
 
       socket.emit('joinedClassroomGame', {
         success: true,
-        gameCode: data.gameCode,
+        gameCode: joinPayload.gameCode,
       });
 
-      logger.info('CLASSROOM_GAME', `Player ${data.username} joined game ${data.gameCode}`);
+      logger.info('CLASSROOM_GAME', `Player ${joinPayload.username} joined game ${joinPayload.gameCode}`);
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to join game: ${error}`);
       socket.emit('classroomGameError', {
@@ -149,28 +214,43 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
   /**
    * Leave a classroom game
    */
-  socket.on('leaveClassroomGame', async (data: LeaveClassroomGamePayload) => {
+  socket.on('leaveClassroomGame', async (data: unknown) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
+    // Validate payload
+    const leaveValidation = validatePayload(leaveClassroomGameSchema, data);
+    if (!leaveValidation.success) {
+      socket.emit('classroomGameError', { error: `Invalid payload: ${leaveValidation.error}` });
+      return;
+    }
+    const leavePayload = leaveValidation.data as { gameCode: string; userId: string };
+
+    // Auth check: userId must match authenticated user if present
+    const leaveAuthUserId = getAuthUserId(socket);
+    if (leaveAuthUserId && leaveAuthUserId !== leavePayload.userId) {
+      socket.emit('classroomGameError', { error: 'User ID does not match authenticated user' });
+      return;
+    }
+
     try {
-      await removePlayerFromClassroomGame(data.gameCode, data.userId);
+      await removePlayerFromClassroomGame(leavePayload.gameCode, leavePayload.userId);
 
       // Get updated game state
-      const game = await getClassroomGame(data.gameCode);
+      const game = await getClassroomGame(leavePayload.gameCode);
 
       // Notify all players
       if (game) {
         io.to(`classroom:${game.classroomId}`).emit('classroomGamePlayerLeft', {
-          gameCode: data.gameCode,
-          userId: data.userId,
+          gameCode: leavePayload.gameCode,
+          userId: leavePayload.userId,
           playerCount: game.players.length,
         });
       }
 
-      logger.info('CLASSROOM_GAME', `Player ${data.userId} left game ${data.gameCode}`);
+      logger.info('CLASSROOM_GAME', `Player ${leavePayload.userId} left game ${leavePayload.gameCode}`);
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to leave game: ${error}`);
     }

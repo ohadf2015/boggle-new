@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { fireConfetti } from '@/utils/confettiUtils';
 
@@ -47,6 +47,7 @@ export function useDailyConfetti(
   }, [isNewCompletion, fireRankConfettiLocal]);
 
   // Fire confetti on new completion
+  const rafIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (skipConfetti || !isNewCompletion || score <= 0) return;
 
@@ -56,15 +57,21 @@ export function useDailyConfetti(
     const frame = () => {
       fireConfetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFE135', '#FF6B35', '#00D9FF'] });
       fireConfetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFE135', '#FF6B35', '#00D9FF'] });
-      if (Date.now() < end) requestAnimationFrame(frame);
+      if (Date.now() < end) {
+        rafIdRef.current = requestAnimationFrame(frame);
+      }
     };
-    frame();
+    rafIdRef.current = requestAnimationFrame(frame);
 
     if (streakMilestone) {
       setTimeout(() => {
         fireConfetti({ particleCount: 60, spread: 100, origin: { y: 0.6 }, colors: ['#FF6B35', '#FFE135', '#FF1493'] });
       }, 500);
     }
+
+    return () => {
+      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
+    };
   }, [isNewCompletion, score, streakMilestone, skipConfetti]);
 
   return {

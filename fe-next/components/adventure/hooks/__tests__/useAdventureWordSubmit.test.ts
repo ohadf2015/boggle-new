@@ -193,7 +193,7 @@ describe('useAdventureWordSubmit', () => {
       useAdventureWordSubmit({
         ...defaultProps,
         isBossActive: true,
-        bossConfig: { id: 'boss' },
+        bossConfig: { id: 'boss' } as any,
       })
     );
 
@@ -212,7 +212,7 @@ describe('useAdventureWordSubmit', () => {
       useAdventureWordSubmit({
         ...defaultProps,
         isBossActive: true,
-        bossConfig: { id: 'boss' },
+        bossConfig: { id: 'boss' } as any,
       })
     );
 

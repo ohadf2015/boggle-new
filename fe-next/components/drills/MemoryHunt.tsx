@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Brain, Heart, Eye, EyeOff, CheckCircle2, XCircle, X, RefreshCw, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -36,7 +36,7 @@ export default function MemoryHunt({
   onExit,
 }: MemoryHuntProps) {
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const isDarkMode = theme === 'dark';
 
   const game = useMemoryHuntGame({
@@ -57,7 +57,7 @@ export default function MemoryHunt({
   });
 
   return (
-    <div className={cn(
+    <div dir={dir} className={cn(
       'flex flex-col h-full',
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
@@ -86,7 +86,7 @@ export default function MemoryHunt({
             {t('brain.drills.round')} {game.round}/5
           </div>
         </div>
-        <div className={cn(
+        <div aria-live="polite" className={cn(
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
           isDarkMode ? 'bg-neo-purple text-neo-white' : 'bg-neo-lime text-neo-black'
         )}>
@@ -98,7 +98,7 @@ export default function MemoryHunt({
       <div className="flex-1 flex flex-col items-center justify-center p-4 relative">
         {/* Ready Phase */}
         {game.phase === 'ready' && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
@@ -127,7 +127,7 @@ export default function MemoryHunt({
               <p>{t('brain.drills.memory-hunt.wordsToRemember')}: {game.levelConfig.wordCount}</p>
               <p>{t('brain.drills.memory-hunt.studyTime')}: {game.levelConfig.studyTime / 1000}s</p>
             </div>
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={game.startGame}
               className={cn(
@@ -138,8 +138,8 @@ export default function MemoryHunt({
               )}
             >
               {t('brain.drills.start')}
-            </motion.button>
-          </motion.div>
+            </AdaptiveMotion.button>
+          </AdaptiveMotion.div>
         )}
 
         {/* Study Phase */}
@@ -153,15 +153,15 @@ export default function MemoryHunt({
                 className="w-full opacity-50"
               />
             </div>
-            <AnimatePresence>
+            <AdaptiveAnimatePresence>
               {game.showStudyModal && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
                 >
-                  <motion.div
+                  <AdaptiveMotion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.8, opacity: 0 }}
@@ -183,7 +183,7 @@ export default function MemoryHunt({
                           {t('brain.drills.memory-hunt.studyPhase')}
                         </span>
                       </div>
-                      <div className={cn(
+                      <div role="status" className={cn(
                         'px-4 py-2 rounded-neo border-3 border-neo-black text-3xl font-black tabular-nums',
                         isDarkMode ? 'bg-neo-lime text-neo-black' : 'bg-neo-orange text-neo-black'
                       )}>
@@ -198,7 +198,7 @@ export default function MemoryHunt({
                     </p>
                     <div className="space-y-3 mb-6">
                       {game.targetWords.map((tw, i) => (
-                        <motion.div
+                        <AdaptiveMotion.div
                           key={`${tw.word}-${i}`}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -211,7 +211,7 @@ export default function MemoryHunt({
                           <span className="text-2xl sm:text-3xl font-black text-neo-black tracking-wide">
                             {tw.word}
                           </span>
-                          <motion.button
+                          <AdaptiveMotion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => game.replaceInvalidWord(tw.word)}
@@ -225,11 +225,11 @@ export default function MemoryHunt({
                           >
                             <X className="w-4 h-4" />
                             <RefreshCw className="w-3 h-3" />
-                          </motion.button>
-                        </motion.div>
+                          </AdaptiveMotion.button>
+                        </AdaptiveMotion.div>
                       ))}
                     </div>
-                    <motion.button
+                    <AdaptiveMotion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={game.skipStudyPhase}
                       className={cn(
@@ -240,11 +240,11 @@ export default function MemoryHunt({
                       )}
                     >
                       {t('brain.drills.memory-hunt.readyToStart')}
-                    </motion.button>
-                  </motion.div>
-                </motion.div>
+                    </AdaptiveMotion.button>
+                  </AdaptiveMotion.div>
+                </AdaptiveMotion.div>
               )}
-            </AnimatePresence>
+            </AdaptiveAnimatePresence>
           </div>
         )}
 
@@ -265,7 +265,7 @@ export default function MemoryHunt({
             </div>
 
             {keyboard.isTypingMode && keyboard.typedWord && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
@@ -276,7 +276,7 @@ export default function MemoryHunt({
                 )}
               >
                 {keyboard.typedWord}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
             <div className="relative">
@@ -288,9 +288,9 @@ export default function MemoryHunt({
                 language={language}
                 className="w-full"
               />
-              <AnimatePresence>
+              <AdaptiveAnimatePresence>
                 {game.lastFeedback && (
-                  <motion.div
+                  <AdaptiveMotion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
@@ -306,9 +306,9 @@ export default function MemoryHunt({
                     ) : (
                       <XCircle className="w-20 h-20 text-white drop-shadow-lg" />
                     )}
-                  </motion.div>
+                  </AdaptiveMotion.div>
                 )}
-              </AnimatePresence>
+              </AdaptiveAnimatePresence>
             </div>
 
             <div className={cn(
@@ -356,7 +356,7 @@ export default function MemoryHunt({
 
             <div className="flex gap-3 mt-4">
               {game.hintsRemaining > 0 && (
-                <motion.button
+                <AdaptiveMotion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={game.useHint}
                   disabled={game.isHintActive}
@@ -371,11 +371,12 @@ export default function MemoryHunt({
                 >
                   <Lightbulb className="w-4 h-4" />
                   {t('brain.drills.useHint')} ({game.hintsRemaining})
-                </motion.button>
+                </AdaptiveMotion.button>
               )}
-              <motion.button
+              <AdaptiveMotion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={game.finishGame}
+                aria-label={t('brain.drills.finishGame')}
                 className={cn(
                   'flex-1 px-4 py-2 rounded-neo border-2 border-neo-black',
                   'font-bold text-sm uppercase',
@@ -384,7 +385,7 @@ export default function MemoryHunt({
                 )}
               >
                 {t('brain.drills.finishGame')}
-              </motion.button>
+              </AdaptiveMotion.button>
             </div>
           </div>
         )}

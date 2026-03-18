@@ -3,6 +3,7 @@
  * Handles target word guess submissions for Word Hunt multiplayer mode
  */
 
+import { z } from 'zod';
 import type { Server, Socket } from 'socket.io';
 import {
   getGame,
@@ -21,7 +22,12 @@ import {
 } from '../utils/socketHelpers.js';
 import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
+import { validatePayload } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
+
+const submitTargetWordSchema = z.object({
+  guess: z.string().min(1, 'Guess is required').max(50, 'Guess is too long').transform(s => s.toLowerCase().trim()),
+});
 
 interface SubmitTargetWordPayload {
   guess: string;
@@ -171,14 +177,21 @@ export function handleSubmitTargetWord(
  * Register word hunt socket event handlers
  */
 export function registerWordHuntHandlers(io: Server, socket: Socket): void {
-  socket.on('submitTargetWord', (data: SubmitTargetWordPayload) => {
+  socket.on('submitTargetWord', (data: unknown) => {
     if (!checkRateLimit(socket.id, 5)) {
       socket.emit('rateLimited', { message: 'Too many guesses, slow down' });
       return;
     }
 
+    // Validate payload with Zod schema
+    const validation = validatePayload(submitTargetWordSchema, data);
+    if (!validation.success) {
+      socket.emit('error', { message: `Invalid guess: ${validation.error}` });
+      return;
+    }
+
     try {
-      handleSubmitTargetWord(io, socket, data);
+      handleSubmitTargetWord(io, socket, validation.data as SubmitTargetWordPayload);
     } catch (error) {
       logger.error('WORD_HUNT', `Error handling submitTargetWord: ${(error as Error).message}`);
       socket.emit('error', { message: 'An error occurred processing your guess' });

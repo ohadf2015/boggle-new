@@ -217,8 +217,8 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Daily quests — track progress for today's 3 quests
     const { recordProgress: recordQuestProgress } = useDailyQuests({
-      initialProgress: (progression as any)?.dailyQuestProgress,
-      lastQuestDate: (progression as any)?.dailyQuestDate,
+      initialProgress: progression?.dailyQuestProgress,
+      lastQuestDate: progression?.dailyQuestDate,
     });
 
     // Chapter quests — track progress for current chapter
