@@ -163,9 +163,10 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     lastSelectTime.current = Date.now();
 
     // On sustained drag, auto-fill remaining cells with a fast cascade
-    if (autoFillTimer.current) clearTimeout(autoFillTimer.current);
+    const prevTimer = autoFillTimer.current;
+    if (prevTimer) clearTimeout(prevTimer);
     if (sel.length + 1 < demoPath.length) {
-      autoFillTimer.current = setTimeout(() => {
+      const timer = setTimeout(() => {
         // If still dragging (no touchEnd yet), cascade remaining cells
         if (isDragging.current) {
           const remaining = demoPath.length - selectedRef.current.length;
@@ -174,6 +175,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
           }
         }
       }, 300);
+      autoFillTimer.current = timer; // eslint-disable-line react-hooks/immutability
     }
   }, [showSuccess, autoTrace, demoPath.length, selectNext]);
 
