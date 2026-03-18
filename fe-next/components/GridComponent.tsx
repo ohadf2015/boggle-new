@@ -15,7 +15,7 @@ import {
 import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import GridCellEffects from './grid/GridCellEffects';
 import EarthquakeEffects from './grid/EarthquakeEffects';
-import { getSelectionEscalation, getEscalationBackground } from './grid/selectionEscalation';
+import { getSelectionEscalation, getEscalationBackground, getEscalationShake } from './grid/selectionEscalation';
 import InputModeIndicator, { type InputMode } from './grid/InputModeIndicator';
 import DoubleClickIndicator from './grid/DoubleClickIndicator';
 import DragReleaseHint from './grid/DragReleaseHint';
@@ -256,6 +256,26 @@ const GridComponent = memo<GridComponentProps>(({
 
   const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
 
+  // Current escalation tier (based on total selected letters)
+  const currentTier = useMemo(
+    () => getSelectionEscalation(0, selectedCells.length, comboLevel).tier,
+    [selectedCells.length, comboLevel],
+  );
+
+  // Tier transition flash — fires once when crossing a tier boundary
+  const prevTierRef = useRef(0);
+  const [tierFlash, setTierFlash] = useState<number | null>(null);
+  useEffect(() => {
+    if (currentTier > prevTierRef.current && currentTier >= 2 && !reduceMotion) {
+      setTierFlash(currentTier);
+      const timeout = setTimeout(() => setTierFlash(null), 150);
+      prevTierRef.current = currentTier;
+      return () => clearTimeout(timeout);
+    }
+    prevTierRef.current = currentTier;
+    return undefined;
+  }, [currentTier, reduceMotion]);
+
   const gridDimensions = useMemo(() => ({
     cols: grid[0]?.length || 4,
     rows: grid.length || 4,
@@ -336,6 +356,9 @@ const GridComponent = memo<GridComponentProps>(({
             gridTemplateColumns: `repeat(${gridDimensions.cols}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(0, 1fr))`,
             backgroundColor: 'var(--neo-cream)',
+            ...(currentTier >= 3 && !reduceMotion ? {
+              filter: 'drop-shadow(2px 0 0 rgba(0,255,255,0.25)) drop-shadow(-2px 0 0 rgba(255,51,102,0.25))',
+            } : {}),
             ['--cell-font-size' as string]: `calc((100cqw / ${gridDimensions.cols}) * ${effectiveLargeText ? 0.70 : 0.50})`,
             containerType: 'size',
           }}
@@ -408,7 +431,9 @@ const GridComponent = memo<GridComponentProps>(({
                         x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, rotateX: 0,
                       }
                     ) : {
-                      scale: isSelected ? (escalation?.scale ?? 1.05) : (isFading ? 1.02 : 1),
+                      scale: isSelected ? (escalation?.scale ?? 1.05)
+                        : currentTier >= 3 && !isEliminated ? 0.96
+                        : (isFading ? 1.02 : 1),
                       opacity: 1,
                       rotate: 0,
                       y: isSelected ? (escalation?.liftY ?? -2) : 0,
@@ -478,7 +503,7 @@ const GridComponent = memo<GridComponentProps>(({
                     ...(isSelected && comboColors.isRainbow ? {
                       background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
                       backgroundSize: '300% 300%',
-                      animation: reduceMotion ? 'none' : 'rainbow-cell 2s ease infinite'
+                      animation: reduceMotion ? 'none' : `rainbow-cell ${Math.max(0.4, 2 - (selectedCells.length - 6) * 0.2)}s ease infinite`
                     } : isSelected && comboLevel >= 5 ? {
                       background: 'linear-gradient(135deg, #FF6B35, #FF3366, #FF6B35)',
                       backgroundSize: '200% 200%',
@@ -489,6 +514,12 @@ const GridComponent = memo<GridComponentProps>(({
                       animation: 'flicker 0.1s infinite alternate'
                     } : isSelected && escalation && escalation.tier >= 1 ? {
                       ...getEscalationBackground(selectionIdx, selectedCells.length, comboLevel),
+                      ...(!reduceMotion && getEscalationShake(selectedCells.length, comboLevel) ? {
+                        animation: [
+                          getEscalationBackground(selectionIdx, selectedCells.length, comboLevel).animation,
+                          `${getEscalationShake(selectedCells.length, comboLevel)} ${escalation.tier >= 3 ? '0.08s' : escalation.tier >= 2 ? '0.12s' : '0.15s'} infinite`,
+                        ].filter(Boolean).join(', '),
+                      } : {}),
                     } : {}),
                     // Keyboard stagger: 50ms delay per cell index
                     ...(isHighlighted && isTypingMode && highlightedOrder !== undefined ? {
@@ -539,6 +570,25 @@ const GridComponent = memo<GridComponentProps>(({
             })
           )}
         </div>
+
+        {/* Tier transition flash overlay */}
+        <AnimatePresence>
+          {tierFlash !== null && (
+            <motion.div
+              key={`tier-flash-${tierFlash}`}
+              className="absolute inset-0 pointer-events-none z-30 rounded-neo"
+              style={{
+                background: tierFlash >= 3
+                  ? 'radial-gradient(circle, rgba(0,255,255,0.6), rgba(255,51,102,0.3) 60%, transparent 85%)'
+                  : 'radial-gradient(circle, rgba(255,255,255,0.7), rgba(255,20,147,0.2) 60%, transparent 85%)',
+              }}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+            />
+          )}
+        </AnimatePresence>
 
         <EarthquakeEffects
           particles={earthquakeParticles}

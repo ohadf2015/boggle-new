@@ -1,4 +1,4 @@
-import { getSelectionEscalation, getEscalationBackground } from '../selectionEscalation';
+import { getSelectionEscalation, getEscalationBackground, getEscalationShake } from '../selectionEscalation';
 
 describe('getSelectionEscalation', () => {
   describe('tier calculation based on word length', () => {
@@ -168,18 +168,20 @@ describe('getEscalationBackground', () => {
     expect(getEscalationBackground(0, 2)).toEqual({});
   });
 
-  it('returns orange gradient for tier 1 later tiles', () => {
-    const bg = getEscalationBackground(2, 3);
-    expect(bg.background).toContain('#FF6B35');
+  it('returns orange gradient for ALL tiles at tier 1', () => {
+    // All tiles get the same color — first and last tile alike
+    const first = getEscalationBackground(0, 3);
+    const last = getEscalationBackground(2, 3);
+    expect(first.background).toContain('#FF6B35');
+    expect(last.background).toContain('#FF6B35');
+    expect(first.background).toBe(last.background);
   });
 
-  it('returns empty for tier 1 early tiles', () => {
-    expect(getEscalationBackground(0, 3)).toEqual({});
-  });
-
-  it('returns pink gradient for tier 2', () => {
-    const bg = getEscalationBackground(3, 5);
-    expect(bg.background).toContain('#FF1493');
+  it('returns pink gradient for ALL tiles at tier 2', () => {
+    const first = getEscalationBackground(0, 5);
+    const last = getEscalationBackground(4, 5);
+    expect(first.background).toContain('#FF1493');
+    expect(first.background).toBe(last.background);
   });
 
   it('returns rainbow animation for tier 3', () => {
@@ -191,5 +193,28 @@ describe('getEscalationBackground', () => {
     // 3 letters + combo 4 → tier 2 → pink
     const bg = getEscalationBackground(2, 3, 4);
     expect(bg.background).toContain('#FF1493');
+  });
+});
+
+describe('getEscalationShake', () => {
+  it('returns undefined for tier 0', () => {
+    expect(getEscalationShake(2)).toBeUndefined();
+  });
+
+  it('returns tremble for tier 1', () => {
+    expect(getEscalationShake(3)).toBe('escalation-tremble');
+  });
+
+  it('returns shake for tier 2', () => {
+    expect(getEscalationShake(5)).toBe('escalation-shake');
+  });
+
+  it('returns vibrate for tier 3', () => {
+    expect(getEscalationShake(7)).toBe('escalation-vibrate');
+  });
+
+  it('combo boosts shake tier', () => {
+    // 3 letters + combo 4 → tier 2 → shake
+    expect(getEscalationShake(3, 4)).toBe('escalation-shake');
   });
 });

@@ -20,15 +20,19 @@ const TOTAL_STEPS = 3;
 const SPRING_POP = { type: 'spring' as const, stiffness: 500, damping: 22 };
 const SPRING_SOFT = { type: 'spring' as const, stiffness: 300, damping: 26 };
 
-/** Step transition helper */
-const getStepTransition = (dir: number) => ({
-  initial: { opacity: 0, x: dir > 0 ? 80 : -80, scale: 0.95 },
-  animate: { opacity: 1, x: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 300, damping: 26 } },
-  exit: { opacity: 0, x: dir > 0 ? -80 : 80, scale: 0.95, transition: { duration: 0.2 } },
-});
+/** Step transition helper — flips x direction for RTL */
+const getStepTransition = (dir: number, rtl: boolean) => {
+  const flip = rtl ? -1 : 1;
+  return {
+    initial: { opacity: 0, x: dir * 80 * flip, scale: 0.95 },
+    animate: { opacity: 1, x: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 300, damping: 26 } },
+    exit: { opacity: 0, x: dir * -80 * flip, scale: 0.95, transition: { duration: 0.2 } },
+  };
+};
 
 const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
+  const isRTL = dir === 'rtl';
   const isDesktop = useIsDesktop();
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -86,7 +90,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
           {currentStep === 0 && (
             <motion.div
               key="welcome"
-              {...getStepTransition(direction)}
+              {...getStepTransition(direction, isRTL)}
               className="flex flex-col items-center text-center space-y-4"
             >
               <MascotWithEntrance variant="happy" size="xl" priority />
@@ -119,7 +123,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 className="bg-neo-yellow border-3 border-neo-black rounded-neo px-6 py-3 font-black text-neo-black shadow-hard transition-shadow flex items-center gap-2"
               >
                 {t('preGameTutorial.next')}
-                <ChevronRight className="w-4 h-4" />
+                {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
               </motion.button>
             </motion.div>
           )}
@@ -128,7 +132,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
           {currentStep === 1 && (
             <motion.div
               key="practice"
-              {...getStepTransition(direction)}
+              {...getStepTransition(direction, isRTL)}
               className="flex flex-col items-center text-center space-y-4 w-full"
             >
               <motion.div
@@ -186,7 +190,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
           {currentStep === 2 && (
             <motion.div
               key="tips"
-              {...getStepTransition(direction)}
+              {...getStepTransition(direction, isRTL)}
               className="flex flex-col items-center text-center space-y-4 w-full"
             >
               <Mascot variant="celebration" size="lg" />
@@ -292,7 +296,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          <ChevronLeft className="w-5 h-5" />
+          {isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
         </motion.button>
 
         <div className="flex items-center gap-3">
@@ -323,7 +327,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          <ChevronRight className="w-5 h-5" />
+          {isRTL ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
         </motion.button>
       </div>
     </div>

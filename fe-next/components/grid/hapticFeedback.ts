@@ -99,10 +99,33 @@ export function vibrateCellTap(fireRoundActive: boolean): void {
 }
 
 /**
- * Haptic feedback during cell drag selection
+ * Haptic feedback during cell drag selection.
+ * Escalates with selection tier for a "building power" sensation.
  */
-export function vibrateCellDrag(fireRoundActive: boolean): void {
-  vibrate(fireRoundActive ? PATTERNS.cellDragFire : PATTERNS.cellDragNormal);
+export function vibrateCellDrag(fireRoundActive: boolean, tier = 0): void {
+  if (tier >= 3) {
+    vibrate(fireRoundActive ? [20, 8, 25] : [15, 8, 20]);
+  } else if (tier >= 2) {
+    vibrate(fireRoundActive ? [15, 8, 15] : [12, 6, 12]);
+  } else if (tier >= 1) {
+    vibrate(fireRoundActive ? PATTERNS.cellDragFire : 12);
+  } else {
+    vibrate(fireRoundActive ? PATTERNS.cellDragFire : PATTERNS.cellDragNormal);
+  }
+}
+
+/**
+ * Haptic feedback for tier transition — a distinct "power surge" pulse
+ * fired once when crossing a tier boundary during selection.
+ */
+export function vibrateTierTransition(newTier: number): void {
+  if (newTier >= 3) {
+    vibrate([30, 10, 30, 10, 50]);
+  } else if (newTier >= 2) {
+    vibrate([20, 10, 25]);
+  } else if (newTier >= 1) {
+    vibrate(15);
+  }
 }
 
 /**

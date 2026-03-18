@@ -159,9 +159,10 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
       )}
 
       {/* Escalation burst particles — compounds: more particles, bigger, further at high combo */}
+      {/* Variable ratio: 20% chance of 1.5x particle count for surprise "extra juice" */}
       {escalation.showBurst && !reduceMotion && effectiveRenderMode === 'full' && !isFirstSelected && (
         <>
-          {[...Array(escalation.particleCount)].map((_, idx) => {
+          {[...Array(Math.round(escalation.particleCount * (selectionIndex % 5 === 3 ? 1.5 : 1)))].map((_, idx) => {
             const angle = (idx * (360 / escalation.particleCount) + 30) * (Math.PI / 180);
             const color = escalation.particleColors[idx % escalation.particleColors.length];
             return (

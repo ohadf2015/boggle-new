@@ -18,8 +18,10 @@ import {
   vibrateCellDrag,
   vibrateBacktrack,
   vibrateUndo,
+  vibrateTierTransition,
 } from './hapticFeedback';
 import { createVelocityTracker } from './velocityTracker';
+import { getSelectionEscalation } from './selectionEscalation';
 import { useGridKeyboardHandler } from './useGridKeyboardHandler';
 import { useGridClickHandler } from './useGridClickHandler';
 
@@ -239,10 +241,17 @@ export function useGridInteraction({
       return;
     }
     if (isAdjacentCell(lastCell, currentCell)) {
+      const newCount = selectedCells.length + 1;
+      const prevTier = getSelectionEscalation(0, selectedCells.length, comboLevel).tier;
+      const newTier = getSelectionEscalation(0, newCount, comboLevel).tier;
       setSelectedCells([...selectedCells, { row: currentCell.row, col: currentCell.col, letter: currentCell.letter }]);
-      vibrateCellDrag(fireRoundActive);
+      if (newTier > prevTier) {
+        vibrateTierTransition(newTier);
+      } else {
+        vibrateCellDrag(fireRoundActive, newTier);
+      }
     }
-  }, [selectedCells, setSelectedCells, fireRoundActive, getCellAtPos]);
+  }, [selectedCells, setSelectedCells, fireRoundActive, comboLevel, getCellAtPos]);
 
   const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
     if (!interactive || !isTouchingRef.current) return;

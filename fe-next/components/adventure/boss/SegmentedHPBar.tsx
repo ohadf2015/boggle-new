@@ -317,10 +317,10 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
 
   return (
     <div className="w-full">
-      {/* Header: Boss name + Phase indicator */}
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-1.5">
-          <h2 className="font-neo-display text-sm sm:text-base font-black text-neo-white truncate">
+      {/* Header: Boss name + Phase indicator — compact single line */}
+      <div className="flex items-center justify-between mb-0.5">
+        <div className="flex items-center gap-1 min-w-0">
+          <h2 className="font-neo-display text-xs sm:text-sm font-black text-neo-white truncate">
             {t(bossName) || bossName}
           </h2>
           {/* Swords icon when enraged */}
@@ -337,7 +337,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* HP numbers */}
           <span
-            className={`font-mono text-xs font-bold tabular-nums ${
+            className={`font-mono text-[10px] sm:text-xs font-bold tabular-nums ${
               isLowHP ? 'text-neo-red' : 'text-neo-white/70'
             }`}
           >
@@ -356,7 +356,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         aria-label={`${t(bossName) || bossName} health: ${hpPercentage}%`}
         data-testid="segmented-hp-bar"
         className={`
-          relative w-full h-6 sm:h-7
+          relative w-full h-5 sm:h-6
           border-3 border-neo-black rounded-neo
           shadow-hard
           overflow-hidden flex

@@ -167,27 +167,28 @@ function fireTier(depth: number, amp: number): SelectionEscalation {
 
 /**
  * Get the escalation background gradient for tiles at higher tiers.
+ * ALL selected tiles share the same tier color (based on totalSelected),
+ * creating a unified color shift as the word grows.
  * Returns inline style object or empty object for base tier.
  */
 export function getEscalationBackground(
-  selectionIndex: number,
+  _selectionIndex: number,
   totalSelected: number,
   comboLevel = 0,
 ): React.CSSProperties {
-  const esc = getSelectionEscalation(selectionIndex, totalSelected, comboLevel);
+  const esc = getSelectionEscalation(0, totalSelected, comboLevel);
 
   if (esc.tier <= 0) return {};
 
-  if (esc.tier === 1 && selectionIndex >= 2) {
+  if (esc.tier === 1) {
     return {
       background: 'linear-gradient(135deg, #FFE135, #FF6B35)',
     };
   }
 
   if (esc.tier === 2) {
-    const pinkRatio = Math.min(selectionIndex * 15, 60);
     return {
-      background: `linear-gradient(135deg, #FF6B35 ${40 - pinkRatio}%, #FF1493)`,
+      background: 'linear-gradient(135deg, #FF6B35 10%, #FF1493)',
     };
   }
 
@@ -200,4 +201,20 @@ export function getEscalationBackground(
   }
 
   return {};
+}
+
+/**
+ * Get the escalation shake animation name for selected tiles.
+ * Returns a CSS animation name that intensifies with tier.
+ * All selected tiles shake together, creating a "building energy" feel.
+ */
+export function getEscalationShake(
+  totalSelected: number,
+  comboLevel = 0,
+): string | undefined {
+  const esc = getSelectionEscalation(0, totalSelected, comboLevel);
+  if (esc.tier <= 0) return undefined;
+  if (esc.tier === 1) return 'escalation-tremble';
+  if (esc.tier === 2) return 'escalation-shake';
+  return 'escalation-vibrate';
 }

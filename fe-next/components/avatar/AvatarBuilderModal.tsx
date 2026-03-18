@@ -630,7 +630,7 @@ function PartPreviewGrid<T extends string>({
                         : 'bg-neo-navy-light border-neo-white/15 hover:border-neo-white/40 hover:bg-neo-navy-light/80'
               }`}
             >
-              <div className={`w-12 h-12 flex items-center justify-center ${isLocked ? 'opacity-50' : ''}`}>
+              <div className={`w-12 h-12 flex items-center justify-center ${isLocked ? 'opacity-40 grayscale-[30%]' : ''}`}>
                 {option === 'none' ? (
                   <span className="text-neo-white/40 text-xs font-bold">{noneLabel ?? '—'}</span>
                 ) : (
@@ -639,20 +639,23 @@ function PartPreviewGrid<T extends string>({
               </div>
               {isLocked && (
                 <>
+                  {/* Tier badge */}
                   <div className="absolute top-0.5 end-0.5">
                     {isLegendary ? (
                       <span className="text-[7px] font-black text-amber-300 bg-gradient-to-r from-amber-900/80 to-amber-800/80 px-1 rounded shadow-sm tracking-wide">LEGENDARY</span>
                     ) : isEpic ? (
                       <span className="text-[8px] font-black text-purple-400 bg-purple-900/60 px-1 rounded">EPIC</span>
-                    ) : (
-                      <Lock className="w-3 h-3 text-neo-yellow" />
-                    )}
+                    ) : null}
                   </div>
-                  <div className="absolute bottom-0.5 inset-x-0 flex items-center justify-center">
-                    <span className={`text-[9px] font-black flex items-center gap-0.5 px-1 rounded ${
-                      isLegendary ? 'text-amber-300 bg-amber-900/70' : isEpic ? 'text-purple-300 bg-purple-900/70' : 'text-neo-yellow bg-neo-navy/80'
+                  {/* Lock overlay with price — covers bottom half for clear visibility */}
+                  <div className={`absolute bottom-0 inset-x-0 flex items-center justify-center gap-1 py-1 rounded-b-neo ${
+                    isLegendary ? 'bg-gradient-to-t from-amber-900/90 to-amber-900/50' : isEpic ? 'bg-gradient-to-t from-purple-900/90 to-purple-900/50' : 'bg-gradient-to-t from-neo-navy/90 to-neo-navy/50'
+                  }`}>
+                    <Lock className={`w-3 h-3 ${isLegendary ? 'text-amber-300' : isEpic ? 'text-purple-300' : 'text-neo-yellow'}`} />
+                    <span className={`text-[11px] font-black flex items-center gap-0.5 ${
+                      isLegendary ? 'text-amber-300' : isEpic ? 'text-purple-300' : 'text-neo-yellow'
                     }`}>
-                      <Coins className="w-2.5 h-2.5" />
+                      <Coins className="w-3 h-3" />
                       {getPartPrice(cat, option)}
                     </span>
                   </div>

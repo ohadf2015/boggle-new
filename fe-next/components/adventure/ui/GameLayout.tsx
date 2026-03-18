@@ -19,6 +19,8 @@ interface GameLayoutProps {
   gridArea: React.ReactNode;
   sidebar: React.ReactNode;
   overlays?: React.ReactNode;
+  /** When true, sidebar collapses to give the grid max space (boss fights) */
+  isBossActive?: boolean;
   className?: string;
 }
 
@@ -31,6 +33,7 @@ export const GameLayout = memo(function GameLayout({
   gridArea,
   sidebar,
   overlays,
+  isBossActive = false,
   className,
 }: GameLayoutProps) {
   return (
@@ -68,14 +71,20 @@ export const GameLayout = memo(function GameLayout({
         */}
         <div
           className={cn(
-            'flex-shrink-0',
-            // Portrait: compact bar above grid (visible objectives)
-            'h-20 md:h-24',
-            // Landscape / desktop: full-height column to the right (order-last)
-            'landscape:h-full landscape:w-64 landscape:order-last',
-            'lg:h-full lg:w-80 xl:w-96 lg:order-last',
-            'overflow-x-auto overflow-y-hidden landscape:overflow-y-auto landscape:overflow-x-hidden',
-            'lg:overflow-y-auto lg:overflow-x-hidden',
+            'flex-shrink-0 transition-all duration-300',
+            // Boss active: collapse sidebar completely — boss HUD replaces objectives
+            isBossActive
+              ? 'h-0 landscape:w-0 lg:w-0 overflow-hidden opacity-0'
+              : [
+                  // Portrait: compact bar above grid (visible objectives)
+                  'h-20 md:h-24',
+                  // Landscape / desktop: full-height column to the right (order-last)
+                  'landscape:h-full landscape:w-64 landscape:order-last',
+                  'lg:h-full lg:w-80 xl:w-96 lg:order-last',
+                  'overflow-x-auto overflow-y-hidden landscape:overflow-y-auto landscape:overflow-x-hidden',
+                  'lg:overflow-y-auto lg:overflow-x-hidden',
+                  'opacity-100',
+                ],
             'bg-neo-black/20 landscape:bg-neo-black/30 lg:bg-neo-black/30',
             'z-10'
           )}

@@ -6,11 +6,11 @@ import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 
 const bioByLocale: Record<string, string> = {
-  en: 'Cognitive science enthusiast exploring how word games impact brain health, learning, and cognitive development.',
-  he: 'חובבת מדעי הקוגניציה, חוקרת כיצד משחקי מילים משפיעים על בריאות המוח, למידה והתפתחות קוגניטיבית.',
-  sv: 'Kognitionsvetenskapsentusiast som utforskar hur ordspel paverkar hjarnhalsa, larande och kognitiv utveckling.',
-  ja: '\u8a8d\u77e5\u79d1\u5b66\u611b\u597d\u5bb6\u3002\u30ef\u30fc\u30c9\u30b2\u30fc\u30e0\u304c\u8133\u306e\u5065\u5eb7\u3001\u5b66\u7fd2\u3001\u8a8d\u77e5\u767a\u9054\u306b\u4e0e\u3048\u308b\u5f71\u97ff\u3092\u63a2\u6c42\u3002',
-  es: 'Entusiasta de la ciencia cognitiva que explora como los juegos de palabras impactan la salud cerebral, el aprendizaje y el desarrollo cognitivo.',
+  en: 'Cognitive science enthusiast with 8+ years researching word games, linguistics, and brain health. Creator of LexiClash.',
+  he: 'חובבת מדעי הקוגניציה עם 8+ שנות מחקר במשחקי מילים, בלשנות ובריאות המוח. יוצרת LexiClash.',
+  sv: 'Kognitionsvetenskapsentusiast med 8+ ars forskning om ordspel, lingvistik och hjarnhalsa. Skapare av LexiClash.',
+  ja: '認知科学愛好家。8年以上にわたりワードゲーム、言語学、脳の健康を研究。LexiClash開発者。',
+  es: 'Entusiasta de la ciencia cognitiva con 8+ anos investigando juegos de palabras, linguistica y salud cerebral. Creadora de LexiClash.',
 };
 
 const titleByLocale: Record<string, string> = {

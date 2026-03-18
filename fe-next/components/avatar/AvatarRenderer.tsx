@@ -148,15 +148,15 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
         <ellipse cx="42" cy="36" rx="14" ry="8" fill={skinHighlight} opacity="0.18" />
       )}
 
-      {/* Chin shadow — depth below the face for jawline separation */}
+      {/* Chin shadow — subtle depth at jawline/body junction */}
       {showDepth && CIRCULAR_BASES.has(config.base) && (
-        <ellipse cx="50" cy="72" rx="16" ry="6" fill={skinShadow} opacity="0.55" />
+        <ellipse cx="50" cy="73" rx="12" ry="3" fill={skinShadow} opacity="0.2" />
       )}
       {showDepth && ELLIPTICAL_BASES.has(config.base) && (
-        <ellipse cx="50" cy="76" rx="14" ry="6" fill={skinShadow} opacity="0.5" />
+        <ellipse cx="50" cy="77" rx="10" ry="3" fill={skinShadow} opacity="0.18" />
       )}
       {showDepth && config.base === 'square' && (
-        <ellipse cx="50" cy="74" rx="18" ry="5" fill={skinShadow} opacity="0.45" />
+        <ellipse cx="50" cy="75" rx="14" ry="3" fill={skinShadow} opacity="0.15" />
       )}
 
       {/* Cheek blush (skin-tone-aware) — skip for non-human face shapes */}

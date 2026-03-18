@@ -629,6 +629,7 @@ const AdventureGame = memo<AdventureGameProps>(
       <div ref={effects.shakeRef} data-testid="adventure-game" role="main" aria-label="Adventure Mode Game" className="h-full w-full overflow-hidden relative" style={{ '--mastery-aura': masteryAura } as React.CSSProperties}>
         <GameplayBackground className="absolute inset-0 -z-10" />
         <GameLayout
+          isBossActive={isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete}
           header={
             <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}
               score={gameState.score} timeRemaining={timeRemaining} isPaused={isPaused}

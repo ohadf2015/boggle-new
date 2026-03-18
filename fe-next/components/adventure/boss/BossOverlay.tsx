@@ -315,9 +315,9 @@ const BossOverlay = memo<BossOverlayProps>(
         {/* ACTIVE BATTLE UI */}
         {showingActivePhase && !showingVictory && !showingDefeat && (
           <>
-            {/* Compact Combat HUD Strip */}
-            <div className="fixed top-12 sm:top-14 left-0 right-0 z-30 pointer-events-none">
-              <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 pt-2">
+            {/* Compact Combat HUD Strip — sits just below the GameHeader */}
+            <div className="fixed top-[3.25rem] sm:top-[3.75rem] left-0 right-0 z-30 pointer-events-none">
+              <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 pt-1.5">
                 {/* Boss Avatar + HP Bar row */}
                 <div className="flex items-center gap-2 sm:gap-3">
                   {/* Boss Avatar — compact */}

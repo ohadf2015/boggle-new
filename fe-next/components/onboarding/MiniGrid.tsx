@@ -419,7 +419,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                   'relative z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-md font-black text-xl sm:text-2xl',
                   filled
                     ? 'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm'
-                    : 'bg-neo-black/5 text-neo-black/20 border-2 border-neo-black/15'
+                    : 'bg-neo-black/10 text-neo-black/50 border-2 border-neo-black/25'
                 )}
                 animate={filled ? { scale: [0.7, 1.2, 1], rotate: [0, -5, 0] } : { scale: 1 }}
                 transition={filled ? SPRING_BOUNCE : undefined}
