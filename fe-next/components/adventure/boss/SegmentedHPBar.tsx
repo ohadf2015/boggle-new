@@ -21,7 +21,7 @@
 'use client';
 
 import { memo, useMemo, useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Swords } from 'lucide-react';
 import PhaseIndicator from './PhaseIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -140,7 +140,7 @@ const Segment = memo<SegmentProps>(({ id, fill, color, label, isLowHP }) => {
       className="relative flex-1 h-full bg-neo-navy-light overflow-hidden"
       aria-label={label}
     >
-      <motion.div
+      <AdaptiveMotion.div
         data-fill-bar
         className={`
           absolute inset-y-0 start-0 h-full
@@ -171,7 +171,7 @@ const Segment = memo<SegmentProps>(({ id, fill, color, label, isLowHP }) => {
               'repeating-linear-gradient(90deg, transparent, transparent 11px, rgba(0,0,0,0.15) 11px, rgba(0,0,0,0.15) 12px)',
           }}
         />
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 });
@@ -206,7 +206,7 @@ interface FloatingDamageNumberProps {
 
 /** Floating "-N" damage number that rises and fades */
 const FloatingDamageNumber = memo<FloatingDamageNumberProps>(({ id, amount }) => (
-  <motion.div
+  <AdaptiveMotion.div
     key={id}
     className="absolute -top-2 end-2 pointer-events-none z-20"
     initial={{ y: 0, opacity: 1 }}
@@ -218,7 +218,7 @@ const FloatingDamageNumber = memo<FloatingDamageNumberProps>(({ id, amount }) =>
     <span className="font-neo-display text-sm font-black text-neo-red drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
       -{amount}
     </span>
-  </motion.div>
+  </AdaptiveMotion.div>
 ));
 
 FloatingDamageNumber.displayName = 'FloatingDamageNumber';
@@ -325,13 +325,13 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
           </h2>
           {/* Swords icon when enraged */}
           {phase === 'enraged' && (
-            <motion.span
+            <AdaptiveMotion.span
               animate={{ rotate: [-8, 8, -8], scale: [1, 1.15, 1] }}
               transition={{ duration: 0.4, repeat: Infinity }}
               aria-hidden="true"
             >
               <Swords className="w-3.5 h-3.5 text-neo-red flex-shrink-0" />
-            </motion.span>
+            </AdaptiveMotion.span>
           )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -348,7 +348,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
       </div>
 
       {/* HP Bar Container */}
-      <motion.div
+      <AdaptiveMotion.div
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
@@ -394,7 +394,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
 
         {/* Low HP outer glow — intensifies as HP decreases */}
         {isLowHP && (
-          <motion.div
+          <AdaptiveMotion.div
             className="absolute inset-0 rounded-neo pointer-events-none"
             animate={{
               boxShadow: [
@@ -408,12 +408,12 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         )}
 
         {/* Floating damage numbers */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {damageNumbers.map(n => (
             <FloatingDamageNumber key={n.id} id={n.id} amount={n.amount} />
           ))}
-        </AnimatePresence>
-      </motion.div>
+        </AdaptiveAnimatePresence>
+      </AdaptiveMotion.div>
     </div>
   );
 });

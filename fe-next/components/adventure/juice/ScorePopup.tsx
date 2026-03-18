@@ -24,7 +24,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 export interface ScorePopupProps {
@@ -85,7 +85,7 @@ export function ScorePopup({
   // Reduced motion variant - simple fade
   if (prefersReducedMotion) {
     return (
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed z-50 pointer-events-none"
         data-testid="score-popup-fly"
         style={{
@@ -102,7 +102,7 @@ export function ScorePopup({
             <span className="ms-2 text-lg opacity-80">×{comboMultiplier}</span>
           )}
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 
@@ -112,7 +112,7 @@ export function ScorePopup({
   const arcMidY = Math.min(clampedPosition.y, target.y) - 50;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className="fixed z-50 pointer-events-none"
       data-testid="score-popup-fly"
       style={{
@@ -143,6 +143,6 @@ export function ScorePopup({
           <span className="ms-2 text-lg opacity-80">×{comboMultiplier}</span>
         )}
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 }

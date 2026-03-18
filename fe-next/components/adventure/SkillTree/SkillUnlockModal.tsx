@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { SkillNode, SkillPath } from '@/types/adventure';
@@ -73,9 +73,9 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
   const colors = PATH_COLORS[skill.path];
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {skill && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -87,7 +87,7 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
           )}
           data-testid="skill-unlock-modal"
         >
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.5, opacity: 0 }}
@@ -101,7 +101,7 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
             )}
           >
             {/* Skill Icon */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: 'spring', damping: 10 }}
@@ -114,10 +114,10 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
               )}
             >
               <span className="text-4xl">{skill.icon}</span>
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Title */}
-            <motion.h2
+            <AdaptiveMotion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -127,10 +127,10 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
               )}
             >
               {t('adventure.skills.unlocked')}
-            </motion.h2>
+            </AdaptiveMotion.h2>
 
             {/* Skill Name */}
-            <motion.h3
+            <AdaptiveMotion.h3
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -141,20 +141,20 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
               )}
             >
               {t(skill.nameKey)}
-            </motion.h3>
+            </AdaptiveMotion.h3>
 
             {/* Skill Description */}
-            <motion.p
+            <AdaptiveMotion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
               className="text-center text-neo-white/80 text-sm"
             >
               {t(skill.descriptionKey)}
-            </motion.p>
+            </AdaptiveMotion.p>
 
             {/* Close Button */}
-            <motion.button
+            <AdaptiveMotion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -171,11 +171,11 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
               )}
             >
               {t('common.continue')}
-            </motion.button>
-          </motion.div>
-        </motion.div>
+            </AdaptiveMotion.button>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 }
 

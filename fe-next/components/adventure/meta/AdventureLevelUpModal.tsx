@@ -10,7 +10,7 @@
 'use client';
 
 import { memo, useEffect, useId, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -79,9 +79,9 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
     }
 
     return (
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {/* Overlay */}
-        <motion.div
+        <AdaptiveMotion.div
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
@@ -97,7 +97,7 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
           onClick={onClose}
         >
           {/* Modal Card */}
-          <motion.div
+          <AdaptiveMotion.div
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',
@@ -112,14 +112,14 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
             onClick={(e) => e.stopPropagation()}
           >
             {/* Celebration Emoji */}
-            <motion.span
+            <AdaptiveMotion.span
               className="block text-6xl mb-4"
               initial={{ opacity: 0, scale: 0.95, rotate: -30 }}
               animate={{ opacity: 1, scale: [0.95, 1.3, 1], rotate: [30, -15, 0] }}
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
             >
               🎉
-            </motion.span>
+            </AdaptiveMotion.span>
 
             {/* Title */}
             <h2
@@ -139,7 +139,7 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
               <p className="text-neo-white/70 font-bold text-lg mb-2">
                 {t('adventure.xp.newLevel')}
               </p>
-              <motion.div
+              <AdaptiveMotion.div
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
@@ -159,11 +159,11 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
                 >
                   {newLevel}
                 </span>
-              </motion.div>
+              </AdaptiveMotion.div>
             </div>
 
             {/* Continue Button */}
-            <motion.button
+            <AdaptiveMotion.button
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
@@ -180,10 +180,10 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
               transition={{ delay: 0.6 }}
             >
               {t('adventure.xp.continue')}
-            </motion.button>
-          </motion.div>
-        </motion.div>
-      </AnimatePresence>
+            </AdaptiveMotion.button>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveAnimatePresence>
     );
   }
 );

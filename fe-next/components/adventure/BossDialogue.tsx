@@ -16,7 +16,7 @@
 
 import { memo, useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
@@ -64,9 +64,9 @@ const LegacyBossDialogue = memo<BossDialogueProps>(
     const variants = SLIDE_VARIANTS[position];
 
     return (
-      <AnimatePresence mode="wait">
+      <AdaptiveAnimatePresence mode="wait">
         {isVisible && (
-          <motion.div
+          <AdaptiveMotion.div
             key="boss-dialogue"
             data-testid="boss-dialogue"
             className={cn(
@@ -124,9 +124,9 @@ const LegacyBossDialogue = memo<BossDialogueProps>(
                 </p>
               </div>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     );
   }
 );
@@ -186,8 +186,8 @@ export const BossDialogue = memo(function BossDialogue({
   if (!dialogue) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         key={dialogue}
         initial={{ opacity: 0, y: -8, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -223,8 +223,8 @@ export const BossDialogue = memo(function BossDialogue({
             )}
           </p>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 });
 

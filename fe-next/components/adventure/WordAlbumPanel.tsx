@@ -9,7 +9,7 @@
 'use client';
 
 import { memo, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { BookOpen, X, Star, Coins, Zap, Check, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -48,12 +48,12 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 backdrop-blur-sm"
         onClick={onClose}
       >
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -177,9 +177,9 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
               )}
             </>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

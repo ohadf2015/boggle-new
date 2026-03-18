@@ -9,7 +9,8 @@
 'use client';
 
 import React, { useRef, useState, useCallback, memo } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -184,7 +185,7 @@ export const PremiumCard = memo(function PremiumCard({
   };
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       ref={cardRef}
       data-testid={dataTestId}
       onClick={handleClick}
@@ -239,7 +240,7 @@ export const PremiumCard = memo(function PremiumCard({
       />
 
       {/* Subtle glare effect on hover */}
-      <motion.div
+      <AdaptiveMotion.div
         className="absolute inset-0 pointer-events-none z-10"
         style={{
           background: useTransform(
@@ -253,15 +254,15 @@ export const PremiumCard = memo(function PremiumCard({
 
       {/* Shimmer effect on hover */}
       {shouldAnimate && (
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {(isHovered || (autoShimmer && (variant === 'gold' || variant === 'mythic'))) && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg z-15"
             >
-              <motion.div
+              <AdaptiveMotion.div
                 className="absolute inset-0"
                 style={{
                   background: variant === 'mythic'
@@ -277,9 +278,9 @@ export const PremiumCard = memo(function PremiumCard({
                   repeatDelay: autoShimmer ? 1 : 0,
                 }}
               />
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       )}
 
       {/* Locked variant chain overlay */}
@@ -320,7 +321,7 @@ export const PremiumCard = memo(function PremiumCard({
       <div className="relative z-20">
         {children}
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

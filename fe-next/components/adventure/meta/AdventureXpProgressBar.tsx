@@ -14,7 +14,7 @@
  */
 
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getXpProgress, type AdventureXpProgress } from '@/shared/utils/adventureXpUtils';
 import { cn } from '@/lib/utils';
@@ -149,7 +149,7 @@ const AdventureXpProgressBar = memo<AdventureXpProgressBarProps>(({
 
         {/* Recent XP gain indicator */}
         {recentXpGain && recentXpGain > 0 && (
-          <motion.span
+          <AdaptiveMotion.span
             initial={{ opacity: 1, scale: 1.2 }}
             animate={{ opacity: 0, scale: 1 }}
             transition={{ duration: 1.2 }}
@@ -159,7 +159,7 @@ const AdventureXpProgressBar = memo<AdventureXpProgressBarProps>(({
             )}
           >
             +{recentXpGain}
-          </motion.span>
+          </AdaptiveMotion.span>
         )}
       </div>
 
@@ -175,7 +175,7 @@ const AdventureXpProgressBar = memo<AdventureXpProgressBarProps>(({
         )}
       >
         {/* Progress fill */}
-        <motion.div
+        <AdaptiveMotion.div
           data-testid="adventure-xp-progress-fill"
           initial={{ width: 0 }}
           animate={progressAnimation}

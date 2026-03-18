@@ -9,7 +9,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -170,9 +170,9 @@ export const AdventureHUD = memo<AdventureHUDProps>(
               </div>
 
               {/* Recent score gain animation */}
-              <AnimatePresence>
+              <AdaptiveAnimatePresence>
                 {recentScoreGain && recentScoreGain > 0 && (
-                  <motion.div
+                  <AdaptiveMotion.div
                     data-testid="recent-score-gain"
                     initial={
                       prefersReducedMotion
@@ -193,9 +193,9 @@ export const AdventureHUD = memo<AdventureHUDProps>(
                     )}
                   >
                     +{recentScoreGain.toLocaleString('en-US')}
-                  </motion.div>
+                  </AdaptiveMotion.div>
                 )}
-              </AnimatePresence>
+              </AdaptiveAnimatePresence>
             </div>
 
             {/* Cooldowns */}

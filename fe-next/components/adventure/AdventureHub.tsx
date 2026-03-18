@@ -9,7 +9,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Flame, Target, Star, Zap, ChevronRight, Map, Coins, Trophy, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -93,7 +93,7 @@ const AdventureHub = memo<AdventureHubProps>(({
     <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-56px)] px-4 py-8 gap-6 max-w-lg mx-auto">
 
       {/* Streak Section */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -144,10 +144,10 @@ const AdventureHub = memo<AdventureHubProps>(({
             {t('adventure.hub.bestStreak')}: {bestStreak} {t('adventure.hub.days')}
           </p>
         )}
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Daily Quests */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -169,7 +169,7 @@ const AdventureHub = memo<AdventureHubProps>(({
           {dailyQuests.map((dq, i) => {
             const progress = Math.min(dq.current / dq.quest.target, 1);
             return (
-              <motion.div
+              <AdaptiveMotion.div
                 key={dq.quest.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -195,7 +195,7 @@ const AdventureHub = memo<AdventureHubProps>(({
 
                 {/* Progress bar */}
                 <div className="h-1.5 bg-neo-black/40 rounded-full overflow-hidden">
-                  <motion.div
+                  <AdaptiveMotion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${progress * 100}%` }}
                     transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
@@ -215,14 +215,14 @@ const AdventureHub = memo<AdventureHubProps>(({
                     <Zap className="w-3 h-3" /> {dq.quest.rewardXp} XP
                   </span>
                 </div>
-              </motion.div>
+              </AdaptiveMotion.div>
             );
           })}
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Player Stats Row */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
@@ -243,11 +243,11 @@ const AdventureHub = memo<AdventureHubProps>(({
           <Coins className="w-4 h-4 text-neo-orange" />
           <span className="text-sm font-bold text-neo-orange">{gold}</span>
         </button>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Continue Button — primary CTA */}
       {nextLevel && nextWorldConfig && (
-        <motion.button
+        <AdaptiveMotion.button
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
@@ -270,11 +270,11 @@ const AdventureHub = memo<AdventureHubProps>(({
             </span>
           </div>
           <ChevronRight className="w-6 h-6" />
-        </motion.button>
+        </AdaptiveMotion.button>
       )}
 
       {/* Secondary CTAs Row */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
@@ -327,7 +327,7 @@ const AdventureHub = memo<AdventureHubProps>(({
           <Map className="w-5 h-5" />
           {t('adventure.hub.worldMap')}
         </button>
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 });

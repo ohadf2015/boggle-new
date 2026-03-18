@@ -11,7 +11,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Bomb, Link2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
@@ -122,7 +122,7 @@ const TileOverlay = memo<TileOverlayProps>(({ type, config }) => {
   switch (type) {
     case 'sparkle':
       return (
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo"
           animate={{
             background: [
@@ -146,7 +146,7 @@ const TileOverlay = memo<TileOverlayProps>(({ type, config }) => {
 
     case 'flames':
       return (
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute inset-0 pointer-events-none rounded-neo"
           animate={{
             boxShadow: [
@@ -169,7 +169,7 @@ const TileOverlay = memo<TileOverlayProps>(({ type, config }) => {
 
     case 'clock':
       return (
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute inset-0 pointer-events-none rounded-neo"
           animate={{
             boxShadow: [
@@ -268,7 +268,7 @@ const ThemedTile = memo<ThemedTileProps>(
     const entryVariants = getEntryVariants();
 
     return (
-      <motion.div
+      <AdaptiveMotion.div
         role="gridcell"
         aria-label={ariaLabel}
         aria-selected={isSelected}
@@ -349,7 +349,7 @@ const ThemedTile = memo<ThemedTileProps>(
         {tile.isChained && tile.chainedWith && tile.chainedWith.length > 0 && (
           <div className="absolute inset-0 border-2 border-purple-400 rounded-neo animate-pulse" />
         )}
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 );

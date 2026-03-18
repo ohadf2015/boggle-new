@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { SkillNode as SkillNodeType, SkillPath as SkillPathType, SkillTreeState } from '@/types/adventure';
@@ -96,7 +96,7 @@ export const SkillPath = memo<SkillPathProps>(
     const tiers = Array.from(skillsByTier.keys()).sort();
 
     return (
-      <motion.div
+      <AdaptiveMotion.div
         data-testid={testId || `skill-path-${path}`}
         className="flex flex-col items-center gap-4"
         initial={{ opacity: 0, y: 20 }}
@@ -144,7 +144,7 @@ export const SkillPath = memo<SkillPathProps>(
 
                 {/* Connection Line to next tier */}
                 {isNotLastTier && (
-                  <motion.div
+                  <AdaptiveMotion.div
                     className={cn(
                       'w-1 h-8 mt-2',
                       'rounded-full',
@@ -159,7 +159,7 @@ export const SkillPath = memo<SkillPathProps>(
             );
           })}
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 );

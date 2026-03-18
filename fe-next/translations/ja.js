@@ -3669,6 +3669,13 @@ const ja = {
     "fireBonus": "ファイアボーナス",
     "highScore": "ハイスコア",
     "boardCoverage": "ボードカバー率",
+    "results": {
+      "missedWords": {
+        "title": "見逃した単語",
+        "showMore": "もっと見る",
+        "count": "{total}語中{found}語発見"
+      }
+    },
     "maxCombo": "最大コンボ",
     "submitWord": "送信",
     "clearWord": "クリア",
@@ -5941,6 +5948,8 @@ const ja = {
       "bossIntro": "ボスバトル！",
       "bossDefeated": "ボス撃破！",
       "bossWins": "ボスの勝ち...",
+      "nearMiss": "あと少し！",
+      "nearMissDesc": "残りHP {{hp}}%！もう少しだった！",
       "twistMechanic": "ボスツイスト",
       "skipIntro": "スキップ",
       "readyToFight": "いくぞ！",

@@ -11,7 +11,7 @@
 
 import { memo, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Swords } from 'lucide-react';
 import BossDialogue from '../BossDialogue';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -94,7 +94,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
         <div className="w-full max-w-2xl mx-auto px-4 pt-3">
           <div className="flex items-center gap-3 mb-2">
             {/* Boss Avatar */}
-            <motion.div
+            <AdaptiveMotion.div
               className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-black shadow-hard-sm overflow-hidden bg-neo-navy-light flex-shrink-0"
               animate={
                 bossReaction === 'hit'
@@ -120,14 +120,14 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
 
               {/* Desperate glow */}
               {phase === 'desperate' && (
-                <motion.div
+                <AdaptiveMotion.div
                   className="absolute inset-0 border-2 border-neo-red rounded-neo"
                   animate={{ opacity: [0.4, 0.8, 0.4] }}
                   transition={{ repeat: Infinity, duration: 0.6 }}
                   data-testid="boss-avatar-desperate-glow"
                 />
               )}
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Simple HP Bar */}
             <div className="flex-1 min-w-0" data-testid="boss-hp-bar-container">
@@ -140,7 +140,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
                 </span>
               </div>
               <div className="h-5 sm:h-6 bg-neo-navy-dark rounded-neo border-2 border-neo-black overflow-hidden">
-                <motion.div
+                <AdaptiveMotion.div
                   className={`h-full rounded-sm ${PHASE_COLORS[phase]} ${PHASE_GLOW[phase]}`}
                   initial={{ width: '100%' }}
                   animate={{ width: `${hpPct}%` }}
@@ -154,7 +154,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
       </div>
 
       {/* Boss Dialogue/Taunts */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {currentTaunt && (
           <BossDialogue
             boss={boss}
@@ -163,7 +163,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
             position="top"
           />
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </>
   );
 });

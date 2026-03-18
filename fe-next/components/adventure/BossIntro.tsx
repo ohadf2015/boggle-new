@@ -9,7 +9,7 @@
 'use client';
 
 import { memo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
@@ -35,7 +35,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
     : '';
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       <div
         ref={dialogRef}
         role="dialog"
@@ -48,7 +48,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
         )}
       >
         {/* Modal Content */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
@@ -62,7 +62,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
           )}
         >
           {/* Boss Battle Heading */}
-          <motion.h1
+          <AdaptiveMotion.h1
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
@@ -74,11 +74,11 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
             )}
           >
             {t('adventure.bosses.bossIntro')}
-          </motion.h1>
+          </AdaptiveMotion.h1>
 
           {/* Boss Image with scared mascot */}
           <div className="relative mb-4">
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ scale: 0, rotate: -10 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 180, damping: 14 }}
@@ -90,7 +90,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               )}
               style={{ boxShadow: `0 0 20px ${bossFightTheme.avatarGlow}` }}
             >
-              <motion.img
+              <AdaptiveMotion.img
                 src={boss.imagePath}
                 alt={bossName}
                 className="w-full h-full object-cover"
@@ -98,19 +98,19 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
               />
-            </motion.div>
-            <motion.div
+            </AdaptiveMotion.div>
+            <AdaptiveMotion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 15 }}
               className="absolute -bottom-2 -right-4"
             >
               <Mascot variant="scared" size="sm" />
-            </motion.div>
+            </AdaptiveMotion.div>
           </div>
 
           {/* Boss Name */}
-          <motion.h1
+          <AdaptiveMotion.h1
             id="boss-intro-title"
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -122,10 +122,10 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
             )}
           >
             {bossName}
-          </motion.h1>
+          </AdaptiveMotion.h1>
 
           {/* Twist Mechanic Section */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -141,11 +141,11 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
             <p className="text-neo-white font-bold text-sm md:text-base">
               {mechanicDescription}
             </p>
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Start Taunt */}
           {startTaunt && (
-            <motion.p
+            <AdaptiveMotion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -156,13 +156,13 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               )}
             >
               &ldquo;{startTaunt}&rdquo;
-            </motion.p>
+            </AdaptiveMotion.p>
           )}
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3 w-full">
             {/* Fight Button */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 20 }}
@@ -182,10 +182,10 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               >
                 {t('adventure.bosses.readyToFight')}
               </button>
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Skip Button */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.9 }}
@@ -203,11 +203,11 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               >
                 {t('adventure.bosses.skipIntro')}
               </button>
-            </motion.div>
+            </AdaptiveMotion.div>
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

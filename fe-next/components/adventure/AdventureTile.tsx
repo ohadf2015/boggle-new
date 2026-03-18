@@ -14,7 +14,7 @@
  */
 
 import React, { memo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import type { GridTileState, TileType } from '@/types/adventure';
 import { TileBadge } from './TileBadge';
@@ -119,7 +119,7 @@ export const AdventureTile = memo(({
   const effectiveCascadeDelay = chainCascadeDelay ?? tile.cascadeDelay;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       key={tile.id}
       layout="position"
       data-row={tile.row}
@@ -384,7 +384,7 @@ export const AdventureTile = memo(({
       {/* Contained ripple that stays within cell bounds - no blur, no overflow */}
       {/* Selection glow ring — prominent inset highlight + radial fill */}
       {isSelected && !prefersReducedMotion && (
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute inset-0 pointer-events-none z-10"
           style={{
             borderRadius: 'clamp(4px, 1cqi, 8px)',
@@ -423,7 +423,7 @@ export const AdventureTile = memo(({
           <span className="text-neo-red text-[0.6em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">🔒</span>
         </div>
       )}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

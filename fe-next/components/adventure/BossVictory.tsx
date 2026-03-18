@@ -9,7 +9,7 @@
 'use client';
 
 import { memo, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Star, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -28,7 +28,7 @@ const STAR_SLOTS = [0, 1, 2] as const;
 
 const BossStarDisplay = memo<{ filled: boolean; index: number }>(
   ({ filled, index }) => (
-    <motion.div
+    <AdaptiveMotion.div
       data-testid={filled ? 'star-filled' : 'star-empty'}
       initial={{ scale: 0, rotate: -180 }}
       animate={filled ? {
@@ -53,7 +53,7 @@ const BossStarDisplay = memo<{ filled: boolean; index: number }>(
             : 'text-neo-white/30 fill-transparent'
         )}
       />
-    </motion.div>
+    </AdaptiveMotion.div>
   )
 );
 
@@ -64,8 +64,13 @@ BossStarDisplay.displayName = 'BossStarDisplay';
 // ==============================================
 
 const BossVictory = memo<BossVictoryProps>(
-  ({ boss, isVictory, stars, score, wordsFound, onContinue, onRetry }) => {
+  ({ boss, isVictory, stars, score, wordsFound, gameState, onContinue, onRetry }) => {
     const { t } = useLanguage();
+
+    // Near-miss detection: boss was at <15% HP when player lost
+    const bossObjective = gameState?.objectives?.find((o: { type: string }) => o.type === 'defeatBoss');
+    const bossHpDepleted = bossObjective?.current ?? 0; // percentage depleted (0-100)
+    const isNearMiss = !isVictory && bossHpDepleted >= 85; // boss had <15% HP left
     const dialogRef = useRef<HTMLDivElement>(null);
 
     useFocusTrap(dialogRef, true);
@@ -84,7 +89,7 @@ const BossVictory = memo<BossVictoryProps>(
     const bossName = useMemo(() => t(boss.displayName), [t, boss.displayName]);
 
     return (
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         <div
           ref={dialogRef}
           role="dialog"
@@ -98,7 +103,7 @@ const BossVictory = memo<BossVictoryProps>(
         >
           {/* Themed background glow */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute inset-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -112,7 +117,7 @@ const BossVictory = memo<BossVictoryProps>(
           </div>
 
           {/* Modal Content */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
@@ -125,7 +130,7 @@ const BossVictory = memo<BossVictoryProps>(
             )}
           >
             {/* Title */}
-            <motion.h2
+            <AdaptiveMotion.h2
               id="boss-victory-title"
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -138,10 +143,10 @@ const BossVictory = memo<BossVictoryProps>(
               {isVictory
                 ? t('adventure.bosses.bossDefeated')
                 : t('adventure.bosses.bossWins')}
-            </motion.h2>
+            </AdaptiveMotion.h2>
 
             {/* Boss Image */}
-            <motion.div
+            <AdaptiveMotion.div
               className="flex justify-center mb-3"
               initial={{ scale: 0 }}
               animate={isVictory
@@ -155,7 +160,7 @@ const BossVictory = memo<BossVictoryProps>(
                 damping: 15,
               }}
             >
-              <motion.img
+              <AdaptiveMotion.img
                 src={boss.imagePath}
                 alt={bossName}
                 className={cn(
@@ -167,20 +172,20 @@ const BossVictory = memo<BossVictoryProps>(
                     : 'drop-shadow-[0_0_12px_rgba(239,68,68,0.5)]'
                 )}
               />
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Boss Name */}
-            <motion.p
+            <AdaptiveMotion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               className="text-center text-lg font-black text-neo-white mb-1"
             >
               {bossName}
-            </motion.p>
+            </AdaptiveMotion.p>
 
             {/* Boss Taunt */}
-            <motion.p
+            <AdaptiveMotion.p
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -190,7 +195,28 @@ const BossVictory = memo<BossVictoryProps>(
               )}
             >
               &ldquo;{bossTaunt}&rdquo;
-            </motion.p>
+            </AdaptiveMotion.p>
+
+            {/* Near-miss encouragement */}
+            {isNearMiss && (
+              <AdaptiveMotion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+                className={cn(
+                  'mx-auto mb-4 px-4 py-2 rounded-neo',
+                  'bg-neo-yellow/20 border-2 border-neo-yellow/50',
+                  'text-center'
+                )}
+              >
+                <p className="text-neo-yellow font-black text-sm">
+                  {t('adventure.bosses.nearMiss')}
+                </p>
+                <p className="text-neo-white/60 text-xs mt-0.5">
+                  {t('adventure.bosses.nearMissDesc', { hp: 100 - bossHpDepleted })}
+                </p>
+              </AdaptiveMotion.div>
+            )}
 
             {/* Stars */}
             <div className="flex justify-center gap-2 mb-4">
@@ -264,9 +290,9 @@ const BossVictory = memo<BossVictoryProps>(
                 {t('adventure.retryLevel')}
               </button>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         </div>
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     );
   }
 );

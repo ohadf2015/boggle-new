@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,7 +24,7 @@ export const ChapterQuestPanel = memo(function ChapterQuestPanel({
   if (quests.length === 0) return null;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
@@ -50,7 +50,7 @@ export const ChapterQuestPanel = memo(function ChapterQuestPanel({
           return <QuestCard key={quest.id} quest={quest} progress={prog} />;
         })}
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

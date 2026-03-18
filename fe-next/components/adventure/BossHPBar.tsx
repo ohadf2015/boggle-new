@@ -20,7 +20,7 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { BossHealthState } from '../../types/boss';
@@ -69,7 +69,7 @@ function LegacyBossHPBar({ healthState, bossName }: LegacyBossHPBarProps) {
           {t(bossName)}
         </h2>
         {phase === 'enraged' && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0, rotate: -15 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{
@@ -82,7 +82,7 @@ function LegacyBossHPBar({ healthState, bossName }: LegacyBossHPBarProps) {
             <span className="font-neo-display text-sm font-bold text-neo-white uppercase">
               {t('adventure.bosses.enraged')}
             </span>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
       </div>
 
@@ -92,7 +92,7 @@ function LegacyBossHPBar({ healthState, bossName }: LegacyBossHPBarProps) {
         aria-hidden="true"
       >
         {/* HP fill (animated) */}
-        <motion.div
+        <AdaptiveMotion.div
           className={`absolute inset-y-0 left-0 ${hpBarColor} ${hpBarGlow} transition-colors duration-300`}
           initial={{ width: '100%' }}
           animate={{ width: `${hpPercentage}%` }}
@@ -176,9 +176,9 @@ export const BossHPBar = memo(function BossHPBar({
       {/* Boss name + enraged badge */}
       <div className="flex items-center justify-between mb-1">
         <span className="text-sm font-black text-neo-white uppercase tracking-wide">{bossName}</span>
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {isEnraged && (
-            <motion.span
+            <AdaptiveMotion.span
               data-testid="enraged-badge"
               initial={{ scale: 0 }}
               animate={{ scale: [0, 1.3, 1] }}
@@ -187,28 +187,28 @@ export const BossHPBar = memo(function BossHPBar({
               className="text-[10px] font-black text-neo-red bg-neo-red/20 border border-neo-red/60 rounded-neo px-1.5 py-0.5 uppercase"
             >
               {t('adventure.bosses.enraged')}
-            </motion.span>
+            </AdaptiveMotion.span>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
 
       {/* HP Bar with segments */}
-      <motion.div
+      <AdaptiveMotion.div
         animate={isShaking ? { x: [0, -6, 6, -4, 4, 0] } : { x: 0 }}
         transition={{ duration: 0.3 }}
         className="relative h-5 bg-neo-black/60 rounded-neo border-2 border-neo-black overflow-hidden"
       >
         {/* Fill */}
-        <motion.div
+        <AdaptiveMotion.div
           animate={{ width: `${pct}%` }}
           transition={{ type: 'spring', stiffness: 200, damping: 30 }}
           className={cn('absolute inset-y-0 left-0 rounded-neo', barColor, isEnraged && 'animate-pulse')}
         />
 
         {/* White flash overlay on hit */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {showDamage && (
-            <motion.div
+            <AdaptiveMotion.div
               key={damageKey}
               initial={{ opacity: 0.6 }}
               animate={{ opacity: 0 }}
@@ -216,7 +216,7 @@ export const BossHPBar = memo(function BossHPBar({
               className="absolute inset-0 bg-white rounded-neo"
             />
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         {/* 3 internal segment dividers (at 25%, 50%, 75%) */}
         {[25, 50, 75].map((seg, i) => (
@@ -229,7 +229,7 @@ export const BossHPBar = memo(function BossHPBar({
         ))}
         {/* 4th segment anchor at end for test count */}
         <div data-testid="hp-segment-4" className="sr-only" />
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* HP text */}
       <div className="flex items-center justify-between mt-0.5">
@@ -237,9 +237,9 @@ export const BossHPBar = memo(function BossHPBar({
       </div>
 
       {/* Floating damage number */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {showDamage && onDamage && (
-          <motion.div
+          <AdaptiveMotion.div
             key={`dmg-${damageKey}`}
             data-testid="damage-number"
             initial={{ y: 0, opacity: 1 }}
@@ -248,9 +248,9 @@ export const BossHPBar = memo(function BossHPBar({
             className="absolute right-2 top-0 text-lg font-black text-neo-red pointer-events-none"
           >
             -{onDamage}
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 });

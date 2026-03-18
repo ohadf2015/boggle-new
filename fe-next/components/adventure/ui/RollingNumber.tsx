@@ -8,7 +8,8 @@
 'use client';
 
 import React, { useEffect, useState, useRef, memo } from 'react';
-import { motion, useSpring, useTransform } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 // ==============================================
@@ -113,7 +114,7 @@ export const RollingNumber = memo(function RollingNumber({
   };
 
   return (
-    <motion.span
+    <AdaptiveMotion.span
       className={cn(
         'font-mono font-black tabular-nums inline-flex items-center',
         variantClasses[variant],
@@ -126,7 +127,7 @@ export const RollingNumber = memo(function RollingNumber({
       {prefix && <span className="opacity-70 me-1">{prefix}</span>}
       <span>{formattedValue}</span>
       {suffix && <span className="opacity-70 ms-1">{suffix}</span>}
-    </motion.span>
+    </AdaptiveMotion.span>
   );
 });
 
@@ -156,7 +157,7 @@ export const DigitRoller = memo(function DigitRoller({
 
   return (
     <div className={cn('relative overflow-hidden h-[1em] w-[0.6em]', className)}>
-      <motion.div
+      <AdaptiveMotion.div
         key={digit}
         initial={{ y: '-100%' }}
         animate={{ y: 0 }}
@@ -165,7 +166,7 @@ export const DigitRoller = memo(function DigitRoller({
         className={cn('absolute inset-0 flex items-center justify-center', variantClasses[variant])}
       >
         {digit}
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 });

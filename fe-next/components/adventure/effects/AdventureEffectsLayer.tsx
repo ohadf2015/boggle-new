@@ -16,7 +16,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ScorePopup } from '../juice/ScorePopup';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
 import { AdaptiveParticles } from '../juice/AdaptiveParticles';
@@ -233,9 +233,9 @@ export const AdventureEffectsLayer = memo(function AdventureEffectsLayer({
   showEdgeVignetteFlash = false,
 }: AdventureEffectsLayerNamedProps) {
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {showEdgeVignetteFlash && (
-        <motion.div
+        <AdaptiveMotion.div
           key="edge-vignette"
           data-testid="edge-vignette"
           initial={{ opacity: 0 }}
@@ -248,7 +248,7 @@ export const AdventureEffectsLayer = memo(function AdventureEffectsLayer({
           }}
         />
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

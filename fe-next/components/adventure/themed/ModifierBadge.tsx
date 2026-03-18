@@ -8,7 +8,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
@@ -45,8 +45,8 @@ const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) 
   const mechanicKey = `adventure.mechanics.${mechanic}`;
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
@@ -97,8 +97,8 @@ const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) 
             {t(mechanicKey) || mechanic}
           </span>
         )}
-      </motion.div>
-    </AnimatePresence>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 });
 

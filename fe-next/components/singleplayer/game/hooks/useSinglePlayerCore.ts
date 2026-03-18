@@ -408,6 +408,7 @@ export function useSinglePlayerCore({
       botScores: botScoresRef.current, botWords: botWordsRef.current,
       gameStartTime: effects.gameStartTimeRef.current, timerSeconds: settings.timerSeconds,
       maxCombo: combo.maxCombo, mode: settings.mode, language: settings.language,
+      availableWords: availableWordsRef.current,
     };
     try {
       const results = buildGameResults(resultParams);

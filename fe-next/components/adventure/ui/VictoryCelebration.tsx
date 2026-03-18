@@ -9,7 +9,7 @@
 'use client';
 
 import React, { useEffect, useState, memo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Star, Trophy, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -90,7 +90,7 @@ export const VictoryCelebration = memo(function VictoryCelebration({
   return (
     <div className={cn('fixed inset-0 z-50 flex items-center justify-center pointer-events-none', className)}>
       {/* Dark overlay - no blur for performance */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={prefersReducedMotion ? { duration: 0 } : undefined}
@@ -100,16 +100,16 @@ export const VictoryCelebration = memo(function VictoryCelebration({
       {/* Confetti is rendered by canvas-confetti library on its own canvas */}
 
       {/* Main content */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {showContent && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
             animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1, opacity: 1 }}
             transition={prefersReducedMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 200, damping: 20 }}
             className="relative z-10 text-center pointer-events-auto"
           >
             {/* Victory title */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={prefersReducedMotion ? { opacity: 0 } : { y: -50, opacity: 0 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
               transition={prefersReducedMotion ? { duration: 0.1 } : { delay: 0.2 }}
@@ -122,7 +122,7 @@ export const VictoryCelebration = memo(function VictoryCelebration({
                 {isPerfect ? t('adventure.perfect') : t('adventure.victory')}
               </h2>
               {isPerfect && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0 }}
                   animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1 }}
                   transition={prefersReducedMotion ? { duration: 0.1 } : { delay: 0.5, type: 'spring' }}
@@ -130,19 +130,19 @@ export const VictoryCelebration = memo(function VictoryCelebration({
                 >
                   <Trophy className="w-6 h-6 text-neo-yellow" />
                   <span className="text-neo-yellow font-bold">{t('adventure.allStars')}</span>
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Stars display */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1 }}
               transition={prefersReducedMotion ? { duration: 0.1 } : { delay: 0.3, type: 'spring', stiffness: 200 }}
               className="flex items-center justify-center gap-4 mb-8"
             >
               {[1, 2, 3].map((starNum) => (
-                <motion.div
+                <AdaptiveMotion.div
                   key={starNum}
                   initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0, rotate: -180 }}
                   animate={prefersReducedMotion
@@ -163,12 +163,12 @@ export const VictoryCelebration = memo(function VictoryCelebration({
                         : 'text-neo-white/30'
                     )}
                   />
-                </motion.div>
+                </AdaptiveMotion.div>
               ))}
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Stats grid - no backdrop blur for performance */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 50, opacity: 0 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
               transition={prefersReducedMotion ? { duration: 0.1 } : { delay: 0.6 }}
@@ -206,10 +206,10 @@ export const VictoryCelebration = memo(function VictoryCelebration({
                   className="text-2xl"
                 />
               </div>
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Continue button */}
-            <motion.button
+            <AdaptiveMotion.button
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
               transition={prefersReducedMotion ? { duration: 0.1 } : { delay: 0.8 }}
@@ -224,10 +224,10 @@ export const VictoryCelebration = memo(function VictoryCelebration({
               )}
             >
               {t('adventure.continue')}
-            </motion.button>
-          </motion.div>
+            </AdaptiveMotion.button>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 });

@@ -10,7 +10,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -59,8 +59,8 @@ const FlipDigit = memo(function FlipDigit({ digit, className, prefersReducedMoti
 
   return (
     <div className={cn('relative w-[0.6em] h-[1.2em] overflow-hidden', className)}>
-      <AnimatePresence mode="popLayout">
-        <motion.span
+      <AdaptiveAnimatePresence mode="popLayout">
+        <AdaptiveMotion.span
           key={digit}
           initial={{ y: '-100%', opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -69,8 +69,8 @@ const FlipDigit = memo(function FlipDigit({ digit, className, prefersReducedMoti
           className="absolute inset-0 flex items-center justify-center font-mono"
         >
           {digit}
-        </motion.span>
-      </AnimatePresence>
+        </AdaptiveMotion.span>
+      </AdaptiveAnimatePresence>
     </div>
   );
 });
@@ -160,7 +160,7 @@ export const EnhancedTimer = memo(function EnhancedTimer({
     : undefined;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className={cn(
         'relative rounded-neo flex items-center gap-2 font-black',
         'transition-colors duration-300',
@@ -225,13 +225,13 @@ export const EnhancedTimer = memo(function EnhancedTimer({
         <FlipDigit digit={minOnes} prefersReducedMotion={prefersReducedMotion} />
 
         {/* Separator - blinking colon respects reduced motion */}
-        <motion.span
+        <AdaptiveMotion.span
           className="mx-0.5"
           animate={prefersReducedMotion ? {} : { opacity: [1, 0.3, 1] }}
           transition={prefersReducedMotion ? {} : { duration: 1, repeat: Infinity }}
         >
           :
-        </motion.span>
+        </AdaptiveMotion.span>
 
         {/* Seconds */}
         <FlipDigit digit={secTens} prefersReducedMotion={prefersReducedMotion} />
@@ -239,7 +239,7 @@ export const EnhancedTimer = memo(function EnhancedTimer({
       </div>
 
       {/* No glow effect - using hard shadows per neo-brutalist design */}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

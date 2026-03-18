@@ -3729,6 +3729,13 @@ const es = {
     "fireBonus": "Bono de fuego",
     "highScore": "Récord",
     "boardCoverage": "Cobertura del tablero",
+    "results": {
+      "missedWords": {
+        "title": "Palabras que perdiste",
+        "showMore": "Mostrar más",
+        "count": "{found} de {total} palabras encontradas"
+      }
+    },
     "maxCombo": "Combo máximo",
     "submitWord": "Enviar",
     "clearWord": "Borrar",
@@ -5602,6 +5609,8 @@ const es = {
       "bossIntro": "¡Batalla de jefe!",
       "bossDefeated": "¡Jefe derrotado!",
       "bossWins": "El jefe gana...",
+      "nearMiss": "¡TAN CERCA!",
+      "nearMissDesc": "¡Solo {{hp}}% HP restante! ¡Casi lo tenías!",
       "twistMechanic": "Giro del jefe",
       "skipIntro": "Saltar",
       "readyToFight": "¡Vamos!",

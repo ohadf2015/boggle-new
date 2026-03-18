@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import { calculatePlayerInsights, type PlayerInsights, type WordData } from '@/utils/gameInsights';
 import { categorizeWords, calculateWordStats } from '@/components/results/utils';
 import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
+import { calculateWordScore } from '@/shared/utils/scoring';
 import type { WordObject } from '@/components/results/types';
 import type { SinglePlayerResultsData, PlayerWordData } from '../SinglePlayerView';
 
@@ -276,6 +277,25 @@ export function useResultsData(
     return getMissedWords(playerUsername, allPlayersWords, 10);
   }, [results.botScores, results.playerWordData, t]);
 
+  // Calculate ALL board words the player missed (from board solver, not just bot-found)
+  const allBoardMissedWords = useMemo(() => {
+    if (!results.allPossibleWords || results.allPossibleWords.length === 0) return [];
+
+    const playerFoundSet = new Set(
+      (results.playerWordData || [])
+        .filter(w => w.isValid)
+        .map(w => w.word.toLowerCase())
+    );
+
+    return results.allPossibleWords
+      .filter(word => !playerFoundSet.has(word.toLowerCase()))
+      .map(word => ({
+        word,
+        score: calculateWordScore(word),
+      }))
+      .sort((a, b) => b.word.length - a.word.length || b.score - a.score);
+  }, [results.allPossibleWords, results.playerWordData]);
+
   return {
     allParticipants,
     playerRank,
@@ -286,5 +306,6 @@ export function useResultsData(
     playerArchetypes,
     playerArchetype,
     missedWords,
+    allBoardMissedWords,
   };
 }

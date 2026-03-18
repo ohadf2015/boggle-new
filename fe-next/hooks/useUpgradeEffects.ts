@@ -138,7 +138,7 @@ export function computeUpgradeEffects(upgrades: UpgradeState): UpgradeEffects {
 
   // ── Word Dynamite ──
   const dynamite = getUpgradeTier(upgrades, 'wordDynamite');
-  if (dynamite >= 1) effects.shuffleUsesPerLevel = [0, 1, 1, 1][dynamite];
+  if (dynamite >= 1) effects.shuffleUsesPerLevel = [0, 1, 2, 2][dynamite];
   if (dynamite >= 3) effects.canDetonateWords = true;
 
   // ── Time Freeze ──

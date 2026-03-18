@@ -12,7 +12,7 @@
 
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion';
 
@@ -50,9 +50,9 @@ export function AttackTelegraph({
   const pulseDuration = Math.max(0.22, 0.5 - progress * 0.3);
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {isActive && (
-        <motion.div
+        <AdaptiveMotion.div
           className="fixed inset-0 pointer-events-none z-40"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -65,7 +65,7 @@ export function AttackTelegraph({
         >
           {/* Screen Edge Glow — countdown is inline in BossOverlay HUD */}
           {!prefersReducedMotion && (
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute inset-0 pointer-events-none"
               style={{ boxShadow: edgeBoxShadow }}
               animate={{ opacity: [0.5, 0.85, 0.5] }}
@@ -82,8 +82,8 @@ export function AttackTelegraph({
               aria-hidden="true"
             />
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 }

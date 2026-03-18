@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useRef, useEffect, useMemo, useCallback, memo } from 'react';
-import { motion, useTransform, useMotionValue } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css';
 import { Star, Lock, Crown } from 'lucide-react';
 import Image from 'next/image';
@@ -79,7 +80,7 @@ const WorldNode = memo(function WorldNode({
   const glowColor = getWorldGlow(world.colorPrimary);
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className={cn(
         'relative w-full px-4 sm:px-8 lg:px-12',
         'flex items-center gap-3 sm:gap-6 lg:gap-8',
@@ -100,7 +101,7 @@ const WorldNode = memo(function WorldNode({
             colorPrimary={world.colorPrimary}
           />
 
-          <motion.button
+          <AdaptiveMotion.button
             onClick={onClick}
             disabled={!isUnlocked}
             data-testid={`world-${world.id}`}
@@ -162,13 +163,13 @@ const WorldNode = memo(function WorldNode({
           </div>
 
           {isFinalWorld && isUnlocked && (
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute -top-5 left-1/2 -translate-x-1/2"
               animate={{ y: [0, -4, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
               <Crown className="w-9 h-9 sm:w-10 sm:h-10 text-neo-yellow fill-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.8)]" />
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {isComplete && (
@@ -184,18 +185,18 @@ const WorldNode = memo(function WorldNode({
           )}
 
           {isUnlocked && !isComplete && (
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute -inset-1 rounded-full border-[3px] border-neo-yellow"
               animate={{ scale: [1, 1.18, 1], opacity: [0.7, 0, 0.7] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
           )}
-        </motion.button>
+        </AdaptiveMotion.button>
         </div>
       </div>
 
       {/* World Info Card */}
-      <motion.div
+      <AdaptiveMotion.div
         className={cn(
           'flex-shrink min-w-0',
           'w-[140px] sm:w-[200px] lg:w-[220px]',
@@ -244,8 +245,8 @@ const WorldNode = memo(function WorldNode({
             <Star className="w-3.5 h-3.5 flex-shrink-0 text-neo-yellow/50" />
           </div>
         )}
-      </motion.div>
-    </motion.div>
+      </AdaptiveMotion.div>
+    </AdaptiveMotion.div>
   );
 });
 
@@ -414,7 +415,7 @@ export default function WorldMap({
 
         {/* Endless Mode Tease — visible once player reaches World 5+ */}
         {furthestUnlockedId >= 5 && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
@@ -432,7 +433,7 @@ export default function WorldMap({
             <p className="text-neo-white/40 text-xs mt-1">
               {t('adventure.endlessMode.comingSoon')}
             </p>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
 
         <div ref={bottomRef} className="h-24" />

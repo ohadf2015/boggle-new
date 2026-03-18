@@ -8,16 +8,16 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 
 interface BossAttackEffectProps {
   attackEffect: { abilityName: string | null; damage: number } | null;
 }
 
 const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
-  <AnimatePresence>
+  <AdaptiveAnimatePresence>
     {attackEffect && (
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed inset-0 z-50 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -26,7 +26,7 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
         data-testid="boss-attack-effect"
       >
         {/* Red damage flash */}
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute inset-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: [0, 0.45, 0] }}
@@ -35,7 +35,7 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
         />
 
         {/* Enhanced slash marks with glow layers */}
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
           initial={{ scale: 0, rotate: -45 }}
           animate={{ scale: [0, 1.6, 1.3], rotate: [-45, -45, -45] }}
@@ -43,7 +43,7 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
         >
           <div className="relative w-40 h-40">
             {/* Slash line 1 — glow base (wide, low opacity) */}
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute top-1/2 left-0 w-full h-3 rounded-full -translate-y-1/2"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: [0, 1, 0.8] }}
@@ -54,7 +54,7 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
               }}
             />
             {/* Slash line 1 — glow mid */}
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute top-1/2 left-0 w-full h-1.5 rounded-full -translate-y-1/2"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: [0, 1, 0.8] }}
@@ -65,7 +65,7 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
               }}
             />
             {/* Slash line 1 — sharp core */}
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute top-1/2 left-0 w-full h-[3px] bg-neo-red rounded-full -translate-y-1/2"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: [0, 1, 0.8] }}
@@ -74,7 +74,7 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
             />
 
             {/* Slash line 2 — glow base (rotated 45°) */}
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute top-1/2 left-0 w-full h-3 rounded-full -translate-y-1/2 rotate-45"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: [0, 1, 0.8] }}
@@ -85,7 +85,7 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
               }}
             />
             {/* Slash line 2 — glow mid */}
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute top-1/2 left-0 w-full h-1.5 rounded-full -translate-y-1/2 rotate-45"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: [0, 1, 0.8] }}
@@ -96,7 +96,7 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
               }}
             />
             {/* Slash line 2 — sharp core */}
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute top-1/2 left-0 w-full h-[3px] bg-neo-red rounded-full -translate-y-1/2 rotate-45"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: [0, 1, 0.8] }}
@@ -104,11 +104,11 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
               style={{ boxShadow: '0 0 14px rgba(255, 51, 102, 1)' }}
             />
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Dramatic damage number */}
         {attackEffect.damage > 0 && (
-          <motion.div
+          <AdaptiveMotion.div
             className="absolute top-1/3 left-1/2 -translate-x-1/2"
             initial={{ y: 0, opacity: 0, scale: 0.4 }}
             animate={{ y: -56, opacity: [0, 1, 1, 0], scale: [0.4, 1.5, 1.2] }}
@@ -122,11 +122,11 @@ const BossAttackEffect = memo<BossAttackEffectProps>(({ attackEffect }) => (
             >
               -{attackEffect.damage}
             </span>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </motion.div>
+      </AdaptiveMotion.div>
     )}
-  </AnimatePresence>
+  </AdaptiveAnimatePresence>
 ));
 
 BossAttackEffect.displayName = 'BossAttackEffect';

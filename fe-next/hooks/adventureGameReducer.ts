@@ -300,9 +300,11 @@ function processSpecialTileEffects(
   }
 
   // Melt ice tiles adjacent to used tiles
+  // Blast Shield T1 (iceTileReduction): extends melt range from 1 to 2 tiles
+  const meltRange = upgradeConfig?.iceTileReduction ? 2 : 1;
   for (const pos of path) {
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
+    for (let dr = -meltRange; dr <= meltRange; dr++) {
+      for (let dc = -meltRange; dc <= meltRange; dc++) {
         if (dr === 0 && dc === 0) continue;
         const nr = pos.row + dr;
         const nc = pos.col + dc;

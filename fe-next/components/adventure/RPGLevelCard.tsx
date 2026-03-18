@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import {
   Star,
   Lock,
@@ -77,7 +77,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
       : 'border-neo-black';
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className={cn(
         'relative rounded-neo-lg overflow-hidden cursor-pointer',
         'border-3 shadow-hard-lg',
@@ -220,7 +220,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
           style={{ animation: 'pulse-border 2s ease-in-out infinite' }}
         />
       )}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

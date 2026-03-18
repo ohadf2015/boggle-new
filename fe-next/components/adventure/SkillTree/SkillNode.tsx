@@ -8,7 +8,7 @@
 'use client';
 
 import { memo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { SkillNode as SkillNodeType, SkillTreeState } from '@/types/adventure';
@@ -105,7 +105,7 @@ export const SkillNode = memo<SkillNodeProps>(
     const isLocked = status === 'locked';
 
     return (
-      <motion.button
+      <AdaptiveMotion.button
         data-testid={testId || `skill-node-${skill.id}`}
         data-status={status}
         onClick={handleClick}
@@ -163,7 +163,7 @@ export const SkillNode = memo<SkillNodeProps>(
 
         {/* Cost Badge (only for available skills) */}
         {isClickable && (
-          <motion.span
+          <AdaptiveMotion.span
             className={cn(
               'absolute -bottom-2 -right-2',
               'px-2 py-0.5',
@@ -177,7 +177,7 @@ export const SkillNode = memo<SkillNodeProps>(
             transition={{ delay: 0.2, type: 'spring' }}
           >
             {skill.cost}
-          </motion.span>
+          </AdaptiveMotion.span>
         )}
 
         {/* Locked Icon Overlay */}
@@ -192,7 +192,7 @@ export const SkillNode = memo<SkillNodeProps>(
 
         {/* Unlocked Checkmark */}
         {isUnlocked && (
-          <motion.span
+          <AdaptiveMotion.span
             className={cn(
               'absolute -top-2 -right-2',
               'w-6 h-6 flex items-center justify-center',
@@ -205,9 +205,9 @@ export const SkillNode = memo<SkillNodeProps>(
             transition={{ type: 'spring', stiffness: 500 }}
           >
             ✓
-          </motion.span>
+          </AdaptiveMotion.span>
         )}
-      </motion.button>
+      </AdaptiveMotion.button>
     );
   }
 );

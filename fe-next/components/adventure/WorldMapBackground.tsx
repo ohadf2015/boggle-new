@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion, useTransform, type MotionValue } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { useTransform, type MotionValue } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { Cloud } from './WorldMapDecorations';
@@ -74,13 +75,13 @@ export function WorldMapBackground({
   return (
     <>
       {/* Deep space background gradient */}
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed inset-0 bg-gradient-to-b from-[#050510] via-[#0a0a2a] to-[#0d1033] pointer-events-none"
         style={{ x: bgX, y: bgY }}
       />
 
       {/* Milky Way band */}
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed inset-0 pointer-events-none opacity-30"
         style={{
           background: 'linear-gradient(135deg, transparent 20%, rgba(139,92,246,0.1) 35%, rgba(236,72,153,0.08) 50%, rgba(34,211,238,0.1) 65%, transparent 80%)',
@@ -90,7 +91,7 @@ export function WorldMapBackground({
       />
 
       {/* Cosmic dust particles */}
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed inset-0 pointer-events-none opacity-40"
         style={{
           backgroundImage: `radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.3), transparent),
@@ -106,7 +107,7 @@ export function WorldMapBackground({
       />
 
       {/* Nebula clouds — radial-gradient only, blur capped at 40px (skip on low-end) */}
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{ x: nebulaX, y: nebulaY }}
       >
@@ -126,10 +127,10 @@ export function WorldMapBackground({
             } as React.CSSProperties}
           />
         ))}
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Shooting stars */}
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{ x: shootingX, y: shootingY }}
       >
@@ -145,10 +146,10 @@ export function WorldMapBackground({
             } as React.CSSProperties}
           />
         ))}
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Starfield with parallax */}
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{
           y: starsY,
@@ -180,10 +181,10 @@ export function WorldMapBackground({
             } as React.CSSProperties}
           />
         ))}
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Floating clouds with parallax */}
-      <motion.div
+      <AdaptiveMotion.div
         className="fixed inset-0 pointer-events-none"
         style={{
           y: cloudsY,
@@ -194,7 +195,7 @@ export function WorldMapBackground({
         <Cloud className="top-[15%] left-[5%]" size="md" speed={0.5} />
         <Cloud className="top-[50%] right-[6%]" size="lg" speed={0.4} />
         <Cloud className="top-[80%] left-[8%]" size="sm" speed={0.6} />
-      </motion.div>
+      </AdaptiveMotion.div>
     </>
   );
 }

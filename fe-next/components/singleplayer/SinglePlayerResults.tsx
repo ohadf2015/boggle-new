@@ -44,6 +44,7 @@ import {
   BotWordsSection,
   RankingsSection,
   ChallengeButton,
+  MissedWordsSection,
 } from './results';
 import { TrainingAnalysisModal } from '@/components/training';
 import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
@@ -102,7 +103,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     allParticipants, playerRank, isWinner, playerInsights,
     wordsByPoints, sortedPointGroups, invalidWords,
     totalComboBonus, totalFireRoundBonus, botWordDetails,
-    playerArchetype, missedWords,
+    playerArchetype, missedWords, allBoardMissedWords,
   } = useResultsData(results, t, playerAvatar);
 
   const { hasUpdatedStats } = useGuestStatsSync({
@@ -401,6 +402,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
               {/* Right analysis column */}
               <div className="space-y-3">
+                {allBoardMissedWords && allBoardMissedWords.length > 0 && (
+                  <MissedWordsSection
+                    words={allBoardMissedWords}
+                    playerFoundCount={validWordCount}
+                    totalBoardWords={results.allPossibleWords?.length || undefined}
+                    initialDisplayCount={15}
+                  />
+                )}
+
                 {mode === 'solo-bots' && missedWords.length > 0 && (
                   <MissedWords missedWords={missedWords} maxDisplay={5} />
                 )}

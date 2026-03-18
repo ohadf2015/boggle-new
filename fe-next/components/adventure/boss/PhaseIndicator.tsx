@@ -14,7 +14,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Shield, Flame, Skull } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
@@ -110,13 +110,13 @@ const PhaseIndicator = memo<PhaseIndicatorProps>(({ phase }) => {
   // Enraged badge: add framer-motion scale pulse on top of CSS shake
   if (phase === 'enraged') {
     return (
-      <motion.div
+      <AdaptiveMotion.div
         animate={{ scale: [1, 1.08, 1] }}
         transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
         className="motion-reduce:animate-none"
       >
         {badge}
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 

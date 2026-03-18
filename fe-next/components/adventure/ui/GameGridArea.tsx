@@ -9,7 +9,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -144,10 +144,10 @@ export const GameGridArea = memo(function GameGridArea({
 
           {/* Feedback Area */}
           <div data-testid="feedback-container" className="h-7 flex items-center justify-center sm:w-full">
-            <AnimatePresence mode="wait">
+            <AdaptiveAnimatePresence mode="wait">
               {/* Validation Error */}
               {validationError && (
-                <motion.div
+                <AdaptiveMotion.div
                   key="error"
                   initial={{ opacity: 0, y: -8, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -160,12 +160,12 @@ export const GameGridArea = memo(function GameGridArea({
                   )}
                 >
                   {validationError}
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
 
               {/* Validating Indicator */}
               {!validationError && isValidating && (
-                <motion.div
+                <AdaptiveMotion.div
                   key="validating"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -173,12 +173,12 @@ export const GameGridArea = memo(function GameGridArea({
                   className="text-neo-cyan font-bold text-xs sm:text-sm animate-pulse"
                 >
                   {t('common.validating')}
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
 
               {/* Word Length Hint */}
               {!validationError && !isValidating && selectedLength > 0 && selectedLength < minWordLength && (
-                <motion.div
+                <AdaptiveMotion.div
                   key="hint"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -199,14 +199,14 @@ export const GameGridArea = memo(function GameGridArea({
                   <span className="font-black text-neo-lime">
                     {selectedLength}/{minWordLength}
                   </span>
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
 
               {/* Empty spacer */}
               {!validationError && !isValidating && (selectedLength === 0 || selectedLength >= minWordLength) && (
                 <div key="empty" className="w-full" />
               )}
-            </AnimatePresence>
+            </AdaptiveAnimatePresence>
           </div>
         </div>
       </div>
@@ -221,7 +221,7 @@ export const GameGridArea = memo(function GameGridArea({
           - 100% width ensures full-width on narrow phones.
         */}
         <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 90cqh, 520px)' }}>
-          <motion.div
+          <AdaptiveMotion.div
             className={cn(
               'w-full aspect-square max-h-full rounded-neo-lg',
               // Stronger glow when a word is accepted — ring + outer shadow pulse
@@ -257,14 +257,14 @@ export const GameGridArea = memo(function GameGridArea({
                 lockedTileIndices={lockedTileIndices}
                 className="h-full"
               />
-          </motion.div>
+          </AdaptiveMotion.div>
         </div>
 
         {/* Hint Message - Bottom of grid area */}
         <div className="h-6 shrink-0 flex items-center justify-center mt-1">
-          <AnimatePresence>
+          <AdaptiveAnimatePresence>
             {hintLevel !== 'none' && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
@@ -275,9 +275,9 @@ export const GameGridArea = memo(function GameGridArea({
                   : hintLevel === 'lengthAndStart'
                     ? t('adventure.game.hintLengthAndStart')
                     : t('adventure.game.hintGeneral')}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
         </div>
       </div>
     </div>

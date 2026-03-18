@@ -8,7 +8,7 @@
 'use client';
 
 import { memo, useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Trophy, X, Clock, ChevronRight, Crown, Medal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -59,12 +59,12 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 backdrop-blur-sm"
         onClick={onClose}
       >
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -104,7 +104,7 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
 
           {/* Play Button */}
           {onPlay && (
-            <motion.button
+            <AdaptiveMotion.button
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               onClick={onPlay}
@@ -121,7 +121,7 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
             >
               {t('adventure.weeklyChallenge.play')}
               <ChevronRight className="w-5 h-5" />
-            </motion.button>
+            </AdaptiveMotion.button>
           )}
 
           {/* Leaderboard */}
@@ -173,9 +173,9 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
               })}
             </div>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

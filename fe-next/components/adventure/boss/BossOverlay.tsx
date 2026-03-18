@@ -15,7 +15,7 @@
 
 import React, { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Swords } from 'lucide-react';
 import { BossDialogue as BossDialogueInline } from '../BossDialogue';
 import BossVictory from '../BossVictory';
@@ -322,7 +322,7 @@ const BossOverlay = memo<BossOverlayProps>(
                 <div className="flex items-center gap-2 sm:gap-3">
                   {/* Boss Avatar — compact */}
                   <div className="relative flex-shrink-0">
-                    <motion.div
+                    <AdaptiveMotion.div
                       className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-3 ${borderClass} shadow-hard-sm overflow-hidden bg-neo-navy-light`}
                       animate={
                         bossReaction === 'attacking'
@@ -352,18 +352,18 @@ const BossOverlay = memo<BossOverlayProps>(
                         </div>
                       )}
                       {derivedPhase === 'enraged' && (
-                        <motion.div
+                        <AdaptiveMotion.div
                           className="absolute inset-0 border-2 border-neo-red rounded-neo"
                           animate={{ opacity: [0.4, 0.8, 0.4] }}
                           transition={{ repeat: Infinity, duration: 0.6 }}
                         />
                       )}
-                    </motion.div>
+                    </AdaptiveMotion.div>
 
                     {/* Floating damage text */}
-                    <AnimatePresence>
+                    <AdaptiveAnimatePresence>
                       {playerDmgFloat && (
-                        <motion.div
+                        <AdaptiveMotion.div
                           key={playerDmgFloat.id}
                           className="absolute -top-1 -end-1 pointer-events-none z-10"
                           initial={{ y: 0, opacity: 1, scale: 0.8 }}
@@ -375,9 +375,9 @@ const BossOverlay = memo<BossOverlayProps>(
                           <span className="font-neo-display text-[10px] font-black text-neo-lime drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                             +{playerDmgFloat.amount}
                           </span>
-                        </motion.div>
+                        </AdaptiveMotion.div>
                       )}
-                    </AnimatePresence>
+                    </AdaptiveAnimatePresence>
                   </div>
 
                   {/* HP Bar — no taunt inline, keeps it tight */}
@@ -391,9 +391,9 @@ const BossOverlay = memo<BossOverlayProps>(
                   </div>
 
                   {/* Inline attack countdown — replaces separate telegraph banner */}
-                  <AnimatePresence>
+                  <AdaptiveAnimatePresence>
                     {isTelegraphing && (
-                      <motion.div
+                      <AdaptiveMotion.div
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
@@ -419,15 +419,15 @@ const BossOverlay = memo<BossOverlayProps>(
                             {Math.ceil(telegraphState.timeRemaining / 1000)}
                           </span>
                         </div>
-                      </motion.div>
+                      </AdaptiveMotion.div>
                     )}
-                  </AnimatePresence>
+                  </AdaptiveAnimatePresence>
                 </div>
 
                 {/* Boss taunt — below the HUD strip, fades in/out */}
-                <AnimatePresence>
+                <AdaptiveAnimatePresence>
                   {showTaunt && currentTaunt && (
-                    <motion.div
+                    <AdaptiveMotion.div
                       initial={{ opacity: 0, y: -8, height: 0 }}
                       animate={{ opacity: 1, y: 0, height: 'auto' }}
                       exit={{ opacity: 0, y: -8, height: 0 }}
@@ -439,16 +439,16 @@ const BossOverlay = memo<BossOverlayProps>(
                         bossAvatarUrl={boss.imagePath}
                         bossName={t(boss.displayName)}
                       />
-                    </motion.div>
+                    </AdaptiveMotion.div>
                   )}
-                </AnimatePresence>
+                </AdaptiveAnimatePresence>
               </div>
             </div>
 
             {/* Phase Transition Banner — centered, brief */}
-            <AnimatePresence>
+            <AdaptiveAnimatePresence>
               {phaseBanner && (
-                <motion.div
+                <AdaptiveMotion.div
                   className="fixed inset-x-0 top-1/3 z-50 flex items-center justify-center pointer-events-none"
                   initial={{ opacity: 0, scale: 0.6 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -465,13 +465,13 @@ const BossOverlay = memo<BossOverlayProps>(
                       {phaseBanner}
                     </span>
                   </div>
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
-            </AnimatePresence>
+            </AdaptiveAnimatePresence>
 
             {/* Subtle rage vignette — only when NOT telegraphing (avoid double overlay) */}
             {hpPct < 20 && !isTelegraphing && (
-              <motion.div
+              <AdaptiveMotion.div
                 className="fixed inset-0 pointer-events-none z-20"
                 animate={{ opacity: [0.15, 0.3, 0.15] }}
                 transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}

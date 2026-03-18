@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { RotateCcw, Clock, Lightbulb, LogOut, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -95,9 +95,9 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     const showHintAssist = consecutiveFailures >= HINT_ASSIST_THRESHOLD;
 
     return (
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {isOpen && (
-          <motion.div
+          <AdaptiveMotion.div
             data-testid="retry-assist-modal"
             role="dialog"
             aria-modal="true"
@@ -113,7 +113,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
               'p-4'
             )}
           >
-            <motion.div
+            <AdaptiveMotion.div
               variants={modalVariants}
               initial="hidden"
               animate="visible"
@@ -276,10 +276,10 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                   {t('common.exit')}
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </AdaptiveMotion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     );
   }
 );

@@ -9,7 +9,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Pause, Play, X, MapPin, Coins, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -74,7 +74,7 @@ export const GameHeader = memo(function GameHeader({
       )}
     >
       {/* Left: Level Badge — compact, always abbreviated */}
-      <motion.div
+      <AdaptiveMotion.div
         className={cn(
           'flex items-center gap-1.5',
           'px-2 py-1',
@@ -89,7 +89,7 @@ export const GameHeader = memo(function GameHeader({
         <span className="text-xs sm:text-sm font-mono font-black text-neo-white tabular-nums">
           W{worldNumber} · L{levelNumber}
         </span>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Center: Score — single display, always visible, absolutely centered.
           pointer-events-none prevents the absolutely-positioned element from
@@ -143,7 +143,7 @@ export const GameHeader = memo(function GameHeader({
         {/* Control Buttons */}
         <div className="flex items-center gap-1">
           {/* Pause/Resume */}
-          <motion.button
+          <AdaptiveMotion.button
             onClick={onPauseToggle}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -162,10 +162,10 @@ export const GameHeader = memo(function GameHeader({
             ) : (
               <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
             )}
-          </motion.button>
+          </AdaptiveMotion.button>
 
           {/* Exit */}
-          <motion.button
+          <AdaptiveMotion.button
             onClick={onExit}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -179,7 +179,7 @@ export const GameHeader = memo(function GameHeader({
             aria-label={t('common.exit')}
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
-          </motion.button>
+          </AdaptiveMotion.button>
         </div>
       </div>
     </header>

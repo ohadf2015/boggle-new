@@ -8,7 +8,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Crown, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -51,7 +51,7 @@ const LevelDots = memo<LevelDotsProps>(({
         const isBossLevel = isBossChapter && levelIndex === totalLevels;
 
         return (
-          <motion.div
+          <AdaptiveMotion.div
             key={levelIndex}
             className={cn(
               'rounded-full transition-all duration-300',
@@ -67,7 +67,7 @@ const LevelDots = memo<LevelDotsProps>(({
             {isBossLevel && isCurrent && (
               <Crown className="w-full h-full p-0.5 text-neo-black" />
             )}
-          </motion.div>
+          </AdaptiveMotion.div>
         );
       })}
     </div>
@@ -92,7 +92,7 @@ const ChapterIndicator = memo<ChapterIndicatorProps>(({
   const isCurrentBossLevel = isBoss();
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       className={cn(
@@ -139,7 +139,7 @@ const ChapterIndicator = memo<ChapterIndicatorProps>(({
 
       {/* Boss level indicator */}
       {isCurrentBossLevel && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className={cn(
@@ -150,9 +150,9 @@ const ChapterIndicator = memo<ChapterIndicatorProps>(({
         >
           <Star className="w-3 h-3 fill-current" />
           <span>{t('adventure.boss')}</span>
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

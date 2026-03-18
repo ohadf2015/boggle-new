@@ -14,6 +14,12 @@ import type { LetterGrid } from '@/shared/types/game';
 import type { FoundWord } from '../types';
 import type { Language } from '@/types';
 
+interface AvailableWords {
+  easy: string[];
+  medium: string[];
+  hard: string[];
+}
+
 interface BuildResultsParams {
   foundWords: FoundWord[];
   grid: LetterGrid;
@@ -25,6 +31,7 @@ interface BuildResultsParams {
   maxCombo: number;
   mode: string;
   language: Language;
+  availableWords?: AvailableWords | null;
 }
 
 /**
@@ -34,6 +41,7 @@ export function buildGameResults(params: BuildResultsParams): SinglePlayerResult
   const {
     foundWords, grid, bots, botScores, botWords,
     gameStartTime, timerSeconds, maxCombo, mode, language,
+    availableWords,
   } = params;
 
   // Treat pending words (isValid: null) as invalid
@@ -92,7 +100,9 @@ export function buildGameResults(params: BuildResultsParams): SinglePlayerResult
       words: botWords[bot.id] || [],
     })),
     grid,
-    allPossibleWords: [],
+    allPossibleWords: availableWords
+      ? [...new Set([...availableWords.easy, ...availableWords.medium, ...availableWords.hard])]
+      : [],
     isNewHighScore: false,
     achievements: finalAchievements,
     botWordsForValidation,

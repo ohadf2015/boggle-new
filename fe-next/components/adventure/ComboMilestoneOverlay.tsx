@@ -9,7 +9,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // ==============================================
@@ -86,9 +86,9 @@ export const ComboMilestoneOverlay = memo(function ComboMilestoneOverlay({
   const { t } = useLanguage();
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {milestone && (
-        <motion.div
+        <AdaptiveMotion.div
           key={milestone.threshold}
           className="fixed inset-0 z-40 pointer-events-none flex items-center justify-center"
           variants={overlayVariants}
@@ -98,7 +98,7 @@ export const ComboMilestoneOverlay = memo(function ComboMilestoneOverlay({
           data-testid="combo-milestone-overlay"
         >
           {/* Giant milestone text */}
-          <motion.div
+          <AdaptiveMotion.div
             className="
               font-neo-display text-neo-yellow
               text-6xl sm:text-7xl md:text-8xl lg:text-9xl
@@ -112,10 +112,10 @@ export const ComboMilestoneOverlay = memo(function ComboMilestoneOverlay({
             exit="exit"
           >
             {t(milestone.labelKey)}
-          </motion.div>
-        </motion.div>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

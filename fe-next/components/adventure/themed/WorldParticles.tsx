@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { ParticleConfig } from '@/lib/adventure/themes/types';
@@ -321,7 +321,7 @@ const WorldParticles = memo<WorldParticlesProps>(({ particles, className }) => {
 
       <div className={cn('absolute inset-0 overflow-hidden pointer-events-none', className)}>
         {particleElements.map((particle) => (
-          <motion.div
+          <AdaptiveMotion.div
             key={particle.id}
             className={cn('absolute', animation.className)}
             style={{
@@ -338,7 +338,7 @@ const WorldParticles = memo<WorldParticlesProps>(({ particles, className }) => {
             transition={{ duration: 0.5, delay: particle.delay * 0.5 }}
           >
             {renderParticleShape(particles.type, particle, particle.color, particle.size)}
-          </motion.div>
+          </AdaptiveMotion.div>
         ))}
       </div>
     </>

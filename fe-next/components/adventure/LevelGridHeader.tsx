@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -45,7 +45,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
   const ringOffset = ringCircumference - (masteryPercent / 100) * ringCircumference;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
@@ -149,7 +149,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
         </svg>
         <div className="flex-1 h-[2px] bg-neo-white/15" />
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

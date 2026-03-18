@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
 import WorldParticles from './WorldParticles';
@@ -39,7 +39,7 @@ const BackgroundLayer = memo<BackgroundLayerProps>(({ layer, index }) => {
   const isGradient = layer.source.startsWith('bg-');
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       key={layer.id}
       className={cn(
         layer.className,

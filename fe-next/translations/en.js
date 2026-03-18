@@ -3791,6 +3791,13 @@ const en = {
     "fireBonus": "Fire Bonus",
     "highScore": "High Score",
     "boardCoverage": "Board Coverage",
+    "results": {
+      "missedWords": {
+        "title": "Words You Missed",
+        "showMore": "Show More",
+        "count": "{found} of {total} words found"
+      }
+    },
     "maxCombo": "Max Combo",
     "submitWord": "Submit",
     "clearWord": "Clear",
@@ -5985,6 +5992,8 @@ const en = {
       "bossIntro": "Boss Battle!",
       "bossDefeated": "Boss Defeated!",
       "bossWins": "Boss Wins...",
+      "nearMiss": "SO CLOSE!",
+      "nearMissDesc": "Only {{hp}}% HP left! You almost had them!",
       "twistMechanic": "Boss Twist",
       "skipIntro": "Skip",
       "readyToFight": "Let's Go!",

@@ -14,7 +14,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Check, Target, FileText, Zap, Clock, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -117,9 +117,9 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
     return (
       <div className={cn('flex flex-col gap-2', className)}>
         {/* All Complete Banner */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {allComplete && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={prefersReducedMotion ? false : { opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0 }}
@@ -132,9 +132,9 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
               <Trophy className="w-4 h-4" />
               <span>All Objectives Complete!</span>
               <Sparkles className="w-4 h-4" />
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         <ul
           role="list"
@@ -159,7 +159,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                 )}
               >
                 {/* Icon */}
-                <motion.div
+                <AdaptiveMotion.div
                   data-testid={`icon-${objective.type}`}
                   whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
                   className={cn(
@@ -171,7 +171,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                   )}
                 >
                   <Icon className="w-3.5 h-3.5" />
-                </motion.div>
+                </AdaptiveMotion.div>
 
                 {/* Label and Progress */}
                 <div className="flex-1 min-w-0 flex flex-col gap-0.5">
@@ -199,7 +199,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
 
                   {/* Progress bar with animation */}
                   <div className="relative h-1.5 bg-neo-black/30 rounded-full overflow-hidden">
-                    <motion.div
+                    <AdaptiveMotion.div
                       data-testid={`progress-${objective.id}`}
                       className={cn(
                         'absolute inset-y-0 left-0 rounded-full',
@@ -223,9 +223,9 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                 </div>
 
                 {/* Checkmark for completed objectives */}
-                <AnimatePresence>
+                <AdaptiveAnimatePresence>
                   {objective.isComplete && (
-                    <motion.div
+                    <AdaptiveMotion.div
                       data-testid={`checkmark-${objective.id}`}
                       initial={prefersReducedMotion ? false : { scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
@@ -241,9 +241,9 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                       )}
                     >
                       <Check className="w-3 h-3" strokeWidth={3} />
-                    </motion.div>
+                    </AdaptiveMotion.div>
                   )}
-                </AnimatePresence>
+                </AdaptiveAnimatePresence>
               </li>
             );
           })}

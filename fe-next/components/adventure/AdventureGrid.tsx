@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import type { GridTileState } from '@/types/adventure';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -403,7 +403,7 @@ const AdventureGrid = memo(
             bossGridClass,
           )}
         >
-          <AnimatePresence mode={enableComplexAnimations ? 'popLayout' : 'sync'}>
+          <AdaptiveAnimatePresence mode={enableComplexAnimations ? 'popLayout' : 'sync'}>
           {tiles.map((tile, index) => {
             const isSelected = selectedSet.has(index);
             const isHintHighlighted = hintSet.has(index);
@@ -439,7 +439,7 @@ const AdventureGrid = memo(
               />
             );
           })}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
 
           {/* Word Path Trail - z-20 to render above tiles (which have z-10 when selected) */}
           {enableComplexAnimations && pathPoints && pathPoints.length >= 2 && (

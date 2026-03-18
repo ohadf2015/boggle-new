@@ -8,7 +8,7 @@
 'use client';
 
 import { memo, useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Star, Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -180,7 +180,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     if (!isOpen) return null;
 
     return (
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         <div
           ref={dialogRef}
           role="dialog"
@@ -199,7 +199,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
           />
 
           {/* Modal Content */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
@@ -212,7 +212,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             )}
           >
             {/* Enhanced Title */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ y: -30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
@@ -229,10 +229,10 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   ? t('adventure.perfect') 
                   : t('adventure.levelComplete')}
               </h2>
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Level Number with badge */}
-            <motion.div 
+            <AdaptiveMotion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -247,10 +247,10 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   {t('adventure.level')} {levelNumber}
                 </span>
               </div>
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Lexi Celebration - celebrates alongside existing star animation */}
-            <motion.div
+            <AdaptiveMotion.div
               className="flex justify-center mb-4"
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -268,24 +268,24 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 enableHover={false}
                 enableClick={false}
               />
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Perfect Badge */}
             {isPerfect && (
-              <motion.p
+              <AdaptiveMotion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 className="text-center text-lg font-black text-neo-yellow mb-4"
               >
                 {t('adventure.game.perfect')}
-              </motion.p>
+              </AdaptiveMotion.p>
             )}
 
             {/* Stars - clean animation without sparkle effects */}
             <div className="flex justify-center gap-3 mb-6">
               {[0, 1, 2].map((i) => (
-                <motion.div
+                <AdaptiveMotion.div
                   key={`star-${i}`}
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{
@@ -307,12 +307,12 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                         : 'text-neo-white/30 fill-transparent'
                     )}
                   />
-                </motion.div>
+                </AdaptiveMotion.div>
               ))}
             </div>
 
             {/* Score & Rewards Grid */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -359,11 +359,11 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   <span className="text-neo-lime text-xs font-bold">x2!</span>
                 )}
               </div>
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* High Score Badge */}
             {isHighScore && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8, type: 'spring' }}
@@ -373,12 +373,12 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   <Trophy className="w-5 h-5 text-neo-lime" />
                   <span className="text-neo-lime font-bold">{t('adventure.game.newHighScore')}</span>
                 </div>
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
             {/* Boss Defeat Share Button */}
             {bossDefeatShare && !isFailed && (
-              <motion.button
+              <AdaptiveMotion.button
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.85, type: 'spring' }}
@@ -413,7 +413,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               >
                 <Share2 className="w-4 h-4" />
                 {t('adventure.share.shareCard')}
-              </motion.button>
+              </AdaptiveMotion.button>
             )}
 
             {/* Objectives Summary */}
@@ -455,7 +455,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             {lootDrops.length > 0 && !isFailed && (
               <div className="flex flex-wrap gap-2 mb-4 justify-center">
                 {lootDrops.map((drop, i) => (
-                  <motion.div
+                  <AdaptiveMotion.div
                     key={`loot-${i}`}
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -468,26 +468,26 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     )}
                   >
                     {drop.label || drop.type}
-                  </motion.div>
+                  </AdaptiveMotion.div>
                 ))}
               </div>
             )}
 
             {/* Story Beat (inline — no separate overlay) */}
             {storyBeatText && !isFailed && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.9 }}
                 className="mb-4 p-3 rounded-neo bg-neo-white/5 border border-neo-white/10"
               >
                 <p className="text-xs text-neo-white/70 italic leading-relaxed">{storyBeatText}</p>
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
             {/* Partial Progress Display (for failed attempts) */}
             {isFailed && bestAttempt && bestAttempt.attemptCount > 1 && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -514,12 +514,12 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     {t('adventure.game.keepTrying')}
                   </p>
                 )}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
             {/* Next Level Preview — creates pull to continue */}
             {!isFailed && nextLevelPreview && !isLastLevelOfWorld && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
@@ -536,7 +536,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     {t(nextLevelPreview.mechanic)}
                   </p>
                 )}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
             {/* Double Coins Rewarded Ad */}
@@ -618,9 +618,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 {t('common.exit')}
               </button>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         </div>
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     );
   }
 );

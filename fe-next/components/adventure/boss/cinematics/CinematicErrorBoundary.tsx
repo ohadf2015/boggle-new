@@ -8,7 +8,7 @@
 'use client';
 
 import React, { Component, ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { AlertTriangle, RefreshCw, SkipForward } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 
@@ -90,7 +90,7 @@ function ErrorFallback({ error, onRetry, onSkip, testId }: ErrorFallbackProps) {
       className="fixed inset-0 z-50 bg-neo-navy flex items-center justify-center p-4"
       data-testid={`${testId}-error`}
     >
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-md w-full bg-neo-white rounded-neo border-4 border-neo-black shadow-hard-lg p-6"
@@ -137,7 +137,7 @@ function ErrorFallback({ error, onRetry, onSkip, testId }: ErrorFallbackProps) {
             {t('adventure.bosses.cinematics.skip')}
           </button>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 }

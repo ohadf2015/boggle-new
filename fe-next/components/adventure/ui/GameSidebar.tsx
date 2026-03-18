@@ -9,7 +9,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import {
   Lightbulb, Target, Check, FileText, Star, Snowflake,
   Clock, Gem, Swords, Heart, Zap, Shield, Timer, Shuffle, Bomb,
@@ -292,7 +292,7 @@ export const GameSidebar = memo(function GameSidebar({
         </div>
 
         {/* Objectives Card */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -321,7 +321,7 @@ export const GameSidebar = memo(function GameSidebar({
             showSlideIn={showSlideIn}
             onSlideInComplete={onSlideInComplete}
           />
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Chapter Quest Progress */}
         {chapterQuests.length > 0 && (
@@ -331,7 +331,7 @@ export const GameSidebar = memo(function GameSidebar({
         {/* Hint Section */}
         <div className="space-y-2">
           {/* Hint Button — glows subtly when auto-hint is active */}
-          <motion.button
+          <AdaptiveMotion.button
             onClick={onHintClick}
             disabled={!hasHintsAvailable}
             whileHover={hasHintsAvailable ? { scale: 1.02 } : {}}
@@ -350,11 +350,11 @@ export const GameSidebar = memo(function GameSidebar({
           >
             <Lightbulb className="w-4 h-4" />
             <span>{t('adventure.game.hint')}</span>
-          </motion.button>
+          </AdaptiveMotion.button>
 
           {/* Time Freeze Button (desktop — only if upgrade purchased) */}
           {freezeSeconds > 0 && (
-            <motion.button
+            <AdaptiveMotion.button
               onClick={onFreezeClick}
               disabled={freezeUsed}
               whileHover={!freezeUsed ? { scale: 1.02 } : {}}
@@ -372,12 +372,12 @@ export const GameSidebar = memo(function GameSidebar({
             >
               <Timer className="w-4 h-4" />
               <span>{isFrozen ? t('adventure.game.frozen') : t('adventure.game.freezeWithTime', { seconds: freezeSeconds })}</span>
-            </motion.button>
+            </AdaptiveMotion.button>
           )}
 
           {/* Shuffle Button (desktop — only if upgrade purchased) */}
           {shufflesRemaining > 0 && (
-            <motion.button
+            <AdaptiveMotion.button
               onClick={onShuffleClick}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -390,12 +390,12 @@ export const GameSidebar = memo(function GameSidebar({
             >
               <Shuffle className="w-4 h-4" />
               <span>{t('adventure.game.shuffleWithCount', { count: shufflesRemaining })}</span>
-            </motion.button>
+            </AdaptiveMotion.button>
           )}
 
           {/* Detonate Toggle (desktop — Word Dynamite T3) */}
           {canDetonate && (
-            <motion.button
+            <AdaptiveMotion.button
               onClick={onDetonateToggle}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -411,13 +411,13 @@ export const GameSidebar = memo(function GameSidebar({
             >
               <Bomb className="w-4 h-4" />
               <span>{t('adventure.game.detonate')}</span>
-            </motion.button>
+            </AdaptiveMotion.button>
           )}
 
           {/* Current Hint Display */}
-          <AnimatePresence>
+          <AdaptiveAnimatePresence>
             {currentHint && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -433,14 +433,14 @@ export const GameSidebar = memo(function GameSidebar({
                 <p className="text-lg font-black text-neo-white tracking-wider">
                   {currentHint.word}
                 </p>
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
 
           {/* Adaptive Difficulty Hint */}
-          <AnimatePresence>
+          <AdaptiveAnimatePresence>
             {hintLevel !== 'none' && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -458,9 +458,9 @@ export const GameSidebar = memo(function GameSidebar({
                     }
                   })()}
                 </p>
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
         </div>
       </div>
     </aside>

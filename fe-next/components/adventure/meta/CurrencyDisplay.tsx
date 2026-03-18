@@ -7,7 +7,7 @@
 
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion';
 
 /**
@@ -89,19 +89,19 @@ export function CurrencyDisplay({
       </span>
 
       {/* Amount */}
-      <motion.span
+      <AdaptiveMotion.span
         key={amount}
         initial={prefersReducedMotion ? false : { scale: 1.1 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.2 }}
       >
         {formattedAmount}
-      </motion.span>
+      </AdaptiveMotion.span>
 
       {/* Recent gain animation */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {recentGain && recentGain > 0 && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
             animate={
               prefersReducedMotion
@@ -114,9 +114,9 @@ export function CurrencyDisplay({
             aria-live="polite"
           >
             +{recentGain}
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 }

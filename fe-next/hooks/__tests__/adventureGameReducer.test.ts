@@ -306,3 +306,73 @@ describe('SUBMIT_WORD with detonate (Word Dynamite T3)', () => {
     expect(result.gameState.score).toBe(90);
   });
 });
+
+describe('Blast Shield T1 (iceTileReduction) — extended ice melt range', () => {
+  const levelConfig = {
+    world: 5,
+    level: 1,
+    gridSize: 5,
+    timerSeconds: 120,
+    isBossLevel: false,
+    specialTiles: [
+      { row: 0, col: 0, type: 'ice' as const },
+      { row: 0, col: 4, type: 'ice' as const },
+    ],
+    objectives: [
+      { type: 'wordCount', target: 50, isPrimary: true },
+    ],
+    difficulty: 'MEDIUM' as const,
+    chapterNumber: 2,
+    levelInChapter: 1,
+  } as LevelConfig;
+
+  const grid = [
+    ['I', 'C', 'E', 'D', 'F'],
+    ['A', 'B', 'C', 'D', 'E'],
+    ['F', 'G', 'H', 'I', 'J'],
+    ['K', 'L', 'M', 'N', 'O'],
+    ['P', 'Q', 'R', 'S', 'T'],
+  ];
+
+  it('without iceTileReduction, ice at (0,0) does NOT melt from word at row 2', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+
+    // Word at (2,2) — 2 tiles away from ice at (0,0)
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'H', score: 5, path: [{ row: 2, col: 2 }] },
+    });
+
+    // Ice at (0,0) is 2 tiles away — should NOT melt with default range=1
+    expect(result.tiles[0][0].isFrozen).toBe(true);
+  });
+
+  it('with iceTileReduction, ice melts at range 2', () => {
+    const state = createInitialState(levelConfig, grid, { iceTileReduction: true });
+    const started = gameReducer(state, { type: 'START_GAME' });
+
+    // Word at (2,2) — 2 tiles away from ice at (0,0)
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'H', score: 5, path: [{ row: 2, col: 2 }] },
+    });
+
+    // Ice at (0,0) is exactly 2 tiles away — should melt with iceTileReduction
+    expect(result.tiles[0][0].isFrozen).toBe(false);
+    expect(result.tiles[0][0].type).toBe('standard');
+  });
+
+  it('ice at distance 3 does not melt even with iceTileReduction', () => {
+    const state = createInitialState(levelConfig, grid, { iceTileReduction: true });
+    const started = gameReducer(state, { type: 'START_GAME' });
+
+    // Word at (3,3) — 3+ tiles from ice at (0,0)
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'N', score: 5, path: [{ row: 3, col: 3 }] },
+    });
+
+    expect(result.tiles[0][0].isFrozen).toBe(true);
+  });
+});

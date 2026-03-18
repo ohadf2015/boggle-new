@@ -9,7 +9,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTimerTheme } from '@/contexts/AdventureThemeContext';
@@ -47,8 +47,8 @@ const CRITICAL_THRESHOLD = 5;
 const FlipDigit = memo(function FlipDigit({ digit, className }: FlipDigitProps) {
   return (
     <div className={cn('relative w-[0.55em] h-[1.1em] overflow-hidden', className)}>
-      <AnimatePresence mode="popLayout">
-        <motion.span
+      <AdaptiveAnimatePresence mode="popLayout">
+        <AdaptiveMotion.span
           key={digit}
           initial={{ y: '-100%', opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -57,8 +57,8 @@ const FlipDigit = memo(function FlipDigit({ digit, className }: FlipDigitProps) 
           className="absolute inset-0 flex items-center justify-center"
         >
           {digit}
-        </motion.span>
-      </AnimatePresence>
+        </AdaptiveMotion.span>
+      </AdaptiveAnimatePresence>
     </div>
   );
 });
@@ -108,7 +108,7 @@ const AdventureTimer = memo<AdventureTimerProps>(
     const themeLevel = timerTheme[urgencyState];
 
     return (
-      <motion.div
+      <AdaptiveMotion.div
         role="timer"
         aria-label={`${timeRemaining} seconds remaining`}
         aria-live={isDanger ? 'assertive' : 'polite'}
@@ -129,12 +129,12 @@ const AdventureTimer = memo<AdventureTimerProps>(
         {/* Icon */}
         <div className="relative">
           {isCritical ? (
-            <motion.div
+            <AdaptiveMotion.div
               animate={{ rotate: [0, 15, -15, 0] }}
               transition={{ duration: 0.5, repeat: Infinity }}
             >
               <AlertTriangle className={iconSizes[size]} />
-            </motion.div>
+            </AdaptiveMotion.div>
           ) : (
             <Clock className={iconSizes[size]} />
           )}
@@ -147,13 +147,13 @@ const AdventureTimer = memo<AdventureTimerProps>(
           <FlipDigit digit={minOnes} />
 
           {/* Separator */}
-          <motion.span
+          <AdaptiveMotion.span
             className="mx-0.5 opacity-60"
             animate={{ opacity: [0.6, 0.3, 0.6] }}
             transition={{ duration: 1, repeat: Infinity }}
           >
             :
-          </motion.span>
+          </AdaptiveMotion.span>
 
           {/* Seconds */}
           <FlipDigit digit={secTens} />
@@ -162,7 +162,7 @@ const AdventureTimer = memo<AdventureTimerProps>(
 
         {/* Urgency glow effect */}
         {isDanger && (
-          <motion.div
+          <AdaptiveMotion.div
             className="absolute inset-0 rounded-neo pointer-events-none"
             animate={{
               boxShadow: [
@@ -174,7 +174,7 @@ const AdventureTimer = memo<AdventureTimerProps>(
             transition={{ duration: 0.8, repeat: Infinity }}
           />
         )}
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 );

@@ -19,7 +19,7 @@
 
 'use client';
 
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion';
 
 // ==============================================
@@ -86,7 +86,7 @@ export function TileWarningOverlay({
   }
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className={`absolute inset-0 pointer-events-none z-10 ${className}`}
       initial={{ opacity: 0, scale: 1 }}
       animate={{
@@ -106,7 +106,7 @@ export function TileWarningOverlay({
       }}
     >
       {/* Pulsing inner effect */}
-      <motion.div
+      <AdaptiveMotion.div
         className="absolute inset-0 bg-red-500/20"
         style={{ borderRadius: 'inherit' }}
         animate={{
@@ -118,6 +118,6 @@ export function TileWarningOverlay({
           ease: 'easeInOut',
         }}
       />
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 }

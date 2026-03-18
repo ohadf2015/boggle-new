@@ -8,7 +8,7 @@
 'use client';
 
 import { memo, useEffect, useId, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Play, RotateCcw, LogOut, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -61,7 +61,7 @@ export const PauseOverlay = memo(function PauseOverlay({
 
   return (
     <>
-      <motion.div
+      <AdaptiveMotion.div
         ref={dialogRef}
         data-testid="pause-overlay"
         role="dialog"
@@ -78,7 +78,7 @@ export const PauseOverlay = memo(function PauseOverlay({
         )}
       >
         {/* Pause Card */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
@@ -92,7 +92,7 @@ export const PauseOverlay = memo(function PauseOverlay({
         >
           {/* Pause Icon */}
           <div className="flex justify-center mb-6">
-            <motion.div
+            <AdaptiveMotion.div
               className={cn(
                 'w-16 h-16 sm:w-20 sm:h-20',
                 'rounded-full',
@@ -109,7 +109,7 @@ export const PauseOverlay = memo(function PauseOverlay({
               transition={{ duration: 2, repeat: Infinity }}
             >
               <Pause className="w-8 h-8 sm:w-10 sm:h-10 text-neo-yellow" />
-            </motion.div>
+            </AdaptiveMotion.div>
           </div>
 
           {/* Title */}
@@ -123,7 +123,7 @@ export const PauseOverlay = memo(function PauseOverlay({
           {/* Actions */}
           <div className="flex flex-col gap-3">
             {/* Resume */}
-            <motion.button
+            <AdaptiveMotion.button
               onClick={onResume}
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
@@ -139,10 +139,10 @@ export const PauseOverlay = memo(function PauseOverlay({
             >
               <Play className="w-5 h-5" />
               {t('common.resume')}
-            </motion.button>
+            </AdaptiveMotion.button>
 
             {/* Restart */}
-            <motion.button
+            <AdaptiveMotion.button
               onClick={() => setShowRestartConfirm(true)}
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
@@ -158,10 +158,10 @@ export const PauseOverlay = memo(function PauseOverlay({
             >
               <RotateCcw className="w-5 h-5" />
               {t('adventure.restart')}
-            </motion.button>
+            </AdaptiveMotion.button>
 
             {/* Exit */}
-            <motion.button
+            <AdaptiveMotion.button
               onClick={() => setShowExitConfirm(true)}
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
@@ -177,7 +177,7 @@ export const PauseOverlay = memo(function PauseOverlay({
             >
               <LogOut className="w-5 h-5" />
               {t('common.exit')}
-            </motion.button>
+            </AdaptiveMotion.button>
           </div>
 
           {/* Keyboard Hint */}
@@ -186,8 +186,8 @@ export const PauseOverlay = memo(function PauseOverlay({
             <kbd className="px-2 py-1 bg-neo-black rounded font-mono">ESC</kbd>{' '}
             {t('common.toResume')}
           </p>
-        </motion.div>
-      </motion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
 
       <ConfirmationDialog
         open={showRestartConfirm}

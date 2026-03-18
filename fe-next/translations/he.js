@@ -3687,6 +3687,13 @@ const he = {
     "fireBonus": "בונוס אש",
     "highScore": "שיא",
     "boardCoverage": "כיסוי לוח",
+    "results": {
+      "missedWords": {
+        "title": "מילים שפספסת",
+        "showMore": "הצג עוד",
+        "count": "מצאת {found} מתוך {total} מילים"
+      }
+    },
     "maxCombo": "קומבו מקסימלי",
     "submitWord": "שלח",
     "clearWord": "נקה",
@@ -5915,6 +5922,8 @@ const he = {
       "bossIntro": "קרב בוס!",
       "bossDefeated": "הבוס הובס!",
       "bossWins": "הבוס ניצח...",
+      "nearMiss": "כמעט!",
+      "nearMissDesc": "נשארו רק {{hp}}% חיים! כמעט הצלחת!",
       "twistMechanic": "טוויסט הבוס",
       "skipIntro": "דלג",
       "readyToFight": "קדימה!",

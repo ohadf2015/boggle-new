@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LootDrop, LootRarity } from '@/types/adventure';
 
@@ -61,14 +61,14 @@ export default function LootChestReveal({ isOpen, drops, onComplete }: LootChest
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <motion.div
+      <AdaptiveMotion.div
         className="flex flex-col items-center gap-6 p-8"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       >
         {/* Chest */}
-        <motion.div
+        <AdaptiveMotion.div
           data-testid="loot-chest"
           className="relative cursor-pointer rounded-neo border-neo bg-amber-700 border-amber-900 p-8"
           onClick={handleChestClick}
@@ -82,15 +82,15 @@ export default function LootChestReveal({ isOpen, drops, onComplete }: LootChest
               {t('adventure.loot.tapToOpen')}
             </p>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Drops */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {opened && (
             <div className="flex flex-wrap justify-center gap-4">
               {drops.map((drop, i) => (
                 i < revealedCount && (
-                  <motion.div
+                  <AdaptiveMotion.div
                     key={`${drop.type}-${i}`}
                     data-testid={`loot-drop-${drop.type}`}
                     className={`flex flex-col items-center rounded-neo border-neo border-black bg-neo-navy p-4 ${RARITY_GLOW[drop.rarity]}`}
@@ -105,16 +105,16 @@ export default function LootChestReveal({ isOpen, drops, onComplete }: LootChest
                     <span className="text-xs text-neo-white/70">
                       {t(DROP_NAME_KEYS[drop.type])}
                     </span>
-                  </motion.div>
+                  </AdaptiveMotion.div>
                 )
               ))}
             </div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         {/* Continue */}
         {allRevealed && opened && (
-          <motion.button
+          <AdaptiveMotion.button
             data-testid="loot-continue"
             className="rounded-neo border-neo border-black bg-neo-yellow px-6 py-3 font-neo-display text-lg text-black shadow-hard active:shadow-hard-pressed"
             onClick={onComplete}
@@ -123,9 +123,9 @@ export default function LootChestReveal({ isOpen, drops, onComplete }: LootChest
             whileTap={{ scale: 0.95 }}
           >
             {t('adventure.loot.continue')}
-          </motion.button>
+          </AdaptiveMotion.button>
         )}
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 }

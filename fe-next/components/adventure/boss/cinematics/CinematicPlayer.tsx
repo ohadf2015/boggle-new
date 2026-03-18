@@ -18,7 +18,7 @@
 
 import React, { useEffect, useRef, ComponentType, useCallback } from 'react';
 import { Player, PlayerRef } from '@remotion/player';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import {
   useCinematic,
   SKIP_DELAY_MS,
@@ -340,8 +340,8 @@ function CinematicPlayerInner({
       />
 
       {/* Skip Button */}
-      <AnimatePresence>
-        <motion.div
+      <AdaptiveAnimatePresence>
+        <AdaptiveMotion.div
           className="absolute right-4 z-50"
           style={{ bottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))' }}
           initial={{ opacity: 0, y: 20 }}
@@ -377,8 +377,8 @@ function CinematicPlayerInner({
               <SkipCountdown />
             )}
           </button>
-        </motion.div>
-      </AnimatePresence>
+        </AdaptiveMotion.div>
+      </AdaptiveAnimatePresence>
 
       {/* Progress Bar */}
       <div
@@ -389,7 +389,7 @@ function CinematicPlayerInner({
         aria-valuemax={100}
         aria-label={t('adventure.bosses.cinematics.progress')}
       >
-        <motion.div
+        <AdaptiveMotion.div
           className="h-full bg-neo-yellow"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}

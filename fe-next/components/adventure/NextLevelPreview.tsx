@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ChevronRight, Grid3X3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -32,9 +32,9 @@ export function NextLevelPreview({
   }, [isVisible]);
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {isVisible && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ y: 200, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 200, opacity: 0 }}
@@ -68,22 +68,22 @@ export function NextLevelPreview({
               <button onClick={onDismiss} className="text-xs text-neo-white/40 hover:text-neo-white/60">
                 {t('adventure.later')}
               </button>
-              <AnimatePresence>
+              <AdaptiveAnimatePresence>
                 {showPlayBtn && (
-                  <motion.button
+                  <AdaptiveMotion.button
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     onClick={onPlay}
                     className="bg-neo-lime text-neo-black px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard font-neo-display font-bold text-sm hover:shadow-hard-pressed active:shadow-hard-pressed"
                   >
                     {t('adventure.play')}
-                  </motion.button>
+                  </AdaptiveMotion.button>
                 )}
-              </AnimatePresence>
+              </AdaptiveAnimatePresence>
             </div>
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 }

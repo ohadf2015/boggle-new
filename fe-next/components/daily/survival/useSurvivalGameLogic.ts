@@ -2,26 +2,17 @@
 
 import { useCallback, useEffect, useRef, useReducer } from 'react';
 import type { LetterGrid, Language } from '@/types';
-import { getLetterFeedback, isTargetWordFound, type LetterFeedback } from '@/utils/wordHuntFeedback';
-import { calculateLifeReward, calculateTokenReward, calculateEfficiencyScore, type ClueShopItem, type HintLevel } from '@/utils/aiHintGenerator';
+import type { LetterFeedback } from '@/utils/wordHuntFeedback';
+import { calculateEfficiencyScore, type ClueShopItem, type HintLevel } from '@/utils/aiHintGenerator';
 import type { FeedbackType } from '../WordFeedbackToast';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, ScoreEvent, AutoClueNotificationData } from './types';
 import { useLiveScoreTracker } from './useLiveScoreTracker';
 import {
-  MAX_ATTEMPTS,
-  INITIAL_LIFE,
   LIFE_DRAIN_RATE,
   NEW_PLAYER_LIFE_DRAIN_RATE,
   NEW_PLAYER_THRESHOLD,
-  INVALID_WORD_PENALTY,
-  NOT_IN_DICTIONARY_PENALTY,
-  FEEDBACK_OVERLAY_DURATION,
-  getLifeBonusForWord,
 } from './constants';
-import { isWordOnBoard, normalizeWord } from '@/utils/clientWordValidator';
-import { MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
-import { formatRewardMessage } from '@/utils/formatRewardMessage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -32,7 +23,7 @@ import { useSurvivalClues } from './useSurvivalClues';
 import { useSurvivalHints } from './useSurvivalHints';
 import { survivalGameReducer, createInitialState } from './survivalGameReducer';
 import { useSafeTimeout, useSafeInterval } from '@/hooks/useSafeTimeout';
-import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
+import { useSurvivalWordSubmission } from './useSurvivalWordSubmission';
 
 export interface UseSurvivalGameLogicProps {
   grid: LetterGrid;
@@ -208,11 +199,8 @@ export function useSurvivalGameLogic({
     t,
   });
 
-  // Callback refs for circular dependencies
+  // Callback ref for game over (needed by word submission hook)
   const handleGameOverRef = useRef<((won: boolean, finalAttempts?: TargetAttempt[]) => void) | null>(null);
-  const handleTargetAttemptRef = useRef<((word: string, target: string) => void) | null>(null);
-  const handleWordDiscoveryRef = useRef<((word: string) => void) | null>(null);
-  const handleDiscoveryFeedbackRef = useRef<((word: string, target: string) => void) | null>(null);
 
   // Enable sound effects
   useEffect(() => {
@@ -289,29 +277,24 @@ export function useSurvivalGameLogic({
     }
   }, [clueState.allPositionsRevealed]);
 
-  // Dictionary validation
-  const validateWordInDictionary = useCallback(async (word: string): Promise<boolean> => {
-    // Target word is always valid — it's curated from word lists
-    if (word.toLowerCase() === targetWord.toLowerCase()) return true;
-
-    try {
-      const response = await fetch('/api/dictionary/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: word.toLowerCase(), language }),
-      });
-      const data = await response.json();
-      return data.isValid === true;
-    } catch {
-      // Network error fetching dictionary — treat word as valid to avoid blocking gameplay
-      return true;
-    }
-  }, [language, targetWord]);
-
-  // Handle word change from grid
-  const handleWordChange = useCallback((word: string, count: number) => {
-    dispatch({ type: 'SET_FORMED_WORD', payload: { word, count } });
-  }, []);
+  // Word submission logic (extracted hook)
+  const wordSubmission = useSurvivalWordSubmission({
+    grid,
+    language,
+    targetWord,
+    t,
+    isGameOver: state.isGameOver,
+    attempts: state.attempts,
+    discoveredWords: state.discoveredWords,
+    lifePoints: state.lifePoints,
+    dispatch,
+    showToast,
+    playWordAcceptedSound,
+    clueActions,
+    feedbackTimeout,
+    lifeAnimationTimeout,
+    handleGameOverRef,
+  });
 
   // Handle game over
   const handleGameOver = useCallback(async (won: boolean, finalAttempts?: TargetAttempt[]) => {
@@ -384,198 +367,6 @@ export function useSurvivalGameLogic({
     onComplete(result);
   }, [state.attempts, state.discoveredWords, state.lifePoints, state.clueTokens, state.gameSessionId, hintState.tokensSpent, hintState.currentHint, targetWord, onComplete, lifeDrainInterval, fadeToTrack, TRACKS]);
 
-  // Handle target attempt
-  const handleTargetAttempt = useCallback((word: string, target: string) => {
-    // Use normalized comparison for duplicate check to handle Hebrew final letters
-    const normalizedWord = normalizeWord(word, language);
-    if (state.attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
-      showToast('duplicate', t('wordHunt.alreadyGuessed') || 'Already guessed!');
-      return;
-    }
-
-    // Pass language to enable Hebrew final letter normalization
-    const feedback = getLetterFeedback(word, target, language);
-
-    const newAttempt: TargetAttempt = {
-      word,
-      feedback,
-      timestamp: Date.now(),
-    };
-
-    dispatch({ type: 'ADD_ATTEMPT', payload: { attempt: newAttempt } });
-    playWordAcceptedSound?.();
-
-    // Update clues from feedback
-    const newAttempts = [...state.attempts, newAttempt];
-    clueActions.updateCluesFromFeedback(feedback, newAttempts);
-
-    // Show feedback overlay
-    feedbackTimeout.clear();
-    dispatch({ type: 'SET_FEEDBACK_OVERLAY', payload: { show: true, feedback } });
-
-    feedbackTimeout.set(() => {
-      dispatch({ type: 'SET_FEEDBACK_OVERLAY', payload: { show: false } });
-    }, FEEDBACK_OVERLAY_DURATION);
-
-    // Check if correct
-    const won = isTargetWordFound(feedback);
-    if (won) {
-      feedbackTimeout.clear();
-      handleGameOverRef.current?.(true, newAttempts);
-      return;
-    }
-
-    // Wrong guess - penalize
-    dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
-
-    // Check if out of attempts (only count non-discovery attempts)
-    const targetAttemptCount = newAttempts.filter(a => !a.isDiscovery).length;
-    if (targetAttemptCount >= MAX_ATTEMPTS) {
-      feedbackTimeout.clear();
-      handleGameOverRef.current?.(false, newAttempts);
-    }
-  }, [state.attempts, playWordAcceptedSound, t, showToast, clueActions, language, feedbackTimeout]);
-
-  // Handle discovery feedback (for different-length words)
-  // This shows feedback overlay and persists yellow/green letters without counting as a "try"
-  const handleDiscoveryFeedback = useCallback((word: string, target: string) => {
-    // Skip if word is too short for meaningful feedback (2+ letters for all languages)
-    if (word.length < MIN_DISCOVERY_WORD_LENGTH) return;
-
-    // Pass language to enable Hebrew final letter normalization
-    const feedback = getLetterFeedback(word, target, language);
-
-    // Only add to attempts if there's at least one non-gray feedback
-    // (i.e., the word contains at least one letter from the target)
-    const hasRelevantFeedback = feedback.some(fb => fb.feedback !== 'gray');
-    if (!hasRelevantFeedback) return;
-
-    const newAttempt: TargetAttempt = {
-      word,
-      feedback,
-      timestamp: Date.now(),
-      isDiscovery: true, // Mark as discovery - won't count toward tries
-    };
-
-    dispatch({ type: 'ADD_ATTEMPT', payload: { attempt: newAttempt } });
-
-    // Update clues from feedback (adds greens to accumulatedClues, yellows to knownLetters)
-    const newAttempts = [...state.attempts, newAttempt];
-    clueActions.updateCluesFromFeedback(feedback, newAttempts);
-
-    // Show feedback overlay
-    feedbackTimeout.clear();
-    dispatch({ type: 'SET_FEEDBACK_OVERLAY', payload: { show: true, feedback } });
-
-    feedbackTimeout.set(() => {
-      dispatch({ type: 'SET_FEEDBACK_OVERLAY', payload: { show: false } });
-    }, FEEDBACK_OVERLAY_DURATION);
-
-    // No win check (different length can't be the target)
-    // No life penalty (discovery has its own rewards/penalties)
-    // No max attempts check (discoveries don't count as tries)
-  }, [state.attempts, clueActions, language, feedbackTimeout]);
-
-  // Handle word discovery - accepts 2+ letter words (target word min is enforced separately)
-  const handleWordDiscovery = useCallback(async (word: string) => {
-    if (word.length < MIN_DISCOVERY_WORD_LENGTH) {
-      showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${MIN_DISCOVERY_WORD_LENGTH} letters`);
-      return;
-    }
-
-    if (state.discoveredWords.some(w => w.word === word)) {
-      showToast('duplicate', t('wordHunt.feedback.duplicate') || 'Already found!');
-      return;
-    }
-
-    if (!isWordOnBoard(word, grid, language)) {
-      dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
-      showToast('not-on-board', t('wordHunt.feedback.notOnBoardPenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
-      recordNotOnBoard(word, language, 'daily_word_hunt');
-      return;
-    }
-
-    const isValidWord = await validateWordInDictionary(word);
-    if (!isValidWord) {
-      dispatch({ type: 'ADJUST_LIFE', payload: { delta: -NOT_IN_DICTIONARY_PENALTY } });
-      showToast('not-in-dictionary', t('wordHunt.feedback.notInDictionary') || `Not a word -${NOT_IN_DICTIONARY_PENALTY}`);
-      recordNotInDictionary(word, language, 'daily_word_hunt');
-      return;
-    }
-
-    const baseLifeGained = calculateLifeReward(word.length);
-    const longWordBonus = getLifeBonusForWord(word.length);
-    const lifeGained = baseLifeGained + longWordBonus;
-    const tokensGained = calculateTokenReward(word.length);
-
-    const discovery: WordDiscovery = {
-      word,
-      lifeGained,
-      tokensGained,
-      timestamp: Date.now(),
-    };
-
-    const newLife = Math.min(INITIAL_LIFE, state.lifePoints + lifeGained);
-    dispatch({ type: 'DISCOVER_WORD', payload: { discovery, newLife } });
-    playWordAcceptedSound?.();
-
-    // Update clues from discovery (handles greens, known letters, and cleanup)
-    const cluesRevealed = clueActions.updateCluesFromDiscovery(word);
-
-    // Life gain animation
-    dispatch({ type: 'SET_LIFE_GAIN_ANIMATION', payload: { amount: lifeGained, isGaining: true } });
-    lifeAnimationTimeout.set(() => dispatch({ type: 'STOP_LIFE_ANIMATION' }), 600);
-
-    // Clue gain animation
-    if (cluesRevealed > 0) {
-      clueActions.triggerClueGainAnimation(cluesRevealed);
-    }
-
-    // Show reward toast with bonus info for long words
-    const rewardMessage = formatRewardMessage({ lifeGained, tokensGained });
-    const bonusMessage = longWordBonus > 0
-      ? `${rewardMessage} 🔥 +${longWordBonus} long word bonus!`
-      : rewardMessage;
-    showToast('valid-word', bonusMessage);
-  }, [state.discoveredWords, state.lifePoints, grid, language, playWordAcceptedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout]);
-
-  // Handle word submission
-  const handleWordSubmit = useCallback((word: string) => {
-    if (state.isGameOver) return;
-
-    // Keep original uppercase for display
-    const displayWord = word.toUpperCase();
-    // Normalize words for comparison (handles Hebrew final letters, Spanish accents, etc.)
-    const normalizedWord = normalizeWord(displayWord, language);
-    const normalizedTarget = normalizeWord(targetWord.toUpperCase(), language);
-
-    if (normalizedWord === normalizedTarget) {
-      // Pass display word for UI, target word as-is (getLetterFeedback will normalize internally)
-      handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
-    } else if (normalizedWord.length === normalizedTarget.length) {
-      // Check for duplicates using normalized comparison
-      if (state.attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
-        showToast('duplicate', t('wordHunt.alreadyGuessed') || 'Already guessed!');
-        return;
-      }
-
-      if (isWordOnBoard(displayWord, grid, language)) {
-        handleWordDiscoveryRef.current?.(displayWord);
-        handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
-      } else {
-        // Word can't be formed on board - only apply "not on board" penalty
-        dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
-        showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
-        recordNotOnBoard(displayWord, language, 'daily_word_hunt');
-      }
-    } else {
-      // Different length word - process as discovery AND show feedback
-      handleWordDiscoveryRef.current?.(displayWord);
-      // Also compute and show feedback so yellow/green letters persist in boxes
-      handleDiscoveryFeedbackRef.current?.(displayWord, targetWord.toUpperCase());
-    }
-  }, [state.isGameOver, state.attempts, targetWord, grid, language, showToast, t]);
-
   // Token adjustment helper for hint purchases
   const adjustTokens = useCallback((delta: number) => {
     dispatch({ type: 'ADJUST_TOKENS', payload: { delta } });
@@ -641,18 +432,6 @@ export function useSurvivalGameLogic({
     handleGameOverRef.current = handleGameOver;
   }, [handleGameOver]);
 
-  useEffect(() => {
-    handleTargetAttemptRef.current = handleTargetAttempt;
-  }, [handleTargetAttempt]);
-
-  useEffect(() => {
-    handleWordDiscoveryRef.current = handleWordDiscovery;
-  }, [handleWordDiscovery]);
-
-  useEffect(() => {
-    handleDiscoveryFeedbackRef.current = handleDiscoveryFeedback;
-  }, [handleDiscoveryFeedback]);
-
   // UI state setters using dispatch
   const setShowShop = useCallback((show: boolean) => {
     dispatch({ type: 'SET_SHOW_SHOP', payload: show });
@@ -710,8 +489,8 @@ export function useSurvivalGameLogic({
   };
 
   const actions: SurvivalGameActions = {
-    handleWordSubmit,
-    handleWordChange,
+    handleWordSubmit: wordSubmission.handleWordSubmit,
+    handleWordChange: wordSubmission.handleWordChange,
     handlePurchase,
     buyNextHint,
     showToast,

@@ -17,3 +17,4 @@ export { MobileDetailsTab } from './MobileDetailsTab';
 export { default as ChallengeButton } from './ChallengeButton';
 export { CelebrationHero } from './CelebrationHero';
 export { ResultsInfoCards } from './ResultsInfoCards';
+export { default as MissedWordsSection } from './MissedWordsSection';

@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -127,8 +127,8 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
     }
 
     return (
-      <AnimatePresence mode="wait">
-        <motion.div
+      <AdaptiveAnimatePresence mode="wait">
+        <AdaptiveMotion.div
           key="level-entry-overlay"
           data-testid="level-entry-overlay"
           className={cn(
@@ -143,7 +143,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
           transition={{ duration: FADE_DURATION / 1000 }}
         >
           {/* Background dim */}
-          <motion.div
+          <AdaptiveMotion.div
             className="absolute inset-0 bg-neo-navy/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: phase === 'fade' ? 0 : 0.6 }}
@@ -151,7 +151,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
           />
 
           {/* Title container */}
-          <motion.div
+          <AdaptiveMotion.div
             className="relative"
             initial={{ scale: 0, opacity: 0 }}
             animate={{
@@ -170,7 +170,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
           >
             {/* Glow effect */}
             {enableGlowEffects && (
-              <motion.div
+              <AdaptiveMotion.div
                 className="absolute inset-0 blur-2xl rounded-full"
                 style={{
                   background: `radial-gradient(circle, ${theme.glowColor} 0%, transparent 70%)`,
@@ -189,7 +189,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
 
             {/* Level text */}
             <div className="relative z-10 flex flex-col items-center">
-              <motion.span
+              <AdaptiveMotion.span
                 className={cn(
                   'text-lg font-bold uppercase tracking-widest',
                   'text-neo-white/80'
@@ -199,9 +199,9 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
                 transition={{ delay: 0.1, duration: 0.3 }}
               >
                 {t('adventure.level')}
-              </motion.span>
+              </AdaptiveMotion.span>
 
-              <motion.span
+              <AdaptiveMotion.span
                 className={cn(
                   'text-7xl md:text-8xl font-black',
                   'bg-gradient-to-r bg-clip-text text-transparent',
@@ -222,14 +222,14 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
                 }}
               >
                 {levelNumber}
-              </motion.span>
+              </AdaptiveMotion.span>
             </div>
 
             {/* Burst particles */}
             {enableGlowEffects && phase === 'burst' && (
               <>
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
-                  <motion.div
+                  <AdaptiveMotion.div
                     key={`particle-${i}`}
                     className={cn(
                       'absolute w-3 h-3 rounded-full',
@@ -258,9 +258,9 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
                 ))}
               </>
             )}
-          </motion.div>
-        </motion.div>
-      </AnimatePresence>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveAnimatePresence>
     );
   }
 );

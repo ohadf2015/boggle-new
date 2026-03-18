@@ -9,7 +9,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import { SKIP_DELAY_MS } from '../../../../hooks/useCinematic';
 
@@ -119,7 +119,7 @@ export function CinematicFallback({
     >
       {/* Boss Image + Name */}
       {showBoss && (
-        <motion.div
+        <AdaptiveMotion.div
           className="flex flex-col items-center mb-6"
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -135,7 +135,7 @@ export function CinematicFallback({
             />
           </div>
           {bossName && (
-            <motion.span
+            <AdaptiveMotion.span
               className="text-2xl sm:text-3xl font-neo-display text-neo-white"
               data-testid="fallback-boss-name"
               initial={{ opacity: 0, y: 10 }}
@@ -143,24 +143,24 @@ export function CinematicFallback({
               transition={{ delay: 0.4 }}
             >
               {bossName}
-            </motion.span>
+            </AdaptiveMotion.span>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
 
       {/* Title */}
-      <motion.h1
+      <AdaptiveMotion.h1
         className="text-4xl sm:text-6xl font-neo-display text-neo-yellow mb-8"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15, delay: showBoss ? 0.6 : 0.3 }}
       >
         {t(TITLE_KEYS[cinematicType])}
-      </motion.h1>
+      </AdaptiveMotion.h1>
 
       {/* Stats Panel */}
       {(score !== undefined || wordsFound !== undefined) && (
-        <motion.div
+        <AdaptiveMotion.div
           className="flex gap-8 mb-12"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -186,11 +186,11 @@ export function CinematicFallback({
               </div>
             </div>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
 
       {/* Skip Button */}
-      <motion.div
+      <AdaptiveMotion.div
         className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -215,7 +215,7 @@ export function CinematicFallback({
             ? t('adventure.bosses.cinematics.skip')
             : t('adventure.bosses.cinematics.skipIn', { seconds: Math.ceil(SKIP_DELAY_MS / 1000) })}
         </button>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Progress Bar */}
       <div
@@ -226,7 +226,7 @@ export function CinematicFallback({
         aria-valuemax={100}
         aria-label={t('adventure.bosses.cinematics.progress')}
       >
-        <motion.div
+        <AdaptiveMotion.div
           className="h-full bg-neo-yellow"
           style={{ width: `${progress}%` }}
         />

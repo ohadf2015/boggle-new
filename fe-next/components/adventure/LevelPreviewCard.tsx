@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import {
   Clock,
   Target,
@@ -103,7 +103,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
     }, [levelConfig.specialTiles]);
 
     return (
-      <motion.div
+      <AdaptiveMotion.div
         data-testid="level-preview-card"
         variants={cardVariants}
         initial="hidden"
@@ -330,7 +330,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
             {t('adventure.preview.back')}
           </button>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 );

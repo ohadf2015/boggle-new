@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { X, Coins, Check, Zap, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,8 +27,8 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
   if (!challenge) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         key={isFailed ? `${challenge.id}-failed` : challenge.id}
         initial={{ x: 60, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -90,8 +90,8 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 });
 

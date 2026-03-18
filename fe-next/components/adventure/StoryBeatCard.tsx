@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface StoryBeatCardProps {
@@ -51,9 +51,9 @@ export function StoryBeatCard({
   };
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {isVisible && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -61,7 +61,7 @@ export function StoryBeatCard({
           className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 p-4"
           onClick={!isComplete ? skipToEnd : undefined}
         >
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
@@ -76,9 +76,9 @@ export function StoryBeatCard({
               {!isComplete && <span className="animate-pulse">▌</span>}
             </div>
 
-            <AnimatePresence>
+            <AdaptiveAnimatePresence>
               {isComplete && (
-                <motion.button
+                <AdaptiveMotion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   onClick={onContinue}
@@ -86,12 +86,12 @@ export function StoryBeatCard({
                   className="w-full bg-neo-lime text-neo-black py-2.5 rounded-neo border-2 border-neo-black shadow-hard font-neo-display font-bold text-sm hover:shadow-hard-pressed"
                 >
                   {t('adventure.continue')}
-                </motion.button>
+                </AdaptiveMotion.button>
               )}
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
+            </AdaptiveAnimatePresence>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 }

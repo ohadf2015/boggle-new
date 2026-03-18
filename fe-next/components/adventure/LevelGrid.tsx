@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useCallback, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
 import { Sparkles, Star } from 'lucide-react';
 import { useParallax } from '@/hooks/useParallax';
@@ -144,7 +144,7 @@ export default function LevelGrid({
 
   for (const level of levels) {
     gridItems.push(
-      <motion.div key={level.levelNum} variants={cardVariants} ref={level.isCurrent ? currentLevelRef : undefined}>
+      <AdaptiveMotion.div key={level.levelNum} variants={cardVariants} ref={level.isCurrent ? currentLevelRef : undefined}>
         <RPGLevelCard
           levelNum={level.levelNum}
           stars={level.stars}
@@ -157,7 +157,7 @@ export default function LevelGrid({
           glowColor={glowColor}
           onClick={() => handleLevelClick(level.levelNum)}
         />
-      </motion.div>
+      </AdaptiveMotion.div>
     );
 
     if (MILESTONE_AFTER.includes(level.levelNum)) {
@@ -265,14 +265,14 @@ export default function LevelGrid({
         />
 
         {/* Level Grid — RPG cards with milestone dividers */}
-        <motion.div
+        <AdaptiveMotion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5 mt-6"
         >
           {gridItems}
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
       </div>
     </div>

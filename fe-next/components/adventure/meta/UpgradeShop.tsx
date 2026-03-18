@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
 import { Coins, Lock, Check, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -99,7 +99,7 @@ export function UpgradeShop({
 
       {/* Upgrade cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <AnimatePresence mode="popLayout">
+        <AdaptiveAnimatePresence mode="popLayout">
           {categoryUpgrades.map(upgrade => (
             <UpgradeCard
               key={upgrade.id}
@@ -112,7 +112,7 @@ export function UpgradeShop({
               t={t}
             />
           ))}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
     </div>
   );
@@ -137,7 +137,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
   const maxTier = upgrade.tiers.length;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -216,7 +216,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
                 {nextCost!.toLocaleString()}
               </span>
             </div>
-            <motion.button
+            <AdaptiveMotion.button
               onClick={() => onPurchase(upgrade.id)}
               disabled={!canAfford}
               className={cn(
@@ -234,24 +234,24 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
                   {t('adventure.upgrades.needMore', { amount: nextCost ?? 0 })}
                 </span>
               )}
-            </motion.button>
+            </AdaptiveMotion.button>
           </>
         )}
       </div>
 
       {/* Purchase flash */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {isFlashing && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 flex items-center justify-center bg-neo-lime/20 rounded-neo pointer-events-none"
           >
             <span className="text-2xl font-neo-display font-black text-neo-lime">✓</span>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
-    </motion.div>
+      </AdaptiveAnimatePresence>
+    </AdaptiveMotion.div>
   );
 }

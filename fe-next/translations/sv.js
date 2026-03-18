@@ -3669,6 +3669,13 @@ const sv = {
     "fireBonus": "Eldbonus",
     "highScore": "Rekord",
     "boardCoverage": "Bräcktäckning",
+    "results": {
+      "missedWords": {
+        "title": "Ord du missade",
+        "showMore": "Visa fler",
+        "count": "{found} av {total} ord hittade"
+      }
+    },
     "maxCombo": "Max kombo",
     "submitWord": "Skicka",
     "clearWord": "Rensa",
@@ -5890,6 +5897,8 @@ const sv = {
       "bossIntro": "Bosskamp!",
       "bossDefeated": "Bossen besegrad!",
       "bossWins": "Bossen vinner...",
+      "nearMiss": "SÅ NÄRA!",
+      "nearMissDesc": "Bara {{hp}}% HP kvar! Du hade nästan!",
       "twistMechanic": "Boss-twist",
       "skipIntro": "Hoppa over",
       "readyToFight": "Kör igång!",

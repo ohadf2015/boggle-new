@@ -9,7 +9,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -53,7 +53,7 @@ const BossMechanicWidget = memo<BossMechanicWidgetProps>(({
   const showMultiplier = bonusMultiplier > 1;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       data-testid="boss-mechanic-widget"
       className={`
         ${bossFightTheme.dialogueBg}
@@ -90,7 +90,7 @@ const BossMechanicWidget = memo<BossMechanicWidgetProps>(({
         aria-label={t('adventure.bosses.mechanicProgress')}
         className="relative w-full h-3 bg-neo-navy-light border-2 border-neo-black rounded-full overflow-hidden"
       >
-        <motion.div
+        <AdaptiveMotion.div
           className={`absolute inset-y-0 left-0 ${bossFightTheme.telegraphProgressColor} rounded-full`}
           initial={{ width: '0%' }}
           animate={{ width: `${progressPct}%` }}
@@ -104,7 +104,7 @@ const BossMechanicWidget = memo<BossMechanicWidgetProps>(({
           {current} / {target}
         </span>
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

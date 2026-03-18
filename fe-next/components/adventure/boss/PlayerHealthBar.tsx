@@ -19,7 +19,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Heart, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -115,9 +115,9 @@ export default function PlayerHealthBar({
         </div>
 
         {/* Low health warning badge */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {isLowHealth && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ scale: 0, rotate: -15 }}
               animate={{ scale: 1, rotate: 0 }}
               exit={{ scale: 0, rotate: -15 }}
@@ -132,9 +132,9 @@ export default function PlayerHealthBar({
               <span className="font-neo-display text-xs font-bold text-neo-white uppercase">
                 {t('adventure.player.danger')}
               </span>
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
 
       {/* HP bar container with progressbar role */}
@@ -151,7 +151,7 @@ export default function PlayerHealthBar({
         className="relative w-full h-7 sm:h-8 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard overflow-hidden"
       >
         {/* HP fill (animated) */}
-        <motion.div
+        <AdaptiveMotion.div
           className={cn(
             'absolute inset-y-0 left-0 transition-colors duration-300',
             hpBarColor,
@@ -175,12 +175,12 @@ export default function PlayerHealthBar({
                 'repeating-linear-gradient(90deg, transparent, transparent 11px, rgba(0,0,0,0.15) 11px, rgba(0,0,0,0.15) 12px)',
             }}
           />
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Heal / damage flash overlay */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {flashType && (
-            <motion.div
+            <AdaptiveMotion.div
               key={flashType}
               className="absolute inset-0 pointer-events-none rounded-neo"
               initial={{ opacity: 0 }}
@@ -191,7 +191,7 @@ export default function PlayerHealthBar({
               aria-hidden="true"
             />
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         {/* HP text overlay */}
         <div className="absolute inset-0 flex items-center justify-center">

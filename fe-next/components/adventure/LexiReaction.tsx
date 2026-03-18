@@ -12,7 +12,7 @@
 'use client';
 
 import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -215,9 +215,9 @@ export const LexiReaction = memo<LexiReactionProps>(
     }
 
     return (
-      <AnimatePresence mode="wait">
+      <AdaptiveAnimatePresence mode="wait">
         {reaction && (
-          <motion.div
+          <AdaptiveMotion.div
             key={reaction.id}
             data-testid="lexi-reaction"
             className={cn(
@@ -258,7 +258,7 @@ export const LexiReaction = memo<LexiReactionProps>(
           >
             <div className="flex items-end gap-2">
               {/* Dialogue bubble */}
-              <motion.div
+              <AdaptiveMotion.div
                 className={cn(
                   'bg-neo-white border-3 border-neo-black rounded-neo p-3 shadow-hard',
                   'max-w-48'
@@ -277,18 +277,18 @@ export const LexiReaction = memo<LexiReactionProps>(
 
                 {/* Speed indicator when sped up */}
                 {animationSpeed > 1 && (
-                  <motion.span
+                  <AdaptiveMotion.span
                     className="text-xs text-neo-black/50 mt-1 block"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
                     {animationSpeed}x
-                  </motion.span>
+                  </AdaptiveMotion.span>
                 )}
-              </motion.div>
+              </AdaptiveMotion.div>
 
               {/* Animated mascot */}
-              <motion.div
+              <AdaptiveMotion.div
                 animate={
                   reaction.type === 'celebration'
                     ? {
@@ -310,11 +310,11 @@ export const LexiReaction = memo<LexiReactionProps>(
                   enableHover={false}
                   enableClick={false}
                 />
-              </motion.div>
+              </AdaptiveMotion.div>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     );
   }
 );

@@ -21,7 +21,7 @@ import {
   Zap,
   Shield,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -134,7 +134,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
     };
 
     return (
-      <motion.ul
+      <AdaptiveMotion.ul
         role="list"
         className={cn('flex flex-col gap-2', className)}
         aria-label="Level objectives"
@@ -154,7 +154,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
           const shouldAnimate = showSlideIn && !prefersReducedMotion && !animationComplete;
 
           return (
-            <motion.li
+            <AdaptiveMotion.li
               key={objective.type}
               data-testid={`objective-${objective.type}`}
               custom={isRTL}
@@ -187,7 +187,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
               )}
             >
               {/* Icon with background */}
-              <motion.div
+              <AdaptiveMotion.div
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 className={cn(
                   'flex-shrink-0 w-9 h-9 flex items-center justify-center',
@@ -200,7 +200,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                 )}
               >
                 <Icon className="w-4 h-4" />
-              </motion.div>
+              </AdaptiveMotion.div>
 
               {/* Label and Progress */}
               <div className="flex-1 min-w-0">
@@ -240,7 +240,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                     'bg-neo-black/50 overflow-hidden border border-neo-white/10'
                   )}
                 >
-                  <motion.div
+                  <AdaptiveMotion.div
                     data-testid={`progress-bar-${objective.type}`}
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
@@ -256,20 +256,20 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                   >
                     {/* Shimmer effect on progress */}
                     {!objective.isComplete && progress > 0 && (
-                      <motion.div
+                      <AdaptiveMotion.div
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
                         animate={{ x: ['-100%', '100%'] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
                       />
                     )}
-                  </motion.div>
+                  </AdaptiveMotion.div>
                 </div>
               </div>
 
               {/* Completion badge */}
-              <AnimatePresence>
+              <AdaptiveAnimatePresence>
                 {objective.isComplete && (
-                  <motion.div
+                  <AdaptiveMotion.div
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     exit={{ scale: 0, rotate: 180 }}
@@ -280,13 +280,13 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                     )}
                   >
                     <Check className="w-4 h-4 text-neo-black" strokeWidth={3} />
-                  </motion.div>
+                  </AdaptiveMotion.div>
                 )}
-              </AnimatePresence>
-            </motion.li>
+              </AdaptiveAnimatePresence>
+            </AdaptiveMotion.li>
           );
         })}
-      </motion.ul>
+      </AdaptiveMotion.ul>
     );
   }
 );
