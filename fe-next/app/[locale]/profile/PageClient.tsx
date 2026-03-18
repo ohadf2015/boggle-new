@@ -307,7 +307,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 transition={{ duration: 0.2 }}
               >
                 <ProfileHeader {...profileHeaderProps} compact />
-                <ProfileXpSection profile={profile} isDarkMode={isDarkMode} compact />
+                <ProfileXpSection profile={profile} isDarkMode={isDarkMode} compact onProfileRefresh={refreshProfile} />
                 <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} compact />
                 <CreatorProfileStats stats={getCreatorStats()} className="mt-4" />
                 <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />
@@ -381,7 +381,7 @@ export default function ProfilePageClient(): React.JSX.Element {
 
           {/* 3. XP + Coins side by side */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ProfileXpSection profile={profile} isDarkMode={isDarkMode} delay={0.15} />
+            <ProfileXpSection profile={profile} isDarkMode={isDarkMode} delay={0.15} onProfileRefresh={refreshProfile} />
             <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} delay={0.18} />
           </div>
 

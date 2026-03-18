@@ -288,26 +288,10 @@ export async function updatePlayerStats(
     playerCount: gameStats.totalPlayers || 1,
   });
 
-  // Update XP and level
-  const currentXp = profile.total_xp || 0;
-  const newTotalXp = currentXp + xpResult.totalXp;
-  const oldLevel = profile.current_level || getLevelFromXp(currentXp);
-  const newLevel = getLevelFromXp(newTotalXp);
-
-  updates.total_xp = newTotalXp;
-  updates.current_level = newLevel;
-
-  // Check for level up
-  const levelUpInfo = checkLevelUp(oldLevel, newLevel);
-  if (levelUpInfo.leveledUp) {
-    logger.info('XP', `Player ${playerId} leveled up! ${oldLevel} -> ${newLevel}`);
-    const newTitle = getTitleForLevel(newLevel);
-    if (newTitle && newTitle !== profile.player_title) {
-      updates.player_title = newTitle;
-    }
-  }
+  const oldLevel = profile.current_level || getLevelFromXp(profile.total_xp || 0);
 
   try {
+    // First: update non-XP stats
     const { data, error } = await client
       .from('profiles')
       .update(updates)
@@ -320,6 +304,43 @@ export async function updatePlayerStats(
       // CRITICAL: Don't return xpInfo/updatedStats when database save fails
       // This prevents "phantom XP" where players see XP gains that weren't persisted
       return { data: null, error };
+    }
+
+    // Then: use increment_player_xp RPC for XP update
+    // This ensures prestige multiplier is applied and lifetime_xp is tracked
+    let newTotalXp = (profile.total_xp || 0) + xpResult.totalXp;
+    let newLevel = getLevelFromXp(newTotalXp);
+    let actualXpGranted = xpResult.totalXp;
+
+    if (xpResult.totalXp > 0) {
+      const { data: xpData, error: xpError } = await client
+        .rpc('increment_player_xp', {
+          p_player_id: playerId,
+          p_xp_amount: xpResult.totalXp,
+        });
+
+      if (xpError) {
+        logger.error('SUPABASE', `Failed to increment XP for ${playerId}`, xpError.message);
+        // Stats were saved but XP wasn't — log but don't fail the whole operation
+      } else if (xpData && xpData.length > 0) {
+        const xpRow = xpData[0];
+        newTotalXp = Number(xpRow.new_total_xp);
+        newLevel = xpRow.new_level;
+        actualXpGranted = xpRow.xp_granted;
+      }
+    }
+
+    // Check for level up and update title if needed
+    const levelUpInfo = checkLevelUp(oldLevel, newLevel);
+    if (levelUpInfo.leveledUp) {
+      logger.info('XP', `Player ${playerId} leveled up! ${oldLevel} -> ${newLevel}`);
+      const newTitle = getTitleForLevel(newLevel);
+      if (newTitle && newTitle !== profile.player_title) {
+        await client
+          .from('profiles')
+          .update({ player_title: newTitle })
+          .eq('id', playerId);
+      }
     }
 
     // Calculate updated stats for socket emission (only when save succeeded)
@@ -337,7 +358,7 @@ export async function updatePlayerStats(
       data,
       error: null,
       xpInfo: {
-        xpEarned: xpResult.totalXp,
+        xpEarned: actualXpGranted,
         xpBreakdown: xpResult.breakdown,
         newTotalXp,
         oldLevel,

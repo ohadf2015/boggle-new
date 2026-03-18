@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3769,
+    "totalKeysInCode": 3779,
     "keyCountByLanguage": {
-      "en": 6405,
-      "he": 6427,
-      "sv": 6461,
-      "ja": 6448,
-      "es": 6469
+      "en": 6433,
+      "he": 6462,
+      "sv": 6495,
+      "ja": 6482,
+      "es": 6493
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -147,39 +147,10 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "adventure.tiles.letter",
-      "encouragement.gameStart",
-      "encouragement.firstWord",
-      "encouragement.longWord",
-      "encouragement.combo",
-      "encouragement.halfway",
-      "encouragement.almostDone"
-    ],
-    "sv": [
-      "encouragement.gameStart",
-      "encouragement.firstWord",
-      "encouragement.longWord",
-      "encouragement.combo",
-      "encouragement.halfway",
-      "encouragement.almostDone"
-    ],
-    "ja": [
-      "encouragement.gameStart",
-      "encouragement.firstWord",
-      "encouragement.longWord",
-      "encouragement.combo",
-      "encouragement.halfway",
-      "encouragement.almostDone"
-    ],
-    "es": [
-      "encouragement.gameStart",
-      "encouragement.firstWord",
-      "encouragement.longWord",
-      "encouragement.combo",
-      "encouragement.halfway",
-      "encouragement.almostDone"
-    ]
+    "he": [],
+    "sv": [],
+    "ja": [],
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [
@@ -348,16 +319,6 @@
       "admin.wordBank.wikipediaSync.errorMessage",
       "admin.wordBank.wikipediaSync.noFilesFound",
       "admin.wordBank.wikipediaSync.lastSynced",
-      "adventure.tiles.locked",
-      "adventure.tiles.multiplier",
-      "adventure.tiles.aria.gold",
-      "adventure.tiles.aria.ice",
-      "adventure.tiles.aria.bomb",
-      "adventure.tiles.aria.rainbow",
-      "adventure.tiles.aria.chain",
-      "adventure.tiles.aria.time",
-      "adventure.tiles.aria.locked",
-      "adventure.tiles.aria.multiplier",
       "adventure.achievements.cinematic.unlocked",
       "adventure.achievements.cinematic.gold",
       "adventure.achievements.cinematic.platinum",

@@ -2323,6 +2323,8 @@ const ja = {
       "lexiconAdept": "レキシコンアデプト",
       "linguisticLegend": "リングイスティックレジェンド"
     },
+    "xpBonus": "+{{percent}}% XP",
+    "compactLevel": "Lv",
     "canPrestige": "プレステージ可能！",
     "prestigeModal": {
       "title": "プレステージシステム",
@@ -2339,6 +2341,7 @@ const ja = {
       "maxPrestigeText": "最高レベルに到達しました。あなたは伝説です！",
       "rewardsFor": "プレステージ{{level}}の報酬",
       "prestigeTo": "{{level}}にプレステージ",
+      "prestigeAchievedLevel": "プレステージ {{level}}",
       "reachLevel": "プレステージするにはレベル100に到達してください",
       "levelsRemaining": "残り{{count}}レベル"
     }

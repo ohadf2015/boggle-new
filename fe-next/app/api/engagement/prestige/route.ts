@@ -149,10 +149,33 @@ export async function POST(_request: NextRequest) {
       })),
     ];
 
-    await supabase
+    const { error: unlockError } = await supabase
       .from('profiles')
       .update({ prestige_unlocks: newUnlocks })
       .eq('id', userId);
+
+    if (unlockError) {
+      console.error('[PRESTIGE API] Failed to save unlocks, retrying once:', unlockError);
+      // Retry once — prestige was already applied, rewards must be saved
+      const { error: retryError } = await supabase
+        .from('profiles')
+        .update({ prestige_unlocks: newUnlocks })
+        .eq('id', userId);
+
+      if (retryError) {
+        console.error('[PRESTIGE API] Retry failed — prestige applied but rewards lost:', retryError);
+        captureApiError(new Error(`Prestige rewards lost: ${retryError.message}`), '/api/engagement/prestige', { method: 'POST', userId });
+        // Still return success since prestige itself was applied, but flag the issue
+        return NextResponse.json({
+          success: true,
+          newPrestigeLevel,
+          newMultiplier: result.new_multiplier,
+          rewards,
+          rewardsLost: true,
+          message: `Prestige ${toRoman(newPrestigeLevel)} achieved! Some rewards may need to be re-synced.`,
+        });
+      }
+    }
 
     const newMultiplier = result.new_multiplier;
 

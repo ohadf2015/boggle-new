@@ -57,6 +57,7 @@ describe('updatePlayerStats', () => {
       single: jest.fn(),
       update: jest.fn().mockReturnThis(),
       insert: jest.fn().mockReturnThis(),
+      rpc: jest.fn().mockResolvedValue({ data: [{ new_total_xp: 600, new_level: 7, xp_granted: 100 }], error: null }),
       auth: {
         admin: {
           getUserById: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),

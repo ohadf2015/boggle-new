@@ -9,19 +9,20 @@ import {
   getXpProgress,
   getLevelFromXp,
   getXpForLevel,
+  PRESTIGE_CONFIG,
   type PrestigeReward,
 } from '@/backend/modules/xpManager';
 
 /**
- * Prestige display configuration
+ * Prestige display with gradient (extends PRESTIGE_CONFIG.DISPLAY)
  */
-const PRESTIGE_DISPLAY = {
-  1: { name: 'Prestige I', color: '#CD7F32', icon: '⭐', gradient: 'from-amber-700 to-amber-500' },
-  2: { name: 'Prestige II', color: '#C0C0C0', icon: '🌟', gradient: 'from-gray-500 to-gray-300' },
-  3: { name: 'Prestige III', color: '#FFD700', icon: '✨', gradient: 'from-yellow-600 to-yellow-400' },
-  4: { name: 'Prestige IV', color: '#B9F2FF', icon: '💫', gradient: 'from-cyan-500 to-cyan-300' },
-  5: { name: 'Prestige V', color: '#9B59B6', icon: '🌌', gradient: 'from-purple-700 to-pink-500' },
-} as const;
+const PRESTIGE_GRADIENTS: Record<number, string> = {
+  1: 'from-amber-700 to-amber-500',
+  2: 'from-gray-500 to-gray-300',
+  3: 'from-yellow-600 to-yellow-400',
+  4: 'from-cyan-500 to-cyan-300',
+  5: 'from-purple-700 to-pink-500',
+};
 
 /**
  * XpProgressBar Props
@@ -63,7 +64,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
   }, []);
 
   const prestigeDisplay = prestigeLevel > 0 && prestigeLevel <= 5
-    ? PRESTIGE_DISPLAY[prestigeLevel as keyof typeof PRESTIGE_DISPLAY]
+    ? { ...PRESTIGE_CONFIG.DISPLAY[prestigeLevel], gradient: PRESTIGE_GRADIENTS[prestigeLevel] }
     : null;
 
   const canPrestige = progress.isMaxLevel && prestigeLevel < 5;
@@ -88,6 +89,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
                   `bg-gradient-to-r ${prestigeDisplay.gradient} text-white`
                 )}
                 title={`${prestigeDisplay.name} - Click for details`}
+                aria-label={`${prestigeDisplay.name} - View prestige details`}
               >
                 <span>{prestigeDisplay.icon}</span>
                 <span className="hidden sm:inline">{prestigeLevel}</span>
@@ -96,7 +98,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             {/* XP Multiplier indicator */}
             {showPrestige && prestigeMultiplier > 1 && (
               <span className="text-[10px] font-bold text-neo-lime bg-neo-lime/20 px-1.5 py-0.5 rounded">
-                +{Math.round((prestigeMultiplier - 1) * 100)}% XP
+                {t('xp.xpBonus').replace('{{percent}}', String(Math.round((prestigeMultiplier - 1) * 100)))}
               </span>
             )}
           </div>
@@ -164,7 +166,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         <div className="flex items-center justify-between mt-0.5">
           <div className="flex items-center gap-1">
             <span className="text-[10px] font-bold text-neo-black/75 dark:text-gray-300">
-              Lv {progress.currentLevel}
+              {t('xp.compactLevel')} {progress.currentLevel}
             </span>
             {showPrestige && prestigeDisplay && (
               <span className="text-[10px]">{prestigeDisplay.icon}</span>

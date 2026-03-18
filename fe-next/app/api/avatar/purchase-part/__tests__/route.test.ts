@@ -3,7 +3,8 @@
  * Avatar Premium Part Purchase API Route Tests
  *
  * Server-side validated: client sends { category, partId }, server fetches
- * current gold/premium_avatar_parts from DB, validates premium status, deducts gold.
+ * current gold/premium_avatar_parts from DB, validates premium status,
+ * deducts gold via sync_coins RPC, then saves parts.
  */
 
 // Mock next/server
@@ -28,9 +29,11 @@ jest.mock('@/utils/supabase/server', () => ({
 
 // Mock supabase service client
 const mockFrom = jest.fn();
+const mockRpc = jest.fn();
 jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn().mockReturnValue({
     from: (...args: unknown[]) => mockFrom(...args),
+    rpc: (...args: unknown[]) => mockRpc(...args),
   }),
 }));
 
@@ -75,9 +78,11 @@ function setupDbMocks({
   gold = 500,
   premiumParts = [] as string[],
   fetchError = null as { message?: string } | null,
-  updateError = null as { message?: string } | null,
-  updateReturnsNull = false,
+  rpcError = null as { message?: string } | null,
+  rpcInsufficientFunds = false,
+  partsUpdateError = null as { message?: string } | null,
 } = {}) {
+  // Mock profiles.select for initial fetch
   mockFrom.mockImplementation((table: string) => {
     if (table === 'profiles') {
       return {
@@ -89,23 +94,34 @@ function setupDbMocks({
             }),
           }),
         }),
-        update: jest.fn().mockImplementation((payload: Record<string, unknown>) => ({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                maybeSingle: jest.fn().mockResolvedValue({
-                  data: updateError || updateReturnsNull
-                    ? null
-                    : { total_coins: payload.total_coins, premium_avatar_parts: payload.premium_avatar_parts },
-                  error: updateError,
-                }),
-              }),
-            }),
+        update: jest.fn().mockReturnValue({
+          eq: jest.fn().mockResolvedValue({
+            error: partsUpdateError,
           }),
-        })),
+        }),
       };
     }
     return {};
+  });
+
+  // Mock sync_coins RPC
+  mockRpc.mockImplementation((fnName: string) => {
+    if (fnName === 'sync_coins') {
+      if (rpcError) {
+        return Promise.resolve({ data: null, error: rpcError });
+      }
+      if (rpcInsufficientFunds) {
+        return Promise.resolve({
+          data: [{ success: false, new_balance: gold, error_message: 'Insufficient coins' }],
+          error: null,
+        });
+      }
+      return Promise.resolve({
+        data: [{ success: true, new_balance: gold - 75, error_message: null }],
+        error: null,
+      });
+    }
+    return Promise.resolve({ data: null, error: null });
   });
 }
 
@@ -182,11 +198,31 @@ describe('POST /api/avatar/purchase-part', () => {
     expect(res.data.premiumAvatarParts).toEqual(['eyes:laser']);
   });
 
-  // ===== OPTIMISTIC LOCK CONFLICT =====
-  it('returns 409 on optimistic lock conflict', async () => {
-    setupDbMocks({ gold: 200, premiumParts: [], updateReturnsNull: true });
+  // ===== SYNC_COINS RPC FAILURE =====
+  it('returns 500 on sync_coins RPC failure', async () => {
+    setupDbMocks({ gold: 200, premiumParts: [], rpcError: { message: 'DB error' } });
     const res = await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
-    expect(res.status).toBe(409);
-    expect(res.data.error).toBe('Purchase conflict, please retry');
+    expect(res.status).toBe(500);
+    expect(res.data.error).toBe('Failed to process payment');
+  });
+
+  // ===== INSUFFICIENT FUNDS VIA RPC =====
+  it('returns 400 when sync_coins reports insufficient funds', async () => {
+    setupDbMocks({ gold: 200, premiumParts: [], rpcInsufficientFunds: true });
+    const res = await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
+    expect(res.status).toBe(400);
+    expect(res.data.error).toBe('Insufficient coins');
+  });
+
+  // ===== PARTS SAVE FAILURE (triggers refund) =====
+  it('returns 500 and refunds when parts save fails', async () => {
+    setupDbMocks({ gold: 200, premiumParts: [], partsUpdateError: { message: 'Write failed' } });
+    const res = await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
+    expect(res.status).toBe(500);
+    expect(res.data.error).toBe('Failed to save purchase');
+    // Verify refund RPC was called (second rpc call)
+    expect(mockRpc).toHaveBeenCalledTimes(2);
+    expect(mockRpc.mock.calls[1][0]).toBe('sync_coins');
+    expect(mockRpc.mock.calls[1][1].p_amount).toBe(75); // refund amount
   });
 });

@@ -90,7 +90,7 @@ export function ProfileXpSection({
             {t('xp.totalXpEarned')}
           </span>
           <span className="text-lg font-black text-neo-cyan">
-            {(profile?.total_xp || 0).toLocaleString()}
+            {(profile?.lifetime_xp || profile?.total_xp || 0).toLocaleString()}
           </span>
         </div>
       )}

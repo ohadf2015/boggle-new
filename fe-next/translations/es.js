@@ -2227,6 +2227,8 @@ const es = {
       "lexiconAdept": "Adepto del Léxico",
       "linguisticLegend": "Leyenda Lingüística"
     },
+    "xpBonus": "+{{percent}}% XP",
+    "compactLevel": "Nv",
     "canPrestige": "¡Prestigio Disponible!",
     "prestigeModal": {
       "title": "Sistema de Prestigio",
@@ -2243,6 +2245,7 @@ const es = {
       "maxPrestigeText": "Has alcanzado el nivel más alto. ¡Eres una leyenda!",
       "rewardsFor": "Recompensas de Prestigio {{level}}",
       "prestigeTo": "Prestigio a {{level}}",
+      "prestigeAchievedLevel": "Prestigio {{level}}",
       "reachLevel": "Alcanza el Nivel 100 para Prestigio",
       "levelsRemaining": "{{count}} niveles restantes"
     }

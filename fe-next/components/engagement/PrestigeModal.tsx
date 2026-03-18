@@ -6,8 +6,7 @@ import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { Sparkles, Star, Crown, Zap, AlertTriangle, Check } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
-import { supabase } from '@/lib/supabase';
-import { toRoman, type PrestigeReward } from '@/backend/modules/xpManager';
+import { toRoman, PRESTIGE_CONFIG, type PrestigeReward } from '@/backend/modules/xpManager';
 
 interface PrestigeModalProps {
   isOpen: boolean;
@@ -23,15 +22,14 @@ interface PrestigeModalProps {
   onPrestigeSuccess?: () => void;
 }
 
-const PRESTIGE_COLORS = {
+/** Tailwind classes for prestige tiers (extends PRESTIGE_CONFIG.DISPLAY) */
+const PRESTIGE_STYLES = {
   1: { bg: 'bg-amber-600', text: 'text-amber-100', border: 'border-amber-500', gradient: 'from-amber-700 to-amber-500' },
   2: { bg: 'bg-gray-400', text: 'text-gray-900', border: 'border-gray-300', gradient: 'from-gray-500 to-gray-300' },
   3: { bg: 'bg-yellow-500', text: 'text-yellow-900', border: 'border-yellow-400', gradient: 'from-yellow-600 to-yellow-400' },
   4: { bg: 'bg-cyan-400', text: 'text-cyan-900', border: 'border-cyan-300', gradient: 'from-cyan-500 to-cyan-300' },
   5: { bg: 'bg-purple-600', text: 'text-purple-100', border: 'border-purple-400', gradient: 'from-purple-700 to-pink-500' },
 } as const;
-
-const PRESTIGE_ICONS = ['', '⭐', '🌟', '✨', '💫', '🌌'];
 
 export const PrestigeModal: React.FC<PrestigeModalProps> = ({
   isOpen,
@@ -52,7 +50,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const nextPrestigeLevel = currentPrestige + 1;
-  const colors = PRESTIGE_COLORS[nextPrestigeLevel as keyof typeof PRESTIGE_COLORS] || PRESTIGE_COLORS[1];
+  const colors = PRESTIGE_STYLES[nextPrestigeLevel as keyof typeof PRESTIGE_STYLES] || PRESTIGE_STYLES[1];
   const pm = (key: string) => t(`xp.prestigeModal.${key}`);
 
   const handlePrestige = useCallback(async () => {
@@ -60,20 +58,9 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
     setError(null);
 
     try {
-      if (!supabase) {
-        throw new Error('Not authenticated');
-      }
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        throw new Error('Not authenticated');
-      }
-
       const response = await fetch('/api/engagement/prestige', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
 
       const data = await response.json();
@@ -141,12 +128,12 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   transition={{ duration: 0.5, repeat: 3 }}
                   className="text-7xl"
                 >
-                  {PRESTIGE_ICONS[nextPrestigeLevel]}
+                  {PRESTIGE_CONFIG.DISPLAY[nextPrestigeLevel]?.icon || '⭐'}
                 </motion.div>
 
                 <div className="text-center">
                   <p className={cn('text-2xl font-black', colors.text.replace('text-', 'text-'))}>
-                    Prestige {toRoman(nextPrestigeLevel)}
+                    {pm('prestigeAchievedLevel').replace('{{level}}', toRoman(nextPrestigeLevel))}
                   </p>
                   <p className="text-white/70 text-sm mt-1">
                     {pm('rewardsUnlocked')}
@@ -255,8 +242,8 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     </p>
                     <p className="text-2xl font-black">
                       {currentPrestige > 0 ? (
-                        <span className={cn(PRESTIGE_COLORS[currentPrestige as keyof typeof PRESTIGE_COLORS]?.text || 'text-white')}>
-                          {PRESTIGE_ICONS[currentPrestige]} {toRoman(currentPrestige)}
+                        <span className={cn(PRESTIGE_STYLES[currentPrestige as keyof typeof PRESTIGE_STYLES]?.text || 'text-white')}>
+                          {PRESTIGE_CONFIG.DISPLAY[currentPrestige]?.icon || '⭐'} {toRoman(currentPrestige)}
                         </span>
                       ) : (
                         <span className="text-white/70">-</span>
@@ -276,7 +263,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 {isMaxPrestige ? (
                   /* Max Prestige Reached */
                   <div className="text-center py-6">
-                    <div className="text-5xl mb-3">{PRESTIGE_ICONS[5]}</div>
+                    <div className="text-5xl mb-3">{PRESTIGE_CONFIG.DISPLAY[5]?.icon || '🌌'}</div>
                     <p className="text-xl font-black text-purple-400">
                       {pm('maxPrestige')}
                     </p>

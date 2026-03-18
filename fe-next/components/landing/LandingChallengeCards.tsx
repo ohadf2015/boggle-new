@@ -1,12 +1,11 @@
 'use client';
 
-import { Suspense, lazy, useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { User, Users, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
+import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
-
-const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
 
 interface DailyChallengePreloadedStats {
   hasPlayed: boolean;
@@ -82,29 +81,14 @@ export function LandingChallengeCards({
         </motion.div>
 
         {/* Daily Challenge Banner */}
-        <div className="col-span-1 sm:col-span-2 xl:col-span-1">
-          <Suspense fallback={
-            <div
-              className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
-              style={{ minHeight: '72px' }}
-            >
-              <div className="flex items-center gap-3 sm:gap-4 animate-pulse">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-neo bg-neo-navy shrink-0" />
-                <div className="flex-1 min-w-0 space-y-2">
-                  <div className="h-6 w-40 bg-neo-black/15 rounded" />
-                  <div className="h-4 w-28 bg-neo-black/10 rounded" />
-                </div>
-              </div>
-            </div>
-          }>
-            <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
-          </Suspense>
+        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.15 }} className="col-span-1 sm:col-span-2 xl:col-span-1">
+          <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
           {solveRate !== null && (
             <p className="text-center text-neo-white/50 text-xs mt-1 font-medium">
               {t('landing.solvedPercent').replace('{percent}', String(solveRate))}
             </p>
           )}
-        </div>
+        </motion.div>
 
         {/* Adventure Mode - full width on mobile/tablet, single col on xl */}
         <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.25 }} className="col-span-1 sm:col-span-2 xl:col-span-1 w-full">

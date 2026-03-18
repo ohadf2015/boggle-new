@@ -2340,6 +2340,8 @@ const he = {
       "lexiconAdept": "מומחה לקסיקון",
       "linguisticLegend": "אגדת הלשון"
     },
+    "xpBonus": "+{{percent}}% XP",
+    "compactLevel": "רמ'",
     "canPrestige": "פרסטיג' זמין!",
     "prestigeModal": {
       "title": "מערכת פרסטיג'",
@@ -2356,6 +2358,7 @@ const he = {
       "maxPrestigeText": "הגעת לרמה הגבוהה ביותר. אתה אגדה!",
       "rewardsFor": "פרסים לפרסטיג' {{level}}",
       "prestigeTo": "קפוץ לפרסטיג' {{level}}",
+      "prestigeAchievedLevel": "פרסטיג' {{level}}",
       "reachLevel": "הגע לרמה 100 כדי לבצע פרסטיג'",
       "levelsRemaining": "{{count}} רמות נותרו"
     }

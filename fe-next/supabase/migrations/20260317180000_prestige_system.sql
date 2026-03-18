@@ -150,7 +150,7 @@ BEGIN
   UPDATE profiles
   SET current_level = 1,
       total_xp = 0,
-      lifetime_xp = COALESCE(lifetime_xp, 0) + COALESCE(total_xp, 0),
+      -- lifetime_xp is NOT modified here — increment_player_xp already tracks it cumulatively
       prestige_level = v_new_prestige,
       prestige_multiplier = v_new_multiplier,
       player_title = v_new_title,

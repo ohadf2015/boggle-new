@@ -105,33 +105,51 @@ export async function POST(request: NextRequest) {
     }
 
     const newParts = [...currentParts, partKey];
-    const newGold = currentGold - price;
 
-    const { data: updatedRow, error: updateError } = await supabase
+    // Use sync_coins RPC for coin deduction (tracks audit trail + lifetime stats)
+    const { data: coinResult, error: coinError } = await supabase
+      .rpc('sync_coins', {
+        p_user_id: user.id,
+        p_amount: -price,
+        p_reason: 'Avatar Part Purchase',
+        p_metadata: { category, partId, partKey },
+      });
+
+    if (coinError) {
+      console.error('[AVATAR PURCHASE API] sync_coins error:', coinError);
+      return NextResponse.json({ error: 'Failed to process payment' }, { status: 500 });
+    }
+
+    const coinRow = coinResult?.[0];
+    if (!coinRow?.success) {
+      return NextResponse.json({ error: coinRow?.error_message || 'Insufficient gold' }, { status: 400 });
+    }
+
+    // Update premium parts separately (coins already deducted atomically)
+    const { error: partsError } = await supabase
       .from('profiles')
       .update({
-        total_coins: newGold,
         premium_avatar_parts: newParts,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id)
-      .eq('total_coins', currentGold)
-      .select('total_coins, premium_avatar_parts')
-      .maybeSingle();
+      .eq('id', user.id);
 
-    if (updateError) {
-      console.error('[AVATAR PURCHASE API] Update error:', updateError);
+    if (partsError) {
+      // Refund coins since parts save failed
+      console.error('[AVATAR PURCHASE API] Parts save failed, refunding:', partsError);
+      await supabase.rpc('sync_coins', {
+        p_user_id: user.id,
+        p_amount: price,
+        p_reason: 'Avatar Purchase Refund',
+        p_metadata: { category, partId, refundReason: 'parts_save_failed' },
+      });
       return NextResponse.json({ error: 'Failed to save purchase' }, { status: 500 });
-    }
-
-    if (!updatedRow) {
-      return NextResponse.json({ error: 'Purchase conflict, please retry' }, { status: 409 });
     }
 
     return NextResponse.json({
       success: true,
-      gold: updatedRow.total_coins,
-      premiumAvatarParts: updatedRow.premium_avatar_parts,
+      gold: coinRow.new_balance,
+      premiumAvatarParts: newParts,
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/avatar/purchase-part', { method: 'POST' });

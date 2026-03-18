@@ -2441,6 +2441,8 @@ const en = {
       "lexiconAdept": "Lexicon Adept",
       "linguisticLegend": "Linguistic Legend"
     },
+    "xpBonus": "+{{percent}}% XP",
+    "compactLevel": "Lv",
     "canPrestige": "Prestige Available!",
     "prestigeModal": {
       "title": "Prestige System",
@@ -2457,6 +2459,7 @@ const en = {
       "maxPrestigeText": "You have reached the highest level. You are a legend!",
       "rewardsFor": "Prestige {{level}} Rewards",
       "prestigeTo": "Prestige to {{level}}",
+      "prestigeAchievedLevel": "Prestige {{level}}",
       "reachLevel": "Reach Level 100 to Prestige",
       "levelsRemaining": "{{count}} levels remaining"
     }

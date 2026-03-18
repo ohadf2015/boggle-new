@@ -2322,6 +2322,8 @@ const sv = {
       "lexiconAdept": "Lexikonadept",
       "linguisticLegend": "Lingvistisk Legend"
     },
+    "xpBonus": "+{{percent}}% XP",
+    "compactLevel": "Nv",
     "canPrestige": "Prestige tillgänglig!",
     "prestigeModal": {
       "title": "Prestigesystem",
@@ -2338,6 +2340,7 @@ const sv = {
       "maxPrestigeText": "Du har nått den högsta nivån. Du är en legend!",
       "rewardsFor": "Prestige {{level}}-belöningar",
       "prestigeTo": "Prestige till {{level}}",
+      "prestigeAchievedLevel": "Prestige {{level}}",
       "reachLevel": "Nå nivå 100 för Prestige",
       "levelsRemaining": "{{count}} nivåer kvar"
     }
