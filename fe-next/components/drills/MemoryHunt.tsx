@@ -26,6 +26,7 @@ interface MemoryHuntProps {
     level: number;
   }) => void;
   onExit?: () => void;
+  onPlayAgain?: () => void;
 }
 
 export default function MemoryHunt({
@@ -35,6 +36,7 @@ export default function MemoryHunt({
   language = 'en',
   onComplete,
   onExit,
+  onPlayAgain,
 }: MemoryHuntProps) {
   const { t, dir } = useLanguage();
   const studyModalRef = useRef<HTMLDivElement>(null);
@@ -399,7 +401,7 @@ export default function MemoryHunt({
             results={game.results}
             lives={game.lives}
             t={t}
-            onPlayAgain={game.resetGame}
+            onPlayAgain={() => { game.resetGame(); onPlayAgain?.(); }}
             onExit={onExit}
           />
         )}

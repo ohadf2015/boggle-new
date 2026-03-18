@@ -34,6 +34,7 @@ interface ComboMasterProps {
     level: number;
   }) => void;
   onExit?: () => void;
+  onPlayAgain?: () => void;
 }
 
 type GamePhase = 'ready' | 'playing' | 'complete';
@@ -51,6 +52,7 @@ export default function ComboMaster({
   language = 'en',
   onComplete,
   onExit,
+  onPlayAgain,
 }: ComboMasterProps) {
   const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
@@ -513,7 +515,7 @@ export default function ComboMaster({
             >
               <AdaptiveMotion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setPhase('ready')}
+                onClick={() => { setPhase('ready'); onPlayAgain?.(); }}
                 className={cn(
                   'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                   'font-bold uppercase',

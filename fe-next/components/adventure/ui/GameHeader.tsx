@@ -16,6 +16,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
 import AdventureTimer from '../AdventureTimer';
 import { RollingNumber } from './RollingNumber';
+import { displayScore } from '@/utils/scoreDisplay';
 
 // ==============================================
 // TYPES
@@ -105,7 +106,7 @@ export const GameHeader = memo(function GameHeader({
           {t('common.score')}
         </span>
         <RollingNumber
-          value={score}
+          value={displayScore(score)}
           variant="white"
           className="text-lg sm:text-xl font-black leading-tight tabular-nums"
         />

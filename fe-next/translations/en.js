@@ -5030,6 +5030,25 @@ const en = {
     "leaderboard": "Leaderboard",
     "playDaily": "Play Daily Challenge"
   },
+  "puzzleBrowse": {
+    "title": "Browse Puzzles",
+    "subtitle": "Discover custom puzzles from the community",
+    "createYourOwn": "Create Your Own",
+    "sortNewest": "Newest",
+    "sortPopular": "Most Played",
+    "loading": "Loading puzzles...",
+    "empty": "No puzzles yet",
+    "emptyHint": "Be the first to create one!",
+    "createFirst": "Create a Puzzle",
+    "by": "By {name}",
+    "plays": "plays",
+    "difficultyEasy": "Easy",
+    "difficultyMedium": "Medium",
+    "difficultyHard": "Hard",
+    "minutesAgo": "{n}m ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n}d ago"
+  },
   "admin": {
     "dashboard": "Admin Dashboard",
     "accessRequired": "Admin Access Required",

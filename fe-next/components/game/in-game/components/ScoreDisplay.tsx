@@ -4,6 +4,7 @@ import { memo, useRef, useEffect, useState } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import ScoreBreakdownTooltip from '../../ScoreBreakdownTooltip';
 import type { TranslationFn } from '../types';
+import { displayScore } from '@/utils/scoreDisplay';
 
 interface ScoreDisplayProps {
   score: number;
@@ -51,7 +52,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className="landscape-stat-primary text-neo-black"
         >
-          {score}
+          {displayScore(score)}
         </AdaptiveMotion.div>
         <div className="landscape-stat-label text-neo-black flex items-center gap-0.5">
           {t('common.score')}
@@ -94,7 +95,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
             className="text-3xl font-black text-neo-black leading-tight"
             style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.5)' }}
           >
-            {score}
+            {displayScore(score)}
           </AdaptiveMotion.div>
           <div className="text-sm font-bold uppercase tracking-wider text-neo-black flex items-center justify-center gap-0.5">
             {t('common.score')}
@@ -148,7 +149,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           className="font-black text-neo-black leading-tight text-lg md:text-2xl"
           style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
         >
-          {score}
+          {displayScore(score)}
         </AdaptiveMotion.div>
         <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px] md:text-xs">
           {t('common.score')}

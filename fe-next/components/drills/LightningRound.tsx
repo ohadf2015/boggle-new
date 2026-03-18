@@ -34,6 +34,7 @@ interface LightningRoundProps {
     wordsPerMinute: number;
   }) => void;
   onExit?: () => void;
+  onPlayAgain?: () => void;
 }
 
 type GamePhase = 'ready' | 'playing' | 'complete';
@@ -51,6 +52,7 @@ export default function LightningRound({
   language = 'en',
   onComplete,
   onExit,
+  onPlayAgain,
 }: LightningRoundProps) {
   const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
@@ -490,6 +492,7 @@ export default function LightningRound({
                   setPhase('ready');
                   setWordsFound([]);
                   setScore(0);
+                  onPlayAgain?.();
                 }}
                 className={cn(
                   'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',

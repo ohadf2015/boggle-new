@@ -57,6 +57,7 @@ interface RareGemsProps {
     level: number;
   }) => void;
   onExit?: () => void;
+  onPlayAgain?: () => void;
 }
 
 type GamePhase = 'ready' | 'playing' | 'complete';
@@ -74,6 +75,7 @@ export default function RareGems({
   language = 'en',
   onComplete,
   onExit,
+  onPlayAgain,
 }: RareGemsProps) {
   const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
@@ -525,7 +527,7 @@ export default function RareGems({
             >
               <AdaptiveMotion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setPhase('ready')}
+                onClick={() => { setPhase('ready'); onPlayAgain?.(); }}
                 className="flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-purple text-white"
               >
                 <RotateCcw className="w-5 h-5" />

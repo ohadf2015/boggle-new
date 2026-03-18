@@ -33,7 +33,7 @@ export default function RareGemsPageClient() {
   const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
 
   // Generate drill grid
-  const { grid, availableWords, isLoading } = useDrillGrid(5, language);
+  const { grid, availableWords, isLoading, regenerate } = useDrillGrid(5, language);
 
   // Hide bottom nav during drill
   React.useEffect(() => {
@@ -136,6 +136,7 @@ export default function RareGemsPageClient() {
             language={language}
             onComplete={handleComplete}
             onExit={handleExit}
+            onPlayAgain={regenerate}
           />
         </FeatureErrorBoundary>
       </div>

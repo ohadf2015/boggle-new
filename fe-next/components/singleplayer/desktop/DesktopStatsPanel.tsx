@@ -6,6 +6,7 @@ import { Target } from 'lucide-react';
 import CircularTimer from '@/components/CircularTimer';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { cn } from '@/lib/utils';
+import { formatScore } from '@/utils/scoreDisplay';
 
 interface DesktopStatsPanelProps {
   /** Current score */
@@ -88,7 +89,7 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
                 {t('common.score')}
               </div>
               <div className="text-4xl font-black text-neo-black leading-none tracking-tighter">
-                {score.toLocaleString()}
+                {formatScore(score)}
               </div>
             </div>
           </div>

@@ -18,6 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { fireConfetti } from '@/utils/confettiUtils';
+import { displayScore } from '@/utils/scoreDisplay';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { Button } from '@/components/ui/button';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
@@ -184,7 +185,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             playerRank={playerRank} labels={bannerLabels}
           />
           <ScoreDisplay
-            score={results.playerScore} wordCount={validWordCount}
+            score={displayScore(results.playerScore)} wordCount={validWordCount}
             scoreLabel={t('common.score')} wordsLabel={t('common.words')}
           />
           {mode === 'solo-bots' && playerArchetype && (
@@ -230,7 +231,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {mode === 'solo-bots' ? (
             <PlacementHero
               rank={playerRank}
-              score={results.playerScore}
+              score={displayScore(results.playerScore)}
               totalPlayers={allParticipants.length}
               username={profile?.display_name || profile?.username || t('common.you')}
               avatar={playerAvatar}
@@ -242,7 +243,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 {bannerConfig.message || t('results.finalScore')}
               </p>
               <p className="font-black text-6xl sm:text-7xl text-white tabular-nums" style={{ WebkitTextStroke: '2px rgba(0,0,0,0.3)', textShadow: '4px 4px 0px rgba(0,0,0,0.3)' }}>
-                {results.playerScore}
+                {displayScore(results.playerScore)}
               </p>
               {bannerConfig.announcement && (
                 <p className="text-white/60 text-sm font-bold mt-1">{bannerConfig.announcement}</p>

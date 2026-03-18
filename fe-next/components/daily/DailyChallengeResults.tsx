@@ -10,6 +10,7 @@ import { ImagePreviewModal } from './results/ImagePreviewModal';
 import { Button } from '@/components/ui/button';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import { ResultsHero } from '@/components/results/shared';
+import { displayScore } from '@/utils/scoreDisplay';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import { LANGUAGE_OPTIONS } from './results/constants';
 import type { Language } from '@/types';
@@ -147,7 +148,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
         totalPlayers,
         puzzleNumber: result.puzzleNumber,
         language: result.language,
-        score: Math.round(result.score),
+        score: displayScore(Math.round(result.score)),
         wordCount: result.wordCount,
         displayName: isAuthenticated && profile
           ? profile.display_name || profile.username
@@ -225,7 +226,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
         {/* Hero Zone — unified score + stats */}
         <ResultsHero
           outcomeLabel={isNewCompletion ? t('daily.completed') : t('daily.alreadyPlayed')}
-          score={Math.round(result.score)}
+          score={displayScore(Math.round(result.score))}
           subtitle={t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
           pointsLabel={t('common.points')}
           variant={isNewCompletion ? 'win' : 'neutral'}

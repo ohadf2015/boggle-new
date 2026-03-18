@@ -14,6 +14,7 @@ import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { cn } from '@/lib/utils';
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
+import { formatScore } from '@/utils/scoreDisplay';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { DynamicEnergyBackground } from './DynamicEnergyBackground';
@@ -308,7 +309,7 @@ export function PortraitGameLayout({
                   animate={{ scale: 1 }}
                   className="font-black text-neo-black leading-tight text-xl"
                 >
-                  {score.toLocaleString()}
+                  {formatScore(score)}
                 </AdaptiveMotion.div>
                 <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px]">
                   {t('common.score')}
@@ -339,7 +340,7 @@ export function PortraitGameLayout({
                   animate={{ scale: 1 }}
                   className="font-black text-neo-black leading-none text-xl tracking-tighter"
                 >
-                  {score.toLocaleString()}
+                  {formatScore(score)}
                 </AdaptiveMotion.div>
               </div>
             </AdaptiveMotion.div>

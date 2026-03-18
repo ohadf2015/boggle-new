@@ -1,16 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { ArrowLeft, Bomb, BookOpen, HelpCircle, Lightbulb, Shuffle, Star } from 'lucide-react';
+import { Lightbulb, Shuffle, Star } from 'lucide-react';
 import { useReducedMotion } from 'framer-motion';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
 
-import ComboDisplay from '@/components/game/ComboDisplay';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { BlastGrid } from './BlastGrid';
-import { BlastProgressBar } from './BlastProgressBar';
 import { BlastFoundWords } from './BlastFoundWords';
+import { BlastGameHeader } from './BlastGameHeader';
 import dynamic from 'next/dynamic';
 const BlastHelpModal = dynamic(() => import('./BlastHelpModal').then(m => m.BlastHelpModal), { ssr: false });
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
@@ -24,17 +23,13 @@ import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { Mascot } from '@/components/ui/Mascot';
-import { BlastMoveCounter } from './BlastMoveCounter';
 import { BlastObjectiveDisplay } from './BlastObjectiveDisplay';
-// BlastChainCounter kept as sole chain indicator (BlastChainBadge removed — was duplicate)
 import { BlastChainCounter } from './BlastChainCounter';
 import { BlastCodexModal } from './BlastCodexModal';
-import CircularTimer from '@/components/CircularTimer';
 import type { BlastComboType } from './utils/blastCombos';
 import { LeadChangeBanner } from '@/components/game/LeadChangeBanner';
 import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 import { BlastOpponentFeed } from './BlastOpponentFeed';
-import { BlastComboStreakBadge } from './BlastComboStreakBadge';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 import { BlastHotTileOverlay } from './BlastHotTileOverlay';
 import type { HotTile } from './hooks/useBlastHotTiles';
@@ -314,90 +309,32 @@ export function BlastGameLayout({
           was double-firing with ComboFlash on combo words and also flashing on
           every cascade auto-clear, adding noise without information. */}
 
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pb-1" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)' }}>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={onQuitRequest}
-          className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold text-xs tracking-widest"
-        >
-          <ArrowLeft className="me-1.5 h-4 w-4 rtl:rotate-180" />
-          <span className="hidden sm:inline">
-            {isMultiplayer
-              ? (t('common.leave'))
-              : (t('common.quit'))}
-          </span>
-        </Button>
-
-        {/* MP: CircularTimer between quit and help */}
-        {isMultiplayer && remainingTime != null && (
-          <CircularTimer remainingTime={remainingTime} totalTime={totalTime} size="xs" />
-        )}
-
-        {/* Wave badge — SP only */}
-        {!isMultiplayer && waveNumber > 1 && (
-          <AdaptiveMotion.div
-            key={waveNumber}
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="px-2 py-0.5 rounded-neo border-2 border-fuchsia-400/60 bg-fuchsia-500/20"
-          >
-            <span className="font-black text-xs text-fuchsia-300 uppercase tracking-wider">
-              {t('blast.waveBadge')?.replace('{wave}', String(waveNumber)) || `Wave ${waveNumber}`}
-            </span>
-          </AdaptiveMotion.div>
-        )}
-
-        <div className="flex items-center gap-1">
-          {discoveredCombos && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowCodex(true)}
-              className="text-white/60 hover:text-white"
-              aria-label={t('blast.comboCodex')}
-            >
-              <BookOpen className="h-5 w-5" />
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowHelp(true)}
-            className="text-white/60 hover:text-white"
-            aria-label={t('blast.helpTitle')}
-          >
-            <HelpCircle className="h-5 w-5" />
-          </Button>
-        </div>
-
-        {/* End Game button — SP only */}
-        {!isMultiplayer && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowEndGameConfirm(true)}
-            className="border-2 border-neo-black shadow-hard-sm font-bold text-xs"
-          >
-            <Bomb className="h-4 w-4 sm:me-1.5" />
-            <span className="hidden sm:inline">{t('blast.giveUp')}</span>
-          </Button>
-        )}
-      </header>
-
-      {/* Combo Display + Streak Badge */}
-      <div className="h-6 flex items-center justify-center shrink-0 relative z-30 gap-2">
-        {streak && arcRef && (
-          <BlastComboStreakBadge streak={streak} arcRef={arcRef} />
-        )}
-        <ComboDisplay
-          comboLevel={comboLevel}
-          compact
-          timeRemaining={comboTimeRemaining}
-          isDanger={comboDanger}
-        />
-      </div>
+      <BlastGameHeader
+        isMultiplayer={isMultiplayer}
+        remainingTime={remainingTime}
+        totalTime={totalTime}
+        waveNumber={waveNumber}
+        comboLevel={comboLevel}
+        comboTimeRemaining={comboTimeRemaining}
+        comboDanger={comboDanger}
+        streak={streak}
+        arcRef={arcRef}
+        score={score}
+        personalBestScore={personalBestScore}
+        wordsFoundCount={wordsFound.length}
+        movesRemaining={movesRemaining}
+        totalMoves={totalMoves}
+        tilesCleared={tilesCleared}
+        totalTiles={totalTiles}
+        bonusMoveAwarded={bonusMoveAwarded}
+        discoveredCombos={discoveredCombos}
+        onQuitRequest={onQuitRequest}
+        onShowHelp={() => setShowHelp(true)}
+        onShowCodex={() => setShowCodex(true)}
+        onShowEndGame={() => setShowEndGameConfirm(true)}
+        onToggleFoundWords={() => setShowFoundWords(prev => !prev)}
+        t={t}
+      />
 
       {/* Cascade word showcase banner — sole cascade notification (milestone + fallback text removed to reduce noise) */}
       <AdaptiveAnimatePresence>
@@ -414,70 +351,6 @@ export function BlastGameLayout({
           </AdaptiveMotion.div>
         )}
       </AdaptiveAnimatePresence>
-
-      {/* Stats row */}
-      <div className={cn(
-        'px-4 flex items-center shrink-0 relative z-30 mb-1 max-w-md mx-auto w-full',
-        isMultiplayer ? 'justify-center gap-8' : 'justify-between'
-      )}>
-        {/* Score — SP only */}
-        {!isMultiplayer && (
-          <AdaptiveMotion.div
-            key={Math.floor(score / 500)}
-            initial={{ scale: 1.04 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="border-3 border-neo-black rounded-neo shadow-hard px-3 py-1.5 min-w-[80px]"
-            style={{
-              background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-            }}
-          >
-            <div className="text-center">
-              <div className="font-black text-neo-black text-xl sm:text-2xl leading-tight tabular-nums">
-                {score.toLocaleString()}
-              </div>
-              <div className="font-bold uppercase tracking-wider text-neo-black/60 text-[10px] sm:text-xs">
-                {t('common.score')}
-              </div>
-            </div>
-            {/* Personal best anchor — loss aversion hook */}
-            {personalBestScore != null && personalBestScore > 0 && (
-              <div className={cn(
-                'text-[9px] font-bold uppercase tracking-wider text-center mt-0.5',
-                score > personalBestScore ? 'text-neo-lime' : 'text-neo-black/40',
-              )}>
-                {score > personalBestScore ? '★ NEW BEST' : `${t('blast.best')}: ${personalBestScore}`}
-              </div>
-            )}
-          </AdaptiveMotion.div>
-        )}
-
-        {/* Move counter (visible when move limit is finite) */}
-        <BlastMoveCounter
-          movesRemaining={movesRemaining}
-          totalMoves={totalMoves}
-          t={t}
-          bonusMoveAwarded={bonusMoveAwarded}
-        />
-
-        {/* Words found count - clickable to expand list */}
-        <button
-          onClick={() => setShowFoundWords(prev => !prev)}
-          className="text-center cursor-pointer hover:scale-105 transition-transform"
-        >
-          <div className="font-black text-white text-xl sm:text-2xl">{wordsFound.length}</div>
-          <div className="font-bold uppercase tracking-wider text-white/70 text-[10px] sm:text-xs">
-            {t('common.words')}
-          </div>
-        </button>
-
-        {/* Progress — SP only */}
-        {!isMultiplayer && (
-          <div className="w-28 sm:w-32">
-            <BlastProgressBar cleared={tilesCleared} total={totalTiles} t={t} />
-          </div>
-        )}
-      </div>
 
       {/* MP Lead Change Banner — pop-up style like classic game */}
       {isMultiplayer ? (
