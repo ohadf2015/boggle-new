@@ -193,11 +193,10 @@ export const PremiumCard = memo(function PremiumCard({
       onMouseLeave={handleMouseLeave}
       onMouseEnter={handleMouseEnter}
       style={{
-        rotateX: effectiveTiltEnabled ? rotateX : 0,
-        rotateY: effectiveTiltEnabled ? rotateY : 0,
+        transform: effectiveTiltEnabled ? `rotateX(${rotateX}deg) rotateY(${rotateY}deg)` : undefined,
         transformStyle: 'preserve-3d',
-        boxShadow: isHovered && !disabled 
-          ? `${styles.hoverShadow}, 0 0 30px ${styles.glowColor}` 
+        boxShadow: isHovered && !disabled
+          ? `${styles.hoverShadow}, 0 0 30px ${styles.glowColor}`
           : styles.shadow,
       }}
       whileHover={!disabled ? { scale: 1.02, y: -4 } : {}}

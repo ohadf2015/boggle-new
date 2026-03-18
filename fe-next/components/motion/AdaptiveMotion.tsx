@@ -49,10 +49,9 @@ export function SkipAnimationsProvider({ children, skip = true }: { children: Re
 interface AdaptiveMotionProps extends MotionProps {
   skipAnimation?: boolean;
   className?: string;
-  style?: React.CSSProperties;
   children?: ReactNode;
   onClick?: React.MouseEventHandler;
-   
+
   [key: string]: any;
 }
 

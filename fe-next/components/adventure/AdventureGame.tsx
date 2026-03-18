@@ -1,8 +1,4 @@
-/**
- * AdventureGame — Main orchestrator for adventure mode gameplay.
- * Hook logic extracted to: useAdventureGameInit, useAdventureWordSubmit,
- * useAdventureLevelCompletion, useAdventureBossOrchestration.
- */
+/** AdventureGame — Main orchestrator for adventure mode gameplay. */
 'use client';
 
 import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from 'react';
@@ -24,27 +20,15 @@ import { useFlashChallenge } from '@/hooks/useFlashChallenge';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
-import FlashChallengeToast from './FlashChallengeToast';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
-import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
-import { StoryBeatCard } from './StoryBeatCard';
-import AdventureEffectsLayerFull, { AdventureEffectsLayer as EdgeVignetteLayer } from './effects/AdventureEffectsLayer';
-import LevelCompleteModal from './LevelCompleteModal';
-import LootChestReveal from './LootChestReveal';
-import LevelEntryOverlay from './LevelEntryOverlay';
-import { BossOverlay, PlayerHealthBar } from './boss';
-import dynamic from 'next/dynamic';
-import { VICTORY_DURATION_FRAMES, DEFEAT_DURATION_FRAMES, WORLD_UNLOCK_DURATION_FRAMES } from './cinematics';
 import GameplayBackground from './themed/GameplayBackground';
-
-// Dynamic imports — cinematics are heavy (Remotion) and only shown on level complete/defeat
-const VictoryCinematic = dynamic(() => import('./cinematics/VictoryCinematic').then(mod => ({ default: mod.VictoryCinematic as React.ComponentType<any> })), { ssr: false });
-const DefeatCinematic = dynamic(() => import('./cinematics/DefeatCinematic').then(mod => ({ default: mod.DefeatCinematic as React.ComponentType<any> })), { ssr: false });
-const WorldUnlockCinematic = dynamic(() => import('./cinematics/WorldUnlockCinematic').then(mod => ({ default: mod.WorldUnlockCinematic as React.ComponentType<any> })), { ssr: false });
-const CinematicPlayer = dynamic(() => import('./boss/cinematics/CinematicPlayer').then(mod => ({ default: mod.CinematicPlayer })), { ssr: false });
-import { GameHeader, GameSidebar, GameGridArea, PauseOverlay, GameLayout } from './ui';
+import { GameHeader, GameSidebar, GameGridArea, GameLayout } from './ui';
+import AdventureGameOverlays from './AdventureGameOverlays';
+import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
+import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
+import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
@@ -81,10 +65,8 @@ function useMemoizedFlatTiles(tiles2D: TileState[][], tilesVersion: number): Gri
 const AdventureGame = memo<AdventureGameProps>(
   ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, totalStars, onNextWorld }) => {
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
-
     const init = useAdventureGameInit({ world: levelConfig.world, level: levelConfig.level, timerSeconds: levelConfig.timerSeconds ?? 120 });
 
-    // Gem Detector upgrade: boost special tile spawning
     const boostedLevelConfig = useMemo(() => {
       const { specialTileBoost, guaranteedGoldTile } = init.upgradeEffects;
       if (specialTileBoost <= 0 && !guaranteedGoldTile) return init.adjustedLevelConfig;
@@ -98,7 +80,6 @@ const AdventureGame = memo<AdventureGameProps>(
         ),
       };
     }, [init.adjustedLevelConfig, init.upgradeEffects]);
-
     const { t, language } = useLanguage();
 
     const {
@@ -149,7 +130,6 @@ const AdventureGame = memo<AdventureGameProps>(
       scrambleImmunity: init.upgradeEffects.scrambleImmunity,
     });
 
-    // Track tile types used in last word for flash challenges (useGoldTile)
     const [lastWordTileTypes, setLastWordTileTypes] = useState<string[]>([]);
     const prevWordsFoundLenRef = useRef(gameState.wordsFound.length);
     useEffect(() => {
@@ -170,7 +150,6 @@ const AdventureGame = memo<AdventureGameProps>(
       locale: language,
     });
 
-    // Award flash challenge gold when completed (guarded to fire once per challenge)
     const hasAwardedFlashGoldRef = useRef(false);
     useEffect(() => {
       if (flashChallenge.isChallengeComplete && flashChallenge.activeChallenge && !hasAwardedFlashGoldRef.current) {
@@ -180,52 +159,25 @@ const AdventureGame = memo<AdventureGameProps>(
       if (!flashChallenge.isChallengeComplete) {
         hasAwardedFlashGoldRef.current = false;
       }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- using init.addGold (stable useCallback) instead of init (unstable object) to prevent infinite re-render loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [flashChallenge.isChallengeComplete, flashChallenge.activeChallenge, init.addGold]);
 
-    // Boss objective tracking — sync boss state to reducer objectives
-    // defeatBoss: track boss HP depletion as percentage
-    // NOTE: must NOT guard on isBossActive — when boss HP reaches 0,
-    // isActive becomes false in the same React batch as hp=0, so the
-    // guard would skip the final 100% update.
-    useEffect(() => {
-      if (!isBossLevel) return;
-      const depleted = bossOrch.bossMaxHP > 0
-        ? Math.round(((bossOrch.bossMaxHP - bossOrch.bossCurrentHP) / bossOrch.bossMaxHP) * 100)
-        : 0;
-      updateObjective('defeatBoss', depleted, 'set');
-    }, [isBossLevel, bossOrch.bossCurrentHP, bossOrch.bossMaxHP, updateObjective]);
-
-    // surviveBattle: track player health percentage (updated continuously)
-    useEffect(() => {
-      if (!isBossLevel) return;
-      const healthPct = bossOrch.playerHealthState.maxHP > 0
-        ? Math.round((bossOrch.playerHealthState.currentHP / bossOrch.playerHealthState.maxHP) * 100)
-        : 100;
-      updateObjective('surviveBattle', healthPct, 'set');
-    }, [isBossLevel, bossOrch.playerHealthState.currentHP, bossOrch.playerHealthState.maxHP, updateObjective]);
-
-    // mechanicTrigger: increment when boss grid effect triggers
-    const prevGridEffectRef = useRef(bossOrch.gridEffectTrigger);
-    useEffect(() => {
-      if (!isBossLevel) return;
-      if (bossOrch.gridEffectTrigger !== prevGridEffectRef.current && bossOrch.gridEffectTrigger) {
-        updateObjective('mechanicTrigger', 1, 'increment');
-      }
-      prevGridEffectRef.current = bossOrch.gridEffectTrigger;
-    }, [isBossLevel, bossOrch.gridEffectTrigger, updateObjective]);
-
-    // Daily quests — track progress for today's 3 quests
     const { recordProgress: recordQuestProgress } = useDailyQuests({
       initialProgress: progression?.dailyQuestProgress,
       lastQuestDate: progression?.dailyQuestDate,
     });
-
-    // Chapter quests — track progress for current chapter
     const chapterNumber = getChapterNumber(levelConfig.level);
     const chapterQuests = useChapterQuests({ worldId: levelConfig.world, chapterNumber });
 
-    // CrazyGames SDK lifecycle — report gameplay and trigger happyTime on achievements
+    useAdventureQuestTracking({
+      wordsFound: gameState.wordsFound, comboCount: gameState.comboCount,
+      isBossLevel, bossCurrentHP: bossOrch.bossCurrentHP, bossMaxHP: bossOrch.bossMaxHP,
+      playerCurrentHP: bossOrch.playerHealthState.currentHP, playerMaxHP: bossOrch.playerHealthState.maxHP,
+      gridEffectTrigger: bossOrch.gridEffectTrigger,
+      isChallengeComplete: flashChallenge.isChallengeComplete,
+      recordQuestProgress, chapterQuests, updateObjective,
+    });
+
     useCrazyGamesLifecycle({
       isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,
       isGameOver: gameState.isComplete,
@@ -235,12 +187,7 @@ const AdventureGame = memo<AdventureGameProps>(
       wordsFound: gameState.wordsFound.length,
     });
 
-    // Score multiplier: currently 1x base. AI director adjusts pacing (not score),
-    // and upgrade-based score bonus is already applied via upgradeBonuses.scoreBonus.
-    // This hook point remains for future world-specific or event-based score scaling.
     const getScoreMultiplier = useCallback(() => 1, []);
-
-    // Augment skill effects with rune boss damage multiplier
     const augmentedSkillEffects = useMemo(() => ({
       ...init.skillEffects,
       bossDamageMultiplier: init.skillEffects.bossDamageMultiplier * init.runeEffects.bossDamage,
@@ -267,7 +214,6 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const isModalOpen = showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic || bossOrch.showBossIntro || bossOrch.showBossFireworks;
-    // Stuck detection: auto-reveal a hint instead of firing an intrusive toast
     const { resetOnGameAction } = useLexiStuckDetection({
       onStuck: () => { if (hasHintsAvailable) { getHint(); dismissAutoHint(); } },
       isPlaying: isPlaying && entryPhase === 'playing', isPaused, isModalOpen, isBossLevel,
@@ -305,7 +251,6 @@ const AdventureGame = memo<AdventureGameProps>(
       },
     });
 
-    // Wire click-to-submit ref now that wordSubmit is available
     clickSubmitRef.current = wordSubmit.handleWordSubmit;
 
     const levelCompletion = useAdventureLevelCompletion({
@@ -349,139 +294,28 @@ const AdventureGame = memo<AdventureGameProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gameState.comboCount, isPlaying, entryPhase, isPaused, init]);
 
-    // Daily quest progress: track words found, long words, and combos
-    const prevQuestWordsRef = useRef(gameState.wordsFound.length);
-    useEffect(() => {
-      const newWords = gameState.wordsFound.length - prevQuestWordsRef.current;
-      if (newWords > 0) {
-        recordQuestProgress('wordCount', newWords);
-        chapterQuests.recordWordsFound(newWords);
-        // Check for long words (6+ letters)
-        const latestWord = gameState.wordsFound[gameState.wordsFound.length - 1];
-        if (latestWord && latestWord.length >= 6) {
-          recordQuestProgress('longWord');
-          chapterQuests.recordLongWord();
-        }
-      }
-      prevQuestWordsRef.current = gameState.wordsFound.length;
-    }, [gameState.wordsFound, recordQuestProgress, chapterQuests]);
-
-    useEffect(() => {
-      if (gameState.comboCount >= 5) recordQuestProgress('comboStreak');
-    }, [gameState.comboCount, recordQuestProgress]);
-
-    // Chapter quest: streak master — track consecutive valid words
-    useEffect(() => {
-      if (gameState.comboCount > 0) {
-        chapterQuests.recordStreakMaster();
-      }
-    }, [gameState.comboCount, chapterQuests]);
-
-    // Chapter quest: flash challenge master — track completed flash challenges
-    useEffect(() => {
-      if (flashChallenge.isChallengeComplete) {
-        chapterQuests.recordFlashChallengeMaster();
-      }
-    }, [flashChallenge.isChallengeComplete, chapterQuests]);
-
-    // Chapter quest: world mechanic use — track when boss grid effect triggers
-    const prevMechanicTriggerRef = useRef(bossOrch.gridEffectTrigger);
-    useEffect(() => {
-      if (bossOrch.gridEffectTrigger !== prevMechanicTriggerRef.current && bossOrch.gridEffectTrigger) {
-        chapterQuests.recordWorldMechanicUse();
-      }
-      prevMechanicTriggerRef.current = bossOrch.gridEffectTrigger;
-    }, [bossOrch.gridEffectTrigger, chapterQuests]);
-
-    // Streamlined entry: cascade → playing (skip objectives parade + title burst)
     const handleCascadeComplete = useCallback(() => {
       markCascadeComplete();
       entryPhaseManager.advanceToPlaying();
       if (!isPlaying) { startGame(); init.startAIDirector(); }
-      // Word Radar T5: free hint on level start
       if (init.upgradeEffects.freeStartHint) {
         setTimeout(() => getHint(), 500);
       }
     }, [markCascadeComplete, entryPhaseManager, isPlaying, startGame, init, getHint]);
 
-    // Shared handler for objectives/title entry phases (no longer triggered in normal flow,
-    // but still passed as props for backward compat)
     const handleEntryPhaseComplete = useCallback(() => {
       entryPhaseManager.advanceToPlaying();
       if (!isPlaying) { startGame(); init.startAIDirector(); }
     }, [entryPhaseManager, isPlaying, startGame, init]);
 
-    const calculateTileCenter = useCallback((row: number, col: number) => {
-      if (!gridRef.current) return { x: 0, y: 0 };
-      const gridRect = gridRef.current.getBoundingClientRect();
-      const tileSize = gridRect.width / levelConfig.gridSize;
-      return { x: gridRect.left + col * tileSize + tileSize / 2, y: gridRect.top + row * tileSize + tileSize / 2 };
-    }, [levelConfig.gridSize]);
+    const gridInteraction = useAdventureGridInteraction({
+      isPlaying, isPaused, isValidating, selectTile, clearSelection,
+      resetOnGameAction, startGame, pauseGame, setIsPaused,
+      selectedIndices, currentWord, handleWordSubmit: wordSubmit.handleWordSubmit,
+      tiles, cascadePhase, lastSubmittedWordRef: wordSubmit.lastSubmittedWordRef,
+      gridRef, gridSize: levelConfig.gridSize, effects,
+    });
 
-    useEffect(() => {
-      const chainTiles = tiles.filter(t => t.activationEffect === 'link' && t.activationTimestamp);
-      if (chainTiles.length === 0) return;
-      effects.setChainBurstConfig({ trigger: true, position: calculateTileCenter(chainTiles[0].row, chainTiles[0].col) });
-    }, [tiles, calculateTileCenter, effects]);
-
-    useEffect(() => {
-      if (cascadePhase === 'removing' && wordSubmit.lastSubmittedWordRef.current) {
-        const { word, path } = wordSubmit.lastSubmittedWordRef.current;
-        if (path.length >= 3) {
-          let cx = 0, cy = 0;
-          for (const pos of path) { const c = calculateTileCenter(pos.row, pos.col); cx += c.x; cy += c.y; }
-          cx /= path.length; cy /= path.length;
-          let intensity: 1 | 2 | 3 | 4 = 1;
-          if (word.length >= 10) intensity = 4;
-          else if (word.length >= 7) intensity = 3;
-          else if (word.length >= 5) intensity = 2;
-          effects.addExplosion({ id: Date.now(), position: { x: cx, y: cy }, intensity });
-        }
-        wordSubmit.lastSubmittedWordRef.current = null;
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cascadePhase, calculateTileCenter, effects]);
-
-    const handlePauseToggle = useCallback(() => {
-      if (isPaused) { startGame(); setIsPaused(false); }
-      else { pauseGame(); setIsPaused(true); }
-    }, [isPaused, startGame, pauseGame]);
-
-    const handleTileSelect = useCallback(
-      (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating) return;
-        selectTile(index); resetOnGameAction();
-      }, [isPlaying, isPaused, isValidating, selectTile, resetOnGameAction]
-    );
-
-    const handleDragStart = useCallback(
-      (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating) return;
-        clearSelection(); selectTile(index);
-      }, [isPlaying, isPaused, isValidating, clearSelection, selectTile]
-    );
-
-    const handleDragEnter = useCallback(
-      (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating) return;
-        selectTile(index);
-      }, [isPlaying, isPaused, isValidating, selectTile]
-    );
-
-    // Refs for latest selection state — avoids stale closure in handleDragEnd (fixes outside-grid release + RAF lag)
-    const selectedIndicesRef = useRef(selectedIndices);
-    const currentWordRef = useRef(currentWord);
-    useEffect(() => { selectedIndicesRef.current = selectedIndices; }, [selectedIndices]);
-    useEffect(() => { currentWordRef.current = currentWord; }, [currentWord]);
-
-    const handleDragEnd = useCallback(() => {
-      const word = currentWordRef.current;
-      const indices = selectedIndicesRef.current;
-      if (!word || indices.length === 0) return;
-      wordSubmit.handleWordSubmit(word, indices);
-    }, [wordSubmit]);
-
-    // Flow: cinematic → story beat → loot chest → level complete
     const showLootOrComplete = useCallback(() => {
       if (levelCompletion.lootDrops.length > 0 && gameState.stars > 0) {
         setShowLootChest(true);
@@ -490,42 +324,11 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [levelCompletion.lootDrops, gameState.stars]);
 
-    // Non-boss levels: show results UI when completion hook signals done
     useEffect(() => {
       if (levelCompletion.nonBossCompleted) {
         showLootOrComplete();
       }
     }, [levelCompletion.nonBossCompleted, showLootOrComplete]);
-
-    const handleCinematicComplete = useCallback(() => {
-      // After victory cinematic on boss level — check if next world is now unlocked
-      if (
-        cinematics.showVictoryCinematic && isBossLevel && gameState.stars > 0
-        && levelConfig.world < 10 && !cinematics.showWorldUnlockCinematic
-      ) {
-        const nextWorld = levelConfig.world + 1;
-        const currentWorldConfig = getWorldConfig(levelConfig.world);
-        const nextWorldConfig = getWorldConfig(nextWorld);
-        cinematics.handleCinematicComplete();
-        cinematics.showWorldUnlock({
-          previousWorldNumber: levelConfig.world,
-          previousWorldName: t(`adventure.worlds.${currentWorldConfig.name}`),
-          newWorldNumber: nextWorld,
-          newWorldName: t(`adventure.worlds.${nextWorldConfig.name}`),
-          previousColor: currentWorldConfig.colorPrimary,
-          newColor: nextWorldConfig.colorPrimary,
-          newSecondaryColor: nextWorldConfig.colorSecondary,
-        });
-        return;
-      }
-
-      cinematics.handleCinematicComplete();
-      if (storyBeat && gameState.stars > 0) {
-        setShowStoryBeat(true);
-      } else {
-        showLootOrComplete();
-      }
-    }, [cinematics, storyBeat, gameState.stars, showLootOrComplete, isBossLevel, levelConfig.world, t]);
 
     const handleStoryBeatContinue = useCallback(() => {
       setShowStoryBeat(false);
@@ -538,52 +341,31 @@ const AdventureGame = memo<AdventureGameProps>(
     }, []);
 
     const hintsUsedRef = useRef(0);
-    const handleContinue = useCallback(() => {
-      if (gameState.stars >= 3) chapterQuests.recordLevelPerfect();
-      if (isBossLevel && bossOrch.bossHealthState.phase === 'victory' && hintsUsedRef.current === 0) {
-        chapterQuests.recordBossDefeatedNoHint();
-      }
-      // Score challenge quest: record final score
-      if (gameState.score > 0) {
-        chapterQuests.recordScoreChallenge(gameState.score);
-      }
-      // Boss high health: record if boss defeated with >75% player HP
-      if (isBossLevel && bossOrch.bossHealthState.phase === 'victory' && bossOrch.playerHealthState.currentHP > bossOrch.playerHealthState.maxHP * 0.75) {
-        chapterQuests.recordBossHighHealth();
-      }
-      // Full combo level: record if no combo breaks during the level
-      if (gameState.stars > 0 && gameState.comboCount >= gameState.wordsFound.length && gameState.wordsFound.length > 0) {
-        chapterQuests.recordFullComboLevel();
-      }
-      // Progression achievements — star milestones (totalStars includes stars from this level)
-      const newTotalStars = (totalStars ?? 0) + gameState.stars;
-      if (newTotalStars >= 50) init.handleEarnAchievement('STAR_COLLECTOR_50');
-      if (newTotalStars >= 100) init.handleEarnAchievement('STAR_COLLECTOR_100');
-      // World complete: finishing the boss level (level 7) means the world is done
-      if (isBossLevel && gameState.stars > 0) {
-        init.handleEarnAchievement('WORLD_COMPLETE');
-      }
-      // All bosses: finishing world 10 boss means all 10 bosses defeated
-      if (isBossLevel && levelConfig.world === 10 && gameState.stars > 0) {
-        init.handleEarnAchievement('ALL_BOSSES');
-      }
-      setShowLevelComplete(false);
-      onLevelComplete(gameState.stars, gameState.score, gameState.wordsFound.length, levelCompletion.earnedGold);
-    }, [gameState.stars, gameState.score, gameState.wordsFound.length, gameState.comboCount, levelCompletion.earnedGold, onLevelComplete, chapterQuests, isBossLevel, bossOrch.bossHealthState.phase, bossOrch.playerHealthState.currentHP, bossOrch.playerHealthState.maxHP, totalStars, init, levelConfig.world]);
-
-    const handleRetry = useCallback(() => {
-      setShowLevelComplete(false);
-      setRetriesUsed(prev => prev + 1);
-      levelCompletion.resetRewards();
-      clearSelection();
-      // Salvage Claw T2: retain a fraction of score on retry
-      const retainedScore = init.upgradeEffects.retryScoreRetention > 0
-        ? Math.floor(gameState.score * init.upgradeEffects.retryScoreRetention)
-        : 0;
-      resetGame({ retainedScore });
-      bossOrch.resetBossHealth(); bossOrch.resetPlayerHealth();
-      cinematics.resetCinematics(); startGame();
-    }, [resetGame, startGame, clearSelection, bossOrch, cinematics, levelCompletion, init.upgradeEffects.retryScoreRetention, gameState.score]);
+    const { handleCinematicComplete, handleContinue, handleRetry } = useAdventureGameCallbacks({
+      gameStars: gameState.stars, gameScore: gameState.score,
+      wordsFoundList: gameState.wordsFound, comboCount: gameState.comboCount,
+      isBossLevel, worldNumber: levelConfig.world, levelNumber: levelConfig.level,
+      bossHealthPhase: bossOrch.bossHealthState.phase,
+      playerHealthCurrentHP: bossOrch.playerHealthState.currentHP,
+      playerHealthMaxHP: bossOrch.playerHealthState.maxHP,
+      resetBossHealth: bossOrch.resetBossHealth, resetPlayerHealth: bossOrch.resetPlayerHealth,
+      showVictoryCinematic: cinematics.showVictoryCinematic,
+      showWorldUnlockCinematic: cinematics.showWorldUnlockCinematic,
+      handleCinematicCompleteBase: cinematics.handleCinematicComplete,
+      showWorldUnlock: cinematics.showWorldUnlock, resetCinematics: cinematics.resetCinematics,
+      earnedGold: levelCompletion.earnedGold, resetRewards: levelCompletion.resetRewards,
+      recordLevelPerfect: chapterQuests.recordLevelPerfect,
+      recordBossDefeatedNoHint: chapterQuests.recordBossDefeatedNoHint,
+      recordScoreChallenge: chapterQuests.recordScoreChallenge,
+      recordBossHighHealth: chapterQuests.recordBossHighHealth,
+      recordFullComboLevel: chapterQuests.recordFullComboLevel,
+      handleEarnAchievement: init.handleEarnAchievement,
+      upgradeRetryScoreRetention: init.upgradeEffects.retryScoreRetention,
+      onLevelComplete, totalStars, clearSelection, resetGame, startGame,
+      storyBeat, showLootOrComplete,
+      setShowLevelComplete, setRetriesUsed, setShowStoryBeat,
+      t, hintsUsed: hintsUsedRef.current,
+    });
 
     const handleHintClick = useCallback(() => {
       if (hasHintsAvailable) { getHint(); dismissAutoHint(); hintsUsedRef.current += 1; }
@@ -603,19 +385,6 @@ const AdventureGame = memo<AdventureGameProps>(
       return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
     }, [init.hintData, currentHint, levelConfig.gridSize, isFrozen, init.upgradeEffects.freezeHighlightsWord, remainingHintWords, findPathForWord]);
 
-    const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const handlePopupComplete = useCallback(() => {
-      if (popupQueueTimeoutRef.current) { clearTimeout(popupQueueTimeoutRef.current); popupQueueTimeoutRef.current = null; }
-      effects.handlePopupComplete();
-    }, [effects]);
-
-    useEffect(() => {
-      if (popupQueueTimeoutRef.current) { clearTimeout(popupQueueTimeoutRef.current); popupQueueTimeoutRef.current = null; }
-      if (effects.currentPopup) {
-        popupQueueTimeoutRef.current = setTimeout(() => { effects.handlePopupComplete(); popupQueueTimeoutRef.current = null; }, 3000);
-      }
-      return () => { if (popupQueueTimeoutRef.current) { clearTimeout(popupQueueTimeoutRef.current); } };
-    }, [effects]);
 
     if (!isValidConfig) {
       return (
@@ -633,14 +402,14 @@ const AdventureGame = memo<AdventureGameProps>(
           header={
             <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}
               score={gameState.score} timeRemaining={timeRemaining} isPaused={isPaused}
-              onPauseToggle={handlePauseToggle} onExit={onExit}
+              onPauseToggle={gridInteraction.handlePauseToggle} onExit={onExit}
               gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100} />
           }
           gridArea={
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}
-              selectedIndices={selectedIndices} onTileSelect={handleTileSelect}
+              selectedIndices={selectedIndices} onTileSelect={gridInteraction.handleTileSelect}
               onWordSubmit={wordSubmit.handleWordSubmit}
-              onDragStart={handleDragStart} onDragEnter={handleDragEnter} onDragEnd={handleDragEnd}
+              onDragStart={gridInteraction.handleDragStart} onDragEnter={gridInteraction.handleDragEnter} onDragEnd={gridInteraction.handleDragEnd}
               gridRef={gridRef}
               isInteractive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating}
               isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating}
@@ -680,129 +449,44 @@ const AdventureGame = memo<AdventureGameProps>(
               className="border-b-2 lg:border-b-0 lg:border-s-2 border-neo-black/30" />
           }
           overlays={
-            <>
-              <BossOverlay boss={bossOrch.bossConfig}
-                maxHP={bossOrch.bossMaxHP}
-                currentTaunt={bossOrch.bossTaunt}
-                showTaunt={!!bossOrch.bossTaunt}
-                showIntro={bossOrch.showBossIntro}
-                onStartBattle={bossOrch.handleBossIntroStart}
-                showVictory={showLevelComplete && bossOrch.bossHealthState.phase === 'victory'}
-                showDefeat={showLevelComplete && (bossOrch.bossHealthState.phase === 'defeat' || bossOrch.playerHealthState.isDead)}
-                stars={gameState.stars} score={gameState.score}
-                wordsFound={gameState.wordsFound} gameState={gameState}
-                onContinue={handleContinue} onRetry={handleRetry}
-                worldNumber={levelConfig.world}
-                healthState={bossOrch.bossHealthState}
-                effectCallbacks={bossOrch.bossEffectCallbacks} />
-
-              {isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete && !bossOrch.playerHealthState.isDead && (
-                <div className="fixed bottom-[4.5rem] sm:bottom-24 lg:bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">
-                  <PlayerHealthBar healthState={bossOrch.playerHealthState} />
-                </div>
-              )}
-
-              {flashChallenge.activeChallenge && (
-                <FlashChallengeToast
-                  challenge={flashChallenge.activeChallenge}
-                  isComplete={flashChallenge.isChallengeComplete}
-                  onDismiss={flashChallenge.dismiss}
-                  timeLeft={flashChallenge.challengeTimeLeft}
-                />
-              )}
-
-              <PauseOverlay isOpen={isPaused && !showLevelComplete}
-                onResume={handlePauseToggle} onRestart={handleRetry} onExit={onExit} />
-
-              <LevelEntryOverlay levelNumber={levelConfig.level} worldNumber={levelConfig.world}
-                isVisible={entryPhase === 'title'} onComplete={handleEntryPhaseComplete} />
-
-              {cinematics.showVictoryCinematic && (
-                <CinematicPlayer
-                  composition={VictoryCinematic as unknown as React.ComponentType<Record<string, unknown>>}
-                  compositionProps={{
-                    starsEarned: gameState.stars, wordsFound: gameState.wordsFound.length,
-                    finalScore: gameState.score, timeRemaining,
-                    titleText: t('adventure.cinematic.victory'),
-                    statLabels: { wordsFound: t('adventure.cinematic.wordsFound'), finalScore: t('adventure.cinematic.score'), timeRemaining: t('adventure.cinematic.timeLeft') },
-                    starsLabel: t('adventure.cinematic.stars'),
-                  }}
-                  durationSeconds={VICTORY_DURATION_FRAMES / 30} onComplete={handleCinematicComplete}
-                  fallbackType="victory" />
-              )}
-
-              {cinematics.showDefeatCinematic && (
-                <CinematicPlayer
-                  composition={DefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
-                  compositionProps={{
-                    wordsFound: gameState.wordsFound.length,
-                    bestWord: gameState.wordsFound.reduce((best, word) => word.length > best.length ? word : best, ''),
-                    finalScore: gameState.score,
-                    titleText: t('adventure.cinematic.defeat'),
-                    encourageText: t('adventure.cinematic.encourageText'),
-                    encourageSubtext: t('adventure.cinematic.encourageSubtext'),
-                    statLabels: { wordsFound: t('adventure.cinematic.wordsFound'), finalScore: t('adventure.cinematic.score'), bestWord: t('adventure.cinematic.bestWord') },
-                  }}
-                  durationSeconds={DEFEAT_DURATION_FRAMES / 30} onComplete={handleCinematicComplete}
-                  fallbackType="defeat" />
-              )}
-
-              {/* World Unlock Cinematic — plays after boss defeat when next world is unlocked */}
-              {cinematics.showWorldUnlockCinematic && cinematics.worldUnlockProps && (
-                <CinematicPlayer
-                  composition={WorldUnlockCinematic as unknown as React.ComponentType<Record<string, unknown>>}
-                  compositionProps={cinematics.worldUnlockProps as unknown as Record<string, unknown>}
-                  durationSeconds={WORLD_UNLOCK_DURATION_FRAMES / 30}
-                  onComplete={handleCinematicComplete}
-                  fallbackType="victory" />
-              )}
-
-              <LootChestReveal
-                isOpen={showLootChest}
-                drops={levelCompletion.lootDrops}
-                onComplete={handleLootChestComplete}
-              />
-
-              {!isBossLevel && (
-                <LevelCompleteModal isOpen={showLevelComplete}
-                  stars={gameState.stars} score={gameState.score} objectives={objectives}
-                  levelNumber={levelConfig.level} worldNumber={levelConfig.world}
-                  onContinue={handleContinue} onRetry={handleRetry} onExit={onExit}
-                  totalStars={totalStars} bestAttempt={bestAttempt}
-                  xpEarned={levelCompletion.earnedXp} goldEarned={levelCompletion.earnedGold}
-                  isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD}
-                  onNextWorld={onNextWorld}
-                  canRetryFree={retriesUsed < (init.upgradeEffects.freeRetriesPerWorld ?? 0)} />
-              )}
-
-              {storyBeat && (
-                <StoryBeatCard
-                  worldId={levelConfig.world}
-                  characterName={t(storyBeat.characterKey)}
-                  dialogueKey={storyBeat.dialogueKey}
-                  isVisible={showStoryBeat}
-                  onContinue={handleStoryBeatContinue}
-                />
-              )}
-
-              <EdgeVignetteLayer showEdgeVignetteFlash={bossOrch.showEdgeVignette} />
-
-              <AdventureEffectsLayerFull currentPopup={effects.currentPopup}
-                onPopupComplete={handlePopupComplete} scoreDisplayRef={effects.scoreDisplayRef}
-                reaction={effects.reaction} onDismissReaction={effects.dismissReaction}
-                chainBurstConfig={effects.chainBurstConfig}
-                onChainBurstComplete={() => effects.setChainBurstConfig(null)}
-                world={levelConfig.world} particleConfig={effects.particleConfig}
-                onParticleComplete={() => effects.setParticleConfig(null)}
-                pendingExplosions={effects.pendingExplosions}
-                onExplosionComplete={effects.removeExplosion}
-                levelUpData={levelCompletion.levelUpData}
-                onLevelUpClose={levelCompletion.handleLevelUpClose}
-                currentMilestone={init.currentMilestone}
-                isBossLevel={isBossLevel}
-                showBossFireworks={bossOrch.showBossFireworks}
-                defeatedBossTier={bossOrch.defeatedBossTier} />
-            </>
+            <AdventureGameOverlays
+              bossConfig={bossOrch.bossConfig} bossMaxHP={bossOrch.bossMaxHP}
+              bossTaunt={bossOrch.bossTaunt} showBossIntro={bossOrch.showBossIntro}
+              handleBossIntroStart={bossOrch.handleBossIntroStart}
+              bossHealthState={bossOrch.bossHealthState} bossEffectCallbacks={bossOrch.bossEffectCallbacks}
+              isBossLevel={isBossLevel} isBossActive={bossOrch.isBossActive}
+              showBossFireworks={bossOrch.showBossFireworks} defeatedBossTier={bossOrch.defeatedBossTier}
+              showEdgeVignette={bossOrch.showEdgeVignette} playerHealthState={bossOrch.playerHealthState}
+              showLevelComplete={showLevelComplete} gameStars={gameState.stars}
+              gameScore={gameState.score} wordsFound={gameState.wordsFound} gameState={gameState}
+              handleContinue={handleContinue} handleRetry={handleRetry} onExit={onExit}
+              handleCinematicComplete={handleCinematicComplete} handlePauseToggle={gridInteraction.handlePauseToggle}
+              handleEntryPhaseComplete={handleEntryPhaseComplete}
+              handleStoryBeatContinue={handleStoryBeatContinue} handleLootChestComplete={handleLootChestComplete}
+              handlePopupComplete={gridInteraction.handlePopupComplete}
+              activeChallenge={flashChallenge.activeChallenge} isChallengeComplete={flashChallenge.isChallengeComplete}
+              dismissChallenge={flashChallenge.dismiss} challengeTimeLeft={flashChallenge.challengeTimeLeft}
+              isPaused={isPaused} entryPhase={entryPhase}
+              levelNumber={levelConfig.level} worldNumber={levelConfig.world}
+              showVictoryCinematic={cinematics.showVictoryCinematic}
+              showDefeatCinematic={cinematics.showDefeatCinematic}
+              showWorldUnlockCinematic={cinematics.showWorldUnlockCinematic}
+              worldUnlockProps={cinematics.worldUnlockProps}
+              timeRemaining={timeRemaining} t={t}
+              showLootChest={showLootChest} lootDrops={levelCompletion.lootDrops}
+              objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt}
+              earnedXp={levelCompletion.earnedXp} earnedGold={levelCompletion.earnedGold}
+              isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD} onNextWorld={onNextWorld}
+              retriesUsed={retriesUsed} freeRetriesPerWorld={init.upgradeEffects.freeRetriesPerWorld ?? 0}
+              storyBeat={storyBeat} showStoryBeat={showStoryBeat}
+              currentPopup={effects.currentPopup} scoreDisplayRef={effects.scoreDisplayRef}
+              reaction={effects.reaction} dismissReaction={effects.dismissReaction}
+              chainBurstConfig={effects.chainBurstConfig} setChainBurstConfig={effects.setChainBurstConfig}
+              particleConfig={effects.particleConfig} setParticleConfig={effects.setParticleConfig}
+              pendingExplosions={effects.pendingExplosions} removeExplosion={effects.removeExplosion}
+              levelUpData={levelCompletion.levelUpData} handleLevelUpClose={levelCompletion.handleLevelUpClose}
+              currentMilestone={init.currentMilestone}
+            />
           }
         />
       </div>

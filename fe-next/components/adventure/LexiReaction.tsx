@@ -250,7 +250,7 @@ export const LexiReaction = memo<LexiReactionProps>(
             role="button"
             tabIndex={0}
             aria-label="Lexi says something - tap to speed up, double-tap to dismiss"
-            onKeyDown={(e) => {
+            onKeyDown={(e: React.KeyboardEvent) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 handleTap();
               }

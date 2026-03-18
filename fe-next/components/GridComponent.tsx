@@ -51,7 +51,7 @@ interface GridCellProps {
   effectiveRenderMode: PerformanceMode;
   earthquakePhase: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getPhaseAnimation: Record<string, { animate: any; transition: any }>;
+  getPhaseAnimation: Record<string, { animate?: any; transition: any }>;
   comboLevel: number;
   comboColors: ReturnType<typeof getComboColors>;
   reduceMotion: boolean;
@@ -647,8 +647,8 @@ const GridComponent = memo<GridComponentProps>(({
                   hintAnimationPhase={hintAnimationPhase}
                   currentTier={currentTier}
                   selectedCellsLength={selectedCells.length}
-                  onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
-                  onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
+                  onTouchStart={(e: any) => handleTouchStart(i, j, cell, e)}
+                  onMouseDown={(e: any) => handleMouseDown(i, j, cell, e)}
                   onDoubleClick={() => handleDoubleClick(i, j)}
                 />
               );

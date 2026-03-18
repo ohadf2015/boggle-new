@@ -10,14 +10,13 @@ import { useLessonDraft } from '@/hooks/useLessonDraft';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import LessonTemplateEditor from './LessonTemplateEditor';
 import LessonAssignmentDialog from './LessonAssignmentDialog';
-import { BulkImportEnhanced, TemplateLessonSelector } from './lesson-creation';
-import WordListEditor from './WordListEditor';
-import * as Dialog from '@radix-ui/react-dialog';
-import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { Plus, CheckCircle, AlertCircle, X, Pencil, Play, Settings, Clock, Share2, BookTemplate, ChevronDown } from 'lucide-react';
+import { BulkImportEnhanced } from './lesson-creation';
+import LessonBuilderCreateDialog from './LessonBuilderCreateDialog';
+import LessonBuilderEditDialog from './LessonBuilderEditDialog';
+import LessonBuilderDraftPrompt from './LessonBuilderDraftPrompt';
+import { Plus, CheckCircle, AlertCircle, Pencil, Play, Settings, Clock, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/education';
 import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
@@ -28,7 +27,6 @@ export default function LessonBuilder() {
   const { lessons, isLoading, createLesson, updateLesson } = useLessons();
   const { classrooms } = useClassrooms();
 
-  // Lesson draft hook
   const { hasDraft, saveDraft, clearDraft, restoreDraft, draftAge } = useLessonDraft();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -45,135 +43,76 @@ export default function LessonBuilder() {
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(true);
 
-  // Edit dialog state
   const [editingLesson, setEditingLesson] = useState<VocabularyLesson | null>(null);
   const [editWords, setEditWords] = useState<VocabularyWord[]>([]);
   const [isEditSaving, setIsEditSaving] = useState(false);
 
-  // Template editor state
   const [selectedLesson, setSelectedLesson] = useState<VocabularyLesson | null>(null);
   const [isTemplateEditorOpen, setIsTemplateEditorOpen] = useState(false);
   const [isTemplateSaving, setIsTemplateSaving] = useState(false);
 
-  // Assignment dialog state
   const [assigningLesson, setAssigningLesson] = useState<VocabularyLesson | null>(null);
 
-  // Template hook for the selected lesson
   const { templates, createTemplate, updateTemplate, getDefaultTemplate } = useTemplates(selectedLesson?.id);
 
-  // Check for draft on dialog open
   useEffect(() => {
-    if (isCreateDialogOpen && hasDraft) {
-      setShowDraftPrompt(true);
-    }
+    if (isCreateDialogOpen && hasDraft) setShowDraftPrompt(true);
   }, [isCreateDialogOpen, hasDraft]);
 
-  // Auto-save draft every 30 seconds when editing
   useEffect(() => {
     if (!isCreateDialogOpen) return;
-
-    // Only save if there's content
     if (!formData.name && words.length === 0) return;
-
     const interval = setInterval(() => {
-      saveDraft({
-        name: formData.name,
-        description: formData.description,
-        language: formData.language,
-        classroomId: formData.classroomId,
-        words,
-      });
-    }, 30000); // Every 30 seconds
-
+      saveDraft({ name: formData.name, description: formData.description, language: formData.language, classroomId: formData.classroomId, words });
+    }, 30000);
     return () => clearInterval(interval);
   }, [isCreateDialogOpen, formData, words, saveDraft]);
 
-  // Handle bulk import
   const handleBulkImport = useCallback((importedWords: VocabularyWord[]) => {
     setWords((prev) => [...prev, ...importedWords]);
-    toast.success(
-      t('teacher.lesson.bulkImportDetected').replace('{{count}}', String(importedWords.length))
-    );
+    toast.success(t('teacher.lesson.bulkImportDetected').replace('{{count}}', String(importedWords.length)));
   }, [t]);
 
-  // Handle template selection
   const handleTemplateSelect = useCallback((template: {
-    id: string;
-    name: string;
-    description: string;
-    language: Language;
-    wordCount: number;
-    category: string;
-    words: VocabularyWord[];
+    id: string; name: string; description: string; language: Language; wordCount: number; category: string; words: VocabularyWord[];
   }) => {
-    setFormData(prev => ({
-      ...prev,
-      name: template.name,
-      description: template.description,
-      language: template.language,
-    }));
+    setFormData(prev => ({ ...prev, name: template.name, description: template.description, language: template.language }));
     setWords(template.words);
-    setShowTemplateSelector(false); // Collapse after selection
+    setShowTemplateSelector(false);
     toast.success(t('teacher.lesson.templateLoaded').replace('{{count}}', String(template.words.length)));
   }, [t]);
 
-  // Handle draft restore
   const handleRestoreDraft = useCallback(() => {
     const draftData = restoreDraft();
     if (draftData) {
-      setFormData({
-        name: draftData.name,
-        description: draftData.description,
-        language: draftData.language,
-        classroomId: draftData.classroomId,
-        isPublic: false,
-      });
+      setFormData({ name: draftData.name, description: draftData.description, language: draftData.language, classroomId: draftData.classroomId, isPublic: false });
       setWords(draftData.words);
       toast.success(t('teacher.lesson.resumeDraft'));
     }
     setShowDraftPrompt(false);
   }, [restoreDraft, t]);
 
-  // Handle draft discard
-  const handleDiscardDraft = useCallback(() => {
-    clearDraft();
-    setShowDraftPrompt(false);
-  }, [clearDraft]);
+  const handleDiscardDraft = useCallback(() => { clearDraft(); setShowDraftPrompt(false); }, [clearDraft]);
 
-  // Format draft age for display
   const formatDraftAge = useCallback((ageMs: number | null): string => {
     if (!ageMs) return '';
     const minutes = Math.floor(ageMs / 60000);
     if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    return `${hours}h ago`;
+    return `${Math.floor(minutes / 60)}h ago`;
   }, []);
-
-  const handleOpenTemplateEditor = (lesson: VocabularyLesson) => {
-    setSelectedLesson(lesson);
-    setIsTemplateEditorOpen(true);
-  };
 
   const handleSaveTemplate = async (data: CreateTemplateData | ({ id: string } & UpdateTemplateData)) => {
     setIsTemplateSaving(true);
     try {
-      if ('id' in data) {
-        const { id, ...updates } = data;
-        return await updateTemplate(id, updates);
-      } else {
-        return await createTemplate(data as CreateTemplateData);
-      }
-    } finally {
-      setIsTemplateSaving(false);
-    }
+      if ('id' in data) { const { id, ...updates } = data; return await updateTemplate(id, updates); }
+      else { return await createTemplate(data as CreateTemplateData); }
+    } finally { setIsTemplateSaving(false); }
   };
 
   const handleStartGame = (lesson: VocabularyLesson) => {
-    // Navigate to classroom game route (education-specific, no main app escape)
     router.push(`/${language}/education/classroom-game?lessonId=${lesson.id}`);
   };
 
-  // Get default template for a lesson
   const getLessonDefaultTemplate = (lessonId: string) => {
     return templates.find((t) => t.is_default && t.lesson_id === lessonId);
   };
@@ -188,46 +127,26 @@ export default function LessonBuilder() {
     setIsEditSaving(true);
     const result = await updateLesson(editingLesson.id, { words: editWords });
     setIsEditSaving(false);
-    if (result.success) {
-      toast.success(t('teacher.lesson.saved'));
-      setEditingLesson(null);
-    } else {
-      toast.error(result.error || t('teacher.lesson.error.updateFailed'));
-    }
+    if (result.success) { toast.success(t('teacher.lesson.saved')); setEditingLesson(null); }
+    else { toast.error(result.error || t('teacher.lesson.error.updateFailed')); }
   };
 
   const handleCreate = async () => {
-    if (!formData.name.trim()) {
-      toast.error(t('teacher.lesson.validation.nameRequired'));
-      return;
-    }
-    if (words.length === 0) {
-      toast.error(t('teacher.lesson.validation.wordsRequired'));
-      return;
-    }
+    if (!formData.name.trim()) { toast.error(t('teacher.lesson.validation.nameRequired')); return; }
+    if (words.length === 0) { toast.error(t('teacher.lesson.validation.wordsRequired')); return; }
 
     setIsSaving(true);
     const result = await createLesson({
-      name: formData.name.trim(),
-      description: formData.description.trim() || undefined,
-      language: formData.language,
-      words,
-      classroomId: formData.classroomId || undefined,
-      isPublic: formData.isPublic,
+      name: formData.name.trim(), description: formData.description.trim() || undefined,
+      language: formData.language, words, classroomId: formData.classroomId || undefined, isPublic: formData.isPublic,
     });
     setIsSaving(false);
 
     if (result.success) {
       toast.success(t('teacher.lesson.saved'));
-      clearDraft(); // Clear draft on successful save
+      clearDraft();
       setIsCreateDialogOpen(false);
-      setFormData({
-        name: '',
-        description: '',
-        language: language as Language,
-        classroomId: '',
-        isPublic: false,
-      });
+      setFormData({ name: '', description: '', language: language as Language, classroomId: '', isPublic: false });
       setWords([]);
     } else {
       toast.error(result.error || t('teacher.lesson.error.createFailed'));
@@ -251,13 +170,7 @@ export default function LessonBuilder() {
       <div className="flex justify-between items-center">
         <Button
           onClick={() => {
-            setFormData({
-              name: '',
-              description: '',
-              language: language as Language,
-              classroomId: '',
-              isPublic: false,
-            });
+            setFormData({ name: '', description: '', language: language as Language, classroomId: '', isPublic: false });
             setWords([]);
             setIsCreateDialogOpen(true);
           }}
@@ -365,55 +278,17 @@ export default function LessonBuilder() {
 
                   {/* Lesson Actions */}
                   <div className="flex gap-2 mt-4 pt-4 border-t border-neo-black/30">
-                    <Button
-                      size="sm"
-                      onClick={() => handleStartGame(lesson)}
-                      className={cn(
-                        'flex-1 bg-neo-cyan text-neo-black font-bold',
-                        'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
-                        'transition-all text-xs'
-                      )}
-                    >
+                    <Button size="sm" onClick={() => handleStartGame(lesson)} className={cn('flex-1 bg-neo-cyan text-neo-black font-bold', 'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed', 'transition-all text-xs')}>
                       <Play className="w-4 h-4 me-1" />
                       {t('education.template.startGame')}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleOpenEdit(lesson)}
-                      className={cn(
-                        'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
-                        'bg-neo-navy/50 text-neo-white hover:bg-neo-navy',
-                        'transition-all'
-                      )}
-                      aria-label={t('teacher.lesson.editLesson')}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => handleOpenEdit(lesson)} className={cn('border-neo border-neo-black shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all')} aria-label={t('teacher.lesson.editLesson')}>
                       <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setAssigningLesson(lesson)}
-                      className={cn(
-                        'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
-                        'bg-neo-navy/50 text-neo-white hover:bg-neo-navy',
-                        'transition-all'
-                      )}
-                      aria-label={t('teacher.lessons.assign.trigger')}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => setAssigningLesson(lesson)} className={cn('border-neo border-neo-black shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all')} aria-label={t('teacher.lessons.assign.trigger')}>
                       <Share2 className="w-4 h-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleOpenTemplateEditor(lesson)}
-                      className={cn(
-                        'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
-                        'bg-neo-navy/50 text-neo-white hover:bg-neo-navy',
-                        'transition-all'
-                      )}
-                      aria-label={t('education.template.settings')}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => { setSelectedLesson(lesson); setIsTemplateEditorOpen(true); }} className={cn('border-neo border-neo-black shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all')} aria-label={t('education.template.settings')}>
                       <Settings className="w-4 h-4" />
                     </Button>
                   </div>
@@ -425,229 +300,39 @@ export default function LessonBuilder() {
       )}
 
       {/* Create Dialog */}
-      <Dialog.Root open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
-          <Dialog.Content
-            className={cn(
-              'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-              'w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6',
-              'bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50 rounded-neo'
-            )}
-          >
-            <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4 text-balance">
-              {t('teacher.lesson.create')}
-            </Dialog.Title>
-            <Dialog.Description className="sr-only">
-              {t('teacher.lesson.dialog.createDescription')}
-            </Dialog.Description>
-
-            <div className="space-y-4">
-              {/* Template Selector - Collapsible */}
-              <div className="border-neo border-neo-black rounded-neo p-4 bg-neo-navy/50">
-                <button
-                  onClick={() => setShowTemplateSelector(!showTemplateSelector)}
-                  className="flex items-center justify-between w-full text-left"
-                  type="button"
-                >
-                  <div className="flex items-center gap-2">
-                    <BookTemplate className="w-5 h-5 text-neo-yellow" />
-                    <span className="font-neo-body font-bold text-neo-white">
-                      {t('teacher.lesson.startFromTemplate')}
-                    </span>
-                  </div>
-                  <ChevronDown
-                    className={cn(
-                      'w-5 h-5 text-neo-white transition-transform',
-                      showTemplateSelector && 'rotate-180'
-                    )}
-                  />
-                </button>
-
-                {showTemplateSelector && (
-                  <div className="mt-4">
-                    <TemplateLessonSelector
-                      classroomLanguage={formData.language}
-                      onSelect={handleTemplateSelect}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Lesson Name */}
-              <div>
-                <label className="block text-sm font-neo-body text-neo-white mb-2">
-                  {t('teacher.lesson.name')}
-                </label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder={t('teacher.lesson.namePlaceholder')}
-                  className="border-neo border-neo-black shadow-hard-sm"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-neo-body text-neo-white mb-2">
-                  {t('teacher.lesson.description')}
-                </label>
-                <Input
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder={t('teacher.lesson.descriptionPlaceholder')}
-                  className="border-neo border-neo-black shadow-hard-sm"
-                />
-              </div>
-
-              {/* Language */}
-              <div>
-                <label className="block text-sm font-neo-body text-neo-white mb-2">
-                  {t('teacher.classroom.language')}
-                </label>
-                <select
-                  value={formData.language}
-                  onChange={(e) => setFormData({ ...formData, language: e.target.value as Language })}
-                  className={cn(
-                    'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
-                    'text-neo-white font-neo-body shadow-hard-sm',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
-                  )}
-                >
-                  <option value="en">English</option>
-                  <option value="he">Hebrew</option>
-                  <option value="sv">Swedish</option>
-                  <option value="ja">Japanese</option>
-                </select>
-              </div>
-
-              {/* Classroom Assignment */}
-              <div>
-                <label className="block text-sm font-neo-body text-neo-white mb-2">
-                  {t('teacher.lesson.assignToClassroom')}
-                </label>
-                <select
-                  value={formData.classroomId}
-                  onChange={(e) => setFormData({ ...formData, classroomId: e.target.value })}
-                  className={cn(
-                    'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
-                    'text-neo-white font-neo-body shadow-hard-sm',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
-                  )}
-                >
-                  <option value="">{t('teacher.lesson.noClassroomSelected')}</option>
-                  {classrooms.map((classroom) => (
-                    <option key={classroom.id} value={classroom.id}>
-                      {classroom.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Words List */}
-              <WordListEditor
-                words={words}
-                onWordsChange={setWords}
-                language={formData.language}
-                showAddInput
-                showBulkImport
-                onBulkImportOpen={() => setIsBulkImportOpen(true)}
-              />
-
-              {/* Actions */}
-              <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={handleCreate}
-                  disabled={isSaving || !formData.name.trim() || words.length === 0}
-                  className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-                >
-                  {isSaving ? t('teacher.lesson.saving') : t('teacher.lesson.save')}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsCreateDialogOpen(false)}
-                  className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-                >
-                  {t('common.cancel')}
-                </Button>
-              </div>
-            </div>
-
-            <Dialog.Close asChild>
-              <button
-                className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
-                aria-label={t('common.close')}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </Dialog.Close>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <LessonBuilderCreateDialog
+        isOpen={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        formData={formData}
+        onFormDataChange={setFormData}
+        words={words}
+        onWordsChange={setWords}
+        classrooms={classrooms}
+        isSaving={isSaving}
+        showTemplateSelector={showTemplateSelector}
+        onToggleTemplateSelector={() => setShowTemplateSelector(!showTemplateSelector)}
+        onTemplateSelect={handleTemplateSelect}
+        onBulkImportOpen={() => setIsBulkImportOpen(true)}
+        onCreate={handleCreate}
+        t={t}
+      />
 
       {/* Edit Lesson Dialog */}
-      <Dialog.Root open={!!editingLesson} onOpenChange={(open) => !open && setEditingLesson(null)}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
-          <Dialog.Content
-            className={cn(
-              'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-              'w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6',
-              'bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50 rounded-neo'
-            )}
-          >
-            <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
-              {t('teacher.lesson.editLesson')}
-            </Dialog.Title>
-            <Dialog.Description className="text-sm text-neo-white/70 mb-4 text-pretty">
-              {t('teacher.lesson.dialog.editDescription')}
-            </Dialog.Description>
-
-            <WordListEditor
-              words={editWords}
-              onWordsChange={setEditWords}
-              language={editingLesson?.language || 'en'}
-              showAddInput
-              maxHeight="max-h-[50vh]"
-            />
-
-            <div className="flex gap-3 pt-4">
-              <Button
-                onClick={handleSaveEdit}
-                disabled={isEditSaving}
-                className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-              >
-                {isEditSaving ? t('teacher.lesson.saving') : t('teacher.lesson.saveChanges')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setEditingLesson(null)}
-                className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-              >
-                {t('common.cancel')}
-              </Button>
-            </div>
-
-            <Dialog.Close asChild>
-              <button
-                className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
-                aria-label={t('common.close')}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </Dialog.Close>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <LessonBuilderEditDialog
+        editingLesson={editingLesson}
+        onClose={() => setEditingLesson(null)}
+        editWords={editWords}
+        onEditWordsChange={setEditWords}
+        isEditSaving={isEditSaving}
+        onSaveEdit={handleSaveEdit}
+        t={t}
+      />
 
       {/* Template Editor Dialog */}
       {selectedLesson && (
         <LessonTemplateEditor
           isOpen={isTemplateEditorOpen}
-          onClose={() => {
-            setIsTemplateEditorOpen(false);
-            setSelectedLesson(null);
-          }}
+          onClose={() => { setIsTemplateEditorOpen(false); setSelectedLesson(null); }}
           lessonId={selectedLesson.id}
           lessonName={selectedLesson.name}
           existingTemplate={getDefaultTemplate()}
@@ -675,45 +360,14 @@ export default function LessonBuilder() {
       />
 
       {/* Draft Resume Prompt */}
-      <AlertDialog.Root open={showDraftPrompt} onOpenChange={setShowDraftPrompt}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay className="fixed inset-0 bg-neo-black/80 z-[60]" />
-          <AlertDialog.Content
-            className={cn(
-              'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-              'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-black shadow-hard-lg z-[60]',
-              'rounded-neo'
-            )}
-          >
-            <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
-              {t('teacher.lesson.resumeDraft')}
-            </AlertDialog.Title>
-            <AlertDialog.Description className="text-neo-white/60 mb-6 text-pretty">
-              {t('teacher.lesson.draftFound').replace('{{time}}', formatDraftAge(draftAge))}
-            </AlertDialog.Description>
-
-            <div className="flex gap-3">
-              <AlertDialog.Action asChild>
-                <Button
-                  onClick={handleRestoreDraft}
-                  className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-                >
-                  {t('teacher.lesson.resumeDraftButton')}
-                </Button>
-              </AlertDialog.Action>
-              <AlertDialog.Cancel asChild>
-                <Button
-                  onClick={handleDiscardDraft}
-                  variant="outline"
-                  className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-                >
-                  {t('teacher.lesson.discardDraftButton')}
-                </Button>
-              </AlertDialog.Cancel>
-            </div>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+      <LessonBuilderDraftPrompt
+        open={showDraftPrompt}
+        onOpenChange={setShowDraftPrompt}
+        onRestore={handleRestoreDraft}
+        onDiscard={handleDiscardDraft}
+        formattedAge={formatDraftAge(draftAge)}
+        t={t}
+      />
     </div>
   );
 }

@@ -11,6 +11,15 @@ describe('AdventureGame — useChapterQuests wiring', () => {
     path.resolve(__dirname, '../AdventureGame.tsx'),
     'utf-8'
   );
+  const questTrackingSource = fs.readFileSync(
+    path.resolve(__dirname, '../hooks/useAdventureQuestTracking.ts'),
+    'utf-8'
+  );
+  const callbacksSource = fs.readFileSync(
+    path.resolve(__dirname, '../hooks/useAdventureGameCallbacks.ts'),
+    'utf-8'
+  );
+  const allSources = sourceFile + questTrackingSource + callbacksSource;
 
   it('imports useChapterQuests from hooks', () => {
     expect(sourceFile).toMatch(/import.*useChapterQuests.*from.*hooks\/useChapterQuests/);
@@ -27,11 +36,11 @@ describe('AdventureGame — useChapterQuests wiring', () => {
   });
 
   it('calls recordWordsFound when words are found', () => {
-    expect(sourceFile).toMatch(/chapterQuests\.recordWordsFound/);
+    expect(allSources).toMatch(/chapterQuests\.recordWordsFound/);
   });
 
   it('calls recordLongWord for long words', () => {
-    expect(sourceFile).toMatch(/chapterQuests\.recordLongWord/);
+    expect(allSources).toMatch(/chapterQuests\.recordLongWord/);
   });
 
   it('calls recordLevelPerfect when 3 stars earned', () => {
@@ -43,15 +52,15 @@ describe('AdventureGame — useChapterQuests wiring', () => {
   });
 
   it('calls recordStreakMaster when combo count increases', () => {
-    expect(sourceFile).toMatch(/chapterQuests\.recordStreakMaster/);
+    expect(allSources).toMatch(/chapterQuests\.recordStreakMaster/);
   });
 
   it('calls recordFlashChallengeMaster when flash challenge completes', () => {
-    expect(sourceFile).toMatch(/chapterQuests\.recordFlashChallengeMaster/);
+    expect(allSources).toMatch(/chapterQuests\.recordFlashChallengeMaster/);
   });
 
   it('calls recordWorldMechanicUse when boss grid effect triggers', () => {
-    expect(sourceFile).toMatch(/chapterQuests\.recordWorldMechanicUse/);
+    expect(allSources).toMatch(/chapterQuests\.recordWorldMechanicUse/);
   });
 
   it('calls recordScoreChallenge with final score on level complete', () => {
