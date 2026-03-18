@@ -254,10 +254,10 @@ function AdventureView(): React.JSX.Element {
   }, []);
 
   // Handle weekly challenge completion — submit score to leaderboard
+  const userId = progression?.userId;
   const handleWeeklyChallengeComplete = useCallback(async (
     _stars: number, score: number, wordsFound: number, _goldEarned: number
   ) => {
-    // Find longest word from game state (not available here, use empty)
     try {
       await fetch('/api/adventure/weekly-challenge', {
         method: 'POST',
@@ -267,7 +267,7 @@ function AdventureView(): React.JSX.Element {
           score,
           wordsFound,
           longestWord: '',
-          playerName: progression?.userId ? 'Player' : 'Guest',
+          playerName: userId ? 'Player' : 'Guest',
         }),
       });
     } catch {
@@ -275,7 +275,7 @@ function AdventureView(): React.JSX.Element {
     }
     setViewState('hub');
     setShowWeeklyChallenge(true); // Show leaderboard after playing
-  }, [progression?.userId]);
+  }, [userId]);
 
   // Handle hub → world map navigation
   const handleOpenWorldMap = useCallback(() => {

@@ -38,7 +38,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
   const handleSave = useCallback((config: CustomAvatarConfig) => {
     onAvatarChange(config);
     setIsBuilderOpen(false);
-  }, [onAvatarChange]);
+  }, [onAvatarChange, setIsBuilderOpen]);
 
   if (compact) {
     return (

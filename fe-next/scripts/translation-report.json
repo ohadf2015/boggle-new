@@ -2,13 +2,13 @@
   "summary": {
     "totalKeysInCode": 3769,
     "keyCountByLanguage": {
-      "en": 6404,
-      "he": 6422,
-      "sv": 6455,
-      "ja": 6442,
-      "es": 6464
+      "en": 6405,
+      "he": 6427,
+      "sv": 6461,
+      "ja": 6448,
+      "es": 6469
     },
-    "missingFromEnglish": 1,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 5,
@@ -145,24 +145,10 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "adventure.tiles.letter",
-      "usages": [
-        {
-          "file": "components/adventure/AdventureGrid.tsx",
-          "line": 339
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
-      "common.claim",
-      "common.looksGood",
-      "common.verified",
-      "adventure.loot.bonusGold",
-      "adventure.loot.bossTrophy",
+      "adventure.tiles.letter",
       "encouragement.gameStart",
       "encouragement.firstWord",
       "encouragement.longWord",
@@ -171,11 +157,6 @@
       "encouragement.almostDone"
     ],
     "sv": [
-      "common.claim",
-      "common.looksGood",
-      "common.verified",
-      "adventure.loot.bonusGold",
-      "adventure.loot.bossTrophy",
       "encouragement.gameStart",
       "encouragement.firstWord",
       "encouragement.longWord",
@@ -184,11 +165,6 @@
       "encouragement.almostDone"
     ],
     "ja": [
-      "common.claim",
-      "common.looksGood",
-      "common.verified",
-      "adventure.loot.bonusGold",
-      "adventure.loot.bossTrophy",
       "encouragement.gameStart",
       "encouragement.firstWord",
       "encouragement.longWord",
@@ -197,11 +173,6 @@
       "encouragement.almostDone"
     ],
     "es": [
-      "common.claim",
-      "common.looksGood",
-      "common.verified",
-      "adventure.loot.bonusGold",
-      "adventure.loot.bossTrophy",
       "encouragement.gameStart",
       "encouragement.firstWord",
       "encouragement.longWord",
@@ -379,7 +350,6 @@
       "admin.wordBank.wikipediaSync.lastSynced",
       "adventure.tiles.locked",
       "adventure.tiles.multiplier",
-      "adventure.tiles.letter",
       "adventure.tiles.aria.gold",
       "adventure.tiles.aria.ice",
       "adventure.tiles.aria.bomb",

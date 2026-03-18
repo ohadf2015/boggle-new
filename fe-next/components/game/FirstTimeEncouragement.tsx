@@ -1,8 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Mascot } from '@/components/ui/Mascot';
-import type { MascotVariant } from '@/components/ui/Mascot';
+import { Mascot, type MascotVariant } from '@/components/ui/Mascot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { EncouragementTrigger } from '@/hooks/useFirstTimeEncouragement';
 
