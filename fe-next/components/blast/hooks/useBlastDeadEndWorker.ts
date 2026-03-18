@@ -1,8 +1,8 @@
 'use client';
 
 import { useRef, useEffect, useCallback } from 'react';
-import type { HintPathResult } from '../utils/blastDeadEndDetector';
-import { hasValidWords as hasValidWordsSync, findHintPath as findHintPathSync } from '../utils/blastDeadEndDetector';
+import { hasValidWords as hasValidWordsSync, findHintPath as findHintPathSync, type HintPathResult } from '../utils/blastDeadEndDetector';
+
 
 /**
  * Hook that offloads dead-end detection to a Web Worker.
@@ -22,6 +22,8 @@ export function useBlastDeadEndWorker(validWords: string[]) {
   useEffect(() => {
     if (typeof window === 'undefined' || typeof Worker === 'undefined') return;
 
+    const pending = pendingRef.current;
+
     try {
       const worker = new Worker(
         new URL('../utils/blastDeadEndDetector.worker.ts', import.meta.url)
@@ -29,18 +31,18 @@ export function useBlastDeadEndWorker(validWords: string[]) {
 
       worker.onmessage = (e: MessageEvent) => {
         const { type, result } = e.data;
-        const pending = pendingRef.current.get(type);
-        if (pending) {
-          pending.resolve(result);
-          pendingRef.current.delete(type);
+        const pend = pending.get(type);
+        if (pend) {
+          pend.resolve(result);
+          pending.delete(type);
         }
       };
 
       worker.onerror = () => {
         // On error, resolve any pending promises so callers don't hang
-        for (const [key, pending] of pendingRef.current) {
-          pending.reject(new Error('Worker error'));
-          pendingRef.current.delete(key);
+        for (const [key, pend] of pending) {
+          pend.reject(new Error('Worker error'));
+          pending.delete(key);
         }
       };
 
@@ -53,7 +55,7 @@ export function useBlastDeadEndWorker(validWords: string[]) {
     return () => {
       workerRef.current?.terminate();
       workerRef.current = null;
-      pendingRef.current.clear();
+      pending.clear();
     };
   }, []);
 

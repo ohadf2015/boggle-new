@@ -1,17 +1,17 @@
 {
   "summary": {
-    "totalKeysInCode": 3781,
+    "totalKeysInCode": 3805,
     "keyCountByLanguage": {
-      "en": 6448,
-      "he": 6477,
-      "sv": 6510,
-      "ja": 6497,
-      "es": 6508
+      "en": 6474,
+      "he": 6486,
+      "sv": 6519,
+      "ja": 6506,
+      "es": 6517
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 5,
+      "templateLiterals": 7,
       "fallbackUsages": 0,
       "variableKeys": 10
     }
@@ -30,6 +30,20 @@
         "file": "components/adventure/SkillTree/SkillPath.tsx",
         "line": 116,
         "context": "{t(`adventure.skills.paths.${path}`) || path}",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "adventure.worlds.${currentWorldConfig.name}",
+        "file": "components/adventure/hooks/useAdventureGameCallbacks.ts",
+        "line": 92,
+        "context": "previousWorldName: t(`adventure.worlds.${currentWorldConfig.name}`),",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "adventure.worlds.${nextWorldConfig.name}",
+        "file": "components/adventure/hooks/useAdventureGameCallbacks.ts",
+        "line": 94,
+        "context": "newWorldName: t(`adventure.worlds.${nextWorldConfig.name}`),",
         "type": "template_literal"
       },
       {
@@ -124,7 +138,7 @@
         "pattern": "t(textKey)",
         "variable": "textKey",
         "file": "components/blast/BlastWordCelebration.tsx",
-        "line": 169,
+        "line": 170,
         "context": "{t(textKey)}",
         "type": "variable_key"
       },
@@ -147,10 +161,82 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
-    "es": []
+    "he": [
+      "puzzleBrowse.title",
+      "puzzleBrowse.subtitle",
+      "puzzleBrowse.createYourOwn",
+      "puzzleBrowse.sortNewest",
+      "puzzleBrowse.sortPopular",
+      "puzzleBrowse.loading",
+      "puzzleBrowse.empty",
+      "puzzleBrowse.emptyHint",
+      "puzzleBrowse.createFirst",
+      "puzzleBrowse.by",
+      "puzzleBrowse.plays",
+      "puzzleBrowse.difficultyEasy",
+      "puzzleBrowse.difficultyMedium",
+      "puzzleBrowse.difficultyHard",
+      "puzzleBrowse.minutesAgo",
+      "puzzleBrowse.hoursAgo",
+      "puzzleBrowse.daysAgo"
+    ],
+    "sv": [
+      "puzzleBrowse.title",
+      "puzzleBrowse.subtitle",
+      "puzzleBrowse.createYourOwn",
+      "puzzleBrowse.sortNewest",
+      "puzzleBrowse.sortPopular",
+      "puzzleBrowse.loading",
+      "puzzleBrowse.empty",
+      "puzzleBrowse.emptyHint",
+      "puzzleBrowse.createFirst",
+      "puzzleBrowse.by",
+      "puzzleBrowse.plays",
+      "puzzleBrowse.difficultyEasy",
+      "puzzleBrowse.difficultyMedium",
+      "puzzleBrowse.difficultyHard",
+      "puzzleBrowse.minutesAgo",
+      "puzzleBrowse.hoursAgo",
+      "puzzleBrowse.daysAgo"
+    ],
+    "ja": [
+      "puzzleBrowse.title",
+      "puzzleBrowse.subtitle",
+      "puzzleBrowse.createYourOwn",
+      "puzzleBrowse.sortNewest",
+      "puzzleBrowse.sortPopular",
+      "puzzleBrowse.loading",
+      "puzzleBrowse.empty",
+      "puzzleBrowse.emptyHint",
+      "puzzleBrowse.createFirst",
+      "puzzleBrowse.by",
+      "puzzleBrowse.plays",
+      "puzzleBrowse.difficultyEasy",
+      "puzzleBrowse.difficultyMedium",
+      "puzzleBrowse.difficultyHard",
+      "puzzleBrowse.minutesAgo",
+      "puzzleBrowse.hoursAgo",
+      "puzzleBrowse.daysAgo"
+    ],
+    "es": [
+      "puzzleBrowse.title",
+      "puzzleBrowse.subtitle",
+      "puzzleBrowse.createYourOwn",
+      "puzzleBrowse.sortNewest",
+      "puzzleBrowse.sortPopular",
+      "puzzleBrowse.loading",
+      "puzzleBrowse.empty",
+      "puzzleBrowse.emptyHint",
+      "puzzleBrowse.createFirst",
+      "puzzleBrowse.by",
+      "puzzleBrowse.plays",
+      "puzzleBrowse.difficultyEasy",
+      "puzzleBrowse.difficultyMedium",
+      "puzzleBrowse.difficultyHard",
+      "puzzleBrowse.minutesAgo",
+      "puzzleBrowse.hoursAgo",
+      "puzzleBrowse.daysAgo"
+    ]
   },
   "keysNotInEnglish": {
     "he": [

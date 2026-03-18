@@ -50,7 +50,7 @@ interface GridCellProps {
   shakeOffset: { x: number; y: number; rotate: number; scale: number; delay: number };
   effectiveRenderMode: PerformanceMode;
   earthquakePhase: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   getPhaseAnimation: Record<string, { animate?: any; transition: any }>;
   comboLevel: number;
   comboColors: ReturnType<typeof getComboColors>;

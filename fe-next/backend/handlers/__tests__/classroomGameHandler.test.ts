@@ -13,6 +13,18 @@ jest.mock('../../modules/gameStateManager');
 jest.mock('../../utils/rateLimiter', () => ({
   checkRateLimit: jest.fn(() => true),
 }));
+jest.mock('../../utils/socketValidation', () => ({
+  validatePayload: jest.fn((schema, data) => ({
+    success: true,
+    data,
+  })),
+  gameCodeSchema: expect.anything(),
+  usernameSchema: expect.anything(),
+}));
+jest.mock('../../utils/logger', () => ({
+  info: jest.fn(),
+  error: jest.fn(),
+}));
 
 describe('ClassroomGameHandler', () => {
   let mockSocket: any;
@@ -26,6 +38,11 @@ describe('ClassroomGameHandler', () => {
       on: jest.fn(),
       emit: jest.fn(),
       join: jest.fn(),
+      handshake: {
+        auth: {
+          authUserId: null,
+        },
+      },
     };
 
     mockIo = {

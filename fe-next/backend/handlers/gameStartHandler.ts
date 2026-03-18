@@ -242,16 +242,12 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
       : undefined;
 
-    // SECURITY: Always regenerate grid server-side for competitive modes
+    // SECURITY: Regenerate grid server-side for competitive modes only
     // to prevent the host from crafting favorable boards
     if (resolvedMode === 'blast') {
       letterGrid = generateRandomTable(6, 6, gameLang);
-    } else {
-      // Classic and Word Hunt: regenerate server-side using same dimensions as client grid
-      const rows = letterGrid.length || 5;
-      const cols = letterGrid[0]?.length || 5;
-      letterGrid = generateRandomTable(rows, cols, gameLang);
     }
+    // Classic and Word Hunt modes: use client-provided grid (not competitive)
 
     updateGame(gameCode, {
       letterGrid,

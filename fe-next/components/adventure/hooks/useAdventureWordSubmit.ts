@@ -8,10 +8,9 @@
 
 import { useCallback, useState, useRef, useEffect } from 'react';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
-import type { BossTauntEvent } from '@/types/boss';
+import type { BossTauntEvent, BossConfig, BossMechanicResult } from '@/types/boss';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
 import type { GridTileState } from '@/types/adventure';
-import type { BossConfig, BossMechanicResult } from '@/types/boss';
 import { evaluateWorldMechanic } from '@/lib/adventure/worldMechanics';
 import { useHaptics } from '@/hooks/useHaptics';
 
