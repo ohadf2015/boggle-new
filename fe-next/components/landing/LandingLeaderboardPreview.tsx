@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Trophy, ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -88,7 +89,13 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
         </div>
         <div className="flex justify-center gap-3">
           {displayPlayers.map((player, i) => (
-            <div key={player.username} className="flex flex-col items-center gap-1 min-w-0">
+            <motion.div
+              key={player.username}
+              initial={{ opacity: 0, y: 12, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.1 * i, type: 'spring', stiffness: 350, damping: 22 }}
+              className="flex flex-col items-center gap-1 min-w-0"
+            >
               <span className={cn(
                 'font-black text-xs w-6 h-6 rounded-full flex items-center justify-center border-2 border-neo-black',
                 RANK_BG[i], RANK_TEXT[i]
@@ -122,7 +129,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               <span className="font-black text-neo-lime text-xs">
                 {player.totalScore.toLocaleString()}
               </span>
-            </div>
+            </motion.div>
           ))}
         </div>
         <Link
@@ -147,8 +154,11 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
 
       <div className="space-y-1">
         {displayPlayers.map((player, i) => (
-          <div
+          <motion.div
             key={player.username}
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.06 * i, type: 'spring', stiffness: 350, damping: 24 }}
             className={cn(
               'flex items-center gap-3 py-1.5 px-2 rounded-neo',
               i < 3 && 'bg-neo-white/5'
@@ -187,7 +197,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             <span className="font-black text-neo-lime text-sm">
               {player.totalScore.toLocaleString()}
             </span>
-          </div>
+          </motion.div>
         ))}
       </div>
 

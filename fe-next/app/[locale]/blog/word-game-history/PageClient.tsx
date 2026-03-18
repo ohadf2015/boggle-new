@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -120,6 +121,17 @@ export default function WordGameHistoryPageClient(): React.ReactElement {
               <Clock className="w-4 h-4" />
               {content.readTime}
             </span>
+          </div>
+
+          {/* Hero Image */}
+          <div className="relative w-full h-64 md:h-80 rounded-neo border-3 border-neo-black overflow-hidden shadow-hard mb-6">
+            <Image
+              src="/images/blog/word-game-history.jpg"
+              alt="Historical word game tiles and vintage board games"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
         </header>
 

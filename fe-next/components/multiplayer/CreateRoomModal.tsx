@@ -119,7 +119,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const isNameValid = usernameValidation.isValid && username.length > 0;
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={!isAvatarBuilderOpen}>
-      <DialogContent noDescription className="max-w-[420px] max-h-[90dvh] overflow-y-auto !p-0 !gap-0 !border-4">
+      <DialogContent noDescription className="!max-w-[420px] sm:!max-w-[420px] lg:!max-w-[420px] xl:!max-w-[420px] max-h-[90dvh] overflow-y-auto !p-0 !gap-0 !border-4">
 
         {/* ── Battle Arena Banner ── */}
         <AdaptiveMotion.div
@@ -271,7 +271,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               onChange={(e) => setRoomName(e.target.value)}
               maxLength={MAX_ROOM_LENGTH}
               placeholder={generateRoomName(username || 'Your')}
-              className="w-full h-11 px-3 bg-neo-navy-light/30 border-2 border-neo-white/10 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white/15 outline-none focus:border-neo-cyan/50 transition-colors"
+              className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white/25 outline-none focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"
             />
           </AdaptiveMotion.div>
 

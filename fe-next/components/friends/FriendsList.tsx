@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import {
   Users,
   UserPlus,
@@ -300,14 +301,20 @@ const FriendsList: React.FC<FriendsListProps> = ({
             )}
             <div className="space-y-2">
               {friends.length > 0 ? (
-                friends.map(friend => (
-                  <FriendRow
+                friends.map((friend, i) => (
+                  <motion.div
                     key={friend.id}
-                    friend={friend}
-                    isDark={isDark}
-                    onChallengeClick={() => setChallengeFriend(friend)}
-                    onClick={() => setSelectedFriend(friend)}
-                  />
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 * Math.min(i, 10), type: 'spring', stiffness: 350, damping: 24 }}
+                  >
+                    <FriendRow
+                      friend={friend}
+                      isDark={isDark}
+                      onChallengeClick={() => setChallengeFriend(friend)}
+                      onClick={() => setSelectedFriend(friend)}
+                    />
+                  </motion.div>
                 ))
               ) : (
                 <EnhancedEmptyState
@@ -333,16 +340,22 @@ const FriendsList: React.FC<FriendsListProps> = ({
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {pendingRequests.map(request => (
-                    <RequestRow
+                  {pendingRequests.map((request, i) => (
+                    <motion.div
                       key={request.id}
-                      request={request}
-                      isDark={isDark}
-                      isLoading={actionLoading === request.id}
-                      onAccept={() => handleAccept(request.id)}
-                      onDecline={() => handleDecline(request.id)}
-                      language={language}
-                    />
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 * i, type: 'spring', stiffness: 350, damping: 24 }}
+                    >
+                      <RequestRow
+                        request={request}
+                        isDark={isDark}
+                        isLoading={actionLoading === request.id}
+                        onAccept={() => handleAccept(request.id)}
+                        onDecline={() => handleDecline(request.id)}
+                        language={language}
+                      />
+                    </motion.div>
                   ))}
                 </div>
               </div>

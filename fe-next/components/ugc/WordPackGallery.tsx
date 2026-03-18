@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Plus, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import WordPackCard from './WordPackCard';
@@ -188,14 +189,20 @@ export default function WordPackGallery() {
       {/* Grid */}
       {state.packs.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {state.packs.map((pack) => (
-            <WordPackCard
+          {state.packs.map((pack, i) => (
+            <motion.div
               key={pack.id}
-              pack={pack}
-              isUpvoted={upvotedIds.has(pack.id)}
-              onPlay={handlePlay}
-              onUpvote={handleUpvote}
-            />
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.04 * Math.min(i, 12), type: 'spring', stiffness: 350, damping: 24 }}
+            >
+              <WordPackCard
+                pack={pack}
+                isUpvoted={upvotedIds.has(pack.id)}
+                onPlay={handlePlay}
+                onUpvote={handleUpvote}
+              />
+            </motion.div>
           ))}
         </div>
       ) : !state.isLoading ? (

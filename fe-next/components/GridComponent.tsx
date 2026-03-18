@@ -16,6 +16,7 @@ import {
 import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import GridCellEffects from './grid/GridCellEffects';
 import EarthquakeEffects from './grid/EarthquakeEffects';
+import { getSelectionEscalation, getEscalationBackground } from './grid/selectionEscalation';
 import InputModeIndicator, { type InputMode } from './grid/InputModeIndicator';
 import DoubleClickIndicator from './grid/DoubleClickIndicator';
 import DragReleaseHint from './grid/DragReleaseHint';
@@ -159,6 +160,12 @@ const GridComponent = memo<GridComponentProps>(({
   const fadingCellsSet = useMemo(
     () => new Set(fadingCells.map(c => `${c.row}-${c.col}`)),
     [fadingCells],
+  );
+
+  // Map cell key → selection order index (0-based) for escalation effects
+  const selectionOrderMap = useMemo(
+    () => new Map(selectedCells.map((c, idx) => [`${c.row}-${c.col}`, idx])),
+    [selectedCells],
   );
 
   const adjacentHintCells = useMemo(() => {
@@ -362,6 +369,10 @@ const GridComponent = memo<GridComponentProps>(({
                 selectedCells[selectedCells.length - 1]?.col === j;
 
               const shakeOffset = getShakeOffset(cellKey);
+              const selectionIdx = selectionOrderMap.get(cellKey) ?? 0;
+              const escalation = isSelected
+                ? getSelectionEscalation(selectionIdx, selectedCells.length, comboLevel)
+                : null;
 
               return (
                 <motion.div
@@ -400,10 +411,10 @@ const GridComponent = memo<GridComponentProps>(({
                         x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, rotateX: 0,
                       }
                     ) : {
-                      scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
+                      scale: isSelected ? (escalation?.scale ?? 1.05) : (isFading ? 1.02 : 1),
                       opacity: 1,
                       rotate: 0,
-                      y: isSelected ? -2 : 0,
+                      y: isSelected ? (escalation?.liftY ?? -2) : 0,
                       x: 0,
                       rotateX: 0,
                     }
@@ -464,13 +475,8 @@ const GridComponent = memo<GridComponentProps>(({
                     borderRadius: '6px',
                     fontSize: 'var(--cell-font-size)',
                     ...(isSelected && {
-                      boxShadow: comboColors.isRainbow
-                        ? '0 0 12px rgba(255, 51, 102, 0.4), 0 0 20px rgba(0, 255, 255, 0.2)'
-                        : comboLevel >= 5
-                          ? '0 0 10px rgba(255, 107, 53, 0.4)'
-                          : comboLevel >= 3
-                            ? '0 0 8px rgba(255, 150, 50, 0.3)'
-                            : '0 0 6px rgba(255, 200, 100, 0.3)',
+                      boxShadow: escalation?.glow ?? '0 0 6px rgba(255, 200, 100, 0.3)',
+                      borderColor: escalation?.borderColor,
                     }),
                     ...(isSelected && comboColors.isRainbow ? {
                       background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
@@ -484,6 +490,8 @@ const GridComponent = memo<GridComponentProps>(({
                       background: 'linear-gradient(135deg, #F97316, #EF4444)',
                     } : isSelected && comboColors.flicker ? {
                       animation: 'flicker 0.1s infinite alternate'
+                    } : isSelected && escalation && escalation.tier >= 1 ? {
+                      ...getEscalationBackground(selectionIdx, selectedCells.length, comboLevel),
                     } : {}),
                     // Keyboard stagger: 50ms delay per cell index
                     ...(isHighlighted && isTypingMode && highlightedOrder !== undefined ? {
@@ -499,6 +507,8 @@ const GridComponent = memo<GridComponentProps>(({
                     comboColors={comboColors}
                     effectiveRenderMode={effectiveRenderMode}
                     reduceMotion={reduceMotion}
+                    selectionIndex={selectionIdx}
+                    totalSelected={selectedCells.length}
                   />
 
                   <span

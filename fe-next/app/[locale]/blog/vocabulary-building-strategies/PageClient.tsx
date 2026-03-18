@@ -127,7 +127,7 @@ export default function VocabularyPageClient(): React.ReactElement {
           {/* Hero Image */}
           <div className="relative w-full h-64 md:h-80 rounded-neo border-3 border-neo-black overflow-hidden shadow-hard mb-6">
             <Image
-              src="/images/blog/brain-health.jpg"
+              src="/images/blog/vocabulary-building.jpg"
               alt="Notebook with vocabulary words and a word game board"
               fill
               className="object-cover"

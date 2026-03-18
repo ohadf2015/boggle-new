@@ -127,7 +127,7 @@ export default function MultiplayerSocialPageClient(): React.ReactElement {
           {/* Hero Image */}
           <div className="relative w-full h-64 md:h-80 rounded-neo border-3 border-neo-black overflow-hidden shadow-hard mb-6">
             <Image
-              src="/images/blog/brain-health.jpg"
+              src="/images/blog/multiplayer-social.jpg"
               alt="Friends playing word games together around a table"
               fill
               className="object-cover"

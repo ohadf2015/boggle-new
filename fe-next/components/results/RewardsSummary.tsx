@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import WinStreakDisplay from './WinStreakDisplay';
 import { fireConfetti } from '@/utils/confettiUtils';
 import useReducedMotion from '@/hooks/useReducedMotion';
+import { ScoreCountUp } from '@/components/results/shared';
 import type { CoinReward } from './CoinRewardDisplay';
 
 export interface RewardsSummaryProps {
@@ -171,10 +172,10 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                   </div>
                   <div>
                     <div className={cn(
-                      'font-black text-xl',
+                      'font-black text-xl tabular-nums',
                       isAuthenticated ? 'text-neo-lime' : 'text-amber-400/70'
                     )}>
-                      +{coinReward.awarded}
+                      +<ScoreCountUp to={coinReward.awarded} duration={1200} delay={reducedMotion ? 0 : 400} />
                     </div>
                     <div className="text-xs text-white/60 font-medium">
                       {isAuthenticated
@@ -242,8 +243,8 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                     <Trophy className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <div className="font-black text-xl text-neo-pink">
-                      {achievementsUnlocked}
+                    <div className="font-black text-xl text-neo-pink tabular-nums">
+                      <ScoreCountUp to={achievementsUnlocked} duration={800} delay={reducedMotion ? 0 : 600} />
                     </div>
                     <div className="text-xs text-white/60 font-medium">
                       {achievementsUnlocked === 1

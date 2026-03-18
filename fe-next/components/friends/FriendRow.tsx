@@ -100,7 +100,8 @@ export const FriendRow: React.FC<FriendRowProps> = ({
 
   return (
     <motion.div
-      whileHover={{ x: compact ? 0 : 2 }}
+      whileHover={{ x: compact ? 0 : 2, y: compact ? 0 : -1 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={cn(
         'flex items-center gap-3 p-2 rounded-neo border-2 cursor-pointer transition-colors',

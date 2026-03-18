@@ -35,7 +35,7 @@ const WordPackCard = memo(function WordPackCard({
   const { t } = useLanguage();
 
   return (
-    <article className="flex flex-col bg-neo-navy border-neo border-black rounded-neo shadow-hard overflow-hidden">
+    <article className="flex flex-col bg-neo-navy border-neo border-black rounded-neo shadow-hard overflow-hidden transition-all duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-[1px] active:shadow-hard-pressed">
       {/* Creator row */}
       <div className="flex items-center gap-2 px-4 pt-3">
         <Avatar

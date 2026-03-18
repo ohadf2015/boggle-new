@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -74,25 +75,31 @@ export function OAuthButtonGroup({
 
   return (
     <div className={cn('space-y-3', className)}>
-      {providers.map((provider) => (
-        <Button
+      {providers.map((provider, i) => (
+        <motion.div
           key={provider.id}
-          onClick={() => onSignIn(provider.id)}
-          disabled={isAnyLoading}
-          className={cn(
-            'w-full h-12 text-base font-medium rounded-xl transition-all',
-            provider.color
-          )}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 * i, type: 'spring', stiffness: 400, damping: 24 }}
         >
-          {loadingProvider === provider.id ? (
-            <Loader size="sm" />
-          ) : (
-            <provider.icon className="w-5 h-5" />
-          )}
-          <span className="ms-2">
-            {t('auth.signInWith', { provider: provider.label })}
-          </span>
-        </Button>
+          <Button
+            onClick={() => onSignIn(provider.id)}
+            disabled={isAnyLoading}
+            className={cn(
+              'w-full h-12 text-base font-medium rounded-xl transition-all',
+              provider.color
+            )}
+          >
+            {loadingProvider === provider.id ? (
+              <Loader size="sm" />
+            ) : (
+              <provider.icon className="w-5 h-5" />
+            )}
+            <span className="ms-2">
+              {t('auth.signInWith', { provider: provider.label })}
+            </span>
+          </Button>
+        </motion.div>
       ))}
     </div>
   );

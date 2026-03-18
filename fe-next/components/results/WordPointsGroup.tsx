@@ -120,8 +120,12 @@ const PointGroupRow = memo<{
   getPlayerCountForWord?: (word: string) => number;
   mode: 'chip' | 'simple';
   animate: boolean;
-}>(({ points, words, t, getPlayerCountForWord, mode, animate }) => (
-  <div
+  groupIndex?: number;
+}>(({ points, words, t, getPlayerCountForWord, mode, animate, groupIndex = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -12 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ delay: 0.05 * groupIndex, type: 'spring', stiffness: 300, damping: 26 }}
     className="rounded-neo p-1.5 border-l-4 border-neo-black bg-white/50 text-neo-black dark:bg-slate-700/50"
     style={{ borderLeftColor: getPointColor(points) }}
   >
@@ -129,11 +133,17 @@ const PointGroupRow = memo<{
     <div className="flex flex-wrap gap-1">
       {words.map((wordObj, i) => (
         mode === 'chip' ? (
-          <WordChip
+          <motion.div
             key={`${points}-${i}`}
-            wordObj={wordObj}
-            playerCount={getPlayerCountForWord?.(wordObj.word) ?? 0}
-          />
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.02 * Math.min(i, 15) + 0.05 * groupIndex, type: 'spring', stiffness: 400, damping: 22 }}
+          >
+            <WordChip
+              wordObj={wordObj}
+              playerCount={getPlayerCountForWord?.(wordObj.word) ?? 0}
+            />
+          </motion.div>
         ) : (
           <SimpleWordSpan
             key={`${points}-${i}`}
@@ -144,7 +154,7 @@ const PointGroupRow = memo<{
         )
       ))}
     </div>
-  </div>
+  </motion.div>
 ));
 
 PointGroupRow.displayName = 'PointGroupRow';
@@ -203,7 +213,7 @@ export const WordPointsGroup = memo<WordPointsGroupProps>(({
 
       {/* Point groups */}
       <div className="space-y-2">
-        {sortedPointGroups.map(points => {
+        {sortedPointGroups.map((points, groupIdx) => {
           const wordsForPoints = wordsByPoints[points] ?? [];
           return (
             <PointGroupRow
@@ -214,6 +224,7 @@ export const WordPointsGroup = memo<WordPointsGroupProps>(({
               getPlayerCountForWord={getPlayerCountForWord}
               mode={mode}
               animate={animate}
+              groupIndex={groupIdx}
             />
           );
         })}
@@ -257,11 +268,17 @@ export const SharedWordsSection = memo<SharedWordsSectionProps>(({
       </p>
       <div className="flex flex-wrap gap-1">
         {duplicateWords.map((wordObj, i) => (
-          <WordChip
+          <motion.div
             key={`duplicate-${i}`}
-            wordObj={wordObj}
-            playerCount={getPlayerCountForWord?.(wordObj.word) ?? 0}
-          />
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.03 * Math.min(i, 12), type: 'spring', stiffness: 400, damping: 22 }}
+          >
+            <WordChip
+              wordObj={wordObj}
+              playerCount={getPlayerCountForWord?.(wordObj.word) ?? 0}
+            />
+          </motion.div>
         ))}
       </div>
     </div>

@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAchievementPin, mergePinStatus } from '../../hooks/useAchievementPin';
@@ -175,26 +176,32 @@ export default function EducationBadgeGrid({
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pinnedBadges.map(achievement => {
+            {pinnedBadges.map((achievement, i) => {
               return (
-                <AchievementProgressCard
-                  key={achievement.achievementKey}
-                  achievement={{
-                    key: achievement.achievementKey,
-                    category: achievement.category,
-                    icon: achievement.icon,
-                    isSecret: achievement.isSecret,
-                    currentTier: achievement.currentTier,
-                    progressValue: achievement.progressValue,
-                    nextThreshold: achievement.nextThreshold,
-                    isMaxTier: achievement.currentTier === 'platinum',
-                    percentComplete: achievement.percentComplete,
-                  }}
-                  isPinned={true}
-                  onTogglePin={handleTogglePin}
-                  canPin={true}
-                  isLoading={isPinLoading}
-                />
+                <motion.div
+                  key={`featured-${achievement.achievementKey}`}
+                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 0.08 * i, type: 'spring', stiffness: 350, damping: 22 }}
+                >
+                  <AchievementProgressCard
+                    achievement={{
+                      key: achievement.achievementKey,
+                      category: achievement.category,
+                      icon: achievement.icon,
+                      isSecret: achievement.isSecret,
+                      currentTier: achievement.currentTier,
+                      progressValue: achievement.progressValue,
+                      nextThreshold: achievement.nextThreshold,
+                      isMaxTier: achievement.currentTier === 'platinum',
+                      percentComplete: achievement.percentComplete,
+                    }}
+                    isPinned={true}
+                    onTogglePin={handleTogglePin}
+                    canPin={true}
+                    isLoading={isPinLoading}
+                  />
+                </motion.div>
               );
             })}
           </div>
@@ -240,32 +247,41 @@ export default function EducationBadgeGrid({
               data-testid={`category-${category}`}
               data-category={category}
               data-expanded={!isCollapsed}
-              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-300 ${
-                isCollapsed ? 'hidden' : ''
-              }`}
+              className={cn(
+                'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-300 origin-top',
+                isCollapsed
+                  ? 'grid-rows-[0fr] opacity-0 scale-y-0 h-0 overflow-hidden'
+                  : 'grid-rows-[1fr] opacity-100 scale-y-100'
+              )}
             >
-              {categoryAchievements.map(achievement => {
+              {categoryAchievements.map((achievement, achIdx) => {
                 const canPinAchievement = achievement.isPinned || canPinMore;
 
                 return (
-                  <AchievementProgressCard
+                  <motion.div
                     key={achievement.achievementKey}
-                    achievement={{
-                      key: achievement.achievementKey,
-                      category: achievement.category,
-                      icon: achievement.icon,
-                      isSecret: achievement.isSecret,
-                      currentTier: achievement.currentTier,
-                      progressValue: achievement.progressValue,
-                      nextThreshold: achievement.nextThreshold,
-                      isMaxTier: achievement.currentTier === 'platinum',
-                      percentComplete: achievement.percentComplete,
-                    }}
-                    isPinned={achievement.isPinned}
-                    onTogglePin={handleTogglePin}
-                    canPin={canPinAchievement}
-                    isLoading={isPinLoading}
-                  />
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.03 * Math.min(achIdx, 12), type: 'spring', stiffness: 400, damping: 24 }}
+                  >
+                    <AchievementProgressCard
+                      achievement={{
+                        key: achievement.achievementKey,
+                        category: achievement.category,
+                        icon: achievement.icon,
+                        isSecret: achievement.isSecret,
+                        currentTier: achievement.currentTier,
+                        progressValue: achievement.progressValue,
+                        nextThreshold: achievement.nextThreshold,
+                        isMaxTier: achievement.currentTier === 'platinum',
+                        percentComplete: achievement.percentComplete,
+                      }}
+                      isPinned={achievement.isPinned}
+                      onTogglePin={handleTogglePin}
+                      canPin={canPinAchievement}
+                      isLoading={isPinLoading}
+                    />
+                  </motion.div>
                 );
               })}
             </div>

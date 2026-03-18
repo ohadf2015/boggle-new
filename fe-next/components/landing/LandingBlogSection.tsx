@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -94,11 +95,17 @@ export function LandingBlogSection() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {recentPosts.map((post) => {
+        {recentPosts.map((post, i) => {
           const c = post.content[lang] || post.content.en;
           return (
-            <Link
+            <motion.div
               key={post.slug}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ delay: 0.1 * i, type: 'spring', stiffness: 300, damping: 24 }}
+            >
+            <Link
               href={`/${locale}/blog/${post.slug}`}
               className={cn(
                 'group block rounded-neo border-3 border-neo-black overflow-hidden',
@@ -140,6 +147,7 @@ export function LandingBlogSection() {
                 </div>
               </div>
             </Link>
+            </motion.div>
           );
         })}
       </div>

@@ -120,8 +120,8 @@ export interface EnhancedButtonProps
   rightIcon?: React.ReactNode;
   /** Enable haptic feedback on tap (mobile) */
   haptic?: boolean;
-  /** Animation variant */
-  animation?: 'none' | 'pop' | 'wobble' | 'shake';
+  /** Animation variant — 'jelly' is the default for a satisfying squish feel */
+  animation?: 'none' | 'jelly' | 'pop' | 'wobble' | 'shake';
 }
 
 const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
@@ -138,7 +138,7 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
       leftIcon,
       rightIcon,
       haptic = false,
-      animation = 'none',
+      animation = 'jelly',
       children,
       onClick,
       ...props
@@ -162,6 +162,12 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
     // Get animation props based on variant
     const getAnimationProps = () => {
       switch (animation) {
+        case 'jelly':
+          // Jelly squish: scaleX widens, scaleY compresses — satisfying elastic feel
+          // Spring config inspired by animate-ai wobble-jelly (stiffness 200, damping 8)
+          return {
+            whileTap: { scaleX: 1.04, scaleY: 0.94 },
+          };
         case 'pop':
           return {
             whileHover: { scale: 1.05 },
@@ -199,7 +205,10 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
     return (
       <motion.div
         {...getAnimationProps()}
-        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        transition={animation === 'jelly'
+          ? { type: 'spring', stiffness: 300, damping: 10 }
+          : { type: 'spring', stiffness: 400, damping: 17 }
+        }
       >
         <Comp
           className={cn(

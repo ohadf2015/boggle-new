@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3779,
+    "totalKeysInCode": 3781,
     "keyCountByLanguage": {
-      "en": 6433,
-      "he": 6462,
-      "sv": 6495,
-      "ja": 6482,
-      "es": 6493
+      "en": 6436,
+      "he": 6465,
+      "sv": 6498,
+      "ja": 6485,
+      "es": 6496
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -35,7 +35,7 @@
       {
         "pattern": "xp.prestigeModal.${key}",
         "file": "components/engagement/PrestigeModal.tsx",
-        "line": 56,
+        "line": 54,
         "context": "const pm = (key: string) => t(`xp.prestigeModal.${key}`);",
         "type": "template_literal"
       },
