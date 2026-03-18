@@ -1,40 +1,11 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Play, Coins, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
-
-const AD_TIMESTAMPS_KEY = 'lexiclash_ad_timestamps';
-const MAX_ADS_PER_HOUR = 3;
-const ONE_HOUR = 60 * 60 * 1000;
-
-function isFrequencyCapped(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    const stored = localStorage.getItem(AD_TIMESTAMPS_KEY);
-    if (!stored) return false;
-    const timestamps: number[] = JSON.parse(stored);
-    const cutoff = Date.now() - ONE_HOUR;
-    const recentCount = timestamps.filter(t => t > cutoff).length;
-    return recentCount >= MAX_ADS_PER_HOUR;
-  } catch {
-    return false;
-  }
-}
-
-function recordAdView(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const stored = localStorage.getItem(AD_TIMESTAMPS_KEY);
-    const timestamps: number[] = stored ? JSON.parse(stored) : [];
-    const cutoff = Date.now() - ONE_HOUR;
-    const updated = [...timestamps.filter(t => t > cutoff), Date.now()];
-    localStorage.setItem(AD_TIMESTAMPS_KEY, JSON.stringify(updated));
-  } catch { /* silent */ }
-}
 
 interface RewardedAdGoldButtonProps {
   goldAmount: number;
@@ -50,18 +21,14 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { t } = useLanguage();
-  const capped = useMemo(() => isFrequencyCapped(), []);
 
-  const { showAd, isAdAvailable, status } = useRewardedAd({
+  const { showAd, status, isPlaceholderCooldown } = useRewardedAd({
     onRewardEarned: (amount) => {
-      recordAdView();
       onRewardEarned?.(amount);
     },
   });
 
-  // Don't render if no real ad platform is available (no fake gold in production)
-  if (!isAdAvailable) return null;
-
+  const capped = isPlaceholderCooldown;
   const isDisabled = status === 'loading' || status === 'showing' || capped;
 
   const label = status === 'showing'

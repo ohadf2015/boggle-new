@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, memo } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Crown, Medal, TrendingUp, Zap } from 'lucide-react';
+import { Crown, Medal, TrendingUp, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
@@ -25,114 +25,38 @@ interface PlacementHeroProps {
     avatarImage?: string;
     customAvatar?: CustomAvatarConfig | null;
   };
-  /** Gap to winner in points (0 if winner) */
   gapToWinner?: number;
+  wordHuntData?: {
+    targetWord: string;
+    foundTarget: boolean;
+    survivalTime: number;
+  };
 }
 
 // ============================================================
-// RANK THEME CONFIG
+// RANK THEME CONFIG — Fight Card Edition
 // ============================================================
 
 interface RankTheme {
-  bg: string;
-  accent: string;
-  textPrimary: string;
-  textSecondary: string;
-  rankBg: string;
-  rankText: string;
-  scoreBg: string;
-  glowColor: string;
-  textShadow: string;
-  icon: typeof Crown;
+  accentColor: string;
+  rankBorderColor: string;
   message: string;
-  mascotGif: string;
+  icon: typeof Crown;
 }
 
 const RANK_THEMES: Record<number, RankTheme> = {
-  1: {
-    bg: 'from-amber-400 via-yellow-300 to-amber-500',
-    accent: 'border-amber-600',
-    textPrimary: 'text-neo-black',
-    textSecondary: 'text-neo-black/70',
-    rankBg: 'bg-neo-black',
-    rankText: 'text-amber-400',
-    scoreBg: 'bg-neo-cream',
-    glowColor: 'rgba(255,225,53,0.4)',
-    textShadow: '2px 2px 0px rgba(0,0,0,0.15)',
-    icon: Crown,
-    message: 'results.youWon',
-    mascotGif: '/mascot/trophy-nobg.gif',
-  },
-  2: {
-    bg: 'from-slate-400 via-slate-300 to-slate-500',
-    accent: 'border-slate-600',
-    textPrimary: 'text-neo-black',
-    textSecondary: 'text-neo-black/60',
-    rankBg: 'bg-neo-black',
-    rankText: 'text-slate-300',
-    scoreBg: 'bg-neo-cream',
-    glowColor: 'rgba(148,163,184,0.4)',
-    textShadow: '2px 2px 0px rgba(0,0,0,0.15)',
-    icon: Medal,
-    message: 'results.secondPlace',
-    mascotGif: '/mascot/flexing-nobg.gif',
-  },
-  3: {
-    bg: 'from-amber-600 via-orange-400 to-amber-600',
-    accent: 'border-amber-700',
-    textPrimary: 'text-neo-black',
-    textSecondary: 'text-neo-black/60',
-    rankBg: 'bg-neo-black',
-    rankText: 'text-amber-500',
-    scoreBg: 'bg-neo-cream',
-    glowColor: 'rgba(245,158,11,0.4)',
-    textShadow: '2px 2px 0px rgba(0,0,0,0.15)',
-    icon: Medal,
-    message: 'results.thirdPlace',
-    mascotGif: '/mascot/encouraging-nobg.gif',
-  },
-  0: {
-    bg: 'from-neo-pink via-purple-500 to-neo-pink',
-    accent: 'border-purple-700',
-    textPrimary: 'text-white',
-    textSecondary: 'text-white/70',
-    rankBg: 'bg-white/20',
-    rankText: 'text-white',
-    scoreBg: 'bg-neo-cream',
-    glowColor: 'rgba(255,20,147,0.3)',
-    textShadow: '2px 2px 0px rgba(0,0,0,0.15)',
-    icon: TrendingUp,
-    message: 'results.betterLuckNextTime',
-    mascotGif: '/mascot/oops-nobg.gif',
-  },
+  1: { accentColor: 'var(--neo-lime)', rankBorderColor: 'border-neo-lime', message: 'results.youWon', icon: Crown },
+  2: { accentColor: 'var(--neo-cyan)', rankBorderColor: 'border-neo-cyan', message: 'results.secondPlace', icon: Medal },
+  3: { accentColor: 'var(--neo-orange)', rankBorderColor: 'border-neo-orange', message: 'results.thirdPlace', icon: Medal },
+  0: { accentColor: 'var(--neo-pink)', rankBorderColor: 'border-neo-pink', message: 'results.betterLuckNextTime', icon: TrendingUp },
 };
-
-// ============================================================
-// MASCOT GIF
-// ============================================================
-
-const MascotGif: React.FC<{ src: string; alt: string; size: number; className?: string }> = ({
-  src, alt, size, className = '',
-}) => (
-  /* eslint-disable-next-line @next/next/no-img-element */
-  <img
-    src={src}
-    alt={alt}
-    width={size}
-    height={size}
-    className={`object-contain drop-shadow-lg ${className}`}
-    loading="eager"
-  />
-);
 
 // ============================================================
 // ANIMATED SCORE COUNTER
 // ============================================================
 
 const AnimatedScore: React.FC<{ target: number; className?: string; delay?: number }> = ({
-  target,
-  className,
-  delay = 0.6,
+  target, className, delay = 0.6,
 }) => {
   const motionVal = useMotionValue(0);
   const rounded = useTransform(motionVal, (v) => Math.round(v));
@@ -140,60 +64,14 @@ const AnimatedScore: React.FC<{ target: number; className?: string; delay?: numb
 
   useEffect(() => {
     const controls = animate(motionVal, target, {
-      type: 'spring',
-      stiffness: 60,
-      damping: 18,
-      mass: 0.8,
-      delay,
+      type: 'spring', stiffness: 60, damping: 18, mass: 0.8, delay,
     });
     const unsub = rounded.on('change', (v) => setDisplay(v));
-    return () => {
-      controls.stop();
-      unsub();
-    };
+    return () => { controls.stop(); unsub(); };
   }, [target, motionVal, rounded, delay]);
 
   return <span className={className}>{display.toLocaleString()}</span>;
 };
-
-// ============================================================
-// FLOATING SPARKLES (winner only)
-// ============================================================
-
-const SPARKLES = [
-  { x: '12%', y: '18%', size: 8, delay: 0 },
-  { x: '85%', y: '25%', size: 6, delay: 0.4 },
-  { x: '22%', y: '72%', size: 7, delay: 0.8 },
-  { x: '78%', y: '68%', size: 5, delay: 1.2 },
-  { x: '50%', y: '12%', size: 9, delay: 0.6 },
-  { x: '92%', y: '50%', size: 6, delay: 1.0 },
-];
-
-const FloatingSparkles: React.FC = () => (
-  <>
-    {SPARKLES.map((s, i) => (
-      <motion.div
-        key={i}
-        className="absolute pointer-events-none text-neo-cream/60"
-        style={{ insetInlineStart: s.x, top: s.y, fontSize: s.size }}
-        animate={{
-          y: [0, -8, 0],
-          opacity: [0.3, 0.8, 0.3],
-          scale: [0.8, 1.3, 0.8],
-          rotate: [0, 180, 360],
-        }}
-        transition={{
-          duration: 2.5,
-          delay: s.delay,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      >
-        ✦
-      </motion.div>
-    ))}
-  </>
-);
 
 // ============================================================
 // ORDINAL SUFFIX
@@ -206,23 +84,16 @@ function getOrdinalSuffix(n: number): string {
 }
 
 // ============================================================
-// MAIN COMPONENT
+// MAIN COMPONENT — Fight Card Hero
 // ============================================================
 
 const PlacementHero = memo<PlacementHeroProps>(({
-  rank,
-  score,
-  totalPlayers,
-  username,
-  avatar,
-  gapToWinner = 0,
+  rank, score, avatar, gapToWinner = 0, wordHuntData,
 }) => {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
   const theme = RANK_THEMES[rank <= 3 ? rank : 0];
-  const RankIcon = theme.icon;
 
-  // Fire confetti for top 3
   useEffect(() => {
     if (rank <= 3 && !reducedMotion) {
       const timer = setTimeout(() => fireRankConfetti(rank, 'light'), 500);
@@ -231,369 +102,174 @@ const PlacementHero = memo<PlacementHeroProps>(({
     return undefined;
   }, [rank, reducedMotion]);
 
-  const containerVariants = {
-    hidden: { opacity: 0, scale: 0.85, y: 20 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 180,
-        damping: 20,
-        staggerChildren: 0.12,
-      },
-    },
-  };
-
-  const childVariants = {
-    hidden: { opacity: 0, y: 28, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { type: 'spring' as const, stiffness: 300, damping: 22 },
-    },
-  };
-
-  // Rank number slam-in: overshoots then settles
-  const rankSlamVariants = {
-    hidden: { opacity: 0, scale: 3, rotate: -15 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      rotate: 0,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 350,
-        damping: 15,
-        mass: 0.6,
-        delay: 0.3,
-      },
-    },
-  };
-
-  // Mascot slides in from the side with bouncy overshoot
-  const mascotVariants = {
-    hidden: { opacity: 0, x: -40, rotate: -15, scale: 0.7 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      rotate: 0,
-      scale: 1,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 300,
-        damping: 14,
-        mass: 0.8,
-        delay: 0.4,
-      },
-    },
-  };
-
   return (
     <motion.div
-      variants={containerVariants}
-      initial={reducedMotion ? 'visible' : 'hidden'}
-      animate="visible"
-      className="w-full mb-4"
+      initial={reducedMotion ? undefined : { opacity: 0, scale: 0.92, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 180, damping: 20 }}
+      className="w-full"
     >
       <div
-        className={`
-          relative overflow-hidden
-          bg-gradient-to-br ${theme.bg}
-          border-4 border-neo-black rounded-neo-lg shadow-hard-xl
-          cursor-pointer transition-transform hover:scale-[1.005] active:scale-[0.995]
-        `}
+        className="relative overflow-hidden bg-slate-800/40 border-3 border-neo-cream shadow-hard-lg cursor-pointer"
         onClick={() => rank <= 3 && !reducedMotion && fireRankConfetti(rank)}
       >
         {/* Halftone texture */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.05] bg-[radial-gradient(circle,rgb(var(--neo-black))_1px,transparent_1px)] bg-[length:10px_10px]" />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:10px_10px]" />
 
-        {/* Floating sparkles for winner */}
-        {rank === 1 && !reducedMotion && <FloatingSparkles />}
-
-        {/* Shimmer sweep */}
+        {/* Shimmer sweep — slow cinematic swipe */}
         {!reducedMotion && (
           <motion.div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none z-[1]"
             style={{
-              background:
-                'linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.25) 50%, transparent 65%)',
+              background: 'linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.12) 50%, transparent 65%)',
               backgroundSize: '200% 100%',
             }}
             animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
-            transition={{ duration: 1.8, delay: 0.5, ease: 'easeInOut', repeat: Infinity, repeatDelay: 3 }}
+            transition={{ duration: 2.5, ease: 'linear', repeat: Infinity }}
           />
         )}
 
-        {/* Winner glow ring */}
-        {rank === 1 && !reducedMotion && (
-          <motion.div
-            className="absolute inset-0 rounded-neo-lg pointer-events-none"
-            animate={{
-              boxShadow: [
-                `inset 0 0 0 0 ${theme.glowColor}, 0 0 0 ${theme.glowColor}`,
-                `inset 0 0 30px ${theme.glowColor}, 0 0 50px ${theme.glowColor}`,
-                `inset 0 0 0 0 ${theme.glowColor}, 0 0 0 ${theme.glowColor}`,
-              ],
-            }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        )}
+        {/* Huge ghost rank number — responsive sizing: 120px on xs, 160px on sm+ */}
+        <motion.div
+          className="absolute -top-2 sm:-top-4 -start-1 sm:-start-2 pointer-events-none"
+          initial={reducedMotion ? { opacity: 0.1 } : { opacity: 0, scale: 3, rotate: -15 }}
+          animate={{ opacity: 0.1, scale: 1, rotate: -12 }}
+          transition={{ type: 'spring', stiffness: 350, damping: 15, delay: 0.3 }}
+        >
+          <span className="font-neo-display text-[120px] sm:text-[160px] leading-none text-white inline-block select-none">
+            {rank}
+          </span>
+        </motion.div>
 
-        {/* Main content */}
-        <div className="relative z-10 px-4 py-4 sm:px-6 sm:py-6 flex flex-col items-center text-center gap-2.5 sm:gap-3">
-          {/* Row 1: Mascot GIF + Rank badge — mascot is the star */}
-          <motion.div variants={childVariants} className="flex items-center gap-4 sm:gap-5">
-            {/* Mascot GIF — desktop (bigger!) */}
-            <motion.div
-              className="shrink-0 hidden xs:block sm:block"
-              variants={reducedMotion ? undefined : mascotVariants}
-            >
-              <motion.div
-                animate={!reducedMotion ? {
-                  y: [0, -10, 0],
-                  rotate: [0, 3, -3, 0],
-                  scale: [1, 1.05, 1],
-                } : undefined}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ filter: rank === 1 ? `drop-shadow(0 0 12px ${theme.glowColor})` : undefined }}
-              >
-                <MascotGif src={theme.mascotGif} alt={t(theme.message)} size={100} />
-              </motion.div>
-            </motion.div>
+        {/* Main content — responsive padding */}
+        <div className="relative z-10 px-4 py-5 sm:p-6 flex flex-col items-center gap-2.5 sm:gap-3">
 
+          {/* Word Hunt: Target word display */}
+          {wordHuntData && (
             <motion.div
-              className="relative"
-              variants={reducedMotion ? childVariants : rankSlamVariants}
+              initial={reducedMotion ? undefined : { opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-col items-center gap-2"
             >
-              {/* Rank circle */}
-              <motion.div
-                className={`
-                  ${theme.rankBg} border-4 border-neo-black rounded-full shadow-hard-lg
-                  flex items-center justify-center
-                  w-24 h-24 sm:w-28 sm:h-28
-                `}
-                animate={
-                  !reducedMotion && rank <= 3
-                    ? {
-                        rotate: rank === 1 ? [0, -3, 3, -2, 0] : undefined,
-                        scale: [1, 1.06, 1],
-                        boxShadow: [
-                          `0 0 0 0px ${theme.glowColor}`,
-                          `0 0 0 10px ${theme.glowColor}`,
-                          `0 0 0 0px ${theme.glowColor}`,
-                        ],
-                      }
-                    : undefined
-                }
-                transition={
-                  rank <= 3
-                    ? { duration: rank === 1 ? 2 : 2.5, delay: 1.2, repeat: Infinity, ease: 'easeInOut' }
-                    : undefined
-                }
-              >
-                <span
-                  className={`${theme.rankText} font-black text-6xl sm:text-7xl leading-none`}
-                  style={{ textShadow: theme.textShadow }}
-                >
-                  {rank}
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-neo-lime" />
+                <span className="text-[9px] sm:text-[10px] font-black uppercase text-neo-cream/50 tracking-[0.2em]">
+                  {t('results.targetWord')}
                 </span>
-              </motion.div>
-
-              {/* Rank icon floating top-right — bouncy entrance */}
-              <motion.div
-                className={`
-                  absolute -top-2 -end-2 sm:-top-3 sm:-end-3
-                  bg-neo-cream border-3 border-neo-black rounded-full shadow-hard-sm
-                  w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center
-                `}
-                initial={{ scale: 0, rotate: -20 }}
-                animate={{ scale: 1, rotate: [5, -3, 5] }}
-                transition={{ delay: 0.7, type: 'spring', stiffness: 400, damping: 12 }}
-              >
+              </div>
+              <span className="font-neo-display text-3xl xs:text-4xl sm:text-5xl text-white tracking-widest uppercase drop-shadow-[4px_4px_0px_#000] break-all text-center">
+                {wordHuntData.targetWord}
+              </span>
+              {wordHuntData.foundTarget && (
                 <motion.div
-                  animate={!reducedMotion ? { rotate: [0, 10, -10, 0] } : undefined}
-                  transition={{ duration: 2, delay: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  initial={reducedMotion ? undefined : { scale: 0, rotate: -10 }}
+                  animate={{ scale: 1, rotate: -1 }}
+                  transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 12 }}
+                  className="bg-neo-lime text-neo-black px-3 py-1 border-3 border-neo-black shadow-hard"
                 >
-                  <RankIcon className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
+                  <span className="font-neo-display text-xs sm:text-sm uppercase">
+                    {t('results.foundByYou')}
+                  </span>
                 </motion.div>
-              </motion.div>
+              )}
             </motion.div>
+          )}
 
-            {/* Mascot GIF — mobile (bigger than before: 56→72) */}
-            <motion.div
-              className="shrink-0 xs:hidden sm:hidden"
-              variants={reducedMotion ? undefined : mascotVariants}
-            >
-              <motion.div
-                animate={!reducedMotion ? {
-                  y: [0, -8, 0],
-                  scale: [1, 1.04, 1],
-                } : undefined}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ filter: rank === 1 ? `drop-shadow(0 0 8px ${theme.glowColor})` : undefined }}
-              >
-                <MascotGif src={theme.mascotGif} alt={t(theme.message)} size={72} />
-              </motion.div>
-            </motion.div>
-          </motion.div>
-
-          {/* Row 2: Ordinal placement text */}
-          <motion.div variants={childVariants}>
-            <span
-              className={`
-                inline-block font-black uppercase text-sm sm:text-base tracking-widest
-                ${theme.textPrimary}
-                bg-neo-black/10 px-3 py-1 rounded-neo border-2 border-neo-black/20
-              `}
-            >
-              {getOrdinalSuffix(rank)} {t('results.yourPlace', { place: rank, total: totalPlayers })}
-            </span>
-          </motion.div>
-
-          {/* Row 3: Avatar + Username */}
+          {/* Avatar + placement info — stacked on xs, horizontal on sm+ */}
           <motion.div
-            variants={childVariants}
-            className="flex items-center gap-2.5"
+            initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4"
           >
             {avatar && (
-              <div className="border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5">
+              <motion.div
+                className={`border-3 ${theme.rankBorderColor} rounded-full shadow-hard bg-slate-900 p-0.5`}
+                animate={!reducedMotion && rank === 1 ? {
+                  boxShadow: [
+                    `0 0 0px ${theme.accentColor}`,
+                    `0 0 16px ${theme.accentColor}`,
+                    `0 0 0px ${theme.accentColor}`,
+                  ],
+                } : undefined}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
                 <Avatar
                   profilePictureUrl={avatar.profilePictureUrl ?? undefined}
                   avatarImage={avatar.avatarImage}
                   customAvatar={avatar.customAvatar}
                   size="lg"
+                  className="w-16 h-16 sm:w-20 sm:h-20"
                 />
-              </div>
+              </motion.div>
             )}
-            <h2
-              className={`font-black text-xl sm:text-2xl uppercase ${theme.textPrimary} leading-tight`}
-              style={{ textShadow: theme.textShadow }}
-            >
-              {username}
-            </h2>
-          </motion.div>
-
-          {/* Row 4: Score — the star of the show */}
-          <motion.div variants={childVariants}>
-            <motion.div
-              className={`
-                ${theme.scoreBg} border-4 border-neo-black rounded-neo shadow-hard-lg
-                px-5 py-2 sm:px-7 sm:py-3 inline-flex flex-col items-center
-                relative overflow-hidden
-              `}
-              animate={
-                !reducedMotion
-                  ? {
-                      boxShadow: rank === 1
-                        ? [
-                            '6px 6px 0px rgba(0,0,0,1)',
-                            '6px 6px 0px rgba(0,204,204,0.8), 0 0 20px rgba(0,255,255,0.3)',
-                            '6px 6px 0px rgba(0,0,0,1)',
-                          ]
-                        : [
-                            '6px 6px 0px rgba(0,0,0,1)',
-                            `6px 6px 0px ${theme.glowColor}`,
-                            '6px 6px 0px rgba(0,0,0,1)',
-                          ],
-                    }
-                  : undefined
-              }
-              transition={{ duration: 2, delay: 2, repeat: Infinity, ease: 'easeInOut' }}
-              {...(!reducedMotion && rank === 1
-                ? {
-                    whileHover: {
-                      scale: 1.05,
-                      rotate: [-1, 1, 0],
-                      transition: { duration: 0.3 },
-                    },
-                  }
-                : {})}
-            >
-              {/* Score shine sweep */}
-              {!reducedMotion && (
-                <motion.div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background:
-                      'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)',
-                    backgroundSize: '200% 100%',
-                  }}
-                  animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
-                  transition={{ duration: 1.5, delay: 2.5, ease: 'easeInOut' }}
-                />
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="font-neo-display text-2xl sm:text-3xl text-neo-cream leading-none uppercase text-center sm:text-start">
+                {getOrdinalSuffix(rank)} {t('results.place')}
+              </span>
+              {wordHuntData && (
+                <span className="text-[10px] font-black uppercase tracking-wider mt-0.5" style={{ color: theme.accentColor }}>
+                  {t('results.survived')} {Math.floor(wordHuntData.survivalTime / 60)}:{String(wordHuntData.survivalTime % 60).padStart(2, '0')}
+                </span>
               )}
-              <motion.div
-                initial={{ scale: 1 }}
-                animate={
-                  !reducedMotion && rank === 1
-                    ? { scale: [1, 1.15, 0.95, 1.05, 1] }
-                    : !reducedMotion
-                      ? { scale: [1, 1.08, 1] }
-                      : undefined
-                }
-                transition={{ delay: 2, duration: rank === 1 ? 0.6 : 0.4, ease: 'easeOut' }}
-              >
-                <AnimatedScore
-                  target={score}
-                  className="font-black text-neo-black text-5xl sm:text-6xl md:text-7xl leading-none tabular-nums relative z-10"
-                  delay={0.4}
-                />
-              </motion.div>
-              <span className="font-bold text-neo-black/50 uppercase text-xs sm:text-sm tracking-wider mt-1 relative z-10">
-                {t('results.points')}
-              </span>
-            </motion.div>
+            </div>
           </motion.div>
 
-          {/* Row 5: Rank message with icon */}
+          {/* Title text — responsive sizing */}
+          {!wordHuntData && (
+            <motion.h1
+              initial={reducedMotion ? undefined : { opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.25, type: 'spring', stiffness: 200, damping: 15 }}
+              className="font-neo-display text-2xl xs:text-3xl sm:text-4xl text-neo-cream uppercase tracking-wide drop-shadow-lg text-center"
+            >
+              {rank === 1 ? t('results.greatVictory') : t('results.greatBattle')}
+            </motion.h1>
+          )}
+
+          {/* Score box — responsive padding, hover lift */}
           <motion.div
-            variants={childVariants}
-            className="flex items-center gap-2"
+            initial={reducedMotion ? undefined : { opacity: 0, scale: 0.8, rotate: -2 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+            transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 15 }}
+            className="bg-neo-black border-3 border-neo-cream px-5 py-2.5 sm:px-8 sm:py-3 shadow-hard-lg flex flex-col items-center relative overflow-hidden"
           >
-            {rank === 1 && (
+            {/* Score shimmer sweep */}
+            {!reducedMotion && (
               <motion.div
-                animate={!reducedMotion ? { rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] } : undefined}
-                transition={{ duration: 1.5, delay: 1.8, repeat: Infinity, repeatDelay: 3 }}
-              >
-                <Zap className={`w-5 h-5 sm:w-6 sm:h-6 ${theme.textPrimary} fill-current`} />
-              </motion.div>
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)',
+                  backgroundSize: '200% 100%',
+                }}
+                animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
+                transition={{ duration: 1.5, delay: 2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 4 }}
+              />
             )}
-            <span
-              className={`
-                inline-block font-black uppercase text-base sm:text-lg tracking-wide
-                ${theme.textPrimary}
-              `}
-              style={{ textShadow: theme.textShadow }}
-            >
-              {t(theme.message)}
+            <span className="text-[10px] sm:text-[12px] font-black uppercase text-neo-cream/50 tracking-widest relative z-10">
+              {t('results.finalScore')}
             </span>
-            {rank === 1 && (
-              <motion.div
-                animate={!reducedMotion ? { rotate: [0, -15, 15, 0], scale: [1, 1.2, 1] } : undefined}
-                transition={{ duration: 1.5, delay: 2, repeat: Infinity, repeatDelay: 3 }}
-              >
-                <Zap className={`w-5 h-5 sm:w-6 sm:h-6 ${theme.textPrimary} fill-current`} />
-              </motion.div>
-            )}
+            <span style={{ color: theme.accentColor }} className="relative z-10">
+              <AnimatedScore
+                target={score}
+                className="font-neo-display text-4xl xs:text-5xl sm:text-6xl tabular-nums leading-none"
+                delay={0.5}
+              />
+            </span>
           </motion.div>
 
-          {/* Row 6: Gap to winner (only for non-winners) */}
+          {/* Gap to winner — bounce in */}
           {rank > 1 && gapToWinner > 0 && (
-            <motion.div
-              variants={childVariants}
-              className={`
-                flex items-center gap-1.5
-                bg-neo-black/15 px-3 py-1.5 rounded-neo border-2 border-neo-black/20
-              `}
+            <motion.p
+              initial={reducedMotion ? undefined : { opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.55, type: 'spring', stiffness: 300, damping: 18 }}
+              className="text-xs sm:text-sm font-black uppercase text-neo-pink tracking-tight"
             >
-              <TrendingUp className={`w-4 h-4 ${theme.textSecondary}`} />
-              <span className={`text-xs sm:text-sm font-bold ${theme.textSecondary}`}>
-                {t('results.pointsBehind', { points: gapToWinner })}
-              </span>
-            </motion.div>
+              {t('results.pointsBehind', { points: gapToWinner })}
+            </motion.p>
           )}
         </div>
       </div>

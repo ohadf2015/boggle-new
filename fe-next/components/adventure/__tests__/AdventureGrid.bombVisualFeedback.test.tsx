@@ -86,6 +86,15 @@ jest.mock('@/components/adventure/themed/BoardFrame', () => ({
   default: ({ children }: { children: React.ReactNode }) => <div data-testid="board-frame">{children}</div>,
 }));
 
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    language: 'en',
+    setLanguage: jest.fn(),
+    t: (key: string) => key,
+    dir: 'ltr',
+  }),
+}));
+
 // ==============================================
 // HELPERS
 // ==============================================

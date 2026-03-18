@@ -1607,6 +1607,17 @@ const es = {
     "readyForNextRound": "¿Listos para la siguiente ronda?",
     "readyExplanation": "Marca listo para la siguiente ronda",
     "defendTitle": "¡Defiende tu título!",
+    "greatVictory": "¡VICTORIA!",
+    "greatBattle": "¡GRAN BATALLA!",
+    "battleRankings": "Clasificación",
+    "players": "Jugadores",
+    "survivors": "Supervivientes",
+    "eliminated": "Eliminados",
+    "targetWord": "Palabra objetivo",
+    "foundByYou": "¡Encontrada por ti!",
+    "survived": "Sobrevivió",
+    "ultimateChampion": "CAMPEÓN SUPREMO",
+    "risingContender": "CONTENDIENTE EN ASCENSO",
     "surviveLongerThan": "¡Sobrevive más que @{player}!",
     "waitingForPlayers": "Esperando que los jugadores estén listos...",
     "waitingForHost": "Esperando a que el anfitrión inicie la siguiente ronda...",
@@ -5986,7 +5997,8 @@ const es = {
       "wordMismatch": "La palabra no coincide con las fichas seleccionadas",
       "alreadyFound": "Esta palabra ya fue encontrada",
       "notInDictionary": "La palabra no está en el diccionario",
-      "validationFailed": "No se pudo validar la palabra"
+      "validationFailed": "No se pudo validar la palabra",
+      "validationCancelled": "La validación fue cancelada"
     },
     "game": {
       "objectives": "Objetivos",
@@ -8239,7 +8251,15 @@ const es = {
     bgColor: "Fondo",
     gender: "Tipo de cuerpo",
     male: "Masculino",
-    female: "Femenino"
+    female: "Femenino",
+    theme: {
+      classic: "Clásico",
+      fire: "Fuego",
+      electric: "Eléctrico",
+      toxic: "Tóxico",
+      royal: "Real",
+      pop: "Pop"
+    }
   },
   "features": {
     "unlocked": {
@@ -8278,6 +8298,14 @@ const es = {
     pushWordLength: "Tu promedio fue {{avg}} letras (más larga: {{longest}}). Intenta expandir palabras cortas — si ves \"MAR\", busca \"MARCA\" o \"MARCHA\" cerca.",
     scanMoreWords: "Solo {{count}} palabras encontradas. Antes de adivinar el objetivo, dedica 15-20 segundos a escanear palabras fáciles de 3-4 letras — dan vida y pistas.",
     pushForFirst: "Quedaste en el puesto #{{rank}}. Para cerrar la brecha, encuentra palabras más largas (5+ letras) y mantén alta la precisión.",
+  },
+  "encouragement": {
+    "gameStart": "¡Tú puedes! Desliza letras para encontrar palabras",
+    "firstWord": "¡Bien hecho! ¡Sigue encontrando palabras!",
+    "longWord": "¡Increíble! ¡Las palabras largas dan más puntos!",
+    "combo": "¡Combo! ¡Estás en racha!",
+    "halfway": "¡A mitad de camino, sigue así!",
+    "almostDone": "¡Recta final! ¡Encuentra más palabras!"
   }
 };
 

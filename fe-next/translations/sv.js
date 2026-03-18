@@ -1545,6 +1545,17 @@ const sv = {
     "hostStartDescription": "Starta ett nytt spel när alla är redo!",
     "readyExplanation": "Tryck för att visa att du vill köra igen",
     "defendTitle": "Försvara din titel!",
+    "greatVictory": "SEGER!",
+    "greatBattle": "FANTASTISK STRID!",
+    "battleRankings": "Stridsranking",
+    "players": "Spelare",
+    "survivors": "Överlevande",
+    "eliminated": "Eliminerade",
+    "targetWord": "Målord",
+    "foundByYou": "Hittad av dig!",
+    "survived": "Överlevde",
+    "ultimateChampion": "ULTIMAT MÄSTARE",
+    "risingContender": "STIGANDE UTMANARE",
     "surviveLongerThan": "Överlev längre än @{player}!",
     "waitingForPlayers": "Väntar på att spelare ska bli redo...",
     "waitingForHost": "Väntar på att värden startar nästa runda...",
@@ -5624,7 +5635,8 @@ const sv = {
       "wordMismatch": "Ordet matchar inte valda rutor",
       "alreadyFound": "Ordet har redan hittats",
       "notInDictionary": "Ordet finns inte i ordboken",
-      "validationFailed": "Kunde inte validera ordet"
+      "validationFailed": "Kunde inte validera ordet",
+      "validationCancelled": "Valideringen avbröts"
     },
 "game": {
       "selectWord": "Välj ett ord",
@@ -5699,7 +5711,19 @@ const sv = {
       "rainbow": "Regnbåge (joker)",
       "chain": "Kedja (kombo)",
       "time": "Tid (+5 sek)",
-      "letter": "Bokstav"
+      "locked": "Låst",
+      "multiplier": "Multiplikator (2x poäng)",
+      "letter": "Bokstav",
+      "aria": {
+        "gold": "guldplatta, 3x multiplikator",
+        "ice": "isplatta, hinder",
+        "bomb": "bombplatta, rensar rad",
+        "rainbow": "regnbågsplatta, joker",
+        "chain": "kedjeplatta, länkbonus",
+        "time": "tidsplatta, plus 5 sekunder",
+        "locked": "låst platta, lås upp med matchande bokstav",
+        "multiplier": "multiplikatorplatta, 2x poäng"
+      }
     },
     "cutscene": {
       "skip": "Hoppa över"
@@ -8225,7 +8249,23 @@ const sv = {
     bgColor: "Bakgrund",
     gender: "Kroppstyp",
     male: "Man",
-    female: "Kvinna"
+    female: "Kvinna",
+    theme: {
+      classic: "Klassisk",
+      fire: "Eld",
+      electric: "Elektrisk",
+      toxic: "Giftig",
+      royal: "Kunglig",
+      pop: "Pop"
+    }
+  },
+  "encouragement": {
+    "gameStart": "Du klarar det! Svep bokstäver för att hitta ord",
+    "firstWord": "Snyggt! Fortsätt hitta ord!",
+    "longWord": "Fantastiskt! Långa ord ger mer!",
+    "combo": "Combo! Du är i elden!",
+    "halfway": "Halvvägs, fortsätt!",
+    "almostDone": "Slutspurten! Hitta fler ord!"
   }
 };
 

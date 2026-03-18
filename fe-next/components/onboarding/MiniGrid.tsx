@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -23,6 +23,19 @@ interface SelectedCell extends GridPosition {
   letter: string;
 }
 
+/** Spring configs for different juice moments */
+const SPRING_BOUNCE = { type: 'spring' as const, stiffness: 600, damping: 18 };
+const SPRING_SNAPPY = { type: 'spring' as const, stiffness: 500, damping: 25 };
+const SPRING_SOFT = { type: 'spring' as const, stiffness: 300, damping: 22 };
+
+/** Get center position of a cell for SVG line drawing */
+function getCellCenter(row: number, col: number, cellSize: number, gap: number) {
+  return {
+    x: col * (cellSize + gap) + cellSize / 2,
+    y: row * (cellSize + gap) + cellSize / 2,
+  };
+}
+
 const MiniGrid: React.FC<MiniGridProps> = ({
   size,
   letters,
@@ -30,6 +43,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   demoPath,
   onDemoComplete,
   showHints = true,
+  autoTrace,
+  onAutoTraceComplete,
   className,
 }) => {
   const { t } = useLanguage();
@@ -37,22 +52,54 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const [showSuccess, setShowSuccess] = useState(false);
   const [shakeCell, setShakeCell] = useState<string | null>(null);
   const [showStartHint, setShowStartHint] = useState(false);
+  const [cellFlash, setCellFlash] = useState<string | null>(null);
   const isDragging = useRef(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedRef = useRef<SelectedCell[]>([]);
   selectedRef.current = selected;
 
-  useEffect(() => {
-    if (!showHints) return undefined;
-    const timer = setTimeout(() => setShowStartHint(true), 2500);
-    return () => clearTimeout(timer);
-  }, [showHints]);
+  // Animated progress value for the word bar
+  const progressMotion = useMotionValue(0);
+  const progressSpring = useSpring(progressMotion, { stiffness: 400, damping: 30 });
+  const progressScale = useTransform(progressSpring, [0, 1], [1, 1.02]);
 
+  // Update progress motion value
+  useEffect(() => {
+    progressMotion.set(selected.length / demoPath.length);
+  }, [selected.length, demoPath.length, progressMotion]);
+
+  // Auto-trace animation: show the path automatically first
+  useEffect(() => {
+    if (!autoTrace) return;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    demoPath.forEach((pos, i) => {
+      timers.push(setTimeout(() => {
+        setSelected(prev => [...prev, { row: pos.row, col: pos.col, letter: letters[pos.row][pos.col] }]);
+        if (navigator?.vibrate) navigator.vibrate(8);
+      }, 600 + i * 450));
+    });
+    // After showing full path, clear and hand off to user
+    timers.push(setTimeout(() => {
+      setSelected([]);
+      onAutoTraceComplete?.();
+    }, 600 + demoPath.length * 450 + 800));
+    return () => timers.forEach(clearTimeout);
+  }, [autoTrace, demoPath, letters, onAutoTraceComplete]);
+
+  // Show "start here" hint after a delay
+  useEffect(() => {
+    if (!showHints || autoTrace) return undefined;
+    const timer = setTimeout(() => setShowStartHint(true), 2000);
+    return () => clearTimeout(timer);
+  }, [showHints, autoTrace]);
+
+  // Cleanup success timer
   useEffect(() => {
     return () => { if (successTimer.current) clearTimeout(successTimer.current); };
   }, []);
 
+  // Cell geometry for hit detection
   const getCellAt = useCallback((clientX: number, clientY: number): GridPosition | null => {
     const grid = gridRef.current;
     if (!grid) return null;
@@ -63,7 +110,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
 
     const cols = letters[0]?.length ?? size;
     const rows = letters.length;
-    const gap = 8;
+    const gap = 10;
     const cellW = (rect.width - gap * (cols - 1)) / cols;
     const cellH = (rect.height - gap * (rows - 1)) / rows;
     const col = Math.floor(x / (cellW + gap));
@@ -73,20 +120,21 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     const cellLeft = col * (cellW + gap);
     const cellTop = row * (cellH + gap);
     if (x > cellLeft + cellW || y > cellTop + cellH) return null;
-
     return { row, col };
   }, [letters, size]);
 
   const trySelect = useCallback((row: number, col: number) => {
-    if (showSuccess) return;
+    if (showSuccess || autoTrace) return;
     const sel = selectedRef.current;
 
+    // Deselect last if tapping it again
     const idx = sel.findIndex(c => c.row === row && c.col === col);
     if (idx !== -1) {
       if (idx === sel.length - 1) setSelected(sel.slice(0, -1));
       return;
     }
 
+    // Must be adjacent to last selected
     if (sel.length > 0 && !areAdjacent(sel[sel.length - 1], { row, col })) {
       setShakeCell(`${row}-${col}`);
       setTimeout(() => setShakeCell(null), 400);
@@ -94,6 +142,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
       return;
     }
 
+    // Must follow the demo path
     const next = demoPath[sel.length];
     if (!next || next.row !== row || next.col !== col) {
       setShakeCell(`${row}-${col}`);
@@ -103,18 +152,21 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     }
 
     setShowStartHint(false);
+    setCellFlash(`${row}-${col}`);
+    setTimeout(() => setCellFlash(null), 300);
     const newSel = [...sel, { row, col, letter: letters[row][col] }];
     setSelected(newSel);
-    if (navigator?.vibrate) navigator.vibrate(10);
+    if (navigator?.vibrate) navigator.vibrate(12);
 
+    // Check completion
     if (newSel.length === demoPath.length) {
       setShowSuccess(true);
       if (navigator?.vibrate) navigator.vibrate([30, 50, 30, 50, 60]);
       successTimer.current = setTimeout(() => onDemoComplete(), 1200);
     }
-  }, [showSuccess, demoPath, letters, onDemoComplete]);
+  }, [showSuccess, autoTrace, demoPath, letters, onDemoComplete]);
 
-  // Touch handlers
+  // Touch handlers with passive: false for smooth dragging
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     e.preventDefault();
     isDragging.current = true;
@@ -158,17 +210,70 @@ const MiniGrid: React.FC<MiniGridProps> = ({
 
   const handleMouseUp = useCallback(() => { isDragging.current = false; }, []);
 
-  const nextHint = showHints && selected.length < demoPath.length ? demoPath[selected.length] : null;
+  const nextHint = showHints && !autoTrace && selected.length < demoPath.length
+    ? demoPath[selected.length]
+    : null;
   const progress = selected.length / demoPath.length;
 
+  // SVG line path connecting selected cells
+  const linePath = useMemo(() => {
+    if (selected.length < 2) return '';
+    // Approximate cell size based on grid max-width
+    const approxGridW = size === 3 ? 260 : 320;
+    const gap = 10;
+    const cols = letters[0]?.length ?? size;
+    const cellSize = (approxGridW - gap * (cols - 1)) / cols;
+    return selected.map((cell, i) => {
+      const { x, y } = getCellCenter(cell.row, cell.col, cellSize, gap);
+      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+    }).join(' ');
+  }, [selected, size, letters]);
+
+  const svgSize = useMemo(() => {
+    const approxGridW = size === 3 ? 260 : 320;
+    const gap = 10;
+    const cols = letters[0]?.length ?? size;
+    const rows = letters.length;
+    const cellSize = (approxGridW - gap * (cols - 1)) / cols;
+    return {
+      width: cols * cellSize + (cols - 1) * gap,
+      height: rows * cellSize + (rows - 1) * gap,
+    };
+  }, [size, letters]);
+
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn('relative select-none', className)}>
+      {/* SVG connection lines between selected cells */}
+      {selected.length >= 2 && (
+        <svg
+          className="absolute inset-0 pointer-events-none z-10"
+          viewBox={`0 0 ${svgSize.width} ${svgSize.height}`}
+          style={{ width: '100%', height: 'auto', maxWidth: size === 3 ? 'min(260px,65vw)' : 'min(320px,75vw)', margin: '0 auto', display: 'block' }}
+        >
+          <motion.path
+            d={linePath}
+            fill="none"
+            stroke="#84CC16"
+            strokeWidth={4}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeOpacity={0.6}
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.25 }}
+          />
+        </svg>
+      )}
+
+      {/* The grid */}
       <div
         ref={gridRef}
         dir="ltr"
         className={cn(
-          'grid gap-2 mx-auto w-full',
-          size === 3 ? 'grid-cols-3 max-w-[min(260px,65vw)]' : 'grid-cols-4 max-w-[min(320px,75vw)]'
+          'grid mx-auto w-full relative',
+          size === 3
+            ? 'grid-cols-3 max-w-[min(260px,65vw)] gap-[10px]'
+            : 'grid-cols-4 max-w-[min(320px,75vw)] gap-[10px]'
         )}
         style={{ touchAction: 'none', userSelect: 'none' }}
         onTouchStart={handleTouchStart}
@@ -180,71 +285,96 @@ const MiniGrid: React.FC<MiniGridProps> = ({
       >
         {letters.map((row, ri) =>
           row.map((letter, ci) => {
+            const cellKey = `${ri}-${ci}`;
             const selIdx = selected.findIndex(c => c.row === ri && c.col === ci);
             const isSel = selIdx !== -1;
             const isHint = nextHint?.row === ri && nextHint?.col === ci;
-            const isShaking = shakeCell === `${ri}-${ci}`;
+            const isShaking = shakeCell === cellKey;
+            const isFlashing = cellFlash === cellKey;
             const isFirstHint = isHint && showStartHint && selected.length === 0;
 
             return (
               <motion.div
-                key={`${ri}-${ci}`}
+                key={cellKey}
                 className={cn(
-                  'relative aspect-square rounded-neo border-3 border-neo-black',
-                  'flex items-center justify-center font-black text-2xl sm:text-3xl text-neo-black',
-                  'pointer-events-none',
-                  isShaking && 'border-red-500 bg-red-200',
+                  'relative aspect-square rounded-neo border-3',
+                  'flex items-center justify-center font-black text-2xl sm:text-3xl',
+                  'pointer-events-none cursor-grab active:cursor-grabbing',
+                  'transition-colors duration-100',
+                  isShaking && 'border-red-400 bg-red-300/80',
                   isSel
-                    ? 'bg-neo-lime shadow-[0_0_16px_rgba(132,204,22,0.6)] border-neo-lime'
-                    : 'letter-tile-gradient-cream shadow-hard-sm',
-                  isHint && !isSel && 'ring-2 ring-neo-yellow shadow-[0_0_20px_rgba(255,225,53,0.6)]'
+                    ? 'bg-neo-lime border-neo-black text-neo-black'
+                    : 'letter-tile-gradient-cream border-neo-black text-neo-black shadow-hard-sm',
+                  isHint && !isSel && 'border-neo-yellow ring-2 ring-neo-yellow/60',
+                  isFlashing && 'bg-neo-lime/80'
                 )}
+                layout
                 animate={
                   isShaking
-                    ? { x: [0, -6, 6, -4, 4, 0], transition: { duration: 0.35 } }
+                    ? { x: [0, -8, 8, -5, 5, 0], rotate: [0, -2, 2, -1, 0], transition: { duration: 0.35 } }
                     : isSel
-                    ? { scale: 0.9, transition: { type: 'spring', stiffness: 500, damping: 25 } }
+                    ? { scale: 0.88, y: 2, transition: SPRING_SNAPPY }
                     : isHint && !isSel
-                    ? { scale: [1, 1.06, 1], transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' } }
-                    : { scale: 1 }
+                    ? { scale: [1, 1.08, 1], transition: { duration: 0.9, repeat: Infinity, ease: 'easeInOut' } }
+                    : { scale: 1, y: 0, transition: SPRING_SOFT }
                 }
+                whileHover={!isSel ? { scale: 1.04, transition: { duration: 0.15 } } : undefined}
               >
-                <span className={cn(
-                  'transition-transform duration-150',
-                  isSel && 'scale-110'
-                )}>
+                {/* Glow ring when selected */}
+                {isSel && (
+                  <motion.div
+                    className="absolute inset-[-4px] rounded-neo border-2 border-neo-lime/40"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: [0.4, 0.7, 0.4], scale: 1 }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{ boxShadow: '0 0 16px rgba(132,204,22,0.5), inset 0 0 8px rgba(132,204,22,0.2)' }}
+                  />
+                )}
+
+                {/* Letter with pop animation */}
+                <motion.span
+                  className="relative z-10"
+                  animate={isSel ? { scale: [1, 1.15, 1.05] } : { scale: 1 }}
+                  transition={SPRING_BOUNCE}
+                >
                   {letter}
-                </span>
+                </motion.span>
 
                 {/* Selection order badge — juicy pop-in */}
                 <AnimatePresence>
                   {isSel && (
                     <motion.div
-                      initial={{ scale: 0, rotate: -90 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      exit={{ scale: 0, rotate: 90 }}
-                      transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-neo-yellow border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] font-black shadow-hard-xs pointer-events-none"
+                      initial={{ scale: 0, rotate: -120, opacity: 0 }}
+                      animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                      exit={{ scale: 0, rotate: 90, opacity: 0 }}
+                      transition={SPRING_BOUNCE}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-neo-yellow border-2 border-neo-black rounded-full flex items-center justify-center text-[11px] font-black shadow-hard-sm pointer-events-none z-20"
                     >
                       {selIdx + 1}
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                {/* Pulsing "Start here" hint */}
+                {/* Pulsing "Start here" finger pointer */}
                 <AnimatePresence>
                   {isFirstHint && (
                     <motion.div
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: [0, -3, 0] }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ y: { duration: 0.8, repeat: Infinity, ease: 'easeInOut' } }}
-                      className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap z-10 pointer-events-none"
+                      initial={{ opacity: 0, y: 8, scale: 0.8 }}
+                      animate={{ opacity: 1, y: [0, -4, 0], scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.8 }}
+                      transition={{
+                        y: { duration: 0.8, repeat: Infinity, ease: 'easeInOut' },
+                        opacity: { duration: 0.2 },
+                        scale: { duration: 0.2 },
+                      }}
+                      className="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap z-30 pointer-events-none"
                     >
-                      <div className="bg-neo-yellow text-neo-black border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-[10px] font-black flex items-center gap-1">
+                      <div className="bg-neo-yellow text-neo-black border-2 border-neo-black rounded-neo px-2.5 py-1 shadow-hard-sm text-[10px] font-black flex items-center gap-1">
                         <Sparkles className="w-3 h-3" />
                         {t('onboarding.welcome.startHere')}
                       </div>
+                      {/* Tooltip arrow */}
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-neo-yellow border-b-2 border-r-2 border-neo-black rotate-45" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -254,18 +384,19 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         )}
       </div>
 
-      {/* Word preview with progress feel */}
+      {/* Word preview bar with animated progress */}
       <motion.div
-        className="mt-4 text-center"
+        className="mt-5 text-center"
         dir="ltr"
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.3, ...SPRING_SOFT }}
+        style={{ scale: progressScale }}
       >
-        <div className="inline-flex items-center gap-1.5 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo px-3 py-2 shadow-hard relative overflow-hidden">
-          {/* Progress bar behind letters */}
+        <div className="inline-flex items-center gap-2 bg-neo-cream/90 backdrop-blur-sm text-neo-black border-3 border-neo-black rounded-neo px-4 py-2.5 shadow-hard relative overflow-hidden">
+          {/* Animated progress fill */}
           <motion.div
-            className="absolute inset-0 bg-neo-lime/20 origin-left"
+            className="absolute inset-0 bg-neo-lime/25 origin-left"
             animate={{ scaleX: progress }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           />
@@ -276,38 +407,54 @@ const MiniGrid: React.FC<MiniGridProps> = ({
               <motion.span
                 key={i}
                 className={cn(
-                  'relative z-10 w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center rounded-md border-2 font-black text-base sm:text-lg',
+                  'relative z-10 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-md font-black text-lg sm:text-xl',
                   filled
-                    ? 'bg-neo-lime text-neo-black border-neo-black'
-                    : 'bg-neo-black/5 text-neo-black/25 border-neo-black/20'
+                    ? 'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm'
+                    : 'bg-neo-black/5 text-neo-black/20 border-2 border-neo-black/15'
                 )}
-                animate={filled ? { scale: [1, 1.2, 1] } : {}}
-                transition={{ duration: 0.25, type: 'spring', stiffness: 500 }}
+                animate={filled ? { scale: [0.7, 1.2, 1], rotate: [0, -5, 0] } : { scale: 1 }}
+                transition={filled ? SPRING_BOUNCE : undefined}
               >
                 {filled ? selected[i].letter : targetLetter}
               </motion.span>
             );
           })}
 
-          {/* Success checkmark with celebration */}
+          {/* Success checkmark with celebration burst */}
           <AnimatePresence>
             {showSuccess && (
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                className="relative z-10 ml-1 w-8 h-8 sm:w-9 sm:h-9 bg-neo-lime border-3 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
+                transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+                className="relative z-10 ml-1 w-9 h-9 sm:w-10 sm:h-10 bg-neo-lime border-3 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
               >
-                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-neo-black" strokeWidth={3} />
+                <Check className="w-5 h-5 text-neo-black" strokeWidth={3} />
+                {/* Mini celebration particles */}
+                {[...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-1.5 h-1.5 rounded-full bg-neo-yellow"
+                    initial={{ x: 0, y: 0, opacity: 1 }}
+                    animate={{
+                      x: Math.cos((i * Math.PI * 2) / 6) * 24,
+                      y: Math.sin((i * Math.PI * 2) / 6) * 24,
+                      opacity: 0,
+                      scale: 0,
+                    }}
+                    transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
+                  />
+                ))}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* Letter count */}
+        {/* Letter count with animated opacity */}
         <motion.p
-          className="text-xs text-neo-white/50 font-bold mt-1.5"
-          animate={selected.length > 0 ? { opacity: 1 } : { opacity: 0.4 }}
+          className="text-xs text-neo-white/50 font-bold mt-2"
+          animate={{ opacity: selected.length > 0 ? 1 : 0.3 }}
+          transition={{ duration: 0.2 }}
         >
           {selected.length}/{demoWord.length}
         </motion.p>

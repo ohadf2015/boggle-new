@@ -288,10 +288,11 @@ export function useAdventureWordValidation({
       setIsValidating(true);
 
       try {
-        const response = await fetch('/api/validate-word', {
+        const normalizedWord = word.toLowerCase().trim();
+        const response = await fetch('/api/dictionary/check', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ word, language }),
+          body: JSON.stringify({ word: normalizedWord, language }),
           signal: abortControllerRef.current.signal,
         });
 

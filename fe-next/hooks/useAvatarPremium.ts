@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { isPremiumPart, getPartPrice } from '@/shared/types/customAvatar';
+import { isPremiumPart } from '@/shared/types/customAvatar';
 import toast from 'react-hot-toast';
 
 const TEMP_PREMIUM_KEY = 'lexiclash_temp_premium';
@@ -88,11 +88,7 @@ export function useAvatarPremium() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        toast.error(errData?.error === 'Insufficient gold'
-          ? 'Not enough gold! Keep playing to earn more.'
-          : errData?.error || 'Purchase failed',
-          { duration: 3000, style: { fontWeight: 700, background: '#1a1a2e', color: '#FF6B35', border: '2px solid #FF6B35' } }
-        );
+        toast.error(errData?.error || 'Purchase failed', { duration: 2000 });
         setIsPurchasing(false);
         return false;
       }
@@ -104,11 +100,7 @@ export function useAvatarPremium() {
         setPermanentUnlocks(prev => [...prev, `${category}:${partId}`]);
       }
       await refreshCoins();
-      const price = getPartPrice(category, partId);
-      toast.success(`Unlocked ${partId}! -${price} gold`, {
-        duration: 3000,
-        style: { fontWeight: 700, background: '#1a1a2e', color: '#BFFF00', border: '2px solid #BFFF00' },
-      });
+      toast('🎉 Unlocked!', { duration: 1500 });
       setIsPurchasing(false);
       return true;
     } catch {

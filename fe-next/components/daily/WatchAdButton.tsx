@@ -42,7 +42,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   const { coins: currentCoins, refreshCoins } = useCoinContext();
 
   // Update effect to refresh coins when ad succeeds
-  const { showAd, isAdAvailable, status, error, rewardAmount } = useRewardedAd({
+  const { showAd, isAdAvailable, isPlaceholderCooldown, status, error, rewardAmount } = useRewardedAd({
     onRewardEarned: async (earned) => {
       setEarnedAmount(earned);
       setShowSuccess(true);
@@ -63,7 +63,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
 
   const isLoading = status === 'loading';
   const isShowing = status === 'showing';
-  const isDisabled = !isAdAvailable || isLoading || isShowing;
+  const isDisabled = !isAdAvailable || isLoading || isShowing || isPlaceholderCooldown;
 
   // Get status-specific content
   const getStatusContent = () => {

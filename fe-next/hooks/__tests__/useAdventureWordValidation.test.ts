@@ -237,10 +237,10 @@ describe('useAdventureWordValidation', () => {
       });
 
       // THEN
-      expect(mockFetch).toHaveBeenCalledWith('/api/validate-word', expect.objectContaining({
+      expect(mockFetch).toHaveBeenCalledWith('/api/dictionary/check', expect.objectContaining({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: 'CAT', language: 'en' }),
+        body: JSON.stringify({ word: 'cat', language: 'en' }),
         // signal is also passed for request deduplication (AbortController)
       }));
       expect(validationResult!.isValid).toBe(true);

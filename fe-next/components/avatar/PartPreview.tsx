@@ -48,10 +48,17 @@ function renderPart(partType: string, partName: string, config: CustomAvatarConf
     case 'eyebrows': {
       const Part = EYEBROW_PARTS[partName as keyof typeof EYEBROW_PARTS];
       return Part ? (
-        <>
-          <circle cx="50" cy="52" r="32" fill="#d4a574" opacity="0.2" />
-          <Part />
-        </>
+        <g>
+          <defs>
+            <filter id="preview-invert">
+              <feColorMatrix type="matrix" values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0" />
+            </filter>
+          </defs>
+          <circle cx="50" cy="52" r="32" fill={config.skinColor} opacity="0.35" />
+          <g filter="url(#preview-invert)">
+            <Part />
+          </g>
+        </g>
       ) : null;
     }
     case 'mouth': {

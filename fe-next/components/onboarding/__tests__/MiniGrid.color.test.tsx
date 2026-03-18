@@ -13,8 +13,8 @@ jest.mock('lucide-react', () => ({
 jest.mock('framer-motion', () => {
   const React = require('react');
   const createMotionComponent = (tag: string) => {
-    const Comp = React.forwardRef(({ children, className, animate, transition, initial, exit, whileHover, whileTap, ...rest }: any, ref: any) =>
-      React.createElement(tag, { ref, className, ...rest }, children)
+    const Comp = React.forwardRef(({ children, className, animate, transition, initial, exit, whileHover, whileTap, layout, style, ...rest }: any, ref: any) =>
+      React.createElement(tag, { ref, className, style, ...rest }, children)
     );
     Comp.displayName = `motion.${tag}`;
     return Comp;
@@ -24,6 +24,9 @@ jest.mock('framer-motion', () => {
       get: (_: any, prop: string) => createMotionComponent(prop),
     }),
     AnimatePresence: ({ children }: any) => <>{children}</>,
+    useMotionValue: (initial: number) => ({ get: () => initial, set: () => {} }),
+    useSpring: (val: any) => val,
+    useTransform: (_val: any, _input: any, output: any) => ({ get: () => output?.[0] ?? 1 }),
   };
 });
 

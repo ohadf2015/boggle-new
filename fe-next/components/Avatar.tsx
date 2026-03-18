@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, memo } from 'react';
 import Image from 'next/image';
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
+import { cn } from '@/lib/utils';
 
 // Special constant for "use profile avatar" selection - indicates profile picture should be used
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
@@ -60,11 +61,11 @@ const Avatar = memo<AvatarProps>(({
   if (customAvatar) {
     return (
       <div
-        className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+        className={cn('relative rounded-full overflow-hidden flex-shrink-0', config.container, className)}
         data-testid="header-avatar"
         data-avatar-type="custom"
       >
-        <AvatarRenderer config={customAvatar} size={config.px} circular />
+        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" />
       </div>
     );
   }
@@ -77,7 +78,7 @@ const Avatar = memo<AvatarProps>(({
   if (shouldShowProfilePicture) {
     return (
       <div
-        className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+        className={cn('relative rounded-full overflow-hidden flex-shrink-0', config.container, className)}
         data-testid="header-avatar"
         data-avatar-image={avatarImage || PROFILE_AVATAR_ID}
         data-profile-picture-url={profilePictureUrl}
@@ -101,7 +102,7 @@ const Avatar = memo<AvatarProps>(({
   // 3. Fallback: deterministic random custom avatar
   return (
     <div
-      className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+      className={cn('relative rounded-full overflow-hidden flex-shrink-0', config.container, className)}
       data-testid="header-avatar"
       data-avatar-type="generated"
     >

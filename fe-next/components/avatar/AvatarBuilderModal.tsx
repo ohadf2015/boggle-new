@@ -65,12 +65,12 @@ interface ColorTheme {
 
 const COLOR_THEMES: ColorTheme[] = [
   // Bold primaries, high contrast, thick-outline energy
-  { name: 'classic', labelKey: 'avatar.theme.classic', colors: { skinColor: '#FFDBB4', hairColor: '#2C1B18', bgColor: '#1a1a2e', shirtColor: '#4A90D9', accessoryColor: '#000000' } },
-  { name: 'fire', labelKey: 'avatar.theme.fire', colors: { skinColor: '#EDB98A', hairColor: '#C62828', bgColor: '#FF6B35', shirtColor: '#FFD700', accessoryColor: '#000000' } },
-  { name: 'electric', labelKey: 'avatar.theme.electric', colors: { skinColor: '#F8D5C2', hairColor: '#FF1493', bgColor: '#1a1a2e', shirtColor: '#2C1B18', accessoryColor: '#00FFFF' } },
-  { name: 'toxic', labelKey: 'avatar.theme.toxic', colors: { skinColor: '#D08B5B', hairColor: '#4A3728', bgColor: '#00897B', shirtColor: '#2C1B18', accessoryColor: '#BFFF00' } },
-  { name: 'royal', labelKey: 'avatar.theme.royal', colors: { skinColor: '#694D3D', hairColor: '#2C1B18', bgColor: '#8B5CF6', shirtColor: '#FFD700', accessoryColor: '#FFD700' } },
-  { name: 'pop', labelKey: 'avatar.theme.pop', colors: { skinColor: '#FFE0BD', hairColor: '#FF1493', bgColor: '#FFE135', shirtColor: '#FF6B35', accessoryColor: '#FF1493' } },
+  { name: 'classic', labelKey: 'avatarBuilder.theme.classic', colors: { skinColor: '#FFDBB4', hairColor: '#2C1B18', bgColor: '#1a1a2e', shirtColor: '#4A90D9', accessoryColor: '#000000' } },
+  { name: 'fire', labelKey: 'avatarBuilder.theme.fire', colors: { skinColor: '#EDB98A', hairColor: '#C62828', bgColor: '#FF6B35', shirtColor: '#FFD700', accessoryColor: '#000000' } },
+  { name: 'electric', labelKey: 'avatarBuilder.theme.electric', colors: { skinColor: '#F8D5C2', hairColor: '#FF1493', bgColor: '#1a1a2e', shirtColor: '#2C1B18', accessoryColor: '#00FFFF' } },
+  { name: 'toxic', labelKey: 'avatarBuilder.theme.toxic', colors: { skinColor: '#D08B5B', hairColor: '#4A3728', bgColor: '#00897B', shirtColor: '#2C1B18', accessoryColor: '#BFFF00' } },
+  { name: 'royal', labelKey: 'avatarBuilder.theme.royal', colors: { skinColor: '#694D3D', hairColor: '#2C1B18', bgColor: '#8B5CF6', shirtColor: '#FFD700', accessoryColor: '#FFD700' } },
+  { name: 'pop', labelKey: 'avatarBuilder.theme.pop', colors: { skinColor: '#FFE0BD', hairColor: '#FF1493', bgColor: '#FFE135', shirtColor: '#FF6B35', accessoryColor: '#FF1493' } },
 ];
 
 // Staggered grid entrance — cascading waterfall (from animate-ai: playful-staggered-list)
@@ -201,9 +201,17 @@ export default function AvatarBuilderModal({
           <h2 id="avatar-builder-title" className="font-neo-display text-neo-white text-xl font-bold">
             {t('avatar.builder.title')}
           </h2>
-          <button onClick={onClose} className="text-neo-white/60 hover:text-neo-white p-1 transition-colors" aria-label={t('common.close')}>
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-3">
+            {premium && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-neo bg-neo-navy-light border-2 border-neo-yellow/30">
+                <Coins size={14} className="text-neo-yellow" />
+                <span className="text-neo-yellow font-black text-sm tabular-nums">{premium.coins}</span>
+              </div>
+            )}
+            <button onClick={onClose} className="text-neo-white/60 hover:text-neo-white p-1 transition-colors" aria-label={t('common.close')}>
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Preview — jelly wobble on every change */}
@@ -505,11 +513,7 @@ function CategoryOptions({ category, config, updateConfig, t, premium, onCoinSpe
             onSelect={v => {
               if (isPremiumPart('bgColor', v) && premium && !premium.isPartUnlocked('bgColor', v)) {
                 const price = getPartPrice('bgColor', v);
-                toast(
-                  t('avatar.premium.locked') + ' — ' +
-                  t('avatar.premium.buyWithGold').replace('{price}', String(price)),
-                  { icon: '🔒', duration: 3000 }
-                );
+                toast(`${price} gold needed`, { icon: '🔒', duration: 2000 });
                 return;
               }
               updateConfig('bgColor', v);
@@ -567,23 +571,29 @@ function PartPreviewGrid<T extends string>({
     if (isPrem && premium && !premium.isPartUnlocked(cat, option)) {
       const price = getPartPrice(cat, option);
       if (premium.coins >= price) {
-        // Player can afford — attempt purchase directly
         const success = await premium.purchaseWithGold(cat, option);
         if (success) {
-          onCoinSpend?.(price); // Trigger coin animation
-          onSelect(option); // Auto-select after purchase
+          onCoinSpend?.(price);
+          onSelect(option);
         }
       } else {
-        // Can't afford — show motivational message
-        toast(
-          `${price} gold needed \u00b7 You have ${premium.coins}. Keep playing!`,
-          { duration: 3000, style: { fontWeight: 700, background: '#1a1a2e', color: '#FFE135', border: '2px solid #FF6B35' } }
-        );
+        toast(`${price} gold needed`, { icon: '🔒', duration: 2000 });
       }
       return;
     }
     onSelect(option);
   };
+
+  // Sort: premium/epic/legendary first, then free parts
+  const sortedOptions = [...options].sort((a, b) => {
+    const aPrem = isPremiumPart(cat, a);
+    const bPrem = isPremiumPart(cat, b);
+    if (a === 'none') return -1;
+    if (b === 'none') return 1;
+    if (aPrem && !bPrem) return -1;
+    if (!aPrem && bPrem) return 1;
+    return 0;
+  });
 
   return (
     <div>
@@ -594,7 +604,7 @@ function PartPreviewGrid<T extends string>({
         animate="visible"
         className="grid grid-cols-3 sm:grid-cols-4 gap-2"
       >
-        {options.map(option => {
+        {sortedOptions.map(option => {
           const isPremium = isPremiumPart(cat, option);
           const isEpic = isEpicPart(cat, option);
           const isLegendary = isLegendaryPart(cat, option);

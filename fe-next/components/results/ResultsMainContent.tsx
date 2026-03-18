@@ -11,10 +11,11 @@ import Avatar from '@/components/Avatar';
 
 // Dynamic imports for heavy components
 const PlacementHero = dynamic(() => import('@/components/results/PlacementHero'), { ssr: false });
-const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboard'), { ssr: false });
+const FightCardLeaderboard = dynamic(() => import('@/components/results/FightCardLeaderboard'), { ssr: false });
 const ScoreRevealAnimation = dynamic(() => import('@/components/results/ScoreRevealAnimation'), { ssr: false });
 const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
-const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
+const WordMarqueeTicker = dynamic(() => import('@/components/results/WordMarqueeTicker'), { ssr: false });
+// Legacy: Top3Leaderboard + MobileCompactLeaderboard still used by ResultsLandscapeLayout
 
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import WordHuntAnnouncementBanner from '@/components/results/WordHuntAnnouncementBanner';
@@ -217,13 +218,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
 
-  // Calculate accuracy for stats
-  const accuracy = (() => {
-    const total = currentPlayerData?.allWords?.length || 0;
-    const valid = currentPlayerValidWords.length;
-    return total > 0 ? Math.round((valid / total) * 100) : 0;
-  })();
-
   // Calculate gap to winner for PlacementHero
   const winnerScore = sortedScores[0]?.score ?? 0;
   const gapToWinner = currentPlayerRank > 1 ? winnerScore - (currentPlayerData?.score ?? 0) : 0;
@@ -271,7 +265,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Top 3 Leaderboard / Podium — cascaded after hero */}
+      {/* Fight Card Leaderboard — ranked list (fight card style) */}
       {sortedScores.length > 1 && (
         scoreRevealComplete ? (
           <motion.div
@@ -279,18 +273,17 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
             animate={isVisible('leaderboard') ? { opacity: 1, y: 0 } : undefined}
             transition={{ type: 'spring', stiffness: 120, damping: 20, delay: getDelay('leaderboard') }}
           >
-            {isMobile ? (
-              <MobileCompactLeaderboard
-                participants={sortedScores.map(p => ({
-                  name: p.username,
-                  score: p.score,
-                  isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-                }))}
-                emojiReactions={emojiReactions}
-              />
-            ) : (
-              <Top3Leaderboard players={sortedScores} currentUsername={username} compact showConfetti emojiReactions={emojiReactions} />
-            )}
+            <FightCardLeaderboard
+              participants={sortedScores.map(p => ({
+                name: p.username,
+                score: p.score,
+                isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
+                avatar: p.avatar,
+              }))}
+              currentUsername={username}
+              gameMode={gameMode}
+              emojiReactions={emojiReactions}
+            />
           </motion.div>
         ) : (
           <ScoreRevealAnimation
@@ -313,51 +306,54 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 20, delay: getDelay('revenge') }}
-          className="bg-neo-navy-light/30 border-3 border-neo-black rounded-neo shadow-hard p-4 relative overflow-hidden"
+          className="bg-slate-800 border-3 border-slate-700 shadow-hard-lg p-3 sm:p-5 relative overflow-hidden"
         >
+          {/* Decorative pink triangle (top-right, matching SuperDesign) */}
+          <div className="absolute top-0 end-0 w-24 h-24 sm:w-32 sm:h-32 bg-neo-pink/10 transform rotate-45 translate-x-12 sm:translate-x-16 -translate-y-12 sm:-translate-y-16 pointer-events-none" />
           {/* Halftone overlay */}
           <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]" />
 
-          <div className="relative z-10 flex items-center justify-center gap-3 sm:gap-5">
+          <div className="relative z-10 flex items-center justify-center gap-3 sm:gap-5 px-2 sm:px-4 mb-3 sm:mb-4">
             {/* YOUR side */}
-            <div className="flex flex-col items-center gap-1.5 min-w-0">
-              <div className="border-3 border-neo-cyan rounded-full shadow-hard-sm bg-neo-cream p-0.5">
+            <div className="flex flex-col items-center gap-1 sm:gap-1.5 min-w-0">
+              <div className="border-2 sm:border-3 border-neo-cyan rounded-full shadow-hard-sm bg-slate-900 overflow-hidden">
                 <Avatar
                   profilePictureUrl={currentPlayerData.avatar?.profilePictureUrl ?? undefined}
                   avatarImage={currentPlayerData.avatar?.avatarImage}
                   customAvatar={currentPlayerData.avatar?.customAvatar}
-                  size="lg"
+                  size="md"
+                  className="w-11 h-11 sm:w-14 sm:h-14"
                 />
               </div>
-              <span className="text-xs font-black uppercase text-neo-cyan truncate max-w-[80px]">
+              <span className="text-[10px] sm:text-xs font-black uppercase text-neo-cyan truncate max-w-[60px] sm:max-w-[80px]">
                 {t('results.you')}
               </span>
-              <span className="text-lg font-black text-neo-cream tabular-nums">{currentPlayerData.score}</span>
             </div>
 
-            {/* VS badge — wobble + scale pulse */}
+            {/* VS badge — hexagonal, wobble + scale pulse */}
             <motion.div
               animate={!reducedMotion ? { rotate: [0, 4, -4, 0], scale: [1, 1.08, 1] } : undefined}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              className="shrink-0 bg-neo-pink border-3 border-neo-black rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-hard"
+              className="shrink-0 bg-neo-cream border-3 border-neo-black w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center"
+              style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
             >
-              <span className="font-black text-white text-sm sm:text-base">VS</span>
+              <span className="font-neo-display text-neo-black text-base sm:text-xl">VS</span>
             </motion.div>
 
             {/* WINNER side */}
-            <div className="flex flex-col items-center gap-1.5 min-w-0">
-              <div className="border-3 border-neo-lime rounded-full shadow-hard-sm bg-neo-cream p-0.5">
+            <div className="flex flex-col items-center gap-1 sm:gap-1.5 min-w-0">
+              <div className="border-2 sm:border-3 border-neo-lime rounded-full shadow-hard-sm bg-slate-900 overflow-hidden">
                 <Avatar
                   profilePictureUrl={sortedScores[0].avatar?.profilePictureUrl ?? undefined}
                   avatarImage={sortedScores[0].avatar?.avatarImage}
                   customAvatar={sortedScores[0].avatar?.customAvatar}
-                  size="lg"
+                  size="md"
+                  className="w-11 h-11 sm:w-14 sm:h-14"
                 />
               </div>
-              <span className="text-xs font-black uppercase text-neo-lime truncate max-w-[80px]">
+              <span className="text-[10px] sm:text-xs font-black uppercase text-neo-lime truncate max-w-[60px] sm:max-w-[80px]">
                 {sortedScores[0].username}
               </span>
-              <span className="text-lg font-black text-neo-cream tabular-nums">{sortedScores[0].score}</span>
             </div>
           </div>
 
@@ -366,7 +362,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
             initial={reducedMotion ? undefined : { opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: reducedMotion ? 0 : getDelay('revenge') + 0.3, type: 'spring', stiffness: 300, damping: 18 }}
-            className="text-center mt-3 text-sm font-black uppercase text-neo-pink"
+            className="text-center mb-3 sm:mb-4 text-xs sm:text-sm font-black uppercase text-neo-pink tracking-tight sm:tracking-widest"
           >
             {gameMode === 'word-hunt'
               ? t('results.surviveLongerThan', { player: sortedScores[0].username })
@@ -405,6 +401,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/mascot/trophy-nobg.gif" alt="" width={36} height={36} className="object-contain shrink-0" loading="eager" />
         </motion.div>
+      )}
+
+      {/* Word Marquee Ticker — scrolling word display */}
+      {scoreRevealComplete && currentPlayerValidWords.length > 0 && (
+        <WordMarqueeTicker
+          words={currentPlayerValidWords}
+          gameMode={gameMode}
+        />
       )}
 
       {/* Primary CTA — cascaded entrance */}
@@ -614,7 +618,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
                 accent: 'lime',
               },
             ]}
-            variant="inline"
+            variant="grid"
           />
         </motion.div>
       )}

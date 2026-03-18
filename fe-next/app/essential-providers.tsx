@@ -185,8 +185,7 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
                             </MotionConfigProvider>
                         </AccessibilityProvider>
                     </CoinProvider>
-                    </AuthProvider>
-                </LanguageProvider>
+                    </AuthProvider>                </LanguageProvider>
             </ThemeProvider>
         </ErrorBoundary>
     );

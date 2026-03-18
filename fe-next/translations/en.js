@@ -1664,6 +1664,17 @@ const en = {
     "hostStartDescription": "Start anytime!",
     "readyExplanation": "Ready up to show you're in!",
     "defendTitle": "Defend Your Title!",
+    "greatVictory": "VICTORY!",
+    "greatBattle": "GREAT BATTLE!",
+    "battleRankings": "Battle Rankings",
+    "players": "Players",
+    "survivors": "Survivors",
+    "eliminated": "Eliminated",
+    "targetWord": "Target Word",
+    "foundByYou": "Found by You!",
+    "survived": "Survived",
+    "ultimateChampion": "ULTIMATE CHAMPION",
+    "risingContender": "RISING CONTENDER",
     "surviveLongerThan": "Survive longer than @{player}!",
     "waitingForPlayers": "Waiting for players to ready up...",
     "waitingForHost": "Waiting for host to start next round...",
@@ -5719,7 +5730,8 @@ const en = {
       "wordMismatch": "Word doesn't match selected tiles",
       "alreadyFound": "Word already found",
       "notInDictionary": "Word not in dictionary",
-      "validationFailed": "Could not validate word"
+      "validationFailed": "Could not validate word",
+      "validationCancelled": "Validation was cancelled"
     },
 "game": {
       "objectives": "Objectives",
@@ -5794,7 +5806,19 @@ const en = {
       "rainbow": "Rainbow (wild)",
       "chain": "Chain (combo)",
       "time": "Time (+5 sec)",
-      "letter": "Letter"
+      "locked": "Locked",
+      "multiplier": "Multiplier (2x score)",
+      "letter": "Letter",
+      "aria": {
+        "gold": "gold tile, 3x multiplier",
+        "ice": "ice tile, obstacle",
+        "bomb": "bomb tile, clears row",
+        "rainbow": "rainbow tile, wildcard",
+        "chain": "chain tile, link bonus",
+        "time": "time tile, plus 5 seconds",
+        "locked": "locked tile, unlock with matching letter",
+        "multiplier": "multiplier tile, 2x score"
+      }
     },
     "cutscene": {
       "skip": "Skip"
@@ -8284,7 +8308,15 @@ const en = {
     bgColor: "Background",
     gender: "Body Type",
     male: "Male",
-    female: "Female"
+    female: "Female",
+    theme: {
+      classic: "Classic",
+      fire: "Fire",
+      electric: "Electric",
+      toxic: "Toxic",
+      royal: "Royal",
+      pop: "Pop"
+    }
   },
   "encouragement": {
     "gameStart": "You got this! Swipe letters to find words",

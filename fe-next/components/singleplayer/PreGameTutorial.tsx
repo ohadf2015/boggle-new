@@ -2,12 +2,12 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pointer, Star, Zap, Play, Mouse, Palette } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Pointer, Star, Zap, Play, Mouse, Palette, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { Mascot, MascotWithEntrance } from '@/components/ui/Mascot';
 import MiniGrid from '@/components/onboarding/MiniGrid';
+import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { demoConfigs } from '@/components/onboarding/demoConfigs';
 
 interface PreGameTutorialProps {
@@ -16,17 +16,23 @@ interface PreGameTutorialProps {
 
 const TOTAL_STEPS = 3;
 
-/**
- * PreGameTutorial - 3-step mascot-guided tutorial shown before first game.
- * Step 0: Welcome — Mascot introduces the game
- * Step 1: Practice — Interactive MiniGrid demo
- * Step 2: Tips & Go — Scoring tips + "Let's Play!" CTA
- */
+/** Shared spring configs */
+const SPRING_POP = { type: 'spring' as const, stiffness: 500, damping: 22 };
+const SPRING_SOFT = { type: 'spring' as const, stiffness: 300, damping: 26 };
+
+/** Step transition helper */
+const getStepTransition = (dir: number) => ({
+  initial: { opacity: 0, x: dir > 0 ? 80 : -80, scale: 0.95 },
+  animate: { opacity: 1, x: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 300, damping: 26 } },
+  exit: { opacity: 0, x: dir > 0 ? -80 : 80, scale: 0.95, transition: { duration: 0.2 } },
+});
+
 const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
   const { t, language } = useLanguage();
   const isDesktop = useIsDesktop();
-  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
 
   const demoConfig = useMemo(() => {
     return demoConfigs[language] || demoConfigs.en;
@@ -34,11 +40,13 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
 
   const handleNext = useCallback(() => {
     if (currentStep < TOTAL_STEPS - 1) {
+      setDirection(1);
       setCurrentStep(prev => prev + 1);
     }
   }, [currentStep]);
 
   const handleDemoComplete = useCallback(() => {
+    setDirection(1);
     setCurrentStep(2);
   }, []);
 
@@ -50,32 +58,39 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-neo-navy flex flex-col items-center justify-center p-4 overflow-y-auto">
+      {/* Subtle radial gradient backdrop */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(132,204,22,0.06)_0%,transparent_70%)] pointer-events-none" />
+
       {/* Skip button */}
-      <button
+      <motion.button
         onClick={onComplete}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.7 }}
+        transition={{ delay: 0.5 }}
         className="absolute top-4 right-4 z-10 text-neo-white/60 hover:text-neo-white text-sm font-bold px-3 py-1.5 rounded-neo border border-neo-white/20 hover:border-neo-white/40 transition-colors"
       >
         {t('preGameTutorial.skip')}
-      </button>
+      </motion.button>
 
-      {/* Step content */}
-      <div className="w-full max-w-md mx-auto flex-1 flex flex-col items-center justify-center">
-        <AnimatePresence mode="wait">
+      {/* Step content with directional transitions */}
+      <div className="w-full max-w-md mx-auto flex-1 flex flex-col items-center justify-center relative">
+        <AnimatePresence mode="wait" custom={direction}>
           {/* Step 0: Welcome */}
           {currentStep === 0 && (
             <motion.div
               key="welcome"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
+              {...getStepTransition(direction)}
               className="flex flex-col items-center text-center space-y-4"
             >
               <MascotWithEntrance variant="happy" size="xl" priority />
 
-              {/* Speech bubble */}
-              <div className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard max-w-sm">
-                {/* Bubble tail */}
+              {/* Speech bubble with staggered entrance */}
+              <motion.div
+                className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard max-w-sm"
+                initial={{ scale: 0.8, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, ...SPRING_POP }}
+              >
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-neo-black" />
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-neo-cream" />
 
@@ -85,14 +100,20 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 <p className="text-sm text-neo-black/70 mt-1">
                   {t('preGameTutorial.welcome.subtitle')}
                 </p>
-              </div>
+              </motion.div>
 
-              <button
+              <motion.button
                 onClick={handleNext}
-                className="bg-neo-yellow border-3 border-neo-black rounded-neo px-6 py-3 font-black text-neo-black shadow-hard hover:shadow-hard-sm active:shadow-none active:translate-y-1 transition-all"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, ...SPRING_SOFT }}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96, y: 2 }}
+                className="bg-neo-yellow border-3 border-neo-black rounded-neo px-6 py-3 font-black text-neo-black shadow-hard transition-shadow flex items-center gap-2"
               >
                 {t('preGameTutorial.next')}
-              </button>
+                <ChevronRight className="w-4 h-4" />
+              </motion.button>
             </motion.div>
           )}
 
@@ -100,13 +121,15 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
           {currentStep === 1 && (
             <motion.div
               key="practice"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
+              {...getStepTransition(direction)}
               className="flex flex-col items-center text-center space-y-4 w-full"
             >
-              <div className="flex items-center gap-3">
+              <motion.div
+                className="flex items-center gap-3"
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.15, ...SPRING_SOFT }}
+              >
                 <Mascot variant="gaming" size="md" />
                 <div className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard-sm text-left">
                   <p className="font-bold text-sm text-neo-black">
@@ -116,23 +139,32 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                     {demoConfig.word}
                   </p>
                 </div>
-              </div>
+              </motion.div>
 
-              <MiniGrid
-                size={3}
-                letters={demoConfig.letters}
-                demoWord={demoConfig.word}
-                demoPath={demoConfig.path}
-                onDemoComplete={handleDemoComplete}
-                showHints
-              />
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.25, ...SPRING_SOFT }}
+              >
+                <MiniGrid
+                  size={3}
+                  letters={demoConfig.letters}
+                  demoWord={demoConfig.word}
+                  demoPath={demoConfig.path}
+                  onDemoComplete={handleDemoComplete}
+                  showHints
+                />
+              </motion.div>
 
-              <button
+              <motion.button
                 onClick={handleNext}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.6 }}
+                transition={{ delay: 1 }}
                 className="text-neo-white/60 hover:text-neo-white text-sm font-bold transition-colors mt-2"
               >
                 {t('preGameTutorial.next')}
-              </button>
+              </motion.button>
             </motion.div>
           )}
 
@@ -140,15 +172,17 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
           {currentStep === 2 && (
             <motion.div
               key="tips"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
+              {...getStepTransition(direction)}
               className="flex flex-col items-center text-center space-y-4 w-full"
             >
               <Mascot variant="celebration" size="lg" />
 
-              <div className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard max-w-sm">
+              <motion.div
+                className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard max-w-sm"
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.1, ...SPRING_POP }}
+              >
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-neo-black" />
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-neo-cream" />
 
@@ -158,23 +192,29 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 <p className="text-xs text-neo-black/60 mt-0.5">
                   {t('preGameTutorial.tips.subtitle')}
                 </p>
-              </div>
+              </motion.div>
 
-              {/* Tip cards */}
+              {/* Tip cards — staggered entrance */}
               <div className="grid grid-cols-3 gap-2 w-full max-w-sm">
                 {tips.map((tip, index) => {
                   const Icon = tip.icon;
                   return (
                     <motion.div
                       key={tip.titleKey}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.1 + index * 0.1 }}
+                      initial={{ y: 30, opacity: 0, scale: 0.9 }}
+                      animate={{ y: 0, opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.2 + index * 0.1, ...SPRING_POP }}
+                      whileHover={{ y: -2, scale: 1.03 }}
                       className="flex flex-col items-center gap-1.5 p-2.5 rounded-neo border-2 border-neo-black shadow-hard-sm bg-neo-cream"
                     >
-                      <div className="w-8 h-8 bg-neo-lime text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm">
+                      <motion.div
+                        className="w-8 h-8 bg-neo-lime text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
+                        initial={{ rotate: -20 }}
+                        animate={{ rotate: 0 }}
+                        transition={{ delay: 0.3 + index * 0.1, ...SPRING_POP }}
+                      >
                         <Icon className="w-4 h-4" />
-                      </div>
+                      </motion.div>
                       <div className="font-black text-[10px] text-neo-black leading-tight">
                         {t(tip.titleKey)}
                       </div>
@@ -186,26 +226,41 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 })}
               </div>
 
-              {/* Avatar prompt — gentle nudge */}
+              {/* Avatar prompt — opens modal instead of navigating */}
               <motion.button
-                onClick={() => router.push(`/${language}/avatar`)}
+                onClick={() => setIsAvatarBuilderOpen(true)}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black/30 bg-neo-white/10 hover:bg-neo-purple/20 hover:border-neo-purple/50 transition-all text-neo-black/70 hover:text-neo-black"
+                transition={{ delay: 0.6, ...SPRING_SOFT }}
+                whileHover={{ scale: 1.03, backgroundColor: 'rgba(139,92,246,0.2)' }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-white/20 bg-neo-white/5 hover:border-neo-purple/50 transition-colors text-neo-white/70 hover:text-neo-white"
               >
                 <Palette className="w-4 h-4" />
                 <span className="text-xs font-bold">{t('preGameTutorial.buildAvatar')}</span>
               </motion.button>
+              <AvatarBuilderModal
+                isOpen={isAvatarBuilderOpen}
+                onClose={() => setIsAvatarBuilderOpen(false)}
+                onSave={() => setIsAvatarBuilderOpen(false)}
+              />
 
-              {/* Let's Play CTA */}
+              {/* Let's Play CTA — breathing pulse */}
               <motion.button
                 onClick={onComplete}
-                className="bg-neo-lime border-3 border-neo-black rounded-neo px-8 py-3.5 font-black text-lg text-neo-black shadow-hard hover:shadow-hard-sm active:shadow-none active:translate-y-1 transition-all flex items-center gap-2"
-                animate={{ scale: [1, 1.03, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, ...SPRING_POP }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95, y: 2 }}
+                className="bg-neo-lime border-3 border-neo-black rounded-neo px-8 py-3.5 font-black text-lg text-neo-black shadow-hard transition-shadow flex items-center gap-2"
               >
-                <Play className="w-5 h-5" fill="currentColor" />
+                <motion.div
+                  animate={{ scale: [1, 1.15, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <Play className="w-5 h-5" fill="currentColor" />
+                </motion.div>
                 {t('preGameTutorial.letsPlay')}
               </motion.button>
             </motion.div>
@@ -213,15 +268,20 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
         </AnimatePresence>
       </div>
 
-      {/* Progress dots */}
-      <div className="flex items-center gap-2 mt-6 mb-4">
+      {/* Progress dots with animated fill */}
+      <div className="flex items-center gap-3 mt-6 mb-4">
         {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-          <div
+          <motion.div
             key={i}
             data-testid={`progress-dot-${i}`}
-            className={`w-2.5 h-2.5 rounded-full border-2 border-neo-black transition-colors ${
-              i === currentStep ? 'bg-neo-yellow' : 'bg-neo-white/20'
-            }`}
+            className="border-2 border-neo-black"
+            animate={{
+              width: i === currentStep ? 24 : 10,
+              height: 10,
+              borderRadius: i === currentStep ? 5 : 5,
+              backgroundColor: i <= currentStep ? '#FFE135' : 'rgba(255,255,255,0.15)',
+            }}
+            transition={SPRING_POP}
           />
         ))}
       </div>

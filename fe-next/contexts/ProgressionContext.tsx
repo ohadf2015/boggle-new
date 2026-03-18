@@ -250,6 +250,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
               currentWorld: data.progression.currentWorld,
               currentLevel: data.progression.currentLevel,
               totalStars: data.progression.totalStars,
+              gold: data.progression.gold ?? prev.gold,
+              upgrades: data.progression.upgrades ?? prev.upgrades,
               completions: updatedCompletions,
               updatedAt: new Date().toISOString(),
             };

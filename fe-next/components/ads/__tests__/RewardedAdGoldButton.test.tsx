@@ -17,6 +17,7 @@ jest.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: jest.fn(() => ({
     status: 'idle',
     isAdAvailable: true,
+    isPlaceholderCooldown: false,
     showAd: mockShowAd,
     error: null,
     rewardAmount: 25,
@@ -41,6 +42,7 @@ describe('RewardedAdGoldButton', () => {
     (useRewardedAd as jest.Mock).mockReturnValue({
       status: 'idle',
       isAdAvailable: true,
+      isPlaceholderCooldown: false,
       showAd: mockShowAd,
       error: null,
       rewardAmount: 25,
@@ -59,22 +61,11 @@ describe('RewardedAdGoldButton', () => {
     expect(mockShowAd).toHaveBeenCalled();
   });
 
-  test('renders nothing when ad not available', () => {
-    (useRewardedAd as jest.Mock).mockReturnValue({
-      status: 'idle',
-      isAdAvailable: false,
-      showAd: mockShowAd,
-      error: null,
-      rewardAmount: 25,
-    });
-    const { container } = render(<RewardedAdGoldButton goldAmount={25} />);
-    expect(container.innerHTML).toBe('');
-  });
-
   test('is disabled during loading state', () => {
     (useRewardedAd as jest.Mock).mockReturnValue({
       status: 'loading',
       isAdAvailable: true,
+      isPlaceholderCooldown: false,
       showAd: mockShowAd,
       error: null,
       rewardAmount: 25,
@@ -89,17 +80,21 @@ describe('RewardedAdGoldButton', () => {
     expect(button).toHaveAttribute('aria-label');
   });
 
-  test('respects frequency cap - disabled when 3+ ads viewed in last hour', () => {
-    const now = Date.now();
-    localStorage.setItem('lexiclash_ad_timestamps', JSON.stringify([
-      now - 1000, now - 2000, now - 3000,
-    ]));
+  test('is disabled when placeholder cooldown is active', () => {
+    (useRewardedAd as jest.Mock).mockReturnValue({
+      status: 'idle',
+      isAdAvailable: true,
+      isPlaceholderCooldown: true,
+      showAd: mockShowAd,
+      error: null,
+      rewardAmount: 25,
+    });
     render(<RewardedAdGoldButton goldAmount={25} />);
     expect(screen.getByRole('button')).toBeDisabled();
+    expect(screen.getByText('Available soon')).toBeInTheDocument();
   });
 
-  test('allows ad when frequency cap not reached', () => {
-    localStorage.setItem('lexiclash_ad_timestamps', JSON.stringify([Date.now() - 1000]));
+  test('is enabled when placeholder cooldown is not active', () => {
     render(<RewardedAdGoldButton goldAmount={25} />);
     expect(screen.getByRole('button')).not.toBeDisabled();
   });

@@ -1536,6 +1536,17 @@ const he = {
     "waiting": "ממתין...",
     "readyExplanation": "לחצו כדי להגיד למארח שאתם רוצים עוד סיבוב",
     "defendTitle": "הגנו על התואר!",
+    "greatVictory": "!ניצחון",
+    "greatBattle": "!קרב מטורף",
+    "battleRankings": "דירוג קרב",
+    "players": "שחקנים",
+    "survivors": "שורדים",
+    "eliminated": "הודחו",
+    "targetWord": "מילת מטרה",
+    "foundByYou": "!נמצאה על ידך",
+    "survived": "שרד",
+    "ultimateChampion": "אלוף על",
+    "risingContender": "מתמודד עולה",
     "surviveLongerThan": "שרדו יותר מ-@{player}!",
     "waitingForPlayers": "ממתינים לשחקנים להתכונן...",
     "waitingForHost": "ממתינים למארח להתחיל סיבוב חדש...",
@@ -5649,7 +5660,8 @@ const he = {
       "wordMismatch": "המילה לא תואמת לאריחים שנבחרו",
       "alreadyFound": "המילה כבר נמצאה",
       "notInDictionary": "המילה לא במילון",
-      "validationFailed": "לא ניתן לאמת את המילה"
+      "validationFailed": "לא ניתן לאמת את המילה",
+      "validationCancelled": "האימות בוטל"
     },
 "game": {
       "objectives": "מטרות",
@@ -5723,7 +5735,20 @@ const he = {
       "bomb": "פצצה (מנקה שורה)",
       "rainbow": "קשת (ג'וקר)",
       "chain": "שרשרת (קומבו)",
-      "time": "זמן (+5 שניות)"
+      "time": "זמן (+5 שניות)",
+      "locked": "נעול",
+      "multiplier": "מכפיל (x2 ניקוד)",
+      "letter": "אות",
+      "aria": {
+        "gold": "אריח זהב, מכפיל x3",
+        "ice": "אריח קרח, מכשול",
+        "bomb": "אריח פצצה, מנקה שורה",
+        "rainbow": "אריח קשת, ג'וקר",
+        "chain": "אריח שרשרת, בונוס קישור",
+        "time": "אריח זמן, פלוס 5 שניות",
+        "locked": "אריח נעול, שחרר עם אות תואמת",
+        "multiplier": "אריח מכפיל, ניקוד x2"
+      }
     },
     "cutscene": {
       "skip": "דלג"
@@ -8229,7 +8254,23 @@ const he = {
     bgColor: "רקע",
     gender: "סוג גוף",
     male: "זכר",
-    female: "נקבה"
+    female: "נקבה",
+    theme: {
+      classic: "קלאסי",
+      fire: "אש",
+      electric: "חשמלי",
+      toxic: "רעיל",
+      royal: "מלכותי",
+      pop: "פופ"
+    }
+  },
+  "encouragement": {
+    "gameStart": "אתם יכולים! החליקו אותיות כדי למצוא מילים",
+    "firstWord": "יפה! המשיכו למצוא מילים!",
+    "longWord": "מדהים! מילים ארוכות שוות יותר!",
+    "combo": "קומבו! אתם על גל!",
+    "halfway": "באמצע הדרך, המשיכו!",
+    "almostDone": "הישורת האחרונה! מצאו עוד מילים!"
   }
 };
 

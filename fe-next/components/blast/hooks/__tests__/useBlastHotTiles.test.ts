@@ -125,8 +125,15 @@ describe('useBlastHotTiles', () => {
 
     const firstHot = result.current.hotTiles[0];
     expect(result.current.getHotMultiplier(firstHot.row, firstHot.col)).toBe(HOT_TILE_MULTIPLIER);
-    // Non-hot tile
-    expect(result.current.getHotMultiplier(5, 5)).toBe(1);
+    // Non-hot tile — find a position that is NOT in the hot tiles list
+    const hotSet = new Set(result.current.hotTiles.map(t => `${t.row},${t.col}`));
+    let nonHotRow = -1, nonHotCol = -1;
+    for (let r = 0; r < 6 && nonHotRow === -1; r++) {
+      for (let c = 0; c < 6; c++) {
+        if (!hotSet.has(`${r},${c}`)) { nonHotRow = r; nonHotCol = c; break; }
+      }
+    }
+    expect(result.current.getHotMultiplier(nonHotRow, nonHotCol)).toBe(1);
   });
 
   it('should refresh hot tiles after interval', () => {

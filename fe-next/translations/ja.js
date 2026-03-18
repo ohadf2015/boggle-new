@@ -1546,6 +1546,17 @@ const ja = {
     "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！",
     "readyExplanation": "タップしてホストに「もう一回やりたい！」を伝えよう",
     "defendTitle": "タイトルを防衛せよ！",
+    "greatVictory": "勝利！",
+    "greatBattle": "激戦！",
+    "battleRankings": "バトルランキング",
+    "players": "プレイヤー",
+    "survivors": "生存者",
+    "eliminated": "脱落",
+    "targetWord": "ターゲットワード",
+    "foundByYou": "あなたが発見！",
+    "survived": "生存",
+    "ultimateChampion": "究極のチャンピオン",
+    "risingContender": "挑戦者",
     "surviveLongerThan": "@{player}より長く生き残れ！",
     "waitingForPlayers": "プレイヤーの準備を待っています...",
     "waitingForHost": "ホストが次のラウンドを始めるのを待っています...",
@@ -5675,7 +5686,8 @@ const ja = {
       "wordMismatch": "単語が選択したタイルと一致しません",
       "alreadyFound": "この単語は既に見つかっています",
       "notInDictionary": "辞書にない単語です",
-      "validationFailed": "単語を検証できませんでした"
+      "validationFailed": "単語を検証できませんでした",
+      "validationCancelled": "検証がキャンセルされました"
     },
 "game": {
       "objectives": "目標",
@@ -5750,7 +5762,19 @@ const ja = {
       "rainbow": "レインボー (ワイルド)",
       "chain": "チェーン (コンボ)",
       "time": "タイム (+5秒)",
-      "letter": "文字"
+      "locked": "ロック",
+      "multiplier": "マルチプライヤー (2倍スコア)",
+      "letter": "文字",
+      "aria": {
+        "gold": "ゴールドタイル、3倍マルチプライヤー",
+        "ice": "アイスタイル、障害物",
+        "bomb": "ボムタイル、行をクリア",
+        "rainbow": "レインボータイル、ワイルドカード",
+        "chain": "チェーンタイル、リンクボーナス",
+        "time": "タイムタイル、プラス5秒",
+        "locked": "ロックタイル、一致する文字で解除",
+        "multiplier": "マルチプライヤータイル、2倍スコア"
+      }
     },
     "cutscene": {
       "skip": "スキップ"
@@ -8205,7 +8229,23 @@ const ja = {
     bgColor: "背景",
     gender: "体型",
     male: "男性",
-    female: "女性"
+    female: "女性",
+    theme: {
+      classic: "クラシック",
+      fire: "ファイア",
+      electric: "エレクトリック",
+      toxic: "トキシック",
+      royal: "ロイヤル",
+      pop: "ポップ"
+    }
+  },
+  "encouragement": {
+    "gameStart": "できるよ！文字をスワイプして単語を見つけよう",
+    "firstWord": "ナイス！どんどん見つけよう！",
+    "longWord": "すごい！長い単語は高得点！",
+    "combo": "コンボ！絶好調！",
+    "halfway": "半分達成、続けて！",
+    "almostDone": "ラストスパート！もっと見つけよう！"
   }
 };
 

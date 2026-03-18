@@ -328,6 +328,8 @@ export async function POST(request: NextRequest) {
         playerLevel: newPlayerLevel,
         xp: newTotalXp,
         totalStars: newTotalStars,
+        gold: newGold,
+        upgrades: existingProgression?.upgrades ?? {},
         currentWorld: Math.max(existingProgression?.current_world ?? 1, nextWorld),
         currentLevel: Math.max(existingProgression?.current_level ?? 1, nextLevel),
       },
