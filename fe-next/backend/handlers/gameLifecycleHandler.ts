@@ -284,8 +284,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     endGame(io, gameCode);
   });
 
-  // Debug: Get current game state
+  // Debug: Get current game state (development only)
   socket.on('debugGameState', () => {
+    if (process.env.NODE_ENV === 'production') return;
     if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     const game = gameCode ? getGame(gameCode) : null;

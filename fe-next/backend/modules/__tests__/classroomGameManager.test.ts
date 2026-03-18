@@ -60,7 +60,7 @@ describe('ClassroomGameManager', () => {
       // THEN
       expect(mockRedis.setex).toHaveBeenCalledWith(
         `classroom_game:${gameData.gameCode}`,
-        3600, // 1 hour TTL
+        14400, // 4 hour TTL
         expect.stringContaining(gameData.classroomId)
       );
       expect(mockRedis.sadd).toHaveBeenCalledWith(
@@ -225,7 +225,7 @@ describe('ClassroomGameManager', () => {
       // THEN
       expect(mockRedis.setex).toHaveBeenCalledWith(
         `classroom_game:${gameCode}`,
-        3600,
+        14400,
         expect.stringContaining(player.userId)
       );
     });

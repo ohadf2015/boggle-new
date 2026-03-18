@@ -255,7 +255,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
 
   // Loading state
   if (isLoading) {
-    return <PageLoader text="Setting up your classroom..." size="lg" nested />;
+    return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
   }
 
   // No classrooms — guide teacher to create one

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { ArrowLeft, Bomb, BookOpen, HelpCircle, Lightbulb, Shuffle, Star } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
 
 import ComboDisplay from '@/components/game/ComboDisplay';
@@ -336,7 +337,7 @@ export function BlastGameLayout({
 
         {/* Wave badge — SP only */}
         {!isMultiplayer && waveNumber > 1 && (
-          <motion.div
+          <AdaptiveMotion.div
             key={waveNumber}
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -345,7 +346,7 @@ export function BlastGameLayout({
             <span className="font-black text-xs text-fuchsia-300 uppercase tracking-wider">
               {t('blast.waveBadge')?.replace('{wave}', String(waveNumber)) || `Wave ${waveNumber}`}
             </span>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
 
         <div className="flex items-center gap-1">
@@ -399,9 +400,9 @@ export function BlastGameLayout({
       </div>
 
       {/* Cascade word showcase banner — sole cascade notification (milestone + fallback text removed to reduce noise) */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {cascadeHighlightPhase === 'highlighting' && cascadeHighlightData && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -410,9 +411,9 @@ export function BlastGameLayout({
             style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
           >
             <BlastCascadeWordBanner highlightData={cascadeHighlightData} />
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
 
       {/* Stats row */}
       <div className={cn(
@@ -421,7 +422,7 @@ export function BlastGameLayout({
       )}>
         {/* Score — SP only */}
         {!isMultiplayer && (
-          <motion.div
+          <AdaptiveMotion.div
             key={Math.floor(score / 500)}
             initial={{ scale: 1.04 }}
             animate={{ scale: 1 }}
@@ -448,7 +449,7 @@ export function BlastGameLayout({
                 {score > personalBestScore ? '★ NEW BEST' : `${t('blast.best')}: ${personalBestScore}`}
               </div>
             )}
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
 
         {/* Move counter (visible when move limit is finite) */}
@@ -533,23 +534,23 @@ export function BlastGameLayout({
       </div>
 
       {/* Found words expandable list */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {showFoundWords && wordsFound.length > 0 && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden relative z-30 px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full flex-shrink-0"
           >
             <BlastFoundWords words={wordsFound} t={t} />
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
 
       {/* Dead-end notification */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {noWordsRemaining && !isComplete && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -595,9 +596,9 @@ export function BlastGameLayout({
                 )}
               </div>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
 
       {/* Game grid with overlays */}
       {(() => {
@@ -615,16 +616,16 @@ export function BlastGameLayout({
         )}
 
         {/* Board complete celebration — SP: blocking overlay, MP: lightweight auto-dismiss toast */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {!isMultiplayer && isComplete && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className="absolute inset-0 z-50 flex items-center justify-center bg-neo-black/40 backdrop-blur-sm"
             >
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ scale: 0.3, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.15 }}
@@ -637,7 +638,7 @@ export function BlastGameLayout({
                 {/* Stars — filled count based on tilesCleared percentage */}
                 <div className="flex justify-center gap-2">
                   {[0, 1, 2].map(i => (
-                    <motion.div
+                    <AdaptiveMotion.div
                       key={i}
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
@@ -649,36 +650,36 @@ export function BlastGameLayout({
                           i < earnedStars ? 'fill-neo-orange' : 'fill-neo-black/20',
                         )}
                       />
-                    </motion.div>
+                    </AdaptiveMotion.div>
                   ))}
                 </div>
 
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.5 }}
                   className="text-2xl font-black uppercase text-neo-black"
                 >
                   {t('blast.complete')}
-                </motion.div>
+                </AdaptiveMotion.div>
 
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.65 }}
                   className="text-lg font-bold text-neo-black/70 tabular-nums"
                 >
                   {score.toLocaleString()} {t('common.points')}
-                </motion.div>
-              </motion.div>
-            </motion.div>
+                </AdaptiveMotion.div>
+              </AdaptiveMotion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         {/* MP board-clear toast — non-blocking, auto-dismisses */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {isMultiplayer && showMpCelebration && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ opacity: 0, y: -20, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.8 }}
@@ -696,9 +697,9 @@ export function BlastGameLayout({
                 </span>
                 <Star className="h-5 w-5 text-neo-black fill-neo-orange" />
               </div>
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         <BlastGrid
           grid={grid}

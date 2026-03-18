@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Hand, Sparkles, Target, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -50,7 +50,7 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 gap-6">
       {/* Title */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
@@ -62,12 +62,12 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
         <p className="text-sm font-bold text-white/70 mt-1">
           {t('blast.ready.subtitle')}
         </p>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Infographic steps */}
       <div className="w-full max-w-sm lg:max-w-3xl xl:max-w-4xl lg:grid lg:grid-cols-3 lg:gap-4 space-y-3 lg:space-y-0">
         {STEPS.map((step, i) => (
-          <motion.div
+          <AdaptiveMotion.div
             key={step.key}
             data-testid={`step-card-${step.key}`}
             initial={{ opacity: 0, x: -30 }}
@@ -86,12 +86,12 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
                 {t(step.descKey)}
               </div>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         ))}
       </div>
 
       {/* CTA */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, type: 'spring', stiffness: 300, damping: 25 }}
@@ -113,7 +113,7 @@ export function BlastReadyScreen({ onStart, discoveredCombos }: BlastReadyScreen
           <BookOpen className="h-4 w-4" />
           {t('blast.comboCodex')}
         </button>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       <BlastCodexModal
         isOpen={isCodexOpen}

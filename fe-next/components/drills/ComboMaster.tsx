@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Target, Flame, Trophy, RotateCcw, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
@@ -53,10 +52,8 @@ export default function ComboMaster({
   onComplete,
   onExit,
 }: ComboMasterProps) {
-  const { theme } = useTheme();
   const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
-  const isDarkMode = theme === 'dark';
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -74,10 +71,16 @@ export default function ComboMaster({
   const comboRef = useRef(combo);
   comboRef.current = combo;
 
-  const availableWordSet = useMemo(
-    () => new Set(availableWords.map(w => w.word.toUpperCase())),
-    [availableWords]
-  );
+  const { validateWord, availableWordSet } = useDrillWordSubmit({
+    grid,
+    language,
+    availableWords,
+    wordsFound,
+    phase,
+    playingPhase: 'playing',
+    playErrorSound,
+    t,
+  });
   const MAX_COMBO_BREAKS = 3;
 
   // Keyboard support for desktop users
@@ -135,31 +138,12 @@ export default function ComboMaster({
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
-    if (phase !== 'playing') return;
-
-    const upperWord = word.toUpperCase();
-
-    // Check if word can be formed on the board
-    if (!isWordOnBoard(upperWord, grid, language)) {
-      setFeedback({ message: t('brain.drills.errors.notOnBoard'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Check if already found
-    if (wordsFound.includes(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.alreadyFound'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Check if word is in available words list
-    if (!availableWordSet.has(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.invalidWord'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
+    const { valid, upperWord, error } = validateWord(word);
+    if (!valid) {
+      if (error && error !== 'notPlaying') {
+        setFeedback({ message: error, type: 'error' });
+        setTimeout(() => setFeedback(null), 2000);
+      }
       return;
     }
 
@@ -182,7 +166,7 @@ export default function ComboMaster({
       if (comboTimerRef.current) clearInterval(comboTimerRef.current);
       setPhase('complete');
     }
-  }, [phase, availableWordSet, wordsFound, startComboTimer, levelConfig.targetCombo, grid, language, t, playErrorSound]);
+  }, [validateWord, startComboTimer, levelConfig.targetCombo, t]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -219,19 +203,19 @@ export default function ComboMaster({
   return (
     <div dir={dir} className={cn(
       'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-slate-800'
       )}>
         <div className="flex items-center gap-3">
           {/* Combo display */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            combo >= 5 ? 'bg-neo-orange' : isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            combo >= 5 ? 'bg-neo-orange' : 'bg-slate-700'
           )}>
             <Flame className={cn(
               'w-4 h-4',
@@ -239,7 +223,7 @@ export default function ComboMaster({
             )} />
             <span className={cn(
               'font-black text-lg',
-              combo >= 5 ? 'text-neo-black' : isDarkMode ? 'text-neo-orange' : 'text-neo-orange'
+              combo >= 5 ? 'text-neo-black' : 'text-neo-orange'
             )}>
               x{combo}
             </span>
@@ -263,7 +247,7 @@ export default function ComboMaster({
 
         <div aria-live="polite" className={cn(
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-          isDarkMode ? 'bg-neo-orange text-neo-black' : 'bg-neo-orange text-neo-black'
+          'bg-neo-orange text-neo-black'
         )}>
           {score} {t('brain.drills.points')}
         </div>
@@ -273,7 +257,7 @@ export default function ComboMaster({
       {phase === 'playing' && (
         <div className={cn(
           'h-2 border-b-2 border-neo-black',
-          isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+          'bg-slate-700'
         )}>
           <AdaptiveMotion.div
             className={cn(
@@ -299,19 +283,19 @@ export default function ComboMaster({
             <Target className="w-20 h-20 mx-auto text-neo-orange" />
             <h2 className={cn(
               'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              'text-neo-white'
             )}>
               {t('brain.drills.combo-master.name')}
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              'text-neo-white/70'
             )}>
               {t('brain.drills.combo-master.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              'bg-slate-800'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.combo-master.targetCombo', { combo: levelConfig.targetCombo })}</p>
@@ -338,14 +322,14 @@ export default function ComboMaster({
               <Target className="w-5 h-5 text-neo-orange" />
               <span className={cn(
                 'font-bold',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}>
                 {t('brain.drills.target')}: x{levelConfig.targetCombo}
               </span>
               <Timer className="w-4 h-4 text-neo-cyan ms-2" />
               <span role="status" className={cn(
                 'font-bold tabular-nums',
-                comboTimer <= 3 ? 'text-neo-red' : isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+                comboTimer <= 3 ? 'text-neo-red' : 'text-neo-cyan'
               )}>
                 {comboTimer}s
               </span>
@@ -422,7 +406,7 @@ export default function ComboMaster({
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
                 'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                'bg-slate-700 text-neo-white'
               )}
             >
               {t('brain.drills.finishGame')}
@@ -453,7 +437,7 @@ export default function ComboMaster({
               transition={{ delay: 0.3 }}
               className={cn(
                 'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}
             >
               {maxCombo >= levelConfig.targetCombo ? t('brain.drills.complete') : t('brain.drills.gameOver')}
@@ -464,7 +448,7 @@ export default function ComboMaster({
               transition={{ delay: 0.5 }}
               className={cn(
                 'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
+                'bg-slate-800'
               )}
             >
               {/* Animated Score */}
@@ -491,14 +475,14 @@ export default function ComboMaster({
                   transition={{ delay: 0.9 }}
                   className={cn(
                     'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                    'bg-slate-700'
                   )}
                 >
                   <Flame className="w-6 h-6 mx-auto text-neo-orange mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-cyan' : 'text-neo-purple')}>
+                  <p className={cn('text-2xl font-black', 'text-neo-cyan')}>
                     x{maxCombo}
                   </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                  <p className={cn('text-xs', 'text-neo-white/70')}>
                     {t('brain.drills.maxCombo')}
                   </p>
                 </AdaptiveMotion.div>
@@ -508,14 +492,14 @@ export default function ComboMaster({
                   transition={{ delay: 1 }}
                   className={cn(
                     'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                    'bg-slate-700'
                   )}
                 >
                   <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                  <p className={cn('text-2xl font-black', 'text-neo-white')}>
                     {wordsFound.length}
                   </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                  <p className={cn('text-xs', 'text-neo-white/70')}>
                     {t('brain.drills.wordsFound')}
                   </p>
                 </AdaptiveMotion.div>
@@ -533,7 +517,7 @@ export default function ComboMaster({
                 className={cn(
                   'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                   'font-bold uppercase',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
+                  'bg-slate-700 text-neo-white'
                 )}
               >
                 <RotateCcw className="w-5 h-5" />

@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Zap, Clock, Trophy, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
@@ -53,10 +52,8 @@ export default function LightningRound({
   onComplete,
   onExit,
 }: LightningRoundProps) {
-  const { theme } = useTheme();
   const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
-  const isDarkMode = theme === 'dark';
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -69,11 +66,16 @@ export default function LightningRound({
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Available word set for quick lookup
-  const availableWordSet = useMemo(
-    () => new Set(availableWords.map(w => w.word.toUpperCase())),
-    [availableWords]
-  );
+  const { validateWord } = useDrillWordSubmit({
+    grid,
+    language,
+    availableWords,
+    wordsFound,
+    phase,
+    playingPhase: 'playing',
+    playErrorSound,
+    t,
+  });
 
   // Keyboard support for desktop users
   const keyboard = useDrillKeyboardSupport({
@@ -112,31 +114,12 @@ export default function LightningRound({
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
-    if (phase !== 'playing') return;
-
-    const upperWord = word.toUpperCase();
-
-    // Check if word can be formed on the board
-    if (!isWordOnBoard(upperWord, grid, language)) {
-      setFeedback({ message: t('brain.drills.errors.notOnBoard'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Check if already found
-    if (wordsFound.includes(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.alreadyFound'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Check if word is in available words list
-    if (!availableWordSet.has(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.invalidWord'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
+    const { valid, upperWord, error } = validateWord(word);
+    if (!valid) {
+      if (error && error !== 'notPlaying') {
+        setFeedback({ message: error, type: 'error' });
+        setTimeout(() => setFeedback(null), 2000);
+      }
       return;
     }
 
@@ -151,7 +134,7 @@ export default function LightningRound({
       setLastWordScore(null);
       setFeedback(null);
     }, 1000);
-  }, [phase, availableWordSet, wordsFound, grid, language, t, playErrorSound]);
+  }, [validateWord, t]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -189,25 +172,25 @@ export default function LightningRound({
   const getTimeColor = () => {
     if (timeRemaining <= 5) return 'text-neo-red';
     if (timeRemaining <= 10) return 'text-neo-orange';
-    return isDarkMode ? 'text-neo-lime' : 'text-neo-purple';
+    return 'text-neo-lime';
   };
 
   return (
     <div dir={dir} className={cn(
       'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-slate-800'
       )}>
         <div className="flex items-center gap-3">
           {/* Timer */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            'bg-slate-700'
           )}>
             <Clock className={cn('w-4 h-4', getTimeColor())} />
             <span role="status" className={cn('font-black text-lg tabular-nums', getTimeColor())}>
@@ -218,7 +201,7 @@ export default function LightningRound({
           {/* Words found */}
           <div className={cn(
             'px-2 py-1 rounded border-2 border-neo-black text-xs font-bold',
-            isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-neo-cream text-neo-black'
+            'bg-slate-700 text-neo-white'
           )}>
             {wordsFound.length} {t('brain.drills.wordsFound')}
           </div>
@@ -228,7 +211,7 @@ export default function LightningRound({
         <div className="relative">
           <div aria-live="polite" className={cn(
             'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-            isDarkMode ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black'
+            'bg-neo-lime text-neo-black'
           )}>
             {score} {t('brain.drills.points')}
           </div>
@@ -260,23 +243,23 @@ export default function LightningRound({
           >
             <Zap className={cn(
               'w-20 h-20 mx-auto',
-              isDarkMode ? 'text-neo-lime' : 'text-neo-lime'
+              'text-neo-lime'
             )} />
             <h2 className={cn(
               'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              'text-neo-white'
             )}>
               {t('brain.drills.lightning-round.name')}
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              'text-neo-white/70'
             )}>
               {t('brain.drills.lightning-round.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              'bg-slate-800'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.timeLimit')}: {levelConfig.timeLimit}s</p>
@@ -303,7 +286,7 @@ export default function LightningRound({
               <Zap className="w-5 h-5 text-neo-lime animate-pulse" />
               <span className={cn(
                 'font-bold uppercase',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}>
                 {t('brain.drills.lightning-round.name')}
               </span>
@@ -357,7 +340,7 @@ export default function LightningRound({
             {wordsFound.length > 0 && (
               <div className={cn(
                 'flex flex-wrap gap-2 justify-center p-3 rounded-neo border-2 border-neo-black max-h-28 overflow-y-auto',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
+                'bg-slate-800'
               )}>
                 {wordsFound.slice(-10).map((word, i) => (
                   <span
@@ -399,7 +382,7 @@ export default function LightningRound({
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
                 'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                'bg-slate-700 text-neo-white'
               )}
             >
               {t('brain.drills.finishGame')}
@@ -427,7 +410,7 @@ export default function LightningRound({
               transition={{ delay: 0.3 }}
               className={cn(
                 'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}
             >
               {t('brain.drills.complete')}
@@ -438,7 +421,7 @@ export default function LightningRound({
               transition={{ delay: 0.5 }}
               className={cn(
                 'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
+                'bg-slate-800'
               )}
             >
               {/* Animated Score */}
@@ -465,14 +448,14 @@ export default function LightningRound({
                   transition={{ delay: 0.9 }}
                   className={cn(
                     'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                    'bg-slate-700'
                   )}
                 >
                   <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                  <p className={cn('text-2xl font-black', 'text-neo-white')}>
                     {wordsFound.length}
                   </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                  <p className={cn('text-xs', 'text-neo-white/70')}>
                     {t('brain.drills.wordsFound')}
                   </p>
                 </AdaptiveMotion.div>
@@ -482,14 +465,14 @@ export default function LightningRound({
                   transition={{ delay: 1 }}
                   className={cn(
                     'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                    'bg-slate-700'
                   )}
                 >
                   <Zap className="w-6 h-6 mx-auto text-neo-lime mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-cyan' : 'text-neo-purple')}>
+                  <p className={cn('text-2xl font-black', 'text-neo-cyan')}>
                     {getResults().wordsPerMinute}
                   </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                  <p className={cn('text-xs', 'text-neo-white/70')}>
                     {t('brain.drills.wpm')}
                   </p>
                 </AdaptiveMotion.div>
@@ -511,7 +494,7 @@ export default function LightningRound({
                 className={cn(
                   'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                   'font-bold uppercase',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
+                  'bg-slate-700 text-neo-white'
                 )}
               >
                 <RotateCcw className="w-5 h-5" />

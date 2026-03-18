@@ -362,7 +362,7 @@ export class RateLimiter {
   cleanupInterval: ReturnType<typeof setInterval> | null;
 
   constructor(options: SocketRateLimiterOptions = {}) {
-    this.maxMessages = options.maxMessages ?? 150;
+    this.maxMessages = options.maxMessages ?? 100;
     this.windowMs = options.windowMs ?? 10000;
     this.ipMaxMessages = options.ipMaxMessages ?? 4500;
     this.ipWindowMs = options.ipWindowMs ?? 10000;
@@ -474,7 +474,7 @@ export class RateLimiter {
   }
 }
 
-const maxMessages = parseInt(process.env.RATE_MAX_MESSAGES || '150');
+const maxMessages = parseInt(process.env.RATE_MAX_MESSAGES || '100');
 const windowMs = parseInt(process.env.RATE_WINDOW_MS || '10000');
 const ipMaxMessages = parseInt(process.env.RATE_IP_MAX_MESSAGES || '4500');
 const blockDurationMs = parseInt(process.env.RATE_BLOCK_DURATION_MS || '60000');

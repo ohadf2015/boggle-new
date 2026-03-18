@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import type { CascadeHighlightData } from './types';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 
@@ -31,10 +31,10 @@ export function BlastCascadeHighlight({
         gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
       }}
     >
-      <AnimatePresence mode="sync">
+      <AdaptiveAnimatePresence mode="sync">
         {highlightData.words.map((wordData, wordIdx) => (
           wordData.path.map(cell => (
-            <motion.div
+            <AdaptiveMotion.div
               key={`glow-${wordIdx}-${cell.row}-${cell.col}`}
               data-testid={`cascade-glow-${cell.row}-${cell.col}`}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -59,7 +59,7 @@ export function BlastCascadeHighlight({
             />
           ))
         ))}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 }

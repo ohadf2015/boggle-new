@@ -6017,6 +6017,8 @@ const es = {
       "yourBest": "Tu mejor intento",
       "words": "Palabras",
       "keepTrying": "¡Sigue intentando! ¡Estás mejorando!",
+      "soClose": "¡Casi!",
+      "soCloseDesc": "Llegaste a {{current}}/{{target}} — ¡solo un poco más!",
       "hint": "Pista",
       "hintAvailable": "¿Necesitas una pista?",
       "hintUsed": "¡Prueba esta palabra!",
@@ -6870,6 +6872,7 @@ const es = {
       "members": "{{count}} estudiantes",
       "member": "1 estudiante",
       "noMembers": "Sin estudiantes aún",
+      "settingUp": "Preparando tu aula...",
       "namePlaceholder": "Nombre de la clase",
       "validation": {
         "nameRequired": "El nombre es obligatorio"

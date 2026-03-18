@@ -317,10 +317,10 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     minWordLength,
   });
 
-  // Desktop detection
+  // Desktop detection via pointer capability (no UA sniffing)
   const isDesktop = useMemo(() => {
     if (typeof window === 'undefined') return false;
-    return !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    return window.matchMedia('(pointer: fine)').matches;
   }, []);
 
   // Keyboard help state

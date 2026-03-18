@@ -1,14 +1,15 @@
 'use client';
 
+import { useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Brain, Heart, Eye, EyeOff, CheckCircle2, XCircle, X, RefreshCw, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useMemoryHuntGame } from './useMemoryHuntGame';
 import { MemoryHuntCompletePhase } from './MemoryHuntCompletePhase';
 
@@ -35,9 +36,8 @@ export default function MemoryHunt({
   onComplete,
   onExit,
 }: MemoryHuntProps) {
-  const { theme } = useTheme();
   const { t, dir } = useLanguage();
-  const isDarkMode = theme === 'dark';
+  const studyModalRef = useRef<HTMLDivElement>(null);
 
   const game = useMemoryHuntGame({
     grid,
@@ -46,6 +46,8 @@ export default function MemoryHunt({
     language,
     onComplete,
   });
+
+  useFocusTrap(studyModalRef, game.phase === 'study' && game.showStudyModal);
 
   // Keyboard support for desktop users (only during recall phase)
   const keyboard = useDrillKeyboardSupport({
@@ -59,13 +61,13 @@ export default function MemoryHunt({
   return (
     <div dir={dir} className={cn(
       'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-slate-800'
       )}>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
@@ -81,14 +83,14 @@ export default function MemoryHunt({
           </div>
           <div className={cn(
             'px-2 py-1 rounded border-2 border-neo-black text-xs font-bold',
-            isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-neo-cream text-neo-black'
+            'bg-slate-700 text-neo-white'
           )}>
             {t('brain.drills.round')} {game.round}/5
           </div>
         </div>
         <div aria-live="polite" className={cn(
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-          isDarkMode ? 'bg-neo-purple text-neo-white' : 'bg-neo-lime text-neo-black'
+          'bg-neo-purple text-neo-white'
         )}>
           {game.score} {t('brain.drills.points')}
         </div>
@@ -105,23 +107,23 @@ export default function MemoryHunt({
           >
             <Brain className={cn(
               'w-20 h-20 mx-auto',
-              isDarkMode ? 'text-neo-purple' : 'text-neo-purple'
+              'text-neo-purple'
             )} />
             <h2 className={cn(
               'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              'text-neo-white'
             )}>
               {t('brain.drills.memory-hunt.name')}
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              'text-neo-white/70'
             )}>
               {t('brain.drills.memory-hunt.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              'bg-slate-800'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.memory-hunt.wordsToRemember')}: {game.levelConfig.wordCount}</p>
@@ -159,6 +161,7 @@ export default function MemoryHunt({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  ref={studyModalRef}
                   className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
                 >
                   <AdaptiveMotion.div
@@ -167,32 +170,32 @@ export default function MemoryHunt({
                     exit={{ scale: 0.8, opacity: 0 }}
                     className={cn(
                       'w-full max-w-lg p-6 rounded-neo border-4 border-neo-black shadow-hard-lg',
-                      isDarkMode ? 'bg-slate-800' : 'bg-white'
+                      'bg-slate-800'
                     )}
                   >
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-2">
                         <Eye className={cn(
                           'w-8 h-8',
-                          isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+                          'text-neo-cyan'
                         )} />
                         <span className={cn(
                           'font-black text-xl uppercase',
-                          isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                          'text-neo-white'
                         )}>
                           {t('brain.drills.memory-hunt.studyPhase')}
                         </span>
                       </div>
                       <div role="status" className={cn(
                         'px-4 py-2 rounded-neo border-3 border-neo-black text-3xl font-black tabular-nums',
-                        isDarkMode ? 'bg-neo-lime text-neo-black' : 'bg-neo-orange text-neo-black'
+                        'bg-neo-lime text-neo-black'
                       )}>
                         {game.studyCountdown}
                       </div>
                     </div>
                     <p className={cn(
                       'text-center text-lg font-medium mb-4',
-                      isDarkMode ? 'text-neo-white/80' : 'text-neo-black/80'
+                      'text-neo-white/80'
                     )}>
                       {t('brain.drills.memory-hunt.studyTheseWords')}
                     </p>
@@ -205,7 +208,7 @@ export default function MemoryHunt({
                           transition={{ delay: i * 0.1 }}
                           className={cn(
                             'flex items-center justify-between gap-3 px-4 py-3 rounded-neo border-3 border-neo-black',
-                            isDarkMode ? 'bg-neo-purple' : 'bg-neo-lime'
+                            'bg-neo-purple'
                           )}
                         >
                           <span className="text-2xl sm:text-3xl font-black text-neo-black tracking-wide">
@@ -254,11 +257,11 @@ export default function MemoryHunt({
             <div className="flex items-center justify-center gap-2">
               <EyeOff className={cn(
                 'w-5 h-5',
-                isDarkMode ? 'text-neo-orange' : 'text-neo-purple'
+                'text-neo-orange'
               )} />
               <span className={cn(
                 'font-bold uppercase',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}>
                 {t('brain.drills.memory-hunt.recallPhase')}
               </span>
@@ -313,11 +316,11 @@ export default function MemoryHunt({
 
             <div className={cn(
               'p-3 rounded-neo border-2 border-neo-black text-center',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              'bg-slate-800'
             )}>
               <p className={cn(
                 'text-xs font-medium mb-2',
-                isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                'text-neo-white/70'
               )}>
                 {t('brain.drills.memory-hunt.remaining')}: {game.remainingWords.length}
               </p>
@@ -329,7 +332,7 @@ export default function MemoryHunt({
                       'px-3 py-1.5 rounded-neo border-2 border-neo-black text-base font-bold min-w-[5ch] text-center',
                       tw.found
                         ? 'bg-neo-green/30 text-neo-green line-through'
-                        : isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-gray-200 text-gray-600'
+                        : 'bg-slate-700 text-gray-300'
                     )}
                   >
                     {tw.found ? tw.word : '???'}
@@ -381,7 +384,7 @@ export default function MemoryHunt({
                   'flex-1 px-4 py-2 rounded-neo border-2 border-neo-black',
                   'font-bold text-sm uppercase',
                   'transition-all hover:translate-y-[-1px]',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                  'bg-slate-700 text-neo-white'
                 )}
               >
                 {t('brain.drills.finishGame')}
@@ -392,7 +395,7 @@ export default function MemoryHunt({
 
         {game.phase === 'complete' && (
           <MemoryHuntCompletePhase
-            isDarkMode={isDarkMode}
+            isDarkMode={true}
             results={game.results}
             lives={game.lives}
             t={t}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { RotateCcw, Home, Trophy, Zap, Grid3X3, Star } from 'lucide-react';
 // canvas-confetti is lazy-loaded (only fires on 3 stars or retrigger)
 import { Button } from '@/components/ui/button';
@@ -82,7 +82,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative z-10">
       {/* Title */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-4"
@@ -91,10 +91,10 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
           {t('blast.title')}
         </h1>
         <p className="text-lg font-bold text-neo-orange">{starLabel}</p>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Star rating + confetti retrigger button */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
@@ -111,7 +111,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
             🎉
           </button>
         )}
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Desktop: stats + wave breakdown side by side; mobile: stacked */}
       <div className="w-full max-w-sm lg:max-w-3xl xl:max-w-4xl lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start mb-8">
@@ -190,7 +190,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
       </div>{/* end desktop grid */}
 
       {/* Action buttons */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 1.0 }}
@@ -214,7 +214,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
           <Home className="me-2 h-5 w-5" />
           {t('common.home')}
         </Button>
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 }

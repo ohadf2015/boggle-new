@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { BookOpen, Gem, Star, Trophy, RotateCcw, Clock, Target } from 'lucide-react';
+import { Gem, Star, Trophy, RotateCcw, Clock, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
@@ -76,10 +75,8 @@ export default function RareGems({
   onComplete,
   onExit,
 }: RareGemsProps) {
-  const { theme } = useTheme();
   const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
-  const isDarkMode = theme === 'dark';
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -92,10 +89,21 @@ export default function RareGems({
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const availableWordSet = useMemo(
-    () => new Set(availableWords.map(w => w.word.toUpperCase())),
-    [availableWords]
+  const foundWordStrings = useMemo(
+    () => wordsFound.map(w => w.word),
+    [wordsFound]
   );
+
+  const { validateWord } = useDrillWordSubmit({
+    grid,
+    language,
+    availableWords,
+    wordsFound: foundWordStrings,
+    phase,
+    playingPhase: 'playing',
+    playErrorSound,
+    t,
+  });
 
   // Keyboard support for desktop users
   const keyboard = useDrillKeyboardSupport({
@@ -132,30 +140,12 @@ export default function RareGems({
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
-    if (phase !== 'playing') return;
-
-    const upperWord = word.toUpperCase();
-
-    // Check if word can be formed on the board
-    if (!isWordOnBoard(upperWord, grid, language)) {
-      setFeedback({ message: t('brain.drills.errors.notOnBoard'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    const alreadyFound = wordsFound.some(w => w.word === upperWord);
-    if (alreadyFound) {
-      setFeedback({ message: t('brain.drills.errors.alreadyFound'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    if (!availableWordSet.has(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.invalidWord'), type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
+    const { valid, upperWord, error } = validateWord(word);
+    if (!valid) {
+      if (error && error !== 'notPlaying') {
+        setFeedback({ message: error, type: 'error' });
+        setTimeout(() => setFeedback(null), 2000);
+      }
       return;
     }
 
@@ -177,7 +167,7 @@ export default function RareGems({
       setScore(prev => prev + bonusTime);
       setPhase('complete');
     }
-  }, [phase, availableWordSet, wordsFound, rareWordsFound, levelConfig.targetRare, timeRemaining, grid, language, t, playErrorSound]);
+  }, [validateWord, rareWordsFound, levelConfig.targetRare, timeRemaining, t]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {
@@ -215,19 +205,19 @@ export default function RareGems({
   return (
     <div dir={dir} className={cn(
       'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-slate-800'
       )}>
         <div className="flex items-center gap-3">
           {/* Timer */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            'bg-slate-700'
           )}>
             <Clock className={cn(
               'w-4 h-4',
@@ -235,7 +225,7 @@ export default function RareGems({
             )} />
             <span role="status" className={cn(
               'font-black text-lg tabular-nums',
-              timeRemaining <= 10 ? 'text-neo-red' : isDarkMode ? 'text-neo-green' : 'text-neo-green'
+              timeRemaining <= 10 ? 'text-neo-red' : 'text-neo-green'
             )}>
               {timeRemaining}s
             </span>
@@ -244,12 +234,12 @@ export default function RareGems({
           {/* Rare count */}
           <div className={cn(
             'flex items-center gap-1 px-2 py-1 rounded border-2 border-neo-black',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            'bg-slate-700'
           )}>
             <Gem className="w-4 h-4 text-neo-purple" />
             <span className={cn(
               'font-bold text-sm',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              'text-neo-white'
             )}>
               {rareWordsFound}/{levelConfig.targetRare}
             </span>
@@ -266,12 +256,12 @@ export default function RareGems({
         <div className={cn(
           'flex items-center justify-center gap-3 py-2 text-xs',
           'border-b-2 border-neo-black',
-          isDarkMode ? 'bg-slate-800' : 'bg-white'
+          'bg-slate-800'
         )}>
           {Object.entries(RARITY_COLORS).map(([rarity, color]) => (
             <div key={rarity} className="flex items-center gap-1">
               <div className={cn('w-3 h-3 rounded border border-neo-black', color)} />
-              <span className={isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'}>
+              <span className={'text-neo-white/70'}>
                 {t(`brain.drills.rarity.${rarity}`)} (+{RARITY_POINTS[rarity as keyof typeof RARITY_POINTS]})
               </span>
             </div>
@@ -290,19 +280,19 @@ export default function RareGems({
             <Gem className="w-20 h-20 mx-auto text-neo-purple" />
             <h2 className={cn(
               'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              'text-neo-white'
             )}>
               {t('brain.drills.rare-gems.name')}
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              'text-neo-white/70'
             )}>
               {t('brain.drills.rare-gems.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              'bg-slate-800'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.timeSpent')}: {levelConfig.timeLimit}s</p>
@@ -325,7 +315,7 @@ export default function RareGems({
               <div className="flex justify-center">
                 <div className={cn(
                   'px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-lg',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
+                  'bg-slate-700 text-neo-white'
                 )}>
                   {keyboard.typedWord.toUpperCase()}
                 </div>
@@ -387,7 +377,7 @@ export default function RareGems({
             {wordsFound.length > 0 && (
               <div className={cn(
                 'flex flex-wrap gap-2 justify-center p-3 rounded-neo border-2 border-neo-black max-h-32 overflow-y-auto',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
+                'bg-slate-800'
               )}>
                 {wordsFound.slice(-15).map((w, i) => (
                   <span
@@ -429,7 +419,7 @@ export default function RareGems({
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
                 'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                'bg-slate-700 text-neo-white'
               )}
             >
               {t('brain.drills.finishGame')}
@@ -459,7 +449,7 @@ export default function RareGems({
               transition={{ delay: 0.3 }}
               className={cn(
                 'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}
             >
               {rareWordsFound >= levelConfig.targetRare ? t('brain.drills.complete') : t('brain.drills.gameOver')}
@@ -470,7 +460,7 @@ export default function RareGems({
               transition={{ delay: 0.5 }}
               className={cn(
                 'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
+                'bg-slate-800'
               )}
             >
               {/* Animated Score */}
@@ -497,14 +487,14 @@ export default function RareGems({
                   transition={{ delay: 0.9 }}
                   className={cn(
                     'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                    'bg-slate-700'
                   )}
                 >
                   <Gem className="w-6 h-6 mx-auto text-neo-purple mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                  <p className={cn('text-2xl font-black', 'text-neo-white')}>
                     {rareWordsFound}
                   </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                  <p className={cn('text-xs', 'text-neo-white/70')}>
                     {t('brain.drills.rareWords')}
                   </p>
                 </AdaptiveMotion.div>
@@ -514,14 +504,14 @@ export default function RareGems({
                   transition={{ delay: 1 }}
                   className={cn(
                     'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                    'bg-slate-700'
                   )}
                 >
                   <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                  <p className={cn('text-2xl font-black', 'text-neo-white')}>
                     {wordsFound.length}
                   </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                  <p className={cn('text-xs', 'text-neo-white/70')}>
                     {t('brain.drills.wordsFound')}
                   </p>
                 </AdaptiveMotion.div>

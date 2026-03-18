@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CODEX_COMBOS, CODEX_COMBO_COUNT } from './utils/blastComboScaling';
@@ -30,8 +30,8 @@ export function BlastCodexModal({ discoveredCombos, isOpen, onClose }: BlastCode
   const discoveredCount = CODEX_COMBOS.filter((c) => discoveredCombos.has(c)).length;
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         key="codex-backdrop"
         className="fixed inset-0 z-40 flex items-center justify-center p-4"
         initial={{ opacity: 0 }}
@@ -54,7 +54,7 @@ export function BlastCodexModal({ discoveredCombos, isOpen, onClose }: BlastCode
         />
 
         {/* Modal card */}
-        <motion.div
+        <AdaptiveMotion.div
           data-testid="combo-codex-modal"
           className="relative border-neo border-black bg-neo-navy shadow-hard-lg rounded-neo w-full max-w-sm max-h-[80vh] flex flex-col"
           initial={{ scale: 0.9, opacity: 0 }}
@@ -103,8 +103,8 @@ export function BlastCodexModal({ discoveredCombos, isOpen, onClose }: BlastCode
               );
             })}
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 }

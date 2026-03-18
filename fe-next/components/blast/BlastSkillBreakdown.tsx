@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import type { BlastResultsData } from './types';
 
@@ -85,7 +85,7 @@ export const BlastSkillBreakdown = memo(function BlastSkillBreakdown({
   if (metrics.length === 0) return null;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1.1, duration: 0.4, ease: 'easeOut' }}
@@ -102,7 +102,7 @@ export const BlastSkillBreakdown = memo(function BlastSkillBreakdown({
             <span className="font-black text-white tabular-nums">{metric.value}</span>
           </div>
           <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ width: 0 }}
               animate={{ width: `${metric.pct}%` }}
               transition={{ delay: 1.2 + i * 0.1, duration: 0.6, ease: 'easeOut' }}
@@ -111,6 +111,6 @@ export const BlastSkillBreakdown = memo(function BlastSkillBreakdown({
           </div>
         </div>
       ))}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });

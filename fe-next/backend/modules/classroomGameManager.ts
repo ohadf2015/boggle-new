@@ -8,7 +8,7 @@
 import { getRedisClient } from '../redisClient.js';
 import logger from '../utils/logger.js';
 
-const CLASSROOM_GAME_TTL = 3600; // 1 hour
+const CLASSROOM_GAME_TTL = 14400; // 4 hours
 
 function getRedis() {
   const client = getRedisClient();

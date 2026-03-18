@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Zap, Swords, Trophy } from 'lucide-react';
 import { useBlastOpponentActivity } from '@/hooks/gameState/store';
 
@@ -37,9 +37,9 @@ export function BlastOpponentFeed() {
 
   return (
     <div className="absolute top-0 inset-x-0 z-40 pointer-events-none flex flex-col items-center gap-0.5 px-2 pt-1">
-      <AnimatePresence mode="popLayout">
+      <AdaptiveAnimatePresence mode="popLayout">
         {visible.map(event => (
-          <motion.div
+          <AdaptiveMotion.div
             key={event.id}
             layout
             initial={{ opacity: 0, y: -12, scale: 0.9 }}
@@ -73,9 +73,9 @@ export function BlastOpponentFeed() {
                 <span>{event.message}</span>
               </>
             )}
-          </motion.div>
+          </AdaptiveMotion.div>
         ))}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 }

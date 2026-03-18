@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { getChainColor, getChainLabel } from './utils/blastChainCounter';
 
 interface BlastChainCounterProps {
@@ -24,9 +24,9 @@ export function BlastChainCounter({ chainLevel }: BlastChainCounterProps) {
   const isRainbow = color === 'rainbow';
 
   return (
-    <AnimatePresence mode="wait">
+    <AdaptiveAnimatePresence mode="wait">
       {label && (
-        <motion.div
+        <AdaptiveMotion.div
           key={chainLevel}
           data-testid="blast-chain-counter"
           data-chain-level={chainLevel}
@@ -59,8 +59,8 @@ export function BlastChainCounter({ chainLevel }: BlastChainCounterProps) {
               {label}
             </span>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 }

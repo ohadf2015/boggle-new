@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 
 interface BlastProgressBarProps {
   cleared: number;
@@ -85,7 +85,7 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
         ))}
 
         {/* Animated fill — chunky with glow trail */}
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute inset-y-0 left-0 rounded-neo"
           initial={{ width: '0%' }}
           animate={{
@@ -104,9 +104,9 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-white/25 to-transparent rounded-neo pointer-events-none" />
 
         {/* Milestone pulse flash */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {milestonePulse && (
-            <motion.div
+            <AdaptiveMotion.div
               key={`pulse-${milestonePulse}`}
               initial={{ opacity: 0.8, scaleX: 0 }}
               animate={{ opacity: 0, scaleX: 1 }}
@@ -116,12 +116,12 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
               style={{ backgroundColor: `${getProgressColor(milestonePulse)}40` }}
             />
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
 
       {/* Percentage badge */}
       {percentage > 0 && (
-        <motion.div
+        <AdaptiveMotion.div
           key={percentage}
           initial={{ scale: 1.3, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -133,7 +133,7 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
           >
             {percentage}%
           </span>
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
     </div>
   );

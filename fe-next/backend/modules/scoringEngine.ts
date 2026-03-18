@@ -73,6 +73,16 @@ export function calculateGameScores(
   const playerWords = game.playerWords || {};
   const playerWordDetails = game.playerWordDetails || {};
 
+  // Pre-build Map<word, WordDetail> per player for O(1) lookup
+  const playerWordDetailsMap: Record<string, Map<string, WordDetail>> = {};
+  for (const [username, details] of Object.entries(playerWordDetails)) {
+    const map = new Map<string, WordDetail>();
+    for (const d of (details || [])) {
+      map.set(d.word, d);
+    }
+    playerWordDetailsMap[username] = map;
+  }
+
   for (const [username, words] of Object.entries(playerWords)) {
     const uniqueWords = [...new Set(words)];
     let totalScore = 0;
@@ -131,7 +141,7 @@ export function calculateGameScores(
       }
 
       // Get pre-calculated score from word details if available
-      const existingDetails = (playerWordDetails[username] || []).find(d => d.word === word);
+      const existingDetails = playerWordDetailsMap[username]?.get(word);
       let score = 0;
 
       if (validated) {

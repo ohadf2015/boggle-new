@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BlastComboType } from './utils/blastCombos';
 
@@ -39,8 +40,8 @@ export function BlastComboDiscovery({ pendingDiscovery, onComplete }: BlastCombo
   if (!pendingDiscovery) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         key={pendingDiscovery}
         data-testid="combo-discovery-banner"
         className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
@@ -53,7 +54,7 @@ export function BlastComboDiscovery({ pendingDiscovery, onComplete }: BlastCombo
         <div className="absolute inset-0 bg-black/40" />
 
         {/* Card */}
-        <motion.div
+        <AdaptiveMotion.div
           className="relative border-neo border-black bg-neo-yellow shadow-hard-lg rounded-neo px-8 py-6 text-center"
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -65,8 +66,8 @@ export function BlastComboDiscovery({ pendingDiscovery, onComplete }: BlastCombo
           <p className="font-neo-display text-2xl font-bold text-neo-orange uppercase">
             {t(`blast.combo.${pendingDiscovery}`)}
           </p>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { WaveResult } from './types';
@@ -14,7 +14,7 @@ export function StarRating({ stars }: { stars: 1 | 2 | 3 }) {
   return (
     <div className="flex items-center gap-3">
       {[1, 2, 3].map(i => (
-        <motion.div
+        <AdaptiveMotion.div
           key={i}
           initial={{ scale: 0, rotate: -180 }}
           animate={{
@@ -41,7 +41,7 @@ export function StarRating({ stars }: { stars: 1 | 2 | 3 }) {
               i <= stars ? 'text-yellow-400 fill-yellow-400' : 'text-white/15'
             )}
           />
-        </motion.div>
+        </AdaptiveMotion.div>
       ))}
     </div>
   );
@@ -74,7 +74,7 @@ export function StatCard({
 }) {
   const rotation = CARD_ROTATIONS[index % CARD_ROTATIONS.length];
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: 20, rotate: rotation * 2 }}
       animate={{ opacity: 1, y: 0, rotate: rotation }}
       transition={{ delay, duration: 0.4, type: 'spring', stiffness: 200 }}
@@ -97,7 +97,7 @@ export function StatCard({
           NEW!
         </span>
       )}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 }
 
@@ -111,7 +111,7 @@ const WAVE_COLORS = ['#A855F7', '#06B6D4', '#6366F1'];
 export function WaveBreakdown({ waveResults, label }: { waveResults: WaveResult[]; label: string }) {
   if (waveResults.length <= 1) return null;
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 1.1 }}
@@ -124,7 +124,7 @@ export function WaveBreakdown({ waveResults, label }: { waveResults: WaveResult[
         {waveResults.map((wr, idx) => {
           const color = WAVE_COLORS[idx % WAVE_COLORS.length];
           return (
-            <motion.div
+            <AdaptiveMotion.div
               key={wr.waveNumber}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -143,10 +143,10 @@ export function WaveBreakdown({ waveResults, label }: { waveResults: WaveResult[
               <span className="text-[10px] font-bold text-white/70 tabular-nums relative z-10">
                 {wr.wordsFound}w · {wr.clearPercentage}%
               </span>
-            </motion.div>
+            </AdaptiveMotion.div>
           );
         })}
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 }

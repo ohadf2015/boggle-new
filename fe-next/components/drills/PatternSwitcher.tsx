@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Shuffle, Trophy, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
@@ -53,10 +52,8 @@ export default function PatternSwitcher({
   onComplete,
   onExit,
 }: PatternSwitcherProps) {
-  const { theme } = useTheme();
   const { t, dir } = useLanguage();
   const { playErrorSound } = useSoundEffects();
-  const isDarkMode = theme === 'dark';
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -251,13 +248,13 @@ export default function PatternSwitcher({
   return (
     <div dir={dir} className={cn(
       'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-slate-800'
       )}>
         <div className="flex items-center gap-3">
           {/* Required length */}
@@ -294,7 +291,7 @@ export default function PatternSwitcher({
       {phase !== 'ready' && phase !== 'complete' && (
         <div className={cn(
           'flex items-center justify-center gap-2 py-2 border-b-2 border-neo-black',
-          isDarkMode ? 'bg-slate-800' : 'bg-white'
+          'bg-slate-800'
         )}>
           {pattern.map((len, i) => (
             <div
@@ -303,7 +300,7 @@ export default function PatternSwitcher({
                 'w-8 h-8 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-sm',
                 i < patternIndex ? 'bg-neo-green text-neo-black' :
                 i === patternIndex ? 'bg-neo-cyan text-neo-black' :
-                isDarkMode ? 'bg-slate-700 text-neo-white/50' : 'bg-gray-200 text-neo-black/50'
+                'bg-slate-700 text-neo-white/50'
               )}
             >
               {len}
@@ -323,19 +320,19 @@ export default function PatternSwitcher({
             <Shuffle className="w-20 h-20 mx-auto text-neo-cyan" />
             <h2 className={cn(
               'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              'text-neo-white'
             )}>
               {t('brain.drills.pattern-switcher.name')}
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              'text-neo-white/70'
             )}>
               {t('brain.drills.pattern-switcher.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              'bg-slate-800'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.patternLength')}: {levelConfig.patternLength}</p>
@@ -398,7 +395,7 @@ export default function PatternSwitcher({
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
                 'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                'bg-slate-700 text-neo-white'
               )}
             >
               {t('brain.drills.finishGame')}
@@ -428,7 +425,7 @@ export default function PatternSwitcher({
               transition={{ delay: 0.3 }}
               className={cn(
                 'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}
             >
               {lives > 0 ? t('brain.drills.complete') : t('brain.drills.gameOver')}
@@ -439,7 +436,7 @@ export default function PatternSwitcher({
               transition={{ delay: 0.5 }}
               className={cn(
                 'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
+                'bg-slate-800'
               )}
             >
               {/* Animated Score */}
@@ -466,14 +463,14 @@ export default function PatternSwitcher({
                   transition={{ delay: 0.9 }}
                   className={cn(
                     'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                    'bg-slate-700'
                   )}
                 >
                   <Shuffle className="w-6 h-6 mx-auto text-neo-cyan mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                  <p className={cn('text-2xl font-black', 'text-neo-white')}>
                     {patternsCompleted}
                   </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                  <p className={cn('text-xs', 'text-neo-white/70')}>
                     {t('brain.drills.patterns')}
                   </p>
                 </AdaptiveMotion.div>
@@ -483,14 +480,14 @@ export default function PatternSwitcher({
                   transition={{ delay: 1 }}
                   className={cn(
                     'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                    'bg-slate-700'
                   )}
                 >
                   <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                  <p className={cn('text-2xl font-black', 'text-neo-white')}>
                     {wordsFound.length}
                   </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                  <p className={cn('text-xs', 'text-neo-white/70')}>
                     {t('brain.drills.wordsFound')}
                   </p>
                 </AdaptiveMotion.div>
@@ -507,7 +504,7 @@ export default function PatternSwitcher({
                 onClick={() => setPhase('ready')}
                 className={cn(
                   'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
+                  'bg-slate-700 text-neo-white'
                 )}
               >
                 <RotateCcw className="w-5 h-5" />

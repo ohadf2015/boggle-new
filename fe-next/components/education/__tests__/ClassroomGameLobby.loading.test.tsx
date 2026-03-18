@@ -60,7 +60,7 @@ describe('ClassroomGameLobby — loading state', () => {
   it('shows contextual loading text', () => {
     render(<ClassroomGameLobby onBack={jest.fn()} />);
 
-    expect(screen.getByText('Setting up your classroom...')).toBeInTheDocument();
+    expect(screen.getByText('education.classroom.settingUp')).toBeInTheDocument();
   });
 
   it('does not render wizard content while loading', () => {

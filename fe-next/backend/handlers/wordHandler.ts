@@ -36,7 +36,7 @@ import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } fro
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
 
 // Rate limit weights
-const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '1');
+const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '3');
 
 // Types for payloads
 interface SubmitWordPayload {

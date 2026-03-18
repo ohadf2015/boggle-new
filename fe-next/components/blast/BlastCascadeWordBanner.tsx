@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import type { CascadeHighlightData } from './types';
 
@@ -35,9 +35,9 @@ export function BlastCascadeWordBanner({ highlightData }: BlastCascadeWordBanner
   if (!highlightData) return null;
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {highlightData.words.map((wordData, idx) => (
-        <motion.div
+        <AdaptiveMotion.div
           key={`banner-${idx}`}
           data-testid={`cascade-word-banner-${idx}`}
           initial={{ opacity: 0, scale: 0.9, y: 6 }}
@@ -68,8 +68,8 @@ export function BlastCascadeWordBanner({ highlightData }: BlastCascadeWordBanner
           <span className="font-black text-lg tabular-nums drop-shadow-md">
             +{wordData.score}
           </span>
-        </motion.div>
+        </AdaptiveMotion.div>
       ))}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 }

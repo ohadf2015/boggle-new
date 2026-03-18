@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // ==================== Types ====================
@@ -142,8 +143,8 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
 
       {/* Celebration text (tier 2+) */}
       {tier >= 2 && textKey && (
-        <AnimatePresence>
-          <motion.div
+        <AdaptiveAnimatePresence>
+          <AdaptiveMotion.div
             data-testid="celebration-text"
             className="absolute font-neo-display font-black select-none"
             style={{
@@ -167,8 +168,8 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
             transition={{ duration: 0.6, times: [0, 0.4, 1] }}
           >
             {t(textKey)}
-          </motion.div>
-        </AnimatePresence>
+          </AdaptiveMotion.div>
+        </AdaptiveAnimatePresence>
       )}
 
       {/* Star particles (tier 2+) — more particles, larger travel, brighter glow */}
@@ -183,7 +184,7 @@ export function BlastWordCelebration({ celebration, onComplete }: BlastWordCeleb
         const starColor = PARTICLE_COLORS[i % PARTICLE_COLORS.length];
         const isOdd = i % 2 === 1;
         return (
-          <motion.div
+          <AdaptiveMotion.div
             key={i}
             className={isOdd ? 'absolute rounded-full' : 'absolute rounded-sm'}
             style={{

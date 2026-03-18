@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 
 interface BlastMoveCounterProps {
@@ -43,7 +43,7 @@ export function BlastMoveCounter({
 
   return (
     <div className="relative">
-      <motion.div
+      <AdaptiveMotion.div
         data-testid="move-counter"
         className={cn(
           'border-3 border-neo-black rounded-neo shadow-hard px-3 py-1.5 min-w-[70px]',
@@ -65,12 +65,12 @@ export function BlastMoveCounter({
             {t('blast.movesLeft')}
           </div>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Bonus move popup */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {bonusText && (
-          <motion.span
+          <AdaptiveMotion.span
             initial={{ opacity: 0, y: 8, scale: 0.8 }}
             animate={{ opacity: 1, y: -18, scale: 1 }}
             exit={{ opacity: 0, y: -32 }}
@@ -78,9 +78,9 @@ export function BlastMoveCounter({
             className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap font-black text-sm text-neo-lime drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] pointer-events-none z-10"
           >
             {bonusText}
-          </motion.span>
+          </AdaptiveMotion.span>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 }

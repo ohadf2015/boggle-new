@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BlastChainBadgeProps {
@@ -39,8 +40,8 @@ export function BlastChainBadge({ chainLevel }: BlastChainBadgeProps) {
     : undefined;
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
+    <AdaptiveAnimatePresence mode="wait">
+      <AdaptiveMotion.div
         key={chainLevel}
         data-testid="blast-chain-badge"
         data-tier={tier}
@@ -55,7 +56,7 @@ export function BlastChainBadge({ chainLevel }: BlastChainBadgeProps) {
         transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
       >
         <span>{t('blast.chain.badge', { level: chainLevel })}</span>
-      </motion.div>
-    </AnimatePresence>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 }

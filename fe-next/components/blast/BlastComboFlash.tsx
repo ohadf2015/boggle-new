@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import type { BlastComboType } from './utils/blastCombos';
 
 // ==================== Types ====================
@@ -98,8 +99,8 @@ export function BlastComboFlash({ activeFlash, onComplete }: BlastComboFlashProp
   const background = getComboFlashColor(tier);
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         key={activeFlash.id}
         data-testid="combo-flash"
         className="absolute inset-0 pointer-events-none z-40 overflow-hidden"
@@ -109,7 +110,7 @@ export function BlastComboFlash({ activeFlash, onComplete }: BlastComboFlashProp
         onAnimationComplete={() => onComplete(activeFlash.id)}
       >
         {/* Radial flash — expands from center like a shockwave */}
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute"
           style={{
             inset: '-50%',
@@ -123,7 +124,7 @@ export function BlastComboFlash({ activeFlash, onComplete }: BlastComboFlashProp
         />
         {/* Horizontal sweep line for tier 2+ */}
         {tier >= 2 && (
-          <motion.div
+          <AdaptiveMotion.div
             style={{
               position: 'absolute',
               top: '50%',
@@ -140,8 +141,8 @@ export function BlastComboFlash({ activeFlash, onComplete }: BlastComboFlashProp
             transition={{ duration: 0.3, ease: 'easeOut' }}
           />
         )}
-      </motion.div>
-    </AnimatePresence>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 }
 

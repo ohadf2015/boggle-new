@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Target, Gem, Zap, Check, Snowflake, Bomb, Type, Star } from 'lucide-react';
 import type { BlastObjectiveProgress, BlastObjectiveType, BlastTileType } from './types';
 
@@ -28,14 +28,14 @@ export function BlastObjectiveDisplay({ objectiveProgress, t }: BlastObjectiveDi
 
   return (
     <div className="flex flex-col gap-1">
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {objectiveProgress.map((progress, idx) => {
           const { objective, current, isComplete } = progress;
           const displayTarget = objective.target;
           const displayCurrent = Math.min(current, displayTarget);
 
           return (
-            <motion.div
+            <AdaptiveMotion.div
               key={`obj-${idx}`}
               className={`flex items-center gap-2 px-2 py-1 rounded-neo text-xs
                 ${isComplete ? 'bg-green-900/40 text-green-300' : 'bg-neo-navy/60 text-neo-white/80'}`}
@@ -66,10 +66,10 @@ export function BlastObjectiveDisplay({ objectiveProgress, t }: BlastObjectiveDi
               <span className="font-mono text-[10px] shrink-0 tabular-nums">
                 {current}/{displayTarget}
               </span>
-            </motion.div>
+            </AdaptiveMotion.div>
           );
         })}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 }
