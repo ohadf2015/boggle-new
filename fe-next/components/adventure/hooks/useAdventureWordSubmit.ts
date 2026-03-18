@@ -86,7 +86,7 @@ export interface UseAdventureWordSubmitReturn {
 
 export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseAdventureWordSubmitReturn {
   const {
-    isPlaying, isPaused, isValidating, isCascading,
+    isPlaying, isPaused, isValidating,
     currentWord, selectedIndices, tiles, gridSize, minWordLength,
     validateWord, submitWordWithPath, clearSelection, clearCurrentHint,
     recordActivity, resetOnGameAction,
@@ -129,7 +129,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       const word = submittedWord || currentWord;
       const indices = submittedIndices.length > 0 ? submittedIndices : selectedIndices;
 
-      if (!isPlaying || isPaused || word.length < minWordLength || isValidating || isCascading) return;
+      if (!isPlaying || isPaused || word.length < minWordLength || isValidating) return;
 
       tap();
 
@@ -261,7 +261,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         }, 2000);
       }
     },
-    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, tiles, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
+    [isPlaying, isPaused, isValidating, currentWord, selectedIndices, tiles, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
   );
 
   return {

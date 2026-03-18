@@ -141,6 +141,10 @@ const es = {
     "shareViaWhatsApp": "Compartir por WhatsApp",
     "shareViaTelegram": "Compartir por Telegram",
     "close": "Cerrar",
+    "showAll": "Mostrar todo",
+    "claim": "Reclamar",
+    "looksGood": "Se ve bien",
+    "verified": "Verificado",
     "home": "Inicio",
     "playAgain": "Jugar de nuevo",
     "exit": "Salir",
@@ -1602,6 +1606,9 @@ const es = {
     "of": "de",
     "readyForNextRound": "¿Listos para la siguiente ronda?",
     "readyExplanation": "Marca listo para la siguiente ronda",
+    "defendTitle": "¡Defiende tu título!",
+    "surviveLongerThan": "¡Sobrevive más que @{player}!",
+    "waitingForPlayers": "Esperando que los jugadores estén listos...",
     "waitingForHost": "Esperando a que el anfitrión inicie la siguiente ronda...",
     "scoringTip": "Tip de puntuación",
     "scoringTipText": "Palabras más largas = más puntos",
@@ -3108,6 +3115,7 @@ const es = {
       "subtitle": "Unos tips antes de empezar"
     },
     "letsPlay": "¡A jugar!",
+    "buildAvatar": "¿Crear tu avatar primero?",
     "skip": "Saltar tutorial",
     "next": "Siguiente",
     "step": "Paso {current} de {total}"
@@ -5422,6 +5430,51 @@ const es = {
     "nextWorld": "Siguiente mundo",
     "retryLevel": "Reintentar",
     "freeRetry": "Reintento gratis",
+    "nextUp": "Siguiente",
+    "streakBadge": "Racha de {{days}} días ({{multiplier}}x bonus)",
+    "hub": {
+      "days": "días",
+      "streakActive": "¡Sigue así!",
+      "playToStart": "Juega un nivel para iniciar tu racha",
+      "bestStreak": "Mejor",
+      "dailyQuests": "Misiones diarias",
+      "continue": "Continuar",
+      "worldMap": "Mapa del mundo",
+      "wordAlbum": "Álbum de palabras"
+    },
+    "album": {
+      "title": "Álbum de palabras",
+      "uniqueWords": "Palabras únicas",
+      "milestones": {
+        "novice": "Novato de palabras",
+        "explorer": "Explorador de palabras",
+        "collector": "Coleccionista de palabras",
+        "scholar": "Erudito de palabras",
+        "master": "Maestro de palabras",
+        "lexicon": "Leyenda del léxico"
+      },
+      "newWordsFound": "¡{{count}} palabras nuevas añadidas!"
+    },
+    "endlessMode": {
+      "teaser": "Modo infinito",
+      "comingSoon": "Completa el mundo 10 para desbloquear"
+    },
+    "share": {
+      "bossDefeated": "¡Derroté a {{boss}} en {{world}}!",
+      "shareCard": "Compartir victoria"
+    },
+    "weeklyChallenge": {
+      "title": "Desafío semanal",
+      "description": "¡El mismo tablero para todos — compite por la mejor puntuación!",
+      "play": "Jugar desafío",
+      "leaderboard": "Clasificación",
+      "yourBest": "Tu mejor",
+      "resetsIn": "Se reinicia en",
+      "rank": "Rango",
+      "noScoresYet": "Aún no hay puntuaciones esta semana",
+      "scoreSubmitted": "¡Puntuación enviada!",
+      "newHighScore": "¡Nuevo récord personal!"
+    },
     "quest": {
       "title": "Misiones del cap.",
       "wordCount": "Encontrar palabras",
@@ -5912,7 +5965,20 @@ const es = {
       "bomb": "Bomba (limpia fila)",
       "rainbow": "Arcoíris (comodín)",
       "chain": "Cadena (combo)",
-      "time": "Tiempo (+5 seg)"
+      "time": "Tiempo (+5 seg)",
+      "locked": "Bloqueado",
+      "multiplier": "Multiplicador (2x puntos)",
+      "letter": "Letra",
+      "aria": {
+        "gold": "ficha de oro, multiplicador 3x",
+        "ice": "ficha de hielo, obstáculo",
+        "bomb": "ficha bomba, limpia fila",
+        "rainbow": "ficha arcoíris, comodín",
+        "chain": "ficha cadena, combo",
+        "time": "ficha de tiempo, más 5 segundos",
+        "locked": "ficha bloqueada, desbloquear con letra coincidente",
+        "multiplier": "ficha multiplicadora, 2x puntos"
+      }
     },
     "errors": {
       "tooShort": "La palabra es muy corta",
@@ -6387,6 +6453,30 @@ const es = {
         "perfectLevels": {
           "title": "Perfeccionista",
           "desc": "Completa {target} niveles con 3 estrellas"
+        },
+        "fullCombo": {
+          "title": "Maestro del Combo",
+          "desc": "Completa {target} niveles sin romper el combo"
+        },
+        "worldMechanic": {
+          "title": "Experto del Mundo",
+          "desc": "Activa la mecánica del mundo {target} veces"
+        },
+        "flashChallenge": {
+          "title": "Pensador Rápido",
+          "desc": "Completa {target} desafíos relámpago"
+        },
+        "bossHighHealth": {
+          "title": "Intocable",
+          "desc": "Derrota al jefe con más del 75% de salud"
+        },
+        "streak": {
+          "title": "Maestro de Racha",
+          "desc": "Alcanza una racha de {target} palabras"
+        },
+        "scoreChallenge": {
+          "title": "Gran Puntuación",
+          "desc": "Obtén {target} puntos en un capítulo"
         }
       }
     },
@@ -6396,7 +6486,9 @@ const es = {
       "loreScroll": "Pergamino de historia",
       "runeFragment": "Fragmento de runa",
       "tapToOpen": "Toca para abrir",
-      "xp": "Experiencia"
+      "xp": "Experiencia",
+      "bonusGold": "Oro Extra",
+      "bossTrophy": "Trofeo de Jefe"
     },
     "later": "Más tarde",
     "nextLevel": "Siguiente: Nivel",

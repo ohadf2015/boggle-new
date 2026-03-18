@@ -23,7 +23,6 @@ import type {
 // Extracted components
 import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
-import NewPlayerOnboarding from '../components/game/NewPlayerOnboarding';
 import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
@@ -162,7 +161,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // UI state
   const [showQR, setShowQR] = useState<boolean>(false);
-  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
 
   // Exit handlers (confirmation, room leave, custom event listener)
   const { showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom } = usePlayerExit({
@@ -294,28 +292,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
   }, [gameActive, setShufflingGrid]);
 
-  // Show onboarding for first-time players during WAITING phase (not during gameplay)
-  // This gives players time to learn before the game starts
-  useEffect(() => {
-    // Only show during waiting phase (not gameActive) and when connected
-    if (!gameActive && !showOnboarding && socket) {
-      const hasSeenOnboarding = localStorage.getItem('lexiclash_seen_onboarding');
-      if (!hasSeenOnboarding) {
-        // Small delay to let the waiting view render first
-        const timer = setTimeout(() => {
-          setShowOnboarding(true);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-    }
-    return undefined;
-  }, [gameActive, showOnboarding, socket]);
-
-  // Handle onboarding dismissal
-  const handleOnboardingDismiss = useCallback(() => {
-    setShowOnboarding(false);
-    localStorage.setItem('lexiclash_seen_onboarding', 'true');
-  }, []);
 
 
   // Clear game state on mount and cleanup
@@ -549,12 +525,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       {showStartAnimation && (
         <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} t={t} />
       )}
-      {showOnboarding && (
-        <NewPlayerOnboarding
-          t={t}
-          onDismiss={handleOnboardingDismiss}
-        />
-      )}
       {/* First-time achievement celebrations for new players */}
       {isNewPlayerRef.current && (
         <FirstTimeAchievement
@@ -599,7 +569,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
         boardTheme={boardTheme}
-        onShowTutorial={() => setShowOnboarding(true)}
         totalTime={totalGameTimeRef.current}
       />
     </>

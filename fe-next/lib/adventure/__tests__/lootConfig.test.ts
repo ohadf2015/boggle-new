@@ -30,37 +30,41 @@ describe('generateLootChest', () => {
     expect(xp!.amount).toBe(40);
   });
 
-  it('guarantees rune fragment on 3-star', () => {
+  it('guarantees bonus gold on 3-star', () => {
     const chest = generateLootChest(1, 1, 3, 100, 1);
-    const rune = chest.drops.find(d => d.type === 'runeFragment');
-    expect(rune).toBeDefined();
-    expect(rune!.rarity).toBe('rare');
+    const bonus = chest.drops.find(d => d.type === 'bonusGold');
+    expect(bonus).toBeDefined();
+    expect(bonus!.rarity).toBe('rare');
+    // World 1 * 15 * 1 multiplier = 15
+    expect(bonus!.amount).toBe(15);
   });
 
-  it('does not award rune fragment on 1-star', () => {
+  it('does not award bonus gold on 1-star', () => {
     const chest = generateLootChest(1, 1, 1, 100, 1);
-    const rune = chest.drops.find(d => d.type === 'runeFragment');
-    expect(rune).toBeUndefined();
+    const bonus = chest.drops.find(d => d.type === 'bonusGold');
+    expect(bonus).toBeUndefined();
   });
 
-  it('does not award lore scroll on boss levels (level 5)', () => {
-    const chest = generateLootChest(1, 5, 3, 500, 1);
-    const scroll = chest.drops.find(d => d.type === 'loreScroll');
-    expect(scroll).toBeUndefined();
+  it('awards boss trophy gold on boss levels with 3 stars', () => {
+    const chest = generateLootChest(3, 7, 3, 500, 1);
+    const trophy = chest.drops.filter(d => d.type === 'bonusGold');
+    // Should have both bonus gold (rare) and trophy gold (epic)
+    expect(trophy.length).toBe(2);
+    expect(trophy.some(d => d.rarity === 'epic')).toBe(true);
   });
 
-  it('does not award lore scroll on boss levels (level 7)', () => {
-    const chest = generateLootChest(1, 7, 3, 500, 1);
-    const scroll = chest.drops.find(d => d.type === 'loreScroll');
-    expect(scroll).toBeUndefined();
+  it('does not award boss trophy on non-boss levels', () => {
+    const chest = generateLootChest(3, 3, 3, 500, 1);
+    const epic = chest.drops.find(d => d.rarity === 'epic');
+    expect(epic).toBeUndefined();
   });
 
-  it('awards lore scroll on non-boss levels with stars >= 1', () => {
-    const chest = generateLootChest(2, 3, 1, 100, 1);
-    const scroll = chest.drops.find(d => d.type === 'loreScroll');
-    expect(scroll).toBeDefined();
-    expect(scroll!.scrollId).toBe('scroll-w2-l3');
-    expect(scroll!.rarity).toBe('epic');
+  it('bonus gold scales with world number', () => {
+    const w1 = generateLootChest(1, 1, 3, 100, 1);
+    const w5 = generateLootChest(5, 1, 3, 100, 1);
+    const w1Bonus = w1.drops.find(d => d.type === 'bonusGold')!.amount;
+    const w5Bonus = w5.drops.find(d => d.type === 'bonusGold')!.amount;
+    expect(w5Bonus).toBeGreaterThan(w1Bonus);
   });
 
   it('maps chest tier to 3-star → golden', () => {

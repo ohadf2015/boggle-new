@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { ChapterQuestProgress, ChapterQuest } from '@/types/adventure';
 import { getQuestsForChapter } from '@/lib/adventure/questConfig';
+import { useProgression } from '@/contexts/ProgressionContext';
 
 interface UseChapterQuestsProps {
   worldId: number;
@@ -16,24 +17,40 @@ interface UseChapterQuestsReturn {
   recordLevelPerfect: () => void;
   recordBossDefeatedNoHint: () => void;
   recordLongWord: () => void;
+  recordWorldMechanicUse: () => void;
+  recordStreakMaster: () => void;
+  recordBossHighHealth: () => void;
+  recordFlashChallengeMaster: () => void;
+  recordScoreChallenge: (score: number) => void;
+  recordFullComboLevel: () => void;
 }
 
 export function useChapterQuests({ worldId, chapterNumber }: UseChapterQuestsProps): UseChapterQuestsReturn {
   const quests = getQuestsForChapter(worldId, chapterNumber);
-  const [progress, setProgress] = useState<ChapterQuestProgress[]>(
-    quests.map(q => ({ questId: q.id, current: 0, isComplete: false, rewardClaimed: false }))
-  );
+  const { progression, updateChapterQuestProgress } = useProgression();
 
+  // Derive progress from persisted progression data
+  const progress = useMemo<ChapterQuestProgress[]>(() => {
+    const saved = progression?.chapterQuestProgress ?? {};
+    return quests.map(q => {
+      const current = Math.min(saved[q.id] ?? 0, q.target);
+      return {
+        questId: q.id,
+        current,
+        isComplete: current >= q.target,
+        rewardClaimed: false,
+      };
+    });
+  }, [quests, progression?.chapterQuestProgress]);
+
+  // Increment matching quests by type — delegates persistence to ProgressionContext
   const increment = useCallback((type: string, amount = 1) => {
-    setProgress(prev =>
-      prev.map(p => {
-        const quest = quests.find(q => q.id === p.questId);
-        if (!quest || quest.type !== type || p.isComplete) return p;
-        const next = Math.min(p.current + amount, quest.target);
-        return { ...p, current: next, isComplete: next >= quest.target };
-      })
-    );
-  }, [quests]);
+    const matchingIds = quests
+      .filter(q => q.type === type)
+      .map(q => q.id);
+    if (matchingIds.length === 0) return;
+    updateChapterQuestProgress(type, amount, matchingIds);
+  }, [quests, updateChapterQuestProgress]);
 
   return {
     quests,
@@ -42,5 +59,11 @@ export function useChapterQuests({ worldId, chapterNumber }: UseChapterQuestsPro
     recordLevelPerfect: () => increment('perfectLevels'),
     recordBossDefeatedNoHint: () => increment('defeatBossNoHint'),
     recordLongWord: () => increment('longWordCount'),
+    recordWorldMechanicUse: () => increment('worldMechanicUse'),
+    recordStreakMaster: () => increment('streakMaster'),
+    recordBossHighHealth: () => increment('bossHighHealth'),
+    recordFlashChallengeMaster: () => increment('flashChallengeMaster'),
+    recordScoreChallenge: (score: number) => increment('scoreChallenge', score),
+    recordFullComboLevel: () => increment('fullComboLevels'),
   };
 }

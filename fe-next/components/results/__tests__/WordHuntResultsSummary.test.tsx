@@ -9,8 +9,25 @@ import WordHuntResultsSummary from '../WordHuntResultsSummary';
 
 // Mock translations
 jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (key: string) => key }),
+  useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
+
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const makeMotion = (_target: Record<string, unknown>, prop: string) => {
+    // eslint-disable-next-line react/display-name
+    const Comp = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+      const { initial, animate, exit, variants, whileHover, whileTap, transition, ...rest } = props;
+      return React.createElement(prop, { ...rest, ref });
+    });
+    return Comp;
+  };
+  return {
+    ...jest.requireActual('framer-motion'),
+    useReducedMotion: () => true,
+    motion: new Proxy({}, { get: makeMotion }),
+  };
+});
 
 const baseProps = {
   targetWord: 'PUZZLE',

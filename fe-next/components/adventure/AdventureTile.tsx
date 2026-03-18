@@ -162,7 +162,7 @@ export const AdventureTile = memo(({
       }
       whileTap={!prefersReducedMotion ? { scale: 0.95 } : undefined}
       style={{
-        borderRadius: '6px',
+        borderRadius: 'clamp(4px, 1cqi, 8px)',
         fontSize: 'var(--cell-font-size)',
         animationDelay: effectiveCascadeDelay
           ? `${effectiveCascadeDelay}ms`
@@ -387,7 +387,7 @@ export const AdventureTile = memo(({
         <motion.div
           className="absolute inset-0 pointer-events-none z-10"
           style={{
-            borderRadius: '6px',
+            borderRadius: 'clamp(4px, 1cqi, 8px)',
             // Strong golden inset ring for clear selection feedback
             boxShadow: 'inset 0 0 0 2px rgba(255,225,53,0.9), inset 0 0 12px rgba(255,200,80,0.5)',
             background: 'radial-gradient(circle at center, rgba(255,210,80,0.35) 0%, rgba(255,200,80,0.12) 55%, transparent 75%)',

@@ -130,7 +130,9 @@ describe('useAdventureWordSubmit', () => {
     expect(mockValidateWord).not.toHaveBeenCalled();
   });
 
-  it('should not submit when cascading', async () => {
+  it('should allow submission during cascade (word was formed before cascade started)', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+
     const { result } = renderHook(() =>
       useAdventureWordSubmit({ ...defaultProps, isCascading: true })
     );
@@ -139,7 +141,7 @@ describe('useAdventureWordSubmit', () => {
       await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
     });
 
-    expect(mockValidateWord).not.toHaveBeenCalled();
+    expect(mockValidateWord).toHaveBeenCalledWith('hello', expect.any(Array));
   });
 
   it('should handle valid word submission', async () => {

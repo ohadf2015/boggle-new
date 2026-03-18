@@ -30,6 +30,7 @@ interface GameGridAreaProps {
   onWordSubmit: (word: string, indices: number[]) => void;
   onDragStart: (index: number, tile: GridTileState) => void;
   onDragEnter: (index: number, tile: GridTileState) => void;
+  onDragEnd?: () => void;
   gridRef: React.RefObject<HTMLDivElement | null>;
 
   // State
@@ -85,6 +86,7 @@ export const GameGridArea = memo(function GameGridArea({
   onWordSubmit,
   onDragStart,
   onDragEnter,
+  onDragEnd,
   gridRef,
   isInteractive,
   isDisabled,
@@ -210,17 +212,15 @@ export const GameGridArea = memo(function GameGridArea({
       </div>
 
       {/* Main Content - Centered vertically and horizontally (grid only) */}
-      <div className="flex-1 flex flex-col items-center justify-center min-h-0 px-2 sm:px-4 py-1">
+      <div className="flex-1 flex flex-col items-center justify-center min-h-0 px-2 sm:px-4 py-1" style={{ containerType: 'size' }}>
         {/*
-          Grid Container.
-          Old: max-w-md (448px) — too narrow on phone, leaves dead space on tablet.
-          New: w-full with a square clamp.
-            - `min(100%, 80vh)` lets the grid grow to full container width but
-              never exceed 80% of the viewport height (keeps it square & visible).
-            - On landscape/desktop the sidebar eats width, so 80vh naturally caps.
-            - On portrait mobile the sidebar is only h-16, so 80vh ≈ useful space.
+          Grid Container — uses container query height (cqh) so sizing adapts
+          to the actual available space in the flex container, not the viewport.
+          - 90cqh keeps the grid within its parent (leaves room for word preview + hint).
+          - 520px caps on large screens to prevent an oversized board.
+          - 100% width ensures full-width on narrow phones.
         */}
-        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 75dvh, 520px)' }}>
+        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 90cqh, 520px)' }}>
           <motion.div
             className={cn(
               'w-full aspect-square max-h-full rounded-neo-lg',
@@ -242,6 +242,7 @@ export const GameGridArea = memo(function GameGridArea({
                 onWordSubmit={onWordSubmit}
                 onDragStart={onDragStart}
                 onDragEnter={onDragEnter}
+                onDragEnd={onDragEnd}
                 interactive={isInteractive}
                 disabled={isDisabled}
                 showWordPreview={false}

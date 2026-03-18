@@ -243,10 +243,10 @@ describe('AdventureTile', () => {
       expect(tile).not.toHaveClass('letter-tile-gradient');
     });
 
-    it('should have 6px border radius via inline style', () => {
+    it('should have responsive border radius via inline style', () => {
       const { container } = render(<AdventureTile {...defaultProps} />);
       const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveStyle({ borderRadius: '6px' });
+      expect(tile).toHaveStyle({ borderRadius: 'clamp(4px, 1cqi, 8px)' });
     });
 
     it('should have font-size from CSS variable', () => {

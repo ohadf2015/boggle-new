@@ -377,6 +377,62 @@ jest.mock('../LevelGrid', () => {
   return MockLevelGrid;
 });
 
+// Mock AdventureHub — renders a simple button to navigate to world map
+jest.mock('../AdventureHub', () => {
+  const MockAdventureHub = ({
+    onOpenWorldMap,
+    onPlayLevel,
+  }: {
+    onOpenWorldMap: () => void;
+    onPlayLevel: (worldId: number, levelId: number) => void;
+  }) => (
+    <div data-testid="adventure-hub">
+      <button data-testid="hub-world-map" onClick={onOpenWorldMap}>World Map</button>
+      <button data-testid="hub-continue" onClick={() => onPlayLevel(1, 6)}>Continue</button>
+    </div>
+  );
+  MockAdventureHub.displayName = 'MockAdventureHub';
+  return MockAdventureHub;
+});
+
+// Mock useDailyQuests for hub
+jest.mock('@/hooks/useDailyQuests', () => ({
+  useDailyQuests: () => ({
+    quests: [],
+    recordProgress: jest.fn(),
+    completedQuests: [],
+    todayStr: '2026-03-18',
+  }),
+}));
+
+// Mock adventureStreak for hub
+jest.mock('@/lib/adventure/adventureStreak', () => ({
+  getStreakMultiplier: () => 1.0,
+}));
+
+jest.mock('@/lib/adventure/weeklyChallenge', () => ({
+  getWeeklyChallengeConfig: () => ({
+    weekId: '2026-W11',
+    grid: Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => 'A')),
+    gridSize: 5,
+    timerSeconds: 120,
+    resetMs: 86400000,
+  }),
+  getCurrentWeekId: () => '2026-W11',
+}));
+
+jest.mock('../WordAlbumPanel', () => {
+  const Mock = () => null;
+  Mock.displayName = 'MockWordAlbumPanel';
+  return Mock;
+});
+
+jest.mock('../WeeklyChallengePanel', () => {
+  const Mock = () => null;
+  Mock.displayName = 'MockWeeklyChallengePanel';
+  return Mock;
+});
+
 // Mock AdventureGame to simplify testing of AdventureView integration
 jest.mock('../AdventureGame', () => {
   const MockAdventureGame = ({
@@ -441,8 +497,17 @@ const createMockProgression = (overrides = {}): PlayerProgression => ({
 // HELPER FUNCTIONS
 // ==============================================
 
+/** Render AdventureView.
+ * Note: With completions in mock, initial view is 'hub'.
+ * Most tests call navigatePastHub() first to get to worldMap. */
 const renderAdventureView = () => {
-  return render(<AdventureView />);
+  const result = render(<AdventureView />);
+  // Auto-navigate past hub for backward compatibility with existing tests
+  const hub = screen.queryByTestId('adventure-hub');
+  if (hub) {
+    fireEvent.click(screen.getByTestId('hub-world-map'));
+  }
+  return result;
 };
 
 // ==============================================
@@ -504,37 +569,35 @@ describe('AdventureView Integration', () => {
     });
   });
 
-  describe('World Map View (Initial State)', () => {
-    it('should render world map as initial view', () => {
-      // GIVEN / WHEN
-      renderAdventureView();
-
-      // THEN
-      expect(screen.getByTestId('world-map')).toBeInTheDocument();
+  describe('Hub View (Initial State for returning players)', () => {
+    it('should render hub as initial view for players with completions', () => {
+      // Use raw render to avoid auto-navigation past hub
+      render(<AdventureView />);
+      expect(screen.getByTestId('adventure-hub')).toBeInTheDocument();
     });
 
-    it('should display player stats in header', () => {
-      // GIVEN / WHEN
-      renderAdventureView();
+    it('should navigate to world map when World Map button is clicked', () => {
+      render(<AdventureView />);
+      expect(screen.getByTestId('adventure-hub')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('hub-world-map'));
+      expect(screen.getByTestId('world-map')).toBeInTheDocument();
+    });
+  });
 
-      // THEN
-      expect(screen.getByText('15')).toBeInTheDocument(); // Total stars
-      expect(screen.getByText('Lv. 3')).toBeInTheDocument(); // Player level
+  describe('World Map View', () => {
+    it('should display player stats in header', () => {
+      renderAdventureView(); // auto-navigates past hub
+      expect(screen.getByText('15')).toBeInTheDocument();
+      expect(screen.getByText('Lv. 3')).toBeInTheDocument();
     });
 
     it('should display adventure title', () => {
-      // GIVEN / WHEN
       renderAdventureView();
-
-      // THEN
       expect(screen.getByText('Adventure')).toBeInTheDocument();
     });
 
     it('should display back link to home on world map', () => {
-      // GIVEN / WHEN
       renderAdventureView();
-
-      // THEN
       const backLink = screen.getByRole('link', { name: /back/i });
       expect(backLink).toHaveAttribute('href', '/');
     });

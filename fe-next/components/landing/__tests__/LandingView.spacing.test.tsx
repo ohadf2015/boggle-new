@@ -1,6 +1,6 @@
 /**
- * Test: Daily Challenge Banner spacing on mobile view
- * Bug: Banner has insufficient margin from mode cards on mobile/landscape
+ * Test: Daily Challenge Banner is inside the mode cards grid on mobile view
+ * Updated: Banner moved from full-width above grid to col-span-2 inside grid
  */
 
 import { render } from '@testing-library/react';
@@ -100,7 +100,6 @@ describe('LandingView - Daily Challenge Banner Spacing', () => {
     });
 
     // Simulate mobile landscape dimensions (< 1024px wide)
-    // so isDesktopWidth stays false and the mobile layout renders
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 768 });
 
     // Mock window.matchMedia for mobile landscape
@@ -119,87 +118,35 @@ describe('LandingView - Daily Challenge Banner Spacing', () => {
     });
   });
 
-  it('should have consistent spacing between Daily Challenge Banner and mode cards on mobile landscape', () => {
+  it('should render Daily Challenge Banner inside the mode cards grid on mobile landscape', () => {
     const { container } = render(<LandingView />);
 
-    // Find the Daily Challenge Banner wrapper by looking for the div containing DailyChallengeBanner
-    // It should have 'w-full' class and be a direct child before the grid
-    const bannerWrappers = container.querySelectorAll('.w-full');
-    let bannerWrapper: Element | null = null;
-
-    // Find the wrapper that contains the Daily Challenge Banner
-    bannerWrappers.forEach((el) => {
-      if (el.className.includes('mb-')) {
-        // Check if this is specifically the banner wrapper (has w-full and mb-X)
-        const parent = el.parentElement;
-        if (parent && parent.querySelector('.grid.grid-cols-2')) {
-          bannerWrapper = el;
-        }
-      }
-    });
-
-    // Find the mode cards grid
+    // The Daily Challenge Banner is now inside the 2-col grid as a col-span-2 item
     const cardsGrid = container.querySelector('.grid.grid-cols-2');
-
-    expect(bannerWrapper).toBeTruthy();
     expect(cardsGrid).toBeTruthy();
 
-    // Check that banner wrapper has adequate bottom margin
-    // Current bug: has mb-2 (0.5rem), should have at least mb-3 (0.75rem) or mb-4 (1rem)
-    const bannerWrapperClasses = bannerWrapper ? (bannerWrapper as HTMLElement).className : '';
+    // Banner wrapper should be inside the grid with col-span-2
+    const bannerInGrid = cardsGrid?.querySelector('.col-span-2');
+    expect(bannerInGrid).toBeTruthy();
 
-    // This should FAIL with current code (mb-2), and PASS after fix (mb-3 or mb-4)
-    const hasInadequateMargin = bannerWrapperClasses.includes('mb-2');
-    const hasAdequateMargin = bannerWrapperClasses.includes('mb-3') ||
-                             bannerWrapperClasses.includes('mb-4') ||
-                             bannerWrapperClasses.includes('mb-5');
-
-    // Assert that we DON'T have the bug (inadequate margin)
-    expect(hasInadequateMargin).toBe(false);
-    // Assert that we DO have adequate margin
-    expect(hasAdequateMargin).toBe(true);
+    // Grid gap handles spacing between items — no separate mb-X wrapper needed
   });
 
-  it('should have consistent spacing between Daily Challenge Banner and mode cards on mobile portrait', () => {
-    // Override mobile portrait mock
+  it('should render Daily Challenge Banner inside the mode cards grid on mobile portrait', () => {
     jest.resetModules();
     jest.mock('@/hooks/useMobileLandscape', () => ({
       useMobileLandscape: () => false,
     }));
     jest.mock('@/hooks/useMobilePortrait', () => ({
-      useMobilePortrait: () => true, // Mobile portrait mode
+      useMobilePortrait: () => true,
     }));
 
     const { container } = render(<LandingView />);
 
-    // Find the Daily Challenge Banner wrapper
-    const bannerWrappers = container.querySelectorAll('.w-full');
-    let bannerWrapper: Element | null = null;
-
-    // Find the wrapper that contains the Daily Challenge Banner
-    bannerWrappers.forEach((el) => {
-      if (el.className.includes('mb-')) {
-        const parent = el.parentElement;
-        if (parent && parent.querySelector('.grid.grid-cols-2')) {
-          bannerWrapper = el;
-        }
-      }
-    });
-
-    // Find the mode cards grid
     const cardsGrid = container.querySelector('.grid.grid-cols-2');
-
-    expect(bannerWrapper).toBeTruthy();
     expect(cardsGrid).toBeTruthy();
 
-    // Check spacing - same as landscape test
-    const bannerWrapperClasses = bannerWrapper ? (bannerWrapper as HTMLElement).className : '';
-    const hasInadequateMargin = bannerWrapperClasses.includes('mb-2');
-    const hasAdequateMargin = bannerWrapperClasses.includes('mb-3') ||
-                             bannerWrapperClasses.includes('mb-4') ||
-                             bannerWrapperClasses.includes('mb-5');
-
-    expect(hasInadequateMargin).toBe(false);
-    expect(hasAdequateMargin).toBe(true);
+    const bannerInGrid = cardsGrid?.querySelector('.col-span-2');
+    expect(bannerInGrid).toBeTruthy();
   });
 });

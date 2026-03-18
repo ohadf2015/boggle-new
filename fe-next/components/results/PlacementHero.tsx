@@ -175,7 +175,7 @@ const FloatingSparkles: React.FC = () => (
       <motion.div
         key={i}
         className="absolute pointer-events-none text-neo-cream/60"
-        style={{ left: s.x, top: s.y, fontSize: s.size }}
+        style={{ insetInlineStart: s.x, top: s.y, fontSize: s.size }}
         animate={{
           y: [0, -8, 0],
           opacity: [0.3, 0.8, 0.3],
@@ -323,7 +323,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
               backgroundSize: '200% 100%',
             }}
             animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
-            transition={{ duration: 2.5, delay: 1, ease: 'easeInOut', repeat: Infinity, repeatDelay: 4 }}
+            transition={{ duration: 1.8, delay: 0.5, ease: 'easeInOut', repeat: Infinity, repeatDelay: 3 }}
           />
         )}
 
@@ -373,7 +373,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 className={`
                   ${theme.rankBg} border-4 border-neo-black rounded-full shadow-hard-lg
                   flex items-center justify-center
-                  w-20 h-20 sm:w-24 sm:h-24
+                  w-24 h-24 sm:w-28 sm:h-28
                 `}
                 animate={
                   !reducedMotion && rank <= 3
@@ -395,7 +395,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 }
               >
                 <span
-                  className={`${theme.rankText} font-black text-4xl sm:text-5xl leading-none`}
+                  className={`${theme.rankText} font-black text-6xl sm:text-7xl leading-none`}
                   style={{ textShadow: theme.textShadow }}
                 >
                   {rank}

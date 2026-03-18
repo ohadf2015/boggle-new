@@ -2,9 +2,12 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
-import { Star, Play, Check, Swords, BookOpen } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Star, Play, Check, Swords, BookOpen, Trophy } from 'lucide-react';
+import { useEntranceChoreography } from '@/hooks/useEntranceChoreography';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { Player } from '@/components/results/types';
+import Avatar from '@/components/Avatar';
 
 // Dynamic imports for heavy components
 const PlacementHero = dynamic(() => import('@/components/results/PlacementHero'), { ssr: false });
@@ -21,6 +24,10 @@ import { AdPlaceholder } from '@/components/ads';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
 import ShareButton from '@/components/results/ShareButton';
 import { StatsCardGrid } from '@/components/results/shared';
+import { WordPointsGroup, InvalidWordsSection } from '@/components/results/WordPointsGroup';
+import { useWordCategories } from '@/components/results/useWordCategories';
+import { AchievementBadge } from '@/components/AchievementBadge';
+import { filterGameAchievements } from '@/components/results/utils';
 import type { ShareParams } from '@/shared/utils/shareResultGenerator';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
@@ -159,6 +166,8 @@ export interface ResultsMainContentProps {
   seriesRoundNumber?: number;
   /** Current game mode (to show Word Hunt promo when not playing word-hunt) */
   gameMode?: string;
+  /** Emoji reactions for speech bubbles on leaderboard rows */
+  emojiReactions?: Array<{ id: string; emoji: string; username: string; timestamp: number }>;
 }
 
 // ==============================================
@@ -203,6 +212,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   seriesStandings,
   seriesRoundNumber,
   gameMode,
+  emojiReactions,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -218,6 +228,35 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   const winnerScore = sortedScores[0]?.score ?? 0;
   const gapToWinner = currentPlayerRank > 1 ? winnerScore - (currentPlayerData?.score ?? 0) : 0;
 
+  const reducedMotion = useReducedMotion();
+  const { dir } = useLanguage();
+  const shadowX = dir === 'rtl' ? '-6px' : '6px';
+  const shadowXLg = dir === 'rtl' ? '-8px' : '8px';
+  const breathingShadow = [
+    `${shadowX} 6px 0px black`,
+    `${shadowXLg} 8px 0px black`,
+    `${shadowX} 6px 0px black`,
+  ];
+  const { isVisible, getDelay } = useEntranceChoreography(
+    ['hero', 'leaderboard', 'revenge', 'cta', 'stats', 'words'],
+    { baseDelay: 300, stagger: 200 }
+  );
+
+  // Top achievements earned this game (max 3 shown as highlight)
+  const gameAchievements = React.useMemo(() => {
+    if (!currentPlayerData?.achievements) return [];
+    return filterGameAchievements(currentPlayerData.achievements, currentPlayerData.allWords).slice(0, 3);
+  }, [currentPlayerData]);
+
+  // Rich word categorization for "Your Words" section
+  const {
+    wordsByPoints,
+    sortedPointGroups,
+    invalidWords: playerInvalidWords,
+    totalComboBonus,
+    totalFireRoundBonus,
+  } = useWordCategories(currentPlayerData?.allWords);
+
   return (
     <div className="space-y-3">
       {/* Placement Hero — big, clear rank + score for the current player */}
@@ -232,20 +271,27 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Top 3 Leaderboard / Podium - prominent placement */}
+      {/* Top 3 Leaderboard / Podium — cascaded after hero */}
       {sortedScores.length > 1 && (
         scoreRevealComplete ? (
-          isMobile ? (
-            <MobileCompactLeaderboard
-              participants={sortedScores.map(p => ({
-                name: p.username,
-                score: p.score,
-                isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-              }))}
-            />
-          ) : (
-            <Top3Leaderboard players={sortedScores} currentUsername={username} compact showConfetti />
-          )
+          <motion.div
+            initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
+            animate={isVisible('leaderboard') ? { opacity: 1, y: 0 } : undefined}
+            transition={{ type: 'spring', stiffness: 120, damping: 20, delay: getDelay('leaderboard') }}
+          >
+            {isMobile ? (
+              <MobileCompactLeaderboard
+                participants={sortedScores.map(p => ({
+                  name: p.username,
+                  score: p.score,
+                  isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
+                }))}
+                emojiReactions={emojiReactions}
+              />
+            ) : (
+              <Top3Leaderboard players={sortedScores} currentUsername={username} compact showConfetti emojiReactions={emojiReactions} />
+            )}
+          </motion.div>
         ) : (
           <ScoreRevealAnimation
             players={sortedScores.map(p => ({
@@ -261,129 +307,245 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         )
       )}
 
-      {/* MVP Awards removed — notable stats shown per-player in leaderboard instead */}
+      {/* Revenge Face-Off — YOUR avatar vs WINNER avatar + VS badge + score gap */}
+      {scoreRevealComplete && currentPlayerRank > 1 && sortedScores.length > 1 && sortedScores[0] && currentPlayerData && isVisible('revenge') && (
+        <motion.div
+          initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20, delay: getDelay('revenge') }}
+          className="bg-neo-navy-light/30 border-3 border-neo-black rounded-neo shadow-hard p-4 relative overflow-hidden"
+        >
+          {/* Halftone overlay */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]" />
 
-      {/* Primary CTA - Play Again / Ready / Next Step (above the fold) */}
-      {gameCode && onReturnToRoom && (
-        isBotsOnlyGame && !isHost ? (
-          <NextStepPrompt
-            currentMode="multiplayer-bots"
-            onBackToLobby={onExit}
-            variant="mobile"
-            className="mt-2"
-          />
-        ) : (
-          <>
-            <div className="mt-2">
-              {isHost ? (
-                <div className="space-y-2">
-                  {/* Game Mode Selector - host can override before starting */}
-                  {selectedGameMode !== undefined && onSelectGameMode && (
-                    <div className="bg-neo-navy-light/50 border-2 border-neo-white/10 rounded-neo p-2">
-                      <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-1.5">
-                        {t('gameModes.nextMode')}
-                      </p>
-                      <GameModeSelector
-                        selectedMode={selectedGameMode}
-                        onSelectMode={onSelectGameMode}
-                        t={t}
-                        showRandom
-                        compact
-                      />
-                    </div>
-                  )}
-                  <motion.button
-                    onClick={onStartGame}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
-                  >
-                    <Play className="w-6 h-6" />
-                    {t('results.playAgain')}
-                  </motion.button>
-                </div>
-              ) : isCurrentPlayerReady ? (
-                <div className="bg-emerald-500 text-white border-3 border-neo-black rounded-neo p-3 shadow-hard">
-                  <div className="flex items-center justify-center gap-2">
-                    <Check className="w-5 h-5" />
-                    <span className="font-black uppercase">{t('results.youAreReady')}</span>
-                  </div>
-                  <p className="text-center text-sm text-white/80 mt-1">
-                    {t('results.waitingForHostToStart')}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  {/* Revenge framing when player lost — "Rematch vs @winner?" activates competitive drive */}
-                  {currentPlayerRank > 1 && sortedScores.length > 1 && sortedScores[0]?.username ? (
-                    <motion.button
-                      onClick={onMarkReady}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full bg-neo-pink text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
-                    >
-                      <Swords className="w-6 h-6" />
-                      {t('results.revengeRematch', { player: sortedScores[0].username })}
-                    </motion.button>
-                  ) : (
-                    <motion.button
-                      onClick={onMarkReady}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
-                    >
-                      <Star className="w-6 h-6" />
-                      {t('results.imReady')}
-                    </motion.button>
-                  )}
-                  <p className="text-center text-xs text-neo-cream/60">
-                    {t('results.readyExplanation')}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Share Button with narrative preview */}
-            {currentPlayerData && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
-              <div className="space-y-1.5">
-                {/* Auto-generated narrative — gives the share context */}
-                {currentPlayerValidWords.length > 0 && (
-                  <p className="text-[10px] text-neo-cream/40 text-center italic px-2">
-                    {currentPlayerRank === 1
-                      ? t('results.shareNarrativeWin', {
-                          word: currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase(),
-                          score: currentPlayerData.score || 0,
-                        })
-                      : t('results.shareNarrativeLoss', {
-                          words: currentPlayerValidWords.length,
-                          score: currentPlayerData.score || 0,
-                        })
-                    }
-                  </p>
-                )}
-                <ShareButton
-                  params={{
-                    gameMode: 'multiplayer',
-                    score: currentPlayerData.score || 0,
-                    wordsFound: currentPlayerValidWords.length,
-                    longestWord: currentPlayerValidWords.length > 0
-                      ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word
-                      : undefined,
-                    won: currentPlayerRank === 1,
-                    opponentScore: sortedScores.length > 1
-                      ? sortedScores.find(p => normalizeUsername(p.username) !== normalizeUsername(username))?.score
-                      : undefined,
-                  } satisfies ShareParams}
-                  t={t}
-                  className="w-full"
+          <div className="relative z-10 flex items-center justify-center gap-3 sm:gap-5">
+            {/* YOUR side */}
+            <div className="flex flex-col items-center gap-1.5 min-w-0">
+              <div className="border-3 border-neo-cyan rounded-full shadow-hard-sm bg-neo-cream p-0.5">
+                <Avatar
+                  profilePictureUrl={currentPlayerData.avatar?.profilePictureUrl ?? undefined}
+                  avatarImage={currentPlayerData.avatar?.avatarImage}
+                  customAvatar={currentPlayerData.avatar?.customAvatar}
+                  size="lg"
                 />
               </div>
-            )}
-          </>
-        )
+              <span className="text-xs font-black uppercase text-neo-cyan truncate max-w-[80px]">
+                {t('results.you')}
+              </span>
+              <span className="text-lg font-black text-neo-cream tabular-nums">{currentPlayerData.score}</span>
+            </div>
+
+            {/* VS badge — wobble + scale pulse */}
+            <motion.div
+              animate={!reducedMotion ? { rotate: [0, 4, -4, 0], scale: [1, 1.08, 1] } : undefined}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              className="shrink-0 bg-neo-pink border-3 border-neo-black rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-hard"
+            >
+              <span className="font-black text-white text-sm sm:text-base">VS</span>
+            </motion.div>
+
+            {/* WINNER side */}
+            <div className="flex flex-col items-center gap-1.5 min-w-0">
+              <div className="border-3 border-neo-lime rounded-full shadow-hard-sm bg-neo-cream p-0.5">
+                <Avatar
+                  profilePictureUrl={sortedScores[0].avatar?.profilePictureUrl ?? undefined}
+                  avatarImage={sortedScores[0].avatar?.avatarImage}
+                  customAvatar={sortedScores[0].avatar?.customAvatar}
+                  size="lg"
+                />
+              </div>
+              <span className="text-xs font-black uppercase text-neo-lime truncate max-w-[80px]">
+                {sortedScores[0].username}
+              </span>
+              <span className="text-lg font-black text-neo-cream tabular-nums">{sortedScores[0].score}</span>
+            </div>
+          </div>
+
+          {/* Score gap / mode-specific callout */}
+          <motion.p
+            initial={reducedMotion ? undefined : { opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: reducedMotion ? 0 : getDelay('revenge') + 0.3, type: 'spring', stiffness: 300, damping: 18 }}
+            className="text-center mt-3 text-sm font-black uppercase text-neo-pink"
+          >
+            {gameMode === 'word-hunt'
+              ? t('results.surviveLongerThan', { player: sortedScores[0].username })
+              : gapToWinner > 0
+                ? t('results.pointsBehind', { points: gapToWinner })
+                : null
+            }
+          </motion.p>
+
+          {/* Mascot motivator */}
+          {!reducedMotion && (
+            <motion.div
+              className="absolute -bottom-1 -end-1 opacity-30 pointer-events-none"
+              animate={{ y: [0, -4, 0], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/mascot/flexing-nobg.gif" alt="" width={48} height={48} className="object-contain" loading="eager" />
+            </motion.div>
+          )}
+        </motion.div>
       )}
 
-      {/* Ready status — inline text instead of separate component */}
+      {/* Winner — "DEFEND YOUR TITLE" card */}
+      {scoreRevealComplete && currentPlayerRank === 1 && sortedScores.length > 1 && isVisible('revenge') && (
+        <motion.div
+          initial={reducedMotion ? undefined : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20, delay: getDelay('revenge') }}
+          className="flex items-center justify-center gap-3 p-3 bg-neo-lime/10 border-3 border-neo-lime/40 rounded-neo shadow-hard-sm"
+        >
+          <Trophy className="w-6 h-6 text-neo-lime shrink-0" />
+          <span className="font-black uppercase text-neo-lime text-sm">
+            {t('results.defendTitle')}
+          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mascot/trophy-nobg.gif" alt="" width={36} height={36} className="object-contain shrink-0" loading="eager" />
+        </motion.div>
+      )}
+
+      {/* Primary CTA — cascaded entrance */}
+      {gameCode && onReturnToRoom && isVisible('cta') && (
+        <motion.div
+          initial={reducedMotion ? undefined : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20, delay: getDelay('cta') }}
+        >
+          {isBotsOnlyGame && !isHost ? (
+            <NextStepPrompt
+              currentMode="multiplayer-bots"
+              onBackToLobby={onExit}
+              variant="mobile"
+              className="mt-2"
+            />
+          ) : (
+            <>
+              <div className="mt-2">
+                {isHost ? (
+                  <div className="space-y-2">
+                    {selectedGameMode !== undefined && onSelectGameMode && (
+                      <div className="bg-neo-navy-light/50 border-2 border-neo-white/10 rounded-neo p-2">
+                        <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-1.5">
+                          {t('gameModes.nextMode')}
+                        </p>
+                        <GameModeSelector
+                          selectedMode={selectedGameMode}
+                          onSelectMode={onSelectGameMode}
+                          t={t}
+                          showRandom
+                          compact
+                        />
+                      </div>
+                    )}
+                    <motion.button
+                      onClick={onStartGame}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.93 }}
+                      animate={!reducedMotion ? {
+                        scale: [1, 1.02, 1],
+                        boxShadow: breathingShadow,
+                      } : undefined}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                      className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                    >
+                      <Play className="w-6 h-6" />
+                      {t('results.playAgain')}
+                    </motion.button>
+                  </div>
+                ) : isCurrentPlayerReady ? (
+                  <div className="bg-emerald-500 text-white border-3 border-neo-black rounded-neo p-3 shadow-hard">
+                    <div className="flex items-center justify-center gap-2">
+                      <Check className="w-5 h-5" />
+                      <span className="font-black uppercase">{t('results.youAreReady')}</span>
+                    </div>
+                    <p className="text-center text-sm text-white/80 mt-1">
+                      {t('results.waitingForHostToStart')}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {currentPlayerRank > 1 && sortedScores.length > 1 && sortedScores[0]?.username ? (
+                      <motion.button
+                        onClick={onMarkReady}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
+                        animate={!reducedMotion ? {
+                          scale: [1, 1.02, 1],
+                          boxShadow: breathingShadow,
+                        } : undefined}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        className="w-full bg-neo-pink text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                      >
+                        <Swords className="w-6 h-6" />
+                        {t('results.revengeRematch', { player: sortedScores[0].username })}
+                      </motion.button>
+                    ) : (
+                      <motion.button
+                        onClick={onMarkReady}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
+                        animate={!reducedMotion ? {
+                          scale: [1, 1.02, 1],
+                          boxShadow: breathingShadow,
+                        } : undefined}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                      >
+                        <Star className="w-6 h-6" />
+                        {t('results.imReady')}
+                      </motion.button>
+                    )}
+                    <p className="text-center text-xs text-neo-cream/60">
+                      {t('results.readyExplanation')}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Share Button with narrative preview */}
+              {currentPlayerData && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
+                <div className="space-y-1.5">
+                  {currentPlayerValidWords.length > 0 && (
+                    <p className="text-[10px] text-neo-cream/40 text-center italic px-2">
+                      {currentPlayerRank === 1
+                        ? t('results.shareNarrativeWin', {
+                            word: currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase(),
+                            score: currentPlayerData.score || 0,
+                          })
+                        : t('results.shareNarrativeLoss', {
+                            words: currentPlayerValidWords.length,
+                            score: currentPlayerData.score || 0,
+                          })
+                      }
+                    </p>
+                  )}
+                  <ShareButton
+                    params={{
+                      gameMode: 'multiplayer',
+                      score: currentPlayerData.score || 0,
+                      wordsFound: currentPlayerValidWords.length,
+                      longestWord: currentPlayerValidWords.length > 0
+                        ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word
+                        : undefined,
+                      won: currentPlayerRank === 1,
+                      opponentScore: sortedScores.length > 1
+                        ? sortedScores.find(p => normalizeUsername(p.username) !== normalizeUsername(username))?.score
+                        : undefined,
+                    } satisfies ShareParams}
+                    t={t}
+                    className="w-full"
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </motion.div>
+      )}
+
+      {/* Ready status */}
       {gameCode && sortedScores.length > 1 && readyUsernames.length > 0 && (
         <div className="text-center" aria-live="polite">
           <span className="text-xs text-neo-cream/60 font-medium">
@@ -392,7 +554,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         </div>
       )}
 
-      {/* Streak Urgency — motivate continued play (singleplayer only) */}
+      {/* Streak Urgency (singleplayer only) */}
       {!gameCode && winStreakData && winStreakData.currentStreak >= 1 && (
         <StreakUrgencyDisplay
           currentStreak={winStreakData.currentStreak}
@@ -400,7 +562,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Series Standings - Accumulated scores across multiple games */}
+      {/* Series Standings */}
       {seriesStandings && seriesRoundNumber && seriesRoundNumber >= 2 && (
         <SeriesStandingsBanner
           standings={seriesStandings}
@@ -410,7 +572,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Near-Miss Notifications - Motivate "one more game" (before analysis) */}
+      {/* Near-Miss Notifications */}
       {nearMisses.length > 0 && (
         <NearMissCard
           nearMisses={nearMisses}
@@ -420,67 +582,112 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Word Hunt promo — singleplayer only, non-WH games, max 3 impressions */}
+      {/* Word Hunt promo — singleplayer only */}
       {!gameCode && gameMode !== 'word-hunt' && <WordHuntAnnouncementBanner className="mt-2" />}
 
-      {/* Stats Row — unified grid */}
-      {currentPlayerData && currentPlayerRank > 0 && (
-        <StatsCardGrid
-          cards={[
-            { label: t('results.words'), value: currentPlayerValidWords.length, icon: '📝' },
-            {
-              label: t('results.bestCombo'),
-              value: (() => {
-                const words = currentPlayerData?.allWords ?? [];
-                const maxCombo = words.reduce((max, w) => Math.max(max, w.comboBonus ?? 0), 0);
-                return maxCombo > 0 ? `x${maxCombo}` : '-';
-              })(),
-              icon: '⚡',
-              accent: 'amber',
-            },
-            {
-              label: t('results.bestWord'),
-              value: currentPlayerValidWords.length > 0
-                ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()
-                : '-',
-              icon: '⭐',
-              accent: 'lime',
-            },
-          ]}
-          variant="inline"
-        />
-      )}
-
-
-      {/* Your Words — collapsed by default, for players who want to investigate */}
-      {currentPlayerValidWords.length > 0 && (
-        <CollapsibleSection
-          title={t('results.yourWords')}
-          icon={<BookOpen className="w-4 h-4" />}
-          badge={currentPlayerValidWords.length}
-          summary={currentPlayerValidWords.length > 0
-            ? `${t('results.bestWord')}: ${currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()}`
-            : undefined}
-          defaultExpanded={false}
-          variant="tertiary"
-          className="shadow-hard"
+      {/* Stats Row — cascaded entrance */}
+      {currentPlayerData && currentPlayerRank > 0 && isVisible('stats') && (
+        <motion.div
+          initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 120, damping: 20, delay: getDelay('stats') }}
         >
-          <div className="flex flex-wrap gap-1">
-            {currentPlayerValidWords
-              .sort((a, b) => b.score - a.score)
-              .map((w) => (
-                <span
-                  key={w.word}
-                  className="px-2 py-1 text-xs font-medium rounded-md bg-slate-800 text-slate-300 border border-slate-700"
-                >
-                  {w.word.toUpperCase()} <span className="text-neo-lime/70">{w.score}</span>
-                </span>
-              ))}
-          </div>
-        </CollapsibleSection>
+          <StatsCardGrid
+            cards={[
+              { label: t('results.words'), value: currentPlayerValidWords.length, icon: '📝' },
+              {
+                label: t('results.bestCombo'),
+                value: (() => {
+                  const words = currentPlayerData?.allWords ?? [];
+                  const maxCombo = words.reduce((max, w) => Math.max(max, w.comboBonus ?? 0), 0);
+                  return maxCombo > 0 ? `x${maxCombo}` : '-';
+                })(),
+                icon: '⚡',
+                accent: 'amber',
+              },
+              {
+                label: t('results.bestWord'),
+                value: currentPlayerValidWords.length > 0
+                  ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()
+                  : '-',
+                icon: '⭐',
+                accent: 'lime',
+              },
+            ]}
+            variant="inline"
+          />
+        </motion.div>
       )}
 
-      {/* Large Room Notice - Compact */}
+      {/* Top Achievements — highlight reel of badges earned this game */}
+      {gameAchievements.length > 0 && isVisible('stats') && (
+        <motion.div
+          initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20, delay: getDelay('stats') + 0.15 }}
+          className="flex items-center gap-2 flex-wrap justify-center py-2"
+        >
+          <span className="text-[10px] font-black uppercase tracking-widest text-neo-cream/40 w-full text-center mb-0.5">
+            {t('results.badges')}
+          </span>
+          {gameAchievements.map((ach, i) => (
+            <AchievementBadge
+              key={ach.key || ach.name || `ach-${i}`}
+              achievement={ach}
+              index={i}
+            />
+          ))}
+        </motion.div>
+      )}
+
+      {/* Your Words — rich display with combo/fire/AI badges, grouped by points */}
+      {currentPlayerValidWords.length > 0 && isVisible('words') && (
+        <motion.div
+          initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 120, damping: 20, delay: getDelay('words') }}
+        >
+          <CollapsibleSection
+            title={t('results.yourWords')}
+            icon={<BookOpen className="w-4 h-4" />}
+            badge={currentPlayerValidWords.length}
+            summary={[
+              currentPlayerValidWords.length > 0
+                ? `${t('results.bestWord')}: ${currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()}`
+                : undefined,
+              totalComboBonus > 0 ? `⚡ +${totalComboBonus}` : undefined,
+              totalFireRoundBonus > 0 ? `🔥 +${totalFireRoundBonus}` : undefined,
+            ].filter(Boolean).join(' · ')}
+            defaultExpanded={false}
+            variant="tertiary"
+            className="shadow-hard"
+          >
+            <div className="space-y-2">
+              {/* Valid words grouped by points — shows combo, fire round, AI badges */}
+              {sortedPointGroups.length > 0 && (
+                <WordPointsGroup
+                  wordsByPoints={wordsByPoints}
+                  sortedPointGroups={sortedPointGroups}
+                  t={t}
+                  mode="simple"
+                  animate
+                />
+              )}
+
+              {/* Invalid words — show what didn't count and why */}
+              {playerInvalidWords.length > 0 && (
+                <InvalidWordsSection
+                  invalidWords={playerInvalidWords}
+                  t={t}
+                  mode="simple"
+                />
+              )}
+            </div>
+          </CollapsibleSection>
+        </motion.div>
+      )}
+
+      {/* Large Room Notice */}
       {duplicateRuleDisabled && (
         <div className="bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo p-2 text-center">
           <span className="text-xs text-neo-cyan font-bold">
@@ -489,7 +696,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         </div>
       )}
 
-      {/* Ad: Post-game AdSense (primary) + CrazyGames (fallback) */}
+      {/* Ad zones */}
       <div className="flex flex-col items-center gap-2 py-2">
         <AdPlaceholder zone="post-game" />
         {showBanner && <CrazyGamesBanner size={bannerSize} />}

@@ -265,6 +265,12 @@ export interface PlayerProgression {
   prestigeLevel?: number;
   /** Highest endless mode floor reached */
   endlessHighFloor?: number;
+  /** Chapter quest progress — map of questId to current count (persists across sessions) */
+  chapterQuestProgress?: Record<string, number>;
+  /** Word album — all unique words found across adventure mode (uppercase) */
+  wordAlbum?: string[];
+  /** Claimed word album milestone targets (e.g. [50, 100]) */
+  wordAlbumClaimedMilestones?: number[];
   /** Daily quest progress — map of questId to current count (resets daily) */
   dailyQuestProgress?: Record<string, number>;
   /** Last date daily quests were active (YYYY-MM-DD) — for reset detection */

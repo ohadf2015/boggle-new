@@ -142,6 +142,10 @@ const he = {
     "shareViaWhatsApp": "שתף דרך WhatsApp",
     "shareViaTelegram": "שתף דרך Telegram",
     "close": "סגור",
+    "showAll": "הצג הכל",
+    "claim": "קבל",
+    "looksGood": "נראה טוב",
+    "verified": "מאומת",
     "home": "בית",
     "playAgain": "שחק שוב",
     "exit": "יציאה",
@@ -1380,6 +1384,7 @@ const he = {
       "subtitle": "כמה טיפים לפני שנתחיל"
     },
     "letsPlay": "בואו נשחק!",
+    "buildAvatar": "ליצור אווטאר קודם?",
     "skip": "דלג על ההדרכה",
     "next": "הבא",
     "step": "שלב {current} מתוך {total}"
@@ -1530,6 +1535,9 @@ const he = {
     "ready": "מוכן!",
     "waiting": "ממתין...",
     "readyExplanation": "לחצו כדי להגיד למארח שאתם רוצים עוד סיבוב",
+    "defendTitle": "הגנו על התואר!",
+    "surviveLongerThan": "שרדו יותר מ-@{player}!",
+    "waitingForPlayers": "ממתינים לשחקנים להתכונן...",
     "waitingForHost": "ממתינים למארח להתחיל סיבוב חדש...",
     "scoringTip": "טיפ לניקוד",
     "scoringTipText": "מצאו מילים מהר ברצף לבונוס קומבו (⚡). מילים ארוכות שוות הרבה יותר!",
@@ -5422,6 +5430,51 @@ const he = {
     "nextWorld": "העולם הבא",
     "retryLevel": "נסה שוב",
     "freeRetry": "ניסיון חינם",
+    "nextUp": "הבא בתור",
+    "streakBadge": "רצף של {{days}} ימים (בונוס x{{multiplier}})",
+    "hub": {
+      "days": "ימים",
+      "streakActive": "המשיכו כך!",
+      "playToStart": "שחקו שלב כדי להתחיל רצף",
+      "bestStreak": "שיא",
+      "dailyQuests": "משימות יומיות",
+      "continue": "המשך",
+      "worldMap": "מפת עולם",
+      "wordAlbum": "אלבום מילים"
+    },
+    "album": {
+      "title": "אלבום מילים",
+      "uniqueWords": "מילים ייחודיות",
+      "milestones": {
+        "novice": "מתחיל מילים",
+        "explorer": "חוקר מילים",
+        "collector": "אספן מילים",
+        "scholar": "חכם מילים",
+        "master": "אדון המילים",
+        "lexicon": "אגדת הלקסיקון"
+      },
+      "newWordsFound": "{{count}} מילים חדשות נוספו!"
+    },
+    "endlessMode": {
+      "teaser": "מצב אינסופי",
+      "comingSoon": "השלימו עולם 10 כדי לפתוח"
+    },
+    "share": {
+      "bossDefeated": "ניצחתי את {{boss}} ב{{world}}!",
+      "shareCard": "שתף ניצחון"
+    },
+    "weeklyChallenge": {
+      "title": "אתגר שבועי",
+      "description": "אותו לוח לכולם — התחרו על הניקוד הגבוה!",
+      "play": "שחק אתגר",
+      "leaderboard": "טבלת מובילים",
+      "yourBest": "השיא שלך",
+      "resetsIn": "מתאפס בעוד",
+      "rank": "דירוג",
+      "noScoresYet": "אין ניקודים השבוע עדיין",
+      "scoreSubmitted": "הניקוד נשלח!",
+      "newHighScore": "שיא אישי חדש!"
+    },
     "quest": {
       "title": "משימות פרק",
       "wordCount": "מצא מילים",
@@ -5575,7 +5628,20 @@ const he = {
       "bomb": "פצצה (מנקה שורה)",
       "rainbow": "קשת (ג'וקר)",
       "chain": "שרשרת (בונוס קישור)",
-      "time": "זמן (+5 שניות)"
+      "time": "זמן (+5 שניות)",
+      "locked": "נעול",
+      "multiplier": "מכפיל (x2 ניקוד)",
+      "letter": "אות",
+      "aria": {
+        "gold": "אריח זהב, מכפיל x3",
+        "ice": "אריח קרח, מכשול",
+        "bomb": "אריח פצצה, מנקה שורה",
+        "rainbow": "אריח קשת, ג'וקר",
+        "chain": "אריח שרשרת, בונוס קישור",
+        "time": "אריח זמן, פלוס 5 שניות",
+        "locked": "אריח נעול, שחרר עם אות תואמת",
+        "multiplier": "אריח מכפיל, ניקוד x2"
+      }
     },
     "errors": {
       "tooShort": "המילה קצרה מדי",
@@ -6326,6 +6392,30 @@ const he = {
         "perfectLevels": {
           "title": "פרפקציוניסט",
           "desc": "השלם {target} שלבים עם 3 כוכבים"
+        },
+        "fullCombo": {
+          "title": "מאסטר קומבו",
+          "desc": "השלם {target} שלבים בלי לשבור את הקומבו"
+        },
+        "worldMechanic": {
+          "title": "מומחה עולם",
+          "desc": "הפעל את מכניקת העולם {target} פעמים"
+        },
+        "flashChallenge": {
+          "title": "חשיבה מהירה",
+          "desc": "השלם {target} אתגרי בזק"
+        },
+        "bossHighHealth": {
+          "title": "בלתי ניתן לפגיעה",
+          "desc": "הבס את הבוס עם מעל 75% חיים"
+        },
+        "streak": {
+          "title": "מאסטר רצף",
+          "desc": "הגע לרצף של {target} מילים"
+        },
+        "scoreChallenge": {
+          "title": "ניקוד גבוה",
+          "desc": "צבור {target} נקודות בפרק"
         }
       }
     },
@@ -6335,7 +6425,9 @@ const he = {
       "loreScroll": "מגילת סיפור",
       "runeFragment": "שבר רונה",
       "tapToOpen": "לחץ לפתיחה",
-      "xp": "ניסיון"
+      "xp": "ניסיון",
+      "bonusGold": "זהב בונוס",
+      "bossTrophy": "גביע בוס"
     },
     "later": "אחר כך",
     "nextLevel": "הבא: שלב",

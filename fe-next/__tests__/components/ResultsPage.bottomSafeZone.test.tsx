@@ -81,9 +81,9 @@ describe('ResultsPage mobile bottom safe zone', () => {
   describe('ResultsPage mobile scroll container', () => {
     test('should have sufficient bottom padding to clear fixed tab bar', () => {
       // The scrollable content area needs enough bottom padding
-      // to ensure content isn't hidden behind the fixed tab bar.
-      // pb-40 = 160px, which clears the tab bar (~76px) plus safe area.
-      expect(resultsPageTSX).toContain('pb-40');
+      // to ensure content isn't hidden behind the fixed tab bar + StickyReadyBar.
+      // pb-52 = 208px, which clears the tab bar (~76px) + StickyReadyBar (~80px) plus safe area.
+      expect(resultsPageTSX).toContain('pb-52');
     });
 
     test('fixed bottom tab bar wrapper should have appropriate styling', () => {

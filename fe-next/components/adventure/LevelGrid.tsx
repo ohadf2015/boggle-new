@@ -193,7 +193,7 @@ export default function LevelGrid({
           style={{ '--parallax-depth': '0.2' } as React.CSSProperties}
         >
           <div
-            className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[300px] h-[200px] rounded-full"
+            className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[min(90%,300px)] h-[min(60%,200px)] rounded-full"
             style={{ backgroundColor: glowColor, opacity: 0.15 }}
           />
         </div>

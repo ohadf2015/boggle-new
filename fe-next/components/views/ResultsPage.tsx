@@ -30,6 +30,7 @@ import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { ResultsModals } from '@/components/results/ResultsModals';
 import { ResultsMainContent } from '@/components/results/ResultsMainContent';
 import { ResultsDetailsContent } from '@/components/results/ResultsDetailsContent';
+const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -357,6 +358,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     seriesStandings,
     seriesRoundNumber,
     gameMode: resolvedGameMode,
+    emojiReactions: floatingReactions.map(r => ({
+      id: r.id,
+      emoji: r.emoji,
+      username: r.username,
+      timestamp: 0,
+    })),
   };
 
   // Word Hunt results data (shared between tabs)
@@ -494,7 +501,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Tab Content - Scrollable area */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-40 sm:pb-48 bg-neo-navy"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-52 sm:pb-56 bg-neo-navy"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
           <div className="max-w-lg mx-auto">
@@ -513,8 +520,24 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
         </div>
 
-        {/* Fixed Bottom Tab Bar — reactions integrated into tab bar area */}
+        {/* Fixed Bottom Area — StickyReadyBar + reactions + tab bar */}
         <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-bottom">
+          {/* Sticky Ready Bar — always visible CTA above tabs */}
+          {gameCode && onReturnToRoom && scoreRevealComplete && !isBotsOnlyGame && (
+            <StickyReadyBar
+              isHost={isHost}
+              isCurrentPlayerReady={isCurrentPlayerReady}
+              currentPlayerRank={currentPlayerRank}
+              winnerUsername={sortedScores[0]?.username}
+              readyCount={readyUsernames.length}
+              totalPlayers={sortedScores.length}
+              readyUsernames={readyUsernames}
+              onStartGame={handleStartGame}
+              onMarkReady={handleMarkReady}
+              selectedGameMode={selectedGameMode}
+              onSelectGameMode={isHost ? setSelectedGameMode : undefined}
+            />
+          )}
           {/* Quick Reactions row inside tab bar (above tabs, no overlap with content) */}
           {sortedScores.length > 1 && (
             <div className="flex justify-center py-1 border-b border-neo-white/10">
@@ -542,7 +565,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Two-Column Layout */}
         <div className="flex-1 w-full max-w-6xl mx-auto flex flex-row gap-6">
-          {/* LEFT COLUMN: Results (Winner banner, stats, leaderboard, actions) */}
+          {/* LEFT COLUMN: Results */}
           <div className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4">
             <ResultsMainContent
               {...mainContentProps}
@@ -550,15 +573,23 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             />
           </div>
 
-          {/* RIGHT COLUMN: Details (Your words, other players, charts, chat) */}
-          <div className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4">
+          {/* Vertical divider */}
+          <div className="w-px bg-neo-white/10 self-stretch shrink-0" />
+
+          {/* RIGHT COLUMN: Details — slightly delayed entrance on desktop */}
+          <motion.div
+            className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 120, damping: 20 }}
+          >
             <ResultsDetailsContent
               {...detailsContentProps}
               hideRankAndScore={true}
               showBanner={true}
               bannerSize="300x250"
             />
-          </div>
+          </motion.div>
         </div>
       </div>
 

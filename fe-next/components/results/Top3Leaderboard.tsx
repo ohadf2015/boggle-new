@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useCallback, memo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useCallback, memo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Bot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { fireConfetti, RANK_COLORS } from '@/utils/confettiUtils';
 import { RANK_CONFIG } from '@/utils/rankingStyles';
 import useReducedMotion from '@/hooks/useReducedMotion';
+import { ScoreCountUp } from '@/components/results/shared';
 
 // Fire confetti burst for a specific rank with custom origin
 const fireConfettiForRank = (rank: number, intensity: number = 1): void => {
@@ -71,6 +72,13 @@ export interface LeaderboardParticipant {
   };
 }
 
+export interface EmojiReaction {
+  id: string;
+  emoji: string;
+  username: string;
+  timestamp: number;
+}
+
 interface Top3LeaderboardProps {
   /** Multiplayer players (preferred) */
   players?: Player[];
@@ -83,6 +91,8 @@ interface Top3LeaderboardProps {
   showConfetti?: boolean;
   /** Compact mode - reduced padding and no header (default: false) */
   compact?: boolean;
+  /** Emoji reactions for speech bubbles above podium cards */
+  emojiReactions?: EmojiReaction[];
 }
 
 // Using shared RANK_CONFIG from @/utils/rankingStyles
@@ -96,6 +106,27 @@ interface Top3LeaderboardProps {
  * - Multiplayer mode: Pass `players` prop
  * - Single player mode: Pass `participants` prop (with bots)
  */
+/** Speech bubble that appears above a podium card */
+function PodiumEmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onDone, 2500);
+    return () => clearTimeout(timer);
+  }, [onDone]);
+
+  return (
+    <motion.div
+      initial={{ scale: 0, y: 10, opacity: 0 }}
+      animate={{ scale: 1, y: -8, opacity: 1 }}
+      exit={{ scale: 0, opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+      className="absolute -top-8 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 z-30 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-lg pointer-events-none"
+    >
+      {emoji}
+      <div className="absolute -bottom-1.5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-3 h-3 bg-neo-cream border-b-3 border-e-3 border-neo-black rotate-45" />
+    </motion.div>
+  );
+}
+
 const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   players,
   participants,
@@ -103,9 +134,11 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   headerText,
   showConfetti = true,
   compact = false,
+  emojiReactions = [],
 }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const reducedMotion = useReducedMotion();
+  const rtlFlip = dir === 'rtl' ? -1 : 1;
 
   // Normalize to unified participant format
   const normalizedParticipants: LeaderboardParticipant[] = React.useMemo(() => {
@@ -147,6 +180,10 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   const handleCardClick = useCallback((rank: number, isCurrentPlayer: boolean) => {
     if (!reducedMotion) fireConfettiForRank(rank, isCurrentPlayer ? 1.2 : 0.7);
   }, [reducedMotion]);
+
+  // Emoji speech bubble state
+  const [dismissedBubbles, setDismissedBubbles] = useState<Set<string>>(new Set());
+  const activeBubbles = emojiReactions.filter(r => !dismissedBubbles.has(r.id));
 
   if (top3.length === 0) return null;
 
@@ -202,7 +239,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
               initial={{
                 opacity: 0,
                 y: rank === 1 ? -40 : 30,
-                x: rank === 2 ? -30 : rank === 3 ? 30 : 0,
+                x: rank === 2 ? -30 * rtlFlip : rank === 3 ? 30 * rtlFlip : 0,
                 scale: 0.8,
               }}
               animate={{
@@ -212,6 +249,23 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
               style={{ order: podium.order }}
               className={cn('flex flex-col items-center', podium.mt, rank === 1 && 'z-10')}
             >
+              {/* Emoji speech bubbles above podium card */}
+              <div className="relative">
+                <AnimatePresence>
+                  {activeBubbles
+                    .filter(r => r.username === participant.name)
+                    .slice(0, 3) // max 3 stacked
+                    .map((r, bubbleIdx) => (
+                      <div key={r.id} style={{ position: 'relative', marginBottom: bubbleIdx > 0 ? -4 : 0 }}>
+                        <PodiumEmojiBubble
+                          emoji={r.emoji}
+                          onDone={() => setDismissedBubbles(prev => new Set(prev).add(r.id))}
+                        />
+                      </div>
+                    ))}
+                </AnimatePresence>
+              </div>
+
               {/* Crown/Medal icon above card for winner */}
               <motion.div
                 initial={{ scale: 0, y: 10 }}
@@ -236,11 +290,26 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                   'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden cursor-pointer',
                   cardStyles[rank as 1 | 2 | 3],
                   compact ? 'w-24 p-2' : rank === 1 ? 'w-36 p-3' : 'w-28 p-2.5',
-                  isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-navy'
+                  isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-navy',
                 )}
               >
                 {/* Subtle halftone texture */}
                 <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,black_1px,transparent_1px)] bg-[length:8px_8px]" />
+
+                {/* Winner glow pulse */}
+                {rank === 1 && !reducedMotion && (
+                  <motion.div
+                    className="absolute inset-0 rounded-neo pointer-events-none"
+                    animate={{
+                      boxShadow: [
+                        'inset 0 0 0 0 rgba(191,255,0,0)',
+                        'inset 0 0 20px rgba(191,255,0,0.3)',
+                        'inset 0 0 0 0 rgba(191,255,0,0)',
+                      ],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                )}
 
                 {/* Avatar */}
                 <div className="flex justify-center relative mb-1.5">
@@ -289,13 +358,13 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                   </p>
                 </PlayerProfileTooltip>
 
-                {/* Score - prominent display */}
+                {/* Score - prominent display with count-up */}
                 <div className={cn(
                   'text-center rounded-neo border-2 border-neo-black mt-1.5 bg-white/90 shadow-hard-sm',
                   compact ? 'py-0.5 px-1' : 'py-1 px-2',
                 )}>
-                  <span className={cn('font-black text-neo-black', compact ? 'text-sm' : rank === 1 ? 'text-xl' : 'text-lg')}>
-                    {participant.score}
+                  <span className={cn('font-black text-neo-black tabular-nums', compact ? 'text-sm' : rank === 1 ? 'text-xl' : 'text-lg')}>
+                    <ScoreCountUp to={participant.score} duration={1400} delay={reducedMotion ? 0 : 400 + displayIndex * 150} />
                   </span>
                 </div>
               </motion.div>

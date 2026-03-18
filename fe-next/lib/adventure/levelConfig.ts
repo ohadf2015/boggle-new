@@ -475,8 +475,8 @@ export function generateObjectives(
     });
   }
 
-  // Time bonus objective (level 7+, worlds 3+)
-  if (world >= 3 && level >= 7) {
+  // Time bonus objective (level 5+, worlds 3+)
+  if (world >= 3 && level >= 5 && !isBossLevel) {
     // Complete with 30+ seconds remaining
     const target = Math.max(30 - (world - 3) * 5, 10);
     objectives.push({

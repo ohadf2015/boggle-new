@@ -17,7 +17,6 @@ import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { DynamicEnergyBackground } from './DynamicEnergyBackground';
-import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
@@ -122,7 +121,7 @@ export function PortraitGameLayout({
   currentFeedback,
   keyboardInput,
   tutorialPath,
-  tutorialWord,
+  tutorialWord: _tutorialWord,
   highlightedPath,
   lastWordFoundTimeRef,
   fireRoundActive,
@@ -394,25 +393,6 @@ export function PortraitGameLayout({
 
       {/* Game grid - Takes remaining space */}
       <div className="flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0">
-        {/* Tutorial Callout - Absolute overlay above grid, doesn't consume flow height */}
-        <AdaptiveAnimatePresence>
-          {!!tutorialPath && !isPaused && !isGameOver && (
-            <AdaptiveMotion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute -top-1 start-4 end-4 z-50"
-            >
-              <TutorialCallout
-                isVisible
-                tutorialWord={tutorialWord}
-                position="floating"
-                compact
-              />
-            </AdaptiveMotion.div>
-          )}
-        </AdaptiveAnimatePresence>
-
         {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
         <AdaptiveAnimatePresence>
           {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (

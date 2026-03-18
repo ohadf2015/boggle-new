@@ -53,6 +53,8 @@ export interface UseAdventureLevelCompletionProps {
     isCompletion: boolean
   ) => void;
   recordCompletion: (data: any) => void;
+  /** Update word album with words found this level */
+  updateWordAlbum?: (words: string[]) => void;
   endAIDirector: () => void;
   handleEarnAchievement: (id: AdventureAchievementId) => boolean;
   pauseGame: () => void;
@@ -95,11 +97,20 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const [nonBossCompleted, setNonBossCompleted] = useState(false);
   const completionProcessedRef = useRef(false);
 
+  // Track if player ever took damage (for BOSS_NO_DAMAGE achievement)
+  const playerTookDamageRef = useRef(false);
+  useEffect(() => {
+    if (isBossLevel && props.playerHealthPercent !== undefined && props.playerHealthPercent < 100) {
+      playerTookDamageRef.current = true;
+    }
+  }, [isBossLevel, props.playerHealthPercent]);
+
   // Store callbacks in refs for stable references
   const recordAttemptRef = useRef(recordAttempt);
   const recordCompletionRef = useRef(recordCompletion);
   const endAIDirectorRef = useRef(endAIDirector);
   const handleEarnAchievementRef = useRef(handleEarnAchievement);
+  const updateWordAlbumRef = useRef(props.updateWordAlbum);
 
   // Keep callback refs in sync and reset completion flag on level change
   useEffect(() => {
@@ -107,6 +118,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     recordCompletionRef.current = recordCompletion;
     endAIDirectorRef.current = endAIDirector;
     handleEarnAchievementRef.current = handleEarnAchievement;
+    updateWordAlbumRef.current = props.updateWordAlbum;
     completionProcessedRef.current = false;
   }, [recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
 
@@ -223,8 +235,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       if (timeRemaining > timerSeconds * 0.5) {
         handleEarnAchievementRef.current('BOSS_SPEEDRUN');
       }
-      // Boss No Damage: defeat boss without taking any damage (player HP = max)
-      if (!playerDied && props.playerHealthPercent === 100) {
+      // Boss No Damage: defeat boss without ever taking damage during the fight
+      if (!playerDied && !playerTookDamageRef.current) {
         handleEarnAchievementRef.current('BOSS_NO_DAMAGE');
       }
     }
@@ -261,6 +273,11 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     });
 
     endAIDirectorRef.current();
+
+    // Update word album with words found this level
+    if (gameState.wordsFound.length > 0) {
+      updateWordAlbumRef.current?.(gameState.wordsFound);
+    }
   }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore]);
 
   const handleLevelUpClose = useCallback(() => {

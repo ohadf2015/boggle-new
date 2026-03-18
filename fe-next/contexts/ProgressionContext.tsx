@@ -70,6 +70,10 @@ interface ProgressionContextType {
   getLevelAttempt: (worldId: number, levelId: number) => LevelAttempt | undefined;
   /** Purchase upgrade by ID — server validates cost, optimistic + reconcile */
   updateCurrency: (upgradeId: string, optimisticGold: number, optimisticUpgrades: Record<string, number>) => Promise<void>;
+  /** Update chapter quest progress — persists to server */
+  updateChapterQuestProgress: (questType: string, amount: number, questIds: string[]) => void;
+  /** Add words to the word album — deduplicates and persists */
+  updateWordAlbum: (newWords: string[]) => void;
 }
 
 // ==============================================
@@ -397,6 +401,66 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [attempts]
   );
 
+  // Update chapter quest progress — optimistic local update + debounced server persist
+  const updateChapterQuestProgress = useCallback(
+    (questType: string, amount: number, questIds: string[]) => {
+      setProgression((prev) => {
+        if (!prev) return prev;
+        const current = prev.chapterQuestProgress ?? {};
+        const updated = { ...current };
+        // Increment matching quest IDs (the hook passes the relevant quest IDs)
+        for (const id of questIds) {
+          updated[id] = (updated[id] ?? 0) + amount;
+        }
+        // Persist to server (fire-and-forget)
+        if (user?.id) {
+          fetch('/api/adventure/quest-progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ chapterQuestProgress: updated }),
+          }).catch((err) => {
+            console.error('[ProgressionContext] Quest progress persist error:', err);
+          });
+        }
+        return { ...prev, chapterQuestProgress: updated };
+      });
+    },
+    [user?.id]
+  );
+
+  // Add words to the word album — dedup + persist
+  const updateWordAlbum = useCallback(
+    (newWords: string[]) => {
+      if (newWords.length === 0) return;
+      setProgression((prev) => {
+        if (!prev) return prev;
+        const existing = new Set((prev.wordAlbum ?? []).map(w => w.toUpperCase()));
+        let added = false;
+        for (const word of newWords) {
+          const upper = word.toUpperCase();
+          if (!existing.has(upper)) {
+            existing.add(upper);
+            added = true;
+          }
+        }
+        if (!added) return prev;
+        const updatedAlbum = Array.from(existing);
+        // Fire-and-forget persist
+        if (user?.id) {
+          fetch('/api/adventure/quest-progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ wordAlbum: updatedAlbum }),
+          }).catch(() => {});
+        }
+        return { ...prev, wordAlbum: updatedAlbum };
+      });
+    },
+    [user?.id]
+  );
+
   // Purchase upgrade by ID — server validates cost and deducts gold
   const updateCurrency = useCallback(
     async (upgradeId: string, optimisticGold: number, optimisticUpgrades: Record<string, number>) => {
@@ -458,6 +522,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       getLevelCompletion,
       getLevelAttempt,
       updateCurrency,
+      updateChapterQuestProgress,
+      updateWordAlbum,
     }),
     [
       progression,
@@ -473,6 +539,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       getLevelCompletion,
       getLevelAttempt,
       updateCurrency,
+      updateChapterQuestProgress,
+      updateWordAlbum,
     ]
   );
 

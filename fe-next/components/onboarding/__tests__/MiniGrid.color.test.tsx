@@ -5,35 +5,24 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock lucide-react icons
 jest.mock('lucide-react', () => ({
-  ArrowDown: () => <div>ArrowDown</div>,
-  ArrowUp: () => <div>ArrowUp</div>,
-  ArrowLeft: () => <div>ArrowLeft</div>,
-  ArrowRight: () => <div>ArrowRight</div>,
-  ArrowDownLeft: () => <div>ArrowDownLeft</div>,
-  ArrowDownRight: () => <div>ArrowDownRight</div>,
-  ArrowUpLeft: () => <div>ArrowUpLeft</div>,
-  ArrowUpRight: () => <div>ArrowUpRight</div>,
-  Hand: () => <div>Hand</div>,
+  Check: () => <div>Check</div>,
+  Sparkles: () => <div>Sparkles</div>,
 }));
 
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => {
   const React = require('react');
-  const MotionDiv = React.forwardRef(({ children, className, ...props }: any, ref: any) => (
-    <div ref={ref} className={className} {...props}>{children}</div>
-  ));
-  MotionDiv.displayName = 'motion.div';
-
-  const MotionSpan = React.forwardRef(({ children, className, ...props }: any, ref: any) => (
-    <span ref={ref} className={className} {...props}>{children}</span>
-  ));
-  MotionSpan.displayName = 'motion.span';
-
+  const createMotionComponent = (tag: string) => {
+    const Comp = React.forwardRef(({ children, className, animate, transition, initial, exit, whileHover, whileTap, ...rest }: any, ref: any) =>
+      React.createElement(tag, { ref, className, ...rest }, children)
+    );
+    Comp.displayName = `motion.${tag}`;
+    return Comp;
+  };
   return {
-    motion: {
-      div: MotionDiv,
-      span: MotionSpan,
-    },
+    motion: new Proxy({}, {
+      get: (_: any, prop: string) => createMotionComponent(prop),
+    }),
     AnimatePresence: ({ children }: any) => <>{children}</>,
   };
 });
@@ -69,8 +58,8 @@ describe('MiniGrid - Letter Color Fix', () => {
   it('should render all letters with black text color', () => {
     const { container } = renderMiniGrid();
 
-    // Find all grid cells
-    const cells = container.querySelectorAll('[data-row]');
+    // Find all grid cells (they have aspect-square class)
+    const cells = container.querySelectorAll('.aspect-square');
 
     // Verify we have 9 cells (3x3 grid)
     expect(cells.length).toBe(9);
@@ -94,7 +83,7 @@ describe('MiniGrid - Letter Color Fix', () => {
   it('should ensure letters are visible (not using same color as background)', () => {
     const { container } = renderMiniGrid();
 
-    const cells = container.querySelectorAll('[data-row]');
+    const cells = container.querySelectorAll('.aspect-square');
 
     cells.forEach((cell) => {
       const classList = Array.from(cell.classList);

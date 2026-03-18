@@ -1,9 +1,10 @@
 'use client';
 
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Users, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
+import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 
 const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
 
@@ -45,11 +46,43 @@ export function LandingChallengeCards({
   dailyChallengeStats,
   solveRate,
 }: LandingChallengeCardsProps) {
+  const [isFirstTimer, setIsFirstTimer] = useState(false);
+  useEffect(() => {
+    setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted'));
+  }, []);
+
   return (
     <div className="w-full max-w-4xl mx-auto xl:max-w-5xl">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-stretch">
-        {/* Daily Challenge Banner - full width */}
-        <div className="col-span-1 sm:col-span-2 xl:col-span-4">
+        {/* Single Player (cyan) */}
+        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.05 }} className="w-full h-full">
+          <ModeCard
+            title={t('landing.singlePlayer')}
+            description={t('landing.singlePlayerDesc')}
+            href={`/${language}/singleplayer`}
+            icon={<User className="w-6 h-6" />}
+            variant="cyan"
+            personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
+            highlighted={isFirstTimer}
+            highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
+          />
+        </motion.div>
+
+        {/* Multiplayer (pink) */}
+        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }} className="w-full h-full">
+          <ModeCard
+            title={t('landing.multiplayer')}
+            description={t('landing.multiplayerDesc')}
+            href={`/${language}/multiplayer`}
+            icon={<Users className="w-6 h-6" />}
+            variant="pink"
+            liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
+            playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
+          />
+        </motion.div>
+
+        {/* Daily Challenge Banner */}
+        <div className="col-span-1 sm:col-span-2 xl:col-span-1">
           <Suspense fallback={
             <div
               className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
@@ -73,33 +106,8 @@ export function LandingChallengeCards({
           )}
         </div>
 
-        {/* Multiplayer (pink) */}
-        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }} className="w-full h-full">
-          <ModeCard
-            title={t('landing.multiplayer')}
-            description={t('landing.multiplayerDesc')}
-            href={`/${language}/multiplayer`}
-            icon={<Users className="w-6 h-6" />}
-            variant="pink"
-            liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
-            playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
-          />
-        </motion.div>
-
-        {/* Single Player (cyan) */}
-        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }} className="w-full h-full">
-          <ModeCard
-            title={t('landing.singlePlayer')}
-            description={t('landing.singlePlayerDesc')}
-            href={`/${language}/singleplayer`}
-            icon={<User className="w-6 h-6" />}
-            variant="cyan"
-            personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
-          />
-        </motion.div>
-
         {/* Adventure Mode - full width on mobile/tablet, single col on xl */}
-        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.35 }} className="col-span-1 sm:col-span-2 xl:col-span-1 w-full">
+        <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.25 }} className="col-span-1 sm:col-span-2 xl:col-span-1 w-full">
           <ModeCard
             title={t('landing.adventureMode')}
             description={t('landing.adventureModeDesc')}
@@ -111,7 +119,7 @@ export function LandingChallengeCards({
 
         {/* Blast Mode (admin only) */}
         {(isAdmin || hasBlastAccess) && (
-          <div className="col-span-1 sm:col-span-2 xl:col-span-1 w-full xl:max-w-none max-w-md mx-auto">
+          <motion.div {...cardMotion} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.35 }} className="col-span-1 sm:col-span-2 xl:col-span-1 w-full xl:max-w-none max-w-md mx-auto">
             <ModeCard
               title={t('landing.blastMode')}
               description={t('landing.blastModeDesc')}
@@ -121,7 +129,7 @@ export function LandingChallengeCards({
               secondary
               badge="ADMIN"
             />
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

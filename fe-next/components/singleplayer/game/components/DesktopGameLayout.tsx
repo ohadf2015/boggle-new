@@ -14,7 +14,6 @@ import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { DynamicEnergyBackground } from './DynamicEnergyBackground';
-import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { DesktopStatsPanel, DesktopWordList } from '../../desktop';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
@@ -117,7 +116,7 @@ export function DesktopGameLayout({
   currentFeedback,
   keyboardInput,
   tutorialPath,
-  tutorialWord,
+  tutorialWord: _tutorialWord,
   highlightedPath,
   lastWordFoundTimeRef,
   fireRoundActive,
@@ -295,13 +294,6 @@ export function DesktopGameLayout({
           <div className="flex items-center justify-center">
             <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
           </div>
-
-          {/* Tutorial Callout - Shows above grid for new players */}
-          <TutorialCallout
-            isVisible={!!tutorialPath && !isPaused && !isGameOver}
-            tutorialWord={tutorialWord}
-            position="above-grid"
-          />
 
           {/* Game Grid - centered with aspect ratio maintained */}
           <div className="flex-1 flex items-center justify-center w-full min-h-0 max-h-full relative" style={{ containerType: 'size' }}>

@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3736,
+    "totalKeysInCode": 3769,
     "keyCountByLanguage": {
-      "en": 6341,
-      "he": 6370,
-      "sv": 6403,
-      "ja": 6390,
-      "es": 6401
+      "en": 6404,
+      "he": 6422,
+      "sv": 6455,
+      "ja": 6442,
+      "es": 6464
     },
     "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
@@ -147,20 +147,68 @@
   },
   "missingFromEnglish": [
     {
-      "key": "avatar.builder.shirtColor",
+      "key": "adventure.tiles.letter",
       "usages": [
         {
-          "file": "components/avatar/AvatarBuilderModal.tsx",
-          "line": 458
+          "file": "components/adventure/AdventureGrid.tsx",
+          "line": 339
         }
       ]
     }
   ],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
-    "es": []
+    "he": [
+      "common.claim",
+      "common.looksGood",
+      "common.verified",
+      "adventure.loot.bonusGold",
+      "adventure.loot.bossTrophy",
+      "encouragement.gameStart",
+      "encouragement.firstWord",
+      "encouragement.longWord",
+      "encouragement.combo",
+      "encouragement.halfway",
+      "encouragement.almostDone"
+    ],
+    "sv": [
+      "common.claim",
+      "common.looksGood",
+      "common.verified",
+      "adventure.loot.bonusGold",
+      "adventure.loot.bossTrophy",
+      "encouragement.gameStart",
+      "encouragement.firstWord",
+      "encouragement.longWord",
+      "encouragement.combo",
+      "encouragement.halfway",
+      "encouragement.almostDone"
+    ],
+    "ja": [
+      "common.claim",
+      "common.looksGood",
+      "common.verified",
+      "adventure.loot.bonusGold",
+      "adventure.loot.bossTrophy",
+      "encouragement.gameStart",
+      "encouragement.firstWord",
+      "encouragement.longWord",
+      "encouragement.combo",
+      "encouragement.halfway",
+      "encouragement.almostDone"
+    ],
+    "es": [
+      "common.claim",
+      "common.looksGood",
+      "common.verified",
+      "adventure.loot.bonusGold",
+      "adventure.loot.bossTrophy",
+      "encouragement.gameStart",
+      "encouragement.firstWord",
+      "encouragement.longWord",
+      "encouragement.combo",
+      "encouragement.halfway",
+      "encouragement.almostDone"
+    ]
   },
   "keysNotInEnglish": {
     "he": [
@@ -329,6 +377,17 @@
       "admin.wordBank.wikipediaSync.errorMessage",
       "admin.wordBank.wikipediaSync.noFilesFound",
       "admin.wordBank.wikipediaSync.lastSynced",
+      "adventure.tiles.locked",
+      "adventure.tiles.multiplier",
+      "adventure.tiles.letter",
+      "adventure.tiles.aria.gold",
+      "adventure.tiles.aria.ice",
+      "adventure.tiles.aria.bomb",
+      "adventure.tiles.aria.rainbow",
+      "adventure.tiles.aria.chain",
+      "adventure.tiles.aria.time",
+      "adventure.tiles.aria.locked",
+      "adventure.tiles.aria.multiplier",
       "adventure.achievements.cinematic.unlocked",
       "adventure.achievements.cinematic.gold",
       "adventure.achievements.cinematic.platinum",

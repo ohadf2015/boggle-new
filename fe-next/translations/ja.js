@@ -142,6 +142,10 @@ const ja = {
     "shareViaWhatsApp": "WhatsAppでシェア",
     "shareViaTelegram": "Telegramでシェア",
     "close": "閉じる",
+    "showAll": "すべて表示",
+    "claim": "受け取る",
+    "looksGood": "良さそう",
+    "verified": "確認済み",
     "home": "ホーム",
     "playAgain": "もう一度",
     "exit": "退出",
@@ -1363,6 +1367,7 @@ const ja = {
       "subtitle": "始める前にちょっとコツ"
     },
     "letsPlay": "さあ遊ぼう！",
+    "buildAvatar": "先にアバターを作る？",
     "skip": "チュートリアルをスキップ",
     "next": "次へ",
     "step": "ステップ {current} / {total}"
@@ -1540,6 +1545,9 @@ const ja = {
     "readyForNextRound": "次のラウンドの準備はいい？",
     "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！",
     "readyExplanation": "タップしてホストに「もう一回やりたい！」を伝えよう",
+    "defendTitle": "タイトルを防衛せよ！",
+    "surviveLongerThan": "@{player}より長く生き残れ！",
+    "waitingForPlayers": "プレイヤーの準備を待っています...",
     "waitingForHost": "ホストが次のラウンドを始めるのを待っています...",
     "scoringTip": "スコアのコツ",
     "scoringTipText": "連続で単語を見つけてコンボボーナス(⚡)ゲット！長い単語はポイント爆上げだよ！",
@@ -5427,6 +5435,51 @@ const ja = {
     "nextWorld": "次のワールド",
     "retryLevel": "リトライ",
     "freeRetry": "無料リトライ",
+    "nextUp": "次のレベル",
+    "streakBadge": "{{days}}日連続（{{multiplier}}倍ボーナス）",
+    "hub": {
+      "days": "日",
+      "streakActive": "この調子で！",
+      "playToStart": "レベルをプレイして連続記録を始めよう",
+      "bestStreak": "最高",
+      "dailyQuests": "デイリークエスト",
+      "continue": "続ける",
+      "worldMap": "ワールドマップ",
+      "wordAlbum": "ワードアルバム"
+    },
+    "album": {
+      "title": "ワードアルバム",
+      "uniqueWords": "ユニークワード",
+      "milestones": {
+        "novice": "ワード初心者",
+        "explorer": "ワード探検家",
+        "collector": "ワードコレクター",
+        "scholar": "ワード学者",
+        "master": "ワードマスター",
+        "lexicon": "辞書の伝説"
+      },
+      "newWordsFound": "{{count}}個の新しい単語を追加！"
+    },
+    "endlessMode": {
+      "teaser": "エンドレスモード",
+      "comingSoon": "ワールド10をクリアして解放"
+    },
+    "share": {
+      "bossDefeated": "{{world}}で{{boss}}を倒した！",
+      "shareCard": "勝利をシェア"
+    },
+    "weeklyChallenge": {
+      "title": "ウィークリーチャレンジ",
+      "description": "全員同じグリッド — 最高スコアを競おう！",
+      "play": "チャレンジに挑戦",
+      "leaderboard": "リーダーボード",
+      "yourBest": "自己ベスト",
+      "resetsIn": "リセットまで",
+      "rank": "ランク",
+      "noScoresYet": "今週のスコアはまだありません",
+      "scoreSubmitted": "スコア送信完了！",
+      "newHighScore": "自己ベスト更新！"
+    },
     "quest": {
       "title": "チャプタークエスト",
       "wordCount": "単語を見つける",
@@ -5601,7 +5654,20 @@ const ja = {
       "bomb": "爆弾（行をクリア）",
       "rainbow": "レインボー（ワイルドカード）",
       "chain": "チェーン（リンクボーナス）",
-      "time": "タイム（+5秒）"
+      "time": "タイム（+5秒）",
+      "locked": "ロック",
+      "multiplier": "マルチプライヤー（2倍スコア）",
+      "letter": "文字",
+      "aria": {
+        "gold": "ゴールドタイル、3倍マルチプライヤー",
+        "ice": "氷タイル、障害物",
+        "bomb": "爆弾タイル、行をクリア",
+        "rainbow": "レインボータイル、ワイルドカード",
+        "chain": "チェーンタイル、リンクボーナス",
+        "time": "タイムタイル、プラス5秒",
+        "locked": "ロックタイル、一致する文字で解除",
+        "multiplier": "マルチプライヤータイル、2倍スコア"
+      }
     },
     "errors": {
       "tooShort": "単語が短すぎます",
@@ -5683,7 +5749,8 @@ const ja = {
       "bomb": "ボム (行をクリア)",
       "rainbow": "レインボー (ワイルド)",
       "chain": "チェーン (コンボ)",
-      "time": "タイム (+5秒)"
+      "time": "タイム (+5秒)",
+      "letter": "文字"
     },
     "cutscene": {
       "skip": "スキップ"
@@ -6352,6 +6419,30 @@ const ja = {
         "perfectLevels": {
           "title": "パーフェクショニスト",
           "desc": "3つ星で{target}レベルクリアしよう"
+        },
+        "fullCombo": {
+          "title": "コンボマスター",
+          "desc": "コンボを途切れさせずに{target}レベルクリア"
+        },
+        "worldMechanic": {
+          "title": "ワールドエキスパート",
+          "desc": "ワールドメカニクスを{target}回発動"
+        },
+        "flashChallenge": {
+          "title": "クイックシンカー",
+          "desc": "フラッシュチャレンジを{target}回クリア"
+        },
+        "bossHighHealth": {
+          "title": "アンタッチャブル",
+          "desc": "HP75%以上でボスを倒す"
+        },
+        "streak": {
+          "title": "ストリークマスター",
+          "desc": "{target}連続ワードストリーク達成"
+        },
+        "scoreChallenge": {
+          "title": "ハイスコアラー",
+          "desc": "チャプターで{target}ポイント獲得"
         }
       }
     },
@@ -6361,7 +6452,9 @@ const ja = {
       "loreScroll": "伝説の巻物",
       "runeFragment": "ルーンの欠片",
       "tapToOpen": "タップして開く",
-      "xp": "経験値"
+      "xp": "経験値",
+      "bonusGold": "ボーナスゴールド",
+      "bossTrophy": "ボストロフィー"
     },
     "later": "あとで",
     "nextLevel": "次: レベル",

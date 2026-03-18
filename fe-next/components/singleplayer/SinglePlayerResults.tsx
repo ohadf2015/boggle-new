@@ -45,13 +45,14 @@ import {
   RankingsSection,
   ChallengeButton,
 } from './results';
-import { ResultsInfoCards } from './results/components/ResultsInfoCards';
 import { TrainingAnalysisModal } from '@/components/training';
 import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
-import { ResultsHero } from '@/components/results/shared';
+import { StatsCardGrid } from '@/components/results/shared';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
+const PlacementHero = dynamic(() => import('@/components/results/PlacementHero'), { ssr: false });
+const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 
 const RANK_CONFETTI_COLORS: Record<number, string[]> = {
   1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'],
@@ -121,7 +122,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     results, playerRank, totalParticipants: allParticipants.length,
   });
 
-  const { winStreakData } = useWinStreakTracking({ mode, isWinner });
+  useWinStreakTracking({ mode, isWinner });
 
 
   const { showSignupModal, setShowSignupModal } = useSignupPrompt({
@@ -224,20 +225,45 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       <div className="px-2 md:px-4 xl:px-6 pb-20 md:pb-6">
         <div className="mx-auto space-y-4 md:space-y-6 pt-2 md:pt-4">
 
-          {/* 1. Hero Zone — unified score + stats */}
-          <ResultsHero
-            outcomeLabel={bannerConfig.message || t('results.finalScore')}
-            score={results.playerScore}
-            subtitle={bannerConfig.announcement}
-            pointsLabel={t('common.points')}
-            variant={isWinner || results.isNewHighScore ? 'win' : results.playerScore === 0 ? 'neutral' : 'loss'}
-            onScoreClick={shouldShowConfetti ? () => {
-              const colors = (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3)
-                ? RANK_CONFETTI_COLORS[playerRank]
-                : ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7'];
-              fireConfetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors });
-            } : undefined}
-            stats={[
+          {/* 1. Hero Zone — PlacementHero for solo-bots (matches MP style) */}
+          {mode === 'solo-bots' ? (
+            <PlacementHero
+              rank={playerRank}
+              score={results.playerScore}
+              totalPlayers={allParticipants.length}
+              username={profile?.display_name || profile?.username || t('common.you')}
+              avatar={playerAvatar}
+              gapToWinner={playerRank > 1 ? (allParticipants[0]?.score || 0) - results.playerScore : 0}
+            />
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-xs font-black uppercase tracking-widest text-neo-lime mb-1">
+                {bannerConfig.message || t('results.finalScore')}
+              </p>
+              <p className="font-black text-6xl sm:text-7xl text-white tabular-nums" style={{ WebkitTextStroke: '2px rgba(0,0,0,0.3)', textShadow: '4px 4px 0px rgba(0,0,0,0.3)' }}>
+                {results.playerScore}
+              </p>
+              {bannerConfig.announcement && (
+                <p className="text-white/60 text-sm font-bold mt-1">{bannerConfig.announcement}</p>
+              )}
+            </div>
+          )}
+
+          {/* 2. Leaderboard — compact ranked list (matches MP MobileCompactLeaderboard) */}
+          {mode === 'solo-bots' && allParticipants.length > 1 && (
+            <MobileCompactLeaderboard
+              participants={allParticipants.map(p => ({
+                name: p.name,
+                score: p.score,
+                isCurrentPlayer: p.isPlayer,
+                isBot: !p.isPlayer,
+              }))}
+            />
+          )}
+
+          {/* 3. Stats row — same grid style as MP */}
+          <StatsCardGrid
+            cards={[
               { label: t('results.words'), value: validWordCount, icon: '📝' },
               {
                 label: t('results.bestWord'),
@@ -256,12 +282,12 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             ]}
           />
 
-          {/* 1.5. Rewarded Ad for Gold */}
+          {/* 3.5. Rewarded Ad for Gold */}
           <div className="flex justify-center">
             <RewardedAdGoldButton goldAmount={25} />
           </div>
 
-          {/* 2. Achievements + Bonus - high visibility, right after hero */}
+          {/* 4. Achievements + Bonus */}
           {(results.achievements && results.achievements.length > 0) || totalComboBonus > 0 || totalFireRoundBonus > 0 ? (
             <div className="space-y-2">
               {results.achievements && results.achievements.length > 0 && (
@@ -278,22 +304,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             </div>
           ) : null}
 
-          {/* 3. Global Rank Badge */}
+          {/* 5. Global Rank Badge */}
           {globalRank && (
             <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
           )}
-
-          {/* 4. Info Cards (3-col desktop, stacked mobile) */}
-          <ResultsInfoCards
-            currentScore={results.playerScore}
-            archetype={playerArchetype}
-            participants={allParticipants}
-            mode={mode === 'challenge' ? 'challenge' : mode === 'practice' ? 'practice' : 'solo-bots'}
-            coinReward={coinReward}
-            isAuthenticated={isAuthenticated}
-            winStreakData={winStreakData}
-            achievementCount={results.achievements?.length || 0}
-          />
 
           {/* Word Hunt promo — shown max 3 times total, only for non-WH games */}
           <WordHuntAnnouncementBanner className="mt-4" />

@@ -757,18 +757,19 @@ describe('Word count backpressure from timer (Fix 2)', () => {
     }
   });
 
-  it('World 7 should not require 24 words in 90 seconds anymore', () => {
+  it('World 7 word count is capped by backpressure from timer', () => {
     // GIVEN: World 7, level 1 (odd = wordCount)
-    // globalLevel = (7-1)*7 + 1 = 43
-    // Old formula: min(8 + floor(43/5)*2, 25) = min(8+16, 25) = 24
-    // Timer for world 7 = 90s. 24 words in 90s = 3.75s/word (too tight)
+    // Timer for world 7 = 140s (6x6 grid). Cap = floor((140/4)*0.8) = 28
+    // Formula: min(8 + floor(43/5)*2, 25) = 24, under cap of 28
     const objectives = generateObjectives(7, 1);
     const wordObj = objectives.find(
       (o) => o.type === 'wordCount' && o.isPrimary
     );
 
     expect(wordObj).toBeDefined();
-    // With 90s timer, cap = floor((90/4)*0.8) = floor(18) = 18
-    expect(wordObj!.target).toBeLessThanOrEqual(18);
+    // With 140s timer (6x6 grid), backpressure cap = 28. Target = 24.
+    expect(wordObj!.target).toBeLessThanOrEqual(28);
+    // Still a challenging target
+    expect(wordObj!.target).toBeGreaterThanOrEqual(20);
   });
 });

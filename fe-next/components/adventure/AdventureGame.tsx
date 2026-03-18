@@ -27,6 +27,7 @@ import { getChapterNumber } from '@/lib/adventure/questConfig';
 import FlashChallengeToast from './FlashChallengeToast';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
+import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
 import { StoryBeatCard } from './StoryBeatCard';
 import AdventureEffectsLayerFull, { AdventureEffectsLayer as EdgeVignetteLayer } from './effects/AdventureEffectsLayer';
@@ -35,12 +36,13 @@ import LootChestReveal from './LootChestReveal';
 import LevelEntryOverlay from './LevelEntryOverlay';
 import { BossOverlay, PlayerHealthBar } from './boss';
 import dynamic from 'next/dynamic';
-import { VICTORY_DURATION_FRAMES, DEFEAT_DURATION_FRAMES } from './cinematics';
+import { VICTORY_DURATION_FRAMES, DEFEAT_DURATION_FRAMES, WORLD_UNLOCK_DURATION_FRAMES } from './cinematics';
 import GameplayBackground from './themed/GameplayBackground';
 
 // Dynamic imports — cinematics are heavy (Remotion) and only shown on level complete/defeat
 const VictoryCinematic = dynamic(() => import('./cinematics/VictoryCinematic').then(mod => ({ default: mod.VictoryCinematic as React.ComponentType<any> })), { ssr: false });
 const DefeatCinematic = dynamic(() => import('./cinematics/DefeatCinematic').then(mod => ({ default: mod.DefeatCinematic as React.ComponentType<any> })), { ssr: false });
+const WorldUnlockCinematic = dynamic(() => import('./cinematics/WorldUnlockCinematic').then(mod => ({ default: mod.WorldUnlockCinematic as React.ComponentType<any> })), { ssr: false });
 const CinematicPlayer = dynamic(() => import('./boss/cinematics/CinematicPlayer').then(mod => ({ default: mod.CinematicPlayer })), { ssr: false });
 import { GameHeader, GameSidebar, GameGridArea, PauseOverlay, GameLayout } from './ui';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -118,7 +120,7 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const tiles = useMemoizedFlatTiles(tiles2D, tilesVersion);
-    const { recordAttempt, getLevelAttempt, progression } = useProgression();
+    const { recordAttempt, getLevelAttempt, progression, updateWordAlbum } = useProgression();
     const bestAttempt = useMemo(
       () => getLevelAttempt(levelConfig.world, levelConfig.level),
       [getLevelAttempt, levelConfig.world, levelConfig.level]
@@ -168,12 +170,18 @@ const AdventureGame = memo<AdventureGameProps>(
       locale: language,
     });
 
-    // Award flash challenge gold when completed
+    // Award flash challenge gold when completed (guarded to fire once per challenge)
+    const hasAwardedFlashGoldRef = useRef(false);
     useEffect(() => {
-      if (flashChallenge.isChallengeComplete && flashChallenge.activeChallenge) {
+      if (flashChallenge.isChallengeComplete && flashChallenge.activeChallenge && !hasAwardedFlashGoldRef.current) {
+        hasAwardedFlashGoldRef.current = true;
         init.addGold(flashChallenge.activeChallenge.rewardCoins);
       }
-    }, [flashChallenge.isChallengeComplete, flashChallenge.activeChallenge, init]);
+      if (!flashChallenge.isChallengeComplete) {
+        hasAwardedFlashGoldRef.current = false;
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- using init.addGold (stable useCallback) instead of init (unstable object) to prevent infinite re-render loop
+    }, [flashChallenge.isChallengeComplete, flashChallenge.activeChallenge, init.addGold]);
 
     // Boss objective tracking — sync boss state to reducer objectives
     // defeatBoss: track boss HP depletion as percentage
@@ -307,7 +315,7 @@ const AdventureGame = memo<AdventureGameProps>(
       bonusGoldMultiplier: init.runeEffects.goldMultiplier * init.streakMultiplier,
       isFirstCompletion: !bestAttempt,
       awardXp: init.awardXp, addGold: init.addGold,
-      recordAttempt, recordCompletion: init.recordCompletion,
+      recordAttempt, recordCompletion: init.recordCompletion, updateWordAlbum,
       endAIDirector: init.endAIDirector, handleEarnAchievement: init.handleEarnAchievement,
       pauseGame, completeLevel, showVictory: cinematics.showVictory, showDefeat: cinematics.showDefeat,
       showLevelComplete, showVictoryCinematic: cinematics.showVictoryCinematic,
@@ -361,6 +369,29 @@ const AdventureGame = memo<AdventureGameProps>(
     useEffect(() => {
       if (gameState.comboCount >= 5) recordQuestProgress('comboStreak');
     }, [gameState.comboCount, recordQuestProgress]);
+
+    // Chapter quest: streak master — track consecutive valid words
+    useEffect(() => {
+      if (gameState.comboCount > 0) {
+        chapterQuests.recordStreakMaster();
+      }
+    }, [gameState.comboCount, chapterQuests]);
+
+    // Chapter quest: flash challenge master — track completed flash challenges
+    useEffect(() => {
+      if (flashChallenge.isChallengeComplete) {
+        chapterQuests.recordFlashChallengeMaster();
+      }
+    }, [flashChallenge.isChallengeComplete, chapterQuests]);
+
+    // Chapter quest: world mechanic use — track when boss grid effect triggers
+    const prevMechanicTriggerRef = useRef(bossOrch.gridEffectTrigger);
+    useEffect(() => {
+      if (bossOrch.gridEffectTrigger !== prevMechanicTriggerRef.current && bossOrch.gridEffectTrigger) {
+        chapterQuests.recordWorldMechanicUse();
+      }
+      prevMechanicTriggerRef.current = bossOrch.gridEffectTrigger;
+    }, [bossOrch.gridEffectTrigger, chapterQuests]);
 
     // Streamlined entry: cascade → playing (skip objectives parade + title burst)
     const handleCascadeComplete = useCallback(() => {
@@ -437,6 +468,19 @@ const AdventureGame = memo<AdventureGameProps>(
       }, [isPlaying, isPaused, isValidating, selectTile]
     );
 
+    // Refs for latest selection state — avoids stale closure in handleDragEnd (fixes outside-grid release + RAF lag)
+    const selectedIndicesRef = useRef(selectedIndices);
+    const currentWordRef = useRef(currentWord);
+    useEffect(() => { selectedIndicesRef.current = selectedIndices; }, [selectedIndices]);
+    useEffect(() => { currentWordRef.current = currentWord; }, [currentWord]);
+
+    const handleDragEnd = useCallback(() => {
+      const word = currentWordRef.current;
+      const indices = selectedIndicesRef.current;
+      if (!word || indices.length === 0) return;
+      wordSubmit.handleWordSubmit(word, indices);
+    }, [wordSubmit]);
+
     // Flow: cinematic → story beat → loot chest → level complete
     const showLootOrComplete = useCallback(() => {
       if (levelCompletion.lootDrops.length > 0 && gameState.stars > 0) {
@@ -454,13 +498,34 @@ const AdventureGame = memo<AdventureGameProps>(
     }, [levelCompletion.nonBossCompleted, showLootOrComplete]);
 
     const handleCinematicComplete = useCallback(() => {
+      // After victory cinematic on boss level — check if next world is now unlocked
+      if (
+        cinematics.showVictoryCinematic && isBossLevel && gameState.stars > 0
+        && levelConfig.world < 10 && !cinematics.showWorldUnlockCinematic
+      ) {
+        const nextWorld = levelConfig.world + 1;
+        const currentWorldConfig = getWorldConfig(levelConfig.world);
+        const nextWorldConfig = getWorldConfig(nextWorld);
+        cinematics.handleCinematicComplete();
+        cinematics.showWorldUnlock({
+          previousWorldNumber: levelConfig.world,
+          previousWorldName: t(`adventure.worlds.${currentWorldConfig.name}`),
+          newWorldNumber: nextWorld,
+          newWorldName: t(`adventure.worlds.${nextWorldConfig.name}`),
+          previousColor: currentWorldConfig.colorPrimary,
+          newColor: nextWorldConfig.colorPrimary,
+          newSecondaryColor: nextWorldConfig.colorSecondary,
+        });
+        return;
+      }
+
       cinematics.handleCinematicComplete();
       if (storyBeat && gameState.stars > 0) {
         setShowStoryBeat(true);
       } else {
         showLootOrComplete();
       }
-    }, [cinematics, storyBeat, gameState.stars, showLootOrComplete]);
+    }, [cinematics, storyBeat, gameState.stars, showLootOrComplete, isBossLevel, levelConfig.world, t]);
 
     const handleStoryBeatContinue = useCallback(() => {
       setShowStoryBeat(false);
@@ -478,9 +543,33 @@ const AdventureGame = memo<AdventureGameProps>(
       if (isBossLevel && bossOrch.bossHealthState.phase === 'victory' && hintsUsedRef.current === 0) {
         chapterQuests.recordBossDefeatedNoHint();
       }
+      // Score challenge quest: record final score
+      if (gameState.score > 0) {
+        chapterQuests.recordScoreChallenge(gameState.score);
+      }
+      // Boss high health: record if boss defeated with >75% player HP
+      if (isBossLevel && bossOrch.bossHealthState.phase === 'victory' && bossOrch.playerHealthState.currentHP > bossOrch.playerHealthState.maxHP * 0.75) {
+        chapterQuests.recordBossHighHealth();
+      }
+      // Full combo level: record if no combo breaks during the level
+      if (gameState.stars > 0 && gameState.comboCount >= gameState.wordsFound.length && gameState.wordsFound.length > 0) {
+        chapterQuests.recordFullComboLevel();
+      }
+      // Progression achievements — star milestones (totalStars includes stars from this level)
+      const newTotalStars = (totalStars ?? 0) + gameState.stars;
+      if (newTotalStars >= 50) init.handleEarnAchievement('STAR_COLLECTOR_50');
+      if (newTotalStars >= 100) init.handleEarnAchievement('STAR_COLLECTOR_100');
+      // World complete: finishing the boss level (level 7) means the world is done
+      if (isBossLevel && gameState.stars > 0) {
+        init.handleEarnAchievement('WORLD_COMPLETE');
+      }
+      // All bosses: finishing world 10 boss means all 10 bosses defeated
+      if (isBossLevel && levelConfig.world === 10 && gameState.stars > 0) {
+        init.handleEarnAchievement('ALL_BOSSES');
+      }
       setShowLevelComplete(false);
       onLevelComplete(gameState.stars, gameState.score, gameState.wordsFound.length, levelCompletion.earnedGold);
-    }, [gameState.stars, gameState.score, gameState.wordsFound.length, levelCompletion.earnedGold, onLevelComplete, chapterQuests, isBossLevel, bossOrch.bossHealthState.phase]);
+    }, [gameState.stars, gameState.score, gameState.wordsFound.length, gameState.comboCount, levelCompletion.earnedGold, onLevelComplete, chapterQuests, isBossLevel, bossOrch.bossHealthState.phase, bossOrch.playerHealthState.currentHP, bossOrch.playerHealthState.maxHP, totalStars, init, levelConfig.world]);
 
     const handleRetry = useCallback(() => {
       setShowLevelComplete(false);
@@ -531,7 +620,7 @@ const AdventureGame = memo<AdventureGameProps>(
     if (!isValidConfig) {
       return (
         <div data-testid="adventure-game" role="main" className="flex items-center justify-center h-full">
-          <p className="text-neo-red font-bold">Invalid level configuration</p>
+          <p className="text-neo-red font-bold">{t('adventure.loadError')}</p>
         </div>
       );
     }
@@ -550,7 +639,7 @@ const AdventureGame = memo<AdventureGameProps>(
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}
               selectedIndices={selectedIndices} onTileSelect={handleTileSelect}
               onWordSubmit={wordSubmit.handleWordSubmit}
-              onDragStart={handleDragStart} onDragEnter={handleDragEnter}
+              onDragStart={handleDragStart} onDragEnter={handleDragEnter} onDragEnd={handleDragEnd}
               gridRef={gridRef}
               isInteractive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating}
               isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating}
@@ -655,6 +744,16 @@ const AdventureGame = memo<AdventureGameProps>(
                   }}
                   durationSeconds={DEFEAT_DURATION_FRAMES / 30} onComplete={handleCinematicComplete}
                   fallbackType="defeat" />
+              )}
+
+              {/* World Unlock Cinematic — plays after boss defeat when next world is unlocked */}
+              {cinematics.showWorldUnlockCinematic && cinematics.worldUnlockProps && (
+                <CinematicPlayer
+                  composition={WorldUnlockCinematic as unknown as React.ComponentType<Record<string, unknown>>}
+                  compositionProps={cinematics.worldUnlockProps as unknown as Record<string, unknown>}
+                  durationSeconds={WORLD_UNLOCK_DURATION_FRAMES / 30}
+                  onComplete={handleCinematicComplete}
+                  fallbackType="victory" />
               )}
 
               <LootChestReveal

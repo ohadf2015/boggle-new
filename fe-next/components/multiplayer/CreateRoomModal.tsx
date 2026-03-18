@@ -4,16 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogBody,
-  DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { AvatarSelector } from '@/components/multiplayer/AvatarSelector';
-import { LanguageSelector } from '@/components/join/LanguageSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   getStoredUsername,
@@ -24,6 +16,8 @@ import {
 import { sanitizeRoomName } from '@/utils/consts';
 import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { Swords, Loader2, MapPin } from 'lucide-react';
 import type { Language } from '@/shared/types/game';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 
@@ -44,6 +38,20 @@ interface CreateRoomModalProps {
   profileAvatar?: CustomAvatarConfig | null;
 }
 
+const MAX_NAME_LENGTH = 20;
+const MAX_ROOM_LENGTH = 30;
+
+const SPRING = { type: 'spring' as const, stiffness: 300, damping: 24 };
+const BUTTON_SPRING = { type: 'spring' as const, stiffness: 400, damping: 17 };
+
+const LANGUAGES: { code: Language; flag: string; labelKey: string }[] = [
+  { code: 'en', flag: '🇺🇸', labelKey: 'joinView.english' },
+  { code: 'he', flag: '🇮🇱', labelKey: 'joinView.hebrew' },
+  { code: 'sv', flag: '🇸🇪', labelKey: 'joinView.swedish' },
+  { code: 'ja', flag: '🇯🇵', labelKey: 'joinView.japanese' },
+  { code: 'es', flag: '🇪🇸', labelKey: 'joinView.spanish' },
+];
+
 const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   isOpen,
   onClose,
@@ -62,12 +70,12 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const [language, setLanguage] = useState<Language>(defaultLanguage);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [hasTouchedName, setHasTouchedName] = useState(false);
+  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const [nameFocused, setNameFocused] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize state when modal opens
   useEffect(() => {
     if (!isOpen) return;
-
     setLanguage(defaultLanguage);
     setRoomName('');
     setHasAttemptedSubmit(false);
@@ -90,124 +98,248 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
   const handleCreate = useCallback(() => {
     setHasAttemptedSubmit(true);
-
     const validation = validateUsername(username);
     if (!validation.isValid || !customAvatar) {
-      // Focus the name input if that's the problem
-      if (!validation.isValid) {
-        nameInputRef.current?.focus();
-      }
+      if (!validation.isValid) nameInputRef.current?.focus();
       return;
     }
-
-    if (!isAuthenticated) {
-      setStoredUsername(username.trim());
-    }
-    setStoredCustomAvatar(customAvatar);
+    if (!isAuthenticated) setStoredUsername(username.trim());
+    setStoredCustomAvatar(customAvatar!);
 
     const finalRoomName = roomName.trim()
       ? sanitizeRoomName(roomName.trim())
       : sanitizeRoomName(generateRoomName(username.trim()));
 
-    onCreate({
-      hostUsername: username.trim(),
-      roomName: finalRoomName,
-      language,
-    });
+    onCreate({ hostUsername: username.trim(), roomName: finalRoomName, language });
   }, [username, customAvatar, roomName, language, isAuthenticated, onCreate, generateRoomName]);
 
   const usernameValidation = validateUsername(username);
   const showError = (hasAttemptedSubmit || hasTouchedName) && !usernameValidation.isValid;
   const nameError = showError ? usernameValidation.error : null;
-
+  const isNameValid = usernameValidation.isValid && username.length > 0;
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85dvh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {t('multiplayerFlow.createModal.title')}
-          </DialogTitle>
-        </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={!isAvatarBuilderOpen}>
+      <DialogContent noDescription className="max-w-[420px] max-h-[90dvh] overflow-y-auto !p-0 !gap-0 !border-4">
 
-        <DialogBody className="space-y-5">
-          {/* Avatar + Name — compact inline layout */}
-          <div className="flex items-start gap-4">
-            <AvatarSelector
-              selectedAvatar={customAvatar}
-              onAvatarChange={setCustomAvatar}
-              compact
-            />
-            <div className="flex-1 space-y-1.5">
-              <Label htmlFor="create-username" className="text-xs font-bold uppercase text-neo-cyan">
-                {t('multiplayerFlow.createModal.yourName')}
-              </Label>
-              {isAuthenticated ? (
-                <Input
-                  id="create-username"
-                  value={username}
-                  disabled
-                  className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
-                />
-              ) : (
-                <Input
+        {/* ── Battle Arena Banner ── */}
+        <AdaptiveMotion.div
+          initial={{ opacity: 0, y: -16, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ ...SPRING, delay: 0.05 }}
+          className="relative bg-gradient-to-r from-neo-orange to-neo-pink px-5 py-4 border-b-4 border-black overflow-hidden"
+        >
+          {/* Halftone dot pattern overlay */}
+          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, black 1px, transparent 1px)', backgroundSize: '8px 8px' }} />
+          <div className="relative flex items-center gap-3">
+            <div className="w-10 h-10 bg-neo-black/20 rounded-neo border-2 border-black flex items-center justify-center flex-shrink-0">
+              <Swords className="w-5 h-5 text-neo-white" />
+            </div>
+            <div>
+              <h2 className="font-neo-display text-xl font-bold text-neo-black leading-tight uppercase tracking-tight">
+                {t('multiplayerFlow.createModal.title')}
+              </h2>
+            </div>
+          </div>
+        </AdaptiveMotion.div>
+
+        <div className="px-5 py-5 space-y-5">
+
+          {/* ── Hero Avatar + Name ── */}
+          <AdaptiveMotion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING, delay: 0.1 }}
+            className="flex flex-col items-center space-y-3"
+          >
+            {/* Avatar with glow ring */}
+            <div className="relative">
+              <div className={cn(
+                'absolute -inset-1.5 rounded-full transition-opacity duration-300',
+                nameFocused || isNameValid ? 'opacity-60' : 'opacity-30',
+              )} style={{
+                background: 'conic-gradient(from 0deg, var(--neo-cyan), var(--neo-pink), var(--neo-lime), var(--neo-cyan))',
+                filter: 'blur(6px)',
+              }} />
+              <AvatarSelector
+                selectedAvatar={customAvatar}
+                onAvatarChange={setCustomAvatar}
+                compact
+                onBuilderOpenChange={setIsAvatarBuilderOpen}
+              />
+            </div>
+
+            {/* "Enter as..." label */}
+            <p className="text-[11px] font-black text-neo-cyan uppercase tracking-[0.15em]">
+              {t('multiplayerFlow.createModal.yourName')}
+            </p>
+
+            {/* Name input — centered, underline style */}
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <span className="font-neo-display font-bold text-2xl text-neo-white">{username}</span>
+                <span className="text-[9px] font-bold text-neo-cyan/60 uppercase bg-neo-cyan/10 px-1.5 py-0.5 rounded-sm">
+                  {t('common.verified') || '✓'}
+                </span>
+              </div>
+            ) : (
+              <div className="w-full max-w-[280px]">
+                <input
                   ref={nameInputRef}
                   id="create-username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  onBlur={() => setHasTouchedName(true)}
+                  onFocus={() => setNameFocused(true)}
+                  onBlur={() => { setNameFocused(false); setHasTouchedName(true); }}
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                  maxLength={20}
+                  maxLength={MAX_NAME_LENGTH}
                   autoFocus
                   className={cn(
-                    'font-bold bg-neo-navy/40 border-2 border-neo-black text-neo-white placeholder:text-neo-white/40',
-                    nameError && 'border-red-500 animate-neo-shake'
+                    'w-full bg-transparent text-center font-neo-display font-bold text-2xl text-neo-white',
+                    'border-b-3 pb-1.5 outline-none transition-colors',
+                    'placeholder:text-neo-white/15',
+                    nameError
+                      ? 'border-red-500 animate-neo-shake'
+                      : nameFocused
+                        ? 'border-neo-lime'
+                        : isNameValid
+                          ? 'border-neo-lime/40'
+                          : 'border-neo-white/20',
                   )}
                   placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
                 />
-              )}
-              {nameError && (
-                <p className="text-xs font-bold text-red-400" role="alert">
-                  {t(nameError)}
-                </p>
-              )}
-            </div>
-          </div>
+                {/* Feedback row */}
+                <div className="flex items-center justify-between mt-1.5 px-1">
+                  <AdaptiveAnimatePresence mode="wait">
+                    {nameError ? (
+                      <AdaptiveMotion.span
+                        key="error"
+                        initial={{ opacity: 0, x: -4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="text-[10px] font-bold text-red-400"
+                        role="alert"
+                      >
+                        {t(nameError)}
+                      </AdaptiveMotion.span>
+                    ) : isNameValid ? (
+                      <AdaptiveMotion.span
+                        key="ok"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-[10px] font-bold text-neo-lime"
+                      >
+                        ✓ {t('common.looksGood') || 'Ready'}
+                      </AdaptiveMotion.span>
+                    ) : (
+                      <span className="text-[10px] text-neo-white/25">
+                        {t('multiplayerFlow.profileSetup.usernameHint') || '2-20 characters'}
+                      </span>
+                    )}
+                  </AdaptiveAnimatePresence>
+                  <span className={cn(
+                    'text-[10px] font-mono tabular-nums',
+                    username.length >= MAX_NAME_LENGTH ? 'text-neo-orange font-bold' : 'text-neo-white/20',
+                  )}>
+                    {username.length}/{MAX_NAME_LENGTH}
+                  </span>
+                </div>
+              </div>
+            )}
+          </AdaptiveMotion.div>
 
-          {/* Room Name Input */}
-          <div className="space-y-1.5">
-            <Label htmlFor="create-room-name" className="text-xs font-bold uppercase text-neo-cyan">
-              {t('multiplayerFlow.createModal.roomNameLabel')}{' '}
-              <span className="font-normal text-neo-white/40">
-                ({t('multiplayerFlow.createModal.optional')})
+          {/* ── Divider ── */}
+          <div className="border-t-2 border-neo-white/5" />
+
+          {/* ── Room Name (optional) ── */}
+          <AdaptiveMotion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING, delay: 0.18 }}
+            className="space-y-1.5"
+          >
+            <label htmlFor="create-room-name" className="text-[10px] font-black uppercase text-neo-white/35 flex items-center gap-1.5 tracking-widest">
+              <MapPin className="w-3 h-3" />
+              {t('multiplayerFlow.createModal.roomNameLabel')}
+              <span className="font-normal lowercase opacity-50 ms-auto">
+                {t('multiplayerFlow.createModal.optional')}
               </span>
-            </Label>
-            <Input
+            </label>
+            <input
               id="create-room-name"
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
-              maxLength={30}
+              maxLength={MAX_ROOM_LENGTH}
               placeholder={generateRoomName(username || 'Your')}
-              className="bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/40"
+              className="w-full h-11 px-3 bg-neo-navy-light/30 border-2 border-neo-white/10 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white/15 outline-none focus:border-neo-cyan/50 transition-colors"
             />
-          </div>
+          </AdaptiveMotion.div>
 
-          {/* Language Selector */}
-          <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
-        </DialogBody>
+          {/* ── Language — inline flag pills ── */}
+          <AdaptiveMotion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING, delay: 0.22 }}
+            className="space-y-2"
+          >
+            <p className="text-[10px] font-black uppercase text-neo-white/35 tracking-widest">
+              {t('joinView.selectLanguage')}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {LANGUAGES.map(lang => (
+                <AdaptiveMotion.button
+                  key={lang.code}
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={BUTTON_SPRING}
+                  onClick={() => setLanguage(lang.code)}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 font-bold text-sm transition-all',
+                    language === lang.code
+                      ? 'bg-neo-lime/15 border-neo-lime text-neo-lime shadow-hard-sm'
+                      : 'bg-neo-navy-light/30 border-neo-white/10 text-neo-white/50 hover:border-neo-white/30 hover:text-neo-white/70',
+                  )}
+                >
+                  <span className="text-base leading-none">{lang.flag}</span>
+                  <span className="text-xs">{t(lang.labelKey)}</span>
+                </AdaptiveMotion.button>
+              ))}
+            </div>
+          </AdaptiveMotion.div>
+        </div>
 
-        <DialogFooter className="sticky bottom-0 bg-inherit z-10">
-          <Button
-            variant="success"
-            size="lg"
+        {/* ── CTA ── */}
+        <div className="px-5 pb-5 pt-1">
+          <AdaptiveMotion.button
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING, delay: 0.28 }}
+            whileHover={!isCreating ? { scale: 1.02, y: -2 } : undefined}
+            whileTap={!isCreating ? { scale: 0.97, y: 1 } : undefined}
             onClick={handleCreate}
             disabled={isCreating}
-            className="w-full font-bold uppercase"
+            className={cn(
+              'w-full py-4 rounded-neo border-3 border-black font-neo-display font-bold text-xl uppercase tracking-wide',
+              'flex items-center justify-center gap-3',
+              'transition-all duration-150',
+              isCreating
+                ? 'bg-neo-navy-light text-neo-white/40 shadow-none cursor-wait'
+                : 'bg-neo-lime text-neo-black shadow-hard-lg hover:shadow-hard-xl active:shadow-hard-pressed',
+            )}
           >
-            {isCreating
-              ? t('multiplayerFlow.createModal.creating')
-              : t('multiplayerFlow.createModal.createButton')}
-          </Button>
-        </DialogFooter>
+            {isCreating ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                {t('multiplayerFlow.createModal.creating')}
+              </>
+            ) : (
+              <>
+                <Swords className="w-5 h-5" />
+                {t('multiplayerFlow.createModal.createButton')}
+              </>
+            )}
+          </AdaptiveMotion.button>
+        </div>
       </DialogContent>
     </Dialog>
   );

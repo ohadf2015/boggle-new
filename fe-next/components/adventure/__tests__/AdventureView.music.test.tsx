@@ -312,6 +312,49 @@ jest.mock('@/lib/adventure', () => ({
 }));
 
 // Mock WorldMap to provide clickable world buttons with expected testids
+// Mock AdventureHub
+jest.mock('../AdventureHub', () => {
+  const MockAdventureHub = ({
+    onOpenWorldMap,
+    onPlayLevel,
+  }: {
+    onOpenWorldMap: () => void;
+    onPlayLevel: (worldId: number, levelId: number) => void;
+  }) => (
+    <div data-testid="adventure-hub">
+      <button data-testid="hub-world-map" onClick={onOpenWorldMap}>World Map</button>
+      <button data-testid="hub-continue" onClick={() => onPlayLevel(1, 6)}>Continue</button>
+    </div>
+  );
+  MockAdventureHub.displayName = 'MockAdventureHub';
+  return MockAdventureHub;
+});
+
+jest.mock('@/hooks/useDailyQuests', () => ({
+  useDailyQuests: () => ({
+    quests: [],
+    recordProgress: jest.fn(),
+    completedQuests: [],
+    todayStr: '2026-03-18',
+  }),
+}));
+
+jest.mock('@/lib/adventure/adventureStreak', () => ({
+  getStreakMultiplier: () => 1.0,
+}));
+
+jest.mock('@/lib/adventure/weeklyChallenge', () => ({
+  getWeeklyChallengeConfig: () => ({
+    weekId: '2026-W11',
+    grid: Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => 'A')),
+    gridSize: 5, timerSeconds: 120, resetMs: 86400000,
+  }),
+  getCurrentWeekId: () => '2026-W11',
+}));
+
+jest.mock('../WordAlbumPanel', () => { const M = () => null; M.displayName = 'M'; return M; });
+jest.mock('../WeeklyChallengePanel', () => { const M = () => null; M.displayName = 'M'; return M; });
+
 jest.mock('../WorldMap', () => {
   const MockWorldMap = ({
     onWorldSelect,
@@ -382,6 +425,16 @@ jest.mock('../AdventureGame', () => {
 // TESTS
 // ==============================================
 
+/** Render and navigate past hub to world map */
+const renderAndNavigateToWorldMap = () => {
+  const result = render(<AdventureView />);
+  const hub = screen.queryByTestId('adventure-hub');
+  if (hub) {
+    fireEvent.click(screen.getByTestId('hub-world-map'));
+  }
+  return result;
+};
+
 describe('AdventureView Music Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -390,7 +443,7 @@ describe('AdventureView Music Integration', () => {
   describe('WorldMap screen', () => {
     it('should call useAdventureMusic when on WorldMap', () => {
       // WHEN
-      render(<AdventureView />);
+      renderAndNavigateToWorldMap();
 
       // THEN - music hook should be called
       expect(mockUseAdventureMusic).toHaveBeenCalled();
@@ -398,7 +451,7 @@ describe('AdventureView Music Integration', () => {
 
     it('should play music for world 1 by default on WorldMap', () => {
       // WHEN
-      render(<AdventureView />);
+      renderAndNavigateToWorldMap();
 
       // THEN - should call hook with world 1 (first unlocked world)
       const lastCall =
@@ -416,7 +469,7 @@ describe('AdventureView Music Integration', () => {
   describe('LevelGrid screen', () => {
     it('should continue playing world music on LevelGrid', () => {
       // GIVEN
-      render(<AdventureView />);
+      renderAndNavigateToWorldMap();
       mockUseAdventureMusic.mockClear();
 
       // WHEN - navigate to level grid for world 1
@@ -436,7 +489,7 @@ describe('AdventureView Music Integration', () => {
 
     it('should change world music when selecting different world', () => {
       // GIVEN - progression with world 2 unlocked
-      render(<AdventureView />);
+      renderAndNavigateToWorldMap();
 
       // Navigate to world 1, then back to map, then to world 2 would require
       // more stars. For this test, let's verify world 1 is playing
@@ -454,7 +507,7 @@ describe('AdventureView Music Integration', () => {
   describe('AdventureGame screen', () => {
     it('should pass timer info to music hook during gameplay', () => {
       // GIVEN
-      render(<AdventureView />);
+      renderAndNavigateToWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       mockUseAdventureMusic.mockClear();
 
@@ -515,7 +568,7 @@ describe('AdventureView Music Integration', () => {
 
     it('should continue music when navigating WorldMap → LevelGrid → WorldMap', () => {
       // GIVEN
-      render(<AdventureView />);
+      renderAndNavigateToWorldMap();
 
       // Navigate to level grid
       fireEvent.click(screen.getByTestId('world-1'));
@@ -534,7 +587,7 @@ describe('AdventureView Music Integration', () => {
 
     it('should reset to ambient mode when exiting gameplay', () => {
       // GIVEN
-      render(<AdventureView />);
+      renderAndNavigateToWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       fireEvent.click(screen.getByTestId('level-button-1'));
 

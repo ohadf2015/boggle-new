@@ -10,7 +10,7 @@
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Pause, Play, LogOut, MapPin, Coins } from 'lucide-react';
+import { Pause, Play, X, MapPin, Coins, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -33,6 +33,10 @@ interface GameHeaderProps {
   gold?: number;
   /** XP progress within current level (0-1) */
   xpProgress?: number;
+  /** Current adventure streak days (0 = no streak) */
+  streakDays?: number;
+  /** Streak multiplier (1.0-2.0) */
+  streakMultiplier?: number;
   className?: string;
 }
 
@@ -50,6 +54,8 @@ export const GameHeader = memo(function GameHeader({
   onExit,
   gold,
   xpProgress,
+  streakDays = 0,
+  streakMultiplier = 1,
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
@@ -105,6 +111,19 @@ export const GameHeader = memo(function GameHeader({
         />
       </div>
 
+      {/* Streak Badge — only visible when streak > 0 */}
+      {streakDays > 0 && (
+        <div
+          className="flex items-center gap-1 px-2 py-0.5 bg-neo-orange/20 rounded-neo"
+          aria-label={t('adventure.streakBadge', { days: streakDays, multiplier: streakMultiplier.toFixed(1) })}
+        >
+          <Flame className="w-3.5 h-3.5 text-neo-orange" />
+          <span className="text-xs font-black text-neo-orange tabular-nums">
+            {streakMultiplier > 1 ? `${streakMultiplier.toFixed(1)}x` : `${streakDays}d`}
+          </span>
+        </div>
+      )}
+
       {/* Gold Badge */}
       {gold !== undefined && (
         <div className="flex items-center gap-1 px-2 py-0.5 bg-neo-yellow/20 rounded-neo">
@@ -130,7 +149,7 @@ export const GameHeader = memo(function GameHeader({
             whileTap={{ scale: 0.95 }}
             className={cn(
               'p-2 rounded-neo',
-              'min-w-[44px] min-h-[44px] flex items-center justify-center',
+              'min-w-11 min-h-11 flex items-center justify-center',
               'transition-colors duration-200',
               isPaused
                 ? 'bg-neo-lime text-neo-black shadow-hard-sm'
@@ -152,14 +171,14 @@ export const GameHeader = memo(function GameHeader({
             whileTap={{ scale: 0.95 }}
             className={cn(
               'p-2 rounded-neo',
-              'min-w-[44px] min-h-[44px] flex items-center justify-center',
+              'min-w-11 min-h-11 flex items-center justify-center',
               'bg-neo-white/5 text-neo-white/60',
               'hover:bg-neo-red/20 hover:text-neo-red',
               'transition-colors duration-200'
             )}
             aria-label={t('common.exit')}
           >
-            <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </motion.button>
         </div>
       </div>

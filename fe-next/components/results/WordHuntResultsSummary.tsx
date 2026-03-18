@@ -1,8 +1,10 @@
 'use client';
 
+import { motion, useReducedMotion } from 'framer-motion';
 import { Heart, Clock, Skull, Shield, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { ScoreCountUp } from '@/components/results/shared';
 import WordHuntTipBadge from './WordHuntTipBadge';
 
 export interface WordHuntPlayerResult {
@@ -26,6 +28,24 @@ interface WordHuntResultsSummaryProps {
   currentUsername?: string;
 }
 
+const staggerContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+};
+
+const fadeSlide = {
+  hidden: { opacity: 0, y: 16 },
+  show: {
+    opacity: 1, y: 0,
+    transition: { type: 'spring' as const, stiffness: 200, damping: 20 },
+  },
+};
+
+const fadeOnly = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: 0.15 } },
+};
+
 export default function WordHuntResultsSummary({
   targetWord,
   foundTarget,
@@ -35,12 +55,12 @@ export default function WordHuntResultsSummary({
   playerResults,
   currentUsername,
 }: WordHuntResultsSummaryProps) {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
+  const reducedMotion = useReducedMotion();
+  const variant = reducedMotion ? fadeOnly : fadeSlide;
 
-  // Apply Hebrew final letters for display (e.g., כ→ך at end of word)
   const displayTargetWord = language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord;
 
-  // Format survival time as mm:ss or just Xs for short times
   const formattedSurvivalTime = survivalTime >= 60
     ? `${Math.floor(survivalTime / 60)}:${String(survivalTime % 60).padStart(2, '0')}`
     : `${survivalTime}s`;
@@ -52,36 +72,57 @@ export default function WordHuntResultsSummary({
     ?.filter((p) => !p.survived)
     .sort((a, b) => b.score - a.score);
 
+  const xSlide = dir === 'rtl' ? 20 : -20;
+
   return (
-    <div className="space-y-3">
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="show"
+      className="space-y-3"
+    >
       {/* Target word reveal — prominent hero display */}
-      <div className="flex flex-col items-center gap-2 p-4 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard border-t-4 border-t-purple-500">
+      <motion.div
+        variants={variant}
+        className="flex flex-col items-center gap-2 p-4 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard border-t-4 border-t-purple-500"
+      >
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-neo-yellow" />
           <span className="text-sm font-bold text-neo-cream/70 uppercase tracking-wide">{t('wordHunt.multiplayer.targetWord')}</span>
         </div>
-        <span className="text-3xl font-black text-neo-white tracking-widest font-neo-display uppercase">
+        <motion.span
+          initial={reducedMotion ? undefined : { scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 18, delay: reducedMotion ? 0 : 0.2 }}
+          className="text-3xl font-black text-neo-white tracking-widest font-neo-display uppercase"
+        >
           {displayTargetWord}
-        </span>
-        {foundTarget ? (
-          isFirstFinder ? (
-            <span className="px-3 py-1 text-xs font-bold bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black shadow-hard-sm">
-              {t('wordHunt.multiplayer.firstFinder')}
-            </span>
+        </motion.span>
+        <motion.span
+          initial={reducedMotion ? undefined : { scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 15, delay: reducedMotion ? 0 : 0.4 }}
+        >
+          {foundTarget ? (
+            isFirstFinder ? (
+              <span className="px-3 py-1 text-xs font-bold bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black shadow-hard-sm">
+                {t('wordHunt.multiplayer.firstFinder')}
+              </span>
+            ) : (
+              <span className="px-3 py-1 text-xs font-bold bg-green-500 text-neo-black rounded-neo border-2 border-neo-black shadow-hard-sm">
+                {t('wordHunt.multiplayer.found')}
+              </span>
+            )
           ) : (
-            <span className="px-3 py-1 text-xs font-bold bg-green-500 text-neo-black rounded-neo border-2 border-neo-black shadow-hard-sm">
-              {t('wordHunt.multiplayer.found')}
+            <span className="px-3 py-1 text-xs font-bold bg-red-500 text-neo-white rounded-neo border-2 border-neo-black shadow-hard-sm">
+              {t('wordHunt.multiplayer.notFound')}
             </span>
-          )
-        ) : (
-          <span className="px-3 py-1 text-xs font-bold bg-red-500 text-neo-white rounded-neo border-2 border-neo-black shadow-hard-sm">
-            {t('wordHunt.multiplayer.notFound')}
-          </span>
-        )}
-      </div>
+          )}
+        </motion.span>
+      </motion.div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 gap-2">
+      <motion.div variants={variant} className="grid grid-cols-2 gap-2">
         <div className="flex items-center gap-2 p-3 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm">
           <Clock className="w-5 h-5 text-neo-orange" />
           <div className="flex flex-col">
@@ -92,15 +133,17 @@ export default function WordHuntResultsSummary({
         <div className="flex items-center gap-2 p-3 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm">
           <Heart className="w-5 h-5 text-neo-pink" />
           <div className="flex flex-col">
-            <span className="text-lg font-bold text-neo-white">{discoveryWords}</span>
+            <span className="text-lg font-bold text-neo-white tabular-nums">
+              <ScoreCountUp to={discoveryWords} duration={1000} delay={reducedMotion ? 0 : 300} />
+            </span>
             <span className="text-xs text-neo-cream/70">{t('wordHunt.multiplayer.discoveryWords')}</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Survivors section */}
       {survivors && survivors.length > 0 && (
-        <div className="space-y-2">
+        <motion.div variants={variant} className="space-y-2">
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-green-400" />
             <span className="text-sm font-bold text-green-400 font-neo-display">
@@ -109,34 +152,41 @@ export default function WordHuntResultsSummary({
           </div>
           <div className="space-y-1">
             {survivors.map((player, idx) => (
-              <PlayerRow
+              <motion.div
                 key={player.username}
-                player={player}
-                isCurrentUser={player.username === currentUsername}
-                variant="survivor"
-                tipStats={{
-                  score: player.score,
-                  survived: true,
-                  lifeRemaining: player.lifeRemaining,
-                  discoveryWords,
-                  foundTarget,
-                  isFirstFinder: isFirstFinder && player.username === currentUsername,
-                  totalPlayers: (playerResults?.length ?? 0),
-                  rank: idx + 1,
-                  validWordCount: player.validWordCount ?? 0,
-                  invalidWordCount: player.invalidWordCount ?? 0,
-                  avgWordLength: player.avgWordLength ?? 0,
-                  longestWordLength: player.longestWordLength ?? 0,
-                }}
-              />
+                initial={reducedMotion ? undefined : { opacity: 0, x: xSlide }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ type: 'spring', stiffness: 150, damping: 18, delay: reducedMotion ? 0 : 0.05 * idx }}
+              >
+                <PlayerRow
+                  player={player}
+                  isCurrentUser={player.username === currentUsername}
+                  variant="survivor"
+                  reducedMotion={!!reducedMotion}
+                  tipStats={{
+                    score: player.score,
+                    survived: true,
+                    lifeRemaining: player.lifeRemaining,
+                    discoveryWords,
+                    foundTarget,
+                    isFirstFinder: isFirstFinder && player.username === currentUsername,
+                    totalPlayers: (playerResults?.length ?? 0),
+                    rank: idx + 1,
+                    validWordCount: player.validWordCount ?? 0,
+                    invalidWordCount: player.invalidWordCount ?? 0,
+                    avgWordLength: player.avgWordLength ?? 0,
+                    longestWordLength: player.longestWordLength ?? 0,
+                  }}
+                />
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Eliminated section */}
       {eliminated && eliminated.length > 0 && (
-        <div className="space-y-2">
+        <motion.div variants={variant} className="space-y-2">
           <div className="flex items-center gap-2">
             <Skull className="w-4 h-4 text-red-400" />
             <span className="text-sm font-bold text-red-400 font-neo-display">
@@ -144,32 +194,45 @@ export default function WordHuntResultsSummary({
             </span>
           </div>
           <div className="space-y-1">
-            {eliminated.map((player) => (
-              <PlayerRow
+            {eliminated.map((player, idx) => (
+              <motion.div
                 key={player.username}
-                player={player}
-                isCurrentUser={player.username === currentUsername}
-                variant="eliminated"
-                tipStats={{
-                  score: player.score,
-                  survived: false,
-                  lifeRemaining: 0,
-                  discoveryWords,
-                  foundTarget,
-                  isFirstFinder: false,
-                  totalPlayers: (playerResults?.length ?? 0),
-                  rank: (survivors?.length ?? 0) + (eliminated?.indexOf(player) ?? 0) + 1,
-                  validWordCount: player.validWordCount ?? 0,
-                  invalidWordCount: player.invalidWordCount ?? 0,
-                  avgWordLength: player.avgWordLength ?? 0,
-                  longestWordLength: player.longestWordLength ?? 0,
+                initial={reducedMotion ? undefined : { opacity: 0, x: 0 }}
+                animate={reducedMotion ? { opacity: 0.7 } : {
+                  opacity: 0.7,
+                  x: dir === 'rtl' ? [0, 4, -4, 3, -3, 0] : [0, -4, 4, -3, 3, 0],
                 }}
-              />
+                transition={{
+                  opacity: { duration: 0.2, delay: reducedMotion ? 0 : 0.05 * idx },
+                  x: { duration: 0.4, delay: reducedMotion ? 0 : 0.05 * idx + 0.1, ease: 'easeOut' },
+                }}
+              >
+                <PlayerRow
+                  player={player}
+                  isCurrentUser={player.username === currentUsername}
+                  variant="eliminated"
+                  reducedMotion={!!reducedMotion}
+                  tipStats={{
+                    score: player.score,
+                    survived: false,
+                    lifeRemaining: 0,
+                    discoveryWords,
+                    foundTarget,
+                    isFirstFinder: false,
+                    totalPlayers: (playerResults?.length ?? 0),
+                    rank: (survivors?.length ?? 0) + (eliminated?.indexOf(player) ?? 0) + 1,
+                    validWordCount: player.validWordCount ?? 0,
+                    invalidWordCount: player.invalidWordCount ?? 0,
+                    avgWordLength: player.avgWordLength ?? 0,
+                    longestWordLength: player.longestWordLength ?? 0,
+                  }}
+                />
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -177,11 +240,13 @@ function PlayerRow({
   player,
   isCurrentUser,
   variant,
+  reducedMotion,
   tipStats,
 }: {
   player: WordHuntPlayerResult;
   isCurrentUser: boolean;
   variant: 'survivor' | 'eliminated';
+  reducedMotion: boolean;
   tipStats: import('./getWordHuntTip').WordHuntTipInput;
 }) {
   const isSurvivor = variant === 'survivor';
@@ -215,15 +280,19 @@ function PlayerRow({
               aria-valuenow={player.lifeRemaining}
               aria-valuemin={0}
               aria-valuemax={100}
-              className="w-16 h-2 bg-neo-black/50 rounded-full overflow-hidden"
+              className="w-12 sm:w-16 h-2 bg-neo-black/50 rounded-full overflow-hidden"
             >
-              <div
+              <motion.div
                 className="h-full bg-green-400 rounded-full"
-                style={{ width: `${player.lifeRemaining}%` }}
+                initial={reducedMotion ? { width: `${player.lifeRemaining}%` } : { width: '0%' }}
+                animate={{ width: `${player.lifeRemaining}%` }}
+                transition={{ duration: reducedMotion ? 0 : 0.6, ease: 'easeOut', delay: reducedMotion ? 0 : 0.3 }}
               />
             </div>
           )}
-          <span className="text-sm font-bold text-neo-white">{player.score}</span>
+          <span className="text-sm font-bold text-neo-white tabular-nums">
+            <ScoreCountUp to={player.score} duration={1000} delay={reducedMotion ? 0 : 200} />
+          </span>
         </div>
       </div>
       {isCurrentUser && <WordHuntTipBadge stats={tipStats} />}

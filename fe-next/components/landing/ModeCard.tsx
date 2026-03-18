@@ -51,6 +51,10 @@ interface ModeCardProps {
   onLockedClick?: () => void;
   /** Optional badge to display (e.g., "NEW", "HOT") */
   badge?: string;
+  /** Highlighted state for first-time players — adds pulsing glow and animated badge */
+  highlighted?: boolean;
+  /** Label for the highlighted badge (e.g., "Start Here") */
+  highlightLabel?: string;
 }
 
 /**
@@ -73,6 +77,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
   lockedMessage,
   onLockedClick,
   badge,
+  highlighted = false,
+  highlightLabel,
 }) => {
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -170,13 +176,16 @@ const ModeCard: React.FC<ModeCardProps> = ({
         !locked && (isRTL
           ? 'active:translate-x-[-1px] active:translate-y-[1px]'
           : 'active:translate-x-[1px] active:translate-y-[1px]'),
-        !locked && 'active:shadow-hard-pressed'
+        !locked && 'active:shadow-hard-pressed',
+        highlighted && 'ring-4 ring-neo-yellow ring-offset-2 ring-offset-neo-navy'
       )}
       style={{
         // Container-relative padding using cqw - smaller for secondary
         padding: secondary ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)',
         // Hover glow effect via CSS filter (GPU-accelerated) instead of boxShadow
-        filter: isHovered && !locked ? `drop-shadow(0 0 20px ${styles.glowColor})` : undefined,
+        filter: highlighted
+          ? `drop-shadow(0 0 24px ${styles.glowColor})`
+          : isHovered && !locked ? `drop-shadow(0 0 20px ${styles.glowColor})` : undefined,
         ...tiltStyle,
       }}
       {...handlers}
@@ -197,6 +206,36 @@ const ModeCard: React.FC<ModeCardProps> = ({
         >
           {badge}
         </div>
+      )}
+
+      {/* Highlighted badge for first-time players */}
+      {highlighted && highlightLabel && (
+        <motion.div
+          className={cn(
+            'absolute top-2 z-10',
+            isRTL ? 'left-2' : 'right-2'
+          )}
+          animate={{ scale: [1, 1.08, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <span
+            className={cn(
+              'inline-flex items-center gap-1.5',
+              'px-2.5 py-1 sm:px-3 sm:py-1.5',
+              'bg-neo-yellow text-neo-black',
+              'font-black uppercase tracking-wider',
+              'text-[10px] sm:text-xs',
+              'border-2 border-neo-black rounded-neo shadow-hard-sm',
+              isRTL ? '-rotate-3' : 'rotate-3'
+            )}
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-black" />
+            </span>
+            {highlightLabel}
+          </span>
+        </motion.div>
       )}
 
       {/* Header with icon, title, and arrow in one row */}

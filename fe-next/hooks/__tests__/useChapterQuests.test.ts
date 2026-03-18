@@ -1,8 +1,26 @@
 import { renderHook, act } from '@testing-library/react';
 import { useChapterQuests } from '../useChapterQuests';
 
+// Mock ProgressionContext — quest progress now persisted via context
+const mockUpdateChapterQuestProgress = jest.fn();
+const mockProgression: Record<string, unknown> = {
+  chapterQuestProgress: {},
+};
+
+jest.mock('@/contexts/ProgressionContext', () => ({
+  useProgression: () => ({
+    progression: mockProgression,
+    updateChapterQuestProgress: mockUpdateChapterQuestProgress,
+  }),
+}));
+
 describe('useChapterQuests', () => {
-  it('initializes with zero progress', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockProgression.chapterQuestProgress = {};
+  });
+
+  it('initializes with zero progress when no saved data', () => {
     const { result } = renderHook(() => useChapterQuests({ worldId: 1, chapterNumber: 1 }));
     expect(result.current.progress).toHaveLength(3);
     result.current.progress.forEach(p => {
@@ -11,17 +29,56 @@ describe('useChapterQuests', () => {
     });
   });
 
-  it('recordWordsFound increments wordCountChapter quest', () => {
+  it('restores progress from ProgressionContext (persistence)', () => {
+    mockProgression.chapterQuestProgress = { 'w1c1-words': 12 };
     const { result } = renderHook(() => useChapterQuests({ worldId: 1, chapterNumber: 1 }));
-    act(() => { result.current.recordWordsFound(5); });
     const wordQuest = result.current.progress.find(p => p.questId === 'w1c1-words');
-    expect(wordQuest?.current).toBe(5);
+    expect(wordQuest?.current).toBe(12);
+    expect(wordQuest?.isComplete).toBe(false);
   });
 
-  it('marks quest complete when target reached', () => {
+  it('marks quest complete when saved progress meets target', () => {
+    mockProgression.chapterQuestProgress = { 'w1c1-words': 20 };
     const { result } = renderHook(() => useChapterQuests({ worldId: 1, chapterNumber: 1 }));
-    act(() => { result.current.recordWordsFound(20); });
     const wordQuest = result.current.progress.find(p => p.questId === 'w1c1-words');
+    expect(wordQuest?.isComplete).toBe(true);
+  });
+
+  it('recordWordsFound delegates to updateChapterQuestProgress', () => {
+    const { result } = renderHook(() => useChapterQuests({ worldId: 1, chapterNumber: 1 }));
+    act(() => { result.current.recordWordsFound(5); });
+    expect(mockUpdateChapterQuestProgress).toHaveBeenCalledWith(
+      'wordCountChapter',
+      5,
+      ['w1c1-words']
+    );
+  });
+
+  it('recordLongWord delegates to updateChapterQuestProgress', () => {
+    const { result } = renderHook(() => useChapterQuests({ worldId: 1, chapterNumber: 1 }));
+    act(() => { result.current.recordLongWord(); });
+    expect(mockUpdateChapterQuestProgress).toHaveBeenCalledWith(
+      'longWordCount',
+      1,
+      ['w1c1-long']
+    );
+  });
+
+  it('recordLevelPerfect delegates to updateChapterQuestProgress', () => {
+    const { result } = renderHook(() => useChapterQuests({ worldId: 1, chapterNumber: 1 }));
+    act(() => { result.current.recordLevelPerfect(); });
+    expect(mockUpdateChapterQuestProgress).toHaveBeenCalledWith(
+      'perfectLevels',
+      1,
+      ['w1c1-perfect']
+    );
+  });
+
+  it('caps progress at quest target', () => {
+    mockProgression.chapterQuestProgress = { 'w1c1-words': 999 };
+    const { result } = renderHook(() => useChapterQuests({ worldId: 1, chapterNumber: 1 }));
+    const wordQuest = result.current.progress.find(p => p.questId === 'w1c1-words');
+    expect(wordQuest?.current).toBe(20); // target is 20
     expect(wordQuest?.isComplete).toBe(true);
   });
 });

@@ -5,10 +5,8 @@
  */
 
 export interface LootDrop {
-  type: 'gold' | 'xp' | 'runeFragment' | 'loreScroll';
+  type: 'gold' | 'xp' | 'bonusGold';
   amount: number;
-  /** For lore scrolls — which scroll was found */
-  scrollId?: string;
   /** Translation key for display name */
   nameKey: string;
   /** Rarity for visual treatment */
@@ -42,16 +40,17 @@ export function generateLootChest(
   const xp = 25 + stars * 15;
   drops.push({ type: 'xp', amount: xp, nameKey: 'adventure.loot.xp', rarity: 'common' });
 
-  // Rune Fragment (guaranteed on 3-star, 40% on 2-star)
+  // Bonus Gold (guaranteed on 3-star, 40% on 2-star) — scales with world
   if (stars === 3 || (stars === 2 && seededRandom(worldId * 100 + levelNumber) > 0.6)) {
-    drops.push({ type: 'runeFragment', amount: 1, nameKey: 'adventure.loot.runeFragment', rarity: 'rare' });
+    const bonusGold = Math.floor(15 * worldId * goldMultiplier);
+    drops.push({ type: 'bonusGold', amount: bonusGold, nameKey: 'adventure.loot.bonusGold', rarity: 'rare' });
   }
 
-  // Lore Scroll (non-boss levels, stars >= 1)
+  // Extra Bonus Gold (boss levels with 3 stars — boss trophy reward)
   const isBossLevel = levelNumber === 5 || levelNumber === 7;
-  if (!isBossLevel && stars >= 1) {
-    const scrollId = `scroll-w${worldId}-l${levelNumber}`;
-    drops.push({ type: 'loreScroll', amount: 1, scrollId, nameKey: 'adventure.loot.loreScroll', rarity: 'epic' });
+  if (isBossLevel && stars === 3) {
+    const trophyGold = Math.floor(30 * worldId * goldMultiplier);
+    drops.push({ type: 'bonusGold', amount: trophyGold, nameKey: 'adventure.loot.bossTrophy', rarity: 'epic' });
   }
 
   const chestTier = stars === 3 ? 'golden' : stars === 2 ? 'silver' : 'wooden';

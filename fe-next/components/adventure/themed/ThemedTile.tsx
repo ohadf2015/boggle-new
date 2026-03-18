@@ -203,7 +203,7 @@ const TileBadge = memo<TileBadgeProps>(({ text, background, config }) => {
     <span
       className={cn(
         'absolute -top-1 -right-1 z-20',
-        'min-w-[20px] h-[20px]',
+        'min-w-5 h-5',
         'flex items-center justify-center',
         'text-[10px] font-black text-neo-white',
         'rounded-full border-2 border-neo-black/50',

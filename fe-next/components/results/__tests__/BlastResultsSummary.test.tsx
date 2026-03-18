@@ -12,6 +12,23 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const makeMotion = (_target: Record<string, unknown>, prop: string) => {
+    // eslint-disable-next-line react/display-name
+    const Comp = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+      const { initial, animate, exit, variants, whileHover, whileTap, transition, ...rest } = props;
+      return React.createElement(prop, { ...rest, ref });
+    });
+    return Comp;
+  };
+  return {
+    ...jest.requireActual('framer-motion'),
+    useReducedMotion: () => true,
+    motion: new Proxy({}, { get: makeMotion }),
+  };
+});
+
 describe('BlastResultsSummary', () => {
   it('should render moves used', () => {
     render(<BlastResultsSummary movesUsed={15} tilesCleared={8} tileBonus={25} />);
@@ -26,7 +43,10 @@ describe('BlastResultsSummary', () => {
 
   it('should render tile bonus total', () => {
     render(<BlastResultsSummary movesUsed={10} tilesCleared={8} tileBonus={45} />);
-    expect(screen.getByText('+45')).toBeInTheDocument();
+    // '+' prefix and '45' may be in separate elements due to ScoreCountUp animation
+    expect(screen.getByText((_content, element) =>
+      element?.textContent === '+45'
+    )).toBeInTheDocument();
   });
 
   it('should render with zero values', () => {

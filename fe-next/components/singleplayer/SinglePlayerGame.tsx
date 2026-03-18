@@ -3,6 +3,8 @@
 import React, { useMemo, useEffect, useRef } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAchievementQueue } from '@/components/achievements';
+import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
+import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
 import {
   useSinglePlayerCore,
   LandscapeGameLayout,
@@ -35,6 +37,28 @@ function SinglePlayerGame({
     onGameEnd,
     onQuit,
   });
+
+  // First-time player encouragement system
+  const encouragement = useFirstTimeEncouragement();
+  const hasTriggeredStartRef = useRef(false);
+  const prevWordCountRef = useRef(0);
+
+  // Trigger 'game-start' once when grid loads
+  useEffect(() => {
+    if (core.grid && !hasTriggeredStartRef.current) {
+      hasTriggeredStartRef.current = true;
+      encouragement.triggerEncouragement('game-start');
+    }
+  }, [core.grid, encouragement]);
+
+  // Trigger 'first-word' when first word is found
+  useEffect(() => {
+    const wordCount = core.foundWords.length;
+    if (wordCount === 1 && prevWordCountRef.current === 0) {
+      encouragement.triggerEncouragement('first-word');
+    }
+    prevWordCountRef.current = wordCount;
+  }, [core.foundWords.length, encouragement]);
 
   // Show toast notifications for achievements (same as multiplayer)
   const { queueAchievement } = useAchievementQueue();
@@ -161,45 +185,63 @@ function SinglePlayerGame({
     );
   }
 
+  const encouragementBanner = encouragement.currentTrigger ? (
+    <div className="flex justify-center py-1">
+      <FirstTimeEncouragement
+        trigger={encouragement.currentTrigger}
+        onDismiss={encouragement.dismiss}
+      />
+    </div>
+  ) : null;
+
   // Landscape layout
   if (core.isLandscape) {
     return (
-      <LandscapeGameLayout
-        {...commonProps}
-        progressBarExpanded={core.progressBarExpanded}
-        onToggleProgressBar={core.handleToggleProgressBar}
-        showLandscapeTutorial={core.showLandscapeTutorial}
-        onDismissLandscapeTutorial={core.dismissLandscapeTutorial}
-      />
+      <>
+        {encouragementBanner}
+        <LandscapeGameLayout
+          {...commonProps}
+          progressBarExpanded={core.progressBarExpanded}
+          onToggleProgressBar={core.handleToggleProgressBar}
+          showLandscapeTutorial={core.showLandscapeTutorial}
+          onDismissLandscapeTutorial={core.dismissLandscapeTutorial}
+        />
+      </>
     );
   }
 
   // Desktop/TV layout
   if (core.isDesktop || core.isTv) {
     return (
-      <DesktopGameLayout
-        {...commonProps}
-        targetHighScore={core.targetHighScore}
-        totalBoardWords={core.totalBoardWords}
-        progressBarExpanded={core.progressBarExpanded}
-        onToggleProgressBar={core.handleToggleProgressBar}
-        isTv={core.isTv}
-      />
+      <>
+        {encouragementBanner}
+        <DesktopGameLayout
+          {...commonProps}
+          targetHighScore={core.targetHighScore}
+          totalBoardWords={core.totalBoardWords}
+          progressBarExpanded={core.progressBarExpanded}
+          onToggleProgressBar={core.handleToggleProgressBar}
+          isTv={core.isTv}
+        />
+      </>
     );
   }
 
   // Portrait layout (default)
   return (
-    <PortraitGameLayout
-      {...commonProps}
-      targetHighScore={core.targetHighScore}
-      totalBoardWords={core.totalBoardWords}
-      progressBarExpanded={core.progressBarExpanded}
-      onToggleProgressBar={core.handleToggleProgressBar}
-      showCompletionPopup={core.showCompletionPopup}
-      setShowCompletionPopup={core.setShowCompletionPopup}
-      gameStatsRef={core.gameStatsRef}
-    />
+    <>
+      {encouragementBanner}
+      <PortraitGameLayout
+        {...commonProps}
+        targetHighScore={core.targetHighScore}
+        totalBoardWords={core.totalBoardWords}
+        progressBarExpanded={core.progressBarExpanded}
+        onToggleProgressBar={core.handleToggleProgressBar}
+        showCompletionPopup={core.showCompletionPopup}
+        setShowCompletionPopup={core.setShowCompletionPopup}
+        gameStatsRef={core.gameStatsRef}
+      />
+    </>
   );
 }
 

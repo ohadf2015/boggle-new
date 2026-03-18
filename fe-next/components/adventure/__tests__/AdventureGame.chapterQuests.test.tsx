@@ -41,4 +41,28 @@ describe('AdventureGame — useChapterQuests wiring', () => {
   it('calls recordBossDefeatedNoHint after boss defeat without hints', () => {
     expect(sourceFile).toMatch(/recordBossDefeatedNoHint/);
   });
+
+  it('calls recordStreakMaster when combo count increases', () => {
+    expect(sourceFile).toMatch(/chapterQuests\.recordStreakMaster/);
+  });
+
+  it('calls recordFlashChallengeMaster when flash challenge completes', () => {
+    expect(sourceFile).toMatch(/chapterQuests\.recordFlashChallengeMaster/);
+  });
+
+  it('calls recordWorldMechanicUse when boss grid effect triggers', () => {
+    expect(sourceFile).toMatch(/chapterQuests\.recordWorldMechanicUse/);
+  });
+
+  it('calls recordScoreChallenge with final score on level complete', () => {
+    expect(sourceFile).toMatch(/chapterQuests\.recordScoreChallenge/);
+  });
+
+  it('calls recordBossHighHealth when boss defeated with high HP', () => {
+    expect(sourceFile).toMatch(/chapterQuests\.recordBossHighHealth/);
+  });
+
+  it('calls recordFullComboLevel when full combo achieved', () => {
+    expect(sourceFile).toMatch(/chapterQuests\.recordFullComboLevel/);
+  });
 });

@@ -6,7 +6,6 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import SinglePlayerGame from './SinglePlayerGame';
-import { TutorialProvider, TutorialOverlay } from '@/components/tutorial';
 import SinglePlayerResults from './SinglePlayerResults';
 import PracticeResults from './results/PracticeResults';
 import PreGameTutorial from './PreGameTutorial';
@@ -223,6 +222,8 @@ const SinglePlayerView: React.FC = () => {
 
   // Guard to prevent auto-start from running multiple times
   const hasAutoStartedRef = useRef(false);
+  // Track if this was a first-timer practice game (from tutorial) — next game should be bots
+  const wasFirstTimerPracticeRef = useRef(false);
 
   // Auto-start practice mode when coming from onboarding (autoStart=practice)
   // Note: 'phase' intentionally NOT in deps - this effect should only run once on mount
@@ -448,10 +449,32 @@ const SinglePlayerView: React.FC = () => {
     // game loops because the useEffects would re-trigger with the existing URL params.
   }, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode]);
 
-  const handlePlayAgain = () => {
+  const handlePlayAgain = useCallback(() => {
+    // After first-timer practice, transition to bot game instead of going back
+    if (wasFirstTimerPracticeRef.current) {
+      wasFirstTimerPracticeRef.current = false;
+      const botsPreset = getDefaultPreset('solo-bots');
+      if (botsPreset) {
+        unlockAudio();
+        const bots = generateBotsForPreset(botsPreset.settings.bots, botsPreset.settings.botDifficulty);
+        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
+        setGameState({
+          mode: 'solo-bots',
+          difficulty: botsPreset.settings.difficulty,
+          timerSeconds: botsPreset.settings.timerSeconds,
+          bots,
+          language: (uiLanguage as Language) || 'en',
+          grid: null,
+          minWordLength,
+        });
+        setResultsData(null);
+        setPhase('playing');
+        return;
+      }
+    }
     // Navigate back to landing page
     router.push(`/${uiLanguage}/`);
-  };
+  }, [uiLanguage, router, unlockAudio]);
 
   // Quick rematch - immediately start a new game with same settings
   const handleQuickRematch = useCallback(() => {
@@ -464,11 +487,26 @@ const SinglePlayerView: React.FC = () => {
     setPhase('playing');
   }, [unlockAudio]);
 
-  // Handle pre-game tutorial completion
+  // Handle pre-game tutorial completion — start in practice mode for first-timers
   const handleTutorialComplete = useCallback(() => {
     markGuidanceShown('firstPlayTutorialCompleted');
+    wasFirstTimerPracticeRef.current = true;
+    const practicePreset = getDefaultPreset('practice');
+    if (practicePreset) {
+      const minWordLength = getMinWordLength(uiLanguage, practicePreset.settings.difficulty);
+      setGameState(prev => ({
+        ...prev,
+        mode: 'practice',
+        difficulty: practicePreset.settings.difficulty,
+        timerSeconds: practicePreset.settings.timerSeconds,
+        bots: [],
+        language: (uiLanguage as Language) || 'en',
+        grid: null,
+        minWordLength,
+      }));
+    }
     setPhase('playing');
-  }, []);
+  }, [uiLanguage]);
 
   const handleBackToLobby = () => {
     // Navigate back to landing page
@@ -497,15 +535,12 @@ const SinglePlayerView: React.FC = () => {
 
       <div className={`w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden ${phase === 'playing' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>
         {phase === 'playing' && (
-          <TutorialProvider autoStart>
-            <TutorialOverlay />
             <SinglePlayerGame
               settings={gameState}
               targetHighScore={currentHighScore?.score || null}
               onGameEnd={handleGameEnd}
               onQuit={handleBackToLobby}
             />
-          </TutorialProvider>
         )}
 
         {phase === 'results' && resultsData && resultsData.playerWordData && (

@@ -138,7 +138,7 @@ export const GameSidebar = memo(function GameSidebar({
         {/* Star projection chip */}
         <div className={cn(
           'flex-shrink-0 flex items-center gap-0.5 px-2 py-1',
-          'rounded-neo border-2 min-h-[40px]',
+          'rounded-neo border-2 min-h-10',
           currentStars === 3 ? 'bg-neo-yellow/20 border-neo-yellow' :
           currentStars > 0 ? 'bg-neo-yellow/10 border-neo-yellow/40' :
           'bg-neo-black/40 border-neo-white/10'
@@ -158,7 +158,7 @@ export const GameSidebar = memo(function GameSidebar({
               data-testid={`objective-${obj.type}`}
               className={cn(
                 'flex-shrink-0 flex items-center gap-1.5 px-2 py-1',
-                'rounded-neo border-2 min-w-[64px] min-h-[44px]',
+                'rounded-neo border-2 min-w-16 min-h-11',
                 'transition-all duration-300',
                 obj.isComplete
                   ? 'bg-neo-lime/20 border-neo-lime'
@@ -210,7 +210,7 @@ export const GameSidebar = memo(function GameSidebar({
           className={cn(
             'flex-shrink-0 flex items-center gap-1 px-2 py-1',
             'rounded-neo border-2',
-            'min-w-[40px] min-h-[40px]',
+            'min-w-10 min-h-10',
             'transition-all duration-500',
             hasHintsAvailable
               ? showAutoHint
@@ -228,9 +228,10 @@ export const GameSidebar = memo(function GameSidebar({
           <button
             onClick={onFreezeClick}
             disabled={freezeUsed}
+            aria-label={isFrozen ? t('adventure.game.frozen') : t('adventure.game.freezeWithTime', { seconds: freezeSeconds })}
             className={cn(
               'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-              'rounded-neo border-2 min-w-[40px] min-h-[40px]',
+              'rounded-neo border-2 min-w-10 min-h-10',
               !freezeUsed
                 ? isFrozen
                   ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse'
@@ -247,9 +248,10 @@ export const GameSidebar = memo(function GameSidebar({
         {shufflesRemaining > 0 && (
           <button
             onClick={onShuffleClick}
+            aria-label={t('adventure.game.shuffleWithCount', { count: shufflesRemaining })}
             className={cn(
               'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-              'rounded-neo border-2 min-w-[40px] min-h-[40px]',
+              'rounded-neo border-2 min-w-10 min-h-10',
               'bg-neo-orange text-neo-black border-neo-black shadow-hard-sm'
             )}
           >
@@ -262,9 +264,10 @@ export const GameSidebar = memo(function GameSidebar({
         {canDetonate && (
           <button
             onClick={onDetonateToggle}
+            aria-label={t('adventure.game.detonate')}
             className={cn(
               'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-              'rounded-neo border-2 min-w-[40px] min-h-[40px]',
+              'rounded-neo border-2 min-w-10 min-h-10',
               detonateActive
                 ? 'bg-neo-red text-neo-white border-neo-black shadow-hard-sm animate-pulse'
                 : 'bg-neo-red/60 text-neo-black border-neo-black shadow-hard-sm'

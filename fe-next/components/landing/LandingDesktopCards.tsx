@@ -46,27 +46,28 @@ export function LandingDesktopCards({
   return (
     <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
       <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-stretch px-4 lg:px-6">
-        {/* Daily Challenge Banner */}
-        <div className="col-span-1 sm:col-span-2 lg:col-span-3 w-full max-w-4xl mx-auto">
-          <Suspense fallback={
-            <div
-              className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
-              style={{ minHeight: '72px' }}
-            >
-              <div className="flex items-center gap-3 sm:gap-4 animate-pulse">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-neo bg-neo-navy shrink-0" />
-                <div className="flex-1 min-w-0 space-y-2">
-                  <div className="h-6 w-40 bg-neo-black/15 rounded" />
-                  <div className="h-4 w-28 bg-neo-black/10 rounded" />
-                </div>
-              </div>
-            </div>
-          }>
-            <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
-          </Suspense>
-        </div>
+        {/* Single Player (cyan) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.05 }}
+          className="w-full h-full"
+        >
+          <ModeCard
+            title={t('landing.singlePlayer')}
+            description={t('landing.singlePlayerDesc')}
+            href={`/${language}/singleplayer`}
+            icon={<User className="w-6 h-6" />}
+            variant="cyan"
+            className="w-full"
+            personalBest={playerAllTimeBest ? {
+              score: playerAllTimeBest.score,
+              label: t('landing.personalBest'),
+            } : undefined}
+          />
+        </motion.div>
 
-        {/* Primary cards - Multiplayer and Single Player */}
+        {/* Multiplayer (pink) */}
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -92,31 +93,32 @@ export function LandingDesktopCards({
             }}
           />
         </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
-          className="w-full h-full"
-        >
-          <ModeCard
-            title={t('landing.singlePlayer')}
-            description={t('landing.singlePlayerDesc')}
-            href={`/${language}/singleplayer`}
-            icon={<User className="w-6 h-6" />}
-            variant="cyan"
-            className="w-full"
-            personalBest={playerAllTimeBest ? {
-              score: playerAllTimeBest.score,
-              label: t('landing.personalBest'),
-            } : undefined}
-          />
-        </motion.div>
+
+        {/* Daily Challenge Banner */}
+        <div className="col-span-1 sm:col-span-2 lg:col-span-1 w-full">
+          <Suspense fallback={
+            <div
+              className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
+              style={{ minHeight: '72px' }}
+            >
+              <div className="flex items-center gap-3 sm:gap-4 animate-pulse">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-neo bg-neo-navy shrink-0" />
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="h-6 w-40 bg-neo-black/15 rounded" />
+                  <div className="h-4 w-28 bg-neo-black/10 rounded" />
+                </div>
+              </div>
+            </div>
+          }>
+            <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
+          </Suspense>
+        </div>
 
         {/* Adventure Mode */}
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.25 }}
           className="col-span-1 sm:col-span-2 lg:col-span-1 w-full"
         >
           <ModeCard

@@ -319,8 +319,8 @@ describe('Bomb Tile Tooltip and Badge', () => {
       />
     );
 
-    // THEN - Bomb tile should have aria-label mentioning row clear
-    const bombTile = screen.getByRole('gridcell', { name: /clears row/i });
+    // THEN - Bomb tile should have aria-label with bomb tile type (via t() key)
+    const bombTile = screen.getByRole('gridcell', { name: /adventure\.tiles\.aria\.bomb/i });
     expect(bombTile).toBeInTheDocument();
   });
 });

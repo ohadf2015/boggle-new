@@ -36,7 +36,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
         className={cn(
           'tile-gold-badge',
           'absolute -top-1.5 -right-1.5 z-20',
-          'min-w-[24px] h-[24px]',
+          'min-w-6 h-6',
           'flex items-center justify-center',
           'bg-neo-black text-neo-yellow',
           'text-[11px] font-black',
@@ -55,7 +55,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
       <span
         className={cn(
           'absolute -top-1.5 -right-1.5 z-20',
-          'min-w-[24px] h-[24px]',
+          'min-w-6 h-6',
           'flex items-center justify-center',
           'bg-neo-black text-neo-white',
           'text-[15px] font-black',

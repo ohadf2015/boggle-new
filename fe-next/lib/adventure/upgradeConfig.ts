@@ -61,7 +61,7 @@ export const UPGRADES: UpgradeDefinition[] = [
       { level: 2, cost: 120, effectKey: 'adventure.upgrades.wordRadar.t2', value: 0.5 },
       { level: 3, cost: 200, effectKey: 'adventure.upgrades.wordRadar.t3', value: 2 },
       { level: 4, cost: 350, effectKey: 'adventure.upgrades.wordRadar.t4', value: 3 },
-      { level: 5, cost: 500, effectKey: 'adventure.upgrades.wordRadar.t5', value: 1 },
+      { level: 5, cost: 500, effectKey: 'adventure.upgrades.wordRadar.t5', value: 5 },
     ],
   },
   {
@@ -105,7 +105,7 @@ export const UPGRADES: UpgradeDefinition[] = [
       { level: 1, cost: 50, effectKey: 'adventure.upgrades.fuelTank.t1', value: 10 },
       { level: 2, cost: 100, effectKey: 'adventure.upgrades.fuelTank.t2', value: 20 },
       { level: 3, cost: 200, effectKey: 'adventure.upgrades.fuelTank.t3', value: 30 },
-      { level: 4, cost: 400, effectKey: 'adventure.upgrades.fuelTank.t4', value: 5 },
+      { level: 4, cost: 400, effectKey: 'adventure.upgrades.fuelTank.t4', value: 40 },
     ],
   },
   {

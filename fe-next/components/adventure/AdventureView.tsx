@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star, Sparkles, Map, Zap, Loader2, Coins, Hammer, X } from 'lucide-react';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
@@ -12,6 +12,9 @@ import { useMusic } from '@/contexts/MusicContext';
 import { UpgradeShop } from './meta/UpgradeShop';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
+import { useDailyQuests } from '@/hooks/useDailyQuests';
+import { getStreakMultiplier } from '@/lib/adventure/adventureStreak';
+import { getWeeklyChallengeConfig, getCurrentWeekId } from '@/lib/adventure/weeklyChallenge';
 import {
   getWorldConfig,
   getLevelConfig,
@@ -24,13 +27,16 @@ import dynamic from 'next/dynamic';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import MusicControls from '@/components/MusicControls';
 
+import AdventureHub from './AdventureHub';
+import WordAlbumPanel from './WordAlbumPanel';
+import WeeklyChallengePanel from './WeeklyChallengePanel';
 import WorldMap from './WorldMap';
 import LevelGrid from './LevelGrid';
 // AdventureGame loads on demand (contains heavy cinematic/Remotion imports)
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 
-// View state type for navigation
-type ViewState = 'worldMap' | 'levelGrid' | 'playing';
+// View state type for navigation — hub is the initial entry point
+type ViewState = 'hub' | 'worldMap' | 'levelGrid' | 'playing' | 'weeklyChallenge';
 
 // History state interface for browser back button support
 interface AdventureHistoryState {
@@ -64,12 +70,17 @@ function AdventureView(): React.JSX.Element {
 
   // Shop modal state
   const [showShop, setShowShop] = useState(false);
+  const [showWordAlbum, setShowWordAlbum] = useState(false);
+  const [showWeeklyChallenge, setShowWeeklyChallenge] = useState(false);
 
   // Global music context - stop main game music when adventure starts
   const { stopMusic: stopGlobalMusic } = useMusic();
 
-  // View navigation state
-  const [viewState, setViewState] = useState<ViewState>('worldMap');
+  // View navigation state — returning players (with completions) see hub first
+  const hasCompletions = (progression?.completions?.length ?? 0) > 0;
+  const [viewState, setViewState] = useState<ViewState>(() =>
+    hasCompletions ? 'hub' : 'worldMap'
+  );
   const [selectedWorld, setSelectedWorld] = useState<number | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
 
@@ -108,6 +119,17 @@ function AdventureView(): React.JSX.Element {
   const totalStars = progression?.totalStars ?? 0;
   const playerLevel = progression?.playerLevel ?? 1;
   const completions = progression?.completions ?? [];
+
+  // Streak data from progression
+  const streakDays = progression?.streak?.currentStreak ?? 0;
+  const bestStreak = progression?.streak?.bestStreak ?? 0;
+  const streakMultiplier = getStreakMultiplier(streakDays);
+
+  // Daily quests — seeded by date, progress from progression context
+  const { quests: dailyQuests } = useDailyQuests({
+    initialProgress: progression?.dailyQuestProgress,
+    lastQuestDate: progression?.dailyQuestDate,
+  });
 
   // Get selected world config
   const selectedWorldConfig = selectedWorld ? getWorldConfig(selectedWorld) : null;
@@ -209,6 +231,66 @@ function AdventureView(): React.JSX.Element {
     updateCurrency(upgradeId, newGold, newState);
   }, [updateCurrency]);
 
+  // Weekly challenge config (memoized — same grid all week)
+  const weeklyConfig = useMemo(() => getWeeklyChallengeConfig(), []);
+  const weeklyLevelConfig = useMemo(() => ({
+    world: 0, // Special "world 0" for weekly challenge
+    level: 1,
+    gridSize: weeklyConfig.gridSize as 4 | 5 | 6 | 7,
+    timerSeconds: weeklyConfig.timerSeconds,
+    minWordLength: 3 as const,
+    objectives: [{ type: 'scoreTarget' as const, target: 500, isPrimary: true }],
+    specialTiles: [],
+    difficulty: 'MEDIUM' as const,
+    chapterNumber: 1 as const,
+    levelInChapter: 1 as const,
+    isBossLevel: false,
+  }), [weeklyConfig]);
+
+  // Handle weekly challenge play
+  const handlePlayWeeklyChallenge = useCallback(() => {
+    setShowWeeklyChallenge(false);
+    setViewState('weeklyChallenge');
+  }, []);
+
+  // Handle weekly challenge completion — submit score to leaderboard
+  const handleWeeklyChallengeComplete = useCallback(async (
+    _stars: number, score: number, wordsFound: number, _goldEarned: number
+  ) => {
+    // Find longest word from game state (not available here, use empty)
+    try {
+      await fetch('/api/adventure/weekly-challenge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          score,
+          wordsFound,
+          longestWord: '',
+          playerName: progression?.userId ? 'Player' : 'Guest',
+        }),
+      });
+    } catch {
+      // Fire and forget
+    }
+    setViewState('hub');
+    setShowWeeklyChallenge(true); // Show leaderboard after playing
+  }, [progression?.userId]);
+
+  // Handle hub → world map navigation
+  const handleOpenWorldMap = useCallback(() => {
+    setViewState('worldMap');
+    pushHistoryState('worldMap', null, null);
+  }, [pushHistoryState]);
+
+  // Handle hub → direct play navigation
+  const handleHubPlayLevel = useCallback((worldId: number, levelId: number) => {
+    setSelectedWorld(worldId);
+    setSelectedLevel(levelId);
+    setViewState('playing');
+    pushHistoryState('playing', worldId, levelId);
+  }, [pushHistoryState]);
+
   // Handle world selection from WorldMap
   const handleWorldSelect = useCallback((worldId: number) => {
     setSelectedWorld(worldId);
@@ -285,6 +367,8 @@ function AdventureView(): React.JSX.Element {
       } else if (viewState === 'levelGrid') {
         setViewState('worldMap');
         setSelectedWorld(null);
+      } else if (viewState === 'worldMap') {
+        setViewState('hub');
       }
     }
   }, [viewState]);
@@ -335,10 +419,10 @@ function AdventureView(): React.JSX.Element {
       initialLevel={selectedLevel || 1}
     >
     <div className="min-h-screen bg-neo-navy relative flex flex-col overflow-x-hidden">
-      {/* Header - Fixed at top, hidden during gameplay (game has its own GameHeader) */}
-      {viewState !== 'playing' && <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
+      {/* Header - Fixed at top, hidden on hub (has own stats) and during gameplay */}
+      {(viewState === 'worldMap' || viewState === 'levelGrid') && <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Back / World Map button */}
+          {/* Back button */}
           {viewState !== 'worldMap' ? (
             <button
               onClick={handleBack}
@@ -435,7 +519,7 @@ function AdventureView(): React.JSX.Element {
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className={cn(
-                'relative w-full max-w-lg lg:max-w-2xl max-h-[80vh] lg:max-h-[85vh] overflow-y-auto',
+                'relative w-full max-w-lg lg:max-w-2xl max-h-[min(80dvh,600px)] lg:max-h-[min(85dvh,800px)] overflow-y-auto',
                 'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4 lg:p-6'
               )}
               onClick={(e) => e.stopPropagation()}
@@ -460,14 +544,56 @@ function AdventureView(): React.JSX.Element {
             </motion.div>
           </motion.div>
         )}
+
+        {/* Word Album Panel */}
+        <WordAlbumPanel
+          isOpen={showWordAlbum}
+          onClose={() => setShowWordAlbum(false)}
+          words={progression?.wordAlbum ?? []}
+          claimedMilestones={progression?.wordAlbumClaimedMilestones ?? []}
+        />
+
+        {/* Weekly Challenge Panel */}
+        <WeeklyChallengePanel
+          isOpen={showWeeklyChallenge}
+          onClose={() => setShowWeeklyChallenge(false)}
+          onPlay={handlePlayWeeklyChallenge}
+        />
       </AnimatePresence>
 
-      {/* Spacer for fixed header (approx 56px height), hidden during gameplay */}
-      {viewState !== 'playing' && <div className="h-14 flex-shrink-0" />}
+      {/* Spacer for fixed header, only when header is visible */}
+      {(viewState === 'worldMap' || viewState === 'levelGrid') && <div className="h-14 flex-shrink-0" />}
 
       {/* Main Content - Takes remaining height, children handle their own scroll */}
       <div className="relative z-10 flex-1 min-h-0">
         <AnimatePresence mode="wait">
+          {viewState === 'hub' && (
+            <motion.div
+              key="hub"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="h-full"
+            >
+              <AdventureHub
+                streakDays={streakDays}
+                bestStreak={bestStreak}
+                dailyQuests={dailyQuests}
+                totalStars={totalStars}
+                playerLevel={playerLevel}
+                gold={gold}
+                completions={completions}
+                currentWorld={progression?.currentWorld ?? 1}
+                onOpenWorldMap={handleOpenWorldMap}
+                onPlayLevel={handleHubPlayLevel}
+                onOpenShop={() => setShowShop(true)}
+                wordAlbumCount={progression?.wordAlbum?.length ?? 0}
+                onWeeklyChallenge={() => setShowWeeklyChallenge(true)}
+              />
+            </motion.div>
+          )}
+
           {viewState === 'worldMap' && (
             // World Map View
             <motion.div
@@ -526,11 +652,32 @@ function AdventureView(): React.JSX.Element {
               />
             </motion.div>
           )}
+
+          {viewState === 'weeklyChallenge' && (
+            // Weekly Challenge — same grid for all players
+            <motion.div
+              key="weekly"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="h-full"
+            >
+              <AdventureGame
+                levelConfig={weeklyLevelConfig}
+                initialGrid={weeklyConfig.grid}
+                onLevelComplete={handleWeeklyChallengeComplete}
+                onExit={() => setViewState('hub')}
+                onTimerStateChange={handleTimerStateChange}
+                totalStars={totalStars}
+              />
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
-      {/* Floating Word Forge FAB — visible on worldMap and levelGrid, hidden on desktop (header has shop button) */}
-      {viewState !== 'playing' && (
+      {/* Floating Word Forge FAB — visible on worldMap and levelGrid only */}
+      {(viewState === 'worldMap' || viewState === 'levelGrid') && (
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

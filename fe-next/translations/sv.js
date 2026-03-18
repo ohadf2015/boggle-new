@@ -142,6 +142,10 @@ const sv = {
     "shareViaWhatsApp": "Dela via WhatsApp",
     "shareViaTelegram": "Dela via Telegram",
     "close": "Stäng",
+    "showAll": "Visa alla",
+    "claim": "Hämta",
+    "looksGood": "Ser bra ut",
+    "verified": "Verifierad",
     "home": "Hem",
     "playAgain": "Spela igen",
     "exit": "Avsluta",
@@ -1363,6 +1367,7 @@ const sv = {
       "subtitle": "Några tips innan vi börjar"
     },
     "letsPlay": "Nu kör vi!",
+    "buildAvatar": "Skapa din avatar först?",
     "skip": "Hoppa över guide",
     "next": "Nästa",
     "step": "Steg {current} av {total}"
@@ -1539,6 +1544,9 @@ const sv = {
     "readyForNextRound": "Redo för nästa runda?",
     "hostStartDescription": "Starta ett nytt spel när alla är redo!",
     "readyExplanation": "Tryck för att visa att du vill köra igen",
+    "defendTitle": "Försvara din titel!",
+    "surviveLongerThan": "Överlev längre än @{player}!",
+    "waitingForPlayers": "Väntar på att spelare ska bli redo...",
     "waitingForHost": "Väntar på att värden startar nästa runda...",
     "scoringTip": "Poängtips",
     "scoringTipText": "Hitta ord snabbt i rad för kombobonus (⚡). Längre ord ger mycket mer poäng!",
@@ -5375,6 +5383,51 @@ const sv = {
     "nextWorld": "Nästa värld",
     "retryLevel": "Försök igen",
     "freeRetry": "Gratis omstart",
+    "nextUp": "Nästa",
+    "streakBadge": "{{days}} dagars svit ({{multiplier}}x bonus)",
+    "hub": {
+      "days": "dagar",
+      "streakActive": "Fortsätt så!",
+      "playToStart": "Spela en nivå för att starta din svit",
+      "bestStreak": "Bästa",
+      "dailyQuests": "Dagliga uppdrag",
+      "continue": "Fortsätt",
+      "worldMap": "Världskarta",
+      "wordAlbum": "Ordalbum"
+    },
+    "album": {
+      "title": "Ordalbum",
+      "uniqueWords": "Unika ord",
+      "milestones": {
+        "novice": "Ordnybörjare",
+        "explorer": "Ordutforskare",
+        "collector": "Ordsamlare",
+        "scholar": "Ordlärd",
+        "master": "Ordmästare",
+        "lexicon": "Lexikonlegend"
+      },
+      "newWordsFound": "{{count}} nya ord tillagda!"
+    },
+    "endlessMode": {
+      "teaser": "Oändligt läge",
+      "comingSoon": "Slutför värld 10 för att låsa upp"
+    },
+    "share": {
+      "bossDefeated": "Jag besegrade {{boss}} i {{world}}!",
+      "shareCard": "Dela seger"
+    },
+    "weeklyChallenge": {
+      "title": "Veckoutmaning",
+      "description": "Samma rutnät för alla — tävla om högsta poäng!",
+      "play": "Spela utmaning",
+      "leaderboard": "Topplista",
+      "yourBest": "Ditt bästa",
+      "resetsIn": "Återställs om",
+      "rank": "Rang",
+      "noScoresYet": "Inga poäng denna vecka ännu",
+      "scoreSubmitted": "Poäng skickad!",
+      "newHighScore": "Nytt personligt rekord!"
+    },
     "quest": {
       "title": "Kapiteluppdrag",
       "wordCount": "Hitta ord",
@@ -5550,7 +5603,20 @@ const sv = {
       "bomb": "Bomb (rensar rad)",
       "rainbow": "Regnbåge (joker)",
       "chain": "Kedja (länkbonus)",
-      "time": "Tid (+5 sekunder)"
+      "time": "Tid (+5 sekunder)",
+      "locked": "Låst",
+      "multiplier": "Multiplikator (2x poäng)",
+      "letter": "Bokstav",
+      "aria": {
+        "gold": "guldbricka, 3x multiplikator",
+        "ice": "isbricka, hinder",
+        "bomb": "bombbricka, rensar rad",
+        "rainbow": "regnbågsbricka, joker",
+        "chain": "kedjebricka, länkbonus",
+        "time": "tidsbricka, plus 5 sekunder",
+        "locked": "låst bricka, lås upp med matchande bokstav",
+        "multiplier": "multiplikatorbricka, 2x poäng"
+      }
     },
     "errors": {
       "tooShort": "Ordet är för kort",
@@ -5632,7 +5698,8 @@ const sv = {
       "bomb": "Bomb (rensar rad)",
       "rainbow": "Regnbåge (joker)",
       "chain": "Kedja (kombo)",
-      "time": "Tid (+5 sek)"
+      "time": "Tid (+5 sek)",
+      "letter": "Bokstav"
     },
     "cutscene": {
       "skip": "Hoppa över"
@@ -6301,6 +6368,30 @@ const sv = {
         "perfectLevels": {
           "title": "Perfektionist",
           "desc": "Slutför {target} nivåer med 3 stjärnor"
+        },
+        "fullCombo": {
+          "title": "Kombomästare",
+          "desc": "Slutför {target} nivåer utan att bryta kombon"
+        },
+        "worldMechanic": {
+          "title": "Världsexpert",
+          "desc": "Aktivera världsmekaniken {target} gånger"
+        },
+        "flashChallenge": {
+          "title": "Snabbtänkare",
+          "desc": "Slutför {target} blixtutmaningar"
+        },
+        "bossHighHealth": {
+          "title": "Orörd",
+          "desc": "Besegra bossen med över 75% hälsa"
+        },
+        "streak": {
+          "title": "Seriemästare",
+          "desc": "Nå en {target}-ordssvit"
+        },
+        "scoreChallenge": {
+          "title": "Topppoäng",
+          "desc": "Samla {target} poäng i ett kapitel"
         }
       }
     },
@@ -6310,7 +6401,9 @@ const sv = {
       "loreScroll": "Berättelserulle",
       "runeFragment": "Runfragment",
       "tapToOpen": "Tryck för att öppna",
-      "xp": "Erfarenhet"
+      "xp": "Erfarenhet",
+      "bonusGold": "Bonusguld",
+      "bossTrophy": "Bosstrofé"
     },
     "later": "Senare",
     "nextLevel": "Nästa: Nivå",

@@ -15,8 +15,6 @@ import { cn } from '@/lib/utils';
 import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
-import { LandscapeTutorialOverlay } from './LandscapeTutorialOverlay';
-import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
@@ -115,7 +113,7 @@ export function LandscapeGameLayout({
   currentFeedback,
   keyboardInput,
   tutorialPath,
-  tutorialWord,
+  tutorialWord: _tutorialWord,
   highlightedPath,
   lastWordFoundTimeRef,
   fireRoundActive,
@@ -139,8 +137,8 @@ export function LandscapeGameLayout({
   onConfirmQuit,
   showQuitConfirm,
   setShowQuitConfirm,
-  showLandscapeTutorial,
-  onDismissLandscapeTutorial,
+  showLandscapeTutorial: _showLandscapeTutorial,
+  onDismissLandscapeTutorial: _onDismissLandscapeTutorial,
   t,
 }: LandscapeGameLayoutProps): React.ReactElement {
   const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
@@ -257,13 +255,6 @@ export function LandscapeGameLayout({
               compact
             />
           </div>
-          {/* Tutorial Callout - Shows above grid for new players */}
-          <TutorialCallout
-            isVisible={!!tutorialPath && !isPaused && !isGameOver}
-            tutorialWord={tutorialWord}
-            position="above-grid"
-            compact
-          />
           <div className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0" style={{ aspectRatio: '1/1' }}>
             <GridComponent
               grid={grid}
@@ -410,13 +401,6 @@ export function LandscapeGameLayout({
         cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
         variant="danger"
-      />
-
-      {/* First-time Landscape Tutorial Overlay */}
-      <LandscapeTutorialOverlay
-        isVisible={showLandscapeTutorial}
-        onDismiss={onDismissLandscapeTutorial}
-        t={t}
       />
 
       {/* Screen reader status announcements */}

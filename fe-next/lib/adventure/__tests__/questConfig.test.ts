@@ -28,11 +28,14 @@ describe('questConfig', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('World 1 chapter 1 quests are unchanged', () => {
+  it('World 1 chapter 1 quests have no boss quests (boss is in chapter 3)', () => {
     const w1c1 = getQuestsForChapter(1, 1);
     expect(w1c1[0]).toMatchObject({ id: 'w1c1-words', type: 'wordCountChapter', target: 20, reward: { coins: 100, xp: 50 } });
-    expect(w1c1[1]).toMatchObject({ id: 'w1c1-boss', type: 'defeatBossNoHint', target: 1, reward: { coins: 150, xp: 75, badge: 'badge-boss-slayer' } });
-    expect(w1c1[2]).toMatchObject({ id: 'w1c1-long', type: 'longWordCount', target: 5, reward: { coins: 80, xp: 40 } });
+    expect(w1c1[1]).toMatchObject({ id: 'w1c1-long', type: 'longWordCount', target: 5, reward: { coins: 80, xp: 40 } });
+    expect(w1c1[2]).toMatchObject({ id: 'w1c1-perfect', type: 'perfectLevels', target: 1, reward: { coins: 120, xp: 60 } });
+    // defeatBossNoHint moved to chapter 3 where the boss actually is
+    const w1c1Types = w1c1.map(q => q.type);
+    expect(w1c1Types).not.toContain('defeatBossNoHint');
   });
 
   it('World 1 chapter 2 quests are unchanged', () => {

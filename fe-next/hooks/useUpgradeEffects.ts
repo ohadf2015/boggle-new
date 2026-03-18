@@ -94,7 +94,7 @@ export function computeUpgradeEffects(upgrades: UpgradeState): UpgradeEffects {
 
   // ── Fuel Tank ──
   const fuelTank = getUpgradeTier(upgrades, 'fuelTank');
-  if (fuelTank >= 1) effects.bonusTimeSeconds = [0, 10, 20, 30, 30][fuelTank];
+  if (fuelTank >= 1) effects.bonusTimeSeconds = [0, 10, 20, 30, 40][fuelTank];
 
   // ── Armor Plating ──
   const armor = getUpgradeTier(upgrades, 'armorPlating');

@@ -105,21 +105,33 @@ describe('Adventure Constants', () => {
   });
 
   describe('Timer Durations', () => {
-    it('should decrease timer with higher worlds using gentle curve', () => {
-      // World 1 has longest timer (tutorial)
+    it('should scale timer with grid size (bumps at grid transitions)', () => {
+      // World 1 starts generous for tutorial
       expect(TIMER_DURATIONS[1]).toBe(120);
 
-      // World 10 has shortest timer (but still playable at 75s)
-      // Uses gentle linear curve (-5s per world) to prevent abandonment
-      expect(TIMER_DURATIONS[10]).toBe(75);
+      // Timer bumps UP when grid size increases (worlds 3, 6, 9)
+      // to maintain consistent per-tile search time
+      expect(TIMER_DURATIONS[3]).toBeGreaterThan(TIMER_DURATIONS[2]); // 4x4→5x5
+      expect(TIMER_DURATIONS[6]).toBeGreaterThan(TIMER_DURATIONS[5]); // 5x5→6x6
+      expect(TIMER_DURATIONS[9]).toBeGreaterThan(TIMER_DURATIONS[8]); // 6x6→7x7
 
-      // Timer decreases progressively (5s per world)
-      expect(TIMER_DURATIONS[5]).toBeLessThan(TIMER_DURATIONS[1]);
-      expect(TIMER_DURATIONS[10]).toBeLessThan(TIMER_DURATIONS[5]);
+      // Within same grid size, timer decreases gently
+      expect(TIMER_DURATIONS[2]).toBeLessThan(TIMER_DURATIONS[1]); // both 4x4
+      expect(TIMER_DURATIONS[5]).toBeLessThan(TIMER_DURATIONS[3]); // both 5x5
+      expect(TIMER_DURATIONS[8]).toBeLessThan(TIMER_DURATIONS[6]); // both 6x6
+      expect(TIMER_DURATIONS[10]).toBeLessThan(TIMER_DURATIONS[9]); // both 7x7
+    });
 
-      // Verify linear progression
-      for (let world = 2; world <= 10; world++) {
-        expect(TIMER_DURATIONS[world]).toBe(TIMER_DURATIONS[world - 1] - 5);
+    it('should maintain reasonable per-tile search time across all worlds', () => {
+      const GRID_TILES: Record<number, number> = {
+        1: 16, 2: 16, 3: 25, 4: 25, 5: 25, 6: 36, 7: 36, 8: 36, 9: 49, 10: 49,
+      };
+      for (let world = 1; world <= 10; world++) {
+        const perTile = TIMER_DURATIONS[world] / GRID_TILES[world];
+        // Every world should give at least 3 seconds per tile
+        expect(perTile).toBeGreaterThanOrEqual(3);
+        // And no more than 8 (tutorial generosity)
+        expect(perTile).toBeLessThanOrEqual(8);
       }
     });
   });
@@ -140,15 +152,15 @@ describe('World Unlock Functions', () => {
       expect(getWorldUnlockRequirement(4)).toBe(33);
     });
 
-    it('should require 60 stars for world 10', () => {
-      // Final world has special requirement (encourages replaying)
-      expect(getWorldUnlockRequirement(10)).toBe(60);
+    it('should require 45 stars for world 10', () => {
+      // Final world — lowered from 60 to 45 to reduce late-game churn
+      expect(getWorldUnlockRequirement(10)).toBe(45);
     });
 
     it('should handle invalid world numbers', () => {
       expect(getWorldUnlockRequirement(0)).toBe(0);
       expect(getWorldUnlockRequirement(-1)).toBe(0);
-      expect(getWorldUnlockRequirement(11)).toBe(60);
+      expect(getWorldUnlockRequirement(11)).toBe(45);
     });
   });
 
@@ -163,9 +175,9 @@ describe('World Unlock Functions', () => {
       expect(isWorldUnlocked(2, 21)).toBe(true);
     });
 
-    it('should unlock world 10 with 60+ stars', () => {
-      expect(isWorldUnlocked(10, 59)).toBe(false);
-      expect(isWorldUnlocked(10, 60)).toBe(true);
+    it('should unlock world 10 with 45+ stars', () => {
+      expect(isWorldUnlocked(10, 44)).toBe(false);
+      expect(isWorldUnlocked(10, 45)).toBe(true);
     });
   });
 

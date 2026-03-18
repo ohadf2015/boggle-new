@@ -81,10 +81,11 @@ export const STARS_TO_UNLOCK_NEXT_WORLD = 11;
 
 /**
  * Total stars required to unlock the final world (World 10)
- * Special requirement: needs 60 total stars regardless of distribution
- * (60 = ~32% of total 189 possible stars, encourages replaying)
+ * Special requirement: needs 45 total stars regardless of distribution
+ * (45 = ~48% of 9 worlds × 21 stars = ~24% of total 189, achievable with 2-star average)
+ * Previously 60 which required near-perfect play across all 9 worlds.
  */
-export const TOTAL_STARS_FOR_FINAL_WORLD = 60;
+export const TOTAL_STARS_FOR_FINAL_WORLD = 45;
 
 /**
  * Maximum stars per level
@@ -213,23 +214,29 @@ export function getGridSize(world: number): 4 | 5 | 6 | 7 {
 /**
  * Timer durations per world (in seconds)
  *
- * Uses a gentler linear curve (-5 seconds per world) to prevent
- * frustration-based abandonment in later worlds. Previous aggressive
- * curve (120s → 45s) caused significant player drop-off at World 5+.
+ * Calibrated to maintain consistent per-tile search time across grid sizes.
+ * Target: ~4-5 seconds per tile on average, decreasing gently with world.
  *
- * New curve: 120s → 75s (37.5% reduction vs previous 62.5% reduction)
+ * Formula rationale:
+ *   World 1-2 (4x4=16 tiles): ~7.5s/tile → generous for tutorial
+ *   World 3-5 (5x5=25 tiles): ~5s/tile → fair challenge
+ *   World 6-8 (6x6=36 tiles): ~4s/tile → tight but doable with upgrades
+ *   World 9-10 (7x7=49 tiles): ~3.5s/tile → expert, requires Fuel Tank upgrade
+ *
+ * Previous flat -5s/world curve caused per-tile time to drop from 7.5s→1.6s.
+ * New curve accounts for grid area growth at Worlds 3, 6, and 9.
  */
 export const TIMER_DURATIONS: Record<number, number> = {
-  1: 120, // 2 minutes - generous for tutorial
-  2: 115, // Gentle introduction to time pressure
-  3: 110, // 5x5 grid introduction
-  4: 105,
-  5: 100, // Mid-game milestone
-  6: 95,
-  7: 90,  // 6x6 grid starts - still comfortable
-  8: 85,
-  9: 80,  // 7x7 grid - challenging but fair
-  10: 75, // Final world - 75s gives time to strategize
+  1: 120, // 4x4 (16 tiles) — 7.5s/tile — generous tutorial
+  2: 115, // 4x4 (16 tiles) — 7.2s/tile
+  3: 130, // 5x5 (25 tiles) — 5.2s/tile — grid grows, timer bumps up
+  4: 125, // 5x5 (25 tiles) — 5.0s/tile
+  5: 120, // 5x5 (25 tiles) — 4.8s/tile
+  6: 150, // 6x6 (36 tiles) — 4.2s/tile — grid grows again, timer bumps
+  7: 140, // 6x6 (36 tiles) — 3.9s/tile
+  8: 135, // 6x6 (36 tiles) — 3.8s/tile
+  9: 170, // 7x7 (49 tiles) — 3.5s/tile — grid grows, timer bumps
+  10: 160, // 7x7 (49 tiles) — 3.3s/tile — final world, still challenging
 };
 
 /**

@@ -10,7 +10,8 @@
 import React, { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import type { GridTileState, TileType } from '@/types/adventure';
+import type { GridTileState } from '@/types/adventure';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { WordPathTrail, SelectionSparkle } from '@/components/animations';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useCascadeAnimation } from '@/hooks/useCascadeAnimation';
@@ -77,18 +78,6 @@ interface AdventureGridProps {
 // CONSTANTS
 // ==============================================
 
-const TILE_TYPE_LABELS: Record<TileType, string> = {
-  standard: '',
-  gold: 'gold tile (3x multiplier)',
-  ice: 'ice tile (obstacle)',
-  bomb: 'bomb tile (clears row)',
-  rainbow: 'rainbow tile (wildcard)',
-  chain: 'chain tile (link bonus)',
-  time: 'time tile (+5 seconds)',
-  locked: 'locked tile (unlock with matching letter)',
-  multiplier: 'multiplier tile (2x score)',
-};
-
 
 // ==============================================
 // COMPONENT
@@ -122,6 +111,8 @@ const AdventureGrid = memo(
       },
       ref
     ) => {
+      const { t } = useLanguage();
+
       // Ref to grid container for touch event handling
       const gridRef = useRef<HTMLDivElement>(null);
 
@@ -311,23 +302,45 @@ const AdventureGrid = memo(
     // Handle tile click (use hook's version directly)
     const handleTileClick = handleTileClickFromHook;
 
+    // Refs for latest selection — avoids stale closure when RAF batches lag behind touchend
+    const selectedIndicesRef = useRef(selectedIndices);
+    const formedWordRef = useRef(formedWord);
+    useEffect(() => { selectedIndicesRef.current = selectedIndices; }, [selectedIndices]);
+    useEffect(() => { formedWordRef.current = formedWord; }, [formedWord]);
+
+    // Guard against ghost click double-submission (touchend + synthetic mouseup)
+    const lastSubmitTimeRef = useRef(0);
+
     // Handle word submission (on mouse/touch up)
     const handleMouseUp = useCallback(() => {
-      // Call drag end first
       handleMouseUpFromHook();
 
-      if (disabled || selectedIndices.length === 0) return;
-      if (onWordSubmit) {
-        onWordSubmit(formedWord, selectedIndices);
-      }
-    }, [disabled, selectedIndices, formedWord, onWordSubmit, handleMouseUpFromHook]);
+      // Debounce: ignore if another submit happened within 300ms (ghost click prevention)
+      const now = Date.now();
+      if (now - lastSubmitTimeRef.current < 300) return;
 
-    // Get aria-label for tile
+      const indices = selectedIndicesRef.current;
+      const word = formedWordRef.current;
+      if (disabled || indices.length === 0) return;
+      if (onWordSubmit) {
+        lastSubmitTimeRef.current = now;
+        onWordSubmit(word, indices);
+      }
+    }, [disabled, onWordSubmit, handleMouseUpFromHook]);
+
+    // Prevent ghost mouseup from touch events
+    const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+      e.preventDefault(); // Suppress synthetic mouseup
+      handleMouseUp();
+    }, [handleMouseUp]);
+
+    // Get aria-label for tile (translated)
     const getTileAriaLabel = useCallback((tile: GridTileState): string => {
-      const baseLabel = `Letter ${tile.letter}`;
-      const typeLabel = TILE_TYPE_LABELS[tile.type];
+      const baseLabel = `${t('adventure.tiles.letter')} ${tile.letter}`;
+      if (tile.type === 'standard') return baseLabel;
+      const typeLabel = t(`adventure.tiles.aria.${tile.type}`);
       return typeLabel ? `${baseLabel}, ${typeLabel}` : baseLabel;
-    }, []);
+    }, [t]);
 
     return (
       <div className={cn('flex flex-col', showWordPreview && 'gap-2', className)}>
@@ -368,7 +381,7 @@ const AdventureGrid = memo(
           aria-label="Adventure game board"
           onMouseUp={interactive ? handleMouseUp : undefined}
           /* touchmove registered as native non-passive listener in useGridGestures */
-          onTouchEnd={interactive ? handleMouseUp : undefined}
+          onTouchEnd={interactive ? handleTouchEnd : undefined}
           data-boss-effect={bossGridEffect?.name ?? undefined}
           style={{
             padding: GRID_PADDING,

@@ -122,13 +122,22 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
         <motion.div
           key={card.label}
           variants={prefersReduced ? cardReduced : cardVariant}
+          whileHover={prefersReduced ? undefined : { y: -2, scale: 1.03 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className={cn(
-            'rounded-neo border-2 p-3 text-center',
+            'rounded-neo border-2 p-3 text-center cursor-default',
             accentBg[card.accent ?? 'default'],
           )}
         >
           {card.icon && (
-            <div className="text-lg mb-0.5">{card.icon}</div>
+            <motion.div
+              className="text-lg mb-0.5"
+              initial={prefersReduced ? undefined : { scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 12, delay: 0.3 }}
+            >
+              {card.icon}
+            </motion.div>
           )}
           <div className="text-xl font-black text-white tabular-nums">
             {card.value}

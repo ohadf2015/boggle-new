@@ -1,6 +1,6 @@
 /**
  * Test: Daily Challenge Banner container positioning on mobile view
- * Bug: Banner should be inside the main container on mobile for proper layout
+ * Updated: Banner is now inside the 2-col grid as col-span-2, not a separate element above it
  */
 
 import { render } from '@testing-library/react';
@@ -99,11 +99,8 @@ describe('LandingView - Daily Challenge Banner Container', () => {
       TRACKS: { LOBBY: 'lobby' },
     });
 
-    // Simulate mobile landscape dimensions (< 1024px wide)
-    // so isDesktopWidth stays false and the mobile layout renders
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 768 });
 
-    // Mock window.matchMedia for mobile landscape
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
       value: jest.fn().mockImplementation((query) => ({
@@ -126,32 +123,16 @@ describe('LandingView - Daily Challenge Banner Container', () => {
     const mainContainer = container.querySelector('section');
     expect(mainContainer).toBeTruthy();
 
-    // Find the Daily Challenge Banner wrapper (it's inside a div with w-full and mb-X classes)
-    // This wrapper is inside the conditional (isLandscape || isMobilePortrait) block
-    const bannerWrappers = container.querySelectorAll('.w-full');
-    let bannerWrapper: Element | null = null;
+    // Find the 2-col grid
+    const cardsGrid = container.querySelector('.grid.grid-cols-2');
+    expect(cardsGrid).toBeTruthy();
 
-    // Find the wrapper that contains the Suspense boundary for DailyChallengeBanner
-    // It should have w-full class and be before the grid layout
-    bannerWrappers.forEach((el) => {
-      if (el.className.includes('mb-')) {
-        const parent = el.parentElement;
-        // Check if this is the banner wrapper (parent has the grid.grid-cols-2 as sibling)
-        if (parent && parent.querySelector('.grid.grid-cols-2')) {
-          bannerWrapper = el;
-        }
-      }
-    });
-
-    // Verify the banner wrapper exists (which means the conditional rendered correctly)
+    // Daily Challenge Banner is now a col-span-2 item inside the grid
+    const bannerWrapper = cardsGrid?.querySelector('.col-span-2');
     expect(bannerWrapper).toBeTruthy();
 
-    // Verify the banner wrapper is inside main container
-    const isBannerWrapperInsideMain = mainContainer?.contains(bannerWrapper!);
-    expect(isBannerWrapperInsideMain).toBe(true);
+    // Verify it's inside the main container
+    const isBannerInsideMain = mainContainer?.contains(bannerWrapper!);
+    expect(isBannerInsideMain).toBe(true);
   });
-
-  // Note: Mobile portrait test removed because jest.resetModules() mid-test doesn't work
-  // The banner rendering is already tested in the landscape test above
-  // and the component logic is the same for both mobile orientations
 });

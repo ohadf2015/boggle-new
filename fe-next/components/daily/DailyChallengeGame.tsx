@@ -22,21 +22,18 @@ import { useGameTimer } from '@/hooks/useGameTimer';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
-import { useFirstPlayTutorial } from '@/hooks/useFirstPlayTutorial';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
-import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { PANIC_TIMER_THRESHOLD, ONFIRE_COMBO_THRESHOLD } from '@/utils/mascotConfig';
 import { useScorePopup } from './useScorePopup';
-import { useGridWords } from './useGridWords';
 import { buildGameResult, type DailyChallengeGameResult } from './dailyChallengeGameUtils';
 import type { LetterGrid, Language } from '@/types';
 
@@ -71,9 +68,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Game state
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
-
-  // Available words from grid solver (for first-play tutorial)
-  const availableWords = useGridWords(grid, language);
 
   // Word forming state (for external WordFormingArea)
   const [formedWord, setFormedWord] = useState('');
@@ -223,13 +217,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     15 // 15 seconds delay
   );
 
-  // First-play tutorial - shows highlighted word path until player uses combined directions
-  const firstPlayTutorial = useFirstPlayTutorial({
-    grid,
-    availableWords,
-    language,
-    isGameActive,
-  });
 
   // Stop music on unmount
   useEffect(() => {
@@ -313,9 +300,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
     // Track for direction guidance
     directionGuidance.trackWordPath(cells);
-    // Track for first-play tutorial (detect mixed-direction usage)
-    firstPlayTutorial.trackUserPath(cells);
-  }, [directionGuidance, firstPlayTutorial]);
+  }, [directionGuidance]);
 
   // Handle word forming changes from GridComponent
   const handleWordChange = useCallback((word: string, count: number) => {
@@ -465,14 +450,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         />
       </div>
 
-      {/* Tutorial Callout - Shows above grid for new players */}
-      <TutorialCallout
-        isVisible={!!firstPlayTutorial.tutorialPath && !isGameOver}
-        tutorialWord={firstPlayTutorial.tutorialWord}
-        position="above-grid"
-        compact
-      />
-
       {/* Game Grid */}
       <div className={cn(
         "flex-1 flex items-center justify-center",
@@ -489,11 +466,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           animateOnMount={true}
           comboLevel={combo.comboLevel}
           highlightedPath={
-            // Keyboard typing takes priority over tutorial path
             keyboardInput.highlightedCells.length > 0
               ? keyboardInput.highlightedCells
-              : firstPlayTutorial.tutorialPath
-              ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
               : undefined
           }
         />

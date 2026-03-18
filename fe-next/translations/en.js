@@ -147,6 +147,10 @@ const en = {
     "valid": "Valid",
     "invalid": "Invalid",
     "close": "Close",
+    "showAll": "Show All",
+    "claim": "Claim",
+    "looksGood": "Looks Good",
+    "verified": "Verified",
     "home": "Home",
     "playAgain": "Play Again",
     "exit": "Exit",
@@ -1482,6 +1486,7 @@ const en = {
       "subtitle": "A few tips before we start"
     },
     "letsPlay": "Let's Play!",
+    "buildAvatar": "Create your avatar first?",
     "skip": "Skip Tutorial",
     "next": "Next",
     "step": "Step {current} of {total}"
@@ -1658,6 +1663,9 @@ const en = {
     "readyForNextRound": "Ready?",
     "hostStartDescription": "Start anytime!",
     "readyExplanation": "Ready up to show you're in!",
+    "defendTitle": "Defend Your Title!",
+    "surviveLongerThan": "Survive longer than @{player}!",
+    "waitingForPlayers": "Waiting for players to ready up...",
     "waitingForHost": "Waiting for host to start next round...",
     "scoringTip": "Scoring Tip",
     "scoringTipText": "Longer words = bigger points!",
@@ -5610,7 +5618,20 @@ const en = {
       "bomb": "Bomb (clears row)",
       "rainbow": "Rainbow (wildcard)",
       "chain": "Chain (link bonus)",
-      "time": "Time (+5 seconds)"
+      "time": "Time (+5 seconds)",
+      "locked": "Locked",
+      "multiplier": "Multiplier (2x score)",
+      "letter": "Letter",
+      "aria": {
+        "gold": "gold tile, 3x multiplier",
+        "ice": "ice tile, obstacle",
+        "bomb": "bomb tile, clears row",
+        "rainbow": "rainbow tile, wildcard",
+        "chain": "chain tile, link bonus",
+        "time": "time tile, plus 5 seconds",
+        "locked": "locked tile, unlock with matching letter",
+        "multiplier": "multiplier tile, 2x score"
+      }
     },
     "next": "NEXT",
     "exitToMap": "Exit to Map",
@@ -5619,8 +5640,53 @@ const en = {
     "starsEarned": "Stars Earned",
     "continueToNext": "Continue",
     "nextWorld": "Next World",
+    "nextUp": "Next Up",
+    "streakBadge": "{{days}} day streak ({{multiplier}}x bonus)",
+    "hub": {
+      "days": "days",
+      "streakActive": "Keep it going!",
+      "playToStart": "Play a level to start your streak",
+      "bestStreak": "Best",
+      "dailyQuests": "Daily Quests",
+      "continue": "Continue",
+      "worldMap": "World Map",
+      "wordAlbum": "Word Album"
+    },
     "retryLevel": "Retry",
     "freeRetry": "Free Retry",
+    "album": {
+      "title": "Word Album",
+      "uniqueWords": "Unique Words",
+      "milestones": {
+        "novice": "Word Novice",
+        "explorer": "Word Explorer",
+        "collector": "Word Collector",
+        "scholar": "Word Scholar",
+        "master": "Word Master",
+        "lexicon": "Lexicon Legend"
+      },
+      "newWordsFound": "{{count}} new words added!"
+    },
+    "endlessMode": {
+      "teaser": "Endless Mode",
+      "comingSoon": "Complete World 10 to unlock"
+    },
+    "weeklyChallenge": {
+      "title": "Weekly Challenge",
+      "description": "Same grid for everyone — compete for the top score!",
+      "play": "Play Challenge",
+      "leaderboard": "Leaderboard",
+      "yourBest": "Your Best",
+      "resetsIn": "Resets in",
+      "rank": "Rank",
+      "noScoresYet": "No scores yet this week",
+      "scoreSubmitted": "Score submitted!",
+      "newHighScore": "New personal best!"
+    },
+    "share": {
+      "bossDefeated": "I defeated {{boss}} in {{world}}!",
+      "shareCard": "Share Victory"
+    },
     "quest": {
       "title": "Chapter Quests",
       "wordCount": "Find Words",
@@ -5727,7 +5793,8 @@ const en = {
       "bomb": "Bomb (clears row)",
       "rainbow": "Rainbow (wild)",
       "chain": "Chain (combo)",
-      "time": "Time (+5 sec)"
+      "time": "Time (+5 sec)",
+      "letter": "Letter"
     },
     "cutscene": {
       "skip": "Skip"
@@ -6396,12 +6463,38 @@ const en = {
         "perfectLevels": {
           "title": "Perfectionist",
           "desc": "Complete {target} levels with 3 stars"
+        },
+        "fullCombo": {
+          "title": "Combo Master",
+          "desc": "Complete {target} levels without breaking your combo"
+        },
+        "worldMechanic": {
+          "title": "World Expert",
+          "desc": "Trigger the world mechanic {target} times"
+        },
+        "flashChallenge": {
+          "title": "Quick Thinker",
+          "desc": "Complete {target} flash challenges"
+        },
+        "bossHighHealth": {
+          "title": "Untouchable",
+          "desc": "Defeat the boss with over 75% health"
+        },
+        "streak": {
+          "title": "Streak Master",
+          "desc": "Reach a {target}-word streak"
+        },
+        "scoreChallenge": {
+          "title": "High Scorer",
+          "desc": "Score {target} points in a chapter"
         }
       }
     },
     "loot": {
       "continue": "Continue",
       "gold": "Gold",
+      "bonusGold": "Bonus Gold",
+      "bossTrophy": "Boss Trophy",
       "loreScroll": "Lore Scroll",
       "runeFragment": "Rune Fragment",
       "tapToOpen": "Tap to open",
@@ -8192,6 +8285,14 @@ const en = {
     gender: "Body Type",
     male: "Male",
     female: "Female"
+  },
+  "encouragement": {
+    "gameStart": "You got this! Swipe letters to find words",
+    "firstWord": "Nice one! Keep finding words!",
+    "longWord": "Amazing! Long words score big!",
+    "combo": "Combo! You're on fire!",
+    "halfway": "Halfway there, keep going!",
+    "almostDone": "Final stretch! Find more words!"
   }
 };
 

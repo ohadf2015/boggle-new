@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateRoomModal from '../CreateRoomModal';
 import type { Language } from '@/shared/types/game';
@@ -14,14 +14,6 @@ jest.mock('@/components/ui/dialog', () => ({
     open ? <div data-testid="dialog">{children}</div> : null,
   DialogContent: ({ children, className }: { children: React.ReactNode; className?: string; noDescription?: boolean }) =>
     <div className={className} data-testid="dialog-content">{children}</div>,
-  DialogHeader: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <div className={className} data-testid="dialog-header">{children}</div>,
-  DialogTitle: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <h2 className={className} data-testid="dialog-title">{children}</h2>,
-  DialogBody: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <div className={className} data-testid="dialog-body">{children}</div>,
-  DialogFooter: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <div className={className} data-testid="dialog-footer">{children}</div>,
 }));
 
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -35,6 +27,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'multiplayerFlow.createModal.optional': 'optional',
         'multiplayerFlow.createModal.creating': 'Creating...',
         'multiplayerFlow.createModal.createButton': 'Create Room',
+        'joinView.selectLanguage': 'Language',
+        'joinView.english': 'English',
+        'joinView.hebrew': 'Hebrew',
+        'joinView.swedish': 'Swedish',
+        'joinView.japanese': 'Japanese',
+        'joinView.spanish': 'Spanish',
       };
       return translations[key] || key;
     },
@@ -46,7 +44,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 jest.mock('@/utils/profileStorage', () => ({
   getStoredUsername: jest.fn().mockReturnValue('TestUser'),
   getStoredCustomAvatar: jest.fn().mockReturnValue(null),
-  getOrCreateStoredCustomAvatar: jest.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4' }),
+  getOrCreateStoredCustomAvatar: jest.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', eyebrows: 'none', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4', shirtColor: '#4A90D9' }),
   setStoredUsername: jest.fn(),
   setStoredCustomAvatar: jest.fn(),
 }));
@@ -70,6 +68,15 @@ jest.mock('@/utils/consts', () => ({
   PASSWORD_STRENGTH_PATTERN: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
 }));
 
+jest.mock('@/utils/validation', () => ({
+  validateUsername: (username: string) => {
+    if (!username || username.trim().length < 2) {
+      return { isValid: false, error: 'validation.usernameRequired' };
+    }
+    return { isValid: true, error: null };
+  },
+}));
+
 jest.mock('@/lib/utils', () => ({
   cn: (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(' '),
 }));
@@ -79,6 +86,7 @@ jest.mock('@/components/multiplayer/AvatarSelector', () => ({
     selectedAvatar?: CustomAvatarConfig | null;
     onAvatarChange: (config: CustomAvatarConfig) => void;
     compact?: boolean;
+    onBuilderOpenChange?: (open: boolean) => void;
   }) => (
     <div data-testid="avatar-selector">
       <button onClick={() => onAvatarChange({ ...DEFAULT_AVATAR_CONFIG, eyes: 'star' })}>
@@ -88,39 +96,31 @@ jest.mock('@/components/multiplayer/AvatarSelector', () => ({
   ),
 }));
 
-jest.mock('@/components/join/LanguageSelector', () => ({
-  LanguageSelector: ({ selectedLanguage, onLanguageChange }: { selectedLanguage: string; onLanguageChange: (lang: string) => void }) => (
-    <select
-      data-testid="language-selector"
-      value={selectedLanguage}
-      onChange={(e) => onLanguageChange(e.target.value)}
-    >
-      <option value="en">English</option>
-      <option value="he">Hebrew</option>
-    </select>
-  ),
-}));
+jest.mock('@/components/motion/AdaptiveMotion', () => {
+  // Cache components to prevent unmount/remount on re-render
+  const cache: Record<string, React.FC<Record<string, unknown>>> = {};
 
-jest.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, disabled, className }: React.PropsWithChildren<{
-    onClick?: () => void; disabled?: boolean; className?: string; variant?: string; size?: string;
-  }>) => (
-    <button onClick={onClick} disabled={disabled} className={className}>{children}</button>
-  ),
-}));
+  const createMotionComponent = (tag: string) => {
+    if (!cache[tag]) {
+      const Comp = React.forwardRef<HTMLElement, Record<string, unknown>>(
+        (props, ref) => {
+          const { initial, animate, exit, transition, variants, whileHover, whileTap, whileFocus, whileDrag, layout, layoutId, ...htmlProps } = props;
+          return React.createElement(tag, { ...htmlProps, ref });
+        }
+      );
+      Comp.displayName = `Motion.${tag}`;
+      cache[tag] = Comp as unknown as React.FC<Record<string, unknown>>;
+    }
+    return cache[tag];
+  };
 
-jest.mock('@/components/ui/input', () => {
-  const MockInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-    (props, ref) => <input ref={ref} {...props} />
-  );
-  MockInput.displayName = 'MockInput';
-  return { Input: MockInput };
+  return {
+    AdaptiveMotion: new Proxy({}, {
+      get: (_target, prop: string) => createMotionComponent(prop),
+    }),
+    AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode; mode?: string }) => <>{children}</>,
+  };
 });
-
-jest.mock('@/components/ui/label', () => ({
-  Label: ({ children, className }: React.PropsWithChildren<{ className?: string }>) =>
-    <label className={className}>{children}</label>,
-}));
 
 describe('CreateRoomModal', () => {
   const defaultProps = {
@@ -146,19 +146,16 @@ describe('CreateRoomModal', () => {
     render(<CreateRoomModal {...defaultProps} />);
     const nameInput = screen.getByDisplayValue('TestUser');
     expect(nameInput.tagName).toBe('INPUT');
-    expect(nameInput).not.toBeDisabled();
   });
 
-  it('should show disabled input for authenticated users', () => {
+  it('should show authenticated user name as text (not editable input)', () => {
     render(<CreateRoomModal {...defaultProps} isAuthenticated={true} displayName="AuthUser" />);
-    const nameInput = screen.getByDisplayValue('AuthUser');
-    expect(nameInput).toBeDisabled();
+    expect(screen.getByText('AuthUser')).toBeInTheDocument();
   });
 
   it('should show validation error on submit with empty name', async () => {
     const user = userEvent.setup();
     const mockOnCreate = jest.fn();
-    // Override stored username to empty
     const profileStorage = jest.requireMock('@/utils/profileStorage');
     profileStorage.getStoredUsername.mockReturnValueOnce('');
     render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
@@ -172,13 +169,19 @@ describe('CreateRoomModal', () => {
 
   it('should render room name input with optional label', () => {
     render(<CreateRoomModal {...defaultProps} />);
-    expect(screen.getByText('(optional)')).toBeInTheDocument();
+    expect(screen.getByText('optional')).toBeInTheDocument();
   });
 
   it('should call onCreate with correct config', async () => {
     const user = userEvent.setup();
     const mockOnCreate = jest.fn();
+
     render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
+
+    // Wait for useEffect to populate username from storage
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('TestUser')).toBeInTheDocument();
+    });
 
     const createButton = screen.getByRole('button', { name: /create room/i });
     await user.click(createButton);
@@ -196,9 +199,43 @@ describe('CreateRoomModal', () => {
     expect(screen.getByRole('button', { name: /creating/i })).toBeDisabled();
   });
 
-  it('should render language selector with default language', () => {
+  it('should render language flag pills with default selected', () => {
     render(<CreateRoomModal {...defaultProps} defaultLanguage="he" />);
-    const selector = screen.getByTestId('language-selector') as HTMLSelectElement;
-    expect(selector.value).toBe('he');
+    // Hebrew flag pill should exist
+    const hebrewButton = screen.getByText('Hebrew');
+    expect(hebrewButton).toBeInTheDocument();
+    // All 5 language pills should render
+    expect(screen.getByText('English')).toBeInTheDocument();
+    expect(screen.getByText('Swedish')).toBeInTheDocument();
+  });
+
+  it('should switch language when clicking a flag pill', async () => {
+    const user = userEvent.setup();
+    const mockOnCreate = jest.fn();
+    render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
+
+    // Wait for useEffect to populate state
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('TestUser')).toBeInTheDocument();
+    });
+
+    // Click Hebrew language pill
+    await user.click(screen.getByText('Hebrew'));
+
+    // Submit and verify language changed
+    const createButton = screen.getByRole('button', { name: /create room/i });
+    await user.click(createButton);
+
+    await waitFor(() => {
+      expect(mockOnCreate).toHaveBeenCalledWith(
+        expect.objectContaining({ language: 'he' })
+      );
+    });
+  });
+
+  it('should render character counter for name input', () => {
+    render(<CreateRoomModal {...defaultProps} />);
+    // TestUser is 8 chars
+    expect(screen.getByText('8/20')).toBeInTheDocument();
   });
 });

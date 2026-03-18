@@ -258,6 +258,7 @@ export default function WorldMap({
   completions,
   onWorldSelect,
 }: WorldMapProps): React.JSX.Element {
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
@@ -410,6 +411,29 @@ export default function WorldMap({
             </React.Fragment>
           );
         })}
+
+        {/* Endless Mode Tease — visible once player reaches World 5+ */}
+        {furthestUnlockedId >= 5 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className={cn(
+              'mx-auto max-w-[200px] p-4 rounded-neo border-3 border-dashed',
+              'border-neo-purple/40 bg-neo-purple/10',
+              'text-center',
+              furthestUnlockedId >= 5 ? 'opacity-70' : 'opacity-30'
+            )}
+          >
+            <div className="text-2xl mb-1">∞</div>
+            <p className="text-neo-purple font-black text-sm uppercase tracking-wide">
+              {t('adventure.endlessMode.teaser')}
+            </p>
+            <p className="text-neo-white/40 text-xs mt-1">
+              {t('adventure.endlessMode.comingSoon')}
+            </p>
+          </motion.div>
+        )}
 
         <div ref={bottomRef} className="h-24" />
       </div>

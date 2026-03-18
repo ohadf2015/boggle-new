@@ -2,7 +2,8 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pointer, Star, Zap, Play, Mouse } from 'lucide-react';
+import { Pointer, Star, Zap, Play, Mouse, Palette } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { Mascot, MascotWithEntrance } from '@/components/ui/Mascot';
@@ -24,6 +25,7 @@ const TOTAL_STEPS = 3;
 const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
   const { t, language } = useLanguage();
   const isDesktop = useIsDesktop();
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
 
   const demoConfig = useMemo(() => {
@@ -183,6 +185,18 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                   );
                 })}
               </div>
+
+              {/* Avatar prompt — gentle nudge */}
+              <motion.button
+                onClick={() => router.push(`/${language}/avatar`)}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black/30 bg-neo-white/10 hover:bg-neo-purple/20 hover:border-neo-purple/50 transition-all text-neo-black/70 hover:text-neo-black"
+              >
+                <Palette className="w-4 h-4" />
+                <span className="text-xs font-bold">{t('preGameTutorial.buildAvatar')}</span>
+              </motion.button>
 
               {/* Let's Play CTA */}
               <motion.button

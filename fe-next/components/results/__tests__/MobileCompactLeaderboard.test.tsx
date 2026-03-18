@@ -10,6 +10,24 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const makeMotion = (_target: Record<string, unknown>, prop: string) => {
+    // eslint-disable-next-line react/display-name
+    const Comp = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+      const { initial, animate, exit, variants, whileHover, whileTap, transition, ...rest } = props;
+      return React.createElement(prop, { ...rest, ref });
+    });
+    return Comp;
+  };
+  return {
+    ...jest.requireActual('framer-motion'),
+    useReducedMotion: () => true,
+    motion: new Proxy({}, { get: makeMotion }),
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+  };
+});
+
 describe('MobileCompactLeaderboard', () => {
   const mockParticipants = [
     { name: 'Player1', score: 247, isCurrentPlayer: true },
@@ -53,7 +71,7 @@ describe('MobileCompactLeaderboard', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('limits to 3 participants', () => {
+  it('shows all participants (full ranked leaderboard)', () => {
     const manyParticipants = [
       ...mockParticipants,
       { name: 'Bot3', score: 100 },
@@ -61,7 +79,7 @@ describe('MobileCompactLeaderboard', () => {
     ];
     render(<MobileCompactLeaderboard participants={manyParticipants} />);
 
-    expect(screen.queryByText('Bot3')).not.toBeInTheDocument();
-    expect(screen.queryByText('Bot4')).not.toBeInTheDocument();
+    expect(screen.getByText('Bot3')).toBeInTheDocument();
+    expect(screen.getByText('Bot4')).toBeInTheDocument();
   });
 });

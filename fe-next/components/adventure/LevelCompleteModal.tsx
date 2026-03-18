@@ -9,7 +9,7 @@
 
 import { memo, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Check, X, Trophy, RotateCcw, LogOut, Coins, Zap } from 'lucide-react';
+import { Star, Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -66,6 +66,20 @@ interface LevelCompleteModalProps {
   storyBeatText?: string;
   /** Whether the player can retry for free (Salvage Claw upgrade) */
   canRetryFree?: boolean;
+  /** Next level preview info (shown below rewards to create pull) */
+  nextLevelPreview?: {
+    worldName: string;
+    levelNumber: number;
+    mechanic?: string;
+  } | null;
+  /** Boss defeat share data (only present on boss levels with victory) */
+  bossDefeatShare?: {
+    bossId: string;
+    bossName: string;
+    worldName: string;
+    killingWord: string;
+    playerName: string;
+  } | null;
 }
 
 /**
@@ -124,6 +138,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     lootDrops = [],
     storyBeatText,
     canRetryFree = false,
+    nextLevelPreview,
+    bossDefeatShare,
   }) => {
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -360,6 +376,46 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               </motion.div>
             )}
 
+            {/* Boss Defeat Share Button */}
+            {bossDefeatShare && !isFailed && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.85, type: 'spring' }}
+                onClick={() => {
+                  const params = new URLSearchParams({
+                    world: String(worldNumber),
+                    boss: bossDefeatShare.bossId,
+                    word: bossDefeatShare.killingWord,
+                    player: bossDefeatShare.playerName,
+                    stars: String(stars),
+                  });
+                  const shareUrl = `${window.location.origin}/api/og/boss-defeat?${params}`;
+                  const shareText = t('adventure.share.bossDefeated', {
+                    boss: bossDefeatShare.bossName,
+                    world: bossDefeatShare.worldName,
+                  });
+                  if (navigator.share) {
+                    navigator.share({ title: 'LexiClash', text: shareText, url: shareUrl }).catch(() => {});
+                  } else {
+                    navigator.clipboard?.writeText(`${shareText}\n${shareUrl}`).catch(() => {});
+                  }
+                }}
+                className={cn(
+                  'w-full mb-4 py-2.5 px-4',
+                  'flex items-center justify-center gap-2',
+                  'bg-neo-pink/20 text-neo-pink',
+                  'font-bold text-sm',
+                  'border-2 border-neo-pink/40 rounded-neo',
+                  'hover:bg-neo-pink/30',
+                  'transition-all duration-150'
+                )}
+              >
+                <Share2 className="w-4 h-4" />
+                {t('adventure.share.shareCard')}
+              </motion.button>
+            )}
+
             {/* Objectives Summary */}
             <div className="mb-6">
               <p className="text-neo-white/60 text-sm font-bold mb-2">
@@ -461,6 +517,28 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               </motion.div>
             )}
 
+            {/* Next Level Preview — creates pull to continue */}
+            {!isFailed && nextLevelPreview && !isLastLevelOfWorld && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 }}
+                className="mb-4 p-3 rounded-neo bg-neo-cyan/10 border border-neo-cyan/20"
+              >
+                <p className="text-neo-cyan text-xs font-bold uppercase tracking-wide mb-1">
+                  {t('adventure.nextUp')}
+                </p>
+                <p className="text-neo-white text-sm font-bold">
+                  {t('adventure.level')} {nextLevelPreview.levelNumber} — {nextLevelPreview.worldName}
+                </p>
+                {nextLevelPreview.mechanic && (
+                  <p className="text-neo-white/60 text-xs mt-0.5">
+                    {t(nextLevelPreview.mechanic)}
+                  </p>
+                )}
+              </motion.div>
+            )}
+
             {/* Double Coins Rewarded Ad */}
             {stars > 0 && !goldDoubled && (
               <div className="mb-4">
@@ -469,7 +547,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   onReward={() => setGoldDoubled(true)}
                   className="w-full"
                 >
-                  {t('adventure.watchAdDoubleCoins') || 'Watch Ad to Double Coins'}
+                  {t('adventure.watchAdDoubleCoins')}
                 </RewardedAdButton>
               </div>
             )}
@@ -536,7 +614,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   'rounded-neo transition-all duration-200'
                 )}
               >
-                <LogOut className="w-4 h-4" />
+                <DoorOpen className="w-4 h-4" />
                 {t('common.exit')}
               </button>
             </div>

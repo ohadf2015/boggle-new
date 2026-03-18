@@ -3,15 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { AnimatePresence, motion } from 'framer-motion';
-import { GraduationCap, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useMobilePortrait } from '@/hooks/useMobilePortrait';
 import { cn } from '@/lib/utils';
-import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
@@ -36,7 +33,6 @@ import { LandingBlogSection } from './LandingBlogSection';
 import { LandingCommunityShowcase } from './LandingCommunityShowcase';
 import { LandingMobileCards } from './LandingMobileCards';
 import Header from '@/components/Header';
-import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
 import { useEvents } from '@/hooks/useEvents';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
@@ -95,8 +91,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   });
 
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
-  const [showTutorialCallout, setShowTutorialCallout] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
@@ -111,26 +105,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     }
   }, [language, router]);
 
-  // Check if user is first-time visitor
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const isFirstTime = !isAuthenticated && !hasCompletedOnboarding();
-    setIsFirstTimeUser(isFirstTime);
-    setShowTutorialCallout(isFirstTime);
-  }, [isAuthenticated]);
-
   const handlePlayClick = () => {
     unlockAudio();
     router.push(`/${language}/multiplayer?autoCreate=true`);
-  };
-
-  const handleOpenTutorial = () => {
-    setShowOnboarding(true);
-    setShowTutorialCallout(false);
-    if (isFirstTimeUser) {
-      markOnboardingSkipped();
-      setIsFirstTimeUser(false);
-    }
   };
 
   const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
@@ -276,74 +253,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
       )}
 
       <LandingSEOSection />
-
-      {/* Tutorial FAB with Callout — hidden when avatar builder is open */}
-      {!isAvatarBuilderOpen && <div className={cn(
-        "fixed bottom-20 right-[max(env(safe-area-inset-right,0px),1rem)] z-[55] sm:bottom-24 sm:right-6 lg:right-8",
-        "flex flex-col items-end gap-2",
-        "rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8 rtl:items-start"
-      )}>
-        <AnimatePresence>
-          {showTutorialCallout && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 5, scale: 0.95 }}
-              transition={SPRING_PRESETS.gentle}
-              className="relative"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.02, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2",
-                  "bg-gradient-to-r from-neo-pink to-neo-purple",
-                  "border-2 border-neo-black rounded-neo shadow-hard",
-                  "cursor-pointer"
-                )}
-                onClick={handleOpenTutorial}
-                role="status"
-                aria-live="polite"
-              >
-                <Sparkles className="w-4 h-4 text-neo-lime animate-pulse" />
-                <span className="text-sm font-bold text-white whitespace-nowrap">
-                  {t('tutorialPrompt.title')}
-                </span>
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, 3, 0] }}
-                transition={{ duration: 0.8, repeat: Infinity }}
-                className="absolute -bottom-2 right-4 rtl:right-auto rtl:left-4"
-              >
-                <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neo-black" />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <motion.button
-          onClick={handleOpenTutorial}
-          className={cn(
-            "flex items-center justify-center gap-2",
-            "min-w-[48px] min-h-[48px]",
-            "px-4 py-3",
-            "bg-neo-purple text-neo-white",
-            "font-bold text-sm",
-            "border-3 border-neo-black",
-            "rounded-neo shadow-hard-lg",
-            "hover:shadow-hard-xl active:shadow-hard",
-            "transition-shadow duration-150",
-            "animate-fade-in-up",
-            isFirstTimeUser && "animate-pulse-subtle"
-          )}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          aria-label={t('landing.tutorial')}
-        >
-          <GraduationCap className="w-5 h-5" />
-          <span className="text-xs sm:text-sm">{t('landing.tutorial')}</span>
-        </motion.button>
-      </div>}
     </div>
   );
 };

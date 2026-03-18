@@ -14,6 +14,8 @@ interface AvatarSelectorProps {
   className?: string;
   /** Compact mode: circular avatar only, no wide button. Used inline with name input. */
   compact?: boolean;
+  /** Notify parent when the avatar builder modal opens/closes (useful for nested modal scenarios). */
+  onBuilderOpenChange?: (isOpen: boolean) => void;
 }
 
 export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
@@ -21,9 +23,15 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
   onAvatarChange,
   className,
   compact,
+  onBuilderOpenChange,
 }) => {
   const { t } = useLanguage();
-  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+  const [isBuilderOpen, _setIsBuilderOpen] = useState(false);
+
+  const setIsBuilderOpen = useCallback((open: boolean) => {
+    _setIsBuilderOpen(open);
+    onBuilderOpenChange?.(open);
+  }, [onBuilderOpenChange]);
 
   const currentConfig = selectedAvatar ?? getRandomAvatarConfig();
 

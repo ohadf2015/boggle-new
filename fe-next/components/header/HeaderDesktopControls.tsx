@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import Link from 'next/link';
-import { BookOpen, Gift, Newspaper, Users } from 'lucide-react';
+import { Gift, Users } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
@@ -100,42 +100,6 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
                 title={t('ugc.nav.community')}
             >
                 <Users size={18} />
-            </Link>
-
-            <Link
-                href={`/${language}/blog`}
-                className={cn(
-                    "flex items-center justify-center",
-                    "w-10 h-10",
-                    "bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white",
-                    "border-3 border-neo-black dark:border-slate-500",
-                    "rounded-neo shadow-hard-sm",
-                    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-orange/30",
-                    "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                    "transition-all duration-100"
-                )}
-                aria-label={t('footer.blog')}
-                title={t('footer.blog')}
-            >
-                <Newspaper size={18} />
-            </Link>
-
-            <Link
-                href={`/${language}/guides`}
-                className={cn(
-                    "flex items-center justify-center",
-                    "w-10 h-10",
-                    "bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white",
-                    "border-3 border-neo-black dark:border-slate-500",
-                    "rounded-neo shadow-hard-sm",
-                    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
-                    "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                    "transition-all duration-100"
-                )}
-                aria-label={t('footer.guides')}
-                title={t('footer.guides')}
-            >
-                <BookOpen size={18} />
             </Link>
 
             <QuickLanguageSwitcher compact />
