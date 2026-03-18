@@ -5833,27 +5833,6 @@ const en = {
         "threeStarsPartial": "Complete main + {{count}} bonus objectives"
       }
     },
-    "tiles": {
-      "gold": "Gold (3x points)",
-      "ice": "Ice (obstacle)",
-      "bomb": "Bomb (clears row)",
-      "rainbow": "Rainbow (wild)",
-      "chain": "Chain (combo)",
-      "time": "Time (+5 sec)",
-      "locked": "Locked",
-      "multiplier": "Multiplier (2x score)",
-      "letter": "Letter",
-      "aria": {
-        "gold": "gold tile, 3x multiplier",
-        "ice": "ice tile, obstacle",
-        "bomb": "bomb tile, clears row",
-        "rainbow": "rainbow tile, wildcard",
-        "chain": "chain tile, link bonus",
-        "time": "time tile, plus 5 seconds",
-        "locked": "locked tile, unlock with matching letter",
-        "multiplier": "multiplier tile, 2x score"
-      }
-    },
     "cutscene": {
       "skip": "Skip"
     },

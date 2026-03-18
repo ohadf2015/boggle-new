@@ -159,7 +159,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       goldEarned?: number
     ) => {
       if (!user?.id) {
-        throw new Error('User not authenticated');
+        // Guest users can't save progress — silently skip
+        return;
       }
 
       try {

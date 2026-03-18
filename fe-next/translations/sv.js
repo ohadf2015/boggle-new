@@ -5738,27 +5738,6 @@ const sv = {
         "threeStarsPartial": "Klara huvudmålet + {{count}} bonusmål"
       }
     },
-    "tiles": {
-      "gold": "Guld (3x poäng)",
-      "ice": "Is (hinder)",
-      "bomb": "Bomb (rensar rad)",
-      "rainbow": "Regnbåge (joker)",
-      "chain": "Kedja (kombo)",
-      "time": "Tid (+5 sek)",
-      "locked": "Låst",
-      "multiplier": "Multiplikator (2x poäng)",
-      "letter": "Bokstav",
-      "aria": {
-        "gold": "guldplatta, 3x multiplikator",
-        "ice": "isplatta, hinder",
-        "bomb": "bombplatta, rensar rad",
-        "rainbow": "regnbågsplatta, joker",
-        "chain": "kedjeplatta, länkbonus",
-        "time": "tidsplatta, plus 5 sekunder",
-        "locked": "låst platta, lås upp med matchande bokstav",
-        "multiplier": "multiplikatorplatta, 2x poäng"
-      }
-    },
     "cutscene": {
       "skip": "Hoppa över"
     },

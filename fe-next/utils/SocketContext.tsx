@@ -235,7 +235,13 @@ export function SocketProvider({ children }: SocketProviderProps) {
     const handleError = (error: unknown) => {
       // Only log non-empty errors to reduce noise
       if (error && typeof error === 'object' && Object.keys(error).length > 0) {
-        logger.error('[SOCKET.IO] Socket error event:', error);
+        const code = (error as Record<string, unknown>).code;
+        const expectedErrors = ['GAME_NOT_FOUND', 'NOT_IN_GAME', 'ROOM_NOT_FOUND'];
+        if (typeof code === 'string' && expectedErrors.includes(code)) {
+          logger.warn('[SOCKET.IO] Expected error:', error);
+        } else {
+          logger.error('[SOCKET.IO] Socket error event:', error);
+        }
       }
     };
 
