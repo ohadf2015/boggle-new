@@ -106,7 +106,7 @@ export function registerRealtimeHandlers(
       if (!inDictionary) {
         socket.emit('duel:word-rejected', {
           word: payload.word,
-          reason: 'Word not in dictionary',
+          reason: 'not_in_dictionary',
         });
         return;
       }
@@ -116,7 +116,7 @@ export function registerRealtimeHandlers(
       if (!onBoard) {
         socket.emit('duel:word-rejected', {
           word: payload.word,
-          reason: 'Word not on board',
+          reason: 'not_on_board',
         });
         return;
       }

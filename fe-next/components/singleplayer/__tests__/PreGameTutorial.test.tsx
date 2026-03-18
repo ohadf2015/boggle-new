@@ -194,19 +194,38 @@ describe('PreGameTutorial', () => {
   });
 
   // GIVEN: User is on step 2 (practice) and hasn't done demo
-  // WHEN: Click "Next" manually
+  // WHEN: Click forward nav arrow manually
   // THEN: Can still advance to step 3
-  it('allows manual "Next" on step 2 even without demo completion', () => {
+  it('allows manual forward navigation on step 2 even without demo completion', () => {
     render(<PreGameTutorial onComplete={mockOnComplete} />);
 
     // Advance to step 2
     fireEvent.click(screen.getByText('preGameTutorial.next'));
 
-    // Should show Next button on step 2
-    const nextButton = screen.getByText('preGameTutorial.next');
-    fireEvent.click(nextButton);
+    // Click the forward nav arrow (bottom navigation)
+    const dots = screen.getAllByTestId(/^progress-dot-/);
+    // Click on dot 2 (step 3) to navigate forward
+    fireEvent.click(dots[2]);
 
     // Should be on step 3
     expect(screen.getByText('preGameTutorial.tips.title')).toBeInTheDocument();
+  });
+
+  // GIVEN: User is on step 2
+  // WHEN: Click back nav arrow
+  // THEN: Returns to step 1
+  it('back navigation returns to previous step', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    // Advance to step 2
+    fireEvent.click(screen.getByText('preGameTutorial.next'));
+    expect(screen.getByTestId('mini-grid')).toBeInTheDocument();
+
+    // Click back via progress dot 0
+    const dots = screen.getAllByTestId(/^progress-dot-/);
+    fireEvent.click(dots[0]);
+
+    // Should be back on step 1
+    expect(screen.getByText('preGameTutorial.welcome.title')).toBeInTheDocument();
   });
 });

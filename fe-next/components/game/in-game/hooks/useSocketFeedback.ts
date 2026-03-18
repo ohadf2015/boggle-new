@@ -67,11 +67,20 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     };
 
     const handleWordRejected = (data: { word: string; reason?: string }): void => {
+      const reasonKeyMap: Record<string, string> = {
+        not_in_dictionary: 'playerView.notInDictionary',
+        not_on_board: 'playerView.wordNotOnBoard',
+        too_short: 'playerView.wordTooShort',
+        duplicate: 'playerView.alreadyFound',
+      };
+      const messageKey = data.reason && reasonKeyMap[data.reason]
+        ? reasonKeyMap[data.reason]
+        : 'playerView.invalidWord';
       setCurrentFeedback({
         id: `rejected-${Date.now()}`,
         type: 'rejected',
         word: data.word,
-        message: data.reason || t('playerView.invalidWord') || 'Invalid word',
+        message: t(messageKey) || 'Invalid word',
         timestamp: Date.now(),
       });
     };

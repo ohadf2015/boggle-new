@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Sparkles, Star } from 'lucide-react';
@@ -98,6 +98,26 @@ export default function LevelGrid({
 
   const worldImage = WORLD_IMAGES[world.id];
 
+  // Auto-scroll to current level on mount
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const currentLevelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = currentLevelRef.current;
+    const container = scrollContainerRef.current;
+    if (!el || !container) return;
+
+    // Small delay to let framer-motion stagger animation start
+    const timer = setTimeout(() => {
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const scrollTop = container.scrollTop + (elRect.top - containerRect.top) - containerRect.height / 3;
+      container.scrollTo({ top: scrollTop, behavior: 'smooth' });
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [world.id]);
+
   // Stable click handler
   const handleLevelClick = useCallback(
     (levelNum: number) => onLevelSelect(world.id, levelNum),
@@ -124,7 +144,7 @@ export default function LevelGrid({
 
   for (const level of levels) {
     gridItems.push(
-      <motion.div key={level.levelNum} variants={cardVariants}>
+      <motion.div key={level.levelNum} variants={cardVariants} ref={level.isCurrent ? currentLevelRef : undefined}>
         <RPGLevelCard
           levelNum={level.levelNum}
           stars={level.stars}
@@ -232,7 +252,7 @@ export default function LevelGrid({
       </div>
 
       {/* Scrollable content layer */}
-      <div className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent z-10">
+      <div ref={scrollContainerRef} className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent z-10">
       <div className="relative pt-6 sm:pt-8 pb-8 px-4 sm:px-6 max-w-3xl mx-auto">
         <LevelGridHeader
           world={world}

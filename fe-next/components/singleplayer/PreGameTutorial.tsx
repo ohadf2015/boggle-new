@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pointer, Star, Zap, Play, Mouse, Palette, ChevronRight } from 'lucide-react';
+import { Pointer, Star, Zap, Play, Mouse, Palette, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { Mascot, MascotWithEntrance } from '@/components/ui/Mascot';
@@ -42,6 +42,13 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
     if (currentStep < TOTAL_STEPS - 1) {
       setDirection(1);
       setCurrentStep(prev => prev + 1);
+    }
+  }, [currentStep]);
+
+  const handleBack = useCallback(() => {
+    if (currentStep > 0) {
+      setDirection(-1);
+      setCurrentStep(prev => prev - 1);
     }
   }, [currentStep]);
 
@@ -125,20 +132,27 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
               className="flex flex-col items-center text-center space-y-4 w-full"
             >
               <motion.div
-                className="flex items-center gap-3"
+                className="flex flex-col items-center gap-2"
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.15, ...SPRING_SOFT }}
               >
-                <Mascot variant="gaming" size="md" />
-                <div className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard-sm text-left">
-                  <p className="font-bold text-sm text-neo-black">
+                <div className="flex items-center gap-3">
+                  <Mascot variant="gaming" size="md" />
+                  <p className="font-bold text-sm text-neo-white/80">
                     {t('preGameTutorial.practice.instruction')}
                   </p>
-                  <p className="text-lg font-black text-neo-black mt-0.5">
-                    {demoConfig.word}
-                  </p>
                 </div>
+                <motion.div
+                  className="bg-neo-yellow border-3 border-neo-black rounded-neo px-6 py-2.5 shadow-hard"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ delay: 0.4, duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <span className="text-2xl sm:text-3xl font-black text-neo-black tracking-widest" dir="ltr">
+                    {demoConfig.word}
+                  </span>
+                </motion.div>
               </motion.div>
 
               <motion.div
@@ -159,11 +173,11 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
               <motion.button
                 onClick={handleNext}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.6 }}
-                transition={{ delay: 1 }}
-                className="text-neo-white/60 hover:text-neo-white text-sm font-bold transition-colors mt-2"
+                animate={{ opacity: 0.7 }}
+                transition={{ delay: 1.5 }}
+                className="text-neo-white/50 hover:text-neo-white text-xs font-bold transition-colors mt-1"
               >
-                {t('preGameTutorial.next')}
+                {t('preGameTutorial.skip')}
               </motion.button>
             </motion.div>
           )}
@@ -268,22 +282,49 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
         </AnimatePresence>
       </div>
 
-      {/* Progress dots with animated fill */}
-      <div className="flex items-center gap-3 mt-6 mb-4">
-        {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-          <motion.div
-            key={i}
-            data-testid={`progress-dot-${i}`}
-            className="border-2 border-neo-black"
-            animate={{
-              width: i === currentStep ? 24 : 10,
-              height: 10,
-              borderRadius: i === currentStep ? 5 : 5,
-              backgroundColor: i <= currentStep ? '#FFE135' : 'rgba(255,255,255,0.15)',
-            }}
-            transition={SPRING_POP}
-          />
-        ))}
+      {/* Navigation bar with back/forward + progress dots */}
+      <div className="flex items-center gap-4 mt-6 mb-4">
+        <motion.button
+          onClick={handleBack}
+          animate={{ opacity: currentStep > 0 ? 1 : 0, scale: currentStep > 0 ? 1 : 0.8 }}
+          disabled={currentStep === 0}
+          className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-white/30 text-neo-white/70 hover:border-neo-white/60 hover:text-neo-white transition-colors disabled:pointer-events-none"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </motion.button>
+
+        <div className="flex items-center gap-3">
+          {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+            <motion.div
+              key={i}
+              data-testid={`progress-dot-${i}`}
+              className="border-2 border-neo-black cursor-pointer"
+              onClick={() => {
+                setDirection(i > currentStep ? 1 : -1);
+                setCurrentStep(i);
+              }}
+              animate={{
+                width: i === currentStep ? 24 : 10,
+                height: 10,
+                borderRadius: 5,
+                backgroundColor: i <= currentStep ? '#FFE135' : 'rgba(255,255,255,0.15)',
+              }}
+              transition={SPRING_POP}
+              whileHover={{ scale: 1.2 }}
+            />
+          ))}
+        </div>
+
+        <motion.button
+          onClick={currentStep < TOTAL_STEPS - 1 ? handleNext : onComplete}
+          className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-white/30 text-neo-white/70 hover:border-neo-white/60 hover:text-neo-white transition-colors"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <ChevronRight className="w-5 h-5" />
+        </motion.button>
       </div>
     </div>
   );

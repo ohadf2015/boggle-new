@@ -9,7 +9,6 @@ import {
   useGridInteraction,
   getPerformanceMode,
   ComboIndicator,
-  ComboExplanationTooltip,
   type SelectedCell,
   type PerformanceMode,
 } from './grid';
@@ -301,8 +300,6 @@ const GridComponent = memo<GridComponentProps>(({
       {!hideComboIndicator && (
         <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
       )}
-
-      <ComboExplanationTooltip comboLevel={comboLevel} />
 
       <motion.div
         className="game-board-frame relative"

@@ -1248,6 +1248,7 @@ const ja = {
     "words": "単語",
     "alreadyFound": "既に発見済み",
     "invalidWord": "無効な単語",
+    "notInDictionary": "辞書にありません",
     "pendingValidation": "チェック待ち",
     "letterWords": "文字の単語",
     "swipeHintWithMin": "スワイプして単語を探そう！（{min}文字以上）",
@@ -5073,7 +5074,9 @@ const ja = {
       "reasons": {
         "not_on_board": "ボード上にない",
         "not_in_dictionary": "辞書にない",
-        "peer_rejected": "プレイヤーに拒否された"
+        "peer_rejected": "プレイヤーに拒否された",
+        "dismissed": "却下済み",
+        "unknown": "不明"
       }
     },
     "live": {
@@ -8249,6 +8252,19 @@ const ja = {
     "combo": "コンボ！絶好調！",
     "halfway": "半分達成、続けて！",
     "almostDone": "ラストスパート！もっと見つけよう！"
+  },
+  "toast": {
+    "rejection": {
+      "notInDictionary": "辞書にありません",
+      "alreadyFound": "既に発見済み",
+      "tooShort": "短すぎます",
+      "invalidPath": "無効なパス",
+      "outsideBoard": "ボードにありません",
+      "notConnected": "文字がつながっていません",
+      "duplicate": "既に送信済み",
+      "timeout": "時間切れ",
+      "unknown": "無効な単語"
+    }
   }
 };
 

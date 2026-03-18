@@ -1265,6 +1265,7 @@ const he = {
     "words": "מילים",
     "alreadyFound": "כבר נמצא",
     "invalidWord": "מילה לא חוקית",
+    "notInDictionary": "לא במילון",
     "pendingValidation": "בבדיקה...",
     "swipeHintWithMin": "החליקו על אותיות למציאת מילים! (מינימום {min} אותיות)",
     "longWordsLabel": "מילים ארוכות",
@@ -4998,7 +4999,9 @@ const he = {
       "reasons": {
         "not_on_board": "לא על הלוח",
         "not_in_dictionary": "לא במילון",
-        "peer_rejected": "נדחה על ידי שחקנים"
+        "peer_rejected": "נדחה על ידי שחקנים",
+        "dismissed": "נדחה",
+        "unknown": "לא ידוע"
       }
     },
     "live": {
@@ -8274,6 +8277,19 @@ const he = {
     "combo": "קומבו! אתם על גל!",
     "halfway": "באמצע הדרך, המשיכו!",
     "almostDone": "הישורת האחרונה! מצאו עוד מילים!"
+  },
+  "toast": {
+    "rejection": {
+      "notInDictionary": "לא במילון",
+      "alreadyFound": "כבר נמצאה",
+      "tooShort": "קצרה מדי",
+      "invalidPath": "מסלול לא תקין",
+      "outsideBoard": "לא על הלוח",
+      "notConnected": "אותיות לא מחוברות",
+      "duplicate": "כבר הוגשה",
+      "timeout": "נגמר הזמן",
+      "unknown": "מילה לא חוקית"
+    }
   }
 };
 

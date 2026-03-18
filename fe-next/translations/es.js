@@ -1396,6 +1396,7 @@ const es = {
     "words": "Palabras",
     "alreadyFound": "Ya encontrada",
     "invalidWord": "Palabra inválida",
+    "notInDictionary": "No está en el diccionario",
     "loadFailed": "No se pudo cargar",
     "pendingValidation": "En verificación",
     "letterWords": "letras palabras",
@@ -5005,7 +5006,9 @@ const es = {
       "reasons": {
         "not_on_board": "No está en el tablero",
         "not_in_dictionary": "No está en el diccionario",
-        "peer_rejected": "Rechazada por jugadores"
+        "peer_rejected": "Rechazada por jugadores",
+        "dismissed": "Descartada",
+        "unknown": "Desconocido"
       }
     },
     "live": {
@@ -8309,6 +8312,19 @@ const es = {
     "combo": "¡Combo! ¡Estás en racha!",
     "halfway": "¡A mitad de camino, sigue así!",
     "almostDone": "¡Recta final! ¡Encuentra más palabras!"
+  },
+  "toast": {
+    "rejection": {
+      "notInDictionary": "No está en el diccionario",
+      "alreadyFound": "Ya encontrada",
+      "tooShort": "Muy corta",
+      "invalidPath": "Ruta inválida",
+      "outsideBoard": "No está en el tablero",
+      "notConnected": "Letras no conectadas",
+      "duplicate": "Ya enviada",
+      "timeout": "Tiempo agotado",
+      "unknown": "Palabra inválida"
+    }
   }
 };
 

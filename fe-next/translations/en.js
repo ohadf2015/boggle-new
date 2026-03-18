@@ -1372,6 +1372,7 @@ const en = {
     "submittingTooFast": "You're submitting words too fast",
     "words": "Words",
     "invalidWord": "Invalid word",
+    "notInDictionary": "Not in dictionary",
     "pendingValidation": "Being checked...",
     "validation": {
       "scanning": "Scanning words...",
@@ -5118,7 +5119,9 @@ const en = {
       "reasons": {
         "not_on_board": "Not on board",
         "not_in_dictionary": "Not in dictionary",
-        "peer_rejected": "Peer rejected"
+        "peer_rejected": "Peer rejected",
+        "dismissed": "Dismissed",
+        "unknown": "Unknown"
       }
     },
     "live": {
@@ -8328,6 +8331,19 @@ const en = {
     "combo": "Combo! You're on fire!",
     "halfway": "Halfway there, keep going!",
     "almostDone": "Final stretch! Find more words!"
+  },
+  "toast": {
+    "rejection": {
+      "notInDictionary": "Not in dictionary",
+      "alreadyFound": "Already found",
+      "tooShort": "Too short",
+      "invalidPath": "Invalid path",
+      "outsideBoard": "Not on board",
+      "notConnected": "Letters not connected",
+      "duplicate": "Already submitted",
+      "timeout": "Time's up",
+      "unknown": "Invalid word"
+    }
   }
 };
 

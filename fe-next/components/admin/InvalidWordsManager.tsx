@@ -43,13 +43,27 @@ interface InvalidWordsManagerProps {
   authToken: string;
 }
 
-const REASON_LABELS: Record<string, string> = {
+const REASON_KEYS: Record<string, string> = {
+  not_on_board: 'admin.invalidWords.reasons.not_on_board',
+  not_in_dictionary: 'admin.invalidWords.reasons.not_in_dictionary',
+  peer_rejected: 'admin.invalidWords.reasons.peer_rejected',
+};
+
+const REASON_FALLBACKS: Record<string, string> = {
   not_on_board: 'Not on board',
   not_in_dictionary: 'Not in dictionary',
   peer_rejected: 'Peer rejected',
 };
 
-const LANGUAGE_LABELS: Record<string, string> = {
+const LANGUAGE_KEYS: Record<string, string> = {
+  en: 'languages.english',
+  he: 'languages.hebrew',
+  sv: 'languages.swedish',
+  ja: 'languages.japanese',
+  es: 'languages.spanish',
+};
+
+const LANGUAGE_FALLBACKS: Record<string, string> = {
   en: 'English',
   he: 'Hebrew',
   sv: 'Swedish',
@@ -265,12 +279,13 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
   };
 
   const getReasonLabel = (reason: string | null) => {
-    if (!reason) return 'Unknown';
+    if (!reason) return t('admin.invalidWords.reasons.unknown') || 'Unknown';
     // Handle dismissed reasons
     if (reason.startsWith('dismissed:')) {
-      return 'Dismissed';
+      return t('admin.invalidWords.reasons.dismissed') || 'Dismissed';
     }
-    return REASON_LABELS[reason] || reason;
+    const key = REASON_KEYS[reason];
+    return key ? (t(key) || REASON_FALLBACKS[reason] || reason) : reason;
   };
 
   const getReasonColor = (reason: string | null) => {
@@ -484,7 +499,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                           <h3 className="text-lg font-bold text-white">{word.word}</h3>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge variant="outline" className="text-xs">
-                              {LANGUAGE_LABELS[word.language] || word.language}
+                              {(LANGUAGE_KEYS[word.language] ? t(LANGUAGE_KEYS[word.language]) : null) || LANGUAGE_FALLBACKS[word.language] || word.language}
                             </Badge>
                             <Badge className={cn("text-xs text-white", getReasonColor(word.reason))}>
                               {getReasonLabel(word.reason)}

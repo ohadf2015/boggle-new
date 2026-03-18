@@ -122,6 +122,11 @@ const mockT = (key: string) => {
     'admin.invalidWords.reasons.not_on_board': 'Not on board',
     'admin.invalidWords.reasons.not_in_dictionary': 'Not in dictionary',
     'admin.invalidWords.reasons.peer_rejected': 'Peer rejected',
+    'languages.english': 'English',
+    'languages.hebrew': 'Hebrew',
+    'languages.swedish': 'Swedish',
+    'languages.japanese': 'Japanese',
+    'languages.spanish': 'Spanish',
   };
   return translations[key] || key;
 };

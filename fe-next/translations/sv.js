@@ -1248,6 +1248,7 @@ const sv = {
     "words": "Ord",
     "alreadyFound": "Redan hittad",
     "invalidWord": "Ogiltigt ord",
+    "notInDictionary": "Inte i ordlistan",
     "pendingValidation": "Kollas...",
     "letterWords": "bokstavsord",
     "swipeHintWithMin": "Svep bokstäver för att hitta ord! (minst {min} bokstäver)",
@@ -4954,7 +4955,9 @@ const sv = {
       "reasons": {
         "not_on_board": "Inte på brädet",
         "not_in_dictionary": "Inte i ordboken",
-        "peer_rejected": "Avvisad av spelare"
+        "peer_rejected": "Avvisad av spelare",
+        "dismissed": "Avvisad",
+        "unknown": "Okänd"
       }
     },
     "live": {
@@ -8269,6 +8272,19 @@ const sv = {
     "combo": "Combo! Du är i elden!",
     "halfway": "Halvvägs, fortsätt!",
     "almostDone": "Slutspurten! Hitta fler ord!"
+  },
+  "toast": {
+    "rejection": {
+      "notInDictionary": "Inte i ordlistan",
+      "alreadyFound": "Redan hittat",
+      "tooShort": "För kort",
+      "invalidPath": "Ogiltig sökväg",
+      "outsideBoard": "Inte på brädet",
+      "notConnected": "Bokstäver inte sammankopplade",
+      "duplicate": "Redan inskickat",
+      "timeout": "Tiden ute",
+      "unknown": "Ogiltigt ord"
+    }
   }
 };
 

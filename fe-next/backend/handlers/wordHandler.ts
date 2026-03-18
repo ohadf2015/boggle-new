@@ -311,7 +311,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         incPerGame(gameCode, 'wordNeedsValidation');
         socket.emit('wordRejected', {
           word: normalizedWord,
-          reason: 'Not in dictionary'
+          reason: 'not_in_dictionary'
         });
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.REJECTED, game);
       }

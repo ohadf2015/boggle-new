@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from
 import { Check, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { type GridPosition, areAdjacent } from './miniGridUtils';
+import { type GridPosition } from './miniGridUtils';
 
 interface MiniGridProps {
   size: 3 | 4;
@@ -50,7 +50,6 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const { t } = useLanguage();
   const [selected, setSelected] = useState<SelectedCell[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [shakeCell, setShakeCell] = useState<string | null>(null);
   const [showStartHint, setShowStartHint] = useState(false);
   const [cellFlash, setCellFlash] = useState<string | null>(null);
   const isDragging = useRef(false);
@@ -94,77 +93,89 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     return () => clearTimeout(timer);
   }, [showHints, autoTrace]);
 
-  // Cleanup success timer
+  // Cleanup timers
   useEffect(() => {
-    return () => { if (successTimer.current) clearTimeout(successTimer.current); };
+    return () => {
+      if (successTimer.current) clearTimeout(successTimer.current);
+      if (autoFillTimer.current) clearTimeout(autoFillTimer.current);
+    };
   }, []);
 
-  // Cell geometry for hit detection
+  // Cell geometry for hit detection — snaps gap touches to nearest cell
   const getCellAt = useCallback((clientX: number, clientY: number): GridPosition | null => {
     const grid = gridRef.current;
     if (!grid) return null;
     const rect = grid.getBoundingClientRect();
     const x = clientX - rect.left;
     const y = clientY - rect.top;
-    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
+    // Allow a small overshoot beyond grid edges for fat-finger tolerance
+    const margin = 12;
+    if (x < -margin || y < -margin || x > rect.width + margin || y > rect.height + margin) return null;
 
     const cols = letters[0]?.length ?? size;
     const rows = letters.length;
-    const gap = 10;
+    const gap = 8;
     const cellW = (rect.width - gap * (cols - 1)) / cols;
     const cellH = (rect.height - gap * (rows - 1)) / rows;
-    const col = Math.floor(x / (cellW + gap));
-    const row = Math.floor(y / (cellH + gap));
+    const strideX = cellW + gap;
+    const strideY = cellH + gap;
+
+    // Clamp to grid bounds, then find nearest cell center
+    const cx = Math.max(0, Math.min(x, rect.width));
+    const cy = Math.max(0, Math.min(y, rect.height));
+    const col = Math.min(cols - 1, Math.max(0, Math.round((cx - cellW / 2) / strideX)));
+    const row = Math.min(rows - 1, Math.max(0, Math.round((cy - cellH / 2) / strideY)));
 
     if (row < 0 || row >= rows || col < 0 || col >= cols) return null;
-    const cellLeft = col * (cellW + gap);
-    const cellTop = row * (cellH + gap);
-    if (x > cellLeft + cellW || y > cellTop + cellH) return null;
     return { row, col };
   }, [letters, size]);
 
-  const trySelect = useCallback((row: number, col: number) => {
-    if (showSuccess || autoTrace) return;
+  // Track last select time to auto-fill remaining cells on sustained drag
+  const lastSelectTime = useRef(0);
+  const autoFillTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const selectNext = useCallback(() => {
     const sel = selectedRef.current;
-
-    // Deselect last if tapping it again
-    const idx = sel.findIndex(c => c.row === row && c.col === col);
-    if (idx !== -1) {
-      if (idx === sel.length - 1) setSelected(sel.slice(0, -1));
-      return;
-    }
-
-    // Must be adjacent to last selected
-    if (sel.length > 0 && !areAdjacent(sel[sel.length - 1], { row, col })) {
-      setShakeCell(`${row}-${col}`);
-      setTimeout(() => setShakeCell(null), 400);
-      if (navigator?.vibrate) navigator.vibrate([20, 15, 20]);
-      return;
-    }
-
-    // Must follow the demo path
     const next = demoPath[sel.length];
-    if (!next || next.row !== row || next.col !== col) {
-      setShakeCell(`${row}-${col}`);
-      setTimeout(() => setShakeCell(null), 400);
-      if (navigator?.vibrate) navigator.vibrate([20, 15, 20]);
-      return;
-    }
+    if (!next || showSuccess) return;
 
     setShowStartHint(false);
-    setCellFlash(`${row}-${col}`);
+    setCellFlash(`${next.row}-${next.col}`);
     setTimeout(() => setCellFlash(null), 300);
-    const newSel = [...sel, { row, col, letter: letters[row][col] }];
+    const newSel = [...sel, { row: next.row, col: next.col, letter: letters[next.row][next.col] }];
     setSelected(newSel);
     if (navigator?.vibrate) navigator.vibrate(12);
 
-    // Check completion
     if (newSel.length === demoPath.length) {
       setShowSuccess(true);
       if (navigator?.vibrate) navigator.vibrate([30, 50, 30, 50, 60]);
       successTimer.current = setTimeout(() => onDemoComplete(), 1200);
     }
-  }, [showSuccess, autoTrace, demoPath, letters, onDemoComplete]);
+  }, [showSuccess, demoPath, letters, onDemoComplete]);
+
+  const trySelect = useCallback((_row: number, _col: number) => {
+    if (showSuccess || autoTrace) return;
+    const sel = selectedRef.current;
+    if (sel.length >= demoPath.length) return;
+
+    // Any touch/drag movement advances to the next cell in the path
+    selectNext();
+    lastSelectTime.current = Date.now();
+
+    // On sustained drag, auto-fill remaining cells with a fast cascade
+    if (autoFillTimer.current) clearTimeout(autoFillTimer.current);
+    if (sel.length + 1 < demoPath.length) {
+      autoFillTimer.current = setTimeout(() => {
+        // If still dragging (no touchEnd yet), cascade remaining cells
+        if (isDragging.current) {
+          const remaining = demoPath.length - selectedRef.current.length;
+          for (let i = 0; i < remaining; i++) {
+            setTimeout(() => selectNext(), i * 120);
+          }
+        }
+      }, 300);
+    }
+  }, [showSuccess, autoTrace, demoPath.length, selectNext]);
 
   // Touch handlers with passive: false for smooth dragging
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -219,8 +230,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const linePath = useMemo(() => {
     if (selected.length < 2) return '';
     // Approximate cell size based on grid max-width
-    const approxGridW = size === 3 ? 260 : 320;
-    const gap = 10;
+    const approxGridW = size === 3 ? 300 : 360;
+    const gap = 8;
     const cols = letters[0]?.length ?? size;
     const cellSize = (approxGridW - gap * (cols - 1)) / cols;
     return selected.map((cell, i) => {
@@ -230,8 +241,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   }, [selected, size, letters]);
 
   const svgSize = useMemo(() => {
-    const approxGridW = size === 3 ? 260 : 320;
-    const gap = 10;
+    const approxGridW = size === 3 ? 300 : 360;
+    const gap = 8;
     const cols = letters[0]?.length ?? size;
     const rows = letters.length;
     const cellSize = (approxGridW - gap * (cols - 1)) / cols;
@@ -248,7 +259,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         <svg
           className="absolute inset-0 pointer-events-none z-10"
           viewBox={`0 0 ${svgSize.width} ${svgSize.height}`}
-          style={{ width: '100%', height: 'auto', maxWidth: size === 3 ? 'min(260px,65vw)' : 'min(320px,75vw)', margin: '0 auto', display: 'block' }}
+          style={{ width: '100%', height: 'auto', maxWidth: size === 3 ? 'min(300px,78vw)' : 'min(360px,85vw)', margin: '0 auto', display: 'block' }}
         >
           <motion.path
             d={linePath}
@@ -272,8 +283,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         className={cn(
           'grid mx-auto w-full relative',
           size === 3
-            ? 'grid-cols-3 max-w-[min(260px,65vw)] gap-[10px]'
-            : 'grid-cols-4 max-w-[min(320px,75vw)] gap-[10px]'
+            ? 'grid-cols-3 max-w-[min(300px,78vw)] gap-[8px]'
+            : 'grid-cols-4 max-w-[min(360px,85vw)] gap-[8px]'
         )}
         style={{ touchAction: 'none', userSelect: 'none' }}
         onTouchStart={handleTouchStart}
@@ -289,7 +300,6 @@ const MiniGrid: React.FC<MiniGridProps> = ({
             const selIdx = selected.findIndex(c => c.row === ri && c.col === ci);
             const isSel = selIdx !== -1;
             const isHint = nextHint?.row === ri && nextHint?.col === ci;
-            const isShaking = shakeCell === cellKey;
             const isFlashing = cellFlash === cellKey;
             const isFirstHint = isHint && showStartHint && selected.length === 0;
 
@@ -298,10 +308,9 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 key={cellKey}
                 className={cn(
                   'relative aspect-square rounded-neo border-3',
-                  'flex items-center justify-center font-black text-2xl sm:text-3xl',
+                  'flex items-center justify-center font-black text-3xl sm:text-4xl',
                   'pointer-events-none cursor-grab active:cursor-grabbing',
                   'transition-colors duration-100',
-                  isShaking && 'border-red-400 bg-red-300/80',
                   isSel
                     ? 'bg-neo-lime border-neo-black text-neo-black'
                     : 'letter-tile-gradient-cream border-neo-black text-neo-black shadow-hard-sm',
@@ -310,10 +319,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 )}
                 layout
                 animate={
-                  isShaking
-                    ? { x: [0, -8, 8, -5, 5, 0], rotate: [0, -2, 2, -1, 0], transition: { duration: 0.35 } }
-                    : isSel
-                    ? { scale: 0.88, y: 2, transition: SPRING_SNAPPY }
+                  isSel
+                    ? { scale: 0.92, y: 1, transition: SPRING_SNAPPY }
                     : isHint && !isSel
                     ? { scale: [1, 1.08, 1], transition: { duration: 0.9, repeat: Infinity, ease: 'easeInOut' } }
                     : { scale: 1, y: 0, transition: SPRING_SOFT }
@@ -393,7 +400,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         transition={{ delay: 0.3, ...SPRING_SOFT }}
         style={{ scale: progressScale }}
       >
-        <div className="inline-flex items-center gap-2 bg-neo-cream/90 backdrop-blur-sm text-neo-black border-3 border-neo-black rounded-neo px-4 py-2.5 shadow-hard relative overflow-hidden">
+        <div className="inline-flex items-center gap-3 bg-neo-cream/90 backdrop-blur-sm text-neo-black border-3 border-neo-black rounded-neo px-5 py-3 shadow-hard relative overflow-hidden">
           {/* Animated progress fill */}
           <motion.div
             className="absolute inset-0 bg-neo-lime/25 origin-left"
@@ -407,7 +414,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
               <motion.span
                 key={i}
                 className={cn(
-                  'relative z-10 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-md font-black text-lg sm:text-xl',
+                  'relative z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-md font-black text-xl sm:text-2xl',
                   filled
                     ? 'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm'
                     : 'bg-neo-black/5 text-neo-black/20 border-2 border-neo-black/15'
