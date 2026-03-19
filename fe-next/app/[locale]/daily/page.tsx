@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
-import { translations } from '@/translations';
+import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
@@ -63,7 +63,9 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
   const { locale } = await params;
   const { share, wh, whSolved, whAttempts, whPuzzle, whName, whEmoji, whStreak, whAvatar } = await searchParams;
   const validLocale = (locale as Locale) || 'en';
-  const seo = translations[validLocale]?.seo?.daily || translations.en.seo.daily;
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const enT = await loadTranslation('en') as Record<string, any>;
+  const seo = t?.seo?.daily || enT.seo.daily;
 
   const localePath = `/${locale}`;
   const baseUrl = 'https://www.lexiclash.live';

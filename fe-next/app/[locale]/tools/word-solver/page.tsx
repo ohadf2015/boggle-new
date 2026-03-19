@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { translations } from '@/translations';
+import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import WordSolverPageClient from './PageClient';
 import { getContent, type Locale } from './content';
 
-type ValidLocale = keyof typeof translations;
+type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
@@ -40,7 +40,9 @@ function getHreflangAlternates(path: string) {
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (locale in translations ? locale : 'en') as ValidLocale;
+  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as ValidLocale;
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const enT = await loadTranslation('en') as Record<string, any>;
   const content = getContent(validLocale);
   const localePath = `/${locale}`;
   const pageUrl = `${BASE_URL}${localePath}/tools/word-solver`;
@@ -82,7 +84,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
 export default async function WordSolverPage({ params }: PageParams) {
   const { locale } = await params;
-  const validLocale = (locale in translations ? locale : 'en') as ValidLocale;
+  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as ValidLocale;
   const content = getContent(validLocale);
   const pageUrl = `${BASE_URL}/${locale}/tools/word-solver`;
 

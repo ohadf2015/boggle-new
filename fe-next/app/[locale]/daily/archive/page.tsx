@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { translations } from '@/translations';
+import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
@@ -37,8 +37,8 @@ function getArchiveDates(): Array<{ date: string; puzzleNumber: number }> {
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
   const validLocale = (locale as Locale) || 'en';
-  const t = (translations[validLocale] || translations.en) as Record<string, any>;
-  const archiveT = t.daily?.archive || {
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const archiveT = t?.daily?.archive || {
     title: 'Daily Challenge Archive',
     description: 'Browse past LexiClash daily challenges. See stats, leaderboards, and results from every puzzle.',
     ogTitle: 'Daily Challenge Archive - LexiClash',
@@ -92,8 +92,8 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 export default async function DailyArchivePage({ params }: PageParams) {
   const { locale } = await params;
   const validLocale = (locale as Locale) || 'en';
-  const t = (translations[validLocale] || translations.en) as Record<string, any>;
-  const archiveT = t.daily?.archive || {
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const archiveT = t?.daily?.archive || {
     title: 'Daily Challenge Archive',
     subtitle: 'Browse past puzzles and see how players performed',
     puzzleLabel: 'Puzzle',

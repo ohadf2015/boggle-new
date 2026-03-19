@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
-import { translations } from '@/translations';
+import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
 
-type Locale = keyof typeof translations;
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {
   params: Promise<{ locale: string; puzzleCode: string }>;
@@ -30,10 +30,12 @@ export const dynamic = 'force-dynamic';
  */
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const supportedLocales = Object.keys(translations);
+  const supportedLocales = ['en', 'he', 'sv', 'ja', 'es'];
   const validLocale = (supportedLocales.includes(locale) ? locale : 'en') as Locale;
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const enT = await loadTranslation('en') as Record<string, any>;
 
-  const customPuzzle = (translations[validLocale] as any).customPuzzle || {};
+  const customPuzzle = (t as any).customPuzzle || {};
   const title = customPuzzle.title || 'Custom Puzzle';
   const description = customPuzzle.description || 'Can you solve this custom word puzzle?';
 

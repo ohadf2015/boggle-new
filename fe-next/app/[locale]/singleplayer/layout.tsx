@@ -1,4 +1,4 @@
-import { translations } from '@/translations';
+import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
@@ -71,8 +71,10 @@ interface LayoutParams {
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
   const { locale } = await params;
   const validLocale = (locale as Locale) || 'en';
-  const seo = translations[validLocale]?.seo?.singleplayer || translations.en.seo.singleplayer;
-  const baseSeo = translations[validLocale]?.seo || translations.en.seo;
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const enT = await loadTranslation('en') as Record<string, any>;
+  const seo = t?.seo?.singleplayer || enT.seo.singleplayer;
+  const baseSeo = t?.seo || enT.seo;
 
   const localePath = `/${locale}`;
   const ogImage = locale === 'he'

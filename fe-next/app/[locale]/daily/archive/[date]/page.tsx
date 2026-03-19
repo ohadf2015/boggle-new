@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { translations } from '@/translations';
+import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 
@@ -68,6 +68,8 @@ const LOCALE_MAP: Record<string, string> = {
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale, date } = await params;
   const validLocale = (locale as Locale) || 'en';
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const enT = await loadTranslation('en') as Record<string, any>;
 
   if (!isValidArchiveDate(date)) {
     return { title: 'Not Found' };
@@ -133,7 +135,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
 export default async function DailyArchiveDatePage({ params }: PageParams) {
   const { locale, date } = await params;
   const validLocale = (locale as Locale) || 'en';
-  const t = translations[validLocale] || translations.en;
+  const t = await loadTranslation(validLocale) as Record<string, any>;
 
   if (!isValidArchiveDate(date)) {
     return (

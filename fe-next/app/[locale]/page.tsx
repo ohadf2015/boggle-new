@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { translations } from '@/translations';
+import { loadTranslation } from '@/translations/loadTranslation';
 import HomePageClient from './PageClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 
@@ -42,9 +42,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HomePage({ params }: PageProps) {
   const { locale } = await params;
-  const t = translations[locale as keyof typeof translations] || translations.en;
-  const seo = t.landing?.seo;
-  const legal = t.legal;
+  const t = await loadTranslation(locale as 'en' | 'he' | 'sv' | 'ja' | 'es') as Record<string, any>;
+  const seo = t?.landing?.seo;
+  const legal = t?.legal;
 
   // Fetch non-realtime landing data server-side to eliminate client waterfall.
   // Errors are swallowed — hooks fall back to client fetches when initialData is absent.
