@@ -6609,6 +6609,7 @@ const he = {
     "stars1": "טוב",
     "stars2": "מעולה",
     "stars3": "מושלם!",
+    "cleared": "נוקה",
     "endGameConfirmTitle": "לסיים משחק?",
     "endGameConfirmMessage": "הניקוד הנוכחי שלך יישמר. בטוח שאתה רוצה לסיים?",
     "gridLabel": "לוח אותיות",

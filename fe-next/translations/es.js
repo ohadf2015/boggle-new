@@ -6678,6 +6678,7 @@ const es = {
     "stars1": "Bien",
     "stars2": "Genial",
     "stars3": "¡Perfecto!",
+    "cleared": "Despejado",
     "endGameConfirmTitle": "¿Terminar juego?",
     "endGameConfirmMessage": "Tu puntuación actual se guardará. ¿Estás seguro de que quieres terminar?",
     "gridLabel": "Cuadrícula de letras",

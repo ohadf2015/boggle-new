@@ -15,9 +15,6 @@ const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), 
 const WordMarqueeTicker = dynamic(() => import('@/components/results/WordMarqueeTicker'), { ssr: false });
 const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
 
-import WordHuntAnnouncementBanner from '@/components/results/WordHuntAnnouncementBanner';
-import CrazyGamesBanner from '@/components/CrazyGamesBanner';
-import { AdPlaceholder } from '@/components/ads';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { NearMiss } from '@/components/results/NearMissCard';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
@@ -111,8 +108,6 @@ export interface ResultsMainContentProps {
   duplicateRuleDisabled: boolean;
   onShowDetails?: () => void;
   t: TFunction;
-  showBanner?: boolean;
-  bannerSize?: '320x50' | '300x250';
   selectedGameMode?: GameModeOption;
   onSelectGameMode?: (mode: GameModeOption) => void;
   seriesStandings?: SeriesStanding[];
@@ -155,8 +150,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   duplicateRuleDisabled,
   winStreakData,
   t,
-  showBanner = true,
-  bannerSize = '320x50',
   selectedGameMode,
   onSelectGameMode,
   seriesStandings,
@@ -319,9 +312,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Word Hunt promo — singleplayer only */}
-      {!gameCode && gameMode !== 'word-hunt' && <WordHuntAnnouncementBanner className="mt-2" />}
-
       {/* Stats + Achievements + Words */}
       {currentPlayerData && (
         <ResultsWordsSection
@@ -352,16 +342,10 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
       {duplicateRuleDisabled && (
         <div className="bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo p-2 text-center">
           <span className="text-xs text-neo-cyan font-bold">
-            👥 {t('results.largeRoomMode')} - {t('results.duplicateRuleDisabled')}
+            {t('results.largeRoomMode')} - {t('results.duplicateRuleDisabled')}
           </span>
         </div>
       )}
-
-      {/* Ad zones */}
-      <div className="flex flex-col items-center gap-2 py-2">
-        <AdPlaceholder zone="post-game" />
-        {showBanner && <CrazyGamesBanner size={bannerSize} />}
-      </div>
     </div>
   );
 };

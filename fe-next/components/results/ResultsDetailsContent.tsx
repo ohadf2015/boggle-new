@@ -22,7 +22,6 @@ const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/Consol
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
-import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 
 // ==============================================
 // TYPES
@@ -89,10 +88,6 @@ export interface ResultsDetailsContentProps {
   t: TFunction;
   /** Whether to hide rank and score in player card (desktop) */
   hideRankAndScore?: boolean;
-  /** Show CrazyGames banner */
-  showBanner?: boolean;
-  /** Banner size for CrazyGames */
-  bannerSize?: '320x50' | '300x250';
   /** Resolved game mode */
   gameMode?: string;
   /** Blast mode results data */
@@ -139,8 +134,6 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
   currentStreakCount,
   t,
   hideRankAndScore = false,
-  showBanner = false,
-  bannerSize = '300x250',
   gameMode,
   blastResults,
   wordHuntResults,
@@ -261,13 +254,6 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
       {/* Room Chat */}
       {gameCode && sortedScores.length > 1 && username && (
         <RoomChat username={username} isHost={isHost} gameCode={gameCode} className="max-h-[350px]" />
-      )}
-
-      {/* CrazyGames Banner Ad */}
-      {showBanner && (
-        <div className="flex justify-center py-2">
-          <CrazyGamesBanner size={bannerSize} />
-        </div>
       )}
 
       {/* Sticky Ready chip — lets multiplayer users mark ready without tab-switching */}

@@ -1,5 +1,5 @@
 /**
- * BlastResults drama tests — score count-up, confetti on 3 stars, retrigger button.
+ * BlastResults drama tests — score count-up, confetti on 3 stars.
  * TDD: written before implementation.
  */
 import React from 'react';
@@ -15,12 +15,35 @@ jest.mock('framer-motion', () => {
   return {
     motion: { div: Div },
     AnimatePresence: ({ children }: any) => children,
+    useMotionValue: (initial: number) => ({
+      get: () => initial,
+      set: () => {},
+      on: () => () => {},
+    }),
+    useTransform: (_mv: any, fn: (v: number) => number) => ({
+      get: () => fn(0),
+      on: (_event: string, cb: (v: number) => void) => { cb(fn(0)); return () => {}; },
+    }),
+    animate: () => ({ stop: () => {} }),
   };
 });
 
 jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (key: string) => key }),
+  useLanguage: () => ({ t: (key: string) => key, dir: 'ltr' }),
 }));
+
+// Mock AdaptiveMotion
+jest.mock('@/components/motion/AdaptiveMotion', () => {
+  const React = require('react');
+  const Div = React.forwardRef(function MockDiv({ children, ...rest }: any, ref: any) {
+    const { initial, animate, exit, transition, whileHover, whileTap, style, ...htmlProps } = rest;
+    return React.createElement('div', { ref, style, ...htmlProps }, children);
+  });
+  return {
+    AdaptiveMotion: { div: Div },
+    AdaptiveAnimatePresence: ({ children }: any) => children,
+  };
+});
 
 // Mock useBlastResultSaver — we don't want fetch calls in unit tests
 jest.mock('../hooks/useBlastResultSaver', () => ({
@@ -38,6 +61,65 @@ const mockConfetti = jest.fn();
 jest.mock('canvas-confetti', () => ({
   __esModule: true,
   default: (...args: any[]) => mockConfetti(...args),
+}));
+
+// Mock useReducedMotion
+jest.mock('@/hooks/useReducedMotion', () => ({
+  __esModule: true,
+  default: () => false,
+}));
+
+// Mock Avatar
+jest.mock('@/components/Avatar', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+// Mock Mascot components
+jest.mock('@/components/ui/Mascot', () => ({
+  MascotWithEntrance: () => null,
+}));
+jest.mock('@/components/ui/CelebrationMascot', () => ({
+  CelebrationMascotWithEntrance: () => null,
+}));
+
+// Mock confettiUtils
+jest.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: jest.fn(),
+  fireConfetti: jest.fn(),
+}));
+
+jest.mock('@/hooks/useAdPlacement', () => ({
+  useAdPlacement: () => ({ showInterstitial: jest.fn() }),
+}));
+
+// Mock UI components
+jest.mock('@/components/ui/button', () => ({
+  Button: ({ children, ...props }: any) => {
+    const React = require('react');
+    return React.createElement('button', props, children);
+  },
+}));
+
+jest.mock('../BlastSkillBreakdown', () => ({
+  BlastSkillBreakdown: () => null,
+}));
+
+jest.mock('@/components/results/ResultsWinnerBanner', () => ({
+  __esModule: true,
+  default: ({ customMessage }: any) => {
+    const React = require('react');
+    return React.createElement('div', { 'data-testid': 'results-winner-banner' }, customMessage);
+  },
+}));
+
+jest.mock('../BlastResultsComponents', () => ({
+  StarRating: ({ stars }: any) => {
+    const React = require('react');
+    return React.createElement('div', { 'data-testid': 'star-rating' }, `${stars} stars`);
+  },
+  StatCard: () => null,
+  WaveBreakdown: () => null,
 }));
 
 import { BlastResults } from '../BlastResults';
@@ -75,31 +157,23 @@ const defaultProps = {
 // Tests
 // ---------------------------------------------------------------------------
 
-describe('BlastResults — confetti retrigger button', () => {
+describe('BlastResults — hero banner', () => {
   beforeEach(() => {
     mockConfetti.mockClear();
   });
 
-  it('shows confetti retrigger button when stars === 3', () => {
+  it('renders ResultsWinnerBanner for 3-star results', () => {
     render(<BlastResults {...defaultProps} results={makeResults({ stars: 3 })} />);
-    expect(screen.getByTestId('confetti-retrigger')).toBeInTheDocument();
+    // Banner fires confetti on click (via ResultsWinnerBanner)
+    expect(screen.getByText('blast.stars3')).toBeInTheDocument();
   });
 
-  it('hides confetti retrigger button when stars === 2', () => {
-    render(<BlastResults {...defaultProps} results={makeResults({ stars: 2, tilesCleared: 20, clearPercentage: 55 })} />);
-    expect(screen.queryByTestId('confetti-retrigger')).not.toBeInTheDocument();
-  });
+  it('renders star rating for all star levels', () => {
+    const { rerender } = render(<BlastResults {...defaultProps} results={makeResults({ stars: 2, tilesCleared: 20, clearPercentage: 55 })} />);
+    expect(screen.getByText('blast.stars2')).toBeInTheDocument();
 
-  it('hides confetti retrigger button when stars === 1', () => {
-    render(<BlastResults {...defaultProps} results={makeResults({ stars: 1, tilesCleared: 10, clearPercentage: 27 })} />);
-    expect(screen.queryByTestId('confetti-retrigger')).not.toBeInTheDocument();
-  });
-
-  it('confetti retrigger button has aria-label for accessibility', () => {
-    render(<BlastResults {...defaultProps} results={makeResults({ stars: 3 })} />);
-    const btn = screen.getByTestId('confetti-retrigger');
-    expect(btn).toHaveAttribute('aria-label');
-    expect(btn.getAttribute('aria-label')).not.toBe('');
+    rerender(<BlastResults {...defaultProps} results={makeResults({ stars: 1, tilesCleared: 10, clearPercentage: 27 })} />);
+    expect(screen.getByText('blast.stars1')).toBeInTheDocument();
   });
 });
 
@@ -113,11 +187,7 @@ describe('BlastResults — score count-up animation', () => {
     jest.useRealTimers();
   });
 
-  it('score starts at 0 on initial render (before animation completes)', () => {
-    // Mock requestAnimationFrame to not fire automatically
-    const originalRAF = global.requestAnimationFrame;
-    global.requestAnimationFrame = jest.fn(); // no-op: never fires tick
-
+  it('renders the score in ResultsWinnerBanner', () => {
     render(
       <BlastResults
         {...defaultProps}
@@ -125,9 +195,7 @@ describe('BlastResults — score count-up animation', () => {
       />
     );
 
-    // The main score display should start at 0 (animation hasn't ticked yet)
-    expect(screen.getByTestId('blast-score-display')).toHaveTextContent('0');
-
-    global.requestAnimationFrame = originalRAF;
+    // Score is now rendered inside ResultsWinnerBanner (mocked)
+    expect(screen.getByTestId('results-winner-banner')).toBeInTheDocument();
   });
 });

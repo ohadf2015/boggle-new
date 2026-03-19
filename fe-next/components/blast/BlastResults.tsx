@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import type { BlastResultsData, BlastDifficulty } from './types';
 import { useBlastResultSaver } from './hooks/useBlastResultSaver';
+import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import { StarRating, StatCard, WaveBreakdown } from './BlastResultsComponents';
 import { BlastSkillBreakdown } from './BlastSkillBreakdown';
 
@@ -73,44 +74,30 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
       ? (t('blast.stars2'))
       : (t('blast.stars1'));
 
-  const handleRetrigger = () => {
-    import('canvas-confetti').then(({ default: confettiFn }) => {
-      confettiFn({ particleCount: 80, spread: 60, origin: { y: 0.5 } });
-    });
-  };
-
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative z-10">
-      {/* Title */}
-      <AdaptiveMotion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-4"
-      >
-        <h1 className="text-3xl sm:text-4xl font-black uppercase text-white mb-1">
-          {t('blast.title')}
-        </h1>
-        <p className="text-lg font-bold text-neo-orange">{starLabel}</p>
-      </AdaptiveMotion.div>
+      {/* Hero Banner */}
+      <div className="w-full max-w-sm lg:max-w-md mb-4">
+        <ResultsWinnerBanner
+          winner={{ username: t('common.you'), score: results.finalScore }}
+          isCurrentUserWinner={results.stars >= 2}
+          variant={results.stars === 3 ? 'ranking' : results.stars === 2 ? 'highScore' : 'completion'}
+          rank={results.stars === 3 ? 1 : results.stars === 2 ? 2 : 3}
+          customMessage={starLabel}
+          customAnnouncement={`${results.clearPercentage}% ${t('blast.cleared')}`}
+          showConfetti={results.stars === 3}
+          compact
+        />
+      </div>
 
-      {/* Star rating + confetti retrigger button */}
+      {/* Star rating */}
       <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
-        className="mb-6 flex items-center gap-3"
+        className="mb-6"
       >
         <StarRating stars={results.stars} />
-        {results.stars === 3 && (
-          <button
-            data-testid="confetti-retrigger"
-            onClick={handleRetrigger}
-            className="text-2xl hover:scale-125 transition-transform duration-150 active:scale-90"
-            aria-label={t('blast.celebrateAgain')}
-          >
-            🎉
-          </button>
-        )}
       </AdaptiveMotion.div>
 
       {/* Desktop: stats + wave breakdown side by side; mobile: stacked */}
@@ -209,7 +196,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
           variant="outline"
           size="lg"
           onClick={onBackToHome}
-          className="w-full min-h-[48px] font-bold uppercase"
+          className="w-full min-h-[48px] font-bold uppercase border-3 border-neo-black shadow-hard-sm bg-neo-navy text-white hover:shadow-hard hover:-translate-y-0.5 transition-all"
         >
           <Home className="me-2 h-5 w-5" />
           {t('common.home')}

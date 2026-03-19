@@ -6635,6 +6635,7 @@ const ja = {
     "stars1": "グッド",
     "stars2": "グレート",
     "stars3": "パーフェクト！",
+    "cleared": "クリア",
     "endGameConfirmTitle": "ゲームを終了しますか？",
     "endGameConfirmMessage": "現在のスコアは保存されます。本当に終了しますか？",
     "gridLabel": "文字グリッド",

@@ -6584,6 +6584,7 @@ const sv = {
     "stars1": "Bra",
     "stars2": "Toppen",
     "stars3": "Perfekt!",
+    "cleared": "Rensat",
     "endGameConfirmTitle": "Avsluta spelet?",
     "endGameConfirmMessage": "Din nuvarande poäng sparas. Är du säker på att du vill avsluta?",
     "gridLabel": "Bokstavsrutnät",

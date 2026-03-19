@@ -415,8 +415,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       <ResultsMainContent
         {...mainContentProps}
         onShowDetails={() => setMobileActiveTab('details')}
-        showBanner={true}
-        bannerSize="320x50"
       />
     </>
   );
@@ -567,7 +565,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <div className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4">
             <ResultsMainContent
               {...mainContentProps}
-              showBanner={false}
             />
           </div>
 
@@ -584,8 +581,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             <ResultsDetailsContent
               {...detailsContentProps}
               hideRankAndScore={true}
-              showBanner={true}
-              bannerSize="300x250"
             />
           </motion.div>
         </div>

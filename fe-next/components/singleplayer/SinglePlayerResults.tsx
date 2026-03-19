@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { TrendingUp, ArrowLeft } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
@@ -13,7 +14,7 @@ import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
-import WordHuntAnnouncementBanner from '@/components/results/WordHuntAnnouncementBanner';
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
@@ -49,9 +50,9 @@ import {
   ChallengeButton,
   MissedWordsSection,
 } from './results';
-import { TrainingAnalysisModal } from '@/components/training';
-import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
+
 import { StatsCardGrid } from '@/components/results/shared';
+import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
@@ -91,7 +92,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const nextStepMode: NextStepMode = mode === 'practice' ? 'practice' : 'solo-bots';
-  const [showTrainingAnalysis, setShowTrainingAnalysis] = useState(false);
 
   const playerAvatar = useMemo(() => {
     if (!profile) return undefined;
@@ -219,7 +219,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" className="mt-auto" />
         </div>
         <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
-        <TrainingAnalysisModal isOpen={showTrainingAnalysis} onClose={() => setShowTrainingAnalysis(false)} returnTo={null} />
       </div>
     );
   }
@@ -235,18 +234,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       gapToWinner={playerRank > 1 ? (allParticipants[0]?.score || 0) - results.playerScore : 0}
     />
   ) : (
-    <div className="text-center py-6 md:py-8 relative">
-      <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_center,var(--neo-lime)_0%,transparent_60%)]" />
-      <p className="text-xs font-black uppercase tracking-widest text-neo-lime mb-2 relative z-10">
-        {bannerConfig.message || t('results.finalScore')}
-      </p>
-      <p className="font-black text-6xl sm:text-7xl md:text-8xl text-white tabular-nums relative z-10" style={{ WebkitTextStroke: '2px rgba(0,0,0,0.3)', textShadow: '4px 4px 0px rgba(0,0,0,0.4), 0 0 30px rgba(191,255,0,0.15)' }}>
-        {displayScore(results.playerScore)}
-      </p>
-      {bannerConfig.announcement && (
-        <p className="text-white/60 text-sm font-bold mt-2 relative z-10">{bannerConfig.announcement}</p>
-      )}
-    </div>
+    <ResultsWinnerBanner
+      winner={{ username: profileDisplayName, score: results.playerScore, avatar: playerAvatar }}
+      isCurrentUserWinner={true}
+      variant="completion"
+      customMessage={bannerConfig.message || t('results.finalScore')}
+      customAnnouncement={bannerConfig.announcement}
+      compact={true}
+    />
   );
 
   const leaderboardBlock = mode === 'solo-bots' && allParticipants.length > 1 ? (
@@ -357,22 +352,20 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               <div className="space-y-4">
                 {statsBlock}
                 <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
-                <div className="flex justify-center"><RewardedAdGoldButton goldAmount={25} /></div>
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
                 {ctaBlock}
               </div>
             </div>
-            <WordHuntAnnouncementBanner className="mt-6" />
             <div className="mt-8">{analysisBlock}</div>
           </>
         ) : (
           <div className="space-y-4">
-            {heroBlock}{leaderboardBlock}{statsBlock}
-            <div className="flex justify-center"><RewardedAdGoldButton goldAmount={25} /></div>
-            {achievementsBlock}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</motion.div>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</motion.div>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{statsBlock}</motion.div>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</motion.div>
             {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
-            <WordHuntAnnouncementBanner className="mt-4" />
             {ctaBlock}{analysisBlock}
           </div>
         )}
@@ -392,7 +385,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           onSkip={() => setShowWordValidation(false)} onTimeout={() => setShowWordValidation(false)} />
       )}
       <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
-      <TrainingAnalysisModal isOpen={showTrainingAnalysis} onClose={() => setShowTrainingAnalysis(false)} returnTo={null} />
     </div>
   );
 };

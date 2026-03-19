@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
@@ -9,11 +9,9 @@ import { SharePanelModal, XTwitterIcon, WhatsAppIcon } from './results/SharePane
 import { ImagePreviewModal } from './results/ImagePreviewModal';
 import { Button } from '@/components/ui/button';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
-import { ResultsHero } from '@/components/results/shared';
+import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
+import { StatsCardGrid } from '@/components/results/shared';
 import { displayScore } from '@/utils/scoreDisplay';
-import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
-import { LANGUAGE_OPTIONS } from './results/constants';
-import type { Language } from '@/types';
 import {
   generateShareableResult,
   type DailyChallengeResult,
@@ -22,8 +20,6 @@ import {
 import DailyLeaderboard from './DailyLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
-import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
-import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import { useDailyResultSubmission } from './results/useDailyResultSubmission';
 import {
   shareImageWithNativeShare,
@@ -43,7 +39,6 @@ interface DailyChallengeResultsProps {
   countdown: string;
   isNewCompletion: boolean;
   onBack: () => void;
-  onGameLanguageChange?: (lang: Language) => void;
   t: (key: string) => string;
 }
 
@@ -59,7 +54,6 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   countdown,
   isNewCompletion,
   onBack,
-  onGameLanguageChange,
   t,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -68,7 +62,6 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [shareImage, setShareImage] = useState<ShareImageResult | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
-  const [showSharePreview, setShowSharePreview] = useState(false);
   const [showWords, setShowWords] = useState(false);
   const { profile, isAuthenticated } = useAuth();
   const { showInterstitial } = useAdPlacement();
@@ -84,15 +77,6 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     setTotalPlayers,
     fireRankConfettiLocal,
   } = useDailyConfetti(isNewCompletion, result.score, streakMilestone);
-
-  // Get languages that haven't been played today
-  const availableLanguages = useMemo(() =>
-    LANGUAGE_OPTIONS.filter(
-      (option) => option.code !== result.language && !hasPlayedToday(option.code as Language)
-    ),
-    [result.language]
-  );
-
 
   // Generate shareable text with translations
   const shareText = generateShareableResult(result, undefined, t);
@@ -224,24 +208,31 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       <div className="text-center space-y-5">
 
         {/* Hero Zone — unified score + stats */}
-        <ResultsHero
-          outcomeLabel={isNewCompletion ? t('daily.completed') : t('daily.alreadyPlayed')}
-          score={displayScore(Math.round(result.score))}
-          subtitle={t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
-          pointsLabel={t('common.points')}
-          variant={isNewCompletion ? 'win' : 'neutral'}
-          badge={streakMilestone && isNewCompletion ? {
-            text: `🔥 ${t('daily.streakDays').replace('{count}', String(streakMilestone))}`,
-            variant: 'milestone',
-          } : undefined}
-          onScoreClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
-          inlineStats
-          stats={[
-            { label: t('common.words'), value: result.wordCount },
-            { label: t('daily.streak'), value: streak?.currentStreak ?? 0, icon: <Flame className="w-4 h-4 text-amber-400" /> },
-            { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
-          ]}
+        <ResultsWinnerBanner
+          winner={{
+            username: isAuthenticated && profile
+              ? profile.display_name || profile.username
+              : t('common.you'),
+            score: Math.round(result.score),
+            avatar: isAuthenticated && profile ? {
+              avatarImage: profile.avatar_image,
+            } : undefined,
+          }}
+          isCurrentUserWinner={isNewCompletion}
+          variant={isNewCompletion ? 'ranking' : 'completion'}
+          rank={currentUserRank ?? 1}
+          totalPlayers={totalPlayers}
+          customMessage={isNewCompletion ? t('daily.completed') : t('daily.alreadyPlayed')}
+          customAnnouncement={t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
+          showConfetti={false}
         />
+
+        {/* Stats row */}
+        <StatsCardGrid cards={[
+          { label: t('common.words'), value: result.wordCount },
+          { label: t('daily.streak'), value: streak?.currentStreak ?? 0, icon: <Flame className="w-4 h-4 text-amber-400" /> },
+          { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
+        ]} />
 
         {/* Share Section - Streamlined */}
         <motion.div
@@ -259,13 +250,13 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             {t('daily.shareScore')}
           </Button>
 
-          {/* Secondary share options - Cleaner row */}
+          {/* Secondary share options — neo-brutalist row */}
           <div className="flex items-center justify-center gap-2">
             <Button
               onClick={handleWhatsApp}
               aria-label="Share on WhatsApp"
               size="sm"
-              className="flex-1 py-3 bg-brand-whatsapp hover:bg-brand-whatsapp-hover text-white border-2 border-slate-600 rounded-lg transition-all"
+              className="flex-1 py-3 bg-brand-whatsapp hover:bg-brand-whatsapp-hover text-white border-2 border-neo-black rounded-neo shadow-hard-sm transition-all"
             >
               <WhatsAppIcon className="w-4 h-4" />
             </Button>
@@ -274,7 +265,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={handleTwitter}
               aria-label="Share on X"
               size="sm"
-              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
+              className="flex-1 py-3 bg-neo-navy text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
             >
               <XTwitterIcon className="w-4 h-4" />
             </Button>
@@ -284,7 +275,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               disabled={isGeneratingImage}
               aria-label={t('daily.shareImage')}
               size="sm"
-              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all disabled:opacity-50"
+              className="flex-1 py-3 bg-neo-navy text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all disabled:opacity-50"
             >
               {isGeneratingImage ? (
                 <Loader size="sm" />
@@ -297,7 +288,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={handleCopy}
               aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
               size="sm"
-              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
+              className="flex-1 py-3 bg-neo-navy text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
             >
               {copied ? (
                 <Check className="w-4 h-4 text-neo-cyan" />
@@ -317,60 +308,6 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             </motion.p>
           )}
 
-          {/* Collapsible share preview */}
-          <button
-            onClick={() => setShowSharePreview(!showSharePreview)}
-            className="flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-400 transition-colors mx-auto"
-          >
-            {showSharePreview ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            {showSharePreview ? t('common.hidePreview') : t('common.showPreview')}
-          </button>
-
-          <AnimatePresence>
-            {showSharePreview && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="bg-slate-900 rounded-lg border border-slate-700 p-3 text-left">
-                  <pre className="text-white text-xs font-mono whitespace-pre-wrap leading-relaxed">
-                    {shareText}
-                  </pre>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* Rewarded Ad: Retry Daily Challenge */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.52 }}
-          className="pt-2"
-        >
-          <RewardedAdButton
-            name="daily-retry"
-            onReward={() => {
-              // Return to daily hub to retry the challenge
-              onBack();
-            }}
-            className="w-full max-w-btn"
-          >
-            {t('daily.watchAdRetry') || 'Watch Ad to Retry'}
-          </RewardedAdButton>
-        </motion.div>
-
-        {/* Bonus Gold Ad */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.53 }}
-          className="flex justify-center"
-        >
-          <RewardedAdGoldButton goldAmount={25} />
         </motion.div>
 
         {/* Next Step - Suggest Multiplayer */}
@@ -387,33 +324,6 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           />
         </motion.div>
 
-        {/* Try Another Language */}
-        {availableLanguages.length > 0 && onGameLanguageChange && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.55 }}
-            className="pt-4 border-t border-slate-700/50"
-          >
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">
-              {t('wordHunt.results.tryAnotherLanguage')}
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {availableLanguages.map((option) => (
-                <Button
-                  key={option.code}
-                  onClick={() => onGameLanguageChange(option.code as Language)}
-                  size="sm"
-                  className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-lg transition-all flex items-center gap-1.5"
-                >
-                  <span className="text-base">{option.flag}</span>
-                  <span className="font-medium text-xs">{option.name}</span>
-                </Button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
         {/* Next puzzle countdown */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -421,7 +331,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           transition={{ delay: 0.6 }}
           className="py-3"
         >
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-neo-cream/50 font-bold uppercase tracking-wider">
             {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
           </p>
         </motion.div>
@@ -456,8 +366,8 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                         key={i}
                         className={`px-2 py-1 text-xs font-medium rounded-md ${
                           word === longestWord
-                            ? 'bg-neo-lime/20 text-neo-lime border border-neo-lime/30'
-                            : 'bg-slate-800 text-slate-300 border border-slate-700'
+                            ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm font-black'
+                            : 'bg-neo-navy text-neo-cream border border-neo-black/30 rounded-neo'
                         }`}
                       >
                         {word}

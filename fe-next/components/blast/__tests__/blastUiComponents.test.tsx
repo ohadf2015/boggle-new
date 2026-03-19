@@ -12,6 +12,39 @@ jest.mock('framer-motion', () => ({
     span: ({ children, ...rest }: any) => <span {...rest}>{children}</span>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
+  useMotionValue: (initial: number) => ({
+    get: () => initial,
+    set: () => {},
+    on: () => () => {},
+  }),
+  useTransform: (_mv: any, fn: (v: number) => number) => ({
+    get: () => fn(0),
+    on: (_event: string, cb: (v: number) => void) => { cb(fn(0)); return () => {}; },
+  }),
+  animate: () => ({ stop: () => {} }),
+}));
+
+jest.mock('@/hooks/useReducedMotion', () => ({
+  __esModule: true,
+  default: () => false,
+}));
+
+jest.mock('@/components/Avatar', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock('@/components/ui/Mascot', () => ({
+  MascotWithEntrance: () => null,
+}));
+
+jest.mock('@/components/ui/CelebrationMascot', () => ({
+  CelebrationMascotWithEntrance: () => null,
+}));
+
+jest.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: jest.fn(),
+  fireConfetti: jest.fn(),
 }));
 
 jest.mock('../hooks/useBlastResultSaver', () => ({

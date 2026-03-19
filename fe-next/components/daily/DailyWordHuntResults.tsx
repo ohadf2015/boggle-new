@@ -31,8 +31,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/mascotConfig';
 import { WinCinematic } from './WinCinematic';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
-import dynamic from 'next/dynamic';
-const WordHuntPromoPopup = dynamic(() => import('@/components/results/WordHuntPromoPopup'), { ssr: false });
 
 // Import from results module
 import {
@@ -421,9 +419,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         onClose={() => setShowCreatePuzzle(false)}
         language={language}
       />
-
-      {/* Word Hunt Multiplayer Promotion Popup */}
-      <WordHuntPromoPopup />
 
       {/* Spend animation portal */}
       {typeof document !== 'undefined' && showSpendAnimation && createPortal(
