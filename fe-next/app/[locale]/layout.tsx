@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { layoutTranslations as translations } from '@/translations/layout';
+import { translations } from '@/translations';
 import { ConditionalProviders } from '../conditional-providers';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
