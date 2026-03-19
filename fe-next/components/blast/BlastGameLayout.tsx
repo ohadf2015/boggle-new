@@ -208,13 +208,8 @@ export function BlastGameLayout({
     username ?? '',
   );
 
-  const [showHelp, setShowHelp] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      const { shouldShowGuidance } = require('@/utils/contextualGuidanceStorage');
-      return shouldShowGuidance('blastHelpShown');
-    } catch { return false; }
-  });
+  // Help modal is on-demand only (? button in header). The ready screen covers onboarding.
+  const [showHelp, setShowHelp] = useState(false);
   const [showCodex, setShowCodex] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [shakeClass, setShakeClass] = useState('');

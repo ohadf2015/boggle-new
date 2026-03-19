@@ -251,6 +251,12 @@ export interface Game {
   } | null;
 }
 
+export interface RoomPlayerAvatar {
+  avatarImage?: string;
+  emoji?: string;
+  color?: string;
+}
+
 export interface ActiveRoom {
   gameCode: string;
   roomName: string;
@@ -259,6 +265,8 @@ export interface ActiveRoom {
   gameState: GameState;
   isRanked: boolean;
   createdAt: number;
+  gameMode?: GameMode;
+  playerAvatars?: RoomPlayerAvatar[];
 }
 
 // ==================== Word Hunt Types ====================

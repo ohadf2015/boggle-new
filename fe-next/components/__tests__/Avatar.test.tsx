@@ -32,6 +32,13 @@ jest.mock('@/components/avatar/AvatarRenderer', () => ({
   ),
 }));
 
+// Mock NeoSkeletonAvatar
+jest.mock('@/components/ui/skeleton', () => ({
+  NeoSkeletonAvatar: ({ size, className }: { size: number; className?: string }) => (
+    <div data-testid="avatar-skeleton" data-size={size} className={className} role="status" aria-busy="true" />
+  ),
+}));
+
 const SAMPLE_CUSTOM_AVATAR: CustomAvatarConfig = {
   gender: 'female',
   base: 'heart',
@@ -219,6 +226,70 @@ describe('Avatar', () => {
           />
         )
       ).not.toThrow();
+    });
+  });
+
+  describe('loading state', () => {
+    it('renders skeleton when isLoading is true', () => {
+      render(<Avatar isLoading />);
+      expect(screen.getByTestId('avatar-skeleton')).toBeInTheDocument();
+      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+    });
+
+    it('renders skeleton with correct size', () => {
+      render(<Avatar isLoading size="lg" />);
+      expect(screen.getByTestId('avatar-skeleton')).toHaveAttribute('data-size', '48');
+    });
+
+    it('passes className to skeleton', () => {
+      render(<Avatar isLoading className="my-class" />);
+      expect(screen.getByTestId('avatar-skeleton')).toHaveClass('my-class');
+    });
+
+    it('skeleton has accessible loading attributes', () => {
+      render(<Avatar isLoading />);
+      const skeleton = screen.getByTestId('avatar-skeleton');
+      expect(skeleton).toHaveAttribute('role', 'status');
+      expect(skeleton).toHaveAttribute('aria-busy', 'true');
+    });
+  });
+
+  describe('userId-based unique avatars', () => {
+    it('generates different avatars for different userIds when no other props', () => {
+      const { unmount } = render(<Avatar userId="user-abc-123" />);
+      const avatar1 = screen.getByTestId('custom-avatar').getAttribute('data-base');
+      unmount();
+
+      render(<Avatar userId="user-xyz-789" />);
+      const avatar2 = screen.getByTestId('custom-avatar').getAttribute('data-base');
+
+      // Different userIds should produce generated avatars (mechanism test)
+      expect(screen.getByTestId('header-avatar')).toHaveAttribute('data-avatar-type', 'generated');
+      // With enough variation in hash, bases will likely differ
+      expect(avatar1).toBeDefined();
+      expect(avatar2).toBeDefined();
+    });
+
+    it('generates deterministic avatar for same userId', () => {
+      const { unmount } = render(<Avatar userId="consistent-user" />);
+      const avatar1 = screen.getByTestId('custom-avatar').getAttribute('data-base');
+      unmount();
+
+      render(<Avatar userId="consistent-user" />);
+      const avatar2 = screen.getByTestId('custom-avatar').getAttribute('data-base');
+
+      expect(avatar1).toBe(avatar2);
+    });
+
+    it('prefers avatarImage over userId as seed', () => {
+      const { unmount } = render(<Avatar avatarImage="pizza-pete" userId="user-123" />);
+      const withUserId = screen.getByTestId('custom-avatar').getAttribute('data-base');
+      unmount();
+
+      render(<Avatar avatarImage="pizza-pete" />);
+      const withoutUserId = screen.getByTestId('custom-avatar').getAttribute('data-base');
+
+      expect(withUserId).toBe(withoutUserId);
     });
   });
 

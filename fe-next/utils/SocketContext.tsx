@@ -238,7 +238,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
         const code = (error as Record<string, unknown>).code;
         const expectedErrors = ['GAME_NOT_FOUND', 'NOT_IN_GAME', 'ROOM_NOT_FOUND'];
         if (typeof code === 'string' && expectedErrors.includes(code)) {
-          logger.warn('[SOCKET.IO] Expected error:', error);
+          logger.log('[SOCKET.IO] Expected error:', error);
         } else {
           logger.error('[SOCKET.IO] Socket error event:', error);
         }

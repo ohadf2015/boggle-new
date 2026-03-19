@@ -4,7 +4,7 @@
  * Extracted from gameStateManager.ts for better modularity
  */
 
-import type { Language, GameUser, Spectator, LetterGrid } from '@/shared/types/game';
+import type { Language, GameMode, GameUser, Spectator, LetterGrid } from '@/shared/types/game';
 
 // Game state type
 type GameStateValue = 'waiting' | 'in-progress' | 'validating' | 'finished';
@@ -25,6 +25,14 @@ export interface QueryGameBase {
   playerScores: Record<string, number>;
   letterGrid: LetterGrid | null;
   tournamentId: string | null;
+  gameMode?: GameMode;
+}
+
+// Lightweight avatar for room list display (max 4 shown)
+export interface RoomPlayerAvatar {
+  avatarImage?: string;
+  emoji?: string;
+  color?: string;
 }
 
 // Game summary interface for lightweight listing
@@ -35,6 +43,8 @@ export interface GameSummary {
   playerCount: number;
   gameState: string;
   language: Language;
+  gameMode: GameMode;
+  playerAvatars: RoomPlayerAvatar[];
 }
 
 // Detailed player info for admin dashboard
@@ -70,7 +80,13 @@ export function getAllGames(games: Record<string, QueryGameBase>): GameSummary[]
     hostUsername: game.hostUsername,
     playerCount: Object.keys(game.users).length,
     gameState: game.gameState,
-    language: game.language
+    language: game.language,
+    gameMode: game.gameMode || 'classic',
+    playerAvatars: Object.values(game.users).slice(0, 4).map(user => ({
+      ...(user.avatar?.avatarImage ? { avatarImage: user.avatar.avatarImage } : {}),
+      ...(user.avatar?.emoji ? { emoji: user.avatar.emoji } : {}),
+      ...(user.avatar?.color ? { color: user.avatar.color } : {}),
+    })),
   }));
 }
 
@@ -140,13 +156,27 @@ export function getActiveRooms(games: Record<string, QueryGameBase>): GameSummar
       const humanPlayerCount = Object.values(game.users).filter(
         user => !user.isBot && !user.disconnected
       ).length;
+      // Extract up to 4 player avatars for room card display
+      const humanUsers = Object.values(game.users).filter(
+        user => !user.isBot && !user.disconnected
+      );
+      const playerAvatars: RoomPlayerAvatar[] = humanUsers
+        .slice(0, 4)
+        .map(user => ({
+          ...(user.avatar?.avatarImage ? { avatarImage: user.avatar.avatarImage } : {}),
+          ...(user.avatar?.emoji ? { emoji: user.avatar.emoji } : {}),
+          ...(user.avatar?.color ? { color: user.avatar.color } : {}),
+        }));
+
       return {
         gameCode: game.gameCode,
         roomName: game.roomName,
         hostUsername: game.hostUsername,
         playerCount: humanPlayerCount,
         gameState: game.gameState,
-        language: game.language
+        language: game.language,
+        gameMode: game.gameMode || 'classic',
+        playerAvatars,
       };
     });
 }

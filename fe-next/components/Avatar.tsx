@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import { cn } from '@/lib/utils';
+import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
 
 // Special constant for "use profile avatar" selection - indicates profile picture should be used
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
@@ -20,8 +21,12 @@ interface AvatarProps {
   profilePictureUrl?: string | null;
   avatarImage?: string;
   customAvatar?: CustomAvatarConfig | null;
+  /** Unique identifier for deterministic fallback avatar generation (e.g. user ID, username) */
+  userId?: string;
   size?: AvatarSize;
   className?: string;
+  /** Show loading skeleton instead of avatar */
+  isLoading?: boolean;
 }
 
 const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
@@ -40,8 +45,10 @@ const Avatar = memo<AvatarProps>(({
   profilePictureUrl,
   avatarImage,
   customAvatar,
+  userId,
   size = 'md',
-  className = ''
+  className = '',
+  isLoading = false,
 }) => {
   const [imageError, setImageError] = useState(false);
   const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
@@ -51,11 +58,19 @@ const Avatar = memo<AvatarProps>(({
   }, [profilePictureUrl]);
 
   // Pre-compute fallback avatar (must be before conditionals to satisfy hook rules)
-  const fallbackSeed = avatarImage || profilePictureUrl || 'default-avatar';
+  // Use userId for unique seed when no avatarImage/profilePictureUrl is available
+  const fallbackSeed = avatarImage || profilePictureUrl || userId || 'default-avatar';
   const fallbackConfig = useMemo(
     () => getSeededAvatarConfig(hashString(fallbackSeed)),
     [fallbackSeed]
   );
+
+  // 0. Loading state
+  if (isLoading) {
+    return (
+      <NeoSkeletonAvatar size={config.px} className={className} />
+    );
+  }
 
   // 1. Custom SVG avatar (highest priority)
   if (customAvatar) {

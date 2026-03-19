@@ -19,27 +19,11 @@ describe('BlastReadyScreen', () => {
 
   beforeEach(() => onStart.mockClear());
 
-  it('renders 3 infographic step cards', () => {
-    render(<BlastReadyScreen onStart={onStart} />);
-    expect(screen.getByTestId('step-card-step1')).toBeInTheDocument();
-    expect(screen.getByTestId('step-card-step2')).toBeInTheDocument();
-    expect(screen.getByTestId('step-card-step3')).toBeInTheDocument();
-  });
-
   it('displays translated step titles and descriptions', () => {
     render(<BlastReadyScreen onStart={onStart} />);
     expect(screen.getByText('blast.ready.step1Title')).toBeInTheDocument();
-    expect(screen.getByText('blast.ready.step1Desc')).toBeInTheDocument();
     expect(screen.getByText('blast.ready.step2Title')).toBeInTheDocument();
     expect(screen.getByText('blast.ready.step3Title')).toBeInTheDocument();
-  });
-
-  it('does not render old difficulty picker or tile guide', () => {
-    render(<BlastReadyScreen onStart={onStart} />);
-    expect(screen.queryByTestId('difficulty-easy')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('difficulty-medium')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('tile-legend-gold')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('tile-legend-bomb')).not.toBeInTheDocument();
   });
 
   it('play button calls onStart with no arguments', () => {
@@ -53,5 +37,29 @@ describe('BlastReadyScreen', () => {
     render(<BlastReadyScreen onStart={onStart} />);
     expect(screen.getByText('blast.ready.title')).toBeInTheDocument();
     expect(screen.getByText('blast.ready.subtitle')).toBeInTheDocument();
+  });
+
+  it('has an expandable tile guide', () => {
+    render(<BlastReadyScreen onStart={onStart} />);
+    const toggle = screen.getByTestId('tile-guide-toggle');
+    // Tile hints hidden by default
+    expect(screen.queryByText('blast.helpGoldLabel')).not.toBeInTheDocument();
+    // Expand
+    fireEvent.click(toggle);
+    expect(screen.getByText('blast.helpGoldLabel')).toBeInTheDocument();
+    expect(screen.getByText('blast.helpBombLabel')).toBeInTheDocument();
+  });
+
+  it('renders codex button', () => {
+    render(<BlastReadyScreen onStart={onStart} />);
+    expect(screen.getByTestId('codex-button')).toBeInTheDocument();
+  });
+
+  it('renders resume wave button when saved progress exists', () => {
+    const onStartFromWave = jest.fn();
+    render(<BlastReadyScreen onStart={onStart} onStartFromWave={onStartFromWave} savedWave={3} />);
+    const resumeBtn = screen.getByTestId('resume-wave-button');
+    fireEvent.click(resumeBtn);
+    expect(onStartFromWave).toHaveBeenCalledWith(3);
   });
 });

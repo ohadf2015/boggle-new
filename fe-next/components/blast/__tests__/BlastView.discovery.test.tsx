@@ -136,8 +136,7 @@ describe('BlastView discovery prop wiring', () => {
   function renderAndStartGame() {
     render(<BlastView />);
     fireEvent.click(screen.getByText('play'));
-    // Advance through wave intro
-    fireEvent.click(screen.getByText('go'));
+    // Wave 1 skips intro — goes directly to playing
   }
 
   it('passes onComboDetected prop to BlastGame when phase is playing', () => {

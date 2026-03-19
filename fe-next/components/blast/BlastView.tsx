@@ -116,7 +116,8 @@ const BlastView: React.FC = () => {
   }, []);
 
   const handleStart = useCallback(() => {
-    setPhase('waveIntro');
+    // Skip wave intro for wave 1 — go straight to playing
+    setPhase('playing');
   }, []);
 
   /** Start from a saved wave (skip earlier waves) */

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Zap, ChevronRight, Ghost, RefreshCw, HelpCircle, Users } from 'lucide-react';
+import { ArrowLeft, Zap, ChevronRight, Ghost, RefreshCw, HelpCircle, Users, Sword, Bomb, Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -65,6 +65,14 @@ const emptyStateVariants = {
     scale: 1,
     transition: { type: 'spring' as const, stiffness: 250, damping: 20, delay: 0.2 },
   },
+};
+
+// ==================== Mode Config ====================
+
+const MODE_CONFIG: Record<string, { icon: typeof Sword; label: string; borderColor: string; bgColor: string }> = {
+  classic: { icon: Sword, label: 'Classic', borderColor: 'border-neo-cyan/60', bgColor: 'bg-neo-cyan/10' },
+  blast: { icon: Bomb, label: 'Blast', borderColor: 'border-neo-pink/60', bgColor: 'bg-neo-pink/10' },
+  'word-hunt': { icon: Search, label: 'Word Hunt', borderColor: 'border-neo-purple/60', bgColor: 'bg-neo-purple/10' },
 };
 
 // ==================== Types ====================
@@ -292,14 +300,28 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                         transition: { type: 'spring' as const, stiffness: 400, damping: 20 },
                       }}
                       whileTap={{ scale: 0.97 }}
-                      className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-[background-color,border-color] text-start group relative overflow-hidden"
+                      className={`flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-[background-color,border-color] text-start group relative overflow-hidden ${
+                        room.gameMode ? `border-s-4 ${MODE_CONFIG[room.gameMode]?.borderColor || ''}` : ''
+                      }`}
                     >
                       {/* Subtle hover shimmer */}
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-                      <span className="text-xl relative">
-                        {LANGUAGE_FLAGS[room.language] || '🎮'}
-                      </span>
+                      {/* Language flag + mode icon stack */}
+                      <div className="flex flex-col items-center gap-1 relative flex-shrink-0">
+                        <span className="text-xl">
+                          {LANGUAGE_FLAGS[room.language] || '🎮'}
+                        </span>
+                        {room.gameMode && MODE_CONFIG[room.gameMode] && (() => {
+                          const ModeIcon = MODE_CONFIG[room.gameMode!].icon;
+                          return (
+                            <span className={`flex items-center justify-center w-5 h-5 rounded-sm ${MODE_CONFIG[room.gameMode!].bgColor} border border-white/10`}>
+                              <ModeIcon className="w-3 h-3 text-white/70" />
+                            </span>
+                          );
+                        })()}
+                      </div>
+
                       <div className="flex-1 min-w-0 relative">
                         <div className="flex items-center gap-2">
                           <p className="font-bold text-sm text-neo-white truncate">
@@ -311,8 +333,35 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <Users className="w-3 h-3 text-slate-500" />
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {/* Player avatar stack */}
+                          {room.playerAvatars && room.playerAvatars.length > 0 ? (
+                            <div className="flex items-center -space-x-1.5 rtl:space-x-reverse">
+                              {room.playerAvatars.slice(0, 4).map((av, i) => (
+                                <div
+                                  key={i}
+                                  className="w-5 h-5 rounded-full border border-neo-black/50 bg-neo-navy-light flex items-center justify-center text-[10px] overflow-hidden"
+                                  style={av.color ? { backgroundColor: av.color } : undefined}
+                                >
+                                  {av.avatarImage ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={`/avatars/${av.avatarImage}`} alt="" className="w-full h-full object-cover" />
+                                  ) : av.emoji ? (
+                                    av.emoji
+                                  ) : (
+                                    <Users className="w-3 h-3 text-white/50" />
+                                  )}
+                                </div>
+                              ))}
+                              {(room.playerCount || 0) > 4 && (
+                                <span className="w-5 h-5 rounded-full border border-neo-black/50 bg-neo-navy-light flex items-center justify-center text-[8px] font-bold text-white/60">
+                                  +{(room.playerCount || 0) - 4}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <Users className="w-3 h-3 text-slate-500" />
+                          )}
                           <p className="text-xs text-slate-400">
                             {room.playerCount || 0} {t('joinView.players')}
                           </p>
