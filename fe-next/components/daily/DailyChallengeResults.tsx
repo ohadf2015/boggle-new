@@ -9,8 +9,7 @@ import { SharePanelModal, XTwitterIcon, WhatsAppIcon } from './results/SharePane
 import { ImagePreviewModal } from './results/ImagePreviewModal';
 import { Button } from '@/components/ui/button';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
-import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
-import { StatsCardGrid } from '@/components/results/shared';
+import { ResultsHero } from '@/components/results/shared';
 import { displayScore } from '@/utils/scoreDisplay';
 import {
   generateShareableResult,
@@ -208,31 +207,24 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       <div className="text-center space-y-5">
 
         {/* Hero Zone — unified score + stats */}
-        <ResultsWinnerBanner
-          winner={{
-            username: isAuthenticated && profile
-              ? profile.display_name || profile.username
-              : t('common.you'),
-            score: Math.round(result.score),
-            avatar: isAuthenticated && profile ? {
-              avatarImage: profile.avatar_image,
-            } : undefined,
-          }}
-          isCurrentUserWinner={isNewCompletion}
-          variant={isNewCompletion ? 'ranking' : 'completion'}
-          rank={currentUserRank ?? 1}
-          totalPlayers={totalPlayers}
-          customMessage={isNewCompletion ? t('daily.completed') : t('daily.alreadyPlayed')}
-          customAnnouncement={t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
-          showConfetti={false}
+        <ResultsHero
+          outcomeLabel={isNewCompletion ? t('daily.completed') : t('daily.alreadyPlayed')}
+          score={displayScore(Math.round(result.score))}
+          subtitle={t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
+          pointsLabel={t('common.points')}
+          variant={isNewCompletion ? 'win' : 'neutral'}
+          badge={streakMilestone && isNewCompletion ? {
+            text: `${t('daily.streakDays').replace('{count}', String(streakMilestone))}`,
+            variant: 'milestone',
+          } : undefined}
+          onScoreClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
+          inlineStats
+          stats={[
+            { label: t('common.words'), value: result.wordCount },
+            { label: t('daily.streak'), value: streak?.currentStreak ?? 0, icon: <Flame className="w-4 h-4 text-amber-400" /> },
+            { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
+          ]}
         />
-
-        {/* Stats row */}
-        <StatsCardGrid cards={[
-          { label: t('common.words'), value: result.wordCount },
-          { label: t('daily.streak'), value: streak?.currentStreak ?? 0, icon: <Flame className="w-4 h-4 text-amber-400" /> },
-          { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
-        ]} />
 
         {/* Share Section - Streamlined */}
         <motion.div
