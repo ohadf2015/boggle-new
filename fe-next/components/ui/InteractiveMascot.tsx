@@ -383,28 +383,39 @@ export const InteractiveMascot = memo(function InteractiveMascot({
     };
   }, []);
 
-  // Lazy preload hover/click variants when interaction is enabled
-  // This ensures smooth transitions without upfront preloading cost
+  // Defer preloading hover/click variant GIFs until browser is idle.
+  // These GIFs are 500KB-1.7MB each — loading them eagerly on mount blocks
+  // LCP and wastes bandwidth if the user never interacts with the mascot.
   useEffect(() => {
     if (!enableHover && !enableClick) return;
 
-    // Preload hover variant if enabled
-    if (enableHover) {
-      const hoverTarget = hoverVariant || DEFAULT_HOVER_TRANSITIONS[variant];
-      if (hoverTarget) {
-        const hoverSrc = getImageSource(hoverTarget);
-        preloadMascotImage(hoverSrc);
+    const doPreload = () => {
+      if (enableHover) {
+        const hoverTarget = hoverVariant || DEFAULT_HOVER_TRANSITIONS[variant];
+        if (hoverTarget) {
+          preloadMascotImage(getImageSource(hoverTarget));
+        }
       }
-    }
+      if (enableClick) {
+        const clickTarget = clickVariant || DEFAULT_CLICK_TRANSITIONS[variant];
+        if (clickTarget) {
+          preloadMascotImage(getImageSource(clickTarget));
+        }
+      }
+    };
 
-    // Preload click variant if enabled
-    if (enableClick) {
-      const clickTarget = clickVariant || DEFAULT_CLICK_TRANSITIONS[variant];
-      if (clickTarget) {
-        const clickSrc = getImageSource(clickTarget);
-        preloadMascotImage(clickSrc);
+    // Use requestIdleCallback to defer until main thread is idle
+    const id = typeof requestIdleCallback !== 'undefined'
+      ? requestIdleCallback(doPreload, { timeout: 5000 })
+      : setTimeout(doPreload, 3000) as unknown as number;
+
+    return () => {
+      if (typeof cancelIdleCallback !== 'undefined') {
+        cancelIdleCallback(id);
+      } else {
+        clearTimeout(id);
       }
-    }
+    };
   }, [variant, enableHover, enableClick, hoverVariant, clickVariant]);
 
   const shouldAnimate = animated && !prefersReducedMotion && enableComplexAnimations;

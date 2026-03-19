@@ -38,6 +38,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 
 describe('InteractiveMascot - Lazy Loading', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     // Clear tracked constructor calls
     mockImageConstructorCalls.length = 0;
 
@@ -72,6 +73,7 @@ describe('InteractiveMascot - Lazy Loading', () => {
   afterEach(() => {
     // Restore original Image constructor
     window.Image = originalImage;
+    jest.useRealTimers();
     jest.clearAllMocks();
   });
 
@@ -158,7 +160,8 @@ describe('InteractiveMascot - Lazy Loading', () => {
       expect(screen.getByAltText(/Lexi mascot - happy/i)).toBeInTheDocument();
     });
 
-    // Wait for lazy preloading to occur
+    // Preloading is deferred via requestIdleCallback/setTimeout — advance timers
+    jest.advanceTimersByTime(5000);
     await waitFor(() => {
       // Lazy preload: only hover (gaming) and click (celebration) variants should be preloaded
       expect(mockImageConstructorCalls.length).toBeGreaterThan(0);

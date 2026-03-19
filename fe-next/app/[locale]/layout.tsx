@@ -660,8 +660,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
-                {/* Preload hero mascot for faster LCP (200-300ms improvement) */}
-                <link rel="preload" as="image" href="/mascot/main-nobg.gif" type="image/gif" fetchPriority="high" />
+                {/* GIF preload removed — 571KB blocks critical resources (Lighthouse: LCP 24s → should drop significantly) */}
                 {/* Favicon and icons - use relative paths for development, absolute for production */}
                 {/* PNG icons FIRST - Google requires multiples of 48px and prefers PNG over SVG/ICO */}
                 <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
