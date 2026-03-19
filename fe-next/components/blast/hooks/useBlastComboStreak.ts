@@ -36,6 +36,10 @@ export interface UseBlastComboStreakReturn {
   onWordSubmitted: () => void;
   /** Reset streak entirely */
   reset: () => void;
+  /** Pause combo timer (call during cascades to prevent unfair decay) */
+  pauseTimer: () => void;
+  /** Resume combo timer after cascade ends */
+  resumeTimer: () => void;
   /** Ref to the countdown arc SVG circle element — hook drives strokeDashoffset directly */
   arcRef: React.RefObject<SVGCircleElement | null>;
 }
@@ -75,6 +79,10 @@ export function useBlastComboStreak(comboWindowMs: number = COMBO_WINDOW_BASE_MS
   const windowEndRef = useRef<number>(0);
   /** Direct DOM ref for the SVG countdown arc — avoids React re-renders */
   const arcRef = useRef<SVGCircleElement | null>(null);
+  /** Timestamp when timer was paused (0 = not paused) */
+  const pausedAtRef = useRef<number>(0);
+  /** Remaining time when paused (to restore on resume) */
+  const pausedRemainingRef = useRef<number>(0);
 
   // ---- Cancel any running RAF loop ----
   const cancelLoop = useCallback(() => {
@@ -161,6 +169,24 @@ export function useBlastComboStreak(comboWindowMs: number = COMBO_WINDOW_BASE_MS
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ---- pauseTimer: freeze combo countdown during cascades ----
+  const pauseTimer = useCallback(() => {
+    if (pausedAtRef.current > 0 || levelRef.current <= 0) return; // already paused or no streak
+    pausedAtRef.current = performance.now();
+    pausedRemainingRef.current = Math.max(0, windowEndRef.current - performance.now());
+    cancelLoop();
+  }, [cancelLoop]);
+
+  // ---- resumeTimer: restore combo countdown after cascade ----
+  const resumeTimer = useCallback(() => {
+    if (pausedAtRef.current <= 0 || levelRef.current <= 0) return; // not paused or no streak
+    windowEndRef.current = performance.now() + pausedRemainingRef.current;
+    pausedAtRef.current = 0;
+    pausedRemainingRef.current = 0;
+    startLoop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ---- reset ----
   const reset = useCallback(() => {
     cancelLoop();
@@ -179,5 +205,5 @@ export function useBlastComboStreak(comboWindowMs: number = COMBO_WINDOW_BASE_MS
     };
   }, [cancelLoop]);
 
-  return { streak, onWordSubmitted, reset, arcRef };
+  return { streak, onWordSubmitted, reset, arcRef, pauseTimer, resumeTimer };
 }

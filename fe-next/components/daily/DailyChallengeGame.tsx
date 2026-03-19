@@ -180,9 +180,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     comboLevel: combo.comboLevel,
     t,
     onWordAccepted: (word, wordScore) => {
+      // Combo already incremented optimistically in onComboIncrement
       setScore(prev => prev + wordScore);
       playWordAcceptedSound?.();
-      combo.incrementCombo(true);
       triggerPopup(wordScore, word);
     },
     onWordRejected: () => {
@@ -303,10 +303,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   }, [directionGuidance]);
 
   // Handle word forming changes from GridComponent
+  // Also prefetch validation while user is swiping for instant submit
   const handleWordChange = useCallback((word: string, count: number) => {
     setFormedWord(word);
     setLetterCount(count);
-  }, []);
+    if (word.length >= 3) {
+      wordSubmission.prefetchValidation(word);
+    }
+  }, [wordSubmission]);
 
   // Handle word submission from grid
   const handleWordSubmit = useCallback((word: string) => {

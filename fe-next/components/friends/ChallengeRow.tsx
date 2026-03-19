@@ -37,6 +37,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
     >
       <Avatar
         avatarImage={challenge.challengerAvatarImage}
+        customAvatar={challenge.challengerCustomAvatar}
         size="sm"
       />
       <div className="flex-1 min-w-0">

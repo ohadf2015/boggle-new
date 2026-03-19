@@ -3,8 +3,14 @@
  * Tracks consecutive wins for gamification and retention
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { spendCoins, canAfford } from '@/utils/coinManager';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  getStreakTier as getStreakTierConfig,
+  getStreakCoinBonusPercent,
+  getNextTierInfo,
+} from '@/lib/streakTierRewards';
 
 const STREAK_KEY = 'lexiclash_win_streak';
 const STREAK_DATE_KEY = 'lexiclash_streak_date';
@@ -235,6 +241,8 @@ export const useWinStreak = () => {
   const [streakData, setStreakData] = useState<WinStreakData>(DEFAULT_STREAK_DATA);
   // Track whether data has been loaded from localStorage
   const [isLoaded, setIsLoaded] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const hasSyncedRef = useRef(false);
 
   // Load streak data from localStorage after mount
   useEffect(() => {
@@ -264,6 +272,73 @@ export const useWinStreak = () => {
     setStreakData(data);
     setIsLoaded(true);
   }, []);
+
+  // Sync with server when authenticated — merge localStorage → server, then use server as truth
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id || hasSyncedRef.current || !isLoaded) return;
+    hasSyncedRef.current = true;
+
+    const localData = getStoredStreakData();
+    const hasLocalData = localData.currentStreak > 0 || localData.bestStreak > 0;
+
+    const syncWithServer = async () => {
+      try {
+        if (hasLocalData) {
+          const res = await fetch('/api/streak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'merge',
+              localData: {
+                currentStreak: localData.currentStreak,
+                bestStreak: localData.bestStreak,
+                totalWins: localData.totalWins,
+                lastWinDate: localData.lastWinDate,
+              },
+            }),
+          });
+          if (res.ok) {
+            const serverData = await res.json();
+            setStreakData(prev => ({
+              ...prev,
+              currentStreak: serverData.currentStreak,
+              bestStreak: serverData.bestStreak,
+              lastWinDate: serverData.lastWinDate,
+              freezesAvailable: serverData.freezesAvailable ?? prev.freezesAvailable,
+            }));
+            saveStreakData({
+              currentStreak: serverData.currentStreak,
+              bestStreak: serverData.bestStreak,
+              lastWinDate: serverData.lastWinDate,
+            });
+          }
+        } else {
+          const res = await fetch('/api/streak');
+          if (res.ok) {
+            const serverData = await res.json();
+            if (serverData.currentStreak > 0) {
+              setStreakData(prev => ({
+                ...prev,
+                currentStreak: serverData.currentStreak,
+                bestStreak: serverData.bestStreak,
+                lastWinDate: serverData.lastWinDate,
+                freezesAvailable: serverData.freezesAvailable ?? prev.freezesAvailable,
+              }));
+              saveStreakData({
+                currentStreak: serverData.currentStreak,
+                bestStreak: serverData.bestStreak,
+                lastWinDate: serverData.lastWinDate,
+              });
+            }
+          }
+        }
+      } catch {
+        // Best-effort — localStorage remains as fallback
+      }
+    };
+
+    syncWithServer();
+  }, [isAuthenticated, user?.id, isLoaded]);
 
   /**
    * Result of recording a win
@@ -361,13 +436,22 @@ export const useWinStreak = () => {
     debugLogLocalStorage('After saveStreakData in recordWin');
     setStreakData(newData);
 
+    // Fire-and-forget server sync for authenticated users
+    if (isAuthenticated && user?.id) {
+      fetch('/api/streak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'recordWin' }),
+      }).catch(() => { /* best-effort */ });
+    }
+
     return {
       newStreak,
       bestStreak: newBestStreak,
       previousStreak,
       alreadyWonToday: false,
     };
-  }, []);
+  }, [isAuthenticated, user?.id]);
 
   /**
    * Apply a streak freeze to protect the streak for one day
@@ -503,6 +587,11 @@ export const useWinStreak = () => {
     return isYesterday(lastDate) && !isSameDay(lastDate, today);
   }, [streakData]);
 
+  // Compute tier reward info from current streak
+  const currentTier = getStreakTierConfig(streakData.currentStreak);
+  const coinBonusPercent = getStreakCoinBonusPercent(streakData.currentStreak);
+  const nextTier = getNextTierInfo(streakData.currentStreak);
+
   return {
     ...streakData,
     /** Whether localStorage data has been loaded (use to avoid race conditions) */
@@ -514,6 +603,12 @@ export const useWinStreak = () => {
     getStreakEmoji,
     getStreakTier,
     isStreakAtRisk: isStreakAtRisk(),
+    /** Current streak tier config (null if no streak) */
+    currentTier,
+    /** Active coin bonus percentage from streak tier (0 if none) */
+    coinBonusPercent,
+    /** Info about next tier: { tier, daysNeeded } or null if at max */
+    nextTier,
   };
 };
 

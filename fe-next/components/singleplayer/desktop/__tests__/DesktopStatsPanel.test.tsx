@@ -87,20 +87,20 @@ describe('DesktopStatsPanel', () => {
       // WHEN component is rendered
       render(<DesktopStatsPanel {...defaultProps} />);
 
-      // THEN score should be displayed (10x display multiplier: 150 * 10 = 1,500)
-      expect(screen.getByText(/1.?500/)).toBeInTheDocument();
+      // THEN score should be displayed (display multiplier is 1x)
+      expect(screen.getByText('150')).toBeInTheDocument();
       expect(screen.getByText('Score')).toBeInTheDocument();
     });
 
     it('should display score with locale formatting for large numbers', () => {
-      // GIVEN a large score (10x display: 1500 * 10 = 15,000)
+      // GIVEN a large score
       const props = { ...defaultProps, score: 1500 };
 
       // WHEN component is rendered
       render(<DesktopStatsPanel {...props} />);
 
       // THEN score should be formatted with display multiplier
-      expect(screen.getByText(/15.?000/)).toBeInTheDocument();
+      expect(screen.getByText(/1.?500/)).toBeInTheDocument();
     });
   });
 

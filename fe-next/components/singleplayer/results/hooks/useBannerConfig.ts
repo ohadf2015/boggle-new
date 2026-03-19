@@ -14,6 +14,7 @@ interface UseBannerConfigParams {
   playerRank: number;
   totalParticipants: number;
   t: (key: string) => string | undefined;
+  totalBoardWords?: number;
 }
 
 interface BannerConfig {
@@ -32,6 +33,7 @@ export function useBannerConfig({
   playerRank,
   totalParticipants,
   t,
+  totalBoardWords,
 }: UseBannerConfigParams): BannerConfig {
   function getVariant(): BannerConfig['variant'] {
     if (playerScore === 0 || validWordCount === 0) return 'completion';
@@ -75,6 +77,12 @@ export function useBannerConfig({
         : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount));
     }
     if (mode === 'solo-bots') {
+      if (totalBoardWords && totalBoardWords > validWordCount) {
+        const missed = totalBoardWords - validWordCount;
+        return (t('singlePlayer.progressAnnouncement') || 'Found {found} words — {missed} more were hiding!')
+          .replace('{found}', String(validWordCount))
+          .replace('{missed}', String(missed));
+      }
       return `#${playerRank} ${t('results.of') || 'of'} ${totalParticipants}`;
     }
     return undefined;

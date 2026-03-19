@@ -55,7 +55,7 @@ export function FriendDetailDialog({
           <>
             <DialogHeader>
               <div className="flex items-center gap-3">
-                <Avatar avatarImage={friend.avatarImage} size="lg" />
+                <Avatar avatarImage={friend.avatarImage} customAvatar={friend.customAvatar} size="lg" />
                 <div>
                   <DialogTitle className="text-lg">
                     {friend.displayName || friend.username}

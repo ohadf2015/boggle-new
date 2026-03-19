@@ -33,6 +33,8 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     }): void => {
       // Track when the last word was found for inactivity-based trail visibility
       setLastWordFoundTime(Date.now());
+      const wordLen = data.word.length;
+      const longWordLabel = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
       setCurrentFeedback({
         id: `accepted-${Date.now()}`,
         type: 'accepted',
@@ -41,6 +43,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         fireRoundActive: data.fireRoundActive,
         fireRoundBonus: data.fireRoundBonus,
         fromLesson: data.fromLesson,
+        longWordLabel,
         timestamp: Date.now(),
       });
 
@@ -109,18 +112,24 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       word: string;
       foundBy: string;
       foundByAvatar?: { emoji?: string; color?: string; avatarImage?: string } | null;
+      confirmationScore?: number;
     }): void => {
+      const hasPartialCredit = data.confirmationScore && data.confirmationScore > 0;
       setCurrentFeedback({
         id: `foundByOther-${Date.now()}`,
         type: 'foundByOther',
         word: data.word,
-        message:
-          t('playerView.foundByOther')?.replace('${player}', data.foundBy) ||
-          `Found by ${data.foundBy}`,
+        message: hasPartialCredit
+          ? `+${data.confirmationScore} — ${t('playerView.foundByOther')?.replace('${player}', data.foundBy) || `Found by ${data.foundBy}`}`
+          : t('playerView.foundByOther')?.replace('${player}', data.foundBy) || `Found by ${data.foundBy}`,
         foundBy: data.foundBy,
         foundByAvatar: data.foundByAvatar,
         timestamp: Date.now(),
       });
+      // Update last word found time for partial credit (keeps combo alive)
+      if (hasPartialCredit) {
+        setLastWordFoundTime(Date.now());
+      }
     };
 
     socket.on('wordAccepted', handleWordAccepted);

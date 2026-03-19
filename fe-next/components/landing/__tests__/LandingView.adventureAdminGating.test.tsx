@@ -6,7 +6,15 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+
+jest.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: () => false,
+}));
 import '@testing-library/jest-dom';
+
+jest.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: () => false,
+}));
 import LandingView from '../LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,15 +22,20 @@ import { useMusic } from '@/contexts/MusicContext';
 
 // Mock all required contexts and hooks
 jest.mock('@/contexts/AuthContext');
+
 jest.mock('@/contexts/LanguageContext');
+
 jest.mock('@/contexts/MusicContext');
+
 jest.mock('@/utils/ThemeContext', () => ({
+
   useTheme: () => ({
     theme: 'dark',
     setTheme: jest.fn(),
   }),
 }));
 jest.mock('@/contexts/SoundEffectsContext', () => ({
+
   useSoundEffects: () => ({
     playSound: jest.fn(),
     stopSound: jest.fn(),
@@ -31,18 +44,21 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 jest.mock('@/contexts/CoinContext', () => ({
+
   useCoin: () => ({
     coins: 0,
     updateCoins: jest.fn(),
   }),
 }));
 jest.mock('@/contexts/HapticsContext', () => ({
+
   useHapticsConfig: () => ({
     isEnabled: true,
     toggle: jest.fn(),
   }),
 }));
 jest.mock('@/hooks/useLiveRoomStats', () => ({
+
   useLiveRoomStats: () => ({
     openRooms: 0,
     totalPlayers: 0,
@@ -50,18 +66,22 @@ jest.mock('@/hooks/useLiveRoomStats', () => ({
   }),
 }));
 jest.mock('@/hooks/useMobileLandscape', () => ({
+
   useMobileLandscape: () => false,
 }));
 jest.mock('@/hooks/useMobilePortrait', () => ({
+
   useMobilePortrait: () => false,
 }));
 jest.mock('@/hooks/usePullToRefresh', () => ({
+
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
   }),
 }));
 jest.mock('@/hooks/useTiltEffect', () => ({
+
   useTiltEffect: () => ({
     ref: { current: null },
     style: {},
@@ -70,12 +90,14 @@ jest.mock('@/hooks/useTiltEffect', () => ({
   useMouseParallax: () => ({ x: 0, y: 0 }),
 }));
 jest.mock('@/hooks/useDevicePerformance', () => ({
+
   useDevicePerformance: () => ({
     enableComplexAnimations: true,
     prefersReducedMotion: false,
   }),
 }));
 jest.mock('next/navigation', () => ({
+
   useRouter: () => ({
     push: jest.fn(),
     replace: jest.fn(),
@@ -83,23 +105,27 @@ jest.mock('next/navigation', () => ({
   useParams: () => ({ locale: 'en' }),
 }));
 jest.mock('@/utils/onboardingStorage', () => ({
+
   hasCompletedOnboarding: () => true,
 }));
 
 // Mock components that are lazy loaded
 jest.mock('@/components/daily/DailyChallengeBanner', () => {
+
   return function MockDailyChallengeBanner() {
     return <div data-testid="daily-challenge-banner">Daily Challenge</div>;
   };
 });
 
 jest.mock('@/components/OnboardingModal', () => {
+
   return function MockOnboardingModal() {
     return <div>Onboarding Modal</div>;
   };
 });
 
 jest.mock('@/components/ProfileCustomizationModal', () => {
+
   return function MockProfileCustomizationModal() {
     return <div>Profile Customization</div>;
   };

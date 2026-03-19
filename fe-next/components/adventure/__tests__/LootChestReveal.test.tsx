@@ -11,6 +11,17 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+jest.mock('next/image', () => {
+  const React = require('react');
+  return {
+    __esModule: true,
+    default: React.forwardRef(function MockImage(props: any, ref: any) {
+      const { fill, priority, ...rest } = props;
+      return React.createElement('img', { ...rest, ref });
+    }),
+  };
+});
+
 jest.mock('framer-motion', () => {
   const React = require('react');
   const MockComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
@@ -89,5 +100,40 @@ describe('LootChestReveal', () => {
       <LootChestReveal isOpen={true} drops={[]} onComplete={jest.fn()} />
     );
     expect(container.innerHTML).toBe('');
+  });
+
+  it('renders correct chest image for each tier', () => {
+    const { rerender } = render(
+      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} chestTier="wooden" />
+    );
+    expect(screen.getByAltText('adventure.loot.chest')).toHaveAttribute(
+      'src', '/images/adventure/loot/chest-wooden-closed.webp'
+    );
+
+    rerender(
+      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} chestTier="golden" />
+    );
+    expect(screen.getByAltText('adventure.loot.chest')).toHaveAttribute(
+      'src', '/images/adventure/loot/chest-golden-closed.webp'
+    );
+  });
+
+  it('switches to open chest image after click', () => {
+    render(
+      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} chestTier="silver" />
+    );
+    fireEvent.click(screen.getByTestId('loot-chest'));
+    expect(screen.getByAltText('adventure.loot.chest')).toHaveAttribute(
+      'src', '/images/adventure/loot/chest-silver-open.webp'
+    );
+  });
+
+  it('renders loot drop images instead of emojis', () => {
+    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} />);
+    fireEvent.click(screen.getByTestId('loot-chest'));
+
+    act(() => { jest.advanceTimersByTime(STAGGER_MS); });
+    const goldImg = screen.getByAltText('adventure.loot.gold');
+    expect(goldImg).toHaveAttribute('src', '/images/adventure/loot/loot-gold-coins.webp');
   });
 });

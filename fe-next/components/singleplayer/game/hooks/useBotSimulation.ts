@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { calculateWordScoreByLength as canonicalWordScoreByLength } from '@/shared/utils/scoring';
 import type { BotOpponent } from '../../../singleplayer/SinglePlayerView';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -95,7 +96,10 @@ export function useBotSimulation({
    */
   const simulateBotFindWord = useCallback((bot: BotOpponent) => {
     // Simple scoring for bots: word length - 1 (no fire round multiplier, no combos)
-    const getBotWordScore = (wordLength: number): number => Math.max(wordLength - 1, 1);
+    const getBotWordScore = (wordOrLength: string | number): number => {
+      const len = typeof wordOrLength === 'string' ? wordOrLength.length : wordOrLength;
+      return canonicalWordScoreByLength(len);
+    };
 
     // Use ref to get current availableWords (avoids stale closure)
     const currentAvailableWords = availableWordsRef.current;

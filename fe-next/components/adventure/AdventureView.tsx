@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
@@ -19,7 +20,11 @@ import {
   generateAdventureGrid,
   getLevelSeed,
   getGridSize,
+  LEVELS_PER_WORLD,
+  WORLD_CONFIGS,
 } from '@/lib/adventure';
+import { calculateMasteryTier } from '@/lib/adventure/mastery';
+import type { MasteryCriteria, MasteryTier } from '@/types/adventure';
 import dynamic from 'next/dynamic';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 
@@ -82,9 +87,34 @@ function AdventureView(): React.JSX.Element {
 
   const totalStars = progression?.totalStars ?? 0;
   const playerLevel = progression?.playerLevel ?? 1;
-  const completions = progression?.completions ?? [];
+  const completions = useMemo(() => progression?.completions ?? [], [progression?.completions]);
+  const router = useRouter();
+  // Boss rush unlocks after defeating at least 1 boss (level 7 in any world)
+  const hasBossDefeat = useMemo(() => completions.some(c => c.level === LEVELS_PER_WORLD && c.stars >= 1), [completions]);
   const streakDays = progression?.streak?.currentStreak ?? 0;
   const bestStreak = progression?.streak?.bestStreak ?? 0;
+
+  // Compute per-world mastery tiers from available progression data
+  const masteryTiers = useMemo(() => {
+    const tiers: Record<number, MasteryTier> = {};
+    for (const wc of WORLD_CONFIGS) {
+      const wId = wc.id;
+      const wCompletions = completions.filter(c => c.world === wId);
+      const completed = wCompletions.filter(c => c.stars >= 1).length;
+      const perfect = wCompletions.filter(c => c.stars === 3).length;
+      const criteria: MasteryCriteria = {
+        allLevelsCompleted: completed >= LEVELS_PER_WORLD,
+        allLevelsPerfect: perfect >= LEVELS_PER_WORLD,
+        // Quest/boss/flash data not available at map level — defaults to false
+        allQuestsCompleted: false,
+        bossHighHealth: false,
+        flashChallengesMastered: false,
+      };
+      const tier = calculateMasteryTier(criteria);
+      if (tier > 0) tiers[wId] = tier;
+    }
+    return tiers;
+  }, [completions]);
 
   const { quests: dailyQuests } = useDailyQuests({
     initialProgress: progression?.dailyQuestProgress,
@@ -138,10 +168,10 @@ function AdventureView(): React.JSX.Element {
   }, [userId, setViewState]);
 
   const handleLevelComplete = useCallback(
-    async (stars: number, score: number, wordsFound: number, goldEarned: number) => {
+    async (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => {
       if (selectedWorld && selectedLevel) {
         try {
-          await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned);
+          await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords);
         } catch (err) {
           console.warn('Failed to save progress:', err instanceof Error ? err.message : String(err));
         }
@@ -249,13 +279,15 @@ function AdventureView(): React.JSX.Element {
                 onOpenShop={() => setShowShop(true)}
                 wordAlbumCount={progression?.wordAlbum?.length ?? 0}
                 onWeeklyChallenge={() => setShowWeeklyChallenge(true)}
+                onBossRush={() => router.push(`/${language}/adventure/boss-rush`)}
+                hasBossDefeat={hasBossDefeat}
               />
             </motion.div>
           )}
 
           {viewState === 'worldMap' && (
             <motion.div key="world-map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: isRTL ? 100 : -100 }} transition={{ duration: 0.3 }} className="h-full">
-              <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} />
+              <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} masteryTiers={masteryTiers} />
             </motion.div>
           )}
 

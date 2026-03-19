@@ -47,6 +47,8 @@ export interface WordFeedback {
   fromLesson?: boolean;
   /** Word rarity classification for bonus display */
   rarity?: 'common' | 'uncommon' | 'rare' | 'epic';
+  /** Label for long word bonus display */
+  longWordLabel?: string;
 }
 
 interface WordFormingAreaProps {

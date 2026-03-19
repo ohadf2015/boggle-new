@@ -1,10 +1,19 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+
+jest.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: () => false,
+}));
 import '@testing-library/jest-dom';
+
+jest.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: () => false,
+}));
 import LandingView from '../LandingView';
 
 // Mock all the contexts and hooks
 jest.mock('@/contexts/LanguageContext', () => ({
+
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -13,6 +22,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 jest.mock('@/contexts/MusicContext', () => ({
+
   useMusic: () => ({
     playTrack: jest.fn(),
     TRACKS: { LOBBY: 'lobby' },
@@ -22,14 +32,17 @@ jest.mock('@/contexts/MusicContext', () => ({
 // Auth mock is defined inside describe block to allow dynamic values
 
 jest.mock('@/hooks/useMobileLandscape', () => ({
+
   useMobileLandscape: () => false,
 }));
 
 jest.mock('@/hooks/useMobilePortrait', () => ({
+
   useMobilePortrait: () => false,
 }));
 
 jest.mock('@/hooks/useLiveRoomStats', () => ({
+
   useLiveRoomStats: () => ({
     openRooms: 0,
     totalPlayers: 0,
@@ -38,6 +51,7 @@ jest.mock('@/hooks/useLiveRoomStats', () => ({
 }));
 
 jest.mock('@/hooks/usePullToRefresh', () => ({
+
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
@@ -45,11 +59,13 @@ jest.mock('@/hooks/usePullToRefresh', () => ({
 }));
 
 jest.mock('@/hooks/useTiltEffect', () => ({
+
   useMouseParallax: () => ({ x: 0, y: 0 }),
   useTiltEffect: () => ({ ref: { current: null }, style: {}, handlers: {} }),
 }));
 
 jest.mock('@/hooks/useDevicePerformance', () => ({
+
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
     prefersReducedMotion: true,
@@ -57,12 +73,14 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 jest.mock('@/utils/onboardingStorage', () => ({
+
   hasCompletedOnboarding: () => true,
   markOnboardingSkipped: jest.fn(),
 }));
 
 // Mock Next.js components
 jest.mock('next/link', () => {
+
   const MockLink = ({ children, href }: { children: React.ReactNode; href: string }) => {
     return <a href={href}>{children}</a>;
   };
@@ -71,6 +89,7 @@ jest.mock('next/link', () => {
 });
 
 jest.mock('next/navigation', () => ({
+
   useRouter: () => ({
     push: jest.fn(),
     replace: jest.fn(),
@@ -79,12 +98,14 @@ jest.mock('next/navigation', () => ({
 }));
 
 jest.mock('next/dynamic', () => () => {
+
   const DynamicComponent = () => <div>Mocked Dynamic Component</div>;
   return DynamicComponent;
 });
 
 // Mock framer-motion
 jest.mock('framer-motion', () => {
+
   const motionObj = {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     h1: ({ children, ...props }: any) => <h1 {...props}>{children}</h1>,
@@ -110,34 +131,41 @@ jest.mock('framer-motion', () => {
 
 // Mock components
 jest.mock('@/components/Header', () => {
+
   return function MockHeader() {
     return <header data-testid="header">Header</header>;
   };
 });
 
 jest.mock('@/components/ui/PlayfulBackground', () => ({
+
   PlayfulBackground: () => <div data-testid="playful-background">Background</div>,
 }));
 
 jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
+
   PullToRefreshIndicator: () => <div data-testid="pull-to-refresh">Pull to Refresh</div>,
 }));
 
 jest.mock('@/components/ui/InteractiveMascot', () => ({
+
   InteractiveMascotWithEntrance: () => <div data-testid="mascot">Mascot</div>,
 }));
 
 jest.mock('@/components/ui/IdleMascot', () => ({
+
   IdleMascotWithEntrance: () => <div data-testid="idle-mascot">Idle Mascot</div>,
 }));
 
 jest.mock('@/components/daily/DailyChallengeBanner', () => {
+
   return function MockDailyChallengeBanner() {
     return <div data-testid="daily-challenge-banner">Daily Challenge</div>;
   };
 });
 
 jest.mock('../ModeCard', () => {
+
   return function MockModeCard({ title, locked, loading, lockedMessage }: { title: string; locked?: boolean; loading?: boolean; lockedMessage?: string }) {
     return (
       <div data-testid={`mode-card-${title}`}>
@@ -150,35 +178,42 @@ jest.mock('../ModeCard', () => {
 });
 
 jest.mock('../ModeCard', () => {
+
   return function MockModeCard({ title }: { title: string }) {
     return <div data-testid={`mode-card-${title}`}>{title}</div>;
   };
 });
 
 jest.mock('@/hooks/usePlayerStats', () => ({
+
   usePlayerStats: () => ({ allTimeBest: null }),
 }));
 
 jest.mock('@/hooks/useDailyChallengeStatus', () => ({
+
   useDailyChallengeStatus: () => ({ hasCompleted: false, isLoading: false }),
 }));
 
 jest.mock('@/utils/perfVariant', () => ({
+
   getPerfVariant: () => 'control',
 }));
 
 jest.mock('../LandingShareBanner', () => ({
+
   LandingShareBanner: ({ onShareClick }: { onShareClick: () => void }) => (
     <button data-testid="landing-share-banner" onClick={onShareClick}>Share</button>
   ),
 }));
 
 jest.mock('../LandingSEOSection', () => ({
+
   LandingSEOSection: () => <div data-testid="seo-section">SEO Content</div>,
   ScrollIndicator: () => <div data-testid="scroll-indicator">Scroll</div>,
 }));
 
 jest.mock('@/components/auth/AuthModal', () => {
+
   return function MockAuthModal() {
     return <div data-testid="auth-modal">Auth Modal</div>;
   };
@@ -196,6 +231,7 @@ let mockAuthState: {
 
 // Reset mock to use dynamic values
 jest.mock('@/contexts/AuthContext', () => ({
+
   useAuth: () => mockAuthState,
 }));
 

@@ -3741,6 +3741,11 @@ const en = {
       "faq6A": "Yes! Use the Community Board Builder to design custom letter grids with your own seed words. Publish them for others to play, rate, and compete on. Top boards get featured on the home page.",
       "communityTitle": "Join Thousands of Word Game Enthusiasts",
       "communityContent": "LexiClash players span over 40 countries and five languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights."
+    },
+    "firstTimer": {
+      "exploreModes": "Explore Modes",
+      "playFirst": "Play Your First Game",
+      "playFirstDesc": "Jump in and find as many words as you can!"
     }
   },
   "modeDiscovery": {
@@ -3771,6 +3776,7 @@ const en = {
     "finish": "Finish",
     "victory": "Victory!",
     "gameOver": "Game Over",
+    "progressAnnouncement": "Found {found} words — {missed} more were hiding!",
     "verifyingWords": "Checking your words...",
     "practiceComplete": "Nice practice!",
     "newHighScore": "New Record!",
@@ -5693,7 +5699,9 @@ const en = {
       "dailyQuests": "Daily Quests",
       "continue": "Continue",
       "worldMap": "World Map",
-      "wordAlbum": "Word Album"
+      "wordAlbum": "Word Album",
+      "bossRush": "Boss Rush",
+      "bossRushLocked": "Defeat all bosses to unlock Boss Rush"
     },
     "retryLevel": "Retry",
     "freeRetry": "Free Retry",
@@ -5712,7 +5720,36 @@ const en = {
     },
     "endlessMode": {
       "teaser": "Endless Mode",
-      "comingSoon": "Complete World 10 to unlock"
+      "comingSoon": "Complete World 10 to unlock",
+      "bossFloor": "Boss Floor",
+      "floor": "Floor",
+      "floorCleared": "Floor Cleared!",
+      "gridSize": "Grid Size",
+      "highFloor": "Highest Floor",
+      "newRecord": "New Record!",
+      "nextFloor": "Next Floor",
+      "quit": "Quit Run",
+      "runOver": "Run Over",
+      "scoreTarget": "Score Target",
+      "startRun": "Start Run",
+      "subtitle": "How far can you go?",
+      "timeLimit": "Time Limit",
+      "title": "Endless Mode"
+    },
+    "bossRush": {
+      "backToHub": "Back to Hub",
+      "bossOf": "Boss of",
+      "defeated": "Defeated!",
+      "fighting": "Fighting",
+      "fullClear": "Full Clear!",
+      "fullClearBonus": "Full Clear Bonus",
+      "goldEarned": "Gold Earned",
+      "runOver": "Run Over",
+      "startRush": "Start Rush",
+      "subtitle": "Defeat every boss in a row!",
+      "title": "Boss Rush",
+      "tryAgain": "Try Again",
+      "xpEarned": "XP Earned"
     },
     "weeklyChallenge": {
       "title": "Weekly Challenge",
@@ -6534,6 +6571,7 @@ const en = {
       "gold": "Gold",
       "bonusGold": "Bonus Gold",
       "bossTrophy": "Boss Trophy",
+      "chest": "Loot Chest",
       "loreScroll": "Lore Scroll",
       "runeFragment": "Rune Fragment",
       "tapToOpen": "Tap to open",

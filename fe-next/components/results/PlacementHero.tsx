@@ -104,17 +104,40 @@ const PlacementHero = memo<PlacementHeroProps>(({
 
   return (
     <motion.div
-      initial={reducedMotion ? undefined : { opacity: 0, scale: 0.92, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 180, damping: 20 }}
+      initial={reducedMotion ? undefined : { opacity: 0, scale: 0.88, y: 30, rotate: -1 }}
+      animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+      transition={{ type: 'spring', stiffness: 160, damping: 16 }}
       className="w-full"
     >
       <div
         className="relative overflow-hidden bg-slate-800/40 border-3 border-neo-cream shadow-hard-lg cursor-pointer"
         onClick={() => rank <= 3 && !reducedMotion && fireRankConfetti(rank)}
       >
+        {/* Animated accent border glow for top 3 */}
+        {rank <= 3 && !reducedMotion && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none z-[2]"
+            animate={{
+              boxShadow: [
+                `inset 0 0 0px transparent, 0 0 0px transparent`,
+                `inset 0 0 25px color-mix(in srgb, ${theme.accentColor} 15%, transparent), 0 0 15px color-mix(in srgb, ${theme.accentColor} 20%, transparent)`,
+                `inset 0 0 0px transparent, 0 0 0px transparent`,
+              ],
+            }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+
         {/* Halftone texture */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:10px_10px]" />
+
+        {/* Diagonal energy stripes */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.025]"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 14px, #fff 14px, #fff 16px)',
+          }}
+        />
 
         {/* Shimmer sweep — slow cinematic swipe */}
         {!reducedMotion && (
@@ -230,10 +253,10 @@ const PlacementHero = memo<PlacementHeroProps>(({
 
           {/* Score box — responsive padding, hover lift */}
           <motion.div
-            initial={reducedMotion ? undefined : { opacity: 0, scale: 0.8, rotate: -2 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-            transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 15 }}
+            initial={reducedMotion ? undefined : { opacity: 0, scale: 0.7, rotate: -3, y: 15 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
+            whileHover={{ scale: 1.05, rotate: 1, transition: { duration: 0.15 } }}
+            transition={{ delay: 0.35, type: 'spring', stiffness: 250, damping: 14 }}
             className="bg-neo-black border-3 border-neo-cream px-5 py-2.5 sm:px-8 sm:py-3 shadow-hard-lg flex flex-col items-center relative overflow-hidden"
           >
             {/* Score shimmer sweep */}

@@ -14,6 +14,8 @@ interface UseCoinRewardsParams {
   results: SinglePlayerResultsData;
   playerRank: number;
   totalParticipants: number;
+  /** Current win streak for tier coin bonus */
+  currentStreak?: number;
 }
 
 interface CoinRewardsResult {
@@ -28,6 +30,7 @@ export function useCoinRewards({
   results,
   playerRank,
   totalParticipants,
+  currentStreak,
 }: UseCoinRewardsParams): CoinRewardsResult {
   const { awardGameCompletion } = useCoinContext();
   const [coinReward, setCoinReward] = useState<CoinRewardResult | null>(null);
@@ -51,6 +54,7 @@ export function useCoinRewards({
           score: results.playerScore,
           rank: playerRank,
           totalPlayers: totalParticipants,
+          currentStreak,
         });
 
         if (reward && mountedRef.current) {
@@ -62,7 +66,7 @@ export function useCoinRewards({
     }
 
     void awardCoins();
-  }, [awardGameCompletion, results.playerScore, results.gameSessionId, playerRank, totalParticipants]);
+  }, [awardGameCompletion, results.playerScore, results.gameSessionId, playerRank, totalParticipants, currentStreak]);
 
   return { coinReward };
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { calculateWordScore, getComboBonus } from '@/shared/utils/scoring';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
@@ -10,9 +11,9 @@ interface PageParams {
   params: Promise<{ locale: string; word: string }>;
 }
 
-/** Calculate base points for a word (length - 1) */
+/** Calculate base points for a word using canonical scoring */
 function getBasePoints(word: string): number {
-  return Math.max(word.length - 1, 1);
+  return calculateWordScore(word);
 }
 
 /** Get letter frequency map */
@@ -56,11 +57,10 @@ function sanitizeWord(raw: string): string | null {
   return cleaned;
 }
 
-/** Get combo bonus for a given word length and combo level */
+/** Get combo score for a given word length and combo level */
 function getComboScore(wordLength: number, comboLevel: number): number {
-  const base = Math.max(wordLength - 1, 1);
-  const factor = wordLength <= 3 ? 0.2 : wordLength === 4 ? 0.5 : wordLength === 5 ? 1.0 : wordLength === 6 ? 1.5 : 2.0;
-  return base + Math.floor(comboLevel * factor);
+  const dummyWord = 'A'.repeat(wordLength);
+  return calculateWordScore(dummyWord, comboLevel);
 }
 
 export const revalidate = 86400;

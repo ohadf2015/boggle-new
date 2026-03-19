@@ -80,6 +80,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
 const mockPlayAchievementSound = jest.fn();
 jest.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
+    playWordAcceptedSound: jest.fn(),
+    playComboSound: jest.fn(),
+    playComboBreakSound: jest.fn(),
+    playCountdownBeep: jest.fn(),
+    playComboMilestoneSound: jest.fn(),
+    playComboSavedSound: jest.fn(),
+    setGameActive: jest.fn(),
     playAchievementSound: mockPlayAchievementSound,
     playSound: jest.fn(),
     playWordSound: jest.fn(),

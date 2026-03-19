@@ -21,6 +21,7 @@ export interface ScoreRevealPlayer {
     color?: string;
     profilePictureUrl?: string | null;
     avatarImage?: string;
+    customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   };
   isCurrentPlayer?: boolean;
 }
@@ -223,19 +224,20 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
       <motion.div
         key={player.username}
         layout={enableComplexAnimations && isRevealing}
-        initial={shouldAnimate ? { opacity: 0, x: -20 } : false}
-        animate={{ opacity: 1, x: 0 }}
+        initial={shouldAnimate ? { opacity: 0, x: -30, scale: 0.95 } : false}
+        animate={{ opacity: 1, x: 0, scale: 1 }}
         transition={{
-          layout: { type: 'spring', stiffness: 300, damping: 30 },
+          layout: { type: 'spring', stiffness: 250, damping: 25 },
           opacity: { duration: 0.3 },
+          scale: { type: 'spring', stiffness: 300, damping: 20 },
         }}
         className={cn(
-          'flex items-center gap-3 p-2 rounded-neo border-2 border-neo-black transition-colors duration-300',
+          'flex items-center gap-3 p-2.5 rounded-neo border-2 border-neo-black transition-colors duration-300',
           isTop3 ? rankStyle.bg : 'bg-neo-cream',
           isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-1',
           'shadow-hard-sm',
           // Flash highlight when position just swapped
-          lastPositionSwap && sortedByDisplayed[position]?.username === player.username && 'bg-neo-lime/20'
+          lastPositionSwap && sortedByDisplayed[position]?.username === player.username && 'bg-neo-lime/30'
         )}
       >
         {/* Rank badge */}
@@ -254,6 +256,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         <Avatar
           profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
           avatarImage={player.avatar?.avatarImage}
+          customAvatar={player.avatar?.customAvatar}
           size="sm"
           className="border-2 border-neo-black"
         />
@@ -307,16 +310,22 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
       {/* Reveal progress bar (only during animation) */}
       {isRevealing && enableComplexAnimations && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="h-1 bg-white/10 rounded-full overflow-hidden mb-3"
+          initial={{ opacity: 0, scaleX: 0.8 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-3 border border-white/5"
         >
           <motion.div
-            className="h-full bg-neo-lime"
-            style={{ boxShadow: '0 0 12px var(--neo-lime, #BFFF00), 0 0 4px var(--neo-lime, #BFFF00)' }}
+            className="h-full bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime"
+            style={{
+              boxShadow: '0 0 16px var(--neo-lime, #BFFF00), 0 0 6px var(--neo-lime, #BFFF00)',
+              backgroundSize: '200% 100%',
+            }}
             initial={{ width: '0%' }}
-            animate={{ width: '100%' }}
-            transition={{ duration: clampedDuration / 1000, ease: 'easeOut' }}
+            animate={{ width: '100%', backgroundPosition: ['0% 0', '100% 0'] }}
+            transition={{
+              width: { duration: clampedDuration / 1000, ease: 'easeOut' },
+              backgroundPosition: { duration: 1, repeat: Infinity, ease: 'linear' },
+            }}
           />
         </motion.div>
       )}

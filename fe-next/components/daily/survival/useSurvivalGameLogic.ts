@@ -12,6 +12,7 @@ import {
   LIFE_DRAIN_RATE,
   NEW_PLAYER_LIFE_DRAIN_RATE,
   NEW_PLAYER_THRESHOLD,
+  getLanguageDrainMultiplier,
 } from './constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -242,7 +243,8 @@ export function useSurvivalGameLogic({
 
   // Check if player is new (first 3 daily challenges) - calculated once
   const isNewPlayer = useRef(isNewDailyPlayer(NEW_PLAYER_THRESHOLD));
-  const drainRate = isNewPlayer.current ? NEW_PLAYER_LIFE_DRAIN_RATE : LIFE_DRAIN_RATE;
+  const baseDrainRate = isNewPlayer.current ? NEW_PLAYER_LIFE_DRAIN_RATE : LIFE_DRAIN_RATE;
+  const drainRate = baseDrainRate * getLanguageDrainMultiplier(language);
 
   // Life drain effect
   useEffect(() => {

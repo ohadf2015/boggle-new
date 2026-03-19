@@ -225,7 +225,8 @@ export function useResultsSideEffects({
       'multiplayer',
       currentPlayerData.score || 0,
       currentPlayerRank,
-      totalPlayers
+      totalPlayers,
+      currentStreak
     );
 
     if (reward && reward.awarded > 0) {
@@ -250,7 +251,7 @@ export function useResultsSideEffects({
     }
 
     hasAwardedCoinsRef.current = true;
-  }, [currentPlayerData, currentPlayerRank, totalPlayers, gameCode, user?.id, refreshCoins]);
+  }, [currentPlayerData, currentPlayerRank, totalPlayers, gameCode, user?.id, refreshCoins, currentStreak]);
 
   // ==============================================
   // EFFECT 3: Save Cognitive Score

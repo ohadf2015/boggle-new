@@ -25,7 +25,7 @@ export async function searchUsers(query: string, limit: number = 10): Promise<Fr
 
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, total_games, current_level, last_seen_at')
+    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, avatar_config, total_games, current_level, last_seen_at')
     .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
     .neq('id', user.id)
     .limit(limit);
@@ -59,6 +59,7 @@ export async function searchUsers(query: string, limit: number = 10): Promise<Fr
     avatarImage: p.avatar_image,
     avatarEmoji: p.avatar_emoji || '😊',
     avatarColor: p.avatar_color || '#4F46E5',
+    customAvatar: p.avatar_config as Friend['customAvatar'],
     status: existingMap.get(p.id) || ('none' as FriendStatus),
     isOnline: isUserOnline(p.last_seen_at),
     lastSeenAt: p.last_seen_at,
@@ -309,7 +310,7 @@ export async function getUserByUsername(username: string): Promise<Friend | null
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, total_games, current_level, last_seen_at')
+    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, avatar_config, total_games, current_level, last_seen_at')
     .eq('username', username)
     .single();
 
@@ -325,6 +326,7 @@ export async function getUserByUsername(username: string): Promise<Friend | null
     avatarImage: profile.avatar_image,
     avatarEmoji: profile.avatar_emoji || '😊',
     avatarColor: profile.avatar_color || '#4F46E5',
+    customAvatar: profile.avatar_config as Friend['customAvatar'],
     status: 'none' as FriendStatus,
     isOnline: isUserOnline(profile.last_seen_at),
     lastSeenAt: profile.last_seen_at,

@@ -23,12 +23,12 @@ interface StatsCardGridProps {
 }
 
 const accentBg: Record<string, string> = {
-  lime: 'bg-neo-lime/15 border-neo-lime/30',
-  pink: 'bg-neo-pink/15 border-neo-pink/30',
-  orange: 'bg-neo-orange/15 border-neo-orange/30',
-  cyan: 'bg-neo-cyan/15 border-neo-cyan/30',
-  amber: 'bg-amber-500/15 border-amber-500/30',
-  default: 'bg-slate-800/50 border-slate-700/50',
+  lime: 'bg-neo-lime/10 border-neo-lime/25 border-t-neo-lime',
+  pink: 'bg-neo-pink/10 border-neo-pink/25 border-t-neo-pink',
+  orange: 'bg-neo-orange/10 border-neo-orange/25 border-t-neo-orange',
+  cyan: 'bg-neo-cyan/10 border-neo-cyan/25 border-t-neo-cyan',
+  amber: 'bg-amber-500/10 border-amber-500/25 border-t-amber-500',
+  default: 'bg-slate-800/50 border-slate-700/50 border-t-slate-500',
 };
 
 const container = {
@@ -125,24 +125,26 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
           whileHover={prefersReduced ? undefined : { y: -2, scale: 1.03 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className={cn(
-            'rounded-neo border-2 p-3 text-center cursor-default',
+            'rounded-neo border-2 border-t-[3px] p-3 text-center cursor-default relative overflow-hidden',
             accentBg[card.accent ?? 'default'],
           )}
         >
+          {/* Subtle inner glow */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(ellipse_at_top,#fff_0%,transparent_60%)]" />
           {card.icon && (
             <motion.div
-              className="text-lg mb-0.5"
-              initial={prefersReduced ? undefined : { scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 12, delay: 0.3 }}
+              className="text-xl mb-1 relative z-10"
+              initial={prefersReduced ? undefined : { scale: 0, rotate: -15 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 12, delay: 0.35 }}
             >
               {card.icon}
             </motion.div>
           )}
-          <div className="text-xl font-black text-white tabular-nums">
+          <div className="text-2xl font-black text-white tabular-nums relative z-10">
             {card.value}
           </div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 relative z-10">
             {card.label}
           </div>
         </motion.div>

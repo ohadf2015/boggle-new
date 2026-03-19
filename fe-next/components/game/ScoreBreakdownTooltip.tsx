@@ -10,14 +10,14 @@ interface ScoreBreakdownTooltipProps {
   minWordLength?: number;
 }
 
-// Standard Boggle scoring rules
+// Exponential scoring — must match shared/utils/scoring.ts WORD_SCORES
 const SCORING_RULES = [
-  { letters: '3', points: 1 },
-  { letters: '4', points: 2 },
-  { letters: '5', points: 4 },
-  { letters: '6', points: 8 },
-  { letters: '7', points: 16 },
-  { letters: '8+', points: '32+' },
+  { letters: '3', points: 10 },
+  { letters: '4', points: 20 },
+  { letters: '5', points: 50 },
+  { letters: '6', points: 100 },
+  { letters: '7', points: 200 },
+  { letters: '8+', points: '500+' },
 ];
 
 /**

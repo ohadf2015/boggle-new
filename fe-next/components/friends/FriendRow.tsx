@@ -114,6 +114,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
       <div className="relative">
         <Avatar
           avatarImage={friend.avatarImage}
+          customAvatar={friend.customAvatar}
           size={compact ? 'sm' : 'md'}
         />
         <FriendStatusIndicator

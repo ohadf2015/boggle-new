@@ -25,6 +25,7 @@ interface WorldMapProps {
   totalStars: number;
   completions: Array<{ world: number; level: number; stars: number }>;
   onWorldSelect: (worldId: number) => void;
+  masteryTiers?: Record<number, number>;
 }
 
 // Motion variants - extracted to constants to prevent re-creation on every render

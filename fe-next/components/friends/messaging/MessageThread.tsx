@@ -140,6 +140,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                 <div className="relative">
                   <Avatar
                     avatarImage={thread.friendAvatar.image}
+                    customAvatar={thread.friendAvatar.customAvatar}
                     size="sm"
                     className="border-2 border-neo-black"
                   />
@@ -218,6 +219,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                       {!isMine && showAvatar && (
                         <Avatar
                           avatarImage={thread.friendAvatar.image}
+                    customAvatar={thread.friendAvatar.customAvatar}
                           size="sm"
                           className="border-2 border-neo-black flex-shrink-0"
                         />
@@ -273,6 +275,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                   >
                     <Avatar
                       avatarImage={thread.friendAvatar.image}
+                    customAvatar={thread.friendAvatar.customAvatar}
                       size="sm"
                       className="border-2 border-neo-black flex-shrink-0"
                     />

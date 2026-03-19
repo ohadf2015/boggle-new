@@ -112,14 +112,14 @@ export function ResultsModals({
 
   const modals = useMemo(
     () => [
-      { id: 'levelUp', priority: 1, isReady: levelUp.showLevelUpCelebration && !!levelUp.levelUpData },
+      // Level-up celebration disabled on MP results — XP/level shown inline in player card
+      { id: 'levelUp', priority: 1, isReady: false },
       { id: 'referralMilestone', priority: 2, isReady: referralMilestone.showReferralMilestone },
       { id: 'firstWin', priority: 3, isReady: !hideExternal && firstWinModal.showFirstWinModal },
       { id: 'auth', priority: 4, isReady: !hideExternal && authModal.showAuthModal },
       { id: 'wordFeedback', priority: 5, isReady: wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null },
     ],
     [
-      levelUp.showLevelUpCelebration, levelUp.levelUpData,
       referralMilestone.showReferralMilestone,
       firstWinModal.showFirstWinModal,
       authModal.showAuthModal,

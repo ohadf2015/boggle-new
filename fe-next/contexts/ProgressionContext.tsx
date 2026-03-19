@@ -46,7 +46,8 @@ interface ProgressionContextType {
     stars: 0 | 1 | 2 | 3,
     score: number,
     words: number,
-    goldEarned?: number
+    goldEarned?: number,
+    longWords?: number
   ) => Promise<void>;
   /** Record a level attempt (including failures) */
   recordAttempt: (
@@ -156,7 +157,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       stars: 0 | 1 | 2 | 3,
       score: number,
       words: number,
-      goldEarned?: number
+      goldEarned?: number,
+      longWords?: number
     ) => {
       if (!user?.id) {
         // Guest users can't save progress — silently skip
@@ -177,6 +179,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             score,
             words,
             ...(goldEarned !== undefined && { goldEarned }),
+            ...(longWords !== undefined && { longWords }),
           }),
         });
 

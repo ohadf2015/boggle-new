@@ -248,9 +248,9 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+      initial={{ opacity: 0, scale: 0.85, y: 30, rotate: -3 }}
+      animate={{ opacity: 1, scale: 1, y: 0, rotate: -1 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 18 }}
       className="mb-3 sm:mb-4 relative w-full"
     >
       {/* Neo-Brutalist Main Container - Clickable for confetti */}
@@ -258,20 +258,43 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
         className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] -rotate-1`}
         onClick={handleConfetti}
       >
+        {/* Animated accent border glow for winner */}
+        {rank === 1 && variant === 'ranking' && !reducedMotion && (
+          <motion.div
+            className="absolute inset-0 rounded-neo-lg pointer-events-none z-[2]"
+            animate={{
+              boxShadow: [
+                'inset 0 0 0px rgba(191,255,0,0), 0 0 0px rgba(191,255,0,0)',
+                'inset 0 0 30px rgba(191,255,0,0.15), 0 0 20px rgba(191,255,0,0.2)',
+                'inset 0 0 0px rgba(191,255,0,0), 0 0 0px rgba(191,255,0,0)',
+              ],
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+
         {/* Comic-style halftone texture pattern */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,rgb(var(--neo-black))_1px,transparent_1px)] bg-[length:12px_12px]"
         />
 
-        {/* Shimmer sweep effect */}
+        {/* Diagonal accent stripes for visual energy */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.04]"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgb(var(--neo-black)) 10px, rgb(var(--neo-black)) 12px)',
+          }}
+        />
+
+        {/* Shimmer sweep effect — faster, more dramatic */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)',
+            background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.2) 48%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.2) 52%, transparent 70%)',
             backgroundSize: '200% 100%',
           }}
           animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
-          transition={{ duration: 2.5, delay: 0.8, ease: 'easeInOut' }}
+          transition={{ duration: 2, delay: 0.5, ease: 'easeInOut' }}
         />
 
         {/* Content - Two-row centered layout */}
@@ -281,10 +304,10 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
             {/* Rank placement badge */}
             {variant === 'ranking' && (
               <motion.div
-                initial={{ scale: 0, rotate: -20 }}
-                animate={{ scale: 1, rotate: -3 }}
-                transition={{ delay: 0.3, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-                whileHover={{ scale: 1.1, rotate: 0, transition: { duration: 0.2 } }}
+                initial={{ scale: 0, rotate: -30, y: -20 }}
+                animate={{ scale: 1, rotate: -3, y: 0 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 12 }}
+                whileHover={{ scale: 1.15, rotate: 3, transition: { duration: 0.15 } }}
                 className="flex-shrink-0"
               >
                 <div className={`
@@ -360,21 +383,33 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
 
             {/* Score Badge - Prominent with count-up */}
             <motion.div
-              initial={{ scale: 0, rotate: 5 }}
-              animate={{ scale: 1, rotate: 2 }}
-              transition={{ delay: 0.5, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+              initial={{ scale: 0, rotate: 8, x: 20 }}
+              animate={{ scale: 1, rotate: 2, x: 0 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 350, damping: 14 }}
               whileHover={{ scale: 1.08, rotate: 0, transition: { duration: 0.15 } }}
               className="flex-shrink-0 ms-auto"
             >
               <div className={`
                 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard
-                flex flex-col items-center justify-center
+                flex flex-col items-center justify-center relative overflow-hidden
                 ${compact ? 'px-2.5 py-1.5' : 'px-3 py-2 sm:px-4 sm:py-2.5'}
               `}>
+                {/* Score box shimmer */}
+                {!reducedMotion && (
+                  <motion.div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(110deg, transparent 30%, rgba(0,0,0,0.06) 50%, transparent 70%)',
+                      backgroundSize: '200% 100%',
+                    }}
+                    animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
+                    transition={{ duration: 2, delay: 2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 5 }}
+                  />
+                )}
                 <motion.div
                   initial={{ scale: 1 }}
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ delay: 1.8, duration: 0.3, ease: 'easeOut' }}
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ delay: 1.5, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
                 >
                   <ScoreCounter
                     target={winner.score}
@@ -388,22 +423,6 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
             </motion.div>
           </div>
         </div>
-
-        {/* Winner pulse ring - visible for 1st place */}
-        {rank === 1 && variant === 'ranking' && !reducedMotion && (
-          <>
-            <div
-              className="absolute inset-0 rounded-neo-lg pointer-events-none"
-              style={{ animation: 'banner-pulse-ring 2s ease-in-out 1s infinite' }}
-            />
-            <style>{`
-              @keyframes banner-pulse-ring {
-                0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,225,53,0), 0 0 20px rgba(255,225,53,0.15); }
-                50% { box-shadow: inset 0 0 20px rgba(255,225,53,0.15), 0 0 40px rgba(255,225,53,0.3); }
-              }
-            `}</style>
-          </>
-        )}
 
         {/* Mascot — scaled down in compact (mobile) mode */}
         <div className={`absolute z-20 pointer-events-none ${compact ? '-bottom-1 -right-1 scale-75 origin-bottom-right' : '-bottom-2 -right-2 sm:bottom-0 sm:right-0'}`}>

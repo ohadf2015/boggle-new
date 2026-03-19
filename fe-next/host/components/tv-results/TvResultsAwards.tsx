@@ -546,6 +546,7 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                     <Avatar
                       profilePictureUrl={award.recipient.avatar?.profilePictureUrl ?? undefined}
                       avatarImage={award.recipient.avatar?.avatarImage}
+                      customAvatar={award.recipient.avatar?.customAvatar}
                       size="md"
                       className="border-3 border-neo-black shadow-hard-sm"
                     />

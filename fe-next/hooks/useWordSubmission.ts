@@ -1,23 +1,24 @@
 /**
  * useWordSubmission - Unified word submission and validation hook
  *
- * Consolidates word validation logic from:
- * - SinglePlayerGame.tsx (~220 lines)
- * - DailyChallengeGame.tsx (~185 lines)
- * - InGameScreen.tsx (~70 lines for multiplayer)
+ * Used by DailyChallengeGame, SoloPracticeBoard, and any future modes.
  *
  * Features:
  * - Local validation (length, duplicates, board presence)
- * - Dictionary API validation
+ * - Client-side dictionary cache for instant validation (IndexedDB + memory)
+ * - Pre-validation cache (words validated while user types)
+ * - Fallback to dictionary API when cache misses
  * - Optional spam detection
- * - Combo integration
- * - Score calculation
+ * - Optimistic combo increment (combo increments at submit, rolls back on reject)
+ * - Score calculation via canonical scoring engine
  * - Feedback state management
  */
 
 import { useState, useRef, useCallback, useMemo } from 'react';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
-import { getComboBonus } from '@/shared/utils/scoring';
+import { getComboBonus, calculateWordScore } from '@/shared/utils/scoring';
+import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { usePrevalidation } from '@/hooks/usePrevalidation';
 import type { Language, LetterGrid } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -84,7 +85,9 @@ export interface WordSubmissionReturn {
   /** Get valid word count */
   validWordCount: number;
   /** Calculate word score */
-  calculateScore: (wordLength: number, comboLevel: number) => number;
+  calculateScore: (word: string, comboLevel: number) => number;
+  /** Prefetch validation for a word being formed (call as user swipes) */
+  prefetchValidation: (word: string) => void;
 }
 
 // ==================== Constants ====================
@@ -125,6 +128,12 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
   // Keep combo ref in sync
   comboLevelRef.current = comboLevel;
 
+  // Client-side dictionary cache — preloads full dictionary for O(1) lookups
+  const { checkWord: checkWordInCache, isLoaded: isDictionaryCacheLoaded } = useDictionaryCache(language);
+
+  // Pre-validation cache — validates words as user swipes, before submit
+  const { prefetch: prefetchValidation, getCached: getPrevalidationCached, clearCache: clearPrevalidationCache } = usePrevalidation(language);
+
   // Calculate valid word count
   const validWordCount = useMemo(() => {
     return foundWords.filter(w => w.isValid === true).length;
@@ -133,26 +142,19 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
   /**
    * Calculate word score based on length and combo - matches backend scoring engine
    */
-  const calculateScore = useCallback((wordLength: number, currentCombo: number): number => {
-    // Base score: word length - 1 (matches multiplayer scoring)
-    const baseScore = Math.max(wordLength - 1, 1);
-    // Combo bonus based on combo level and word length (matches backend formula)
-    const comboBonus = getComboBonus(currentCombo, wordLength);
-    // Fire round multiplier (2x during fire round, 1x otherwise)
+  const calculateScore = useCallback((word: string, currentCombo: number): number => {
     const multiplier = fireRoundActive ? 2 : 1;
-    return (baseScore + comboBonus) * multiplier;
+    return calculateWordScore(word, currentCombo, multiplier);
   }, [fireRoundActive]);
 
   /**
    * Check spam detection
-   * Returns true if submission should be blocked
    */
   const checkSpam = useCallback((): { blocked: boolean; warning: boolean; message?: string } => {
     if (!enableSpamDetection) return { blocked: false, warning: false };
 
     const now = Date.now();
 
-    // Check if on cooldown
     if (spamCooldownUntilRef.current > now) {
       const remaining = Math.ceil((spamCooldownUntilRef.current - now) / 1000);
       return {
@@ -162,7 +164,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       };
     }
 
-    // Prune old timestamps and add new one
     submissionTimestampsRef.current = submissionTimestampsRef.current.filter(
       ts => now - ts < SPAM_WINDOW_MS
     );
@@ -170,7 +171,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
     const submissionCount = submissionTimestampsRef.current.length;
 
-    // Check for spam cooldown
     if (submissionCount >= SPAM_COOLDOWN_THRESHOLD) {
       spamCooldownUntilRef.current = now + SPAM_COOLDOWN_MS;
       return {
@@ -180,7 +180,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       };
     }
 
-    // Warning for approaching limit
     if (submissionCount === SPAM_WARNING_THRESHOLD) {
       return {
         blocked: false,
@@ -191,6 +190,63 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
     return { blocked: false, warning: false };
   }, [enableSpamDetection, t]);
+
+  /**
+   * Handle a validated word (valid in dictionary)
+   */
+  const handleValidWord = useCallback((
+    normalizedWord: string,
+    now: number,
+    currentCombo: number,
+  ) => {
+    const fullScore = calculateScore(normalizedWord, currentCombo);
+    const comboBonus = getComboBonus(currentCombo, normalizedWord.length);
+    const fireRoundBonus = fireRoundActive
+      ? calculateWordScore(normalizedWord, currentCombo, 1)
+      : 0;
+
+    setFoundWords(prev => prev.map(fw =>
+      fw.word === normalizedWord && fw.timestamp === now
+        ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
+        : fw
+    ));
+
+    setCurrentFeedback({
+      id: `accept-${now}`,
+      type: 'accepted',
+      word: normalizedWord.toUpperCase(),
+      score: fullScore,
+      fireRoundActive,
+      fireRoundBonus,
+      timestamp: now,
+    });
+
+    onWordAccepted?.(normalizedWord, fullScore, comboBonus, fireRoundBonus);
+  }, [calculateScore, fireRoundActive, onWordAccepted]);
+
+  /**
+   * Handle an invalid word (not in dictionary)
+   */
+  const handleInvalidWord = useCallback((
+    normalizedWord: string,
+    now: number,
+  ) => {
+    setFoundWords(prev => prev.map(fw =>
+      fw.word === normalizedWord && fw.timestamp === now
+        ? { ...fw, isValid: false, score: 0 }
+        : fw
+    ));
+    const msg = t('playerView.invalidWord') || 'Not a valid word';
+    setCurrentFeedback({
+      id: `reject-${now}`,
+      type: 'rejected',
+      word: normalizedWord.toUpperCase(),
+      message: msg,
+      timestamp: now,
+    });
+    onWordRejected?.(normalizedWord, msg);
+    onComboReset?.();
+  }, [t, onWordRejected, onComboReset]);
 
   /**
    * Submit a word for validation
@@ -214,7 +270,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     }
 
     if (spamCheck.warning) {
-      // Show warning but don't block
       setCurrentFeedback({
         id: `warning-${now}`,
         type: 'rejected',
@@ -282,8 +337,12 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     // Add to set immediately to prevent double submission
     foundWordsSetRef.current.add(normalizedWord);
 
+    // Optimistically increment combo BEFORE validation.
+    // Ensures rapid submissions each get a unique combo level.
+    // If the word is invalid, combo resets via onComboReset.
+    onComboIncrement?.(true);
     const currentCombo = comboLevelRef.current;
-    const baseScore = calculateScore(normalizedWord.length, 0);
+    const baseScore = calculateScore(normalizedWord, 0);
     const timeSinceStart = (now - gameStartTimeRef.current) / 1000;
 
     // Step 4: Add word with pending state
@@ -292,10 +351,26 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       score: baseScore,
       timestamp: now,
       timeSinceStart,
-      isValid: null, // Awaiting dictionary API response
+      isValid: null,
     }]);
 
-    // Step 5: Validate with dictionary API
+    // Step 5a: Try client-side dictionary cache (instant, no network)
+    if (isDictionaryCacheLoaded && checkWordInCache(normalizedWord)) {
+      handleValidWord(normalizedWord, now, currentCombo);
+      return;
+    }
+
+    // Step 5b: Try pre-validation cache (validated while user was swiping)
+    const prevalidated = getPrevalidationCached(normalizedWord);
+    if (prevalidated === true) {
+      handleValidWord(normalizedWord, now, currentCombo);
+      return;
+    } else if (prevalidated === false) {
+      handleInvalidWord(normalizedWord, now);
+      return;
+    }
+
+    // Step 5c: Fallback to dictionary API (network round-trip)
     fetch('/api/dictionary/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -309,80 +384,30 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       })
       .then(result => {
         if (result.isValid) {
-          // Word is valid - calculate full score with combo using backend-matching formula
-          const fullScore = calculateScore(normalizedWord.length, currentCombo);
-          const wordLenScore = Math.max(normalizedWord.length - 1, 1);
-          const comboBonus = getComboBonus(currentCombo, normalizedWord.length);
-          const fireRoundBonus = fireRoundActive ? (wordLenScore + comboBonus) : 0;
-
-          setFoundWords(prev => prev.map(fw =>
-            fw.word === normalizedWord && fw.timestamp === now
-              ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
-              : fw
-          ));
-
-          setCurrentFeedback({
-            id: `accept-${now}`,
-            type: 'accepted',
-            word: normalizedWord.toUpperCase(),
-            score: fullScore,
-            fireRoundActive,
-            fireRoundBonus,
-            timestamp: now,
-          });
-
-          onWordAccepted?.(normalizedWord, fullScore, comboBonus, fireRoundBonus);
-          onComboIncrement?.(true);
+          handleValidWord(normalizedWord, now, currentCombo);
         } else {
-          // Word not in dictionary - reject immediately
-          setFoundWords(prev => prev.map(fw =>
-            fw.word === normalizedWord && fw.timestamp === now
-              ? { ...fw, isValid: false, score: 0 }
-              : fw
-          ));
-          const msg = t('playerView.invalidWord') || 'Not a valid word';
-          setCurrentFeedback({
-            id: `reject-${now}`,
-            type: 'rejected',
-            word: normalizedWord.toUpperCase(),
-            message: msg,
-            timestamp: now,
-          });
-          onWordRejected?.(normalizedWord, msg);
-          onComboReset?.();
+          handleInvalidWord(normalizedWord, now);
         }
       })
       .catch(() => {
-        // On API error, treat as rejected
-        setFoundWords(prev => prev.map(fw =>
-          fw.word === normalizedWord && fw.timestamp === now
-            ? { ...fw, isValid: false, score: 0 }
-            : fw
-        ));
-        const msg = t('playerView.invalidWord') || 'Not a valid word';
-        setCurrentFeedback({
-          id: `reject-${Date.now()}`,
-          type: 'rejected',
-          word: normalizedWord.toUpperCase(),
-          message: msg,
-          timestamp: Date.now(),
-        });
-        onWordRejected?.(normalizedWord, msg);
-        onComboReset?.();
+        handleInvalidWord(normalizedWord, now);
       });
   }, [
     grid,
     language,
     minWordLength,
     foundWords,
-    fireRoundActive,
     t,
     checkSpam,
     calculateScore,
-    onWordAccepted,
     onWordRejected,
     onComboReset,
     onComboIncrement,
+    isDictionaryCacheLoaded,
+    checkWordInCache,
+    getPrevalidationCached,
+    handleValidWord,
+    handleInvalidWord,
   ]);
 
   /**
@@ -402,7 +427,8 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     gameStartTimeRef.current = Date.now();
     submissionTimestampsRef.current = [];
     spamCooldownUntilRef.current = 0;
-  }, []);
+    clearPrevalidationCache();
+  }, [clearPrevalidationCache]);
 
   return {
     foundWords,
@@ -413,6 +439,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     reset,
     validWordCount,
     calculateScore,
+    prefetchValidation,
   };
 }
 

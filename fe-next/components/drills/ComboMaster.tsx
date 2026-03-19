@@ -69,9 +69,11 @@ export default function ComboMaster({
   const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const comboTimerRef = useRef<NodeJS.Timeout | null>(null);
-  // Ref to avoid stale closure in handleWordSubmit
+  // Refs to avoid stale closures in callbacks
   const comboRef = useRef(combo);
   comboRef.current = combo;
+  const comboBreaksRef = useRef(comboBreaks);
+  comboBreaksRef.current = comboBreaks;
 
   const { validateWord, availableWordSet } = useDrillWordSubmit({
     grid,
@@ -102,22 +104,29 @@ export default function ComboMaster({
     comboTimerRef.current = setInterval(() => {
       setComboTimer(prev => {
         if (prev <= 1) {
-          // Combo broken!
-          setCombo(0);
-          setComboBreaks(breaks => {
-            const newBreaks = breaks + 1;
-            if (newBreaks >= MAX_COMBO_BREAKS) {
-              if (comboTimerRef.current) clearInterval(comboTimerRef.current);
-              setPhase('complete');
-            }
-            return newBreaks;
-          });
-          return levelConfig.comboTimeout;
+          return 0; // Signal combo break
         }
         return prev - 1;
       });
     }, 1000);
   }, [levelConfig.comboTimeout]);
+
+  // Handle combo break when timer reaches 0
+  useEffect(() => {
+    if (comboTimer === 0 && phase === 'playing') {
+      setCombo(0);
+      comboRef.current = 0;
+      comboBreaksRef.current += 1;
+      const newBreaks = comboBreaksRef.current;
+      setComboBreaks(newBreaks);
+      if (newBreaks >= MAX_COMBO_BREAKS) {
+        if (comboTimerRef.current) clearInterval(comboTimerRef.current);
+        setPhase('complete');
+      } else {
+        setComboTimer(levelConfig.comboTimeout);
+      }
+    }
+  }, [comboTimer, phase, levelConfig.comboTimeout]);
 
   // Start game
   const startGame = useCallback(() => {
@@ -127,6 +136,7 @@ export default function ComboMaster({
     setWordsFound([]);
     setScore(0);
     setComboBreaks(0);
+    comboBreaksRef.current = 0;
 
     startTimeRef.current = Date.now();
     startComboTimer();

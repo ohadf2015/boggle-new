@@ -30,6 +30,7 @@ import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
@@ -37,7 +38,7 @@ export interface GameTimerState { timeRemaining: number; totalTime: number; isPl
 interface AdventureGameProps {
   levelConfig: LevelConfig;
   initialGrid: string[][];
-  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => void;
   onExit: () => void;
   onTimerStateChange?: (timerState: GameTimerState) => void;
   totalStars?: number;
@@ -81,6 +82,7 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [init.adjustedLevelConfig, init.upgradeEffects]);
     const { t, language } = useLanguage();
+    const { playWordAcceptedSound, playComboSound, playComboBreakSound, setGameActive, playCountdownBeep } = useSoundEffects();
 
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining,
@@ -178,6 +180,18 @@ const AdventureGame = memo<AdventureGameProps>(
       recordQuestProgress, chapterQuests, updateObjective,
     });
 
+    // SFX: gate sounds to active gameplay, countdown beep in last 10s
+    useEffect(() => { setGameActive(isPlaying); return () => setGameActive(false); }, [isPlaying, setGameActive]);
+    useEffect(() => { if (isPlaying && timeRemaining <= 10 && timeRemaining > 0) playCountdownBeep(timeRemaining); }, [isPlaying, timeRemaining, playCountdownBeep]);
+    // SFX: play word accepted sound when a new word is found
+    const prevWordsCountRef = useRef(0);
+    useEffect(() => {
+      if (gameState.wordsFound.length > prevWordsCountRef.current && isPlaying) {
+        playWordAcceptedSound();
+        if (gameState.comboCount >= 2) playComboSound(gameState.comboCount);
+      }
+      prevWordsCountRef.current = gameState.wordsFound.length;
+    }, [gameState.wordsFound, gameState.comboCount, isPlaying, playWordAcceptedSound, playComboSound]);
     useCrazyGamesLifecycle({
       isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,
       isGameOver: gameState.isComplete,

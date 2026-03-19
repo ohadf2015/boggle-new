@@ -56,6 +56,10 @@ interface AdventureHubProps {
   wordAlbumCount?: number;
   /** Navigate to weekly challenge */
   onWeeklyChallenge?: () => void;
+  /** Navigate to boss rush mode */
+  onBossRush?: () => void;
+  /** Whether player has defeated a boss */
+  hasBossDefeat?: boolean;
 }
 
 // ==============================================

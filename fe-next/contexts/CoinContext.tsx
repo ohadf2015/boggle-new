@@ -50,6 +50,8 @@ export interface CoinRewardBreakdown {
   streak?: number;
   scoreBonus?: number;
   placement?: number;
+  /** Bonus from streak tier (e.g. +5% at 3-day, +25% at 30-day) */
+  streakBonus?: number;
 }
 
 export interface CoinRewardResult {
@@ -87,6 +89,7 @@ interface CoinContextValue {
     rank?: number;
     totalPlayers?: number;
     gameCode?: string;
+    currentStreak?: number;
   }) => Promise<CoinRewardResult | null>;
 
   awardComboMilestone: (params: {
@@ -320,12 +323,13 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     rank?: number;
     totalPlayers?: number;
     gameCode?: string;
+    currentStreak?: number;
   }): Promise<CoinRewardResult | null> => {
-    const { sessionId, mode, score, rank, totalPlayers, gameCode } = params;
+    const { sessionId, mode, score, rank, totalPlayers, gameCode, currentStreak } = params;
     const awardKey = `lexiclash_game_coin_award_${sessionId}`;
 
     // Calculate reward first (needed for both auth and guest modes)
-    const reward = calculateGameReward(score, mode, rank, totalPlayers);
+    const reward = calculateGameReward(score, mode, rank, totalPlayers, currentStreak);
 
     // Don't show anything if reward is 0
     if (reward.total <= 0) {

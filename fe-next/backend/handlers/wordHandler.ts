@@ -17,6 +17,7 @@ import {
   markUserActivity,
   recordPeerValidationVote,
   getFirstFinder,
+  addPlayerWord as addPlayerWordToGame,
 } from '../modules/gameStateManager.js';
 
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
@@ -283,14 +284,28 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       // Check if someone else already found this word (first-to-find scoring)
       const firstFinder = getFirstFinder(gameCode, normalizedWord, username);
       if (firstFinder) {
-        // Someone else already found this word - they get the points
+        // Catch-up mechanic: give 50% partial credit for confirmation finds
+        // This rewards word knowledge without devaluing first-find
+        const { calculateWordScore } = await import('../modules/scoringEngine.js');
+        const baseScore = calculateWordScore(normalizedWord, 0);
+        const confirmationScore = Math.floor(baseScore * 0.5);
+
+        if (confirmationScore > 0) {
+          updatePlayerScore(gameCode, username, confirmationScore);
+          addPlayerWordToGame(gameCode, username, normalizedWord, {
+            score: confirmationScore,
+            validated: true,
+            autoValidated: true,
+          });
+        }
+
         socket.emit('wordAlreadyFoundByOther', {
           word: normalizedWord,
           foundBy: firstFinder.username,
           foundByAvatar: firstFinder.avatar || null,
+          confirmationScore,
         });
-        // Reset combo since word was already found
-        // Note: We don't count this as spam - it's valid gameplay
+        // Don't reset combo — player found a valid word, just not first
         await releaseGraceLockIfNeeded();
         return;
       }

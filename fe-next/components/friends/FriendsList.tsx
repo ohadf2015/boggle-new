@@ -368,7 +368,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 <div className="space-y-2">
                   {outgoingRequests.map(req => (
                     <div key={req.id} className="flex items-center gap-2 text-sm">
-                      <Avatar avatarImage={req.fromAvatarImage} size="sm" />
+                      <Avatar avatarImage={req.fromAvatarImage} customAvatar={req.fromCustomAvatar} size="sm" />
                       <span className={cn('flex-1', isDark ? 'text-gray-300' : 'text-gray-600')}>{req.fromUsername}</span>
                       <span className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-400')}>
                         ({t('friends.pending')})

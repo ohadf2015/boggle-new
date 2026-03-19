@@ -96,23 +96,17 @@ describe('useAdventureCurrency', () => {
       expect(result.current.gold).toBe(150);
     });
 
-    it('should track pending update after adding gold', () => {
-      // GIVEN: Hook with initial gold
+    it('should not set pendingUpdate (deprecated — gold persists via API)', () => {
       const { result } = renderHook(() =>
         useAdventureCurrency({ userId: 'user-123', initialGold: 100 })
       );
 
-      // WHEN: Adding gold
       act(() => {
         result.current.addGold(50);
       });
 
-      // THEN: Should have pending update
-      expect(result.current.pendingUpdate).toEqual({
-        userId: 'user-123',
-        gold: 150,
-        upgrades: {},
-      });
+      // pendingUpdate is deprecated — always null
+      expect(result.current.pendingUpdate).toBeNull();
     });
   });
 
@@ -194,23 +188,17 @@ describe('useAdventureCurrency', () => {
       expect(result.current.upgrades.fuelTank).toBe(2);
     });
 
-    it('should track pending update after purchase', () => {
-      // GIVEN: Hook with enough gold
+    it('should not set pendingUpdate after purchase (deprecated)', () => {
       const { result } = renderHook(() =>
         useAdventureCurrency({ userId: 'user-123', initialGold: 1000 })
       );
 
-      // WHEN: Purchasing upgrade
       act(() => {
         result.current.purchase('fuelTank');
       });
 
-      // THEN: Should have pending update
-      expect(result.current.pendingUpdate).toEqual({
-        userId: 'user-123',
-        gold: 950,
-        upgrades: { fuelTank: 1 },
-      });
+      // pendingUpdate is deprecated — always null
+      expect(result.current.pendingUpdate).toBeNull();
     });
   });
 
@@ -251,9 +239,8 @@ describe('useAdventureCurrency', () => {
     });
   });
 
-  describe('acknowledgePersistence', () => {
-    it('should clear pending update', () => {
-      // GIVEN: Hook with pending update
+  describe('pendingUpdate (deprecated)', () => {
+    it('should always be null (gold persists via server API)', () => {
       const { result } = renderHook(() =>
         useAdventureCurrency({ userId: 'user-123', initialGold: 1000 })
       );
@@ -262,14 +249,13 @@ describe('useAdventureCurrency', () => {
         result.current.addGold(100);
       });
 
-      expect(result.current.pendingUpdate).not.toBeNull();
+      // pendingUpdate is deprecated — always null
+      expect(result.current.pendingUpdate).toBeNull();
 
-      // WHEN: Acknowledging persistence
+      // acknowledgePersistence is a no-op
       act(() => {
         result.current.acknowledgePersistence();
       });
-
-      // THEN: Pending update should be cleared
       expect(result.current.pendingUpdate).toBeNull();
     });
   });

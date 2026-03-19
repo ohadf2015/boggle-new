@@ -89,12 +89,11 @@ export default function PatternSwitcher({
   // Generate random pattern — only request lengths that have unfound words on the board
   const generatePattern = useCallback(() => {
     const lengths: number[] = [];
-    // Track which words are "used" within this pattern to avoid requesting
-    // more words of a length than actually exist on the board
+    // Count only words NOT yet found across all patterns (fixes C3: impossible states)
     const wordCountByLength: Record<number, number> = {};
     for (const w of availableWords) {
       const len = w.word.length;
-      if (len <= MAX_WORD_LENGTH) {
+      if (len <= MAX_WORD_LENGTH && !wordsFoundSetRef.current.has(w.word.toLowerCase())) {
         wordCountByLength[len] = (wordCountByLength[len] || 0) + 1;
       }
     }
@@ -107,14 +106,20 @@ export default function PatternSwitcher({
       if (validLengths.length === 0) break; // No more valid lengths possible
       const randomLength = validLengths[Math.floor(Math.random() * validLengths.length)];
       lengths.push(randomLength);
-      remainingByLength[randomLength] = (remainingByLength[randomLength] || 1) - 1;
+      remainingByLength[randomLength] -= 1;
     }
     return lengths;
   }, [levelConfig.patternLength, availableLengths, availableWords]);
 
-  // Start game
+  // Start game — regenerate board if too few words for a valid pattern
   const startGame = useCallback(() => {
+    wordsFoundSetRef.current.clear();
     const newPattern = generatePattern();
+    if (newPattern.length === 0) {
+      // Board has too few words — request regeneration
+      onPlayAgain?.();
+      return;
+    }
     setPattern(newPattern);
     setPatternIndex(0);
     setRequiredLength(newPattern[0]);
@@ -123,10 +128,9 @@ export default function PatternSwitcher({
     setScore(0);
     setPatternsCompleted(0);
     setCurrentFeedback(null);
-    wordsFoundSetRef.current.clear();
     startTimeRef.current = Date.now();
     setPhase('playing');
-  }, [generatePattern, levelConfig.lives]);
+  }, [generatePattern, levelConfig.lives, onPlayAgain]);
 
   // Handle word submission with integrated validation feedback
   const handleWordSubmit = useCallback((word: string) => {
@@ -190,8 +194,13 @@ export default function PatternSwitcher({
           setPatternsCompleted(prev => prev + 1);
           setScore(prev => prev + 100); // Bonus
 
-          // Generate new pattern
+          // Generate new pattern — if board exhausted, end with bonus
           const newPattern = generatePattern();
+          if (newPattern.length === 0) {
+            setScore(prev => prev + 200);
+            setPhase('complete');
+            return;
+          }
           setPattern(newPattern);
           setPatternIndex(0);
           setRequiredLength(newPattern[0]);

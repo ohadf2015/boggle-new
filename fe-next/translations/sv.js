@@ -958,6 +958,7 @@ const sv = {
     "advancedSettings": "Avancerade inställningar",
     "roomClosedInactivity": "Rummet stängt på grund av inaktivitet",
     "gameOverCheckScores": "Spelet slut! Kolla slutresultaten",
+    "progressAnnouncement": "Hittade {found} ord — {missed} till gömde sig!",
     "youAreNowHost": "Du är nu värden!",
     "newHostAssigned": "är nu värden",
     "tournamentMode": "Turneringsläge",
@@ -3619,6 +3620,11 @@ const sv = {
       "faq6A": "Ja! Använd Communitybrädbyggaren för att designa egna bokstavsrutnät. Publicera dem så att andra kan spela, betygsätta och tävla. Topprankade brädor visas på startsidan.",
       "communityTitle": "Gå med tusentals ordspelsentusiaster",
       "communityContent": "LexiClash-spelare finns i över 40 länder och fem språk. Gå med i communityt för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäcka nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och community-höjdpunkter."
+    },
+    "firstTimer": {
+      "exploreModes": "Utforska lägen",
+      "playFirst": "Spela ditt första spel",
+      "playFirstDesc": "Hoppa in och hitta så många ord du kan!"
     }
   },
   "modeDiscovery": {
@@ -3649,6 +3655,7 @@ const sv = {
     "finish": "Avsluta",
     "victory": "Seger!",
     "gameOver": "Spelet slut",
+    "progressAnnouncement": "Hittade {found} ord — {missed} till gömde sig!",
     "verifyingWords": "Verifierar ord...",
     "practiceComplete": "Övning slutförd!",
     "newHighScore": "Nytt rekord!",
@@ -5436,7 +5443,9 @@ const sv = {
       "dailyQuests": "Dagliga uppdrag",
       "continue": "Fortsätt",
       "worldMap": "Världskarta",
-      "wordAlbum": "Ordalbum"
+      "wordAlbum": "Ordalbum",
+      "bossRush": "Bossrush",
+      "bossRushLocked": "Besegra alla bossar för att låsa upp Bossrush"
     },
     "album": {
       "title": "Ordalbum",
@@ -5453,7 +5462,36 @@ const sv = {
     },
     "endlessMode": {
       "teaser": "Oändligt läge",
-      "comingSoon": "Slutför värld 10 för att låsa upp"
+      "comingSoon": "Slutför värld 10 för att låsa upp",
+      "bossFloor": "Bossvåning",
+      "floor": "Våning",
+      "floorCleared": "Våning klarad!",
+      "gridSize": "Rutstorlek",
+      "highFloor": "Högsta våning",
+      "newRecord": "Nytt rekord!",
+      "nextFloor": "Nästa våning",
+      "quit": "Avsluta körning",
+      "runOver": "Körningen är över",
+      "scoreTarget": "Poängmål",
+      "startRun": "Starta körning",
+      "subtitle": "Hur långt kan du nå?",
+      "timeLimit": "Tidsgräns",
+      "title": "Oändligt läge"
+    },
+    "bossRush": {
+      "backToHub": "Tillbaka till hubben",
+      "bossOf": "Boss av",
+      "defeated": "Besegrad!",
+      "fighting": "Strider",
+      "fullClear": "Full rensning!",
+      "fullClearBonus": "Full rensningsbonus",
+      "goldEarned": "Guld intjänat",
+      "runOver": "Körningen är över",
+      "startRush": "Starta rush",
+      "subtitle": "Besegra alla bossar i rad!",
+      "title": "Bossrush",
+      "tryAgain": "Försök igen",
+      "xpEarned": "XP intjänat"
     },
     "share": {
       "bossDefeated": "Jag besegrade {{boss}} i {{world}}!",
@@ -6442,7 +6480,8 @@ const sv = {
       "tapToOpen": "Tryck för att öppna",
       "xp": "Erfarenhet",
       "bonusGold": "Bonusguld",
-      "bossTrophy": "Bosstrofé"
+      "bossTrophy": "Bosstrofé",
+      "chest": "Skattekista"
     },
     "later": "Senare",
     "nextLevel": "Nästa: Nivå",

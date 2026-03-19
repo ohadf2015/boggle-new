@@ -163,6 +163,12 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </LanguageProvider>
 );
 
+jest.mock('@/components/animations/ScorePopupFly', () => ({
+  ScorePopupFly: () => null,
+  __esModule: true,
+  default: () => null,
+}));
+
 describe('SinglePlayerGame - Word Submission', () => {
   beforeEach(() => {
     jest.clearAllMocks();

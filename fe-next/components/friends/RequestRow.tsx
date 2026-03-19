@@ -40,6 +40,7 @@ export const RequestRow: React.FC<RequestRowProps> = ({
     )}>
       <Avatar
         avatarImage={request.fromAvatarImage}
+        customAvatar={request.fromCustomAvatar}
         size="sm"
       />
       <div className="flex-1 min-w-0">

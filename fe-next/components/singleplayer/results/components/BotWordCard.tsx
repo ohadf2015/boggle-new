@@ -10,6 +10,7 @@ import React from 'react';
 import { Bot } from 'lucide-react';
 import { getPointColor, getTextColor } from '@/components/results/utils';
 import { applyHebrewFinalLetters } from '@/utils/utils';
+import { calculateWordScore } from '@/shared/utils/scoring';
 import type { BotWordDetail } from '../useResultsData';
 
 interface BotWordCardProps {
@@ -41,7 +42,7 @@ export function BotWordCard({ bot, language, t }: BotWordCardProps): React.React
       {bot.words && bot.words.length > 0 ? (
         <div className="flex flex-wrap gap-1">
           {bot.words.slice(0, 20).map((word, i) => {
-            const points = Math.max(word.length - 1, 1);
+            const points = calculateWordScore(word);
             const displayWord = language === 'he' ? applyHebrewFinalLetters(word) : word;
             return (
               <span

@@ -42,11 +42,12 @@ function validateRequestBody(body: Record<string, unknown>): {
     stars: number;
     score: number;
     words: number;
+    longWords?: number;
     lootDrops?: unknown[];
     retainedScore?: number;
   };
 } {
-  const { world, level, stars, score, words, lootDrops, retainedScore } = body;
+  const { world, level, stars, score, words, longWords, lootDrops, retainedScore } = body;
 
   // Check required fields
   if (
@@ -89,6 +90,7 @@ function validateRequestBody(body: Record<string, unknown>): {
     data: {
       world, level, stars, score, words,
       // TODO: persist lootDrops to inventory table once schema exists
+      ...(typeof longWords === 'number' && longWords >= 0 && { longWords }),
       ...(Array.isArray(lootDrops) && { lootDrops }),
       ...(typeof retainedScore === 'number' && { retainedScore }),
     },
@@ -142,7 +144,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const { world, level, stars, score, words, lootDrops: _lootDrops, retainedScore: _retainedScore } = validation.data;
+    const { world, level, stars, score, words, longWords, lootDrops: _lootDrops, retainedScore: _retainedScore } = validation.data;
 
     // TODO: persist lootDrops to a player_inventory table once the DB schema is created
     // TODO: persist retainedScore once retry scoring schema exists
@@ -244,23 +246,22 @@ export async function POST(request: NextRequest) {
     const newPlayerLevel = getLevelFromXp(newTotalXp);
 
     // Calculate gold earned server-side (never trust client value)
-    let goldEarned = 0;
-    if (isFirstCompletion) {
-      const baseGold = 10 * stars;
-      const perfectClearGoldBonus = stars === 3 ? 50 : 0;
-      goldEarned = baseGold + perfectClearGoldBonus;
+    // Gold is always awarded — not gated by isFirstCompletion
+    const playerUpgrades = (existingProgression?.upgrades as UpgradeState) ?? {};
+    const baseGold = 10 * stars;
+    const perfectClearGoldBonus = stars === 3 ? 50 : 0;
+    const longWordBonus = (longWords ?? 0) * getUpgradeEffect(playerUpgrades, 'cargoBay');
+    let goldEarned = baseGold + perfectClearGoldBonus + longWordBonus;
 
-      // Apply luckyPickaxe upgrade bonus from DB if player has it
-      const playerUpgrades = (existingProgression?.upgrades as UpgradeState) ?? {};
-      const luckyPickaxeBonus = getUpgradeEffect(playerUpgrades, 'luckyPickaxe');
-      if (luckyPickaxeBonus > 0) {
-        goldEarned = Math.round(goldEarned * (1 + luckyPickaxeBonus));
-      }
-
-      // Cap gold per level to prevent edge-case abuse
-      const MAX_GOLD_PER_LEVEL = 500;
-      goldEarned = Math.min(goldEarned, MAX_GOLD_PER_LEVEL);
+    // Apply luckyPickaxe upgrade bonus from DB if player has it
+    const luckyPickaxeBonus = getUpgradeEffect(playerUpgrades, 'luckyPickaxe');
+    if (luckyPickaxeBonus > 0) {
+      goldEarned = Math.round(goldEarned * (1 + luckyPickaxeBonus));
     }
+
+    // Cap gold per level to prevent edge-case abuse
+    const MAX_GOLD_PER_LEVEL = 500;
+    goldEarned = Math.min(goldEarned, MAX_GOLD_PER_LEVEL);
     const currentGold = (existingProgression?.gold as number) ?? 0;
     const newGold = currentGold + goldEarned;
 

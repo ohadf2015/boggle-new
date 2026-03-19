@@ -265,7 +265,7 @@ export function useComboSystem(options: UseComboSystemOptions = {}): ComboSystem
     const comboChainWindow = calculateComboChainWindow(currentComboLevel);
     const wasDanger = wasDangerStateRef.current;
 
-    let newComboLevel = 0;
+    let newComboLevel = 1; // Every accepted word starts or continues a chain
 
     if (currentLastWordTime && (now - currentLastWordTime) < comboChainWindow) {
       // Within combo window - increment combo
@@ -276,7 +276,7 @@ export function useComboSystem(options: UseComboSystemOptions = {}): ComboSystem
         onComboSaved();
       }
     }
-    // If outside window or first word, newComboLevel stays 0
+    // If outside window or first word, newComboLevel stays 1 (new chain)
 
     // Update state
     setComboLevel(newComboLevel);

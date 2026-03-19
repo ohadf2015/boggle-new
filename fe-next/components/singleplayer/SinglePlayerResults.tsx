@@ -17,6 +17,7 @@ import WordHuntAnnouncementBanner from '@/components/results/WordHuntAnnouncemen
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useWinStreak } from '@/hooks/useWinStreak';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -120,8 +121,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   useGameSessionLogging({ results, language: language as string, userId: user?.id, playerRank });
 
+  const { currentStreak } = useWinStreak();
+
   const { coinReward } = useCoinRewards({
     results, playerRank, totalParticipants: allParticipants.length,
+    currentStreak,
   });
 
   useWinStreakTracking({ mode, isWinner });
@@ -148,6 +152,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     playerScore: results.playerScore, validWordCount, mode,
     isNewHighScore: results.isNewHighScore, isNewAllTimeBest: results.isNewAllTimeBest,
     isWinner, playerRank, totalParticipants: allParticipants.length, t,
+    totalBoardWords: results.allPossibleWords?.length,
   });
 
   const hasMinimumScore = results.playerScore > 0;
@@ -238,15 +243,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               gapToWinner={playerRank > 1 ? (allParticipants[0]?.score || 0) - results.playerScore : 0}
             />
           ) : (
-            <div className="text-center py-6">
-              <p className="text-xs font-black uppercase tracking-widest text-neo-lime mb-1">
+            <div className="text-center py-6 relative">
+              {/* Radial glow behind score */}
+              <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_center,var(--neo-lime)_0%,transparent_60%)]" />
+              <p className="text-xs font-black uppercase tracking-widest text-neo-lime mb-2 relative z-10">
                 {bannerConfig.message || t('results.finalScore')}
               </p>
-              <p className="font-black text-6xl sm:text-7xl text-white tabular-nums" style={{ WebkitTextStroke: '2px rgba(0,0,0,0.3)', textShadow: '4px 4px 0px rgba(0,0,0,0.3)' }}>
+              <p className="font-black text-6xl sm:text-7xl text-white tabular-nums relative z-10" style={{ WebkitTextStroke: '2px rgba(0,0,0,0.3)', textShadow: '4px 4px 0px rgba(0,0,0,0.4), 0 0 30px rgba(191,255,0,0.15)' }}>
                 {displayScore(results.playerScore)}
               </p>
               {bannerConfig.announcement && (
-                <p className="text-white/60 text-sm font-bold mt-1">{bannerConfig.announcement}</p>
+                <p className="text-white/60 text-sm font-bold mt-2 relative z-10">{bannerConfig.announcement}</p>
               )}
             </div>
           )}

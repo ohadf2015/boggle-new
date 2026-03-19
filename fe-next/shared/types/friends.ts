@@ -60,6 +60,7 @@ export interface MessageThread {
     emoji: string;
     color: string;
     image?: string;
+    customAvatar?: import('./customAvatar').CustomAvatarConfig;
   };
   lastMessage: string;
   lastMessageAt: number;

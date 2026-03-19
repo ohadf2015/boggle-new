@@ -1,13 +1,14 @@
 import seedWords from './seed-words.json';
+import { calculateWordScore } from '@/shared/utils/scoring';
 
 export type WordLength = 3 | 4 | 5 | 6 | 7 | 8;
 export const VALID_LENGTHS: WordLength[] = [3, 4, 5, 6, 7, 8];
 export type Letter = string;
 export const VALID_LETTERS: Letter[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-/** Base LexiClash score for a word: length - 1, minimum 1 */
+/** Base LexiClash score for a word using canonical scoring */
 export function getWordScore(word: string): number {
-  return Math.max(word.length - 1, 1);
+  return calculateWordScore(word);
 }
 
 /** Get words by exact length (max 100). */

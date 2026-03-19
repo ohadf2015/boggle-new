@@ -154,11 +154,17 @@ jest.mock('@/contexts/MusicContext', () => ({
 // Mock SoundEffectsContext - required by MusicControls component
 jest.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
+    playWordAcceptedSound: jest.fn(),
+    playComboSound: jest.fn(),
+    playComboBreakSound: jest.fn(),
+    playCountdownBeep: jest.fn(),
+    playComboMilestoneSound: jest.fn(),
+    playComboSavedSound: jest.fn(),
+    setGameActive: jest.fn(),
     sfxVolume: 0.5,
     setSfxVolume: jest.fn(),
     sfxMuted: false,
     toggleSfxMute: jest.fn(),
-    playWordAcceptedSound: jest.fn(),
     playErrorSound: jest.fn(),
     playBonusSound: jest.fn(),
   }),
@@ -283,6 +289,13 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
 
 // Mock adventure lib to provide grid/level config for gameplay
 jest.mock('@/lib/adventure', () => ({
+  WORLD_CONFIGS: Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1, name: `World ${i + 1}`, theme: 'forest', mechanic: null,
+    bossName: 'Boss', colorPrimary: 'neo-lime', colorSecondary: 'neo-lime-light',
+    description: 'desc',
+  })),
+  LEVELS_PER_WORLD: 7,
+  WORLDS_COUNT: 10,
   getWorldConfig: (worldId: number) => ({
     id: worldId,
     name: `World ${worldId}`,

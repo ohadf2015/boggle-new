@@ -114,6 +114,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
           <div className="relative flex-shrink-0">
             <Avatar
               avatarImage={thread.friendAvatar.image}
+              customAvatar={thread.friendAvatar.customAvatar}
               size="md"
               className="border-2 border-neo-black"
             />

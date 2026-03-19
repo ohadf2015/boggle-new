@@ -147,7 +147,7 @@ export function AddFriendDialog({
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <Avatar avatarImage={searchUser.avatarImage} size="md" />
+                  <Avatar avatarImage={searchUser.avatarImage} customAvatar={searchUser.customAvatar} size="md" />
                   <div>
                     <p className={cn('font-bold', isDark ? 'text-white' : 'text-gray-900')}>
                       {searchUser.displayName || searchUser.username}

@@ -247,14 +247,26 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.goldEarned).toBe(80);
     });
 
-    it('awards 0 gold on repeat completion', async () => {
+    it('awards gold on repeat completion (not just first)', async () => {
       setupDbMocks({
         completionData: { stars: 2, best_score: 300, best_words: 8 },
       });
 
-      const res = await POST(makeRequest({ ...validBody, goldEarned: 999999 }));
+      const res = await POST(makeRequest({ ...validBody, stars: 3 }));
       expect(res.status).toBe(200);
-      expect(res.data.goldEarned).toBe(0);
+      // Repeat completion: 10 * 3 + 50 = 80 (same formula as first)
+      expect(res.data.goldEarned).toBe(80);
+    });
+
+    it('awards gold on repeat with same stars', async () => {
+      setupDbMocks({
+        completionData: { stars: 3, best_score: 600, best_words: 12 },
+      });
+
+      const res = await POST(makeRequest({ ...validBody, stars: 2 }));
+      expect(res.status).toBe(200);
+      // 10 * 2 = 20 (no perfect bonus for 2 stars)
+      expect(res.data.goldEarned).toBe(20);
     });
 
     it('server gold formula: 0 stars = 0 gold', async () => {
@@ -293,6 +305,25 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.goldEarned).toBe(100);
       expect(mockGetUpgradeEffect).toHaveBeenCalledWith({ luckyPickaxe: 2 }, 'luckyPickaxe');
       mockGetUpgradeEffect.mockReturnValue(0); // reset
+    });
+
+    it('applies longWordGold bonus from cargoBay upgrade', async () => {
+      // cargoBay gives per-long-word gold bonus
+      mockGetUpgradeEffect.mockImplementation((_state: unknown, id: string) =>
+        id === 'cargoBay' ? 5 : 0
+      );
+      setupDbMocks({
+        progressionData: { ...mockProgression, upgrades: { cargoBay: 1 } },
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      // 3 long words (6+ letters)
+      const res = await POST(makeRequest({ ...validBody, stars: 2, longWords: 3 }));
+      expect(res.status).toBe(200);
+      // base=20, longWordBonus=5*3=15, total=35
+      expect(res.data.goldEarned).toBe(35);
+      mockGetUpgradeEffect.mockReturnValue(0);
     });
 
     it('caps gold at 500 per level', async () => {
@@ -344,7 +375,7 @@ describe('POST /api/adventure/complete', () => {
 
   // ===== EDGE CASES =====
   describe('Edge cases', () => {
-    it('replaying a level with fewer stars awards 0 XP and 0 stars gained', async () => {
+    it('replaying a level with fewer stars awards 0 XP but still awards gold', async () => {
       setupDbMocks({
         completionData: { stars: 3, best_score: 600, best_words: 12 },
       });
@@ -353,7 +384,8 @@ describe('POST /api/adventure/complete', () => {
       expect(res.status).toBe(200);
       expect(res.data.xpEarned).toBe(0);
       expect(res.data.starsGained).toBe(0);
-      expect(res.data.goldEarned).toBe(0);
+      // Gold is always awarded: 10 * 1 = 10
+      expect(res.data.goldEarned).toBe(10);
     });
 
     it('improving stars on existing completion awards only new stars XP', async () => {

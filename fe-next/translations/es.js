@@ -991,6 +991,7 @@ const es = {
     "advancedSettings": "Avanzado",
     "roomClosedInactivity": "Cerrada por inactividad",
     "gameOverCheckScores": "¡Fin! Revisa puntuaciones",
+    "progressAnnouncement": "Encontraste {found} palabras — {missed} más estaban escondidas!",
     "youAreNowHost": "¡Eres el anfitrión!",
     "newHostAssigned": "ahora es el anfitrión",
     "tournamentMode": "Modo Torneo",
@@ -3679,6 +3680,11 @@ const es = {
       "faq6A": "¡Sí! Usa el Constructor de Tableros Comunitarios para diseñar cuadrículas de letras personalizadas. Publícalos para que otros jugadores jueguen, califiquen y compitan. Los mejores tableros aparecen en la página principal.",
       "communityTitle": "Únete a miles de entusiastas de juegos de palabras",
       "communityContent": "Los jugadores de LexiClash abarcan más de 40 países y cinco idiomas. Únete a la comunidad para competir en clasificaciones globales, compartir resultados del desafío diario y descubrir nuevas estrategias de palabras. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y eventos de la comunidad."
+    },
+    "firstTimer": {
+      "exploreModes": "Explorar modos",
+      "playFirst": "Juega tu primer juego",
+      "playFirstDesc": "¡Entra y encuentra todas las palabras que puedas!"
     }
   },
   "modeDiscovery": {
@@ -3709,6 +3715,7 @@ const es = {
     "finish": "Terminar",
     "victory": "¡Victoria!",
     "gameOver": "Juego Terminado",
+    "progressAnnouncement": "Encontraste {found} palabras — {missed} más estaban escondidas!",
     "verifyingWords": "Verificando palabras...",
     "practiceComplete": "¡Práctica Completa!",
     "newHighScore": "¡Nuevo Récord!",
@@ -5483,7 +5490,9 @@ const es = {
       "dailyQuests": "Misiones diarias",
       "continue": "Continuar",
       "worldMap": "Mapa del mundo",
-      "wordAlbum": "Álbum de palabras"
+      "wordAlbum": "Álbum de palabras",
+      "bossRush": "Carrera de Jefes",
+      "bossRushLocked": "Derrota a todos los jefes para desbloquear Carrera de Jefes"
     },
     "album": {
       "title": "Álbum de palabras",
@@ -5500,7 +5509,36 @@ const es = {
     },
     "endlessMode": {
       "teaser": "Modo infinito",
-      "comingSoon": "Completa el mundo 10 para desbloquear"
+      "comingSoon": "Completa el mundo 10 para desbloquear",
+      "bossFloor": "Piso de Jefe",
+      "floor": "Piso",
+      "floorCleared": "¡Piso completado!",
+      "gridSize": "Tamaño del tablero",
+      "highFloor": "Piso más alto",
+      "newRecord": "¡Nuevo récord!",
+      "nextFloor": "Siguiente piso",
+      "quit": "Abandonar carrera",
+      "runOver": "Carrera terminada",
+      "scoreTarget": "Objetivo de puntuación",
+      "startRun": "Iniciar carrera",
+      "subtitle": "¿Hasta dónde puedes llegar?",
+      "timeLimit": "Límite de tiempo",
+      "title": "Modo infinito"
+    },
+    "bossRush": {
+      "backToHub": "Volver al centro",
+      "bossOf": "Jefe de",
+      "defeated": "¡Derrotado!",
+      "fighting": "Luchando",
+      "fullClear": "¡Limpieza total!",
+      "fullClearBonus": "Bonus de limpieza total",
+      "goldEarned": "Oro ganado",
+      "runOver": "Carrera terminada",
+      "startRush": "Iniciar carrera",
+      "subtitle": "¡Derrota a todos los jefes seguidos!",
+      "title": "Carrera de Jefes",
+      "tryAgain": "Intentar de nuevo",
+      "xpEarned": "XP ganado"
     },
     "share": {
       "bossDefeated": "¡Derroté a {{boss}} en {{world}}!",
@@ -6536,7 +6574,8 @@ const es = {
       "tapToOpen": "Toca para abrir",
       "xp": "Experiencia",
       "bonusGold": "Oro Extra",
-      "bossTrophy": "Trofeo de Jefe"
+      "bossTrophy": "Trofeo de Jefe",
+      "chest": "Cofre de botín"
     },
     "later": "Más tarde",
     "nextLevel": "Siguiente: Nivel",

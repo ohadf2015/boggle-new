@@ -208,7 +208,13 @@ export function BlastGameLayout({
     username ?? '',
   );
 
-  const [showHelp, setShowHelp] = useState(false);
+  const [showHelp, setShowHelp] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const { shouldShowGuidance } = require('@/utils/contextualGuidanceStorage');
+      return shouldShowGuidance('blastHelpShown');
+    } catch { return false; }
+  });
   const [showCodex, setShowCodex] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [shakeClass, setShakeClass] = useState('');
@@ -637,7 +643,15 @@ export function BlastGameLayout({
       {/* Help Modal */}
       <BlastHelpModal
         open={showHelp}
-        onOpenChange={setShowHelp}
+        onOpenChange={(open) => {
+          setShowHelp(open);
+          if (!open) {
+            try {
+              const { markGuidanceShown } = require('@/utils/contextualGuidanceStorage');
+              markGuidanceShown('blastHelpShown');
+            } catch { /* ignore */ }
+          }
+        }}
         t={t}
       />
 

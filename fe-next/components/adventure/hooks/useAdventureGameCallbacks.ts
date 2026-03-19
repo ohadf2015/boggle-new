@@ -41,7 +41,7 @@ interface UseAdventureGameCallbacksParams {
   handleEarnAchievement: (id: AdventureAchievementId) => void;
   upgradeRetryScoreRetention: number;
   // Parent callbacks
-  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => void;
   // Other
   totalStars?: number;
   clearSelection: () => void;
@@ -132,8 +132,9 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
       handleEarnAchievement('ALL_BOSSES');
     }
     setShowLevelComplete(false);
-    onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold);
-  }, [gameStars, gameScore, wordsFoundList.length, comboCount, earnedGold, onLevelComplete,
+    const longWords = wordsFoundList.filter(w => w.length >= 6).length;
+    onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords);
+  }, [gameStars, gameScore, wordsFoundList, comboCount, earnedGold, onLevelComplete,
     recordLevelPerfect, recordBossDefeatedNoHint, recordScoreChallenge, recordBossHighHealth,
     recordFullComboLevel, isBossLevel, bossHealthPhase, playerHealthCurrentHP, playerHealthMaxHP,
     totalStars, handleEarnAchievement, worldNumber, setShowLevelComplete, hintsUsed]);

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
-import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
+import { getComboBonus as calculateComboBonus, calculateWordScore as canonicalWordScore } from '@/shared/utils/scoring';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
@@ -140,12 +140,9 @@ export function useWordSubmission({
     gridRef.current = grid;
   }, [grid]);
 
-  // Calculate word score using shared scoring utilities
-  const calculateWordScore = useCallback((wordLength: number, currentComboLevel: number): number => {
-    const baseScore = Math.max(wordLength - 1, 1);
-    const comboBonus = calculateComboBonus(currentComboLevel, wordLength);
-    const multiplier = getScoreMultiplier();
-    return (baseScore + comboBonus) * multiplier;
+  // Calculate word score using canonical scoring
+  const calculateWordScore = useCallback((word: string, currentComboLevel: number): number => {
+    return canonicalWordScore(word, currentComboLevel, getScoreMultiplier());
   }, [getScoreMultiplier]);
 
   const handleWordSubmit = useCallback((word: string) => {
@@ -243,8 +240,8 @@ export function useWordSubmission({
     foundWordsSetRef.current.add(normalizedWord);
 
     const currentCombo = combo.comboLevelRef.current;
-    const baseScore = calculateWordScore(normalizedWord.length, 0);
-    const fullScore = calculateWordScore(normalizedWord.length, currentCombo);
+    const baseScore = calculateWordScore(normalizedWord, 0);
+    const fullScore = calculateWordScore(normalizedWord, currentCombo);
     const timeSinceStart = (now - gameStartTime) / 1000;
 
     // Step 4: Add word with pending state
@@ -260,9 +257,8 @@ export function useWordSubmission({
 
     // Helper function to handle valid word
     const handleValidWord = () => {
-      const wordLenScore = Math.max(normalizedWord.length - 1, 1);
       const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
-      const scoreWithoutMultiplier = wordLenScore + comboBonus;
+      const scoreWithoutMultiplier = canonicalWordScore(normalizedWord, currentCombo, 1);
       const multiplier = getScoreMultiplier();
       const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
 

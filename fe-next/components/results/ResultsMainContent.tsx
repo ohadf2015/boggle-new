@@ -25,6 +25,7 @@ import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSection';
 import { ResultsCtaSection } from '@/components/results/ResultsCtaSection';
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
+import MissedWords from '@/components/results/MissedWords';
 
 // ==============================================
 // TYPES
@@ -117,6 +118,8 @@ export interface ResultsMainContentProps {
   seriesStandings?: SeriesStanding[];
   seriesRoundNumber?: number;
   gameMode?: string;
+  /** Words found by others that this player missed */
+  missedWords?: Array<{ word: string; score: number; foundBy: string[] }>;
   emojiReactions?: Array<{ id: string; emoji: string; username: string; timestamp: number }>;
 }
 
@@ -160,6 +163,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   seriesRoundNumber,
   gameMode,
   emojiReactions,
+  missedWords,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -179,7 +183,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   ];
   const { isVisible, getDelay } = useEntranceChoreography(
     ['hero', 'leaderboard', 'revenge', 'cta', 'stats', 'words'],
-    { baseDelay: 300, stagger: 200 }
+    { baseDelay: 200, stagger: 150 }
   );
 
   return (
@@ -331,6 +335,17 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           isWordsVisible={isVisible('words')}
           t={t}
         />
+      )}
+
+      {/* Words You Missed — promotes discovery and replay motivation */}
+      {missedWords && missedWords.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
+        >
+          <MissedWords missedWords={missedWords} maxDisplay={5} />
+        </motion.div>
       )}
 
       {/* Large Room Notice */}

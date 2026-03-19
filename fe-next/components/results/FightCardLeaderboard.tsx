@@ -104,21 +104,21 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
 }) => {
   const accent = RANK_ACCENTS[rank] ?? DEFAULT_ACCENT;
 
-  // Fight card scaling: rank 1 slightly larger, lower ranks shrink
-  const scaleDown = rank === 1 ? 1.01 : rank <= 2 ? 1 : rank === 3 ? 0.97 : 0.93;
-  const opacityDown = rank <= 2 ? 1 : rank === 3 ? 0.8 : 0.6;
+  // Fight card scaling: rank 1 larger, dramatic falloff for lower ranks
+  const scaleDown = rank === 1 ? 1.02 : rank === 2 ? 0.98 : rank === 3 ? 0.95 : 0.9;
+  const opacityDown = rank === 1 ? 1 : rank === 2 ? 0.9 : rank === 3 ? 0.75 : 0.55;
 
   const rowBubbles = emojiReactions.filter(r => r.username === participant.name);
 
   return (
     <motion.div
-      initial={reducedMotion ? undefined : { opacity: 0, y: 16 }}
-      animate={{ opacity: opacityDown, y: 0, scale: eliminated ? 0.93 : scaleDown }}
+      initial={reducedMotion ? undefined : { opacity: 0, y: 24, x: rank === 1 ? -10 : 0, scale: 0.92 }}
+      animate={{ opacity: opacityDown, y: 0, x: 0, scale: eliminated ? 0.93 : scaleDown }}
       transition={{
         type: 'spring',
-        stiffness: 300,
-        damping: 24,
-        delay: reducedMotion ? 0 : 0.08 * index,
+        stiffness: 280,
+        damping: 20,
+        delay: reducedMotion ? 0 : 0.12 * index,
       }}
       className={cn(
         'relative flex items-center gap-2 sm:gap-3 border-3 border-neo-black',

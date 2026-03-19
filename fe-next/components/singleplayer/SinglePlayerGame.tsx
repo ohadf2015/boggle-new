@@ -13,6 +13,7 @@ import {
 } from './game';
 import type { SinglePlayerGameState, SinglePlayerResultsData } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
+import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 
 interface SinglePlayerGameProps {
   settings: SinglePlayerGameState;
@@ -64,6 +65,11 @@ function SinglePlayerGame({
   const { queueAchievement } = useAchievementQueue();
   const prevAchievementCountRef = useRef(0);
 
+  // Score popup — shows "+30" when score increases
+  const [scorePopup, setScorePopup] = React.useState<{ id: number; value: number; x: number; y: number; word?: string; bonus?: string } | null>(null);
+  const prevScoreRef = useRef(0);
+  const scoreDisplayRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const achievements = core.liveAchievements;
     // Only trigger for NEW achievements (not on initial render)
@@ -76,6 +82,26 @@ function SinglePlayerGame({
     }
     prevAchievementCountRef.current = achievements.length;
   }, [core.liveAchievements, queueAchievement]);
+
+  // Score popup effect — detect score delta and show flying number
+  // Long words (6+) get a bonus label for extra celebration
+  useEffect(() => {
+    const delta = core.score - prevScoreRef.current;
+    if (delta > 0 && prevScoreRef.current > 0) {
+      const lastWord = core.foundWords[core.foundWords.length - 1];
+      const wordLen = lastWord?.word?.length ?? 0;
+      const bonus = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
+      setScorePopup({
+        id: Date.now(),
+        value: delta,
+        x: typeof window !== 'undefined' ? window.innerWidth / 2 : 200,
+        y: typeof window !== 'undefined' ? window.innerHeight / 2 : 300,
+        word: lastWord?.word,
+        bonus,
+      });
+    }
+    prevScoreRef.current = core.score;
+  }, [core.score, core.foundWords]);
 
   // Common props for all layouts - memoized to prevent unnecessary re-renders
   // Must be called before any conditional returns to follow React hooks rules
@@ -194,11 +220,22 @@ function SinglePlayerGame({
     </div>
   ) : null;
 
+  const scorePopupElement = (
+    <ScorePopupFly
+      popup={scorePopup}
+      flyToTarget
+      showWord
+      size={scorePopup?.bonus ? 'lg' : 'md'}
+      onComplete={() => setScorePopup(null)}
+    />
+  );
+
   // Landscape layout
   if (core.isLandscape) {
     return (
       <>
         {encouragementBanner}
+        {scorePopupElement}
         <LandscapeGameLayout
           {...commonProps}
           progressBarExpanded={core.progressBarExpanded}
@@ -215,6 +252,7 @@ function SinglePlayerGame({
     return (
       <>
         {encouragementBanner}
+        {scorePopupElement}
         <DesktopGameLayout
           {...commonProps}
           targetHighScore={core.targetHighScore}
@@ -231,6 +269,7 @@ function SinglePlayerGame({
   return (
     <>
       {encouragementBanner}
+        {scorePopupElement}
       <PortraitGameLayout
         {...commonProps}
         targetHighScore={core.targetHighScore}

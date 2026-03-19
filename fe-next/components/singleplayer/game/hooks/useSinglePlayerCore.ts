@@ -9,6 +9,7 @@ import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useGameTimer } from '@/hooks/useGameTimer';
+import { useWordPace } from '@/hooks/useWordPace';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
@@ -33,7 +34,7 @@ import {
   createAchievementState,
   type SinglePlayerAchievement,
 } from '@/utils/singlePlayerAchievements';
-import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
+import { getComboBonus as calculateComboBonus, calculateWordScore as canonicalWordScore } from '@/shared/utils/scoring';
 import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
 import { useSinglePlayerEffects } from './useSinglePlayerEffects';
@@ -136,6 +137,7 @@ export function useSinglePlayerCore({
     mode: settings.mode, bots: settings.bots, isPaused, isGameOver, availableWords,
   });
   const { checkSubmission, resetSpamDetection } = useSpamDetection();
+  const wordPace = useWordPace();
   const combo = useComboSystem({
     onComboSound: (level) => { if (level >= 2) playComboSound(level); },
     onComboMilestone: (level) => {
@@ -219,9 +221,8 @@ export function useSinglePlayerCore({
     enabled: settings.mode !== 'practice', earthquakeState,
   });
 
-  const calculateWordScore = useCallback((wordLength: number, currentComboLevel: number): number => {
-    const baseScore = Math.max(wordLength - 1, 1);
-    return (baseScore + calculateComboBonus(currentComboLevel, wordLength)) * getScoreMultiplier();
+  const calculateWordScoreLocal = useCallback((word: string, currentComboLevel: number): number => {
+    return canonicalWordScore(word, currentComboLevel, getScoreMultiplier());
   }, [getScoreMultiplier]);
 
   const handleWordSubmit = useCallback((word: string) => {
@@ -271,13 +272,14 @@ export function useSinglePlayerCore({
 
     foundWordsSetRef.current.add(normalizedWord);
     const currentCombo = combo.comboLevelRef.current;
-    const baseScore = calculateWordScore(normalizedWord.length, 0);
-    const fullScore = calculateWordScore(normalizedWord.length, currentCombo);
+    const baseScore = calculateWordScoreLocal(normalizedWord, 0);
+    const fullScore = calculateWordScoreLocal(normalizedWord, currentCombo);
     const timeSinceStart = (now - effects.gameStartTimeRef.current) / 1000;
 
     const newWord: FoundWord = { word: normalizedWord, score: baseScore, timestamp: now, timeSinceStart, isValid: null };
     foundWordsRef.current = [...foundWordsRef.current, newWord];
     setFoundWords(foundWordsRef.current);
+    wordPace.recordWord();
 
     fetch('/api/dictionary/check', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -287,7 +289,7 @@ export function useSinglePlayerCore({
       .then(result => {
         if (result.isValid) {
           const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
-          const scoreWithoutMultiplier = Math.max(normalizedWord.length - 1, 1) + comboBonus;
+          const scoreWithoutMultiplier = canonicalWordScore(normalizedWord, currentCombo, 1);
           const multiplier = getScoreMultiplier();
           const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
 
@@ -295,6 +297,7 @@ export function useSinglePlayerCore({
             fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus } : fw
           );
           setFoundWords(foundWordsRef.current);
+    wordPace.recordWord();
           setScore(prev => prev + fullScore);
           playWordAcceptedSound(); hapticForWordScore(normalizedWord.length);
           effects.lastWordFoundTimeRef.current = Date.now(); setShowHintPrompt(false);
@@ -322,6 +325,7 @@ export function useSinglePlayerCore({
             fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
           );
           setFoundWords(foundWordsRef.current);
+    wordPace.recordWord();
           const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
           setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
           hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
@@ -334,11 +338,12 @@ export function useSinglePlayerCore({
           fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
         );
         setFoundWords(foundWordsRef.current);
+    wordPace.recordWord();
         const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
         setCurrentFeedback({ id: `reject-${Date.now()}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: Date.now() });
         hapticError();
       });
-  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef]);
+  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScoreLocal, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef, wordPace]);
 
   const keyboardInput = useKeyboardWordInput({
     grid: grid || ([] as LetterGrid), language: settings.language, gameLanguage: settings.language,
@@ -498,5 +503,6 @@ export function useSinglePlayerCore({
     lastWordFoundTimeRef: effects.lastWordFoundTimeRef, gameStatsRef,
     handleWordSubmit, handlePathSubmit, handleWordChange,
     handlePauseToggle, handleFinishPractice, handleQuitRequest, onQuit, t,
+    wordPace,
   };
 }

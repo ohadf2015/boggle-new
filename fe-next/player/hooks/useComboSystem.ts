@@ -8,15 +8,12 @@
  */
 
 import { useState, useCallback, useRef, useMemo, MutableRefObject } from 'react';
-
-// ==========================================
-// Configuration
-// ==========================================
-
-const COMBO_BASE_WINDOW_MS = 3000; // Base time window to chain combos
-const COMBO_WINDOW_INCREMENT_MS = 1000; // Additional time per combo level
-const COMBO_MAX_WINDOW_MS = 10000; // Maximum combo window
-const VALID_WORDS_PER_SHIELD = 10; // Earn 1 shield per N valid words
+import {
+  COMBO_BASE_WINDOW_MS,
+  COMBO_LEVEL_BONUS_MS as COMBO_WINDOW_INCREMENT_MS,
+  COMBO_MAX_WINDOW_MS,
+  VALID_WORDS_PER_SHIELD,
+} from '@/shared/utils/comboUtils';
 
 // ==========================================
 // Types
@@ -153,7 +150,7 @@ export function useComboSystem(options: UseComboSystemOptions): UseComboSystemRe
     if (isWithinWindow) {
       newLevel = currentLevel + 1;
     } else {
-      newLevel = 0;
+      newLevel = 1; // Every accepted word starts a new chain
     }
 
     // Update state

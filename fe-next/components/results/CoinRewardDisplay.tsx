@@ -14,6 +14,7 @@ export interface CoinReward {
     placement?: number;
     efficiency?: number;
     streak?: number;
+    streakBonus?: number;
   };
 }
 
@@ -129,18 +130,30 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
   // Full variant - large card with breakdown and hint
   return (
     <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
+      initial={{ scale: 0.8, opacity: 0, y: 10 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      transition={{ delay: 0.3, type: 'spring', stiffness: 350, damping: 18 }}
       className={cn(
-        'px-4 py-3 bg-gradient-to-r from-neo-lime to-amber-400 rounded-neo border-3 border-neo-black shadow-hard',
+        'px-4 py-3 bg-gradient-to-r from-neo-lime via-lime-300 to-amber-400 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden',
         className
       )}
     >
+      {/* Diagonal stripes for texture */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.06]"
+        style={{
+          backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 8px, rgb(var(--neo-black)) 8px, rgb(var(--neo-black)) 10px)',
+        }}
+      />
       {/* Main reward display */}
-      <div className="flex items-center justify-center gap-2 mb-1">
-        <Coins className="w-5 h-5 text-neo-black" />
-        <span className="font-black text-xl text-neo-black">+{reward.awarded}</span>
+      <div className="flex items-center justify-center gap-2 mb-1 relative z-10">
+        <motion.div
+          animate={{ rotate: [0, -10, 10, -5, 0] }}
+          transition={{ delay: 0.8, duration: 0.5, ease: 'easeInOut' }}
+        >
+          <Coins className="w-6 h-6 text-neo-black" />
+        </motion.div>
+        <span className="font-black text-2xl text-neo-black">+{reward.awarded}</span>
         <span className="text-sm font-bold text-neo-black/70">
           {t('reveal.coins')}
         </span>
@@ -148,7 +161,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
 
       {/* Breakdown */}
       {showBreakdown && (
-        <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium flex-wrap">
+        <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium flex-wrap relative z-10">
           {reward.breakdown.base > 0 && (
             <span>{t('reveal.base')}: +{reward.breakdown.base}</span>
           )}
@@ -163,6 +176,9 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
           )}
           {(reward.breakdown.streak ?? 0) > 0 && (
             <span>{t('coins.streak')}: +{reward.breakdown.streak}</span>
+          )}
+          {(reward.breakdown.streakBonus ?? 0) > 0 && (
+            <span className="text-amber-600 font-semibold">🔥 +{reward.breakdown.streakBonus}</span>
           )}
         </div>
       )}

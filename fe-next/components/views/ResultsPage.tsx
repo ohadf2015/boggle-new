@@ -356,6 +356,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     seriesStandings,
     seriesRoundNumber,
     gameMode: resolvedGameMode,
+    missedWords,
     emojiReactions: floatingReactions.map(r => ({
       id: r.id,
       emoji: r.emoji,

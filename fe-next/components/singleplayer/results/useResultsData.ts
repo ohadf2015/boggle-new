@@ -232,7 +232,7 @@ export function useResultsData(
         .map(word => ({
           word,
           validated: true,
-          score: Math.max(word.length - 1, 1), // Estimate score from word length
+          score: calculateWordScore(word),
         })),
     }));
 
@@ -270,7 +270,7 @@ export function useResultsData(
         .map(word => ({
           word,
           validated: true,
-          score: Math.max(word.length - 1, 1), // Estimate score from word length
+          score: calculateWordScore(word),
         }));
     });
 

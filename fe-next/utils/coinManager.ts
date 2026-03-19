@@ -5,13 +5,13 @@
  * Coins are earned from Daily Challenge completion and spent on word reveals.
  */
 
-import logger from '@/utils/logger';
 import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
   getFromLocalStorage,
   saveToLocalStorage,
 } from '@/utils/storageHelpers';
+import { getStreakCoinBonusPercent } from '@/lib/streakTierRewards';
 
 const COINS_STORAGE_KEY = 'lexiclash_coins';
 const COINS_HISTORY_KEY = 'lexiclash_coins_history';
@@ -187,14 +187,15 @@ export function canAfford(amount: number): boolean {
 export function calculateDailyReward(
   solved: boolean,
   efficiencyScore: number,
-  streakDays: number
-): { total: number; breakdown: { base: number; efficiency: number; streak: number } } {
+  streakDays: number,
+  currentWinStreak?: number
+): { total: number; breakdown: { base: number; efficiency: number; streak: number; streakBonus: number } } {
   if (!solved) {
     // Still give some coins for trying
     const base = Math.floor(COIN_EARNING.DAILY_BASE / 2);
     return {
       total: base,
-      breakdown: { base, efficiency: 0, streak: 0 }
+      breakdown: { base, efficiency: 0, streak: 0, streakBonus: 0 }
     };
   }
 
@@ -203,9 +204,13 @@ export function calculateDailyReward(
   const cappedStreakDays = Math.min(streakDays, COIN_EARNING.MAX_STREAK_BONUS_DAYS);
   const streak = cappedStreakDays * COIN_EARNING.STREAK_BONUS;
 
+  // Streak tier coin bonus (applied to subtotal)
+  const subtotal = base + efficiency + streak;
+  const streakBonus = currentWinStreak ? Math.floor(subtotal * getStreakCoinBonusPercent(currentWinStreak) / 100) : 0;
+
   return {
-    total: base + efficiency + streak,
-    breakdown: { base, efficiency, streak }
+    total: subtotal + streakBonus,
+    breakdown: { base, efficiency, streak, streakBonus }
   };
 }
 
@@ -261,8 +266,9 @@ export function calculateGameReward(
   score: number,
   mode: 'singleplayer' | 'multiplayer',
   rank?: number,
-  totalPlayers?: number
-): { total: number; breakdown: { base: number; scoreBonus: number; placement: number } } {
+  totalPlayers?: number,
+  currentStreak?: number
+): { total: number; breakdown: { base: number; scoreBonus: number; placement: number; streakBonus: number } } {
   // Base coins for completing the game (only if player scored points)
   const base = score > 0
     ? (mode === 'multiplayer'
@@ -283,9 +289,13 @@ export function calculateGameReward(
     }
   }
 
+  // Streak tier coin bonus (applied to subtotal)
+  const subtotal = base + scoreBonus + placement;
+  const streakBonus = currentStreak ? Math.floor(subtotal * getStreakCoinBonusPercent(currentStreak) / 100) : 0;
+
   return {
-    total: base + scoreBonus + placement,
-    breakdown: { base, scoreBonus, placement }
+    total: subtotal + streakBonus,
+    breakdown: { base, scoreBonus, placement, streakBonus }
   };
 }
 
@@ -298,8 +308,9 @@ export function awardGameCoins(
   mode: 'singleplayer' | 'multiplayer',
   score: number,
   rank?: number,
-  totalPlayers?: number
-): { awarded: number; breakdown: { base: number; scoreBonus: number; placement: number } } | null {
+  totalPlayers?: number,
+  currentStreak?: number
+): { awarded: number; breakdown: { base: number; scoreBonus: number; placement: number; streakBonus: number } } | null {
   if (typeof window === 'undefined') return null;
 
   // Check if already awarded for this session
@@ -308,7 +319,7 @@ export function awardGameCoins(
     return null; // Already awarded
   }
 
-  const reward = calculateGameReward(score, mode, rank, totalPlayers);
+  const reward = calculateGameReward(score, mode, rank, totalPlayers, currentStreak);
 
   // Don't award if reward is 0
   if (reward.total <= 0) {
@@ -374,4 +385,14 @@ export function awardComboCoins(comboLevel: number, gameMode: string): number {
   });
 
   return reward;
+}
+
+/**
+ * Apply streak tier coin bonus to a base amount.
+ * Returns the bonus amount (not the total).
+ */
+export function applyStreakCoinBonus(baseAmount: number, currentStreak: number): number {
+  const bonusPercent = getStreakCoinBonusPercent(currentStreak);
+  if (bonusPercent <= 0) return 0;
+  return Math.floor(baseAmount * bonusPercent / 100);
 }

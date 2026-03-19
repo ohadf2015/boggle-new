@@ -36,21 +36,11 @@ export function useAdventureCurrency(
 
   const [gold, setGold] = useState(initialGold);
   const [upgrades, setUpgrades] = useState<UpgradeState>(initialUpgrades);
-  const [pendingUpdate, setPendingUpdate] = useState<{
-    userId: string;
-    gold: number;
-    upgrades: UpgradeState;
-  } | null>(null);
-
   const addGold = useCallback(
     (amount: number) => {
-      setGold(current => {
-        const newGold = current + amount;
-        setPendingUpdate({ userId, gold: newGold, upgrades });
-        return newGold;
-      });
+      setGold(current => current + amount);
     },
-    [userId, upgrades]
+    []
   );
 
   const purchase = useCallback(
@@ -60,10 +50,9 @@ export function useAdventureCurrency(
 
       setGold(result.gold);
       setUpgrades(result.state);
-      setPendingUpdate({ userId, gold: result.gold, upgrades: result.state });
       return true;
     },
-    [userId, gold, upgrades]
+    [gold, upgrades]
   );
 
   const getUpgradeEffect = useCallback(
@@ -78,9 +67,10 @@ export function useAdventureCurrency(
     [upgrades]
   );
 
-  const acknowledgePersistence = useCallback(() => {
-    setPendingUpdate(null);
-  }, []);
+  /** @deprecated pendingUpdate was never consumed — gold persists via server API */
+  const pendingUpdate = null;
+  /** @deprecated No-op — kept for backward compatibility */
+  const acknowledgePersistence = useCallback(() => {}, []);
 
   return {
     gold,

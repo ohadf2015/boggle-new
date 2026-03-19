@@ -21,6 +21,9 @@ jest.mock('../ModeCard', () => {
   ModeCard.displayName = 'ModeCard';
   return { __esModule: true, default: ModeCard };
 });
+jest.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: () => false,
+}));
 jest.mock('@/components/daily/DailyChallengeBanner', () => {
   const DailyChallengeBanner = () => <div data-testid="daily-banner" />;
   DailyChallengeBanner.displayName = 'DailyChallengeBanner';

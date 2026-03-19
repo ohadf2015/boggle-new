@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3805,
+    "totalKeysInCode": 3842,
     "keyCountByLanguage": {
-      "en": 6474,
-      "he": 6503,
-      "sv": 6536,
-      "ja": 6523,
-      "es": 6534
+      "en": 6511,
+      "he": 6541,
+      "sv": 6574,
+      "ja": 6561,
+      "es": 6572
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -168,6 +168,7 @@
   },
   "keysNotInEnglish": {
     "he": [
+      "hostView.progressAnnouncement",
       "education.duels.addWord",
       "education.duels.backToLobby",
       "education.duels.challengeClassmate",
@@ -199,6 +200,7 @@
       "education.classroomGame.connecting"
     ],
     "sv": [
+      "hostView.progressAnnouncement",
       "admin.wordBank.filters.allValidationStatuses",
       "admin.wordBank.filters.pending",
       "admin.wordBank.filters.approved",
@@ -263,6 +265,7 @@
       "education.classroomGame.connecting"
     ],
     "ja": [
+      "hostView.progressAnnouncement",
       "consent.modal.dataUsage.title",
       "consent.modal.dataUsage.items",
       "admin.wordBank.filters.allValidationStatuses",
@@ -314,6 +317,7 @@
       "education.classroomGame.connecting"
     ],
     "es": [
+      "hostView.progressAnnouncement",
       "playerView.loadFailed",
       "admin.wordBank.filters.allValidationStatuses",
       "admin.wordBank.filters.pending",

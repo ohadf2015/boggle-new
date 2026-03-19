@@ -973,6 +973,7 @@ const he = {
     "advancedSettings": "הגדרות מתקדמות",
     "roomClosedInactivity": "החדר נסגר עקב חוסר פעילות",
     "gameOverCheckScores": "המשחק נגמר! בדוק את התוצאות הסופיות",
+    "progressAnnouncement": "מצאת {found} מילים — עוד {missed} הסתתרו!",
     "youAreNowHost": "אתה המארח החדש!",
     "newHostAssigned": "הוא המארח החדש",
     "tournamentMode": "מצב טורניר",
@@ -3637,6 +3638,11 @@ const he = {
       "faq6A": "כן! השתמשו בבונה הלוחות הקהילתי כדי לעצב לוחות אותיות מותאמים אישית. פרסמו אותם כדי ששחקנים אחרים ישחקו, ידרגו ויתחרו. הלוחות הטובים ביותר מוצגים בעמוד הבית.",
       "communityTitle": "הצטרפו לאלפי חובבי משחקי מילים",
       "communityContent": "שחקני לקסיקלאש מגיעים מיותר מ-40 מדינות וחמש שפות. הצטרפו לקהילה כדי להתחרות בטבלאות מובילים גלובליות, לשתף תוצאות אתגר יומי ולגלות אסטרטגיות מילים חדשות. עקבו אחרינו באינסטגרם @lexi.clash לטיפים, עדכונים ואירועי קהילה."
+    },
+    "firstTimer": {
+      "exploreModes": "גלה מצבים",
+      "playFirst": "שחק את המשחק הראשון שלך",
+      "playFirstDesc": "קפצו פנימה ומצאו כמה שיותר מילים!"
     }
   },
   "modeDiscovery": {
@@ -3667,6 +3673,7 @@ const he = {
     "finish": "סיום",
     "victory": "ניצחון!",
     "gameOver": "המשחק נגמר",
+    "progressAnnouncement": "מצאת {found} מילים — עוד {missed} הסתתרו!",
     "verifyingWords": "מאמת מילים...",
     "practiceComplete": "האימון הושלם!",
     "newHighScore": "שיא חדש!",
@@ -5483,7 +5490,9 @@ const he = {
       "dailyQuests": "משימות יומיות",
       "continue": "המשך",
       "worldMap": "מפת עולם",
-      "wordAlbum": "אלבום מילים"
+      "wordAlbum": "אלבום מילים",
+      "bossRush": "מרוץ בוסים",
+      "bossRushLocked": "נצחו את כל הבוסים כדי לפתוח מרוץ בוסים"
     },
     "album": {
       "title": "אלבום מילים",
@@ -5500,7 +5509,36 @@ const he = {
     },
     "endlessMode": {
       "teaser": "מצב אינסופי",
-      "comingSoon": "השלימו עולם 10 כדי לפתוח"
+      "comingSoon": "השלימו עולם 10 כדי לפתוח",
+      "bossFloor": "קומת בוס",
+      "floor": "קומה",
+      "floorCleared": "הקומה הושלמה!",
+      "gridSize": "גודל לוח",
+      "highFloor": "הקומה הגבוהה ביותר",
+      "newRecord": "שיא חדש!",
+      "nextFloor": "הקומה הבאה",
+      "quit": "עזוב ריצה",
+      "runOver": "הריצה נגמרה",
+      "scoreTarget": "יעד ניקוד",
+      "startRun": "התחל ריצה",
+      "subtitle": "כמה רחוק תגיעו?",
+      "timeLimit": "מגבלת זמן",
+      "title": "מצב אינסופי"
+    },
+    "bossRush": {
+      "backToHub": "חזרה למרכז",
+      "bossOf": "הבוס של",
+      "defeated": "הובס!",
+      "fighting": "נלחם",
+      "fullClear": "ניקוי מלא!",
+      "fullClearBonus": "בונוס ניקוי מלא",
+      "goldEarned": "זהב שנצבר",
+      "runOver": "הריצה נגמרה",
+      "startRush": "התחל מרוץ",
+      "subtitle": "הביסו את כל הבוסים ברצף!",
+      "title": "מרוץ בוסים",
+      "tryAgain": "נסו שוב",
+      "xpEarned": "ניסיון שנצבר"
     },
     "share": {
       "bossDefeated": "ניצחתי את {{boss}} ב{{world}}!",
@@ -6467,7 +6505,8 @@ const he = {
       "tapToOpen": "לחץ לפתיחה",
       "xp": "ניסיון",
       "bonusGold": "זהב בונוס",
-      "bossTrophy": "גביע בוס"
+      "bossTrophy": "גביע בוס",
+      "chest": "ארגז שלל"
     },
     "later": "אחר כך",
     "nextLevel": "הבא: שלב",

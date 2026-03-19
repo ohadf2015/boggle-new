@@ -36,15 +36,15 @@ describe('useComboSystem', () => {
   });
 
   describe('incrementCombo', () => {
-    it('should start combo at 0 for first word', () => {
+    it('should start combo at 1 for first word', () => {
       const { result } = renderHook(() => useComboSystem(defaultOptions));
 
       act(() => {
         result.current.actions.incrementCombo();
       });
 
-      // First word sets lastWordTime but doesn't increase combo yet
-      expect(result.current.state.level).toBe(0);
+      // First word starts a new chain at level 1
+      expect(result.current.state.level).toBe(1);
       expect(result.current.state.lastWordTime).not.toBeNull();
     });
 
@@ -62,7 +62,7 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
 
-      expect(result.current.state.level).toBe(1);
+      expect(result.current.state.level).toBe(2);
     });
 
     it('should reset combo after window expires', () => {
@@ -79,11 +79,11 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
 
-      expect(result.current.state.level).toBe(1);
+      expect(result.current.state.level).toBe(2);
 
-      // Wait for combo to expire
+      // Wait for combo to expire (base 6000 + level*1000 = 8000ms for level 2)
       act(() => {
-        jest.advanceTimersByTime(5000); // Past the combo window
+        jest.advanceTimersByTime(9000); // Past the combo window
       });
 
       // Combo should decay to 0
@@ -101,13 +101,15 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
 
+      expect(playComboSound).toHaveBeenCalledWith(1);
+
       // Second word within window
       act(() => {
         jest.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
 
-      expect(playComboSound).toHaveBeenCalledWith(1);
+      expect(playComboSound).toHaveBeenCalledWith(2);
     });
   });
 
@@ -275,8 +277,8 @@ describe('useComboSystem', () => {
     it('should return base window for level 0', () => {
       const { result } = renderHook(() => useComboSystem(defaultOptions));
 
-      // Base window is 3000ms
-      expect(result.current.actions.getComboWindow()).toBe(3000);
+      // Base window is 6000ms
+      expect(result.current.actions.getComboWindow()).toBe(6000);
     });
 
     it('should increase window with combo level', () => {
@@ -297,7 +299,7 @@ describe('useComboSystem', () => {
 
       // Window should be longer at higher combo levels
       const window = result.current.actions.getComboWindow();
-      expect(window).toBeGreaterThan(3000);
+      expect(window).toBeGreaterThan(6000);
     });
   });
 

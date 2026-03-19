@@ -201,6 +201,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
       isOpen={showLootChest}
       drops={lootDrops}
       onComplete={handleLootChestComplete}
+      chestTier={gameStars >= 3 ? 'golden' : gameStars >= 2 ? 'silver' : 'wooden'}
     />
 
     {!isBossLevel && (

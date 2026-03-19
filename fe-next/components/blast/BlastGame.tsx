@@ -234,6 +234,16 @@ export function BlastGame({
   // Combo streak — tracks consecutive word submissions within a time window
   const comboStreak = useBlastComboStreak(getComboWindowMs(minWordLength));
 
+  // Pause combo timer during cascades to prevent unfair decay
+  useEffect(() => {
+    if (blast.cascadePhase === 'clearing' || blast.cascadePhase === 'falling' || blast.cascadePhase === 'appearing') {
+      comboStreak.pauseTimer();
+    } else {
+      comboStreak.resumeTimer();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- comboStreak object ref changes; we only need pause/resume fns
+  }, [blast.cascadePhase, comboStreak.pauseTimer, comboStreak.resumeTimer]);
+
   // Hot tiles — bonus multiplier tiles in the last 25% of timed rounds (SP only)
   const hotTiles = useBlastHotTiles({
     gridSize: config.gridSize,

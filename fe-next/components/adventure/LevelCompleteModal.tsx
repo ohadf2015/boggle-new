@@ -8,6 +8,7 @@
 'use client';
 
 import { memo, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Star, Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,6 +23,15 @@ import { RollingNumber } from './ui/RollingNumber';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
+
+const LOOT_DROP_IMAGES: Record<string, string> = {
+  gold: '/images/adventure/loot/loot-gold-coins.webp',
+  xp: '/images/adventure/loot/loot-xp-star.webp',
+  bonusGold: '/images/adventure/loot/loot-bonus-gold.webp',
+  bossTrophy: '/images/adventure/loot/loot-boss-trophy.webp',
+  runeFragment: '/images/runes/rune-goldvein.webp',
+  loreScroll: '/images/adventure/floating-scroll.webp',
+};
 
 // ==============================================
 // TYPES
@@ -451,25 +461,31 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               </ul>
             </div>
 
-            {/* Loot Drops (inline — no separate animation) */}
+            {/* Loot Drops (inline — with graphics) */}
             {lootDrops.length > 0 && !isFailed && (
               <div className="flex flex-wrap gap-2 mb-4 justify-center">
-                {lootDrops.map((drop, i) => (
-                  <AdaptiveMotion.div
-                    key={`loot-${i}`}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.8 + i * 0.1, type: 'spring', stiffness: 300 }}
-                    className={cn(
-                      'px-3 py-1.5 rounded-neo border-2 text-xs font-bold',
-                      drop.rarity === 'legendary' ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow' :
-                      drop.rarity === 'rare' ? 'bg-neo-purple/20 border-neo-purple text-neo-purple' :
-                      'bg-neo-cyan/20 border-neo-cyan/50 text-neo-cyan'
-                    )}
-                  >
-                    {drop.label || drop.type}
-                  </AdaptiveMotion.div>
-                ))}
+                {lootDrops.map((drop, i) => {
+                  const imgSrc = LOOT_DROP_IMAGES[drop.type];
+                  return (
+                    <AdaptiveMotion.div
+                      key={`loot-${i}`}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.8 + i * 0.1, type: 'spring', stiffness: 300 }}
+                      className={cn(
+                        'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 text-xs font-bold',
+                        drop.rarity === 'legendary' ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow' :
+                        drop.rarity === 'rare' ? 'bg-neo-purple/20 border-neo-purple text-neo-purple' :
+                        'bg-neo-cyan/20 border-neo-cyan/50 text-neo-cyan'
+                      )}
+                    >
+                      {imgSrc && (
+                        <Image src={imgSrc} alt={drop.label || drop.type} width={20} height={20} />
+                      )}
+                      {drop.label || drop.type}
+                    </AdaptiveMotion.div>
+                  );
+                })}
               </div>
             )}
 

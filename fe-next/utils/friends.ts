@@ -228,7 +228,7 @@ export async function getFriends(): Promise<Friend[]> {
 
   const { data: profiles, error: profileError } = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, total_games, ranked_mmr, current_level, last_seen_at')
+    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, avatar_config, total_games, ranked_mmr, current_level, last_seen_at')
     .in('id', friendIds);
 
   if (profileError || !profiles) {
@@ -245,6 +245,7 @@ export async function getFriends(): Promise<Friend[]> {
     avatarImage: p.avatar_image,
     avatarEmoji: p.avatar_emoji || '😊',
     avatarColor: p.avatar_color || '#4F46E5',
+    customAvatar: p.avatar_config as Friend['customAvatar'],
     status: 'accepted' as FriendStatus,
     isOnline: isUserOnline(p.last_seen_at),
     lastSeenAt: p.last_seen_at,
@@ -272,8 +273,10 @@ export async function getPendingRequests(): Promise<FriendRequest[]> {
       profiles!friends_user_id_fkey (
         username,
         display_name,
+        avatar_image,
         avatar_emoji,
-        avatar_color
+        avatar_color,
+        avatar_config
       )
     `)
     .eq('friend_id', user.id)
@@ -291,8 +294,10 @@ export async function getPendingRequests(): Promise<FriendRequest[]> {
     profiles: Array<{
       username: string;
       display_name?: string;
+      avatar_image?: string;
       avatar_emoji?: string;
       avatar_color?: string;
+      avatar_config?: Record<string, unknown>;
     }>;
   }
   return (requests as unknown as RequestWithProfile[]).map((r: RequestWithProfile) => {
@@ -302,8 +307,10 @@ export async function getPendingRequests(): Promise<FriendRequest[]> {
       fromUserId: r.user_id,
       fromUsername: profile?.username || 'Unknown',
       fromDisplayName: profile?.display_name,
+      fromAvatarImage: profile?.avatar_image,
       fromAvatarEmoji: profile?.avatar_emoji || '😊',
       fromAvatarColor: profile?.avatar_color || '#4F46E5',
+      fromCustomAvatar: profile?.avatar_config as FriendRequest['fromCustomAvatar'],
       createdAt: r.created_at,
     };
   });
@@ -353,8 +360,10 @@ export async function getOutgoingRequests(): Promise<FriendRequest[]> {
       profiles!friends_friend_id_fkey (
         username,
         display_name,
+        avatar_image,
         avatar_emoji,
-        avatar_color
+        avatar_color,
+        avatar_config
       )
     `)
     .eq('user_id', user.id)
@@ -372,8 +381,10 @@ export async function getOutgoingRequests(): Promise<FriendRequest[]> {
     profiles: Array<{
       username: string;
       display_name?: string;
+      avatar_image?: string;
       avatar_emoji?: string;
       avatar_color?: string;
+      avatar_config?: Record<string, unknown>;
     }>;
   }
   return (requests as unknown as OutgoingRequestWithProfile[]).map((r: OutgoingRequestWithProfile) => {
@@ -383,8 +394,10 @@ export async function getOutgoingRequests(): Promise<FriendRequest[]> {
       fromUserId: r.friend_id,
       fromUsername: profile?.username || 'Unknown',
       fromDisplayName: profile?.display_name,
+      fromAvatarImage: profile?.avatar_image,
       fromAvatarEmoji: profile?.avatar_emoji || '😊',
       fromAvatarColor: profile?.avatar_color || '#4F46E5',
+      fromCustomAvatar: profile?.avatar_config as FriendRequest['fromCustomAvatar'],
       createdAt: r.created_at,
     };
   });

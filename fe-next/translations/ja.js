@@ -958,6 +958,7 @@ const ja = {
     "advancedSettings": "詳細設定",
     "roomClosedInactivity": "非アクティブのためルームが閉じられました",
     "gameOverCheckScores": "ゲームオーバー！最終スコアを確認してください",
+    "progressAnnouncement": "{found}個の単語を発見 — あと{missed}個が隠れていた!",
     "youAreNowHost": "あなたが新しいホストになりました！",
     "newHostAssigned": "が新しいホストになりました",
     "tournamentMode": "トーナメントモード",
@@ -3619,6 +3620,11 @@ const ja = {
       "faq6A": "はい！コミュニティボードビルダーを使って、オリジナルの文字グリッドをデザインできます。公開して他のプレイヤーにプレイ、評価、競争してもらいましょう。トップボードはホームページで紹介されます。",
       "communityTitle": "数千人のワードゲーム愛好家に参加",
       "communityContent": "LexiClashのプレイヤーは40カ国以上、5言語にわたります。グローバルリーダーボードで競い合い、デイリーチャレンジの結果を共有し、新しいワード戦略を発見するコミュニティに参加しましょう。ヒント、アップデート、コミュニティハイライトはInstagram @lexi.clashをフォロー。"
+    },
+    "firstTimer": {
+      "exploreModes": "モードを探索",
+      "playFirst": "最初のゲームをプレイ",
+      "playFirstDesc": "飛び込んで、できるだけ多くの単語を見つけよう！"
     }
   },
   "modeDiscovery": {
@@ -3649,6 +3655,7 @@ const ja = {
     "finish": "終了",
     "victory": "勝利！",
     "gameOver": "ゲームオーバー",
+    "progressAnnouncement": "{found}個の単語を発見 — あと{missed}個が隠れていた!",
     "verifyingWords": "単語を確認中...",
     "practiceComplete": "練習完了！",
     "newHighScore": "新記録！",
@@ -5488,7 +5495,9 @@ const ja = {
       "dailyQuests": "デイリークエスト",
       "continue": "続ける",
       "worldMap": "ワールドマップ",
-      "wordAlbum": "ワードアルバム"
+      "wordAlbum": "ワードアルバム",
+      "bossRush": "ボスラッシュ",
+      "bossRushLocked": "全ボスを倒してボスラッシュを解放"
     },
     "album": {
       "title": "ワードアルバム",
@@ -5505,7 +5514,36 @@ const ja = {
     },
     "endlessMode": {
       "teaser": "エンドレスモード",
-      "comingSoon": "ワールド10をクリアして解放"
+      "comingSoon": "ワールド10をクリアして解放",
+      "bossFloor": "ボスフロア",
+      "floor": "フロア",
+      "floorCleared": "フロアクリア！",
+      "gridSize": "グリッドサイズ",
+      "highFloor": "最高フロア",
+      "newRecord": "新記録！",
+      "nextFloor": "次のフロア",
+      "quit": "ランを終了",
+      "runOver": "ラン終了",
+      "scoreTarget": "スコア目標",
+      "startRun": "ランを開始",
+      "subtitle": "どこまで行けるか？",
+      "timeLimit": "制限時間",
+      "title": "エンドレスモード"
+    },
+    "bossRush": {
+      "backToHub": "ハブに戻る",
+      "bossOf": "のボス",
+      "defeated": "撃破！",
+      "fighting": "戦闘中",
+      "fullClear": "全クリア！",
+      "fullClearBonus": "全クリアボーナス",
+      "goldEarned": "獲得ゴールド",
+      "runOver": "ラン終了",
+      "startRush": "ラッシュ開始",
+      "subtitle": "全ボスを連続で倒せ！",
+      "title": "ボスラッシュ",
+      "tryAgain": "もう一度",
+      "xpEarned": "獲得XP"
     },
     "share": {
       "bossDefeated": "{{world}}で{{boss}}を倒した！",
@@ -6493,7 +6531,8 @@ const ja = {
       "tapToOpen": "タップして開く",
       "xp": "経験値",
       "bonusGold": "ボーナスゴールド",
-      "bossTrophy": "ボストロフィー"
+      "bossTrophy": "ボストロフィー",
+      "chest": "宝箱"
     },
     "later": "あとで",
     "nextLevel": "次: レベル",

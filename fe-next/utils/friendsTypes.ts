@@ -21,6 +21,7 @@ export interface ProfileRow {
   avatar_image?: string;
   avatar_emoji?: string;
   avatar_color?: string;
+  avatar_config?: Record<string, unknown>;
   total_games?: number;
   ranked_mmr?: number;
   current_level?: number;
@@ -66,6 +67,7 @@ export interface Friend {
   avatarImage?: string;
   avatarEmoji: string;
   avatarColor: string;
+  customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig;
   status: FriendStatus;
   isOnline: boolean;
   lastSeenAt?: string;
@@ -82,6 +84,7 @@ export interface FriendRequest {
   fromAvatarImage?: string;
   fromAvatarEmoji: string;
   fromAvatarColor: string;
+  fromCustomAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig;
   createdAt: string;
 }
 
@@ -107,6 +110,7 @@ export interface FriendChallenge {
   challengerAvatarImage?: string;
   challengerAvatarEmoji: string;
   challengerAvatarColor: string;
+  challengerCustomAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig;
   challengeId: string;
   challengeCode: string;
   message?: string;
