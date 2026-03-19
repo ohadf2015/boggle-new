@@ -22,16 +22,18 @@ import { AdPlaceholder } from '@/components/ads';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingHero } from './LandingHero';
 import { LandingSocialProofBar } from './LandingSocialProofBar';
-import { LandingAvatarTeaser } from './LandingAvatarTeaser';
+const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m => m.LandingAvatarTeaser), { ssr: false });
 import { LandingChallengeCards } from './LandingChallengeCards';
-import { LandingYourRank } from './LandingYourRank';
-import { LandingBottomCTA } from './LandingBottomCTA';
-import { LandingTopWords } from './LandingTopWords';
-import { LandingHallOfFame } from './LandingHallOfFame';
-import { LandingShareBanner } from './LandingShareBanner';
-import { LandingBlogSection } from './LandingBlogSection';
-import { LandingCommunityShowcase } from './LandingCommunityShowcase';
 import { LandingMobileCards } from './LandingMobileCards';
+
+// Below-the-fold sections — lazy load to speed up initial render
+const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
+const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
+const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
+const LandingHallOfFame = dynamic(() => import('./LandingHallOfFame').then(m => m.LandingHallOfFame), { ssr: false });
+const LandingShareBanner = dynamic(() => import('./LandingShareBanner').then(m => m.LandingShareBanner), { ssr: false });
+const LandingBlogSection = dynamic(() => import('./LandingBlogSection').then(m => m.LandingBlogSection), { ssr: false });
+const LandingCommunityShowcase = dynamic(() => import('./LandingCommunityShowcase').then(m => m.LandingCommunityShowcase), { ssr: false });
 import { LeaguePositionBadge } from '@/components/leagues/LeaguePositionBadge';
 import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
