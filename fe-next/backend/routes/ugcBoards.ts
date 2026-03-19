@@ -101,6 +101,11 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
     const embedMultipleWordsInGrid = getGridEmbedder();
     const findWordsForBots = getSolver();
 
+    if (!embedMultipleWordsInGrid || !findWordsForBots) {
+      res.status(503).json({ error: 'Board generation service not ready, try again' });
+      return;
+    }
+
     // Use first seed word as primary, rest as bonus
     const [primary, ...bonus] = seedWords as string[];
     const letterPoolByLang: Record<string, string[]> = {
