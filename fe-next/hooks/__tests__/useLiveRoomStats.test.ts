@@ -9,7 +9,7 @@ const mockSocket = {
   emit: jest.fn(),
 };
 
-jest.mock('@/utils/socketContextCore', () => ({
+jest.mock('@/utils/SocketContext', () => ({
   useSocketOptional: () => ({
     socket: mockSocket,
     isConnected: true,

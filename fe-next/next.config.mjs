@@ -79,10 +79,9 @@ const nextConfig = {
   // - Three.js packages: Fix HMR issues
   // - @supabase/ssr: Fix "module is not defined" error (CommonJS/ESM interop)
   // - date-fns: Fix "module is not defined" on mobile browsers (JAVASCRIPT-NEXTJS-9S, 9Z, 19)
+  // - framer-motion: Fix CommonJS/ESM interop issues on student pages
+  // - react-hot-toast: Fix "module is not defined" in practice/education components (JAVASCRIPT-NEXTJS-9S, 9Z)
   // - remotion/@remotion/player: Fix ESM interop for Remotion cinematics (black screen without transpilation)
-  // NOTE: framer-motion and react-hot-toast removed — they ship ESM and are
-  // already in optimizePackageImports. transpilePackages forced full recompilation
-  // on every cold page load (~10s TTFB penalty in dev).
   transpilePackages: [
     'three',
     '@react-three/fiber',
@@ -90,6 +89,8 @@ const nextConfig = {
     '@react-three/postprocessing',
     '@supabase/ssr',
     'date-fns',
+    'framer-motion',
+    'react-hot-toast',
     'remotion',
     '@remotion/player',
   ],

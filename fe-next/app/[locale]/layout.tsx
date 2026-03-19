@@ -1,12 +1,32 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import nextDynamic from 'next/dynamic';
 import { translations } from '@/translations';
 import { ConditionalProviders } from '../conditional-providers';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
+import GoogleConsentMode from '@/components/GoogleConsentMode';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
+import GoogleAdSense from '@/components/GoogleAdSense';
+import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
+import WebVitalsReporter from '@/components/WebVitalsReporter';
+import PWAInstallPrompt from '@/components/PWAInstallPrompt';
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import VersionChecker from '@/components/VersionChecker';
+import NewYearCountdown from '@/components/celebration/NewYearCountdown';
+import AnimationsLoader from '@/components/AnimationsLoader';
+import DeepLinkHandler from '@/components/DeepLinkHandler';
+import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { fredoka, rubik } from '../fonts';
-import { PreProviderScripts, PostProviderScripts } from './ClientOnlyScripts';
+
+// Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
+const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureModal'), {
+  loading: () => null,
+});
+
+// Lazy-load cookie consent banner — only needed on first visit
+const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
 
 export const dynamicParams = false;
 
@@ -670,8 +690,20 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 >
                     {translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
                 </a>
-                {/* Client-only scripts: consent, analytics, SW, deep links, etc. */}
-                <PreProviderScripts />
+                {/* Google Consent Mode v2 — MUST load before GA/AdSense */}
+                <GoogleConsentMode />
+                {/* Load external scripts with optimized strategies to prevent blocking */}
+                <GoogleAnalytics />
+                <GoogleAdSense />
+                <CrazyGamesScript />
+                <WebVitalsReporter />
+                <ServiceWorkerRegistration />
+                {/* Defer loading animations.css (60KB) after page mount */}
+                <AnimationsLoader />
+                {/* Handle deep links for OAuth callbacks on mobile (Capacitor) */}
+                <DeepLinkHandler />
+                {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
+                <NativeOAuthInitializer />
                 {/* Server-rendered legal navigation — guarantees crawlers find
                     privacy/terms/about links even without JS execution (AdSense requirement) */}
                 <nav aria-label="Site Navigation" className="sr-only">
@@ -687,7 +719,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     </ul>
                 </nav>
                 <ConditionalProviders lang={validLocale}>
-                    <PostProviderScripts />
+                    {/* VersionChecker needs to be inside providers to access LanguageContext */}
+                    <VersionChecker />
                     <div className="flex-1 flex flex-col min-h-0 relative [overflow-x:clip]">
                         <main
                             id="main-content"
@@ -702,6 +735,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         {/* Global bottom navigation - mobile only, hidden during gameplay */}
                         <GlobalBottomNav />
                     </div>
+                    <PWAInstallPrompt />
+                    <EmailCaptureModal />
+                    <NewYearCountdown />
+                    <CookieConsent />
                     {/* Toast notifications container */}
                     <ToastContainer position="bottom-right" />
                 </ConditionalProviders>

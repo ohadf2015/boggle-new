@@ -18,16 +18,9 @@
 
 import { usePathname } from 'next/navigation';
 import { ReactNode, useMemo } from 'react';
-import dynamic from 'next/dynamic';
+import { GameSpecificProviders } from './providers';
 import { EssentialProviders } from './essential-providers';
 import type { Language } from '@/shared/types/game';
-
-// Lazy-load game providers — they pull in Socket.IO, game state, achievements, etc.
-// Static import forced compilation of the entire game stack on every page (even landing).
-const GameSpecificProviders = dynamic(
-  () => import('./providers').then(m => m.GameSpecificProviders),
-  { ssr: false }
-);
 
 interface ConditionalProvidersProps {
   children: ReactNode;
