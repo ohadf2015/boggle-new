@@ -50,7 +50,7 @@ function mergeApprovedWords(
 export async function loadEnglishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
-  const englishWords: string[] = require('an-array-of-english-words');
+  const { default: englishWords }: { default: string[] } = await import('an-array-of-english-words');
   const dict = new Set(englishWords.map(w => w.toLowerCase()));
   logger.debug('DICT', `Loaded ${dict.size} English words from main dictionary`);
 
@@ -155,7 +155,7 @@ export async function loadJapaneseDictionary(
 export async function loadSpanishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
-  const spanishWords: string[] = require('an-array-of-spanish-words');
+  const { default: spanishWords }: { default: string[] } = await import('an-array-of-spanish-words');
   const dict = new Set(spanishWords.map(w => w.toLowerCase()));
   logger.debug('DICT', `Loaded ${dict.size} Spanish words from main dictionary`);
 

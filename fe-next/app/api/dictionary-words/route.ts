@@ -10,13 +10,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import englishWords from 'an-array-of-english-words';
-import spanishWords from 'an-array-of-spanish-words';
 import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
-import * as fs from 'fs';
+import * as fsp from 'fs/promises';
 import * as path from 'path';
 
-// Cache dictionaries at module level
+// Cache dictionaries at module level — populated lazily per language
 const dictionaries: Record<string, string[] | null> = {
   en: null,
   es: null,
@@ -25,7 +23,7 @@ const dictionaries: Record<string, string[] | null> = {
   ja: null,
 };
 
-function loadDictionary(language: string): string[] {
+async function loadDictionary(language: string): Promise<string[]> {
   if (dictionaries[language]) {
     return dictionaries[language]!;
   }
@@ -33,34 +31,34 @@ function loadDictionary(language: string): string[] {
   let words: string[] = [];
 
   switch (language) {
-    case 'en':
+    case 'en': {
+      const { default: englishWords } = await import('an-array-of-english-words');
       words = englishWords.map((w: string) => w.toLowerCase());
       break;
+    }
 
-    case 'es':
+    case 'es': {
+      const { default: spanishWords } = await import('an-array-of-spanish-words');
       words = spanishWords.map((w: string) => w.toLowerCase());
       break;
+    }
 
     case 'he': {
       const backendDir = path.join(process.cwd(), 'backend');
-      const mainFile = path.join(backendDir, 'hebrew_words.txt');
-      const approvedFile = path.join(backendDir, 'hebrew_words_approved.txt');
       const wordSet = new Set<string>();
 
-      if (fs.existsSync(mainFile)) {
-        fs.readFileSync(mainFile, 'utf-8')
-          .split('\n')
-          .map(w => normalizeHebrewWord(w.trim()))
-          .filter(w => w.length > 0)
-          .forEach(w => wordSet.add(w));
-      }
+      const [mainContent, approvedContent] = await Promise.all([
+        fsp.readFile(path.join(backendDir, 'hebrew_words.txt'), 'utf-8').catch(() => ''),
+        fsp.readFile(path.join(backendDir, 'hebrew_words_approved.txt'), 'utf-8').catch(() => ''),
+      ]);
 
-      if (fs.existsSync(approvedFile)) {
-        fs.readFileSync(approvedFile, 'utf-8')
-          .split('\n')
-          .map(w => normalizeHebrewWord(w.trim()))
-          .filter(w => w.length > 0)
-          .forEach(w => wordSet.add(w));
+      for (const content of [mainContent, approvedContent]) {
+        if (content) {
+          for (const line of content.split('\n')) {
+            const w = normalizeHebrewWord(line.trim());
+            if (w.length > 0) wordSet.add(w);
+          }
+        }
       }
 
       words = Array.from(wordSet);
@@ -73,12 +71,15 @@ function loadDictionary(language: string): string[] {
       const wordSet = new Set<string>();
       const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
 
-      if (fs.existsSync(swedishWordsPath)) {
-        const content = fs.readFileSync(swedishWordsPath, 'utf-8');
-        const arrayMatch = content.match(/var swedish_words = \[([\s\S]*?)\];/);
+      const [content, approvedContent] = await Promise.all([
+        fsp.readFile(swedishWordsPath, 'utf-8').catch(() => ''),
+        fsp.readFile(approvedFile, 'utf-8').catch(() => ''),
+      ]);
 
+      if (content) {
+        const arrayMatch = content.match(/var swedish_words = \[([\s\S]*?)\];/);
         if (arrayMatch) {
-          arrayMatch[1].split(',').forEach(line => {
+          for (const line of arrayMatch[1].split(',')) {
             const trimmed = line.trim();
             if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
               try {
@@ -91,16 +92,15 @@ function loadDictionary(language: string): string[] {
                 // Skip invalid entries
               }
             }
-          });
+          }
         }
       }
 
-      if (fs.existsSync(approvedFile)) {
-        fs.readFileSync(approvedFile, 'utf-8')
-          .split('\n')
-          .map(w => w.trim().toLowerCase())
-          .filter(w => w.length > 0)
-          .forEach(w => wordSet.add(w));
+      if (approvedContent) {
+        for (const line of approvedContent.split('\n')) {
+          const w = line.trim().toLowerCase();
+          if (w.length > 0) wordSet.add(w);
+        }
       }
 
       words = Array.from(wordSet);
@@ -109,24 +109,20 @@ function loadDictionary(language: string): string[] {
 
     case 'ja': {
       const backendDir = path.join(process.cwd(), 'backend');
-      const kanjiFile = path.join(backendDir, 'kanji_compounds.txt');
-      const approvedFile = path.join(backendDir, 'japanese_words_approved.txt');
       const wordSet = new Set<string>();
 
-      if (fs.existsSync(kanjiFile)) {
-        fs.readFileSync(kanjiFile, 'utf-8')
-          .split('\n')
-          .map(w => w.trim())
-          .filter(w => w.length > 0)
-          .forEach(w => wordSet.add(w));
-      }
+      const [kanjiContent, approvedContent] = await Promise.all([
+        fsp.readFile(path.join(backendDir, 'kanji_compounds.txt'), 'utf-8').catch(() => ''),
+        fsp.readFile(path.join(backendDir, 'japanese_words_approved.txt'), 'utf-8').catch(() => ''),
+      ]);
 
-      if (fs.existsSync(approvedFile)) {
-        fs.readFileSync(approvedFile, 'utf-8')
-          .split('\n')
-          .map(w => w.trim())
-          .filter(w => w.length > 0)
-          .forEach(w => wordSet.add(w));
+      for (const content of [kanjiContent, approvedContent]) {
+        if (content) {
+          for (const line of content.split('\n')) {
+            const w = line.trim();
+            if (w.length > 0) wordSet.add(w);
+          }
+        }
       }
 
       words = Array.from(wordSet);
@@ -158,7 +154,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const words = loadDictionary(language);
+    const words = await loadDictionary(language);
 
     // Return as newline-delimited text (more compact than JSON)
     const response = new NextResponse(words.join('\n'), {

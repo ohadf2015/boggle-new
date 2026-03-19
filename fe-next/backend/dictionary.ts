@@ -61,6 +61,8 @@ interface DictionaryMemoryStats {
 }
 
 class Dictionary {
+  static _communityValidator: ((word: string, language: Language) => boolean) | null = null;
+
   englishWords: Set<string>;
   hebrewWords: Set<string>;
   swedishWords: Set<string>;
@@ -166,6 +168,16 @@ class Dictionary {
       this.loadedLanguages.add('en');
       this.lastAccessTime.set('en', Date.now());
       this.loaded = true;
+
+      // Lazily initialize community word validator (once, not per-call)
+      if (!Dictionary._communityValidator) {
+        try {
+          const { isWordCommunityValid } = await import('./modules/communityWordManager');
+          Dictionary._communityValidator = isWordCommunityValid;
+        } catch {
+          // Community word manager not available yet
+        }
+      }
 
       const loadTime = Date.now() - startTime;
       logger.info('DICT', `English dictionary loaded in ${loadTime}ms (other languages will be lazy-loaded)`);
@@ -286,9 +298,10 @@ class Dictionary {
     if (dictionary.has(normalizedWord)) return true;
 
     try {
-      const { isWordCommunityValid } = require('./modules/communityWordManager');
-      if (isWordCommunityValid(normalizedWord, language)) return true;
-    } catch (e) {
+      if (Dictionary._communityValidator) {
+        if (Dictionary._communityValidator(normalizedWord, language)) return true;
+      }
+    } catch {
       // Community word manager not available yet
     }
 
