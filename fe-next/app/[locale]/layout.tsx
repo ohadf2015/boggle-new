@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import nextDynamic from 'next/dynamic';
-import { translations } from '@/translations';
+import { layoutTranslations as translations } from '@/translations/layout';
 import { ConditionalProviders } from '../conditional-providers';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';

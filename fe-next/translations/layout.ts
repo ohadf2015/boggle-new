@@ -1,0 +1,557 @@
+export const layoutTranslations: Record<string, any> = {
+  "en": {
+    "direction": "ltr",
+    "seo": {
+      "title": "Free Word Game Online - Multiplayer Boggle & Word Battle",
+      "description": "Play free boggle online — no download required! LexiClash is a word game where you type in words like Boggle, competing in real-time. Race friends, build combos, and climb leaderboards. Best free alternative to Boggle, Wordle & Scrabble for groups. Play instantly in 5 languages. Great for parties, team building, and family game nights!",
+      "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle",
+      "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
+      "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
+      "twitterTitle": "LexiClash - Free Multiplayer Word Game | Play With Friends Online",
+      "twitterDescription": "Challenge friends to real-time word battles! 🎮 Find words fast, build combos, climb leaderboards. Free to play, no download. Try now! 🔥",
+      "locale": "en_US",
+      "language": "English",
+      "leaderboard": {
+        "title": "Global Leaderboard - Top Players",
+        "description": "View the top-ranked players on LexiClash global leaderboard. Compete with word game enthusiasts worldwide and track your progress to become the ultimate word master.",
+        "ogTitle": "Global Leaderboard - Top Word Game Players",
+        "ogDescription": "See where you rank among the best word game players. Join LexiClash and compete for the top spot!"
+      },
+      "profile": {
+        "title": "Your Profile & Stats",
+        "description": "View your LexiClash profile, game statistics, achievements, and progress. Track your wins, total score, words found, and time played in this competitive word game.",
+        "ogTitle": "Player Profile & Game Stats - LexiClash",
+        "ogDescription": "Track your word game achievements, statistics, and climb the leaderboard rankings."
+      },
+      "studentProfile": {
+        "title": "Student Profile & Progress",
+        "description": "View your LexiClash student profile, XP progress, lesson completion, and educational achievements. Track your learning journey and vocabulary mastery.",
+        "ogTitle": "Student Profile - LexiClash Education",
+        "ogDescription": "Track your learning progress, achievements, and vocabulary mastery in LexiClash Education."
+      },
+      "terms": {
+        "title": "Terms of Service",
+        "description": "Read LexiClash Terms of Service. Learn about user rights, acceptable use, account management, and our game policies for this multiplayer word game platform.",
+        "ogTitle": "Terms of Service - LexiClash",
+        "ogDescription": "LexiClash Terms of Service - User rights and acceptable use policies."
+      },
+      "privacy": {
+        "title": "Privacy Policy",
+        "description": "LexiClash Privacy Policy - Learn how we collect, use, and protect your data. We prioritize your privacy and use industry-standard security measures.",
+        "ogTitle": "Privacy Policy - LexiClash",
+        "ogDescription": "Learn how LexiClash protects your privacy and handles your data securely."
+      },
+      "legal": {
+        "title": "Legal Information",
+        "description": "LexiClash legal information - Access our Terms of Service and Privacy Policy. Learn about your rights and how we protect your data.",
+        "ogTitle": "Legal Information - LexiClash",
+        "ogDescription": "Access LexiClash Terms of Service and Privacy Policy."
+      },
+      "singleplayer": {
+        "title": "Play Boggle Online Free - No Download Word Game",
+        "description": "Play free boggle online — no download required! LexiClash single player lets you practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. Play boggle free in your browser instantly.",
+        "ogTitle": "Play Boggle Free Online - No Download",
+        "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
+      },
+      "daily": {
+        "title": "Daily Word Puzzle - Free Challenge Like Wordle",
+        "description": "Play the LexiClash Daily Challenge! Same puzzle for everyone worldwide each day. Share your emoji results like Wordle. Compete globally and track your daily streaks.",
+        "ogTitle": "Daily Challenge - Same Puzzle Worldwide",
+        "ogDescription": "Daily word puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
+      },
+      "multiplayer": {
+        "title": "Word Game With Friends - Free Online Multiplayer",
+        "description": "Join real-time word battles with friends! Host or join multiplayer rooms, compete live against opponents, and climb the leaderboard. Perfect for parties and game nights.",
+        "ogTitle": "Multiplayer Word Battle - Compete Live",
+        "ogDescription": "Real-time multiplayer word game - host rooms, invite friends, and compete in live word battles!"
+      },
+      "about": {
+        "title": "About Us - Our Story & Mission",
+        "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 5 languages.",
+        "ogTitle": "About LexiClash - Word Game Innovation",
+        "ogDescription": "The story behind LexiClash: making language learning fun and competitive through real-time word battles."
+      },
+      "contact": {
+        "title": "Contact Us - Get in Touch",
+        "description": "Have questions or feedback about LexiClash? Contact our team via email or social media. We'd love to hear from you about our multiplayer word game.",
+        "ogTitle": "Contact LexiClash - We'd Love to Hear From You",
+        "ogDescription": "Get in touch with the LexiClash team. Send feedback, report issues, or just say hello."
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "description": "Find answers to common questions about LexiClash word game. Learn about gameplay, scoring, account management, multiplayer features, and technical support.",
+        "ogTitle": "FAQ - LexiClash Word Game",
+        "ogDescription": "Answers to common questions about LexiClash gameplay, scoring, accounts, and more."
+      },
+      "blog": {
+        "title": "Word Game Tips & Strategies - Free Resources",
+        "description": "Tips, strategies, and insights for word game enthusiasts. Learn how to improve your vocabulary, master word-finding techniques, and become a LexiClash champion.",
+        "ogTitle": "LexiClash Blog - Word Game Tips & Strategies",
+        "ogDescription": "Expert tips, strategies, and insights to improve your word game skills."
+      },
+      "adventure": {
+        "title": "Word Adventure Game - RPG Word Puzzle Free",
+        "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
+        "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
+        "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
+      }
+    },
+    "accessibility": {
+      "skipToMain": "Skip to main content"
+    },
+    "nav": {
+      "howToPlay": "How to Play",
+      "blog": "Blog",
+      "faq": "FAQ",
+      "aboutLexiClash": "About LexiClash",
+      "contactUs": "Contact Us",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "disclaimer": "Disclaimer"
+    }
+  },
+  "he": {
+    "direction": "rtl",
+    "seo": {
+      "title": "משחק מילים חינם - מרובה משתתפים אונליין",
+      "description": "המשחק מילים הכי טוב בעברית - חינם לגמרי! לקסיקלאש הוא כמו בוגל וסקראבל אבל מרובה משתתפים בזמן אמת. 10,000+ מילים בעברית, ללא הורדה, שחקו ישר מהדפדפן. מושלם למסיבות, ערבי משפחה וגיבוש צוות. פותח בישראל 🇮🇱",
+      "keywords": "משחק מילים חינם בעברית, משחק מילים מרובה משתתפים, משחק כמו וורדל בעברית, בוגל אונליין בעברית, סקראבל אונליין חינם, משחק מילים לחברים, אלטרנטיבה לבוגל, משחק מילים בזמן אמת, קרב מילים אונליין, משחק מילים למסיבות, תפזורת אונליין, משחק מילים ישראלי, ערב משחקים משפחתי, משחק גיבוש צוות, משחק מילים ללא הורדה, משחק דפדפן חינם, אליאס אונליין בעברית, משחק אוצר מילים, משחק לילדים בעברית, משחק חינוכי בעברית, אתגר מילים, משחק מילים מתוחכם, משחק מילים חינם ללא הורדה, משחק מילים אונליין",
+      "ogTitle": "לקסיקלאש - משחק מילים כמו בוגל וסקראבל | מרובה משתתפים בעברית",
+      "ogDescription": "🎮 אוהבים וורדל או סקראבל? נסו לקסיקלאש - משחק מילים מרובה משתתפים בעברית! ⚡ צרו חדר, שלחו לינק והתחרו בזמן אמת 🔥 חינם, ללא הרשמה 🇮🇱",
+      "twitterTitle": "לקסיקלאש - משחק מילים כמו בוגל וסקראבל | מרובה משתתפים בעברית",
+      "twitterDescription": "🎮 משחק מילים מרובה משתתפים בעברית! צרו חדר, שלחו לינק והתחרו בזמן אמת ⚡ חינם, ללא הרשמה 🇮🇱 נסו עכשיו! 🔥",
+      "locale": "he_IL",
+      "language": "Hebrew",
+      "leaderboard": {
+        "title": "טבלת מובילים עולמית - השחקנים המובילים",
+        "description": "צפו בשחקנים המדורגים הגבוה ביותר בטבלת המובילים העולמית של לקסיקלאש. התחרו עם חובבי משחקי מילים ברחבי העולם ועקבו אחר ההתקדמות שלכם.",
+        "ogTitle": "טבלת מובילים עולמית - שחקני משחקי מילים מובילים",
+        "ogDescription": "ראו איפה אתם מדורגים בין שחקני משחקי המילים הטובים ביותר. הצטרפו ללקסיקלאש והתחרו על המקום הראשון!"
+      },
+      "profile": {
+        "title": "הפרופיל והסטטיסטיקות שלך",
+        "description": "צפו בפרופיל לקסיקלאש שלכם, סטטיסטיקות משחק, הישגים והתקדמות. עקבו אחר הניצחונות, הניקוד הכולל, המילים שמצאתם והזמן ששיחקתם במשחק מילים תחרותי זה.",
+        "ogTitle": "פרופיל שחקן וסטטיסטיקות משחק - לקסיקלאש",
+        "ogDescription": "עקבו אחר הישגי משחקי המילים, הסטטיסטיקות וטפסו בדירוג טבלת המובילים."
+      },
+      "studentProfile": {
+        "title": "פרופיל תלמיד והתקדמות",
+        "description": "צפו בפרופיל התלמיד שלכם בלקסיקלאש, התקדמות XP, השלמת שיעורים והישגים חינוכיים. עקבו אחר מסע הלמידה ושליטה באוצר המילים.",
+        "ogTitle": "פרופיל תלמיד - לקסיקלאש חינוך",
+        "ogDescription": "עקבו אחר התקדמות הלמידה, הישגים ושליטה באוצר המילים בלקסיקלאש חינוך."
+      },
+      "terms": {
+        "title": "תנאי שימוש",
+        "description": "קראו את תנאי השימוש של לקסיקלאש. למדו על זכויות משתמשים, שימוש מקובל, ניהול חשבון ומדיניות המשחק שלנו לפלטפורמת משחקי מילים מרובי משתתפים.",
+        "ogTitle": "תנאי שימוש - לקסיקלאש",
+        "ogDescription": "תנאי השימוש של לקסיקלאש - זכויות משתמשים ומדיניות שימוש מקובל."
+      },
+      "privacy": {
+        "title": "מדיניות פרטיות",
+        "description": "מדיניות הפרטיות של לקסיקלאש - למדו כיצד אנו אוספים, משתמשים ומגנים על הנתונים שלכם. אנו שמים בראש סדר העדיפויות את הפרטיות שלכם ומשתמשים באמצעי אבטחה בתקן התעשייה.",
+        "ogTitle": "מדיניות פרטיות - לקסיקלאש",
+        "ogDescription": "למדו כיצד לקסיקלאש מגן על הפרטיות שלכם ומטפל בנתונים שלכם בצורה מאובטחת."
+      },
+      "legal": {
+        "title": "מידע משפטי",
+        "description": "מידע משפטי של לקסיקלאש - גשו לתנאי השימוש ומדיניות הפרטיות שלנו. למדו על הזכויות שלכם וכיצד אנו מגנים על הנתונים שלכם.",
+        "ogTitle": "מידע משפטי - לקסיקלאש",
+        "ogDescription": "גשו לתנאי השימוש ומדיניות הפרטיות של לקסיקלאש."
+      },
+      "singleplayer": {
+        "title": "משחק מילים יחיד - תרגול ואתגר",
+        "description": "שחקו לקסיקלאש לבד! תרגלו מציאת מילים, התמודדו עם בוטים ושפרו את אוצר המילים. רמות קושי מרובות מקל עד קשה. עקבו אחר ההתקדמות ונצחו את השיאים שלכם.",
+        "ogTitle": "מצב שחקן יחיד - תרגול ואתגר",
+        "ogDescription": "תרגלו מציאת מילים לבד, התמודדו עם בוטים ונצחו את השיאים שלכם במצב שחקן יחיד של לקסיקלאש."
+      },
+      "daily": {
+        "title": "אתגר מילים יומי - אותו פאזל בכל העולם",
+        "description": "שחקו את האתגר היומי של לקסיקלאש! אותו פאזל לכולם בכל העולם כל יום. שתפו את התוצאות שלכם כמו וורדל. התחרו גלובלית ועקבו אחר הרצף היומי שלכם.",
+        "ogTitle": "אתגר יומי - אותו פאזל בכל העולם",
+        "ogDescription": "אתגר מילים יומי - אותו לוח לכולם בכל העולם. שתפו את התוצאות והתחרו גלובלית!"
+      },
+      "multiplayer": {
+        "title": "קרב מילים מרובה משתתפים - תחרות בזמן אמת",
+        "description": "אוהבים בוגל, סקראבל או וורדל? לקסיקלאש הוא משחק מילים מרובה משתתפים בעברית! צרו חדר, שלחו לינק והתחרו בזמן אמת - מי ימצא יותר מילים? 10,000+ מילים, ללא הרשמה, מושלם למסיבות. פותח בישראל.",
+        "ogTitle": "משחק מילים כמו בוגל וסקראבל - מרובה משתתפים בעברית",
+        "ogDescription": "אוהבים בוגל או סקראבל? נסו לקסיקלאש - משחק מילים מרובה משתתפים בעברית! צרו חדר ← שלחו לינק ← התחרו. חינם! 🇮🇱"
+      },
+      "about": {
+        "title": "אודות - הסיפור והמשימה שלנו",
+        "description": "למדו על לקסיקלאש, משחק המילים המרובה משתתפים בזמן אמת. גלו את המשימה שלנו להפוך לימוד שפות למהנה ותחרותי, הטכנולוגיה שלנו, כלי החינוך והקהילה הגדלה ב-5 שפות.",
+        "ogTitle": "אודות לקסיקלאש - חדשנות במשחקי מילים",
+        "ogDescription": "הסיפור מאחורי לקסיקלאש: להפוך לימוד שפות למהנה ותחרותי דרך קרבות מילים בזמן אמת."
+      },
+      "contact": {
+        "title": "צרו קשר",
+        "description": "יש לכם שאלות או משוב על לקסיקלאש? צרו קשר עם הצוות שלנו באימייל או ברשתות חברתיות. נשמח לשמוע מכם.",
+        "ogTitle": "צרו קשר עם לקסיקלאש",
+        "ogDescription": "צרו קשר עם צוות לקסיקלאש. שלחו משוב, דווחו על בעיות, או סתם אמרו שלום."
+      },
+      "faq": {
+        "title": "שאלות נפוצות",
+        "description": "מצאו תשובות לשאלות נפוצות על משחק המילים לקסיקלאש. למדו על המשחק, ניקוד, ניהול חשבון, תכונות מרובות משתתפים ותמיכה טכנית.",
+        "ogTitle": "שאלות נפוצות - לקסיקלאש",
+        "ogDescription": "תשובות לשאלות נפוצות על לקסיקלאש - משחק, ניקוד, חשבונות ועוד."
+      },
+      "blog": {
+        "title": "בלוג ומשאבים",
+        "description": "טיפים, אסטרטגיות ותובנות לחובבי משחקי מילים. למדו איך לשפר את אוצר המילים, לשלוט בטכניקות מציאת מילים ולהפוך לאלוף לקסיקלאש.",
+        "ogTitle": "בלוג לקסיקלאש - טיפים ואסטרטגיות",
+        "ogDescription": "טיפים מומחים, אסטרטגיות ותובנות לשיפור כישורי משחקי המילים שלכם."
+      },
+      "adventure": {
+        "title": "משחק מילים הרפתקה - RPG פאזל מילים חינם",
+        "description": "צאו להרפתקת מילים אפית! הילחמו בבוסים, כבשו 100 שלבים ב-10 עולמות נושאיים. משחק RPG פאזל מילים חינם עם אריחים מיוחדים וכוחות על.",
+        "ogTitle": "לקסיקלאש הרפתקה - RPG פאזל מילים",
+        "ogDescription": "הילחמו בבוסים בהרפתקת מילים אפית! 100 שלבים, 10 עולמות. שחקו בחינם!"
+      }
+    },
+    "accessibility": {
+      "skipToMain": "דלג לתוכן הראשי"
+    },
+    "nav": {
+      "howToPlay": "איך לשחק",
+      "blog": "בלוג",
+      "faq": "שאלות נפוצות",
+      "aboutLexiClash": "על LexiClash",
+      "contactUs": "צור קשר",
+      "privacyPolicy": "מדיניות פרטיות",
+      "termsOfService": "תנאי שימוש",
+      "disclaimer": "הצהרת אחריות"
+    }
+  },
+  "sv": {
+    "direction": "ltr",
+    "seo": {
+      "title": "Gratis Multiplayer Ordspel - Spela Online",
+      "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 5 språk - ingen nedladdning krävs.",
+      "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel, alfapet online gratis, ordspel utan nedladdning, ordspel för fester, dagligt ordpussel, ordlek med vänner, ordäventyr spel",
+      "ogTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
+      "ogDescription": "🎮 Tävla mot vänner i spännande ordstrider i realtid! ⚡ Hitta ord snabbt, överträffa motståndarna, klättra på topplistan 🔥 Perfekt för fester och spelkvällar. Spela gratis!",
+      "twitterTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
+      "twitterDescription": "🎮 Tävla i ordstrider mot vänner! Hitta ord snabbt, överträffa motståndarna ⚡ Perfekt för fester 🔥 Spela gratis nu!",
+      "locale": "sv_SE",
+      "language": "Swedish",
+      "leaderboard": {
+        "title": "Global Topplista - Toppspelare",
+        "description": "Visa de högst rankade spelarna på LexiClash globala topplista. Tävla med ordspelsentusiaster över hela världen och följ dina framsteg.",
+        "ogTitle": "Global topplista - Topp ordspelspelare",
+        "ogDescription": "Se var du rankas bland de bästa ordspelsspelarna. Gå med i LexiClash och tävla om toppplatsen!"
+      },
+      "profile": {
+        "title": "Din Profil och Statistik",
+        "description": "Visa din LexiClash-profil, spelstatistik, prestationer och framsteg. Följ dina vinster, totala poäng, hittade ord och speltid i detta tävlingsinriktade ordspel.",
+        "ogTitle": "Spelarprofil och spelstatistik - LexiClash",
+        "ogDescription": "Följ dina ordspelsprestationer, statistik och klättra i topplistans rankningar."
+      },
+      "studentProfile": {
+        "title": "Elevprofil och Framsteg",
+        "description": "Visa din LexiClash-elevprofil, XP-framsteg, lektionsslutförande och utbildningsprestationer. Följ din inlärningsresa och ordförrådsbehärskning.",
+        "ogTitle": "Elevprofil - LexiClash Utbildning",
+        "ogDescription": "Följ dina inlärningsframsteg, prestationer och ordförrådsbehärskning i LexiClash Utbildning."
+      },
+      "terms": {
+        "title": "Användarvillkor",
+        "description": "Läs LexiClash användarvillkor. Lär dig om användarrättigheter, acceptabel användning, kontohantering och våra spelregler för denna multiplayer-ordspelsplattform.",
+        "ogTitle": "Användarvillkor - LexiClash",
+        "ogDescription": "LexiClash användarvillkor - Användarrättigheter och policyer för acceptabel användning."
+      },
+      "privacy": {
+        "title": "Integritetspolicy",
+        "description": "LexiClash integritetspolicy - Lär dig hur vi samlar in, använder och skyddar dina data. Vi prioriterar din integritet och använder branschstandardiserade säkerhetsåtgärder.",
+        "ogTitle": "Integritetspolicy - LexiClash",
+        "ogDescription": "Lär dig hur LexiClash skyddar din integritet och hanterar dina data säkert."
+      },
+      "legal": {
+        "title": "Juridisk Information",
+        "description": "LexiClash juridisk information - Få tillgång till våra användarvillkor och integritetspolicy. Lär dig om dina rättigheter och hur vi skyddar dina data.",
+        "ogTitle": "Juridisk information - LexiClash",
+        "ogDescription": "Få tillgång till LexiClash användarvillkor och integritetspolicy."
+      },
+      "singleplayer": {
+        "title": "Enspelarläge - Öva och Utmana",
+        "description": "Spela LexiClash solo! Öva ordhittning, utmana AI-bottar och förbättra ditt ordförråd. Flera svårighetsgrader från lätt till svår. Följ dina framsteg och slå dina highscores.",
+        "ogTitle": "Enspelarläge - Öva & Utmana",
+        "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge."
+      },
+      "daily": {
+        "title": "Daglig Ordutmaning - Samma Pussel Världen Över",
+        "description": "Spela LexiClash dagliga utmaning! Samma pussel för alla världen över varje dag. Dela dina emoji-resultat som Wordle. Tävla globalt och följ dina dagliga serier.",
+        "ogTitle": "Daglig Utmaning - Samma Pussel Världen Över",
+        "ogDescription": "Dagligt ordpussel - samma bräda för alla världen över. Dela dina resultat och tävla globalt!"
+      },
+      "multiplayer": {
+        "title": "Multiplayer Ordstrid - Realtidstävling",
+        "description": "Gå med i ordstrider i realtid med vänner! Var värd för eller gå med i multiplayer-rum, tävla live mot motståndare och klättra på topplistan. Perfekt för fester och spelkvällar.",
+        "ogTitle": "Multiplayer Ordstrid - Tävla Live",
+        "ogDescription": "Realtids multiplayer ordspel - var värd för rum, bjud in vänner och tävla i live ordstrider!"
+      },
+      "about": {
+        "title": "Om Oss - Vår Historia och Mission",
+        "description": "Lär dig om LexiClash, realtids multiplayer ordspel. Upptäck vår mission att göra språkinlärning rolig och tävlingsinriktad, vår teknik, utbildningsverktyg och växande gemenskap på 5 språk.",
+        "ogTitle": "Om LexiClash - Innovation inom Ordspel",
+        "ogDescription": "Historien bakom LexiClash: att göra språkinlärning rolig och tävlingsinriktad genom ordstrider i realtid."
+      },
+      "contact": {
+        "title": "Kontakta Oss",
+        "description": "Har du frågor eller feedback om LexiClash? Kontakta vårt team via e-post eller sociala medier. Vi vill gärna höra från dig.",
+        "ogTitle": "Kontakta LexiClash",
+        "ogDescription": "Kontakta LexiClash-teamet. Skicka feedback, rapportera problem eller bara säg hej."
+      },
+      "faq": {
+        "title": "Vanliga Frågor",
+        "description": "Hitta svar på vanliga frågor om LexiClash ordspel. Lär dig om gameplay, poängsättning, kontohantering, multiplayer-funktioner och teknisk support.",
+        "ogTitle": "FAQ - LexiClash Ordspel",
+        "ogDescription": "Svar på vanliga frågor om LexiClash gameplay, poängsättning, konton och mer."
+      },
+      "blog": {
+        "title": "Blogg och Ordspelsresurser",
+        "description": "Tips, strategier och insikter för ordspelsentusiaster. Lär dig förbättra ditt ordförråd, bemästra ordsökningstekniker och bli en LexiClash-mästare.",
+        "ogTitle": "LexiClash Blogg - Ordspelstips & Strategier",
+        "ogDescription": "Experttips, strategier och insikter för att förbättra dina ordspelsfärdigheter."
+      },
+      "adventure": {
+        "title": "Ordäventyrsspel - RPG Ordpussel Gratis",
+        "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 100 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
+        "ogTitle": "LexiClash Äventyr - RPG Ordpussel",
+        "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!"
+      }
+    },
+    "accessibility": {
+      "skipToMain": "Hoppa till huvudinnehåll"
+    },
+    "nav": {
+      "howToPlay": "Hur man spelar",
+      "blog": "Blogg",
+      "faq": "Vanliga frågor",
+      "aboutLexiClash": "Om LexiClash",
+      "contactUs": "Kontakta oss",
+      "privacyPolicy": "Integritetspolicy",
+      "termsOfService": "Användarvillkor",
+      "disclaimer": "Ansvarsfriskrivning"
+    }
+  },
+  "ja": {
+    "direction": "ltr",
+    "seo": {
+      "title": "無料マルチプレイヤーワードゲーム - オンラインで対戦",
+      "description": "友達とスリリングなリアルタイムワードバトルで競い合おう！LexiClashは一秒一秒が勝負の速いマルチプレイヤーワードゲーム。単語を見つけ、相手を出し抜き、リーダーボードを駆け上がれ。パーティー、ゲームナイト、友達との対戦に最適。楽しみながら語彙力も鍛えられる！5言語対応で無料プレイ - ダウンロード不要！",
+      "keywords": "マルチプレイヤーワードゲーム, リアルタイムワードゲーム, オンラインワードバトル, パーティーゲーム, 対戦ワードゲーム, 速いワードゲーム, ワードパズルマルチプレイヤー, Alias, Kahoot, ファミリーゲームナイト, チームビルディング, 単語対戦, ライブワードゲーム, ワードレース, 語彙ゲーム, 無料オンラインゲーム, ボグル 無料 ダウンロード不要, ワードホイール, 世界記録 ワードゲーム, 文字ゲーム 無料, ワードゲーム ダウンロード不要, 言葉遊び オンライン, 語彙力 ゲーム, ワードアドベンチャー ゲーム",
+      "ogTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
+      "ogDescription": "🎮 友達とスリリングなリアルタイムワードバトルで競い合おう！⚡ 素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ 🔥 パーティーやゲームナイトに最適。無料プレイ！",
+      "twitterTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
+      "twitterDescription": "🎮 リアルタイムワードバトル！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ ⚡ パーティーに最適 🔥 無料プレイ！",
+      "locale": "ja_JP",
+      "language": "Japanese",
+      "leaderboard": {
+        "title": "グローバルリーダーボード - トッププレイヤー",
+        "description": "LexiClashグローバルリーダーボードで上位ランクのプレイヤーを見る。世界中のワードゲーム愛好家と競い合い、進捗を追跡しましょう。",
+        "ogTitle": "グローバルリーダーボード - トップワードゲームプレイヤー",
+        "ogDescription": "最高のワードゲームプレイヤーの中で自分のランクを確認しよう。LexiClashに参加してトップを目指そう！"
+      },
+      "profile": {
+        "title": "あなたのプロフィールと統計",
+        "description": "LexiClashプロフィール、ゲーム統計、実績、進捗を表示。この競争的なワードゲームで勝利数、合計スコア、見つけた単語、プレイ時間を追跡しましょう。",
+        "ogTitle": "プレイヤープロフィールとゲーム統計 - LexiClash",
+        "ogDescription": "ワードゲームの実績、統計を追跡し、リーダーボードランキングを登りましょう。"
+      },
+      "studentProfile": {
+        "title": "生徒プロフィールと進捗",
+        "description": "LexiClash生徒プロフィール、XP進捗、レッスン完了状況、教育実績を表示。学習の旅と語彙マスタリーを追跡しましょう。",
+        "ogTitle": "生徒プロフィール - LexiClash 教育",
+        "ogDescription": "LexiClash 教育で学習進捗、実績、語彙マスタリーを追跡しましょう。"
+      },
+      "terms": {
+        "title": "利用規約",
+        "description": "LexiClash利用規約を読む。このマルチプレイヤーワードゲームプラットフォームのユーザー権利、利用規定、アカウント管理、ゲームポリシーについて学びましょう。",
+        "ogTitle": "利用規約 - LexiClash",
+        "ogDescription": "LexiClash利用規約 - ユーザー権利と利用規定ポリシー。"
+      },
+      "privacy": {
+        "title": "プライバシーポリシー",
+        "description": "LexiClashプライバシーポリシー - データの収集、使用、保護方法を学びましょう。私たちはあなたのプライバシーを優先し、業界標準のセキュリティ対策を使用しています。",
+        "ogTitle": "プライバシーポリシー - LexiClash",
+        "ogDescription": "LexiClashがあなたのプライバシーをどのように保護し、データを安全に処理するかを学びましょう。"
+      },
+      "legal": {
+        "title": "法的情報",
+        "description": "LexiClash法的情報 - 利用規約とプライバシーポリシーにアクセス。あなたの権利と私たちがどのようにデータを保護するかを学びましょう。",
+        "ogTitle": "法的情報 - LexiClash",
+        "ogDescription": "LexiClash利用規約とプライバシーポリシーにアクセス。"
+      },
+      "singleplayer": {
+        "title": "シングルプレイヤー - 練習とチャレンジ",
+        "description": "LexiClashをソロでプレイ！単語探しを練習し、AIボットに挑戦し、語彙力を向上させよう。簡単から難しいまで複数の難易度レベル。進捗を追跡しハイスコアを更新しよう。",
+        "ogTitle": "シングルプレイヤーモード - 練習＆チャレンジ",
+        "ogDescription": "ソロで単語探しを練習し、AIボットに挑戦し、LexiClashシングルプレイヤーモードでハイスコアを更新しよう。"
+      },
+      "daily": {
+        "title": "デイリーワードチャレンジ - 世界記録に挑戦",
+        "description": "LexiClashデイリーチャレンジをプレイ！毎日同じパズルが世界中で出題。世界記録に挑戦しよう！ワードホイールで単語を見つけ、Wordleのように絵文字で結果をシェア。グローバルで競い合い、連続記録を追跡しよう。",
+        "ogTitle": "デイリーワードチャレンジ - 世界記録に挑戦",
+        "ogDescription": "毎日のワードパズルチャレンジ - 世界中で同じボード。世界記録に挑戦して結果をシェア！"
+      },
+      "multiplayer": {
+        "title": "マルチプレイヤーワードバトル - リアルタイム対戦",
+        "description": "友達とリアルタイムワードバトルに参加！マルチプレイヤールームをホストまたは参加し、対戦相手とライブで競い合い、リーダーボードを登りましょう。パーティーやゲームナイトに最適。",
+        "ogTitle": "マルチプレイヤーワードバトル - ライブ対戦",
+        "ogDescription": "リアルタイムマルチプレイヤーワードゲーム - ルームをホスト、友達を招待、ライブワードバトルで競争！"
+      },
+      "about": {
+        "title": "私たちについて - ストーリーとミッション",
+        "description": "LexiClashについて学びましょう。リアルタイムマルチプレイヤーワードゲーム。言語学習を楽しく競争的にするミッション、テクノロジー、教育ツール、5言語にわたる成長するコミュニティをご覧ください。",
+        "ogTitle": "LexiClashについて - ワードゲームイノベーション",
+        "ogDescription": "LexiClashの物語：リアルタイムワードバトルを通じて言語学習を楽しく競争的に。"
+      },
+      "contact": {
+        "title": "お問い合わせ",
+        "description": "LexiClashについてご質問やフィードバックがありますか？メールまたはソーシャルメディアでチームにお問い合わせください。",
+        "ogTitle": "LexiClashにお問い合わせ",
+        "ogDescription": "LexiClashチームにご連絡ください。フィードバック、問題報告、またはご挨拶をお待ちしています。"
+      },
+      "faq": {
+        "title": "よくある質問",
+        "description": "LexiClashワードゲームに関するよくある質問への回答。ゲームプレイ、スコアリング、アカウント管理、マルチプレイヤー機能、テクニカルサポートについて学びましょう。",
+        "ogTitle": "FAQ - LexiClashワードゲーム",
+        "ogDescription": "LexiClashのゲームプレイ、スコアリング、アカウントなどに関するよくある質問への回答。"
+      },
+      "blog": {
+        "title": "ブログとワードゲームリソース",
+        "description": "ワードゲーム愛好家のためのヒント、戦略、洞察。語彙力の向上、単語発見テクニックの習得、LexiClashチャンピオンになる方法を学びましょう。",
+        "ogTitle": "LexiClashブログ - ワードゲームのヒントと戦略",
+        "ogDescription": "ワードゲームスキルを向上させるための専門的なヒント、戦略、洞察。"
+      },
+      "adventure": {
+        "title": "ワードアドベンチャーゲーム - RPGワードパズル無料",
+        "description": "壮大なワードアドベンチャーに出発！ボスと戦い、10のテーマワールドで100レベルを征服。特殊タイルとパワーアップ付きの無料RPGワードパズルゲーム。",
+        "ogTitle": "LexiClash アドベンチャー - RPGワードパズル",
+        "ogDescription": "壮大なワードアドベンチャーでボスと戦おう！100レベル、10ワールド。無料でプレイ！"
+      }
+    },
+    "accessibility": {
+      "skipToMain": "メインコンテンツへスキップ"
+    },
+    "nav": {
+      "howToPlay": "遊び方",
+      "blog": "ブログ",
+      "faq": "よくある質問",
+      "aboutLexiClash": "LexiClashについて",
+      "contactUs": "お問い合わせ",
+      "privacyPolicy": "プライバシーポリシー",
+      "termsOfService": "利用規約",
+      "disclaimer": "免責事項"
+    }
+  },
+  "es": {
+    "direction": "ltr",
+    "seo": {
+      "title": "Juego de Palabras Multijugador Gratis - Online",
+      "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! LexiClash es un juego de palabras multijugador rápido donde cada segundo cuenta. Encuentra palabras, supera a tus oponentes y sube en la clasificación. Perfecto para fiestas, noches de juegos y competiciones amistosas. ¡Juega gratis en 5 idiomas - sin descargas!",
+      "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis, juego de letras gratis, wordle en español, boggle en español gratis, juego de palabras sin descargar, juego de palabras para grupos, juego de vocabulario online, juego de palabras con amigos, juego de palabras educativo, scrabble alternativa online, juego de palabras en navegador, reto de palabras diario, juego de palabras rápido, juego cerebral de palabras",
+      "ogTitle": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
+      "ogDescription": "🎮 ¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! ⚡ Encuentra palabras rápido, supera a tus oponentes, sube en la clasificación 🔥 ¡Juega gratis ahora!",
+      "twitterTitle": "LexiClash - Juego de Palabras Multijugador Rápido",
+      "twitterDescription": "🎮 ¡Batallas de palabras en tiempo real! Encuentra palabras, supera oponentes ⚡ Perfecto para fiestas 🔥 ¡Juega gratis!",
+      "locale": "es_ES",
+      "language": "Spanish",
+      "leaderboard": {
+        "title": "Clasificación Global - Mejores Jugadores",
+        "description": "Ve a los jugadores mejor clasificados en la tabla de LexiClash. Compite con entusiastas de juegos de palabras de todo el mundo.",
+        "ogTitle": "Clasificación Global - Mejores Jugadores de Palabras",
+        "ogDescription": "¡Mira dónde te clasificas entre los mejores jugadores de palabras!"
+      },
+      "profile": {
+        "title": "Tu Perfil y Estadísticas",
+        "description": "Ve tu perfil de LexiClash, estadísticas de juego, logros y progreso.",
+        "ogTitle": "Perfil del Jugador y Estadísticas - LexiClash",
+        "ogDescription": "Rastrea tus logros y estadísticas de juegos de palabras."
+      },
+      "studentProfile": {
+        "title": "Perfil de Estudiante y Progreso",
+        "description": "Ve tu perfil de estudiante de LexiClash, progreso de XP, lecciones completadas y logros educativos. Rastrea tu viaje de aprendizaje y dominio del vocabulario.",
+        "ogTitle": "Perfil de Estudiante - LexiClash Educación",
+        "ogDescription": "Rastrea tu progreso de aprendizaje, logros y dominio del vocabulario en LexiClash Educación."
+      },
+      "terms": {
+        "title": "Términos de Servicio",
+        "description": "Lee los Términos de Servicio de LexiClash.",
+        "ogTitle": "Términos de Servicio - LexiClash",
+        "ogDescription": "Términos de Servicio de LexiClash."
+      },
+      "privacy": {
+        "title": "Política de Privacidad",
+        "description": "Política de Privacidad de LexiClash - Aprende cómo protegemos tus datos.",
+        "ogTitle": "Política de Privacidad - LexiClash",
+        "ogDescription": "Aprende cómo LexiClash protege tu privacidad."
+      },
+      "legal": {
+        "title": "Información Legal",
+        "description": "Información legal de LexiClash - Términos de Servicio y Política de Privacidad.",
+        "ogTitle": "Información Legal - LexiClash",
+        "ogDescription": "Accede a los Términos de Servicio y Política de Privacidad de LexiClash."
+      },
+      "singleplayer": {
+        "title": "Modo Un Jugador - Practica y Desafía",
+        "description": "¡Juega LexiClash solo! Practica la búsqueda de palabras, desafía bots de IA y mejora tu vocabulario. Múltiples niveles de dificultad. Sigue tu progreso y supera tus mejores puntuaciones.",
+        "ogTitle": "Modo Un Jugador - Practica y Desafía",
+        "ogDescription": "Practica la búsqueda de palabras solo, desafía bots de IA y supera tus mejores puntuaciones."
+      },
+      "daily": {
+        "title": "Desafío Diario - Mismo Puzzle Mundial",
+        "description": "¡Juega el Desafío Diario de LexiClash! Mismo puzzle para todos en el mundo cada día. Comparte tus resultados como Wordle. Compite globalmente.",
+        "ogTitle": "Desafío Diario - Mismo Puzzle Mundial",
+        "ogDescription": "Desafío de palabras diario - mismo tablero para todos. ¡Comparte tus resultados y compite globalmente!"
+      },
+      "multiplayer": {
+        "title": "Batalla de Palabras Multijugador - Tiempo Real",
+        "description": "¡Únete a batallas de palabras en tiempo real con amigos! Crea o únete a salas multijugador, compite en vivo contra oponentes y sube en la clasificación.",
+        "ogTitle": "Batalla de Palabras Multijugador - Compite en Vivo",
+        "ogDescription": "Juego de palabras multijugador en tiempo real - crea salas, invita amigos y compite en batallas de palabras en vivo."
+      },
+      "about": {
+        "title": "Sobre Nosotros - Nuestra Historia y Misión",
+        "description": "Conoce LexiClash, el juego de palabras multijugador en tiempo real. Descubre nuestra misión de hacer el aprendizaje de idiomas divertido y competitivo, nuestra tecnología, herramientas educativas y comunidad en 5 idiomas.",
+        "ogTitle": "Sobre LexiClash - Innovación en Juegos de Palabras",
+        "ogDescription": "La historia detrás de LexiClash: hacer el aprendizaje de idiomas divertido y competitivo a través de batallas de palabras en tiempo real."
+      },
+      "contact": {
+        "title": "Contáctanos",
+        "description": "¿Tienes preguntas o comentarios sobre LexiClash? Contacta a nuestro equipo por correo electrónico o redes sociales. Nos encantaría saber de ti.",
+        "ogTitle": "Contacta a LexiClash",
+        "ogDescription": "Ponte en contacto con el equipo de LexiClash. Envía comentarios, reporta problemas o simplemente saluda."
+      },
+      "faq": {
+        "title": "Preguntas Frecuentes",
+        "description": "Encuentra respuestas a preguntas comunes sobre el juego de palabras LexiClash. Aprende sobre jugabilidad, puntuación, gestión de cuentas, funciones multijugador y soporte técnico.",
+        "ogTitle": "FAQ - LexiClash Juego de Palabras",
+        "ogDescription": "Respuestas a preguntas frecuentes sobre LexiClash: jugabilidad, puntuación, cuentas y más."
+      },
+      "blog": {
+        "title": "Blog y Recursos de Juegos de Palabras",
+        "description": "Consejos, estrategias e información para entusiastas de juegos de palabras. Aprende a mejorar tu vocabulario, dominar técnicas de búsqueda de palabras y convertirte en campeón de LexiClash.",
+        "ogTitle": "Blog de LexiClash - Consejos y Estrategias",
+        "ogDescription": "Consejos expertos, estrategias e información para mejorar tus habilidades en juegos de palabras."
+      },
+      "adventure": {
+        "title": "Juego de Palabras Aventura - RPG de Palabras Gratis",
+        "description": "¡Embárcate en una aventura épica de palabras! Batalla contra jefes, conquista 100 niveles en 10 mundos temáticos. Juego RPG de palabras gratis con fichas especiales y power-ups.",
+        "ogTitle": "LexiClash Aventura - Juego RPG de Palabras",
+        "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 100 niveles, 10 mundos. ¡Juega gratis!"
+      }
+    },
+    "accessibility": {
+      "skipToMain": "Saltar al contenido principal"
+    },
+    "nav": {
+      "howToPlay": "Cómo jugar",
+      "blog": "Blog",
+      "faq": "Preguntas frecuentes",
+      "aboutLexiClash": "Sobre LexiClash",
+      "contactUs": "Contáctenos",
+      "privacyPolicy": "Política de privacidad",
+      "termsOfService": "Términos de servicio",
+      "disclaimer": "Descargo de responsabilidad"
+    }
+  }
+};
