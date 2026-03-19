@@ -27,9 +27,10 @@ const isCrazyGamesEnabled = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Standalone output: produces a self-contained .next/standalone/ directory
-  // with only the node_modules files actually needed at runtime (~200-350MB vs 1.4GB)
-  output: 'standalone',
+  // NOTE: output: 'standalone' removed — incompatible with custom Express server.
+  // Next.js 16 warns: "next start" does not work with standalone config.
+  // The custom server.ts uses next({ dev }) directly, not the standalone server.js.
+  // Keeping full node_modules on Railway is fine — disk is cheap, stability matters.
 
   // Enable gzip compression — Railway edge does NOT compress responses,
   // so the app must do it. Without this, 1.5MB+ JS chunks are sent raw.
