@@ -28,7 +28,6 @@ interface UseResultSubmissionProps {
     avatar_emoji?: string | null;
     avatar_color?: string | null;
     avatar_image?: string | null;
-    profile_picture_url?: string | null;
   } | null;
   guestPlayer: GuestDailyPlayer | null;
   countryCodeReady: boolean;

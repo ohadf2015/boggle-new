@@ -250,7 +250,6 @@ router.post('/publish', async (req: Request, res: Response): Promise<void> => {
       isPublic,
       creatorDisplayName,
       creatorAvatar,
-      creatorProfilePictureUrl,
     } = req.body;
 
     if (!title) {
@@ -286,7 +285,7 @@ router.post('/publish', async (req: Request, res: Response): Promise<void> => {
       creator_id: user.id,
       creator_display_name: creatorDisplayName ?? 'Anonymous',
       creator_avatar: creatorAvatar ?? null,
-      creator_profile_picture_url: creatorProfilePictureUrl ?? null,
+      creator_profile_picture_url: null,
       language: language ?? 'en',
       title,
       description: description ?? null,
@@ -547,18 +546,17 @@ router.get('/creators/top', async (req: Request, res: Response): Promise<void> =
 
     // Join with profiles for display names and avatars
     const creatorIds = (data ?? []).map((r) => r.creator_id);
-    let profileMap: Record<string, { display_name: string; profile_picture_url: string | null; avatar_config: unknown }> = {};
+    let profileMap: Record<string, { display_name: string; avatar_config: unknown }> = {};
 
     if (creatorIds.length > 0) {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, display_name, profile_picture_url, avatar_config')
+        .select('id, display_name, avatar_config')
         .in('id', creatorIds);
 
       for (const p of profiles ?? []) {
         profileMap[p.id] = {
           display_name: p.display_name ?? 'Creator',
-          profile_picture_url: p.profile_picture_url ?? null,
           avatar_config: p.avatar_config ?? null,
         };
       }
@@ -567,7 +565,6 @@ router.get('/creators/top', async (req: Request, res: Response): Promise<void> =
     const creators = (data ?? []).map((row) => ({
       creator_id: row.creator_id,
       display_name: profileMap[row.creator_id]?.display_name ?? 'Creator',
-      profile_picture_url: profileMap[row.creator_id]?.profile_picture_url ?? null,
       avatar_config: profileMap[row.creator_id]?.avatar_config ?? null,
       boards_created: row.boards_created ?? 0,
       total_plays: row.total_plays ?? 0,

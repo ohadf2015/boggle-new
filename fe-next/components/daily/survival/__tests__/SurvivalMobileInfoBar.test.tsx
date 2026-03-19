@@ -52,8 +52,8 @@ beforeEach(() => {
     ok: true,
     json: () => Promise.resolve({
       data: [
-        { rank_position: 1, display_name: 'Alice', efficiency_score: 350, solved: true, player_id: 'alice-id', guest_fingerprint: null, profile_picture_url: null, avatar_image: null },
-        { rank_position: 2, display_name: 'Bob', efficiency_score: 280, solved: true, player_id: 'bob-id', guest_fingerprint: null, profile_picture_url: null, avatar_image: null },
+        { rank_position: 1, display_name: 'Alice', efficiency_score: 350, solved: true, player_id: 'alice-id', guest_fingerprint: null, avatar_image: null},
+        { rank_position: 2, display_name: 'Bob', efficiency_score: 280, solved: true, player_id: 'bob-id', guest_fingerprint: null, avatar_image: null},
       ],
       totalPlayers: 25,
     }),

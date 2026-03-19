@@ -89,7 +89,7 @@ const TvResultsLeaderboard = memo<TvResultsLeaderboardProps>(({
 
                 {/* Avatar */}
                 <Avatar
-                  profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+
                   avatarImage={player.avatar?.avatarImage}
                   customAvatar={player.avatar?.customAvatar}
                   size="md"

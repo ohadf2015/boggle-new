@@ -100,7 +100,6 @@ export function usePendingDailyResult(): PendingDailyResultSubmission {
           avatarEmoji: userProfile.avatar_emoji || guestPlayer?.avatarEmoji || '',
           avatarColor: userProfile.avatar_color || guestPlayer?.avatarColor || '#6366f1',
           avatarImage: userProfile.avatar_image || undefined,
-          profilePictureUrl: userProfile.profile_picture_url || undefined,
           solved: pending.result.solved,
           attemptsUsed: pending.result.attemptsUsed,
           targetWord: pending.result.targetWord,

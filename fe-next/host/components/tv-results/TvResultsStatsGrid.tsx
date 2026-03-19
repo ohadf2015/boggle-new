@@ -243,7 +243,7 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
               {stat.player && (
                 <div className="flex items-center gap-2 mt-2 pt-2 border-t-2 border-neo-black/20">
                   <Avatar
-                    profilePictureUrl={stat.player.avatar?.profilePictureUrl ?? undefined}
+
                     avatarImage={stat.player.avatar?.avatarImage}
                     customAvatar={stat.player.avatar?.customAvatar}
                     size="sm"

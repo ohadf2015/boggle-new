@@ -32,7 +32,6 @@ interface LeaderboardEntry {
   username?: string;
   avatar_image?: string;
   avatar_config?: CustomAvatarConfig | null;
-  profile_picture_url?: string;
   total_score?: number;
   games_played?: number;
 }
@@ -215,8 +214,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                 <div className="flex items-center gap-4">
                   <Avatar
                     customAvatar={profile.avatar_config}
-                    profilePictureUrl={profile.profile_picture_url ?? undefined}
                     avatarImage={profile.avatar_image ?? undefined}
+                    userId={user?.id}
                     size="lg"
                   />
                   <div>
@@ -338,8 +337,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       <div className="sm:hidden flex-shrink-0 w-6 text-center">{getRankIcon(rank)}</div>
                       <Avatar
                         customAvatar={entry.avatar_config}
-                        profilePictureUrl={entry.profile_picture_url ?? undefined}
                         avatarImage={entry.avatar_image ?? undefined}
+                        userId={entry.player_id}
                         size="sm"
                       />
                       <Link

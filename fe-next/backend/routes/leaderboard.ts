@@ -62,7 +62,6 @@ interface LeaderboardEntry {
   avatar_emoji: string;
   avatar_color: string;
   avatar_image?: string;
-  profile_picture_url?: string;
   total_score: number;
   games_played: number;
   games_won: number;
@@ -125,7 +124,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
       const supabase = getSupabase();
       const { data, error } = await supabase
         .from('leaderboard')
-        .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, total_score, games_played, games_won, ranked_mmr')
+        .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, total_score, games_played, games_won, ranked_mmr')
         .order('total_score', { ascending: false })
         .limit(100);
 

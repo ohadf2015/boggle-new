@@ -12,7 +12,6 @@ export interface TopPlayer {
   totalScore: number;
   avatarImage: string | null;
   avatarConfig: CustomAvatarConfig | null;
-  profilePictureUrl: string | null;
 }
 
 // Module-level cache for top players
@@ -65,7 +64,7 @@ export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
     async function fetchData() {
       const { data, error } = await supabase!
         .from('leaderboard')
-        .select('player_id, username, display_name, total_score, avatar_image, avatar_config, profile_picture_url')
+        .select('player_id, username, display_name, total_score, avatar_image, avatar_config')
         .order('total_score', { ascending: false })
         .limit(limit);
 
@@ -79,7 +78,6 @@ export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
           totalScore: row.total_score,
           avatarImage: row.avatar_image,
           avatarConfig: row.avatar_config,
-          profilePictureUrl: row.profile_picture_url,
         }));
         setPlayers(mapped);
         topPlayersCache.data = mapped;

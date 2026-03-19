@@ -1494,6 +1494,8 @@ const ja = {
     "finalScore": "最終スコア",
     "coinsEarned": "獲得コイン",
     "detailedAnalysis": "詳細分析",
+    "gameStats": "ゲーム統計",
+    "accuracy": "正確率",
     "yourPerformance": "あなたの成績",
     "rewards": "報酬",
     "standings": "順位",

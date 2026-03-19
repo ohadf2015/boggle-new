@@ -11,7 +11,6 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 interface CreatorRow {
   creator_id: string;
   display_name: string;
-  profile_picture_url: string | null;
   avatar_config: CustomAvatarConfig | null;
   boards_created: number;
   total_plays: number;
@@ -79,7 +78,7 @@ function CreatorSpotlight({ creator }: { creator: CreatorRow }) {
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <Avatar
           customAvatar={creator.avatar_config}
-          profilePictureUrl={creator.profile_picture_url ?? undefined}
+
           size="lg"
         />
         <div className="min-w-0">
@@ -119,7 +118,7 @@ function CreatorTableRow({ creator, rank }: { creator: CreatorRow; rank: number 
       <div className="col-span-5 flex items-center gap-2 min-w-0">
         <Avatar
           customAvatar={creator.avatar_config}
-          profilePictureUrl={creator.profile_picture_url ?? undefined}
+
           size="sm"
         />
         <span className="font-medium text-neo-white text-sm truncate">

@@ -577,7 +577,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   username: p.username,
                   score: p.score,
                   rank: 0,
-                  profilePictureUrl: p.avatar?.profilePictureUrl,
+
                   avatarEmoji: p.avatar?.emoji,
                   avatarColor: p.avatar?.color,
                   inputMethod: p.username === username && isTypingMode ? 'keyboard' as const : null,

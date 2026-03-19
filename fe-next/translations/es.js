@@ -1557,6 +1557,8 @@ const es = {
     "finalScore": "Puntuación Final",
     "coinsEarned": "Monedas Ganadas",
     "detailedAnalysis": "Análisis Detallado",
+    "gameStats": "Estadísticas",
+    "accuracy": "Precisión",
     "rewards": "Recompensas",
     "standings": "Clasificación",
     "guestSavePrompt": "Inicia sesión para guardar recompensas",

@@ -23,7 +23,7 @@ export default function WinnerOnboardingWrapper() {
       onComplete={completeOnboarding}
       initialName={onboardingData.initialName}
       initialAvatarId={onboardingData.initialAvatarId}
-      profilePictureUrl={profile?.profile_picture_url ?? undefined}
+
       trigger={onboardingData.trigger}
     />
   );

@@ -8,8 +8,6 @@ import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
-import { PROFILE_AVATAR_ID } from '@/components/Avatar';
-
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -68,16 +66,14 @@ jest.mock('@/components/auth/AuthButton', () => ({
 }));
 jest.mock('@/components/Avatar', () => ({
   __esModule: true,
-  default: ({ avatarImage, profilePictureUrl }: { avatarImage?: string; profilePictureUrl?: string }) => (
+  default: ({ avatarImage }: { avatarImage?: string }) => (
     <div
       data-testid="header-avatar"
       data-avatar-image={avatarImage}
-      data-profile-picture-url={profilePictureUrl}
     >
       Avatar
     </div>
   ),
-  PROFILE_AVATAR_ID: '__profile_avatar__',
 }));
 
 const mockPush = jest.fn();
@@ -106,16 +102,15 @@ describe('Header - Mobile Menu Avatar Bug', () => {
     } as any);
   });
 
-  it('FIXED: hamburger menu should ALWAYS show Menu icon, not avatar (authenticated user with profile picture)', () => {
-    // Setup: User with custom profile picture uploaded
+  it('FIXED: hamburger menu should ALWAYS show Menu icon, not avatar (authenticated user with avatar)', () => {
+    // Setup: User with avatar
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       isAdmin: false,
       profile: {
         id: 'test-user',
         username: 'TestUser',
-        profile_picture_url: 'https://example.com/custom-profile.jpg',
-        avatar_image: PROFILE_AVATAR_ID, // Special ID indicating use profile picture
+        avatar_image: 'broccoli-bob',
         total_coins: 100,
       },
       loading: false,
@@ -148,15 +143,14 @@ describe('Header - Mobile Menu Avatar Bug', () => {
   });
 
   it('FIXED: hamburger menu should ALWAYS show Menu icon, not avatar (authenticated user with character avatar)', () => {
-    // Setup: User with custom profile picture but avatarImage explicitly set to character avatar
+    // Setup: User with character avatar
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       isAdmin: false,
       profile: {
         id: 'test-user',
         username: 'TestUser',
-        profile_picture_url: 'https://example.com/custom-profile.jpg',
-        avatar_image: 'broccoli-bob', // User explicitly wants character avatar
+        avatar_image: 'broccoli-bob',
         total_coins: 100,
       },
       loading: false,

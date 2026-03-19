@@ -1611,6 +1611,8 @@ const en = {
     "finalScore": "Final Score",
     "coinsEarned": "Coins Earned",
     "detailedAnalysis": "Detailed Analysis",
+    "gameStats": "Game Stats",
+    "accuracy": "Accuracy",
     "yourPerformance": "Your Performance",
     "rewards": "Rewards",
     "standings": "Standings",

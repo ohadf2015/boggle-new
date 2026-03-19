@@ -51,6 +51,7 @@ jest.mock('@/utils/utils', () => ({
 jest.mock('@/utils/clientWordValidator', () => ({
   validateWordLocally: jest.fn().mockReturnValue({ isValid: true }),
   isWordOnBoard: jest.fn().mockReturnValue(true),
+  buildPositionsMap: jest.fn().mockReturnValue(new Map()),
 }));
 
 /** Helper to get the most recent GridComponent props */

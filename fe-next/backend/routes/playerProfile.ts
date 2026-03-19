@@ -11,7 +11,7 @@ const router: Router = express.Router();
 
 // Public profile columns — NEVER include email, UTM, admin, tokens
 const PUBLIC_PROFILE_COLUMNS = [
-  'id', 'username', 'display_name', 'avatar_config', 'profile_picture_url',
+  'id', 'username', 'display_name', 'avatar_config',
   'country_code', 'current_level', 'total_xp', 'total_games', 'total_score',
   'total_words', 'casual_wins', 'ranked_wins', 'longest_word', 'longest_word_length',
   'achievement_counts', 'created_at',
@@ -88,7 +88,6 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
       username: profile.username,
       displayName: profile.display_name || profile.username,
       customAvatar: profile.avatar_config || null,
-      profilePictureUrl: profile.profile_picture_url || null,
       countryCode: profile.country_code || null,
       currentLevel: profile.current_level || 1,
       totalXp: profile.total_xp || 0,

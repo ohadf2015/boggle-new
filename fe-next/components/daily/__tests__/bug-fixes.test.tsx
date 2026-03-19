@@ -64,7 +64,6 @@ describe('Bug Fixes - Phase 10', () => {
     avatar_emoji: '🏆',
     avatar_color: '#FFD700',
     avatar_image: null,
-    profile_picture_url: null,
   };
 
   const mockOnSubmitSuccess = jest.fn();

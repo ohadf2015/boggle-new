@@ -79,14 +79,6 @@ jest.mock('@/hooks/usePullToRefresh', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useProfilePictureUpload', () => ({
-  useProfilePictureUpload: () => ({
-    isUploading: false,
-    handleProfilePictureUpload: jest.fn(),
-    handleRemoveProfilePicture: jest.fn(),
-  }),
-}));
-
 jest.mock('@/hooks/usePlayerCollectibles', () => ({
   usePlayerCollectibles: () => ({
     collectibles: [],

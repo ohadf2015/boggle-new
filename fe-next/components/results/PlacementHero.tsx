@@ -21,7 +21,7 @@ interface PlacementHeroProps {
   avatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string | null;
+
     avatarImage?: string;
     customAvatar?: CustomAvatarConfig | null;
   };
@@ -219,7 +219,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <Avatar
-                  profilePictureUrl={avatar.profilePictureUrl ?? undefined}
+
                   avatarImage={avatar.avatarImage}
                   customAvatar={avatar.customAvatar}
                   size="lg"

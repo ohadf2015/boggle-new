@@ -123,7 +123,7 @@ export const BlastGrid = memo(function BlastGrid({
   return (
     <div
       ref={containerRef}
-      className={`blast-game blast-grid-frame relative w-full aspect-square max-w-[360px] md:max-w-[480px] transition-shadow duration-300 ${!isInteractive ? 'ring-2 ring-cyan-400/30 ring-offset-1 ring-offset-transparent' : ''}`}
+      className={`blast-game blast-grid-frame relative w-full aspect-square max-w-[360px] md:max-w-[480px] transition-shadow duration-300 overflow-hidden ${!isInteractive ? 'ring-2 ring-cyan-400/30 ring-offset-1 ring-offset-transparent' : ''}`}
       style={{ contain: 'layout paint' }}
       data-cascade={cascadePhase !== 'idle' ? 'active' : 'idle'}
       aria-label={ariaLabel}

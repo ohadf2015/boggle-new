@@ -74,7 +74,6 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
         <div className="flex items-center gap-2">
           <Avatar
             customAvatar={(board.creator_avatar as CustomAvatarConfig | null) ?? null}
-            profilePictureUrl={board.creator_profile_picture_url}
             size="sm"
           />
           <span className="text-neo-white/70 text-xs font-neo-body">

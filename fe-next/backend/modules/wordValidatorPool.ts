@@ -1,7 +1,7 @@
 /**
  * Word Validator Worker Pool
  * Manages a pool of worker threads for CPU-intensive word validation
- * Falls back to synchronous validation if workers are unavailable
+ * Falls back to direct synchronous validation if workers are unavailable
  *
  * Supports both Node.js worker_threads and Bun.Worker
  */
@@ -10,6 +10,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { createWorker, WorkerLike, isBun } from './workerRuntime';
+import * as validator from './wordValidator';
 
 // Interfaces
 export interface WorkerMessage {
@@ -64,6 +65,7 @@ export class WordValidatorPool {
   private taskIdCounter: number = 0;
   private isInitialized: boolean = false;
   private initPromise: Promise<void> | null = null;
+  private syncOnly: boolean = false;
 
   /**
    * Initialize the worker pool
@@ -83,7 +85,8 @@ export class WordValidatorPool {
 
     // Skip worker creation if the worker file doesn't exist (uses sync fallback)
     if (!fs.existsSync(workerPath)) {
-      console.log('[WORKER POOL] Worker file not found, using synchronous validation');
+      console.log('[WORKER POOL] Worker file not found, using direct synchronous validation');
+      this.syncOnly = true;
       return;
     }
 
@@ -110,6 +113,7 @@ export class WordValidatorPool {
       console.log(`[WORKER POOL] Initialized with ${this.workers.length} workers (${runtime})`);
     } else {
       console.warn('[WORKER POOL] No workers available, falling back to sync mode');
+      this.syncOnly = true;
     }
   }
 
@@ -190,7 +194,11 @@ export class WordValidatorPool {
     return new Promise((resolve, reject) => {
       // If no workers available, fall back to sync
       if (this.workers.length === 0) {
-        return this._runSync(action, data).then(resolve).catch(reject);
+        try {
+          return resolve(this._runSync(action, data));
+        } catch (err) {
+          return reject(err);
+        }
       }
 
       // Reject if queue is full
@@ -207,7 +215,11 @@ export class WordValidatorPool {
         if (task) {
           this.pendingTasks.delete(id);
           // Fall back to sync on timeout
-          this._runSync(action, data).then(task.resolve).catch(task.reject);
+          try {
+            task.resolve(this._runSync(action, data));
+          } catch (err) {
+            task.reject(err);
+          }
         }
       }, TASK_TIMEOUT);
 
@@ -224,11 +236,9 @@ export class WordValidatorPool {
 
   /**
    * Synchronous fallback for when workers are unavailable
+   * Used only when workers exist but the task needs sync execution
    */
-  private async _runSync(action: string, data: Record<string, unknown>): Promise<unknown> {
-    // Dynamic import for ES module compatibility
-    const validator = await import('./wordValidator');
-
+  private _runSync(action: string, data: Record<string, unknown>): unknown {
     // Reconstruct Map from serialized array entries if needed
     const positions = data.positions
       ? new Map(data.positions as [string, [number, number][]][])
@@ -259,6 +269,11 @@ export class WordValidatorPool {
     // Defensive: ensure positions is a proper Map before using Map methods
     const safePositions = positions instanceof Map ? positions : undefined;
 
+    // Direct sync path — no serialization overhead, no promise chains
+    if (this.syncOnly) {
+      return validator.isWordOnBoard(word, board, safePositions);
+    }
+
     try {
       return await this._submitTask('isWordOnBoard', {
         word,
@@ -266,10 +281,8 @@ export class WordValidatorPool {
         positions: safePositions ? Array.from(safePositions.entries()) : null
       }) as boolean;
     } catch (error) {
-      // Fall back to sync on error
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-      const validator = await import('./wordValidator');
       return validator.isWordOnBoard(word, board, safePositions);
     }
   }
@@ -286,6 +299,10 @@ export class WordValidatorPool {
 
     const safePositions = positions instanceof Map ? positions : undefined;
 
+    if (this.syncOnly) {
+      return validator.getWordPath(word, board, safePositions);
+    }
+
     try {
       return await this._submitTask('getWordPath', {
         word,
@@ -295,7 +312,6 @@ export class WordValidatorPool {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-      const validator = await import('./wordValidator');
       return validator.getWordPath(word, board, safePositions);
     }
   }
@@ -306,13 +322,16 @@ export class WordValidatorPool {
   async makePositionsMapAsync(board: string[][]): Promise<PositionsMap> {
     await this.initialize();
 
+    if (this.syncOnly) {
+      return validator.makePositionsMap(board);
+    }
+
     try {
       const entries = await this._submitTask('makePositionsMap', { board }) as [string, [number, number][]][];
       return new Map(entries);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-      const validator = await import('./wordValidator');
       return validator.makePositionsMap(board);
     }
   }

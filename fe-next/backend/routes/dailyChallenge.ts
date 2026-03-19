@@ -219,7 +219,7 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
 
     const {
       puzzleDate, puzzleNumber, language, playerId, guestFingerprint,
-      displayName, avatarEmoji, avatarColor, avatarImage, profilePictureUrl,
+      displayName, avatarEmoji, avatarColor, avatarImage,
       countryCode, score, wordCount, wordsByLength, timeSeconds, longestWord
     } = req.body;
 
@@ -255,7 +255,6 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       avatar_emoji: avatarEmoji || '🎯',
       avatar_color: avatarColor || '#6366f1',
       avatar_image: avatarImage || undefined,
-      profile_picture_url: profilePictureUrl || undefined,
       country_code: countryCode || undefined
     };
 

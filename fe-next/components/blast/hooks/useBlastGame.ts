@@ -161,6 +161,13 @@ export function useBlastGame(
   const effectiveGridRef = useRef(effectiveGrid);
   effectiveGridRef.current = effectiveGrid;
 
+  // Derive a bitmask signature of cleared cells so displayGrid only recomputes
+  // when actual cleared positions change (not on every tileState mutation like
+  // hitsRemaining decrements, activationEffect changes, etc.)
+  const clearedSignature = useMemo(() => {
+    return tileStates.map(row => row.map(t => t.isCleared ? 1 : 0).join('')).join('|');
+  }, [tileStates]);
+
   // Display grid: show letters for non-cleared tiles, empty for cleared
   const displayGrid = useMemo<LetterGrid | null>(() => {
     if (!effectiveGrid) return null;
@@ -169,7 +176,8 @@ export function useBlastGame(
         tileStates[ri]?.[ci]?.isCleared ? '' : cell
       )
     );
-  }, [effectiveGrid, tileStates]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- clearedSignature is the derived dependency
+  }, [effectiveGrid, clearedSignature]);
 
   // Dictionary cache (moved up — used by both cascade detection and dead-end detection)
   const { checkWord: checkWordInDict, isLoaded: isDictLoaded } = useDictionaryCache(language);
@@ -242,6 +250,8 @@ export function useBlastGame(
   // Skip during cascade/auto-detect phases — no interactive dead-end is possible while cascading.
   // Use wordsFound.length (not array ref) to avoid re-running on every push.
   const wordsFoundCount = gameState.wordsFound.length;
+  // Ref to track the latest requestIdleCallback handle for cleanup
+  const deadEndIdleRef = useRef<number | null>(null);
   useEffect(() => {
     if (!isDictLoaded || !displayGrid) return;
     if (gameState.isComplete || gameState.isDeadEnd) return;
@@ -250,8 +260,8 @@ export function useBlastGame(
     // Only check after at least one word has been found (skip initial load)
     if (wordsFoundCount === 0) return;
 
-    // Debounce + requestIdleCallback to avoid blocking the main thread post-cascade.
-    // The DFS over a 6x6 grid can take 15-25ms — enough to cause a jank spike.
+    // Debounce 500ms (up from 300ms) + requestIdleCallback to avoid blocking
+    // the main thread post-cascade. The DFS can take 15-25ms on a 6x6 grid.
     const timer = setTimeout(() => {
       const run = () => {
         const foundSet = new Set(gameState.wordsFound);
@@ -259,13 +269,19 @@ export function useBlastGame(
         setNoWordsRemaining(!valid);
       };
       if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(run, { timeout: 500 });
+        deadEndIdleRef.current = requestIdleCallback(run, { timeout: 1000 });
       } else {
         run();
       }
-    }, 300);
+    }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (deadEndIdleRef.current !== null && typeof cancelIdleCallback === 'function') {
+        cancelIdleCallback(deadEndIdleRef.current);
+        deadEndIdleRef.current = null;
+      }
+    };
   }, [isDictLoaded, displayGrid, cascade.cascadePhase, isAutoDetecting, gameState.isComplete, gameState.isDeadEnd, wordsFoundCount, gameState.wordsFound, language, checkWordInDict]);
 
   /**

@@ -30,7 +30,6 @@ jest.mock('../../../contexts/AuthContext', () => ({
       username: 'TestUser',
       display_name: 'Test User',
       total_xp: 1000,
-      profile_picture_url: null,
       avatar_emoji: '🧑',
       avatar_color: '#00CED1',
       avatar_image: null,

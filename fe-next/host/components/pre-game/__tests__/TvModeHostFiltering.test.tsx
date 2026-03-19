@@ -26,7 +26,7 @@ jest.mock('framer-motion', () => ({
 // Mock Avatar component
 jest.mock('../../../../components/Avatar', () => ({
   __esModule: true,
-  default: ({ profilePictureUrl, size, className }: { profilePictureUrl?: string; avatarImage?: string; size?: string; className?: string }) => (
+  default: ({ size, className }: { avatarImage?: string; size?: string; className?: string }) => (
     <div data-testid="avatar" className={className}>{size}</div>
   ),
 }));
@@ -53,7 +53,7 @@ const mockT = (key: string) => {
 
 interface PlayerData {
   username: string;
-  avatar?: { profilePictureUrl?: string; avatarImage?: string } | null;
+  avatar?: { avatarImage?: string } | null;
   isHost?: boolean;
   presenceStatus?: 'active' | 'idle' | 'afk';
   isBot?: boolean;

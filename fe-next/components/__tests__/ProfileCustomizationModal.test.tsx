@@ -26,11 +26,6 @@ describe('Profile Customization Avatar Config', () => {
       expect(unknownResult).toEqual({ emoji: '🎯', color: '#FF6B6B' });
     });
 
-    it('returns default for profile picture avatar ID', () => {
-      const profileResult = getAvatarEmojiAndColor('__profile_avatar__');
-      expect(profileResult).toEqual({ emoji: '🎯', color: '#FF6B6B' });
-    });
-
     it('all AVATARS have valid emoji and hex color mappings', () => {
       AVATARS.forEach(avatar => {
         const { emoji, color } = getAvatarEmojiAndColor(avatar.id);
@@ -78,38 +73,6 @@ describe('Profile Customization Save Handler Integration', () => {
       avatar_color: '#52B788', // Using hex color for socket/database compatibility
       has_customized_profile: true,
     });
-  });
-
-  it('save handler should handle profile picture avatar correctly', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
-    const PROFILE_AVATAR_ID = '__profile_avatar__';
-
-    // Simulate save with profile picture
-    const handleProfileCustomizationSave = async (name: string, avatarId: string) => {
-      const { emoji, color } = getAvatarEmojiAndColor(avatarId);
-
-      await mockUpdateProfile({
-        display_name: name,
-        username: name,
-        avatar_image: avatarId,
-        avatar_emoji: emoji,
-        avatar_color: color,
-        has_customized_profile: true,
-      });
-    };
-
-    await handleProfileCustomizationSave('TestPlayer', PROFILE_AVATAR_ID);
-
-    // Should still include emoji and color (defaults for profile avatar)
-    expect(mockUpdateProfile).toHaveBeenCalledWith(
-      expect.objectContaining({
-        display_name: 'TestPlayer',
-        avatar_image: PROFILE_AVATAR_ID,
-        avatar_emoji: '🎯',  // default emoji for profile avatar
-        avatar_color: '#FF6B6B',  // default hex color for socket/database compatibility
-        has_customized_profile: true,
-      })
-    );
   });
 
   it('save handler should handle any avatar from AVATARS list', async () => {

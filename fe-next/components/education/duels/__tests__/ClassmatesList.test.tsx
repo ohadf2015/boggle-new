@@ -41,7 +41,6 @@ const createMockClassmate = (id: string, username: string, avatarEmoji?: string)
   profiles: {
     username,
     avatar_emoji: avatarEmoji || '👤',
-    profile_picture_url: null,
   },
 });
 

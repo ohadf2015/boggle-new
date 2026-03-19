@@ -104,7 +104,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               </span>
               <Avatar
                 avatarImage={player.avatarImage ?? undefined}
-                profilePictureUrl={player.profilePictureUrl}
+
                 customAvatar={player.avatarConfig as any}
                 size="sm"
               />
@@ -113,7 +113,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
                   id: player.id,
                   username: player.username,
                   displayName: player.displayName ?? undefined,
-                  profilePictureUrl: player.profilePictureUrl,
+
                   avatarImage: player.avatarImage ?? undefined,
                   customAvatar: player.avatarConfig,
                 }}
@@ -172,7 +172,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             </span>
             <Avatar
               avatarImage={player.avatarImage ?? undefined}
-              profilePictureUrl={player.profilePictureUrl}
+
               customAvatar={player.avatarConfig as any}
               size="sm"
             />
@@ -181,7 +181,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
                 id: player.id,
                 username: player.username,
                 displayName: player.displayName ?? undefined,
-                profilePictureUrl: player.profilePictureUrl,
+
                 avatarImage: player.avatarImage ?? undefined,
                 customAvatar: player.avatarConfig,
               }}

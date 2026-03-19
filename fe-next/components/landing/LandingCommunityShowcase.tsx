@@ -153,7 +153,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <Avatar
                       customAvatar={(board.creator_avatar as CustomAvatarConfig | null) ?? null}
-                      profilePictureUrl={board.creator_profile_picture_url}
+
                       size="sm"
                     />
                     <span className="text-neo-white/50 text-[10px] font-neo-body truncate">

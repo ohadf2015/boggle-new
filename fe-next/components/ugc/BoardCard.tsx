@@ -20,7 +20,6 @@ export interface BoardCardBoard {
   featured: boolean;
   creator_display_name: string;
   creator_avatar?: Record<string, unknown> | null;
-  creator_profile_picture_url?: string | null;
   cover_image_url?: string | null;
 }
 
@@ -85,7 +84,7 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay }) => {
       <div className="flex items-center gap-2 px-3 pt-3 pb-2">
         <Avatar
           customAvatar={(board.creator_avatar as CustomAvatarConfig | null) ?? null}
-          profilePictureUrl={board.creator_profile_picture_url}
+
           size="sm"
         />
         <span className="text-neo-white/70 text-xs font-neo-body truncate">

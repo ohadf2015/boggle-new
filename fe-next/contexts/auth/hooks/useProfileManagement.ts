@@ -75,7 +75,6 @@ async function syncGuestResults(
       avatar_emoji: profileData.avatar_emoji ?? null,
       avatar_color: profileData.avatar_color ?? null,
       avatar_image: profileData.avatar_image ?? null,
-      profile_picture_url: profileData.profile_picture_url ?? null,
     });
     if (syncedCount > 0) {
       logger.info(`Synced ${syncedCount} guest daily results to account`);
@@ -129,17 +128,6 @@ async function createNewProfile(
 ): Promise<void> {
   logger.info('Profile not found, creating minimal profile for user:', userId);
 
-  // Extract profile picture from OAuth provider if available
-  let profilePictureUrl: string | null = null;
-  let profilePictureProvider: string | null = null;
-  if (userMetadata?.avatar_url) {
-    profilePictureUrl = userMetadata.avatar_url as string;
-    profilePictureProvider = 'oauth';
-  } else if (userMetadata?.picture) {
-    profilePictureUrl = userMetadata.picture as string;
-    profilePictureProvider = 'google';
-  }
-
   // Get display name from OAuth provider if available
   // Extract FIRST NAME only from OAuth (e.g., "Anders Ekdahl" -> "Anders")
   const oauthFullName =
@@ -165,10 +153,7 @@ async function createNewProfile(
     displayName = randomData.name;
   }
 
-  // Determine the avatar_image:
-  // If OAuth provided a profile picture, default to using it (PROFILE_AVATAR_ID)
-  // Otherwise use the random character avatar
-  const finalAvatarImage = profilePictureUrl ? '__profile_avatar__' : avatarImage;
+  const finalAvatarImage = avatarImage;
 
   // Get legacy emoji/color from the character avatar (for backward compatibility with DB)
   const { emoji: avatarEmoji, color: avatarColor } = getAvatarEmojiAndColor(avatarImage);
@@ -181,9 +166,7 @@ async function createNewProfile(
     display_name: displayName,
     avatar_emoji: avatarEmoji,
     avatar_color: avatarColor,
-    avatar_image: finalAvatarImage, // Use profile picture if available, otherwise character avatar
-    profile_picture_url: profilePictureUrl,
-    profile_picture_provider: profilePictureProvider,
+    avatar_image: finalAvatarImage,
     avatar_config: randomCustomAvatar,
     has_customized_profile: false, // Will prompt user to customize after sign-in
   });
@@ -283,20 +266,6 @@ export function useProfileManagement({
     async (username: string, avatarEmoji?: string, avatarColor?: string) => {
       if (!user) return { data: null, error: { message: 'Not authenticated' } };
 
-      // Extract profile picture from OAuth provider metadata
-      const userMetadata = user.user_metadata;
-      let profilePictureUrl: string | null = null;
-      let profilePictureProvider: string | null = null;
-
-      // Google provides 'avatar_url' or 'picture' in user_metadata
-      if (userMetadata?.avatar_url) {
-        profilePictureUrl = userMetadata.avatar_url;
-        profilePictureProvider = user.app_metadata?.provider || 'oauth';
-      } else if (userMetadata?.picture) {
-        profilePictureUrl = userMetadata.picture;
-        profilePictureProvider = 'google';
-      }
-
       // Fetch geolocation data for analytics
       const geoData = await fetchGeolocation();
 
@@ -309,8 +278,6 @@ export function useProfileManagement({
         display_name: username,
         avatar_emoji: avatarEmoji || '',
         avatar_color: avatarColor || '#4ECDC4',
-        profile_picture_url: profilePictureUrl,
-        profile_picture_provider: profilePictureProvider,
         country_code: geoData.countryCode,
         utm_source: utmData.utm_source,
         utm_medium: utmData.utm_medium,

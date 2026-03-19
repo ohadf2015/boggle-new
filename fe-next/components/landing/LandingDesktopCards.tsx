@@ -95,10 +95,15 @@ export function LandingDesktopCards({
         </motion.div>
 
         {/* Daily Challenge Banner */}
-        <div className="col-span-1 sm:col-span-2 lg:col-span-1 w-full">
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.15 }}
+          className="col-span-1 sm:col-span-2 lg:col-span-1 w-full h-full"
+        >
           <Suspense fallback={
             <div
-              className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
+              className="w-full h-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
               style={{ minHeight: '72px' }}
             >
               <div className="flex items-center gap-3 sm:gap-4 animate-pulse">
@@ -112,14 +117,14 @@ export function LandingDesktopCards({
           }>
             <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
           </Suspense>
-        </div>
+        </motion.div>
 
         {/* Adventure Mode */}
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.25 }}
-          className="col-span-1 sm:col-span-2 lg:col-span-1 w-full"
+          className="col-span-1 sm:col-span-2 lg:col-span-1 w-full h-full"
         >
           <ModeCard
             title={t('landing.adventureMode')}

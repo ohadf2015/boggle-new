@@ -544,7 +544,7 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                     transition={{ delay: index * 0.25 + 0.5, type: 'spring', stiffness: 400, damping: 8 }}
                   >
                     <Avatar
-                      profilePictureUrl={award.recipient.avatar?.profilePictureUrl ?? undefined}
+
                       avatarImage={award.recipient.avatar?.avatarImage}
                       customAvatar={award.recipient.avatar?.customAvatar}
                       size="md"

@@ -18,6 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useWinStreak } from '@/hooks/useWinStreak';
+import { useIsDesktop } from '@/hooks/useDesktopLayout';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -82,6 +83,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
+  const isDesktop = useIsDesktop();
   const { showInterstitial } = useAdPlacement();
 
   useEffect(() => {
@@ -96,7 +98,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     return {
       emoji: profile.avatar_emoji,
       color: profile.avatar_color,
-      profilePictureUrl: profile.profile_picture_url,
       avatarImage: profile.avatar_image,
     };
   }, [profile]);
@@ -129,7 +130,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   });
 
   useWinStreakTracking({ mode, isWinner });
-
 
   const { showSignupModal, setShowSignupModal } = useSignupPrompt({
     isAuthenticated, hasUser: !!user, authLoading,
@@ -171,7 +171,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const gameLanguage = results.language || language;
 
-  // --- LANDSCAPE MODE (unchanged) ---
+  // --- LANDSCAPE MODE ---
   if (isLandscape) {
     const bannerLabels = {
       tryAgain: t('singlePlayer.tryAgain'),
@@ -224,251 +224,172 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     );
   }
 
-  // --- PORTRAIT / DESKTOP: Single-scroll layout ---
-  // Uses natural page scroll (no internal overflow container) so mobile scrolling works reliably.
-  // Fixed bottom bar on mobile provides the sticky CTA.
-  return (
-    <div className="min-h-dvh bg-neo-navy text-white">
-      <div className="px-2 md:px-4 xl:px-6 pb-20 md:pb-6">
-        <div className="mx-auto space-y-4 md:space-y-6 pt-2 md:pt-4">
+  // --- PORTRAIT / DESKTOP ---
+  // Same components, different layout: desktop uses two-column grid via isDesktop hook.
+  const profileDisplayName = profile?.display_name || profile?.username || t('common.you');
 
-          {/* 1. Hero Zone — PlacementHero for solo-bots (matches MP style) */}
-          {mode === 'solo-bots' ? (
-            <PlacementHero
-              rank={playerRank}
-              score={displayScore(results.playerScore)}
-              totalPlayers={allParticipants.length}
-              username={profile?.display_name || profile?.username || t('common.you')}
-              avatar={playerAvatar}
-              gapToWinner={playerRank > 1 ? (allParticipants[0]?.score || 0) - results.playerScore : 0}
-            />
-          ) : (
-            <div className="text-center py-6 relative">
-              {/* Radial glow behind score */}
-              <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_center,var(--neo-lime)_0%,transparent_60%)]" />
-              <p className="text-xs font-black uppercase tracking-widest text-neo-lime mb-2 relative z-10">
-                {bannerConfig.message || t('results.finalScore')}
-              </p>
-              <p className="font-black text-6xl sm:text-7xl text-white tabular-nums relative z-10" style={{ WebkitTextStroke: '2px rgba(0,0,0,0.3)', textShadow: '4px 4px 0px rgba(0,0,0,0.4), 0 0 30px rgba(191,255,0,0.15)' }}>
-                {displayScore(results.playerScore)}
-              </p>
-              {bannerConfig.announcement && (
-                <p className="text-white/60 text-sm font-bold mt-2 relative z-10">{bannerConfig.announcement}</p>
-              )}
-            </div>
-          )}
+  const heroBlock = mode === 'solo-bots' ? (
+    <PlacementHero
+      rank={playerRank} score={displayScore(results.playerScore)} totalPlayers={allParticipants.length}
+      username={profileDisplayName} avatar={playerAvatar}
+      gapToWinner={playerRank > 1 ? (allParticipants[0]?.score || 0) - results.playerScore : 0}
+    />
+  ) : (
+    <div className="text-center py-6 md:py-8 relative">
+      <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_center,var(--neo-lime)_0%,transparent_60%)]" />
+      <p className="text-xs font-black uppercase tracking-widest text-neo-lime mb-2 relative z-10">
+        {bannerConfig.message || t('results.finalScore')}
+      </p>
+      <p className="font-black text-6xl sm:text-7xl md:text-8xl text-white tabular-nums relative z-10" style={{ WebkitTextStroke: '2px rgba(0,0,0,0.3)', textShadow: '4px 4px 0px rgba(0,0,0,0.4), 0 0 30px rgba(191,255,0,0.15)' }}>
+        {displayScore(results.playerScore)}
+      </p>
+      {bannerConfig.announcement && (
+        <p className="text-white/60 text-sm font-bold mt-2 relative z-10">{bannerConfig.announcement}</p>
+      )}
+    </div>
+  );
 
-          {/* 2. Leaderboard — compact ranked list (matches MP MobileCompactLeaderboard) */}
-          {mode === 'solo-bots' && allParticipants.length > 1 && (
-            <MobileCompactLeaderboard
-              participants={allParticipants.map(p => ({
-                name: p.name,
-                score: p.score,
-                isCurrentPlayer: p.isPlayer,
-                isBot: !p.isPlayer,
-              }))}
-            />
-          )}
+  const leaderboardBlock = mode === 'solo-bots' && allParticipants.length > 1 ? (
+    <MobileCompactLeaderboard participants={allParticipants.map(p => ({
+      name: p.name, score: p.score, isCurrentPlayer: p.isPlayer, isBot: !p.isPlayer,
+    }))} />
+  ) : null;
 
-          {/* 3. Stats row — same grid style as MP */}
-          <StatsCardGrid
-            cards={[
-              { label: t('results.words'), value: validWordCount, icon: '📝' },
-              {
-                label: t('results.bestWord'),
-                value: results.playerWordData && results.playerWordData.filter(w => w.isValid).length > 0
-                  ? results.playerWordData.filter(w => w.isValid).reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()
-                  : '-',
-                icon: '⭐',
-                accent: 'lime',
-              },
-              {
-                label: t('results.coinsEarned'),
-                value: coinReward ? `+${coinReward.awarded}` : '-',
-                icon: '🪙',
-                accent: 'amber',
-              },
-            ]}
-          />
+  const statsBlock = (
+    <StatsCardGrid cards={[
+      { label: t('results.words'), value: validWordCount, icon: '📝' },
+      {
+        label: t('results.bestWord'),
+        value: results.playerWordData && results.playerWordData.filter(w => w.isValid).length > 0
+          ? results.playerWordData.filter(w => w.isValid).reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()
+          : '-',
+        icon: '⭐', accent: 'lime' as const,
+      },
+      { label: t('results.coinsEarned'), value: coinReward ? `+${coinReward.awarded}` : '-', icon: '🪙', accent: 'amber' as const },
+    ]} />
+  );
 
-          {/* 3.5. Rewarded Ad for Gold */}
-          <div className="flex justify-center">
-            <RewardedAdGoldButton goldAmount={25} />
-          </div>
-
-          {/* 4. Achievements + Bonus */}
-          {(results.achievements && results.achievements.length > 0) || totalComboBonus > 0 || totalFireRoundBonus > 0 ? (
-            <div className="space-y-2">
-              {results.achievements && results.achievements.length > 0 && (
-                <div className="flex flex-wrap gap-2 justify-center lg:grid lg:grid-cols-3 xl:grid-cols-4 lg:gap-3">
-                  {results.achievements.slice(0, 8).map((ach, i) => (
-                    <AchievementBadge key={ach.key} achievement={ach} index={i} />
-                  ))}
-                  {results.achievements.length > 8 && (
-                    <span className="text-xs text-neo-cyan font-bold lg:col-span-3 xl:col-span-4 text-center">+{results.achievements.length - 8} more</span>
-                  )}
-                </div>
-              )}
-              <BonusBadgesRow comboBonus={totalComboBonus} fireRoundBonus={totalFireRoundBonus} />
-            </div>
-          ) : null}
-
-          {/* 5. Global Rank Badge */}
-          {globalRank && (
-            <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
-          )}
-
-          {/* Word Hunt promo — shown max 3 times total, only for non-WH games */}
-          <WordHuntAnnouncementBanner className="mt-4" />
-
-          {/* 7. Desktop What's Next + Challenge - 70/30 split */}
-          <div className="hidden md:flex gap-4">
-            <div className="flex-[7]">
-              <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="desktop" />
-            </div>
-            <div className="flex-[3] space-y-3">
-              {results.grid && (
-                <ChallengeButton
-                  grid={results.grid} score={results.playerScore}
-                  words={results.playerWords} gameLanguage={gameLanguage}
-                  gameDuration={results.gameDuration} variant="default"
-                />
-              )}
-              <Button
-                variant="ghost"
-                className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40"
-                onClick={onBackToLobby}
-              >
-                <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />
-                {t('nextStep.backToLobby')}
-              </Button>
-            </div>
-          </div>
-
-          {/* 8. Mobile: Challenge + Back buttons */}
-          <div className="md:hidden space-y-3">
-            {results.grid && (
-              <ChallengeButton
-                grid={results.grid} score={results.playerScore}
-                words={results.playerWords} gameLanguage={gameLanguage}
-                gameDuration={results.gameDuration} variant="compact"
-                isWinner={isWinner}
-              />
+  const achievementsBlock = (
+    ((results.achievements && results.achievements.length > 0) || totalComboBonus > 0 || totalFireRoundBonus > 0) ? (
+      <div className="space-y-2">
+        {mode === 'solo-bots' && playerArchetype && (
+          <div className="flex justify-center"><PlayerArchetypeBadge archetype={playerArchetype} size="md" /></div>
+        )}
+        <BonusBadgesRow comboBonus={totalComboBonus} fireRoundBonus={totalFireRoundBonus} />
+        {results.achievements && results.achievements.length > 0 && (
+          <div className="flex flex-wrap gap-2 justify-center">
+            {results.achievements.slice(0, 8).map((ach, i) => (
+              <AchievementBadge key={ach.key} achievement={ach} index={i} />
+            ))}
+            {results.achievements.length > 8 && (
+              <span className="text-xs text-neo-cyan font-bold text-center w-full">+{results.achievements.length - 8} more</span>
             )}
-            <Button
-              variant="ghost"
-              className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40"
-              onClick={onBackToLobby}
-            >
-              <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />
-              {t('nextStep.backToLobby')}
-            </Button>
           </div>
+        )}
+      </div>
+    ) : null
+  );
 
-          {/* 9. Detailed Analysis - collapsed sections, 2-col on desktop */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-6 bg-neo-lime rounded-full" />
-              <h3 className="text-[10px] sm:text-xs font-black text-white/60 uppercase tracking-wider">
-                {t('results.detailedAnalysis')}
-              </h3>
-            </div>
+  const ctaBlock = (
+    <div className="space-y-3">
+      <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} />
+      {results.grid && (
+        <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}
+          gameLanguage={gameLanguage} gameDuration={results.gameDuration}
+          variant={isDesktop ? 'default' : 'compact'} isWinner={isWinner} />
+      )}
+      <Button variant="ghost" className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40" onClick={onBackToLobby}>
+        <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />{t('nextStep.backToLobby')}
+      </Button>
+    </div>
+  );
 
-            <div className="lg:grid lg:grid-cols-2 lg:gap-4 lg:items-start space-y-3 lg:space-y-0">
-              {/* Left analysis column */}
-              <div className="space-y-3">
-                {results.playerWordData && results.playerWordData.length > 0 && (
-                  <YourWordsSection
-                    wordsByPoints={wordsByPoints}
-                    sortedPointGroups={sortedPointGroups}
-                    invalidWords={invalidWords}
-                    wordCount={results.playerWordData.length}
-                    title={t('results.yourWords')}
-                    t={t}
-                    defaultExpanded={false}
-                  />
-                )}
-
-                {playerInsights && (
-                  <PerformanceSection
-                    insights={playerInsights}
-                    title={t('results.performanceDetails')}
-                    archetype={playerArchetype}
-                  />
-                )}
-
-                <CollapsibleSection
-                  title={t('results.performanceHistory')}
-                  icon={<TrendingUp className="w-4 h-4" />}
-                  defaultExpanded={false}
-                  variant="tertiary"
-                  className="shadow-hard"
-                >
-                  <PerformanceChart currentScore={results.playerScore} gamesLimit={10} />
-                </CollapsibleSection>
-              </div>
-
-              {/* Right analysis column */}
-              <div className="space-y-3">
-                {allBoardMissedWords && allBoardMissedWords.length > 0 && (
-                  <MissedWordsSection
-                    words={allBoardMissedWords}
-                    playerFoundCount={validWordCount}
-                    totalBoardWords={results.allPossibleWords?.length || undefined}
-                    initialDisplayCount={15}
-                  />
-                )}
-
-                {mode === 'solo-bots' && missedWords.length > 0 && (
-                  <MissedWords missedWords={missedWords} maxDisplay={5} />
-                )}
-
-                {mode === 'solo-bots' && botWordDetails.length > 0 && (
-                  <BotWordsSection
-                    botWordDetails={botWordDetails}
-                    language={gameLanguage}
-                    title={t('singlePlayer.botWordsFound')}
-                    t={t}
-                    defaultExpanded={false}
-                  />
-                )}
-
-                {results.achievements && results.achievements.length > 4 && (
-                  <AchievementsSection
-                    achievements={results.achievements}
-                    title={t('hostView.achievements')}
-                    disclaimer={t('singlePlayer.achievementsNotSaved')}
-                    defaultExpanded={false}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
+  const analysisBlock = (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 md:gap-3">
+        <div className="w-1 md:w-1.5 h-6 md:h-8 bg-neo-lime rounded-full" />
+        <h3 className="text-[10px] sm:text-xs font-black text-white/60 uppercase tracking-wider md:tracking-[0.2em]">
+          {t('results.detailedAnalysis')}
+        </h3>
+        {isDesktop && <div className="flex-1 h-px bg-white/10" />}
+      </div>
+      <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-start">
+        <div className="space-y-3">
+          {results.playerWordData && results.playerWordData.length > 0 && (
+            <YourWordsSection wordsByPoints={wordsByPoints} sortedPointGroups={sortedPointGroups}
+              invalidWords={invalidWords} wordCount={results.playerWordData.length}
+              title={t('results.yourWords')} t={t} defaultExpanded={false} />
+          )}
+          {playerInsights && (
+            <PerformanceSection insights={playerInsights} title={t('results.performanceDetails')} archetype={playerArchetype} />
+          )}
+          <CollapsibleSection title={t('results.performanceHistory')} icon={<TrendingUp className="w-4 h-4" />}
+            defaultExpanded={false} variant="tertiary" className="shadow-hard">
+            <PerformanceChart currentScore={results.playerScore} gamesLimit={10} />
+          </CollapsibleSection>
+        </div>
+        <div className="space-y-3">
+          {allBoardMissedWords && allBoardMissedWords.length > 0 && (
+            <MissedWordsSection words={allBoardMissedWords} playerFoundCount={validWordCount}
+              totalBoardWords={results.allPossibleWords?.length || undefined} initialDisplayCount={15} />
+          )}
+          {mode === 'solo-bots' && missedWords.length > 0 && <MissedWords missedWords={missedWords} maxDisplay={5} />}
+          {mode === 'solo-bots' && botWordDetails.length > 0 && (
+            <BotWordsSection botWordDetails={botWordDetails} language={gameLanguage}
+              title={t('singlePlayer.botWordsFound')} t={t} defaultExpanded={false} />
+          )}
+          {results.achievements && results.achievements.length > 4 && (
+            <AchievementsSection achievements={results.achievements} title={t('hostView.achievements')}
+              disclaimer={t('singlePlayer.achievementsNotSaved')} defaultExpanded={false} />
+          )}
         </div>
       </div>
+    </div>
+  );
 
-      {/* Mobile sticky bottom bar - compact single row */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-sm border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
-        <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" />
+  return (
+    <div className="min-h-dvh bg-neo-navy text-white">
+      <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-8 pt-4' : 'px-2 pb-20 pt-2'}>
+        {isDesktop ? (
+          <>
+            <div className="grid grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-6 items-start">
+              <div className="space-y-4">{heroBlock}{leaderboardBlock}</div>
+              <div className="space-y-4">
+                {statsBlock}
+                <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
+                <div className="flex justify-center"><RewardedAdGoldButton goldAmount={25} /></div>
+                {achievementsBlock}
+                {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
+                {ctaBlock}
+              </div>
+            </div>
+            <WordHuntAnnouncementBanner className="mt-6" />
+            <div className="mt-8">{analysisBlock}</div>
+          </>
+        ) : (
+          <div className="space-y-4">
+            {heroBlock}{leaderboardBlock}{statsBlock}
+            <div className="flex justify-center"><RewardedAdGoldButton goldAmount={25} /></div>
+            {achievementsBlock}
+            {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
+            <WordHuntAnnouncementBanner className="mt-4" />
+            {ctaBlock}{analysisBlock}
+          </div>
+        )}
       </div>
 
-      {/* Modals */}
+      {!isDesktop && (
+        <div className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-sm border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" />
+        </div>
+      )}
+
       {showWordValidation && wordValidationQueue.length > 0 && (
-        <WordFeedbackModal
-          isOpen={showWordValidation}
-          word={wordValidationQueue[0] || ''}
-          submittedBy="Bot"
+        <WordFeedbackModal isOpen={showWordValidation} word={wordValidationQueue[0] || ''} submittedBy="Bot"
           submitterAvatar={{ emoji: '\u{1F916}', color: '#6366f1' }}
-          wordQueue={wordValidationQueue.map(w => ({
-            word: w,
-            submittedBy: 'Bot',
-            submitterAvatar: { emoji: '\u{1F916}', color: '#6366f1' },
-          }))}
-          timeoutSeconds={15}
-          onVote={handleWordVote}
-          onSkip={() => setShowWordValidation(false)}
-          onTimeout={() => setShowWordValidation(false)}
-        />
+          wordQueue={wordValidationQueue.map(w => ({ word: w, submittedBy: 'Bot', submitterAvatar: { emoji: '\u{1F916}', color: '#6366f1' } }))}
+          timeoutSeconds={15} onVote={handleWordVote}
+          onSkip={() => setShowWordValidation(false)} onTimeout={() => setShowWordValidation(false)} />
       )}
       <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
       <TrainingAnalysisModal isOpen={showTrainingAnalysis} onClose={() => setShowTrainingAnalysis(false)} returnTo={null} />

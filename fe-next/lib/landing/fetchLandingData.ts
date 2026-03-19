@@ -41,7 +41,7 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
     supabase
       .from('leaderboard')
       .select(
-        'player_id, username, display_name, total_score, avatar_image, avatar_config, profile_picture_url'
+        'player_id, username, display_name, total_score, avatar_image, avatar_config'
       )
       .order('total_score', { ascending: false })
       .limit(TOP_PLAYERS_LIMIT),
@@ -66,7 +66,6 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
     totalScore: row.total_score,
     avatarImage: row.avatar_image,
     avatarConfig: row.avatar_config,
-    profilePictureUrl: row.profile_picture_url,
   }));
 
   const gamesToday = gamesTodayResult.count ?? 0;

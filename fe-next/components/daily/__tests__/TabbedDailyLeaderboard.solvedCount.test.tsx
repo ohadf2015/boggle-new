@@ -33,7 +33,6 @@ jest.mock('framer-motion', () => ({
 // Mock avatar config utilities
 jest.mock('@/utils/avatarConfig', () => ({
   AVATARS: [{ id: 'test-avatar', name: 'Test Avatar', filename: 'test-avatar.png' }],
-  PROFILE_AVATAR_ID: '__profile_avatar__',
   getAvatarPath: (avatar: { id: string; filename: string } | string) =>
     typeof avatar === 'string' ? `/avatars/${avatar}.png` : `/avatars/${avatar.filename}`,
   getRandomAvatar: () => ({ id: 'test-avatar', name: 'Test Avatar', filename: 'test-avatar.png' }),
@@ -64,7 +63,7 @@ const createMockSolvedParticipant = (id: number): DailyParticipant => ({
   avatar_emoji: '🎯',
   avatar_color: '#6366f1',
   avatar_image: null,
-  profile_picture_url: null,
+
   country_code: 'US',
   score: 100 - id * 10,
   word_count: 10,

@@ -17,7 +17,7 @@ interface LeaderboardEntry {
   solved: boolean;
   playerId?: string;
   guestFingerprint?: string;
-  profile_picture_url?: string | null;
+
   avatar_image?: string | null;
 }
 
@@ -71,7 +71,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
         solved: (row.solved as boolean) ?? false,
         playerId: row.player_id as string | undefined,
         guestFingerprint: row.guest_fingerprint as string | undefined,
-        profile_picture_url: row.profile_picture_url as string | null,
+
         avatar_image: row.avatar_image as string | null,
       }));
       setEntries(mapped);
@@ -314,7 +314,7 @@ const RanksTabContent: React.FC<{
             </span>
             <div className="flex-shrink-0">
               <Avatar
-                profilePictureUrl={entry.profile_picture_url ?? undefined}
+
                 avatarImage={entry.avatar_image ?? undefined}
                 size="sm"
               />

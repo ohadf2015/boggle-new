@@ -280,7 +280,7 @@ export function getAllGuestDailyResults(): Array<{
  */
 export async function syncGuestDailyResultsToAccount(
   userId: string,
-  userProfile: { display_name: string | null; username: string; avatar_emoji: string | null; avatar_color: string | null; avatar_image: string | null; profile_picture_url: string | null }
+  userProfile: { display_name: string | null; username: string; avatar_emoji: string | null; avatar_color: string | null; avatar_image: string | null }
 ): Promise<number> {
   if (typeof window === 'undefined') return 0;
 
@@ -318,7 +318,6 @@ export async function syncGuestDailyResultsToAccount(
           avatarEmoji: userProfile.avatar_emoji || guestPlayer?.avatarEmoji || '🎯',
           avatarColor: userProfile.avatar_color || guestPlayer?.avatarColor || '#6366f1',
           avatarImage: userProfile.avatar_image || undefined,
-          profilePictureUrl: userProfile.profile_picture_url || undefined,
           solved: result.solved,
           attemptsUsed: result.attemptsUsed,
           targetWord: result.targetWord,

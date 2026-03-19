@@ -43,7 +43,8 @@ interface GameGridAreaProps {
   pathPoints: Array<{ x: number; y: number; timestamp: number }>;
 
   // Feedback
-  validationError: string | null;
+  /** @deprecated Validation errors now displayed by WordFormingArea */
+  validationError?: string | null;
   isValidating: boolean;
   isWordValid: boolean;
   wasWordSubmitted: boolean;
@@ -94,7 +95,7 @@ export const GameGridArea = memo(function GameGridArea({
   onCascadeComplete,
   hintHighlightIndices,
   pathPoints,
-  validationError,
+  // validationError is deprecated — feedback now handled by WordFormingArea
   isValidating,
   isWordValid,
   wasWordSubmitted,
@@ -142,29 +143,11 @@ export const GameGridArea = memo(function GameGridArea({
             />
           </div>
 
-          {/* Feedback Area */}
+          {/* Feedback Area — validation errors are shown by WordFormingArea above */}
           <div data-testid="feedback-container" className="h-7 flex items-center justify-center sm:w-full">
             <AdaptiveAnimatePresence mode="wait">
-              {/* Validation Error */}
-              {validationError && (
-                <AdaptiveMotion.div
-                  key="error"
-                  initial={{ opacity: 0, y: -8, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.9 }}
-                  className={cn(
-                    'px-3 py-1 rounded-neo',
-                    'bg-neo-red/20 border-2 border-neo-red',
-                    'text-neo-red font-bold text-xs sm:text-sm',
-                    'animate-neo-shake'
-                  )}
-                >
-                  {validationError}
-                </AdaptiveMotion.div>
-              )}
-
               {/* Validating Indicator */}
-              {!validationError && isValidating && (
+              {isValidating && (
                 <AdaptiveMotion.div
                   key="validating"
                   initial={{ opacity: 0 }}
@@ -177,7 +160,7 @@ export const GameGridArea = memo(function GameGridArea({
               )}
 
               {/* Word Length Hint */}
-              {!validationError && !isValidating && selectedLength > 0 && selectedLength < minWordLength && (
+              {!isValidating && selectedLength > 0 && selectedLength < minWordLength && (
                 <AdaptiveMotion.div
                   key="hint"
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -203,7 +186,7 @@ export const GameGridArea = memo(function GameGridArea({
               )}
 
               {/* Empty spacer */}
-              {!validationError && !isValidating && (selectedLength === 0 || selectedLength >= minWordLength) && (
+              {!isValidating && (selectedLength === 0 || selectedLength >= minWordLength) && (
                 <div key="empty" className="w-full" />
               )}
             </AdaptiveAnimatePresence>

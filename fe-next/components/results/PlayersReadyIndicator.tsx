@@ -11,7 +11,7 @@ import type { Avatar as AvatarType } from '@/types';
 
 interface PlayerInfo {
   username: string;
-  avatar?: AvatarType & { profilePictureUrl?: string };
+  avatar?: AvatarType;
   isBot?: boolean;
   isHost?: boolean;
 }
@@ -142,7 +142,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                           </div>
                         ) : (
                           <Avatar
-                            profilePictureUrl={player.avatar?.profilePictureUrl}
+
                             avatarImage={player.avatar?.avatarImage}
                             customAvatar={player.avatar?.customAvatar}
                             size="sm"

@@ -8,7 +8,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 interface CreatorAttributionProps {
   displayName: string;
   avatar?: CustomAvatarConfig | null;
-  profilePictureUrl?: string | null;
+
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -26,7 +26,6 @@ const SIZE_MAP = {
 export function CreatorAttribution({
   displayName,
   avatar,
-  profilePictureUrl,
   size = 'md',
   className,
 }: CreatorAttributionProps) {
@@ -42,7 +41,7 @@ export function CreatorAttribution({
     >
       <Avatar
         customAvatar={avatar}
-        profilePictureUrl={profilePictureUrl}
+
         size={avatarSize}
       />
       <span className={cn('font-neo-body text-neo-white/80', text)}>

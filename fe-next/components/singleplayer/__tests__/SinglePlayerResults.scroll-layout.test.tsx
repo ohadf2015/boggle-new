@@ -39,8 +39,9 @@ describe('SinglePlayerResults Scroll Layout', () => {
   });
 
   describe('Mobile sticky bar', () => {
-    it('should have md:hidden to only show on mobile', () => {
-      expect(source).toMatch(/md:hidden/);
+    it('should conditionally render sticky bar for non-desktop only', () => {
+      // Uses isDesktop hook to conditionally render (not md:hidden CSS)
+      expect(source).toMatch(/!isDesktop/);
     });
 
     it('should have fixed bottom bar with z-50 for mobile CTA', () => {

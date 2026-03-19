@@ -60,7 +60,6 @@ interface JoinGamePayload {
   authUserId?: string;
   guestTokenHash?: string;
   guestSessionId?: string;
-  profilePictureUrl?: string;
 }
 
 interface LeaveRoomPayload {
@@ -93,7 +92,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    let { gameCode, username, playerId, avatar, authUserId: clientAuthUserId, guestTokenHash, guestSessionId, profilePictureUrl } = validation.data as JoinGamePayload;
+    let { gameCode, username, playerId, avatar, authUserId: clientAuthUserId, guestTokenHash, guestSessionId } = validation.data as JoinGamePayload;
 
     // Use server-verified user ID if available (from JWT middleware), ignore client-supplied value
     const authUserId = (socket.data?.verifiedUserId as string | undefined) || undefined;
@@ -148,7 +147,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       // Add as spectator
       const userAvatar = avatar || generateRandomAvatar();
       addSpectatorToGame(gameCode, username, socket.id, {
-        avatar: { ...userAvatar, profilePictureUrl: profilePictureUrl || null },
+        avatar: userAvatar,
         authUserId: authUserId || null,
         guestTokenHash: guestTokenHash || null,
         guestSessionId: guestSessionId || null
@@ -183,7 +182,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     const userAvatar = avatar || generateRandomAvatar();
     logger.info('PLAYER_JOIN', `Adding user ${username} to game ${gameCode} with authUserId=${authUserId || 'NONE'}, guestHash=${guestTokenHash ? 'yes' : 'no'}`);
     addUserToGame(gameCode, username, socket.id, {
-      avatar: { ...userAvatar, profilePictureUrl: profilePictureUrl || null },
+      avatar: userAvatar,
       isHost: false,
       playerId,
       authUserId: authUserId || null,
@@ -209,7 +208,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     }
 
     // Handle tournament join
-    handleTournamentJoin(io, socket, gameCode, username, userAvatar, profilePictureUrl);
+    handleTournamentJoin(io, socket, gameCode, username, userAvatar);
 
     // Broadcast updates
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {

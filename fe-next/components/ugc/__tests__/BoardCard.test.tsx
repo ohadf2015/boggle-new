@@ -16,8 +16,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 jest.mock('@/components/Avatar', () => {
-  const MockAvatar = ({ profilePictureUrl }: { profilePictureUrl?: string | null }) => (
-    <div data-testid="avatar" data-url={profilePictureUrl ?? ''} />
+  const MockAvatar = () => (
+    <div data-testid="avatar" />
   );
   MockAvatar.displayName = 'Avatar';
   return MockAvatar;
@@ -39,7 +39,6 @@ const defaultBoard = {
   featured: false,
   creator_display_name: 'TestUser',
   creator_avatar: null,
-  creator_profile_picture_url: null,
 };
 
 describe('BoardCard', () => {

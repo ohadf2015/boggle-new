@@ -215,7 +215,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         ref={tiltRef}
         className={cn(
           // Base card styles matching ModeCard
-          "relative w-full rounded-neo border-3 border-neo-black shadow-hard-lg transition-shadow cursor-pointer overflow-hidden",
+          "relative w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg transition-shadow cursor-pointer overflow-hidden",
           // Active effects matching ModeCard
           isRTL
             ? 'active:translate-x-[-1px] active:translate-y-[1px]'

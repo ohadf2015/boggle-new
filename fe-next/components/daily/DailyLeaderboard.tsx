@@ -24,7 +24,6 @@ export interface DailyParticipant {
   avatar_emoji: string;
   avatar_color: string;
   avatar_image?: string | null;
-  profile_picture_url?: string | null;
   custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   country_code?: string | null;
   score: number;
@@ -101,7 +100,7 @@ const ParticipantRow = memo<{
           ${isCurrentUser ? 'border-neo-cyan' : isTopThree ? 'border-neo-orange' : 'border-neo-black/80'}
         `}>
           <Avatar
-            profilePictureUrl={participant.profile_picture_url ?? undefined}
+
             avatarImage={participant.avatar_image ?? undefined}
             customAvatar={participant.custom_avatar ?? undefined}
             size="lg"
@@ -123,7 +122,7 @@ const ParticipantRow = memo<{
             player={{
               id: participant.player_id ?? undefined,
               username: participant.display_name || 'Player',
-              profilePictureUrl: participant.profile_picture_url,
+
               avatarImage: participant.avatar_image ?? undefined,
               customAvatar: participant.custom_avatar,
               countryCode: participant.country_code,
@@ -578,7 +577,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               <div className="flex items-center gap-2 mt-1">
                 <div className="w-10 h-10 rounded-full border-2 border-neo-cyan overflow-hidden shadow-hard-sm flex-shrink-0">
                   <Avatar
-                    profilePictureUrl={currentUserData.profile_picture_url ?? undefined}
+
                     avatarImage={currentUserData.avatar_image ?? undefined}
                     customAvatar={currentUserData.custom_avatar ?? undefined}
                     size="lg"

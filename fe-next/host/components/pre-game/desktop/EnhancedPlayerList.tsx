@@ -118,7 +118,7 @@ export function EnhancedPlayerList({
                 <div className="relative flex-shrink-0">
                   <Avatar
                     customAvatar={avatar?.customAvatar ?? undefined}
-                    profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+
                     avatarImage={avatar?.avatarImage}
                     size="md"
                     className="w-12 h-12 xl:w-14 xl:h-14"

@@ -20,7 +20,6 @@ interface PartyPlayer {
   avatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string | null;
     avatarImage?: string;
   };
   isHost?: boolean;

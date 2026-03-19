@@ -8,7 +8,6 @@ export interface HallOfFameEntry {
   totalScore: number;
   avatarImage: string | null;
   avatarConfig: Record<string, string> | null;
-  profilePictureUrl: string | null;
 }
 
 interface UseHallOfFameOptions {
@@ -31,7 +30,6 @@ export function useHallOfFame(limit = 5, options: UseHallOfFameOptions = {}) {
     totalScore: p.totalScore,
     avatarImage: p.avatarImage,
     avatarConfig: p.avatarConfig as Record<string, string> | null,
-    profilePictureUrl: p.profilePictureUrl,
   }));
 
   return { champions, loading };

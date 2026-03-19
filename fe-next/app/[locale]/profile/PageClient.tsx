@@ -12,7 +12,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { useProfilePictureUpload } from '@/hooks/useProfilePictureUpload';
+
 import { usePlayerCollectibles } from '@/hooks/usePlayerCollectibles';
 import AuthModal from '@/components/auth/AuthModal';
 import { ReferralCard } from '@/components/profile/ReferralCard';
@@ -66,13 +66,6 @@ export default function ProfilePageClient(): React.JSX.Element {
   const [activeSection, setActiveSection] = useState<ProfileSection>(getInitialSection);
 
   // Hooks
-  const { isUploading, handleProfilePictureUpload, handleRemoveProfilePicture } = useProfilePictureUpload({
-    userId: user?.id,
-    profile,
-    updateProfile,
-    refreshProfile
-  });
-
   const { collectibles: playerCollectibles, isLoading: isLoadingCollectibles } = usePlayerCollectibles(user?.id);
 
   // Pull-to-refresh
@@ -211,9 +204,6 @@ export default function ProfilePageClient(): React.JSX.Element {
   const profileHeaderProps = {
     profile,
     isDarkMode,
-    isUploading,
-    onProfilePictureUpload: handleProfilePictureUpload,
-    onRemoveProfilePicture: handleRemoveProfilePicture,
     updateProfile,
     refreshProfile
   };

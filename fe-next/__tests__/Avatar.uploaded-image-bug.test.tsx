@@ -4,7 +4,7 @@
 
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Avatar, { PROFILE_AVATAR_ID } from '@/components/Avatar';
+import Avatar from '@/components/Avatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Mock Next.js Image component
@@ -24,30 +24,36 @@ jest.mock('@/components/avatar/AvatarRenderer', () => ({
   ),
 }));
 
-describe('Avatar - Uploaded Image Priority Bug', () => {
-  it('should show profile picture when avatarImage is PROFILE_AVATAR_ID', () => {
+describe('Avatar - renders with customAvatar', () => {
+  const SAMPLE_CUSTOM_AVATAR: CustomAvatarConfig = {
+    gender: 'female',
+    base: 'heart',
+    skinColor: '#FFDBB4',
+    hair: 'bob',
+    hairColor: '#2C1B18',
+    eyes: 'sparkle',
+    mouth: 'smile',
+    accessory: 'crown',
+    accessoryColor: '#FFD700',
+    bgColor: '#FF1493',
+  };
+
+  it('should render custom SVG avatar when customAvatar is provided', () => {
     render(
       <Avatar
-        profilePictureUrl="https://example.com/custom-profile.jpg"
-        avatarImage={PROFILE_AVATAR_ID}
+        customAvatar={SAMPLE_CUSTOM_AVATAR}
         size="md"
       />
     );
 
     const avatar = screen.getByTestId('header-avatar');
-    expect(avatar).toHaveAttribute('data-avatar-image', PROFILE_AVATAR_ID);
-    expect(avatar).toHaveAttribute('data-profile-picture-url', 'https://example.com/custom-profile.jpg');
-
-    const img = avatar.querySelector('img');
-    expect(img).toHaveAttribute('src', 'https://example.com/custom-profile.jpg');
+    expect(avatar).toHaveAttribute('data-avatar-type', 'custom');
+    expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
   });
 
-  it('should show generated avatar when avatarImage is a character ID, even if profile picture exists', () => {
-    // When user has an old character avatarImage like "broccoli-bob" plus a profile picture,
-    // the avatarImage takes priority over profilePictureUrl — now renders as generated custom avatar
+  it('should show generated avatar when avatarImage is a character ID', () => {
     render(
       <Avatar
-        profilePictureUrl="https://example.com/custom-profile.jpg"
         avatarImage="broccoli-bob"
         size="md"
       />
@@ -56,22 +62,17 @@ describe('Avatar - Uploaded Image Priority Bug', () => {
     const avatar = screen.getByTestId('header-avatar');
     expect(avatar).toHaveAttribute('data-avatar-type', 'generated');
     expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
-
-    // Should NOT show profile picture
-    expect(avatar.querySelector('img')).not.toBeInTheDocument();
   });
 
-  it('should show profile picture when avatarImage is undefined', () => {
+  it('should show generated avatar when no props provided', () => {
     render(
       <Avatar
-        profilePictureUrl="https://example.com/custom-profile.jpg"
         avatarImage={undefined}
         size="md"
       />
     );
 
     const avatar = screen.getByTestId('header-avatar');
-    const img = avatar.querySelector('img');
-    expect(img?.getAttribute('src')).toBe('https://example.com/custom-profile.jpg');
+    expect(avatar).toHaveAttribute('data-avatar-type', 'generated');
   });
 });

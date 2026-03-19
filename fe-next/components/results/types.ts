@@ -36,7 +36,7 @@ export interface Player {
   score: number;
   allWords?: WordObject[];
   achievements?: GameAchievement[];
-  avatar?: AvatarType & { profilePictureUrl?: string };
+  avatar?: AvatarType;
   title?: Title;
 }
 

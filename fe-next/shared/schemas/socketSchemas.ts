@@ -74,25 +74,6 @@ export const AvatarSchema = z.object({
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   avatarImage: z.string().max(100).regex(/^[a-z0-9_\-\/]+$/i).optional().nullable(),
   customAvatar: customAvatarSchema.optional().nullable(),
-  profilePictureUrl: z.string()
-    .url()
-    .nullable()
-    .optional()
-    // SECURITY: HTTPS-only and domain whitelist to prevent SSRF/XSS
-    .refine((url) => {
-      if (!url) return true; // null/undefined is allowed
-      try {
-        const parsed = new URL(url);
-        // Only allow HTTPS (prevent data:, javascript:, file:, http: schemes)
-        if (parsed.protocol !== 'https:') return false;
-        // Check against whitelist
-        return ALLOWED_IMAGE_DOMAINS.some(domain =>
-          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
-        );
-      } catch {
-        return false;
-      }
-    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 });
 
 export const GameCodeSchema = z.string()
@@ -140,22 +121,6 @@ export const CreateGameSchema = z.object({
   authUserId: z.string().uuid().optional().nullable(),
   guestTokenHash: z.string().max(128).optional().nullable(),
   isRanked: z.boolean().optional().default(false),
-  profilePictureUrl: z.string()
-    .url()
-    .optional()
-    .nullable()
-    .refine((url) => {
-      if (!url) return true;
-      try {
-        const parsed = new URL(url);
-        if (parsed.protocol !== 'https:') return false;
-        return ALLOWED_IMAGE_DOMAINS.some(domain =>
-          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
-        );
-      } catch {
-        return false;
-      }
-    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 });
 
 /**
@@ -168,22 +133,6 @@ export const JoinGameSchema = z.object({
   avatar: AvatarSchema.optional(),
   authUserId: z.string().uuid().optional().nullable(),
   guestTokenHash: z.string().max(128).optional().nullable(),
-  profilePictureUrl: z.string()
-    .url()
-    .optional()
-    .nullable()
-    .refine((url) => {
-      if (!url) return true;
-      try {
-        const parsed = new URL(url);
-        if (parsed.protocol !== 'https:') return false;
-        return ALLOWED_IMAGE_DOMAINS.some(domain =>
-          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
-        );
-      } catch {
-        return false;
-      }
-    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 });
 
 /**

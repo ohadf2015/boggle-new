@@ -19,7 +19,7 @@ export interface ScoreRevealPlayer {
   avatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string | null;
+
     avatarImage?: string;
     customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   };
@@ -254,7 +254,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
 
         {/* Avatar */}
         <Avatar
-          profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+
           avatarImage={player.avatar?.avatarImage}
           customAvatar={player.avatar?.customAvatar}
           size="sm"

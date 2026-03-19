@@ -26,7 +26,7 @@ interface HeaderMobileMenuProps {
 
 const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, isAdmin, profile } = useAuth();
+    const { isAuthenticated, isAdmin, profile, user } = useAuth();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [mounted, setMounted] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -78,7 +78,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                     <Avatar
                         customAvatar={avatarConfig}
                         avatarImage={profile?.avatar_image}
-                        profilePictureUrl={profile?.profile_picture_url}
+                        userId={user?.id}
                         size="md"
                     />
                 </Link>

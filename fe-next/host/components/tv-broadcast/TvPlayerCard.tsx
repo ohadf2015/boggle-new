@@ -200,7 +200,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       {/* Avatar */}
       <div className="relative flex-shrink-0">
         <Avatar
-          profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+
           avatarImage={avatar?.avatarImage}
           customAvatar={avatar?.customAvatar ?? undefined}
           size="lg"

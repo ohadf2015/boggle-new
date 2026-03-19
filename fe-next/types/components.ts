@@ -63,7 +63,7 @@ export interface GameAchievement {
 export interface PlayerResult {
   username: string;
   score: number;
-  avatar?: Avatar & { profilePictureUrl?: string };
+  avatar?: Avatar;
   isHost?: boolean;
   allWords?: WordDetail[];
   achievements?: GameAchievement[];

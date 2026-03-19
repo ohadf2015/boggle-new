@@ -41,7 +41,7 @@ const MOCK_CREATORS = [
   {
     creator_id: 'user-1',
     display_name: 'WordWizard',
-    profile_picture_url: null,
+
     avatar_config: null,
     boards_created: 12,
     total_plays: 3400,
@@ -50,7 +50,7 @@ const MOCK_CREATORS = [
   {
     creator_id: 'user-2',
     display_name: 'PuzzlePro',
-    profile_picture_url: null,
+
     avatar_config: null,
     boards_created: 7,
     total_plays: 1200,
@@ -59,7 +59,7 @@ const MOCK_CREATORS = [
   {
     creator_id: 'user-3',
     display_name: 'GridGuru',
-    profile_picture_url: null,
+
     avatar_config: null,
     boards_created: 5,
     total_plays: 800,

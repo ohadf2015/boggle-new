@@ -20,7 +20,7 @@ import {
 interface AvatarData {
   emoji?: string;
   color?: string;
-  profilePictureUrl?: string;
+
 }
 
 /**
@@ -270,7 +270,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               >
                 {currentWord.submitterAvatar && (
                   <Avatar
-                    profilePictureUrl={currentWord.submitterAvatar.profilePictureUrl}
+
                     size="sm"
                   />
                 )}

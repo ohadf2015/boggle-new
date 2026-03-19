@@ -58,7 +58,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
       {/* Avatar */}
       <Avatar
         customAvatar={player.avatar?.customAvatar ?? undefined}
-        profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+
         avatarImage={player.avatar?.avatarImage}
         size="xl"
       />
@@ -76,7 +76,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
           <PlayerProfileTooltip
             player={{
               username: player.username,
-              profilePictureUrl: player.avatar?.profilePictureUrl,
+
               avatarImage: player.avatar?.avatarImage,
               customAvatar: player.avatar?.customAvatar,
               score: player.score,

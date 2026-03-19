@@ -22,7 +22,7 @@ export interface FightCardParticipant {
   avatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string | null;
+
     avatarImage?: string;
     customAvatar?: CustomAvatarConfig | null;
   };
@@ -173,7 +173,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
         <PlayerProfileTooltip
           player={{
             username: participant.name,
-            profilePictureUrl: participant.avatar?.profilePictureUrl,
+
             avatarImage: participant.avatar?.avatarImage,
             customAvatar: participant.avatar?.customAvatar,
             score: participant.score,
@@ -182,7 +182,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
           side="right"
         >
           <Avatar
-            profilePictureUrl={participant.avatar?.profilePictureUrl ?? undefined}
+
             avatarImage={participant.avatar?.avatarImage}
             customAvatar={participant.avatar?.customAvatar}
             size={rank === 1 ? 'md' : 'sm'}

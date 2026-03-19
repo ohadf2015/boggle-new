@@ -126,7 +126,9 @@ export function useGridInit({
     initGrid();
   }, [difficulty, language, mode, rowsOverride, colsOverride]);
 
-  // Fetch valid words from grid for bots and word progress tracking
+  // Fetch valid words from grid for bots and word progress tracking.
+  // Blast mode skips this entirely — it never uses availableWords and the
+  // solve-grid API call (full Boggle solver) adds 200-500ms to initial load.
   useEffect(() => {
     if (!grid) return;
 
@@ -136,6 +138,12 @@ export function useGridInit({
 
     // Notify parent of grid change
     onGridChange?.();
+
+    // Blast mode: set empty words immediately, skip expensive solver API
+    if (mode === 'blast') {
+      setAvailableWords({ easy: [], medium: [], hard: [] });
+      return;
+    }
 
     // Set timeout to ensure we get words even if API is slow/fails
     const timeoutId = setTimeout(() => {
@@ -182,7 +190,7 @@ export function useGridInit({
     fetchGridWords();
 
     return () => clearTimeout(timeoutId);
-  }, [grid, language, onGridChange]);
+  }, [grid, language, mode, onGridChange]);
 
   return {
     grid,

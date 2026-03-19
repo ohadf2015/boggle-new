@@ -57,7 +57,6 @@ const mockProfile: ProfileData = {
   username: 'TestUser',
   display_name: 'Test User',
   avatar_image: undefined,
-  profile_picture_url: 'https://example.com/pic.jpg',
   avatar_config: null,
   country_code: null,
   created_at: '2024-01-01',
@@ -77,9 +76,6 @@ describe('ProfileHeader design tokens', () => {
       <ProfileHeader
         profile={mockProfile}
         isDarkMode={false}
-        isUploading={false}
-        onProfilePictureUpload={noop as any}
-        onRemoveProfilePicture={noop}
         updateProfile={async () => ({ data: null, error: null })}
         refreshProfile={noop}
       />

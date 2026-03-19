@@ -180,15 +180,15 @@ type ProfileResult = { data: ProfileData | null; error: { message: string } | nu
  */
 export const PROFILE_SELECTS = {
   // Minimal fields for display (avatars, cards, leaderboards)
-  minimal: 'id, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, avatar_config',
+  minimal: 'id, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config',
   // Overview fields for profile cards and summaries
-  overview: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, avatar_config, total_games, total_score, current_level, player_title',
+  overview: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, total_games, total_score, current_level, player_title',
   // Game-related stats for results and stats pages
   stats: 'id, display_name, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, achievement_counts, total_time_played, prestige_level, prestige_multiplier',
   // Auth and settings fields
-  settings: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, avatar_config, profile_picture_provider, has_customized_profile, is_admin, country_code, daily_email_subscribed, timezone',
+  settings: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, has_customized_profile, is_admin, country_code, daily_email_subscribed, timezone',
   // Full profile (use sparingly - only when all fields needed)
-  full: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, avatar_config, profile_picture_provider, has_customized_profile, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone, gift_modal_dismissed_at, prestige_level, prestige_multiplier, prestige_unlocks, lifetime_xp'
+  full: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, has_customized_profile, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone, gift_modal_dismissed_at, prestige_level, prestige_multiplier, prestige_unlocks, lifetime_xp'
 } as const;
 
 export type ProfileSelectType = keyof typeof PROFILE_SELECTS;
@@ -312,52 +312,6 @@ export async function isSupabaseConfigured(): Promise<boolean> {
   return !!supabase;
 }
 
-
-// Profile picture storage functions
-export async function uploadProfilePicture(userId: string, file: File) {
-  if (!supabase) return { url: null, error: { message: 'Supabase not configured' } };
-
-  const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-  const fileName = `${userId}/profile.${fileExt}`;
-
-  // Remove any existing profile pictures for this user
-  const extensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-  const filesToRemove = extensions.map(ext => `${userId}/profile.${ext}`);
-  await supabase.storage.from('profile_pictures').remove(filesToRemove);
-
-  // Upload new file
-  const { error } = await supabase.storage
-    .from('profile_pictures')
-    .upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: true
-    });
-
-  if (error) return { url: null, error };
-
-  // Get public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('profile_pictures')
-    .getPublicUrl(fileName);
-
-  // Add cache-busting timestamp
-  const urlWithCacheBust = `${publicUrl}?t=${Date.now()}`;
-
-  return { url: urlWithCacheBust, error: null };
-}
-
-export async function removeProfilePicture(userId: string) {
-  if (!supabase) return { error: { message: 'Supabase not configured' } };
-
-  const extensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-  const filesToRemove = extensions.map(ext => `${userId}/profile.${ext}`);
-
-  const { error } = await supabase.storage
-    .from('profile_pictures')
-    .remove(filesToRemove);
-
-  return { error };
-}
 
 // Coin management functions
 export interface CoinSyncResult {

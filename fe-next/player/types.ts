@@ -23,7 +23,6 @@ export interface WordToVote {
   submitterAvatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string;
   };
   timeoutSeconds: number;
   gameCode: string;

@@ -90,6 +90,10 @@ Sentry.init({
     // Socket.IO connection warnings - transient network errors with auto-retry
     "[SOCKET.IO] Connection error",
     /\[socket\.io\].*connection error/i,
+    // Socket.IO expected business logic errors (GAME_NOT_FOUND, NOT_IN_GAME, ROOM_NOT_FOUND)
+    // These are handled gracefully in SocketContext.tsx and are not bugs
+    "[SOCKET.IO] Expected error",
+    /\[socket\.io\].*expected error/i,
     // WebSocket/Socket.IO connection closed - transient network errors
     // These are expected when users close tabs, lose network, or switch pages
     "Connection closed",

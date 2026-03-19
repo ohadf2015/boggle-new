@@ -5,7 +5,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 export interface CrazyGamesUser {
   username: string;
-  profilePictureUrl: string;
+  profilePictureUrl?: string;
 }
 
 interface UseCrazyGamesAuthReturn {
@@ -103,7 +103,7 @@ export function useCrazyGamesAuth(): UseCrazyGamesAuthReturn {
   useEffect(() => {
     if (!isAvailable) return;
 
-    const handleAuthChange = (cgUser: { username: string; profilePictureUrl: string }) => {
+    const handleAuthChange = (cgUser: { username: string }) => {
       setUser(cgUser);
     };
 

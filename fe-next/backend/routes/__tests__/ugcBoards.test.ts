@@ -97,7 +97,6 @@ const MOCK_BOARD = {
   creator_id: 'user-456',
   creator_display_name: 'TestUser',
   creator_avatar: null,
-  creator_profile_picture_url: null,
   language: 'en',
   title: 'My Fun Board',
   description: 'A test board',

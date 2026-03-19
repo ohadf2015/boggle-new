@@ -188,7 +188,6 @@ export const profileOperations = {
     // Validate updates
     const allowedFields = [
       'username', 'display_name', 'avatar_image', 'avatar_emoji', 'avatar_color',
-      'profile_picture_url', 'profile_picture_provider'
     ];
 
     const sanitizedUpdates: Record<string, any> = {};

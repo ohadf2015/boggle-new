@@ -65,7 +65,6 @@ interface CreateGamePayload {
   guestTokenHash?: string;
   guestSessionId?: string;
   isRanked?: boolean;
-  profilePictureUrl?: string;
 }
 
 interface StartGameAckPayload {
@@ -109,7 +108,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, profilePictureUrl } = validation.data as CreateGamePayload;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked } = validation.data as CreateGamePayload;
 
       logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`, {
         socketId: socket.id,
@@ -150,7 +149,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       const hostAvatar = avatar || generateRandomAvatar();
       logger.info('HOST_JOIN', `Adding host ${hostUsername || 'Host'} to game ${gameCode} with authUserId=${authUserId || 'NONE'}, guestHash=${guestTokenHash ? 'yes' : 'no'}`);
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
-        avatar: { ...hostAvatar, profilePictureUrl: profilePictureUrl || null },
+        avatar: hostAvatar,
         isHost: true,
         playerId: sanitizedPlayerId,
         authUserId: authUserId || null,

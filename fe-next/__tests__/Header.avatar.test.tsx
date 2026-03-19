@@ -4,7 +4,6 @@ import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
-import { PROFILE_AVATAR_ID } from '@/components/Avatar';
 import type { ProfileData } from '@/contexts/auth';
 
 // Mock window.matchMedia
@@ -65,16 +64,14 @@ jest.mock('@/components/auth/AuthButton', () => ({
 }));
 jest.mock('@/components/Avatar', () => ({
   __esModule: true,
-  default: ({ avatarImage, profilePictureUrl }: { avatarImage?: string; profilePictureUrl?: string }) => (
+  default: ({ avatarImage }: { avatarImage?: string }) => (
     <div
       data-testid="header-avatar"
       data-avatar-image={avatarImage}
-      data-profile-picture-url={profilePictureUrl}
     >
       Avatar
     </div>
   ),
-  PROFILE_AVATAR_ID: '__profile_avatar__',
 }));
 
 const mockPush = jest.fn();
@@ -109,7 +106,7 @@ describe('Header - Avatar Display', () => {
         username: 'testuser',
         display_name: 'Test User',
         avatar_image: 'broccoli-bob',
-        profile_picture_url: 'https://example.com/profile.jpg',
+
         total_coins: 100,
         total_xp: 500,
       } as ProfileData;
@@ -133,13 +130,13 @@ describe('Header - Avatar Display', () => {
       expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('should show avatar as profile link for authenticated user with profile picture', () => {
+    it('should show avatar as profile link for authenticated user with avatar', () => {
       const profile: ProfileData = {
         id: 'user-123',
         username: 'testuser',
         display_name: 'Test User',
-        avatar_image: PROFILE_AVATAR_ID,
-        profile_picture_url: 'https://example.com/profile.jpg',
+        avatar_image: 'broccoli-bob',
+
         total_coins: 100,
         total_xp: 500,
       } as ProfileData;
@@ -170,7 +167,7 @@ describe('Header - Avatar Display', () => {
         username: 'testuser',
         display_name: 'Test User',
         avatar_image: selectedAvatarId,
-        profile_picture_url: null,
+
         total_coins: 100,
         total_xp: 500,
       } as ProfileData;

@@ -37,7 +37,7 @@ interface WinnerData {
   avatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string | null;
+
     avatarImage?: string;
     customAvatar?: CustomAvatarConfig | null;
   };
@@ -373,7 +373,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                   ${compact ? '' : 'sm:p-1'}
                 `}>
                   <Avatar
-                    profilePictureUrl={winner.avatar.profilePictureUrl ?? undefined}
+
                     avatarImage={winner.avatar.avatarImage}
                     customAvatar={winner.avatar.customAvatar}
                     size={compact ? 'lg' : 'xl'}

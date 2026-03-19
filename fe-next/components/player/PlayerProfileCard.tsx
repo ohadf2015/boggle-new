@@ -66,7 +66,7 @@ const PlayerProfileCard = memo<PlayerProfileCardProps>(({
           {/* Avatar */}
           <Avatar
             customAvatar={profile.customAvatar ?? undefined}
-            profilePictureUrl={profile.profilePictureUrl ?? undefined}
+
             size={compact ? 'md' : 'lg'}
             className="flex-shrink-0 border-2 border-neo-black"
           />

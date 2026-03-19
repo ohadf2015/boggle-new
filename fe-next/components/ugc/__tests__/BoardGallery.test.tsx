@@ -45,7 +45,7 @@ const mockBoards = [
     featured: true,
     creator_display_name: 'Alice',
     creator_avatar: null,
-    creator_profile_picture_url: null,
+
   },
   {
     board_code: 'BBB2',
@@ -59,7 +59,7 @@ const mockBoards = [
     featured: false,
     creator_display_name: 'Bob',
     creator_avatar: null,
-    creator_profile_picture_url: null,
+
   },
 ];
 

@@ -20,7 +20,7 @@ interface HeaderDesktopControlsProps {
 
 const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount, onOpenGiftModal }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, profile } = useAuth();
+    const { isAuthenticated, profile, user } = useAuth();
 
     const guestAvatar = !isAuthenticated ? getStoredCustomAvatar() : null;
     const avatarConfig = profile?.avatar_config ?? guestAvatar;
@@ -42,7 +42,7 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
                 <Avatar
                     customAvatar={avatarConfig}
                     avatarImage={profile?.avatar_image}
-                    profilePictureUrl={profile?.profile_picture_url}
+                    userId={user?.id}
                     size="md"
                 />
             </Link>

@@ -15,7 +15,6 @@ export interface PlayerTooltipData {
   id?: string;
   username: string;
   displayName?: string;
-  profilePictureUrl?: string | null;
   avatarImage?: string;
   customAvatar?: CustomAvatarConfig | null;
   countryCode?: string | null;
@@ -51,9 +50,9 @@ const PlayerProfileTooltipContent = memo<{
       {/* Header: Avatar + Name */}
       <div className="flex items-center gap-2">
         <Avatar
-          profilePictureUrl={player.profilePictureUrl ?? undefined}
           avatarImage={player.avatarImage}
           customAvatar={player.customAvatar}
+          userId={player.id}
           size="lg"
           className="border-2 border-neo-black"
         />

@@ -59,7 +59,6 @@ const MOCK_PROFILE: PublicProfile = {
   username: 'WordMaster',
   displayName: 'Word Master',
   customAvatar: { gender: 'male' as const, base: 'round' as const, skinColor: '#FFDBB4' as const, hair: 'spiky' as const, hairColor: '#2C1B18' as const, eyes: 'round' as const, mouth: 'smile' as const, accessory: 'none' as const, accessoryColor: '#000000' as const, bgColor: '#FF6B35' as const },
-  profilePictureUrl: null,
   countryCode: 'US',
   currentLevel: 15,
   totalXp: 5200,

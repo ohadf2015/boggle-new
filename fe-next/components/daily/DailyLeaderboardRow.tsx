@@ -54,7 +54,7 @@ export const TodayParticipantRow = memo<{
       <div className="relative">
         <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
           <Avatar
-            profilePictureUrl={participant.profile_picture_url ?? undefined}
+
             avatarImage={participant.avatar_image ?? undefined}
             customAvatar={participant.custom_avatar ?? undefined}
             size="lg"
@@ -76,7 +76,7 @@ export const TodayParticipantRow = memo<{
             player={{
               id: participant.player_id ?? undefined,
               username: participant.display_name || 'Player',
-              profilePictureUrl: participant.profile_picture_url,
+
               avatarImage: participant.avatar_image ?? undefined,
               customAvatar: participant.custom_avatar,
               countryCode: participant.country_code,
@@ -167,7 +167,7 @@ export const AllTimeParticipantRow = memo<{
       <div className="relative">
         <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
           <Avatar
-            profilePictureUrl={participant.profile_picture_url ?? undefined}
+
             avatarImage={participant.avatar_image ?? undefined}
             customAvatar={participant.custom_avatar ?? undefined}
             size="lg"
@@ -189,7 +189,7 @@ export const AllTimeParticipantRow = memo<{
             player={{
               id: participant.player_id ?? undefined,
               username: participant.display_name || 'Player',
-              profilePictureUrl: participant.profile_picture_url,
+
               avatarImage: participant.avatar_image ?? undefined,
               customAvatar: participant.custom_avatar,
               countryCode: participant.country_code,

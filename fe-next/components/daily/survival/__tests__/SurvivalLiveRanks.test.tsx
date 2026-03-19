@@ -59,9 +59,9 @@ afterEach(() => {
 // Mock response matches real Supabase view output (snake_case)
 const mockLeaderboardResponse = {
   data: [
-    { rank_position: 1, display_name: 'Alice', efficiency_score: 350, solved: true, player_id: 'alice-id', guest_fingerprint: null, profile_picture_url: null, avatar_image: null },
-    { rank_position: 2, display_name: 'Bob', efficiency_score: 280, solved: true, player_id: null, guest_fingerprint: 'bob-fp', profile_picture_url: null, avatar_image: null },
-    { rank_position: 3, display_name: 'Charlie', efficiency_score: 200, solved: false, player_id: 'charlie-id', guest_fingerprint: null, profile_picture_url: null, avatar_image: null },
+    { rank_position: 1, display_name: 'Alice', efficiency_score: 350, solved: true, player_id: 'alice-id', guest_fingerprint: null, avatar_image: null},
+    { rank_position: 2, display_name: 'Bob', efficiency_score: 280, solved: true, player_id: null, guest_fingerprint: 'bob-fp', avatar_image: null},
+    { rank_position: 3, display_name: 'Charlie', efficiency_score: 200, solved: false, player_id: 'charlie-id', guest_fingerprint: null, avatar_image: null},
   ],
   totalPlayers: 25,
 };

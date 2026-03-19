@@ -143,8 +143,8 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
       }}
     >
       <AdaptiveAnimatePresence>
-        {tileStates.flat().map(tile => {
-          const posKey = `${tile.row}-${tile.col}`;
+        {tileStates.map((row, ri) => row.map((tile, ci) => {
+          const posKey = `${ri}-${ci}`;
           const isSelected = selectedPositions?.has(posKey) ?? false;
 
           // Cleared tile → dark void cell
@@ -158,8 +158,8 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
                 transition={{ type: 'spring', stiffness: 600, damping: 30 }}
                 className="rounded-lg"
                 style={{
-                  gridRow: tile.row + 1,
-                  gridColumn: tile.col + 1,
+                  gridRow: ri + 1,
+                  gridColumn: ci + 1,
                   background: 'radial-gradient(circle at 50% 50%, rgba(15,15,35,0.85) 0%, rgba(8,8,25,0.95) 100%)',
                   border: '2px solid rgba(255,255,255,0.06)',
                   boxShadow: 'inset 0 3px 12px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.4)',
@@ -225,8 +225,8 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               className={`relative rounded-lg ${config.animationClass}${isWeakened ? ' blast-tile-weakened' : ''}${isSelected ? ' blast-tile-selected' : ''}${objectiveTileTypes?.has(tile.type) ? ' blast-tile-objective' : ''}`}
               style={{
-                gridRow: tile.row + 1,
-                gridColumn: tile.col + 1,
+                gridRow: ri + 1,
+                gridColumn: ci + 1,
                 background,
                 border,
                 boxShadow: shadow,
@@ -266,7 +266,7 @@ export const BlastTileOverlay = memo(function BlastTileOverlay({
               )}
             </AdaptiveMotion.div>
           );
-        })}
+        }))}
       </AdaptiveAnimatePresence>
     </div>
   );

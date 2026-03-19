@@ -49,7 +49,6 @@ interface BotControlsPlayer {
   avatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string | null;
   } | null;
 }
 

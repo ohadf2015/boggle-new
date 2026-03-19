@@ -11,7 +11,6 @@ const MOCK_PROFILE: PublicProfile = {
   username: 'WordMaster',
   displayName: 'Word Master',
   customAvatar: null,
-  profilePictureUrl: null,
   countryCode: 'US',
   currentLevel: 15,
   totalXp: 5200,

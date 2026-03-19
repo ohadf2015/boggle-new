@@ -84,7 +84,6 @@ describe('useResultSubmission', () => {
     avatar_emoji: '🏆',
     avatar_color: '#FFD700',
     avatar_image: null,
-    profile_picture_url: null,
   };
 
   const mockGuestPlayer: GuestDailyPlayer = {

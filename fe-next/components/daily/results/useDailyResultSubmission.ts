@@ -55,10 +55,6 @@ export function useDailyResultSubmission(
         const avatarImage = isAuthenticated && profile
           ? profile.avatar_image
           : undefined;
-        const profilePictureUrl = isAuthenticated && profile
-          ? profile.profile_picture_url
-          : undefined;
-
         let countryCode: string | null = null;
         try {
           const geoResponse = await fetch('/api/geolocation');
@@ -83,7 +79,6 @@ export function useDailyResultSubmission(
             avatarEmoji,
             avatarColor,
             avatarImage,
-            profilePictureUrl,
             countryCode,
             score: Math.round(result.score),
             wordCount: result.wordCount,

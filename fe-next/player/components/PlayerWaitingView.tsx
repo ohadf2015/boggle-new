@@ -162,10 +162,10 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                     isMe ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : '',
                     AVATAR_COLORS[index % AVATAR_COLORS.length]
                   )}>
-                    {avatar?.customAvatar || avatar?.profilePictureUrl || avatar?.avatarImage ? (
+                    {avatar?.customAvatar || avatar?.avatarImage ? (
                       <Avatar
                         customAvatar={avatar?.customAvatar ?? undefined}
-                        profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+
                         avatarImage={avatar?.avatarImage}
                         size="md"
                       />

@@ -8,8 +8,6 @@ import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
-import { PROFILE_AVATAR_ID } from '@/components/Avatar';
-
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -110,8 +108,7 @@ describe('Header - Hamburger Menu Avatar Bugs', () => {
       profile: {
         id: 'test-user',
         username: 'TestUser',
-        profile_picture_url: 'https://example.com/custom-profile.jpg',
-        avatar_image: PROFILE_AVATAR_ID,
+        avatar_image: 'broccoli-bob',
         total_coins: 100,
       },
       loading: false,
@@ -154,8 +151,7 @@ describe('Header - Hamburger Menu Avatar Bugs', () => {
       profile: {
         id: 'test-user',
         username: 'TestUser',
-        profile_picture_url: null,
-        avatar_image: 'broccoli-bob', // Character avatar
+        avatar_image: 'broccoli-bob',
         total_coins: 100,
       },
       loading: false,

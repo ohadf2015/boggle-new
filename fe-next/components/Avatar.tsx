@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo, memo } from 'react';
-import Image from 'next/image';
+import { useMemo, memo } from 'react';
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import { cn } from '@/lib/utils';
 import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
 
-// Special constant for "use profile avatar" selection - indicates profile picture should be used
+/** @deprecated No longer used — profile pictures removed in favor of custom avatars */
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
 
 type AvatarSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
@@ -18,7 +17,9 @@ interface SizeConfig {
 }
 
 interface AvatarProps {
+  /** @deprecated Profile pictures removed — this prop is ignored */
   profilePictureUrl?: string | null;
+  /** @deprecated Use customAvatar instead */
   avatarImage?: string;
   customAvatar?: CustomAvatarConfig | null;
   /** Unique identifier for deterministic fallback avatar generation (e.g. user ID, username) */
@@ -39,27 +40,20 @@ const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
 
 /**
  * Unified Avatar Component
- * Fallback chain: customAvatar (SVG) > profilePictureUrl > deterministic random custom avatar.
+ * Fallback chain: customAvatar (SVG) > deterministic random custom avatar.
  */
 const Avatar = memo<AvatarProps>(({
-  profilePictureUrl,
-  avatarImage,
   customAvatar,
   userId,
+  avatarImage,
   size = 'md',
   className = '',
   isLoading = false,
 }) => {
-  const [imageError, setImageError] = useState(false);
   const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
 
-  useEffect(() => {
-    setImageError(false);
-  }, [profilePictureUrl]);
-
   // Pre-compute fallback avatar (must be before conditionals to satisfy hook rules)
-  // Use userId for unique seed when no avatarImage/profilePictureUrl is available
-  const fallbackSeed = avatarImage || profilePictureUrl || userId || 'default-avatar';
+  const fallbackSeed = avatarImage || userId || 'default-avatar';
   const fallbackConfig = useMemo(
     () => getSeededAvatarConfig(hashString(fallbackSeed)),
     [fallbackSeed]
@@ -85,36 +79,7 @@ const Avatar = memo<AvatarProps>(({
     );
   }
 
-  // 2. Profile picture (when PROFILE_AVATAR_ID or no avatarImage set)
-  const shouldShowProfilePicture = profilePictureUrl &&
-    (avatarImage === PROFILE_AVATAR_ID || !avatarImage) &&
-    !imageError;
-
-  if (shouldShowProfilePicture) {
-    return (
-      <div
-        className={cn('relative rounded-full overflow-hidden flex-shrink-0', config.container, className)}
-        data-testid="header-avatar"
-        data-avatar-image={avatarImage || PROFILE_AVATAR_ID}
-        data-profile-picture-url={profilePictureUrl}
-      >
-        <Image
-          src={profilePictureUrl}
-          alt="Profile"
-          fill
-          sizes={`(max-width: 768px) ${config.px}px, ${config.px}px`}
-          className="object-cover"
-          onError={() => setImageError(true)}
-          referrerPolicy="no-referrer"
-          loading="lazy"
-          priority={false}
-          unoptimized={profilePictureUrl.startsWith('http')}
-        />
-      </div>
-    );
-  }
-
-  // 3. Fallback: deterministic random custom avatar
+  // 2. Fallback: deterministic random custom avatar
   return (
     <div
       className={cn('relative rounded-full overflow-hidden flex-shrink-0', config.container, className)}

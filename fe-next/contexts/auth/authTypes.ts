@@ -15,8 +15,6 @@ export interface ProfileData {
   avatar_emoji?: string;
   avatar_color?: string;
   avatar_config?: CustomAvatarConfig | null;
-  profile_picture_url?: string | null;
-  profile_picture_provider?: string | null;
   total_games?: number;
   total_score?: number;
   total_words?: number;

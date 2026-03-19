@@ -15,7 +15,7 @@
  */
 
 import { useState, useRef, useCallback, useMemo } from 'react';
-import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
+import { validateWordLocally, isWordOnBoard, buildPositionsMap } from '@/utils/clientWordValidator';
 import { getComboBonus, calculateWordScore } from '@/shared/utils/scoring';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { usePrevalidation } from '@/hooks/usePrevalidation';
@@ -124,9 +124,17 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
   const submissionTimestampsRef = useRef<number[]>([]);
   const spamCooldownUntilRef = useRef<number>(0);
   const comboLevelRef = useRef(comboLevel);
+  const positionsMapRef = useRef<Map<string, [number, number][]> | null>(null);
+  const positionsGridRef = useRef<LetterGrid | null>(null);
 
   // Keep combo ref in sync
   comboLevelRef.current = comboLevel;
+
+  // Cache positions map — rebuild only when grid changes
+  if (grid !== positionsGridRef.current) {
+    positionsGridRef.current = grid;
+    positionsMapRef.current = grid ? buildPositionsMap(grid, language) : null;
+  }
 
   // Client-side dictionary cache — preloads full dictionary for O(1) lookups
   const { checkWord: checkWordInCache, isLoaded: isDictionaryCacheLoaded } = useDictionaryCache(language);
@@ -279,12 +287,12 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       });
     }
 
-    // Step 1: Local validation
+    // Step 1: Local validation (uses Set ref for O(1) duplicate check)
     const localValidation = validateWordLocally(
       normalizedWord,
       language,
       minWordLength,
-      foundWords.map(fw => ({ word: fw.word, isValid: fw.isValid }))
+      foundWordsSetRef.current
     );
 
     if (!localValidation.isValid) {
@@ -304,8 +312,8 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       return;
     }
 
-    // Step 2: Check if word exists on board
-    if (!grid || !isWordOnBoard(normalizedWord, grid, language)) {
+    // Step 2: Check if word exists on board (uses cached positions map)
+    if (!grid || !isWordOnBoard(normalizedWord, grid, language, positionsMapRef.current ?? undefined)) {
       const msg = t('playerView.wordNotOnBoard') || 'Word not on board';
       setCurrentFeedback({
         id: `reject-${now}`,
@@ -396,7 +404,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     grid,
     language,
     minWordLength,
-    foundWords,
     t,
     checkSpam,
     calculateScore,

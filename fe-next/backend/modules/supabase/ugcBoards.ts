@@ -14,7 +14,8 @@ export interface CommunityBoard {
   creator_id: string | null;
   creator_display_name: string;
   creator_avatar: Record<string, unknown> | null;
-  creator_profile_picture_url: string | null;
+  /** @deprecated - kept for DB column compatibility, no longer populated */
+  creator_profile_picture_url?: string | null;
   language: string;
   title: string;
   description: string | null;

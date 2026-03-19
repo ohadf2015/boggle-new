@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, Edit, Check, Globe, Sparkles, Camera } from 'lucide-react';
+import { X, Edit, Check, Globe, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -25,9 +25,12 @@ interface ProfileHeaderProps {
   profile: ProfileData | null;
   isDarkMode: boolean;
   compact?: boolean;
-  isUploading: boolean;
-  onProfilePictureUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
-  onRemoveProfilePicture: () => Promise<void>;
+  /** @deprecated No longer used — profile picture upload removed */
+  isUploading?: boolean;
+  /** @deprecated No longer used — profile picture upload removed */
+  onProfilePictureUpload?: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  /** @deprecated No longer used — profile picture upload removed */
+  onRemoveProfilePicture?: () => Promise<void>;
   updateProfile: (updates: Partial<ProfileData>) => Promise<{ data: ProfileData | null; error: { message: string } | null }>;
   refreshProfile: () => Promise<void>;
 }
@@ -36,9 +39,6 @@ export function ProfileHeader({
   profile,
   isDarkMode,
   compact = false,
-  isUploading,
-  onProfilePictureUpload,
-  onRemoveProfilePicture,
   updateProfile,
   refreshProfile
 }: ProfileHeaderProps): React.ReactNode {
@@ -142,55 +142,26 @@ export function ProfileHeader({
           >
             <Avatar
               customAvatar={profile?.avatar_config ?? undefined}
-              profilePictureUrl={profile?.profile_picture_url ?? undefined}
-              avatarImage={profile?.avatar_image ?? undefined}
+              userId={profile?.id}
               size={compact ? 'lg' : '2xl'}
               className="w-full h-full"
             />
           </div>
 
-          {/* Overlay control buttons */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Upload photo button — bottom-end */}
-            <label
-              className={cn(
-                'absolute -bottom-1 -end-1 flex items-center justify-center cursor-pointer pointer-events-auto',
-                'rounded-full bg-slate-700/90 border-2 border-slate-500/50',
-                'text-white/80 hover:bg-slate-600 hover:text-white transition-colors',
-                compact ? 'w-6 h-6' : 'w-7 h-7'
-              )}
-              title={t('profile.uploadPhoto')}
-              aria-label={t('profile.uploadPhoto')}
-            >
-              {isUploading ? (
-                <Loader size="sm" />
-              ) : (
-                <Camera size={compact ? 10 : 12} />
-              )}
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={onProfilePictureUpload}
-                className="hidden"
-                disabled={isUploading}
-              />
-            </label>
-
-            {/* Edit avatar button — bottom-start */}
-            <button
-              onClick={() => setIsAvatarBuilderOpen(true)}
-              className={cn(
-                'absolute -bottom-1 -start-1 flex items-center justify-center pointer-events-auto',
-                'rounded-full bg-neo-pink/90 border-2 border-neo-pink/50',
-                'text-white/90 hover:bg-neo-pink hover:text-white transition-colors',
-                compact ? 'w-6 h-6' : 'w-7 h-7'
-              )}
-              title={t('profile.chooseAvatar')}
-              aria-label={t('profile.chooseAvatar')}
-            >
-              <Edit size={compact ? 10 : 12} />
-            </button>
-          </div>
+          {/* Edit avatar button */}
+          <button
+            onClick={() => setIsAvatarBuilderOpen(true)}
+            className={cn(
+              'absolute -bottom-1 -end-1 flex items-center justify-center',
+              'rounded-full bg-neo-pink/90 border-2 border-neo-pink/50',
+              'text-white/90 hover:bg-neo-pink hover:text-white transition-colors',
+              compact ? 'w-6 h-6' : 'w-7 h-7'
+            )}
+            title={t('profile.chooseAvatar')}
+            aria-label={t('profile.chooseAvatar')}
+          >
+            <Edit size={compact ? 10 : 12} />
+          </button>
         </div>
 
         {/* User Info */}
@@ -287,18 +258,6 @@ export function ProfileHeader({
             </span>
           </div>
 
-          {/* Remove profile picture */}
-          {!compact && profile?.profile_picture_url && (
-            <button
-              onClick={onRemoveProfilePicture}
-              className="mt-2 text-xs text-red-400 hover:text-red-300 transition-colors"
-              title={t('profile.removePhoto')}
-              aria-label={t('profile.removePhoto')}
-            >
-              <X size={12} className="inline me-1" />
-              {t('profile.removePhoto')}
-            </button>
-          )}
         </div>
       </div>
 

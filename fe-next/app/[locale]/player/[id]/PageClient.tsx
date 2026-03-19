@@ -173,7 +173,7 @@ export default function PlayerProfilePageClient() {
           {/* Avatar */}
           <Avatar
             customAvatar={profile.customAvatar ?? undefined}
-            profilePictureUrl={profile.profilePictureUrl ?? undefined}
+            userId={id}
             size="2xl"
             className="flex-shrink-0 border-3 border-neo-black shadow-hard"
           />

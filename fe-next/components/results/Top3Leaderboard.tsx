@@ -66,7 +66,7 @@ export interface LeaderboardParticipant {
   avatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string | null;
+
     avatarImage?: string;
     customAvatar?: CustomAvatarConfig | null;
   };
@@ -326,7 +326,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                       compact ? '' : rank === 1 ? 'p-1' : ''
                     )}>
                       <Avatar
-                        profilePictureUrl={participant.avatar?.profilePictureUrl ?? undefined}
+
                         avatarImage={participant.avatar?.avatarImage}
                         customAvatar={participant.avatar?.customAvatar}
                         size={compact ? 'md' : rank === 1 ? 'xl' : 'lg'}
@@ -340,7 +340,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 <PlayerProfileTooltip
                   player={{
                     username: participant.name,
-                    profilePictureUrl: participant.avatar?.profilePictureUrl,
+
                     avatarImage: participant.avatar?.avatarImage,
                     customAvatar: participant.avatar?.customAvatar,
                     score: participant.score,

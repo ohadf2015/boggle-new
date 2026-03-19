@@ -1511,6 +1511,8 @@ const he = {
     "finalScore": "תוצאה סופית",
     "coinsEarned": "מטבעות שנצברו",
     "detailedAnalysis": "ניתוח מפורט",
+    "gameStats": "סטטיסטיקות משחק",
+    "accuracy": "דיוק",
     "yourPerformance": "הביצועים שלך",
     "rewards": "פרסים",
     "standings": "דירוג",

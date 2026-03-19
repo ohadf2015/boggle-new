@@ -60,14 +60,12 @@ export interface GridPosition {
 
 /**
  * Avatar data structure
- * Primary fields: avatarImage (character avatar ID) and profilePictureUrl (OAuth profile picture)
+ * Primary fields: avatarImage (character avatar ID) and customAvatar (SVG avatar)
  * The emoji and color fields are deprecated but kept for backward compatibility
  */
 export interface Avatar {
-  /** Primary: Avatar image ID (e.g., 'broccoli-bob', 'pizza-pete') or '__profile_avatar__' for profile picture */
+  /** Primary: Avatar image ID (e.g., 'broccoli-bob', 'pizza-pete') */
   avatarImage?: string;
-  /** Profile picture URL from OAuth provider (Google, Discord, etc.) */
-  profilePictureUrl?: string | null;
   /** Custom SVG avatar configuration */
   customAvatar?: CustomAvatarConfig;
   /** @deprecated - kept for backward compatibility, will be removed */

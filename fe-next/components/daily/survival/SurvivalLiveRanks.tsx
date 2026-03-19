@@ -16,7 +16,7 @@ interface LeaderboardEntry {
   solved: boolean;
   playerId?: string;
   guestFingerprint?: string;
-  profile_picture_url?: string | null;
+
   avatar_image?: string | null;
 }
 
@@ -63,7 +63,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
         solved: (row.solved as boolean) ?? false,
         playerId: row.player_id as string | undefined,
         guestFingerprint: row.guest_fingerprint as string | undefined,
-        profile_picture_url: row.profile_picture_url as string | null,
+
         avatar_image: row.avatar_image as string | null,
       }));
       setEntries(mapped);
@@ -136,7 +136,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
               {/* Avatar */}
               <div className="flex-shrink-0">
                 <Avatar
-                  profilePictureUrl={entry.profile_picture_url ?? undefined}
+
                   avatarImage={entry.avatar_image ?? undefined}
                   size="sm"
                 />
@@ -147,7 +147,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
                 player={{
                   id: entry.playerId,
                   username: entry.displayName,
-                  profilePictureUrl: entry.profile_picture_url,
+
                   avatarImage: entry.avatar_image ?? undefined,
                   score: entry.score,
                 }}

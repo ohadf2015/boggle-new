@@ -120,7 +120,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const user = authResult.data?.user;
     const { data: profileData } = user
-      ? await supabase.from('profiles').select('avatar_emoji, avatar_color, avatar_image, profile_picture_url').eq('id', user.id).single()
+      ? await supabase.from('profiles').select('avatar_emoji, avatar_color, avatar_image').eq('id', user.id).single()
       : { data: null };
 
     const { data: puzzle, error: puzzleError } = puzzleResult;
@@ -157,7 +157,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       avatar_emoji: avatarEmoji || profileData?.avatar_emoji || '🎯',
       avatar_color: avatarColor || profileData?.avatar_color || '#6366f1',
       avatar_image: avatarImage || profileData?.avatar_image || undefined,
-      profile_picture_url: profileData?.profile_picture_url || undefined,
       country_code: countryCode || undefined,
       solved,
       attempts_used: attemptsUsed,

@@ -12,7 +12,6 @@ export interface CompactPlayer {
   score: number;
   rank: number;
   isCurrentUser?: boolean;
-  profilePictureUrl?: string | null;
   avatarImage?: string;
   customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   avatarEmoji?: string;
@@ -319,7 +318,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
 
                     {/* Avatar */}
                     <Avatar
-                      profilePictureUrl={player.profilePictureUrl ?? undefined}
+
                       avatarImage={player.avatarImage}
                       customAvatar={player.customAvatar}
                       size="md"
@@ -409,7 +408,6 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   <PlayerProfileTooltip
                     player={{
                       username: player.username,
-                      profilePictureUrl: player.profilePictureUrl,
                       avatarImage: player.avatarImage,
                       customAvatar: player.customAvatar,
                       score: player.score,

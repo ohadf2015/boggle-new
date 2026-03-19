@@ -134,7 +134,7 @@ const TvResultsPlayerSpotlight = memo<TvResultsPlayerSpotlightProps>(({
                   {/* Avatar (top-right) */}
                   <div className="absolute -top-3 -right-3">
                     <Avatar
-                      profilePictureUrl={originalPlayer?.avatar?.profilePictureUrl ?? undefined}
+
                       avatarImage={originalPlayer?.avatar?.avatarImage}
                       customAvatar={originalPlayer?.avatar?.customAvatar}
                       size="sm"

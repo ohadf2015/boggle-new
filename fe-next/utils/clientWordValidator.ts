@@ -54,7 +54,7 @@ export function validateWordLocally(
   word: string,
   language: string,
   minWordLength: number,
-  foundWords: Array<{ word: string; isValid?: boolean | null }>
+  foundWordsOrSet: Array<{ word: string; isValid?: boolean | null }> | Set<string>
 ): ClientValidationResult {
   // Check minimum length
   if (word.length < minWordLength) {
@@ -76,12 +76,11 @@ export function validateWordLocally(
     };
   }
 
-  // Check if word was already found (case-insensitive)
+  // Check if word was already found
   const normalizedWord = normalizeWord(word, language);
-  const alreadyFound = foundWords.some(fw => {
-    const existingNormalized = normalizeWord(fw.word, language);
-    return existingNormalized === normalizedWord;
-  });
+  const alreadyFound = foundWordsOrSet instanceof Set
+    ? foundWordsOrSet.has(normalizedWord)
+    : foundWordsOrSet.some(fw => normalizeWord(fw.word, language) === normalizedWord);
 
   if (alreadyFound) {
     return {
@@ -191,14 +190,21 @@ function searchWord(
  * Uses DFS to find adjacent cell path (8-directional)
  * This is the authoritative validation - same logic as backend
  */
-export function isWordOnBoard(word: string, letterGrid: string[][] | null, language: string): boolean {
+export { makePositionsMap as buildPositionsMap };
+
+export function isWordOnBoard(
+  word: string,
+  letterGrid: string[][] | null,
+  language: string,
+  positionsMap?: Map<string, [number, number][]>
+): boolean {
   if (!letterGrid || !word || letterGrid.length === 0) return false;
 
   // Normalize the word for comparison
   const wordNormalized = normalizeWord(word, language);
 
-  // Find all starting positions (cells with the first letter)
-  const posMap = makePositionsMap(letterGrid, language);
+  // Use pre-built map if provided, otherwise build one (expensive per call)
+  const posMap = positionsMap || makePositionsMap(letterGrid, language);
   const startPositions = posMap.get(wordNormalized[0]) || [];
 
   // Try to find the word starting from each position

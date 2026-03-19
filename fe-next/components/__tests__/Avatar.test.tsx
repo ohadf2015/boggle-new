@@ -2,7 +2,7 @@
  * Avatar Component Tests
  *
  * Tests the unified avatar component with fallback chain:
- * customAvatar (SVG) > profilePictureUrl > deterministic random custom avatar
+ * customAvatar (SVG) > deterministic random custom avatar
  */
 
 import React from 'react';
@@ -61,38 +61,16 @@ describe('Avatar', () => {
       expect(screen.getByTestId('header-avatar')).toHaveAttribute('data-avatar-type', 'custom');
     });
 
-    it('prefers customAvatar over profilePictureUrl and avatarImage', () => {
+    it('prefers customAvatar over avatarImage', () => {
       render(
         <Avatar
           customAvatar={SAMPLE_CUSTOM_AVATAR}
-          profilePictureUrl="https://example.com/photo.jpg"
           avatarImage="pizza-pete"
         />
       );
 
       expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
       expect(screen.queryByTestId('avatar-image')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('profile picture', () => {
-    it('renders profile picture when URL provided and no customAvatar', () => {
-      render(<Avatar profilePictureUrl="https://example.com/avatar.jpg" />);
-
-      const img = screen.getByTestId('avatar-image');
-      expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg');
-      expect(img).toHaveAttribute('alt', 'Profile');
-    });
-
-    it('falls back to generated avatar on profile picture error', async () => {
-      render(<Avatar profilePictureUrl="https://example.com/broken.jpg" />);
-
-      fireEvent.error(screen.getByTestId('avatar-image'));
-
-      await waitFor(() => {
-        expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
-        expect(screen.getByTestId('header-avatar')).toHaveAttribute('data-avatar-type', 'generated');
-      });
     });
   });
 
@@ -136,15 +114,13 @@ describe('Avatar', () => {
       expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
     });
 
-    it('prioritizes avatarImage as seed over profilePictureUrl when both present', () => {
+    it('uses avatarImage as seed for generated avatar', () => {
       render(
         <Avatar
-          profilePictureUrl="https://example.com/profile.jpg"
           avatarImage="pizza-pete"
         />
       );
 
-      // avatarImage is set and not PROFILE_AVATAR_ID, so profile picture won't show
       // Falls through to generated avatar seeded from avatarImage
       expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
     });
@@ -189,38 +165,11 @@ describe('Avatar', () => {
     });
   });
 
-  describe('image URL changes', () => {
-    it('resets error state when profile picture URL changes', async () => {
-      const { rerender } = render(
-        <Avatar profilePictureUrl="https://example.com/broken.jpg" />
-      );
-
-      fireEvent.error(screen.getByTestId('avatar-image'));
-
-      // After error, falls to generated avatar
-      await waitFor(() => {
-        expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
-      });
-
-      // Update with new profile picture URL — should reset error state
-      rerender(<Avatar profilePictureUrl="https://example.com/new-avatar.jpg" />);
-
-      const newImg = screen.getByTestId('avatar-image');
-      expect(newImg).toHaveAttribute('src', 'https://example.com/new-avatar.jpg');
-    });
-  });
-
   describe('edge cases', () => {
-    it('handles empty string profile picture URL — falls to generated', () => {
-      render(<Avatar profilePictureUrl="" avatarImage="pizza-pete" />);
-      expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
-    });
-
     it('handles undefined values gracefully', () => {
       expect(() =>
         render(
           <Avatar
-            profilePictureUrl={undefined}
             avatarImage={undefined}
             size={undefined}
           />

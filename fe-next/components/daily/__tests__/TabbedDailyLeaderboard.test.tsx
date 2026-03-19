@@ -42,15 +42,13 @@ jest.mock('framer-motion', () => ({
 // Mock Avatar component
 jest.mock('@/components/Avatar', () => ({
   __esModule: true,
-  default: ({ profilePictureUrl, avatarImage, ...props }: {
-    profilePictureUrl?: string;
+  default: ({ avatarImage, ...props }: {
     avatarImage?: string;
     [key: string]: unknown;
   }) => {
-    const src = profilePictureUrl || (avatarImage ? `/avatars/${avatarImage}.png` : null);
-    if (src) {
+    if (avatarImage) {
       // eslint-disable-next-line @next/next/no-img-element
-      return <img src={src} alt="avatar" data-testid="avatar-image" />;
+      return <img src={`/avatars/${avatarImage}.png`} alt="avatar" data-testid="avatar-image" />;
     }
     return <div data-testid="avatar-emoji">avatar</div>;
   },
@@ -63,7 +61,6 @@ jest.mock('@/utils/avatarConfig', () => ({
     { id: 'shroom-shelly', name: 'Shroom Shelly', filename: 'shroom-shelly.png' },
     { id: 'pizza-pete', name: 'Pizza Pete', filename: 'pizza-pete.png' },
   ],
-  PROFILE_AVATAR_ID: '__profile_avatar__',
   getAvatarPath: (avatar: { id: string; filename: string } | string) => {
     if (typeof avatar === 'string') {
       return `/avatars/${avatar}.png`;
@@ -100,7 +97,7 @@ const createMockParticipant = (overrides: Partial<DailyParticipant> = {}): Daily
   avatar_emoji: '🦊',
   avatar_color: '#FF5733',
   avatar_image: 'shroom-shelly',  // Custom avatar
-  profile_picture_url: null,
+
   country_code: 'US',
   score: 100,
   word_count: 10,
@@ -121,7 +118,7 @@ const createMockAllTimeParticipant = (overrides: Partial<AllTimeParticipant> = {
   avatar_emoji: '🦊',
   avatar_color: '#FF5733',
   avatar_image: 'pizza-pete',  // Custom avatar
-  profile_picture_url: null,
+
   country_code: 'US',
   total_efficiency_score: 500,
   total_games: 10,
@@ -180,7 +177,7 @@ describe('TabbedDailyLeaderboard', () => {
       expect(participant.avatar_image).toBe('pizza-pete');
     });
 
-    it('should render custom avatar image when avatar_image is provided and no profile_picture_url', async () => {
+    it('should render custom avatar image when avatar_image is provided', async () => {
       // Dynamically import after mocks are set up
       const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
 
@@ -204,46 +201,6 @@ describe('TabbedDailyLeaderboard', () => {
         img => img.getAttribute('src')?.includes('/avatars/shroom-shelly')
       );
       expect(hasCustomAvatar).toBe(true);
-    });
-
-    it('should render profile picture when avatar_image is PROFILE_AVATAR_ID', async () => {
-      (global.fetch as jest.Mock).mockImplementation((url: string) => {
-        if (url.includes('/word-hunt/leaderboard')) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({
-              data: [createMockParticipant({
-                profile_picture_url: 'https://example.com/profile.jpg',
-                avatar_image: '__profile_avatar__',  // Use profile picture
-              })],
-              totalParticipants: 1,
-              totalPlayers: 1,
-              totalSolved: 1,
-              guestPlayerCount: 0,
-            }),
-          });
-        }
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
-      });
-
-      const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
-
-      render(
-        <TabbedDailyLeaderboard
-          puzzleDate="2026-01-09"
-          language="en"
-          t={mockT}
-        />
-      );
-
-      await screen.findByText('TestPlayer');
-
-      // Should render the profile picture URL when avatar_image is PROFILE_AVATAR_ID
-      const avatarImages = screen.getAllByTestId('avatar-image');
-      const hasProfilePicture = avatarImages.some(
-        img => img.getAttribute('src')?.includes('example.com/profile.jpg')
-      );
-      expect(hasProfilePicture).toBe(true);
     });
 
     it('should NOT show emoji when avatar_image is available', async () => {

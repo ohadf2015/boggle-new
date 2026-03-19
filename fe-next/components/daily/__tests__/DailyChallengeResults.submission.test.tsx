@@ -167,7 +167,6 @@ describe('DailyChallengeResults score submission', () => {
       avatar_emoji: '🏆',
       avatar_color: '#FFD700',
       avatar_image: null,
-      profile_picture_url: null,
     };
 
     beforeEach(() => {

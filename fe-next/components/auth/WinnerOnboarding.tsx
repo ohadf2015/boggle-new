@@ -13,14 +13,13 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { AVATARS, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
 import { fireConfetti } from '@/utils/confettiUtils';
-import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
+
 
 interface WinnerOnboardingProps {
   isOpen: boolean;
   onComplete: (displayName: string, avatarId: string) => void | Promise<void>;
   initialName?: string;
   initialAvatarId?: string;
-  profilePictureUrl?: string;
   trigger?: 'firstCompletion' | 'streakAtRisk' | 'topPercentile' | 'quickSolve';
 }
 
@@ -29,7 +28,6 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
   onComplete,
   initialName = '',
   initialAvatarId,
-  profilePictureUrl,
   trigger = 'firstCompletion'
 }) => {
   const { theme } = useTheme();
@@ -38,14 +36,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
 
   const [displayName, setDisplayName] = useState(initialName);
 
-  // Determine if we should use profile picture by default
-  const shouldUseProfilePicture = profilePictureUrl && initialAvatarId === PROFILE_AVATAR_ID;
-  const [useProfilePicture, setUseProfilePicture] = useState(shouldUseProfilePicture);
-
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig>(() => {
-    if (shouldUseProfilePicture) {
-      return AVATARS[0]; // Default fallback, won't be shown if using profile picture
-    }
     return AVATARS.find(a => a.id === initialAvatarId) || AVATARS[0];
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,20 +49,6 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
     }
   }, [initialName]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Sync profile picture state when props change
-  useEffect(() => {
-    const newShouldUseProfilePicture = profilePictureUrl && initialAvatarId === PROFILE_AVATAR_ID;
-    if (newShouldUseProfilePicture !== useProfilePicture) {
-      setUseProfilePicture(newShouldUseProfilePicture);
-    }
-    // Also update selected avatar if not using profile picture
-    if (!newShouldUseProfilePicture && initialAvatarId) {
-      const avatar = AVATARS.find(a => a.id === initialAvatarId);
-      if (avatar) {
-        setSelectedAvatar(avatar);
-      }
-    }
-  }, [profilePictureUrl, initialAvatarId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fire confetti on mount
   useEffect(() => {
@@ -100,13 +77,13 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
     setError(null);
 
     try {
-      const avatarId = useProfilePicture ? PROFILE_AVATAR_ID : selectedAvatar.id;
+      const avatarId = selectedAvatar.id;
       await onComplete(trimmedName, avatarId);
     } catch (err) {
       setError((err as Error).message || 'Failed to save profile');
       setIsSubmitting(false);
     }
-  }, [displayName, selectedAvatar, useProfilePicture, onComplete]);
+  }, [displayName, selectedAvatar, onComplete]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !isSubmitting) {
@@ -226,7 +203,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
               {/* Preview */}
               <div className="flex justify-center mb-4">
                 <motion.div
-                  key={useProfilePicture ? 'profile' : selectedAvatar.id}
+                  key={selectedAvatar.id}
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 22 }}
@@ -236,26 +213,14 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                     'w-32 h-32 rounded-2xl overflow-hidden border-4 shadow-hard',
                     isDarkMode ? 'border-amber-400' : 'border-amber-500'
                   )}>
-                    {useProfilePicture && profilePictureUrl ? (
-                      <Image
-                        src={profilePictureUrl}
-                        alt="Your Profile"
-                        width={128}
-                        height={128}
-                        className="object-cover"
-                        priority
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <Image
-                        src={getAvatarPath(selectedAvatar)}
-                        alt={selectedAvatar.name}
-                        width={128}
-                        height={128}
-                        className="object-cover"
-                        priority
-                      />
-                    )}
+                    <Image
+                      src={getAvatarPath(selectedAvatar)}
+                      alt={selectedAvatar.name}
+                      width={128}
+                      height={128}
+                      className="object-cover"
+                      priority
+                    />
                   </div>
                   <div className={cn(
                     'absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full border-2 text-xs font-bold whitespace-nowrap',
@@ -263,7 +228,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                       ? 'bg-slate-800 border-amber-400 text-amber-300'
                       : 'bg-white border-amber-500 text-amber-700'
                   )}>
-                    {useProfilePicture ? 'Your Profile' : selectedAvatar.name}
+                    {selectedAvatar.name}
                   </div>
                 </motion.div>
               </div>
@@ -273,40 +238,6 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 'grid grid-cols-6 gap-3 p-4 rounded-xl border-2 max-h-64 overflow-y-auto',
                 isDarkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-white/50 border-gray-300'
               )}>
-                {/* Profile Picture Option (if available) */}
-                {profilePictureUrl && (
-                  <motion.button
-                    key="profile-picture"
-                    type="button"
-                    onClick={() => setUseProfilePicture(true)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={cn(
-                      'relative w-full aspect-square rounded-xl overflow-hidden border-3 transition-all',
-                      useProfilePicture
-                        ? 'border-amber-400 ring-4 ring-amber-400/50'
-                        : 'border-neo-black hover:border-gray-500'
-                    )}
-                  >
-                    <Image
-                      src={profilePictureUrl}
-                      alt="Your Profile"
-                      fill
-                      sizes="80px"
-                      className="object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    {useProfilePicture && (
-                      <div className="absolute inset-0 bg-amber-400/20 flex items-center justify-center">
-                        <Check className="w-6 h-6 text-amber-600 drop-shadow" />
-                      </div>
-                    )}
-                    {/* Label */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[9px] font-bold text-center py-0.5">
-                      YOU
-                    </div>
-                  </motion.button>
-                )}
 
                 {/* Regular Character Avatars */}
                 {AVATARS.map((avatar) => (
@@ -315,13 +246,12 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                     type="button"
                     onClick={() => {
                       setSelectedAvatar(avatar);
-                      setUseProfilePicture(false);
                     }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     className={cn(
                       'relative w-full aspect-square rounded-xl overflow-hidden border-3 transition-all',
-                      !useProfilePicture && selectedAvatar.id === avatar.id
+                      selectedAvatar.id === avatar.id
                         ? 'border-amber-400 ring-4 ring-amber-400/50'
                         : 'border-neo-black hover:border-gray-500'
                     )}
@@ -333,7 +263,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                       sizes="80px"
                       className="object-cover"
                     />
-                    {!useProfilePicture && selectedAvatar.id === avatar.id && (
+                    {selectedAvatar.id === avatar.id && (
                       <div className="absolute inset-0 bg-amber-400/20 flex items-center justify-center">
                         <Check className="w-6 h-6 text-amber-600 drop-shadow" />
                       </div>

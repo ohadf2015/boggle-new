@@ -400,7 +400,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                     score: p.score,
                     rank: index + 1,
                     isCurrentUser: p.username === username,
-                    profilePictureUrl: p.avatar?.profilePictureUrl,
+
                     avatarImage: p.avatar?.avatarImage,
                     avatarEmoji: p.avatar?.emoji,
                     avatarColor: p.avatar?.color,

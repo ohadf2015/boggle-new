@@ -261,7 +261,6 @@ export interface CreateGamePayload {
   authUserId?: string;
   guestTokenHash?: string;
   isRanked?: boolean;
-  profilePictureUrl?: string;
 }
 
 export interface JoinGamePayload {
@@ -271,7 +270,6 @@ export interface JoinGamePayload {
   avatar?: Avatar;
   authUserId?: string;
   guestTokenHash?: string;
-  profilePictureUrl?: string;
 }
 
 export interface StartGamePayload {

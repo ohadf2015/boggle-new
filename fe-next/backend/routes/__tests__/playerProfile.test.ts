@@ -35,7 +35,6 @@ const MOCK_PROFILE = {
   username: 'WordMaster',
   display_name: 'Word Master',
   avatar_config: { gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18', eyes: 'round', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#FF6B35' },
-  profile_picture_url: null,
   country_code: 'US',
   current_level: 15,
   total_xp: 5200,

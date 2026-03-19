@@ -79,7 +79,7 @@ interface UseMultiplayerJoinOptions {
   t: (path: string, params?: Record<string, string | number>) => string;
   isSupabaseEnabled: boolean;
   user: { id?: string; email?: string; user_metadata?: { full_name?: string; name?: string } } | null;
-  profile: { display_name?: string; avatar_emoji?: string; avatar_color?: string; avatar_image?: string; avatar_config?: CustomAvatarConfig | null; profile_picture_url?: string | null } | null;
+  profile: { display_name?: string; avatar_emoji?: string; avatar_color?: string; avatar_image?: string; avatar_config?: CustomAvatarConfig | null } | null;
   loading: boolean;
   authLoadingStartTime: number | null;
   guestAvatar: { emoji: string; color: string } | null;
@@ -235,7 +235,6 @@ export function useMultiplayerJoin({
           guestTokenHash,
           guestSessionId,
           avatar: hostAvatar,
-          profilePictureUrl: profile?.profile_picture_url,
         });
       } else {
         logger.log('[JOIN] Emitting join event:', {
@@ -252,7 +251,6 @@ export function useMultiplayerJoin({
           guestTokenHash,
           guestSessionId,
           avatar: effectiveAvatar,
-          profilePictureUrl: profile?.profile_picture_url,
         });
       }
     },

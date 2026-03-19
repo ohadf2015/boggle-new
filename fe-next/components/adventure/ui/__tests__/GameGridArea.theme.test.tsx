@@ -86,10 +86,11 @@ describe('GameGridArea — Theme Integration', () => {
     expect(hintElements.length).toBeGreaterThan(0);
   });
 
-  it('should render validation error with proper styling', () => {
+  it('should not render a separate validation error banner (handled by WordFormingArea)', () => {
     render(
       <GameGridArea {...defaultProps} validationError="Too short!" />
     );
-    expect(screen.getByText('Too short!')).toBeInTheDocument();
+    // Validation errors are now displayed by WordFormingArea, not a separate banner
+    expect(screen.queryByText('Too short!')).not.toBeInTheDocument();
   });
 });

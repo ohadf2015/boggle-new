@@ -31,7 +31,7 @@ export interface PlayerScore {
   username: string;
   score: number;
   isBot?: boolean;
-  avatar?: Avatar & { profilePictureUrl?: string };
+  avatar?: Avatar;
   isHost?: boolean;
   allWords?: WordObject[];
   achievements?: any[]; // GameAchievement[] from types

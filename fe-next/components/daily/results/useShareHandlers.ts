@@ -25,7 +25,7 @@ interface UseShareHandlersProps {
   avatarEmoji: string;
   stats: WordHuntStats | null;
   isAuthenticated: boolean;
-  profile: { display_name?: string | null; username?: string; avatar_emoji?: string | null; avatar_image?: string | null; profile_picture_url?: string | null } | null;
+  profile: { display_name?: string | null; username?: string; avatar_emoji?: string | null; avatar_image?: string | null } | null;
   guestPlayer: GuestDailyPlayer | null;
   t: (key: string) => string;
 }
@@ -74,11 +74,9 @@ export function useShareHandlers({
     // Add custom avatar image if available (authenticated users)
     if (isAuthenticated && profile?.avatar_image) {
       params.set('avatarImage', profile.avatar_image);
-    } else if (isAuthenticated && profile?.profile_picture_url) {
-      params.set('avatarUrl', profile.profile_picture_url);
     }
     return `${origin}/api/og/word-hunt?${params.toString()}`;
-  }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language, isAuthenticated, profile?.avatar_image, profile?.profile_picture_url]);
+  }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language, isAuthenticated, profile?.avatar_image]);
 
   // Generate shareable text
   const shareText = useMemo(() => {

@@ -31,7 +31,6 @@ export const CUSTOM_AVATAR_ID = '__custom_avatar__';
  * Profile avatar info for authenticated users
  */
 interface ProfileAvatarInfo {
-  profilePictureUrl?: string | null;
   displayName?: string;
   avatarImage?: string; // Profile's current avatar_image ID
 }
@@ -71,7 +70,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
   const isDarkMode = theme === 'dark';
 
   // Check if profile picture is available (user has OAuth profile picture)
-  const hasProfilePicture = !!profileAvatar?.profilePictureUrl;
+  const hasProfilePicture = false;
 
   // Check if currently using profile avatar
   const isUsingProfileAvatar = currentAvatarImage === PROFILE_AVATAR_ID;
@@ -186,16 +185,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
               'w-20 h-20 rounded-full overflow-hidden border-4 mb-2 relative',
               isDarkMode ? 'border-slate-600' : 'border-gray-300'
             )}>
-              {useProfileAvatar && profileAvatar?.profilePictureUrl ? (
-                <Image
-                  src={profileAvatar.profilePictureUrl}
-                  alt={profileAvatar.displayName || 'Profile'}
-                  fill
-                  sizes="80px"
-                  className="object-cover"
-                  priority
-                />
-              ) : selectedAvatar ? (
+              {selectedAvatar ? (
                 <Image
                   src={getAvatarPath(selectedAvatar)}
                   alt={selectedAvatar.name}
@@ -241,43 +231,6 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
           <div className="p-4">
             <div className="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto">
               {/* Profile Picture Option (if available) */}
-              {hasProfilePicture && (
-                <button
-                  onClick={handleSelectProfilePicture}
-                  aria-label={t('profile.useProfileAvatar')}
-                  aria-pressed={useProfileAvatar}
-                  className={cn(
-                    'relative aspect-square rounded-xl overflow-hidden transition-all duration-150',
-                    useProfileAvatar
-                      ? 'ring-3 ring-neo-cyan ring-offset-2 scale-105'
-                      : cn(
-                          'hover:scale-105',
-                          isDarkMode ? 'ring-offset-slate-800' : 'ring-offset-white'
-                        ),
-                    isDarkMode ? 'ring-offset-slate-800' : 'ring-offset-white'
-                  )}
-                >
-                  <Image
-                    src={profileAvatar!.profilePictureUrl!}
-                    alt={profileAvatar?.displayName || 'Profile'}
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                    loading="lazy"
-                  />
-                  {/* "Profile" label */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
-                    {t('profile.you')}
-                  </div>
-                  {/* Selected checkmark */}
-                  {useProfileAvatar && (
-                    <div className="absolute top-1 right-1 w-5 h-5 bg-neo-cyan text-neo-black rounded-full flex items-center justify-center">
-                      <Check className="w-3 h-3" />
-                    </div>
-                  )}
-                </button>
-              )}
-
               {/* Character Avatars */}
               {AVATARS.map((avatar) => {
                 const isSelected = !useProfileAvatar && selectedAvatar?.id === avatar.id;

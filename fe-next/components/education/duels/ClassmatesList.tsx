@@ -82,8 +82,6 @@ export function ClassmatesList({
 
         const displayName = profile?.username || 'Unknown';
         const avatarEmoji = profile?.avatar_emoji || '👤';
-        const avatarUrl = profile?.profile_picture_url || null;
-
         return (
           <div
             key={classmate.id}
@@ -101,7 +99,7 @@ export function ClassmatesList({
             <ChallengeButton
               opponentId={classmate.student_id}
               opponentName={displayName}
-              opponentAvatar={avatarUrl}
+              opponentAvatar={null}
               classroomId={classroomId}
               lessons={lessons}
               variant="icon"

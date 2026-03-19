@@ -181,7 +181,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
             )}
           >
-            <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} size="sm" />
+            <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} userId={user?.id} size="sm" />
             <span className="text-neo-black truncate flex-1">{profile.display_name || profile.username}</span>
             {profile.total_xp !== undefined && (
               <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />
@@ -224,7 +224,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
           )}
         >
-          <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} size="sm" />
+          <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} userId={user?.id} size="sm" />
           <span className="hidden sm:inline max-w-[80px] truncate font-medium">{profile.display_name || profile.username}</span>
           {profile.total_xp !== undefined && (
             <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />

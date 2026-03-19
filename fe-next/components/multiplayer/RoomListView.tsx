@@ -132,7 +132,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
       <div
         dir={dir}
-        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-lg lg:max-w-xl xl:max-w-3xl mx-auto"
+        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-2xl mx-auto"
         {...pullToRefreshHandlers}
       >
         <PullToRefreshIndicator
@@ -263,7 +263,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               </div>
             ) : hasRooms ? (
               <motion.div
-                className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3"
+                className="flex flex-col gap-2"
                 role="list"
                 aria-label={t('multiplayerFlow.roomList.roomsListLabel')}
                 variants={roomListVariants}
@@ -343,14 +343,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                                   className="w-5 h-5 rounded-full border border-neo-black/50 bg-neo-navy-light flex items-center justify-center text-[10px] overflow-hidden"
                                   style={av.color ? { backgroundColor: av.color } : undefined}
                                 >
-                                  {av.avatarImage ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={`/avatars/${av.avatarImage}`} alt="" className="w-full h-full object-cover" />
-                                  ) : av.emoji ? (
-                                    av.emoji
-                                  ) : (
-                                    <Users className="w-3 h-3 text-white/50" />
-                                  )}
+                                  {av.emoji || '👤'}
                                 </div>
                               ))}
                               {(room.playerCount || 0) > 4 && (

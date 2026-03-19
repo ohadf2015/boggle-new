@@ -143,6 +143,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       }
 
       setValidationFeedback(prev => ({ ...prev, error: null }));
+      setWordFeedback(null);
 
       const path = indices.map(i => ({
         row: tiles[i]?.row ?? Math.floor(i / gridSize),

@@ -1493,6 +1493,8 @@ const sv = {
     "finalScore": "Slutpoäng",
     "coinsEarned": "Mynt intjänade",
     "detailedAnalysis": "Detaljerad analys",
+    "gameStats": "Spelstatistik",
+    "accuracy": "Precision",
     "yourPerformance": "Din prestation",
     "rewards": "Belöningar",
     "standings": "Ställning",

@@ -374,14 +374,14 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         {/* Desktop: Single row layout - Form | Rooms side by side without scroll */}
         {/* Mobile: Stack vertically, rooms first when available */}
         <div className={cn(
-          "flex-1 flex gap-4 lg:gap-6 lg:flex-row lg:items-stretch",
+          "flex-1 flex gap-4 lg:gap-6 flex-col max-w-2xl mx-auto w-full",
           activeRooms.length > 0 ? "flex-col-reverse" : "flex-col"
         )}>
           {/* Main Form - Premium card styling with gradient accent */}
           <motion.div
             initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="w-full lg:w-[45%] lg:max-w-md flex flex-col rtl:order-2"
+            className="w-full flex flex-col"
           >
             <div className="rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard-lg p-4 flex flex-col h-full relative overflow-hidden">
               {/* Decorative top accent bar */}
@@ -470,7 +470,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <motion.div
             initial={{ x: 30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="w-full lg:max-w-2xl rtl:order-1"
+            className="w-full lg:max-w-2xl"
           >
             <RoomList
               activeRooms={activeRooms}

@@ -48,7 +48,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
           <div className="flex flex-col items-center gap-1 sm:gap-1.5 min-w-0">
             <div className="border-2 sm:border-3 border-neo-cyan rounded-full shadow-hard-sm bg-slate-900 overflow-hidden">
               <Avatar
-                profilePictureUrl={currentPlayerData.avatar?.profilePictureUrl ?? undefined}
+
                 avatarImage={currentPlayerData.avatar?.avatarImage}
                 customAvatar={currentPlayerData.avatar?.customAvatar}
                 size="md"
@@ -74,7 +74,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
           <div className="flex flex-col items-center gap-1 sm:gap-1.5 min-w-0">
             <div className="border-2 sm:border-3 border-neo-lime rounded-full shadow-hard-sm bg-slate-900 overflow-hidden">
               <Avatar
-                profilePictureUrl={sortedScores[0].avatar?.profilePictureUrl ?? undefined}
+
                 avatarImage={sortedScores[0].avatar?.avatarImage}
                 customAvatar={sortedScores[0].avatar?.customAvatar}
                 size="md"

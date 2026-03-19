@@ -306,12 +306,12 @@ function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: 
 /**
  * Handle tournament join for a player
  */
-function handleTournamentJoin(_io: Server, socket: Socket, gameCode: string, username: string, userAvatar: Avatar, profilePictureUrl?: string): void {
+function handleTournamentJoin(_io: Server, socket: Socket, gameCode: string, username: string, userAvatar: Avatar): void {
   const tournamentId = getTournamentIdFromGame(gameCode);
   if (!tournamentId) return;
 
   try {
-    const tournamentAvatar = { ...userAvatar, profilePictureUrl: profilePictureUrl || null };
+    const tournamentAvatar = { ...userAvatar };
     addPlayerMidTournament(tournamentId, socket.id, username, JSON.stringify(tournamentAvatar));
 
     const tournament = getTournament(tournamentId);

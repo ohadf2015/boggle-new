@@ -69,7 +69,6 @@ function playerWordDataToWordObject(word: PlayerWordData): WordObject {
 export interface ParticipantAvatar {
   emoji?: string;
   color?: string;
-  profilePictureUrl?: string | null;
   avatarImage?: string;
 }
 

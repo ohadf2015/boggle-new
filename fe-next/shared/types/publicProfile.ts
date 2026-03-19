@@ -14,7 +14,6 @@ export interface PublicProfile {
   username: string;
   displayName: string;
   customAvatar?: CustomAvatarConfig | null;
-  profilePictureUrl?: string | null;
   countryCode?: string | null;
   currentLevel: number;
   totalXp: number;
