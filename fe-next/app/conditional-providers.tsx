@@ -20,11 +20,14 @@ import { usePathname } from 'next/navigation';
 import { ReactNode, useMemo } from 'react';
 import { GameSpecificProviders } from './providers';
 import { EssentialProviders } from './essential-providers';
+import type { TranslationData } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 
 interface ConditionalProvidersProps {
   children: ReactNode;
   lang: Language;
+  /** Pre-loaded translations for the initial language */
+  initialTranslations?: TranslationData;
 }
 
 // Routes that need the full provider stack (Socket.IO, game state, etc.)
@@ -66,7 +69,7 @@ function needsGameProviders(pathname: string | null): boolean {
  *
  * Game-specific providers are added conditionally inside EssentialProviders.
  */
-export function ConditionalProviders({ children, lang }: ConditionalProvidersProps) {
+export function ConditionalProviders({ children, lang, initialTranslations }: ConditionalProvidersProps) {
   const pathname = usePathname();
 
   const needsGameStack = useMemo(() => {
@@ -76,7 +79,7 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
   // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
   // Conditionally add game-specific providers inside
   return (
-    <EssentialProviders lang={lang}>
+    <EssentialProviders lang={lang} initialTranslations={initialTranslations}>
       {needsGameStack ? (
         <GameSpecificProviders>
           {children}

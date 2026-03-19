@@ -2,8 +2,8 @@
 
 import { createContext, useState, useContext, useEffect, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { translations } from '../translations';
 import { locales, defaultLocale } from '../lib/i18n';
+import { loadTranslation, getCachedTranslation, seedTranslationCache, type TranslationData } from '../translations/loadTranslation';
 import logger from '@/utils/logger';
 import type { Language } from '@/types';
 
@@ -58,9 +58,11 @@ const getBrowserLanguage = (): Language | null => {
 interface LanguageProviderProps {
   children: ReactNode;
   initialLanguage?: Language;
+  /** Pre-loaded translation data for the initial language (avoids async load on mount) */
+  initialTranslations?: TranslationData;
 }
 
-export const LanguageProvider = ({ children, initialLanguage }: LanguageProviderProps) => {
+export const LanguageProvider = ({ children, initialLanguage, initialTranslations }: LanguageProviderProps) => {
     const router = useRouter();
     const pathname = usePathname();
 
@@ -93,6 +95,32 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
     const [language, setLanguageState] = useState<Language>(getServerSafeLanguage);
     const mountedRef = useRef(false);
     const languageRef = useRef(language);
+
+    // Seed the cache with initial translations if provided (avoids async load for first language)
+    if (initialTranslations && initialLanguage) {
+        seedTranslationCache(initialLanguage, initialTranslations);
+    }
+
+    // Dynamic translation state — only the active language is loaded
+    const [currentTranslations, setCurrentTranslations] = useState<TranslationData | undefined>(
+        () => initialTranslations || getCachedTranslation(getServerSafeLanguage())
+    );
+
+    // Load translations when language changes or on first mount when no initialTranslations
+    useEffect(() => {
+        const cached = getCachedTranslation(language);
+        if (cached) {
+            if (cached !== currentTranslations) setCurrentTranslations(cached);
+            return;
+        }
+        // Async load for language switch (or first mount without initialTranslations)
+        loadTranslation(language).then((data) => {
+            setCurrentTranslations(data);
+        }).catch((err) => {
+            logger.warn(`Failed to load translations for ${language}:`, err);
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [language]);
 
     // Keep ref in sync
     useEffect(() => {
@@ -193,11 +221,11 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
             : (paramsWhenFallback || {});
 
         const keys = path.split('.');
-        // Use type assertion since Language type may include values not in translations
-        let current: unknown = (translations as Record<string, unknown>)[language] || translations['he']; // Fallback to Hebrew if language is invalid
+        // Use dynamically loaded translations for current language
+        let current: unknown = currentTranslations;
 
         if (!current) {
-            logger.warn(`Translation missing for language: ${language}`);
+            // Translations not loaded yet — return fallback or key
             return fallback || path;
         }
 
@@ -231,16 +259,16 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         }
 
         return typeof current === 'string' ? current : (fallback || path);
-    }, [language]);
+    }, [language, currentTranslations]);
 
     // Memoize context value to prevent unnecessary re-renders of all consumers
     const value = useMemo<LanguageContextValue>(() => ({
         language,
         setLanguage,
         t,
-        dir: ((translations as Record<string, { direction?: 'rtl' | 'ltr' }>)[language])?.direction || 'rtl',
-        currentFlag: ((translations as Record<string, { flag?: string }>)[language])?.flag || '🇮🇱'
-    }), [language, setLanguage, t]);
+        dir: (currentTranslations?.direction as 'rtl' | 'ltr') || (language === 'he' ? 'rtl' : 'ltr'),
+        currentFlag: (currentTranslations?.flag as string) || '🇮🇱'
+    }), [language, setLanguage, t, currentTranslations]);
 
     return (
         <LanguageContext.Provider value={value}>
@@ -268,19 +296,25 @@ export const useLanguage = (): LanguageContextValue => {
  * Default translation function for use outside of LanguageContext
  * Falls back to English translations with basic key lookup
  */
-const createFallbackT = (lang: Language = 'en') => (
+const createFallbackT = (_lang: Language = 'en') => (
     path: string,
     fallbackOrParams?: string | Record<string, string | number>,
-    paramsWhenFallback?: Record<string, string | number>
+    _paramsWhenFallback?: Record<string, string | number>
 ): string => {
+    // Fallback t() — translations may not be loaded yet, return key or fallback
     const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : undefined;
+
+    // Try to use cached translations if available
+    const cached = getCachedTranslation(_lang);
+    if (!cached) return fallback || path;
+
     const params: Record<string, string | number> = typeof fallbackOrParams === 'object' && fallbackOrParams !== null
         ? fallbackOrParams
-        : (paramsWhenFallback || {});
+        : (_paramsWhenFallback || {});
 
     try {
         const keys = path.split('.');
-        let current: unknown = (translations as Record<string, unknown>)[lang] || translations['en'];
+        let current: unknown = cached;
 
         for (const key of keys) {
             if (typeof current !== 'object' || current === null || !(key in current)) {

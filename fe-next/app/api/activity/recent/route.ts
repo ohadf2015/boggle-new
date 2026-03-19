@@ -19,7 +19,10 @@ function getSupabaseConfig() {
 export interface ActivityEvent {
   type: 'multiplayer_win' | 'daily_solved' | 'word_hunt_solved' | 'blast_highscore' | 'long_word' | 'streak';
   playerName: string;
+  /** @deprecated Use detailData for translated rendering */
   detail: string;
+  /** Structured data for client-side i18n formatting */
+  detailData?: Record<string, string | number>;
   timestamp: string;
 }
 
@@ -107,6 +110,7 @@ export async function GET(request: NextRequest) {
         type: 'multiplayer_win',
         playerName: name,
         detail: `scored ${g.score} pts with ${g.word_count} words`,
+        detailData: { score: g.score, count: g.word_count },
         timestamp: g.created_at,
       });
     }
@@ -120,6 +124,9 @@ export async function GET(request: NextRequest) {
         detail: d.longest_word
           ? `found "${d.longest_word.toUpperCase()}" (${d.score} pts)`
           : `scored ${d.score} pts`,
+        detailData: d.longest_word
+          ? { word: d.longest_word.toUpperCase(), score: d.score }
+          : { score: d.score },
         timestamp: d.completed_at,
       });
     }
@@ -131,6 +138,7 @@ export async function GET(request: NextRequest) {
         type: 'word_hunt_solved',
         playerName: name,
         detail: `cracked the target word in ${w.attempts_used} tries`,
+        detailData: { tries: w.attempts_used },
         timestamp: w.completed_at || w.created_at,
       });
     }
@@ -142,6 +150,7 @@ export async function GET(request: NextRequest) {
         type: 'blast_highscore',
         playerName: name,
         detail: `cleared ${b.tiles_cleared} tiles with a ${b.max_combo}x combo`,
+        detailData: { tiles: b.tiles_cleared, combo: b.max_combo },
         timestamp: b.created_at,
       });
     }
@@ -154,6 +163,7 @@ export async function GET(request: NextRequest) {
           type: 'long_word',
           playerName: name,
           detail: `found "${lw.longest_word.toUpperCase()}" (${lw.longest_word.length} letters!)`,
+          detailData: { word: lw.longest_word.toUpperCase(), length: lw.longest_word.length },
           timestamp: lw.created_at,
         });
       }

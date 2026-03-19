@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -65,6 +65,23 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { isAuthenticated, isAdmin, profile } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
+
+  // Defer non-critical hooks until after first paint to speed up TTI
+  const [hydrated, setHydrated] = useState(false);
+  const hydratedRef = useRef(false);
+  useEffect(() => {
+    if (hydratedRef.current) return;
+    hydratedRef.current = true;
+    // Use requestIdleCallback (or setTimeout fallback) to defer after first paint
+    const id = typeof requestIdleCallback !== 'undefined'
+      ? requestIdleCallback(() => setHydrated(true))
+      : setTimeout(() => setHydrated(true), 100) as unknown as number;
+    return () => {
+      if (typeof cancelIdleCallback !== 'undefined') cancelIdleCallback(id);
+      else clearTimeout(id);
+    };
+  }, []);
+
   const liveRoomStats = useLiveRoomStats();
   const { allTimeBest: playerAllTimeBest } = usePlayerStats();
   const dailyChallengeStatus = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
@@ -167,7 +184,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
       )}
       {...pullToRefreshHandlers}
     >
-      {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
+      {hydrated && enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
@@ -206,8 +223,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           languages={langCount}
         />
 
-        {/* Live Activity Ticker */}
-        <LiveActivityTicker />
+        {/* Below-fold sections deferred until after first paint */}
+        {hydrated && <LiveActivityTicker />}
 
         {/* Challenge / Mode Cards */}
         <LandingChallengeCards
@@ -223,35 +240,31 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           solveRate={solveRate}
         />
 
-        {/* Top Words */}
-        <LandingTopWords />
+        {/* Below-fold sections — deferred until after first paint */}
+        {hydrated && (
+          <>
+            <LandingTopWords />
 
-        {/* Your Rank + Avatar Teaser — side-by-side on desktop */}
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
-          <div className="lg:flex-1">
-            <LandingYourRank />
-          </div>
-          <div className="lg:flex-1">
-            <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
-          </div>
-        </div>
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
+              <div className="lg:flex-1">
+                <LandingYourRank />
+              </div>
+              <div className="lg:flex-1">
+                <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
+              </div>
+            </div>
 
-        {/* Community Boards Showcase */}
-        <LandingCommunityShowcase />
+            <LandingCommunityShowcase />
+            <LandingHallOfFame champions={champions} loading={hallLoading} />
 
-        {/* Hall of Fame */}
-        <LandingHallOfFame champions={champions} loading={hallLoading} />
+            <div className="w-full max-w-4xl mx-auto">
+              <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
+            </div>
 
-        {/* Share Banner */}
-        <div className="w-full max-w-4xl mx-auto">
-          <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
-        </div>
-
-        {/* Latest Blog Posts */}
-        <LandingBlogSection />
-
-        {/* Bottom CTA */}
-        <LandingBottomCTA onPlayClick={handlePlayClick} />
+            <LandingBlogSection />
+            <LandingBottomCTA onPlayClick={handlePlayClick} />
+          </>
+        )}
       </section>
 
       {!isLandscape && <ScrollIndicator />}

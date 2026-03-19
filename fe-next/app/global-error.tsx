@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 import { captureError } from "@/utils/sentry";
-import { translations } from "../translations";
+import { getCachedTranslation } from "@/translations/loadTranslation";
+import type { Language } from "@/types";
 
 function isChunkLoadError(error: Error): boolean {
   const message = error.message?.toLowerCase() || "";
@@ -61,25 +62,47 @@ export default function GlobalError({
   const detectedLocale = (() => {
     try {
       const match = window.location.pathname.match(/^\/(he|en|sv|ja|es)\b/);
-      return (match?.[1] as keyof typeof translations) || 'en';
+      return (match?.[1] as Language) || 'en';
     } catch {
-      return 'en' as const;
+      return 'en' as Language;
     }
   })();
   const isRTL = detectedLocale === 'he';
 
+  // Use cached translations if available (from LanguageContext's dynamic loader),
+  // fall back to hardcoded strings. This avoids importing all 1.26MB of translations.
   const t = (path: string): string => {
     try {
-      const keys = path.split(".");
-      let current: unknown = translations[detectedLocale] || translations.en;
-      for (const key of keys) {
-        current = (current as Record<string, unknown>)[key];
-        if (current === undefined) return path;
+      const cached = getCachedTranslation(detectedLocale) || getCachedTranslation('en');
+      if (cached) {
+        const keys = path.split(".");
+        let current: unknown = cached;
+        for (const key of keys) {
+          current = (current as Record<string, unknown>)[key];
+          if (current === undefined) break;
+        }
+        if (typeof current === 'string') return current;
       }
-      return current as string;
-    } catch {
-      return path;
-    }
+    } catch { /* fall through to hardcoded */ }
+
+    // Hardcoded fallbacks for when translations aren't cached
+    const fallbacks: Record<string, Record<string, string>> = {
+      en: {
+        'errors.somethingWentWrong': 'Something Went Wrong',
+        'errors.unexpectedError': 'An unexpected error occurred. Please try again.',
+        'errors.refreshPage': 'Try Again',
+        'errors.goHome': 'Go Home',
+        'errors.globalErrorEncouragement': "Don't worry, these things happen!",
+      },
+      he: {
+        'errors.somethingWentWrong': 'משהו השתבש',
+        'errors.unexpectedError': 'אירעה שגיאה בלתי צפויה. אנא נסו שוב.',
+        'errors.refreshPage': 'נסו שוב',
+        'errors.goHome': 'חזרה הביתה',
+        'errors.globalErrorEncouragement': 'אל דאגה, דברים כאלה קורים!',
+      },
+    };
+    return fallbacks[detectedLocale]?.[path] || fallbacks.en[path] || path;
   };
 
   return (

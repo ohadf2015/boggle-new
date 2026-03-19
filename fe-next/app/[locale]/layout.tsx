@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import nextDynamic from 'next/dynamic';
 import { layoutTranslations as translations } from '@/translations/layout';
 import { ConditionalProviders } from '../conditional-providers';
+import { loadTranslation } from '@/translations/loadTranslation';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
@@ -167,6 +168,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     const seo = translations[validLocale]?.seo || translations.he.seo;
     const localePath = getLocalePath(validLocale);
     const languageCode = getLanguageCode(validLocale);
+
+    // Load only the active language's full translations server-side (~250KB instead of 1.26MB)
+    // This is passed to ConditionalProviders → EssentialProviders → LanguageProvider
+    // so the client only downloads the language it needs
+    const initialTranslations = await loadTranslation(validLocale).catch(() => undefined);
 
     // IMPORTANT: The theme script below modifies the DOM before React hydration
     // To prevent hydration mismatches, we need to ensure the server-rendered className
@@ -718,7 +724,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         <li><a href={`/${validLocale}/legal/disclaimer`}>{translations[validLocale]?.nav?.disclaimer || 'Disclaimer'}</a></li>
                     </ul>
                 </nav>
-                <ConditionalProviders lang={validLocale}>
+                <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
                     <div className="flex-1 flex flex-col min-h-0 relative [overflow-x:clip]">

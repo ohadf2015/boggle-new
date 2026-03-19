@@ -92,7 +92,8 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             <motion.div
               key={player.username}
               initial={{ opacity: 0, y: 12, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.1 * i, type: 'spring', stiffness: 350, damping: 22 }}
               className="flex flex-col items-center gap-1 min-w-0"
             >
@@ -157,7 +158,8 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
           <motion.div
             key={player.username}
             initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
             transition={{ delay: 0.06 * i, type: 'spring', stiffness: 350, damping: 24 }}
             className={cn(
               'flex items-center gap-3 py-1.5 px-2 rounded-neo',

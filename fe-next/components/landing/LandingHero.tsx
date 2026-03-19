@@ -56,7 +56,8 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
               <motion.h1
                 className="font-black uppercase tracking-tight text-neo-white text-xl neo-title"
                 initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
                 transition={{ delay: 0.15 }}
               >
                 <span className="sr-only">LexiClash — </span>
@@ -69,7 +70,8 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
               <motion.h1
                 className="font-black uppercase tracking-tight text-neo-white text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl mt-3 mb-2 neo-title"
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 transition={{ delay: 0.15 }}
               >
                 <span className="sr-only">LexiClash — </span>
@@ -84,7 +86,8 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
               isMobilePortrait ? 'text-sm mb-3' : 'text-base md:text-lg mb-5'
             )}
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ delay: 0.25 }}
           >
             {t('landing.welcomeSubtitle')}
@@ -97,7 +100,8 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
           <motion.div
             className="hidden md:block w-64 lg:w-80 xl:w-[26rem] shrink-0"
             initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
             <LandingLeaderboardPreview players={players} loading={playersLoading} />
@@ -110,7 +114,8 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
         <motion.div
           className="mt-4"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ delay: 0.45 }}
         >
           <LandingLeaderboardPreview players={players} loading={playersLoading} compact />

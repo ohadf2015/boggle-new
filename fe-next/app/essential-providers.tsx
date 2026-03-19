@@ -26,11 +26,14 @@ import { initSessionTracking } from '@/utils/sessionTracking';
 import { linkLogRocketSession } from '@/utils/sentry';
 
 
+import type { TranslationData } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 
 interface EssentialProvidersProps {
   children: ReactNode;
   lang: Language;
+  /** Pre-loaded translations for the initial language (avoids 1.26MB bundle) */
+  initialTranslations?: TranslationData;
 }
 
 // Initialize UTM capture immediately on module load
@@ -104,7 +107,7 @@ const initLogRocket = () => {
  * Bug fix: Profile dropdown was only appearing after visiting settings page
  * Root cause: AuthProvider was missing from EssentialProviders
  */
-export function EssentialProviders({ children, lang }: EssentialProvidersProps) {
+export function EssentialProviders({ children, lang, initialTranslations }: EssentialProvidersProps) {
     // Initialize session tracking for analytics
     useEffect(() => {
         initSessionTracking();
@@ -151,7 +154,7 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
         <ErrorBoundary>
             {/* Stable tier: rarely changes */}
             <ThemeProvider>
-                <LanguageProvider initialLanguage={lang}>
+                <LanguageProvider initialLanguage={lang} initialTranslations={initialTranslations}>
                     <AuthProvider>
                         <CoinProvider>
                             <AccessibilityProvider>
