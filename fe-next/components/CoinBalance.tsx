@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Coins, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,22 @@ export function CoinBalance({
   showSparkle = false,
   className
 }: CoinBalanceProps) {
+
+  // Inject shimmer keyframes once on mount (SSR-safe)
+  useEffect(() => {
+    const styleId = 'coin-balance-shimmer';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
 
   const sizeClasses = {
     xs: 'px-1.5 py-0.5 text-xs gap-1',
@@ -146,22 +162,6 @@ export function CoinBalance({
   }
 
   return content;
-}
-
-// Add shimmer keyframes via style tag (only once)
-if (typeof document !== 'undefined') {
-  const styleId = 'coin-balance-shimmer';
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = `
-      @keyframes shimmer {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
-      }
-    `;
-    document.head.appendChild(style);
-  }
 }
 
 export default CoinBalance;

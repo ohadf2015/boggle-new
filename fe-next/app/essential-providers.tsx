@@ -154,7 +154,7 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
                 <LanguageProvider initialLanguage={lang}>
                     <AuthProvider>
                         <CoinProvider>
-                        <AccessibilityProvider>
+                            <AccessibilityProvider>
                             <MotionConfigProvider>
                                 {/* Active tier: changes during gameplay */}
                                 <MusicProvider>

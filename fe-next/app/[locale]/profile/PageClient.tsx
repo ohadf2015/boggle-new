@@ -167,7 +167,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 haptic
               >
                 <ArrowLeft className="me-2 rtl:rotate-180" />
-                Back to Game
+                {t('profile.backToGame')}
               </EnhancedButton>
             </div>
           </div>
