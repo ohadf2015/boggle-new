@@ -2,7 +2,7 @@
  * API Route: /api/activity/recent
  * Public endpoint returning recent game activity for the live ticker.
  * Returns anonymized events — no user IDs, just display names and game stats.
- * Cached for 30s to avoid hammering the DB.
+ * In-memory cached for 30s + queries run in parallel.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -23,6 +23,11 @@ export interface ActivityEvent {
   timestamp: string;
 }
 
+// ── In-memory cache (30s TTL) ──
+let cachedEvents: ActivityEvent[] | null = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 30_000;
+
 export async function GET(request: NextRequest) {
   const rateLimitResult = checkApiRateLimit(request, 'activity-recent', {
     maxRequests: 30,
@@ -30,6 +35,14 @@ export async function GET(request: NextRequest) {
   });
   if (!rateLimitResult.success) {
     return NextResponse.json({ events: [] }, { status: 429 });
+  }
+
+  // Return cached data if fresh
+  if (cachedEvents && Date.now() - cacheTimestamp < CACHE_TTL_MS) {
+    return NextResponse.json(
+      { events: cachedEvents },
+      { headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' } }
+    );
   }
 
   const config = getSupabaseConfig();
@@ -41,19 +54,53 @@ export async function GET(request: NextRequest) {
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(config.url, config.key);
 
-    const events: ActivityEvent[] = [];
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-    // 1. Recent multiplayer wins (placement = 1)
-    const { data: mpWins } = await supabase
-      .from('game_results')
-      .select('score, word_count, longest_word, created_at, profiles:player_id(display_name, username)')
-      .eq('placement', 1)
-      .gte('created_at', since)
-      .order('created_at', { ascending: false })
-      .limit(5);
+    // Run ALL 5 queries in parallel instead of sequentially
+    const [mpWinsResult, dailySolvesResult, whSolvesResult, blastScoresResult, longWordsResult] = await Promise.all([
+      supabase
+        .from('game_results')
+        .select('score, word_count, longest_word, created_at, profiles:player_id(display_name, username)')
+        .eq('placement', 1)
+        .gte('created_at', since)
+        .order('created_at', { ascending: false })
+        .limit(5),
 
-    for (const g of mpWins || []) {
+      supabase
+        .from('daily_puzzle_attempts')
+        .select('score, word_count, longest_word, completed_at, profiles:player_id(display_name, username)')
+        .gte('completed_at', since)
+        .order('completed_at', { ascending: false })
+        .limit(5),
+
+      supabase
+        .from('daily_word_hunt_attempts')
+        .select('target_word, attempts_used, solved, completed_at, created_at, profiles:player_id(display_name, username)')
+        .eq('solved', true)
+        .gte('created_at', since)
+        .order('created_at', { ascending: false })
+        .limit(5),
+
+      supabase
+        .from('blast_results')
+        .select('score, tiles_cleared, max_combo, stars, difficulty, created_at, profiles:user_id(display_name, username)')
+        .gte('stars', 3)
+        .gte('created_at', since)
+        .order('created_at', { ascending: false })
+        .limit(5),
+
+      supabase
+        .from('game_results')
+        .select('longest_word, score, created_at, profiles:player_id(display_name, username)')
+        .gte('created_at', since)
+        .not('longest_word', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(10),
+    ]);
+
+    const events: ActivityEvent[] = [];
+
+    for (const g of mpWinsResult.data || []) {
       const profile = g.profiles as any;
       const name = profile?.display_name || profile?.username || 'Someone';
       events.push({
@@ -64,15 +111,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 2. Daily challenge completions
-    const { data: dailySolves } = await supabase
-      .from('daily_puzzle_attempts')
-      .select('score, word_count, longest_word, completed_at, profiles:player_id(display_name, username)')
-      .gte('completed_at', since)
-      .order('completed_at', { ascending: false })
-      .limit(5);
-
-    for (const d of dailySolves || []) {
+    for (const d of dailySolvesResult.data || []) {
       const profile = d.profiles as any;
       const name = profile?.display_name || profile?.username || 'A player';
       events.push({
@@ -85,16 +124,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 3. Word Hunt solves
-    const { data: whSolves } = await supabase
-      .from('daily_word_hunt_attempts')
-      .select('target_word, attempts_used, solved, completed_at, created_at, profiles:player_id(display_name, username)')
-      .eq('solved', true)
-      .gte('created_at', since)
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    for (const w of whSolves || []) {
+    for (const w of whSolvesResult.data || []) {
       const profile = w.profiles as any;
       const name = profile?.display_name || profile?.username || 'A detective';
       events.push({
@@ -105,16 +135,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 4. Blast high scores (stars >= 3)
-    const { data: blastScores } = await supabase
-      .from('blast_results')
-      .select('score, tiles_cleared, max_combo, stars, difficulty, created_at, profiles:user_id(display_name, username)')
-      .gte('stars', 3)
-      .gte('created_at', since)
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    for (const b of blastScores || []) {
+    for (const b of blastScoresResult.data || []) {
       const profile = b.profiles as any;
       const name = profile?.display_name || profile?.username || 'A blaster';
       events.push({
@@ -125,16 +146,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 5. Long words found (7+ letters) from game results
-    const { data: longWords } = await supabase
-      .from('game_results')
-      .select('longest_word, score, created_at, profiles:player_id(display_name, username)')
-      .gte('created_at', since)
-      .not('longest_word', 'is', null)
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    for (const lw of longWords || []) {
+    for (const lw of longWordsResult.data || []) {
       if (lw.longest_word && lw.longest_word.length >= 7) {
         const profile = lw.profiles as any;
         const name = profile?.display_name || profile?.username || 'A wordsmith';
@@ -152,13 +164,13 @@ export async function GET(request: NextRequest) {
       .sort(() => Math.random() - 0.5)
       .slice(0, 15);
 
+    // Update in-memory cache
+    cachedEvents = shuffled;
+    cacheTimestamp = Date.now();
+
     return NextResponse.json(
       { events: shuffled },
-      {
-        headers: {
-          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
-        },
-      }
+      { headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' } }
     );
   } catch (error) {
     console.error('[activity/recent] Error:', error);
