@@ -31,6 +31,10 @@ const nextConfig = {
   // with only the node_modules files actually needed at runtime (~200-350MB vs 1.4GB)
   output: 'standalone',
 
+  // Enable gzip compression — Railway edge does NOT compress responses,
+  // so the app must do it. Without this, 1.5MB+ JS chunks are sent raw.
+  compress: true,
+
   // Force-include server-side packages that Next.js trace can miss
   // (native addons, dynamic requires, data files, etc.)
   outputFileTracingIncludes: {
