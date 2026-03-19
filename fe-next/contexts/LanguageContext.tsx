@@ -106,16 +106,31 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         () => initialTranslations || getCachedTranslation(getServerSafeLanguage())
     );
 
+    // Ref to avoid re-creating t() on every translation load (prevents app-wide render storm).
+    // The t() function reads from this ref instead of closing over state, so its identity
+    // stays stable even when translations load asynchronously.
+    const translationsRef = useRef(currentTranslations);
+    translationsRef.current = currentTranslations;
+
+    // Bump counter once when translations finish loading to update dir/flag in context.
+    // This triggers exactly ONE re-render per language switch, not per-state-update.
+    const [translationsReady, setTranslationsReady] = useState(() => !!currentTranslations);
+
     // Load translations when language changes or on first mount when no initialTranslations
     useEffect(() => {
         const cached = getCachedTranslation(language);
         if (cached) {
-            if (cached !== currentTranslations) setCurrentTranslations(cached);
+            if (cached !== currentTranslations) {
+                setCurrentTranslations(cached);
+                setTranslationsReady(true);
+            }
             return;
         }
+        setTranslationsReady(false);
         // Async load for language switch (or first mount without initialTranslations)
         loadTranslation(language).then((data) => {
             setCurrentTranslations(data);
+            setTranslationsReady(true);
         }).catch((err) => {
             logger.warn(`Failed to load translations for ${language}:`, err);
         });
@@ -221,8 +236,8 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             : (paramsWhenFallback || {});
 
         const keys = path.split('.');
-        // Use dynamically loaded translations for current language
-        let current: unknown = currentTranslations;
+        // Read from ref to avoid depending on currentTranslations state
+        let current: unknown = translationsRef.current;
 
         if (!current) {
             // Translations not loaded yet — return fallback or key
@@ -259,16 +274,19 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         }
 
         return typeof current === 'string' ? current : (fallback || path);
-    }, [language, currentTranslations]);
+    }, [language]);
 
-    // Memoize context value to prevent unnecessary re-renders of all consumers
+    // Memoize context value — depends on translationsReady (boolean) not currentTranslations (object).
+    // This means consumers re-render at most once per language switch (false→true), not on every
+    // intermediate state update of the large translations object.
     const value = useMemo<LanguageContextValue>(() => ({
         language,
         setLanguage,
         t,
-        dir: (currentTranslations?.direction as 'rtl' | 'ltr') || (language === 'he' ? 'rtl' : 'ltr'),
-        currentFlag: (currentTranslations?.flag as string) || '🇮🇱'
-    }), [language, setLanguage, t, currentTranslations]);
+        dir: (translationsRef.current?.direction as 'rtl' | 'ltr') || (language === 'he' ? 'rtl' : 'ltr'),
+        currentFlag: (translationsRef.current?.flag as string) || '🇮🇱'
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }), [language, setLanguage, t, translationsReady]);
 
     return (
         <LanguageContext.Provider value={value}>
