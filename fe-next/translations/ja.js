@@ -8160,7 +8160,10 @@ const ja = {
     "standings": "順位表",
     "noLeague": "リーグに参加して競争しよう!",
     "finalResults": "最終結果",
-    "viewStandings": "順位表を見る"
+    "viewStandings": "順位表を見る",
+    "xpToPromote": "昇格まで{xp} XP",
+    "xpAboveRelegation": "降格まで{xp} XP余裕",
+    "positionOf": "#{position} / {total}人中"
   },
   "socialGift": {
     "title": "ギフトを送る",

@@ -8185,7 +8185,10 @@ const he = {
     "standings": "טבלה",
     "noLeague": "הצטרף לליגה כדי להתחרות!",
     "finalResults": "תוצאות סופיות",
-    "viewStandings": "צפה בטבלה"
+    "viewStandings": "צפה בטבלה",
+    "xpToPromote": "{xp} XP לעלייה",
+    "xpAboveRelegation": "{xp} XP מעל ירידה",
+    "positionOf": "#{position} מתוך {total}"
   },
   "socialGift": {
     "title": "שליחת מתנה",

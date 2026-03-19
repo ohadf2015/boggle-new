@@ -8203,7 +8203,10 @@ const es = {
     "standings": "Tabla",
     "noLeague": "¡Únete a una liga para competir!",
     "finalResults": "Resultados Finales",
-    "viewStandings": "Ver Tabla"
+    "viewStandings": "Ver Tabla",
+    "xpToPromote": "{xp} XP para ascender",
+    "xpAboveRelegation": "{xp} XP sobre descenso",
+    "positionOf": "#{position} de {total}"
   },
   "socialGift": {
     "title": "Enviar Regalo",

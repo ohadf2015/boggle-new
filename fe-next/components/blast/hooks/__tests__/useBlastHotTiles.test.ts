@@ -145,8 +145,6 @@ describe('useBlastHotTiles', () => {
       result.current.onTimerUpdate(46000);
     });
 
-    const initialTiles = result.current.hotTiles.map(t => `${t.row}-${t.col}`);
-
     // Advance past refresh interval
     act(() => {
       jest.advanceTimersByTime(8100);

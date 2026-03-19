@@ -97,8 +97,6 @@ export interface ResultsMainContentProps {
   currentPlayerData: Player | null;
   isCurrentUserWinner: boolean;
   currentPlayerValidWords: Array<{ word: string; score: number }>;
-  /** @deprecated Kept for compatibility — no longer rendered in main content */
-  currentPlayerArchetype: import('@/utils/playerArchetypes').PlayerArchetype | null;
   currentPlayerRank: number;
   scoreRevealComplete: boolean;
   setScoreRevealComplete: (complete: boolean) => void;
@@ -114,8 +112,6 @@ export interface ResultsMainContentProps {
   t: TFunction;
   showBanner?: boolean;
   bannerSize?: '320x50' | '300x250';
-  isMobile?: boolean;
-  allPlayerWords?: Record<string, Array<{ word: string; score: number }>>;
   selectedGameMode?: GameModeOption;
   onSelectGameMode?: (mode: GameModeOption) => void;
   seriesStandings?: SeriesStanding[];
@@ -158,7 +154,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   t,
   showBanner = true,
   bannerSize = '320x50',
-  allPlayerWords: _allPlayerWords,
   selectedGameMode,
   onSelectGameMode,
   seriesStandings,

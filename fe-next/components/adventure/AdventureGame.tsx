@@ -83,10 +83,10 @@ const AdventureGame = memo<AdventureGameProps>(
     const { t, language } = useLanguage();
 
     const {
-      gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining, canComplete,
-      isPlaying, cascadeComplete, submitWordWithPath, startGame, pauseGame, completeLevel,
-      resetGame, markCascadeComplete, isCascading, cascadePhase, addTime, regenerateGrid,
-      activateFreeze, isFrozen, freezeRemaining, freezeUsed, useShuffle, shufflesRemaining, updateObjective,
+      gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining,
+      isPlaying, submitWordWithPath, startGame, pauseGame, completeLevel,
+      resetGame, markCascadeComplete, isCascading, cascadePhase, addTime,
+      activateFreeze, isFrozen, freezeUsed, useShuffle, shufflesRemaining, updateObjective,
     } = useAdventureGame({
       levelConfig: boostedLevelConfig, initialGrid,
       comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
@@ -202,7 +202,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const handleClickSubmit = useCallback((word: string, indices: number[]) => {
       clickSubmitRef.current?.(word, indices);
     }, []);
-    const { selectedIndices, currentWord, selectTile, clearSelection, getPath, pathPoints, adjacentIndices } = useAdventureSelection({
+    const { selectedIndices, currentWord, selectTile, clearSelection, pathPoints, adjacentIndices } = useAdventureSelection({
       tiles, gridSize: levelConfig.gridSize, disabled: !isPlaying || isPaused || isValidating, gridRef,
       onClickSubmit: handleClickSubmit,
     });

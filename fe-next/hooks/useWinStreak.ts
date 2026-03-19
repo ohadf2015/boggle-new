@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { spendCoins, canAfford } from '@/utils/coinManager';
 
 const STREAK_KEY = 'lexiclash_win_streak';
 const STREAK_DATE_KEY = 'lexiclash_streak_date';
@@ -405,6 +406,17 @@ export const useWinStreak = () => {
     const currentData = getStoredStreakData();
 
     if (!currentData.recoverableStreak || currentData.recoveryTimeRemaining === null || currentData.recoveryTimeRemaining <= 0) {
+      return false;
+    }
+
+    // Deduct coins BEFORE recovering — fail if insufficient
+    if (!canAfford(STREAK_RECOVERY_COST)) {
+      return false;
+    }
+    const spent = spendCoins(STREAK_RECOVERY_COST, 'Streak Recovery', {
+      recoveredStreak: currentData.recoverableStreak,
+    });
+    if (!spent) {
       return false;
     }
 

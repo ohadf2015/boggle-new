@@ -339,7 +339,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentPlayerData: currentPlayerData ?? null,
     isCurrentUserWinner,
     currentPlayerValidWords,
-    currentPlayerArchetype: currentPlayerArchetype ?? null,
     currentPlayerRank,
     scoreRevealComplete,
     setScoreRevealComplete,
@@ -351,7 +350,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     isCurrentPlayerReady,
     readyUsernames,
     duplicateRuleDisabled: duplicateRuleDisabled ?? false,
-    allPlayerWords,
     t,
     selectedGameMode,
     onSelectGameMode: setSelectedGameMode,
@@ -418,7 +416,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         onShowDetails={() => setMobileActiveTab('details')}
         showBanner={true}
         bannerSize="320x50"
-        isMobile
       />
     </>
   );

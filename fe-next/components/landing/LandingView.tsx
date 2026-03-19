@@ -32,6 +32,7 @@ import { LandingShareBanner } from './LandingShareBanner';
 import { LandingBlogSection } from './LandingBlogSection';
 import { LandingCommunityShowcase } from './LandingCommunityShowcase';
 import { LandingMobileCards } from './LandingMobileCards';
+import { LeaguePositionBadge } from '@/components/leagues/LeaguePositionBadge';
 import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
 import { useEvents } from '@/hooks/useEvents';
@@ -93,7 +94,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const [, setIsAvatarBuilderOpen] = useState(false);
 
   // Check for room parameter and redirect to multiplayer page
   useEffect(() => {
@@ -190,6 +191,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           playersLoading={topPlayersLoading}
           isMobilePortrait={isMobilePortrait}
         />
+
+        {/* League Position Badge — social pressure for retention */}
+        {isAuthenticated && <LeaguePositionBadge />}
 
         {/* Social Proof Bar */}
         <LandingSocialProofBar

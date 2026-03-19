@@ -7,8 +7,16 @@
 
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { getDailyQuests, type DailyQuest } from '@/lib/adventure/dailyQuests';
+import { useAuth } from '@/contexts/AuthContext';
+
+const LS_KEY = 'lexiclash_daily_quest_progress';
+
+interface StoredQuestProgress {
+  date: string;
+  progress: Record<string, number>;
+}
 
 interface DailyQuestProgress {
   quest: DailyQuest;
@@ -40,6 +48,24 @@ function getTodayStr(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+function loadLocalProgress(todayStr: string): Record<string, number> | null {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const stored: StoredQuestProgress = JSON.parse(raw);
+    if (stored.date === todayStr && stored.progress) return stored.progress;
+    // Stale date — clear it
+    localStorage.removeItem(LS_KEY);
+  } catch { /* corrupted data */ }
+  return null;
+}
+
+function saveLocalProgress(progress: Record<string, number>, date: string): void {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ date, progress }));
+  } catch { /* storage full / unavailable */ }
+}
+
 export function useDailyQuests({
   initialProgress,
   lastQuestDate,
@@ -47,12 +73,46 @@ export function useDailyQuests({
 }: UseDailyQuestsProps = {}): UseDailyQuestsReturn {
   const todayStr = useMemo(() => getTodayStr(), []);
   const dailyQuests = useMemo(() => getDailyQuests(todayStr), [todayStr]);
+  const { isAuthenticated } = useAuth();
+  const hasSyncedRef = useRef(false);
 
-  // Reset progress if date changed
+  // Reset progress if date changed; for guests, hydrate from localStorage
   const [progress, setProgress] = useState<Record<string, number>>(() => {
     if (lastQuestDate === todayStr && initialProgress) return initialProgress;
+    // Fallback: try localStorage (primarily helps guests)
+    if (typeof window !== 'undefined') {
+      return loadLocalProgress(todayStr) ?? {};
+    }
     return {};
   });
+
+  // When a guest signs in, sync localStorage progress to the server
+  useEffect(() => {
+    if (!isAuthenticated || hasSyncedRef.current) return;
+    hasSyncedRef.current = true;
+    const local = loadLocalProgress(todayStr);
+    if (!local || Object.keys(local).length === 0) return;
+    // Merge local into current state and push to server
+    setProgress(prev => {
+      const merged: Record<string, number> = { ...prev };
+      for (const [key, value] of Object.entries(local)) {
+        merged[key] = Math.max(merged[key] ?? 0, value);
+      }
+      // Fire server persist
+      onProgressChange?.(merged, todayStr);
+      // Post directly as fallback if no onProgressChange provided
+      if (!onProgressChange) {
+        fetch('/api/adventure/quest-progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chapterQuestProgress: merged }),
+        }).catch(() => { /* best-effort */ });
+      }
+      // Clear localStorage now that server has the data
+      localStorage.removeItem(LS_KEY);
+      return merged;
+    });
+  }, [isAuthenticated, todayStr, onProgressChange]);
 
   const recordProgress = useCallback((type: DailyQuest['type'], amount = 1) => {
     setProgress(prev => {
@@ -63,6 +123,8 @@ export function useDailyQuests({
         }
       }
       onProgressChange?.(updated, todayStr);
+      // Always persist to localStorage as fallback (cheap insurance)
+      saveLocalProgress(updated, todayStr);
       return updated;
     });
   }, [dailyQuests, todayStr, onProgressChange]);

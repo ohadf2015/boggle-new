@@ -5,6 +5,7 @@
 
 import { getSupabase, GameStats, XpInfo, UpdatedUserStats } from './client';
 import { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } from '../xpManager';
+import { addXpToLeague } from '../leagueManager';
 import logger from '../../utils/logger';
 
 // Lazy import to avoid circular dependency with botManager
@@ -328,6 +329,11 @@ export async function updatePlayerStats(
         newLevel = xpRow.new_level;
         actualXpGranted = xpRow.xp_granted;
       }
+
+      // Feed XP into the player's weekly league (fire-and-forget)
+      addXpToLeague(playerId, actualXpGranted).catch((err) => {
+        logger.warn('LEAGUE', `Failed to add league XP for ${playerId}`, err?.message);
+      });
     }
 
     // Check for level up and update title if needed

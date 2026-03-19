@@ -57,7 +57,7 @@ export async function loadCommunityWords(): Promise<void> {
   const startTime = Date.now();
   try {
     const { data, error } = await client.from('word_scores').select('word, language').eq('is_potentially_valid', true);
-    if (error) { logger.error('CommunityWords', `Error loading: ${error.message}`); loaded = true; return; }
+    if (error) { logger.error('CommunityWords', `Error loading: ${error.message}`); return; }
 
     const counts: Record<LanguageCode, number> = { en: 0, he: 0, sv: 0, ja: 0, es: 0 };
     for (const row of data || []) {
@@ -85,7 +85,7 @@ export async function loadCommunityWords(): Promise<void> {
     }
     logger.info('CommunityWords', `Loaded in ${Date.now() - startTime}ms: ${JSON.stringify(counts)}`);
     loaded = true;
-  } catch (err) { logger.error('CommunityWords', `Error loading: ${err}`); loaded = true; }
+  } catch (err) { logger.error('CommunityWords', `Error loading: ${err}`); }
 }
 
 export function isWordCommunityValid(word: string, language: string): boolean {

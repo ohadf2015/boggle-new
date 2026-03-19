@@ -8239,7 +8239,10 @@ const en = {
     "standings": "Standings",
     "noLeague": "Join a league to compete!",
     "finalResults": "Final Results",
-    "viewStandings": "View Standings"
+    "viewStandings": "View Standings",
+    "xpToPromote": "{xp} XP to promote",
+    "xpAboveRelegation": "{xp} XP above relegation",
+    "positionOf": "#{position} of {total}"
   },
   "socialGift": {
     "title": "Send a Gift",

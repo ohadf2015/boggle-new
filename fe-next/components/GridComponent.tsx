@@ -65,7 +65,7 @@ interface GridCellProps {
   selectedCellsLength: number;
   onTouchStart: (e: React.TouchEvent) => void;
   onMouseDown: (e: React.MouseEvent) => void;
-  onDoubleClick: () => void;
+  onDoubleClick: (e: React.MouseEvent) => void;
 }
 
 const GridCell = memo<GridCellProps>(({
@@ -349,6 +349,30 @@ const GridComponent = memo<GridComponentProps>(({
     language,
     disableLetterKeyInput,
   });
+
+  // Stable handlers that read row/col from data attributes to avoid inline arrows per cell
+  const handleCellTouchStart = useCallback((e: React.TouchEvent) => {
+    const el = e.currentTarget as HTMLDivElement;
+    const row = Number(el.dataset.row);
+    const col = Number(el.dataset.col);
+    const letter = el.dataset.letter || '';
+    handleTouchStart(row, col, letter, e as React.TouchEvent<HTMLDivElement>);
+  }, [handleTouchStart]);
+
+  const handleCellMouseDown = useCallback((e: React.MouseEvent) => {
+    const el = e.currentTarget as HTMLDivElement;
+    const row = Number(el.dataset.row);
+    const col = Number(el.dataset.col);
+    const letter = el.dataset.letter || '';
+    handleMouseDown(row, col, letter, e as React.MouseEvent<HTMLDivElement>);
+  }, [handleMouseDown]);
+
+  const handleCellDoubleClick = useCallback((e: React.MouseEvent) => {
+    const el = e.currentTarget as HTMLDivElement;
+    const row = Number(el.dataset.row);
+    const col = Number(el.dataset.col);
+    handleDoubleClick(row, col);
+  }, [handleDoubleClick]);
 
   const inputMode: InputMode = useMemo(() => {
     if (isTypingMode) return 'keyboard';
@@ -647,9 +671,9 @@ const GridComponent = memo<GridComponentProps>(({
                   hintAnimationPhase={hintAnimationPhase}
                   currentTier={currentTier}
                   selectedCellsLength={selectedCells.length}
-                  onTouchStart={(e: any) => handleTouchStart(i, j, cell, e)}
-                  onMouseDown={(e: any) => handleMouseDown(i, j, cell, e)}
-                  onDoubleClick={() => handleDoubleClick(i, j)}
+                  onTouchStart={handleCellTouchStart}
+                  onMouseDown={handleCellMouseDown}
+                  onDoubleClick={handleCellDoubleClick}
                 />
               );
             })

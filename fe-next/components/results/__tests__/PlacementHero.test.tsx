@@ -7,13 +7,13 @@ jest.mock('framer-motion', () => {
   return {
     ...actual,
     motion: {
-      div: (() => { const MotionDiv = React.forwardRef(({ children, className, onClick, style, ...rest }: React.PropsWithChildren<{ className?: string; onClick?: () => void; style?: React.CSSProperties; 'data-testid'?: string }>, ref: React.Ref<HTMLDivElement>) => (
-        <div ref={ref} className={className} onClick={onClick} style={style} data-testid={rest['data-testid']}>{children}</div>
+      div: (() => { const MotionDiv = React.forwardRef(({ children, className, onClick, style, 'data-testid': dataTestId }: React.PropsWithChildren<{ className?: string; onClick?: () => void; style?: React.CSSProperties; 'data-testid'?: string }>, ref: React.Ref<HTMLDivElement>) => (
+        <div ref={ref} className={className} onClick={onClick} style={style} data-testid={dataTestId}>{children}</div>
       )); MotionDiv.displayName = 'motion.div'; return MotionDiv; })(),
-      h1: (() => { const MotionH1 = React.forwardRef(({ children, className, ...rest }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLHeadingElement>) => (
+      h1: (() => { const MotionH1 = React.forwardRef(({ children, className }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLHeadingElement>) => (
         <h1 ref={ref} className={className}>{children}</h1>
       )); MotionH1.displayName = 'motion.h1'; return MotionH1; })(),
-      p: (() => { const MotionP = React.forwardRef(({ children, className, ...rest }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLParagraphElement>) => (
+      p: (() => { const MotionP = React.forwardRef(({ children, className }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLParagraphElement>) => (
         <p ref={ref} className={className}>{children}</p>
       )); MotionP.displayName = 'motion.p'; return MotionP; })(),
     },

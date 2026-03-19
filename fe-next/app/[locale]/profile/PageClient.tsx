@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { User, ArrowLeft, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Trophy, Gem } from 'lucide-react';
-import { PageLoader } from '@/components/ui/PageLoader';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -65,7 +64,6 @@ export default function ProfilePageClient(): React.JSX.Element {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
   const [activeSection, setActiveSection] = useState<ProfileSection>(getInitialSection);
-  const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
 
   // Hooks
   const { isUploading, handleProfilePictureUpload, handleRemoveProfilePicture } = useProfilePictureUpload({

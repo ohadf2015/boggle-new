@@ -1,4 +1,10 @@
 {
   "_comment": "This file is only used if deploying to Vercel. Railway does not use vercel.json.",
-  "_comment2": "For Railway, use external cron service, GitHub Actions, or node-cron instead."
+  "_comment2": "For Railway, use external cron service, GitHub Actions, or node-cron instead.",
+  "crons": [
+    {
+      "path": "/api/cron/weekly-league-reset",
+      "schedule": "0 0 * * 1"
+    }
+  ]
 }

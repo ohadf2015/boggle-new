@@ -84,7 +84,6 @@ export function useMultiplayerSocket(
   options: UseMultiplayerSocketOptions
 ): UseMultiplayerSocketReturn {
   const {
-    language,
     gameCode,
     isActive,
     isHost,
@@ -101,6 +100,7 @@ export function useMultiplayerSocket(
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
   const hostLeftReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectFallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const kickedReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Latest-ref pattern: keeps a stable ref to the latest options so socket
   // callbacks (registered once) always read fresh values without re-registering
@@ -391,7 +391,7 @@ export function useMultiplayerSocket(
       toast.error(message, { icon: '🚫', duration: 5000 });
       clearSessionPreservingUsername(opts.username);
       opts.onHostLeftRoomClosing({ message });
-      setTimeout(() => window.location.reload(), 2000);
+      kickedReloadTimerRef.current = setTimeout(() => window.location.reload(), 2000);
     });
 
     socketInstance.on('playerKicked', (data: { username: string; reason: string }) => {
@@ -482,12 +482,16 @@ export function useMultiplayerSocket(
         clearTimeout(reconnectFallbackTimerRef.current);
         reconnectFallbackTimerRef.current = null;
       }
+      if (kickedReloadTimerRef.current) {
+        clearTimeout(kickedReloadTimerRef.current);
+        kickedReloadTimerRef.current = null;
+      }
       eventNames.forEach((event) => socketInstance.off(event));
       if (!isReusingSocket) {
         releaseSharedSocket();
       }
     };
-  }, [language]);
+  }, []);
 
   // Host keep-alive
   useEffect(() => {

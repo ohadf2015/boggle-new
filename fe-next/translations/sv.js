@@ -8180,7 +8180,10 @@ const sv = {
     "standings": "Ställning",
     "noLeague": "Gå med i en liga för att tävla!",
     "finalResults": "Slutresultat",
-    "viewStandings": "Visa ställning"
+    "viewStandings": "Visa ställning",
+    "xpToPromote": "{xp} XP till uppflyttning",
+    "xpAboveRelegation": "{xp} XP över nedflyttning",
+    "positionOf": "#{position} av {total}"
   },
   "socialGift": {
     "title": "Skicka en gåva",

@@ -406,7 +406,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
   // Update chapter quest progress — optimistic local update + debounced server persist
   const updateChapterQuestProgress = useCallback(
-    (questType: string, amount: number, questIds: string[]) => {
+    (_questType: string, amount: number, questIds: string[]) => {
       setProgression((prev) => {
         if (!prev) return prev;
         const current = prev.chapterQuestProgress ?? {};
