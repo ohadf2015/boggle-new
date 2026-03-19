@@ -27,6 +27,9 @@ const { cleanupEmptyRooms } = require('./modules/gameStateManager');
 const { initRateLimit, resetRateLimit, isIpBlocked, isIpBlockedAsync, RateLimiter } = require('./utils/rateLimiter');
 const logger = require('./utils/logger');
 
+// Track cleanup timer for graceful shutdown
+let _emptyRoomCleanupTimer: ReturnType<typeof setInterval> | null = null;
+
 /**
  * Initialize socket handlers for the Socket.IO server
  * @param io - Socket.IO server instance
@@ -40,8 +43,9 @@ function initializeSocketHandlers(io: Server): void {
   // Start connection health check
   startConnectionHealthCheck(io);
 
-  // Set up periodic cleanup of empty rooms
-  setInterval(() => {
+  // Set up periodic cleanup of empty rooms (tracked for shutdown)
+  if (_emptyRoomCleanupTimer) clearInterval(_emptyRoomCleanupTimer);
+  _emptyRoomCleanupTimer = setInterval(() => {
     try {
       cleanupEmptyRooms();
     } catch (err: unknown) {
@@ -65,8 +69,22 @@ function initializeSocketHandlers(io: Server): void {
     // Initialize rate limiting for this socket with IP tracking
     initRateLimit(socket);
 
+    // Register friends:setAuth once (not inside promise branches to avoid duplication)
+    socket.on('friends:setAuth', (data: { userId: string }) => {
+      const userId = data?.userId;
+      if (!userId || typeof userId !== 'string') return;
+      (socket as any).authUserId = userId;
+      socket.join(`user:${userId}`);
+      logger.debug('SOCKET', `Socket ${socket.id} joined user room user:${userId}`);
+    });
+
+    // Clean up rate limiting on disconnect
+    socket.on('disconnect', () => {
+      resetRateLimit(socket.id);
+    });
+
     // Async check: Redis distributed IP block (catches blocks from other instances)
-    // This runs after connection is established but before handlers are registered
+    // This runs after connection is established but before game handlers are registered
     isIpBlockedAsync(clientIp)
       .then((blocked: boolean) => {
         if (blocked) {
@@ -83,16 +101,6 @@ function initializeSocketHandlers(io: Server): void {
 
         // Register all event handlers for this socket
         registerAllHandlers(io, socket);
-
-        // Allow authenticated clients to join their personal user room for
-        // O(1) targeted broadcasts from socialHelpers.broadcastToUser.
-        socket.on('friends:setAuth', (data: { userId: string }) => {
-          const userId = data?.userId;
-          if (!userId || typeof userId !== 'string') return;
-          (socket as any).authUserId = userId;
-          socket.join(`user:${userId}`);
-          logger.debug('SOCKET', `Socket ${socket.id} joined user room user:${userId}`);
-        });
       })
       .catch((err: Error) => {
         // On Redis error, allow connection (fail open)
@@ -100,32 +108,30 @@ function initializeSocketHandlers(io: Server): void {
         logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
         socket.join('lobby:rooms');
         registerAllHandlers(io, socket);
-
-        socket.on('friends:setAuth', (data: { userId: string }) => {
-          const userId = data?.userId;
-          if (!userId || typeof userId !== 'string') return;
-          (socket as any).authUserId = userId;
-          socket.join(`user:${userId}`);
-          logger.debug('SOCKET', `Socket ${socket.id} joined user room user:${userId}`);
-        });
       });
-
-    // Clean up rate limiting on disconnect
-    socket.on('disconnect', () => {
-      resetRateLimit(socket.id);
-    });
   });
 
   logger.info('SOCKET', 'Socket handlers initialized');
 }
 
+/**
+ * Stop the empty room cleanup timer (for graceful shutdown)
+ */
+function stopEmptyRoomCleanup(): void {
+  if (_emptyRoomCleanupTimer) {
+    clearInterval(_emptyRoomCleanupTimer);
+    _emptyRoomCleanupTimer = null;
+  }
+}
+
 // Named exports for TypeScript compatibility
-export { initializeSocketHandlers };
+export { initializeSocketHandlers, stopEmptyRoomCleanup };
 export { MAX_PLAYERS_PER_ROOM };
 
 // CommonJS exports for backward compatibility
 module.exports = {
   initializeSocketHandlers,
+  stopEmptyRoomCleanup,
   MAX_PLAYERS_PER_ROOM,
   handlers: require('./handlers'),
 };

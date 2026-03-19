@@ -148,9 +148,9 @@ const gameExists = (gameCode: string): boolean => !!games[gameCode];
 const getGameCount = (): number => Object.keys(games).length;
 const getAllGameCodes = (): string[] => Object.keys(games);
 
-function forEachGame(callback: (gameCode: string, game: GameState) => void): void {
+function forEachGame(callback: (gameCode: string, game: GameState) => void | boolean): void {
   for (const [gameCode, game] of Object.entries(games)) {
-    callback(gameCode, game);
+    if (callback(gameCode, game) === false) break;
   }
 }
 

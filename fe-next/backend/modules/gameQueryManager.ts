@@ -143,42 +143,40 @@ export function getDetailedGames(games: Record<string, QueryGameBase>): Detailed
  * Filters out rooms with no human players (bots don't count)
  */
 export function getActiveRooms(games: Record<string, QueryGameBase>): GameSummary[] {
-  return Object.values(games)
-    .filter(game => {
-      // Only show rooms with active human players (bots and disconnected players don't count)
-      const humanPlayers = Object.values(game.users).filter(
-        user => !user.isBot && !user.disconnected
-      );
-      return humanPlayers.length > 0;
-    })
-    .map(game => {
-      // Count only active human players for display (exclude disconnected)
-      const humanPlayerCount = Object.values(game.users).filter(
-        user => !user.isBot && !user.disconnected
-      ).length;
-      // Extract up to 4 player avatars for room card display
-      const humanUsers = Object.values(game.users).filter(
-        user => !user.isBot && !user.disconnected
-      );
-      const playerAvatars: RoomPlayerAvatar[] = humanUsers
-        .slice(0, 4)
-        .map(user => ({
+  const result: GameSummary[] = [];
+
+  for (const game of Object.values(games)) {
+    // Single pass: count human players and collect up to 4 avatars
+    const playerAvatars: RoomPlayerAvatar[] = [];
+    let humanCount = 0;
+
+    for (const user of Object.values(game.users)) {
+      if (user.isBot || user.disconnected) continue;
+      humanCount++;
+      if (playerAvatars.length < 4) {
+        playerAvatars.push({
           ...(user.avatar?.avatarImage ? { avatarImage: user.avatar.avatarImage } : {}),
           ...(user.avatar?.emoji ? { emoji: user.avatar.emoji } : {}),
           ...(user.avatar?.color ? { color: user.avatar.color } : {}),
-        }));
+        });
+      }
+    }
 
-      return {
-        gameCode: game.gameCode,
-        roomName: game.roomName,
-        hostUsername: game.hostUsername,
-        playerCount: humanPlayerCount,
-        gameState: game.gameState,
-        language: game.language,
-        gameMode: game.gameMode || 'classic',
-        playerAvatars,
-      };
+    if (humanCount === 0) continue;
+
+    result.push({
+      gameCode: game.gameCode,
+      roomName: game.roomName,
+      hostUsername: game.hostUsername,
+      playerCount: humanCount,
+      gameState: game.gameState,
+      language: game.language,
+      gameMode: game.gameMode || 'classic',
+      playerAvatars,
     });
+  }
+
+  return result;
 }
 
 /**

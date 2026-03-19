@@ -85,7 +85,7 @@ export async function loadCommunityWords(): Promise<void> {
     }
     logger.info('CommunityWords', `Loaded in ${Date.now() - startTime}ms: ${JSON.stringify(counts)}`);
     loaded = true;
-  } catch (err) { logger.error('CommunityWords', `Error loading: ${err}`); }
+  } catch (err) { logger.error('CommunityWords', `Error loading: ${err}`); loaded = true; }
 }
 
 export function isWordCommunityValid(word: string, language: string): boolean {

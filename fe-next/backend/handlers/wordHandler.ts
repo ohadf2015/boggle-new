@@ -35,6 +35,7 @@ import { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerVali
 import { handleValidatedWord, handleWordBecameValid, handlePeerRejection, type PeerValidationResult } from './wordValidationHandler';
 import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } from '../modules/spamDetector.js';
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
+import { calculateWordScore } from '../modules/scoringEngine.js';
 
 // Rate limit weights
 const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '3');
@@ -286,7 +287,6 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       if (firstFinder) {
         // Catch-up mechanic: give 50% partial credit for confirmation finds
         // This rewards word knowledge without devaluing first-find
-        const { calculateWordScore } = await import('../modules/scoringEngine.js');
         const baseScore = calculateWordScore(normalizedWord, 0);
         const confirmationScore = Math.floor(baseScore * 0.5);
 
