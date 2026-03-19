@@ -250,6 +250,7 @@ export interface Game {
 }
 
 export interface RoomPlayerAvatar {
+  customAvatar?: CustomAvatarConfig;
   avatarImage?: string;
   emoji?: string;
   color?: string;

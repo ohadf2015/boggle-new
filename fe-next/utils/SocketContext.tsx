@@ -1,24 +1,16 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode, useMemo } from 'react';
+import { useContext, useEffect, useState, useCallback, useRef, ReactNode, useMemo } from 'react';
 import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { sanitizeRoomName } from '@/utils/consts';
 import type { LetterGrid, Language, Avatar } from '@/types';
 
-// Socket.IO Context Value Type
-export interface SocketContextValue {
-  socket: Socket | null;
-  isConnected: boolean;
-  isReconnecting: boolean;
-  connectionError: string | null;
-  reconnectAttempt: number;
-  maxReconnectAttempts: number;
-  manualReconnect: () => void;
-}
+// Import from core and re-export so existing imports from SocketContext still work
+import { SocketContext, useSocketOptional, type SocketContextValue } from './socketContextCore';
 
-// Socket.IO Context
-export const SocketContext = createContext<SocketContextValue | null>(null);
+export { SocketContext, useSocketOptional };
+export type { SocketContextValue };
 
 // Configuration - increased for better handling of poor network conditions
 const SOCKET_CONFIG = {
@@ -311,13 +303,7 @@ export function useSocket(): SocketContextValue {
   return context;
 }
 
-/**
- * Optional hook for cases where socket might not be available yet
- * @returns Socket context value or null
- */
-export function useSocketOptional(): SocketContextValue | null {
-  return useContext(SocketContext);
-}
+// useSocketOptional is re-exported from socketContextCore above
 
 /**
  * Hook to listen to socket events

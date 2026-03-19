@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3843,
+    "totalKeysInCode": 3831,
     "keyCountByLanguage": {
-      "en": 6511,
-      "he": 6541,
-      "sv": 6574,
-      "ja": 6561,
-      "es": 6572
+      "en": 6513,
+      "he": 6543,
+      "sv": 6576,
+      "ja": 6563,
+      "es": 6574
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,

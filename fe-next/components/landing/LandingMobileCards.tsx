@@ -7,6 +7,7 @@ import { User, Users, Bot, Trophy, LayoutGrid, Crown, Map, Sparkles, Bomb } from
 import { cn } from '@/lib/utils';
 import { LandingShareBanner } from './LandingShareBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
+import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 
 const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
 
@@ -45,7 +46,7 @@ export function LandingMobileCards({
 }: LandingMobileCardsProps): React.JSX.Element {
   const [isFirstTimer, setIsFirstTimer] = useState(false);
   useEffect(() => {
-    setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted'));
+    setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding());
   }, []);
 
   return (

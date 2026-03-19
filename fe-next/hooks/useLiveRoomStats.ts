@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSocketOptional } from '@/utils/SocketContext';
+import { useSocketOptional } from '@/utils/socketContextCore';
 import type { ActiveRoom } from '@/shared/types/game';
 
 interface LiveRoomStats {

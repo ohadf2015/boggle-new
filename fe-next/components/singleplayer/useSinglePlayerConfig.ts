@@ -7,6 +7,7 @@ import {
   shouldShowGuidance,
   markGuidanceShown,
 } from '@/utils/contextualGuidanceStorage';
+import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import type {
   SinglePlayerMode,
@@ -89,7 +90,8 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     const hasAutoStart = searchParams?.get('autoStart');
     const hasPreset = searchParams?.get('preset');
     if (hasAutoStart || hasPreset) return 'playing';
-    return shouldShowGuidance('firstPlayTutorialCompleted') ? 'pre-game' : 'playing';
+    const isNewPlayer = shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding();
+    return isNewPlayer ? 'pre-game' : 'playing';
   });
 
   const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({

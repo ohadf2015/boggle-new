@@ -30,6 +30,7 @@ export interface QueryGameBase {
 
 // Lightweight avatar for room list display (max 4 shown)
 export interface RoomPlayerAvatar {
+  customAvatar?: Record<string, string>;
   avatarImage?: string;
   emoji?: string;
   color?: string;
@@ -83,6 +84,7 @@ export function getAllGames(games: Record<string, QueryGameBase>): GameSummary[]
     language: game.language,
     gameMode: game.gameMode || 'classic',
     playerAvatars: Object.values(game.users).slice(0, 4).map(user => ({
+      ...(user.avatar?.customAvatar ? { customAvatar: user.avatar.customAvatar } : {}),
       ...(user.avatar?.avatarImage ? { avatarImage: user.avatar.avatarImage } : {}),
       ...(user.avatar?.emoji ? { emoji: user.avatar.emoji } : {}),
       ...(user.avatar?.color ? { color: user.avatar.color } : {}),
@@ -155,6 +157,7 @@ export function getActiveRooms(games: Record<string, QueryGameBase>): GameSummar
       humanCount++;
       if (playerAvatars.length < 4) {
         playerAvatars.push({
+          ...(user.avatar?.customAvatar ? { customAvatar: user.avatar.customAvatar } : {}),
           ...(user.avatar?.avatarImage ? { avatarImage: user.avatar.avatarImage } : {}),
           ...(user.avatar?.emoji ? { emoji: user.avatar.emoji } : {}),
           ...(user.avatar?.color ? { color: user.avatar.color } : {}),
