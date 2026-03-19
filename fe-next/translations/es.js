@@ -3614,6 +3614,7 @@ const es = {
     "yourRank": "Tu ranking",
     "totalScore": "Puntuación total",
     "solvedPercent": "Solo el {percent}% lo resolvió hoy",
+    "liveActivity": "Actividad en vivo",
     "todaysTopWords": "Palabras top de hoy",
     "hallOfFame": "Salón de la Fama",
     "careerPoints": "Puntos de Carrera",

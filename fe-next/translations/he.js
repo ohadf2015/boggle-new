@@ -3572,6 +3572,7 @@ const he = {
     "yourRank": "הדירוג שלכם",
     "totalScore": "ניקוד כולל",
     "solvedPercent": "רק {percent}% פתרו היום",
+    "liveActivity": "פעילות משחק בזמן אמת",
     "todaysTopWords": "המילים המובילות היום",
     "hallOfFame": "היכל התהילה",
     "careerPoints": "נקודות קריירה",

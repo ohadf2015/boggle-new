@@ -3554,6 +3554,7 @@ const sv = {
     "yourRank": "Din ranking",
     "totalScore": "Totalpoäng",
     "solvedPercent": "Bara {percent}% löste idag",
+    "liveActivity": "Spelaktivitet i realtid",
     "todaysTopWords": "Dagens toppord",
     "hallOfFame": "Hall of Fame",
     "careerPoints": "Karriärpoäng",

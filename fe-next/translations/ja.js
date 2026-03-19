@@ -3554,6 +3554,7 @@ const ja = {
     "yourRank": "あなたのランク",
     "totalScore": "合計スコア",
     "solvedPercent": "今日は{percent}%だけが解決",
+    "liveActivity": "ライブゲームアクティビティ",
     "todaysTopWords": "今日のトップワード",
     "hallOfFame": "殿堂入り",
     "careerPoints": "キャリアポイント",

@@ -3674,6 +3674,7 @@ const en = {
     "yourRank": "Your Rank",
     "totalScore": "Total Score",
     "solvedPercent": "Only {percent}% solved today",
+    "liveActivity": "Live game activity",
     "todaysTopWords": "Top Words Today",
     "hallOfFame": "Hall of Fame",
     "careerPoints": "Career Points",

@@ -27,6 +27,7 @@ import { LandingChallengeCards } from './LandingChallengeCards';
 import { LandingMobileCards } from './LandingMobileCards';
 
 // Below-the-fold sections — lazy load to speed up initial render
+const LiveActivityTicker = dynamic(() => import('./LiveActivityTicker').then(m => m.LiveActivityTicker), { ssr: false });
 const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
@@ -204,6 +205,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           gameModes={gameModes}
           languages={langCount}
         />
+
+        {/* Live Activity Ticker */}
+        <LiveActivityTicker />
 
         {/* Challenge / Mode Cards */}
         <LandingChallengeCards
