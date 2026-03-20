@@ -126,7 +126,7 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
               totalComboBonus > 0 ? `\u26a1 +${totalComboBonus}` : undefined,
               totalFireRoundBonus > 0 ? `\ud83d\udd25 +${totalFireRoundBonus}` : undefined,
             ].filter(Boolean).join(' \u00b7 ')}
-            defaultExpanded={false}
+            defaultExpanded={true}
             variant="tertiary"
             className="shadow-hard"
           >

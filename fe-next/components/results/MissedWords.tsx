@@ -90,12 +90,12 @@ const MissedWords = memo<MissedWordsProps>(({
     >
       <div
         className={cn(
-          'rounded-neo-lg border-2 border-neo-black/30 overflow-hidden',
-          'bg-gray-500'
+          'rounded-neo border-3 border-neo-black overflow-hidden shadow-hard',
+          'bg-neo-navy'
         )}
       >
         {/* Header - clearer messaging about missed words */}
-        <div className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-600 border-b-2 border-neo-black/20">
+        <div className="flex items-center justify-between gap-2 px-3 py-2 bg-neo-navy-light border-b-3 border-neo-black">
           <div className={cn("flex items-center gap-2", dir === 'rtl' && 'flex-row-reverse')}>
             <EyeOff className="w-4 h-4 text-neo-lime" />
             <span className="font-bold text-xs uppercase text-white">
@@ -130,7 +130,7 @@ const MissedWords = memo<MissedWordsProps>(({
                     hasPath && 'cursor-pointer hover:scale-105',
                     isSelected
                       ? 'border-neo-lime bg-neo-lime/30 ring-2 ring-neo-lime/50'
-                      : 'border-slate-500 bg-slate-600 hover:bg-slate-500'
+                      : 'border-neo-black/40 bg-neo-navy-light hover:bg-neo-navy-light/80'
                   )}
                 >
                   {/* Score badge */}
@@ -168,8 +168,8 @@ const MissedWords = memo<MissedWordsProps>(({
               className={cn(
                 'w-full flex items-center justify-center gap-1.5 py-1.5 rounded-neo',
                 'text-xs font-bold uppercase',
-                'bg-slate-600 hover:bg-slate-500 text-white/80 hover:text-white',
-                'border border-slate-500 transition-colors'
+                'bg-neo-navy-light hover:bg-neo-navy text-neo-cream/80 hover:text-white',
+                'border-2 border-neo-black/30 transition-colors'
               )}
             >
               <span>
