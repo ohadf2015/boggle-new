@@ -1541,6 +1541,12 @@ const he = {
     "topMissedWord": "המילה שפספסת",
     "wordsYouMissed": "מילים שפספסת",
     "rarestAchievement": "הישג נדיר",
+    "rankHighlight": {
+      "champion": "!אלוף",
+      "soClose": "!כמעט",
+      "podium": "!על הפודיום",
+      "keepGoing": "!המשך"
+    },
     "everyoneReady": "כולם מוכנים!",
     "waitingForPlayers": "ממתין לשחקנים",
     "ready": "מוכן!",

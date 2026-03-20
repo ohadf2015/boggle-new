@@ -20,6 +20,7 @@ import type { NearMiss } from '@/components/results/NearMissCard';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 
 import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSection';
+import { RankHighlight } from '@/components/results/RankHighlight';
 import { ResultsCtaSection } from '@/components/results/ResultsCtaSection';
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
 import MissedWords from '@/components/results/MissedWords';
@@ -183,14 +184,22 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
     <div className="space-y-3">
       {/* Placement Hero — big, clear rank + score for the current player */}
       {sortedScores.length > 1 && scoreRevealComplete && currentPlayerData && (
-        <PlacementHero
-          rank={currentPlayerRank}
-          score={currentPlayerData.score}
-          totalPlayers={sortedScores.length}
-          username={currentPlayerData.username}
-          avatar={currentPlayerData.avatar}
-          gapToWinner={gapToWinner}
-        />
+        <>
+          <PlacementHero
+            rank={currentPlayerRank}
+            score={currentPlayerData.score}
+            totalPlayers={sortedScores.length}
+            username={currentPlayerData.username}
+            avatar={currentPlayerData.avatar}
+            gapToWinner={gapToWinner}
+          />
+          <RankHighlight
+            rank={currentPlayerRank}
+            totalPlayers={sortedScores.length}
+            gapToWinner={gapToWinner}
+            winnerUsername={sortedScores[0]?.username}
+          />
+        </>
       )}
 
       {/* Fight Card Leaderboard — ranked list (fight card style) */}

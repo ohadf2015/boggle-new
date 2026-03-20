@@ -1523,6 +1523,12 @@ const sv = {
     "topMissedWord": "Bästa missade",
     "wordsYouMissed": "Ord du missade",
     "rarestAchievement": "Sällsynt prestation",
+    "rankHighlight": {
+      "champion": "Mästare!",
+      "soClose": "Så nära!",
+      "podium": "På pallen!",
+      "keepGoing": "Kämpa på!"
+    },
     "everyoneReady": "Alla redo!",
     "waitingForPlayers": "Väntar på spelare",
     "ready": "Redo!",

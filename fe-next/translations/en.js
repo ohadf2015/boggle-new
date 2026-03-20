@@ -1641,6 +1641,12 @@ const en = {
     "topMissedWord": "Top missed",
     "wordsYouMissed": "Words You Missed",
     "rarestAchievement": "Rarest Achievement",
+    "rankHighlight": {
+      "champion": "Champion!",
+      "soClose": "So Close!",
+      "podium": "On The Podium!",
+      "keepGoing": "Keep Going!"
+    },
     "everyoneReady": "All Set!",
     "waitingForPlayers": "Waiting...",
     "ready": "Ready!",

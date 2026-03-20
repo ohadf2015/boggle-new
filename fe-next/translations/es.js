@@ -1586,6 +1586,12 @@ const es = {
     "topMissedWord": "Mejor palabra perdida",
     "wordsYouMissed": "Palabras que te perdiste",
     "rarestAchievement": "Logro más raro",
+    "rankHighlight": {
+      "champion": "¡Campeón!",
+      "soClose": "¡Tan cerca!",
+      "podium": "¡En el podio!",
+      "keepGoing": "¡Sigue así!"
+    },
     "everyoneReady": "¡Todos listos!",
     "waitingForPlayers": "Esperando jugadores",
     "ready": "¡Listo!",

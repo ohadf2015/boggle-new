@@ -1524,6 +1524,12 @@ const ja = {
     "topMissedWord": "最高の見逃し",
     "wordsYouMissed": "見逃した単語",
     "rarestAchievement": "レアな実績",
+    "rankHighlight": {
+      "champion": "チャンピオン！",
+      "soClose": "惜しい！",
+      "podium": "表彰台！",
+      "keepGoing": "頑張れ！"
+    },
     "everyoneReady": "全員準備完了！",
     "waitingForPlayers": "プレイヤーを待っています",
     "ready": "準備完了！",
