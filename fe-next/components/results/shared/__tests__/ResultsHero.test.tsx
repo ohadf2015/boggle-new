@@ -13,6 +13,10 @@ jest.mock('framer-motion', () => ({
       const { initial, animate, transition, ...rest } = props;
       return <span {...rest}>{children}</span>;
     },
+    h1: ({ children, ...props }: any) => {
+      const { initial, animate, transition, ...rest } = props;
+      return <h1 {...rest}>{children}</h1>;
+    },
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
   useReducedMotion: jest.fn(() => false),

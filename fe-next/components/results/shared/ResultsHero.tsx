@@ -73,23 +73,36 @@ export function ResultsHero({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className={cn(
-        'relative text-center bg-gradient-to-b py-6 md:py-10',
+        'relative text-center bg-gradient-to-b py-6 md:py-10 overflow-hidden',
         gradients[variant],
         className,
       )}
     >
+      {/* Halftone texture overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:8px_8px]" />
+
       {/* Outcome label — h1 for a11y, first heading on page */}
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        initial={{ opacity: 0, y: -15, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 14 }}
       >
-        <h1 className={cn(
-          'text-xl sm:text-2xl font-black uppercase tracking-wider',
-          variant === 'win' ? 'text-neo-lime' : variant === 'loss' ? 'text-neo-pink' : 'text-neo-cyan',
-        )}>
+        <motion.h1
+          className={cn(
+            'text-xl sm:text-2xl font-black uppercase tracking-wider',
+            variant === 'win' ? 'text-neo-lime' : variant === 'loss' ? 'text-neo-pink' : 'text-neo-cyan',
+          )}
+          animate={variant === 'win' ? {
+            textShadow: [
+              '0 0 0px rgba(191,255,0,0)',
+              '0 0 16px rgba(191,255,0,0.5)',
+              '0 0 0px rgba(191,255,0,0)',
+            ],
+          } : undefined}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
           {outcomeLabel}
-        </h1>
+        </motion.h1>
       </motion.div>
 
       {/* Subtitle (e.g. puzzle number) */}
@@ -107,19 +120,22 @@ export function ResultsHero({
       {/* Score — the hero number */}
       <motion.div
         data-testid="score-area"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        initial={{ scale: 0.8, opacity: 0, y: 10 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 12 }}
         onClick={onScoreClick}
+        whileHover={onScoreClick ? { scale: 1.04 } : undefined}
+        whileTap={onScoreClick ? { scale: 0.97 } : undefined}
         className={cn(
           'py-2',
-          onScoreClick && 'cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]',
+          onScoreClick && 'cursor-pointer',
         )}
       >
         <ScoreCountUp
           to={score}
           delay={300}
           duration={countUpDuration}
+          slam
           className="text-7xl md:text-8xl font-black text-white drop-shadow-[0_0_20px_rgba(255,225,53,0.3)]"
         />
         {pointsLabel && (
@@ -132,9 +148,9 @@ export function ResultsHero({
       {/* Badge (completion, streak milestone) */}
       {badge && (
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring' as const, delay: 0.3 }}
+          initial={{ scale: 0, rotate: -10, y: 8 }}
+          animate={{ scale: 1, rotate: 0, y: 0 }}
+          transition={{ type: 'spring' as const, stiffness: 400, damping: 10, delay: 0.3 }}
           className="mb-3"
         >
           <span className={cn(

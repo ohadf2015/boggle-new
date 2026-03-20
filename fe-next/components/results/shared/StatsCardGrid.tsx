@@ -39,10 +39,10 @@ const container = {
 };
 
 const cardVariant = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  hidden: { opacity: 0, y: 24, scale: 0.88, rotate: -2 },
   show: {
-    opacity: 1, y: 0, scale: 1,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 22 },
+    opacity: 1, y: 0, scale: 1, rotate: 0,
+    transition: { type: 'spring' as const, stiffness: 340, damping: 14 },
   },
 };
 
@@ -122,15 +122,18 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
         <motion.div
           key={card.label}
           variants={prefersReduced ? cardReduced : cardVariant}
-          whileHover={prefersReduced ? undefined : { y: -2, scale: 1.03 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+          whileHover={prefersReduced ? undefined : { y: -3, scale: 1.04, rotate: 1 }}
+          whileTap={prefersReduced ? undefined : { scale: 0.96, rotate: -1 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 10 }}
           className={cn(
-            'rounded-neo border-2 border-t-[3px] p-3 text-center cursor-default relative overflow-hidden',
+            'rounded-neo border-3 border-t-4 p-3 text-center cursor-default relative overflow-hidden shadow-hard-sm',
             accentBg[card.accent ?? 'default'],
           )}
         >
-          {/* Subtle inner glow */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(ellipse_at_top,#fff_0%,transparent_60%)]" />
+          {/* Halftone texture */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
+          {/* Top glow */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(ellipse_at_top,#fff_0%,transparent_50%)]" />
           {card.icon && (
             <motion.div
               className="text-xl mb-1 relative z-10"
@@ -141,7 +144,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
               {card.icon}
             </motion.div>
           )}
-          <div className="text-2xl font-black text-white tabular-nums relative z-10">
+          <div className="text-2xl font-black text-white tabular-nums relative z-10 drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
             {card.value}
           </div>
           <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 relative z-10">

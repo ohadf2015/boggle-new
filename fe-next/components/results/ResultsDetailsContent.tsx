@@ -215,9 +215,10 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
             transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
             className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard overflow-hidden"
           >
-            <div className="flex items-center gap-2 px-3 py-2 bg-neo-navy-light border-b-3 border-neo-black">
-              <Star className="w-4 h-4 text-neo-orange" />
-              <span className="text-xs font-black text-neo-cream/70 uppercase tracking-wider">
+            <div className="flex items-center gap-2 px-3 py-2.5 bg-neo-navy-light border-b-3 border-neo-black relative overflow-hidden">
+              <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
+              <Star className="w-4 h-4 text-neo-orange relative z-10" />
+              <span className="text-xs font-black text-neo-cream/70 uppercase tracking-wider relative z-10">
                 {t('results.wordsYouMissed')}
               </span>
             </div>
@@ -228,12 +229,12 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + i * 0.1 }}
-                  className="flex items-center justify-between px-3 py-2 bg-neo-navy-light/50 border-2 border-neo-black/20 rounded-neo"
+                  className="flex items-center justify-between px-3 py-2 bg-neo-navy-light/50 border-3 border-neo-black/30 shadow-hard-sm"
                 >
                   <span className="font-black text-sm text-white uppercase tracking-wide">
                     {language === 'he' ? applyHebrewFinalLetters(wordData.word) : wordData.word}
                   </span>
-                  <span className="text-xs font-black bg-neo-orange/20 text-neo-orange px-2 py-0.5 rounded-neo border border-neo-orange/30">
+                  <span className="text-[10px] font-black bg-neo-orange/20 text-neo-orange px-2 py-0.5 border-2 border-neo-orange/30">
                     +{wordData.score} {t('results.points')}
                   </span>
                 </motion.div>
@@ -251,11 +252,18 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.4 }}
-            className="flex items-center gap-3 px-3 py-2.5 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard"
+            className="flex items-center gap-3 px-4 py-3 bg-neo-navy border-3 border-neo-black shadow-hard-lg relative overflow-hidden"
           >
-            <span className="text-2xl">{rarest.icon || '🏆'}</span>
-            <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-black uppercase text-neo-cream/40 tracking-widest block">
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
+            <motion.span
+              className="text-2xl relative z-10"
+              animate={{ rotate: [0, -5, 5, 0] }}
+              transition={{ delay: 1, duration: 0.4 }}
+            >
+              {rarest.icon || '🏆'}
+            </motion.span>
+            <div className="flex-1 min-w-0 relative z-10">
+              <span className="text-[10px] font-black uppercase text-neo-cream/40 tracking-[0.2em] block">
                 {t('results.rarestAchievement')}
               </span>
               <span className="text-sm font-black text-white truncate block">

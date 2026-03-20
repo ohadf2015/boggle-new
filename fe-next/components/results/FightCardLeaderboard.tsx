@@ -112,13 +112,25 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
 
   return (
     <motion.div
-      initial={reducedMotion ? undefined : { opacity: 0, y: 24, x: rank === 1 ? -10 : 0, scale: 0.92 }}
-      animate={{ opacity: opacityDown, y: 0, x: 0, scale: eliminated ? 0.93 : scaleDown }}
+      initial={reducedMotion ? undefined : {
+        opacity: 0,
+        y: 30 + index * 4,
+        x: rank === 1 ? -15 : 0,
+        scale: 0.85,
+        rotate: rank === 1 ? -2 : index % 2 === 0 ? 1 : -1,
+      }}
+      animate={{
+        opacity: opacityDown,
+        y: 0,
+        x: 0,
+        scale: eliminated ? 0.93 : scaleDown,
+        rotate: 0,
+      }}
       transition={{
         type: 'spring',
-        stiffness: 280,
-        damping: 20,
-        delay: reducedMotion ? 0 : 0.12 * index,
+        stiffness: 260,
+        damping: 14,
+        delay: reducedMotion ? 0 : 0.1 * index,
       }}
       className={cn(
         'relative flex items-center gap-2 sm:gap-3 border-3 border-neo-black',
@@ -142,11 +154,14 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
         />
       )}
 
-      {/* Winner: trophy watermark */}
+      {/* Winner: trophy watermark + diagonal energy stripes */}
       {rank === 1 && !eliminated && (
-        <div className="absolute top-0 end-0 p-1.5 sm:p-2 opacity-10 pointer-events-none">
-          <Trophy className="w-8 h-8 sm:w-12 sm:h-12 text-white" />
-        </div>
+        <>
+          <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 14px, #fff 14px, #fff 16px)' }} />
+          <div className="absolute top-0 end-0 p-1.5 sm:p-2 opacity-[0.08] pointer-events-none">
+            <Trophy className="w-10 h-10 sm:w-14 sm:h-14 text-white" />
+          </div>
+        </>
       )}
 
       {/* Emoji speech bubbles */}
@@ -310,11 +325,11 @@ const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
   // Classic / Blast: single ranked list
   return (
     <div className={cn('space-y-1.5 sm:space-y-2', className)}>
-      <div className="flex items-center justify-between px-1 mb-1.5 sm:mb-2">
-        <h2 className="font-black text-[10px] sm:text-xs uppercase tracking-widest text-neo-cream/60">
+      <div className="flex items-center justify-between px-1 mb-2 sm:mb-2.5">
+        <h2 className="font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] text-neo-cream/50">
           {t('results.battleRankings')}
         </h2>
-        <span className="text-[9px] sm:text-[10px] font-bold bg-neo-black px-1.5 sm:px-2 py-0.5 border-2 sm:border-3 border-slate-700 uppercase text-white/60">
+        <span className="text-[9px] sm:text-[10px] font-black bg-neo-black px-2 py-0.5 border-3 border-slate-700 uppercase text-white/50 shadow-hard-sm tracking-wider">
           {participants.length} {t('results.players')}
         </span>
       </div>

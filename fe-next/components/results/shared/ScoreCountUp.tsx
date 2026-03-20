@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface ScoreCountUpProps {
   /** Starting value (default 0) */
@@ -14,6 +14,8 @@ interface ScoreCountUpProps {
   delay?: number;
   /** Additional CSS classes */
   className?: string;
+  /** Enable slam effect when count completes (scale overshoot + glow) */
+  slam?: boolean;
 }
 
 /**
@@ -21,6 +23,7 @@ interface ScoreCountUpProps {
  *
  * Used across all results pages for the hero score reveal.
  * Respects prefers-reduced-motion. Accessible via aria-label.
+ * Optional "slam" effect: bouncy scale overshoot when counter lands.
  */
 export function ScoreCountUp({
   from = 0,
@@ -28,14 +31,18 @@ export function ScoreCountUp({
   duration = 1800,
   delay = 0,
   className = '',
+  slam = false,
 }: ScoreCountUpProps) {
   const [display, setDisplay] = useState(from);
+  const [landed, setLanded] = useState(false);
   const prefersReduced = useReducedMotion();
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
+    setLanded(false);
     if (prefersReduced) {
       setDisplay(to);
+      setLanded(true);
       return;
     }
 
@@ -48,7 +55,11 @@ export function ScoreCountUp({
         // Ease-out-expo: fast start, satisfying deceleration
         const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
         setDisplay(Math.round(from + (to - from) * eased));
-        if (progress < 1) rafRef.current = requestAnimationFrame(tick);
+        if (progress < 1) {
+          rafRef.current = requestAnimationFrame(tick);
+        } else {
+          setLanded(true);
+        }
       };
 
       rafRef.current = requestAnimationFrame(tick);
@@ -60,13 +71,40 @@ export function ScoreCountUp({
     };
   }, [to, from, duration, delay, prefersReduced]);
 
+  if (!slam || prefersReduced) {
+    return (
+      <span
+        className={className}
+        aria-label={`Score: ${to}`}
+        aria-live="polite"
+      >
+        {display.toLocaleString()}
+      </span>
+    );
+  }
+
   return (
-    <span
+    <motion.span
       className={className}
       aria-label={`Score: ${to}`}
       aria-live="polite"
+      animate={landed ? {
+        scale: [1.18, 0.95, 1.04, 1],
+        filter: [
+          'drop-shadow(0 0 0px rgba(191,255,0,0))',
+          'drop-shadow(0 0 24px rgba(191,255,0,0.7))',
+          'drop-shadow(0 0 10px rgba(191,255,0,0.3))',
+          'drop-shadow(0 0 0px rgba(191,255,0,0))',
+        ],
+      } : { scale: 1 }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 12,
+        duration: 0.5,
+      }}
     >
       {display.toLocaleString()}
-    </span>
+    </motion.span>
   );
 }

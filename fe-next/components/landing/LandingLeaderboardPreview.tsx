@@ -83,9 +83,9 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
       <div className="bg-neo-navy-light border-2 border-neo-black shadow-hard rounded-neo p-3">
         <div className="flex items-center justify-center gap-1 mb-2">
           <Trophy className="w-4 h-4 text-neo-yellow" />
-          <h3 className="font-black text-neo-white uppercase text-xs">
+          <h2 className="font-black text-neo-white uppercase text-xs">
             {t('landing.todaysTopPlayers')}
-          </h3>
+          </h2>
         </div>
         <div className="flex justify-center gap-3">
           {displayPlayers.map((player, i) => (
@@ -148,9 +148,9 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
     <div className="bg-neo-navy-light border-3 border-neo-black shadow-hard-lg rounded-neo-lg p-4 sm:p-5">
       <div className="flex items-center gap-2 mb-3">
         <Trophy className="w-5 h-5 text-neo-yellow" />
-        <h3 className="font-black text-neo-white uppercase text-sm sm:text-base neo-title-sm">
+        <h2 className="font-black text-neo-white uppercase text-sm sm:text-base neo-title-sm">
           {t('landing.todaysTopPlayers')}
-        </h3>
+        </h2>
       </div>
 
       <div className="space-y-1">

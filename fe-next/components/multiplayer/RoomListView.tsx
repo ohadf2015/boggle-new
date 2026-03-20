@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Zap, ChevronRight, Ghost, RefreshCw, HelpCircle, Users, Sword, Bomb, Search } from 'lucide-react';
+import { ArrowLeft, Zap, Ghost, RefreshCw, HelpCircle, Sword, Bomb, Search, ChevronRight, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -69,10 +69,47 @@ const emptyStateVariants = {
 
 // ==================== Mode Config ====================
 
-const MODE_CONFIG: Record<string, { icon: typeof Sword; label: string; borderColor: string; bgColor: string }> = {
-  classic: { icon: Sword, label: 'Classic', borderColor: 'border-neo-cyan/60', bgColor: 'bg-neo-cyan/10' },
-  blast: { icon: Bomb, label: 'Blast', borderColor: 'border-neo-pink/60', bgColor: 'bg-neo-pink/10' },
-  'word-hunt': { icon: Search, label: 'Word Hunt', borderColor: 'border-neo-purple/60', bgColor: 'bg-neo-purple/10' },
+const MODE_CONFIG: Record<string, {
+  icon: typeof Sword;
+  label: string;
+  borderColor: string;
+  iconBg: string;
+  iconColor: string;
+  textColor: string;
+}> = {
+  classic: {
+    icon: Sword,
+    label: 'Classic',
+    borderColor: 'border-s-neo-cyan',
+    iconBg: 'bg-neo-cyan',
+    iconColor: 'text-neo-black',
+    textColor: 'text-neo-cyan',
+  },
+  blast: {
+    icon: Bomb,
+    label: 'Blast',
+    borderColor: 'border-s-neo-pink',
+    iconBg: 'bg-neo-pink',
+    iconColor: 'text-neo-black',
+    textColor: 'text-neo-pink',
+  },
+  'word-hunt': {
+    icon: Search,
+    label: 'Word Hunt',
+    borderColor: 'border-s-neo-purple',
+    iconBg: 'bg-neo-purple',
+    iconColor: 'text-neo-black',
+    textColor: 'text-neo-purple',
+  },
+};
+
+const DEFAULT_MODE_CONFIG = {
+  icon: Sword,
+  label: 'Classic',
+  borderColor: 'border-s-neo-cyan',
+  iconBg: 'bg-neo-cyan',
+  iconColor: 'text-neo-black',
+  textColor: 'text-neo-cyan',
 };
 
 // ==================== Types ====================
@@ -89,10 +126,6 @@ interface RoomListViewProps {
 
 // ==================== Component ====================
 
-/**
- * RoomListView - Social Hub multiplayer landing
- * Single Quick Play CTA and active battles list with juicy animations
- */
 const RoomListView: React.FC<RoomListViewProps> = ({
   activeRooms,
   roomsLoading,
@@ -124,6 +157,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   });
 
   const totalPlayers = activeRooms.reduce((sum, room) => sum + (room.playerCount || 0), 0);
+  const liveMatchCount = activeRooms.filter((r) => r.gameState === 'in-progress').length;
   const hasRooms = activeRooms.length > 0;
 
   return (
@@ -141,30 +175,33 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           threshold={60}
         />
 
-        {/* Header */}
+        {/* Header — Arena Hub style */}
         <motion.header
           variants={headerVariants}
           initial="hidden"
           animate="visible"
-          className="flex items-center justify-between py-3 px-4 lg:px-6 flex-shrink-0"
+          className="flex items-center justify-between py-4 px-4 lg:px-6 flex-shrink-0 border-b-4 border-neo-black bg-neo-navy-light"
         >
           <Link
             href="/"
             aria-label={t('common.back')}
-            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-3 border-neo-black bg-neo-navy-light shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
           >
             <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
           </Link>
 
-          <h1 className="font-neo-display text-lg font-black uppercase text-neo-white tracking-tight"
-            style={{ textShadow: '3px 3px 0px rgba(0,0,0,0.8)' }}
-          >
-            {t('multiplayerFlow.roomList.socialHub')}
-          </h1>
+          <div className="text-center">
+            <h1
+              className="font-neo-display text-xl font-black uppercase text-neo-white tracking-tighter italic"
+              style={{ textShadow: '3px 3px 0px rgba(0,0,0,0.8)' }}
+            >
+              {t('multiplayerFlow.roomList.arenaHub')}
+            </h1>
+          </div>
 
           <button
             onClick={() => setShowHowToPlay(true)}
-            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-3 border-neo-black bg-neo-navy-light shadow-hard-sm hover:bg-white/10 active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:bg-white/10 active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
             aria-label={t('landing.tutorial')}
           >
             <HelpCircle className="w-5 h-5 text-neo-white" />
@@ -172,42 +209,60 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         </motion.header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 flex flex-col xl:flex-row px-4 lg:px-6 gap-6 xl:gap-8 overflow-y-auto pb-10 safe-area-bottom xl:items-start xl:justify-center">
+        <div className="flex-1 flex flex-col px-5 lg:px-6 gap-5 overflow-y-auto pb-10 safe-area-bottom pt-5">
 
-          {/* Quick Play CTA */}
+          {/* Live Match Status Bar */}
+          {liveMatchCount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-neo-pink/10 border-2 border-neo-pink rounded-xl p-3 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-neo-pink animate-pulse" />
+                <span className="text-[10px] font-black text-neo-pink uppercase">
+                  {liveMatchCount} {t('multiplayerFlow.roomList.liveMatches')}
+                </span>
+              </div>
+              <Eye className="w-4 h-4 text-neo-pink" />
+            </motion.div>
+          )}
+
+          {/* Quick Start CTA — Large lime card */}
           {onQuickPlay && (
             <motion.section
               variants={quickPlayVariants}
               initial="hidden"
               animate="visible"
-              className="flex flex-col items-center xl:sticky xl:top-4 xl:w-[320px] xl:flex-shrink-0 xl:pt-4"
+              className="flex flex-col items-center"
             >
               <motion.button
                 onClick={onQuickPlay}
                 disabled={isQuickPlayLoading}
-                className="w-full max-w-md py-6 flex flex-col items-center justify-center gap-1 bg-neo-lime border-4 border-neo-black rounded-2xl shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                className="w-full py-8 flex flex-col items-center justify-center gap-2 bg-neo-lime border-4 border-neo-black rounded-2xl shadow-hard-lg active:translate-y-1 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
                 whileTap={{ scale: 0.97 }}
-                animate={!isQuickPlayLoading ? { boxShadow: ['6px 6px 0px #000', '6px 6px 20px rgba(191,255,0,0.4), 6px 6px 0px #000', '6px 6px 0px #000'] } : {}}
+                animate={!isQuickPlayLoading ? {
+                  boxShadow: [
+                    '0 0 20px rgba(191,255,0,0.4), 8px 8px 0px #000',
+                    '0 0 50px rgba(191,255,0,0.7), 8px 8px 0px #000',
+                    '0 0 20px rgba(191,255,0,0.4), 8px 8px 0px #000',
+                  ],
+                } : {}}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' as const }}
               >
-                <div className="flex items-center gap-2">
-                  {isQuickPlayLoading ? (
-                    <Loader size="sm" />
-                  ) : (
-                    <motion.div
-                      animate={{ rotate: [0, -10, 10, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 3 }}
-                    >
-                      <Zap className="w-8 h-8 text-neo-black" />
-                    </motion.div>
-                  )}
-                  <span className="text-neo-black font-black text-2xl uppercase tracking-tight">
-                    {t('multiplayerFlow.roomList.quickPlay')}
-                  </span>
-                </div>
-                <span className="text-neo-black/60 font-bold text-[10px] uppercase tracking-widest">
-                  {t('multiplayerFlow.roomList.hostAndPlay')}
+                {isQuickPlayLoading ? (
+                  <Loader size="sm" />
+                ) : (
+                  <motion.div
+                    animate={{ rotate: [0, -10, 10, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 3 }}
+                  >
+                    <Zap className="w-10 h-10 text-neo-black" />
+                  </motion.div>
+                )}
+                <span className="text-neo-black font-black text-3xl uppercase tracking-tight">
+                  {t('multiplayerFlow.roomList.quickStart')}
                 </span>
               </motion.button>
 
@@ -215,28 +270,27 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 onClick={onCreateRoom}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="mt-4 text-slate-300 hover:text-neo-pink font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime rounded-full px-4 py-2 border border-white/20 hover:border-neo-pink/50 bg-white/5 hover:bg-white/10"
+                className="mt-4 text-neo-pink hover:text-neo-pink/80 font-black text-xs uppercase tracking-[0.15em] transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime rounded-full px-4 py-2"
               >
-                {t('multiplayerFlow.roomList.orCreateCustom')}
-                <ChevronRight className="w-3 h-3" />
+                {t('multiplayerFlow.roomList.createPrivateBattle')}
               </motion.button>
             </motion.section>
           )}
 
-          {/* Active Battles Section */}
+          {/* Open Arenas Section */}
           <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
-            className="flex flex-col gap-3 xl:flex-1 xl:min-w-0 xl:max-w-xl"
+            className="flex flex-col gap-3"
             aria-busy={roomsLoading}
           >
-            <div className="flex items-center justify-between">
-              <h2 className="font-neo-display font-black uppercase text-xs tracking-widest text-white/70">
-                {t('multiplayerFlow.roomList.activeBattles')}
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+                {t('multiplayerFlow.roomList.openArenas')}
                 {totalPlayers > 0 && (
                   <span className="text-neo-cyan ms-2">
-                    ({totalPlayers} {t('multiplayerFlow.roomList.online')})
+                    {totalPlayers} {t('multiplayerFlow.roomList.online')}
                   </span>
                 )}
               </h2>
@@ -263,7 +317,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               </div>
             ) : hasRooms ? (
               <motion.div
-                className="flex flex-col gap-2"
+                className="flex flex-col gap-3"
                 role="list"
                 aria-label={t('multiplayerFlow.roomList.roomsListLabel')}
                 variants={roomListVariants}
@@ -271,110 +325,102 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 animate="visible"
               >
                 <AnimatePresence mode="popLayout">
-                  {activeRooms.map((room) => (
-                    <motion.button
-                      key={room.gameCode}
-                      role="listitem"
-                      aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: room.roomName || room.gameCode })}
-                      variants={roomCardVariants}
-                      exit="exit"
-                      layout
-                      onClick={() => onRoomClick(room)}
-                      onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          onRoomClick(room);
-                        } else if (e.key === 'ArrowDown') {
-                          e.preventDefault();
-                          const next = (e.currentTarget.nextElementSibling as HTMLElement);
-                          next?.focus();
-                        } else if (e.key === 'ArrowUp') {
-                          e.preventDefault();
-                          const prev = (e.currentTarget.previousElementSibling as HTMLElement);
-                          prev?.focus();
-                        }
-                      }}
-                      whileHover={{
-                        scale: 1.02,
-                        y: -2,
-                        transition: { type: 'spring' as const, stiffness: 400, damping: 20 },
-                      }}
-                      whileTap={{ scale: 0.97 }}
-                      className={`flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-[background-color,border-color] text-start group relative overflow-hidden ${
-                        room.gameMode ? `border-s-4 ${MODE_CONFIG[room.gameMode]?.borderColor || ''}` : ''
-                      }`}
-                    >
-                      {/* Subtle hover shimmer */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  {activeRooms.map((room) => {
+                    const mode = MODE_CONFIG[room.gameMode || ''] || DEFAULT_MODE_CONFIG;
+                    const ModeIcon = mode.icon;
 
-                      {/* Language flag + mode icon stack */}
-                      <div className="flex flex-col items-center gap-1 relative flex-shrink-0">
-                        <span className="text-xl">
-                          {LANGUAGE_FLAGS[room.language] || '🎮'}
-                        </span>
-                        {room.gameMode && MODE_CONFIG[room.gameMode] && (() => {
-                          const ModeIcon = MODE_CONFIG[room.gameMode!].icon;
-                          return (
-                            <span className={`flex items-center justify-center w-5 h-5 rounded-sm ${MODE_CONFIG[room.gameMode!].bgColor} border border-white/10`}>
-                              <ModeIcon className="w-3 h-3 text-white/70" />
-                            </span>
-                          );
-                        })()}
-                      </div>
-
-                      <div className="flex-1 min-w-0 relative">
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-sm text-neo-white truncate">
-                            {room.roomName || room.gameCode}
-                          </p>
-                          {room.gameState === 'in-progress' && (
-                            <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neo-orange bg-neo-orange/15 border border-neo-orange/40 rounded-sm animate-pulse-subtle">
-                              {t('multiplayerFlow.roomList.inProgress')}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          {/* Player avatar stack */}
-                          {room.playerAvatars && room.playerAvatars.length > 0 ? (
-                            <div className="flex items-center -space-x-1.5 rtl:space-x-reverse">
-                              {room.playerAvatars.slice(0, 4).map((av, i) => (
-                                <div
-                                  key={i}
-                                  className="w-5 h-5 rounded-full border border-neo-black/50 bg-neo-navy-light flex items-center justify-center text-[10px] overflow-hidden"
-                                  style={av.color ? { backgroundColor: av.color } : undefined}
-                                >
-                                  {av.emoji || '👤'}
-                                </div>
-                              ))}
-                              {(room.playerCount || 0) > 4 && (
-                                <span className="w-5 h-5 rounded-full border border-neo-black/50 bg-neo-navy-light flex items-center justify-center text-[8px] font-bold text-white/60">
-                                  +{(room.playerCount || 0) - 4}
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <Users className="w-3 h-3 text-slate-500" />
-                          )}
-                          <p className="text-xs text-slate-400">
-                            {room.playerCount || 0} {t('joinView.players')}
-                          </p>
-                        </div>
-                      </div>
-                      <motion.span
-                        className="px-3 py-1.5 text-xs font-bold text-neo-black bg-neo-cyan rounded-neo border-2 border-neo-black shadow-hard-sm transition-all relative"
-                        whileHover={{
-                          y: -2,
-                          boxShadow: '4px 4px 0px #000',
+                    return (
+                      <motion.button
+                        key={room.gameCode}
+                        role="listitem"
+                        aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: room.roomName || room.gameCode })}
+                        variants={roomCardVariants}
+                        exit="exit"
+                        layout
+                        onClick={() => onRoomClick(room)}
+                        onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onRoomClick(room);
+                          } else if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            (e.currentTarget.nextElementSibling as HTMLElement)?.focus();
+                          } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            (e.currentTarget.previousElementSibling as HTMLElement)?.focus();
+                          }
                         }}
+                        whileHover={{
+                          scale: 1.01,
+                          y: -2,
+                          transition: { type: 'spring' as const, stiffness: 400, damping: 20 },
+                        }}
+                        whileTap={{ scale: 0.98 }}
+                        className={`flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 ${mode.borderColor} bg-neo-navy-light/40 hover:bg-neo-navy-light transition-colors text-start group relative overflow-hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime cursor-pointer`}
                       >
-                        {t('common.join')}
-                      </motion.span>
-                    </motion.button>
-                  ))}
+                        {/* Mode icon box */}
+                        <div className={`w-10 h-10 ${mode.iconBg} border-2 border-neo-black rounded-lg flex items-center justify-center flex-shrink-0 shadow-hard-sm`}>
+                          <ModeIcon className={`w-5 h-5 ${mode.iconColor}`} />
+                        </div>
+
+                        {/* Player avatar stack */}
+                        {room.playerAvatars && room.playerAvatars.length > 0 && (
+                          <div className="flex -space-x-3 rtl:space-x-reverse flex-shrink-0">
+                            {room.playerAvatars.slice(0, 4).map((av, i) => (
+                              <div
+                                key={i}
+                                className="w-6 h-6 rounded-full border-2 border-neo-black flex items-center justify-center text-[8px] overflow-hidden"
+                                style={{ backgroundColor: av.color || '#1a1a2e' }}
+                              >
+                                {av.emoji || '👤'}
+                              </div>
+                            ))}
+                            {(room.playerCount || 0) > 4 && (
+                              <div className="w-6 h-6 rounded-full border-2 border-neo-black bg-neo-navy flex items-center justify-center text-[6px] font-black text-white">
+                                +{(room.playerCount || 0) - 4}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Room info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <h4 className="font-neo-display font-black text-neo-white text-sm uppercase truncate leading-none">
+                              {room.roomName || room.gameCode}
+                            </h4>
+                            {room.gameState === 'in-progress' && (
+                              <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse flex-shrink-0" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[7px] font-bold text-white/40 uppercase">
+                              {LANGUAGE_FLAGS[room.language] || '🎮'} {mode.label}
+                            </span>
+                            <span className="w-1 h-1 rounded-full bg-white/20" />
+                            <span className="text-[7px] font-bold text-white/40 uppercase">
+                              {room.playerCount || 0} {t('joinView.players')}
+                            </span>
+                            {room.gameState === 'in-progress' && (
+                              <>
+                                <span className="w-1 h-1 rounded-full bg-white/20" />
+                                <span className={`text-[7px] font-bold ${mode.textColor} uppercase italic`}>
+                                  {t('multiplayerFlow.roomList.inProgress')}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Chevron */}
+                        <ChevronRight className="w-4 h-4 text-white/20 flex-shrink-0 rtl:rotate-180" />
+                      </motion.button>
+                    );
+                  })}
                 </AnimatePresence>
               </motion.div>
             ) : (
-              /* Empty State: Animated ghost + nudge toward Quick Play */
+              /* Empty State */
               <motion.div
                 variants={emptyStateVariants}
                 initial="hidden"

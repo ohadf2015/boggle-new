@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
         .single(),
     ]);
 
-    const { data: existingProgression, error: progressionError } = progressionResult;
+    let { data: existingProgression, error: progressionError } = progressionResult;
     const { data: existingCompletion } = completionResult;
 
     // If no progression, create it
@@ -183,6 +183,8 @@ export async function POST(request: NextRequest) {
         current_level: 1,
         total_stars: 0,
       });
+      // Set defaults so downstream code works
+      existingProgression = { xp: 0, total_stars: 0, current_world: 1, current_level: 1, player_level: 1, upgrades: {} } as typeof existingProgression;
     } else if (progressionError) {
       console.error('[ADVENTURE COMPLETE API] Progression fetch error:', progressionError);
       return NextResponse.json({ error: 'Failed to fetch progression' }, { status: 500 });

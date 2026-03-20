@@ -1,9 +1,12 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Users, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
+import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
+import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 
 interface DailyChallengePreloadedStats {
   hasPlayed: boolean;
@@ -43,6 +46,11 @@ export function LandingChallengeCards({
   dailyChallengeStats,
   solveRate,
 }: LandingChallengeCardsProps) {
+  const [isFirstTimer, setIsFirstTimer] = useState(false);
+  useEffect(() => {
+    setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding());
+  }, []);
+
   return (
     <div className="w-full max-w-4xl mx-auto xl:max-w-5xl">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-stretch">
@@ -55,6 +63,8 @@ export function LandingChallengeCards({
             icon={<User className="w-6 h-6" />}
             variant="cyan"
             personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
+            highlighted={isFirstTimer}
+            highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
           />
         </motion.div>
 
@@ -94,7 +104,7 @@ export function LandingChallengeCards({
 
         {/* Blast Mode (admin only) */}
         {(isAdmin || hasBlastAccess) && (
-          <motion.div initial={cardInitial} whileInView={cardVisible} viewport={cardViewport} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.28 }} className="w-full h-full max-w-md mx-auto xl:max-w-none">
+          <motion.div initial={cardInitial} whileInView={cardVisible} viewport={cardViewport} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.28 }} className="w-full h-full">
             <ModeCard
               title={t('landing.blastMode')}
               description={t('landing.blastModeDesc')}

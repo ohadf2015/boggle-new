@@ -61,16 +61,35 @@ const AnimatedScore: React.FC<{ target: number; className?: string; delay?: numb
   const motionVal = useMotionValue(0);
   const rounded = useTransform(motionVal, (v) => Math.round(v));
   const [display, setDisplay] = useState(0);
+  const [landed, setLanded] = useState(false);
 
   useEffect(() => {
+    setLanded(false);
     const controls = animate(motionVal, target, {
       type: 'spring', stiffness: 60, damping: 18, mass: 0.8, delay,
+      onComplete: () => setLanded(true),
     });
     const unsub = rounded.on('change', (v) => setDisplay(v));
     return () => { controls.stop(); unsub(); };
   }, [target, motionVal, rounded, delay]);
 
-  return <span className={className}>{display.toLocaleString()}</span>;
+  return (
+    <motion.span
+      className={className}
+      animate={landed ? {
+        scale: [1.18, 0.95, 1.04, 1],
+        filter: [
+          'drop-shadow(0 0 0px rgba(191,255,0,0))',
+          'drop-shadow(0 0 24px rgba(191,255,0,0.7))',
+          'drop-shadow(0 0 10px rgba(191,255,0,0.3))',
+          'drop-shadow(0 0 0px rgba(191,255,0,0))',
+        ],
+      } : undefined}
+      transition={{ type: 'spring', stiffness: 300, damping: 12 }}
+    >
+      {display.toLocaleString()}
+    </motion.span>
+  );
 };
 
 // ============================================================
@@ -110,7 +129,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
       className="w-full"
     >
       <div
-        className="relative overflow-hidden bg-slate-800/40 border-3 border-neo-cream shadow-hard-lg cursor-pointer"
+        className="relative overflow-hidden bg-slate-800/50 border-3 border-neo-cream shadow-hard-xl cursor-pointer"
         onClick={() => rank <= 3 && !reducedMotion && fireRankConfetti(rank)}
       >
         {/* Animated accent border glow for top 3 */}
@@ -253,10 +272,11 @@ const PlacementHero = memo<PlacementHeroProps>(({
 
           {/* Score box — responsive padding, hover lift */}
           <motion.div
-            initial={reducedMotion ? undefined : { opacity: 0, scale: 0.7, rotate: -3, y: 15 }}
+            initial={reducedMotion ? undefined : { opacity: 0, scale: 0.5, rotate: -5, y: 25 }}
             animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
-            whileHover={{ scale: 1.05, rotate: 1, transition: { duration: 0.15 } }}
-            transition={{ delay: 0.35, type: 'spring', stiffness: 250, damping: 14 }}
+            whileHover={{ scale: 1.06, rotate: 1.5, transition: { type: 'spring', stiffness: 400, damping: 12 } }}
+            whileTap={{ scale: 0.95, rotate: -1 }}
+            transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 10 }}
             className="bg-neo-black border-3 border-neo-cream px-5 py-2.5 sm:px-8 sm:py-3 shadow-hard-lg flex flex-col items-center relative overflow-hidden"
           >
             {/* Score shimmer sweep */}
@@ -271,13 +291,13 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 transition={{ duration: 1.5, delay: 2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 4 }}
               />
             )}
-            <span className="text-[10px] sm:text-[12px] font-black uppercase text-neo-cream/50 tracking-widest relative z-10">
+            <span className="text-[10px] sm:text-[11px] font-black uppercase text-neo-cream/40 tracking-[0.25em] relative z-10">
               {t('results.finalScore')}
             </span>
             <span style={{ color: theme.accentColor }} className="relative z-10">
               <AnimatedScore
                 target={score}
-                className="font-neo-display text-4xl xs:text-5xl sm:text-6xl tabular-nums leading-none"
+                className="font-neo-display text-4xl xs:text-5xl sm:text-6xl tabular-nums leading-none drop-shadow-[0_0_12px_currentColor]"
                 delay={0.5}
               />
             </span>

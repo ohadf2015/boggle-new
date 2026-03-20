@@ -95,14 +95,15 @@ const MissedWords = memo<MissedWordsProps>(({
         )}
       >
         {/* Header - clearer messaging about missed words */}
-        <div className="flex items-center justify-between gap-2 px-3 py-2 bg-neo-navy-light border-b-3 border-neo-black">
-          <div className={cn("flex items-center gap-2", dir === 'rtl' && 'flex-row-reverse')}>
+        <div className="flex items-center justify-between gap-2 px-3 py-2.5 bg-neo-navy-light border-b-3 border-neo-black relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
+          <div className={cn("flex items-center gap-2 relative z-10", dir === 'rtl' && 'flex-row-reverse')}>
             <EyeOff className="w-4 h-4 text-neo-lime" />
-            <span className="font-bold text-xs uppercase text-white">
+            <span className="font-black text-xs uppercase text-white tracking-wider">
               {t('results.missedOnBoard')}
             </span>
           </div>
-          <span className="text-xs font-black bg-neo-lime px-2 py-0.5 rounded-full text-neo-black">
+          <span className="text-[10px] font-black bg-neo-lime px-2.5 py-0.5 border-2 border-neo-black shadow-hard-sm text-neo-black relative z-10">
             +{showAll ? allTotalPoints : totalPoints} {t('results.points')}
           </span>
         </div>
@@ -118,10 +119,12 @@ const MissedWords = memo<MissedWordsProps>(({
                 <motion.button
                   key={wordData.word}
                   layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 26, delay: index * 0.03 }}
+                  initial={{ opacity: 0, scale: 0.7, y: 8, rotate: index % 2 === 0 ? -6 : 6 }}
+                  animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: -4 }}
+                  whileHover={{ scale: 1.08, y: -2, rotate: index % 2 === 0 ? 2 : -2 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 12, delay: index * 0.04 }}
                   onClick={() => hasPath && handleWordClick(wordData)}
                   disabled={!hasPath}
                   className={cn(

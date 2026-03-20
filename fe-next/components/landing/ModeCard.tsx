@@ -194,14 +194,13 @@ const ModeCard: React.FC<ModeCardProps> = ({
       {badge && !locked && (
         <div
           className={cn(
-            'absolute top-2 right-2 z-10',
+            'absolute top-2 end-2 z-10',
             'px-2 py-0.5 sm:px-2.5 sm:py-1',
             'bg-neo-navy text-neo-white',
             'font-black uppercase tracking-wider',
             'text-[10px] sm:text-xs',
             'border-2 border-neo-black rounded-neo shadow-hard-sm',
-            'transform rotate-3',
-            isRTL && 'right-auto left-2 -rotate-3'
+            isRTL ? 'transform -rotate-3' : 'transform rotate-3'
           )}
         >
           {badge}
@@ -410,11 +409,11 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
           {/* Decorative corner accent */}
           <motion.div
-            className="absolute top-0 right-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
+            className="absolute top-0 end-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
             initial={false}
           >
             <motion.div
-              className="absolute -top-8 -right-8 w-16 h-16 bg-white/10 rotate-45"
+              className="absolute -top-8 -end-8 w-16 h-16 bg-white/10 rotate-45"
               animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
               transition={{ duration: 0.3 }}
             />

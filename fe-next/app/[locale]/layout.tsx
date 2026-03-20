@@ -658,6 +658,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta charSet="utf-8" />
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
+                <link rel="preconnect" href="https://www.lexiclash.live" />
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 {/* GIF preload removed — 571KB blocks critical resources (Lighthouse: LCP 24s → should drop significantly) */}

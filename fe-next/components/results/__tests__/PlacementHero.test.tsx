@@ -16,6 +16,9 @@ jest.mock('framer-motion', () => {
       p: (() => { const MotionP = React.forwardRef(({ children, className }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLParagraphElement>) => (
         <p ref={ref} className={className}>{children}</p>
       )); MotionP.displayName = 'motion.p'; return MotionP; })(),
+      span: (() => { const MotionSpan = React.forwardRef(({ children, className, 'aria-label': ariaLabel }: React.PropsWithChildren<{ className?: string; 'aria-label'?: string }>, ref: React.Ref<HTMLSpanElement>) => (
+        <span ref={ref} className={className} aria-label={ariaLabel}>{children}</span>
+      )); MotionSpan.displayName = 'motion.span'; return MotionSpan; })(),
     },
     useMotionValue: (initial: number) => ({
       get: () => initial,

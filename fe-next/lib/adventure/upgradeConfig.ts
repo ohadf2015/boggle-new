@@ -231,7 +231,7 @@ export function getUpgradesByCategory(category: UpgradeCategory): UpgradeDefinit
 
 /** Get current tier level for an upgrade (0 = not purchased) */
 export function getUpgradeTier(state: UpgradeState, upgradeId: string): number {
-  return state[upgradeId] ?? 0;
+  return state?.[upgradeId] ?? 0;
 }
 
 /** Get cost to purchase next tier (null if maxed) */

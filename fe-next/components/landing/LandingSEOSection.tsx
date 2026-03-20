@@ -124,9 +124,9 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
           className="shrink-0"
         >
           {open ? (
-            <Minus className="w-4 h-4 text-neo-white/40" />
+            <Minus className="w-4 h-4 text-neo-white/60" />
           ) : (
-            <Plus className="w-4 h-4 text-neo-white/40" />
+            <Plus className="w-4 h-4 text-neo-white/60" />
           )}
         </motion.span>
       </button>
@@ -235,10 +235,10 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
               <div className="p-2.5 bg-neo-lime/10 rounded-neo border border-neo-lime/20">
                 <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-neo-lime" aria-hidden="true" />
               </div>
-              <h3 className="font-black text-neo-white text-xs sm:text-sm uppercase leading-tight">
+              <p className="font-black text-neo-white text-xs sm:text-sm uppercase leading-tight">
                 {t(titleKey) || fallbackTitle}
-              </h3>
-              <span className="text-[10px] sm:text-xs font-medium text-neo-white/40 uppercase tracking-wider">
+              </p>
+              <span className="text-[10px] sm:text-xs font-medium text-neo-white/60 uppercase tracking-wider">
                 {t(tagKey) || fallbackTag}
               </span>
             </motion.div>
@@ -323,7 +323,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 'text-neo-white/70 font-bold text-xs sm:text-sm'
               )}
             >
-              <Icon className="w-4 h-4 shrink-0 text-neo-white/40" aria-hidden="true" />
+              <Icon className="w-4 h-4 shrink-0 text-neo-white/60" aria-hidden="true" />
               {t(key) || fallback}
             </motion.div>
           ))}
@@ -373,7 +373,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
             href={`/${language}/blog`}
             className={cn(
               'text-xs sm:text-sm font-bold',
-              'text-neo-white/40 hover:text-neo-white transition-colors',
+              'text-neo-white/60 hover:text-neo-white transition-colors',
               'underline underline-offset-2'
             )}
           >

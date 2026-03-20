@@ -232,23 +232,34 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           scale: { type: 'spring', stiffness: 300, damping: 20 },
         }}
         className={cn(
-          'flex items-center gap-3 p-2.5 rounded-neo border-2 border-neo-black transition-colors duration-300',
-          isTop3 ? rankStyle.bg : 'bg-neo-cream',
-          isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-1',
+          'flex items-center gap-3 p-2.5 rounded-neo border-3 border-neo-black transition-colors duration-300 relative overflow-hidden',
+          isTop3
+            ? position === 0
+              ? 'bg-gradient-to-r from-neo-lime/20 via-neo-lime/10 to-neo-lime/20 border-neo-lime'
+              : position === 1
+                ? 'bg-gradient-to-r from-slate-400/15 via-slate-300/10 to-slate-400/15 border-slate-400'
+                : 'bg-gradient-to-r from-neo-orange/15 via-neo-orange/10 to-neo-orange/15 border-neo-orange'
+            : 'bg-slate-800/60 border-slate-700',
+          isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-1 ring-offset-neo-navy',
           'shadow-hard-sm',
           // Flash highlight when position just swapped
-          lastPositionSwap && sortedByDisplayed[position]?.username === player.username && 'bg-neo-lime/30'
+          lastPositionSwap && sortedByDisplayed[position]?.username === player.username && 'border-neo-lime shadow-[0_0_16px_rgba(191,255,0,0.25)]'
         )}
       >
+        {/* Halftone texture overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:8px_8px]" />
+
         {/* Rank badge */}
         <div className={cn(
-          'w-8 h-8 rounded-full flex items-center justify-center border-2 border-neo-black',
-          isTop3 ? 'bg-neo-cream' : 'bg-neo-cream/80'
+          'w-8 h-8 flex items-center justify-center border-3 border-neo-black font-neo-display shrink-0',
+          isTop3
+            ? position === 0 ? 'bg-neo-lime text-neo-black' : position === 1 ? 'bg-slate-300 text-slate-800' : 'bg-neo-orange text-neo-black'
+            : 'bg-neo-black text-white/60'
         )}>
           {isTop3 ? (
-            <RankIcon className={cn('w-4 h-4', rankStyle.text)} />
+            <RankIcon className="w-4 h-4" />
           ) : (
-            <span className="text-sm font-black text-slate-600">{position + 1}</span>
+            <span className="text-sm font-black">{position + 1}</span>
           )}
         </div>
 
@@ -258,14 +269,14 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           avatarImage={player.avatar?.avatarImage}
           customAvatar={player.avatar?.customAvatar}
           size="sm"
-          className="border-2 border-neo-black"
+          className="border-2 border-neo-black shrink-0"
         />
 
         {/* Name */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 relative z-10">
           <p className={cn(
-            'font-bold truncate',
-            isTop3 ? rankStyle.text : 'text-neo-black'
+            'font-neo-display uppercase truncate text-sm',
+            isTop3 ? 'text-white' : 'text-white/70'
           )}>
             {player.username}
             {isCurrentPlayer && <span className="text-neo-cyan ms-1">*</span>}
@@ -279,11 +290,13 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className={cn(
-            'px-3 py-1 rounded-neo border-2 border-neo-black font-black text-lg',
-            isTop3 ? 'bg-neo-cream text-neo-black' : 'bg-neo-cream/80 text-neo-black'
+            'px-3 py-1 border-3 border-neo-black font-black text-lg tabular-nums relative z-10',
+            isTop3
+              ? position === 0 ? 'bg-neo-black text-neo-lime' : position === 1 ? 'bg-neo-black text-slate-300' : 'bg-neo-black text-neo-orange'
+              : 'bg-neo-black/60 text-white/60'
           )}
         >
-          {score}
+          {score.toLocaleString()}
         </motion.div>
 
         {/* Position change indicator */}
@@ -312,12 +325,12 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         <motion.div
           initial={{ opacity: 0, scaleX: 0.8 }}
           animate={{ opacity: 1, scaleX: 1 }}
-          className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-3 border border-white/5"
+          className="h-2 bg-neo-black border-3 border-slate-700 overflow-hidden mb-3 shadow-hard-sm"
         >
           <motion.div
             className="h-full bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime"
             style={{
-              boxShadow: '0 0 16px var(--neo-lime, #BFFF00), 0 0 6px var(--neo-lime, #BFFF00)',
+              boxShadow: '0 0 12px var(--neo-lime, #BFFF00)',
               backgroundSize: '200% 100%',
             }}
             initial={{ width: '0%' }}
@@ -343,8 +356,8 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           exit={{ opacity: 0, x: 40 }}
           className="flex justify-end"
         >
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-neo border-2 border-neo-pink bg-neo-pink/20 text-xs font-bold text-neo-pink uppercase tracking-wide shadow-hard-sm">
-            <Zap className="w-3 h-3" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 border-3 border-neo-black bg-neo-pink shadow-hard-sm text-xs font-black text-neo-black uppercase tracking-widest">
+            <Zap className="w-3.5 h-3.5" />
             {t('results.positionSwap')}
           </div>
         </motion.div>
@@ -356,7 +369,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           onClick={handleSkip}
-          className="flex items-center justify-center gap-1.5 mx-auto mt-1 px-3 py-1.5 rounded-neo border-2 border-white/20 bg-white/5 hover:bg-white/10 text-[10px] font-bold text-neo-cream/60 uppercase tracking-wide transition-colors"
+          className="flex items-center justify-center gap-1.5 mx-auto mt-1 px-3 py-1.5 border-3 border-slate-700 bg-neo-black hover:bg-slate-800 text-[10px] font-black text-neo-cream/50 uppercase tracking-widest shadow-hard-sm hover:text-neo-cream/80 transition-colors"
         >
           <SkipForward className="w-3 h-3" />
           {t('results.skipReveal')}

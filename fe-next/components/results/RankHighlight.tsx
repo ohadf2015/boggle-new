@@ -81,9 +81,11 @@ export function RankHighlight({ rank, totalPlayers, gapToWinner, winnerUsername 
       <motion.div
         animate={!reducedMotion && rank <= 3 ? { rotate: [0, -3, 3, -2, 2, 0] } : undefined}
         transition={{ delay: 1.2, duration: 0.5, ease: 'easeInOut' }}
-        className={`relative inline-flex items-center gap-2.5 px-5 py-2.5 ${config.bg} rounded-neo border-3 ${config.border} shadow-hard overflow-hidden`}
-        style={rank <= 3 ? { boxShadow: `0 0 16px ${config.glowColor}, 4px 4px 0px black` } : undefined}
+        className={`relative inline-flex items-center gap-2.5 px-6 py-3 ${config.bg} border-3 ${config.border} shadow-hard-lg overflow-hidden`}
+        style={rank <= 3 ? { boxShadow: `0 0 20px ${config.glowColor}, 4px 4px 0px black` } : undefined}
       >
+        {/* Halftone texture */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,#000_1px,transparent_1px)] bg-[length:6px_6px]" />
         {/* Shimmer sweep for podium finishers */}
         {!reducedMotion && rank <= 3 && (
           <motion.div
@@ -102,7 +104,7 @@ export function RankHighlight({ rank, totalPlayers, gapToWinner, winnerUsername 
         >
           <Icon className={`w-5 h-5 ${config.text}`} />
         </motion.div>
-        <span className={`font-black text-lg ${config.text} uppercase`}>
+        <span className={`font-black text-lg ${config.text} uppercase tracking-wider`}>
           {t(config.messageKey)}
         </span>
       </motion.div>

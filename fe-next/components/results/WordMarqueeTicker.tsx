@@ -38,14 +38,21 @@ const WordMarqueeTicker: React.FC<WordMarqueeTickerProps> = memo(({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
-        'bg-neo-black border-3 border-slate-800 py-2 overflow-hidden relative shadow-hard',
+        'bg-neo-black border-3 border-neo-black py-2.5 overflow-hidden relative shadow-hard',
         className,
       )}
     >
+      {/* Halftone texture */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
+
+      {/* Edge fade masks */}
+      <div className="absolute inset-y-0 start-0 w-8 bg-gradient-to-e from-neo-black to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-y-0 end-0 w-8 bg-gradient-to-s from-neo-black to-transparent z-20 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--neo-black), transparent)' }} />
+
       <div
         ref={contentRef}
         className={cn(
-          'inline-block whitespace-nowrap font-black text-[10px] uppercase tracking-widest',
+          'inline-block whitespace-nowrap font-black text-[10px] uppercase tracking-[0.2em]',
           reducedMotion && 'overflow-x-auto',
         )}
         style={!reducedMotion ? {
@@ -57,19 +64,31 @@ const WordMarqueeTicker: React.FC<WordMarqueeTickerProps> = memo(({
           <span key={copy} className="inline-block">
             {tickerWords.map((w, i) => (
               <React.Fragment key={`${copy}-${i}`}>
-                <span className="text-neo-lime">{w.word.toUpperCase()}</span>
+                <span className="text-neo-lime drop-shadow-[0_0_4px_rgba(191,255,0,0.3)]">{w.word.toUpperCase()}</span>
                 {' '}
-                <span className="text-white/60">({w.score})</span>
+                <span className="text-white/40 text-[9px]">+{w.score}</span>
                 {i < tickerWords.length - 1 && (
-                  <span className="text-white/30 mx-3">&bull;</span>
+                  <span className="text-neo-lime/20 mx-3">◆</span>
                 )}
               </React.Fragment>
             ))}
-            {copy === 0 && <span className="text-white/30 mx-3">&bull;</span>}
+            {copy === 0 && <span className="text-neo-lime/20 mx-3">◆</span>}
           </span>
         ))}
       </div>
 
+      {/* Shimmer overlay — sweeps across the ticker */}
+      {!reducedMotion && (
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(191,255,0,0.08) 20%, rgba(0,255,255,0.06) 40%, transparent 60%)',
+            backgroundSize: '200% 100%',
+          }}
+          animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
+          transition={{ duration: 3, ease: 'linear', repeat: Infinity }}
+        />
+      )}
       <style>{`
         @keyframes fight-card-marquee {
           0% { transform: translateX(0); }

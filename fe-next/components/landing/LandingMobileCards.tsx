@@ -229,7 +229,7 @@ export function LandingMobileCards({
               )}
               aria-label={`${t('landing.blastMode')} - ${t('landing.blastModeDesc')}`}
             >
-              <span className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[8px] sm:text-[10px] border border-neo-black rounded-neo shadow-hard-xs transform rotate-3">
+              <span className="absolute top-1 end-1 sm:top-2 sm:end-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[8px] sm:text-[10px] border border-neo-black rounded-neo shadow-hard-xs transform rotate-3 rtl:-rotate-3">
                 ADMIN
               </span>
               <Bomb className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />

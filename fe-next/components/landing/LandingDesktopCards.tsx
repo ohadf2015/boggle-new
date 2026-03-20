@@ -1,12 +1,14 @@
 'use client';
 
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { User, Users, Trophy, Map, Bomb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ModeCard from './ModeCard';
 import { LandingShareBanner } from './LandingShareBanner';
+import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
+import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 
 const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
 
@@ -43,6 +45,11 @@ export function LandingDesktopCards({
   onShareClick,
   dailyChallengeStats,
 }: LandingDesktopCardsProps): React.JSX.Element {
+  const [isFirstTimer, setIsFirstTimer] = useState(false);
+  useEffect(() => {
+    setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding());
+  }, []);
+
   return (
     <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
       <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-stretch px-4 lg:px-6">
@@ -64,6 +71,8 @@ export function LandingDesktopCards({
               score: playerAllTimeBest.score,
               label: t('landing.personalBest'),
             } : undefined}
+            highlighted={isFirstTimer}
+            highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
           />
         </motion.div>
 

@@ -172,11 +172,11 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                   )}>
                     {t(`ugc.difficulty.${board.difficulty.toLowerCase()}`)}
                   </span>
-                  <span className="flex items-center gap-0.5 text-neo-white/40 text-[10px]">
+                  <span className="flex items-center gap-0.5 text-neo-white/60 text-[10px]">
                     <Users size={10} /> {board.play_count}
                   </span>
                   {avgRating && (
-                    <span className="flex items-center gap-0.5 text-neo-white/40 text-[10px]">
+                    <span className="flex items-center gap-0.5 text-neo-white/60 text-[10px]">
                       <Star size={10} /> {avgRating}
                     </span>
                   )}

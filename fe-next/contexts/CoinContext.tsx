@@ -27,6 +27,7 @@ import {
 } from '@/utils/coinManager';
 import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
 import toast from 'react-hot-toast';
+import * as Sentry from '@sentry/nextjs';
 
 // Coin effect toasts — neo-brutalist styled visual feedback for earn/spend
 function coinEarnToast(amount: number, reason?: string) {
@@ -485,7 +486,21 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 export function useCoinContext(): CoinContextValue {
   const context = useContext(CoinContext);
   if (!context) {
-    throw new Error('useCoinContext must be used within a CoinProvider');
+    Sentry.captureMessage('useCoinContext used outside CoinProvider — returning defaults', 'warning');
+    return {
+      coins: 0,
+      isLoading: false,
+      canAfford: () => false,
+      addCoins: async () => 0,
+      spendCoins: async () => false,
+      refreshCoins: async () => 0,
+      awardDailyCompletion: async () => null,
+      awardGameCompletion: async () => null,
+      awardComboMilestone: async () => 0,
+      awardWatchedAd: async () => null,
+      costs: COIN_COSTS,
+      rewards: COIN_REWARDS,
+    };
   }
   return context;
 }
