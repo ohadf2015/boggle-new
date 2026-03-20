@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import type { Socket } from 'socket.io-client';
-import { toast } from '@/components/ui/EnhancedToast';
 import type { WordFeedback } from '../../WordFormingArea';
 import type { TranslationFn } from '../types';
 
@@ -47,16 +46,6 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         timestamp: Date.now(),
       });
 
-      // Show toast for high-scoring words (7+ letters or 15+ points)
-      if (data.word.length >= 7 || data.score >= 15) {
-        const bonusText = data.fireRoundActive && data.fireRoundBonus
-          ? ` (+${data.fireRoundBonus} 🔥)`
-          : '';
-        toast.success(
-          `${data.word.toUpperCase()}!`,
-          `+${data.score} points${bonusText}`
-        );
-      }
     };
 
     const handleWordAlreadyFound = (data: { word: string }): void => {

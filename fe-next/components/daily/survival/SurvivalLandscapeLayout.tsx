@@ -9,7 +9,6 @@ import GridComponent, { type HighlightedCell } from '@/components/GridComponent'
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import type { FeedbackType } from '../WordFeedbackToast';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
-import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { AutoClueNotification } from './AutoClueNotification';
 import type { LetterGrid } from '@/types';
 import type { HintLevel } from '@/utils/aiHintGenerator';
@@ -79,10 +78,6 @@ export interface SurvivalLandscapeLayoutProps {
   formedWord?: string;
   letterCount?: number;
 
-  // Guidance props
-  showSwipeTip: boolean;
-  onDismissSwipeTip: () => void;
-
   // Notification props
   activeNotifications: Array<{ id: string; clueType: 'reveal_letter' | 'reveal_category' | 'example_sentence'; timestamp: number }>;
   onDismissNotification: (id: string) => void;
@@ -140,10 +135,6 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   formedWord = '',
   letterCount = 0,
 
-  // Guidance props
-  showSwipeTip,
-  onDismissSwipeTip,
-
   // Notification props
   activeNotifications,
   onDismissNotification,
@@ -161,13 +152,6 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
           compact
         />
       </div>
-
-      {/* Swipe tip guidance */}
-      <SwipeTipTooltip
-        isVisible={showSwipeTip}
-        onDismiss={onDismissSwipeTip}
-        t={t}
-      />
 
       {/* Left Side Panel - Life & Tries */}
       <LeftPanel

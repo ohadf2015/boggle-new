@@ -17,7 +17,7 @@ import { DynamicEnergyBackground } from './DynamicEnergyBackground';
 import { DesktopStatsPanel, DesktopWordList } from '../../desktop';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
-import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
+import type { FoundWord, KeyboardInputState, TrainingState } from '../types';
 
 export interface DesktopGameLayoutProps {
   // Grid
@@ -67,8 +67,6 @@ export interface DesktopGameLayoutProps {
   revealableWordCount: number;
   onReveal: () => Promise<unknown>;
   setShowHintPrompt: (show: boolean) => void;
-  // Direction guidance
-  directionGuidance: DirectionGuidanceState;
   // Training (practice mode)
   training: TrainingState | null;
   progressBarExpanded: boolean;
@@ -127,7 +125,6 @@ export function DesktopGameLayout({
   revealableWordCount,
   onReveal,
   setShowHintPrompt,
-  directionGuidance,
   training,
   progressBarExpanded,
   onToggleProgressBar,
@@ -183,15 +180,13 @@ export function DesktopGameLayout({
         timeSinceStart={totalTime - remainingTime}
         gameDuration={totalTime}
         isGameOver={isGameOver}
-        showDirectionGuidance={directionGuidance.showDirectionGuidance}
-        onDismissDirectionGuidance={directionGuidance.dismissDirectionGuidance}
-        showKeyboardHint={!isPaused && !isGameOver}
         isPracticeMode={isPracticeMode}
         trainingCurrentHint={training?.currentHint}
         onDismissTrainingHint={training?.dismissHint}
         trainingComplete={training?.hasPassed}
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
+        showKeyboardHint={true}
         t={(key) => t(key) || key}
       />
 

@@ -88,14 +88,8 @@ interface LandscapeLayoutProps {
   // Fire round
   fireRoundRemaining: number;
 
-  // Tap-to-drag guidance
-  showDragTutorial: boolean;
-  onDismissDragTutorial: () => void;
-
   // Keyboard help
   isDesktop: boolean;
-  showQuickTip: boolean;
-  onDismissQuickTip: () => void;
   isHelpOpen: boolean;
   onCloseHelp: () => void;
 
@@ -160,11 +154,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   onSingleTapDetected,
   hints,
   fireRoundRemaining,
-  showDragTutorial,
-  onDismissDragTutorial,
   isDesktop,
-  showQuickTip,
-  onDismissQuickTip,
   isHelpOpen,
   onCloseHelp,
   children,
@@ -260,18 +250,12 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
-        showDragTutorial={showDragTutorial}
-        onDismissDragTutorial={onDismissDragTutorial}
         isPlaying={isPlaying}
         isDesktop={isDesktop}
-        showQuickTip={showQuickTip}
-        onDismissQuickTip={onDismissQuickTip}
         isTypingMode={isTypingMode}
         isHelpOpen={isHelpOpen}
         onCloseHelp={onCloseHelp}
         t={t}
-        dir={dir}
-        gameLanguage={gameLanguage}
       />
 
       {/* Full-screen landscape container - grid prevents side-panel overlap */}

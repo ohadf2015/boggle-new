@@ -106,14 +106,8 @@ interface PortraitLayoutProps {
   // Fire round
   fireRoundRemaining: number;
 
-  // Tap-to-drag guidance
-  showDragTutorial: boolean;
-  onDismissDragTutorial: () => void;
-
   // Keyboard help
   isDesktop: boolean;
-  showQuickTip: boolean;
-  onDismissQuickTip: () => void;
   isHelpOpen: boolean;
   onCloseHelp: () => void;
 
@@ -123,11 +117,11 @@ interface PortraitLayoutProps {
   // Single player
   totalBoardWords: number | null;
 
-  // Refs
-  gameStatsRef: RefObject<HTMLDivElement | null>;
-
   // Lead change notification
   leadChangeEvent?: LeadChangeEvent | null;
+
+  // Refs
+  gameStatsRef: RefObject<HTMLDivElement | null>;
 
   // Game mode overlays
   gameMode?: GameModeSelection;
@@ -189,17 +183,13 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   onSingleTapDetected,
   hints,
   fireRoundRemaining,
-  showDragTutorial,
-  onDismissDragTutorial,
   isDesktop,
-  showQuickTip,
-  onDismissQuickTip,
   isHelpOpen,
   onCloseHelp,
   tournamentData,
   totalBoardWords,
-  gameStatsRef,
   leadChangeEvent,
+  gameStatsRef,
   gameMode,
   blastTileOverlay,
   wordHuntTargetLength,
@@ -288,21 +278,15 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
-        showDragTutorial={showDragTutorial}
-        onDismissDragTutorial={onDismissDragTutorial}
         isPlaying={isPlaying}
         isDesktop={isDesktop}
-        showQuickTip={showQuickTip}
-        onDismissQuickTip={onDismissQuickTip}
         isTypingMode={isTypingMode}
         isHelpOpen={isHelpOpen}
         onCloseHelp={onCloseHelp}
         t={t}
-        dir={dir}
-        gameLanguage={gameLanguage}
       />
 
-      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden lg:overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-4">
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden overflow-y-auto lg:overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-4">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -321,7 +305,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         )}
 
         {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-hidden overflow-y-hidden">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div
@@ -347,7 +331,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center relative min-h-[70px] short:min-h-[60px] md:min-h-[80px] lg:min-h-[120px] xl:min-h-[130px]"
+                className="flex w-full items-center justify-center relative min-h-[56px] short:min-h-[48px] md:min-h-[70px] lg:min-h-[120px] xl:min-h-[130px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -499,11 +483,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             </div>
           )}
 
-          {/* Grid - no expansion on mobile to stay close to word forming area, centers on desktop */}
+          {/* Grid - flexible on mobile to prevent clipping, centers on desktop */}
           <div
             data-testid="grid-container"
             className={cn(
-              'flex-grow-0 md:flex-1 flex flex-col items-center justify-start min-h-0 overflow-hidden pt-1 md:pt-0 gap-2',
+              'flex-1 flex flex-col items-center justify-start min-h-0 overflow-visible pt-1 md:pt-0 gap-2',
               'transition-shadow duration-500',
               comboGlow
             )}

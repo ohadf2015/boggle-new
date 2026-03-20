@@ -26,7 +26,6 @@ import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useCo
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
-import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -497,20 +496,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         t={t}
       />
 
-      {/* Swipe Tip Tooltip - shows after 15 seconds if player hasn't submitted any words */}
-      <SwipeTipTooltip
-        isVisible={contextualGuidance.showSwipeTip}
-        onDismiss={contextualGuidance.dismissSwipeTip}
-        t={t}
-      />
-
       {/* Keyboard Input Hint - Desktop only */}
       {!isGameOver && (
-        <KeyboardHintTooltip
-          delaySeconds={10}
-          desktopOnly={true}
-          t={t}
-        />
+        <KeyboardHintTooltip delaySeconds={10} desktopOnly={true} t={t} />
       )}
 
       {/* Quit Confirmation Dialog */}

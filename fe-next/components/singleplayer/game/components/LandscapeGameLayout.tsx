@@ -17,7 +17,7 @@ import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
-import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
+import type { FoundWord, KeyboardInputState, TrainingState } from '../types';
 
 export interface LandscapeGameLayoutProps {
   // Grid
@@ -64,8 +64,6 @@ export interface LandscapeGameLayoutProps {
   revealableWordCount: number;
   onReveal: () => Promise<unknown>;
   setShowHintPrompt: (show: boolean) => void;
-  // Direction guidance
-  directionGuidance: DirectionGuidanceState;
   // Training (practice mode)
   training: TrainingState | null;
   progressBarExpanded: boolean;
@@ -124,7 +122,6 @@ export function LandscapeGameLayout({
   revealableWordCount,
   onReveal,
   setShowHintPrompt,
-  directionGuidance,
   training,
   progressBarExpanded,
   onToggleProgressBar,
@@ -173,15 +170,13 @@ export function LandscapeGameLayout({
         timeSinceStart={totalTime - remainingTime}
         gameDuration={totalTime}
         isGameOver={isGameOver}
-        showDirectionGuidance={directionGuidance.showDirectionGuidance}
-        onDismissDirectionGuidance={directionGuidance.dismissDirectionGuidance}
-        showKeyboardHint={!isPaused && !isGameOver}
         isPracticeMode={isPracticeMode}
         trainingCurrentHint={training?.currentHint}
         onDismissTrainingHint={training?.dismissHint}
         trainingComplete={training?.hasPassed}
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
+        showKeyboardHint={true}
         t={(key) => t(key) || key}
       />
 

@@ -5,7 +5,6 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { EarthquakeWarning, FireRoundIndicator, FireBottomEffect } from '@/components/earthquake';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
 import { Loader } from '@/components/ui/Loader';
-import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { TrainingHints, SkillUnlockToast } from '@/components/training';
 import type { TrainingHintType } from '@/hooks/useTrainingAnalysis';
@@ -27,11 +26,6 @@ interface GameOverlaysProps {
   timeSinceStart: number;
   gameDuration: number;
   isGameOver: boolean;
-  /** Direction guidance */
-  showDirectionGuidance: boolean;
-  onDismissDirectionGuidance: () => void;
-  /** Keyboard hint */
-  showKeyboardHint: boolean;
   /** Training mode state (optional) */
   isPracticeMode?: boolean;
   trainingCurrentHint?: TrainingHintType | null;
@@ -39,6 +33,8 @@ interface GameOverlaysProps {
   trainingComplete?: boolean;
   trainingJustUnlocked?: string | null;
   onClearTrainingUnlock?: () => void;
+  /** Keyboard hint */
+  showKeyboardHint: boolean;
   /** Translation function */
   t: (key: string) => string;
 }
@@ -59,15 +55,13 @@ export function GameOverlays({
   timeSinceStart,
   gameDuration,
   isGameOver,
-  showDirectionGuidance,
-  onDismissDirectionGuidance,
-  showKeyboardHint,
   isPracticeMode = false,
   trainingCurrentHint,
   onDismissTrainingHint,
   trainingComplete,
   trainingJustUnlocked,
   onClearTrainingUnlock,
+  showKeyboardHint,
   t,
 }: GameOverlaysProps): React.ReactElement {
   return (
@@ -116,21 +110,11 @@ export function GameOverlays({
         isGameOver={isGameOver}
       />
 
-      {/* Direction Guidance Tooltip */}
-      <DirectionGuidanceTooltip
-        isVisible={showDirectionGuidance}
-        onDismiss={onDismissDirectionGuidance}
-        t={t}
-      />
-
       {/* Keyboard Input Hint - Desktop only */}
       {showKeyboardHint && (
-        <KeyboardHintTooltip
-          delaySeconds={10}
-          desktopOnly={true}
-          t={t}
-        />
+        <KeyboardHintTooltip delaySeconds={10} desktopOnly={true} t={t} />
       )}
+
 
       {/* Training Hints - practice mode only */}
       {isPracticeMode && onDismissTrainingHint && (
@@ -138,7 +122,7 @@ export function GameOverlays({
           currentHint={trainingCurrentHint ?? null}
           onDismiss={onDismissTrainingHint}
           trainingComplete={trainingComplete ?? false}
-          otherTooltipVisible={showDirectionGuidance}
+          otherTooltipVisible={false}
         />
       )}
 

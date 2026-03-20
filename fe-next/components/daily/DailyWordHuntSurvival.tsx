@@ -7,12 +7,9 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
-import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
-import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import WordFormingArea from '@/components/game/WordFormingArea';
 
 import type { LetterGrid, Language } from '@/types';
@@ -98,16 +95,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     },
   });
 
-  // Contextual guidance for new players
-  const contextualGuidance = useContextualGuidance();
   const isGameActive = !state.isGameOver && state.lifePoints > 0;
-
-  useSwipeTipGuidanceTrigger(
-    state.discoveredWords.length,
-    contextualGuidance.triggerSwipeTipGuidance,
-    isGameActive,
-    15
-  );
 
   // Keyboard word input - allows typing words directly instead of swiping
   const keyboardInput = useKeyboardWordInput({
@@ -172,15 +160,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           onQuitClick={() => actions.setShowQuitConfirm(true)}
           t={t}
         />
-
-        {/* Keyboard Input Hint */}
-        {!state.isGameOver && (
-          <KeyboardHintTooltip
-            delaySeconds={10}
-            desktopOnly={true}
-            t={t}
-          />
-        )}
 
         {/* Word Feedback — inline WordFormingArea */}
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
@@ -253,8 +232,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         wordFeedback={state.wordFeedback}
         formedWord={state.formedWord}
         letterCount={state.letterCount}
-        showSwipeTip={contextualGuidance.showSwipeTip}
-        onDismissSwipeTip={contextualGuidance.dismissSwipeTip}
         activeNotifications={state.activeNotifications}
         onDismissNotification={actions.dismissNotification}
         t={t}
@@ -337,22 +314,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         highlightedPath={keyboardInput.highlightedCells}
         t={t}
       />
-
-      {/* Swipe Tip Tooltip */}
-      <SwipeTipTooltip
-        isVisible={contextualGuidance.showSwipeTip}
-        onDismiss={contextualGuidance.dismissSwipeTip}
-        t={t}
-      />
-
-      {/* Keyboard Input Hint - Desktop only */}
-      {!state.isGameOver && (
-        <KeyboardHintTooltip
-          delaySeconds={10}
-          desktopOnly={true}
-          t={t}
-        />
-      )}
 
       {/* Word Feedback — inline WordFormingArea */}
       <div className="flex justify-center py-1">
