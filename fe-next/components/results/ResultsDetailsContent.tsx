@@ -3,9 +3,8 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { Trophy, Star, Users, Check } from 'lucide-react';
+import { Star, Users, Check } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
-import RoomChat from '@/components/RoomChat';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
@@ -18,8 +17,6 @@ import type {
 
 // Dynamic imports for heavy components
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
-const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/ConsolidatedPlayerCard'), { ssr: false });
-const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 
@@ -164,23 +161,6 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         />
       )}
 
-      {/* Full Player Performance Card - Shows detailed breakdown */}
-      {currentPlayerData && currentPlayerRank > 0 && (
-        <ConsolidatedPlayerCard
-          player={currentPlayerData}
-          rank={currentPlayerRank}
-          totalPlayers={sortedScores.length}
-          winnerScore={winner?.score || 0}
-          xpGainedData={xpGainedData}
-          levelUpData={levelUpData}
-          archetype={currentPlayerArchetype}
-          duplicateRuleDisabled={duplicateRuleDisabled}
-          hideRankAndScore={hideRankAndScore}
-        />
-      )}
-
-      {/* Share Prompt removed from multiplayer results — decluttered per redesign */}
-
       {/* Other Players — auto-expand in 1v1 for natural word comparison */}
       {otherPlayers.length > 0 && (
         <CollapsibleSection
@@ -216,45 +196,75 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         </CollapsibleSection>
       )}
 
-      {/* TurningPointCard + ComparativeInsights removed — decluttered per redesign */}
-
-      {/* Performance Chart */}
-      <CollapsibleSection
-        title={t('results.yourProgress')}
-        icon={<Trophy className="w-4 h-4" />}
-        defaultExpanded={false}
-        variant="tertiary"
-        className="shadow-hard"
-      >
-        <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
-      </CollapsibleSection>
-
-      {/* Top Missed Word — single highlight instead of full list */}
+      {/* Top 3 Words You Missed — filtered to exclude words the player found */}
       {missedWords.length > 0 && (() => {
-        const topMissed = [...missedWords].sort((a, b) => b.score - a.score)[0];
+        const playerFoundWords = new Set(
+          (currentPlayerValidWords || []).map(w => w.word.toLowerCase())
+        );
+        const top3Missed = [...missedWords]
+          .filter(w => !playerFoundWords.has(w.word.toLowerCase()))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3);
+
+        if (top3Missed.length === 0) return null;
+
         return (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
-            className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-neo border border-white/10"
+            className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard overflow-hidden"
           >
-            <Star className="w-4 h-4 text-neo-lime flex-shrink-0" />
-            <span className="text-xs font-bold text-slate-300 uppercase">{t('results.topMissedWord')}</span>
-            <span className="font-black text-sm text-white uppercase tracking-wide">
-              {language === 'he' ? applyHebrewFinalLetters(topMissed.word) : topMissed.word}
-            </span>
-            <span className="text-xs font-black bg-neo-lime/20 text-neo-lime px-1.5 py-0.5 rounded-sm">
-              +{topMissed.score}
-            </span>
+            <div className="flex items-center gap-2 px-3 py-2 bg-neo-navy-light border-b-3 border-neo-black">
+              <Star className="w-4 h-4 text-neo-orange" />
+              <span className="text-xs font-black text-neo-cream/70 uppercase tracking-wider">
+                {t('results.wordsYouMissed')}
+              </span>
+            </div>
+            <div className="p-2 space-y-1.5">
+              {top3Missed.map((wordData, i) => (
+                <motion.div
+                  key={wordData.word}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                  className="flex items-center justify-between px-3 py-2 bg-neo-navy-light/50 border-2 border-neo-black/20 rounded-neo"
+                >
+                  <span className="font-black text-sm text-white uppercase tracking-wide">
+                    {language === 'he' ? applyHebrewFinalLetters(wordData.word) : wordData.word}
+                  </span>
+                  <span className="text-xs font-black bg-neo-orange/20 text-neo-orange px-2 py-0.5 rounded-neo border border-neo-orange/30">
+                    +{wordData.score} {t('results.points')}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         );
       })()}
 
-      {/* Room Chat */}
-      {gameCode && sortedScores.length > 1 && username && (
-        <RoomChat username={username} isHost={isHost} gameCode={gameCode} className="max-h-[350px]" />
-      )}
+      {/* Rarest Achievement */}
+      {achievements && achievements.length > 0 && (() => {
+        const rarest = achievements[achievements.length - 1];
+        return (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.4 }}
+            className="flex items-center gap-3 px-3 py-2.5 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard"
+          >
+            <span className="text-2xl">{rarest.icon || '🏆'}</span>
+            <div className="flex-1 min-w-0">
+              <span className="text-[10px] font-black uppercase text-neo-cream/40 tracking-widest block">
+                {t('results.rarestAchievement')}
+              </span>
+              <span className="text-sm font-black text-white truncate block">
+                {rarest.name || rarest.key}
+              </span>
+            </div>
+          </motion.div>
+        );
+      })()}
 
       {/* Sticky Ready chip — lets multiplayer users mark ready without tab-switching */}
       {gameCode && !isHost && onMarkReady && isCurrentPlayerReady === false && (
