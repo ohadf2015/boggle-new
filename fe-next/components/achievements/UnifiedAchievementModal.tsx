@@ -187,7 +187,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
         exit={{ opacity: 0 }}
         onClick={handleBackdropClick}
         className={cn(
-          'fixed inset-0 z-[9999]',
+          'fixed inset-0 z-60',
           'flex items-center justify-center',
           'bg-neo-black/80 backdrop-blur-sm'
         )}

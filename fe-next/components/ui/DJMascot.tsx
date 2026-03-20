@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -62,7 +62,7 @@ export const DJMascot = memo(function DJMascot({
   const altText = alt || 'DJ Lexi mascot';
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className={`relative ${SIZE_CLASSES[size]} ${className}`}
       animate={
         shouldAnimate
@@ -89,7 +89,7 @@ export const DJMascot = memo(function DJMascot({
         priority={priority}
         unoptimized
       />
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 
@@ -104,7 +104,7 @@ export const DJMascotWithEntrance = memo(function DJMascotWithEntrance({
   const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={shouldAnimate ? { scale: 0, opacity: 0, rotate: -15 } : undefined}
       animate={{ scale: 1, opacity: 1, rotate: 0 }}
       transition={{
@@ -115,7 +115,7 @@ export const DJMascotWithEntrance = memo(function DJMascotWithEntrance({
       }}
     >
       <DJMascot {...props} />
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

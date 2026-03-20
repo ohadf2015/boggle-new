@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { motion, useSpring, useMotionValue } from 'framer-motion';
+import { useSpring, useMotionValue } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
@@ -205,7 +206,7 @@ export function AnimatedCounter({
   }
 
   return (
-    <motion.span
+    <AdaptiveMotion.span
       className={cn(
         'font-black tabular-nums inline-block',
         sizeClasses[size],
@@ -224,7 +225,7 @@ export function AnimatedCounter({
       }}
     >
       {prefix}{formatValue(displayValue)}
-    </motion.span>
+    </AdaptiveMotion.span>
   );
 }
 
@@ -257,7 +258,7 @@ export function AnimatedCounterWithImpact({
     <div className="relative inline-block">
       {/* Impact ring effect */}
       {showImpact && (
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute inset-0 rounded-full border-2 border-neo-lime"
           initial={{ scale: 1, opacity: 0.8 }}
           animate={{ scale: 2.5, opacity: 0 }}

@@ -98,7 +98,7 @@ const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
                 <p className="text-sm font-bold text-neo-cream truncate">
                   {fact.playerName}
                   {fact.playerName2 && (
-                    <span className="font-normal text-neo-cream/70">
+                    <span className="font-bold text-neo-cream/70">
                       {' '}
                       vs {fact.playerName2}
                     </span>

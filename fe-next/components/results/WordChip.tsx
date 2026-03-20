@@ -155,7 +155,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           exit={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           transition={{ duration: 0.15 }}
           className={cn(
-            'fixed z-[9999] -translate-x-1/2',
+            'fixed z-30 -translate-x-1/2',
             'w-56 sm:w-64 px-3 py-2.5 rounded-neo border-3 border-neo-black',
             'bg-neo-red text-neo-cream shadow-hard-lg',
             tooltipPosition.showAbove && '-translate-y-full'

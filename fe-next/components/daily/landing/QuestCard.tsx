@@ -129,7 +129,7 @@ export function QuestCard({
         onTouchEnd={tiltHandlers.onTouchEnd}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => {
+        onKeyDown={(e: React.KeyboardEvent) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             handleClick();

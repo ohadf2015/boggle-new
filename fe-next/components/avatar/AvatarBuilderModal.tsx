@@ -132,7 +132,7 @@ export default function AvatarBuilderModal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <AdaptiveMotion.div
         role="dialog"
         aria-modal="true"
@@ -155,7 +155,7 @@ export default function AvatarBuilderModal({
                 <span className="text-neo-yellow font-black text-sm tabular-nums">{premium.coins}</span>
               </div>
             )}
-            <button onClick={onClose} className="text-neo-white/60 hover:text-neo-white p-1 transition-colors" aria-label={t('common.close')}>
+            <button onClick={onClose} className="text-neo-white/60 hover:text-neo-white p-2.5 transition-colors" aria-label={t('common.close')}>
               <X size={20} />
             </button>
           </div>

@@ -114,7 +114,7 @@ export function CoinSpendAnimation({
 
   return (
     <div
-      className={cn('fixed pointer-events-none z-[200]', className)}
+      className={cn('fixed pointer-events-none z-60', className)}
       style={{ left: position.x, top: position.y }}
       aria-hidden="true"
     >

@@ -139,7 +139,7 @@ export function ResultsHero({
           className="text-7xl md:text-8xl font-black text-white drop-shadow-[0_0_20px_rgba(255,225,53,0.3)]"
         />
         {pointsLabel && (
-          <div className="text-slate-400 text-sm font-medium mt-1">
+          <div className="text-neo-cream/60 text-sm font-bold mt-1">
             {pointsLabel}
           </div>
         )}

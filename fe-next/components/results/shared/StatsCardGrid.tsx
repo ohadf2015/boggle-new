@@ -94,7 +94,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
                     {card.value}
                   </span>
                 </div>
-                <div className="text-xs text-slate-400 font-medium">
+                <div className="text-xs text-neo-cream/60 font-bold">
                   {card.label}
                 </div>
               </motion.div>

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 
 /**
@@ -203,7 +203,7 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
     };
 
     return (
-      <motion.div
+      <AdaptiveMotion.div
         {...getAnimationProps()}
         transition={animation === 'jelly'
           ? { type: 'spring', stiffness: 300, damping: 10 }
@@ -221,6 +221,7 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
           onMouseDown={() => setIsPressed(true)}
           onMouseUp={() => setIsPressed(false)}
           onMouseLeave={() => setIsPressed(false)}
+          onTouchEnd={() => setIsPressed(false)}
           disabled={isLoading || props.disabled}
           aria-busy={isLoading}
           aria-pressed={isPressed}
@@ -296,7 +297,7 @@ const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(
           {/* Right icon */}
           {!isLoading && !isSuccess && !isError && rightIcon}
         </Comp>
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 );

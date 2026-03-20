@@ -111,7 +111,7 @@ export default function StudentAchievementsPageClient() {
   // Show loader while checking auth
   if (loading || isChecking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neo-navy">
+      <div className="min-h-dvh flex items-center justify-center bg-neo-navy">
         <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );

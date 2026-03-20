@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, memo } from 'react';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { useMotionValue, useTransform, animate } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Crown, Medal, TrendingUp, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -74,7 +75,7 @@ const AnimatedScore: React.FC<{ target: number; className?: string; delay?: numb
   }, [target, motionVal, rounded, delay]);
 
   return (
-    <motion.span
+    <AdaptiveMotion.span
       className={className}
       animate={landed ? {
         scale: [1.18, 0.95, 1.04, 1],
@@ -88,7 +89,7 @@ const AnimatedScore: React.FC<{ target: number; className?: string; delay?: numb
       transition={{ type: 'spring', stiffness: 300, damping: 12 }}
     >
       {display.toLocaleString()}
-    </motion.span>
+    </AdaptiveMotion.span>
   );
 };
 
@@ -122,19 +123,20 @@ const PlacementHero = memo<PlacementHeroProps>(({
   }, [rank, reducedMotion]);
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={reducedMotion ? undefined : { opacity: 0, scale: 0.88, y: 30, rotate: -1 }}
       animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
       transition={{ type: 'spring', stiffness: 160, damping: 16 }}
       className="w-full"
     >
       <div
-        className="relative overflow-hidden bg-slate-800/50 border-3 border-neo-cream shadow-hard-xl cursor-pointer"
+        className="relative overflow-hidden bg-slate-800/50 border-3 border-neo-black shadow-hard-xl cursor-pointer"
+        style={{ borderInlineStartColor: theme.accentColor, borderInlineStartWidth: '6px' }}
         onClick={() => rank <= 3 && !reducedMotion && fireRankConfetti(rank)}
       >
         {/* Animated accent border glow for top 3 */}
         {rank <= 3 && !reducedMotion && (
-          <motion.div
+          <AdaptiveMotion.div
             className="absolute inset-0 pointer-events-none z-[2]"
             animate={{
               boxShadow: [
@@ -160,7 +162,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
 
         {/* Shimmer sweep — slow cinematic swipe */}
         {!reducedMotion && (
-          <motion.div
+          <AdaptiveMotion.div
             className="absolute inset-0 pointer-events-none z-[1]"
             style={{
               background: 'linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.12) 50%, transparent 65%)',
@@ -172,7 +174,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
         )}
 
         {/* Huge ghost rank number — responsive sizing: 120px on xs, 160px on sm+ */}
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute -top-2 sm:-top-4 -start-1 sm:-start-2 pointer-events-none"
           initial={reducedMotion ? { opacity: 0.1 } : { opacity: 0, scale: 3, rotate: -15 }}
           animate={{ opacity: 0.1, scale: 1, rotate: -12 }}
@@ -181,14 +183,14 @@ const PlacementHero = memo<PlacementHeroProps>(({
           <span className="font-neo-display text-[120px] sm:text-[160px] leading-none text-white inline-block select-none">
             {rank}
           </span>
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Main content — responsive padding */}
         <div className="relative z-10 px-4 py-5 sm:p-6 flex flex-col items-center gap-2.5 sm:gap-3">
 
           {/* Word Hunt: Target word display */}
           {wordHuntData && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={reducedMotion ? undefined : { opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -204,7 +206,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 {wordHuntData.targetWord}
               </span>
               {wordHuntData.foundTarget && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={reducedMotion ? undefined : { scale: 0, rotate: -10 }}
                   animate={{ scale: 1, rotate: -1 }}
                   transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 12 }}
@@ -213,20 +215,20 @@ const PlacementHero = memo<PlacementHeroProps>(({
                   <span className="font-neo-display text-xs sm:text-sm uppercase">
                     {t('results.foundByYou')}
                   </span>
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {/* Avatar + placement info — stacked on xs, horizontal on sm+ */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
             className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4"
           >
             {avatar && (
-              <motion.div
+              <AdaptiveMotion.div
                 className={`border-3 ${theme.rankBorderColor} rounded-full shadow-hard bg-slate-900 p-0.5`}
                 animate={!reducedMotion && rank === 1 ? {
                   boxShadow: [
@@ -244,7 +246,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                   size="lg"
                   className="w-16 h-16 sm:w-20 sm:h-20"
                 />
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
             <div className="flex flex-col items-center sm:items-start">
               <span className="font-neo-display text-2xl sm:text-3xl text-neo-cream leading-none uppercase text-center sm:text-start">
@@ -256,22 +258,22 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 </span>
               )}
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Title text — responsive sizing */}
           {!wordHuntData && (
-            <motion.h1
+            <AdaptiveMotion.h1
               initial={reducedMotion ? undefined : { opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.25, type: 'spring', stiffness: 200, damping: 15 }}
               className="font-neo-display text-2xl xs:text-3xl sm:text-4xl text-neo-cream uppercase tracking-wide drop-shadow-lg text-center"
             >
               {rank === 1 ? t('results.greatVictory') : t('results.greatBattle')}
-            </motion.h1>
+            </AdaptiveMotion.h1>
           )}
 
           {/* Score box — responsive padding, hover lift */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={reducedMotion ? undefined : { opacity: 0, scale: 0.5, rotate: -5, y: 25 }}
             animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
             whileHover={{ scale: 1.06, rotate: 1.5, transition: { type: 'spring', stiffness: 400, damping: 12 } }}
@@ -281,7 +283,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
           >
             {/* Score shimmer sweep */}
             {!reducedMotion && (
-              <motion.div
+              <AdaptiveMotion.div
                 className="absolute inset-0 pointer-events-none"
                 style={{
                   background: 'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)',
@@ -301,22 +303,22 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 delay={0.5}
               />
             </span>
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Gap to winner — bounce in */}
           {rank > 1 && gapToWinner > 0 && (
-            <motion.p
+            <AdaptiveMotion.p
               initial={reducedMotion ? undefined : { opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.55, type: 'spring', stiffness: 300, damping: 18 }}
               className="text-xs sm:text-sm font-black uppercase text-neo-pink tracking-tight"
             >
               {t('results.pointsBehind', { points: gapToWinner })}
-            </motion.p>
+            </AdaptiveMotion.p>
           )}
         </div>
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

@@ -166,8 +166,8 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
                 {currentStreak}
               </span>
               <span className={cn(
-                'text-sm font-medium',
-                isDarkMode ? 'text-gray-300' : 'text-neo-black/70'
+                'text-sm font-bold',
+                isDarkMode ? 'text-neo-cream/80' : 'text-neo-black/70'
               )}>
                 {t('growth.dayStreak')}
               </span>
@@ -194,8 +194,8 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
         {nextTier && (
           <div className="text-right">
             <div className={cn(
-              'text-xs font-medium',
-              isDarkMode ? 'text-gray-400' : 'text-neo-black/60'
+              'text-xs font-bold',
+              isDarkMode ? 'text-neo-cream/60' : 'text-neo-black/60'
             )}>
               {t('growth.nextTier')}
             </div>

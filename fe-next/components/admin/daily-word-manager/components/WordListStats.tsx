@@ -3,6 +3,16 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Copy, Check, Download, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import type { Language } from '@/types';
 import type { WordListStats as WordListStatsType } from '../types';
 import { generateTypeScriptCode } from '../constants';
@@ -19,6 +29,7 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
   onResetToDefaults,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleExportCode = () => {
     const code = generateTypeScriptCode(wordLists);
@@ -39,8 +50,12 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
   };
 
   const handleReset = () => {
-    if (!confirm('Reset all word lists to defaults? This will clear your custom changes.')) return;
+    setShowResetConfirm(true);
+  };
+
+  const handleConfirmReset = () => {
     onResetToDefaults();
+    setShowResetConfirm(false);
   };
 
   return (
@@ -129,6 +144,23 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
           Reset
         </Button>
       </div>
+
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset word lists</AlertDialogTitle>
+            <AlertDialogDescription>
+              Reset all word lists to defaults? This will clear your custom changes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmReset} className="bg-red-600 hover:bg-red-700">
+              Reset
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

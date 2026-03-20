@@ -172,16 +172,9 @@ export function DailyChallengeLanding({
             className="w-full"
             data-testid="word-hunt-hero"
           >
-            <div
+            <button
+              type="button"
               onClick={onSelectWordHunt}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  onSelectWordHunt();
-                }
-              }}
               className={cn(
                 'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black',
                 'shadow-hard overflow-hidden cursor-pointer p-4',
@@ -232,7 +225,7 @@ export function DailyChallengeLanding({
                 <Eye className="w-4 h-4" />
                 {t('daily.viewResults')}
               </div>
-            </div>
+            </button>
           </motion.div>
 
           {/* Continue missions divider */}

@@ -141,7 +141,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
           stiffness: 300,
           damping: 25,
         }}
-        className="fixed top-20 end-4 z-[9999] w-80 max-w-[calc(100vw-2rem)]"
+        className="fixed top-20 end-4 z-60 w-80 max-w-[calc(100vw-2rem)]"
         onClick={onComplete}
       >
         {/* Compact toast container - Neo-Brutalist */}

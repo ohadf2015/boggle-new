@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo, ReactNode } from 'react';
 import { ArrowRight, Search, Users, Trophy, Gamepad2 } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -116,19 +116,19 @@ export const EmptyState = memo(function EmptyState({
           />
         </div>
       ) : actualIcon ? (
-        <motion.div
+        <AdaptiveMotion.div
           className={`${sizeClasses[size].icon} mx-auto mb-4 text-neo-lime`}
           {...floatAnimation}
         >
           {actualIcon}
-        </motion.div>
+        </AdaptiveMotion.div>
       ) : (
-        <motion.div
+        <AdaptiveMotion.div
           className="text-5xl mb-4"
           {...floatAnimation}
         >
           {config.emoji}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
 
       {/* Title */}
@@ -145,24 +145,24 @@ export const EmptyState = memo(function EmptyState({
 
       {/* Arrow indicator */}
       {showArrow && (
-        <motion.div
+        <AdaptiveMotion.div
           className={`mt-4 text-neo-cyan ${arrowRotation[arrowDirection]}`}
           {...arrowAnimation}
         >
           <ArrowRight className="w-8 h-8 mx-auto" />
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
 
       {/* Action button */}
       {action && (
-        <motion.div
+        <AdaptiveMotion.div
           className="mt-4"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
           {action}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
     </div>
   );
@@ -187,7 +187,7 @@ export const WaitingDots = memo(function WaitingDots({ color = 'neo-cyan' }: { c
   return (
     <span className="inline-flex gap-1">
       {[0, 1, 2].map((i) => (
-        <motion.span
+        <AdaptiveMotion.span
           key={i}
           className={`w-2 h-2 bg-${color} rounded-full`}
           animate={{ y: [0, -6, 0] }}

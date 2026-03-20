@@ -170,17 +170,16 @@ export const LexiReaction = memo<LexiReactionProps>(
     // Reduced motion: static fallback
     if (prefersReducedMotion && reaction) {
       return (
-        <div
+        <button
+          type="button"
           data-testid="lexi-reaction"
           className={cn(
-            'fixed z-40',
+            'fixed z-40 appearance-none bg-transparent',
             'bottom-20 lg:bottom-6',
             isRTL ? 'left-4' : 'right-4',
             className
           )}
           onClick={handleTap}
-          role="button"
-          tabIndex={0}
           aria-label="Lexi says something - tap to dismiss"
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -210,7 +209,7 @@ export const LexiReaction = memo<LexiReactionProps>(
               enableClick={false}
             />
           </div>
-        </div>
+        </button>
       );
     }
 

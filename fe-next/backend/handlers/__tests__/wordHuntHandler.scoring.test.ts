@@ -1,6 +1,6 @@
 /**
  * Word Hunt Handler - First Finder Bonus Scoring Test
- * Verifies that the 50-point first-finder bonus is applied to player score.
+ * Verifies that the first-finder bonus is applied to player score.
  */
 
 jest.mock('../../../backend/modules/gameStateManager', () => ({
@@ -77,7 +77,7 @@ describe('wordHuntHandler - first finder bonus scoring', () => {
   it('should apply first-finder bonus to player score via updatePlayerScore', () => {
     // GIVEN: Player guesses the target word correctly and is first finder
     validateTargetGuess.mockReturnValue(['correct', 'correct', 'correct', 'correct', 'correct']);
-    recordTargetFound.mockReturnValue({ isFirstFinder: true, bonus: 50 });
+    recordTargetFound.mockReturnValue({ isFirstFinder: true, bonus: 500 });
 
     const socket = makeMockSocket();
     const io = { on: jest.fn() } as any;
@@ -85,8 +85,8 @@ describe('wordHuntHandler - first finder bonus scoring', () => {
     // WHEN: Player submits the correct target word
     handleSubmitTargetWord(io, socket as any, { guess: 'apple' });
 
-    // THEN: updatePlayerScore should be called with the 50-point bonus
-    expect(updatePlayerScore).toHaveBeenCalledWith('HUNT1', 'player1', 50, true);
+    // THEN: updatePlayerScore should be called with the 500-point bonus
+    expect(updatePlayerScore).toHaveBeenCalledWith('HUNT1', 'player1', 500, true);
   });
 
   it('should NOT call updatePlayerScore when bonus is 0 (not first finder)', () => {

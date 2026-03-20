@@ -87,7 +87,7 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
           aria-modal="true"
           aria-labelledby={titleId}
           className={cn(
-            'fixed inset-0 z-[300]',
+            'fixed inset-0 z-60',
             'flex items-center justify-center',
             'bg-neo-black/80 backdrop-blur-sm'
           )}

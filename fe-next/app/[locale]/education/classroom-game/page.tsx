@@ -11,7 +11,7 @@ export default function ClassroomGamePage() {
   return (
     <Suspense
       fallback={
-        <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-screen">
+        <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
           <PageLoader size="lg" text="Loading game..." />
         </div>
       }

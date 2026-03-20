@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
@@ -82,7 +82,7 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
   // For reduced motion or low-end devices, show a simple fade animation
   if (prefersReducedMotion || skipComplexAnimation) {
     return (
-      <motion.div
+      <AdaptiveMotion.div
         key={animationKey}
         className={`fixed z-[100] pointer-events-none ${className || ''}`}
         style={{
@@ -105,18 +105,18 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
           <span>+{displayScore}</span>
           {isFireRound && <span>🔥</span>}
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 
   return (
-    <AnimatePresence mode="wait">
+    <AdaptiveAnimatePresence mode="wait">
       <div
         key={animationKey}
         className={`fixed inset-0 z-[100] pointer-events-none overflow-hidden ${className || ''}`}
       >
         {/* Main floating score */}
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute flex items-center gap-1.5"
           style={{
             left: startPosition?.x ?? '50%',
@@ -141,7 +141,7 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
             ease: [0.25, 0.1, 0.25, 1],
           }}
         >
-          <motion.div
+          <AdaptiveMotion.div
             className={`px-4 py-2 rounded-full font-black text-xl shadow-xl border-3 border-neo-black ${
               isFireRound
                 ? 'bg-gradient-to-r from-orange-400 via-red-400 to-orange-400 text-white'
@@ -168,28 +168,28 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
             }}
           >
             <span className="flex items-center gap-2">
-              <motion.span
+              <AdaptiveMotion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: [0, 1.3, 1] }}
                 transition={{ duration: 0.3 }}
               >
                 +{displayScore}
-              </motion.span>
+              </AdaptiveMotion.span>
               {isFireRound && (
-                <motion.span
+                <AdaptiveMotion.span
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 0.3, repeat: 2 }}
                 >
                   🔥
-                </motion.span>
+                </AdaptiveMotion.span>
               )}
             </span>
-          </motion.div>
-        </motion.div>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
 
         {/* Sparkle burst at start position */}
         {[...Array(6)].map((_, i) => (
-          <motion.div
+          <AdaptiveMotion.div
             key={`sparkle-${i}`}
             className={`absolute w-2 h-2 rounded-full ${
               isFireRound ? 'bg-orange-400' : 'bg-neo-lime'
@@ -216,7 +216,7 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
 
         {/* Plus particles trailing behind */}
         {[...Array(3)].map((_, i) => (
-          <motion.div
+          <AdaptiveMotion.div
             key={`trail-${i}`}
             className={`absolute text-lg font-bold ${
               isFireRound ? 'text-orange-400' : 'text-neo-lime'
@@ -239,10 +239,10 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
             }}
           >
             +
-          </motion.div>
+          </AdaptiveMotion.div>
         ))}
       </div>
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

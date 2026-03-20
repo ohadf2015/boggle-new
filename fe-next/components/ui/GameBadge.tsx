@@ -20,7 +20,8 @@
  */
 
 import React, { useEffect, useState, type ReactNode } from 'react';
-import { motion, AnimatePresence, type HTMLMotionProps } from 'framer-motion';
+import { type HTMLMotionProps } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useSafeTimeout } from '@/hooks/useSafeTimeout';
 
@@ -237,9 +238,9 @@ export const GameBadge = React.memo<GameBadgeProps>(({
   if (!animate) {
     if (autoHideMs > 0) {
       return (
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {isVisible && staticContent}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       );
     }
     return staticContent;
@@ -251,30 +252,30 @@ export const GameBadge = React.memo<GameBadgeProps>(({
   // Wobble animation applies to icon only, not the whole badge
   if (animate === 'wobble' && Icon) {
     return (
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {isVisible && (
           <span
             className={baseClasses}
             onClick={onClick}
           >
-            <motion.span
+            <AdaptiveMotion.span
               animate={animConfig.animate}
               transition={animConfig.transition}
             >
               {renderIcon()}
-            </motion.span>
+            </AdaptiveMotion.span>
             {children}
           </span>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     );
   }
 
   // Standard animation (spring, pulse, pop)
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {isVisible && (
-        <motion.span
+        <AdaptiveMotion.span
           className={baseClasses}
           onClick={onClick}
           initial={animConfig.initial}
@@ -285,9 +286,9 @@ export const GameBadge = React.memo<GameBadgeProps>(({
         >
           {renderIcon()}
           {children}
-        </motion.span>
+        </AdaptiveMotion.span>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

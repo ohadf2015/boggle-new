@@ -64,7 +64,7 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
       animate={{ y: 0, opacity: 1, scale: 1 }}
       exit={{ y: 40, opacity: 0, scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className="fixed bottom-16 left-4 right-4 z-[10000] max-w-[400px] mx-auto pointer-events-auto"
+      className="fixed bottom-16 left-4 right-4 z-70 max-w-[400px] mx-auto pointer-events-auto"
       onClick={(e) => e.stopPropagation()}
     >
       <div

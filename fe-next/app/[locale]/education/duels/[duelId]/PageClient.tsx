@@ -75,7 +75,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
 
   if (isChecking || authLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-screen">
+      <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
         <PageLoader
           size="lg"
           text={t('common.loading')}
@@ -86,7 +86,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
 
   if (duelError) {
     return (
-      <div className={cn('flex-1 flex flex-col bg-neo-navy w-full min-h-screen', isRTL && 'rtl')}>
+      <div className={cn('flex-1 flex flex-col bg-neo-navy w-full min-h-dvh', isRTL && 'rtl')}>
         <EducationHeader showBackButton title={t('duelsTitle')} />
 
         <main className="flex-1 flex items-center justify-center px-4">
@@ -115,7 +115,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
   }
 
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full min-h-screen', isRTL && 'rtl')}>
+    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full min-h-dvh', isRTL && 'rtl')}>
       <EducationHeader showBackButton title={t('duelsTitle')} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">

@@ -415,14 +415,10 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         >
           <button
             onClick={onStart}
-            className="group relative w-full py-5 text-2xl font-black uppercase rounded-neo border-4 border-neo-black overflow-hidden transition-all duration-200 hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm shadow-hard-lg"
+            className="group w-full py-3.5 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-gradient-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-neo-cyan to-emerald-400 bg-[length:200%_100%] animate-shimmer" />
-            <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10" />
-            <span className="relative flex items-center justify-center gap-3 text-neo-black drop-shadow-sm">
-              <Target className="w-6 h-6" />
-              {t('daily.playButton')}
-            </span>
+            <Target className="w-5 h-5" />
+            {t('daily.playButton')}
           </button>
         </motion.div>
       </div>
@@ -465,21 +461,14 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
         className="fixed bottom-0 inset-x-0 z-50 pointer-events-none lg:hidden"
       >
-        <div className="bg-gradient-to-t from-neo-navy via-neo-navy/95 to-transparent pt-8 px-4 pointer-events-auto" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
-          <div className="max-w-md mx-auto">
+        <div className="bg-neo-navy px-4 pt-3 pointer-events-auto" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+          <div className="max-w-sm mx-auto">
             <button
               onClick={onStart}
-              className="group relative w-full py-5 text-2xl font-black uppercase rounded-neo border-4 border-neo-black overflow-hidden transition-all duration-200 hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm shadow-hard-lg"
+              className="group w-full py-3 text-base font-black uppercase rounded-neo border-3 border-neo-black bg-gradient-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2"
             >
-              {/* Animated gradient background */}
-              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-neo-cyan to-emerald-400 bg-[length:200%_100%] animate-shimmer" />
-              {/* Glow effect */}
-              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10" />
-              {/* Text */}
-              <span className="relative flex items-center justify-center gap-3 text-neo-black drop-shadow-sm">
-                <Target className="w-6 h-6" />
-                {t('daily.playButton')}
-              </span>
+              <Target className="w-5 h-5" />
+              {t('daily.playButton')}
             </button>
           </div>
         </div>

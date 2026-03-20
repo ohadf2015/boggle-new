@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -78,7 +78,7 @@ export const CelebrationMascot = memo(function CelebrationMascot({
   const altText = alt || `Lexi mascot - ${variant}`;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className={`relative ${SIZE_CLASSES[size]} ${className}`}
       animate={
         shouldAnimate
@@ -104,7 +104,7 @@ export const CelebrationMascot = memo(function CelebrationMascot({
         priority={priority}
         unoptimized
       />
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 
@@ -119,7 +119,7 @@ export const CelebrationMascotWithEntrance = memo(function CelebrationMascotWith
   const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={shouldAnimate ? { scale: 0, opacity: 0, y: 20, rotate: -10 } : undefined}
       animate={{ scale: 1, opacity: 1, y: 0, rotate: 0 }}
       transition={{
@@ -130,7 +130,7 @@ export const CelebrationMascotWithEntrance = memo(function CelebrationMascotWith
       }}
     >
       <CelebrationMascot {...props} />
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 

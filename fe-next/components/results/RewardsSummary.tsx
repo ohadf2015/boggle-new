@@ -177,7 +177,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                     )}>
                       +<ScoreCountUp to={coinReward.awarded} duration={1200} delay={reducedMotion ? 0 : 400} />
                     </div>
-                    <div className="text-xs text-white/60 font-medium">
+                    <div className="text-xs text-neo-cream/60 font-bold">
                       {isAuthenticated
                         ? (t('reveal.coins'))
                         : (t('coins.signInToEarn'))}
@@ -246,7 +246,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                     <div className="font-black text-xl text-neo-pink tabular-nums">
                       <ScoreCountUp to={achievementsUnlocked} duration={800} delay={reducedMotion ? 0 : 600} />
                     </div>
-                    <div className="text-xs text-white/60 font-medium">
+                    <div className="text-xs text-neo-cream/60 font-bold">
                       {achievementsUnlocked === 1
                         ? (t('results.achievementUnlocked'))
                         : (t('results.achievementsUnlocked'))}

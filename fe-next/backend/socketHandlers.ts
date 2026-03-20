@@ -83,31 +83,26 @@ function initializeSocketHandlers(io: Server): void {
       resetRateLimit(socket.id);
     });
 
+    logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
+
+    // Join lobby room so client receives activeRooms broadcasts
+    socket.join('lobby:rooms');
+
+    // Register all event handlers immediately — don't gate on async Redis check
+    registerAllHandlers(io, socket);
+
     // Async check: Redis distributed IP block (catches blocks from other instances)
-    // This runs after connection is established but before game handlers are registered
+    // Runs in background — disconnects only if confirmed blocked
     isIpBlockedAsync(clientIp)
       .then((blocked: boolean) => {
         if (blocked) {
           logger.warn('SOCKET', `Redis-blocked IP ${clientIp} detected - disconnecting`);
           socket.emit('error', { message: 'Too many requests. Please try again later.' });
           socket.disconnect(true);
-          return;
         }
-
-        logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
-
-        // Join lobby room so client receives activeRooms broadcasts
-        socket.join('lobby:rooms');
-
-        // Register all event handlers for this socket
-        registerAllHandlers(io, socket);
       })
       .catch((err: Error) => {
-        // On Redis error, allow connection (fail open)
         logger.warn('SOCKET', `Redis check failed for ${clientIp}: ${err.message} - allowing connection`);
-        logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
-        socket.join('lobby:rooms');
-        registerAllHandlers(io, socket);
       });
   });
 

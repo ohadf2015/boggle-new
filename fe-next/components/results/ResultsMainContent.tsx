@@ -117,6 +117,8 @@ export interface ResultsMainContentProps {
   /** Words found by others that this player missed */
   missedWords?: Array<{ word: string; score: number; foundBy: string[] }>;
   emojiReactions?: Array<{ id: string; emoji: string; username: string; timestamp: number }>;
+  /** Hide inline CTA section (when StickyReadyBar handles it on mobile) */
+  hideInlineCta?: boolean;
 }
 
 // ==============================================
@@ -158,6 +160,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   gameMode,
   emojiReactions,
   missedWords,
+  hideInlineCta = false,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -202,7 +205,30 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         </>
       )}
 
-      {/* Fight Card Leaderboard — ranked list (fight card style) */}
+      {/* Revenge Face-Off / Defend Title — moved up for emotional impact */}
+      {scoreRevealComplete && sortedScores.length > 1 && isVisible('revenge') && currentPlayerData && (
+        <ResultsRevengeSection
+          sortedScores={sortedScores}
+          currentPlayerData={currentPlayerData}
+          currentPlayerRank={currentPlayerRank}
+          gapToWinner={gapToWinner}
+          gameMode={gameMode}
+          reducedMotion={reducedMotion}
+          revengeDelay={getDelay('revenge')}
+          t={t}
+          missedWords={missedWords}
+        />
+      )}
+
+      {/* Word Marquee Ticker — scrolling word display */}
+      {scoreRevealComplete && currentPlayerValidWords.length > 0 && (
+        <WordMarqueeTicker
+          words={currentPlayerValidWords}
+          gameMode={gameMode}
+        />
+      )}
+
+      {/* Fight Card Leaderboard — ranked list (deferred, revealed on scroll) */}
       {sortedScores.length > 1 && (
         scoreRevealComplete ? (
           <motion.div
@@ -220,6 +246,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
               currentUsername={username}
               gameMode={gameMode}
               emojiReactions={emojiReactions}
+              deferRankings
             />
           </motion.div>
         ) : (
@@ -237,30 +264,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         )
       )}
 
-      {/* Revenge Face-Off / Defend Title */}
-      {scoreRevealComplete && sortedScores.length > 1 && isVisible('revenge') && currentPlayerData && (
-        <ResultsRevengeSection
-          sortedScores={sortedScores}
-          currentPlayerData={currentPlayerData}
-          currentPlayerRank={currentPlayerRank}
-          gapToWinner={gapToWinner}
-          gameMode={gameMode}
-          reducedMotion={reducedMotion}
-          revengeDelay={getDelay('revenge')}
-          t={t}
-        />
-      )}
-
-      {/* Word Marquee Ticker — scrolling word display */}
-      {scoreRevealComplete && currentPlayerValidWords.length > 0 && (
-        <WordMarqueeTicker
-          words={currentPlayerValidWords}
-          gameMode={gameMode}
-        />
-      )}
-
-      {/* Primary CTA — cascaded entrance */}
-      {gameCode && onReturnToRoom && isVisible('cta') && (
+      {/* Primary CTA — cascaded entrance (hidden on mobile when StickyReadyBar is present) */}
+      {gameCode && onReturnToRoom && isVisible('cta') && !hideInlineCta && (
         <ResultsCtaSection
           sortedScores={sortedScores}
           currentPlayerData={currentPlayerData}
@@ -284,16 +289,16 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Ready status */}
-      {gameCode && sortedScores.length > 1 && readyUsernames.length > 0 && (
+      {/* Ready status — only on desktop (mobile has StickyReadyBar) */}
+      {!hideInlineCta && gameCode && sortedScores.length > 1 && readyUsernames.length > 0 && (
         <div className="text-center" aria-live="polite">
-          <span className="text-xs text-neo-cream/60 font-medium">
+          <span className="text-xs text-neo-cream/60 font-bold">
             {t('results.playersReady', { count: readyUsernames.length, total: sortedScores.length })}
           </span>
         </div>
       )}
 
-      {/* Streak Urgency (singleplayer only) */}
+      {/* Streak Urgency (singleplayer only — never show in multiplayer) */}
       {!gameCode && winStreakData && winStreakData.currentStreak >= 1 && (
         <StreakUrgencyDisplay
           currentStreak={winStreakData.currentStreak}

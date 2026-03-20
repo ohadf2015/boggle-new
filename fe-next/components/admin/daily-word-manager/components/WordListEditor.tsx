@@ -1,9 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Search, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface WordListEditorProps {
   filteredWords: string[];
@@ -21,6 +31,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
   onRemoveWord,
 }) => {
   const [newWord, setNewWord] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState<{ word: string } | null>(null);
 
   const handleAddWord = () => {
     const result = onAddWord(newWord);
@@ -32,8 +43,14 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
   };
 
   const handleRemoveWord = (word: string) => {
-    if (!confirm(`Remove "${word}"?`)) return;
-    onRemoveWord(word);
+    setConfirmDelete({ word });
+  };
+
+  const handleConfirmRemove = () => {
+    if (confirmDelete) {
+      onRemoveWord(confirmDelete.word);
+      setConfirmDelete(null);
+    }
   };
 
   return (
@@ -83,7 +100,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
 
         <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-1.5 sm:gap-2 max-h-[50vh] sm:max-h-[600px] overflow-y-auto">
           {filteredWords.map((word, idx) => (
-            <motion.div
+            <AdaptiveMotion.div
               key={word}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -98,7 +115,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
               >
                 <Trash2 className="w-3 h-3" />
               </button>
-            </motion.div>
+            </AdaptiveMotion.div>
           ))}
         </div>
 
@@ -108,6 +125,22 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
           </div>
         )}
       </div>
+      <AlertDialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove word</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove &quot;{confirmDelete?.word}&quot; from the word list?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRemove} className="bg-red-600 hover:bg-red-700">
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

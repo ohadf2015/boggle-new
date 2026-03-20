@@ -21,6 +21,8 @@ interface BattleModeCardProps {
   gameCode?: string;
   playersReady?: (string | PlayerData)[];
   t: (path: string, params?: Record<string, string | number>) => string;
+  /** When false, blast mode is hidden from the mode selector */
+  isAdmin?: boolean;
 }
 
 // ==================== Mode Visual Configs ====================
@@ -210,8 +212,12 @@ export function BattleModeCard({
   selectedGameMode,
   setSelectedGameMode,
   t,
+  isAdmin = false,
 }: BattleModeCardProps): React.ReactElement {
   const [sparkMode, setSparkMode] = useState<GameModeOption | null>(null);
+
+  // Filter modes: blast only visible to admins
+  const visibleModes = isAdmin ? MODES : MODES.filter(m => m.mode !== 'blast');
 
   const handleSelect = useCallback((mode: GameModeOption) => {
     if (mode !== selectedGameMode) {
@@ -243,7 +249,7 @@ export function BattleModeCard({
           initial="hidden"
           animate="visible"
         >
-          {MODES.map(({ mode, icon, nameKey, descKey, color, iconActiveClass }) => {
+          {visibleModes.map(({ mode, icon, nameKey, descKey, color, iconActiveClass }) => {
             const isActive = selectedGameMode === mode;
             const isSparking = sparkMode === mode;
 

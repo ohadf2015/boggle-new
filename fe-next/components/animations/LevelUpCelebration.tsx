@@ -195,7 +195,7 @@ export function LevelUpCelebration({
     return (
       <div
         className={cn(
-          'fixed inset-0 z-[300] flex items-center justify-center bg-neo-black/80',
+          'fixed inset-0 z-60 flex items-center justify-center bg-neo-black/80',
           className
         )}
         onClick={onDismiss}
@@ -221,7 +221,7 @@ export function LevelUpCelebration({
         <motion.div
           ref={containerRef}
           className={cn(
-            'fixed inset-0 z-[300] flex items-center justify-center',
+            'fixed inset-0 z-60 flex items-center justify-center',
             className
           )}
           initial={{ opacity: 0 }}

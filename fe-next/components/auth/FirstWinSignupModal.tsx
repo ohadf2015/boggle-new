@@ -108,7 +108,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <Trophy
-                  className="text-6xl text-yellow-500 drop-shadow-[0_0_20px_rgba(234,179,8,0.5)]"
+                  className="text-6xl text-yellow-500 drop-shadow-[0_0_20px_rgb(234_179_8/0.5)]"
                   size={64}
                 />
               </motion.div>

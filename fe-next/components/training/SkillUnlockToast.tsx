@@ -119,7 +119,7 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -30, scale: 0.9 }}
           transition={{ type: 'spring', damping: 15, stiffness: 300 }}
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
         >
           <motion.div
             className={cn(

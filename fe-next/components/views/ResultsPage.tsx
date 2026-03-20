@@ -168,9 +168,27 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   };
 
   const confirmExitRoom = () => {
-    // Preserve username in localStorage for smooth fallback to lobby
-    clearSessionPreservingUsername();
-    window.location.reload();
+    // Emit leaveRoom so backend properly removes/disconnects the player
+    try {
+      if (socket && gameCode && username) {
+        socket.emit('leaveRoom', { gameCode, username });
+      }
+    } catch (error) {
+      logger.error('[RESULTS] Error emitting leaveRoom:', error);
+    }
+
+    clearSessionPreservingUsername(username);
+
+    setTimeout(() => {
+      try {
+        if (socket) {
+          socket.disconnect();
+        }
+      } catch (error) {
+        logger.error('[RESULTS] Error disconnecting socket:', error);
+      }
+      window.location.reload();
+    }, 200);
   };
 
   // Defer expensive word mapping calculation
@@ -415,6 +433,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       <ResultsMainContent
         {...mainContentProps}
         onShowDetails={() => setMobileActiveTab('details')}
+        hideInlineCta={true}
       />
     </>
   );
@@ -549,7 +568,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       </div>
 
       {/* DESKTOP/TABLET VIEW - Two-column side-by-side layout (hidden on mobile) */}
-      <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 md:overflow-y-auto md:overscroll-contain scrollable-area p-4 xl:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 md:overflow-y-auto md:overscroll-contain scrollable-area p-4 xl:p-6 pb-32" style={{ WebkitOverflowScrolling: 'touch' }}>
         {/* Top Bar with Exit Button and Reactions */}
         <div className="w-full max-w-6xl mx-auto flex items-center justify-between mb-4">
           {sortedScores.length > 1 && (
@@ -565,6 +584,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <div className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4">
             <ResultsMainContent
               {...mainContentProps}
+              hideInlineCta={!!gameCode}
             />
           </div>
 
@@ -585,6 +605,27 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </motion.div>
         </div>
       </div>
+
+      {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}
+      {gameCode && onReturnToRoom && !isBotsOnlyGame && (
+        <div className="hidden md:block fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black">
+          <div className="max-w-6xl mx-auto">
+            <StickyReadyBar
+              isHost={isHost}
+              isCurrentPlayerReady={isCurrentPlayerReady}
+              currentPlayerRank={currentPlayerRank}
+              winnerUsername={sortedScores[0]?.username}
+              readyCount={readyUsernames.length}
+              totalPlayers={sortedScores.length}
+              readyUsernames={readyUsernames}
+              onStartGame={handleStartGame}
+              onMarkReady={handleMarkReady}
+              selectedGameMode={selectedGameMode}
+              onSelectGameMode={isHost ? setSelectedGameMode : undefined}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Exit Confirmation Dialog */}
       <ConfirmationDialog

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { RefreshCw, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -29,9 +29,9 @@ export const PullToRefreshIndicator = memo<PullToRefreshIndicatorProps>(({
   const isVisible = pullDistance > 5 || isRefreshing;
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {isVisible && (
-        <motion.div
+        <AdaptiveMotion.div
           className={cn(
             'absolute top-0 left-0 right-0 flex justify-center items-center z-[70] pointer-events-none',
             className
@@ -44,7 +44,7 @@ export const PullToRefreshIndicator = memo<PullToRefreshIndicatorProps>(({
           exit={{ opacity: 0, height: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
-          <motion.div
+          <AdaptiveMotion.div
             className={cn(
               'rounded-full p-2.5 shadow-lg border-2 transition-colors duration-200',
               isAtThreshold || isRefreshing
@@ -74,21 +74,21 @@ export const PullToRefreshIndicator = memo<PullToRefreshIndicatorProps>(({
                 )}
               />
             )}
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Release text hint */}
           {isAtThreshold && !isRefreshing && (
-            <motion.span
+            <AdaptiveMotion.span
               className="absolute bottom-1 text-xs font-medium text-neo-pink dark:text-neo-cyan"
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
             >
               Release to refresh
-            </motion.span>
+            </AdaptiveMotion.span>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

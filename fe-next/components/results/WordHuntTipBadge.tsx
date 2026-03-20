@@ -26,7 +26,7 @@ const WordHuntTipBadge: React.FC<WordHuntTipBadgeProps> = memo(({ stats }) => {
       className="flex items-start gap-1.5 mt-1 px-2 py-1 rounded-neo bg-neo-cyan/10 border border-neo-cyan/30"
     >
       <Lightbulb className="w-3 h-3 text-neo-cyan flex-shrink-0 mt-0.5" />
-      <span className="text-[9px] sm:text-[10px] text-neo-cream/80 leading-snug font-medium">
+      <span className="text-[9px] sm:text-[10px] text-neo-cream leading-snug font-bold">
         {tipText}
       </span>
     </div>

@@ -265,7 +265,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
               <h3 className="font-black text-neo-black text-lg uppercase tracking-tight">
                 {title}
               </h3>
-              <p className="text-neo-black/80 text-sm font-medium mt-0.5">
+              <p className="text-neo-black/80 text-sm font-bold mt-0.5">
                 {description}
               </p>
             </div>

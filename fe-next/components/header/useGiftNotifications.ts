@@ -63,6 +63,19 @@ export function useGiftNotifications() {
         }
     }, [gifts, selectedGift, refreshProfile]);
 
+    // Listen for openGiftModal events dispatched by NotificationBell
+    useEffect(() => {
+        const handleOpenGiftModal = () => {
+            const unclaimedGift = gifts.find(g => !g.claimed);
+            if (unclaimedGift) {
+                setSelectedGift(unclaimedGift);
+                setShowGiftModal(true);
+            }
+        };
+        window.addEventListener('openGiftModal', handleOpenGiftModal);
+        return () => window.removeEventListener('openGiftModal', handleOpenGiftModal);
+    }, [gifts]);
+
     // Auto-show gift modal after 3 seconds when user has unclaimed gifts
     useEffect(() => {
         if (showGiftModal || gifts.length === 0) return;

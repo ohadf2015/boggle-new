@@ -71,7 +71,7 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
         animate={isLow ? { scale: [1, 1.2, 0.95, 1.1, 1] } : {}}
         transition={{ duration: 0.8, repeat: isLow ? Infinity : 0, ease: 'easeInOut' }}
       >
-        <Heart data-testid="heart-icon" className="w-4 h-4 text-white fill-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]" />
+        <Heart data-testid="heart-icon" className="w-4 h-4 text-white fill-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.4)]" />
       </motion.div>
 
       {/* Bar */}
@@ -112,7 +112,7 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span className={cn(
             "text-xs font-black tabular-nums tracking-wide",
-            "drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]",
+            "drop-shadow-[0_1px_3px_rgb(0_0_0/0.7)]",
             pct > 50 ? "text-white" : "text-neo-white"
           )}>
             {Math.floor(life)}/{maxLife}

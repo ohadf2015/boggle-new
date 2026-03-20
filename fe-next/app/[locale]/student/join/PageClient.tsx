@@ -38,7 +38,7 @@ export default function StudentJoinPageClient() {
   // Show loader during auth check or while auth is loading
   if (isChecking || loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neo-navy">
+      <div className="flex min-h-dvh items-center justify-center bg-neo-navy">
         <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );

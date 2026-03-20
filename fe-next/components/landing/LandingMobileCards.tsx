@@ -82,9 +82,9 @@ export function LandingMobileCards({
               'bg-gradient-to-br from-neo-cyan to-cyan-400',
               'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
               'transition-all duration-200 min-h-[80px] sm:min-h-[100px]',
-              'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(0,255,255,0.4))]',
+              'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgb(0_255_255/0.4))]',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-              isFirstTimer && 'ring-4 ring-neo-yellow ring-offset-2 ring-offset-neo-navy [filter:drop-shadow(0_0_24px_rgba(0,255,255,0.5))]'
+              isFirstTimer && 'ring-4 ring-neo-yellow ring-offset-2 ring-offset-neo-navy [filter:drop-shadow(0_0_24px_rgb(0_255_255/0.5))]'
             )}
             aria-label={`${t('landing.singlePlayer')} - ${t('landing.singlePlayerDesc')}`}
           >
@@ -128,7 +128,7 @@ export function LandingMobileCards({
               'bg-gradient-to-br from-neo-pink to-pink-400',
               'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
               'transition-all duration-200 min-h-[80px] sm:min-h-[100px]',
-              'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(255,20,147,0.4))]',
+              'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgb(255_20_147/0.4))]',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
             )}
             aria-label={`${t('landing.multiplayer')} - ${t('landing.multiplayerDesc')}`}
@@ -187,7 +187,7 @@ export function LandingMobileCards({
               'bg-gradient-to-br from-neo-lime via-lime-400 to-lime-500',
               'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
               'transition-all duration-200',
-              'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.5))]',
+              'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgb(163_230_53/0.5))]',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
             )}
             aria-label={`${t('landing.adventureMode')} - ${t('landing.adventureModeDesc')}`}
@@ -224,7 +224,7 @@ export function LandingMobileCards({
                 'bg-gradient-to-br from-neo-orange to-amber-500',
                 'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                 'transition-all duration-200 min-h-[64px] sm:min-h-[80px]',
-                'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(255,107,53,0.4))]',
+                'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgb(255_107_53/0.4))]',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
               )}
               aria-label={`${t('landing.blastMode')} - ${t('landing.blastModeDesc')}`}

@@ -50,7 +50,7 @@ export default function DuelsPageClient() {
 
   if (!classroom) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-neo-navy min-h-screen p-8">
+      <div className="flex-1 flex flex-col items-center justify-center bg-neo-navy min-h-dvh p-8">
         <Swords className="w-16 h-16 text-neo-white/30 mb-4" />
         <p className="text-neo-white/70 font-neo-body text-lg text-center">
           {t('joinClassroomToDuel')}
@@ -68,7 +68,7 @@ export default function DuelsPageClient() {
   const lessonOptions = lessons.map((l) => ({ id: l.id, name: l.name }));
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
+    <div className="min-h-dvh bg-neo-navy p-4 sm:p-6">
       <DuelNotification classroomId={classroom.id} />
 
       <div className="flex gap-1 mb-6 border-b-2 border-neo-white/10">

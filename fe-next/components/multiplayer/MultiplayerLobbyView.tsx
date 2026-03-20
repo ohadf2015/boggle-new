@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Copy, LogOut, Pencil, Check, X } from 'lucide-react';
 import RoomChat from '../RoomChat';
@@ -84,20 +84,6 @@ export interface MultiplayerLobbyViewProps {
 
 const MAX_PLAYERS_DEFAULT = 8;
 
-// Rotating word facts shown while waiting
-const WORD_FACTS = [
-  { key: 'qi', fact: '"QI" is a valid 2-letter word worth 11 points in Scrabble' },
-  { key: 'oxyphenbutazone', fact: '"OXYPHENBUTAZONE" is the highest-scoring word in Scrabble history' },
-  { key: 'set', fact: '"SET" has the most definitions of any English word \u2014 over 430' },
-  { key: 'rhythm', fact: '"RHYTHM" is the longest common English word without a vowel' },
-  { key: 'dreamt', fact: '"DREAMT" is the only English word ending in "MT"' },
-  { key: 'strengths', fact: '"STRENGTHS" has only one vowel in 9 letters' },
-  { key: 'typewriter', fact: '"TYPEWRITER" can be typed using only the top row of a keyboard' },
-  { key: 'uncopyrightable', fact: '"UNCOPYRIGHTABLE" is the longest word with no repeating letters' },
-  { key: 'aa', fact: '"AA" is a valid word \u2014 it\'s a type of volcanic lava' },
-  { key: 'za', fact: '"ZA" is slang for pizza and a valid Scrabble word' },
-];
-
 // Staggered entrance animation
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -133,15 +119,8 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
 }) => {
   const { isAuthenticated, updateProfile } = useAuth();
 
-  // Display players: use filteredPlayers if provided, otherwise filter out host for players
-  const displayPlayers = filteredPlayers ?? (
-    isHost
-      ? playersReady
-      : playersReady.filter(p => {
-          const isHostPlayer = typeof p === 'object' ? p.isHost : false;
-          return !isHostPlayer;
-        })
-  );
+  // Display all players (including host) to everyone
+  const displayPlayers = filteredPlayers ?? playersReady;
 
   // Avatar builder (player-only)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
@@ -155,16 +134,6 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
     // Persist to DB for authenticated users so header/menu avatar updates
     await updateProfile({ avatar_config: config }).catch(() => {});
   }, [onAvatarChange, updateProfile]);
-
-  // Word fact rotation (player-only)
-  const [factIndex, setFactIndex] = useState(0);
-  useEffect(() => {
-    if (isHost) return;
-    const interval = setInterval(() => {
-      setFactIndex(i => (i + 1) % WORD_FACTS.length);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [isHost]);
 
   // Guest name editing (player-only)
   const [isEditingName, setIsEditingName] = useState(false);
@@ -241,23 +210,11 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
       className="space-y-3"
     >
       <div className="flex justify-center">
-        <IdleMascot baseVariant="waving" size="sm" />
+        <IdleMascot baseVariant="waving" size="md" />
       </div>
       <p className="text-sm text-center text-slate-400">
         {t('playerView.hostWillStart')}
       </p>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={factIndex}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.3 }}
-          className="text-xs text-center text-neo-cyan/70 bg-neo-cyan/5 rounded-xl px-4 py-3 border border-neo-cyan/20"
-        >
-          {WORD_FACTS[factIndex].fact}
-        </motion.div>
-      </AnimatePresence>
 
       {/* Bonus Gold Ad while waiting */}
       <div className="flex justify-center">
@@ -357,7 +314,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           'flex-1 min-h-0 rounded-neo-lg overflow-hidden',
           isHost
             ? 'bg-neo-navy-light/50 border-3 border-neo-white/10'
-            : 'bg-neo-navy/30 border-4 border-neo-black shadow-hard',
+            : 'bg-neo-navy/30 border-3 border-neo-cyan/20 shadow-hard',
         )}
       >
         <RoomChat
@@ -406,11 +363,11 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           t={t}
         />
         <MobileShareSection gameCode={gameCode} t={t} />
-        <section className="pb-4">
+        <section className="pb-4 flex-1 flex flex-col min-h-0">
           <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 mb-2">
             {t('hostView.roomChat')}
           </h3>
-          <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-64 sm:h-80">
+          <div className="bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden flex-1 min-h-[20rem] sm:min-h-[24rem]">
             <RoomChat
               username={username}
               isHost={false}

@@ -31,9 +31,14 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Handle notification click - navigate to action URL (prefixed with locale)
+  // Gift notifications open the gift modal directly instead of navigating
   const handleNotificationClick = useCallback(
     (notification: NotificationData) => {
       setIsDropdownOpen(false);
+      if (notification.notification_type === 'gift') {
+        window.dispatchEvent(new CustomEvent('openGiftModal'));
+        return;
+      }
       if (notification.action_url) {
         const url = notification.action_url.startsWith('/')
           ? `/${language}${notification.action_url}`
@@ -45,7 +50,13 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
   );
 
   // Handle toast action (also needs locale prefix)
+  // Gift notifications open the gift modal directly instead of navigating
   const handleToastAction = useCallback(() => {
+    if (latestNotification?.notification_type === 'gift') {
+      window.dispatchEvent(new CustomEvent('openGiftModal'));
+      clearLatestNotification();
+      return;
+    }
     if (latestNotification?.action_url) {
       const url = latestNotification.action_url.startsWith('/')
         ? `/${language}${latestNotification.action_url}`
@@ -75,6 +86,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
           active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
           transition-all duration-100
           focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
+          cursor-pointer
         "
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >

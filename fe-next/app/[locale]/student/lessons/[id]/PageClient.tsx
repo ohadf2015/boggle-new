@@ -249,7 +249,7 @@ function PracticeContent({
 
   // Mode selector view
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden min-h-screen', isRTL && 'rtl')}>
+    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden min-h-dvh', isRTL && 'rtl')}>
       <EducationHeader showBackButton />
 
       <div className="w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">

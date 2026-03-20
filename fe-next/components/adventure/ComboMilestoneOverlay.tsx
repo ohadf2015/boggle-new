@@ -103,7 +103,7 @@ export const ComboMilestoneOverlay = memo(function ComboMilestoneOverlay({
               font-neo-display text-neo-yellow
               text-6xl sm:text-7xl md:text-8xl lg:text-9xl
               font-black uppercase tracking-tight
-              drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]
+              drop-shadow-[4px_4px_0px_black]
               select-none
             "
             variants={textVariants}

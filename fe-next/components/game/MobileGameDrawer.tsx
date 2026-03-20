@@ -63,9 +63,8 @@ export function MobileGameDrawer({
       transition={{ type: 'spring', stiffness: 400, damping: 35 }}
     >
       {/* Peek bar — always visible, shows key stats + drag handle */}
-      <motion.div
-        role="button"
-        tabIndex={0}
+      <motion.button
+        type="button"
         aria-expanded={isOpen}
         aria-label={t('game.drawer.toggle')}
         className="w-full bg-neo-navy/95 backdrop-blur-sm border-t-2 border-neo-black/60 cursor-grab active:cursor-grabbing touch-none select-none"
@@ -116,7 +115,7 @@ export function MobileGameDrawer({
           {/* Drag pill */}
           <div className="w-6 h-1 rounded-full bg-neo-cream/30" />
         </div>
-      </motion.div>
+      </motion.button>
 
       {/* Expanded content */}
       <motion.div

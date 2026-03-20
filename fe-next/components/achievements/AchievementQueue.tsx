@@ -200,7 +200,7 @@ function AchievementInlineToast({
       animate={{ y: 0, opacity: 1, scale: 1 }}
       exit={{ y: -40, opacity: 0, scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className="fixed inset-x-0 z-[9999] flex justify-center pointer-events-none px-4"
+      className="fixed inset-x-0 z-60 flex justify-center pointer-events-none px-4"
       style={{
         top: 'max(1rem, env(safe-area-inset-top, 1rem))',
       }}

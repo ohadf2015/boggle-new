@@ -255,7 +255,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
               >
                 <Trophy className="w-10 h-10 text-neo-lime" />
               </motion.div>
-              <h2 className="text-2xl font-black text-neo-black drop-shadow-[1px_1px_0px_white]">
+              <h2 className="text-2xl font-black text-neo-black ltr:drop-shadow-[1px_1px_0px_white] rtl:drop-shadow-[-1px_1px_0px_white]">
                 {t('customPuzzle.created')}
               </h2>
               <p className="text-neo-black/70 mt-1 font-medium">

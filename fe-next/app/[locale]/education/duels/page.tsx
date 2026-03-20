@@ -7,7 +7,7 @@ export default function DuelsPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-screen">
+        <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-cyan" />
         </div>
       }

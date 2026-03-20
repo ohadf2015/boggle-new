@@ -121,7 +121,7 @@ describe('CoinSpendAnimation', () => {
         />
       );
       const wrapper = container.firstChild as HTMLElement;
-      expect(wrapper).toHaveClass('z-[200]');
+      expect(wrapper).toHaveClass('z-60');
     });
   });
 

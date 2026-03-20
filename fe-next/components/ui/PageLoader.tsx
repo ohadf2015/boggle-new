@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Mascot, type MascotVariant } from './Mascot';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
@@ -84,7 +84,7 @@ export const PageLoader = memo(function PageLoader({
           {/* Background ring */}
           <div className="absolute inset-0 rounded-full border-4 border-neo-cyan/20" />
           {/* Animated spinner ring */}
-          <motion.div
+          <AdaptiveMotion.div
             className="absolute inset-0 rounded-full border-4 border-transparent border-t-neo-cyan border-r-neo-pink"
             animate={{ rotate: 360 }}
             transition={{
@@ -104,13 +104,13 @@ export const PageLoader = memo(function PageLoader({
           </div>
         </div>
         {text && (
-          <motion.p
+          <AdaptiveMotion.p
             className="text-sm font-neo-body text-neo-cream/70"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
             {text}
-          </motion.p>
+          </AdaptiveMotion.p>
         )}
       </div>
     </div>

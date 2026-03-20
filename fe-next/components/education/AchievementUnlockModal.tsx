@@ -115,7 +115,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
           aria-modal="false"
           aria-labelledby={titleId}
           className={cn(
-            'fixed top-4 ltr:right-4 rtl:left-4 z-[300]',
+            'fixed top-4 ltr:right-4 rtl:left-4 z-60',
             'w-full max-w-sm mx-4 sm:mx-0',
             'bg-neo-navy border-3 border-neo-black',
             'rounded-neo shadow-hard',
@@ -172,7 +172,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
           aria-modal="true"
           aria-labelledby={titleId}
           className={cn(
-            'fixed inset-0 z-[300]',
+            'fixed inset-0 z-60',
             'flex items-center justify-center',
             'bg-neo-black/80 backdrop-blur-sm'
           )}

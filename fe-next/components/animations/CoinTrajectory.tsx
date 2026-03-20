@@ -192,7 +192,7 @@ export function CoinTrajectory({
   return (
     <div
       className={cn(
-        'fixed inset-0 pointer-events-none z-[200] overflow-hidden',
+        'fixed inset-0 pointer-events-none z-60 overflow-hidden',
         className
       )}
     >

@@ -161,7 +161,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
 
       {/* Breakdown */}
       {showBreakdown && (
-        <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium flex-wrap relative z-10">
+        <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-bold flex-wrap relative z-10">
           {reward.breakdown.base > 0 && (
             <span>{t('reveal.base')}: +{reward.breakdown.base}</span>
           )}
@@ -220,10 +220,10 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
         className
       )}>
         <div className="flex items-center justify-center gap-1">
-          <Lock className="w-3 h-3 text-slate-300" />
-          <span className="font-bold text-slate-300 text-xs">+{reward.awarded}</span>
+          <Lock className="w-3 h-3 text-neo-cream/70" />
+          <span className="font-bold text-neo-cream/70 text-xs">+{reward.awarded}</span>
         </div>
-        <div className="text-[7px] font-medium text-slate-400">
+        <div className="text-[7px] font-bold text-neo-cream/50">
           {t('coins.signInShort')}
         </div>
       </div>
@@ -242,7 +242,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
           <Coins className="w-5 h-5 text-amber-400/60" />
           <span className="font-black text-xl text-amber-400/80">+{reward.awarded}</span>
         </div>
-        <p className="text-xs text-slate-300 mt-1 text-center">
+        <p className="text-xs text-neo-cream/80 mt-1 text-center">
           {formattedMessage}
         </p>
       </div>
@@ -265,13 +265,13 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
         <Lock className="w-4 h-4 text-amber-400" />
         <Coins className="w-5 h-5 text-amber-400/60" />
         <span className="font-black text-xl text-amber-400/80">+{reward.awarded}</span>
-        <span className="text-sm font-bold text-slate-400">
+        <span className="text-sm font-bold text-neo-cream/60">
           {t('reveal.coins')}
         </span>
       </div>
 
       {/* Teasing message */}
-      <p className="text-sm text-slate-300 text-center font-medium">
+      <p className="text-sm text-neo-cream/80 text-center font-bold">
         {formattedMessage}
       </p>
     </motion.div>

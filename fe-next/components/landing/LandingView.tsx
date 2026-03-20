@@ -66,20 +66,16 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
 
-  // Defer non-critical hooks until after first paint to speed up TTI
+  // Defer below-fold content until after first paint to speed up FCP.
+  // Uses rAF (fires on next frame ~16ms) instead of requestIdleCallback
+  // which can be delayed several seconds on busy pages, blocking scroll.
   const [hydrated, setHydrated] = useState(false);
   const hydratedRef = useRef(false);
   useEffect(() => {
     if (hydratedRef.current) return;
     hydratedRef.current = true;
-    // Use requestIdleCallback (or setTimeout fallback) to defer after first paint
-    const id = typeof requestIdleCallback !== 'undefined'
-      ? requestIdleCallback(() => setHydrated(true))
-      : setTimeout(() => setHydrated(true), 100) as unknown as number;
-    return () => {
-      if (typeof cancelIdleCallback !== 'undefined') cancelIdleCallback(id);
-      else clearTimeout(id);
-    };
+    const id = requestAnimationFrame(() => setHydrated(true));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const liveRoomStats = useLiveRoomStats();

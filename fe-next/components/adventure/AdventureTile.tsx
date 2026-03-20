@@ -403,12 +403,12 @@ export const AdventureTile = memo(({
         className={cn(
           'relative z-20 select-none',
           // Stronger text shadow for legibility against all tile backgrounds
-          'drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]',
+          'drop-shadow-[0_1px_2px_rgb(0_0_0/0.6)]',
           // Extra contrast on dark tiles where text is light
           (tile.type === 'bomb' || tile.type === 'chain' || tile.type === 'time') &&
-            'drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]',
+            'drop-shadow-[0_1px_3px_rgb(0_0_0/0.8)]',
           // Keep existing gold/rainbow shadow
-          (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
+          (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]'
         )}
       >
         {tile.letter}
@@ -420,7 +420,7 @@ export const AdventureTile = memo(({
       {/* Boss lock overlay */}
       {isLocked && (
         <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none rounded-neo bg-black/30">
-          <span className="text-neo-red text-[0.6em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">🔒</span>
+          <span className="text-neo-red text-[0.6em] drop-shadow-[0_1px_2px_rgb(0_0_0/0.8)]">🔒</span>
         </div>
       )}
     </AdaptiveMotion.div>

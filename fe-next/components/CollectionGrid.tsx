@@ -130,9 +130,8 @@ function CollectibleBadge({ item, index }: CollectibleBadgeProps) {
 
   return (
     <MobileTooltip content={tooltipContent} side="top" contentClassName="max-w-xs">
-      <motion.div
-        role="button"
-        tabIndex={0}
+      <motion.button
+        type="button"
         aria-label={`${itemName} - ${rarityLabel}${equippedLabel}`}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -164,7 +163,7 @@ function CollectibleBadge({ item, index }: CollectibleBadgeProps) {
             ✓
           </span>
         )}
-      </motion.div>
+      </motion.button>
     </MobileTooltip>
   );
 }

@@ -127,7 +127,7 @@ export function CoinBurstSource({
     if (trigger && showAmount && amount !== undefined) {
       return (
         <div
-          className={cn('fixed pointer-events-none z-[200]', className)}
+          className={cn('fixed pointer-events-none z-60', className)}
           style={{ left: position.x, top: position.y, transform: 'translate(-50%, -50%)' }}
         >
           <div className="px-4 py-2 rounded-neo bg-neo-lime border-3 border-neo-black shadow-hard">
@@ -143,7 +143,7 @@ export function CoinBurstSource({
 
   return (
     <div
-      className={cn('fixed pointer-events-none z-[200]', className)}
+      className={cn('fixed pointer-events-none z-60', className)}
       style={{ left: position.x, top: position.y }}
     >
       {/* Expanding ring effect */}

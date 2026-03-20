@@ -67,17 +67,10 @@ export const RoomList: React.FC<RoomListProps> = ({
     return (
       <div className="h-full flex flex-col rounded-neo border-3 border-neo-black bg-slate-800 shadow-hard overflow-hidden">
         {/* Compact header - inline title + badge + refresh */}
-        <div
-          className="flex items-center justify-between gap-2 p-3 border-b-2 border-neo-black/30 cursor-pointer md:cursor-default"
+        <button
+          type="button"
+          className="flex items-center justify-between gap-2 p-3 border-b-2 border-neo-black/30 cursor-pointer md:cursor-default w-full appearance-none bg-transparent text-left"
           onClick={onToggleMobileExpand}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e: React.KeyboardEvent) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              onToggleMobileExpand();
-            }
-          }}
         >
           <div className="flex items-center gap-2 min-w-0">
             <span className="font-black text-neo-white text-sm uppercase truncate">
@@ -110,7 +103,7 @@ export const RoomList: React.FC<RoomListProps> = ({
               <TooltipContent>{t('common.refresh')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
+        </button>
 
         {/* Content */}
         <div className={cn(

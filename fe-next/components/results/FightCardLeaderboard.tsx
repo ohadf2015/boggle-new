@@ -43,6 +43,8 @@ interface FightCardLeaderboardProps {
   gameMode?: string;
   emojiReactions?: EmojiReaction[];
   className?: string;
+  /** Show only top 2 + current player initially, expand for rest */
+  deferRankings?: boolean;
 }
 
 // ============================================================
@@ -237,14 +239,18 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
         )}
       </div>
 
-      {/* Score — responsive text */}
+      {/* Score — animate only rank 1 + current player to reduce visual noise */}
       <div className="text-end shrink-0">
         <span className={cn(
           'font-neo-display tabular-nums',
           rank === 1 ? 'text-xl sm:text-2xl' : 'text-base sm:text-xl',
           rank === 1 ? accent.textColor : isCurrentPlayer ? 'text-white' : 'text-white/40',
         )}>
-          <ScoreCountUp to={participant.score} duration={1200} delay={reducedMotion ? 0 : 80 * index + 200} />
+          {(rank === 1 || isCurrentPlayer) ? (
+            <ScoreCountUp to={participant.score} duration={1200} delay={reducedMotion ? 0 : 80 * index + 200} />
+          ) : (
+            participant.score.toLocaleString()
+          )}
         </span>
       </div>
     </motion.div>
@@ -256,11 +262,12 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
 // ============================================================
 
 const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
-  participants, currentUsername, gameMode, emojiReactions = [], className,
+  participants, currentUsername, gameMode, emojiReactions = [], className, deferRankings = false,
 }) => {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
   const [dismissedBubbles, setDismissedBubbles] = useState<Set<string>>(new Set());
+  const [expanded, setExpanded] = useState(false);
 
   const activeBubbles = emojiReactions.filter(r => !dismissedBubbles.has(r.id));
   const handleDismiss = (id: string) => setDismissedBubbles(prev => new Set(prev).add(id));
@@ -322,6 +329,13 @@ const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
     );
   }
 
+  // Deferred rankings: show top 2 + current player, collapse the rest
+  const shouldDefer = deferRankings && participants.length > 3 && !expanded;
+  const visibleParticipants = shouldDefer
+    ? participants.filter((p, i) => i < 2 || p.isCurrentPlayer || p.name === currentUsername)
+    : participants;
+  const hiddenCount = participants.length - visibleParticipants.length;
+
   // Classic / Blast: single ranked list
   return (
     <div className={cn('space-y-1.5 sm:space-y-2', className)}>
@@ -333,14 +347,29 @@ const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
           {participants.length} {t('results.players')}
         </span>
       </div>
-      {participants.map((p, i) => (
-        <PlayerRow
-          key={p.name} participant={p} rank={i + 1}
-          isCurrentPlayer={p.isCurrentPlayer ?? p.name === currentUsername}
-          reducedMotion={reducedMotion} index={i}
-          emojiReactions={activeBubbles} onDismissBubble={handleDismiss} t={t}
-        />
-      ))}
+      {visibleParticipants.map((p) => {
+        const originalIndex = participants.indexOf(p);
+        return (
+          <PlayerRow
+            key={p.name} participant={p} rank={originalIndex + 1}
+            isCurrentPlayer={p.isCurrentPlayer ?? p.name === currentUsername}
+            reducedMotion={reducedMotion} index={originalIndex}
+            emojiReactions={activeBubbles} onDismissBubble={handleDismiss} t={t}
+          />
+        );
+      })}
+      {/* Expand button for deferred rankings */}
+      {shouldDefer && hiddenCount > 0 && (
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          onClick={() => setExpanded(true)}
+          className="w-full py-2.5 border-3 border-dashed border-slate-600 text-xs font-black uppercase tracking-wider text-neo-cream/50 hover:text-neo-cream hover:border-neo-cream/40 transition-colors"
+        >
+          {t('results.showAllRankings', { count: hiddenCount })}
+        </motion.button>
+      )}
     </div>
   );
 });

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -41,11 +42,9 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
 
   return (
     <>
-    <motion.div
+    <motion.button
+      type="button"
       onClick={openBuilder}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBuilder(); } }}
       className={cn(
         'flex items-center gap-4 sm:gap-5 px-5 py-4 sm:px-6 sm:py-5',
         'bg-gradient-to-r from-neo-purple/25 to-neo-pink/15',
@@ -62,7 +61,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
     >
       <div className="flex -space-x-3 rtl:space-x-reverse shrink-0">
         {SAMPLE_AVATARS.map((config, i) => (
-          <motion.div
+          <AdaptiveMotion.div
             key={i}
             className={cn(
               'border-3 border-neo-black rounded-full overflow-hidden shadow-hard-sm',
@@ -72,7 +71,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
             transition={{ duration: 2 + i * 0.3, repeat: Infinity, repeatDelay: 3 + i, ease: 'easeInOut' }}
           >
             <AvatarRenderer config={config} size={48} />
-          </motion.div>
+          </AdaptiveMotion.div>
         ))}
       </div>
       <div className="flex-1 min-w-0">
@@ -81,15 +80,15 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
         </p>
         <p className="text-neo-white/50 text-xs sm:text-sm font-medium flex items-center gap-1.5 mt-0.5">
           {t('landing.designYourLook')}
-          <motion.span
+          <AdaptiveMotion.span
             animate={{ x: dir === 'rtl' ? [0, -5, 0] : [0, 5, 0] }}
             transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
           >
             <ArrowIcon className="w-3.5 h-3.5 text-neo-purple" />
-          </motion.span>
+          </AdaptiveMotion.span>
         </p>
       </div>
-    </motion.div>
+    </motion.button>
     <AvatarBuilderModal
       isOpen={isBuilderOpen}
       onClose={closeBuilder}

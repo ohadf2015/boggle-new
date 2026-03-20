@@ -90,7 +90,6 @@ const TimeScopeTabs = memo<TimeScopeTabsProps>(({ timeScope, onScopeChange }) =>
       {tabs.map(tab => (
         <button
           key={tab.key}
-          role="button"
           onClick={() => onScopeChange(tab.key)}
           className={cn(
             'px-4 py-2 rounded-neo border-neo font-neo-body font-bold text-sm transition-all',

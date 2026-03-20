@@ -50,7 +50,7 @@ const NewYearFireworks = memo(({ active, count = 8, duration = 5000 }: NewYearFi
   return (
     <AnimatePresence>
       {active && (
-        <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none z-60 overflow-hidden">
           {fireworks.map((firework) => (
             <Firework
               key={firework.id}

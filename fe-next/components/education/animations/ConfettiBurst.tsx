@@ -112,7 +112,7 @@ export function ConfettiBurst({
     <canvas
       ref={canvasRef}
       data-testid="confetti-canvas"
-      className={`pointer-events-none fixed inset-0 z-[9999] ${className}`}
+      className={`pointer-events-none fixed inset-0 z-60 ${className}`}
     />
   );
 }

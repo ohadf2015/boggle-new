@@ -23,7 +23,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
@@ -288,7 +288,7 @@ export function Collapsible({
         )}
         {renderBadge()}
       </div>
-      <motion.div
+      <AdaptiveMotion.div
         animate={{ rotate: isOpen ? 180 : 0 }}
         transition={{ duration: 0.2 }}
       >
@@ -296,15 +296,15 @@ export function Collapsible({
           'flex-shrink-0',
           bordered ? 'w-5 h-5' : 'w-4 h-4 sm:w-5 sm:h-5'
         )} />
-      </motion.div>
+      </AdaptiveMotion.div>
     </button>
   );
 
   // Expandable content
   const expandableContent = (
-    <AnimatePresence initial={false}>
+    <AdaptiveAnimatePresence initial={false}>
       {isOpen && (
-        <motion.div
+        <AdaptiveMotion.div
           id={contentId}
           role="region"
           aria-labelledby={`${contentId}-header`}
@@ -322,9 +322,9 @@ export function Collapsible({
           )}>
             {children}
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 
   // Render with or without bordered wrapper

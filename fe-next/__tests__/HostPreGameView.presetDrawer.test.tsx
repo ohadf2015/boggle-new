@@ -35,6 +35,10 @@ jest.mock('../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),
 }));
 
+jest.mock('../contexts/AuthContext', () => ({
+  useAuth: () => ({ isAdmin: true, isAuthenticated: true, profile: null }),
+}));
+
 jest.mock('../hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
     showInviteButton: jest.fn(),

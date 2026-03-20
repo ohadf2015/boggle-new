@@ -81,7 +81,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
           aria-modal="true"
           aria-labelledby={titleId}
           className={cn(
-            'fixed inset-0 z-[300]',
+            'fixed inset-0 z-60',
             'flex items-center justify-center',
             'bg-neo-black/80 backdrop-blur-sm'
           )}
@@ -121,7 +121,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               className={cn(
                 'text-3xl md:text-4xl font-black',
                 'text-neo-yellow',
-                'drop-shadow-[0_0_15px_rgba(255,225,53,0.6)]',
+                'drop-shadow-[0_0_15px_rgb(255_225_53/0.6)]',
                 'mb-4'
               )}
             >
@@ -148,7 +148,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                   className={cn(
                     'text-4xl md:text-5xl font-black',
                     'text-neo-orange',
-                    'drop-shadow-[0_0_10px_rgba(255,107,53,0.5)]'
+                    'drop-shadow-[0_0_10px_rgb(255_107_53/0.5)]'
                   )}
                 >
                   {level}

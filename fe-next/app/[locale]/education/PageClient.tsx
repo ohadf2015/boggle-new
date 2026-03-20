@@ -231,7 +231,7 @@ export default function EducationPageClient() {
   };
 
   return (
-    <div className="min-h-screen bg-neo-navy relative">
+    <div className="min-h-dvh bg-neo-navy relative">
       {/* Halftone dot pattern overlay */}
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.04]"

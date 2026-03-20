@@ -21,6 +21,14 @@ jest.mock('framer-motion', () => ({
       );
     },
     span: ({ children, ...props }: Record<string, unknown>) => <span {...props}>{children as React.ReactNode}</span>,
+    button: ({ children, onClick, ...props }: Record<string, unknown>) => {
+      const filteredProps = Object.fromEntries(
+        Object.entries(props).filter(([key]) =>
+          !['drag', 'dragConstraints', 'dragElastic', 'transition', 'initial', 'exit', 'whileHover', 'whileTap', 'animate', 'style'].includes(key)
+        )
+      );
+      return (<button {...filteredProps} onClick={onClick as React.MouseEventHandler}>{children as React.ReactNode}</button>);
+    },
   },
   m: {
     div: ({ children, onClick, onDragEnd, animate, ...props }: Record<string, unknown>) => {

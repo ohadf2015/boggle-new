@@ -160,7 +160,7 @@ describe('wordHuntHandler', () => {
       mockValidateTargetGuess.mockReturnValue([
         'correct', 'correct', 'correct', 'correct', 'correct',
       ]);
-      mockRecordTargetFound.mockReturnValue({ isFirstFinder: true, bonus: 50 });
+      mockRecordTargetFound.mockReturnValue({ isFirstFinder: true, bonus: 500 });
 
       handleSubmitTargetWord(mockIo, mockSocket, { guess: 'hello' });
 
@@ -169,7 +169,7 @@ describe('wordHuntHandler', () => {
         guess: 'hello',
         correct: true,
         isFirstFinder: true,
-        bonus: 50,
+        bonus: 500,
       }));
 
       // Should broadcast to room

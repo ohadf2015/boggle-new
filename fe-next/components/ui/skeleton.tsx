@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
@@ -77,7 +77,7 @@ export const NeoSkeleton = memo(function NeoSkeleton({
       aria-label="Loading"
       aria-busy="true"
     >
-      <motion.div
+      <AdaptiveMotion.div
         className="absolute inset-0"
         style={{
           background: `linear-gradient(90deg, transparent 0%, rgba(255, 225, 53, 0.08) 50%, transparent 100%)`,

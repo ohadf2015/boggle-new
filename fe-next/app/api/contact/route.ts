@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 import { captureApiError } from '@/utils/sentry';
 import { checkApiRateLimit, rateLimitResponse, addRateLimitHeaders } from '@/lib/apiRateLimit';
-
-// Timeout for SendGrid API calls (prevents indefinite hangs)
-const SENDGRID_TIMEOUT_MS = 10_000; // 10 seconds
+import { withTimeout, EMAIL_COLORS } from '@/lib/email';
 
 /**
  * HTML entity encoding to prevent XSS in email HTML content
- * This is critical for security when user input is rendered in HTML emails
  */
 function escapeHtml(str: string): string {
   return str
@@ -19,32 +17,9 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;');
 }
 
-/**
- * Fetch with timeout using AbortController
- */
-async function fetchWithTimeout(
-  url: string,
-  options: RequestInit,
-  timeoutMs: number = SENDGRID_TIMEOUT_MS
-): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    return response;
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`SendGrid request timed out after ${timeoutMs / 1000}s`);
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 /**
  * Contact Form API Endpoint
@@ -53,7 +28,7 @@ async function fetchWithTimeout(
  * 1. Rate limits requests (5 per hour per IP to prevent spam)
  * 2. Validates input
  * 3. Stores message in Supabase
- * 4. Optionally sends email notification via SendGrid
+ * 4. Sends email notification via Resend
  */
 
 const CONTACT_EMAIL = 'lexiclash.game@gmail.com';
@@ -82,71 +57,50 @@ function getSupabaseAdmin() {
 }
 
 /**
- * Send email notification via SendGrid
+ * Send email notification via Resend
  */
 async function sendEmailNotification(name: string, email: string, message: string): Promise<boolean> {
-  const sendgridApiKey = process.env.SENDGRID_API_KEY;
+  const fromEmail = process.env.RESEND_FROM_EMAIL;
 
-  if (!sendgridApiKey) {
-    console.log('[Contact Form] SendGrid not configured, skipping email notification');
+  if (!resend || !fromEmail) {
+    console.log('[Contact Form] Resend not configured, skipping email notification');
     return false;
   }
 
-  try {
-    const response = await fetchWithTimeout('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${sendgridApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        personalizations: [
-          {
-            to: [{ email: CONTACT_EMAIL }],
-            subject: `[LexiClash Contact] New message from ${name}`,
-          },
-        ],
-        from: {
-          email: 'noreply@lexiclash.com',
-          name: 'LexiClash Contact Form',
-        },
-        reply_to: {
-          email: email,
-          name: name,
-        },
-        content: [
-          {
-            type: 'text/plain',
-            value: `New contact form submission:\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\n---\nSent via LexiClash Contact Form`,
-          },
-          {
-            type: 'text/html',
-            // Security: Escape user input to prevent XSS in HTML emails
-            value: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #1a1a2e; border-bottom: 3px solid #FFE135; padding-bottom: 10px;">
-                  New Contact Form Submission
-                </h2>
-                <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-                <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
-                <div style="margin-top: 20px; padding: 15px; background-color: #f5f5f5; border-radius: 8px;">
-                  <strong>Message:</strong>
-                  <p style="white-space: pre-wrap;">${escapeHtml(message)}</p>
-                </div>
-                <p style="margin-top: 20px; color: #666; font-size: 12px;">
-                  Sent via LexiClash Contact Form
-                </p>
-              </div>
-            `,
-          },
-        ],
-      }),
-    });
+  const colors = EMAIL_COLORS;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[Contact Form] SendGrid error:', errorText);
-      captureApiError(new Error(`SendGrid error: ${errorText}`), '/api/contact', {
+  try {
+    const result = await withTimeout(
+      resend.emails.send({
+        from: fromEmail,
+        to: CONTACT_EMAIL,
+        replyTo: email,
+        subject: `[LexiClash Contact] New message from ${name}`,
+        text: `New contact form submission:\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\n---\nSent via LexiClash Contact Form`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: ${colors.navy}; padding: 24px; border-radius: 12px;">
+            <h2 style="color: ${colors.lime}; border-bottom: 3px solid ${colors.lime}; padding-bottom: 10px;">
+              New Contact Form Submission
+            </h2>
+            <p style="color: ${colors.white};"><strong style="color: ${colors.cyan};">Name:</strong> ${escapeHtml(name)}</p>
+            <p style="color: ${colors.white};"><strong style="color: ${colors.cyan};">Email:</strong> <a href="mailto:${escapeHtml(email)}" style="color: ${colors.lime};">${escapeHtml(email)}</a></p>
+            <div style="margin-top: 20px; padding: 15px; background-color: ${colors.navyCard}; border: 2px solid ${colors.grayDark}; border-radius: 8px;">
+              <strong style="color: ${colors.cyan};">Message:</strong>
+              <p style="white-space: pre-wrap; color: ${colors.white}; line-height: 1.6;">${escapeHtml(message)}</p>
+            </div>
+            <p style="margin-top: 20px; color: ${colors.gray}; font-size: 12px;">
+              Sent via LexiClash Contact Form
+            </p>
+          </div>
+        `,
+      }),
+      10_000,
+      'Resend API timed out after 10 seconds'
+    );
+
+    if (result.error) {
+      console.error('[Contact Form] Resend error:', result.error);
+      captureApiError(new Error(result.error.message), '/api/contact', {
         method: 'POST',
         statusCode: 500,
       });

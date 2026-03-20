@@ -343,6 +343,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         {onClose && (
           <button
             onClick={onClose}
+            aria-label={t('common.close')}
             className={cn(
               'absolute top-2 right-2 p-1.5 rounded-full transition-colors',
               isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-black/5 text-gray-600'
@@ -370,8 +371,8 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
                 : t('results.wellPlayed')}
             </h3>
             <p className={cn(
-              'text-sm font-medium italic',
-              isDarkMode ? 'text-gray-300' : 'text-gray-600'
+              'text-sm font-bold italic',
+              isDarkMode ? 'text-neo-cream/80' : 'text-gray-600'
             )}>
               &ldquo;{wittyMessage}&rdquo;
             </p>
@@ -384,7 +385,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium mb-4',
+              'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold mb-4',
               streakDays >= 7
                 ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                 : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
@@ -432,8 +433,8 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
 
         {/* Viral prompt */}
         <p className={cn(
-          'mt-3 text-center text-sm font-medium',
-          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          'mt-3 text-center text-sm font-bold',
+          isDarkMode ? 'text-neo-cream/60' : 'text-gray-500'
         )}>
           {t('results.challengeFriends')}
         </p>

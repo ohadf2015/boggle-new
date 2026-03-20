@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 
 /**
@@ -85,7 +86,7 @@ export const LoadingDots: React.FC<LoadingDotsProps> = ({
   return (
     <div className={cn('flex items-center gap-1.5', className)} role="status">
       {[0, 1, 2].map((i) => (
-        <motion.div
+        <AdaptiveMotion.div
           key={i}
           className={cn('rounded-full', sizeClasses[size], variantClasses[variant])}
           animate={{
@@ -120,7 +121,7 @@ export const LoadingPulse: React.FC<LoadingPulseProps> = ({ className }) => (
     )}
     role="status"
   >
-    <motion.div
+    <AdaptiveMotion.div
       className="absolute w-full h-full rounded-neo bg-neo-lime/30"
       animate={{
         scale: [1, 1.2, 1],
@@ -309,7 +310,7 @@ export const FullPageLoader: React.FC<FullPageLoaderProps> = ({
       >
         {/* Game-themed loading animation */}
         <div className="relative mb-8">
-          <motion.div
+          <AdaptiveMotion.div
             className="w-24 h-24 rounded-neo-lg bg-neo-lime border-4 border-neo-black shadow-hard-lg"
             animate={{
               rotate: [0, 90, 180, 270, 360],
@@ -324,10 +325,10 @@ export const FullPageLoader: React.FC<FullPageLoaderProps> = ({
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-3xl font-black text-neo-black">L</span>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
           {/* Orbiting letters */}
           {['E', 'X', 'I'].map((letter, i) => (
-            <motion.div
+            <AdaptiveMotion.div
               key={letter}
               className="absolute w-8 h-8 rounded-neo bg-neo-pink border-2 border-neo-black flex items-center justify-center"
               style={{ top: '50%', left: '50%', marginTop: -16, marginLeft: -16 }}
@@ -343,17 +344,17 @@ export const FullPageLoader: React.FC<FullPageLoaderProps> = ({
               }}
             >
               <span className="text-sm font-black text-neo-black">{letter}</span>
-            </motion.div>
+            </AdaptiveMotion.div>
           ))}
         </div>
 
-        <motion.h2
+        <AdaptiveMotion.h2
           className="text-2xl font-black text-neo-white mb-2"
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
           {message}
-        </motion.h2>
+        </AdaptiveMotion.h2>
         {subMessage && (
           <p className="text-neo-white/70 font-medium">{subMessage}</p>
         )}
@@ -372,13 +373,13 @@ export const FullPageLoader: React.FC<FullPageLoaderProps> = ({
       aria-live="polite"
     >
       <LoadingSpinner size="xl" variant="primary" />
-      <motion.p
+      <AdaptiveMotion.p
         className="mt-6 text-xl font-black text-neo-black dark:text-neo-white"
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >
         {message}
-      </motion.p>
+      </AdaptiveMotion.p>
       {subMessage && (
         <p className="text-neo-black/60 dark:text-neo-white/60 font-medium mt-2">
           {subMessage}

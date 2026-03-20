@@ -74,7 +74,11 @@ const MissedWords = memo<MissedWordsProps>(({
   }, [onWordSelect, selectedWord]);
 
   if (allHighValueWords.length === 0) {
-    return null;
+    return (
+      <div className={cn('py-6 text-center text-neo-cream/50 text-sm', className)}>
+        {t('results.noMissedWords')}
+      </div>
+    );
   }
 
   // Calculate total potential points for displayed words
@@ -154,7 +158,7 @@ const MissedWords = memo<MissedWordsProps>(({
                   {hasPath && (
                     <Grid3X3 className={cn(
                       'w-3 h-3',
-                      isSelected ? 'text-neo-lime' : 'text-slate-400'
+                      isSelected ? 'text-neo-lime' : 'text-neo-cream/50'
                     )} />
                   )}
                 </motion.button>

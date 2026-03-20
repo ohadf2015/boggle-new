@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -30,12 +30,17 @@ interface ToastItemProps {
 const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
   const [progress, setProgress] = useState(100);
   const duration = toast.duration || 5000;
+  const isPausedRef = useRef(false);
+  const elapsedBeforePauseRef = useRef(0);
+  const segmentStartRef = useRef(0);
 
   // Auto-dismiss progress
   useEffect(() => {
-    const startTime = Date.now();
+    elapsedBeforePauseRef.current = 0;
+    segmentStartRef.current = Date.now();
     const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
+      if (isPausedRef.current) return;
+      const elapsed = elapsedBeforePauseRef.current + (Date.now() - segmentStartRef.current);
       const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
       setProgress(remaining);
 
@@ -92,6 +97,14 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
       )}
       role="alert"
       aria-live="polite"
+      onMouseEnter={() => {
+        isPausedRef.current = true;
+        elapsedBeforePauseRef.current += Date.now() - segmentStartRef.current;
+      }}
+      onMouseLeave={() => {
+        isPausedRef.current = false;
+        segmentStartRef.current = Date.now();
+      }}
     >
       {/* Progress bar */}
       <div className="absolute bottom-0 left-0 h-1 bg-neo-black/20">
@@ -145,7 +158,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
           <button
             onClick={() => onRemove(toast.id)}
             className={cn(
-              'flex-shrink-0 p-1 rounded-neo',
+              'flex-shrink-0 p-2.5 rounded-neo cursor-pointer',
               'hover:bg-neo-black/10 active:bg-neo-black/20',
               'transition-colors',
               text
@@ -206,7 +219,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
   return (
     <div
       className={cn(
-        'fixed z-[9999] flex flex-col gap-3 pointer-events-none',
+        'fixed z-50 flex flex-col gap-3 pointer-events-none',
         positionStyles[position],
         className
       )}

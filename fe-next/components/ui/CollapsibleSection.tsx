@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
@@ -104,12 +104,12 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
             </span>
           )}
         </div>
-        <motion.div
+        <AdaptiveMotion.div
           animate={{ rotate: isExpanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
           <ChevronDown className="w-5 h-5 flex-shrink-0" />
-        </motion.div>
+        </AdaptiveMotion.div>
       </button>
 
       {/* Summary line — visible only when collapsed, tells player what's inside */}
@@ -123,9 +123,9 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
       )}
 
       {/* Collapsible Content */}
-      <AnimatePresence initial={false}>
+      <AdaptiveAnimatePresence initial={false}>
         {isExpanded && (
-          <motion.div
+          <AdaptiveMotion.div
             id={contentId}
             role="region"
             aria-labelledby={`${contentId}-header`}
@@ -138,9 +138,9 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
             <div className={cn('p-3', styles.content, contentClassName)}>
               {children}
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 };

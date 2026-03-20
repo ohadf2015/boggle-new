@@ -108,9 +108,9 @@ export const RollingNumber = memo(function RollingNumber({
 
   const variantClasses = {
     default: 'text-neo-white',
-    gold: 'text-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.5)]',
-    green: 'text-neo-lime drop-shadow-[0_0_10px_rgba(163,230,53,0.5)]',
-    white: 'text-neo-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]',
+    gold: 'text-neo-yellow drop-shadow-[0_0_10px_rgb(255_225_53/0.5)]',
+    green: 'text-neo-lime drop-shadow-[0_0_10px_rgb(163_230_53/0.5)]',
+    white: 'text-neo-white drop-shadow-[0_2px_4px_rgb(0_0_0/0.5)]',
   };
 
   return (

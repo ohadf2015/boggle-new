@@ -81,7 +81,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
             >
               <Wand2 className="w-5 h-5 text-neo-pink" />
             </motion.div>
-            <h2 className="text-xl font-black text-neo-cream drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+            <h2 className="text-xl font-black text-neo-cream ltr:drop-shadow-[2px_2px_0px_black] rtl:drop-shadow-[-2px_2px_0px_black]">
               {t('customPuzzle.createTitle')}
             </h2>
           </div>

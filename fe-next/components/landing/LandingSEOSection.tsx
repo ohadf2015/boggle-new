@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence, type Variants } from 'framer-motion';
+import { type Variants } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import {
   Swords, CalendarDays, Map, Sparkles, ChevronDown, Plus, Minus, PencilRuler,
   Smartphone, BookOpen, Users, Zap, MousePointerClick, Layers, Trophy, Target,
@@ -34,19 +35,19 @@ const staggerItem: Variants = {
 
 export function ScrollIndicator() {
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className="flex flex-col items-center gap-1 py-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 1.2, duration: 0.6 }}
     >
-      <motion.div
+      <AdaptiveMotion.div
         animate={{ y: [0, 6, 0] }}
         transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
       >
         <ChevronDown className="w-5 h-5 text-neo-black/30 dark:text-neo-white/30" />
-      </motion.div>
-    </motion.div>
+      </AdaptiveMotion.div>
+    </AdaptiveMotion.div>
   );
 }
 
@@ -99,7 +100,7 @@ const STEP_ICONS = [MousePointerClick, Layers, Target, Trophy];
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className={cn(
         'border-2 border-neo-white/10 rounded-neo overflow-hidden',
         'bg-neo-white/[0.03]',
@@ -118,7 +119,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         aria-expanded={open}
       >
         <span>{question}</span>
-        <motion.span
+        <AdaptiveMotion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.2 }}
           className="shrink-0"
@@ -128,11 +129,11 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
           ) : (
             <Plus className="w-4 h-4 text-neo-white/60" />
           )}
-        </motion.span>
+        </AdaptiveMotion.span>
       </button>
-      <AnimatePresence initial={false}>
+      <AdaptiveAnimatePresence initial={false}>
         {open && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -142,10 +143,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             <p className="px-3 sm:px-4 pb-3 sm:pb-4 text-sm text-neo-white/60 leading-relaxed">
               {answer}
             </p>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
-    </motion.div>
+      </AdaptiveAnimatePresence>
+    </AdaptiveMotion.div>
   );
 }
 
@@ -186,7 +187,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
     <section className={cn('w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 sm:pb-12 relative z-20', className)}>
 
       {/* ── What is LexiClash ────────── */}
-      <motion.div
+      <AdaptiveMotion.div
         className="mb-12 sm:mb-14 text-center"
         variants={sectionReveal}
         initial="hidden"
@@ -199,10 +200,10 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         <p className="text-sm sm:text-base text-neo-white/60 leading-relaxed max-w-2xl mx-auto">
           {t('landing.seo.whatIsShort')}
         </p>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* ── Game Modes ── */}
-      <motion.div
+      <AdaptiveMotion.div
         className="mb-12 sm:mb-14"
         variants={sectionReveal}
         initial="hidden"
@@ -212,7 +213,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-6 neo-title-sm">
           {t('landing.seo.featuresTitle')}
         </h2>
-        <motion.div
+        <AdaptiveMotion.div
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
           variants={staggerContainer}
           initial="hidden"
@@ -220,7 +221,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           viewport={{ once: true, margin: '-30px' }}
         >
           {GAME_MODES.map(({ icon: Icon, titleKey, tagKey, fallbackTitle, fallbackTag }) => (
-            <motion.div
+            <AdaptiveMotion.div
               key={titleKey}
               variants={staggerItem}
               whileHover={{ y: -4, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
@@ -241,13 +242,13 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
               <span className="text-[10px] sm:text-xs font-medium text-neo-white/60 uppercase tracking-wider">
                 {t(tagKey) || fallbackTag}
               </span>
-            </motion.div>
+            </AdaptiveMotion.div>
           ))}
-        </motion.div>
-      </motion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
 
       {/* ── How to Play ─────── */}
-      <motion.div
+      <AdaptiveMotion.div
         className="mb-12 sm:mb-14"
         variants={sectionReveal}
         initial="hidden"
@@ -257,7 +258,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-6 neo-title-sm">
           {t('landing.seo.howToPlayTitle')}
         </h2>
-        <motion.div
+        <AdaptiveMotion.div
           className="grid grid-cols-2 sm:grid-cols-4 gap-3"
           variants={staggerContainer}
           initial="hidden"
@@ -267,7 +268,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           {steps.map((step, i) => {
             const StepIcon = STEP_ICONS[i];
             return (
-              <motion.div
+              <AdaptiveMotion.div
                 key={i}
                 variants={staggerItem}
                 className={cn(
@@ -291,21 +292,21 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 <span className="text-xs sm:text-sm font-bold text-neo-white/80 leading-tight">
                   {step}
                 </span>
-              </motion.div>
+              </AdaptiveMotion.div>
             );
           })}
-        </motion.div>
-      </motion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
 
       {/* ── Highlight pills ── */}
-      <motion.div
+      <AdaptiveMotion.div
         className="mb-12 sm:mb-14"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <motion.div
+        <AdaptiveMotion.div
           className="flex flex-wrap justify-center gap-3"
           variants={staggerContainer}
           initial="hidden"
@@ -313,7 +314,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           viewport={{ once: true, margin: '-30px' }}
         >
           {HIGHLIGHTS.map(({ icon: Icon, key, fallback }) => (
-            <motion.div
+            <AdaptiveMotion.div
               key={key}
               variants={staggerItem}
               className={cn(
@@ -325,13 +326,13 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
             >
               <Icon className="w-4 h-4 shrink-0 text-neo-white/60" aria-hidden="true" />
               {t(key) || fallback}
-            </motion.div>
+            </AdaptiveMotion.div>
           ))}
-        </motion.div>
-      </motion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
 
       {/* ── FAQ ─────────────────────────── */}
-      <motion.div
+      <AdaptiveMotion.div
         className="mb-12 sm:mb-14"
         variants={sectionReveal}
         initial="hidden"
@@ -341,7 +342,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-6 neo-title-sm">
           {t('landing.seo.faqTitle')}
         </h2>
-        <motion.div
+        <AdaptiveMotion.div
           className="space-y-2 max-w-2xl mx-auto"
           variants={staggerContainer}
           initial="hidden"
@@ -355,11 +356,11 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
               answer={t(`landing.seo.faq${n}A`) || `Answer ${n}`}
             />
           ))}
-        </motion.div>
-      </motion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
 
       {/* ── Blog Links ────────────────── */}
-      <motion.div
+      <AdaptiveMotion.div
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
@@ -380,7 +381,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
             {t('landing.seo.viewAllPosts') || 'View all posts'}
           </Link>
         </div>
-        <motion.div
+        <AdaptiveMotion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
           variants={staggerContainer}
           initial="hidden"
@@ -388,7 +389,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           viewport={{ once: true, margin: '-30px' }}
         >
           {BLOG_LINKS.map(({ slug, key, fallback, category, image }) => (
-            <motion.div key={slug} variants={staggerItem}>
+            <AdaptiveMotion.div key={slug} variants={staggerItem}>
               <Link
                 href={`/${language}/blog/${slug}`}
                 className={cn(
@@ -416,10 +417,10 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                   </p>
                 </div>
               </Link>
-            </motion.div>
+            </AdaptiveMotion.div>
           ))}
-        </motion.div>
-      </motion.div>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
     </section>
   );
 }

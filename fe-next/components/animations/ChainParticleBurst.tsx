@@ -119,7 +119,7 @@ export function ChainParticleBurst({
     if (trigger && config.emoji) {
       return (
         <div
-          className={cn('fixed pointer-events-none z-[200]', className)}
+          className={cn('fixed pointer-events-none z-60', className)}
           style={{ left: position.x, top: position.y, transform: 'translate(-50%, -50%)' }}
         >
           <div className="px-3 py-2 rounded-neo bg-neo-navy border-3 border-neo-white shadow-hard">
@@ -135,7 +135,7 @@ export function ChainParticleBurst({
 
   return (
     <div
-      className={cn('fixed pointer-events-none z-[200]', className)}
+      className={cn('fixed pointer-events-none z-60', className)}
       style={{ left: position.x, top: position.y }}
     >
       {/* Expanding ring effect */}

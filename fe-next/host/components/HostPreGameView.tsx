@@ -8,6 +8,7 @@ import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode } from '@/hooks/gameState';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 import { GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
@@ -109,10 +110,13 @@ function HostPreGameView({
   lessonData,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
+  const { isAdmin } = useAuth();
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
   const storeGameMode = useGameMode();
-  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(storeGameMode || 'random');
+  // If stored mode is blast but user isn't admin, fall back to random
+  const initialMode = (storeGameMode === 'blast' && !isAdmin) ? 'random' : (storeGameMode || 'random');
+  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(initialMode);
   const { setGameMode: setStoreGameMode } = useGameActions();
 
   useEffect(() => {
@@ -474,7 +478,7 @@ function HostPreGameView({
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
                 <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} t={t} />
                 <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
-                <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} />
+                <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} />
               </>
             }
             rightContent={
@@ -496,7 +500,7 @@ function HostPreGameView({
               <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
             </motion.div>
             <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={1}>
-              <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} />
+              <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} />
             </motion.div>
             <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
               <MobileShareSection gameCode={gameCode} t={t} />
