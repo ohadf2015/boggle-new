@@ -90,6 +90,7 @@ describe('wordHuntHandler', () => {
   });
 
   beforeEach(() => {
+    jest.useFakeTimers();
     jest.clearAllMocks();
     mockSocket = {
       id: 'socket-1',

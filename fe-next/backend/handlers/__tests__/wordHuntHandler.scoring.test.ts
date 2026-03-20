@@ -68,6 +68,7 @@ function makeMockSocket() {
 
 describe('wordHuntHandler - first finder bonus scoring', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     jest.clearAllMocks();
     getGameBySocketId.mockReturnValue('HUNT1');
     getUsernameBySocketId.mockReturnValue('player1');
