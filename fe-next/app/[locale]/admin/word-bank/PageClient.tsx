@@ -10,6 +10,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
+import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 
 export default function WordBankPageClient() {
   const router = useRouter();
@@ -44,56 +46,42 @@ export default function WordBankPageClient() {
     );
   }
 
+  const isRTL = language === 'he';
+
   return (
-    <div
-      className={cn(
-        'flex-1 flex flex-col w-full overflow-x-hidden',
-        isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
-      )}
-    >
+    <div className={cn(
+      'flex-1 flex flex-col w-full overflow-x-hidden min-h-screen',
+      isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50',
+      isRTL && 'rtl'
+    )}>
       <Header />
 
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        {/* Header with back button */}
-        <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <Button
-            onClick={() => router.push(`/${language}/admin`)}
-            variant="outline"
-            size="sm"
-            className={cn(
-              'rounded-lg flex-shrink-0 min-w-[44px] min-h-[44px]',
-              isDarkMode
-                ? 'border-slate-600 text-gray-300 hover:bg-slate-700'
-                : 'hover:bg-gray-100'
-            )}
-            aria-label="Back to admin dashboard"
-          >
-            <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
-            <span className="hidden sm:inline ms-2">{t('common.back')}</span>
-          </Button>
+      <div className="flex flex-1">
+        <AdminSidebar />
 
-          <div className="flex-1 min-w-0">
-            <h1
-              className={cn(
+        <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 pb-20 sm:pb-6">
+          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div className="flex-1 min-w-0">
+              <h1 className={cn(
                 'text-lg sm:text-2xl md:text-3xl font-bold truncate',
                 isDarkMode ? 'text-white' : 'text-gray-900'
-              )}
-            >
-              {t('admin.wordBank.title')}
-            </h1>
-            <p
-              className={cn(
+              )}>
+                {t('admin.wordBank.title')}
+              </h1>
+              <p className={cn(
                 'text-xs sm:text-sm truncate',
                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-              )}
-            >
-              {t('admin.wordBank.description')}
-            </p>
+              )}>
+                {t('admin.wordBank.description')}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <WordBankPanel />
+          <WordBankPanel />
+        </main>
       </div>
+
+      <AdminBottomNav />
     </div>
   );
 }

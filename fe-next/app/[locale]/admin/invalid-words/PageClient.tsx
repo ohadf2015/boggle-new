@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils';
 import { InvalidWordsManager } from '@/components/admin/InvalidWordsManager';
 import { useTheme } from '@/utils/ThemeContext';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
+import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 
 export default function InvalidWordsPageClient() {
   const router = useRouter();
@@ -67,47 +69,41 @@ export default function InvalidWordsPageClient() {
     );
   }
 
+  const isRTL = language === 'he';
+
   return (
     <div className={cn(
-      'flex-1 flex flex-col w-full overflow-x-hidden',
-      isDarkMode
-        ? 'bg-neo-navy'
-        : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+      'flex-1 flex flex-col w-full overflow-x-hidden min-h-screen',
+      isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50',
+      isRTL && 'rtl'
     )}>
       <Header />
 
-      <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
-        <div className="flex items-center gap-4 mb-6">
-          <Button
-            onClick={() => router.push(`/${language}/admin`)}
-            variant="outline"
-            size="sm"
-            className={cn(
-              "rounded-lg flex-shrink-0",
-              isDarkMode && "border-slate-600 text-gray-300 hover:bg-slate-700"
-            )}
-          >
-            <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
-            <span className="hidden sm:inline ms-2">Back</span>
-          </Button>
+      <div className="flex flex-1">
+        <AdminSidebar />
 
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-500/20 rounded-lg">
-              <AlertTriangle className="w-6 h-6 text-yellow-500" />
-            </div>
-            <div>
-              <h1 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>
-                {t('admin.invalidWords.title')}
-              </h1>
-              <p className="text-sm text-slate-500">
-                {t('admin.invalidWords.subtitle')}
-              </p>
+        <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 pb-20 sm:pb-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-yellow-500/20 rounded-lg">
+                <AlertTriangle className="w-6 h-6 text-yellow-500" />
+              </div>
+              <div>
+                <h1 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>
+                  {t('admin.invalidWords.title')}
+                </h1>
+                <p className="text-sm text-slate-500">
+                  {t('admin.invalidWords.subtitle')}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <InvalidWordsManager authToken={authToken} />
+          <InvalidWordsManager authToken={authToken} />
+        </main>
       </div>
+
+      <AdminBottomNav />
     </div>
   );
 }

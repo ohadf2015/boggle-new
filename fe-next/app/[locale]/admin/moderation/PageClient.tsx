@@ -53,17 +53,23 @@ export default function ModerationPageClient() {
   const handleAction = useCallback(async (id: string, action: 'approve' | 'reject') => {
     if (!authToken) return;
     try {
-      await fetch(`/api/admin/invalid-words/${id}/${action}`, {
+      const res = await fetch(`/api/admin/invalid-words/${id}/${action}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Failed to ${action}`);
+      }
       // Remove from local state for instant feedback
       setQueueItems(prev => prev?.filter(item => item.id !== id) ?? []);
       setQueueTotal(prev => Math.max(0, prev - 1));
-    } catch {
-      // Silently fail — user can refresh
+    } catch (err) {
+      console.error(`Moderation ${action} failed:`, err);
+      // Re-fetch to restore accurate state
+      fetchQueue();
     }
-  }, [authToken]);
+  }, [authToken, fetchQueue]);
 
   const isProfileLoading = !authLoading && user && !profile;
 

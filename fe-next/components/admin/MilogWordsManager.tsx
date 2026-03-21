@@ -95,6 +95,9 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
   const [revokeReason, setRevokeReason] = useState('');
   const [revoking, setRevoking] = useState(false);
 
+  // Add to dictionary loading state
+  const [addingWordId, setAddingWordId] = useState<string | null>(null);
+
   const fetchWords = useCallback(async () => {
     try {
       setLoading(true);
@@ -163,6 +166,34 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
       setRevoking(false);
     }
   }, [revokeWord, revokeBlacklist, revokeReason, authToken, fetchWords]);
+
+  const handleAddToDictionary = useCallback(async (word: MilogWord) => {
+    setAddingWordId(word.id);
+    try {
+      const response = await fetch('/api/admin/invalid-words/bulk-approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          wordIds: [word.id],
+          addToDictionary: true,
+        }),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to add word to dictionary');
+      }
+      toast.success(`Added "${word.word}" to dictionary`);
+      fetchWords();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'An unexpected error occurred';
+      toast.error(`Failed: ${msg}`);
+    } finally {
+      setAddingWordId(null);
+    }
+  }, [authToken, fetchWords]);
 
   const handlePageChange = (newOffset: number) => {
     setOffset(newOffset);
@@ -385,6 +416,20 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                           View on Milog
                         </a>
                       )}
+                      {/* Add to Dictionary — verified but not yet promoted */}
+                      {word.milog_status === 'verified' && !word.approved_at && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="ms-auto border-green-600 text-green-400 hover:bg-green-600/20 hover:text-green-300"
+                          onClick={() => handleAddToDictionary(word)}
+                          disabled={addingWordId === word.id}
+                        >
+                          <Check className="w-3 h-3 me-1" />
+                          {addingWordId === word.id ? 'Adding...' : 'Add to Dictionary'}
+                        </Button>
+                      )}
+                      {/* Revoke — already in dictionary */}
                       {word.approved_at && (
                         <Button
                           variant="outline"

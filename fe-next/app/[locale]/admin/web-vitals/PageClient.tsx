@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Activity, ArrowLeft, RefreshCw, Monitor, Smartphone, Tablet,
+  Activity, RefreshCw, Monitor, Smartphone, Tablet,
   Wifi, WifiOff, TrendingDown, AlertCircle, CheckCircle
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,8 @@ import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
+import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 
 interface WebVital {
   id: string;
@@ -243,29 +245,22 @@ export default function WebVitalsPageClient() {
   }
 
   return (
-    <div className={cn("flex-1 flex flex-col w-full overflow-x-hidden", isDark ? "bg-gray-900" : "bg-gray-50")}>
+    <div className={cn("flex-1 flex flex-col w-full overflow-x-hidden min-h-screen", isDark ? "bg-gray-900" : "bg-gray-50")}>
       <Header />
 
-      <div className="w-full max-w-7xl mx-auto px-4 py-8">
+      <div className="flex flex-1">
+        <AdminSidebar />
+
+        <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 pb-20 sm:pb-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={() => router.push('/admin')}
-              variant="outline"
-              size="sm"
-            >
-              <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
-              Back to Admin
-            </Button>
-            <div>
-              <h1 className={cn("text-3xl font-bold", isDark ? "text-white" : "text-gray-900")}>
-                Web Vitals Performance
-              </h1>
-              <p className={cn("text-sm mt-1", isDark ? "text-gray-400" : "text-gray-600")}>
-                Core Web Vitals metrics and performance monitoring
-              </p>
-            </div>
+          <div>
+            <h1 className={cn("text-3xl font-bold", isDark ? "text-white" : "text-gray-900")}>
+              Web Vitals Performance
+            </h1>
+            <p className={cn("text-sm mt-1", isDark ? "text-gray-400" : "text-gray-600")}>
+              Core Web Vitals metrics and performance monitoring
+            </p>
           </div>
           <Button onClick={fetchData} variant="outline" size="sm">
             <RefreshCw className="w-4 h-4 me-2" />
@@ -508,7 +503,10 @@ export default function WebVitalsPageClient() {
             )}
           </div>
         </div>
+        </main>
       </div>
+
+      <AdminBottomNav />
     </div>
   );
 }
