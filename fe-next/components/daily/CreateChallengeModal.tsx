@@ -218,6 +218,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
               </motion.div>
               <button
                 onClick={handleClose}
+                aria-label={t('common.close')}
                 className="p-2 hover:bg-neo-black/10 rounded-lg transition-all hover:scale-110 active:scale-95"
               >
                 <X className="w-6 h-6 sm:w-7 sm:h-7 text-neo-black" strokeWidth={2.5} />

@@ -525,6 +525,7 @@ const ja = {
     "email": "メール",
     "sms": "SMS",
     "discordCopied": "Discordにコピー！サーバーに貼り付けて 💬",
+    "shareBonusAwarded": "シェアで+20コイン!",
     "morePlatforms": "他のプラットフォーム",
     "lessOptions": "オプションを減らす",
     "hideShareOptions": "共有オプションを隠す",

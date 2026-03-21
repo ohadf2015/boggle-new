@@ -122,6 +122,11 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
       primary, bonus, letters, gridSize, gridSize, seededRandom, language
     );
 
+    if (!rawGrid || (Array.isArray(rawGrid) && rawGrid.length === 0)) {
+      res.status(500).json({ error: 'Failed to generate grid from seed words' });
+      return;
+    }
+
     // Normalize grid to string[][]
     const grid: string[][] = Array.isArray(rawGrid[0])
       ? (rawGrid as unknown as string[][])
@@ -129,8 +134,15 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
           Array.from({ length: gridSize }, (__, c) => (rawGrid as unknown as string[])[r * gridSize + c] ?? '')
         );
 
-    const result = findWordsForBots(grid, language);
-    const totalFindableWords = (result?.easy?.length ?? 0) + (result?.medium?.length ?? 0) + (result?.hard?.length ?? 0);
+    let totalFindableWords = 0;
+    try {
+      const result = findWordsForBots(grid, language);
+      if (result) {
+        totalFindableWords = (result.easy?.length ?? 0) + (result.medium?.length ?? 0) + (result.hard?.length ?? 0);
+      }
+    } catch (solverErr) {
+      logger.warn('UGC', `Word solver failed for language ${language}, continuing with 0 findable words`);
+    }
     const difficulty = totalFindableWords > 0 ? computeDifficulty(totalFindableWords) : 'HARD';
 
     res.json({

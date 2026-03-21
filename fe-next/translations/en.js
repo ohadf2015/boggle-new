@@ -525,6 +525,7 @@ const en = {
     "email": "Email",
     "sms": "SMS",
     "discordCopied": "Copied for Discord! Paste in your server 💬",
+    "shareBonusAwarded": "+20 coins for sharing!",
     "morePlatforms": "More platforms",
     "lessOptions": "Less options",
     "hideShareOptions": "Hide share options",

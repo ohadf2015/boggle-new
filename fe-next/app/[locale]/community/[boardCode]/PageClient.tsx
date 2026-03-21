@@ -65,7 +65,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
         onClick={() => router.back()}
         className="flex items-center gap-1 text-neo-white/60 font-neo-body text-sm mb-6 hover:text-neo-white transition-colors"
       >
-        <ArrowLeft size={16} />
+        <ArrowLeft size={16} className="rtl:scale-x-[-1]" />
         {t('common.back')}
       </button>
 

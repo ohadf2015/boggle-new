@@ -124,7 +124,7 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
                 'transition-colors duration-200'
               )}
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
               <span className="text-sm font-neo-body">{t('education.analytics.backToClassroom')}</span>
             </button>
 

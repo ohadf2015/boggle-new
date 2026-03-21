@@ -148,6 +148,9 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                   onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
                   maxLength={20}
                   autoFocus
+                  aria-required="true"
+                  aria-invalid={!!nameError}
+                  aria-describedby={nameError ? 'join-username-error' : undefined}
                   className={cn(
                     'font-bold bg-neo-navy/40 border-2 border-neo-black text-neo-white placeholder:text-neo-white/40',
                     nameError && 'border-red-500 animate-neo-shake'
@@ -156,7 +159,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 />
               )}
               {nameError && (
-                <p className="text-xs font-bold text-red-400" role="alert">
+                <p id="join-username-error" className="text-xs font-bold text-red-400" role="alert">
                   {t(nameError)}
                 </p>
               )}

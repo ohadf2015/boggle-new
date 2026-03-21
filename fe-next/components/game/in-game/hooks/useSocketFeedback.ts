@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { WordFeedback } from '../../WordFormingArea';
 import type { TranslationFn } from '../types';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface UseSocketFeedbackOptions {
   socket: Socket | null;
@@ -100,7 +101,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     const handleWordAlreadyFoundByOther = (data: {
       word: string;
       foundBy: string;
-      foundByAvatar?: { emoji?: string; color?: string; avatarImage?: string } | null;
+      foundByAvatar?: { customAvatar?: CustomAvatarConfig; avatarImage?: string } | null;
       confirmationScore?: number;
     }): void => {
       const hasPartialCredit = data.confirmationScore && data.confirmationScore > 0;
@@ -111,7 +112,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         score: hasPartialCredit ? data.confirmationScore : undefined,
         message: t('playerView.foundByOther')?.replace('${player}', data.foundBy) || `Found by ${data.foundBy}`,
         foundBy: data.foundBy,
-        foundByAvatar: data.foundByAvatar,
+        foundByAvatar: data.foundByAvatar as WordFeedback['foundByAvatar'],
         timestamp: Date.now(),
       });
       // Update last word found time for partial credit (keeps combo alive)

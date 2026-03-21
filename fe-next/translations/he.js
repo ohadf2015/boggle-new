@@ -525,6 +525,7 @@ const he = {
     "email": "אימייל",
     "sms": "SMS",
     "discordCopied": "הועתק לדיסקורד! הדביקו בשרת שלכם 💬",
+    "shareBonusAwarded": "+20 מטבעות על שיתוף!",
     "morePlatforms": "עוד פלטפורמות",
     "lessOptions": "פחות אפשרויות",
     "hideShareOptions": "הסתר אפשרויות שיתוף",

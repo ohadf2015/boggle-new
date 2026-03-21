@@ -266,6 +266,7 @@ export default function FlashcardReview({
               variant="ghost"
               size="sm"
               onClick={onBack}
+              aria-label={t('common.back')}
               className="text-slate-400 hover:text-neo-white"
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
@@ -327,6 +328,7 @@ export default function FlashcardReview({
             variant="ghost"
             size="sm"
             onClick={onBack}
+            aria-label={t('common.back')}
             className="text-slate-400 hover:text-neo-white"
           >
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />

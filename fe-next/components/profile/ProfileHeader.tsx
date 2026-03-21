@@ -202,6 +202,7 @@ export function ProfileHeader({
                 onClick={startEditingName}
                 className="p-1 rounded hover:bg-slate-700 transition-colors flex-shrink-0 text-gray-400"
                 title={t('profile.editName')}
+                aria-label={t('profile.editName')}
               >
                 <Edit size={compact ? 12 : 16} />
               </button>

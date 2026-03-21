@@ -326,7 +326,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
               'transition-all duration-200'
             )}
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
             {t('adventure.preview.back')}
           </button>
         </div>

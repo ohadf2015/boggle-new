@@ -291,14 +291,36 @@ export async function updatePlayerStats(
 
   const oldLevel = profile.current_level || getLevelFromXp(profile.total_xp || 0);
 
+  // Retry helper for deadlock recovery (PostgreSQL error code 40P01)
+  const MAX_RETRIES = 3;
+  const retryOnDeadlock = async <T>(
+    operation: () => Promise<{ data: T; error: { message: string; code?: string } | null }>,
+    label: string
+  ): Promise<{ data: T; error: { message: string; code?: string } | null }> => {
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      const result = await operation();
+      if (!result.error) return result;
+      const isDeadlock = result.error.message?.toLowerCase().includes('deadlock') ||
+                         result.error.code === '40P01';
+      if (!isDeadlock || attempt === MAX_RETRIES - 1) return result;
+      const backoff = Math.pow(2, attempt) * 100 + Math.random() * 100;
+      logger.warn('SUPABASE', `Deadlock on ${label} for ${playerId}, retry ${attempt + 1}/${MAX_RETRIES} in ${Math.round(backoff)}ms`);
+      await new Promise(resolve => setTimeout(resolve, backoff));
+    }
+    return { data: null as T, error: { message: 'Max retries exceeded' } };
+  };
+
   try {
-    // First: update non-XP stats
-    const { data, error } = await client
-      .from('profiles')
-      .update(updates)
-      .eq('id', playerId)
-      .select()
-      .single();
+    // First: update non-XP stats (with deadlock retry)
+    const { data, error } = await retryOnDeadlock(
+      () => client
+        .from('profiles')
+        .update(updates)
+        .eq('id', playerId)
+        .select()
+        .single(),
+      'profile stats update'
+    );
 
     if (error) {
       logger.error('SUPABASE', `Failed to update profile stats for ${playerId}`, error.message);
@@ -307,27 +329,30 @@ export async function updatePlayerStats(
       return { data: null, error };
     }
 
-    // Then: use increment_player_xp RPC for XP update
+    // Then: use increment_player_xp RPC for XP update (with deadlock retry)
     // This ensures prestige multiplier is applied and lifetime_xp is tracked
     let newTotalXp = (profile.total_xp || 0) + xpResult.totalXp;
     let newLevel = getLevelFromXp(newTotalXp);
     let actualXpGranted = xpResult.totalXp;
 
     if (xpResult.totalXp > 0) {
-      const { data: xpData, error: xpError } = await client
-        .rpc('increment_player_xp', {
-          p_player_id: playerId,
-          p_xp_amount: xpResult.totalXp,
-        });
+      const { data: xpData, error: xpError } = await retryOnDeadlock(
+        () => client
+          .rpc('increment_player_xp', {
+            p_player_id: playerId,
+            p_xp_amount: xpResult.totalXp,
+          }),
+        'XP increment'
+      );
 
       if (xpError) {
         logger.error('SUPABASE', `Failed to increment XP for ${playerId}`, xpError.message);
         // Stats were saved but XP wasn't — log but don't fail the whole operation
-      } else if (xpData && xpData.length > 0) {
-        const xpRow = xpData[0];
+      } else if (xpData && (xpData as unknown[]).length > 0) {
+        const xpRow = (xpData as Record<string, unknown>[])[0];
         newTotalXp = Number(xpRow.new_total_xp);
-        newLevel = xpRow.new_level;
-        actualXpGranted = xpRow.xp_granted;
+        newLevel = xpRow.new_level as number;
+        actualXpGranted = xpRow.xp_granted as number;
       }
 
       // Feed XP into the player's weekly league (fire-and-forget)

@@ -212,7 +212,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
             )}
           >
             {t('friends.seeAll')} ({friends.length})
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="w-3 h-3 rtl:scale-x-[-1]" />
           </button>
         )}
       </div>

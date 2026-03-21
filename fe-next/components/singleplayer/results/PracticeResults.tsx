@@ -4,6 +4,7 @@ import { memo, useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Trophy, Users, Swords, RotateCcw } from 'lucide-react';
+import { calculateWordScore } from '@/shared/utils/scoring';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +13,7 @@ import { clearSessionPreservingUsername } from '@/utils/session';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
+import MissedWordsSection from './components/MissedWordsSection';
 import {
   useGuestStatsSync,
   useLeaderboardSync,
@@ -209,6 +211,20 @@ const PracticeResults = memo(function PracticeResults({
 
   useAchievementsSave({ isAuthenticated, profile, results, updateProfile });
 
+  // ─── Missed words from board solver ───
+  const allBoardMissedWords = useMemo(() => {
+    if (!results.allPossibleWords || results.allPossibleWords.length === 0) return [];
+    const playerFoundSet = new Set(
+      (results.playerWordData || [])
+        .filter(w => w.isValid)
+        .map(w => w.word.toLowerCase())
+    );
+    return results.allPossibleWords
+      .filter(word => !playerFoundSet.has(word.toLowerCase()))
+      .map(word => ({ word, score: calculateWordScore(word) }))
+      .sort((a, b) => b.score - a.score || b.word.length - a.word.length);
+  }, [results.allPossibleWords, results.playerWordData]);
+
   // ─── Encouragement content ───
   const tier = getEncouragementTier(results.playerScore);
   const encouragementKey = `practiceResults.encouragement.${tier}` as const;
@@ -364,6 +380,22 @@ const PracticeResults = memo(function PracticeResults({
               {t(subtitleKey)}
             </motion.p>
           </motion.div>
+
+          {/* ── Words You Missed section ── */}
+          {allBoardMissedWords.length > 0 && (
+            <motion.div
+              initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+            >
+              <MissedWordsSection
+                words={allBoardMissedWords}
+                playerFoundCount={validWordCount}
+                totalBoardWords={results.allPossibleWords?.length || undefined}
+                initialDisplayCount={10}
+              />
+            </motion.div>
+          )}
 
           {/* ── Play Again button with gentle pulse ── */}
           <motion.div

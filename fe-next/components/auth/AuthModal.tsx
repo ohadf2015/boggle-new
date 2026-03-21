@@ -12,6 +12,7 @@ import { Button as ButtonComponent } from '../ui/button';
 const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { trackEvent } from '@/components/GoogleAnalytics';
 import { isNative } from '../../utils/platform';
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
@@ -223,6 +224,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         }
         setIsLoading(null);
       } else if (authMode === 'signup') {
+        trackEvent('funnel_sign_up', { method: 'password' });
         setSuccess(t('auth.inlineSignup.checkEmail'));
         setIsLoading(null);
       }
@@ -251,6 +253,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       if (result.error) {
         setError(result.error.message);
       } else {
+        trackEvent('funnel_sign_up', { method: 'magic_link' });
         setSuccess(t('auth.magicLink.checkEmail'));
       }
       setIsLoading(null);

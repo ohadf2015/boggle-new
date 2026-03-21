@@ -196,7 +196,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
       {/* Next tier preview */}
       {!isMaxed && tier < maxTier && (
         <div className="text-xs text-neo-white/40 font-neo-body flex items-center gap-1">
-          <ChevronRight className="w-3 h-3" />
+          <ChevronRight className="w-3 h-3 rtl:scale-x-[-1]" />
           <span>{t(upgrade.tiers[tier].effectKey)}</span>
         </div>
       )}

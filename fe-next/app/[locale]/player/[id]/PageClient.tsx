@@ -159,7 +159,7 @@ export default function PlayerProfilePageClient() {
         onClick={() => window.history.back()}
         className="flex items-center gap-1.5 text-sm font-bold text-slate-400 hover:text-white mb-4 transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
         {t('common.back')}
       </button>
 

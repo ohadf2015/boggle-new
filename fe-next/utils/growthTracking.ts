@@ -206,6 +206,13 @@ export const trackShare = (method: ShareMethod, gameCode?: string): void => {
       shareMethod: method,
       gameCode,
     });
+    // Funnel event for share action
+    const platformMap: Record<string, string> = {
+      copy: 'clipboard', native: 'native', whatsapp: 'whatsapp',
+      facebook: 'native', telegram: 'native', twitter: 'native',
+      discord: 'native', email: 'native', sms: 'native',
+    };
+    trackGA4Event('funnel_share', { platform: platformMap[method] || 'native' });
   }
 };
 
@@ -238,10 +245,13 @@ export const trackGameCompletion = (
   isWinner: boolean,
   score: number,
   wordCount: number,
-  isFirstGame: boolean
+  isFirstGame: boolean,
+  gameMode?: string
 ): void => {
   if (isFirstGame) {
     trackGrowthEvent('first_game_played', { score, wordCount });
+    // Funnel event for first game
+    trackGA4Event('funnel_first_game', { mode: gameMode || 'unknown' });
   }
 
   if (isWinner) {
@@ -340,7 +350,8 @@ export const getShareUrlWithTracking = (gameCode: string, referralCode?: string,
 
   // Add UTM tracking for analytics
   params.set('utm_source', utmSource);
-  params.set('utm_medium', 'share');
+  params.set('utm_medium', 'referral');
+  params.set('utm_campaign', 'player_invite');
 
   return `${baseUrl}?${params.toString()}`;
 };

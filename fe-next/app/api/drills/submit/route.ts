@@ -329,10 +329,15 @@ export async function POST(request: NextRequest) {
     }
 
     // =====================================================
-    // Award profile XP based on drill performance
+    // Award profile XP based on drill difficulty and performance
+    // Easy (L1-2): 30 base, Medium (L3): 50 base, Hard (L4-5): 80 base
+    // Bonus: +10% per combo level (estimated from score brackets)
     // =====================================================
-    const baseXp = 10 + Math.floor(score / 50);
-    const xpToAward = Math.min(baseXp, 50); // Cap at 50 XP per drill session
+    const DRILL_XP_BASE: Record<number, number> = { 1: 30, 2: 30, 3: 50, 4: 80, 5: 80 };
+    const baseXp = DRILL_XP_BASE[level] ?? 30;
+    const comboEstimate = Math.min(10, Math.floor(score / 100)); // rough combo proxy
+    const comboMultiplier = 1 + comboEstimate * 0.1;
+    const xpToAward = Math.min(Math.round(baseXp * comboMultiplier), 150);
     let xpAwarded = 0;
 
     if (xpToAward > 0) {

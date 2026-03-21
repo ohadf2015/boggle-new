@@ -273,7 +273,7 @@ const AdventureHub = memo<AdventureHubProps>(({
               {t(`adventure.worlds.${nextWorldConfig.name}`)} — {t('adventure.level')} {nextLevel.level}
             </span>
           </div>
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="w-6 h-6 rtl:scale-x-[-1]" />
         </AdaptiveMotion.button>
       )}
 

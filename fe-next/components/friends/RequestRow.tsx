@@ -52,9 +52,11 @@ export const RequestRow: React.FC<RequestRowProps> = ({
         <button
           onClick={onAccept}
           disabled={isLoading}
+          aria-label="Accept"
           className={cn(
             'p-1.5 rounded-full transition-colors',
-            'bg-green-500 text-white hover:bg-green-600'
+            'bg-green-500 text-white hover:bg-green-600',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
           {isLoading ? <Loader size="sm" /> : <Check className="w-4 h-4" />}
@@ -62,9 +64,11 @@ export const RequestRow: React.FC<RequestRowProps> = ({
         <button
           onClick={onDecline}
           disabled={isLoading}
+          aria-label="Decline"
           className={cn(
             'p-1.5 rounded-full transition-colors',
-            isDark ? 'bg-red-500/20 text-red-400 hover:bg-red-500/40' : 'bg-red-100 text-red-600 hover:bg-red-200'
+            isDark ? 'bg-red-500/20 text-red-400 hover:bg-red-500/40' : 'bg-red-100 text-red-600 hover:bg-red-200',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
           <X className="w-4 h-4" />

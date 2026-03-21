@@ -122,6 +122,7 @@ export default function FirstGameCelebration({
           {/* Close Button */}
           <button
             onClick={onClose}
+            aria-label={t('common.close')}
             className={cn(
               'absolute top-3 right-3 p-2 rounded-neo border-2 border-neo-black',
               'transition-all hover:translate-y-[-2px] hover:shadow-hard-sm',

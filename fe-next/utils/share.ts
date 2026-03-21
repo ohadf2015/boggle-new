@@ -20,7 +20,8 @@ export const getJoinUrl = (gameCode: string, utmSource?: string): string => {
   params.set('room', gameCode);
   if (utmSource) {
     params.set('utm_source', utmSource);
-    params.set('utm_medium', 'share');
+    params.set('utm_medium', 'referral');
+    params.set('utm_campaign', 'player_invite');
   }
   return `${publicUrl}?${params.toString()}`;
 };

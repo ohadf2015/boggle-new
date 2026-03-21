@@ -350,7 +350,7 @@ export default function EducationPageClient() {
                   )}
                 >
                   {t('education.landing.goToDashboard')}
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 rtl:scale-x-[-1]" />
                 </Link>
               </div>
             </motion.div>

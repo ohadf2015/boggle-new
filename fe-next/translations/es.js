@@ -513,6 +513,7 @@ const es = {
     "email": "Correo",
     "sms": "SMS",
     "discordCopied": "¡Copiado para Discord! Pega en tu servidor 💬",
+    "shareBonusAwarded": "+20 monedas por compartir!",
     "morePlatforms": "Más plataformas",
     "lessOptions": "Menos opciones",
     "hideShareOptions": "Ocultar opciones",
@@ -4900,6 +4901,8 @@ const es = {
     "drills": {
       "title": "Ejercicios Mentales",
       "brainTraining": "Entrena tu Mente",
+      "xpEarned": "+{xp} XP",
+      "goldEarned": "+{gold} Oro",
       "round": "Ronda",
       "level": "Nivel",
       "start": "Iniciar",

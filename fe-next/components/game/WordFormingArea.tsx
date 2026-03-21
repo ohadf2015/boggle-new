@@ -4,6 +4,8 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
+import Avatar from '@/components/Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Hebrew final letters (sofit) mapping - non-final to final form
 const HEBREW_FINAL_LETTERS: Record<string, string> = {
@@ -42,7 +44,7 @@ export interface WordFeedback {
   /** Name of the player who found this word first (for foundByOther type) */
   foundBy?: string;
   /** Avatar of the first finder */
-  foundByAvatar?: { emoji?: string; color?: string; avatarImage?: string } | null;
+  foundByAvatar?: { customAvatar?: CustomAvatarConfig; avatarImage?: string } | null;
   /** Whether this word is from lesson vocabulary (classroom games) */
   fromLesson?: boolean;
   /** Word rarity classification for bonus display */
@@ -250,13 +252,12 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   {visibleFeedback?.type === 'rejected' && '✗'}
                   {visibleFeedback?.type === 'duplicate' && '⟳'}
                   {visibleFeedback?.type === 'foundByOther' && (
-                    visibleFeedback?.foundByAvatar?.avatarImage ? (
-                      <img
-                        src={`/avatars/${visibleFeedback.foundByAvatar.avatarImage}.png`}
-                        alt={visibleFeedback.foundBy || ''}
-                        className={cn(compact ? 'w-5 h-5' : 'w-6 h-6', 'rounded-full')}
-                      />
-                    ) : (visibleFeedback?.foundByAvatar?.emoji || '👤')
+                    <Avatar
+                      customAvatar={visibleFeedback?.foundByAvatar?.customAvatar}
+                      avatarImage={visibleFeedback?.foundByAvatar?.avatarImage}
+                      userId={visibleFeedback?.foundBy}
+                      size="sm"
+                    />
                   )}
                 </motion.span>
               )}

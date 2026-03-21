@@ -87,7 +87,7 @@ export default function PartyScreenContent() {
             className="w-full bg-neo-lime text-neo-black font-black text-xl py-4 px-6 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard transition-shadow flex items-center justify-center gap-2"
           >
             {t('partyScreen.startDisplay')}
-            <ArrowRight className="w-6 h-6" />
+            <ArrowRight className="w-6 h-6 rtl:scale-x-[-1]" />
           </button>
         </form>
 

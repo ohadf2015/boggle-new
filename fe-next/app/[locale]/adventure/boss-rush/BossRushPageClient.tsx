@@ -59,7 +59,7 @@ export function BossRushPageClient() {
           href="/adventure"
           className="text-neo-white/70 hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
           {t('adventure.bossRush.backToHub')}
         </Link>
       </div>
@@ -168,7 +168,7 @@ export function BossRushPageClient() {
         href="/adventure"
         className="absolute top-4 start-4 text-neo-white/70 hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
         {t('adventure.bossRush.backToHub')}
       </Link>
 

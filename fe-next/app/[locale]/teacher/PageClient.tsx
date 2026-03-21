@@ -58,7 +58,7 @@ export default function TeacherPageClient() {
             onClick={() => router.push(`/${language}`)}
             className="bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
           >
-            <ArrowLeft className="w-4 h-4 me-2" />
+            <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
             {t('common.backToHome')}
           </Button>
         </div>

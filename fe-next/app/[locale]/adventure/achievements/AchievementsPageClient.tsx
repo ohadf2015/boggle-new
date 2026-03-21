@@ -57,7 +57,7 @@ export function AchievementsPageClient() {
             'mb-6 transition-colors'
           )}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
           {t('adventure.backToMap')}
         </Link>
 

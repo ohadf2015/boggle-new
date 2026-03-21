@@ -163,6 +163,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
                 <button
                   onClick={handleClose}
                   disabled={isLoading}
+                  aria-label={t('common.close')}
                   className={cn(
                     'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
                     'hover:shadow-hard hover:-translate-y-0.5 transition-all',

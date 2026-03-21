@@ -128,7 +128,7 @@ export default function EndlessPageClient(): React.JSX.Element {
                 href={`/${language}/adventure`}
                 className="absolute top-4 start-4 flex items-center gap-2 text-neo-white/60 hover:text-neo-white transition-colors"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5 rtl:scale-x-[-1]" />
                 <span className="text-sm font-bold">{t('common.back')}</span>
               </Link>
 

@@ -299,6 +299,7 @@ export default function SoloPracticeBoard({
             variant="ghost"
             size="sm"
             onClick={onBack}
+            aria-label={t('common.back')}
             className="text-slate-400 hover:text-neo-white"
           >
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
@@ -313,6 +314,7 @@ export default function SoloPracticeBoard({
             variant="ghost"
             size="sm"
             onClick={handleRegenerate}
+            aria-label={t('common.refresh')}
             className="text-slate-400 hover:text-neo-white"
           >
             <RotateCcw className="w-4 h-4" />

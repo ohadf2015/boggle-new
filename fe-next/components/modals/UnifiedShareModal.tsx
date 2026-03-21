@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTwitter, shareViaDiscord, shareViaEmail, shareViaSms, canShareViaSms, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
 import { trackShare } from '@/utils/growthTracking';
 import { useNativeShare } from '@/hooks/useNativeShare';
+import { addCoins } from '@/utils/coinManager';
 import { createChallenge, getChallengeUrl, generateChallengeShareMessage, type ChallengeCreatorData, type ChallengeGameConfig, type ChallengePerformance } from '@/utils/challenges';
 import toast from 'react-hot-toast';
 
@@ -65,6 +66,18 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 }) => {
   const { canNativeShare, nativeShare } = useNativeShare();
   const isPostGame = context === 'post-game';
+
+  // Award daily share bonus (20 coins, once per day)
+  const awardShareBonus = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const today = new Date().toISOString().split('T')[0];
+    const lastBonus = localStorage.getItem('lastShareBonusDate');
+    if (lastBonus !== today) {
+      localStorage.setItem('lastShareBonusDate', today);
+      addCoins(20, 'Share Bonus');
+      toast.success(t('share.shareBonusAwarded'), { icon: '🎉', duration: 3000 });
+    }
+  }, [t]);
   const joinUrl = getJoinUrl(gameCode, isPostGame ? 'share-win' : 'modal-share');
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -110,14 +123,16 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
     setIsLoading(false);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    awardShareBonus();
     // Haptic feedback on mobile
     if (navigator.vibrate) {
       navigator.vibrate(50);
     }
-  }, [gameCode, t, isPostGame]);
+  }, [gameCode, t, isPostGame, awardShareBonus]);
 
   const handleWhatsApp = useCallback(() => {
     trackShare('whatsapp', gameCode);
+    awardShareBonus();
     if (isPostGame && gameResult) {
       // Use personalized message for post-game
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
@@ -125,7 +140,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
     } else {
       shareViaWhatsApp(gameCode, roomName, t);
     }
-  }, [gameCode, roomName, t, isPostGame, gameResult, shareMessage]);
+  }, [gameCode, roomName, t, isPostGame, gameResult, shareMessage, awardShareBonus]);
 
   const handleTwitter = useCallback(() => {
     trackShare('twitter', gameCode);
@@ -169,9 +184,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
       url: joinUrl,
     });
     if (success) {
+      awardShareBonus();
       onClose();
     }
-  }, [nativeShare, joinUrl, shareMessage, isPostGame, t, onClose]);
+  }, [nativeShare, joinUrl, shareMessage, isPostGame, t, onClose, awardShareBonus]);
 
   // Handle creating a challenge
   const handleCreateChallenge = useCallback(async () => {

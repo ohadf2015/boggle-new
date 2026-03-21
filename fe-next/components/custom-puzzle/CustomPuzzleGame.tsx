@@ -196,7 +196,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             <h2 className="text-xl font-bold text-red-500 mb-4">{error}</h2>
             <Link href={`/${language}/daily`}>
               <Button variant="outline">
-                <ArrowLeft className="w-4 h-4 me-2" />
+                <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
                 {t('common.back')}
               </Button>
             </Link>
@@ -256,7 +256,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
           <Link href={`/${language}/daily`} className="block mt-4">
             <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 me-2" />
+              <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
               {t('common.back')}
             </Button>
           </Link>

@@ -131,7 +131,7 @@ export default function ReportsPageClient() {
             className="flex items-center gap-2 text-neo-gray hover:text-neo-white mb-6 transition-colors"
             aria-label={t('teacher.reports.backToClass')}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 rtl:scale-x-[-1]" />
             <span>{t('teacher.reports.backToClass')}</span>
           </button>
 

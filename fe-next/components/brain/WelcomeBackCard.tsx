@@ -159,6 +159,7 @@ export default function WelcomeBackCard({
               </div>
               <button
                 onClick={handleDismiss}
+                aria-label={t('common.close')}
                 className={cn(
                   'p-1.5 rounded-neo border-2 border-neo-black',
                   'transition-all hover:bg-neo-red/20',

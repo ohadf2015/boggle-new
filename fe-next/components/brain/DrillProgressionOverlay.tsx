@@ -207,6 +207,7 @@ export default function DrillProgressionOverlay({
             {/* Close button */}
             <button
               onClick={onClose}
+              aria-label={t('common.close')}
               className={cn(
                 'absolute top-3 right-3 p-1.5 rounded-neo border-2 border-neo-black',
                 'transition-all hover:scale-105',

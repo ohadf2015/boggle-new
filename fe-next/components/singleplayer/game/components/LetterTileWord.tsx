@@ -4,6 +4,7 @@ import React from 'react';
 import { Check, X, RotateCcw } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
+import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 
@@ -131,15 +132,12 @@ export function LetterTileWord({
             {/* Found by other player - avatar + partial credit */}
             {feedback.type === 'foundByOther' && (
               <div className="flex items-center gap-1">
-                {feedback.foundByAvatar?.avatarImage ? (
-                  <img
-                    src={`/avatars/${feedback.foundByAvatar.avatarImage}.png`}
-                    alt={feedback.foundBy || ''}
-                    className="w-5 h-5 rounded-full"
-                  />
-                ) : (
-                  <span className="text-sm">{feedback.foundByAvatar?.emoji || '👤'}</span>
-                )}
+                <Avatar
+                  customAvatar={feedback.foundByAvatar?.customAvatar}
+                  avatarImage={feedback.foundByAvatar?.avatarImage}
+                  userId={feedback.foundBy}
+                  size="sm"
+                />
                 {feedback.score != null && feedback.score > 0 && (
                   <span className="font-black text-neo-cyan text-sm">+{feedback.score}</span>
                 )}

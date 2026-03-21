@@ -525,6 +525,7 @@ const sv = {
     "email": "E-post",
     "sms": "SMS",
     "discordCopied": "Kopierat för Discord! Klistra in i din server 💬",
+    "shareBonusAwarded": "+20 mynt för delning!",
     "morePlatforms": "Fler plattformar",
     "lessOptions": "Färre alternativ",
     "hideShareOptions": "Dölj delningsalternativ",

@@ -214,7 +214,7 @@ export default function PersonalizedDrillRecommendation({
               )}
             >
               {t('brain.recommendation.startDrill')}
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 rtl:scale-x-[-1]" />
             </motion.button>
           ) : (
             <div className={cn(

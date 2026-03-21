@@ -301,6 +301,8 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
+      role="region"
+      aria-label={t('daily.todaysPlayers')}
       className={`
         bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
@@ -340,7 +342,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
             onClick={handleShareRank}
             size="sm"
             className="px-3 py-1 h-8 bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-xl shadow-sm hover:-translate-y-0.5 transition-all"
-            aria-label="Share your rank"
+            aria-label={t('common.share')}
           >
             {copied ? (
               <Check className="w-3.5 h-3.5" />
@@ -439,7 +441,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               t={t}
             />
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2" role="list" aria-label={t('daily.todaysPlayers')}>
               <AnimatePresence mode="popLayout">
                 {visibleParticipants.map((participant, index) => (
                   <ParticipantRow

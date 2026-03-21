@@ -176,6 +176,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
           variant="ghost"
           size="sm"
           onClick={onQuitClick}
+          aria-label={t('common.quit')}
           className="w-12 h-12 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
         >
           <X className="text-lg text-neo-cream" />

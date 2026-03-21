@@ -260,6 +260,7 @@ lexiclash.com`;
               </h3>
               <button
                 onClick={onClose}
+                aria-label={t('common.close')}
                 className={cn(
                   'p-1.5 rounded-neo border-2 border-neo-black',
                   isDarkMode ? 'bg-slate-700' : 'bg-gray-100'

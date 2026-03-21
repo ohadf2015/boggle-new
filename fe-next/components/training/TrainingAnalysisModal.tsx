@@ -154,6 +154,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           {/* Close button */}
           <button
             onClick={handleClose}
+            aria-label={t('common.close')}
             className={cn(
               'absolute top-4 right-4 rtl:right-auto rtl:left-4 rounded-full p-2 z-10 transition-colors',
               isDarkMode

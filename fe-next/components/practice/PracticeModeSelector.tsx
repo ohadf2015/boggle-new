@@ -170,6 +170,7 @@ export default function PracticeModeSelector({
             variant="ghost"
             size="sm"
             onClick={onBack}
+            aria-label={t('common.back')}
             className="text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10"
           >
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
