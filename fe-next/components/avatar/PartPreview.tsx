@@ -8,9 +8,10 @@ import { EYEBROW_PARTS } from './parts/EyebrowParts';
 import { MOUTH_PARTS } from './parts/MouthParts';
 import { HAIR_PARTS } from './parts/HairParts';
 import { ACCESSORY_PARTS } from './parts/AccessoryParts';
+import { FACIAL_HAIR_PARTS } from './parts/FacialHairParts';
 
 interface PartPreviewProps {
-  partType: 'base' | 'eyes' | 'eyebrows' | 'mouth' | 'hair' | 'accessory';
+  partType: 'base' | 'eyes' | 'eyebrows' | 'mouth' | 'hair' | 'accessory' | 'facialHair';
   partName: string;
   config: CustomAvatarConfig;
   size?: number;
@@ -87,6 +88,16 @@ function renderPart(partType: string, partName: string, config: CustomAvatarConf
         <>
           <circle cx="50" cy="52" r="32" fill="#d4a574" opacity="0.2" />
           <Part fill={config.accessoryColor} />
+        </>
+      );
+    }
+    case 'facialHair': {
+      const Part = FACIAL_HAIR_PARTS[partName as keyof typeof FACIAL_HAIR_PARTS];
+      if (!Part) return null;
+      return (
+        <>
+          <circle cx="50" cy="52" r="32" fill="#d4a574" opacity="0.2" />
+          <Part fill={config.hairColor} />
         </>
       );
     }

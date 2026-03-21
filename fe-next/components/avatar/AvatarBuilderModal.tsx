@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Shuffle, Undo2, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette, Coins } from 'lucide-react';
+import { X, Shuffle, Undo2, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette, Coins, Brush } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import AvatarRenderer from './AvatarRenderer';
@@ -18,22 +18,24 @@ import {
   DEFAULT_MALE_HAIR,
 } from '@/shared/types/customAvatar';
 
-type Category = 'base' | 'hair' | 'eyes' | 'mouth' | 'accessories' | 'background';
+type Category = 'base' | 'hair' | 'eyes' | 'mouth' | 'facialHair' | 'accessories' | 'background';
 
 const CATEGORY_ICONS: Record<Category, typeof X> = {
   base: SmilePlus,
   hair: Scissors,
   eyes: Eye,
   mouth: Smile,
+  facialHair: Brush,
   accessories: Sparkles,
   background: Palette,
 };
 
-const CATEGORIES: { key: Category; labelKey: string }[] = [
+const ALL_CATEGORIES: { key: Category; labelKey: string; maleOnly?: boolean }[] = [
   { key: 'base', labelKey: 'avatar.builder.base' },
   { key: 'hair', labelKey: 'avatar.builder.hair' },
   { key: 'eyes', labelKey: 'avatar.builder.eyes' },
   { key: 'mouth', labelKey: 'avatar.builder.mouth' },
+  { key: 'facialHair', labelKey: 'avatar.builder.facialHair', maleOnly: true },
   { key: 'accessories', labelKey: 'avatar.builder.accessories' },
   { key: 'background', labelKey: 'avatar.builder.background' },
 ];
@@ -89,6 +91,9 @@ export default function AvatarBuilderModal({
         const hairList = value === 'female' ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES;
         if (!(hairList as readonly string[]).includes(prev.hair)) {
           next.hair = value === 'female' ? DEFAULT_FEMALE_HAIR : DEFAULT_MALE_HAIR;
+        }
+        if (value === 'female') {
+          next.facialHair = 'none';
         }
       }
       return next;
@@ -176,7 +181,7 @@ export default function AvatarBuilderModal({
 
         {/* Category Tabs with icons + spring bounce */}
         <div className="flex px-3 sm:px-4 gap-0.5">
-          {CATEGORIES.map(cat => (
+          {ALL_CATEGORIES.filter(c => !c.maleOnly || config.gender === 'male').map(cat => (
             <AdaptiveMotion.button
               key={cat.key}
               onClick={() => setActiveCategory(cat.key)}

@@ -12,6 +12,7 @@ import {
   AVATAR_ACCESSORY_COLORS,
   AVATAR_BG_COLORS,
   AVATAR_SHIRT_COLORS,
+  AVATAR_FACIAL_HAIR_STYLES,
   FEMALE_HAIR_STYLES,
   MALE_HAIR_STYLES,
   isPremiumPart,
@@ -23,7 +24,7 @@ import PartPreviewGrid from './AvatarBuilderPartGrid';
 import { ColorStrip, GenderToggle } from './AvatarBuilderColorControls';
 import toast from 'react-hot-toast';
 
-type Category = 'base' | 'hair' | 'eyes' | 'mouth' | 'accessories' | 'background';
+type Category = 'base' | 'hair' | 'eyes' | 'mouth' | 'facialHair' | 'accessories' | 'background';
 
 // ==================== Color Theme Presets ====================
 interface ColorTheme {
@@ -146,6 +147,22 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
           selected={config.mouth}
           onSelect={v => updateConfig('mouth', v)}
           config={config}
+          premium={premium}
+          t={t}
+          onCoinSpend={onCoinSpend}
+        />
+      );
+    case 'facialHair':
+      return (
+        <PartPreviewGrid
+          label={t('avatar.builder.facialHairStyle') || 'Style'}
+          partType="facialHair"
+          premiumCategory="facialHair"
+          options={AVATAR_FACIAL_HAIR_STYLES}
+          selected={config.facialHair ?? 'none'}
+          onSelect={v => updateConfig('facialHair', v)}
+          config={config}
+          noneLabel={t('avatar.builder.none')}
           premium={premium}
           t={t}
           onCoinSpend={onCoinSpend}

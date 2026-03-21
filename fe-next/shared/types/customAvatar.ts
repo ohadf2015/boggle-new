@@ -55,6 +55,12 @@ export const AVATAR_EYEBROW_STYLES = [
   'none', 'natural', 'thin', 'thick', 'angry', 'raised', 'unibrow', 'flat', 'worried',
 ] as const;
 
+// ==================== Facial Hair (male only) ====================
+export const AVATAR_FACIAL_HAIR_STYLES = [
+  'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'fullBeard',
+  'soulPatch', 'chinStrap', 'muttonChops', 'vanDyke', 'handlebar',
+] as const;
+
 // ==================== Mouth ====================
 export const AVATAR_MOUTH_STYLES = [
   'none', 'smile', 'grin', 'tongue', 'oh', 'smirk', 'flat', 'teeth', 'cat',
@@ -102,6 +108,7 @@ export const customAvatarSchema = z.object({
   eyes: z.enum(AVATAR_EYE_STYLES),
   /** Eyebrow style — optional for backward compatibility with saved avatars */
   eyebrows: z.enum(AVATAR_EYEBROW_STYLES).optional(),
+  facialHair: z.enum(AVATAR_FACIAL_HAIR_STYLES).optional(),
   mouth: z.enum(AVATAR_MOUTH_STYLES),
   accessory: z.enum(AVATAR_ACCESSORIES),
   accessoryColor: hexColorSchema,
@@ -169,6 +176,9 @@ export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScar
 export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon'] as const;
 export const EPIC_BASES = ['skull', 'shield', 'dragonHead'] as const;
 
+export const PREMIUM_FACIAL_HAIR_STYLES = ['vanDyke', 'handlebar'] as const;
+export const EPIC_FACIAL_HAIR_STYLES: readonly string[] = [];
+
 // ==================== Per-Part Pricing ====================
 // Every premium part has an explicit price. Fallback by category only for
 // parts accidentally missing from this map.
@@ -181,6 +191,7 @@ export const PREMIUM_PART_PRICES: Record<string, number> = {
   hair: 500,
   bgColor: 250,
   base: 750,
+  facialHair: 450,
 };
 
 // VIP per-part prices
@@ -227,6 +238,9 @@ export const VIP_PART_PRICES: Record<string, number> = {
   'hair:mohawk': 400,
   'hair:sideshave': 450,
   'hair:twintails': 500,
+  // ── Facial Hair (VIP) ──
+  'facialHair:vanDyke': 500,
+  'facialHair:handlebar': 600,
   // ── Bases (VIP) ──
   'base:hexagon': 800,
   'base:blob': 750,
@@ -268,6 +282,7 @@ export function isEpicPart(category: string, value: string): boolean {
   const epicMap: Record<string, readonly string[]> = {
     eyes: EPIC_EYE_STYLES, mouth: EPIC_MOUTH_STYLES,
     accessory: EPIC_ACCESSORIES, hair: EPIC_HAIR_STYLES, base: EPIC_BASES,
+    facialHair: EPIC_FACIAL_HAIR_STYLES,
   };
   return (epicMap[category] as readonly string[] | undefined)?.includes(value) ?? false;
 }
@@ -288,6 +303,7 @@ const PREMIUM_MAP: Record<string, readonly string[]> = {
   hair: [...PREMIUM_HAIR_STYLES, ...EPIC_HAIR_STYLES],
   bgColor: PREMIUM_BG_COLORS,
   base: [...PREMIUM_BASES, ...EPIC_BASES],
+  facialHair: [...PREMIUM_FACIAL_HAIR_STYLES, ...EPIC_FACIAL_HAIR_STYLES],
 };
 
 /** Check if a part value is premium (VIP or Epic) */
@@ -308,18 +324,21 @@ const FREE_BASES = AVATAR_BASES.filter(v => !PREMIUM_MAP.base.includes(v));
 const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.eyes.includes(v));
 const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.mouth.includes(v));
 const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v));
+const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v));
 const FREE_HAIR_STYLES = AVATAR_HAIR_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.hair.includes(v));
 
 export function getRandomAvatarConfig(): CustomAvatarConfig {
   const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
+  const gender = pick(AVATAR_GENDERS);
   return {
-    gender: pick(AVATAR_GENDERS),
+    gender,
     base: pick(FREE_BASES),
     skinColor: pick(AVATAR_SKIN_COLORS),
     hair: pick(FREE_HAIR_STYLES),
     hairColor: pick(AVATAR_HAIR_COLORS),
     eyes: pick(FREE_EYE_STYLES),
     eyebrows: pick(AVATAR_EYEBROW_STYLES),
+    facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
     mouth: pick(FREE_MOUTH_STYLES),
     accessory: pick(FREE_ACCESSORIES),
     accessoryColor: pick(AVATAR_ACCESSORY_COLORS),
@@ -342,14 +361,16 @@ export function getSeededAvatarConfig(seed: number): CustomAvatarConfig {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
   const pick = <T>(arr: readonly T[]): T => arr[Math.floor(rand() * arr.length)];
+  const gender = pick(AVATAR_GENDERS);
   return {
-    gender: pick(AVATAR_GENDERS),
+    gender,
     base: pick(FREE_BASES),
     skinColor: pick(AVATAR_SKIN_COLORS),
     hair: pick(FREE_HAIR_STYLES),
     hairColor: pick(AVATAR_HAIR_COLORS),
     eyes: pick(FREE_EYE_STYLES),
     eyebrows: pick(AVATAR_EYEBROW_STYLES),
+    facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
     mouth: pick(FREE_MOUTH_STYLES),
     accessory: pick(FREE_ACCESSORIES),
     accessoryColor: pick(AVATAR_ACCESSORY_COLORS),

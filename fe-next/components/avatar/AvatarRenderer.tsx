@@ -9,6 +9,7 @@ import { MOUTH_PARTS } from './parts/MouthParts';
 import { HAIR_PARTS, HAIR_FRONT_PARTS } from './parts/HairParts';
 import { ACCESSORY_PARTS } from './parts/AccessoryParts';
 import { EYEBROW_PARTS } from './parts/EyebrowParts';
+import { FACIAL_HAIR_PARTS } from "./parts/FacialHairParts";
 import { BODY_PARTS } from './parts/BodyParts';
 import AvatarTierEffects, { type Tier } from './AvatarTierEffects';
 
@@ -72,6 +73,7 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
   const HairFrontPart = HAIR_FRONT_PARTS[config.hair] ?? null;
   const AccessoryPart = ACCESSORY_PARTS[config.accessory] ?? ACCESSORY_PARTS.none;
   const EyebrowPart = EYEBROW_PARTS[config.eyebrows ?? 'none'] ?? EYEBROW_PARTS.none;
+  const FacialHairPart = FACIAL_HAIR_PARTS[config.facialHair ?? 'none'] ?? FACIAL_HAIR_PARTS.none;
   const BodyPart = BODY_PARTS[config.gender ?? 'male'];
   const isBackStyle = BACK_LAYER_STYLES.includes(config.hair);
   const isBackAccessory = BACK_ACCESSORY_STYLES.has(config.accessory);
@@ -217,6 +219,11 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
 
       {/* Mouth */}
       {config.mouth !== 'none' && <MouthPart />}
+
+      {/* Facial hair */}
+      {config.facialHair && config.facialHair !== 'none' && (
+        <FacialHairPart fill={config.hairColor} />
+      )}
 
       {/* Hair front layer — bangs/framing strands ON TOP of face */}
       {isBackStyle && HairFrontPart && <HairFrontPart fill={config.hairColor} />}
