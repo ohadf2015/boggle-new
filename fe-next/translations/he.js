@@ -158,10 +158,10 @@ const he = {
     "reconnecting": "מחזיר אותך...",
     "reconnected": "חזרנו!",
     "connectionLost": "איבדנו חיבור",
-    "notConnected": "לא מחובר",
-    "connected": "מחובר",
-    "playerDisconnected": "מנותק",
-    "playerAFK": "לא פעיל",
+    "notConnected": "לא מחובר/ת",
+    "connected": "מחובר/ת",
+    "playerDisconnected": "מנותק/ת",
+    "playerAFK": "לא פעיל/ה",
     "playerIdle": "לא פעיל",
     "playerReconnecting": "מתחבר מחדש...",
     "left": "נותרו",
@@ -198,7 +198,7 @@ const he = {
     "word": "מילה",
     "words": "מילים",
     "wordsFound": "מילים",
-    "you": "אתה",
+    "you": "את/ה",
     "quickRematch": "עוד סיבוב",
     "attempts": "ניסיונות",
     "share": "שתף",
@@ -230,7 +230,7 @@ const he = {
     "hidePreview": "הסתר תצוגה מקדימה",
     "loadingProfile": "מתכונן...",
     "rematch": "עוד סיבוב",
-    "roomFull": "החדר מלא - אתה צופה עכשיו",
+    "roomFull": "החדר מלא - צופים בינתיים",
     "gotIt": "הבנתי",
     "pause": "השהה",
     "resume": "המשך",
@@ -306,7 +306,7 @@ const he = {
       "name": "תגובת שרשרת"
     },
     "comboMaster": {
-      "name": "אדון הקומבו"
+      "name": "מאסטר הקומבו"
     },
     "quickCharge": {
       "name": "טעינה מהירה"
@@ -315,7 +315,7 @@ const he = {
       "name": "חריץ כוח"
     },
     "hintMaster": {
-      "name": "אדון הרמזים"
+      "name": "מאסטר הרמזים"
     },
     "xpBoost": {
       "name": "הגברת ניסיון"
@@ -326,11 +326,11 @@ const he = {
   },
   "connection": {
     "reconnecting": "מתחבר מחדש...",
-    "disconnected": "החיבור נפל",
+    "disconnected": "אופס, נפלת לרגע!",
     "attempt": "ניסיון",
-    "checkConnection": "נראה שאתה לא מחובר!",
+    "checkConnection": "אופס, נראה שנפלת מהרשת!",
     "retry": "נסה שוב",
-    "retryNow": "נסה עכשיו",
+    "retryNow": "התחברו מחדש!",
     "scoreSafe": "הניקוד שלך שמור בשרת",
     "qualityExcellent": "חיבור מצוין",
     "qualityGood": "חיבור טוב",
@@ -350,7 +350,22 @@ const he = {
   },
   "leadChange": {
     "tookLead": "אתם מובילים!",
-    "lostLead": "{{username}} תפס את ההובלה!"
+    "tookTheLeadVerb": "תפס את ההובלה!",
+    "lostLead": "{{username}} תפס את ההובלה!",
+    "tookLeadWitty_0": "יאללה, מי פה הבוס?",
+    "tookLeadWitty_1": "הפסגה שלך. תהנה כל עוד זה נמשך.",
+    "tookLeadWitty_2": "שום דבר לא עוצר אותך עכשיו.",
+    "tookLeadWitty_3": "אתה בראש, אל תסתכל למטה.",
+    "lostLeadWitty_0": "עקפו אותך... אבל עוד לא נגמר.",
+    "lostLeadWitty_1": "עכשיו זה אישי.",
+    "lostLeadWitty_2": "תראה להם מי פה.",
+    "lostLeadWitty_3": "סיבוב הנקמה מתחיל.",
+    "otherTookLeadWitty_0": "אוי ואבוי, פה זה נהיה מעניין!",
+    "otherTookLeadWitty_1": "שחקן חדש נכנס לתמונה!",
+    "otherTookLeadWitty_2": "רגע, מה קרה פה?",
+    "otherTookLeadWitty_3": "הקלפים התערבבו!",
+    "pointsAhead": "נק׳ יתרון",
+    "wordsFound": "{{count}} מילים"
   },
   "countdown": {
     "hint": "גררו אותיות כדי ליצור מילים!",
@@ -414,7 +429,7 @@ const he = {
   "effects": {
     "preferenceTitle": "הגדרות אנימציה",
     "preferenceSubtitle": "פעם ראשונה שאתה רואה את זה?",
-    "preferenceDescription": "לתשומת לב! אנחנו משתמשים ברעידות מסך ואורות מהבהבים כדי לחגוג את הניצחונות שלך. רוצה לכבות?",
+    "preferenceDescription": "שימו לב! יש לנו רעידות מסך ואורות מהבהבים. רוצים לכבות?",
     "earthquakeShake": "רעידת מסך",
     "fireRoundLights": "אורות מהבהבים",
     "keepAnimations": "השאר אפקטים",
@@ -545,7 +560,7 @@ const he = {
     "telegram": "טלגרם",
     "moreWays": "עוד דרכים לשתף",
     "invite": "הזמנה",
-    "emailSubjectPostGame": "הצלחתי ב-LexiClash!",
+    "emailSubjectPostGame": "ריסקתי את LexiClash!",
     "emailSubjectInvite": "בואו לשחק LexiClash!",
     "challengeLinkCopied": "קישור האתגר הועתק!",
     "errorCreatingChallenge": "שגיאה ביצירת האתגר",
@@ -590,8 +605,8 @@ const he = {
     "updateProgress": "לוקח שתי שניות!",
     "globalErrorEncouragement": "אל דאגה - המשחק שלך מאובטח!",
     "goHome": "הביתה",
-    "failedToLoadLeaderboard": "טעינת טבלת המובילים נכשלה",
-    "failedToLoadProfile": "טעינת הפרופיל נכשלה",
+    "failedToLoadLeaderboard": "לא הצלחנו לטעון את הטבלה",
+    "failedToLoadProfile": "לא הצלחנו לטעון את הפרופיל",
     "unableToLoadData": "לא ניתן לטעון נתונים. נסה שוב.",
     "tryAgainButton": "נסה שוב",
     "connectionTimeout": "לוקח יותר מדי זמן להתחבר",
@@ -924,7 +939,8 @@ const he = {
     "playerEliminated": "הודח מהמשחק!",
     "youEliminated": "הודחת מהמשחק!",
     "playerLastLife": "בחיים האחרונים!",
-    "yourLastLife": "חיים אחרונים!"
+    "yourLastLife": "חיים אחרונים!",
+    "botsJoined": "{{count}} יריבים הצטרפו — אין אנשים אמיתיים, אז קיבלתם בוטים!"
   },
   "stats": {
     "games": "משחקים",
@@ -1022,7 +1038,7 @@ const he = {
     "tournamentCreateFailed": "יצירת הטורניר נכשלה. אנא נסה שוב.",
     "cancelTournament": "בטל טורניר",
     "confirmCancelTournament": "לבטל את הטורניר?",
-    "cancelTournamentWarning": "האם אתה בטוח שברצונך לבטל את הטורניר? כל ההתקדמות תאבד ולא ניתן לבטל פעולה זו.",
+    "cancelTournamentWarning": "לבטל את הטורניר? כל ההתקדמות תאבד ואין דרך חזרה.",
     "minWordLength": "אורך מילה מינימלי",
     "wordsAutoValidated": "מילים אומתו אוטומטית",
     "gameTypeSelector": "בחר מצב משחק",
@@ -1202,7 +1218,7 @@ const he = {
     "most3LetterWords": "אלוף מילים בנות 3 אותיות!",
     "bigBrain": "מוח גדול",
     "highestAvgScore": "ממוצע ניקוד הכי גבוה למילה!",
-    "socialButterfly": "פרפר חברתי",
+    "socialButterfly": "הפרפר החברתי",
     "mostSharedWords": "הכי הרבה מילים משותפות!",
     "mascotComments": {
       "awardsIntro1": "והפרסים הולכים ל...",
@@ -1245,7 +1261,7 @@ const he = {
   },
   "playerView": {
     "wordsFound": "מילים שנמצאו",
-    "getReadyHint": "קראו את הטיפים למטה כדי ללמוד איך לשחק! 👇",
+    "getReadyHint": "סרקו את הלוח!",
     "wordsOnBoard": "מילים על הלוח",
     "wordsRemaining": "מילים נותרו",
     "letterWords": "אותיות ומעלה",
@@ -1258,7 +1274,7 @@ const he = {
     "wordNotInList": "המילה לא זמינה",
     "roomClosed": "החדר נסגר",
     "exitConfirmation": "לצאת מהחדר?",
-    "exitWarning": "האם אתה בטוח שברצונך לעזוב? תאבד את ההתקדמות שלך במשחק הנוכחי.",
+    "exitWarning": "בטוח/ה? ההתקדמות במשחק תאבד.",
     "exit": "יציאה",
     "exitRoom": "יציאה מהחדר",
     "waitForGameStart": "המתן לתחילת המשחק",
@@ -1319,7 +1335,7 @@ const he = {
     "waitingForPlayers": "אוספים מתמודדים...",
     "oneMoreNeeded": "גייס את החבר'ה!",
     "readyToStart": "מוכנים לקרב! יותר = יותר כיף!",
-    "fullHouse": "הזירה מלאה! יאללה קראש!"
+    "fullHouse": "הזירה מלאה! יאללה קלאש!"
   },
   "roomCode": {
     "title": "קוד חדר",
@@ -1343,7 +1359,7 @@ const he = {
     "step2Text": "מילים ארוכות = הרבה יותר נקודות. מצאו מילים ייחודיות!",
     "welcome": {
       "title": "ברוכים הבאים ל-LexiClash!",
-      "subtitle": "החליקו אותיות. צרו מילים. שלטו.",
+      "subtitle": "החליקו. אייתו. שלטו.",
       "demoInstruction": "נסו! החליקו לכתוב:",
       "demoWord": "שמש",
       "demoHint": "חברו אותיות סמוכות",
@@ -1436,7 +1452,7 @@ const he = {
     "quickTip2": "שחררו לשליחה",
     "quickTip3": "מילים ארוכות = יותר נקודות!",
     "gotIt": "קיבלתי, יאללה!",
-    "badge": "איחור אופנתי"
+    "badge": "מאחרים בסטייל"
   },
   "spectator": {
     "upgraded": "נכנסת! יאללה לשחק!",
@@ -1476,32 +1492,32 @@ const he = {
   "chat": {
     "title": "צ'אט החדר",
     "placeholder": "כתבו משהו...",
-    "noMessages": "שקט פה...",
+    "noMessages": "צרצרים...",
     "startChatting": "יאללה לדבר!",
     "send": "שלח",
     "newMessages": "הודעות חדשות"
   },
   "results": {
-    "results": "תוצאות",
-    "share": "שתף",
+    "results": "דו״ח קרב",
+    "share": "תתגאו",
     "yourProgress": "ההתקדמות שלך",
-    "topPlayers": "שחקנים מובילים",
-    "otherPlayers": "שחקנים אחרים",
+    "topPlayers": "הפודיום",
+    "otherPlayers": "גם השתתפו",
     "foundWords": "מצא",
     "yourPerformance": "המשחק שלך",
-    "viewDetails": "ראו פירוט",
+    "viewDetails": "צלילה לעומק",
     "viewAllWords": "כל המילים",
     "viewXpBreakdown": "פירוט XP",
-    "rewardsEarned": "פרסים שנצברו",
+    "rewardsEarned": "שלל שנאסף",
     "achievementUnlocked": "הישג נפתח",
     "achievementsUnlocked": "הישגים נפתחו",
     "details": "פרטים",
-    "performanceDetails": "פרטי ביצועים",
+    "performanceDetails": "הפירוט המלא",
     "badges": "תגים",
     "xp": "XP",
     "winner": "מנצח",
     "winnerAnnouncement": "המנצח",
-    "youWon": "ניצחון!",
+    "youWon": "ניצחון! 🏆",
     "secondPlace": "סגן אלוף!",
     "thirdPlace": "ארד!",
     "silverMedalist": "מדליית כסף",
@@ -1526,7 +1542,7 @@ const he = {
     "appealed": "נשלח",
     "appealExplanation": "חושבים שמילה נדחתה בטעות? ערערו ונבדוק.",
     "levelUp": "עליית רמה!",
-    "pendingValidation": "ממתין לאימות קהילתי",
+    "pendingValidation": "בבדיקה...",
     "autoRejoinIn": "חזרה אוטומטית בעוד",
     "rejoinNow": "חזור עכשיו",
     "largeRoomMode": "מצב חדר גדול",
@@ -1569,10 +1585,10 @@ const he = {
     "wordsYouMissed": "מילים שפספסת",
     "rarestAchievement": "הישג נדיר",
     "rankHighlight": {
-      "champion": "!אלוף",
-      "soClose": "!כמעט",
-      "podium": "!על הפודיום",
-      "keepGoing": "!המשך"
+      "champion": "אלוף/ה!",
+      "soClose": "כמעט!",
+      "podium": "על הפודיום!",
+      "keepGoing": "המשך!"
     },
     "everyoneReady": "כולם מוכנים!",
     "waitingForPlayers": "ממתין לשחקנים",
@@ -1603,14 +1619,14 @@ const he = {
       "thinIce": "הם נושמים לך בעורף",
       "comingForYou": "{player} קרוב. סיבוב טוב אחד וזה שלהם. תישאר ממוקד."
     },
-    "greatVictory": "!ניצחון",
-    "greatBattle": "!קרב מטורף",
+    "greatVictory": "ניצחון!",
+    "greatBattle": "קרב מטורף!",
     "battleRankings": "דירוג קרב",
     "players": "שחקנים",
     "survivors": "שורדים",
     "eliminated": "הודחו",
     "targetWord": "מילת מטרה",
-    "foundByYou": "!נמצאה על ידך",
+    "foundByYou": "נמצאה על ידך!",
     "survived": "שרד",
     "ultimateChampion": "אלוף על",
     "risingContender": "מתמודד עולה",
@@ -1643,7 +1659,7 @@ const he = {
     "performanceHistory": "היסטוריית ביצועים",
     "goToLobby": "לחדר המתנה",
     "you": "(אתה)",
-    "betterLuckNextTime": "יותר מזל בפעם הבאה!",
+    "betterLuckNextTime": "הסיבוב הבא שלך!",
     "of": "מתוך",
     "readyForNextRound": "מוכנים לסיבוב הבא?",
     "hostStartDescription": "התחילו משחק חדש כשכולם מוכנים!",
@@ -1695,15 +1711,15 @@ const he = {
     "backToLobby": "חזרה ללובי",
     "letsGo": "יאללה!",
     "challengeBots": "אתגר בוטים",
-    "challengeBotsDesc": "בחן את כישוריך נגד יריבי AI",
+    "challengeBotsDesc": "חושבים שתנצחו את המכונות?",
     "challengeBotsAgain": "שחק שוב!",
     "challengeBotsAgainDesc": "התחל משחק חדש עם בוטים",
     "tryDailyChallenge": "נסו אתגר יומי",
     "tryDailyChallengeDesc": "אותו פאזל לכולם בעולם - תתחרו גלובלית!",
     "goMultiplayer": "עברו למולטיפלייר",
-    "goMultiplayerDesc": "אתגרו שחקנים אמיתיים בקרבות מילים חיים",
+    "goMultiplayerDesc": "בני אדם אמיתיים, תחרות אמיתית, גאווה אמיתית",
     "brainTraining": "אימון מוחי",
-    "brainTrainingDesc": "שפרו את הכישורים הקוגניטיביים שלכם עם תרגילים ממוקדים"
+    "brainTrainingDesc": "שדרגו את המוח"
   },
   "practiceResults": {
     "playAgain": "שחקו שוב",
@@ -1868,7 +1884,7 @@ const he = {
     "description": "מצאו מילים על הלוח. מילים ארוכות = יותר נקודות. נצחו את החברים!",
     "createOrJoinTitle": "צרו או הצטרפו",
     "createOrJoinDesc": "המארח יוצר חדר. שתפו קוד. קפצו פנימה!",
-    "hostStartsTitle": "מוכנים, יציב, צא!",
+    "hostStartsTitle": "מוכנים, היכון, צא!",
     "hostStartsDesc": "כולם מוכנים? המארח לוחץ. האותיות מופיעות. קדימה!",
     "findWordsNote": "כל אות יכולה לשמש רק פעם אחת בכל מילה!",
     "earnPointsTitle": "צברו נקודות",
@@ -2046,8 +2062,8 @@ const he = {
     },
     "completion": {
       "title": "כל הכבוד!",
-      "message": "הבנת את המשחק! אתה יכול להמשיך לתרגל או לסיים ולעבור למשחק האמיתי.",
-      "finish": "סיום",
+      "message": "תפסת את הטריק! מוכנים למשחק האמיתי?",
+      "finish": "יאללה לקרב!",
       "continuePractice": "המשך תרגול"
     },
     "analysis": {
@@ -2385,7 +2401,7 @@ const he = {
         "tip": "סרוק מהר, התמקד בפינות."
       },
       "comeback": {
-        "headline": "חזרה בעיבוד...",
+        "headline": "זמן קאמבק",
         "message": "לגדולים יש סיבובים רעים. הבא שלך!",
         "tip": "אמור אותיות בקול לעורר אסוציאציות."
       }
@@ -2443,7 +2459,7 @@ const he = {
   },
   "oneMoreGame": {
     "defaultTitle": "עוד משחק?",
-    "defaultMessage": "!המשך את הרצף — שחק שוב"
+    "defaultMessage": "המשיכו את הרצף — שחקו שוב!"
   },
   "almostFound": {
     "title": "כמעט מצאת...",
@@ -3169,7 +3185,7 @@ const he = {
     "title": "ברוך שובך!",
     "close": "סגור בונוס חזרה",
     "xpBonus": "בונוס XP",
-    "daysAway": "היית משחק נעדר {days} ימים",
+    "daysAway": "לא היית כאן {days} ימים",
     "xpDuration": "בוסט XP ל-{hours} שעות",
     "hints": "רמזים חינמיים נוספו",
     "streakFreezes": "הקפאות רצף נוספו",

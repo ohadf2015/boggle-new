@@ -4696,7 +4696,8 @@ const en = {
     "playerEliminated": "has been eliminated!",
     "youEliminated": "You have been eliminated!",
     "playerLastLife": "is on their last life!",
-    "yourLastLife": "FINAL LIFE!"
+    "yourLastLife": "FINAL LIFE!",
+    "botsJoined": "{{count}} opponents joined — no humans around, so you got bots!"
   },
   "stats": {
     "games": "Games",

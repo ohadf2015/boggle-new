@@ -155,7 +155,7 @@ const ja = {
     "understood": "行くぞ！",
     "refresh": "更新",
     "refreshed": "更新完了！",
-    "reconnecting": "戻しています...",
+    "reconnecting": "すぐ戻るよ...",
     "reconnected": "復活！",
     "connectionLost": "接続切れ",
     "notConnected": "オフライン",
@@ -204,7 +204,7 @@ const ja = {
     "bot": "ボット",
     "minutes": "分",
     "playNow": "今すぐプレイ",
-    "tryAgainLater": "後で再試行",
+    "tryAgainLater": "後でもう一度",
     "seconds": "秒",
     "days": "日",
     "step": "ステップ",
@@ -235,7 +235,7 @@ const ja = {
     "resume": "再開",
     "save": "保存",
     "edit": "編集",
-    "retry": "再試行",
+    "retry": "もう一度",
     "join": "参加",
     "showLess": "少なく",
     "showMore": "もっと",
@@ -294,7 +294,7 @@ const ja = {
       "name": "パワーストライク"
     },
     "longWordMastery": {
-      "name": "長い単語マスタリー"
+      "name": "長い単語マスター"
     },
     "devastatingBlow": {
       "name": "壊滅的な一撃"
@@ -326,11 +326,11 @@ const ja = {
   },
   "connection": {
     "reconnecting": "戻しています...",
-    "disconnected": "接続が切断されました",
+    "disconnected": "一瞬切れちゃった！",
     "attempt": "試行",
     "checkConnection": "オフラインみたい！",
     "retry": "再接続",
-    "retryNow": "今すぐ再試行",
+    "retryNow": "再接続！",
     "scoreSafe": "スコアはサーバーに保存されています",
     "qualityExcellent": "接続状態：優良",
     "qualityGood": "接続状態：良好",
@@ -350,7 +350,22 @@ const ja = {
   },
   "leadChange": {
     "tookLead": "トップに立った！",
-    "lostLead": "{{username}}がトップに！"
+    "tookTheLeadVerb": "がトップに！",
+    "lostLead": "{{username}}がトップに！",
+    "tookLeadWitty_0": "この勢い、止まらないぞ！",
+    "tookLeadWitty_1": "てっぺん最高！",
+    "tookLeadWitty_2": "独走態勢に入った！",
+    "tookLeadWitty_3": "王座についた…が、油断は禁物。",
+    "lostLeadWitty_0": "抜かれた…まだ終わってない！",
+    "lostLeadWitty_1": "ここからが本番だ。",
+    "lostLeadWitty_2": "逆転のチャンス到来。",
+    "lostLeadWitty_3": "リベンジ開始！",
+    "otherTookLeadWitty_0": "波乱の展開！",
+    "otherTookLeadWitty_1": "ダークホース登場！",
+    "otherTookLeadWitty_2": "おっと、混戦模様！",
+    "otherTookLeadWitty_3": "勝負の行方が読めない！",
+    "pointsAhead": "点リード",
+    "wordsFound": "{{count}}語"
   },
   "countdown": {
     "hint": "スワイプして単語を作ろう！",
@@ -458,7 +473,7 @@ const ja = {
     "controls": "音楽コントロール",
     "musicVolumeSlider": "音楽ボリュームスライダー",
     "sfxVolumeSlider": "効果音ボリュームスライダー",
-    "haptics": "触覚",
+    "haptics": "振動",
     "toggleHaptics": "触覚フィードバックを切り替え",
     "sound": "サウンド",
     "soundOn": "サウンドオン",
@@ -905,9 +920,9 @@ const ja = {
       "pasteButton": "コードを貼り付け"
     },
     "errors": {
-      "roomFull": "このルームは満員です。別のルームを試すか、自分で作成してください。",
-      "roomClosed": "このルームは終了しました。ロビーに戻って別のゲームを探してください。",
-      "invalidCode": "無効なコードまたはルームが閉鎖されています。コードを確認して再試行してください。",
+      "roomFull": "満員だ！別のルームを試すか、自分で作ろう！",
+      "roomClosed": "このルームは終了したよ。ロビーに戻って別のゲームを探そう！",
+      "invalidCode": "コードが無効かルームが閉じてる。確認してもう一度！",
       "connectionLost": "接続が切断されました。再接続中...",
       "hostLeft": "ホストがゲームを離れました。ロビーに戻ります...",
       "invalidUsername": "ユーザー名は2〜20文字にしてください。",
@@ -916,8 +931,8 @@ const ja = {
   },
   "hostView": {
     "lobby": "ロビー",
-    "waitingForPlayers": "待機中...",
-    "startGame": "開始",
+    "waitingForPlayers": "戦士集合中...",
+    "startGame": "GO！",
     "startBattle": "バトル開始！",
     "commandersJoined": "参加中の司令官",
     "playersInRoom": "ルーム内のプレイヤー",
@@ -958,14 +973,14 @@ const ja = {
     "minutes": "分",
     "playerJoinedLate": "途中参加しました！",
     "gameStopped": "ゲーム停止",
-    "confirmExit": "本当に終了しますか？ルームは開いたままで、別のプレイヤーがホストになります。",
-    "exitWarning": "このアクションは全プレイヤーのためにルームを閉じます。本当に退出しますか？",
+    "confirmExit": "退出する？別のプレイヤーがホストになるよ。",
+    "exitWarning": "退出するとルームが閉じるよ。本当にいい？",
     "exitRoom": "ルームを退出",
     "startNewGame": "新しいゲームを開始",
     "startNextRound": "次のラウンドを開始",
     "playersReady": "準備完了のプレイヤー",
-    "waitingForPlayersToReady": "プレイヤーの準備完了を待っています...",
-    "allPlayersReady": "全員準備完了！次のラウンドを開始しましょう。",
+    "waitingForPlayersToReady": "みんなの準備待ち...",
+    "allPlayersReady": "全員OK！次のラウンドいこう！",
     "validation": "単語の検証",
     "submitValidation": "検証を送信",
     "finalScores": "最終スコア",
@@ -1078,11 +1093,11 @@ const ja = {
       "longWord": "ワードパワー!",
       "epicWord": "モンスターワード!",
       "rareWord": "伝説の発見!",
-      "combo5x": "加熱中!",
+      "combo5x": "アツくなってきた！",
       "combo10x": "止められない!",
-      "combo15x": "絶対的な獣!",
+      "combo15x": "鬼強すぎ！",
       "combo20x": "コンボの王!",
-      "comboBroken": "連続記録終了!",
+      "comboBroken": "コンボ崩壊！",
       "firstBlood": "ファーストブラッド!",
       "overtake": "追い抜き!",
       "comeback": "復活!",
@@ -1108,7 +1123,7 @@ const ja = {
       "gridShuffle": "グリッドシャッフル!",
       "nLetters": "{count}文字!",
       "sameWordFound": "同じ{length}文字の単語!",
-      "finalMinute": "ラストミニッツ！",
+      "finalMinute": "残り1分！",
       "everySecondCounts": "一秒一秒が大切！"
     },
     "modeClassic": "クラシック",
@@ -1182,11 +1197,11 @@ const ja = {
     "lengths": "種類",
     "steadyEddie": "安定王",
     "mostConsistent": "最も安定したペース!",
-    "shortAndSweet": "短くて甘い",
+    "shortAndSweet": "ショート＆スイート",
     "most3LetterWords": "3文字単語のマスター!",
     "bigBrain": "ビッグブレイン",
     "highestAvgScore": "最高平均単語スコア!",
-    "socialButterfly": "ソーシャルバタフライ",
+    "socialButterfly": "みんなの人気者",
     "mostSharedWords": "最も人気の単語選び!",
     "mascotComments": {
       "awardsIntro1": "受賞者は...",
@@ -1256,7 +1271,7 @@ const ja = {
     "me": "自分",
     "noWordsYet": "まだ単語が見つかりません",
     "swipeHintShort": "文字をスワイプして単語を見つけよう！",
-    "getReadyHint": "下のコツを読んで遊び方をマスターしよう！",
+    "getReadyHint": "グリッドをスキャンしよう！",
     "waitingForHostToStart": "ホストがゲームを開始するのを待っています...",
     "hostWillStart": "全員の準備ができたらホストがゲームを開始します",
     "readyUp": "準備OK!",
@@ -1275,8 +1290,8 @@ const ja = {
     "validatingWord": "確認中:",
     "rankings": "ランキング",
     "showLeaderboard": "リーダーボードを表示",
-    "slowDown": "速度を落としてください！単語を処理中です。",
-    "submittingTooFast": "単語を送信するのが速すぎます",
+    "slowDown": "ちょっと待って！単語を処理中...",
+    "submittingTooFast": "単語の送信が速すぎ！",
     "words": "単語",
     "alreadyFound": "既に発見済み",
     "invalidWord": "無効な単語",
@@ -1300,9 +1315,9 @@ const ja = {
     "milestoneFirst": "最初のプレイヤー！",
     "milestoneParty": "パーティー開始！",
     "milestoneFull": "満員御礼！",
-    "waitingForPlayers": "プレイヤーを待っています...",
-    "oneMoreNeeded": "友達を招待して始めましょう！",
-    "readyToStart": "開始準備完了！プレイヤーが多いほど楽しい！",
+    "waitingForPlayers": "挑戦者を集めてるよ...",
+    "oneMoreNeeded": "仲間を呼び集めろ！",
+    "readyToStart": "準備OK！多いほど盛り上がる！",
     "fullHouse": "満員御礼！バトル開始！"
   },
   "roomCode": {
@@ -1319,14 +1334,14 @@ const ja = {
   "onboarding": {
     "header": "クイックスタートガイド",
     "skip": "スキップ",
-    "letsPlay": "プレイ開始！",
+    "letsPlay": "レッツクラッシュ！",
     "step1Title": "文字をスワイプ",
     "step1Text": "つながった文字をドラッグして単語を作ろう。",
     "step2Title": "ポイントを獲得",
     "step2Text": "長い単語 = もっとポイント。ユニークな単語を見つけよう！",
     "welcome": {
       "title": "LexiClashへようこそ！",
-      "subtitle": "文字をスワイプ。単語を作る。制覇する。",
+      "subtitle": "スワイプ。スペル。制覇。",
       "demoInstruction": "やってみよう！スワイプで綴ろう:",
       "demoWord": "CAT",
       "demoHint": "隣接する文字をつなげよう",
@@ -1345,7 +1360,7 @@ const ja = {
       "characterCount": "文字"
     },
     "profile": {
-      "title": "プロフィールを作成",
+      "title": "装備せよ！",
       "subtitle": "アバター + 名前 = バトル準備完了",
       "deferredTitle": "進捗を保存しますか？",
       "deferredSubtitle": "プロフィールを設定して統計を保存しよう！",
@@ -1451,7 +1466,7 @@ const ja = {
     "fire": "ファイヤー",
     "clap": "拍手",
     "wow": "わお",
-    "dead": "死亡",
+    "dead": "やられた",
     "crown": "王冠",
     "zap": "稲妻",
     "label": "クイックリアクション"
@@ -1465,24 +1480,24 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
-    "results": "結果",
-    "share": "シェア",
-    "yourProgress": "あなたの進捗",
-    "topPlayers": "トッププレイヤー",
+    "results": "バトルレポート",
+    "share": "自慢する",
+    "yourProgress": "今回の成績",
+    "topPlayers": "表彰台",
     "yourPerformance": "あなたのゲーム",
-    "viewDetails": "詳細を見る",
+    "viewDetails": "くわしく見る",
     "viewAllWords": "すべての単語",
     "viewXpBreakdown": "XP内訳",
-    "rewardsEarned": "獲得報酬",
+    "rewardsEarned": "ゲットした報酬",
     "achievementUnlocked": "アチーブメント解除",
     "achievementsUnlocked": "アチーブメント解除",
     "details": "詳細",
-    "performanceDetails": "パフォーマンス詳細",
+    "performanceDetails": "内訳",
     "badges": "バッジ",
     "xp": "XP",
     "winner": "勝者",
     "winnerAnnouncement": "勝者",
-    "youWon": "勝利！",
+    "youWon": "勝利！🏆",
     "secondPlace": "準優勝！",
     "thirdPlace": "銅！",
     "silverMedalist": "銀メダル",
@@ -1507,7 +1522,7 @@ const ja = {
     "aiRejected": "AIにより却下",
     "appealWord": "異議申立",
     "appealed": "送信済",
-    "appealExplanation": "単語が誤って却下されたと思いますか？異議を申し立てて確認します。",
+    "appealExplanation": "単語が間違って却下された？異議申立すればチェックするよ！",
     "levelUp": "レベルアップ!",
     "pendingValidation": "コミュニティチェック待ち",
     "autoRejoinIn": "自動再参加まで",
@@ -1530,7 +1545,7 @@ const ja = {
     "yourPerformance": "あなたの成績",
     "rewards": "報酬",
     "standings": "順位",
-    "guestSavePrompt": "報酬を保存するにはログインしてください",
+    "guestSavePrompt": "ログインして報酬を保存しよう！",
     "keepItUp": "その調子！",
     "dailyPlayBonus": "デイリーボーナス",
     "best": "最高",
@@ -1678,13 +1693,13 @@ const ja = {
     "backToLobby": "ロビーに戻る",
     "letsGo": "レッツゴー!",
     "challengeBots": "ボットに挑戦",
-    "challengeBotsDesc": "AIの対戦相手とスキルを試す",
+    "challengeBotsDesc": "マシンに勝てると思う？",
     "challengeBotsAgain": "もう一度！",
-    "challengeBotsAgainDesc": "ボットと新しいゲームを開始",
+    "challengeBotsAgainDesc": "同じボット、新ボード、リベンジだ！",
     "tryDailyChallenge": "デイリーチャレンジに挑戦",
     "tryDailyChallengeDesc": "世界中で同じパズル - グローバルに競い合おう！",
     "goMultiplayer": "マルチプレイヤーへ",
-    "goMultiplayerDesc": "リアルプレイヤーとライブワードバトルに挑戦",
+    "goMultiplayerDesc": "リアルな人間、リアルな勝負、リアルな自慢",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "集中トレーニングで認知能力を向上"
   },
@@ -1848,7 +1863,7 @@ const ja = {
     "scoreMultipliers": "スコア倍率",
     "comboBonus": "コンボボーナス！",
     "proTipsTitle": "チャンピオンのコツ",
-    "description": "LexiClashは、文字のグリッド上でできるだけ多くの単語を見つけるために時間と競う、速いペースのワードゲームです。単語が長いほど、獲得できるポイントが多くなります！",
+    "description": "グリッドで単語を見つけよう。長い単語 = 高得点。友達に勝て！",
     "createOrJoinTitle": "ゲームを作成または参加",
     "createOrJoinDesc": "ホストがルームを作成してコードを共有します。プレイヤーはコードを使用して参加します。",
     "hostStartsTitle": "ホストがゲームを開始",
@@ -2028,9 +2043,9 @@ const ja = {
       "skillsUnlocked": "スキル解放！準備完了！"
     },
     "completion": {
-      "title": "よくできました！",
-      "message": "ゲームをマスターしました！練習を続けるか、終了して実際のマッチを開始できます。",
-      "finish": "終了",
+      "title": "完璧！",
+      "message": "操作マスターした！本番に挑戦する？",
+      "finish": "バトルへ！",
       "continuePractice": "練習を続ける"
     },
     "analysis": {
@@ -2088,7 +2103,7 @@ const ja = {
     },
     "FIRST_BLOOD": {
       "name": "ファーストブラッド",
-      "description": "最初に単語を見つける"
+      "description": "最初の一撃！"
     },
     "SPEED_DEMON": {
       "name": "スピードデーモン",
@@ -2107,7 +2122,7 @@ const ja = {
       "description": "15以上の単語、すべて有効"
     },
     "LEXICON": {
-      "name": "レキシコン",
+      "name": "生ける辞書",
       "description": "35以上の単語を見つけた"
     },
     "WORDSMITH": {
@@ -2239,11 +2254,11 @@ const ja = {
       "description": "合計50,000ポイントを獲得"
     },
     "DEDICATION": {
-      "name": "献身",
+      "name": "常連プレイヤー",
       "description": "7日間にわたってプレイ"
     },
     "LOYAL_PLAYER": {
-      "name": "忠実なプレイヤー",
+      "name": "古参プレイヤー",
       "description": "30日間にわたってプレイ"
     },
     "DAILY_DOUBLE": {
@@ -2478,8 +2493,8 @@ const ja = {
     "hidePassword": "パスワードを隠す",
     "upgradePrompt": "ログインして進捗を保存し、リーダーボードで競いましょう!",
     "firstWin": {
-      "title": "初勝利おめでとうございます!",
-      "subtitle": "才能がありますね!アカウントを作成して連勝を続けましょう。",
+      "title": "初勝利！🎉",
+      "subtitle": "才能あるじゃん！登録して勝ち続けよう！",
       "benefitsTitle": "登録して以下をアンロック:",
       "benefits": {
         "trackProgress": "進捗を追跡",
@@ -4570,7 +4585,8 @@ const ja = {
     "playerEliminated": "が脱落しました！",
     "youEliminated": "脱落しました！",
     "playerLastLife": "が最後のライフです！",
-    "yourLastLife": "最後のライフ！"
+    "yourLastLife": "最後のライフ！",
+    "botsJoined": "{{count}}人の対戦相手が参加 — 人がいないからボットが来たよ！"
   },
   "stats": {
     "games": "ゲーム",

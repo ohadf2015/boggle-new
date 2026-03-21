@@ -155,7 +155,7 @@ const sv = {
     "understood": "Kör!",
     "refresh": "Uppdatera",
     "refreshed": "Uppdaterat!",
-    "reconnecting": "Tar tillbaka dig...",
+    "reconnecting": "Tar dig tillbaka...",
     "reconnected": "Vi är tillbaka!",
     "connectionLost": "Förlorade anslutningen",
     "notConnected": "Offline",
@@ -325,12 +325,12 @@ const sv = {
     }
   },
   "connection": {
-    "reconnecting": "Återansluter...",
-    "disconnected": "Anslutning förlorad",
+    "reconnecting": "Vi fixar det...",
+    "disconnected": "Tappade dig en sekund!",
     "attempt": "Försök",
-    "checkConnection": "Du verkar vara offline!",
+    "checkConnection": "Hmm, du tappade nätet!",
     "retry": "Försök igen",
-    "retryNow": "Försök nu",
+    "retryNow": "Koppla upp igen!",
     "scoreSafe": "Din poäng är sparad på servern",
     "qualityExcellent": "Utmärkt anslutning",
     "qualityGood": "Bra anslutning",
@@ -350,7 +350,22 @@ const sv = {
   },
   "leadChange": {
     "tookLead": "Du leder!",
-    "lostLead": "{{username}} tog ledningen!"
+    "tookTheLeadVerb": "tog ledningen!",
+    "lostLead": "{{username}} tog ledningen!",
+    "tookLeadWitty_0": "Toppen är din, njut medan det varar!",
+    "tookLeadWitty_1": "Ingen kan stoppa dig just nu.",
+    "tookLeadWitty_2": "Kronan sitter perfekt.",
+    "tookLeadWitty_3": "Du äger banan!",
+    "lostLeadWitty_0": "De leder... men inte länge till.",
+    "lostLeadWitty_1": "Nu gäller det på riktigt.",
+    "lostLeadWitty_2": "Din tur att slå tillbaka.",
+    "lostLeadWitty_3": "Dags för comeback!",
+    "otherTookLeadWitty_0": "Nu händer det grejer!",
+    "otherTookLeadWitty_1": "En ny utmanare kliver fram!",
+    "otherTookLeadWitty_2": "Vänta, vad hände?",
+    "otherTookLeadWitty_3": "Korten blandas om!",
+    "pointsAhead": "poäng före",
+    "wordsFound": "{{count}} ord"
   },
   "countdown": {
     "hint": "Svep bokstäver för att bilda ord!",
@@ -547,13 +562,13 @@ const sv = {
     "invite": "Bjud in",
     "emailSubjectPostGame": "Jag krossade det i LexiClash!",
     "emailSubjectInvite": "Spela LexiClash med mig!",
-    "challengeLinkCopied": "Utmaningslank kopierad!",
+    "challengeLinkCopied": "Utmaningslänk kopierad!",
     "errorCreatingChallenge": "Fel vid skapande av utmaning",
-    "pts": "poang",
+    "pts": "poäng",
     "words": "ord",
     "combo": "kombo",
     "streak": "svit",
-    "longest": "Langsta:",
+    "longest": "Längsta:",
     "emojiCard": {
       "classicHeader": "LexiClash Daglig #{number}",
       "blastHeader": "LexiClash Blast 💥",
@@ -915,9 +930,9 @@ const sv = {
     }
   },
   "hostView": {
-    "lobby": "Lobby",
-    "waitingForPlayers": "Väntar...",
-    "startGame": "Starta",
+    "lobby": "Krigsrummet",
+    "waitingForPlayers": "Samlar krigare...",
+    "startGame": "KÖR!",
     "startBattle": "Starta strid!",
     "commandersJoined": "Befälhavare anslutna",
     "playersInRoom": "Spelare i rummet",
@@ -941,13 +956,13 @@ const sv = {
     "ofMaxWarriors": "av {{max}} krigare redo",
     "roomCode": "Kod",
     "host": "Värd",
-    "inviteFriends": "Bjud in vänner att spela!",
+    "inviteFriends": "Samla gänget!",
     "inviteWarriors": "Bjud in krigare",
     "invitePlayer": "Bjud in spelare",
     "battleFeed": "Stridsflöde",
     "roomChat": "Rumschatt",
     "hostIs": "Värd är",
-    "playersJoined": "Spelare",
+    "playersJoined": "Krigare",
     "gameSettings": "Inställningar",
     "quickSetup": "Förval",
     "selectPreset": "Spelläge",
@@ -958,8 +973,8 @@ const sv = {
     "minutes": "minuter",
     "playerJoinedLate": "gick med sent!",
     "gameStopped": "Spelet stoppat",
-    "confirmExit": "Är du säker på att du vill avsluta? Rummet förblir öppet och en annan spelare blir värd.",
-    "exitWarning": "Denna åtgärd stänger rummet för alla spelare. Är du säker på att du vill avsluta?",
+    "confirmExit": "Lämna? Någon annan tar över som värd.",
+    "exitWarning": "Lämna? Rummet stängs för alla.",
     "exitRoom": "Lämna rum",
     "startNewGame": "Starta nytt spel",
     "startNextRound": "Starta nästa runda",
@@ -1245,7 +1260,7 @@ const sv = {
     "exitRoom": "Lämna rummet",
     "waitForGameStart": "Vänta på att spelet startar",
     "clickToWakeUp": "Tryck för att hälsa!",
-    "getReadyHint": "Läs tipsen nedan för att lära dig spela!",
+    "getReadyHint": "Skanna rutnätet nu!",
     "calculatingScores": "Beräknar poäng...",
     "aiValidating": "AI kontrollerar...",
     "leaderboard": "Topplista",
@@ -1300,10 +1315,10 @@ const sv = {
     "milestoneFirst": "Första spelaren!",
     "milestoneParty": "Festen börjar!",
     "milestoneFull": "Fullsatt!",
-    "waitingForPlayers": "Väntar på spelare...",
-    "oneMoreNeeded": "Bjud in vänner för att börja!",
-    "readyToStart": "Redo att starta! Fler spelare = mer kul!",
-    "fullHouse": "Fullsatt! Låt striden börja!"
+    "waitingForPlayers": "Samlar utmanare...",
+    "oneMoreNeeded": "Trumma ihop gänget!",
+    "readyToStart": "Redo att köra! Ju fler, desto roligare!",
+    "fullHouse": "Proppfullt! Nu smäller det!"
   },
   "roomCode": {
     "title": "Rumskod",
@@ -1349,7 +1364,7 @@ const sv = {
       "title": "Skapa Din Profil",
       "subtitle": "Avatar + namn = redo för strid",
       "deferredTitle": "Spara dina framsteg?",
-      "deferredSubtitle": "Skapa en profil for att behålla din statistik!",
+      "deferredSubtitle": "Skapa en profil för att behålla din statistik!",
       "tapToCustomize": "Tryck för att anpassa"
     },
     "quickTips": {
@@ -1450,7 +1465,7 @@ const sv = {
     "fire": "Eld",
     "clap": "Klapp",
     "wow": "Wow",
-    "dead": "Dod",
+    "dead": "Död",
     "crown": "Krona",
     "zap": "Blixt",
     "label": "Snabbreaktioner"
@@ -1464,18 +1479,18 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
-    "results": "Resultat",
-    "share": "Dela",
-    "yourProgress": "Din Utveckling",
-    "topPlayers": "Toppspelare",
+    "results": "Stridsrapport",
+    "share": "Skryt",
+    "yourProgress": "Hur det gick",
+    "topPlayers": "Pallen",
     "otherPlayers": "Andra spelare",
     "foundWords": "hittade",
     "yourPerformance": "Ditt spel",
-    "viewDetails": "Se uppdelningen",
+    "viewDetails": "Djupdykning",
     "viewAllWords": "Alla ord",
     "viewXpBreakdown": "XP-uppdelning",
-    "rewardsEarned": "Belöningar intjänade",
-    "achievementUnlocked": "Prestation upplåst",
+    "rewardsEarned": "Byte insamlat",
+    "achievementUnlocked": "Trofé upplåst!",
     "achievementsUnlocked": "Prestationer upplåsta",
     "details": "Detaljer",
     "performanceDetails": "Prestandadetaljer",
@@ -1486,8 +1501,8 @@ const sv = {
     "youWon": "SEGER!",
     "secondPlace": "Tvåa!",
     "thirdPlace": "Brons!",
-    "silverMedalist": "Silvermedaljör",
-    "bronzeMedalist": "Bronsmedaljör",
+    "silverMedalist": "Silver! 🥈",
+    "bronzeMedalist": "Brons! 🥉",
     "points": "poäng",
     "invalid": "Ogiltiga",
     "exitRoom": "Lämna",
@@ -1508,7 +1523,7 @@ const sv = {
     "appealed": "Skickat",
     "appealExplanation": "Tycker du att ett ord avvisades felaktigt? Överklaga så granskar vi.",
     "levelUp": "Nivå upp!",
-    "pendingValidation": "Väntar på gemenskapens validering",
+    "pendingValidation": "Kollas...",
     "autoRejoinIn": "Automatiskt återansluter om",
     "rejoinNow": "Återanslut nu",
     "largeRoomMode": "Stort rumsläge",
@@ -1583,7 +1598,7 @@ const sv = {
     "performanceHistory": "Prestationshistorik",
     "goToLobby": "Gå till lobby",
     "you": "(Du)",
-    "betterLuckNextTime": "Bättre lycka nästa gång!",
+    "betterLuckNextTime": "Nästa runda!",
     "of": "av",
     "readyForNextRound": "Redo för nästa runda?",
     "hostStartDescription": "Starta ett nytt spel när alla är redo!",
@@ -1667,10 +1682,10 @@ const sv = {
     "wellPlayed": "BRA SPELAT!",
     "wordsLabel": "ord",
     "shareYourVictory": "Dela din seger!",
-    "challengeFriends": "Utmana dina vanner 😈",
-    "streakOneWeek": "En dag fran en hel vecka!",
-    "streakTwoWeeks": "Nastan tva veckor!",
-    "streakOneMonth": "En dag fran en hel manad!",
+    "challengeFriends": "Utmana dina vänner 😈",
+    "streakOneWeek": "En dag från en hel vecka!",
+    "streakTwoWeeks": "Nästan två veckor!",
+    "streakOneMonth": "En dag från en hel månad!",
     "streakWeeks": "{{weeks}} veckors svit!"
   },
   "nextStep": {
@@ -1682,10 +1697,10 @@ const sv = {
     "challengeBotsAgainDesc": "Starta en ny match med bottar",
     "tryDailyChallenge": "Testa Daglig Utmaning",
     "tryDailyChallengeDesc": "Samma pussel för alla i världen - tävla globalt!",
-    "goMultiplayer": "Gå Multiplayer",
-    "goMultiplayerDesc": "Utmana riktiga spelare i livekamper med ord",
+    "goMultiplayer": "Utmana vänner",
+    "goMultiplayerDesc": "Riktiga motståndare, riktig tävling, riktigt skryt",
     "brainTraining": "Hjärnträning",
-    "brainTrainingDesc": "Förbättra dina kognitiva förmågor med fokuserade övningar"
+    "brainTrainingDesc": "Vässa hjärnan"
   },
   "practiceResults": {
     "playAgain": "Spela igen",
@@ -1708,7 +1723,7 @@ const sv = {
       "warmup": "Bra start!"
     },
     "subtitle": {
-      "legendary": "Du är on fire — behåll momentumet!",
+      "legendary": "Du är het som en ugn — kör vidare!",
       "great": "Du har riktiga ordkunskaper",
       "nice": "Varje spel gör dig vassare",
       "warmup": "Övning ger färdighet — du är på väg!"
@@ -2028,8 +2043,8 @@ const sv = {
     },
     "completion": {
       "title": "Bra gjort!",
-      "message": "Du har bemästrat spelet! Du kan fortsätta öva eller avsluta och starta en riktig match.",
-      "finish": "Avsluta",
+      "message": "Du har koll! Redo för riktig tävling?",
+      "finish": "Nu kör vi!",
       "continuePractice": "Fortsätt Öva"
     },
     "analysis": {
@@ -2077,7 +2092,7 @@ const sv = {
   "achievements": {
     "unlocked": "Prestation Upplåst!",
     "upgraded": "Prestation Uppgraderad!",
-    "shareText": "Jag laste upp \"{{name}}\" i LexiClash! Kom och spela!",
+    "shareText": "Jag låste upp \"{{name}}\" i LexiClash! Kom och spela!",
     "shareButton": "Dela",
     "copied": "Kopierat!",
     "cinematic": {
@@ -2340,7 +2355,7 @@ const sv = {
     "noWordsThisRound": "Tom runda",
     "keepGoing": "Skaka av dig det!",
     "nextRoundIsYours": "Nästa runda är din",
-    "funFact": "Fakta: Spelare missar 70% av möjliga ord!",
+    "funFact": "Visste du? De flesta missar 70% av orden!",
     "otherPlayer": {
       "headline": "Tuff Runda",
       "message": "Bokstäverna var inte snälla denna gång."
@@ -2465,7 +2480,7 @@ const sv = {
     "alreadyHaveAccount": "Har du redan ett konto? Logga in",
     "noAccount": "Har du inget konto? Registrera dig",
     "invalidCredentials": "Hmm, det stämmer inte. Försök igen?",
-    "continueAsGuest": "Fortsätt som gäst",
+    "continueAsGuest": "Spela som gäst",
     "continueWithGoogle": "Fortsätt med Google",
     "continueWithDiscord": "Fortsätt med Discord",
     "guestStatsTitle": "Din statistik som gäst:",
@@ -2604,7 +2619,7 @@ const sv = {
     }
   },
   "profile": {
-    "title": "Profil",
+    "title": "Ditt HK",
     "coins": "Mynt",
     "viewProfile": "Visa Profil",
     "viewCoins": "Se dina mynt",
@@ -2616,12 +2631,12 @@ const sv = {
     },
     "overview": "Översikt",
     "stats": "Statistik",
-    "memberSince": "Medlem sedan",
-    "totalGames": "Spel",
+    "memberSince": "Clashar sedan",
+    "totalGames": "Strider",
     "wins": "Vinster",
-    "wordsFound": "Ord hittade",
+    "wordsFound": "Ord krossade",
     "totalScore": "Total poäng",
-    "timePlayed": "Spelad tid",
+    "timePlayed": "Tid i arenan",
     "achievements": "Prestationer",
     "hallOfFame": "Hall of Fame",
     "hallOfFameDescription": "Elitprestationer som kräver exceptionell skicklighet eller hängivenhet",
@@ -2651,10 +2666,10 @@ const sv = {
     "referralReward": "Bjud in vänner",
     "referralDescription": "Tjäna belöningar när vänner går med!",
     "referralsCount": "Vänner",
-    "yourReferralCode": "Din remiss-kod",
-    "referralRewards": "Remiss-belöningar",
-    "yourReferrals": "Dina remisser",
-    "noReferralsYet": "Inga remisser än. Börja dela!",
+    "yourReferralCode": "Din värvningskod",
+    "referralRewards": "Värvningsbelöningar",
+    "yourReferrals": "Dina värvningar",
+    "noReferralsYet": "Inga värvningar än. Börja dela!",
     "selectCountry": "Välj land",
     "searchCountry": "Sök...",
     "clearCountry": "Rensa val",
@@ -2665,12 +2680,12 @@ const sv = {
     "countryError": "Kunde inte uppdatera land",
     "records": {
       "title": "Personliga rekord",
-      "longestWord": "Langsta ordet",
-      "highestCombo": "Hogsta kombo",
+      "longestWord": "Längsta ordet",
+      "highestCombo": "Högsta kombo",
       "fastestWord": "Snabbaste ordet",
       "uniqueWords": "Unika ord",
-      "bestRanked": "Basta rankade",
-      "bestCasual": "Basta casual",
+      "bestRanked": "Bästa rankade",
+      "bestCasual": "Bästa casual",
       "share": "Dela"
     },
     "level": "Nivå",
@@ -2695,11 +2710,11 @@ const sv = {
   "streaks": {
     "wager": {
       "title": "Satsa dina mynt!",
-      "description": "Satsa mynt pa din svit - vinn 3x eller forlora allt!",
+      "description": "Satsa mynt på din svit - vinn 3x eller förlora allt!",
       "payout": "Potentiell utbetalning",
-      "risk": "Du forlorar din insats om du bryter sviten!",
-      "confirm": "Lagg insats",
-      "skip": "Hoppa over"
+      "risk": "Du förlorar din insats om du bryter sviten!",
+      "confirm": "Lägg insats",
+      "skip": "Hoppa över"
     }
   },
   "consent": {
@@ -2792,8 +2807,8 @@ const sv = {
     "claimButton": "Hämta min bonus"
   },
   "calendar": {
-    "title": "Dagliga Belöningar",
-    "description": "Hämta dagliga belöningar för att tjäna mynt, XP och speciella föremål!",
+    "title": "Dagens byte",
+    "description": "Plocka upp mynt, XP och godsaker varje dag!",
     "loadError": "Kunde inte ladda belöningar. Försök igen.",
     "claimToday": "Hämta dagens belöning",
     "claimedCount": "Hämtade",
@@ -2814,7 +2829,7 @@ const sv = {
     }
   },
   "referralDashboard": {
-    "title": "Mina Hänvisningar",
+    "title": "Mina Värvningar",
     "friendsInvited": "Vänner Inbjudna",
     "friendsJoined": "Vänner Gick Med",
     "coinsEarned": "Mynt Intjänade",
@@ -4582,7 +4597,8 @@ const sv = {
     "playerEliminated": "har eliminerats!",
     "youEliminated": "Du har eliminerats!",
     "playerLastLife": "har ett liv kvar!",
-    "yourLastLife": "SISTA LIVET!"
+    "yourLastLife": "SISTA LIVET!",
+    "botsJoined": "{{count}} motståndare anslöt — inga riktiga spelare, så du fick bottar!"
   },
   "stats": {
     "games": "Matcher",
@@ -6127,7 +6143,7 @@ const sv = {
         "requirementMissed": "Krav missades"
       },
       "cinematics": {
-        "skip": "Hoppa over",
+        "skip": "Hoppa över",
         "skipIn": "Hoppa over om {seconds}...",
         "progress": "Filmsekvens pagar",
         "loading": "Laddar...",

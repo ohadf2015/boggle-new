@@ -276,7 +276,7 @@ const es = {
     "blog": "Blog",
     "faq": "Preguntas frecuentes",
     "aboutLexiClash": "Sobre LexiClash",
-    "contactUs": "Contáctenos",
+    "contactUs": "Contáctanos",
     "privacyPolicy": "Política de privacidad",
     "termsOfService": "Términos de servicio",
     "disclaimer": "Descargo de responsabilidad"
@@ -326,11 +326,11 @@ const es = {
   },
   "connection": {
     "reconnecting": "Te regresamos...",
-    "disconnected": "Conexión perdida",
+    "disconnected": "¡Se cayó la conexión un momento!",
     "attempt": "Intento",
     "checkConnection": "¡Parece que estás sin conexión!",
     "retry": "Reintentar",
-    "retryNow": "Reintentar ahora",
+    "retryNow": "¡Reconectar!",
     "scoreSafe": "Tu puntuación está segura en el servidor",
     "qualityExcellent": "Conexión excelente",
     "qualityGood": "Buena conexión",
@@ -395,10 +395,10 @@ const es = {
     "explanationText": "Encadena palabras rápido para crear combos. Mayor combo = mayores multiplicadores. ¡No lo dejes caer!"
   },
   "wordRarity": {
-    "common": "Comun",
-    "uncommon": "Poco comun",
+    "common": "Común",
+    "uncommon": "Poco común",
     "rare": "Raro",
-    "epic": "Epico"
+    "epic": "Épico"
   },
   "earthquake": {
     "warning": "¡TERREMOTO!",
@@ -454,8 +454,8 @@ const es = {
     "controls": "Controles de Música",
     "musicVolumeSlider": "Control de volumen de música",
     "sfxVolumeSlider": "Control de volumen de efectos de sonido",
-    "haptics": "Hápticos",
-    "toggleHaptics": "Activar/desactivar retroalimentación háptica",
+    "haptics": "Vibración",
+    "toggleHaptics": "Activar/desactivar vibración",
     "sound": "Sonido",
     "soundOn": "Sonido Activado",
     "soundOff": "Sonido Desactivado"
@@ -490,8 +490,8 @@ const es = {
     "moreSettings": "Más ajustes",
     "mute": "Silenciar",
     "unmute": "Activar sonido",
-    "enabled": "Habilitado",
-    "disabled": "Deshabilitado"
+    "enabled": "Activado",
+    "disabled": "Desactivado"
   },
   "share": {
     "button": "Compartir",
@@ -520,7 +520,7 @@ const es = {
     "email": "Correo",
     "sms": "SMS",
     "discordCopied": "¡Copiado para Discord! Pega en tu servidor 💬",
-    "shareBonusAwarded": "+20 monedas por compartir!",
+    "shareBonusAwarded": "¡+20 monedas por compartir!",
     "morePlatforms": "Más plataformas",
     "lessOptions": "Menos opciones",
     "hideShareOptions": "Ocultar opciones",
@@ -711,7 +711,7 @@ const es = {
     "usernameTooLong": "Máximo 20 caracteres",
     "usernameInvalidChars": "¡Solo letras, números y espacios!",
     "invalidEmail": "El formato del email no se ve bien - busca errores de tipeo",
-    "invalidCharacters": "Solo letras"
+    "invalidCharacters": "¡Solo letras, crack!"
   },
   "profileCustomization": {
     "title": "¡Hazlo tuyo!",
@@ -837,8 +837,8 @@ const es = {
   },
   "multiplayerFlow": {
     "host": "Anfitrión",
-    "roomClosed": "Room closed",
-    "rateLimited": "Slow down!",
+    "roomClosed": "Sala cerrada",
+    "rateLimited": "¡Más lento, campeón!",
     "roomList": {
       "activeRooms": "¡Métete!",
       "online": "en batalla",
@@ -1181,7 +1181,7 @@ const es = {
     "wordWizard": "MAGO DE PALABRAS",
     "comboKing": "REY DEL COMBO",
     "loneWolf": "LOBO SOLITARIO",
-    "clutchPlayer": "JUGADOR CLUTCH",
+    "clutchPlayer": "JUGADOR DECISIVO",
     "playersReady": "¡LISTOS!",
     "startNewGame": "NUEVO JUEGO",
     "nextRound": "SIGUIENTE RONDA",
@@ -1517,7 +1517,7 @@ const es = {
     "dead": "Muerto",
     "crown": "Corona",
     "zap": "Rayo",
-    "label": "Reacciones rapidas"
+    "label": "Reacciones rápidas"
   },
   "chat": {
     "title": "Chat de Sala",
@@ -1528,30 +1528,30 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
-    "results": "Resultados",
-    "share": "Compartir",
+    "results": "Reporte de Batalla",
+    "share": "Presumir",
     "yourProgress": "Tu Progreso",
-    "topPlayers": "Top Jugadores",
-    "otherPlayers": "Otros Jugadores",
+    "topPlayers": "Podio",
+    "otherPlayers": "También Jugaron",
     "foundWords": "encontró",
     "yourPerformance": "Tu Rendimiento",
-    "viewDetails": "Ver desglose",
+    "viewDetails": "A fondo",
     "viewAllWords": "Todas las Palabras",
     "viewXpBreakdown": "Desglose XP",
-    "rewardsEarned": "Recompensas Ganadas",
+    "rewardsEarned": "Botín Ganado",
     "achievementUnlocked": "Logro Desbloqueado",
     "achievementsUnlocked": "Logros Desbloqueados",
     "details": "Detalles",
-    "performanceDetails": "Detalles de Rendimiento",
+    "performanceDetails": "El Desglose",
     "badges": "Insignias",
     "xp": "XP",
     "winner": "Ganador",
     "winnerAnnouncement": "Ganador",
     "youWon": "¡VICTORIA!",
-    "secondPlace": "¡Subcampeón!",
+    "secondPlace": "¡Casi!",
     "thirdPlace": "¡Bronce!",
-    "silverMedalist": "Medallista de Plata",
-    "bronzeMedalist": "Medallista de Bronce",
+    "silverMedalist": "¡Plata! 🥈",
+    "bronzeMedalist": "¡Bronce! 🥉",
     "points": "pts",
     "invalid": "Inválido",
     "exitRoom": "Salir",
@@ -1609,7 +1609,7 @@ const es = {
     "missedWordsSummary": "{count} palabras en el tablero que no encontraste",
     "wordLengths": "Longitudes de palabras",
     "missedOnBoard": "Palabras que se te escaparon",
-    "noMissedWords": "Encontraste todas las palabras!",
+    "noMissedWords": "¡Encontraste todas las palabras!",
     "topMissedWord": "Mejor palabra perdida",
     "wordsYouMissed": "Palabras que te perdiste",
     "rarestAchievement": "Logro más raro",
@@ -1639,10 +1639,10 @@ const es = {
     "shareNarrativeWin": "¡Encontré {{word}} y anoté {{score}} en LexiClash!",
     "shareNarrativeLoss": "¡Encontré {{words}} palabras por {{score}} pts en LexiClash!",
     "revengeRematch": "¿Revancha contra {{player}}?",
-    "markReadyDescription": "Toca el botón para indicar que estás listo para el próximo juego",
-    "allReadyHostCanStart": "🎉 ¡Todos los jugadores listos! Puedes iniciar la siguiente ronda.",
+    "markReadyDescription": "Toca cuando estés listo",
+    "allReadyHostCanStart": "¡Todos listos! Dale cuando quieras.",
     "allPlayersReadyWaitingHost": "✓ Todos los jugadores listos — esperando al anfitrión",
-    "hostWillStartWhenReady": "El anfitrión iniciará la siguiente ronda cuando todos estén listos",
+    "hostWillStartWhenReady": "El anfitrión arranca cuando estén listos",
     "performanceHistory": "Historial de Rendimiento",
     "goToLobby": "Ir al lobby",
     "you": "(Tú)",
@@ -1740,14 +1740,14 @@ const es = {
     "backToLobby": "Volver al Lobby",
     "letsGo": "¡Vamos!",
     "challengeBots": "Desafiar Bots",
-    "challengeBotsDesc": "Pon a prueba tus habilidades contra oponentes IA",
-    "challengeBotsAgain": "¡Jugar otra vez!",
-    "challengeBotsAgainDesc": "Inicia una nueva partida con bots",
+    "challengeBotsDesc": "¿Crees que les ganas a las máquinas?",
+    "challengeBotsAgain": "¡Revancha!",
+    "challengeBotsAgainDesc": "Mismos bots, nuevo tablero, revancha fresca",
     "tryDailyChallenge": "Prueba el Desafío Diario",
     "tryDailyChallengeDesc": "¡Mismo puzzle para todos en el mundo - compite globalmente!",
-    "goMultiplayer": "Ir a Multijugador",
-    "goMultiplayerDesc": "Desafía a jugadores reales en batallas de palabras en vivo",
-    "brainTraining": "Entrenamiento Cerebral",
+    "goMultiplayer": "Contra Amigos",
+    "goMultiplayerDesc": "Humanos reales, competencia real, presume de verdad",
+    "brainTraining": "Gym Cerebral",
     "brainTrainingDesc": "Mejora tus habilidades cognitivas con ejercicios enfocados"
   },
   "practiceResults": {
@@ -1788,7 +1788,7 @@ const es = {
     "rematch": "¡Revancha!",
     "rematchQuestion": "¿Revancha?",
     "almostHadIt": "¡Casi lo logras!",
-    "nailBiter": "¡Que partido tan reñido!",
+    "nailBiter": "¡Qué partida tan reñida!",
     "challengeBot": "Desafiar a un bot"
   },
   "player": {
@@ -1882,7 +1882,7 @@ const es = {
       "description": "Más palabras en el primer minuto"
     },
     "clutchPlayer": {
-      "name": "Jugador Clutch",
+      "name": "Jugador Decisivo",
       "icon": "⏰",
       "description": "Más palabras en los últimos 30 segundos"
     },
@@ -1892,7 +1892,7 @@ const es = {
       "description": "Más palabras de 6+ letras"
     },
     "consistentPlayer": {
-      "name": "Eddie Constante",
+      "name": "El Constante",
       "icon": "📊",
       "description": "Envíos de palabras más consistentes"
     }
@@ -1911,7 +1911,7 @@ const es = {
     "scoreMultipliers": "Multiplicadores de Puntuación",
     "comboBonus": "¡Bono Combo!",
     "proTipsTitle": "Consejos Pro",
-    "description": "LexiClash es un juego de palabras rápido donde compites contra el tiempo para encontrar tantas palabras como sea posible en un tablero de letras. ¡Cuanto más larga la palabra, más puntos ganas!",
+    "description": "Encuentra palabras en la cuadrícula. Más largas = más puntos. ¡Gánale a tus amigos!",
     "createOrJoinTitle": "Crear o Unirse a un Juego",
     "createOrJoinDesc": "El anfitrión crea una sala y comparte el código. Los jugadores se unen usando el código.",
     "hostStartsTitle": "El Anfitrión Inicia el Juego",
@@ -2210,8 +2210,8 @@ const es = {
       "sharpshooter": "Tirador de Élite",
       "sharpshooterDesc": "Calidad sobre cantidad. Cada tiro cuenta.",
       "wordStorm": "Tormenta de Palabras",
-      "wordStormDesc": "¡Disparar y rezar tiene sus méritos!",
-      "clutchFinisher": "Finalizador Clutch",
+      "wordStormDesc": "¡Tirar para todos lados a veces funciona!",
+      "clutchFinisher": "Finalizador Letal",
       "clutchFinisherDesc": "Guardaste lo mejor para el final. La presión hace diamantes.",
       "firstBlood": "Primera Sangre",
       "firstBloodDesc": "Saliste con todo. La agresión temprana marca el tono.",
@@ -2573,7 +2573,7 @@ const es = {
     },
     "privacy": {
       "title": "Política de Privacidad",
-      "intro": "Su privacidad es importante para nosotros.",
+      "intro": "Tu privacidad es importante para nosotros.",
       "infoCollected": {
         "title": "Información que Recopilamos",
         "content": "Recopilamos varios tipos de información.",
@@ -2584,8 +2584,8 @@ const es = {
         "analytics": "Datos de análisis y uso"
       },
       "howWeUse": {
-        "title": "Cómo Usamos Su Información",
-        "content": "Usamos su información para proporcionar y mejorar nuestro servicio."
+        "title": "Cómo Usamos Tu Información",
+        "content": "Usamos tu información para proporcionar y mejorar nuestro servicio."
       },
       "thirdParties": {
         "title": "Servicios de Terceros",
@@ -2594,7 +2594,7 @@ const es = {
         "google": "Google OAuth (autenticación)",
         "discord": "Discord OAuth (autenticación)",
         "logrocket": "LogRocket (análisis y registro de errores)",
-        "noSale": "No vendemos su información personal a terceros."
+        "noSale": "No vendemos tu información personal a terceros."
       },
       "advertising": {
         "title": "Publicidad de Terceros",
@@ -2641,15 +2641,15 @@ const es = {
       },
       "dataRetention": {
         "title": "Retención de Datos",
-        "content": "Retenemos sus datos mientras su cuenta esté activa."
+        "content": "Retenemos tus datos mientras tu cuenta esté activa."
       },
       "yourRights": {
-        "title": "Sus Derechos",
-        "content": "Usted tiene derecho a acceder, corregir o eliminar su información personal."
+        "title": "Tus Derechos",
+        "content": "Tienes derecho a acceder, corregir o eliminar tu información personal."
       },
       "international": {
         "title": "Transferencias Internacionales",
-        "content": "Su información puede ser transferida y almacenada en servidores ubicados fuera de su país."
+        "content": "Tu información puede ser transferida y almacenada en servidores ubicados fuera de tu país."
       },
       "changes": {
         "title": "Cambios a Esta Política",
@@ -2862,7 +2862,7 @@ const es = {
     }
   },
   "profile": {
-    "title": "Perfil",
+    "title": "Tu Cuartel",
     "coins": "Monedas",
     "viewProfile": "Ver Perfil",
     "viewCoins": "Ver tus monedas",
@@ -2873,14 +2873,14 @@ const es = {
       "collection": "Colección"
     },
     "overview": "General",
-    "stats": "Estadísticas",
-    "memberSince": "Miembro desde",
-    "totalGames": "Juegos",
+    "stats": "Stats de Batalla",
+    "memberSince": "En batalla desde",
+    "totalGames": "Batallas",
     "wins": "Victorias",
-    "wordsFound": "Palabras Encontradas",
+    "wordsFound": "Palabras Aplastadas",
     "totalScore": "Puntuación Total",
-    "timePlayed": "Tiempo Jugado",
-    "achievements": "Logros",
+    "timePlayed": "Tiempo en la Arena",
+    "achievements": "Trofeos",
     "hallOfFame": "Salón de la Fama",
     "hallOfFameDescription": "Logros de élite que requieren habilidad excepcional o dedicación",
     "chooseAvatar": "Elige tu Avatar",
@@ -2923,10 +2923,10 @@ const es = {
     "countryError": "Error al actualizar el país",
     "records": {
       "title": "Records personales",
-      "longestWord": "Palabra mas larga",
-      "highestCombo": "Combo mas alto",
-      "fastestWord": "Palabra mas rapida",
-      "uniqueWords": "Palabras unicas",
+      "longestWord": "Palabra más larga",
+      "highestCombo": "Combo más alto",
+      "fastestWord": "Palabra más rápida",
+      "uniqueWords": "Palabras únicas",
       "bestRanked": "Mejor clasificado",
       "bestCasual": "Mejor casual",
       "share": "Compartir"
@@ -2952,7 +2952,7 @@ const es = {
   },
   "streaks": {
     "wager": {
-      "title": "Apuesta tus monedas!",
+      "title": "¡Apuesta tus monedas!",
       "description": "Apuesta monedas en tu racha - gana 3x o pierdelo todo!",
       "payout": "Pago potencial",
       "risk": "Perderas tu apuesta si rompes la racha!",
@@ -2972,10 +2972,10 @@ const es = {
     "claimButton": "Reclamar mi bono"
   },
   "calendar": {
-    "title": "Recompensas Diarias",
-    "description": "¡Reclama recompensas diarias para ganar monedas, XP y objetos especiales!",
+    "title": "Botín Diario",
+    "description": "¡Agarra monedas, XP y sorpresas cada día!",
     "loadError": "Error al cargar recompensas. Por favor, inténtalo de nuevo.",
-    "claimToday": "Reclamar Recompensa de Hoy",
+    "claimToday": "¡Agarra el botín de hoy!",
     "claimedCount": "Reclamadas",
     "alreadyClaimed": "¡Recompensa de hoy reclamada!",
     "comeBackTomorrow": "Vuelve mañana para más recompensas",
@@ -3230,7 +3230,7 @@ const es = {
     },
     "practice": {
       "instruction": "Desliza sobre las letras para deletrear:",
-      "success": "¡Perfecto! ¡Lo estás pillando!"
+      "success": "¡Perfecto! ¡Ya le agarraste la onda!"
     },
     "tips": {
       "title": "¡Eres un natural!",
@@ -3342,7 +3342,7 @@ const es = {
         "noPressure": "Practicar sin presión de tiempo"
       },
       "returnNote": "¡Después del entrenamiento estarás listo para el reto real!",
-      "startTraining": "Empezar Entrenamiento",
+      "startTraining": "¡A Calentar!",
       "skipAnyway": "Saltar, ya sé jugar",
       "dontShowAgain": "No mostrar de nuevo"
     },
@@ -3355,8 +3355,8 @@ const es = {
     },
     "completion": {
       "title": "¡Bien hecho!",
-      "message": "¡Has dominado el juego! Puedes seguir practicando o terminar y comenzar una partida real.",
-      "finish": "Terminar",
+      "message": "¡Ya tienes las jugadas! ¿Listo para la competencia real?",
+      "finish": "¡A Batallar!",
       "continuePractice": "Continuar Practicando"
     },
     "analysis": {
@@ -4645,7 +4645,8 @@ const es = {
     "playerEliminated": "ha sido eliminado!",
     "youEliminated": "Has sido eliminado!",
     "playerLastLife": "esta en su ultima vida!",
-    "yourLastLife": "ULTIMA VIDA!"
+    "yourLastLife": "ULTIMA VIDA!",
+    "botsJoined": "{{count}} oponentes se unieron — no hay humanos, ¡así que te tocan bots!"
   },
   "stats": {
     "games": "partidas",
@@ -8334,7 +8335,22 @@ const es = {
   "duelComplete": "¡Duelo completado!",
   "leadChange": {
     "tookLead": "¡Vas a la cabeza!",
-    "lostLead": "¡{{username}} tomó la delantera!"
+    "tookTheLeadVerb": "¡tomó la delantera!",
+    "lostLead": "¡{{username}} tomó la delantera!",
+    "tookLeadWitty_0": "¡Nadie te para ahora!",
+    "tookLeadWitty_1": "Qué bien se siente la cima, ¿eh?",
+    "tookLeadWitty_2": "¡Modo bestia activado!",
+    "tookLeadWitty_3": "El trono es tuyo... de momento.",
+    "lostLeadWitty_0": "Te pasaron... pero esto no acaba aquí.",
+    "lostLeadWitty_1": "Ahora sí va en serio.",
+    "lostLeadWitty_2": "¿Te vas a dejar ganar así?",
+    "lostLeadWitty_3": "¡La remontada empieza ya!",
+    "otherTookLeadWitty_0": "¡Se puso bueno esto!",
+    "otherTookLeadWitty_1": "¡Apareció un rival inesperado!",
+    "otherTookLeadWitty_2": "Uy, ¿qué acaba de pasar?",
+    "otherTookLeadWitty_3": "¡Se barajaron las cartas!",
+    "pointsAhead": "pts adelante",
+    "wordsFound": "{{count}} palabras"
   },
   "challenges": {
     "daily": {
