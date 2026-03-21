@@ -25,563 +25,583 @@ const scoringTable = [
 
 export const contentByLocale: Record<string, GuideContent> = {
   en: {
-    title: 'Classic Mode Strategy Guide: Find More Words, Score Higher',
-    subtitle: 'Master the grid with proven scanning patterns, time management, and scoring strategies.',
+    title: 'How I Went from 30 Points to 200+ in Classic Mode (And How You Can Too)',
+    subtitle: 'Real strategies from someone who has embarrassingly logged 500+ hours staring at letter grids.',
     category: 'Strategy',
     readTime: '8 min read',
     authorName: 'The Word Nerd',
-    authorBio: 'Competitive word game player with 500+ hours of Classic mode gameplay.',
+    authorBio: 'I play Classic mode way too much. My friends have stopped inviting me to game nights because of it. Worth it.',
     quickTips: [
-      'Start from corners - they connect to fewer tiles, so words are easier to trace',
-      'Look for common prefixes like UN-, RE-, PRE- and suffixes like -ING, -TION, -ED',
-      'Submit short words first to build momentum, then hunt for longer ones',
-      'Spend the first 15 seconds scanning the entire board before submitting anything',
-      'Focus on vowel-consonant clusters - they form the backbone of most words',
-      'Dont forget diagonal connections - they unlock hidden words others miss',
-      'In the final 30 seconds, rapid-fire any 3-letter words you spot',
+      'Start from corners. Seriously. I ignored this advice for months and my scores suffered for it.',
+      'Train your eyes to spot UN-, RE-, PRE- and -ING, -TION, -ED. Once you see them, you cant unsee them.',
+      'Slam in short words first. Get that score ticking up. The long words will come.',
+      'Force yourself to just LOOK for 15 seconds before touching anything. It feels wrong. Do it anyway.',
+      'Vowel-consonant clusters are your bread and butter. A lonely Q in a corner? Skip it.',
+      'Diagonals! I probably missed 30% of my words for the first hundred hours because I forgot diagonals exist.',
+      'Last 30 seconds? Panic mode. Submit every 3-letter word your eyes land on. No shame.',
     ],
     scoringTable,
     sections: [
       {
-        title: 'Understanding the Classic Grid',
-        content: `Classic mode drops you into a grid of letters with a ticking clock. Your mission: find as many valid words as possible by connecting adjacent tiles - horizontally, vertically, or diagonally. Each tile can only be used once per word, and words must be at least 3 letters long.
+        title: 'So You Want to Get Good at Classic',
+        content: `Here's the deal. Classic mode gives you a grid, a clock, and the vague hope that your brain will cooperate. You connect adjacent tiles to spell words. Horizontal, vertical, diagonal. Each tile gets used once per word, minimum 3 letters. Simple enough.
 
-The scoring is straightforward: longer words earn more points. A 3-letter word gives you 2 points (word length minus one), while an 8-letter word earns 7 points. But the real skill lies not in knowing this, but in developing systematic approaches to find words faster and more consistently.
+Scoring? Longer words = more points. A 3-letter word gets you 2 points, an 8-letter one gets 7. It's just word length minus one. You probably figured that out already. But knowing the scoring isn't what makes you good. I knew the scoring for months before I broke 100 points consistently.
 
-What separates casual players from top scorers is not vocabulary size alone - its pattern recognition and board-reading technique. The strategies in this guide are used by players who consistently score in the top 10%.`,
+What actually matters is how you read the board. I used to just... stare at it and hope words would appear. Sometimes they did! Mostly they didn't. The difference between me at 30 points and me at 200+ was learning to scan systematically instead of randomly hoping for the best.`,
       },
       {
-        title: 'The Corner-Edge-Center Scanning Pattern',
-        content: `The most effective scanning strategy follows a specific order: corners first, then edges, then center.
+        title: 'Corners First (Trust Me on This)',
+        content: `OK so this is the single biggest improvement I ever made to my game. Start with the corners.
 
-Why corners? Corner tiles connect to only 3 adjacent tiles (compared to 8 for center tiles). This means words starting from corners are easier to trace mentally, and you are less likely to lose your path. Start at the top-left corner and look for 3-4 letter words radiating outward.
+Why? Corner tiles only touch 3 other tiles. Center tiles touch 8. That means when you start from a corner, there are way fewer paths to get confused by. Your brain can actually trace the word without getting lost. I used to start dead center every game and wonder why I kept losing my place mid-word.
 
-Edge tiles connect to 5 neighbors. After exhausting corner starts, move along each edge. Many players skip edges entirely and jump to the center - this is a mistake. Edge-starting words are often overlooked by opponents in multiplayer.
+After corners, hit the edges. Edge tiles connect to 5 neighbors. Not as easy as corners but way more manageable than the middle. A lot of people skip straight from corners to center. Don't. I've found some of my best words starting from edges, and in multiplayer your opponents are probably ignoring them too.
 
-Center tiles are the trickiest. They have maximum connections (up to 8 adjacent tiles), which means more possible paths but also more confusion. Save these for after you have found the easy corner and edge words. By then, you will have internalized the board layout and can trace complex center paths more confidently.
+Center tiles last. They're a mess of connections and possibilities, which sounds great until you're three letters deep and can't remember which direction you were going. By the time you get to center tiles, you've already internalized where everything is from your corner and edge passes. Makes a huge difference.
 
-A full corner-edge-center scan takes about 30-40 seconds. After that, shift to targeted hunting for specific patterns.`,
+This whole sweep takes me about 30-40 seconds now. Used to take over a minute when I was learning it.`,
       },
       {
-        title: 'Prefix and Suffix Hunting',
-        content: `Once you have done your initial scan, switch to prefix/suffix mode. This is where experienced players separate themselves from beginners.
+        title: 'The Prefix/Suffix Trick That Changed Everything',
+        content: `I learned this one from getting absolutely destroyed by someone in multiplayer who found 6-letter words like it was nothing. After the game I asked them what they were doing differently. Their answer: "I don't look for words. I look for word parts."
 
-Common prefixes to hunt for: UN- (undo, unit, under), RE- (redo, rest, react), PRE- (press, prey), OUT- (out, outer), OVER- (over, overt). When you spot one of these letter combinations on the board, immediately look for what can follow.
+That clicked for me. Instead of scanning for complete words, scan for beginnings: UN-, RE-, PRE-, OUT-, OVER-. The second you spot one of those combos on the board, start tracing forward. What can come after UN? UNDO, UNIT, UNDER. Your eyes learn to do this automatically after a while.
 
-Suffixes are equally powerful: -ING (turning any verb into a present participle), -ED (past tense), -ER (comparative or agent noun), -TION (turns verbs to nouns), -LY (turns adjectives to adverbs), -NESS, -ABLE, -MENT.
+Same thing works backwards with suffixes: -ING, -ED, -ER, -TION, -LY, -NESS, -ABLE, -MENT. Spot an -ING cluster? Now trace backwards from it.
 
-The advanced technique is "bridge building": find a prefix on one side of the board and a suffix on the other, then see if the middle tiles connect them into a valid word. This is how most 6+ letter words are discovered.
+The real galaxy-brain move is what I call bridge building. You see RE- on the left side of the board and -ING on the right. Can you connect them through the middle? This is how basically every 6+ letter word gets found. It felt impossible at first. Now I do it without thinking.
 
-Pro tip: the letter S is incredibly valuable. Any noun or verb you have already found might have an S adjacent to its last letter. Always check for plurals and third-person verb forms.`,
+Oh, and the letter S. Never forget S. Any word you already found might have an S sitting right next to its last letter. Free plurals. Free verb forms. I probably get 15-20% of my points just from adding S to words I already submitted.`,
       },
       {
-        title: 'Time Management: The 3-Phase Approach',
-        content: `Top players divide their time into three distinct phases, regardless of the total timer length.
+        title: 'How I Actually Spend My Time (The 3 Phases)',
+        content: `I wasted so many games before I figured out pacing. I'd either blow all my time hunting for one big word, or I'd frantically submit tiny words the whole round and miss the good stuff. Turns out there's a rhythm to it.
 
-Phase 1 - Rapid Harvest (first 30%): Submit every word you see without overthinking. Speed matters more than word length here. Three-letter words are perfectly fine. Your goal is to bank guaranteed points and get a feel for the board.
+First 30% of the clock - just go. Submit everything. See THE? Submit. See AT? Submit. Don't think about whether a 3-letter word is "worth it." It is. You're banking points and getting the lay of the land at the same time. My fingers are basically on autopilot during this phase.
 
-Phase 2 - Deep Mining (middle 40%): Slow down. This is when you apply the prefix/suffix technique and look for longer words. Study tile clusters you have not explored. Try mentally tracing unusual paths. Most of your high-scoring words will come from this phase.
+Middle 40% - now slow down. This is your hunting phase. Apply the prefix/suffix stuff. Look at clusters you haven't touched. Try weird diagonal paths. I find most of my 5+ letter words here. It's the part of the game that actually feels like a puzzle.
 
-Phase 3 - Desperation Sweep (final 30%): Speed up again. Go back to areas you skimmed over in Phase 1. Try new starting tiles. Submit anything that looks remotely valid - the penalty for wrong guesses is minimal compared to the reward for finding forgotten words.
+Last 30% - speed up again. Go back to corners you only glanced at. Try starting from tiles you haven't used yet. Submit anything that looks like it might be a word. Wrong guesses barely cost you anything, but a word you didn't submit costs you everything.
 
-Many players make the mistake of spending too long in Phase 2. Set a mental checkpoint: if you have not found a new word in 10 seconds, force yourself to move to a different area of the board.`,
+One thing I still struggle with: getting stuck in the middle phase. If you haven't found anything new in 10 seconds, MOVE. Staring harder at the same six tiles won't make a word appear. I have to physically force my eyes to a different part of the board sometimes.`,
       },
       {
-        title: 'Tile Cluster Recognition',
-        content: `Expert players dont read letter by letter - they recognize clusters. With practice, certain letter groupings will jump out at you instantly.
+        title: 'Training Your Eyes to See Clusters',
+        content: `This is the part that takes real practice, and honestly I'm still getting better at it. The goal is to stop reading individual letters and start seeing chunks.
 
-High-value clusters: TH (the most common English bigram), IN, ER, AN, ON, AT, EN, ST, RE, ES. When you spot TH on the board, your brain should immediately start appending: THE, THEN, THEM, THIN, THIS, THAT, THOSE, THREE.
+When I see TH on a board now, my brain doesn't process "T... H..." It just goes "THE THEN THEM THIN THIS THAT." It's automatic. Same with IN, ER, AN, ON, ST, RE. These two-letter combos are so common in English that they should trigger an instant mental cascade of words. That takes time. Took me maybe 50 hours of play before it started feeling natural.
 
-Vowel islands: Look for spots where 2-3 vowels cluster together. These are goldmines because they form the core of many words. A-I next to each other? Think AID, AIR, AIM, RAIN, MAIN, PAIR. O-U together? OUT, OUR, POUR, TOUR, FOUR.
+Vowel clusters are gold. Two or three vowels next to each other? That's the core of a dozen words right there. A-I together? AID, AIR, AIM, RAIN, MAIN, PAIR. O-U together? OUT, OUR, POUR, TOUR, FOUR. I get excited when I see vowel islands now. My friends think that's weird.
 
-Consonant blends: BL, BR, CL, CR, DR, FL, FR, GL, GR, PL, PR, SC, SH, SK, SL, SM, SN, SP, ST, SW, TR. These typically start words, so when you find one, trace paths forward to build words.
+Consonant blends at the start of words: BL, BR, CL, CR, DR, FL, FR, GL, GR, PL, PR, SC, SH, SK, SL, SM, SN, SP, ST, SW, TR. When you spot one, trace forward. Something is almost always there.
 
-Dead zones: Some areas of the board will have awkward letter combinations (QX, ZJ, VV). Identify these quickly and stop wasting time on them. Not every tile will be part of a word.`,
+And then there are dead zones. QX next to each other. ZJ. VV. Sometimes a chunk of the board is just useless. Recognizing that FAST saves you from wasting 15 seconds trying to make "QXVZ" into a word. Not everything on the board wants to cooperate.`,
       },
       {
-        title: 'When to Submit vs. Keep Searching',
-        content: `This is one of the most debated aspects of Classic strategy. Should you submit a word immediately, or keep tracing to see if it extends into something longer?
+        title: 'Submit First, Ask Questions Later',
+        content: `People argue about this all the time: should you submit a short word immediately or keep tracing to see if it becomes a longer word?
 
-The general rule: submit first, extend second. If you see CAT, submit it. Then check if CATS, CATCH, or CATER is available. You lock in guaranteed points and can always build on them.
+My answer: just submit. You see CAT? Tap it in. Then check if CATS or CATCH or CATER works. You've already locked in your 2 points. Now you're playing with house money.
 
-Exception: if you are within the first few seconds and you clearly see a 6+ letter word forming, trace the whole thing first. The point difference between a 3-letter word (2 pts) and a 7-letter word (6 pts) is significant enough to justify the brief delay.
+The only time I hold off is if I'm in the first few seconds and I can clearly see a 6+ letter word forming. Going from CAT (2 pts) to CATCHER (6 pts) is a big enough jump to justify the risk. But that's rare. And I've definitely lost words by being greedy. More than once I've sat there trying to trace BEAUTIFUL and lost track, when I could've had BEAT, BEAU, and BUT already in the bank.
 
-In multiplayer specifically, submitting fast matters even more. If another player submits the same word before you, you both get credit, but speed affects tiebreakers. Get your words in early.
+In multiplayer this matters even more. Both players get credit for the same word, but speed affects tiebreakers. Don't sit on words. Get them in.
 
-Never hold a word hoping to "save" it. There is no strategic benefit to delayed submission. The clock is always your enemy.`,
+There is zero benefit to holding a word. Zero. The clock doesn't care about your plans.`,
       },
       {
-        title: 'Common Mistakes and How to Avoid Them',
-        content: `Tunnel vision: The most common mistake is getting stuck trying to make one specific word work. If you have been staring at the same cluster for more than 5 seconds, move on. The board has dozens of words - do not fixate on one.
+        title: 'Mistakes I Made (So You Don\'t Have To)',
+        content: `Tunnel vision. This is the big one. I once spent 20 seconds trying to make BEAUTIFUL work on a board where it was physically impossible. Twenty seconds! That's an eternity. If you've been staring at the same spot for 5 seconds, leave. The board has tons of words. Don't get married to one.
 
-Ignoring short words: Some players skip 3-letter words because they seem "not worth it." Wrong. Ten 3-letter words (20 points) outscore two 6-letter words (10 points). Volume matters.
+Skipping short words. I used to think 3-letter words were beneath me. "I'm looking for the big ones." Cool strategy, me. Except ten 3-letter words give you 20 points and two 6-letter words give you 10. Volume wins. I had to swallow my pride on this one.
 
-Forgetting diagonals: About 40% of words use at least one diagonal connection. Players who only scan horizontally and vertically miss nearly half the board. Force yourself to trace diagonal paths.
+Ignoring diagonals. This one's embarrassing. For way too long I was basically only scanning horizontally and vertically. Turns out about 40% of findable words use at least one diagonal connection. I was leaving almost half the board on the table.
 
-Not adapting to the board: Every board is different. Some boards are vowel-heavy and favor lots of short words. Others have rare consonant clusters that enable a few long words. Read the board in the first 10 seconds and adjust your strategy accordingly.
+Not reading the board first. Some boards are drowning in vowels and want you to find lots of short words. Others have weird consonant clusters that hide a few monsters. You can usually tell in the first 10 seconds what kind of board you're dealing with. Adjust accordingly. I used to play every board the same way.
 
-Panic in the last minute: When the timer gets low, many players freeze or start making wild guesses. Instead, fall back to your Phase 3 strategy - rapid sweeping of unexplored areas with quick submissions.`,
+Panicking at the end. When that timer hits 30 seconds, something in your brain just breaks. You freeze or start wildly tapping random tiles. Neither helps. Fall back to phase 3. Sweep areas you skipped. Submit fast. Stay calm. (I still panic sometimes. It's a work in progress.)`,
       },
     ],
     faq: [
       {
         question: 'What is the best starting strategy for Classic mode in LexiClash?',
-        answer: 'Start by scanning corners first, then edges, then center tiles. Corner tiles have fewer connections, making words easier to trace. Spend the first 15 seconds getting a feel for the board layout before rapid-firing submissions.',
+        answer: 'Corners first, always. They have fewer connections so your brain can actually trace paths without getting lost. Then edges, then the messy center. And spend the first 15 seconds just looking at the board before you start tapping. It feels counterintuitive but it works.',
       },
       {
         question: 'How does scoring work in LexiClash Classic mode?',
-        answer: 'Points equal word length minus one. A 3-letter word scores 2 points, a 4-letter word scores 3, and so on. Longer words are worth more, but submitting many short words is often more effective than hunting for a single long word.',
+        answer: 'It is just word length minus one. So a 3-letter word gets you 2 points, 4 letters gets 3, and so on up. Longer words score more per word, but honestly you will get more total points by submitting a bunch of short words than agonizing over one long one.',
       },
       {
         question: 'How can I find longer words on the grid?',
-        answer: 'Use the prefix/suffix hunting technique. Look for common beginnings like UN-, RE-, PRE- and endings like -ING, -ED, -TION. Then bridge-build between them using middle tiles. Most 6+ letter words are found this way.',
+        answer: 'Stop looking for whole words and start looking for word parts. Spot UN- or RE- on the board? Trace forward. See -ING or -TION? Trace backwards. Then try to bridge a prefix to a suffix through the middle tiles. Basically every 6+ letter word I find comes from this technique.',
       },
       {
         question: 'Is it better to submit short words or look for long words?',
-        answer: 'Submit short words first to lock in points, then hunt for longer ones. Ten 3-letter words (20 points) outscore three 5-letter words (12 points). Volume combined with occasional long finds is the winning formula.',
+        answer: 'Both, but short words first. Lock in those points. Ten 3-letter words (20 points) beat three 5-letter words (12 points) every time. The winning approach is a steady stream of short words with the occasional long one mixed in when you spot it.',
       },
     ],
-    ctaText: 'Practice these strategies now',
+    ctaText: 'Go try this stuff right now',
     ctaLink: '/singleplayer',
     backToGuides: 'Back to Guides',
   },
   he: {
-    title: 'מדריך אסטרטגיה למצב קלאסי: מצאו יותר מילים, השיגו ניקוד גבוה יותר',
-    subtitle: 'שלטו בלוח עם טכניקות סריקה מוכחות, ניהול זמן ואסטרטגיות ניקוד.',
+    title: 'איך עליתי מ-30 נקודות ל-200+ במצב קלאסי (ואיך גם אתם יכולים)',
+    subtitle: 'אסטרטגיות אמיתיות ממישהו שהשקיע 500+ שעות מביכות בבהייה בלוחות אותיות.',
     category: 'אסטרטגיה',
     readTime: '8 דקות קריאה',
     authorName: 'חנון המילים',
-    authorBio: 'שחקן משחקי מילים תחרותי עם 500+ שעות משחק במצב קלאסי.',
+    authorBio: 'אני משחק קלאסי יותר מדי. החברים שלי הפסיקו להזמין אותי לערבי משחקים בגלל זה. שווה את זה.',
     quickTips: [
-      'התחילו מהפינות - הן מתחברות לפחות אריחים, אז מילים קלות יותר לאיתור',
-      'חפשו תחיליות נפוצות כמו ה-, מ-, ל- וסיומות כמו -ים, -ות, -ה',
-      'הגישו מילים קצרות קודם כדי לבנות מומנטום, אז חפשו ארוכות יותר',
-      'הקדישו 15 שניות ראשונות לסריקת כל הלוח לפני שמגישים משהו',
-      'התמקדו באשכולות תנועות-עיצורים - הם עמוד השדרה של רוב המילים',
-      'אל תשכחו חיבורים אלכסוניים - הם חושפים מילים נסתרות',
-      'ב-30 השניות האחרונות, ירו מהר כל מילה בת 3 אותיות שאתם רואים',
+      'התחילו מפינות. ברצינות. התעלמתי מהעצה הזו חודשים והניקוד שלי סבל.',
+      'אמנו את העיניים לזהות ה-, מ-, ל- וסיומות כמו -ים, -ות, -ה. ברגע שרואים את זה, אי אפשר להפסיק.',
+      'תדחפו מילים קצרות קודם. שהנקודות יתחילו לרוץ. המילים הארוכות יגיעו.',
+      'תכריחו את עצמכם פשוט להסתכל 15 שניות לפני שנוגעים במשהו. זה מרגיש לא נכון. תעשו את זה בכל זאת.',
+      'אשכולות תנועות-עיצורים הם הלחם והחמאה שלכם. ק בודדת בפינה? דלגו.',
+      'אלכסונים! כנראה פספסתי 30% מהמילים ב-100 השעות הראשונות כי שכחתי שאלכסונים קיימים.',
+      '30 שניות אחרונות? מצב פאניקה. תגישו כל מילה בת 3 אותיות שהעין נופלת עליה. בלי בושה.',
     ],
     scoringTable,
     sections: [
       {
-        title: 'הבנת הלוח הקלאסי',
-        content: `מצב קלאסי מציב אתכם מול לוח אותיות עם שעון מתקתק. המשימה שלכם: למצוא כמה שיותר מילים חוקיות על ידי חיבור אריחים סמוכים - אופקית, אנכית או אלכסונית. כל אריח ניתן לשימוש פעם אחת בלבד למילה, ומילים חייבות להיות בנות 3 אותיות לפחות.
+        title: 'אז רוצים להיות טובים בקלאסי',
+        content: `בואו נהיה כנים. מצב קלאסי נותן לכם לוח, שעון, ואת התקווה העמומה שהמוח שלכם ישתף פעולה. מחברים אריחים סמוכים כדי לאיית מילים. אופקי, אנכי, אלכסוני. כל אריח נמצא בשימוש פעם אחת למילה, מינימום 3 אותיות. פשוט ככה.
 
-הניקוד פשוט: מילים ארוכות יותר מרוויחות יותר נקודות. מילה בת 3 אותיות נותנת 2 נקודות (אורך המילה פחות אחד), בעוד מילה בת 8 אותיות מרוויחה 7 נקודות. אבל המיומנות האמיתית היא לא בידיעת זה, אלא בפיתוח גישות שיטתיות למציאת מילים מהר יותר ובעקביות.
+ניקוד? מילים ארוכות = יותר נקודות. מילה בת 3 אותיות מקבלת 2 נקודות, בת 8 מקבלת 7. זה פשוט אורך מילה פחות אחד. בטח כבר הבנתם את זה. אבל לדעת את הניקוד זה לא מה שהופך אתכם לטובים. אני ידעתי את הניקוד חודשים לפני שהצלחתי לעבור 100 נקודות בעקביות.
 
-מה שמפריד בין שחקנים מזדמנים לבין מובילי הטבלה הוא לא גודל אוצר המילים בלבד - זה זיהוי תבניות וטכניקת קריאת לוח. האסטרטגיות במדריך הזה משמשות שחקנים שמשיגים באופן עקבי ניקוד ב-10% העליונים.`,
+מה שבאמת משנה הוא איך קוראים את הלוח. פעם הייתי פשוט... בוהה בו ומקווה שמילים יופיעו. לפעמים הן הופיעו! ברוב המקרים לא. ההבדל ביני עם 30 נקודות לביני עם 200+ היה ללמוד לסרוק שיטתית במקום לקוות לטוב.`,
       },
       {
-        title: 'תבנית סריקה: פינה-שוליים-מרכז',
-        content: `אסטרטגיית הסריקה היעילה ביותר עוקבת אחר סדר ספציפי: פינות קודם, אז שוליים, אז מרכז.
+        title: 'פינות קודם (תסמכו עליי בזה)',
+        content: `אוקיי אז זה השיפור הכי גדול שעשיתי במשחק שלי. להתחיל מהפינות.
 
-למה פינות? אריחי פינה מתחברים רק ל-3 אריחים סמוכים (לעומת 8 לאריחי מרכז). זה אומר שמילים שמתחילות מפינות קלות יותר לאיתור מנטלי, ופחות סביר שתאבדו את הנתיב. התחילו בפינה העליונה וחפשו מילים בנות 3-4 אותיות שמתפשטות החוצה.
+למה? אריחי פינה נוגעים רק ב-3 אריחים אחרים. אריחי מרכז נוגעים ב-8. זה אומר שכשמתחילים מפינה, יש הרבה פחות נתיבים שמבלבלים. המוח באמת יכול לעקוב אחרי המילה בלי ללכת לאיבוד. פעם הייתי מתחיל ממש מהמרכז בכל משחק ותוהה למה אני מאבד את עצמי באמצע מילה.
 
-אריחי שוליים מתחברים ל-5 שכנים. אחרי שמיציתם התחלות מפינות, עברו לאורך כל שוליים. שחקנים רבים מדלגים על שוליים ישירות למרכז - זו טעות.
+אחרי פינות, תתקפו את השוליים. אריחי שוליים מתחברים ל-5 שכנים. לא קל כמו פינות אבל הרבה יותר נוח מהמרכז. הרבה אנשים מדלגים מפינות ישר למרכז. אל תעשו את זה. מצאתי כמה מהמילים הכי טובות שלי דווקא בשוליים, ובמרובה משתתפים היריבים שלכם כנראה מתעלמים מהם.
 
-אריחי מרכז הם הכי מאתגרים. יש להם מקסימום חיבורים (עד 8 אריחים סמוכים), מה שאומר יותר נתיבים אפשריים אבל גם יותר בלבול. שמרו אותם לאחר שמצאתם את מילות הפינה והשוליים הקלות.`,
+אריחי מרכז בסוף. הם בלאגן של חיבורים ואפשרויות, שנשמע מעולה עד שאתם שלוש אותיות פנימה ולא זוכרים לאן הייתם הולכים. עד שמגיעים לאריחי מרכז, כבר הפנמתם איפה הכל נמצא מהסריקות הקודמות. זה עושה הבדל עצום.
+
+כל הסריקה הזאת לוקחת לי עכשיו 30-40 שניות. פעם לקח לי יותר מדקה כשלמדתי את זה.`,
       },
       {
-        title: 'ציד תחיליות וסיומות',
-        content: `אחרי שביצעתם את הסריקה הראשונית, עברו למצב תחיליות/סיומות. כאן שחקנים מנוסים מתבדלים ממתחילים.
+        title: 'הטריק של תחיליות/סיומות ששינה לי את המשחק',
+        content: `את הטריק הזה למדתי אחרי שמישהו במרובה משתתפים פשוט מחק איתי את הרצפה ומצא מילים בנות 6 אותיות כאילו זה כלום. אחרי המשחק שאלתי אותו מה הוא עושה אחרת. התשובה שלו: "אני לא מחפש מילים. אני מחפש חלקי מילים."
 
-תחיליות נפוצות לחפש: ה- (הזמנה, הגנה), מ- (מכתב, מנוחה), ל- (לשון, לימוד), ב- (בניין, ברכה). כשאתם מזהים שילוב אותיות כזה על הלוח, חפשו מיד מה יכול להמשיך.
+זה עשה לי קליק. במקום לסרוק מילים שלמות, סורקים התחלות: ה-, מ-, ל-, ב-. הרגע שמזהים שילוב כזה על הלוח, מתחילים לעקוב קדימה. מה יכול לבוא אחרי מ-? מכתב, מנוחה, מלכה. העיניים לומדות לעשות את זה אוטומטית אחרי כמה זמן.
 
-סיומות חזקות באותה מידה: -ים (רבים זכר), -ות (רבים נקבה), -ה (יחידה נקבה), -ת (סיומת פועל), -ן, -ית, -ני. הטכניקה המתקדמת היא "בניית גשרים": מצאו תחילית בצד אחד של הלוח וסיומת בצד השני, ובדקו אם האריחים באמצע מחברים אותם למילה חוקית.
+אותו דבר עובד הפוך עם סיומות: -ים, -ות, -ה, -ת, -ן, -ית. רואים אשכול -ים? עכשיו עקבו אחורה ממנו.
 
-טיפ מקצועי: האות י מאוד חשובה בעברית. היא מופיעה בתחיליות, סיומות ובאמצע מילים רבות. תמיד בדקו מה ניתן לבנות סביבה.`,
+המהלך של גאונים אמיתיים הוא מה שאני קורא בניית גשרים. רואים ה- בצד שמאל של הלוח ו-ים בצד ימין. אפשר לחבר אותם דרך האמצע? ככה בעצם כל מילה של 6+ אותיות נמצאת. זה הרגיש בלתי אפשרי בהתחלה. עכשיו אני עושה את זה בלי לחשוב.
+
+אה, והאות י. לעולם אל תשכחו את י. היא מופיעה בתחיליות, סיומות ובאמצע כל דבר. אני בטח מקבל 15-20% מהנקודות שלי רק מזה שאני בונה מילים סביב י.`,
       },
       {
-        title: 'ניהול זמן: גישת 3 השלבים',
-        content: `שחקני עילית מחלקים את הזמן שלהם לשלושה שלבים ברורים.
+        title: 'איך אני באמת מבלה את הזמן שלי (3 השלבים)',
+        content: `בזבזתי כל כך הרבה משחקים לפני שהבנתי את הקצב. או שהייתי שורף את כל הזמן בציד מילה ארוכה אחת, או שהייתי מגיש בטירוף מילים זעירות כל הסיבוב ומפספס את הדברים הטובים. מסתבר שיש קצב לזה.
 
-שלב 1 - קציר מהיר (30% ראשונים): הגישו כל מילה שאתם רואים בלי לחשוב יותר מדי. מהירות חשובה יותר מאורך מילה כאן. מילים בנות 3 אותיות מצוינות. המטרה היא לצבור נקודות מובטחות ולהרגיש את הלוח.
+30% ראשונים של השעון - יאללה קדימה. תגישו הכל. רואים גם? תגישו. רואים על? תגישו. אל תחשבו אם מילה בת 3 אותיות "שווה את זה." היא שווה. אתם צוברים נקודות ולומדים את הלוח בו זמנית. האצבעות שלי על טייס אוטומטי בשלב הזה.
 
-שלב 2 - כרייה עמוקה (40% אמצעיים): האטו. זה הזמן ליישם את טכניקת התחיליות/סיומות ולחפש מילים ארוכות. חקרו אשכולות אריחים שלא בדקתם. רוב המילים בעלות הניקוד הגבוה יגיעו מהשלב הזה.
+40% אמצעיים - עכשיו להאט. זה שלב הציד. מפעילים את כל העניין של תחיליות/סיומות. מסתכלים על אשכולות שלא נגעתם בהם. מנסים נתיבים אלכסוניים מוזרים. אני מוצא את רוב המילים של 5+ אותיות פה. זה החלק שמרגיש כמו פאזל אמיתי.
 
-שלב 3 - סריקת ייאוש (30% אחרונים): האיצו שוב. חזרו לאזורים שרפרפתם עליהם בשלב 1. נסו אריחי התחלה חדשים. הגישו כל דבר שנראה חוקי מרחוק.
+30% אחרונים - להאיץ שוב. לחזור לפינות שרק הצצתם עליהן. לנסות אריחי התחלה שלא השתמשתם בהם. להגיש כל דבר שנראה כמו מילה. ניחושים שגויים כמעט לא עולים לכם כלום, אבל מילה שלא הגשתם עולה לכם הכל.
 
-שחקנים רבים עושים את הטעות של לבלות יותר מדי זמן בשלב 2. הציבו נקודת ביקורת מנטלית: אם לא מצאתם מילה חדשה ב-10 שניות, הכריחו את עצמכם לעבור לאזור אחר בלוח.`,
+משהו שאני עדיין מתקשה בו: להיתקע בשלב האמצעי. אם לא מצאתם משהו חדש 10 שניות, תזוזו. לבהות חזק יותר באותם שישה אריחים לא יגרום למילה להופיע. אני צריך פיזית להכריח את העיניים לחלק אחר של הלוח לפעמים.`,
       },
       {
-        title: 'זיהוי אשכולות אריחים',
-        content: `שחקנים מומחים לא קוראים אות אות - הם מזהים אשכולות. עם תרגול, שילובי אותיות מסוימים יקפצו לכם לעין מיד.
+        title: 'לאמן את העיניים לראות אשכולות',
+        content: `זה החלק שדורש תרגול אמיתי, ובכנות אני עדיין משתפר בו. המטרה היא להפסיק לקרוא אותיות בודדות ולהתחיל לראות גושים.
 
-אשכולות בעלי ערך גבוה בעברית: שׁ-ת (שתיים, שתייה), מ-ת (מתנה, מתכון), ב-ר (ברכה, בריאות). כשאתם מזהים אשכול כזה על הלוח, המוח שלכם צריך להתחיל להוסיף אותיות מיד.
+כשאני רואה שׁ-ת על הלוח עכשיו, המוח שלי לא מעבד "שׁ... ת..." הוא פשוט הולך "שתיים שתייה שתול שתלן." זה אוטומטי. אותו דבר עם מ-ת, ב-ר, ה-ת, כ-ל. השילובים האלה כל כך נפוצים בעברית שהם צריכים להפעיל מפל מנטלי מיידי של מילים. זה לוקח זמן. לי לקח בערך 50 שעות משחק לפני שזה התחיל להרגיש טבעי.
 
-איי תנועות: חפשו מקומות שבהם 2-3 תנועות מתקבצות יחד. אלה מכרות זהב כי הם יוצרים את הליבה של מילים רבות.
+איי תנועות זה זהב. שתיים-שלוש תנועות אחת ליד השנייה? זה הליבה של תריסר מילים. א-י ביחד? אישה, איש, אילן. ו-א ביחד? ואדי, ואלה. אני מתרגש כשאני רואה איי תנועות עכשיו. החברים שלי חושבים שזה מוזר.
 
-אזורים מתים: חלק מאזורי הלוח יכילו שילובי אותיות מביכים. זהו אותם מהר והפסיקו לבזבז זמן עליהם. לא כל אריח יהיה חלק ממילה.`,
+צירופי עיצורים בתחילת מילים: בר, גר, דר, כל, מש, נש, פר, שמ, תר. כשמזהים אחד כזה, עוקבים קדימה. כמעט תמיד יש שם משהו.
+
+ואז יש אזורים מתים. ק-צ אחד ליד השני. ז-ע-ק. לפעמים חלק מהלוח פשוט חסר תועלת. לזהות את זה מהר חוסך לכם 15 שניות של ניסיון ליצור מילה ממשהו שלא רוצה לשתף פעולה.`,
       },
       {
-        title: 'מתי להגיש ומתי להמשיך לחפש',
-        content: `זה אחד ההיבטים השנויים ביותר במחלוקת באסטרטגיית קלאסי. האם כדאי להגיש מילה מיד, או להמשיך לאתר כדי לראות אם היא מתארכת למשהו יותר ארוך?
+        title: 'תגישו קודם, תשאלו שאלות אחר כך',
+        content: `אנשים מתווכחים על זה כל הזמן: להגיש מילה קצרה מיד או להמשיך לעקוב ולראות אם היא הופכת למילה ארוכה יותר?
 
-הכלל הכללי: הגישו קודם, הרחיבו אחר כך. אם אתם רואים חתול, הגישו. אז בדקו אם חתולים או חתלתול זמינים. אתם נועלים נקודות מובטחות ותמיד יכולים לבנות עליהן.
+התשובה שלי: פשוט תגישו. רואים גם? תקלידו. אז תבדקו אם גמישה או גמלון עובד. כבר נעלתם 2 נקודות. עכשיו אתם משחקים עם כסף של הבית.
 
-חריג: אם אתם בתוך השניות הראשונות ואתם רואים בבירור מילה בת 6+ אותיות נבנית, אתרו את כולה קודם.
+הפעם היחידה שאני ממתין היא אם אני בשניות הראשונות ואני רואה בבירור מילה של 6+ אותיות נבנית. לקפוץ מגם (2 נק׳) לגמישות (6 נק׳) זה מספיק גדול כדי להצדיק את הסיכון. אבל זה נדיר. ובהחלט הפסדתי מילים בגלל חמדנות. יותר מפעם אחת ישבתי שם מנסה לעקוב אחרי מילה ארוכה ואיבדתי את עצמי, כשיכולתי כבר לקבל שלוש מילים קצרות בבנק.
 
-במרובה משתתפים ספציפית, הגשה מהירה חשובה עוד יותר. אם שחקן אחר מגיש את אותה מילה לפניכם, שניכם מקבלים קרדיט, אבל מהירות משפיעה על שוברי שוויון.
+במרובה משתתפים זה חשוב עוד יותר. שני שחקנים מקבלים קרדיט על אותה מילה, אבל מהירות משפיעה על שוברי שוויון. אל תשבו על מילים. תכניסו אותן.
 
-לעולם אל תחזיקו מילה בתקווה "לשמור" אותה. אין יתרון אסטרטגי להגשה מאוחרת. השעון תמיד האויב שלכם.`,
+אין שום תועלת בלהחזיק מילה. אפס. לשעון לא אכפת מהתוכניות שלכם.`,
       },
       {
-        title: 'טעויות נפוצות ואיך להימנע מהן',
-        content: `ראייה מנהרתית: הטעות הנפוצה ביותר היא להיתקע בניסיון לגרום למילה ספציפית לעבוד. אם בהיתם באותו אשכול יותר מ-5 שניות, המשיכו הלאה.
+        title: 'טעויות שעשיתי (כדי שאתם לא תצטרכו)',
+        content: `ראיית מנהרה. זו הגדולה. פעם בזבזתי 20 שניות בניסיון לגרום למילה לעבוד על לוח שבו זה היה פיזית בלתי אפשרי. עשרים שניות! זה נצח. אם בהיתם באותה נקודה 5 שניות, עזבו. בלוח יש המון מילים. אל תתחתנו עם אחת.
 
-התעלמות ממילים קצרות: חלק מהשחקנים מדלגים על מילים בנות 3 אותיות כי הן נראות "לא שוות". טעות. עשר מילים בנות 3 אותיות (20 נקודות) מנצחות שתי מילים בנות 6 אותיות (10 נקודות).
+דילוג על מילים קצרות. פעם חשבתי שמילים בנות 3 אותיות מתחת לכבודי. "אני מחפש את הגדולות." אסטרטגיה מעולה, אני. חוץ מזה שעשר מילים בנות 3 אותיות נותנות 20 נקודות ושתי מילים בנות 6 אותיות נותנות 10. כמות מנצחת. נאלצתי לבלוע את הגאווה בעניין הזה.
 
-שכחת אלכסונים: כ-40% מהמילים משתמשות בחיבור אלכסוני אחד לפחות. שחקנים שסורקים רק אופקית ואנכית מפספסים כמעט חצי מהלוח.
+התעלמות מאלכסונים. זה מביך. יותר מדי זמן סרקתי בעיקר אופקית ואנכית. מסתבר שבערך 40% מהמילים משתמשות בחיבור אלכסוני אחד לפחות. השארתי כמעט חצי מהלוח על השולחן.
 
-אי-התאמה ללוח: כל לוח שונה. חלק מהלוחות עשירים בתנועות ומעדיפים מילים קצרות רבות. אחרים מכילים אשכולות עיצורים נדירים שמאפשרים כמה מילים ארוכות. קראו את הלוח ב-10 השניות הראשונות והתאימו.
+לא לקרוא את הלוח קודם. יש לוחות שטובעים בתנועות ורוצים שתמצאו המון מילים קצרות. אחרים יש בהם אשכולות עיצורים מוזרים שמסתירים כמה מפלצות. בדרך כלל אפשר להבין ב-10 השניות הראשונות עם איזה סוג לוח מתמודדים. תתאימו בהתאם. פעם שיחקתי כל לוח אותו דבר.
 
-פאניקה בדקה האחרונה: כשהטיימר יורד, שחקנים רבים קופאים. במקום, חזרו לאסטרטגיית שלב 3 - סריקה מהירה של אזורים לא חקורים.`,
+פאניקה בסוף. כשהטיימר מגיע ל-30 שניות, משהו במוח פשוט נשבר. קופאים או מתחילים ללחוץ על אריחים אקראיים כמו משוגעים. שניהם לא עוזרים. תחזרו לשלב 3. תסרקו אזורים שדילגתם. תגישו מהר. תישארו רגועים. (אני עדיין נכנס לפאניקה לפעמים. זה עבודה בתהליך.)`,
       },
     ],
     faq: [
       {
         question: 'מהי אסטרטגיית ההתחלה הטובה ביותר למצב קלאסי בלקסיקלאש?',
-        answer: 'התחילו בסריקת פינות קודם, אז שוליים, אז אריחי מרכז. לאריחי פינה יש פחות חיבורים, מה שהופך מילים לקלות יותר לאיתור. הקדישו 15 שניות ראשונות להבנת מבנה הלוח.',
+        answer: 'פינות קודם, תמיד. יש להן פחות חיבורים אז המוח באמת יכול לעקוב אחרי נתיבים בלי ללכת לאיבוד. אז שוליים, אז המרכז המבולגן. ותקדישו 15 שניות ראשונות רק להסתכל על הלוח לפני שמתחילים ללחוץ. זה מרגיש הפוך מהאינטואיציה אבל עובד.',
       },
       {
         question: 'איך עובד הניקוד במצב קלאסי של לקסיקלאש?',
-        answer: 'נקודות שוות לאורך המילה פחות אחד. מילה בת 3 אותיות מקבלת 2 נקודות, בת 4 אותיות 3 נקודות, וכן הלאה. מילים ארוכות שוות יותר, אבל הגשת מילים קצרות רבות לעיתים קרובות יעילה יותר.',
+        answer: 'זה פשוט אורך מילה פחות אחד. מילה בת 3 אותיות מקבלת 2 נקודות, בת 4 מקבלת 3, וככה הלאה. מילים ארוכות שוות יותר לכל מילה, אבל בכנות תקבלו יותר נקודות סה"כ מלהגיש המון מילים קצרות מאשר להתייסר על מילה ארוכה אחת.',
       },
       {
         question: 'איך אפשר למצוא מילים ארוכות יותר על הלוח?',
-        answer: 'השתמשו בטכניקת ציד תחיליות/סיומות. חפשו התחלות נפוצות כמו ה-, מ-, ל- וסיומות כמו -ים, -ות, -ה. אז בנו גשרים ביניהן באמצעות אריחים אמצעיים.',
+        answer: 'תפסיקו לחפש מילים שלמות ותתחילו לחפש חלקי מילים. רואים ה- או מ- על הלוח? עקבו קדימה. רואים -ים או -ות? עקבו אחורה. אז תנסו לגשר בין תחילית לסיומת דרך אריחי האמצע. ככה בעצם כל מילה של 6+ אותיות שאני מוצא מגיעה.',
       },
       {
         question: 'עדיף להגיש מילים קצרות או לחפש מילים ארוכות?',
-        answer: 'הגישו מילים קצרות קודם כדי לנעול נקודות, אז חפשו ארוכות יותר. עשר מילים בנות 3 אותיות (20 נקודות) מנצחות שלוש מילים בנות 5 אותיות (12 נקודות). נפח בשילוב עם ממצאים ארוכים מזדמנים הוא הנוסחה המנצחת.',
+        answer: 'שניהם, אבל קצרות קודם. תנעלו את הנקודות. עשר מילים בנות 3 אותיות (20 נקודות) מנצחות שלוש מילים בנות 5 אותיות (12 נקודות) כל יום. הנוסחה המנצחת היא זרם קבוע של מילים קצרות עם מילה ארוכה פה ושם כשהיא צצה.',
       },
     ],
-    ctaText: 'תרגלו את האסטרטגיות עכשיו',
+    ctaText: 'יאללה לנסות את זה עכשיו',
     ctaLink: '/singleplayer',
     backToGuides: 'חזרה למדריכים',
   },
   sv: {
-    title: 'Strategiguide for Klassiskt Lage: Hitta Fler Ord, Fa Hogre Poang',
-    subtitle: 'Bemestra rutnatet med bevisade skanningsmonster, tidshantering och poangstrategier.',
+    title: 'Hur Jag Gick Fran 30 Poang till 200+ i Klassiskt Lage (Och Hur Du Ocksa Kan)',
+    subtitle: 'Riktiga strategier fran nagon som pinsamt nog loggat 500+ timmar stirrandes pa bokstavsrutnat.',
     category: 'Strategi',
     readTime: '8 min lasning',
     authorName: 'Ordnorden',
-    authorBio: 'Tavlingsspelare med 500+ timmar i klassiskt lage.',
+    authorBio: 'Jag spelar Klassiskt lage alldeles for mycket. Mina vanner har slutat bjuda mig pa spelkvaallar. Vart det.',
     quickTips: [
-      'Borja fran horn - de ansluter till farre plattor, sa ord ar lattare att spara',
-      'Leta efter vanliga prefix som O-, FOR-, UT- och suffix som -ING, -NING, -AR',
-      'Skicka in korta ord forst for att bygga momentum, sedan jaga langre',
-      'Lagg de forsta 15 sekunderna pa att skanna hela bradet innan du skickar nagot',
-      'Fokusera pa vokal-konsonant-kluster - de bildar ryggraden i de flesta ord',
-      'Glom inte diagonala kopplingar - de avsljar dolda ord som andra missar',
-      'Under de sista 30 sekunderna, snabbskjut alla 3-bokstavsord du ser',
+      'Borja fran hornen. Pa riktigt. Jag ignorerade det har radet i manader och mina poang led av det.',
+      'Trana ogonen att hitta O-, FOR-, UT- och -ING, -NING, -AR. Nar du vaal ser dem kan du inte sluta.',
+      'Skicka in korta ord forst. Fa poangen att ticka upaat. De langa orden kommer.',
+      'Tvinga dig att bara TITTA i 15 sekunder innan du ror nagot. Det kanns fel. Gor det andaa.',
+      'Vokal-konsonant-kluster ar din basta van. Ett ensamt Q i ett horn? Skippa det.',
+      'Diagonaler! Jag missade sakert 30% av mina ord de forsta hundra timmarna for att jag glomde att de finns.',
+      'Sista 30 sekunderna? Panik-lage. Skicka varje 3-bokstavsord dina ogon landar pa. Ingen skam.',
     ],
     scoringTable,
     sections: [
       {
-        title: 'Forsta det Klassiska Rutnatet',
-        content: `Klassiskt lage placerar dig framfor ett rutnat av bokstaver med en tickande klocka. Ditt uppdrag: hitta sa manga giltiga ord som mojligt genom att koppla intilliggande plattor - horisontellt, vertikalt eller diagonalt. Varje platta kan bara anvandas en gang per ord, och ord maste vara minst 3 bokstaver langa.
+        title: 'Sa Du Vill Bli Bra pa Klassiskt Lage',
+        content: `Har ar grejen. Klassiskt lage ger dig ett rutnat, en klocka och ett vagt hopp om att hjarnan ska samarbeta. Du kopplar ihop intilliggande plattor for att stava ord. Horisontellt, vertikalt, diagonalt. Varje platta anvands en gang per ord, minst 3 bokstaver. Enkelt nog.
 
-Poangsattningen ar enkel: langre ord ger mer poang. Ett 3-bokstavsord ger 2 poang (ordlangd minus ett), medan ett 8-bokstavsord ger 7 poang. Men den verkliga skickligheten ligger inte i att veta detta, utan i att utveckla systematiska metoder for att hitta ord snabbare.
+Poangsattning? Langre ord = mer poang. Ett 3-bokstavsord ger 2 poang, ett 8-bokstavsord ger 7. Det ar bara ordlangd minus ett. Du fattade det formodligen redan. Men att kunna poangsattningen ar inte det som gor dig bra. Jag kunde poangsattningen i manader innan jag konsekvent slog 100 poang.
 
-Det som skiljer vanliga spelare fran toppspelare ar inte ordforrad ensamt - det ar monsterigenkanning och bradlasingsteknik. Strategierna i denna guide anvands av spelare som konsekvent placerar sig i topp 10%.`,
+Det som faktiskt spelar roll ar hur du laser bradet. Jag brukade bara... stirra pa det och hoppas att ord skulle dyka upp. Ibland gjorde de det! Oftast inte. Skillnaden mellan mig pa 30 poang och mig pa 200+ var att lara sig skanna systematiskt istallet for att slumpmassigt hoppas pa det basta.`,
       },
       {
-        title: 'Horn-Kant-Center Skanningsmonster',
-        content: `Den mest effektiva skanningsstrategin foljer en specifik ordning: horn forst, sedan kanter, sedan center.
+        title: 'Horn Forst (Lita Pa Mig Har)',
+        content: `OK sa det har ar den enskilt storsta forbattringen jag nagonsin gjorde. Borja med hornen.
 
-Varfor horn? Hornplattor ansluter till bara 3 intilliggande plattor (jamfort med 8 for centerplattor). Det innebar att ord som borjar fran horn ar lattare att spara mentalt. Borja i det ovre vanstra hornet och leta efter 3-4 bokstavsord som straalar utaat.
+Varfor? Hornplattor roor bara 3 andra plattor. Centerplattor roor 8. Det betyder att nar du borjar fran ett horn finns det mycket farre vagar att bli forvirrad av. Hjarnan kan faktiskt folja ordet utan att gaa vilse. Jag brukade borja i mitten varje omgang och undra varfor jag tappade bort mig mitt i ett ord.
 
-Kantplattor ansluter till 5 grannar. Efter att ha uttornat hornstarter, ror dig langs varje kant. Manga spelare hoppar over kanter och gar direkt till center - detta ar ett misstag.
+Efter hornen, ta kanterna. Kantplattor ansluter till 5 grannar. Inte lika latt som horn men mycket mer hanterbart an mitten. Manga hoppar direkt fran horn till center. Gor inte det. Jag har hittat nagra av mina basta ord med start fran kanter, och i multiplayer ignorerar dina motstandare troligtvis dem ocksa.
 
-Centerplattor ar svaarast. De har maximalt antal kopplingar (upp till 8 intilliggande plattor), vilket innebar fler mojliga vagar men ocksa mer forvirring. Spara dessa till efter att du har hittat de latta horn- och kantorden.
+Centerplattor sist. De ar en rora av kopplingar och mojligheter, vilket later bra tills du ar tre bokstaver in och inte minns aat vilket hall du var pa vag. Nar du vaal kommer till center har du redan internaliserat var allt ar fran dina horn- och kantsvep. Gor enorm skillnad.
 
-En fullstandig horn-kant-center skanning tar ungefar 30-40 sekunder. Efter det, overgaa till riktat soke efter specifika monster.`,
+Hela den har svepningen tar mig ungefar 30-40 sekunder nu. Tog over en minut nar jag larde mig.`,
       },
       {
-        title: 'Prefix- och Suffixjakt',
-        content: `Nar du har gjort din initiala skanning, byt till prefix/suffix-lage. Har ar dar erfarna spelare skiljer sig fran nyborjare.
+        title: 'Prefix/Suffix-Tricket Som Andrade Allt',
+        content: `Jag larde mig det har fran att bli totalt forstord av nagon i multiplayer som hittade 6-bokstavsord som om det var ingenting. Efter matchen fragade jag vad de gjorde annorlunda. Svaret: "Jag letar inte efter ord. Jag letar efter orddelar."
 
-Vanliga prefix att jaga: O- (om, ord), FOR- (for, fordel), UT- (ut, utan), AV- (av, avgift), AN- (an, anda). Nar du upptacker en sadan bokstavskombination pa bradet, leta omedelbart efter vad som kan folja.
+Det klickade for mig. Istallet for att skanna efter hela ord, skanna efter borjan: O-, FOR-, UT-, AV-, AN-. Sekunden du ser en sadan kombination pa bradet, borja folja framat. Vad kan komma efter FOR? FORD, FORM, FORT. Ogonen larar sig gora det automatiskt efter ett tag.
 
-Suffix ar lika kraftfulla: -ING (vandning), -NING (borjan), -AR (plural), -ER (komparativ), -EN (bestamnd form), -ANDE, -TION, -SKAP.
+Samma sak funkar baklangees med suffix: -ING, -NING, -AR, -ER, -EN, -ANDE, -TION, -SKAP. Ser du ett -ING-kluster? Folj nu baklangees fran det.
 
-Den avancerade tekniken ar "brobyggande": hitta ett prefix pa ena sidan av bradet och ett suffix pa den andra, se sedan om mellanbokstaverna forbinder dem till ett giltigt ord. Sa hittas de flesta 6+ bokstavsord.
+Det riktigt smarta draget ar "brobyggande". Du ser FOR- pa vanstra sidan av bradet och -ING pa hogra. Kan du koppla ihop dem genom mitten? Sa hittas i princip varje 6+ bokstavsord. Det kandes omojligt forst. Nu gor jag det utan att tanka.
 
-Proffstips: bokstaven S ar otroligt vardefull pa svenska. Nagon substantiv eller verb du redan hittat kan ha ett S intill sin sista bokstav. Kontrollera alltid for pluraler.`,
+Och bokstaven S. Glom aldrig S. Alla ord du redan hittat kan ha ett S precis intill sin sista bokstav. Gratis pluraler. Gratis verbformer. Jag far formodligen 15-20% av mina poang bara genom att lagga till S pa ord jag redan skickat.`,
       },
       {
-        title: 'Tidshantering: 3-Fas Metoden',
-        content: `Toppspelare delar sin tid i tre distinkta faser.
+        title: 'Hur Jag Faktiskt Anvander Min Tid (De 3 Faserna)',
+        content: `Jag slosade sa manga omgangar innan jag fattade tempot. Antingen brande jag all tid pa att jaga ett enda stort ord, eller sa skickade jag hektiskt in smaa ord hela rundan och missade det bra. Det visar sig att det finns en rytm.
 
-Fas 1 - Snabbskord (forsta 30%): Skicka in varje ord du ser utan att overtanka. Hastighet ar viktigare an ordlangd har. Trebokstavsord ar helt okej. Malet ar att banka garanterade poang och fa en kansla for bradet.
+Forsta 30% av klockan - kor bara. Skicka allt. Ser du TRE? Skicka. Ser du AT? Skicka. Tank inte pa om ett 3-bokstavsord ar "vart det." Det ar det. Du bankar poang och far en kansla for bradet samtidigt. Mina fingrar ar i princip pa autopilot under den har fasen.
 
-Fas 2 - Djupbrytning (mellersta 40%): Sakta ner. Nu tillaampar du prefix/suffix-tekniken och letar efter langre ord. Studera plattkluster du inte utforskat. De flesta av dina hogpoangord kommer fran denna fas.
+Mellersta 40% - sakta nu ner. Det har ar din jaktfas. Tillampaa prefix/suffix-grejen. Titta pa kluster du inte rort. Prova konstiga diagonalvagar. Jag hittar de flesta av mina 5+ bokstavsord har. Det ar den delen av spelet som faktiskt kanns som ett pussel.
 
-Fas 3 - Desperationsskanning (sista 30%): Oka farten igen. Gaa tillbaka till omraden du skummade over i Fas 1. Prova nya startplattor. Skicka in allt som ser remoterligt giltigt ut.
+Sista 30% - oka farten igen. Gaa tillbaka till horn du bara glansade aat. Prova starta fran plattor du inte anvant. Skicka allt som ser ut som att det kanske ar ett ord. Fel gissningar kostar dig knappt nagot, men ett ord du inte skickade kostar dig allt.
 
-Manga spelare gor misstaget att tillbringa for lang tid i Fas 2. Satt en mental kontrollpunkt: om du inte har hittat ett nytt ord pa 10 sekunder, tvinga dig att flytta till ett annat omrade.`,
+En sak jag fortfarande kampar med: att fastna i mellanfasen. Om du inte hittat nagot nytt pa 10 sekunder, FLYTTA. Att stirra hardare pa samma sex plattor far inte ett ord att dyka upp. Jag maste ibland fysiskt tvinga ogonen till en annan del av bradet.`,
       },
       {
-        title: 'Plattkluster-Igenkanning',
-        content: `Expertspelare laser inte bokstav for bokstav - de kanner igen kluster. Med ovning kommer vissa bokstavsgrupperingar att hoppa ut omedelbart.
+        title: 'Att Trana Ogonen Att Se Kluster',
+        content: `Det har ar delen som tar riktig ovning, och arligt talat blir jag fortfarande battre pa det. Maalet ar att sluta lasa enskilda bokstaver och borja se bitar.
 
-Hogvardiga kluster pa svenska: ST (start, sten), AN (and, ande), ER (er, ert), IN (in, inne), OR (ord, ort). Nar du ser ST pa bradet bor din hjarna omedelbart borja bygga: STEN, STOL, STOR, STARK.
+Nar jag ser ST pa ett brade nu processar inte min hjarna "S... T..." Den gar bara "STEN STOL STOR STARK STALL." Det ar automatiskt. Samma med AN, ER, IN, OR, EN. De har tvaa-bokstavskombinationerna ar sa vanliga pa svenska att de borde trigga en direkt mental kaskad av ord. Det tar tid. Tog mig kanske 50 timmars spelande innan det borjade kannas naturligt.
 
-Vokalgrupper: Leta efter platser dar 2-3 vokaler klustrar ihop. Dessa ar guldgruvor. A-I intill varandra? Tank AID, AIR. O-U tillsammans? OUT, OUR.
+Vokalgrupper ar guld. Tvaa eller tre vokaler intill varandra? Det ar karnan i ett dussin ord. A-I ihop? Tank VAIT, AIR. O-R tillsammans? ORD, ORT, ORM. Jag blir exalterad nar jag ser vokal-oar nu. Mina vanner tycker det ar konstigt.
 
-Konsonantblandningar: BL, BR, DR, FL, FR, GL, GR, KL, KR, PL, PR, SK, SL, SM, SN, SP, ST, SV, TR. Dessa borjar vanligtvis ord.
+Konsonantblandningar i borjan av ord: BL, BR, DR, FL, FR, GL, GR, KL, KR, PL, PR, SK, SL, SM, SN, SP, ST, SV, TR. Nar du ser en, folj framat. Nagot finns nastan alltid dar.
 
-Doda zoner: Vissa omraden pa bradet har klumpiga bokstavskombinationer. Identifiera dessa snabbt och sluta slosa tid pa dem.`,
+Och sa finns det doda zoner. QX intill varandra. ZJ. VV. Ibland ar en del av bradet bara oanvandbar. Att kanna igen det SNABBT sparar dig fran att slosa 15 sekunder pa att forsoka gora "QXVZ" till ett ord. Allt pa bradet vill inte samarbeta.`,
       },
       {
-        title: 'Vanliga Misstag och Hur Du Undviker Dem',
-        content: `Tunnelseende: Det vanligaste misstaget ar att fastna i att forsoka fa ett specifikt ord att fungera. Om du har stirrat pa samma kluster i mer an 5 sekunder, gaa vidare.
+        title: 'Misstag Jag Gjorde (Sa Du Slipper)',
+        content: `Tunnelseende. Det har ar det stora. Jag tillbringade en gang 20 sekunder med att forsoka fa UNDERBAR att funka pa ett brade dar det var fysiskt omojligt. Tjugo sekunder! Det ar en evighet. Om du stirrat pa samma stalle i 5 sekunder, lamna. Bradet har massor av ord. Gift dig inte med ett.
 
-Ignorera korta ord: Vissa spelare hoppar over 3-bokstavsord for att de verkar "inte varda det." Fel. Tio 3-bokstavsord (20 poang) overtraffar tva 6-bokstavsord (10 poang). Volym spelar roll.
+Skippa korta ord. Jag brukade tycka att 3-bokstavsord var under min vardighet. "Jag letar efter de stora." Bra strategi, jag. Forutom att tio 3-bokstavsord ger 20 poang och tvaa 6-bokstavsord ger 10. Volym vinner. Jag fick svalja min stolthet dar.
 
-Glomma diagonaler: Ungefar 40% av orden anvander minst en diagonal koppling. Spelare som bara skannar horisontellt och vertikalt missar nastan halva bradet.
+Ignorera diagonaler. Den har ar pinsam. Alldeles for lange skannade jag i princip bara horisontellt och vertikalt. Visar sig att ungefar 40% av alla ord anvander minst en diagonal koppling. Jag lamnade nastan halva bradet pa bordet.
 
-Att inte anpassa sig till bradet: Varje brade ar annorlunda. Vissa braden ar vokaltunga och gynnar manga korta ord. Andra har sallsynta konsonantkluster som mojliggor nagra langa ord. Las bradet de forsta 10 sekunderna och justera.
+Att inte lasa bradet forst. Visa braden dranks i vokaler och vill att du hittar massor av korta ord. Andra har konstiga konsonantkluster som gommer nagra monster. Du kan oftast avgora pa 10 sekunder vilken typ av brade du har. Anpassa dig. Jag brukade spela varje brade pa samma satt.
 
-Panik sista minuten: Nar timern blir lag fryser manga spelare. Fall istallet tillbaka till din Fas 3-strategi - snabb svepning av outforskade omraden.`,
+Panik pa slutet. Nar timern visar 30 sekunder gar nagot sonder i hjarnan. Du fryser eller borjar vilt trycka pa slumpmassiga plattor. Ingetdera hjalper. Fall tillbaka till fas 3. Svep omraden du hoppat over. Skicka snabbt. Hall lugnet. (Jag far fortfarande panik ibland. Det ar ett pagaende arbete.)`,
       },
     ],
     faq: [
       {
         question: 'Vad ar den basta startstrategin for Klassiskt lage i LexiClash?',
-        answer: 'Borja med att skanna horn forst, sedan kanter, sedan centerplattor. Hornplattor har farre kopplingar, vilket gor ord lattare att spara. Lagg de forsta 15 sekunderna pa att fa en kansla for bradets layout.',
+        answer: 'Horn forst, alltid. De har farre kopplingar sa hjarnan kan faktiskt folja vagar utan att gaa vilse. Sen kanter, sen den roriga mitten. Och lagg 15 sekunder pa att bara titta pa bradet innan du borjar trycka. Det kanns bakvaant men det funkar.',
       },
       {
         question: 'Hur fungerar poangsattningen i LexiClash Klassiskt lage?',
-        answer: 'Poang ar lika med ordlangd minus ett. Ett 3-bokstavsord ger 2 poang, ett 4-bokstavsord ger 3, och sa vidare. Langre ord ar varda mer, men att skicka manga korta ord ar ofta effektivare.',
+        answer: 'Det ar ordlangd minus ett, helt enkelt. Ett 3-bokstavsord ger 2 poang, 4 bokstaver ger 3, och sa vidare upaat. Langre ord ger mer per ord, men arligt talat far du mer totalt genom att skicka en massa korta ord an att pina dig over ett enda langt.',
       },
       {
         question: 'Hur hittar jag langre ord pa rutnatet?',
-        answer: 'Anvand prefix/suffix-jakttekniken. Leta efter vanliga borjor som O-, FOR-, UT- och slut som -ING, -NING, -AR. Bygg sedan broar mellan dem med mellanplattor.',
+        answer: 'Sluta leta efter hela ord och borja leta efter orddelar. Ser du O- eller FOR- pa bradet? Folj framat. Ser du -ING eller -NING? Folj baklangees. Sen forsok bygga en bro fran prefix till suffix genom mellanplattorna. I princip varje 6+ bokstavsord jag hittar kommer fran den tekniken.',
       },
       {
         question: 'Ar det battre att skicka korta ord eller leta efter langa ord?',
-        answer: 'Skicka korta ord forst for att lasa in poang, sedan jaga langre. Tio 3-bokstavsord (20 poang) overtraffar tre 5-bokstavsord (12 poang). Volym kombinerat med tillfaalliga langa fynd ar vinnarformeln.',
+        answer: 'Bada, men korta ord forst. Las in poangen. Tio 3-bokstavsord (20 poang) slaar tre 5-bokstavsord (12 poang) varje gang. Vinnarstrategin ar en stadig strom av korta ord med naat langt inslanggt nar du ser det.',
       },
     ],
-    ctaText: 'Ova dessa strategier nu',
+    ctaText: 'Testa det har nu direkt',
     ctaLink: '/singleplayer',
     backToGuides: 'Tillbaka till guider',
   },
   ja: {
-    title: 'クラシックモード攻略ガイド：もっと単語を見つけて高得点を狙おう',
-    subtitle: '実証済みのスキャンパターン、時間管理、スコアリング戦略でグリッドをマスター。',
+    title: '僕がクラシックモードで30点から200点超えになるまでにやったこと',
+    subtitle: '文字グリッドを500時間以上見つめてきた人間のリアルな攻略法。恥ずかしいけど本当の話です。',
     category: '攻略',
     readTime: '8分で読める',
     authorName: 'ワードオタク',
-    authorBio: 'クラシックモードで500時間以上プレイした競技ワードゲームプレイヤー。',
+    authorBio: 'クラシックモードをやりすぎて友達にゲーム会に誘われなくなりました。後悔はしてません。',
     quickTips: [
-      '角から始める - 接続タイルが少ないので単語が追跡しやすい',
-      '一般的な接頭辞や接尾辞を探す',
-      '短い単語を先に送信してモメンタムを作り、その後長い単語を探す',
-      '最初の15秒はボード全体をスキャンしてから送信を始める',
-      '母音と子音のクラスターに注目 - ほとんどの単語の骨格を形成する',
-      '対角線の接続を忘れない - 他の人が見逃す隠れた単語を発見できる',
-      '最後の30秒は見つけた3文字の単語をすべて素早く送信する',
+      '角から始めよう。マジで。僕はこのアドバイスを何ヶ月も無視してスコアが伸び悩みました。',
+      'UN-、RE-、PRE-、-ING、-TION、-EDを見つける目を鍛えよう。一度見えるようになったら、もう戻れない。',
+      '短い単語をガンガン入力。まずスコアを動かす。長い単語はそのうち見つかります。',
+      '最初の15秒、何も触らずにボードを「見る」だけ。違和感あるけど、やってみて。',
+      '母音と子音のクラスターがすべて。角にポツンとある使いにくい文字？無視でOK。',
+      '対角線！最初の100時間くらい、対角線を忘れてて単語の30%くらい見逃してました。恥ずかしい。',
+      '残り30秒？パニックモード発動。目に入った3文字の単語を片っ端から送信。プライドは捨てよう。',
     ],
     scoringTable,
     sections: [
       {
-        title: 'クラシックグリッドを理解する',
-        content: `クラシックモードでは、制限時間内に文字のグリッドから単語を見つけます。隣接するタイル（水平、垂直、または対角線）を接続して、できるだけ多くの有効な単語を見つけることが目標です。各タイルは1つの単語につき1回のみ使用でき、単語は3文字以上でなければなりません。
+        title: 'クラシックモードで強くなりたいあなたへ',
+        content: `正直に言うと、クラシックモードってシンプルです。グリッドがあって、時計があって、あとは脳みそが協力してくれることを祈るだけ。隣接するタイルをつないで単語を作る。水平、垂直、対角線。各タイルは1つの単語につき1回だけ、最低3文字。ルールはこれだけ。
 
-スコアリングはシンプルです。長い単語ほど多くのポイントを獲得します。3文字の単語は2ポイント（単語の長さマイナス1）、8文字の単語は7ポイントを獲得します。しかし、本当のスキルはこれを知ることではなく、より速く一貫して単語を見つけるための体系的なアプローチを開発することにあります。
+スコアリング？長い単語ほど高得点。3文字で2ポイント、8文字で7ポイント。要するに文字数マイナス1。たぶんもう分かってますよね。でも、スコアリングを知っていることと実際に強いことは全然別の話なんです。僕はスコアリングを理解してから安定して100点を超えるまで、何ヶ月もかかりました。
 
-カジュアルプレイヤーとトップスコアラーを分けるのは語彙力だけではありません。パターン認識とボード読みのテクニックです。このガイドの戦略は、常にトップ10%のスコアを出すプレイヤーが使用しています。`,
+本当に差がつくのは「ボードの読み方」です。昔の僕はただグリッドをぼーっと眺めて、単語が浮かんでくるのを待ってました。たまに見つかることもあった！でもだいたい見つからない。30点の僕と200点超えの僕の違いは、ランダムに祈るのをやめて、体系的にスキャンすることを覚えたことでした。`,
       },
       {
-        title: '角-辺-中央スキャンパターン',
-        content: `最も効果的なスキャン戦略は、特定の順序に従います：まず角、次に辺、そして中央。
+        title: '角から始めろ（これだけは信じて）',
+        content: `これは僕のゲームを一番変えたたった1つのコツです。角から始める。
 
-なぜ角から？角のタイルは隣接する3つのタイルにのみ接続します（中央タイルの8つと比較して）。つまり、角から始まる単語は精神的に追跡しやすく、パスを見失う可能性が低くなります。左上の角から始めて、外側に広がる3-4文字の単語を探しましょう。
+なぜか？角のタイルは3つのタイルとしかつながっていません。中央は8つ。つまり角から始めると、脳が混乱するパスが圧倒的に少ない。迷子にならずに単語をたどれます。僕は毎回ド真ん中からスタートしていて、なんで途中で迷うんだろうって思ってました。そりゃ迷うわ。
 
-辺のタイルは5つの隣接タイルに接続します。角の開始を使い切った後、各辺に沿って移動します。多くのプレイヤーは辺を飛ばして中央に直行しますが、これは間違いです。
+角の次は辺。辺のタイルは5つの隣接タイルとつながっています。角ほど楽じゃないけど、中央よりずっとマシ。角から一気に中央に飛ぶ人が多いけど、やめた方がいいです。辺から始まる良い単語、けっこう見つかるんですよ。マルチプレイヤーだと対戦相手もたぶん辺を無視してるし。
 
-中央のタイルは最も難しいです。最大接続数（最大8つの隣接タイル）を持つため、可能なパスは多いですが混乱も多くなります。角と辺の簡単な単語を見つけた後に取り組みましょう。
+中央は最後。接続が多すぎてカオスです。可能性は多いけど、3文字目で「あれ、どっちに進んでたっけ？」ってなります。角と辺のスキャンが終わってからなら、ボードの配置が頭に入ってるので中央もずっと読みやすくなります。
 
-完全な角-辺-中央スキャンには約30-40秒かかります。その後、特定のパターンを狙った探索に切り替えます。`,
+このスキャン全体、今の僕だと30-40秒。覚えたての頃は1分以上かかってました。`,
       },
       {
-        title: '接頭辞と接尾辞の探索',
-        content: `初期スキャンが終わったら、接頭辞/接尾辞モードに切り替えます。ここで経験豊富なプレイヤーは初心者と差をつけます。
+        title: '接頭辞と接尾辞のコツ ― これで世界が変わった',
+        content: `このテクニックは、マルチプレイヤーで6文字の単語をスラスラ見つける人にボコボコにされた後に教えてもらいました。試合後に「何が違うの？」って聞いたら、「単語を探してない。単語のパーツを探してる」って。
 
-日本語のワードゲームでも、文字の組み合わせパターンを認識することが重要です。よく出現する文字の並びを覚えておくと、素早く単語を見つけることができます。
+これが僕の中でカチッとハマりました。完成した単語じゃなくて、始まりのパーツを探す。UN-、RE-、PRE-、OUT-、OVER-。ボード上でこの組み合わせを見つけた瞬間、前方にたどる。UNの後に何が来る？UNDO、UNIT、UNDER。慣れると目が自動的にやってくれるようになります。
 
-上級テクニックは「ブリッジビルディング」：ボードの一方に接頭辞を見つけ、もう一方に接尾辞を見つけ、中間のタイルがそれらを有効な単語に接続するかどうかを確認します。6文字以上の単語のほとんどはこの方法で発見されます。
+逆方向も同じ。接尾辞：-ING、-ED、-ER、-TION、-LY、-NESS、-ABLE、-MENT。-INGのクラスターを発見？そこから逆方向にたどる。
 
-プロのヒント：よく使われる文字は非常に価値があります。すでに見つけた単語に隣接する文字を確認し、拡張できないか常にチェックしましょう。`,
+本当の上級技は「ブリッジビルディング」。ボードの左にRE-があって、右に-INGがある。中央を通ってつなげられるか？6文字以上の単語はほぼこの方法で見つかります。最初は不可能に感じたけど、今は無意識でやってます。
+
+あと、Sの文字。絶対忘れないで。見つけた単語の最後の文字の隣にSがあるかもしれない。タダで複数形ゲット。タダで動詞の活用ゲット。僕のポイントの15-20%はたぶんSを付け足すだけで稼いでます。`,
       },
       {
-        title: '時間管理：3フェーズアプローチ',
-        content: `トッププレイヤーは時間を3つの明確なフェーズに分けます。
+        title: '僕の時間の使い方（3つのフェーズ）',
+        content: `ペース配分を覚える前、本当にたくさんのゲームを無駄にしました。1つの大きな単語を探すのに全時間使っちゃったり、逆に小さい単語ばっかり入力して良い単語を全部逃したり。リズムがあるんです。
 
-フェーズ1 - 高速収穫（最初の30%）：見つけた単語をすべて考えすぎずに送信します。ここではスピードが単語の長さより重要です。3文字の単語で十分です。目標は確実なポイントを稼ぎ、ボードの感触をつかむことです。
+最初の30% - とにかく行く。全部送信。THEが見えた？送信。ATが見えた？送信。3文字の単語が「意味あるの？」なんて考えない。意味ある。ポイントを貯めながら、同時にボードの地図を頭に作ってるんです。この段階、僕の指はほぼオートパイロット。
 
-フェーズ2 - 深掘り（中間の40%）：ペースを落とします。接頭辞/接尾辞テクニックを適用し、長い単語を探す時間です。まだ探索していないタイルクラスターを研究します。高得点の単語のほとんどはこのフェーズで見つかります。
+中間の40% - ここでペースを落とす。狩りの時間です。接頭辞と接尾辞のテクニックを使う。まだ触ってないクラスターを見る。変な対角線のパスを試す。5文字以上の単語はだいたいここで見つかります。パズルっぽくて一番楽しい時間。
 
-フェーズ3 - 最後の追い込み（最後の30%）：再びスピードアップします。フェーズ1で軽く見た領域に戻ります。新しい開始タイルを試します。有効に見えるものは何でも送信します。
+最後の30% - また加速。最初に軽くしか見なかった角に戻る。まだ使ってないタイルから始めてみる。単語っぽいものはとりあえず送信。間違えてもペナルティはほぼゼロだけど、送信しなかった単語はポイントゼロ。
 
-多くのプレイヤーはフェーズ2に時間をかけすぎるという間違いを犯します。メンタルチェックポイントを設定しましょう：10秒間新しい単語が見つからなければ、ボードの別のエリアに移動することを強制してください。`,
+今でも苦手なこと：中間フェーズにハマること。10秒間何も見つからなかったら、移動。同じ6つのタイルをもっと睨んでも単語は出てきません。物理的に目を別の場所に動かさないとダメなときもあります。`,
       },
       {
-        title: 'タイルクラスター認識',
-        content: `エキスパートプレイヤーは文字を1つずつ読むのではなく、クラスターを認識します。練習を重ねると、特定の文字の組み合わせが瞬時に目に飛び込んでくるようになります。
+        title: 'クラスターを「見る」目を鍛える',
+        content: `ここは本当に練習が必要で、正直まだ上達中です。目標は、1文字ずつ読むのをやめて、かたまりで見ること。
 
-高価値クラスター：よく使われる文字の組み合わせを見つけたら、脳はすぐに単語を構築し始めるべきです。
+今の僕がボードでTHを見たとき、脳は「T...H...」とは処理しません。「THE THEN THEM THIN THIS THAT」って一気に浮かぶ。自動です。IN、ER、AN、ON、ST、REも同じ。この2文字の組み合わせは英語で超頻出なので、見た瞬間に単語が連鎖的に思い浮かぶようになるべき。時間はかかります。僕は50時間くらいプレイしてやっと自然になってきました。
 
-母音のアイランド：2-3つの母音がまとまっている場所を探しましょう。これらは多くの単語のコアを形成するため、宝の山です。
+母音のクラスターは宝です。2-3個の母音が隣り合ってる？それだけで十数個の単語の核になる。A-Iが一緒？AID、AIR、AIM、RAIN、MAIN、PAIR。O-Uが一緒？OUT、OUR、POUR、TOUR、FOUR。母音の島を見つけるとテンション上がります。友達には変だと思われてますけど。
 
-子音ブレンド：これらは通常単語の始まりに来るので、見つけたら前方にパスをたどって単語を構築します。
+単語の頭に来る子音ブレンド：BL、BR、CL、CR、DR、FL、FR、GL、GR、PL、PR、SC、SH、SK、SL、SM、SN、SP、ST、SW、TR。見つけたら前にたどる。だいたい何かあります。
 
-デッドゾーン：ボードの一部のエリアには扱いにくい文字の組み合わせがあります。これらを素早く特定し、時間を無駄にするのをやめましょう。すべてのタイルが単語の一部になるわけではありません。`,
+そしてデッドゾーン。QとXが隣り合ってる。ZとJ。VとV。ボードの一部はどうしようもないときがある。それを素早く見抜くことで、「QXVZ」から単語を作ろうとして15秒無駄にするのを防げます。`,
       },
       {
-        title: 'よくある間違いとその回避方法',
-        content: `トンネルビジョン：最も一般的な間違いは、特定の単語を作ろうとして行き詰まることです。同じクラスターを5秒以上見つめていたら、先に進みましょう。
+        title: '僕がやらかした失敗（あなたはやらないで）',
+        content: `トンネルビジョン。これが一番デカい。一度、物理的に不可能なボードでBEAUTIFULを作ろうとして20秒費やしたことがあります。20秒ですよ！永遠に等しい。5秒以上同じ場所を見てたら、離れる。ボードには大量の単語がある。1つの単語と結婚しない。
 
-短い単語の無視：一部のプレイヤーは3文字の単語を「価値がない」と思ってスキップします。間違いです。10個の3文字の単語（20ポイント）は、2個の6文字の単語（10ポイント）を上回ります。量が重要です。
+短い単語をバカにする。昔は3文字の単語なんて「僕の格じゃない」と思ってました。「大物を狙ってるんだ」って。カッコいい戦略ですね、過去の僕。でも3文字の単語10個で20ポイント、6文字の単語2個で10ポイント。数が勝つ。プライドを飲み込みました。
 
-対角線を忘れる：単語の約40%は少なくとも1つの対角線接続を使用します。水平と垂直のみをスキャンするプレイヤーは、ボードのほぼ半分を見逃しています。
+対角線を無視する。これは恥ずかしい。ずっと水平と垂直だけスキャンしてました。実は見つかる単語の約40%が最低1つの対角線接続を使ってるんです。ボードのほぼ半分をテーブルの上に残してた。
 
-ボードに適応しない：すべてのボードは異なります。母音が多いボードもあれば、珍しい子音クラスターがあるボードもあります。最初の10秒でボードを読み、戦略を調整しましょう。
+ボードを読まない。母音だらけで短い単語をたくさん探すべきボードもあれば、変な子音クラスターの中にモンスター級の単語が隠れてるボードもある。最初の10秒でだいたいどっちか分かります。昔の僕はどのボードも同じやり方でプレイしてました。
 
-最後の1分のパニック：タイマーが残り少なくなると、多くのプレイヤーがフリーズします。代わりに、フェーズ3の戦略に戻りましょう。`,
+最後のパニック。残り30秒になると脳が壊れる。フリーズするか、ランダムにタイルを連打し始める。どっちも無意味。フェーズ3に戻る。飛ばした場所をスキャン。高速で送信。落ち着く。（今でもたまにパニックになります。成長の途中です。）`,
       },
     ],
     faq: [
       {
-        question: 'LexiClashのクラシックモードで最良の開始戦略は何ですか？',
-        answer: 'まず角をスキャンし、次に辺、そして中央タイルの順に進みます。角タイルは接続が少ないため、単語を追跡しやすくなります。最初の15秒はボードレイアウトの把握に使いましょう。',
+        question: 'LexiClashのクラシックモードで一番いいスタート戦略は？',
+        answer: '角から。これは絶対です。角は接続が少ないから、脳がパスを追いやすい。そのあと辺、最後にカオスな中央。あと最初の15秒はボードを見るだけにする。直感に反するけど、効きます。',
       },
       {
-        question: 'LexiClashクラシックモードのスコアリングはどのように機能しますか？',
-        answer: 'ポイントは単語の長さマイナス1です。3文字の単語は2ポイント、4文字は3ポイント、というように続きます。長い単語はより価値がありますが、多くの短い単語を送信する方がしばしば効果的です。',
+        question: 'LexiClashクラシックモードのスコアリングってどう計算されるの？',
+        answer: '文字数マイナス1、それだけです。3文字で2ポイント、4文字で3ポイント。長い単語の方が1語あたりの得点は高いけど、正直なところ、短い単語をたくさん送信する方が合計点は伸びることが多いです。',
       },
       {
-        question: 'グリッド上でより長い単語を見つけるにはどうすればよいですか？',
-        answer: '接頭辞/接尾辞探索テクニックを使用します。一般的な始まりと終わりを探し、中間タイルでそれらをつなぎます。6文字以上の単語のほとんどはこの方法で見つかります。',
+        question: 'グリッドで長い単語を見つけるコツは？',
+        answer: '完成した単語を探すのをやめて、単語のパーツを探すこと。UN-やRE-を見つけたら前にたどる。-INGや-TIONを見つけたら後ろにたどる。そして接頭辞と接尾辞を中央のタイルでつなぐ。僕が見つける6文字以上の単語は、ほぼ全部このテクニックから生まれてます。',
       },
       {
-        question: '短い単語を送信するのと長い単語を探すのとではどちらが良いですか？',
-        answer: 'まず短い単語を送信してポイントを確保し、その後長い単語を探します。10個の3文字の単語（20ポイント）は3個の5文字の単語（12ポイント）を上回ります。量と時折の長い発見の組み合わせが勝利の方程式です。',
+        question: '短い単語と長い単語、どっちを優先すべき？',
+        answer: '両方だけど、短い方が先。まずポイントを確保する。3文字の単語10個（20ポイント）は5文字の単語3個（12ポイント）に毎回勝ちます。短い単語の安定した流れに、たまに長い単語を混ぜるのが勝利の方程式です。',
       },
     ],
-    ctaText: 'これらの戦略を今すぐ練習する',
+    ctaText: 'さっそく試してみよう',
     ctaLink: '/singleplayer',
     backToGuides: 'ガイドに戻る',
   },
   es: {
-    title: 'Guia de Estrategia del Modo Clasico: Encuentra Mas Palabras, Obtiene Mayor Puntaje',
-    subtitle: 'Domina la cuadricula con patrones de escaneo probados, gestion del tiempo y estrategias de puntuacion.',
+    title: 'Como pase de 30 puntos a 200+ en modo Clasico (y como tu tambien puedes)',
+    subtitle: 'Estrategias reales de alguien que lleva vergonzosamente mas de 500 horas mirando cuadriculas de letras.',
     category: 'Estrategia',
     readTime: '8 min de lectura',
     authorName: 'El Nerd de las Palabras',
-    authorBio: 'Jugador competitivo de juegos de palabras con mas de 500 horas en modo clasico.',
+    authorBio: 'Juego modo Clasico demasiado. Mis amigos ya no me invitan a noches de juegos por eso. Lo vale.',
     quickTips: [
-      'Comienza desde las esquinas - se conectan a menos fichas, asi que las palabras son mas faciles de trazar',
-      'Busca prefijos comunes como DES-, RE-, PRE- y sufijos como -CION, -MENTE, -ANDO',
-      'Envia palabras cortas primero para generar impulso, luego busca las largas',
-      'Dedica los primeros 15 segundos a escanear todo el tablero antes de enviar nada',
-      'Concentrate en grupos de vocales y consonantes - forman la columna vertebral de la mayoria de las palabras',
-      'No olvides las conexiones diagonales - revelan palabras ocultas que otros pasan por alto',
-      'En los ultimos 30 segundos, dispara rapido cualquier palabra de 3 letras que veas',
+      'Empieza por las esquinas. En serio. Yo ignore este consejo durante meses y mi puntaje lo pago caro.',
+      'Entrena tus ojos para ver DES-, RE-, PRE- y -CION, -ANDO, -MENTE. Una vez que los ves, no puedes dejar de verlos.',
+      'Mete palabras cortas primero. Que el marcador vaya subiendo. Las largas ya vendran.',
+      'Obligate a solo MIRAR el tablero 15 segundos antes de tocar nada. Se siente mal. Hazlo igual.',
+      'Los grupos vocal-consonante son tu pan de cada dia. Una Q sola en una esquina? Pasala de largo.',
+      'Diagonales! Yo perdi como el 30% de mis palabras las primeras cien horas porque se me olvidaba que existen.',
+      'Ultimos 30 segundos? Modo panico. Manda toda palabra de 3 letras que veas. Sin verguenza.',
     ],
     scoringTable,
     sections: [
       {
-        title: 'Entendiendo la Cuadricula Clasica',
-        content: `El modo clasico te coloca frente a una cuadricula de letras con un reloj en marcha. Tu mision: encontrar tantas palabras validas como sea posible conectando fichas adyacentes - horizontal, vertical o diagonalmente. Cada ficha solo puede usarse una vez por palabra, y las palabras deben tener al menos 3 letras.
+        title: 'Asi que quieres ser bueno en modo Clasico',
+        content: `A ver, el asunto es asi. El modo Clasico te da una cuadricula, un reloj, y la vaga esperanza de que tu cerebro coopere. Conectas fichas adyacentes para formar palabras. Horizontal, vertical, diagonal. Cada ficha se usa una vez por palabra, minimo 3 letras. Bastante simple.
 
-La puntuacion es directa: las palabras mas largas ganan mas puntos. Una palabra de 3 letras te da 2 puntos (longitud de la palabra menos uno), mientras que una de 8 letras gana 7 puntos. Pero la verdadera habilidad no esta en saber esto, sino en desarrollar enfoques sistematicos para encontrar palabras mas rapido y de manera consistente.
+La puntuacion? Palabras mas largas = mas puntos. Una de 3 letras te da 2 puntos, una de 8 te da 7. Es la longitud menos uno. Seguro ya lo habias deducido. Pero saber la puntuacion no es lo que te hace bueno. Yo sabia la puntuacion durante meses antes de superar los 100 puntos consistentemente.
 
-Lo que separa a los jugadores casuales de los mejores puntuadores no es solo el tamano del vocabulario, es el reconocimiento de patrones y la tecnica de lectura del tablero. Las estrategias en esta guia son utilizadas por jugadores que consistentemente puntuan en el top 10%.`,
+Lo que de verdad importa es como lees el tablero. Yo antes simplemente... lo miraba fijamente esperando que las palabras aparecieran. A veces funcionaba! La mayoria no. La diferencia entre yo con 30 puntos y yo con 200+ fue aprender a escanear sistematicamente en vez de esperar que la suerte me salvara.`,
       },
       {
-        title: 'El Patron de Escaneo Esquina-Borde-Centro',
-        content: `La estrategia de escaneo mas efectiva sigue un orden especifico: esquinas primero, luego bordes, luego centro.
+        title: 'Esquinas primero (conffia en mi)',
+        content: `OK, esta fue la mejora mas grande que hice en mi juego. Empieza por las esquinas.
 
-Por que esquinas? Las fichas de esquina se conectan a solo 3 fichas adyacentes (comparado con 8 para fichas del centro). Esto significa que las palabras que comienzan desde esquinas son mas faciles de trazar mentalmente. Comienza en la esquina superior izquierda y busca palabras de 3-4 letras que se expandan hacia afuera.
+Por que? Las fichas de esquina solo tocan 3 fichas. Las del centro tocan 8. Eso significa que cuando empiezas desde una esquina, hay muchos menos caminos para confundirte. Tu cerebro puede trazar la palabra sin perderse. Yo antes empezaba justo en el centro cada partida y me preguntaba por que perdia el hilo a mitad de palabra.
 
-Las fichas de borde se conectan a 5 vecinos. Despues de agotar los inicios de esquina, muevete a lo largo de cada borde. Muchos jugadores saltan los bordes y van directo al centro - esto es un error.
+Despues de las esquinas, ve a los bordes. Las fichas de borde se conectan a 5 vecinos. No tan facil como las esquinas pero mucho mas manejable que el centro. Mucha gente salta directo de esquinas al centro. No lo hagas. Yo he encontrado algunas de mis mejores palabras empezando desde bordes, y en multijugador tus rivales probablemente los estan ignorando.
 
-Las fichas del centro son las mas complicadas. Tienen el maximo de conexiones (hasta 8 fichas adyacentes), lo que significa mas caminos posibles pero tambien mas confusion. Guardalas para despues de haber encontrado las palabras faciles de esquinas y bordes.
+Fichas del centro al final. Son un desastre de conexiones y posibilidades, lo cual suena genial hasta que llevas tres letras y no recuerdas en que direccion ibas. Para cuando llegas al centro, ya internalizaste donde esta todo despues de tus pasadas por esquinas y bordes. Cambia todo.
 
-Un escaneo completo de esquina-borde-centro toma unos 30-40 segundos. Despues de eso, cambia a busqueda dirigida de patrones especificos.`,
+Todo este barrido me toma unos 30-40 segundos ahora. Antes me tardaba mas de un minuto cuando lo estaba aprendiendo.`,
       },
       {
-        title: 'Caza de Prefijos y Sufijos',
-        content: `Una vez que hayas hecho tu escaneo inicial, cambia al modo prefijo/sufijo. Aqui es donde los jugadores experimentados se separan de los principiantes.
+        title: 'El truco de prefijos/sufijos que me cambio la vida',
+        content: `Esto lo aprendi despues de que alguien me destruyera en multijugador encontrando palabras de 6 letras como si nada. Despues del juego le pregunte que hacia diferente. Su respuesta: "No busco palabras. Busco partes de palabras."
 
-Prefijos comunes para buscar: DES- (deshacer, despertar), RE- (repetir, revisar), PRE- (prevenir, preparar), IN- (incapaz, incierto), CON- (contener, confiar). Cuando detectes una de estas combinaciones en el tablero, busca inmediatamente que puede seguir.
+Ahi me cayo el veinte. En vez de buscar palabras completas, busca comienzos: DES-, RE-, PRE-, IN-, CON-. En el momento que ves una de esas combinaciones en el tablero, empieza a trazar hacia adelante. Que puede venir despues de DES? DESHACER, DESPERTAR, DESTINO. Tus ojos aprenden a hacer esto automaticamente con el tiempo.
 
-Los sufijos son igualmente poderosos: -CION (accion, cancion), -MENTE (rapidamente), -ANDO/-IENDO (gerundios), -ADO/-IDO (participios), -ABLE (notable), -DAD (ciudad).
+Lo mismo funciona al reves con sufijos: -CION, -ANDO, -MENTE, -ABLE, -ADO, -DAD. Ves un grupo -CION? Ahora traza hacia atras.
 
-La tecnica avanzada es la "construccion de puentes": encuentra un prefijo en un lado del tablero y un sufijo en el otro, luego ve si las fichas intermedias los conectan en una palabra valida. Asi es como se descubren la mayoria de las palabras de 6+ letras.
+El movimiento galaxia-cerebro es lo que yo llamo construir puentes. Ves DES- en un lado del tablero y -CION en el otro. Puedes conectarlos por el medio? Asi es como se encuentran basicamente todas las palabras de 6+ letras. Al principio parecia imposible. Ahora lo hago sin pensar.
 
-Consejo profesional: la letra S es increiblemente valiosa. Cualquier sustantivo o verbo que ya hayas encontrado puede tener una S adyacente a su ultima letra. Siempre verifica los plurales.`,
+Ah, y la letra S. Nunca olvides la S. Cualquier palabra que ya encontraste podria tener una S sentada justo al lado de su ultima letra. Plurales gratis. Verbos gratis. Yo saco como el 15-20% de mis puntos solo de agregar S a palabras que ya mande.`,
       },
       {
-        title: 'Gestion del Tiempo: El Enfoque de 3 Fases',
-        content: `Los mejores jugadores dividen su tiempo en tres fases distintas.
+        title: 'Como realmente paso mi tiempo (las 3 fases)',
+        content: `Desperdicie tantas partidas antes de entender el ritmo. O gastaba todo mi tiempo cazando una palabra enorme, o mandaba palabras diminutas como loco toda la ronda y me perdia lo bueno. Resulta que hay un ritmo.
 
-Fase 1 - Cosecha Rapida (primer 30%): Envia cada palabra que veas sin pensar demasiado. La velocidad importa mas que la longitud de la palabra aqui. Las palabras de 3 letras estan perfectamente bien. Tu objetivo es acumular puntos garantizados y sentir el tablero.
+Primer 30% del reloj - simplemente ve. Manda todo. Ves SOL? Manda. Ves MAS? Manda. No pienses si una palabra de 3 letras "vale la pena." Vale. Estas acumulando puntos y reconociendo el terreno al mismo tiempo. Mis dedos van basicamente en piloto automatico durante esta fase.
 
-Fase 2 - Mineria Profunda (40% medio): Reduce la velocidad. Este es el momento de aplicar la tecnica de prefijo/sufijo y buscar palabras mas largas. Estudia grupos de fichas que no hayas explorado. La mayoria de tus palabras de alta puntuacion vendran de esta fase.
+40% del medio - ahora baja la velocidad. Esta es tu fase de caza. Aplica lo de prefijos/sufijos. Mira grupos que no hayas tocado. Prueba caminos diagonales raros. Aqui encuentro la mayoria de mis palabras de 5+ letras. Es la parte del juego que realmente se siente como un rompecabezas.
 
-Fase 3 - Barrido Desesperado (ultimo 30%): Acelera de nuevo. Vuelve a areas que pasaste por encima en la Fase 1. Prueba nuevas fichas de inicio. Envia cualquier cosa que parezca remotamente valida.
+Ultimo 30% - acelera de nuevo. Vuelve a esquinas que solo miraste de reojo. Prueba empezar desde fichas que no hayas usado. Manda cualquier cosa que parezca palabra. Los intentos fallidos casi no te cuestan, pero una palabra que no mandaste te cuesta todo.
 
-Muchos jugadores cometen el error de pasar demasiado tiempo en la Fase 2. Establece un punto de control mental: si no has encontrado una nueva palabra en 10 segundos, forzate a moverte a un area diferente del tablero.`,
+Algo con lo que todavia lucho: quedarme atascado en la fase del medio. Si no has encontrado nada nuevo en 10 segundos, MUEVETE. Mirar mas intensamente las mismas seis fichas no va a hacer que aparezca una palabra. A veces tengo que forzar fisicamente mis ojos a otra parte del tablero.`,
       },
       {
-        title: 'Reconocimiento de Grupos de Fichas',
-        content: `Los jugadores expertos no leen letra por letra - reconocen grupos. Con practica, ciertas agrupaciones de letras te saltaran a la vista instantaneamente.
+        title: 'Entrenar tus ojos para ver grupos',
+        content: `Esta es la parte que requiere practica real, y honestamente sigo mejorando. La meta es dejar de leer letras individuales y empezar a ver bloques.
 
-Grupos de alto valor en espanol: ST (estar, este), AN (ante, andar), ER (era, error), EN (en, entre), AR (arbol, arar). Cuando veas uno de estos en el tablero, tu cerebro deberia comenzar a construir palabras inmediatamente.
+Cuando veo AN en un tablero ahora, mi cerebro no procesa "A... N..." Simplemente va "ANTE ANDAR ANGEL ANCHO ANIMO." Es automatico. Igual con ER, EN, AR, ST, RE. Estas combinaciones de dos letras son tan comunes en espanol que deberian disparar una cascada mental instantanea de palabras. Eso toma tiempo. Me tomo como 50 horas de juego antes de que empezara a sentirse natural.
 
-Islas de vocales: Busca lugares donde 2-3 vocales se agrupen juntas. Estas son minas de oro porque forman el nucleo de muchas palabras. A-E juntas? Piensa en CAER, NACER. I-O juntas? RIO, FRIO.
+Las islas de vocales son oro. Dos o tres vocales juntas? Eso es el nucleo de una docena de palabras. A-E juntas? CAER, NACER, HACER, TRAER. I-O juntas? RIO, FRIO, SITIO, LIRIO. Me emociono cuando veo islas de vocales ahora. Mis amigos dicen que eso es raro.
 
-Mezclas de consonantes: BL, BR, CL, CR, DR, FL, FR, GL, GR, PL, PR, TR. Estas tipicamente inician palabras, asi que cuando encuentres una, traza caminos hacia adelante.
+Combinaciones de consonantes al inicio de palabras: BL, BR, CL, CR, DR, FL, FR, GL, GR, PL, PR, TR. Cuando encuentres una, traza hacia adelante. Casi siempre hay algo ahi.
 
-Zonas muertas: Algunas areas del tablero tendran combinaciones de letras incomodas. Identificalas rapidamente y deja de perder tiempo en ellas.`,
+Y luego estan las zonas muertas. QX juntas. ZJ. VV. A veces un pedazo del tablero simplemente no sirve. Reconocer eso RAPIDO te ahorra 15 segundos que habrias gastado intentando hacer que "QXVZ" sea una palabra. No todo en el tablero quiere cooperar.`,
       },
       {
-        title: 'Errores Comunes y Como Evitarlos',
-        content: `Vision de tunel: El error mas comun es quedarse atrapado intentando hacer funcionar una palabra especifica. Si has estado mirando el mismo grupo por mas de 5 segundos, sigue adelante.
+        title: 'Manda primero, pregunta despues',
+        content: `La gente discute esto todo el tiempo: deberia mandar una palabra corta inmediatamente o seguir trazando para ver si se convierte en una mas larga?
 
-Ignorar palabras cortas: Algunos jugadores saltan las palabras de 3 letras porque parecen "no valer la pena." Incorrecto. Diez palabras de 3 letras (20 puntos) superan dos palabras de 6 letras (10 puntos). El volumen importa.
+Mi respuesta: solo manda. Ves SOL? Metelo. Despues checa si SOLAR o SOLTAR funciona. Ya aseguraste tus 2 puntos. Ahora estas jugando con dinero de la casa.
 
-Olvidar las diagonales: Aproximadamente el 40% de las palabras usan al menos una conexion diagonal. Los jugadores que solo escanean horizontal y verticalmente pierden casi la mitad del tablero.
+La unica vez que me detengo es si estoy en los primeros segundos y claramente veo una palabra de 6+ letras formandose. Pasar de SOL (2 pts) a SOLEDAD (6 pts) es un salto lo suficientemente grande para justificar el riesgo. Pero eso es raro. Y definitivamente he perdido palabras por ser ambicioso. Mas de una vez me quede ahi tratando de trazar EXTRAORDINARIO y perdi el hilo, cuando podria haber tenido EXTRA, TREN y RIO ya en el banco.
 
-No adaptarse al tablero: Cada tablero es diferente. Algunos tableros tienen muchas vocales y favorecen muchas palabras cortas. Otros tienen grupos de consonantes raras que permiten unas pocas palabras largas. Lee el tablero en los primeros 10 segundos y ajusta tu estrategia.
+En multijugador esto importa aun mas. Ambos jugadores reciben credito por la misma palabra, pero la velocidad afecta desempates. No te sientes sobre las palabras. Mandalas.
 
-Panico en el ultimo minuto: Cuando el temporizador baja, muchos jugadores se paralizan. En su lugar, vuelve a tu estrategia de Fase 3 - barrido rapido de areas inexploradas con envios rapidos.`,
+No hay ningun beneficio en guardar una palabra. Ninguno. Al reloj no le importan tus planes.`,
+      },
+      {
+        title: 'Errores que yo cometi (para que tu no tengas que)',
+        content: `Vision de tunel. Este es el grande. Una vez pase 20 segundos intentando armar EXTRAORDINARIO en un tablero donde era fisicamente imposible. Veinte segundos! Eso es una eternidad. Si llevas 5 segundos mirando el mismo punto, vete. El tablero tiene toneladas de palabras. No te cases con una.
+
+Ignorar palabras cortas. Yo antes pensaba que las de 3 letras estaban por debajo de mi. "Estoy buscando las grandes." Genial estrategia, yo del pasado. Excepto que diez palabras de 3 letras te dan 20 puntos y dos de 6 letras te dan 10. El volumen gana. Tuve que tragarme el orgullo con esa.
+
+Olvidar las diagonales. Esta me da verguenza. Durante demasiado tiempo basicamente solo escaneaba horizontal y verticalmente. Resulta que como el 40% de las palabras encontrables usan al menos una conexion diagonal. Estaba dejando casi la mitad del tablero en la mesa.
+
+No leer el tablero primero. Algunos tableros estan ahogados en vocales y quieren que encuentres muchas palabras cortas. Otros tienen grupos de consonantes raros que esconden unos cuantos monstruos. Generalmente puedes saber en los primeros 10 segundos que tipo de tablero tienes. Ajustate. Yo antes jugaba cada tablero igual.
+
+Entrar en panico al final. Cuando el reloj llega a 30 segundos, algo en tu cerebro se rompe. Te congelas o empiezas a tocar fichas al azar como loco. Ninguna ayuda. Vuelve a la fase 3. Barre areas que saltaste. Manda rapido. Manten la calma. (Yo todavia entro en panico a veces. Es un trabajo en progreso.)`,
       },
     ],
     faq: [
       {
         question: 'Cual es la mejor estrategia inicial para el modo Clasico en LexiClash?',
-        answer: 'Comienza escaneando esquinas primero, luego bordes, luego fichas del centro. Las fichas de esquina tienen menos conexiones, haciendo las palabras mas faciles de trazar. Dedica los primeros 15 segundos a entender el diseno del tablero.',
+        answer: 'Esquinas primero, siempre. Tienen menos conexiones asi que tu cerebro puede trazar caminos sin perderse. Luego bordes, luego el caos del centro. Y dedica los primeros 15 segundos a solo mirar el tablero antes de empezar a tocar. Se siente contraproducente pero funciona.',
       },
       {
         question: 'Como funciona la puntuacion en el modo Clasico de LexiClash?',
-        answer: 'Los puntos son iguales a la longitud de la palabra menos uno. Una palabra de 3 letras obtiene 2 puntos, una de 4 letras obtiene 3, y asi sucesivamente. Las palabras largas valen mas, pero enviar muchas palabras cortas es frecuentemente mas efectivo.',
+        answer: 'Es la longitud de la palabra menos uno. Una de 3 letras te da 2 puntos, una de 4 te da 3, y asi hasta arriba. Las palabras largas puntuan mas por palabra, pero honestamente vas a sacar mas puntos totales mandando un monton de cortas que agonizando por una larga.',
       },
       {
         question: 'Como puedo encontrar palabras mas largas en la cuadricula?',
-        answer: 'Usa la tecnica de caza de prefijos/sufijos. Busca comienzos comunes como DES-, RE-, PRE- y terminaciones como -CION, -MENTE, -ANDO. Luego construye puentes entre ellos usando fichas intermedias.',
+        answer: 'Deja de buscar palabras completas y empieza a buscar partes de palabras. Ves DES- o RE- en el tablero? Traza hacia adelante. Ves -CION o -ANDO? Traza hacia atras. Luego intenta conectar un prefijo con un sufijo a traves de las fichas del medio. Basicamente asi encuentro todas mis palabras de 6+ letras.',
       },
       {
         question: 'Es mejor enviar palabras cortas o buscar palabras largas?',
-        answer: 'Envia palabras cortas primero para asegurar puntos, luego busca las largas. Diez palabras de 3 letras (20 puntos) superan tres palabras de 5 letras (12 puntos). Volumen combinado con hallazgos largos ocasionales es la formula ganadora.',
+        answer: 'Las dos, pero cortas primero. Asegura esos puntos. Diez palabras de 3 letras (20 puntos) le ganan a tres de 5 letras (12 puntos) siempre. La estrategia ganadora es un flujo constante de palabras cortas con alguna larga mezclada cuando la veas.',
       },
     ],
-    ctaText: 'Practica estas estrategias ahora',
+    ctaText: 'Ve a probar esto ahora mismo',
     ctaLink: '/singleplayer',
     backToGuides: 'Volver a guias',
   },

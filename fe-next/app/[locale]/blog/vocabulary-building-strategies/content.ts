@@ -215,7 +215,7 @@ Your future self — the one who casually drops DEFENESTRATION in conversation a
     subtitle: 'חזרה מרווחת, שליפה אקטיבית, פריצות מורפולוגיות, ושגרות יומיות שבאמת נדבקות. לא צריך אפליקציות כרטיסיות.',
     category: 'למידה',
     readTime: 'קריאה של 12 דקות',
-    authorName: 'הנרד של המילים',
+    authorName: 'חנון המילים',
     authorBio: 'אובססיבי אוצר מילים אוטודידקט שמחזיק יומן מילים, משחק משחקי מילים בתחרותיות, ופעם בכה דמעות שמחה על המילה "דפנסטרציה."',
     sections: [
       {
@@ -223,17 +223,17 @@ Your future self — the one who casually drops DEFENESTRATION in conversation a
 
 התוצאה? 500 מילים חדשות. לא מילים מסוג "אני מזהה את זה באופן מעורפל" — מילים שאני יכול להגדיר, לאיית, להשתמש בהן במשפט, ו(קריטי) לפרוס במשחק מילים כדי לגרום לחברים שלי להתחרט שאתגרו אותי.
 
-אבל הנה מה שעשה את הניסוי הזה שונה מכל ניסיון קודם: לא השתמשתי בכוח גס. לא ישבתי עם כרטיסיות שעות. במקום זאת, השתמשתי בשילוב של טכניקות מדעי הקוגניציה שחוקרים משפצרים כבר מעל מאה שנה.`,
+מה שעשה את הניסוי הזה שונה מכל ניסיון קודם: לא השתמשתי בכוח גס. לא ישבתי עם כרטיסיות שעות. במקום זאת, השתמשתי בשילוב של טכניקות מדעי הקוגניציה שחוקרים משפצרים כבר מעל מאה שנה.`,
       },
       {
         title: 'ניסוי 30 היום: כללי הבסיס',
-        content: `לפני שאכנס לטכניקות, הנה הפרמטרים. כי "למדתי 500 מילים" לא אומר כלום בלי הקשר.
+        content: `לפני שאכנס לטכניקות, אלה הפרמטרים. כי "למדתי 500 מילים" לא אומר כלום בלי הקשר.
 
-הגדרת "למדתי": יכולתי להפיק את המילה מהזיכרון, להגדיר אותה נכון, לאיית נכון, ולהשתמש בהקשר. זה מה שחוקרים קוראים "אוצר מילים פרודוקטיבי" — בניגוד ל"אוצר מילים רצפטיבי," שהוא רק לזהות מילה כשרואים אותה.
+מה זה "למדתי"? יכולתי להפיק את המילה מהזיכרון, להגדיר אותה נכון, לאיית נכון, ולהשתמש בהקשר. זה מה שחוקרים קוראים "אוצר מילים פרודוקטיבי" — בניגוד ל"אוצר מילים רצפטיבי," שהוא רק לזהות מילה כשרואים אותה.
 
-מקור המילים: בעיקר משחקי מילים (בוגל, תרגול סקרבל, תשבצים, ופאזלי מילים יומיים), בתוספת קריאה. כשנתקלתי במילה שלא הכרתי, רשמתי אותה.
+מאיפה הגיעו המילים? בעיקר משחקי מילים (בוגל, תרגול סקרבל, תשבצים, ופאזלי מילים יומיים), בתוספת קריאה. כשנתקלתי במילה שלא הכרתי, רשמתי אותה.
 
-השקעת זמן: כ-45 דקות ביום. חמש עשרה דקות משחקי מילים, חמש עשרה דקות חזרה, וחמש עשרה דקות קריאה. זה חשוב — לא בזבזתי ארבע שעות ביום על זה.
+כמה זמן? כ-45 דקות ביום. חמש עשרה דקות משחקי מילים, חמש עשרה דקות חזרה, וחמש עשרה דקות קריאה. זה חשוב — לא בזבזתי ארבע שעות ביום על זה.
 
 עד יום 30, במחברת שלי היו 523 ערכים. חלקם היו אזוטריים. חלקם היו מעשיים. וחלקם היו פשוט מענגים.`,
       },
@@ -259,7 +259,7 @@ Your future self — the one who casually drops DEFENESTRATION in conversation a
 
 שליפה אקטיבית היא ההיפך. במקום להסתכל על מילה ולזכור את ההגדרה (זיהוי), מתחילים עם ההגדרה ומנסים להפיק את המילה (שליפה). או מסתכלים על סט אותיות מעורבל ומנסים ליצור מילים — מה שהוא, לא במקרה, בדיוק מה שמשחקי מילים עושים.
 
-קרפיקה ורודיגר (2008) פרסמו מחקר מכונן ב-Science שהראה שתרגול שליפה ייצר שימור טוב ב-80% משליפה חוזרת. שמונים אחוז. המאמץ של שליפה — ההיאבקות כדי למשוך מילה מהזיכרון — הוא מה שמחזק את עקבת הזיכרון.
+קרפיקה ורודיגר (2008) פרסמו מחקר מכונן ב-Science שהראה שתרגול שליפה ייצר שימור טוב ב-80% משליפה חוזרת. שמונים אחוז! המאמץ של שליפה — ההיאבקות כדי למשוך מילה מהזיכרון — הוא מה שמחזק את עקבת הזיכרון.
 
 לכן משחקי מילים הם בוני אוצר מילים כל כך יעילים. כל פעם שסורקים לוח אותיות ומושכים מילה מהכאוס, עושים שליפה אקטיבית. המשחק הוא סשן הלמידה.`,
       },
@@ -277,19 +277,19 @@ Your future self — the one who casually drops DEFENESTRATION in conversation a
       },
       {
         title: 'משפחות מילים ומורפולוגיה: קוד הרמאות שאף אחד לא מדבר עליו',
-        content: `אוקיי, זו הטכניקה שעשתה את ההבדל הגדול ביותר בניסוי שלי. והיא מנוצלת בחסר באופן מזעזע.
+        content: `הטכניקה הזו עשתה את ההבדל הגדול ביותר בניסוי שלי, ומזעזע כמה מעט אנשים מדברים עליה.
 
 מורפולוגיה היא חקר חלקי המילה — תחיליות, סיומות ושורשים. עברית, בניגוד לאנגלית, בנויה על מערכת שורשים תלת-עיצוריים שמייצרים משפחות מילים שלמות. ברגע שלומדים את הדפוסים, מילים חדשות מפסיקות להיות מחרוזות אקראיות של אותיות ומתחילות להיות פאזלים שאפשר לפענח.
 
-הנה דוגמה. השורש כ.ת.ב מייצר: כָּתַב, מִכְתָּב, כְּתוֹבֶת, כָּתְבָן, כְּתִיבָה, מַכְתֵּבָה. שורש אחד, מילים רבות, כולן מחוברות.
+דוגמה. השורש כ.ת.ב מייצר: כָּתַב, מִכְתָּב, כְּתוֹבֶת, כָּתְבָן, כְּתִיבָה, מַכְתֵּבָה. שורש אחד, מילים רבות, כולן מחוברות.
 
-ניישן (2001) העריך שידע של כ-20 משפחות מילים בשבוע יכול לבנות אוצר מילים בקצב של פי ארבע מלימוד מילים בודדות בבידוד.
+ניישן (2001) העריך שידע של כ-20 משפחות מילים בשבוע יכול לבנות אוצר מילים בקצב של פי ארבע מלימוד מילים בודדות בבידוד (פי ארבע!).
 
 בשבוע השני, למדתי מילים בקצב כפול מהקצב ההתחלתי. לא כי למדתי יותר קשה, אלא כי כל מילה חדשה הגיעה מחוברת מראש למילים שכבר הכרתי. הרשת המורפולוגית עשתה את העבודה הכבדה.`,
       },
       {
         title: 'העברה חוצת-שפות: היתרון הרב-לשוני',
-        content: `הנה משהו שלא ציפיתי לו כשהתחלתי את הניסוי. משחק משחקי מילים בשפות מרובות שיפר את אוצר המילים שלי באנגלית.
+        content: `משהו שלא ציפיתי לו כשהתחלתי את הניסוי. משחק משחקי מילים בשפות מרובות שיפר את אוצר המילים שלי באנגלית.
 
 זה נשמע פרדוקסלי, אבל המחקר תומך בזה. קרול וסטיוארט (1994) הציעו את המודל ההיררכי המתוקן של זיכרון דו-לשוני, שמציע שמילים בשפות שונות חולקות חיבורים מושגיים. כשלומדים מילה בשפה אחת, לא רק לומדים תווית — מחזקים את המושג הבסיסי.
 
@@ -299,25 +299,25 @@ Your future self — the one who casually drops DEFENESTRATION in conversation a
       },
       {
         title: 'שגרות יומיות שבאמת עובדות',
-        content: `הטכניקות למעלה הן המדע. אבל מדע בלי יישום הוא רק טריוויה. הנה השגרה היומית שהשתמשתי בה.
+        content: `הטכניקות למעלה הן המדע. אבל מדע בלי יישום הוא סתם טריוויה. השגרה היומית שהשתמשתי בה.
 
-בוקר (15 דקות): סשן משחק מילים. שיחקתי שני סיבובי בוגל והשתמשתי בזמן הנותר לחפש מילים שנתקלתי בהן אבל לא יכולתי להגדיר. מילים חדשות נכנסו ישר למחברת.
+בבוקר, חמש עשרה דקות של משחק מילים. שיחקתי שני סיבובי בוגל והשתמשתי בזמן הנותר לחפש מילים שנתקלתי בהן אבל לא יכולתי להגדיר. מילים חדשות נכנסו ישר למחברת.
 
-צהריים (15 דקות): חזרה מרווחת. דפדפתי במחברת וחזרתי על מילים שהגיע זמנן לפי לוח הזמנים. כיסיתי את ההגדרה, ניסיתי לזכור, בדקתי, המשכתי.
+בצהריים, חמש עשרה דקות של חזרה מרווחת. דפדפתי במחברת וחזרתי על מילים שהגיע זמנן לפי לוח הזמנים. כיסיתי את ההגדרה, ניסיתי לזכור, בדקתי, המשכתי.
 
-ערב (15 דקות): קריאה. קראתי חמש עשרה דקות עם המחברת פתוחה. כל מילה לא מוכרת נרשמה מיד.
+בערב, חמש עשרה דקות קריאה. קראתי חמש עשרה דקות עם המחברת פתוחה. כל מילה לא מוכרת נרשמה מיד.
 
 זה הכל. ארבעים וחמש דקות ביום, מחולקות לשלוש פיסות. התובנה המפתח היא שתדירות חשובה יותר ממשך. שלושה סשנים של 15 דקות מנצחים סשן אחד של 45 דקות, כי כל סשן הוא הזדמנות שליפה נוספת.
 
-כללים לא-ניתנים-למשא-ומתן: כתבו ביד. השתמשו במילה תוך 24 שעות. שחקו עם אחרים לפחות פעמיים בשבוע. אין דחיסה.`,
+כללי ברזל: כתבו ביד. השתמשו במילה תוך 24 שעות. שחקו עם אחרים לפחות פעמיים בשבוע. אין דחיסה.`,
       },
       {
         title: 'מדידת התקדמות (ולמה זה לא מה שחושבים)',
         content: `בסוף 30 יום, היו לי 523 מילים במחברת. אבל המספר הגולמי כמעט חסר משמעות. מה שחשוב הוא שימור ושימושיות.
 
-בדקתי את עצמי בשלוש דרכים. מבחן שליפה קרה: עברתי על כל המחברת עם ההגדרות מכוסות. תוצאה: 447 מתוך 523 נכונות (85.5%). ביצועי משחקי מילים: הציונים שלי בבוגל עלו ב-22%, ואורך המילה הממוצע שלי עלה מ-4.2 ל-5.1 אותיות. שימוש בשיחה: חברים סימנו 31 מקרים שבהם השתמשתי במילה שלא שמעו ממני קודם.
+בדקתי את עצמי בשלוש דרכים. קודם כל, שליפה קרה: עברתי על כל המחברת עם ההגדרות מכוסות. תוצאה: 447 מתוך 523 נכונות (85.5%). שנית, ביצועי משחקים: הציונים שלי בבוגל עלו ב-22%, ואורך המילה הממוצע שלי עלה מ-4.2 ל-5.1 אותיות. ושלישית, בשיחה: חברים סימנו 31 מקרים שבהם השתמשתי במילה שלא שמעו ממני קודם.
 
-אבל הנה מה שאני באמת רוצה להדגיש. המספר 500 מרשים, אבל הוא גם מטעה. הוא מציע שבניית אוצר מילים זה על צבירת פריטים בדידים.
+אבל מה שאני באמת רוצה להדגיש: המספר 500 מרשים, אבל הוא גם מטעה. הוא מציע שבניית אוצר מילים זה על צבירת פריטים בדידים.
 
 זה לא. זה על בניית רשת. עד סוף הניסוי, הלקסיקון המנטלי שלי הרגיש שונה. מילים שכבר הכרתי קיבלו חיבורים חדשים. החיבורים המורפולוגיים והמושגיים לא רק עזרו לי לזכור מילים חדשות — הם הפכו את כל אוצר המילים שלי לנגיש יותר.
 
@@ -347,7 +347,7 @@ Men det som gjorde detta experiment annorlunda än alla andra försök att bygga
         title: '30-dagarsexperimentet: Grundregler',
         content: `Innan jag går in på teknikerna, låt mig lägga ut parametrarna. För "jag lärde mig 500 ord" betyder ingenting utan sammanhang.
 
-Definition av "lärt mig": Jag kunde producera ordet från minnet, definiera det korrekt, stava det korrekt och använda det i sammanhang. Detta är vad forskare kallar "produktivt ordförråd" — till skillnad från "receptivt ordförråd," som bara är att känna igen ett ord när man ser det.
+Definition av "lärt mig": Jag kunde producera ordet från minnet, definiera det korrekt, stava det korrekt och använda det i sammanhang. Detta är vad forskare kallar "produktivt ordförråd", till skillnad från "receptivt ordförråd," som bara är att känna igen ett ord när man ser det.
 
 Ordkälla: Främst ordspel (Boggle, Scrabble-övning, korsord och dagliga ordpussel), kompletterat med läsning.
 
@@ -357,11 +357,11 @@ Vid dag 30 hade min anteckningsbok 523 poster. Några var obskyra. Några var pr
       },
       {
         title: 'Utspridd repetition: Ebbinghaus-kurvan som förändrade allt',
-        content: `1885 gjorde en tysk psykolog vid namn Hermann Ebbinghaus något ingen gjort förut: han mätte systematiskt hur snabbt människor glömmer saker. Hans metod var brutal — han memorerade listor av nonsensstavelser och testade sedan sig själv vid ökande intervaller.
+        content: `1885 gjorde en tysk psykolog vid namn Hermann Ebbinghaus något ingen gjort förut: han mätte systematiskt hur snabbt människor glömmer saker. Hans metod var brutal: han memorerade listor av nonsensstavelser och testade sedan sig själv vid ökande intervaller.
 
 Det han upptäckte kallas nu "glömskekurvan," och det är ett av de mest replikerade resultaten i hela psykologin. Utan någon repetition glömmer man cirka 70% av ny information inom 24 timmar. Inom en vecka har man förlorat cirka 90%.
 
-Men — och detta är den avgörande delen — varje gång man repeterar informationen vid rätt ögonblick plattas kurvan ut. Minnet blir starkare. Intervallen mellan nödvändiga repetitioner blir längre.
+Men varje gång man repeterar informationen vid rätt ögonblick plattas kurvan ut. Minnet blir starkare. Intervallen mellan nödvändiga repetitioner blir längre.
 
 Detta är utspridd repetition: att repetera information vid gradvis ökande intervaller. Repetition efter 1 dag, sedan 3, sedan 7, sedan 14, sedan 30 dagar. Varje repetition cementerar minnet fastare.
 
@@ -375,21 +375,21 @@ Det fungerar inte. Eller snarare, det fungerar, men det är otroligt långsamt o
 
 Problemet är att läsning är passivt. Man känner igen ord, producerar dem inte. Hjärnan gör minimalt arbete för att extrahera mening från texten.
 
-Aktiv återkallelse är motsatsen. Istället för att titta på ett ord och komma ihåg dess definition (igenkänning), börjar man med definitionen och försöker producera ordet (återkallelse). Eller så tittar man på en blandad uppsättning bokstäver och försöker bilda ord — vilket är exakt vad ordspel gör.
+Aktiv återkallelse är motsatsen. Istället för att titta på ett ord och komma ihåg dess definition (igenkänning), börjar man med definitionen och försöker producera ordet (återkallelse). Eller så tittar man på en blandad uppsättning bokstäver och försöker bilda ord, vilket är exakt vad ordspel gör.
 
 Karpicke och Roediger (2008) publicerade en banbrytande studie i Science som visade att återkallelseövning producerade 80% bättre långsiktigt bibehållande än upprepat studerande av samma material. Åttio procent.
 
-Därför är ordspel så effektiva ordförrådsbyggare. Varje gång man skannar ett bokstavsrutnät och drar ut ett ord från kaos av slumpvisa bokstäver gör man aktiv återkallelse. Spelet är studiesessionen — man inser det bara inte för att man har kul.`,
+Därför är ordspel så effektiva ordförrådsbyggare. Varje gång man skannar ett bokstavsrutnät och drar ut ett ord från kaos av slumpvisa bokstäver gör man aktiv återkallelse. Spelet är studiesessionen. Man inser det bara inte för att man har kul.`,
       },
       {
         title: 'Testeffekten: Misslyckande är poängen',
-        content: `Testeffekten — också kallad "återkallelseförbättrad inlärning" — är fyndet att testning på material förbättrar minnet mer än ytterligare studietid.
+        content: `Testeffekten, också kallad "återkallelseförbättrad inlärning", är fyndet att testning på material förbättrar minnet mer än ytterligare studietid.
 
 Här är den kontraintuitiva delen: testeffekten fungerar även när man svarar fel. Viss forskning tyder på att misslyckade återkallelseförsök, följda av korrekt feedback, producerar starkare minnen än lyckad återkallelse.
 
 Kornell, Hays och Bjork (2009) demonstrerade detta i en studie. Deltagare som försökte och misslyckades med att svara på frågor, och sedan fick rätt svar, presterade bättre på ett slutprov än deltagare som helt enkelt studerade svaren.
 
-Implikationen för ordförrådsbyggande är djupgående. När man stöter på ett okänt ord i ett ordspel och tänker "jag vet det här... jag har sett det förut..." — den kampen, även om man misslyckas, får hjärnan att arbeta hårdare. Och det hårdare arbetet skapar ett starkare minnesspår.
+Implikationen för ordförrådsbyggande är djupgående. När man stöter på ett okänt ord i ett ordspel och tänker "jag vet det här... jag har sett det förut...", den kampen, även om man misslyckas, får hjärnan att arbeta hårdare. Och det hårdare arbetet skapar ett starkare minnesspår.
 
 Därför säger jag till folk: bli inte avskräckt när ett ordspel ställer dig. Varje ord du inte kan är en möjlighet. Varje misslyckat återkallelseförsök grundar hjärnan för ögonblicket du lär dig svaret.`,
       },
@@ -397,7 +397,7 @@ Därför säger jag till folk: bli inte avskräckt när ett ordspel ställer dig
         title: 'Ordfamiljer och morfologi: Fuskkoden ingen pratar om',
         content: `Detta är tekniken som gjorde den största enskilda skillnaden i mitt experiment. Och den är chockerande underutnyttjad.
 
-Morfologi är studiet av orddelar — prefix, suffix och rötter. Engelska är ett Frankensteinspråk byggt från latin, grekiska, germanska, franska och ett dussin andra källor. Men de källorna följer mönster. När man lär sig mönstren slutar nya ord att vara slumpvisa bokstavssträngar och börjar vara pussel man kan avkoda.
+Morfologi är studiet av orddelar: prefix, suffix och rötter. Engelska är ett Frankensteinspråk byggt från latin, grekiska, germanska, franska och ett dussin andra källor. Men de källorna följer mönster. När man lär sig mönstren slutar nya ord att vara slumpvisa bokstavssträngar och börjar vara pussel man kan avkoda.
 
 Här är ett exempel. Anta att du lär dig ordet EPHEMERAL (kortvarigt). Om du också lär dig att EPHEMER- kommer från grekiskans "ephemeros" som betyder "varar en dag," har du just låst upp en familj ord: EPHEMERA, EPHEMERIS, EPHEMERON. En rot, flera ord, alla sammankopplade.
 
@@ -415,9 +415,9 @@ Det låter paradoxalt, men forskningen stödjer det. Kroll och Stewart (1994) f�
 
 Jag testade detta genom att spela LexiClash på svenska. Svenska delar germanska rötter med engelska, så ord som HUND, HAND och VATTEN var omedelbart igenkännbara. Men den intressanta delen var de mindre uppenbara kopplingarna.
 
-En metaanalys av Adesope et al. (2010) fann att tvåspråkiga individer konsekvent överpresterade enspråkiga på ordförrådstester — även på sitt modersmål. Teorin är att hanteringen av flera språkliga system skapar ett mer flexibelt och sammankopplat mentalt lexikon.
+En metaanalys av Adesope et al. (2010) fann att tvåspråkiga individer konsekvent överpresterade enspråkiga på ordförrådstester, även på sitt modersmål. Teorin är att hanteringen av flera språkliga system skapar ett mer flexibelt och sammankopplat mentalt lexikon.
 
-Man behöver inte vara flytande på ett annat språk för att dra nytta av detta. Grundläggande exponering för kognater — ord som delar ursprung över språk — kan stärka ordförrådsnätverket.`,
+Man behöver inte vara flytande på ett annat språk för att dra nytta av detta. Grundläggande exponering för kognater (ord som delar ursprung över språk) kan stärka ordförrådsnätverket.`,
       },
       {
         title: 'Dagliga rutiner som faktiskt fungerar',
@@ -441,7 +441,7 @@ Jag testade mig på tre sätt. Kall återkallelsetest: 447 av 523 korrekta (85,5
 
 Men här är vad jag verkligen vill betona. Siffran 500 är imponerande men också missvisande. Den antyder att ordförrådsbyggande handlar om att samla diskreta objekt.
 
-Det gör det inte. Det handlar om att bygga ett nätverk. Vid slutet av experimentet kändes mitt mentala lexikon annorlunda. Ord jag redan kände hade nya kopplingar. De morfologiska och konceptuella kopplingarna hjälpte inte bara mig att komma ihåg nya ord — de gjorde hela mitt ordförråd mer tillgängligt.
+Det gör det inte. Det handlar om att bygga ett nätverk. Vid slutet av experimentet kändes mitt mentala lexikon annorlunda. Ord jag redan kände hade nya kopplingar. De morfologiska och konceptuella kopplingarna hjälpte inte bara mig att komma ihåg nya ord. De gjorde hela mitt ordförråd mer tillgängligt.
 
 Du behöver inte 30 dagar för att börja se resultat. Skaffa en fysisk anteckningsbok. Spela ett ordspel om dagen. Logga tre nya ord. Repetera med utspridd repetition. Använd varje nytt ord inom 24 timmar. Femton till tjugo minuter om dagen.`,
       },
@@ -591,11 +591,11 @@ Pero esto es lo que hizo este experimento diferente de cualquier otro intento de
         title: 'El experimento de 30 dias: Reglas basicas',
         content: `Antes de entrar en las tecnicas, los parametros. Porque "aprendi 500 palabras" no significa nada sin contexto.
 
-Definicion de "aprendido": Podia producir la palabra de memoria, definirla correctamente, deletrearla correctamente y usarla en contexto. Esto es lo que los investigadores llaman "vocabulario productivo" — en oposicion al "vocabulario receptivo," que es solo reconocer una palabra al verla.
+Para que cuente como "aprendida," tenia que poder producir la palabra de memoria, definirla correctamente, deletrearla correctamente y usarla en contexto. Esto es lo que los investigadores llaman "vocabulario productivo" — en oposicion al "vocabulario receptivo," que es solo reconocer una palabra al verla.
 
-Fuente de palabras: Principalmente juegos de palabras (Boggle, practica de Scrabble, crucigramas y puzzles diarios), complementado con lectura.
+Las palabras venian principalmente de juegos de palabras (Boggle, practica de Scrabble, crucigramas y puzzles diarios), complementado con lectura.
 
-Inversion de tiempo: Aproximadamente 45 minutos al dia. Quince minutos de juegos de palabras, quince de revision y quince de lectura. Las tecnicas estan disenadas para maximizar la retencion por minuto de estudio.
+La inversion de tiempo fue de aproximadamente 45 minutos al dia. Quince minutos de juegos de palabras, quince de revision y quince de lectura. Las tecnicas estan disenadas para maximizar la retencion por minuto de estudio.
 
 Para el dia 30, mi cuaderno tenia 523 entradas. Algunas eran oscuras. Algunas eran practicas. Y algunas eran simplemente deliciosas.`,
       },
@@ -665,13 +665,13 @@ No necesitas ser fluido en otro idioma para beneficiarte. La exposicion basica a
       },
       {
         title: 'Rutinas diarias que realmente funcionan',
-        content: `Las tecnicas de arriba son la ciencia. Pero ciencia sin implementacion es solo trivia. Aqui esta la rutina diaria que use.
+        content: `Las tecnicas de arriba son la ciencia. Pero ciencia sin implementacion es solo trivia. Te cuento la rutina diaria que use.
 
-Manana (15 minutos): Sesion de juego de palabras. Jugaba dos rondas de Boggle y usaba el tiempo restante para buscar palabras que habia encontrado pero no podia definir. Palabras nuevas iban directo al cuaderno.
+Por la manana, quince minutos de juego de palabras. Jugaba dos rondas de Boggle y usaba el tiempo restante para buscar palabras que habia encontrado pero no podia definir. Palabras nuevas iban directo al cuaderno.
 
-Mediodia (15 minutos): Repeticion espaciada. Repasaba el cuaderno y revisaba palabras que correspondian segun mi calendario. Cubria la definicion, intentaba recordarla, verificaba, seguia.
+Al mediodia, quince minutos de repeticion espaciada. Repasaba el cuaderno y revisaba palabras que correspondian segun mi calendario. Cubria la definicion, intentaba recordarla, verificaba, seguia.
 
-Noche (15 minutos): Lectura. Leia quince minutos con el cuaderno abierto. Cualquier palabra desconocida se registraba inmediatamente.
+Y por la noche, quince minutos de lectura. Leia quince minutos con el cuaderno abierto. Cualquier palabra desconocida se registraba inmediatamente.
 
 Eso es todo. Cuarenta y cinco minutos al dia, divididos en tres bloques manejables. La intuicion clave es que la frecuencia importa mas que la duracion. Tres sesiones de 15 minutos superan a una sesion de 45 minutos cada vez.
 
@@ -681,9 +681,9 @@ Reglas innegociables: Escribir a mano. Usar la palabra dentro de 24 horas. Jugar
         title: 'Medir el progreso (y por que no es lo que piensas)',
         content: `Al final de 30 dias, tenia 523 palabras en mi cuaderno. Pero el numero bruto es casi insignificante. Lo que importa es la retencion y la usabilidad.
 
-Me evalue de tres formas. Prueba de recuerdo frio: 447 de 523 correctas (85.5%). Rendimiento en juegos: mis puntajes de Boggle aumentaron un 22%, y mi longitud promedio de palabra aumento de 4.2 a 5.1 letras. Uso conversacional: amigos senalaron 31 instancias donde use una palabra que no habian escuchado de mi antes.
+Me evalue de tres formas. En recuerdo frio, 447 de 523 correctas (85.5%). En rendimiento de juegos, mis puntajes de Boggle aumentaron un 22%, y mi longitud promedio de palabra aumento de 4.2 a 5.1 letras. En uso conversacional, amigos senalaron 31 instancias donde use una palabra que no habian escuchado de mi antes.
 
-Pero esto es lo que realmente quiero enfatizar. El numero 500 es impresionante pero tambien enganoso. Sugiere que construir vocabulario se trata de acumular elementos discretos.
+Pero ojo. El numero 500 es impresionante pero tambien enganoso. Sugiere que construir vocabulario se trata de acumular elementos discretos.
 
 No lo es. Se trata de construir una red. Al final del experimento, mi lexico mental se sentia diferente. Palabras que ya conocia tenian nuevas conexiones. Las conexiones morfologicas y conceptuales no solo me ayudaron a recordar nuevas palabras — hicieron todo mi vocabulario mas accesible.
 

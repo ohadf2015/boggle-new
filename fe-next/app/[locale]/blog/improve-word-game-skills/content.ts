@@ -170,17 +170,17 @@ That's it. That's the napkin version. Everything else is details.`,
       },
       {
         title: 'האיש ששבר את משחקי המילים (בלי להבין אותם)',
-        content: `אם לא שמעתם על נייג'ל ריצ'רדס, תתכוננו. הבחור הזה מניו זילנד זכה באליפות העולם בסקראבל בצרפתית. פעמיים. הוא לא מדבר צרפתית.
+        content: `אם לא שמעתם על נייג'ל ריצ'רדס, תתכוננו. הבחור הזה מניו זילנד? זכה באליפות העולם בסקראבל בצרפתית. פעמיים. בלי לדבר צרפתית.
 
 תנו לזה לשקוע. הוא שינן את כל מילון הסקראבל הצרפתי — כ-386,000 מילים — בלי לדעת מה אף אחת מהן אומרת. הוא גם זכה באליפות הסקראבל בספרדית. גם לא מדבר ספרדית. הזכיות המצטברות שלו הופכות אותו לאחד השחקנים הגדולים בהיסטוריה.
 
 כשבהתחלה שמעתי את הסיפור הזה, חשבתי שזה מוכיח ששינון הוא התשובה. טעיתי. מה שזה באמת מוכיח הוא משהו מעניין הרבה יותר: ריצ'רדס לא רק משנן מילים — הוא מזהה דפוסי אותיות ברמה על-אנושית. שחקני סקראבל צרפתים שראיינו אותו אמרו שהוא מזהה מהלכים של שבע אותיות מהר יותר מדוברי שפת אם. הוא לא שלף הגדרות. הוא ראה דפוסים מבניים בסידור אותיות שרוב האנשים פשוט לא יכולים לתפוס.
 
-ההבחנה הזו — זיהוי דפוסים לעומת שליפה גולמית — שינתה את הדרך שבה אני מתרגל. לחלוטין.`,
+ההבחנה הזו, זיהוי דפוסים לעומת שליפה גולמית, שינתה את הדרך שבה אני מתרגל. לחלוטין.`,
       },
       {
         title: 'מה המוח באמת עושה כשאתם מחפשים מילים',
-        content: `פה זה נהיה נרדי. סליחה. לא באמת סליחה.
+        content: `פה זה נהיה נרדי. לא מתנצל.
 
 חוקרים שחקרו שחקני סקראבל תחרותיים עם מכשירי fMRI מצאו משהו מנוגד לאינטואיציה. שחקנים מומחים לא מפעילים בעיקר אזורי עיבוד שפה כשהם סורקים אותיות. הם מפעילים אזורי עיבוד חזותי. המוח שלהם מתייחס לסידורי אותיות יותר כמו לפאזלים מרחביים מאשר לבעיות לשוניות.
 
@@ -194,13 +194,13 @@ That's it. That's the napkin version. Everything else is details.`,
         title: 'תרגול מכוון: החלק שכולם מפספסים',
         content: `בטח שמעתם על כלל "10,000 השעות". מלקולם גלדוול הפך אותו למפורסם, אנדרס אריקסון חקר אותו בפועל, והאינטרנט עיוות אותו מעבר לזיהוי.
 
-הנה מה שאריקסון באמת מצא: זה לא עניין של שעות. זה עניין של תרגול מכוון — עבודה על חולשות ספציפיות עם משוב מיידי, בקצה של היכולת שלכם. שחקן שח שמשחק 10,000 שעות של משחקים מהירים ישתפר פחות ממישהו שמשקיע 2,000 שעות בלימוד עמדות ספציפיות ובניתוח הטעויות שלו.
+מה שאריקסון באמת מצא: זה לא עניין של שעות. זה עניין של תרגול מכוון. עבודה על חולשות ספציפיות עם משוב מיידי, בקצה של היכולת שלכם. שחקן שח שמשחק 10,000 שעות של משחקים מהירים ישתפר פחות ממישהו שמשקיע 2,000 שעות בלימוד עמדות ספציפיות ובניתוח הטעויות שלו.
 
 אותו דבר עם משחקי מילים. שיחקתי בצורה רגועה שנים. השתפרתי קצת. הגעתי לרמה. התעצבנתי. שיחקתי יותר. נשארתי באותה רמה.
 
 ואז שיניתי את הגישה. במקום רק לשחק משחקים, התחלתי לעשות תרגילים ממוקדים. חמש עשרה דקות ביום של תרגול אנגרמות עם טיימר. לא כדי לשנן תשובות, אלא כדי לאלץ את המוח לעבד צירופי אותיות מהר יותר. כשנתקעתי על קבוצת אותיות, למדתי למה נתקעתי. צירוף לא מוכר? תחילית שפספסתי? יותר מדי תנועות שגרמו לי לפניקה?
 
-השיפור היה מיידי. לא דרמטי — לא הפכתי לנייג'ל ריצ'רדס בין לילה — אבל בתוך שבועיים מצאתי מילים 20-30% מהר יותר. אחרי חודש, עברתי בעקביות ניקודים שנתקעתי בהם שנים.
+השיפור היה מיידי. לא דרמטי (לא הפכתי לנייג'ל ריצ'רדס בין לילה), אבל בתוך שבועיים מצאתי מילים 20-30% מהר יותר. אחרי חודש, עברתי בעקביות ניקודים שנתקעתי בהם שנים.
 
 ההבדל לא היה ידיעת יותר מילים. הוא היה לראות אותן מהר יותר.`,
       },
@@ -210,7 +210,7 @@ That's it. That's the napkin version. Everything else is details.`,
 
 קיבוץ חזותי אומר שהמוח מקבץ אוטומטית אותיות לצירופים מוכרים ובודק מספר אפשרויות בו-זמנית. "מת" מזוהה מיידית כיחידה. "-ות" בסוף קבוצת אותיות קופצת החוצה. אתם לא חושבים במודע "מ ו-ת מופיעות הרבה ביחד" — המערכת החזותית שלכם עושה את זה לפני שאתם מודעים.
 
-הנה החלק המטורף: אי אפשר לקצר את זה. אי אפשר לקרוא על קיבוץ ופתאום להתחיל לעשות את זה. זו מיומנות תפיסתית שמתפתחת דרך חשיפה חוזרת, כמו רדיולוג שלומד לזהות גידולים בצילומי רנטגן. הרדיולוג לא משנן איך נראה כל גידול. הוא מפתח רגישות לחריגות דרך אלפי שעות של הסתכלות.
+והחלק המטורף? אי אפשר לקצר את זה. אי אפשר לקרוא על קיבוץ ופתאום להתחיל לעשות את זה. זו מיומנות תפיסתית שמתפתחת דרך חשיפה חוזרת, כמו רדיולוג שלומד לזהות גידולים בצילומי רנטגן. הרדיולוג לא משנן איך נראה כל גידול. הוא מפתח רגישות לחריגות דרך אלפי שעות של הסתכלות.
 
 אבל — וזו התובנה המפתח מעבודתו של אריקסון — לא כל הסתכלות שווה. חזרה חסרת מחשבה כמעט לא מזיזה את המחט. צריך להיות מעורבים באופן פעיל, לדחוף מעבר לדפוסים נוחים, ולשים לב למה שאתם מפספסים.`,
       },
@@ -228,7 +228,7 @@ That's it. That's the napkin version. Everything else is details.`,
         title: 'טריק הקריאה לאחור (הטכניקה המוזרה האהובה עליי)',
         content: `טוב, הטכניקה הזו נשמעת מגוחכת. אבל היא עובדת, ויש סיבה אמיתית למה.
 
-כשאתם בוהים בקבוצת אותיות, המוח ננעל לקריאה מימין לשמאל (או משמאל לימין באנגלית). זה יוצר מה שפסיכולוגים קוראים "קיבעון תפקודי" — התפיסה נתקעת במסגרת ארגונית אחת.
+כשאתם בוהים בקבוצת אותיות, המוח ננעל לקריאה מימין לשמאל (או משמאל לימין באנגלית). זה יוצר מה שפסיכולוגים קוראים "קיבעון תפקודי", כלומר התפיסה נתקעת במסגרת ארגונית אחת.
 
 נסו את זה: כשאתם מרגישים תקועים, קראו את האותיות הפוך. או סדרו אותן מחדש בראש. או כסו חצי מהן עם היד.
 
@@ -240,9 +240,9 @@ That's it. That's the napkin version. Everything else is details.`,
         title: 'צירופי אותיות נפוצים: ספריית הדפוסים שלכם',
         content: `במקום לשנן מילים, תשננו צירופי אותיות. אלה אבני הבניין שמערכת הקיבוץ החזותי שלכם צריכה.
 
-בעברית, הצירופים החזקים הם: סיומות כמו "-ות", "-ים", "-ית", "-ון". תחיליות כמו "ה-", "מ-", "ל-", "ב-". ושורשים תלת-עיצוריים שמופיעים שוב ושוב — כ-ת-ב, ש-מ-ר, ד-ב-ר.
+בעברית, הצירופים החזקים הם: סיומות כמו "-ות", "-ים", "-ית", "-ון". תחיליות כמו "ה-", "מ-", "ל-", "ב-". ושורשים תלת-עיצוריים שחוזרים: כ-ת-ב, ש-מ-ר, ד-ב-ר.
 
-הנה שגרת התרגול שלי: אני מפריד אותיות לעיצורים ותנועות, מנטלית. ואז מחפש בעיצורים צירופים מוכרים. ואז בודק את הצירופים עם התנועות הזמינות. זה לא תהליך נוקשה — אחרי מספיק תרגול זה נהיה אוטומטי. אבל בהתחלה, לעשות את זה מכוון עשה הבדל עצום.
+שגרת התרגול שלי: אני מפריד אותיות לעיצורים ותנועות, מנטלית. ואז מחפש בעיצורים צירופים מוכרים. ואז בודק את הצירופים עם התנועות הזמינות. זה לא תהליך נוקשה — אחרי מספיק תרגול זה נהיה אוטומטי. אבל בהתחלה, לעשות את זה מכוון עשה הבדל עצום.
 
 המחקר תומך בזה. מחקרים על שחקני סקראבל מומחים מראים שהם מעבדים צירופי אותיות במקביל — מספר מילים פוטנציאליות נבדקות בו-זמנית — בעוד שמתחילים מעבדים אותן בזו אחר זו. בניית ספרייה עשירה של צירופי אותיות היא מה שמאפשר את העיבוד המקבילי.`,
       },
@@ -271,7 +271,7 @@ That's it. That's the napkin version. Everything else is details.`,
 שובר הרמות השני שלי היה לשחק בשפה שנייה. אני לא שולט בשום שפה מלבד עברית, אבל התחלתי לשחק משחקי מילים באנגלית. המאבק עם דפוסי אותיות לא מוכרים הכריח את המוח למצב עיבוד פעיל במקום טייס אוטומטי.`,
       },
       {
-        content: `הנה האמת הכנה על להשתפר במשחקי מילים. אפשר לקרוא את כל המחקרים, ללמוד את כל הטכניקות, ולהבין בדיוק איך המוח מעבד שפה. שום דבר מזה לא משנה אם לא מתרגלים בצורה מכוונת ועקבית.
+        content: `האמת הכנה על להשתפר במשחקי מילים: אפשר לקרוא את כל המחקרים, ללמוד את כל הטכניקות, ולהבין בדיוק איך המוח מעבד שפה. שום דבר מזה לא משנה אם לא מתרגלים בצורה מכוונת ועקבית.
 
 החדשות הטובות? תרגול מכוון במשחקי מילים זה כיף. זה לא כמו לתרגל סולמות על פסנתר או לרוץ ספרינטים. אתם משחקים משחקים. רק משחקים אותם עם כוונה במקום על טייס אוטומטי.
 
@@ -300,14 +300,10 @@ Vet ni vad som hände? Jag blev marginellt bättre på just Scrabble, och absolu
 Sedan läste jag om Nigel Richards, och allt jag trodde att jag visste om ordspel föll samman.`,
       },
       {
-        title: 'Mannen som krossade ordspel (utan att förstå dem)',
-        content: `Om ni inte har hört talas om Nigel Richards, spänn fast er. Den här killen från Nya Zeeland vann franska Scrabble-världsmästerskapet. Två gånger. Han talar inte franska.
+        title: 'Mönster, inte memorering',
+        content: `Nigel Richards vann franska Scrabble-VM utan att tala franska. Han memorerade 386 000 ord som rena bokstavsmönster, utan att veta vad de betydde. Och han hittade giltiga sjubokstavsdrag snabbare än modersmålstalare.
 
-Låt det sjunka in. Han memorerade hela den franska Scrabble-ordboken — ungefär 386 000 ord — utan att veta vad något av dem betydde. Han vann också det spanska Scrabble-mästerskapet. Talar inte spanska heller.
-
-När jag först hörde den här historien trodde jag att den bevisade att memorering var svaret. Jag hade fel. Vad det faktiskt bevisar är något långt mer intressant: Richards memorerar inte bara ord — han känner igen bokstavsmönster på en övermänsklig nivå. Franska Scrabble-spelare som intervjuade honom sa att han kunde hitta giltiga sjubokstavsdrag snabbare än modersmålstalare. Han hämtade inte definitioner. Han såg strukturella mönster i bokstavsarrangemang som de flesta helt enkelt inte kan uppfatta.
-
-Den distinktionen — mönsterigenkänning kontra ren minnesåterkallning — förändrade hur jag tränar. Totalt.`,
+Poängen är inte att Richards är ett geni (det är han). Poängen är att hans försprång handlar om mönsterigenkänning, inte ordkunskap. Den distinktionen förändrade hur jag tränar. Totalt.`,
       },
       {
         title: 'Vad din hjärna faktiskt gör när du söker ord',
@@ -315,9 +311,9 @@ Den distinktionen — mönsterigenkänning kontra ren minnesåterkallning — f�
 
 Forskare som studerade tävlings-Scrabble-spelare med fMRI-maskiner fann något kontraintuitivt. Expertspelare aktiverar inte främst språkbearbetningsregioner när de skannar sina brickor. De aktiverar visuella bearbetningsområden. Deras hjärnor behandlar bokstavsarrangemang mer som rumsliga pussel än lingvistiska problem.
 
-Tänk på det. De bästa ordfinnarna i världen "tänker inte på ord" — de ser dem. På samma sätt som du eller jag kan hitta ett ansikte i en folkmassa, hittar de SKRATT gömt inuti STRYKA.
+Tänk på det. De bästa ordfinnarna i världen "tänker inte på ord", de ser dem. På samma sätt som du eller jag kan hitta ett ansikte i en folkmassa, hittar de SKRATT gömt inuti STRYKA.
 
-Carnegie Mellon University skapade faktiskt en kurs som lär ut kognitionsvetenskap genom Scrabble. Professor Michael Ramscar använder spelet för att demonstrera hur mänsklig mönsterigenkänning fungerar — och hur fundamentalt annorlunda det är jämfört med hur datorer hittar ord. En dator kontrollerar varje permutation. En mänsklig hjärna klumpar ihop bokstäver i bekanta grupper och kontrollerar dessa klumpar mot kända mönster.
+Carnegie Mellon University skapade faktiskt en kurs som lär ut kognitionsvetenskap genom Scrabble. Professor Michael Ramscar använder spelet för att demonstrera hur mänsklig mönsterigenkänning fungerar, och hur fundamentalt annorlunda det är jämfört med hur datorer hittar ord. En dator kontrollerar varje permutation. En mänsklig hjärna klumpar ihop bokstäver i bekanta grupper och kontrollerar dessa klumpar mot kända mönster.
 
 Det är därför memorering av ordlistor känns produktivt men mest inte är det. Du lägger till poster i en databas. Vad du faktiskt behöver är bättre mönstermatchande firmware.`,
       },
@@ -325,25 +321,25 @@ Det är därför memorering av ordlistor känns produktivt men mest inte är det
         title: 'Medveten övning: Delen alla gör fel',
         content: `Du har förmodligen hört om "10 000 timmars"-regeln. Malcolm Gladwell gjorde den berömd, K. Anders Ericsson forskade faktiskt på den, och internet förvred den bortom igenkänning.
 
-Här är vad Ericsson faktiskt fann: det handlar inte om timmar. Det handlar om medveten övning — att arbeta på specifika svagheter med omedelbar feedback, vid gränsen av din förmåga. En schackspelare som spelar 10 000 timmar casual blitz-spel förbättras långt mindre än någon som lägger 2 000 timmar på att studera specifika positioner och analysera sina misstag.
+Här är vad Ericsson faktiskt fann: det handlar inte om timmar. Det handlar om medveten övning: att arbeta på specifika svagheter med omedelbar feedback, vid gränsen av din förmåga. En schackspelare som spelar 10 000 timmar casual blitz-spel förbättras långt mindre än någon som lägger 2 000 timmar på att studera specifika positioner och analysera sina misstag.
 
 Samma sak med ordspel. Jag spelade avslappnat i åratal. Blev lite bättre. Nådde en platå. Blev frustrerad. Spelade mer. Stannade på platån.
 
 Sedan ändrade jag min approach. Istället för att bara spela spel började jag göra riktade övningar. Femton minuter om dagen med anagramträning och en timer. Inte för att memorera svar, utan för att tvinga hjärnan att bearbeta bokstavskombinationer snabbare.
 
-Förbättringen var omedelbar. Inte dramatisk — jag förvandlades inte till Nigel Richards över en natt — men inom två veckor hittade jag ord 20-30% snabbare. Efter en månad slog jag konsekvent poäng jag hade fastnat på i åratal.
+Förbättringen var omedelbar. Inte dramatisk, men inom två veckor hittade jag ord 20-30% snabbare. Efter en månad slog jag konsekvent poäng jag hade fastnat på i åratal.
 
 Skillnaden var inte att kunna fler ord. Det var att se dem snabbare.`,
       },
       {
         title: 'Visuell gruppering: Den verkliga färdigheten',
-        content: `Forskare som studerar anagramlösning har identifierat två distinkta strategier. Sekventiell skanning innebär att kontrollera bokstavskombinationer en i taget — A med B, sedan A med C. Långsamt. Utmattande. Det är vad nybörjare gör.
+        content: `Forskare som studerar anagramlösning har identifierat två distinkta strategier. Sekventiell skanning innebär att kontrollera bokstavskombinationer en i taget: A med B, sedan A med C. Långsamt. Utmattande. Det är vad nybörjare gör.
 
-Visuell gruppering innebär att din hjärna automatiskt grupperar bokstäver i igenkända kluster och kontrollerar flera kombinationer samtidigt. SK identifieras omedelbart som en enhet. -ING i slutet av en bokstavsgrupp hoppar ut. Du tänker inte medvetet "S och K dyker ofta upp tillsammans" — ditt visuella system gör det innan du ens är medveten.
+Visuell gruppering innebär att din hjärna automatiskt grupperar bokstäver i igenkända kluster och kontrollerar flera kombinationer samtidigt. SK identifieras omedelbart som en enhet. -ING i slutet av en bokstavsgrupp hoppar ut. Du tänker inte medvetet "S och K dyker ofta upp tillsammans"; ditt visuella system gör det innan du ens är medveten.
 
 Här är den vilda delen: det här går inte att ta en genväg till. Du kan inte läsa om gruppering och plötsligt börja göra det. Det är en perceptuell färdighet som utvecklas genom upprepad exponering, som en radiolog som lär sig att upptäcka tumörer i röntgenbilder.
 
-Men — och det här är nyckelinsikten från Ericssons arbete — all observation är inte lika. Tanklös upprepning flyttar knappt nålen. Du måste vara aktivt engagerad, pressa förbi bekväma mönster och uppmärksamma vad du missar.`,
+Men all observation är inte lika. Tanklös upprepning flyttar knappt nålen. Du måste vara aktivt engagerad, pressa förbi bekväma mönster och uppmärksamma vad du missar.`,
       },
       {
         title: 'Korta-ord-strategin (och varför den faktiskt fungerar)',
@@ -359,7 +355,7 @@ Det finns också en praktisk vinkel. Trebokstavsord delar ofta bokstäver med l�
         title: 'Bakåtläsningstricket (min favorit-konstig-teknik)',
         content: `Okej, den här låter löjlig. Men den fungerar, och det finns en riktig anledning.
 
-När du stirrar på en uppsättning bokstäver låser din hjärna sig till att läsa dem vänster-till-höger. Det skapar vad psykologer kallar "funktionell fixering" — din uppfattning fastnar i ett organisatoriskt ramverk.
+När du stirrar på en uppsättning bokstäver låser din hjärna sig till att läsa dem vänster-till-höger. Det skapar vad psykologer kallar "funktionell fixering", din uppfattning fastnar i ett organisatoriskt ramverk.
 
 Prova det här: när du känner dig fast, läs bokstäverna baklänges. Eller arrangera om dem i huvudet. Eller täck hälften med handen och titta på de kvarvarande.
 
@@ -373,17 +369,17 @@ Jag använder det här konstant. När jag slår i en vägg i något ordspel änd
 
 På svenska är tungviktarna: SK, ST, NG, SJ för konsonantpar. -ANDE, -TION, -NING, -HET, -SKAP för suffix. FÖR-, OM-, AV-, UT-, AN- för prefix. Och vokalkluster: ÖR, ÅR, AU, ÄR.
 
-Här är min faktiska övningsrutin: jag separerar bokstäver i konsonanter och vokaler, mentalt. Sedan letar jag efter bekanta par bland konsonanterna. Sedan testar jag de paren med tillgängliga vokaler. Det är inte en rigid process — efter tillräcklig övning blir den automatisk. Men i början gjorde det medvetna tillvägagångssättet enorm skillnad.
+Här är min faktiska övningsrutin: jag separerar bokstäver i konsonanter och vokaler, mentalt. Sedan letar jag efter bekanta par bland konsonanterna. Sedan testar jag de paren med tillgängliga vokaler. Det är inte en rigid process; efter tillräcklig övning blir den automatisk. Men i början gjorde det medvetna tillvägagångssättet enorm skillnad.
 
-Forskningen stöder detta. Studier på expert-Scrabble-spelare visar att de bearbetar bokstavskombinationer parallellt — flera potentiella ord utvärderas samtidigt — medan nybörjare bearbetar dem seriellt. Att bygga ett robust bibliotek av bokstavskluster är vad som möjliggör den parallella bearbetningen.`,
+Forskningen stöder detta. Studier på expert-Scrabble-spelare visar att de bearbetar bokstavskombinationer parallellt (flera potentiella ord utvärderas samtidigt) medan nybörjare bearbetar dem seriellt. Att bygga ett robust bibliotek av bokstavskluster är vad som möjliggör den parallella bearbetningen.`,
       },
       {
         title: 'När man ska spela (ja, det spelar faktiskt roll)',
         content: `Jag spårade mina ordspelspoäng i sex månader tillsammans med tidpunkten på dagen jag spelade. Resultaten var pinsamt tydliga.
 
-Morgonpoäng (inom två timmar efter uppvakning): konsekvent 15-25% högre än kvällspoäng. Det stämmer med kronobiologisk forskning som visar att de flesta har sin kognitiva topp på förmiddagen. Arbetsminne, uppmärksamhet och mönsterigenkänning — allt mätbart skarpare.
+Morgonpoäng (inom två timmar efter uppvakning): konsekvent 15-25% högre än kvällspoäng. Det stämmer med kronobiologisk forskning som visar att de flesta har sin kognitiva topp på förmiddagen. Arbetsminne, uppmärksamhet och mönsterigenkänning, allt mätbart skarpare.
 
-Men här är förbehållet: "de flesta" är inte "alla." Nattugglor visar det omvända mönstret. Nyckeln är inte morgonen specifikt — det är att spela under DITT kognitiva toppfönster.
+Men här är förbehållet: "de flesta" är inte "alla." Nattugglor visar det omvända mönstret. Nyckeln är inte morgonen specifikt, det är att spela under DITT kognitiva toppfönster.
 
 Jag fann också att mina sämsta poäng korrelerade med dagar jag var sömnberövad eller stressad. Inte direkt chockerande, men storleken överraskade mig. Efter en dålig natts sömn sjönk mina poäng 30-40%.
 
@@ -391,7 +387,7 @@ Det praktiska: om du spelar en tävlingsinriktad daglig utmaning, spela den när
       },
       {
         title: 'Platåproblemet (och hur jag äntligen bröt igenom)',
-        content: `Runt månad åtta av mitt medvetna övningsexperiment slog jag i en vägg. Mina poäng slutade förbättras. Jag gjorde allt "rätt" — riktad övning, mönsterövningar, spelade vid topptider — men ingenting rörde sig.
+        content: `Runt månad åtta av mitt medvetna övningsexperiment slog jag i en vägg. Mina poäng slutade förbättras. Jag gjorde allt "rätt", riktad övning, mönsterövningar, spelade vid topptider, men ingenting rörde sig.
 
 Jag höll nästan på att ge upp. Allvarligt.
 
@@ -399,7 +395,7 @@ Sedan läste jag något Ericsson skrev om färdighetsplatåer: de är inte tecke
 
 Så jag gjorde något obekvämt. Jag bytte från mitt vanliga 4x4-rutnät till 5x5. Det större brädet var överväldigande först. Mina poäng störtdök. Men inom tre veckor skiftade något. När jag gick tillbaka till 4x4 kändes det nästan lätt.
 
-Det här är principen bakom "överinlärning" — att träna på en svårare nivå än vad du möter i prestation. Idrottare gör det. Musiker gör det. Och det fungerar absolut för ordspel.
+Det här är principen bakom "överinlärning", att träna på en svårare nivå än vad du möter i prestation. Idrottare gör det. Musiker gör det. Och det fungerar absolut för ordspel.
 
 Min andra platåbrytare var att spela på ett andra språk. Jag började spela casual ordspel på engelska. Kampen med obekanta bokstavsmönster tvingade min hjärna till aktivt bearbetningsläge istället för att förlita sig på autopilot.`,
       },
@@ -408,7 +404,7 @@ Min andra platåbrytare var att spela på ett andra språk. Jag började spela c
 
 De goda nyheterna? Medveten övning i ordspel är kul. Det är inte som att öva skalor på piano eller springa intervaller. Du spelar spel. Du spelar dem bara med intention istället för på autopilot.
 
-Börja med de korta orden. Uppmärksamma bokstavskluster. Bryt din visuella fixering när du kör fast. Spela när du är skärpt. Och när du når en platå — gör det svårare istället för att ge upp.
+Börja med de korta orden. Uppmärksamma bokstavskluster. Bryt din visuella fixering när du kör fast. Spela när du är skärpt. Och när du når en platå, gör det svårare istället för att ge upp.
 
 Det är det. Det är servettversionen. Allt annat är detaljer.`,
       },
@@ -563,17 +559,13 @@ fMRIを使って競技スクラブルプレイヤーを研究した科学者た�
 
 ¿Saben qué pasó? Mejoré marginalmente en un juego específico, y absolutamente nada en ningún otro juego de palabras. Mi velocidad resolviendo anagramas no se movió. Había metido un montón de datos en mi cabeza sin mejorar la habilidad que realmente me importaba: ver palabras en el caos.
 
-Entonces leí sobre Nigel Richards, y todo lo que creía saber sobre juegos de palabras se derrumbó.`,
+Entonces descubrí a Nigel Richards, el neozelandés que ganó campeonatos mundiales de Scrabble en francés y español sin hablar ninguno de los dos, y todo se derrumbó.`,
       },
       {
-        title: 'El hombre que rompió los juegos de palabras (sin entenderlos)',
-        content: `Si no han oído hablar de Nigel Richards, abróchense el cinturón. Este tipo de Nueva Zelanda ganó el Campeonato Mundial de Scrabble en francés. Dos veces. No habla francés.
+        title: 'Reconocimiento de patrones, no memorización',
+        content: `Lo fascinante de Richards no es que memorizara 386.000 palabras en francés. Es que reconoce patrones de letras a un nivel sobrehumano. Jugadores franceses dijeron que detectaba jugadas de siete letras más rápido que hablantes nativos. No recordaba significados. Veía estructuras en arreglos de letras que la mayoría simplemente no perciben.
 
-Déjenlo asimilar. Memorizó todo el diccionario de Scrabble en francés — aproximadamente 386.000 palabras — sin saber qué significaba ninguna. También ganó el campeonato de Scrabble en español. Tampoco habla español. Sus ganancias acumuladas en torneos lo convierten posiblemente en el mejor jugador de juegos de mesa vivo.
-
-Cuando escuché esta historia por primera vez, pensé que demostraba que la memorización era la respuesta. Estaba equivocado. Lo que realmente demuestra es algo mucho más interesante: Richards no solo memoriza palabras — reconoce patrones de letras a un nivel sobrehumano. Jugadores franceses de Scrabble que lo entrevistaron dijeron que podía detectar jugadas válidas de siete letras más rápido que hablantes nativos. No estaba recordando definiciones. Estaba viendo patrones estructurales en arreglos de letras que la mayoría de las personas simplemente no pueden percibir.
-
-Esa distinción — reconocimiento de patrones versus recuperación bruta — cambió cómo practico. Completamente.`,
+Esa distinción, reconocimiento de patrones versus recuperación bruta, cambió cómo practico. Completamente.`,
       },
       {
         title: 'Qué hace realmente tu cerebro cuando buscas palabras',
@@ -581,9 +573,9 @@ Esa distinción — reconocimiento de patrones versus recuperación bruta — ca
 
 Investigadores que estudiaron jugadores competitivos de Scrabble con máquinas de fMRI encontraron algo contraintuitivo. Los jugadores expertos no activan principalmente regiones de procesamiento del lenguaje cuando escanean sus fichas. Activan áreas de procesamiento visual. Sus cerebros tratan los arreglos de letras más como rompecabezas espaciales que como problemas lingüísticos.
 
-Piensen en eso. Los mejores encontradores de palabras del mundo no están "pensando en palabras" — las están viendo. De la misma forma en que tú o yo podríamos detectar una cara en una multitud, ellos detectan SIRENA escondida dentro de INSERTAR.
+Piensen en eso. Los mejores encontradores de palabras del mundo no están "pensando en palabras", las están viendo. De la misma forma en que tú o yo podríamos detectar una cara en una multitud, ellos detectan SIRENA escondida dentro de INSERTAR.
 
-La Universidad Carnegie Mellon creó un curso que enseña ciencia cognitiva a través del Scrabble. El profesor Michael Ramscar usa el juego para demostrar cómo funciona el reconocimiento de patrones humano — y lo fundamentalmente diferente que es de cómo las computadoras encuentran palabras. Una computadora verifica cada permutación. Un cerebro humano agrupa letras en conjuntos familiares y verifica esos conjuntos contra patrones conocidos. Es enormemente más eficiente, pero solo funciona si has construido esos conjuntos a través de la experiencia.
+La Universidad Carnegie Mellon creó un curso que enseña ciencia cognitiva a través del Scrabble. El profesor Michael Ramscar usa el juego para demostrar cómo funciona el reconocimiento de patrones humano, y lo fundamentalmente diferente que es de cómo las computadoras encuentran palabras. Una computadora verifica cada permutación. Un cerebro humano agrupa letras en conjuntos familiares y verifica esos conjuntos contra patrones conocidos. Es enormemente más eficiente, pero solo funciona si has construido esos conjuntos a través de la experiencia.
 
 Por eso memorizar listas de palabras se siente productivo pero generalmente no lo es. Estás añadiendo entradas a una base de datos. Lo que realmente necesitas es mejor firmware de coincidencia de patrones.`,
       },
@@ -591,25 +583,25 @@ Por eso memorizar listas de palabras se siente productivo pero generalmente no l
         title: 'Práctica deliberada: La parte que todos entienden mal',
         content: `Probablemente han oído sobre la regla de las "10.000 horas." Malcolm Gladwell la hizo famosa, K. Anders Ericsson la investigó de verdad, e internet la distorsionó más allá de todo reconocimiento.
 
-Esto es lo que Ericsson realmente encontró: no se trata de horas. Se trata de práctica deliberada — trabajar en debilidades específicas con retroalimentación inmediata, al borde de tu capacidad. Un ajedrecista que juega 10.000 horas de partidas casuales rápidas mejorará mucho menos que alguien que dedica 2.000 horas a estudiar posiciones específicas y analizar sus errores.
+Esto es lo que Ericsson realmente encontró: no se trata de horas. Se trata de práctica deliberada: trabajar en debilidades específicas con retroalimentación inmediata, al borde de tu capacidad. Un ajedrecista que juega 10.000 horas de partidas casuales rápidas mejorará mucho menos que alguien que dedica 2.000 horas a estudiar posiciones específicas y analizar sus errores.
 
 Lo mismo con los juegos de palabras. Jugué casualmente durante años. Mejoré un poco. Me estanqué. Me frustré. Jugué más. Seguí estancado.
 
 Entonces cambié mi enfoque. En lugar de solo jugar partidas, empecé a hacer ejercicios dirigidos. Quince minutos al día de práctica de anagramas con cronómetro. No para memorizar respuestas, sino para forzar a mi cerebro a procesar combinaciones de letras más rápido. Cuando me atascaba con un conjunto de letras, estudiaba por qué me atasqué. ¿Un grupo de letras desconocido? ¿Un prefijo que seguía pasando por alto? ¿Demasiadas vocales que me causaban pánico?
 
-La mejora fue inmediata. No dramática — no me convertí en Nigel Richards de la noche a la mañana — pero en dos semanas encontraba palabras 20-30% más rápido. Después de un mes, superaba constantemente puntuaciones en las que había estado estancado durante años.
+La mejora fue inmediata. No dramática (no me convertí en un genio de la noche a la mañana), pero en dos semanas encontraba palabras 20-30% más rápido. Después de un mes, superaba constantemente puntuaciones en las que había estado estancado durante años.
 
 La diferencia no era saber más palabras. Era verlas más rápido.`,
       },
       {
         title: 'Agrupamiento visual: La habilidad real',
-        content: `Investigadores que estudian la resolución de anagramas han identificado dos estrategias distintas. El escaneo secuencial significa verificar combinaciones de letras una a la vez — A con B, luego A con C. Lento. Agotador. Esto es lo que hacen los principiantes.
+        content: `Investigadores que estudian la resolución de anagramas han identificado dos estrategias distintas. El escaneo secuencial significa verificar combinaciones de letras una a la vez: A con B, luego A con C. Lento. Agotador. Esto es lo que hacen los principiantes.
 
-El agrupamiento visual significa que tu cerebro automáticamente agrupa letras en conjuntos reconocidos y verifica múltiples combinaciones simultáneamente. TR se reconoce instantáneamente como una unidad. -CIÓN al final de un grupo de letras salta a la vista. No piensas conscientemente "T y R a menudo aparecen juntas" — tu sistema visual lo hace antes de que seas consciente.
+El agrupamiento visual significa que tu cerebro automáticamente agrupa letras en conjuntos reconocidos y verifica múltiples combinaciones simultáneamente. TR se reconoce instantáneamente como una unidad. -CIÓN al final de un grupo de letras salta a la vista. No piensas conscientemente "T y R a menudo aparecen juntas", tu sistema visual lo hace antes de que seas consciente.
 
-Aquí está la parte increíble: esto no se puede atajar. No puedes leer sobre agrupamiento y de repente empezar a hacerlo. Es una habilidad perceptual que se desarrolla a través de la exposición repetida, como un radiólogo que aprende a detectar tumores en radiografías. El radiólogo no memoriza cómo se ve cada tumor. Desarrolla una sensibilidad a las anomalías a través de miles de horas de observación.
+Lo increíble es que esto no se puede atajar. No puedes leer sobre agrupamiento y de repente empezar a hacerlo. Es una habilidad perceptual que se desarrolla a través de la exposición repetida, como un radiólogo que aprende a detectar tumores en radiografías. El radiólogo no memoriza cómo se ve cada tumor. Desarrolla una sensibilidad a las anomalías a través de miles de horas de observación.
 
-Pero — y esta es la clave del trabajo de Ericsson — no toda observación es igual. La repetición mecánica apenas mueve la aguja. Necesitas estar activamente involucrado, empujando más allá de patrones cómodos, y prestando atención a lo que te pierdes.`,
+Pero (y esta es la clave del trabajo de Ericsson) no toda observación es igual. La repetición mecánica apenas mueve la aguja. Necesitas estar activamente involucrado, empujando más allá de patrones cómodos, y prestando atención a lo que te pierdes.`,
       },
       {
         title: 'La estrategia de palabras cortas (y por qué realmente funciona)',
@@ -627,7 +619,7 @@ Los jugadores competitivos con los que he hablado hacen esto intuitivamente. Ya 
         title: 'El truco de lectura inversa (mi técnica rara favorita)',
         content: `Vale, esta suena ridícula. Pero funciona, y hay una razón real.
 
-Cuando miras fijamente un conjunto de letras, tu cerebro se bloquea en leerlas de izquierda a derecha. Esto crea lo que los psicólogos llaman "fijación funcional" — tu percepción se atasca en un marco organizativo.
+Cuando miras fijamente un conjunto de letras, tu cerebro se bloquea en leerlas de izquierda a derecha. Esto crea lo que los psicólogos llaman "fijación funcional": tu percepción se atasca en un marco organizativo.
 
 Prueba esto: cuando te sientas atascado, lee las letras al revés. O reorganízalas en tu cabeza. O cubre la mitad con tu mano y mira las restantes.
 
@@ -641,17 +633,17 @@ Uso esto constantemente. Cuando me topo con un muro en cualquier juego de palabr
 
 En español, los pesos pesados son: -CIÓN, -MENTE, -ANDO, -IENDO, -IDAD para sufijos. DES-, RE-, PRE-, IN-, CON- para prefijos. Y las combinaciones consonánticas: TR, PR, BL, GR, CR.
 
-Mi rutina de práctica real: separo las letras en consonantes y vocales mentalmente. Luego busco pares familiares entre las consonantes. Después pruebo esos pares con las vocales disponibles. No es un proceso rígido — después de suficiente práctica se vuelve automático. Pero al principio, hacerlo deliberadamente marcó una diferencia enorme.
+Mi rutina de práctica real: separo las letras en consonantes y vocales mentalmente. Luego busco pares familiares entre las consonantes. Después pruebo esos pares con las vocales disponibles. No es un proceso rígido; después de suficiente práctica se vuelve automático. Pero al principio, hacerlo deliberadamente marcó una diferencia enorme.
 
-La investigación respalda esto. Estudios sobre jugadores expertos de Scrabble muestran que procesan combinaciones de letras en paralelo — múltiples palabras potenciales siendo evaluadas simultáneamente — mientras que los novatos las procesan en serie. Construir una biblioteca robusta de grupos de letras es lo que permite ese procesamiento paralelo.`,
+La investigación respalda esto. Estudios sobre jugadores expertos de Scrabble muestran que procesan combinaciones de letras en paralelo, múltiples palabras potenciales siendo evaluadas simultáneamente, mientras que los novatos las procesan en serie. Construir una biblioteca robusta de grupos de letras es lo que permite ese procesamiento paralelo.`,
       },
       {
         title: 'Cuándo jugar (sí, esto realmente importa)',
         content: `Rastreé mis puntuaciones en juegos de palabras durante seis meses junto con la hora del día en que jugaba. Los resultados fueron vergonzosamente claros.
 
-Puntuaciones matutinas (dentro de dos horas después de despertar): consistentemente 15-25% más altas que las puntuaciones nocturnas. Esto coincide con la investigación en cronobiología que muestra que el rendimiento cognitivo de la mayoría de las personas alcanza su pico en la media mañana. Memoria de trabajo, atención y reconocimiento de patrones — todo mediblemente más agudo.
+Puntuaciones matutinas (dentro de dos horas después de despertar): consistentemente 15-25% más altas que las puntuaciones nocturnas. Esto coincide con la investigación en cronobiología que muestra que el rendimiento cognitivo de la mayoría de las personas alcanza su pico en la media mañana. Memoria de trabajo, atención y reconocimiento de patrones, todo mediblemente más agudo.
 
-Pero aquí está la salvedad: "la mayoría de las personas" no es "todas las personas." Los noctámbulos muestran el patrón inverso. La clave no es la mañana específicamente — es jugar durante TU ventana cognitiva pico.
+Pero aquí está la salvedad: "la mayoría de las personas" no es "todas las personas." Los noctámbulos muestran el patrón inverso. La clave no es la mañana específicamente, es jugar durante TU ventana cognitiva pico.
 
 También encontré que mis peores puntuaciones se correlacionaban con días que había dormido mal o estaba estresado. No exactamente sorprendente, pero la magnitud me sorprendió. Después de una mala noche de sueño, mis puntuaciones caían 30-40%. El reconocimiento de patrones es una de las primeras capacidades cognitivas en sufrir por la fatiga.
 
@@ -659,7 +651,7 @@ La conclusión práctica: si juegas un desafío diario competitivo, juégalo cua
       },
       {
         title: 'El problema del estancamiento (y cómo finalmente lo superé)',
-        content: `Alrededor del mes ocho de mi experimento de práctica deliberada, me topé con un muro. Mis puntuaciones dejaron de mejorar. Estaba haciendo todo "bien" — práctica dirigida, ejercicios de patrones, jugando en horas pico — pero nada se movía.
+        content: `Alrededor del mes ocho de mi experimento de práctica deliberada, me topé con un muro. Mis puntuaciones dejaron de mejorar. Estaba haciendo todo "bien" (práctica dirigida, ejercicios de patrones, jugando en horas pico) pero nada se movía.
 
 Casi lo dejo. En serio.
 
@@ -667,16 +659,16 @@ Entonces leí algo que escribió Ericsson sobre los estancamientos en habilidade
 
 Así que hice algo incómodo. Cambié de mi cuadrícula habitual de 4x4 a 5x5. El tablero más grande fue abrumador al principio. Mis puntuaciones se desplomaron. Pero en tres semanas, algo cambió. Cuando volví a 4x4, se sentía casi fácil. Las letras no eran diferentes, pero mi capacidad para escanear campos visuales más grandes había mejorado.
 
-Este es el principio detrás del "sobreaprendizaje" — entrenar a un nivel más difícil del que enfrentarás en la competencia. Los atletas lo hacen. Los músicos lo hacen. Y absolutamente funciona para los juegos de palabras.
+Este es el principio detrás del "sobreaprendizaje": entrenar a un nivel más difícil del que enfrentarás en la competencia. Los atletas lo hacen. Los músicos lo hacen. Y absolutamente funciona para los juegos de palabras.
 
 Mi otro rompedor de estancamiento fue jugar en un segundo idioma. Empecé a jugar juegos de palabras casuales en inglés. La lucha con patrones de letras desconocidos forzó a mi cerebro al modo de procesamiento activo en lugar de depender del piloto automático.`,
       },
       {
-        content: `Aquí está la verdad honesta sobre mejorar en los juegos de palabras. Puedes leer toda la investigación, aprender todas las técnicas y entender exactamente cómo tu cerebro procesa el lenguaje. Nada de eso importa si no practicas deliberada y consistentemente.
+        content: `La verdad honesta sobre mejorar en los juegos de palabras. Puedes leer toda la investigación, aprender todas las técnicas y entender exactamente cómo tu cerebro procesa el lenguaje. Nada de eso importa si no practicas deliberada y consistentemente.
 
 ¿Las buenas noticias? La práctica deliberada en juegos de palabras es divertida. No es como practicar escalas en el piano o correr sprints. Estás jugando juegos. Solo los estás jugando con intención en lugar de en piloto automático.
 
-Empieza con las palabras cortas. Presta atención a los grupos de letras. Rompe tu fijación visual cuando estés atascado. Juega cuando estés alerta. Y cuando llegues a un estancamiento — haz las cosas más difíciles en lugar de rendirte.
+Empieza con las palabras cortas. Presta atención a los grupos de letras. Rompe tu fijación visual cuando estés atascado. Juega cuando estés alerta. Y cuando llegues a un estancamiento, haz las cosas más difíciles en lugar de rendirte.
 
 Eso es todo. Esa es la versión de la servilleta. Todo lo demás son detalles.`,
       },

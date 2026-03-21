@@ -210,7 +210,7 @@ Now if you'll excuse me, it's 2:23am and I need to play just one more round.`,
 
 זה היה ארבעה סיבובים אחורה.
 
-אם זה נשמע לכם מוכר, מזל טוב — אתם לא שבורים. אתם חווים אחת מלולאות הפסיכולוגיה המתוחכמות ביותר שקיימות בעולם המשחקים. משחקי מילים נוגעים במשהו עמוק באופן שהמוח שלנו מחווט, והתוצאה היא סוג של כפייתיות שמרגישה שונה מגלילה אינסופית באינסטגרם או בינג' של נטפליקס.
+אם זה נשמע לכם מוכר, מזל טוב — אתם לא שבורים. אתם חווים אחת מלולאות הפסיכולוגיה המתוחכמות ביותר שקיימות בעולם המשחקים. משחקי מילים נוגעים במשהו עמוק בחיווט של המוח, והתוצאה היא סוג של כפייתיות שמרגישה שונה מגלילה באינסטגרם או בינג' של נטפליקס.
 
 זה מרגיש... פרודוקטיבי? בריא? כאילו אתם עושים משהו טוב לעצמכם גם כשהשעון מעורר מתקרב?
 
@@ -218,11 +218,11 @@ Now if you'll excuse me, it's 2:23am and I need to play just one more round.`,
       },
       {
         title: 'מכת הדופמין: המוח שלכם על תגמולים משתנים',
-        content: `בואו נתחיל עם הגדול: דופמין.
+        content: `נתחיל עם הגדול: דופמין.
 
 בטח שמעתם על דופמין כ"כימיקל של ההנאה", אבל זה לא בדיוק מדויק. דופמין הוא יותר "כימיקל הציפייה". הוא קופץ לא כשמקבלים את הפרס, אלא כשמצפים שפרס אולי בדרך.
 
-בגלל זה מכונות מזל כל כך ממכרות. זה לא הזכייה — רוב האנשים מפסידים. זו הציפייה לאפשרות של זכייה. פסיכולוגים קוראים לזה "לוח זמנים של חיזוק ביחס משתנה", וזה דפוס ההתניה החזק ביותר שידוע למדע ההתנהגות.
+בגלל זה מכונות מזל כל כך ממכרות. זה לא הזכייה (רוב האנשים מפסידים). זו הציפייה לאפשרות של זכייה. פסיכולוגים קוראים לזה "לוח זמנים של חיזוק ביחס משתנה", וזה דפוס ההתניה החזק ביותר שידוע למדע ההתנהגות.
 
 עכשיו חשבו מה קורה כשאתם סורקים רשת אותיות במשחק מילים.
 
@@ -238,17 +238,17 @@ Now if you'll excuse me, it's 2:23am and I need to play just one more round.`,
       },
       {
         title: 'מצב זרימה: כשהזמן נעלם',
-        content: `אי פעם הרמתם את העיניים ממשחק מילים וגיליתם ששעה עברה? זה לא מטאפורה. הזמן ממש מרגיש אחרת כשאתם בזרימה.
+        content: `אי פעם הרמתם את העיניים ממשחק מילים וגיליתם ששעה עברה? לא מטאפורה. הזמן ממש מרגיש אחרת כשאתם בזרימה.
 
 מיהאי צ'יקסנטמיהאי זיהה את מצב הזרימה בשנות ה-70 כמצב של ספיגה מוחלטת בפעילות. אתם מאבדים תחושת זמן, תחושת העצמי נמוגה, וכל השאר פשוט... נעלם.
 
-זרימה דורשת איזון מאוד ספציפי: האתגר חייב להיות בדיוק מספיק קשה. קל מדי ואתם משתעממים. קשה מדי ואתם מתוסכלים. הנקודה המתוקה היא איפה שרמת המיומנות שלכם בקושי פוגשת את הקושי.
+זרימה דורשת איזון מאוד ספציפי: האתגר חייב להיות בדיוק מספיק קשה. קל מדי ואתם משתעממים. קשה מדי ואתם מתוסכלים. הנקודה המתוקה: רמת המיומנות שלכם בקושי פוגשת את הקושי.
 
-משחקי מילים הם מכונות זרימה מושלמות בטעות.
+משחקי מילים הם מכונות זרימה מושלמות. בטעות.
 
 חשבו על זה. רשת 4x4 מכילה מאות מילים אפשריות, מקלות באופן טריוויאלי (אם, גם, לא) ועד לקשות להחריד (המילה בת שמונה אותיות שמסתתרת בדפוס ספיראלי). בכל רגע, אתם פועלים בדיוק בקצה היכולת שלכם. המילים הקלות שומרות על תחושת מסוגלות. המילים הקשות שומרות על האתגר. והטיימר מוסיף בדיוק מספיק לחץ כדי למנוע מהמחשבות לשוטט.
 
-לכן סיבוב של חמש דקות יכול להרגיש כמו שלושים שניות. הקורטקס הפרה-פרונטלי — החלק שאחראי על תפיסת זמן — מגויס למשימת מציאת המילים במקום. פשוט אין מספיק משאבים עצביים שנותרו כדי לעקוב אחרי הזמן.
+לכן סיבוב של חמש דקות יכול להרגיש כמו שלושים שניות. הקורטקס הפרה-פרונטלי, החלק שאחראי על תפיסת זמן, מגויס למשימת מציאת המילים במקום. פשוט אין מספיק משאבים עצביים שנותרו כדי לעקוב אחרי הזמן.
 
 מצב הזרימה הוא גם הסיבה ש"עוד סיבוב אחד" כל כך מסוכן. כל סיבוב קצר מספיק כדי שמצב הזרימה לא יתפוגג לגמרי בין סיבובים. אתם עדיין רוכבים על הגל כשהרשת הבאה מופיעה, והמוח שלכם אומר "נו, כבר פה אנחנו..."`,
       },
@@ -258,7 +258,7 @@ Now if you'll excuse me, it's 2:23am and I need to play just one more round.`,
 
 זה אפקט זייגרניק, ומשחקי מילים מנצלים אותו בלי רחמים.
 
-כשהסיבוב נגמר והמשחק מראה לכם את כל המילים שפספסתם, משהו קורה במוח. המילים שפספסתם — אלה שהיו ממש שם ולא ראיתם אותן — יוצרות לולאות פתוחות. המוח שלכם מסמן אותן כעסק לא גמור.
+כשהסיבוב נגמר והמשחק מראה לכם את כל המילים שפספסתם, משהו קורה במוח. המילים שפספסתם, אלה שהיו ממש שם ולא ראיתם אותן, יוצרות לולאות פתוחות. המוח שלכם מסמן אותן כעסק לא גמור.
 
 "קטסטרופה הייתה על הלוח?! ראיתי את ה-ק-ט-ס! למה לא ראיתי את זה?!"
 
@@ -298,11 +298,11 @@ Now if you'll excuse me, it's 2:23am and I need to play just one more round.`,
       },
       {
         title: 'בריא מול לא בריא: מתי "ממכר" הופך לבעיה',
-        content: `בואו נעצור לרגע ונדבר על הצד הלא נוח של כל זה.
+        content: `רגע, בואו נדבר על הצד הלא נוח של כל זה.
 
-כל מה שתיארתי — תגמולים משתנים, מצבי זרימה, לולאות פתוחות, לחץ חברתי, תגמולי תובנה — אלה מנגנונים פסיכולוגיים חזקים באמת. אלה אותם מנגנונים שהופכים הימורים לממכרים, רשתות חברתיות לכפייתיות, ומשחקי מובייל לטורפניים.
+כל מה שתיארתי (תגמולים משתנים, מצבי זרימה, לולאות פתוחות, לחץ חברתי, תגמולי תובנה) אלה מנגנונים פסיכולוגיים חזקים באמת. אלה אותם מנגנונים שהופכים הימורים לממכרים, רשתות חברתיות לכפייתיות, ומשחקי מובייל לטורפניים.
 
-הפסיכולוג הקליני ד"ר אדם אלטר מותח את הקו בהפרעה. פעילות הופכת לבעייתית כשהיא מפריעה באופן עקבי לדברים שחשובים לכם יותר: שינה, מערכות יחסים, עבודה, בריאות.
+ד"ר אדם אלטר מותח את הקו בהפרעה. פעילות הופכת לבעייתית כשהיא מפריעה באופן עקבי לשינה, מערכות יחסים, עבודה, בריאות.
 
 החדשות הטובות הן שמשחקי מילים מבניתית פחות מסוכנים מחלופות רבות. סיבובים קצרים עם נקודות עצירה טבעיות. אין גלילה אינסופית. אין פיד של קנאה מאוצרת. אין מנגנון פיננסי.
 
@@ -316,17 +316,17 @@ Now if you'll excuse me, it's 2:23am and I need to play just one more round.`,
       },
       {
         title: 'למה ה"התמכרות" הזו דווקא טובה לכם',
-        content: `הנה הפלוט טוויסט: בהשוואה לכמעט כל דבר אחר שמתחרה על תשומת הלב שלכם, "התמכרות" למשחקי מילים היא יחסית שפירה. אולי אפילו מועילה.
+        content: `והפלוט טוויסט: בהשוואה לכמעט כל דבר אחר שמתחרה על תשומת הלב שלכם, "התמכרות" למשחקי מילים היא יחסית שפירה. אולי אפילו מועילה.
 
-בואו נשווה מה קורה במוח במהלך פעילויות פנאי נפוצות:
+נשווה מה קורה במוח בפעילויות פנאי נפוצות:
 
-גלילת דום ברשתות חברתיות: קפיצות קורטיזול מתוכן זועם, חרדת השוואה חברתית, צריכה פסיבית, אפס אתגר קוגניטיבי.
+גלילת דום ברשתות חברתיות? קפיצות קורטיזול מתוכן זועם, חרדת השוואה חברתית, צריכה פסיבית, אפס אתגר קוגניטיבי.
 
-בינג' צפייה: בידור פסיבי, מעורבות קוגניטיבית מינימלית, לרוב מלווה בנשנושים.
+בינג' צפייה? בידור פסיבי, מעורבות קוגניטיבית מינימלית, לרוב מלווה בנשנושים.
 
-משחקי מילים: מעורבות קוגניטיבית פעילה באזורי מוח מרובים, חיזוק אוצר מילים, תרגול זיכרון עבודה, חשיבה אסטרטגית, מחזורי דופמין הניתנים לניהול עם נקודות סיום טבעיות.
+ומשחקי מילים? מעורבות קוגניטיבית פעילה באזורי מוח מרובים, חיזוק אוצר מילים, תרגול זיכרון עבודה, חשיבה אסטרטגית, מחזורי דופמין הניתנים לניהול עם נקודות סיום טבעיות.
 
-מחקר אוניברסיטת אקסטר מצא שפותרי חידות מילים סדירים הראו ביצועים קוגניטיביים שווי ערך למוחות צעירים בעשר שנים. קורלציה, לא סיבתיות — אבל גם אם משחקי מילים לא גורמים לקוגניציה טובה יותר, הם לפחות מתואמים עם להישאר פעילים קוגניטיבית.
+מחקר אוניברסיטת אקסטר מצא שפותרי חידות מילים סדירים הראו ביצועים קוגניטיביים שווי ערך למוחות צעירים בעשר שנים. קורלציה, לא סיבתיות. אבל גם אם משחקי מילים לא גורמים לקוגניציה טובה יותר, הם לפחות מתואמים עם להישאר פעילים קוגניטיבית.
 
 אז כן — המוח שלכם נחטף על ידי לולאות דופמין, מצבי זרימה, ולולאות קוגניטיביות פתוחות. אבל בניגוד לרוב הדברים שחוטפים את המוח שלכם ב-2026, הדבר הזה באמת מאמן אותו באותו הזמן.
 
@@ -363,11 +363,11 @@ Now if you'll excuse me, it's 2:23am and I need to play just one more round.`,
 
 Det var fyra rundor sedan.
 
-Om det har later bekant, grattis — du ar inte trasig. Du upplever en av de mest elegant konstruerade psykologiska looparna som finns i spelvaerlden. Ordspel kopplar in nagot djupt i hur vara hjarnor ar kopplade, och resultatet ar en sorts tvangsmassighet som kans annorlunda an, sag, att doomscrollla Instagram eller binge-watcha Netflix.
+Om det har later bekant, grattis, du ar inte trasig. Du upplever en av de mest elegant konstruerade psykologiska looparna som finns i spelvaerlden. Ordspel kopplar in nagot djupt i hur vara hjarnor ar kopplade, och resultatet ar en sorts tvangsmassighet som kans annorlunda an, sag, att doomscrollla Instagram eller binge-watcha Netflix.
 
 Det kans... produktivt? Halsoamt? Som om du gor nagot bra for dig sjalv aven nar vackarklockan kryper narmare?
 
-Jag ville forsta VARFOR. Inte den vaga forklaringen "det ar kul", utan den faktiska neurovetenskapen och psykologin bakom varfor ordspel ar sa absurt svara att lagga ifran sig. Sa jag dyk ner i forskningen. Och det jag hittade ar fascinerande — och lite oroande.`,
+Jag ville forsta VARFOR. Inte den vaga forklaringen "det ar kul", utan den faktiska neurovetenskapen och psykologin bakom varfor ordspel ar sa absurt svara att lagga ifran sig. Sa jag dyk ner i forskningen. Och det jag hittade ar fascinerande. Och lite oroande.`,
       },
       {
         title: 'Dopaminkicken: Din Hjarna Pa Variabla Beloningar',
@@ -375,13 +375,13 @@ Jag ville forsta VARFOR. Inte den vaga forklaringen "det ar kul", utan den fakti
 
 Du har formodligen hort dopamin beskrivas som "njutningskemikalien," men det ar inte helt ratt. Dopamin ar mer exakt "forvantanskemikalien." Det spikar inte nar du FAR beloningen, utan nar du FORVANTAR dig att en kanske kommer.
 
-Darfor ar spelmaskiner sa beroendeframkallande. Det ar inte vinsten — de flesta forlorar. Det ar forvantan pa att MOJLIGEN vinna. Psykologer kallar detta ett "variabelt kvotforstarkningsschema," och det ar det mest kraftfulla konditioneringsmonstret som beteendevetenskapen kanner till.
+Darfor ar spelmaskiner sa beroendeframkallande. Det ar inte vinsten (de flesta forlorar). Det ar forvantan pa att MOJLIGEN vinna. Psykologer kallar detta ett "variabelt kvotforstarkningsschema," och det ar det mest kraftfulla konditioneringsmonstret som beteendevetenskapen kanner till.
 
 Tank nu pa vad som hander nar du skannar ett rutnot av bokstaver i ett ordspel.
 
 Du ser en kluster: S, T, A, R... kan det vara STARK? Du foljer vagen... K ar precis dar! STARK! Fem bokstaver! Dopaminspikar.
 
-Men har ar det lura: du vet aldrig NAR du hittar nasta ord. Ibland kommer de i snabba kluster — OM, MO, MOR, bom bom bom. Andra ganger stirrar du i trettio sekunder utan att se nagot, och sedan dyker plotsligt KATASTROFAL upp diagonalt och din hjarna lyser upp som Sergels torg pa nyarsafton.
+Men har ar det lura: du vet aldrig NAR du hittar nasta ord. Ibland kommer de i snabba kluster: OM, MO, MOR, bom bom bom. Andra ganger stirrar du i trettio sekunder utan att se nagot, och sedan dyker plotsligt KATASTROFAL upp diagonalt och din hjarna lyser upp som Sergels torg pa nyarsafton.
 
 Denna oforutsagbarhet ar EXAKT det variabla forstarkningsschemat. Din hjarna lar sig att beloningar kommer, men inte pa ett forutsagbart schema, sa den haller dig engagerad i ett tillstand av standig, lagintensiv forvantan.
 
@@ -401,7 +401,7 @@ Ordspel ar oavsiktligt perfekta flowmaskiner.
 
 Tank pa det. Ett 4x4-rutnot innehaller hundratals mojliga ord, fran trivialt latta (OM, PA, EN) till otroligt svara (det atta bokstavers ordet som gommer sig i ett spiralmonster). I varje ogonblick arbetar du precis vid gransen av din formaga.
 
-Darfor kan en femminutersrunda kannas som trettio sekunder. Din prefrontala cortex — delen som ansvarar for tidsuppfattning — rekryteras for ordsokningsuppgiften istallet. Det finns bokstavligen inte tillrackligt med neurala resurser over for att spara tid.
+Darfor kan en femminutersrunda kannas som trettio sekunder. Din prefrontala cortex, delen som ansvarar for tidsuppfattning, rekryteras for ordsokningsuppgiften istallet. Det finns bokstavligen inte tillrackligt med neurala resurser over for att spara tid.
 
 Flowtillstandet ar ocksa darfor "bara en runda till" ar sa farligt. Varje runda ar tillrackligt kort for att flowtillstandet inte helt hinner avta mellan rundorna.`,
       },
@@ -429,7 +429,7 @@ Ordspel med topplistor kopplar direkt in i denna krets.
 
 Det racker inte att hitta 30 ord. Du maste hitta FLER an din kompis. Du maste klatra fran 7:e till 5:e plats. Du maste sla ditt eget tidigare rekord.
 
-Har blir det intressant neurologiskt. Tavling aktiverar det ventrala striatum — samma beloningscentrum som reagerar pa mat, pengar och romantisk attraktion. Att besegra nagon pa en topplista utloser en genuin neurokemisk beloning.
+Har blir det intressant neurologiskt. Tavling aktiverar det ventrala striatum, samma beloningscentrum som reagerar pa mat, pengar och romantisk attraktion. Att besegra nagon pa en topplista utloser en genuin neurokemisk beloning.
 
 Sa du far faktiskt TVA dopaminvagar aktiverade samtidigt: en fran ordfinnarloopen och en fran den sociala tavlingen. Det ar en dopaminsmorgas.
 
@@ -437,19 +437,19 @@ Jag har en gruppchatt med fyra vanner dar vi delar vara dagliga utmaningspoang. 
       },
       {
         title: '"Aha!"-Ogonblicket: Darfor Kans Det SA Bra Att Hitta Ord',
-        content: `Det finns ett specifikt ogonblick nar du ser ett ord — sarskilt ett langt — dar allt klickar. Neuroforskare kallar detta "insiktsupplevelsen" eller "aha-ogonblicket," och det har en distinkt neural signatur.
+        content: `Det finns ett specifikt ogonblick nar du ser ett ord, sarskilt ett langt, dar allt klickar. Neuroforskare kallar detta "insiktsupplevelsen" eller "aha-ogonblicket," och det har en distinkt neural signatur.
 
-Forskning av Mark Beeman och John Kounios med EEG och fMRI har visat att insiktsogonblick foregasav en explosion av gammavagsaktivitet i den hogra temporalloben. Detta foljs av en rusning av aktivitet i beloningscentrumen — samma omraden som aktiveras av skamt, trevliga overraskningar och plotslig forstaelse.
+Forskning av Mark Beeman och John Kounios med EEG och fMRI har visat att insiktsogonblick foregasav en explosion av gammavagsaktivitet i den hogra temporalloben. Detta foljs av en rusning av aktivitet i beloningscentrumen, samma omraden som aktiveras av skamt, trevliga overraskningar och plotslig forstaelse.
 
 Att hitta ett ord bearbetas pa samma satt som att forsta en vits. Det ar en insikt, och insikter ar i sig njutbara.
 
 Darfor kans det kategoriskt annorlunda att hitta ett langt, ovantat ord jamfort med ett kort, uppenbart. Att hitta "OM" ar igenkanning. Att hitta "KATASTROFAL" som slingrar sig over bradet ar insikt. Och insikt belonas neurokemiskt pa ett satt som enkel igenkanning inte gor.
 
-Det ar ocksa darfor vi minns spektakulara ordspelsogonblick aratal senare. Jag kan fortfarande beratta om gangen jag hittade JUXTAPOSITION pa ett brade. Kanslan av "detta har funnits har hela tiden och bara jag sag det" — ren insikt, kemiskt inbrand i mitt minne.`,
+Det ar ocksa darfor vi minns spektakulara ordspelsogonblick aratal senare. Jag kan fortfarande beratta om gangen jag hittade JUXTAPOSITION pa ett brade. Kanslan av "detta har funnits har hela tiden och bara jag sag det". Ren insikt, kemiskt inbrand i mitt minne.`,
       },
       {
         title: 'Halsosamt vs. Ohalsosamt: Nar "Beroendeframkallande" Blir Ett Problem',
-        content: `Allt jag har beskrivit — variabla beloningar, flowtillstand, oppna loopar, socialt tryck — det ar genuint kraftfulla psykologiska mekanismer. De ar samma mekanismer som gor hasardspel beroendeframkallande och sociala medier tvangsmassiga.
+        content: `Allt jag har beskrivit, variabla beloningar, flowtillstand, oppna loopar, socialt tryck, det ar genuint kraftfulla psykologiska mekanismer. De ar samma mekanismer som gor hasardspel beroendeframkallande och sociala medier tvangsmassiga.
 
 Kliniska psykologen Dr. Adam Alter drar gransen vid storning. En aktivitet blir problematisk nar den konsekvent stor saker du vardesatter mer: somn, relationer, arbete, halsa.
 
@@ -477,7 +477,7 @@ Ordspel: Aktiv kognitiv engagemang over flera hjarnregioner, vokabularforstorkni
 
 Exeter-universitetets studie fann att regelbundna ordpusslare visade kognitiv prestation likvardig med hjarnor tio ar yngre.
 
-Sa ja — din hjarna har kapats av dopaminloopar, flowtillstand och oppna kognitiva loopar. Men till skillnad fran de flesta saker som kapar din hjarna 2026, tranar den har faktiskt din hjarna samtidigt.
+Sa ja, din hjarna har kapats av dopaminloopar, flowtillstand och oppna kognitiva loopar. Men till skillnad fran de flesta saker som kapar din hjarna 2026, tranar den har faktiskt din hjarna samtidigt.
 
 Du ar inte bara beroende. Du ar beroende av nagot som formodligen gor dig skarpare.
 

@@ -134,7 +134,7 @@ Now if you'll excuse me, I have a daily challenge to finish. I'm currently on a 
     subtitle: 'ספוילר: חלק מזה באמת קרה.',
     category: 'מחקר',
     readTime: 'זמן קריאה: 9 דקות',
-    authorName: 'נרד המילים',
+    authorName: 'חנון המילים',
     authorBio: 'שחקן משחקי מילים אובססיבי, קורא חובבני של מחקרי מוח, והאדם שהורס ערב משחקים כי לוקח לו יותר מדי זמן בתור.',
     sections: [
       {

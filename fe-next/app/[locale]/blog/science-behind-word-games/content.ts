@@ -201,21 +201,21 @@ Now if you'll excuse me, I have a grid of letters that needs my attention. My co
     subtitle: 'סריקות fMRI, שערורייה של 50 מיליון דולר, ולמה יכול להיות שלסבתא שלכם יש נקודה עם התשבצים שלה.',
     category: 'מדע',
     readTime: 'זמן קריאה: 9 דקות',
-    authorName: 'The Word Nerd',
+    authorName: 'חנון המילים',
     authorBio: 'שחקן משחקי מילים אובססיבי, קורא חובב של מדעי המוח, והבן אדם שהורס את ערב המשחקים כי הוא לוקח יותר מדי זמן בתור שלו.',
     sections: [
       {
-        content: `אני צריך להתוודות על משהו. ביליתי שלוש שעות ביום שלישי האחרון בוהה בלוח 4x4 של אותיות ומנסה למצוא מילה בת שבע אותיות. שלוש שעות. הקפה שלי התקרר. החתול שלי ויתר על ארוחת ערב. וכשסוף סוף מצאתי את זה — מילה חוצה את הלוח באלכסון — הנפתי את האגרוף כאילו זכיתי בגמר גביע העולם.
+        content: `אני צריך להתוודות על משהו. ביליתי שלוש שעות ביום שלישי האחרון בוהה בלוח 4x4 של אותיות ומנסה למצוא מילה בת שבע אותיות. שלוש שעות. הקפה שלי התקרר. החתול שלי ויתר על ארוחת ערב. וכשסוף סוף מצאתי את זה, מילה חוצה את הלוח באלכסון, הנפתי את האגרוף כאילו זכיתי בגמר גביע העולם.
 
 בת הזוג שלי הסתכלה עליי כאילו אני צריך עזרה מקצועית.
 
-אבל הנה העניין: בזמן שישבתי שם ונראיתי קצת מטורף, המוח שלי עשה משהו מדהים באמת. ואני לא מתכוון לזה בצורה מעורפלת של "אימון מוח הופך אותך לחכם יותר". אני מתכוון שמדעני מוח הכניסו אנשים למכשירי fMRI בזמן שהם משחקים משחקי מילים, ומה שהם מצאו די מטריף.
+אבל בזמן שישבתי שם ונראיתי קצת מטורף, המוח שלי עשה משהו מדהים באמת. ואני לא מתכוון לזה בצורה מעורפלת של "אימון מוח הופך אותך לחכם יותר". אני מתכוון שמדעני מוח הכניסו אנשים למכשירי fMRI בזמן שהם משחקים משחקי מילים, ומה שהם מצאו די מטריף.
 
 בואו אסביר. אזהרה: אני הולך לצטט מחקרים אמיתיים, אבל גם הולך לספר לכם היכן המדע נגמר והשיווק מתחיל. כי לתחום הזה יש היסטוריה מבולגנת, ומגיע לכם לדעת על זה.`,
       },
       {
         title: 'המוח שלכם על משחקי מילים: העדויות מ-fMRI',
-        content: `אז תדמיינו את זה. אתם שוכבים במכשיר fMRI — שאם מעולם לא הייתם בתוך אחד, הוא בעצם צינור רועש מאוד וקלאוסטרופובי מאוד שמצלם זרימת דם במוח שלכם. חוקרים מראים לכם רשת של אותיות ומבקשים שתמצאו מילים.
+        content: `אז תדמיינו את זה. אתם שוכבים במכשיר fMRI (אם מעולם לא הייתם בתוך אחד, זה בעצם צינור רועש מאוד וקלאוסטרופובי מאוד) שמצלם זרימת דם במוח שלכם. חוקרים מראים לכם רשת של אותיות ומבקשים שתמצאו מילים.
 
 מה נדלק?
 
@@ -223,15 +223,15 @@ Now if you'll excuse me, I have a grid of letters that needs my attention. My co
 
 לפי סקירה שיטתית של מחקרי fMRI שפורסמה ב-AIMS Neuroscience (2021), חיפוש מילים מפעיל לפחות ארבעה אזורים מוחיים מרכזיים בו-זמנית:
 
-אזור ברוקה מטפל בעיבוד הפונולוגי — בעצם, הוא מצליל את צירופי האותיות בתוך הראש שלכם. גם כשאתם קוראים בשקט, האזור הזה פעיל כי המוח עושה "דיבור פנימי". אתם ממש לוחשים את המילים לעצמכם בתוך הגולגולת.
+אזור ברוקה מטפל בעיבוד הפונולוגי. בעצם, הוא מצליל את צירופי האותיות בתוך הראש שלכם. גם כשאתם קוראים בשקט, האזור הזה פעיל כי המוח עושה "דיבור פנימי". אתם ממש לוחשים את המילים לעצמכם בתוך הגולגולת.
 
 אזור ורניקה מתעסק עם משמעות. זה החלק שאומר "רגע, האם ג-ר-ט זו מילה? לא. גרט? כן!" הוא עושה הצלבה עם המילון המנטלי שלכם במהירות מטורפת.
 
-הקורטקס הפרה-פרונטלי הדורסו-לטרלי (DLPFC) — נסו להגיד את זה חמש פעמים ברצף — פועל כמתאם מבצעי. הוא כמו פקח טיסה שמוודא שכל התהליכים האלה לא מתנגשים זה בזה.
+הקורטקס הפרה-פרונטלי הדורסו-לטרלי (DLPFC), נסו להגיד את זה חמש פעמים ברצף, פועל כמתאם מבצעי. הוא כמו פקח טיסה שמוודא שכל התהליכים האלה לא מתנגשים זה בזה.
 
-ואז הגנגליה הבזאלית נכנסת לפעולה כשהדברים מסתבכים. למצוא חתול? הם רגועים. למצוא קטסטרופה? הם עובדים שעות נוספות.
+ואז הגנגליה הבזאלית נכנסת לפעולה כשהדברים מסתבכים. למצוא חתול? רגועים. למצוא קטסטרופה? עובדים שעות נוספות.
 
-הנה מה שהפיל אותי מהכיסא: זה לא אזור אחד שעושה דבר אחד. זו תזמורת עצבית מסונכרנת, עם חלקים שונים שנכנסים ויוצאים בהתאם לרמת הקושי. ככל שמשחק המילים קשה יותר, ככה יותר מהמוח שלכם משתתף.`,
+מה שהפיל אותי מהכיסא: זה לא אזור אחד שעושה דבר אחד. זו תזמורת עצבית מסונכרנת, עם חלקים שונים שנכנסים ויוצאים בהתאם לרמת הקושי. ככל שמשחק המילים קשה יותר, ככה יותר מהמוח שלכם משתתף.`,
       },
       {
         title: 'הלולאה הפונולוגית (או: למה אתם ממלמלים לעצמכם)',
@@ -239,33 +239,33 @@ Now if you'll excuse me, I have a grid of letters that needs my attention. My co
 
 זה לא סתם הרגל מוזר. זו הלולאה הפונולוגית שלכם בפעולה.
 
-מטא-אנליזה שפורסמה ב-Frontiers in Human Neuroscience (2019) מצאה שזיכרון עבודה מילולי — מהסוג שאתם משתמשים בו כשאתם מחזיקים אותיות בראש תוך כדי חיפוש מילים — מפעיל בעיקר את הקורטקס הפרה-פרונטלי השמאלי. זיכרון עבודה מרחבי (כמו לזכור איפה דברים נמצאים על מפה) מדליק דווקא את הצד הימני.
+מטא-אנליזה שפורסמה ב-Frontiers in Human Neuroscience (2019) מצאה שזיכרון עבודה מילולי, מהסוג שאתם משתמשים בו כשאתם מחזיקים אותיות בראש תוך כדי חיפוש מילים, מפעיל בעיקר את הקורטקס הפרה-פרונטלי השמאלי. זיכרון עבודה מרחבי (כמו לזכור איפה דברים נמצאים על מפה) מדליק דווקא את הצד הימני.
 
 הלולאה הפונולוגית היא בעצם ה-RAM של המוח שלכם לשפה. זה מנגנון חזרה ששומר מידע פעיל על ידי חזרה עליו. כשאתם סורקים רשת אותיות, אתם מריצים עשרות צירופי אותיות דרך הלולאה הזו כל שנייה, בודקים כל אחד מול אוצר המילים שלכם.
 
 בדקתי את זה על עצמי פעם. ניסיתי לשחק משחק מילים בזמן שספרתי לאחור מ-100 בדילוגים של שבע. זה היה אכזרי. הניקוד שלי ירד בערך 60%. למה? כי ספירה לאחור חוטפת את אותה לולאה פונולוגית שמציאת מילים צריכה. יש רק לולאה אחת, והיא לא יכולה לעשות שני דברים בו-זמנית.
 
-זו גם הסיבה שקשה יותר לשחק משחקי מילים בסביבה רועשת שבה אנשים מדברים. המילים שלהם פולשות ללולאה הפונולוגית שלכם. המוח לא יכול שלא לעבד את השפה הנכנסת, מה שגונב משאבים ממשימת מציאת המילים.`,
+ולכן קשה יותר לשחק משחקי מילים בסביבה רועשת שבה אנשים מדברים. המילים שלהם פולשות ללולאה הפונולוגית שלכם. המוח לא יכול שלא לעבד את השפה הנכנסת, מה שגונב משאבים ממשימת מציאת המילים.`,
       },
       {
         title: 'כשהמוח עובר ל"מצב קשה"',
-        content: `הנה משהו שהמחקרים מראים באופן עקבי: יש קשר ישיר וניתן למדידה בין כמה קשה משימה במשחק מילים לבין כמה מהמוח מגויס.
+        content: `המחקרים מראים באופן עקבי: יש קשר ישיר וניתן למדידה בין כמה קשה משימה במשחק מילים לבין כמה מהמוח מגויס.
 
 מילה קלה? כמה אזורים מטפלים ביעילות.
 
-מילה קשה — ארוכה, יוצאת דופן, דורשת סריקה בכמה כיוונים? המוח מתחיל לקרוא לתגבורות. אזורים פרה-מוטוריים מתעוררים (אזורים שמתכננים תנועות פיזיות, למרות שאתם רק חושבים). המוחון — שמסורתית מקושר לשיווי משקל ותיאום — מתערב בתיאום הקוגניטיבי.
+מילה קשה, ארוכה, יוצאת דופן, דורשת סריקה בכמה כיוונים? המוח מתחיל לקרוא לתגבורות. אזורים פרה-מוטוריים מתעוררים (אזורים שמתכננים תנועות פיזיות, למרות שאתם רק חושבים). המוחון (שמסורתית מקושר לשיווי משקל ותיאום) מתערב בתיאום הקוגניטיבי.
 
-זו הסיבה שמשחק מילים מאתגר באמת מרגיש אחרת ממשחק קל. זה לא רק סובייקטיבי. המוח שלכם ממש מגייס יותר שטח עצבי.
+לכן משחק מילים מאתגר באמת מרגיש אחרת ממשחק קל. זה לא בראש שלכם. המוח שלכם ממש מגייס יותר שטח עצבי.
 
-אני שם לב לזה במשחק שלי. כשאני מוצא מילים של שלוש וארבע אותיות, זה מרגיש כמעט אוטומטי. אפילו מרגיע. אבל כשאני צד את המילה הבלתי-נתפסת בת שש או שבע אותיות, יש תחושה פיזית של מאמץ. המצח שלי מתכווץ. אני נשען קדימה. זה כמו ההבדל בין הליכה נינוחה לספרינט — אותן רגליים, עוצמה שונה לגמרי.
+אני שם לב לזה במשחק שלי. כשאני מוצא מילים של שלוש וארבע אותיות, זה מרגיש כמעט אוטומטי. אפילו מרגיע. אבל כשאני צד את המילה הבלתי-נתפסת בת שש או שבע אותיות, יש תחושה פיזית של מאמץ. המצח שלי מתכווץ. אני נשען קדימה. זה כמו ההבדל בין הליכה נינוחה לספרינט. אותן רגליים, עוצמה שונה לגמרי.
 
-המחקר תומך בזה. מחקר על זיכרון מילות פעולה שפורסם ב-PMC (2022) מצא שכשאנשים מחזיקים מילים בזיכרון עבודה — במיוחד פעלי פעולה כמו "לרוץ", "לזרוק" או "לתפוס" — הם מפעילים גם אזורים מוטוריים. המוח לא מאחסן מילים כמו קבצים בתיקייה. הוא מאחסן אותן כרשתות עשירות ומחוברות שמקשרות צליל, משמעות, תחושה פיזית וזיכרון.
+המחקר תומך בזה. מחקר על זיכרון מילות פעולה שפורסם ב-PMC (2022) מצא שכשאנשים מחזיקים מילים בזיכרון עבודה, במיוחד פעלי פעולה כמו "לרוץ" או "לתפוס", הם מפעילים גם אזורים מוטוריים. המוח לא מאחסן מילים כמו קבצים בתיקייה. הוא מאחסן אותן כרשתות עשירות ומחוברות שמקשרות צליל, משמעות, תחושה פיזית וזיכרון.
 
 אז כשאתם מוצאים את המילה קפיצה ברשת אותיות, הקורטקס המוטורי שלכם מתכווץ קלות, כאילו מתכונן לקפוץ באמת. שפה היא גופנית. היא חיה בכל המוח שלכם, לא רק ב"חלקי השפה".`,
       },
       {
         title: 'מודל MUC של הגורט: שלושת מנועי השפה',
-        content: `אוקיי, פה זה נהיה ממש מגניב. פיטר הגורט — מדען מוח הולנדי ממכון מקס פלאנק — הציע מודל לאופן שבו המוח מעבד שפה שמתאים למשחקי מילים כמעט בצורה מושלמת.
+        content: `פה זה נהיה ממש מגניב (סליחה, אני נרדי). פיטר הגורט — מדען מוח הולנדי ממכון מקס פלאנק — הציע מודל לאופן שבו המוח מעבד שפה שמתאים למשחקי מילים כמעט בצורה מושלמת.
 
 הוא קורא לזה מודל MUC: זיכרון (Memory), איחוד (Unification), בקרה (Control).
 
@@ -297,7 +297,7 @@ Now if you'll excuse me, I have a grid of letters that needs my attention. My co
       },
       {
         title: 'מה המחקר באמת מראה (בכנות)',
-        content: `אוקיי, עם ההסתייגות הזו מיושבת היטב, הנה מה שאנחנו יכולים להגיד ברמת ביטחון סבירה.
+        content: `אוקיי, עם ההסתייגות הזו מיושבת היטב, מה שאנחנו יכולים להגיד ברמת ביטחון סבירה.
 
 המחקר הגדול האחרון מגיע מאוניברסיטת אקסטר וקינגס קולג' לונדון. הם עקבו אחרי למעלה מ-19,000 משתתפים בני 50 ומעלה שדיווחו שהם עוסקים באופן קבוע בחידות מילים. התוצאות? אנשים שפתרו חידות מילים באופן קבוע הראו ביצועים טובים משמעותית במבחנים קוגניטיביים — שווה ערך למוח צעיר בערך ב-10 שנים מהגיל האמיתי שלהם.
 
@@ -305,45 +305,45 @@ Now if you'll excuse me, I have a grid of letters that needs my attention. My co
 
 אבל גודל ההשפעה היה גדול מספיק כדי להיות ראוי לציון. לא מדובר על שינוי שולי. עשר שנים של הבדל קוגניטיבי זה משמעותי.
 
-ואז יש את מחקר INHANCE מאוניברסיטת מקגיל (2025), שמצא שתרגילים קוגניטיביים מובנים — כולל משימות מבוססות מילים — היו קשורים לעלייה של 2.3% ברמות האצטילכולין. אצטילכולין הוא נוירוטרנסמיטר חיוני לזיכרון ולמידה. קפיצה של 2.3% אולי נשמעת קטנה, אבל במונחי נוירוטרנסמיטרים, זה משמעותי.
+ואז יש את מחקר INHANCE מאוניברסיטת מקגיל (2025), שמצא שתרגילים קוגניטיביים מובנים, כולל משימות מבוססות מילים, היו קשורים לעלייה של 2.3% ברמות האצטילכולין. אצטילכולין הוא נוירוטרנסמיטר חיוני לזיכרון ולמידה. קפיצה של 2.3% אולי נשמעת קטנה, אבל במונחי נוירוטרנסמיטרים, זה משמעותי.
 
 עם זאת — וזה קריטי — אף אחד מהמחקרים האלה לא אומר "שחקו משחקי מילים והמוח שלכם ישתפר". מה שהם מרמזים הוא שפעילויות לשוניות תובעניות קוגניטיבית מפעילות מערכות עצביות אמיתיות בדרכים שמתאמות עם תוצאות קוגניטיביות טובות יותר. המנגנון עדיין לא מובן במלואו.
 
-הנה הדעה האישית שלי, למי שזה שווה: גם אם משחקי מילים לא הופכים אתכם ל"חכמים יותר" בצורה מדידה כלשהי, עצם העיסוק בפעילות קוגניטיבית ממוקדת ומאתגרת כמעט בוודאות טוב יותר למוח שלכם מגלילה פסיבית ברשתות חברתיות. הרף הוא לא "האם זה מרפא דמנציה?" הרף הוא "האם זה שימוש טוב באנרגיה המנטלית שלי?" וכן, אני חושב שזה כן.`,
+הדעה האישית שלי, למי שזה שווה: גם אם משחקי מילים לא הופכים אתכם ל"חכמים יותר" בצורה מדידה כלשהי, עצם העיסוק בפעילות קוגניטיבית ממוקדת ומאתגרת כמעט בוודאות טוב יותר למוח שלכם מגלילה פסיבית ברשתות חברתיות. הרף הוא לא "האם זה מרפא דמנציה?" הרף הוא "האם זה שימוש טוב באנרגיה המנטלית שלי?" וכן, אני חושב שזה כן.`,
       },
       {
         title: 'למה משחקי מילים שונים ממשחקי מוח אחרים',
         content: `לא כל הפעילויות הקוגניטיביות נוצרו שוות. ולמשחקי מילים יש משהו מיוחד שלסודוקו ולמשחקי התאמת דפוסים אין.
 
-שפה משולבת עמוק ויסודית בקוגניציה האנושית. זה לא מודול שיושב בפינה אחת של המוח. זה ארוג דרך הכל — זיכרון, שליטה מוטורית, עיבוד רגשי, קוגניציה חברתית, חשיבה מופשטת.
+שפה משולבת עמוק בקוגניציה האנושית. זה לא מודול שיושב בפינה. זה ארוג דרך הכל: זיכרון, שליטה מוטורית, עיבוד רגשי, קוגניציה חברתית, חשיבה מופשטת.
 
-כשאתם משחקים משחק מילים, אתם לא רק מאמנים את "אזור השפה". אתם מפעילים רשת מבוזרת שנוגעת כמעט בכל מערכת מוחית מרכזית. הלולאה הפונולוגית מפעילה עיבוד שמיעתי. אחזור סמנטי נוגע במערכות זיכרון. תכנון אסטרטגי מפעיל תפקוד ניהולי. וכמו שדנו, אפילו אזורים מוטוריים נמשכים לפעולה.
+כשאתם משחקים משחק מילים, אתם לא רק מאמנים את "אזור השפה". אתם מפעילים רשת מבוזרת שנוגעת כמעט בכל מערכת מוחית מרכזית. הלולאה הפונולוגית, אחזור סמנטי, תכנון אסטרטגי, אפילו אזורים מוטוריים. הכל עובד.
 
-השוו את זה, למשל, למשחק תגובה מהירה פשוט. המשחקים האלה בודקים בעיקר נתיב אחד: זיהוי גירוי לתגובה מוטורית. שימושי, אבל צר.
+השוו את זה למשחק תגובה מהירה פשוט שבודק בעיקר נתיב אחד. שימושי, אבל צר.
 
-משחקי מילים הם כמו תרגילים מורכבים בחדר כושר. כפיפת מרפקים מבודדת שריר אחד. דדליפט מפעיל את כל השרשרת האחורית שלכם. משחקי מילים הם הדדליפט של פעילויות קוגניטיביות. (אני מוכן למות על הגבעה הזו.)
+משחקי מילים הם כמו תרגילים מורכבים בחדר כושר. כפיפת מרפקים מבודדת שריר אחד. דדליפט מפעיל את כל השרשרת האחורית שלכם. משחקי מילים הם הדדליפט של פעילויות קוגניטיביות. אני מוכן למות על הגבעה הזו.
 
-יש גם את הזווית של הרחבת אוצר מילים. כל פעם שאתם נתקלים במילה שלא הכרתם — או מגלים מחדש מילה ששכחתם — אתם מחזקים נתיב עצבי. ובניגוד לרוב משימות אימון המוח, לזה יש תועלת מעשית ישירה בעולם האמיתי. אוצר מילים גדול יותר באמת עוזר לכם לתקשר טוב יותר, לקרוא מהר יותר ולהבין מידע מגוון יותר.
+יש גם את הזווית של הרחבת אוצר מילים. כל פעם שאתם נתקלים במילה שלא הכרתם — או מגלים מחדש מילה ששכחתם — אתם מחזקים נתיב עצבי. ובניגוד לרוב משימות אימון המוח, לזה יש תועלת מעשית בעולם האמיתי. אוצר מילים גדול יותר עוזר לתקשר טוב יותר ולקרוא מהר יותר.
 
 למדתי את המילה "אקלקטי" ממשחק מילים לפני שלוש שנים. השתמשתי בה בשיחה לפחות שש פעמים מאז. האם זה שווה את שלוש השעות? ניתן לוויכוח. אבל היא שלי עכשיו, ואף אחד לא יכול לקחת אותה ממני.`,
       },
       {
         title: 'הטוויסט הרב-לשוני',
-        content: `הנה משהו שחוקרי משחקי מילים מתחילים לשים אליו יותר לב: מה קורה כשאתם משחקים בשפה שאינה השפה הראשונה שלכם?
+        content: `חוקרי משחקי מילים מתחילים לשים אליו יותר לב: מה קורה כשאתם משחקים בשפה שאינה השפה הראשונה שלכם?
 
-לשחקנים דו-לשוניים או רב-לשוניים, משחקי מילים הופכים למעניינים עוד יותר מבחינה נוירולוגית. המוח צריך לנהל לא רק את משימת מציאת המילים, אלא גם את בחירת השפה — לוודא שהוא מחפש בלקסיקון הנכון. הדרישה הנוספת הזו של בקרה מפעילה עוד יותר את הקורטקס הפרה-פרונטלי ואת קליפת המוח הקינגולטית הקדמית, שמנהלת קונפליקטים בין אפשרויות מתחרות.
+לשחקנים דו-לשוניים או רב-לשוניים, משחקי מילים הופכים למעניינים עוד יותר מבחינה נוירולוגית. המוח צריך לנהל לא רק את משימת מציאת המילים, אלא גם את בחירת השפה — לוודא שהוא מחפש בלקסיקון הנכון. הדרישה הנוספת הזו מפעילה עוד יותר את הקורטקס הפרה-פרונטלי ואת קליפת המוח הקינגולטית הקדמית.
 
 אם אתם משחקים משחקי מילים בכמה שפות (שאם אתם קוראים את זה ב-LexiClash, כנראה שכן), אתם בעצם מוסיפים משקל למוט הקוגניטיבי. התרגיל הבסיסי זהה, אבל העומס כבד יותר.
 
-כמה מחקרים מרמזים ששחקני משחקי מילים דו-לשוניים מראים תפקוד ניהולי משופר בהשוואה לשחקנים חד-לשוניים — אבל שוב, מתאם מול סיבתיות. יכול להיות שאנשים עם תפקוד ניהולי חזק יותר פשוט טובים יותר בלמידת שפות מלכתחילה.
+כמה מחקרים מרמזים ששחקני משחקי מילים דו-לשוניים מראים תפקוד ניהולי משופר. אבל שוב, מתאם מול סיבתיות. יכול להיות שאנשים עם תפקוד ניהולי חזק יותר פשוט טובים יותר בלמידת שפות מלכתחילה.
 
 בכל זאת, לשחק משחקי מילים בשפה השנייה או השלישית שלכם זו אחת הדרכים המהנות ביותר לשמור ולשפר את הכישורים הלשוניים האלה. ובניגוד לאפליקציות כרטיסיות, זה לא מרגיש כמו שיעורי בית.`,
       },
       {
         title: 'אז... כדאי לשחק יותר משחקי מילים?',
-        content: `תשמעו, אני בבירור משוחד. אני הבן אדם שבילה שלוש שעות למצוא מילה אחת וחשב שזה שימוש טוב בזמן.
+        content: `נו, אני בבירור משוחד. אני הבן אדם שבילה שלוש שעות למצוא מילה אחת וחשב שזה שימוש טוב בזמן.
 
-אבל הנה ההערכה הכנה שלי, נקייה מהייפ:
+אבל ההערכה הכנה שלי, בלי הייפ:
 
 מדעי המוח אמיתיים. משחקי מילים מפעילים רשתות מוחיות מורכבות ומבוזרות. הם מפעילים אחזור זיכרון, עיבוד פונולוגי, בקרה ניהולית, ואפילו מערכות מוטוריות. על זה אין ויכוח.
 
@@ -351,7 +351,7 @@ Now if you'll excuse me, I have a grid of letters that needs my attention. My co
 
 תעשיית אימון המוח הרוויחה את הספקנות כלפיה. אחרי השיעור של 50 מיליון דולר של Lumosity, כולנו צריכים להיזהר מהגזמות. "אימון מוח" הוא מונח שיווקי, לא מדעי.
 
-אבל הנה מה שאני חוזר אליו שוב ושוב: משחקי מילים הם אחת מהפעילויות הבודדות שהן בו-זמנית תובעניות קוגניטיבית, מעשירות לשונית, ממש מהנות, וחברתיות (אם משחקים עם אחרים). השילוב הזה נדיר.
+ובכל זאת, מה שאני חוזר אליו שוב ושוב: משחקי מילים הם אחת מהפעילויות הבודדות שהן בו-זמנית תובעניות קוגניטיבית, מעשירות לשונית, ממש מהנות, וחברתיות (אם משחקים עם אחרים). השילוב הזה נדיר.
 
 אתם לא צריכים להצדיק משחקי מילים עם מדעי המוח. זה כיף. וזה מספיק. אבל אם אתם רוצים לדעת שמשהו באמת מעניין קורה בגולגולת שלכם בזמן שאתם צדים את המילה בת שבע האותיות — טוב, עכשיו אתם יודעים.
 
@@ -387,13 +387,13 @@ Now if you'll excuse me, I have a grid of letters that needs my attention. My co
 
 Min partner tittade på mig som om jag behövde professionell hjälp.
 
-Men saken är den: medan jag satt där och såg lite galen ut, gjorde min hjärna något genuint anmärkningsvärt. Och jag menar inte det på ett luddigt "hjärnträning gör dig smartare"-sätt. Jag menar att neuroforskare har stoppat in folk i fMRI-maskiner medan de spelar ordspel, och det de hittade är ganska vilt.
+Medan jag satt där och såg lite galen ut, gjorde min hjärna något genuint anmärkningsvärt. Och jag menar inte det på ett luddigt "hjärnträning gör dig smartare"-sätt. Jag menar att neuroforskare har stoppat in folk i fMRI-maskiner medan de spelar ordspel, och det de hittade är ganska vilt.
 
 Låt mig gå igenom det. Rättvis varning: jag kommer att citera riktig forskning, men jag tänker också berätta var vetenskapen slutar och marknadsföringshypet börjar. För det här fältet har en rörig historia, och du förtjänar att veta om det.`,
       },
       {
         title: 'Din hjärna på ordspel: fMRI-bevisen',
-        content: `Så tänk dig detta. Du ligger i en fMRI-maskin — som, om du aldrig varit i en, i princip är ett väldigt högt, väldigt klaustrofobiskt rör som tar bilder av blodflödet i din hjärna. Forskare visar dig ett rutnät av bokstäver och ber dig hitta ord.
+        content: `Så tänk dig detta. Du ligger i en fMRI-maskin (som, om du aldrig varit i en, i princip är ett väldigt högt, väldigt klaustrofobiskt rör som tar bilder av blodflödet i din hjärna). Forskare visar dig ett rutnät av bokstäver och ber dig hitta ord.
 
 Vad tänds upp?
 
@@ -401,11 +401,11 @@ Allting. Nåja, inte bokstavligen allting, men MYCKET mer än du hade förvänta
 
 Enligt en systematisk genomgång av fMRI-studier publicerad i AIMS Neuroscience (2021), aktiverar ordsökning minst fyra stora hjärnregioner samtidigt:
 
-Brocas område hanterar den fonologiska bearbetningen — i princip, det ljudar ut bokstavskombinationerna i ditt huvud. Även när du läser tyst aktiveras detta område eftersom din hjärna subvokaliserar. Du viskar bokstavligen orden till dig själv inne i skallen.
+Brocas område hanterar den fonologiska bearbetningen, det ljudar ut bokstavskombinationerna i ditt huvud. Även när du läser tyst aktiveras detta område eftersom din hjärna subvokaliserar. Du viskar bokstavligen orden till dig själv inne i skallen.
 
 Wernickes område hanterar betydelse. Det är den delen som säger "vänta, är GRAT ett ord? Nej. GRÄV? Ja!" Den korskör ditt mentala lexikon i otrolig hastighet.
 
-Dorsolateral prefrontal cortex (DLPFC) — försök säga det fem gånger snabbt — fungerar som den verkställande koordinatorn. Den är flygledaren som ser till att alla dessa processer inte krockar med varandra.
+Dorsolateral prefrontal cortex (DLPFC, försök säga det fem gånger snabbt) fungerar som den verkställande koordinatorn. Den är flygledaren som ser till att alla dessa processer inte krockar med varandra.
 
 Och sedan hoppar basala ganglierna in när saker blir komplicerade. Hitta KAT? De tar det lugnt. Hitta KATASTROFAL? De jobbar övertid.
 
@@ -417,7 +417,7 @@ Här är det som överraskade mig mest: det är inte ett område som gör en sak
 
 Det är ingen tic. Det är din fonologiska loop i arbete.
 
-En metaanalys publicerad i Frontiers in Human Neuroscience (2019) fann att verbalt arbetsminne — den typen du använder när du håller bokstäver i minnet medan du söker efter ord — primärt aktiverar vänster prefrontal cortex. Spatialt arbetsminne (som att minnas var saker är på en karta) lyser upp höger sida istället.
+En metaanalys publicerad i Frontiers in Human Neuroscience (2019) fann att verbalt arbetsminne (den typen du använder när du håller bokstäver i minnet medan du söker efter ord) primärt aktiverar vänster prefrontal cortex. Spatialt arbetsminne (som att minnas var saker är på en karta) lyser upp höger sida istället.
 
 Den fonologiska loopen är i princip din hjärnas RAM-minne för språk. Det är en repetitionsmekanism som håller information aktiv genom att upprepa den. När du skannar ett bokstavsrutnät, kör du dussintals bokstavskombinationer genom denna loop varje sekund, och testar var och en mot ditt ordförråd.
 
@@ -431,27 +431,27 @@ Det är också därför det är svårare att spela ordspel i en bullrig miljö d
 
 Lätt ord? Några områden hanterar det effektivt.
 
-Svårt ord — långt, ovanligt, kräver att man skannar åt flera håll? Din hjärna börjar kalla in förstärkningar. Premotoriska regioner aktiveras (områden som planerar fysiska rörelser, fast du bara tänker). Lillhjärnan — traditionellt associerad med balans och koordination — engagerar sig i den kognitiva koordinationen.
+Svårt ord, långt, ovanligt, kräver att man skannar åt flera håll? Din hjärna börjar kalla in förstärkningar. Premotoriska regioner aktiveras (områden som planerar fysiska rörelser, fast du bara tänker). Lillhjärnan, traditionellt associerad med balans och koordination, engagerar sig i den kognitiva koordinationen.
 
 Det är därför ett utmanande ordspel genuint känns annorlunda än ett enkelt. Det är inte bara subjektivt. Din hjärna rekryterar bokstavligen mer neuralt utrymme.
 
-Jag märker detta i mitt eget spelande. När jag hittar tre- och fyrbokstavsord känns det nästan automatiskt. Till och med avkopplande. Men när jag jagar det svårfångade sex- eller sjubokstavsordet, finns det en fysisk känsla av ansträngning. Min panna spänns. Jag lutar mig framåt. Det är som skillnaden mellan en avslappnad promenad och en sprint — samma ben, väldigt olika intensitet.
+Jag märker detta i mitt eget spelande. När jag hittar tre- och fyrbokstavsord känns det nästan automatiskt. Till och med avkopplande. Men när jag jagar det svårfångade sex- eller sjubokstavsordet, finns det en fysisk känsla av ansträngning. Min panna spänns. Jag lutar mig framåt. Det är som skillnaden mellan en avslappnad promenad och en sprint. Samma ben, väldigt olika intensitet.
 
-Forskningen stödjer detta. En studie om handlingsordsminne publicerad i PMC (2022) fann att när människor håller ord i arbetsminnet — särskilt handlingsverb som "springa", "kasta" eller "gripa" — aktiverar de även motoriska områden. Hjärnan lagrar inte ord som filer i en mapp. Den lagrar dem som rika, sammankopplade nätverk som länkar ljud, betydelse, fysisk känsla och minne.
+Forskningen stödjer detta. En studie om handlingsordsminne publicerad i PMC (2022) fann att när människor håller ord i arbetsminnet, särskilt handlingsverb som "springa", "kasta" eller "gripa", aktiverar de även motoriska områden. Hjärnan lagrar inte ord som filer i en mapp. Den lagrar dem som rika, sammankopplade nätverk som länkar ljud, betydelse, fysisk känsla och minne.
 
 Så när du hittar ordet HOPPA i ett bokstavsrutnät, rycks din motoriska cortex till lite, som om den förbereder sig för att faktiskt hoppa. Språk är kroppsligt. Det lever i hela din hjärna, inte bara i "språkdelarna".`,
       },
       {
         title: 'Hagoorts MUC-modell: Språkets tre motorer',
-        content: `Okej, här blir det verkligen coolt. Peter Hagoort — en holländsk neuroforskare vid Max Planck-institutet — föreslog en modell för hur hjärnan bearbetar språk som passar ordspel nästan perfekt.
+        content: `Okej, här blir det verkligen coolt. Peter Hagoort, en holländsk neuroforskare vid Max Planck-institutet, föreslog en modell för hur hjärnan bearbetar språk som passar ordspel nästan perfekt.
 
 Han kallar den MUC-modellen: Minne (Memory), Enande (Unification), Kontroll (Control).
 
-Minne är hämtningssystemet. Det drar upp ord från ditt mentala lexikon — det enorma ordförråd som lagras i tinningloben. När du ser bokstäverna S, T, A, R, börjar minnessystemet omedelbart servera kandidater: STAR, TSAR, RAST, RATS, och dussintals fler.
+Minne är hämtningssystemet. Det drar upp ord från ditt mentala lexikon, det enorma ordförråd som lagras i tinningloben. När du ser bokstäverna S, T, A, R, börjar minnessystemet omedelbart servera kandidater: STAR, TSAR, RAST, RATS, och dussintals fler.
 
 Enande sker i Brocas område. Det är här kandidaterna testas. Bildar denna bokstavskombination faktiskt ett riktigt ord? Följer den spelets regler? Enande är kvalitetskontrollavdelningen som kontrollerar varje kandidat mot fonologiska regler, morfologiska mönster och semantisk betydelse.
 
-Kontroll hanteras av DLPFC. Den bestämmer var man ska fokusera uppmärksamheten, vilka kandidater man ska följa upp och när man ska ge upp en väg och prova en annan. Det är det strategiska lagret — den del som gör dig till en bättre spelare med tiden när du utvecklar bättre sökstrategier.
+Kontroll hanteras av DLPFC. Den bestämmer var man ska fokusera uppmärksamheten, vilka kandidater man ska följa upp och när man ska ge upp en väg och prova en annan. Det är det strategiska lagret, den del som gör dig till en bättre spelare med tiden när du utvecklar bättre sökstrategier.
 
 Alla tre motorerna körs samtidigt när du spelar ett ordspel. Du hämtar, testar och strategiserar parallellt. Att din hjärna kan göra allt detta medan du sitter och tänker "hmm, vad sägs om... nej, det är inget ord" är ärligt talat häpnadsväckande.
 
@@ -461,7 +461,7 @@ Jag tänker på det varje gång någon avfärdar ordspel som "bara en dum först
         title: 'Elefanten i rummet: Lumosity-skandalen',
         content: `Okej. Dags att prata om det obekväma.
 
-2016 dömdes Lumosity — det största namnet inom "hjärnträning" — att betala 50 miljoner dollar i böter av Federal Trade Commission (FTC). Femtio. Miljoner. Dollar.
+2016 dömdes Lumosity, det största namnet inom "hjärnträning", att betala 50 miljoner dollar i böter av Federal Trade Commission (FTC). Femtio. Miljoner. Dollar.
 
 Varför? Eftersom de hävdade att deras spel kunde hjälpa användare att prestera bättre på jobbet och i skolan, fördröja åldersrelaterad kognitiv nedgång, och till och med minska kognitiv funktionsnedsättning kopplad till tillstånd som Alzheimers. Dessa påståenden stöddes inte av deras bevis.
 
@@ -477,15 +477,15 @@ Vad jag SÄGER är vad neurovetenskapen faktiskt visar om vad som händer i din 
         title: 'Vad forskningen faktiskt visar (ärligt)',
         content: `Okej, med det förbehållet ordentligt på plats, här är vad vi kan säga med rimlig säkerhet.
 
-Den största nyare studien kommer från University of Exeter och King's College London. De följde över 19 000 deltagare i åldern 50 och uppåt som rapporterade att de regelbundet ägnade sig åt ordpussel. Resultaten? Människor som gjorde ordpussel regelbundet presterade betydligt bättre på kognitiva tester — motsvarande att ha en hjärna ungefär 10 år yngre än deras faktiska ålder.
+Den största nyare studien kommer från University of Exeter och King's College London. De följde över 19 000 deltagare i åldern 50 och uppåt som rapporterade att de regelbundet ägnade sig åt ordpussel. Resultaten? Människor som gjorde ordpussel regelbundet presterade betydligt bättre på kognitiva tester, motsvarande att ha en hjärna ungefär 10 år yngre än deras faktiska ålder.
 
 Nu, ett massivt förbehåll: detta är en korrelationsstudie. Den bevisar inte att ordpussel orsakade de bättre resultaten. Kanske är personer som redan är kvickare helt enkelt mer benägna att tycka om ordpussel. Hönan eller ägget.
 
 Men effektstorleken var tillräckligt stor för att vara anmärkningsvärd. Vi pratar inte om en marginell förändring. Tio år av kognitiv skillnad är substantiellt.
 
-Sedan finns INHANCE-studien från McGill University (2025), som fann att strukturerade kognitiva övningar — inklusive ordbaserade uppgifter — var associerade med en 2,3% ökning av acetylkolinnivåerna. Acetylkolin är en signalsubstans som är avgörande för minne och inlärning. En 2,3% ökning kanske låter liten, men i signalsubstanstermer är det betydande.
+Sedan finns INHANCE-studien från McGill University (2025), som fann att strukturerade kognitiva övningar, inklusive ordbaserade uppgifter, var associerade med en 2,3% ökning av acetylkolinnivåerna. Acetylkolin är en signalsubstans som är avgörande för minne och inlärning. En 2,3% ökning kanske låter liten, men i signalsubstanstermer är det betydande.
 
-Dock — och detta är kritiskt — ingen av dessa studier säger "spela ordspel så förbättras din hjärna." Vad de antyder är att kognitivt krävande språkliga aktiviteter engagerar verkliga neurala system på sätt som korrelerar med bättre kognitiva utfall. Mekanismen är inte helt förstådd ännu.
+Och detta är kritiskt: ingen av dessa studier säger "spela ordspel så förbättras din hjärna." Vad de antyder är att kognitivt krävande språkliga aktiviteter engagerar verkliga neurala system på sätt som korrelerar med bättre kognitiva utfall. Mekanismen är inte helt förstådd ännu.
 
 Här är min personliga uppfattning, för vad den är värd: även om ordspel inte gör dig "smartare" på något mätbart sätt, är det att ägna sig åt fokuserad, utmanande kognitiv aktivitet nästan säkert bättre för din hjärna än att passivt scrolla sociala medier. Ribban är inte "botar detta demens?" Ribban är "är detta bra användning av min mentala energi?" Och ja, det tycker jag.`,
       },
@@ -493,7 +493,7 @@ Här är min personliga uppfattning, för vad den är värd: även om ordspel in
         title: 'Varför ordspel är annorlunda än andra hjärnspel',
         content: `Inte alla kognitiva aktiviteter är skapade lika. Och ordspel har något speciellt som Sudoku och mönstermatchningsspel saknar.
 
-Språk är djupt och fundamentalt integrerat i mänsklig kognition. Det är inte en modul som sitter i ett hörn av hjärnan. Det är invävt i allt — minne, motorisk kontroll, emotionell bearbetning, social kognition, abstrakt resonemang.
+Språk är djupt och fundamentalt integrerat i mänsklig kognition. Det är inte en modul som sitter i ett hörn av hjärnan. Det är invävt i allt: minne, motorisk kontroll, emotionell bearbetning, social kognition, abstrakt resonemang.
 
 När du spelar ett ordspel tränar du inte bara "språkområdet." Du engagerar ett distribuerat nätverk som berör nästan varje stort hjärnsystem. Den fonologiska loopen arbetar med din auditiva bearbetning. Semantisk hämtning använder minnessystem. Strategisk planering engagerar exekutiva funktioner. Och som vi diskuterade dras även motoriska områden in.
 
@@ -501,7 +501,7 @@ Jämför det med, säg, ett enkelt reaktionstidsspel. De testar främst en väg:
 
 Ordspel är som sammansatta övningar på gymmet. En bicepscurl isolerar en muskel. Ett marklyft tränar hela din bakre kedja. Ordspel är den kognitiva världens marklyft. (Jag dör hellre än att ge upp den liknelsen.)
 
-Det finns också vokabuläraspekten. Varje gång du stöter på ett ord du inte kände till — eller återupptäcker ett du glömt — stärker du en neural koppling. Och till skillnad från de flesta hjärnträningsuppgifter har detta direkt nytta i verkligheten. Ett större ordförråd hjälper dig faktiskt att kommunicera bättre, läsa snabbare och förstå mer nyanserad information.
+Det finns också vokabuläraspekten. Varje gång du stöter på ett ord du inte kände till, eller återupptäcker ett du glömt, stärker du en neural koppling. Och till skillnad från de flesta hjärnträningsuppgifter har detta direkt nytta i verkligheten. Ett större ordförråd hjälper dig faktiskt att kommunicera bättre, läsa snabbare och förstå mer nyanserad information.
 
 Jag lärde mig ordet "galanteri" från ett ordspel för tre år sedan. Jag har använt det i konversation minst sex gånger sedan dess. Var det värt tre timmar? Diskutabelt. Men det är mitt nu, och ingen kan ta det ifrån mig.`,
       },
@@ -509,11 +509,11 @@ Jag lärde mig ordet "galanteri" från ett ordspel för tre år sedan. Jag har a
         title: 'Den flerspråkiga dimensionen',
         content: `Här är något som ordspelsforskare börjar ägna mer uppmärksamhet: vad händer när du spelar på ett språk som inte är ditt modersmål?
 
-För två- eller flerspråkiga spelare blir ordspel ännu mer neurologiskt intressanta. Din hjärna måste hantera inte bara ordletningsuppgiften, utan även språkval — att se till att den söker i rätt lexikon. Denna extra kontrollkrav aktiverar ytterligare prefrontal cortex och anteriora cingulate cortex, som hanterar konflikter mellan konkurrerande alternativ.
+För två- eller flerspråkiga spelare blir ordspel ännu mer neurologiskt intressanta. Din hjärna måste hantera inte bara ordletningsuppgiften, utan även språkval, att se till att den söker i rätt lexikon. Denna extra kontrollkrav aktiverar ytterligare prefrontal cortex och anteriora cingulate cortex, som hanterar konflikter mellan konkurrerande alternativ.
 
 Om du spelar ordspel på flera språk (vilket, om du läser detta på LexiClash, du förmodligen gör), lägger du i princip på vikt till den kognitiva skivstången. Grundövningen är densamma, men belastningen är tyngre.
 
-Viss forskning antyder att tvåspråkiga ordspelsspelare visar förbättrade exekutiva funktioner jämfört med enspråkiga spelare — men återigen gäller korrelation mot orsakssamband. Det kan vara att personer med starkare exekutiva funktioner helt enkelt är bättre på att lära sig flera språk från början.
+Viss forskning antyder att tvåspråkiga ordspelsspelare visar förbättrade exekutiva funktioner jämfört med enspråkiga spelare, men återigen gäller korrelation mot orsakssamband. Det kan vara att personer med starkare exekutiva funktioner helt enkelt är bättre på att lära sig flera språk från början.
 
 Ändå är ordspel på ditt andra eller tredje språk ett av de mest njutbara sätten att upprätthålla och förbättra dessa språkfärdigheter. Och till skillnad från flashkort-appar känns det inte som läxor.`,
       },
@@ -743,7 +743,7 @@ FTCは、Lumosityが「加齢に伴う認知機能低下に対する消費者の
 
 Mi pareja me miró como si necesitara ayuda profesional.
 
-Pero aquí está la cosa: mientras estaba sentado ahí viéndome un poco desquiciado, mi cerebro estaba haciendo algo genuinamente extraordinario. Y no lo digo de forma vaga como "el entrenamiento cerebral te hace más inteligente". Me refiero a que neurocientíficos han metido gente en máquinas de fMRI mientras juegan juegos de palabras, y lo que encontraron es bastante impresionante.
+Pero mientras estaba sentado ahí viéndome un poco desquiciado, mi cerebro estaba haciendo algo genuinamente extraordinario. Y no lo digo de forma vaga como "el entrenamiento cerebral te hace más inteligente". Me refiero a que neurocientíficos han metido gente en máquinas de fMRI mientras juegan juegos de palabras, y lo que encontraron es bastante impresionante.
 
 Déjame explicártelo. Advertencia justa: voy a citar investigación real, pero también te voy a decir dónde termina la ciencia y empieza el marketing exagerado. Porque este campo tiene una historia complicada, y mereces saberlo.`,
       },
@@ -765,7 +765,7 @@ La corteza prefrontal dorsolateral (DLPFC) — intenta decirlo cinco veces rápi
 
 Y luego los ganglios basales entran cuando las cosas se complican. ¿Encontrar GATO? Están relajados. ¿Encontrar CATASTRÓFICO? Están trabajando horas extra.
 
-Esto es lo que me voló la cabeza: no es un área haciendo una cosa. Es una orquesta neural sincronizada, con diferentes secciones entrando y saliendo según la dificultad. Cuanto más difícil el juego de palabras, más de tu cerebro participa.`,
+Lo que me voló la cabeza: no es un área haciendo una cosa. Es una orquesta neural sincronizada, con diferentes secciones entrando y saliendo según la dificultad. Cuanto más difícil el juego de palabras, más de tu cerebro participa.`,
       },
       {
         title: 'El bucle fonológico (O: Por qué murmuras para ti mismo)',
@@ -877,7 +877,7 @@ Aun así, jugar juegos de palabras en tu segundo o tercer idioma es una de las f
         title: 'Entonces... ¿deberías jugar más juegos de palabras?',
         content: `Mira, claramente estoy sesgado. Soy la persona que pasó tres horas encontrando una palabra y lo consideró tiempo bien empleado.
 
-Pero aquí está mi evaluación honesta, despojada del bombo:
+Te doy mi evaluación honesta, despojada del bombo:
 
 La neurociencia es real. Los juegos de palabras activan redes cerebrales complejas y distribuidas. Involucran recuperación de memoria, procesamiento fonológico, control ejecutivo e incluso sistemas motores. Esto no está en disputa.
 
@@ -885,7 +885,7 @@ Los beneficios cognitivos son sugestivos pero no probados. Grandes estudios mues
 
 La industria del entrenamiento cerebral se ha ganado su escepticismo. Después de la lección de 50 millones de dólares de Lumosity, todos deberíamos ser cautelosos con las afirmaciones excesivas. "Entrenamiento cerebral" es un término de marketing, no científico.
 
-Pero esto es a lo que sigo volviendo: los juegos de palabras son una de las pocas actividades que son simultáneamente cognitivamente exigentes, lingüísticamente enriquecedoras, genuinamente divertidas y sociales (si juegas con otros). Esa combinación es rara.
+Pero a lo que sigo volviendo es esto: los juegos de palabras son una de las pocas actividades que son simultáneamente cognitivamente exigentes, lingüísticamente enriquecedoras, genuinamente divertidas y sociales (si juegas con otros). Esa combinación es rara.
 
 No necesitas justificar los juegos de palabras con neurociencia. Son divertidos. Eso es suficiente. Pero si quieres saber que algo genuinamente interesante está pasando en tu cráneo mientras cazas esa palabra de siete letras — bueno, ahora lo sabes.
 

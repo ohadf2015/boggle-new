@@ -221,8 +221,8 @@ And if you're a native Hebrew speaker who's been nodding along to this entire ar
     subtitle: 'שורשים, ניקוד חסר, ולמה לעצב משחק מילים לעברית זה כמו לפתור חידה בתוך חידה. מכתב אהבה לשפה הכי עקשנית שאי פעם שיחקתי בה.',
     category: 'שפה',
     readTime: 'זמן קריאה: 12 דקות',
-    authorName: 'The Word Nerd',
-    authorBio: 'אובססיבית רב-לשונית של משחקי מילים שבילתה שישה חודשים בלימוד שורשים עבריים רק כדי להיות פחות גרועה בערבי סקרבל ישראליים.',
+    authorName: 'חנון המילים',
+    authorBio: 'אובססיבי רב-לשוני של משחקי מילים שבילה שישה חודשים בלימוד שורשים עבריים רק כדי להיות פחות גרוע בערבי סקרבל ישראליים.',
     sections: [
       {
         content: `אני הולכת לחשוף בפניכם סוד שכל שחקני משחקי מילים בעברית כבר יודעים: לשחק משחקי מילים בעברית זו חוויה שונה מהותית מלשחק באנגלית. לא יותר קשה, לא יותר קל — שונה. כמו, שונה מבחינה מבנית ברמת ה-DNA.
@@ -554,7 +554,7 @@ UI要素はミラーリングが必要です。ナビゲーション矢印、プ
     category: 'Idioma',
     readTime: '12 min de lectura',
     authorName: 'The Word Nerd',
-    authorBio: 'Obsesiva multilingüe de juegos de palabras que pasó seis meses aprendiendo raíces hebreas solo para ser menos terrible en las noches de Scrabble israelíes.',
+    authorBio: 'Obsesivo multilingüe de juegos de palabras que pasó seis meses aprendiendo raíces hebreas solo para ser menos terrible en las noches de Scrabble israelíes.',
     sections: [
       {
         content: `Voy a revelarles un secreto que los jugadores de juegos de palabras en hebreo ya conocen: jugar juegos de palabras en hebreo es una experiencia fundamentalmente diferente a jugar en inglés. No más difícil, no más fácil — diferente. Estructuralmente diferente a nivel de ADN.

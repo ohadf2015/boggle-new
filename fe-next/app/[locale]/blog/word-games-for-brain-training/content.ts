@@ -164,7 +164,7 @@ And if you're looking for a place to start, well, I might know a game. It has le
     subtitle: 'מה מחקרים על 19,000 משתתפים באמת אומרים על משחקי מילים ובריאות המוח. ספוילר: זה יותר מורכב ממה שהכותרות מבטיחות.',
     category: 'בריאות המוח',
     readTime: '12 דק׳ קריאה',
-    authorName: 'The Word Nerd',
+    authorName: 'חנון המילים',
     authorBio: 'שחקן משחקי מילים אובססיבי, קורא חובבני של מדעי המוח, ובן אדם שבודק כל טענה על "אימון מוחי" לפני שהוא משתף אותה.',
     sections: [
       {
@@ -174,19 +174,19 @@ And if you're looking for a place to start, well, I might know a game. It has le
 
 אבא שלי — מהנדס בפנסיה שמחשיב "כיף" כסידור מחדש של מחסן הכלים שלו — הסתכל עלי כאילו סוף סוף קיבלתי הצדקה אחרי שנים של הגנה על ההרגל שלי עם משחקי מילים. "רואה?" הוא אמר. "עכשיו זה עצה רפואית."
 
-אבל הנה העניין. אני לא מהסוג שלוקח המלצה נעימה בערך הנקוב. אם רופא אומר לאבא שלי לשחק משחקי מילים, אני רוצה לדעת: מה העדויות באמת אומרות? לא הטקסט השיווקי באפליקציות אימון מוחי. לא הכותרות הנלהבות. המחקרים המדעיים בפועל.
+אבל אני לא מהסוג שלוקח המלצה נעימה בערך הנקוב. אם רופא אומר לאבא שלי לשחק משחקי מילים, אני רוצה לדעת: מה העדויות באמת אומרות? לא הטקסט השיווקי באפליקציות אימון מוחי. לא הכותרות הנלהבות. המחקרים המדעיים בפועל.
 
 אז השקעתי חודשיים בקריאת מחקרים. ומה שמצאתי מעניין יותר — וכנה יותר — ממה שגם ההייפ וגם הספקנות מציעים.`,
       },
       {
         title: 'מחקר ACTIVE: 19,078 משתתפים, 10 שנים של נתונים',
-        content: `בואו נתחיל עם המחקר הגדול ביותר, כי הוא זה שמצוטט (ומוצג בצורה מעוותת) הכי הרבה.
+        content: `נתחיל עם המחקר הגדול ביותר, כי הוא זה שמצוטט (ומוצג בצורה מעוותת) הכי הרבה.
 
 מחקר ACTIVE (אימון קוגניטיבי מתקדם לקשישים עצמאיים ופעילים), שפורסם ב-Journal of the American Geriatrics Society, עקב אחרי 19,078 משתתפים במשך 10 שנים. זה אחד מהניסויים הקליניים הגדולים ביותר שנערכו אי פעם על אימון קוגניטיבי.
 
 המשתתפים חולקו לקבוצות שקיבלו אימון בזיכרון, חשיבה לוגית או מהירות עיבוד. כל קבוצה קיבלה 10 מפגשים של 60-75 דקות.
 
-הנה מה שבאמת מצאו:
+מה שבאמת מצאו:
 
 כל סוג אימון שיפר ביצועים בתחום הספציפי שלו. אימון חשיבה לוגית שיפר חשיבה לוגית. אימון מהירות שיפר מהירות. אימון זיכרון שיפר זיכרון.
 
@@ -208,25 +208,25 @@ And if you're looking for a place to start, well, I might know a game. It has le
 
 מטא-אנליזה ב-Psychological Medicine (2012) סקרה 29,000 אנשים במחקרים מרובים ומצאה שרזרבה קוגניטיבית גבוהה יותר היתה קשורה לסיכון נמוך ב-46% לפתח דמנציה.
 
-ארבעים ושישה אחוז. זו לא טעות עיגול. זו השפעה מגנה משמעותית.
+ארבעים ושישה אחוז. רגע, מה? זו השפעה מגנה משמעותית.
 
-והנה הפרט המפתח: משחקי מילים, תשבצים וחידות מבוססות שפה מופיעים באופן עקבי בקטגוריית "פעילויות פנאי" שתורמות לרזרבה קוגניטיבית. לא בגלל שהם קסם, אלא בגלל שהם באמת דורשים מאמץ מנטלי באופן שצפייה בטלוויזיה לא.`,
+ווהפרט המפתח: משחקי מילים, תשבצים וחידות מבוססות שפה מופיעים באופן עקבי בקטגוריית "פעילויות פנאי" שתורמות לרזרבה קוגניטיבית. לא בגלל שהם קסם, אלא בגלל שהם באמת דורשים מאמץ מנטלי באופן שצפייה בטלוויזיה לא.`,
       },
       {
         title: 'מה משחקי מילים באמת מאמנים (ומה לא)',
-        content: `בואו נהיה ספציפיים לגבי מה קורה במוח שלכם במהלך משחק מילים, כי "אימון מוחי" זה כל כך מעורפל שזה כמעט חסר משמעות.
+        content: `בואו נהיה ספציפיים. "אימון מוחי" זה מונח כל כך מעורפל שהוא כמעט חסר משמעות.
 
 כשאתם משחקים משחק מילים כמו בוגל או סקרבל, אתם מפעילים בו-זמנית:
 
-שליפה לקסיקלית — שליפת מילים מהמילון המנטלי שלכם במהירות. זו אותה מערכת שאתם משתמשים בה כשאתם מנסים למצוא את המילה הנכונה בשיחה, וזה אחד הדברים הראשונים שמאטים עם הגיל.
+שליפה לקסיקלית, כלומר שליפת מילים מהמילון המנטלי שלכם במהירות. זו אותה מערכת שאתם משתמשים בה כשאתם מנסים למצוא את המילה הנכונה בשיחה, וזה אחד הדברים הראשונים שמאטים עם הגיל.
 
-זיכרון עבודה — החזקת מספר צירופי אותיות בראש בזמן שאתם מעריכים אותם. הלולאה הפונולוגית שלכם (החלק במוח ש"משמיע" מילים פנימית) עובד במלוא הקיבולת.
+זיכרון עבודה. אתם מחזיקים מספר צירופי אותיות בראש בזמן שאתם מעריכים אותם. הלולאה הפונולוגית שלכם (החלק במוח ש"משמיע" מילים פנימית) עובד במלוא הקיבולת.
 
-תפקוד ניהולי — החלטה איפה למקד תשומת לב, מתי לנטוש נתיב חיפוש אחד ולנסות אחר, ניהול זמן. זו מערכת הבקרה הקוגניטיבית שמתאמת הכל.
+תפקוד ניהולי: להחליט איפה למקד תשומת לב, מתי לנטוש נתיב חיפוש אחד ולנסות אחר, ניהול זמן. זו מערכת הבקרה הקוגניטיבית שמתאמת הכל.
 
-זיהוי דפוסים — איתור צירופי אותיות שמופיעים לעתים קרובות במילים ושימוש בדפוסים האלה להנחיית החיפוש.
+וזיהוי דפוסים: לאתר צירופי אותיות שמופיעים לעתים קרובות במילים ושימוש בדפוסים האלה להנחיית החיפוש.
 
-מה משחקי מילים לא מאמנים: ניווט מרחבי, חשיבה מתמטית, קוגניציה חברתית או מיומנויות מוטוריות. הם לא אימון קוגניטיבי שלם, כמו שכפיפות מרפקים זה לא אימון גופני שלם.
+מה משחקי מילים לא מאמנים: ניווט מרחבי, חשיבה מתמטית, קוגניציה חברתית או מיומנויות מוטוריות. הם לא אימון קוגניטיבי שלם, כמו שכפיפות מרפקים זה לא אימון גופני שלם (מה לעשות).
 
 אבל הדברים שהם כן מאמנים? אלה בדיוק התפקודים הקוגניטיביים שחשובים ביותר לעצמאות יומיומית עם הגיל. למצוא את המילה הנכונה. להחזיק מחשבה בראש מספיק זמן כדי לפעול לפיה. לקבל החלטות תחת לחץ זמן.`,
       },
@@ -236,7 +236,7 @@ And if you're looking for a place to start, well, I might know a game. It has le
 
 ב-2016, חברת האם של Lumosity, Lumos Labs, הסכימה לשלם 2 מיליון דולר כדי ליישב טענות של ה-FTC (הוועדה הפדרלית למסחר) שהטעו צרכנים עם טענות חסרות בסיס. ספציפית, הם טענו שהמשחקים שלהם יכולים לעזור למשתמשים לתפקד טוב יותר בעבודה ובלימודים, להפחית או לעכב ליקוי קוגניטיבי, ולהגן מפני אלצהיימר ודמנציה.
 
-אבל הנה מה שלדעתי הולך לאיבוד בתגובת הנגד ל-Lumosity: הבעיה לא היתה שאימון מוחי חסר תועלת. הבעיה היתה שחברה אחת העלתה טענות ספציפיות ומנופחות שלא יכלה לתמוך בהן. "האפליקציה שלנו מונעת אלצהיימר" זה מאוד שונה מ"אתגור מנטלי קבוע של המוח עם משימות שפה מורכבות תורם לרזרבה קוגניטיבית."
+אבל מה שלדעתי הולך לאיבוד בתגובת הנגד ל-Lumosity: הבעיה לא היתה שאימון מוחי חסר תועלת. הבעיה היתה שחברה אחת העלתה טענות ספציפיות ומנופחות שלא יכלה לתמוך בהן. "האפליקציה שלנו מונעת אלצהיימר" זה מאוד שונה מ"אתגור מנטלי קבוע של המוח עם משימות שפה מורכבות תורם לרזרבה קוגניטיבית."
 
 הטענה הראשונה היא שטויות שיווקיות. השנייה נתמכת בעדויות.
 
@@ -244,7 +244,7 @@ And if you're looking for a place to start, well, I might know a game. It has le
       },
       {
         title: 'מה המטא-אנליזות באמת מסכמות',
-        content: `כי אני יודע ש"קראתי כמה מחקרים" לא משכנע, הנה מה שהסקירות הגדולות של העדויות אומרות באופן עקבי:
+        content: `כי אני יודע ש"קראתי כמה מחקרים" לא משכנע, מה שהסקירות הגדולות של העדויות אומרות באופן עקבי:
 
 מטא-אנליזה מ-2019 ב-Neuropsychology Review בחנה 52 מחקרים על אימון קוגניטיבי במבוגרים בריאים. הממצא שלהם: אימון הניב שיפורים אמינים במשימות שתורגלו, עם גודלי אפקט בינוניים. ההעברה למשימות שלא תורגלו היתה קטנה יותר אך עדיין מובהקת סטטיסטית.
 
@@ -254,7 +254,7 @@ And if you're looking for a place to start, well, I might know a game. It has le
       },
       {
         title: 'המלצות מעשיות: מה באמת כדאי לעשות?',
-        content: `על בסיס כל מה שקראתי, הנה מה שהייתי אומר לאבא שלי — ומה שהייתי אומר לכם:
+        content: `על בסיס כל מה שקראתי, מה שהייתי אומר לאבא שלי, ולכם:
 
 שחקו משחקי מילים, אבל אל תשחקו רק משחקי מילים. רזרבה קוגניטיבית מרוויחה ממגוון. שלבו משחקי מילים עם פעילויות מעוררות מחשבה אחרות: למדו שפה, נגנו על כלי נגינה, פתרו חידות מתמטיות, שחקו משחקי אסטרטגיה.
 
@@ -301,11 +301,11 @@ And if you're looking for a place to start, well, I might know a game. It has le
 
 "Det är bra för hjärnan," sa doktorn tydligen. "Gör korsord, spela Scrabble, vad som helst med ord."
 
-Min pappa — en pensionerad ingenjör som anser att "nöje" är att organisera om sitt verktygsskjul — tittade på mig som om jag äntligen fått rätt efter år av att försvara min ordspelsvana. "Ser du?" sa han. "Det är medicinsk rådgivning nu."
+Min pappa (en pensionerad ingenjör som anser att "nöje" är att organisera om sitt verktygsskjul) tittade på mig som om jag äntligen fått rätt efter år av att försvara min ordspelsvana. "Ser du?" sa han. "Det är medicinsk rådgivning nu."
 
-Men här är grejen. Jag är inte typen som tar en trevlig rekommendation för given. Om en läkare säger åt min pappa att spela ordspel vill jag veta: vad säger bevisen faktiskt? Inte marknadsföringstexten på hjärnträningsappar. Inte de andlösa rubrikerna. Den faktiska peer-reviewed forskningen.
+Jag är inte typen som tar en trevlig rekommendation för given. Om en läkare säger åt min pappa att spela ordspel vill jag veta: vad säger bevisen faktiskt? Inte marknadsföringstexten på hjärnträningsappar. Inte de andlösa rubrikerna. Den faktiska peer-reviewed forskningen.
 
-Så jag ägnade två månader åt att läsa studier. Och det jag hittade är mer intressant — och mer ärligt — än vad varken hypen eller skepticismen antyder.`,
+Så jag ägnade två månader åt att läsa studier. Och det jag hittade är mer intressant, och mer ärligt, än vad varken hypen eller skepticismen antyder.`,
       },
       {
         title: 'ACTIVE-studien: 19 078 personer, 10 års data',
@@ -321,7 +321,7 @@ Varje typ av träning förbättrade prestationen inom sitt specifika område. Lo
 
 Effekterna höll i sig. Vid 10-årsuppföljningen visade personerna i logik- och hastighetsgrupperna fortfarande förbättringar.
 
-Men — och detta är det avgörande "men" — förbättringarna var till stor del domänspecifika. Att bli bättre på logikpussel gjorde dig inte automatiskt bättre på att komma ihåg var du lade nycklarna.
+Men förbättringarna var till stor del domänspecifika. Att bli bättre på logikpussel gjorde dig inte automatiskt bättre på att komma ihåg var du lade nycklarna.
 
 Det här är resultatet som båda sidor i debatten tenderar att ignorera. Hjärnträningsföretagen vill berätta att det gör dig smartare på allt. Skeptikerna vill berätta att det inte gör någonting. Sanningen ligger mitt emellan: kognitiv träning fungerar, men den fungerar specifikt, inte magiskt.`,
       },
@@ -331,9 +331,9 @@ Det här är resultatet som båda sidor i debatten tenderar att ignorera. Hjärn
 
 Svaret ligger i ett koncept som kallas kognitiv reserv. Tänk på det som din hjärnas sparkonto.
 
-Teorin om kognitiv reserv, utvecklad av forskare som Yaakov Stern vid Columbia University, föreslår att mentalt stimulerande aktiviteter genom livet bygger upp en buffert mot kognitiv nedgång. Det är inte att aktiviteterna förhindrar hjärnans åldrande — det gör de inte. Det är att de ger din hjärna fler alternativa vägar att arbeta med när de primära börjar försämras.
+Teorin om kognitiv reserv, utvecklad av forskare som Yaakov Stern vid Columbia University, föreslår att mentalt stimulerande aktiviteter genom livet bygger upp en buffert mot kognitiv nedgång. Det är inte att aktiviteterna förhindrar hjärnans åldrande (det gör de inte). Det är att de ger din hjärna fler alternativa vägar att arbeta med när de primära börjar försämras.
 
-Föreställ dig två personer med samma mängd åldersrelaterade hjärnförändringar på MRI. En har ägnat årtionden åt mentalt stimulerande arbete — läsning, pussel, språkinlärning. Den andra har inte det. Den första personen kanske inte visar några symptom på kognitiv nedgång medan den andra redan kämpar. Samma hjärnskador, olika utfall.
+Föreställ dig två personer med samma mängd åldersrelaterade hjärnförändringar på MRI. En har ägnat årtionden åt mentalt stimulerande arbete: läsning, pussel, språkinlärning. Den andra har inte det. Den första personen kanske inte visar några symptom på kognitiv nedgång medan den andra redan kämpar. Samma hjärnskador, olika utfall.
 
 En meta-analys i Psychological Medicine (2012) granskade 29 000 individer och fann att högre kognitiv reserv var förknippad med 46% lägre risk att utveckla demens.
 
@@ -347,13 +347,13 @@ Och här är nyckeldetaljen: ordspel, korsord och språkbaserade pussel dyker ko
 
 När du spelar ett ordspel som Boggle eller Scrabble engagerar du samtidigt:
 
-Lexikal hämtning — att dra upp ord ur ditt mentala lexikon i hög hastighet. Det är samma system du använder när du försöker hitta rätt ord i ett samtal, och det är en av de första sakerna som saktar ner med åldern.
+Lexikal hämtning, alltsa att dra upp ord ur ditt mentala lexikon i hög hastighet. Det är samma system du använder när du försöker hitta rätt ord i ett samtal, och det är en av de första sakerna som saktar ner med åldern.
 
-Arbetsminne — att hålla flera bokstavskombinationer i huvudet medan du utvärderar dem. Din fonologiska loop (den del av hjärnan som "ljudar ut" ord internt) kör på full kapacitet.
+Arbetsminne: att hålla flera bokstavskombinationer i huvudet medan du utvärderar dem. Din fonologiska loop (den del av hjärnan som "ljudar ut" ord internt) kör på full kapacitet.
 
-Exekutiv funktion — att bestämma var du ska fokusera uppmärksamheten, när du ska överge en sökväg och prova en annan, hantera din tid.
+Exekutiv funktion: att bestämma var du ska fokusera uppmärksamheten, när du ska överge en sökväg och prova en annan, hantera din tid.
 
-Mönsterigenkänning — att upptäcka bokstavskombinationer som ofta förekommer i ord och använda dessa mönster för att styra din sökning.
+Mönsterigenkänning: att upptäcka bokstavskombinationer som ofta förekommer i ord och använda dessa mönster för att styra din sökning.
 
 Vad ordspel INTE tränar: spatial navigation, matematiskt resonemang, social kognition eller motoriska färdigheter. De är inte ett komplett kognitivt träningsprogram.
 
@@ -379,13 +379,13 @@ Det är som skillnaden mellan ett kosttillskottsföretag som hävdar att deras p
 
 En meta-analys från 2019 i Neuropsychology Review undersökte 52 studier om kognitiv träning hos friska äldre vuxna. Deras resultat: träning producerade pålitliga förbättringar i de övade uppgifterna, med måttliga effektstorlekar. Överföring till oövade uppgifter var mindre men fortfarande statistiskt signifikant.
 
-Cochrane-granskningen (2020) — i princip guldstandarden för medicinska evidensgenomgångar — tittade på datoriserad kognitiv träning under 12 eller fler veckor. De fann att det förmodligen förbättrar övergripande kognition och kan förbättra verbalt minne, men noterade att evidenskvaliteten var måttlig.
+Cochrane-granskningen (2020), i princip guldstandarden för medicinska evidensgenomgångar, tittade på datoriserad kognitiv träning under 12 eller fler veckor. De fann att det förmodligen förbättrar övergripande kognition och kan förbättra verbalt minne, men noterade att evidenskvaliteten var måttlig.
 
-Lägg märke till språket: "förmodligen förbättrar," "kan förbättra," "förknippad med minskad risk." Det här är försiktig vetenskap som talar. De säger inte att ordspel är ett botemedel. De säger att det finns en verklig, mätbar signal i datan — bara inte miraklet som marknadsförarna lovade.`,
+Lägg märke till språket: "förmodligen förbättrar," "kan förbättra," "förknippad med minskad risk." Det här är försiktig vetenskap som talar. De säger inte att ordspel är ett botemedel. De säger att det finns en verklig, mätbar signal i datan. Bara inte miraklet som marknadsförarna lovade.`,
       },
       {
         title: 'Praktiska rekommendationer: Vad bör du faktiskt göra?',
-        content: `Baserat på allt jag har läst, här är vad jag skulle säga till min pappa — och vad jag skulle säga till dig:
+        content: `Baserat på allt jag har läst, här är vad jag skulle säga till min pappa, och vad jag skulle säga till dig:
 
 Spela ordspel, men spela inte BARA ordspel. Kognitiv reserv gynnas av variation. Blanda ordspel med andra mentalt stimulerande aktiviteter: lär dig ett språk, spela ett musikinstrument, gör mattepussel, ta upp ett strategispel.
 
@@ -407,7 +407,7 @@ Ja — med förbehåll.
 
 Ordspel är inget magiskt skydd mot kognitiv nedgång. De kommer inte att förhindra Alzheimers. De kommer inte att göra dig till ett geni. Alla som säljer dig de påståendena säljer ormolja.
 
-Men att regelbundet utmana din hjärna med komplexa språkuppgifter — särskilt i kombination med fysisk träning, sociala kontakter och andra former av mental stimulans — är en av de bästa evidensbaserade sakerna du kan göra för långsiktig kognitiv hälsa. Effektstorlekarna är måttliga, inte mirakulösa. Skyddet är probabilistiskt, inte garanterat. Men det är verkligt.
+Men att regelbundet utmana din hjärna med komplexa språkuppgifter, särskilt i kombination med fysisk träning, sociala kontakter och andra former av mental stimulans, är en av de bästa evidensbaserade sakerna du kan göra för långsiktig kognitiv hälsa. Effektstorlekarna är måttliga, inte mirakulösa. Skyddet är probabilistiskt, inte garanterat. Men det är verkligt.
 
 Min pappa spelar nu ordspel 20 minuter varje morgon. Han är ärligt talat hemsk på dem. Han spenderade en gång fyra minuter på att försöka avgöra om "QI" var ett riktigt ord. (Det är det. Det är en term från kinesisk filosofi. I Sverige skulle vi säga "ki".)
 

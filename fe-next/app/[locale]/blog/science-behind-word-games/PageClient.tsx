@@ -166,28 +166,6 @@ export default function SciencePageClient(): React.ReactElement {
             </div>
           ))}
 
-          {/* Author bio for E-E-A-T */}
-          <div className={cn(
-            'mt-10 p-4 rounded-neo border-3 border-neo-black',
-            isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
-          )}>
-            <div className="flex items-start gap-3">
-              <div className={cn(
-                'w-10 h-10 rounded-full border-2 border-neo-black flex items-center justify-center shrink-0',
-                'bg-neo-lime text-neo-black font-bold text-lg'
-              )}>
-                {content.authorName.charAt(0)}
-              </div>
-              <div>
-                <p className={cn('font-bold text-sm', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  {content.authorName}
-                </p>
-                <p className={cn('text-xs mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                  {content.authorBio}
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* Ad: Before CTAs */}
           <AdPlaceholder zone="content-page" className="my-6" />

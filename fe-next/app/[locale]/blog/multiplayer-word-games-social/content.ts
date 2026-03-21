@@ -165,7 +165,7 @@ Your brain will thank you. Your friendships will thank you. And when you find th
     subtitle: 'קוגניציה שיתופית, טראש טוק תחרותי, ולמה המוח שלכם ממש נדלק אחרת כשיש בני אדם אחרים בסביבה.',
     category: 'מדע חברתי',
     readTime: 'קריאה של 11 דקות',
-    authorName: 'הנרד של המילים',
+    authorName: 'חנון המילים',
     authorBio: 'מטיף כרוני למשחקי מילים שפעם גרם לזר ברכבת לשחק בוגל ארבע תחנות אחרי היעד שלו.',
     sections: [
       {
@@ -173,37 +173,37 @@ Your brain will thank you. Your friendships will thank you. And when you find th
 
 בחרתי באפשרות ב׳. ברור.
 
-והנה העניין — זה לא היה רק יותר כיף. שיחקתי טוב יותר באופן מדיד. אורך המילים הממוצע שלי עלה. מצאתי מילים שלעולם לא הייתי מוצא לבד. ברגע מסוים שיחקתי מילה של שבע אותיות וכמעט התעלפתי מזרם הדופמין, בעיקר כי החבר שלי מיד קרא לי יהיר, מה שאיכשהו עשה את זה אפילו יותר טוב.
+וזה לא היה רק יותר כיף. שיחקתי טוב יותר באופן מדיד. אורך המילים הממוצע שלי עלה. מצאתי מילים שלעולם לא הייתי מוצא לבד. ברגע מסוים שיחקתי מילה של שבע אותיות וכמעט התעלפתי מזרם הדופמין, בעיקר כי החבר שלי מיד קרא לי יהיר, מה שאיכשהו עשה את זה אפילו יותר טוב.
 
-זה לא רק אני שמגזים. יש גוף מחקר הולך וגדל שמראה שמשחקי מילים חברתיים — בין אם שיתופיים או תחרותיים — מפעילים מעגלים עצביים שונים מאשר משחק לבד. המוח שלכם ממש פועל במצב אחר כשבני אדם אחרים מעורבים.`,
+ואני לא מגזים. יש גוף מחקר הולך וגדל שמראה שמשחקי מילים חברתיים, בין אם שיתופיים ובין אם תחרותיים, מפעילים מעגלים עצביים שונים ממשחק לבד. המוח שלכם ממש פועל במצב אחר כשבני אדם אחרים מעורבים.`,
       },
       {
         title: 'סולו מול חברתי: שני מוחות שונים',
-        content: `הנה משהו שהפתיע אותי כשקראתי על זה לראשונה. כששיחקים משחק מילים לבד, האזורים העיקריים שנדלקים הם אזורי עיבוד שפה — אזור ברוקה, אזור ורניקה, הקורטקס הפרה-פרונטלי הדורסולטרלי.
+        content: `משהו שהפתיע אותי כשקראתי על זה לראשונה: כששיחקים משחק מילים לבד, האזורים העיקריים שנדלקים הם אזורי עיבוד שפה. אזור ברוקה, אזור ורניקה, הקורטקס הפרה-פרונטלי הדורסולטרלי.
 
-אבל כשמוסיפים שחקנים אחרים — אפילו רק אחד — רשת נוספת שלמה נכנסת לפעולה. מדעני מוח קוראים לה "רשת המוח החברתי", והיא כוללת את הקורטקס הפרה-פרונטלי המדיאלי, את הצומת הטמפורו-פריאטלי, ואת התלם הטמפורלי העליון האחורי.
+אבל כשמוסיפים שחקנים אחרים (אפילו רק אחד) רשת נוספת שלמה נכנסת לפעולה. מדעני מוח קוראים לה "רשת המוח החברתי", והיא כוללת את הקורטקס הפרה-פרונטלי המדיאלי, את הצומת הטמפורו-פריאטלי, ואת התלם הטמפורלי העליון האחורי.
 
-מחקר מכונן של רדקיי ועמיתיה (2010) השתמש ב-fMRI כדי להשוות פעילות מוחית במשימות סולו מול משימות חברתיות אינטראקטיביות. המצב החברתי הראה הפעלה משמעותית יותר באזורים הקשורים ל"תיאוריית נפש" — חשיבה על מה שאנשים אחרים חושבים.
+מחקר מכונן של רדקיי ועמיתיה (2010) השתמש ב-fMRI כדי להשוות פעילות מוחית במשימות סולו מול משימות חברתיות אינטראקטיביות. המצב החברתי הראה הפעלה משמעותית יותר באזורים הקשורים ל"תיאוריית נפש", כלומר חשיבה על מה שאנשים אחרים חושבים.
 
-במונחי משחקי מילים: כששיחקים לבד, רק מחפשים מילים. כששיחקים עם אחרים, במקביל עוקבים אחרי מילים שהם עלולים למצוא, צופים את האסטרטגיה שלהם, מנטרים את הדינמיקה החברתית, ומנהלים את חרדת הביצועים שלכם. המוח עושה עבודה כפולה — וזה דווקא מעורר אנרגיה.`,
+במונחי משחקי מילים: כששיחקים לבד, רק מחפשים מילים. כששיחקים עם אחרים, במקביל עוקבים אחרי מילים שהם עלולים למצוא, צופים את האסטרטגיה שלהם, מנטרים את הדינמיקה החברתית, ומנהלים את חרדת הביצועים שלכם. המוח עושה עבודה כפולה. וזה דווקא מעורר אנרגיה, לא מתיש.`,
       },
       {
         title: 'קוגניציה תחרותית: למה יריבות משחיזה את המוח',
         content: `תחרות עושה דברים מוזרים למוח. מחקרי fMRI מראים שהקשרים תחרותיים מפעילים את הסטריאטום הוונטרלי ואת הקורטקס הצינגולטי הקדמי בדרכים שהקשרים שיתופיים או סולו לא עושים.
 
-מחקר של דסטי ועמיתיו (2004) מצא שכשמשתתפים האמינו שהם מתחרים נגד אדם אחר (לעומת מחשב), המוח שלהם הראה הפעלה מוגברת באזורים הקשורים לציפייה לתגמול ותכנון אסטרטגי. המילה המפתח היא "האמינו" — האמונה שיש בן אדם אמיתי בצד השני הספיקה כדי להפעיל את המפל העצבי התחרותי.
+מחקר של דסטי ועמיתיו (2004) מצא שכשמשתתפים האמינו שהם מתחרים נגד אדם אחר (לעומת מחשב), המוח שלהם הראה הפעלה מוגברת באזורים הקשורים לציפייה לתגמול ותכנון אסטרטגי. המילה המפתח היא "האמינו". האמונה שיש בן אדם אמיתי בצד השני הספיקה כדי להפעיל את המפל העצבי התחרותי.
 
 זה ממש מתמפה על החוויה שלי. כששאני משחק נגד בוט, אני מעורב. כששאני משחק נגד חבר שאני יודע שהולך לצחוק עליי אם הוא ינצח — אני נעול. כל סיב בגוף מחפש את המילה של שבע אותיות.
 
-יש מלכוד אחד. תחרות משפרת ביצועים רק עד נקודה מסוימת. יותר מדי לחץ תחרותי מפעיל תגובות חרדה שפוגעות בתפקוד הקוגניטיבי. הנקודה המתוקה היא מה שפסיכולוגים קוראים "עוררות אופטימלית" — מספיק תחרותי כדי להניע, לא כל כך תחרותי שזה הופך ללחץ. לכן ערבי משחקים קזואליים מרגישים כל כך טוב.`,
+יש מלכוד אחד. תחרות משפרת ביצועים רק עד נקודה מסוימת. יותר מדי לחץ תחרותי מפעיל תגובות חרדה שפוגעות בתפקוד הקוגניטיבי. הנקודה המתוקה, "עוררות אופטימלית" בשפת הפסיכולוגים, היא מספיק תחרותי כדי להניע, לא כל כך שזה הופך ללחץ. לכן ערבי משחקים קזואליים מרגישים כל כך טוב.`,
       },
       {
         title: 'אפקט הג׳קבוקס: משחקי מילים חברתיים ושמחה קולקטיבית',
-        content: `אם פעם שיחקתם משחק מסיבות של Jackbox, אתם יודעים בדיוק על מה אני מדבר. יש סוג ספציפי של שמחה שמגיע ממשחקי מילים בסביבה קבוצתית — חשמל יצירתי קולקטיבי שלא קיים כששיחקים לבד.
+        content: `אם פעם שיחקתם משחק מסיבות של Jackbox, אתם יודעים בדיוק על מה אני מדבר. יש סוג ספציפי של שמחה שמגיע ממשחקי מילים בסביבה קבוצתית, חשמל יצירתי קולקטיבי שלא קיים כששיחקים לבד.
 
-מעצבי משחקים קוראים לזה "מרחב יצירתי משותף." הרעיון הוא שכשמספר אנשים מייצרים רעיונות בו-זמנית — תשובות מצחיקות, משחקי מילים יצירתיים, אסוציאציות בלתי צפויות — הקבוצה מייצרת משהו גדול יותר מכל פרט לבדו.
+מעצבי משחקים קוראים לזה "מרחב יצירתי משותף." הרעיון הוא שכשמספר אנשים מייצרים רעיונות בו-זמנית. תשובות מצחיקות, משחקי מילים יצירתיים, אסוציאציות בלתי צפויות. הקבוצה מייצרת משהו גדול יותר מכל פרט לבדו.
 
-משחקי מילים יוצרים את הדינמיקה הנכונה באופן טבעי. הכללים מספקים מבנה. לחץ הזמן מונע חשיבת-יתר. והסביבה החברתית מספקת משוב מיידי — צחוק, גניחות, "יאללה, זו לא מילה!" נוירונים מראה ו"הדבקה רגשית" מגבירים את השמחה — כשרואים מישהו אחר מגיב בהפתעה, המוח שלנו משקף את הרגש הזה.`,
+משחקי מילים יוצרים את הדינמיקה הנכונה באופן טבעי. הכללים מספקים מבנה. לחץ הזמן מונע חשיבת-יתר. והסביבה החברתית מספקת משוב מיידי: צחוק, גניחות, "יאללה, זו לא מילה!" נוירונים מראה ו"הדבקה רגשית" מגבירים את השמחה. כשרואים מישהו אחר מגיב בהפתעה, המוח שלנו משקף את הרגש הזה.`,
       },
       {
         title: 'קורונה וקו ההצלה של החיבור הדיגיטלי',
@@ -211,15 +211,15 @@ Your brain will thank you. Your friendships will thank you. And when you find th
 
 כשהסגרים הגיעו, מכירות משחקי לוח זינקו. אבל גם משחקי מילים מרובי משתתפים אונליין. Words With Friends ראו עלייה של 40% במשתמשים פעילים יומיים במרץ 2020. אנשים חיפשו נואשות חיבור חברתי, ומשחקי מילים סיפקו צורה ייחודית שלו.
 
-מחקר של ואור ועמיתיו (2021) מצא שגיימינג חברתי במהלך המגפה היה קשור לרווחה נפשית טובה יותר — אבל רק כשהמשחק כלל אינטראקציה חברתית אמיתית, לא רק משחק לצד אחרים. המרכיב המפתח היה תקשורת.
+מחקר של ואור ועמיתיו (2021) מצא שגיימינג חברתי במהלך המגפה היה קשור לרווחה נפשית טובה יותר, אבל רק כשהמשחק כלל אינטראקציה חברתית אמיתית, לא רק משחק לצד אחרים. המרכיב המפתח היה תקשורת.
 
-שיחקתי יותר משחקי מילים אונליין בסגר מאשר בכל תקופה אחרת בחיי. ובמבט לאחור, המשחקים האלה לא היו באמת על המילים. הם היו על שמירת קשרים. ערב הבוגל השבועי שלי בזום עם חברים מהתואר לא היה סשן משחקים — זה היה טקס חברתי שהתחפש למשחק.`,
+שיחקתי יותר משחקי מילים אונליין בסגר מאשר בכל תקופה אחרת בחיי. ובמבט לאחור, המשחקים האלה לא היו באמת על המילים. הם היו על שמירת קשרים. ערב הבוגל השבועי שלי בזום עם חברים מהתואר לא היה סשן משחקים. זה היה טקס חברתי שהתחפש למשחק.`,
       },
       {
         title: 'הרנסנס של המולטיפלייר המקומי',
-        content: `הנה טרנד שאני מוצא מרגש באמת. אחרי שנים שגיימינג זז יותר ויותר לאונליין, יש רנסנס של מולטיפלייר מקומי — אנשים שמשחקים ביחד, באותו חדר.
+        content: `יש טרנד שאני מוצא מרגש באמת. אחרי שנים שגיימינג זז יותר ויותר לאונליין, יש רנסנס של מולטיפלייר מקומי. אנשים שמשחקים ביחד, באותו חדר.
 
-הנתונים תומכים בזה. בתי קפה של משחקי לוח פרצו גלובלית — היו כ-5,000 ברחבי העולם ב-2023, לעומת פחות מ-1,000 ב-2015. מכירות משחקי מסיבות עלו על קטגוריות אחרות באופן עקבי מאז 2019.
+הנתונים תומכים בזה. בתי קפה של משחקי לוח פרצו גלובלית. היו כ-5,000 ברחבי העולם ב-2023, לעומת פחות מ-1,000 ב-2015. מכירות משחקי מסיבות עלו על קטגוריות אחרות באופן עקבי מאז 2019.
 
 משחקי מילים מתאימים בצורה מושלמת לרנסנס הזה. לא צריך חומרה יקרה. לא צריך ללמוד כללים מורכבים. צריך אותיות ובני אדם, וזהו.
 
@@ -229,11 +229,11 @@ Your brain will thank you. Your friendships will thank you. And when you find th
         title: 'טראש טוק כמנגנון קירוב: הפרדוקס של עלבונות ידידותיים',
         content: `אני יכול להיות כנה? אחד החלקים האהובים עליי במשחקי מילים מרובי משתתפים הוא הטראש טוק.
 
-יש פרדוקס נפלא בלב הגיימינג החברתי התחרותי: העלבונות מקרבים אתכם. לקרוא לחבר "רמאי לקסיקלי" כשהוא משחק מילה של שתי אותיות זה לא אגרסיבי — זה אינטימי. זה מאותת על מערכת יחסים מספיק בטוחה לספוג עוינות משחקית.
+יש פרדוקס נפלא בלב הגיימינג החברתי התחרותי: העלבונות מקרבים אתכם. לקרוא לחבר "רמאי לקסיקלי" כשהוא משחק מילה של שתי אותיות זה לא אגרסיבי, זה אינטימי. זה מאותת על מערכת יחסים מספיק בטוחה לספוג עוינות משחקית.
 
 פסיכולוגים קוראים לזה "התגרות שייכותית," וזה נחקר בהרחבה. קלטנר ועמיתיו (2001) פרסמו מחקר שמראה שהתגרות משרתת פונקציות חברתיות חיוניות: היא בוחנת ומחזקת קשרים, מבססת נורמות קבוצתיות, ויוצרת הומור משותף.
 
-במשחקי מילים, טראש טוק גם יוצר נרטיב. סיבוב בוגל בלי תגובות הוא רק תרגיל אוצר מילים. סיבוב בוגל עם טראש טוק — זה סיפור. נתייחס אליו שבועות.`,
+במשחקי מילים, טראש טוק גם יוצר נרטיב. סיבוב בוגל בלי תגובות הוא רק תרגיל אוצר מילים. סיבוב בוגל עם טראש טוק? זה סיפור. נתייחס אליו שבועות.`,
       },
       {
         title: 'ערב משחקים משפחתי: מה המחקר באמת מראה',
@@ -241,19 +241,19 @@ Your brain will thank you. Your friendships will thank you. And when you find th
 
 המחקר על ערבי משחקים משפחתיים מפתיע בחוסנו. מחקר אורכי של קויל-שפרד וניולנד (2013) מצא שמשפחות ששיחקו משחקים יחד באופן קבוע דיווחו על לכידות משפחתית חזקה יותר, תקשורת טובה יותר בין הורים לילדים, ושביעות רצון משפחתית גבוהה יותר.
 
-משחקי מילים יעילים במיוחד למשפחות כי הם מכילים רמות מיומנות שונות. ילד בן שש שמוצא מילה של שלוש אותיות על אותו לוח שבו הורה מוצא מילה של שמונה — הוא לא מפסיד. כולם יכולים לחגוג את הניצחונות של כולם.
+משחקי מילים יעילים במיוחד למשפחות כי הם מכילים רמות מיומנות שונות. ילד בן שש שמוצא מילה של שלוש אותיות על אותו לוח שבו הורה מוצא מילה של שמונה? הוא לא מפסיד. כולם יכולים לחגוג את הניצחונות של כולם.
 
-יש גם מחקר מתפתח על יתרונות קוגניטיביים בין-דוריים. כשסבים משחקים משחקי מילים עם נכדים, שני הדורות מרוויחים — הסב מקבל גירוי קוגניטיבי וחיבור חברתי, והנכד מקבל חשיפה לאוצר מילים ותשומת לב אישית ממבוגר אכפתי.`,
+יש גם מחקר מתפתח על יתרונות קוגניטיביים בין-דוריים. כשסבים משחקים משחקי מילים עם נכדים, שני הדורות מרוויחים: הסב מקבל גירוי קוגניטיבי וחיבור חברתי, והנכד מקבל חשיפה לאוצר מילים ותשומת לב אישית ממבוגר אכפתי.`,
       },
       {
         title: 'בניית קהילת משחקי מילים (ולמה זה חשוב)',
-        content: `כל המחקר שדנתי בו מצביע לכיוון אחד: משחקי מילים הם טכנולוגיה חברתית. הם כלים לחיבור בין בני אדם, והיתרונות הקוגניטיביים שלהם מוגברים — לפעמים באופן דרמטי — בהקשר חברתי.
+        content: `כל המחקר שדנתי בו מצביע לכיוון אחד: משחקי מילים הם טכנולוגיה חברתית. הם כלים לחיבור בין בני אדם, והיתרונות הקוגניטיביים שלהם מוגברים (לפעמים באופן דרמטי) בהקשר חברתי.
 
 אם אתם משחקים משחקי מילים לבד, אתם מקבלים יתרונות קוגניטיביים אמיתיים. אבל אתם משאירים כמות עצומה של ערך על השולחן. הוספת אפילו אדם אחד משנה את החוויה. אתם מקבלים הקלה חברתית, קוגניציה תחרותית, הגברה רגשית, בניית נרטיב, וחיזוק מערכות יחסים.
 
-המחקר על "מקומות שלישיים" — סביבות חברתיות נפרדות מבית ועבודה — מציע שמפגשים חברתיים קבועים ובלחץ נמוך חיוניים לרווחה. ערבי משחקי מילים הם פעילויות "מקום שלישי" מושלמות.
+המחקר על "מקומות שלישיים", סביבות חברתיות נפרדות מבית ועבודה, מציע שמפגשים חברתיים קבועים ובלחץ נמוך חיוניים לרווחה. ערבי משחקי מילים הם פעילויות "מקום שלישי" מושלמות.
 
-אז הנה ההצעה שלי: תתחילו ערב משחקי מילים. תתפסו כמה חברים, תפתחו חטיפים, ותשחקו. לא צריך להיות טובים. לא צריך לדעת מילים אזוטריות. רק צריך להגיע ולהיות מוכנים להתווכח. המוח שלכם יודה לכם. החברויות שלכם יודו לכם.`,
+נו, אז תתחילו ערב משחקי מילים. תתפסו כמה חברים, תפתחו חטיפים, ותשחקו. לא צריך להיות טובים. לא צריך לדעת מילים אזוטריות. רק צריך להגיע ולהיות מוכנים להתווכח. המוח שלכם יודה לכם. החברויות שלכם יודו לכם.`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -273,37 +273,37 @@ Your brain will thank you. Your friendships will thank you. And when you find th
 
 Jag valde B. Sjalvklart.
 
-Och har ar grejen — det var inte bara roligare. Jag spelade matbart battre. Min genomsnittliga ordlangd okade. Jag hittade ord jag aldrig hade sett ensam. Vid ett tillfalle spelade jag ett sjubokstavsord och nistan svimmade av dopaminrushen, mest for att min van omedelbart kallade mig en angare, vilket pa nagot satt gjorde det annu battre.
+Det var inte bara roligare. Jag spelade matbart battre. Min genomsnittliga ordlangd okade. Jag hittade ord jag aldrig hade sett ensam. Vid ett tillfalle spelade jag ett sjubokstavsord och nistan svimmade av dopaminrushen, mest for att min van omedelbart kallade mig en angare, vilket pa nagot satt gjorde det annu battre.
 
-Det har ar inte bara jag som overdriver. Det finns en vaxande forskningslitteratur som visar att sociala ordspel — bade kooperativa och tavlingsinriktade — aktiverar andra neurala kretsar an solospel. Din hjarna opererar bokstavligen i ett annat lage nar andra manniskor ar med.`,
+Det har ar inte bara jag som overdriver. Det finns en vaxande forskningslitteratur som visar att sociala ordspel, bade kooperativa och tavlingsinriktade, aktiverar andra neurala kretsar an solospel. Din hjarna opererar bokstavligen i ett annat lage nar andra manniskor ar med.`,
       },
       {
         title: 'Solo mot socialt: Tva olika hjarnor',
-        content: `Nar du spelar ett ordspel ensam ar de primara regionerna som lyser upp sprakomraden — Brocas omrade, Wernickes omrade, den dorsolaterala prefrontala cortex.
+        content: `Nar du spelar ett ordspel ensam ar de primara regionerna som lyser upp sprakomraden: Brocas omrade, Wernickes omrade, den dorsolaterala prefrontala cortex.
 
-Men nar du lagger till andra spelare — aven bara en — startar ett helt extra natverk. Neuroforskare kallar det "det sociala hjarnatverket" och det inkluderar mediala prefrontala cortex, temporoparietala knutpunkten och bakre ovre temporala sulcus.
+Men nar du lagger till andra spelare, aven bara en, startar ett helt extra natverk. Neuroforskare kallar det "det sociala hjarnatverket" och det inkluderar mediala prefrontala cortex, temporoparietala knutpunkten och bakre ovre temporala sulcus.
 
-En banbrytande studie av Redcay et al. (2010) anvande fMRI for att jamfora hjarnaktivitet under solouppgifter mot interaktiva sociala uppgifter. Det sociala tillstandet visade signifikant storre aktivering i omraden forknippade med mentalisering — att tanka pa vad andra manniskor tanker.
+En banbrytande studie av Redcay et al. (2010) anvande fMRI for att jamfora hjarnaktivitet under solouppgifter mot interaktiva sociala uppgifter. Det sociala tillstandet visade signifikant storre aktivering i omraden forknippade med mentalisering, alltsa att tanka pa vad andra manniskor tanker.
 
-I ordspelstermer: nar du spelar ensam soker du bara efter ord. Nar du spelar med andra foljer du samtidigt vilka ord de kan hitta, forsaker forutse deras strategi och hanterar din egen prestationsangest. Hjarnan gor dubbelt arbete — och det ar faktiskt energigivande, inte uttommande.`,
+I ordspelstermer: nar du spelar ensam soker du bara efter ord. Nar du spelar med andra foljer du samtidigt vilka ord de kan hitta, forsaker forutse deras strategi och hanterar din egen prestationsangest. Hjarnan gor dubbelt arbete, och det ar faktiskt energigivande, inte uttommande.`,
       },
       {
         title: 'Tavlingskognition: Varfor rivalitet vassar sinnet',
         content: `Tavling gor konstiga saker med hjarnan. fMRI-studier visar att tavlingssammanhang aktiverar ventrala striatum och anteriora cingulara cortex pa satt som kooperativa eller solosammanhang inte gor.
 
-En studie av Decety et al. (2004) fann att nar deltagare trodde att de tavlade mot en annan person (jamfort med en dator), visade deras hjarna okad aktivering i omraden forknippade med beloning och strategisk planering. Nyckelordet ar "trodde" — tron att en riktig manniska var pa andra sidan rakte for att utlosa den tavlingsinriktade neurala kaskaden.
+En studie av Decety et al. (2004) fann att nar deltagare trodde att de tavlade mot en annan person (jamfort med en dator), visade deras hjarna okad aktivering i omraden forknippade med beloning och strategisk planering. Nyckelordet ar "trodde". Tron att en riktig manniska var pa andra sidan rakte for att utlosa den tavlingsinriktade neurala kaskaden.
 
 Mekanismen verkar vara relaterad till social jamforelseteori, forst foreslagen av Leon Festinger 1954. Vi ar hardkodade att utvardera vara formagar i forhallande till andra. I ett tavlingsinriktat ordspel ar varje ord din motstandare hittar en datapunkt din hjarna anvander for att kalibrera sin egen prestation.
 
-Det finns dock en hake. Tavling forstarker prestation bara till en viss punkt. For mycket tavlingstryck kan utlosa angstreaktioner som faktiskt forsemrar kognitiv funktion. Den ljuva punkten ar "optimal arousal" — tillrackligt tavlingsinriktat for att motivera, men inte sa tavlingsinriktat att det blir stressigt.`,
+Det finns dock en hake. Tavling forstarker prestation bara till en viss punkt. For mycket tavlingstryck kan utlosa angstreaktioner som faktiskt forsemrar kognitiv funktion. Den ljuva punkten ar "optimal arousal", tillrackligt tavlingsinriktat for att motivera, men inte sa tavlingsinriktat att det blir stressigt.`,
       },
       {
         title: 'Jackbox-effekten: Festordspel och kollektiv gladje',
-        content: `Om du nagonsin har spelat ett Jackbox-festspel vet du exakt vad jag pratar om. Det finns en specifik gladje som kommer fran ordlek i gruppmiljo — en kollektiv kreativ elektricitet som inte existerar nar du ar ensam.
+        content: `Om du nagonsin har spelat ett Jackbox-festspel vet du exakt vad jag pratar om. Det finns en specifik gladje som kommer fran ordlek i gruppmiljo. En kollektiv kreativ elektricitet som inte existerar nar du ar ensam.
 
-Speldesigners har en term for detta: "delat kreativt utrymme." Iden ar att nar flera manniskor genererar ideer samtidigt — roliga svar, kreativ ordlek, oforvannade associationer — producerar gruppen nagot storre an vad nagon individ kunde ensam.
+Speldesigners har en term for detta: "delat kreativt utrymme." Iden ar att nar flera manniskor genererar ideer samtidigt, roliga svar, kreativ ordlek, oforvannade associationer, producerar gruppen nagot storre an vad nagon individ kunde ensam.
 
-Ordspel skapar naturligt ratt dynamik. Reglerna ger struktur. Tidspressen forhindrar overtankande. Och den sociala miljon ger omedelbar aterrappling — skratt, suckande, "men kom igen, det dar ar ju inte ett ord!"
+Ordspel skapar naturligt ratt dynamik. Reglerna ger struktur. Tidspressen forhindrar overtankande. Och den sociala miljon ger omedelbar aterrappling: skratt, suckande, "men kom igen, det dar ar ju inte ett ord!"
 
 Neuroforskningen bakom detta involverar spegelneuroner och emotionell smittan. Nar du ser nagon annan reagera med fervaning eller gladje speglar din hjarna den emotionen. Gladjen av att hitta ett bra ord forstorks av gladjen att se andra reagera pa det. Det ar en positiv aterkopplingsloop av delad njutning.`,
       },
@@ -313,15 +313,15 @@ Neuroforskningen bakom detta involverar spegelneuroner och emotionell smittan. N
 
 Nar nedstangningarna kom okade forsaljningen av bradspel. Men sa gjorde aven online multiplayer-ordspel. Words With Friends sag en 40-procentig okning av dagliga aktiva anvandare i mars 2020. Manniskor sokte desperat social kontakt, och ordspel erbjod en unik form av den.
 
-En studie av Vuorre et al. (2021) fann att socialt spelande under pandemin var forknippat med battre psykiskt valmaende — men bara nar spelandet involverade faktisk social interaktion, inte bara att spela bredvid andra. Nyckelingrediensen var kommunikation.
+En studie av Vuorre et al. (2021) fann att socialt spelande under pandemin var forknippat med battre psykiskt valmaende, men bara nar spelandet involverade faktisk social interaktion, inte bara att spela bredvid andra. Nyckelingrediensen var kommunikation.
 
-Jag spelade fler online-ordspel under nedstangningen an under nagon annan period i mitt liv. Och nar jag ser tillbaka var de spelen inte egentligen om orden. De handlade om att upprathalla kontakter. Min veckovisa Boggle-kvall over Zoom var inte en spelsession — det var en social ritual forkladd som ett spel.`,
+Jag spelade fler online-ordspel under nedstangningen an under nagon annan period i mitt liv. Och nar jag ser tillbaka var de spelen inte egentligen om orden. De handlade om att upprathalla kontakter. Min veckovisa Boggle-kvall over Zoom var inte en spelsession. Det var en social ritual forkladd som ett spel.`,
       },
       {
         title: 'Renassansen for lokalt multiplayer',
-        content: `Har ar en trend jag finner genuint spannande. Efter ar dar spelande blivit alltmer online, sker en renassans for lokalt multiplayer — manniskor som spelar spel tillsammans, i samma rum.
+        content: `Jag finner en trend jag finner genuint spannande. Efter ar dar spelande blivit alltmer online, sker en renassans for lokalt multiplayer. Manniskor som spelar spel tillsammans, i samma rum.
 
-Datan stodjer detta. Bradspelscafeer har exploderat globalt — det fanns uppskattningsvis 5 000+ varlden over 2023, upp fran farre an 1 000 ar 2015. Forsaljningen av festspel har overtraffat andra bradspelskategorier konsekvent sedan 2019.
+Datan stodjer detta. Bradspelscafeer har exploderat globalt; det fanns uppskattningsvis 5 000+ varlden over 2023, upp fran farre an 1 000 ar 2015. Forsaljningen av festspel har overtraffat andra bradspelskategorier konsekvent sedan 2019.
 
 Ordspel passar perfekt in i denna renassans. Man behover ingen dyr hardvara. Man behover inte lara sig komplicerade regler. Man behover bokstaver och manniskor, och sa ar det klart.
 
@@ -331,11 +331,11 @@ Det som slar mig varje gang ar hur annorlunda energin ar jamfort med vara online
         title: 'Skitsnack som sammanhallning: Paradoxen med vanliga fornarmelser',
         content: `Kan jag vara arlig? En av mina favoritdelar med multiplayer-ordspel ar skitsnacket.
 
-Det finns en underbar paradox i hjartat av tavlingsinriktat socialt spelande: fornarmelserna for er narmare varandra. Att kalla din van en "lexikal bedragare" nar de spelar ett tvabokstavsord ar inte aggressivt — det ar intimt. Det signalerar en relation trygg nog att absorbera lekfull fientlighet.
+Det finns en underbar paradox i hjartat av tavlingsinriktat socialt spelande: fornarmelserna for er narmare varandra. Att kalla din van en "lexikal bedragare" nar de spelar ett tvabokstavsord ar inte aggressivt, det ar intimt. Det signalerar en relation trygg nog att absorbera lekfull fientlighet.
 
 Psykologer kallar detta "affiliativ retsamhet" och det har studerats utforligt. Keltner et al. (2001) visade att retsamhet fyller viktiga sociala funktioner: den testar och forstorker sociala band, etablerar gruppnormer och skapar delad humor.
 
-I ordspel specifikt fyller skitsnack en ytterligare funktion — det skapar narrativ. En Boggle-runda utan kommentarer ar bara en ordforradsoving. En Boggle-runda med skitsnack — det ar en historia. Vi refererar till den i veckor.`,
+I ordspel specifikt fyller skitsnack en ytterligare funktion: det skapar narrativ. En Boggle-runda utan kommentarer ar bara en ordforradsoving. En Boggle-runda med skitsnack? Det ar en historia. Vi refererar till den i veckor.`,
       },
       {
         title: 'Familjespekvallen: Vad forskningen faktiskt visar',
@@ -343,17 +343,17 @@ I ordspel specifikt fyller skitsnack en ytterligare funktion — det skapar narr
 
 Forskningen om familjespekvallen ar overraskande robust. En longitudinell studie av Coyl-Shepherd och Newland (2013) fann att familjer som regelbundet spelade spel tillsammans rapporterade starkare familjesammanhallning, battre foralder-barn-kommunikation och hogre familjetillfredsstallelse.
 
-Ordspel ar sarskilt effektiva for familjer for att de naturligt rymmer olika kompetensnivaer. Ett sexarigt barn som hittar KAT pa samma rutndt dar en foralder hittar KATASTROF forlorar inte — alla kan fira varandras segrar.
+Ordspel ar sarskilt effektiva for familjer for att de naturligt rymmer olika kompetensnivaer. Ett sexarigt barn som hittar KAT pa samma rutndt dar en foralder hittar KATASTROF forlorar inte. Alla kan fira varandras segrar.
 
-Det finns ocksa framvaxande forskning om intergenerationella kognitiva fordelar. Nar morforaldrar spelar ordspel med barnbarn drar bada generationerna nytta — morforaldern far kognitiv stimulans, och barnbarnet far ordforradexponering och uppmarksamhet fran en omtanksam vuxen.`,
+Det finns ocksa framvaxande forskning om intergenerationella kognitiva fordelar. Nar morforaldrar spelar ordspel med barnbarn drar bada generationerna nytta. Morforaldern far kognitiv stimulans, och barnbarnet far ordforradexponering och uppmarksamhet fran en omtanksam vuxen.`,
       },
       {
         title: 'Att bygga en ordspelsgemenskap (och varfor det spelar roll)',
-        content: `All forskning jag diskuterat pekar at ett hall: ordspel ar social teknologi. De ar verktyg for att koppla samman manniskor, och deras kognitiva fordelar forstorks — ibland dramatiskt — av socialt sammanhang.
+        content: `All forskning jag diskuterat pekar at ett hall: ordspel ar social teknologi. De ar verktyg for att koppla samman manniskor, och deras kognitiva fordelar forstorks (ibland dramatiskt) av socialt sammanhang.
 
 Om du spelar ordspel ensam far du akta kognitiva fordelar. Men du lamnar ett enormt varde pa bordet. Att lagga till aven bara en person forvandlar upplevelsen.
 
-Forskningen om "tredje platser" — sociala miljoer separata fran hem och arbete — tyder pa att regelbundna, avslappnade sociala sammankomster ar vasentliga for valmaende. Ordspelskvalllar ar perfekta tredjeplatsaktiviteter.
+Forskningen om "tredje platser", sociala miljoer separata fran hem och arbete, tyder pa att regelbundna, avslappnade sociala sammankomster ar vasentliga for valmaende. Ordspelskvalllar ar perfekta tredjeplatsaktiviteter.
 
 Sa har ar mitt forslag: starta en ordspelskvall. Ta nagra vanner, oppna snacks och spela. Du behover inte vara bra. Du behover inte kunna obskyra ord. Du behover bara dyka upp och vara villig att argumentera om huruvida QI ar ett riktigt ord. Din hjarna kommer att tacka dig. Dina vanskap kommer att tacka dig.`,
       },
@@ -477,25 +477,25 @@ Vuorreら（2021）の研究は、パンデミック中のソーシャルゲー�
 
 Elegi la B. Obviamente.
 
-Y aqui esta la cosa: no solo fue mas divertido. Jugue mediblemente mejor. Mi longitud promedio de palabra aumento. Encontre palabras que jamas habria visto solo. En un momento jugue una palabra de siete letras y casi me desmaye del rush de dopamina, principalmente porque mi amigo inmediatamente me llamo presumido, lo cual de alguna manera lo hizo aun mejor.
+Y no solo fue mas divertido. Jugue mediblemente mejor. Mi longitud promedio de palabra aumento. Encontre palabras que jamas habria visto solo. En un momento jugue una palabra de siete letras y casi me desmaye del rush de dopamina, principalmente porque mi amigo inmediatamente me llamo presumido, lo cual de alguna manera lo hizo aun mejor.
 
 No estoy exagerando. Hay un cuerpo creciente de investigacion que muestra que jugar juegos de palabras socialmente — ya sea cooperativo o competitivo — activa circuitos neuronales diferentes que jugar solo. Tu cerebro literalmente opera en un modo diferente cuando otros humanos estan involucrados.`,
       },
       {
         title: 'Solo vs social: Dos cerebros diferentes',
-        content: `Algo que me sorprendio cuando lo lei por primera vez. Cuando juegas un juego de palabras solo, las regiones primarias que se iluminan son areas de procesamiento del lenguaje — area de Broca, area de Wernicke, corteza prefrontal dorsolateral.
+        content: `Cuando juegas un juego de palabras solo, las regiones primarias que se iluminan son areas de procesamiento del lenguaje — area de Broca, area de Wernicke, corteza prefrontal dorsolateral.
 
 Pero cuando agregas otros jugadores — incluso solo uno — una red adicional completa se activa. Los neurocientificos la llaman "red del cerebro social" e incluye la corteza prefrontal medial, la union temporoparietal y el surco temporal superior posterior.
 
 Un estudio historico de Redcay et al. (2010) uso fMRI para comparar la actividad cerebral durante tareas solitarias versus tareas sociales interactivas. La condicion social mostro activacion significativamente mayor en areas asociadas con la mentalizacion — pensar en lo que otros estan pensando.
 
-En terminos de juegos de palabras: cuando juegas solo, solo buscas palabras. Cuando juegas con otros, simultaneamente rastrear que palabras podrian encontrar, anticipas su estrategia, monitoreas las dinamicas sociales y manejas tu ansiedad de rendimiento. El cerebro hace trabajo doble — y eso es energizante, no agotador.`,
+En terminos de juegos de palabras: cuando juegas solo, solo buscas palabras. Cuando juegas con otros, simultaneamente rastrear que palabras podrian encontrar, anticipas su estrategia, monitoreas las dinamicas sociales y manejas tu ansiedad de rendimiento. El cerebro hace trabajo doble, y eso es energizante, no agotador.`,
       },
       {
         title: 'Cognicion competitiva: Por que la rivalidad agudiza la mente',
         content: `La competencia hace cosas extranas al cerebro. Estudios de fMRI muestran que los contextos competitivos activan el estriado ventral y la corteza cingulada anterior de maneras que los contextos cooperativos o solitarios no lo hacen.
 
-Un estudio de Decety et al. (2004) encontro que cuando los participantes creian que competian contra otra persona (versus una computadora), su cerebro mostro activacion mejorada en regiones asociadas con la anticipacion de recompensa y la planificacion estrategica. La frase clave es "creian" — la creencia de que un humano real estaba del otro lado fue suficiente para desencadenar la cascada neural competitiva.
+Un estudio de Decety et al. (2004) encontro que cuando los participantes creian que competian contra otra persona (versus una computadora), su cerebro mostro activacion mejorada en regiones asociadas con la anticipacion de recompensa y la planificacion estrategica. La frase clave es "creian": la creencia de que un humano real estaba del otro lado fue suficiente para desencadenar la cascada neural competitiva.
 
 El mecanismo parece estar relacionado con la teoria de la comparacion social, propuesta por Leon Festinger en 1954. Estamos programados para evaluar nuestras habilidades en relacion con otros. En un juego de palabras competitivo, cada palabra que tu oponente encuentra es un punto de datos que tu cerebro usa para calibrar su propio rendimiento.
 
@@ -513,17 +513,17 @@ La neurociencia detras de esto involucra neuronas espejo y contagio emocional. C
       },
       {
         title: 'COVID y la linea de vida de la conexion digital',
-        content: `Necesito hablar sobre 2020 y 2021. La pandemia cambio fundamentalmente como pensamos sobre el gaming social.
+        content: `Tenemos que hablar de 2020 y 2021. La pandemia cambio fundamentalmente como pensamos sobre el gaming social.
 
 Cuando llegaron los confinamientos, las ventas de juegos de mesa se dispararon. Pero tambien los juegos de palabras multijugador en linea. Words With Friends vio un aumento del 40% en usuarios activos diarios en marzo de 2020. La gente buscaba desesperadamente conexion social, y los juegos de palabras proporcionaron una forma unica de ella.
 
 Un estudio de Vuorre et al. (2021) encontro que el gaming social durante la pandemia estaba asociado con mejor bienestar mental — pero solo cuando el juego involucraba interaccion social real, no solo jugar junto a otros. El ingrediente clave era la comunicacion.
 
-Jugue mas juegos de palabras en linea durante el confinamiento que en cualquier otro periodo de mi vida. Mirando hacia atras, esos juegos no eran realmente sobre las palabras. Eran sobre mantener conexiones. Mi noche semanal de Boggle por Zoom no era una sesion de juego — era un ritual social disfrazado de juego.`,
+Jugue mas juegos de palabras en linea durante el confinamiento que en cualquier otro periodo de mi vida. Mirando hacia atras, esos juegos no eran realmente sobre las palabras. Eran sobre mantener conexiones. Mi noche semanal de Boggle por Zoom no era una sesion de juego, era un ritual social disfrazado de juego.`,
       },
       {
         title: 'El renacimiento del multijugador local',
-        content: `Aqui hay una tendencia que encuentro genuinamente emocionante. Despues de anos de gaming moviendose cada vez mas en linea, hay un renacimiento del multijugador local — personas jugando juntas, en la misma habitacion.
+        content: `Mira, esto me emociona de verdad. Despues de anos de gaming moviendose cada vez mas en linea, hay un renacimiento del multijugador local — personas jugando juntas, en la misma habitacion.
 
 Los datos lo respaldan. Los cafes de juegos de mesa han explotado globalmente — habia aproximadamente 5,000+ en todo el mundo para 2023, frente a menos de 1,000 en 2015. Las ventas de juegos de fiesta han superado consistentemente a otras categorias de juegos de mesa desde 2019.
 
@@ -533,13 +533,13 @@ Lo que me impacta cada vez es cuan diferente es la energia comparada con nuestra
       },
       {
         title: 'Basurear como vinculo: La paradoja de los insultos amistosos',
-        content: `Puedo ser honesto? Una de mis partes favoritas de los juegos de palabras multijugador es el basureo.
+        content: `Seamos honestos. Una de mis partes favoritas de los juegos de palabras multijugador es el basureo.
 
-Hay una paradoja maravillosa en el corazon del gaming social competitivo: los insultos los acercan. Llamar a tu amigo un "fraude lexical" cuando juega una palabra de dos letras no es agresivo — es intimo. Senala una relacion lo suficientemente segura para absorber hostilidad juguetona.
+Hay una paradoja maravillosa en el corazon del gaming social competitivo: los insultos los acercan. Llamar a tu amigo un "fraude lexical" cuando juega una palabra de dos letras no es agresivo, es intimo. Senala una relacion lo suficientemente segura para absorber hostilidad juguetona.
 
 Los psicologos llaman a esto "burla afiliativa," y se ha estudiado extensamente. Keltner et al. (2001) mostraron que las burlas cumplen funciones sociales cruciales: prueban y refuerzan lazos sociales, establecen normas grupales y crean humor compartido.
 
-En los juegos de palabras especificamente, el basureo cumple una funcion adicional — crea narrativa. Una ronda de Boggle sin comentarios es solo un ejercicio de vocabulario. Una ronda de Boggle con basureo — eso es una historia. La referenciaremos durante semanas.`,
+En los juegos de palabras especificamente, el basureo cumple una funcion adicional — crea narrativa. Una ronda de Boggle sin comentarios es solo un ejercicio de vocabulario. Una ronda de Boggle con basureo es una historia. La referenciaremos durante semanas.`,
       },
       {
         title: 'Noche de juegos familiar: Lo que la investigacion realmente muestra',
@@ -547,9 +547,9 @@ En los juegos de palabras especificamente, el basureo cumple una funcion adicion
 
 La investigacion sobre noches de juegos familiares es sorprendentemente robusta. Un estudio longitudinal de Coyl-Shepherd y Newland (2013) encontro que las familias que jugaban juegos regularmente juntas reportaban mayor cohesion familiar, mejor comunicacion padre-hijo y mayor satisfaccion familiar.
 
-Los juegos de palabras son particularmente efectivos para familias porque acomodan naturalmente diferentes niveles de habilidad. Un nino de seis anos encontrando una palabra de tres letras en la misma cuadricula donde un padre encuentra una de ocho no esta perdiendo — todos pueden celebrar las victorias de todos.
+Los juegos de palabras son particularmente efectivos para familias porque acomodan naturalmente diferentes niveles de habilidad. Un nino de seis anos encontrando una palabra de tres letras en la misma cuadricula donde un padre encuentra una de ocho no esta perdiendo. Todos pueden celebrar las victorias de todos.
 
-Tambien hay investigacion emergente sobre beneficios cognitivos intergeneracionales. Cuando los abuelos juegan juegos de palabras con nietos, ambas generaciones se benefician — los abuelos obtienen estimulacion cognitiva, y los nietos obtienen exposicion al vocabulario y atencion de un adulto carinoso.`,
+Tambien hay investigacion emergente sobre beneficios cognitivos intergeneracionales. Cuando los abuelos juegan juegos de palabras con nietos, ambas generaciones se benefician: los abuelos obtienen estimulacion cognitiva, y los nietos obtienen exposicion al vocabulario y atencion de un adulto carinoso.`,
       },
       {
         title: 'Construir una comunidad de juegos de palabras (y por que importa)',

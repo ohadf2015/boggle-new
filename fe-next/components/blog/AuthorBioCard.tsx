@@ -6,19 +6,19 @@ import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 
 const bioByLocale: Record<string, string> = {
-  en: 'Cognitive science enthusiast with 8+ years researching word games, linguistics, and brain health. Creator of LexiClash.',
-  he: 'חובבת מדעי הקוגניציה עם 8+ שנות מחקר במשחקי מילים, בלשנות ובריאות המוח. יוצרת LexiClash.',
-  sv: 'Kognitionsvetenskapsentusiast med 8+ ars forskning om ordspel, lingvistik och hjarnhalsa. Skapare av LexiClash.',
-  ja: '認知科学愛好家。8年以上にわたりワードゲーム、言語学、脳の健康を研究。LexiClash開発者。',
-  es: 'Entusiasta de la ciencia cognitiva con 8+ anos investigando juegos de palabras, linguistica y salud cerebral. Creadora de LexiClash.',
+  en: 'Obsessive word game player, amateur neuroscience reader, and the guy who ruins game night by taking too long on his turn. Creator of LexiClash.',
+  he: 'שחקן משחקי מילים אובססיבי, קורא חובבני של מדעי המוח, והבחור שהורס ערב משחקים כי לוקח לו יותר מדי זמן בתור. יוצר LexiClash.',
+  sv: 'Besatt ordspelare, amatörneurovetenskap-läsare, och killen som förstör spelkvällen genom att ta för lång tid på sin tur. Skapare av LexiClash.',
+  ja: 'ワードゲーム中毒者、アマチュア脳科学読者、ゲームナイトで自分の番に時間をかけすぎて台無しにする男。LexiClash開発者。',
+  es: 'Jugador obsesivo de juegos de palabras, lector amateur de neurociencia, y el tipo que arruina la noche de juegos por tardar demasiado en su turno. Creador de LexiClash.',
 };
 
 const titleByLocale: Record<string, string> = {
-  en: 'Senior Word Game Researcher & Game Designer',
-  he: '\u05d7\u05d5\u05e7\u05e8\u05ea \u05de\u05e9\u05d7\u05e7\u05d9 \u05de\u05d9\u05dc\u05d9\u05dd \u05d1\u05db\u05d9\u05e8\u05d4 \u05d5\u05de\u05e2\u05e6\u05d1\u05ea \u05de\u05e9\u05d7\u05e7\u05d9\u05dd',
-  sv: 'Senior ordspelsforskare & speldesigner',
-  ja: '\u30b7\u30cb\u30a2\u30ef\u30fc\u30c9\u30b2\u30fc\u30e0\u30ea\u30b5\u30fc\u30c1\u30e3\u30fc & \u30b2\u30fc\u30e0\u30c7\u30b6\u30a4\u30ca\u30fc',
-  es: 'Investigadora senior de juegos de palabras y disenadora de juegos',
+  en: 'Word Game Addict & Game Designer',
+  he: 'מכור למשחקי מילים ומעצב משחקים',
+  sv: 'Ordspelsberoende & speldesigner',
+  ja: 'ワードゲーム中毒者 & ゲームデザイナー',
+  es: 'Adicto a juegos de palabras y diseñador de juegos',
 };
 
 export function AuthorBioCard() {

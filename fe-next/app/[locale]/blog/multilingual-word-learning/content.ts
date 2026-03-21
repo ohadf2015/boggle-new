@@ -201,23 +201,23 @@ Now if you'll excuse me, I need to go figure out why my brain thinks "lagom" is 
     authorBio: 'שחקן משחקי מילים אובססיבי, קורא חובבני של מדעי המוח, והאדם שהורס את ערב המשחקים כי הוא לוקח יותר מדי זמן בתור שלו.',
     sections: [
       {
-        content: `הייתי באמצע סשן של LexiClash באנגלית כשהמוח שלי החליט — בלי שביקשתי — לאיית "bibliotek". זה שוודית ל"ספרייה". אני לא גר בשוודיה. לא חשבתי על שוודיה. ניסיתי להרכיב "bottle" מהאותיות B-I-O-T-L-E-K והמוח שלי החליט: "אתה יודע מה מתאים? מילה בשוודית. בבקשה."
+        content: `הייתי באמצע סשן של LexiClash באנגלית כשהמוח שלי החליט (בלי שביקשתי) לאיית "bibliotek". זה שוודית ל"ספרייה". אני לא גר בשוודיה. לא חשבתי על שוודיה. ניסיתי להרכיב "bottle" מהאותיות B-I-O-T-L-E-K והמוח שלי החליט: "אתה יודע מה מתאים? מילה בשוודית. בבקשה."
 
-אם זה קרה לכם פעם — לערבב שפות באמצע משחק, באמצע משפט, באמצע מחשבה — מזל טוב. המוח שלכם לא שבור. הוא בעצם עושה משהו מרתק, ויש גוף הולך וגדל של מחקרים שמציעים שהדבר שמרגיש כמו תקלה עשוי להיות תכונה.
+אם זה קרה לכם פעם, לערבב שפות באמצע משחק, באמצע משפט, באמצע מחשבה? מזל טוב. המוח שלכם לא שבור. הוא בעצם עושה משהו מרתק, ויש גוף הולך וגדל של מחקרים שמציעים שהדבר שמרגיש כמו תקלה עשוי להיות תכונה.
 
-אבל בואו אהיה כנה מהרגע הראשון: חלק מהטענות על מוחות דו-לשוניים הופרזו בצורה פראית. ה"יתרון הדו-לשוני" הוא אחד הרעיונות השנויים ביותר במחלוקת במדע הקוגניטיבי כרגע. אז אני אספר לכם מה אנחנו באמת יודעים, מה אנחנו חושבים שאנחנו יודעים, ואיפה המדע נהיה באמת מוזר.`,
+אבל בואו נהיה כנים: חלק מהטענות על מוחות דו-לשוניים הופרזו בצורה פראית. ה"יתרון הדו-לשוני" הוא אחד הרעיונות השנויים ביותר במחלוקת במדע הקוגניטיבי כרגע. אז אני אספר לכם מה אנחנו באמת יודעים, מה אנחנו חושבים שאנחנו יודעים, ואיפה המדע נהיה באמת מוזר.`,
       },
       {
         title: 'המודל ההיררכי המתוקן (או: למה המוח שלך פקיד תיוק נוראי)',
-        content: `ב-1994, ג'ודית קרול ואריקה סטיוארט הציעו משהו שנקרא "המודל ההיררכי המתוקן". נשמע מאיים. בפועל זה די אינטואיטיבי.
+        content: `ב-1994, ג'ודית קרול ואריקה סטיוארט הציעו משהו שנקרא "המודל ההיררכי המתוקן". נשמע מאיים. בפועל? די אינטואיטיבי.
 
-דמיינו שלמוח שלכם יש ארון תיוק ענק עם תווית "מושגים" — כלב, אהבה, צדק, הדבר המביך ההוא שאמרתם ב-2007. ואז יש לכם מגירות נפרדות לכל שפה. אחת למילים בעברית, אחת לאנגלית, אחת לכל שפה אחרת שאתם מדברים.
+דמיינו שלמוח שלכם יש ארון תיוק ענק עם תווית "מושגים". כלב, אהבה, צדק, הדבר המביך שאמרתם ב-2007. ואז יש לכם מגירות נפרדות לכל שפה. אחת למילים בעברית, אחת לאנגלית, אחת לכל שפה אחרת שאתם מדברים.
 
 כשאתם מתחילנים בשפה חדשה, אתם לא יכולים ללכת ישר ממושג למילה. אתם חייבים לעבור דרך השפה הראשונה. רואים כלב, חושבים "כלב" בעברית, אז מתרגמים ל-"dog". זה איטי. זה מייגע. זו הסיבה שסטודנטים בתחילת לימודי שפה נראים כאילו הם עושים חילוק ארוך כשהם מנסים להזמין קפה.
 
 אבל פה זה נהיה מעניין. ככל שאתם נהיים יותר מיומנים, המוח מתחיל לבנות כבישים מהירים ישירים ממושגים לשפה השנייה. רואים כלב וחושבים "dog" בלי העצירה בעברית. הגשר הופך מיותר.
 
-חוץ מש — וזה הקיקר — המסלול הישן אף פעם לא נסגר לגמרי. שתי השפות נשארות פעילות בו-זמנית. כל הזמן. גם כשאתם משתמשים רק באחת. המוח שלכם מפעיל שתיים (או שלוש, או ארבע) מערכות שפה במקביל, באופן קבוע, בין אם ביקשתם ובין אם לא.
+חוץ מש (וזה הקיקר) המסלול הישן אף פעם לא נסגר לגמרי. שתי השפות נשארות פעילות בו-זמנית. כל הזמן. גם כשאתם משתמשים רק באחת. המוח שלכם מפעיל שתיים (או שלוש, או ארבע) מערכות שפה במקביל, באופן קבוע, בין אם ביקשתם ובין אם לא.
 
 זו הסיבה שאתם כותבים "bibliotek" כשהתכוונתם ל-"bottle". הלקסיקון השוודי שלכם היה פעיל כל הזמן, יושב ברקע כמו טאב בדפדפן ששכחתם לסגור, מפעם לפעם צועק הצעות.`,
       },
@@ -227,49 +227,37 @@ Now if you'll excuse me, I need to go figure out why my brain thinks "lagom" is 
 
 כשאתם משתמשים באנגלית, המוח צריך באופן פעיל לדכא את השפות האחרות. המונח הטכני הוא "שליטה מעכבת" — קליפת המוח הקדם-מצחית שלכם בעצם אומרת לעברית לשבת ולהיות שקטה בזמן שאנגלית מחזיקה את המיקרופון. וכשאתם עוברים לעברית, המוח צריך לבטל את הדיכוי עליה ולדכא את האנגלית במקום.
 
-זה דורש מאמץ קוגניטיבי אמיתי. הוא מדיד. זו אחת הסיבות שדו-לשוניים לפעמים לוקחים שבריר שנייה יותר לשלוף מילים בכל אחת מהשפות — שתי המערכות מפריעות אחת לשנייה.
+זה דורש מאמץ קוגניטיבי אמיתי. הוא מדיד. זו אחת הסיבות שדו-לשוניים לפעמים לוקחים שבריר שנייה יותר לשלוף מילים. שתי המערכות מפריעות אחת לשנייה.
 
-הנה איפה זה נהיה פרקטי לשחקני משחקי מילים. אחרי שעה של משחק באנגלית, העיכוב על השפה האחרת מתחיל להיחלש. המוח שלכם מתעייף מלהיות סדרן. אז מילים בעברית מתחילות לחלחל פנימה. אותיות בשוודית מתחילות להופיע בשולי התודעה. ופתאום אתם מנסים לשחק "library" על לוח עברי.
+ואיפה זה נהיה פרקטי לשחקני משחקי מילים. אחרי שעה של משחק באנגלית, העיכוב על השפה האחרת מתחיל להיחלש. המוח שלכם מתעייף מלהיות סדרן. אז מילים בעברית מתחילות לחלחל פנימה. אותיות בשוודית מתחילות להופיע בשולי התודעה. ופתאום אתם מנסים לשחק "library" על לוח עברי.
 
 זו לא תקלה. זו מערכת ניהול המשאבים של המוח שנגמר לה הדלק.`,
       },
       {
         title: 'היתרון הדו-לשוני: אמיתי, מופרז, או הכל מסובך?',
-        content: `אוקיי. פה אני חייב להיות ישיר, כי רוב המאמרים על דו-לשוניות יגידו לכם שלדבר כמה שפות הופך אתכם לחכמים יותר, אמפתיים יותר, טובים יותר במולטיטאסקינג, אטרקטיביים יותר למעסיקים, וכנראה גם גבוהים יותר.
+        content: `נו, פה אני חייב להיות ישיר, כי רוב המאמרים על דו-לשוניות יגידו לכם שלדבר כמה שפות הופך אתכם לחכמים יותר, אמפתיים יותר, טובים יותר במולטיטאסקינג, אטרקטיביים יותר למעסיקים, וכנראה גם גבוהים יותר.
 
 המציאות מבולגנת יותר.
 
-השערת "היתרון הדו-לשוני" — הרעיון שניהול שתי שפות נותן לכם תפקוד ביצועי טוב יותר, שליטה קשבית טובה יותר, גמישות קוגניטיבית טובה יותר — הייתה פופולרית בטירוף בשנות ה-2000 וה-2010. ויש מחקרים שתומכים בה. המעבדה של אלן ביאליסטוק הפיקה מחקר אחרי מחקר שהראה שדו-לשוניים מצליחים יותר ממונולינגואלים במשימות שדורשות שליטה מעכבת.
+השערת "היתרון הדו-לשוני" (הרעיון שניהול שתי שפות נותן לכם תפקוד ביצועי ושליטה קשבית טובים יותר) הייתה פופולרית בטירוף בשנות ה-2000 וה-2010. ויש מחקרים שתומכים בה. המעבדה של אלן ביאליסטוק הפיקה מחקר אחרי מחקר שהראה שדו-לשוניים מצליחים יותר ממונולינגואלים במשימות שדורשות שליטה מעכבת.
 
 אבל אז הגיע משבר השכפול. כמה מחקרים רחבי היקף לא הצליחו למצוא את היתרון. מטא-אנליזה מ-2019 של לחטונן ועמיתים בחנה 152 מחקרים ומצאה... ובכן, לא הרבה. ההשפעות היו קטנות עד זניחות ברגע שהטיית הפרסום נלקחה בחשבון.
 
 האם זה אומר שלדו-לשוניות אין יתרונות קוגניטיביים? לא. זה אומר שהיתרונות כנראה יותר ניואנסיים ותלויי הקשר ממה שהכותרות הציעו. יש מחקרים שכן מוצאים יתרונות, במיוחד במשימות ספציפיות, באוכלוסיות מסוימות, בתנאים מסוימים.
 
-מחקר מ-2023 ב-Frontiers in Psychology בחן 266 דו-לשוניים צרפתיים-קנדיים ומצא שמחליפי קוד קבועים — אנשים שקופצים בין שפות בתדירות גבוהה — כן הציגו יתרונות בשליטה מעכבת. מילת המפתח כאן היא "קבועים." זה לא רק לדעת שתי שפות. זה להשתמש בשתיהן באופן פעיל, לעבור ביניהן, בהקשרים טבעיים.
+מחקר מ-2023 ב-Frontiers in Psychology בחן 266 דו-לשוניים צרפתיים-קנדיים ומצא שמחליפי קוד קבועים, אנשים שקופצים בין שפות בתדירות גבוהה, כן הציגו יתרונות בשליטה מעכבת. מילת המפתח כאן היא "קבועים." זה לא רק לדעת שתי שפות. זה להשתמש בשתיהן באופן פעיל, לעבור ביניהן, בהקשרים טבעיים.
 
 מה שזה, אם תחשבו על זה, בדיוק מה שאתם עושים כששחקי משחקי מילים בכמה שפות. סתם אומר.`,
       },
       {
         title: 'נייג\'ל ריצ\'רדס והמקרה של אלוף הסקרבל הבלתי אפשרי',
-        content: `אני חייב לספר לכם על נייג'ל ריצ'רדס, כי הסיפור שלו שובר את המוח לכולם ואני מוצא אותו מענג בלי סוף.
+        content: `נייג'ל ריצ'רדס, אלוף הסקרבל שזכה באליפות בצרפתית בלי לדבר צרפתית, מוכיח נקודה מרתקת: ידע לקסיקלי (להכיר מילים) וידע סמנטי (להבין מה מילים אומרות) באמת ניתנים להפרדה במוח. המודל ההיררכי המתוקן חזה את זה, יש רמה לקסיקלית ורמה מושגית שיכולות להתנתק.
 
-נייג'ל ריצ'רדס הוא ניו זילנדי. הוא מדבר אנגלית. רק אנגלית. הוא ניצח באליפות העולם בסקרבל באנגלית חמש פעמים, מה שמרשים אבל לא החלק המעניין.
-
-ב-2015, הוא ניצח באליפות העולם בסקרבל בצרפתית. בלי לדבר צרפתית.
-
-אני אחזור על זה. הוא שינן את כל מילון הסקרבל הצרפתי — בערך 386,000 מילים — בלי להבין מה אף אחת מהן אומרת. הוא מתייחס למילים כדפוסים טהורים. צירופי אותיות. אובייקטים מתמטיים. הוא לא יודע ש-"maison" אומר בית. הוא יודע ש-M-A-I-S-O-N זה סידור אריחים חוקי ששווה מספר מסוים של נקודות.
-
-מאוחר יותר הוא עשה את אותו הדבר בספרדית.
-
-מה זה אומר לנו על המוח? כמה דברים. ראשית, שידע לקסיקלי (להכיר מילים) וידע סמנטי (להבין מה מילים אומרות) באמת ניתנים להפרדה במוח. המודל ההיררכי המתוקן בעצם חזה את זה — יש רמה לקסיקלית ורמה מושגית, והן יכולות להתנתק.
-
-שנית, זה אומר לנו שזיהוי דפוסים במשחקי מילים הוא מיומנות שחוצה שפות. החשיבה הקומבינטורית שאתם מפתחים כששחקים באנגלית לא נעלמת כשאתם עוברים לעברית או ליפנית.
-
-ושלישית, והכי חשוב לנו בני התמותה שאנחנו לא נייג'ל ריצ'רדס: לא צריך להיות גאון כדי להרוויח ממשחק מילים חוצה שפות.`,
+מה שחשוב לנו: זיהוי דפוסים במשחקי מילים הוא מיומנות שחוצה שפות. החשיבה הקומבינטורית שאתם מפתחים כשמשחקים באנגלית לא נעלמת כשאתם עוברים לעברית או ליפנית. ולא צריך להיות גאון כדי להרוויח ממשחק מילים חוצה שפות.`,
       },
       {
         title: 'פרדוקס "על קצה הלשון"',
-        content: `הנה משהו שיישמע לכם הפוך מהאינטואיציה: דו-לשוניים חווים יותר רגעי "על קצה הלשון" מאשר חד-לשוניים. לא פחות. יותר.
+        content: `משהו שיישמע לכם הפוך מהאינטואיציה: דו-לשוניים חווים יותר רגעי "על קצה הלשון" מאשר חד-לשוניים. לא פחות. יותר.
 
 אתם מכירים את התחושה הזו. המילה ממש שם. אתם מרגישים את הצורה שלה. אתם יודעים שהיא מתחילה ב... משהו. אתם כמעט טועמים אותה. אבל היא לא יוצאת.
 
@@ -291,7 +279,7 @@ Now if you'll excuse me, I need to go figure out why my brain thinks "lagom" is 
 
 "Embarrassed" באנגלית מול "embarazada" בספרדית — שזה אומר בהיריון. "Préservatif" בצרפתית זה לא חומר משמר. זה קונדום. בהצלחה להסביר את זה בארוחת ערב.
 
-לשחקני משחקי מילים, ידידים כוזבים יוצרים סוג ייחודי של הפרעה קוגניטיבית. רואים את האותיות G-I-F-T והמוח צריך לפתור: אני משחק באנגלית (מילה טובה, מתנה) או בשוודית (גם מילה טובה, רעל/נשוי)? האותיות זהות. המשמעות לא רלוונטית בהקשר המשחק — כל מה שחשוב הוא אם זו מילה חוקית בשפת היעד. אבל המוח לא יודע את זה. המוח מתעקש להפעיל את המשמעות לצד הצורה, כי ככה מוחות עובדים.
+לשחקני משחקי מילים, ידידים כוזבים יוצרים סוג ייחודי של הפרעה קוגניטיבית. רואים את האותיות G-I-F-T והמוח צריך לפתור: אני משחק באנגלית (מילה טובה, מתנה) או בשוודית (גם מילה טובה, רעל/נשוי)? האותיות זהות. המשמעות לא רלוונטית בהקשר המשחק, כל מה שחשוב הוא אם זו מילה חוקית בשפת היעד. אבל המוח לא יודע את זה. המוח מתעקש להפעיל את המשמעות לצד הצורה, כי ככה מוחות עובדים.
 
 הפסדתי יותר סיבובים ב-LexiClash בגלל ידידים כוזבים ממה שהייתי רוצה להודות. כששיחקתי בשוודית אחרי סשן באנגלית, פעם בזבזתי שלושים שניות כשהייתי בטוח ש-"bra" זו מילה באנגלית שמשמעותה "טוב". זו כן מילה באנגלית, כמובן. רק לא מסוג ה"טוב" שהמוח השוודי שלי חשב עליו.`,
       },
@@ -301,21 +289,21 @@ Now if you'll excuse me, I need to go figure out why my brain thinks "lagom" is 
 
 המנגנון אלגנטי. כשלומדים שפה שלישית, לא מתחילים מאפס. כבר בניתם את התשתית הקוגניטיבית לניהול מערכות שפה מרובות. יש לכם את מעגלי העיכוב. יש לכם את מנגנוני ההחלפה. יש לכם ניסיון בהתמודדות עם לקסיקונים מתחרים. המוח, במובן מסוים, עבר אימון מקדים לרב-לשוניות.
 
-ממצאים נוירו-קוגניטיביים מראים ששפות של דו-לשוניים מופעלות באופן רציף, גם בהקשרים חד-לשוניים. המוח לא "מכבה" שפה — הוא מדכא אותה. וההפעלה הרציפה ברמה נמוכה אומרת שהשפות שלכם כל הזמן מאביקות זו את זו.
+ממצאים נוירו-קוגניטיביים מראים ששפות של דו-לשוניים מופעלות באופן רציף, גם בהקשרים חד-לשוניים. המוח לא "מכבה" שפה, הוא מדכא אותה. וההפעלה הרציפה ברמה נמוכה אומרת שהשפות שלכם כל הזמן מאביקות זו את זו.
 
-לשחקני משחקי מילים, העברה בין-לשונית מתבטאת בזיהוי דפוסים. אחרי שמשחקים LexiClash באנגלית ובשוודית, התחלתי לשים לב לדפוסי אותיות ביפנית (הירגאנה) מהר יותר ממה שציפיתי. לא בגלל שיש דמיון לשוני בין שוודית ליפנית — ברור שאין — אלא כי המוח שלי השתפר במטא-מיומנות של ניתוח צירופי סמלים בלתי מוכרים.
+לשחקני משחקי מילים, העברה בין-לשונית מתבטאת בזיהוי דפוסים. אחרי שמשחקים LexiClash באנגלית ובשוודית, התחלתי לשים לב לדפוסי אותיות ביפנית (הירגאנה) מהר יותר ממה שציפיתי. לא בגלל שיש דמיון לשוני בין שוודית ליפנית (ברור שאין) אלא כי המוח שלי השתפר במטא-מיומנות של ניתוח צירופי סמלים בלתי מוכרים.
 
-זהו ה"יתרון הדו-לשוני" האמיתי, אם תשאלו אותי. לא שיפור כללי באיי-קיו. אלא מיומנות ספציפית וניתנת לאימון בניהול מערכות סמלים מרובות בו-זמנית.`,
+בואו נהיה כנים, זהו "היתרון הדו-לשוני" האמיתי. לא שיפור כללי באיי-קיו. אלא מיומנות ספציפית וניתנת לאימון בניהול מערכות סמלים מרובות בו-זמנית.`,
       },
       {
         title: 'ארבע שפות, ארבע אימונים למוח',
-        content: `גילוי נאות: אני משחק LexiClash ואני אוהב את זה. אז קחו את הסעיף הזה עם קורט מלח מתאים. אבל אני באמת חושב שיש משהו מעניין באופן ייחודי במשחק מילים שתומך בעברית, אנגלית, שוודית ויפנית — כי אלה לא ארבע וריאציות על אותו נושא. אלה ארבע מערכות כתיבה שונות מהותית שמאתגרות את המוח בדרכים שונות מהותית.
+        content: `גילוי נאות: אני משחק LexiClash. קחו את הסעיף הזה עם קורט מלח. אבל אני באמת חושב שיש משהו מעניין באופן ייחודי במשחק מילים שתומך בעברית, אנגלית, שוודית ויפנית. כי אלה לא ארבע וריאציות על אותו נושא. אלה ארבע מערכות כתיבה שונות מהותית שמאתגרות את המוח בדרכים שונות מהותית.
 
-אנגלית היא אלפבית עם כתיב ידוע לשמצה כלא סדיר. עברית פועלת מימין לשמאל עם אבג'ד — עיצורים הם עיקריים, תנועות לעתים קרובות מושמטות. שוודית אלפביתית ומטעה בדמיון שלה לאנגלית. ויפנית משתמשת בשלושה כתבים בו-זמנית.
+אנגלית היא אלפבית עם כתיב ידוע לשמצה כלא סדיר. עברית פועלת מימין לשמאל עם אבג'ד, עיצורים הם עיקריים, תנועות לעתים קרובות מושמטות. שוודית אלפביתית ומטעה בדמיון שלה לאנגלית. ויפנית משתמשת בשלושה כתבים בו-זמנית.
 
 כשאני משחק LexiClash בכל ארבע השפות בסשן אחד (כן, עשיתי את זה; לא, המשפחה שלי לא מבינה למה), החוויה הקוגניטיבית שונה בכל פעם. אנגלית מרגישה כמו פתרון פאזל מוכר. שוודית מרגישה כמו פתרון הפאזל הזה במראה עקומה. עברית מרגישה כמו פתרון אחורה (כי אתה ממש קורא אחורה). יפנית מרגישה כמו פתרון שלושה פאזלים בו-זמנית.
 
-והנה הדבר שאני שם לב אליו אחרי חודשים של זה: אני משתפר בכולן. לא רק באופן מצטבר, אלא בדרכים שמרגישות מקושרות. להשתפר בזיהוי דפוסים בעברית גורם לי לשים לב לצירופי אותיות באנגלית שפספסתי קודם.
+ומה שאני שם לב אליו אחרי חודשים של זה: אני משתפר בכולן. לא רק באופן מצטבר, אלא בדרכים שמרגישות מקושרות. להשתפר בזיהוי דפוסים בעברית גורם לי לשים לב לצירופי אותיות באנגלית שפספסתי קודם.
 
 האם זו ההעברה הבין-לשונית שהחוקרים מדברים עליה? אני חושב שכן. אבל זה יכול גם להיות שפשוט לשחק הרבה משחקי מילים הופך אותך לטוב יותר במשחקי מילים. לפעמים ההסבר הפשוט ביותר הוא הנכון.`,
       },
@@ -323,15 +311,15 @@ Now if you'll excuse me, I need to go figure out why my brain thinks "lagom" is 
         title: 'אז מה באמת כדאי לעשות?',
         content: `אם הגעתם עד לפה (תודה, באמת — אני יודע ש-1,500 מילים על נוירולינגוויסטיקה זה בקשה גדולה ביום שלישי), הנה העצה הפרקטית שלי, שווה מה ששווה:
 
-שחקו משחקי מילים בשפה החזקה ביותר שלכם קודם. התחממו. תכניסו את המוח ל"מצב מילים." אז עברו לשפה אחרת. אל תדאגו כשהדקה הראשונה מרגישה מגושמת — זה העיכוב שמסתדר מחדש, וזה נורמלי.
+שחקו משחקי מילים בשפה החזקה ביותר שלכם קודם. התחממו. תכניסו את המוח ל"מצב מילים." אז עברו לשפה אחרת. אל תדאגו כשהדקה הראשונה מרגישה מגושמת. זה העיכוב שמסתדר מחדש, וזה נורמלי.
 
-נסו שפות שונות אחת מהשנייה, לא רק בנות דודות קרובות. אנגלית ושוודית זה כיף, אבל המתיחה הקוגניטיבית האמיתית מגיעה מהוספת משהו שונה מבנית — כמו עברית עם הכיוון מימין לשמאל, או יפנית עם הכתבים המרובים שלה.
+נסו שפות שונות אחת מהשנייה, לא רק בנות דודות קרובות. אנגלית ושוודית זה כיף, אבל המתיחה הקוגניטיבית האמיתית מגיעה מהוספת משהו שונה מבנית, כמו עברית עם הכיוון מימין לשמאל, או יפנית עם הכתבים המרובים שלה.
 
 אל תרביצו לעצמכם בגלל ידידים כוזבים והפרעות בין-לשוניות. זה לא סימן של חולשה. זה סימן שהשפות שלכם משולבות עמוק, שזה בדיוק מה שאתם רוצים.
 
 ותחבקו את רגעי "על קצה הלשון". הם מעצבנים, כן. אבל הם המוח שלכם עושה חזרות.
 
-המחקר על קוגניציה רב-לשונית רחוק מלהיות סגור. היתרון הדו-לשוני עשוי להתגלות כקטן יותר ממה שקיווינו, או יותר ספציפי ממה שחשבנו. אבל דבר אחד המחקר ברור לגביו: שימוש בשפה באופן פעיל, בהקשרים מעניינים, עם השקעה רגשית — ככה המוח לומד ומתחזק מיומנות לשונית.
+המחקר על קוגניציה רב-לשונית רחוק מלהיות סגור. היתרון הדו-לשוני עשוי להתגלות כקטן יותר ממה שקיווינו, או יותר ספציפי ממה שחשבנו. אבל דבר אחד המחקר ברור לגביו: שימוש בשפה באופן פעיל, בהקשרים מעניינים, עם השקעה רגשית. ככה המוח לומד ומתחזק מיומנות לשונית.
 
 משחק מילים שאתם באמת נהנים לשחק שווה יותר מחפיסת כרטיסיות שתזנחו תוך שבוע. ומשחק מילים רב-לשוני? זה בונוס.
 
@@ -351,9 +339,9 @@ Now if you'll excuse me, I need to go figure out why my brain thinks "lagom" is 
     authorBio: 'Besatt ordspelsspelare, amatörmässig neurovetenskapsläsare, och personen som förstör spelkvällen genom att ta för lång tid på sin tur.',
     sections: [
       {
-        content: `Jag var tre rundor in i en LexiClash-session på engelska när min hjärna bestämde sig — helt oinbjudet — för att stava "bibliotek." Okej, det ÄR ett svenskt ord. Men jag spelade på engelska. Jag tänkte inte på svenska. Jag försökte göra "bottle" av B-I-O-T-L-E-K och min hjärna gick: "Du vet vad som passar? Ett svenskt ord. Varsågod."
+        content: `Jag var tre rundor in i en LexiClash-session på engelska när min hjärna bestämde sig, helt oinbjudet, för att stava "bibliotek." Okej, det ÄR ett svenskt ord. Men jag spelade på engelska. Jag tänkte inte på svenska. Jag försökte göra "bottle" av B-I-O-T-L-E-K och min hjärna gick: "Du vet vad som passar? Ett svenskt ord. Varsågod."
 
-Om detta har hänt dig — att blanda språk mitt i ett spel, mitt i en mening, mitt i en tanke — grattis. Din hjärna är inte trasig. Den gör faktiskt något fascinerande, och det finns en växande mängd forskning som tyder på att det som känns som en bugg kanske är en funktion.
+Om detta har hänt dig, att blanda språk mitt i ett spel, mitt i en mening, mitt i en tanke: grattis. Din hjärna är inte trasig. Den gör faktiskt något fascinerande, och det finns en växande mängd forskning som tyder på att det som känns som en bugg kanske är en funktion.
 
 Men låt mig vara ärlig med dig från start: en del av påståendena om tvåspråkiga hjärnor har överdrivits vilt. Den "tvåspråkiga fördelen" är en av de mest omstridda idéerna inom kognitiv vetenskap just nu. Så jag tänker berätta vad vi faktiskt vet, vad vi tror att vi vet, och var vetenskapen blir genuint konstig.`,
       },
@@ -361,13 +349,13 @@ Men låt mig vara ärlig med dig från start: en del av påståendena om tvåspr
         title: 'Den reviderade hierarkiska modellen (eller: Varför din hjärna är en usel arkivarie)',
         content: `1994 föreslog Judith Kroll och Erica Stewart något som kallas den "reviderade hierarkiska modellen." Låter skrämmande. Det är faktiskt ganska intuitivt.
 
-Föreställ dig att din hjärna har ett gigantiskt arkivskåp märkt "Begrepp" — hund, kärlek, rättvisa, den där pinsamma grejen du sa 2007. Sen har du separata lådor för varje språk. En för svenska ord, en för engelska, en för vad du nu mer pratar.
+Föreställ dig att din hjärna har ett gigantiskt arkivskåp märkt "Begrepp": hund, kärlek, rättvisa, den där pinsamma grejen du sa 2007. Sen har du separata lådor för varje språk. En för svenska ord, en för engelska, en för vad du nu mer pratar.
 
 När du är nybörjare i ett nytt språk kan du inte gå direkt från begrepp till ord. Du måste ta omvägen via ditt första språk. Du ser en hund, tänker "hund" på svenska, och översätter sedan till "dog." Det är långsamt. Det är ansträngande. Det är därför nybörjare i språkkurser ser ut som om de gör lång division när de försöker beställa kaffe.
 
 Men här blir det intressant. Ju bättre du blir, desto mer börjar din hjärna bygga direktvägar från begrepp till ditt andra språk. Du ser en hund och tänker "dog" utan den svenska omvägen. Bryggan blir onödig.
 
-Förutom att — och det här är poängen — den gamla vägen aldrig stängs helt. Båda språken förblir aktiva samtidigt. Hela tiden. Även när du bara använder ett. Din hjärna kör två (eller tre, eller fyra) språksystem parallellt, konstant, oavsett om du bad om det eller inte.
+Förutom att den gamla vägen aldrig stängs helt. Båda språken förblir aktiva samtidigt. Hela tiden. Även när du bara använder ett. Din hjärna kör två (eller tre, eller fyra) språksystem parallellt, konstant, oavsett om du bad om det eller inte.
 
 Det är därför du skriver "bibliotek" när du menar "bottle." Ditt svenska lexikon var aktivt hela tiden, sittande i bakgrunden som en webbläsarflik du glömde stänga, som då och då skriker förslag.`,
       },
@@ -375,9 +363,9 @@ Det är därför du skriver "bibliotek" när du menar "bottle." Ditt svenska lex
         title: 'Språken köar inte artigt. De slåss.',
         content: `Forskning publicerad i Bilingualism: Language and Cognition bekräftade något som flerspråkiga alltid har vetat intuitivt: dina språk tävlar om tillgång. Det är ingen artig kö. Det är en moshpit.
 
-När du använder engelska måste din hjärna aktivt undertrycka dina andra språk. Den tekniska termen är "inhibitorisk kontroll" — din prefrontala cortex säger i princip åt svenskan att sitta ner och vara tyst medan engelskan håller mikrofonen. Och när du byter till svenska måste hjärnan häva undertryckningen av den och undertrycka engelskan istället.
+När du använder engelska måste din hjärna aktivt undertrycka dina andra språk. Den tekniska termen är "inhibitorisk kontroll", din prefrontala cortex säger i princip åt svenskan att sitta ner och vara tyst medan engelskan håller mikrofonen. Och när du byter till svenska måste hjärnan häva undertryckningen av den och undertrycka engelskan istället.
 
-Detta kräver verklig kognitiv ansträngning. Det är mätbart. Det är en av anledningarna till att tvåspråkiga ibland tar en bråkdel av en sekund längre att hämta ord i något av språken — båda systemen stör varandra.
+Detta kräver verklig kognitiv ansträngning. Det är mätbart. Det är en av anledningarna till att tvåspråkiga ibland tar en bråkdel av en sekund längre att hämta ord i något av språken; båda systemen stör varandra.
 
 Här blir det praktiskt för ordspelsspelare. Efter en timmes spelande på engelska börjar hämningen av ditt andra språk försvagas. Din hjärna tröttnar på att vara dörrvakt. Så svenska ord börjar läcka igenom. Hebreiska bokstäver börjar dyka upp i utkanten av ditt medvetande. Och plötsligt försöker du spela "library" på ett svenskt bräde.
 
@@ -389,33 +377,19 @@ Det är inte en bugg. Det är din hjärnas resurshanteringssystem som börjar ta
 
 Verkligheten är stökigare.
 
-Hypotesen om "den tvåspråkiga fördelen" — idén att hantera två språk ger dig bättre exekutiv funktion, bättre uppmärksamhetskontroll, bättre kognitiv flexibilitet — var enormt populär under 2000- och 2010-talen. Och det FINNS forskning som stödjer den. Ellen Bialystoks labb producerade studie efter studie som visade att tvåspråkiga presterade bättre än enspråkiga på uppgifter som kräver inhibitorisk kontroll.
+Hypotesen om "den tvåspråkiga fördelen", idén att hantera två språk ger dig bättre exekutiv funktion, bättre uppmärksamhetskontroll, bättre kognitiv flexibilitet, var enormt populär under 2000- och 2010-talen. Och det FINNS forskning som stödjer den. Ellen Bialystoks labb producerade studie efter studie som visade att tvåspråkiga presterade bättre än enspråkiga på uppgifter som kräver inhibitorisk kontroll.
 
 Men sedan kom replikationskrisen. Flera storskaliga studier misslyckades med att hitta fördelen. En metaanalys från 2019 av Lehtonen och kollegor tittade på 152 studier och hittade... tja, inte mycket. Effekterna var små till försumbara när publiceringsbias togs i beaktande.
 
 Betyder det att tvåspråkighet inte har några kognitiva fördelar? Nej. Det betyder att fördelarna förmodligen är mer nyanserade och kontextberoende än vad rubrikerna antydde.
 
-En studie från 2023 i Frontiers in Psychology undersökte 266 fransk-kanadensiska tvåspråkiga och fann att regelbundna kodväxlare — personer som ofta hoppar mellan språk — VISADE fördelar i inhibitorisk kontroll. Nyckelordet är "regelbundna." Det var inte bara att kunna två språk. Det var att aktivt använda båda, växla mellan dem, i naturliga sammanhang.
+En studie från 2023 i Frontiers in Psychology undersökte 266 fransk-kanadensiska tvåspråkiga och fann att regelbundna kodväxlare, personer som ofta hoppar mellan språk, VISADE fördelar i inhibitorisk kontroll. Nyckelordet är "regelbundna." Det var inte bara att kunna två språk. Det var att aktivt använda båda, växla mellan dem, i naturliga sammanhang.
 
 Vilket, om du tänker efter, är exakt vad du gör när du spelar ordspel på flera språk. Bara sagt.`,
       },
       {
-        title: 'Nigel Richards och det omöjliga Scrabble-mästerskapet',
-        content: `Jag måste berätta om Nigel Richards, för hans historia krossar allas hjärnor och jag tycker den är oändligt härlig.
-
-Nigel Richards är nyzeeländare. Han talar engelska. Bara engelska. Han vann engelskspråkiga Scrabble-VM fem gånger, vilket är imponerande men inte den intressanta delen.
-
-2015 vann han franskspråkiga Scrabble-VM. Utan att prata franska.
-
-Jag upprepar det. Han memorerade hela den franska Scrabble-ordboken — ungefär 386 000 ord — utan att förstå vad något av dem betydde. Han behandlar ord som rena mönster. Bokstavskombinationer. Matematiska objekt. Han vet inte att "maison" betyder hus. Han vet att M-A-I-S-O-N är en giltig bricksplacering värd ett visst antal poäng.
-
-Senare gjorde han samma sak på spanska.
-
-Vad säger detta om hjärnan? Några saker. Först att lexikal kunskap (att känna igen ord) och semantisk kunskap (att veta vad ord betyder) verkligen är separerbara i hjärnan. Den reviderade hierarkiska modellen förutspådde faktiskt detta.
-
-För det andra berättar det att mönsterigenkänning i ordspel är en färdighet som transcenderar språk. Det kombinatoriska tänkandet du utvecklar när du spelar på engelska försvinner inte när du byter till hebreiska eller japanska.
-
-Och för det tredje, och viktigast för oss dödliga som INTE är Nigel Richards: man behöver inte vara ett geni för att dra nytta av tvärspråkligt ordspel.`,
+        title: 'Mönster utan mening',
+        content: `Nigel Richards vann franska Scrabble-VM utan att tala franska. Han memorerade 386 000 ord som rena bokstavsmönster. Gjorde sedan samma sak på spanska. Det berättar oss två saker: att mönsterigenkänning i ordspel transcenderar språk, och att man inte behöver vara ett geni för att dra nytta av tvärspråkligt spelande. Det kombinatoriska tänkandet du bygger upp i ett språk följer med dig till nästa.`,
       },
       {
         title: '"På tungan"-paradoxen',
@@ -425,7 +399,7 @@ Du vet den känslan. Ordet är PRECIS DÄR. Du kan känna dess form. Du vet att 
 
 Forskning av Gollan och Acenas (2004) visade att tvåspråkiga upplever detta oftare i BÅDA sina språk. Anledningen går tillbaka till tävlingsmodellen. När du har två (eller fler) lexikon som tävlar om aktivering får varje enskilt ord lite mindre total aktivering än det skulle i ett enspråkigt system. Det är som att dela din bandbredd mellan två WiFi-nätverk.
 
-Men — och här är paradoxen — denna skenbara svaghet kanske tränar en styrka. Varje gång din hjärna löser ett "på tungan"-ögonblick, varje gång den framgångsrikt hämtar rätt ord från rätt språk trots störningar från det andra, tränar den samma hämtnings- och hämningskretsar som ligger till grund för exekutiv funktion.
+Men denna skenbara svaghet kanske tränar en styrka. Varje gång din hjärna löser ett "på tungan"-ögonblick, varje gång den framgångsrikt hämtar rätt ord från rätt språk trots störningar från det andra, tränar den samma hämtnings- och hämningskretsar som ligger till grund för exekutiv funktion.
 
 Tänk på det som styrketräning. Det extra motståndet (konkurrerande språk) gör varje rep svårare. Men det gör dig också starkare.
 
@@ -437,13 +411,13 @@ Det är anekdotiskt, förstås. Jag är en person. Men forskningen om kodväxlin
         title: 'Falska vänner: Minorna i flerspråkiga ordspel',
         content: `Om du någonsin spelat ordspel på flera språk har du trampat på en falsk vän. Och det är alltid roligt tills det händer dig.
 
-Falska vänner (eller "falska kognater" om du vill låta smart på fester) är ord som ser lika ut på olika språk men betyder helt olika saker. "Gift" på engelska betyder present. "Gift" på svenska betyder — tja, DU vet. Antingen poison eller married, beroende på sammanhanget. (Vi svenskar har tydligen starka känslor om äktenskap.)
+Falska vänner (eller "falska kognater" om du vill låta smart på fester) är ord som ser lika ut på olika språk men betyder helt olika saker. "Gift" på engelska betyder present. "Gift" på svenska betyder, tja, DU vet. Antingen poison eller married, beroende på sammanhanget. (Vi svenskar har tydligen starka känslor om äktenskap.)
 
-"Embarrassed" på engelska vs. "embarazada" på spanska — som betyder gravid. "Préservatif" på franska är inte konserveringsmedel. Det är kondom. Lycka till med att förklara DET vid middagsbordet.
+"Embarrassed" på engelska vs. "embarazada" på spanska, som betyder gravid. "Préservatif" på franska är inte konserveringsmedel. Det är kondom. Lycka till med att förklara DET vid middagsbordet.
 
 Här på hemmaplan har vi våra egna. "Rolig" på svenska betyder fun. "Rolig" på danska och norska betyder calm. Föreställ dig förvirringen vid ett nordiskt spelkvällsbord.
 
-För ordspelsspelare skapar falska vänner en unik sorts kognitiv störning. Du ser bokstäverna G-I-F-T och din hjärna måste lösa: spelar jag på engelska (bra ord, present) eller svenska (också bra ord, gift/married)? Bokstäverna är identiska. Betydelsen är irrelevant i spelkontexten — allt som spelar roll är om det är ett giltigt ord i målspråket. Men din hjärna vet inte det. Din hjärna insisterar på att aktivera betydelsen tillsammans med formen, för det är vad hjärnor gör.
+För ordspelsspelare skapar falska vänner en unik sorts kognitiv störning. Du ser bokstäverna G-I-F-T och din hjärna måste lösa: spelar jag på engelska (bra ord, present) eller svenska (också bra ord, gift/married)? Bokstäverna är identiska. Betydelsen är irrelevant i spelkontexten; allt som spelar roll är om det är ett giltigt ord i målspråket. Men din hjärna vet inte det. Din hjärna insisterar på att aktivera betydelsen tillsammans med formen, för det är vad hjärnor gör.
 
 Jag har förlorat fler LexiClash-rundor på grund av falska vänner än jag vill erkänna.`,
       },
@@ -453,28 +427,28 @@ Jag har förlorat fler LexiClash-rundor på grund av falska vänner än jag vill
 
 Mekanismen är elegant. När du lär dig ett tredje språk börjar du inte från noll. Du har redan byggt den kognitiva infrastrukturen för att hantera flera språksystem. Du har hämningskretsarna. Du har växlingsmekanismerna. Du har övning i att hantera konkurrerande lexikon. Din hjärna har, i en mening, blivit förtränad för flerspråkighet.
 
-Neurokognitiva fynd visar att tvåspråkigas språk är kontinuerligt aktiverade, även i enspråkiga sammanhang. Hjärnan "stänger inte av" ett språk — den undertrycker det. Och den kontinuerliga lågintensiva aktiveringen innebär att dina språk ständigt korsbefruktar varandra.
+Neurokognitiva fynd visar att tvåspråkigas språk är kontinuerligt aktiverade, även i enspråkiga sammanhang. Hjärnan "stänger inte av" ett språk, den undertrycker det. Och den kontinuerliga lågintensiva aktiveringen innebär att dina språk ständigt korsbefruktar varandra.
 
-För ordspelsspelare visar sig tvärspråklig överföring i mönsterigenkänning. Efter att ha spelat LexiClash på engelska och svenska började jag märka bokstavsmönster i japanska (hiragana) snabbare än förväntat. Inte för att det finns någon lingvistisk likhet mellan svenska och japanska — det gör det uppenbarligen inte — utan för att min hjärna hade blivit bättre på metafärdigheten att analysera obekanta symbolkombinationer.
+För ordspelsspelare visar sig tvärspråklig överföring i mönsterigenkänning. Efter att ha spelat LexiClash på engelska och svenska började jag märka bokstavsmönster i japanska (hiragana) snabbare än förväntat. Inte för att det finns någon lingvistisk likhet mellan svenska och japanska (det gör det uppenbarligen inte) utan för att min hjärna hade blivit bättre på metafärdigheten att analysera obekanta symbolkombinationer.
 
 Det är den verkliga "tvåspråkiga fördelen," om du frågar mig. Inte någon generell IQ-boost. Utan en specifik, träningsbar färdighet i att hantera flera symbolsystem samtidigt.`,
       },
       {
         title: 'Fyra språk, fyra hjärnträningar',
-        content: `Full transparens: jag spelar LexiClash och jag älskar det. Så ta det här avsnittet med lämpligt mycket salt. Men jag tror genuint att det finns något unikt intressant med ett ordspel som stödjer hebreiska, engelska, svenska och japanska — för det här är inte fyra variationer på samma tema. Det är fyra fundamentalt olika skriftsystem som utmanar din hjärna på fundamentalt olika sätt.
+        content: `Full transparens: jag spelar LexiClash och jag älskar det. Så ta det här avsnittet med lämpligt mycket salt. Men jag tror genuint att det finns något unikt intressant med ett ordspel som stödjer hebreiska, engelska, svenska och japanska, för det här är inte fyra variationer på samma tema. Det är fyra fundamentalt olika skriftsystem som utmanar din hjärna på fundamentalt olika sätt.
 
 Engelska är ett alfabet med ökänt oregelbunden stavning. Svenska är också alfabetiskt, och om du talar engelska, bedrägligt likt. Precis tillräckligt likt för att vagga in dig i falsk trygghet. Sen träffar du "sju" och inser att svenskt uttal är ett genomarbetat skämt. (Förresten, att förklara uttalet av "sju" för icke-svenskar är en av mina stora glädjeämnen i livet.)
 
-Hebreiska opererar höger-till-vänster med ett abjad-skriftsystem. Att spela på hebreiska kräver en fundamentalt annorlunda sorts mönsterigenkänning. Och själva RTL-riktningen förändrar dina skanmönster — forskning tyder på att dubbelriktade läsare utvecklar mer flexibel rumslig uppmärksamhet.
+Hebreiska opererar höger-till-vänster med ett abjad-skriftsystem. Att spela på hebreiska kräver en fundamentalt annorlunda sorts mönsterigenkänning. Och själva RTL-riktningen förändrar dina skanmönster; forskning tyder på att dubbelriktade läsare utvecklar mer flexibel rumslig uppmärksamhet.
 
-Japanska använder tre skriftsystem samtidigt — hiragana, katakana och kanji. Att spela på japanska tränar en helt annan dimension av lingvistisk bearbetning.
+Japanska använder tre skriftsystem samtidigt: hiragana, katakana och kanji. Att spela på japanska tränar en helt annan dimension av lingvistisk bearbetning.
 
 När jag spelar LexiClash på alla fyra språken under en session (ja, jag har gjort det; nej, min familj förstår inte varför) är den kognitiva upplevelsen genuint annorlunda varje gång. Engelska känns som att lösa ett bekant pussel. Svenska känns som att lösa det pusslet i en skrattspegel. Hebreiska känns som att lösa det bakvänt. Japanska känns som att lösa tre pussel samtidigt.
 
-Och efter månader av detta märker jag: jag blir bättre på alla. Inte bara stegvis, utan på sätt som känns sammankopplade. Ibland är det enklaste svaret det rätta — att spela mycket ordspel gör dig bättre på ordspel. Men den kopplingen mellan språken? Den känns verklig.`,
+Och efter månader av detta märker jag: jag blir bättre på alla. Inte bara stegvis, utan på sätt som känns sammankopplade. Ibland är det enklaste svaret det rätta: att spela mycket ordspel gör dig bättre på ordspel. Men den kopplingen mellan språken? Den känns verklig.`,
       },
       {
-        content: `Om du har kommit hela vägen hit (tack, genuint — jag vet att 1 500 ord om neurolingvistik är mycket att be om en tisdag), här är mitt praktiska råd:
+        content: `Om du har kommit hela vägen hit (tack, genuint, jag vet att 1 500 ord om neurolingvistik är mycket att be om en tisdag), här är mitt praktiska råd:
 
 Spela ordspel på ditt starkaste språk först. Värm upp. Byt sedan till ett annat språk. Oroa dig inte när den första minuten känns klumpig — det är hämningen som omorganiserar sig, och det är normalt.
 
@@ -482,7 +456,7 @@ Prova språk som är OLIKA varandra. Engelska och svenska är kul, men den verkl
 
 Och omfamna "på tungan"-ögonblicken. De är irriterande, ja. Men de är din hjärna som gör reps.
 
-Forskningen om flerspråkig kognition är långt ifrån avgjord. Men en sak är forskningen tydlig med: att använda språk aktivt, i engagerande sammanhang, med emotionell investering — det är så hjärnan lär sig och upprätthåller språklig färdighet.
+Forskningen om flerspråkig kognition är långt ifrån avgjord. Men en sak är forskningen tydlig med: att använda språk aktivt, i engagerande sammanhang, med emotionell investering. Det är så hjärnan lär sig och upprätthåller språklig färdighet.
 
 Ett ordspel du faktiskt tycker om att spela är värt mer än ett flashcard-set du överger inom en vecka. Och ett flerspråkigt ordspel? Det är bara bonus.
 
@@ -706,22 +680,12 @@ Un estudio de 2023 en Frontiers in Psychology examinó a 266 bilingües franco-c
 Lo cual, si lo piensas, es exactamente lo que haces cuando juegas juegos de palabras en varios idiomas. Solo digo.`,
       },
       {
-        title: 'Nigel Richards y el caso del campeón imposible de Scrabble',
-        content: `Tengo que contarte sobre Nigel Richards, porque su historia le rompe el cerebro a todo el mundo y a mí me parece infinitamente deliciosa.
+        title: 'Patrones sin significado: La lección de Nigel Richards',
+        content: `Quizás hayas oído de Nigel Richards, el neozelandés que ganó campeonatos mundiales de Scrabble en francés y español sin hablar ninguno de los dos. Memorizó diccionarios enteros como patrones puros de letras, sin saber qué significaba ninguna palabra.
 
-Nigel Richards es neozelandés. Habla inglés. Solo inglés. Ganó el Campeonato Mundial de Scrabble en inglés cinco veces, lo cual es impresionante pero no es la parte interesante.
+¿Qué nos dice esto? Que el conocimiento léxico (conocer palabras) y el conocimiento semántico (saber qué significan) son genuinamente separables en el cerebro. El Modelo Jerárquico Revisado predijo exactamente esto: hay un nivel léxico y un nivel conceptual, y se pueden desacoplar.
 
-En 2015, ganó el Campeonato Mundial de Scrabble en francés. Sin hablar francés.
-
-Lo repito. Memorizó el diccionario completo de Scrabble en francés — aproximadamente 386,000 palabras — sin entender qué significaba ninguna. Trata las palabras como patrones puros. Combinaciones de letras. Objetos matemáticos. No sabe que "maison" significa casa. Sabe que M-A-I-S-O-N es una colocación legal de fichas que vale cierta cantidad de puntos.
-
-Después hizo lo mismo en español. Sí. Español. Nuestro idioma. Y ganó.
-
-¿Qué nos dice esto sobre el cerebro? Varias cosas. Primero, que el conocimiento léxico (conocer palabras) y el conocimiento semántico (saber qué significan las palabras) son genuinamente separables en el cerebro. El Modelo Jerárquico Revisado en realidad predijo esto — hay un nivel léxico y un nivel conceptual, y se pueden desacoplar.
-
-Segundo, que el reconocimiento de patrones en juegos de palabras es una habilidad que trasciende idiomas. El razonamiento combinatorio que desarrollas jugando en inglés no desaparece cuando cambias al hebreo o al japonés.
-
-Y tercero, y más importante para los mortales que NO somos Nigel Richards: no necesitas ser un savant para beneficiarte del juego de palabras multilingüe. El mero acto de involucrarte con diferentes sistemas ortográficos ejercita los circuitos de reconocimiento de patrones de tu cerebro de formas que el juego monolingüe no logra.`,
+También nos dice que el reconocimiento de patrones en juegos de palabras trasciende idiomas. El razonamiento combinatorio que desarrollas jugando en inglés no desaparece cuando cambias al hebreo o al japonés. Y lo más importante para los mortales que no somos Richards: no necesitas ser un savant para beneficiarte del juego de palabras multilingüe. Involucrarte con diferentes sistemas ortográficos ejercita los circuitos de reconocimiento de patrones de tu cerebro de formas que el juego monolingüe no logra.`,
       },
       {
         title: 'La paradoja de "en la punta de la lengua"',

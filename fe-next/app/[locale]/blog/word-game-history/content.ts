@@ -187,7 +187,7 @@ That's not going to change. The four-thousand-year streak continues.`,
     subtitle: 'רעיונות גנובים, טירוף תשבצים, המצאה של אבא בבית, ומילה אחת בת חמש אותיות ששברה את האינטרנט.',
     category: 'היסטוריה',
     readTime: 'זמן קריאה: 11 דקות',
-    authorName: 'The Word Nerd',
+    authorName: 'חנון המילים',
     authorBio: 'שחקן משחקי מילים אובססיבי, היסטוריון חובב של ידע חסר תועלת, והבן אדם שיש לו שלושה מהדורות שונות של סקרבל.',
     sections: [
       {

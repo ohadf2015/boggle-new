@@ -229,15 +229,15 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
     subtitle: 'מצבי זרימה, מדיטציה דיגיטלית, והקו הדק המפתיע בין התמודדות בריאה להימנעות. סיפור אישי מגובה במחקר אמיתי.',
     category: 'בריאות הנפש',
     readTime: 'זמן קריאה: 11 דקות',
-    authorName: 'The Word Nerd',
-    authorBio: 'חרדתנית אובססיבית שגילתה שסידור אותיות זול יותר מפסיכולוג — אבל היא עדיין הולכת לפסיכולוג גם.',
+    authorName: 'חנון המילים',
+    authorBio: 'חרדתן אובססיבי שגילה שסידור אותיות זול יותר מפסיכולוג — אבל הוא עדיין הולך לפסיכולוג גם.',
     sections: [
       {
         content: `אני הולכת לספר לכם משהו שאולי יישמע מגוחך: לוח 4x4 של אותיות עשה יותר לחרדה שלי מרוב ספרי העזרה העצמית שעל השידה שלי. ויש לי הרבה ספרי עזרה עצמית. כמות מביכה. המטפלת שלי פעם הסתכלה על מדף הספרים שלי ואמרה, "זה הרבה קריאה על הרגעה למישהי שנראית כל כך מתוחה."
 
 היה לה פוינט.
 
-אבל הנה העניין — כל הספרים האלה אמרו לי לעשות מדיטציה, והמדיטציה הגבירה לי את החרדה. הם אמרו לי לכתוב יומן, וכתיבת היומן הפכה לספירלה. הם אמרו לי "לשבת עם הרגש", והישיבה עם הרגש גרמה לי לרצות לצאת מהעור שלי.
+אבל כל הספרים האלה אמרו לי לעשות מדיטציה, והמדיטציה הגבירה לי את החרדה. הם אמרו לי לכתוב יומן, וכתיבת היומן הפכה לספירלה. הם אמרו לי "לשבת עם הרגש", והישיבה עם הרגש גרמה לי לרצות לצאת מהעור שלי.
 
 ואז ביום שלישי אחד, בשתיים בלילה, בלי יכולת לישון כי המוח שלי החליט שזה הזמן המושלם להריץ מחדש כל שיחה מביכה מ-2019, פתחתי משחק מילים בטלפון. סתם להסיח את הדעת. ומשהו מוזר קרה.
 
@@ -249,7 +249,7 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
       },
       {
         title: 'מצב הזרימה: כשהמוח שלך סוף סוף שותק',
-        content: `בואו נתחיל עם הרעיון הגדול: זרימה.
+        content: `נתחיל עם הרעיון הגדול: זרימה.
 
 מיהאי צ\'יקסנטמיהאי — פסיכולוג הונגרי-אמריקאי שבילה עשורים בחקר מה שהוא קרא "חוויה אופטימלית." הספר פורץ הדרך שלו "זרימה" מ-1990 תיאר מצב נפשי שבו אתה כל כך שקוע בפעילות שהכל חוץ ממנה נעלם.
 
@@ -257,7 +257,7 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
 
 נשמע מוכר? אם פעם הרמתם עיניים ממשחק מילים וגיליתם ששעה נעלמה, זו זרימה.
 
-הנה מה שחשוב לחרדה: מצבי זרימה לא תואמים הרהור טורדני. קליפת המוח הקדם-מצחית שלכם לא יכולה בו-זמנית לנהל חיפוש מילים מורכב ולהפעיל את "מחולל הקטסטרופות." אין לה את רוחב הפס. מחקר ב-Journal of Positive Psychology מ-2018 מצא שאנשים שחוו מצבי זרימה באופן קבוע דיווחו על רמות חרדה ודיכאון נמוכות משמעותית.
+מה שחשוב לחרדה: מצבי זרימה לא תואמים הרהור טורדני. קליפת המוח הקדם-מצחית שלכם לא יכולה בו-זמנית לנהל חיפוש מילים מורכב ולהפעיל את "מחולל הקטסטרופות." אין לה את רוחב הפס. מחקר ב-Journal of Positive Psychology מ-2018 מצא שאנשים שחוו מצבי זרימה באופן קבוע דיווחו על רמות חרדה ודיכאון נמוכות משמעותית.
 
 משחקי מילים הם אחת הדרכים הנגישות ביותר להגיע לשם, כי אתם לא צריכים ציוד מיוחד, שותף, או אפילו לצאת מהמיטה.`,
       },
@@ -267,13 +267,13 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
 
 המנגנון פועל דרך כמה מסלולים עקיפים:
 
-עקירה קוגניטיבית: לזיכרון העבודה שלכם יש קיבולת מוגבלת. כשהוא עסוק בחיפוש מילים, יש פחות מקום למחשבות חרדתיות.
+נו, לזיכרון העבודה שלכם יש קיבולת מוגבלת. כשהוא עסוק בחיפוש מילים, יש פחות מקום למחשבות חרדתיות.
 
-חוויית שליטה: מציאת מילים בהצלחה — במיוחד קשות — מייצרת פיסות קטנות של הישג. תיאוריית המסוגלות העצמית של בנדורה מציעה שחוויות שליטה מצטברות בונות תחושת מסוגלות כללית שמגנה מפני חרדה.
+מציאת מילים בהצלחה — במיוחד קשות — מייצרת פיסות קטנות של הישג. תיאוריית המסוגלות העצמית של בנדורה מציעה שחוויות שליטה מצטברות בונות תחושת מסוגלות כללית שמגנה מפני חרדה.
 
-מבנה צפוי: חרדה משגשגת על אי-ודאות. משחקי מילים מציעים סביבה מבוקרת עם חוקים ברורים. עבור מוח חרדתי, הצפיות הזו מרגיעה.
+חרדה משגשגת על אי-ודאות. משחקי מילים מציעים סביבה מבוקרת עם חוקים ברורים. עבור מוח חרדתי, הצפיות הזו מרגיעה.
 
-ויסות חברתי: במשחקי מילים מרובי משתתפים, יש מרכיב מעורבות חברתית שמפעיל את הקומפלקס הוגאלי הוונטרלי — החלק של מערכת העצבים שאחראי על חיבור חברתי ורוגע.`,
+ובמשחקי מילים מרובי משתתפים, יש מרכיב מעורבות חברתית שמפעיל את הקומפלקס הוגאלי הוונטרלי — החלק של מערכת העצבים שאחראי על חיבור חברתי ורוגע.`,
       },
       {
         title: 'ההשוואה למיינדפולנס: דומה אבל שונה',
@@ -281,9 +281,9 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
 
 ד"ר אדם גזלי, מדען עצבים ב-UCSF, מצא שמטלות קוגניטיביות מובנות מסוימות מייצרות מצבי מוח דומים לאלה שנראים במדיטציה — ספציפית, עלייה בפעילות גלי אלפא בקליפת המוח הקדם-מצחית וירידה בפעילות ברשת ברירת המחדל.
 
-רשת ברירת המחדל היא "הטייס האוטומטי" של המוח שלכם. היא מופעלת כשאתם לא ממוקדים במשהו ספציפי — והיא גם הרשת שהכי קשורה להרהור, חשיבה עצמית-התייחסותית ודאגה. כשאתם משחקים משחק מילים מרתק, היא נשתקת מעצמה.
+רשת ברירת המחדל היא בעצם "הטייס האוטומטי" של המוח. היא מופעלת כשאתם לא ממוקדים במשהו ספציפי, והיא גם הרשת שהכי קשורה להרהור, חשיבה עצמית-התייחסותית ודאגה. כשאתם משחקים משחק מילים מרתק, היא נשתקת מעצמה.
 
-חשבו על זה ככה: מדיטציה היא כמו ללכת לחדר כושר באופן קבוע. משחקי מילים הם כמו לעלות במדרגות במקום במעלית. שניהם כוללים מאמץ. אחד יותר מכוון ובונה יותר כוח לאורך זמן. אבל השני יותר נגיש ועדיף על כלום.
+נו, חשבו על זה: מדיטציה היא כמו ללכת לחדר כושר באופן קבוע. משחקי מילים הם כמו לעלות במדרגות במקום במעלית. שניהם כוללים מאמץ. אחד יותר מכוון ובונה יותר כוח לאורך זמן. אבל השני יותר נגיש ועדיף על כלום.
 
 מחקר מ-2023 ב-Computers in Human Behavior מצא שמשתתפים ששיחקו משחקי פאזל מעוררי חשיבה במשך 20 דקות הראו ירידות דומות בחרדת-מצב לאלה שהשלימו מפגש מדיטציה מודרכת באותו אורך.`,
       },
@@ -303,7 +303,7 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
 
 במהלך שלוש הדקות האלה, המוח שלי מתעורר בעדינות. אין קפיצת קורטיזול ממייל מלחיץ. אין פחד מכותרת חדשות. רק אותיות, דפוסים, והסיפוק השקט של מציאת מילה מסתתרת בלוח.
 
-טקסים נחקרו רבות בפסיכולוגיה, והם מראים באופן עקבי השפעות מפחיתות חרדה. מחקר ב-Philosophical Transactions of the Royal Society B מ-2020 מצא שהתנהגות טקסית — המאופיינת בחזרתיות, נוקשות ומיותרות — מפחיתה חרדה על ידי הגברת תחושת השליטה.
+טקסים נחקרו בהרחבה, והם מראים באופן עקבי השפעות מפחיתות חרדה. מחקר ב-Philosophical Transactions of the Royal Society B מ-2020 מצא שהתנהגות טקסית — המאופיינת בחזרתיות, נוקשות ומיותרות, מפחיתה חרדה על ידי הגברת תחושת השליטה.
 
 דיברתי עם שחקנים יומיים אחרים שמתארים טקסים דומים. אישה אחת משחקת בנסיעה לעבודה — זה המעבר שלה מ"עצמי-בית" ל"עצמי-עבודה." סטודנט משחק ממש לפני השינה — עוזר לו להפסיק לחשוב על המבחן של מחר.
 
@@ -315,13 +315,13 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
 
 אז שיחקתי משחקי מילים. הרבה. ארבע, חמש, שש שעות ביום. התעוררתי ושיחקתי במקום לנהל את השיחה הקשה. שיחקתי בהפסקת צהריים במקום לעבד מה שהרגשתי.
 
-והנה העניין — זה עבד. לא הייתי חרדתית באותן שעות. אבל לא הייתי בסדר. השתמשתי ביכולת של המשחק להשתיק את המוח שלי כדי להימנע מדברים שהיו צריכים להיות רועשים.
+וזה עבד. לא הייתי חרדתית באותן שעות. אבל לא הייתי בסדר. השתמשתי ביכולת של המשחק להשתיק את המוח שלי כדי להימנע מדברים שהיו צריכים להיות רועשים.
 
 המטפלת שלי עזרה לי לראות את ההבדל בין שני סוגי סשנים:
 
-משחק מווסת: את מרגישה לחוצה או חרדתית. משחקת 15-30 דקות. המשחק עוזר לך לווסת את מערכת העצבים. חוזרת לחיים מרגישה רגועה יותר.
+כשמשחק מווסת, את מרגישה לחוצה או חרדתית. משחקת 15-30 דקות. המשחק עוזר לך לווסת את מערכת העצבים. חוזרת לחיים מרגישה רגועה יותר.
 
-משחק נמנע: את מרגישה משהו כואב. משחקת שעות. המשחק עוזר לך לא להרגיש. חוזרת לחיים עם אותן בעיות, עכשיו קצת יותר גרועות.
+וכשמשחק נמנע? את מרגישה משהו כואב. משחקת שעות. המשחק עוזר לך לא להרגיש. חוזרת לחיים עם אותן בעיות, עכשיו קצת יותר גרועות.
 
 שאלות שאני שואלת את עצמי עכשיו: האם אני נעה לעבר משהו (ריכוז, רוגע) או רחוק ממשהו (שיחה, רגש)? כמה זמן אני משחקת? האם זו הפסקה או זלילה? כשאפסיק, אני ארגיש רעננה או אשמה?
 
@@ -331,7 +331,7 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
         title: 'הקשר הנוכחי שלי עם הלוח',
         content: `אז איפה זה משאיר אותי? אחרי שלוש שנות משחק יומי, יותר מדי מחקר, ושיחת טיפול אחת מועילה באמת, הנה העמדה הנוכחית שלי:
 
-משחקי מילים הם כלי לגיטימי ומגובה מחקרית לניהול חרדה. לא תרופה. לא תחליף לעזרה מקצועית. כלי.
+בואו נהיה כנים: משחקי מילים הם כלי לגיטימי ומגובה מחקרית לניהול חרדה. לא תרופה, לא תחליף לעזרה מקצועית. כלי.
 
 מצב הזרימה שהם מספקים הוא אמיתי ובעל ערך. למי שמתקשה עם מיינדפולנס מסורתי, משחקי מילים מציעים נתיב חלופי לאותו שקט קוגניטיבי.
 
@@ -369,7 +369,7 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
 
 Hon hade en poäng.
 
-Men grejen är — alla de böckerna sa åt mig att meditera, och meditation gjorde mig mer ångestfylld. De sa åt mig att journalföra, och journalföringen blev till spiraler. De sa åt mig att "sitta med känslan," och att sitta med känslan fick mig att vilja krypa ur mitt eget skinn.
+Alla de böckerna sa åt mig att meditera, och meditation gjorde mig mer ångestfylld. De sa åt mig att journalföra, och journalföringen blev till spiraler. De sa åt mig att "sitta med känslan," och att sitta med känslan fick mig att vilja krypa ur mitt eget skinn.
 
 Sen en tisdag klockan två på natten, oförmögen att sova för att min hjärna beslutade att det var den perfekta tiden att spela upp varje pinsamt samtal från 2019, öppnade jag ett ordspel på telefonen. Bara för att distrahera mig. Och något konstigt hände.
 
@@ -401,15 +401,15 @@ Mestringsupplevelse: Att framgångsrikt hitta ord producerar små doser av prest
 
 Förutsägbar struktur: Ångest frodas ofta i osäkerhet. Ordspel erbjuder en kontrollerad miljö med tydliga regler. För en ångestfylld hjärna är den förutsägbarheten lugnande.
 
-Social reglering: I multiplayer-ordspel finns en social komponent som aktiverar det ventrala vagalkomplexet — den del av nervsystemet som ansvarar för social bindning och lugn.`,
+Social reglering: I multiplayer-ordspel finns en social komponent som aktiverar det ventrala vagalkomplexet, den del av nervsystemet som ansvarar för social bindning och lugn.`,
       },
       {
         title: 'Mindfulness-jämförelsen: Likt Men Olikt',
         content: `Forskare börjar märka att den kognitiva profilen av fokuserat spelande ser anmärkningsvärt lik ut mindfulness-meditation.
 
-Dr. Adam Gazzaley vid UCSF fann att vissa strukturerade kognitiva uppgifter producerar hjärntillstånd liknande dem vid meditation — specifikt ökad alfavågsaktivitet i prefrontala cortex och minskad aktivitet i default mode-nätverket.
+Dr. Adam Gazzaley vid UCSF fann att vissa strukturerade kognitiva uppgifter producerar hjärntillstånd liknande dem vid meditation, specifikt ökad alfavågsaktivitet i prefrontala cortex och minskad aktivitet i default mode-nätverket.
 
-Default mode-nätverket är hjärnans "autopilot." Det aktiveras när du inte fokuserar på något specifikt — och det är också det nätverk som är mest associerat med grubblande och oro. När du spelar ett absorberande ordspel tysnar det av sig självt.
+Default mode-nätverket är hjärnans "autopilot." Det aktiveras när du inte fokuserar på något specifikt, och det är också det nätverk som är mest associerat med grubblande och oro. När du spelar ett absorberande ordspel tysnar det av sig självt.
 
 Jag vill vara försiktig här. Ordspel ÄR inte meditation. Meditation bygger långsiktiga regleringsförmågor. Men ordspel ger en on-demand avstängningsknapp för grubbelmaskinen.
 
@@ -419,11 +419,11 @@ En studie från 2023 i Computers in Human Behavior fann att deltagare som spelad
         title: 'Vad Terapeuter Verkligen Tycker',
         content: `Jag frågade min egen terapeut vad hon tyckte om min ordspelsvanor. Hon sa: "Det låter som att du har hittat en adaptiv copingstrategi. Frågan är inte om den fungerar. Frågan är om det är det enda verktyget i din verktygslåda."
 
-En klinisk psykolog jag pratade med rekommenderar faktiskt pusselspel till vissa ångestpatienter. "Inte som ersättning för terapi, utan som komplement. Jag har klienter som använder ordspel som en brygga — något de gör när ångest stiger men de inte kan göra en fullständig jordningsövning."
+En klinisk psykolog jag pratade med rekommenderar faktiskt pusselspel till vissa ångestpatienter. "Inte som ersättning för terapi, utan som komplement. Jag har klienter som använder ordspel som en brygga, något de gör när ångest stiger men de inte kan göra en fullständig jordningsövning."
 
-Hon tillade: "Strukturen spelar roll. Öppna spel kan öka ångest för vissa för att det finns för många val. Ordspel har begränsningar — ett begränsat rutnät, en timer, specifika regler. De begränsningarna är faktiskt terapeutiska för ångestfyllda sinnen."
+Hon tillade: "Strukturen spelar roll. Öppna spel kan öka ångest för vissa för att det finns för många val. Ordspel har begränsningar: ett begränsat rutnät, en timer, specifika regler. De begränsningarna är faktiskt terapeutiska för ångestfyllda sinnen."
 
-Inte alla terapeuter var entusiastiska. En påpekade att vilken copingmekanism som helst kan bli undvikande. "Om någon spelar ordspel sex timmar om dagen för att undvika verkliga problem, det är inte coping — det är flykt."`,
+Inte alla terapeuter var entusiastiska. En påpekade att vilken copingmekanism som helst kan bli undvikande. "Om någon spelar ordspel sex timmar om dagen för att undvika verkliga problem, det är inte coping. Det är flykt."`,
       },
       {
         title: 'Den Dagliga Ritualen',
@@ -433,7 +433,7 @@ Under de tre minuterna startar min hjärna mjukt. Ingen kortisoltopp från stres
 
 Ritualer har studerats flitigt i psykologi och visar konsekvent ångestreducerande effekter. En studie i Philosophical Transactions of the Royal Society B (2020) fann att rituellt beteende minskar ångest genom att öka upplevd kontroll.
 
-"En omgång till"-fenomenet är inte beroende. Varje omgång är en komplett upplevelse — utmaning, ansträngning, upplösning. Din hjärna känner igen en hälsosam källa till engagemang och begär mer.`,
+"En omgång till"-fenomenet är inte beroende. Varje omgång är en komplett upplevelse: utmaning, ansträngning, upplösning. Din hjärna känner igen en hälsosam källa till engagemang och begär mer.`,
       },
       {
         title: 'När Man Ska Oroa Sig: Spelande vs Flykt',
@@ -585,7 +585,7 @@ Computers in Human Behavior（2023年）の研究では、20分間認知的に�
 
 Tenía razón.
 
-Pero aquí está la cosa — todos esos libros me dijeron que meditara, y la meditación me daba más ansiedad. Me dijeron que escribiera un diario, y el diario se convirtió en espirales. Me dijeron "siéntate con el sentimiento," y sentarme con el sentimiento me daba ganas de salir de mi propia piel.
+Pero todos esos libros me dijeron que meditara, y la meditación me daba más ansiedad. Me dijeron que escribiera un diario, y el diario se convirtió en espirales. Me dijeron "siéntate con el sentimiento," y sentarme con el sentimiento me daba ganas de salir de mi propia piel.
 
 Entonces, un martes a las 2 AM, sin poder dormir porque mi cerebro decidió que era el momento perfecto para reproducir cada conversación incómoda de 2019, abrí un juego de palabras en mi teléfono. Solo para distraerme. Y algo extraño pasó.
 
@@ -609,8 +609,7 @@ Los juegos de palabras son una de las formas más accesibles de llegar al flujo,
         title: 'Ansiedad y Juegos de Palabras: Lo Que Dice la Investigación',
         content: `Una revisión sistemática de 2022 en JMIR Serious Games examinó 27 estudios sobre juegos de puzzles y palabras como intervenciones cognitivas. El juego estructurado de palabras se asoció con reducción de ansiedad auto-reportada en 19 de los 27 estudios.
 
-El mecanismo funciona a través de varias vías indirectas:
-
+El mecanismo funciona a través de varias vías indirectas. 
 Desplazamiento cognitivo: Tu memoria de trabajo tiene capacidad limitada. Cuando está ocupada buscando palabras, literalmente hay menos espacio para pensamientos ansiosos.
 
 Experiencia de dominio: Encontrar palabras exitosamente produce pequeñas dosis de logro. La teoría de autoeficacia de Bandura sugiere que las experiencias de dominio acumuladas construyen un sentido general de competencia que amortigua contra la ansiedad.
@@ -655,11 +654,6 @@ Sobre el fenómeno de "una ronda más" — cada ronda es una experiencia complet
         title: 'Cuándo Preocuparse: Gaming vs Escapismo',
         content: `Hace un año pasé por un momento difícil. Jugaba cuatro, cinco, seis horas al día. Usaba la capacidad del juego para silenciar mi mente como forma de evitar cosas que necesitaban ser ruidosas.
 
-Mi terapeuta me ayudó a ver la diferencia:
-
-Juego regulador: Estás estresada. Juegas 15-30 minutos. El juego te ayuda a regular. Vuelves a tu vida más calmada.
-
-Juego evasivo: Sientes algo doloroso. Juegas por horas. El juego te ayuda a NO sentir. Vuelves con los mismos problemas, ahora un poco peores.
 
 Preguntas que me hago ahora: ¿Me muevo hacia algo o lejos de algo? ¿Cuánto tiempo llevo jugando? ¿Es un descanso o un atracón? ¿Me sentiré renovada o culpable cuando pare?
 

@@ -236,7 +236,7 @@ Marcus did. And that's what I keep coming back to.`,
       },
       {
         title: 'המחקר: למידה מבוססת משחקים באמת עובדת',
-        content: `אני יודע, אני יודע. "למידה מבוססת משחקים" הפכה למילת באזז כל כך גדולה שהיא כמעט חסרת משמעות. כל סטארטאפ אדטק טוען שהמוצר שלו "מגיימיפיי" את הלמידה. רובם פשוט הוסיפו מערכת נקודות לדף עבודה.
+        content: `נו, אני יודע. "למידה מבוססת משחקים" הפכה למילת באזז כל כך גדולה שהיא כמעט חסרת משמעות. כל סטארטאפ אדטק טוען שהמוצר שלו "מגיימיפיי" את הלמידה. רובם פשוט הוסיפו מערכת נקודות לדף עבודה.
 
 אבל המחקר על משחקי מילים אמיתיים — לא דפי עבודה מגוימפיים, אלא משחקים אמיתיים שבהם מניפולציה לשונית היא המשחק עצמו — הוא חזק להפתיע.
 
@@ -244,7 +244,7 @@ Marcus did. And that's what I keep coming back to.`,
 
 מחקר של הונג ושותפיו (2018) מצא שתלמידים שלמדו אוצר מילים דרך משחקי מילים הראו שימור טוב יותר ב-40% במעקב של ארבעה שבועות, בהשוואה לתלמידים שלמדו בהוראה מסורתית.
 
-למה? החוקרים מצביעים על כמה מנגנונים: למידה אגבית — אתה לא מנסה "ללמוד" אוצר מילים, אתה מנסה לנצח. חשיפה חוזרת — סיבוב בודד עשוי לחשוף תלמיד לעשרות מילים. עיבוד פעיל — אתה בונה מילים באופן אקטיבי. מעורבות רגשית — לנצח מרגיש טוב, ורגשות חיוביים מחזקים את גיבוש הזיכרון.`,
+למה? החוקרים מצביעים על כמה מנגנונים: למידה אגבית: אתה לא מנסה "ללמוד" אוצר מילים, אתה מנסה לנצח. חשיפה חוזרת: סיבוב בודד עשוי לחשוף תלמיד לעשרות מילים. עיבוד פעיל: אתה בונה מילים באופן אקטיבי. ומעורבות רגשית: לנצח מרגיש טוב, ורגשות חיוביים מחזקים את גיבוש הזיכרון.`,
       },
       {
         title: 'אנגלית כשפה שנייה: איפה משחקי מילים באמת זורחים',
@@ -264,17 +264,17 @@ Marcus did. And that's what I keep coming back to.`,
 
 ראיתי הרבה מורים מנסים ונכשלים, והכישלונות כמעט תמיד נובעים מאותה טעות: להתייחס למשחק כפרס ולא כהוראה. "אם תסיימו את דפי העבודה, תוכלו לשחק בוגל" זו לא למידה מבוססת משחקים. זה שוחד עם צעדים נוספים.
 
-הנה מה שעובד:
+מה שעובד:
 
-חימום מובנה (5-7 דקות): התחילו שיעור עם סיבוב מהיר של משחק מילים. זה מפעיל רשתות אוצר מילים, מערב תלמידים מיד, ומספק נקודת כניסה בלחץ נמוך.
+חימום מובנה, חמש עד שבע דקות: התחילו שיעור עם סיבוב מהיר של משחק מילים. זה מפעיל רשתות אוצר מילים, מערב תלמידים מיד, ומספק נקודת כניסה בלחץ נמוך.
 
-הצגת אוצר מילים דרך משחקים: במקום להציג מילים חדשות ברשימה, הציגו אותן דרך משחק קודם. תנו לתלמידים להיתקל במילים בהקשר של משחק, ואז דונו בהגדרות אחר כך.
+שנית, הציגו אוצר מילים דרך משחקים. במקום להציג מילים חדשות ברשימה, הציגו אותן דרך משחק קודם. תנו לתלמידים להיתקל במילים בהקשר של משחק, ואז דונו בהגדרות אחר כך.
 
-אתגרים מותאמים: כאן משחקי מילים באמת עולים על הוראה מסורתית. ברשת מתוזמנת, תלמידים מתקשים יכולים למצוא מילים בנות שלוש אותיות בעוד תלמידים מתקדמים מחפשים מילים בנות שש. כולם עושים את אותה פעילות ברמה שלהם.
+שלישית, אתגרים מותאמים. כאן משחקי מילים באמת עולים על הוראה מסורתית. ברשת מתוזמנת, תלמידים מתקשים יכולים למצוא מילים בנות שלוש אותיות בעוד תלמידים מתקדמים מחפשים מילים בנות שש. כולם עושים את אותה פעילות ברמה שלהם.
 
-משחק שיתופי: זווגו תלמיד חזק עם חלש. הם מחפשים יחד, והתלמיד החזק מדגמן ידע אוצר מילים באופן טבעי.
+רביעית, משחק שיתופי. זווגו תלמיד חזק עם חלש. הם מחפשים יחד, והתלמיד החזק מדגמן ידע אוצר מילים באופן טבעי.
 
-רפלקציה אחרי המשחק: אחרי המשחק, הקדישו חמש דקות לדיון במילים מעניינות. "מישהו מצא מילה שלא הכיר? מה היא? מה לדעתכם היא אומרת?"`,
+ולבסוף, רפלקציה. אחרי המשחק, הקדישו חמש דקות לדיון במילים מעניינות. "מישהו מצא מילה שלא הכיר? מה היא? מה לדעתכם היא אומרת?"`,
       },
       {
         title: 'הוראה מותאמת: לפגוש כל תלמיד',
@@ -284,7 +284,7 @@ Marcus did. And that's what I keep coming back to.`,
 
 במשחק כמו בוגל או לקסיקלאש, האתגר מתאים את עצמו אוטומטית לרמת השחקן. תלמיד עם אוצר מילים מוגבל ימצא מילים קצרות ונפוצות. תלמיד עם אוצר מילים מתקדם ימצא מילים ארוכות ונדירות. שני התלמידים מעורבים, שניהם מאותגרים, ואף אחד לא משועמם או מתוסכל.
 
-זה מה שחוקרי חינוך קוראים הוראה "מותאמת טבעית", והיא יקרת ערך מאוד כי היא לא דורשת הכנה נוספת מהמורה.
+חוקרי חינוך קוראים לזה הוראה "מותאמת טבעית". בואו נהיה כנים, זה נדיר בחינוך ולא דורש הכנה נוספת מהמורה.
 
 לתלמידים עם לקויות למידה, משחקי מילים מציעים יתרונות נוספים. מחקר של רוזאס ושותפיו (2003) מצא שהוראה מבוססת משחקים הייתה יעילה במיוחד לתלמידים עם קשיי קשב.
 
@@ -298,13 +298,13 @@ Marcus did. And that's what I keep coming back to.`,
 
 משחקי מילים מייצרים נתונים ניתנים לצפייה ומדידה. בסיבוב יחיד של חמש דקות, אפשר להעריך:
 
-רוחב אוצר מילים: כמה מילים התלמיד מצא? זה מודד ישירות גודל אוצר מילים פרודוקטיבי.
+כמה מילים התלמיד מצא? זה מודד ישירות גודל אוצר מילים פרודוקטיבי.
 
-עומק אוצר מילים: מה איכות המילים? האם מצאו רק מילים נפוצות, או שניגשו לאוצר מילים נדיר ומתוחכם יותר?
+מה איכות המילים? האם מצאו רק מילים נפוצות, או שניגשו לאוצר מילים נדיר ומתוחכם יותר?
 
-דיוק באיות: במשחקים שבהם תלמידים כותבים את המילים שלהם, מקבלים תובנה מיידית לגבי דפוסי איות.
+במשחקים שבהם תלמידים כותבים את המילים שלהם, מקבלים תובנה מיידית לגבי דפוסי איות.
 
-צמיחה לאורך זמן: עקבו אחרי ציונים לאורך מספר מפגשים. צמיחה באוצר מילים הופכת נראית באופן שמבחנים סטנדרטיים, שנערכים פעמיים בשנה, לא יכולים לתפוס.
+ואפשר לעקוב אחרי ציונים לאורך מספר מפגשים. צמיחה באוצר מילים הופכת נראית באופן שמבחנים סטנדרטיים, שנערכים פעמיים בשנה, לא יכולים לתפוס.
 
 משחקי מילים דיגיטליים כמו לקסיקלאש מקלים על זה עוד יותר על ידי מעקב אוטומטי אחרי ציונים, מילים שנמצאו ורמות קושי.
 
@@ -314,7 +314,7 @@ Marcus did. And that's what I keep coming back to.`,
         title: 'דיגיטלי מול אנלוגי: האם הפורמט משנה?',
         content: `האם להשתמש במשחקי לוח פיזיים או באפליקציות דיגיטליות? התשובה הכנה: שניהם, וזה תלוי במטרות.
 
-משחקי מילים פיזיים (אריחי סקרבל, סטי בוגל, חיפושי מילים מודפסים) מציעים יתרונות: הם מישושיים — לתלמידים צעירים במיוחד, טיפול פיזי באריחי אותיות יוצר אסוציאציות זיכרון חזקות יותר. הם חברתיים כברירת מחדל. הם לא דורשים טכנולוגיה.
+משחקי מילים פיזיים (אריחי סקרבל, סטי בוגל, חיפושי מילים מודפסים) מציעים יתרונות: הם מישושיים. לתלמידים צעירים במיוחד, טיפול פיזי באריחי אותיות יוצר אסוציאציות זיכרון חזקות יותר. הם חברתיים כברירת מחדל. הם לא דורשים טכנולוגיה.
 
 משחקי מילים דיגיטליים מציעים יתרונות אחרים: אימות מיידי, התאמת קושי אוטומטית, איסוף נתונים, תמיכה רב-לשונית ונגישות.
 
@@ -344,7 +344,7 @@ Marcus did. And that's what I keep coming back to.`,
   },
   sv: {
     title: 'Varför Varje Lärare Borde Ha ett Ordspel i sin Verktygslåda',
-    subtitle: 'Ordförrådsgapet är verkligt, forskningen är övertygande, och dina elever är redan spelare — så möt dem där de är.',
+    subtitle: 'Ordförrådsgapet är verkligt, forskningen är övertygande, och dina elever är redan spelare. Möt dem där de är.',
     category: 'Utbildning',
     readTime: '12 min läsning',
     authorName: 'The Word Nerd',
@@ -359,7 +359,7 @@ Marcus satte sig upp så snabbt att jag trodde stolen skulle välta.
 
 Han hittade 23 ord på fem minuter. Fler än någon annan elev. Fler än jag, ärligt talat. Och för första gången hela terminen ställde han en ordförrådsfråga frivilligt: "Är QUAIL ett ord? Som fågeln?"
 
-Det var åtta år sedan. Marcus studerar kommunikation på universitetet nu. Jag hade gärna sagt att ett Boggle-spel förändrade hans liv, men det vore oärligt. Vad jag kan säga är att det öppnade något — en vilja att engagera sig med ord som arbetsblad aldrig utlöste.`,
+Det var åtta år sedan. Marcus studerar kommunikation på universitetet nu. Jag hade gärna sagt att ett Boggle-spel förändrade hans liv, men det vore oärligt. Vad jag kan säga är att det öppnade något, en vilja att engagera sig med ord som arbetsblad aldrig utlöste.`,
       },
       {
         title: 'Ordförrådsgapet: En Kris Dold i Öppen Dager',
@@ -367,17 +367,17 @@ Det var åtta år sedan. Marcus studerar kommunikation på universitetet nu. Jag
 
 Vid tre års ålder har barn från höginkomstfamiljer exponerats för ungefär 30 miljoner fler ord än barn från låginkomstfamiljer. Detta är det berömda "30 miljoner ords gap"-fyndet från Hart och Risleys studie 1995.
 
-När barn börjar skolan är gapen redan betydande. En studie av Biemiller (2003) fann att förstaklassares ordförråd varierade från cirka 2 500 ord till över 8 000 ord. Det är inte ett gap — det är en avgrund.
+När barn börjar skolan är gapen redan betydande. En studie av Biemiller (2003) fann att förstaklassares ordförråd varierade från cirka 2 500 ord till över 8 000 ord. Det är inte ett gap. Det är en avgrund.
 
 Och här är poängen: ordförrådskunskap är en av de starkaste prediktorerna för akademisk framgång i ALLA ämnen, inte bara språk. En elev som inte känner till ordet "hypotes" kommer att kämpa i naturvetenskap. Ordförråd är den osynliga infrastrukturen för lärande.`,
       },
       {
         title: 'Forskningen: Spelbaserat Lärande Fungerar Faktiskt',
-        content: `Jag vet, jag vet. "Spelbaserat lärande" har blivit ett sådant modeord att det nästan är meningslöst. Men forskningen om faktiska ordspel — inte gamifierade arbetsblad, utan äkta spel — är överraskande robust.
+        content: `Jag vet, jag vet. "Spelbaserat lärande" har blivit ett sådant modeord att det nästan är meningslöst. Men forskningen om faktiska ordspel, inte gamifierade arbetsblad utan äkta spel, är överraskande robust.
 
 En meta-analys av Acquah och Katz (2020) granskade 30 studier om digital spelbaserad språkinlärning och fann signifikanta positiva effekter på ordförrådsförvärv. Effektstorleken var medelstor till stor (d = 0.67).
 
-En studie av Hung et al. (2018) fann att elever som lärde sig ordförråd genom ordspel visade 40% bättre bibehållande vid en uppföljning efter fyra veckor. Inte 40% bättre omedelbart — 40% bättre en månad senare.
+En studie av Hung et al. (2018) fann att elever som lärde sig ordförråd genom ordspel visade 40% bättre bibehållande vid en uppföljning efter fyra veckor. Inte 40% bättre omedelbart, utan 40% bättre en månad senare.
 
 Varför? Forskarna pekar på flera mekanismer: incidentell inlärning (du försöker vinna, inte studera), upprepad exponering, aktivt bearbetande och emotionellt engagemang. Att vinna känns bra, och positiva känslor under inlärning förstärker minneskonsolidering.`,
       },
@@ -387,7 +387,7 @@ Varför? Forskarna pekar på flera mekanismer: incidentell inlärning (du förs�
 
 Att lära sig ett andraspråk är fundamentalt ett ordförrådsproblem. Forskning av Nation (2006) fastslog att man behöver kunna cirka 8 000-9 000 ordfamiljer för att förstå 98% av allmän skriven engelska. De flesta ESL-elever kan långt färre.
 
-Ordspel adresserar flera dimensioner samtidigt. En ESL-elev som spelar ett tidsstyrt ordsökningsspel ser stavningen, underuttalar uttal, kontrollerar betydelser och stöter på ord nära andra ord — allt under tidspress.
+Ordspel adresserar flera dimensioner samtidigt. En ESL-elev som spelar ett tidsstyrt ordsökningsspel ser stavningen, underuttalar uttal, kontrollerar betydelser och stöter på ord nära andra ord, allt under tidspress.
 
 En studie av Aghlara och Tamjid (2011) fann att iranska EFL-inlärare som använde ordspel presterade signifikant bättre på ordförrådstest och rapporterade dramatiskt lägre ångestnivåer. För ESL-elever som ofta upplever betydande språkångest är denna stressminskning i sig en inlärningsfördel.`,
       },
@@ -427,7 +427,7 @@ Jag hade en elev med dyslexi som kämpade med läsuppgifter men konsekvent över
 
 Digitala ordspel som LexiClash gör detta ännu enklare genom att automatiskt spåra poäng, hittade ord och svårighetsnivåer.
 
-Den viktigaste insikten för skolledare: ordspel ersätter inte bedömning. De ÄR bedömning — formativ, kontinuerlig bedömning med låga insatser som fångar data traditionella prov missar.
+Den viktigaste insikten för skolledare: ordspel ersätter inte bedömning. De ÄR bedömning: formativ, kontinuerlig bedömning med låga insatser som fångar data traditionella prov missar.
 
 Min rekommendation: använd fysiska spel för sociala aktiviteter och digitala spel för individuell övning och bedömning. De två formaten kompletterar varandra vackert.
 
@@ -579,9 +579,9 @@ Eso fue hace ocho años. Marcus está en la universidad ahora, estudiando comuni
 
 A los tres años, los niños de familias de altos ingresos han sido expuestos a aproximadamente 30 millones de palabras más que los niños de familias de bajos ingresos. Este es el famoso hallazgo de la "Brecha de 30 Millones de Palabras" del estudio de Hart y Risley de 1995.
 
-Cuando los niños entran a la escuela, las brechas ya son significativas. Un estudio de Biemiller (2003) encontró que el vocabulario de los alumnos de primer grado variaba de unas 2,500 palabras a más de 8,000. Eso no es una brecha — es un abismo.
+Cuando los niños entran a la escuela, las brechas ya son significativas. Un estudio de Biemiller (2003) encontró que el vocabulario de los alumnos de primer grado variaba de unas 2,500 palabras a más de 8,000. Eso no es una brecha, es un abismo.
 
-Y aquí está lo importante: el conocimiento de vocabulario es uno de los predictores más fuertes del éxito académico en TODAS las materias, no solo en lengua. Un estudiante que no conoce la palabra "hipótesis" tendrá dificultades en ciencias. El vocabulario es la infraestructura invisible del aprendizaje.`,
+Y ojo: el conocimiento de vocabulario es uno de los predictores más fuertes del éxito académico en TODAS las materias, no solo en lengua. Un estudiante que no conoce la palabra "hipótesis" tendrá dificultades en ciencias. El vocabulario es la infraestructura invisible del aprendizaje.`,
       },
       {
         title: 'La Investigación: El Aprendizaje Basado en Juegos Realmente Funciona',
@@ -589,7 +589,7 @@ Y aquí está lo importante: el conocimiento de vocabulario es uno de los predic
 
 Un meta-análisis de Acquah y Katz (2020) revisó 30 estudios y encontró efectos positivos significativos en la adquisición de vocabulario. El tamaño del efecto fue de moderado a grande (d = 0.67).
 
-Un estudio de Hung et al. (2018) encontró que los estudiantes que aprendieron vocabulario a través de juegos de palabras mostraron un 40% mejor retención en un seguimiento de cuatro semanas. No 40% mejor inmediatamente — 40% mejor un mes después.
+Un estudio de Hung et al. (2018) encontró que los estudiantes que aprendieron vocabulario a través de juegos de palabras mostraron un 40% mejor retención en un seguimiento de cuatro semanas. No 40% mejor inmediatamente. 40% mejor un mes después.
 
 ¿Por qué? Los investigadores señalan varios mecanismos: aprendizaje incidental (no intentas estudiar vocabulario, intentas ganar), exposición repetida, procesamiento activo y compromiso emocional. Ganar se siente bien, y las emociones positivas durante el aprendizaje mejoran la consolidación de la memoria.`,
       },
@@ -611,15 +611,7 @@ Los fracasos casi siempre vienen del mismo error: tratar el juego como recompens
 
 Lo que funciona:
 
-Calentamientos estructurados (5-7 minutos): Comenzar la clase con una ronda rápida de juego de palabras. Activa las redes de vocabulario e involucra a los estudiantes inmediatamente.
-
-Introducción de vocabulario a través de juegos: En lugar de presentar nuevas palabras en una lista, introdúcelas primero a través del juego. Deja que los estudiantes encuentren las palabras en contexto de juego, luego discutan definiciones después.
-
-Desafíos diferenciados: En una cuadrícula cronometrada, los estudiantes con dificultades pueden encontrar palabras de tres letras mientras los avanzados buscan palabras de seis. Todos hacen la misma actividad a su nivel.
-
-Juego colaborativo: Empareja un estudiante fuerte con uno débil. Buscan juntos y el fuerte modela naturalmente el conocimiento de vocabulario.
-
-Reflexión post-juego: Dedica cinco minutos a discutir palabras interesantes que surgieron.`,
+Empezar la clase con un calentamiento estructurado de 5-7 minutos. Una ronda rápida de juego de palabras activa las redes de vocabulario e involucra a los estudiantes inmediatamente. Introducir vocabulario nuevo a través del juego en lugar de presentar palabras en una lista: deja que los estudiantes las encuentren en contexto de juego y luego discutan definiciones. Usar desafíos diferenciados dentro de la misma cuadrícula cronometrada: los estudiantes con dificultades encuentran palabras de tres letras mientras los avanzados buscan palabras de seis, todos haciendo la misma actividad a su nivel. Emparejar un estudiante fuerte con uno débil para juego colaborativo, donde el fuerte modela naturalmente el conocimiento de vocabulario. Y siempre dedicar cinco minutos de reflexión post-juego a discutir palabras interesantes que surgieron.`,
       },
       {
         title: 'Instrucción Diferenciada: Alcanzar a Cada Estudiante',
@@ -639,7 +631,7 @@ Tuve una estudiante con dislexia que luchaba terriblemente con las tareas de lec
 
 Los juegos de palabras digitales como LexiClash hacen esto aún más fácil al rastrear automáticamente puntajes, palabras encontradas y niveles de dificultad.
 
-La perspectiva clave para los administradores: los juegos de palabras no reemplazan la evaluación. SON evaluación — formativa, continua, de bajo riesgo que captura datos que las pruebas tradicionales pasan por alto.
+La perspectiva clave para los administradores: los juegos de palabras no reemplazan la evaluación. SON evaluación: formativa, continua, de bajo riesgo que captura datos que las pruebas tradicionales pasan por alto.
 
 Mi recomendación: usa juegos físicos para actividades sociales y colaborativas, y juegos digitales para práctica individual y evaluación. LexiClash soporta hebreo, inglés, sueco, japonés y español. En un aula diversa, esto importa.
 

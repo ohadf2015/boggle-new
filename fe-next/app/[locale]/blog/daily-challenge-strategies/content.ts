@@ -155,10 +155,10 @@ Some days you'll crush it. Some days the board will crush you. Both are fine. It
   },
   he: {
     title: 'אסטרטגיות לאתגר היומי: מה באמת משנה',
-    subtitle: 'שלושה חודשים של מעקב אובססיבי אחרי תוצאות, טקטיקות מסקראבל תחרותי, ותורת האינפורמציה — מזוקקים למשהו שבאמת שימושי.',
+    subtitle: 'שלושה חודשים של מעקב אובססיבי אחרי תוצאות, טקטיקות מסקראבל תחרותי, ותורת האינפורמציה. מזוקקים למשהו שבאמת שימושי.',
     category: 'אסטרטגיה',
     readTime: 'זמן קריאה: 12 דקות',
-    authorName: 'נרד המילים',
+    authorName: 'חנון המילים',
     authorBio: 'שחקן מילים אובססיבי, קורא חובבני של מדעי המוח, והאדם שהורס את ערב המשחקים כי הוא לוקח יותר מדי זמן בתור שלו.',
     sections: [
       {
@@ -166,39 +166,39 @@ Some days you'll crush it. Some days the board will crush you. Both are fine. It
 
 זה הדבר עם אתגרים יומיים. הם נכנסים לך מתחת לעור. מה שמתחיל כ"אה, אני רק אשחק סיבוב מהיר" הופך לריטואל, אחר כך לאובססיה, ואחר כך לפרויקט איסוף נתונים שבו אתה עוקב אחרי הציונים שלך בגיליון אלקטרוני בשש בבוקר כי אתה רוצה לדעת אם הביצועים שלך ביום שלישי שונים סטטיסטית מהביצועים ביום חמישי. (כן, הם שונים. ימי שלישי גרועים יותר. אין לי הסבר לזה.)
 
-אני משחק אתגרים יומיים של מילים כבר בערך שלושה חודשים — משחק ברצינות, לא סתם מקליק ומקווה לטוב. בדרך שאלתי טקטיקות משחקני סקראבל תחרותיים, גנבתי מסגרת חשיבה מגישה של יוטיובר מתמטיקה לפתרון וורדל, ובטעות למדתי יותר על פסיכולוגיה קוגניטיבית ממה שאי פעם ציפיתי ללמוד ממשחק מילים. הנה מה שגיליתי.`,
+אני משחק אתגרים יומיים של מילים כבר בערך שלושה חודשים, משחק ברצינות, לא סתם מקליק ומקווה לטוב. בדרך שאלתי טקטיקות משחקני סקראבל תחרותיים, גנבתי מסגרת חשיבה מגישה של יוטיובר מתמטיקה לפתרון וורדל, ובטעות למדתי יותר על פסיכולוגיה קוגניטיבית ממה שאי פעם ציפיתי ללמוד ממשחק מילים. מה שגיליתי:`,
       },
       {
         title: 'התזמון הוא לא פרט שולי',
-        content: `בואו אהיה ישיר: מתי אתם משחקים חשוב כמעט כמו איך אתם משחקים.
+        content: `מתי אתם משחקים חשוב כמעט כמו איך אתם משחקים.
 
-מחקר קוגניטיבי — ואני מתכוון למחקרים שפורסמו בפועל, לא לפוסטים של "גורו פרודוקטיביות" — מראה שרוב האנשים מגיעים לשיא הביצועים המנטליים בערך 2-4 שעות אחרי ההתעוררות. הקורטקס הפרה-פרונטלי שלכם, החלק במוח שאחראי על תכנון וזיהוי דפוסים, עובד במלוא הכוח בחלון הזמן הזה. אחרי זה, זה ירידה איטית עם התאוששות קצרה אחרי הצהריים (אם יש לכם מזל) ואז הצניחה הארוכה לעייפות של הערב.
+מחקר קוגניטיבי (ואני מתכוון למחקרים אמיתיים, לא לפוסטים של "גורו פרודוקטיביות") מראה שרוב האנשים מגיעים לשיא הביצועים המנטליים בערך 2-4 שעות אחרי ההתעוררות. הקורטקס הפרה-פרונטלי שלכם עובד במלוא הכוח בחלון הזה. אחרי זה? ירידה איטית, אולי התאוששות קצרה אחהצ, ואז הצניחה הארוכה לעייפות של הערב.
 
-בדקתי את זה על עצמי. במשך שלושה שבועות, שיחקתי את האתגר היומי בשלוש שעות שונות: בוקר (בתוך חלון ה-2-4 שעות), אחרי הצהריים (בסביבות שלוש), וערב (אחרי תשע). התוצאות היו ברורות באופן מביך. הציונים הממוצעים שלי בבוקר היו 23% גבוהים יותר מהציונים בערב. עשרים ושלושה אחוז. זו לא שגיאת עיגול — זה ההבדל בין ביצוע בינוני לביצוע ממש טוב.
+בדקתי את זה על עצמי. במשך שלושה שבועות, שיחקתי את האתגר היומי בשלוש שעות שונות: בוקר (בתוך חלון ה-2-4 שעות), אחרי הצהריים (בסביבות שלוש), וערב (אחרי תשע). התוצאות היו ברורות באופן מביך. הציונים הממוצעים שלי בבוקר היו 23% גבוהים יותר מהציונים בערב. עשרים ושלושה אחוז. זה לא שגיאת עיגול. זה ההבדל בין ביצוע בינוני לביצוע ממש טוב.
 
-אני לא אומר שאתם צריכים לכוון שעון מעורר בשביל משחק מילים. זה היה מטורף. (כיוונתי שעון מעורר בשביל משחק מילים.) אבל אם אתם תוהים למה הציונים שלכם לא עקביים, בדקו את התזמון לפני שאתם מאשימים את הלוח.`,
+אני לא אומר שאתם צריכים לכוון שעון מעורר בשביל משחק מילים. (כיוונתי שעון מעורר בשביל משחק מילים.) אבל אם אתם תוהים למה הציונים שלכם לא עקביים, בדקו את התזמון לפני שאתם מאשימים את הלוח.`,
       },
       {
-        title: 'סריקת חמש השניות — גנוב משחמט',
-        content: `הנה הרגל שרכשתי מקריאה על גרנדמאסטרים בשחמט, והוא באמת שינה את הגישה שלי לכל לוח.
+        title: 'סריקת חמש השניות (גנוב משחמט)',
+        content: `רגל שרכשתי מקריאה על גרנדמאסטרים בשחמט, והוא באמת שינה את הגישה שלי לכל לוח.
 
 כשהלוח מופיע, אל תיגעו בכלום. אל תתחילו לעקוב אחרי אותיות. פשוט הסתכלו. חמש שניות. אולי עשר. תנו לעיניים לשוטט על פני הלוח כולו בלי לנסות ליצור מילה ספציפית.
 
-מה שקורה באותן שניות זה מרתק. המוח שלכם עושה מה שמדעני קוגניציה קוראים לו "עיבוד קדם-תשומת-לב" — הוא מקטלג תדירויות אותיות, יחסים מרחביים, וצירופי אותיות נפוצים לפני שהמודעות שלכם בכלל התחילה לעבוד. גרנדמאסטרים בשחמט עושים את זה כשהם רואים עמדה לראשונה. הם לא מחשבים מהלכים עדיין. הם סופגים את צורת המשחק.
+מה שקורה באותן שניות זה מרתק. המוח שלכם עושה מה שמדעני קוגניציה קוראים "עיבוד קדם-תשומת-לב". הוא מקטלג תדירויות אותיות, יחסים מרחביים, וצירופי אותיות נפוצים לפני שהמודעות שלכם בכלל התחילה לעבוד. גרנדמאסטרים בשחמט עושים את זה כשהם רואים עמדה לראשונה. הם לא מחשבים מהלכים עדיין. הם סופגים את צורת המשחק.
 
 פעם הייתי צולל פנימה מיד. הייתי מזהה מילה בשתי השניות הראשונות ומתחיל לבנות אותה. הבעיה? הייתי נעוגן על המילה הראשונה ומפספס את כל הצד השמאלי של הלוח. עכשיו אני מכריח את עצמי לסרוק קודם, וכמות המילים שלי למשחק עלתה בכ-30%. המילה הראשונה שאני מגיש אולי מגיעה חמש שניות מאוחר יותר ממה שהיה פעם, אבל אני מוצא משמעותית יותר מילים בסך הכל.
 
-חשבו על זה ככה: חמש שניות על בניית מפה מנטלית חוסכות לכם שלושים שניות של תעייה בפינה הלא נכונה של הלוח.`,
+חשבו על זה ככה: חמש שניות מפה מנטלית חוסכות שלושים שניות תעייה.`,
       },
       {
-        title: 'מילים קצרות קודם — האמת האינטואיטיבית ההפוכה',
+        title: 'מילים קצרות קודם: האמת ההפוכה',
         content: `כל אינסטינקט בגוף שלכם אומר "תלכו על המילים הגדולות." שבע אותיות. שמונה אותיות. מילות התהילה. אני מבין. באמת שאני מבין. יש משהו מספק עמוקות במציאת מילה כמו "אנציקלופדיה" על לוח 4x4.
 
-אבל הנה מה שהנתונים שלי באמת מראים: להתחיל עם מילים קצרות זו כמעט תמיד האסטרטגיה הטובה יותר, ולא בפער קטן.
+אבל מה שהנתונים שלי באמת מראים: להתחיל עם מילים קצרות זו כמעט תמיד האסטרטגיה הטובה יותר, ולא בפער קטן.
 
-שלוש סיבות. ראשית, מילים קצרות מהירות יותר למציאה ולשליחה, מה שאומר שאתם צוברים נקודות בזמן שתהליכי הרקע של המוח עובדים על המילים הארוכות. שנית — וזה החלק שאף אחד לא מדבר עליו — כל מילה שנשלחת מפחיתה את העומס הקוגניטיבי שלכם. זו דבר אחד פחות שהמוח מנסה להחזיק בזיכרון העבודה. רוחב הפס המנטלי המשוחרר הזה חשוב יותר ממה שאתם חושבים. שלישית, במשחקים עם מגבלת זמן, שלוש מילים של 3 אותיות (9 אותיות שוות נקודות) כמעט תמיד מביאות יותר נקודות ממילה אחת של 7 אותיות שלקח לכם 45 שניות להרכיב.
+שלוש סיבות. אחת, מילים קצרות מהירות יותר למציאה ולשליחה, מה שאומר שאתם צוברים נקודות בזמן שתהליכי הרקע של המוח עובדים על המילים הארוכות. שתיים (וזה החלק שאף אחד לא מדבר עליו): כל מילה שנשלחת מפחיתה את העומס הקוגניטיבי, דבר אחד פחות בזיכרון העבודה. רוחב הפס המנטלי שמשתחרר חשוב יותר ממה שחושבים. שלוש, במשחקים עם מגבלת זמן, שלוש מילים של 3 אותיות (9 אותיות שוות נקודות) כמעט תמיד מביאות יותר נקודות ממילה אחת של 7 אותיות שלקח לכם 45 שניות להרכיב.
 
-שחקני סקראבל תחרותיים מבינים את זה אינסטינקטיבית. הם לא מבלים שלוש דקות בחיפוש אחרי בינגו (המונח לשימוש בכל שבע האריחים). הם משחקים מילים מוצקות של 4-5 אותיות, שומרים על "ערך שארית" טוב — זה האותיות שנשארות על המעמד אחרי כל תור — ונותנים למשחקים הגדולים להגיע באופן טבעי.
+שחקני סקראבל תחרותיים מבינים את זה אינסטינקטיבית. הם לא מבלים שלוש דקות בחיפוש אחרי בינגו (המונח לשימוש בכל שבע האריחים). הם משחקים מילים מוצקות של 4-5 אותיות, שומרים על "ערך שארית" טוב (האותיות שנשארות על המעמד אחרי כל תור) ונותנים למשחקים הגדולים להגיע באופן טבעי.
 
 ההקבלה ישירה: אל תכריחו מילים ארוכות. תנו להן לצוץ בזמן שאתם קוצרים ביעילות את הקצרות.`,
       },
@@ -206,41 +206,41 @@ Some days you'll crush it. Some days the board will crush you. Both are fine. It
         title: 'צ\'אנקינג — איך מומחים באמת רואים את הלוח',
         content: `יש מושג בפסיכולוגיה קוגניטיבית שנקרא "צ'אנקינג" (קיבוץ), והוא מסביר לחלוטין למה חלק מהשחקנים נראים כאילו הם מוצאים מילים במהירות על-אנושית.
 
-כשמתחיל מסתכל על האותיות ת-י-ו-נ, הוא רואה ארבע אותיות נפרדות. כשמומחה מסתכל על אותן אותיות, הוא רואה צ'אנק אחד: סיומת. אבן בניין. המוח שלו לא מעבד ארבעה דברים — הוא מעבד דבר אחד, והדבר האחד הזה מיד מציע עשרות מילים.
+כשמתחיל מסתכל על האותיות ת-י-ו-נ, הוא רואה ארבע אותיות נפרדות. כשמומחה מסתכל על אותן אותיות, הוא רואה צ'אנק אחד: סיומת. אבן בניין. המוח שלו לא מעבד ארבעה דברים. הוא מעבד דבר אחד, והדבר האחד הזה מיד מציע עשרות מילים.
 
 שחקני מילים מומחים לא קוראים לוחות אות אות. הם רואים אשכולות. סיומות כמו -ות, -ים, -ית. תחיליות כמו מ-, ב-, ל-, ה-. הם רואים זוגות עיצורים נפוצים ודפוסי תנועות. כל אחד מהצ'אנקים האלה הוא יחידה אחת בזיכרון העבודה, לא שלוש או ארבע אותיות נפרדות.
 
 זה ניתן לאימון. ברצינות. אפשר להשתפר בזה. תתחילו לשים לב לקבוצות אותיות במקום לאותיות בודדות. כשאתם סורקים את הלוח (במהלך ההפסקה של חמש השניות, זוכרים?), חפשו סיומות קודם. אחר כך חפשו תחיליות. אחר כך חפשו זוגות נפוצים. עם הזמן, זה הופך לאוטומטי, ומהירות קריאת הלוח שלכם תעלה באופן דרמטי.
 
-ביליתי שבועיים בתרגול מכוון של זיהוי צ'אנקים — פשוט בהייה בלוחות אותיות אקראיים וניסיון לזהות קבוצות נפוצות הכי מהר שאפשר. זה הרגיש חסר תועלת. אז הציונים שלי באתגר היומי קפצו ב-15% ולא ירדו בחזרה.`,
+ביליתי שבועיים בתרגול מכוון של זיהוי צ'אנקים, פשוט בהייה בלוחות אותיות אקראיים וניסיון לזהות קבוצות נפוצות הכי מהר שאפשר. זה הרגיש חסר תועלת. אז הציונים שלי באתגר היומי קפצו ב-15% ולא ירדו בחזרה.`,
       },
       {
-        title: 'אל תתקעו — כלל 15 השניות',
+        title: 'אל תתקעו: כלל 15 השניות',
         content: `אם לא מצאתם מילה ב-15 שניות, אתם תקועים. זה לא מרגיש כאילו אתם תקועים. זה מרגיש כאילו אתם "כמעט שם," כאילו המילה על קצה הלשון, כאילו רק עוד שלוש שניות של מבט על האותיות האלה וזה ייפול. זה לא ייפול. תמשיכו הלאה.
 
 שחקני סקראבל מנוסים קוראים לזה "להיתקע בצורה." המוח שלכם שכנע את עצמו שסידור מסוים של אותיות חייב ליצור מילה, והוא מפסיק לשקול חלופות. זה סוג של הטיית קיבעון, והתרופה היחידה היא להזיז את תשומת הלב שלכם פיזית לחלק אחר של הלוח.
 
-יש לי כלל נוקשה עכשיו: 15 שניות בלי מילה חדשה, ואני מסתכל בכוונה על הפינה הנגדית של הלוח. לא האזור הסמוך — הפינה הנגדית. המטרה היא לשבור את הקיבעון לחלוטין. האם זה מרגיש לא טבעי? כן. האם זה עובד? בהחלט כן.
+יש לי כלל נוקשה עכשיו: 15 שניות בלי מילה חדשה, ואני מסתכל בכוונה על הפינה הנגדית של הלוח. לא האזור הסמוך. הפינה הנגדית. המטרה היא לשבור את הקיבעון לחלוטין. האם זה מרגיש לא טבעי? כן. האם זה עובד? בהחלט כן.
 
-הנה הסוד המלוכלך על להיות תקוע: המילה שאתם מנסים למצוא בדרך כלל אפילו לא שם. המוח מתאים דפוסים למשהו שלא קיים בלוח הספציפי הזה. ככל שתקבלו את זה מוקדם יותר ותמשיכו הלאה, כך תמצאו מילים שבאמת נמצאות שם מוקדם יותר.`,
+הסוד המלוכלך: המילה שאתם מנסים למצוא בדרך כלל אפילו לא שם. המוח מתאים דפוסים למשהו שלא קיים בלוח הספציפי הזה. ככל שתקבלו את זה מוקדם יותר ותמשיכו הלאה, כך תמצאו מילים שבאמת נמצאות שם מוקדם יותר.`,
       },
       {
-        title: 'אפקט האינקובציה — הנשק הסודי של המוח',
-        content: `זה נשמע כמו פסאודו-מדע, אבל זו אחת התופעות המתועדות ביותר בפסיכולוגיה קוגניטיבית.
+        title: 'אפקט האינקובציה: הנשק הסודי של המוח',
+        content: `נשמע כמו פסאודו-מדע? דווקא זו אחת התופעות המתועדות ביותר בפסיכולוגיה קוגניטיבית.
 
-אפקט האינקובציה פשוט: כשאתם מפסיקים לחשוב באופן פעיל על בעיה, המוח ממשיך לעבוד עליה באופן לא מודע. אז, כשאתם חוזרים לבעיה, פתרונות נראים "קופצים" לתודעה — אותו רגע "אהה!" קלאסי.
+אפקט האינקובציה פשוט: כשאתם מפסיקים לחשוב באופן פעיל על בעיה, המוח ממשיך לעבוד עליה באופן לא מודע. אז, כשאתם חוזרים לבעיה, פתרונות נראים "קופצים" לתודעה, אותו רגע "אהה!" קלאסי.
 
-באתגר יומי, אפשר לנצל את זה. אם במשחק יש הפסקה טבעית — מסך מעבר, סיכום ניקוד, אפילו חצי השנייה בזמן שהמילה האחרונה שלכם נבדקת — תנו לעיניים להירגע. אל תחפשו באופן פעיל. פשוט תנו ללוח להתקיים בראייה ההיקפית שלכם. אני יודע שזה נשמע כמו עצה של מדריך מדיטציה, אבל המחקר שמגבה את אפקט האינקובציה ממש חזק. המאמר של דייקסטרהויס ונורדגרן מ-2006 על תורת החשיבה הלא-מודעת הראה שלבעיות מורכבות עם משתנים רבים (כמו מציאת מילים בלוח אותיות), עיבוד לא-מודע לעתים קרובות עולה על ניתוח מכוון.
+באתגר יומי, אפשר לנצל את זה. אם במשחק יש הפסקה טבעית (מסך מעבר, סיכום ניקוד, אפילו חצי שנייה בזמן שהמילה נבדקת) תנו לעיניים להירגע. אל תחפשו באופן פעיל. פשוט תנו ללוח להתקיים בראייה ההיקפית שלכם. אני יודע שזה נשמע כמו עצה של מדריך מדיטציה, אבל המחקר שמגבה את אפקט האינקובציה ממש חזק. המאמר של דייקסטרהויס ונורדגרן מ-2006 על תורת החשיבה הלא-מודעת הראה שלבעיות מורכבות עם משתנים רבים (כמו מציאת מילים בלוח אותיות), עיבוד לא-מודע לעתים קרובות עולה על ניתוח מכוון.
 
 הטריק האישי שלי: אחרי שליחת מילה, אני לוקח נשימה אחת לפני שאני מחפש את הבאה. נשימה אחת. אולי שתי שניות. זה בקושי מורגש מבחינת עלות זמן, אבל זה יוצר תקופת אינקובציה מיקרוסקופית שתדיר מעלה מילים שלא הייתי מוצא דרך סריקה בכוח.`,
       },
       {
         title: 'תורת האינפורמציה והתובנה של 3Blue1Brown',
-        content: `גרנט סנדרסון — המתמטיקאי מאחורי ערוץ היוטיוב 3Blue1Brown — עשה סרטון מבריק על אסטרטגיית וורדל אופטימלית באמצעות תורת האינפורמציה. התובנה המרכזית שלו מתאימה יפה לאתגרי מילים יומיים, למרות שהמשחקים שונים מבנית.
+        content: `גרנט סנדרסון (המתמטיקאי מאחורי 3Blue1Brown) עשה סרטון מבריק על אסטרטגיית וורדל אופטימלית באמצעות תורת האינפורמציה. התובנה המרכזית שלו מתאימה יפה לאתגרי מילים יומיים, למרות שהמשחקים שונים מבנית.
 
 הרעיון המרכזי: כל ניחוש צריך למקסם רווח מידע. בוורדל, זה אומר לבחור מילים שמחסלות הכי הרבה אפשרויות. באתגר לוח מילים, האנלוגיה היא: אסטרטגיית הסריקה שלכם צריכה לתת עדיפות לאזורים בלוח עם "צפיפות מידע" הגבוהה ביותר.
 
-מה זה אומר בפועל? חפשו אותיות חריגות קודם. ק', ז', צ' על הלוח זה מידע בעל ערך עצום כי זה מצמצם את מרחב החיפוש באופן דרמטי. יש מעט מאוד מילים שמכילות את האותיות האלה — אז כשאתם רואים אחת, אתם יכולים לבדוק במהירות צירופים ולמצוא מילה או לשלול את זה לחלוטין. זה יעיל. לעומת זאת, להסתכל על אשכול של א-ר-ת-ש — שם מרחב האפשרויות עצום. יש מאות מילים שאפשר ליצור. קשה יותר לחפש ביעילות.
+מה זה אומר בפועל? חפשו אותיות חריגות קודם. ק', ז', צ' על הלוח זה מידע בעל ערך עצום כי זה מצמצם את מרחב החיפוש באופן דרמטי. יש מעט מאוד מילים שמכילות אותן, אז כשאתם רואים אחת, אתם יכולים לבדוק במהירות צירופים ולמצוא מילה או לשלול את זה לחלוטין. זה יעיל. לעומת זאת, להסתכל על אשכול של א-ר-ת-ש, שם מרחב האפשרויות עצום. יש מאות מילים שאפשר ליצור. קשה יותר לחפש ביעילות.
 
 אז הנה האסטרטגיה המותאמת שלי: סרקו אותיות נדירות קודם, בדקו את הסביבה שלהן למילים תקינות, ואז עברו לאזורי האותיות הנפוצות.`,
       },
@@ -256,11 +256,11 @@ Some days you'll crush it. Some days the board will crush you. Both are fine. It
       },
       {
         title: 'הפסיכולוגיה של רצפים — גם מניעה וגם מסוכנת',
-        content: `בואו נדבר על רצפים (streaks) בכנות, כי יש לי רגשות מעורבים לגביהם.
+        content: `נו, בואו נדבר על רצפים בכנות. יש לי רגשות מעורבים.
 
 מצד אחד, הרצף היומי שלי הוא המוטיבטור היעיל ביותר שאי פעם פגשתי במשחק. הוא גרם לי לשחק כל יום. הוא גרם לי לרצות להשתפר. הוא הפך תחביב מזדמן למיומנות שאני מפתח באופן פעיל. מצד שני, רצפים יוצרים מערכת יחסים רעילה עם המשחק אם לא נזהרים.
 
-הבעיה היא שנאת הפסד — הטיה פסיכולוגית מתועדת היטב שבה לאבד משהו מרגיש פי שניים כואב יותר ממה שלהרוויח את אותו דבר מרגיש טוב. לשמור על רצף של 47 ימים לא מרגיש 47 פעמים טוב. זה מרגיש פחות או יותר ניטרלי, כי קו הבסיס זז. אבל לאבד את הרצף? זה מרגיש נורא. באופן לא פרופורציונלי נורא.
+הבעיה היא שנאת הפסד, הטיה פסיכולוגית שלאבד משהו מרגיש פי שניים כואב יותר מלהרוויח אותו דבר. לשמור על רצף של 47 ימים לא מרגיש 47 פעמים טוב. זה מרגיש פחות או יותר ניטרלי, כי קו הבסיס זז. אבל לאבד את הרצף? זה מרגיש נורא. באופן לא פרופורציונלי נורא.
 
 ראיתי אנשים (טוב, הייתי אנשים) מקבלים החלטות ממש לא רציונליות כדי לשמור על רצף. לשחק כשחולים. לשחק בחתונה. לשחק במהלך הפסקת החשמל שהזכרתי קודם. בנקודה הזו, הרצף לא משרת אתכם — אתם משרתים את הרצף.
 
@@ -270,9 +270,9 @@ Some days you'll crush it. Some days the board will crush you. Both are fine. It
       },
       {
         title: 'לחץ, דירוג, ולמה לא לאכפת יכול דווקא לעזור לכם לנצח',
-        content: `שמרתי את זה לסוף כי זה הדבר הכי חשוב שלמדתי, והוא מתסכל בפרדוקסליות שלו.
+        content: `שמרתי את זה לסוף כי זה הדבר הכי חשוב שלמדתי. ומתסכל.
 
-לחץ — ספציפית, הלחץ של לאכפת מהדירוג — עושה אתכם באופן פעיל גרועים יותר במשחק. זו לא חוכמת פוסטר מוטיבציה. זה מדע המוח. כשאתם לחוצים מביצועים, הגוף מפעיל את מערכת העצבים הסימפתטית (תגובת "הילחם או ברח"), שמפנה משאבים מהקורטקס הפרה-פרונטלי לאזורים פרימיטיביים יותר במוח. בדיוק החלק במוח שאתם צריכים לזיהוי דפוסים ומציאת מילים יצירתית — נחנק.
+לחץ, ספציפית הלחץ של לאכפת מהדירוג, עושה אתכם גרועים יותר במשחק. זו לא חוכמת פוסטר מוטיבציה. זה מדע המוח. כשאתם לחוצים מביצועים, הגוף מפעיל את מערכת העצבים הסימפתטית (תגובת "הילחם או ברח"), שמפנה משאבים מהקורטקס הפרה-פרונטלי לאזורים פרימיטיביים יותר במוח. בדיוק החלק במוח שאתם צריכים לזיהוי דפוסים ומציאת מילים יצירתית — נחנק.
 
 המחקר על "חנק תחת לחץ" בספורט ישים ישירות כאן. העבודה של ביילוק וקאר מ-2001 הראתה שלחץ גורם למבצעים מיומנים לחזור לעיבוד מבוקר צעד-אחר-צעד במקום העיבוד הזורם והאוטומטי שאימנו. במונחי משחקי מילים: במקום לראות צ'אנקים ודפוסים ללא מאמץ, אתם מתחילים לבדוק אות אחר אות בעמל. אתם נהיים איטיים יותר. מוצאים פחות מילים. נלחצים יותר. זה מעגל קסמים.
 
@@ -281,9 +281,9 @@ Some days you'll crush it. Some days the board will crush you. Both are fine. It
 ואם מערכת הדירוג ממש מלחיצה אתכם? שחקו במצב תרגול חופשי. ברצינות. האתגר היומי עדיין יהיה שם כשתהיו מוכנים, ותהיו שחקנים טובים יותר מהתרגול בכל מקרה.`,
       },
       {
-        content: `תשמעו. התחלתי לכתוב את זה בחשיבה שאשתף כמה טיפים. במקום זה כתבתי חיבור קטן על פסיכולוגיה קוגניטיבית, תורת האינפורמציה, ומערכת היחסים הלא בריאה שלי עם מונה רצפים במשחק מילים. זה כנראה אומר לכם הכל על סוג האדם שכותב מדריכי אסטרטגיה לאתגרי מילים יומיים.
+        content: `נו, התחלתי לכתוב את זה בחשיבה שאשתף כמה טיפים. במקום זה כתבתי חיבור קטן על פסיכולוגיה קוגניטיבית, תורת האינפורמציה, ומערכת היחסים הלא בריאה שלי עם מונה רצפים במשחק מילים. זה כנראה אומר לכם הכל על סוג האדם שכותב מדריכי אסטרטגיה לאתגרי מילים יומיים.
 
-אבל הנה מה שאני באמת מאמין אחרי שלושה חודשים של משחק אובססיבי: האסטרטגיות למעלה עובדות. לא כי הן קסם, אלא כי הן מבוססות על איך שהמוח באמת מעבד מידע. סרקו לפני שאתם פועלים. תתחילו קטן. אל תתקבעו. תנו למוח הלא-מודע שלכם לעשות את שלו. ולמען כל מה שחשוב לכם, שחקו כשאתם ערים באמת.
+אבל מה שאני באמת מאמין אחרי שלושה חודשים של משחק אובססיבי: האסטרטגיות למעלה עובדות. לא כי הן קסם, אלא כי הן מבוססות על איך שהמוח באמת מעבד מידע. סרקו לפני שאתם פועלים. תתחילו קטן. אל תתקבעו. תנו למוח הלא-מודע שלכם לעשות את שלו. ולמען כל מה שחשוב לכם, שחקו כשאתם ערים באמת.
 
 חלק מהימים תרסקו את זה. חלק מהימים הלוח ירסק אתכם. שניהם בסדר. זה משחק. משחק ממש, ממש טוב.`,
       },
@@ -294,7 +294,7 @@ Some days you'll crush it. Some days the board will crush you. Both are fine. It
   },
   sv: {
     title: 'Strategier för dagliga utmaningen: Vad som faktiskt spelar roll',
-    subtitle: 'Tre månader av besatt poängspårning, taktik från tävlings-Scrabble och informationsteori — destillerat till något faktiskt användbart.',
+    subtitle: 'Tre månader av besatt poängspårning, taktik från tävlings-Scrabble och informationsteori. Destillerat till något faktiskt användbart.',
     category: 'Strategi',
     readTime: '12 min läsning',
     authorName: 'Ordnörden',
@@ -305,107 +305,107 @@ Some days you'll crush it. Some days the board will crush you. Both are fine. It
 
 Det är grejen med dagliga utmaningar. De kryper under huden på dig. Det som börjar som "jag kör bara en snabb runda" förvandlas till en ritual, sedan en besatthet, och sedan ett datainsamlingsprojekt där du sitter och spårar dina poäng i ett kalkylblad klockan sex på morgonen för att du vill veta om din prestation på tisdagar skiljer sig statistiskt från din prestation på torsdagar. (Det gör den. Tisdagar är sämre. Jag har ingen förklaring.)
 
-Jag har spelat dagliga ordutmaningar i ungefär tre månader nu — spelat på allvar, inte bara tryckt runt och hoppats på det bästa. Under resans gång har jag lånat taktik från tävlings-Scrabble-spelare, stulit ett ramverk från en matematisk YouTubers approach till Wordle, och av misstag lärt mig mer om kognitiv psykologi än jag någonsin förväntat mig av ett ordspel. Här är vad jag kommit fram till.`,
+Jag har spelat dagliga ordutmaningar i ungefär tre månader nu, spelat på allvar, inte bara tryckt runt och hoppats på det bästa. Under resans gång har jag lånat taktik från tävlings-Scrabble-spelare, stulit ett ramverk från en matematisk YouTubers approach till Wordle, och av misstag lärt mig mer om kognitiv psykologi än jag någonsin förväntat mig av ett ordspel. Här är vad jag kommit fram till.`,
       },
       {
         title: 'Timing är inte en bisak',
         content: `Låt mig vara rak: när du spelar spelar nästan lika stor roll som hur du spelar.
 
-Kognitiv forskning — och jag menar faktiskt publicerade studier, inte "produktivitetsguru"-blogginlägg — visar att de flesta når sin mentala topprestanda ungefär 2-4 timmar efter uppvaknande. Din prefrontala cortex, den del av hjärnan som hanterar planering och mönsterigenkänning, går på alla cylindrar under det fönstret. Sedan är det en långsam nedgång avbruten av en kort återhämtning på eftermiddagen (om du har tur) och sedan den långa nedförsbacken mot kvälls-hjärndimma.
+Kognitiv forskning (och jag menar faktiskt publicerade studier, inte "produktivitetsguru"-blogginlägg) visar att de flesta når sin mentala topprestanda ungefär 2-4 timmar efter uppvaknande. Din prefrontala cortex, den del av hjärnan som hanterar planering och mönsterigenkänning, går på alla cylindrar under det fönstret. Sedan är det en långsam nedgång avbruten av en kort återhämtning på eftermiddagen (om du har tur) och sedan den långa nedförsbacken mot kvälls-hjärndimma.
 
-Jag testade detta på mig själv. I tre veckor spelade jag den dagliga utmaningen vid tre olika tidpunkter: morgon (inom 2-4-timmarsfönstret), eftermiddag (runt klockan tre), och kväll (efter nio). Resultaten var generande tydliga. Mina morgonpoäng låg i genomsnitt 23% högre än mina kvällspoäng. Tjugotre procent. Det är inte ett avrundningsfel — det är skillnaden mellan en medioker runda och en genuint bra.
+Jag testade detta på mig själv. I tre veckor spelade jag den dagliga utmaningen vid tre olika tidpunkter: morgon (inom 2-4-timmarsfönstret), eftermiddag (runt klockan tre), och kväll (efter nio). Resultaten var generande tydliga. Mina morgonpoäng låg i genomsnitt 23% högre än mina kvällspoäng. Tjugotre procent. Det är inte ett avrundningsfel. Det är skillnaden mellan en medioker runda och en genuint bra.
 
 Jag säger inte att du behöver ställa ett alarm för att spela ett ordspel. Det vore galet. (Jag ställde ett alarm för att spela ett ordspel.) Men om du undrar varför dina poäng är inkonsekventa, kolla din timing innan du skyller på brädet.`,
       },
       {
-        title: 'Fem-sekunders-scanningen — stulen från schack',
+        title: 'Fem-sekunders-scanningen, stulen från schack',
         content: `Här är en vana jag plockade upp genom att läsa om schackstormästare, och den har genuint förändrat hur jag angriper varje bräde.
 
 När rutnätet dyker upp, rör ingenting. Börja inte spåra bokstäver. Titta bara. Fem sekunder. Kanske tio. Låt dina ögon vandra över hela brädet utan att försöka bilda ett specifikt ord.
 
-Vad som händer under de sekunderna är fascinerande. Din hjärna gör vad kognitionsforskare kallar "pre-attentive processing" — den katalogiserar bokstavsfrekvenser, spatiala relationer och vanliga bokstavskombinationer innan ditt medvetna sinne ens börjat arbeta. Schackstormästare gör detta när de först ser en position. De beräknar inte drag ännu. De absorberar spelets form.
+Vad som händer under de sekunderna är fascinerande. Din hjärna gör vad kognitionsforskare kallar "pre-attentive processing", den katalogiserar bokstavsfrekvenser, spatiala relationer och vanliga bokstavskombinationer innan ditt medvetna sinne ens börjat arbeta. Schackstormästare gör detta när de först ser en position. De beräknar inte drag ännu. De absorberar spelets form.
 
 Jag brukade dyka rakt in. Jag såg ett ord under de två första sekunderna och började bygga det. Problemet? Jag förankrade mig i det första ordet och missade hela vänstra sidan av brädet. Nu tvingar jag mig själv att scanna först, och min ordräkning per spel har ökat med ungefär 30%. Det första ordet jag skickar in kanske kommer fem sekunder senare än det brukade, men jag hittar betydligt fler ord totalt.
 
 Tänk på det så här: att spendera fem sekunder på att bygga en mental karta sparar dig från att spendera trettio sekunder vilse i fel hörn av brädet.`,
       },
       {
-        title: 'Korta ord först — den kontraintuitiva sanningen',
+        title: 'Korta ord först: den kontraintuitiva sanningen',
         content: `Varje instinkt i din kropp säger "gå på de stora orden." Sju bokstäver. Åtta bokstäver. Glansorden. Jag fattar. Verkligen. Det finns något djupt tillfredsställande med att hitta MJÖLKBILEN på ett 4x4-rutnät.
 
 Men här är vad min data faktiskt visar: att börja med korta ord är nästan alltid den bättre strategin, och det är inte ens i närheten.
 
-Tre anledningar. För det första är korta ord snabbare att hitta och skicka in, vilket innebär att du samlar poäng medan din hjärnas bakgrundsprocesser jobbar på de längre orden. För det andra — och det här är delen ingen pratar om — varje inskickat ord reducerar din kognitiva belastning. Det är en sak mindre som din hjärna försöker hålla i arbetsminnet. Den frigjorda mentala bandbredden spelar större roll än du tror. För det tredje, i tidsbegränsade spel överträffar tre trebokstavsord (9 bokstävers poäng) nästan alltid ett sjubokstavsord som tog 45 sekunder att pussla ihop.
+Tre anledningar. För det första är korta ord snabbare att hitta och skicka in, vilket innebär att du samlar poäng medan din hjärnas bakgrundsprocesser jobbar på de längre orden. För det andra, och det här är delen ingen pratar om, varje inskickat ord reducerar din kognitiva belastning. Det är en sak mindre som din hjärna försöker hålla i arbetsminnet. Den frigjorda mentala bandbredden spelar större roll än du tror. För det tredje, i tidsbegränsade spel överträffar tre trebokstavsord (9 bokstävers poäng) nästan alltid ett sjubokstavsord som tog 45 sekunder att pussla ihop.
 
-Tävlings-Scrabble-spelare förstår detta instinktivt. De spenderar inte tre minuter på att jaga bingo (termen för att använda alla sju brickor). De spelar solida fyra-fem-bokstavsord, behåller bra "rack leave" — det är bokstäverna kvar på ställningen efter varje tur — och låter de stora spelen komma naturligt.
+Tävlings-Scrabble-spelare förstår detta instinktivt. De spenderar inte tre minuter på att jaga bingo (termen för att använda alla sju brickor). De spelar solida fyra-fem-bokstavsord, behåller bra "rack leave" (bokstäverna kvar på ställningen efter varje tur) och låter de stora spelen komma naturligt.
 
 Parallellen är direkt: tvinga inte fram långa ord. Låt dem dyka upp medan du effektivt skördar de korta.`,
       },
       {
-        title: 'Chunking — hur experter faktiskt ser brädet',
+        title: 'Chunking: hur experter faktiskt ser brädet',
         content: `Det finns ett koncept inom kognitiv psykologi som kallas "chunking," och det förklarar helt varför vissa spelare verkar hitta ord med övermänsklig hastighet.
 
-När en nybörjare tittar på bokstäverna N-I-N-G ser de fyra enskilda bokstäver. När en expert tittar på samma bokstäver ser de en chunk: -NING. Ett suffix. En byggsten. Deras hjärna processar inte fyra saker — den processar en sak, och den enda saken föreslår omedelbart dussintals ord: spring, ring, ting, sning, bräning.
+När en nybörjare tittar på bokstäverna N-I-N-G ser de fyra enskilda bokstäver. När en expert tittar på samma bokstäver ser de en chunk: -NING. Ett suffix. En byggsten. Deras hjärna processar inte fyra saker, den processar en sak, och den enda saken föreslår omedelbart dussintals ord: spring, ring, ting, sning, bräning.
 
 Expert-ordspelsspelare läser inte bräden bokstav för bokstav. De ser kluster. -ING, -ANDE, -TION, O-, FÖR-, UT-. De ser vanliga konsonantpar: SK, ST, STR. De ser vokalmönster. Var och en av dessa chunks är en enda enhet i arbetsminnet, inte tre eller fyra separata bokstäver.
 
 Detta är träningsbart. Seriöst. Du kan bli bättre på det. Börja uppmärksamma bokstavsgrupper istället för enskilda bokstäver. När du scannar brädet (under din fem-sekunders-paus, minns du?), leta efter suffix först. Sedan prefix. Sedan vanliga par. Med tiden blir detta automatiskt, och din brädläsningshastighet ökar dramatiskt.
 
-Jag spenderade två veckor med att medvetet träna chunk-igenkänning — bara stirra på slumpmässiga bokstavsrutnät och försöka identifiera vanliga grupper så fort som möjligt. Det kändes meningslöst. Sedan hoppade mina poäng i den dagliga utmaningen med ungefär 15% och kom aldrig tillbaka ner.`,
+Jag spenderade två veckor med att medvetet träna chunk-igenkänning, bara stirra på slumpmässiga bokstavsrutnät och försöka identifiera vanliga grupper så fort som möjligt. Det kändes meningslöst. Sedan hoppade mina poäng i den dagliga utmaningen med ungefär 15% och kom aldrig tillbaka ner.`,
       },
       {
-        title: 'Fastna inte — 15-sekundersregeln',
+        title: 'Fastna inte: 15-sekundersregeln',
         content: `Om du inte hittat ett ord på 15 sekunder är du fast. Det känns inte som att du är fast. Det känns som att du "nästan är där," som att ordet ligger på tungspetsen, som att om du bara stirrar på de bokstäverna tre sekunder till så klickar det. Det gör det inte. Gå vidare.
 
 Erfarna Scrabble-spelare kallar det "att fastna i en form." Din hjärna har övertygat sig om att en viss bokstavskombination måste bilda ett ord, och den slutar överväga alternativ. Det är en form av fixeringsbias, och det enda botemedlet är att fysiskt flytta din uppmärksamhet till en annan del av brädet.
 
-Jag har en hård regel nu: 15 sekunder utan ett nytt ord, och jag tittar medvetet på det motsatta hörnet av rutnätet. Inte det intilliggande området — det motsatta hörnet. Målet är att bryta fixeringen helt. Känns det onaturligt? Ja. Funkar det? Absolut ja.
+Jag har en hård regel nu: 15 sekunder utan ett nytt ord, och jag tittar medvetet på det motsatta hörnet av rutnätet. Inte det intilliggande området, det motsatta hörnet. Målet är att bryta fixeringen helt. Känns det onaturligt? Ja. Funkar det? Absolut ja.
 
 Här är den smutsiga hemligheten med att vara fast: ordet du försöker hitta finns vanligtvis inte ens där. Din hjärna mönstermatchar mot något som inte existerar på just det här brädet. Ju snabbare du accepterar det och går vidare, desto snabbare hittar du ord som faktiskt finns.`,
       },
       {
-        title: 'Inkubationseffekten — hjärnans hemliga vapen',
+        title: 'Inkubationseffekten: hjärnans hemliga vapen',
         content: `Det här låter som pseudovetenskap, men det är ett av de mest väldokumenterade fenomenen inom kognitiv psykologi.
 
-Inkubationseffekten är enkel: när du slutar aktivt tänka på ett problem fortsätter din hjärna arbeta med det omedvetet. När du sedan återvänder till problemet verkar lösningar "poppa" upp i medvetandet — det klassiska "aha!"-ögonblicket.
+Inkubationseffekten är enkel: när du slutar aktivt tänka på ett problem fortsätter din hjärna arbeta med det omedvetet. När du sedan återvänder till problemet verkar lösningar "poppa" upp i medvetandet, det klassiska "aha!"-ögonblicket.
 
-I en daglig utmaning kan du utnyttja detta. Om spelet har någon naturlig paus — en övergångsskärm, en poängsammanställning, till och med den halva sekunden medan ditt senaste ord valideras — låt blicken bli mjuk. Sök inte aktivt. Låt bara brädet existera i ditt perifera synfält. Jag vet att det här låter som meditationsgururåd, men forskningen bakom inkubationseffekten är genuint robust. Dijksterhuis och Nordgrens artikel från 2006 om unconscious thought theory visade att för komplexa problem med många variabler (som att hitta ord i ett rutnät av bokstäver) överträffar omedveten bearbetning ofta medveten analys.
+I en daglig utmaning kan du utnyttja detta. Om spelet har någon naturlig paus, en övergångsskärm, en poängsammanställning, till och med den halva sekunden medan ditt senaste ord valideras, låt blicken bli mjuk. Sök inte aktivt. Låt bara brädet existera i ditt perifera synfält. Jag vet att det här låter som meditationsgururåd, men forskningen bakom inkubationseffekten är genuint robust. Dijksterhuis och Nordgrens artikel från 2006 om unconscious thought theory visade att för komplexa problem med många variabler (som att hitta ord i ett rutnät av bokstäver) överträffar omedveten bearbetning ofta medveten analys.
 
 Mitt personliga trick: efter att ha skickat in ett ord tar jag ett andetag innan jag letar efter nästa. Ett andetag. Kanske två sekunder. Det märks knappt tidsmässigt, men det skapar en mikro-inkubationsperiod som ofta lyfter fram ord jag inte hade hittat genom ren kraft-scanning.`,
       },
       {
         title: 'Informationsteori och insikten från 3Blue1Brown',
-        content: `Grant Sanderson — matematikern bakom YouTube-kanalen 3Blue1Brown — gjorde ett briljant videoklipp om optimal Wordle-strategi med informationsteori. Hans kärninsikt fungerar vackert för dagliga ordutmaningar, trots att spelen är strukturellt olika.
+        content: `Grant Sanderson, matematikern bakom YouTube-kanalen 3Blue1Brown, gjorde ett briljant videoklipp om optimal Wordle-strategi med informationsteori. Hans kärninsikt fungerar vackert för dagliga ordutmaningar, trots att spelen är strukturellt olika.
 
 Nyckelidén: varje gissning bör maximera informationsvinsten. I Wordle innebär det att välja ord som eliminerar flest möjligheter. I en ordrutnätsutmaning är analogen denna: din scanningsstrategi bör prioritera de områden av brädet med högst "informationsdensitet."
 
-Vad betyder det praktiskt? Leta efter ovanliga bokstäver först. Ett Q, Z, X eller J på brädet är otroligt informativt eftersom det drastiskt begränsar ditt sökutrymme. Det finns väldigt få ord som innehåller Q — så när du ser en kan du snabbt kolla QU-kombinationer och antingen hitta ord eller utesluta det helt. Det är effektivt. Att stirra på ett kluster av E-A-T-S, å andra sidan, har enormt möjlighetsrum. Det finns hundratals ord du kan bilda. Det är svårare att söka effektivt.
+Vad betyder det praktiskt? Leta efter ovanliga bokstäver först. Ett Q, Z, X eller J på brädet är otroligt informativt eftersom det drastiskt begränsar ditt sökutrymme. Det finns väldigt få ord som innehåller Q, så när du ser en kan du snabbt kolla QU-kombinationer och antingen hitta ord eller utesluta det helt. Det är effektivt. Att stirra på ett kluster av E-A-T-S, å andra sidan, har enormt möjlighetsrum. Det finns hundratals ord du kan bilda. Det är svårare att söka effektivt.
 
-Så här är min anpassade strategi: scanna efter sällsynta bokstäver först, kolla deras grannskap efter giltiga ord, och flytta sedan till områdena med vanliga bokstäver. Det är kontraintuitivt — din hjärna vill börja med de lätta, vanliga bokstäverna — men att börja med begränsningar är nästan alltid snabbare än att börja med frihet.`,
+Så här är min anpassade strategi: scanna efter sällsynta bokstäver först, kolla deras grannskap efter giltiga ord, och flytta sedan till områdena med vanliga bokstäver. Det är kontraintuitivt (din hjärna vill börja med de lätta, vanliga bokstäverna) men att börja med begränsningar är nästan alltid snabbare än att börja med frihet.`,
       },
       {
-        title: 'Leave values — ett Scrabble-koncept som överförs perfekt',
+        title: 'Leave values: ett Scrabble-koncept som överförs perfekt',
         content: `I tävlings-Scrabble är "leave value" kvaliteten på de bokstäver som finns kvar på din ställning efter att du spelat ett ord. En bra leave betyder att du har balanserade, flexibla bokstäver som kan kombineras till många framtida ord. En dålig leave betyder att du sitter med problembokstäver och inga vokaler.
 
 Hur gäller detta ett ordrutnät? Det handlar om väghantering.
 
-När du spårar ett ord genom rutnätet hittar du inte bara det ordet — du väljer också vilka bokstäver som förblir tillgängliga för din nästa väg. Vissa vägar genom ett ord lämnar brädets återstående bokstäver i ett mer "anslutet" tillstånd, där det är lättare att hitta nästa ord. Andra vägar isolerar fickor av bokstäver, vilket gör dem svårare att nå.
+När du spårar ett ord genom rutnätet hittar du inte bara det ordet, du väljer också vilka bokstäver som förblir tillgängliga för din nästa väg. Vissa vägar genom ett ord lämnar brädets återstående bokstäver i ett mer "anslutet" tillstånd, där det är lättare att hitta nästa ord. Andra vägar isolerar fickor av bokstäver, vilket gör dem svårare att nå.
 
 Jag började uppmärksamma detta för ungefär en månad sedan, och det var ett av de där "hur har jag aldrig märkt detta förut"-ögonblicken. När jag har två möjliga vägar till samma ord väljer jag nu den väg som håller flest framtida anslutningar öppna. Det är en liten optimering, men i en tidsbegränsad utmaning ackumuleras de små optimeringarna.`,
       },
       {
-        title: 'Psykologin bakom sviter — både motiverande och farligt',
+        title: 'Psykologin bakom sviter: både motiverande och farligt',
         content: `Låt oss prata om sviter (streaks) ärligt, för jag har komplicerade känslor kring dem.
 
 Å ena sidan är min dagliga svit den enskilt mest effektiva motivatorn jag någonsin stött på i ett spel. Den fick mig att spela varje dag. Den fick mig att bry mig om att förbättras. Den förvandlade en vardagshobby till en färdighet jag aktivt utvecklar. Å andra sidan skapar sviter en toxisk relation med spelet om du inte är försiktig.
 
-Problemet är förlustaversion — en väldokumenterad psykologisk bias där att förlora något känns ungefär dubbelt så smärtsamt som att vinna motsvarande sak känns bra. Att upprätthålla en 47-dagarssvit känns inte 47 gånger bra. Det känns ungefär neutralt, för baslinjen har förskjutits. Men att förlora den sviten? Det känns hemskt. Oproportionerligt hemskt.
+Problemet är förlustaversion, en väldokumenterad psykologisk bias där att förlora något känns ungefär dubbelt så smärtsamt som att vinna motsvarande sak känns bra. Att upprätthålla en 47-dagarssvit känns inte 47 gånger bra. Det känns ungefär neutralt, för baslinjen har förskjutits. Men att förlora den sviten? Det känns hemskt. Oproportionerligt hemskt.
 
-Jag har sett folk (okej, jag har varit folk) fatta genuint irrationella beslut för att behålla en svit. Spela när man är sjuk. Spela på ett bröllop. Spela under strömavbrottet jag nämnde tidigare. I det läget tjänar sviten inte dig — du tjänar sviten.
+Jag har sett folk (okej, jag har varit folk) fatta genuint irrationella beslut för att behålla en svit. Spela när man är sjuk. Spela på ett bröllop. Spela under strömavbrottet jag nämnde tidigare. I det läget tjänar sviten inte dig. Du tjänar sviten.
 
 Mitt råd: njut av sviten, men bestäm i förväg vilka dina "brytvillkor" är. Mina är enkla: om jag är sjuk, om jag är på en viktig livshändelse, eller om spelandet skulle kräva att jag är oartig mot någon närvarande. Sviten kan starta om. Dina relationer och din hälsa kan inte.
 
-Och — detta är viktigt — vissa dagar får du ett fruktansvärt bräde. Ett rutnät fullt av konsonanter. En layout där bästa möjliga poäng är medioker. Det är inte ett strategimisslyckande. Det är bara livet. Brädet är inte skyldigt dig en bra upplevelse. Acceptera de dåliga rundorna, lär dig ingenting av dem (för det finns inget att lära), och gå vidare.`,
+Och detta är viktigt: vissa dagar får du ett fruktansvärt bräde. Ett rutnät fullt av konsonanter. En layout där bästa möjliga poäng är medioker. Det är inte ett strategimisslyckande. Det är bara livet. Brädet är inte skyldigt dig en bra upplevelse. Acceptera de dåliga rundorna, lär dig ingenting av dem (för det finns inget att lära), och gå vidare.`,
       },
       {
         title: 'Stress, ranking och varför att bry sig mindre kan hjälpa dig vinna mer',
@@ -574,7 +574,7 @@ Vissa dagar krossar du det. Vissa dagar krossar brädet dig. Båda är okej. Det
   },
   es: {
     title: 'Estrategias para el desafío diario: Lo que realmente importa',
-    subtitle: 'Tres meses de seguimiento obsesivo de puntuaciones, tácticas de Scrabble competitivo y teoría de la información — destilado en algo realmente útil.',
+    subtitle: 'Tres meses de seguimiento obsesivo de puntuaciones, tácticas de Scrabble competitivo y teoría de la información, destilado en algo realmente útil.',
     category: 'Estrategia',
     readTime: '12 min de lectura',
     authorName: 'El Nerd de las Palabras',
@@ -585,32 +585,32 @@ Vissa dagar krossar du det. Vissa dagar krossar brädet dig. Båda är okej. Det
 
 Eso es lo que pasa con los desafíos diarios. Se te meten bajo la piel. Lo que empieza como "ah, solo haré una rondita rápida" se convierte en un ritual, luego en una obsesión, y después en un proyecto de recolección de datos donde estás rastreando tus puntuaciones en una hoja de cálculo a las 6 de la mañana porque quieres saber si tu rendimiento del martes es estadísticamente diferente al del jueves. (Lo es. Los martes son peores. No tengo explicación para esto.)
 
-Llevo unos tres meses jugando desafíos diarios de palabras — jugando en serio, no solo tocando la pantalla y esperando lo mejor. En el camino, tomé prestadas tácticas de jugadores de Scrabble competitivo, robé un marco de referencia del enfoque de un YouTuber matemático para Wordle, y accidentalmente aprendí más sobre psicología cognitiva de lo que jamás esperé aprender de un juego de palabras. Esto es lo que descubrí.`,
+Llevo unos tres meses jugando desafíos diarios de palabras, jugando en serio, no solo tocando la pantalla y esperando lo mejor. En el camino, tomé prestadas tácticas de jugadores de Scrabble competitivo, robé un marco de referencia del enfoque de un YouTuber matemático para Wordle, y accidentalmente aprendí más sobre psicología cognitiva de lo que jamás esperé aprender de un juego de palabras. Esto es lo que descubrí.`,
       },
       {
-        title: 'El momento importa — y mucho',
+        title: 'El momento importa, y mucho',
         content: `Seré directo: cuándo juegas importa casi tanto como cómo juegas.
 
-La investigación cognitiva — y me refiero a estudios publicados de verdad, no publicaciones de blog de "gurús de productividad" — muestra que la mayoría de las personas alcanzan su máximo rendimiento mental aproximadamente 2-4 horas después de despertar. Tu corteza prefrontal, la parte del cerebro que maneja la planificación y el reconocimiento de patrones, está funcionando a toda máquina durante esa ventana. Después de eso, es un declive lento interrumpido por una breve recuperación por la tarde (si tienes suerte) y luego la larga caída hacia el cerebro-papilla de la noche.
+La investigación cognitiva (y me refiero a estudios publicados de verdad, no publicaciones de blog de "gurús de productividad") muestra que la mayoría de las personas alcanzan su máximo rendimiento mental aproximadamente 2-4 horas después de despertar. Tu corteza prefrontal, la parte del cerebro que maneja la planificación y el reconocimiento de patrones, está funcionando a toda máquina durante esa ventana. Después de eso, es un declive lento interrumpido por una breve recuperación por la tarde (si tienes suerte) y luego la larga caída hacia el cerebro-papilla de la noche.
 
-Lo probé conmigo mismo. Durante tres semanas, jugué el desafío diario a tres horas diferentes: mañana (dentro de la ventana de 2-4 horas), tarde (alrededor de las 3) y noche (después de las 9). Los resultados fueron vergonzosamente claros. Mis puntuaciones matutinas promediaron un 23% más que las nocturnas. Veintitrés por ciento. Eso no es un error de redondeo — es la diferencia entre una ronda mediocre y una genuinamente buena.
+Lo probé conmigo mismo. Durante tres semanas, jugué el desafío diario a tres horas diferentes: mañana (dentro de la ventana de 2-4 horas), tarde (alrededor de las 3) y noche (después de las 9). Los resultados fueron vergonzosamente claros. Mis puntuaciones matutinas promediaron un 23% más que las nocturnas. Veintitrés por ciento. Eso no es un error de redondeo, es la diferencia entre una ronda mediocre y una genuinamente buena.
 
 No estoy diciendo que necesites poner una alarma para jugar un juego de palabras. Eso sería una locura. (Puse una alarma para jugar un juego de palabras.) Pero si te preguntas por qué tus puntuaciones son inconsistentes, revisa tu horario antes de culpar al tablero.`,
       },
       {
-        title: 'El escaneo de cinco segundos — robado del ajedrez',
+        title: 'El escaneo de cinco segundos (robado del ajedrez)',
         content: `Este es un hábito que adquirí leyendo sobre grandes maestros del ajedrez, y genuinamente cambió cómo abordo cada tablero.
 
 Cuando aparece la cuadrícula, no toques nada. No empieces a trazar letras. Solo mira. Cinco segundos. Quizás diez. Deja que tus ojos vaguen por todo el tablero sin intentar formar una palabra específica.
 
-Lo que sucede durante esos segundos es fascinante. Tu cerebro está haciendo lo que los científicos cognitivos llaman "procesamiento pre-atentivo" — está catalogando frecuencias de letras, relaciones espaciales y combinaciones comunes de letras antes de que tu mente consciente haya empezado a trabajar. Los grandes maestros de ajedrez hacen esto cuando ven una posición por primera vez. No están calculando jugadas todavía. Están absorbiendo la forma del juego.
+Lo que sucede durante esos segundos es fascinante. Tu cerebro está haciendo lo que los científicos cognitivos llaman "procesamiento pre-atentivo", está catalogando frecuencias de letras, relaciones espaciales y combinaciones comunes de letras antes de que tu mente consciente haya empezado a trabajar. Los grandes maestros de ajedrez hacen esto cuando ven una posición por primera vez. No están calculando jugadas todavía. Están absorbiendo la forma del juego.
 
 Yo solía lanzarme de inmediato. Veía una palabra en los primeros dos segundos y empezaba a construirla. ¿El problema? Me anclaba en esa primera palabra y me perdía todo el lado izquierdo del tablero. Ahora me obligo a escanear primero, y mi conteo de palabras por juego ha subido aproximadamente un 30%. La primera palabra que envío quizás llega cinco segundos más tarde que antes, pero encuentro significativamente más palabras en total.
 
 Piénsalo así: gastar cinco segundos construyendo un mapa mental te ahorra treinta segundos perdido en la esquina equivocada del tablero.`,
       },
       {
-        title: 'Palabras cortas primero — la verdad contraintuitiva',
+        title: 'Palabras cortas primero: la verdad contraintuitiva',
         content: `Cada instinto en tu cuerpo dice "ve por las palabras grandes." Siete letras. Ocho letras. Las palabras de gloria. Lo entiendo. De verdad. Hay algo profundamente satisfactorio en encontrar MURCIÉLAGO en una cuadrícula 4x4.
 
 Pero esto es lo que mis datos realmente muestran: empezar con palabras cortas es casi siempre la mejor estrategia, y ni siquiera es reñido.
