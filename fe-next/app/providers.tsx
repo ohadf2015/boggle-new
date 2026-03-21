@@ -31,6 +31,7 @@ import { initSessionTracking } from '@/utils/sessionTracking';
 import { initializeHowlerConfig } from '@/lib/audio/howlerConfig';
 import WinnerOnboardingWrapper from './components/WinnerOnboardingWrapper';
 import ProfileCustomizationWrapper from './components/ProfileCustomizationWrapper';
+import ComebackBonusWrapper from './components/ComebackBonusWrapper';
 import { EssentialProviders } from './essential-providers';
 
 import type { Language } from '@/shared/types/game';
@@ -111,6 +112,7 @@ export function GameSpecificProviders({ children }: GameSpecificProvidersProps) 
                                 {children}
                                 <WinnerOnboardingWrapper />
                                 <ProfileCustomizationWrapper />
+                                <ComebackBonusWrapper />
                             </CoreGameProviders>
                         </SocketEventBusProvider>
                     </SocketProvider>

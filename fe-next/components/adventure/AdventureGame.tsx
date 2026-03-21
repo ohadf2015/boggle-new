@@ -86,6 +86,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining,
+      timerStore,
       isPlaying, submitWordWithPath, startGame, pauseGame, completeLevel,
       resetGame, markCascadeComplete, isCascading, cascadePhase, addTime,
       activateFreeze, isFrozen, freezeUsed, useShuffle, shufflesRemaining, updateObjective,
@@ -308,12 +309,15 @@ const AdventureGame = memo<AdventureGameProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gameState.comboCount, isPlaying, entryPhase, isPaused, init]);
 
+    const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    useEffect(() => () => { if (hintTimerRef.current) clearTimeout(hintTimerRef.current); }, []);
+
     const handleCascadeComplete = useCallback(() => {
       markCascadeComplete();
       entryPhaseManager.advanceToPlaying();
       if (!isPlaying) { startGame(); init.startAIDirector(); }
       if (init.upgradeEffects.freeStartHint) {
-        setTimeout(() => getHint(), 500);
+        hintTimerRef.current = setTimeout(() => { hintTimerRef.current = null; getHint(); }, 500);
       }
     }, [markCascadeComplete, entryPhaseManager, isPlaying, startGame, init, getHint]);
 
@@ -415,7 +419,7 @@ const AdventureGame = memo<AdventureGameProps>(
           isBossActive={isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete}
           header={
             <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}
-              score={gameState.score} timeRemaining={timeRemaining} isPaused={isPaused}
+              score={gameState.score} timerStore={timerStore} isPaused={isPaused}
               onPauseToggle={gridInteraction.handlePauseToggle} onExit={onExit}
               gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100} />
           }

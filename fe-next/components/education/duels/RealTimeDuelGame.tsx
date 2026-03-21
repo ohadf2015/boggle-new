@@ -16,6 +16,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useInterval } from '@/hooks/useSafeTimeout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swords, Trophy, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -98,24 +99,13 @@ export function RealTimeDuelGame({
   // TIMER EFFECT
   // ============================================
 
-  useEffect(() => {
-    if (phase !== 'playing' || !startTime) return;
-
-    const interval = setInterval(() => {
-      const start = new Date(startTime).getTime();
-      const now = new Date().getTime();
-      const elapsed = Math.floor((now - start) / 1000);
-      const remaining = Math.max(0, timeLimit - elapsed);
-
-      setTimeRemaining(remaining);
-
-      if (remaining <= 0) {
-        clearInterval(interval);
-      }
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [phase, startTime, timeLimit]);
+  useInterval(() => {
+    const start = new Date(startTime).getTime();
+    const now = new Date().getTime();
+    const elapsed = Math.floor((now - start) / 1000);
+    const remaining = Math.max(0, timeLimit - elapsed);
+    setTimeRemaining(remaining);
+  }, phase === 'playing' && startTime ? 100 : null);
 
   // ============================================
   // SOCKET EVENT LISTENERS

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useInterval } from '@/hooks/useSafeTimeout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -97,6 +98,12 @@ const DailyChallenge: React.FC = () => {
   // Fetch guest fingerprint on mount
   useEffect(() => {
     getGuestFingerprint().then(setGuestFingerprint);
+  }, []);
+
+  // Set initial countdown value immediately on mount
+  useEffect(() => {
+    const seconds = getSecondsUntilNextDaily();
+    setCountdown(formatCountdown(seconds));
   }, []);
 
   // Training gateway for new players
@@ -226,15 +233,10 @@ const DailyChallenge: React.FC = () => {
   }, [gameLanguage, wasReset, isAuthenticated, profile?.id]);
 
   // Countdown timer
-  useEffect(() => {
-    const updateCountdown = () => {
-      const seconds = getSecondsUntilNextDaily();
-      setCountdown(formatCountdown(seconds));
-    };
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  useInterval(() => {
+    const seconds = getSecondsUntilNextDaily();
+    setCountdown(formatCountdown(seconds));
+  }, 1000);
 
   // Handle game start with safety checks
   const handleStartGame = useCallback(async () => {

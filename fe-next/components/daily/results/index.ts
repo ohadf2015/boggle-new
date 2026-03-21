@@ -96,3 +96,6 @@ export { EmojiShareCard } from './EmojiShareCard';
 export type { EmojiShareCardProps } from './EmojiShareCard';
 
 export { default as DailyWordHuntFacts } from './DailyWordHuntFacts';
+
+export { StreakFreezeIndicator } from './StreakFreezeIndicator';
+export type { StreakFreezeIndicatorProps } from './StreakFreezeIndicator';

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -25,6 +25,10 @@ interface DrillProgressionOverlayProps {
   overallScore: number;
   /** Current tier */
   tier: BrainTier;
+  /** XP awarded for this drill (from server) */
+  xpAwarded?: number;
+  /** Gold awarded for this drill */
+  goldAwarded?: number;
 }
 
 const DOMAIN_CONFIG: Record<CognitiveDomain, {
@@ -124,6 +128,8 @@ export default function DrillProgressionOverlay({
   scoreDelta,
   overallScore,
   tier,
+  xpAwarded,
+  goldAwarded,
 }: DrillProgressionOverlayProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
@@ -353,6 +359,37 @@ export default function DrillProgressionOverlay({
                       {t(`brain.tiers.${tier}`)}
                     </span>
                   </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* XP + Gold rewards */}
+            <AnimatePresence>
+              {showOverall && (xpAwarded !== undefined || goldAwarded !== undefined) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex justify-center gap-3 mt-3"
+                >
+                  {(xpAwarded ?? 0) > 0 && (
+                    <div className={cn(
+                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black',
+                      'bg-neo-cyan text-neo-black font-bold text-sm'
+                    )}>
+                      <Star className="w-4 h-4" />
+                      {t('brain.drills.xpEarned', { xp: xpAwarded ?? 0 })}
+                    </div>
+                  )}
+                  {(goldAwarded ?? 0) > 0 && (
+                    <div className={cn(
+                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black',
+                      'bg-neo-yellow text-neo-black font-bold text-sm'
+                    )}>
+                      <Coins className="w-4 h-4" />
+                      {t('brain.drills.goldEarned', { gold: goldAwarded ?? 0 })}
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

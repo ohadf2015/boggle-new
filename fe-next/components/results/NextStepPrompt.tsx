@@ -11,7 +11,7 @@ import { clearSessionPreservingUsername } from '@/utils/session';
 import { getCloseLossMessage } from '@/shared/utils/closeLossDetector';
 import useReducedMotion from '@/hooks/useReducedMotion';
 
-export type NextStepMode = 'practice' | 'solo-bots' | 'daily' | 'multiplayer-bots';
+export type NextStepMode = 'practice' | 'solo-bots' | 'daily' | 'multiplayer-bots' | 'blast' | 'word-hunt';
 
 interface NextStepPromptProps {
   /** Current game mode to determine next suggestion */
@@ -118,6 +118,24 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           icon: <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />,
           gradient: 'from-amber-400 to-amber-600',
           iconBg: 'bg-neo-navy text-amber-400',
+        };
+      case 'blast':
+        return {
+          titleKey: 'nextStep.tryDailyChallenge',
+          descKey: 'nextStep.tryDailyChallengeDesc',
+          href: `/${language}/daily`,
+          icon: <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />,
+          gradient: 'from-amber-400 to-amber-600',
+          iconBg: 'bg-neo-navy text-amber-400',
+        };
+      case 'word-hunt':
+        return {
+          titleKey: 'nextStep.goMultiplayer',
+          descKey: 'nextStep.goMultiplayerDesc',
+          href: `/${language}/multiplayer`,
+          icon: <Users className="w-6 h-6 sm:w-7 sm:h-7" />,
+          gradient: 'from-neo-pink to-neo-pink-dark',
+          iconBg: 'bg-neo-navy text-neo-pink',
         };
     }
   };

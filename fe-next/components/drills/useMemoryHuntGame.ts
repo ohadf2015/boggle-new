@@ -3,6 +3,7 @@ import type { HighlightedCell } from '@/components/GridComponent';
 import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { LetterGrid, Language } from '@/types';
+import { calculateWordScore } from '@/shared/utils/scoring';
 
 // Level configurations
 export const LEVEL_CONFIGS = [
@@ -232,7 +233,7 @@ export function useMemoryHuntGame({
       updatedTargets[targetIndex].found = true;
       setTargetWords(updatedTargets);
 
-      const wordPoints = word.length * 10 * round;
+      const wordPoints = calculateWordScore(word) * round;
       setScore(prev => prev + wordPoints);
 
       setLastFeedback('correct');

@@ -11,6 +11,7 @@ import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
+import { calculateWordScore } from '@/shared/utils/scoring';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -164,7 +165,7 @@ export default function ComboMaster({
     const newCombo = comboRef.current + 1;
     setCombo(newCombo);
     setMaxCombo(prev => Math.max(prev, newCombo));
-    const baseScore = word.length * 10;
+    const baseScore = calculateWordScore(word, 0);
     const comboMultiplier = 1 + (newCombo * 0.1);
     const wordScore = Math.round(baseScore * comboMultiplier);
 

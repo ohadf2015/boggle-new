@@ -19,6 +19,18 @@ jest.mock('@/utils/logger', () => ({
   },
 }));
 
+// Mock LanguageContext
+const mockT = jest.fn((key: string) => key);
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: mockT }),
+}));
+
+// Mock EnhancedToast showToast
+const mockShowToast = jest.fn();
+jest.mock('@/components/ui/EnhancedToast', () => ({
+  showToast: (...args: unknown[]) => mockShowToast(...args),
+}));
+
 // ==============================================
 // TEST FIXTURES
 // ==============================================
@@ -73,6 +85,7 @@ describe('useResultsSocketEvents', () => {
   beforeEach(() => {
     mockSocket = createMockSocket();
     jest.clearAllMocks();
+    mockShowToast.mockClear();
   });
 
   describe('Initialization', () => {
@@ -636,6 +649,106 @@ describe('useResultsSocketEvents', () => {
 
         // THEN - Should not throw and state should remain false
         expect(result.current.isCurrentPlayerReady).toBe(false);
+      });
+    });
+
+    describe('One More Game prompt', () => {
+      it('should show toast with prompt title and message when engagement:oneMoreGame is received', () => {
+        // GIVEN
+        renderHook(() =>
+          useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+        );
+
+        // WHEN
+        act(() => {
+          triggerSocketEvent(mockSocket, 'engagement:oneMoreGame', {
+            prompt: {
+              title: 'Keep Going!',
+              message: 'You were on fire — play again!',
+              incentive: '+50 XP',
+            },
+          });
+        });
+
+        // THEN
+        expect(mockShowToast).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: 'info',
+            title: 'Keep Going!',
+            message: 'You were on fire — play again!',
+          })
+        );
+      });
+
+      it('should use fallback translation keys when prompt title/message are empty', () => {
+        // GIVEN
+        renderHook(() =>
+          useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+        );
+
+        // WHEN
+        act(() => {
+          triggerSocketEvent(mockSocket, 'engagement:oneMoreGame', {
+            prompt: {
+              title: '',
+              message: '',
+              incentive: '+25 XP',
+            },
+          });
+        });
+
+        // THEN
+        expect(mockShowToast).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: 'info',
+            title: 'oneMoreGame.defaultTitle',
+            message: 'oneMoreGame.defaultMessage',
+          })
+        );
+      });
+
+      it('should not show toast when prompt is missing', () => {
+        // GIVEN
+        renderHook(() =>
+          useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+        );
+
+        // WHEN
+        act(() => {
+          triggerSocketEvent(mockSocket, 'engagement:oneMoreGame', { prompt: null });
+        });
+
+        // THEN
+        expect(mockShowToast).not.toHaveBeenCalled();
+      });
+
+      it('should register engagement:oneMoreGame listener on mount', () => {
+        // GIVEN/WHEN
+        renderHook(() =>
+          useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+        );
+
+        // THEN
+        expect(mockSocket.on).toHaveBeenCalledWith(
+          'engagement:oneMoreGame',
+          expect.any(Function)
+        );
+      });
+
+      it('should unregister engagement:oneMoreGame listener on unmount', () => {
+        // GIVEN
+        const { unmount } = renderHook(() =>
+          useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+        );
+
+        // WHEN
+        unmount();
+
+        // THEN
+        expect(mockSocket.off).toHaveBeenCalledWith(
+          'engagement:oneMoreGame',
+          expect.any(Function)
+        );
       });
     });
 

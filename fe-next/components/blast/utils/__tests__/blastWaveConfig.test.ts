@@ -82,13 +82,13 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(1).scoreThreshold).toBeUndefined();
     expect(getWaveConfig(2).scoreThreshold).toBeUndefined();
     expect(getWaveConfig(3).scoreThreshold).toBeUndefined();
-    expect(getWaveConfig(4).scoreThreshold).toBe(50);
+    expect(getWaveConfig(4).scoreThreshold).toBe(150);
   });
 
   it('increases scoreThreshold for later waves', () => {
-    expect(getWaveConfig(4).scoreThreshold).toBe(50);
-    expect(getWaveConfig(5).scoreThreshold).toBe(80);
-    expect(getWaveConfig(6).scoreThreshold).toBe(120);
+    expect(getWaveConfig(4).scoreThreshold).toBe(150);
+    expect(getWaveConfig(5).scoreThreshold).toBe(250);
+    expect(getWaveConfig(6).scoreThreshold).toBe(400);
   });
 
   it('caps scaling at wave 6+ (no further changes)', () => {

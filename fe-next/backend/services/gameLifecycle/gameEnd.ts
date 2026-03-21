@@ -15,7 +15,7 @@ import {
   cleanupGameTracking,
 } from '../../modules/communityWordManager';
 import { broadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../../utils/socketHelpers';
-import timerManager from '../../utils/timerManager';
+import { clearGameTimer } from '../../utils/timerManager';
 import * as botManager from '../../modules/botManager';
 import { gameCleanupEmitter } from '../../events/gameCleanup';
 import { calculateAndBroadcastFinalScores } from './gameScores';
@@ -54,8 +54,8 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
     return;
   }
 
-  // Stop timer
-  timerManager.clearTimer(gameCode);
+  // Stop timer (must use clearGameTimer which prefixes 'game:' to match setGameTimer key)
+  clearGameTimer(gameCode);
 
   // Stop all bots
   botManager.stopAllBots(gameCode);

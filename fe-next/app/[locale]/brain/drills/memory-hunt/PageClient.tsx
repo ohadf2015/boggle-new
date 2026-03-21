@@ -12,6 +12,7 @@ import MemoryHunt from '@/components/drills/MemoryHunt';
 import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
 import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
+import { useDrillRewards } from '@/hooks/useDrillRewards';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 
 /**
@@ -27,10 +28,12 @@ export default function MemoryHuntPageClient() {
   const { setIsInGame } = useNavigation();
   const isDarkMode = theme === 'dark';
   const { saveDrillResult } = useSaveDrillResult();
+  const { awardDrillRewards } = useDrillRewards();
 
   // State for progression overlay
   const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
   const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
+  const [drillRewards, setDrillRewards] = useState<{ xpAwarded: number; goldAwarded: number } | null>(null);
 
   // Generate drill grid
   const { grid, availableWords, isLoading, regenerate } = useDrillGrid(5, language);
@@ -63,8 +66,10 @@ export default function MemoryHuntPageClient() {
     if (saveResult.success && saveResult.brainScore) {
       setBrainScoreUpdate(saveResult.brainScore);
       setShowProgressionOverlay(true);
+      const rewards = await awardDrillRewards({ level: result.level, score: result.score, xpAwarded: saveResult.xpAwarded ?? 0 });
+      setDrillRewards(rewards);
     }
-  }, [saveDrillResult]);
+  }, [saveDrillResult, awardDrillRewards]);
 
   const handleExit = useCallback(() => {
     router.push(`/${language}/brain`);
@@ -151,6 +156,8 @@ export default function MemoryHuntPageClient() {
           scoreDelta={brainScoreUpdate.scoreDelta}
           overallScore={brainScoreUpdate.overallScore}
           tier={brainScoreUpdate.tier}
+          xpAwarded={drillRewards?.xpAwarded}
+          goldAwarded={drillRewards?.goldAwarded}
         />
       )}
     </div>

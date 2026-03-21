@@ -14,9 +14,12 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { showToast } from '@/components/ui/EnhancedToast';
 import type { NearMiss } from './NearMissCard';
 import type { ReferralMilestone } from '@/shared/types/socket';
 import type { WordToVote, XpGainedData, LevelUpData } from '@/types/components';
+import type { OneMoreGamePrompt } from '@/shared/types/engagement';
 
 export interface ResultsSocketEventsState {
   // Word feedback state
@@ -59,6 +62,8 @@ export function useResultsSocketEvents({
   socket,
   username,
 }: UseResultsSocketEventsProps): ResultsSocketEventsState & ResultsSocketEventsActions {
+  const { t } = useLanguage();
+
   // Word feedback state
   const [showWordFeedback, setShowWordFeedback] = useState(false);
   const [wordToVote, setWordToVote] = useState<WordToVote | null>(null);
@@ -156,12 +161,22 @@ export function useResultsSocketEvents({
       }
     };
 
+    const handleOneMoreGame = (data: { prompt: OneMoreGamePrompt }) => {
+      logger.log('[RESULTS] One more game prompt received:', data);
+      if (!data?.prompt) return;
+      const { prompt } = data;
+      const title = prompt.title || t('oneMoreGame.defaultTitle');
+      const message = prompt.message || t('oneMoreGame.defaultMessage');
+      showToast({ type: 'info', title, message, duration: 8000 });
+    };
+
     socket.on('showWordFeedback', handleShowWordFeedback);
     socket.on('voteRecorded', handleVoteRecorded);
     socket.on('xpGained', handleXpGained);
     socket.on('levelUp', handleLevelUp);
     socket.on('engagement:nearMisses', handleNearMisses);
     socket.on('engagement:referralMilestone', handleReferralMilestone);
+    socket.on('engagement:oneMoreGame', handleOneMoreGame);
 
     return () => {
       socket.off('showWordFeedback', handleShowWordFeedback);
@@ -170,8 +185,9 @@ export function useResultsSocketEvents({
       socket.off('levelUp', handleLevelUp);
       socket.off('engagement:nearMisses', handleNearMisses);
       socket.off('engagement:referralMilestone', handleReferralMilestone);
+      socket.off('engagement:oneMoreGame', handleOneMoreGame);
     };
-  }, [socket]);
+  }, [socket, t]);
 
   // Socket listener for players ready for next game updates
   useEffect(() => {

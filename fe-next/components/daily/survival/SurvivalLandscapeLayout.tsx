@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Heart, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -224,7 +224,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
       </div>
 
       {/* Auto-Clue Notifications */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {activeNotifications.map((notification) => (
           <AutoClueNotification
             key={notification.id}
@@ -234,7 +234,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
             t={t}
           />
         ))}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
 
       {/* Quit Confirmation Dialog */}
       <ConfirmationDialog
@@ -271,7 +271,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
     <div className="landscape-panel flex flex-col items-center gap-4">
       {/* Life Heart Icon */}
-      <motion.div
+      <AdaptiveMotion.div
         className={cn(
           "flex items-center justify-center w-14 h-14 rounded-full border-3 border-neo-black shadow-hard",
           lifePoints > 66 ? "bg-green-500" : lifePoints > 33 ? "bg-yellow-500" : "bg-red-500",
@@ -285,7 +285,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
         transition={{ duration: 0.6, repeat: lifePoints <= 20 && !isLifeGaining ? Infinity : 0 }}
       >
         <Heart className="w-7 h-7 text-white fill-white" />
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Life Points */}
       <div className="flex flex-col items-center">
@@ -343,7 +343,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
     <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
       <div className="landscape-panel flex flex-col items-center gap-4">
         {/* Live Score Display */}
-        <motion.div
+        <AdaptiveMotion.div
           className={cn(
             "flex flex-col items-center px-4 py-3 bg-gradient-to-br border-neo border-neo-black rounded-neo shadow-hard-sm",
             gradientClass
@@ -365,16 +365,16 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
           {/* Last increment badge */}
           {lastScoreIncrement !== null && lastScoreIncrement > 0 && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="text-[10px] font-bold text-green-600"
             >
               +{Math.round(lastScoreIncrement)}
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
     </div>
   );
@@ -477,14 +477,14 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
           
         )}
       >
-        <AnimatePresence mode="sync">
+        <AdaptiveAnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             // Feedback overlay - shows letter feedback after a guess
             // Normalize to target word length so boxes always match
             (() => {
               const normalizedFeedback = normalizeToTargetLength(latestAttemptFeedback, targetWord.length);
               return (
-                <motion.div
+                <AdaptiveMotion.div
                   key="feedback-overlay"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -497,7 +497,7 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
                     const isGray = !isClue;
                     const showGrayLetter = isGray && !grayFaded;
                     return (
-                <motion.div
+                <AdaptiveMotion.div
                   key={idx}
                   initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
                   animate={skipAnimations ? { opacity: 1 } : { rotateX: 0, opacity: 1 }}
@@ -520,15 +520,15 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
                   )}
                 >
                     {isClue ? letterFb.letter : (showGrayLetter ? letterFb.letter : '?')}
-                  </motion.div>
+                  </AdaptiveMotion.div>
                     );
                   })}
-              </motion.div>
+              </AdaptiveMotion.div>
               );
             })()
           ) : (
             // Hint boxes - shows persisted letters
-            <motion.div
+            <AdaptiveMotion.div
               key="hint-boxes"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -581,9 +581,9 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
                   </div>
                 );
               })}
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
       {/* Known letters indicator for landscape */}
       {!showFeedbackOverlay && knownLetters.size > 0 && (

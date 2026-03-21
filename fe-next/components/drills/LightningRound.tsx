@@ -11,6 +11,7 @@ import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
+import { calculateWordScore } from '@/shared/utils/scoring';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -127,7 +128,7 @@ export default function LightningRound({
 
     // Valid word!
     setWordsFound(prev => [...prev, upperWord]);
-    const wordScore = word.length * 10;
+    const wordScore = calculateWordScore(word);
     setScore(prev => prev + wordScore);
     setLastWordScore(wordScore);
 

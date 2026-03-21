@@ -1,0 +1,309 @@
+// @ts-nocheck
+
+// --- Mock next/server ---
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+  },
+}));
+
+// --- Mock rate limiter ---
+jest.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+}));
+
+// --- Mock sentry ---
+jest.mock('@/utils/sentry', () => ({
+  captureApiError: jest.fn(),
+}));
+
+// --- Mock customPuzzle utils ---
+jest.mock('@/utils/customPuzzle', () => ({
+  isValidPuzzleCode: jest.fn((code: string) => /^[a-z0-9]{8}$/.test(code)),
+  calculateCustomPuzzleScore: jest.fn(() => 120),
+}));
+
+// --- Supabase mock ---
+const mockGetUser = jest.fn();
+const mockFrom = jest.fn();
+
+jest.mock('@/utils/supabase/server', () => ({
+  createClient: jest.fn().mockResolvedValue({
+    auth: { getUser: () => mockGetUser() },
+    from: (...args: unknown[]) => mockFrom(...args),
+  }),
+}));
+
+import { NextRequest } from 'next/server';
+import { POST } from '../route';
+
+// --- Helpers ---
+
+function makeRequest(body: unknown, ip = '127.0.0.1'): NextRequest {
+  return {
+    json: () => Promise.resolve(body),
+    headers: { get: jest.fn().mockReturnValue(ip) },
+  } as unknown as NextRequest;
+}
+
+function makeParams(puzzleCode = 'abcd1234') {
+  return { params: Promise.resolve({ puzzleCode }) };
+}
+
+const validBody = {
+  displayName: 'TestPlayer',
+  solved: true,
+  attemptsUsed: 3,
+  targetWord: 'APPLE',
+  attemptWords: [
+    { word: 'GRAPE', feedback: [], timestamp: 1000 },
+    { word: 'AROSE', feedback: [], timestamp: 2000 },
+    { word: 'APPLE', feedback: [], timestamp: 3000 },
+  ],
+};
+
+const mockPuzzle = {
+  id: 'puzzle-uuid-1',
+  puzzle_code: 'abcd1234',
+  target_word: 'APPLE',
+  creator_id: 'creator-user-id',
+  creator_guest_fingerprint: null,
+  creator_efficiency_score: 100,
+};
+
+const mockAttemptData = {
+  id: 'attempt-uuid-1',
+  puzzle_id: 'puzzle-uuid-1',
+  display_name: 'TestPlayer',
+  solved: true,
+  attempts_used: 3,
+  efficiency_score: 120,
+};
+
+function setupDefaultMocks({
+  puzzle = mockPuzzle,
+  puzzleError = null,
+  insertError = null,
+  insertData = mockAttemptData,
+  profileData = null,
+  user = { id: 'user-1' },
+} = {}) {
+  mockGetUser.mockResolvedValue({ data: { user }, error: null });
+
+  mockFrom.mockImplementation((table: string) => {
+    if (table === 'custom_puzzles') {
+      return {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: puzzle, error: puzzleError }),
+      };
+    }
+    if (table === 'profiles') {
+      return {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: profileData, error: null }),
+      };
+    }
+    if (table === 'custom_puzzle_attempts') {
+      return {
+        insert: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: insertData, error: insertError }),
+      };
+    }
+    return {};
+  });
+}
+
+describe('POST /api/custom-puzzle/[puzzleCode]/submit', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('Rate limiting', () => {
+    it('returns 429 when rate limit exceeded', async () => {
+      const { checkApiRateLimit } = require('@/lib/apiRateLimit');
+      checkApiRateLimit.mockReturnValueOnce({ success: false });
+
+      const res = await POST(makeRequest(validBody), makeParams());
+      expect(res.status).toBe(429);
+      expect(res.data.error).toBe('Too many requests');
+    });
+  });
+
+  describe('Input validation', () => {
+    it('returns 400 for invalid puzzle code format', async () => {
+      // Given: puzzle code with invalid characters (uppercase)
+      const res = await POST(makeRequest(validBody), makeParams('INVALID!'));
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Invalid puzzle code format');
+    });
+
+    it('returns 400 when displayName is missing', async () => {
+      const { displayName, ...bodyWithoutName } = validBody;
+      const res = await POST(makeRequest(bodyWithoutName), makeParams());
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Missing required fields');
+    });
+
+    it('returns 400 when targetWord is missing', async () => {
+      const { targetWord, ...body } = validBody;
+      const res = await POST(makeRequest(body), makeParams());
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Missing required fields');
+    });
+
+    it('returns 400 when attemptsUsed is missing', async () => {
+      const { attemptsUsed, ...body } = validBody;
+      const res = await POST(makeRequest(body), makeParams());
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Missing required fields');
+    });
+
+    it('returns 400 when attemptsUsed is 0', async () => {
+      const res = await POST(makeRequest({ ...validBody, attemptsUsed: 0 }), makeParams());
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Attempts must be between 1 and 10');
+    });
+
+    it('returns 400 when attemptsUsed exceeds 10', async () => {
+      const res = await POST(makeRequest({ ...validBody, attemptsUsed: 11 }), makeParams());
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Attempts must be between 1 and 10');
+    });
+  });
+
+  describe('Puzzle lookup', () => {
+    it('returns 404 when puzzle does not exist', async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null });
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'custom_puzzles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({ data: null, error: { message: 'not found' } }),
+          };
+        }
+        if (table === 'profiles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+          };
+        }
+        return {};
+      });
+
+      const res = await POST(makeRequest(validBody), makeParams());
+      expect(res.status).toBe(404);
+      expect(res.data.error).toBe('Puzzle not found');
+    });
+
+    it('returns 400 when targetWord does not match puzzle', async () => {
+      setupDefaultMocks({ puzzle: { ...mockPuzzle, target_word: 'GRAPE' } });
+
+      const res = await POST(makeRequest(validBody), makeParams()); // body has targetWord: APPLE
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Invalid target word');
+    });
+  });
+
+  describe('Successful submission', () => {
+    it('returns success with efficiency score and beatCreator flag', async () => {
+      setupDefaultMocks();
+
+      const res = await POST(makeRequest(validBody), makeParams());
+      expect(res.status).toBe(200);
+      expect(res.data.success).toBe(true);
+      expect(res.data.efficiencyScore).toBe(120); // from mock calculateCustomPuzzleScore
+      expect(res.data.beatCreator).toBe(true); // 120 > creator_efficiency_score(100)
+    });
+
+    it('marks beatCreator as false when efficiency score does not exceed creator score', async () => {
+      const { calculateCustomPuzzleScore } = require('@/utils/customPuzzle');
+      calculateCustomPuzzleScore.mockReturnValueOnce(80); // below creator's 100
+
+      setupDefaultMocks();
+
+      const res = await POST(makeRequest(validBody), makeParams());
+      expect(res.status).toBe(200);
+      expect(res.data.beatCreator).toBe(false);
+    });
+
+    it('returns alreadySubmitted true on unique constraint violation', async () => {
+      setupDefaultMocks({ insertError: { code: '23505', message: 'duplicate key' }, insertData: null });
+
+      const res = await POST(makeRequest(validBody), makeParams());
+      expect(res.status).toBe(200);
+      expect(res.data.alreadySubmitted).toBe(true);
+    });
+
+    it('server recalculates efficiency score ignoring client value', async () => {
+      const { calculateCustomPuzzleScore } = require('@/utils/customPuzzle');
+      setupDefaultMocks();
+
+      await POST(makeRequest({ ...validBody, efficiencyScore: 9999 }), makeParams());
+
+      // calculateCustomPuzzleScore should have been called server-side
+      expect(calculateCustomPuzzleScore).toHaveBeenCalled();
+    });
+
+    it('works for guest user (unauthenticated)', async () => {
+      mockGetUser.mockResolvedValue({ data: { user: null }, error: null });
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'custom_puzzles') {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({ data: mockPuzzle, error: null }),
+          };
+        }
+        if (table === 'custom_puzzle_attempts') {
+          return {
+            insert: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({ data: mockAttemptData, error: null }),
+          };
+        }
+        return {};
+      });
+
+      const res = await POST(
+        makeRequest({ ...validBody, guestFingerprint: 'guest-fp-123' }),
+        makeParams()
+      );
+      expect(res.status).toBe(200);
+      expect(res.data.success).toBe(true);
+    });
+  });
+
+  describe('Database errors', () => {
+    it('returns 500 on non-duplicate insert error', async () => {
+      setupDefaultMocks({ insertError: { code: 'INTERNAL', message: 'db down' }, insertData: null });
+
+      const res = await POST(makeRequest(validBody), makeParams());
+      expect(res.status).toBe(500);
+      expect(res.data.error).toContain('Failed to submit attempt');
+    });
+  });
+
+  describe('Survival mode fields', () => {
+    it('accepts optional survival mode fields', async () => {
+      setupDefaultMocks();
+
+      const survivalBody = {
+        ...validBody,
+        wordsDiscovered: [{ word: 'cat', timestamp: 1000, lifeGained: 1, tokensGained: 2 }],
+        lifeRemaining: 30,
+        clueTokensEarned: 5,
+        clueTokensSpent: 2,
+        hintsUnlocked: 1,
+      };
+
+      const res = await POST(makeRequest(survivalBody), makeParams());
+      expect(res.status).toBe(200);
+      expect(res.data.success).toBe(true);
+    });
+  });
+});

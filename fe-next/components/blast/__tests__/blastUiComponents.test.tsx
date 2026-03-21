@@ -29,6 +29,15 @@ jest.mock('@/hooks/useReducedMotion', () => ({
   default: () => false,
 }));
 
+jest.mock('@/components/shared/GameEmojiShareCard', () => ({
+  GameEmojiShareCard: () => null,
+}));
+
+jest.mock('@/components/results/NextStepPrompt', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
 jest.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => null,

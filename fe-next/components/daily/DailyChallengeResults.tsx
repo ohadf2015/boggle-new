@@ -18,6 +18,7 @@ import {
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
+import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useDailyResultSubmission } from './results/useDailyResultSubmission';
 import {
@@ -300,6 +301,24 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             </motion.p>
           )}
 
+        </motion.div>
+
+        {/* Emoji Share Card */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.52 }}
+        >
+          <GameEmojiShareCard
+            data={{
+              mode: 'classic',
+              puzzleNumber: result.puzzleNumber,
+              score: Math.round(result.score),
+              words,
+            }}
+            t={t}
+            language={result.language}
+          />
         </motion.div>
 
         {/* Next Step - Suggest Multiplayer */}

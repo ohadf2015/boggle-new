@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import { useSafeInterval } from '@/hooks/useSafeTimeout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -219,25 +220,21 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   }, [language, onParticipantCountChange, activeTab]);
 
   // Initial fetch and polling
+  const pollingInterval = useSafeInterval();
+
   useEffect(() => {
     fetchTodayLeaderboard();
     fetchAllTimeLeaderboard();
 
-    let interval: NodeJS.Timeout | null = null;
-
     const startPolling = () => {
-      if (interval) clearInterval(interval);
-      interval = setInterval(() => {
+      pollingInterval.start(() => {
         fetchTodayLeaderboard();
         fetchAllTimeLeaderboard();
       }, 30000);
     };
 
     const stopPolling = () => {
-      if (interval) {
-        clearInterval(interval);
-        interval = null;
-      }
+      pollingInterval.stop();
     };
 
     const handleVisibilityChange = () => {
@@ -257,7 +254,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       stopPolling();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchTodayLeaderboard, fetchAllTimeLeaderboard]);
+  }, [fetchTodayLeaderboard, fetchAllTimeLeaderboard, pollingInterval]);
 
   // Check if current user is in today's list
   const isCurrentUserToday = (participant: DailyParticipant) => {

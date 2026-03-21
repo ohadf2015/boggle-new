@@ -545,7 +545,13 @@ const ja = {
     "words": "語",
     "combo": "コンボ",
     "streak": "連続",
-    "longest": "最長:"
+    "longest": "最長:",
+    "emojiCard": {
+      "classicHeader": "LexiClash デイリー #{number}",
+      "blastHeader": "LexiClash Blast 💥",
+      "share": "シェア",
+      "copy": "コピー"
+    }
   },
   "messaging": {
     "timeNow": "今",
@@ -2395,6 +2401,10 @@ const ja = {
     "more": "あと",
     "soClose": "あと少しでした！もう1ゲームで達成できるかも。"
   },
+  "oneMoreGame": {
+    "defaultTitle": "もう1ゲーム？",
+    "defaultMessage": "連続記録を続けよう — もう1回プレイ！"
+  },
   "almostFound": {
     "title": "もう少しで見つけられた...",
     "matchPercent": "{percent}%一致",
@@ -2747,6 +2757,17 @@ const ja = {
       "skip": "スキップ"
     }
   },
+  "comebackBonus": {
+    "title": "おかえり！",
+    "close": "カムバックボーナスを閉じる",
+    "xpBonus": "XPボーナス",
+    "daysAway": "{days}日間離れていました",
+    "xpDuration": "{hours}時間のXPブースト",
+    "hints": "無料ヒントが追加されました",
+    "streakFreezes": "ストリークフリーズが追加されました",
+    "titleUnlocked": "限定タイトルが解除されました！",
+    "claimButton": "ボーナスを受け取る"
+  },
   "calendar": {
     "title": "デイリー報酬",
     "description": "毎日報酬を受け取ってコイン、XP、特別アイテムをゲット！",
@@ -2797,7 +2818,11 @@ const ja = {
     "freezes": "連続記録凍結",
     "freezeDesc": "凍結を使って、勝たなくても1日連続記録を保護できます。",
     "useFreeze": "凍結を使用",
-    "noFreezes": "凍結がありません。週に1回無料の凍結を獲得できます！"
+    "noFreezes": "凍結がありません。週に1回無料の凍結を獲得できます！",
+    "freezeShields": "フリーズシールド {count}個",
+    "freezeShields_plural": "フリーズシールド {count}個",
+    "freezeShieldActive": "ストリーク保護中！",
+    "freezeShieldHint": "シールドは欠席した場合に自動で発動します"
   },
   "partyScreen": {
     "title": "パーティースクリーン",
@@ -3887,7 +3912,10 @@ const ja = {
     "attempts": "挑戦回数",
     "beaten": "勝利",
     "winRate": "勝率",
-    "startChallenge": "チャレンジ開始！"
+    "startChallenge": "チャレンジ開始！",
+    "notFoundOrExpired": "チャレンジが見つからないか、期限切れです",
+    "expired": "このチャレンジは期限切れです",
+    "loading": "チャレンジを読み込み中..."
   },
   "challengeResults": {
     "youWon": "勝利!",
@@ -4873,6 +4901,8 @@ const ja = {
     "drills": {
       "title": "脳トレドリル",
       "brainTraining": "脳トレ",
+      "xpEarned": "+{xp} XP",
+      "goldEarned": "+{gold} ゴールド",
       "round": "ラウンド",
       "level": "レベル",
       "start": "スタート",

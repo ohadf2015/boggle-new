@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Package, Lightbulb, Target, Star, Heart, KeyRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MAX_ATTEMPTS } from './constants';
@@ -59,14 +59,14 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
         ref={listRef}
         className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-1 scrollbar-thin scrollbar-thumb-neo-cream/20 scrollbar-track-transparent"
       >
-        <AnimatePresence mode="popLayout">
+        <AdaptiveAnimatePresence mode="popLayout">
           {sortedWords.map((word) => (
             <LootWordItem
               key={`${word.word}-${word.timestamp}`}
               word={word}
             />
           ))}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         {/* Empty State */}
         {discoveredWords.length === 0 && (
@@ -117,7 +117,7 @@ const LootWordItem: React.FC<{ word: WordDiscovery }> = ({ word }) => {
       : 'text-neo-cream';
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: -20, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
@@ -146,7 +146,7 @@ const LootWordItem: React.FC<{ word: WordDiscovery }> = ({ word }) => {
           </span>
         )}
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 };
 

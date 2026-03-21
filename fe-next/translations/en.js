@@ -545,7 +545,13 @@ const en = {
     "words": "words",
     "combo": "combo",
     "streak": "streak",
-    "longest": "Longest:"
+    "longest": "Longest:",
+    "emojiCard": {
+      "classicHeader": "LexiClash Daily #{number}",
+      "blastHeader": "LexiClash Blast 💥",
+      "share": "Share",
+      "copy": "Copy"
+    }
   },
   "messaging": {
     "timeNow": "now",
@@ -2512,6 +2518,10 @@ const en = {
     "more": "more",
     "soClose": "You're so close! One more game could do it."
   },
+  "oneMoreGame": {
+    "defaultTitle": "One More Game?",
+    "defaultMessage": "Keep the streak going — play again!"
+  },
   "almostFound": {
     "title": "You Almost Found...",
     "matchPercent": "{percent}% match",
@@ -3234,6 +3244,17 @@ const en = {
       "skip": "Skip"
     }
   },
+  "comebackBonus": {
+    "title": "Welcome Back!",
+    "close": "Close comeback bonus",
+    "xpBonus": "XP Bonus",
+    "daysAway": "You were away for {days} days",
+    "xpDuration": "{hours}h of boosted XP",
+    "hints": "Free hints added",
+    "streakFreezes": "Streak freezes added",
+    "titleUnlocked": "Exclusive title unlocked!",
+    "claimButton": "Claim My Bonus"
+  },
   "calendar": {
     "title": "Daily Loot",
     "description": "Grab coins, XP, and goodies every day!",
@@ -3284,7 +3305,11 @@ const en = {
     "freezes": "Streak Freezes",
     "freezeDesc": "Use a freeze to protect your streak for one day without winning.",
     "useFreeze": "Use Streak Freeze",
-    "noFreezes": "No freezes available. Earn 1 free freeze per week!"
+    "noFreezes": "No freezes available. Earn 1 free freeze per week!",
+    "freezeShields": "{count} Freeze Shield",
+    "freezeShields_plural": "{count} Freeze Shields",
+    "freezeShieldActive": "Streak Protected!",
+    "freezeShieldHint": "Shields auto-activate if you miss a day"
   },
   "partyScreen": {
     "title": "Party Screen",
@@ -4008,7 +4033,10 @@ const en = {
     "attempts": "Attempts",
     "beaten": "Beaten",
     "winRate": "Win Rate",
-    "startChallenge": "Start Challenge!"
+    "startChallenge": "Start Challenge!",
+    "notFoundOrExpired": "Challenge not found or has expired",
+    "expired": "This challenge has expired",
+    "loading": "Loading challenge..."
   },
   "challengeResults": {
     "youWon": "You Won!",
@@ -4943,6 +4971,8 @@ const en = {
     "drills": {
       "title": "Brain Drills",
       "brainTraining": "Brain Training",
+      "xpEarned": "+{xp} XP",
+      "goldEarned": "+{gold} Gold",
       "round": "Round",
       "level": "Level",
       "start": "Start",

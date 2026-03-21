@@ -33,6 +33,15 @@ const NOOP = () => {};
 const WORLD_HOVER_VARIANT = { scale: 1.08, y: -4, rotate: 2 };
 const WORLD_TAP_VARIANT = { scale: 0.95, rotate: -1 };
 
+// Extracted to module-level constant to prevent useParallax re-subscribing RAF/listeners every render
+const WORLD_MAP_PARALLAX_OPTIONS = {
+  intensity: 0.8,
+  enableGyroscope: true,
+  enableGesture: true,
+  enableAmbient: true,
+  ambientSpeed: 0.5,
+} as const;
+
 // World images mapping (WebP for 91% smaller file sizes)
 const WORLD_IMAGES: Record<number, string> = {
   1: '/images/adventure/world-meadows-3d.webp',
@@ -307,13 +316,7 @@ export default function WorldMap({
   const starsY = useTransform(scrollProgress, [0, 1], [0, -100]);
   const cloudsY = useTransform(scrollProgress, [0, 1], [0, -150]);
 
-  const { x: parallaxX, y: parallaxY } = useParallax({
-    intensity: 0.8,
-    enableGyroscope: true,
-    enableGesture: true,
-    enableAmbient: true,
-    ambientSpeed: 0.5,
-  });
+  const { x: parallaxX, y: parallaxY } = useParallax(WORLD_MAP_PARALLAX_OPTIONS);
 
   // Prepare worlds data (World 10 at top, World 1 at bottom)
   const worldsData = useMemo(() => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { X, Wand2, Check, AlertCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -63,7 +63,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
   const validationStyles = getValidationStyles();
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ scale: 0.9, opacity: 0, y: 20 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -74,13 +74,13 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
       <div className="bg-gradient-to-r from-neo-pink to-neo-orange border-b-4 border-neo-black px-5 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <motion.div
+            <AdaptiveMotion.div
               animate={{ rotate: [0, 15, -15, 0] }}
               transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
               className="w-10 h-10 bg-neo-cream border-3 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
             >
               <Wand2 className="w-5 h-5 text-neo-pink" />
-            </motion.div>
+            </AdaptiveMotion.div>
             <h2 className="text-xl font-black text-neo-cream ltr:drop-shadow-[2px_2px_0px_black] rtl:drop-shadow-[-2px_2px_0px_black]">
               {t('customPuzzle.createTitle')}
             </h2>
@@ -123,37 +123,37 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
             />
 
             {/* Validation icon */}
-            <motion.div
+            <AdaptiveMotion.div
               className="absolute right-4 top-1/2 -translate-y-1/2"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               key={validationStatus}
             >
               {validationStatus === 'valid' && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   className="w-8 h-8 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
                 >
                   <Check className="w-5 h-5 text-neo-black" strokeWidth={3} />
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
               {(validationStatus === 'invalid' || validationStatus === 'too-short' || validationStatus === 'too-long') && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="w-8 h-8 bg-neo-pink border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
                 >
                   <AlertCircle className="w-5 h-5 text-neo-cream" strokeWidth={3} />
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
-            </motion.div>
+            </AdaptiveMotion.div>
           </div>
 
           {/* Validation message */}
-          <AnimatePresence mode="wait">
+          <AdaptiveAnimatePresence mode="wait">
             {getValidationMessage() && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: -10, height: 0 }}
                 animate={{ opacity: 1, y: 0, height: 'auto' }}
                 exit={{ opacity: 0, y: -10, height: 0 }}
@@ -165,14 +165,14 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
                 )}
               >
                 {getValidationMessage()}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
 
           {/* Character count indicator */}
           <div className="flex justify-center gap-1">
             {Array.from({ length: MAX_WORD_LENGTH }).map((_, i) => (
-              <motion.div
+              <AdaptiveMotion.div
                 key={i}
                 initial={{ scale: 0 }}
                 animate={{
@@ -192,7 +192,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
         </div>
 
         {/* Create Button */}
-        <motion.div
+        <AdaptiveMotion.div
           whileHover={validationStatus === 'valid' && !isCreating ? { scale: 1.02 } : {}}
           whileTap={validationStatus === 'valid' && !isCreating ? { scale: 0.98 } : {}}
         >
@@ -218,14 +218,14 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
               </span>
             )}
           </Button>
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Hint text */}
         <p className="text-xs text-center text-neo-black/50">
           {t('customPuzzle.createDescription')}
         </p>
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 };
 

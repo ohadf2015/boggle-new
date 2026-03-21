@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Share2, Check, Copy, ArrowRight, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -187,8 +187,8 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -224,7 +224,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
         {/* Share Phase */}
         {phase === 'share' && puzzleCode && creatorResult && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
@@ -232,29 +232,29 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
           >
             {/* Success Header */}
             <div className="bg-gradient-to-r from-neo-lime to-neo-cyan border-b-4 border-neo-black p-6 text-center relative overflow-hidden">
-              <motion.div
+              <AdaptiveMotion.div
                 className="absolute top-2 left-4 text-2xl"
                 animate={{ rotate: [0, 15, -15, 0], y: [0, -5, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 🎉
-              </motion.div>
-              <motion.div
+              </AdaptiveMotion.div>
+              <AdaptiveMotion.div
                 className="absolute top-4 right-6 text-xl"
                 animate={{ rotate: [0, -15, 15, 0], y: [0, -3, 0] }}
                 transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
               >
                 ✨
-              </motion.div>
+              </AdaptiveMotion.div>
 
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', damping: 10, delay: 0.2 }}
                 className="w-20 h-20 bg-neo-cream border-4 border-neo-black rounded-full flex items-center justify-center mx-auto mb-3 shadow-hard"
               >
                 <Trophy className="w-10 h-10 text-neo-lime" />
-              </motion.div>
+              </AdaptiveMotion.div>
               <h2 className="text-2xl font-black text-neo-black ltr:drop-shadow-[1px_1px_0px_white] rtl:drop-shadow-[-1px_1px_0px_white]">
                 {t('customPuzzle.created')}
               </h2>
@@ -265,7 +265,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
             <div className="p-5 space-y-4">
               {/* Score Display */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -275,10 +275,10 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   {t('customPuzzle.yourScore')}
                 </p>
                 <p className="text-5xl font-black text-neo-black">{Math.round(creatorResult.efficiencyScore)}</p>
-              </motion.div>
+              </AdaptiveMotion.div>
 
               {/* Share URL */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
@@ -287,7 +287,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 <code className="flex-1 text-sm truncate text-neo-cream font-mono">
                   {buildPuzzleShareUrl(puzzleCode, language)}
                 </code>
-                <motion.button
+                <AdaptiveMotion.button
                   onClick={handleCopyLink}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -301,11 +301,11 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   ) : (
                     <Copy className="w-5 h-5 text-neo-cream" />
                   )}
-                </motion.button>
-              </motion.div>
+                </AdaptiveMotion.button>
+              </AdaptiveMotion.div>
 
               {/* Actions */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
@@ -327,12 +327,12 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   {t('common.done')}
                   <ArrowRight className="w-5 h-5 ms-2" />
                 </Button>
-              </motion.div>
+              </AdaptiveMotion.div>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </motion.div>
-    </AnimatePresence>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 };
 

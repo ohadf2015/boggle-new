@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { useSafeInterval } from '@/hooks/useSafeTimeout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2, Check } from 'lucide-react';
+import { Users, Trophy, ChevronDown, ChevronUp, Share2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
-import { getRankDisplay, getRankRowClasses, getRankBadgeClasses } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
-import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
+import { getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
-import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import type { Language } from '@/types';
+
+import ParticipantRow from './DailyLeaderboardParticipantRow';
+import VirtualizedParticipantList from './VirtualizedParticipantList';
 
 // ==========================================
 // Types
@@ -50,205 +51,6 @@ interface DailyLeaderboardProps {
   t: (key: string) => string;
   gameType?: 'puzzle' | 'wordHunt';
 }
-
-// ==========================================
-// Helper Components
-// ==========================================
-
-const ParticipantRow = memo<{
-  participant: DailyParticipant;
-  index: number;
-  isCurrentUser: boolean;
-  compact: boolean;
-  gameType: 'puzzle' | 'wordHunt';
-  t: (key: string) => string;
-}>(({ participant, index, isCurrentUser, compact, gameType, t }) => {
-  const rank = participant.rank_position;
-  const isTopThree = rank <= 3;
-  const countryFlag = getCountryFlag(participant.country_code);
-
-  // Format time since completion
-  const timeAgo = formatDistanceToNow(participant.completed_at, t);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.3 }}
-      className={`
-        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
-        ${getRankRowClasses(rank, isCurrentUser)}
-        ${compact ? 'py-2' : ''}
-        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
-      `}
-    >
-      {/* Rank Badge */}
-      <div
-        className={`
-          w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
-          ${getRankBadgeClasses(rank)}
-          border-2 shadow-sm flex-shrink-0
-        `}
-      >
-        {getRankDisplay(rank)}
-      </div>
-
-      {/* Avatar with Country Flag — prominent display */}
-      <div className="relative flex-shrink-0">
-        <div className={`
-          w-11 h-11 sm:w-14 sm:h-14 border-3 shadow-hard-sm rounded-full overflow-hidden
-          ${isCurrentUser ? 'border-neo-cyan' : isTopThree ? 'border-neo-orange' : 'border-neo-black/80'}
-        `}>
-          <Avatar
-
-            avatarImage={participant.avatar_image ?? undefined}
-            customAvatar={participant.custom_avatar ?? undefined}
-            size="lg"
-            className="w-full h-full"
-          />
-        </div>
-        {/* Country Flag Badge */}
-        {countryFlag && (
-          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
-            {countryFlag}
-          </div>
-        )}
-      </div>
-
-      {/* Name & Score */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <PlayerProfileTooltip
-            player={{
-              id: participant.player_id ?? undefined,
-              username: participant.display_name || 'Player',
-
-              avatarImage: participant.avatar_image ?? undefined,
-              customAvatar: participant.custom_avatar,
-              countryCode: participant.country_code,
-            }}
-            isCurrentUser={isCurrentUser}
-            side="bottom"
-          >
-            <span className={`font-bold truncate text-sm sm:text-base cursor-pointer ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white hover:text-neo-cyan dark:hover:text-neo-cyan'}`}>
-              {participant.display_name || 'Player'}
-            </span>
-          </PlayerProfileTooltip>
-          {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
-              YOU
-            </span>
-          )}
-          {rank === 1 && (
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-tier-gold shrink-0 animate-pulse" />
-          )}
-        </div>
-        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
-          {gameType === 'wordHunt' ? (
-            <>
-              <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
-                {participant.solved ? `✓ ${t('wordHunt.leaderboard.solved')}` : `✗ ${t('wordHunt.leaderboard.failed')}`}
-              </span>
-              {participant.solved && (
-                <>
-                  <span className="text-slate-400 dark:text-slate-500">•</span>
-                  <span className="text-slate-600 dark:text-slate-300 font-medium">{participant.attempts_used} {t('wordHunt.leaderboard.attempts')}</span>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <span className="font-bold text-indigo-600 dark:text-indigo-400">{participant.score} {t('wordHunt.leaderboard.pts')}</span>
-              <span className="text-slate-400 dark:text-slate-500">•</span>
-              <span className="text-slate-600 dark:text-slate-300 font-medium">{participant.word_count} {t('wordHunt.leaderboard.words')}</span>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Time */}
-      {!compact && (
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
-          <Clock className="w-3.5 h-3.5" />
-          <span>{timeAgo}</span>
-        </div>
-      )}
-    </motion.div>
-  );
-});
-
-ParticipantRow.displayName = 'ParticipantRow';
-
-// ==========================================
-// Virtualized List (for expanded view with many rows)
-// ==========================================
-
-const ESTIMATED_ROW_HEIGHT = 72;
-const VIRTUAL_LIST_MAX_HEIGHT = 600;
-const VIRTUAL_OVERSCAN = 3;
-
-const VirtualizedParticipantList: React.FC<{
-  participants: DailyParticipant[];
-  isCurrentUser: (p: DailyParticipant) => boolean;
-  compact: boolean;
-  gameType: 'puzzle' | 'wordHunt';
-  t: (key: string) => string;
-}> = ({ participants, isCurrentUser, compact, gameType, t }) => {
-  const parentRef = useRef<HTMLDivElement>(null);
-
-  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Virtual returns non-memoizable functions by design; component is already wrapped in memo
-  const virtualizer = useVirtualizer({
-    count: participants.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => ESTIMATED_ROW_HEIGHT,
-    overscan: VIRTUAL_OVERSCAN,
-  });
-
-  return (
-    <div
-      ref={parentRef}
-      style={{ maxHeight: VIRTUAL_LIST_MAX_HEIGHT, overflowY: 'auto' }}
-      className="rounded-lg"
-    >
-      <div
-        style={{
-          height: `${virtualizer.getTotalSize()}px`,
-          width: '100%',
-          position: 'relative',
-        }}
-      >
-        {virtualizer.getVirtualItems().map((virtualRow) => {
-          const participant = participants[virtualRow.index];
-          return (
-            <div
-              key={participant.player_id || participant.guest_fingerprint || virtualRow.index}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                transform: `translateY(${virtualRow.start}px)`,
-              }}
-              ref={virtualizer.measureElement}
-              data-index={virtualRow.index}
-            >
-              <div className="pb-2">
-                <ParticipantRow
-                  participant={participant}
-                  index={virtualRow.index}
-                  isCurrentUser={isCurrentUser(participant)}
-                  compact={compact}
-                  gameType={gameType}
-                  t={t}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 
 // ==========================================
 // Main Component
@@ -316,22 +118,18 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   }, [puzzleDate, language, onParticipantCountChange, gameType]);
 
   // Initial fetch and polling - pause when tab is not visible
+  const pollingInterval = useSafeInterval();
+
   useEffect(() => {
     fetchLeaderboard();
 
-    let interval: NodeJS.Timeout | null = null;
-
     const startPolling = () => {
-      if (interval) clearInterval(interval);
       // Poll every 30 seconds for updates
-      interval = setInterval(fetchLeaderboard, 30000);
+      pollingInterval.start(fetchLeaderboard, 30000);
     };
 
     const stopPolling = () => {
-      if (interval) {
-        clearInterval(interval);
-        interval = null;
-      }
+      pollingInterval.stop();
     };
 
     const handleVisibilityChange = () => {
@@ -354,7 +152,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       stopPolling();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchLeaderboard]);
+  }, [fetchLeaderboard, pollingInterval]);
 
   // Check if current user is in the list
   const isCurrentUser = (participant: DailyParticipant) => {

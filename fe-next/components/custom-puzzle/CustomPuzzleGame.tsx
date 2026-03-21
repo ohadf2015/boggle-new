@@ -4,7 +4,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getGuestFingerprint } from '@/utils/dailyChallenge';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ArrowLeft, Share2, Trophy, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
@@ -212,7 +212,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   if (phase === 'intro' && puzzle) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-4 bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full bg-white dark:bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-6 text-center"
@@ -260,7 +260,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
               {t('common.back')}
             </Button>
           </Link>
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
     );
   }
@@ -283,8 +283,8 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   if (phase === 'results' && puzzle && gameResult) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-4 bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-        <AnimatePresence mode="wait">
-          <motion.div
+        <AdaptiveAnimatePresence mode="wait">
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="max-w-md w-full bg-white dark:bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-6"
@@ -309,14 +309,14 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
               </h2>
 
               {beatCreator && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="inline-flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 rounded-neo font-bold"
                 >
                   <Trophy className="w-5 h-5" />
                   {t('customPuzzle.beatCreator')}
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
             </div>
 
@@ -379,8 +379,8 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                 </Button>
               </Link>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </AdaptiveMotion.div>
+        </AdaptiveAnimatePresence>
       </div>
     );
   }

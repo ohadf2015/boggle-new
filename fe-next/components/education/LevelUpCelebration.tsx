@@ -9,7 +9,8 @@
 
 'use client';
 
-import { memo, useEffect, useId } from 'react';
+import { memo, useEffect, useId, useRef } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -47,17 +48,9 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
   ({ levelUpData, onClose }) => {
     const { t } = useLanguage();
     const titleId = useId();
-    // Handle escape key
-    useEffect(() => {
-      const handleEscape = (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && levelUpData) {
-          onClose();
-        }
-      };
+    const modalRef = useRef<HTMLDivElement>(null);
 
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
-    }, [levelUpData, onClose]);
+    useFocusTrap(modalRef, !!levelUpData, onClose);
 
     // Fire confetti when modal opens
     useEffect(() => {
@@ -93,6 +86,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
         >
           {/* Modal Card */}
           <AdaptiveMotion.div
+            ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',

@@ -190,18 +190,18 @@ describe('ComboMaster Drill Gameplay', () => {
   // --- Score Calculation ---
 
   describe('score calculation', () => {
-    it('calculates score as length * 10 * (1 + combo * 0.1)', () => {
+    it('calculates score using canonical scoring: calculateWordScore(word,0) * (1 + combo * 0.1)', () => {
       const onComplete = jest.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
-      // Submit 'cat' (length=3): combo becomes 1, score = 3*10 * (1 + 1*0.1) = 33
+      // Submit 'cat' (length=3): canonical base = 10pts, combo becomes 1, score = round(10 * 1.1) = 11
       fireEvent.click(screen.getByTestId('submit-cat'));
 
       // Finish to check score
       fireEvent.click(screen.getByText('brain.drills.finishGame'));
       expect(onComplete).toHaveBeenCalledWith(
-        expect.objectContaining({ score: 33 })
+        expect.objectContaining({ score: 11 })
       );
     });
 
@@ -210,14 +210,14 @@ describe('ComboMaster Drill Gameplay', () => {
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
-      // Word 1 'cat' (3 letters): combo=1, score = 3*10*(1+0.1) = 33
+      // Word 1 'cat' (3 letters): canonical base=10, combo=1, score = round(10 * 1.1) = 11
       fireEvent.click(screen.getByTestId('submit-cat'));
-      // Word 2 'dog' (3 letters): combo=2, score = 3*10*(1+0.2) = 36
+      // Word 2 'dog' (3 letters): canonical base=10, combo=2, score = round(10 * 1.2) = 12
       fireEvent.click(screen.getByTestId('submit-dog'));
 
       fireEvent.click(screen.getByText('brain.drills.finishGame'));
       expect(onComplete).toHaveBeenCalledWith(
-        expect.objectContaining({ score: 33 + 36 })
+        expect.objectContaining({ score: 11 + 12 })
       );
     });
   });

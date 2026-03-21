@@ -195,7 +195,7 @@ export function registerLifecycleHandlers(
         return;
       }
 
-      // Update duel status to active
+      // Update duel status to active (atomic: WHERE status='pending' prevents double-accept race)
       const startedAt = new Date().toISOString();
       const { data: updatedDuel, error: updateError } = await supabase
         .from('student_duels')
@@ -204,6 +204,7 @@ export function registerLifecycleHandlers(
           started_at: startedAt,
         })
         .eq('id', payload.duelId)
+        .eq('status', 'pending')
         .select()
         .single();
 

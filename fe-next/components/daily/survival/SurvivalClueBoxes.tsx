@@ -1,7 +1,7 @@
 'use client';
 
 import React, { forwardRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { HintLevel } from '@/utils/aiHintGenerator';
@@ -44,7 +44,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   if (!currentHint) return null;
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       ref={ref}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -80,7 +80,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
 
       {/* Black boxes for target word OR Letter Feedback Overlay */}
       <div dir={gameDir} className="flex justify-center flex-wrap gap-2 sm:gap-2.5 px-2">
-        <AnimatePresence mode="sync">
+        <AdaptiveAnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackOverlay
               feedback={latestAttemptFeedback}
@@ -96,20 +96,20 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
               attempts={attempts}
             />
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
 
       {/* Legend / Known letters indicator */}
       <div className="min-h-[40px] sm:min-h-[44px] flex flex-col justify-center">
-        <AnimatePresence mode="sync">
+        <AdaptiveAnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackLegend t={t} />
           ) : (
             <KnownLettersDisplay knownLetters={knownLetters} t={t} />
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });
 
@@ -174,7 +174,7 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
         : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm";
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       key="feedback-overlay"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -187,7 +187,7 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
         const isGray = !isClue;
         const showGrayLetter = isGray && !grayFaded;
         return (
-          <motion.div
+          <AdaptiveMotion.div
             key={idx}
             initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
             animate={skipAnimations ? { opacity: 1 } : { rotateX: 0, opacity: 1 }}
@@ -210,10 +210,10 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
             )}
           >
             {isClue ? letterFb.letter : (showGrayLetter ? letterFb.letter : '?')}
-          </motion.div>
+          </AdaptiveMotion.div>
         );
       })}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 };
 
@@ -254,7 +254,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
         : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm";
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       key="hint-boxes"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -302,7 +302,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
         const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed || !!persistedLetter;
 
         return (
-          <motion.div
+          <AdaptiveMotion.div
             key={idx}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -316,10 +316,10 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
             )}
           >
             {displayChar}
-          </motion.div>
+          </AdaptiveMotion.div>
         );
       })}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 };
 
@@ -328,7 +328,7 @@ interface FeedbackLegendProps {
 }
 
 const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
-  <motion.div
+  <AdaptiveMotion.div
     key="feedback-legend"
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
@@ -348,7 +348,7 @@ const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-gray-400 rounded border border-gray-500"></span>
       <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.notInWord')}</span>
     </span>
-  </motion.div>
+  </AdaptiveMotion.div>
 );
 
 interface KnownLettersDisplayProps {
@@ -357,7 +357,7 @@ interface KnownLettersDisplayProps {
 }
 
 const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters, t }) => (
-  <motion.div
+  <AdaptiveMotion.div
     key="known-letters"
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
@@ -366,7 +366,7 @@ const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters,
     className="flex flex-col items-center gap-0.5 mt-0.5"
   >
     {knownLetters.size > 0 && (
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: -5 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-1 text-[10px] sm:text-xs"
@@ -384,7 +384,7 @@ const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters,
             </span>
           ))}
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     )}
-  </motion.div>
+  </AdaptiveMotion.div>
 );

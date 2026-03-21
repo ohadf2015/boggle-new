@@ -14,6 +14,7 @@
 'use client';
 
 import React, { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { useSafeInterval } from '@/hooks/useSafeTimeout';
 import Image from 'next/image';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Swords } from 'lucide-react';
@@ -229,7 +230,7 @@ const BossOverlay = memo<BossOverlayProps>(
     } = useAttackTelegraph({ duration: 2000, onComplete: handleTelegraphComplete });
 
     const lastCheckRef = useRef<number>(0);
-    const abilityCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const abilityCheckInterval = useSafeInterval();
     const derivedStateRef = useRef(derivedState);
     const derivedContextRef = useRef(derivedContext);
     useEffect(() => {
@@ -239,14 +240,11 @@ const BossOverlay = memo<BossOverlayProps>(
 
     useEffect(() => {
       if (!boss || !effectiveIsActive) {
-        if (abilityCheckIntervalRef.current) {
-          clearInterval(abilityCheckIntervalRef.current);
-          abilityCheckIntervalRef.current = null;
-        }
+        abilityCheckInterval.stop();
         return;
       }
       if (lastCheckRef.current === 0) lastCheckRef.current = Date.now();
-      abilityCheckIntervalRef.current = setInterval(() => {
+      abilityCheckInterval.start(() => {
         const now = Date.now();
         const delta = now - lastCheckRef.current;
         lastCheckRef.current = now;
@@ -260,9 +258,9 @@ const BossOverlay = memo<BossOverlayProps>(
         }
       }, 500);
       return () => {
-        if (abilityCheckIntervalRef.current) clearInterval(abilityCheckIntervalRef.current);
+        abilityCheckInterval.stop();
       };
-    }, [boss, effectiveIsActive, telegraphingAbility, checkActivation, startAbility, startTelegraph, tickCooldowns]);
+    }, [boss, effectiveIsActive, telegraphingAbility, checkActivation, startAbility, startTelegraph, tickCooldowns, abilityCheckInterval]);
 
     // ==============================================
     // CINEMATIC HANDLERS

@@ -6,12 +6,14 @@ import { RotateCcw, Home, Trophy, Zap, Grid3X3, Star } from 'lucide-react';
 // canvas-confetti is lazy-loaded (only fires on 3 stars or retrigger)
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import NextStepPrompt from '@/components/results/NextStepPrompt';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import type { BlastResultsData, BlastDifficulty } from './types';
 import { useBlastResultSaver } from './hooks/useBlastResultSaver';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import { StarRating, StatCard, WaveBreakdown } from './BlastResultsComponents';
 import { BlastSkillBreakdown } from './BlastSkillBreakdown';
+import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 
 interface BlastResultsProps {
   results: BlastResultsData;
@@ -176,6 +178,29 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
 
       </div>{/* end desktop grid */}
 
+      {/* Emoji Share Card */}
+      <AdaptiveMotion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.9 }}
+        className="w-full max-w-sm lg:max-w-md mb-4"
+      >
+        <GameEmojiShareCard
+          data={{
+            mode: 'blast',
+            score: results.finalScore,
+            stars: results.stars,
+            clearPercentage: results.clearPercentage,
+            wordsFound: results.wordsFound,
+            maxCombo: results.maxCombo,
+            wavesCompleted: results.wavesCompleted ?? 0,
+            waveResults: results.waveResults ?? [],
+          }}
+          t={t}
+          language={language}
+        />
+      </AdaptiveMotion.div>
+
       {/* Action buttons */}
       <AdaptiveMotion.div
         initial={{ opacity: 0, y: 20 }}
@@ -201,6 +226,19 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
           <Home className="me-2 h-5 w-5" />
           {t('common.home')}
         </Button>
+      </AdaptiveMotion.div>
+
+      <AdaptiveMotion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 1.2 }}
+        className="w-full max-w-sm lg:max-w-md"
+      >
+        <NextStepPrompt
+          currentMode="blast"
+          onBackToLobby={onBackToHome}
+          variant="mobile"
+        />
       </AdaptiveMotion.div>
     </div>
   );

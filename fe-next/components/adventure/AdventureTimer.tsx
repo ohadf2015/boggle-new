@@ -4,6 +4,11 @@
  * Displays countdown timer with urgency states (normal, warning, danger).
  * Features flip digit animation and pulsing glow effects.
  * Urgency colors driven by useTimerTheme() for per-world theming.
+ *
+ * Performance: accepts an optional `timerStore` prop. When provided, this
+ * component subscribes directly via useSyncExternalStore so it re-renders
+ * independently of its parent — parent re-renders don't cascade here on
+ * non-timer changes, and per-second ticks don't re-render siblings.
  */
 
 'use client';
@@ -13,14 +18,24 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { Clock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTimerTheme } from '@/contexts/AdventureThemeContext';
+import { type AdventureTimerStore, useAdventureTimerValue } from '@/hooks/useAdventureTimerStore';
 
 // ==============================================
 // TYPES
 // ==============================================
 
 interface AdventureTimerProps {
-  /** Time remaining in seconds */
-  timeRemaining: number;
+  /**
+   * External timer store (preferred). Subscribes via useSyncExternalStore so
+   * only this component re-renders each second, not sibling components.
+   * When provided, `timeRemaining` prop is ignored.
+   */
+  timerStore?: AdventureTimerStore;
+  /**
+   * Fallback: direct timeRemaining value. Used when timerStore is not passed
+   * (legacy callers, tests that pass the value directly).
+   */
+  timeRemaining?: number;
   /** Size variant */
   size?: 'compact' | 'normal' | 'large';
   /** Additional CSS classes */
@@ -32,6 +47,12 @@ interface FlipDigitProps {
   className?: string;
 }
 
+interface AdventureTimerDisplayProps {
+  timeRemaining: number;
+  size: 'compact' | 'normal' | 'large';
+  className?: string;
+}
+
 // ==============================================
 // CONSTANTS
 // ==============================================
@@ -39,6 +60,17 @@ interface FlipDigitProps {
 const WARNING_THRESHOLD = 30;
 const DANGER_THRESHOLD = 10;
 const CRITICAL_THRESHOLD = 5;
+
+// ==============================================
+// NO-OP STORE for when timerStore prop is absent
+// ==============================================
+
+const NO_OP_STORE: AdventureTimerStore = {
+  getSnapshot: () => 0,
+  subscribe: () => () => {},
+  notify: () => {},
+  destroy: () => {},
+};
 
 // ==============================================
 // FLIP DIGIT COMPONENT
@@ -64,11 +96,11 @@ const FlipDigit = memo(function FlipDigit({ digit, className }: FlipDigitProps) 
 });
 
 // ==============================================
-// MAIN COMPONENT
+// DISPLAY COMPONENT (pure, receives timeRemaining as number)
 // ==============================================
 
-const AdventureTimer = memo<AdventureTimerProps>(
-  ({ timeRemaining, size = 'normal', className }) => {
+const AdventureTimerDisplay = memo<AdventureTimerDisplayProps>(
+  ({ timeRemaining, size, className }) => {
     // Format time
     const minutes = Math.floor(timeRemaining / 60);
     const seconds = timeRemaining % 60;
@@ -179,7 +211,40 @@ const AdventureTimer = memo<AdventureTimerProps>(
   }
 );
 
+// ==============================================
+// PUBLIC COMPONENT
+// ==============================================
+
+/**
+ * AdventureTimer renders the countdown display.
+ *
+ * Pass `timerStore` (from useAdventureGame) to subscribe directly —
+ * only this component re-renders each second, not its parent or siblings.
+ *
+ * Pass `timeRemaining` directly for tests and legacy callers.
+ */
+const AdventureTimer = memo<AdventureTimerProps>(function AdventureTimer({
+  timerStore,
+  timeRemaining: timeRemainingProp = 0,
+  size = 'normal',
+  className,
+}) {
+  // Always call the hook (no conditional hook calls). When timerStore is absent,
+  // NO_OP_STORE returns 0 and never notifies, so this subscription is dormant.
+  const storeValue = useAdventureTimerValue(timerStore ?? NO_OP_STORE);
+  const timeRemaining = timerStore ? storeValue : timeRemainingProp;
+
+  return (
+    <AdventureTimerDisplay
+      timeRemaining={timeRemaining}
+      size={size}
+      className={className}
+    />
+  );
+});
+
 AdventureTimer.displayName = 'AdventureTimer';
+AdventureTimerDisplay.displayName = 'AdventureTimerDisplay';
 FlipDigit.displayName = 'FlipDigit';
 
 export default AdventureTimer;

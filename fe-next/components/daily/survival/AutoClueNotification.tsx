@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { X, Sparkles, Tag, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -65,7 +65,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
   const content = getClueContent();
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{
         x: direction === 'ltr' ? -300 : 300,
         opacity: 0,
@@ -100,7 +100,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
         )}
       >
         {/* Mascot/Icon Section */}
-        <motion.div
+        <AdaptiveMotion.div
           animate={{
             scale: [1, 1.1, 1],
             rotate: [0, 5, -5, 0],
@@ -113,7 +113,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
           className="flex-shrink-0 text-3xl"
         >
           {content.emoji}
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Content Section */}
         <div className="flex-1 min-w-0">
@@ -160,7 +160,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 };
 

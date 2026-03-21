@@ -26,6 +26,7 @@ import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../modules/blastModeManager.js';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
+import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 
 interface Achievement {
   key: string;
@@ -111,8 +112,13 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     });
   }
 
-  // Single atomic score update: word score + blast tile bonus (if any)
-  updatePlayerScore(gameCode, username, wordScore + blastTileBonus, true);
+  // In word-hunt mode, award extra score per letter for board words to reward vocabulary skill
+  const wordHuntBoardBonus = (game.gameMode === 'word-hunt' && game.wordHuntState)
+    ? normalizedWord.length * BOARD_WORD_SCORE_PER_LETTER
+    : 0;
+
+  // Single atomic score update: word score + blast tile bonus + word-hunt board bonus (if any)
+  updatePlayerScore(gameCode, username, wordScore + blastTileBonus + wordHuntBoardBonus, true);
 
   inc('wordAccepted');
   incPerGame(gameCode, 'wordAccepted');

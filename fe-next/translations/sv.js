@@ -545,7 +545,13 @@ const sv = {
     "words": "ord",
     "combo": "kombo",
     "streak": "svit",
-    "longest": "Langsta:"
+    "longest": "Langsta:",
+    "emojiCard": {
+      "classicHeader": "LexiClash Daglig #{number}",
+      "blastHeader": "LexiClash Blast 💥",
+      "share": "Dela",
+      "copy": "Kopiera"
+    }
   },
   "messaging": {
     "timeNow": "nu",
@@ -2394,6 +2400,10 @@ const sv = {
     "more": "mer",
     "soClose": "Du var så nära! Ett spel till kan göra det."
   },
+  "oneMoreGame": {
+    "defaultTitle": "Ännu ett spel?",
+    "defaultMessage": "Håll igång serien — spela igen!"
+  },
   "almostFound": {
     "title": "Du hittade nastan...",
     "matchPercent": "{percent}% matchning",
@@ -2747,6 +2757,17 @@ const sv = {
       "cancel": "Behåll aktivt"
     }
   },
+  "comebackBonus": {
+    "title": "Välkommen tillbaka!",
+    "close": "Stäng återkomstbonus",
+    "xpBonus": "XP-bonus",
+    "daysAway": "Du var borta i {days} dagar",
+    "xpDuration": "{hours}h med extra XP",
+    "hints": "Gratisledtrådar tillagda",
+    "streakFreezes": "Seriefrysningar tillagda",
+    "titleUnlocked": "Exklusiv titel upplåst!",
+    "claimButton": "Hämta min bonus"
+  },
   "calendar": {
     "title": "Dagliga Belöningar",
     "description": "Hämta dagliga belöningar för att tjäna mynt, XP och speciella föremål!",
@@ -2797,7 +2818,11 @@ const sv = {
     "freezes": "Svitfrysningar",
     "freezeDesc": "Använd en frysning för att skydda din svit en dag utan att vinna.",
     "useFreeze": "Använd svitfrysning",
-    "noFreezes": "Inga frysningar tillgängliga. Tjäna 1 gratis frysning per vecka!"
+    "noFreezes": "Inga frysningar tillgängliga. Tjäna 1 gratis frysning per vecka!",
+    "freezeShields": "{count} Frysningssköld",
+    "freezeShields_plural": "{count} Frysningssköldar",
+    "freezeShieldActive": "Streak Skyddad!",
+    "freezeShieldHint": "Sköldar aktiveras automatiskt om du missar en dag"
   },
   "partyScreen": {
     "title": "Partyskärm",
@@ -3887,7 +3912,10 @@ const sv = {
     "attempts": "Forsok",
     "beaten": "Besegrade",
     "winRate": "Vinstfrekvens",
-    "startChallenge": "Starta utmaning!"
+    "startChallenge": "Starta utmaning!",
+    "notFoundOrExpired": "Utmaningen hittades inte eller har gått ut",
+    "expired": "Denna utmaning har gått ut",
+    "loading": "Laddar utmaning..."
   },
   "challengeResults": {
     "youWon": "Du vann!",
@@ -4822,6 +4850,8 @@ const sv = {
     "drills": {
       "title": "Hjärnövningar",
       "brainTraining": "Hjärnträning",
+      "xpEarned": "+{xp} XP",
+      "goldEarned": "+{gold} guld",
       "round": "Runda",
       "level": "Nivå",
       "start": "Starta",

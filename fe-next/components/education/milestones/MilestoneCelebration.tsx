@@ -7,7 +7,8 @@
 
 'use client';
 
-import { memo, useEffect, useId } from 'react';
+import { memo, useEffect, useId, useRef } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -45,18 +46,9 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
   ({ milestone, onClose }) => {
     const { t } = useLanguage();
     const titleId = useId();
+    const modalRef = useRef<HTMLDivElement>(null);
 
-    // Handle escape key
-    useEffect(() => {
-      const handleEscape = (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && milestone) {
-          onClose();
-        }
-      };
-
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
-    }, [milestone, onClose]);
+    useFocusTrap(modalRef, !!milestone, onClose);
 
     // Fire confetti when modal opens
     useEffect(() => {
@@ -92,6 +84,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
         >
           {/* Modal Card */}
           <motion.div
+            ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',

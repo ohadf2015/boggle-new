@@ -11,7 +11,8 @@
 
 'use client';
 
-import { memo, useEffect, useId } from 'react';
+import { memo, useEffect, useId, useRef } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -51,22 +52,13 @@ const TOAST_DISMISS_MS = 3000;
 const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onClose }) => {
   const { t, dir } = useLanguage();
   const titleId = useId();
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Determine display mode based on tier
   const isToast = unlock?.tier === 'bronze' || unlock?.tier === 'silver';
   const isFullModal = unlock?.tier === 'gold' || unlock?.tier === 'platinum';
 
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && unlock) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [unlock, onClose]);
+  useFocusTrap(modalRef, !!isFullModal && !!unlock, onClose);
 
   // Fire confetti for Gold/Platinum only
   useEffect(() => {
@@ -183,6 +175,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
         >
           {/* Modal Card */}
           <motion.div
+            ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',

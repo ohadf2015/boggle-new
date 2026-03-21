@@ -392,6 +392,24 @@ describe('useBlastGame', () => {
 
       expect(result.current.gameState.isComplete).toBe(false);
     });
+
+    it('should auto-complete in multiplayer when all tiles are cleared (board-clear fires in MP)', () => {
+      const { result } = renderHook(() => useBlastGame(
+        { gridSize: 2, specialTileChance: 0, language: 'en' },
+        { isMultiplayer: true },
+      ));
+
+      act(() => {
+        result.current.clearTilesForWord(
+          [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
+          'test',
+          10,
+        );
+      });
+
+      // Board-clear celebration fires in MP just like singleplayer
+      expect(result.current.gameState.isComplete).toBe(true);
+    });
   });
 
   describe('modified grid for GridComponent', () => {

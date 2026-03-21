@@ -545,7 +545,13 @@ const he = {
     "words": "מילים",
     "combo": "קומבו",
     "streak": "רצף",
-    "longest": "הכי ארוכה:"
+    "longest": "הכי ארוכה:",
+    "emojiCard": {
+      "classicHeader": "LexiClash יומי #{number}",
+      "blastHeader": "LexiClash Blast 💥",
+      "share": "שתף",
+      "copy": "העתק"
+    }
   },
   "messaging": {
     "timeNow": "עכשיו",
@@ -2412,6 +2418,10 @@ const he = {
     "more": "עוד",
     "soClose": "היית כל כך קרוב! משחק אחד עוד יכול לעשות את זה."
   },
+  "oneMoreGame": {
+    "defaultTitle": "עוד משחק?",
+    "defaultMessage": "!המשך את הרצף — שחק שוב"
+  },
   "almostFound": {
     "title": "כמעט מצאת...",
     "matchPercent": "{percent}% התאמה",
@@ -3132,6 +3142,17 @@ const he = {
       "skip": "דלג"
     }
   },
+  "comebackBonus": {
+    "title": "ברוך שובך!",
+    "close": "סגור בונוס חזרה",
+    "xpBonus": "בונוס XP",
+    "daysAway": "היית משחק נעדר {days} ימים",
+    "xpDuration": "בוסט XP ל-{hours} שעות",
+    "hints": "רמזים חינמיים נוספו",
+    "streakFreezes": "הקפאות רצף נוספו",
+    "titleUnlocked": "תואר בלעדי נפתח!",
+    "claimButton": "קחי את הבונוס שלי"
+  },
   "calendar": {
     "title": "פרסים יומיים",
     "description": "אספו פרסים יומיים והרוויחו מטבעות, XP ופריטים מיוחדים!",
@@ -3182,7 +3203,11 @@ const he = {
     "freezes": "הקפאות רצף",
     "freezeDesc": "השתמש בהקפאה כדי להגן על הרצף שלך ליום אחד בלי לנצח.",
     "useFreeze": "השתמש בהקפאת רצף",
-    "noFreezes": "אין הקפאות זמינות. קבל הקפאה חינם בכל שבוע!"
+    "noFreezes": "אין הקפאות זמינות. קבל הקפאה חינם בכל שבוע!",
+    "freezeShields": "מגן הקפאה {count}",
+    "freezeShields_plural": "{count} מגני הקפאה",
+    "freezeShieldActive": "הרצף מוגן!",
+    "freezeShieldHint": "המגנים מופעלים אוטומטית אם תפספס יום"
   },
   "partyScreen": {
     "title": "מסך מסיבה",
@@ -3905,7 +3930,10 @@ const he = {
     "attempts": "ניסיונות",
     "beaten": "ניצחונות",
     "winRate": "אחוז הצלחה",
-    "startChallenge": "התחל אתגר!"
+    "startChallenge": "התחל אתגר!",
+    "notFoundOrExpired": "האתגר לא נמצא או שפג תוקפו",
+    "expired": "פג תוקף האתגר",
+    "loading": "טוען אתגר..."
   },
   "challengeResults": {
     "youWon": "ניצחת!",
@@ -4816,6 +4844,8 @@ const he = {
     "drills": {
       "title": "תרגילים קוגניטיביים",
       "brainTraining": "אימון קוגניטיבי",
+      "xpEarned": "+{xp} XP",
+      "goldEarned": "+{gold} זהב",
       "round": "סיבוב",
       "level": "רמה",
       "start": "התחל",

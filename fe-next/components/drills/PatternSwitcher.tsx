@@ -11,6 +11,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
+import { calculateWordScore } from '@/shared/utils/scoring';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -172,7 +173,7 @@ export default function PatternSwitcher({
       // Correct length! Show positive feedback
       wordsFoundSetRef.current.add(normalizedWord);
       setWordsFound(prev => [...prev, upperWord]);
-      const wordScore = word.length * 15;
+      const wordScore = calculateWordScore(word);
       setScore(prev => prev + wordScore);
 
       // Show positive feedback using WordFormingArea component

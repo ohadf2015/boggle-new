@@ -42,6 +42,15 @@ function seededRandom(seed: number) {
 // Background particle count (Lucide icons instead of emojis)
 const PARTICLE_COUNT = 9;
 
+// Extracted to module-level constant to prevent useParallax re-subscribing RAF/listeners every render
+const LEVEL_GRID_PARALLAX_OPTIONS = {
+  intensity: 1.0,
+  enableGyroscope: true,
+  enableGesture: true,
+  enableAmbient: true,
+  ambientSpeed: 0.6,
+} as const;
+
 /**
  * LevelGrid — RPG-style level select with immersive world background
  * Features: Shield header, decluttered RPG cards, boss card, milestone dividers,
@@ -53,13 +62,7 @@ export default function LevelGrid({
   onLevelSelect,
 }: LevelGridProps): React.JSX.Element {
   // Interactive parallax from gyroscope/mouse/touch
-  useParallax({
-    intensity: 1.0,
-    enableGyroscope: true,
-    enableGesture: true,
-    enableAmbient: true,
-    ambientSpeed: 0.6,
-  });
+  useParallax(LEVEL_GRID_PARALLAX_OPTIONS);
 
   // Compute level data
   const levels = useMemo(() => {

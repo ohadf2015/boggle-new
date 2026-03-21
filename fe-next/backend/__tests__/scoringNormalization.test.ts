@@ -119,8 +119,8 @@ describe('Scoring Normalization - Blast Tile Bonuses', () => {
 });
 
 describe('Scoring Normalization - Word Hunt First Finder', () => {
-  test('first finder bonus should be 35 (reduced from 50)', () => {
-    expect(HUNT_FIRST_FINDER_BONUS).toBe(35);
+  test('first finder bonus should be 20 (reduced from 35 to reduce dominance over vocabulary skill)', () => {
+    expect(HUNT_FIRST_FINDER_BONUS).toBe(20);
   });
 });
 

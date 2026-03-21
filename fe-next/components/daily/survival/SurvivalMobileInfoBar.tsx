@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Trophy, Package, Users, ChevronUp, ChevronDown, Heart, KeyRound, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
@@ -147,9 +147,9 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
       </button>
 
       {/* Expanded panel */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {isExpanded && (
-          <motion.div
+          <AdaptiveMotion.div
             data-testid="mobile-info-expanded"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -207,9 +207,9 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
                 )}
               </div>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 };

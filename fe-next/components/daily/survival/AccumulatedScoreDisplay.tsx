@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -82,7 +82,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
   return (
     <div className="relative">
       {/* Score Container */}
-      <motion.div
+      <AdaptiveMotion.div
         className={cn(
           'relative flex flex-col items-center gap-0.5',
           'px-3 py-1.5',
@@ -114,7 +114,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
 
         {/* Score Value */}
         <div className="relative">
-          <motion.div
+          <AdaptiveMotion.div
             key={currentScore}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -124,12 +124,12 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
             )}
           >
             {Math.max(0, Math.round(currentScore))}
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Increment Badge */}
-          <AnimatePresence>
+          <AdaptiveAnimatePresence>
             {lastIncrement !== null && lastIncrement !== 0 && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 0, scale: 0.5 }}
                 animate={{
                   opacity: [0, 1, 1, 0],
@@ -151,16 +151,16 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
               >
                 {lastIncrement > 0 ? '+' : ''}
                 {Math.round(lastIncrement)}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
         </div>
 
         {/* Tooltip Hint (on larger screens) */}
         <div className="hidden @[120px]:block text-[8px] text-neo-black/60 font-bold">
           {t('wordHunt.survival.scoreBreakdownTooltip')}
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 };

@@ -94,7 +94,7 @@ const WAVE_TABLE: WaveConfig[] = [
   // Wave 4 — frost + lightning + diamond unlock (15 moves)
   {
     minWordLength: 3, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16,
-    vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 50,
+    vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 150,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 15,
@@ -102,7 +102,7 @@ const WAVE_TABLE: WaveConfig[] = [
   // Wave 5 — all minus vortex (14 moves)
   {
     minWordLength: 4, specialTileChance: 0.23, iceDistribution: 0.28, goldDistribution: 0.14,
-    vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 80,
+    vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 250,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 14,
@@ -110,7 +110,7 @@ const WAVE_TABLE: WaveConfig[] = [
   // Wave 6+ — everything unlocked (12 moves — tight, requires strategy)
   {
     minWordLength: 4, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12,
-    vowelModifier: 0.82, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 120,
+    vowelModifier: 0.82, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 400,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 12,
@@ -128,7 +128,7 @@ export function getWaveConfig(wave: number): WaveConfig {
 
   // Beyond wave 6: increase scoreThreshold linearly
   if (wave > 6) {
-    config.scoreThreshold = 120 + (wave - 6) * 40;
+    config.scoreThreshold = 400 + (wave - 6) * 40;
   }
 
   return config;

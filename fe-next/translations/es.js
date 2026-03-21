@@ -541,7 +541,13 @@ const es = {
     "words": "palabras",
     "combo": "combo",
     "streak": "racha",
-    "longest": "Más larga:"
+    "longest": "Más larga:",
+    "emojiCard": {
+      "classicHeader": "LexiClash Diario #{number}",
+      "blastHeader": "LexiClash Blast 💥",
+      "share": "Compartir",
+      "copy": "Copiar"
+    }
   },
   "messaging": {
     "timeNow": "ahora",
@@ -2299,6 +2305,10 @@ const es = {
     "more": "más",
     "soClose": "¡Estuviste tan cerca! Una partida más podría lograrlo."
   },
+  "oneMoreGame": {
+    "defaultTitle": "¿Una partida más?",
+    "defaultMessage": "¡Mantén la racha — vuelve a jugar!"
+  },
   "mysteryReward": {
     "title": "Recompensa Misteriosa",
     "youFound": "¡Encontraste una recompensa misteriosa!",
@@ -2927,6 +2937,17 @@ const es = {
       "skip": "Saltar"
     }
   },
+  "comebackBonus": {
+    "title": "¡Bienvenido de vuelta!",
+    "close": "Cerrar bono de regreso",
+    "xpBonus": "Bono XP",
+    "daysAway": "Estuviste ausente {days} días",
+    "xpDuration": "{hours}h de XP potenciado",
+    "hints": "Pistas gratuitas añadidas",
+    "streakFreezes": "Congelaciones de racha añadidas",
+    "titleUnlocked": "¡Título exclusivo desbloqueado!",
+    "claimButton": "Reclamar mi bono"
+  },
   "calendar": {
     "title": "Recompensas Diarias",
     "description": "¡Reclama recompensas diarias para ganar monedas, XP y objetos especiales!",
@@ -2977,7 +2998,11 @@ const es = {
     "freezes": "Congelaciones de Racha",
     "freezeDesc": "Usa una congelación para proteger tu racha por un día sin ganar.",
     "useFreeze": "Usar Congelación de Racha",
-    "noFreezes": "No hay congelaciones disponibles. ¡Gana 1 congelación gratis por semana!"
+    "noFreezes": "No hay congelaciones disponibles. ¡Gana 1 congelación gratis por semana!",
+    "freezeShields": "{count} Escudo de Congelación",
+    "freezeShields_plural": "{count} Escudos de Congelación",
+    "freezeShieldActive": "¡Racha Protegida!",
+    "freezeShieldHint": "Los escudos se activan automáticamente si pierdes un día"
   },
   "partyScreen": {
     "title": "Pantalla de Fiesta",
@@ -3947,7 +3972,10 @@ const es = {
     "attempts": "Intentos",
     "beaten": "Derrotados",
     "winRate": "% Victoria",
-    "startChallenge": "¡Iniciar desafío!"
+    "startChallenge": "¡Iniciar desafío!",
+    "notFoundOrExpired": "Desafío no encontrado o ha expirado",
+    "expired": "Este desafío ha expirado",
+    "loading": "Cargando desafío..."
   },
   "challengeResults": {
     "youWon": "¡Ganaste!",

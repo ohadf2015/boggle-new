@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Plus, TrendingUp, Clock, Users, Hash, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -166,7 +166,7 @@ const PuzzleBrowse: React.FC = () => {
         {!loading && !error && puzzles.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {puzzles.map((puzzle, i) => (
-              <motion.div
+              <AdaptiveMotion.div
                 key={puzzle.puzzleCode}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -205,7 +205,7 @@ const PuzzleBrowse: React.FC = () => {
                     </div>
                   </div>
                 </Link>
-              </motion.div>
+              </AdaptiveMotion.div>
             ))}
           </div>
         )}

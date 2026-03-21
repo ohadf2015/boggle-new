@@ -83,9 +83,13 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
     const payload = validation.data as z.infer<typeof createClassroomGameSchema>;
 
-    // Auth check: teacherId must match authenticated user
+    // Auth check: teacherId MUST match authenticated user (mandatory, not optional)
     const authUserId = getAuthUserId(socket);
-    if (authUserId && authUserId !== payload.teacherId) {
+    if (!authUserId) {
+      socket.emit('classroomGameError', { error: 'Authentication required to create classroom games' });
+      return;
+    }
+    if (authUserId !== payload.teacherId) {
       socket.emit('classroomGameError', { error: 'Teacher ID does not match authenticated user' });
       return;
     }

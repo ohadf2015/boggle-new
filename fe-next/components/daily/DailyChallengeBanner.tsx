@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useInterval } from '@/hooks/useSafeTimeout';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Target, Flame, Check, Clock, Sparkles, X, Star, Zap } from 'lucide-react';
@@ -110,18 +111,24 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
 
   // Update countdown timer
   // Performance: Skip updates when tab is hidden to reduce CPU usage
+  useInterval(() => {
+    // Skip update if tab is not visible (saves CPU cycles)
+    if (document.visibilityState === 'hidden') return;
+    const seconds = getSecondsUntilNextDaily();
+    setCountdown(formatCountdown(seconds));
+  }, isClient ? 1000 : null);
+
+  // Set initial countdown and handle visibility changes
   useEffect(() => {
     if (!isClient) return;
 
     const updateCountdown = () => {
-      // Skip update if tab is not visible (saves CPU cycles)
       if (document.visibilityState === 'hidden') return;
       const seconds = getSecondsUntilNextDaily();
       setCountdown(formatCountdown(seconds));
     };
 
     updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
 
     // Update immediately when tab becomes visible again
     const handleVisibilityChange = () => {
@@ -132,7 +139,6 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      clearInterval(interval);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [isClient]);

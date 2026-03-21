@@ -12,6 +12,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Eye } from 'lucide-react';
+import NextStepPrompt from '@/components/results/NextStepPrompt';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
@@ -28,6 +29,7 @@ import {
   ShareSection,
   CoinUnlockCard,
   MoreOptionsAccordion,
+  StreakFreezeIndicator,
   type WordHuntStats,
   type CoinReward,
 } from './results';
@@ -82,6 +84,9 @@ export interface WordHuntResultsContentProps {
   onGameLanguageChange?: (lang: Language) => void;
   onShowCreatePuzzle: () => void;
   onSpendStart: (position: { x: number; y: number }, amount: number) => void;
+  onBackToLobby?: () => void;
+  freezesAvailable?: number;
+  isStreakProtected?: boolean;
   t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
 }
 
@@ -109,6 +114,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   onGameLanguageChange,
   onShowCreatePuzzle,
   onSpendStart,
+  onBackToLobby,
+  freezesAvailable = 0,
+  isStreakProtected = false,
   t,
 }) => (
   <div className="space-y-4">
@@ -137,6 +145,15 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       wordsDiscovered={result.wordsDiscovered?.length || 0}
       t={t}
     />
+
+    {/* Streak freeze shields indicator */}
+    {(freezesAvailable > 0 || isStreakProtected) && (
+      <StreakFreezeIndicator
+        freezesAvailable={freezesAvailable}
+        isProtected={isStreakProtected}
+        t={t}
+      />
+    )}
 
     {/* WIN state: Performance breakdown with 3 bars */}
     {result.solved && (
@@ -298,5 +315,20 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       onGameLanguageChange={onGameLanguageChange}
       t={t}
     />
+
+    {/* Next Step — guide player to multiplayer after word hunt */}
+    {onBackToLobby && (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <NextStepPrompt
+          currentMode="word-hunt"
+          onBackToLobby={onBackToLobby}
+          variant="mobile"
+        />
+      </motion.div>
+    )}
   </div>
 );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Trophy, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
@@ -106,9 +106,9 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
 
       {/* Leaderboard List */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-1 scrollbar-thin scrollbar-thumb-neo-cream/20 scrollbar-track-transparent">
-        <AnimatePresence mode="popLayout">
+        <AdaptiveAnimatePresence mode="popLayout">
           {entries.map((entry) => (
-            <motion.div
+            <AdaptiveMotion.div
               key={`${entry.rank}-${entry.displayName}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -166,9 +166,9 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
               <span className="font-black text-sm tabular-nums text-neo-lime flex-shrink-0">
                 {entry.score}
               </span>
-            </motion.div>
+            </AdaptiveMotion.div>
           ))}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         {/* Empty State */}
         {entries.length === 0 && (

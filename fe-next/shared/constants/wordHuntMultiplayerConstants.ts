@@ -5,8 +5,10 @@
 
 export const HUNT_LIFE_DRAIN_RATE = 1.2;
 export const HUNT_INITIAL_LIFE = 100;
-export const HUNT_FIRST_FINDER_BONUS = 35;
-export const HUNT_WRONG_GUESS_PENALTY = 5;
+export const HUNT_FIRST_FINDER_BONUS = 20;
+export const HUNT_WRONG_GUESS_PENALTY = 15;
+/** Score awarded per letter when a non-target board word is found in word-hunt mode */
+export const BOARD_WORD_SCORE_PER_LETTER = 2;
 export const HUNT_TARGET_MIN_LENGTH = 4;
 export const HUNT_TARGET_MAX_LENGTH = 5;
 export const HUNT_LIFE_DRAIN_INTERVAL_MS = 1000;

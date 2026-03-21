@@ -17,6 +17,7 @@ import { useHUDTheme } from '@/contexts/AdventureThemeContext';
 import AdventureTimer from '../AdventureTimer';
 import { RollingNumber } from './RollingNumber';
 import { displayScore } from '@/utils/scoreDisplay';
+import type { AdventureTimerStore } from '@/hooks/useAdventureTimerStore';
 
 // ==============================================
 // TYPES
@@ -26,7 +27,15 @@ interface GameHeaderProps {
   worldNumber: number;
   levelNumber: number;
   score: number;
-  timeRemaining: number;
+  /**
+   * External timer store (preferred). Passed to AdventureTimer so only the
+   * timer widget re-renders on tick, not GameHeader or AdventureGame.
+   */
+  timerStore?: AdventureTimerStore;
+  /**
+   * Fallback timeRemaining for legacy/test usage when timerStore is absent.
+   */
+  timeRemaining?: number;
   isPaused: boolean;
   onPauseToggle: () => void;
   onExit: () => void;
@@ -49,6 +58,7 @@ export const GameHeader = memo(function GameHeader({
   worldNumber,
   levelNumber,
   score,
+  timerStore,
   timeRemaining,
   isPaused,
   onPauseToggle,
@@ -137,6 +147,7 @@ export const GameHeader = memo(function GameHeader({
       <div className="flex items-center gap-1 sm:gap-2">
         {/* Timer — most important game state indicator, visually prominent */}
         <AdventureTimer
+          timerStore={timerStore}
           timeRemaining={timeRemaining}
           size="compact"
         />

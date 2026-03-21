@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LifeGainAnimation } from '../LifeGainAnimation';
@@ -75,7 +75,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
       />
 
       {/* Heart icon — neo-brutalist circle with pulse */}
-      <motion.div
+      <AdaptiveMotion.div
         key={`heart-${isLifeGaining ? 'beating' : 'idle'}`}
         className={cn(
           "flex-shrink-0 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full",
@@ -98,10 +98,10 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
           "w-4 h-4 sm:w-5 sm:h-5 text-white fill-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
           isLifeGaining && "heart-beating"
         )} />
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Life bar container */}
-      <motion.div
+      <AdaptiveMotion.div
         className={cn(
           "flex-1 h-7 sm:h-8 rounded-neo overflow-hidden border-3 shadow-hard-sm relative",
           "bg-neo-navy/80",
@@ -116,7 +116,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
         transition={{ duration: 1, repeat: isLow && !isLifeGaining ? Infinity : 0 }}
       >
         {/* Fill bar */}
-        <motion.div
+        <AdaptiveMotion.div
           className={cn(
             "h-full flex items-center relative overflow-hidden",
             "bg-gradient-to-r",
@@ -132,7 +132,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
 
           {/* Inner highlight — top edge glow */}
           <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-white/40 via-white/20 to-white/40 pointer-events-none" />
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Segment markers */}
         {segments.map((seg) => (
@@ -158,7 +158,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
         {!skipAnimations && isDanger && pct > 0 && !isGameOver && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {[0, 1, 2, 3].map((i) => (
-              <motion.div
+              <AdaptiveMotion.div
                 key={i}
                 className="absolute w-1.5 h-1.5 bg-red-400 rounded-full opacity-80"
                 style={{ left: `${pct}%`, top: '50%' }}
@@ -178,7 +178,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
             ))}
           </div>
         )}
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 };

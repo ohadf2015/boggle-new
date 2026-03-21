@@ -45,14 +45,14 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
     async function loadChallenge() {
       const data = await getChallenge(challengeCode);
       if (!data) {
-        setError('Challenge not found or has expired');
+        setError(t('challengeView.notFoundOrExpired'));
         setPhase('error');
         return;
       }
 
       // Check if expired
       if (new Date(data.expiresAt) < new Date()) {
-        setError('This challenge has expired');
+        setError(t('challengeView.expired'));
         setPhase('error');
         return;
       }
@@ -140,7 +140,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   if (phase === 'loading') {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <PageLoader size="lg" text="Loading challenge..." />
+        <PageLoader size="lg" text={t('challengeView.loading')} />
       </div>
     );
   }

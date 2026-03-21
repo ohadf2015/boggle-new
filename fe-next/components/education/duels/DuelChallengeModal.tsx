@@ -15,7 +15,8 @@
  * - Neo-brutalist modal style
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef, useId } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 import { cn } from '@/lib/utils';
@@ -48,22 +49,15 @@ export default function DuelChallengeModal({
 }: DuelChallengeModalProps) {
   const { t } = useLanguage();
   const { createChallenge } = useDuelSocket();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+
+  useFocusTrap(modalRef, true, onClose);
 
   // State
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
   const [duelType, setDuelType] = useState<'async' | 'realtime'>('async');
   const [isCreating, setIsCreating] = useState(false);
-
-  // Dismiss modal on Escape key press
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
 
   // Handle send challenge
   const handleSendChallenge = useCallback(() => {
@@ -90,6 +84,10 @@ export default function DuelChallengeModal({
 
       {/* Modal */}
       <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
         data-testid="duel-challenge-modal"
         className={cn(
           'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
@@ -102,7 +100,7 @@ export default function DuelChallengeModal({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Swords className="w-6 h-6 text-neo-yellow" />
-            <h3 className="text-xl font-neo-display font-black text-neo-white">
+            <h3 id={titleId} className="text-xl font-neo-display font-black text-neo-white">
               {t('challengePlayer', { name: opponent.displayName ?? '?' })}
             </h3>
           </div>

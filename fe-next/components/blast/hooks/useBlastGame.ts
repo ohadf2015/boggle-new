@@ -218,9 +218,8 @@ export function useBlastGame(
 
   // Auto-complete when cumulative tilesCleared reaches the board size
   // Award leftover move bonus (Sugar Crush equivalent)
-  // Skipped in multiplayer — server timer is authoritative; tiles keep cascading/refilling
+  // Fires in both singleplayer and multiplayer — board-clear celebration should always trigger
   useEffect(() => {
-    if (options?.isMultiplayer) return;
     if (!isComplete && !isDeadEnd && tilesCleared >= totalTiles && totalTiles > 0) {
       const bonus = calculateLeftoverMoveBonus(gsMovesRemaining);
       setGameState(prev => ({

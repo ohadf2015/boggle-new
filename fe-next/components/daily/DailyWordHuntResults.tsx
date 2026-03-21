@@ -82,6 +82,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [showSpendAnimation, setShowSpendAnimation] = useState(false);
   const [spendAnimationPosition, setSpendAnimationPosition] = useState({ x: 0, y: 0 });
   const [spendAnimationAmount, setSpendAnimationAmount] = useState(0);
+  const [freezesAvailable, setFreezesAvailable] = useState(0);
+  const [isStreakProtected, setIsStreakProtected] = useState(false);
 
   // Handle spend animation trigger
   const handleSpendStart = useCallback((position: { x: number; y: number }, amount: number) => {
@@ -220,6 +222,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [isNewCompletion, fetchStats]);
 
+  // Fetch streak freeze data for authenticated users
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    fetch('/api/streak')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!data) return;
+        setFreezesAvailable(data.freezesAvailable ?? 0);
+        const today = new Date().toISOString().split('T')[0];
+        const protected_ = data.protectedUntil && new Date(data.protectedUntil) >= new Date(today);
+        setIsStreakProtected(Boolean(protected_));
+      })
+      .catch(() => {/* silently ignore */});
+  }, [isAuthenticated]);
+
   // Use confetti effects hook
   const { handleBadgeClickConfetti } = useConfettiEffects({
     isNewCompletion,
@@ -290,6 +307,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     onGameLanguageChange,
     onShowCreatePuzzle: () => setShowCreatePuzzle(true),
     onSpendStart: handleSpendStart,
+    onBackToLobby: onBack,
+    freezesAvailable,
+    isStreakProtected,
     t,
   };
 
