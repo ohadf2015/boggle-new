@@ -26,6 +26,12 @@ const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureMod
   loading: () => null,
 });
 
+// Lazy-load push notification prompt — shown after engagement threshold
+const PushNotificationPrompt = nextDynamic(
+  () => import('@/components/notifications/PushNotificationPrompt'),
+  { loading: () => null }
+);
+
 // Lazy-load cookie consent banner — only needed on first visit
 const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
 
@@ -742,6 +748,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         <GlobalBottomNav />
                     </div>
                     <PWAInstallPrompt />
+                    <PushNotificationPrompt />
                     <EmailCaptureModal />
                     <NewYearCountdown />
                     <CookieConsent />

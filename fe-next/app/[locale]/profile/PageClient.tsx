@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { User, ArrowLeft, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Trophy, Gem } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { EnhancedButton } from '@/components/ui/EnhancedButton';
@@ -383,6 +384,12 @@ export default function ProfilePageClient(): React.JSX.Element {
           {user && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
               <ReferralCard />
+              <Link
+                href={`/${language}/referrals`}
+                className="block text-center text-sm font-bold text-neo-cyan hover:text-neo-cyan/80 mt-2 transition-colors"
+              >
+                {t('referralDashboard.title')} &rarr;
+              </Link>
             </motion.div>
           )}
 

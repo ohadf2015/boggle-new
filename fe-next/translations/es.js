@@ -741,6 +741,8 @@ const es = {
       "male": "Masculino",
       "female": "Femenino",
       "eyebrows": "Cejas",
+      "facialHair": "Barba",
+      "facialHairStyle": "Estilo",
       "colorTheme": "Tema de color"
     },
     "premium": {
@@ -2971,6 +2973,24 @@ const es = {
       "subtitle": "¡Obtén 100 XP por cada amigo que se una!"
     }
   },
+  "referralDashboard": {
+    "title": "Mis Referidos",
+    "friendsInvited": "Amigos Invitados",
+    "friendsJoined": "Amigos Unidos",
+    "coinsEarned": "Monedas Ganadas",
+    "yourLink": "Tu Enlace de Referido",
+    "copied": "¡Enlace copiado!",
+    "milestone": "Progreso de Hitos",
+    "inviteMore": "¡Invita más amigos para desbloquear recompensas!",
+    "noReferrals": "Sin referidos aún. ¡Comparte tu enlace!",
+    "active": "Activo",
+    "invited": "Invitado",
+    "inactive": "Inactivo",
+    "shareVia": "Compartir vía",
+    "recentReferrals": "Referidos Recientes",
+    "loginRequired": "Inicia sesión para ver tu panel de referidos.",
+    "shareText": "¡Únete a LexiClash! Usa mi código: {code}"
+  },
   "coins": {
     "title": "Monedas y Recompensas",
     "description": "Gana monedas jugando, ganando partidas y desbloqueando logros. ¡Úsalas para coleccionar artículos especiales!",
@@ -3556,7 +3576,24 @@ const es = {
     "title": "Modo Clasificatorio",
     "unlocked": "Desbloqueado",
     "unlockProgress": "{current}/{required} partidas para desbloquear",
-    "toGo": "restantes"
+    "toGo": "restantes",
+    "leaderboard": "Clasificación",
+    "yourRating": "Tu puntuación",
+    "ratingChange": "Cambio de puntuación",
+    "gamesPlayed": "Partidas jugadas",
+    "winRate": "Tasa de victorias",
+    "peakRating": "Puntuación máxima",
+    "noRatingYet": "Sin puntuación aún",
+    "tiers": {
+      "unranked": "Sin clasificar",
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "platinum": "Platino",
+      "diamond": "Diamante",
+      "master": "Maestro",
+      "grandmaster": "Gran Maestro"
+    }
   },
   "growth": {
     "dayStreak": "racha de días",
@@ -6199,7 +6236,13 @@ const es = {
       "frozen": "¡Congelado!",
       "shuffle": "Mezclar",
       "shuffleWithCount": "Mezclar (×{count})",
-      "detonate": "Detonar"
+      "detonate": "Detonar",
+      "gemDetectorActive": "¡Detector de gemas activo — fichas raras resaltadas!",
+      "shuffleBoard": "Mezclar tablero",
+      "shuffleUsed": "¡Tablero mezclado! ({remaining} restantes)",
+      "freezeTimer": "Congelar temporizador",
+      "timerFrozen": "¡Temporizador congelado por {seconds}s!",
+      "shieldBlocked": "¡Escudo bloqueó {percent}% de daño!"
     },
     "hints": {
       "minLetters2": "2+ letras",
@@ -6807,7 +6850,8 @@ const es = {
       "easyDesc": "Menos especiales, cascadas relajadas",
       "mediumDesc": "Caos balanceado",
       "hardDesc": "Especiales por todos lados, oleadas brutales",
-      "resumeWave": "Empezar desde Oleada {wave}"
+      "resumeWave": "Empezar desde Oleada {wave}",
+      "savedScore": "Puntos: {score}"
     },
     "helpIceLabel": "Hielo",
     "helpIce": "2 golpes para romper. Se agrieta en el primero.",
@@ -6835,6 +6879,7 @@ const es = {
     "outOfMoves": "¡Sin Movimientos!",
     "movesBonus": "Bonus de Movimientos",
     "sugarCrush": "¡Sugar Crush!",
+    "checkpointSaved": "¡Checkpoint guardado!",
     "waveIntro": {
       "title": "Oleada {wave}",
       "objectives": "Objetivos",
@@ -8097,6 +8142,19 @@ const es = {
       "actionUrlLabel": "URL de Acción",
       "sendSuccess": "¡Notificación enviada con éxito!",
       "sendError": "Error al enviar notificación. Intenta de nuevo."
+    },
+    "prompt": {
+      "title": "¡Mantente en el juego!",
+      "body": "Recibe recordatorios de desafíos diarios y advertencias de racha",
+      "enable": "Activar notificaciones",
+      "notNow": "Ahora no"
+    },
+    "preferences": {
+      "title": "Configuración de notificaciones",
+      "dailyChallenge": "Recordatorio de desafío diario",
+      "streakWarning": "Advertencia de racha en riesgo",
+      "friendInvites": "Invitaciones de desafío de amigos",
+      "weeklySummary": "Resumen semanal"
     }
   },
   "native": {

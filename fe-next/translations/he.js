@@ -677,6 +677,8 @@ const he = {
       "male": "זכר",
       "female": "נקבה",
       "eyebrows": "גבות",
+      "facialHair": "זקן",
+      "facialHairStyle": "סגנון",
       "colorTheme": "ערכת צבעים"
     },
     "premium": {
@@ -3176,6 +3178,24 @@ const he = {
       "subtitle": "קבל 100 XP על כל חבר שמצטרף!"
     }
   },
+  "referralDashboard": {
+    "title": "ההפניות שלי",
+    "friendsInvited": "חברים הוזמנו",
+    "friendsJoined": "חברים הצטרפו",
+    "coinsEarned": "מטבעות שנצברו",
+    "yourLink": "קישור ההפניה שלך",
+    "copied": "הקישור הועתק!",
+    "milestone": "התקדמות אבני דרך",
+    "inviteMore": "הזמן עוד חברים כדי לפתוח פרסים!",
+    "noReferrals": "אין הפניות עדיין. שתף את הקישור שלך!",
+    "active": "פעיל",
+    "invited": "הוזמן",
+    "inactive": "לא פעיל",
+    "shareVia": "שתף דרך",
+    "recentReferrals": "הפניות אחרונות",
+    "loginRequired": "התחבר כדי לצפות בלוח ההפניות שלך.",
+    "shareText": "הצטרף אליי ב-LexiClash! השתמש בקוד ההפניה שלי: {code}"
+  },
   "coins": {
     "title": "מטבעות ופרסים",
     "description": "צבור מטבעות במשחקים, ניצחונות והישגים. השתמש בהם לאיסוף פריטים מיוחדים!",
@@ -3513,7 +3533,24 @@ const he = {
     "title": "מצב מדורג",
     "unlocked": "פתוח",
     "unlockProgress": "{current}/{required} משחקים לפתיחה",
-    "toGo": "נשאר"
+    "toGo": "נשאר",
+    "leaderboard": "טבלת דירוג",
+    "yourRating": "הדירוג שלך",
+    "ratingChange": "שינוי דירוג",
+    "gamesPlayed": "משחקים ששוחקו",
+    "winRate": "אחוז ניצחון",
+    "peakRating": "דירוג שיא",
+    "noRatingYet": "שחק משחקים מדורגים כדי לקבל דירוג",
+    "tiers": {
+      "unranked": "לא מדורג",
+      "bronze": "ארד",
+      "silver": "כסף",
+      "gold": "זהב",
+      "platinum": "פלטינה",
+      "diamond": "יהלום",
+      "master": "מאסטר",
+      "grandmaster": "גרנדמאסטר"
+    }
   },
   "growth": {
     "dayStreak": "ימי רצף",
@@ -5860,7 +5897,13 @@ const he = {
       "frozen": "מוקפא!",
       "shuffle": "ערבוב",
       "shuffleWithCount": "ערבוב (×{count})",
-      "detonate": "פיצוץ"
+      "detonate": "פיצוץ",
+      "gemDetectorActive": "גלאי אבני חן פעיל — אריחים נדירים מודגשים!",
+      "shuffleBoard": "ערבוב לוח",
+      "shuffleUsed": "הלוח עורבב! ({remaining} נותרו)",
+      "freezeTimer": "הקפאת טיימר",
+      "timerFrozen": "הטיימר הוקפא ל-{seconds} שניות!",
+      "shieldBlocked": "המגן חסם {percent}% נזק!"
     },
     "hints": {
       "minLetters2": "2+ אותיות",
@@ -6748,7 +6791,8 @@ const he = {
       "easyDesc": "פחות מיוחדים, קסקדות רגועות",
       "mediumDesc": "כאוס מאוזן",
       "hardDesc": "מיוחדים בכל מקום, גלים אכזריים",
-      "resumeWave": "התחל מגל {wave}"
+      "resumeWave": "התחל מגל {wave}",
+      "savedScore": "ניקוד: {score}"
     },
     "hint": "רמז",
     "stuck": "תקוע?",
@@ -6766,6 +6810,7 @@ const he = {
     "outOfMoves": "נגמרו המהלכים!",
     "movesBonus": "בונוס מהלכים",
     "sugarCrush": "פיצוץ סופי!",
+    "checkpointSaved": "נקודת שמירה נשמרה!",
     "waveIntro": {
       "title": "גל {wave}",
       "objectives": "משימות",
@@ -8043,6 +8088,19 @@ const he = {
       "actionUrlLabel": "קישור פעולה",
       "sendSuccess": "ההתראה נשלחה בהצלחה!",
       "sendError": "שליחת ההתראה נכשלה. נסה שוב."
+    },
+    "prompt": {
+      "title": "!הישאר במשחק",
+      "body": "קבל תזכורות לאתגרים יומיים ואזהרות רצף",
+      "enable": "הפעל התראות",
+      "notNow": "לא עכשיו"
+    },
+    "preferences": {
+      "title": "הגדרות התראות",
+      "dailyChallenge": "תזכורת אתגר יומי",
+      "streakWarning": "אזהרת רצף בסיכון",
+      "friendInvites": "הזמנות אתגר מחברים",
+      "weeklySummary": "סיכום שבועי"
     }
   },
   "native": {

@@ -6,6 +6,14 @@
 // Types
 export * from './types';
 
+// Category preferences
+export {
+  loadCategoryPreferences,
+  saveCategoryPreferences,
+  shouldShowPushPrompt,
+  dismissPushPrompt,
+} from './categoryPreferences';
+
 // Permission handling
 export {
   checkNotificationPermission,

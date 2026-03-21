@@ -144,3 +144,48 @@ export interface DailyScheduleOptions {
   /** Optional letter hint to include in message */
   letterHint?: string;
 }
+
+/**
+ * Category-level notification preferences
+ * Controls which types of notifications the user receives
+ */
+export interface NotificationCategoryPreferences {
+  /** Daily challenge reminder (default: true) */
+  dailyChallenge: boolean;
+  /** Streak at risk warning (default: true) */
+  streakWarning: boolean;
+  /** Friend challenge invites (default: true) */
+  friendInvites: boolean;
+  /** Weekly summary digest (default: false) */
+  weeklySummary: boolean;
+}
+
+/**
+ * Default category preferences
+ */
+export const DEFAULT_CATEGORY_PREFERENCES: NotificationCategoryPreferences = {
+  dailyChallenge: true,
+  streakWarning: true,
+  friendInvites: true,
+  weeklySummary: false,
+};
+
+/**
+ * Storage key for category preferences
+ */
+export const CATEGORY_PREFERENCES_KEY = 'lexiclash_notification_categories';
+
+/**
+ * Storage key for push prompt dismissal
+ */
+export const PROMPT_DISMISSED_UNTIL_KEY = 'lexiclash_push_prompt_dismissed_until';
+
+/**
+ * Number of games user must play before seeing push prompt
+ */
+export const MIN_GAMES_BEFORE_PROMPT = 3;
+
+/**
+ * Days to suppress prompt after "Not Now" is clicked
+ */
+export const PROMPT_DISMISS_DAYS = 7;

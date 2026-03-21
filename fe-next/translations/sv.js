@@ -677,6 +677,8 @@ const sv = {
       "male": "Man",
       "female": "Kvinna",
       "eyebrows": "Ögonbryn",
+      "facialHair": "Skägg",
+      "facialHairStyle": "Stil",
       "colorTheme": "Färgtema"
     },
     "premium": {
@@ -2791,6 +2793,24 @@ const sv = {
       "subtitle": "Få 100 XP för varje vän som går med!"
     }
   },
+  "referralDashboard": {
+    "title": "Mina Hänvisningar",
+    "friendsInvited": "Vänner Inbjudna",
+    "friendsJoined": "Vänner Gick Med",
+    "coinsEarned": "Mynt Intjänade",
+    "yourLink": "Din Hänvisningslänk",
+    "copied": "Länk kopierad!",
+    "milestone": "Milstolpeframsteg",
+    "inviteMore": "Bjud in fler vänner för att låsa upp belöningar!",
+    "noReferrals": "Inga hänvisningar ännu. Dela din länk!",
+    "active": "Aktiv",
+    "invited": "Inbjuden",
+    "inactive": "Inaktiv",
+    "shareVia": "Dela via",
+    "recentReferrals": "Senaste Hänvisningar",
+    "loginRequired": "Logga in för att se din hänvisningspanel.",
+    "shareText": "Gå med mig på LexiClash! Använd min hänvisningskod: {code}"
+  },
   "coins": {
     "title": "Mynt & Belöningar",
     "description": "Tjäna mynt genom att spela, vinna och låsa upp prestationer. Använd dem för att samla speciella föremål!",
@@ -3128,7 +3148,24 @@ const sv = {
     "title": "Rankat läge",
     "unlocked": "Upplåst",
     "unlockProgress": "{current}/{required} spel för att låsa upp",
-    "toGo": "kvar"
+    "toGo": "kvar",
+    "leaderboard": "Rankad topplista",
+    "yourRating": "Din ranking",
+    "ratingChange": "Rankingändring",
+    "gamesPlayed": "Spelade spel",
+    "winRate": "Vinstprocent",
+    "peakRating": "Toppranking",
+    "noRatingYet": "Spela rankade spel för att få en ranking",
+    "tiers": {
+      "unranked": "Orankad",
+      "bronze": "Brons",
+      "silver": "Silver",
+      "gold": "Guld",
+      "platinum": "Platina",
+      "diamond": "Diamant",
+      "master": "Mästare",
+      "grandmaster": "Stormästare"
+    }
   },
   "legal": {
     "title": "Juridiskt",
@@ -5835,7 +5872,13 @@ const sv = {
       "frozen": "Fryst!",
       "shuffle": "Blanda",
       "shuffleWithCount": "Blanda (×{count})",
-      "detonate": "Detonera"
+      "detonate": "Detonera",
+      "gemDetectorActive": "Ädelstensdetektorn aktiv — sällsynta brickor markerade!",
+      "shuffleBoard": "Blanda brädet",
+      "shuffleUsed": "Brädet blandat! ({remaining} kvar)",
+      "freezeTimer": "Frys timer",
+      "timerFrozen": "Timer frusen i {seconds}s!",
+      "shieldBlocked": "Sköld blockerade {percent}% skada!"
     },
     "hints": {
       "minLetters2": "2+ bokstäver",
@@ -6723,7 +6766,8 @@ const sv = {
       "easyDesc": "Färre specialbrickor, lugna kaskader",
       "mediumDesc": "Balanserat kaos",
       "hardDesc": "Specialbrickor överallt, brutala vågor",
-      "resumeWave": "Börja från Våg {wave}"
+      "resumeWave": "Börja från Våg {wave}",
+      "savedScore": "Poäng: {score}"
     },
     "hint": "Tips",
     "stuck": "Fastnat?",
@@ -6741,6 +6785,7 @@ const sv = {
     "outOfMoves": "Inga drag kvar!",
     "movesBonus": "Dragbonus",
     "sugarCrush": "Sockerkross!",
+    "checkpointSaved": "Checkpoint sparat!",
     "waveIntro": {
       "title": "Vag {wave}",
       "objectives": "Mal",
@@ -8038,6 +8083,19 @@ const sv = {
       "actionUrlLabel": "Åtgärds-URL",
       "sendSuccess": "Avisering skickad!",
       "sendError": "Misslyckades med att skicka avisering. Försök igen."
+    },
+    "prompt": {
+      "title": "Håll dig i spelet!",
+      "body": "Få påminnelser om dagliga utmaningar och streak-varningar",
+      "enable": "Aktivera aviseringar",
+      "notNow": "Inte nu"
+    },
+    "preferences": {
+      "title": "Aviseringsinställningar",
+      "dailyChallenge": "Daglig utmaningspåminnelse",
+      "streakWarning": "Varning för hotad streak",
+      "friendInvites": "Kompis-utmaningar",
+      "weeklySummary": "Veckosammanfattning"
     }
   },
   "native": {

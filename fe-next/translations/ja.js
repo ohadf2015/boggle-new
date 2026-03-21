@@ -677,6 +677,8 @@ const ja = {
       "male": "男性",
       "female": "女性",
       "eyebrows": "眉毛",
+      "facialHair": "ヒゲ",
+      "facialHairStyle": "スタイル",
       "colorTheme": "カラーテーマ"
     },
     "premium": {
@@ -2791,6 +2793,24 @@ const ja = {
       "subtitle": "参加した友達ごとに100 XPをゲット！"
     }
   },
+  "referralDashboard": {
+    "title": "マイ紹介",
+    "friendsInvited": "招待した友達",
+    "friendsJoined": "参加した友達",
+    "coinsEarned": "獲得コイン",
+    "yourLink": "あなたの紹介リンク",
+    "copied": "リンクをコピーしました！",
+    "milestone": "マイルストーン進捗",
+    "inviteMore": "もっと友達を招待して報酬をゲットしよう！",
+    "noReferrals": "まだ紹介がありません。リンクをシェアしよう！",
+    "active": "アクティブ",
+    "invited": "招待済み",
+    "inactive": "非アクティブ",
+    "shareVia": "シェア",
+    "recentReferrals": "最近の紹介",
+    "loginRequired": "紹介ダッシュボードを表示するにはログインしてください。",
+    "shareText": "LexiClashで一緒に遊ぼう！紹介コード: {code}"
+  },
   "coins": {
     "title": "コイン＆報酬",
     "description": "ゲームをプレイし、勝利し、実績をアンロックしてコインを獲得。特別なアイテムを集めよう！",
@@ -3128,7 +3148,24 @@ const ja = {
     "title": "ランクマッチ",
     "unlocked": "解除済み",
     "unlockProgress": "解放まであと{required}ゲーム中{current}",
-    "toGo": "あと"
+    "toGo": "あと",
+    "leaderboard": "ランキング",
+    "yourRating": "あなたのレーティング",
+    "ratingChange": "レーティング変動",
+    "gamesPlayed": "プレイ回数",
+    "winRate": "勝率",
+    "peakRating": "最高レーティング",
+    "noRatingYet": "ランクマッチをプレイしてレーティングを取得しよう",
+    "tiers": {
+      "unranked": "未ランク",
+      "bronze": "ブロンズ",
+      "silver": "シルバー",
+      "gold": "ゴールド",
+      "platinum": "プラチナ",
+      "diamond": "ダイヤモンド",
+      "master": "マスター",
+      "grandmaster": "グランドマスター"
+    }
   },
   "legal": {
     "title": "法的情報",
@@ -5886,7 +5923,13 @@ const ja = {
       "frozen": "凍結中！",
       "shuffle": "シャッフル",
       "shuffleWithCount": "シャッフル (×{count})",
-      "detonate": "爆破"
+      "detonate": "爆破",
+      "gemDetectorActive": "ジェム検出器作動中 — レアタイルがハイライトされています！",
+      "shuffleBoard": "ボードシャッフル",
+      "shuffleUsed": "シャッフル完了！ (残り{remaining}回)",
+      "freezeTimer": "タイマー凍結",
+      "timerFrozen": "タイマーが{seconds}秒間凍結！",
+      "shieldBlocked": "シールドが{percent}%のダメージをブロック！"
     },
     "hints": {
       "minLetters2": "2文字以上",
@@ -6774,7 +6817,8 @@ const ja = {
       "easyDesc": "特殊タイル少なめ、穏やかなカスケード",
       "mediumDesc": "バランスのとれた混沌",
       "hardDesc": "特殊タイルだらけ、激しいウェーブ",
-      "resumeWave": "ウェーブ{wave}から開始"
+      "resumeWave": "ウェーブ{wave}から開始",
+      "savedScore": "スコア: {score}"
     },
     "hint": "ヒント",
     "stuck": "詰まった？",
@@ -6792,6 +6836,7 @@ const ja = {
     "outOfMoves": "手数切れ!",
     "movesBonus": "手数ボーナス",
     "sugarCrush": "シュガークラッシュ!",
+    "checkpointSaved": "チェックポイント保存！",
     "waveIntro": {
       "title": "ウェーブ {wave}",
       "objectives": "目標",
@@ -8070,6 +8115,19 @@ const ja = {
       "actionUrlLabel": "アクションURL",
       "sendSuccess": "通知が正常に送信されました！",
       "sendError": "通知の送信に失敗しました。もう一度お試しください。"
+    },
+    "prompt": {
+      "title": "ゲームに参加し続けよう！",
+      "body": "デイリーチャレンジとストリーク警告のリマインダーを受け取る",
+      "enable": "通知を有効にする",
+      "notNow": "今はしない"
+    },
+    "preferences": {
+      "title": "通知設定",
+      "dailyChallenge": "デイリーチャレンジリマインダー",
+      "streakWarning": "ストリーク危険警告",
+      "friendInvites": "フレンドチャレンジ招待",
+      "weeklySummary": "週間サマリー"
     }
   },
   "native": {

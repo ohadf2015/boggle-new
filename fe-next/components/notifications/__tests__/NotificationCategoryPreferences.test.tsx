@@ -1,0 +1,115 @@
+/**
+ * NotificationCategoryPreferences Tests
+ * Tests for the notification category toggles settings panel
+ */
+
+import { render, screen, fireEvent } from '@testing-library/react';
+import { NotificationCategoryPreferences } from '../NotificationCategoryPreferences';
+import type { ReactNode } from 'react';
+
+// Mock framer-motion
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: { children: ReactNode } & Record<string, unknown>) => (
+      <div {...props}>{children}</div>
+    ),
+  },
+}));
+
+// Mock LanguageContext
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'notifications.preferences.title': 'Notification Settings',
+        'notifications.preferences.dailyChallenge': 'Daily Challenge Reminder',
+        'notifications.preferences.streakWarning': 'Streak at Risk Warning',
+        'notifications.preferences.friendInvites': 'Friend Challenge Invites',
+        'notifications.preferences.weeklySummary': 'Weekly Summary',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+// Mock categoryPreferences utils
+const mockLoad = jest.fn();
+const mockSave = jest.fn();
+
+jest.mock('@/utils/pushNotifications', () => ({
+  loadCategoryPreferences: (...args: unknown[]) => mockLoad(...args),
+  saveCategoryPreferences: (...args: unknown[]) => mockSave(...args),
+}));
+
+describe('NotificationCategoryPreferences', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockLoad.mockReturnValue({
+      dailyChallenge: true,
+      streakWarning: true,
+      friendInvites: true,
+      weeklySummary: false,
+    });
+  });
+
+  describe('rendering', () => {
+    it('should render title and all category toggles', () => {
+      // GIVEN - Default preferences
+
+      // WHEN
+      render(<NotificationCategoryPreferences />);
+
+      // THEN
+      expect(screen.getByText('Notification Settings')).toBeInTheDocument();
+      expect(screen.getByText('Daily Challenge Reminder')).toBeInTheDocument();
+      expect(screen.getByText('Streak at Risk Warning')).toBeInTheDocument();
+      expect(screen.getByText('Friend Challenge Invites')).toBeInTheDocument();
+      expect(screen.getByText('Weekly Summary')).toBeInTheDocument();
+    });
+
+    it('should render toggles with correct initial state', () => {
+      // GIVEN - Default preferences (weeklySummary off, rest on)
+
+      // WHEN
+      render(<NotificationCategoryPreferences />);
+      const switches = screen.getAllByRole('switch');
+
+      // THEN - 4 toggles, first 3 checked, last unchecked
+      expect(switches).toHaveLength(4);
+      expect(switches[0]).toHaveAttribute('aria-checked', 'true');
+      expect(switches[1]).toHaveAttribute('aria-checked', 'true');
+      expect(switches[2]).toHaveAttribute('aria-checked', 'true');
+      expect(switches[3]).toHaveAttribute('aria-checked', 'false');
+    });
+  });
+
+  describe('toggle interactions', () => {
+    it('should toggle a category and save preferences', () => {
+      // GIVEN
+      render(<NotificationCategoryPreferences />);
+      const switches = screen.getAllByRole('switch');
+
+      // WHEN - Toggle daily challenge off
+      fireEvent.click(switches[0]);
+
+      // THEN
+      expect(mockSave).toHaveBeenCalledWith(
+        expect.objectContaining({ dailyChallenge: false })
+      );
+    });
+
+    it('should toggle weeklySummary on', () => {
+      // GIVEN
+      render(<NotificationCategoryPreferences />);
+      const switches = screen.getAllByRole('switch');
+
+      // WHEN - Toggle weekly summary on (last switch)
+      fireEvent.click(switches[3]);
+
+      // THEN
+      expect(mockSave).toHaveBeenCalledWith(
+        expect.objectContaining({ weeklySummary: true })
+      );
+    });
+  });
+});

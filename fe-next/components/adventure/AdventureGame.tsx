@@ -16,6 +16,7 @@ import { useAdventureWordSubmit } from './hooks/useAdventureWordSubmit';
 import { useAdventureLevelCompletion } from './hooks/useAdventureLevelCompletion';
 import { useAdventureBossOrchestration } from './hooks/useAdventureBossOrchestration';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
+import { useGemDetectorHighlights } from '@/hooks/useGemDetectorHighlights';
 import { useFlashChallenge } from '@/hooks/useFlashChallenge';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
@@ -228,6 +229,15 @@ const AdventureGame = memo<AdventureGameProps>(
       maxHintsPerLevel: init.upgradeEffects.hintsPerLevel,
     });
 
+    // Gem Detector upgrade: highlight starting tiles of highest-scoring available words
+    const gemDetectorLevel = init.upgrades.gemDetector ?? 0;
+    const gemDetectorHighlights = useGemDetectorHighlights({
+      gemDetectorLevel,
+      remainingWords: remainingHintWords,
+      findPathForWord,
+      gridSize: levelConfig.gridSize,
+    });
+
     const isModalOpen = showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic || bossOrch.showBossIntro || bossOrch.showBossFireworks;
     const { resetOnGameAction } = useLexiStuckDetection({
       onStuck: () => { if (hasHintsAvailable) { getHint(); dismissAutoHint(); } },
@@ -399,9 +409,15 @@ const AdventureGame = memo<AdventureGameProps>(
         const path = findPathForWord(longestWord);
         if (path) return path.map(pos => pos.row * levelConfig.gridSize + pos.col);
       }
-      if (!currentHint?.path) return [];
-      return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
-    }, [init.hintData, currentHint, levelConfig.gridSize, isFrozen, init.upgradeEffects.freezeHighlightsWord, remainingHintWords, findPathForWord]);
+      if (currentHint?.path) {
+        return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
+      }
+      // Gem Detector: subtly highlight starting tiles of high-value words
+      if (gemDetectorHighlights.length > 0) {
+        return gemDetectorHighlights;
+      }
+      return [];
+    }, [init.hintData, currentHint, levelConfig.gridSize, isFrozen, init.upgradeEffects.freezeHighlightsWord, remainingHintWords, findPathForWord, gemDetectorHighlights]);
 
 
     if (!isValidConfig) {

@@ -677,6 +677,8 @@ const en = {
       "male": "Male",
       "female": "Female",
       "eyebrows": "Brows",
+      "facialHair": "Beard",
+      "facialHairStyle": "Style",
       "colorTheme": "Color Theme"
     },
     "premium": {
@@ -3278,6 +3280,24 @@ const en = {
       "subtitle": "Get 100 XP for each friend who joins!"
     }
   },
+  "referralDashboard": {
+    "title": "My Referrals",
+    "friendsInvited": "Friends Invited",
+    "friendsJoined": "Friends Joined",
+    "coinsEarned": "Coins Earned",
+    "yourLink": "Your Referral Link",
+    "copied": "Link copied!",
+    "milestone": "Milestone Progress",
+    "inviteMore": "Invite more friends to unlock rewards!",
+    "noReferrals": "No referrals yet. Share your link!",
+    "active": "Active",
+    "invited": "Invited",
+    "inactive": "Inactive",
+    "shareVia": "Share via",
+    "recentReferrals": "Recent Referrals",
+    "loginRequired": "Sign in to view your referral dashboard.",
+    "shareText": "Join me on LexiClash! Use my referral code: {code}"
+  },
   "coins": {
     "title": "Coins & Rewards",
     "description": "Earn coins by playing games, winning matches, and unlocking achievements. Use them to collect special items!",
@@ -3615,7 +3635,24 @@ const en = {
     "title": "Ranked Mode",
     "unlocked": "Unlocked",
     "unlockProgress": "{current}/{required} games to unlock",
-    "toGo": "to go"
+    "toGo": "to go",
+    "leaderboard": "Ranked Leaderboard",
+    "yourRating": "Your Rating",
+    "ratingChange": "Rating Change",
+    "gamesPlayed": "Games Played",
+    "winRate": "Win Rate",
+    "peakRating": "Peak Rating",
+    "noRatingYet": "Play ranked games to get a rating",
+    "tiers": {
+      "unranked": "Unranked",
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond",
+      "master": "Master",
+      "grandmaster": "Grandmaster"
+    }
   },
   "growth": {
     "dayStreak": "day streak",
@@ -5929,7 +5966,13 @@ const en = {
       "frozen": "Frozen!",
       "shuffle": "Shuffle",
       "shuffleWithCount": "Shuffle (×{count})",
-      "detonate": "Detonate"
+      "detonate": "Detonate",
+      "gemDetectorActive": "Gem Detector active — rare tiles highlighted!",
+      "shuffleBoard": "Shuffle Board",
+      "shuffleUsed": "Board shuffled! ({remaining} left)",
+      "freezeTimer": "Freeze Timer",
+      "timerFrozen": "Timer frozen for {seconds}s!",
+      "shieldBlocked": "Shield blocked {percent}% damage!"
     },
     "hints": {
       "minLetters2": "2+ letters",
@@ -6817,7 +6860,8 @@ const en = {
       "easyDesc": "Fewer specials, relaxed cascades",
       "mediumDesc": "Balanced chaos",
       "hardDesc": "Specials everywhere, brutal waves",
-      "resumeWave": "Start from Wave {wave}"
+      "resumeWave": "Start from Wave {wave}",
+      "savedScore": "Score: {score}"
     },
     "hint": "Hint",
     "stuck": "Stuck?",
@@ -6835,6 +6879,7 @@ const en = {
     "outOfMoves": "Out of Moves!",
     "movesBonus": "Move Bonus",
     "sugarCrush": "Sugar Crush!",
+    "checkpointSaved": "Checkpoint saved!",
     "waveIntro": {
       "title": "Wave {wave}",
       "objectives": "Objectives",
@@ -8095,6 +8140,19 @@ const en = {
       "actionUrlLabel": "Action URL",
       "sendSuccess": "Notification sent successfully!",
       "sendError": "Failed to send notification. Please try again."
+    },
+    "prompt": {
+      "title": "Stay in the Game!",
+      "body": "Get reminders for daily challenges and streak warnings",
+      "enable": "Enable Notifications",
+      "notNow": "Not Now"
+    },
+    "preferences": {
+      "title": "Notification Settings",
+      "dailyChallenge": "Daily Challenge Reminder",
+      "streakWarning": "Streak at Risk Warning",
+      "friendInvites": "Friend Challenge Invites",
+      "weeklySummary": "Weekly Summary"
     }
   },
   "native": {
