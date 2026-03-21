@@ -331,7 +331,13 @@ const en = {
     "checkConnection": "Hmm, you went offline!",
     "retry": "Try again",
     "retryNow": "Reconnect!",
-    "scoreSafe": "Your score is safe on the server"
+    "scoreSafe": "Your score is safe on the server",
+    "qualityExcellent": "Excellent connection",
+    "qualityGood": "Good connection",
+    "qualityPoor": "Slow connection",
+    "qualityCritical": "Very slow connection",
+    "wordQueued": "Word saved — will submit when reconnected",
+    "wordsReplayed": "Queued words submitted!"
   },
   "game": {
     "combo": "Combo",

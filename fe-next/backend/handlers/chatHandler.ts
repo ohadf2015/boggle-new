@@ -6,7 +6,7 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, ChatMessagePayload } from '@/shared/types';
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
-import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
+import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers';
 import { cleanProfanity } from '../utils/profanityFilter';
 import { emitError, ErrorMessages } from '../utils/errorHandler';
 import { checkRateLimit } from '../utils/rateLimiter';
@@ -100,7 +100,7 @@ function registerChatHandlers(io: Server, socket: Socket): void {
       game.chatHistory = game.chatHistory.slice(-100);
     }
 
-    broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', chatMessageData);
+    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', chatMessageData);
   });
 
   // Handle chat history request (for late joiners and page refresh)

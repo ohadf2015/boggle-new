@@ -1,6 +1,6 @@
 /**
  * Avatar Base (Face Shape) Parts
- * 11 face shapes, all centered on viewBox 0 0 100 100
+ * 12 face shapes, all centered on viewBox 0 0 100 100
  */
 
 import { STROKE_OUTER } from './avatarDesignConstants';
@@ -233,6 +233,73 @@ function DragonHead({ fill }: BasePartProps) {
   );
 }
 
+function Triangle({ fill }: BasePartProps) {
+  return (
+    <g>
+      {/* Inverted triangle — wide forehead, pointed chin */}
+      <path
+        d="M14 24 L86 24 L50 86Z"
+        fill={fill}
+        stroke="#000"
+        strokeWidth={S}
+        strokeLinejoin="round"
+      />
+      {/* Inner highlight contour */}
+      <path d="M20 28 L80 28 L50 80Z" fill="none" stroke="#fff" strokeWidth={1} opacity="0.1" />
+      {/* Forehead shine */}
+      <ellipse cx="50" cy="32" rx="16" ry="4" fill="#fff" opacity="0.08" />
+      {/* Cheekbone lines */}
+      <path d="M24 30 Q32 38 36 48" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
+      <path d="M76 30 Q68 38 64 48" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
+      {/* Chin shadow */}
+      <path d="M40 70 L50 82 L60 70" fill="#000" opacity="0.06" />
+      <Nose />
+    </g>
+  );
+}
+
+function CatFace({ fill }: BasePartProps) {
+  return (
+    <g>
+      {/* Cat face — rounded top with ear bumps, wide cheeks, pointed chin */}
+      <path
+        d={[
+          'M50 84',          // chin point
+          'C36 80 22 68 20 52', // left jaw to cheek
+          'C18 40 20 30 26 22', // left cheek up to ear base
+          'L22 12',            // left ear tip
+          'C26 18 30 20 34 22', // left ear inner curve
+          'C38 16 44 14 50 14', // forehead left to center
+          'C56 14 62 16 66 22', // forehead center to right
+          'C70 20 74 18 78 12', // right ear inner curve
+          'L74 22',            // right ear tip
+          'C80 30 82 40 80 52', // right ear base to cheek
+          'C78 68 64 80 50 84', // right jaw to chin
+          'Z',
+        ].join(' ')}
+        fill={fill}
+        stroke="#000"
+        strokeWidth={S}
+        strokeLinejoin="round"
+      />
+      {/* Inner ear triangles */}
+      <path d="M24 16 C27 20 30 22 33 23 L27 24 C23 22 22 18 24 16Z" fill="#000" opacity="0.12" />
+      <path d="M76 16 C73 20 70 22 67 23 L73 24 C77 22 78 18 76 16Z" fill="#000" opacity="0.12" />
+      {/* Cheek fluff */}
+      <ellipse cx="28" cy="52" rx="5" ry="6" fill="#fff" opacity="0.06" />
+      <ellipse cx="72" cy="52" rx="5" ry="6" fill="#fff" opacity="0.06" />
+      {/* Whisker dots */}
+      <circle cx="36" cy="56" r="1" fill="#000" opacity="0.2" />
+      <circle cx="34" cy="58" r="1" fill="#000" opacity="0.2" />
+      <circle cx="64" cy="56" r="1" fill="#000" opacity="0.2" />
+      <circle cx="66" cy="58" r="1" fill="#000" opacity="0.2" />
+      {/* Chin shadow */}
+      <path d="M44 76 Q50 82 56 76" fill="#000" opacity="0.06" />
+      <Nose />
+    </g>
+  );
+}
+
 export const BASE_PARTS = {
   round: Round,
   square: Square,
@@ -244,6 +311,8 @@ export const BASE_PARTS = {
   skull: Skull,
   shield: Shield,
   dragonHead: DragonHead,
+  triangle: Triangle,
+  catFace: CatFace,
 } as const;
 
 export type BasePart = keyof typeof BASE_PARTS;

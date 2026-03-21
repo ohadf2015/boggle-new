@@ -4,13 +4,14 @@ import { z } from 'zod';
 export const AVATAR_GENDERS = ['male', 'female'] as const;
 
 // ==================== Face Base Shapes ====================
-export const AVATAR_BASES = ['round', 'square', 'oval', 'heart', 'diamond', 'hexagon', 'blob', 'skull', 'shield', 'dragonHead'] as const;
+export const AVATAR_BASES = ['round', 'square', 'oval', 'heart', 'diamond', 'hexagon', 'blob', 'skull', 'shield', 'dragonHead', 'triangle', 'catFace'] as const;
 
 // ==================== Skin Colors (inclusive range) ====================
 export const AVATAR_SKIN_COLORS = [
   '#FFDBB4', '#F8D5C2', '#EDB98A', '#D08B5B', '#AE5D29', '#694D3D',
   '#FFE0BD', '#C68642', '#8D5524', '#4A2912',
   '#87CEEB', '#98FB98', '#FFB6C1', '#E6E6FA', '#FFFACD',
+  '#808080', '#A9A9A9',
 ] as const;
 
 // ==================== Hair ====================
@@ -18,18 +19,21 @@ export const AVATAR_HAIR_STYLES = [
   'none', 'spiky', 'curly', 'long', 'buzz', 'mohawk', 'bob', 'ponytail', 'afro', 'wavy',
   'pigtails', 'topknot', 'sideshave', 'dreads', 'braids', 'bun', 'bangs', 'twintails',
   'mullet', 'combover', 'elvis', 'ramen', 'flame', 'galaxy', 'neon',
+  'pixie', 'undercut', 'spaceBuns', 'straight', 'fade', 'cornrows', 'wolfCut',
 ] as const;
 
 /** Styles that look feminine — shown when gender is female */
 export const FEMALE_HAIR_STYLES = [
   'none', 'long', 'bob', 'ponytail', 'wavy', 'pigtails', 'sideshave', 'braids',
   'bun', 'bangs', 'twintails', 'curly', 'afro', 'topknot', 'dreads',
+  'pixie', 'spaceBuns', 'straight', 'wolfCut', 'cornrows',
 ] as const;
 
 /** Styles that look masculine — shown when gender is male */
 export const MALE_HAIR_STYLES = [
   'none', 'spiky', 'curly', 'buzz', 'mohawk', 'afro', 'topknot', 'dreads',
   'mullet', 'combover', 'elvis', 'ramen',
+  'undercut', 'fade', 'cornrows', 'wolfCut', 'ponytail', 'bun', 'straight',
 ] as const;
 
 /** Default hair when switching to female */
@@ -40,6 +44,7 @@ export const DEFAULT_MALE_HAIR = 'spiky' as const;
 export const AVATAR_HAIR_COLORS = [
   '#2C1B18', '#4A3728', '#8B6E4E', '#D4A574', '#E8C07A',
   '#C62828', '#F57F17', '#6A1B9A', '#00897B', '#FF1493',
+  '#FFFFFF', '#C0C0C0', '#808080',
 ] as const;
 
 // ==================== Eyes ====================
@@ -48,17 +53,20 @@ export const AVATAR_EYE_STYLES = [
   'hearts', 'dizzy', 'cyclops', 'lashes', 'monocleEye', 'crossEyed', 'laser',
   'hypno', 'money', 'alien', 'crying', 'galaxy', 'flame', 'robot', 'void', 'infinity',
   'curious', 'determined', 'doe',
+  'closed', 'catPupils', 'wide', 'squint', 'sad',
 ] as const;
 
 // ==================== Eyebrows ====================
 export const AVATAR_EYEBROW_STYLES = [
   'none', 'natural', 'thin', 'thick', 'angry', 'raised', 'unibrow', 'flat', 'worried',
+  'arched', 'bushy', 'scarred', 'short', 'feathered', 'angryThick',
 ] as const;
 
 // ==================== Facial Hair (male only) ====================
 export const AVATAR_FACIAL_HAIR_STYLES = [
   'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'fullBeard',
   'soulPatch', 'chinStrap', 'muttonChops', 'vanDyke', 'handlebar',
+  'wizardBeard', 'pencilMustache', 'braidedBeard', 'fuManchu',
 ] as const;
 
 // ==================== Mouth ====================
@@ -66,6 +74,7 @@ export const AVATAR_MOUTH_STYLES = [
   'none', 'smile', 'grin', 'tongue', 'oh', 'smirk', 'flat', 'teeth', 'cat',
   'vampire', 'kiss', 'braces', 'drool', 'goldTooth', 'mustache', 'whistle',
   'zipper', 'blowfish', 'gap', 'pipe', 'dragon', 'diamond', 'glitch',
+  'frown', 'pout', 'bubbleGum', 'buckTeeth', 'sideSmile',
 ] as const;
 
 // ==================== Accessories ====================
@@ -76,6 +85,7 @@ export const AVATAR_ACCESSORIES = [
   'propellerHat', 'viking', 'devilHorns', 'headphones', 'chefHat', 'cucumberFace', 'plunger',
   'samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown',
   'monkeyEars',
+  'beanie', 'catEars', 'flowerCrown', 'goggles', 'bunnyEars', 'cyberpunkVisor',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
@@ -86,6 +96,9 @@ export const AVATAR_ACCESSORY_COLORS = [
 export const AVATAR_SHIRT_COLORS = [
   '#4A90D9', '#E85D9B', '#FF6B35', '#00897B', '#8B5CF6', '#C62828', '#FFD700', '#2C1B18',
 ] as const;
+
+// ==================== Body Styles ====================
+export const AVATAR_BODY_STYLES = ['default', 'hoodie', 'suit', 'turtleneck'] as const;
 
 // ==================== Background Colors ====================
 export const AVATAR_BG_COLORS = [
@@ -115,6 +128,8 @@ export const customAvatarSchema = z.object({
   bgColor: hexColorSchema,
   /** Shirt/body color — defaults based on gender for backward compat */
   shirtColor: hexColorSchema.optional(),
+  /** Body/clothing style — defaults to gender-based body if not set */
+  bodyStyle: z.enum(AVATAR_BODY_STYLES).optional(),
 });
 
 export type CustomAvatarConfig = z.output<typeof customAvatarSchema>;
@@ -142,7 +157,7 @@ export const DEFAULT_AVATAR_CONFIG: CustomAvatarConfig = {
 export const PREMIUM_EYE_STYLES = [
   'laser', 'hypno', 'money', 'alien',
   'star', 'sparkle', 'hearts', 'cyclops',
-  'monocleEye',
+  'monocleEye', 'catPupils',
 ] as const;
 
 export const PREMIUM_MOUTH_STYLES = [
@@ -156,11 +171,13 @@ export const PREMIUM_ACCESSORIES = [
   'monocle', 'eyepatch', 'mask', 'sombrero',
   'cucumberFace', 'monkeyEars', 'plunger',
   'mustacheGlasses', 'propellerHat',
+  'catEars', 'bunnyEars', 'flowerCrown', 'goggles', 'beanie',
 ] as const;
 
 export const PREMIUM_HAIR_STYLES = [
   'elvis', 'ramen',
   'mohawk', 'sideshave', 'twintails',
+  'undercut', 'spaceBuns',
 ] as const;
 
 export const PREMIUM_BG_COLORS = ['#FF0000', '#000000', '#4B0082', '#FFD700'] as const;
@@ -172,12 +189,15 @@ export const PREMIUM_BASES = ['hexagon', 'blob', 'diamond', 'heart'] as const;
 
 export const EPIC_EYE_STYLES = ['galaxy', 'flame', 'robot', 'void', 'infinity'] as const;
 export const EPIC_MOUTH_STYLES = ['dragon', 'diamond', 'glitch'] as const;
-export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown'] as const;
+export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown', 'cyberpunkVisor'] as const;
 export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon'] as const;
 export const EPIC_BASES = ['skull', 'shield', 'dragonHead'] as const;
 
-export const PREMIUM_FACIAL_HAIR_STYLES = ['vanDyke', 'handlebar'] as const;
-export const EPIC_FACIAL_HAIR_STYLES: readonly string[] = [];
+export const PREMIUM_EYEBROW_STYLES = ['arched', 'bushy', 'scarred'] as const;
+export const EPIC_EYEBROW_STYLES = ['angryThick'] as const;
+
+export const PREMIUM_FACIAL_HAIR_STYLES = ['vanDyke', 'handlebar', 'pencilMustache', 'fuManchu'] as const;
+export const EPIC_FACIAL_HAIR_STYLES = ['wizardBeard', 'braidedBeard'] as const;
 
 // ==================== Per-Part Pricing ====================
 // Every premium part has an explicit price. Fallback by category only for
@@ -192,6 +212,7 @@ export const PREMIUM_PART_PRICES: Record<string, number> = {
   bgColor: 250,
   base: 750,
   facialHair: 450,
+  eyebrows: 350,
 };
 
 // VIP per-part prices
@@ -238,9 +259,26 @@ export const VIP_PART_PRICES: Record<string, number> = {
   'hair:mohawk': 400,
   'hair:sideshave': 450,
   'hair:twintails': 500,
+  // ── Eyes (VIP new) ──
+  'eyes:catPupils': 400,
+  // ── Eyebrows (VIP) ──
+  'eyebrows:arched': 350,
+  'eyebrows:bushy': 300,
+  'eyebrows:scarred': 400,
   // ── Facial Hair (VIP) ──
   'facialHair:vanDyke': 500,
   'facialHair:handlebar': 600,
+  'facialHair:pencilMustache': 400,
+  'facialHair:fuManchu': 500,
+  // ── Hair (VIP new) ──
+  'hair:undercut': 450,
+  'hair:spaceBuns': 500,
+  // ── Accessories (VIP new) ──
+  'accessory:catEars': 400,
+  'accessory:bunnyEars': 400,
+  'accessory:flowerCrown': 500,
+  'accessory:goggles': 450,
+  'accessory:beanie': 350,
   // ── Bases (VIP) ──
   'base:hexagon': 800,
   'base:blob': 750,
@@ -259,8 +297,13 @@ export const EPIC_PART_PRICES: Record<string, number> = {
   'eyes:galaxy': 1500, 'eyes:flame': 1500, 'eyes:robot': 1200, 'eyes:void': 2000,
   // ── Mouth (Epic) ──
   'mouth:dragon': 1500, 'mouth:diamond': 2000, 'mouth:glitch': 1200,
+  // ── Eyebrows (Epic) ──
+  'eyebrows:angryThick': 800,
+  // ── Facial Hair (Epic) ──
+  'facialHair:wizardBeard': 2000, 'facialHair:braidedBeard': 1800,
   // ── Accessories (Epic) ──
   'accessory:samurai': 2500, 'accessory:astronaut': 2500, 'accessory:wizardHat': 2000, 'accessory:ninjaScarf': 1800,
+  'accessory:cyberpunkVisor': 2000,
   // ── Hair (Epic) ──
   'hair:flame': 2000, 'hair:galaxy': 2500, 'hair:neon': 1800,
   // ── Bases (Epic) ──
@@ -282,7 +325,7 @@ export function isEpicPart(category: string, value: string): boolean {
   const epicMap: Record<string, readonly string[]> = {
     eyes: EPIC_EYE_STYLES, mouth: EPIC_MOUTH_STYLES,
     accessory: EPIC_ACCESSORIES, hair: EPIC_HAIR_STYLES, base: EPIC_BASES,
-    facialHair: EPIC_FACIAL_HAIR_STYLES,
+    facialHair: EPIC_FACIAL_HAIR_STYLES, eyebrows: EPIC_EYEBROW_STYLES,
   };
   return (epicMap[category] as readonly string[] | undefined)?.includes(value) ?? false;
 }
@@ -304,6 +347,7 @@ const PREMIUM_MAP: Record<string, readonly string[]> = {
   bgColor: PREMIUM_BG_COLORS,
   base: [...PREMIUM_BASES, ...EPIC_BASES],
   facialHair: [...PREMIUM_FACIAL_HAIR_STYLES, ...EPIC_FACIAL_HAIR_STYLES],
+  eyebrows: [...PREMIUM_EYEBROW_STYLES, ...EPIC_EYEBROW_STYLES],
 };
 
 /** Check if a part value is premium (VIP or Epic) */
@@ -325,6 +369,7 @@ const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_M
 const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.mouth.includes(v));
 const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v));
 const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v));
+const FREE_EYEBROW_STYLES = AVATAR_EYEBROW_STYLES.filter(v => !PREMIUM_MAP.eyebrows.includes(v));
 const FREE_HAIR_STYLES = AVATAR_HAIR_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.hair.includes(v));
 
 export function getRandomAvatarConfig(): CustomAvatarConfig {
@@ -337,7 +382,7 @@ export function getRandomAvatarConfig(): CustomAvatarConfig {
     hair: pick(FREE_HAIR_STYLES),
     hairColor: pick(AVATAR_HAIR_COLORS),
     eyes: pick(FREE_EYE_STYLES),
-    eyebrows: pick(AVATAR_EYEBROW_STYLES),
+    eyebrows: pick(FREE_EYEBROW_STYLES),
     facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
     mouth: pick(FREE_MOUTH_STYLES),
     accessory: pick(FREE_ACCESSORIES),
@@ -369,7 +414,7 @@ export function getSeededAvatarConfig(seed: number): CustomAvatarConfig {
     hair: pick(FREE_HAIR_STYLES),
     hairColor: pick(AVATAR_HAIR_COLORS),
     eyes: pick(FREE_EYE_STYLES),
-    eyebrows: pick(AVATAR_EYEBROW_STYLES),
+    eyebrows: pick(FREE_EYEBROW_STYLES),
     facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
     mouth: pick(FREE_MOUTH_STYLES),
     accessory: pick(FREE_ACCESSORIES),

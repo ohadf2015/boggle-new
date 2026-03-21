@@ -596,6 +596,144 @@ function PhoenixCrown({ fill }: AccessoryPartProps) {
   );
 }
 
+function Beanie({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      <path d="M24 30 Q24 10 50 6 Q76 10 76 30" fill={fill} stroke="#000" strokeWidth={SO} />
+      <rect x="22" y="26" width="56" height="10" rx="2" fill={fill} stroke="#000" strokeWidth={SO} />
+      <path d="M24 28 Q50 22 76 28" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
+      {/* Knit pattern lines */}
+      <path d="M30 14 L30 26" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M40 10 L40 26" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M50 8 L50 26" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M60 10 L60 26" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M70 14 L70 26" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      {/* Cuff fold line */}
+      <path d="M24 30 Q50 26 76 30" fill="none" stroke="#000" strokeWidth={1.2} opacity="0.2" />
+      <path d="M26 32 Q50 28 74 32" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.15" />
+      {/* Top pom-pom */}
+      <circle cx="50" cy="6" r="4" fill={fill} stroke="#000" strokeWidth={SO} />
+      <circle cx="49" cy="5" r="1.2" fill="#fff" opacity="0.2" />
+    </g>
+  );
+}
+
+function CatEars({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      {/* Left ear */}
+      <path d="M28 28 L22 4 L40 22Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M30 24 L26 10 L36 20Z" fill="#FFB6C1" stroke="none" />
+      {/* Right ear */}
+      <path d="M72 28 L78 4 L60 22Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M70 24 L74 10 L64 20Z" fill="#FFB6C1" stroke="none" />
+      {/* Ear highlights */}
+      <path d="M26 14 L28 18" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
+      <path d="M74 14 L72 18" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
+    </g>
+  );
+}
+
+function FlowerCrown({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      {/* Stem/vine across head */}
+      <path d="M24 26 Q37 18 50 20 Q63 18 76 26" fill="none" stroke={fill} strokeWidth={2.5} strokeLinecap="round" />
+      {/* Leaves */}
+      <ellipse cx="30" cy="24" rx="3" ry="1.5" fill="#228B22" transform="rotate(-20 30 24)" />
+      <ellipse cx="45" cy="19" rx="3" ry="1.5" fill="#228B22" transform="rotate(10 45 19)" />
+      <ellipse cx="58" cy="19" rx="3" ry="1.5" fill="#228B22" transform="rotate(-10 58 19)" />
+      <ellipse cx="70" cy="23" rx="3" ry="1.5" fill="#228B22" transform="rotate(20 70 23)" />
+      {/* Flower 1 — pink */}
+      <circle cx="28" cy="22" r="2" fill="#FF69B4" stroke="#000" strokeWidth={0.6} />
+      <circle cx="28" cy="22" r="0.8" fill="#FFD700" />
+      {/* Flower 2 — yellow */}
+      <circle cx="38" cy="18" r="2.2" fill="#FFD700" stroke="#000" strokeWidth={0.6} />
+      <circle cx="38" cy="18" r="0.8" fill="#fff" />
+      {/* Flower 3 — white */}
+      <circle cx="50" cy="17" r="2" fill="#fff" stroke="#000" strokeWidth={0.6} />
+      <circle cx="50" cy="17" r="0.8" fill="#FFD700" />
+      {/* Flower 4 — pink */}
+      <circle cx="62" cy="18" r="2.2" fill="#FF69B4" stroke="#000" strokeWidth={0.6} />
+      <circle cx="62" cy="18" r="0.8" fill="#FFD700" />
+      {/* Flower 5 — yellow */}
+      <circle cx="72" cy="22" r="2" fill="#FFD700" stroke="#000" strokeWidth={0.6} />
+      <circle cx="72" cy="22" r="0.8" fill="#fff" />
+    </g>
+  );
+}
+
+function Goggles({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      {/* Strap */}
+      <path d="M18 30 Q50 24 82 30" fill="none" stroke={fill} strokeWidth={4} strokeLinecap="round" />
+      <path d="M18 30 Q50 24 82 30" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
+      {/* Left lens */}
+      <circle cx="38" cy="28" r="9" fill="none" stroke="#888" strokeWidth={2.5} />
+      <circle cx="38" cy="28" r="7" fill="#87CEEB" opacity="0.15" />
+      <circle cx="38" cy="28" r="9" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
+      {/* Right lens */}
+      <circle cx="62" cy="28" r="9" fill="none" stroke="#888" strokeWidth={2.5} />
+      <circle cx="62" cy="28" r="7" fill="#87CEEB" opacity="0.15" />
+      <circle cx="62" cy="28" r="9" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
+      {/* Bridge */}
+      <path d="M47 28 Q50 30 53 28" stroke="#888" strokeWidth={2} fill="none" />
+      {/* Lens shine */}
+      <path d="M33 24 Q36 22 39 24" stroke="#fff" strokeWidth={0.8} opacity="0.3" fill="none" />
+      <path d="M57 24 Q60 22 63 24" stroke="#fff" strokeWidth={0.8} opacity="0.3" fill="none" />
+      {/* Strap rivets */}
+      <circle cx="26" cy="29" r="1.5" fill="#888" stroke="#000" strokeWidth={0.8} />
+      <circle cx="74" cy="29" r="1.5" fill="#888" stroke="#000" strokeWidth={0.8} />
+    </g>
+  );
+}
+
+function BunnyEars({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      {/* Left ear — upright */}
+      <path d="M34 26 Q32 -4 30 -10 Q28 -14 34 -12 Q40 -10 38 20" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M35 22 Q34 0 33 -6 Q32 -8 35 -7 Q37 -6 37 18" fill="#FFB6C1" stroke="none" />
+      {/* Right ear — slightly drooping */}
+      <path d="M66 26 Q70 -2 74 -6 Q78 -8 80 -4 Q82 2 72 20" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M68 22 Q71 2 74 -2 Q76 -4 77 -1 Q78 4 71 18" fill="#FFB6C1" stroke="none" />
+      {/* Right ear droop curve */}
+      <path d="M74 -6 Q78 -2 80 4" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.15" />
+      {/* Ear highlights */}
+      <path d="M33 4 L34 10" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
+      <path d="M73 2 L72 8" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
+    </g>
+  );
+}
+
+function CyberpunkVisor({ fill }: AccessoryPartProps) {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="cyberpunkVisorGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#0ff" stopOpacity="0.4" />
+          <stop offset="50%" stopColor="#f0f" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#0ff" stopOpacity="0.4" />
+        </linearGradient>
+      </defs>
+      {/* Frame */}
+      <path d="M20 38 Q22 34 30 33 Q40 32 50 32 Q60 32 70 33 Q78 34 80 38 L82 44 Q80 48 70 49 Q60 50 50 50 Q40 50 30 49 Q22 48 18 44Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Visor lens */}
+      <path d="M24 38 Q26 35 34 34 Q42 33 50 33 Q58 33 66 34 Q74 35 76 38 L78 43 Q76 46 66 47 Q58 48 50 48 Q42 48 34 47 Q26 46 22 43Z" fill="url(#cyberpunkVisorGrad)" />
+      {/* Neon accent line */}
+      <path d="M24 41 Q37 39 50 39 Q63 39 76 41" fill="none" stroke="#0ff" strokeWidth={1.5} opacity="0.8" />
+      <path d="M28 41 Q50 39.5 72 41" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.4" />
+      {/* Temple arms */}
+      <path d="M20 38 L14 36" stroke={fill} strokeWidth={S + 0.5} strokeLinecap="round" />
+      <path d="M80 38 L86 36" stroke={fill} strokeWidth={S + 0.5} strokeLinecap="round" />
+      {/* Frame detail dots */}
+      <circle cx="26" cy="42" r="1" fill="#0ff" opacity="0.6" />
+      <circle cx="74" cy="42" r="1" fill="#f0f" opacity="0.6" />
+    </g>
+  );
+}
+
 /** Monkey ears — furry round ears peeking from behind the head.
  * Rendered in the back-layer (before face) so they naturally peek out. */
 function MonkeyEars({ fill }: AccessoryPartProps) {
@@ -652,6 +790,12 @@ export const ACCESSORY_PARTS = {
   ninjaScarf: NinjaScarf,
   phoenixCrown: PhoenixCrown,
   monkeyEars: MonkeyEars,
+  beanie: Beanie,
+  catEars: CatEars,
+  flowerCrown: FlowerCrown,
+  goggles: Goggles,
+  bunnyEars: BunnyEars,
+  cyberpunkVisor: CyberpunkVisor,
 } as const;
 
 export type AccessoryPart = keyof typeof ACCESSORY_PARTS;

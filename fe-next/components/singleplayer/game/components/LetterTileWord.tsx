@@ -6,7 +6,6 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
-import { SPRING_PRESETS } from '@/lib/animation/presets';
 
 interface LetterTileWordProps {
   /** The word being formed */
@@ -71,7 +70,7 @@ export function LetterTileWord({
       data-testid="tile-container"
       className={cn(
         'relative flex items-center justify-center',
-        shouldShake && 'animate-neo-shake'
+        shouldShake && 'animate-neo-shake animate-neo-reject-flash rounded-lg'
       )}
     >
       {/* Letter tiles - always centered */}
@@ -79,11 +78,14 @@ export function LetterTileWord({
         {letters.map((letter, index) => (
           <AdaptiveMotion.div
             key={`${letter}-${index}`}
-            initial={{ scale: 0, y: -20 }}
-            animate={{ scale: 1, y: 0 }}
+            initial={{ scale: 0.85, y: -10, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
             transition={{
-              ...SPRING_PRESETS.snappy,
-              delay: index * 0.03,
+              type: 'spring',
+              stiffness: 600,
+              damping: 20,
+              mass: 0.5,
+              delay: index * 0.025,
             }}
             className={cn(
               'w-10 h-12 flex items-center justify-center',

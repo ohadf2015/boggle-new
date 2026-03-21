@@ -50,7 +50,33 @@ export function handlePlayerConnectionStatusChanged(
 }
 
 /**
- * Handle player disconnected event
+ * Delay before showing opponent disconnect notification.
+ * Hides brief disconnects (< 6s) from other players to prevent:
+ * 1. Exploitation (rushing while opponent reconnects)
+ * 2. Unnecessary anxiety for spectators
+ * Pattern used by Clash Royale and Among Us.
+ */
+const OPPONENT_DISCONNECT_DELAY_MS = 6000;
+
+// Track pending disconnect notifications so they can be cancelled on reconnect
+const pendingDisconnectTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+/**
+ * Cancel a pending disconnect notification (called when player reconnects quickly)
+ */
+export function cancelPendingDisconnectNotification(username: string): boolean {
+  const timer = pendingDisconnectTimers.get(username);
+  if (timer) {
+    clearTimeout(timer);
+    pendingDisconnectTimers.delete(username);
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Handle player disconnected event.
+ * Delays the notification to hide brief disconnections from opponents.
  */
 export function handlePlayerDisconnected(
   data: PlayerEventData,
@@ -58,17 +84,29 @@ export function handlePlayerDisconnected(
   context: 'HOST' | 'PLAYER'
 ): void {
   logger.log(`[${context}] Player disconnected:`, data.username);
-  neoInfoToast(
-    data.message || `${data.username} ${t('playerView.disconnected') || 'disconnected. Waiting for reconnection...'}`,
-    {
-      icon: '📡',
-      duration: 3000,
-    }
-  );
+
+  // Cancel any existing pending notification for this player
+  cancelPendingDisconnectNotification(data.username);
+
+  // Delay showing the notification — if they reconnect within 6s, nobody knows
+  const timer = setTimeout(() => {
+    pendingDisconnectTimers.delete(data.username);
+    neoInfoToast(
+      data.message || `${data.username} ${t('playerView.disconnected') || 'disconnected. Waiting for reconnection...'}`,
+      {
+        icon: '📡',
+        duration: 3000,
+      }
+    );
+  }, OPPONENT_DISCONNECT_DELAY_MS);
+
+  pendingDisconnectTimers.set(data.username, timer);
 }
 
 /**
- * Handle player reconnected event
+ * Handle player reconnected event.
+ * If they reconnected within the delay window, the disconnect toast
+ * was never shown — the disconnection was invisible to opponents.
  */
 export function handlePlayerReconnected(
   data: PlayerEventData,
@@ -76,6 +114,14 @@ export function handlePlayerReconnected(
   context: 'HOST' | 'PLAYER'
 ): void {
   logger.log(`[${context}] Player reconnected:`, data.username);
+
+  // If the disconnect notification was still pending, cancel it silently
+  const wasPending = cancelPendingDisconnectNotification(data.username);
+  if (wasPending) {
+    logger.log(`[${context}] Quick reconnect — disconnect was invisible to opponents`);
+    return; // Don't show reconnect toast either — nobody knew they left
+  }
+
   neoSuccessToast(
     data.message || `${data.username} ${t('playerView.reconnected') || 'reconnected'}`,
     {

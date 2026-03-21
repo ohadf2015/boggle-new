@@ -81,6 +81,7 @@ export function getSharedSocket(): Socket {
       reconnectionAttempts: SOCKET_CONFIG.reconnectionAttempts,
       reconnectionDelay: SOCKET_CONFIG.reconnectionDelay,
       reconnectionDelayMax: SOCKET_CONFIG.reconnectionDelayMax,
+      randomizationFactor: 0.7,  // Higher jitter prevents thundering herd on server restart
       timeout: SOCKET_CONFIG.timeout,
       autoConnect: false, // Connect after setting auth
       forceNew: false,

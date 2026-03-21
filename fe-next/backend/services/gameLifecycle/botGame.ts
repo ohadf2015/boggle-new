@@ -14,7 +14,7 @@ import {
   getLeaderboard,
   getGame,
 } from '../../modules/gameStateManager';
-import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
+import { volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../../modules/blastModeManager';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
@@ -158,7 +158,7 @@ export function startBotsForGame(
         updatePlayerScore(gameCode, username, totalScore, true);
 
         const leaderboard = getLeaderboard(gameCode);
-        broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
+        volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
           leaderboard,
         });
       },

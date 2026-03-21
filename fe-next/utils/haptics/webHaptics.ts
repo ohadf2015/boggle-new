@@ -11,9 +11,9 @@ import {
  */
 export class WebHaptics implements IHapticsImplementation {
   private readonly patternMap: Record<HapticPattern, number | number[]> = {
-    [HapticPattern.TAP]: 10,
+    [HapticPattern.TAP]: 12,
     [HapticPattern.SUCCESS]: [10, 50, 10],
-    [HapticPattern.ERROR]: [10, 50, 10, 50, 20],
+    [HapticPattern.ERROR]: [30, 40, 25, 35, 15, 30, 10],
     [HapticPattern.WARNING]: [20, 100, 20],
     [HapticPattern.SELECTION]: 5,
   };

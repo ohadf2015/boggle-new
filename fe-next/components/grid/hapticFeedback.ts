@@ -30,11 +30,11 @@ const PATTERNS: Record<string, number | number[]> = {
   blastPrism: [100, 40, 100, 40, 150],
   blastCascade: [30, 20, 30, 20, 50],
 
-  // Interaction feedback
-  cellTapFire: 18,
-  cellTapNormal: 12,
-  cellDragFire: 12,
-  cellDragNormal: 8,
+  // Interaction feedback — stronger tap matches the "rubber stamp pop" visual
+  cellTapFire: 25,
+  cellTapNormal: 18,
+  cellDragFire: 15,
+  cellDragNormal: 10,
   backtrackFire: 8,
   backtrackNormal: 3,
   undoFire: 15,
@@ -104,10 +104,13 @@ export function vibrateCellTap(fireRoundActive: boolean): void {
  */
 export function vibrateCellDrag(fireRoundActive: boolean, tier = 0): void {
   if (tier >= 3) {
-    vibrate(fireRoundActive ? [20, 8, 25] : [15, 8, 20]);
+    // Firm double-tap — matches urgent breathing glow
+    vibrate(fireRoundActive ? [25, 10, 30] : [18, 10, 22]);
   } else if (tier >= 2) {
-    vibrate(fireRoundActive ? [15, 8, 15] : [12, 6, 12]);
+    // Medium double-tap — matches faster pink breathing
+    vibrate(fireRoundActive ? [18, 10, 18] : [14, 8, 14]);
   } else if (tier >= 1) {
+    // Slightly stronger single tap — matches orange breathing onset
     vibrate(fireRoundActive ? PATTERNS.cellDragFire : 12);
   } else {
     vibrate(fireRoundActive ? PATTERNS.cellDragFire : PATTERNS.cellDragNormal);
@@ -120,11 +123,14 @@ export function vibrateCellDrag(fireRoundActive: boolean, tier = 0): void {
  */
 export function vibrateTierTransition(newTier: number): void {
   if (newTier >= 3) {
-    vibrate([30, 10, 30, 10, 50]);
+    // Triple pulse — "power surge" matching cyan/pink shimmer onset
+    vibrate([40, 15, 35, 15, 50]);
   } else if (newTier >= 2) {
-    vibrate([20, 10, 25]);
+    // Double pulse — "charge up" matching pink bloom onset
+    vibrate([30, 15, 35]);
   } else if (newTier >= 1) {
-    vibrate(15);
+    // Single firm pulse — "momentum" matching orange glow onset
+    vibrate(22);
   }
 }
 

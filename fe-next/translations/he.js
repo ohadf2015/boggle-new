@@ -331,7 +331,13 @@ const he = {
     "checkConnection": "נראה שאתה לא מחובר!",
     "retry": "נסה שוב",
     "retryNow": "נסה עכשיו",
-    "scoreSafe": "הניקוד שלך שמור בשרת"
+    "scoreSafe": "הניקוד שלך שמור בשרת",
+    "qualityExcellent": "חיבור מצוין",
+    "qualityGood": "חיבור טוב",
+    "qualityPoor": "חיבור איטי",
+    "qualityCritical": "חיבור איטי מאוד",
+    "wordQueued": "המילה נשמרה — תישלח כשהחיבור יחזור",
+    "wordsReplayed": "מילים בתור נשלחו!"
   },
   "game": {
     "combo": "קומבו",

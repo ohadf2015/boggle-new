@@ -28,7 +28,7 @@ describe('customAvatarSchema', () => {
 
   it('should reject invalid base type', () => {
     // Given a config with an invalid base
-    const config = { ...DEFAULT_AVATAR_CONFIG, base: 'triangle' };
+    const config = { ...DEFAULT_AVATAR_CONFIG, base: 'nonexistent' };
 
     // When parsing
     const result = customAvatarSchema.safeParse(config);
@@ -242,7 +242,7 @@ describe('Premium Parts', () => {
   describe('getPremiumParts', () => {
     test('returns all premium eye styles (VIP + Epic)', () => {
       expect(getPremiumParts('eyes')).toEqual([
-        'laser', 'hypno', 'money', 'alien', 'star', 'sparkle', 'hearts', 'cyclops', 'monocleEye',
+        'laser', 'hypno', 'money', 'alien', 'star', 'sparkle', 'hearts', 'cyclops', 'monocleEye', 'catPupils',
         'galaxy', 'flame', 'robot', 'void', 'infinity',
       ]);
     });
@@ -258,12 +258,13 @@ describe('Premium Parts', () => {
         'monocle', 'eyepatch', 'mask', 'sombrero',
         'cucumberFace', 'monkeyEars', 'plunger',
         'mustacheGlasses', 'propellerHat',
-        'samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown',
+        'catEars', 'bunnyEars', 'flowerCrown', 'goggles', 'beanie',
+        'samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown', 'cyberpunkVisor',
       ]);
     });
     test('returns all premium hair styles (VIP + Epic)', () => {
       expect(getPremiumParts('hair')).toEqual([
-        'elvis', 'ramen', 'mohawk', 'sideshave', 'twintails',
+        'elvis', 'ramen', 'mohawk', 'sideshave', 'twintails', 'undercut', 'spaceBuns',
         'flame', 'galaxy', 'neon',
       ]);
     });

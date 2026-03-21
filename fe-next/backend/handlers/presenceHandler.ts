@@ -15,7 +15,7 @@ import {
   forEachGame,
 } from '../modules/gameStateManager.js';
 
-import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { checkAutoKickInactive } from './kickHandler.js';
 import logger from '../utils/logger.js';
@@ -36,6 +36,15 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
   // Handle ping (simple connection check)
   socket.on('ping', () => {
     socket.emit('pong');
+  });
+
+  // Handle latency check (RTT measurement via acknowledgment callback)
+  // Client sends { t: timestamp }, server immediately invokes callback
+  // Client measures round-trip time from the timestamp delta
+  socket.on('latencyCheck', (_data: unknown, callback: () => void) => {
+    if (typeof callback === 'function') {
+      callback();
+    }
   });
 
   // Handle presence update (active/idle/afk status)
@@ -64,8 +73,8 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
     // Update user presence
     updateUserPresence(gameCode, username, presenceData);
 
-    // Broadcast to room
-    broadcastToRoom(io, getGameRoom(gameCode), 'userPresenceChanged', {
+    // Broadcast to room (volatile — non-critical presence update)
+    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'userPresenceChanged', {
       username,
       status,
       timestamp: Date.now()

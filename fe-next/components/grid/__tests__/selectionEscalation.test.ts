@@ -201,20 +201,20 @@ describe('getEscalationShake', () => {
     expect(getEscalationShake(2)).toBeUndefined();
   });
 
-  it('returns tremble for tier 1', () => {
-    expect(getEscalationShake(3)).toBe('escalation-tremble');
+  it('returns breathe-1 for tier 1', () => {
+    expect(getEscalationShake(3)).toBe('escalation-breathe-1 1.4s ease-in-out infinite');
   });
 
-  it('returns shake for tier 2', () => {
-    expect(getEscalationShake(5)).toBe('escalation-shake');
+  it('returns breathe-2 for tier 2', () => {
+    expect(getEscalationShake(5)).toBe('escalation-breathe-2 1.0s ease-in-out infinite');
   });
 
-  it('returns vibrate for tier 3', () => {
-    expect(getEscalationShake(7)).toBe('escalation-vibrate');
+  it('returns breathe-3 for tier 3', () => {
+    expect(getEscalationShake(7)).toBe('escalation-breathe-3 0.7s ease-in-out infinite');
   });
 
-  it('combo boosts shake tier', () => {
-    // 3 letters + combo 4 → tier 2 → shake
-    expect(getEscalationShake(3, 4)).toBe('escalation-shake');
+  it('combo boosts breathe tier', () => {
+    // 3 letters + combo 4 → tier 2 → breathe-2
+    expect(getEscalationShake(3, 4)).toBe('escalation-breathe-2 1.0s ease-in-out infinite');
   });
 });

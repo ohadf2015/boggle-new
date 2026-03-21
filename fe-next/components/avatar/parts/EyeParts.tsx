@@ -1,6 +1,6 @@
 /**
  * Avatar Eye Parts
- * 8 eye styles, positioned at y≈38 within viewBox 0 0 100 100
+ * 32 eye styles, positioned at y≈38 within viewBox 0 0 100 100
  */
 
 import { STROKE_INNER } from './avatarDesignConstants';
@@ -570,6 +570,142 @@ function Doe() {
   );
 }
 
+/** Peaceful closed eyes — gentle curved lines */
+function Closed() {
+  return (
+    <g>
+      {/* Closed eyelid curves — gentle arcs */}
+      <path d="M33 42 Q38 45 43 42" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M57 42 Q62 45 67 42" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Upper lid crease — subtle shadow */}
+      <path d="M34 40 Q38 38 42 40" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.2" strokeLinecap="round" />
+      <path d="M58 40 Q62 38 66 40" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.2" strokeLinecap="round" />
+      {/* Eyelash hints at outer corners */}
+      <line x1="33" y1="42.5" x2="31.5" y2="43.5" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.4" />
+      <line x1="67" y1="42.5" x2="68.5" y2="43.5" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.4" />
+      {/* Inner lash hints */}
+      <line x1="43" y1="42.5" x2="44" y2="43.5" stroke="#000" strokeWidth={0.8} strokeLinecap="round" opacity="0.3" />
+      <line x1="57" y1="42.5" x2="56" y2="43.5" stroke="#000" strokeWidth={0.8} strokeLinecap="round" opacity="0.3" />
+    </g>
+  );
+}
+
+/** Cat/dragon eyes — normal sclera with vertical slit pupils */
+function CatPupils() {
+  return (
+    <g>
+      {/* Sclera */}
+      <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Upper lid shadow */}
+      <path d="M33 40 Q38 37.5 43 40" fill="#000" opacity="0.06" />
+      <path d="M57 40 Q62 37.5 67 40" fill="#000" opacity="0.06" />
+      {/* Iris — amber/yellow for cat feel */}
+      <circle cx="38" cy="42" r="3.5" fill="#D4A017" />
+      <circle cx="62" cy="42" r="3.5" fill="#D4A017" />
+      {/* Iris outer ring */}
+      <circle cx="38" cy="42" r="3.5" fill="none" stroke="#8B6914" strokeWidth={0.6} opacity="0.5" />
+      <circle cx="62" cy="42" r="3.5" fill="none" stroke="#8B6914" strokeWidth={0.6} opacity="0.5" />
+      {/* Vertical slit pupils */}
+      <ellipse cx="38" cy="42" rx="1" ry="3.2" fill="#000" />
+      <ellipse cx="62" cy="42" rx="1" ry="3.2" fill="#000" />
+      {/* Catchlight */}
+      <circle cx="36.5" cy="40" r="1" fill="#fff" />
+      <circle cx="60.5" cy="40" r="1" fill="#fff" />
+      <circle cx="39" cy="43.5" r="0.4" fill="#fff" opacity="0.5" />
+      <circle cx="63" cy="43.5" r="0.4" fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
+/** Extra large shocked/surprised eyes — tiny irises, maximum white */
+function Wide() {
+  return (
+    <g>
+      {/* Large sclera — bigger than normal */}
+      <circle cx="38" cy="42" r="7.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Upper lid pulled high */}
+      <path d="M31 38 Q38 34 45 38" fill="#000" opacity="0.05" />
+      <path d="M55 38 Q62 34 69 38" fill="#000" opacity="0.05" />
+      {/* Tiny iris — maximum white showing */}
+      <circle cx="38" cy="42" r="2.2" fill="#4A6FA5" />
+      <circle cx="62" cy="42" r="2.2" fill="#4A6FA5" />
+      {/* Tiny pupil */}
+      <circle cx="38" cy="42" r="1.3" fill="#000" />
+      <circle cx="62" cy="42" r="1.3" fill="#000" />
+      {/* Catchlight */}
+      <circle cx="37" cy="41" r="0.7" fill="#fff" />
+      <circle cx="61" cy="41" r="0.7" fill="#fff" />
+      {/* Bottom lid line for extra shock */}
+      <path d="M31.5 46 Q38 49 44.5 46" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.15" />
+      <path d="M55.5 46 Q62 49 68.5 46" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.15" />
+      {/* Raised brow lines for shock */}
+      <path d="M32 34 Q38 30 44 34" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      <path d="M56 34 Q62 30 68 34" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** Narrow suspicious squinting eyes */
+function Squint() {
+  return (
+    <g>
+      {/* Narrow eye slits — top and bottom lids nearly touching */}
+      <path d="M33 42 Q38 39.5 43 42 Q38 44 33 42Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M57 42 Q62 39.5 67 42 Q62 44 57 42Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Iris peek through the slit */}
+      <ellipse cx="38" cy="42" rx="2.5" ry="1.2" fill="#5D4037" />
+      <ellipse cx="62" cy="42" rx="2.5" ry="1.2" fill="#5D4037" />
+      {/* Pupil — flattened */}
+      <ellipse cx="38" cy="42" rx="1.5" ry="0.8" fill="#000" />
+      <ellipse cx="62" cy="42" rx="1.5" ry="0.8" fill="#000" />
+      {/* Tiny catchlight */}
+      <circle cx="37" cy="41.5" r="0.5" fill="#fff" />
+      <circle cx="61" cy="41.5" r="0.5" fill="#fff" />
+      {/* Lid crease lines — suspicious furrowing */}
+      <path d="M33 39 Q38 37 43 39" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" strokeLinecap="round" />
+      <path d="M57 39 Q62 37 67 39" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" strokeLinecap="round" />
+      {/* Lower lid crease */}
+      <path d="M34 44.5 Q38 46 42 44.5" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.2" strokeLinecap="round" />
+      <path d="M58 44.5 Q62 46 66 44.5" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.2" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** Downturned sad eyes — droopy outer corners */
+function Sad() {
+  return (
+    <g>
+      {/* Sclera */}
+      <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
+      {/* Droopy upper lid — outer corners sag down */}
+      <path d="M33 41 Q36 39 38 39 Q41 39 43 43" fill="#000" opacity="0.08" />
+      <path d="M57 43 Q59 39 62 39 Q64 39 67 41" fill="#000" opacity="0.08" />
+      {/* Droopy eyelid line */}
+      <path d="M33 40 Q36 38 38 38 Q41 38 43 42" fill="none" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.4" />
+      <path d="M57 42 Q59 38 62 38 Q64 38 67 40" fill="none" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.4" />
+      {/* Iris — looking slightly down */}
+      <circle cx="38" cy="43" r="3" fill="#4A6FA5" />
+      <circle cx="62" cy="43" r="3" fill="#4A6FA5" />
+      <circle cx="38" cy="43.5" r="2.5" fill="#3A5A8A" opacity="0.4" />
+      <circle cx="62" cy="43.5" r="2.5" fill="#3A5A8A" opacity="0.4" />
+      {/* Pupil */}
+      <circle cx="38" cy="43" r="1.8" fill="#000" />
+      <circle cx="62" cy="43" r="1.8" fill="#000" />
+      {/* Catchlight — slightly dimmer for sad mood */}
+      <circle cx="36.5" cy="41.5" r="1" fill="#fff" opacity="0.8" />
+      <circle cx="60.5" cy="41.5" r="1" fill="#fff" opacity="0.8" />
+      <circle cx="39" cy="44" r="0.4" fill="#fff" opacity="0.4" />
+      <circle cx="63" cy="44" r="0.4" fill="#fff" opacity="0.4" />
+      {/* Downturned eyebrows */}
+      <path d="M32 37 Q36 35 40 36 Q42 37 44 38" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      <path d="M56 38 Q58 37 60 36 Q64 35 68 37" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+    </g>
+  );
+}
+
 function None() { return <g />; }
 
 export const EYE_PARTS = {
@@ -601,6 +737,11 @@ export const EYE_PARTS = {
   curious: Curious,
   determined: Determined,
   doe: Doe,
+  closed: Closed,
+  catPupils: CatPupils,
+  wide: Wide,
+  squint: Squint,
+  sad: Sad,
 } as const;
 
 export type EyePart = keyof typeof EYE_PARTS;

@@ -32,7 +32,7 @@ interface AvatarRendererProps {
  *   hair(front) -> accessory
  */
 /** Styles that render their main body behind the head */
-const BACK_LAYER_STYLES = ['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly'];
+const BACK_LAYER_STYLES = ['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut'];
 
 /** Accessories that render behind the face (ears, wings, etc.) */
 const BACK_ACCESSORY_STYLES = new Set(['monkeyEars']);
@@ -60,6 +60,7 @@ const SKIP_BLINK_EYES = new Set([
   'none', 'sleepy', 'happy', 'dizzy', 'cool', 'wink',
   'galaxy', 'flame', 'robot', 'void', 'infinity', 'laser',
   'hypno', 'alien', 'crying', 'money', 'hearts', 'star',
+  'closed', 'squint',
 ]);
 
 const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular }) => {
@@ -74,7 +75,10 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
   const AccessoryPart = ACCESSORY_PARTS[config.accessory] ?? ACCESSORY_PARTS.none;
   const EyebrowPart = EYEBROW_PARTS[config.eyebrows ?? 'none'] ?? EYEBROW_PARTS.none;
   const FacialHairPart = FACIAL_HAIR_PARTS[config.facialHair ?? 'none'] ?? FACIAL_HAIR_PARTS.none;
-  const BodyPart = BODY_PARTS[config.gender ?? 'male'];
+  const bodyKey = config.bodyStyle && config.bodyStyle !== 'default'
+    ? config.bodyStyle
+    : (config.gender ?? 'male');
+  const BodyPart = BODY_PARTS[bodyKey as keyof typeof BODY_PARTS] ?? BODY_PARTS.male;
   const isBackStyle = BACK_LAYER_STYLES.includes(config.hair);
   const isBackAccessory = BACK_ACCESSORY_STYLES.has(config.accessory);
   const blushColor = getBlushColor(config.skinColor);
@@ -170,7 +174,7 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       )}
 
       {/* Eyebrows — rendered above the eyes */}
-      {config.eyebrows && config.eyebrows !== 'none' && <EyebrowPart />}
+      {config.eyebrows && config.eyebrows !== 'none' && <EyebrowPart fill={config.hairColor} />}
 
       {/* Eyes — with periodic blink for standard eye types */}
       {config.eyes !== 'none' && (

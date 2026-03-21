@@ -159,6 +159,104 @@ function Handlebar({ fill }: FacialHairProps) {
   );
 }
 
+function WizardBeard({ fill }: FacialHairProps) {
+  return (
+    <g>
+      <defs>
+        <linearGradient id="wizardBeardGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={fill} />
+          <stop offset="60%" stopColor={fill} stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0.15" />
+        </linearGradient>
+      </defs>
+      {/* Main flowing beard shape */}
+      <path d="M34 58 Q36 56 40 57 Q44 58 47 58 Q50 58 53 58 Q56 58 60 57 Q64 56 66 58 Q70 64 68 74 Q66 82 62 88 Q58 94 54 97 Q52 98 50 99 Q48 98 46 97 Q42 94 38 88 Q34 82 32 74 Q30 64 34 58Z" fill="url(#wizardBeardGrad)" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Mustache portion */}
+      <path d="M40 57 Q44 55 47 56 Q50 57.5 50 57.5 Q50 57.5 53 56 Q56 55 60 57" fill="none" stroke="#000" strokeWidth={1} opacity="0.3" />
+      {/* Wispy flow lines */}
+      <path d="M38 64 Q40 72 42 80 Q44 88 46 94" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
+      <path d="M50 60 Q50 72 50 82 Q50 90 50 97" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.08" />
+      <path d="M62 64 Q60 72 58 80 Q56 88 54 94" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
+      {/* Wispy tendrils at the tip */}
+      <path d="M46 94 Q44 98 42 100" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.5" />
+      <path d="M50 97 Q50 100 50 102" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.4" />
+      <path d="M54 94 Q56 98 58 100" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.5" />
+      {/* Subtle highlight streaks */}
+      <path d="M44 62 Q46 68 46 74" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.1" />
+      <path d="M56 62 Q54 68 54 74" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.1" />
+      {/* Magical sparkle hints */}
+      <circle cx="42" cy="78" r="0.6" fill="#fff" opacity="0.15" />
+      <circle cx="56" cy="84" r="0.5" fill="#fff" opacity="0.12" />
+      <circle cx="48" cy="90" r="0.7" fill="#fff" opacity="0.1" />
+      {/* Volume highlights */}
+      <ellipse cx="40" cy="66" rx="3" ry="5" fill="#fff" opacity="0.06" />
+      <ellipse cx="60" cy="66" rx="3" ry="5" fill="#fff" opacity="0.06" />
+    </g>
+  );
+}
+
+function PencilMustache({ fill }: FacialHairProps) {
+  return (
+    <g>
+      {/* Left line */}
+      <path d="M40 57 Q44 55.5 50 56.5" fill="none" stroke={fill} strokeWidth={1.2} strokeLinecap="round" />
+      {/* Right line */}
+      <path d="M60 57 Q56 55.5 50 56.5" fill="none" stroke={fill} strokeWidth={1.2} strokeLinecap="round" />
+      {/* Subtle shadow */}
+      <path d="M40 57 Q44 55.5 50 56.5" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.2" />
+      <path d="M60 57 Q56 55.5 50 56.5" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.2" />
+      {/* Tiny pointed tips */}
+      <path d="M40 57 L38 57.5" stroke={fill} strokeWidth={0.8} strokeLinecap="round" />
+      <path d="M60 57 L62 57.5" stroke={fill} strokeWidth={0.8} strokeLinecap="round" />
+    </g>
+  );
+}
+
+function BraidedBeard({ fill }: FacialHairProps) {
+  return (
+    <g>
+      {/* Mustache */}
+      <path d="M42 57 Q44 55 47 56 Q50 57.5 50 57.5 Q50 57.5 53 56 Q56 55 58 57 Q58 59 55 59 Q52 59 50 60 Q48 59 45 59 Q42 59 42 57Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Chin base */}
+      <path d="M38 62 Q38 60 42 60 Q46 61 50 61 Q54 61 58 60 Q62 60 62 62 Q62 66 60 68 Q56 70 50 70 Q44 70 40 68 Q38 66 38 62Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Left braid */}
+      <path d="M42 68 Q40 72 42 74 Q44 76 42 78 Q40 80 42 82" fill="none" stroke={fill} strokeWidth={3} strokeLinecap="round" />
+      <path d="M42 68 Q40 72 42 74 Q44 76 42 78 Q40 80 42 82" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.25" />
+      {/* Center braid */}
+      <path d="M50 70 Q48 74 50 76 Q52 78 50 80 Q48 82 50 84" fill="none" stroke={fill} strokeWidth={3} strokeLinecap="round" />
+      <path d="M50 70 Q48 74 50 76 Q52 78 50 80 Q48 82 50 84" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.25" />
+      {/* Right braid */}
+      <path d="M58 68 Q60 72 58 74 Q56 76 58 78 Q60 80 58 82" fill="none" stroke={fill} strokeWidth={3} strokeLinecap="round" />
+      <path d="M58 68 Q60 72 58 74 Q56 76 58 78 Q60 80 58 82" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.25" />
+      {/* Beads at braid tips */}
+      <circle cx="42" cy="84" r="2" fill="#C0C0C0" stroke="#000" strokeWidth={0.8} />
+      <circle cx="50" cy="86" r="2" fill="#FFD700" stroke="#000" strokeWidth={0.8} />
+      <circle cx="58" cy="84" r="2" fill="#C0C0C0" stroke="#000" strokeWidth={0.8} />
+      {/* Bead highlights */}
+      <circle cx="41.5" cy="83.5" r="0.6" fill="#fff" opacity="0.3" />
+      <circle cx="49.5" cy="85.5" r="0.6" fill="#fff" opacity="0.3" />
+      <circle cx="57.5" cy="83.5" r="0.6" fill="#fff" opacity="0.3" />
+    </g>
+  );
+}
+
+function FuManchu({ fill }: FacialHairProps) {
+  return (
+    <g>
+      {/* Thin mustache line */}
+      <path d="M42 57 Q46 55.5 50 56.5 Q54 55.5 58 57" fill="none" stroke={fill} strokeWidth={1.8} strokeLinecap="round" />
+      {/* Left drooping tendril */}
+      <path d="M42 57 Q40 60 38 65 Q36 72 34 78 Q33 82 34 84" fill="none" stroke={fill} strokeWidth={2.5} strokeLinecap="round" />
+      <path d="M42 57 Q40 60 38 65 Q36 72 34 78 Q33 82 34 84" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.2" />
+      {/* Right drooping tendril */}
+      <path d="M58 57 Q60 60 62 65 Q64 72 66 78 Q67 82 66 84" fill="none" stroke={fill} strokeWidth={2.5} strokeLinecap="round" />
+      <path d="M58 57 Q60 60 62 65 Q64 72 66 78 Q67 82 66 84" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.2" />
+      {/* Subtle highlight */}
+      <path d="M44 56.5 Q47 55.5 50 56.5" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.15" />
+    </g>
+  );
+}
+
 export const FACIAL_HAIR_PARTS: Record<string, React.FC<FacialHairProps> | (() => null)> = {
   none: None,
   stubble: Stubble,
@@ -171,6 +269,10 @@ export const FACIAL_HAIR_PARTS: Record<string, React.FC<FacialHairProps> | (() =
   muttonChops: MuttonChops,
   vanDyke: VanDyke,
   handlebar: Handlebar,
+  wizardBeard: WizardBeard,
+  pencilMustache: PencilMustache,
+  braidedBeard: BraidedBeard,
+  fuManchu: FuManchu,
 };
 
 export type FacialHairPart = keyof typeof FACIAL_HAIR_PARTS;

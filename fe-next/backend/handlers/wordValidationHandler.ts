@@ -16,7 +16,7 @@ import {
   removePeerRejectedWordScore,
 } from '../modules/gameStateManager.js';
 
-import { broadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
+import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
@@ -298,7 +298,7 @@ function handlePeerRejection(io: Server, gameCode: string, game: GameState, resu
   });
 
   const leaderboard: LeaderboardPlayer[] = getLeaderboard(gameCode);
-  broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
+  volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
 }
 
 export { handleValidatedWord, handleWordBecameValid, handlePeerRejection };

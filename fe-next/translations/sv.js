@@ -331,7 +331,13 @@ const sv = {
     "checkConnection": "Du verkar vara offline!",
     "retry": "Försök igen",
     "retryNow": "Försök nu",
-    "scoreSafe": "Din poäng är sparad på servern"
+    "scoreSafe": "Din poäng är sparad på servern",
+    "qualityExcellent": "Utmärkt anslutning",
+    "qualityGood": "Bra anslutning",
+    "qualityPoor": "Långsam anslutning",
+    "qualityCritical": "Mycket långsam anslutning",
+    "wordQueued": "Ordet sparades — skickas vid återanslutning",
+    "wordsReplayed": "Köade ord har skickats!"
   },
   "game": {
     "combo": "Kombo",

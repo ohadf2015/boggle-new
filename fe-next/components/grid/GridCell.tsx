@@ -99,14 +99,14 @@ const GridCell = memo<GridCellProps>(({
         scale: isSelected ? (escalation?.scale ?? 1.05)
           : currentTier >= 3 && !isEliminated ? 0.96
           : (isFading ? 1.02 : 1),
-        opacity: 1,
-        rotate: 0,
+        opacity: isSelecting && selectedCellsLength > 0 && !isSelected && !isAdjacentHint && !isHighlighted ? 0.4 : 1,
+        rotate: isSelected ? ((row + col) % 2 === 0 ? -1.5 : 1.5) : 0,
         y: isSelected ? (escalation?.liftY ?? -2) : 0,
         x: 0,
         rotateX: 0,
       }
     }
-    whileTap={effectiveRenderMode === 'minimal' ? undefined : { scale: 0.95 }}
+    whileTap={effectiveRenderMode === 'minimal' ? undefined : { scale: 0.92 }}
     transition={effectiveRenderMode === 'minimal'
       ? { duration: 0 }
       : earthquakePhase !== 'idle' ? (
@@ -122,7 +122,12 @@ const GridCell = memo<GridCellProps>(({
         } : {
           duration: 0.1,
         }
-      ) : {
+      ) : isSelected ? {
+        type: 'spring',
+        stiffness: 600,
+        damping: 18,
+        mass: 0.6,
+      } : {
         type: 'spring',
         stiffness: 200,
         damping: 15,
@@ -149,9 +154,9 @@ const GridCell = memo<GridCellProps>(({
       isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
       isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
       isHovered && isLastSelected && selectedCellsLength >= 2 && "ring-4 ring-neo-green ring-offset-2 scale-110",
-      isSelecting && selectedCellsLength > 0 && !isSelected && !isAdjacentHint && !isHighlighted && "opacity-40 cursor-not-allowed",
+      isSelecting && selectedCellsLength > 0 && !isSelected && !isAdjacentHint && !isHighlighted && "cursor-not-allowed",
       isLastSelected && isSelecting && !isDragging && "animate-anchor-pulse z-20",
-      isSelected && !isHovered && "shadow-hard-sm",
+      isSelected && !isHovered && "shadow-hard-sm transition-shadow duration-75",
       isFocused && !isSelected && "z-20 animate-keyboard-focus",
       "transition-all",
       comboLevel > 0 ? "duration-300" : "duration-100"
@@ -160,9 +165,10 @@ const GridCell = memo<GridCellProps>(({
       borderRadius: '6px',
       fontSize: 'var(--cell-font-size)',
       ...(isSelected && {
-        boxShadow: escalation?.glow ?? '0 0 6px rgba(255, 200, 100, 0.3)',
+        '--esc-scale': String(escalation?.scale ?? 1.05),
+        boxShadow: escalation?.glow ?? '0 0 0 2px rgba(255, 225, 53, 0.7), 0 0 8px rgba(255, 200, 100, 0.3)',
         borderColor: escalation?.borderColor,
-      }),
+      } as React.CSSProperties),
       ...(isSelected && comboColors.isRainbow ? {
         background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
         backgroundSize: '300% 300%',
@@ -180,7 +186,7 @@ const GridCell = memo<GridCellProps>(({
         ...(!reduceMotion && getEscalationShake(selectedCellsLength, comboLevel) ? {
           animation: [
             getEscalationBackground(selectionIdx, selectedCellsLength, comboLevel).animation,
-            `${getEscalationShake(selectedCellsLength, comboLevel)} ${escalation.tier >= 3 ? '0.08s' : escalation.tier >= 2 ? '0.12s' : '0.15s'} infinite`,
+            getEscalationShake(selectedCellsLength, comboLevel),
           ].filter(Boolean).join(', '),
         } : {}),
       } : {}),

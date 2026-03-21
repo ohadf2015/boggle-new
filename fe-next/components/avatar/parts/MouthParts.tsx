@@ -1,6 +1,6 @@
 /**
  * Avatar Mouth Parts
- * 22 mouth styles, positioned at y≈58 within viewBox 0 0 100 100
+ * 27 mouth styles, positioned at y≈58 within viewBox 0 0 100 100
  */
 
 import { STROKE_INNER } from './avatarDesignConstants';
@@ -406,6 +406,110 @@ function Glitch() {
   );
 }
 
+function Frown() {
+  return (
+    <g>
+      <path d="M40 64 Q50 58 60 64" fill="#E85D75" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Inner lip highlight */}
+      <path d="M42 63.5 Q50 59.5 58 63.5" fill="#FF8FA3" opacity="0.5" />
+      {/* Lip shine */}
+      <path d="M44 64 Q50 61 56 64" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.45" strokeLinecap="round" />
+      {/* Dimple hints at corners */}
+      <circle cx="40" cy="63.5" r="0.6" fill="#000" opacity="0.12" />
+      <circle cx="60" cy="63.5" r="0.6" fill="#000" opacity="0.12" />
+      {/* Subtle downturned crease lines */}
+      <path d="M38 64 Q37 65 36 65.5" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.2" strokeLinecap="round" />
+      <path d="M62 64 Q63 65 64 65.5" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.2" strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Pout() {
+  return (
+    <g>
+      {/* Upper lip */}
+      <path d="M42 60 Q46 57 50 59 Q54 57 58 60" fill="#E85D75" stroke="#000" strokeWidth={S} strokeLinecap="round" strokeLinejoin="round" />
+      {/* Lower lip — plump */}
+      <path d="M42 60 Q50 67 58 60" fill="#D14D67" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Upper lip cupid's bow highlight */}
+      <path d="M44 59 Q47 57.5 50 59 Q53 57.5 56 59" fill="none" stroke="#FF8FA3" strokeWidth={0.7} opacity="0.5" />
+      {/* Lower lip shine */}
+      <ellipse cx="50" cy="63" rx="4" ry="1.5" fill="#FF8FA3" opacity="0.4" />
+      {/* Center highlight */}
+      <ellipse cx="50" cy="62" rx="2" ry="0.8" fill="#fff" opacity="0.3" />
+      {/* Lip line */}
+      <path d="M43 60 Q50 61.5 57 60" fill="none" stroke="#B33D55" strokeWidth={0.5} opacity="0.4" />
+    </g>
+  );
+}
+
+function BubbleGum() {
+  return (
+    <g>
+      {/* Open smile */}
+      <path d="M40 60 Q50 68 60 60" fill="#E85D75" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Inner lip highlight */}
+      <path d="M42 61 Q50 66 58 61" fill="#FF8FA3" opacity="0.5" />
+      {/* Teeth row */}
+      <path d="M42 60 Q50 62 58 60" fill="#fff" stroke="#000" strokeWidth={0.8} />
+      {/* Bubble — inflating from mouth center */}
+      <circle cx="50" cy="72" r="7" fill="#FF69B4" stroke="#000" strokeWidth={1.5} />
+      {/* Bubble inner gradient highlight */}
+      <circle cx="50" cy="72" r="6" fill="none" stroke="#FFB6D9" strokeWidth={0.8} opacity="0.4" />
+      {/* Bubble shine — top left */}
+      <ellipse cx="47" cy="69" rx="2.5" ry="1.8" fill="#fff" opacity="0.5" transform="rotate(-20 47 69)" />
+      {/* Bubble secondary highlight */}
+      <circle cx="53" cy="74" r="0.8" fill="#fff" opacity="0.3" />
+      {/* Connection to mouth */}
+      <path d="M48 66 Q49 68 48 70" fill="none" stroke="#FF69B4" strokeWidth={1} opacity="0.6" />
+      <path d="M52 66 Q51 68 52 70" fill="none" stroke="#FF69B4" strokeWidth={1} opacity="0.6" />
+    </g>
+  );
+}
+
+function BuckTeeth() {
+  return (
+    <g>
+      {/* Open smile */}
+      <path d="M38 58 Q50 68 62 58" fill="#8B0000" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Gum line */}
+      <path d="M38 58 Q50 62 62 58" fill="#FF9999" stroke="#000" strokeWidth={0.8} />
+      {/* Regular teeth row */}
+      <rect x="39" y="58" width="5" height="4" rx="0.5" fill="#fff" stroke="#000" strokeWidth={0.6} />
+      <rect x="56" y="58" width="5" height="4" rx="0.5" fill="#fff" stroke="#000" strokeWidth={0.6} />
+      {/* Two prominent buck teeth — taller and wider */}
+      <rect x="44.5" y="58" width="5" height="7" rx="1" fill="#fff" stroke="#000" strokeWidth={1} />
+      <rect x="50" y="58" width="5" height="7" rx="1" fill="#fff" stroke="#000" strokeWidth={1} />
+      {/* Tooth divider line */}
+      <line x1="50" y1="58" x2="50" y2="65" stroke="#000" strokeWidth={0.6} />
+      {/* Tooth shine */}
+      <rect x="45.5" y="59" width="1.5" height="2.5" rx="0.5" fill="#fff" opacity="0.5" />
+      <rect x="51" y="59" width="1.5" height="2.5" rx="0.5" fill="#fff" opacity="0.5" />
+      {/* Tongue peek behind */}
+      <ellipse cx="50" cy="65" rx="4" ry="2.5" fill="#FF6B6B" opacity="0.5" />
+    </g>
+  );
+}
+
+function SideSmile() {
+  return (
+    <g>
+      {/* Asymmetric mouth — left corner neutral, right corner up */}
+      <path d="M40 62 Q48 63 52 61 Q56 58 60 56" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Subtle lip fill on the curved side */}
+      <path d="M48 62 Q52 60 56 58" fill="#E85D75" opacity="0.25" />
+      {/* Right corner uptick emphasis */}
+      <circle cx="60" cy="56.5" r="0.7" fill="#000" opacity="0.3" />
+      {/* Dimple at the raised corner */}
+      <path d="M61 55 Q63 56 61 58" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.25" />
+      {/* Left corner — flat, subtle mark */}
+      <circle cx="40" cy="62.5" r="0.5" fill="#000" opacity="0.15" />
+      {/* Subtle lower lip shadow */}
+      <path d="M42 64 Q48 65 54 63" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.12" />
+    </g>
+  );
+}
+
 function None() { return <g />; }
 
 export const MOUTH_PARTS = {
@@ -432,6 +536,11 @@ export const MOUTH_PARTS = {
   dragon: Dragon,
   diamond: DiamondMouth,
   glitch: Glitch,
+  frown: Frown,
+  pout: Pout,
+  bubbleGum: BubbleGum,
+  buckTeeth: BuckTeeth,
+  sideSmile: SideSmile,
 } as const;
 
 export type MouthPart = keyof typeof MOUTH_PARTS;

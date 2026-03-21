@@ -1,10 +1,18 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSocket } from '@/utils/SocketContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+
+/**
+ * Graduated reconnection UX delay.
+ * Brief disconnections (< 5s) are silent — most mobile cellular handoffs
+ * resolve within 1-3 seconds. Showing a banner immediately creates
+ * unnecessary anxiety. Only show after this threshold.
+ */
+const BANNER_DELAY_MS = 5000;
 
 /**
  * Connection status type for better semantics
@@ -269,6 +277,8 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
     manualReconnect
   } = useSocket();
   const { t } = useLanguage();
+  const [showBanner, setShowBanner] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getStatus = (): ConnectionStatus => {
     if (isConnected) return 'connected';
@@ -279,8 +289,38 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
 
   const status = getStatus();
 
-  // Don't show banner when connected
-  if (status === 'connected') {
+  // Graduated UX: delay banner appearance to avoid anxiety during brief drops.
+  // Phase 1 (0-5s): Silent reconnection — most mobile dropouts resolve here.
+  // Phase 2 (5s+): Show full banner with progress and retry button.
+  useEffect(() => {
+    if (status === 'connected') {
+      // Immediately hide on reconnect
+      setShowBanner(false);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    // Start delay timer when disconnected
+    if (!timerRef.current) {
+      timerRef.current = setTimeout(() => {
+        setShowBanner(true);
+        timerRef.current = null;
+      }, BANNER_DELAY_MS);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [status]);
+
+  // Don't show banner when connected or during silent grace period
+  if (status === 'connected' || !showBanner) {
     return null;
   }
 

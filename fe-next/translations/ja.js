@@ -331,7 +331,13 @@ const ja = {
     "checkConnection": "オフラインみたい！",
     "retry": "再接続",
     "retryNow": "今すぐ再試行",
-    "scoreSafe": "スコアはサーバーに保存されています"
+    "scoreSafe": "スコアはサーバーに保存されています",
+    "qualityExcellent": "接続状態：優良",
+    "qualityGood": "接続状態：良好",
+    "qualityPoor": "接続状態：遅い",
+    "qualityCritical": "接続状態：非常に遅い",
+    "wordQueued": "単語を保存しました — 再接続時に送信されます",
+    "wordsReplayed": "保留中の単語を送信しました！"
   },
   "game": {
     "combo": "コンボ",

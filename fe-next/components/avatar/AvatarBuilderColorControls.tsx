@@ -96,7 +96,7 @@ export function GenderToggle({ selected, onSelect, t }: GenderToggleProps) {
                 : 'bg-neo-navy-light border-neo-white/15 hover:border-neo-white/40 text-neo-white/70'
             }`}
           >
-            <span className="text-lg">{gender === 'male' ? '♂' : '♀'}</span>
+            <span className="text-lg">{gender === 'male' ? '\u2642' : '\u2640'}</span>
             <span className="text-sm">{t(`avatar.builder.${gender}`)}</span>
           </AdaptiveMotion.button>
         ))}

@@ -37,6 +37,19 @@ export function broadcastToRoom(io: Server, room: string, event: string, data: u
 }
 
 /**
+ * Volatile broadcast to all sockets in a room.
+ * Volatile events are silently dropped if the transport is not ready (like UDP).
+ * Use for non-critical updates: leaderboard, presence, achievements, chat.
+ */
+export function volatileBroadcastToRoom(io: Server, room: string, event: string, data: unknown): void {
+  try {
+    io.to(room).volatile.emit(event, data);
+  } catch (error) {
+    console.error('[SOCKET] Error volatile broadcasting to room:', (error as Error).message);
+  }
+}
+
+/**
  * Broadcast to all sockets in a room except the sender
  */
 export function broadcastToRoomExceptSender(socket: Socket, room: string, event: string, data: unknown): void {

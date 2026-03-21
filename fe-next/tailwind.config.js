@@ -379,9 +379,20 @@ module.exports = {
           "100%": { transform: "translateY(0) rotate(0deg)", opacity: "1" },
         },
         "neo-shake": {
-          "0%, 100%": { transform: "translateX(0)" },
-          "25%": { transform: "translateX(-4px) rotate(-1deg)" },
-          "75%": { transform: "translateX(4px) rotate(1deg)" },
+          "0%":   { transform: "translateX(0) rotate(0deg)" },
+          "8%":   { transform: "translateX(-8px) rotate(1.5deg)" },
+          "18%":  { transform: "translateX(7px) rotate(-1.2deg)" },
+          "30%":  { transform: "translateX(-5px) rotate(0.8deg)" },
+          "42%":  { transform: "translateX(4px) rotate(-0.5deg)" },
+          "55%":  { transform: "translateX(-2px) rotate(0.3deg)" },
+          "70%":  { transform: "translateX(1px) rotate(-0.1deg)" },
+          "100%": { transform: "translateX(0) rotate(0deg)" },
+        },
+        "neo-reject-flash": {
+          "0%":   { borderColor: "currentColor", backgroundColor: "transparent" },
+          "15%":  { borderColor: "#FF3366", backgroundColor: "rgba(255,51,102,0.15)" },
+          "50%":  { borderColor: "#FF3366", backgroundColor: "rgba(255,51,102,0.08)" },
+          "100%": { borderColor: "currentColor", backgroundColor: "transparent" },
         },
         // Subtle pulse for CTA buttons
         "pulse-subtle": {
@@ -495,7 +506,8 @@ module.exports = {
         "neo-wobble": "neo-wobble 0.3s ease-in-out",
         "neo-pop": "neo-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-slide-in": "neo-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
-        "neo-shake": "neo-shake 0.4s ease-in-out",
+        "neo-shake": "neo-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
+        "neo-reject-flash": "neo-reject-flash 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
         "hint-glow": "hint-glow 2.5s ease-in-out infinite",
         "hint-blink": "hint-blink 1.5s ease-in-out 2",

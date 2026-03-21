@@ -20,7 +20,7 @@ import {
   addPlayerWord as addPlayerWordToGame,
 } from '../modules/gameStateManager.js';
 
-import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { isWordOnBoardAsync } from '../modules/wordValidatorPool.js';
 import { isProfane } from '../utils/profanityFilter.js';
 import { isDictionaryWord } from '../dictionary.js';
@@ -335,7 +335,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       // Using 200ms as a balance between responsiveness and network efficiency
       const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '200');
       getLeaderboardThrottled(gameCode, (leaderboard: LeaderboardPlayer[]) => {
-        broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
+        volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
       }, lbThrottleMs);
 
       // Release grace period lock after successful word processing

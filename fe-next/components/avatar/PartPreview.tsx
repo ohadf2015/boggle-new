@@ -57,7 +57,7 @@ function renderPart(partType: string, partName: string, config: CustomAvatarConf
           </defs>
           <circle cx="50" cy="52" r="32" fill={config.skinColor} opacity="0.35" />
           <g filter="url(#preview-invert)">
-            <Part />
+            <Part fill={config.hairColor} />
           </g>
         </g>
       ) : null;

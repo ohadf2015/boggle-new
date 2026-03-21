@@ -331,7 +331,13 @@ const es = {
     "checkConnection": "¡Parece que estás sin conexión!",
     "retry": "Reintentar",
     "retryNow": "Reintentar ahora",
-    "scoreSafe": "Tu puntuación está segura en el servidor"
+    "scoreSafe": "Tu puntuación está segura en el servidor",
+    "qualityExcellent": "Conexión excelente",
+    "qualityGood": "Buena conexión",
+    "qualityPoor": "Conexión lenta",
+    "qualityCritical": "Conexión muy lenta",
+    "wordQueued": "Palabra guardada — se enviará al reconectar",
+    "wordsReplayed": "¡Palabras en cola enviadas!"
   },
   "game": {
     "combo": "Combo",

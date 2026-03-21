@@ -204,9 +204,12 @@ export function getEscalationBackground(
 }
 
 /**
- * Get the escalation shake animation name for selected tiles.
- * Returns a CSS animation name that intensifies with tier.
- * All selected tiles shake together, creating a "building energy" feel.
+ * Get the escalation breathing animation for selected tiles.
+ * Replaces the old continuous shake (which read as a GPU glitch) with
+ * a breathing glow that communicates "charging up" through pulsing
+ * box-shadow and subtle scale oscillation.
+ *
+ * Returns a full CSS animation shorthand string or undefined for base tier.
  */
 export function getEscalationShake(
   totalSelected: number,
@@ -214,7 +217,7 @@ export function getEscalationShake(
 ): string | undefined {
   const esc = getSelectionEscalation(0, totalSelected, comboLevel);
   if (esc.tier <= 0) return undefined;
-  if (esc.tier === 1) return 'escalation-tremble';
-  if (esc.tier === 2) return 'escalation-shake';
-  return 'escalation-vibrate';
+  if (esc.tier === 1) return 'escalation-breathe-1 1.4s ease-in-out infinite';
+  if (esc.tier === 2) return 'escalation-breathe-2 1.0s ease-in-out infinite';
+  return 'escalation-breathe-3 0.7s ease-in-out infinite';
 }
