@@ -3,6 +3,10 @@
  *
  * Manages adventure game state including tiles, objectives, timer, and score.
  * Handles special tile effects and level completion logic.
+ *
+ * Exposes a `timerStore` (pub/sub) that mirrors `timeRemaining` so that leaf
+ * components (AdventureTimer) can subscribe directly via useSyncExternalStore,
+ * isolating per-second re-renders from sibling component subtrees.
  */
 
 import { useReducer, useCallback, useEffect, useRef, useMemo } from 'react';
@@ -16,6 +20,7 @@ import { WORLDS_COUNT, LEVELS_PER_WORLD, generateAdventureGrid } from '@/lib/adv
 import type { Language } from '@/types';
 import { useCascadeLoop, type CascadePhase } from './useCascadeLoop';
 import { gameReducer, createInitialState, type ReducerUpgradeConfig } from './adventureGameReducer';
+import { useAdventureTimerStore, type AdventureTimerStore } from './useAdventureTimerStore';
 
 
 // ==============================================
@@ -39,6 +44,12 @@ interface UseAdventureGameReturn {
   tilesVersion: number;
   objectives: LevelObjective[];
   timeRemaining: number;
+  /**
+   * Pub/sub store that mirrors timeRemaining. Pass to AdventureTimer (via
+   * GameHeader) so it subscribes directly and re-renders independently of
+   * sibling components. Use `useAdventureTimerValue(timerStore)` to subscribe.
+   */
+  timerStore: AdventureTimerStore;
   canComplete: boolean;
   isPlaying: boolean;
   cascadeComplete: boolean;
@@ -113,6 +124,18 @@ export function useAdventureGame({
   });
 
   const comboTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Pub/sub store that mirrors timeRemaining for leaf-component subscriptions.
+  // AdventureTimer subscribes via useAdventureTimerValue(timerStore) so only
+  // the timer widget re-renders on tick, not sibling components.
+  const timerStore = useAdventureTimerStore(levelConfig.timerSeconds);
+
+  // Sync store whenever reducer's timeRemaining changes (every TICK, time tile
+  // bonus, ADD_TIME, RESET_GAME, etc.). The store is a passive mirror — no
+  // interval of its own; the reducer drives it.
+  useEffect(() => {
+    timerStore.notify(state.timeRemaining);
+  }, [timerStore, state.timeRemaining]);
 
   // Timer effect - only depends on isPlaying
   useEffect(() => {
@@ -248,6 +271,7 @@ export function useAdventureGame({
     tilesVersion: state.tilesVersion,
     objectives: state.objectives,
     timeRemaining: state.timeRemaining,
+    timerStore,
     canComplete,
     isPlaying: state.isPlaying,
     cascadeComplete: state.cascadeComplete,

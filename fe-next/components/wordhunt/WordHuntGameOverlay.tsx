@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Skull, Target, Trophy } from 'lucide-react';
 
 export interface WordHuntGameOverlayProps {
@@ -34,15 +34,15 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
   // Target found takes priority (game is ending for everyone)
   if (targetFound) {
     return (
-      <AnimatePresence>
-        <motion.div
+      <AdaptiveAnimatePresence>
+        <AdaptiveMotion.div
           data-testid="target-found-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-neo-black/70 backdrop-blur-sm"
         >
           {/* Icon */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', damping: 12 }}
@@ -52,10 +52,10 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
             ) : (
               <Target className="w-16 h-16 text-neo-cyan drop-shadow-[0_0_20px_rgba(0,255,255,0.5)]" />
             )}
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Title */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -75,10 +75,10 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
                 </span>
               </div>
             )}
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Players progress */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -120,27 +120,27 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
                 </div>
               );
             })}
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Waiting message */}
-          <motion.p
+          <AdaptiveMotion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
             className="mt-4 text-xs text-neo-cream/50 animate-pulse"
           >
             {t('wordHunt.mp.gameEnding')}
-          </motion.p>
-        </motion.div>
-      </AnimatePresence>
+          </AdaptiveMotion.p>
+        </AdaptiveMotion.div>
+      </AdaptiveAnimatePresence>
     );
   }
 
   // Elimination overlay
   if (isEliminated) {
     return (
-      <AnimatePresence>
-        <motion.div
+      <AdaptiveAnimatePresence>
+        <AdaptiveMotion.div
           data-testid="elimination-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -157,34 +157,34 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
 
           {/* Content */}
           <div className="relative z-10 flex flex-col items-center">
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ scale: 0, rotate: -90 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', damping: 10, stiffness: 100 }}
             >
               <Skull className="w-20 h-20 text-neo-red drop-shadow-[0_0_30px_rgba(220,38,38,0.8)]" />
-            </motion.div>
+            </AdaptiveMotion.div>
 
-            <motion.span
+            <AdaptiveMotion.span
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="mt-4 text-2xl font-black text-neo-red font-neo-display uppercase tracking-wide"
             >
               {t('wordHunt.mp.eliminated')}
-            </motion.span>
+            </AdaptiveMotion.span>
 
-            <motion.p
+            <AdaptiveMotion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.7 }}
               transition={{ delay: 0.5 }}
               className="mt-2 text-sm text-neo-cream/60"
             >
               {t('wordHunt.mp.watchOthers')}
-            </motion.p>
+            </AdaptiveMotion.p>
 
             {/* Other players still alive */}
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
@@ -211,10 +211,10 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
                   </div>
                 ))
               }
-            </motion.div>
+            </AdaptiveMotion.div>
           </div>
-        </motion.div>
-      </AnimatePresence>
+        </AdaptiveMotion.div>
+      </AdaptiveAnimatePresence>
     );
   }
 

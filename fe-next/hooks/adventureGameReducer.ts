@@ -13,6 +13,10 @@ export type GameAction =
   | { type: 'START_GAME' }
   | { type: 'PAUSE_GAME' }
   | { type: 'TICK' }
+  /** Fired by the external timer store when time reaches 0. Sets isComplete directly. */
+  | { type: 'TIMER_EXPIRED' }
+  /** Sync reducer's timeRemaining from the external timer store snapshot. */
+  | { type: 'TIME_SYNC'; payload: { timeRemaining: number } }
   | { type: 'ADD_TIME'; payload: { seconds: number } }
   | {
       type: 'SUBMIT_WORD';
@@ -394,6 +398,24 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       }
 
       return { ...state, timeRemaining: newTime };
+    }
+
+    case 'TIMER_EXPIRED': {
+      return {
+        ...state,
+        timeRemaining: 0,
+        isPlaying: false,
+        gameState: {
+          ...state.gameState,
+          isComplete: true,
+          stars: calculateStars(state.objectives),
+        },
+      };
+    }
+
+    case 'TIME_SYNC': {
+      if (!state.isPlaying) return state;
+      return { ...state, timeRemaining: action.payload.timeRemaining };
     }
 
     case 'ADD_TIME': {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Skull, Eye, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,8 +45,8 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
   const isOtherFound = reason === 'otherFound';
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         key="gameover-overlay"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -54,7 +54,7 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
         className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center overflow-hidden"
       >
         {/* Vignette — red for death, gold for victory, blue for other found */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: phase === 'impact' ? 1 : 0.2 }}
           transition={{ duration: 0.8 }}
@@ -69,7 +69,7 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
         />
 
         {/* Dark overlay for spectator */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: phase === 'spectator' ? 0.4 : 0.15 }}
           transition={{ duration: 0.6, delay: phase === 'spectator' ? 0 : 0.3 }}
@@ -80,15 +80,15 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
         {!isEliminated && !isOtherFound && phase === 'impact' && <VictoryParticles />}
 
         {/* Content */}
-        <AnimatePresence mode="wait">
+        <AdaptiveAnimatePresence mode="wait">
           {phase === 'impact' ? (
             <ImpactContent key="impact" isEliminated={isEliminated} isOtherFound={isOtherFound} t={t} />
           ) : (
             <SpectatorContent key="spectator" t={t} />
           )}
-        </AnimatePresence>
-      </motion.div>
-    </AnimatePresence>
+        </AdaptiveAnimatePresence>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 };
 
@@ -100,14 +100,14 @@ const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t:
   isOtherFound,
   t,
 }) => (
-  <motion.div
+  <AdaptiveMotion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0, y: -20, transition: { duration: 0.4 } }}
     className="relative flex flex-col items-center gap-4"
   >
     {/* Icon — skull or trophy */}
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ scale: 0, rotate: isEliminated ? -15 : 0 }}
       animate={{
         scale: [0, 1.4, 1],
@@ -134,10 +134,10 @@ const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t:
           strokeWidth={2.5}
         />
       )}
-    </motion.div>
+    </AdaptiveMotion.div>
 
     {/* Banner text */}
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, scale: 0.5, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.5, type: 'spring', stiffness: 200 }}
@@ -152,33 +152,33 @@ const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t:
       )}
     >
       {isEliminated ? t('wordHunt.mp.youEliminated') : isOtherFound ? t('wordHunt.mp.someoneFoundIt') : t('wordHunt.mp.youFoundIt')}
-    </motion.div>
+    </AdaptiveMotion.div>
 
     {/* Subtitle */}
-    <motion.p
+    <AdaptiveMotion.p
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 1.2, duration: 0.5 }}
       className="text-neo-white/80 font-neo-body text-sm"
     >
       {t('wordHunt.mp.watchOthers')}
-    </motion.p>
+    </AdaptiveMotion.p>
 
     {/* Screen shake for elimination */}
     {isEliminated && (
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ x: 0 }}
         animate={{ x: [0, -8, 8, -6, 6, -3, 3, 0] }}
         transition={{ duration: 0.5, delay: 0.1 }}
         className="absolute inset-0 pointer-events-none"
       />
     )}
-  </motion.div>
+  </AdaptiveMotion.div>
 );
 
 /** Spectator mode — subtle watching indicator at top */
 const SpectatorContent: React.FC<{ t: (key: string) => string }> = ({ t }) => (
-  <motion.div
+  <AdaptiveMotion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
@@ -190,7 +190,7 @@ const SpectatorContent: React.FC<{ t: (key: string) => string }> = ({ t }) => (
         {t('wordHunt.mp.watchOthers')}
       </span>
     </div>
-  </motion.div>
+  </AdaptiveMotion.div>
 );
 
 /** Floating sparkle particles for the victory burst */
@@ -218,7 +218,7 @@ const VictoryParticles: React.FC = () => {
   return (
     <>
       {particles.map((p) => (
-        <motion.div
+        <AdaptiveMotion.div
           key={p.id}
           initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
           animate={{
@@ -235,7 +235,7 @@ const VictoryParticles: React.FC = () => {
           className="absolute z-10"
         >
           <Sparkles size={p.size} className="text-yellow-300" />
-        </motion.div>
+        </AdaptiveMotion.div>
       ))}
     </>
   );
