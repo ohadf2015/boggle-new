@@ -294,7 +294,7 @@ export async function updatePlayerStats(
   // Retry helper for deadlock recovery (PostgreSQL error code 40P01)
   const MAX_RETRIES = 3;
   const retryOnDeadlock = async <T>(
-    operation: () => Promise<{ data: T; error: { message: string; code?: string } | null }>,
+    operation: () => PromiseLike<{ data: T; error: { message: string; code?: string } | null }>,
     label: string
   ): Promise<{ data: T; error: { message: string; code?: string } | null }> => {
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
