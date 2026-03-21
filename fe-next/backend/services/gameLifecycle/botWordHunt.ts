@@ -258,6 +258,8 @@ function scheduleWordHuntGuess(
     playerLives: huntState.playerLives,
     eliminatedPlayers: huntState.eliminatedPlayers,
   });
+  // Mark last broadcast time so gameTimer skips redundant tick broadcast
+  huntState.lastLifeUpdateAt = Date.now();
 
   // Schedule next guess
   const delay = strategy.minDelay + Math.random() * (strategy.maxDelay - strategy.minDelay);

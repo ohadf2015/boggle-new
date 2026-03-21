@@ -129,8 +129,12 @@ export const useGameStore = create<GameStore>()(
     updatePlayer: (username, updates) => set((state) => {
       const idx = state.players.findIndex(p => p.username === username);
       if (idx === -1) return state;
+      // Skip update when all values are identical (avoids ~5x/sec garbage array creation)
+      const current = state.players[idx];
+      const keys = Object.keys(updates) as (keyof typeof updates)[];
+      if (keys.every(k => current[k] === updates[k])) return state;
       const next = [...state.players];
-      next[idx] = { ...next[idx], ...updates };
+      next[idx] = { ...current, ...updates };
       return { players: next };
     }),
 
