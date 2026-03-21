@@ -31,17 +31,17 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 My partner looked at me like I needed professional help.
 
-But here's the thing: while I was sitting there looking slightly unhinged, my brain was doing something genuinely remarkable. And I don't mean that in a hand-wavy "brain training makes you smarter" way. I mean that neuroscientists have stuck people in fMRI machines while they play word games, and what they found is kind of wild.
+But while I was sitting there looking slightly unhinged, my brain was doing something genuinely remarkable. Not in a hand-wavy "brain training makes you smarter" way. Neuroscientists have stuck people in fMRI machines while they play word games, and what they found is kind of wild.
 
-Let me walk you through it. Fair warning: I'm going to cite actual research, but I'm also going to tell you where the science ends and the marketing hype begins. Because this field has a messy history, and you deserve to know about it.`,
+Fair warning: I'm going to cite actual research, but I'm also going to tell you where the science ends and the marketing hype begins. This field has a messy history, and you deserve to know about it.`,
       },
       {
-        title: 'Your Brain on Word Games: The fMRI Evidence',
-        content: `So picture this. You're lying in an fMRI machine — which, if you've never been in one, is basically a very loud, very claustrophobic tube that takes pictures of blood flow in your brain. Researchers show you a grid of letters and ask you to find words.
+        title: 'Your brain on word games: the fMRI evidence',
+        content: `Picture this. You're lying in an fMRI machine, which is basically a very loud, very claustrophobic tube that takes pictures of blood flow in your brain. Researchers show you a grid of letters and ask you to find words.
 
 What lights up?
 
-Everything. Well, not literally everything, but a LOT more than you'd expect.
+A lot more than you'd expect.
 
 According to a systematic review of fMRI studies published in AIMS Neuroscience (2021), word searching activates at least four major brain regions simultaneously:
 
@@ -49,19 +49,19 @@ Broca's area handles the phonological processing — basically, it's sounding ou
 
 Wernicke's area deals with meaning. It's the part that goes "wait, is GRAT a word? No. GRATE? Yes!" It's cross-referencing your mental dictionary at incredible speed.
 
-The Dorsolateral Prefrontal Cortex (DLPFC) — try saying that five times fast — acts as the executive coordinator. It's the air traffic controller making sure all these processes don't crash into each other.
+The Dorsolateral Prefrontal Cortex (DLPFC) acts as the executive coordinator. It's the air traffic controller making sure all these processes don't crash into each other.
 
 And then the Basal Ganglia jump in when things get complicated. Finding CAT? They're chilling. Finding CATASTROPHE? They're working overtime.
 
-Here's what blew my mind: this isn't one area doing one thing. It's a synchronized neural orchestra, with different sections coming in and out depending on the difficulty. The harder the word game, the more of your brain participates.`,
+What surprised me most: this isn't one area doing one thing. It's a synchronized neural orchestra, with different sections coming in and out depending on the difficulty. The harder the word game, the more of your brain participates.`,
       },
       {
-        title: 'The Phonological Loop (Or: Why You Mutter to Yourself)',
+        title: 'The phonological loop (or: why you mutter to yourself)',
         content: `Ever notice that when you're really concentrating on a word game, your lips move slightly? Or you catch yourself quietly mumbling letter combinations?
 
 That's not a quirk. That's your phonological loop at work.
 
-A meta-analysis published in Frontiers in Human Neuroscience (2019) found that verbal working memory — the kind you use when holding letters in mind while searching for words — primarily activates the left prefrontal cortex. Spatial working memory (like remembering where things are on a map) lights up the right side instead.
+A 2019 meta-analysis in Frontiers in Human Neuroscience found that verbal working memory, the kind you use when holding letters in mind while searching for words, primarily activates the left prefrontal cortex. Spatial working memory lights up the right side instead.
 
 The phonological loop is basically your brain's RAM for language. It's a rehearsal mechanism that keeps information active by repeating it. When you're scanning a letter grid, you're running dozens of letter combinations through this loop per second, testing each one against your vocabulary.
 
@@ -70,28 +70,28 @@ I tested this on myself once. I tried playing a word game while simultaneously c
 This is also why it's harder to play word games in a noisy environment with people talking. Their words intrude on your phonological loop. Your brain can't help but process the incoming language, which steals resources from the word-finding task.`,
       },
       {
-        title: 'When Your Brain Goes to "Hard Mode"',
-        content: `Here's something the studies consistently show: there's a direct, measurable relationship between how hard a word game task is and how much of your brain gets recruited.
+        title: 'When your brain goes to hard mode',
+        content: `The studies consistently show a direct, measurable relationship between how hard a word game task is and how much of your brain gets recruited.
 
 Easy word? A few areas handle it efficiently.
 
-Hard word — long, unusual, requires scanning multiple directions? Your brain starts pulling in reinforcements. Pre-motor regions activate (the areas that plan physical movements, even though you're just thinking). The cerebellum — traditionally associated with balance and coordination — gets involved in the cognitive coordination.
+Hard word, long, unusual, requires scanning multiple directions? Your brain starts pulling in reinforcements. Pre-motor regions activate (the areas that plan physical movements, even though you're just thinking). The cerebellum, traditionally associated with balance and coordination, gets involved in the cognitive coordination.
 
 This is why a challenging word game genuinely feels different from an easy one. It's not just subjective. Your brain is literally recruiting more neural real estate.
 
 I notice this in my own playing. When I'm finding three- and four-letter words, it feels almost automatic. Relaxing, even. But when I'm hunting for that elusive six- or seven-letter word, there's a physical sensation of effort. My forehead tenses. I lean forward. It's like the difference between a casual walk and a sprint — same legs, very different intensity.
 
-The research backs this up. A study on action word memory published in PMC (2022) found that when people hold words in working memory — especially action verbs like "run," "throw," or "grab" — they activate motor areas too. The brain doesn't store words like files in a folder. It stores them as rich, interconnected networks linking sound, meaning, physical sensation, and memory.
+A 2022 study on action word memory found that when people hold words in working memory, especially action verbs like "run," "throw," or "grab," they activate motor areas too. The brain doesn't store words like files in a folder. It stores them as rich, interconnected networks linking sound, meaning, physical sensation, and memory.
 
 So when you find the word JUMP in a letter grid, your motor cortex twitches slightly, as if preparing to actually jump. Language is embodied. It lives in your whole brain, not just the "language parts."`,
       },
       {
-        title: 'Hagoort\'s MUC Model: The Three Engines of Language',
-        content: `Okay, this is where it gets really cool. Peter Hagoort — a Dutch neuroscientist at the Max Planck Institute — proposed a model for how the brain processes language that fits word games almost perfectly.
+        title: 'Hagoort\'s MUC model: the three engines of language',
+        content: `Peter Hagoort at the Max Planck Institute proposed a model for how the brain processes language that fits word games almost perfectly.
 
 He calls it the MUC Model: Memory, Unification, Control.
 
-Memory is the retrieval system. It pulls words from your mental lexicon — the vast dictionary stored in your temporal lobe. When you see the letters S, T, A, R, your memory system immediately starts serving up candidates: STAR, TARS, RATS, ARTS, and dozens more.
+Memory is the retrieval system. It pulls words from your mental lexicon, the vast dictionary stored in your temporal lobe. When you see the letters S, T, A, R, your memory system immediately starts serving up candidates: STAR, TARS, RATS, ARTS, and dozens more.
 
 Unification happens in Broca's area. This is where the candidates get tested. Does this combination of letters actually form a real word? Does it follow the rules of the game? Unification is the quality control department, checking each candidate against phonological rules, morphological patterns, and semantic meaning.
 
@@ -102,10 +102,8 @@ All three engines run simultaneously when you play a word game. You're retrievin
 I think about this every time someone dismisses word games as "just a silly pastime." You're running one of the most complex cognitive operations your brain is capable of. Give yourself some credit.`,
       },
       {
-        title: 'The Elephant in the Room: The Lumosity Scandal',
-        content: `Alright. Time to talk about the uncomfortable stuff.
-
-In 2016, Lumosity — the biggest name in "brain training" — was fined $50 million by the Federal Trade Commission. Fifty. Million. Dollars.
+        title: 'The Lumosity scandal',
+        content: `In 2016, Lumosity was fined $50 million by the Federal Trade Commission. Fifty million dollars.
 
 Why? Because they claimed their games could help users perform better at work and school, delay age-related cognitive decline, and even reduce cognitive impairment associated with conditions like Alzheimer's disease. These claims weren't supported by their evidence.
 
@@ -113,59 +111,59 @@ The FTC found that Lumosity "preyed on consumers' fears about age-related cognit
 
 This is important context for everything I'm telling you. The brain-training industry has a credibility problem. Too many companies have sold vague promises about "neuroplasticity" and "cognitive enhancement" without the research to back it up.
 
-So let me be really clear: I am NOT telling you that word games will make you smarter, prevent Alzheimer's, or boost your IQ. Anyone who tells you that is either uninformed or selling something.
+To be clear: I am not telling you that word games will make you smarter, prevent Alzheimer's, or boost your IQ. Anyone who tells you that is either uninformed or selling something.
 
-What I AM telling you is what the neuroscience actually shows about what happens in your brain during word games. That's a different conversation entirely.`,
+What I am telling you is what the neuroscience actually shows about what happens in your brain during word games. Different conversation entirely.`,
       },
       {
-        title: 'What the Research Actually Shows (Honestly)',
-        content: `Okay, with that caveat firmly in place, here's what we can say with reasonable confidence.
+        title: 'What the research actually shows',
+        content: `With that caveat firmly in place, here's what we can say with reasonable confidence.
 
-The biggest recent study comes from the University of Exeter and King's College London. They tracked over 19,000 participants aged 50 and older who reported regularly engaging in word puzzles. The results? People who did word puzzles regularly performed significantly better on cognitive tests — equivalent to having a brain about 10 years younger than their actual age.
+The biggest recent study comes from Exeter and King's College London. They tracked over 19,000 participants aged 50+ who regularly engaged in word puzzles. People who did word puzzles regularly performed significantly better on cognitive tests, equivalent to having a brain about 10 years younger than their actual age.
 
 Now, massive caveat: this is a correlational study. It doesn't prove that word puzzles caused the better performance. Maybe people who are already sharper are just more likely to enjoy word puzzles. Chicken-and-egg problem.
 
 But the effect size was big enough to be noteworthy. We're not talking about a marginal blip. Ten years of cognitive difference is substantial.
 
-Then there's the INHANCE Trial out of McGill University (2025), which found that structured cognitive exercises — including word-based tasks — were associated with a 2.3% increase in acetylcholine levels. Acetylcholine is a neurotransmitter crucial for memory and learning. A 2.3% bump might sound small, but in neurotransmitter terms, it's meaningful.
+Then there's the INHANCE Trial out of McGill (2025), which found that structured cognitive exercises, including word-based tasks, were associated with a 2.3% increase in acetylcholine levels. Acetylcholine is a neurotransmitter crucial for memory and learning. A 2.3% bump might sound small, but in neurotransmitter terms, it's meaningful.
 
-However — and this is critical — neither of these studies says "play word games and your brain will improve." What they suggest is that cognitively demanding linguistic activities engage real neural systems in ways that correlate with better cognitive outcomes. The mechanism isn't fully understood yet.
+Neither of these studies says "play word games and your brain will improve." What they suggest is that cognitively demanding linguistic activities engage real neural systems in ways that correlate with better cognitive outcomes. The mechanism isn't fully understood yet.
 
-Here's my personal take, for what it's worth: even if word games don't make you "smarter" in some measurable way, the act of engaging in focused, challenging cognitive activity is almost certainly better for your brain than passively scrolling social media. The bar isn't "does this cure dementia?" The bar is "is this a good use of my mental energy?" And yeah, I think it is.`,
+My personal take: even if word games don't make you "smarter" in some measurable way, engaging in focused, challenging cognitive activity is almost certainly better for your brain than passively scrolling social media. The bar isn't "does this cure dementia?" The bar is "is this a good use of my mental energy?" Yeah. I think it is.`,
       },
       {
-        title: 'Why Word Games Hit Different Than Other Brain Games',
-        content: `Not all cognitive activities are created equal. And word games have something special going for them that Sudoku and pattern-matching games don't.
+        title: 'Why word games hit different than other brain games',
+        content: `Not all cognitive activities are created equal. Word games have something Sudoku and pattern-matching games don't.
 
-Language is deeply, fundamentally integrated into human cognition. It's not a module that sits in one corner of your brain. It's woven through everything — memory, motor control, emotional processing, social cognition, abstract reasoning.
+Language is deeply integrated into human cognition. It's not a module that sits in one corner of your brain. It's woven through everything: memory, motor control, emotional processing, social cognition, abstract reasoning.
 
 When you play a word game, you're not just exercising "the language area." You're engaging a distributed network that touches almost every major brain system. The phonological loop works your auditory processing. Semantic retrieval taps into memory systems. Strategic planning engages executive function. And as we discussed, even motor areas get pulled in.
 
 Compare that to, say, a simple reaction-time game. Those primarily test one pathway: stimulus recognition to motor response. Useful, but narrow.
 
-Word games are like compound exercises at the gym. A bicep curl isolates one muscle. A deadlift works your entire posterior chain. Word games are the deadlift of cognitive activities. (I will die on this hill.)
+Word games are like compound exercises at the gym. A bicep curl isolates one muscle. A deadlift works your entire posterior chain. Word games are the deadlift of cognitive activities.
 
 There's also the vocabulary-building angle. Every time you encounter a word you didn't know — or rediscover one you'd forgotten — you're strengthening a neural pathway. And unlike most brain-training tasks, this has direct real-world utility. A bigger vocabulary actually helps you communicate better, read faster, and understand more nuanced information.
 
 I learned the word QUAFF from a word game three years ago. I've used it in conversation at least six times since. Was it worth the three hours? Debatable. But it's mine now, and nobody can take it from me.`,
       },
       {
-        title: 'The Multilingual Twist',
-        content: `Here's something that word game researchers are starting to pay more attention to: what happens when you play in a language that isn't your first?
+        title: 'The multilingual twist',
+        content: `Word game researchers are starting to pay more attention to what happens when you play in a language that isn't your first.
 
-For bilingual or multilingual players, word games become even more neurologically interesting. Your brain has to manage not just the word-finding task, but also language selection — making sure it's searching the right lexicon. This additional control demand further activates the prefrontal cortex and the anterior cingulate cortex, which manages conflict between competing options.
+For bilingual or multilingual players, word games become even more neurologically interesting. Your brain has to manage not just the word-finding task, but also language selection, making sure it's searching the right lexicon. This additional control demand further activates the prefrontal cortex and the anterior cingulate cortex, which manages conflict between competing options.
 
 If you play word games in multiple languages (which, if you're reading this on LexiClash, you probably do), you're essentially adding weight to the cognitive barbell. The base exercise is the same, but the load is heavier.
 
-Some research suggests that bilingual word game players show enhanced executive function compared to monolingual players — but again, correlation vs. causation applies. It might be that people with stronger executive function are better at learning multiple languages in the first place.
+Some research suggests that bilingual word game players show enhanced executive function compared to monolingual players, but again, correlation vs. causation applies. It might be that people with stronger executive function are better at learning multiple languages in the first place.
 
 Still, playing word games in your second or third language is one of the most enjoyable ways to maintain and improve those language skills. And unlike flashcard apps, it doesn't feel like homework.`,
       },
       {
-        title: 'So... Should You Play More Word Games?',
-        content: `Look, I'm clearly biased. I'm the person who spent three hours finding one word and considered it time well spent.
+        title: 'Should you play more word games?',
+        content: `I'm clearly biased. I'm the person who spent three hours finding one word and considered it time well spent.
 
-But here's my honest assessment, stripped of hype:
+My honest assessment, stripped of hype:
 
 The neuroscience is real. Word games activate complex, distributed brain networks. They engage memory retrieval, phonological processing, executive control, and even motor systems. This is not disputed.
 
@@ -173,9 +171,9 @@ The cognitive benefits are suggestive but not proven. Large studies show correla
 
 The brain-training industry has earned its skepticism. After Lumosity's $50 million lesson, we should all be wary of overclaiming. "Brain training" is a marketing term, not a scientific one.
 
-But here's what I keep coming back to: word games are one of the few activities that are simultaneously cognitively demanding, linguistically enriching, genuinely enjoyable, and social (if you play with others). That combination is rare.
+What I keep coming back to: word games are one of the few activities that are simultaneously cognitively demanding, linguistically enriching, genuinely enjoyable, and social if you play with others. That combination is rare.
 
-You don't need to justify playing word games with neuroscience. They're fun. That's enough. But if you want to know that something genuinely interesting is happening in your skull while you hunt for that seven-letter word — well, now you know.
+You don't need to justify playing word games with neuroscience. They're fun. That's enough. But if you want to know that something genuinely interesting is happening in your skull while you hunt for that seven-letter word, now you know.
 
 Your brain is running a symphony every time you play. Whether or not that symphony makes you "smarter" is almost beside the point. It's a remarkable piece of cognitive performance, and you should enjoy it.
 

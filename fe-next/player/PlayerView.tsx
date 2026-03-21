@@ -272,8 +272,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     if (!showModeReveal && !showStartAnimation && letterGrid && remainingTime && remainingTime > 0 && !gameActive && !waitingForResults) {
       logger.log('[PLAYER] Countdown animation complete, activating game');
       setGameActive(true);
+      // Resume internal timer so local countdown ticks between server syncs.
+      // reset() sets internalPaused=true (autoStart=false), and nothing else clears it.
+      gameTimer.resume();
     }
-  }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults]);
+  }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, gameTimer]);
 
   // Auto-dismiss mode reveal after 2 seconds, then trigger countdown
   useEffect(() => {

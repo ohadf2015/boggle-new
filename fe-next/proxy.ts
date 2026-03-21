@@ -60,13 +60,10 @@ export async function proxy(request: NextRequest) {
     });
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      
       // Session refresh happens automatically via cookie handling above
-      // This ensures tokens are refreshed on every request
-    } catch (error) {
+      // Calling getSession() ensures tokens are refreshed on every request
+      await supabase.auth.getSession();
+    } catch {
       // Silently handle auth errors in proxy - let client handle them
     }
   }
@@ -104,8 +101,8 @@ export async function proxy(request: NextRequest) {
  * Checks Accept-Language header, cookie, or defaults to 'en'
  */
 function getLocaleFromRequest(request: NextRequest): string | null {
-  // Check cookie first (user preference)
-  const localeCookie = request.cookies.get('locale');
+  // Check cookie first (user preference) - LanguageContext sets 'boggle_language'
+  const localeCookie = request.cookies.get('boggle_language');
   if (localeCookie && VALID_LOCALES.includes(localeCookie.value as typeof VALID_LOCALES[number])) {
     return localeCookie.value;
   }

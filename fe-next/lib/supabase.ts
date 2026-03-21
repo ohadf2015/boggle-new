@@ -48,9 +48,11 @@ export async function signInWithGoogle() {
 
   // Use deep link scheme for native apps, web URL for browser
   // Note: On mobile, useOAuthSignIn uses performMobileOAuth instead of this function
+  // Include locale in the URL path so proxy.ts preserves it (not as query param)
+  const locale = currentLocale || 'en';
   const redirectUrl = isNative()
     ? 'lexiclash://auth/callback' + (currentLocale ? `?locale=${currentLocale}` : '')
-    : new URL('/auth/callback' + (currentLocale ? `?locale=${currentLocale}` : ''), window.location.origin).toString();
+    : new URL(`/${locale}/auth/callback`, window.location.origin).toString();
 
   return supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -66,9 +68,11 @@ export async function signInWithDiscord() {
 
   // Use deep link scheme for native apps, web URL for browser
   // Note: On mobile, useOAuthSignIn uses performMobileOAuth instead of this function
+  // Include locale in the URL path so proxy.ts preserves it (not as query param)
+  const locale = currentLocale || 'en';
   const redirectUrl = isNative()
     ? 'lexiclash://auth/callback' + (currentLocale ? `?locale=${currentLocale}` : '')
-    : new URL('/auth/callback' + (currentLocale ? `?locale=${currentLocale}` : ''), window.location.origin).toString();
+    : new URL(`/${locale}/auth/callback`, window.location.origin).toString();
 
   return supabase.auth.signInWithOAuth({
     provider: 'discord',
@@ -79,12 +83,10 @@ export async function signInWithDiscord() {
 export async function signUpWithEmail(email: string, password: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
-  // Include current locale in the callback URL so we can redirect back correctly
+  // Include current locale in the URL path so proxy.ts preserves it (not as query param)
   const currentLocale = getCurrentLocale();
-  const redirectUrl = new URL('/auth/callback', window.location.origin);
-  if (currentLocale) {
-    redirectUrl.searchParams.set('locale', currentLocale);
-  }
+  const locale = currentLocale || 'en';
+  const redirectUrl = new URL(`/${locale}/auth/callback`, window.location.origin);
 
   return supabase.auth.signUp({
     email,
@@ -107,11 +109,10 @@ export async function signInWithEmail(email: string, password: string) {
 export async function signInWithMagicLink(email: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
+  // Include current locale in the URL path so proxy.ts preserves it (not as query param)
   const currentLocale = getCurrentLocale();
-  const redirectUrl = new URL('/auth/callback', window.location.origin);
-  if (currentLocale) {
-    redirectUrl.searchParams.set('locale', currentLocale);
-  }
+  const locale = currentLocale || 'en';
+  const redirectUrl = new URL(`/${locale}/auth/callback`, window.location.origin);
 
   return supabase.auth.signInWithOtp({
     email,

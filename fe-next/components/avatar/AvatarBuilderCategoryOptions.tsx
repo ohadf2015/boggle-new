@@ -12,6 +12,7 @@ import {
   AVATAR_ACCESSORY_COLORS,
   AVATAR_BG_COLORS,
   AVATAR_SHIRT_COLORS,
+  AVATAR_BODY_STYLES,
   AVATAR_FACIAL_HAIR_STYLES,
   FEMALE_HAIR_STYLES,
   MALE_HAIR_STYLES,
@@ -250,6 +251,27 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             selected={config.shirtColor || (config.gender === 'female' ? '#E85D9B' : '#4A90D9')}
             onSelect={v => updateConfig('shirtColor', v)}
           />
+          {/* Body/Clothing Style */}
+          <div>
+            <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
+              {t('avatar.builder.bodyStyle') || 'Outfit'}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {AVATAR_BODY_STYLES.map(style => (
+                <button
+                  key={style}
+                  onClick={() => updateConfig('bodyStyle', style)}
+                  className={`px-3 py-1.5 rounded-neo border-2 text-xs font-bold capitalize transition-colors ${
+                    (config.bodyStyle || 'default') === style
+                      ? 'border-neo-yellow bg-neo-yellow/20 text-neo-yellow'
+                      : 'border-neo-white/15 text-neo-white/60 hover:border-neo-white/40'
+                  }`}
+                >
+                  {t(`avatar.builder.bodyStyles.${style}`) || style}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       );
     }

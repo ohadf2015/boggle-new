@@ -94,7 +94,7 @@ const HeaderMenuDropdown = memo(() => {
                         className={cn(
                             "absolute top-full mt-3 w-72",
                             language === 'he' ? 'left-0' : 'right-0',
-                            "bg-gradient-to-br from-neo-cream via-neo-cream to-neo-cream/95 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900",
+                            "bg-gradient-to-br from-neo-cream via-neo-cream to-neo-cream/95 dark:from-neo-navy dark:via-neo-navy dark:to-neo-navy/90",
                             "border-4 border-neo-black dark:border-slate-600",
                             "rounded-neo-lg shadow-hard-xl",
                             "p-4 space-y-3",

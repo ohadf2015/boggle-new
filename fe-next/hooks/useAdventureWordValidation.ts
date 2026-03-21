@@ -324,12 +324,10 @@ export function useAdventureWordValidation({
           return result;
         }
       } catch (error) {
-        // Ignore aborted requests (user started new validation)
+        // Silently ignore aborted requests (user started new validation)
+        // Don't show error feedback or reset isValidating — the new request handles that
         if (error instanceof Error && error.name === 'AbortError') {
-          return {
-            isValid: false,
-            errorKey: 'adventure.errors.validationCancelled',
-          };
+          return { isValid: false };
         }
 
         const result: WordValidationResult = {

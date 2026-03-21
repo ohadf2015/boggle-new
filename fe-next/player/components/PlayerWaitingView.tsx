@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X } from 'lucide-react';
 import Avatar from '../../components/Avatar';
@@ -13,8 +13,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { IdleMascot } from '@/components/ui/IdleMascot';
-import { getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
-import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -50,19 +50,6 @@ interface PlayerWaitingViewProps {
 const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
 const MAX_PLAYERS = 8;
 
-// Rotating word facts shown while waiting
-const WORD_FACTS = [
-  { key: 'qi', fact: '"QI" is a valid 2-letter word worth 11 points in Scrabble' },
-  { key: 'oxyphenbutazone', fact: '"OXYPHENBUTAZONE" is the highest-scoring word in Scrabble history' },
-  { key: 'set', fact: '"SET" has the most definitions of any English word — over 430' },
-  { key: 'rhythm', fact: '"RHYTHM" is the longest common English word without a vowel' },
-  { key: 'dreamt', fact: '"DREAMT" is the only English word ending in "MT"' },
-  { key: 'strengths', fact: '"STRENGTHS" has only one vowel in 9 letters' },
-  { key: 'typewriter', fact: '"TYPEWRITER" can be typed using only the top row of a keyboard' },
-  { key: 'uncopyrightable', fact: '"UNCOPYRIGHTABLE" is the longest word with no repeating letters' },
-  { key: 'aa', fact: '"AA" is a valid word — it\'s a type of volcanic lava' },
-  { key: 'za', fact: '"ZA" is slang for pizza and a valid Scrabble word' },
-];
 
 // ==================== Component ====================
 
@@ -83,7 +70,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   // Avatar builder state
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
-  const currentAvatar = getStoredCustomAvatar() ?? getRandomAvatarConfig();
+  const currentAvatar = getOrCreateStoredCustomAvatar();
 
   const handleAvatarSave = async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
@@ -93,20 +80,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     await updateProfile({ avatar_config: config }).catch(() => {});
   };
 
-  // Rotating word facts
-  const [factIndex, setFactIndex] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFactIndex(i => (i + 1) % WORD_FACTS.length);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, []);
 
-  // Filter out host from player roster - players shouldn't see the host as a fellow player
-  const nonHostPlayers = playersReady.filter(player => {
-    const isHostPlayer = typeof player === 'object' ? player.isHost : false;
-    return !isHostPlayer;
-  });
+  // Show all players including host in the roster
+  const nonHostPlayers = playersReady;
   const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - nonHostPlayers.length);
 
   // Guest name editing state
@@ -225,19 +201,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         {t('playerView.hostWillStart')}
       </p>
 
-      {/* Word fact rotation - fills dead time */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={factIndex}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.3 }}
-          className="text-xs text-center text-neo-cyan/70 bg-neo-cyan/5 rounded-xl px-4 py-3 border border-neo-cyan/20"
-        >
-          {WORD_FACTS[factIndex].fact}
-        </motion.div>
-      </AnimatePresence>
 
       {/* Edit avatar + name */}
       <div className="flex items-center justify-center gap-3">

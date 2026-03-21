@@ -60,7 +60,15 @@ jest.mock('../../Avatar', () => ({
   default: ({ size, className }: { size: string; className?: string }) => <div data-testid="avatar" data-size={size} className={className} />,
 }));
 
-describe('PlacementHero — Fight Card Edition', () => {
+jest.mock('@/components/ui/CelebrationMascot', () => ({
+  CelebrationMascotWithEntrance: ({ variant }: { variant: string }) => <div data-testid="celebration-mascot" data-variant={variant} />,
+}));
+
+jest.mock('@/components/ui/Mascot', () => ({
+  MascotWithEntrance: ({ variant }: { variant: string }) => <div data-testid="mascot" data-variant={variant} />,
+}));
+
+describe('PlacementHero — Podium Celebration', () => {
 
   const PlacementHero = require('../PlacementHero').default;
 
@@ -69,13 +77,12 @@ describe('PlacementHero — Fight Card Edition', () => {
     score: 450,
     totalPlayers: 4,
     username: 'TestPlayer',
-    avatar: { avatarImage: 'fox' },
+    avatar: { customAvatar: null },
   };
 
-  it('renders ghost rank number overlay', () => {
+  it('renders rank badge with ordinal', () => {
     render(<PlacementHero {...defaultProps} />);
-    // Ghost rank number is the huge background number
-    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('1st')).toBeInTheDocument();
   });
 
   it('renders ordinal placement text', () => {
@@ -123,10 +130,34 @@ describe('PlacementHero — Fight Card Edition', () => {
     expect(screen.getByTestId('avatar')).toBeInTheDocument();
   });
 
-  it('does not render avatar when not provided', () => {
-    const { avatar: _, ...propsWithoutAvatar } = defaultProps;
-    render(<PlacementHero {...propsWithoutAvatar} />);
-    expect(screen.queryByTestId('avatar')).not.toBeInTheDocument();
+  it('renders avatar with 2xl size', () => {
+    render(<PlacementHero {...defaultProps} />);
+    expect(screen.getByTestId('avatar')).toHaveAttribute('data-size', '2xl');
+  });
+
+  it('renders username', () => {
+    render(<PlacementHero {...defaultProps} />);
+    expect(screen.getByText('TestPlayer')).toBeInTheDocument();
+  });
+
+  it('renders celebration mascot for podium finishers', () => {
+    render(<PlacementHero {...defaultProps} rank={1} />);
+    expect(screen.getByTestId('celebration-mascot')).toBeInTheDocument();
+  });
+
+  it('renders encouraging mascot for non-podium', () => {
+    render(<PlacementHero {...defaultProps} rank={5} />);
+    expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'encouraging');
+  });
+
+  it('renders oops mascot for zero score', () => {
+    render(<PlacementHero {...defaultProps} rank={5} score={0} />);
+    expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'oops');
+  });
+
+  it('renders rank message badge', () => {
+    render(<PlacementHero {...defaultProps} rank={1} />);
+    expect(screen.getByText('results.youWon')).toBeInTheDocument();
   });
 
   it('fires confetti for top 3', () => {

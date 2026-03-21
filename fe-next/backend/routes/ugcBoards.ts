@@ -269,8 +269,13 @@ router.post('/publish', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!grid || !Array.isArray(grid)) {
-      res.status(400).json({ error: 'grid is required' });
+    if (!grid || !Array.isArray(grid) || grid.length === 0) {
+      res.status(400).json({ error: 'grid is required and must not be empty' });
+      return;
+    }
+
+    if (!Array.isArray(grid[0]) || grid[0].length === 0) {
+      res.status(400).json({ error: 'grid rows must be non-empty arrays' });
       return;
     }
 

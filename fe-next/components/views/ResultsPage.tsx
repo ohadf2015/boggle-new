@@ -535,25 +535,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
         </div>
 
-        {/* Fixed Bottom Area — StickyReadyBar + reactions + tab bar */}
+        {/* Fixed Bottom Area — reactions + tab bar + StickyReadyBar */}
         <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-bottom">
-          {/* Sticky Ready Bar — always visible CTA above tabs */}
-          {gameCode && onReturnToRoom && scoreRevealComplete && !isBotsOnlyGame && (
-            <StickyReadyBar
-              isHost={isHost}
-              isCurrentPlayerReady={isCurrentPlayerReady}
-              currentPlayerRank={currentPlayerRank}
-              winnerUsername={sortedScores[0]?.username}
-              readyCount={readyUsernames.length}
-              totalPlayers={sortedScores.length}
-              readyUsernames={readyUsernames}
-              onStartGame={handleStartGame}
-              onMarkReady={handleMarkReady}
-              selectedGameMode={selectedGameMode}
-              onSelectGameMode={isHost ? setSelectedGameMode : undefined}
-            />
-          )}
-          {/* Quick Reactions row inside tab bar (above tabs, no overlap with content) */}
+          {/* Quick Reactions row — compact strip at top */}
           {sortedScores.length > 1 && (
             <div className="flex justify-center py-1 border-b border-neo-white/10">
               <QuickReactions onReaction={sendReaction} layout="bar" />
@@ -564,6 +548,23 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             activeTab={mobileActiveTab}
             onTabChange={(id) => setMobileActiveTab(id as MobileTab)}
           />
+          {/* Sticky Ready Bar — full-width CTA pinned to bottom */}
+          {gameCode && onReturnToRoom && scoreRevealComplete && !isBotsOnlyGame && (
+            <StickyReadyBar
+              isHost={isHost}
+              isCurrentPlayerReady={isCurrentPlayerReady}
+              currentPlayerRank={currentPlayerRank}
+              winnerUsername={sortedScores[0]?.username}
+              readyCount={readyUsernames.length}
+              totalPlayers={sortedScores.length}
+              readyUsernames={readyUsernames}
+              players={sortedScores}
+              onStartGame={handleStartGame}
+              onMarkReady={handleMarkReady}
+              selectedGameMode={selectedGameMode}
+              onSelectGameMode={isHost ? setSelectedGameMode : undefined}
+            />
+          )}
         </div>
       </div>
 
@@ -618,6 +619,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               readyCount={readyUsernames.length}
               totalPlayers={sortedScores.length}
               readyUsernames={readyUsernames}
+              players={sortedScores}
               onStartGame={handleStartGame}
               onMarkReady={handleMarkReady}
               selectedGameMode={selectedGameMode}

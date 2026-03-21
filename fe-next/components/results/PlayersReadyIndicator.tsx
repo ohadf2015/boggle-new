@@ -142,8 +142,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                           </div>
                         ) : (
                           <Avatar
-
-                            avatarImage={player.avatar?.avatarImage}
+                            userId={player.username}
                             customAvatar={player.avatar?.customAvatar}
                             size="sm"
                             className="w-8 h-8 border-2 border-neo-black"

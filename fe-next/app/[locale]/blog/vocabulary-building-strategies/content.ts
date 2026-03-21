@@ -19,7 +19,7 @@ export type LocaleContent = {
 
 export const contentByLocale: Record<string, LocaleContent> = {
   en: {
-    title: 'I Learned 500 New Words in 30 Days (Here\'s Exactly How)',
+    title: 'I Learned 500 New Words in 30 Days. The Method Is Embarrassingly Simple.',
     subtitle: 'Spaced repetition, active recall, morphology hacks, and the daily routines that actually stick. No flashcard apps required.',
     category: 'Learning',
     readTime: '12 min read',
@@ -29,181 +29,177 @@ export const contentByLocale: Record<string, LocaleContent> = {
       {
         content: `Thirty days ago, I started an experiment. The rules were simple: learn as many new words as possible in one month using only word games and research-backed techniques. No expensive courses. No language tutors. Just me, a notebook, a timer, and an embarrassing number of hours playing Boggle.
 
-The result? 500 new words. Not "I vaguely recognize this" words — words I can define, spell, use in a sentence, and (crucially) deploy in a word game to make my friends regret challenging me.
+The result? 500 new words. Not "I vaguely recognize this" words. Words I can define, spell, use in a sentence, and deploy in a word game to make my friends regret challenging me.
 
-But here's what made this experiment different from every other vocabulary-building attempt I've made: I didn't use brute force. I didn't sit with flashcards for hours. Instead, I used a combination of cognitive science techniques that researchers have been refining for over a century — techniques that most people have never heard of, even though the evidence behind them is overwhelming.
+What made this experiment different from every other vocabulary-building attempt I've made: I didn't use brute force. I didn't sit with flashcards for hours. Instead, I used a combination of cognitive science techniques that researchers have been refining for over a century. Most people have never heard of them, even though the evidence is overwhelming.
 
-Let me walk you through exactly what I did, why it works, and how you can do the same thing. I'll cite the research so you can fact-check me (please do — I'm a word nerd, not a neuroscientist).`,
+I'll walk you through what I did, why it works, and how you can do the same thing. I'll cite the research so you can fact-check me. Please do. I'm a word nerd, not a neuroscientist.`,
       },
       {
-        title: 'The 30-Day Experiment: Ground Rules',
-        content: `Before I get into the techniques, let me lay out the parameters. Because "I learned 500 words" means nothing without context.
+        title: 'Ground rules',
+        content: `The parameters first. "I learned 500 words" means nothing without context.
 
-Definition of "learned": I could produce the word from memory, define it correctly, spell it correctly, and use it in context. This is what researchers call "productive vocabulary" — as opposed to "receptive vocabulary," which is just recognizing a word when you see it.
+Definition of "learned": I could produce the word from memory, define it correctly, spell it correctly, and use it in context. Researchers call this "productive vocabulary," as opposed to "receptive vocabulary," which is just recognizing a word when you see it.
 
 Source of words: Primarily word games (Boggle, Scrabble practice, crosswords, and daily word puzzles), supplemented by reading. When I encountered a word I didn't know, I logged it.
 
-Time investment: About 45 minutes per day. Fifteen minutes of word games, fifteen minutes of review, and fifteen minutes of reading. This is important — I wasn't spending four hours a day on this. The techniques I used are designed to maximize retention per minute of study.
+Time investment: About 45 minutes per day. Fifteen minutes of word games, fifteen minutes of review, and fifteen minutes of reading. I wasn't spending four hours a day on this. The techniques are designed to maximize retention per minute of study.
 
 Tracking: I kept a physical notebook (more on why later) where I logged every new word, its definition, an example sentence, and any morphological connections I could find.
 
-By day 30, my notebook had 523 entries. Some were obscure (QUAHOG — a type of clam). Some were practical (AMELIORATE — to make something better). And some were just delightful (PETRICHOR — the smell of rain on dry earth, which isn't even allowed in most word games but I couldn't not learn it).`,
+By day 30, my notebook had 523 entries. Some were obscure. QUAHOG, a type of clam. Some were practical. AMELIORATE, to make something better. And some were just delightful. PETRICHOR, the smell of rain on dry earth, which isn't even allowed in most word games but I couldn't not learn it.`,
       },
       {
-        title: 'Spaced Repetition: The Ebbinghaus Curve That Changed Everything',
-        content: `In 1885, a German psychologist named Hermann Ebbinghaus did something no one had done before: he systematically measured how quickly humans forget things. His method was brutal — he memorized lists of nonsense syllables (DAX, BUP, ZOL) and then tested himself at increasing intervals to see how many he'd retained.
+        title: 'Spaced repetition',
+        content: `In 1885, a German psychologist named Hermann Ebbinghaus did something no one had done before: he systematically measured how quickly humans forget things. His method was brutal. He memorized lists of nonsense syllables (DAX, BUP, ZOL) and then tested himself at increasing intervals to see how many he'd retained.
 
 What he discovered is now called the "forgetting curve," and it's one of the most replicated findings in all of psychology. Without any review, you forget approximately 70% of new information within 24 hours. Within a week, you've lost about 90%.
 
-But — and this is the crucial part — each time you review the information at the right moment, the curve flattens. The memory gets stronger. The intervals between necessary reviews get longer.
+But each time you review the information at the right moment, the curve flattens. The memory gets stronger. The intervals between necessary reviews get longer. This is the crucial part.
 
 This is spaced repetition: reviewing information at gradually increasing intervals, timed to catch the memory just before it fades. Review after 1 day, then 3 days, then 7 days, then 14 days, then 30 days. Each review cements the memory more firmly.
 
-A meta-analysis by Cepeda et al. (2006) published in Psychological Bulletin analyzed 254 studies involving over 14,000 participants and found that spaced practice produced significantly better long-term retention than massed practice (cramming) across virtually every type of material and every age group.
+Cepeda et al. ran a meta-analysis in 2006, published in Psychological Bulletin, covering 254 studies and over 14,000 participants. Spaced practice produced significantly better long-term retention than cramming across virtually every type of material and every age group.
 
-For my 30-day experiment, I used a simple spacing schedule. Every new word got reviewed at 1, 3, 7, 14, and 28 days after I first learned it. I didn't use an app — I used my notebook and a simple calendar system. Each word had a small grid of boxes next to it, and I'd check off each review.
+For my 30-day experiment, I used a simple spacing schedule. Every new word got reviewed at 1, 3, 7, 14, and 28 days after I first learned it. I didn't use an app. I used my notebook and a simple calendar system. Each word had a small grid of boxes next to it, and I'd check off each review.
 
-I'm embarrassed to admit how long I resisted this. I spent years thinking I could just... absorb words by playing enough games. Like osmosis, but for vocabulary. Spoiler: that's not how brains work. I'd "learn" PERSPICACIOUS on a Tuesday and by Friday I couldn't tell you if it meant sharp-sighted or related to sweating. (It means sharp-sighted. I know that now. Permanently.)
+I'm embarrassed to admit how long I resisted this. I spent years thinking I could just... absorb words by playing enough games. Like osmosis, but for vocabulary. That's not how brains work. I'd "learn" PERSPICACIOUS on a Tuesday and by Friday I couldn't tell you if it meant sharp-sighted or related to sweating. It means sharp-sighted. I know that now. Permanently.
 
 The difference was dramatic. In previous vocabulary-building attempts, I'd learn 20 words in an evening and forget 15 of them by the next week. With spaced repetition, my retention rate was over 85% at the 30-day mark. Not perfect, but vastly better than anything I'd achieved before.`,
       },
       {
-        title: 'Active Recall: Why Reading Isn\'t Enough',
-        content: `Here's a mistake I made for years: I thought that reading was the best way to build vocabulary. Encounter a word in context, look it up, move on. Natural, organic vocabulary growth.
+        title: 'Active recall: why reading isn\'t enough',
+        content: `A mistake I made for years: I thought reading was the best way to build vocabulary. Encounter a word in context, look it up, move on. Natural, organic vocabulary growth.
 
 It doesn't work. Or rather, it works, but it's incredibly slow and inefficient.
 
 The problem is that reading is passive. You're recognizing words, not producing them. Your brain is doing the minimum amount of work necessary to extract meaning from the text, and that minimum amount of work doesn't create strong memories.
 
-Active recall is the opposite. Instead of looking at a word and remembering its definition (recognition), you start with the definition and try to produce the word (recall). Or you look at a scrambled set of letters and try to form words (which is, not coincidentally, exactly what word games do).
+Active recall is the opposite. Instead of looking at a word and remembering its definition (recognition), you start with the definition and try to produce the word (recall). Or you look at a scrambled set of letters and try to form words. Which is, not coincidentally, exactly what word games do.
 
-The research on this is extensive. Karpicke and Roediger (2008) published a landmark study in Science — yes, Science, the journal — showing that retrieval practice (actively pulling information from memory) produced 80% better long-term retention than repeated studying of the same material. Eighty percent.
+Karpicke and Roediger published a landmark study in Science in 2008 showing that retrieval practice produced 80% better long-term retention than repeated studying of the same material. That number bears repeating. Students who tested themselves remembered 80% more than students who re-read their notes the same number of times. The act of struggling to pull a word from memory is what strengthens the memory trace.
 
-Let me say that again because it's genuinely staggering. Students who tested themselves remembered 80% more than students who re-read their notes the same number of times. The act of retrieval — of struggling to pull a word from memory — is what strengthens the memory trace.
-
-This is why word games are such effective vocabulary builders. Every time you scan a letter grid and pull EPHEMERAL from the chaos of random letters, you're doing active recall. Every time you unscramble AELNR into LEARN and RENAL, you're exercising retrieval. The game is the study session — you just don't realize it because you're having fun.
+This is why word games are such effective vocabulary builders. Every time you scan a letter grid and pull EPHEMERAL from the chaos of random letters, you're doing active recall. Every time you unscramble AELNR into LEARN and RENAL, you're exercising retrieval. The game is the study session. You just don't realize it because you're having fun.
 
 During my 30-day experiment, I incorporated active recall in two ways. First, my daily word game sessions (Boggle, primarily) served as natural recall practice for words I'd recently learned. Second, during my review sessions, I'd cover the definitions in my notebook and try to define each word from memory before checking. If I couldn't, that word got flagged for more frequent review.`,
       },
       {
-        title: 'The Testing Effect: Failure Is the Point',
-        content: `This is related to active recall, but it's important enough to deserve its own section. The testing effect — also called "retrieval-enhanced learning" — is the finding that being tested on material improves memory more than additional study time.
+        title: 'Failure is the point',
+        content: `Related to active recall, but important enough for its own section. The testing effect (also called "retrieval-enhanced learning") is the finding that being tested on material improves memory more than additional study time.
 
-Here's the counterintuitive part: the testing effect works even when you get the answer wrong. In fact, some research suggests that unsuccessful retrieval attempts, followed by correct feedback, produce stronger memories than successful retrieval.
+The counterintuitive part: the testing effect works even when you get the answer wrong. Some research suggests that unsuccessful retrieval attempts, followed by correct feedback, produce stronger memories than successful retrieval.
 
-Kornell, Hays, and Bjork (2009) demonstrated this in a study published in the Journal of Experimental Psychology: Learning, Memory, and Cognition. Participants who tried and failed to answer questions, then received the correct answer, performed better on a final test than participants who simply studied the answers without attempting retrieval first.
+Kornell, Hays, and Bjork demonstrated this in 2009. Participants who tried and failed to answer questions, then received the correct answer, performed better on a final test than participants who simply studied the answers without attempting retrieval first.
 
-This matters a lot for vocabulary building. When you encounter an unfamiliar word in a word game and think "I know this... I've seen this before... what does it mean..." — that struggle, even if you fail to produce the definition, is making your brain work harder. And that harder work creates a stronger memory trace for when you eventually look up the answer.
+This matters for vocabulary building. When you encounter an unfamiliar word in a word game and think "I know this... I've seen this before... what does it mean..." that struggle, even if you fail to produce the definition, is making your brain work harder. That harder work creates a stronger memory trace for when you eventually look up the answer.
 
-I noticed this pattern repeatedly during my experiment. Words that I'd struggled with during word games — words where I thought "is that even a word?" before looking them up — stuck far better than words I'd simply read in a book and looked up casually. The struggle was the secret ingredient.
+I noticed this pattern repeatedly during my experiment. Words that I'd struggled with during word games, the ones where I thought "is that even a word?" before looking them up, stuck far better than words I'd simply read in a book and looked up casually. The struggle was the secret ingredient.
 
-Case in point: QUAHOG. I found Q-U-A-H-O-G on a board, played it as a desperate Hail Mary, and was genuinely shocked when it was accepted. Looked it up. A type of clam. I will never forget that word. Not ever. Meanwhile, I read SANGUINE in a novel the same week and had to look it up three separate times before it stuck. The difference? I fought for QUAHOG. SANGUINE was handed to me.
+Case in point: QUAHOG. I found Q-U-A-H-O-G on a board, played it as a desperate Hail Mary, and was genuinely shocked when it was accepted. Looked it up. A type of clam. I will never forget that word. Meanwhile, I read SANGUINE in a novel the same week and had to look it up three separate times before it stuck. The difference? I fought for QUAHOG. SANGUINE was handed to me.
 
 This is why I tell people: don't be discouraged when a word game stumps you. Every word you don't know is an opportunity. Every failed retrieval attempt is priming your brain for the moment you learn the answer. The harder the struggle, the stronger the memory.`,
       },
       {
-        title: 'Word Families and Morphology: The Cheat Code Nobody Talks About',
-        content: `Okay, this is the technique that made the biggest single difference in my experiment. And it's shockingly underutilized.
+        title: 'Morphology: the cheat code',
+        content: `This is the technique that made the biggest single difference in my experiment. Shockingly underutilized.
 
-Morphology is the study of word parts — prefixes, suffixes, and roots. English is a Frankenstein language built from Latin, Greek, Germanic, French, and a dozen other sources. But those sources follow patterns. Once you learn the patterns, new words stop being random strings of letters and start being puzzles you can decode.
+Morphology is the study of word parts: prefixes, suffixes, and roots. English is a Frankenstein language built from Latin, Greek, Germanic, French, and a dozen other sources. But those sources follow patterns. Once you learn the patterns, new words stop being random strings of letters and start being puzzles you can decode.
 
-Here's an example. Let's say you learn the word EPHEMERAL (lasting a short time). If you also learn that EPHEMER- comes from the Greek "ephemeros" meaning "lasting a day," you've just unlocked a family of words: EPHEMERA (things that exist briefly), EPHEMERIS (a table of astronomical data for specific dates), EPHEMERON (something short-lived). One root, multiple words, all connected.
+Example. You learn the word EPHEMERAL (lasting a short time). You also learn that EPHEMER- comes from the Greek "ephemeros" meaning "lasting a day." You've just unlocked a family of words: EPHEMERA (things that exist briefly), EPHEMERIS (a table of astronomical data for specific dates), EPHEMERON (something short-lived). One root, multiple words, all connected.
 
-Nation (2001), in his seminal work "Learning Vocabulary in Another Language" published by Cambridge University Press, estimated that knowledge of approximately 20 word families per week — where each "family" includes the root word plus its derived forms — can build vocabulary at roughly four times the rate of learning individual words in isolation.
+Nation's 2001 work "Learning Vocabulary in Another Language" estimated that knowledge of approximately 20 word families per week can build vocabulary at roughly four times the rate of learning individual words in isolation.
 
 During my experiment, I started grouping new words by their roots. BENE- (good): BENEVOLENT, BENEFICIAL, BENEDICTION, BENEFACTOR. MAL- (bad): MALEVOLENT, MALICIOUS, MALADY, MALFEASANCE. CHRON- (time): CHRONOLOGICAL, CHRONIC, SYNCHRONIZE, ANACHRONISM.
 
-The thing about morphology — actually, let me back up. I tried this once before, years ago, and gave up after two days because I was doing it wrong. I was memorizing roots like flashcards. Isolated. Joyless. This time I stumbled into MAGNANIMOUS during a Boggle round, couldn't define it, looked it up, and went "wait — MAGN like MAGNIFICENT?" That one connection unlocked something. Suddenly I was hunting for roots in every new word like a kid flipping over rocks looking for bugs.
+I should mention I tried this once before, years ago, and gave up after two days because I was doing it wrong. I was memorizing roots like flashcards. Isolated. Joyless. This time I stumbled into MAGNANIMOUS during a Boggle round, couldn't define it, looked it up, and went "wait, MAGN like MAGNIFICENT?" That one connection unlocked something. Suddenly I was hunting for roots in every new word like a kid flipping over rocks looking for bugs.
 
-This approach turned each new word into a node in a network rather than an isolated fact. When I encountered MAGNANIMOUS in a crossword, I already knew MAGN- (great) from MAGNIFICENT and MAGNITUDE, and ANIM- (spirit/mind) from ANIMATE and ANIMAL. So MAGNANIMOUS — great-spirited, generous — practically defined itself.
+This approach turned each new word into a node in a network rather than an isolated fact. When I encountered MAGNANIMOUS in a crossword, I already knew MAGN- (great) from MAGNIFICENT and MAGNITUDE, and ANIM- (spirit/mind) from ANIMATE and ANIMAL. So MAGNANIMOUS, great-spirited, generous, practically defined itself.
 
 By week two, I was learning words at nearly double my initial rate. Not because I was studying harder, but because each new word came pre-connected to words I already knew. The morphological network was doing the heavy lifting.
 
 For word games specifically, morphology is an absolute superpower. Knowing that -TION, -SION, -MENT, -NESS, -LY, and -ABLE are common suffixes means you can extend base words systematically. Found AGREE on the board? Your brain immediately suggests AGREEMENT, AGREEABLE, AGREEABLY. That's three extra words from one root, and your opponents never knew what hit them.`,
       },
       {
-        title: 'Cross-Linguistic Transfer: The Multilingual Advantage',
-        content: `Here's something I didn't expect when I started this experiment. Playing word games in multiple languages made me better at English vocabulary.
+        title: 'Cross-linguistic transfer',
+        content: `Something I didn't expect when I started this experiment: playing word games in multiple languages made me better at English vocabulary.
 
-This sounds paradoxical, but the research backs it up. Kroll and Stewart (1994) proposed the Revised Hierarchical Model of bilingual memory, which suggests that words in different languages share conceptual connections. When you learn a word in one language, you're not just learning a label — you're strengthening the underlying concept, which makes related words in other languages easier to learn.
+Sounds paradoxical. Kroll and Stewart's 1994 Revised Hierarchical Model of bilingual memory suggests that words in different languages share conceptual connections. When you learn a word in one language, you're not just learning a label. You're strengthening the underlying concept, which makes related words in other languages easier to learn.
 
-I tested this by playing LexiClash in Swedish (one of the supported languages). Swedish shares Germanic roots with English, so words like HUND (dog), HAND (hand), and VATTEN (water) were immediately recognizable. But the interesting part was the less obvious connections. Learning the Swedish word UNGEFAR (approximately) led me to the English word UNFAIR through Germanic root connections, which led me to INEQUITABLE through Latin roots, which led me to the word INIQUITY.
+I tested this by playing LexiClash in Swedish. Swedish shares Germanic roots with English, so words like HUND (dog), HAND (hand), and VATTEN (water) were immediately recognizable. But the interesting part was the less obvious connections. Learning the Swedish word UNGEFAR (approximately) led me to the English word UNFAIR through Germanic root connections, which led me to INEQUITABLE through Latin roots, which led me to INIQUITY.
 
-One word in Swedish opened up three new English words. That's cross-linguistic transfer in action.
+One word in Swedish opened up three new English words.
 
-A meta-analysis by Adesope et al. (2010) published in Review of Educational Research found that bilingual individuals consistently outperformed monolinguals on vocabulary tests — even in their native language. The theory is that managing multiple linguistic systems creates a more flexible and interconnected mental lexicon.
+Adesope et al.'s 2010 meta-analysis in Review of Educational Research found that bilingual individuals consistently outperformed monolinguals on vocabulary tests, even in their native language. The theory: managing multiple linguistic systems creates a more flexible and interconnected mental lexicon.
 
-You don't need to be fluent in another language to benefit from this. Even basic exposure to cognates — words that share origins across languages — can strengthen your vocabulary network. The French word LUMINEUX is obviously related to LUMINOUS. The Spanish CORAZON connects to CORONARY through Latin. Japanese TSUNAMI is, well, TSUNAMI.
+You don't need to be fluent in another language to benefit from this. Even basic exposure to cognates, words that share origins across languages, can strengthen your vocabulary network. The French word LUMINEUX is obviously related to LUMINOUS. The Spanish CORAZON connects to CORONARY through Latin. Japanese TSUNAMI is, well, TSUNAMI.
 
 During weeks three and four of my experiment, I deliberately sought out cognates and cross-linguistic connections for my new English words. This added maybe five minutes to each review session, but the retention benefits were noticeable. Words with cross-linguistic hooks seemed to stick better, probably because they had more connection points in my mental network.`,
       },
       {
-        title: 'Daily Routines That Actually Work',
-        content: `The techniques above are the science. But science without implementation is just trivia. Here's the actual daily routine I used during my 30-day experiment.
+        title: 'The daily routine',
+        content: `The techniques above are the science. Science without implementation is just trivia. The actual daily routine I used:
 
 Morning (15 minutes): Word game session. I played two rounds of Boggle (3 minutes each) and used the remaining time to look up any words I'd encountered but couldn't define. New words went straight into the notebook.
 
 Midday (15 minutes): Spaced repetition review. I'd flip through my notebook and review words that were due based on my spacing schedule. Cover the definition, try to recall it, check, move on. Words I couldn't recall got a mark and would be reviewed again the next day.
 
-Evening (15 minutes): Reading. I read for fifteen minutes — usually longform journalism or nonfiction — with my notebook open. Any unfamiliar word got logged immediately. I found that having the notebook physically present changed my reading behavior. Instead of glossing over unfamiliar words (which I'd normally do), I'd stop and engage with them.
+Evening (15 minutes): Reading. I read for fifteen minutes, usually longform journalism or nonfiction, with my notebook open. Any unfamiliar word got logged immediately. Having the notebook physically present changed my reading behavior. Instead of glossing over unfamiliar words, I'd stop and engage with them.
 
 That's it. Forty-five minutes a day, split into three manageable chunks. The key insight is that frequency matters more than duration. Three 15-minute sessions beat one 45-minute session every time, because each session is an additional retrieval opportunity, and the spacing between sessions gives your brain time to consolidate.
 
 I also had a few non-negotiable rules:
 
-Write by hand. There's research suggesting that handwriting engages motor areas that typing doesn't, creating additional memory traces. Mueller and Oppenheimer (2014), in a study published in Psychological Science, found that students who took notes by hand retained information better than those who typed. I believe the same applies to vocabulary logging.
+Write by hand. Handwriting engages motor areas that typing doesn't, creating additional memory traces. Mueller and Oppenheimer showed in 2014 that students who took notes by hand retained information better than those who typed. Same principle applies to vocabulary logging.
 
-Use the word within 24 hours. If I learned a new word, I had to use it in conversation or writing within a day. This forced production — which, as we discussed, is far more effective than passive recognition.
+Use the word within 24 hours. If I learned a new word, I had to use it in conversation or writing within a day. This forced production, which is far more effective than passive recognition.
 
 Play with others at least twice a week. Social word game sessions provided natural active recall, competitive motivation, and the emotional amplification that helps memories stick. Plus, using an obscure word against a friend and watching their face is its own reward.
 
 No cramming. If I hit my 15-minute limit, I stopped. Even if I was on a roll. The temptation to cram is strong, but the research is clear: spreading practice over time beats concentrated practice every single time.`,
       },
       {
-        title: 'Measuring Progress (And Why It\'s Not What You Think)',
+        title: 'Measuring progress',
         content: `At the end of 30 days, I had 523 words in my notebook. But the raw number is almost meaningless. What matters is retention and usability.
 
 I tested myself three ways:
 
-Cold recall test. I went through my entire notebook with the definitions covered and tried to define each word. Result: 447 out of 523 correct (85.5%). The words I missed were mostly from the last week — they hadn't gone through enough spacing repetitions yet.
+Cold recall test. I went through my entire notebook with the definitions covered and tried to define each word. Result: 447 out of 523 correct (85.5%). The words I missed were mostly from the last week. They hadn't gone through enough spacing repetitions yet.
 
-Word game performance. I compared my average scores from the month before the experiment to the month during. My Boggle scores increased by 22%. More importantly, my average word length increased from 4.2 to 5.1 letters — meaning I wasn't just finding more words, I was finding harder words.
+Word game performance. I compared my average scores from the month before the experiment to the month during. My Boggle scores increased by 22%. More importantly, my average word length increased from 4.2 to 5.1 letters. I wasn't just finding more words. I was finding harder words.
 
-Conversational usage. I asked three friends to flag whenever I used a word they hadn't heard from me before. Over the last week of the experiment, they flagged 31 instances. Some were deliberate (I was showing off). Some were unconscious — words that had genuinely entered my active vocabulary without me noticing.
+Conversational usage. I asked three friends to flag whenever I used a word they hadn't heard from me before. Over the last week of the experiment, they flagged 31 instances. Some were deliberate (I was showing off). Some were unconscious, words that had genuinely entered my active vocabulary without me noticing.
 
-But here's the thing I really want to emphasize. The number 500 is impressive, but it's also misleading. It suggests that vocabulary building is about accumulating discrete items, like collecting stamps.
+The thing I really want to emphasize: the number 500 is impressive, but it's also misleading. It suggests that vocabulary building is about accumulating discrete items, like collecting stamps.
 
 It's not. It's about building a network.
 
-By the end of the experiment, my mental lexicon felt different. Words I already knew had new connections. EPHEMERAL linked to EPHEMERA, which linked to EPHEMERIS, which linked to DIURNAL (daily), which linked to NOCTURNAL, which linked to EQUINOX. The morphological and conceptual connections I'd built didn't just help me remember new words — they made my entire vocabulary more accessible.
+By the end of the experiment, my mental lexicon felt different. Words I already knew had new connections. EPHEMERAL linked to EPHEMERA, which linked to EPHEMERIS, which linked to DIURNAL (daily), which linked to NOCTURNAL, which linked to EQUINOX. The morphological and conceptual connections I'd built didn't just help me remember new words. They made my entire vocabulary more accessible.
 
-This is consistent with the network theory of the mental lexicon proposed by Collins and Loftus (1975). Words aren't stored in isolation — they're nodes in a vast interconnected network. When you activate one node, related nodes get partially activated too (a process called "spreading activation"). The more connections a word has, the easier it is to retrieve.
+This is consistent with the network theory of the mental lexicon (Collins and Loftus, 1975). Words aren't stored in isolation. They're nodes in a vast interconnected network. When you activate one node, related nodes get partially activated too, a process called "spreading activation." The more connections a word has, the easier it is to retrieve.
 
-My 30-day experiment didn't just add 500 nodes to the network. It added thousands of new connections between existing nodes. And those connections are what make vocabulary useful — not just for word games, but for reading, writing, thinking, and communicating.`,
+My 30-day experiment didn't just add 500 nodes to the network. It added thousands of new connections between existing nodes. And those connections are what make vocabulary useful. Not just for word games, but for reading, writing, thinking, and communicating.`,
       },
       {
-        title: 'Your Turn: How to Start Today',
-        content: `You don't need 30 days to start seeing results. Here's the minimum viable vocabulary routine:
+        title: 'How to start today',
+        content: `You don't need 30 days to start seeing results. The minimum viable vocabulary routine:
 
 Get a physical notebook. Seriously. Hand. Writing. Matters.
 
-Play one word game per day. Boggle, Wordle, crosswords, Scrabble — whatever you enjoy. The game provides the active recall and retrieval practice. The enjoyment provides the consistency.
+Play one word game per day. Boggle, Wordle, crosswords, Scrabble, whatever you enjoy. The game provides the active recall and retrieval practice. The enjoyment provides the consistency.
 
-Log three new words per day. When you encounter a word you don't know — in the game, in reading, in conversation — write it down. Definition, example sentence, and any word-family connections you can find.
+Log three new words per day. When you encounter a word you don't know, in the game, in reading, in conversation, write it down. Definition, example sentence, and any word-family connections you can find.
 
 Review using spaced repetition. Check your notebook at 1, 3, 7, 14, and 28 days after learning each word. Cover the definition, try to recall it. If you can't, mark it for more frequent review.
 
 Use each new word within 24 hours. Text it to a friend. Drop it in a work email. Say it out loud to your cat. Production cements memory.
 
-That's it. Fifteen to twenty minutes a day. Three new words per day is 90 words per month, over 1,000 per year. And because you're building network connections, the rate accelerates — by month three, you'll be learning faster than month one.
+That's it. Fifteen to twenty minutes a day. Three new words per day is 90 words per month, over 1,000 per year. And because you're building network connections, the rate accelerates. By month three, you'll be learning faster than month one.
 
-The research is clear. The techniques work. The word games make it fun. The only variable is whether you'll start.
+The techniques work. The word games make it fun. The only variable is whether you'll start.
 
-I know what you're thinking. "500 words in 30 days sounds like a lot of work." And sure, 45 minutes a day adds up. But think about how much time you already spend on your phone. Swap fifteen minutes of scrolling for fifteen minutes of word games, and you're a third of the way there.
+"500 words in 30 days sounds like a lot of work." Sure, 45 minutes a day adds up. But think about how much time you already spend on your phone. Swap fifteen minutes of scrolling for fifteen minutes of word games, and you're a third of the way there.
 
-Your future self — the one who casually drops DEFENESTRATION in conversation and watches everyone's jaw drop — will thank you.
-
-(DEFENESTRATION: the act of throwing someone out of a window. You're welcome.)`,
+Your future self, the one who casually drops DEFENESTRATION in conversation and watches everyone's jaw drop, will thank you. DEFENESTRATION: the act of throwing someone out of a window. You're welcome.`,
       },
     ],
     backToBlog: 'Back to Blog',

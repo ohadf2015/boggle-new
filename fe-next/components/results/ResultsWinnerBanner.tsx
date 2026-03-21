@@ -35,10 +35,6 @@ interface WinnerData {
   username: string | undefined;
   score: number;
   avatar?: {
-    emoji?: string;
-    color?: string;
-
-    avatarImage?: string;
     customAvatar?: CustomAvatarConfig | null;
   };
 }
@@ -373,9 +369,8 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                   ${compact ? '' : 'sm:p-1'}
                 `}>
                   <Avatar
-
-                    avatarImage={winner.avatar.avatarImage}
                     customAvatar={winner.avatar.customAvatar}
+                    userId={winner.username}
                     size={compact ? 'lg' : 'xl'}
                   />
                 </div>

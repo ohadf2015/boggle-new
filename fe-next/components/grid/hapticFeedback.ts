@@ -31,16 +31,20 @@ const PATTERNS: Record<string, number | number[]> = {
   blastCascade: [30, 20, 30, 20, 50],
 
   // Interaction feedback — stronger tap matches the "rubber stamp pop" visual
-  cellTapFire: 25,
-  cellTapNormal: 18,
-  cellDragFire: 15,
-  cellDragNormal: 10,
+  cellTapFire: 30,
+  cellTapNormal: 22,
+  cellDragFire: 18,
+  cellDragNormal: 14,
   backtrackFire: 8,
   backtrackNormal: 3,
   undoFire: 15,
   undoNormal: 5,
   navigation: 10,
-  clickSelect: 10,
+  clickSelect: 12,
+
+  // Word validation feedback
+  wordAccepted: [20, 10, 30],
+  wordRejected: [40, 20, 40],
 };
 
 /**
@@ -71,7 +75,7 @@ export function vibrateWordSubmit(
       vibrate(PATTERNS.fireCombo1Plus);
     } else if (wordLength >= 6) {
       vibrate(PATTERNS.fireLongWord);
-    } else if (wordLength >= 3) {
+    } else {
       vibrate(PATTERNS.fireShortWord);
     }
   } else {
@@ -85,7 +89,7 @@ export function vibrateWordSubmit(
       vibrate(PATTERNS.normalCombo1Plus);
     } else if (wordLength >= 6) {
       vibrate(PATTERNS.normalLongWord);
-    } else if (wordLength >= 3) {
+    } else {
       vibrate(PATTERNS.normalShortWord);
     }
   }
@@ -195,4 +199,19 @@ export function vibrateBlastPrism(): void {
  */
 export function vibrateBlastCascade(): void {
   vibrate(PATTERNS.blastCascade);
+}
+
+/**
+ * Haptic feedback when a word is accepted after validation.
+ * Distinct from vibrateWordSubmit (which fires on touch-end before validation).
+ */
+export function vibrateWordAccepted(): void {
+  vibrate(PATTERNS.wordAccepted);
+}
+
+/**
+ * Haptic feedback when a word is rejected after validation.
+ */
+export function vibrateWordRejected(): void {
+  vibrate(PATTERNS.wordRejected);
 }

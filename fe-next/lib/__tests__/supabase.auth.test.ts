@@ -53,7 +53,7 @@ describe('signInWithMagicLink', () => {
     const result = await signInWithMagicLink('user@example.com');
     expect(mockAuth.signInWithOtp).toHaveBeenCalledWith({
       email: 'user@example.com',
-      options: { emailRedirectTo: 'https://lexiclash.com/auth/callback?locale=en' },
+      options: { emailRedirectTo: 'https://lexiclash.com/en/auth/callback' },
     });
     expect(result.error).toBeNull();
   });
@@ -63,16 +63,16 @@ describe('signInWithMagicLink', () => {
     mockAuth.signInWithOtp.mockResolvedValue({ data: {}, error: null });
     await signInWithMagicLink('user@example.com');
     expect(mockAuth.signInWithOtp).toHaveBeenCalledWith(
-      expect.objectContaining({ options: { emailRedirectTo: 'https://lexiclash.com/auth/callback?locale=he' } })
+      expect.objectContaining({ options: { emailRedirectTo: 'https://lexiclash.com/he/auth/callback' } })
     );
   });
 
-  it('omits locale when path has no locale segment', async () => {
+  it('falls back to English locale when path has no locale segment', async () => {
     mockLocation.pathname = '/auth/callback';
     mockAuth.signInWithOtp.mockResolvedValue({ data: {}, error: null });
     await signInWithMagicLink('user@example.com');
     expect(mockAuth.signInWithOtp).toHaveBeenCalledWith(
-      expect.objectContaining({ options: { emailRedirectTo: 'https://lexiclash.com/auth/callback' } })
+      expect.objectContaining({ options: { emailRedirectTo: 'https://lexiclash.com/en/auth/callback' } })
     );
   });
 
@@ -108,7 +108,7 @@ describe('signUpWithEmail', () => {
     await signUpWithEmail('new@example.com', 'password123');
     expect(mockAuth.signUp).toHaveBeenCalledWith({
       email: 'new@example.com', password: 'password123',
-      options: { emailRedirectTo: 'https://lexiclash.com/auth/callback?locale=en' },
+      options: { emailRedirectTo: 'https://lexiclash.com/en/auth/callback' },
     });
   });
 });
@@ -120,7 +120,7 @@ describe('signInWithGoogle', () => {
     mockAuth.signInWithOAuth.mockResolvedValue({ data: {}, error: null });
     await signInWithGoogle();
     expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
-      provider: 'google', options: { redirectTo: 'https://lexiclash.com/auth/callback?locale=en' },
+      provider: 'google', options: { redirectTo: 'https://lexiclash.com/en/auth/callback' },
     });
   });
 });
@@ -132,7 +132,7 @@ describe('signInWithDiscord', () => {
     mockAuth.signInWithOAuth.mockResolvedValue({ data: {}, error: null });
     await signInWithDiscord();
     expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
-      provider: 'discord', options: { redirectTo: 'https://lexiclash.com/auth/callback?locale=sv' },
+      provider: 'discord', options: { redirectTo: 'https://lexiclash.com/sv/auth/callback' },
     });
   });
 });

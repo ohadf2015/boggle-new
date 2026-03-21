@@ -125,7 +125,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
         className="relative overflow-hidden"
       >
         {/* Outer container with animated border pulse */}
-        <div className="bg-gradient-to-br from-slate-800 via-slate-800/95 to-neo-pink/10 border-3 border-neo-pink/60 shadow-hard-xl p-4 sm:p-6 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-neo-navy via-neo-navy/95 to-neo-pink/10 border-3 border-neo-pink/60 shadow-hard-xl p-4 sm:p-6 relative overflow-hidden">
 
           {/* Animated border glow */}
           {!reducedMotion && (
@@ -179,7 +179,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
               <div className="relative">
                 <div className="border-3 border-neo-cyan rounded-full shadow-hard bg-slate-900 overflow-hidden">
                   <Avatar
-                    avatarImage={currentPlayerData.avatar?.avatarImage}
+                    userId={currentPlayerData.username}
                     customAvatar={currentPlayerData.avatar?.customAvatar}
                     size="lg"
                     className="w-14 h-14 sm:w-16 sm:h-16"
@@ -241,7 +241,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
               <div className="relative">
                 <div className="border-3 border-neo-lime rounded-full shadow-hard bg-slate-900 overflow-hidden">
                   <Avatar
-                    avatarImage={winner.avatar?.avatarImage}
+                    userId={winner.username}
                     customAvatar={winner.avatar?.customAvatar}
                     size="lg"
                     className="w-14 h-14 sm:w-16 sm:h-16"
@@ -355,7 +355,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
               className="border-3 border-neo-lime rounded-full shadow-hard bg-slate-900 overflow-hidden shrink-0"
             >
               <Avatar
-                avatarImage={currentPlayerData.avatar?.avatarImage}
+                userId={currentPlayerData.username}
                 customAvatar={currentPlayerData.avatar?.customAvatar}
                 size="lg"
                 className="w-14 h-14 sm:w-16 sm:h-16"

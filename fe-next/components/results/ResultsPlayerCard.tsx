@@ -172,8 +172,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             {/* Left: Avatar + Username with key badges */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Avatar
-
-                avatarImage={avatar?.avatarImage}
+                userId={player.username}
                 customAvatar={avatar?.customAvatar}
                 size="2xl"
                 className="flex-shrink-0"

@@ -20,10 +20,6 @@ export interface FightCardParticipant {
   isCurrentPlayer?: boolean;
   isBot?: boolean;
   avatar?: {
-    emoji?: string;
-    color?: string;
-
-    avatarImage?: string;
     customAvatar?: CustomAvatarConfig | null;
   };
   survived?: boolean;
@@ -182,16 +178,14 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
         <span className={accent.textColor}>{rank}</span>
       </div>
 
-      {/* Avatar — responsive sizing */}
+      {/* Avatar — larger for better recognition */}
       <div className={cn(
-        'rounded-full border-2 sm:border-3 border-neo-black bg-slate-700 overflow-hidden shrink-0',
-        rank === 1 ? 'w-10 h-10 sm:w-12 sm:h-12' : 'w-8 h-8 sm:w-10 sm:h-10',
+        'rounded-full border-3 border-neo-black overflow-hidden shrink-0',
+        rank === 1 ? 'w-12 h-12 sm:w-14 sm:h-14 bg-neo-cream' : isCurrentPlayer ? 'w-10 h-10 sm:w-12 sm:h-12 bg-neo-cyan/20' : 'w-10 h-10 sm:w-12 sm:h-12 bg-slate-700',
       )}>
         <PlayerProfileTooltip
           player={{
             username: participant.name,
-
-            avatarImage: participant.avatar?.avatarImage,
             customAvatar: participant.avatar?.customAvatar,
             score: participant.score,
           }}
@@ -199,10 +193,9 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
           side="right"
         >
           <Avatar
-
-            avatarImage={participant.avatar?.avatarImage}
             customAvatar={participant.avatar?.customAvatar}
-            size={rank === 1 ? 'md' : 'sm'}
+            userId={participant.name}
+            size={rank === 1 ? 'lg' : 'md'}
           />
         </PlayerProfileTooltip>
       </div>

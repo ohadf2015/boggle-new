@@ -234,7 +234,7 @@ export const startGameSchema = z.object({
   timerSeconds: z.number().int().optional().default(120),
   language: languageSchema.optional(),
   difficulty: difficultySchema.optional().default('MEDIUM'),
-  minWordLength: z.number().int().min(2).max(5).optional().default(3),
+  minWordLength: z.number().int().min(2).max(5).optional().default(2),
   boardTheme: z.object({
     nameKey: z.string(),
     emoji: z.string(),

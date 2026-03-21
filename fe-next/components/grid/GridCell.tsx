@@ -34,6 +34,8 @@ export interface GridCellProps {
   earthquakePhase: string;
   getPhaseAnimation: Record<string, { animate?: Record<string, unknown>; transition: Record<string, unknown> }>;
   comboLevel: number;
+  /** Combo level including cooldown warmth, used for escalation background/shake */
+  escalationCombo: number;
   comboColors: ReturnType<typeof getComboColors>;
   reduceMotion: boolean;
   animateOnMount: boolean;
@@ -55,7 +57,7 @@ const GridCell = memo<GridCellProps>(({
   isAdjacentHint, isHighlighted, isEliminated, isHovered,
   highlightedOrder, selectionIdx, escalation, shakeOffset,
   effectiveRenderMode, earthquakePhase, getPhaseAnimation,
-  comboLevel, comboColors, reduceMotion, animateOnMount, interactive,
+  comboLevel, escalationCombo, comboColors, reduceMotion, animateOnMount, interactive,
   isSelecting, isDragging, isTypingMode, hintAnimationPhase,
   currentTier, selectedCellsLength,
   onTouchStart, onMouseDown, onDoubleClick,
@@ -156,14 +158,15 @@ const GridCell = memo<GridCellProps>(({
       isHovered && isLastSelected && selectedCellsLength >= 2 && "ring-4 ring-neo-green ring-offset-2 scale-110",
       isSelecting && selectedCellsLength > 0 && !isSelected && !isAdjacentHint && !isHighlighted && "cursor-not-allowed",
       isLastSelected && isSelecting && !isDragging && "animate-anchor-pulse z-20",
-      isSelected && !isHovered && "shadow-hard-sm transition-shadow duration-75",
-      isFocused && !isSelected && "z-20 animate-keyboard-focus",
-      "transition-all",
-      comboLevel > 0 ? "duration-300" : "duration-100"
+      isSelected && !isHovered && "shadow-hard-sm",
+      isFocused && !isSelected && "z-20 animate-keyboard-focus"
     )}
     style={{
       borderRadius: '6px',
       fontSize: 'var(--cell-font-size)',
+      transition: isSelected
+        ? `box-shadow ${escalationCombo > 0 ? 350 : 250}ms ease-out, background ${escalationCombo > 0 ? 300 : 200}ms ease, border-color 200ms ease`
+        : 'box-shadow 400ms ease-out, background 350ms ease-out, border-color 300ms ease-out, opacity 150ms ease',
       ...(isSelected && {
         '--esc-scale': String(escalation?.scale ?? 1.05),
         boxShadow: escalation?.glow ?? '0 0 0 2px rgba(255, 225, 53, 0.7), 0 0 8px rgba(255, 200, 100, 0.3)',
@@ -182,11 +185,11 @@ const GridCell = memo<GridCellProps>(({
       } : isSelected && comboColors.flicker ? {
         animation: 'flicker 0.1s infinite alternate'
       } : isSelected && escalation && escalation.tier >= 1 ? {
-        ...getEscalationBackground(selectionIdx, selectedCellsLength, comboLevel),
-        ...(!reduceMotion && getEscalationShake(selectedCellsLength, comboLevel) ? {
+        ...getEscalationBackground(selectionIdx, selectedCellsLength, escalationCombo),
+        ...(!reduceMotion && getEscalationShake(selectedCellsLength, escalationCombo) ? {
           animation: [
-            getEscalationBackground(selectionIdx, selectedCellsLength, comboLevel).animation,
-            getEscalationShake(selectedCellsLength, comboLevel),
+            getEscalationBackground(selectionIdx, selectedCellsLength, escalationCombo).animation,
+            getEscalationShake(selectedCellsLength, escalationCombo),
           ].filter(Boolean).join(', '),
         } : {}),
       } : {}),

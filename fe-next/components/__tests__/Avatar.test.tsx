@@ -75,8 +75,8 @@ describe('Avatar', () => {
   });
 
   describe('generated fallback avatar', () => {
-    it('renders generated avatar when no props provided', () => {
-      render(<Avatar />);
+    it('renders generated avatar when userId seed is provided but no customAvatar', () => {
+      render(<Avatar userId="some-user" />);
 
       expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
       expect(screen.getByTestId('header-avatar')).toHaveAttribute('data-avatar-type', 'generated');
@@ -128,39 +128,39 @@ describe('Avatar', () => {
 
   describe('sizes', () => {
     it('renders small size correctly', () => {
-      const { container } = render(<Avatar size="sm" />);
+      const { container } = render(<Avatar userId="test" size="sm" />);
       expect(container.querySelector('.w-6')).toBeInTheDocument();
     });
 
     it('renders medium size correctly (default)', () => {
-      const { container } = render(<Avatar />);
+      const { container } = render(<Avatar userId="test" />);
       expect(container.querySelector('.w-8')).toBeInTheDocument();
     });
 
     it('renders large size correctly', () => {
-      const { container } = render(<Avatar size="lg" />);
+      const { container } = render(<Avatar userId="test" size="lg" />);
       expect(container.querySelector('.w-12')).toBeInTheDocument();
     });
 
     it('renders extra large size correctly', () => {
-      const { container } = render(<Avatar size="xl" />);
+      const { container } = render(<Avatar userId="test" size="xl" />);
       expect(container.querySelector('.w-20')).toBeInTheDocument();
     });
   });
 
   describe('styling', () => {
     it('accepts additional className', () => {
-      const { container } = render(<Avatar className="custom-class" />);
+      const { container } = render(<Avatar userId="test" className="custom-class" />);
       expect(container.querySelector('.custom-class')).toBeInTheDocument();
     });
 
     it('has rounded-full class for circular shape', () => {
-      const { container } = render(<Avatar />);
+      const { container } = render(<Avatar userId="test" />);
       expect(container.querySelector('.rounded-full')).toBeInTheDocument();
     });
 
     it('has flex-shrink-0 to prevent shrinking in flex containers', () => {
-      const { container } = render(<Avatar />);
+      const { container } = render(<Avatar userId="test" />);
       expect(container.querySelector('.flex-shrink-0')).toBeInTheDocument();
     });
   });
@@ -239,6 +239,44 @@ describe('Avatar', () => {
       const withoutUserId = screen.getByTestId('custom-avatar').getAttribute('data-base');
 
       expect(withUserId).toBe(withoutUserId);
+    });
+  });
+
+  describe('init loading state', () => {
+    it('shows skeleton on first render when no customAvatar and no seed provided', () => {
+      render(<Avatar />);
+      // On initial mount with no avatar data, should show loading skeleton
+      expect(screen.getByTestId('avatar-skeleton')).toBeInTheDocument();
+    });
+
+    it('does NOT show skeleton when customAvatar is provided', () => {
+      render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} />);
+      expect(screen.queryByTestId('avatar-skeleton')).not.toBeInTheDocument();
+      expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
+    });
+
+    it('does NOT show skeleton when userId seed is provided', () => {
+      render(<Avatar userId="user-123" />);
+      expect(screen.queryByTestId('avatar-skeleton')).not.toBeInTheDocument();
+      expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
+    });
+
+    it('does NOT show skeleton when avatarImage seed is provided', () => {
+      render(<Avatar avatarImage="pizza-pete" />);
+      expect(screen.queryByTestId('avatar-skeleton')).not.toBeInTheDocument();
+      expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
+    });
+
+    it('explicit isLoading=true overrides everything and shows skeleton', () => {
+      render(<Avatar isLoading customAvatar={SAMPLE_CUSTOM_AVATAR} />);
+      expect(screen.getByTestId('avatar-skeleton')).toBeInTheDocument();
+      expect(screen.queryByTestId('custom-avatar')).not.toBeInTheDocument();
+    });
+
+    it('explicit isLoading=false suppresses init loading even with no data', () => {
+      render(<Avatar isLoading={false} />);
+      expect(screen.queryByTestId('avatar-skeleton')).not.toBeInTheDocument();
+      expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
     });
   });
 

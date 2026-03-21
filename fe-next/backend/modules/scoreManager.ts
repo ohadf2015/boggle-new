@@ -238,14 +238,7 @@ export function getLeaderboard(game: ScoreGameBase | null, gameCode?: string): L
       isHost: game.users[username]?.isHost || false,
       isBot: game.users[username]?.isBot || false
     }))
-    .filter(player => {
-      // Filter out Host from leaderboard if they haven't found any words
-      // This supports "Broadcast Mode" where the host manages the game but doesn't play
-      if (player.isHost && player.wordCount === 0) {
-        return false;
-      }
-      return true;
-    })
+    // Host is always visible as a player — no broadcast mode filtering
     .sort((a, b) => b.score - a.score);
 
   // Cache the result

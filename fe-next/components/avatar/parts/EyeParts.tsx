@@ -357,34 +357,30 @@ function Galaxy() {
   return (
     <g>
       <defs>
+        {/* Static nebula gradient — no color cycling */}
         <radialGradient id="galaxyEyeGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#E040FB"><animate attributeName="stopColor" values="#E040FB;#00BCD4;#E040FB" dur="3s" repeatCount="indefinite" /></stop>
+          <stop offset="0%" stopColor="#E040FB" />
           <stop offset="50%" stopColor="#7C4DFF" />
           <stop offset="100%" stopColor="#1A237E" />
         </radialGradient>
       </defs>
       <circle cx="38" cy="42" r="7" fill="url(#galaxyEyeGrad)" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="7" fill="url(#galaxyEyeGrad)" stroke="#000" strokeWidth={S} />
-      <path d="M34 40 Q38 38 42 40" fill="none" stroke="#E040FB" strokeWidth={0.6} opacity="0.4">
-        <animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="8s" repeatCount="indefinite" />
+      {/* Slow orbit arcs */}
+      <path d="M34 40 Q38 38 42 40" fill="none" stroke="#E040FB" strokeWidth={0.6} opacity="0.3">
+        <animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="15s" repeatCount="indefinite" />
       </path>
-      <path d="M35 44 Q38 46 41 44" fill="none" stroke="#00BCD4" strokeWidth={0.5} opacity="0.3">
-        <animateTransform attributeName="transform" type="rotate" from="180 38 42" to="540 38 42" dur="10s" repeatCount="indefinite" />
+      <path d="M58 40 Q62 38 66 40" fill="none" stroke="#00BCD4" strokeWidth={0.6} opacity="0.3">
+        <animateTransform attributeName="transform" type="rotate" from="0 62 42" to="-360 62 42" dur="15s" repeatCount="indefinite" />
       </path>
-      <path d="M58 40 Q62 38 66 40" fill="none" stroke="#00BCD4" strokeWidth={0.6} opacity="0.4">
-        <animateTransform attributeName="transform" type="rotate" from="0 62 42" to="-360 62 42" dur="8s" repeatCount="indefinite" />
-      </path>
-      <path d="M59 44 Q62 46 65 44" fill="none" stroke="#E040FB" strokeWidth={0.5} opacity="0.3">
-        <animateTransform attributeName="transform" type="rotate" from="180 62 42" to="-180 62 42" dur="10s" repeatCount="indefinite" />
-      </path>
-      <circle cx="36" cy="40" r="1" fill="#fff"><animate attributeName="opacity" values="0.9;0.2;0.9" dur="2s" repeatCount="indefinite" /></circle>
-      <circle cx="40" cy="43" r="0.7" fill="#fff"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.8s" begin="0.5s" repeatCount="indefinite" /></circle>
-      <circle cx="60" cy="40" r="1" fill="#fff"><animate attributeName="opacity" values="0.9;0.2;0.9" dur="2.2s" begin="0.3s" repeatCount="indefinite" /></circle>
-      <circle cx="64" cy="43" r="0.7" fill="#fff"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.6s" begin="0.8s" repeatCount="indefinite" /></circle>
-      <circle cx="35" cy="44" r="0.5" fill="#E040FB"><animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" begin="1.2s" repeatCount="indefinite" /></circle>
-      <circle cx="65" cy="41" r="0.5" fill="#00BCD4"><animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" begin="0.7s" repeatCount="indefinite" /></circle>
-      <circle cx="38" cy="42" r="2" fill="#fff"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite" /><animate attributeName="r" values="2;2.5;2" dur="2s" repeatCount="indefinite" /></circle>
-      <circle cx="62" cy="42" r="2" fill="#fff"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" begin="0.5s" repeatCount="indefinite" /><animate attributeName="r" values="2;2.5;2" dur="2s" begin="0.5s" repeatCount="indefinite" /></circle>
+      {/* Gentle star twinkle */}
+      <circle cx="36" cy="40" r="0.8" fill="#fff"><animate attributeName="opacity" values="0.7;0.15;0.7" dur="4s" repeatCount="indefinite" /></circle>
+      <circle cx="40" cy="43" r="0.5" fill="#fff"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="5s" begin="1.5s" repeatCount="indefinite" /></circle>
+      <circle cx="60" cy="40" r="0.8" fill="#fff"><animate attributeName="opacity" values="0.7;0.15;0.7" dur="4.5s" begin="1s" repeatCount="indefinite" /></circle>
+      <circle cx="64" cy="43" r="0.5" fill="#fff"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="5s" begin="2.5s" repeatCount="indefinite" /></circle>
+      {/* Soft center glow — slow pulse */}
+      <circle cx="38" cy="42" r="2" fill="#fff"><animate attributeName="opacity" values="0.4;0.75;0.4" dur="4s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="2" fill="#fff"><animate attributeName="opacity" values="0.4;0.75;0.4" dur="4s" begin="1.5s" repeatCount="indefinite" /></circle>
     </g>
   );
 }
@@ -401,20 +397,20 @@ function FlameEyes() {
       </defs>
       <circle cx="38" cy="42" r="9" fill="#FF6D00" opacity="0.08" />
       <circle cx="62" cy="42" r="9" fill="#FF6D00" opacity="0.08" />
+      {/* Flame shape — slow gentle breathing instead of fast flicker */}
       <path d="M38 48 C32 44 32 38 38 34 C44 38 44 44 38 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5}>
-        <animateTransform attributeName="transform" type="scale" values="1 1;1.02 1.06;0.98 1.03;1 1" dur="0.8s" repeatCount="indefinite" additive="sum" />
+        <animateTransform attributeName="transform" type="scale" values="1 1;1.01 1.04;1 1" dur="3s" repeatCount="indefinite" additive="sum" />
       </path>
       <path d="M62 48 C56 44 56 38 62 34 C68 38 68 44 62 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5}>
-        <animateTransform attributeName="transform" type="scale" values="1 1;0.98 1.04;1.02 1.07;1 1" dur="0.9s" repeatCount="indefinite" additive="sum" />
+        <animateTransform attributeName="transform" type="scale" values="1 1;1.01 1.04;1 1" dur="3.5s" repeatCount="indefinite" additive="sum" />
       </path>
       <path d="M38 46 C35 43 35 39 38 37 C41 39 41 43 38 46Z" fill="#FFD600" opacity="0.6" />
       <path d="M62 46 C59 43 59 39 62 37 C65 39 65 43 62 46Z" fill="#FFD600" opacity="0.6" />
       <path d="M38 44 C37 42 37 41 38 40 C39 41 39 42 38 44Z" fill="#fff" opacity="0.7" />
       <path d="M62 44 C61 42 61 41 62 40 C63 41 63 42 62 44Z" fill="#fff" opacity="0.7" />
-      <circle cx="36" cy="36" r="0.6" fill="#FFD600"><animate attributeName="cy" values="36;32;28" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.8;0.4;0" dur="1.5s" repeatCount="indefinite" /></circle>
-      <circle cx="64" cy="35" r="0.5" fill="#FF9100"><animate attributeName="cy" values="35;30;26" dur="1.8s" begin="0.4s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.3;0" dur="1.8s" begin="0.4s" repeatCount="indefinite" /></circle>
-      <circle cx="40" cy="34" r="0.4" fill="#fff"><animate attributeName="cy" values="34;29;24" dur="1.3s" begin="0.8s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.2;0" dur="1.3s" begin="0.8s" repeatCount="indefinite" /></circle>
-      <circle cx="60" cy="34" r="0.4" fill="#FF9100"><animate attributeName="cy" values="34;28;22" dur="1.6s" begin="0.6s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.2;0" dur="1.6s" begin="0.6s" repeatCount="indefinite" /></circle>
+      {/* Slow gentle embers */}
+      <circle cx="36" cy="36" r="0.5" fill="#FFD600"><animate attributeName="cy" values="36;30;24" dur="4s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.25;0" dur="4s" repeatCount="indefinite" /></circle>
+      <circle cx="64" cy="35" r="0.4" fill="#FF9100"><animate attributeName="cy" values="35;28;22" dur="5s" begin="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.5;0.2;0" dur="5s" begin="1.5s" repeatCount="indefinite" /></circle>
     </g>
   );
 }
@@ -426,16 +422,18 @@ function Robot() {
       <rect x="55" y="37" width="14" height="10" rx="2" fill="#0D47A1" stroke="#000" strokeWidth={S} />
       <rect x="31" y="37" width="14" height="1.5" rx="1" fill="#1565C0" opacity="0.5" />
       <rect x="55" y="37" width="14" height="1.5" rx="1" fill="#1565C0" opacity="0.5" />
-      <line x1="33" y1="38" x2="43" y2="38" stroke="#00E5FF" strokeWidth={1} opacity="0.5"><animate attributeName="y1" values="38;46;38" dur="2s" repeatCount="indefinite" /><animate attributeName="y2" values="38;46;38" dur="2s" repeatCount="indefinite" /></line>
-      <line x1="57" y1="38" x2="67" y2="38" stroke="#00E5FF" strokeWidth={1} opacity="0.5"><animate attributeName="y1" values="38;46;38" dur="2s" begin="0.5s" repeatCount="indefinite" /><animate attributeName="y2" values="38;46;38" dur="2s" begin="0.5s" repeatCount="indefinite" /></line>
+      {/* Slow scan lines */}
+      <line x1="33" y1="38" x2="43" y2="38" stroke="#00E5FF" strokeWidth={1} opacity="0.5"><animate attributeName="y1" values="38;46;38" dur="4s" repeatCount="indefinite" /><animate attributeName="y2" values="38;46;38" dur="4s" repeatCount="indefinite" /></line>
+      <line x1="57" y1="38" x2="67" y2="38" stroke="#00E5FF" strokeWidth={1} opacity="0.5"><animate attributeName="y1" values="38;46;38" dur="4s" begin="1s" repeatCount="indefinite" /><animate attributeName="y2" values="38;46;38" dur="4s" begin="1s" repeatCount="indefinite" /></line>
       <line x1="33" y1="40" x2="43" y2="40" stroke="#00E5FF" strokeWidth={0.5} opacity="0.3" />
       <line x1="33" y1="43" x2="43" y2="43" stroke="#00E5FF" strokeWidth={0.5} opacity="0.3" />
       <line x1="57" y1="40" x2="67" y2="40" stroke="#00E5FF" strokeWidth={0.5} opacity="0.3" />
       <line x1="57" y1="43" x2="67" y2="43" stroke="#00E5FF" strokeWidth={0.5} opacity="0.3" />
       <circle cx="38" cy="42" r="3" fill="#00E5FF" opacity="0.3" />
       <circle cx="62" cy="42" r="3" fill="#00E5FF" opacity="0.3" />
-      <circle cx="38" cy="42" r="2" fill="#00E5FF"><animate attributeName="r" values="2;2.5;2" dur="1.5s" repeatCount="indefinite" /></circle>
-      <circle cx="62" cy="42" r="2" fill="#00E5FF"><animate attributeName="r" values="2;2.5;2" dur="1.5s" begin="0.3s" repeatCount="indefinite" /></circle>
+      {/* Gentle core pulse */}
+      <circle cx="38" cy="42" r="2" fill="#00E5FF"><animate attributeName="r" values="2;2.4;2" dur="3s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="2" fill="#00E5FF"><animate attributeName="r" values="2;2.4;2" dur="3s" begin="0.7s" repeatCount="indefinite" /></circle>
       <circle cx="37" cy="41" r="0.8" fill="#fff" opacity="0.6" />
       <circle cx="61" cy="41" r="0.8" fill="#fff" opacity="0.6" />
     </g>
@@ -451,14 +449,18 @@ function Void() {
           <stop offset="0%" stopColor="#000" /><stop offset="70%" stopColor="#1A0033" /><stop offset="100%" stopColor="#4A0080" />
         </radialGradient>
       </defs>
-      <circle cx="38" cy="42" r="7" fill={vg} stroke="#4A0080" strokeWidth={S}><animate attributeName="r" values="7;7.3;7" dur="3s" repeatCount="indefinite" /></circle>
-      <circle cx="62" cy="42" r="7" fill={vg} stroke="#4A0080" strokeWidth={S}><animate attributeName="r" values="7;7.3;7" dur="3s" begin="0.5s" repeatCount="indefinite" /></circle>
-      <path d="M38 42 Q36 39 38 37 Q40 39 38 42 Q36 45 38 47" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.5"><animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="6s" repeatCount="indefinite" /></path>
-      <path d="M62 42 Q60 39 62 37 Q64 39 62 42 Q60 45 62 47" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.5"><animateTransform attributeName="transform" type="rotate" from="0 62 42" to="-360 62 42" dur="6s" repeatCount="indefinite" /></path>
-      <circle cx="32" cy="38" r="0.5" fill="#E040FB" opacity="0.6"><animate attributeName="cx" values="32;38" dur="2s" repeatCount="indefinite" /><animate attributeName="cy" values="38;42" dur="2s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0" dur="2s" repeatCount="indefinite" /></circle>
-      <circle cx="68" cy="39" r="0.5" fill="#7C4DFF" opacity="0.5"><animate attributeName="cx" values="68;62" dur="2.2s" begin="0.5s" repeatCount="indefinite" /><animate attributeName="cy" values="39;42" dur="2.2s" begin="0.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.5;0" dur="2.2s" begin="0.5s" repeatCount="indefinite" /></circle>
-      <circle cx="38" cy="42" r="0.8" fill="#E040FB"><animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite" /></circle>
-      <circle cx="62" cy="42" r="0.8" fill="#E040FB"><animate attributeName="opacity" values="1;0.3;1" dur="1.5s" begin="0.4s" repeatCount="indefinite" /></circle>
+      {/* Slow eerie breathing */}
+      <circle cx="38" cy="42" r="7" fill={vg} stroke="#4A0080" strokeWidth={S}><animate attributeName="r" values="7;7.2;7" dur="5s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="7" fill={vg} stroke="#4A0080" strokeWidth={S}><animate attributeName="r" values="7;7.2;7" dur="5s" begin="1s" repeatCount="indefinite" /></circle>
+      {/* Slow vortex rotation */}
+      <path d="M38 42 Q36 39 38 37 Q40 39 38 42 Q36 45 38 47" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.4"><animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="12s" repeatCount="indefinite" /></path>
+      <path d="M62 42 Q60 39 62 37 Q64 39 62 42 Q60 45 62 47" fill="none" stroke="#7C4DFF" strokeWidth={0.8} opacity="0.4"><animateTransform attributeName="transform" type="rotate" from="0 62 42" to="-360 62 42" dur="12s" repeatCount="indefinite" /></path>
+      {/* Slow matter absorption */}
+      <circle cx="32" cy="38" r="0.5" fill="#E040FB" opacity="0.5"><animate attributeName="cx" values="32;38" dur="4s" repeatCount="indefinite" /><animate attributeName="cy" values="38;42" dur="4s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.5;0" dur="4s" repeatCount="indefinite" /></circle>
+      <circle cx="68" cy="39" r="0.5" fill="#7C4DFF" opacity="0.4"><animate attributeName="cx" values="68;62" dur="5s" begin="1.5s" repeatCount="indefinite" /><animate attributeName="cy" values="39;42" dur="5s" begin="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.4;0" dur="5s" begin="1.5s" repeatCount="indefinite" /></circle>
+      {/* Eerie center glow */}
+      <circle cx="38" cy="42" r="0.8" fill="#E040FB"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="0.8" fill="#E040FB"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" begin="1s" repeatCount="indefinite" /></circle>
     </g>
   );
 }
@@ -706,6 +708,65 @@ function Sad() {
   );
 }
 
+function WingedLiner() {
+  return (
+    <g>
+      {/* Eyes with bold winged eyeliner — cat-eye makeup look */}
+      {/* Left eye */}
+      <ellipse cx="38" cy="42" rx="6" ry="4.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <path d="M32 40 Q38 36 44 40" fill="#1a1a2e" stroke="#1a1a2e" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Wing flick — left */}
+      <path d="M44 40 L48 35 L46 39" fill="#1a1a2e" stroke="#1a1a2e" strokeWidth={1} />
+      {/* Iris + pupil */}
+      <circle cx="39" cy="42" r="3" fill="#4A6FA5" />
+      <circle cx="39" cy="42" r="1.8" fill="#000" />
+      <circle cx="37.5" cy="40.5" r="1" fill="#fff" />
+      {/* Right eye */}
+      <ellipse cx="62" cy="42" rx="6" ry="4.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <path d="M56 40 Q62 36 68 40" fill="#1a1a2e" stroke="#1a1a2e" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Wing flick — right */}
+      <path d="M68 40 L72 35 L70 39" fill="#1a1a2e" stroke="#1a1a2e" strokeWidth={1} />
+      {/* Iris + pupil */}
+      <circle cx="63" cy="42" r="3" fill="#4A6FA5" />
+      <circle cx="63" cy="42" r="1.8" fill="#000" />
+      <circle cx="61.5" cy="40.5" r="1" fill="#fff" />
+      {/* Lower lash line — subtle */}
+      <path d="M34 44 Q38 46 42 44" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
+      <path d="M58 44 Q62 46 66 44" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
+    </g>
+  );
+}
+
+function SmokyEye() {
+  return (
+    <g>
+      {/* Smoky eye — blended dark shadow around eyes */}
+      {/* Shadow halos */}
+      <ellipse cx="38" cy="42" rx="9" ry="6" fill="#2D1B4E" opacity="0.25" />
+      <ellipse cx="62" cy="42" rx="9" ry="6" fill="#2D1B4E" opacity="0.25" />
+      <ellipse cx="38" cy="41" rx="7.5" ry="5" fill="#4A2D6E" opacity="0.2" />
+      <ellipse cx="62" cy="41" rx="7.5" ry="5" fill="#4A2D6E" opacity="0.2" />
+      {/* Eye whites */}
+      <ellipse cx="38" cy="42" rx="5.5" ry="4" fill="#fff" stroke="#2D1B4E" strokeWidth={S} />
+      <ellipse cx="62" cy="42" rx="5.5" ry="4" fill="#fff" stroke="#2D1B4E" strokeWidth={S} />
+      {/* Thick upper lid line */}
+      <path d="M32.5 40 Q38 36.5 43.5 40" fill="none" stroke="#1a1a2e" strokeWidth={2.5} strokeLinecap="round" />
+      <path d="M56.5 40 Q62 36.5 67.5 40" fill="none" stroke="#1a1a2e" strokeWidth={2.5} strokeLinecap="round" />
+      {/* Iris — deep blue-gray for dramatic look */}
+      <circle cx="39" cy="42" r="3" fill="#3A5A6A" />
+      <circle cx="63" cy="42" r="3" fill="#3A5A6A" />
+      {/* Pupils */}
+      <circle cx="39" cy="42" r="1.8" fill="#000" />
+      <circle cx="63" cy="42" r="1.8" fill="#000" />
+      {/* Catchlights */}
+      <circle cx="37.5" cy="40.5" r="1" fill="#fff" />
+      <circle cx="61.5" cy="40.5" r="1" fill="#fff" />
+      <circle cx="40" cy="43" r="0.4" fill="#fff" opacity="0.5" />
+      <circle cx="64" cy="43" r="0.4" fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
 function None() { return <g />; }
 
 export const EYE_PARTS = {
@@ -742,6 +803,8 @@ export const EYE_PARTS = {
   wide: Wide,
   squint: Squint,
   sad: Sad,
+  wingedLiner: WingedLiner,
+  smokyEye: SmokyEye,
 } as const;
 
 export type EyePart = keyof typeof EYE_PARTS;

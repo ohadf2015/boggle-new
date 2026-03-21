@@ -67,9 +67,7 @@ function playerWordDataToWordObject(word: PlayerWordData): WordObject {
 }
 
 export interface ParticipantAvatar {
-  emoji?: string;
-  color?: string;
-  avatarImage?: string;
+  customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
 }
 
 export interface Participant {

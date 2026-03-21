@@ -52,10 +52,13 @@ export default function ModerationPageClient() {
 
   const handleAction = useCallback(async (id: string, action: 'approve' | 'reject') => {
     if (!authToken) return;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     try {
       const res = await fetch(`/api/admin/invalid-words/${id}/${action}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+        signal: controller.signal,
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -65,9 +68,14 @@ export default function ModerationPageClient() {
       setQueueItems(prev => prev?.filter(item => item.id !== id) ?? []);
       setQueueTotal(prev => Math.max(0, prev - 1));
     } catch (err) {
-      console.error(`Moderation ${action} failed:`, err);
+      const message = err instanceof DOMException && err.name === 'AbortError'
+        ? 'Request timed out — please try again'
+        : err instanceof Error ? err.message : 'Unknown error';
+      console.error(`Moderation ${action} failed:`, message);
       // Re-fetch to restore accurate state
       fetchQueue();
+    } finally {
+      clearTimeout(timeoutId);
     }
   }, [authToken, fetchQueue]);
 

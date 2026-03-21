@@ -750,6 +750,131 @@ function MonkeyEars({ fill }: AccessoryPartProps) {
   );
 }
 
+function Bow({ fill }: AccessoryPartProps) {
+  const bowColor = fill || '#FF1493';
+  return (
+    <g>
+      {/* Hair bow — sits on top of head */}
+      {/* Left wing */}
+      <path d="M34 16 Q26 8 22 14 Q18 20 28 22 Q34 24 38 20Z"
+        fill={bowColor} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Right wing */}
+      <path d="M46 16 Q54 8 58 14 Q62 20 52 22 Q46 24 42 20Z"
+        fill={bowColor} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Center knot */}
+      <ellipse cx="40" cy="19" rx="4" ry="3.5" fill={bowColor} stroke="#000" strokeWidth={S} />
+      {/* Ribbon tails */}
+      <path d="M36 22 L32 30 Q34 28 36 30" fill={bowColor} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
+      <path d="M44 22 L48 30 Q46 28 44 30" fill={bowColor} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
+      {/* Highlights */}
+      <path d="M28 12 Q32 10 36 14" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.3" />
+      <path d="M52 12 Q48 10 44 14" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.3" />
+    </g>
+  );
+}
+
+function Pearls({ fill }: AccessoryPartProps) {
+  const pearlColor = fill || '#FFF5EE';
+  return (
+    <g>
+      {/* Pearl necklace — strand around neck/body junction */}
+      {[
+        { x: 30, y: 73 }, { x: 34, y: 71.5 }, { x: 38, y: 70.5 },
+        { x: 42, y: 70 }, { x: 46, y: 69.5 }, { x: 50, y: 69.5 },
+        { x: 54, y: 69.5 }, { x: 58, y: 70 }, { x: 62, y: 70.5 },
+        { x: 66, y: 71.5 }, { x: 70, y: 73 },
+      ].map((p, i) => (
+        <g key={i}>
+          <circle cx={p.x} cy={p.y} r="2.2" fill={pearlColor} stroke="#C0B8A8" strokeWidth={0.6} />
+          {/* Pearl luster — shifted highlight */}
+          <circle cx={p.x - 0.5} cy={p.y - 0.6} r="0.8" fill="#fff" opacity="0.6" />
+        </g>
+      ))}
+      {/* Connecting strand hint */}
+      <path d="M30 73 Q34 71 38 70 Q42 69.5 46 69.5 Q50 69.5 54 69.5 Q58 70 62 70.5 Q66 71.5 70 73"
+        fill="none" stroke="#C0B8A8" strokeWidth={0.4} opacity="0.3" />
+    </g>
+  );
+}
+
+function HeartGlasses({ fill }: AccessoryPartProps) {
+  const frameColor = fill || '#FF1493';
+  return (
+    <g>
+      {/* Heart-shaped sunglasses */}
+      <defs>
+        <linearGradient id="heartLensGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={frameColor} stopOpacity="0.7" />
+          <stop offset="100%" stopColor="#000" stopOpacity="0.3" />
+        </linearGradient>
+      </defs>
+      {/* Left heart lens */}
+      <path d="M30 40 C30 34 36 34 38 38 C40 34 46 34 46 40 C46 48 38 52 38 52 C38 52 30 48 30 40Z"
+        fill="url(#heartLensGrad)" stroke={frameColor} strokeWidth={S} />
+      {/* Right heart lens */}
+      <path d="M54 40 C54 34 60 34 62 38 C64 34 70 34 70 40 C70 48 62 52 62 52 C62 52 54 48 54 40Z"
+        fill="url(#heartLensGrad)" stroke={frameColor} strokeWidth={S} />
+      {/* Bridge */}
+      <path d="M46 42 Q50 44 54 42" stroke={frameColor} strokeWidth={S} fill="none" />
+      {/* Arms */}
+      <path d="M30 40 L22 36" stroke={frameColor} strokeWidth={S} strokeLinecap="round" />
+      <path d="M70 40 L78 36" stroke={frameColor} strokeWidth={S} strokeLinecap="round" />
+      {/* Lens shine */}
+      <path d="M33 37 Q36 35 38 37" fill="none" stroke="#fff" strokeWidth={1} opacity="0.35" />
+      <path d="M57 37 Q60 35 62 37" fill="none" stroke="#fff" strokeWidth={1} opacity="0.35" />
+    </g>
+  );
+}
+
+function Choker({ fill }: AccessoryPartProps) {
+  const bandColor = fill || '#000000';
+  return (
+    <g>
+      {/* Choker necklace — tight band around neck */}
+      <path d="M36 68 Q50 72 64 68" fill="none" stroke={bandColor} strokeWidth={4} strokeLinecap="round" />
+      {/* Band edges */}
+      <path d="M36 66.5 Q50 70.5 64 66.5" fill="none" stroke={bandColor} strokeWidth={0.8} opacity="0.5" />
+      <path d="M36 69.5 Q50 73.5 64 69.5" fill="none" stroke={bandColor} strokeWidth={0.8} opacity="0.5" />
+      {/* Center pendant — small heart charm */}
+      <path d="M48 72 C48 70 50 70 50 71.5 C50 70 52 70 52 72 C52 74 50 76 50 76 C50 76 48 74 48 72Z"
+        fill="#FFD700" stroke="#000" strokeWidth={0.8} />
+      {/* Pendant shine */}
+      <circle cx="49.5" cy="72" r="0.5" fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
+function ButterflyClip({ fill }: AccessoryPartProps) {
+  const wingColor = fill || '#E6A0FF';
+  return (
+    <g>
+      {/* Butterfly hair clip — sits on right side of head */}
+      {/* Left upper wing */}
+      <path d="M72 18 Q66 10 68 16 Q64 12 70 20Z"
+        fill={wingColor} stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      {/* Right upper wing */}
+      <path d="M72 18 Q78 10 76 16 Q80 12 74 20Z"
+        fill={wingColor} stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      {/* Left lower wing */}
+      <path d="M71 20 Q66 24 68 22 Q64 26 70 22Z"
+        fill={wingColor} stroke="#000" strokeWidth={0.8} opacity="0.8" strokeLinejoin="round" />
+      {/* Right lower wing */}
+      <path d="M73 20 Q78 24 76 22 Q80 26 74 22Z"
+        fill={wingColor} stroke="#000" strokeWidth={0.8} opacity="0.8" strokeLinejoin="round" />
+      {/* Body */}
+      <line x1="72" y1="14" x2="72" y2="24" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      {/* Antennae */}
+      <path d="M72 14 L70 10" stroke="#000" strokeWidth={0.8} strokeLinecap="round" />
+      <path d="M72 14 L74 10" stroke="#000" strokeWidth={0.8} strokeLinecap="round" />
+      <circle cx="70" cy="10" r="0.8" fill="#000" />
+      <circle cx="74" cy="10" r="0.8" fill="#000" />
+      {/* Wing pattern dots */}
+      <circle cx="68" cy="16" r="1" fill="#fff" opacity="0.4" />
+      <circle cx="76" cy="16" r="1" fill="#fff" opacity="0.4" />
+    </g>
+  );
+}
+
 export const ACCESSORY_PARTS = {
   none: None,
   glasses: Glasses,
@@ -796,6 +921,11 @@ export const ACCESSORY_PARTS = {
   goggles: Goggles,
   bunnyEars: BunnyEars,
   cyberpunkVisor: CyberpunkVisor,
+  bow: Bow,
+  pearls: Pearls,
+  heartGlasses: HeartGlasses,
+  choker: Choker,
+  butterflyClip: ButterflyClip,
 } as const;
 
 export type AccessoryPart = keyof typeof ACCESSORY_PARTS;

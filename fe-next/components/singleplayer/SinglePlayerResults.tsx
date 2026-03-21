@@ -96,9 +96,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const playerAvatar = useMemo(() => {
     if (!profile) return undefined;
     return {
-      emoji: profile.avatar_emoji,
-      color: profile.avatar_color,
-      avatarImage: profile.avatar_image,
+      customAvatar: profile.avatar_config ?? null,
     };
   }, [profile]);
 

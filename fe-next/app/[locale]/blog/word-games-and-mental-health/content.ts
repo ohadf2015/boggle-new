@@ -31,21 +31,21 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 She had a point.
 
-But here's the thing — all those books told me to meditate, and meditation made me more anxious. They told me to journal, and journaling turned into spiraling. They told me to "sit with the feeling," and sitting with the feeling made me want to crawl out of my skin.
+All those books told me to meditate, and meditation made me more anxious. They told me to journal, and journaling turned into spiraling. They told me to "sit with the feeling," and sitting with the feeling made me want to crawl out of my skin.
 
 Then one Tuesday at 2 AM, unable to sleep because my brain decided that was the perfect time to replay every awkward conversation from 2019, I opened a word game on my phone. Just to distract myself. And something strange happened.
 
-Within five minutes, the noise stopped. Not because I was distracting myself FROM something, but because my brain was fully absorbed IN something. The letters needed my attention. The timer was ticking. There was no room for "what if" or "what did they mean by that" because I was too busy figuring out if QUARTZ could possibly fit in the bottom-left corner.
+Within five minutes, the noise stopped. Not because I was distracting myself from something, but because my brain was fully absorbed in something. The letters needed my attention. The timer was ticking. There was no room for "what if" or "what did they mean by that" because I was too busy figuring out if QUARTZ could possibly fit in the bottom-left corner.
 
 That was three years ago. I've played almost every day since. And I started wondering: is this actually healthy? Or am I just swapping one anxiety behavior for another?
 
 So I did what any self-respecting Word Nerd would do. I went looking for the research.`,
       },
       {
-        title: 'The Flow State: When Your Brain Finally Shuts Up',
-        content: `Let's start with the big concept: flow.
+        title: 'The flow state: when your brain finally shuts up',
+        content: `The big concept first: flow.
 
-Mihaly Csikszentmihalyi — and yes, I had to look up the spelling every single time — was a Hungarian-American psychologist who spent decades studying what he called "optimal experience." His landmark 1990 book "Flow: The Psychology of Optimal Experience" described a mental state where you're so completely absorbed in an activity that everything else falls away.
+Mihaly Csikszentmihalyi (I had to look up the spelling every single time) was a Hungarian-American psychologist who spent decades studying what he called "optimal experience." His 1990 book "Flow" described a mental state where you're so completely absorbed in an activity that everything else falls away.
 
 Time distortion. Loss of self-consciousness. Complete focus. An intrinsic sense of reward.
 
@@ -59,79 +59,79 @@ There must be immediate feedback — the game tells you instantly whether a word
 
 There must be a balance between challenge and skill — too easy and you're bored, too hard and you're frustrated. This is the sweet spot word games nail perfectly, because as your vocabulary grows, you naturally seek harder challenges.
 
-Here's what matters for anxiety: flow states are functionally incompatible with rumination. Your prefrontal cortex can't simultaneously manage complex word-finding and run the "what-if" catastrophe generator. It doesn't have the bandwidth. A study published in the Journal of Positive Psychology (2018) found that people who regularly experienced flow states reported significantly lower levels of anxiety and depression.
+What matters for anxiety: flow states are functionally incompatible with rumination. Your prefrontal cortex can't simultaneously manage complex word-finding and run the "what-if" catastrophe generator. It doesn't have the bandwidth. The Journal of Positive Psychology (2018) found that people who regularly experienced flow states reported significantly lower levels of anxiety and depression.
 
-That study wasn't about word games specifically — it covered everything from rock climbing to music to chess. But the principle holds. Flow is flow. And word games are one of the most accessible ways to get there, because you don't need special equipment, a partner, or even to put on pants.`,
+That study covered everything from rock climbing to music to chess, not word games specifically. But the principle holds. Flow is flow. And word games are one of the most accessible ways to get there. You don't need special equipment, a partner, or even to put on pants.`,
       },
       {
-        title: 'Anxiety and Word Games: What the Research Says',
-        content: `The intersection of gaming and mental health has been studied extensively over the past decade, and the findings are more nuanced than either "games are therapy" or "games rot your brain."
+        title: 'Anxiety and word games: what the research says',
+        content: `Gaming and mental health has been studied extensively over the past decade. The findings are more nuanced than either "games are therapy" or "games rot your brain."
 
-A 2022 systematic review published in JMIR Serious Games examined 27 studies on puzzle and word games as cognitive interventions. The findings: structured word-game play was associated with reduced self-reported anxiety in 19 of the 27 studies. The effect sizes ranged from small to moderate, which in psychology-speak means "it's real, but don't throw away your medication."
+JMIR Serious Games (2022) examined 27 studies on puzzle and word games as cognitive interventions. Structured word-game play was associated with reduced self-reported anxiety in 19 of the 27 studies. The effect sizes ranged from small to moderate, which in psychology-speak means "it's real, but don't throw away your medication."
 
-What's interesting is the mechanism. It's not that word games directly reduce cortisol or serotonin levels in some pharmaceutical way. Rather, they seem to work through several indirect pathways:
+The mechanism is the interesting part. Word games don't directly reduce cortisol or serotonin levels. They work through several indirect pathways:
 
-Cognitive displacement: Your working memory has limited capacity. When it's occupied with word-finding, there's literally less room for anxious thoughts. This isn't avoidance — it's competitive exclusion. Your brain can only run so many processes at once.
+Cognitive displacement: Your working memory has limited capacity. When it's occupied with word-finding, there's literally less room for anxious thoughts. This isn't avoidance. It's competitive exclusion.
 
-Mastery experience: Successfully finding words — especially difficult ones — produces small hits of accomplishment. Albert Bandura's self-efficacy theory (1977) suggests that accumulated mastery experiences build a general sense of competence that can buffer against anxiety.
+Mastery experience: Successfully finding words produces small hits of accomplishment. Bandura's self-efficacy theory suggests that accumulated mastery experiences build a general sense of competence that buffers against anxiety.
 
-Predictable structure: Anxiety often thrives on uncertainty. Word games offer a controlled environment with clear rules, known boundaries, and fair outcomes. You know what you're getting. For an anxious brain, that predictability is soothing.
+Predictable structure: Anxiety thrives on uncertainty. Word games offer clear rules, known boundaries, fair outcomes. For an anxious brain, that predictability is soothing.
 
-Social regulation: In multiplayer word games, there's a social engagement component that activates the ventral vagal complex — the part of your nervous system Stephen Porges identified as responsible for social bonding and calm. Even competing against others can be regulating, because you're connected to other humans in a structured, safe way.
+Social regulation: Multiplayer word games activate the ventral vagal complex, the part of your nervous system responsible for social bonding and calm. Even competing against others can be regulating, because you're connected to other humans in a structured, safe way.
 
-A particularly compelling study from the University of Oxford's Internet Institute (2021) surveyed over 3,200 gamers and found that actual time spent playing — as opposed to self-reported estimates — was positively associated with wellbeing. People who played more reported feeling better, not worse. This contradicted the popular assumption that gaming time is inherently harmful.`,
+Oxford's Internet Institute (2021) surveyed over 3,200 gamers and found something that contradicted popular assumptions: actual time spent playing was positively associated with wellbeing. People who played more reported feeling better, not worse.`,
       },
       {
-        title: 'The Mindfulness Comparison: Same Same but Different',
-        content: `Here's where it gets really interesting. Researchers are starting to notice that the cognitive profile of focused game-play looks remarkably similar to mindfulness meditation.
+        title: 'The mindfulness comparison',
+        content: `Researchers are starting to notice that the cognitive profile of focused game-play looks remarkably similar to mindfulness meditation.
 
-Dr. Adam Gazzaley, a neuroscientist at UCSF and author of "The Distracted Mind," has studied how interactive activities affect attention and anxiety. His lab found that certain structured cognitive tasks produce brain states similar to those seen during meditation — specifically, increased alpha wave activity in the prefrontal cortex and reduced activity in the default mode network.
+Adam Gazzaley, a neuroscientist at UCSF, found that certain structured cognitive tasks produce brain states similar to meditation: increased alpha wave activity in the prefrontal cortex and reduced activity in the default mode network.
 
-The default mode network is your brain's "autopilot." It's what activates when you're not focused on anything specific — and it's also the network most associated with rumination, self-referential thinking, and worry. When you meditate, you learn to quiet the default mode network. When you play an absorbing word game, it gets quiet on its own.
+The default mode network is your brain's autopilot. It activates when you're not focused on anything specific, and it's the network most associated with rumination and worry. Meditation teaches you to quiet it. An absorbing word game quiets it on its own.
 
-Now, I want to be careful here. I'm not saying word games ARE meditation. Meditation builds long-term regulatory skills that gaming doesn't. A regular meditation practice changes the structure of your brain over time — thickening the prefrontal cortex, shrinking the amygdala, strengthening connections between regulatory regions.
+I'm not saying word games are meditation. Meditation builds long-term regulatory skills that gaming doesn't. A regular practice changes the structure of your brain over time, thickening the prefrontal cortex, shrinking the amygdala, strengthening connections between regulatory regions.
 
-Word games don't do that. What they do is provide an on-demand off-switch for the rumination machine. And for people like me, who find traditional meditation aversive (my brain: "Focus on your breath." Also my brain: "WHAT IF THE MOLE ON YOUR ARM IS CANCER"), that on-demand quality is incredibly valuable.
+Word games don't do that. They provide an on-demand off-switch for the rumination machine. For people like me, who find traditional meditation aversive (my brain: "Focus on your breath." Also my brain: "What if the mole on your arm is cancer?"), that on-demand quality is valuable.
 
-Think of it this way: meditation is like going to the gym regularly. Word games are like taking the stairs instead of the elevator. Both involve exercise. One is more intentional and builds more strength over time. But the other is more accessible and better than nothing.
+Meditation is going to the gym regularly. Word games are taking the stairs instead of the elevator. One builds more strength over time. The other is more accessible and better than nothing.
 
-A 2023 study in Computers in Human Behavior found that participants who played cognitively engaging puzzle games for 20 minutes showed comparable reductions in state anxiety (that's "how anxious you feel right now") to those who completed a guided meditation session of equal length. The meditation group showed greater improvement in trait anxiety (that's "how anxious you generally are") over a six-week period, but for immediate relief, the games held their own.`,
+Computers in Human Behavior (2023) found that participants who played cognitively engaging puzzle games for 20 minutes showed comparable reductions in state anxiety to those who completed a guided meditation session of equal length. The meditation group improved more on trait anxiety over six weeks. But for immediate relief, the games held their own.`,
       },
       {
-        title: 'What Therapists Actually Think',
+        title: 'What therapists actually think',
         content: `I asked my own therapist what she thought about my word game habit. She said something that stuck with me: "It sounds like you've found an adaptive coping strategy. The question isn't whether it works — it clearly does. The question is whether it's the only tool in your toolbox."
 
 Fair point.
 
-I also reached out to several mental health professionals who specialize in anxiety disorders. Here's a composite of what I heard:
+I reached out to several mental health professionals who specialize in anxiety disorders.
 
-Dr. Rachel Kowert, a research psychologist who studies the mental health effects of gaming, told me that word games can serve as effective "micro-interventions" — brief, self-directed activities that help regulate emotional states. She emphasized that the key factor isn't the specific game, but the cognitive engagement level. "Any activity that fully occupies working memory can interrupt anxious thought patterns," she said. "Word games are particularly good at this because they scale in difficulty and provide constant feedback."
+Rachel Kowert, a research psychologist who studies gaming and mental health, described word games as effective "micro-interventions." The key factor isn't the specific game, but the cognitive engagement level. "Any activity that fully occupies working memory can interrupt anxious thought patterns," she said. "Word games are particularly good at this because they scale in difficulty and provide constant feedback."
 
-A clinical psychologist I spoke with (who asked to remain anonymous because she didn't want her clients to think she was prescribing Scrabble) said she actually recommends puzzle games to some anxiety patients. "Not as a replacement for therapy or medication, but as a complement. I have clients who use word games as a bridge — something they do when they feel anxiety rising but aren't in a place where they can do a full grounding exercise or breathing technique."
+A clinical psychologist I spoke with (who asked to remain anonymous because she didn't want her clients to think she was prescribing Scrabble) said she recommends puzzle games to some anxiety patients. "Not as a replacement for therapy or medication, but as a complement. I have clients who use word games as a bridge when they feel anxiety rising but can't do a full grounding exercise."
 
-She added: "The structure matters. Open-ended games can increase anxiety for some people because there are too many choices. Word games have constraints — a limited grid, a timer, specific rules. Those constraints are actually therapeutic for anxious minds because they reduce decision fatigue."
+She added something worth remembering: "Open-ended games can increase anxiety for some people because there are too many choices. Word games have constraints. A limited grid, a timer, specific rules. Those constraints are actually therapeutic for anxious minds because they reduce decision fatigue."
 
-Not every therapist was enthusiastic, though. One pointed out that any coping mechanism can become avoidance. "If someone is playing word games for six hours a day to avoid dealing with real problems, that's not coping — that's escape. The game itself is neutral. The pattern of use is what matters."
+Not every therapist was enthusiastic. One pointed out that any coping mechanism can become avoidance. "If someone is playing word games for six hours a day to avoid dealing with real problems, that's not coping. That's escape."
 
-This resonated with me, because I've definitely had nights where I played way too long to avoid thinking about something difficult. More on that later.`,
+This resonated. I've had nights where I played way too long to avoid thinking about something difficult.`,
       },
       {
-        title: 'The Digital Wellness Paradox',
-        content: `Here's the weird thing about word games and wellness: we live in a culture that constantly tells us screens are bad, phones are bad, "digital wellness" means less screen time. And yet here's an activity that happens on a screen, on a phone, that might actually be good for your mental health.
+        title: 'The digital wellness paradox',
+        content: `The weird thing about word games and wellness: we live in a culture that constantly tells us screens are bad, phones are bad, "digital wellness" means less screen time. And yet here's an activity on a phone that might actually be good for your mental health.
 
 The problem with the "all screen time is bad" narrative is that it treats screens like a single category. Doom-scrolling Twitter at 1 AM is not the same as playing a challenging word game. Watching reaction videos for three hours is not the same as solving a puzzle that requires focused attention.
 
 The American Psychological Association acknowledged this in a 2020 report, noting that the effects of screen time depend heavily on the quality of the experience, not just the quantity. Active cognitive engagement — which word games provide — is fundamentally different from passive consumption.
 
-I think about this a lot because I used to feel guilty about my word game time. Like I should be reading a book or going for a walk or doing something "productive." But then I'd put down the game and pick up Instagram, which made me feel objectively worse, and nobody was telling me to feel guilty about THAT.
+I used to feel guilty about my word game time. Like I should be reading a book or going for a walk or doing something "productive." But then I'd put down the game and pick up Instagram, which made me feel objectively worse.
 
-The research suggests we should worry less about screen time as a raw number and more about what we're doing during that time. Are you engaged or passive? Challenged or numbed? Connected or isolated? A word game where you're actively problem-solving, maybe competing with friends, and experiencing regular moments of accomplishment is qualitatively different from passively scrolling through content designed to trigger outrage.
+The research suggests worrying less about screen time as a raw number and more about what you're doing during that time. A word game where you're actively problem-solving and experiencing regular moments of accomplishment is qualitatively different from scrolling through content designed to trigger outrage.
 
-This doesn't mean word games can't be problematic. Any behavioral pattern can become compulsive. But the dose-response relationship for puzzle games seems much more forgiving than for, say, social media. The Oxford study I mentioned earlier found that wellbeing benefits plateaued around 2-3 hours of play per day, but didn't significantly decline even at higher amounts. Social media, by contrast, shows negative wellbeing effects at much lower thresholds.`,
+Word games can still be problematic. Any behavioral pattern can become compulsive. But the dose-response relationship for puzzle games seems much more forgiving than for social media. The Oxford study found wellbeing benefits plateaued around 2-3 hours of daily play but didn't decline even at higher amounts. Social media shows negative effects at much lower thresholds.`,
       },
       {
-        title: 'The Daily Ritual: Why "One More Round" Is Actually Meditation',
-        content: `I want to describe what my daily word game routine actually looks like, because I think the ritual aspect matters as much as the cognitive aspect.
+        title: 'The daily ritual',
+        content: `My daily word game routine matters as much for the ritual as for the cognitive exercise.
 
 Every morning, before I check email, before I look at the news, before I do anything that might seed anxiety for the day, I play one round of the daily challenge. Just one. It takes about three minutes.
 
@@ -139,35 +139,35 @@ During those three minutes, my brain boots up gently. There's no cortisol spike 
 
 Then I put the phone down and start my day.
 
-It's become a ritual in the truest sense — a structured, repeated, intentional activity that marks a transition. I'm transitioning from sleep to wakefulness, from rest to engagement, and the word game is the bridge.
+It's a ritual in the truest sense. A structured, repeated, intentional activity that marks a transition from sleep to wakefulness. The word game is the bridge.
 
-Rituals have been studied extensively in psychology, and they consistently show anxiety-reducing effects. A study in Philosophical Transactions of the Royal Society B (2020) found that ritualistic behavior — characterized by repetition, rigidity, and redundancy — reduces anxiety by increasing perceived control. Sound familiar? Same grid size every day. Same rules. Same comforting predictability.
+Philosophical Transactions of the Royal Society B (2020) found that ritualistic behavior, characterized by repetition and redundancy, reduces anxiety by increasing perceived control. Same grid size every day. Same rules. Same comforting predictability.
 
 I've talked to other daily players who describe similar rituals. One woman plays during her commute — it's her transition from "home self" to "work self." A college student plays right before bed — it helps him stop thinking about tomorrow's exam. A retiree plays at exactly 8 AM with her coffee — it's become the anchor of her morning routine.
 
 None of these people are doing it because they read a study about flow states. They're doing it because it feels right. The research just explains why.
 
-There's also something to be said for the "one more round" phenomenon. You finish a round, and your brain says "one more." I used to think this was addictive behavior, but I've come to see it differently. Each round is a complete experience — challenge, effort, resolution. It has a beginning, a middle, and an end. You get closure. And your brain, having just experienced something satisfying, naturally wants to experience it again.
+The "one more round" phenomenon used to worry me. You finish a round, your brain says "one more." But each round is a complete experience: challenge, effort, resolution. Beginning, middle, end. Closure. Your brain, having experienced something satisfying, naturally wants it again.
 
-That's not addiction. That's your brain recognizing a healthy source of engagement and requesting more of it. Addiction is characterized by escalating need and negative consequences. If you play two rounds instead of one and then go about your day feeling fine, that's not a disorder. That's a second cup of coffee.`,
+That's not addiction. Addiction means escalating need and negative consequences. Playing two rounds instead of one and then going about your day feeling fine? That's a second cup of coffee.`,
       },
       {
-        title: 'When to Worry: Gaming vs. Escapism',
-        content: `Okay, honesty time. I promised I'd talk about the dark side, and here it is.
+        title: 'When to worry',
+        content: `Honesty time.
 
-About a year ago, I went through a rough patch. Relationship stuff. Without getting into details, let's just say things were complicated and painful and I did not want to deal with them.
+About a year ago, I went through a rough patch. Relationship stuff. Things were complicated and painful and I did not want to deal with them.
 
 So I played word games. A lot of word games. We're talking four, five, six hours a day. I'd wake up and play instead of dealing with the difficult conversation I needed to have. I'd play during lunch instead of processing how I felt. I'd play until 2 AM instead of sitting with the sadness.
 
-And the thing is — it worked. I wasn't anxious during those hours. My flow states were flowing. My default mode network was nice and quiet. By all the metrics I've described in this article, I was doing great.
+And it worked. I wasn't anxious during those hours. My flow states were flowing. My default mode network was nice and quiet. By every metric in this article, I was doing great.
 
-Except I wasn't. I was using the game's ability to quiet my mind as a way to avoid things that needed to be loud. The anxiety wasn't gone — it was suppressed. And the problems I was avoiding didn't go away. They got worse.
+Except I wasn't. I was using the game's ability to quiet my mind as a way to avoid things that needed to be loud. The anxiety wasn't gone. It was suppressed. The problems I was avoiding didn't go away. They got worse.
 
 My therapist helped me see the difference between two types of word game sessions:
 
-Regulatory play: You're feeling stressed, anxious, or overstimulated. You play for 15-30 minutes. The game helps you regulate your nervous system. You return to your life feeling calmer and more capable.
+Regulatory play: You're stressed or overstimulated. You play for 15-30 minutes. The game helps you regulate your nervous system. You return to your life calmer and more capable.
 
-Avoidant play: You're feeling something painful or confronting a difficult situation. You play for hours. The game helps you NOT feel. You return to your life with the same problems, now slightly worse from neglect.
+Avoidant play: You're feeling something painful. You play for hours. The game helps you not feel. You return to your life with the same problems, now slightly worse from neglect.
 
 The activity is identical. The context and the pattern make all the difference.
 
@@ -181,27 +181,25 @@ When I stop playing, will I feel refreshed or will I feel guilty?
 
 Am I using this to cope or to avoid?
 
-There's no perfect formula. Sometimes avoidance is actually fine — you don't need to process every emotion in real time. Sometimes your brain genuinely needs a break from something hard, and a word game is a perfectly reasonable way to take that break. The problem is when the break becomes the default mode.
+Sometimes avoidance is fine. You don't need to process every emotion in real time. Sometimes your brain genuinely needs a break from something hard. The problem is when the break becomes the default mode.
 
-If you recognize yourself in any of this, you're probably fine. The fact that you're self-aware enough to ask the question usually means you're using the tool well. But if you're worried, talk to someone. A therapist. A friend. Anyone who can help you see the patterns you might be too close to see yourself.`,
+If you recognize yourself in any of this, you're probably fine. Self-awareness is a good sign. But if you're worried, talk to someone who can see patterns you might be too close to see.`,
       },
       {
-        title: 'My Current Relationship with the Grid',
-        content: `So where does that leave me? After three years of daily play, way too much research, and one genuinely helpful therapy conversation, here's my current stance:
+        title: 'My current relationship with the grid',
+        content: `Three years of daily play, too much research, and one genuinely helpful therapy conversation. Where I've landed:
 
-Word games are a legitimate, research-supported tool for managing anxiety. Not a cure. Not a replacement for professional help. A tool. Like deep breathing, or exercise, or calling a friend.
+Word games are a legitimate tool for managing anxiety. Not a cure. Not a replacement for professional help. A tool, like deep breathing or exercise or calling a friend.
 
-The flow state they provide is real and valuable. For people who struggle with traditional mindfulness practices, word games offer an alternative path to the same cognitive quiet.
+The flow state is real. For people who struggle with traditional mindfulness, word games offer an alternative path to the same cognitive quiet.
 
-Structure matters. The constraints of a word game — limited grid, timer, clear rules — are part of what makes them therapeutic. They provide predictability in a world that often feels chaotic.
+The constraints of a word game, the limited grid, the timer, the clear rules, are part of what makes them therapeutic. Predictability in a world that feels chaotic.
 
-Context matters more than content. The same game session can be healthy or unhealthy depending on why you're playing and how it fits into the rest of your life.
+Context matters more than content. The same game session can be healthy or unhealthy depending on why you're playing.
 
-Rituals are powerful. A brief daily game as part of a morning or evening routine can anchor your day in a small moment of competence and calm.
+And guilt is unnecessary. If you enjoy playing word games and it makes you feel better, you don't need a neuroscience paper to justify it. Though if you want one, I've cited several above.
 
-And guilt is unnecessary. If you enjoy playing word games and it makes you feel better, you don't need a neuroscience paper to justify it. But if you want one, there are several. I've cited them above.
-
-The grid isn't magic. It's just letters. But what those letters do for my brain — the focusing, the quieting, the tiny joy of finding a word I didn't expect — that's become a genuinely important part of how I take care of myself.
+The grid isn't magic. It's just letters. But the focusing, the quieting, the tiny joy of finding a word I didn't expect. That's become a genuinely important part of how I take care of myself.
 
 Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily challenge waiting. Three minutes of calm before the world starts shouting.`,
       },

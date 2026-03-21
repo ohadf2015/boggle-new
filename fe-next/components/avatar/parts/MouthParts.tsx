@@ -370,23 +370,23 @@ function Glitch() {
   return (
     <g>
       <rect x="38" y="57" width="24" height="5" rx="1" fill="#000" />
-      {/* Glitch offset slices — jittering */}
+      {/* Glitch offset slices — slower, less frantic */}
       <rect x="36" y="56" width="10" height="2" fill="#FF0000">
-        <animate attributeName="opacity" values="0.35;0;0.35;0.5;0" dur="0.3s" repeatCount="indefinite" />
-        <animate attributeName="x" values="36;38;35;36" dur="0.4s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.3;0;0;0.3;0.4;0" dur="2s" repeatCount="indefinite" />
+        <animate attributeName="x" values="36;38;35;36" dur="2.5s" repeatCount="indefinite" />
       </rect>
       <rect x="54" y="60" width="10" height="2" fill="#00FFFF">
-        <animate attributeName="opacity" values="0.35;0.5;0;0.35;0" dur="0.35s" repeatCount="indefinite" />
-        <animate attributeName="x" values="54;52;55;54" dur="0.45s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0;0.35;0.4;0;0;0.3" dur="2.5s" repeatCount="indefinite" />
+        <animate attributeName="x" values="54;52;55;54" dur="3s" repeatCount="indefinite" />
       </rect>
       <rect x="42" y="59" width="6" height="1" fill="#FF00FF">
-        <animate attributeName="opacity" values="0.25;0;0.4;0;0.25" dur="0.25s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0;0;0.3;0;0;0.25;0" dur="3s" repeatCount="indefinite" />
       </rect>
-      <rect x="40" y="57" width="8" height="5" rx="1" fill="#FF0000" opacity="0.3" transform="translate(2, -1)">
-        <animate attributeName="opacity" values="0.3;0;0.3;0.5;0.3" dur="0.5s" repeatCount="indefinite" />
+      <rect x="40" y="57" width="8" height="5" rx="1" fill="#FF0000" opacity="0.25" transform="translate(2, -1)">
+        <animate attributeName="opacity" values="0.25;0;0;0.3;0;0.25" dur="3s" repeatCount="indefinite" />
       </rect>
-      <rect x="52" y="57" width="8" height="5" rx="1" fill="#00FFFF" opacity="0.3" transform="translate(-2, 1)">
-        <animate attributeName="opacity" values="0.3;0.5;0.3;0;0.3" dur="0.4s" repeatCount="indefinite" />
+      <rect x="52" y="57" width="8" height="5" rx="1" fill="#00FFFF" opacity="0.25" transform="translate(-2, 1)">
+        <animate attributeName="opacity" values="0;0.3;0;0;0.25;0" dur="2.5s" repeatCount="indefinite" />
       </rect>
       {/* Pixel teeth */}
       <rect x="41" y="57" width="3" height="2.5" fill="#fff" />
@@ -397,10 +397,10 @@ function Glitch() {
       <line x1="38" y1="58.5" x2="62" y2="58.5" stroke="#fff" strokeWidth={0.3} opacity="0.15" />
       <line x1="38" y1="60" x2="62" y2="60" stroke="#fff" strokeWidth={0.3} opacity="0.1" />
       <rect x="44" y="56" width="4" height="1" fill="#0F0">
-        <animate attributeName="opacity" values="0.2;0;0.3;0;0.2" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0;0;0.2;0;0;0.15;0" dur="3.5s" repeatCount="indefinite" />
       </rect>
       <rect x="52" y="62" width="5" height="1" fill="#F0F">
-        <animate attributeName="opacity" values="0.15;0.3;0;0.15" dur="0.5s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0;0.2;0;0;0;0.15" dur="3s" repeatCount="indefinite" />
       </rect>
     </g>
   );
@@ -510,6 +510,54 @@ function SideSmile() {
   );
 }
 
+function Lipstick() {
+  return (
+    <g>
+      {/* Full lipstick — bold colored lips */}
+      <defs>
+        <linearGradient id="lipstickGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#D4264F" />
+          <stop offset="100%" stopColor="#A01B3A" />
+        </linearGradient>
+      </defs>
+      {/* Upper lip — cupid's bow */}
+      <path d="M40 59 Q44 56 48 58 L50 56 L52 58 Q56 56 60 59 Q50 61 40 59Z"
+        fill="url(#lipstickGrad)" stroke="#8B1538" strokeWidth={1} />
+      {/* Lower lip — fuller bottom */}
+      <path d="M40 59 Q50 67 60 59 Q50 61 40 59Z"
+        fill="url(#lipstickGrad)" stroke="#8B1538" strokeWidth={1} />
+      {/* Lip highlight — glossy top */}
+      <path d="M44 58 Q48 56.5 52 58" fill="none" stroke="#FF6B8A" strokeWidth={1} opacity="0.5" strokeLinecap="round" />
+      {/* Lower lip shine */}
+      <ellipse cx="50" cy="62.5" rx="4" ry="1.5" fill="#fff" opacity="0.2" />
+      {/* Dimples */}
+      <circle cx="39" cy="59.5" r="0.5" fill="#000" opacity="0.12" />
+      <circle cx="61" cy="59.5" r="0.5" fill="#000" opacity="0.12" />
+    </g>
+  );
+}
+
+function LipGloss() {
+  return (
+    <g>
+      {/* Lip gloss — natural lips with high shine */}
+      {/* Upper lip — soft natural shape */}
+      <path d="M41 59.5 Q44 57 48 58.5 L50 57 L52 58.5 Q56 57 59 59.5 Q50 61 41 59.5Z"
+        fill="#E87C9E" stroke="#C4607A" strokeWidth={0.8} />
+      {/* Lower lip */}
+      <path d="M41 59.5 Q50 66 59 59.5 Q50 61 41 59.5Z"
+        fill="#E87C9E" stroke="#C4607A" strokeWidth={0.8} />
+      {/* Glossy shine — multiple reflections for wet look */}
+      <ellipse cx="47" cy="58.5" rx="3" ry="1" fill="#fff" opacity="0.45" />
+      <ellipse cx="53" cy="58.5" rx="2.5" ry="0.8" fill="#fff" opacity="0.35" />
+      <ellipse cx="50" cy="62" rx="5" ry="2" fill="#fff" opacity="0.3" />
+      {/* Tiny highlight dots */}
+      <circle cx="45" cy="58" r="0.6" fill="#fff" opacity="0.6" />
+      <circle cx="55" cy="58" r="0.5" fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
 function None() { return <g />; }
 
 export const MOUTH_PARTS = {
@@ -541,6 +589,8 @@ export const MOUTH_PARTS = {
   bubbleGum: BubbleGum,
   buckTeeth: BuckTeeth,
   sideSmile: SideSmile,
+  lipstick: Lipstick,
+  lipGloss: LipGloss,
 } as const;
 
 export type MouthPart = keyof typeof MOUTH_PARTS;

@@ -685,7 +685,16 @@ const ja = {
       "eyebrows": "眉毛",
       "facialHair": "ヒゲ",
       "facialHairStyle": "スタイル",
-      "colorTheme": "カラーテーマ"
+      "colorTheme": "カラーテーマ",
+      "bodyStyle": "服装",
+      bodyStyles: {
+        default: "デフォルト",
+        hoodie: "パーカー",
+        suit: "スーツ",
+        turtleneck: "タートルネック",
+        offShoulder: "オフショルダー",
+        cropTop: "クロップトップ"
+      }
     },
     "premium": {
       "locked": "VIPパーツ",
@@ -3877,14 +3886,14 @@ const ja = {
     },
     "features": {
       "unlocked": {
-        "advancedSettings": "詳細設定が解除されました！",
-        "advancedSettingsDesc": "ゲーム設定をカスタマイズできます",
-        "customBotCount": "ボット数のカスタムが解除！",
-        "customBotCountDesc": "対戦するボット数を選択できます",
-        "challengeMode": "チャレンジモードが解除！",
-        "challengeModeDesc": "タイムアタックで記録を作ろう",
-        "practiceMode": "練習モードが解除！",
-        "practiceModeDesc": "時間制限なし、自分のペースで"
+        "practiceMode": "練習モード",
+        "practiceModeDesc": "自分のペースで練習しよう",
+        "challengeMode": "チャレンジモード",
+        "challengeModeDesc": "より難しいパズルでスキルを試そう",
+        "customBotCount": "カスタムボット",
+        "customBotCountDesc": "対戦するボットの数を選択",
+        "advancedSettings": "詳細設定",
+        "advancedSettingsDesc": "ゲーム体験を細かく調整"
       },
       "locked": {
         "advancedSettings": "5回プレイで解除",
@@ -5437,12 +5446,12 @@ const ja = {
       }
     },
     "kpi": {
-      "dau": "本日のアクティブ",
+      "dau": "デイリーアクティブユーザー",
       "gamesToday": "本日のゲーム",
-      "signupsToday": "登録",
+      "signupsToday": "本日の登録",
       "stickiness": "定着率",
       "totalPlayers": "総プレイヤー数",
-      "totalWords": "発見された単語",
+      "totalWords": "総単語数",
       "thisWeek": "今週"
     },
     "system": {
@@ -5456,18 +5465,18 @@ const ja = {
       "size": "サイズ",
       "funnelTitle": "エンゲージメントファネル（30日）",
       "funnelRegistered": "登録済み",
-      "funnelFirstGame": "初回ゲーム",
+      "funnelFirstGame": "初回ゲームプレイ",
       "funnelDay7": "7日目に復帰",
       "funnelDay30": "30日目に復帰",
       "churnTitle": "離脱リスク",
       "churnTotal": "リスク合計",
-      "noChurnRisk": "リスクのあるプレイヤーはいません",
+      "noChurnRisk": "離脱リスクは検出されていません",
       "games": "ゲーム"
     },
     "moderation": {
       "title": "モデレーション",
       "queueTitle": "モデレーションキュー",
-      "empty": "キューは空です — 保留中のアイテムはありません",
+      "empty": "モデレーションするアイテムはありません",
       "approve": "承認",
       "reject": "却下",
       "investigate": "調査",
@@ -5574,10 +5583,10 @@ const ja = {
         "postBoss": "スペリングビーの巣を制覇！あなたの語彙力は蜜のように甘い！"
       },
       "w3": {
-        "boss": "シソーラス教授",
-        "after2": "この洞窟には古代の語根が眠っています。深く掘りましょう！",
-        "after4": "語源が複雑になってきました。教授が見ています…",
-        "postBoss": "教授が認めました — あなたの語彙力は本当に…印象的です。"
+        "boss": "影の書記",
+        "after2": "影が深まる…何かが先に潜んでいる。",
+        "after4": "古代のささやきが廊下に響く。",
+        "postBoss": "影の書記が倒された！言葉の王国がより明るく輝く。"
       },
       "w4": {
         "boss": "メタファー船長",
@@ -5847,7 +5856,7 @@ const ja = {
       "allMechanics": "すべてのメカニクスを組み合わせ"
     },
     "mechanic": {
-      "synonymPairs": "同義語ペアで+25%",
+      "synonymPairs": "同義語ペア",
       "etymologyRoots": "ラテン語/ギリシャ語の語源でボーナス",
       "idioms": "隠し慣用句チャレンジ",
       "compounds": "複合語で+30%",
@@ -5868,6 +5877,15 @@ const ja = {
       "surviveBattle": "{{target}}%のHPで生き残る",
       "mechanicTrigger": "メカニクスを発動",
       "noDamage": "ダメージを受けない"
+    },
+    "daily": {
+      "wordCount": { "title": "単語コレクター", "desc": "アドベンチャーレベルで{{target}}語を見つける" },
+      "longWord": { "title": "長い単語", "desc": "5文字以上の単語を{{target}}個見つける" },
+      "perfect": { "title": "パーフェクトスター", "desc": "パーフェクト星評価を{{target}}個獲得する" },
+      "combo": { "title": "コンボマスター", "desc": "{{target}}xコンボストリークに到達する" },
+      "speed": { "title": "スピードラン", "desc": "{{target}}秒以上残してレベルをクリアする" },
+      "boss": { "title": "ボススレイヤー", "desc": "ボスを{{target}}体倒す" },
+      "mechanic": { "title": "メカニクスエキスパート", "desc": "ワールドメカニクスを{{target}}回発動する" }
     },
     "tiles": {
       "gold": "ゴールド（3倍ポイント）",
@@ -6728,7 +6746,21 @@ const ja = {
       "blitz": { "name": "ブリッツ" },
       "zenMode": { "name": "禅モード" }
     },
-    "watchAdDoubleCoins": "広告を見てコイン2倍"
+    "watchAdDoubleCoins": "広告を見てコイン2倍",
+    "daily": {
+      "wordCount": {
+        "title": "単語コレクター",
+        "description": "{target}個の単語を見つけよう"
+      },
+      "perfect": {
+        "title": "パーフェクトスター",
+        "description": "{target}個の完璧な3つ星レベルを達成しよう"
+      },
+      "longWord": {
+        "title": "ワードスミス",
+        "description": "{target}個の長い単語（5文字以上）を見つけよう"
+      }
+    }
   },
   "blast": {
     "chain": {
@@ -8249,20 +8281,20 @@ const ja = {
   },
   "features": {
     "unlocked": {
-      "advancedSettings": "詳細設定がアンロック！",
-      "advancedSettingsDesc": "ゲーム設定をカスタマイズできます",
-      "customBotCount": "ボット数カスタムがアンロック！",
+      "practiceMode": "練習モード",
+      "practiceModeDesc": "自分のペースで練習しよう",
+      "challengeMode": "チャレンジモード",
+      "challengeModeDesc": "より難しいパズルでスキルを試そう",
+      "customBotCount": "カスタムボット",
       "customBotCountDesc": "対戦するボットの数を選択",
-      "challengeMode": "チャレンジモードがアンロック！",
-      "challengeModeDesc": "時間と戦ってレコードを樹立",
-      "practiceMode": "練習モードがアンロック！",
-      "practiceModeDesc": "タイマーなし - 自分のペースで学習"
+      "advancedSettings": "詳細設定",
+      "advancedSettingsDesc": "ゲーム体験を細かく調整"
     }
   },
   wordHuntAnnouncement: {
     badge: "マルチプレイヤーに新登場",
     title: "ワードハントモードを試そう！",
-    subtitle: "対戦相手より先に隠されたターゲットワードを見つけよう。ライフ、脱落、そして大混乱！",
+    subtitle: "隠されたターゲットワードを見つけるレース",
   },
   wordHuntTips: {
     needMoreWords: "見つけた単語は{{count}}個だけ。各単語でライフが回復するよ — ターゲットを推測する前に、行や対角線で3文字の単語をスキャンしよう。",
@@ -8279,11 +8311,11 @@ const ja = {
     pushForFirst: "{{rank}}位でフィニッシュ。差を縮めるには、長い単語（5文字以上）を見つけて正確度を高く保とう。",
   },
   wordHuntPromo: {
-    title: "友達にワードハントで挑戦しよう！",
-    subtitle: "対戦相手より先に隠されたターゲットワードを見つけよう。ライフ、脱落、そして大混乱！",
-    cta: "今すぐプレイ",
+    title: "ワードハントモードを試そう！",
+    subtitle: "マルチプレイヤーで隠されたターゲットワードを見つけよう",
+    cta: "ワードハントをプレイ",
     dismiss: "あとで",
-    imageAlt: "2人のプレイヤーによる壮大なワードバトル",
+    imageAlt: "ワードハント マルチプレイヤーデュエル",
   },
   gameModes: {
     classic: {
@@ -8461,7 +8493,7 @@ const ja = {
     }
   },
   "encouragement": {
-    "gameStart": "できるよ！文字をスワイプして単語を見つけよう",
+    "gameStart": "さあ行こう！君ならできる！ 🎯",
     "firstWord": "ナイス！どんどん見つけよう！",
     "longWord": "すごい！長い単語は高得点！",
     "combo": "コンボ！絶好調！",
@@ -8480,6 +8512,13 @@ const ja = {
       "timeout": "時間切れ",
       "unknown": "無効な単語"
     }
+  },
+  "languages": {
+    "english": "英語",
+    "hebrew": "ヘブライ語",
+    "swedish": "スウェーデン語",
+    "japanese": "日本語",
+    "spanish": "スペイン語"
   }
 };
 

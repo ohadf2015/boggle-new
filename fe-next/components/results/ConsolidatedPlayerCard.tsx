@@ -161,8 +161,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             {/* Avatar */}
             {player.avatar && (
               <Avatar
-
-                avatarImage={player.avatar.avatarImage}
+                userId={player.username}
                 customAvatar={player.avatar.customAvatar}
                 size="xl"
                 className="flex-shrink-0 border-2 border-neo-black w-12 h-12 sm:w-14 sm:h-14"

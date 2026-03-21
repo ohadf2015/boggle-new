@@ -685,7 +685,16 @@ const sv = {
       "eyebrows": "Ögonbryn",
       "facialHair": "Skägg",
       "facialHairStyle": "Stil",
-      "colorTheme": "Färgtema"
+      "colorTheme": "Färgtema",
+      "bodyStyle": "Kläder",
+      bodyStyles: {
+        default: "Standard",
+        hoodie: "Hoodie",
+        suit: "Kostym",
+        turtleneck: "Polotröja",
+        offShoulder: "Off-Shoulder",
+        cropTop: "Crop Top"
+      }
     },
     "premium": {
       "locked": "VIP-del",
@@ -3877,14 +3886,14 @@ const sv = {
     },
     "features": {
       "unlocked": {
-        "advancedSettings": "Avancerade inställningar olåsta!",
-        "advancedSettingsDesc": "Nu kan du anpassa spelinställningar",
-        "customBotCount": "Anpassat antal bottar olåst!",
-        "customBotCountDesc": "Välj hur många bottar du vill möta",
-        "challengeMode": "Utmaningsläge olåst!",
-        "challengeModeDesc": "Slå klockan och sätt rekord",
-        "practiceMode": "Övningsläge olåst!",
-        "practiceModeDesc": "Ingen timer - lär i din takt"
+        "practiceMode": "Övningsläge",
+        "practiceModeDesc": "Öva i din egen takt",
+        "challengeMode": "Utmaningsläge",
+        "challengeModeDesc": "Testa dina färdigheter med svårare pussel",
+        "customBotCount": "Anpassade Bottar",
+        "customBotCountDesc": "Välj hur många bottar du spelar mot",
+        "advancedSettings": "Avancerade Inställningar",
+        "advancedSettingsDesc": "Finjustera din spelupplevelse"
       },
       "locked": {
         "advancedSettings": "Spela 5 matcher för att låsa upp",
@@ -5318,12 +5327,12 @@ const sv = {
       }
     },
     "kpi": {
-      "dau": "Aktiva idag",
-      "gamesToday": "Spel idag",
-      "signupsToday": "Registreringar",
+      "dau": "Dagliga Aktiva Användare",
+      "gamesToday": "Spel Idag",
+      "signupsToday": "Registreringar Idag",
       "stickiness": "Engagemang",
-      "totalPlayers": "Totalt spelare",
-      "totalWords": "Ord hittade",
+      "totalPlayers": "Totalt Spelare",
+      "totalWords": "Totalt Ord",
       "thisWeek": "Denna vecka"
     },
     "system": {
@@ -5337,18 +5346,18 @@ const sv = {
       "size": "Storlek",
       "funnelTitle": "Engagemangstratt (30d)",
       "funnelRegistered": "Registrerade",
-      "funnelFirstGame": "Första spelet",
-      "funnelDay7": "Återkom D7",
-      "funnelDay30": "Återkom D30",
+      "funnelFirstGame": "Spelade Första Spelet",
+      "funnelDay7": "Återkom Dag 7",
+      "funnelDay30": "Återkom Dag 30",
       "churnTitle": "Churnrisk",
       "churnTotal": "Totalt i riskzonen",
-      "noChurnRisk": "Inga spelare i riskzonen",
+      "noChurnRisk": "Ingen churnrisk upptäckt",
       "games": "spel"
     },
     "moderation": {
       "title": "Moderering",
       "queueTitle": "Modereringskö",
-      "empty": "Kön är tom — inga väntande ärenden",
+      "empty": "Inga ärenden att moderera",
       "approve": "Godkänn",
       "reject": "Avslå",
       "investigate": "Undersök",
@@ -5522,10 +5531,10 @@ const sv = {
         "postBoss": "Stavningsbiets kupan är besegrad! Ditt ordförråd är sött som honung!"
       },
       "w3": {
-        "boss": "Professor Thesaurus",
-        "after2": "Grottorna gömmer uråldriga ordrötter. Gräv djupt!",
-        "after4": "Etymologierna blir komplexa. Professorn vaktar...",
-        "postBoss": "Professorn erkänner — ditt ordförråd är verkligen... imponerande."
+        "boss": "Skuggskrivaren",
+        "after2": "Skuggorna tätnar... Något lurar framför.",
+        "after4": "Uråldriga viskningar ekar genom korridorerna.",
+        "postBoss": "Skuggskrivaren har besegrats! Ordens rike lyser starkare."
       },
       "w4": {
         "boss": "Kapten Metafor",
@@ -5796,7 +5805,7 @@ const sv = {
       "allMechanics": "Alla mekaniker kombinerade"
     },
     "mechanic": {
-      "synonymPairs": "+25% för synonympar",
+      "synonymPairs": "Synonympar",
       "etymologyRoots": "Bonus för latinska/grekiska rötter",
       "idioms": "Dolda idiomutmaningar",
       "compounds": "+30% för sammansatta ord",
@@ -5817,6 +5826,15 @@ const sv = {
       "surviveBattle": "Överlev med {{target}}% Hälsa",
       "mechanicTrigger": "Utlös Mekanism",
       "noDamage": "Ta Ingen Skada"
+    },
+    "daily": {
+      "wordCount": { "title": "Ordsamlare", "desc": "Hitta {{target}} ord i äventyrsnivåer" },
+      "longWord": { "title": "Långa Ord", "desc": "Hitta {{target}} ord med 5+ bokstäver" },
+      "perfect": { "title": "Perfekta Stjärnor", "desc": "Få {{target}} perfekta stjärnbetyg" },
+      "combo": { "title": "Kombomästare", "desc": "Nå en {{target}}x kombosvit" },
+      "speed": { "title": "Snabblöpning", "desc": "Klara en nivå med {{target}}+ sekunder kvar" },
+      "boss": { "title": "Bossdödare", "desc": "Besegra {{target}} boss(ar)" },
+      "mechanic": { "title": "Mekanikexpert", "desc": "Utlös världsmekaniker {{target}} gånger" }
     },
     "tiles": {
       "gold": "Guld (3x poäng)",
@@ -6677,7 +6695,21 @@ const sv = {
       "blitz": { "name": "Blixt" },
       "zenMode": { "name": "Zenläge" }
     },
-    "watchAdDoubleCoins": "Se reklam för att dubbla mynt"
+    "watchAdDoubleCoins": "Se reklam för att dubbla mynt",
+    "daily": {
+      "wordCount": {
+        "title": "Ordsamlare",
+        "description": "Hitta {target} ord"
+      },
+      "perfect": {
+        "title": "Perfekt Stjärna",
+        "description": "Få {target} perfekta nivåer med 3 stjärnor"
+      },
+      "longWord": {
+        "title": "Ordsmed",
+        "description": "Hitta {target} långa ord (5+ bokstäver)"
+      }
+    }
   },
   "blast": {
     "chain": {
@@ -8269,20 +8301,20 @@ const sv = {
   },
   "features": {
     "unlocked": {
-      "advancedSettings": "Avancerade Inställningar Upplåsta!",
-      "advancedSettingsDesc": "Du kan nu anpassa spelinställningar",
-      "customBotCount": "Anpassat Botantal Upplåst!",
-      "customBotCountDesc": "Välj hur många botar du möter",
-      "challengeMode": "Utmaningsläge Upplåst!",
-      "challengeModeDesc": "Slå klockan och sätt rekord",
-      "practiceMode": "Övningsläge Upplåst!",
-      "practiceModeDesc": "Ingen timer - lär dig i din takt"
+      "practiceMode": "Övningsläge",
+      "practiceModeDesc": "Öva i din egen takt",
+      "challengeMode": "Utmaningsläge",
+      "challengeModeDesc": "Testa dina färdigheter med svårare pussel",
+      "customBotCount": "Anpassade Bottar",
+      "customBotCountDesc": "Välj hur många bottar du spelar mot",
+      "advancedSettings": "Avancerade Inställningar",
+      "advancedSettingsDesc": "Finjustera din spelupplevelse"
     }
   },
   wordHuntAnnouncement: {
     badge: "Nytt i Multiplayer",
     title: "Testa Word Hunt-läget!",
-    subtitle: "Hitta det dolda målordet före dina motståndare. Liv, eliminering och rent kaos!",
+    subtitle: "Hitta det dolda målordet i en kapplöpning",
   },
   wordHuntTips: {
     needMoreWords: "Du hittade bara {{count}} ord. Varje ord fyller på ditt liv — skanna rader och diagonaler efter snabba 3-bokstavsord innan du gissar målet.",
@@ -8299,11 +8331,11 @@ const sv = {
     pushForFirst: "Du kom {{rank}}:a. För att stänga gapet, hitta längre ord (5+ bokstäver) och håll träffsäkerheten hög.",
   },
   wordHuntPromo: {
-    title: "Utmana dina vänner i Word Hunt!",
-    subtitle: "Hitta det dolda målordet före dina motståndare. Liv, eliminering och rent kaos!",
-    cta: "Spela nu",
-    dismiss: "Kanske senare",
-    imageAlt: "Två spelare i en episk ordstrid",
+    title: "Testa Word Hunt-läget!",
+    subtitle: "Hitta det dolda målordet i multiplayer",
+    cta: "Spela Word Hunt",
+    dismiss: "Kanske Senare",
+    imageAlt: "Word Hunt multiplayer-duell",
   },
   gameModes: {
     classic: {
@@ -8481,7 +8513,7 @@ const sv = {
     }
   },
   "encouragement": {
-    "gameStart": "Du klarar det! Svep bokstäver för att hitta ord",
+    "gameStart": "Kör! Du klarar det! 🎯",
     "firstWord": "Snyggt! Fortsätt hitta ord!",
     "longWord": "Fantastiskt! Långa ord ger mer!",
     "combo": "Combo! Du är i elden!",
@@ -8500,6 +8532,13 @@ const sv = {
       "timeout": "Tiden ute",
       "unknown": "Ogiltigt ord"
     }
+  },
+  "languages": {
+    "english": "Engelska",
+    "hebrew": "Hebreiska",
+    "swedish": "Svenska",
+    "japanese": "Japanska",
+    "spanish": "Spanska"
   }
 };
 

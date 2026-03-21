@@ -19,7 +19,7 @@ export type LocaleContent = {
 
 export const contentByLocale: Record<string, LocaleContent> = {
   en: {
-    title: 'I Played Word Games Every Day for a Year. Here\'s What the Science Says Should Have Happened.',
+    title: 'I Played Word Games Every Day for a Year. The Science Says My Brain Should Be Different Now.',
     subtitle: 'Spoiler: some of it actually did.',
     category: 'Research',
     readTime: '9 min read',
@@ -27,95 +27,95 @@ export const contentByLocale: Record<string, LocaleContent> = {
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who ruins game night by taking too long on their turn.',
     sections: [
       {
-        content: `Let me tell you about the dumbest experiment I've ever run on myself.
+        content: `I'll tell you about the dumbest experiment I've ever run on myself.
 
-Last January, I decided to play at least one word game every single day for a full year. Not because I wanted to "optimize my brain" or whatever LinkedIn gurus are selling these days. I just... really like finding words in jumbled letters. Always have. But somewhere around month three, I started reading the research. And honestly? Some of it blew my mind. Some of it made me roll my eyes. Let me walk you through what's real and what's marketing.`,
+Last January, I decided to play at least one word game every single day for a full year. Not because I wanted to "optimize my brain" or whatever LinkedIn gurus are selling these days. I just... really like finding words in jumbled letters. Always have. But somewhere around month three, I started reading the research. And honestly? Some of it blew my mind. Some of it made me roll my eyes. What follows is what's real and what's marketing.`,
       },
       {
-        title: 'The Study That Made Me Take This Seriously',
-        content: `In 2019, researchers from the University of Exeter and King's College London dropped a study in the International Journal of Geriatric Psychiatry that tracked — wait for it — 19,000 adults aged 50 to 93. That's not a typo. Nineteen thousand people.
+        title: 'The study that made me take this seriously',
+        content: `In 2019, researchers from the University of Exeter and King's College London published a study in the International Journal of Geriatric Psychiatry that tracked 19,000 adults aged 50 to 93. Not a typo. Nineteen thousand people.
 
-The people who regularly solved word puzzles showed reasoning abilities equivalent to someone TEN years younger. And short-term memory of someone eight years younger. Not "marginally better." Not "statistically significant but practically meaningless." We're talking a full decade of cognitive difference.
+The people who regularly solved word puzzles showed reasoning abilities equivalent to someone ten years younger. And short-term memory of someone eight years younger. Not "marginally better." Not "statistically significant but practically meaningless." A full decade of cognitive difference.
 
 Professor Keith Wesnes summed it up: "Performance was consistently better in those who reported engaging in puzzles, and generally improved incrementally with the frequency of puzzle use."
 
 In plain English: the more you play, the sharper you stay. And the effect isn't small.
 
-Now — before you get too excited — this was an observational study. They didn't lock people in a room and force them to do crosswords. Which brings us to the part most word game articles conveniently skip over.`,
+Now, before you get too excited, this was an observational study. They didn't lock people in a room and force them to do crosswords. Which brings us to the part most word game articles conveniently skip over.`,
       },
       {
-        title: 'The Dementia Question (Let\'s Be Honest)',
+        title: 'The dementia question',
         content: `Every single article about word games eventually makes this claim: "Word games can help prevent dementia!" Usually with an exclamation mark and a stock photo of a smiling elderly person.
 
-Here's the truth. Dr. Anne Corbett, one of the lead researchers from Exeter, specifically said: "We can't say that playing these puzzles necessarily reduces the risk of dementia in later life."
+The truth: Dr. Anne Corbett, one of the lead researchers from Exeter, specifically said: "We can't say that playing these puzzles necessarily reduces the risk of dementia in later life."
 
-And she's right to be cautious. The studies show correlation — people who do puzzles tend to have better cognitive function. But that doesn't prove the puzzles caused it. Maybe people with naturally sharper minds are just more drawn to word games in the first place. Maybe it's the kind of person who does puzzles daily, not the puzzles themselves.
+And she's right to be cautious. The studies show correlation. People who do puzzles tend to have better cognitive function. But that doesn't prove the puzzles caused it. Maybe people with naturally sharper minds are just more drawn to word games in the first place. Maybe it's the kind of person who does puzzles daily, not the puzzles themselves.
 
 I know. Disappointing. I was disappointed too. But I'd rather tell you the truth than sell you a comforting lie that some blog cooked up for clicks.
 
-What IS clear — and this part is solid — is that word games are linked to better cognitive function right now. In the present. Today. Not in some hypothetical future. That's worth something on its own.`,
+What is clear, and this part is solid, is that word games are linked to better cognitive function right now. In the present. Today. Not in some hypothetical future. That's worth something on its own.`,
       },
       {
-        title: 'Crosswords vs. Brain Training Apps (This One Genuinely Surprised Me)',
-        content: `OK, this study from Columbia and Duke universities was the one that made me put my phone down and stare at the wall for a minute.
+        title: 'Crosswords vs. brain training apps',
+        content: `This study from Columbia and Duke universities made me put my phone down and stare at the wall for a minute.
 
-They took 107 older adults with mild cognitive impairment and split them into two groups. Half got computerized crosswords. The other half got those slick digital "brain training" games — you know, the kind advertised on podcasts with phrases like "train your brain in just 10 minutes a day!"
+They took 107 older adults with mild cognitive impairment and split them into two groups. Half got computerized crosswords. The other half got those slick digital "brain training" games, the kind advertised on podcasts with phrases like "train your brain in just 10 minutes a day!"
 
-After 78 weeks — that's a year and a half — the crossword group showed cognitive IMPROVEMENT. The brain games group showed DECLINE.
+After 78 weeks, a year and a half, the crossword group showed cognitive improvement. The brain games group showed decline.
 
 Read that again. The brain games group got worse.
 
 Dr. D.P. Devanand from Columbia noted the benefits showed up "not only in cognition but also in daily activities, with indications of brain shrinkage on MRI that suggests the effects are clinically meaningful."
 
-This was the first study to document long-term benefits of home-based crossword training. And it made me feel stupidly vindicated for every time someone told me I was "wasting time" playing word games instead of using Lumosity.`,
+First study to document long-term benefits of home-based crossword training. I felt stupidly vindicated for every time someone told me I was "wasting time" playing word games instead of using Lumosity.`,
       },
       {
-        title: 'Who Benefits Most? (Not Who You\'d Think)',
-        content: `Here's where the Columbia-Duke study gets even more interesting. If you're at a very early stage of cognitive impairment, both crosswords and brain games help about equally. But at later stages, crosswords pull ahead — significantly.
+        title: 'Who benefits most',
+        content: `The Columbia-Duke study gets more interesting. At a very early stage of cognitive impairment, both crosswords and brain games help about equally. But at later stages, crosswords pull ahead. Significantly.
 
 A separate 2024 study from Texas A&M backed this up, finding that games, puzzles, and reading slow cognitive decline even in people who already have mild impairment. Not prevent. Slow. But slowing down cognitive decline is still a big deal.
 
-And here's a personal observation: I'm not 50. I'm nowhere near it. But the pattern-recognition improvements I noticed after months of daily play were dramatic enough that I'm convinced this isn't just an "older adults" thing. Your brain is plastic at any age — the question is whether you're giving it something interesting to chew on.`,
+A personal observation: I'm not 50. Nowhere near it. But the pattern-recognition improvements I noticed after months of daily play were dramatic enough that I'm convinced this isn't just an "older adults" thing. Your brain is plastic at any age. The question is whether you're giving it something interesting to chew on.`,
       },
       {
-        title: 'The Vocabulary Trick Nobody Talks About',
+        title: 'The vocabulary trick',
         content: `This might be my favorite piece of research.
 
 A systematic review of 17 studies on learning words through games found something beautifully counterintuitive: your brain remembers words better when it discovers them during problem-solving than when you read them off a list.
 
-When was the last time you remembered a word from a vocabulary flashcard? Really think about it. Now think about the last weird word you stumbled into during a game. "QANAT." "ETUI." "ZAX." Those stick because your brain encountered them in context — during a challenge, while problem-solving, when emotions were engaged.
+When was the last time you remembered a word from a vocabulary flashcard? Really think about it. Now think about the last weird word you stumbled into during a game. "QANAT." "ETUI." "ZAX." Those stick because your brain encountered them in context. During a challenge, while problem-solving, when emotions were engaged.
 
-Games provide what researchers clinically call "rich contexts, cognitive engagement, and virtual learning situations." Which is just a fancy way of saying: your brain pays more attention when it's having fun.
+Games provide what researchers clinically call "rich contexts, cognitive engagement, and virtual learning situations." Fancy way of saying: your brain pays more attention when it's having fun.
 
-I've personally learned more obscure English words from Scrabble and word games than from four years of formal education. That's not a brag — it's an indictment of how I studied.`,
+I've personally learned more obscure English words from Scrabble and word games than from four years of formal education. Not a brag. An indictment of how I studied.`,
       },
       {
-        title: 'What I Actually Noticed After a Year',
-        content: `Look, I'm not going to pretend I ran a controlled experiment on myself. I didn't take fMRI scans or measure my reaction times. But here's what I honestly noticed after 365 days of daily word games:
+        title: 'What I actually noticed after a year',
+        content: `I'm not going to pretend I ran a controlled experiment on myself. No fMRI scans, no reaction time measurements. But what I honestly noticed after 365 days of daily word games:
 
-The speed thing was dramatic. By month three, letter patterns started jumping out at me. I'd glance at a scrambled set of letters and words would just... appear. The research calls this "chunking" — your brain stops processing individual letters and starts seeing groups. "TH" becomes a unit. "ING" becomes a unit. You stop reading a grid of 16 letters and start reading 5-6 building blocks. It's hard to describe, but once it clicks, you can't un-see it.
+The speed thing was dramatic. By month three, letter patterns started jumping out at me. I'd glance at a scrambled set of letters and words would just... appear. The research calls this "chunking." Your brain stops processing individual letters and starts seeing groups. "TH" becomes a unit. "ING" becomes a unit. You stop reading a grid of 16 letters and start reading 5-6 building blocks. Hard to describe, but once it clicks, you can't un-see it.
 
-My vocabulary grew in weird ways. I now know words I couldn't define but instantly recognize as "real." Turns out competitive Scrabble players have the same experience — only 6.4% say they "always" learn word meanings. They just know the words exist.
+My vocabulary grew in weird ways. I now know words I couldn't define but instantly recognize as "real." Turns out competitive Scrabble players have the same experience. Only 6.4% say they "always" learn word meanings. They just know the words exist.
 
-And the one that surprised me most: the daily game became a form of meditation. Five minutes of absolute focus. No notifications, no scrolling, no multitasking — just me and letters. In a world that's constantly screaming for your attention, that five minutes of flow state is worth more than any brain-health benefit.`,
+The one that surprised me most: the daily game became a form of meditation. Five minutes of absolute focus. No notifications, no scrolling, no multitasking. Just me and letters. In a world that's constantly screaming for your attention, that five minutes of flow state is worth more than any brain-health benefit.`,
       },
       {
-        title: 'The Honest Downsides (Because Nobody Mentions These)',
+        title: 'The honest downsides',
         content: `Since we're being real with each other:
 
-Word games won't replace exercise. Your brain needs blood flow, and no amount of crosswords replaces a walk. They won't substitute for social connection — your brain needs other humans, not just consonants and vowels. And they absolutely won't fix bad sleep.
+Word games won't replace exercise. Your brain needs blood flow, and no amount of crosswords replaces a walk. They won't substitute for social connection. Your brain needs other humans, not just consonants and vowels. And they won't fix bad sleep.
 
-Also — and I think this is important — if word games stress you out, you might be doing it wrong. That same fight-or-flight response that helped our ancestors escape predators? It shuts down your prefrontal cortex, which is the exact part of your brain you're trying to exercise. If the daily challenge ranking is raising your blood pressure, try free play mode. Seriously.
+Also, if word games stress you out, you might be doing it wrong. The fight-or-flight response shuts down your prefrontal cortex, which is the exact part of your brain you're trying to exercise. If the daily challenge ranking is raising your blood pressure, try free play mode. Seriously.
 
-And one more thing: there's a real risk of getting obsessive about it. Ask my partner. Some nights I stayed up way too late chasing a high score when I should have been sleeping — which, ironically, probably undid whatever cognitive benefits I earned that day.`,
+One more thing: there's a real risk of getting obsessive about it. Ask my partner. Some nights I stayed up way too late chasing a high score when I should have been sleeping, which, ironically, probably undid whatever cognitive benefits I earned that day.`,
       },
       {
-        title: 'So, Is It Worth Playing Every Day?',
-        content: `Honestly? Yeah. I think so. But maybe not for the reasons you'd expect.
+        title: 'So is it worth playing every day?',
+        content: `Yeah. I think so. But maybe not for the reasons you'd expect.
 
 The neuroscience is real. The Exeter study with 19,000 people. The Columbia-Duke trial showing crosswords beating brain games over 78 weeks. The vocabulary research across 17 studies. The evidence points in one clear direction.
 
-But the best reason to play word games daily isn't the science. It's that it's five minutes of doing something slightly challenging that happens to be fun. Not everything needs a neuroscience justification. Not every habit needs an ROI calculation.
+But the best reason to play word games daily isn't the science. It's five minutes of doing something slightly challenging that happens to be fun. Not everything needs a neuroscience justification.
 
 Play because it's enjoyable. The brain benefits are a bonus.
 

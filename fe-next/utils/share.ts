@@ -45,7 +45,7 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
     });
     return true;
   } catch (clipboardError) {
-    // Fallback to execCommand for mobile browsers that lose focus
+    // Fallback 1: execCommand for older browsers
     try {
       const textarea = document.createElement('textarea');
       textarea.value = url;
@@ -67,11 +67,25 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
         return true;
       }
       throw new Error('execCommand copy returned false');
-    } catch (fallbackError) {
-      // Both methods failed — log appropriately
+    } catch {
+      // Fallback 2: Web Share API (works on most mobile browsers)
+      if (typeof navigator.share === 'function') {
+        try {
+          await navigator.share({ url });
+          return true;
+        } catch (shareError) {
+          // User cancelled or share failed — only log if not user-cancelled
+          if (shareError instanceof DOMException && shareError.name === 'AbortError') {
+            return false;
+          }
+          logger.warn('Share API also failed:', shareError);
+        }
+      }
+
+      // All methods failed
       const isNotAllowed = clipboardError instanceof DOMException && clipboardError.name === 'NotAllowedError';
       if (isNotAllowed) {
-        logger.warn('Clipboard copy failed (NotAllowedError + fallback failed):', fallbackError);
+        logger.warn('Clipboard copy failed (NotAllowedError, all fallbacks exhausted)');
       } else {
         logger.error('Failed to copy URL:', clipboardError);
       }

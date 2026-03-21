@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
-import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { Pencil } from 'lucide-react';
 
 export interface AvatarSelectorButtonProps {
@@ -24,7 +24,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
 }) => {
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
 
-  const currentConfig = selectedAvatar ?? getStoredCustomAvatar() ?? getRandomAvatarConfig();
+  const currentConfig = selectedAvatar ?? getOrCreateStoredCustomAvatar();
 
   const handleSave = (config: CustomAvatarConfig) => {
     onAvatarSelect(config);

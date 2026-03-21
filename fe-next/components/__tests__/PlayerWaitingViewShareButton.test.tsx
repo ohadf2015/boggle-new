@@ -122,8 +122,8 @@ describe('PlayerWaitingView - Command Center Style', () => {
 
     it('should display player count badge', () => {
       render(<PlayerWaitingView {...defaultProps} />);
-      // Component filters out host players from roster, so only 1 non-host shows
-      expect(screen.getByText('1/8')).toBeInTheDocument();
+      // All players including host are shown in the roster
+      expect(screen.getByText('2/8')).toBeInTheDocument();
     });
 
     it('should have an exit button', () => {

@@ -749,7 +749,16 @@ const es = {
       "eyebrows": "Cejas",
       "facialHair": "Barba",
       "facialHairStyle": "Estilo",
-      "colorTheme": "Tema de color"
+      "colorTheme": "Tema de color",
+      "bodyStyle": "Ropa",
+      bodyStyles: {
+        default: "Normal",
+        hoodie: "Sudadera",
+        suit: "Traje",
+        turtleneck: "Cuello alto",
+        offShoulder: "Hombros al aire",
+        cropTop: "Crop Top"
+      }
     },
     "premium": {
       "locked": "Parte VIP",
@@ -3937,14 +3946,14 @@ const es = {
     },
     "features": {
       "unlocked": {
-        "advancedSettings": "¡Configuración avanzada desbloqueada!",
-        "advancedSettingsDesc": "Ahora puedes personalizar el juego",
-        "customBotCount": "¡Cantidad de bots desbloqueada!",
+        "practiceMode": "Modo Práctica",
+        "practiceModeDesc": "Practica a tu propio ritmo",
+        "challengeMode": "Modo Desafío",
+        "challengeModeDesc": "Pon a prueba tus habilidades con puzzles más difíciles",
+        "customBotCount": "Bots Personalizados",
         "customBotCountDesc": "Elige cuántos bots enfrentar",
-        "challengeMode": "¡Modo desafío desbloqueado!",
-        "challengeModeDesc": "Contrarreloj y haz récords",
-        "practiceMode": "¡Modo práctica desbloqueado!",
-        "practiceModeDesc": "Sin tiempo - aprende a tu ritmo"
+        "advancedSettings": "Configuración Avanzada",
+        "advancedSettingsDesc": "Ajusta tu experiencia de juego"
       },
       "locked": {
         "advancedSettings": "Juega 5 partidas para desbloquear",
@@ -5369,12 +5378,12 @@ const es = {
       }
     },
     "kpi": {
-      "dau": "Activos hoy",
-      "gamesToday": "Juegos hoy",
-      "signupsToday": "Registros",
+      "dau": "Usuarios Activos Diarios",
+      "gamesToday": "Juegos Hoy",
+      "signupsToday": "Registros Hoy",
       "stickiness": "Fidelización",
-      "totalPlayers": "Total de jugadores",
-      "totalWords": "Palabras encontradas",
+      "totalPlayers": "Total de Jugadores",
+      "totalWords": "Total de Palabras",
       "thisWeek": "Esta semana"
     },
     "system": {
@@ -5388,18 +5397,18 @@ const es = {
       "size": "Tamaño",
       "funnelTitle": "Embudo de engagement (30d)",
       "funnelRegistered": "Registrados",
-      "funnelFirstGame": "Primer juego",
-      "funnelDay7": "Regresaron D7",
-      "funnelDay30": "Regresaron D30",
+      "funnelFirstGame": "Jugaron Primera Partida",
+      "funnelDay7": "Regresaron Día 7",
+      "funnelDay30": "Regresaron Día 30",
       "churnTitle": "Riesgo de abandono",
       "churnTotal": "Total en riesgo",
-      "noChurnRisk": "No hay jugadores en riesgo",
+      "noChurnRisk": "No se detectó riesgo de abandono",
       "games": "juegos"
     },
     "moderation": {
       "title": "Moderación",
       "queueTitle": "Cola de moderación",
-      "empty": "La cola está vacía — no hay elementos pendientes",
+      "empty": "No hay elementos para moderar",
       "approve": "Aprobar",
       "reject": "Rechazar",
       "investigate": "Investigar",
@@ -5573,10 +5582,10 @@ const es = {
         "postBoss": "¡La colmena de la Abeja Ortográfica ha caído! ¡Tu vocabulario es dulce como la miel!"
       },
       "w3": {
-        "boss": "Profesor Tesauro",
-        "after2": "Estas cavernas guardan raíces de palabras antiguas. ¡Excava profundo!",
-        "after4": "Las etimologías se complican. El Profesor observa...",
-        "postBoss": "El Profesor concede — tu léxico es realmente... impresionante."
+        "boss": "Escriba de las Sombras",
+        "after2": "Las sombras se profundizan... Algo acecha adelante.",
+        "after4": "Susurros antiguos resuenan por los pasillos.",
+        "postBoss": "¡El Escriba de las Sombras ha sido derrotado! El reino de las palabras se ilumina."
       },
       "w4": {
         "boss": "Capitán Metáfora",
@@ -6160,7 +6169,7 @@ const es = {
       "allMechanics": "Todas las mecánicas combinadas"
     },
     "mechanic": {
-      "synonymPairs": "+25% por pares de sinónimos",
+      "synonymPairs": "Pares de Sinónimos",
       "etymologyRoots": "Bonificación por raíces latinas/griegas",
       "idioms": "Desafíos de modismos ocultos",
       "compounds": "+30% por palabras compuestas",
@@ -6181,6 +6190,15 @@ const es = {
       "surviveBattle": "Sobrevive con {{target}}% de Salud",
       "mechanicTrigger": "Activa Mecánica",
       "noDamage": "Sin Recibir Daño"
+    },
+    "daily": {
+      "wordCount": { "title": "Coleccionista de Palabras", "desc": "Encuentra {{target}} palabras en niveles de aventura" },
+      "longWord": { "title": "Palabras Largas", "desc": "Encuentra {{target}} palabras con 5+ letras" },
+      "perfect": { "title": "Estrellas Perfectas", "desc": "Obtén {{target}} calificaciones de estrella perfecta" },
+      "combo": { "title": "Maestro del Combo", "desc": "Alcanza una racha de combo de {{target}}x" },
+      "speed": { "title": "Carrera Rápida", "desc": "Completa un nivel con {{target}}+ segundos restantes" },
+      "boss": { "title": "Cazador de Jefes", "desc": "Derrota a {{target}} jefe(s)" },
+      "mechanic": { "title": "Experto en Mecánicas", "desc": "Activa mecánicas de mundo {{target}} veces" }
     },
     "tiles": {
       "gold": "Oro (3x puntos)",
@@ -6771,7 +6789,21 @@ const es = {
       "blitz": { "name": "Blitz" },
       "zenMode": { "name": "Modo Zen" }
     },
-    "watchAdDoubleCoins": "Ver anuncio para duplicar monedas"
+    "watchAdDoubleCoins": "Ver anuncio para duplicar monedas",
+    "daily": {
+      "wordCount": {
+        "title": "Coleccionista de Palabras",
+        "description": "Encuentra {target} palabras"
+      },
+      "perfect": {
+        "title": "Estrella Perfecta",
+        "description": "Consigue {target} niveles perfectos de 3 estrellas"
+      },
+      "longWord": {
+        "title": "Maestro de Palabras",
+        "description": "Encuentra {target} palabras largas (5+ letras)"
+      }
+    }
   },
   "blast": {
     "chain": {
@@ -8505,27 +8537,27 @@ const es = {
   },
   "features": {
     "unlocked": {
-      "advancedSettings": "Configuraciones Avanzadas Desbloqueadas!",
-      "advancedSettingsDesc": "Ahora puedes personalizar la configuración del juego",
-      "customBotCount": "Cantidad de Bots Personalizada Desbloqueada!",
+      "practiceMode": "Modo Práctica",
+      "practiceModeDesc": "Practica a tu propio ritmo",
+      "challengeMode": "Modo Desafío",
+      "challengeModeDesc": "Pon a prueba tus habilidades con puzzles más difíciles",
+      "customBotCount": "Bots Personalizados",
       "customBotCountDesc": "Elige cuántos bots enfrentar",
-      "challengeMode": "Modo Desafío Desbloqueado!",
-      "challengeModeDesc": "Contra el reloj y establece récords",
-      "practiceMode": "Modo Práctica Desbloqueado!",
-      "practiceModeDesc": "Sin temporizador - aprende a tu ritmo"
+      "advancedSettings": "Configuración Avanzada",
+      "advancedSettingsDesc": "Ajusta tu experiencia de juego"
     }
   },
   wordHuntAnnouncement: {
     badge: "Nuevo en Multijugador",
     title: "¡Prueba el Modo Word Hunt!",
-    subtitle: "Encuentra la palabra objetivo antes que tus oponentes. ¡Vidas, eliminación y puro caos!",
+    subtitle: "Encuentra la palabra objetivo oculta en una carrera",
   },
   wordHuntPromo: {
-    title: "¡Desafía a tus Amigos a Word Hunt!",
-    subtitle: "Encuentra la palabra oculta antes que tus oponentes. ¡Vidas, eliminación y caos absoluto!",
-    cta: "Jugar Ahora",
-    dismiss: "Quizás después",
-    imageAlt: "Dos jugadores en un épico duelo de palabras",
+    title: "¡Prueba el Modo Word Hunt!",
+    subtitle: "Encuentra la palabra objetivo oculta en multijugador",
+    cta: "Jugar Word Hunt",
+    dismiss: "Quizás Después",
+    imageAlt: "Duelo multijugador de Word Hunt",
   },
   wordHuntTips: {
     needMoreWords: "Solo encontraste {{count}} palabras. Cada palabra recarga tu vida — escanea filas y diagonales para palabras cortas de 3 letras antes de adivinar el objetivo.",
@@ -8542,7 +8574,7 @@ const es = {
     pushForFirst: "Quedaste en el puesto #{{rank}}. Para cerrar la brecha, encuentra palabras más largas (5+ letras) y mantén alta la precisión.",
   },
   "encouragement": {
-    "gameStart": "¡Tú puedes! Desliza letras para encontrar palabras",
+    "gameStart": "¡Vamos! ¡Tú puedes! 🎯",
     "firstWord": "¡Bien hecho! ¡Sigue encontrando palabras!",
     "longWord": "¡Increíble! ¡Las palabras largas dan más puntos!",
     "combo": "¡Combo! ¡Estás en racha!",
@@ -8561,6 +8593,13 @@ const es = {
       "timeout": "Tiempo agotado",
       "unknown": "Palabra inválida"
     }
+  },
+  "languages": {
+    "english": "Inglés",
+    "hebrew": "Hebreo",
+    "swedish": "Sueco",
+    "japanese": "Japonés",
+    "spanish": "Español"
   }
 };
 

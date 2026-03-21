@@ -685,7 +685,16 @@ const en = {
       "eyebrows": "Brows",
       "facialHair": "Beard",
       "facialHairStyle": "Style",
-      "colorTheme": "Color Theme"
+      "colorTheme": "Color Theme",
+      "bodyStyle": "Outfit",
+      bodyStyles: {
+        default: "Default",
+        hoodie: "Hoodie",
+        suit: "Suit",
+        turtleneck: "Turtleneck",
+        offShoulder: "Off-Shoulder",
+        cropTop: "Crop Top"
+      }
     },
     "premium": {
       "locked": "VIP Part",
@@ -3998,14 +4007,14 @@ const en = {
     },
     "features": {
       "unlocked": {
-        "advancedSettings": "Advanced Settings Unlocked!",
-        "advancedSettingsDesc": "You can now customize game settings",
-        "customBotCount": "Custom Bot Count Unlocked!",
-        "customBotCountDesc": "Choose how many bots to face",
-        "challengeMode": "Challenge Mode Unlocked!",
-        "challengeModeDesc": "Beat the clock and set records",
-        "practiceMode": "Practice Mode Unlocked!",
-        "practiceModeDesc": "No timer - learn at your pace"
+        "practiceMode": "Practice Mode",
+        "practiceModeDesc": "Practice at your own pace",
+        "challengeMode": "Challenge Mode",
+        "challengeModeDesc": "Test your skills with harder puzzles",
+        "customBotCount": "Custom Bots",
+        "customBotCountDesc": "Choose how many bots to play against",
+        "advancedSettings": "Advanced Settings",
+        "advancedSettingsDesc": "Fine-tune your game experience"
       },
       "locked": {
         "advancedSettings": "Play 5 games to unlock",
@@ -5224,12 +5233,12 @@ const en = {
       "system": "System"
     },
     "kpi": {
-      "dau": "Active Today",
+      "dau": "Daily Active Users",
       "gamesToday": "Games Today",
-      "signupsToday": "Signups",
+      "signupsToday": "Signups Today",
       "stickiness": "Stickiness",
       "totalPlayers": "Total Players",
-      "totalWords": "Words Found",
+      "totalWords": "Total Words",
       "thisWeek": "This week"
     },
     "system": {
@@ -5243,18 +5252,18 @@ const en = {
       "size": "Size",
       "funnelTitle": "Engagement Funnel (30d)",
       "funnelRegistered": "Registered",
-      "funnelFirstGame": "First Game",
-      "funnelDay7": "Returned D7",
-      "funnelDay30": "Returned D30",
+      "funnelFirstGame": "Played First Game",
+      "funnelDay7": "Returned Day 7",
+      "funnelDay30": "Returned Day 30",
       "churnTitle": "Churn Risk",
       "churnTotal": "Total at risk",
-      "noChurnRisk": "No players at risk",
+      "noChurnRisk": "No churn risk detected",
       "games": "games"
     },
     "moderation": {
       "title": "Moderation",
       "queueTitle": "Moderation Queue",
-      "empty": "Queue is clear — no pending items",
+      "empty": "No items to moderate",
       "approve": "Approve",
       "reject": "Reject",
       "investigate": "Investigate",
@@ -5617,10 +5626,10 @@ const en = {
         "postBoss": "The Spelling Bee's hive is defeated! Your vocabulary is sweet as honey!"
       },
       "w3": {
-        "boss": "Professor Thesaurus",
-        "after2": "These caverns hold ancient word roots. Dig deep!",
-        "after4": "The etymologies grow complex. The Professor watches...",
-        "postBoss": "The Professor concedes — your lexicon is truly... impressive."
+        "boss": "Shadow Scribe",
+        "after2": "The shadows deepen... Something lurks ahead.",
+        "after4": "Ancient whispers echo through the corridors.",
+        "postBoss": "The Shadow Scribe has been defeated! The realm of words grows brighter."
       },
       "w4": {
         "boss": "Captain Metaphor",
@@ -5779,7 +5788,7 @@ const en = {
       "allMechanics": "All mechanics combined"
     },
     "mechanic": {
-      "synonymPairs": "+25% for synonym pairs",
+      "synonymPairs": "Synonym Pairs",
       "etymologyRoots": "Bonus for Latin/Greek roots",
       "idioms": "Hidden idiom challenges",
       "compounds": "+30% for compound words",
@@ -5800,6 +5809,15 @@ const en = {
       "surviveBattle": "Survive with {{target}}% Health",
       "mechanicTrigger": "Trigger Mechanic",
       "noDamage": "Take No Damage"
+    },
+    "daily": {
+      "wordCount": { "title": "Word Collector", "desc": "Find {{target}} words in adventure levels" },
+      "longWord": { "title": "Long Words", "desc": "Find {{target}} words with 5+ letters" },
+      "perfect": { "title": "Perfect Stars", "desc": "Earn {{target}} perfect star ratings" },
+      "combo": { "title": "Combo Master", "desc": "Reach a {{target}}x combo streak" },
+      "speed": { "title": "Speed Run", "desc": "Complete a level with {{target}}+ seconds remaining" },
+      "boss": { "title": "Boss Slayer", "desc": "Defeat {{target}} boss(es)" },
+      "mechanic": { "title": "Mechanic Expert", "desc": "Trigger world mechanics {{target}} times" }
     },
     "tiles": {
       "gold": "Gold (3x points)",
@@ -6771,7 +6789,21 @@ const en = {
       "blitz": { "name": "Blitz" },
       "zenMode": { "name": "Zen Mode" }
     },
-    "watchAdDoubleCoins": "Watch Ad to Double Coins"
+    "watchAdDoubleCoins": "Watch Ad to Double Coins",
+    "daily": {
+      "wordCount": {
+        "title": "Word Collector",
+        "description": "Find {target} words"
+      },
+      "perfect": {
+        "title": "Perfect Star",
+        "description": "Get {target} perfect 3-star levels"
+      },
+      "longWord": {
+        "title": "Wordsmith",
+        "description": "Find {target} long words (5+ letters)"
+      }
+    }
   },
   "blast": {
     "chain": {
@@ -8327,20 +8359,20 @@ const en = {
   },
   "features": {
     "unlocked": {
-      "advancedSettings": "Advanced Settings Unlocked!",
-      "advancedSettingsDesc": "You can now customize game settings",
-      "customBotCount": "Custom Bot Count Unlocked!",
-      "customBotCountDesc": "Choose how many bots to face",
-      "challengeMode": "Challenge Mode Unlocked!",
-      "challengeModeDesc": "Beat the clock and set records",
-      "practiceMode": "Practice Mode Unlocked!",
-      "practiceModeDesc": "No timer - learn at your pace"
+      "practiceMode": "Practice Mode",
+      "practiceModeDesc": "Practice at your own pace",
+      "challengeMode": "Challenge Mode",
+      "challengeModeDesc": "Test your skills with harder puzzles",
+      "customBotCount": "Custom Bots",
+      "customBotCountDesc": "Choose how many bots to play against",
+      "advancedSettings": "Advanced Settings",
+      "advancedSettingsDesc": "Fine-tune your game experience"
     }
   },
   wordHuntAnnouncement: {
     badge: "New in Multiplayer",
     title: "Try Word Hunt Mode!",
-    subtitle: "Race to find the hidden target word before your opponents. Lives, elimination, and pure chaos!",
+    subtitle: "Race to find the hidden target word",
   },
   wordHuntTips: {
     needMoreWords: "You only found {{count}} words. Each word refills your life bar — scan rows and diagonals for quick 3-letter words before guessing the target.",
@@ -8357,11 +8389,11 @@ const en = {
     pushForFirst: "You placed #{{rank}}. To close the gap, find longer words (5+ letters) and keep your accuracy high — invalid words cost life without scoring.",
   },
   wordHuntPromo: {
-    title: "Challenge Your Friends to Word Hunt!",
-    subtitle: "Find the hidden target word before your opponents. Lives, elimination, and absolute chaos!",
-    cta: "Play Now",
-    dismiss: "Maybe later",
-    imageAlt: "Two players in an epic word battle duel",
+    title: "Try Word Hunt Mode!",
+    subtitle: "Race to find the hidden target word in multiplayer",
+    cta: "Play Word Hunt",
+    dismiss: "Maybe Later",
+    imageAlt: "Word Hunt multiplayer duel",
   },
   gameModes: {
     classic: {
@@ -8539,7 +8571,7 @@ const en = {
     }
   },
   "encouragement": {
-    "gameStart": "You got this! Swipe letters to find words",
+    "gameStart": "Let's go! You've got this! 🎯",
     "firstWord": "Nice one! Keep finding words!",
     "longWord": "Amazing! Long words score big!",
     "combo": "Combo! You're on fire!",
@@ -8558,6 +8590,13 @@ const en = {
       "timeout": "Time's up",
       "unknown": "Invalid word"
     }
+  },
+  "languages": {
+    "english": "English",
+    "hebrew": "Hebrew",
+    "swedish": "Swedish",
+    "japanese": "Japanese",
+    "spanish": "Spanish"
   }
 };
 

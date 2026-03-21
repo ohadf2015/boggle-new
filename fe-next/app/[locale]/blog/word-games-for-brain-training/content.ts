@@ -31,32 +31,30 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 "It's good for your brain," the doctor said, apparently. "Do crosswords, play Scrabble, anything with words."
 
-My dad — a retired engineer who considers "fun" to be reorganizing his toolshed — looked at me like I'd been vindicated after years of defending my word game habit. "See?" he said. "It's medical advice now."
+My dad, a retired engineer who considers "fun" to be reorganizing his toolshed, looked at me like I'd been vindicated after years of defending my word game habit. "See?" he said. "It's medical advice now."
 
-But here's the thing. I'm not the type to take a feel-good recommendation at face value. If a doctor tells my dad to play word games, I want to know: what does the evidence actually say? Not the marketing copy on brain training apps. Not the breathless headlines. The actual peer-reviewed research.
+I'm not the type to take a feel-good recommendation at face value. If a doctor tells my dad to play word games, I want to know what the evidence actually says. Not the marketing copy on brain training apps. Not the breathless headlines. The actual peer-reviewed research.
 
-So I spent two months reading studies. And what I found is more interesting — and more honest — than either the hype or the skepticism would suggest.`,
+So I spent two months reading studies. What I found is more interesting, and more honest, than either the hype or the skepticism.`,
       },
       {
-        title: 'The ACTIVE Study: 19,078 People, 10 Years of Data',
-        content: `Let's start with the biggest study, because it's the one that gets cited (and misrepresented) most often.
+        title: 'The ACTIVE study: 19,078 people, 10 years of data',
+        content: `The biggest study is also the most misrepresented one, so it deserves attention first.
 
 The Advanced Cognitive Training for Independent and Vital Elderly (ACTIVE) study, published in the Journal of the American Geriatrics Society, followed 19,078 participants over 10 years. It's one of the largest randomized controlled trials ever conducted on cognitive training.
 
 Participants were divided into groups that received training in memory, reasoning, or processing speed. Each group got 10 sessions of 60-75 minutes.
 
-Here's what they actually found:
-
-Each type of training improved performance in its specific domain. Reasoning training made people better at reasoning tasks. Speed training made people faster at speed tasks. Memory training improved memory performance.
+What they actually found: each type of training improved performance in its specific domain. Reasoning training made people better at reasoning tasks. Speed training made people faster at speed tasks. Memory training improved memory performance.
 
 The effects lasted. At the 10-year follow-up, people in the reasoning and speed groups still showed benefits.
 
-But — and this is the crucial "but" — the improvements were largely domain-specific. Getting better at reasoning puzzles didn't automatically make you better at remembering where you left your keys.
+The catch: improvements were largely domain-specific. Getting better at reasoning puzzles didn't automatically make you better at remembering where you left your keys.
 
-This is the finding that both sides of the debate tend to ignore. The brain training companies want to tell you it makes you smarter at everything. The skeptics want to tell you it does nothing. The truth is in between: cognitive training works, but it works specifically, not magically.`,
+Both sides of the debate ignore this. The brain training companies want to tell you it makes you smarter at everything. The skeptics want to tell you it does nothing. Cognitive training works, but it works specifically, not magically.`,
       },
       {
-        title: 'Cognitive Reserve: The Real Reason Your Brain Wants a Challenge',
+        title: 'Cognitive reserve: the real reason your brain wants a challenge',
         content: `So if word games don't make you universally smarter, why do neurologists recommend them?
 
 The answer lies in a concept called cognitive reserve. Think of it as your brain's savings account.
@@ -67,13 +65,13 @@ Imagine two people with the same amount of age-related brain changes on an MRI. 
 
 A meta-analysis in Psychological Medicine (2012) reviewed 29,000 individuals across multiple studies and found that higher cognitive reserve — measured through education, occupational complexity, and leisure activities — was associated with a 46% lower risk of developing dementia.
 
-Forty-six percent. That's not a rounding error. That's a meaningful protective effect.
+Forty-six percent. Not a rounding error.
 
-And here's the key detail: word games, crosswords, and language-based puzzles consistently show up in the "leisure activities" category that contributes to cognitive reserve. Not because they're magic, but because they're genuinely mentally demanding in a way that watching TV isn't.`,
+Word games, crosswords, and language-based puzzles consistently show up in the "leisure activities" category that contributes to cognitive reserve. Not because they're magic. Because they're genuinely mentally demanding in a way that watching TV isn't.`,
       },
       {
-        title: "What Word Games Actually Train (And What They Don't)",
-        content: `Let's be specific about what happens in your brain during a word game, because "brain training" is so vague it's almost meaningless.
+        title: "What word games actually train (and what they don't)",
+        content: `"Brain training" is so vague it's almost meaningless. So what actually happens in your brain during a word game?
 
 When you play a word game like Boggle or Scrabble, you're simultaneously engaging:
 
@@ -85,13 +83,13 @@ Executive function — deciding where to focus your attention, when to abandon o
 
 Pattern recognition — spotting letter combinations that frequently appear in words (TH, ING, TION) and using those patterns to guide your search.
 
-What word games DON'T train: spatial navigation, mathematical reasoning, social cognition, or motor skills. They're not a complete cognitive workout any more than bicep curls are a complete physical workout.
+What word games don't train: spatial navigation, mathematical reasoning, social cognition, or motor skills. They're not a complete cognitive workout any more than bicep curls are a complete physical workout.
 
-But the things they do train? Those are exactly the cognitive functions that matter most for daily independence as we age. Finding the right word. Holding a thought in mind long enough to act on it. Making decisions under time pressure. These aren't abstract skills — they're the building blocks of staying sharp.`,
+But the things they do train are exactly the cognitive functions that matter most for daily independence as we age. Finding the right word. Holding a thought in mind long enough to act on it. Making decisions under time pressure. Not abstract skills. The building blocks of staying sharp.`,
       },
       {
-        title: 'The Lumosity Settlement: When "Brain Training" Went Too Far',
-        content: `I need to talk about Lumosity, because it's the elephant in every brain-training conversation.
+        title: 'The Lumosity settlement: when "brain training" went too far',
+        content: `Lumosity is the elephant in every brain-training conversation.
 
 In 2016, Lumosity's parent company Lumos Labs agreed to pay $2 million to settle Federal Trade Commission charges that they had deceived consumers with unfounded claims. Specifically, they claimed their brain games could help users perform better at work and school, reduce or delay cognitive impairment associated with age and other conditions, and protect against Alzheimer's disease and dementia.
 
@@ -99,31 +97,31 @@ The FTC's complaint was blunt: Lumos Labs "preyed on consumers' fears about age-
 
 This settlement sent shockwaves through the brain-training industry and — fairly or not — made a lot of people skeptical of all cognitive training claims.
 
-But here's what I think gets lost in the Lumosity backlash: the problem wasn't that brain training is useless. The problem was that one company made specific, grandiose claims they couldn't support. "Our app prevents Alzheimer's" is very different from "regularly challenging your brain with complex language tasks contributes to cognitive reserve."
+What gets lost in the Lumosity backlash: the problem wasn't that brain training is useless. One company made specific, grandiose claims they couldn't support. "Our app prevents Alzheimer's" is very different from "regularly challenging your brain with complex language tasks contributes to cognitive reserve."
 
 The first claim is marketing nonsense. The second is actually supported by evidence.
 
 It's like the difference between a supplement company claiming their pills cure cancer versus a doctor recommending you eat vegetables. The quack doesn't invalidate the real advice.`,
       },
       {
-        title: 'What the Meta-Analyses Actually Conclude',
-        content: `Because I know "I read some studies" isn't convincing, here's what the large-scale reviews of the evidence consistently say:
+        title: 'What the meta-analyses actually conclude',
+        content: `"I read some studies" isn't convincing on its own. So here's what the large-scale reviews consistently say:
 
-A 2019 meta-analysis in Neuropsychology Review examined 52 studies on cognitive training in healthy older adults. Their finding: training produced reliable improvements in the practiced tasks, with moderate effect sizes. Transfer to unpracticed tasks was smaller but still statistically significant.
+Neuropsychology Review (2019) examined 52 studies on cognitive training in healthy older adults. Training produced reliable improvements in practiced tasks, with moderate effect sizes. Transfer to unpracticed tasks was smaller but still statistically significant.
 
-The Cochrane Review (2020) — basically the gold standard of medical evidence reviews — looked at computerized cognitive training for 12 or more weeks. They found that it probably improves overall cognition and may improve verbal memory and psychosocial functioning, but noted the evidence quality was moderate.
+The Cochrane Review (2020), basically the gold standard of medical evidence reviews, looked at computerized cognitive training for 12 or more weeks. It probably improves overall cognition and may improve verbal memory and psychosocial functioning, though the evidence quality was moderate.
 
-A 2021 review in Ageing Research Reviews specifically examined "mentally stimulating leisure activities" (including word games, puzzles, and reading) and found consistent associations with reduced risk of cognitive decline and dementia. Importantly, they noted that the evidence was strongest for activities that combined novelty, complexity, and social engagement.
+Ageing Research Reviews (2021) specifically examined "mentally stimulating leisure activities" including word games, puzzles, and reading. Consistent associations with reduced risk of cognitive decline and dementia. The evidence was strongest for activities combining novelty, complexity, and social engagement.
 
-Notice the language: "probably improves," "may improve," "associated with reduced risk." This is careful science speaking. They're not saying word games are a cure for anything. They're saying there's a real, measurable signal in the data — just not the miracle that marketers promised.
+Notice the language. "Probably improves." "May improve." "Associated with reduced risk." This is careful science speaking. There's a real, measurable signal in the data. Just not the miracle that marketers promised.
 
-If you're looking for certainty, science doesn't offer it. If you're looking for encouraging evidence that's worth acting on, it's there.`,
+Science doesn't offer certainty. It offers encouraging evidence worth acting on.`,
       },
       {
-        title: 'Practical Recommendations: What Should You Actually Do?',
-        content: `Based on everything I've read, here's what I'd tell my dad — and what I'd tell you:
+        title: 'What you should actually do',
+        content: `Based on everything I've read, this is what I'd tell my dad, and what I'd tell you.
 
-Play word games, but don't ONLY play word games. Cognitive reserve benefits from variety. Mix word games with other mentally stimulating activities: learn a language, play a musical instrument, do math puzzles, take up a strategy game. The brain benefits from being challenged in different ways.
+Play word games, but don't only play word games. Cognitive reserve benefits from variety. Mix in other mentally stimulating activities: learn a language, play a musical instrument, do math puzzles, take up a strategy game.
 
 Challenge yourself. The studies consistently show that benefits come from effortful processing, not easy repetition. If you're crushing every puzzle on autopilot, the cognitive benefit drops. Increase the difficulty. Set time limits. Play against better opponents. The moment it stops being a little uncomfortable, it stops being as useful.
 
@@ -136,18 +134,18 @@ Don't neglect the basics. No amount of word games compensates for sleep deprivat
 Start now, regardless of age. The cognitive reserve research suggests that it's never too early or too late to start building your buffer. People who start mentally stimulating activities in midlife still show protective effects decades later.`,
       },
       {
-        title: 'The Honest Conclusion',
+        title: 'The honest conclusion',
         content: `So was my dad's neurologist right?
 
 Yes — with caveats.
 
 Word games aren't a magic shield against cognitive decline. They won't prevent Alzheimer's. They won't make you a genius. Anyone selling you those claims is selling snake oil, and the FTC has receipts.
 
-But regularly challenging your brain with complex language tasks — especially when combined with physical exercise, social connection, and other forms of mental stimulation — is one of the best evidence-backed things you can do for long-term cognitive health. The effect sizes are moderate, not miraculous. The protection is probabilistic, not guaranteed. But it's real.
+But regularly challenging your brain with complex language tasks, especially combined with physical exercise, social connection, and other forms of mental stimulation, is one of the best evidence-backed things you can do for long-term cognitive health. The effect sizes are moderate, not miraculous. The protection is probabilistic, not guaranteed. It's real.
 
-My dad now plays word games for 20 minutes every morning. He's terrible at them, frankly. He once spent four minutes trying to decide if "QAT" was a real word. (It is. It's a plant. I told him that.)
+My dad now plays word games for 20 minutes every morning. He's terrible at them. He once spent four minutes trying to decide if "QAT" was a real word. It is. It's a plant. I told him that.
 
-But he's doing something good for his brain. And unlike a lot of health advice, this one actually feels like fun — even for a man whose previous idea of entertainment was alphabetizing his spice rack.
+But he's doing something good for his brain. And unlike most health advice, this one actually feels like fun. Even for a man whose previous idea of entertainment was alphabetizing his spice rack.
 
 Play your word games. Challenge yourself. Just don't believe anyone who tells you it's a miracle. The real science is more modest, more nuanced, and ultimately more trustworthy than the hype.
 

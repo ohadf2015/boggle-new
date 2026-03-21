@@ -115,6 +115,8 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
   const wordSubmittedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSubmittedWordRef = useRef<{ word: string; path: Array<{ row: number; col: number }> } | null>(null);
   const prevComboCountRef = useRef(0);
+  // Synchronous guard to prevent double-submission from React state batching
+  const isSubmittingRef = useRef(false);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -129,7 +131,8 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       const word = submittedWord || currentWord;
       const indices = submittedIndices.length > 0 ? submittedIndices : selectedIndices;
 
-      if (!isPlaying || isPaused || word.length < minWordLength || isValidating) return;
+      if (!isPlaying || isPaused || word.length < minWordLength || isValidating || isSubmittingRef.current) return;
+      isSubmittingRef.current = true;
 
       tap();
 
@@ -150,6 +153,10 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         col: tiles[i]?.col ?? i % gridSize,
       }));
       const result = await validateWord(word, path);
+      isSubmittingRef.current = false;
+
+      // Silently ignore cancelled validations (aborted by a newer submission)
+      if (!result.isValid && !result.errorKey && !result.score) return;
 
       if (result.isValid && result.score) {
         const startPos = getPopupStartPosition();

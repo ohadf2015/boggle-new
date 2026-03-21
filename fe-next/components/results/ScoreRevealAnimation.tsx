@@ -17,10 +17,6 @@ export interface ScoreRevealPlayer {
   username: string;
   finalScore: number;
   avatar?: {
-    emoji?: string;
-    color?: string;
-
-    avatarImage?: string;
     customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   };
   isCurrentPlayer?: boolean;
@@ -265,8 +261,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
 
         {/* Avatar */}
         <Avatar
-
-          avatarImage={player.avatar?.avatarImage}
+          userId={player.username}
           customAvatar={player.avatar?.customAvatar}
           size="sm"
           className="border-2 border-neo-black shrink-0"

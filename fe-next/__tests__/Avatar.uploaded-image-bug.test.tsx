@@ -64,10 +64,23 @@ describe('Avatar - renders with customAvatar', () => {
     expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
   });
 
-  it('should show generated avatar when no props provided', () => {
+  it('should show loading skeleton when no identity props provided', () => {
     render(
       <Avatar
         avatarImage={undefined}
+        size="md"
+      />
+    );
+
+    // No identity data → inferred loading state → skeleton
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+  });
+
+  it('should show generated avatar when userId seed is provided', () => {
+    render(
+      <Avatar
+        userId="guest-123"
         size="md"
       />
     );

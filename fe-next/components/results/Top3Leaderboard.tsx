@@ -64,10 +64,6 @@ export interface LeaderboardParticipant {
   isCurrentPlayer?: boolean;
   isBot?: boolean;
   avatar?: {
-    emoji?: string;
-    color?: string;
-
-    avatarImage?: string;
     customAvatar?: CustomAvatarConfig | null;
   };
 }
@@ -326,9 +322,8 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                       compact ? '' : rank === 1 ? 'p-1' : ''
                     )}>
                       <Avatar
-
-                        avatarImage={participant.avatar?.avatarImage}
                         customAvatar={participant.avatar?.customAvatar}
+                        userId={participant.name}
                         size={compact ? 'md' : rank === 1 ? 'xl' : 'lg'}
                         className={cn(compact ? 'w-9 h-9' : rank === 1 ? 'w-12 h-12' : 'w-10 h-10')}
                       />
@@ -340,8 +335,6 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 <PlayerProfileTooltip
                   player={{
                     username: participant.name,
-
-                    avatarImage: participant.avatar?.avatarImage,
                     customAvatar: participant.avatar?.customAvatar,
                     score: participant.score,
                   }}

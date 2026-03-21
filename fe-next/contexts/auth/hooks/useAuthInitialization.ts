@@ -50,7 +50,7 @@ export function useClearAuthState(
 
   return useCallback(
     async (reason: string) => {
-      logger.warn(`Clearing auth state: ${reason}`);
+      logger.log(`Clearing auth state: ${reason}`);
       setUser(null);
       setProfile(null);
       setRankedProgress(null);
@@ -406,7 +406,7 @@ async function handleTabBecameVisible(
     if (supabase) {
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData?.session && isMountedRef.current) {
-        logger.warn('Session expired during inactivity');
+        logger.log('Session expired during inactivity');
         await clearAuthState('Session expired during inactivity');
         return;
       }

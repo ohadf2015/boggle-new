@@ -32,7 +32,7 @@ interface AvatarRendererProps {
  *   hair(front) -> accessory
  */
 /** Styles that render their main body behind the head */
-const BACK_LAYER_STYLES = ['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut'];
+const BACK_LAYER_STYLES = ['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut'];
 
 /** Accessories that render behind the face (ears, wings, etc.) */
 const BACK_ACCESSORY_STYLES = new Set(['monkeyEars']);

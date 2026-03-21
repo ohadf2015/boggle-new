@@ -129,10 +129,12 @@ const LiveActivityTicker = memo(function LiveActivityTicker({ className }: { cla
   const hasRealEvents = events.length > 0;
   const sourceEvents = hasRealEvents ? events : fallbackEvents;
 
-  // Duplicate for seamless loop
+  // Repeat events enough times so one copy overflows the container (~12+ pills)
   const displayEvents = useMemo(() => {
     if (sourceEvents.length === 0) return [];
-    return sourceEvents.length < 6 ? [...sourceEvents, ...sourceEvents] : sourceEvents;
+    const minItems = 12;
+    const repeats = Math.ceil(minItems / sourceEvents.length);
+    return Array.from({ length: repeats }, () => sourceEvents).flat();
   }, [sourceEvents]);
 
   if (loading || displayEvents.length === 0) return null;

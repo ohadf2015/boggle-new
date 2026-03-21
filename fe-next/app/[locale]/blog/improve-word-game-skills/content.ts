@@ -19,7 +19,7 @@ export type LocaleContent = {
 
 export const contentByLocale: Record<string, LocaleContent> = {
   en: {
-    title: 'I Spent 3 Years Getting Better at Word Games. Most of What I Tried Was Useless.',
+    title: 'I Spent 3 Years Getting Better at Word Games. Most of What I Tried Was Useless',
     subtitle: 'The actually useful stuff fits on a napkin. The rest is ego and Scrabble Twitter drama.',
     category: 'Techniques',
     readTime: '9 min read',
@@ -27,60 +27,60 @@ export const contentByLocale: Record<string, LocaleContent> = {
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who ruins game night by taking too long on their turn.',
     sections: [
       {
-        content: `I have a confession that will make competitive word game players groan. For my first year of "serious" play, I tried to memorize two-letter Scrabble words from a list. All of them. QI, ZA, XI, JO — the works.
+        content: `I have a confession that will make competitive word game players groan. For my first year of "serious" play, I tried to memorize two-letter Scrabble words from a list. All of them. QI, ZA, XI, JO, the works.
 
 Know what happened? I got marginally better at Scrabble specifically, and absolutely no better at any other word game. My Boggle scores didn't budge. My anagram solving speed stayed the same. I had crammed a bunch of data into my head without actually improving the skill I cared about: seeing words in chaos.
 
 Then I read about Nigel Richards, and everything I thought I knew about word games fell apart.`,
       },
       {
-        title: 'The Man Who Broke Word Games (Without Understanding Them)',
+        title: 'The man who broke word games without understanding them',
         content: `If you haven't heard of Nigel Richards, buckle up. This guy from New Zealand won the French-language Scrabble World Championship. Twice. He doesn't speak French.
 
-Let that sink in. He memorized the entire French Scrabble dictionary — roughly 386,000 words — without knowing what any of them meant. He also won the Spanish Scrabble championship. Doesn't speak Spanish either. His combined Scrabble tournament winnings make him arguably the greatest board game player alive.
+He memorized the entire French Scrabble dictionary, roughly 386,000 words, without knowing what any of them meant. He also won the Spanish Scrabble championship. Doesn't speak Spanish either. His combined Scrabble tournament winnings make him arguably the greatest board game player alive.
 
-When I first heard this story, I thought it proved memorization was the answer. I was wrong. What it actually proves is something far more interesting: Richards doesn't just memorize words — he recognizes letter patterns at a superhuman level. French Scrabble players who interviewed him said he could spot valid seven-letter plays faster than native speakers. He wasn't recalling definitions. He was seeing structural patterns in letter arrangements that most people simply cannot perceive.
+When I first heard this story, I thought it proved memorization was the answer. I was wrong. What it actually proves is something weirder: Richards doesn't just memorize words. He recognizes letter patterns at a superhuman level. French Scrabble players who interviewed him said he could spot valid seven-letter plays faster than native speakers. He wasn't recalling definitions. He was seeing structural patterns in letter arrangements that most people simply cannot perceive.
 
-That distinction — pattern recognition versus raw recall — changed how I practice. Completely.`,
+That distinction, pattern recognition versus raw recall, changed how I practice. Completely.`,
       },
       {
-        title: 'What Your Brain Actually Does When You Search for Words',
-        content: `Here's where it gets nerdy. Sorry. Not sorry.
+        title: 'What your brain actually does when you search for words',
+        content: `This is where it gets nerdy. No apologies.
 
 Researchers studying competitive Scrabble players with fMRI machines found something counterintuitive. Expert players don't primarily activate language processing regions when they scan a rack of tiles. They activate visual processing areas. Their brains treat letter arrangements more like spatial puzzles than linguistic problems.
 
-Think about that. The best word finders in the world aren't "thinking about words" — they're seeing them. The way you or I might spot a face in a crowd, they spot SATIRE hiding inside ASTRIDE.
+The best word finders in the world aren't "thinking about words." They're seeing them. The way you or I might spot a face in a crowd, they spot SATIRE hiding inside ASTRIDE.
 
-Carnegie Mellon University actually created a course that teaches cognitive science through Scrabble. Professor Michael Ramscar uses the game to demonstrate how human pattern recognition works — and how fundamentally different it is from the way computers find words. A computer checks every permutation. A human brain chunks letters into familiar groups and checks those chunks against known patterns. It's massively more efficient, but it only works if you've built up those chunks through experience.
+Carnegie Mellon University created a course that teaches cognitive science through Scrabble. Professor Michael Ramscar uses the game to demonstrate how human pattern recognition works, and how fundamentally different it is from the way computers find words. A computer checks every permutation. A human brain chunks letters into familiar groups and checks those chunks against known patterns. Massively more efficient, but it only works if you've built up those chunks through experience.
 
 This is why memorizing word lists feels productive but mostly isn't. You're adding entries to a database. What you actually need is better pattern-matching firmware.`,
       },
       {
-        title: 'Deliberate Practice: The Part Everyone Gets Wrong',
+        title: 'Deliberate practice, not just more hours',
         content: `You've probably heard about the "10,000 hours" rule. Malcolm Gladwell made it famous, K. Anders Ericsson actually researched it, and the internet distorted it beyond recognition.
 
-Here's what Ericsson actually found: it's not about hours. It's about deliberate practice — working on specific weaknesses with immediate feedback, at the edge of your ability. A chess player who plays 10,000 hours of casual blitz games will improve far less than someone who spends 2,000 hours studying specific positions, analyzing their mistakes, and working with a coach.
+What Ericsson actually found: it's not about hours. It's about deliberate practice. Working on specific weaknesses with immediate feedback, at the edge of your ability. A chess player who plays 10,000 hours of casual blitz games will improve far less than someone who spends 2,000 hours studying specific positions, analyzing their mistakes, and working with a coach.
 
 Same thing with word games. I played casually for years. Got a bit better. Plateaued. Got frustrated. Played more. Stayed plateaued.
 
 Then I changed my approach. Instead of just playing games, I started doing targeted exercises. Fifteen minutes a day of anagram practice with a timer. Not to memorize answers, but to force my brain to process letter combinations faster. When I got stuck on a set of letters, I'd study why I got stuck. Was it an unfamiliar letter cluster? A prefix I kept overlooking? A vowel-heavy set that made me panic?
 
-The improvement was immediate. Not dramatic — I didn't transform into Nigel Richards overnight — but within two weeks, I was finding words 20-30% faster. After a month, I was consistently beating scores I'd been stuck at for years.
+The improvement was immediate. Not dramatic (I didn't transform into Nigel Richards overnight) but within two weeks, I was finding words noticeably faster. After a month, I was consistently beating scores I'd been stuck at for years.
 
 The difference wasn't knowing more words. It was seeing them faster.`,
       },
       {
-        title: 'Visual Chunking: The Actual Skill',
-        content: `Researchers who study anagram solving have identified two distinct strategies people use. Sequential scanning means checking letter combinations one at a time — A with B, then A with C, then A with D. Slow. Exhausting. This is what beginners do.
+        title: 'Visual chunking: the actual skill',
+        content: `Researchers who study anagram solving have identified two distinct strategies. Sequential scanning means checking letter combinations one at a time. A with B, then A with C, then A with D. Slow. Exhausting. This is what beginners do.
 
-Visual chunking means your brain automatically groups letters into recognized clusters and checks multiple combinations simultaneously. TH gets instantly recognized as a unit. -TION at the end of a letter group jumps out. You don't consciously think "T and H often appear together" — your visual system does it before you're even aware.
+Visual chunking means your brain automatically groups letters into recognized clusters and checks multiple combinations simultaneously. TH gets instantly recognized as a unit. -TION at the end of a letter group jumps out. You don't consciously think "T and H often appear together." Your visual system does it before you're even aware.
 
-Here's the wild part: this isn't something you can shortcut. You can't read about chunking and suddenly start doing it. It's a perceptual skill that develops through repeated exposure, like a radiologist learning to spot tumors in X-rays. The radiologist doesn't memorize what every tumor looks like. They develop a sensitivity to anomalies through thousands of hours of looking.
+The frustrating part: this isn't something you can shortcut. You can't read about chunking and suddenly start doing it. It's a perceptual skill that develops through repeated exposure, like a radiologist learning to spot tumors in X-rays. The radiologist doesn't memorize what every tumor looks like. They develop a sensitivity to anomalies through thousands of hours of looking.
 
-But — and this is the key insight from Ericsson's work — not all looking is equal. Mindless repetition barely moves the needle. You need to be actively engaged, pushing past comfortable patterns, and paying attention to what you miss.`,
+But not all looking is equal. Ericsson's key insight. Mindless repetition barely moves the needle. You need to be actively engaged, pushing past comfortable patterns, paying attention to what you miss.`,
       },
       {
-        title: 'The Short Words Strategy (and Why It Actually Works)',
+        title: 'The short words strategy',
         content: `Every word game guide says "find short words first." Most of them don't explain why this works psychologically, not just strategically.
 
 When you spot a three-letter word, your brain gets a tiny dopamine hit. Found one. Good. That micro-reward does two things: it reduces the anxiety of staring at a jumble of letters, and it activates a mental state psychologists call "approach motivation." Your brain shifts from "I can't find anything" to "I'm finding things, let me find more."
@@ -92,10 +92,10 @@ There's also a practical angle. Three-letter words often share letters with long
 The competitive players I've talked to all do this intuitively. They don't even think about it anymore. But when they describe their process, it always starts with the small stuff.`,
       },
       {
-        title: 'The Backward Reading Trick (My Favorite Weird Technique)',
+        title: 'The backward reading trick',
         content: `Okay, this one sounds ridiculous. But it works, and there's a real reason why.
 
-When you stare at a set of letters, your brain locks into reading them left-to-right (or right-to-left for Hebrew/Arabic speakers). This creates what psychologists call "functional fixedness" — your perception gets stuck in one organizational framework.
+When you stare at a set of letters, your brain locks into reading them left-to-right (or right-to-left for Hebrew/Arabic speakers). This creates what psychologists call "functional fixedness." Your perception gets stuck in one organizational framework.
 
 Try this: when you feel stuck, read the letters backward. Or rearrange them in your head. Or cover half of them with your hand and look at the remaining ones.
 
@@ -104,30 +104,30 @@ What you're doing is breaking the fixedness. You're forcing your visual system t
 I use this constantly. When I hit a wall in any word game, I physically change how I'm looking at the letters. Squint. Tilt my head. Read backward. It sounds like superstition, but it's actually solid perceptual psychology. Changing your visual angle changes which patterns your brain can detect.`,
       },
       {
-        title: 'Common Letter Combinations: Your Pattern Library',
+        title: 'Common letter combinations',
         content: `Rather than memorizing words, memorize letter clusters. These are the building blocks your visual chunking system needs.
 
-In English, the heavy hitters are: TH, SH, CH, PH, WH for consonant pairs. -ING, -TION, -NESS, -MENT, -ABLE for suffixes. RE-, UN-, DIS-, PRE-, MIS- for prefixes. And the vowel clusters: EA, OU, AI, EI, OA.
+In English, the heavy hitters: TH, SH, CH, PH, WH for consonant pairs. -ING, -TION, -NESS, -MENT, -ABLE for suffixes. RE-, UN-, DIS-, PRE-, MIS- for prefixes. And the vowel clusters: EA, OU, AI, EI, OA.
 
-Here's my actual practice routine: I separate letters into consonants and vowels, mentally. Then I look at the consonants for familiar pairs. Then I test those pairs with available vowels. It's not a rigid process — after enough practice, it becomes automatic. But in the beginning, doing it deliberately made a huge difference.
+My actual practice routine: I separate letters into consonants and vowels, mentally. Then I look at the consonants for familiar pairs. Then I test those pairs with available vowels. Not a rigid process. After enough practice, it becomes automatic. But in the beginning, doing it deliberately made a huge difference.
 
-The research supports this. Studies on expert Scrabble players show they process letter combinations in parallel — multiple potential words being evaluated simultaneously — while novices process them serially. Building a robust library of letter clusters is what enables that parallel processing.`,
+Studies on expert Scrabble players show they process letter combinations in parallel, multiple potential words being evaluated simultaneously, while novices process them serially. Building a robust library of letter clusters is what enables that parallel processing.`,
       },
       {
-        title: 'When to Play (Yes, This Actually Matters)',
+        title: 'When to play (yes, it matters)',
         content: `I tracked my word game scores for six months alongside the time of day I played. The results were embarrassingly clear.
 
-Morning scores (within two hours of waking): consistently 15-25% higher than evening scores. This tracks with chronobiology research showing that most people's cognitive performance peaks in the mid-morning. Your working memory, attention, and pattern recognition are all measurably sharper.
+Morning scores, within two hours of waking, consistently ran 15-25% higher than evening scores. This tracks with chronobiology research showing that most people's cognitive performance peaks in the mid-morning. Working memory, attention, and pattern recognition are all measurably sharper.
 
-But here's the caveat: "most people" isn't "all people." Night owls show the reverse pattern. The key isn't morning specifically — it's playing during YOUR peak cognitive window.
+Caveat: "most people" isn't "all people." Night owls show the reverse pattern. The key isn't morning specifically. It's playing during your peak cognitive window.
 
-I also found that my worst scores correlated with days I was sleep-deprived or stressed. Not exactly shocking, but the magnitude surprised me. After a bad night of sleep, my scores dropped 30-40%. Pattern recognition is one of the first cognitive abilities to suffer from fatigue.
+I also found that my worst scores correlated with days I was sleep-deprived or stressed. Not exactly shocking, but the magnitude surprised me. After a bad night of sleep, my scores dropped by a third or more. Pattern recognition is one of the first cognitive abilities to suffer from fatigue.
 
-The practical takeaway: if you're playing a competitive daily challenge, play it when you're fresh. Don't squeeze it in at midnight after a long day and then wonder why your scores are terrible.`,
+Practical version: if you're playing a competitive daily challenge, play it when you're fresh. Don't squeeze it in at midnight after a long day and then wonder why your scores are terrible.`,
       },
       {
-        title: 'The Plateau Problem (and How I Finally Broke Through)',
-        content: `Around month eight of my deliberate practice experiment, I hit a wall. My scores stopped improving. I was doing everything "right" — targeted practice, pattern exercises, playing at peak hours — but nothing was moving.
+        title: 'The plateau problem',
+        content: `Around month eight of my deliberate practice experiment, I hit a wall. My scores stopped improving. I was doing everything "right." Targeted practice, pattern exercises, playing at peak hours. Nothing was moving.
 
 I almost quit. Seriously.
 
@@ -135,12 +135,12 @@ Then I read something Ericsson wrote about skill plateaus: they're not signs of 
 
 So I did something uncomfortable. I switched from my usual 4x4 word grid to 5x5. The larger board was overwhelming at first. My scores cratered. But within three weeks, something shifted. When I went back to 4x4, it felt almost easy. The letters weren't different, but my ability to scan larger visual fields had improved.
 
-This is the principle behind "overlearning" — training at a harder level than what you'll face in performance. Athletes do it. Musicians do it. And it absolutely works for word games.
+This is the principle behind "overlearning," training at a harder level than what you'll face in performance. Athletes do it. Musicians do it. Works for word games too.
 
 My other plateau-breaker was playing in a second language. I'm not fluent in anything besides English, but I started playing casual word games in French (yes, inspired by Nigel Richards). The struggle of working with unfamiliar letter patterns forced my brain into active processing mode instead of relying on autopilot.`,
       },
       {
-        content: `Here's the honest truth about getting better at word games. You can read all the research, learn all the techniques, and understand exactly how your brain processes language. None of it matters if you don't practice deliberately and consistently.
+        content: `The honest truth about getting better at word games: you can read all the research, learn all the techniques, and understand exactly how your brain processes language. None of it matters if you don't practice deliberately and consistently.
 
 The good news? Deliberate practice in word games is fun. It's not like practicing scales on a piano or running wind sprints. You're playing games. You're just playing them with intention instead of on autopilot.
 

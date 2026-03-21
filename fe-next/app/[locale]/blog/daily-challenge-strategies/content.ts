@@ -14,7 +14,7 @@ export type LocaleContent = {
 export const contentByLocale: Record<string, LocaleContent> = {
   en: {
     title: 'Daily Challenge Strategies: What Actually Matters',
-    subtitle: 'Three months of obsessive score-tracking, competitive Scrabble tactics, and information theory — distilled into something actually useful.',
+    subtitle: 'Three months of obsessive score-tracking, competitive Scrabble tactics, and information theory. Distilled into something actually useful.',
     category: 'Strategy',
     readTime: '12 min read',
     authorName: 'The Word Nerd',
@@ -25,128 +25,128 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 That's the thing about daily challenges. They get under your skin. What starts as "oh, I'll just do one quick round" turns into a ritual, then an obsession, then a data collection project where you're tracking your scores in a spreadsheet at 6 AM because you want to know if your Tuesday performance is statistically different from your Thursday performance. (It is. Tuesdays are worse. I have no explanation for this.)
 
-I've been playing daily word challenges for about three months now — seriously playing, not just tapping around and hoping for the best. Along the way I've borrowed tactics from competitive Scrabble players, stolen a framework from a math YouTuber's approach to Wordle, and accidentally learned more about cognitive psychology than I ever expected to from a word game. Here's what I've figured out.`,
+I've been playing daily word challenges for about three months now. Seriously playing, not just tapping around and hoping for the best. Along the way I've borrowed tactics from competitive Scrabble players, stolen a framework from a math YouTuber's approach to Wordle, and accidentally learned more about cognitive psychology than I ever expected to from a word game. So. What actually works.`,
       },
       {
-        title: 'Timing Is Not a Minor Detail',
-        content: `Let me be blunt: when you play matters almost as much as how you play.
+        title: 'Timing is not a minor detail',
+        content: `When you play matters almost as much as how you play. Full stop.
 
-Cognitive research — and I mean actual published studies, not "productivity guru" blog posts — shows that most people hit peak mental performance roughly 2-4 hours after waking up. Your prefrontal cortex, the part of your brain that handles planning and pattern recognition, is firing on all cylinders during this window. After that, it's a slow decline punctuated by a brief afternoon recovery (if you're lucky) and then the long slide into evening mush-brain.
+Cognitive research (actual published studies, not "productivity guru" blog posts) shows that most people hit peak mental performance roughly 2-4 hours after waking up. Your prefrontal cortex is firing on all cylinders during this window. After that, slow decline. Maybe a brief afternoon recovery. Then the long slide into evening mush-brain.
 
-I tested this on myself. For three weeks, I played the daily challenge at three different times: morning (within that 2-4 hour window), afternoon (around 3 PM), and evening (after 9 PM). The results were embarrassingly clear. My morning scores averaged 23% higher than my evening scores. Twenty-three percent. That's not a rounding error — that's the difference between a mediocre run and a genuinely good one.
+I tested this on myself. For three weeks, I played the daily challenge at three different times: morning (within that 2-4 hour window), afternoon (around 3 PM), and evening (after 9 PM). The results were embarrassingly clear. My morning scores averaged 23% higher than my evening scores. Twenty-three percent. That's not a rounding error. That's the difference between a mediocre run and a genuinely good one.
 
-Now, I'm not saying you need to set an alarm to play a word game. That would be insane. (I set an alarm to play a word game.) But if you're wondering why your scores are inconsistent, check your timing before you blame the board.`,
+I'm not saying you need to set an alarm to play a word game. That would be insane. I set an alarm to play a word game. But if your scores are inconsistent, check your timing before you blame the board.`,
       },
       {
-        title: 'The Five-Second Scan — Stolen from Chess',
-        content: `Here's a habit I picked up from reading about chess grandmasters, and it's genuinely changed how I approach every board.
+        title: 'The five-second scan, stolen from chess',
+        content: `I picked up this habit from reading about chess grandmasters. It genuinely changed how I approach every board.
 
 When the grid appears, don't touch anything. Don't start tracing letters. Just look. Five seconds. Maybe ten. Let your eyes wander across the entire board without trying to form a specific word.
 
-What's happening during those seconds is fascinating. Your brain is doing what cognitive scientists call "preattentive processing" — it's cataloguing letter frequencies, spatial relationships, and common letter clusters before your conscious mind has even started working. Chess grandmasters do this when they first see a position. They're not calculating moves yet. They're absorbing the shape of the game.
+What's happening during those seconds is fascinating. Your brain is doing what cognitive scientists call "preattentive processing." It catalogues letter frequencies, spatial relationships, and common letter clusters before your conscious mind has even started working. Chess grandmasters do this when they first see a position. They're not calculating moves yet. They're absorbing the shape of the game.
 
-I used to dive in immediately. I'd spot a word in the first two seconds and start building it. The problem? I'd anchor on that first word and miss the entire left side of the board. Now I force myself to scan first, and my word count per game has gone up by about 30%. The first word I submit might come five seconds later than it used to, but I find significantly more words overall.
+I used to dive in immediately. Spot a word in the first two seconds, start building it. The problem? I'd anchor on that first word and miss the entire left side of the board. Now I force myself to scan first. Word count per game went up about 30%. The first word I submit comes five seconds later than it used to, but I find significantly more words overall.
 
-Think of it like this: spending five seconds to build a mental map saves you from spending thirty seconds lost in the wrong corner of the board.`,
+Five seconds of mental mapping saves thirty seconds of wandering the wrong corner.`,
       },
       {
-        title: 'Short Words First — The Counter-Intuitive Truth',
-        content: `Every instinct in your body says "go for the big words." Seven letters. Eight letters. The glory words. I get it. I really do. There's something deeply satisfying about finding QUIXOTIC on a 4x4 grid.
+        title: 'Short words first',
+        content: `Every instinct says go for the big words. Seven letters. Eight letters. The glory words. I get it. There's something deeply satisfying about finding QUIXOTIC on a 4x4 grid.
 
-But here's what my data actually shows: starting with short words is almost always the better strategy, and it's not even close.
+But my data tells a different story: starting with short words is almost always better, and it's not even close.
 
-Three reasons. First, short words are faster to find and submit, which means you're banking points while your brain's background processes work on the longer words. Second — and this is the part nobody talks about — each submitted word reduces your cognitive load. It's one fewer thing your brain is trying to hold in working memory. That freed-up mental bandwidth matters more than you think. Third, in timed games, three 3-letter words (9 letters worth of points) almost always outscore one 7-letter word that took you 45 seconds to assemble.
+Three reasons. First, short words are faster to find and submit, so you're banking points while your brain's background processes work on the longer words. Second, each submitted word reduces your cognitive load. One fewer thing in working memory. That freed-up mental bandwidth matters more than you think. Third, in timed games, three 3-letter words almost always outscore one 7-letter word that took you 45 seconds to assemble.
 
-Competitive Scrabble players understand this instinctively. They don't spend three minutes hunting for BINGO (the term for using all seven tiles). They play solid 4-5 letter words, maintain good "rack leave" — that's the letters remaining on their rack after each turn — and let the big plays come naturally.
+Competitive Scrabble players know this. They don't spend three minutes hunting for BINGO (using all seven tiles). They play solid 4-5 letter words, maintain good "rack leave," and let the big plays come naturally.
 
-The parallel is direct: don't force long words. Let them emerge while you're efficiently harvesting the short ones.`,
+Don't force long words. Let them emerge while you're efficiently harvesting the short ones.`,
       },
       {
-        title: 'Chunking — How Experts Actually See the Board',
-        content: `There's a concept in cognitive psychology called "chunking," and it completely explains why some players seem to find words at superhuman speed.
+        title: 'Chunking, or why some people seem psychic',
+        content: `There's a concept in cognitive psychology called "chunking." It completely explains why some players seem to find words at superhuman speed.
 
-When a beginner looks at the letters T-I-O-N, they see four individual letters. When an expert looks at those same letters, they see one chunk: -TION. A suffix. A building block. Their brain doesn't process four things — it processes one thing, and that one thing immediately suggests dozens of words: action, motion, nation, station, portion.
+When a beginner looks at the letters T-I-O-N, they see four individual letters. When an expert looks at those same letters, they see one chunk: -TION. A suffix. A building block. Their brain doesn't process four things. It processes one thing, and that one thing immediately suggests dozens of words: action, motion, nation, station, portion.
 
 Expert word game players don't read boards letter by letter. They see clusters. -ING, -ED, -NESS, UN-, RE-, PRE-. They see common consonant pairs: TH, CH, SH, STR. They see vowel patterns: -ATE, -IZE, -OUS. Each of these chunks is a single unit in working memory, not three or four separate letters.
 
-This is trainable. Seriously. You can get better at it. Start paying attention to letter groups instead of individual letters. When you scan the board (during your five-second pause, remember?), look for suffixes first. Then look for prefixes. Then look for common pairs. Over time, this becomes automatic, and your board-reading speed will increase dramatically.
+This is trainable. Start paying attention to letter groups instead of individual letters. During your five-second pause, look for suffixes first. Then prefixes. Then common pairs. Over time this becomes automatic and your board-reading speed jumps.
 
-I spent two weeks deliberately practicing chunk recognition — just staring at random letter grids and trying to identify common groups as fast as possible. It felt pointless. Then my daily challenge scores jumped by about 15% and never came back down.`,
+I spent two weeks deliberately practicing chunk recognition. Just staring at random letter grids, trying to identify common groups as fast as possible. Felt pointless. Then my daily challenge scores jumped about 15% and never came back down.`,
       },
       {
-        title: 'Don\'t Get Stuck — The 15-Second Rule',
+        title: 'The 15-second rule',
         content: `If you haven't found a word in 15 seconds, you are stuck. It doesn't feel like you're stuck. It feels like you're "almost there," like the word is right on the tip of your tongue, like if you just stare at those letters for three more seconds it'll click. It won't. Move on.
 
 Experienced Scrabble players call this "getting stuck in a shape." Your brain has convinced itself that a particular arrangement of letters must form a word, and it stops considering alternatives. It's a form of fixation bias, and the only cure is to physically shift your attention to a different part of the board.
 
-I have a hard rule now: 15 seconds without a new word, and I deliberately look at the opposite corner of the grid. Not the adjacent area — the opposite corner. The goal is to break the fixation completely. Does it feel unnatural? Yes. Does it work? Absolutely yes.
+I have a hard rule now: 15 seconds without a new word and I look at the opposite corner of the grid. Not the adjacent area. The opposite corner. Breaking the fixation completely is the point. Feels unnatural. Works anyway.
 
-Here's the dirty secret about being stuck: the word you're trying to find usually isn't even there. Your brain is pattern-matching against something that doesn't exist on this particular board. The sooner you accept that and move on, the sooner you'll find words that actually are there.`,
+The word you're trying to find usually isn't even there. Your brain is pattern-matching against something that doesn't exist on this particular board. The sooner you accept that and move on, the sooner you'll find words that actually are there.`,
       },
       {
-        title: 'The Incubation Effect — Your Brain\'s Secret Weapon',
+        title: 'The incubation effect',
         content: `This one sounds like pseudoscience, but it's one of the most well-documented phenomena in cognitive psychology.
 
-The incubation effect is simple: when you stop actively thinking about a problem, your brain continues working on it unconsciously. Then, when you return to the problem, solutions seem to "pop" into awareness — that classic "aha!" moment.
+The incubation effect is simple: when you stop actively thinking about a problem, your brain continues working on it unconsciously. Then, when you return to the problem, solutions seem to "pop" into awareness. That classic "aha!" moment.
 
-In a daily challenge, you can exploit this. If the game has any natural pause — a transition screen, a score tally, even the half-second while your last word is being validated — let your eyes go soft. Don't actively search. Just let the board exist in your peripheral vision. I know this sounds like meditation-bro advice, but the research backing the incubation effect is genuinely robust. Dijksterhuis and Nordgren's 2006 paper on unconscious thought theory showed that for complex problems with many variables (like finding words in a grid of letters), unconscious processing often outperforms deliberate analysis.
+In a daily challenge, you can exploit this. If the game has any natural pause, a transition screen, a score tally, even the half-second while your last word validates, let your eyes go soft. Don't actively search. Just let the board exist in your peripheral vision. I know this sounds like meditation-bro advice. But Dijksterhuis and Nordgren's 2006 paper on unconscious thought theory showed that for complex problems with many variables, like finding words in a grid of letters, unconscious processing often outperforms deliberate analysis.
 
 My personal trick: after submitting a word, I take one breath before looking for the next one. One breath. Maybe two seconds. It's barely noticeable in terms of time cost, but it creates a micro-incubation period that frequently surfaces words I wouldn't have found through brute-force scanning.`,
       },
       {
-        title: 'Information Theory and the 3Blue1Brown Insight',
-        content: `Grant Sanderson — the mathematician behind the YouTube channel 3Blue1Brown — made a brilliant video about optimal Wordle strategy using information theory. His core insight applies beautifully to daily word challenges, even though the games are structurally different.
+        title: 'Information theory and 3Blue1Brown',
+        content: `Grant Sanderson, the mathematician behind the YouTube channel 3Blue1Brown, made a brilliant video about optimal Wordle strategy using information theory. His core insight applies beautifully to daily word challenges, even though the games are structurally different.
 
 The key idea: every guess should maximize information gain. In Wordle, that means choosing words that eliminate the most possibilities. In a word grid challenge, the analog is this: your scan strategy should prioritize the areas of the board with the highest "information density."
 
-What does that mean practically? Look for unusual letters first. A Q, Z, X, or J on the board is incredibly informative because it constrains your search space dramatically. There are very few words containing Q — so when you see one, you can quickly check for QU combinations and either find QUIZ/QUEEN/QUITE or rule it out entirely. That's efficient. Staring at a cluster of E-A-T-S, on the other hand, has enormous possibility space. There are hundreds of words you could form. It's harder to efficiently search.
+What does that mean practically? Look for unusual letters first. A Q, Z, X, or J on the board constrains your search space dramatically. Very few words contain Q, so when you see one, you can quickly check for QU combinations and either find QUIZ/QUEEN/QUITE or rule it out entirely. Efficient. Staring at a cluster of E-A-T-S, on the other hand? Enormous possibility space. Hundreds of potential words. Much harder to search efficiently.
 
-So here's my adapted strategy: scan for rare letters first, check their neighborhoods for valid words, then move to the common-letter regions. It's counterintuitive — your brain wants to start with the easy, common letters — but starting with constraints is almost always faster than starting with freedom.
+My adapted strategy: scan for rare letters first, check their neighborhoods, then move to common-letter regions. Your brain wants to start with the easy, familiar letters. But starting with constraints is almost always faster than starting with freedom.
 
 Tile tracking from competitive Scrabble reinforces this. Top players mentally track which high-value tiles have been played. They know when the Q is still out there, when the blanks are gone. In a grid challenge, you don't need to track across turns, but the principle is the same: rare letters are landmarks. Use them.`,
       },
       {
-        title: 'Leave Values — A Scrabble Concept That Transfers Perfectly',
+        title: 'Leave values (borrowed from Scrabble)',
         content: `In competitive Scrabble, "leave value" is the quality of the letters remaining on your rack after you play a word. A good leave means you have balanced, flexible letters that can combine into many future words. A bad leave means you're stuck with Q-U-V-W and no vowels.
 
 How does this apply to a word grid? It's about path management.
 
-When you trace a word through the grid, you're not just finding that word — you're also choosing which letters remain available for your next path. Some paths through a word leave the board's remaining letters in a more "connected" state, where it's easier to find the next word. Other paths isolate pockets of letters, making them harder to reach.
+When you trace a word through the grid, you're not just finding that word. You're also choosing which letters remain available for your next path. Some paths through a word leave the board's remaining letters in a more "connected" state, where it's easier to find the next word. Other paths isolate pockets of letters, making them harder to reach.
 
 I started paying attention to this about a month ago, and it was one of those "how did I never notice this before" moments. When I have two possible paths to the same word, I now choose the path that keeps the most future connections open. It's a small optimization, but in a timed challenge, those small optimizations compound.`,
       },
       {
-        title: 'The Psychology of Streaks — Both Motivating and Dangerous',
-        content: `Let's talk about streaks honestly, because I have complicated feelings about them.
+        title: 'Streaks will ruin your life (affectionately)',
+        content: `I have complicated feelings about streaks.
 
-On one hand, my daily streak is the single most effective motivator I've ever encountered in a game. It got me playing every day. It made me care about improving. It turned a casual hobby into a skill I actively develop. On the other hand, streaks create a toxic relationship with the game if you're not careful.
+My daily streak is the single most effective motivator I've ever encountered in a game. Got me playing every day. Made me care about improving. Turned a casual hobby into a skill I actively develop. But streaks also create a toxic relationship with the game if you're not careful.
 
-The problem is loss aversion — a well-documented psychological bias where losing something feels roughly twice as painful as gaining the equivalent thing feels good. Maintaining a 47-day streak doesn't feel 47 times good. It feels approximately neutral, because the baseline has shifted. But losing that streak? That feels terrible. Disproportionately terrible.
+The problem is loss aversion. Losing something feels roughly twice as painful as gaining the equivalent thing feels good. Maintaining a 47-day streak doesn't feel 47 times good. It feels approximately neutral because the baseline has shifted. But losing that streak? Disproportionately terrible.
 
-I've seen people (okay, I've been people) make genuinely irrational decisions to maintain a streak. Playing while sick. Playing at a wedding. Playing during the power outage I mentioned earlier. At that point, the streak isn't serving you — you're serving the streak.
+I've seen people (okay, I've been people) make genuinely irrational decisions to maintain a streak. Playing while sick. Playing at a wedding. Playing during the power outage I mentioned earlier. At that point, the streak isn't serving you. You're serving the streak.
 
 My advice: enjoy the streak, but decide in advance what your "break conditions" are. Mine are simple: if I'm sick, if I'm at a meaningful life event, or if playing would require being rude to someone present. The streak can restart. Your relationships and health can't.
 
-Also — and this is important — some days you'll get a terrible board. A grid full of consonants. A layout where the best possible score is mediocre. That's not a strategy failure. That's just life. The board doesn't owe you a good time. Accept the bad rounds, learn nothing from them (because there's nothing to learn), and move on.`,
+Also, some days you'll get a terrible board. Grid full of consonants. Layout where the best possible score is mediocre. That's not a strategy failure. The board doesn't owe you a good time. Accept the bad rounds, learn nothing from them because there's nothing to learn, and move on.`,
       },
       {
-        title: 'Stress, Ranking, and Why Caring Less Might Help You Win More',
-        content: `I saved this for last because it's the most important thing I've learned, and it's frustratingly paradoxical.
+        title: 'Why caring less might help you win more',
+        content: `Saved this for last because it's the most important thing I've learned.
 
-Stress — specifically, the stress of caring about your ranking — actively makes you worse at the game. This isn't motivational poster wisdom. It's neuroscience. When you're stressed about performance, your body activates the sympathetic nervous system (the "fight or flight" response), which redirects resources away from your prefrontal cortex toward more primitive brain regions. The exact part of your brain you need for pattern recognition and creative word-finding gets throttled.
+The stress of caring about your ranking actively makes you worse at the game. Not motivational poster wisdom. Neuroscience. When you're stressed about performance, your body activates the sympathetic nervous system, redirecting resources away from your prefrontal cortex toward more primitive brain regions. The exact part of your brain you need for pattern recognition and creative word-finding gets throttled.
 
-The research on "choking under pressure" in sports is directly applicable here. Beilock and Carr's work from 2001 showed that pressure causes skilled performers to revert to more controlled, step-by-step processing instead of the fluid, automatic processing they've trained. In word game terms: instead of seeing chunks and patterns effortlessly, you start laboriously checking one letter at a time. You get slower. You find fewer words. You stress more. It's a vicious cycle.
+Beilock and Carr's 2001 research on "choking under pressure" in sports applies directly. Pressure causes skilled performers to revert to controlled, step-by-step processing instead of the fluid, automatic processing they've trained. In word game terms: instead of seeing chunks and patterns effortlessly, you start laboriously checking one letter at a time. Slower. Fewer words. More stress. Vicious cycle.
 
-The fix is annoyingly simple: focus on the process, not the outcome. Don't play to achieve a specific rank. Play to scan efficiently. Play to practice your chunk recognition. Play to maintain your five-second initial scan habit. If you focus on executing your strategy well, the results take care of themselves.
+The fix is annoyingly simple: focus on the process, not the outcome. Don't play to achieve a specific rank. Play to scan efficiently. To practice your chunk recognition. To maintain your five-second initial scan habit. Execute the strategy well and the results follow.
 
-And if the ranking system genuinely stresses you out? Play free practice mode. Seriously. The daily challenge will still be there when you're ready for it, and you'll be a better player from the practice anyway.`,
+And if the ranking system genuinely stresses you out? Play free practice mode. The daily challenge will still be there when you're ready, and you'll be a better player from the practice anyway.`,
       },
       {
-        content: `Look. I started writing this thinking I'd share a few tips. Instead I wrote a small essay about cognitive psychology, information theory, and my unhealthy relationship with a word game streak counter. That probably tells you everything you need to know about the kind of person who writes strategy guides for daily word challenges.
+        content: `Look. I started writing this thinking I'd share a few tips. Instead I wrote a small essay about cognitive psychology, information theory, and my unhealthy relationship with a streak counter. That probably tells you everything you need to know about the kind of person who writes strategy guides for daily word challenges.
 
-But here's what I genuinely believe after three months of obsessive play: the strategies above work. Not because they're magic, but because they're grounded in how your brain actually processes information. Scan before you act. Start small. Don't fixate. Let your unconscious mind do its thing. And for the love of everything, play when you're actually awake.
+After three months of obsessive play, I genuinely believe these strategies work. Not because they're magic. Because they're grounded in how your brain actually processes information. Scan before you act. Start small. Don't fixate. Let your unconscious mind do its thing. And play when you're actually awake.
 
-Some days you'll crush it. Some days the board will crush you. Both are fine. It's a game. A really, really good game.`,
+Some days you'll crush it. Some days the board will crush you. Both are fine.`,
       },
     ],
     backToBlog: 'Back to Blog',

@@ -54,8 +54,8 @@ function getOAuthRedirectUrl(locale: string): string {
 
   if (platform === 'android') {
     // Android: Use HTTPS App Links which are verified and reliably open the app
-    // The locale is passed as a query param so the app knows where to redirect after auth
-    return `https://www.lexiclash.live/auth/callback?locale=${locale}&from_app=true`;
+    // Include locale in the URL path so proxy.ts preserves it during redirect
+    return `https://www.lexiclash.live/${locale}/auth/callback?from_app=true`;
   } else {
     // iOS: Custom URL scheme works reliably with SFSafariViewController
     return `lexiclash://auth/callback${locale ? `?locale=${locale}` : ''}`;

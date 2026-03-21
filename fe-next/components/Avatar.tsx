@@ -48,7 +48,7 @@ const Avatar = memo<AvatarProps>(({
   avatarImage,
   size = 'md',
   className = '',
-  isLoading = false,
+  isLoading,
 }) => {
   const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
 
@@ -59,8 +59,13 @@ const Avatar = memo<AvatarProps>(({
     [fallbackSeed]
   );
 
+  // Infer loading state: if isLoading is not explicitly set and there's no
+  // avatar data or seed, the consumer likely hasn't loaded data yet — show skeleton.
+  const hasIdentity = !!(customAvatar || userId || avatarImage);
+  const shouldLoad = isLoading === true || (isLoading === undefined && !hasIdentity);
+
   // 0. Loading state
-  if (isLoading) {
+  if (shouldLoad) {
     return (
       <NeoSkeletonAvatar size={config.px} className={className} />
     );

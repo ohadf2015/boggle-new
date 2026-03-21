@@ -326,6 +326,10 @@ export function usePlayerGameEvents({
         logger.log('[PLAYER] Timer started on server, activating game via timeUpdate (countdown complete)');
         setGameActive(true);
         gameActiveRef.current = true;
+        // Clear the countdown guard so future timeUpdate events can sync the timer.
+        // Without this, showStartAnimation stays true (set in handleStartGame) and
+        // blocks ALL timeUpdate events for the rest of the game.
+        setShowStartAnimation(false);
       }
 
       if (data.remainingTime <= 0) {

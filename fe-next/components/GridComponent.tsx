@@ -275,10 +275,35 @@ const GridComponent = memo<GridComponentProps>(({
 
   const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
 
+  // Cooldown warmth — carries residual combo boost from previous word
+  // so the next word's escalation starts "warm" instead of cold-snapping to tier 0
+  const [cooldownCombo, setCooldownCombo] = useState(0);
+  const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevSelLenForCooldownRef = useRef(selectedCells.length);
+  useEffect(() => {
+    const wasSelecting = prevSelLenForCooldownRef.current > 0;
+    const nowEmpty = selectedCells.length === 0;
+    if (wasSelecting && nowEmpty) {
+      const lastTier = getSelectionEscalation(0, prevSelLenForCooldownRef.current, comboLevel).tier;
+      if (lastTier > 0 && !reduceMotion) {
+        setCooldownCombo(lastTier * 2);
+        if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
+        cooldownTimerRef.current = setTimeout(() => setCooldownCombo(0), 500);
+      }
+    }
+    prevSelLenForCooldownRef.current = selectedCells.length;
+  }, [selectedCells.length, comboLevel, reduceMotion]);
+  useEffect(() => {
+    return () => { if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current); };
+  }, []);
+
+  // Effective combo includes cooldown warmth for smoother tier transitions
+  const effectiveCombo = comboLevel + cooldownCombo;
+
   // Current escalation tier (based on total selected letters)
   const currentTier = useMemo(
-    () => getSelectionEscalation(0, selectedCells.length, comboLevel).tier,
-    [selectedCells.length, comboLevel],
+    () => getSelectionEscalation(0, selectedCells.length, effectiveCombo).tier,
+    [selectedCells.length, effectiveCombo],
   );
 
   // Tier transition flash — fires once when crossing a tier boundary
@@ -410,7 +435,7 @@ const GridComponent = memo<GridComponentProps>(({
               const shakeOffset = getShakeOffset(cellKey);
               const selectionIdx = selectionOrderMap.get(cellKey) ?? 0;
               const escalation = isSelected
-                ? getSelectionEscalation(selectionIdx, selectedCells.length, comboLevel)
+                ? getSelectionEscalation(selectionIdx, selectedCells.length, effectiveCombo)
                 : null;
 
               return (
@@ -436,6 +461,7 @@ const GridComponent = memo<GridComponentProps>(({
                   earthquakePhase={earthquakePhase}
                   getPhaseAnimation={getPhaseAnimation}
                   comboLevel={comboLevel}
+                  escalationCombo={effectiveCombo}
                   comboColors={comboColors}
                   reduceMotion={reduceMotion}
                   animateOnMount={animateOnMount}

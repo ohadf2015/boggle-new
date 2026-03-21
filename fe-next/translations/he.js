@@ -685,7 +685,16 @@ const he = {
       "eyebrows": "גבות",
       "facialHair": "זקן",
       "facialHairStyle": "סגנון",
-      "colorTheme": "ערכת צבעים"
+      "colorTheme": "ערכת צבעים",
+      "bodyStyle": "לבוש",
+      bodyStyles: {
+        default: "רגיל",
+        hoodie: "קפוצ׳ון",
+        suit: "חליפה",
+        turtleneck: "צווארון גולף",
+        offShoulder: "חשוף כתפיים",
+        cropTop: "חולצת בטן"
+      }
     },
     "premium": {
       "locked": "חלק VIP",
@@ -3895,14 +3904,14 @@ const he = {
     },
     "features": {
       "unlocked": {
-        "advancedSettings": "הגדרות מתקדמות נפתחו!",
-        "advancedSettingsDesc": "עכשיו אפשר להתאים אישית את המשחק",
-        "customBotCount": "מספר בוטים מותאם נפתח!",
-        "customBotCountDesc": "בחרו כמה בוטים להתמודד מולם",
-        "challengeMode": "מצב אתגר נפתח!",
-        "challengeModeDesc": "נגד השעון ושברו שיאים",
-        "practiceMode": "מצב תרגול נפתח!",
-        "practiceModeDesc": "ללא טיימר - למדו בקצב שלכם"
+        "practiceMode": "מצב אימון",
+        "practiceModeDesc": "התאמנו בקצב שלכם",
+        "challengeMode": "מצב אתגר",
+        "challengeModeDesc": "בחנו את הכישורים שלכם עם חידות קשות יותר",
+        "customBotCount": "בוטים מותאמים",
+        "customBotCountDesc": "בחרו כמה בוטים לשחק נגדם",
+        "advancedSettings": "הגדרות מתקדמות",
+        "advancedSettingsDesc": "כוונו את חוויית המשחק שלכם"
       },
       "locked": {
         "advancedSettings": "שחקו 5 משחקים לפתיחה",
@@ -5105,12 +5114,12 @@ const he = {
       "system": "מערכת"
     },
     "kpi": {
-      "dau": "פעילים היום",
+      "dau": "משתמשים פעילים יומיים",
       "gamesToday": "משחקים היום",
-      "signupsToday": "הרשמות",
+      "signupsToday": "הרשמות היום",
       "stickiness": "דביקות",
       "totalPlayers": "סה״כ שחקנים",
-      "totalWords": "מילים שנמצאו",
+      "totalWords": "סה״כ מילים",
       "thisWeek": "השבוע"
     },
     "system": {
@@ -5124,18 +5133,18 @@ const he = {
       "size": "גודל",
       "funnelTitle": "משפך מעורבות (30 יום)",
       "funnelRegistered": "נרשמו",
-      "funnelFirstGame": "משחק ראשון",
-      "funnelDay7": "חזרו יום 7",
-      "funnelDay30": "חזרו יום 30",
+      "funnelFirstGame": "שיחקו משחק ראשון",
+      "funnelDay7": "חזרו ביום 7",
+      "funnelDay30": "חזרו ביום 30",
       "churnTitle": "סיכון נטישה",
       "churnTotal": "סה״כ בסיכון",
-      "noChurnRisk": "אין שחקנים בסיכון",
+      "noChurnRisk": "לא זוהה סיכון נטישה",
       "games": "משחקים"
     },
     "moderation": {
       "title": "מודרציה",
       "queueTitle": "תור מודרציה",
-      "empty": "התור ריק — אין פריטים ממתינים",
+      "empty": "אין פריטים למודרציה",
       "approve": "אשר",
       "reject": "דחה",
       "investigate": "חקור",
@@ -5344,12 +5353,12 @@ const he = {
       }
     },
     "kpi": {
-      "dau": "פעילים היום",
+      "dau": "משתמשים פעילים יומיים",
       "gamesToday": "משחקים היום",
-      "signupsToday": "הרשמות",
+      "signupsToday": "הרשמות היום",
       "stickiness": "דביקות",
       "totalPlayers": "סה\"כ שחקנים",
-      "totalWords": "מילים שנמצאו",
+      "totalWords": "סה\"כ מילים",
       "thisWeek": "השבוע"
     },
     "system": {
@@ -5363,18 +5372,18 @@ const he = {
       "size": "גודל",
       "funnelTitle": "משפך מעורבות (30 יום)",
       "funnelRegistered": "נרשמו",
-      "funnelFirstGame": "משחק ראשון",
+      "funnelFirstGame": "שיחקו משחק ראשון",
       "funnelDay7": "חזרו ביום 7",
       "funnelDay30": "חזרו ביום 30",
       "churnTitle": "סיכון נטישה",
       "churnTotal": "סה\"כ בסיכון",
-      "noChurnRisk": "אין שחקנים בסיכון",
+      "noChurnRisk": "לא זוהה סיכון נטישה",
       "games": "משחקים"
     },
     "moderation": {
       "title": "מודרציה",
       "queueTitle": "תור מודרציה",
-      "empty": "התור ריק — אין פריטים ממתינים",
+      "empty": "אין פריטים למודרציה",
       "approve": "אשר",
       "reject": "דחה",
       "investigate": "חקור",
@@ -5548,10 +5557,10 @@ const he = {
         "postBoss": "הכוורת של דבורת האיות נוצחה! אוצר המילים שלכם מתוק כדבש!"
       },
       "w3": {
-        "boss": "פרופסור תזאורוס",
-        "after2": "במערות האלה מסתתרים שורשי מילים עתיקים. חפרו עמוק!",
-        "after4": "האטימולוגיות נהיות מורכבות. הפרופסור צופה...",
-        "postBoss": "הפרופסור מודה — אוצר המילים שלכם באמת... מרשים."
+        "boss": "סופר הצללים",
+        "after2": "הצללים מעמיקים... משהו אורב לפנים.",
+        "after4": "לחישות עתיקות מהדהדות במסדרונות.",
+        "postBoss": "סופר הצללים הובס! ממלכת המילים הולכת ומאירה."
       },
       "w4": {
         "boss": "קפטן מטאפורה",
@@ -5821,7 +5830,7 @@ const he = {
       "allMechanics": "כל המכניקות משולבות"
     },
     "mechanic": {
-      "synonymPairs": "+25% לזוגות נרדפים",
+      "synonymPairs": "זוגות נרדפים",
       "etymologyRoots": "בונוס לשורשים לטיניים/יווניים",
       "idioms": "אתגרי ביטויים נסתרים",
       "compounds": "+30% למילים מורכבות",
@@ -5842,6 +5851,15 @@ const he = {
       "surviveBattle": "שרדו עם {{target}}% בריאות",
       "mechanicTrigger": "הפעילו מכניקה",
       "noDamage": "ללא נזק"
+    },
+    "daily": {
+      "wordCount": { "title": "אוסף מילים", "desc": "מצאו {{target}} מילים בשלבי הרפתקה" },
+      "longWord": { "title": "מילים ארוכות", "desc": "מצאו {{target}} מילים עם 5+ אותיות" },
+      "perfect": { "title": "כוכבים מושלמים", "desc": "השיגו {{target}} דירוגי כוכב מושלם" },
+      "combo": { "title": "אמן קומבו", "desc": "הגיעו לרצף קומבו של {{target}}x" },
+      "speed": { "title": "מרוץ מהיר", "desc": "סיימו שלב עם {{target}}+ שניות שנותרו" },
+      "boss": { "title": "צייד בוסים", "desc": "הביסו {{target}} בוס(ים)" },
+      "mechanic": { "title": "מומחה מכניקה", "desc": "הפעילו מכניקות עולם {{target}} פעמים" }
     },
     "tiles": {
       "gold": "זהב (x3 נקודות)",
@@ -6702,7 +6720,21 @@ const he = {
       "blitz": { "name": "בליץ" },
       "zenMode": { "name": "מצב זן" }
     },
-    "watchAdDoubleCoins": "צפו בפרסומת כדי להכפיל מטבעות"
+    "watchAdDoubleCoins": "צפו בפרסומת כדי להכפיל מטבעות",
+    "daily": {
+      "wordCount": {
+        "title": "אספן מילים",
+        "description": "מצאו {target} מילים"
+      },
+      "perfect": {
+        "title": "כוכב מושלם",
+        "description": "השיגו {target} שלבים מושלמים עם 3 כוכבים"
+      },
+      "longWord": {
+        "title": "אמן מילים",
+        "description": "מצאו {target} מילים ארוכות (5+ אותיות)"
+      }
+    }
   },
   "blast": {
     "chain": {
@@ -8274,20 +8306,20 @@ const he = {
   },
   "features": {
     "unlocked": {
-      "advancedSettings": "הגדרות מתקדמות נפתחו!",
-      "advancedSettingsDesc": "עכשיו אפשר להתאים אישית את המשחק",
-      "customBotCount": "מספר בוטים מותאם נפתח!",
-      "customBotCountDesc": "בחרו כמה בוטים להתמודד מולם",
-      "challengeMode": "מצב אתגר נפתח!",
-      "challengeModeDesc": "נגד השעון ושברו שיאים",
-      "practiceMode": "מצב תרגול נפתח!",
-      "practiceModeDesc": "ללא טיימר - למדו בקצב שלכם"
+      "practiceMode": "מצב אימון",
+      "practiceModeDesc": "התאמנו בקצב שלכם",
+      "challengeMode": "מצב אתגר",
+      "challengeModeDesc": "בחנו את הכישורים שלכם עם חידות קשות יותר",
+      "customBotCount": "בוטים מותאמים",
+      "customBotCountDesc": "בחרו כמה בוטים לשחק נגדם",
+      "advancedSettings": "הגדרות מתקדמות",
+      "advancedSettingsDesc": "כוונו את חוויית המשחק שלכם"
     }
   },
   wordHuntAnnouncement: {
     badge: "חדש במולטיפלייר",
     title: "נסו את מצב ציד מילים!",
-    subtitle: "מצאו את מילת המטרה הנסתרת לפני היריבים. חיים, הדחה, וכאוס מוחלט!",
+    subtitle: "מצאו את מילת המטרה הנסתרת במירוץ",
   },
   wordHuntTips: {
     needMoreWords: "מצאתם רק {{count}} מילים. כל מילה ממלאת את החיים — סרקו שורות ואלכסונים למילים קצרות של 3 אותיות לפני שמנחשים את היעד.",
@@ -8304,11 +8336,11 @@ const he = {
     pushForFirst: "סיימתם במקום ה-{{rank}}. כדי לסגור פערים, מצאו מילים ארוכות (5+ אותיות) ושמרו על דיוק גבוה.",
   },
   wordHuntPromo: {
-    title: "אתגרו חברים בציד מילים!",
-    subtitle: "מצאו את מילת המטרה הנסתרת לפני היריבים. חיים, הדחה, וכאוס מוחלט!",
-    cta: "שחקו עכשיו",
-    dismiss: "אולי אחר כך",
-    imageAlt: "שני שחקנים בקרב מילים אפי",
+    title: "נסו את מצב ציד מילים!",
+    subtitle: "מצאו את מילת המטרה הנסתרת במולטיפלייר",
+    cta: "שחקו ציד מילים",
+    dismiss: "אולי מאוחר יותר",
+    imageAlt: "דו-קרב ציד מילים במולטיפלייר",
   },
   gameModes: {
     classic: {
@@ -8486,7 +8518,7 @@ const he = {
     }
   },
   "encouragement": {
-    "gameStart": "אתם יכולים! החליקו אותיות כדי למצוא מילים",
+    "gameStart": "יאללה! אתם יכולים! 🎯",
     "firstWord": "יפה! המשיכו למצוא מילים!",
     "longWord": "מדהים! מילים ארוכות שוות יותר!",
     "combo": "קומבו! אתם על גל!",
@@ -8505,6 +8537,13 @@ const he = {
       "timeout": "נגמר הזמן",
       "unknown": "מילה לא חוקית"
     }
+  },
+  "languages": {
+    "english": "אנגלית",
+    "hebrew": "עברית",
+    "swedish": "שוודית",
+    "japanese": "יפנית",
+    "spanish": "ספרדית"
   }
 };
 

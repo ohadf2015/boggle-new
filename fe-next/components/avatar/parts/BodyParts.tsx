@@ -195,12 +195,70 @@ function Turtleneck({ fill, shirtColor }: BodyPartProps) {
   );
 }
 
+function OffShoulder({ fill, shirtColor }: BodyPartProps) {
+  const top = shirtColor || '#E85D9B';
+  const topShadow = darken(top);
+  const neckShade = darken(fill, 0.25);
+  return (
+    <g>
+      {/* Slender neck */}
+      <rect x="43" y="68" width="14" height="14" rx="3" fill={neckShade} stroke="#000" strokeWidth={S} />
+      {/* Exposed shoulders — skin visible above neckline */}
+      <path d="M0 100 L0 89 Q0 80 12 77 L43 73 L57 73 L88 77 Q100 80 100 89 L100 100Z"
+        fill={neckShade} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Off-shoulder top — dropped neckline exposing collarbone area */}
+      <path d="M0 100 L0 89 Q0 82 8 80 L28 78 Q36 82 50 82 Q64 82 72 78 L92 80 Q100 82 100 89 L100 100Z"
+        fill={top} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Shoulder shading */}
+      <path d="M0 89 Q0 82 8 80 L18 79 Q4 84 4 92 L4 100 L0 100Z" fill={topShadow} stroke="none" opacity={0.45} />
+      <path d="M100 89 Q100 82 92 80 L82 79 Q96 84 96 92 L96 100 L100 100Z" fill={topShadow} stroke="none" opacity={0.45} />
+      {/* Collarbone detail — visible above dropped neckline */}
+      <path d="M30 77 Q43 73 50 74 Q57 73 70 77" fill="none" stroke="#000" strokeWidth={1} opacity={0.15} strokeLinecap="round" />
+      {/* Draped neckline edge */}
+      <path d="M28 78 Q36 82 50 82 Q64 82 72 78" fill="none" stroke={topShadow} strokeWidth={1.5} opacity={0.4} />
+      {/* Fabric drape lines */}
+      <line x1="44" y1="86" x2="42" y2="100" stroke={topShadow} strokeWidth={1.5} opacity={0.2} />
+      <line x1="56" y1="86" x2="58" y2="100" stroke={topShadow} strokeWidth={1.5} opacity={0.2} />
+    </g>
+  );
+}
+
+function CropTop({ fill, shirtColor }: BodyPartProps) {
+  const top = shirtColor || '#FF6B35';
+  const topShadow = darken(top);
+  const neckShade = darken(fill, 0.25);
+  return (
+    <g>
+      {/* Slender neck */}
+      <rect x="43" y="68" width="14" height="14" rx="3" fill={neckShade} stroke="#000" strokeWidth={S} />
+      {/* Midriff — skin visible at bottom */}
+      <path d="M0 100 L0 89 Q0 80 12 77 L43 73 L57 73 L88 77 Q100 80 100 89 L100 100Z"
+        fill={neckShade} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Crop top — ends above waist, scoop neck */}
+      <path d="M8 92 L8 83 Q8 78 16 76 L43 73 L57 73 L84 76 Q92 78 92 83 L92 92 Q80 94 50 94 Q20 94 8 92Z"
+        fill={top} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Shoulder shading */}
+      <path d="M8 83 Q8 78 16 76 L26 75 Q12 80 12 86 L12 92 L8 92Z" fill={topShadow} stroke="none" opacity={0.45} />
+      <path d="M92 83 Q92 78 84 76 L74 75 Q88 80 88 86 L88 92 L92 92Z" fill={topShadow} stroke="none" opacity={0.45} />
+      {/* Scoop neckline */}
+      <path d="M43 73 Q50 80 57 73" fill={neckShade} stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      {/* Crop bottom edge detail */}
+      <path d="M12 92 Q30 94 50 94 Q70 94 88 92" fill="none" stroke={topShadow} strokeWidth={1.2} opacity={0.35} />
+      {/* Shirt crease */}
+      <line x1="46" y1="82" x2="44" y2="92" stroke={topShadow} strokeWidth={1} opacity={0.2} />
+      <line x1="54" y1="82" x2="56" y2="92" stroke={topShadow} strokeWidth={1} opacity={0.2} />
+    </g>
+  );
+}
+
 export const BODY_PARTS = {
   male: Male,
   female: Female,
   hoodie: Hoodie,
   suit: Suit,
   turtleneck: Turtleneck,
+  offShoulder: OffShoulder,
+  cropTop: CropTop,
 } as const;
 
 export type BodyPart = keyof typeof BODY_PARTS;

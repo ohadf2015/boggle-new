@@ -27,7 +27,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     authorBio: 'Former ESL tutor, obsessive word game player, and the person who once convinced a room of skeptical teachers that Boggle counts as assessment.',
     sections: [
       {
-        content: `Let me tell you about Marcus. He was a seventh grader in my ESL class back when I was tutoring, and he hated reading. Hated it. Every time I handed out a worksheet, he'd slouch so far down in his chair he was basically horizontal. His vocabulary scores were in the bottom quartile. His parents were worried. His teacher was worried. I was worried.
+        content: `Marcus was a seventh grader in my ESL class back when I was tutoring, and he hated reading. Hated it. Every time I handed out a worksheet, he'd slouch so far down in his chair he was basically horizontal. His vocabulary scores were in the bottom quartile. His parents were worried. His teacher was worried. I was worried.
 
 Then one afternoon, on a whim, I pulled out a Boggle set instead of the usual worksheet. "Five minutes," I said. "Find as many words as you can. Whoever gets the most wins a candy bar."
 
@@ -40,94 +40,92 @@ That was eight years ago. Marcus is in college now, studying communications. I'd
 I've been thinking about that moment ever since. And it turns out, there's a mountain of research that explains exactly why it worked.`,
       },
       {
-        title: 'The Vocabulary Gap: A Crisis Hiding in Plain Sight',
-        content: `Before we talk about solutions, let's talk about the problem. Because the vocabulary gap in education is genuinely alarming, and it's gotten worse.
+        title: 'The vocabulary gap',
+        content: `The vocabulary gap in education is genuinely alarming, and it's gotten worse.
 
-By age three, children from high-income families have been exposed to roughly 30 million more words than children from low-income families. This is the famous "30 Million Word Gap" finding from Hart and Risley's 1995 study. While the exact number has been debated and refined in subsequent research, the core finding remains: early vocabulary exposure varies dramatically by socioeconomic status.
+By age three, children from high-income families have been exposed to roughly 30 million more words than children from low-income families. Hart and Risley's 1995 study. The exact number has been debated since then, but the core finding stands: early vocabulary exposure varies dramatically by socioeconomic status.
 
-By the time kids enter school, these gaps are already significant. A landmark study by Biemiller (2003) found that first graders' vocabulary sizes ranged from about 2,500 words to over 8,000 words. That's not a gap — that's a chasm.
+By the time kids enter school, these gaps are already significant. Biemiller (2003) found that first graders' vocabulary sizes ranged from about 2,500 words to over 8,000 words. Not a gap. A chasm.
 
-And here's the kicker: vocabulary knowledge is one of the strongest predictors of academic success across ALL subjects, not just language arts. A student who doesn't know the word "hypothesis" will struggle in science. A student who doesn't understand "inequality" will struggle in math. Vocabulary is the invisible infrastructure of learning.
+Vocabulary knowledge is one of the strongest predictors of academic success across all subjects, not just language arts. A student who doesn't know the word "hypothesis" will struggle in science. A student who doesn't understand "inequality" will struggle in math. Vocabulary is the invisible infrastructure of learning.
 
-The National Reading Panel found that vocabulary instruction is one of the five essential components of effective reading programs. Yet in many classrooms, vocabulary teaching consists of "look up these ten words in the dictionary and write sentences." We've known for decades that this doesn't work — it produces short-term memorization without deep understanding. Students pass the Friday quiz and forget the words by Monday.
+The National Reading Panel found that vocabulary instruction is one of the five essential components of effective reading programs. Yet in many classrooms, vocabulary teaching still consists of "look up these ten words in the dictionary and write sentences." This produces short-term memorization without deep understanding. Students pass the Friday quiz and forget the words by Monday.
 
-So what does work? Repeated exposure in varied contexts. Active engagement with words. Opportunities to use new vocabulary in meaningful ways. And — this is where it gets interesting — play.`,
+What does work? Repeated exposure in varied contexts. Active engagement with words. Opportunities to use new vocabulary in meaningful ways. And play.`,
       },
       {
-        title: 'The Research: Game-Based Learning Actually Works',
-        content: `I know, I know. "Game-based learning" has become such a buzzword that it's practically meaningless. Every edtech startup claims their product "gamifies" learning. Most of them just added a points system to a worksheet.
+        title: 'Game-based learning actually works',
+        content: `"Game-based learning" has become such a buzzword that it's practically meaningless. Every edtech startup claims their product "gamifies" learning. Most of them just added a points system to a worksheet.
 
-But the research on actual word games — not gamified worksheets, but genuine games where language manipulation IS the gameplay — is stronger than you'd expect.
+But the research on actual word games, genuine games where language manipulation is the gameplay, is stronger than you'd expect.
 
-A meta-analysis by Acquah and Katz (2020), published in Computers & Education, reviewed 30 studies on digital game-based language learning and found significant positive effects on vocabulary acquisition. The effect size was moderate to large (d = 0.67), which in educational research terms is meaningful.
+Acquah and Katz (2020) reviewed 30 studies on digital game-based language learning in Computers & Education and found significant positive effects on vocabulary acquisition. The effect size was moderate to large (d = 0.67).
 
-More specifically, a study by Hung et al. (2018) in the British Journal of Educational Technology found that students who learned vocabulary through word games showed 40% better retention at a four-week follow-up compared to students who learned through traditional instruction. Not 40% better immediately after — 40% better a month later. The games weren't just more engaging; they produced more durable learning.
+Hung et al. (2018) found that students who learned vocabulary through word games showed 40% better retention at a four-week follow-up compared to traditional instruction. Not 40% better immediately. 40% better a month later. The games produced more durable learning.
 
 Why? The researchers point to several mechanisms:
 
-Incidental learning: In a word game, you're not trying to "study" vocabulary. You're trying to win. The vocabulary acquisition happens as a side effect of gameplay. This reduces the anxiety and resistance that explicit vocabulary instruction often triggers — especially in struggling learners like Marcus.
+Incidental learning: You're not trying to "study" vocabulary. You're trying to win. The vocabulary acquisition happens as a side effect. This reduces the anxiety and resistance that explicit instruction triggers, especially in struggling learners like Marcus.
 
-Repeated exposure: A single round of Boggle might expose a student to dozens of words, many of which they'll see multiple times as they scan the grid. Spaced repetition — encountering words at intervals — is one of the most well-established principles in memory science.
+Repeated exposure: A single round of Boggle might expose a student to dozens of words, many seen multiple times while scanning the grid. Spaced repetition is one of the most well-established principles in memory science.
 
-Active processing: In a word game, you're not passively reading a definition. You're actively constructing words, testing combinations, making decisions about which letter patterns form real words. This depth of processing (what cognitive scientists call "elaborative encoding") creates stronger memory traces.
+Active processing: You're not passively reading a definition. You're constructing words, testing combinations, deciding which letter patterns form real words. Cognitive scientists call this "elaborative encoding," and it creates stronger memory traces.
 
-Emotional engagement: Winning feels good. Finding a long word feels good. Beating your friend feels good. Positive emotions during learning enhance memory consolidation. This isn't pop psychology — it's supported by neuroimaging studies showing that emotional arousal during encoding strengthens hippocampal memory formation.`,
+Emotional engagement: Winning feels good. Finding a long word feels good. Beating your friend feels good. Neuroimaging studies show that emotional arousal during encoding strengthens hippocampal memory formation. This isn't pop psychology.`,
       },
       {
-        title: 'ESL and EFL: Where Word Games Really Shine',
-        content: `If word games are effective for native speakers, they're even more powerful for English Language Learners (ELLs).
+        title: 'ESL and EFL: where word games really shine',
+        content: `If word games work for native speakers, they're even more powerful for English Language Learners.
 
-Learning a second language is fundamentally a vocabulary problem. Grammar matters, pronunciation matters, but the single biggest barrier to fluency is vocabulary size. Research by Nation (2006) established that you need to know approximately 8,000-9,000 word families to understand 98% of general written English. Most ELL students know far fewer.
+Learning a second language is fundamentally a vocabulary problem. Grammar matters, pronunciation matters, but the single biggest barrier to fluency is vocabulary size. Nation (2006) established that you need approximately 8,000-9,000 word families to understand 98% of general written English. Most ELL students know far fewer.
 
-Traditional ESL vocabulary instruction has a well-documented problem: it's boring. Flashcards, word lists, fill-in-the-blank exercises — these methods treat vocabulary learning as rote memorization. And while some memorization is necessary, it's insufficient for deep word knowledge. Knowing a word means knowing its spelling, pronunciation, meaning, collocations, connotations, and register. A flashcard gives you one of those.
+Traditional ESL vocabulary instruction has a well-documented problem: it's boring. Flashcards, word lists, fill-in-the-blank exercises. These methods treat vocabulary learning as rote memorization. Knowing a word means knowing its spelling, pronunciation, meaning, collocations, connotations, and register. A flashcard gives you one of those.
 
-Word games address multiple dimensions simultaneously. Consider what happens when an ELL student plays a timed word search game:
+Word games address multiple dimensions simultaneously. An ELL student playing a timed word search game sees the spelling, subvocalizes pronunciations, accesses meanings to verify words are real, encounters words near other words. All under time pressure, which increases attention.
 
-They see the spelling (orthographic knowledge). They subvocalize the pronunciations (phonological knowledge). They access meanings to verify words are real (semantic knowledge). They encounter words in close proximity to other words (collocational awareness). And they do all of this under time pressure, which increases attention and engagement.
+Aghlara and Tamjid (2011) found that Iranian EFL learners who used word games scored significantly higher on vocabulary tests than those who received traditional instruction. The word game group also reported dramatically lower anxiety. For ELL students who already experience significant language anxiety, this matters.
 
-A study by Aghlara and Tamjid (2011) found that Iranian EFL learners who used word games scored significantly higher on vocabulary tests than those who received traditional instruction. Critically, the word game group also reported dramatically lower anxiety levels. For ELL students, who often experience significant language anxiety, this reduction in stress is itself a learning advantage.
-
-I saw this firsthand with my ESL students. The ones who froze during oral exercises would come alive during word games. The pressure shifted from "perform language correctly in front of everyone" to "find words faster than your classmates." It's a subtle but important shift.`,
+I saw it with my own students. The ones who froze during oral exercises would come alive during word games. The pressure shifted from "perform language correctly in front of everyone" to "find words faster than your classmates." Subtle difference. Big impact.`,
       },
       {
-        title: 'Classroom Implementation: What Actually Works',
-        content: `Alright, enough theory. Let's talk practice. How do you actually use word games in a classroom without it devolving into chaos?
+        title: 'Classroom implementation: what actually works',
+        content: `Enough theory. How do you actually use word games in a classroom without it devolving into chaos?
 
-I've watched a lot of teachers try and fail at this, and the failures almost always come from the same mistake: treating the game as a reward rather than as instruction. "If you finish your worksheets, you can play Boggle" is not game-based learning. It's bribery with extra steps.
+I've watched a lot of teachers try and fail at this. The failures almost always come from the same mistake: treating the game as a reward rather than as instruction. "If you finish your worksheets, you can play Boggle" is not game-based learning. It's bribery with extra steps.
 
-Here's what works:
+What works:
 
-Structured warm-ups (5-7 minutes): Start class with a quick word game round. It activates vocabulary networks, gets students engaged immediately, and provides a low-stakes entry point for the day's material. I used to start every ESL class with a three-minute Boggle round using letters relevant to that day's vocabulary theme.
+Structured warm-ups, five to seven minutes. Start class with a quick round. It activates vocabulary networks and provides a low-stakes entry point. I used to start every ESL class with a three-minute Boggle round using letters relevant to that day's vocabulary theme.
 
-Vocabulary introduction through games: Instead of presenting new words via a list, introduce them through gameplay first. Let students encounter the words in a game context, then discuss definitions afterward. This follows the "experience first, formalize later" principle that learning sciences have validated repeatedly.
+Vocabulary introduction through games. Instead of presenting new words via a list, introduce them through gameplay first. Let students encounter the words in a game context, then discuss definitions afterward. Experience first, formalize later.
 
-Differentiated challenges: This is where word games really outperform traditional instruction. In a timed word grid, struggling students can find three-letter words while advanced students hunt for six-letter words. Everyone is doing the same activity at their own level. The differentiation is built into the game mechanic — you don't need to create three separate worksheets.
+Differentiated challenges. In a timed word grid, struggling students find three-letter words while advanced students hunt for six-letter words. Everyone does the same activity at their own level. No need to create three separate worksheets.
 
-Collaborative play: Pair a stronger student with a weaker one. They search together, and the stronger student naturally models vocabulary knowledge. "Oh, THERMAL is a word — it means relating to heat." This peer teaching happens organically during gameplay in a way that feels nothing like instruction.
+Collaborative play. Pair a stronger student with a weaker one. The stronger student naturally models vocabulary knowledge: "Oh, THERMAL is a word, it means relating to heat." This peer teaching happens organically in a way that feels nothing like instruction.
 
-Post-game reflection: After the game, spend five minutes discussing interesting words that came up. "Did anyone find a word they didn't know? What was it? What do you think it means?" This is where the incidental learning gets consolidated into explicit knowledge.`,
+Post-game reflection. Five minutes discussing interesting words. "Did anyone find a word they didn't know?" This is where incidental learning gets consolidated into explicit knowledge.`,
       },
       {
-        title: 'Differentiated Instruction: Meeting Every Student',
-        content: `One of the biggest challenges in any classroom is the range of ability levels. In a typical class, you might have students reading two grade levels above and two grade levels below their peers. Traditional vocabulary instruction — everyone gets the same word list — fails both ends of this spectrum.
+        title: 'Differentiated instruction',
+        content: `The range of ability levels in any classroom is the perennial headache. Two grade levels above, two below, everyone gets the same word list. Traditional vocabulary instruction fails both ends.
 
-Word games solve this problem elegantly.
+Word games solve this without any extra prep.
 
-In a game like Boggle or LexiClash, the challenge automatically scales to the player's level. A student with a limited vocabulary will find shorter, more common words: CAT, THE, RAN. A student with an advanced vocabulary will find longer, rarer words: THEREIN, CATCHER, STRANGE. Both students are engaged, both are challenged, and neither is bored or frustrated.
+In Boggle or LexiClash, the challenge scales automatically. A student with a limited vocabulary finds CAT, THE, RAN. A student with an advanced vocabulary finds THEREIN, CATCHER, STRANGE. Both engaged, both challenged.
 
-Educational researchers call this "naturally differentiated" instruction, and the best part is it requires no additional preparation from the teacher. You don't need to create tiered word lists or design different activities for different groups. The game mechanic does the differentiation for you.
+Educational researchers call this "naturally differentiated" instruction. The game mechanic does the differentiation. No tiered word lists. No separate activity sheets for different groups.
 
-For students with learning disabilities, word games offer additional benefits. Research by Rosas et al. (2003) found that game-based instruction was particularly effective for students with attention difficulties, likely because the time pressure and competitive elements maintain engagement in ways that worksheets cannot.
+Rosas et al. (2003) found game-based instruction was particularly effective for students with attention difficulties. Time pressure and competition maintain engagement in ways that worksheets cannot.
 
-For gifted students, word games provide genuine challenge without the social stigma of "extra work." Finding that seven-letter word is intrinsically motivating in a way that an advanced vocabulary worksheet is not.
+For gifted students, finding that seven-letter word is intrinsically motivating in a way that an advanced vocabulary worksheet will never be.
 
-I had a student with dyslexia who struggled terribly with reading assignments but consistently outperformed her classmates at word games. The visual-spatial scanning required in a letter grid played to her cognitive strengths rather than her weaknesses. Her confidence in that context transferred gradually to other language tasks. Games can reveal abilities that traditional assessment misses.`,
+I had a student with dyslexia who struggled terribly with reading assignments but consistently outperformed her classmates at word games. The visual-spatial scanning in a letter grid played to her cognitive strengths rather than her weaknesses. Her confidence transferred gradually to other language tasks. Games reveal abilities that traditional assessment misses.`,
       },
       {
-        title: 'Assessment Through Play: Yes, It Counts',
-        content: `Here's where I usually get pushback from administrators: "That's nice, but how do you assess it?"
+        title: 'Assessment through play',
+        content: `Administrators always push back here: "That's nice, but how do you assess it?"
 
-Fair question. And the answer is: more easily than you'd think.
+More easily than you'd think.
 
 Word games generate observable, measurable data. In a single five-minute round, you can assess:
 
@@ -143,51 +141,35 @@ Growth over time: Track scores across multiple sessions. Vocabulary growth becom
 
 Digital word games like LexiClash make this even easier by automatically tracking scores, words found, and difficulty levels. You get a dashboard of vocabulary performance without having to grade a single paper.
 
-The key insight for administrators is this: word games don't replace assessment. They ARE assessment — formative, continuous, low-stakes assessment that captures data traditional tests miss. A student who finds PHOTOSYNTHESIS in a letter grid knows the word in a way that circling it on a multiple-choice test doesn't demonstrate.`,
+The key insight: word games don't replace assessment. They are assessment. Formative, continuous, low-stakes assessment that captures data traditional tests miss. A student who finds PHOTOSYNTHESIS in a letter grid knows the word in a way that circling it on a multiple-choice test doesn't demonstrate.`,
       },
       {
-        title: 'Digital vs. Analog: Does the Format Matter?',
-        content: `Should you use physical board games or digital apps? The honest answer: both, and it depends on your goals.
+        title: 'Digital vs. analog',
+        content: `Physical board games or digital apps? Both. Depends on your goals.
 
-Physical word games (Scrabble tiles, Boggle sets, printed word searches) have advantages:
+Physical word games have obvious advantages. They're tactile. Handling letter tiles creates stronger memory associations. They're social by default, students facing each other, talking, laughing. And they don't require technology. No charging, no Wi-Fi, no "my screen is broken." In under-resourced schools, this matters.
 
-They're tactile. For younger students especially, physically handling letter tiles creates stronger memory associations. There's research from embodied cognition showing that motor involvement during learning enhances retention.
+Digital word games solve different problems. Instant validation: the app tells you immediately if a word is valid. Automatic difficulty scaling. Data collection, every word found, every score, every session logged. Multilingual support so a student can play in their home language then switch to English. Accessibility features like text-to-speech and adjustable fonts.
 
-They're social by default. Students are facing each other, talking, negotiating, laughing. The social dimension of learning is not just "nice to have" — it's a cognitive amplifier.
-
-They don't require technology. No charging, no Wi-Fi, no "my screen is broken." In under-resourced schools, this matters a lot.
-
-Digital word games have different advantages:
-
-Instant validation: The app tells you immediately if a word is valid. No more "is that really a word?" arguments (which, while educational, eat into playing time).
-
-Automatic difficulty scaling: Algorithms can adjust challenge level based on player performance.
-
-Data collection: Every word found, every score, every session is logged. This data is gold for teachers tracking student progress.
-
-Multilingual support: Digital platforms can offer word games in multiple languages, which is a big deal in multilingual classrooms. A student can play in English, then switch to their home language, building vocabulary bridges between languages.
-
-Accessibility: Text-to-speech, adjustable fonts, color-blind modes — digital platforms can accommodate diverse learning needs more readily than physical games.
-
-My recommendation: use physical games for social, collaborative activities and digital games for individual practice and assessment. The two formats cover each other's blind spots.`,
+Use physical games for social, collaborative activities. Digital games for individual practice and assessment. They cover each other's blind spots.`,
       },
       {
-        title: 'LexiClash in the Classroom: What Makes It Different',
-        content: `I should be transparent: I'm writing this on the LexiClash blog, so take my enthusiasm with appropriate seasoning. But I genuinely believe this platform addresses gaps that other classroom word games don't.
+        title: 'LexiClash in the classroom',
+        content: `Full transparency: I'm writing this on the LexiClash blog. Season my enthusiasm accordingly. But this platform addresses gaps that other classroom word games don't.
 
-The multilingual angle is the big one. LexiClash supports Hebrew, English, Swedish, Japanese, and Spanish. In a diverse classroom — which is most classrooms in 2026 — this matters. An ELL student can play in their home language to build confidence, then switch to English for challenge. The core mechanic is the same regardless of language, so the skills transfer.
+The multilingual angle is the big one. LexiClash supports Hebrew, English, Swedish, Japanese, and Spanish. In a diverse classroom, which is most classrooms in 2026, an ELL student can play in their home language to build confidence, then switch to English for challenge. Same mechanic regardless of language, so the skills transfer.
 
-The real-time multiplayer is where it gets interesting for teachers. When students compete simultaneously on the same grid, you get peer modeling, social motivation, and natural differentiation all at once. It's Boggle's original insight — everyone plays at the same time — supercharged with modern technology.
+Real-time multiplayer is where it gets interesting for teachers. Students competing simultaneously on the same grid means peer modeling, social motivation, and natural differentiation all at once. Boggle's original insight, supercharged.
 
-The daily challenge feature creates a routine. Teachers who use it report that students arrive in class already talking about the day's puzzle. It becomes a shared cultural reference point, which is exactly what classroom community-building research recommends.
+The daily challenge creates routine. Teachers report that students arrive in class already talking about the day's puzzle. Shared cultural reference point, which is exactly what community-building research recommends.
 
-And the scoring system rewards both breadth (many words) and depth (long, rare words), which means different students can develop different strategies and still feel successful. A student who finds thirty short words and a student who finds ten long words can both be "winners" in their own way.
+The scoring rewards both breadth and depth. A student who finds thirty short words and a student who finds ten long words can both feel successful.
 
-Is LexiClash the only tool you need? Of course not. But as one element in a vocabulary instruction toolkit — alongside direct instruction, wide reading, discussion, and writing — it fills a niche that traditional methods leave empty: engaged, repeated, emotionally positive vocabulary encounters that students actually ask to do again.
+Is LexiClash the only tool you need? No. But alongside direct instruction, wide reading, discussion, and writing, it fills a niche traditional methods leave empty: engaged, repeated, emotionally positive vocabulary encounters that students actually ask to do again.
 
-That's the real test of any educational tool. Not "does it teach?" but "do they want to come back?"
+The real test of any educational tool isn't "does it teach?" It's "do they want to come back?"
 
-Marcus did. And that's what I keep coming back to.`,
+Marcus did.`,
       },
       {
         content: `Sources:

@@ -20,6 +20,8 @@ export const AVATAR_HAIR_STYLES = [
   'pigtails', 'topknot', 'sideshave', 'dreads', 'braids', 'bun', 'bangs', 'twintails',
   'mullet', 'combover', 'elvis', 'ramen', 'flame', 'galaxy', 'neon',
   'pixie', 'undercut', 'spaceBuns', 'straight', 'fade', 'cornrows', 'wolfCut',
+  'curtainBangs', 'halfUp', 'himecut',
+  'frenchBob', 'shag', 'flatTop', 'lob', 'fingerWaves', 'curlyBangs', 'quiff', 'sideSwept',
 ] as const;
 
 /** Styles that look feminine — shown when gender is female */
@@ -27,6 +29,8 @@ export const FEMALE_HAIR_STYLES = [
   'none', 'long', 'bob', 'ponytail', 'wavy', 'pigtails', 'sideshave', 'braids',
   'bun', 'bangs', 'twintails', 'curly', 'afro', 'topknot', 'dreads',
   'pixie', 'spaceBuns', 'straight', 'wolfCut', 'cornrows',
+  'curtainBangs', 'halfUp', 'himecut',
+  'frenchBob', 'shag', 'lob', 'fingerWaves', 'curlyBangs', 'sideSwept',
 ] as const;
 
 /** Styles that look masculine — shown when gender is male */
@@ -34,6 +38,7 @@ export const MALE_HAIR_STYLES = [
   'none', 'spiky', 'curly', 'buzz', 'mohawk', 'afro', 'topknot', 'dreads',
   'mullet', 'combover', 'elvis', 'ramen',
   'undercut', 'fade', 'cornrows', 'wolfCut', 'ponytail', 'bun', 'straight',
+  'flatTop', 'quiff', 'shag', 'sideSwept',
 ] as const;
 
 /** Default hair when switching to female */
@@ -54,6 +59,7 @@ export const AVATAR_EYE_STYLES = [
   'hypno', 'money', 'alien', 'crying', 'galaxy', 'flame', 'robot', 'void', 'infinity',
   'curious', 'determined', 'doe',
   'closed', 'catPupils', 'wide', 'squint', 'sad',
+  'wingedLiner', 'smokyEye',
 ] as const;
 
 // ==================== Eyebrows ====================
@@ -75,6 +81,7 @@ export const AVATAR_MOUTH_STYLES = [
   'vampire', 'kiss', 'braces', 'drool', 'goldTooth', 'mustache', 'whistle',
   'zipper', 'blowfish', 'gap', 'pipe', 'dragon', 'diamond', 'glitch',
   'frown', 'pout', 'bubbleGum', 'buckTeeth', 'sideSmile',
+  'lipstick', 'lipGloss',
 ] as const;
 
 // ==================== Accessories ====================
@@ -86,6 +93,7 @@ export const AVATAR_ACCESSORIES = [
   'samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown',
   'monkeyEars',
   'beanie', 'catEars', 'flowerCrown', 'goggles', 'bunnyEars', 'cyberpunkVisor',
+  'bow', 'pearls', 'heartGlasses', 'choker', 'butterflyClip',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
@@ -98,7 +106,7 @@ export const AVATAR_SHIRT_COLORS = [
 ] as const;
 
 // ==================== Body Styles ====================
-export const AVATAR_BODY_STYLES = ['default', 'hoodie', 'suit', 'turtleneck'] as const;
+export const AVATAR_BODY_STYLES = ['default', 'hoodie', 'suit', 'turtleneck', 'offShoulder', 'cropTop'] as const;
 
 // ==================== Background Colors ====================
 export const AVATAR_BG_COLORS = [
@@ -152,37 +160,34 @@ export const DEFAULT_AVATAR_CONFIG: CustomAvatarConfig = {
 };
 
 // ==================== Premium Part Definitions (VIP tier) ====================
-// VIP = visually striking, fun. ~40% of standard parts.
+// VIP = aspirational but attainable. ~25-35% of parts per category.
+// Philosophy: free players get enough variety for a unique avatar,
+// VIP parts are noticeably cooler / themed / cosplay.
 
 export const PREMIUM_EYE_STYLES = [
   'laser', 'hypno', 'money', 'alien',
-  'star', 'sparkle', 'hearts', 'cyclops',
-  'monocleEye', 'catPupils',
+  'cyclops', 'monocleEye',
 ] as const;
 
 export const PREMIUM_MOUTH_STYLES = [
   'goldTooth', 'pipe', 'vampire',
-  'cat', 'zipper', 'blowfish',
-  'kiss', 'mustache',
+  'zipper', 'blowfish',
 ] as const;
 
 export const PREMIUM_ACCESSORIES = [
-  'crown', 'tiara', 'halo', 'viking', 'devilHorns', 'headphones', 'chefHat',
+  'crown', 'tiara', 'viking', 'devilHorns', 'headphones',
   'monocle', 'eyepatch', 'mask', 'sombrero',
-  'cucumberFace', 'monkeyEars', 'plunger',
-  'mustacheGlasses', 'propellerHat',
-  'catEars', 'bunnyEars', 'flowerCrown', 'goggles', 'beanie',
+  'flowerCrown',
 ] as const;
 
 export const PREMIUM_HAIR_STYLES = [
-  'elvis', 'ramen',
-  'mohawk', 'sideshave', 'twintails',
+  'elvis', 'ramen', 'twintails',
   'undercut', 'spaceBuns',
 ] as const;
 
 export const PREMIUM_BG_COLORS = ['#FF0000', '#000000', '#4B0082', '#FFD700'] as const;
 
-export const PREMIUM_BASES = ['hexagon', 'blob', 'diamond', 'heart'] as const;
+export const PREMIUM_BASES = ['diamond'] as const;
 
 // ==================== Epic Part Definitions (Legendary tier) ====================
 // Gradient-filled, multi-layer, jaw-dropping showpieces. 3-5x VIP price.
@@ -196,7 +201,7 @@ export const EPIC_BASES = ['skull', 'shield', 'dragonHead'] as const;
 export const PREMIUM_EYEBROW_STYLES = ['arched', 'bushy', 'scarred'] as const;
 export const EPIC_EYEBROW_STYLES = ['angryThick'] as const;
 
-export const PREMIUM_FACIAL_HAIR_STYLES = ['vanDyke', 'handlebar', 'pencilMustache', 'fuManchu'] as const;
+export const PREMIUM_FACIAL_HAIR_STYLES = ['vanDyke', 'handlebar', 'fuManchu'] as const;
 export const EPIC_FACIAL_HAIR_STYLES = ['wizardBeard', 'braidedBeard'] as const;
 
 // ==================== Per-Part Pricing ====================
@@ -222,45 +227,31 @@ export const VIP_PART_PRICES: Record<string, number> = {
   'eyes:hypno': 450,
   'eyes:money': 400,
   'eyes:alien': 450,
-  'eyes:star': 300,
-  'eyes:sparkle': 300,
-  'eyes:hearts': 350,
   'eyes:cyclops': 400,
   'eyes:monocleEye': 350,
   // ── Mouth (VIP) ──
   'mouth:goldTooth': 500,
   'mouth:pipe': 450,
   'mouth:vampire': 400,
-  'mouth:cat': 300,
   'mouth:zipper': 350,
   'mouth:blowfish': 350,
-  'mouth:kiss': 300,
-  'mouth:mustache': 300,
   // ── Accessories (VIP) ──
   'accessory:crown': 800,
   'accessory:tiara': 700,
-  'accessory:halo': 600,
   'accessory:viking': 650,
   'accessory:devilHorns': 500,
   'accessory:headphones': 450,
-  'accessory:chefHat': 400,
   'accessory:monocle': 500,
   'accessory:eyepatch': 400,
   'accessory:mask': 450,
   'accessory:sombrero': 500,
-  'accessory:cucumberFace': 350,
-
-  'accessory:plunger': 300,
-  'accessory:mustacheGlasses': 400,
-  'accessory:propellerHat': 350,
+  'accessory:flowerCrown': 500,
   // ── Hair (VIP) ──
   'hair:elvis': 600,
   'hair:ramen': 550,
-  'hair:mohawk': 400,
-  'hair:sideshave': 450,
   'hair:twintails': 500,
-  // ── Eyes (VIP new) ──
-  'eyes:catPupils': 400,
+  'hair:undercut': 450,
+  'hair:spaceBuns': 500,
   // ── Eyebrows (VIP) ──
   'eyebrows:arched': 350,
   'eyebrows:bushy': 300,
@@ -268,22 +259,9 @@ export const VIP_PART_PRICES: Record<string, number> = {
   // ── Facial Hair (VIP) ──
   'facialHair:vanDyke': 500,
   'facialHair:handlebar': 600,
-  'facialHair:pencilMustache': 400,
   'facialHair:fuManchu': 500,
-  // ── Hair (VIP new) ──
-  'hair:undercut': 450,
-  'hair:spaceBuns': 500,
-  // ── Accessories (VIP new) ──
-  'accessory:catEars': 400,
-  'accessory:bunnyEars': 400,
-  'accessory:flowerCrown': 500,
-  'accessory:goggles': 450,
-  'accessory:beanie': 350,
   // ── Bases (VIP) ──
-  'base:hexagon': 800,
-  'base:blob': 750,
   'base:diamond': 900,
-  'base:heart': 700,
   // ── Background Colors (VIP) ──
   'bgColor:#FF0000': 250,
   'bgColor:#000000': 300,

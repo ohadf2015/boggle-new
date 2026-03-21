@@ -31,113 +31,113 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 If this has ever happened to you — mixing up languages mid-game, mid-sentence, mid-thought — congratulations. Your brain is not broken. It's actually doing something fascinating, and recent research suggests the very thing that feels like a glitch might be a feature.
 
-But let me be honest with you upfront: some of the claims about bilingual brains have been wildly overstated. The "bilingual advantage" is one of the most contested ideas in cognitive science right now. So I'm going to tell you what we actually know, what we think we know, and where the science gets plain weird.`,
+Fair warning, though: some of the claims about bilingual brains have been wildly overstated. The "bilingual advantage" is one of the most contested ideas in cognitive science right now. I'm going to tell you what we actually know, what we think we know, and where the science gets plain weird.`,
       },
       {
-        title: 'The Revised Hierarchical Model (Or: Why Your Brain Is a Terrible Filing Clerk)',
+        title: 'The revised hierarchical model (or: your brain is a terrible filing clerk)',
         content: `Back in 1994, Judith Kroll and Erica Stewart proposed something called the Revised Hierarchical Model. Sounds intimidating. It's actually pretty intuitive.
 
-Imagine your brain has a giant filing cabinet labeled "Concepts" — dog, love, justice, that embarrassing thing you said in 2007. Then you have separate drawers for each language. One for English words, one for Spanish, one for whatever else you speak.
+Imagine your brain has a giant filing cabinet labeled "Concepts." Dog, love, justice, that embarrassing thing you said in 2007. Then you have separate drawers for each language. One for English words, one for Spanish, one for whatever else you speak.
 
 When you're a beginner in a new language, you can't go directly from concept to word. You have to route through your first language. You see a dog, think "dog" in English, then translate to "perro." It's slow. It's effortful. It's why beginning language students look like they're doing long division when they try to order coffee.
 
-But here's where it gets interesting. As you get more proficient, your brain starts building direct highways from concepts to your second language. You see a dog and think "perro" without the English detour. The bridge becomes unnecessary.
+But as you get more proficient, your brain starts building direct highways from concepts to your second language. You see a dog and think "perro" without the English detour. The bridge becomes unnecessary.
 
-Except — and this is the kicker — the old route never fully shuts down. Both languages remain active simultaneously. All the time. Even when you're only using one. Your brain is running two (or three, or four) language systems in parallel, constantly, whether you asked it to or not.
+Except the old route never fully shuts down. Both languages remain active simultaneously. All the time. Even when you're only using one. Your brain is running two (or three, or four) language systems in parallel, constantly, whether you asked it to or not.
 
 This is why you type "bibliotek" when you mean "bottle." Your Swedish lexicon was active the whole time, sitting in the background like a browser tab you forgot to close, occasionally shouting suggestions.`,
       },
       {
-        title: 'Languages Don\'t Take Turns. They Fight.',
+        title: 'Languages don\'t take turns. They fight.',
         content: `Research published in Bilingualism: Language and Cognition confirmed something that multilingual people have always intuitively known: your languages compete for access. It's not a polite queue. It's a mosh pit.
 
-When you're using English, your brain has to actively suppress your other languages. The technical term is "inhibitory control" — your prefrontal cortex is essentially telling Swedish to sit down and be quiet while English has the microphone. And when you switch to Swedish, your brain has to un-suppress it and suppress English instead.
+When you're using English, your brain has to actively suppress your other languages. The technical term is "inhibitory control." Your prefrontal cortex is essentially telling Swedish to sit down and be quiet while English has the microphone. And when you switch to Swedish, your brain has to un-suppress it and suppress English instead.
 
-This takes real cognitive effort. It's measurable. It's one of the reasons bilinguals sometimes take a fraction of a second longer to retrieve words in either language — both systems are interfering with each other. (More on that counterintuitive finding in a moment.)
+This takes real cognitive effort. It's measurable. It's one of the reasons bilinguals sometimes take a fraction of a second longer to retrieve words in either language. Both systems are interfering with each other. More on that counterintuitive finding in a moment.
 
-Here's where it gets practical for word game players. After an hour of playing in English, the inhibition on your other language starts to weaken. Your brain gets tired of being the bouncer. So Swedish words start leaking through. Hebrew characters start appearing at the edges of your consciousness. And suddenly you're trying to play "שלום" on an English board.
+This gets practical fast for word game players. After an hour of playing in English, the inhibition on your other language starts to weaken. Your brain gets tired of being the bouncer. So Swedish words start leaking through. Hebrew characters start appearing at the edges of your consciousness. And suddenly you're trying to play "שלום" on an English board.
 
 This isn't a bug. It's your brain's resource management system running low on fuel.`,
       },
       {
-        title: 'The Bilingual Advantage: Real, Exaggerated, or It\'s Complicated?',
-        content: `Okay. Here's where I have to be straight with you, because most articles about bilingualism will tell you that speaking multiple languages makes you smarter, more empathetic, better at multitasking, more attractive to employers, and probably taller.
+        title: 'The bilingual advantage: real, exaggerated, or it\'s complicated?',
+        content: `Most articles about bilingualism will tell you that speaking multiple languages makes you smarter, more empathetic, better at multitasking, more attractive to employers, and probably taller.
 
 The reality is messier.
 
-The "bilingual advantage" hypothesis — the idea that managing two languages gives you better executive function, better attentional control, better cognitive flexibility — was enormously popular in the 2000s and 2010s. And there IS research supporting it. Ellen Bialystok's lab produced study after study showing bilinguals outperforming monolinguals on tasks requiring inhibitory control.
+The "bilingual advantage" hypothesis, the idea that managing two languages gives you better executive function and cognitive flexibility, was enormously popular in the 2000s and 2010s. And there is research supporting it. Ellen Bialystok's lab produced study after study showing bilinguals outperforming monolinguals on tasks requiring inhibitory control.
 
-But then came the replication crisis. Several large-scale studies failed to find the advantage. A 2019 meta-analysis by Lehtonen and colleagues looked at 152 studies and found... well, not much. The effects were small to negligible once publication bias was accounted for.
+But then came the replication crisis. Several large-scale studies failed to find the advantage. A 2019 meta-analysis by Lehtonen and colleagues looked at 152 studies and found not much. The effects were small to negligible once publication bias was accounted for.
 
-Does this mean bilingualism has no cognitive benefits? No. It means the benefits are probably more specific and context-dependent than the headlines suggested. Some studies DO find advantages, particularly in specific tasks, in certain populations, under certain conditions. The question isn't "does bilingualism help your brain?" — it's "when, how much, and for whom?"
+Does this mean bilingualism has no cognitive benefits? No. It means the benefits are probably more specific and context-dependent than the headlines suggested. Some studies do find advantages, particularly in specific tasks, in certain populations, under certain conditions. The question isn't "does bilingualism help your brain?" It's "when, how much, and for whom?"
 
-A 2023 study in Frontiers in Psychology examined 266 French Canadian bilinguals and found that regular code-switchers — people who bounce between languages frequently — DID show advantages in inhibitory control. The key word there is "regular." It wasn't just knowing two languages. It was actively using both, switching between them, in natural contexts.
+A 2023 study in Frontiers in Psychology examined 266 French Canadian bilinguals and found that regular code-switchers, people who bounce between languages frequently, did show advantages in inhibitory control. The key word there is "regular." It wasn't just knowing two languages. It was actively using both, switching between them, in natural contexts.
 
 Which, if you think about it, is exactly what you're doing when you play word games in multiple languages. Just saying.`,
       },
       {
-        title: 'Nigel Richards and the Case of the Impossible Scrabble Champion',
-        content: `I need to tell you about Nigel Richards, because his story breaks everyone's brain and I find it endlessly delightful.
+        title: 'Nigel Richards won French Scrabble without speaking French',
+        content: `Nigel Richards' story breaks everyone's brain and I find it endlessly delightful.
 
 Nigel Richards is a New Zealander. He speaks English. Just English. He won the English-language World Scrabble Championship five times, which is impressive but not the interesting part.
 
 In 2015, he won the French-language World Scrabble Championship. Without speaking French.
 
-Let me repeat that. He memorized the entire French Scrabble dictionary — roughly 386,000 words — without understanding what any of them meant. He treats words as pure patterns. Letter combinations. Mathematical objects. He doesn't know that "maison" means house. He knows that M-A-I-S-O-N is a legal tile arrangement worth a certain number of points.
+Read that again. He memorized the entire French Scrabble dictionary — roughly 386,000 words — without understanding what any of them meant. He treats words as pure patterns. Letter combinations. Mathematical objects. He doesn't know that "maison" means house. He knows that M-A-I-S-O-N is a legal tile arrangement worth a certain number of points.
 
 He later did the same thing in Spanish.
 
 What does this tell us about the brain? A few things. First, that lexical knowledge (knowing words) and semantic knowledge (knowing what words mean) are separable in the brain. The Revised Hierarchical Model actually predicted this — there's a lexical level and a conceptual level, and they can be decoupled.
 
-Second, it tells us that pattern recognition in word games is a skill that transcends language. The combinatorial reasoning you develop playing in English doesn't disappear when you switch to Hebrew or Japanese. The specific letters change, but the underlying cognitive machinery — scanning for patterns, evaluating possibilities, weighing probabilities — stays the same.
+Second, it tells us that pattern recognition in word games is a skill that transcends language. The combinatorial reasoning you develop playing in English doesn't disappear when you switch to Hebrew or Japanese. The specific letters change, but the underlying cognitive machinery stays the same. Scanning for patterns, evaluating possibilities, weighing probabilities.
 
-Third, and most importantly for us mortals who AREN'T Nigel Richards: you don't need to be a savant to benefit from cross-linguistic word play. The mere act of engaging with different orthographic systems exercises your brain's pattern-matching circuits in ways that monolingual play doesn't.`,
+Third, and most importantly for those of us who aren't Nigel Richards: you don't need to be a savant to benefit from cross-linguistic word play. The mere act of engaging with different orthographic systems exercises your brain's pattern-matching circuits in ways that monolingual play doesn't.`,
       },
       {
-        title: 'The Tip-of-the-Tongue Paradox',
-        content: `Here's something that will sound counterintuitive: bilinguals experience more tip-of-the-tongue moments than monolinguals. Not fewer. More.
+        title: 'The tip-of-the-tongue paradox',
+        content: `Something counterintuitive: bilinguals experience more tip-of-the-tongue moments than monolinguals. Not fewer. More.
 
-You know that feeling. The word is RIGHT THERE. You can feel its shape. You know it starts with a... something. You can almost taste it. But it won't come out.
+You know that feeling. The word is right there. You can feel its shape. You know it starts with a... something. You can almost taste it. But it won't come out.
 
-Research by Gollan and Acenas (2004) found that bilinguals experience this more frequently in BOTH their languages. The reason goes back to the competition model. When you have two (or more) lexicons competing for activation, each individual word gets slightly less total activation than it would in a monolingual system. It's like splitting your bandwidth between two WiFi networks.
+Research by Gollan and Acenas (2004) found that bilinguals experience this more frequently in both their languages. The reason goes back to the competition model. When you have two (or more) lexicons competing for activation, each individual word gets slightly less total activation than it would in a monolingual system. It's like splitting your bandwidth between two WiFi networks.
 
-But — and this is the paradox — this apparent weakness might be training a strength. Every time your brain resolves a tip-of-the-tongue moment, every time it successfully retrieves the right word from the right language despite interference from the other, it's exercising the same retrieval and inhibition circuits that underlie executive function.
+The paradox: this apparent weakness might be training a strength. Every time your brain resolves a tip-of-the-tongue moment, every time it successfully retrieves the right word from the right language despite interference from the other, it's exercising the same retrieval and inhibition circuits that underlie executive function.
 
-Think of it like weight training. The extra resistance (competing languages) makes each rep harder. But it also makes you stronger.
+Think of it like weight training. The extra resistance makes each rep harder. But it also makes you stronger.
 
 I notice this in LexiClash constantly. When I switch from an English session to Hebrew, the first minute or two feels like running through mud. Words come slower. I second-guess letters. But by the third round, something shifts. My brain has adjusted its filters, and Hebrew words start flowing. And when I switch back to English afterward? Paradoxically, it feels sharper than when I started. Like I've been doing cognitive stretches.
 
 That's anecdotal, of course. I'm one person. But the research on code-switching and cognitive flexibility supports the general pattern.`,
       },
       {
-        title: 'False Friends: The Landmines of Multilingual Word Games',
+        title: 'False friends: the landmines of multilingual play',
         content: `If you've ever played word games across languages, you've stepped on a false friend. And it's always hilarious until it happens to you.
 
-False friends (or "false cognates" if you want to sound fancy at parties) are words that look similar across languages but mean completely different things. "Gift" in English means present. "Gift" in Swedish means poison. "Gift" in German ALSO means poison. (Germanic languages, apparently, have strong feelings about presents.)
+False friends , sometimes called false cognates, are words that look similar across languages but mean completely different things. "Gift" in English means present. "Gift" in Swedish means poison. "Gift" in German also means poison. Germanic languages apparently have strong feelings about presents.
 
 "Embarrassed" in English vs. "embarazada" in Spanish — which means pregnant. "Preservatif" in French doesn't mean preservative. It means condom. Good luck explaining THAT one at dinner.
 
 For word game players, false friends create a unique kind of cognitive interference. You see the letters G-I-F-T on your rack and your brain has to resolve: am I playing in English (good word, means present) or Swedish (also good word, means poison/married)? The letters are identical. The meaning is irrelevant in the game context — all that matters is whether it's a valid word in the target language. But your brain doesn't know that. Your brain insists on activating the meaning alongside the form, because that's what brains do.
 
-This is actually where the Revised Hierarchical Model makes a concrete prediction. At low proficiency, you're mostly processing at the word level — the form "gift" activates through your L1 (first language). At high proficiency, you're processing at the concept level — "gift" activates the MEANING directly. And that's when false friends become most dangerous, because now you've got two conflicting meanings activating simultaneously.
+This is actually where the Revised Hierarchical Model makes a concrete prediction. At low proficiency, you're mostly processing at the word level, where the form "gift" activates through your L1. At high proficiency, you're processing at the concept level, and "gift" activates the meaning directly. And that's when false friends become most dangerous, because now you've got two conflicting meanings activating simultaneously.
 
 I've lost more LexiClash rounds to false friends than I'd like to admit. Playing in Swedish after an English session, I once spent thirty seconds convinced "bra" was a valid English word meaning "good." It is a valid English word, of course. Just not the kind of "good" my Swedish brain was thinking of.`,
       },
       {
-        title: 'Cross-Linguistic Transfer: Your Languages Are Helping Each Other (Mostly)',
+        title: 'Cross-linguistic transfer: your languages are helping each other (mostly)',
         content: `A 2024 study from PMC on working memory and cross-linguistic influence found something language learners have suspected for centuries: knowing multiple languages accelerates learning new ones. Researchers call this "cross-linguistic transfer."
 
-The mechanism is elegant. When you learn a third language, you're not starting from scratch. You've already built the cognitive infrastructure for managing multiple language systems. You've got the inhibition circuits. You've got the switching mechanisms. You've got practice dealing with competing lexicons. Your brain has, in a sense, been pre-trained for multilingualism.
+When you learn a third language, you're not starting from scratch. You've already built the cognitive infrastructure for managing multiple language systems. You've got the inhibition circuits. You've got the switching mechanisms. You've got practice dealing with competing lexicons. Your brain has, in a sense, been pre-trained for multilingualism.
 
-Neurocognitive findings show that bilinguals' languages are continuously activated, even in monolingual contexts. The brain doesn't "turn off" a language — it suppresses it. And that continuous low-level activation means your languages are constantly cross-pollinating. Phonological patterns from one language influence pronunciation in another. Syntactic structures transfer. Even writing direction can influence spatial cognition (more on that when we talk about Hebrew).
+Neurocognitive findings show that bilinguals' languages are continuously activated, even in monolingual contexts. The brain doesn't "turn off" a language. It suppresses it. And that continuous low-level activation means your languages are constantly cross-pollinating. Phonological patterns from one language influence pronunciation in another. Syntactic structures transfer. Even writing direction can influence spatial cognition.
 
-For word game players, cross-linguistic transfer manifests in pattern recognition. After playing LexiClash in English and Swedish, I started noticing letter patterns in Japanese (hiragana) faster than I expected. Not because there's any linguistic similarity between Swedish and Japanese — there obviously isn't — but because my brain had gotten better at the meta-skill of parsing unfamiliar symbol combinations.
+For word game players, cross-linguistic transfer manifests in pattern recognition. After playing LexiClash in English and Swedish, I started noticing letter patterns in Japanese (hiragana) faster than I expected. Not because Swedish and Japanese have anything in common. They obviously don't. But because my brain had gotten better at the meta-skill of parsing unfamiliar symbol combinations.
 
 This is the real "bilingual advantage," if you ask me. Not some general-purpose IQ boost. But a specific, trainable skill in managing multiple symbol systems simultaneously.`,
       },
       {
-        title: 'Four Languages, Four Brain Workouts: The LexiClash Experiment',
-        content: `Full disclosure: I play LexiClash, and I love it. So take this section with appropriate salt. But I think there's something uniquely interesting about a word game that supports Hebrew, English, Swedish, and Japanese — because these aren't four variations on the same theme. They're four completely different writing systems that challenge your brain in different ways.
+        title: 'Four languages, four brain workouts',
+        content: `Full disclosure: I play LexiClash, and I love it. Take this section with appropriate salt. But a word game that supports Hebrew, English, Swedish, and Japanese is interesting because these aren't four variations on the same theme. They're four completely different writing systems that challenge your brain in different ways.
 
 English is an alphabet with notoriously irregular spelling. You need strong memorization alongside pattern recognition. The challenge is orthographic — "ough" makes at least seven different sounds, and you just have to know which words use which.
 
@@ -147,35 +147,35 @@ Hebrew operates right-to-left with an abjad writing system — consonants are pr
 
 Japanese uses three scripts simultaneously — hiragana, katakana, and kanji — each serving different functions. Playing in Japanese exercises a completely different dimension of linguistic processing: you're not just finding words, you're navigating between writing systems within a single language.
 
-When I play LexiClash across all four languages in one session (yes, I've done this; no, my family doesn't understand why), the cognitive experience is noticeably different each time. English feels like solving a familiar puzzle. Swedish feels like solving that puzzle in a funhouse mirror. Hebrew feels like solving it while reading backward (because you literally are). Japanese feels like solving three different puzzles simultaneously.
+I've played LexiClash across all four languages in one session. My family doesn't understand why. The cognitive experience is noticeably different each time. English feels like solving a familiar puzzle. Swedish feels like solving that puzzle in a funhouse mirror. Hebrew feels like solving it while reading backward (because you literally are). Japanese feels like solving three different puzzles simultaneously.
 
-And here's the thing I've noticed after months of doing this: I get better at all of them. Not just incrementally, but in ways that feel connected. Getting faster at Hebrew pattern recognition makes me notice letter clusters in English that I used to miss. The lateral thinking required for Japanese kanji compounds helps me see longer words in Swedish.
+After months of this, I get better at all of them. Not just incrementally, but in ways that feel connected. Getting faster at Hebrew pattern recognition makes me notice letter clusters in English that I used to miss. The lateral thinking required for Japanese kanji compounds helps me see longer words in Swedish.
 
 Is this the cross-linguistic transfer the researchers talk about? I think so. But it could also just be that playing a lot of word games makes you better at word games. Sometimes the simplest explanation is the right one.`,
       },
       {
-        title: 'Code-Switching as Cognitive Cross-Training',
-        content: `We've been dancing around this, so let me say it directly: the act of switching between languages — what linguists call code-switching — appears to function as cognitive cross-training.
+        title: 'Code-switching as cognitive cross-training',
+        content: `The act of switching between languages, what linguists call code-switching, appears to function as cognitive cross-training.
 
-The 2023 Frontiers in Psychology study I mentioned earlier found that regular code-switchers showed advantages in inhibitory control. But there's a nuance that most summaries miss: it wasn't passive bilingualism that predicted the advantage. It was active switching. The people who benefited most were those who switched frequently, in natural contexts, with real communicative intent.
+The 2023 Frontiers in Psychology study I mentioned earlier found that regular code-switchers showed advantages in inhibitory control. But most summaries miss the nuance: it wasn't passive bilingualism that predicted the advantage. It was active switching. The people who benefited most were those who switched frequently, in natural contexts, with real communicative intent.
 
 This maps perfectly onto multilingual word gaming. When you play a round in English, switch to Hebrew, then try Swedish — you're not just passively "knowing" three languages. You're actively inhibiting two while deploying one, then reshuffling the deck. Over and over. Under time pressure. With points on the line.
 
-That's not just a word game. That's an inhibitory control workout disguised as entertainment.
+An inhibitory control workout disguised as entertainment.
 
-Now, should you play word games in multiple languages to "train your brain"? I'm not going to make that claim with a straight face. The evidence is suggestive, not conclusive. The bilingual advantage debate is still unresolved. And anyone who tells you they've found the one weird trick to cognitive enhancement is selling something.
+Should you play word games in multiple languages to "train your brain"? I'm not going to make that claim with a straight face. The evidence is suggestive, not conclusive. The bilingual advantage debate is still unresolved. And anyone who tells you they've found the one weird trick to cognitive enhancement is selling something.
 
-But I will say this: it's fun. It's really fun to watch your brain struggle and adapt across languages. To feel the gears shift. To notice yourself getting faster. And if there ARE cognitive benefits — even modest ones — they come wrapped in something you'd do anyway because it's entertaining.
+What I will say: it's fun. Really fun to watch your brain struggle and adapt across languages. To feel the gears shift. To notice yourself getting faster. And if there are cognitive benefits, even modest ones, they come wrapped in something you'd do anyway because it's entertaining.
 
 That's not nothing.`,
       },
       {
-        title: 'So What Should You Actually Do?',
-        content: `If you've made it this far (thank you — I know 1,500 words about neurolinguistics is a big ask on a Tuesday), here's my practical advice, for what it's worth:
+        title: 'Practical takeaways',
+        content: `If you've made it this far, 1,500 words about neurolinguistics on a Tuesday, you probably want something actionable. So:
 
-Play word games in your strongest language first. Get warmed up. Get your brain in "word mode." Then switch to another language. Don't worry when the first minute feels clunky — that's the inhibition reshuffling, and it's normal.
+Play word games in your strongest language first. Get warmed up. Get your brain in "word mode." Then switch to another language. Don't worry when the first minute feels clunky. That's the inhibition reshuffling. Normal.
 
-Try languages that are DIFFERENT from each other, not just close cousins. English and Swedish are fun, but the real cognitive stretch comes from adding something structurally different — like Hebrew with its RTL direction, or Japanese with its multiple scripts.
+Try languages that are different from each other, not just close cousins. English and Swedish are fun, but the real cognitive stretch comes from adding something structurally different. Hebrew with its RTL direction. Japanese with its multiple scripts.
 
 Don't beat yourself up over false friends and cross-language interference. It's not a sign of weakness. It's a sign that your languages are deeply integrated, which is exactly what you want.
 
@@ -185,7 +185,7 @@ The research on multilingual cognition is far from settled. The bilingual advant
 
 A word game you actually enjoy playing is worth more than a flashcard deck you'll abandon in a week. And a multilingual word game? That's just gravy.
 
-Now if you'll excuse me, I need to go figure out why my brain thinks "lagom" is an English word. (It should be. It's a great word. But that's another article.)`,
+Now if you'll excuse me, I need to go figure out why my brain thinks "lagom" is an English word. It should be. It's a great word. But that's another article.`,
       },
     ],
     backToBlog: 'Back to Blog',

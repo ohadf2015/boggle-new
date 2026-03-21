@@ -202,6 +202,24 @@ const nextConfig = {
   // Security headers and API caching
   async headers() {
     return [
+      // Service worker — must be served as JavaScript (not HTML fallback)
+      {
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, must-revalidate',
+          },
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/',
+          },
+        ],
+      },
       // Static asset caching — 1 year immutable for fingerprinted assets
       {
         source: '/images/:path*',

@@ -27,7 +27,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     authorBio: 'Multilingual word game obsessive who spent six months learning Hebrew roots just to be less terrible at Israeli Scrabble nights.',
     sections: [
       {
-        content: `I'm going to let you in on a secret that Hebrew word game players already know: playing word games in Hebrew is a fundamentally different experience from playing in English. Not harder, not easier — different. Like, structurally different at the DNA level.
+        content: `Hebrew word game players already know this, but playing word games in Hebrew is a fundamentally different experience from playing in English. Not harder, not easier. Different. Structurally different at the DNA level.
 
 In English, you look at a grid of letters and your brain searches for familiar patterns. C-A-T, T-H-E, S-T-R. You scan left to right, top to bottom, and letter combinations jump out at you because you've seen them a million times.
 
@@ -37,15 +37,15 @@ I fell in love with Hebrew word games about two years ago, when an Israeli frien
 
 This article is about that understanding. Whether you're a native Hebrew speaker curious about why your language is so unique for word games, a learner trying to level up, or a game designer wondering how to handle RTL languages, I think you'll find something here.
 
-Here's what I've learned about the most beautiful linguistic chaos I've ever encountered.`,
+So. The most beautiful linguistic chaos I've ever encountered.`,
       },
       {
-        title: 'Why Hebrew Is Special for Word Games: The Shoresh System',
+        title: 'The shoresh system, or why three letters unlock everything',
         content: `Every Hebrew word game player needs to understand one concept that has no real equivalent in English: the shoresh (שורש), or root system.
 
-In English, words are mostly arbitrary sequences of letters. CAT doesn't relate to CATALOG except by coincidence. RUNNING relates to RUN, but the connection is through adding a suffix, not through a deeper structural system.
+In English, words are mostly arbitrary sequences of letters. "cat" doesn't relate to "catalog" except by coincidence. "Running" relates to "run", but the connection is through adding a suffix, not through a deeper structural system.
 
-Hebrew is built entirely differently. Almost every word in the language derives from a three-letter root — the shoresh — that carries a core meaning. By inserting that root into different patterns (called mishkalim, or templates), you generate a family of related words.
+Hebrew is built entirely differently. Almost every word derives from a three-letter root, the shoresh, that carries a core meaning. By inserting that root into different patterns (called mishkalim, or templates), you generate a family of related words.
 
 Take the root כ-ת-ב (K-T-V), which relates to writing:
 
@@ -60,15 +60,15 @@ Take the root כ-ת-ב (K-T-V), which relates to writing:
 
 Eight words, all from three letters. And that's not even the full list.
 
-Now imagine you're playing a word game and you spot the letters כ, ת, and ב scattered across the grid. In English, seeing C, T, and B together doesn't trigger much. In Hebrew, your brain lights up: those three letters are a root. You know immediately that there's a family of words hiding in that combination. The question isn't IF there's a word — it's WHICH word you can form given the other letters available.
+Now imagine you're playing a word game and you spot the letters כ, ת, and ב scattered across the grid. In English, seeing C, T, and B together doesn't trigger much. In Hebrew, your brain lights up: those three letters are a root. You know immediately that there's a family of words hiding in that combination. The question stops being whether there's a word. It becomes which word you can form given the other letters available.
 
 This is what makes Hebrew word games intellectually thrilling in a way that's hard to describe to non-Hebrew speakers. Every root you recognize is a key that unlocks multiple doors. The more roots you know, the more the grid transforms from random letters into a web of interconnected possibilities.
 
 I once played a round where I found seven different words from a single three-letter root. My Israeli friend just nodded and said, "Now you're thinking in Hebrew." It was one of the best compliments I've ever received.`,
       },
       {
-        title: 'No Vowels, No Problem (Well, Some Problems)',
-        content: `Here's something that blows the minds of English speakers encountering Hebrew for the first time: written Hebrew mostly doesn't include vowels.
+        title: 'No vowels, no problem (well, some problems)',
+        content: `Written Hebrew mostly doesn't include vowels. If you're an English speaker encountering this for the first time, sit with that for a second.
 
 The letters you see on the page (or in a word game grid) are consonants. The vowels are implied. Native speakers just... know them. It's like reading "Cn y rd ths sntnc?" — except Hebrew speakers do it effortlessly because the language was designed this way from the ground up.
 
@@ -76,9 +76,9 @@ In formal or educational texts, you'll see tiny dots and dashes (nikkud) above a
 
 For word games, this creates a fascinating dynamic.
 
-First, it means that the same sequence of consonants can sometimes represent different words depending on which vowels you insert. The letters ד-ב-ר (D-V-R) could be davar (thing), diber (spoke), dever (plague), or dvar (word of). Context usually disambiguates, but in a word game grid, there IS no context. So players need to know all the possible readings.
+First, it means that the same sequence of consonants can sometimes represent different words depending on which vowels you insert. The letters ד-ב-ר (D-V-R) could be davar (thing), diber (spoke), dever (plague), or dvar (word of). Context usually disambiguates, but in a word game grid, there is no context. So players need to know all the possible readings.
 
-Second, it means the information density of Hebrew letters is higher than English letters. Each Hebrew letter carries more semantic weight because it's doing the job of a consonant AND implying possible vowel patterns. This makes Hebrew word games feel more... compressed. More concentrated. Every letter matters more.
+Second, it means the information density of Hebrew letters is higher than English letters. Each Hebrew letter carries more semantic weight because it's doing the job of a consonant and implying possible vowel patterns. This makes Hebrew word games feel more... compressed. More concentrated. Every letter matters more.
 
 Third — and this is where it gets tricky for game design — it means that validating words is more complex. In English, C-A-T is a word and C-T-A is not. Simple. In Hebrew, you need to check whether a consonant sequence, combined with any valid vowel pattern, produces a real word. The dictionary lookup is fundamentally more complex.
 
@@ -87,20 +87,18 @@ I've heard Hebrew Scrabble players describe this as "reading between the letters
 When I first started playing in Hebrew, I was terrible at this. I'd see three consonants and think, "Is that a word?" My Israeli friends would see the same three consonants and think, "That's at least four words." The gap between beginner and native is enormous, and most of it comes down to vowel intuition — the automatic, unconscious knowledge of which vowel patterns are valid.`,
       },
       {
-        title: 'RTL: When Everything You Know About Layout Is Wrong',
-        content: `Okay, let's talk about the elephant in the room — or rather, the elephant reading from the wrong side of the room.
+        title: 'RTL: when everything you know about layout is wrong',
+        content: `Hebrew is written and read right-to-left. If you're a game designer or developer, that single fact creates a cascade of design challenges that are genuinely fascinating.
 
-Hebrew is written and read right-to-left (RTL). If you're a game designer or developer, that single fact creates a cascade of design challenges that are genuinely fascinating.
+In an English word game, you scan the grid left to right, top to bottom. Your eyes follow the reading direction. Word patterns emerge along familiar axes.
 
-In an English word game, you scan the grid left to right, top to bottom. Your eyes naturally follow the reading direction of your language. Word patterns emerge along familiar axes.
-
-In Hebrew, the primary scanning direction flips. But here's the thing — it doesn't just flip horizontally. The entire spatial cognitive framework shifts. Hebrew speakers process visual information differently in game contexts because their reading direction has trained their spatial attention.
+In Hebrew, the primary scanning direction flips. But it doesn't just flip horizontally. The entire spatial cognitive framework shifts. Hebrew speakers process visual information differently in game contexts because their reading direction has trained their spatial attention.
 
 Research from the University of Haifa (2018) found that Hebrew speakers show a rightward spatial attention bias, while English speakers show a leftward bias. This means Hebrew players literally look at a letter grid differently. They start from the right side. Their eyes move differently. The words they find first are different.
 
 For game design, this has real implications:
 
-UI elements need to flip. Navigation arrows, progress bars, shadow directions — everything that implies directionality needs to mirror. At LexiClash, we flip our hard shadows from right-cast (4px 4px) to left-cast (-4px 4px) in RTL mode. It sounds small, but players notice when it's wrong. It creates a subtle feeling of "something is off" that breaks immersion.
+UI elements need to flip. Navigation arrows, progress bars, shadow directions. Everything that implies directionality needs to mirror. At LexiClash, we flip our hard shadows from right-cast (4px 4px) to left-cast (-4px 4px) in RTL mode. It sounds small, but players notice when it's wrong. It creates a subtle feeling of "something is off" that breaks immersion.
 
 Score displays and timers need to respect reading direction. In English, you might put the timer on the left and score on the right. In Hebrew, that feels backwards.
 
@@ -110,10 +108,10 @@ Animations need to respect directionality. A word sliding in from the left feels
 
 The hardest part? Bidirectional (BiDi) text. Hebrew text that includes English words, numbers, or abbreviations switches direction mid-line. The Unicode Bidirectional Algorithm handles this in plain text, but in a game UI with animations, transitions, and custom layouts, BiDi support requires careful, manual testing.
 
-I've seen games that clearly tested only in English. You can always tell because the Hebrew feels like wearing a shirt inside out — technically functional, but clearly not right. The best Hebrew word games feel native from the first moment. The UI doesn't just work in RTL — it thinks in RTL.`,
+I've seen games that clearly tested only in English. You can always tell because the Hebrew feels like wearing a shirt inside out — technically functional, but clearly not right. The best Hebrew word games feel native from the first moment. The UI doesn't just work in RTL. It thinks in RTL.`,
       },
       {
-        title: 'Hebrew Word Game Culture in Israel',
+        title: 'Word game culture in Israel',
         content: `Israel has a word game culture that rivals any country I've visited, and it has a uniquely Israeli flavor.
 
 Scrabble (or as it's known in Hebrew, שבץ נא — "Shvatz Na") has a dedicated following. There's something deeply satisfying about playing Scrabble in a language where the root system means that every rack of tiles contains hidden families of words waiting to be discovered.
@@ -122,19 +120,19 @@ But the culture goes beyond Scrabble. Hebrew crossword puzzles (תשבצים —
 
 Then there's the wordplay tradition. Hebrew is a language that loves puns and double meanings. The root system makes wordplay almost inevitable — when so many words share consonant patterns, double meanings are everywhere. Israeli humor relies heavily on this. Walk through Tel Aviv and you'll see shop names, restaurant names, and street art that play on Hebrew roots in clever ways.
 
-Hebrew also has a unique relationship with word creation. Because Modern Hebrew was essentially revived and modernized in the late 19th and 20th centuries — largely through the work of Eliezer Ben-Yehuda and the Academy of the Hebrew Language — there's a tradition of intentional word creation that English doesn't have.
+Hebrew also has a unique relationship with word creation. Because Modern Hebrew was essentially revived and modernized in the late 19th and 20th centuries, largely through the work of Eliezer Ben-Yehuda and the Academy of the Hebrew Language, there's a tradition of intentional word creation that English doesn't have.
 
 New Hebrew words are often constructed by fitting modern concepts into ancient root patterns. The word for "telephone" (טלפון, "telefon") is a direct loanword, but "computer" (מחשב, "makhshev") comes from the root ח-ש-ב (to think/calculate). "Electricity" (חשמל, "khashmal") was pulled from an obscure biblical word that originally referred to a mysterious gleaming substance in the Book of Ezekiel.
 
 For word game players, this means Hebrew has layers. Ancient words coexist with modern coinages. Biblical Hebrew, Mishnaic Hebrew, and Modern Hebrew all contribute vocabulary. A single game might include a 3,000-year-old word from the Torah sitting next to a word that was invented in 2015 for a concept that didn't exist before smartphones.
 
-This layered vocabulary makes Hebrew word games uniquely rich. You're not just playing with words — you're playing with linguistic archaeology.
+This layered vocabulary makes Hebrew word games uniquely rich. You're not just playing with words. You're playing with linguistic archaeology.
 
 I asked an Israeli competitive Scrabble player what makes Hebrew Scrabble special. She said: "In English, you memorize words. In Hebrew, you understand structures. Once you know the patterns, new words aren't surprises — they're predictions." That distinction captures something essential about the Hebrew word game experience.`,
       },
       {
-        title: 'Tips for Hebrew Learners Playing Word Games',
-        content: `If you're learning Hebrew and want to use word games as a study tool — which I highly recommend — here are the strategies that actually work, based on my own painful learning curve.
+        title: 'What actually works if you\'re learning Hebrew through games',
+        content: `If you're learning Hebrew and want to use word games as a study tool, these are the strategies that actually worked for me. Took a lot of painful losses to figure them out.
 
 Learn roots, not words. This is the single most important tip. When you encounter a new Hebrew word, don't just memorize it in isolation. Look up its three-letter root. Then look up other words from the same root. Suddenly, instead of learning one word, you've learned five. In a word game, root knowledge is exponentially more valuable than vocabulary size because one root unlocks many words.
 
@@ -151,7 +149,7 @@ Use word games to practice reading speed. One of the hardest things about learni
 Accept that you will lose. A lot. For a long time. Hebrew has a steeper word game learning curve than English because of the vowel system, the root system, and the richer morphology. But every game teaches you something, and the learning compounds. My scores in Hebrew word games have roughly tripled over two years. I still lose to native speakers, but the gap is shrinking.`,
       },
       {
-        title: 'Hebrew Slang and Modern Words in Word Games',
+        title: 'Slang, army words, and why the dictionary never sits still',
         content: `One of the joys of Hebrew word games is encountering the wild, creative, sometimes hilarious world of modern Hebrew slang.
 
 Hebrew slang is a beautiful mashup of influences. You'll find words borrowed from Arabic (יאללה — yalla, אחלה — akhla), English (קול — cool, literally spelled as "kol"), Russian (especially in older slang from 1990s immigration), and entirely homegrown creations that play with Hebrew's root system in clever ways.
@@ -166,11 +164,11 @@ Social media has accelerated Hebrew word creation. Hebrew speakers have coined w
 
 The military contributes heavily to Hebrew slang as well, given that most Israelis serve in the IDF. Words like גרבי (garbi — useless/bad, from the word for sock), משופשף (meshupshaf — experienced/seasoned, literally "rubbed"), and סמנכ"ל (samankhal — deputy CEO, an acronym) all originated in military culture and migrated to general use.
 
-For word game players, Hebrew slang never sits still, so the vocabulary keeps growing. New words become valid plays within years of their coinage. It keeps the game fresh in a way that more conservative languages don't experience.`,
+For word game players, this means the vocabulary never stops growing. New words become valid plays within years of coinage. It keeps the game fresh in a way that more conservative languages simply don't.`,
       },
       {
-        title: 'LexiClash\'s Hebrew Experience: Design Decisions',
-        content: `I want to pull back the curtain on how word games handle Hebrew, because the design decisions are genuinely interesting — and they reveal a lot about the relationship between language and game design.
+        title: 'Behind the curtain: designing a word game for Hebrew',
+        content: `The design decisions behind Hebrew word games reveal a lot about the relationship between language and game design. Worth getting into the weeds here.
 
 The first challenge is the dictionary. Which Hebrew words are "valid"? This sounds simple but it's deeply complex. Do you include biblical words that nobody uses in conversation? Talmudic Aramaic loan-words that have become part of Hebrew? Slang that's universally understood but technically not in the Academy's dictionary? Military abbreviations? Arabic-origin words?
 
@@ -184,13 +182,13 @@ The third challenge is the one I've been dancing around this whole article: righ
 
 Getting this right required extensive testing with Hebrew-speaking players. We learned that even small directional inconsistencies — a shadow that falls the wrong way, a progress bar that fills from the wrong side — create cognitive friction that degrades the experience. Hebrew players might not consciously notice these details, but they feel them.
 
-The result, when it works, is something I'm genuinely proud of: a word game that feels native in Hebrew. Not translated. Not adapted. Native. The grid feels right. The words flow naturally. The UI thinks in RTL. And when you find a seven-letter word built from a three-consonant root, with vowels your brain supplied automatically, reading right-to-left across a grid that shadows left — that's an experience that only Hebrew can offer.`,
+The result, when it works, is something I'm genuinely proud of: a word game that feels native in Hebrew. Not translated. Not adapted. Native. The grid feels right. The words flow naturally. The UI thinks in RTL. And when you find a seven-letter word built from a three-consonant root, with vowels your brain supplied automatically, reading right-to-left across a grid that shadows left? That's an experience only Hebrew can offer.`,
       },
       {
-        title: 'Why I Keep Coming Back to Hebrew Word Games',
-        content: `I started learning Hebrew because of a friend. I kept learning because of word games. That's not a joke — it's literally what happened.
+        title: 'Why I keep coming back',
+        content: `I started learning Hebrew because of a friend. I kept learning because of word games. That's not a joke. It's literally what happened.
 
-The shoresh system transformed my understanding of how languages can work. The vowel-less reading trained a kind of pattern recognition I didn't know I was capable of. The RTL shift made me aware of spatial biases I never knew I had. And the culture — the Friday crosswords, the Scrabble nights, the puns that only work if you know the roots — gave me a window into Israeli life that no guidebook could.
+The shoresh system transformed my understanding of how languages can work. The vowel-less reading trained a kind of pattern recognition I didn't know I was capable of. The RTL shift made me aware of spatial biases I never knew I had. And the culture. The Friday crosswords, the Scrabble nights, the puns that only work if you know the roots. It gave me a window into Israeli life that no guidebook could.
 
 Hebrew word games are harder than English ones. I won't pretend otherwise. The learning curve is steeper, the cognitive demands are higher, and native speakers have an enormous advantage because they've been reading vowel-less consonant skeletons since childhood.
 

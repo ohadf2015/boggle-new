@@ -25,8 +25,8 @@ import {
 import { DJMascotWithEntrance } from '@/components/ui/DJMascot';
 import { IdleMascot } from '@/components/ui/IdleMascot';
 import { useAuth } from '@/contexts/AuthContext';
-import { getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
-import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { cn } from '@/lib/utils';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
@@ -125,7 +125,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   // Avatar builder (player-only)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
-  const currentAvatar = getStoredCustomAvatar() ?? getRandomAvatarConfig();
+  const currentAvatar = getOrCreateStoredCustomAvatar();
 
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
