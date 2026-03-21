@@ -20,140 +20,112 @@ export type LocaleContent = {
 export const contentByLocale: Record<string, LocaleContent> = {
   en: {
     title: 'Why Playing Word Games With Friends Hits Different (The Science of Social Gaming)',
-    subtitle: 'Cooperative cognition, competitive trash talk, and why your brain literally lights up more when other humans are involved.',
+    subtitle: 'What happens in your brain when you add other humans to the mix, and why solo puzzling only gets you halfway there.',
     category: 'Social Science',
     readTime: '11 min read',
     authorName: 'The Word Nerd',
-    authorBio: 'Chronic word game evangelist who once made a stranger on a train play Boggle for four stops past their destination.',
+    authorBio: 'Once made a stranger on a train play Boggle four stops past their destination. No regrets on either side.',
     sections: [
       {
-        content: `Last Friday night I had two options. Option A: curl up on the couch with my phone and grind through some solo word puzzles. Option B: drag four friends to my apartment, open some snacks, and spend three hours screaming at each other over a shared letter grid.
+        content: `I keep a spreadsheet. (I know.) It tracks my word game scores going back about two years, tagged by whether I played solo or with other people. The solo column is fine. Respectable. The group column is consistently 15-20% higher.
 
-I chose Option B. Obviously.
+For a while I assumed I was just trying harder when friends were watching. That's part of it. But the real explanation is weirder and more interesting than "I don't want to look bad in front of Jake."
 
-And here's the thing — it wasn't just more fun. I played measurably better. My average word length went up. I found words I'd never have spotted alone. At one point I played QUIXOTIC and nearly blacked out from the dopamine rush, mostly because my friend Jake immediately called me a show-off, which somehow made it even better.
+Last Friday I had the choice between grinding puzzles on my couch or dragging four friends over for a loud, snack-fueled, three-hour word game marathon. I went with the marathon. At one point I found QUIXOTIC on the grid, and Jake called me a show-off, and the dopamine hit from that exchange was genuinely better than any solo high score I've ever posted.
 
-This isn't just me being dramatic (though I am, famously, dramatic). Research shows that playing word games socially — whether cooperative or competitive — activates different neural circuits than playing alone. Your brain literally operates in a different mode when other humans are in the mix.
-
-Let me walk you through what we know, what we're still figuring out, and why game night might be the best thing you can do for your brain this week.`,
+Turns out there's a reason for that. Your brain runs different software when other people are in the room. Not metaphorically. Actual different neural networks light up. The research on this is surprisingly clear, and it changed how I think about something I'd been doing casually for years.`,
       },
       {
-        title: 'Solo vs Social: Two Different Brains',
-        content: `Here's something that surprised me when I first read about it. When you play a word game alone, the primary regions that light up are language-processing areas — Broca's area, Wernicke's area, the dorsolateral prefrontal cortex. Standard stuff.
+        title: 'Your brain on solo vs. your brain on multiplayer',
+        content: `Solo word games activate the parts you'd expect. Broca's area, Wernicke's area, dorsolateral prefrontal cortex. Language processing. Working memory. The usual suspects.
 
-But when you add other players — even just one — a whole additional network kicks in. Neuroscientists call it the "social brain network," and it includes the medial prefrontal cortex (mPFC), the temporoparietal junction (TPJ), and the posterior superior temporal sulcus (pSTS).
+Add one other person and a whole second network comes online. Neuroscientists call it the "social brain network," which sounds grandiose, but it's just the medial prefrontal cortex, temporoparietal junction, and posterior superior temporal sulcus doing what they evolved to do: figure out what the other person is thinking.
 
-A landmark study by Redcay et al. (2010) published in Cerebral Cortex used fMRI to compare brain activity during solo tasks versus interactive social tasks. The social condition showed significantly greater activation in the mPFC and right TPJ — areas associated with mentalizing, or thinking about what other people are thinking.
+Redcay and colleagues stuck people in an fMRI machine in 2010 and compared solo tasks against interactive ones. The interactive condition lit up mentalizing regions significantly more. Published in Cerebral Cortex if you want to look it up.
 
-In word game terms: when you're playing alone, you're just searching for words. When you're playing with others, you're simultaneously tracking what words they might find, anticipating their strategy, monitoring the social dynamics, and managing your own performance anxiety. Your brain is doing double duty.
+What this means in practice: when I play alone, I'm searching for words. When I play across from Jake, I'm searching for words AND tracking what he might find AND adjusting my strategy based on his body language AND trying not to let him see that I'm stuck. My brain is multitasking in a way it never does solo.
 
-This isn't exhausting — it's energizing. The social brain network co-activates with the reward system. Playing with others literally makes the game more rewarding at a neurochemical level.
-
-I tested this informally on myself. I tracked my solo scores for a week, then my group-play scores for a week. My group scores were 15-20% higher on average. Part of that is social facilitation — a well-documented phenomenon where the mere presence of others improves performance on well-practiced tasks. Part of it is the competitive drive pushing me to dig deeper into my mental lexicon.`,
+You'd think that would be tiring. It isn't. The social brain network and the reward system activate together. More cognitive work, more pleasure. Weird trade, but I'll take it.`,
       },
       {
-        title: 'Competitive Cognition: Why Rivalry Sharpens Your Mind',
-        content: `Competition does strange things to the brain. And I mean that literally — fMRI studies show that competitive contexts activate the ventral striatum and anterior cingulate cortex in ways that cooperative or solo contexts don't.
+        title: 'Why rivalry makes you smarter (up to a point)',
+        content: `There was a study by Decety's group back in 2004 that I think about a lot. They told some participants they were competing against another person, and told others they were competing against a computer. Sometimes the "person" was actually an algorithm. Didn't matter. The participants who thought a human was on the other side showed ramped-up activation in reward anticipation and strategic planning regions.
 
-A study by Decety et al. (2004) in Neuropsychologia found that when participants believed they were competing against another person (versus a computer), their brain showed enhanced activation in regions associated with reward anticipation and strategic planning. The key phrase there is "believed they were competing" — in some conditions, the "opponent" was actually a pre-programmed algorithm. But the brain didn't care. The belief that a real human was on the other side was enough to trigger the competitive neural cascade.
+The brain doesn't care about the truth. It cares about the belief.
 
-This maps perfectly onto my experience with word games. When I play against a bot, I'm engaged. When I play against Jake — who I know is going to trash-talk me if he wins — I'm locked in. Every fiber of my being is searching for that seven-letter word.
+This tracks. When I play against a bot, I'm fine. Engaged enough. But when I play against someone who will absolutely roast me if I lose? Every neuron I've got is hunting for long words. The competitive pressure does something you can't replicate with a leaderboard or a high score target.
 
-The mechanism seems to be related to social comparison theory, first proposed by Leon Festinger in 1954. We're hardwired to evaluate our abilities relative to others. In a competitive word game, every word your opponent finds is a data point your brain uses to calibrate its own performance. Am I falling behind? I need to try harder. Am I ahead? How do I maintain this lead?
+Leon Festinger called this social comparison theory back in 1954. We evaluate ourselves relative to other people, not relative to some abstract standard. In a word game, every word your opponent finds recalibrates your internal "am I good enough?" meter. Behind? Push harder. Ahead? Don't get complacent.
 
-This constant social calibration keeps the prefrontal cortex engaged at a higher level than it would be during solo play. You're not just solving a puzzle — you're solving a puzzle while simultaneously running a real-time competitive simulation in your head.
-
-Here's the catch, though. Competition only enhances performance up to a point. Too much competitive pressure — especially in high-stakes environments — can trigger anxiety responses that actually impair cognitive function. The sweet spot is what psychologists call "optimal arousal" — competitive enough to be motivating, but not so competitive that it becomes stressful. This is why casual game nights feel so good. The stakes are low (bragging rights only), but the competitive drive is real.`,
+There's a ceiling though. Too much pressure flips the switch from "motivated" to "anxious," and anxious brains are bad at creative word-finding. The sweet spot is low-stakes competition. Bragging rights only. Which is probably why a casual game night feels so much better than a tournament.`,
       },
       {
-        title: 'The Jackbox Effect: Party Word Games and Collective Joy',
-        content: `If you've ever played a Jackbox party game, you know exactly what I'm talking about. There's a specific kind of joy that comes from wordplay in a group setting — a kind of collective creative electricity that doesn't exist when you're alone.
+        title: 'Party games and the thing that happens when everyone riffs at once',
+        content: `Jackbox ruined me. Before Jackbox I thought word games were a quiet, cerebral activity. Then I played Quiplash at a party and discovered that wordplay with a live audience is a completely different drug.
 
-Game designers have a term for this: "shared creative space." It's the idea that when multiple people are generating ideas simultaneously — coming up with funny answers, creative wordplay, or unexpected associations — the group produces something greater than any individual could alone.
+Game designers call it "shared creative space." Multiple people generating ideas at the same time, bouncing off each other, and the group output ends up somewhere none of them would've gone alone. There's a caveat here, actually. Osborn's brainstorming research from the 1950s found that individuals produce more ideas solo than in groups, because groups have social friction. People hold back, talk over each other, self-censor.
 
-Research on brainstorming and group creativity supports this, with an important caveat. Osborn's original brainstorming research from the 1950s actually found that individuals generate more ideas alone than in groups, due to production blocking and evaluation apprehension. BUT — and this is a big but — the ideas generated in groups tend to be more diverse and more creative when the group dynamics are right.
+But the ideas that DO come out of groups tend to be stranger and more creative, especially when the format is right. Word games are the right format. You've got structure (has to be a real word), time pressure (no overthinking), and instant crowd feedback ("WAIT, that's a WORD?!").
 
-Word games naturally create the right dynamics. The rules provide structure (you can't just say anything — it has to be a real word). The time pressure prevents overthinking. And the social setting provides immediate feedback — laughter, groans, "oh come ON, that's not a word."
+I still remember a Boggle round two years ago where my friend found ZOEAE. Half the table argued it wasn't a word. She pulled up the dictionary. It's the plural of zoea, a crustacean larva. The argument lasted longer than the round did. That's the kind of experience you just don't get playing on your phone at midnight.
 
-I call this the Jackbox Effect: the phenomenon where word games in a party setting produce more creative, memorable, and emotionally resonant experiences than the same games played alone. It's why Quiplash answers are funnier when you hear the room react. It's why finding an obscure word in Boggle feels ten times better when your friend goes "WAIT, that's a WORD?!"
-
-The neuroscience behind this involves mirror neurons and emotional contagion. When you see someone else react with surprise or delight, your brain mirrors that emotion. The joy of finding a good word gets amplified by the joy of seeing others react to it. It's a positive feedback loop of shared pleasure.`,
+Mirror neurons are part of why this works. When you see someone react to your word with genuine shock, your brain mirrors that emotion and amplifies the original pleasure. It becomes a feedback loop. Good word, big reaction, bigger feeling, try to top it next round.`,
       },
       {
-        title: 'COVID and the Digital Connection Lifeline',
-        content: `I need to talk about 2020 and 2021. Because the pandemic changed how we think about social gaming — and the research that came out of that period is fascinating.
+        title: 'What happened during lockdown',
+        content: `Words With Friends gained 40% more daily users in March 2020. Scrabble GO launched mid-pandemic and got downloaded millions of times. People were stuck inside and needed a way to feel connected that didn't require a Zoom happy hour.
 
-When lockdowns hit, board game sales skyrocketed. But so did online multiplayer word games. Words With Friends saw a 40% increase in daily active users in March 2020. Scrabble GO launched in the middle of the pandemic and was downloaded millions of times. People were desperately seeking social connection, and word games provided a unique form of it.
+Vuorre and colleagues published a study in Computers in Human Behavior in 2021 that found social gaming during lockdown was linked to better mental health. But only when the gaming involved actual back-and-forth interaction. Just playing alongside someone, or playing asynchronously without chatting, didn't have the same effect. The communication was the active ingredient.
 
-A study published in Computers in Human Behavior (2021) by Vuorre et al. found that social video gaming during the pandemic was associated with better mental wellbeing — but only when the gaming involved actual social interaction, not just playing alongside others. The key ingredient was communication: chatting, competing, cooperating.
+I can vouch for this anecdotally. My college friends and I started a weekly Boggle night over Zoom that spring. We told ourselves it was about the game. It was not about the game. It was about spending an hour yelling at each other about whether obscure words count, then spending another twenty minutes catching up on life while pretending we were still discussing the rules.
 
-Word games are particularly well-suited for this because they're inherently communicative. Even in an asynchronous game of Words With Friends, you're communicating through your word choices. Playing QUAINT after your opponent plays QUIRKY? That's a conversation. A weird, lexical conversation, but a conversation nonetheless.
-
-I played more online word games during lockdown than any other period of my life. And looking back, those games weren't really about the words. They were about maintaining connections. My weekly Boggle night over Zoom with college friends wasn't a gaming session — it was a social ritual disguised as a game. The word-finding was almost incidental. What mattered was the thirty seconds after each round when we'd argue about whether ZOEAE is a real word (it is — it's the plural of zoea, a larval stage of crustaceans, and yes, I am that person).
-
-The research suggests this isn't unusual. Social gaming during isolation served a genuine psychological need, and word games — with their low barrier to entry, flexible pacing, and inherent conversational nature — were uniquely positioned to fill that role.`,
+When I look back at 2020, those Thursday night Boggle sessions are among the clearest memories I have. Not because the games were good. Because the connection was. Even through a screen, with bad audio and someone's cat walking across the keyboard, it worked. Word games gave us an excuse to show up for each other without having to say "I'm lonely and I need to see your face."`,
       },
       {
-        title: 'The Local Multiplayer Renaissance',
-        content: `Here's a trend I find genuinely exciting. After years of gaming moving increasingly online, there's a renaissance of local multiplayer — people playing games together, in the same room, on the same screen or around the same table.
+        title: 'Same room, different game',
+        content: `Board game cafes went from under 1,000 worldwide in 2015 to over 5,000 by 2023. Party game sales have been outpacing every other board game category since 2019. There's clearly an appetite for playing together in person that the pandemic didn't kill. If anything, it made people hungrier for it.
 
-The data backs this up. Board game cafes have exploded globally — there were an estimated 5,000+ worldwide by 2023, up from fewer than 1,000 in 2015. Party game sales have outpaced other board game categories consistently since 2019. And in the digital space, local multiplayer games like Overcooked, Jackbox, and Keep Talking and Nobody Explodes have proven that couch co-op isn't dead — it was just waiting for the right games.
+I started hosting a monthly word game night after lockdowns ended. The setup is stupid simple. Snacks, a timer, letter tiles, and whoever shows up. No formal invitations. No complicated rules. Just show up and play.
 
-Word games fit perfectly into this renaissance. You don't need expensive hardware. You don't need to learn complex rules. You need letters and humans, and you're good to go.
+What keeps surprising me is how different it feels from our online sessions. Online is fun, but in person, there's information flowing that a screen can't transmit. Someone's knee bouncing because they're stuck. The little exhale when the grid is bad. A raised eyebrow across the table when your friend plays something unexpected.
 
-I've started hosting monthly word game nights. Nothing fancy — a few friends, some snacks, a timer, and a letter grid. What strikes me every time is how different the energy is compared to our online sessions. There's something about physical proximity that changes the whole experience.
-
-Part of it is nonverbal communication. A raised eyebrow when someone plays an unexpected word. The visible frustration of searching for a word you know is there. The synchronized groan when the timer runs out. These micro-interactions create a richer social experience than any chat window can replicate.
-
-Research on co-located versus remote collaboration supports this. A meta-analysis by Baltes et al. (2002) in Organizational Behavior and Human Decision Processes found that face-to-face groups outperformed remote groups on tasks requiring coordination and creative problem-solving. The physical presence of other people provides social cues that enhance both performance and satisfaction.`,
+Baltes and colleagues ran a meta-analysis in 2002 comparing face-to-face groups against remote ones. Face-to-face won on coordination and creative problem-solving. No shock there, but the effect size was bigger than I expected. Physical proximity changes how people think together, not just how they feel about being together. When I'm across from someone, I pick up on cues I'd never notice through a webcam, and those cues make me play differently.`,
       },
       {
-        title: 'Trash Talk as Bonding: The Paradox of Friendly Insults',
-        content: `Can I be honest about something? One of my favorite parts of multiplayer word games is the trash talk. And I don't think I'm alone in this.
+        title: 'The bonding power of calling your friend a lexical fraud',
+        content: `Nobody talks about this but the trash talk is half the point.
 
-There's a wonderful paradox at the heart of competitive social gaming: the insults bring you closer together. Calling your friend a "lexical fraud" when they play a two-letter word isn't aggressive — it's intimate. It signals a relationship secure enough to absorb playful hostility.
+Calling someone a "lexical fraud" when they play AT for two points. Gasping theatrically when your opponent finds a seven-letter word. The fake outrage, the mock devastation, the grudges that last exactly until the next round starts.
 
-Psychologists call this "affiliative teasing," and it's been studied extensively. Keltner et al. (2001) published research in the Journal of Personality and Social Psychology showing that teasing serves crucial social functions: it tests and reinforces social bonds, establishes group norms, and creates shared humor.
+Psychologists have a term for this: affiliative teasing. Keltner's group published work on it in 2001 showing that playful insults actually strengthen social bonds. They signal trust. You can only call someone a cheater if both of you know you don't mean it. It's a relationship stress-test that doubles as entertainment.
 
-In word games specifically, trash talk serves an additional function — it creates narrative. A round of Boggle without commentary is just a vocabulary exercise. A round of Boggle where Jake finds ZEPHYR and I respond with "oh sure, break out the Z words, very original, very creative, I definitely didn't see that" — that's a story. We'll reference it for weeks.
+But in word games, trash talk does something else too. It turns a vocabulary exercise into a story. My friend group still references the Sarah Incident. Three years ago she played QOPH (a Hebrew letter, technically valid) and triggered a twenty-minute rules debate that split the room. We bring it up at least once a month. Without the argument, that round would've been forgotten by the next morning.
 
-This narrative-building aspect of social gaming is underappreciated. Every game night generates inside jokes, recurring rivalries, and shared memories. My friend group still talks about the time Sarah played QOPH (a Hebrew letter) and sparked a twenty-minute debate about whether proper nouns should count. That was three years ago.
-
-The research on shared experiences and relationship quality is clear: couples and friend groups who engage in novel, exciting activities together report higher relationship satisfaction. Word games tick both boxes — they're novel (every grid is different) and exciting (time pressure plus competition equals arousal). Add in the trash talk, and you've got a bonding activity that masquerades as a simple game.`,
+Every game night generates this kind of material. Inside jokes, recurring bits, grudge matches. The research on shared novel experiences and relationship quality says this stuff matters. Couples and friend groups who do exciting things together report higher satisfaction. Word games check both boxes if you play them right. Novel grid every time, time pressure keeping the adrenaline up, and just enough competitive tension to make it feel like something's at stake. Even when the only stake is who buys snacks next time.`,
       },
       {
-        title: 'Family Game Night: What the Research Actually Shows',
-        content: `I grew up playing Scrabble with my parents every Sunday evening. At the time, I thought it was boring (I was twelve — everything was boring). Looking back, it was one of the most formative experiences of my childhood.
+        title: 'Scrabble with your parents might have been more important than you think',
+        content: `I played Scrabble with my parents every Sunday night growing up. At twelve I thought it was the most boring thing imaginable. At thirty I realized it might've been one of the most important things they did for me.
 
-The research on family game nights is surprisingly solid. A longitudinal study by Coyl-Shepherd and Newland (2013) published in the Journal of Family Issues found that families who regularly played games together reported stronger family cohesion, better parent-child communication, and higher family satisfaction — even controlling for other family activities.
+A longitudinal study by Coyl-Shepherd and Newland, published in the Journal of Family Issues in 2013, tracked families over time. The ones who played games together regularly had stronger cohesion, better parent-child communication, and higher satisfaction scores. And this held up even when they controlled for other family activities like meals together or shared hobbies.
 
-Word games are particularly effective for families because they naturally accommodate different skill levels. A six-year-old finding CAT on the same grid where a parent finds CATASTROPHE isn't losing — they're playing a different game at a different level, and everyone can celebrate each other's victories.
+Word games have a specific advantage for families: they don't require everyone to be at the same level. My niece started joining game night at seven, finding CAT and DOG while the adults hunted for longer words. She's eleven now. Last month she beat two of the adults. No formal instruction, no flashcards. She just absorbed vocabulary by sitting at the table.
 
-I've watched this play out with my niece. She started joining our word game nights at age seven, finding three-letter words while the adults hunted for longer ones. Now she's eleven and routinely beats some of the adults. The progression happened naturally, through exposure and practice, without any formal vocabulary instruction.
+There's a newer line of research on grandparent-grandchild gameplay that I find interesting. Both sides benefit. The grandparent gets cognitive stimulation and social engagement, which are two of the strongest protective factors against cognitive decline. The kid gets vocabulary exposure and undivided attention from an adult who isn't trying to multitask.
 
-There's also emerging research on intergenerational cognitive benefits. When grandparents play word games with grandchildren, both generations benefit — the grandparent gets cognitive stimulation and social engagement (both protective against cognitive decline), while the grandchild gets vocabulary exposure and one-on-one attention from a caring adult.
-
-A 2022 review in Educational Psychology Review examined game-based learning in family contexts and found that the emotional warmth of family play creates what psychologists call a "low-anxiety learning environment" — conditions where learning happens most effectively. Kids who learn new words through games retain them better than kids who learn them through flashcards, and the family game night context makes the learning feel effortless.`,
+A 2022 review in Educational Psychology Review called this a "low-anxiety learning environment." Games create warmth. Warmth reduces the performance anxiety that makes learning harder. Kids retain new words better when they pick them up during play than when someone drills them with flashcards. Which makes sense. Nobody ever got stressed playing Boggle with Grandma.`,
       },
       {
-        title: 'Building a Word Game Community (And Why It Matters)',
-        content: `Let me zoom out for a moment. All of the research I've discussed points in one direction: word games are social technology. They're tools for connecting humans, and their cognitive benefits are amplified — sometimes dramatically — by social context.
+        title: 'Start a game night. Seriously.',
+        content: `Everything I've read and everything I've experienced points the same direction. Word games are better with people. The cognitive benefits are real either way, solo or social. But the social version adds layers that solo can't touch: you play better, you feel more, you remember it longer, and you end up closer to the people you played with.
 
-This isn't just academic. It has practical implications for how we design, play, and share word games.
+I didn't set out to build a community around word games. It just happened. A group chat where we share daily scores. A monthly in-person night. The occasional online tournament when someone's traveling. If you'd told me five years ago that my most consistent social circle would be "word game friends," I would've laughed. But they are. These are the people I see most often. The people I have the most inside jokes with.
 
-If you're playing word games solo, you're getting genuine cognitive benefits. The language processing, the working memory demands, the executive function — it's all real. But you're leaving a huge amount of value on the table.
+The sociologist Ray Oldenburg wrote about "third places," social spaces that aren't home and aren't work. Bars, barbershops, community centers. Places where you show up regularly, the vibe is low-pressure, and belonging happens gradually. A word game night is a third place. You don't have to be good. You don't have to know obscure words. You just have to show up.
 
-Adding even one other person transforms the experience. You get social facilitation (better performance), competitive cognition (deeper engagement), emotional amplification (more fun), narrative building (lasting memories), and relationship strengthening (closer bonds).
+So. Grab some friends. Open some snacks. Set a timer. Argue about whether QI counts. (It does. It's the circulating life force in Chinese philosophy, and I will fight anyone who challenges it.) See what happens when you stop puzzling alone and start puzzling together.
 
-I've seen this in my own life. The word game community I've built — a group chat where we share daily puzzle scores, a monthly in-person game night, the occasional online tournament — has become one of the most important social structures in my adult life. It sounds silly when I say it out loud. "My word game friends." But these are the people I see most consistently, laugh with most often, and feel most connected to.
-
-The research on "third places" — social environments separate from home and work — suggests that regular, low-pressure social gatherings are essential for wellbeing. Word game nights are perfect third-place activities. They're structured enough to avoid awkward silences, flexible enough to accommodate different personalities, and engaging enough to keep everyone coming back.
-
-So here's my pitch: start a word game night. Grab some friends, set up a grid, crack open some snacks, and play. You don't need to be good. You don't need to know obscure words. You just need to show up and be willing to argue about whether QI is a real word.
-
-(It is. It's the circulating life force in Chinese philosophy. And yes, it's valid in Scrabble. I will die on this hill.)
-
-Your brain will thank you. Your friendships will thank you. And when you find that perfect seven-letter word and the whole room erupts — trust me, nothing else hits quite like that.`,
+The seven-letter word hits different when the whole room hears it.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -162,98 +134,110 @@ Your brain will thank you. Your friendships will thank you. And when you find th
   },
   he: {
     title: 'למה משחקי מילים עם חברים זה סיפור אחר לגמרי (המדע של גיימינג חברתי)',
-    subtitle: 'קוגניציה שיתופית, טראש טוק תחרותי, ולמה המוח שלכם ממש נדלק אחרת כשיש בני אדם אחרים בסביבה.',
+    subtitle: 'מה קורה במוח כשמוסיפים אנשים למשוואה, ולמה לשחק לבד זה רק חצי מהסיפור.',
     category: 'מדע חברתי',
     readTime: 'קריאה של 11 דקות',
     authorName: 'חנון המילים',
-    authorBio: 'מטיף כרוני למשחקי מילים שפעם גרם לזר ברכבת לשחק בוגל ארבע תחנות אחרי היעד שלו.',
+    authorBio: 'פעם גרם לזר ברכבת לשחק בוגל ארבע תחנות אחרי היעד שלו. שניהם לא התחרטו.',
     sections: [
       {
-        content: `ביום שישי האחרון היו לי שתי אפשרויות. אפשרות א׳: להתכרבל על הספה עם הטלפון ולטחון פאזלי מילים לבד. אפשרות ב׳: לגרור ארבעה חברים לדירה שלי, לפתוח חטיפים, ולבלות שלוש שעות בצעקות אחד על השני מעל לוח אותיות משותף.
+        content: `אני מנהל טבלה. (אני יודע.) שנתיים של ניקוד במשחקי מילים, עם סימון אם שיחקתי לבד או עם אנשים. העמודה של סולו בסדר. סבירה. העמודה של משחק קבוצתי גבוהה ב-15-20% באופן עקבי.
 
-בחרתי באפשרות ב׳. ברור.
+תקופה ארוכה הנחתי שאני פשוט משקיע יותר כשחברים צופים. זה חלק מההסבר. אבל ההסבר האמיתי מוזר ומעניין יותר מ"אני לא רוצה להיראות גרוע מול יובל."
 
-וזה לא היה רק יותר כיף. שיחקתי טוב יותר באופן מדיד. אורך המילים הממוצע שלי עלה. מצאתי מילים שלעולם לא הייתי מוצא לבד. ברגע מסוים שיחקתי מילה של שבע אותיות וכמעט התעלפתי מזרם הדופמין, בעיקר כי החבר שלי מיד קרא לי יהיר, מה שאיכשהו עשה את זה אפילו יותר טוב.
+ביום שישי האחרון היה לי את הבחירה בין לטחון פאזלים על הספה, לבין לגרור ארבעה חברים למרתון משחקי מילים רועש עם חטיפים. בחרתי במרתון. ברגע מסוים מצאתי מילה של שבע אותיות על הלוח, ויובל קרא לי יהיר, ומכת הדופמין מהרגע הזה הייתה טובה יותר מכל שיא שהשגתי לבד.
 
-ואני לא מגזים. יש גוף מחקר הולך וגדל שמראה שמשחקי מילים חברתיים, בין אם שיתופיים ובין אם תחרותיים, מפעילים מעגלים עצביים שונים ממשחק לבד. המוח שלכם ממש פועל במצב אחר כשבני אדם אחרים מעורבים.`,
+מסתבר שיש סיבה לזה. המוח מריץ תוכנה אחרת כשיש אנשים אחרים בחדר. לא כמטפורה. ממש רשתות עצביות אחרות נדלקות. המחקר על זה ברור באופן מפתיע, וזה שינה לי את הדרך שבה אני חושב על משהו שעשיתי בלי לחשוב הרבה שנים.`,
       },
       {
-        title: 'סולו מול חברתי: שני מוחות שונים',
-        content: `משהו שהפתיע אותי כשקראתי על זה לראשונה: כששיחקים משחק מילים לבד, האזורים העיקריים שנדלקים הם אזורי עיבוד שפה. אזור ברוקה, אזור ורניקה, הקורטקס הפרה-פרונטלי הדורסולטרלי.
+        title: 'המוח בסולו מול המוח במולטיפלייר',
+        content: `משחק מילים לבד מדליק את מה שהייתם מצפים לו. אזור ברוקה, אזור ורניקה, הקורטקס הפרה-פרונטלי הדורסולטרלי. עיבוד שפה. זיכרון עבודה. החשודים הרגילים.
 
-אבל כשמוסיפים שחקנים אחרים (אפילו רק אחד) רשת נוספת שלמה נכנסת לפעולה. מדעני מוח קוראים לה "רשת המוח החברתי", והיא כוללת את הקורטקס הפרה-פרונטלי המדיאלי, את הצומת הטמפורו-פריאטלי, ואת התלם הטמפורלי העליון האחורי.
+תוסיפו אדם אחד ורשת שנייה שלמה עולה לאוויר. חוקרי מוח קוראים לה "רשת המוח החברתי", שזה נשמע גרנדיוזי, אבל זה פשוט הקורטקס הפרה-פרונטלי המדיאלי, הצומת הטמפורו-פריאטלי והתלם הטמפורלי העליון האחורי עושים את מה שהם התפתחו לעשות: להבין מה האדם השני חושב.
 
-מחקר מכונן של רדקיי ועמיתיה (2010) השתמש ב-fMRI כדי להשוות פעילות מוחית במשימות סולו מול משימות חברתיות אינטראקטיביות. המצב החברתי הראה הפעלה משמעותית יותר באזורים הקשורים ל"תיאוריית נפש", כלומר חשיבה על מה שאנשים אחרים חושבים.
+רדקיי וחבריה הכניסו אנשים למכונת fMRI ב-2010 והשוו משימות סולו מול משימות אינטראקטיביות. המצב האינטראקטיבי הדליק אזורי "תיאוריית נפש" בצורה משמעותית יותר. פורסם ב-Cerebral Cortex, למי שרוצה לחפש.
 
-במונחי משחקי מילים: כששיחקים לבד, רק מחפשים מילים. כששיחקים עם אחרים, במקביל עוקבים אחרי מילים שהם עלולים למצוא, צופים את האסטרטגיה שלהם, מנטרים את הדינמיקה החברתית, ומנהלים את חרדת הביצועים שלכם. המוח עושה עבודה כפולה. וזה דווקא מעורר אנרגיה, לא מתיש.`,
+מה זה אומר בפועל: כשאני משחק לבד, אני מחפש מילים. כשאני משחק מול יובל, אני מחפש מילים ובמקביל עוקב אחרי מה הוא עלול למצוא, מתאים אסטרטגיה לפי שפת הגוף שלו, ומנסה לא לתת לו לראות שאני תקוע. המוח עושה מולטיטסקינג שהוא אף פעם לא עושה בסולו.
+
+הייתם חושבים שזה מתיש. זה לא. רשת המוח החברתי ומערכת התגמול נדלקות ביחד. יותר עבודה קוגניטיבית, יותר הנאה. עסקה מוזרה, אבל אני לוקח.`,
       },
       {
-        title: 'קוגניציה תחרותית: למה יריבות משחיזה את המוח',
-        content: `תחרות עושה דברים מוזרים למוח. מחקרי fMRI מראים שהקשרים תחרותיים מפעילים את הסטריאטום הוונטרלי ואת הקורטקס הצינגולטי הקדמי בדרכים שהקשרים שיתופיים או סולו לא עושים.
+        title: 'למה יריבות הופכת אתכם לחכמים יותר (עד גבול מסוים)',
+        content: `יש מחקר של קבוצת דסטי מ-2004 שאני חושב עליו הרבה. הם אמרו לחלק מהנבדקים שהם מתחרים מול אדם, ולחלק אחר שהם מתחרים מול מחשב. לפעמים ה"אדם" היה בכלל אלגוריתם. לא משנה. הנבדקים שהאמינו שיש בן אדם בצד השני הראו עלייה בהפעלת אזורים של ציפייה לתגמול ותכנון אסטרטגי.
 
-מחקר של דסטי ועמיתיו (2004) מצא שכשמשתתפים האמינו שהם מתחרים נגד אדם אחר (לעומת מחשב), המוח שלהם הראה הפעלה מוגברת באזורים הקשורים לציפייה לתגמול ותכנון אסטרטגי. המילה המפתח היא "האמינו". האמונה שיש בן אדם אמיתי בצד השני הספיקה כדי להפעיל את המפל העצבי התחרותי.
+למוח לא אכפת מהאמת. אכפת לו מהאמונה.
 
-זה ממש מתמפה על החוויה שלי. כששאני משחק נגד בוט, אני מעורב. כששאני משחק נגד חבר שאני יודע שהולך לצחוק עליי אם הוא ינצח — אני נעול. כל סיב בגוף מחפש את המילה של שבע אותיות.
+זה מתחבר. כשאני משחק נגד בוט, אני בסדר. מעורב מספיק. אבל כשאני משחק נגד מישהו שבטוח יצחק עליי אם אני מפסיד? כל נוירון שיש לי מחפש מילים ארוכות. הלחץ התחרותי עושה משהו שאי אפשר לשחזר עם טבלת שיאים או ציון יעד.
 
-יש מלכוד אחד. תחרות משפרת ביצועים רק עד נקודה מסוימת. יותר מדי לחץ תחרותי מפעיל תגובות חרדה שפוגעות בתפקוד הקוגניטיבי. הנקודה המתוקה, "עוררות אופטימלית" בשפת הפסיכולוגים, היא מספיק תחרותי כדי להניע, לא כל כך שזה הופך ללחץ. לכן ערבי משחקים קזואליים מרגישים כל כך טוב.`,
+ליאון פסטינגר קרא לזה "תיאוריית השוואה חברתית" ב-1954. אנחנו מעריכים את עצמנו ביחס לאנשים אחרים, לא ביחס לסטנדרט מופשט כלשהו. במשחק מילים תחרותי, כל מילה שהיריב מוצא מכיילת מחדש את המד הפנימי של "האם אני מספיק טוב?" מפגר? דחוף יותר. מוביל? אל תירגע.
+
+יש תקרה. יותר מדי לחץ מעביר את המתג מ"מוטיבציה" ל"חרדה", ומוח חרדתי גרוע בחיפוש מילים יצירתי. הנקודה האופטימלית היא תחרות עם הימור נמוך. זכויות התרברבות בלבד. בגלל זה ערב משחקים קזואלי מרגיש הרבה יותר טוב מטורניר.`,
       },
       {
-        title: 'אפקט הג׳קבוקס: משחקי מילים חברתיים ושמחה קולקטיבית',
-        content: `אם פעם שיחקתם משחק מסיבות של Jackbox, אתם יודעים בדיוק על מה אני מדבר. יש סוג ספציפי של שמחה שמגיע ממשחקי מילים בסביבה קבוצתית, חשמל יצירתי קולקטיבי שלא קיים כששיחקים לבד.
+        title: 'משחקי מסיבות והדבר שקורה כשכולם מאלתרים ביחד',
+        content: `ג׳קבוקס הרס אותי. לפני ג׳קבוקס חשבתי שמשחקי מילים הם עניין שקט ומוחי. אז שיחקתי Quiplash במסיבה וגיליתי שמשחקי מילים עם קהל חי זה סם אחר לגמרי.
 
-מעצבי משחקים קוראים לזה "מרחב יצירתי משותף." הרעיון הוא שכשמספר אנשים מייצרים רעיונות בו-זמנית. תשובות מצחיקות, משחקי מילים יצירתיים, אסוציאציות בלתי צפויות. הקבוצה מייצרת משהו גדול יותר מכל פרט לבדו.
+מעצבי משחקים קוראים לזה "מרחב יצירתי משותף." כמה אנשים מייצרים רעיונות בו-זמנית, מרחבים אחד מהשני, והתוצאה הקבוצתית מגיעה למקום שאף אחד מהם לא היה מגיע אליו לבד. יש כאן הערה חשובה. המחקר המקורי של אוסבורן על סיעור מוחות מהחמישינים מצא שפרטים מייצרים יותר רעיונות בסולו מאשר בקבוצות, כי קבוצות יוצרות חיכוך חברתי. אנשים מרסנים את עצמם, מדברים אחד על השני, מצנזרים.
 
-משחקי מילים יוצרים את הדינמיקה הנכונה באופן טבעי. הכללים מספקים מבנה. לחץ הזמן מונע חשיבת-יתר. והסביבה החברתית מספקת משוב מיידי: צחוק, גניחות, "יאללה, זו לא מילה!" נוירונים מראה ו"הדבקה רגשית" מגבירים את השמחה. כשרואים מישהו אחר מגיב בהפתעה, המוח שלנו משקף את הרגש הזה.`,
+אבל הרעיונות שכן יוצאים מקבוצות נוטים להיות מוזרים ויצירתיים יותר, במיוחד כשהפורמט מתאים. משחקי מילים הם הפורמט הנכון. יש מבנה (חייבת להיות מילה אמיתית), לחץ זמן (אין חשיבת יתר), ותגובה מיידית מהקהל ("רגע, זו מילה?!").
+
+אני עדיין זוכר סיבוב בוגל לפני שנתיים שבו חברה שלי מצאה מילה שאף אחד לא שמע עליה. חצי מהשולחן טען שזה לא מילה. היא שלפה מילון. הוויכוח נמשך יותר מהסיבוב עצמו. זו חוויה שפשוט לא מקבלים כששיחקים לבד בחצות על הטלפון.`,
       },
       {
-        title: 'קורונה וקו ההצלה של החיבור הדיגיטלי',
-        content: `אני חייב לדבר על 2020 ו-2021. המגפה שינתה מהותית את האופן שבו אנחנו חושבים על גיימינג חברתי.
+        title: 'מה קרה בסגר',
+        content: `Words With Friends צבר 40% יותר משתמשים יומיים במרץ 2020. Scrabble GO הושק באמצע הקורונה והורד מיליוני פעמים. אנשים היו תקועים בבית והיו צריכים דרך להרגיש מחוברים שלא דורשת Happy Hour בזום.
 
-כשהסגרים הגיעו, מכירות משחקי לוח זינקו. אבל גם משחקי מילים מרובי משתתפים אונליין. Words With Friends ראו עלייה של 40% במשתמשים פעילים יומיים במרץ 2020. אנשים חיפשו נואשות חיבור חברתי, ומשחקי מילים סיפקו צורה ייחודית שלו.
+ואור ועמיתיו פרסמו מחקר ב-Computers in Human Behavior ב-2021, שמצא שגיימינג חברתי בסגר היה קשור לבריאות נפשית טובה יותר. אבל רק כשהמשחק כלל אינטראקציה אמיתית הלוך-חזור. סתם לשחק ליד מישהו, או לשחק אסינכרוני בלי צ׳אט, לא עשה את אותו אפקט. התקשורת הייתה המרכיב הפעיל.
 
-מחקר של ואור ועמיתיו (2021) מצא שגיימינג חברתי במהלך המגפה היה קשור לרווחה נפשית טובה יותר, אבל רק כשהמשחק כלל אינטראקציה חברתית אמיתית, לא רק משחק לצד אחרים. המרכיב המפתח היה תקשורת.
+אני יכול להעיד על זה מניסיון. החברים מהתואר ואני התחלנו ערב בוגל שבועי בזום באותו אביב. אמרנו לעצמנו שזה בשביל המשחק. זה לא היה בשביל המשחק. זה היה בשביל לבלות שעה בצעקות אחד על השני על מילים מפוקפקות, ואז עוד עשרים דקות של עדכונים על החיים תוך כדי העמדת פנים שאנחנו עדיין מדברים על הכללים.
 
-שיחקתי יותר משחקי מילים אונליין בסגר מאשר בכל תקופה אחרת בחיי. ובמבט לאחור, המשחקים האלה לא היו באמת על המילים. הם היו על שמירת קשרים. ערב הבוגל השבועי שלי בזום עם חברים מהתואר לא היה סשן משחקים. זה היה טקס חברתי שהתחפש למשחק.`,
+כשאני מסתכל אחורה על 2020, ערבי הבוגל של יום חמישי הם מהזיכרונות הכי חדים שיש לי. לא כי המשחקים היו טובים. כי החיבור היה. אפילו דרך מסך, עם סאונד גרוע וחתול של מישהו שהולך על המקלדת, זה עבד. משחקי מילים נתנו לנו תירוץ להופיע אחד בשביל השני בלי להגיד "אני בודד ואני צריך לראות את הפרצוף שלכם."`,
       },
       {
-        title: 'הרנסנס של המולטיפלייר המקומי',
-        content: `יש טרנד שאני מוצא מרגש באמת. אחרי שנים שגיימינג זז יותר ויותר לאונליין, יש רנסנס של מולטיפלייר מקומי. אנשים שמשחקים ביחד, באותו חדר.
+        title: 'אותו חדר, משחק אחר',
+        content: `בתי קפה של משחקי לוח עברו מפחות מ-1,000 בעולם ב-2015 ליותר מ-5,000 ב-2023. מכירות משחקי מסיבות עוקפות כל קטגוריה אחרת של משחקי לוח מאז 2019. ברור שיש תיאבון לשחק ביחד פנים-אל-פנים שהקורונה לא הרגה. אם משהו, היא הגדילה אותו.
 
-הנתונים תומכים בזה. בתי קפה של משחקי לוח פרצו גלובלית. היו כ-5,000 ברחבי העולם ב-2023, לעומת פחות מ-1,000 ב-2015. מכירות משחקי מסיבות עלו על קטגוריות אחרות באופן עקבי מאז 2019.
+אני מארח ערב משחקי מילים חודשי מאז שהסגרים נגמרו. הסטאפ פשוט עד כאב. חטיפים, טיימר, אותיות, ומי שמגיע. בלי הזמנות רשמיות. בלי כללים מסובכים. פשוט תגיעו ותשחקו.
 
-משחקי מילים מתאימים בצורה מושלמת לרנסנס הזה. לא צריך חומרה יקרה. לא צריך ללמוד כללים מורכבים. צריך אותיות ובני אדם, וזהו.
+מה שממשיך להפתיע אותי זה כמה זה שונה מהסשנים האונליין. אונליין זה כיף, אבל פנים-אל-פנים יש מידע שזורם שמסך לא יכול להעביר. הברך של מישהו שקופצת כי הוא תקוע. הנשיפה הקטנה כשהלוח גרוע. גבה מורמת כשחבר משחק מילה מפתיעה.
 
-מה שמכה בי בכל ערב משחקים הוא כמה האנרגיה שונה מהסשנים האונליין שלנו. יש משהו בקרבה פיזית שמשנה את החוויה באופן מהותי. גבה מורמת כשמישהו משחק מילה בלתי צפויה. התסכול הנראה של חיפוש מילה. הגניחה המסונכרנת כשהטיימר נגמר. אינטראקציות-מיקרו שיוצרות חוויה חברתית עשירה יותר מכל חלון צ׳אט.`,
+בלטס ועמיתיו הריצו מטא-אנליזה ב-2002 שהשוותה קבוצות פנים-אל-פנים מול קבוצות מרחוק. פנים-אל-פנים ניצח בתיאום ובפתרון בעיות יצירתי. לא מפתיע, אבל גודל האפקט היה גדול ממה שציפיתי. קרבה פיזית משנה איך אנשים חושבים ביחד, לא רק איך הם מרגישים לגבי העובדה שהם ביחד.`,
       },
       {
-        title: 'טראש טוק כמנגנון קירוב: הפרדוקס של עלבונות ידידותיים',
-        content: `אני יכול להיות כנה? אחד החלקים האהובים עליי במשחקי מילים מרובי משתתפים הוא הטראש טוק.
+        title: 'הכוח המקרב של לקרוא לחבר "רמאי לקסיקלי"',
+        content: `אף אחד לא מדבר על זה אבל הטראש טוק הוא חצי מהעניין.
 
-יש פרדוקס נפלא בלב הגיימינג החברתי התחרותי: העלבונות מקרבים אתכם. לקרוא לחבר "רמאי לקסיקלי" כשהוא משחק מילה של שתי אותיות זה לא אגרסיבי, זה אינטימי. זה מאותת על מערכת יחסים מספיק בטוחה לספוג עוינות משחקית.
+לקרוא למישהו "רמאי לקסיקלי" כשהוא משחק של לשתי נקודות. לעשות פנים מזועזעות כשהיריב מוצא מילה של שבע אותיות. הזעם המזויף, ההרס המשחקי, הטינה שנגמרת בדיוק כשהסיבוב הבא מתחיל.
 
-פסיכולוגים קוראים לזה "התגרות שייכותית," וזה נחקר בהרחבה. קלטנר ועמיתיו (2001) פרסמו מחקר שמראה שהתגרות משרתת פונקציות חברתיות חיוניות: היא בוחנת ומחזקת קשרים, מבססת נורמות קבוצתיות, ויוצרת הומור משותף.
+לפסיכולוגים יש מונח לזה: "התגרות שייכותית." קבוצת קלטנר פרסמה עבודה על זה ב-2001 שמראה שעלבונות משחקיים דווקא מחזקים קשרים חברתיים. הם מאותתים אמון. אפשר לקרוא למישהו רמאי רק אם שניכם יודעים שאתם לא מתכוונים לזה. זה מבחן לחץ לזוגיות שמשמש גם כבידור.
 
-במשחקי מילים, טראש טוק גם יוצר נרטיב. סיבוב בוגל בלי תגובות הוא רק תרגיל אוצר מילים. סיבוב בוגל עם טראש טוק? זה סיפור. נתייחס אליו שבועות.`,
+אבל במשחקי מילים, טראש טוק עושה עוד משהו. הוא הופך תרגיל אוצר מילים לסיפור. החבר׳ה שלי עדיין מזכירים את "אירוע שרה." לפני שלוש שנים היא שיחקה מילה שפיצלה את החדר לשניים ויצרה ויכוח של עשרים דקות על הכללים. אנחנו מעלים את זה לפחות פעם בחודש. בלי הויכוח, הסיבוב הזה היה נשכח עד הבוקר.
+
+כל ערב משחקים מייצר חומר כזה. בדיחות פנימיות, ביטים חוזרים, ריבים שיש להם קונטיניואיטי. מחקרים על חוויות חדשות משותפות ואיכות מערכות יחסים אומרים שזה חשוב. זוגות וקבוצות חברים שעושים דברים מרגשים ביחד מדווחים על שביעות רצון גבוהה יותר. משחקי מילים מסמנים את שני התיבות אם משחקים נכון. לוח חדש כל פעם, לחץ זמן שומר על האדרנלין, ומספיק מתח תחרותי שזה מרגיש כאילו יש משהו על הכף. גם כשהדבר היחיד על הכף זה מי קונה חטיפים בפעם הבאה.`,
       },
       {
-        title: 'ערב משחקים משפחתי: מה המחקר באמת מראה',
-        content: `גדלתי עם משחקי סקרבל עם ההורים כל ערב ראשון. בזמנו חשבתי שזה משעמם. במבט לאחור, זו הייתה אחת החוויות המעצבות ביותר של ילדותי.
+        title: 'סקרבל עם ההורים היה אולי יותר חשוב ממה שחשבתם',
+        content: `שיחקתי סקרבל עם ההורים שלי כל ערב ראשון כשגדלתי. בגיל שתים-עשרה חשבתי שזה הדבר הכי משעמם בעולם. בגיל שלושים הבנתי שזה אולי אחד הדברים הכי חשובים שהם עשו בשבילי.
 
-המחקר על ערבי משחקים משפחתיים מפתיע בחוסנו. מחקר אורכי של קויל-שפרד וניולנד (2013) מצא שמשפחות ששיחקו משחקים יחד באופן קבוע דיווחו על לכידות משפחתית חזקה יותר, תקשורת טובה יותר בין הורים לילדים, ושביעות רצון משפחתית גבוהה יותר.
+מחקר אורכי של קויל-שפרד וניולנד, שפורסם ב-Journal of Family Issues ב-2013, עקב אחרי משפחות לאורך זמן. אלה ששיחקו משחקים ביחד באופן קבוע הראו לכידות חזקה יותר, תקשורת טובה יותר בין הורים לילדים, וציוני שביעות רצון גבוהים יותר. וזה החזיק גם כששלטו על פעילויות משפחתיות אחרות כמו ארוחות משותפות או תחביבים.
 
-משחקי מילים יעילים במיוחד למשפחות כי הם מכילים רמות מיומנות שונות. ילד בן שש שמוצא מילה של שלוש אותיות על אותו לוח שבו הורה מוצא מילה של שמונה? הוא לא מפסיד. כולם יכולים לחגוג את הניצחונות של כולם.
+למשחקי מילים יש יתרון ספציפי למשפחות: הם לא דורשים שכולם יהיו באותה רמה. האחיינית שלי התחילה להגיע לערב משחקים בגיל שבע, ומצאה כל וגם בזמן שהמבוגרים חיפשו מילים ארוכות. היא בת אחת-עשרה עכשיו. בחודש שעבר היא ניצחה שניים מהמבוגרים. בלי הוראה פורמלית, בלי כרטיסיות. היא פשוט ספגה אוצר מילים מלשבת ליד השולחן.
 
-יש גם מחקר מתפתח על יתרונות קוגניטיביים בין-דוריים. כשסבים משחקים משחקי מילים עם נכדים, שני הדורות מרוויחים: הסב מקבל גירוי קוגניטיבי וחיבור חברתי, והנכד מקבל חשיפה לאוצר מילים ותשומת לב אישית ממבוגר אכפתי.`,
+יש קו מחקר חדש יותר על משחק בין סבים לנכדים שמעניין אותי. שני הצדדים מרוויחים. הסבים מקבלים גירוי קוגניטיבי ומעורבות חברתית, שהם שניים מגורמי ההגנה החזקים ביותר נגד ירידה קוגניטיבית. הילדים מקבלים חשיפה לאוצר מילים ותשומת לב בלעדית ממבוגר שלא מנסה לעשות מולטיטסקינג.
+
+סקירה מ-2022 ב-Educational Psychology Review קראה לזה "סביבת למידה בחרדה נמוכה." משחקים יוצרים חום. חום מפחית את חרדת הביצועים שמקשה על למידה. ילדים שולטים במילים חדשות טוב יותר כשהם קולטים אותן תוך כדי משחק מאשר כשמישהו מתרגל אותם עם כרטיסיות. הגיוני. אף אחד מעולם לא נלחץ ממשחק בוגל עם סבתא.`,
       },
       {
-        title: 'בניית קהילת משחקי מילים (ולמה זה חשוב)',
-        content: `כל המחקר שדנתי בו מצביע לכיוון אחד: משחקי מילים הם טכנולוגיה חברתית. הם כלים לחיבור בין בני אדם, והיתרונות הקוגניטיביים שלהם מוגברים (לפעמים באופן דרמטי) בהקשר חברתי.
+        title: 'תתחילו ערב משחקים. ברצינות.',
+        content: `כל מה שקראתי וכל מה שחוויתי מצביע לאותו כיוון. משחקי מילים טובים יותר עם אנשים. היתרונות הקוגניטיביים אמיתיים בכל מקרה, סולו או חברתי. אבל הגרסה החברתית מוסיפה שכבות שסולו לא נוגע בהן: משחקים טוב יותר, מרגישים יותר, זוכרים יותר זמן, ויוצאים קרובים יותר לאנשים ששיחקתם איתם.
 
-אם אתם משחקים משחקי מילים לבד, אתם מקבלים יתרונות קוגניטיביים אמיתיים. אבל אתם משאירים כמות עצומה של ערך על השולחן. הוספת אפילו אדם אחד משנה את החוויה. אתם מקבלים הקלה חברתית, קוגניציה תחרותית, הגברה רגשית, בניית נרטיב, וחיזוק מערכות יחסים.
+אני לא תכננתי לבנות קהילה סביב משחקי מילים. זה פשוט קרה. קבוצת וואטסאפ שבה משתפים ניקוד יומי. ערב חודשי פנים-אל-פנים. טורניר אונליין פה ושם כשמישהו בנסיעות. אם היו אומרים לי לפני חמש שנים שהחוג החברתי הכי קבוע שלי יהיה "חברי משחקי מילים," הייתי צוחק. אבל ככה זה. אלה האנשים שאני רואה הכי הרבה. האנשים שאיתם יש לי הכי הרבה בדיחות פנימיות.
 
-המחקר על "מקומות שלישיים", סביבות חברתיות נפרדות מבית ועבודה, מציע שמפגשים חברתיים קבועים ובלחץ נמוך חיוניים לרווחה. ערבי משחקי מילים הם פעילויות "מקום שלישי" מושלמות.
+הסוציולוג ריי אולדנבורג כתב על "מקומות שלישיים," מרחבים חברתיים שהם לא בית ולא עבודה. ברים, מספרות, מתנ"סים. מקומות שמגיעים אליהם בקביעות, האווירה נינוחה, ותחושת שייכות נבנית לאט. ערב משחקי מילים הוא מקום שלישי. לא צריך להיות טובים. לא צריך להכיר מילים נדירות. רק צריך להגיע.
 
-נו, אז תתחילו ערב משחקי מילים. תתפסו כמה חברים, תפתחו חטיפים, ותשחקו. לא צריך להיות טובים. לא צריך לדעת מילים אזוטריות. רק צריך להגיע ולהיות מוכנים להתווכח. המוח שלכם יודה לכם. החברויות שלכם יודו לכם.`,
+אז. תתפסו חברים. תפתחו חטיפים. תכוונו טיימר. תתווכחו. תראו מה קורה כשמפסיקים לפתור לבד ומתחילים לפתור ביחד.
+
+מילה של שבע אותיות פוגעת אחרת כשכל החדר שומע אותה.`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -261,101 +245,113 @@ Your brain will thank you. Your friendships will thank you. And when you find th
     practice: 'שחקו מולטיפלייר',
   },
   sv: {
-    title: 'Varfor ordspel med vanner ar nagot helt annat (Vetenskapen om socialt spelande)',
-    subtitle: 'Kooperativ kognition, tavlingsinriktat skitsnack och varfor din hjarna bokstavligen lyser upp mer nar andra manniskor ar inblandade.',
+    title: 'Ordspel ar battre med folk. Forskningen forklarar varfor det kanns sa.',
+    subtitle: 'Om tavlingsinstinkt, skitsnack som bygger vanskap, och varfor hjarnan vaknar till liv pa ett satt den aldrig gor nar du sitter ensam med telefonen.',
     category: 'Samhallsvetenskap',
     readTime: '11 min lasning',
     authorName: 'Ordnorden',
-    authorBio: 'Kronisk ordspelsevangelist som en gang fick en framling pa taget att spela Boggle fyra hallplatser forbi sin destination.',
+    authorBio: 'Fick en gang en framling pa pendeln att spela Boggle fyra stationer for langt. Ingen av oss angrade det.',
     sections: [
       {
-        content: `Forra fredagskvallen hade jag tva alternativ. Alternativ A: krypa ihop i soffan med telefonen och mala igenom lite solopussel. Alternativ B: slapa fyra vanner till min lagenhet, oppna lite snacks och tillbringa tre timmar med att skrika pa varandra over ett delat bokstavsrutndt.
+        content: `Jag for ett kalkylark over mina ordspelsresultat. Har gjort det i tva ar nu. Varje omgang taggad: solo eller med andra. Solokolumnen ar okej. Hyfsad. Men kolumnen for gruppspel ligger konsekvent 15 till 20 procent hogre.
 
-Jag valde B. Sjalvklart.
+Lange trodde jag att jag bara anstrangde mig mer nar nagon satt mittemot. Delvis sant. Men den riktiga forklaringen ar konstigare an sa.
 
-Det var inte bara roligare. Jag spelade matbart battre. Min genomsnittliga ordlangd okade. Jag hittade ord jag aldrig hade sett ensam. Vid ett tillfalle spelade jag ett sjubokstavsord och nistan svimmade av dopaminrushen, mest for att min van omedelbart kallade mig en angare, vilket pa nagot satt gjorde det annu battre.
+Forra fredagen stod valet mellan att ligga i soffan med pussel eller att samla fyra kompisar, kopa chips och skrika at varandra i tre timmar over ett bokstavsrutndt. Jag valde skrikandet. Nagon gang under kvallen hittade jag ett sjubokstavsord och Erik kallade mig sjalvgod, och den kombinationen av prestation plus social reaktion var, ja. Battre an nagon poangrekord jag nagonsin satt ensam.
 
-Det har ar inte bara jag som overdriver. Det finns en vaxande forskningslitteratur som visar att sociala ordspel, bade kooperativa och tavlingsinriktade, aktiverar andra neurala kretsar an solospel. Din hjarna opererar bokstavligen i ett annat lage nar andra manniskor ar med.`,
+Det visar sig att hjarnan kor annorlunda mjukvara nar andra manniskor ar i rummet. Inte bildligt talat. Faktiskt andra neurala natverk. Forskningen ar overraskande tydlig pa den punkten och den forandrade hur jag ser pa nagonting jag gjort slentrianmassigt i aratal.`,
       },
       {
-        title: 'Solo mot socialt: Tva olika hjarnor',
-        content: `Nar du spelar ett ordspel ensam ar de primara regionerna som lyser upp sprakomraden: Brocas omrade, Wernickes omrade, den dorsolaterala prefrontala cortex.
+        title: 'Hjarnan solo, hjarnan med sallskap',
+        content: `Ensam aktiverar ordspel ungefar det du forvantar dig. Brocas omrade. Wernickes omrade. Dorsolaterala prefrontala cortex. Sprakprocessering, arbetsminne, de vanliga.
 
-Men nar du lagger till andra spelare, aven bara en, startar ett helt extra natverk. Neuroforskare kallar det "det sociala hjarnatverket" och det inkluderar mediala prefrontala cortex, temporoparietala knutpunkten och bakre ovre temporala sulcus.
+Lagg till en enda manniska och ett helt nytt natverk vaknar. Neuroforskare kallar det "det sociala hjarnatverket", vilket later hogtravande men egentligen bara ar mediala prefrontala cortex, temporoparietala knutpunkten och bakre ovre temporala sulcus som gor det de utvecklades for: lista ut vad den andra personen tanker.
 
-En banbrytande studie av Redcay et al. (2010) anvande fMRI for att jamfora hjarnaktivitet under solouppgifter mot interaktiva sociala uppgifter. Det sociala tillstandet visade signifikant storre aktivering i omraden forknippade med mentalisering, alltsa att tanka pa vad andra manniskor tanker.
+Redcay och kollegor stoppade in folk i en fMRI-maskin 2010 och jamforde solo mot interaktiva uppgifter. De interaktiva tande upp mentaliseringsregioner rejalt mer. Publicerades i Cerebral Cortex om du vill kolla sjalv.
 
-I ordspelstermer: nar du spelar ensam soker du bara efter ord. Nar du spelar med andra foljer du samtidigt vilka ord de kan hitta, forsaker forutse deras strategi och hanterar din egen prestationsangest. Hjarnan gor dubbelt arbete, och det ar faktiskt energigivande, inte uttommande.`,
+Rent praktiskt: nar jag spelar ensam letar jag efter ord. Nar jag spelar mot Erik letar jag efter ord OCH hakar pa vad han kan ha sett OCH justerar strategi utifran hans kroppssprak OCH forsoker dolja att jag kort fast. Hjarnan kor dubbelskift.
+
+Man skulle kunna tro att det ar uttommande. Tvartom. Sociala natverket och beloningssystemet aktiveras ihop. Mer kognitiv anstrangning, mer njutning. Konstig byteshandel, men jag tar den.`,
       },
       {
-        title: 'Tavlingskognition: Varfor rivalitet vassar sinnet',
-        content: `Tavling gor konstiga saker med hjarnan. fMRI-studier visar att tavlingssammanhang aktiverar ventrala striatum och anteriora cingulara cortex pa satt som kooperativa eller solosammanhang inte gor.
+        title: 'Rivalitet gor dig smartare (till en viss grans)',
+        content: `Decetys forskargrupp publicerade nagonting 2004 som jag tanker pa ofta. De sa till vissa deltagare att de tavlade mot en manniska, andra att det var en dator. Ibland var "manniskan" i sjalva verket en algoritm. Spelade ingen roll. De som trodde att en riktig person satt pa andra sidan visade hogre aktivering i omraden for beloningsforvantan och strategisk planering.
 
-En studie av Decety et al. (2004) fann att nar deltagare trodde att de tavlade mot en annan person (jamfort med en dator), visade deras hjarna okad aktivering i omraden forknippade med beloning och strategisk planering. Nyckelordet ar "trodde". Tron att en riktig manniska var pa andra sidan rakte for att utlosa den tavlingsinriktade neurala kaskaden.
+Hjarnan bryr sig inte om sanningen. Den bryr sig om vad den tror.
 
-Mekanismen verkar vara relaterad till social jamforelseteori, forst foreslagen av Leon Festinger 1954. Vi ar hardkodade att utvardera vara formagar i forhallande till andra. I ett tavlingsinriktat ordspel ar varje ord din motstandare hittar en datapunkt din hjarna anvander for att kalibrera sin egen prestation.
+Det stammar. Nar jag spelar mot en bot ar jag engagerad. Lagom. Men nar jag spelar mot nagon som garanterat kommer hana mig om jag forlorar? Da jobbar varje neuron jag har pa att hitta langa ord. Tavlingstrycket gor nagot som inget poangmal eller topplista kan replikera.
 
-Det finns dock en hake. Tavling forstarker prestation bara till en viss punkt. For mycket tavlingstryck kan utlosa angstreaktioner som faktiskt forsemrar kognitiv funktion. Den ljuva punkten ar "optimal arousal", tillrackligt tavlingsinriktat for att motivera, men inte sa tavlingsinriktat att det blir stressigt.`,
+Leon Festinger kallade det social jamforelseteori redan 1954. Vi bedomer oss sjalva i relation till andra, inte mot nagon abstrakt standard. I ett ordspel kalibrerar varje ord motstandaren hittar din interna "ar jag tillrackligt bra?"-matare. Ligger du efter? Push harder. Ligger du fore? Slappna inte av.
+
+Fast det finns ett tak. For mycket press flippar omkopplaren fran "motiverad" till "angestfylld", och angestfyllda hjarnor ar urusla pa kreativ ordsokning. Sweetspoten ar lagsinsats-tavling. Skrytrattigheter, inget mer. Darfor kanns en avslappnad spelkvall sa mycket battre an en turnering.`,
       },
       {
-        title: 'Jackbox-effekten: Festordspel och kollektiv gladje',
-        content: `Om du nagonsin har spelat ett Jackbox-festspel vet du exakt vad jag pratar om. Det finns en specifik gladje som kommer fran ordlek i gruppmiljo. En kollektiv kreativ elektricitet som inte existerar nar du ar ensam.
+        title: 'Nar alla hittar pa saker samtidigt',
+        content: `Jackbox forstorde mig. Fore Jackbox trodde jag att ordspel var en lugn, cerebral grej. Sen spelade jag Quiplash pa en fest och insag att ordlek infor publik ar ett helt annat rus.
 
-Speldesigners har en term for detta: "delat kreativt utrymme." Iden ar att nar flera manniskor genererar ideer samtidigt, roliga svar, kreativ ordlek, oforvannade associationer, producerar gruppen nagot storre an vad nagon individ kunde ensam.
+Speldesigners kallar det "delat kreativt utrymme." Flera manniskor som genererar ideer samtidigt, studsar av varandra, och slutresultatet hamnar nagon stans dit ingen av dem hade kommit ensam. En brasklapp dock: Osborns brainstorming-forskning fran 1950-talet visade att individer faktiskt producerar fler ideer solo an i grupp, for grupper har social friktion. Folk haller tillbaka, pratar over varandra, sjalvcensurerar.
 
-Ordspel skapar naturligt ratt dynamik. Reglerna ger struktur. Tidspressen forhindrar overtankande. Och den sociala miljon ger omedelbar aterrappling: skratt, suckande, "men kom igen, det dar ar ju inte ett ord!"
+Men ideerna som faktiskt kommer ur grupper tenderar att vara markligare och mer kreativa. Sarskilt nar formatet ar ratt. Ordspel ar ratt format. Du har struktur (maste vara ett riktigt ord), tidspress (ingen overtankning), och direkt publikreaktion ("VANTA, ar det dar ett ORD?!").
 
-Neuroforskningen bakom detta involverar spegelneuroner och emotionell smittan. Nar du ser nagon annan reagera med fervaning eller gladje speglar din hjarna den emotionen. Gladjen av att hitta ett bra ord forstorks av gladjen att se andra reagera pa det. Det ar en positiv aterkopplingsloop av delad njutning.`,
+Jag minns fortfarande en Boggle-runda for tva ar sen dar min kompis hittade ZOEAE. Halva bordet pastod att det inte var ett ord. Hon drog upp ordboken. Det ar plural av zoea, en krastdjurslarv. Diskussionen varade langre an omgangen. Det dar ar grejen med att spela med folk. Sa dar hander aldrig nar du sitter med telefonen vid midnatt.
+
+Spegelneuroner ar en del av forklaringen. Nar nagon reagerar pa ditt ord med genuin chock speglar din hjarna den kanslan och forstarker den ursprungliga gladjen. Det blir en feedbackloop. Bra ord, stor reaktion, storre kansla, forsok toppa det nasta runda.`,
       },
       {
-        title: 'Covid och den digitala kontaktlivlinan',
-        content: `Jag maste prata om 2020 och 2021. Pandemin forandrade fundamentalt hur vi tanker pa socialt spelande.
+        title: 'Sa vad hande under pandemin da',
+        content: `Words With Friends fick 40 procent fler dagliga anvandare i mars 2020. Scrabble GO lanserades mitt under covid och laddades ner miljontals ganger. Folk satt instangda och behivde ett satt att kanna samhorighet som inte kravde annu en Zoom-AW.
 
-Nar nedstangningarna kom okade forsaljningen av bradspel. Men sa gjorde aven online multiplayer-ordspel. Words With Friends sag en 40-procentig okning av dagliga aktiva anvandare i mars 2020. Manniskor sokte desperat social kontakt, och ordspel erbjod en unik form av den.
+Vuorre och kollegor publicerade en studie i Computers in Human Behavior 2021 som visade att socialt spelande under nedstangningen var kopplat till battre psykisk halsa. Men bara nar det var faktisk interaktion fram och tillbaka. Att bara spela bredvid nagon, eller asynkront utan att chatta, hade inte samma effekt. Kommunikationen var den aktiva ingrediensen.
 
-En studie av Vuorre et al. (2021) fann att socialt spelande under pandemin var forknippat med battre psykiskt valmaende, men bara nar spelandet involverade faktisk social interaktion, inte bara att spela bredvid andra. Nyckelingrediensen var kommunikation.
+Jag kan bekrafta det fran egen erfarenhet. Jag och mina universitetskompisar startade en Boggle-kvall over Zoom den varen. Vi sa till oss sjalva att det handlade om spelet. Det handlade inte om spelet. Det handlade om att sitta en timme och skrika at varandra om obscyra ord och sen tjugo minuter till och prata om livet medan vi latsades att vi fortfarande diskuterade reglerna.
 
-Jag spelade fler online-ordspel under nedstangningen an under nagon annan period i mitt liv. Och nar jag ser tillbaka var de spelen inte egentligen om orden. De handlade om att upprathalla kontakter. Min veckovisa Boggle-kvall over Zoom var inte en spelsession. Det var en social ritual forkladd som ett spel.`,
+Nar jag tanker tillbaka pa 2020 ar de dar torsdagskvallarna bland de tydligaste minnena jag har. Inte for att spelen var bra. For att kontakten var det. Aven genom en skarm, med daligt ljud och nagons katt som gick over tangentbordet, funkade det. Ordspelen gav oss en ursakt att dyka upp for varandra utan att behova saga "jag ar ensam och behover se ditt ansikte."`,
       },
       {
-        title: 'Renassansen for lokalt multiplayer',
-        content: `Jag finner en trend jag finner genuint spannande. Efter ar dar spelande blivit alltmer online, sker en renassans for lokalt multiplayer. Manniskor som spelar spel tillsammans, i samma rum.
+        title: 'Samma rum, helt annan grej',
+        content: `Bradspelscafeer gick fran under 1 000 globalt 2015 till over 5 000 ar 2023. Forsaljningen av festspel har slagit alla andra bradspelskategorier sedan 2019. Aptiten for att spela ihop pa riktigt dog inte under pandemin. Snarare blev folk hungrigare.
 
-Datan stodjer detta. Bradspelscafeer har exploderat globalt; det fanns uppskattningsvis 5 000+ varlden over 2023, upp fran farre an 1 000 ar 2015. Forsaljningen av festspel har overtraffat andra bradspelskategorier konsekvent sedan 2019.
+Jag borjade hosta ordspelskvall en gang i manaden efter nedstangningarna. Uppldigget ar lojligt enkelt. Snacks, en timer, bokstavsbrickor, och vem som an dyker upp. Inga formella inbjudningar. Inga krangliga regler. Bara kom och spela.
 
-Ordspel passar perfekt in i denna renassans. Man behover ingen dyr hardvara. Man behover inte lara sig komplicerade regler. Man behover bokstaver och manniskor, och sa ar det klart.
+Det som fortsatter forvana mig ar hur annorlunda det kanns mot vara onlinesessioner. Online ar kul, men i samma rum finns information som en skarm inte kan overfora. Nagons kna som studsar for att de kort fast. Den lilla utandningen nar rutndtet ar daligt. Ett hojt ogonbryn over bordet nar din kompis spelar nagot ovantat.
 
-Det som slar mig varje gang ar hur annorlunda energin ar jamfort med vara onlinesessioner. Det finns nagot med fysisk narhet som forandrar upplevelsen fundamentalt. Ett hojt ogonbryn nar nagon spelar ett ovantat ord. Den synliga frustrationen av att soka efter ett ord man vet finns dar. Den synkroniserade sucken nar timern tar slut.`,
+Baltes metaanalys fran 2002 jamforde grupper som traffades fysiskt mot grupper som jobbade pa distans. Fysiska grupper vann pa koordination och kreativ problemlosning. Ingen overraskning kanske, men effektstorleken var storre an jag vantade mig. Fysisk narhet forandrar hur folk tanker tillsammans, inte bara hur de kanns om att vara tillsammans. Nar jag sitter mittemot nagon fangar jag upp signaler jag aldrig skulle se genom en webbkamera, och de signalerna forandrar hur jag spelar.`,
       },
       {
-        title: 'Skitsnack som sammanhallning: Paradoxen med vanliga fornarmelser',
-        content: `Kan jag vara arlig? En av mina favoritdelar med multiplayer-ordspel ar skitsnacket.
+        title: 'Att kalla sin kompis for ordbedragare ar halva poangen',
+        content: `Ingen pratar om det har men skitsnacket ar halva grejen.
 
-Det finns en underbar paradox i hjartat av tavlingsinriktat socialt spelande: fornarmelserna for er narmare varandra. Att kalla din van en "lexikal bedragare" nar de spelar ett tvabokstavsord ar inte aggressivt, det ar intimt. Det signalerar en relation trygg nog att absorbera lekfull fientlighet.
+Att kalla nagon "lexikal bedragare" nar de spelar PA for tva poang. Att flama teatraliskt nar motstandaren hittar ett sjubokstavsord. Den fejkade ilskan, den spelade fortvivlan, agg som varar exakt tills nasta omgang borjar.
 
-Psykologer kallar detta "affiliativ retsamhet" och det har studerats utforligt. Keltner et al. (2001) visade att retsamhet fyller viktiga sociala funktioner: den testar och forstorker sociala band, etablerar gruppnormer och skapar delad humor.
+Psykologer har ett begrepp for det: affiliativ retsamhet. Keltners forskargrupp publicerade nagonting om det 2001 som visade att lekfulla fornarmelser faktiskt starker sociala band. De signalerar tillit. Du kan bara kalla nagon fuskare om ni bada vet att du inte menar det. Det ar ett relationstest som ocksa fungerar som underhallning.
 
-I ordspel specifikt fyller skitsnack en ytterligare funktion: det skapar narrativ. En Boggle-runda utan kommentarer ar bara en ordforradsoving. En Boggle-runda med skitsnack? Det ar en historia. Vi refererar till den i veckor.`,
+Men i ordspel gor skitsnacket nagot mer. Det forvandlar en ordforradsoving till en berattelse. Min kompiskrets refererar fortfarande till Maja-incidenten. Tre ar sen spelade hon QOPH (en hebreisk bokstav, tekniskt godkant) och utloste en tjugo minuter lang regeldebatt som klov rummet. Vi tar upp det minst en gang i manaden. Utan braket hade den omgangen varit glomd nasta morgon.
+
+Varje spelkvall producerar sadant material. Interna skamt, aterkommande bits, revanschmatcher. Och forskningen om delade nya upplevelser och relationskvalitet sager att det har spelar roll. Par och vankretsar som gor spannande saker ihop rapporterar hogre tillfredsstallelse. Ordspel checkar bada boxarna om man spelar dem ratt. Nytt rutndt varje gang, tidspress som haller adrenalinet uppe, och precis tillrackligt tavlingsspanning for att det ska kanna som att nagot star pa spel. Aven nar det enda som star pa spel ar vem som koper snacks nasta gang.`,
       },
       {
-        title: 'Familjespekvallen: Vad forskningen faktiskt visar',
-        content: `Jag vaxte upp med att spela Scrabble med mina foraldrar varje sondagkvall. Da tyckte jag det var trakigt. Nar jag ser tillbaka var det en av de mest formativa upplevelserna i min barndom.
+        title: 'Scrabble med foraldrar var viktigare an du tror',
+        content: `Jag spelade Scrabble med mina foraldrar varje sondagkvall under hela uppvaxten. Vid tolv tyckte jag det var det trakigaste som fanns. Vid trettio insag jag att det kanske var en av de viktigaste sakerna de gjorde for mig.
 
-Forskningen om familjespekvallen ar overraskande robust. En longitudinell studie av Coyl-Shepherd och Newland (2013) fann att familjer som regelbundet spelade spel tillsammans rapporterade starkare familjesammanhallning, battre foralder-barn-kommunikation och hogre familjetillfredsstallelse.
+En longitudinell studie av Coyl-Shepherd och Newland, publicerad i Journal of Family Issues 2013, foljde familjer over tid. De som spelade spel ihop regelbundet hade starkare sammanhallning, battre kommunikation mellan foraldrar och barn, och hogre tillfredsstallelse. Det holl aven nar de kontrollerade for andra familjeaktiviteter som gemensamma maltider eller delade hobbyer.
 
-Ordspel ar sarskilt effektiva for familjer for att de naturligt rymmer olika kompetensnivaer. Ett sexarigt barn som hittar KAT pa samma rutndt dar en foralder hittar KATASTROF forlorar inte. Alla kan fira varandras segrar.
+Ordspel har en specifik fordel for familjer: alla behover inte vara pa samma niva. Min systerdotter borjade komma pa spelkvallarna vid sju, hittade KAT och SOL medan de vuxna jagade langre ord. Hon ar elva nu. Forra manaden slog hon tva av de vuxna. Ingen formell undervisning, inga gloslappar. Hon absorberade ordforrad genom att sitta vid bordet.
 
-Det finns ocksa framvaxande forskning om intergenerationella kognitiva fordelar. Nar morforaldrar spelar ordspel med barnbarn drar bada generationerna nytta. Morforaldern far kognitiv stimulans, och barnbarnet far ordforradexponering och uppmarksamhet fran en omtanksam vuxen.`,
+Det finns nyare forskning om morforaldrar och barnbarn som spelar ihop som jag tycker ar intressant. Bada sidor vinner. Morforaldern far kognitiv stimulans och social kontakt, som ar tva av de starkaste skyddsfaktorerna mot kognitivt forfall. Barnet far ordforrad och odelad uppmarksamhet fran en vuxen som inte forsoker multitaska.
+
+En forskningsoversikt i Educational Psychology Review fran 2022 kallade det "lagintensiv larandemiljo." Spel skapar varme. Varme minskar prestationsangesten som gor inlarning svarare. Barn behaller nya ord battre nar de plockar upp dem under lek an nar nagon driller dem med flashcards. Vilket ar logiskt. Ingen har nagonsin blivit stressad av att spela Boggle med mormor.`,
       },
       {
-        title: 'Att bygga en ordspelsgemenskap (och varfor det spelar roll)',
-        content: `All forskning jag diskuterat pekar at ett hall: ordspel ar social teknologi. De ar verktyg for att koppla samman manniskor, och deras kognitiva fordelar forstorks (ibland dramatiskt) av socialt sammanhang.
+        title: 'Starta en spelkvall. Pa riktigt.',
+        content: `Allt jag last och allt jag upplevt pekar at samma hall. Ordspel ar battre med folk. De kognitiva fordelarna ar verkliga hursomhelst, solo eller socialt. Men den sociala versionen lagger till lager som solo inte kan rora: du spelar battre, du kannar mer, du minns det langre, och du hamnar narmare de manniskor du spelade med.
 
-Om du spelar ordspel ensam far du akta kognitiva fordelar. Men du lamnar ett enormt varde pa bordet. Att lagga till aven bara en person forvandlar upplevelsen.
+Jag hade inte for avsikt att bygga en gemenskap kring ordspel. Det bara hande. En gruppchatt dar vi delar dagliga resultat. En spelkvall i manaden. Nagon onlineturnering nar nagon ar bortrest. Hade du sagt till mig for fem ar sen att min mest stabila umgangeskrets skulle vara "ordspelsvanner" hade jag skrattat. Men sa ar det. Det ar de manniskorna jag traffar oftast. De jag har flest interna skamt med.
 
-Forskningen om "tredje platser", sociala miljoer separata fran hem och arbete, tyder pa att regelbundna, avslappnade sociala sammankomster ar vasentliga for valmaende. Ordspelskvalllar ar perfekta tredjeplatsaktiviteter.
+Sociologen Ray Oldenburg skrev om "tredje platser," sociala rum som varken ar hemma eller jobbet. Barer, frisorer, moten. Platser dit du kommer regelbundet, stamningen ar avslappnad, och tillit byggs gradvis. En ordspelskvall ar en tredje plats. Du behover inte vara bra. Du behover inte kunna obskyra ord. Du behover bara dyka upp.
 
-Sa har ar mitt forslag: starta en ordspelskvall. Ta nagra vanner, oppna snacks och spela. Du behover inte vara bra. Du behover inte kunna obskyra ord. Du behover bara dyka upp och vara villig att argumentera om huruvida QI ar ett riktigt ord. Din hjarna kommer att tacka dig. Dina vanskap kommer att tacka dig.`,
+Sa. Samla nagra kompisar. Oppna chips. Stall en timer. Braka om huruvida QI raker. (Det gor det. Det ar den cirkulerande livskraften i kinesisk filosofi, och jag tar den striden med vem som helst.) Se vad som hander nar du slutar pussla ensam och borjar pussla ihop.
+
+Sjubokstavsordet traffar annorlunda nar hela rummet hor det.`,
       },
     ],
     backToBlog: 'Tillbaka till bloggen',
@@ -363,101 +359,117 @@ Sa har ar mitt forslag: starta en ordspelskvall. Ta nagra vanner, oppna snacks o
     practice: 'Spela multiplayer',
   },
   ja: {
-    title: '友達とワードゲームをすると別次元になる理由（ソーシャルゲーミングの科学）',
-    subtitle: '協力認知、競争的なトラッシュトーク、そして他の人間が関わると脳が文字通りもっと活性化する理由。',
+    title: '一人で解いてる場合じゃない：誰かと遊ぶとワードゲームの脳が変わる話',
+    subtitle: 'スコアが上がる。記憶に残る。友達が増える。全部、科学的に説明がつく。',
     category: '社会科学',
-    readTime: '11分で読めます',
+    readTime: '11分',
     authorName: 'ワードオタク',
-    authorBio: '電車で見知らぬ人に目的地を4駅過ぎるまでボグルをやらせた筋金入りのワードゲーム伝道師。',
+    authorBio: '電車で隣の人をボグルに巻き込み、降りる駅を4つ過ぎさせた前科あり。後悔はしていない。',
     sections: [
       {
-        content: `先週の金曜夜、選択肢が2つあった。A：ソファでスマホ片手にソロでワードパズルを延々やる。B：友達4人を家に呼んで、スナックを開けて、共有の文字盤を囲んで3時間叫び合う。
+        content: `2年分のワードゲームのスコアを記録している。我ながらどうかと思うけど、やめられない。
 
-Bを選んだ。当然だ。
+面白いのは、一人で遊んだ時と誰かと遊んだ時でスコアを分けて記録していること。一人の列はまあ普通。悪くない。でも誰かと遊んだ列は、一貫して15〜20%高い。
 
-で、ただ楽しかっただけじゃない。測定可能なレベルでプレイが上手くなった。平均単語長が上がった。一人では絶対見つけられなかった言葉を見つけた。7文字の単語を出した時はドーパミンラッシュで気絶しかけた。友達にすぐ「見せびらかし」と言われたのが、なぜかさらに気持ちよかった。
+最初は「人に見られてるから頑張ってるだけでしょ」と思ってた。それも多少あるだろう。でも本当の理由はもっと変で、もっと面白い。
 
-これは大げさじゃない。ソーシャルなワードゲーム ── 協力でも競争でも ── が一人でプレイするのとは異なる神経回路を活性化させることを示す研究が増えている。他の人間が絡むと、脳は文字通り別モードで動く。`,
+先週の金曜、友達4人を呼んでお菓子広げて3時間ぶっ通しで遊んだ。途中で7文字の単語を見つけた時、友達に「調子乗んな」と即座に言われて、そのやりとりだけで今まで出したどのハイスコアよりも気持ちよかった。
+
+なぜか。人がいると脳のソフトウェアが切り替わるからだ。比喩じゃなく、実際に別の神経ネットワークが起動する。この研究結果を知ってから、何年もなんとなくやってたことの見え方が完全に変わった。`,
       },
       {
-        title: 'ソロ対ソーシャル：2つの異なる脳',
-        content: `最初に読んで驚いたこと。一人でワードゲームをする時、主に活性化するのは言語処理領域 ── ブローカ野、ウェルニッケ野、背外側前頭前皮質。標準的な話だ。
+        title: '一人の脳、みんなの脳',
+        content: `一人でワードゲームをやる時に動くのは、まあ予想通りの場所だ。ブローカ野。ウェルニッケ野。背外側前頭前皮質。言語処理と作業記憶。教科書的。
 
-しかし他のプレイヤーを加えると ── たった一人でも ── まったく別のネットワークが起動する。神経科学者はこれを「社会脳ネットワーク」と呼び、内側前頭前皮質、側頭頭頂接合部、後部上側頭溝が含まれる。
+ところが相手が一人でも加わると、全然別の回路が目を覚ます。
 
-Redcayら（2010）のCerebral Cortexに掲載された画期的な研究は、ソロタスクと対話的な社会タスクの脳活動をfMRIで比較した。社会条件では、心の理論 ── 他者が何を考えているかを考えること ── に関連する領域で有意に大きな活性化が見られた。
+神経科学では「社会脳ネットワーク」と呼ばれていて、内側前頭前皮質とか側頭頭頂接合部とか、要するに「相手が何考えてるか読む」ための装置一式が稼働し始める。2010年にRedcayたちがfMRIで一人作業と対人作業を比較した実験がある。対人条件では「心の理論」に関わる領域が明らかに強く反応していた。Cerebral Cortex掲載。
 
-ワードゲームで言えば：一人でプレイする時は単語を探すだけ。他者と一緒の時は、同時に相手が見つけそうな単語を追跡し、戦略を予測し、社会的ダイナミクスを監視し、自分のパフォーマンス不安を管理している。脳は二重作業をしている ── そしてそれは疲れるのではなく、エネルギーを与えてくれる。`,
+具体的に何が起きてるかというと、一人プレイ中は単語を探すだけ。対人プレイ中は単語を探しながら、相手が何を見つけそうか予測して、体の動きから状況を読んで、自分が詰まってることを悟られないようにしている。脳の仕事量は倍。
+
+でも不思議と疲れない。社会脳と報酬系が同時に動くから、負荷が増えるほど快感も増えるという変な取引が成立している。`,
       },
       {
-        title: '競争認知：ライバル関係が頭を研ぎ澄ます理由',
-        content: `競争は脳に不思議なことをする。fMRI研究は、競争的な文脈が腹側線条体と前帯状皮質を、協力的またはソロの文脈とは異なる方法で活性化させることを示している。
+        title: '競争すると賢くなる（限度はあるけど）',
+        content: `Decetyのグループが2004年にやった実験が面白い。被験者に「人間と対戦してます」と伝える場合と「コンピュータと対戦してます」と伝える場合を比較した。実際には相手がアルゴリズムの時もある。でも関係なかった。人間が相手だと信じた被験者は、報酬予測と戦略的計画に関わる領域が強く活性化した。
 
-Decetyら（2004）の研究では、参加者が他の人間と競争していると信じた時（コンピュータとの対戦に比べて）、報酬予測と戦略的計画に関連する領域で活性化が増大した。キーワードは「信じた」── 本物の人間が相手側にいるという信念だけで、競争的な神経カスケードが発動するのに十分だった。
+脳は真実に興味がない。信念に反応する。
 
-メカニズムは1954年にレオン・フェスティンガーが提唱した社会的比較理論に関連しているようだ。私たちは能力を他者と比較して評価するようにハードコードされている。競争的なワードゲームでは、対戦相手が見つける全ての単語が、脳が自分のパフォーマンスを校正するためのデータポイントになる。
+これ、体感でもわかる。botが相手だと普通に集中できる。でも負けたら確実にいじられる友達が相手の時は、全神経が長い単語を探しに行く。リーダーボードやハイスコア目標では再現できない何かが、対人の競争圧にはある。
 
-ただし注意点がある。競争がパフォーマンスを向上させるのはある時点まで。過度な競争圧力は認知機能を実際に損なう不安反応を引き起こす。心理学者が「最適覚醒」と呼ぶスイートスポット ── 動機づけには十分だが、ストレスになるほどではない ── がカジュアルなゲームナイトが心地よい理由だ。`,
+1954年にフェスティンガーが提唱した社会的比較理論がまさにこれで、人は抽象的な基準じゃなく他者との相対評価で自分を測る。ワードゲームなら、相手が見つけた単語一つ一つが「自分、大丈夫？」メーターを動かしてくる。
+
+ただし、圧がかかりすぎると話が変わる。「やる気」が「不安」にひっくり返ると、創造的な単語探しがガタ落ちする。ちょうどいいのは、負けてもお菓子代を出すくらいの軽い賭け。だからカジュアルなゲーム会が一番楽しい。`,
       },
       {
-        title: 'Jackbox効果：パーティーワードゲームと集団的喜び',
-        content: `Jackboxのパーティーゲームをやったことがあれば、私が言いたいことは正確にわかるはず。グループでの言葉遊びから生まれる特別な喜びがある ── 一人の時には存在しない集団的な創造的エネルギー。
+        title: 'あの空間で起きていること',
+        content: `Jackboxを初めてやった時、ワードゲームに対する認識が壊れた。それまで「静かに頭を使う遊び」だと思ってたのが、Quiplashをパーティーでやった瞬間、ライブの観客がいる言葉遊びは完全に別の薬だと気づいた。
 
-ゲームデザイナーはこれを「共有創造空間」と呼ぶ。複数の人が同時にアイデアを生成する時 ── 面白い回答、創造的な言葉遊び、予想外の連想 ── グループは個人では不可能な何かを生み出す。
+ゲームデザインの用語で「共有創造空間」という概念がある。複数人が同時にアイデアを出すと、一人では到達できない場所にたどり着く、という話。ただこれ、実はちょっと注意が必要で、1950年代のオズボーンのブレスト研究では、個人の方がグループよりアイデアの数は多いという結果が出ている。集団だと遠慮したり、かぶったりするから。
 
-ワードゲームは自然に正しいダイナミクスを作り出す。ルールが構造を提供する。時間制限が考えすぎを防ぐ。社会的な環境が即時フィードバックを提供する ── 笑い、うめき声、「おいおい、それ単語じゃないでしょ！」
+でもグループから出てくるアイデアは、質的に変で面白いものが多い。特にフォーマットが合っている時。ワードゲームはまさにそのフォーマット。構造がある（実在する単語じゃないとダメ）、時間制限がある（考えすぎる暇がない）、観客の即時反応がある（「え、それ単語なの！？」）。
 
-この背後にある神経科学はミラーニューロンと感情伝染を含む。誰かが驚きや喜びで反応するのを見ると、脳はその感情をミラーリングする。良い単語を見つけた喜びが、他者がそれに反応するのを見る喜びで増幅される。共有された快楽のポジティブフィードバックループだ。`,
+2年前のボグルで友達がZOEAEを出した時のことを今でも覚えてる。テーブルの半分が「そんな単語ない」と言い張って、友達が辞書を引いたらzoea（甲殻類の幼生）の複数形だった。その議論はラウンドより長く続いた。深夜に一人でスマホをいじってたら絶対に生まれない体験。
+
+ミラーニューロンがこの仕組みの一端を担っている。自分の出した単語に誰かが本気で驚くと、脳がその感情を鏡写しにして元の快感を増幅する。フィードバックループが回り始めて、次のラウンドでもっとすごい単語を探したくなる。`,
       },
       {
-        title: 'コロナとデジタルつながりのライフライン',
-        content: `2020年と2021年について話さなければならない。パンデミックはソーシャルゲーミングに対する考え方を根本的に変えた。
+        title: '2020年に起きたこと',
+        content: `Words With Friendsの日次アクティブユーザーは2020年3月に40%増えた。Scrabble GOはパンデミックのど真ん中にリリースされて数百万ダウンロード。みんな家に閉じ込められて、Zoom飲み以外のつながり方を探してた。
 
-ロックダウンが始まると、ボードゲームの売上が急増した。しかしオンラインマルチプレイヤーワードゲームも同様だった。Words With Friendsは2020年3月にデイリーアクティブユーザーが40%増加した。人々は必死に社会的つながりを求め、ワードゲームはそのユニークな形を提供した。
+ワードゲームがその受け皿になったのは偶然じゃない。
 
-Vuorreら（2021）の研究は、パンデミック中のソーシャルゲーミングがより良い精神的ウェルビーイングと関連していることを発見した ── ただし実際の社会的インタラクションを含む場合に限る。キーとなる要素はコミュニケーションだった。
+Vuorreたちが2021年にComputers in Human Behaviorに出した論文によると、ロックダウン中のソーシャルゲーミングはメンタルヘルスの改善と相関していた。ただし条件がある。実際にやりとりが発生している場合に限る。横で同時にプレイするだけとか、チャットなしの非同期対戦では効果がなかった。コミュニケーションそのものが有効成分だった。
 
-ロックダウン中は人生で最もオンラインワードゲームをプレイした。振り返ると、あのゲームは本当は言葉についてではなかった。つながりを維持することだった。大学の友人とのZoomでの毎週のボグルナイトはゲームセッションではなく、ゲームに偽装した社会的儀式だった。`,
+正直に言うと、あの時期に大学の友達と始めた毎週のZoomボグルは、ゲームのためにやっていたわけじゃない。マイナーな単語が辞書に載ってるかで1時間揉めて、そのあと20分くらいルールの話をするフリをしながら近況報告をする。それが目的だった。
+
+2020年を振り返ると、木曜夜のボグル会は一番はっきり残っている記憶の一つだ。ゲームの内容じゃなくて、あのつながりが良かったから。音声は途切れるし、誰かの猫がキーボードの上を歩くし、それでも成立してた。「寂しいから顔見せて」とは誰も言えなかったけど、ワードゲームがその言い訳になってくれた。`,
       },
       {
-        title: 'ローカルマルチプレイヤーのルネサンス',
-        content: `本当にワクワクするトレンドがある。何年もゲームがオンラインに移行してきた後、ローカルマルチプレイヤーのルネサンスが起きている ── 同じ部屋で一緒にゲームをする人々。
+        title: '同じ部屋で遊ぶということ',
+        content: `ボードゲームカフェは2015年に世界で1,000軒未満だったのが、2023年には5,000軒を超えた。パーティーゲームの売上は2019年からずっと他のカテゴリーを上回っている。対面で一緒に遊びたいという欲求は、パンデミックで消えるどころかむしろ強まった。
 
-データがこれを裏付けている。ボードゲームカフェが世界中で爆発的に増えた ── 2023年には世界で推定5,000以上、2015年の1,000未満から増加。パーティーゲームの売上は2019年以降一貫して他のボードゲームカテゴリーを上回っている。
+自分はロックダウン明けから月1のワードゲーム会をやっている。準備は簡単。お菓子、タイマー、文字タイル、あとは来る人。招待状なし。複雑なルールなし。来て、遊ぶ。
 
-ワードゲームはこのルネサンスに完璧にフィットする。高価なハードウェアは不要。複雑なルールを覚える必要もない。文字と人間があれば十分。
+毎回驚くのは、オンラインと全然違うこと。画面越しでも楽しいけど、対面だと画面では伝わらない情報が流れてくる。詰まってる人の膝の揺れ。ハズレの盤面を見た時の小さなため息。予想外の単語を出した友達に向ける片眉。
 
-毎回のゲームナイトで気づくのは、オンラインセッションとエネルギーがまったく違うこと。物理的な近さが体験を根本的に変える何かがある。予想外の単語を出した時の上がった眉。知っている単語を探す時の目に見えるフラストレーション。タイマーが終わった時の同期したため息。`,
+Baltesたちが2002年に出したメタ分析では、対面グループとリモートグループを比較して、対面が協調性と創造的問題解決で勝っていた。想像はつくけど、効果量が思ったより大きかった。物理的に近くにいると、考え方自体が変わる。一緒にいる気分だけじゃなく、一緒に考える能力が変わる。`,
       },
       {
-        title: 'トラッシュトークは絆：友好的な侮辱のパラドックス',
-        content: `正直に言っていい？マルチプレイヤーワードゲームで一番好きな部分の一つがトラッシュトークだ。
+        title: '煽りの効用',
+        content: `誰もあまり言わないけど、煽りがゲームの半分を占めている。
 
-競争的なソーシャルゲーミングの核心に素晴らしいパラドックスがある：侮辱が互いを近づける。友達が2文字の単語を出した時に「語彙詐欺師」と呼ぶのは攻撃的ではない ── 親密だ。遊び心のある敵意を吸収できるほど安全な関係を示している。
+2文字の単語で2点を取った友達に「語彙力の詐欺師」と言い放つ。相手が7文字の単語を見つけた時に大げさに絶望する。嘘の怒り、芝居がかった悔しさ、次のラウンドが始まった瞬間に消える恨み。
 
-心理学者はこれを「親和的からかい」と呼び、広く研究されている。Keltnerら（2001）は、からかいが重要な社会的機能を果たすことを示した：社会的絆をテストし強化し、グループ規範を確立し、共有ユーモアを生み出す。
+心理学ではこれを「親和的からかい」と呼ぶ。Keltnerのグループが2001年に発表した研究で、遊び心のある悪口が社会的絆を強化することが示されている。信頼のシグナルだ。相手をインチキ呼ばわりできるのは、お互いに本気じゃないとわかっている時だけ。関係性のストレステストであり、同時にエンターテインメント。
 
-ワードゲームでは特に、トラッシュトークはナラティブも生み出す。コメントなしのボグルラウンドはただの語彙練習。トラッシュトーク付きのボグルラウンド ── それは物語だ。何週間も話題にする。`,
+ワードゲームだと、煽りにはもう一つ効果がある。語彙の練習をストーリーに変える。うちのグループには「サラ事件」と呼ばれる伝説がある。3年前にサラがQOPH（ヘブライ文字の名前。一応有効）を出して、部屋が真っ二つに割れる20分のルール論争が勃発した。月に一度は話題に上る。あの口論がなければ、あのラウンドは翌朝には忘れられていた。
+
+毎回のゲーム会がこういう素材を生む。内輪ネタ、定番のいじり、因縁の対決。新しい体験を共有したカップルや友人グループは満足度が高いという研究結果があるけど、ワードゲームはその条件を見事に満たす。毎回違う盤面、時間制限のアドレナリン、何かがかかっている感じ。たとえ賭かっているのが「次のお菓子は誰が買うか」だけだとしても。`,
       },
       {
-        title: 'ファミリーゲームナイト：研究が実際に示すこと',
-        content: `毎週日曜の夜、両親とスクラブルをして育った。当時は退屈だと思った。振り返ると、子供時代で最も形成的な体験の一つだった。
+        title: '子供の頃の家族スクラブル、意外と大事だったかもしれない',
+        content: `毎週日曜の夜に親とスクラブルをやっていた。12歳の時はこの世で一番退屈な時間だと思ってた。30歳になって、親がやってくれた中で最も重要なことの一つだったんじゃないかと気づいた。
 
-ファミリーゲームナイトの研究は驚くほど堅牢だ。Coyl-ShepherdとNewland（2013）の縦断研究は、定期的に一緒にゲームをした家族がより強い家族の結束、より良い親子コミュニケーション、より高い家族満足度を報告したことを発見した。
+Coyl-ShepherdとNewlandが2013年にJournal of Family Issuesに出した縦断研究がある。定期的にゲームをする家族は、結束が強く、親子のコミュニケーションが良く、満足度が高かった。食事を一緒にするとか他の活動の影響を除外しても、この結果は変わらなかった。
 
-ワードゲームは異なるスキルレベルを自然に受け入れるため、家族に特に効果的だ。親が8文字の単語を見つける同じ盤で6歳の子が3文字の単語を見つけても、負けているわけではない。皆がお互いの勝利を祝える。
+ワードゲームの家族向きなところは、全員が同じレベルじゃなくても成り立つこと。姪っ子は7歳からゲーム会に参加して、大人が長い単語を探す横で「ねこ」「いぬ」を見つけていた。今は11歳。先月、大人2人に勝った。教材もフラッシュカードも使ってない。ただテーブルに座って吸収しただけ。
 
-世代間の認知的利益に関する新たな研究もある。祖父母が孫とワードゲームをすると、両世代が恩恵を受ける ── 祖父母は認知的刺激と社会的関与を得、孫は語彙への露出と思いやりのある大人からの個別の注目を得る。`,
+祖父母と孫のゲーム研究も興味深い。祖父母側は認知的刺激と社会的関わりを得る。これは認知機能低下に対する最も強い防御因子のうちの二つだ。孫の側は語彙と、マルチタスクしていない大人からの集中した注目を得る。
+
+2022年のEducational Psychology Reviewのレビューはこれを「低不安学習環境」と呼んでいた。ゲームは温かさを生む。温かさは学習を妨げるパフォーマンス不安を下げる。フラッシュカードで叩き込まれるより、遊びの中で拾った単語の方が定着する。まあそうだろう。おばあちゃんとのボグルでストレスを感じた人はいない。`,
       },
       {
-        title: 'ワードゲームコミュニティの構築（そしてそれが重要な理由）',
-        content: `議論した全ての研究は一つの方向を指している：ワードゲームはソーシャルテクノロジーだ。人間をつなぐためのツールであり、その認知的利益は社会的文脈によって増幅される ── 時にドラマチックに。
+        title: 'ゲーム会、やろう',
+        content: `読んできた研究も、自分の体験も、全部同じ方向を向いている。ワードゲームは人と一緒の方がいい。認知的な効果はソロでもある。でも対人だと、プレイの質が上がり、感情が深くなり、記憶に残りやすくなり、一緒に遊んだ相手との距離が縮まる。ソロでは手が届かない層がいくつもある。
 
-一人でワードゲームをプレイすれば、本物の認知的利益を得られる。しかし膨大な価値をテーブルに残している。たった一人を加えるだけで体験が変わる。
+ワードゲームでコミュニティを作ろうと思ったわけじゃない。気づいたらそうなっていた。スコアを共有するグループチャット。月1の対面ゲーム会。誰かが出張中の時のオンライントーナメント。5年前に「一番よく会う友達がワードゲーム仲間になるよ」と言われたら笑っていたと思う。でもそうなった。一番内輪ネタが多い相手がこの人たちだ。
 
-「第三の場所」── 家と職場から離れた社会的環境 ── に関する研究は、定期的で低プレッシャーの社会的集まりがウェルビーイングに不可欠であることを示唆している。ワードゲームナイトは完璧な第三の場所活動だ。
+社会学者のレイ・オルデンバーグは「第三の場所」について書いた。家でも職場でもない社会的空間。バー、床屋、コミュニティセンター。定期的に顔を出して、空気がゆるくて、気づいたら居場所になっている場所。ワードゲーム会はまさにそれだ。上手くなくていい。マニアックな単語を知ってなくていい。ただ来ればいい。
 
-だから提案する：ワードゲームナイトを始めよう。友達を何人か集めて、スナックを開けて、プレイしよう。上手くなくていい。珍しい単語を知らなくてもいい。来て、議論する覚悟があればいい。脳が感謝する。友情が感謝する。`,
+だから。友達を誘って。お菓子を開けて。タイマーをセットして。「気」が有効かどうかで揉めて。（有効だ。中国哲学における生命エネルギーの循環のことで、文句がある人には全力で反論する。）一人で解いてた時間を、誰かと一緒に解く時間に変えてみてほしい。
+
+7文字の単語、部屋中に聞こえた方が気持ちいいから。`,
       },
     ],
     backToBlog: 'ブログに戻る',
@@ -465,101 +477,111 @@ Vuorreら（2021）の研究は、パンデミック中のソーシャルゲー�
     practice: 'マルチプレイヤーで遊ぶ',
   },
   es: {
-    title: 'Por que jugar juegos de palabras con amigos es diferente (La ciencia del gaming social)',
-    subtitle: 'Cognicion cooperativa, basura competitiva, y por que tu cerebro se ilumina literalmente mas cuando hay otros humanos involucrados.',
+    title: 'Juegos de palabras con amigos: por que tu cerebro los necesita mas de lo que crees',
+    subtitle: 'La neurociencia detras de gritar, competir y encontrar palabras imposibles cuando hay gente mirando.',
     category: 'Ciencia Social',
     readTime: '11 min de lectura',
     authorName: 'El Nerd de las Palabras',
-    authorBio: 'Evangelista cronico de juegos de palabras que una vez hizo que un desconocido en el tren jugara Boggle cuatro paradas mas alla de su destino.',
+    authorBio: 'Llevo una hoja de calculo con mis puntuaciones de los ultimos dos anos. Si, lo se. Pero los datos no mienten.',
     sections: [
       {
-        content: `El viernes pasado tenia dos opciones. Opcion A: acurrucarme en el sofa con el telefono y hacer puzzles de palabras en solitario. Opcion B: arrastrar a cuatro amigos a mi departamento, abrir snacks y pasar tres horas gritandonos sobre una cuadricula de letras compartida.
+        content: `Tengo un dato raro. Llevo dos anos registrando mis puntuaciones en juegos de palabras, separadas por si jugue solo o con gente. La columna de "solo" es decente. Nada del otro mundo. La columna de "con amigos" es consistentemente un 15-20% mas alta.
 
-Elegi la B. Obviamente.
+Al principio pense que era puro ego. O sea, claro que te esfuerzas mas cuando alguien te esta mirando. Pero resulta que la explicacion real es bastante mas rara que "no quiero quedar mal delante de mis amigos."
 
-Y no solo fue mas divertido. Jugue mediblemente mejor. Mi longitud promedio de palabra aumento. Encontre palabras que jamas habria visto solo. En un momento jugue una palabra de siete letras y casi me desmaye del rush de dopamina, principalmente porque mi amigo inmediatamente me llamo presumido, lo cual de alguna manera lo hizo aun mejor.
-
-No estoy exagerando. Hay un cuerpo creciente de investigacion que muestra que jugar juegos de palabras socialmente — ya sea cooperativo o competitivo — activa circuitos neuronales diferentes que jugar solo. Tu cerebro literalmente opera en un modo diferente cuando otros humanos estan involucrados.`,
+El viernes pasado me pase tres horas jugando con cuatro amigos. Snacks por todas partes, gritos, risas. En un momento encontre una palabra de siete letras y mi amigo Carlos me dijo "eres insoportable." La verdad es que ese momento me dio mas satisfaccion que cualquier puntuacion alta que haya conseguido solo en mi vida. Y no es una metafora. Tu cerebro activa redes neuronales completamente diferentes cuando hay otras personas en la ecuacion. La ciencia sobre esto es bastante contundente, y me cambio la forma de ver algo que llevaba anos haciendo sin pensar.`,
       },
       {
-        title: 'Solo vs social: Dos cerebros diferentes',
-        content: `Cuando juegas un juego de palabras solo, las regiones primarias que se iluminan son areas de procesamiento del lenguaje — area de Broca, area de Wernicke, corteza prefrontal dorsolateral.
+        title: 'Lo que pasa en tu cerebro cuando dejas de jugar solo',
+        content: `Las zonas que se activan jugando solo son las esperables. Area de Broca, area de Wernicke, corteza prefrontal dorsolateral. Procesamiento del lenguaje. Memoria de trabajo. Lo tipico.
 
-Pero cuando agregas otros jugadores — incluso solo uno — una red adicional completa se activa. Los neurocientificos la llaman "red del cerebro social" e incluye la corteza prefrontal medial, la union temporoparietal y el surco temporal superior posterior.
+Metes a una sola persona mas y se enciende una segunda red entera. Los neurocientificos la llaman "red del cerebro social", que suena grandilocuente pero basicamente es la corteza prefrontal medial, la union temporoparietal y el surco temporal superior posterior haciendo lo que evolucionaron para hacer: intentar adivinar que piensa el otro.
 
-Un estudio historico de Redcay et al. (2010) uso fMRI para comparar la actividad cerebral durante tareas solitarias versus tareas sociales interactivas. La condicion social mostro activacion significativamente mayor en areas asociadas con la mentalizacion — pensar en lo que otros estan pensando.
+En 2010, el equipo de Redcay metio gente en una maquina de fMRI y comparo tareas en solitario con tareas interactivas. Las zonas de mentalizacion se activaron significativamente mas en la condicion social. Lo publicaron en Cerebral Cortex, por si quieres buscarlo.
 
-En terminos de juegos de palabras: cuando juegas solo, solo buscas palabras. Cuando juegas con otros, simultaneamente rastrear que palabras podrian encontrar, anticipas su estrategia, monitoreas las dinamicas sociales y manejas tu ansiedad de rendimiento. El cerebro hace trabajo doble, y eso es energizante, no agotador.`,
+En la practica esto significa que cuando juego solo, busco palabras. Cuando juego con Carlos enfrente, busco palabras Y vigilo que podria encontrar el Y ajusto mi estrategia segun su lenguaje corporal Y intento que no note que estoy atascado. Mi cerebro esta haciendo multitarea de una forma que nunca hace en solitario.
+
+Pensarias que eso agota. Pues no. La red social y el sistema de recompensa se activan juntos. Mas esfuerzo cognitivo, mas placer. Un intercambio raro, pero lo acepto.`,
       },
       {
-        title: 'Cognicion competitiva: Por que la rivalidad agudiza la mente',
-        content: `La competencia hace cosas extranas al cerebro. Estudios de fMRI muestran que los contextos competitivos activan el estriado ventral y la corteza cingulada anterior de maneras que los contextos cooperativos o solitarios no lo hacen.
+        title: 'Competir contra personas te hace mas listo (hasta cierto punto)',
+        content: `Hay un estudio del grupo de Decety de 2004 que me viene a la cabeza constantemente. A unos participantes les dijeron que competian contra otra persona, a otros que contra un ordenador. A veces la "persona" era en realidad un algoritmo. Daba igual. Los que creian que habia un humano al otro lado mostraron mayor activacion en zonas de anticipacion de recompensa y planificacion estrategica.
 
-Un estudio de Decety et al. (2004) encontro que cuando los participantes creian que competian contra otra persona (versus una computadora), su cerebro mostro activacion mejorada en regiones asociadas con la anticipacion de recompensa y la planificacion estrategica. La frase clave es "creian": la creencia de que un humano real estaba del otro lado fue suficiente para desencadenar la cascada neural competitiva.
+Al cerebro le da igual la verdad. Le importa lo que crees.
 
-El mecanismo parece estar relacionado con la teoria de la comparacion social, propuesta por Leon Festinger en 1954. Estamos programados para evaluar nuestras habilidades en relacion con otros. En un juego de palabras competitivo, cada palabra que tu oponente encuentra es un punto de datos que tu cerebro usa para calibrar su propio rendimiento.
+Esto cuadra totalmente con mi experiencia. Contra un bot, bien. Estoy presente. Pero contra alguien que se que me va a vaciar si pierdo? Cada neurona que tengo se pone a buscar palabras largas. La presion competitiva hace algo que no puedes replicar con una tabla de clasificacion.
 
-Hay una trampa. La competencia mejora el rendimiento solo hasta cierto punto. Demasiada presion competitiva desencadena respuestas de ansiedad que realmente deterioran la funcion cognitiva. El punto dulce es lo que los psicologos llaman "excitacion optima" — suficientemente competitivo para motivar, pero no tanto como para generar estres.`,
+Leon Festinger llamo a esto teoria de la comparacion social alla por 1954. Nos evaluamos en relacion a otras personas, no en relacion a un estandar abstracto. En un juego de palabras, cada palabra que encuentra tu rival recalibra tu metro interno de "lo estoy haciendo bien o no." Vas detras? A apretar. Vas delante? Ni te relajes.
+
+Eso si, hay un techo. Demasiada presion y pasas de "motivado" a "ansioso", y un cerebro ansioso es pesimo encontrando palabras creativas. El punto ideal es la competencia de bajo riesgo. Derechos a fardar y poco mas. Probablemente por eso una noche de juegos casual sienta tan bien comparada con un torneo.`,
       },
       {
-        title: 'El efecto Jackbox: Juegos de palabras de fiesta y alegria colectiva',
-        content: `Si alguna vez jugaste un juego de fiesta Jackbox, sabes exactamente de que hablo. Hay un tipo especifico de alegria que viene del juego de palabras en grupo — una electricidad creativa colectiva que no existe cuando estas solo.
+        title: 'Cuando todo el mundo se pone creativo a la vez',
+        content: `Jackbox me arruino. Antes de Jackbox pensaba que los juegos de palabras eran una actividad tranquila, cerebral. Luego jugue Quiplash en una fiesta y descubri que los juegos de palabras con publico en directo son una droga completamente distinta.
 
-Los disenadores de juegos tienen un termino para esto: "espacio creativo compartido." La idea es que cuando multiples personas generan ideas simultaneamente — respuestas graciosas, juegos de palabras creativos, asociaciones inesperadas — el grupo produce algo mayor que cualquier individuo podria solo.
+Los disenadores de juegos lo llaman "espacio creativo compartido." Varias personas generando ideas al mismo tiempo, rebotando unas contra otras, y el resultado del grupo acaba en un sitio donde ninguno habria llegado solo. Bueno, con un matiz. La investigacion de Osborn sobre brainstorming en los anos 50 encontro que los individuos producen mas ideas solos que en grupo, porque los grupos tienen friccion social. La gente se corta, se interrumpe, se autocensura.
 
-Los juegos de palabras crean naturalmente la dinamica correcta. Las reglas proveen estructura. La presion de tiempo previene el sobrepensar. Y el entorno social proporciona retroalimentacion inmediata — risas, quejidos, "venga ya, eso no es una palabra!"
+Pero las ideas que SI salen de los grupos tienden a ser mas raras y creativas, sobre todo cuando el formato es el adecuado. Los juegos de palabras son el formato adecuado. Tienes estructura (tiene que ser una palabra real), presion de tiempo (no le des muchas vueltas), y reaccion inmediata del publico ("ESPERA, eso es una PALABRA?!").
 
-La neurociencia detras de esto involucra neuronas espejo y contagio emocional. Cuando ves a alguien reaccionar con sorpresa o deleite, tu cerebro refleja esa emocion. La alegria de encontrar una buena palabra se amplifica por la alegria de ver a otros reaccionar ante ella. Es un ciclo de retroalimentacion positiva de placer compartido.`,
+Me acuerdo de una ronda hace un par de anos donde una amiga encontro ZOEAS. Media mesa dijo que no existia. Busco el diccionario. Es el plural de zoea, una larva de crustaceo. La discusion duro mas que la ronda. Ese tipo de experiencia no te la da jugar con el movil a las doce de la noche.
+
+Las neuronas espejo tienen algo que ver con que esto funcione. Cuando ves a alguien reaccionar a tu palabra con sorpresa genuina, tu cerebro refleja esa emocion y amplifica el placer original. Se convierte en un bucle. Buena palabra, reaccion grande, sensacion mas grande, intentar superarla en la siguiente ronda.`,
       },
       {
-        title: 'COVID y la linea de vida de la conexion digital',
-        content: `Tenemos que hablar de 2020 y 2021. La pandemia cambio fundamentalmente como pensamos sobre el gaming social.
+        title: 'Lo que paso en 2020',
+        content: `Words With Friends gano un 40% mas de usuarios diarios en marzo de 2020. Scrabble GO se lanzo en plena pandemia y acumulo millones de descargas. La gente estaba encerrada y necesitaba una forma de sentirse conectada que no requiriera otro "after" por Zoom.
 
-Cuando llegaron los confinamientos, las ventas de juegos de mesa se dispararon. Pero tambien los juegos de palabras multijugador en linea. Words With Friends vio un aumento del 40% en usuarios activos diarios en marzo de 2020. La gente buscaba desesperadamente conexion social, y los juegos de palabras proporcionaron una forma unica de ella.
+Un trabajo de Vuorre y colegas publicado en Computers in Human Behavior en 2021 encontro que jugar videojuegos socialmente durante el confinamiento se asociaba con mejor salud mental. Pero solo cuando el juego implicaba interaccion real de ida y vuelta. Jugar al lado de alguien, o jugar de forma asincrona sin hablar, no tenia el mismo efecto. La comunicacion era el ingrediente activo.
 
-Un estudio de Vuorre et al. (2021) encontro que el gaming social durante la pandemia estaba asociado con mejor bienestar mental — pero solo cuando el juego involucraba interaccion social real, no solo jugar junto a otros. El ingrediente clave era la comunicacion.
+Puedo confirmar esto desde mi experiencia. Mis amigos de la universidad y yo montamos una noche de Boggle semanal por Zoom esa primavera. Nos deciamos que era por el juego. No era por el juego. Era pasar una hora gritandonos sobre si tal palabra cuenta, y luego veinte minutos mas poniendose al dia de la vida mientras haciamos como que seguiamos discutiendo las reglas.
 
-Jugue mas juegos de palabras en linea durante el confinamiento que en cualquier otro periodo de mi vida. Mirando hacia atras, esos juegos no eran realmente sobre las palabras. Eran sobre mantener conexiones. Mi noche semanal de Boggle por Zoom no era una sesion de juego, era un ritual social disfrazado de juego.`,
+Cuando miro atras a 2020, esas noches de los jueves son de los recuerdos mas nitidos que tengo. No porque las partidas fueran buenas. Porque la conexion lo era. Incluso a traves de una pantalla, con audio malo y el gato de alguien caminando sobre el teclado, funcionaba. Los juegos de palabras nos daban una excusa para estar ahi los unos para los otros sin tener que decir "me siento solo y necesito verte."`,
       },
       {
-        title: 'El renacimiento del multijugador local',
-        content: `Mira, esto me emociona de verdad. Despues de anos de gaming moviendose cada vez mas en linea, hay un renacimiento del multijugador local — personas jugando juntas, en la misma habitacion.
+        title: 'En la misma habitacion es otro juego',
+        content: `Los cafes de juegos de mesa pasaron de menos de 1.000 en todo el mundo en 2015 a mas de 5.000 en 2023. Los juegos de fiesta llevan desde 2019 vendiendo mas que cualquier otra categoria de juegos de mesa. Hay un apetito claro por jugar juntos en persona que la pandemia no mato. Si acaso, dejo a la gente con mas ganas.
 
-Los datos lo respaldan. Los cafes de juegos de mesa han explotado globalmente — habia aproximadamente 5,000+ en todo el mundo para 2023, frente a menos de 1,000 en 2015. Las ventas de juegos de fiesta han superado consistentemente a otras categorias de juegos de mesa desde 2019.
+Yo empece a organizar una noche mensual de juegos de palabras cuando se acabaron los confinamientos. El montaje es ridiculo de simple. Snacks, un cronometro, fichas de letras y quien se apunte. Sin invitaciones formales. Sin reglas complicadas. Solo ven y juega.
 
-Los juegos de palabras encajan perfectamente en este renacimiento. No necesitas hardware costoso. No necesitas aprender reglas complejas. Necesitas letras y humanos, y listo.
+Lo que me sigue sorprendiendo es lo diferente que se siente respecto a las sesiones online. Online mola, pero en persona hay informacion fluyendo que una pantalla no transmite. La rodilla de alguien rebotando porque esta atascado. Ese suspiro pequeno cuando la cuadricula es mala. Una ceja levantada al otro lado de la mesa cuando tu amigo juega algo inesperado.
 
-Lo que me impacta cada vez es cuan diferente es la energia comparada con nuestras sesiones en linea. Hay algo sobre la proximidad fisica que cambia la experiencia fundamentalmente. Una ceja levantada cuando alguien juega una palabra inesperada. La frustracion visible de buscar una palabra que sabes que esta ahi. El quejido sincronizado cuando se acaba el tiempo.`,
+Baltes y colegas hicieron un metaanalisis en 2002 comparando grupos presenciales con remotos. Presencial ganaba en coordinacion y resolucion creativa de problemas. No es ninguna sorpresa, pero el tamano del efecto era mayor de lo que esperaba. La proximidad fisica cambia como la gente piensa junta, no solo como se siente estando junta. Cuando estoy sentado enfrente de alguien, pillo senales que nunca notaria por una webcam, y esas senales cambian mi forma de jugar.`,
       },
       {
-        title: 'Basurear como vinculo: La paradoja de los insultos amistosos',
-        content: `Seamos honestos. Una de mis partes favoritas de los juegos de palabras multijugador es el basureo.
+        title: 'El poder de llamar a tu amigo farsante lexico',
+        content: `Nadie habla de esto pero el vacile es la mitad de la gracia.
 
-Hay una paradoja maravillosa en el corazon del gaming social competitivo: los insultos los acercan. Llamar a tu amigo un "fraude lexical" cuando juega una palabra de dos letras no es agresivo, es intimo. Senala una relacion lo suficientemente segura para absorber hostilidad juguetona.
+Llamar a alguien "farsante lexico" cuando juega EN por dos puntos. La exclamacion teatral cuando tu rival encuentra una palabra de siete letras. La indignacion fingida, la devastacion de broma, los rencores que duran exactamente hasta que empieza la siguiente ronda.
 
-Los psicologos llaman a esto "burla afiliativa," y se ha estudiado extensamente. Keltner et al. (2001) mostraron que las burlas cumplen funciones sociales cruciales: prueban y refuerzan lazos sociales, establecen normas grupales y crean humor compartido.
+Los psicologos tienen un termino para esto: burla afiliativa. El grupo de Keltner publico un trabajo en 2001 mostrando que los insultos juguetones en realidad refuerzan los lazos sociales. Son una senal de confianza. Solo puedes llamar a alguien tramposo si los dos sabeis que no lo dices en serio. Es un test de estres de la relacion que ademas funciona como entretenimiento.
 
-En los juegos de palabras especificamente, el basureo cumple una funcion adicional — crea narrativa. Una ronda de Boggle sin comentarios es solo un ejercicio de vocabulario. Una ronda de Boggle con basureo es una historia. La referenciaremos durante semanas.`,
+Pero en los juegos de palabras, el vacile hace algo mas. Convierte un ejercicio de vocabulario en una historia. Mi grupo de amigos todavia habla del Incidente de Laura. Hace tres anos jugo QUOF (si, existe) y desato un debate de veinte minutos que dividio la mesa. Lo sacamos a relucir al menos una vez al mes. Sin la discusion, esa ronda se habria olvidado para la manana siguiente.
+
+Cada noche de juegos genera este tipo de material. Chistes internos, bromas recurrentes, revancha pendientes. La investigacion sobre experiencias nuevas compartidas y calidad de las relaciones dice que esto importa. Parejas y grupos de amigos que hacen cosas emocionantes juntos reportan mayor satisfaccion. Los juegos de palabras cumplen ambos requisitos si juegas bien. Cuadricula nueva cada vez, la presion del tiempo manteniendo la adrenalina, y la tension competitiva justa para que sientas que algo esta en juego. Aunque lo unico en juego sea quien compra los snacks la proxima vez.`,
       },
       {
-        title: 'Noche de juegos familiar: Lo que la investigacion realmente muestra',
-        content: `Creci jugando Scrabble con mis padres cada domingo por la noche. En ese momento pensaba que era aburrido. Mirando atras, fue una de las experiencias mas formativas de mi infancia.
+        title: 'Puede que el Scrabble con tus padres fuera mas importante de lo que piensas',
+        content: `Jugaba Scrabble con mis padres todos los domingos por la noche. A los doce me parecia lo mas aburrido del universo. A los treinta me di cuenta de que probablemente fue una de las cosas mas importantes que hicieron por mi.
 
-La investigacion sobre noches de juegos familiares es sorprendentemente robusta. Un estudio longitudinal de Coyl-Shepherd y Newland (2013) encontro que las familias que jugaban juegos regularmente juntas reportaban mayor cohesion familiar, mejor comunicacion padre-hijo y mayor satisfaccion familiar.
+Un estudio longitudinal de Coyl-Shepherd y Newland, publicado en el Journal of Family Issues en 2013, siguio a familias durante anos. Las que jugaban juntas con regularidad tenian mejor cohesion, mejor comunicacion entre padres e hijos, y puntuaciones mas altas de satisfaccion. Y esto se mantenia incluso controlando otras actividades familiares como cenar juntos o aficiones compartidas.
 
-Los juegos de palabras son particularmente efectivos para familias porque acomodan naturalmente diferentes niveles de habilidad. Un nino de seis anos encontrando una palabra de tres letras en la misma cuadricula donde un padre encuentra una de ocho no esta perdiendo. Todos pueden celebrar las victorias de todos.
+Los juegos de palabras tienen una ventaja concreta para las familias: no necesitan que todos esten al mismo nivel. Mi sobrina empezo a venir a las noches de juegos con siete anos, encontrando SOL y PAN mientras los adultos buscaban palabras mas largas. Ahora tiene once. El mes pasado le gano a dos adultos. Sin clases formales, sin fichas de estudio. Simplemente absorbio vocabulario sentandose a la mesa.
 
-Tambien hay investigacion emergente sobre beneficios cognitivos intergeneracionales. Cuando los abuelos juegan juegos de palabras con nietos, ambas generaciones se benefician: los abuelos obtienen estimulacion cognitiva, y los nietos obtienen exposicion al vocabulario y atencion de un adulto carinoso.`,
+Hay una linea de investigacion mas reciente sobre juegos entre abuelos y nietos que me parece interesante. Los dos salen ganando. El abuelo recibe estimulacion cognitiva y conexion social, que son dos de los factores protectores mas fuertes contra el deterioro cognitivo. El nino recibe exposicion a vocabulario y atencion exclusiva de un adulto que no esta intentando hacer tres cosas a la vez.
+
+Una revision de 2022 en Educational Psychology Review llamo a esto "entorno de aprendizaje de baja ansiedad." Los juegos crean calidez. La calidez reduce la ansiedad de rendimiento que dificulta el aprendizaje. Los ninos retienen mejor las palabras nuevas cuando las aprenden jugando que cuando alguien se las machaca con fichas. Lo cual tiene todo el sentido del mundo. A nadie le ha dado estres jugando Boggle con la abuela.`,
       },
       {
-        title: 'Construir una comunidad de juegos de palabras (y por que importa)',
-        content: `Toda la investigacion que he discutido apunta en una direccion: los juegos de palabras son tecnologia social. Son herramientas para conectar humanos, y sus beneficios cognitivos se amplifican — a veces dramaticamente — por el contexto social.
+        title: 'Monta una noche de juegos. En serio.',
+        content: `Todo lo que he leido y todo lo que he vivido apunta en la misma direccion. Los juegos de palabras son mejores con gente. Los beneficios cognitivos son reales de cualquier forma, solo o en grupo. Pero la version social anade capas que la solitaria no puede tocar: juegas mejor, sientes mas, lo recuerdas mas tiempo, y terminas mas cerca de las personas con las que jugaste.
 
-Si juegas juegos de palabras solo, obtienes beneficios cognitivos genuinos. Pero estas dejando una cantidad enorme de valor sobre la mesa. Agregar incluso una persona transforma la experiencia.
+No me propuse crear una comunidad alrededor de los juegos de palabras. Simplemente paso. Un grupo de WhatsApp donde compartimos puntuaciones diarias. Una noche presencial al mes. Algun torneo online cuando alguien esta de viaje. Si me hubieran dicho hace cinco anos que mi circulo social mas constante iba a ser "los amigos de los juegos de palabras", me habria reido. Pero asi es. Son las personas que veo mas a menudo. Con las que tengo mas chistes internos.
 
-La investigacion sobre "terceros lugares" — entornos sociales separados del hogar y el trabajo — sugiere que reuniones sociales regulares y de baja presion son esenciales para el bienestar. Las noches de juegos de palabras son actividades perfectas de tercer lugar.
+El sociologo Ray Oldenburg escribio sobre los "terceros lugares", espacios sociales que no son ni casa ni trabajo. Bares, peluquerias, centros comunitarios. Sitios donde vas con regularidad, el ambiente es relajado, y la sensacion de pertenencia va llegando poco a poco. Una noche de juegos de palabras es un tercer lugar. No tienes que ser bueno. No tienes que conocer palabras raras. Solo tienes que aparecer.
 
-Asi que aqui va mi propuesta: empieza una noche de juegos de palabras. Agarra unos amigos, abre snacks y jueguen. No necesitas ser bueno. No necesitas saber palabras oscuras. Solo necesitas presentarte y estar dispuesto a discutir. Tu cerebro te lo agradecera. Tus amistades te lo agradeceran.`,
+Asi que nada. Junta a unos amigos. Abre algo para picar. Pon un cronometro. Discutid sobre si QI vale. (Vale. Es la fuerza vital circulante en la filosofia china, y le discuto a quien haga falta.) Mira que pasa cuando dejas de jugar solo y empiezas a jugar con gente.
+
+La palabra de siete letras pega distinto cuando la oye toda la sala.`,
       },
     ],
     backToBlog: 'Volver al blog',
