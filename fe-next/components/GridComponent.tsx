@@ -320,6 +320,12 @@ const GridComponent = memo<GridComponentProps>(({
     return undefined;
   }, [currentTier, reduceMotion]);
 
+  // Clamp selection length for non-selected cells: they only need to know
+  // whether ANY selection exists (0 vs 1), not the exact count.
+  // This prevents all 16+ cells from re-rendering on every letter addition
+  // since memo() sees a stable prop (0 or 1) instead of 0→1→2→3→...
+  const hasAnySelection = selectedCells.length > 0 ? 1 : 0;
+
   const gridDimensions = useMemo(() => ({
     cols: grid[0]?.length || 4,
     rows: grid.length || 4,
@@ -471,7 +477,7 @@ const GridComponent = memo<GridComponentProps>(({
                   isTypingMode={isTypingMode}
                   hintAnimationPhase={hintAnimationPhase}
                   currentTier={currentTier}
-                  selectedCellsLength={selectedCells.length}
+                  selectedCellsLength={isSelected || isLastSelected ? selectedCells.length : hasAnySelection}
                   onTouchStart={handleCellTouchStart}
                   onMouseDown={handleCellMouseDown}
                   onDoubleClick={handleCellDoubleClick}

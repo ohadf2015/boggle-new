@@ -433,7 +433,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       <ResultsMainContent
         {...mainContentProps}
         onShowDetails={() => setMobileActiveTab('details')}
-        hideInlineCta={true}
+        hideInlineCta={!isBotsOnlyGame}
       />
     </>
   );
@@ -585,7 +585,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <div className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4">
             <ResultsMainContent
               {...mainContentProps}
-              hideInlineCta={!!gameCode}
+              hideInlineCta={!!gameCode && !isBotsOnlyGame}
             />
           </div>
 

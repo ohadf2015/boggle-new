@@ -501,6 +501,7 @@ const he = {
     "button": "שתף",
     "linkCopied": "הקישור הועתק! 🔗",
     "copyError": "לא הצליח - נסו שוב",
+    "manualCopy": "העתיקו קישור זה:",
     "inviteMessage": "קרב מילים עכשיו! בואו 🔥",
     "room": "חדר",
     "code": "קוד",
@@ -1714,6 +1715,10 @@ const he = {
     "tryBotsDesc": "בדקו את הכישורים שלכם מול יריבי AI",
     "tryMultiplayer": "שחקו עם חברים",
     "tryMultiplayerDesc": "קרבות מילים בזמן אמת",
+    "wordHuntCta": "שחקו ציד מילים יומי",
+    "wordHuntCtaDesc": "האתגר היומי מחכה לכם!",
+    "wordHuntAlreadyPlayed": "כבר שיחקתם היום",
+    "wordHuntAlreadyPlayedDesc": "חזרו מחר!",
     "encouragement": {
       "legendary": "מדהים!",
       "great": "עבודה יפה!",

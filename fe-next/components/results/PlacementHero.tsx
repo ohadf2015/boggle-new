@@ -78,15 +78,15 @@ const RANK_THEMES: Record<number, RankTheme> = {
     messageKey: 'results.secondPlace',
   },
   3: {
-    bgClass: 'bg-gradient-to-br from-orange-400 via-amber-300 to-orange-400',
-    textClass: 'text-neo-black',
-    accentColor: '#FF6B35',
-    glowColor: 'rgba(255,107,53,0.3)',
+    bgClass: 'bg-gradient-to-br from-amber-700 via-orange-600 to-amber-700',
+    textClass: 'text-neo-cream',
+    accentColor: '#CD7F32',
+    glowColor: 'rgba(205,127,50,0.3)',
     scoreBoxBg: 'bg-neo-cream',
     scoreTextColor: 'text-neo-black',
     borderColor: 'border-neo-black',
-    badgeBg: 'bg-orange-100',
-    badgeText: 'text-orange-600',
+    badgeBg: 'bg-amber-100',
+    badgeText: 'text-amber-700',
     icon: Medal,
     messageKey: 'results.thirdPlace',
   },
@@ -236,12 +236,12 @@ const PlacementHero = memo<PlacementHeroProps>(({
               className="flex flex-col items-center gap-2 mb-4"
             >
               <div className="flex items-center gap-2">
-                <Target className={`w-4 h-4 sm:w-5 sm:h-5 ${isPodium ? 'text-neo-black/60' : 'text-neo-lime'}`} />
-                <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] ${isPodium ? 'text-neo-black/50' : 'text-neo-cream/50'}`}>
+                <Target className={`w-4 h-4 sm:w-5 sm:h-5 ${theme.textClass} opacity-60`} />
+                <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] ${theme.textClass} opacity-50`}>
                   {t('results.targetWord')}
                 </span>
               </div>
-              <span className={`font-neo-display text-3xl xs:text-4xl sm:text-5xl tracking-widest uppercase break-all text-center ${isPodium ? 'text-neo-black drop-shadow-[2px_2px_0px_rgba(255,255,255,0.5)]' : 'text-white drop-shadow-[4px_4px_0px_#000]'}`}>
+              <span className={`font-neo-display font-black text-3xl xs:text-4xl sm:text-5xl tracking-widest uppercase break-all text-center ${theme.textClass} ${rank <= 2 ? 'drop-shadow-[2px_2px_0px_rgba(255,255,255,0.5)]' : 'drop-shadow-[4px_4px_0px_#000]'}`}>
                 {wordHuntData.targetWord}
               </span>
               {wordHuntData.foundTarget && (
@@ -322,7 +322,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
             {username && (
               <h2
                 className={`font-black ${theme.textClass} uppercase leading-none text-center text-xl sm:text-2xl`}
-                style={isPodium ? { textShadow: '2px 2px 0px rgba(0,0,0,0.1)' } : { textShadow: '2px 2px 0px var(--neo-cyan)' }}
+                style={rank <= 2 ? { textShadow: '2px 2px 0px rgba(0,0,0,0.1)' } : isPodium ? { textShadow: '2px 2px 0px rgba(0,0,0,0.3)' } : { textShadow: '2px 2px 0px var(--neo-cyan)' }}
               >
                 {username}
               </h2>
@@ -330,7 +330,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
 
             {/* Word Hunt survival time */}
             {wordHuntData && (
-              <span className={`text-[10px] font-black uppercase tracking-wider ${isPodium ? 'text-neo-black/60' : 'text-neo-lime'}`}>
+              <span className={`text-[10px] font-black uppercase tracking-wider ${theme.textClass} opacity-60`}>
                 {t('results.survived')} {Math.floor(wordHuntData.survivalTime / 60)}:{String(wordHuntData.survivalTime % 60).padStart(2, '0')}
               </span>
             )}
@@ -342,8 +342,8 @@ const PlacementHero = memo<PlacementHeroProps>(({
               initial={reducedMotion ? undefined : { opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 15 }}
-              className={`font-neo-display text-3xl xs:text-4xl sm:text-5xl ${theme.textClass} uppercase tracking-tight text-center leading-none mb-3`}
-              style={isPodium ? { textShadow: '3px 3px 0px rgba(0,0,0,0.08)' } : { textShadow: '0 0 20px rgba(191,255,0,0.3)' }}
+              className={`font-neo-display font-black text-3xl xs:text-4xl sm:text-5xl ${theme.textClass} uppercase tracking-tight text-center leading-none mb-3`}
+              style={rank <= 2 ? { textShadow: '3px 3px 0px rgba(0,0,0,0.08)' } : isPodium ? { textShadow: '3px 3px 0px rgba(0,0,0,0.3)' } : { textShadow: '0 0 20px rgba(191,255,0,0.3)' }}
             >
               {rank === 1 ? t('results.greatVictory') : t('results.greatBattle')}
             </AdaptiveMotion.h1>
@@ -388,7 +388,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
               initial={reducedMotion ? undefined : { opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.55, type: 'spring', stiffness: 300, damping: 18 }}
-              className={`text-center text-xs sm:text-sm font-black uppercase tracking-tight mt-2 ${isPodium ? 'text-neo-black/60' : 'text-neo-pink'}`}
+              className={`text-center text-xs sm:text-sm font-black uppercase tracking-tight mt-2 ${isPodium ? `${theme.textClass} opacity-60` : 'text-neo-pink'}`}
             >
               {t('results.pointsBehind', { points: gapToWinner })}
             </AdaptiveMotion.p>

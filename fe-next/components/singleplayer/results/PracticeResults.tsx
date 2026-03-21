@@ -3,17 +3,19 @@
 import { memo, useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Trophy, Users, Swords, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Trophy, RotateCcw, Crosshair, Lock } from 'lucide-react';
 import { calculateWordScore } from '@/shared/utils/scoring';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { fireConfetti } from '@/utils/confettiUtils';
+import { fireConfetti, fireVictoryConfetti } from '@/utils/confettiUtils';
 import { clearSessionPreservingUsername } from '@/utils/session';
+import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge/storage';
+import type { Language } from '@/shared/types/game';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
-import MissedWordsSection from './components/MissedWordsSection';
+import MissedWords from '@/components/results/MissedWords';
 import {
   useGuestStatsSync,
   useLeaderboardSync,
@@ -48,17 +50,17 @@ const TIER_CONFETTI: Record<Tier, string[]> = {
 
 // ─── Floating sparkle particle (CSS-only, compositor-friendly) ───
 
-const SPARKLE_COUNT = 8;
+const SPARKLE_COUNT = 10;
 
 function FloatingSparkles({ tier }: { tier: Tier }) {
   const sparkles = useMemo(() => {
     const colors = TIER_CONFETTI[tier];
     return Array.from({ length: SPARKLE_COUNT }, (_, i) => ({
       id: i,
-      left: `${10 + (i * 11) % 80}%`,
-      size: 3 + (i % 3) * 2,
-      delay: i * 0.4,
-      duration: 3 + (i % 3),
+      left: `${8 + (i * 9) % 84}%`,
+      size: 3 + (i % 4) * 2,
+      delay: i * 0.35,
+      duration: 2.5 + (i % 3),
       color: colors[i % colors.length],
     }));
   }, [tier]);
@@ -105,7 +107,7 @@ function useCountUp(target: number, duration = 1.2, delay = 0.3) {
     const timeout = setTimeout(() => {
       const controls = animate(motionVal, target, {
         duration,
-        ease: [0.16, 1, 0.3, 1], // Fast start, slow end
+        ease: [0.16, 1, 0.3, 1],
       });
       return () => controls.stop();
     }, delay * 1000);
@@ -156,16 +158,7 @@ function StaggeredText({ text, className, delay = 0 }: {
   );
 }
 
-// ─── Mode suggestion cards ───
-
-interface ModeSuggestion {
-  titleKey: string;
-  descKey: string;
-  href: string;
-  icon: React.ReactNode;
-  bg: string;
-  iconBg: string;
-}
+// ─── Component ───
 
 interface PracticeResultsProps {
   results: SinglePlayerResultsData;
@@ -178,12 +171,16 @@ const PracticeResults = memo(function PracticeResults({
   onPlayAgain,
   onBackToLobby,
 }: PracticeResultsProps) {
-  const { t, language, dir } = useLanguage();
+  const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const reducedMotion = useReducedMotion();
   const router = useRouter();
-  const isRTL = dir === 'rtl';
-  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+
+  // ─── Daily challenge availability ───
+  const dailyAlreadyPlayed = useMemo(
+    () => hasPlayedWordHuntToday(language as Language),
+    [language],
+  );
 
   // ─── Data persistence hooks (invisible to user) ───
   const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
@@ -221,7 +218,7 @@ const PracticeResults = memo(function PracticeResults({
     );
     return results.allPossibleWords
       .filter(word => !playerFoundSet.has(word.toLowerCase()))
-      .map(word => ({ word, score: calculateWordScore(word) }))
+      .map(word => ({ word, score: calculateWordScore(word), foundBy: [] as string[] }))
       .sort((a, b) => b.score - a.score || b.word.length - a.word.length);
   }, [results.allPossibleWords, results.playerWordData]);
 
@@ -237,80 +234,62 @@ const PracticeResults = memo(function PracticeResults({
     reducedMotion ? 0 : 0.3,
   );
 
-  // ─── Confetti on mount (tier-matched colors) ───
+  // ─── Confetti on mount — celebratory for all tiers ───
   const confettiFired = useRef(false);
   useEffect(() => {
-    if (confettiFired.current) return;
-    if (results.playerScore > 0 && !reducedMotion) {
-      confettiFired.current = true;
-      const count = tier === 'legendary' ? 120 : tier === 'great' ? 80 : 40;
+    if (confettiFired.current || reducedMotion) return;
+    confettiFired.current = true;
+    if (tier === 'legendary' || tier === 'great') {
+      fireVictoryConfetti();
+    } else {
       fireConfetti({
-        particleCount: count,
-        spread: 70,
-        origin: { y: 0.6 },
+        particleCount: tier === 'nice' ? 60 : 40,
+        spread: 80,
+        origin: { y: 0.5 },
         colors: TIER_CONFETTI[tier],
       });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ─── Mode suggestions ───
-  const suggestions: ModeSuggestion[] = useMemo(() => [
-    {
-      titleKey: 'practiceResults.tryDaily',
-      descKey: 'practiceResults.tryDailyDesc',
-      href: `/${language}/daily`,
-      icon: <Trophy className="w-5 h-5" />,
-      bg: 'bg-amber-400',
-      iconBg: 'bg-amber-500',
-    },
-    {
-      titleKey: 'practiceResults.tryBots',
-      descKey: 'practiceResults.tryBotsDesc',
-      href: `/${language}/singleplayer?preset=bots`,
-      icon: <Swords className="w-5 h-5" />,
-      bg: 'bg-neo-cyan',
-      iconBg: 'bg-neo-cyan-dark',
-    },
-    {
-      titleKey: 'practiceResults.tryMultiplayer',
-      descKey: 'practiceResults.tryMultiplayerDesc',
-      href: `/${language}/multiplayer`,
-      icon: <Users className="w-5 h-5" />,
-      bg: 'bg-neo-pink',
-      iconBg: 'bg-neo-pink-dark',
-    },
-  ], [language]);
-
-  const handleNavigate = useCallback((href: string) => {
+  // ─── Navigation ───
+  const handleDailyChallenge = useCallback(() => {
     clearSessionPreservingUsername();
-    router.push(href);
-  }, [router]);
+    router.push(`/${language}/daily`);
+  }, [router, language]);
 
   const inf = reducedMotion ? 0 : Infinity;
 
+  // ─── Tier colors for text ───
+  const tierTextColor = tier === 'legendary'
+    ? 'text-neo-lime'
+    : tier === 'great'
+      ? 'text-neo-cyan'
+      : tier === 'nice'
+        ? 'text-neo-pink'
+        : 'text-neo-yellow';
+
   return (
     <div className="min-h-dvh bg-neo-navy text-white flex flex-col relative overflow-hidden">
-      {/* ── Floating sparkle particles (reduced-motion safe) ── */}
       {!reducedMotion && <FloatingSparkles tier={tier} />}
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 pb-28 md:pb-8 pt-6 relative z-10">
-        <div className="w-full max-w-md mx-auto space-y-6">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32 md:pb-8 pt-6 relative z-10">
+        <div className="w-full max-w-md mx-auto space-y-5">
 
-          {/* ── Hero: Score + Encouragement ── */}
+          {/* ── Hero: Mascot + Score + Encouragement ── */}
           <motion.div
             initial={reducedMotion ? false : { opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             className="text-center"
           >
-            {/* Mascot with bounce-wobble after entrance */}
-            <div className="flex justify-center mb-3">
+            {/* Large celebratory mascot */}
+            <div className="flex justify-center mb-4">
               <motion.div
-                className="w-20 h-20 rounded-full bg-neo-cream/90 border-4 border-neo-black shadow-hard-lg flex items-center justify-center"
+                className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-neo-cream/90 border-4 border-neo-black shadow-hard-lg flex items-center justify-center"
                 initial={reducedMotion ? false : { scale: 0, rotate: -15 }}
                 animate={reducedMotion
                   ? { scale: 1 }
-                  : { scale: [0, 1.2, 0.9, 1.05, 1], rotate: [-15, 8, -4, 2, 0] }
+                  : { scale: [0, 1.15, 0.92, 1.05, 1], rotate: [-15, 8, -4, 2, 0] }
                 }
                 transition={{
                   delay: 0.2,
@@ -319,34 +298,28 @@ const PracticeResults = memo(function PracticeResults({
                   ease: 'easeOut',
                 }}
               >
-                {tier === 'legendary' ? (
-                  <CelebrationMascotWithEntrance variant="trophy" size="sm" delay={0.4} />
+                {tier === 'warmup' ? (
+                  <MascotWithEntrance variant="encouraging" size="md" delay={0.4} />
                 ) : (
-                  <MascotWithEntrance variant="happy" size="sm" delay={0.4} />
+                  <CelebrationMascotWithEntrance variant="celebration" size="md" delay={0.4} />
                 )}
               </motion.div>
             </div>
 
-            {/* Encouragement text with per-character stagger */}
+            {/* Encouragement text */}
             {reducedMotion ? (
-              <p className={cn(
-                'text-sm font-black uppercase tracking-wider mb-1',
-                tier === 'legendary' ? 'text-neo-lime' : tier === 'great' ? 'text-neo-cyan' : 'text-neo-pink',
-              )}>
+              <p className={cn('text-sm font-black uppercase tracking-wider mb-1', tierTextColor)}>
                 {t(encouragementKey)}
               </p>
             ) : (
               <StaggeredText
                 text={t(encouragementKey)}
                 delay={0.5}
-                className={cn(
-                  'text-sm font-black uppercase tracking-wider mb-1',
-                  tier === 'legendary' ? 'text-neo-lime' : tier === 'great' ? 'text-neo-cyan' : 'text-neo-pink',
-                )}
+                className={cn('text-sm font-black uppercase tracking-wider mb-1', tierTextColor)}
               />
             )}
 
-            {/* Big score — counting up animation */}
+            {/* Big score */}
             <motion.div
               initial={reducedMotion ? false : { scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -360,7 +333,7 @@ const PracticeResults = memo(function PracticeResults({
               {displayScore}
             </motion.div>
 
-            {/* Words found stat */}
+            {/* Words found */}
             <motion.p
               initial={reducedMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -388,110 +361,104 @@ const PracticeResults = memo(function PracticeResults({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55 }}
             >
-              <MissedWordsSection
-                words={allBoardMissedWords}
-                playerFoundCount={validWordCount}
-                totalBoardWords={results.allPossibleWords?.length || undefined}
-                initialDisplayCount={10}
+              <MissedWords
+                missedWords={allBoardMissedWords}
+                maxDisplay={5}
               />
             </motion.div>
           )}
 
-          {/* ── Play Again button with gentle pulse ── */}
+          {/* ── Primary CTA: Word Hunt Daily ── */}
           <motion.div
-            initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+            initial={reducedMotion ? false : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex justify-center"
-          >
-            <motion.button
-              onClick={onPlayAgain}
-              animate={reducedMotion ? {} : { scale: [1, 1.04, 1] }}
-              transition={{
-                duration: 2,
-                repeat: inf,
-                ease: 'easeInOut',
-                repeatDelay: 1,
-              }}
-              whileHover={reducedMotion ? { opacity: 0.9 } : { scale: 1.08 }}
-              whileTap={reducedMotion ? {} : { scale: 0.95 }}
-              className={cn(
-                'inline-flex items-center gap-2.5',
-                'px-8 py-3.5',
-                'bg-neo-lime text-neo-black',
-                'font-black text-base uppercase',
-                'border-4 border-neo-black rounded-neo',
-                'shadow-hard-lg',
-                'transition-shadow duration-150',
-              )}
-            >
-              <RotateCcw className="w-5 h-5" />
-              {t('practiceResults.playAgain')}
-            </motion.button>
-          </motion.div>
-
-          {/* ── Divider with "or try something new" ── */}
-          <motion.div
-            initial={reducedMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="flex items-center gap-3"
+            className="space-y-3"
           >
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-[10px] font-bold uppercase text-white/40 tracking-wider">
-              {t('practiceResults.orTrySomethingNew')}
-            </span>
-            <div className="flex-1 h-px bg-white/10" />
-          </motion.div>
-
-          {/* ── Mode suggestion cards with jelly wobble hover ── */}
-          <div className="space-y-2.5">
-            {suggestions.map((s, i) => (
-              <motion.button
-                key={s.titleKey}
-                initial={reducedMotion ? false : { opacity: 0, x: isRTL ? 20 : -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.65 + i * 0.1 }}
-                whileHover={reducedMotion
-                  ? { opacity: 0.9 }
-                  : { scaleX: 1.03, scaleY: 0.97 }
-                }
-                whileTap={reducedMotion ? {} : { scale: 0.97 }}
-                onClick={() => handleNavigate(s.href)}
+            {dailyAlreadyPlayed ? (
+              /* Already played — disabled state */
+              <div
                 className={cn(
-                  'w-full flex items-center gap-3 p-3',
-                  s.bg,
-                  'border-3 border-neo-black rounded-neo shadow-hard',
-                  'text-start',
+                  'w-full flex items-center justify-center gap-3',
+                  'px-6 py-4',
+                  'bg-white/5 text-white/40',
+                  'font-black text-base uppercase',
+                  'border-3 border-white/10 rounded-neo',
+                  'cursor-not-allowed',
                 )}
-                style={{ transition: 'box-shadow 150ms' }}
               >
-                <motion.div
-                  className={cn(
-                    'w-10 h-10 rounded-neo border-2 border-neo-black flex items-center justify-center shrink-0',
-                    s.iconBg, 'text-neo-black',
-                  )}
-                  animate={reducedMotion ? {} : { rotate: [0, -8, 8, -4, 0] }}
-                  transition={{
-                    delay: 1.2 + i * 0.15,
-                    duration: 0.5,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  {s.icon}
-                </motion.div>
-                <div className="flex-1 min-w-0">
-                  <span className="font-black text-neo-black text-sm uppercase block">
-                    {t(s.titleKey)}
-                  </span>
-                  <span className="text-neo-black/70 text-xs font-medium block truncate">
-                    {t(s.descKey)}
+                <Lock className="w-5 h-5" />
+                <div className="text-start">
+                  <span className="block">{t('practiceResults.wordHuntAlreadyPlayed')}</span>
+                  <span className="text-xs font-medium text-white/30 block">
+                    {t('practiceResults.wordHuntAlreadyPlayedDesc')}
                   </span>
                 </div>
-                <ArrowIcon className="w-5 h-5 text-neo-black/60 shrink-0" />
+              </div>
+            ) : (
+              /* Daily available — big inviting CTA */
+              <motion.button
+                onClick={handleDailyChallenge}
+                animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
+                transition={{
+                  duration: 2.5,
+                  repeat: inf,
+                  ease: 'easeInOut',
+                  repeatDelay: 0.5,
+                }}
+                whileHover={reducedMotion ? { opacity: 0.9 } : { scale: 1.06 }}
+                whileTap={reducedMotion ? {} : { scale: 0.96 }}
+                className={cn(
+                  'w-full flex items-center justify-center gap-3',
+                  'px-6 py-4',
+                  'bg-amber-400 text-neo-black',
+                  'font-black text-base uppercase',
+                  'border-4 border-neo-black rounded-neo',
+                  'shadow-hard-lg',
+                  'transition-shadow duration-150',
+                )}
+              >
+                <Crosshair className="w-6 h-6" />
+                <div className="text-start">
+                  <span className="block">{t('practiceResults.wordHuntCta')}</span>
+                  <span className="text-xs font-medium text-neo-black/60 block">
+                    {t('practiceResults.wordHuntCtaDesc')}
+                  </span>
+                </div>
+                <Trophy className="w-5 h-5 text-amber-600" />
               </motion.button>
-            ))}
-          </div>
+            )}
+
+            {/* ── Secondary actions row ── */}
+            <div className="hidden md:flex gap-2.5 justify-center">
+              <button
+                onClick={onPlayAgain}
+                className={cn(
+                  'inline-flex items-center gap-2 px-5 py-2.5',
+                  'bg-white/10 text-white/80',
+                  'font-bold text-sm uppercase',
+                  'border-2 border-white/20 rounded-neo',
+                  'transition-colors hover:bg-white/20',
+                )}
+              >
+                <RotateCcw className="w-4 h-4" />
+                {t('practiceResults.playAgain')}
+              </button>
+              <button
+                onClick={onBackToLobby}
+                className={cn(
+                  'inline-flex items-center gap-2 px-5 py-2.5',
+                  'bg-white/10 text-white/80',
+                  'font-bold text-sm uppercase',
+                  'border-2 border-white/20 rounded-neo',
+                  'transition-colors hover:bg-white/20',
+                )}
+              >
+                <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                {t('nextStep.backToLobby')}
+              </button>
+            </div>
+          </motion.div>
         </div>
       </div>
 

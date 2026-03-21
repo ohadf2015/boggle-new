@@ -305,12 +305,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         )}
 
         {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-hidden overflow-y-hidden">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-hidden overflow-y-auto">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div
               ref={gameStatsRef}
-              className="flex flex-col gap-0 w-full px-1 md:px-2"
+              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 bg-inherit"
               role="status"
               aria-label="Game status"
             >
@@ -331,7 +331,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center relative min-h-[56px] short:min-h-[48px] md:min-h-[70px] lg:min-h-[120px] xl:min-h-[130px]"
+                className="flex w-full items-center justify-center relative min-h-[56px] short:min-h-[48px] md:min-h-[70px] lg:min-h-[80px] short:lg:min-h-[56px] xl:min-h-[130px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}

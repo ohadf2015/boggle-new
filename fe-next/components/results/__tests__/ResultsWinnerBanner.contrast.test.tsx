@@ -129,8 +129,8 @@ describe('ResultsWinnerBanner Text Contrast', () => {
       );
 
       const username = screen.getByText('Third');
-      // 3rd place has light pink/orange background, so text should be dark
-      expect(username.className).toContain('text-neo-black');
+      // 3rd place has dark bronze background, so text should be light
+      expect(username.className).toContain('text-neo-cream');
     });
 
     it('should use light text on 4th+ place banner (dark purple background)', () => {

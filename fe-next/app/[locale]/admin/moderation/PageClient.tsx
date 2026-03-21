@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import logger from '@/utils/logger';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { ModerationQueue } from '@/components/admin/moderation/ModerationQueue';
@@ -50,10 +51,13 @@ export default function ModerationPageClient() {
 
   useEffect(() => { fetchQueue(); }, [fetchQueue]);
 
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+
   const handleAction = useCallback(async (id: string, action: 'approve' | 'reject') => {
-    if (!authToken) return;
+    if (!authToken || actionInProgress) return;
+    setActionInProgress(id);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
     try {
       const res = await fetch(`/api/admin/invalid-words/${id}/${action}`, {
         method: 'POST',
@@ -71,13 +75,14 @@ export default function ModerationPageClient() {
       const message = err instanceof DOMException && err.name === 'AbortError'
         ? 'Request timed out — please try again'
         : err instanceof Error ? err.message : 'Unknown error';
-      console.error(`Moderation ${action} failed:`, message);
+      logger.warn(`Moderation ${action} failed:`, message);
       // Re-fetch to restore accurate state
       fetchQueue();
     } finally {
       clearTimeout(timeoutId);
+      setActionInProgress(null);
     }
-  }, [authToken, fetchQueue]);
+  }, [authToken, fetchQueue, actionInProgress]);
 
   const isProfileLoading = !authLoading && user && !profile;
 

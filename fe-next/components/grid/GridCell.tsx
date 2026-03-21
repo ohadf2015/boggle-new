@@ -101,7 +101,6 @@ const GridCell = memo<GridCellProps>(({
         scale: isSelected ? (escalation?.scale ?? 1.05)
           : currentTier >= 3 && !isEliminated ? 0.96
           : (isFading ? 1.02 : 1),
-        opacity: isSelecting && selectedCellsLength > 0 && !isSelected && !isAdjacentHint && !isHighlighted ? 0.4 : 1,
         rotate: isSelected ? ((row + col) % 2 === 0 ? -1.5 : 1.5) : 0,
         y: isSelected ? (escalation?.liftY ?? -2) : 0,
         x: 0,
@@ -164,9 +163,10 @@ const GridCell = memo<GridCellProps>(({
     style={{
       borderRadius: '6px',
       fontSize: 'var(--cell-font-size)',
-      transition: isSelected
-        ? `box-shadow ${escalationCombo > 0 ? 350 : 250}ms ease-out, background ${escalationCombo > 0 ? 300 : 200}ms ease, border-color 200ms ease`
-        : 'box-shadow 400ms ease-out, background 350ms ease-out, border-color 300ms ease-out, opacity 150ms ease',
+      // Opacity dimming for non-selected cells during selection — driven by CSS transition
+      // instead of framer-motion to avoid animation restarts on every re-render
+      opacity: isSelecting && selectedCellsLength > 0 && !isSelected && !isAdjacentHint && !isHighlighted ? 0.4 : 1,
+      transition: 'box-shadow 300ms ease-out, background 250ms ease, border-color 200ms ease, opacity 150ms ease',
       ...(isSelected && {
         '--esc-scale': String(escalation?.scale ?? 1.05),
         boxShadow: escalation?.glow ?? '0 0 0 2px rgba(255, 225, 53, 0.7), 0 0 8px rgba(255, 200, 100, 0.3)',

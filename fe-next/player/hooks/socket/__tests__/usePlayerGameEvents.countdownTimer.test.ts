@@ -1,12 +1,12 @@
 /**
- * TDD: Timer should not count down during 3-2-1-GO countdown animation
+ * TDD: Timer sync during 3-2-1-GO countdown animation
  *
- * Bug: Server sends timeUpdate events after all players ACK, but client
- * ACKs immediately before the countdown animation finishes. This causes
- * the timer to visually tick down during the 3-2-1-GO animation.
+ * The server starts its timer after all players ACK. The client ACKs
+ * immediately, so timeUpdate events arrive during the countdown animation.
  *
- * Fix: handleTimeUpdate must return early while showStartAnimation is true,
- * preventing timer sync and game activation during the countdown.
+ * Fix: handleTimeUpdate ALWAYS syncs the timer with server time (even during
+ * countdown) so the timer starts from the correct value when the game activates.
+ * Game activation is still deferred until the countdown animation completes.
  */
 
 import fs from 'fs';
@@ -18,8 +18,8 @@ const sourceCode = fs.readFileSync(
 );
 
 describe('usePlayerGameEvents countdown timer guard', () => {
-  describe('handleTimeUpdate skips all processing during countdown', () => {
-    it('should return early when countdown animation is showing', () => {
+  describe('handleTimeUpdate syncs timer during countdown but defers activation', () => {
+    it('should sync timer with server BEFORE the countdown guard return', () => {
       // Extract the handleTimeUpdate handler
       const timeUpdateMatch = sourceCode.match(
         /const handleTimeUpdate[\s\S]*?(?=\n    const handle[A-Z])/
@@ -27,17 +27,25 @@ describe('usePlayerGameEvents countdown timer guard', () => {
       expect(timeUpdateMatch).not.toBeNull();
       const handler = timeUpdateMatch![0];
 
-      // The handler should check showStartAnimationRef and return early
-      // before any timer sync or game activation happens
-      expect(handler).toContain('isCountdownShowing');
-      expect(handler).toMatch(/isCountdownShowing[\s\S]*?return/);
-
-      // The early return should come BEFORE gameTimerRef.current.setTime
-      const returnIndex = handler.indexOf('return;');
+      // Timer sync (setTime) should happen BEFORE the countdown early return
+      // so non-host players always have accurate server time
       const setTimeIndex = handler.indexOf('gameTimerRef.current.setTime');
-      expect(returnIndex).toBeGreaterThan(-1);
+      const countdownReturnMatch = handler.match(/showStartAnimationRef\.current[\s\S]*?return;/);
       expect(setTimeIndex).toBeGreaterThan(-1);
-      expect(returnIndex).toBeLessThan(setTimeIndex);
+      expect(countdownReturnMatch).not.toBeNull();
+      const countdownReturnIndex = handler.indexOf(countdownReturnMatch![0]);
+      expect(setTimeIndex).toBeLessThan(countdownReturnIndex);
+    });
+
+    it('should still guard game activation during countdown', () => {
+      const timeUpdateMatch = sourceCode.match(
+        /const handleTimeUpdate[\s\S]*?(?=\n    const handle[A-Z])/
+      );
+      const handler = timeUpdateMatch![0];
+
+      // showStartAnimationRef check should still exist and return early
+      expect(handler).toContain('showStartAnimationRef.current');
+      expect(handler).toMatch(/showStartAnimationRef\.current[\s\S]*?return/);
     });
   });
 

@@ -239,7 +239,7 @@ export async function getDuelHistory(
     const { data: duels, error } = await query;
 
     if (error) {
-      logger.error('Error fetching duel history:', error);
+      logger.warn('Error fetching duel history:', error.message);
       return { data: [], error: { message: error.message } };
     }
 
@@ -277,7 +277,7 @@ export async function getDuelStats(
       .order('completed_at', { ascending: false });
 
     if (error) {
-      logger.error('Error fetching duel stats:', error);
+      logger.warn('Error fetching duel stats:', error.message);
       return { data: null, error: { message: error.message } };
     }
 
@@ -421,7 +421,7 @@ export async function getPendingDuelsForStudent(
       .order('created_at', { ascending: false });
 
     if (error) {
-      logger.error('Error fetching pending duels:', error);
+      logger.warn('Error fetching pending duels:', error.message);
       return { data: [], error: { message: error.message } };
     }
 

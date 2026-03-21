@@ -501,6 +501,7 @@ const sv = {
     "button": "Dela",
     "linkCopied": "Länk kopierad! 🔗",
     "copyError": "Gick inte - tryck igen",
+    "manualCopy": "Kopiera denna länk:",
     "inviteMessage": "Ordstrid pågår NU! Hoppa in 🔥",
     "room": "Rum",
     "code": "Kod",
@@ -1696,6 +1697,10 @@ const sv = {
     "tryBotsDesc": "Testa dina färdigheter mot AI",
     "tryMultiplayer": "Spela med vänner",
     "tryMultiplayerDesc": "Ordstrider i realtid",
+    "wordHuntCta": "Spela dagens ordjakt",
+    "wordHuntCtaDesc": "Dagens utmaning väntar!",
+    "wordHuntAlreadyPlayed": "Redan spelat idag",
+    "wordHuntAlreadyPlayedDesc": "Kom tillbaka imorgon!",
     "encouragement": {
       "legendary": "Otroligt!",
       "great": "Bra jobbat!",

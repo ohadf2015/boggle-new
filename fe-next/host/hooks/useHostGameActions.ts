@@ -9,7 +9,7 @@
  * - Cancel tournament
  */
 
-import React, { useCallback, MutableRefObject } from 'react';
+import React, { useCallback, useRef, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, neoErrorToast, neoInfoToast } from '@/components/NeoToast';
 import { clearSessionPreservingUsername } from '@/utils/session';
@@ -115,7 +115,17 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     tournamentTimeoutRef,
   } = options;
 
+  const startGameLockRef = useRef(false);
+
   const startGame = useCallback(() => {
+    // Debounce: prevent double-click from emitting startGame twice
+    if (startGameLockRef.current) {
+      logger.warn('[HOST] Start game already in progress, ignoring duplicate');
+      return;
+    }
+    startGameLockRef.current = true;
+    setTimeout(() => { startGameLockRef.current = false; }, 3000);
+
     // Validate players are ready (allow start if host is playing solo)
     if (playersCount === 0 && !hostPlaying) {
       logger.warn('[HOST] Cannot start game: no players');

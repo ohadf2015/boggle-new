@@ -92,6 +92,7 @@ export interface XsollaOrder {
 }
 
 interface CrazyGamesSDK {
+  init: () => Promise<void>;
   getEnvironment: () => Promise<CrazyGamesEnvironment>;
   ad: {
     requestAd: (type: 'midgame' | 'rewarded', callbacks?: AdCallbacks) => void;
@@ -410,6 +411,10 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
       if (window.CrazyGames?.SDK) {
         try {
+          // SDK.init() must be called before any other SDK methods.
+          // Without this, CrazyGames QA tool reports "SDK not detected".
+          await window.CrazyGames.SDK.init();
+
           const env = await window.CrazyGames.SDK.getEnvironment();
           // Cache environment on window for utility function access
           window.__crazyGamesEnvironment = env;

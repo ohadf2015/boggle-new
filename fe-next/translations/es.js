@@ -497,6 +497,7 @@ const es = {
     "button": "Compartir",
     "linkCopied": "¡Link copiado! 🔗",
     "copyError": "No se pudo - toca otra vez",
+    "manualCopy": "Copia este enlace:",
     "inviteMessage": "¡Batalla de palabras AHORA! Entra 🔥",
     "room": "Sala",
     "code": "Código",
@@ -1759,6 +1760,10 @@ const es = {
     "tryBotsDesc": "Pon a prueba tus habilidades contra IA",
     "tryMultiplayer": "Jugar con amigos",
     "tryMultiplayerDesc": "Batallas de palabras en tiempo real",
+    "wordHuntCta": "Jugar Word Hunt diario",
+    "wordHuntCtaDesc": "¡El desafío diario te espera!",
+    "wordHuntAlreadyPlayed": "Ya jugaste hoy",
+    "wordHuntAlreadyPlayedDesc": "¡Vuelve mañana!",
     "encouragement": {
       "legendary": "¡Increíble!",
       "great": "¡Buen trabajo!",

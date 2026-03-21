@@ -501,6 +501,7 @@ const en = {
     "button": "Share",
     "linkCopied": "Link copied! 🔗",
     "copyError": "Couldn't copy - tap again",
+    "manualCopy": "Copy this link:",
     "inviteMessage": "Word battle happening NOW! Jump in 🔥",
     "room": "Room",
     "code": "Code",
@@ -1814,6 +1815,10 @@ const en = {
     "tryBotsDesc": "Test your skills against AI opponents",
     "tryMultiplayer": "Play with Friends",
     "tryMultiplayerDesc": "Real-time word battles",
+    "wordHuntCta": "Play Word Hunt Daily",
+    "wordHuntCtaDesc": "Today's daily challenge awaits!",
+    "wordHuntAlreadyPlayed": "Already Played Today",
+    "wordHuntAlreadyPlayedDesc": "Come back tomorrow!",
     "encouragement": {
       "legendary": "Incredible!",
       "great": "Nice Work!",

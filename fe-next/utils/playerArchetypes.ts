@@ -507,9 +507,10 @@ export function getMissedWords(
   allPlayersWords: Record<string, Array<{ word: string; validated?: boolean; score?: number }>>,
   limit: number = 5
 ): Array<{ word: string; score: number; foundBy: string[] }> {
+  // Include ALL words the player submitted (regardless of validation status)
+  // so that duplicated/invalidated words they found don't show as "missed"
   const playerWords = new Set(
     (allPlayersWords[playerUsername] || [])
-      .filter(w => w.validated !== false)
       .map(w => w.word.toLowerCase())
   );
 

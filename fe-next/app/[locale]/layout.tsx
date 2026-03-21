@@ -777,7 +777,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <div className="flex-1 flex flex-col min-h-0 relative [overflow-x:clip]">
                         <main
                             id="main-content"
-                            className="relative z-10 main-content-safe min-h-0 flex-1 flex flex-col"
+                            className="relative z-10 main-content-safe flex-1 min-h-0 flex flex-col"
                             tabIndex={-1}
                         >
                             <div className="flex-1 flex flex-col">

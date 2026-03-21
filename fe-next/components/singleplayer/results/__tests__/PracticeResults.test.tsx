@@ -1,0 +1,292 @@
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import PracticeResults from '../PracticeResults';
+import type { SinglePlayerResultsData } from '../../SinglePlayerView';
+
+// ─── Mocks ───
+
+const mockPush = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string, opts?: Record<string, unknown>) => {
+      const map: Record<string, string> = {
+        'practiceResults.encouragement.legendary': 'Incredible!',
+        'practiceResults.encouragement.great': 'Nice Work!',
+        'practiceResults.encouragement.nice': 'Good Stuff!',
+        'practiceResults.encouragement.warmup': 'Great Start!',
+        'practiceResults.subtitle.legendary': 'You are on fire!',
+        'practiceResults.subtitle.great': 'Serious word skills',
+        'practiceResults.subtitle.nice': 'Every game makes you sharper',
+        'practiceResults.subtitle.warmup': 'Practice makes perfect',
+        'practiceResults.wordsFound': `${opts?.count ?? 0} words found`,
+        'practiceResults.wordHuntCta': 'Play Word Hunt Daily',
+        'practiceResults.wordHuntCtaDesc': 'Today\'s daily challenge awaits!',
+        'practiceResults.wordHuntAlreadyPlayed': 'Already Played Today',
+        'practiceResults.wordHuntAlreadyPlayedDesc': 'Come back tomorrow!',
+        'nextStep.backToLobby': 'Back to Lobby',
+        'practiceResults.playAgain': 'Play Again',
+      };
+      return map[key] || key;
+    },
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
+jest.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    profile: null,
+    updateProfile: jest.fn(),
+    loading: false,
+  }),
+}));
+
+jest.mock('@/hooks/useReducedMotion', () => ({
+  __esModule: true,
+  default: () => true, // Disable animations in tests
+}));
+
+// Mock framer-motion to render plain elements
+jest.mock('framer-motion', () => {
+  const MockDiv = React.forwardRef<HTMLDivElement, React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>>(
+    function MockDiv({ children, className, style, onClick }, ref) {
+      return <div ref={ref} className={className} style={style} onClick={onClick}>{children}</div>;
+    }
+  );
+  const MockButton = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>>(
+    function MockButton({ children, className, onClick }, ref) {
+      return <button ref={ref} className={className} onClick={onClick}>{children}</button>;
+    }
+  );
+  return {
+  motion: {
+    div: MockDiv,
+    p: ({ children, className }: React.PropsWithChildren<React.HTMLAttributes<HTMLParagraphElement>>) => (
+      <p className={className}>{children}</p>
+    ),
+    span: ({ children, className }: React.PropsWithChildren<React.HTMLAttributes<HTMLSpanElement>>) => (
+      <span className={className}>{children}</span>
+    ),
+    button: MockButton,
+  },
+  useMotionValue: () => ({ on: () => () => {} }),
+  useTransform: () => ({ on: () => () => {} }),
+  animate: jest.fn(),
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+};});
+
+const mockFireConfetti = jest.fn();
+const mockFireVictoryConfetti = jest.fn();
+jest.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: (...args: unknown[]) => mockFireConfetti(...args),
+  fireVictoryConfetti: (...args: unknown[]) => mockFireVictoryConfetti(...args),
+}));
+
+jest.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: jest.fn(),
+}));
+
+// Mock all data persistence hooks
+jest.mock('../../results', () => ({
+  useGuestStatsSync: () => ({ hasUpdatedStats: true }),
+  useLeaderboardSync: jest.fn(),
+  useGameHistory: jest.fn(),
+  useGameSessionLogging: jest.fn(),
+  useCoinRewards: jest.fn(),
+  useCognitiveScoring: jest.fn(),
+  useSignupPrompt: jest.fn(),
+  useAchievementsSave: jest.fn(),
+}));
+
+jest.mock('@/components/ui/Mascot', () => ({
+  MascotWithEntrance: ({ variant, size }: { variant: string; size: string }) => (
+    <div data-testid="mascot" data-variant={variant} data-size={size}>Mascot</div>
+  ),
+}));
+
+jest.mock('@/components/ui/CelebrationMascot', () => ({
+  CelebrationMascotWithEntrance: ({ variant, size }: { variant: string; size: string }) => (
+    <div data-testid="celebration-mascot" data-variant={variant} data-size={size}>CelebrationMascot</div>
+  ),
+}));
+
+jest.mock('@/components/results/MissedWords', () => {
+  return function MockMissedWords() {
+    return <div data-testid="missed-words">Missed Words</div>;
+  };
+});
+
+// Mock daily challenge storage
+const mockHasPlayedWordHuntToday = jest.fn();
+jest.mock('@/utils/dailyChallenge/storage', () => ({
+  hasPlayedWordHuntToday: (...args: unknown[]) => mockHasPlayedWordHuntToday(...args),
+}));
+
+// ─── Test data ───
+
+function makeResults(overrides: Partial<SinglePlayerResultsData> = {}): SinglePlayerResultsData {
+  return {
+    playerScore: 120,
+    playerWords: ['hello', 'world', 'test'],
+    playerWordData: [
+      { word: 'hello', isValid: true, score: 5, comboBonus: 0, fireRoundBonus: 0, timestamp: Date.now(), timeSinceStart: 5 },
+      { word: 'world', isValid: true, score: 5, comboBonus: 1, fireRoundBonus: 0, timestamp: Date.now(), timeSinceStart: 12 },
+      { word: 'test', isValid: true, score: 4, comboBonus: 0, fireRoundBonus: 0, timestamp: Date.now(), timeSinceStart: 20 },
+    ],
+    gameDuration: 120,
+    botScores: [],
+    grid: [['h', 'e', 'l', 'l'], ['o', 'w', 'o', 'r'], ['l', 'd', 't', 'e'], ['s', 't', 'a', 'b']],
+    allPossibleWords: ['hello', 'world', 'test', 'star', 'table'],
+    isNewHighScore: false,
+    ...overrides,
+  };
+}
+
+// ─── Tests ───
+
+describe('PracticeResults — Celebratory Redesign', () => {
+  const defaultProps = {
+    results: makeResults(),
+    onPlayAgain: jest.fn(),
+    onBackToLobby: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockHasPlayedWordHuntToday.mockReturnValue(false);
+  });
+
+  // ── Celebration mascot ──
+
+  describe('celebratory mascot', () => {
+    it('shows celebration mascot for legendary tier (score >= 200)', () => {
+      render(<PracticeResults {...defaultProps} results={makeResults({ playerScore: 250 })} />);
+      const mascot = screen.getByTestId('celebration-mascot');
+      expect(mascot).toBeInTheDocument();
+      expect(mascot).toHaveAttribute('data-variant', 'celebration');
+    });
+
+    it('shows celebration mascot for great tier (score >= 100)', () => {
+      render(<PracticeResults {...defaultProps} results={makeResults({ playerScore: 120 })} />);
+      const mascot = screen.getByTestId('celebration-mascot');
+      expect(mascot).toBeInTheDocument();
+      expect(mascot).toHaveAttribute('data-variant', 'celebration');
+    });
+
+    it('shows encouraging mascot for warmup tier (score < 30)', () => {
+      render(<PracticeResults {...defaultProps} results={makeResults({ playerScore: 15 })} />);
+      const mascot = screen.getByTestId('mascot');
+      expect(mascot).toBeInTheDocument();
+      expect(mascot).toHaveAttribute('data-variant', 'encouraging');
+    });
+  });
+
+  // ── Score and encouragement ──
+
+  describe('score display', () => {
+    it('shows encouragement text based on tier', () => {
+      render(<PracticeResults {...defaultProps} results={makeResults({ playerScore: 250 })} />);
+      expect(screen.getByText('Incredible!')).toBeInTheDocument();
+    });
+
+    it('shows words found count', () => {
+      render(<PracticeResults {...defaultProps} />);
+      expect(screen.getByText('3 words found')).toBeInTheDocument();
+    });
+  });
+
+  // ── Word Hunt Daily CTA (primary action) ──
+
+  describe('Word Hunt daily CTA', () => {
+    it('renders Word Hunt daily as the primary CTA button', () => {
+      render(<PracticeResults {...defaultProps} />);
+      expect(screen.getByText('Play Word Hunt Daily')).toBeInTheDocument();
+    });
+
+    it('navigates to daily challenge when CTA is clicked', () => {
+      render(<PracticeResults {...defaultProps} />);
+      fireEvent.click(screen.getByText('Play Word Hunt Daily'));
+      expect(mockPush).toHaveBeenCalledWith('/en/daily');
+    });
+
+    it('shows already-played state when daily was completed today', () => {
+      mockHasPlayedWordHuntToday.mockReturnValue(true);
+      render(<PracticeResults {...defaultProps} />);
+      expect(screen.getByText('Already Played Today')).toBeInTheDocument();
+    });
+
+    it('checks daily status using current language', () => {
+      render(<PracticeResults {...defaultProps} />);
+      expect(mockHasPlayedWordHuntToday).toHaveBeenCalledWith('en');
+    });
+  });
+
+  // ── Secondary actions ──
+
+  describe('secondary actions', () => {
+    it('renders "Back to Lobby" as secondary action', () => {
+      render(<PracticeResults {...defaultProps} />);
+      const lobbyButtons = screen.getAllByText('Back to Lobby');
+      expect(lobbyButtons.length).toBeGreaterThan(0);
+    });
+
+    it('calls onBackToLobby when lobby button is clicked', () => {
+      render(<PracticeResults {...defaultProps} />);
+      const lobbyButtons = screen.getAllByText('Back to Lobby');
+      fireEvent.click(lobbyButtons[0]);
+      expect(defaultProps.onBackToLobby).toHaveBeenCalled();
+    });
+
+    it('renders "Play Again" as a secondary option', () => {
+      render(<PracticeResults {...defaultProps} />);
+      const playAgainButtons = screen.getAllByText('Play Again');
+      expect(playAgainButtons.length).toBeGreaterThan(0);
+    });
+
+    it('calls onPlayAgain when play again is clicked', () => {
+      render(<PracticeResults {...defaultProps} />);
+      const playAgainButtons = screen.getAllByText('Play Again');
+      fireEvent.click(playAgainButtons[0]);
+      expect(defaultProps.onPlayAgain).toHaveBeenCalled();
+    });
+  });
+
+  // ── Missed words ──
+
+  describe('missed words section', () => {
+    it('shows missed words when available', () => {
+      render(<PracticeResults {...defaultProps} />);
+      expect(screen.getByTestId('missed-words')).toBeInTheDocument();
+    });
+
+    it('hides missed words when none exist', () => {
+      render(
+        <PracticeResults
+          {...defaultProps}
+          results={makeResults({ allPossibleWords: ['hello', 'world', 'test'] })}
+        />
+      );
+      expect(screen.queryByTestId('missed-words')).not.toBeInTheDocument();
+    });
+  });
+
+  // ── No old suggestion cards ──
+
+  describe('removes old suggestion cards', () => {
+    it('does not render "Fight Bots" suggestion', () => {
+      render(<PracticeResults {...defaultProps} />);
+      expect(screen.queryByText('practiceResults.tryBots')).not.toBeInTheDocument();
+    });
+
+    it('does not render "Play with Friends" suggestion', () => {
+      render(<PracticeResults {...defaultProps} />);
+      expect(screen.queryByText('practiceResults.tryMultiplayer')).not.toBeInTheDocument();
+    });
+  });
+});

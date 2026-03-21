@@ -249,13 +249,14 @@ export function useResultsData(
     if (results.botScores.length === 0) return [];
 
     const playerUsername = t('common.you') || 'You';
-    const playerWords = results.playerWordData?.filter(w => w.isValid) || [];
+    const playerWords = results.playerWordData || [];
 
-    // Build allPlayersWords map
+    // Build allPlayersWords map — include ALL player words (even invalid)
+    // so words the player attempted don't show as "missed"
     const allPlayersWords: Record<string, Array<{ word: string; validated: boolean; score: number }>> = {
       [playerUsername]: playerWords.map(w => ({
         word: w.word,
-        validated: true,
+        validated: w.isValid,
         score: w.score,
       })),
     };
@@ -274,25 +275,6 @@ export function useResultsData(
     return getMissedWords(playerUsername, allPlayersWords, 10);
   }, [results.botScores, results.playerWordData, t]);
 
-  // Calculate ALL board words the player missed (from board solver, not just bot-found)
-  const allBoardMissedWords = useMemo(() => {
-    if (!results.allPossibleWords || results.allPossibleWords.length === 0) return [];
-
-    const playerFoundSet = new Set(
-      (results.playerWordData || [])
-        .filter(w => w.isValid)
-        .map(w => w.word.toLowerCase())
-    );
-
-    return results.allPossibleWords
-      .filter(word => !playerFoundSet.has(word.toLowerCase()))
-      .map(word => ({
-        word,
-        score: calculateWordScore(word),
-      }))
-      .sort((a, b) => b.word.length - a.word.length || b.score - a.score);
-  }, [results.allPossibleWords, results.playerWordData]);
-
   return {
     allParticipants,
     playerRank,
@@ -303,6 +285,5 @@ export function useResultsData(
     playerArchetypes,
     playerArchetype,
     missedWords,
-    allBoardMissedWords,
   };
 }

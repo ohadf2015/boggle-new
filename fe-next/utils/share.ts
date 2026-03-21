@@ -82,16 +82,17 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
         }
       }
 
-      // All methods failed
+      // All methods failed — show URL in toast for manual copying
       const isNotAllowed = clipboardError instanceof DOMException && clipboardError.name === 'NotAllowedError';
       if (isNotAllowed) {
         logger.warn('Clipboard copy failed (NotAllowedError, all fallbacks exhausted)');
       } else {
-        logger.error('Failed to copy URL:', clipboardError);
+        logger.warn('Failed to copy URL:', clipboardError);
       }
-      const errorMessage = t ? t('share.copyError') : 'Error copying link';
-      toast.error(errorMessage, {
-        duration: 2000,
+      const manualCopyMsg = t ? t('share.manualCopy') : 'Copy this link:';
+      toast(`${manualCopyMsg}\n${url}`, {
+        duration: 8000,
+        icon: '📋',
       });
       return false;
     }
@@ -233,20 +234,40 @@ export const canShareViaSms = (): boolean => {
  * @returns Success status
  */
 export const copyGameCode = async (gameCode: string, t: TranslationFunction | null = null): Promise<boolean> => {
+  const showSuccess = () => {
+    const successMessage = t ? t('share.codeCopied') : 'הקוד הועתק ללוח! 🎯';
+    toast.success(successMessage, { duration: 2000, icon: '✅' });
+  };
+
   try {
     await navigator.clipboard.writeText(gameCode);
-    const successMessage = t ? t('share.codeCopied') : 'הקוד הועתק ללוח! 🎯';
-    toast.success(successMessage, {
-      duration: 2000,
-      icon: '✅',
-    });
+    showSuccess();
     return true;
-  } catch (error) {
-    logger.error('Failed to copy game code:', error);
-    const errorMessage = t ? t('share.codeCopyError') : 'שגיאה בהעתקת הקוד';
-    toast.error(errorMessage, {
-      duration: 2000,
-    });
+  } catch {
+    // Fallback: execCommand for older browsers / permission-denied
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = gameCode;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      if (success) {
+        showSuccess();
+        return true;
+      }
+    } catch {
+      // execCommand also failed
+    }
+
+    // All methods failed — show code in toast for manual copy
+    logger.warn('Failed to copy game code, showing manual fallback');
+    const manualMsg = t ? t('share.manualCopy') : 'Copy this code:';
+    toast(`${manualMsg} ${gameCode}`, { duration: 6000, icon: '📋' });
     return false;
   }
 };

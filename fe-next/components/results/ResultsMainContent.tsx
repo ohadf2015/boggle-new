@@ -339,7 +339,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
         >
-          <MissedWords missedWords={missedWords} maxDisplay={3} />
+          <MissedWords missedWords={missedWords} maxDisplay={5} />
         </motion.div>
       )}
 

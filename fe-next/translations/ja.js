@@ -501,6 +501,7 @@ const ja = {
     "button": "シェア",
     "linkCopied": "リンクコピー完了！🔗",
     "copyError": "失敗 - もう一度タップ",
+    "manualCopy": "このリンクをコピー:",
     "inviteMessage": "ワードバトル開催中！参加して 🔥",
     "room": "ルーム",
     "code": "コード",
@@ -1697,6 +1698,10 @@ const ja = {
     "tryBotsDesc": "AIと腕試し",
     "tryMultiplayer": "フレンドと対戦",
     "tryMultiplayerDesc": "リアルタイムワードバトル",
+    "wordHuntCta": "デイリーワードハントに挑戦",
+    "wordHuntCtaDesc": "今日のチャレンジが待っています！",
+    "wordHuntAlreadyPlayed": "本日プレイ済み",
+    "wordHuntAlreadyPlayedDesc": "また明日！",
     "encouragement": {
       "legendary": "すごい！",
       "great": "ナイス！",

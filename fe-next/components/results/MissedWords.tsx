@@ -38,7 +38,7 @@ const getWordLengthColor = (length: number): string => {
  */
 const MissedWords = memo<MissedWordsProps>(({
   missedWords,
-  maxDisplay = 3,
+  maxDisplay = 5,
   className,
   onWordSelect,
   selectedWord,

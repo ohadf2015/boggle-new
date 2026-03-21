@@ -287,19 +287,10 @@ export function usePlayerGameEvents({
         return;
       }
 
-      const isCountdownShowing = showStartAnimationRef.current;
-
-      // Skip timer sync while 3-2-1-GO countdown animation is playing.
-      // The server starts its timer after all players ACK, but the client ACKs
-      // immediately — so timeUpdate events arrive during the countdown animation.
-      // Syncing here would make the timer visually tick during the countdown.
-      if (isCountdownShowing) {
-        return;
-      }
-
-      // CRITICAL: Sync timer with server time to prevent drift
-      // The local timer counts down smoothly, but server updates keep it accurate
-      // Use ref to get latest timer methods (avoids socket listener re-registration)
+      // ALWAYS sync timer with server time — even during countdown animation.
+      // The timer is paused (isPaused: !gameActive) during countdown so it won't
+      // visually tick, but storing the correct value ensures the timer starts from
+      // the accurate server time when the countdown ends and the game activates.
       if (gameTimerRef.current && data.remainingTime !== undefined) {
         gameTimerRef.current.setTime(data.remainingTime);
       }
@@ -314,21 +305,17 @@ export function usePlayerGameEvents({
         setGameLanguage(data.language);
       }
 
+      // During countdown animation, sync the timer (above) but don't activate the game
+      if (showStartAnimationRef.current) {
+        return;
+      }
+
       const isGameActive = gameActiveRef.current;
       const hasGrid = letterGridRef.current || data.letterGrid;
-      // Only activate game if:
-      // 1. Game is not already active
-      // 2. There's remaining time
-      // 3. We have the grid
-      // 4. Countdown animation has completed (not showing)
-      // This prevents the timer from starting before the 3-2-1-GO countdown completes
-      if (!isGameActive && data.remainingTime > 0 && hasGrid && !isCountdownShowing) {
+      if (!isGameActive && data.remainingTime > 0 && hasGrid) {
         logger.log('[PLAYER] Timer started on server, activating game via timeUpdate (countdown complete)');
         setGameActive(true);
         gameActiveRef.current = true;
-        // Clear the countdown guard so future timeUpdate events can sync the timer.
-        // Without this, showStartAnimation stays true (set in handleStartGame) and
-        // blocks ALL timeUpdate events for the rest of the game.
         setShowStartAnimation(false);
       }
 

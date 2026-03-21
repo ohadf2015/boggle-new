@@ -347,11 +347,28 @@ export function useResultsData({
   // MISSED WORDS
   // ==============================================
 
+  /** Build player→words map for missed words (different structure from allPlayerWords which is word→players) */
+  const playerToWordsMap = useMemo(() => {
+    const map: Record<string, Array<{ word: string; validated?: boolean; score?: number }>> = {};
+    if (!finalScores) return map;
+
+    finalScores.forEach((player) => {
+      if (!player.allWords) return;
+      map[player.username] = player.allWords.map((w) => ({
+        word: w.word,
+        validated: w.validated,
+        score: w.score || 0,
+      }));
+    });
+
+    return map;
+  }, [finalScores]);
+
   /** Calculate missed words for current player (high-value words others found) */
   const missedWords = useMemo(() => {
-    if (!username || !allPlayerWords) return [];
-    return getMissedWords(username, allPlayerWords, 10);
-  }, [username, allPlayerWords]);
+    if (!username || !finalScores) return [];
+    return getMissedWords(username, playerToWordsMap, 10);
+  }, [username, finalScores, playerToWordsMap]);
 
   // ==============================================
   // RETURN ALL DATA

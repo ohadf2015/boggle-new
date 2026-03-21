@@ -17,6 +17,7 @@ import {
   useMemo,
   type ReactNode,
 } from 'react';
+import logger from '@/utils/logger';
 import { useAuth } from '@/contexts/AuthContext';
 import type { PlayerProgression, LevelCompletion, LevelAttempt } from '@/types/adventure';
 import {
@@ -185,7 +186,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
         if (!response.ok) {
           const errorBody = await response.text().catch(() => 'no body');
-          throw new Error(`Failed to complete level: ${response.status} - ${errorBody}`);
+          throw new Error(`Failed to complete level: ${response.status}${errorBody && errorBody !== 'no body' ? ` - ${errorBody}` : ''}`);
         }
 
         const data = await response.json();
@@ -262,7 +263,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           });
         }
       } catch (err) {
-        console.error('[ProgressionContext] Complete level error:', err);
+        logger.warn('[ProgressionContext] Complete level error:', err instanceof Error ? err.message : err);
         throw err;
       }
     },

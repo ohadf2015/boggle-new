@@ -21,8 +21,23 @@ import { Send, MessageSquare, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
 import { useCrazyGamesChatDisabled } from '@/hooks/useCrazyGamesSettingsBridge';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
+
+// Module-level dedup: prevents duplicate notifications when multiple RoomChat
+// instances are mounted (lobby, in-game, results). Only the first instance to
+// process a given chatMessage fires sound/toast/vibrate/announce.
+const _notifiedMessages = new Set<string>();
+const DEDUP_TTL_MS = 5_000; // auto-expire entries after 5s
+
+function shouldNotify(data: ChatMessageData): boolean {
+  const key = `${data.username}:${data.timestamp}:${data.message}`;
+  if (_notifiedMessages.has(key)) return false;
+  _notifiedMessages.add(key);
+  setTimeout(() => _notifiedMessages.delete(key), DEDUP_TTL_MS);
+  return true;
+}
 
 interface ChatMessage {
   id: string;
@@ -55,6 +70,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   const { playMessageSound } = useSoundEffects();
   const { announce } = useAnnouncer();
   const isChatDisabled = useCrazyGamesChatDisabled();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
@@ -88,67 +104,70 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     const isOwnMessage = (isHost && data.isHost) || data.username === username;
 
     if (!isOwnMessage) {
-      // Increment unread count
+      // Increment unread count (always — each instance tracks its own)
       setUnreadCount(prev => prev + 1);
 
-      // Notify parent of new message
-      onNewMessage?.();
+      // Dedup: only fire sound/toast/vibrate/announce once across all mounted RoomChat instances
+      if (shouldNotify(data)) {
+        // Notify parent of new message
+        onNewMessage?.();
 
-      // Play notification sound
-      playMessageSound();
+        // Play notification sound
+        playMessageSound();
 
-      // Announce for screen readers
-      const announcementText = `${data.username} says: ${data.message}`;
-      setLatestAnnouncement(announcementText);
-      announce(announcementText);
+        // Announce for screen readers
+        const announcementText = `${data.username} says: ${data.message}`;
+        setLatestAnnouncement(announcementText);
+        announce(announcementText);
 
-      // Show toast notification with click to scroll
-      const newMessageIndex = messagesLengthRef.current; // Use ref to avoid stale closure
-      toast(
-        <div
-          className="flex items-center gap-3 cursor-pointer"
-          onClick={() => {
-            // Scroll to the message using virtualizer
-            virtualizer.scrollToIndex(newMessageIndex, { align: 'center', behavior: 'smooth' });
-            // Apply highlight effect after scroll
-            setTimeout(() => {
-              const messageElement = document.getElementById(messageId);
-              if (messageElement) {
-                messageElement.classList.add('ring-3', 'ring-neo-cyan', 'ring-offset-2');
-                setTimeout(() => {
-                  messageElement.classList.remove('ring-3', 'ring-neo-cyan', 'ring-offset-2');
-                }, 2000);
-              }
-            }, 300);
-            // Clear unread count
-            setUnreadCount(0);
-            toast.dismiss();
-          }}
-        >
-          <Bell style={{ color: '#FF6B9D', flexShrink: 0, fontSize: '18px' }} />
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 900, color: '#000000', textTransform: 'uppercase', fontSize: '14px' }}>{data.username}</div>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(0,0,0,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
-          </div>
-        </div>,
-        {
-          duration: 4000,
-          position: 'top-right',
-          style: {
-            background: '#FFFEF0',
-            border: '3px solid #000000',
-            boxShadow: '4px 4px 0px #000000',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            cursor: 'pointer',
-            pointerEvents: 'auto',
-          },
+        // Show toast notification with click to scroll
+        const newMessageIndex = messagesLengthRef.current; // Use ref to avoid stale closure
+        toast(
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => {
+              // Scroll to the message using virtualizer
+              virtualizer.scrollToIndex(newMessageIndex, { align: 'center', behavior: 'smooth' });
+              // Apply highlight effect after scroll
+              setTimeout(() => {
+                const messageElement = document.getElementById(messageId);
+                if (messageElement) {
+                  messageElement.classList.add('ring-3', 'ring-neo-cyan', 'ring-offset-2');
+                  setTimeout(() => {
+                    messageElement.classList.remove('ring-3', 'ring-neo-cyan', 'ring-offset-2');
+                  }, 2000);
+                }
+              }, 300);
+              // Clear unread count
+              setUnreadCount(0);
+              toast.dismiss();
+            }}
+          >
+            <Bell style={{ color: '#FF6B9D', flexShrink: 0, fontSize: '18px' }} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 900, color: '#000000', textTransform: 'uppercase', fontSize: '14px' }}>{data.username}</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(0,0,0,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
+            </div>
+          </div>,
+          {
+            duration: 4000,
+            position: 'top-right',
+            style: {
+              background: '#FFFEF0',
+              border: '3px solid #000000',
+              boxShadow: '4px 4px 0px #000000',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+            },
+          }
+        );
+
+        // Vibrate on mobile
+        if (window.navigator && window.navigator.vibrate) {
+          window.navigator.vibrate(200);
         }
-      );
-
-      // Vibrate on mobile
-      if (window.navigator && window.navigator.vibrate) {
-        window.navigator.vibrate(200);
       }
     }
   }, [username, isHost, virtualizer, playMessageSound, onNewMessage, announce]);
@@ -238,8 +257,9 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     return `${hours}:${minutes}`;
   };
 
-  // CrazyGames platform can disable chat (e.g., for child safety)
-  if (isChatDisabled) return null;
+  // Hide chat on CrazyGames platform entirely (child safety, platform policy)
+  // Also hide when platform explicitly disables chat via settings
+  if (isChatDisabled || isOnCrazyGamesPlatform) return null;
 
   return (
     <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>

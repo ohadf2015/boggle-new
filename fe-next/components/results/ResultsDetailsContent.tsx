@@ -3,11 +3,10 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { Star, Users, Check } from 'lucide-react';
+import { Users, Check } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
+import MissedWords from '@/components/results/MissedWords';
 import type {
   WordObject,
   Player,
@@ -137,7 +136,6 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
   isCurrentPlayerReady,
   onMarkReady,
 }) => {
-  const { language } = useLanguage();
   return (
     <div className="space-y-3">
       {/* Game-mode specific summary */}
@@ -196,53 +194,10 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         </CollapsibleSection>
       )}
 
-      {/* Top 3 Words You Missed — filtered to exclude words the player found */}
-      {missedWords.length > 0 && (() => {
-        const playerFoundWords = new Set(
-          (currentPlayerValidWords || []).map(w => w.word.toLowerCase())
-        );
-        const top3Missed = [...missedWords]
-          .filter(w => !playerFoundWords.has(w.word.toLowerCase()))
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 3);
-
-        if (top3Missed.length === 0) return null;
-
-        return (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
-            className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard overflow-hidden"
-          >
-            <div className="flex items-center gap-2 px-3 py-2.5 bg-neo-navy-light border-b-3 border-neo-black relative overflow-hidden">
-              <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
-              <Star className="w-4 h-4 text-neo-orange relative z-10" />
-              <span className="text-xs font-black text-neo-cream/70 uppercase tracking-wider relative z-10">
-                {t('results.wordsYouMissed')}
-              </span>
-            </div>
-            <div className="p-2 space-y-1.5">
-              {top3Missed.map((wordData, i) => (
-                <motion.div
-                  key={wordData.word}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + i * 0.1 }}
-                  className="flex items-center justify-between px-3 py-2 bg-neo-navy-light/50 border-3 border-neo-black/30 shadow-hard-sm"
-                >
-                  <span className="font-black text-sm text-white uppercase tracking-wide">
-                    {language === 'he' ? applyHebrewFinalLetters(wordData.word) : wordData.word}
-                  </span>
-                  <span className="text-[10px] font-black bg-neo-orange/20 text-neo-orange px-2 py-0.5 border-2 border-neo-orange/30">
-                    +{wordData.score} {t('results.points')}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        );
-      })()}
+      {/* Top 5 Words You Missed */}
+      {missedWords.length > 0 && (
+        <MissedWords missedWords={missedWords} maxDisplay={5} />
+      )}
 
       {/* Rarest Achievement */}
       {achievements && achievements.length > 0 && (() => {
