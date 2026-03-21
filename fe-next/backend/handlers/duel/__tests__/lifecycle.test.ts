@@ -47,35 +47,64 @@ describe('Duel Lifecycle Handlers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Reset Supabase mock chains
+    // Reset Supabase mock chains for read operations
     mockSupabaseFrom.mockReturnValue({
       select: mockSupabaseSelect,
       insert: mockSupabaseInsert,
       update: mockSupabaseUpdate,
     });
+
+    // Select chain for reads (fetch)
     mockSupabaseSelect.mockReturnValue({
       eq: mockSupabaseEq,
     });
+
+    // Eq chain for reads (WHERE clause)
     mockSupabaseEq.mockReturnValue({
       single: mockSupabaseSingle,
     });
+
+    // Single for reads - will be set per test
+    mockSupabaseSingle.mockResolvedValue({
+      data: { id: 'duel-123', status: 'pending' },
+      error: null,
+    });
+
+    // Insert chain (for duel:create)
+    const mockInsertSelect = jest.fn();
+    const mockInsertSingle = jest.fn();
+    mockInsertSelect.mockReturnValue({
+      single: mockInsertSingle,
+    });
+    mockInsertSingle.mockResolvedValue({
+      data: { id: 'duel-123' },
+      error: null,
+    });
     mockSupabaseInsert.mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        single: jest.fn().mockResolvedValue({
-          data: { id: 'duel-123' },
-          error: null,
-        }),
-      }),
+      select: mockInsertSelect,
+    });
+
+    // Update chain (for duel:accept)
+    const mockUpdateEq1 = jest.fn();
+    const mockUpdateEq2 = jest.fn();
+    const mockUpdateSelect = jest.fn();
+    const mockUpdateSingle = jest.fn();
+
+    mockUpdateEq1.mockReturnValue({
+      eq: mockUpdateEq2,
+    });
+    mockUpdateEq2.mockReturnValue({
+      select: mockUpdateSelect,
+    });
+    mockUpdateSelect.mockReturnValue({
+      single: mockUpdateSingle,
+    });
+    mockUpdateSingle.mockResolvedValue({
+      data: { id: 'duel-123', status: 'active' },
+      error: null,
     });
     mockSupabaseUpdate.mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
-            data: { id: 'duel-123', status: 'active' },
-            error: null,
-          }),
-        }),
-      }),
+      eq: mockUpdateEq1,
     });
 
     // Mock socket

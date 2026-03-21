@@ -10,6 +10,7 @@ import * as gameStateManager from '../../modules/gameStateManager';
 // Mock the modules
 jest.mock('../../modules/classroomGameManager');
 jest.mock('../../modules/gameStateManager');
+// Mock rate limiter - always allow
 jest.mock('../../utils/rateLimiter', () => ({
   checkRateLimit: jest.fn(() => true),
 }));
@@ -40,7 +41,7 @@ describe('ClassroomGameHandler', () => {
       join: jest.fn(),
       handshake: {
         auth: {
-          authUserId: null,
+          authUserId: 'teacher-1',
         },
       },
     };
@@ -176,11 +177,15 @@ describe('ClassroomGameHandler', () => {
   describe('joinClassroomGame handler', () => {
     it('should add player to game and emit success', async () => {
       // GIVEN
+      const studentId = 'student-1';
       const data = {
         gameCode: 'ABC123',
-        userId: 'student-1',
+        userId: studentId,
         username: 'Alice',
       };
+
+      // Set auth to student for this test
+      mockSocket.handshake.auth.authUserId = studentId;
 
       (classroomGameManager.addPlayerToClassroomGame as jest.Mock).mockResolvedValue(undefined);
       (classroomGameManager.getClassroomGame as jest.Mock).mockResolvedValue({
@@ -216,12 +221,20 @@ describe('ClassroomGameHandler', () => {
   describe('leaveClassroomGame handler', () => {
     it('should remove player from game', async () => {
       // GIVEN
+      const studentId = 'student-1';
       const data = {
         gameCode: 'ABC123',
-        userId: 'student-1',
+        userId: studentId,
       };
 
+      // Set auth to student for this test
+      mockSocket.handshake.auth.authUserId = studentId;
+
       (classroomGameManager.removePlayerFromClassroomGame as jest.Mock).mockResolvedValue(undefined);
+      (classroomGameManager.getClassroomGame as jest.Mock).mockResolvedValue({
+        gameCode: data.gameCode,
+        players: [],
+      });
 
       registerClassroomGameHandlers(mockIo, mockSocket);
 

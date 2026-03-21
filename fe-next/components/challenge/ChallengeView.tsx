@@ -62,7 +62,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
     }
 
     loadChallenge();
-  }, [challengeCode]);
+  }, [challengeCode, t]);
 
   // Parse grid from seed
   const grid = useMemo((): LetterGrid | null => {

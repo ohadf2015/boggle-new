@@ -13,12 +13,12 @@
 
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { Bot, WordSubmissionData } from './botBehavior';
-import type { GameUser } from './botCreation';
 import {
   createBot,
   generateBotId as _generateBotId,
   generateBotName as _generateBotName,
   resetBotIdCounter,
+  type GameUser,
 } from './botCreation';
 import { startBot as _startBot, stopBot as _stopBot } from './botLifecycle';
 
