@@ -23,6 +23,8 @@ const TelegramIcon = ({ className }: { className?: string }) => (
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackShare } from '@/utils/growthTracking';
+import Avatar from '@/components/Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface ReferralData {
   referralCode: string;
@@ -35,6 +37,7 @@ interface ReferralData {
     display_name: string;
     avatar_emoji: string;
     avatar_color: string;
+    avatar_config?: CustomAvatarConfig | null;
     created_at: string;
     referred_games_played: number;
     reward_granted: boolean;
@@ -343,12 +346,7 @@ export function ReferralCard() {
                 )}
                 title={`${referral.display_name || referral.username} - ${referral.referred_games_played} games`}
               >
-                <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px]"
-                  style={{ backgroundColor: referral.avatar_color || '#FFE135' }}
-                >
-                  {referral.avatar_emoji || '🎯'}
-                </div>
+                <Avatar customAvatar={referral.avatar_config} userId={referral.id} size="sm" />
                 <span className={cn(
                   'font-medium truncate max-w-[60px]',
                   isDarkMode ? 'text-gray-300' : 'text-gray-700'

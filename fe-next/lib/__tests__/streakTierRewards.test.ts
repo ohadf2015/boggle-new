@@ -12,8 +12,8 @@ import {
 
 describe('streakTierRewards', () => {
   describe('STREAK_TIERS', () => {
-    it('should define 5 tiers in ascending order', () => {
-      expect(STREAK_TIERS).toHaveLength(5);
+    it('should define 7 tiers in ascending order', () => {
+      expect(STREAK_TIERS).toHaveLength(7);
       for (let i = 1; i < STREAK_TIERS.length; i++) {
         expect(STREAK_TIERS[i].minDays).toBeGreaterThan(STREAK_TIERS[i - 1].minDays);
       }
@@ -53,9 +53,19 @@ describe('streakTierRewards', () => {
       expect(getStreakTier(29)?.id).toBe('epic');
     });
 
-    it('should return "legendary" for 30+ day streak', () => {
+    it('should return "legendary" for 30-59 day streak', () => {
       expect(getStreakTier(30)?.id).toBe('legendary');
-      expect(getStreakTier(100)?.id).toBe('legendary');
+      expect(getStreakTier(59)?.id).toBe('legendary');
+    });
+
+    it('should return "mythic" for 60-99 day streak', () => {
+      expect(getStreakTier(60)?.id).toBe('mythic');
+      expect(getStreakTier(99)?.id).toBe('mythic');
+    });
+
+    it('should return "immortal" for 100+ day streak', () => {
+      expect(getStreakTier(100)?.id).toBe('immortal');
+      expect(getStreakTier(365)?.id).toBe('immortal');
     });
   });
 
@@ -83,6 +93,14 @@ describe('streakTierRewards', () => {
     it('should return 25 for legendary tier', () => {
       expect(getStreakCoinBonusPercent(30)).toBe(25);
     });
+
+    it('should return 35 for mythic tier', () => {
+      expect(getStreakCoinBonusPercent(60)).toBe(35);
+    });
+
+    it('should return 50 for immortal tier', () => {
+      expect(getStreakCoinBonusPercent(100)).toBe(50);
+    });
   });
 
   describe('getNextTierInfo', () => {
@@ -104,9 +122,21 @@ describe('streakTierRewards', () => {
       expect(next?.daysNeeded).toBe(2);
     });
 
-    it('should return null for max tier (30+)', () => {
-      expect(getNextTierInfo(30)).toBeNull();
+    it('should return mythic tier for streak 30', () => {
+      const next = getNextTierInfo(30);
+      expect(next?.tier.id).toBe('mythic');
+      expect(next?.daysNeeded).toBe(30);
+    });
+
+    it('should return immortal tier for streak 60', () => {
+      const next = getNextTierInfo(60);
+      expect(next?.tier.id).toBe('immortal');
+      expect(next?.daysNeeded).toBe(40);
+    });
+
+    it('should return null for max tier (100+)', () => {
       expect(getNextTierInfo(100)).toBeNull();
+      expect(getNextTierInfo(365)).toBeNull();
     });
   });
 });

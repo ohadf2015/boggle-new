@@ -112,11 +112,9 @@ describe('coinManager', () => {
       expect(result.breakdown.streak).toBe(3 * COIN_EARNING.STREAK_BONUS);
     });
 
-    it('caps streak bonus at MAX_STREAK_BONUS_DAYS', () => {
+    it('does not cap streak bonus (uncapped)', () => {
       const result = calculateDailyReward(true, 0, 100);
-      expect(result.breakdown.streak).toBe(
-        COIN_EARNING.MAX_STREAK_BONUS_DAYS * COIN_EARNING.STREAK_BONUS
-      );
+      expect(result.breakdown.streak).toBe(100 * COIN_EARNING.STREAK_BONUS);
     });
 
     it('handles 0 efficiency and 0 streak', () => {

@@ -115,6 +115,8 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
             transition={SPRING_PRESETS.snappy}
+            role="status"
+            aria-live="polite"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
@@ -123,6 +125,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300 }}
               className="text-2xl"
+              aria-hidden="true"
             >
               ✓
             </motion.span>
@@ -284,6 +287,8 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
               damping: 25,
               x: { duration: 0.4, delay: 0.1 }
             }}
+            role="alert"
+            aria-live="assertive"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ minWidth: '240px', pointerEvents: 'auto' }}
           >
@@ -292,6 +297,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               className="text-2xl"
+              aria-hidden="true"
             >
               {rejectionInfo.icon}
             </motion.span>
@@ -343,6 +349,8 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
               damping: 25,
               x: { duration: 0.4, delay: 0.1 }
             }}
+            role="alert"
+            aria-live="assertive"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
@@ -351,6 +359,7 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               className="text-2xl"
+              aria-hidden="true"
             >
               ✗
             </motion.span>
@@ -379,6 +388,8 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
             transition={SPRING_PRESETS.snappy}
+            role="status"
+            aria-live="polite"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
@@ -388,6 +399,7 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.1, type: 'spring' }}
                 className="text-2xl"
+                aria-hidden="true"
               >
                 {options.icon}
               </motion.span>
@@ -428,6 +440,8 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
               damping: 25,
               x: { duration: 0.3 }
             }}
+            role="alert"
+            aria-live="assertive"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
@@ -437,6 +451,7 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
                 className="text-2xl"
+                aria-hidden="true"
               >
                 {options.icon}
               </motion.span>
@@ -466,6 +481,8 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
             transition={SPRING_PRESETS.snappy}
+            role="status"
+            aria-live="polite"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-cyan border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
@@ -475,6 +492,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1, type: 'spring' }}
                 className="text-2xl"
+                aria-hidden="true"
               >
                 {options.icon}
               </motion.span>
@@ -514,6 +532,8 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
               damping: 25,
               x: { duration: 0.3, delay: 0.1 }
             }}
+            role="status"
+            aria-live="polite"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-yellow border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
@@ -523,6 +543,7 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
                 animate={{ opacity: 1, scale: [1, 1.2, 1] }}
                 transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
                 className="text-2xl"
+                aria-hidden="true"
               >
                 {options.icon}
               </motion.span>

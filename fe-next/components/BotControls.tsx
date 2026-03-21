@@ -7,6 +7,7 @@ import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAutoFillBots } from '../hooks/useAutoFillBots';
 import type { Socket } from 'socket.io-client';
+import Avatar from '@/components/Avatar';
 
 type BotDifficulty = 'easy' | 'medium' | 'hard';
 
@@ -49,6 +50,7 @@ interface BotControlsPlayer {
   avatar?: {
     emoji?: string;
     color?: string;
+    customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig;
   } | null;
 }
 
@@ -220,13 +222,7 @@ const BotControls: React.FC<BotControlsProps> = ({
                       config.bgTint
                     )}
                   >
-                    <span
-                      className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 border border-neo-black/30"
-                      style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
-                      aria-hidden="true"
-                    >
-                      {bot.avatar?.emoji ? bot.avatar.emoji : <Bot className="text-neo-cream text-[10px]" />}
-                    </span>
+                    <Avatar customAvatar={bot.avatar?.customAvatar} userId={bot.username} size="sm" />
                     <span className="text-xs text-neo-cream font-medium truncate max-w-[80px]">
                       {bot.username}
                     </span>

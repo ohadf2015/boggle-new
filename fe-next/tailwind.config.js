@@ -281,15 +281,15 @@ module.exports = {
         },
         // Neo-Brutalist animations
         "neo-press": {
-          "0%": { transform: "translate(0, 0)", boxShadow: "4px 4px 0px rgb(var(--neo-black))" },
-          "100%": { transform: "translate(2px, 2px)", boxShadow: "2px 2px 0px rgb(var(--neo-black))" },
+          "0%": { transform: "translate(0, 0)", boxShadow: "var(--shadow-md)" },
+          "100%": { transform: "translate(2px, 2px)", boxShadow: "var(--shadow-pressed)" },
         },
         // Enhanced button press with bounce
         "neo-press-bounce": {
-          "0%": { transform: "translate(0, 0) rotate(0deg)", boxShadow: "4px 4px 0px rgb(var(--neo-black))" },
+          "0%": { transform: "translate(0, 0) rotate(0deg)", boxShadow: "var(--shadow-md)" },
           "40%": { transform: "translate(3px, 3px) rotate(-1deg)", boxShadow: "1px 1px 0px rgb(var(--neo-black))" },
           "60%": { transform: "translate(1px, 1px) rotate(0.5deg)", boxShadow: "3px 3px 0px rgb(var(--neo-black))" },
-          "100%": { transform: "translate(0, 0) rotate(0deg)", boxShadow: "4px 4px 0px rgb(var(--neo-black))" },
+          "100%": { transform: "translate(0, 0) rotate(0deg)", boxShadow: "var(--shadow-md)" },
         },
         // Floating animation for decorative elements
         "float": {
@@ -385,8 +385,8 @@ module.exports = {
         },
         // Subtle pulse for CTA buttons
         "pulse-subtle": {
-          "0%, 100%": { transform: "scale(1)", boxShadow: "6px 6px 0px rgb(var(--neo-black))" },
-          "50%": { transform: "scale(1.02)", boxShadow: "8px 8px 0px rgb(var(--neo-black))" },
+          "0%, 100%": { transform: "scale(1)", boxShadow: "var(--shadow-lg)" },
+          "50%": { transform: "scale(1.02)", boxShadow: "var(--shadow-xl)" },
         },
         // Keyboard focus indicator glow
         "keyboard-focus": {
@@ -574,55 +574,81 @@ module.exports = {
           backgroundColor: 'var(--button-primary)',
           color: 'var(--button-primary-text)',
           border: '3px solid rgb(var(--neo-black))',
-          boxShadow: '4px 4px 0px rgb(var(--neo-black))',
+          boxShadow: 'var(--shadow-md)',
           '&:hover': {
             backgroundColor: 'var(--button-primary-hover)',
           },
           '&:active': {
             transform: 'translate(2px, 2px)',
-            boxShadow: '2px 2px 0px rgb(var(--neo-black))',
+            boxShadow: 'var(--shadow-pressed)',
           },
         },
         '.btn-token-secondary': {
           backgroundColor: 'var(--button-secondary)',
           color: 'var(--button-secondary-text)',
           border: '3px solid rgb(var(--neo-black))',
-          boxShadow: '4px 4px 0px rgb(var(--neo-black))',
+          boxShadow: 'var(--shadow-md)',
           '&:hover': {
             backgroundColor: 'var(--button-secondary-hover)',
           },
           '&:active': {
             transform: 'translate(2px, 2px)',
-            boxShadow: '2px 2px 0px rgb(var(--neo-black))',
+            boxShadow: 'var(--shadow-pressed)',
           },
         },
         '.btn-token-destructive': {
           backgroundColor: 'var(--button-destructive)',
           color: 'var(--button-destructive-text)',
           border: '3px solid rgb(var(--neo-black))',
-          boxShadow: '4px 4px 0px rgb(var(--neo-black))',
+          boxShadow: 'var(--shadow-md)',
           '&:hover': {
             backgroundColor: 'var(--button-destructive-hover)',
           },
           '&:active': {
             transform: 'translate(2px, 2px)',
-            boxShadow: '2px 2px 0px rgb(var(--neo-black))',
+            boxShadow: 'var(--shadow-pressed)',
           },
         },
         '.btn-token-success': {
           backgroundColor: 'var(--button-success)',
           color: 'var(--button-success-text)',
           border: '3px solid rgb(var(--neo-black))',
-          boxShadow: '4px 4px 0px rgb(var(--neo-black))',
+          boxShadow: 'var(--shadow-md)',
           '&:hover': {
             backgroundColor: 'var(--button-success-hover)',
           },
           '&:active': {
             transform: 'translate(2px, 2px)',
-            boxShadow: '2px 2px 0px rgb(var(--neo-black))',
+            boxShadow: 'var(--shadow-pressed)',
           },
         },
         // Semantic badge utilities with Neo-Brutalist styling
+        // RTL-aware hard shadows (auto-flip in RTL context)
+        '[dir="rtl"] .shadow-hard-sm': {
+          boxShadow: '-2px 2px 0px rgb(var(--neo-black))',
+        },
+        '[dir="rtl"] .shadow-hard, [dir="rtl"] .shadow-hard-md': {
+          boxShadow: '-4px 4px 0px rgb(var(--neo-black))',
+        },
+        '[dir="rtl"] .shadow-hard-lg': {
+          boxShadow: '-6px 6px 0px rgb(var(--neo-black))',
+        },
+        '[dir="rtl"] .shadow-hard-xl': {
+          boxShadow: '-8px 8px 0px rgb(var(--neo-black))',
+        },
+        '[dir="rtl"] .shadow-hard-pressed': {
+          boxShadow: '-2px 2px 0px rgb(var(--neo-black))',
+        },
+        // RTL colored shadows
+        '[dir="rtl"] .shadow-hard-lime': {
+          boxShadow: '-4px 4px 0px var(--neo-lime)',
+        },
+        '[dir="rtl"] .shadow-hard-pink': {
+          boxShadow: '-4px 4px 0px var(--neo-pink)',
+        },
+        '[dir="rtl"] .shadow-hard-cyan': {
+          boxShadow: '-4px 4px 0px var(--neo-cyan)',
+        },
         '.badge-token-info': {
           backgroundColor: 'var(--badge-info)',
           color: 'var(--badge-info-text)',

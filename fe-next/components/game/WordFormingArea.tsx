@@ -212,7 +212,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{
-              layout: { type: 'spring', stiffness: 500, damping: 30 },
+              layout: SPRING_PRESETS.snappy,
               opacity: { duration: 0.15 },
               scale: SPRING_PRESETS.snappy,
               x: { duration: 0.5, ease: 'easeInOut' }
@@ -237,7 +237,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   exit={{ scale: 0 }}
                   transition={{
                     default: { type: 'tween' },
-                    scale: { type: 'spring', stiffness: 500, damping: 25 },
+                    scale: SPRING_PRESETS.snappy,
                     rotate: { type: 'tween', duration: 0.4, ease: 'easeInOut' }
                   }}
                   className={cn(
@@ -250,7 +250,13 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   {visibleFeedback?.type === 'rejected' && '✗'}
                   {visibleFeedback?.type === 'duplicate' && '⟳'}
                   {visibleFeedback?.type === 'foundByOther' && (
-                    visibleFeedback?.foundByAvatar?.emoji || '👤'
+                    visibleFeedback?.foundByAvatar?.avatarImage ? (
+                      <img
+                        src={`/avatars/${visibleFeedback.foundByAvatar.avatarImage}.png`}
+                        alt={visibleFeedback.foundBy || ''}
+                        className={cn(compact ? 'w-5 h-5' : 'w-6 h-6', 'rounded-full')}
+                      />
+                    ) : (visibleFeedback?.foundByAvatar?.emoji || '👤')
                   )}
                 </motion.span>
               )}
@@ -281,7 +287,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                  transition={SPRING_PRESETS.snappy}
                   className={cn(
                     'font-bold bg-neo-black/15 rounded-md',
                     compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1',
@@ -293,15 +299,15 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               )}
             </AnimatePresence>
 
-            {/* Score badge - for accepted feedback */}
+            {/* Score badge - for accepted and foundByOther (partial credit) */}
             <AnimatePresence mode="popLayout">
-              {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.score !== undefined && (
+              {showFeedback && (visibleFeedback?.type === 'accepted' || visibleFeedback?.type === 'foundByOther') && visibleFeedback.score !== undefined && visibleFeedback.score > 0 && (
                 <motion.span
                   key="score"
                   initial={{ scale: 0, y: 8 }}
                   animate={{ scale: 1, y: 0 }}
                   exit={{ scale: 0 }}
-                  transition={{ delay: 0.1, type: 'spring', stiffness: 500 }}
+                  transition={{ delay: 0.1, ...SPRING_PRESETS.snappy }}
                   className={cn(
                     'bg-neo-cyan text-neo-black font-black rounded-neo border-2 border-neo-black',
                     compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
@@ -320,7 +326,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  transition={{ delay: 0.15, type: 'spring', stiffness: 500 }}
+                  transition={{ delay: 0.15, ...SPRING_PRESETS.snappy }}
                   className={cn(
                     'font-black rounded-neo border-2 border-neo-black uppercase',
                     compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5',
@@ -347,8 +353,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   }}
                   exit={{ scale: 0 }}
                   transition={{
-                    scale: { delay: 0.15, type: 'spring', stiffness: 600, damping: 20 },
-                    rotate: { delay: 0.15, type: 'spring', stiffness: 600, damping: 20 },
+                    scale: { delay: 0.15, ...SPRING_PRESETS.entrance },
+                    rotate: { delay: 0.15, ...SPRING_PRESETS.entrance },
                     y: { delay: 0.4, duration: 0.6, repeat: Infinity, repeatDelay: 1 }
                   }}
                   className={cn(
@@ -370,7 +376,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 500 }}
+                  transition={{ delay: 0.2, ...SPRING_PRESETS.snappy }}
                   className={cn(
                     'bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-md border-2 border-neo-black',
                     compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5'

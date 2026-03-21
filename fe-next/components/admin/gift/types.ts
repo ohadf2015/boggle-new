@@ -21,6 +21,7 @@ export interface GiftRecipient {
   display_name: string | null;
   avatar_emoji: string | null;
   avatar_color: string | null;
+  avatar_config?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   total_score?: number;
   total_games?: number;
 }

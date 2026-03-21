@@ -247,7 +247,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-[10px] font-bold text-neo-cream/70">
+          <span className="text-[10px] font-bold text-neo-cream/90">
             {totalPlayers} {t('leaderboard.racing')}
           </span>
         </div>
@@ -268,7 +268,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
       {/* Race Track Visualization */}
       <div className="px-2 py-1.5 bg-gradient-to-b from-neo-navy/5 to-transparent">
         {/* Track lanes */}
-        <div className="relative space-y-1">
+        <div className="relative space-y-1" role="list">
           {raceParticipants.map((player) => {
             const isMe = player.username === currentUsername;
             const isLeader = player.rank === 1;
@@ -279,8 +279,11 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
             return (
               <div
                 key={player.username}
+                role="listitem"
+                tabIndex={0}
                 className={cn(
                   'relative flex items-center gap-1.5 h-10 rounded-neo overflow-hidden transition-all duration-200',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1',
                   isMe
                     ? 'bg-neo-cyan/30 border-2 border-neo-cyan'
                     : 'bg-neo-black/5 border border-neo-black/20'
@@ -415,10 +418,13 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                     isCurrentUser={isMe}
                     side="bottom"
                   >
-                    <span className={cn(
-                      'text-[10px] font-bold truncate max-w-[60px]',
-                      isMe ? 'text-neo-black' : 'text-neo-black/60 cursor-pointer hover:text-neo-black hover:underline'
-                    )}>
+                    <span
+                      title={isMe ? undefined : player.username}
+                      className={cn(
+                        'text-[10px] font-bold truncate max-w-[60px]',
+                        isMe ? 'text-neo-black' : 'text-neo-black/80 cursor-pointer hover:text-neo-black hover:underline'
+                      )}
+                    >
                       {isMe ? (t('leaderboard.you')) : player.username}
                     </span>
                   </PlayerProfileTooltip>
@@ -454,7 +460,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   {t('leaderboard.leading')}
                 </span>
                 {pointsAhead > 0 && (
-                  <span className="text-[10px] font-bold text-neo-black/70">
+                  <span className="text-[10px] font-bold text-neo-black/80">
                     +{pointsAhead} {t('leaderboard.ahead')}
                   </span>
                 )}
@@ -486,7 +492,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
             transition={{ type: 'spring', stiffness: 500, damping: 25 }}
             className="flex items-center gap-1"
           >
-            <span className="text-[10px] font-bold text-neo-black/60 uppercase">
+            <span className="text-[10px] font-bold text-neo-black/80 uppercase">
               {t('common.score')}
             </span>
             <span className="text-lg font-black text-neo-black tabular-nums">

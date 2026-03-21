@@ -278,6 +278,15 @@
   --status-pending: var(--neo-yellow);
 }
 
+/* RTL Hard Shadow Offsets */
+[dir="rtl"] {
+  --shadow-sm: -2px 2px 0px rgb(var(--neo-black));
+  --shadow-md: -4px 4px 0px rgb(var(--neo-black));
+  --shadow-lg: -6px 6px 0px rgb(var(--neo-black));
+  --shadow-xl: -8px 8px 0px rgb(var(--neo-black));
+  --shadow-pressed: -2px 2px 0px rgb(var(--neo-black));
+}
+
 /* Light Mode Variables */
 .light {
   /* Inverted semantic color mappings for light mode */
@@ -2091,8 +2100,41 @@ body.crazygames-embed .game-view-container,
   100% { transform: translateX(200%) skewX(-15deg); }
 }
 
+/* Synchronized skeleton pulse — all skeletons animate in lockstep */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.skeleton-sync {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-sync {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
 /* Barber-pole stripe animation for AttackTelegraph progress bar */
 @keyframes barberpole {
   from { background-position: 0 0; }
   to { background-position: 14px 0; }
+}
+
+/* ====================================
+   GLOBAL REDUCED MOTION SAFETY NET
+   Catches any animation not individually handled.
+   Individual components can override with more specific selectors.
+   ==================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

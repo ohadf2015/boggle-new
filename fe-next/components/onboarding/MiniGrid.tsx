@@ -436,7 +436,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 12 }}
-                className="relative z-10 ml-1 w-9 h-9 sm:w-10 sm:h-10 bg-neo-lime border-3 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
+                className="relative z-10 ms-1 w-9 h-9 sm:w-10 sm:h-10 bg-neo-lime border-3 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
               >
                 <Check className="w-5 h-5 text-neo-black" strokeWidth={3} />
                 {/* Mini celebration particles */}

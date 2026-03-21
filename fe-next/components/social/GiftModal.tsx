@@ -63,6 +63,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
           <button
             data-testid="close-gift-modal"
             onClick={onClose}
+            aria-label={t('common.close')}
             className="w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo bg-neo-red text-neo-white shadow-hard-sm"
           >
             <X className="w-4 h-4" />

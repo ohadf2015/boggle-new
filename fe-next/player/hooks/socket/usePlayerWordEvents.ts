@@ -207,23 +207,28 @@ export function usePlayerWordEvents({
     resetCombo();
   }, [setFoundWords, resetCombo, customHaptic]);
 
-  const handleWordAlreadyFoundByOther = useCallback((data: { word: string; foundBy: string; foundByAvatar?: unknown }) => {
-    // Haptic feedback for word found by someone else (same as duplicate)
+  const handleWordAlreadyFoundByOther = useCallback((data: { word: string; foundBy: string; foundByAvatar?: unknown; confirmationScore?: number }) => {
+    // Haptic feedback - use info pattern (not error) since player gets partial credit
     customHaptic(GAME_HAPTICS.invalidWord);
 
-    // Remove from found words if it was pending validation
+    // Keep the word in found words with partial credit score (don't remove it)
     if (data?.word) {
-      setFoundWords(prev => prev.filter(fw => {
+      const hasPartialCredit = data.confirmationScore && data.confirmationScore > 0;
+      setFoundWords(prev => prev.map(fw => {
         if (fw.word.toLowerCase() === data.word.toLowerCase() && !fw.validated) {
-          return false;
+          return {
+            ...fw,
+            validated: true,
+            score: hasPartialCredit ? data.confirmationScore! : 0,
+            foundBy: data.foundBy,
+          };
         }
-        return true;
+        return fw;
       }));
     }
-    // Reset combo - found by someone else doesn't extend combo
-    resetCombo();
+    // Don't reset combo — player found a valid word, just not first
     logger.log('[PLAYER] Word already found by another player:', data.foundBy);
-  }, [setFoundWords, resetCombo, customHaptic]);
+  }, [setFoundWords, customHaptic]);
 
   const handleWordNotOnBoard = useCallback((data: any) => {
     // Haptic feedback for invalid word

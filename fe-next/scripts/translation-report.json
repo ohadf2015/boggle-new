@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3832,
+    "totalKeysInCode": 3874,
     "keyCountByLanguage": {
-      "en": 6553,
-      "he": 6583,
-      "sv": 6616,
-      "ja": 6603,
-      "es": 6614
+      "en": 6595,
+      "he": 6625,
+      "sv": 6658,
+      "ja": 6645,
+      "es": 6654
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -164,7 +164,10 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [
+      "brain.drills.xpEarned",
+      "brain.drills.goldEarned"
+    ]
   },
   "keysNotInEnglish": {
     "he": [

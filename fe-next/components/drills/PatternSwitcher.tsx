@@ -61,7 +61,10 @@ export default function PatternSwitcher({
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
   const [phase, setPhase] = useState<GamePhase>('ready');
-  const [requiredLength, setRequiredLength] = useState(3);
+  const [requiredLength, setRequiredLength] = useState(() => {
+    const lengths = [...new Set(availableWords.map(w => w.word.length))].sort();
+    return lengths[0] ?? 3;
+  });
   const [pattern, setPattern] = useState<number[]>([]);
   const [patternIndex, setPatternIndex] = useState(0);
   const [lives, setLives] = useState(levelConfig.lives);
@@ -81,11 +84,8 @@ export default function PatternSwitcher({
     minWordLength: 2,
   });
 
-  // Generate available lengths from words (capped at 5 letters max for fair gameplay)
-  const MAX_WORD_LENGTH = 5;
-  const availableLengths = [...new Set(availableWords.map(w => w.word.length))]
-    .filter(len => len <= MAX_WORD_LENGTH)
-    .sort();
+  // Generate available lengths from words that actually exist on the board
+  const availableLengths = [...new Set(availableWords.map(w => w.word.length))].sort();
 
   // Generate random pattern — only request lengths that have unfound words on the board
   const generatePattern = useCallback(() => {
@@ -94,7 +94,7 @@ export default function PatternSwitcher({
     const wordCountByLength: Record<number, number> = {};
     for (const w of availableWords) {
       const len = w.word.length;
-      if (len <= MAX_WORD_LENGTH && !wordsFoundSetRef.current.has(w.word.toLowerCase())) {
+      if (!wordsFoundSetRef.current.has(w.word.toLowerCase())) {
         wordCountByLength[len] = (wordCountByLength[len] || 0) + 1;
       }
     }

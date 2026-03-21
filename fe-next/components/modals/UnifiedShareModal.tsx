@@ -213,7 +213,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent noDescription className="sm:max-w-md bg-[#1a1a2e] border-4 border-neo-black rounded-neo shadow-hard-xl p-0 overflow-hidden">
+      <DialogContent noDescription className="sm:max-w-md bg-neo-navy border-4 border-neo-black rounded-neo shadow-hard-xl p-0 overflow-hidden">
         {/* Header - Context-aware */}
         <div className={cn(
           'border-b-4 border-neo-black p-4 flex items-center justify-center gap-2',

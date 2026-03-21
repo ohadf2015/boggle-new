@@ -4,6 +4,7 @@ export interface GameProfile {
   display_name: string | null;
   avatar_emoji: string | null;
   avatar_color: string | null;
+  avatar_config?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
 }
 
 // Unified game data structure

@@ -174,9 +174,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             </div>
 
             {/* "Enter as..." label */}
-            <p className="text-[11px] font-black text-neo-cyan uppercase tracking-[0.15em]">
+            <label htmlFor="create-username" className="text-[11px] font-black text-neo-cyan uppercase tracking-[0.15em]">
               {t('multiplayerFlow.createModal.yourName')}
-            </p>
+            </label>
 
             {/* Name input — centered, underline style */}
             {isAuthenticated ? (

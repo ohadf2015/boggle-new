@@ -46,8 +46,11 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
 }) {
   return (
     <div
+      role="listitem"
+      tabIndex={0}
       className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all duration-200
         hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1
         ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
     >
       {/* Rank badge */}
@@ -94,7 +97,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
             </span>
           )}
         </div>
-        <div className="text-xs font-bold text-neo-black/70 flex items-center gap-1">
+        <div className="text-xs font-bold text-neo-black/80 flex items-center gap-1">
           <Type className="w-3 h-3 text-neo-cyan" />
           <span className="tabular-nums">{player.wordCount || 0}</span>
           <span>{t('hostView.words')}</span>
@@ -112,7 +115,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
           />
         )}
         <div className="text-right bg-neo-black/5 rounded-neo px-2 py-1 min-w-[50px]">
-          <div className="text-[10px] font-bold text-neo-black/60 uppercase tracking-wide">
+          <div className="text-[10px] font-bold text-neo-black/80 uppercase tracking-wide">
             {t('common.score')}
           </div>
           <div className="text-lg font-black text-neo-black leading-none tabular-nums">{player.score}</div>
@@ -161,7 +164,7 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
 
       {/* Content */}
       <div className="overflow-y-auto flex-1 p-3 custom-scrollbar">
-        <div className="space-y-2">
+        <div className="space-y-2" role="list">
           {memoizedLeaderboard.map((player) => (
             <LeaderboardRow
               key={player.username}

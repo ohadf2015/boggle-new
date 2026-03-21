@@ -73,7 +73,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
               size="sm"
               className="bg-purple-600 hover:bg-purple-700 text-white flex-shrink-0 min-h-[40px] min-w-[44px]"
             >
-              <Plus className="h-4 w-4 sm:mr-1" />
+              <Plus className="h-4 w-4 sm:me-1" />
               <span className="hidden sm:inline">Add</span>
             </Button>
           </div>

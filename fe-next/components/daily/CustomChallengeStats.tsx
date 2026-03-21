@@ -6,6 +6,7 @@ import { Trophy, Users, Target, TrendingUp, Crown, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
+import Avatar from '@/components/Avatar';
 
 interface CustomChallengeStatsProps {
   puzzleCode: string;
@@ -31,9 +32,11 @@ interface StatsData {
 
 interface LeaderboardEntry {
   rank_position: number;
+  user_id?: string;
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  avatar_config?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   solved: boolean;
   attempts_used: number;
   efficiency_score: number;
@@ -243,12 +246,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-neo-black text-neo-white font-black text-sm">
                   {entry.rank_position}
                 </div>
-                <div
-                  className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-neo-black"
-                  style={{ backgroundColor: entry.avatar_color }}
-                >
-                  <span className="text-xl">{entry.avatar_emoji}</span>
-                </div>
+                <Avatar customAvatar={entry.avatar_config} userId={entry.user_id} size="lg" />
                 <div className="flex-1">
                   <div className="font-bold text-neo-black">{entry.display_name}</div>
                   <div className="text-xs text-slate-600">

@@ -20,8 +20,7 @@ const COINS_HISTORY_KEY = 'lexiclash_coins_history';
 export const COIN_EARNING = {
   DAILY_BASE: 25,           // Base coins for completing daily challenge
   EFFICIENCY_MULTIPLIER: 0.5, // Coins per efficiency point
-  STREAK_BONUS: 10,         // Coins per streak day
-  MAX_STREAK_BONUS_DAYS: 30, // Cap streak bonus at 30 days (was 7)
+  STREAK_BONUS: 10,         // Coins per streak day (uncapped — tiers reward long streaks)
 } as const;
 
 // Coin cost constants
@@ -53,7 +52,8 @@ export const STREAK_MILESTONES = [
   { days: 7, bonus: 100 },
   { days: 14, bonus: 200 },
   { days: 30, bonus: 500 },
-  { days: 100, bonus: 1000 },
+  { days: 60, bonus: 1000 },
+  { days: 100, bonus: 2500 },
 ] as const;
 
 // Combo milestone coin rewards
@@ -201,8 +201,7 @@ export function calculateDailyReward(
 
   const base = COIN_EARNING.DAILY_BASE;
   const efficiency = Math.floor(efficiencyScore * COIN_EARNING.EFFICIENCY_MULTIPLIER);
-  const cappedStreakDays = Math.min(streakDays, COIN_EARNING.MAX_STREAK_BONUS_DAYS);
-  const streak = cappedStreakDays * COIN_EARNING.STREAK_BONUS;
+  const streak = streakDays * COIN_EARNING.STREAK_BONUS;
 
   // Streak tier coin bonus (applied to subtotal)
   const subtotal = base + efficiency + streak;

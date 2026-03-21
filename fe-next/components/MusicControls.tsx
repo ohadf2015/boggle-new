@@ -257,7 +257,7 @@ const MusicControls: React.FC = memo(() => {
                       />
                       {/* Knob - circular, neo-brutalist with shadow */}
                       <motion.div
-                        className="absolute rounded-full bg-neo-cream border-2 border-neo-black shadow-[2px_2px_0_0_#000]"
+                        className="absolute rounded-full bg-neo-cream border-2 border-neo-black shadow-hard-sm"
                         style={{ width: '16px', height: '16px', top: '3px' }}
                         animate={{ left: hapticsEnabled ? '26px' : '2px' }}
                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}

@@ -6,7 +6,7 @@
  */
 
 export interface StreakTierConfig {
-  id: 'starting' | 'hot' | 'fire' | 'epic' | 'legendary';
+  id: 'starting' | 'hot' | 'fire' | 'epic' | 'legendary' | 'mythic' | 'immortal';
   minDays: number;
   emoji: string;
   /** Percentage bonus applied to all coin earnings (0 = no bonus) */
@@ -24,6 +24,8 @@ export const STREAK_TIERS: readonly StreakTierConfig[] = [
   { id: 'fire', minDays: 7, emoji: '🔥', coinBonusPercent: 10 },
   { id: 'epic', minDays: 14, emoji: '💎', coinBonusPercent: 15 },
   { id: 'legendary', minDays: 30, emoji: '👑', coinBonusPercent: 25 },
+  { id: 'mythic', minDays: 60, emoji: '🌟', coinBonusPercent: 35 },
+  { id: 'immortal', minDays: 100, emoji: '🏆', coinBonusPercent: 50 },
 ] as const;
 
 /**

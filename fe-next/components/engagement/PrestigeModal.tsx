@@ -97,7 +97,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent noDescription className="sm:max-w-lg bg-[#1a1a2e] border-4 border-neo-black rounded-neo shadow-hard-xl p-0 overflow-hidden">
+      <DialogContent noDescription className="sm:max-w-lg bg-neo-navy border-4 border-neo-black rounded-neo shadow-hard-xl p-0 overflow-hidden">
         {/* Header with prestige gradient */}
         <div
           className={cn(

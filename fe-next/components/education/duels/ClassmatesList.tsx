@@ -17,6 +17,7 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ChallengeButton } from './ChallengeButton';
+import Avatar from '@/components/Avatar';
 import type { ClassroomStudent } from '@/lib/supabase/education';
 
 // ============================================
@@ -81,7 +82,6 @@ export function ClassmatesList({
           : classmate.profiles;
 
         const displayName = profile?.username || 'Unknown';
-        const avatarEmoji = profile?.avatar_emoji || '👤';
         return (
           <div
             key={classmate.id}
@@ -89,7 +89,7 @@ export function ClassmatesList({
           >
             {/* Avatar + Name */}
             <div className="flex items-center gap-3">
-              <div className="text-2xl">{avatarEmoji}</div>
+              <Avatar customAvatar={profile?.avatar_config} userId={classmate.student_id} size="md" />
               <div className="font-neo-body font-bold text-neo-white">
                 {displayName}
               </div>

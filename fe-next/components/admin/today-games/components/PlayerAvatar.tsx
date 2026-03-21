@@ -1,19 +1,21 @@
 'use client';
 
-import React from 'react';
+import Avatar from '@/components/Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface PlayerAvatarProps {
   emoji?: string | null;
   color?: string | null;
+  customAvatar?: CustomAvatarConfig | null;
+  userId?: string;
 }
 
-export function PlayerAvatar({ emoji, color }: PlayerAvatarProps) {
+export function PlayerAvatar({ customAvatar, userId, emoji }: PlayerAvatarProps) {
   return (
-    <div
-      className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
-      style={{ backgroundColor: color || '#374151' }}
-    >
-      {emoji || '👤'}
-    </div>
+    <Avatar
+      customAvatar={customAvatar}
+      userId={userId || emoji || undefined}
+      size="sm"
+    />
   );
 }

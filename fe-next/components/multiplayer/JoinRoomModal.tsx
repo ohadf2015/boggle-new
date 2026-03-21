@@ -110,7 +110,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
           <div className="flex items-center gap-4 p-3 bg-neo-navy/40 rounded-neo border-2 border-neo-black shadow-hard-sm">
             <span className="text-3xl flex-shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-neo-white truncate text-lg">
+              <p className="font-bold text-neo-white truncate text-lg" title={room.roomName || room.gameCode}>
                 {room.roomName || room.gameCode}
               </p>
               <p className="text-sm text-neo-cyan flex items-center gap-1.5 font-medium">
@@ -170,7 +170,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
             size="lg"
             onClick={handleJoin}
             disabled={isJoining}
-            className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase"
+            className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           >
             {isJoining
               ? t('multiplayerFlow.joinModal.joining')

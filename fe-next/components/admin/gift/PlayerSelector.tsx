@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
 import type { GiftRecipient } from './types';
 
 interface PlayerSelectorProps {
@@ -120,12 +121,7 @@ export function PlayerSelector({
               variant="secondary"
               className="flex items-center gap-2 py-1.5 px-3 bg-neo-lime/20 border border-neo-lime/40"
             >
-              <span
-                className="w-5 h-5 rounded-full flex items-center justify-center text-xs"
-                style={{ backgroundColor: player.avatar_color || '#e5e5e5' }}
-              >
-                {player.avatar_emoji || '👤'}
-              </span>
+              <Avatar customAvatar={player.avatar_config} userId={player.id} size="sm" />
               <span className="font-medium">
                 {player.display_name || player.username}
               </span>
@@ -180,12 +176,7 @@ export function PlayerSelector({
                       isSelected && 'opacity-50 cursor-not-allowed'
                     )}
                   >
-                    <span
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-lg"
-                      style={{ backgroundColor: player.avatar_color || '#e5e5e5' }}
-                    >
-                      {player.avatar_emoji || '👤'}
-                    </span>
+                    <Avatar customAvatar={player.avatar_config} userId={player.id} size="md" />
                     <div className="flex-1 min-w-0">
                       <div className="font-medium truncate">
                         {player.display_name || player.username}

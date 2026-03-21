@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PlayerGiftDialog } from './gift/PlayerGiftDialog';
+import Avatar from '@/components/Avatar';
 
 interface Player {
   id: string;
@@ -28,6 +29,7 @@ interface Player {
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  avatar_config?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   total_games: number;
   total_score: number;
   ranked_mmr: number;
@@ -183,12 +185,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   {/* Player Info */}
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-slate-100 dark:bg-slate-800"
-                      style={{ backgroundColor: player.avatar_color }}
-                    >
-                      {player.avatar_emoji || '👤'}
-                    </div>
+                    <Avatar customAvatar={player.avatar_config} userId={player.id} size="lg" />
                     <div>
                       <h3 className="font-bold text-lg flex items-center gap-2">
                         {player.display_name || player.username}

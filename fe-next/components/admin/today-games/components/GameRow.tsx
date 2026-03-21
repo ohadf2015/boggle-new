@@ -62,8 +62,8 @@ export function GameRow({ game, t }: GameRowProps) {
             <Crown className="w-4 h-4 text-neo-lime" />
           ) : (
             <PlayerAvatar
-              emoji={game.profiles?.avatar_emoji}
-              color={game.profiles?.avatar_color}
+              customAvatar={game.profiles?.avatar_config}
+              userId={game.player_id || undefined}
             />
           )}
           <span className="text-sm text-neo-white truncate max-w-[120px]">{playerName}</span>

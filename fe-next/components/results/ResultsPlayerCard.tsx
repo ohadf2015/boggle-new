@@ -180,7 +180,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
               />
               <div className="flex flex-col gap-1 min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <h3 className="text-base sm:text-xl font-black text-neo-black truncate">
+                  <h3 className="text-base sm:text-xl font-black text-neo-black truncate" title={player.username}>
                     {player.username}
                   </h3>
                   {isCurrentPlayer && !showWinnerMessage && (

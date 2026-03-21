@@ -185,7 +185,7 @@ export default async function NLetterWordsPage({ params }: PageParams) {
                       <span className="font-bold text-sm text-neo-white group-hover:text-neo-yellow transition-colors uppercase tracking-wide">
                         {word}
                       </span>
-                      <span className="text-xs font-bold text-neo-cyan bg-slate-800 rounded px-1.5 py-0.5 ml-1 shrink-0">
+                      <span className="text-xs font-bold text-neo-cyan bg-slate-800 rounded px-1.5 py-0.5 ms-1 shrink-0">
                         {getWordScore(word)}pt
                       </span>
                     </Link>

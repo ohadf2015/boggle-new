@@ -8,11 +8,12 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
+import Avatar from '@/components/Avatar';
 
 // Types matching backend DetailedGame and DetailedGamePlayer
 interface LivePlayer {
   username: string;
-  avatar: { emoji?: string; color?: string; avatarImage?: string } | null;
+  avatar: { emoji?: string; color?: string; avatarImage?: string; customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig } | null;
   isHost: boolean;
   isBot: boolean;
   presence: 'active' | 'idle' | 'afk' | 'disconnected';
@@ -462,28 +463,12 @@ function PlayerAvatar({
   avatar: LivePlayer['avatar'];
   size?: 'sm' | 'md';
 }) {
-  const sizeClasses = size === 'sm' ? 'w-6 h-6 text-sm' : 'w-8 h-8 text-base';
-
-  if (avatar?.avatarImage) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={avatar.avatarImage}
-        alt=""
-        width={size === 'sm' ? 24 : 32}
-        height={size === 'sm' ? 24 : 32}
-        className={cn('rounded-full', sizeClasses)}
-      />
-    );
-  }
-
   return (
-    <div
-      className={cn('rounded-full flex items-center justify-center', sizeClasses)}
-      style={{ backgroundColor: avatar?.color || '#374151' }}
-    >
-      {avatar?.emoji || '👤'}
-    </div>
+    <Avatar
+      customAvatar={avatar?.customAvatar}
+      userId={avatar?.avatarImage}
+      size={size}
+    />
   );
 }
 

@@ -5,6 +5,7 @@ import { Check, X, RotateCcw } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import { cn } from '@/lib/utils';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 
 interface LetterTileWordProps {
   /** The word being formed */
@@ -15,7 +16,7 @@ interface LetterTileWordProps {
   maxTiles?: number;
 }
 
-// Feedback icon mapping
+// Feedback icon mapping (foundByOther handled separately with avatar)
 const FEEDBACK_ICONS: Record<string, { icon: React.ElementType; color: string }> = {
   accepted: { icon: Check, color: 'text-neo-lime' },
   rejected: { icon: X, color: 'text-white' },
@@ -44,6 +45,8 @@ export function LetterTileWord({
         return 'bg-neo-red border-neo-black text-white';
       case 'duplicate':
         return 'bg-pink-500 border-neo-black text-white';
+      case 'foundByOther':
+        return 'bg-neo-orange/80 border-neo-black text-white';
       default:
         return 'bg-neo-navy border-neo-black text-white';
     }
@@ -78,9 +81,7 @@ export function LetterTileWord({
             initial={{ scale: 0, y: -20 }}
             animate={{ scale: 1, y: 0 }}
             transition={{
-              type: 'spring',
-              stiffness: 500,
-              damping: 25,
+              ...SPRING_PRESETS.snappy,
               delay: index * 0.03,
             }}
             className={cn(
@@ -111,7 +112,7 @@ export function LetterTileWord({
               const { icon: Icon, color } = FEEDBACK_ICONS[feedback.type];
               return (
                 <span data-testid={`feedback-icon-${feedback.type}`}>
-                  <Icon className={cn('w-5 h-5', color)} />
+                  <Icon className={cn('w-6 h-6 sm:w-5 sm:h-5', color)} />
                 </span>
               );
             })()}
@@ -125,6 +126,24 @@ export function LetterTileWord({
               >
                 +{feedback.score}
               </AdaptiveMotion.span>
+            )}
+
+            {/* Found by other player - avatar + partial credit */}
+            {feedback.type === 'foundByOther' && (
+              <div className="flex items-center gap-1">
+                {feedback.foundByAvatar?.avatarImage ? (
+                  <img
+                    src={`/avatars/${feedback.foundByAvatar.avatarImage}.png`}
+                    alt={feedback.foundBy || ''}
+                    className="w-5 h-5 rounded-full"
+                  />
+                ) : (
+                  <span className="text-sm">{feedback.foundByAvatar?.emoji || '👤'}</span>
+                )}
+                {feedback.score != null && feedback.score > 0 && (
+                  <span className="font-black text-neo-cyan text-sm">+{feedback.score}</span>
+                )}
+              </div>
             )}
 
             {/* Message for rejected/duplicate */}

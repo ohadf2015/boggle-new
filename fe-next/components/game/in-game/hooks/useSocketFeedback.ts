@@ -108,9 +108,8 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         id: `foundByOther-${Date.now()}`,
         type: 'foundByOther',
         word: data.word,
-        message: hasPartialCredit
-          ? `+${data.confirmationScore} — ${t('playerView.foundByOther')?.replace('${player}', data.foundBy) || `Found by ${data.foundBy}`}`
-          : t('playerView.foundByOther')?.replace('${player}', data.foundBy) || `Found by ${data.foundBy}`,
+        score: hasPartialCredit ? data.confirmationScore : undefined,
+        message: t('playerView.foundByOther')?.replace('${player}', data.foundBy) || `Found by ${data.foundBy}`,
         foundBy: data.foundBy,
         foundByAvatar: data.foundByAvatar,
         timestamp: Date.now(),
