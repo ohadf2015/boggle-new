@@ -2,9 +2,9 @@ export const layoutTranslations: Record<string, any> = {
   "en": {
     "direction": "ltr",
     "seo": {
-      "title": "Free Word Game Online - Multiplayer Boggle & Word Battle",
-      "description": "Play free boggle online — no download required! LexiClash is a word game where you type in words like Boggle, competing in real-time. Race friends, build combos, and climb leaderboards. Best free alternative to Boggle, Wordle & Scrabble for groups. Play instantly in 5 languages. Great for parties, team building, and family game nights!",
-      "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle",
+      "title": "LexiClash - Free Multiplayer Word Game Online | No Download Boggle & Word Battle",
+      "description": "Play free boggle online — no download required! LexiClash is a word game where you type in words like Boggle, competing in real-time. Race friends, build combos, and climb leaderboards. Best free alternative to Boggle, Wordle, Words With Friends & Scrabble for groups. Play instantly in 5 languages. Great for parties, team building, and family game nights!",
+      "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle, words with friends multiplayer free online, words with friends alternative, online multiplayer word games, play boggle online free no download, daily word wheel, word multiplayer, multiplayer word games online free, boggle alternatives, spelling multiplayer games, word building game online multiplayer, online web based multiplayer words games, clash for words",
       "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
       "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
       "twitterTitle": "LexiClash - Free Multiplayer Word Game | Play With Friends Online",
@@ -48,22 +48,22 @@ export const layoutTranslations: Record<string, any> = {
         "ogDescription": "Access LexiClash Terms of Service and Privacy Policy."
       },
       "singleplayer": {
-        "title": "Play Boggle Online Free - No Download Word Game",
-        "description": "Play free boggle online — no download required! LexiClash single player lets you practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. Play boggle free in your browser instantly.",
-        "ogTitle": "Play Boggle Free Online - No Download",
-        "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
+        "title": "Play Boggle Online Free - No Download, No Signup Word Game",
+        "description": "Play free boggle online — no download required, no signup needed! LexiClash single player lets you practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. The best free boggle alternative you can play instantly in your browser. Like Words With Friends but solo!",
+        "ogTitle": "Play Boggle Free Online - No Download Needed",
+        "ogDescription": "Play free boggle online — no download, no signup. Practice word finding solo, challenge AI bots, and beat your high scores instantly."
       },
       "daily": {
-        "title": "Daily Word Puzzle - Free Challenge Like Wordle",
-        "description": "Play the LexiClash Daily Challenge! Same puzzle for everyone worldwide each day. Share your emoji results like Wordle. Compete globally and track your daily streaks.",
-        "ogTitle": "Daily Challenge - Same Puzzle Worldwide",
-        "ogDescription": "Daily word puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
+        "title": "Daily Word Wheel & Word Puzzle - Free Challenge Like Wordle",
+        "description": "Play the LexiClash Daily Word Wheel Challenge! Same puzzle for everyone worldwide each day. Find words from the daily wheel, share your emoji results like Wordle. Compete globally, track your daily streaks, and chase the world record!",
+        "ogTitle": "Daily Word Wheel Challenge - Same Puzzle Worldwide",
+        "ogDescription": "Daily word wheel puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
       },
       "multiplayer": {
-        "title": "Word Game With Friends - Free Online Multiplayer",
-        "description": "Join real-time word battles with friends! Host or join multiplayer rooms, compete live against opponents, and climb the leaderboard. Perfect for parties and game nights.",
-        "ogTitle": "Multiplayer Word Battle - Compete Live",
-        "ogDescription": "Real-time multiplayer word game - host rooms, invite friends, and compete in live word battles!"
+        "title": "Multiplayer Word Game With Friends - Free Online, No Download",
+        "description": "Play multiplayer word games online free with friends! Host or join real-time word battle rooms, compete live against opponents, and climb the leaderboard. Like Words With Friends meets Boggle — no download needed. Perfect for parties, game nights, and online word find with friends.",
+        "ogTitle": "Multiplayer Word Battle - Play Free With Friends",
+        "ogDescription": "Free online multiplayer word game - host rooms, invite friends, compete in live word battles. No download!"
       },
       "about": {
         "title": "About Us - Our Story & Mission",
@@ -113,9 +113,9 @@ export const layoutTranslations: Record<string, any> = {
   "he": {
     "direction": "rtl",
     "seo": {
-      "title": "משחק מילים חינם - מרובה משתתפים אונליין",
-      "description": "המשחק מילים הכי טוב בעברית - חינם לגמרי! לקסיקלאש הוא כמו בוגל וסקראבל אבל מרובה משתתפים בזמן אמת. 10,000+ מילים בעברית, ללא הורדה, שחקו ישר מהדפדפן. מושלם למסיבות, ערבי משפחה וגיבוש צוות. פותח בישראל 🇮🇱",
-      "keywords": "משחק מילים חינם בעברית, משחק מילים מרובה משתתפים, משחק כמו וורדל בעברית, בוגל אונליין בעברית, סקראבל אונליין חינם, משחק מילים לחברים, אלטרנטיבה לבוגל, משחק מילים בזמן אמת, קרב מילים אונליין, משחק מילים למסיבות, תפזורת אונליין, משחק מילים ישראלי, ערב משחקים משפחתי, משחק גיבוש צוות, משחק מילים ללא הורדה, משחק דפדפן חינם, אליאס אונליין בעברית, משחק אוצר מילים, משחק לילדים בעברית, משחק חינוכי בעברית, אתגר מילים, משחק מילים מתוחכם, משחק מילים חינם ללא הורדה, משחק מילים אונליין",
+      "title": "לקסיקלאש - משחק מילים חינם בעברית | בוגל אונליין ללא הורדה",
+      "description": "שחקו משחק מילים בעברית בחינם! ללא הורדה, ישירות בדפדפן. לקסיקלאש הוא כמו בוגל וסקראבל אבל מרובה משתתפים בזמן אמת. 10,000+ מילים בעברית, מושלם למסיבות, ערבי משפחה וגיבוש צוות. אתגר מילים יומי, משחק מילים מתוחכם ומשחקי קהילה בעברית. פותח בישראל 🇮🇱",
+      "keywords": "משחק מילים חינם בעברית, משחק מילים מרובה משתתפים, משחק כמו וורדל בעברית, בוגל אונליין בעברית, סקראבל אונליין חינם, משחק מילים לחברים, אלטרנטיבה לבוגל, משחק מילים בזמן אמת, קרב מילים אונליין, משחק מילים למסיבות, תפזורת אונליין, משחק מילים ישראלי, ערב משחקים משפחתי, משחק גיבוש צוות, משחק מילים ללא הורדה, משחק דפדפן חינם, אליאס אונליין בעברית, משחק אוצר מילים, משחק לילדים בעברית, משחק חינוכי בעברית, אתגר מילים, משחק מילים מתוחכם, משחק מילים חינם ללא הורדה, משחק מילים אונליין, גלישת מילים, משחקי קהילה בעברית, המילה היומית, מדויקת המילה היומית, מישחק מילים, משחק זיכרון מילים חינם, משחקי מילים בעברית בחינם",
       "ogTitle": "לקסיקלאש - משחק מילים כמו בוגל וסקראבל | מרובה משתתפים בעברית",
       "ogDescription": "🎮 אוהבים וורדל או סקראבל? נסו לקסיקלאש - משחק מילים מרובה משתתפים בעברית! ⚡ צרו חדר, שלחו לינק והתחרו בזמן אמת 🔥 חינם, ללא הרשמה 🇮🇱",
       "twitterTitle": "לקסיקלאש - משחק מילים כמו בוגל וסקראבל | מרובה משתתפים בעברית",
@@ -335,9 +335,9 @@ export const layoutTranslations: Record<string, any> = {
   "ja": {
     "direction": "ltr",
     "seo": {
-      "title": "無料マルチプレイヤーワードゲーム - オンラインで対戦",
-      "description": "友達とスリリングなリアルタイムワードバトルで競い合おう！LexiClashは一秒一秒が勝負の速いマルチプレイヤーワードゲーム。単語を見つけ、相手を出し抜き、リーダーボードを駆け上がれ。パーティー、ゲームナイト、友達との対戦に最適。楽しみながら語彙力も鍛えられる！5言語対応で無料プレイ - ダウンロード不要！",
-      "keywords": "マルチプレイヤーワードゲーム, リアルタイムワードゲーム, オンラインワードバトル, パーティーゲーム, 対戦ワードゲーム, 速いワードゲーム, ワードパズルマルチプレイヤー, Alias, Kahoot, ファミリーゲームナイト, チームビルディング, 単語対戦, ライブワードゲーム, ワードレース, 語彙ゲーム, 無料オンラインゲーム, ボグル 無料 ダウンロード不要, ワードホイール, 世界記録 ワードゲーム, 文字ゲーム 無料, ワードゲーム ダウンロード不要, 言葉遊び オンライン, 語彙力 ゲーム, ワードアドベンチャー ゲーム",
+      "title": "LexiClash - ワードバトル＆ワードハント | 無料マルチプレイヤーワードゲーム",
+      "description": "友達とスリリングなリアルタイムワードバトルで競い合おう！LexiClashは一秒一秒が勝負の速いマルチプレイヤーワードゲーム。ワードハントで単語を見つけ、相手を出し抜き、リーダーボードを駆け上がれ。パーティー、ゲームナイト、友達との対戦に最適。楽しみながら語彙力も鍛えられる！5言語対応で無料プレイ - ダウンロード不要！デイリーワードホイールで世界記録に挑戦！",
+      "keywords": "マルチプレイヤーワードゲーム, リアルタイムワードゲーム, オンラインワードバトル, パーティーゲーム, 対戦ワードゲーム, 速いワードゲーム, ワードパズルマルチプレイヤー, Alias, Kahoot, ファミリーゲームナイト, チームビルディング, 単語対戦, ライブワードゲーム, ワードレース, 語彙ゲーム, 無料オンラインゲーム, ボグル 無料 ダウンロード不要, ワードホイール, 世界記録 ワードゲーム, 文字ゲーム 無料, ワードゲーム ダウンロード不要, 言葉遊び オンライン, 語彙力 ゲーム, ワードアドベンチャー ゲーム, ワードバトル, ワードハント, 共通ワード・チャレンジ",
       "ogTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
       "ogDescription": "🎮 友達とスリリングなリアルタイムワードバトルで競い合おう！⚡ 素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ 🔥 パーティーやゲームナイトに最適。無料プレイ！",
       "twitterTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
@@ -387,10 +387,10 @@ export const layoutTranslations: Record<string, any> = {
         "ogDescription": "ソロで単語探しを練習し、AIボットに挑戦し、LexiClashシングルプレイヤーモードでハイスコアを更新しよう。"
       },
       "daily": {
-        "title": "デイリーワードチャレンジ - 世界記録に挑戦",
-        "description": "LexiClashデイリーチャレンジをプレイ！毎日同じパズルが世界中で出題。世界記録に挑戦しよう！ワードホイールで単語を見つけ、Wordleのように絵文字で結果をシェア。グローバルで競い合い、連続記録を追跡しよう。",
-        "ogTitle": "デイリーワードチャレンジ - 世界記録に挑戦",
-        "ogDescription": "毎日のワードパズルチャレンジ - 世界中で同じボード。世界記録に挑戦して結果をシェア！"
+        "title": "デイリーワードホイール＆ワードチャレンジ - 世界記録に挑戦",
+        "description": "LexiClashデイリーワードホイールチャレンジをプレイ！毎日同じパズルが世界中で出題。世界記録に挑戦しよう！ワードホイールで単語を見つけ、Wordleのように絵文字で結果をシェア。グローバルで競い合い、連続記録を追跡しよう。",
+        "ogTitle": "デイリーワードホイール - 世界記録に挑戦",
+        "ogDescription": "毎日のワードホイールチャレンジ - 世界中で同じボード。世界記録に挑戦して結果をシェア！"
       },
       "multiplayer": {
         "title": "マルチプレイヤーワードバトル - リアルタイム対戦",

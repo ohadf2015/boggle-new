@@ -13,19 +13,19 @@ const DATE_PUBLISHED = '2026-02-15';
 const DATE_MODIFIED = '2026-03-14';
 
 const metaTitles: Record<string, string> = {
-  en: 'Why Playing Word Games With Friends Hits Different - Social Gaming Science',
-  he: 'למה משחקי מילים עם חברים זה סיפור אחר - מדע הגיימינג החברתי',
-  sv: 'Varfor ordspel med vanner ar nagot annat - Vetenskapen om socialt spelande',
-  ja: '友達とワードゲームが別次元になる理由 - ソーシャルゲーミングの科学',
-  es: 'Por que jugar juegos de palabras con amigos es diferente - Ciencia del gaming social',
+  en: 'Online Multiplayer Word Games Free - Why Playing With Friends Is Better',
+  he: 'משחקי מילים מרובה משתתפים אונליין חינם - למה עם חברים זה טוב יותר',
+  sv: 'Multiplayer Ordspel Online Gratis - Varfor Spela Med Vanner Ar Battre',
+  ja: 'オンラインマルチプレイヤーワードゲーム無料 - 友達と遊ぶと別次元',
+  es: 'Juegos de Palabras Multijugador Online Gratis - Jugar Con Amigos Es Mejor',
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Discover the neuroscience of social word games. How multiplayer Boggle, competitive cognition, and party games boost your brain more than solo play.',
-  he: 'גלו את מדעי המוח של משחקי מילים חברתיים. איך משחקים מרובי משתתפים מגבירים את המוח יותר ממשחק יחיד.',
-  sv: 'Upptack neurovetenskapen bakom sociala ordspel. Hur multiplayer-ordspel och tavlingskognition starker hjarnan mer an solospel.',
-  ja: 'ソーシャルワードゲームの神経科学を発見。マルチプレイヤーボグルと競争認知がソロプレイ以上に脳を活性化させる仕組み。',
-  es: 'Descubre la neurociencia de los juegos de palabras sociales. Como los juegos multijugador potencian tu cerebro mas que jugar solo.',
+  en: 'Looking for online multiplayer word games free to play with friends? Discover why multiplayer word games like Boggle and Words With Friends boost your brain more than solo play. No download needed — play web-based multiplayer word games instantly.',
+  he: 'מחפשים משחקי מילים מרובה משתתפים אונליין חינם? גלו למה משחקי מילים עם חברים מגבירים את המוח יותר ממשחק יחיד. ללא הורדה.',
+  sv: 'Letar du efter multiplayer ordspel online gratis? Upptack varfor ordspel med vanner starker hjarnan mer an solospel. Ingen nedladdning kravs.',
+  ja: 'オンラインマルチプレイヤーワードゲームを無料で探していますか？友達とのワードゲームがソロプレイよりも脳を活性化する理由を発見。ダウンロード不要。',
+  es: '¿Buscas juegos de palabras multijugador online gratis? Descubre por que jugar con amigos potencia tu cerebro mas que jugar solo. Sin descargas.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

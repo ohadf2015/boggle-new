@@ -7,8 +7,8 @@ type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
   en: {
-    title: 'Play Boggle Online Free - Single Player Word Game',
-    description: 'Practice word finding against AI bots, challenge yourself with multiple difficulty levels, and sharpen your vocabulary skills. No download required.',
+    title: 'Play Boggle Online Free - No Download, No Signup Word Game',
+    description: 'Play boggle online free — no download required, no signup needed! Practice word finding against AI bots, challenge yourself with multiple difficulty levels, and sharpen your vocabulary skills. Play instantly in your browser.',
     features: [
       'Multiple difficulty levels from beginner to expert',
       'AI opponents that adapt to your skill level',
@@ -17,9 +17,11 @@ const seoContent: Record<string, { title: string; description: string; features:
       'Instant play in your browser - no app download needed',
     ],
     faq: [
+      { question: 'Can I play boggle online free with no download?', answer: 'Yes! LexiClash lets you play boggle online completely free with no download and no signup. Just visit lexiclash.live and start playing instantly in your browser on any device.' },
       { question: 'How does single player mode work?', answer: 'You play on a randomized letter grid and find as many words as possible within the time limit. Words must be formed by connecting adjacent letters. Longer words earn more points.' },
       { question: 'Can I play offline?', answer: 'Yes, single player mode works offline once the page has loaded. Your scores are saved locally and sync when you reconnect.' },
       { question: 'What grid sizes are available?', answer: 'Choose from 4x4 (classic), 5x5 (challenge), or 6x6 (expert) grids. Larger grids offer more word possibilities and higher potential scores.' },
+      { question: 'Is LexiClash a good alternative to boggle and Words With Friends?', answer: 'LexiClash combines the best of both! Like Boggle, you find words on a letter grid. Like Words With Friends, you can play with friends online. But LexiClash is real-time — everyone competes simultaneously. Free to play, no download needed!' },
     ],
   },
   he: {

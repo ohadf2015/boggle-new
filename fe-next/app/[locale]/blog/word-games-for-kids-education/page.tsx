@@ -13,11 +13,11 @@ const DATE_PUBLISHED = '2026-01-27';
 const DATE_MODIFIED = '2026-03-12';
 
 const metaTitles: Record<string, string> = {
-  en: 'Word Games for Education - Why Teachers Need Them in 2026',
-  he: 'משחקי מילים בחינוך - למה מורים צריכים אותם ב-2026',
-  sv: 'Ordspel för Utbildning - Varför Lärare Behöver Dem 2026',
-  ja: '教育のためのワードゲーム - 2026年に教師が必要とする理由',
-  es: 'Juegos de Palabras para Educación - Por Qué los Profesores los Necesitan en 2026',
+  en: 'Free Word Games for Kids & Education - Spelling & Vocabulary Building',
+  he: 'משחקי מילים חינוכיים לילדים בעברית - איות ואוצר מילים',
+  sv: 'Gratis Ordspel för Barn & Utbildning - Stavning & Ordförråd',
+  ja: '子供向け無料ワードゲーム＆教育 - スペルと語彙',
+  es: 'Juegos de Palabras Gratis para Niños - Ortografía y Vocabulario',
 };
 
 const metaDescriptions: Record<string, string> = {

@@ -13,11 +13,11 @@ const DATE_PUBLISHED = '2025-10-05';
 const DATE_MODIFIED = '2026-02-28';
 
 const metaTitles: Record<string, string> = {
-  en: 'Word Games & Mental Health - How They Help With Anxiety',
-  he: 'משחקי מילים ובריאות הנפש - איך הם עוזרים עם חרדה',
-  sv: 'Ordspel och Mental Hälsa - Hur De Hjälper Mot Ångest',
-  ja: 'ワードゲームとメンタルヘルス - 不安解消への効果',
-  es: 'Juegos de Palabras y Salud Mental - Cómo Ayudan Con la Ansiedad',
+  en: 'Benefits of Playing Word Games for Mental Health & Anxiety Relief',
+  he: 'יתרונות של משחקי מילים לבריאות הנפש - הפחתת חרדה ולחץ',
+  sv: 'Fördelar med Ordspel för Mental Hälsa & Ångestlindring',
+  ja: 'ワードゲームのメンタルヘルスへの効果 - 不安解消とストレス軽減',
+  es: 'Beneficios de Jugar Juegos de Palabras para la Salud Mental',
 };
 
 const metaDescriptions: Record<string, string> = {

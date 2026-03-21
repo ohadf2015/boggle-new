@@ -13,17 +13,19 @@ const DATE_PUBLISHED = '2025-12-01';
 const DATE_MODIFIED = '2026-03-15';
 
 const metaTitles: Record<string, string> = {
-  en: 'Best Boggle Alternatives 2026 — I Tried Them All So You Don\'t Have To',
-  he: 'חלופות הבוגל הטובות ביותר 2026 — ניסיתי את כולן בשבילכם',
-  sv: 'Bästa Boggle-alternativen 2026 — Jag testade alla så du slipper',
-  ja: '2026年ベストBoggle代替ゲーム — 全部試してみた',
+  en: 'Best Boggle Alternatives 2026 - Free Online Games Like Boggle (No Download)',
+  he: 'חלופות הבוגל הטובות ביותר 2026 - משחקים כמו בוגל אונליין חינם',
+  sv: 'Bästa Boggle-Alternativen 2026 - Gratis Onlinespel Som Boggle',
+  ja: '2026年ベストBoggle代替ゲーム - 無料オンラインワードゲーム比較',
+  es: 'Mejores Alternativas a Boggle 2026 - Juegos Gratis Online Sin Descargar',
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Honest reviews of every Boggle alternative worth playing in 2026. Wordle, Words With Friends, Wordscapes, LexiClash and more — with real pros and cons.',
-  he: 'ביקורות כנות על כל חלופת בוגל ששווה לשחק ב-2026. וורדל, מילים עם חברים, LexiClash ועוד — יתרונות וחסרונות אמיתיים.',
-  sv: 'Ärliga recensioner av varje Boggle-alternativ värt att spela 2026. Wordle, Words With Friends, Wordscapes, LexiClash och fler.',
-  ja: '2026年にプレイする価値のあるBoggle代替ゲームの正直なレビュー。Wordle、Words With Friends、LexiClashなど。',
+  en: 'Looking for games like Boggle online free? Honest reviews of every Boggle alternative in 2026: Wordle, Words With Friends, Wordscapes, LexiClash — compared with real pros and cons. Play free, no download needed.',
+  he: 'מחפשים משחקים כמו בוגל אונליין חינם? ביקורות כנות על כל חלופת בוגל ב-2026 — וורדל, מילים עם חברים, LexiClash ועוד. ללא הורדה.',
+  sv: 'Letar du efter spel som Boggle online gratis? Ärliga recensioner av alla Boggle-alternativ 2026. Wordle, Words With Friends, LexiClash och fler — utan nedladdning.',
+  ja: 'Boggleのような無料オンラインゲームを探していますか？2026年のBoggle代替ゲームを本音レビュー。Wordle、Words With Friends、LexiClashなど — ダウンロード不要。',
+  es: '¿Buscas juegos como Boggle online gratis? Reseñas honestas de todas las alternativas a Boggle en 2026. Wordle, Words With Friends, LexiClash y más — sin descargar.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

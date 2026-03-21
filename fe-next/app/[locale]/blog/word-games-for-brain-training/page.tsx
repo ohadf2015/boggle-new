@@ -13,19 +13,19 @@ const DATE_PUBLISHED = '2025-12-20';
 const DATE_MODIFIED = '2026-03-10';
 
 const metaTitles: Record<string, string> = {
-  en: 'Word Games for Brain Training - What the Research Actually Says',
-  he: 'משחקי מילים לאימון המוח - מה המחקר באמת אומר',
-  sv: 'Ordspel för Hjärnträning - Vad Forskningen Faktiskt Säger',
-  ja: '脳トレとしてのワードゲーム - 研究が本当に示していること',
-  es: 'Juegos de Palabras para Entrenar el Cerebro - Lo Que Dice la Investigación',
+  en: 'Benefits of Playing Word Making Games for Brain Training (Research)',
+  he: 'יתרונות של משחקי מילים לאימון המוח - מה המחקר אומר',
+  sv: 'Fördelar med Ordspel för Hjärnträning - Vad Forskningen Säger',
+  ja: 'ワードゲームで脳トレ - プレイするメリットを研究が証明',
+  es: 'Beneficios de Jugar Juegos de Palabras para el Cerebro (Investigación)',
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'What 19,000-person studies actually say about word games and brain health. Evidence-based analysis of cognitive reserve, the Lumosity settlement, and practical recommendations.',
-  he: 'מה מחקרים על 19,000 משתתפים באמת אומרים על משחקי מילים ובריאות המוח. ניתוח מבוסס ראיות של רזרבה קוגניטיבית והמלצות מעשיות.',
-  sv: 'Vad studier med 19 000 deltagare faktiskt säger om ordspel och hjärnhälsa. Evidensbaserad analys av kognitiv reserv och praktiska rekommendationer.',
-  ja: '19,000人規模の研究がワードゲームと脳の健康について本当に言っていること。認知予備能のエビデンスに基づく分析と実践的な推奨。',
-  es: 'Lo que estudios con 19.000 participantes realmente dicen sobre juegos de palabras y salud cerebral. Análisis basado en evidencia y recomendaciones prácticas.',
+  en: 'What are the benefits of playing word making games? A 19,000-person study shows word games beat brain training apps for cognitive health. Evidence-based analysis of why free word games like Boggle and Wordle are better than Lumosity for brain training.',
+  he: 'מה היתרונות של משחקי מילים לאימון המוח? מחקר על 19,000 משתתפים מראה שמשחקי מילים מנצחים אפליקציות אימון מוח. ניתוח מבוסס ראיות.',
+  sv: 'Vilka är fördelarna med att spela ordspel? En studie med 19 000 deltagare visar att ordspel slår hjärnträningsappar. Evidensbaserad analys.',
+  ja: 'ワードゲームのプレイにどんなメリットがあるか？19,000人の研究がワードゲームは脳トレアプリよりも認知機能に効果的と証明。',
+  es: '¿Cuáles son los beneficios de jugar juegos de palabras? Un estudio con 19.000 participantes muestra que superan a las apps de entrenamiento cerebral.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

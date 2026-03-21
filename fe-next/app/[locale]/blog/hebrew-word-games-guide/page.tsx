@@ -13,19 +13,19 @@ const DATE_PUBLISHED = '2025-10-24';
 const DATE_MODIFIED = '2026-03-08';
 
 const metaTitles: Record<string, string> = {
-  en: 'Hebrew Word Games Guide - Playing Right-to-Left',
-  he: 'מדריך משחקי מילים בעברית - שורשים, RTL וכל מה שביניהם',
-  sv: 'Hebreiska Ordspel Guide - Spela Höger till Vänster',
+  en: 'Hebrew Word Games Guide - Free Online משחק מילים בעברית',
+  he: 'משחק מילים בעברית חינם - מדריך מלא | בוגל וסקראבל אונליין',
+  sv: 'Hebreiska Ordspel Guide - Spela Höger till Vänster Online',
   ja: 'ヘブライ語ワードゲームガイド - 右から左へのプレイ',
   es: 'Guía de Juegos de Palabras en Hebreo - Jugando de Derecha a Izquierda',
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Discover the unique challenges of Hebrew word games: the shoresh root system, vowel-less reading, RTL design, and Israeli word game culture. Tips for learners included.',
-  he: 'גלו את האתגרים הייחודיים של משחקי מילים בעברית: מערכת השורשים, קריאה ללא ניקוד, עיצוב RTL ותרבות משחקי מילים ישראלית.',
-  sv: 'Upptäck de unika utmaningarna med hebreiska ordspel: rotsystemet, vokallös läsning, RTL-design och israelisk ordspelskultur.',
+  en: 'The complete guide to Hebrew word games online free. Discover the shoresh root system, vowel-less reading, RTL word finding, and Israeli word game culture. Play משחק מילים בעברית חינם — no download needed.',
+  he: 'המדריך המלא למשחקי מילים בעברית חינם! גלו את אתגרי השורשים, קריאה ללא ניקוד, ותרבות משחקי מילים ישראלית. משחק מילים מתוחכם, משחקי קהילה בעברית, אתגר מילים יומי. ללא הורדה.',
+  sv: 'Upptäck de unika utmaningarna med hebreiska ordspel: rotsystemet, vokallös läsning, RTL-design och israelisk ordspelskultur. Gratis online.',
   ja: 'ヘブライ語ワードゲームのユニークな挑戦を発見：ショレシュルートシステム、母音なしの読み、RTLデザイン、イスラエルのワードゲーム文化。',
-  es: 'Descubre los desafíos únicos de los juegos de palabras en hebreo: el sistema de raíces, lectura sin vocales, diseño RTL y cultura israelí de juegos de palabras.',
+  es: 'Descubre los desafíos únicos de los juegos de palabras en hebreo: el sistema de raíces, lectura sin vocales, diseño RTL y cultura israelí.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

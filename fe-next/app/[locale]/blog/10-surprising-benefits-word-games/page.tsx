@@ -13,19 +13,19 @@ const DATE_PUBLISHED = '2025-06-15';
 const DATE_MODIFIED = '2026-02-20';
 
 const metaTitles: Record<string, string> = {
-  en: '10 Benefits of Word Games - Science-Backed Brain Benefits',
-  he: '10 יתרונות מדעיים של משחקי מילים לבריאות המוח',
-  sv: '10 Vetenskapliga Fördelar med Ordspel för Hjärnan',
-  ja: 'ワードゲームの科学的に証明された10の脳への効果',
-  es: '10 Beneficios Científicos de los Juegos de Palabras',
+  en: '10 Benefits of Playing Word Games Daily - Science-Backed Results',
+  he: '10 יתרונות מוכחים של משחקי מילים - למה שווה לשחק כל יום',
+  sv: '10 Fördelar med Att Spela Ordspel Dagligen - Vetenskapligt Bevisat',
+  ja: 'ワードゲームを毎日プレイする10の科学的メリット',
+  es: '10 Beneficios de Jugar Juegos de Palabras Cada Día',
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Discover 10 science-backed benefits of playing word games daily. From sharper memory to reduced dementia risk, learn why experts recommend free word games for brain health.',
-  he: 'גלו 10 יתרונות מוכחים מדעית של משחקי מילים. משיפור הזיכרון ועד הפחתת סיכון לדמנציה - למדו למה מומחים ממליצים על משחקי מילים.',
-  sv: 'Upptäck 10 vetenskapligt bevisade fördelar med att spela ordspel dagligen. Från skarpare minne till minskad demensrisk.',
-  ja: 'ワードゲームの科学的に証明された10の効果を発見。記憶力向上から認知症リスク低減まで、専門家が推奨する理由を解説。',
-  es: 'Descubre 10 beneficios científicos de jugar juegos de palabras. Desde mejor memoria hasta menor riesgo de demencia.',
+  en: 'Are there benefits to playing word games? Yes — 10 science-backed benefits of playing word games daily. From sharper memory to vocabulary building, learn why free word making games like Boggle and Wordle boost brain health. 19,000-person study results inside.',
+  he: 'האם יש יתרונות למשחקי מילים? כן — 10 יתרונות מוכחים מדעית. משיפור הזיכרון ועד בניית אוצר מילים, למדו למה שווה לשחק משחקי מילים בעברית בחינם כל יום.',
+  sv: 'Finns det fördelar med att spela ordspel? Ja — 10 vetenskapligt bevisade fördelar med dagligt spelande. Från skarpare minne till ordförrådsbyggande.',
+  ja: 'ワードゲームをプレイするメリットは？科学的に証明された10の効果。記憶力向上から語彙構築まで、毎日の無料ワードゲームが脳の健康を高める理由。',
+  es: '¿Hay beneficios de jugar juegos de palabras? Sí — 10 beneficios científicos de jugar diariamente. Desde mejor memoria hasta construcción de vocabulario.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

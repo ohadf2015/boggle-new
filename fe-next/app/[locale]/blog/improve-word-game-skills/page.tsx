@@ -13,19 +13,19 @@ const DATE_PUBLISHED = '2025-09-15';
 const DATE_MODIFIED = '2026-03-10';
 
 const metaTitles: Record<string, string> = {
-  en: 'Improve Word Game Skills - Free Boggle & Word Puzzle Tips',
-  he: 'שיפור כישורי משחקי מילים - טיפים חינם',
-  sv: 'Förbättra Dina Ordspelsfärdigheter - Gratis Tips',
-  ja: 'ワードゲームスキルを向上させる - 無料攻略ガイド',
-  es: 'Mejora Tus Habilidades en Juegos de Palabras - Tips Gratis',
+  en: 'How to Find Words in Word Hunt & Boggle - Best Tips & Strategies',
+  he: 'איך למצוא מילים מהר יותר - טיפים לבוגל ומשחקי מילים',
+  sv: 'Hur Man Hittar Ord Snabbare - Bästa Tips för Ordspel',
+  ja: 'ワードハントで単語を見つけるコツ - ボグル攻略法',
+  es: 'Cómo Encontrar Palabras Más Rápido - Tips para Boggle y Word Hunt',
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Proven strategies to improve your word game performance. Learn Boggle strategies, pattern recognition, vocabulary building, and free tips from experienced players.',
-  he: 'אסטרטגיות מוכחות לשיפור הביצועים שלכם במשחקי מילים. למדו זיהוי תבניות, בניית אוצר מילים וטיפים מנוסים.',
-  sv: 'Beprövade strategier för att förbättra din ordspelsprestanda. Lär dig mönsterigenkänning, ordförrådsbyggande och tips.',
-  ja: 'ワードゲームのパフォーマンスを向上させる実証済み戦略。パターン認識、語彙構築、経験豊富なプレイヤーからの無料ヒント。',
-  es: 'Estrategias probadas para mejorar tu rendimiento en juegos de palabras. Aprende reconocimiento de patrones y vocabulario.',
+  en: 'What is the best way to find words in word hunt? Proven strategies to improve your word game skills. Learn the chunking technique, pattern recognition, and vocabulary building tips used by competitive Boggle players. Free tips from experienced players.',
+  he: 'מה הדרך הכי טובה למצוא מילים? אסטרטגיות מוכחות לשיפור מיומנויות במשחקי מילים. למדו טכניקת chunking, זיהוי תבניות וטיפים משחקנים מנוסים.',
+  sv: 'Vad är det bästa sättet att hitta ord? Beprövade strategier för att förbättra dina ordspelsfärdigheter. Lär dig chunking-tekniken och mönsterigenkänning.',
+  ja: 'ワードハントで単語を見つける最善の方法は？ワードゲームスキルを向上させる実証済み戦略。チャンキング技法やパターン認識を学ぶ。',
+  es: '¿Cuál es la mejor manera de encontrar palabras? Estrategias probadas para mejorar tus habilidades en juegos de palabras. Técnica de chunking y reconocimiento de patrones.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

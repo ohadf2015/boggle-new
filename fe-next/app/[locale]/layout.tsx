@@ -501,6 +501,47 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         text: 'LexiClash works on any device with a modern web browser! Play on desktop computers, laptops, tablets, and smartphones. No app download needed - just visit lexiclash.live. The game is optimized for touch screens and supports both portrait and landscape orientations on mobile.',
                     },
                 },
+                // High-value search queries with zero clicks — target exact searched phrases
+                {
+                    '@type': 'Question',
+                    name: 'Can I play boggle online free with no download?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Yes! LexiClash lets you play boggle online completely free with no download required. Just visit lexiclash.live and start playing instantly in your browser. No app installation, no signup needed. Works on desktop, tablet, and mobile. Play solo against AI bots or challenge friends in real-time multiplayer!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'Is there a free alternative to Words With Friends I can play online?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is a great free alternative to Words With Friends that you can play online instantly! Unlike Words With Friends which is turn-based, LexiClash features real-time multiplayer word battles where everyone plays simultaneously. No download needed — just share a room link with friends and compete live. It supports English, Hebrew, Swedish, Japanese, and Spanish.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What is the Daily Word Wheel game?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'The Daily Word Wheel is LexiClash\'s daily challenge mode where everyone worldwide plays the same word puzzle each day. Find as many words as you can from the letter wheel, compete for the world record, and share your emoji results — just like Wordle! Track your daily streak and compare scores with friends. New puzzle every day at midnight UTC.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What are the benefits of playing word games?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Playing word games like LexiClash offers many benefits: improved vocabulary and spelling, enhanced cognitive function and memory, better pattern recognition, stress relief, and social connection through multiplayer gameplay. Research shows regular word game play can help maintain mental sharpness and even delay cognitive decline. LexiClash adds competitive excitement with real-time multiplayer battles!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What is a good online multiplayer word game to play with friends?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is one of the best online multiplayer word games for playing with friends. Create a room, share the link, and up to 20+ players can compete in real-time word battles. It\'s free, requires no download, and works in any browser. Think of it as online Boggle meets Words With Friends — but everyone plays at the same time!',
+                    },
+                },
                 // Hebrew-specific FAQ questions for Israeli SEO
                 {
                     '@type': 'Question',

@@ -4,7 +4,7 @@ export default function sitemap() {
 
   // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
   // Update these dates when actual content changes are deployed.
-  const LAST_DEPLOYED = '2026-03-16T00:00:00.000Z';
+  const LAST_DEPLOYED = '2026-03-21T00:00:00.000Z';
   const BLOG_UPDATED = '2026-03-16T00:00:00.000Z';
   const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
   const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
@@ -80,6 +80,7 @@ export default function sitemap() {
   addForAllLocales('/blast', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
   addForAllLocales('/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
   addForAllLocales('/daily/word-hunt', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
+  addForAllLocales('/daily/word-wheel', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 });
 
   // ─── Brain training ───
   addForAllLocales('/brain', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
@@ -156,6 +157,7 @@ export default function sitemap() {
     { locale: 'sv', path: '/swedish-multiplayer-word-game', img: 'sv' },
     { locale: 'ja', path: '/japanese-word-game', img: 'ja' },
     { locale: 'en', path: '/multiplayer-word-game-online', img: 'en' },
+    { locale: 'en', path: '/play-boggle-online-free', img: 'en' },
     { locale: 'es', path: '/juego-de-palabras-multijugador', img: 'es' },
   ];
   seoLandings.forEach(({ locale, path, img }) => {
