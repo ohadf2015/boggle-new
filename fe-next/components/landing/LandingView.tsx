@@ -74,7 +74,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, unlockAudio, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, profile, user } = useAuth();
+  const { isAuthenticated, isAdmin, profile } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
 
@@ -125,14 +125,29 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [, setIsAvatarBuilderOpen] = useState(false);
 
-  // Check if user is a first-timer who should see the FTUE flow
+  // Check if user is a first-timer who should see the FTUE flow.
+  // Skip for authenticated users with games played — they're returning players
+  // who may have cleared localStorage or are on a new device.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const { hasCompletedOnboarding } = require('@/utils/onboardingStorage');
-    if (!hasCompletedOnboarding()) {
+    const { hasCompletedOnboarding, markOnboardingComplete } = require('@/utils/onboardingStorage');
+    if (hasCompletedOnboarding()) return;
+
+    // Authenticated user with games played = returning player, skip FTUE
+    if (isAuthenticated && profile?.total_games && profile.total_games > 0) {
+      markOnboardingComplete({
+        avatarId: profile.avatar_image || 'default',
+        displayName: profile.display_name || profile.username || 'Player',
+        selectedMode: null,
+      });
+      return;
+    }
+
+    // Only show FTUE for truly new, unauthenticated users
+    if (!isAuthenticated) {
       setShowFTUE(true);
     }
-  }, []);
+  }, [isAuthenticated, profile]);
 
   // Check for room parameter and redirect to multiplayer page
   useEffect(() => {
@@ -263,12 +278,12 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           </div>
         )}
 
-        <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '4rem' }}>
-          {hydrated && <WotdTeaser />}
-        </div>
-        {/* Retention features — gated to test account only */}
-        {hydrated && user?.email === 'ohadf2015@gmail.com' && (
+        {/* Retention features — admin only */}
+        {hydrated && isAdmin && (
           <>
+            <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '4rem' }}>
+              <WotdTeaser />
+            </div>
             <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '6rem' }}>
               <DailyMissionsHub />
             </div>
